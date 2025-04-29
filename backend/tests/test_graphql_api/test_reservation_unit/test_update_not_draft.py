@@ -1,26 +1,16 @@
 from __future__ import annotations
 
-from decimal import Decimal
-
 import pytest
 from freezegun import freeze_time
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import (
-    AccessType,
-    PaymentType,
-    ReservationStartInterval,
-    ReservationStateChoice,
-    TermsOfUseTypeChoices,
-)
+from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, ReservationStateChoice, TermsOfUseTypeChoices
 from utils.date_utils import local_date, local_datetime, next_hour
 
 from tests.factories import (
     ReservationFactory,
     ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
-    ReservationUnitPaymentTypeFactory,
-    TaxPercentageFactory,
     TermsOfUseFactory,
 )
 
@@ -241,27 +231,6 @@ def test_reservation_unit__update__pricing_terms(graphql):
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.pricing_terms == pricing_terms
-
-
-def test_reservation_unit__update__payment_types(graphql):
-    TaxPercentageFactory.create(value=Decimal("10.0"))
-    TaxPercentageFactory.create(value=Decimal("0.0"))
-
-    ReservationUnitPaymentTypeFactory.create(code=PaymentType.INVOICE.value)
-    ReservationUnitPaymentTypeFactory.create(code=PaymentType.ON_SITE.value)
-
-    graphql.login_with_superuser()
-
-    payment_types = [PaymentType.INVOICE.value, PaymentType.ON_SITE.value]
-
-    reservation_unit = ReservationUnitFactory.create(is_draft=False)
-    data = get_non_draft_update_input_data(reservation_unit, paymentTypes=payment_types)
-
-    response = graphql(UPDATE_MUTATION, input_data=data)
-    assert response.has_errors is False, response
-
-    reservation_unit.refresh_from_db()
-    assert sorted(reservation_unit.payment_types.values_list("code", flat=True)) == payment_types
 
 
 def test_reservation_unit__update__instructions(graphql):

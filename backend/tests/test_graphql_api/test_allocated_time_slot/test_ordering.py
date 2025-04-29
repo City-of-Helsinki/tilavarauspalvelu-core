@@ -3,9 +3,9 @@ from __future__ import annotations
 import datetime
 
 import pytest
-from django.utils.timezone import get_default_timezone
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, ApplicationStatusChoice, Weekday
+from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory, ApplicationSectionFactory
 
@@ -200,23 +200,23 @@ def test_allocated_time_slot__order__by_allocated_time_of_week(graphql):
     # - There are four allocated time slots
     allocation_1 = AllocatedTimeSlotFactory.create(
         day_of_the_week=Weekday.MONDAY,
-        begin_time=datetime.time(12, 0, tzinfo=get_default_timezone()),
-        end_time=datetime.time(14, 0, tzinfo=get_default_timezone()),
+        begin_time=datetime.time(12, 0, tzinfo=DEFAULT_TIMEZONE),
+        end_time=datetime.time(14, 0, tzinfo=DEFAULT_TIMEZONE),
     )
     allocation_2 = AllocatedTimeSlotFactory.create(
         day_of_the_week=Weekday.TUESDAY,
-        begin_time=datetime.time(12, 0, tzinfo=get_default_timezone()),
-        end_time=datetime.time(14, 0, tzinfo=get_default_timezone()),
+        begin_time=datetime.time(12, 0, tzinfo=DEFAULT_TIMEZONE),
+        end_time=datetime.time(14, 0, tzinfo=DEFAULT_TIMEZONE),
     )
     allocation_3 = AllocatedTimeSlotFactory.create(
         day_of_the_week=Weekday.TUESDAY,
-        begin_time=datetime.time(13, 0, tzinfo=get_default_timezone()),
-        end_time=datetime.time(14, 0, tzinfo=get_default_timezone()),
+        begin_time=datetime.time(13, 0, tzinfo=DEFAULT_TIMEZONE),
+        end_time=datetime.time(14, 0, tzinfo=DEFAULT_TIMEZONE),
     )
     allocation_4 = AllocatedTimeSlotFactory.create(
         day_of_the_week=Weekday.TUESDAY,
-        begin_time=datetime.time(13, 0, tzinfo=get_default_timezone()),
-        end_time=datetime.time(15, 0, tzinfo=get_default_timezone()),
+        begin_time=datetime.time(13, 0, tzinfo=DEFAULT_TIMEZONE),
+        end_time=datetime.time(15, 0, tzinfo=DEFAULT_TIMEZONE),
     )
     graphql.login_with_superuser()
 

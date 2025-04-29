@@ -5,13 +5,12 @@ import itertools
 from decimal import Decimal
 
 import pytest
-from django.utils import timezone
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from tilavarauspalvelu.enums import AuthenticationType, ReservationKind, ReservationStartInterval
+from tilavarauspalvelu.enums import AuthenticationType, PaymentType, ReservationKind, ReservationStartInterval
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.services.export import ReservationUnitExporter
-from utils.date_utils import local_datetime_string, local_timedelta_string
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime_string, local_timedelta_string
 
 from tests.factories import ReservationUnitFactory
 
@@ -28,8 +27,8 @@ def test_reservation_unit_export_multiple():
     # - There are two "complete"/"full" reservation units in the system
     reservation_units = ReservationUnitFactory.create_batch(
         2,
-        reservation_begins=datetime.datetime(2022, 1, 1, tzinfo=timezone.get_default_timezone()),
-        reservation_ends=datetime.datetime(2022, 2, 1, tzinfo=timezone.get_default_timezone()),
+        reservation_begins=datetime.datetime(2022, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+        reservation_ends=datetime.datetime(2022, 2, 1, tzinfo=DEFAULT_TIMEZONE),
         spaces__name="Space",
         resources__name="Resource",
         qualifiers__name="Qualifier",
@@ -41,9 +40,9 @@ def test_reservation_unit_export_multiple():
         pricing_terms__name="Pricing terms",
         cancellation_rule__name="Cancellation rule",
         metadata_set__name="Metadata set",
-        payment_types__code="Payment type",
         reservation_unit_type__name="Normal",
         pricings__highest_price=Decimal(20),
+        pricings__payment_type=PaymentType.ONLINE,
     )
 
     # when:
@@ -105,7 +104,7 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.require_reservation_handling
     assert row_2[next(index)] == AuthenticationType(reservation_unit_1.authentication).label
     assert row_2[next(index)] == ReservationKind(reservation_unit_1.reservation_kind).label
-    assert row_2[next(index)] == reservation_unit_1.payment_types.first().code
+    assert row_2[next(index)] == PaymentType(reservation_unit_1.pricings.first().payment_type).label
     assert row_2[next(index)] == reservation_unit_1.can_apply_free_of_charge
     assert row_2[next(index)] == reservation_unit_1.reservation_pending_instructions_fi
     assert row_2[next(index)] == reservation_unit_1.reservation_pending_instructions_sv
@@ -187,10 +186,6 @@ def test_reservation_unit_export_multiple():
                 missing=Missing(deleted=["metadata_set__name"]),
                 column_value_mapping={"Reservation metadata set": ""},
             ),
-            "Missing Payment type": MissingParams(
-                missing=Missing(deleted=["payment_types__code"]),
-                column_value_mapping={"Payment type": ""},
-            ),
             "Missing Pricing": MissingParams(
                 missing=Missing(deleted=["pricings__highest_price"]),
                 column_value_mapping={
@@ -226,8 +221,8 @@ def test_reservation_unit_export_missing_relations(column_value_mapping, missing
     # given:
     # - There is one reservation unit with the given missing data in the system
     data = {
-        "reservation_begins": datetime.datetime(2022, 1, 1, tzinfo=timezone.get_default_timezone()),
-        "reservation_ends": datetime.datetime(2022, 2, 1, tzinfo=timezone.get_default_timezone()),
+        "reservation_begins": datetime.datetime(2022, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+        "reservation_ends": datetime.datetime(2022, 2, 1, tzinfo=DEFAULT_TIMEZONE),
         "spaces__name": "Space",
         "resources__name": "Resource",
         "qualifiers__name": "Qualifier",
@@ -239,7 +234,6 @@ def test_reservation_unit_export_missing_relations(column_value_mapping, missing
         "pricing_terms__name": "Pricing terms",
         "cancellation_rule__name": "Cancellation rule",
         "metadata_set__name": "Metadata set",
-        "payment_types__code": "Payment type",
         "pricings__highest_price": Decimal(20),
     }
     missing.remove_from_data(data)

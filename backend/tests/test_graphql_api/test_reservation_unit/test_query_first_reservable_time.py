@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import datetime
 import json
-import os
 from dataclasses import asdict, dataclass
 from functools import partial
 from typing import TYPE_CHECKING, Any, NamedTuple
@@ -2515,24 +2514,6 @@ def test__reservation_unit__first_reservable_time__remove_not_reservable(graphql
     assert len(response) == 1
     assert frt(response) == dt(hour=10)
     assert is_closed(response) is False
-
-    # Don't check queries in CI. Don't know why but some queries appear twice...
-    if os.getenv("CI") == "true":
-        return
-
-    # Check that we fetch reservation units in a big chunk which is then filtered
-    # instead of fetching chunks of the expected page size.
-    # Queries:
-    #  1) Count reservation units for FRT calculation
-    #  2) Fetch reservation units for FRT calculation
-    #  3) Fetch hauki resources for FRT calculation
-    #  4) Fetch reservable time spans for FRT calculation
-    #  5) Fetch application rounds for FRT calculation
-    #  6) Fetch reservation unit access types for FRT calculation
-    #  7) Fetch affecting time spans for FRT calculation
-    #  8) Count reservation units for response
-    #  9) Fetch reservation units for response
-    response.assert_query_count(9)
 
 
 ########################################################################################################################

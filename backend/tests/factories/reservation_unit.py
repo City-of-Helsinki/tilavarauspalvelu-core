@@ -131,7 +131,6 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     resources = ManyToManyFactory("tests.factories.ResourceFactory")
     purposes = ManyToManyFactory("tests.factories.PurposeFactory")
     equipments = ManyToManyFactory("tests.factories.EquipmentFactory")
-    payment_types = ManyToManyFactory("tests.factories.ReservationUnitPaymentTypeFactory")
     qualifiers = ManyToManyFactory("tests.factories.QualifierFactory")
 
     # Reverse many-to-many
