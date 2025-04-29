@@ -678,9 +678,16 @@ class PricingType(models.TextChoices):
 
 
 class PaymentType(models.TextChoices):
-    ONLINE = "ONLINE", pgettext_lazy("PaymentType", "Online")
     ON_SITE = "ON_SITE", pgettext_lazy("PaymentType", "On site")
-    INVOICE = "INVOICE", pgettext_lazy("PaymentType", "Invoice")
+    ONLINE = "ONLINE", pgettext_lazy("PaymentType", "Online")
+    ONLINE_OR_INVOICE = "ONLINE_OR_INVOICE", pgettext_lazy("PaymentType", "Online or invoice")
+
+    @classproperty
+    def requires_verkkokauppa(cls) -> list[PaymentType]:
+        return [
+            cls.ONLINE,
+            cls.ONLINE_OR_INVOICE,
+        ]
 
 
 class PriceUnit(models.TextChoices):
