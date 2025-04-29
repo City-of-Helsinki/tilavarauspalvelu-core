@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime
 import time
 import uuid
-from contextlib import suppress
 from decimal import Decimal
 from functools import wraps
 from typing import TYPE_CHECKING
@@ -14,6 +13,7 @@ from django.db import transaction
 from config.celery import app
 from tilavarauspalvelu.enums import OrderStatus
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
     Application,
@@ -190,12 +190,23 @@ def update_expired_orders_task() -> None:
     from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
 
     for payment_order in PaymentOrder.objects.expired():
-        # Do not update the PaymentOrder status if an error occurs
-        with suppress(GetPaymentError, CancelOrderError), transaction.atomic():
-            payment_order.actions.refresh_order_status_from_webshop()
+        try:
+            # Do not update PaymentOrder status if an error occurs
+            with transaction.atomic():
+                payment_order.actions.refresh_order_status_from_webshop()
+                if payment_order.status == OrderStatus.EXPIRED:
+                    VerkkokauppaAPIClient.cancel_order(
+                        order_uuid=payment_order.remote_id,
+                        user_uuid=payment_order.reservation_user_uuid,
+                    )
 
-            if payment_order.status == OrderStatus.EXPIRED:
-                payment_order.actions.cancel_order_in_webshop()
+        except (GetPaymentError, CancelOrderError) as error:
+            msg = "Failed to cancel expired payment order"
+            details = {
+                "error": str(error),
+                "payment_order": payment_order.pk,
+            }
+            SentryLogger.log_message(msg, details=details)
 
 
 @app.task(name="prune_reservation_statistics")
