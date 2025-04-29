@@ -69,7 +69,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
     # https://checkout-test-api.test.hel.ninja/v1/order/docs/swagger-ui/
 
     @classmethod
-    def get_order(cls, *, order_uuid: uuid.UUID) -> Order:
+    def get_order(cls, *, order_uuid: uuid.UUID) -> Order | None:
         action_fail = "Order retrieval failed"
         url = f"{settings.VERKKOKAUPPA_ORDER_API_URL}/admin/{order_uuid}"
 
@@ -81,8 +81,8 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             response_json = cls.response_json(response)
 
             if response.status_code == HTTP_404_NOT_FOUND:
-                msg = f"Order not found: {response_json.get('errors')}"
-                raise GetOrderError(msg)
+                return None
+
             if response.status_code != HTTP_200_OK:
                 msg = f"{action_fail}: {response_json.get('errors')}"
                 raise GetOrderError(msg)
@@ -131,6 +131,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
 
             if response.status_code == HTTP_404_NOT_FOUND:
                 return None
+
             if response.status_code != HTTP_200_OK:
                 msg = f"{action_fail}: {response_json.get('errors')}"
                 raise CancelOrderError(msg)
@@ -298,6 +299,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             if response.status_code == HTTP_404_NOT_FOUND:
                 msg = f"{action_fail}: merchant {merchant_uuid} not found"
                 raise UpdateMerchantError(msg)
+
             if response.status_code != HTTP_200_OK:
                 msg = f"{action_fail}: {response_json.get('errors')}"
                 raise UpdateMerchantError(msg)

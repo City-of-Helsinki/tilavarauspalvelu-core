@@ -9,6 +9,7 @@ from rest_framework.exceptions import ValidationError
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationStateChoice, ReservationTypeChoice
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_start_of_day
+from utils.utils import comma_sep_str
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation
@@ -205,3 +206,9 @@ class ReservationValidator:
         if end <= now:
             msg = "Reservation has already ended."
             raise ValidationError(msg, code=error_codes.RESERVATION_HAS_ENDED)
+
+    def validate_can_be_deleted(self, reservation: Reservation) -> None:
+        if reservation.state not in ReservationStateChoice.states_that_can_be_deleted:
+            states_str = comma_sep_str(ReservationStateChoice.states_that_can_be_deleted, last_sep="or", quote=True)
+            msg = f"Reservation which is not in {states_str} state cannot be deleted."
+            raise ValidationError(msg)
