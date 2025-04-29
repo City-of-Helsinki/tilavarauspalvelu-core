@@ -3,7 +3,8 @@ from __future__ import annotations
 import datetime
 
 import pytest
-from django.utils.timezone import get_default_timezone
+
+from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import UnitFactory, UnitGroupFactory, UserFactory
 
@@ -19,7 +20,7 @@ def test_user__str__last_login_displays_if_has_logged():
         first_name="First",
         last_name="Last",
         email="test@localhost",
-        last_login=datetime.datetime(2023, 5, 16, 15, 0, tzinfo=get_default_timezone()),
+        last_login=datetime.datetime(2023, 5, 16, 15, 0, tzinfo=DEFAULT_TIMEZONE),
     )
 
     assert str(user) == "Last First (test@localhost) - 16.05.2023 15:00"

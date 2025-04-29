@@ -4,10 +4,10 @@ import datetime
 from decimal import Decimal
 
 import pytest
-from django.utils.timezone import get_default_timezone
 
 from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, Weekday
 from tilavarauspalvelu.models import AgeGroup, City, ReservationStatistic
+from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import (
     RecurringReservationFactory,
@@ -35,9 +35,9 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     reservation = ReservationFactory.create(
         age_group=AgeGroup.objects.create(minimum=18, maximum=30),
         applying_for_free_of_charge=True,
-        begin=datetime.datetime(2020, 1, 1, 12, 0, tzinfo=get_default_timezone()),
+        begin=datetime.datetime(2020, 1, 1, 12, 0, tzinfo=DEFAULT_TIMEZONE),
         description="movies&popcorn",
-        end=datetime.datetime(2020, 1, 1, 14, 0, tzinfo=get_default_timezone()),
+        end=datetime.datetime(2020, 1, 1, 14, 0, tzinfo=DEFAULT_TIMEZONE),
         free_of_charge_reason="This is some reason.",
         home_city=City.objects.create(name="Test", municipality_code="1234"),
         name="movies",

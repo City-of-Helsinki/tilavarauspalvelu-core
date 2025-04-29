@@ -10,7 +10,11 @@ from django.conf import settings
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import ParsePaymentError
-from tilavarauspalvelu.integrations.verkkokauppa.payment.types import Payment
+from tilavarauspalvelu.integrations.verkkokauppa.payment.types import (
+    Payment,
+    WebShopPaymentGateway,
+    WebShopPaymentStatus,
+)
 
 from tests.helpers import patch_method
 
@@ -19,7 +23,7 @@ get_payment_response: dict[str, Any] = {
     "namespace": "tilavarauspalvelu",
     "orderId": "08c2d282-eb98-3271-a3fc-81fe200f129b",
     "userId": "Esperanza_Daniel23",
-    "status": "payment_created",
+    "status": WebShopPaymentStatus.CREATED.value,
     "paymentMethod": "nordea",
     "paymentType": "order",
     "totalExclTax": 100,
@@ -30,6 +34,7 @@ get_payment_response: dict[str, Any] = {
     "token": "354477a1a009a1514fa3cc1132179a60163f5650aaf27ec98bb98158b04e0a63",
     "timestamp": "20211115-122645",
     "paymentMethodLabel": "Nordea",
+    "paymentGateway": WebShopPaymentGateway.PAYTRAIL.value,
 }
 
 
@@ -40,7 +45,7 @@ def test_verkkokauppa__payment_types__payment__from_json():
         namespace="tilavarauspalvelu",
         order_id=uuid.UUID("08c2d282-eb98-3271-a3fc-81fe200f129b"),
         user_id="Esperanza_Daniel23",
-        status="payment_created",
+        status=WebShopPaymentStatus.CREATED.value,
         payment_method="nordea",
         payment_type="order",
         total_excl_tax=Decimal(100),
@@ -51,6 +56,7 @@ def test_verkkokauppa__payment_types__payment__from_json():
         token="354477a1a009a1514fa3cc1132179a60163f5650aaf27ec98bb98158b04e0a63",
         timestamp=datetime.datetime(2021, 11, 15, 12, 26, 45, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
         payment_method_label="Nordea",
+        payment_gateway=WebShopPaymentGateway.PAYTRAIL.value,
     )
 
 
