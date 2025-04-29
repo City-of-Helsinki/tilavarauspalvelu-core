@@ -650,7 +650,7 @@ def test_reservation__create__price_calculation__fixed_price_reservation_unit(gr
         pricings__highest_price=Decimal(20),
         pricings__price_unit=PriceUnit.PRICE_UNIT_FIXED,
         pricings__tax_percentage__value=Decimal(10),
-        payment_types__code=PaymentType.ONLINE,
+        pricings__payment_type=PaymentType.ONLINE,
         payment_product__id=uuid.uuid4(),
     )
 
@@ -676,7 +676,7 @@ def test_reservation__create__price_calculation__time_based_price(graphql):
         pricings__highest_price=Decimal(20),
         pricings__price_unit=PriceUnit.PRICE_UNIT_PER_15_MINS,
         pricings__tax_percentage__value=Decimal(10),
-        payment_types__code=PaymentType.ONLINE,
+        pricings__payment_type=PaymentType.ONLINE,
         payment_product__id=uuid.uuid4(),
     )
 
@@ -697,7 +697,6 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
 
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         allow_reservations_without_opening_hours=True,
-        payment_types__code=PaymentType.ONLINE,
         payment_product__id=uuid.uuid4(),
         # Current pricing
         pricings__begins=now,
@@ -705,6 +704,7 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
         pricings__lowest_price=Decimal(5),
         pricings__highest_price=Decimal(6),
         pricings__tax_percentage__value=Decimal(24),
+        pricings__payment_type=PaymentType.ONLINE,
     )
     # Future pricing
     ReservationUnitPricingFactory.create(
@@ -728,6 +728,32 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
     assert reservation.non_subsidised_price == Decimal(10)
     assert reservation.unit_price == Decimal(10)
     assert reservation.tax_percentage_value == Decimal(24)
+
+
+def test_reservation__create__price_calculation__on_site_doesnt_require_payment_product(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
+        allow_reservations_without_opening_hours=True,
+        pricings__lowest_price=Decimal(10),
+        pricings__highest_price=Decimal(20),
+        pricings__price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        pricings__tax_percentage__value=Decimal(10),
+        pricings__payment_type=PaymentType.ON_SITE,
+        payment_product=None,
+    )
+
+    graphql.login_with_superuser()
+    data = get_create_data(reservation_unit)
+
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+
+    assert reservation.price == Decimal(20)
+    assert reservation.non_subsidised_price == Decimal(20)
+    assert reservation.unit_price == Decimal(20)
+    assert reservation.tax_percentage_value == Decimal(10)
 
 
 def test_reservation__create__duration_is_not_multiple_of_interval(graphql):
@@ -914,7 +940,7 @@ def test_reservation__create__reservation_block_whole_day__non_reserved_time_is_
         pricings__lowest_price=Decimal(5),
         pricings__highest_price=Decimal(6),
         pricings__tax_percentage__value=Decimal(24),
-        payment_types__code=PaymentType.ONLINE,
+        pricings__payment_type=PaymentType.ONLINE,
         payment_product__id=uuid.uuid4(),
     )
 
@@ -947,7 +973,7 @@ def test_reservation__create__reservation_block_whole_day__start_and_end_at_midn
         pricings__lowest_price=Decimal(5),
         pricings__highest_price=Decimal(6),
         pricings__tax_percentage__value=Decimal(24),
-        payment_types__code=PaymentType.ONLINE,
+        pricings__payment_type=PaymentType.ONLINE,
         payment_product__id=uuid.uuid4(),
     )
 
@@ -991,7 +1017,7 @@ def test_reservation__create__reservation_block_whole_day__blocks_reserving_for_
         pricings__lowest_price=Decimal(5),
         pricings__highest_price=Decimal(6),
         pricings__tax_percentage__value=Decimal(24),
-        payment_types__code=PaymentType.ONLINE,
+        pricings__payment_type=PaymentType.ONLINE,
         payment_product__id=uuid.uuid4(),
     )
 
