@@ -18,6 +18,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.order.types import (
     OrderItemMeta,
     OrderItemMetaParams,
     OrderItemParams,
+    WebShopOrderStatus,
 )
 
 from tests.helpers import patch_method
@@ -48,6 +49,7 @@ create_order_params: CreateOrderParams = CreateOrderParams(
             price_gross=Decimal(124),
             price_vat=Decimal(24),
             vat_percentage=Decimal(24),
+            invoicing_date=None,
             meta=[
                 OrderItemMetaParams(
                     key="firstKey",
@@ -233,7 +235,7 @@ def test_verkkokauppa__order_types__order__from_json():
             email="john.doe@example.com",
             phone="+358123456789",
         ),
-        status="draft",
+        status=WebShopOrderStatus.DRAFT,
         subscription_id=None,
         type="order",
     )
