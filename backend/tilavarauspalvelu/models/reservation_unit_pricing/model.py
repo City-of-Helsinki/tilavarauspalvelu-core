@@ -6,7 +6,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from config.utils.auditlog_util import AuditLogger
-from tilavarauspalvelu.enums import PriceUnit
+from tilavarauspalvelu.enums import PaymentType, PriceUnit
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
@@ -34,6 +34,8 @@ def get_default_tax_percentage() -> int:
 class ReservationUnitPricing(models.Model):
     begins: datetime.date = models.DateField()
     price_unit: str = models.CharField(max_length=20, choices=PriceUnit.choices, default=PriceUnit.PRICE_UNIT_PER_HOUR)
+
+    payment_type: str | None = models.CharField(max_length=20, choices=PaymentType.choices, null=True, blank=True)
 
     # True: This pricing is used for reservations that are created after the begins date
     # False: This pricing is used for reservations that start after the begins date
