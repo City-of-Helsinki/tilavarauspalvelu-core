@@ -16,6 +16,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.order.types import (
     OrderCustomer,
     OrderItemMetaParams,
     OrderItemParams,
+    WebShopOrderStatus,
 )
 from tilavarauspalvelu.models import PaymentMerchant, PaymentProduct
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
@@ -69,7 +70,11 @@ def get_meta_label(key: str, reservation: Reservation) -> str:
     return labels[key][preferred_language]
 
 
-def get_verkkokauppa_order_params(reservation: Reservation) -> CreateOrderParams:
+def get_verkkokauppa_order_params(
+    reservation: Reservation,
+    *,
+    invoicing_date: datetime.date | None = None,
+) -> CreateOrderParams:
     reservation_unit = reservation.reservation_units.first()
     preferred_language = reservation.user.get_preferred_language()
     items = [
@@ -85,6 +90,7 @@ def get_verkkokauppa_order_params(reservation: Reservation) -> CreateOrderParams
             price_vat=reservation.price_vat_amount,
             price_gross=reservation.price,
             vat_percentage=reservation.tax_percentage_value,
+            invoicing_date=invoicing_date,
             meta=[
                 OrderItemMetaParams(
                     key="namespaceProductId",
@@ -166,7 +172,7 @@ def create_mock_verkkokauppa_order(reservation: Reservation) -> Order:
             email=reservation.user.email,
             phone="",
         ),
-        status="draft",
+        status=WebShopOrderStatus.DRAFT,
         subscription_id=None,
         type="order",
         checkout_url=f"{base_url}/{mock_verkkokauppa_checkout_url}/",
