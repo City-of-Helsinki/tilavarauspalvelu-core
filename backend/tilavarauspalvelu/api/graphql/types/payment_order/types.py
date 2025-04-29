@@ -7,7 +7,7 @@ from graphene_django_extensions import DjangoNode
 from query_optimizer import MultiField
 
 from tilavarauspalvelu.enums import OrderStatus, PaymentType
-from tilavarauspalvelu.models import PaymentMerchant, PaymentOrder, PaymentProduct
+from tilavarauspalvelu.models import PaymentOrder
 from utils.date_utils import local_datetime
 
 from .permissions import PaymentOrderPermission
@@ -15,33 +15,10 @@ from .permissions import PaymentOrderPermission
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import GQLInfo
 
+
 __all__ = [
-    "PaymentMerchantNode",
     "PaymentOrderNode",
-    "PaymentProductNode",
 ]
-
-
-class PaymentMerchantNode(DjangoNode):
-    pk = graphene.UUID(required=True)
-
-    class Meta:
-        model = PaymentMerchant
-        fields = [
-            "pk",
-            "name",
-        ]
-
-
-class PaymentProductNode(DjangoNode):
-    pk = graphene.UUID(required=True)
-
-    class Meta:
-        model = PaymentProduct
-        fields = [
-            "pk",
-            "merchant",
-        ]
 
 
 class PaymentOrderNode(DjangoNode):
