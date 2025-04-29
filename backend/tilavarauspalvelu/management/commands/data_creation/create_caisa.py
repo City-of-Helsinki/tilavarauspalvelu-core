@@ -5,6 +5,7 @@ import datetime
 from tilavarauspalvelu.enums import (
     AccessType,
     AuthenticationType,
+    PaymentType,
     PriceUnit,
     ReservationKind,
     ReservationStartInterval,
@@ -26,7 +27,6 @@ from tests.factories import (
     ReservationUnitAccessTypeFactory,
     ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
-    ReservationUnitPaymentTypeFactory,
     ReservationUnitPricingFactory,
     ReservationUnitTypeFactory,
     SpaceFactory,
@@ -72,7 +72,6 @@ def _create_caisa() -> None:
 
     tax_percentage_0 = TaxPercentageFactory.create(value=0.0)
     tax_percentage_255 = TaxPercentageFactory.create(value=25.5)
-    payment_type_online = ReservationUnitPaymentTypeFactory.create(code="ONLINE")
 
     ###########################################################################################################
     # Create payment terms
@@ -747,7 +746,6 @@ def _create_caisa() -> None:
         equipment_display,
         equipment_extension_cord,
     )
-    aina_kasiteltava_kellarikerros.payment_types.add(payment_type_online)
     ReservationUnitPricingFactory.create(
         reservation_unit=aina_kasiteltava_kellarikerros,
         begins=datetime.date(2023, 1, 1),
@@ -755,6 +753,7 @@ def _create_caisa() -> None:
         lowest_price=0.0,
         highest_price=40.0,
         tax_percentage=tax_percentage_255,
+        payment_type=PaymentType.ONLINE,
     )
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=aina_kasiteltava_kellarikerros,
@@ -972,7 +971,6 @@ def _create_caisa() -> None:
         equipment_billiard_table,
         equipment_exercise_equipment,
     )
-    aina_maksullinen_aitio.payment_types.add(payment_type_online)
     ReservationUnitPricingFactory.create(
         reservation_unit=aina_maksullinen_aitio,
         begins=datetime.date(2023, 1, 1),
@@ -980,6 +978,7 @@ def _create_caisa() -> None:
         lowest_price=40.0,
         highest_price=40.0,
         tax_percentage=tax_percentage_255,
+        payment_type=PaymentType.ONLINE,
     )
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=aina_maksullinen_aitio,
@@ -1084,7 +1083,6 @@ def _create_caisa() -> None:
         equipment_freezer,
         equipment_mirror_wall,
     )
-    alennuskelpoinen_aula.payment_types.add(payment_type_online)
     ReservationUnitPricingFactory.create(
         reservation_unit=alennuskelpoinen_aula,
         begins=datetime.date(2023, 1, 1),
@@ -1092,6 +1090,7 @@ def _create_caisa() -> None:
         lowest_price=0.0,
         highest_price=30.0,
         tax_percentage=tax_percentage_255,
+        payment_type=PaymentType.ONLINE,
     )
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=alennuskelpoinen_aula,
@@ -1271,7 +1270,6 @@ def _create_caisa() -> None:
         equipment_coffee_machine,
         equipment_extension_cord,
     )
-    perumiskelvoton_patio.payment_types.add(payment_type_online)
     ReservationUnitPricingFactory.create(
         reservation_unit=perumiskelvoton_patio,
         begins=datetime.date(2023, 1, 1),
@@ -1279,6 +1277,7 @@ def _create_caisa() -> None:
         lowest_price=0.0,
         highest_price=30.0,
         tax_percentage=tax_percentage_255,
+        payment_type=PaymentType.ONLINE,
     )
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=perumiskelvoton_patio,

@@ -132,7 +132,6 @@ def _create_normal_reservations(
         .prefetch_related(
             # Prefetch only the active pricing for each reservation unit
             models.Prefetch("pricings", ReservationUnitPricing.objects.active()),
-            "payment_types",
         )
         .order_by("pk")
     )
@@ -185,9 +184,7 @@ def _create_normal_reservations(
         pricing: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
         assert pricing is not None, "Reservation unit must have at least one pricing"
 
-        payment_types_choices: list[PaymentType] = [
-            PaymentType(payment_type.code) for payment_type in reservation_unit.payment_types.all()
-        ]
+        payment_type = PaymentType(pricing.payment_type)
 
         reservation_state: ReservationStateChoice = ReservationStateChoice.CONFIRMED
         handled_at: datetime.datetime | None = None
@@ -257,7 +254,7 @@ def _create_normal_reservations(
                 )
 
                 if pricing.highest_price > 0:
-                    payment_order = _build_payment_order(reservation, payment_types_choices)
+                    payment_order = _build_payment_order(reservation, payment_type)
                     payment_orders.append(payment_order)
 
                 begin_datetime += datetime.timedelta(hours=random.randint(min_interval_hours, max_interval_hours))
@@ -275,8 +272,8 @@ def _create_normal_reservations(
     PaymentOrder.objects.bulk_create(payment_orders)
 
 
-def _build_payment_order(reservation: Reservation, payment_types_choices: list[PaymentType]) -> PaymentOrder:
-    payment_order_builder = PaymentOrderBuilder().set(
+def _build_payment_order(reservation: Reservation, payment_type: PaymentType) -> PaymentOrder:
+    payment_order_builder: PaymentOrderBuilder = PaymentOrderBuilder().set(  # type: ignore[assignment]
         language=reservation.user.get_preferred_language(),
         price_net=reservation.price_net,
         price_vat=reservation.price_vat_amount,
@@ -285,17 +282,16 @@ def _build_payment_order(reservation: Reservation, payment_types_choices: list[P
         reservation_user_uuid=reservation.user.uuid,
     )
 
-    if len(payment_types_choices) == 1:
-        payment_type = payment_types_choices[0]
-    elif set(payment_types_choices) == {PaymentType.INVOICE, PaymentType.ON_SITE}:
-        payment_type = PaymentType.INVOICE
-    else:
-        payment_type = PaymentType.ONLINE
-
     if payment_type == PaymentType.ON_SITE:
         return payment_order_builder.build(
             payment_type=payment_type,
             status=OrderStatus.PAID_MANUALLY,
+        )
+
+    if payment_type == PaymentType.ONLINE_OR_INVOICE:
+        return payment_order_builder.for_mock_order(reservation).build(
+            payment_type=payment_type,
+            status=OrderStatus.PAID_BY_INVOICE,
         )
 
     return payment_order_builder.for_mock_order(reservation).build(

@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.gis.geos import Point
 
 from tilavarauspalvelu.constants import COORDINATE_SYSTEM_ID
-from tilavarauspalvelu.enums import PaymentType, ReservationUnitImageType, TermsOfUseTypeChoices
+from tilavarauspalvelu.enums import ReservationUnitImageType, TermsOfUseTypeChoices
 from tilavarauspalvelu.models import (
     AgeGroup,
     City,
@@ -31,7 +31,6 @@ from tilavarauspalvelu.models import (
     ReservationMetadataSet,
     ReservationPurpose,
     ReservationUnitCancellationRule,
-    ReservationUnitPaymentType,
     Space,
     TaxPercentage,
     TermsOfUse,
@@ -58,7 +57,6 @@ from tests.factories import (
     ReservationPurposeFactory,
     ReservationUnitCancellationRuleFactory,
     ReservationUnitImageFactory,
-    ReservationUnitPaymentTypeFactory,
     TaxPercentageFactory,
     TermsOfUseFactory,
 )
@@ -225,13 +223,6 @@ def _create_purposes() -> list[Purpose]:
         purposes.append(purpose)
 
     return Purpose.objects.bulk_create(purposes)
-
-
-@with_logs
-def _create_reservation_unit_payment_types() -> dict[PaymentType.INVOICE, ReservationUnitPaymentType]:
-    payment_types = [ReservationUnitPaymentTypeFactory.build(code=payment_type) for payment_type in PaymentType.values]
-    payment_types = ReservationUnitPaymentType.objects.bulk_create(payment_types)
-    return {PaymentType(payment_type.code): payment_type for payment_type in payment_types}
 
 
 @with_logs

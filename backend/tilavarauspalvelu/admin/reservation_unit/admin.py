@@ -160,7 +160,6 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
                     "payment_accounting",
                     "payment_product",
                     "can_apply_free_of_charge",
-                    "payment_types",
                 ],
             },
         ],
@@ -209,7 +208,6 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
         "qualifiers",
         "resources",
         "equipments",
-        "payment_types",
     ]
     readonly_fields = [
         "id",
