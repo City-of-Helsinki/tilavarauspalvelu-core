@@ -44,7 +44,6 @@ from .reservation_unit_cancellation_rule.model import ReservationUnitCancellatio
 from .reservation_unit_hierarchy.model import ReservationUnitHierarchy
 from .reservation_unit_image.model import ReservationUnitImage
 from .reservation_unit_option.model import ReservationUnitOption
-from .reservation_unit_payment_type.model import ReservationUnitPaymentType
 from .reservation_unit_pricing.model import ReservationUnitPricing
 from .reservation_unit_type.model import ReservationUnitType
 from .resource.model import Resource
@@ -104,7 +103,6 @@ __all__ = [
     "ReservationUnitHierarchy",
     "ReservationUnitImage",
     "ReservationUnitOption",
-    "ReservationUnitPaymentType",
     "ReservationUnitPricing",
     "ReservationUnitPricing",
     "ReservationUnitType",
