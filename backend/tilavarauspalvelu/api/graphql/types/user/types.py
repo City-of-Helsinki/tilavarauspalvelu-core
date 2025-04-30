@@ -6,7 +6,7 @@ import graphene
 from django.db.models import Value
 from django.db.models.functions import Concat, Trim
 from graphene_django_extensions import DjangoNode
-from query_optimizer import AnnotatedField
+from query_optimizer import AnnotatedField, MultiField
 
 from tilavarauspalvelu.enums import ReservationNotification
 from tilavarauspalvelu.models import User
@@ -37,6 +37,7 @@ _FIELDS = [
     "is_superuser",
     "is_ad_authenticated",
     "is_strongly_authenticated",
+    "is_internal_user",
     "reservation_notification",
     "general_roles",
     "unit_roles",
@@ -52,6 +53,7 @@ class UserNode(DjangoNode):
 
     is_ad_authenticated = graphene.Boolean(required=True)
     is_strongly_authenticated = graphene.Boolean(required=True)
+    is_internal_user = MultiField(graphene.Boolean, fields=["email"], required=True)
     reservation_notification = graphene.Field(graphene.Enum.from_enum(ReservationNotification))
 
     class Meta:
@@ -79,6 +81,9 @@ class UserNode(DjangoNode):
         if token is None:
             return False
         return token.is_strong_login
+
+    def resolve_is_internal_user(root: User, info: GQLInfo) -> bool:
+        return root.actions.is_internal_user
 
 
 class ApplicantNode(UserNode):
