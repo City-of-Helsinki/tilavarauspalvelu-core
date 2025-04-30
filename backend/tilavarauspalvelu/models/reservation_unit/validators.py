@@ -37,16 +37,8 @@ class ReservationUnitValidator:
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_NOT_RESERVABLE)
 
     def validate_user_is_adult_if_required(self, user: User) -> None:
-        if not self.reservation_unit.require_adult_reservee:
-            return
-
-        # AD users are currently never under age since we have blocked students from signing in.
-        if user.actions.is_ad_user:
-            return
-
-        if not user.actions.is_of_age:
-            msg = "Reservation unit can only be booked by an adult reservee"
-            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED)
+        if self.reservation_unit.require_adult_reservee:
+            user.validators.validate_is_of_age(code=error_codes.RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED)
 
     def validate_user_has_not_exceeded_max_reservations(self, user: User) -> None:
         if self.reservation_unit.max_reservations_per_user is None:

@@ -9,7 +9,7 @@ from tilavarauspalvelu.enums import ApplicantTypeChoice, Priority, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
 from utils.date_utils import local_datetime, local_start_of_day, local_time
 
-from tests.factories import ApplicationFactory, OrganisationFactory, SuitableTimeRangeFactory
+from tests.factories import ApplicationFactory, OrganisationFactory, SuitableTimeRangeFactory, UserFactory
 from tests.helpers import patch_method
 
 from .helpers import SEND_MUTATION
@@ -750,4 +750,19 @@ def test_send_application__user_is_not_adult(graphql):
     response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Application can only be sent by an adult reservee"]
+    assert response.field_error_messages() == ["User is not of age"]
+
+
+def test_send_application__is_ad_user__not_internal_user(graphql):
+    user = UserFactory.create_ad_user(
+        date_of_birth=local_datetime(2006, 1, 1),
+        email="test@example.com",
+    )
+
+    application = ApplicationFactory.create_application_ready_for_sending(user=user)
+
+    graphql.login_with_superuser()
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["AD user is not an internal user."]
