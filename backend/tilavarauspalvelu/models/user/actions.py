@@ -225,6 +225,10 @@ class UserActions:
             return False
         return user_age >= settings.USER_IS_ADULT_AT_AGE
 
+    @property
+    def is_internal_user(self) -> bool:
+        return self.user.email.endswith("@edu.hel.fi") or self.user.email.endswith("@hel.fi")
+
     def get_ad_group_roles(self) -> dict[UserRoleChoice, set[int]]:
         """
         Parse information from user's AD groups for creating unit roles.
