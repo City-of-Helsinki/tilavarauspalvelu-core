@@ -9,7 +9,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 
-from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
+from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.models import PaymentOrder
 from utils.date_utils import local_datetime
 
@@ -38,7 +38,11 @@ class MockVerkkokauppaView(TemplateView):
         return payment_order
 
     def handle_payment_success(self, payment_order: PaymentOrder) -> None:
-        payment_order.status = OrderStatus.PAID
+        if payment_order.payment_type == PaymentType.ONLINE_OR_INVOICE:
+            payment_order.status = OrderStatus.PAID_BY_INVOICE
+        else:
+            payment_order.status = OrderStatus.PAID
+
         payment_order.payment_id = uuid.uuid4()
         payment_order.processed_at = local_datetime()
         payment_order.save()
