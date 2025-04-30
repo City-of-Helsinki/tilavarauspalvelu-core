@@ -287,7 +287,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         reservation_unit = ReservationUnitFactory.create(**sub_kwargs)
 
         begin = next_hour(plus_hours=-1)
-        kwargs.setdefault("state", ReservationStateChoice.CANCELLED)
+        kwargs.setdefault("state", ReservationStateChoice.DENIED)
         kwargs.setdefault("begin", begin - datetime.timedelta(hours=2))
         kwargs.setdefault("end", begin - datetime.timedelta(hours=1))
         kwargs.setdefault("price", Decimal("12.4"))

@@ -61,42 +61,8 @@ def test_reservation__refund__regular_user(graphql):
 
 
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
-def test_reservation__refund__invalid_state__ends_in_the_future(graphql):
-    now = local_datetime()
-    last_hour = now.replace(minute=0, second=0, microsecond=0)
-    begin = last_hour - datetime.timedelta(hours=1)
-    end = last_hour + datetime.timedelta(hours=2)
-
-    reservation = ReservationFactory.create_for_refund(state=ReservationStateChoice.CONFIRMED, begin=begin, end=end)
-    payment_order = reservation.payment_order.first()
-
-    graphql.login_with_superuser()
-    input_data = get_refund_data(reservation)
-    response = graphql(REFUND_MUTATION, input_data=input_data)
-
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation cannot be refunded based on its state"]
-
-    assert VerkkokauppaAPIClient.refund_order.called is False
-    payment_order.refresh_from_db()
-    assert payment_order.refund_id is None
-
-
-@freeze_time("2022-01-01 12:00:00")
-@patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
-def test_reservation__refund__correct_state__ends_in_the_future(graphql):
-    """
-    Reservations that end in the future can be refunded.
-    This was previously not allowed, but the restriction was removed in TILA-3881.
-    This test is kept as a regression test.
-    """
-    now = local_datetime()
-
-    reservation = ReservationFactory.create_for_refund(
-        state=ReservationStateChoice.CANCELLED,
-        begin=now - datetime.timedelta(hours=1),
-        end=now + datetime.timedelta(hours=2),
-    )
+def test_reservation__refund__correct_state(graphql):
+    reservation = ReservationFactory.create_for_refund()
     payment_order = reservation.payment_order.first()
 
     graphql.login_with_superuser()
@@ -107,17 +73,17 @@ def test_reservation__refund__correct_state__ends_in_the_future(graphql):
     assert response.has_errors is False, response.errors
 
     VerkkokauppaAPIClient.refund_order.assert_called_with(order_uuid=payment_order.remote_id)
+
     payment_order.refresh_from_db()
     assert payment_order.refund_id == REFUND.refund_id
+    assert payment_order.status == OrderStatus.REFUNDED
 
 
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
-def test_reservation__refund__invalid_state__ends_in_the_past(graphql):
+def test_reservation__refund__invalid_state(graphql):
     reservation = ReservationFactory.create_for_refund(state=ReservationStateChoice.CONFIRMED)
-    payment_order = reservation.payment_order.first()
 
     graphql.login_with_superuser()
-
     input_data = get_refund_data(reservation)
     response = graphql(REFUND_MUTATION, input_data=input_data)
 
@@ -125,72 +91,11 @@ def test_reservation__refund__invalid_state__ends_in_the_past(graphql):
     assert response.field_error_messages() == ["Reservation cannot be refunded based on its state"]
 
     assert VerkkokauppaAPIClient.refund_order.called is False
-    payment_order.refresh_from_db()
-    assert payment_order.refund_id is None
-
-
-@patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
-def test_reservation__refund__payment_order_is_missing(graphql):
-    reservation = ReservationFactory.create_for_refund(state=ReservationStateChoice.CANCELLED)
-    reservation.payment_order.first().delete()
-
-    graphql.login_with_superuser()
-    input_data = get_refund_data(reservation)
-    response = graphql(REFUND_MUTATION, input_data=input_data)
-
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Only reservations with a paid order can be refunded."]
-
-    assert VerkkokauppaAPIClient.refund_order.called is False
-
-
-@patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
-def test_reservation__refund__payment_order_is_not_paid(graphql):
-    reservation = ReservationFactory.create_for_refund(
-        state=ReservationStateChoice.CANCELLED,
-        payment_order__status=OrderStatus.DRAFT,
-    )
-    payment_order = reservation.payment_order.first()
-
-    graphql.login_with_superuser()
-    input_data = get_refund_data(reservation)
-    response = graphql(REFUND_MUTATION, input_data=input_data)
-
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Only reservations with a paid order can be refunded."]
-
-    assert VerkkokauppaAPIClient.refund_order.called is False
-    payment_order.refresh_from_db()
-    assert payment_order.refund_id is None
-
-
-@patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
-def test_reservation__refund__payment_order_is_waiting_for_refund(graphql):
-    refund_id = uuid.uuid4()
-
-    reservation = ReservationFactory.create_for_refund(
-        state=ReservationStateChoice.CANCELLED,
-        payment_order__refund_id=refund_id,
-    )
-    payment_order = reservation.payment_order.first()
-
-    graphql.login_with_superuser()
-    input_data = get_refund_data(reservation)
-    response = graphql(REFUND_MUTATION, input_data=input_data)
-
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Only reservations with a paid order can be refunded."]
-
-    assert VerkkokauppaAPIClient.refund_order.called is False
-    assert payment_order.refund_id == refund_id
 
 
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
 def test_reservation__refund__reservation_price_is_zero(graphql):
-    reservation = ReservationFactory.create_for_refund(
-        state=ReservationStateChoice.CANCELLED,
-        price=Decimal(0),
-    )
+    reservation = ReservationFactory.create_for_refund(price=Decimal(0))
     payment_order = reservation.payment_order.first()
 
     graphql.login_with_superuser()
@@ -203,3 +108,75 @@ def test_reservation__refund__reservation_price_is_zero(graphql):
 
     payment_order.refresh_from_db()
     assert payment_order.refund_id is None
+
+
+@patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
+def test_reservation__refund__payment_order_is_missing(graphql):
+    reservation = ReservationFactory.create_for_refund()
+    reservation.payment_order.first().delete()
+
+    graphql.login_with_superuser()
+    input_data = get_refund_data(reservation)
+    response = graphql(REFUND_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation doesn't have an order."]
+
+    assert VerkkokauppaAPIClient.refund_order.called is False
+
+
+@patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
+def test_reservation__refund__payment_order_is_waiting_for_refund(graphql):
+    reservation = ReservationFactory.create_for_refund(
+        payment_order__refund_id=uuid.uuid4(),
+    )
+
+    graphql.login_with_superuser()
+    input_data = get_refund_data(reservation)
+    response = graphql(REFUND_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Order has already been refunded."]
+
+    assert VerkkokauppaAPIClient.refund_order.called is False
+
+
+@patch_method(VerkkokauppaAPIClient.cancel_order)
+def test_reservation__refund__invoiced__cancel_if_paid_by_invoice(graphql):
+    reservation = ReservationFactory.create_for_refund(
+        payment_order__status=OrderStatus.PAID_BY_INVOICE,
+    )
+    payment_order = reservation.payment_order.first()
+
+    graphql.login_with_superuser()
+    input_data = get_refund_data(reservation)
+    response = graphql(REFUND_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response.errors
+
+    assert VerkkokauppaAPIClient.cancel_order.called is True
+
+    payment_order.refresh_from_db()
+    assert payment_order.status == OrderStatus.CANCELLED
+
+
+@patch_method(VerkkokauppaAPIClient.cancel_order)
+@freeze_time(local_datetime(2021, 1, 2, hour=12))
+def test_reservation__refund__invoiced__date_in_the_past(graphql):
+    begin = local_datetime(2021, 1, 1, hour=12)
+
+    reservation = ReservationFactory.create_for_refund(
+        payment_order__status=OrderStatus.PAID_BY_INVOICE,
+        begin=begin,
+        end=begin + datetime.timedelta(hours=1),
+    )
+    reservation.payment_order.first()
+
+    graphql.login_with_superuser()
+    input_data = get_refund_data(reservation)
+    response = graphql(REFUND_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Order cannot be cancelled after its reservation start date."]
+
+    assert VerkkokauppaAPIClient.cancel_order.called is False

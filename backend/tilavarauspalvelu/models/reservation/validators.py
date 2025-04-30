@@ -12,7 +12,7 @@ from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_start_of_da
 from utils.utils import comma_sep_str
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Reservation
+    from tilavarauspalvelu.models import PaymentOrder, Reservation
 
 __all__ = [
     "ReservationValidator",
@@ -77,7 +77,7 @@ class ReservationValidator:
     def validate_reservation_is_paid(self) -> None:
         if self.reservation.price <= 0:
             msg = "Only paid reservations can be refunded."
-            raise ValidationError(msg, code=error_codes.REFUND_NOT_ALLOWED)
+            raise ValidationError(msg, code=error_codes.ORDER_REFUND_NOT_ALLOWED)
 
     def validate_reservation_not_past_or_ongoing(self) -> None:
         if self.reservation.begin.astimezone(DEFAULT_TIMEZONE) < local_datetime():
@@ -144,16 +144,27 @@ class ReservationValidator:
             msg = "Reservation cannot be handled based on its state"
             raise ValidationError(msg, code=error_codes.RESERVATION_STATE_CHANGE_NOT_ALLOWED)
 
-    def validate_reservation_has_been_paid(self) -> None:
-        payment_order = self.reservation.payment_order.filter(status=OrderStatus.PAID, refund_id=None).first()
+    def validate_reservation_order_allows_refunding_or_cancellation(self) -> None:
+        payment_order: PaymentOrder | None = self.reservation.payment_order.first()
         if payment_order is None:
-            msg = "Only reservations with a paid order can be refunded."
-            raise ValidationError(msg, code=error_codes.REFUND_NOT_ALLOWED)
+            msg = "Reservation doesn't have an order."
+            raise ValidationError(msg, code=error_codes.RESERVATION_NO_PAYMENT_ORDER)
 
-    def validate_reservation_state_allows_refunding(self) -> None:
+        match payment_order.status:
+            case OrderStatus.PAID_BY_INVOICE:
+                payment_order.validators.validate_order_can_be_cancelled()
+
+            case OrderStatus.PAID:
+                payment_order.validators.validate_order_can_be_refunded()
+
+            case _:
+                msg = "Reservation order is not in a state where it can be refunded or cancelled"
+                raise ValidationError(msg, code=error_codes.ORDER_REFUND_NOT_ALLOWED)
+
+    def validate_reservation_state_allows_refunding_or_cancellation(self) -> None:
         if self.reservation.state not in ReservationStateChoice.states_that_can_be_refunded:
             msg = "Reservation cannot be refunded based on its state"
-            raise ValidationError(msg, code=error_codes.REFUND_NOT_ALLOWED)
+            raise ValidationError(msg, code=error_codes.ORDER_REFUND_NOT_ALLOWED)
 
     def validate_reservation_state_allows_staff_edit(self) -> None:
         if self.reservation.state not in ReservationStateChoice.states_that_can_be_edited_by_staff:
