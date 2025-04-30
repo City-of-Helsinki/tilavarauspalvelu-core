@@ -35,6 +35,7 @@
         {% translate "Number of unpaid reservations to be denied:" %} <b>{{ queryset_unpaid_reservation_count }}</b><br>
         {% translate "Number of paid reservations to be denied:" %} <b>{{ queryset_paid_reservation_count }}</b>
         <i>({% translate "of which can be refunded:" %} {{ queryset_refundable_reservation_count }}</i>)<br>
+        <i>({% translate "of which can be cancelled:" %} {{ queryset_cancellable_reservation_count }}</i>)<br>
 
         {% if queryset_ended_reservation_count > 0 %}
             {% translate "Number of ended reservations, which can't be denied:" %} <b>{{ queryset_ended_reservation_count }}</b><br>
