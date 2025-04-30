@@ -14,7 +14,7 @@ from tilavarauspalvelu.models import (
 )
 from utils.date_utils import local_date, local_datetime
 
-from tests.factories import ApplicationRoundFactory
+from tests.factories import ApplicationRoundFactory, UserFactory
 from tests.test_graphql_api.test_application.helpers import get_application_create_data
 
 from .helpers import CREATE_MUTATION
@@ -147,6 +147,42 @@ def test_application__create__is_under_age(graphql):
 
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == ["User is not of age"]
+
+
+@pytest.mark.parametrize("email", ["test@hel.fi", "test@edu.hel.fi"])
+def test_application__create__is_ad_user(graphql, email):
+    application_round = ApplicationRoundFactory.create_in_status_open()
+
+    user = UserFactory.create_ad_user(
+        is_superuser=True,
+        date_of_birth=local_datetime(2006, 1, 1),
+        email=email,
+    )
+
+    graphql.force_login(user)
+
+    input_data = get_application_create_data(application_round)
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response
+
+
+def test_application__create__is_ad_user__not_internal_user(graphql):
+    application_round = ApplicationRoundFactory.create_in_status_open()
+
+    user = UserFactory.create_ad_user(
+        is_superuser=True,
+        date_of_birth=local_datetime(2006, 1, 1),
+        email="test@example.com",
+    )
+
+    graphql.force_login(user)
+
+    input_data = get_application_create_data(application_round)
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["AD user is not an internal user."]
 
 
 def test_application__create__sent_date(graphql):

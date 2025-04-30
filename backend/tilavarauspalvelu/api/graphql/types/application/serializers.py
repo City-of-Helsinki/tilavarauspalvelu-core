@@ -78,6 +78,7 @@ class ApplicationCreateSerializer(NestingModelSerializer):
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         user: User = data["user"]
         user.validators.validate_is_of_age()
+        user.validators.validate_is_internal_user_if_ad_user()
 
         application_round: ApplicationRound = data["application_round"]
         application_round.validators.validate_open_for_applications()
@@ -389,13 +390,15 @@ class ApplicationSendSerializer(NestingModelSerializer):
                 self.validate_billing_address(errors)
 
     def validate_user(self, user: User, errors: ErrorList) -> None:
-        if user.actions.is_ad_user or user.actions.is_of_age:
-            return
+        try:
+            user.validators.validate_is_of_age(code=error_codes.APPLICATION_ADULT_RESERVEE_REQUIRED)
+        except ValidationError as error:
+            errors.append(error)
 
-        msg = "Application can only be sent by an adult reservee"
-        error = ValidationError(msg, code=error_codes.APPLICATION_ADULT_RESERVEE_REQUIRED)
-        errors.append(error)
-        return
+        try:
+            user.validators.validate_is_internal_user_if_ad_user()
+        except ValidationError as error:
+            errors.append(error)
 
     def save(self, **kwargs: Any) -> Application:
         self.instance.sent_date = local_datetime()
