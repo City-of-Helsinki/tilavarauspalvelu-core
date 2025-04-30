@@ -4,7 +4,7 @@ import pytest
 
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 
-from tests.factories import UnitFactory, UserFactory, UserSocialAuthFactory
+from tests.factories import UnitFactory, UserFactory
 from tests.helpers import patch_method
 
 from .helpers import current_user_query
@@ -280,8 +280,7 @@ def test_query_current_user__ad_login(graphql):
     # given:
     # - There is a user logged in with azure ad
     # - That user is using the system
-    user = UserFactory.create()
-    UserSocialAuthFactory.create(user=user, extra_data__amr="helsinkiazuread", extra_data__loa="low")
+    user = UserFactory.create_ad_user()
     graphql.force_login(user)
 
     fields = """
@@ -309,8 +308,7 @@ def test_query_current_user__suomi_fi_login(graphql):
     # given:
     # - There is a user logged in with azure ad
     # - That user is using the system
-    user = UserFactory.create()
-    UserSocialAuthFactory.create(user=user, extra_data__amr="suomi_fi", extra_data__loa="substantial")
+    user = UserFactory.create_profile_user()
     graphql.force_login(user)
 
     fields = """
