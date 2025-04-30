@@ -491,7 +491,6 @@ function Calendar<T extends Record<string, unknown>>({
   viewType = "week",
   onSelecting,
   toolbarComponent,
-  eventWrapperComponent,
   dateCellWrapperComponent,
   onNavigate = () => {},
   onView = () => {},
@@ -544,7 +543,6 @@ function Calendar<T extends Record<string, unknown>>({
       className={`view-${viewType}`}
       components={{
         toolbar: toolbarComponent,
-        eventWrapper: eventWrapperComponent,
         dateCellWrapper: dateCellWrapperComponent,
       }}
       onSelecting={onSelecting}
