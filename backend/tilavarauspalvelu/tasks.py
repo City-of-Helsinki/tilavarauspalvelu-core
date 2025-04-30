@@ -231,6 +231,18 @@ def refund_paid_reservation_task(reservation_pk: int) -> None:
         reservation.actions.refund_paid_reservation()
 
 
+@app.task(
+    name="cancel_reservation_invoice",
+    autoretry_for=(Exception,),
+    max_retries=5,
+    retry_backoff=True,
+)
+def cancel_reservation_invoice_task(reservation_pk: int) -> None:
+    reservation: Reservation | None = Reservation.objects.filter(pk=reservation_pk).first()
+    if reservation is not None:
+        reservation.actions.cancel_invoiced_reservation()
+
+
 @app.task(name="update_reservation_unit_hierarchy")
 def update_reservation_unit_hierarchy_task(using: str | None = None) -> None:
     ReservationUnitHierarchy.refresh(using=using)
