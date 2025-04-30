@@ -130,6 +130,7 @@ class UserAdmin(admin.ModelAdmin):
                     "department_name",
                     "profile_id",
                     "date_of_birth",
+                    "is_internal_user",
                 ],
             },
         ],
@@ -205,6 +206,7 @@ class UserAdmin(admin.ModelAdmin):
         "level_of_assurance",
         "access_token",
         "refresh_token",
+        "is_internal_user",
     ]
     inlines = [
         GeneralRoleInlineAdmin,
@@ -334,3 +336,6 @@ class UserAdmin(admin.ModelAdmin):
 
     def is_strong_login(self, user: User) -> bool:
         return getattr(user.id_token, "is_strong_login", False)
+
+    def is_internal_user(self, user: User) -> bool:
+        return user.actions.is_internal_user
