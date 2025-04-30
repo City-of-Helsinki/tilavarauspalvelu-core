@@ -14,7 +14,7 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import Reservation, ReservationCancelReason
-from tilavarauspalvelu.tasks import refund_paid_reservation_task
+from tilavarauspalvelu.tasks import cancel_reservation_invoice_task, refund_paid_reservation_task
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.errors import external_service_errors_as_validation_errors
 
@@ -79,8 +79,10 @@ class ReservationCancellationSerializer(NestingModelSerializer):
                 ):
                     PindoraService.delete_access_code(obj=instance)
 
-        if instance.actions.is_refundable and instance.price_net > 0:
+        if instance.actions.is_refundable:
             refund_paid_reservation_task.delay(instance.pk)
+        elif instance.actions.is_cancellable_invoice:
+            cancel_reservation_invoice_task.delay(instance.pk)
 
         EmailService.send_reservation_cancelled_email(reservation=instance)
 
