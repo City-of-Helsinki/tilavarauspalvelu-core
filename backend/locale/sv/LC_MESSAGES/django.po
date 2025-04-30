@@ -50,6 +50,10 @@ msgid "of which can be refunded:"
 msgstr ""
 
 #: templates/admin/deny_reservation_confirmation.html
+msgid "of which can be cancelled:"
+msgstr ""
+
+#: templates/admin/deny_reservation_confirmation.html
 msgid "Number of ended reservations, which can't be denied:"
 msgstr ""
 
@@ -1422,11 +1426,17 @@ msgid "Deny selected reservations and refund"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/admin.py
-msgid "Refund has been initiated for selected reservations."
+#, python-format
+msgid "Refund has been initiated for %(count)s paid reservations."
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/admin.py
-msgid "No reservations with paid orders to refund."
+#, python-format
+msgid "Cancellation has been initiated for %(count)s invoiced reservations."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "No reservations with paid orders to refund or cancel."
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/filters.py

@@ -50,6 +50,10 @@ msgid "of which can be refunded:"
 msgstr "joista voidaan hyvittää:"
 
 #: templates/admin/deny_reservation_confirmation.html
+msgid "of which can be cancelled:"
+msgstr "joista voidaan perua:"
+
+#: templates/admin/deny_reservation_confirmation.html
 msgid "Number of ended reservations, which can't be denied:"
 msgstr "Valittujen varausten määrä, jota ei voida hylätä:"
 
@@ -1470,12 +1474,18 @@ msgid "Deny selected reservations and refund"
 msgstr "Hylkää valitut varaukset ja hyvitä"
 
 #: tilavarauspalvelu/admin/reservation/admin.py
-msgid "Refund has been initiated for selected reservations."
-msgstr "Hyvitys on aloitettu valituille varauksille."
+#, python-format
+msgid "Refund has been initiated for %(count)s paid reservations."
+msgstr "Hyvitys on aloitettu %(count)s maksetulle varaukselle."
 
 #: tilavarauspalvelu/admin/reservation/admin.py
-msgid "No reservations with paid orders to refund."
-msgstr "Ei varauksia hyvitettävillä maksetuilla tilauksilla."
+#, python-format
+msgid "Cancellation has been initiated for %(count)s invoiced reservations."
+msgstr "Peruutus on aloitettu %(count)s laskutetulle varaukselle."
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "No reservations with paid orders to refund or cancel."
+msgstr "Ei hyvitettäviä tai peruutettavia maksettuja varauksia."
 
 #: tilavarauspalvelu/admin/reservation/filters.py
 #: tilavarauspalvelu/admin/reservation/form.py
