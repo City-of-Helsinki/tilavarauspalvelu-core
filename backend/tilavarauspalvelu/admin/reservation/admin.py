@@ -13,8 +13,8 @@ from rangefilter.filters import DateRangeFilterBuilder
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import Reservation, ReservationDenyReason
-from tilavarauspalvelu.tasks import refund_paid_reservation_task
-from utils.date_utils import local_datetime
+from tilavarauspalvelu.tasks import cancel_reservation_invoice_task, refund_paid_reservation_task
+from utils.date_utils import local_date, local_datetime
 
 from .filters import (
     AccessCodeGeneratedFilter,
@@ -248,11 +248,19 @@ class ReservationAdmin(admin.ModelAdmin):
         queryset = queryset.filter(end__gte=local_datetime())
         queryset_unpaid_reservation_count = queryset.filter(price=0).count()
         queryset_paid_reservation_count = queryset.filter(price__gt=0).count()
+
         queryset_refundable_reservation_count = queryset.filter(
             price__gt=0,
             payment_order__isnull=False,
             payment_order__status=OrderStatus.PAID,
             payment_order__refund_id__isnull=True,
+        ).count()
+
+        queryset_cancellable_reservation_count = queryset.filter(
+            price__gt=0,
+            payment_order__isnull=False,
+            payment_order__status=OrderStatus.PAID_BY_INVOICE,
+            begin__date__lte=local_date(),
         ).count()
 
         deny_reasons = ReservationDenyReason.objects.all().order_by("reason")
@@ -266,6 +274,7 @@ class ReservationAdmin(admin.ModelAdmin):
             "queryset_paid_reservation_count": queryset_paid_reservation_count,
             "queryset_ended_reservation_count": queryset_ended_reservation_count,
             "queryset_refundable_reservation_count": queryset_refundable_reservation_count,
+            "queryset_cancellable_reservation_count": queryset_cancellable_reservation_count,
             "deny_reasons": deny_reasons,
             "opts": self.model._meta,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
@@ -338,9 +347,32 @@ class ReservationAdmin(admin.ModelAdmin):
         for reservation in refund_queryset:
             refund_paid_reservation_task.delay(reservation.pk)
 
-        if refund_queryset.count():
-            msg = _("Refund has been initiated for selected reservations.") + f" ({refund_queryset.count()})"
-        else:
-            msg = _("No reservations with paid orders to refund.")
+        # Cancel invoiced reservations
+        cancel_queryset = queryset.filter(
+            state=ReservationStateChoice.DENIED,
+            price__gt=0,
+            payment_order__isnull=False,
+            payment_order__status=OrderStatus.PAID_BY_INVOICE,
+            begin__date__lte=local_date(),
+        )
+        for reservation in cancel_queryset:
+            cancel_reservation_invoice_task.delay(reservation.pk)
+
+        refunded = len(refund_queryset)
+        canceled = len(cancel_queryset)
+
+        msg: str = ""
+
+        if refunded:
+            msg += str(_("Refund has been initiated for %(count)s paid reservations.") % {"count": refunded})
+
+        if canceled:
+            if msg:
+                msg += " "
+            msg += str(_("Cancellation has been initiated for %(count)s invoiced reservations.") % {"count": canceled})
+
+        if not msg:
+            msg = str(_("No reservations with paid orders to refund or cancel."))
+
         self.message_user(request, msg, level=messages.INFO)
         return None
