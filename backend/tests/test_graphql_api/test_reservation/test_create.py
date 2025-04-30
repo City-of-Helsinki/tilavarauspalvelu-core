@@ -15,6 +15,7 @@ from tilavarauspalvelu.enums import (
     ADLoginAMR,
     PaymentType,
     PriceUnit,
+    ProfileLoginAMR,
     ReservationKind,
     ReservationStateChoice,
     ReservationTypeChoice,
@@ -792,7 +793,7 @@ def test_reservation__create__duration_is_not_multiple_of_interval(graphql):
     ]
 
 
-@pytest.mark.parametrize("arm", ["suomi_fi", "heltunnistussuomifi"])
+@pytest.mark.parametrize("arm", [ProfileLoginAMR.SUOMI_FI, ProfileLoginAMR.HELTUNNISTUSSUOMIFI])
 def test_reservation__create__prefill_profile_data(graphql, settings, arm):
     # given:
     # - Prefill setting is on
@@ -842,7 +843,7 @@ def test_reservation__create__prefill_profile_data__null_values(graphql, setting
 
     reservation_unit = ReservationUnitFactory.create_reservable_now()
     CityFactory.create(name="Helsinki")
-    user = UserFactory.create(social_auth__extra_data__amr="suomi_fi")
+    user = UserFactory.create_profile_user()
     graphql.force_login(user)
 
     # when:
@@ -891,7 +892,7 @@ def test_reservation__create__prefilled_with_profile_data__api_call_fails(graphq
 
     reservation_unit = ReservationUnitFactory.create_reservable_now()
     CityFactory.create(name="Helsinki")
-    user = UserFactory.create(social_auth__extra_data__amr="suomi_fi")
+    user = UserFactory.create_profile_user()
     graphql.force_login(user)
 
     # when:
@@ -927,7 +928,7 @@ def test_reservation__create__prefilled_with_profile_data__ad_login(graphql, set
 
     reservation_unit = ReservationUnitFactory.create_reservable_now()
     CityFactory.create(name="Helsinki")
-    user = UserFactory.create(social_auth__extra_data__amr=arm.value)
+    user = UserFactory.create(social_auth__extra_data__amr=arm, email="test@hel.fi")
     graphql.force_login(user)
 
     # when:
@@ -1063,14 +1064,14 @@ def test_reservation__create__reservation_block_whole_day__blocks_reserving_for_
 @pytest.mark.parametrize(
     ("amr", "expected"),
     [
-        ("helsinkiazuread", True),
-        ("suomi_fi", False),
+        (ADLoginAMR.HELSINKIAZUREAD, True),
+        (ProfileLoginAMR.SUOMI_FI, False),
     ],
 )
 def test_reservation__create__reservee_used_ad_login(graphql, amr, expected):
     reservation_unit = ReservationUnitFactory.create_reservable_now()
     CityFactory.create(name="Helsinki")
-    user = UserFactory.create(social_auth__extra_data__amr=amr)
+    user = UserFactory.create(social_auth__extra_data__amr=amr, email="test@hel.fi")
     graphql.force_login(user)
 
     data = get_create_data(reservation_unit)
@@ -1086,7 +1087,7 @@ def test_reservation__create__reservee_used_ad_login(graphql, amr, expected):
 def test_reservation__create__require_adult_reservee__is_adult(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=True)
 
-    user = UserFactory.create(social_auth__extra_data__amr="suomi_fi", date_of_birth=local_date(2006, 1, 1))
+    user = UserFactory.create_profile_user(date_of_birth=local_date(2006, 1, 1))
 
     graphql.force_login(user)
 
@@ -1103,38 +1104,21 @@ def test_reservation__create__require_adult_reservee__is_adult(graphql):
 def test_reservation__create__require_adult_reservee__is_under_age(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=True)
 
-    user = UserFactory.create(social_auth__extra_data__amr="suomi_fi", date_of_birth=local_date(2006, 1, 2))
+    user = UserFactory.create_profile_user(date_of_birth=local_date(2006, 1, 2))
 
     graphql.force_login(user)
 
     data = get_create_data(reservation_unit)
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.field_error_messages() == ["Reservation unit can only be booked by an adult reservee"]
+    assert response.field_error_messages() == ["User is not of age"]
 
 
 @freeze_time(local_datetime(2024, 1, 1))
 def test_reservation__create__require_adult_reservee__is_under_age__reservation_unit_allows(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=False)
 
-    user = UserFactory.create(social_auth__extra_data__amr="suomi_fi", date_of_birth=local_date(2006, 1, 2))
-
-    graphql.force_login(user)
-
-    data = get_create_data(reservation_unit)
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    reservation = Reservation.objects.filter(pk=response.first_query_object["pk"]).first()
-    assert reservation is not None
-
-
-@freeze_time(local_datetime(2024, 1, 1))
-def test_reservation__create__require_adult_reservee__is_ad_user(graphql):
-    reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=True)
-
-    user = UserFactory.create(social_auth__extra_data__amr="helsinkiazuread", date_of_birth=local_date(2006, 1, 1))
+    user = UserFactory.create_profile_user(date_of_birth=local_date(2006, 1, 2))
 
     graphql.force_login(user)
 
