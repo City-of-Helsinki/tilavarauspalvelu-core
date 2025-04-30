@@ -56,6 +56,8 @@ class ReservationCreateSerializer(NestingModelSerializer):
         # Endpoint requires users to be logged in
         user: User = self.context["request"].user
 
+        user.validators.validate_is_internal_user_if_ad_user()
+
         reservation_unit.validators.validate_reservation_unit_is_direct_bookable()
         reservation_unit.validators.validate_reservation_unit_is_published()
         reservation_unit.validators.validate_reservation_unit_is_reservable_at(begin=begin)
@@ -126,9 +128,6 @@ class ReservationCreateSerializer(NestingModelSerializer):
             reservation_unit: ReservationUnit = validated_data.pop("reservation_unit")
             reservation: Reservation = super().create(validated_data)
             reservation.reservation_units.set([reservation_unit])
-
-        reservation.begin.astimezone(DEFAULT_TIMEZONE)
-        reservation.end.astimezone(DEFAULT_TIMEZONE)
 
         # After creating the reservation, check again if there are any overlapping reservations.
         # This can fail if two reservations are created for reservation units in the same

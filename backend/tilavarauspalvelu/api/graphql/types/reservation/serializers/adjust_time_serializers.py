@@ -47,6 +47,8 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
         }
 
     def validate(self, data: ReservationAdjustTimeData) -> ReservationAdjustTimeData:
+        self.instance.user.validators.validate_is_internal_user_if_ad_user()
+
         self.instance.validators.validate_reservation_state_allows_rescheduling()
         self.instance.validators.validate_reservation_type_allows_rescheduling()
         self.instance.validators.validate_reservation_not_handled()

@@ -1150,6 +1150,63 @@ def test_reservation__create__require_adult_reservee__no_id_token(graphql):
     assert reservation is not None
 
 
+def test_reservation__create__require_adult_reservee__is_ad_user__internal(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=True)
+
+    user = UserFactory.create_ad_user(email="test@hel.fi")
+
+    graphql.force_login(user)
+
+    data = get_create_data(reservation_unit)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation = Reservation.objects.filter(pk=response.first_query_object["pk"]).first()
+    assert reservation is not None
+
+
+def test_reservation__create__require_adult_reservee__is_ad_user__not_internal(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=True)
+
+    user = UserFactory.create_ad_user(email="test@example.com")
+
+    graphql.force_login(user)
+
+    data = get_create_data(reservation_unit)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["AD user is not an internal user."]
+
+
+def test_reservation__create__dont_require_adult_reservee__is_ad_user__internal(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=False)
+
+    user = UserFactory.create_ad_user(email="test@hel.fi")
+
+    graphql.force_login(user)
+
+    data = get_create_data(reservation_unit)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response
+
+
+def test_reservation__create__dont_require_adult_reservee__is_ad_user__not_internal(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=False)
+
+    user = UserFactory.create_ad_user(email="test@example.com")
+
+    graphql.force_login(user)
+
+    data = get_create_data(reservation_unit)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["AD user is not an internal user."]
+
+
 @patch_method(PindoraService.create_access_code)
 def test_reservation__create__access_type__access_code(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(

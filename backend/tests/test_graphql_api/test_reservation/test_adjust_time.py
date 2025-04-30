@@ -406,6 +406,18 @@ def test_reservation__adjust_time__unit_admin_can_adjust_user_reservation(graphq
     assert reservation.end != reservation_end
 
 
+def test_reservation__adjust_time__non_internal_ad_user(graphql):
+    user = UserFactory.create_ad_user(email="test@example.com")
+    reservation = ReservationFactory.create_for_time_adjustment(user=user)
+
+    graphql.login_with_superuser()
+    data = get_adjust_data(reservation)
+    response = graphql(ADJUST_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["AD user is not an internal user."]
+
+
 @override_settings(SEND_EMAILS=True)
 def test_reservation__adjust_time__needs_handling_after_time_change(graphql, outbox):
     reservation = ReservationFactory.create_for_time_adjustment(reservation_units__require_reservation_handling=True)
