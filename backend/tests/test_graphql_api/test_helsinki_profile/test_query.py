@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 
-from tilavarauspalvelu.enums import ADLoginAMR, LoginMethod, ProfileLoginAMR
+from tilavarauspalvelu.enums import LoginMethod
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 
@@ -26,7 +26,7 @@ pytestmark = [
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
 @patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__all_fields(graphql):
-    user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
+    user = UserFactory.create_profile_user()
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic(
@@ -78,7 +78,7 @@ def test_helsinki_profile_data__query__all_fields(graphql):
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
 @patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__application_user(graphql):
-    user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
+    user = UserFactory.create_profile_user()
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
@@ -100,7 +100,7 @@ def test_helsinki_profile_data__query__application_user(graphql):
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
 @patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__reservation_user(graphql):
-    user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
+    user = UserFactory.create_profile_user()
     reservation = ReservationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
@@ -122,7 +122,7 @@ def test_helsinki_profile_data__query__reservation_user(graphql):
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
 @patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__ad_user(graphql):
-    user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ADLoginAMR.HELSINKIAD.value)
+    user = UserFactory.create_ad_user(profile_id="foo")
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
@@ -222,7 +222,7 @@ def test_helsinki_profile_data__query__non_helauth_user(graphql):
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
 @patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__no_profile_id(graphql):
-    user = UserFactory.create(profile_id="", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
+    user = UserFactory.create_profile_user(profile_id="")
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
@@ -239,7 +239,7 @@ def test_helsinki_profile_data__query__no_profile_id(graphql):
 @patch_method(HelsinkiProfileClient.get_token, return_value=None)
 @patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__no_token(graphql):
-    user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
+    user = UserFactory.create_profile_user()
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
@@ -257,7 +257,7 @@ def test_helsinki_profile_data__query__no_token(graphql):
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(SentryLogger.log_message)
 def test_helsinki_profile_data__query__profile_request_has_errors(graphql):
-    user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
+    user = UserFactory.create_profile_user()
     application = ApplicationFactory.create(user=user)
 
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"errors": [{"message": "foo"}]})
@@ -275,7 +275,7 @@ def test_helsinki_profile_data__query__profile_request_has_errors(graphql):
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
 @patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__no_permission(graphql):
-    user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
+    user = UserFactory.create_profile_user()
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
@@ -292,7 +292,7 @@ def test_helsinki_profile_data__query__no_permission(graphql):
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
 @patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__general_admin(graphql):
-    user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
+    user = UserFactory.create_profile_user()
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
@@ -316,7 +316,7 @@ def test_helsinki_profile_data__query__general_admin(graphql):
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
 @patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__unit_admin(graphql):
-    user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
+    user = UserFactory.create_profile_user()
     application = ApplicationFactory.create(
         user=user,
         application_sections__reservation_unit_options__reservation_unit__unit__name="foo",
@@ -342,7 +342,7 @@ def test_helsinki_profile_data__query__unit_admin(graphql):
 
 
 def test_helsinki_profile_data__query__keycloak_token_expired(graphql):
-    user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
+    user = UserFactory.create_profile_user()
     application = ApplicationFactory.create(user=user)
 
     graphql.login_with_superuser()

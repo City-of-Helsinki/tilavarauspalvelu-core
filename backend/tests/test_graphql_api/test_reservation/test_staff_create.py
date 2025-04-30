@@ -5,7 +5,14 @@ import datetime
 import freezegun
 import pytest
 
-from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import (
+    AccessType,
+    ADLoginAMR,
+    CustomerTypeChoice,
+    ProfileLoginAMR,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -469,8 +476,8 @@ def test_reservation__staff_create__reservation_type_behalf_accepted(graphql):
 @pytest.mark.parametrize(
     ("amr", "expected"),
     [
-        ("helsinkiazuread", True),
-        ("suomi_fi", False),
+        (ADLoginAMR.HELSINKIAZUREAD, True),
+        (ProfileLoginAMR.SUOMI_FI, False),
     ],
 )
 def test_reservation__staff_create__reservee_used_ad_login(graphql, amr, expected):
