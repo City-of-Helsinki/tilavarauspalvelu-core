@@ -32,7 +32,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateO
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, Reservation, ReservationMetadataField, Space
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -288,9 +288,10 @@ class ReservationActions:
     def is_refundable(self) -> bool:
         payment_order: PaymentOrder | None = self.reservation.payment_order.first()
         return (
-            payment_order is not None  # There is a payment order
-            and payment_order.status == OrderStatus.PAID  # This is a paid reservation
-            and payment_order.refund_id is None  # Not refunded already
+            self.reservation.price_net > 0  # Is a paid reservation
+            and payment_order is not None  # Has a payment order
+            and payment_order.status == OrderStatus.PAID  # Has been paid in webshop using online payment
+            and payment_order.refund_id is None  # Has not been refunded already
         )
 
     def refund_paid_reservation(self) -> None:
@@ -307,6 +308,30 @@ class ReservationActions:
 
         payment_order.status = OrderStatus.REFUNDED
         payment_order.save(update_fields=["refund_id", "status"])
+
+    @property
+    def is_cancellable_invoice(self) -> bool:
+        payment_order: PaymentOrder | None = self.reservation.payment_order.first()
+        begin_date = self.reservation.begin.astimezone(DEFAULT_TIMEZONE).date()
+        return (
+            self.reservation.price_net > 0  # Is a paid reservation
+            and local_date() <= begin_date  # Reservation start date is not in the past
+            and payment_order is not None  # Has a payment order
+            and payment_order.status == OrderStatus.PAID_BY_INVOICE  # Has been paid in webshop using invoice
+        )
+
+    def cancel_invoiced_reservation(self) -> None:
+        payment_order: PaymentOrder | None = self.reservation.payment_order.first()
+        if payment_order is None:
+            return
+
+        if not settings.MOCK_VERKKOKAUPPA_API_ENABLED:
+            VerkkokauppaAPIClient.cancel_order(
+                order_uuid=payment_order.remote_id,
+                user_uuid=payment_order.reservation_user_uuid,
+            )
+
+        payment_order.actions.set_order_as_cancelled()
 
     def create_payment_order(self, payment_type: PaymentType) -> PaymentOrder:
         if payment_type == PaymentType.ON_SITE:
