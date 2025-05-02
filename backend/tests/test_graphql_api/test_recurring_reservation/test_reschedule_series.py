@@ -27,7 +27,7 @@ pytestmark = [
 ]
 
 
-@patch_method(EmailService.send_seasonal_reservation_modified_series_email)
+@patch_method(EmailService.send_seasonal_booking_rescheduled_series_email)
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
 def test_recurring_reservations__reschedule_series__change_begin_date(graphql):
     recurring_reservation = create_reservation_series(allocated_time_slot__day_of_the_week=Weekday.MONDAY)
@@ -56,7 +56,7 @@ def test_recurring_reservations__reschedule_series__change_begin_date(graphql):
     assert reservations[6].begin.date() == local_date(year=2024, month=1, day=22)
     assert reservations[7].begin.date() == local_date(year=2024, month=1, day=29)
 
-    assert EmailService.send_seasonal_reservation_modified_series_email.called is True
+    assert EmailService.send_seasonal_booking_rescheduled_series_email.called is True
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday

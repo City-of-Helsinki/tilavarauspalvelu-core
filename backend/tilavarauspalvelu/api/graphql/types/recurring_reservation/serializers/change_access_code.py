@@ -70,6 +70,6 @@ class ReservationSeriesChangeAccessCodeSerializer(NestingModelSerializer):
 
         if instance.allocated_time_slot is not None:
             section = instance.allocated_time_slot.reservation_unit_option.application_section
-            EmailService.send_seasonal_reservation_modified_series_access_code_email(section)
+            EmailService.send_seasonal_booking_access_code_changed_email(section)
 
         return instance

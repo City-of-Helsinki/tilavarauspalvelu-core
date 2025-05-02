@@ -3372,50 +3372,6 @@ msgctxt "Email"
 msgid "You can check your booking details at"
 msgstr "Du kan kontrollera dina bokningsuppgifter på"
 
-#: tilavarauspalvelu/integrations/email/template_context/permissions.py
-msgctxt "Email"
-msgid "Your staff access to Varaamo is expiring"
-msgstr "Din personalåtkomst till Varaamo håller på att gå ut"
-
-#: tilavarauspalvelu/integrations/email/template_context/permissions.py
-msgctxt "Email"
-msgid ""
-"Your staff access to Varaamo will expire if you do not log in to the service "
-"within two weeks."
-msgstr ""
-"Din personalåtkomst till Varaamo kommer att upphöra om du inte loggar in på "
-"tjänsten inom två veckor."
-
-#: tilavarauspalvelu/integrations/email/template_context/permissions.py
-msgctxt "Email"
-msgid "Log in to the service at"
-msgstr "Logga in i tjänsten på"
-
-#: tilavarauspalvelu/integrations/email/template_context/permissions.py
-msgctxt "Email"
-msgid "Your user account in the Varaamo service is expiring"
-msgstr "Ditt användarkonto i Varaamo-tjänsten håller på att gå ut"
-
-#: tilavarauspalvelu/integrations/email/template_context/permissions.py
-msgctxt "Email"
-msgid ""
-"Your user account in the Varaamo service will expire if you do not log in "
-"within two weeks. The information will be permanently deleted if your "
-"account expires."
-msgstr ""
-"Ditt användarkonto på tjänsten Varaamo kommer att upphöra om du inte loggar "
-"in inom två veckor. Informationen kommer att raderas permanent om ditt konto "
-"upphör."
-
-#: tilavarauspalvelu/integrations/email/template_context/permissions.py
-msgctxt "Email"
-msgid ""
-"You can extend the validity of your user account by logging into the service "
-"at"
-msgstr ""
-"Du kan förlänga giltigheten för ditt användarkonto genom att logga in på "
-"tjänsten på"
-
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
 msgid "Your booking has been confirmed with the following discount:"
@@ -3527,34 +3483,53 @@ msgid ""
 msgstr ""
 "En ny bokningsförfrågan för %(reservation_unit_name)s väntar på at behandlats"
 
-#: tilavarauspalvelu/integrations/email/typing.py
-msgctxt "EmailType"
-msgid "Application handled"
+#: tilavarauspalvelu/integrations/email/template_context/user.py
+msgctxt "Email"
+msgid "Your staff access to Varaamo is expiring"
+msgstr "Din personalåtkomst till Varaamo håller på att gå ut"
+
+#: tilavarauspalvelu/integrations/email/template_context/user.py
+msgctxt "Email"
+msgid ""
+"Your staff access to Varaamo will expire if you do not log in to the service "
+"within two weeks."
 msgstr ""
+"Din personalåtkomst till Varaamo kommer att upphöra om du inte loggar in på "
+"tjänsten inom två veckor."
+
+#: tilavarauspalvelu/integrations/email/template_context/user.py
+msgctxt "Email"
+msgid "Log in to the service at"
+msgstr "Logga in i tjänsten på"
+
+#: tilavarauspalvelu/integrations/email/template_context/user.py
+msgctxt "Email"
+msgid "Your user account in the Varaamo service is expiring"
+msgstr "Ditt användarkonto i Varaamo-tjänsten håller på att gå ut"
+
+#: tilavarauspalvelu/integrations/email/template_context/user.py
+msgctxt "Email"
+msgid ""
+"Your user account in the Varaamo service will expire if you do not log in "
+"within two weeks. The information will be permanently deleted if your "
+"account expires."
+msgstr ""
+"Ditt användarkonto på tjänsten Varaamo kommer att upphöra om du inte loggar "
+"in inom två veckor. Informationen kommer att raderas permanent om ditt konto "
+"upphör."
+
+#: tilavarauspalvelu/integrations/email/template_context/user.py
+msgctxt "Email"
+msgid ""
+"You can extend the validity of your user account by logging into the service "
+"at"
+msgstr ""
+"Du kan förlänga giltigheten för ditt användarkonto genom att logga in på "
+"tjänsten på"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Application in allocation"
-msgstr ""
-
-#: tilavarauspalvelu/integrations/email/typing.py
-msgctxt "EmailType"
-msgid "Application received"
-msgstr ""
-
-#: tilavarauspalvelu/integrations/email/typing.py
-msgctxt "EmailType"
-msgid "Application section cancelled"
-msgstr ""
-
-#: tilavarauspalvelu/integrations/email/typing.py
-msgctxt "EmailType"
-msgid "Permission deactivation"
-msgstr ""
-
-#: tilavarauspalvelu/integrations/email/typing.py
-msgctxt "EmailType"
-msgid "User anonymization"
+msgid "Reservation access code changed"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
@@ -3574,17 +3549,12 @@ msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Reservation modified"
+msgid "Reservation confirmed staff notification"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Reservation modified access code"
-msgstr ""
-
-#: tilavarauspalvelu/integrations/email/typing.py
-msgctxt "EmailType"
-msgid "Reservation rejected"
+msgid "Reservation denied"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
@@ -3594,52 +3564,82 @@ msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
+msgid "Reservation requires handling staff notification"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
 msgid "Reservation requires payment"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal reservation cancelled single"
+msgid "Reservation rescheduled"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal reservation modified series"
+msgid "Seasonal reservation access code changed"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal reservation modified series access code"
+msgid "Seasonal booking application received"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal reservation modified single"
+msgid "Seasonal booking application round in allocation"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal reservation rejected series"
+msgid "Seasonal booking application round handled"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal reservation rejected single"
+msgid "Seasonal booking cancelled all"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Staff notification application section cancelled"
+msgid "Seasonal booking cancelled all staff notification"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Staff notification reservation made"
+msgid "Seasonal booking cancelled single"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Staff notification reservation requires handling"
+msgid "Seasonal booking denied series"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal booking denied single"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal booking rescheduled series"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal booking rescheduled single"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "User permissions deactivation"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "User anonymization"
 msgstr ""
 
 #: tilavarauspalvelu/models/ability_group/model.py

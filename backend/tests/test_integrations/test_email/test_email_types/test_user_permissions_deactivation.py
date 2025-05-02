@@ -1,4 +1,4 @@
-# type: EmailType.PERMISSION_DEACTIVATION
+# type: EmailType.USER_PERMISSIONS_DEACTIVATION
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from tilavarauspalvelu.admin.email_template.utils import get_mock_data
 from tilavarauspalvelu.enums import Language
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
-from tilavarauspalvelu.integrations.email.template_context import get_context_for_permission_deactivation
+from tilavarauspalvelu.integrations.email.template_context import get_context_for_user_permissions_deactivation
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from utils.date_utils import local_datetime
 
@@ -76,21 +76,33 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_get_context__permission_deactivation(lang: Lang):
+def test_user_permissions_deactivation__get_context(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
-        assert get_context_for_permission_deactivation(language=lang) == expected
-        assert get_mock_data(email_type=EmailType.PERMISSION_DEACTIVATION, language=lang) == expected
+        context = get_context_for_user_permissions_deactivation(language=lang)
+
+    assert context == expected
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_user_permissions_deactivation__get_context__get_mock_data(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    with TranslationsFromPOFiles():
+        context = get_mock_data(email_type=EmailType.USER_PERMISSIONS_DEACTIVATION, language=lang)
+
+    assert context == expected
 
 
 # RENDER TEXT ##########################################################################################################
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_permission_deactivation__text():
-    context = get_mock_data(email_type=EmailType.PERMISSION_DEACTIVATION, language="en")
-    text_content = render_text(email_type=EmailType.PERMISSION_DEACTIVATION, context=context)
+def test_user_permissions_deactivation__render__text():
+    context = get_mock_data(email_type=EmailType.USER_PERMISSIONS_DEACTIVATION, language="en")
+    text_content = render_text(email_type=EmailType.USER_PERMISSIONS_DEACTIVATION, context=context)
 
     assert text_content == cleandoc(
         f"""
@@ -110,9 +122,9 @@ def test_render_permission_deactivation__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_permission_deactivation__html():
-    context = get_mock_data(email_type=EmailType.PERMISSION_DEACTIVATION, language="en")
-    html_content = render_html(email_type=EmailType.PERMISSION_DEACTIVATION, context=context)
+def test_user_permissions_deactivation__render__html():
+    context = get_mock_data(email_type=EmailType.USER_PERMISSIONS_DEACTIVATION, language="en")
+    html_content = render_html(email_type=EmailType.USER_PERMISSIONS_DEACTIVATION, context=context)
     text_content = html_email_to_text(html_content)
 
     assert text_content == cleandoc(
@@ -137,14 +149,14 @@ def test_render_permission_deactivation__html():
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
-def test_email_service__send_permission_deactivation_emails(outbox):
+def test_user_permissions_deactivation__send_email(outbox):
     UserFactory.create_superuser(
         email="user@email.com",
         preferred_language=Language.EN.value,
         last_login=local_datetime() - datetime.timedelta(days=20),
     )
 
-    EmailService.send_permission_deactivation_emails()
+    EmailService.send_user_permissions_deactivation_emails()
 
     assert len(outbox) == 1
 
@@ -155,14 +167,14 @@ def test_email_service__send_permission_deactivation_emails(outbox):
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
-def test_email_service__send_permission_deactivation_emails__logged_in_recently(outbox):
+def test_user_permissions_deactivation__send_email__logged_in_recently(outbox):
     UserFactory.create_superuser(
         email="user@email.com",
         preferred_language=Language.EN.value,
         last_login=local_datetime() - datetime.timedelta(days=1),
     )
 
-    EmailService.send_permission_deactivation_emails()
+    EmailService.send_user_permissions_deactivation_emails()
 
     assert len(outbox) == 0
 
@@ -170,7 +182,7 @@ def test_email_service__send_permission_deactivation_emails__logged_in_recently(
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
-def test_email_service__send_permission_deactivation_emails__permissions_going_to_expire(outbox):
+def test_user_permissions_deactivation__send_email__permissions_going_to_expire(outbox):
     UserFactory.create_superuser(
         email="user@email.com",
         preferred_language=Language.EN.value,
@@ -179,7 +191,7 @@ def test_email_service__send_permission_deactivation_emails__permissions_going_t
         last_login=local_datetime() - datetime.timedelta(days=6),
     )
 
-    EmailService.send_permission_deactivation_emails()
+    EmailService.send_user_permissions_deactivation_emails()
 
     assert len(outbox) == 1
 
@@ -190,7 +202,7 @@ def test_email_service__send_permission_deactivation_emails__permissions_going_t
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
-def test_email_service__send_permission_deactivation_emails__no_email(outbox):
+def test_user_permissions_deactivation__send_email__no_recipients(outbox):
     UserFactory.create_superuser(
         # User has no email, so we can't notify them (but we should still deactivate the permissions)
         email="",
@@ -198,7 +210,7 @@ def test_email_service__send_permission_deactivation_emails__no_email(outbox):
         last_login=local_datetime() - datetime.timedelta(days=20),
     )
 
-    EmailService.send_permission_deactivation_emails()
+    EmailService.send_user_permissions_deactivation_emails()
 
     assert len(outbox) == 0
 
@@ -206,14 +218,14 @@ def test_email_service__send_permission_deactivation_emails__no_email(outbox):
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
-def test_email_service__send_permission_deactivation_emails__general_admin(outbox):
+def test_user_permissions_deactivation__send_email__general_admin(outbox):
     UserFactory.create_with_general_role(
         email="user@email.com",
         preferred_language=Language.EN.value,
         last_login=local_datetime() - datetime.timedelta(days=20),
     )
 
-    EmailService.send_permission_deactivation_emails()
+    EmailService.send_user_permissions_deactivation_emails()
 
     assert len(outbox) == 1
 
@@ -224,7 +236,7 @@ def test_email_service__send_permission_deactivation_emails__general_admin(outbo
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
-def test_email_service__send_permission_deactivation_emails__general_admin__role_inactive(outbox):
+def test_user_permissions_deactivation__send_email__general_admin__role_inactive(outbox):
     UserFactory.create_with_general_role(
         email="user@email.com",
         preferred_language=Language.EN.value,
@@ -232,7 +244,7 @@ def test_email_service__send_permission_deactivation_emails__general_admin__role
         general_roles__role_active=False,
     )
 
-    EmailService.send_permission_deactivation_emails()
+    EmailService.send_user_permissions_deactivation_emails()
 
     assert len(outbox) == 0
 
@@ -240,7 +252,7 @@ def test_email_service__send_permission_deactivation_emails__general_admin__role
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
-def test_email_service__send_permission_deactivation_emails__unit_admin(outbox):
+def test_user_permissions_deactivation__send_email__unit_admin(outbox):
     UserFactory.create_with_unit_role(
         units=[UnitFactory.create()],
         email="user@email.com",
@@ -248,7 +260,7 @@ def test_email_service__send_permission_deactivation_emails__unit_admin(outbox):
         last_login=local_datetime() - datetime.timedelta(days=20),
     )
 
-    EmailService.send_permission_deactivation_emails()
+    EmailService.send_user_permissions_deactivation_emails()
 
     assert len(outbox) == 1
 
@@ -259,7 +271,7 @@ def test_email_service__send_permission_deactivation_emails__unit_admin(outbox):
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
-def test_email_service__send_permission_deactivation_emails__unit_admin__role_inactive(outbox):
+def test_user_permissions_deactivation__send_email__unit_admin__role_inactive(outbox):
     UserFactory.create_with_unit_role(
         units=[UnitFactory.create()],
         email="user@email.com",
@@ -268,7 +280,7 @@ def test_email_service__send_permission_deactivation_emails__unit_admin__role_in
         unit_roles__role_active=False,
     )
 
-    EmailService.send_permission_deactivation_emails()
+    EmailService.send_user_permissions_deactivation_emails()
 
     assert len(outbox) == 0
 
@@ -276,7 +288,7 @@ def test_email_service__send_permission_deactivation_emails__unit_admin__role_in
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
-def test_email_service__send_permission_deactivation_emails__multiple_languages(outbox):
+def test_user_permissions_deactivation__send_email__multiple_languages(outbox):
     UserFactory.create_superuser(
         email="user1@email.com",
         preferred_language=Language.EN.value,
@@ -289,7 +301,7 @@ def test_email_service__send_permission_deactivation_emails__multiple_languages(
     )
 
     with TranslationsFromPOFiles():
-        EmailService.send_permission_deactivation_emails()
+        EmailService.send_user_permissions_deactivation_emails()
 
     assert len(outbox) == 2
 
@@ -303,14 +315,14 @@ def test_email_service__send_permission_deactivation_emails__multiple_languages(
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
-def test_email_service__send_permission_deactivation_emails__no_permissions(outbox):
+def test_user_permissions_deactivation__send_email__no_permissions(outbox):
     UserFactory.create(
         email="user@email.com",
         preferred_language=Language.EN.value,
         last_login=local_datetime() - datetime.timedelta(days=20),
     )
 
-    EmailService.send_permission_deactivation_emails()
+    EmailService.send_user_permissions_deactivation_emails()
 
     assert len(outbox) == 0
 
@@ -318,7 +330,7 @@ def test_email_service__send_permission_deactivation_emails__no_permissions(outb
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
-def test_email_service__send_permission_deactivation_emails__email_already_sent(outbox):
+def test_user_permissions_deactivation__send_email__email_already_sent(outbox):
     UserFactory.create_superuser(
         email="user@email.com",
         preferred_language=Language.EN.value,
@@ -326,6 +338,6 @@ def test_email_service__send_permission_deactivation_emails__email_already_sent(
         sent_email_about_deactivating_permissions=True,
     )
 
-    EmailService.send_permission_deactivation_emails()
+    EmailService.send_user_permissions_deactivation_emails()
 
     assert len(outbox) == 0

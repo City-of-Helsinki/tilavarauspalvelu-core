@@ -1,4 +1,4 @@
-# type: EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE
+# type: EmailType.SEASONAL_BOOKING_RESCHEDULED_SINGLE
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
-from tilavarauspalvelu.integrations.email.template_context import get_context_for_seasonal_reservation_cancelled_single
+from tilavarauspalvelu.integrations.email.template_context import get_context_for_seasonal_booking_rescheduled_single
 from tilavarauspalvelu.integrations.email.typing import EmailType
 
 from tests.factories import ReservationFactory
@@ -45,25 +45,27 @@ if TYPE_CHECKING:
 
 COMMON_CONTEXT = {
     "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-    "cancel_reason": "[PERUUTUKSEN SYY]",
 }
 LANGUAGE_CONTEXT = {
     "en": {
-        "title": "The space reservation included in your seasonal booking has been cancelled",
+        "title": "The time of the space reservation included in your seasonal booking has changed",
+        "text_reservation_modified": "The time of the space reservation included in your seasonal booking has changed",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
         **COMMON_CONTEXT,
     },
     "fi": {
-        "title": "Kausivaraukseesi kuuluva tilavaraus on peruttu",
+        "title": "Kausivaraukseesi kuuluvan tilavarauksen ajankohta on muuttunut",
+        "text_reservation_modified": "Kausivaraukseesi kuuluvan tilavarauksen ajankohta on muuttunut",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
         **COMMON_CONTEXT,
     },
     "sv": {
-        "title": "Lokalbokningen som ingår i din säsongsbokning har avbokats",
+        "title": "Tiden för lokalbokningen som ingår i din säsongsbokning har ändrats",
+        "text_reservation_modified": "Tiden för lokalbokningen som ingår i din säsongsbokning har ändrats",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
@@ -74,7 +76,7 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_get_context_for_seasonal_reservation_cancelled_single(lang: Lang):
+def test_seasonal_booking_rescheduled_single__get_context(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     params = {
@@ -82,16 +84,29 @@ def test_get_context_for_seasonal_reservation_cancelled_single(lang: Lang):
         "application_section_id": 0,
     }
     with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_reservation_cancelled_single(**get_mock_params(**params, language=lang))
-        assert context == expected
+        context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_RESCHEDULED_SINGLE, **params, language=lang)
 
-        context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE, **params, language=lang)
-        assert context == expected
+    assert context == expected
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_seasonal_booking_rescheduled_single__get_context__get_mock_data(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    params = {
+        "application_id": 0,
+        "application_section_id": 0,
+    }
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_booking_rescheduled_single(**get_mock_params(**params, language=lang))
+
+    assert context == expected
 
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context_for_seasonal_reservation_cancelled_single__instance(email_reservation):
+def test_seasonal_booking_rescheduled_single__get_context__instance(email_reservation):
     section = email_reservation.actions.get_application_section()
 
     expected = {
@@ -99,34 +114,27 @@ def test_get_context_for_seasonal_reservation_cancelled_single__instance(email_r
         **get_application_details_urls(section),
     }
 
-    params = {
-        "application_id": section.application_id,
-        "application_section_id": section.id,
-    }
     with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_reservation_cancelled_single(**get_mock_params(**params, language="en"))
-        assert context == expected
+        context = get_context_for_seasonal_booking_rescheduled_single(reservation=email_reservation, language="en")
 
-    with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_reservation_cancelled_single(reservation=email_reservation, language="en")
-        assert context == expected
+    assert context == expected
 
 
 # RENDER TEXT ##########################################################################################################
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_seasonal_reservation_cancelled_single_text():
-    context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE, language="en")
-    text_content = render_text(email_type=EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE, context=context)
+def test_seasonal_booking_rescheduled_single__render__text():
+    context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_RESCHEDULED_SINGLE, language="en")
+    text_content = render_text(email_type=EmailType.SEASONAL_BOOKING_RESCHEDULED_SINGLE, context=context)
     text_content = text_content.replace("&amp;", "&")
+    url = "https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678"
 
     assert text_content == cleandoc(
         f"""
         Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
-        The space reservation included in your seasonal booking has been cancelled.
-        Reason: [PERUUTUKSEN SYY]
+        The time of the space reservation included in your seasonal booking has changed.
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI]
@@ -135,7 +143,7 @@ def test_render_seasonal_reservation_cancelled_single_text():
         From: 1.1.2024 at 12:00
         To: 1.1.2024 at 15:00
 
-        You can check your booking details at: https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678
+        You can check your booking details at: {url}
 
         {EMAIL_CLOSING_TEXT_EN}
         """
@@ -146,10 +154,11 @@ def test_render_seasonal_reservation_cancelled_single_text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_seasonal_reservation_cancelled_single__html():
-    context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE, language="en")
-    html_content = render_html(email_type=EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE, context=context)
+def test_seasonal_booking_rescheduled_single__render__html():
+    context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_RESCHEDULED_SINGLE, language="en")
+    html_content = render_html(email_type=EmailType.SEASONAL_BOOKING_RESCHEDULED_SINGLE, context=context)
     text_content = html_email_to_text(html_content)
+    url = "https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678"
 
     assert text_content == cleandoc(
         f"""
@@ -157,15 +166,14 @@ def test_render_seasonal_reservation_cancelled_single__html():
 
         **Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],**
 
-        The space reservation included in your seasonal booking has been cancelled.
+        The time of the space reservation included in your seasonal booking has changed.
 
-        Reason: [PERUUTUKSEN SYY]
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]
         [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         From: **1.1.2024** at **12:00**
         To: **1.1.2024** at **15:00**
-        You can check your booking details at: [varaamo.hel.fi](https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678)
+        You can check your booking details at: [varaamo.hel.fi]({url})
 
         {EMAIL_CLOSING_HTML_EN}
         """
@@ -178,9 +186,9 @@ def test_render_seasonal_reservation_cancelled_single__html():
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_email_service__send_seasonal_reservation_cancelled_single(outbox):
+def test_seasonal_booking_rescheduled_single__send_email(outbox):
     reservation = ReservationFactory.create(
-        state=ReservationStateChoice.CANCELLED,
+        state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.SEASONAL,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
@@ -189,9 +197,9 @@ def test_email_service__send_seasonal_reservation_cancelled_single(outbox):
         end=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
-    EmailService.send_reservation_cancelled_email(reservation)
+    EmailService.send_reservation_rescheduled_email(reservation)
 
     assert len(outbox) == 1
 
-    assert outbox[0].subject == "The space reservation included in your seasonal booking has been cancelled"
+    assert outbox[0].subject == "The time of the space reservation included in your seasonal booking has changed"
     assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]

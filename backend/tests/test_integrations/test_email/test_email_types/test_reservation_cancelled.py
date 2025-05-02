@@ -75,37 +75,45 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_get_context__reservation_cancelled(lang: Lang):
+def test_reservation_cancelled__get_context(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_cancelled(**get_mock_params(language=lang)) == expected
-        assert get_mock_data(email_type=EmailType.RESERVATION_CANCELLED, language=lang) == expected
+        context = get_context_for_reservation_cancelled(**get_mock_params(language=lang))
+
+    assert context == expected
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_reservation_cancelled__get_context__mock_data(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    with TranslationsFromPOFiles():
+        mock_context = get_mock_data(email_type=EmailType.RESERVATION_CANCELLED, language=lang)
+
+    assert mock_context == expected
 
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_cancelled__instance(email_reservation):
+def test_reservation_cancelled__get_context__instance(email_reservation):
     expected = {
         **LANGUAGE_CONTEXT["en"],
         "reservation_id": f"{email_reservation.id}",
     }
 
-    params = {
-        "reservation_id": email_reservation.id,
-    }
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_cancelled(**get_mock_params(**params, language="en")) == expected
+        context = get_context_for_reservation_cancelled(reservation=email_reservation, language="en")
 
-    with TranslationsFromPOFiles():
-        assert get_context_for_reservation_cancelled(reservation=email_reservation, language="en") == expected
+    assert context == expected
 
 
 # RENDER TEXT ##########################################################################################################
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_reservation_cancelled__text():
+def test_reservation_cancelled__render__text():
     context = get_mock_data(email_type=EmailType.RESERVATION_CANCELLED, language="en")
     text_content = render_text(email_type=EmailType.RESERVATION_CANCELLED, context=context)
 
@@ -138,7 +146,7 @@ def test_render_reservation_cancelled__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_reservation_cancelled__html():
+def test_reservation_cancelled__render__html():
     context = get_mock_data(email_type=EmailType.RESERVATION_CANCELLED, language="en")
 
     html_content = render_html(email_type=EmailType.RESERVATION_CANCELLED, context=context)
@@ -175,7 +183,7 @@ def test_render_reservation_cancelled__html():
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_email_service__send_reservation_cancelled_email(outbox):
+def test_reservation_cancelled__send_email(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CANCELLED,
         reservee_email="reservee@email.com",
@@ -193,7 +201,7 @@ def test_email_service__send_reservation_cancelled_email(outbox):
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_email_service__send_reservation_cancelled_email__wrong_state(outbox):
+def test_reservation_cancelled__send_email__wrong_state(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="reservee@email.com",
@@ -209,7 +217,7 @@ def test_email_service__send_reservation_cancelled_email__wrong_state(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @patch_method(SentryLogger.log_message)
-def test_email_service__send_reservation_cancelled_email__no_recipients(outbox):
+def test_reservation_cancelled__send_email__no_recipients(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CANCELLED,
         reservee_email="",
@@ -222,4 +230,4 @@ def test_email_service__send_reservation_cancelled_email__no_recipients(outbox):
     assert len(outbox) == 0
 
     assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args[0] == "No recipients for reservation cancelled email"
+    assert SentryLogger.log_message.call_args.args[0] == "No recipients for the 'reservation cancelled' email"

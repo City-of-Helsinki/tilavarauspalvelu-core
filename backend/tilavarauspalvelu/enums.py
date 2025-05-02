@@ -458,6 +458,13 @@ class ReservationTypeChoice(models.TextChoices):
         ]
 
     @classproperty
+    def types_created_by_the_reservee(cls) -> list[str]:
+        return [  # type: ignore[return-type]
+            ReservationTypeChoice.NORMAL.value,
+            ReservationTypeChoice.SEASONAL.value,
+        ]
+
+    @classproperty
     def types_that_staff_can_create(cls) -> list[str]:
         return [  # type: ignore[return-type]
             ReservationTypeChoice.BLOCKED.value,
