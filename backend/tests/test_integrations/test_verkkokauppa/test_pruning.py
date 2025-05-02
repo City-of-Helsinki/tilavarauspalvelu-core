@@ -60,7 +60,7 @@ def test_verkkokauppa_pruning__update_expired_orders__handle_expired_orders(orde
 
 
 @patch_method(EmailService.send_reservation_confirmed_email)
-@patch_method(EmailService.send_staff_notification_reservation_made_email)
+@patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
 @patch_method(VerkkokauppaAPIClient.get_payment)
 def test_verkkokauppa_pruning__update_expired_orders__handle_paid_orders(order):
     VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory.create(status=PaymentStatus.PAID_ONLINE.value)
@@ -76,7 +76,7 @@ def test_verkkokauppa_pruning__update_expired_orders__handle_paid_orders(order):
     assert VerkkokauppaAPIClient.get_payment.called is True
 
     assert EmailService.send_reservation_confirmed_email.called is True
-    assert EmailService.send_staff_notification_reservation_made_email.called is True
+    assert EmailService.send_reservation_confirmed_staff_notification_email.called is True
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment, return_value=None)

@@ -66,6 +66,6 @@ class StaffChangeReservationAccessCodeSerializer(NestingModelSerializer):
                 except ExternalServiceError as error:
                     SentryLogger.log_exception(error, details=f"Reservation: {instance.pk}")
 
-            EmailService.send_reservation_modified_access_code_email(reservation=instance)
+            EmailService.send_reservation_access_code_changed_email(reservation=instance)
 
         return instance

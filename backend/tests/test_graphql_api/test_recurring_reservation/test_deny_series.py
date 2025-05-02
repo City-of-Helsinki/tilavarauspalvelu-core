@@ -27,7 +27,7 @@ pytestmark = [
 ]
 
 
-@patch_method(EmailService.send_seasonal_reservation_rejected_series_email)
+@patch_method(EmailService.send_seasonal_booking_denied_series_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__deny_series(graphql):
     reason = ReservationDenyReasonFactory.create()
@@ -61,7 +61,7 @@ def test_recurring_reservations__deny_series(graphql):
     assert all(reservation.handling_details != "Handling details" for reservation in past_reservations)
     assert all(reservation.handled_at is None for reservation in past_reservations)
 
-    assert EmailService.send_seasonal_reservation_rejected_series_email.called is False
+    assert EmailService.send_seasonal_booking_denied_series_email.called is False
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
@@ -206,7 +206,7 @@ def test_recurring_reservations__deny_series__has_access_codes__pindora_call_fai
     assert all(reservation.state != ReservationStateChoice.DENIED for reservation in future_reservations)
 
 
-@patch_method(EmailService.send_seasonal_reservation_rejected_series_email)
+@patch_method(EmailService.send_seasonal_booking_denied_series_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__deny_series__in_seasonal_booking(graphql):
     reason = ReservationDenyReasonFactory.create()
@@ -225,4 +225,4 @@ def test_recurring_reservations__deny_series__in_seasonal_booking(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert EmailService.send_seasonal_reservation_rejected_series_email.called is True
+    assert EmailService.send_seasonal_booking_denied_series_email.called is True

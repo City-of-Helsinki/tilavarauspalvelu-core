@@ -95,11 +95,11 @@ class ReservationConfirmSerializer(NestingModelSerializer):
                     SentryLogger.log_exception(error, details=f"Reservation: {instance.pk}")
 
             EmailService.send_reservation_confirmed_email(reservation=instance)
-            EmailService.send_staff_notification_reservation_made_email(reservation=instance)
+            EmailService.send_reservation_confirmed_staff_notification_email(reservation=instance)
 
         elif instance.state == ReservationStateChoice.REQUIRES_HANDLING:
             EmailService.send_reservation_requires_handling_email(reservation=instance)
-            EmailService.send_staff_notification_reservation_requires_handling_email(reservation=instance)
+            EmailService.send_reservation_requires_handling_staff_notification_email(reservation=instance)
 
         return instance
 

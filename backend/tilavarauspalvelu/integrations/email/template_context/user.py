@@ -12,15 +12,15 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 __all__ = [
-    "get_context_for_permission_deactivation",
+    "get_context_for_user_permissions_deactivation",
 ]
 
 
-# type: EmailType.PERMISSION_DEACTIVATION ##############################################################################
+# type: EmailType.USER_PERMISSIONS_DEACTIVATION ##############################################################################
 
 
 @get_translated
-def get_context_for_permission_deactivation(*, language: Lang) -> EmailContext:
+def get_context_for_user_permissions_deactivation(*, language: Lang) -> EmailContext:
     link = get_staff_login_link()
     link_tag = create_anchor_tag(link=link)
 

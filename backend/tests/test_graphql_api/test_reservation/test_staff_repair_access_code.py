@@ -21,7 +21,7 @@ pytestmark = [
 
 
 @patch_method(PindoraService.sync_access_code)
-@patch_method(EmailService.send_reservation_modified_email)
+@patch_method(EmailService.send_reservation_rescheduled_email)
 def test_staff_repair_access_code(graphql):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
@@ -47,7 +47,7 @@ def test_staff_repair_access_code(graphql):
     assert reservation.access_code_generated_at is not None
 
     assert PindoraService.sync_access_code.call_count == 1
-    assert EmailService.send_reservation_modified_email.call_count == 1
+    assert EmailService.send_reservation_rescheduled_email.call_count == 1
 
 
 def test_staff_repair_access_code__access_type_not_access_code(graphql):
@@ -96,7 +96,7 @@ def test_staff_repair_access_code__in_series(graphql):
 
 
 @patch_method(PindoraService.sync_access_code)
-@patch_method(EmailService.send_reservation_modified_email)
+@patch_method(EmailService.send_reservation_rescheduled_email)
 def test_staff_repair_access_code__ongoing(graphql):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
@@ -116,7 +116,7 @@ def test_staff_repair_access_code__ongoing(graphql):
     response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
-    assert EmailService.send_reservation_modified_email.call_count == 1
+    assert EmailService.send_reservation_rescheduled_email.call_count == 1
 
 
 @patch_method(PindoraService.sync_access_code)

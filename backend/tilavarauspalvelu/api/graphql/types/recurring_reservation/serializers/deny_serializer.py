@@ -91,7 +91,7 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
 
         if instance.allocated_time_slot is not None:
             section = instance.allocated_time_slot.reservation_unit_option.application_section
-            EmailService.send_seasonal_reservation_rejected_series_email(section)
+            EmailService.send_seasonal_booking_denied_series_email(section)
 
         return instance
 

@@ -290,7 +290,7 @@ class ReservationAdmin(admin.ModelAdmin):
         self.message_user(request, msg, level=messages.INFO)
 
         for reservation in queryset:
-            EmailService.send_reservation_rejected_email(reservation=reservation)
+            EmailService.send_reservation_denied_email(reservation=reservation)
 
     @admin.action(description=_("Deny selected reservations without refund"))
     def deny_reservations_without_refund(

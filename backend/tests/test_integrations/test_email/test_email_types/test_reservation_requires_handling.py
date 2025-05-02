@@ -100,98 +100,124 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_get_context__reservation_requires_handling__not_subsidised(lang: Lang):
+def test_reservation_requires_handling__get_context__subsidised(lang: Lang):
     expected = {
         **LANGUAGE_CONTEXT[lang],
-        "price_can_be_subsidised": False,  # Subsidised price is not lower than normal price
-        "subsidised_price": Decimal("12.30"),
+        "price_can_be_subsidised": True,
+        "subsidised_price": Decimal("10.00"),
     }
 
-    params = {
-        "applying_for_free_of_charge": True,
-        "price": Decimal("12.30"),
-        "subsidised_price": Decimal("12.30"),
-    }
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_requires_handling(**get_mock_params(**params, language=lang)) == expected
-        assert get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, **params, language=lang) == expected
+        context = get_context_for_reservation_requires_handling(**get_mock_params(language=lang))
+
+    assert context == expected
 
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_get_context__reservation_requires_handling__subsidised(lang: Lang):
+def test_reservation_requires_handling__get_context__not_subsidised(lang: Lang):
     expected = {
         **LANGUAGE_CONTEXT[lang],
-        "price_can_be_subsidised": True,  # Subsidised price is lower than normal price
-        "subsidised_price": Decimal("10.00"),
-    }
-
-    params = {
-        "applying_for_free_of_charge": True,
+        "price_can_be_subsidised": False,
         "price": Decimal("12.30"),
-        "subsidised_price": Decimal("10.00"),
-    }
-    with TranslationsFromPOFiles():
-        assert get_context_for_reservation_requires_handling(**get_mock_params(**params, language=lang)) == expected
-        assert get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, **params, language=lang) == expected
-
-
-@pytest.mark.django_db
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_requires_handling__instance__not_subsidised(email_reservation):
-    expected = {
-        **LANGUAGE_CONTEXT["en"],
-        "reservation_id": f"{email_reservation.id}",
-        "price_can_be_subsidised": False,  # Subsidised price is not lower than normal price
         "subsidised_price": Decimal("12.30"),
     }
 
     params = {
-        "reservation_id": email_reservation.id,
-        "applying_for_free_of_charge": True,
         "price": Decimal("12.30"),
         "subsidised_price": Decimal("12.30"),
     }
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_requires_handling(**get_mock_params(**params, language="en")) == expected
+        context = get_context_for_reservation_requires_handling(**get_mock_params(**params, language=lang))
 
-    email_reservation.applying_for_free_of_charge = True
-    email_reservation.save()
-    ReservationUnitPricing.objects.update(lowest_price=Decimal("12.30"), highest_price=Decimal("12.30"))
+    assert context == expected
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_reservation_requires_handling__get_context__get_mock_data__subsidised(lang: Lang):
+    expected = {
+        **LANGUAGE_CONTEXT[lang],
+        "price_can_be_subsidised": True,
+        "subsidised_price": Decimal("10.00"),
+    }
+
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_requires_handling(reservation=email_reservation, language="en") == expected
+        context = get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, language=lang)
+
+    assert context == expected
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_reservation_requires_handling__get_context__get_mock_data__not_subsidised(lang: Lang):
+    expected = {
+        **LANGUAGE_CONTEXT[lang],
+        "price_can_be_subsidised": False,
+        "price": Decimal("12.30"),
+        "subsidised_price": Decimal("12.30"),
+    }
+
+    params = {
+        "price": Decimal("12.30"),
+        "subsidised_price": Decimal("12.30"),
+    }
+    with TranslationsFromPOFiles():
+        mock_context = get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, **params, language=lang)
+
+    assert mock_context == expected
 
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_requires_handling__instance__subsidised(email_reservation):
+def test_reservation_requires_handling__get_context__instance__subsidised(email_reservation):
+    email_reservation.applying_for_free_of_charge = True
+    email_reservation.save()
+
     expected = {
         **LANGUAGE_CONTEXT["en"],
         "reservation_id": f"{email_reservation.id}",
-        "price_can_be_subsidised": True,  # Subsidised price is lower than normal price
-        "subsidised_price": Decimal("10.00"),
-    }
-
-    params = {
-        "reservation_id": email_reservation.id,
-        "applying_for_free_of_charge": True,
+        "price_can_be_subsidised": True,
         "price": Decimal("12.30"),
         "subsidised_price": Decimal("10.00"),
     }
-    with TranslationsFromPOFiles():
-        assert get_context_for_reservation_requires_handling(**get_mock_params(**params, language="en")) == expected
 
+    with TranslationsFromPOFiles():
+        context = get_context_for_reservation_requires_handling(reservation=email_reservation, language="en")
+
+    assert context == expected
+
+
+@pytest.mark.django_db
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_reservation_requires_handling__get_context__instance__not_subsidised(email_reservation):
     email_reservation.applying_for_free_of_charge = True
     email_reservation.save()
+
+    ReservationUnitPricing.objects.update(
+        lowest_price=Decimal("12.30"),
+        highest_price=Decimal("12.30"),
+    )
+
+    expected = {
+        **LANGUAGE_CONTEXT["en"],
+        "reservation_id": f"{email_reservation.id}",
+        "price_can_be_subsidised": False,
+        "price": Decimal("12.30"),
+        "subsidised_price": Decimal("12.30"),
+    }
+
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_requires_handling(reservation=email_reservation, language="en") == expected
+        context = get_context_for_reservation_requires_handling(reservation=email_reservation, language="en")
+
+    assert context == expected
 
 
 # RENDER TEXT ##########################################################################################################
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_reservation_requires_handling__text():
+def test_reservation_requires_handling__render__text():
     context = get_mock_data(
         email_type=EmailType.RESERVATION_REQUIRES_HANDLING,
         language="en",
@@ -237,7 +263,7 @@ def test_render_reservation_requires_handling__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_reservation_requires_handling__subsidised__text():
+def test_reservation_requires_handling__render__text__subsidised():
     context = get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, language="en")
     text_content = render_text(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, context=context)
 
@@ -280,7 +306,7 @@ def test_render_reservation_requires_handling__subsidised__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_reservation_requires_handling__html():
+def test_reservation_requires_handling__render__html():
     context = get_mock_data(
         email_type=EmailType.RESERVATION_REQUIRES_HANDLING,
         language="en",
@@ -327,7 +353,7 @@ def test_render_reservation_requires_handling__html():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_reservation_requires_handling__subsidised__html():
+def test_reservation_requires_handling__render__html__subsidised():
     context = get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, language="en")
     html_content = render_html(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, context=context)
     text_content = html_email_to_text(html_content)
@@ -373,7 +399,7 @@ def test_render_reservation_requires_handling__subsidised__html():
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_email_service__send_reservation_requires_handling_email(outbox):
+def test_reservation_requires_handling__send_email(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservee_email="reservee@email.com",
@@ -396,7 +422,7 @@ def test_email_service__send_reservation_requires_handling_email(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_email_service__send_reservation_requires_handling_email__wrong_state(outbox):
+def test_reservation_requires_handling__send_email__wrong_state(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="reservee@email.com",
@@ -417,7 +443,7 @@ def test_email_service__send_reservation_requires_handling_email__wrong_state(ou
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(SentryLogger.log_message)
-def test_email_service__send_reservation_requires_handling_email__no_recipients(outbox):
+def test_reservation_requires_handling__send_email__no_recipients(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservee_email="",
@@ -434,13 +460,13 @@ def test_email_service__send_reservation_requires_handling_email__no_recipients(
     assert len(outbox) == 0
 
     assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args[0] == "No recipients for reservation requires handling email"
+    assert SentryLogger.log_message.call_args.args[0] == "No recipients for the 'reservation requires handling' email"
 
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-02")
-def test_email_service__send_reservation_requires_handling_email__reservation_in_the_past(outbox):
+def test_reservation_requires_handling__send_email__reservation_in_the_past(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservee_email="reservee@email.com",

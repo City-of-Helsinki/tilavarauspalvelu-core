@@ -34,22 +34,22 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 __all__ = [
+    "get_context_for_reservation_access_code_changed",
     "get_context_for_reservation_approved",
     "get_context_for_reservation_cancelled",
     "get_context_for_reservation_confirmed",
-    "get_context_for_reservation_modified",
-    "get_context_for_reservation_modified_access_code",
-    "get_context_for_reservation_rejected",
+    "get_context_for_reservation_confirmed_staff_notification",
+    "get_context_for_reservation_denied",
     "get_context_for_reservation_requires_handling",
+    "get_context_for_reservation_requires_handling_staff_notification",
     "get_context_for_reservation_requires_payment",
-    "get_context_for_seasonal_reservation_cancelled_single",
-    "get_context_for_seasonal_reservation_modified_series",
-    "get_context_for_seasonal_reservation_modified_series_access_code",
-    "get_context_for_seasonal_reservation_modified_single",
-    "get_context_for_seasonal_reservation_rejected_series",
-    "get_context_for_seasonal_reservation_rejected_single",
-    "get_context_for_staff_notification_reservation_made",
-    "get_context_for_staff_notification_reservation_requires_handling",
+    "get_context_for_reservation_rescheduled",
+    "get_context_for_seasonal_booking_access_code_changed",
+    "get_context_for_seasonal_booking_cancelled_single",
+    "get_context_for_seasonal_booking_denied_series",
+    "get_context_for_seasonal_booking_denied_single",
+    "get_context_for_seasonal_booking_rescheduled_series",
+    "get_context_for_seasonal_booking_rescheduled_single",
 ]
 
 
@@ -282,11 +282,11 @@ def get_context_for_reservation_confirmed(
     }
 
 
-# type: EmailType.RESERVATION_MODIFIED #################################################################################
+# type: EmailType.RESERVATION_RESCHEDULED #################################################################################
 
 
 @overload
-def get_context_for_reservation_modified(
+def get_context_for_reservation_rescheduled(
     reservation: Reservation,
     *,
     language: Lang,
@@ -294,7 +294,7 @@ def get_context_for_reservation_modified(
 
 
 @overload
-def get_context_for_reservation_modified(
+def get_context_for_reservation_rescheduled(
     *,
     language: Lang,
     email_recipient_name: str,
@@ -314,7 +314,7 @@ def get_context_for_reservation_modified(
 
 
 @get_translated
-def get_context_for_reservation_modified(
+def get_context_for_reservation_rescheduled(
     reservation: Reservation | None = None,
     *,
     language: Lang,
@@ -357,11 +357,11 @@ def get_context_for_reservation_modified(
     }
 
 
-# type: EmailType.RESERVATION_MODIFIED_ACCESS_CODE #####################################################################
+# type: EmailType.RESERVATION_ACCESS_CODE_CHANGED #####################################################################
 
 
 @overload
-def get_context_for_reservation_modified_access_code(
+def get_context_for_reservation_access_code_changed(
     reservation: Reservation,
     *,
     language: Lang,
@@ -369,7 +369,7 @@ def get_context_for_reservation_modified_access_code(
 
 
 @overload
-def get_context_for_reservation_modified_access_code(
+def get_context_for_reservation_access_code_changed(
     *,
     language: Lang,
     email_recipient_name: str,
@@ -389,16 +389,16 @@ def get_context_for_reservation_modified_access_code(
 
 
 @get_translated
-def get_context_for_reservation_modified_access_code(
+def get_context_for_reservation_access_code_changed(
     reservation: Reservation | None = None,
     *,
     language: Lang,
     **data: Any,
 ) -> EmailContext:
     if reservation is not None:
-        data = get_context_for_reservation_modified(reservation=reservation, language=language)
+        data = get_context_for_reservation_rescheduled(reservation=reservation, language=language)
     else:
-        data = get_context_for_reservation_modified(**data, language=language)
+        data = get_context_for_reservation_rescheduled(**data, language=language)
 
     title = pgettext("Email", "The door code of your booking has changed")
     return {
@@ -408,11 +408,11 @@ def get_context_for_reservation_modified_access_code(
     }
 
 
-# type: EmailType.RESERVATION_REJECTED #################################################################################
+# type: EmailType.RESERVATION_DENIED #################################################################################
 
 
 @overload
-def get_context_for_reservation_rejected(
+def get_context_for_reservation_denied(
     reservation: Reservation,
     *,
     language: Lang,
@@ -420,7 +420,7 @@ def get_context_for_reservation_rejected(
 
 
 @overload
-def get_context_for_reservation_rejected(
+def get_context_for_reservation_denied(
     *,
     language: Lang,
     email_recipient_name: str,
@@ -436,7 +436,7 @@ def get_context_for_reservation_rejected(
 
 
 @get_translated
-def get_context_for_reservation_rejected(
+def get_context_for_reservation_denied(
     reservation: Reservation | None = None,
     *,
     language: Lang,
@@ -618,17 +618,15 @@ def get_context_for_reservation_requires_payment(
     }
 
 
-# type: EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE ################################################################
+# type: EmailType.SEASONAL_BOOKING_CANCELLED_SINGLE ################################################################
 
 
 @overload
-def get_context_for_seasonal_reservation_cancelled_single(
-    reservation: Reservation, *, language: Lang
-) -> EmailContext: ...
+def get_context_for_seasonal_booking_cancelled_single(reservation: Reservation, *, language: Lang) -> EmailContext: ...
 
 
 @overload
-def get_context_for_seasonal_reservation_cancelled_single(
+def get_context_for_seasonal_booking_cancelled_single(
     *,
     language: Lang,
     email_recipient_name: str,
@@ -644,7 +642,7 @@ def get_context_for_seasonal_reservation_cancelled_single(
 
 
 @get_translated
-def get_context_for_seasonal_reservation_cancelled_single(
+def get_context_for_seasonal_booking_cancelled_single(
     reservation: Reservation | None = None,
     *,
     language: Lang,
@@ -680,17 +678,17 @@ def get_context_for_seasonal_reservation_cancelled_single(
     }
 
 
-# type: EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES #################################################################
+# type: EmailType.SEASONAL_BOOKING_RESCHEDULED_SERIES #################################################################
 
 
 @overload
-def get_context_for_seasonal_reservation_modified_series(
+def get_context_for_seasonal_booking_rescheduled_series(
     application_section: ApplicationSection, *, language: Lang
 ) -> EmailContext: ...
 
 
 @overload
-def get_context_for_seasonal_reservation_modified_series(
+def get_context_for_seasonal_booking_rescheduled_series(
     *,
     language: Lang,
     email_recipient_name: str,
@@ -705,7 +703,7 @@ def get_context_for_seasonal_reservation_modified_series(
 
 
 @get_translated
-def get_context_for_seasonal_reservation_modified_series(
+def get_context_for_seasonal_booking_rescheduled_series(
     application_section: ApplicationSection | None = None,
     *,
     language: Lang,
@@ -741,17 +739,17 @@ def get_context_for_seasonal_reservation_modified_series(
     }
 
 
-# type: EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES_ACCESS_CODE #####################################################
+# type: EmailType.SEASONAL_BOOKING_ACCESS_CODE_CHANGED #####################################################
 
 
 @overload
-def get_context_for_seasonal_reservation_modified_series_access_code(
+def get_context_for_seasonal_booking_access_code_changed(
     application_section: ApplicationSection, *, language: Lang
 ) -> EmailContext: ...
 
 
 @overload
-def get_context_for_seasonal_reservation_modified_series_access_code(
+def get_context_for_seasonal_booking_access_code_changed(
     *,
     language: Lang,
     email_recipient_name: str,
@@ -766,16 +764,16 @@ def get_context_for_seasonal_reservation_modified_series_access_code(
 
 
 @get_translated
-def get_context_for_seasonal_reservation_modified_series_access_code(
+def get_context_for_seasonal_booking_access_code_changed(
     application_section: ApplicationSection | None = None,
     *,
     language: Lang,
     **data: Any,
 ) -> EmailContext:
     if application_section is not None:
-        data = get_context_for_seasonal_reservation_modified_series(application_section, language=language)
+        data = get_context_for_seasonal_booking_rescheduled_series(application_section, language=language)
     else:
-        data = get_context_for_seasonal_reservation_modified_series(**data, language=language)
+        data = get_context_for_seasonal_booking_rescheduled_series(**data, language=language)
 
     title = pgettext("Email", "The door code of your booking has changed")
     return {
@@ -785,17 +783,17 @@ def get_context_for_seasonal_reservation_modified_series_access_code(
     }
 
 
-# type: EmailType.SEASONAL_RESERVATION_MODIFIED_SINGLE #################################################################
+# type: EmailType.SEASONAL_BOOKING_RESCHEDULED_SINGLE #################################################################
 
 
 @overload
-def get_context_for_seasonal_reservation_modified_single(
+def get_context_for_seasonal_booking_rescheduled_single(
     reservation: Reservation, *, language: Lang
 ) -> EmailContext: ...
 
 
 @overload
-def get_context_for_seasonal_reservation_modified_single(
+def get_context_for_seasonal_booking_rescheduled_single(
     *,
     language: Lang,
     email_recipient_name: str,
@@ -810,7 +808,7 @@ def get_context_for_seasonal_reservation_modified_single(
 
 
 @get_translated
-def get_context_for_seasonal_reservation_modified_single(
+def get_context_for_seasonal_booking_rescheduled_single(
     reservation: Reservation | None = None,
     *,
     language: Lang,
@@ -846,17 +844,17 @@ def get_context_for_seasonal_reservation_modified_single(
     }
 
 
-# type: EmailType.SEASONAL_RESERVATION_REJECTED_SERIES #################################################################
+# type: EmailType.SEASONAL_BOOKING_DENIED_SERIES #################################################################
 
 
 @overload
-def get_context_for_seasonal_reservation_rejected_series(
+def get_context_for_seasonal_booking_denied_series(
     application_section: ApplicationSection, *, language: Lang
 ) -> EmailContext: ...
 
 
 @overload
-def get_context_for_seasonal_reservation_rejected_series(
+def get_context_for_seasonal_booking_denied_series(
     *,
     language: Lang,
     rejection_reason: str,
@@ -870,7 +868,7 @@ def get_context_for_seasonal_reservation_rejected_series(
 
 
 @get_translated
-def get_context_for_seasonal_reservation_rejected_series(
+def get_context_for_seasonal_booking_denied_series(
     application_section: ApplicationSection | None = None,
     *,
     language: Lang,
@@ -906,17 +904,15 @@ def get_context_for_seasonal_reservation_rejected_series(
     }
 
 
-# type: EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE #################################################################
+# type: EmailType.SEASONAL_BOOKING_DENIED_SINGLE #################################################################
 
 
 @overload
-def get_context_for_seasonal_reservation_rejected_single(
-    reservation: Reservation, *, language: Lang
-) -> EmailContext: ...
+def get_context_for_seasonal_booking_denied_single(reservation: Reservation, *, language: Lang) -> EmailContext: ...
 
 
 @overload
-def get_context_for_seasonal_reservation_rejected_single(
+def get_context_for_seasonal_booking_denied_single(
     *,
     language: Lang,
     email_recipient_name: str,
@@ -932,7 +928,7 @@ def get_context_for_seasonal_reservation_rejected_single(
 
 
 @get_translated
-def get_context_for_seasonal_reservation_rejected_single(
+def get_context_for_seasonal_booking_denied_single(
     reservation: Reservation | None = None,
     *,
     language: Lang,
@@ -970,11 +966,11 @@ def get_context_for_seasonal_reservation_rejected_single(
     }
 
 
-# type: EmailType.STAFF_NOTIFICATION_RESERVATION_MADE ##################################################################
+# type: EmailType.RESERVATION_CONFIRMED_STAFF_NOTIFICATION ##################################################################
 
 
 @overload
-def get_context_for_staff_notification_reservation_made(
+def get_context_for_reservation_confirmed_staff_notification(
     reservation: Reservation,
     *,
     language: Lang,
@@ -982,7 +978,7 @@ def get_context_for_staff_notification_reservation_made(
 
 
 @overload
-def get_context_for_staff_notification_reservation_made(
+def get_context_for_reservation_confirmed_staff_notification(
     *,
     language: Lang,
     reservee_name: str,
@@ -997,7 +993,7 @@ def get_context_for_staff_notification_reservation_made(
 
 
 @get_translated
-def get_context_for_staff_notification_reservation_made(
+def get_context_for_reservation_confirmed_staff_notification(
     reservation: Reservation | None = None,
     *,
     language: Lang,
@@ -1043,11 +1039,11 @@ def get_context_for_staff_notification_reservation_made(
     }
 
 
-# type: EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING #####################################################
+# type: EmailType.RESERVATION_REQUIRES_HANDLING_STAFF_NOTIFICATION #####################################################
 
 
 @overload
-def get_context_for_staff_notification_reservation_requires_handling(
+def get_context_for_reservation_requires_handling_staff_notification(
     reservation: Reservation,
     *,
     language: Lang,
@@ -1055,7 +1051,7 @@ def get_context_for_staff_notification_reservation_requires_handling(
 
 
 @overload
-def get_context_for_staff_notification_reservation_requires_handling(
+def get_context_for_reservation_requires_handling_staff_notification(
     *,
     language: Lang,
     reservee_name: str | None = None,
@@ -1070,7 +1066,7 @@ def get_context_for_staff_notification_reservation_requires_handling(
 
 
 @get_translated
-def get_context_for_staff_notification_reservation_requires_handling(
+def get_context_for_reservation_requires_handling_staff_notification(
     reservation: Reservation | None = None,
     *,
     language: Lang,

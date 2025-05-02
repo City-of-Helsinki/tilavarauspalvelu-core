@@ -31,7 +31,7 @@ def email_reservation() -> Reservation:
         reservation_confirmed_instructions_en="[HYVÄKSYTYN VARAUKSEN OHJEET]",
         reservation_cancelled_instructions_en="[PERUUTETUN VARAUKSEN OHJEET]",
         reservation_pending_instructions_en="[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
-        pricings__lowest_price=Decimal(10),
+        pricings__lowest_price=Decimal("10.00"),
         pricings__highest_price=Decimal("12.30"),
         pricings__price_unit=PriceUnit.PRICE_UNIT_FIXED,
     )

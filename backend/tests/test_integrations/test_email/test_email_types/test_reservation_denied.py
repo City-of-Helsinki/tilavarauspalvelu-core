@@ -1,4 +1,4 @@
-# type: EmailType.RESERVATION_REJECTED
+# type: EmailType.RESERVATION_DENIED
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
-from tilavarauspalvelu.integrations.email.template_context import get_context_for_reservation_rejected
+from tilavarauspalvelu.integrations.email.template_context import get_context_for_reservation_denied
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 
@@ -74,39 +74,47 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_get_context__reservation_rejected(lang: Lang):
+def test_reservation_denied__get_context(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_rejected(**get_mock_params(language=lang)) == expected
-        assert get_mock_data(email_type=EmailType.RESERVATION_REJECTED, language=lang) == expected
+        context = get_context_for_reservation_denied(**get_mock_params(language=lang))
+
+    assert context == expected
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_reservation_denied__get_context__get_mock_data(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    with TranslationsFromPOFiles():
+        mock_context = get_mock_data(email_type=EmailType.RESERVATION_DENIED, language=lang)
+
+    assert mock_context == expected
 
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_rejected__instance(email_reservation):
+def test_reservation_denied__get_context__instance(email_reservation):
     expected = {
         **LANGUAGE_CONTEXT["en"],
         "reservation_id": f"{email_reservation.id}",
     }
 
-    params = {
-        "reservation_id": email_reservation.id,
-    }
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_rejected(**get_mock_params(**params, language="en")) == expected
+        context = get_context_for_reservation_denied(reservation=email_reservation, language="en")
 
-    with TranslationsFromPOFiles():
-        assert get_context_for_reservation_rejected(reservation=email_reservation, language="en") == expected
+    assert context == expected
 
 
 # RENDER TEXT ##########################################################################################################
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_reservation_rejected__text():
-    context = get_mock_data(email_type=EmailType.RESERVATION_REJECTED, language="en")
-    text_content = render_text(email_type=EmailType.RESERVATION_REJECTED, context=context)
+def test_reservation_denied__render__text():
+    context = get_mock_data(email_type=EmailType.RESERVATION_DENIED, language="en")
+    text_content = render_text(email_type=EmailType.RESERVATION_DENIED, context=context)
 
     assert text_content == cleandoc(
         f"""
@@ -136,9 +144,9 @@ def test_render_reservation_rejected__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_reservation_rejected__html():
-    context = get_mock_data(email_type=EmailType.RESERVATION_REJECTED, language="en")
-    html_content = render_html(email_type=EmailType.RESERVATION_REJECTED, context=context)
+def test_reservation_denied__render__html():
+    context = get_mock_data(email_type=EmailType.RESERVATION_DENIED, language="en")
+    html_content = render_html(email_type=EmailType.RESERVATION_DENIED, context=context)
     text_content = html_email_to_text(html_content)
 
     assert text_content == cleandoc(
@@ -172,7 +180,7 @@ def test_render_reservation_rejected__html():
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_email_service__send_reservation_rejected_email(outbox):
+def test_reservation_denied__send_email(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.DENIED,
         type=ReservationTypeChoice.NORMAL,
@@ -183,7 +191,7 @@ def test_email_service__send_reservation_rejected_email(outbox):
         end=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
-    EmailService.send_reservation_rejected_email(reservation)
+    EmailService.send_reservation_denied_email(reservation)
 
     assert len(outbox) == 1
 
@@ -195,7 +203,7 @@ def test_email_service__send_reservation_rejected_email(outbox):
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(SentryLogger.log_message)
-def test_email_service__send_reservation_rejected_email__no_recipients(outbox):
+def test_reservation_denied__send_email__no_recipients(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.DENIED,
         type=ReservationTypeChoice.NORMAL,
@@ -206,18 +214,18 @@ def test_email_service__send_reservation_rejected_email__no_recipients(outbox):
         end=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
-    EmailService.send_reservation_rejected_email(reservation)
+    EmailService.send_reservation_denied_email(reservation)
 
     assert len(outbox) == 0
 
     assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args[0] == "No recipients for reservation rejected email"
+    assert SentryLogger.log_message.call_args.args[0] == "No recipients for the 'reservation denied' email"
 
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_email_service__send_reservation_rejected_email__wrong_state(outbox):
+def test_reservation_denied__send_email__wrong_state(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CANCELLED,
         type=ReservationTypeChoice.NORMAL,
@@ -228,7 +236,7 @@ def test_email_service__send_reservation_rejected_email__wrong_state(outbox):
         end=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
-    EmailService.send_reservation_rejected_email(reservation)
+    EmailService.send_reservation_denied_email(reservation)
 
     assert len(outbox) == 0
 
@@ -236,7 +244,7 @@ def test_email_service__send_reservation_rejected_email__wrong_state(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-02")
-def test_email_service__send_reservation_rejected_email__reservation_in_the_past(outbox):
+def test_reservation_denied__send_email__reservation_in_the_past(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.DENIED,
         type=ReservationTypeChoice.NORMAL,
@@ -247,7 +255,7 @@ def test_email_service__send_reservation_rejected_email__reservation_in_the_past
         end=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
-    EmailService.send_reservation_rejected_email(reservation)
+    EmailService.send_reservation_denied_email(reservation)
 
     assert len(outbox) == 0
 
@@ -255,7 +263,7 @@ def test_email_service__send_reservation_rejected_email__reservation_in_the_past
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-02")
-def test_email_service__send_reservation_rejected_email__no_normal_reservation(outbox):
+def test_reservation_denied__send_email__no_normal_reservation(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.DENIED,
         type=ReservationTypeChoice.BEHALF,
@@ -266,6 +274,6 @@ def test_email_service__send_reservation_rejected_email__no_normal_reservation(o
         end=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
-    EmailService.send_reservation_rejected_email(reservation)
+    EmailService.send_reservation_denied_email(reservation)
 
     assert len(outbox) == 0

@@ -71,5 +71,5 @@ class ReservationDenySerializer(NestingModelSerializer):
                 ):
                     PindoraService.delete_access_code(obj=instance)
 
-        EmailService.send_reservation_rejected_email(reservation=instance)
+        EmailService.send_reservation_denied_email(reservation=instance)
         return instance

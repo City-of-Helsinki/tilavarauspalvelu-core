@@ -1,4 +1,4 @@
-# type: EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED
+# type: EmailType.SEASONAL_BOOKING_CANCELLED_ALL_STAFF_NOTIFICATION
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from tilavarauspalvelu.enums import ReservationNotification
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import (
-    get_context_for_staff_notification_application_section_cancelled,
+    get_context_for_seasonal_booking_cancelled_all_staff_notification,
 )
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.models import Reservation
@@ -100,62 +100,63 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_get_context_for_staff_notification_application_section_cancelled(lang: Lang):
+def test_seasonal_booking_cancelled_all_staff_notification__get_context(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
-        context = get_context_for_staff_notification_application_section_cancelled(**get_mock_params(language=lang))
-        assert context == expected
+        context = get_context_for_seasonal_booking_cancelled_all_staff_notification(**get_mock_params(language=lang))
 
-        context = get_mock_data(email_type=EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED, language=lang)
-        assert context == expected
+    assert context == expected
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_seasonal_booking_cancelled_all_staff_notification__get_context__get_mock_data(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    with TranslationsFromPOFiles():
+        context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_CANCELLED_ALL_STAFF_NOTIFICATION, language=lang)
+
+    assert context == expected
 
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context_for_staff_notification_application_section_cancelled__instance(email_reservation):
+def test_seasonal_booking_cancelled_all_staff_notification__get_context__instance(email_reservation):
     reservation_id_1 = email_reservation.id
     reservation_id_2 = Reservation.objects.exclude(id=reservation_id_1).first().id
 
     section = email_reservation.actions.get_application_section()
-    cancelled_reservation_series = [
-        {
-            "weekday_value": "Monday",
-            "time_value": "13:00-15:00",
-            "reservation_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_1}",
-        },
-        {
-            "weekday_value": "Tuesday",
-            "time_value": "21:00-22:00",
-            "reservation_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_2}",
-        },
-    ]
+
     expected = {
         **LANGUAGE_CONTEXT["en"],
-        "cancelled_reservation_series": cancelled_reservation_series,
+        "cancelled_reservation_series": [
+            {
+                "weekday_value": "Monday",
+                "time_value": "13:00-15:00",
+                "reservation_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_1}",
+            },
+            {
+                "weekday_value": "Tuesday",
+                "time_value": "21:00-22:00",
+                "reservation_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_2}",
+            },
+        ],
     }
 
-    params = {
-        "cancelled_reservation_series": cancelled_reservation_series,
-    }
     with TranslationsFromPOFiles():
-        context = get_context_for_staff_notification_application_section_cancelled(
-            **get_mock_params(**params, language="en")
-        )
-        assert context == expected
+        context = get_context_for_seasonal_booking_cancelled_all_staff_notification(section, language="en")
 
-    with TranslationsFromPOFiles():
-        context = get_context_for_staff_notification_application_section_cancelled(section, language="en")
-        assert context == expected
+    assert context == expected
 
 
 # RENDER TEXT ##########################################################################################################
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_staff_notification_application_section_cancelled_email_text():
-    context = get_mock_data(email_type=EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED, language="en")
-    text_content = render_text(email_type=EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED, context=context)
+def test_seasonal_booking_cancelled_all_staff_notification__render__text():
+    context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_CANCELLED_ALL_STAFF_NOTIFICATION, language="en")
+    text_content = render_text(email_type=EmailType.SEASONAL_BOOKING_CANCELLED_ALL_STAFF_NOTIFICATION, context=context)
 
     assert text_content == cleandoc(
         """
@@ -186,9 +187,9 @@ def test_render_staff_notification_application_section_cancelled_email_text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_staff_notification_application_section_cancelled_email__html():
-    context = get_mock_data(email_type=EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED, language="en")
-    html_content = render_html(email_type=EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED, context=context)
+def test_seasonal_booking_cancelled_all_staff_notification__render__html():
+    context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_CANCELLED_ALL_STAFF_NOTIFICATION, language="en")
+    html_content = render_html(email_type=EmailType.SEASONAL_BOOKING_CANCELLED_ALL_STAFF_NOTIFICATION, context=context)
     text_content = html_email_to_text(html_content)
 
     assert text_content == cleandoc(
@@ -224,7 +225,7 @@ def test_render_staff_notification_application_section_cancelled_email__html():
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_email_service__send_staff_notification_application_section_cancelled_email(outbox):
+def test_seasonal_booking_cancelled_all_staff_notification__send_email(outbox):
     application = ApplicationFactory.create_in_status_results_sent(user__email="user@email.com")
     application_section = application.application_sections.first()
 
@@ -260,7 +261,7 @@ def test_email_service__send_staff_notification_application_section_cancelled_em
     )
 
     with TranslationsFromPOFiles():
-        EmailService.send_staff_notification_application_section_cancelled(
+        EmailService.send_seasonal_booking_cancelled_all_staff_notification_email(
             application_section=application.application_sections.first()
         )
 

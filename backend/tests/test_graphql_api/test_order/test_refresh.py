@@ -137,7 +137,7 @@ def test_refresh_order__cancelled_status_causes_cancellation(graphql):
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(EmailService.send_reservation_confirmed_email)
-@patch_method(EmailService.send_staff_notification_reservation_made_email)
+@patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
 def test_refresh_order__paid_online_status_causes_paid_marking_and_no_notification(graphql):
     graphql.login_with_superuser()
     order = get_order()
@@ -151,7 +151,7 @@ def test_refresh_order__paid_online_status_causes_paid_marking_and_no_notificati
     assert VerkkokauppaAPIClient.get_payment.call_count == 1
 
     assert EmailService.send_reservation_confirmed_email.call_count == 0
-    assert EmailService.send_staff_notification_reservation_made_email.call_count == 0
+    assert EmailService.send_reservation_confirmed_staff_notification_email.call_count == 0
 
     assert response.has_errors is False
     assert response.first_query_object == {
@@ -166,7 +166,7 @@ def test_refresh_order__paid_online_status_causes_paid_marking_and_no_notificati
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(EmailService.send_reservation_confirmed_email)
-@patch_method(EmailService.send_staff_notification_reservation_made_email)
+@patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
 def test_refresh_order__paid_online_status_sends_notification_if_reservation_waiting_for_payment(graphql):
     graphql.login_with_superuser()
     order = get_order()
@@ -183,7 +183,7 @@ def test_refresh_order__paid_online_status_sends_notification_if_reservation_wai
     assert VerkkokauppaAPIClient.get_payment.call_count == 1
 
     assert EmailService.send_reservation_confirmed_email.call_count == 1
-    assert EmailService.send_staff_notification_reservation_made_email.call_count == 1
+    assert EmailService.send_reservation_confirmed_staff_notification_email.call_count == 1
 
     assert response.has_errors is False
     assert response.first_query_object == {

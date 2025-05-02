@@ -26,8 +26,8 @@ pytestmark = [
 ]
 
 
-@patch_method(EmailService.send_application_section_cancelled)
-@patch_method(EmailService.send_staff_notification_application_section_cancelled)
+@patch_method(EmailService.send_seasonal_booking_cancelled_all_email)
+@patch_method(EmailService.send_seasonal_booking_cancelled_all_staff_notification_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__cancel_section_series__cancel_whole_remaining(graphql):
     reason = ReservationCancelReasonFactory.create()
@@ -64,8 +64,8 @@ def test_recurring_reservations__cancel_section_series__cancel_whole_remaining(g
     assert response.first_query_object == {"cancelled": 5, "future": 5}
     assert reservation_series.reservations.count() == 9
 
-    assert EmailService.send_application_section_cancelled.called is True
-    assert EmailService.send_staff_notification_application_section_cancelled.called is True
+    assert EmailService.send_seasonal_booking_cancelled_all_email.called is True
+    assert EmailService.send_seasonal_booking_cancelled_all_staff_notification_email.called is True
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
@@ -265,8 +265,8 @@ def test_recurring_reservations__cancel_section_series__cancellation_rule(graphq
 
 
 @patch_method(PindoraService.reschedule_access_code)
-@patch_method(EmailService.send_application_section_cancelled)
-@patch_method(EmailService.send_staff_notification_application_section_cancelled)
+@patch_method(EmailService.send_seasonal_booking_cancelled_all_email)
+@patch_method(EmailService.send_seasonal_booking_cancelled_all_staff_notification_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__cancel_section_series__access_codes(graphql):
     reason = ReservationCancelReasonFactory.create()

@@ -97,7 +97,7 @@ class StaffReservationAdjustTimeSerializer(NestingModelSerializer):
                 super().update(instance=instance, validated_data=previous_data)
                 raise ValidationError(str(error), code=error_codes.PINDORA_ERROR) from error
 
-        EmailService.send_reservation_modified_email(reservation=instance)
-        EmailService.send_staff_notification_reservation_requires_handling_email(reservation=instance)
+        EmailService.send_reservation_rescheduled_email(reservation=instance)
+        EmailService.send_reservation_requires_handling_staff_notification_email(reservation=instance)
 
         return instance

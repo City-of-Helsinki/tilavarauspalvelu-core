@@ -46,7 +46,7 @@ def test_staff_change_access_code__regular_user(graphql):
 
 @patch_method(PindoraService.change_access_code)
 @patch_method(PindoraService.activate_access_code)
-@patch_method(EmailService.send_reservation_modified_access_code_email)
+@patch_method(EmailService.send_reservation_access_code_changed_email)
 def test_staff_change_access_code__unit_handler(graphql):
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(
@@ -73,12 +73,12 @@ def test_staff_change_access_code__unit_handler(graphql):
 
     assert PindoraService.change_access_code.call_count == 1
     assert PindoraService.activate_access_code.call_count == 0
-    assert EmailService.send_reservation_modified_access_code_email.call_count == 1
+    assert EmailService.send_reservation_access_code_changed_email.call_count == 1
 
 
 @patch_method(PindoraService.change_access_code)
 @patch_method(PindoraService.activate_access_code)
-@patch_method(EmailService.send_reservation_modified_access_code_email)
+@patch_method(EmailService.send_reservation_access_code_changed_email)
 def test_staff_change_access_code__general_handler(graphql):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
@@ -103,4 +103,4 @@ def test_staff_change_access_code__general_handler(graphql):
 
     assert PindoraService.change_access_code.call_count == 1
     assert PindoraService.activate_access_code.call_count == 0
-    assert EmailService.send_reservation_modified_access_code_email.call_count == 1
+    assert EmailService.send_reservation_access_code_changed_email.call_count == 1

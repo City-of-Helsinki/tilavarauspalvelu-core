@@ -1,4 +1,4 @@
-# type: EmailType.SEASONAL_RESERVATION_REJECTED_SERIES
+# type: EmailType.SEASONAL_BOOKING_DENIED_SERIES
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
-from tilavarauspalvelu.integrations.email.template_context import get_context_for_seasonal_reservation_rejected_series
+from tilavarauspalvelu.integrations.email.template_context import get_context_for_seasonal_booking_denied_series
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 
@@ -86,7 +86,7 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_get_context_for_seasonal_reservation_rejected_series(lang: Lang):
+def test_seasonal_booking_denied_series__get_context(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     params = {
@@ -94,16 +94,32 @@ def test_get_context_for_seasonal_reservation_rejected_series(lang: Lang):
         "application_section_id": 0,
     }
     with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_reservation_rejected_series(**get_mock_params(**params, language=lang))
-        assert context == expected
+        context = get_context_for_seasonal_booking_denied_series(**get_mock_params(**params, language=lang))
 
-        context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_REJECTED_SERIES, **params, language=lang)
-        assert context == expected
+    assert context == expected
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_seasonal_booking_denied_series__get_context__get_mock_data(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    params = {
+        "application_id": 0,
+        "application_section_id": 0,
+    }
+    with TranslationsFromPOFiles():
+        context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_DENIED_SERIES, **params, language=lang)
+
+    assert context == expected
 
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context_for_seasonal_reservation_rejected_series__instance(email_reservation):
+def test_seasonal_booking_denied_series__get_context__instance(email_reservation):
+    email_reservation.state = ReservationStateChoice.DENIED
+    email_reservation.save()
+
     section = email_reservation.actions.get_application_section()
 
     expected = {
@@ -111,28 +127,19 @@ def test_get_context_for_seasonal_reservation_rejected_series__instance(email_re
         **get_application_details_urls(section),
     }
 
-    params = {
-        "application_id": section.application_id,
-        "application_section_id": section.id,
-    }
     with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_reservation_rejected_series(**get_mock_params(**params, language="en"))
-        assert context == expected
+        context = get_context_for_seasonal_booking_denied_series(application_section=section, language="en")
 
-    email_reservation.state = ReservationStateChoice.DENIED
-    email_reservation.save()
-    with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_reservation_rejected_series(application_section=section, language="en")
-        assert context == expected
+    assert context == expected
 
 
 # RENDER TEXT ##########################################################################################################
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_seasonal_reservation_rejected_series__text():
-    context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_REJECTED_SERIES, language="en")
-    text_content = render_text(email_type=EmailType.SEASONAL_RESERVATION_REJECTED_SERIES, context=context)
+def test_seasonal_booking_denied_series__render__text():
+    context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_DENIED_SERIES, language="en")
+    text_content = render_text(email_type=EmailType.SEASONAL_BOOKING_DENIED_SERIES, context=context)
     text_content = text_content.replace("&amp;", "&")
     url = "https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678"
 
@@ -163,9 +170,9 @@ def test_render_seasonal_reservation_rejected_series__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_seasonal_reservation_rejected_series__html():
-    context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_REJECTED_SERIES, language="en")
-    html_content = render_html(email_type=EmailType.SEASONAL_RESERVATION_REJECTED_SERIES, context=context)
+def test_seasonal_booking_denied_series__render__html():
+    context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_DENIED_SERIES, language="en")
+    html_content = render_html(email_type=EmailType.SEASONAL_BOOKING_DENIED_SERIES, context=context)
     text_content = html_email_to_text(html_content)
     url = "https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678"
 
@@ -196,7 +203,7 @@ def test_render_seasonal_reservation_rejected_series__html():
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_email_service__send_seasonal_reservation_rejected_series(outbox):
+def test_seasonal_booking_denied_series__send_email(outbox):
     user = UserFactory.create(email="user@email.com")
     application = ApplicationFactory.create(
         user=user,
@@ -211,7 +218,7 @@ def test_email_service__send_seasonal_reservation_rejected_series(outbox):
     )
     section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
 
-    EmailService.send_seasonal_reservation_rejected_series_email(section)
+    EmailService.send_seasonal_booking_denied_series_email(section)
 
     assert len(outbox) == 1
 
@@ -222,7 +229,7 @@ def test_email_service__send_seasonal_reservation_rejected_series(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_email_service__send_seasonal_reservation_rejected_series__no_reservations(outbox):
+def test_seasonal_booking_denied_series__send_email__no_reservations(outbox):
     user = UserFactory.create(email="user@email.com")
     application = ApplicationFactory.create(
         user=user,
@@ -235,7 +242,7 @@ def test_email_service__send_seasonal_reservation_rejected_series__no_reservatio
     )
     section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
 
-    EmailService.send_seasonal_reservation_rejected_series_email(section)
+    EmailService.send_seasonal_booking_denied_series_email(section)
 
     assert len(outbox) == 0
 
@@ -244,7 +251,7 @@ def test_email_service__send_seasonal_reservation_rejected_series__no_reservatio
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(SentryLogger.log_message)
-def test_email_service__send_seasonal_reservation_rejected_series__no_recipients(outbox):
+def test_seasonal_booking_denied_series__send_email__no_recipients(outbox):
     application = ApplicationFactory.create(
         user=None,
         contact_person=None,
@@ -258,7 +265,7 @@ def test_email_service__send_seasonal_reservation_rejected_series__no_recipients
     )
     section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
 
-    EmailService.send_seasonal_reservation_rejected_series_email(section)
+    EmailService.send_seasonal_booking_denied_series_email(section)
 
     assert len(outbox) == 0
 

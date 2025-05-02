@@ -20,7 +20,7 @@ pytestmark = [
 ]
 
 
-@patch_method(EmailService.send_application_received_email)
+@patch_method(EmailService.send_seasonal_booking_application_received_email)
 def test_send_application__draft(graphql):
     application = ApplicationFactory.create_application_ready_for_sending()
 
@@ -32,10 +32,10 @@ def test_send_application__draft(graphql):
     application.refresh_from_db()
     assert application.sent_date is not None
 
-    assert EmailService.send_application_received_email.called is True
+    assert EmailService.send_seasonal_booking_application_received_email.called is True
 
 
-@patch_method(EmailService.send_application_received_email)
+@patch_method(EmailService.send_seasonal_booking_application_received_email)
 def test_send_application__sent(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(sent_date=local_datetime())
 
@@ -47,7 +47,7 @@ def test_send_application__sent(graphql):
     application.refresh_from_db()
     assert application.sent_date is not None
 
-    assert EmailService.send_application_received_email.called is True
+    assert EmailService.send_seasonal_booking_application_received_email.called is True
 
 
 def test_send_application__cancelled(graphql):
@@ -429,7 +429,7 @@ def test_send_application__no_organisation(graphql, applicant_type):
     assert response.field_error_messages() == ["Application organisation is required."]
 
 
-@patch_method(EmailService.send_application_received_email)
+@patch_method(EmailService.send_seasonal_booking_application_received_email)
 def test_send_application__community_applicant(graphql):
     org = OrganisationFactory.create_for_community_applicant()
 
@@ -448,7 +448,7 @@ def test_send_application__community_applicant(graphql):
     application.refresh_from_db()
     assert application.sent_date is not None
 
-    assert EmailService.send_application_received_email.called is True
+    assert EmailService.send_seasonal_booking_application_received_email.called is True
 
 
 def test_send_application__community_applicant__contact_person_missing(graphql):
@@ -662,7 +662,7 @@ def test_send_application__community_applicant__billing_address__city_missing(gr
     assert response.field_error_messages() == ["Application billing address must have a city."]
 
 
-@patch_method(EmailService.send_application_received_email)
+@patch_method(EmailService.send_seasonal_booking_application_received_email)
 def test_send_application__association_applicant(graphql):
     org = OrganisationFactory.create_for_association_applicant()
 
@@ -681,10 +681,10 @@ def test_send_application__association_applicant(graphql):
     application.refresh_from_db()
     assert application.sent_date is not None
 
-    assert EmailService.send_application_received_email.called is True
+    assert EmailService.send_seasonal_booking_application_received_email.called is True
 
 
-@patch_method(EmailService.send_application_received_email)
+@patch_method(EmailService.send_seasonal_booking_application_received_email)
 def test_send_application__company_applicant(graphql):
     org = OrganisationFactory.create_for_company_applicant()
 
@@ -702,7 +702,7 @@ def test_send_application__company_applicant(graphql):
     application.refresh_from_db()
     assert application.sent_date is not None
 
-    assert EmailService.send_application_received_email.called is True
+    assert EmailService.send_seasonal_booking_application_received_email.called is True
 
 
 def test_send_application__company_applicant__no_contact_person(graphql):

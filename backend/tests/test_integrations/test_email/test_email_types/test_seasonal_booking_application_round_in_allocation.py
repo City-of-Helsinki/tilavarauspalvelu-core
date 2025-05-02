@@ -1,4 +1,4 @@
-# type: EmailType.APPLICATION_IN_ALLOCATION
+# type: EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_IN_ALLOCATION
 
 from __future__ import annotations
 
@@ -12,7 +12,9 @@ from freezegun import freeze_time
 from tilavarauspalvelu.admin.email_template.utils import get_mock_data
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
-from tilavarauspalvelu.integrations.email.template_context import get_context_for_application_in_allocation
+from tilavarauspalvelu.integrations.email.template_context import (
+    get_context_for_seasonal_booking_application_round_in_allocation,
+)
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 
@@ -93,21 +95,33 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_get_context__application_in_allocation(lang: Lang):
+def test_seasonal_booking_application_round_in_allocation__get_context(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
-        assert get_context_for_application_in_allocation(language=lang) == expected
-        assert get_mock_data(email_type=EmailType.APPLICATION_IN_ALLOCATION, language=lang) == expected
+        context = get_context_for_seasonal_booking_application_round_in_allocation(language=lang)
+
+    assert context == expected
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_seasonal_booking_application_round_in_allocation__get_context__get_mock_data(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    with TranslationsFromPOFiles():
+        context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_IN_ALLOCATION, language=lang)
+
+    assert context == expected
 
 
 # RENDER TEXT ##########################################################################################################
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_application_in_allocation_email__text():
-    context = get_mock_data(email_type=EmailType.APPLICATION_IN_ALLOCATION, language="en")
-    text_content = render_text(email_type=EmailType.APPLICATION_IN_ALLOCATION, context=context)
+def test_seasonal_booking_application_round_in_allocation_email__render__text():
+    context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_IN_ALLOCATION, language="en")
+    text_content = render_text(email_type=EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_IN_ALLOCATION, context=context)
 
     body = (
         "The application deadline has passed. We will notify you of the result when "
@@ -128,10 +142,12 @@ def test_render_application_in_allocation_email__text():
 
 
 # RENDER HTML ##########################################################################################################
+
+
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_application_in_allocation_email__html():
-    context = get_mock_data(email_type=EmailType.APPLICATION_IN_ALLOCATION, language="en")
-    html_content = render_html(email_type=EmailType.APPLICATION_IN_ALLOCATION, context=context)
+def test_seasonal_booking_application_round_in_allocation_email__render__html():
+    context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_IN_ALLOCATION, language="en")
+    html_content = render_html(email_type=EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_IN_ALLOCATION, context=context)
     text_content = html_email_to_text(html_content)
 
     link = "https://fake.varaamo.hel.fi/en/applications"
@@ -157,10 +173,10 @@ def test_render_application_in_allocation_email__html():
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_email_service__send_application_in_allocation_emails(outbox):
+def test__seasonal_booking_application_round_in_allocation__send_email(outbox):
     application = ApplicationFactory.create_in_status_in_allocation(in_allocation_notification_sent_date=None)
 
-    EmailService.send_application_in_allocation_emails()
+    EmailService.send_seasonal_booking_application_round_in_allocation_emails()
 
     assert len(outbox) == 1
 
@@ -170,17 +186,17 @@ def test_email_service__send_application_in_allocation_emails(outbox):
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_email_service__send_application_in_allocation_emails__already_sent(outbox):
+def test__seasonal_booking_application_round_in_allocation__send_email__already_sent(outbox):
     ApplicationFactory.create_in_status_in_allocation()
 
-    EmailService.send_application_in_allocation_emails()
+    EmailService.send_seasonal_booking_application_round_in_allocation_emails()
 
     assert len(outbox) == 0
 
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_email_service__send_application_in_allocation_emails__multiple_languages(outbox):
+def test__seasonal_booking_application_round_in_allocation__send_email__multiple_languages(outbox):
     application_1 = ApplicationFactory.create_in_status_in_allocation(
         user__preferred_language="fi",
         in_allocation_notification_sent_date=None,
@@ -191,7 +207,7 @@ def test_email_service__send_application_in_allocation_emails__multiple_language
     )
 
     with TranslationsFromPOFiles():
-        EmailService.send_application_in_allocation_emails()
+        EmailService.send_seasonal_booking_application_round_in_allocation_emails()
 
     assert len(outbox) == 2
 
@@ -204,10 +220,10 @@ def test_email_service__send_application_in_allocation_emails__multiple_language
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_email_service__send_application_in_allocation_emails__wrong_status(outbox):
+def test__seasonal_booking_application_round_in_allocation__send_email__wrong_status(outbox):
     ApplicationFactory.create_in_status_expired()
 
-    EmailService.send_application_in_allocation_emails()
+    EmailService.send_seasonal_booking_application_round_in_allocation_emails()
 
     assert len(outbox) == 0
 
@@ -215,16 +231,18 @@ def test_email_service__send_application_in_allocation_emails__wrong_status(outb
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @patch_method(SentryLogger.log_message)
-def test_email_service__send_application_in_allocation_emails__no_recipients(outbox):
+def test__seasonal_booking_application_round_in_allocation__send_email__no_recipients(outbox):
     ApplicationFactory.create_in_status_in_allocation(
         user__email="",
         contact_person__email="",
         in_allocation_notification_sent_date=None,
     )
 
-    EmailService.send_application_in_allocation_emails()
+    EmailService.send_seasonal_booking_application_round_in_allocation_emails()
 
     assert len(outbox) == 0
 
     assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args[0] == "No recipients for application in allocation emails"
+    assert SentryLogger.log_message.call_args.args[0] == (
+        "No recipients for the 'seasonal booking application round in allocation' email"
+    )

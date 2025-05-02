@@ -21,7 +21,7 @@ pytestmark = [
 ]
 
 
-@patch_method(EmailService.send_reservation_rejected_email)
+@patch_method(EmailService.send_reservation_denied_email)
 @pytest.mark.parametrize("reservation_type", [ReservationTypeChoice.NORMAL, ReservationTypeChoice.SEASONAL])
 def test_reservation__deny__state_is_confirmed(graphql, reservation_type):
     reservation = ReservationFactory.create_for_deny(state=ReservationStateChoice.CONFIRMED, type=reservation_type)
@@ -35,7 +35,7 @@ def test_reservation__deny__state_is_confirmed(graphql, reservation_type):
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.DENIED
 
-    assert EmailService.send_reservation_rejected_email.called is True
+    assert EmailService.send_reservation_denied_email.called is True
 
 
 def test_reservation__deny__status_not_allowed_states(graphql):

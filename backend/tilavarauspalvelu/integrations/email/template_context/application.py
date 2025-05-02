@@ -21,18 +21,18 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 __all__ = [
-    "get_context_for_application_handled",
-    "get_context_for_application_in_allocation",
-    "get_context_for_application_received",
-    "get_context_for_application_section_cancelled",
+    "get_context_for_seasonal_booking_application_received",
+    "get_context_for_seasonal_booking_application_round_handled",
+    "get_context_for_seasonal_booking_application_round_in_allocation",
+    "get_context_for_seasonal_booking_cancelled_all",
 ]
 
 
-# type: EmailType.APPLICATION_HANDLED ##################################################################################
+# type: EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_HANDLED ##################################################################################
 
 
 @get_translated
-def get_context_for_application_handled(*, language: Lang) -> EmailContext:
+def get_context_for_seasonal_booking_application_round_handled(*, language: Lang) -> EmailContext:
     link = get_my_applications_ext_link(language=language)
     text = pgettext("Email", "'My applications' page")
 
@@ -47,11 +47,11 @@ def get_context_for_application_handled(*, language: Lang) -> EmailContext:
     }
 
 
-# type: EmailType.APPLICATION_IN_ALLOCATION ############################################################################
+# type: EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_IN_ALLOCATION ############################################################################
 
 
 @get_translated
-def get_context_for_application_in_allocation(*, language: Lang) -> EmailContext:
+def get_context_for_seasonal_booking_application_round_in_allocation(*, language: Lang) -> EmailContext:
     link = get_my_applications_ext_link(language=language)
     text = pgettext("Email", "'My applications' page")
 
@@ -71,11 +71,11 @@ def get_context_for_application_in_allocation(*, language: Lang) -> EmailContext
     }
 
 
-# type: EmailType.APPLICATION_RECEIVED #################################################################################
+# type: EmailType.SEASONAL_BOOKING_APPLICATION_RECEIVED #################################################################################
 
 
 @get_translated
-def get_context_for_application_received(*, language: Lang) -> EmailContext:
+def get_context_for_seasonal_booking_application_received(*, language: Lang) -> EmailContext:
     link = get_my_applications_ext_link(language=language)
     text = pgettext("Email", "'My applications' page")
 
@@ -93,17 +93,17 @@ def get_context_for_application_received(*, language: Lang) -> EmailContext:
     }
 
 
-# type: EmailType.APPLICATION_SECTION_CANCELLED ########################################################################
+# type: EmailType.SEASONAL_BOOKING_CANCELLED_ALL ########################################################################
 
 
 @overload
-def get_context_for_application_section_cancelled(
+def get_context_for_seasonal_booking_cancelled_all(
     application_section: ApplicationSection, *, language: Lang
 ) -> EmailContext: ...
 
 
 @overload
-def get_context_for_application_section_cancelled(
+def get_context_for_seasonal_booking_cancelled_all(
     *,
     language: Lang,
     cancel_reason: str,
@@ -116,7 +116,7 @@ def get_context_for_application_section_cancelled(
 
 
 @get_translated
-def get_context_for_application_section_cancelled(
+def get_context_for_seasonal_booking_cancelled_all(
     application_section: ApplicationSection | None = None,
     *,
     language: Lang,
@@ -146,17 +146,17 @@ def get_context_for_application_section_cancelled(
     }
 
 
-# type: EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED #####################################################
+# type: EmailType.SEASONAL_BOOKING_CANCELLED_ALL_STAFF_NOTIFICATION #####################################################
 
 
 @overload
-def get_context_for_staff_notification_application_section_cancelled(
+def get_context_for_seasonal_booking_cancelled_all_staff_notification(
     application_section: ApplicationSection, *, language: Lang, **data: Any
 ) -> EmailContext: ...
 
 
 @overload
-def get_context_for_staff_notification_application_section_cancelled(
+def get_context_for_seasonal_booking_cancelled_all_staff_notification(
     *,
     language: Lang,
     cancel_reason: str,
@@ -167,7 +167,7 @@ def get_context_for_staff_notification_application_section_cancelled(
 
 
 @get_translated
-def get_context_for_staff_notification_application_section_cancelled(
+def get_context_for_seasonal_booking_cancelled_all_staff_notification(
     application_section: ApplicationSection | None = None,
     *,
     language: Lang,

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from decimal import Decimal
 from inspect import cleandoc
 from typing import TYPE_CHECKING
 
@@ -96,37 +97,55 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_get_context__reservation_requires_payment(lang: Lang):
-    expected = LANGUAGE_CONTEXT[lang]
+def test_reservation_requires_payment__get_context(lang: Lang):
+    expected = {
+        **LANGUAGE_CONTEXT[lang],
+        "price_can_be_subsidised": False,
+        "subsidised_price": Decimal("12.30"),
+    }
 
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_requires_payment(**get_mock_params(language=lang)) == expected
-        assert get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_PAYMENT, language=lang) == expected
+        context = get_context_for_reservation_requires_payment(**get_mock_params(language=lang))
+
+    assert context == expected
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_reservation_requires_payment__get_context__get_mock_data(lang: Lang):
+    expected = {
+        **LANGUAGE_CONTEXT[lang],
+        "price_can_be_subsidised": False,
+        "subsidised_price": Decimal("12.30"),
+    }
+
+    with TranslationsFromPOFiles():
+        context = get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_PAYMENT, language=lang)
+
+    assert context == expected
 
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_requires_payment_instance(email_reservation):
+def test_reservation_requires_payment__get_context__instance(email_reservation):
     expected = {
         **LANGUAGE_CONTEXT["en"],
         "reservation_id": f"{email_reservation.id}",
+        "price_can_be_subsidised": False,
+        "subsidised_price": Decimal("12.30"),
     }
 
-    params = {
-        "reservation_id": email_reservation.id,
-    }
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_requires_payment(**get_mock_params(**params, language="en")) == expected
+        context = get_context_for_reservation_requires_payment(reservation=email_reservation, language="en")
 
-    with TranslationsFromPOFiles():
-        assert get_context_for_reservation_requires_payment(reservation=email_reservation, language="en") == expected
+    assert context == expected
 
 
 # RENDER TEXT ##########################################################################################################
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_reservation_requires_payment__text():
+def test_reservation_requires_payment__render__text():
     context = get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_PAYMENT, language="en")
     text_content = render_text(email_type=EmailType.RESERVATION_REQUIRES_PAYMENT, context=context)
 
@@ -165,7 +184,7 @@ def test_render_reservation_requires_payment__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_reservation_requires_payment__html():
+def test_reservation_requires_payment__render__html():
     context = get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_PAYMENT, language="en")
     html_content = render_html(email_type=EmailType.RESERVATION_REQUIRES_PAYMENT, context=context)
     text_content = html_email_to_text(html_content)
@@ -204,7 +223,7 @@ def test_render_reservation_requires_payment__html():
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_email_service__send_reservation_requires_payment_email(outbox):
+def test_reservation_requires_payment__send_email(outbox):
     reservation = ReservationFactory.create(
         reservee_email="reservee@email.com",
         user__email="user@email.com",
@@ -223,7 +242,7 @@ def test_email_service__send_reservation_requires_payment_email(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @patch_method(SentryLogger.log_message)
-def test_email_service__send_reservation_requires_payment_email__no_recipients(outbox):
+def test_reservation_requires_payment__send_email__no_recipients(outbox):
     reservation = ReservationFactory.create(
         reservee_email="",
         user__email="",
@@ -236,12 +255,12 @@ def test_email_service__send_reservation_requires_payment_email__no_recipients(o
     assert len(outbox) == 0
 
     assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args[0] == "No recipients for reservation requires payment email"
+    assert SentryLogger.log_message.call_args.args[0] == "No recipients for the 'reservation requires payment' email"
 
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_email_service__send_reservation_requires_payment_email__price_zero(outbox):
+def test_reservation_requires_payment__send_email__price_zero(outbox):
     reservation = ReservationFactory.create(
         reservee_email="reservee@email.com",
         user__email="user@email.com",

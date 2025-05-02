@@ -3446,49 +3446,6 @@ msgctxt "Email"
 msgid "You can check your booking details at"
 msgstr "Voit käydä tarkistamassa varauksesi tiedot osoitteessa"
 
-#: tilavarauspalvelu/integrations/email/template_context/permissions.py
-msgctxt "Email"
-msgid "Your staff access to Varaamo is expiring"
-msgstr "Henkilökunnan käyttöoikeutesi Varaamoon on vanhentumassa"
-
-#: tilavarauspalvelu/integrations/email/template_context/permissions.py
-msgctxt "Email"
-msgid ""
-"Your staff access to Varaamo will expire if you do not log in to the service "
-"within two weeks."
-msgstr ""
-"Henkilökunnan käyttöoikeutesi Varaamoon vanhenee, jos et kirjaudu sisään "
-"palveluun kahden viikon kuluessa."
-
-#: tilavarauspalvelu/integrations/email/template_context/permissions.py
-msgctxt "Email"
-msgid "Log in to the service at"
-msgstr "Kirjaudu palveluun osoitteessa"
-
-#: tilavarauspalvelu/integrations/email/template_context/permissions.py
-msgctxt "Email"
-msgid "Your user account in the Varaamo service is expiring"
-msgstr "Käyttäjätilisi Varaamo-palveluun on vanhentumassa"
-
-#: tilavarauspalvelu/integrations/email/template_context/permissions.py
-msgctxt "Email"
-msgid ""
-"Your user account in the Varaamo service will expire if you do not log in "
-"within two weeks. The information will be permanently deleted if your "
-"account expires."
-msgstr ""
-"Käyttäjätilisi Varaamo-palvelussa vanhenee, jos et kirjaudu sisään palveluun "
-"kahden viikon kuluessa. Tiedot poistetaan pysyvästi, jos tilisi vanhenee."
-
-#: tilavarauspalvelu/integrations/email/template_context/permissions.py
-msgctxt "Email"
-msgid ""
-"You can extend the validity of your user account by logging into the service "
-"at"
-msgstr ""
-"Voit jatkaa käyttäjätilisi voimassaoloa kirjautumalla sisään palveluun "
-"osoitteessa"
-
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
 msgid "Your booking has been confirmed with the following discount:"
@@ -3602,35 +3559,53 @@ msgstr ""
 "Varausyksikköön %(reservation_unit_name)s on tehty uusi käsittelyä vaativa "
 "varauspyyntö"
 
-#: tilavarauspalvelu/integrations/email/typing.py
-msgctxt "EmailType"
-msgid "Application handled"
-msgstr "Kausivaraushakemus käsitelty"
+#: tilavarauspalvelu/integrations/email/template_context/user.py
+msgctxt "Email"
+msgid "Your staff access to Varaamo is expiring"
+msgstr "Henkilökunnan käyttöoikeutesi Varaamoon on vanhentumassa"
+
+#: tilavarauspalvelu/integrations/email/template_context/user.py
+msgctxt "Email"
+msgid ""
+"Your staff access to Varaamo will expire if you do not log in to the service "
+"within two weeks."
+msgstr ""
+"Henkilökunnan käyttöoikeutesi Varaamoon vanhenee, jos et kirjaudu sisään "
+"palveluun kahden viikon kuluessa."
+
+#: tilavarauspalvelu/integrations/email/template_context/user.py
+msgctxt "Email"
+msgid "Log in to the service at"
+msgstr "Kirjaudu palveluun osoitteessa"
+
+#: tilavarauspalvelu/integrations/email/template_context/user.py
+msgctxt "Email"
+msgid "Your user account in the Varaamo service is expiring"
+msgstr "Käyttäjätilisi Varaamo-palveluun on vanhentumassa"
+
+#: tilavarauspalvelu/integrations/email/template_context/user.py
+msgctxt "Email"
+msgid ""
+"Your user account in the Varaamo service will expire if you do not log in "
+"within two weeks. The information will be permanently deleted if your "
+"account expires."
+msgstr ""
+"Käyttäjätilisi Varaamo-palvelussa vanhenee, jos et kirjaudu sisään palveluun "
+"kahden viikon kuluessa. Tiedot poistetaan pysyvästi, jos tilisi vanhenee."
+
+#: tilavarauspalvelu/integrations/email/template_context/user.py
+msgctxt "Email"
+msgid ""
+"You can extend the validity of your user account by logging into the service "
+"at"
+msgstr ""
+"Voit jatkaa käyttäjätilisi voimassaoloa kirjautumalla sisään palveluun "
+"osoitteessa"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Application in allocation"
-msgstr "Kausivaraushakemus käsittelyssä"
-
-#: tilavarauspalvelu/integrations/email/typing.py
-msgctxt "EmailType"
-msgid "Application received"
-msgstr "Kausivaraushakemus vastaanotettu"
-
-#: tilavarauspalvelu/integrations/email/typing.py
-msgctxt "EmailType"
-msgid "Application section cancelled"
-msgstr "Kausivaraushakemuksen osa peruttu"
-
-#: tilavarauspalvelu/integrations/email/typing.py
-msgctxt "EmailType"
-msgid "Permission deactivation"
-msgstr "Käyttöoikeuksien deaktivointi"
-
-#: tilavarauspalvelu/integrations/email/typing.py
-msgctxt "EmailType"
-msgid "User anonymization"
-msgstr "Käyttäjän anonymisointi"
+msgid "Reservation access code changed"
+msgstr "Varauksen ovikoodi vaihtunut"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
@@ -3649,17 +3624,12 @@ msgstr "Varaus vahvistettu"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Reservation modified"
-msgstr "Varausta muokattu"
+msgid "Reservation confirmed staff notification"
+msgstr "Varaus vahvistettu käsittelijän ilmoitus"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Reservation modified access code"
-msgstr "Varausta muokattu ovikoodi"
-
-#: tilavarauspalvelu/integrations/email/typing.py
-msgctxt "EmailType"
-msgid "Reservation rejected"
+msgid "Reservation denied"
 msgstr "Varaus hylätty"
 
 #: tilavarauspalvelu/integrations/email/typing.py
@@ -3669,53 +3639,83 @@ msgstr "Varaus odottaa käsittelyä"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
+msgid "Reservation requires handling staff notification"
+msgstr "Varaus odottaa käsittelyä käsittelijän ilmoitus"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
 msgid "Reservation requires payment"
 msgstr "Varaus odottaa maksua"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal reservation cancelled single"
-msgstr "Kausivaraus peruttu yksittäinen"
+msgid "Reservation rescheduled"
+msgstr "Varauksen aikaa muutettu"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal reservation modified series"
-msgstr "Kausivaraus muokattu sarja"
+msgid "Seasonal reservation access code changed"
+msgstr "Kausivarauksen ovikoodi vaihtunut"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal reservation modified series access code"
-msgstr "Kausivaraus muokattu sarja ovikoodi"
+msgid "Seasonal booking application received"
+msgstr "Kausivaraushakemus vastaanotettu"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal reservation modified single"
-msgstr "Kausivaraus muokattu yksittäinen"
+msgid "Seasonal booking application round in allocation"
+msgstr "Kausivarauskierros käsittelyssä"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal reservation rejected series"
-msgstr "Kausivaraus hylätty sarja"
+msgid "Seasonal booking application round handled"
+msgstr "Kausivarauskierros käsitelty"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal reservation rejected single"
-msgstr "Kausivaraus hylätty yksittäinen"
+msgid "Seasonal booking cancelled all"
+msgstr "Kausivaraus peruttu"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Staff notification application section cancelled"
-msgstr "Käsittelijä ilmoitus kausivaraushakemuksen osan perumisesta"
+msgid "Seasonal booking cancelled all staff notification"
+msgstr "Kausivaraus peruttu käsittelijän ilmoitus"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Staff notification reservation made"
-msgstr "Käsittelijä ilmoitus uudesta varauksesta"
+msgid "Seasonal booking cancelled single"
+msgstr "Kausivaraus peruttu yksittäinen varaus"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Staff notification reservation requires handling"
-msgstr "Käsittelijän ilmoitus käsittelyä vaativasta varauksesta"
+msgid "Seasonal booking denied series"
+msgstr "Kausivaraus hylätty varaussarja"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal booking denied single"
+msgstr "Kausivaraus hylätty yksittäinen varaus"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal booking rescheduled series"
+msgstr "Kausivarauksen varaussarjan aikaa muutettu"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal booking rescheduled single"
+msgstr "Kausivarauksen yksittäisen varauksen aikaa muutettu"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "User permissions deactivation"
+msgstr "Käyttöoikeuksien deaktivointi"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "User anonymization"
+msgstr "Käyttäjän anonymisointi"
 
 #: tilavarauspalvelu/models/ability_group/model.py
 msgid "ability group"
