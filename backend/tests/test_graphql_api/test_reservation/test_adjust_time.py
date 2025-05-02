@@ -34,7 +34,7 @@ pytestmark = [
 ]
 
 
-@patch_method(EmailService.send_reservation_modified_email)
+@patch_method(EmailService.send_reservation_rescheduled_email)
 def test_reservation__adjust_time__success(graphql):
     reservation = ReservationFactory.create_for_time_adjustment()
     reservation_begin = reservation.begin
@@ -50,7 +50,7 @@ def test_reservation__adjust_time__success(graphql):
     assert reservation.begin != reservation_begin
     assert reservation.end != reservation_end
 
-    assert EmailService.send_reservation_modified_email.called is True
+    assert EmailService.send_reservation_rescheduled_email.called is True
 
 
 def test_reservation__adjust_time__wrong_state(graphql):

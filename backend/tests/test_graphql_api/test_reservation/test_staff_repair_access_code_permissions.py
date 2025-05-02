@@ -43,7 +43,7 @@ def test_staff_repair_access_code__regular_user(graphql):
 
 
 @patch_method(PindoraService.sync_access_code)
-@patch_method(EmailService.send_reservation_modified_email)
+@patch_method(EmailService.send_reservation_rescheduled_email)
 def test_staff_repair_access_code__unit_handler(graphql):
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(
@@ -69,11 +69,11 @@ def test_staff_repair_access_code__unit_handler(graphql):
     assert response.has_errors is False, response.errors
 
     assert PindoraService.sync_access_code.call_count == 1
-    assert EmailService.send_reservation_modified_email.call_count == 1
+    assert EmailService.send_reservation_rescheduled_email.call_count == 1
 
 
 @patch_method(PindoraService.sync_access_code)
-@patch_method(EmailService.send_reservation_modified_email)
+@patch_method(EmailService.send_reservation_rescheduled_email)
 def test_staff_repair_access_code__general_handler(graphql):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
@@ -97,4 +97,4 @@ def test_staff_repair_access_code__general_handler(graphql):
     assert response.has_errors is False, response.errors
 
     assert PindoraService.sync_access_code.call_count == 1
-    assert EmailService.send_reservation_modified_email.call_count == 1
+    assert EmailService.send_reservation_rescheduled_email.call_count == 1

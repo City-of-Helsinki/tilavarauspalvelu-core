@@ -1,4 +1,4 @@
-# type: EmailType.APPLICATION_SECTION_CANCELLED
+# type: EmailType.SEASONAL_BOOKING_CANCELLED_ALL
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from freezegun import freeze_time
 from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
-from tilavarauspalvelu.integrations.email.template_context import get_context_for_application_section_cancelled
+from tilavarauspalvelu.integrations.email.template_context import get_context_for_seasonal_booking_cancelled_all
 from tilavarauspalvelu.integrations.email.typing import EmailType
 
 from tests.factories import ApplicationFactory, ApplicationSectionFactory
@@ -69,7 +69,7 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_get_context_for_application_section_cancelled(lang: Lang):
+def test_seasonal_booking_cancelled_all__get_context(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     params = {
@@ -77,13 +77,29 @@ def test_get_context_for_application_section_cancelled(lang: Lang):
         "application_section_id": 0,
     }
     with TranslationsFromPOFiles():
-        assert get_context_for_application_section_cancelled(**get_mock_params(**params, language=lang)) == expected
-        assert get_mock_data(email_type=EmailType.APPLICATION_SECTION_CANCELLED, **params, language=lang) == expected
+        context = get_context_for_seasonal_booking_cancelled_all(**get_mock_params(**params, language=lang))
+
+    assert context == expected
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_seasonal_booking_cancelled_all__get_context__get_mock_data(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    params = {
+        "application_id": 0,
+        "application_section_id": 0,
+    }
+    with TranslationsFromPOFiles():
+        context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_CANCELLED_ALL, **params, language=lang)
+
+    assert context == expected
 
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context_for_application_section_cancelled__instance(email_reservation):
+def test_seasonal_booking_cancelled_all__get_context__instance(email_reservation):
     section = email_reservation.actions.get_application_section()
 
     expected = {
@@ -91,25 +107,22 @@ def test_get_context_for_application_section_cancelled__instance(email_reservati
         **get_application_details_urls(section),
     }
 
-    params = {
-        "application_id": section.application_id,
-        "application_section_id": section.id,
-    }
     with TranslationsFromPOFiles():
-        assert get_context_for_application_section_cancelled(**get_mock_params(**params, language="en")) == expected
+        context = get_context_for_seasonal_booking_cancelled_all(application_section=section, language="en")
 
-    with TranslationsFromPOFiles():
-        assert get_context_for_application_section_cancelled(application_section=section, language="en") == expected
+    assert context == expected
 
 
 # RENDER TEXT ##########################################################################################################
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_application_section_cancelled_email_text():
-    context = get_mock_data(email_type=EmailType.APPLICATION_SECTION_CANCELLED, language="en")
-    text_content = render_text(email_type=EmailType.APPLICATION_SECTION_CANCELLED, context=context)
+def test_seasonal_booking_cancelled_all_email__render__text():
+    context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_CANCELLED_ALL, language="en")
+    text_content = render_text(email_type=EmailType.SEASONAL_BOOKING_CANCELLED_ALL, context=context)
     text_content = text_content.replace("&amp;", "&")
+
+    url = "https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678"
 
     assert text_content == cleandoc(
         f"""
@@ -120,7 +133,7 @@ def test_render_application_section_cancelled_email_text():
 
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
 
-        You can check your booking details at: https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678
+        You can check your booking details at: {url}
 
         {EMAIL_CLOSING_TEXT_EN}
         """
@@ -131,10 +144,12 @@ def test_render_application_section_cancelled_email_text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_render_application_section_cancelled_email__html():
-    context = get_mock_data(email_type=EmailType.APPLICATION_SECTION_CANCELLED, language="en")
-    html_content = render_html(email_type=EmailType.APPLICATION_SECTION_CANCELLED, context=context)
+def test_seasonal_booking_cancelled_all_email__render__html():
+    context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_CANCELLED_ALL, language="en")
+    html_content = render_html(email_type=EmailType.SEASONAL_BOOKING_CANCELLED_ALL, context=context)
     text_content = html_email_to_text(html_content)
+
+    url = "https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678"
 
     assert text_content == cleandoc(
         f"""
@@ -146,7 +161,7 @@ def test_render_application_section_cancelled_email__html():
 
         Reason: [PERUUTUKSEN SYY]
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
-        You can check your booking details at: [varaamo.hel.fi](https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678)
+        You can check your booking details at: [varaamo.hel.fi]({url})
 
         {EMAIL_CLOSING_HTML_EN}
         """
@@ -159,7 +174,7 @@ def test_render_application_section_cancelled_email__html():
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_email_service__send_application_section_cancelled_email(outbox):
+def test_seasonal_booking_cancelled_all__send_email(outbox):
     application = ApplicationFactory.create_in_status_results_sent(
         user__email="user@email.com",
         contact_person__email="contact@email.com",
@@ -171,7 +186,7 @@ def test_email_service__send_application_section_cancelled_email(outbox):
         allocated_time_slot__reservation_unit_option__application_section=application_section,
     )
 
-    EmailService.send_application_section_cancelled(application_section=application_section)
+    EmailService.send_seasonal_booking_cancelled_all_email(application_section=application_section)
 
     assert len(outbox) == 1
 
@@ -182,9 +197,9 @@ def test_email_service__send_application_section_cancelled_email(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_email_service__send_application_section_cancelled_email__no_reservations_email_not_sent(outbox):
+def test_seasonal_booking_cancelled_all__send_email__no_reservations(outbox):
     application_section = ApplicationSectionFactory.create_in_status_handled(application__user__email="user@email.com")
 
-    EmailService.send_application_section_cancelled(application_section=application_section)
+    EmailService.send_seasonal_booking_cancelled_all_email(application_section=application_section)
 
     assert len(outbox) == 0

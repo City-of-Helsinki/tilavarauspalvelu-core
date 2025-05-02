@@ -174,14 +174,14 @@ def prune_reservations_task() -> None:
 def send_application_in_allocation_email_task() -> None:
     from tilavarauspalvelu.integrations.email.main import EmailService
 
-    EmailService.send_application_in_allocation_emails()
+    EmailService.send_seasonal_booking_application_round_in_allocation_emails()
 
 
 @app.task(name="send_application_handled_email")
 def send_application_handled_email_task() -> None:
     from tilavarauspalvelu.integrations.email.main import EmailService
 
-    EmailService.send_application_handled_emails()
+    EmailService.send_seasonal_booking_application_round_handled_emails()
 
 
 @app.task(name="update_expired_orders")
@@ -374,7 +374,7 @@ def deactivate_old_permissions_task() -> None:
 def send_permission_deactivation_email_task() -> None:
     from tilavarauspalvelu.integrations.email.main import EmailService
 
-    EmailService.send_permission_deactivation_emails()
+    EmailService.send_user_permissions_deactivation_emails()
 
 
 @app.task(name="send_user_anonymization_email")

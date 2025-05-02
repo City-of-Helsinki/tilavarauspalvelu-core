@@ -250,7 +250,7 @@ def test_frontend_queries__customer_ui__ChangeReservationAccessCodeSeries(graphq
         access_code_is_active=True,
     ),
 )
-@patch_method(EmailService.send_reservation_modified_access_code_email)
+@patch_method(EmailService.send_reservation_access_code_changed_email)
 def test_frontend_queries__customer_ui__ChangeReservationAccessCodeSingle(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["ChangeReservationAccessCodeSingle"]

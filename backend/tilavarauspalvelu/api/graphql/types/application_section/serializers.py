@@ -292,8 +292,8 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
         )
 
         if cancellable_reservations_count:
-            EmailService.send_application_section_cancelled(application_section=self.instance)
-            EmailService.send_staff_notification_application_section_cancelled(application_section=self.instance)
+            EmailService.send_seasonal_booking_cancelled_all_email(application_section=self.instance)
+            EmailService.send_seasonal_booking_cancelled_all_staff_notification_email(application_section=self.instance)
 
             if has_access_code:
                 # Reschedule the seasonal booking to remove all cancelled reservations.
