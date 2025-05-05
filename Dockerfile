@@ -30,8 +30,6 @@ ARG NEXT_PUBLIC_BASE_URL
 ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
 ARG EMAIL_VARAAMO_EXT_LINK
 ENV EMAIL_VARAAMO_EXT_LINK=$EMAIL_VARAAMO_EXT_LINK
-ARG SENTRY_ENABLE_SOURCE_MAPS
-ENV SENTRY_ENABLE_SOURCE_MAPS=$SENTRY_ENABLE_SOURCE_MAPS
 # Version information from build pipeline (pass it to sentry sourcemap upload)
 ARG NEXT_PUBLIC_SOURCE_VERSION
 ARG NEXT_PUBLIC_SOURCE_BRANCH_NAME
@@ -49,8 +47,7 @@ ENV SKIP_ENV_VALIDATION=true
 COPY turbo.json turbo.json
 RUN npm install -g corepack@latest
 RUN corepack enable
-RUN --mount=type=secret,id=sentry_auth_token,env=SENTRY_AUTH_TOKEN \
-  pnpm turbo run build --filter=$APP...
+RUN pnpm turbo run build --filter=$APP...
 
 FROM base AS runner
 ARG APP
