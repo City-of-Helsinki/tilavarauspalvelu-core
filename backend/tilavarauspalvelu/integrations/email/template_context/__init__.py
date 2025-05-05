@@ -8,6 +8,7 @@ from tilavarauspalvelu.integrations.email.template_context.application import (
     get_context_for_seasonal_booking_cancelled_all_staff_notification,
 )
 from tilavarauspalvelu.integrations.email.template_context.reservation import (
+    get_context_for_reservation_access_code_added,
     get_context_for_reservation_access_code_changed,
     get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
@@ -31,6 +32,7 @@ from tilavarauspalvelu.integrations.email.template_context.user import (
 )
 
 __all__ = [
+    "get_context_for_reservation_access_code_added",
     "get_context_for_reservation_access_code_changed",
     "get_context_for_reservation_approved",
     "get_context_for_reservation_cancelled",

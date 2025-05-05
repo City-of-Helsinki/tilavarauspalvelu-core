@@ -3559,6 +3559,11 @@ msgstr ""
 "Varausyksikköön %(reservation_unit_name)s on tehty uusi käsittelyä vaativa "
 "varauspyyntö"
 
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "A door code has been added to your booking"
+msgstr "Varaukseesi on lisätty ovikoodi"
+
 #: tilavarauspalvelu/integrations/email/template_context/user.py
 msgctxt "Email"
 msgid "Your staff access to Varaamo is expiring"
@@ -3601,6 +3606,11 @@ msgid ""
 msgstr ""
 "Voit jatkaa käyttäjätilisi voimassaoloa kirjautumalla sisään palveluun "
 "osoitteessa"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation access code added"
+msgstr "Varaukseen lisätty ovikoodi"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"

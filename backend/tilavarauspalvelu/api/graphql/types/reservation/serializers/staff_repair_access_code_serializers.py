@@ -45,10 +45,12 @@ class StaffRepairReservationAccessCodeSerializer(NestingModelSerializer):
         return data
 
     def update(self, instance: Reservation, validated_data: dict[str, Any]) -> Reservation:  # noqa: ARG002
+        access_code_was_active = instance.access_code_is_active
+
         with external_service_errors_as_validation_errors(code=error_codes.PINDORA_ERROR):
             PindoraService.sync_access_code(obj=instance)
 
-        if instance.access_code_should_be_active:
-            EmailService.send_reservation_rescheduled_email(reservation=instance)
+        if not access_code_was_active and instance.access_code_should_be_active:
+            EmailService.send_reservation_access_code_added_email(reservation=instance)
 
         return instance

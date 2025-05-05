@@ -39,6 +39,36 @@ class EmailService:
     # Reservation ######################################################################################################
 
     @staticmethod
+    def send_reservation_access_code_added_email(reservation: Reservation, *, language: Lang | None = None) -> None:
+        """Sends an email to the user when an access code has been or added to or activated for their reservation."""
+        # TODO: Send different email for seasonal bookings
+
+        if reservation.access_type != AccessType.ACCESS_CODE:
+            return
+
+        if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
+            return
+
+        if reservation.end.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+            return
+
+        recipients = get_reservation_email_recipients(reservation=reservation)
+        if not recipients:
+            SentryLogger.log_message(
+                "No recipients for the 'reservation access code added' email",
+                details={"reservation": reservation.pk},
+            )
+            return
+
+        if language is None:
+            language = get_reservation_email_language(reservation=reservation)
+
+        email_type = EmailType.RESERVATION_ACCESS_CODE_ADDED
+        context = email_type.get_email_context(reservation, language=language)
+        email = EmailData.build(recipients, context, email_type)
+        send_emails_in_batches_task.delay(email_data=email)
+
+    @staticmethod
     def send_reservation_access_code_changed_email(reservation: Reservation, *, language: Lang | None = None) -> None:
         """Sends an email to the reservee when their reservation's access code has been modified."""
         if reservation.access_type != AccessType.ACCESS_CODE:
