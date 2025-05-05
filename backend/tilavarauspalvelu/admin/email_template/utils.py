@@ -4,13 +4,19 @@ import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
+from admin_data_views.settings import admin_data_settings
+from django.urls import reverse
+from django.utils.html import format_html
+
 from tilavarauspalvelu.enums import WeekdayChoice
 from tilavarauspalvelu.integrations.email.template_context.common import get_staff_reservations_ext_link
-from tilavarauspalvelu.integrations.email.typing import EmailType
+from tilavarauspalvelu.integrations.email.typing import EmailTemplateType, EmailType
 from tilavarauspalvelu.translation import get_translated
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
+    from django.utils.safestring import SafeString
+
     from tilavarauspalvelu.integrations.email.typing import EmailTemplateType
     from tilavarauspalvelu.typing import EmailContext, Lang
 
@@ -113,3 +119,27 @@ def get_mock_data(*, email_type: EmailTemplateType, language: Lang, **kwargs: An
     # Get only the relevant parameters
     context_params = {key: mock_params[key] for key in email_type.context_variables}
     return email_type.get_email_context(**context_params)
+
+
+def get_preview_links(email_template_type: EmailTemplateType, *, text: bool = False) -> SafeString:
+    base_url = reverse(
+        viewname="admin:view_email_type",
+        kwargs={"email_type": email_template_type.value},
+        current_app=admin_data_settings.NAME,
+    )
+
+    text_param = "&text=true" if text else ""
+
+    link_html_fi = format_html('<a href="{}">{}</a>', base_url + f"?lang=fi{text_param}", "FI")
+    link_html_en = format_html('<a href="{}">{}</a>', base_url + f"?lang=en{text_param}", "EN")
+    link_html_sv = format_html('<a href="{}">{}</a>', base_url + f"?lang=sv{text_param}", "SV")
+    return format_html("<span>{} / {} / {}</span>", link_html_fi, link_html_en, link_html_sv)
+
+
+def get_tester_link(email_template_type: EmailTemplateType) -> SafeString:
+    tester_url = reverse(
+        "admin:email_tester",
+        kwargs={"email_type": email_template_type.value},
+        current_app=admin_data_settings.NAME,
+    )
+    return format_html('<a href="{}">{}</a>', tester_url, email_template_type.label)

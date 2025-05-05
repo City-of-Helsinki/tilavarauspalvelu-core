@@ -18,6 +18,7 @@ from tilavarauspalvelu.models import ReservationUnit
 from utils.utils import safe_getattr
 
 from .forms import EmailTesterForm
+from .utils import get_preview_links
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import WSGIRequest
@@ -65,7 +66,7 @@ def email_tester_admin_view(request: WSGIRequest, email_type: str) -> HttpRespon
         return email_tester_admin_redirect_view(request=request, email_type=new_email_type)
 
     try:
-        email_type_class = EmailType.get(email_type)
+        email_template_type = EmailType.get(email_type)
     except ValueError:
         return HttpResponse(f"Invalid email type: {email_type}", HTTP_400_BAD_REQUEST)
 
@@ -74,29 +75,31 @@ def email_tester_admin_view(request: WSGIRequest, email_type: str) -> HttpRespon
     reservation_unit_form = ReservationUnitSelectForm()
 
     if request.method == "POST":
-        tester_form = EmailTesterForm(email_type=email_type_class, data=request.POST)
+        tester_form = EmailTesterForm(email_type=email_template_type, data=request.POST)
         if tester_form.is_valid():
             recipients = [tester_form.cleaned_data["send_to"]]
             context = tester_form.to_context()
-            email = EmailData.build(recipients=recipients, context=context, email_type=email_type_class)
+            email = EmailData.build(recipients=recipients, context=context, email_type=email_template_type)
             send_emails_in_batches_task(email)
 
             messages.add_message(
                 request=request,
                 level=messages.INFO,
-                message=_("Test email '%(email_type)s' successfully sent.") % {"email_type": email_type_class.label},
+                message=_("Test email '%(email_type)s' successfully sent.") % {"email_type": email_template_type.label},
             )
+
     elif reservation_unit_pk:
         reservation_unit = ReservationUnit.objects.get(id=int(reservation_unit_pk))
         tester_form = EmailTesterForm.from_reservation_unit(
-            email_type=email_type_class,
+            email_type=email_template_type,
             instance=reservation_unit,
             language=Language.FI.value,
         )
         tester_form.initial["send_to"] = request.user.email or ""
         reservation_unit_form.initial["reservation_unit"] = reservation_unit.pk
+
     else:
-        tester_form = EmailTesterForm(email_type=email_type_class)
+        tester_form = EmailTesterForm(email_type=email_template_type)
         tester_form.initial["send_to"] = request.user.email or ""
 
     context = {
@@ -107,6 +110,8 @@ def email_tester_admin_view(request: WSGIRequest, email_type: str) -> HttpRespon
         "form": tester_form,
         "reservation_unit_form": reservation_unit_form,
         "template_switcher_form": TemplateSwitcherForm(initial={"email_type": email_type}),
+        "links_html": get_preview_links(email_template_type),
+        "links_text": get_preview_links(email_template_type, text=True),
     }
 
     return TemplateResponse(request, "email/email_tester.html", context=context)
