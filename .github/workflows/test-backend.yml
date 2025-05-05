@@ -8,9 +8,6 @@ on:
       - main
   pull_request:
   workflow_dispatch:
-  repository_dispatch:
-    types:
-      - update-graphql-schema
 
 # Cancel a workflow from the same PR, branch or tag when a new workflow is triggered.
 concurrency:
@@ -23,7 +20,7 @@ env:
 jobs:
 
   checks:
-    name: "Check migrations and translations"
+    name: "Check migrations, translations and outdated graphql schema"
     runs-on: ubuntu-latest
 
     services:
@@ -83,6 +80,12 @@ jobs:
         env:
           DJANGO_SETTINGS_ENVIRONMENT: CI
           DATABASE_URL: postgis://tvp:tvp@localhost:5432/tvp
+
+      - name: "Test for outdated graphql schema file"
+        working-directory: backend
+        run: poetry run python manage.py update_graphql_schema
+        env:
+          DJANGO_SETTINGS_ENVIRONMENT: AutomatedTests
 
   test:
     name: "Run tests (${{ matrix.group }}/8)"
