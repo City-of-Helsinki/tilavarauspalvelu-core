@@ -1,6 +1,10 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { type ApplicantFragment, ApplicantTypeChoice } from "@gql/gql-types";
+import {
+  type AddressFieldsFragment,
+  type ApplicantFragment,
+  ApplicantTypeChoice,
+} from "@gql/gql-types";
 import {
   ApplicationInfoContainer,
   InfoItemContainer,
@@ -28,6 +32,15 @@ const LabelValue = ({
 
 type ApplicantT = Omit<ApplicantFragment, "homeCity" | "additionalInformation">;
 
+function formatAddress(
+  address: AddressFieldsFragment | null | undefined
+): string | null {
+  if (address?.streetAddressTranslations.fi) {
+    return `${address.streetAddressTranslations.fi}, ${address.postCode} ${address.cityTranslations.fi}`;
+  }
+  return null;
+}
+
 export function ApplicantInfoPreview({
   application,
 }: {
@@ -37,12 +50,8 @@ export function ApplicantInfoPreview({
   const applicant = {
     name: `${application.contactPerson?.firstName} ${application.contactPerson?.lastName}`,
     contact: `${application.contactPerson?.phoneNumber} / ${application.contactPerson?.email}`,
-    address: application.organisation?.address?.streetAddressFi
-      ? `${application.organisation?.address?.streetAddressFi}, ${application.organisation?.address?.postCode} ${application.organisation?.address?.cityFi}`
-      : null,
-    billingAddress: application.billingAddress?.streetAddressFi
-      ? `${application.billingAddress?.streetAddressFi}, ${application.billingAddress?.postCode} ${application.billingAddress?.cityFi}`
-      : null,
+    address: formatAddress(application.organisation?.address),
+    billingAddress: formatAddress(application.billingAddress),
   };
 
   return (
@@ -54,11 +63,11 @@ export function ApplicantInfoPreview({
         <>
           <LabelValue
             label={t("application:preview.organisation.name")}
-            value={application.organisation?.nameFi}
+            value={application.organisation?.nameTranslations.fi}
           />
           <LabelValue
             label={t("application:preview.organisation.coreBusiness")}
-            value={application.organisation?.coreBusinessFi}
+            value={application.organisation?.coreBusinessTranslations.fi}
           />
           <LabelValue
             label={t("application:preview.organisation.registrationNumber")}
@@ -84,7 +93,9 @@ export function ApplicantInfoPreview({
         <LabelValue
           label={t("application:preview.organisation.billingAddress")}
           value={applicant.billingAddress}
-          fullWidth={!!application.organisation?.address?.streetAddressFi}
+          fullWidth={
+            !!application.organisation?.address?.streetAddressTranslations.fi
+          }
         />
       )}
     </ApplicationInfoContainer>

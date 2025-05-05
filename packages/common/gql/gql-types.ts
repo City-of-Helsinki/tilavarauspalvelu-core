@@ -41,9 +41,7 @@ export type AbilityGroupNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -78,17 +76,13 @@ export enum AccessTypeWithMultivalued {
 
 export type AddressNode = Node & {
   readonly city: Scalars["String"]["output"];
-  readonly cityEn: Maybe<Scalars["String"]["output"]>;
-  readonly cityFi: Maybe<Scalars["String"]["output"]>;
-  readonly citySv: Maybe<Scalars["String"]["output"]>;
+  readonly cityTranslations: Translatable;
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly postCode: Scalars["String"]["output"];
   readonly streetAddress: Scalars["String"]["output"];
-  readonly streetAddressEn: Maybe<Scalars["String"]["output"]>;
-  readonly streetAddressFi: Maybe<Scalars["String"]["output"]>;
-  readonly streetAddressSv: Maybe<Scalars["String"]["output"]>;
+  readonly streetAddressTranslations: Translatable;
 };
 
 export type AddressSerializerInput = {
@@ -379,21 +373,15 @@ export type ApplicationRoundNode = Node & {
   readonly applicationPeriodEnd: Scalars["DateTime"]["output"];
   readonly applicationsCount: Scalars["Int"]["output"];
   readonly criteria: Scalars["String"]["output"];
-  readonly criteriaEn: Maybe<Scalars["String"]["output"]>;
-  readonly criteriaFi: Maybe<Scalars["String"]["output"]>;
-  readonly criteriaSv: Maybe<Scalars["String"]["output"]>;
+  readonly criteriaTranslations: Translatable;
   readonly handledDate: Maybe<Scalars["DateTime"]["output"]>;
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly isSettingHandledAllowed: Scalars["Boolean"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly notesWhenApplying: Scalars["String"]["output"];
-  readonly notesWhenApplyingEn: Maybe<Scalars["String"]["output"]>;
-  readonly notesWhenApplyingFi: Maybe<Scalars["String"]["output"]>;
-  readonly notesWhenApplyingSv: Maybe<Scalars["String"]["output"]>;
+  readonly notesWhenApplyingTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly publicDisplayBegin: Scalars["DateTime"]["output"];
   readonly publicDisplayEnd: Scalars["DateTime"]["output"];
@@ -887,6 +875,7 @@ export type BannerNotificationNode = Node & {
   readonly messageEn: Maybe<Scalars["String"]["output"]>;
   readonly messageFi: Maybe<Scalars["String"]["output"]>;
   readonly messageSv: Maybe<Scalars["String"]["output"]>;
+  readonly messageTranslations: Translatable;
   readonly name: Scalars["String"]["output"];
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly state: BannerNotificationState;
@@ -977,9 +966,7 @@ export type CityNode = Node & {
   readonly id: Scalars["ID"]["output"];
   readonly municipalityCode: Scalars["String"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -1020,9 +1007,7 @@ export type EquipmentAllNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -1054,9 +1039,7 @@ export type EquipmentCategoryNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -1129,9 +1112,7 @@ export type EquipmentNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -1221,13 +1202,9 @@ export enum ImageType {
 
 export type LocationNode = Node & {
   readonly addressCity: Scalars["String"]["output"];
-  readonly addressCityEn: Maybe<Scalars["String"]["output"]>;
-  readonly addressCityFi: Maybe<Scalars["String"]["output"]>;
-  readonly addressCitySv: Maybe<Scalars["String"]["output"]>;
+  readonly addressCityTranslations: Translatable;
   readonly addressStreet: Scalars["String"]["output"];
-  readonly addressStreetEn: Maybe<Scalars["String"]["output"]>;
-  readonly addressStreetFi: Maybe<Scalars["String"]["output"]>;
-  readonly addressStreetSv: Maybe<Scalars["String"]["output"]>;
+  readonly addressStreetTranslations: Translatable;
   readonly addressZip: Scalars["String"]["output"];
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
@@ -1627,17 +1604,13 @@ export type OrganisationNode = Node & {
   readonly activeMembers: Maybe<Scalars["Int"]["output"]>;
   readonly address: Maybe<AddressNode>;
   readonly coreBusiness: Scalars["String"]["output"];
-  readonly coreBusinessEn: Maybe<Scalars["String"]["output"]>;
-  readonly coreBusinessFi: Maybe<Scalars["String"]["output"]>;
-  readonly coreBusinessSv: Maybe<Scalars["String"]["output"]>;
+  readonly coreBusinessTranslations: Translatable;
   readonly email: Scalars["String"]["output"];
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly identifier: Maybe<Scalars["String"]["output"]>;
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly organisationType: OrganizationTypeChoice;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly yearEstablished: Maybe<Scalars["Int"]["output"]>;
@@ -1849,9 +1822,7 @@ export type PurposeNode = Node & {
   readonly id: Scalars["ID"]["output"];
   readonly imageUrl: Maybe<Scalars["String"]["output"]>;
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly rank: Scalars["Int"]["output"];
   readonly smallUrl: Maybe<Scalars["String"]["output"]>;
@@ -1905,9 +1876,7 @@ export type QualifierNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -2931,9 +2900,7 @@ export type ReservationCancelReasonNode = Node & {
   readonly id: Scalars["ID"]["output"];
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly reason: Scalars["String"]["output"];
-  readonly reasonEn: Maybe<Scalars["String"]["output"]>;
-  readonly reasonFi: Maybe<Scalars["String"]["output"]>;
-  readonly reasonSv: Maybe<Scalars["String"]["output"]>;
+  readonly reasonTranslations: Translatable;
 };
 
 export type ReservationCancelReasonNodeConnection = {
@@ -3028,9 +2995,7 @@ export type ReservationDenyReasonNode = Node & {
   readonly id: Scalars["ID"]["output"];
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly reason: Scalars["String"]["output"];
-  readonly reasonEn: Maybe<Scalars["String"]["output"]>;
-  readonly reasonFi: Maybe<Scalars["String"]["output"]>;
-  readonly reasonSv: Maybe<Scalars["String"]["output"]>;
+  readonly reasonTranslations: Translatable;
 };
 
 export type ReservationDenyReasonNodeConnection = {
@@ -3296,9 +3261,7 @@ export type ReservationPurposeNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly rank: Scalars["Int"]["output"];
 };
@@ -3780,13 +3743,16 @@ export type ReservationUnitAccessTypeSerializerInput = {
 
 /** This Node should be kept to the bare minimum and never expose any relations to avoid performance issues. */
 export type ReservationUnitAllNode = Node & {
+  readonly descriptionTranslations: Translatable;
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly reservationCancelledInstructionsTranslations: Translatable;
+  readonly reservationConfirmedInstructionsTranslations: Translatable;
+  readonly reservationPendingInstructionsTranslations: Translatable;
+  readonly termsOfUseTranslations: Translatable;
 };
 
 export type ReservationUnitCancellationRuleNode = Node & {
@@ -3794,9 +3760,7 @@ export type ReservationUnitCancellationRuleNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -4103,9 +4067,7 @@ export type ReservationUnitNode = Node & {
   readonly contactInformation: Scalars["String"]["output"];
   readonly currentAccessType: Maybe<AccessType>;
   readonly description: Scalars["String"]["output"];
-  readonly descriptionEn: Maybe<Scalars["String"]["output"]>;
-  readonly descriptionFi: Maybe<Scalars["String"]["output"]>;
-  readonly descriptionSv: Maybe<Scalars["String"]["output"]>;
+  readonly descriptionTranslations: Translatable;
   readonly effectiveAccessType: Maybe<AccessType>;
   readonly equipments: ReadonlyArray<EquipmentNode>;
   readonly firstReservableDatetime: Maybe<Scalars["DateTime"]["output"]>;
@@ -4124,9 +4086,7 @@ export type ReservationUnitNode = Node & {
   readonly minPersons: Maybe<Scalars["Int"]["output"]>;
   readonly minReservationDuration: Maybe<Scalars["Duration"]["output"]>;
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly numActiveUserReservations: Scalars["Int"]["output"];
   readonly paymentMerchant: Maybe<PaymentMerchantNode>;
   readonly paymentProduct: Maybe<PaymentProductNode>;
@@ -4147,31 +4107,13 @@ export type ReservationUnitNode = Node & {
   readonly reservationBegins: Maybe<Scalars["DateTime"]["output"]>;
   readonly reservationBlockWholeDay: Scalars["Boolean"]["output"];
   readonly reservationCancelledInstructions: Scalars["String"]["output"];
-  readonly reservationCancelledInstructionsEn: Maybe<
-    Scalars["String"]["output"]
-  >;
-  readonly reservationCancelledInstructionsFi: Maybe<
-    Scalars["String"]["output"]
-  >;
-  readonly reservationCancelledInstructionsSv: Maybe<
-    Scalars["String"]["output"]
-  >;
+  readonly reservationCancelledInstructionsTranslations: Translatable;
   readonly reservationConfirmedInstructions: Scalars["String"]["output"];
-  readonly reservationConfirmedInstructionsEn: Maybe<
-    Scalars["String"]["output"]
-  >;
-  readonly reservationConfirmedInstructionsFi: Maybe<
-    Scalars["String"]["output"]
-  >;
-  readonly reservationConfirmedInstructionsSv: Maybe<
-    Scalars["String"]["output"]
-  >;
+  readonly reservationConfirmedInstructionsTranslations: Translatable;
   readonly reservationEnds: Maybe<Scalars["DateTime"]["output"]>;
   readonly reservationKind: ReservationKind;
   readonly reservationPendingInstructions: Scalars["String"]["output"];
-  readonly reservationPendingInstructionsEn: Maybe<Scalars["String"]["output"]>;
-  readonly reservationPendingInstructionsFi: Maybe<Scalars["String"]["output"]>;
-  readonly reservationPendingInstructionsSv: Maybe<Scalars["String"]["output"]>;
+  readonly reservationPendingInstructionsTranslations: Translatable;
   readonly reservationStartInterval: ReservationStartInterval;
   readonly reservationState: ReservationUnitReservationState;
   readonly reservationUnitType: Maybe<ReservationUnitTypeNode>;
@@ -4184,9 +4126,7 @@ export type ReservationUnitNode = Node & {
   readonly spaces: ReadonlyArray<SpaceNode>;
   readonly surfaceArea: Maybe<Scalars["Int"]["output"]>;
   readonly termsOfUse: Maybe<Scalars["String"]["output"]>;
-  readonly termsOfUseEn: Maybe<Scalars["String"]["output"]>;
-  readonly termsOfUseFi: Maybe<Scalars["String"]["output"]>;
-  readonly termsOfUseSv: Maybe<Scalars["String"]["output"]>;
+  readonly termsOfUseTranslations: Translatable;
   readonly unit: Maybe<UnitNode>;
   readonly uuid: Scalars["UUID"]["output"];
 };
@@ -4477,9 +4417,7 @@ export type ReservationUnitTypeNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly rank: Scalars["Int"]["output"];
 };
@@ -4852,9 +4790,7 @@ export type ResourceNode = Node & {
   readonly id: Scalars["ID"]["output"];
   readonly locationType: ResourceLocationType;
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly space: Maybe<SpaceNode>;
 };
@@ -4974,9 +4910,7 @@ export type SpaceNode = Node & {
   readonly id: Scalars["ID"]["output"];
   readonly maxPersons: Maybe<Scalars["Int"]["output"]>;
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly parent: Maybe<SpaceNode>;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly resources: ReadonlyArray<ResourceNode>;
@@ -5139,15 +5073,11 @@ export type TermsOfUseNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Maybe<Scalars["String"]["output"]>;
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["String"]["output"]>;
   readonly termsType: TermsType;
   readonly text: Scalars["String"]["output"];
-  readonly textEn: Maybe<Scalars["String"]["output"]>;
-  readonly textFi: Maybe<Scalars["String"]["output"]>;
-  readonly textSv: Maybe<Scalars["String"]["output"]>;
+  readonly textTranslations: Translatable;
 };
 
 export type TermsOfUseNodeConnection = {
@@ -5198,15 +5128,24 @@ export type TimeSlotType = {
   readonly end: Scalars["Time"]["output"];
 };
 
+export type Translatable = {
+  /** Translation in en. */
+  readonly en: Maybe<Scalars["String"]["output"]>;
+  /** Translation in fi. */
+  readonly fi: Maybe<Scalars["String"]["output"]>;
+  /** Translation in sv. */
+  readonly sv: Maybe<Scalars["String"]["output"]>;
+};
+
 /** This Node should be kept to the bare minimum and never expose any relations to avoid performance issues. */
 export type UnitAllNode = Node & {
+  readonly descriptionTranslations: Translatable;
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly shortDescriptionTranslations: Translatable;
   readonly tprekId: Maybe<Scalars["String"]["output"]>;
 };
 
@@ -5214,9 +5153,7 @@ export type UnitGroupNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly units: ReadonlyArray<UnitNode>;
 };
@@ -5258,25 +5195,19 @@ export type UnitGroupNodeEdge = {
 
 export type UnitNode = Node & {
   readonly description: Scalars["String"]["output"];
-  readonly descriptionEn: Maybe<Scalars["String"]["output"]>;
-  readonly descriptionFi: Maybe<Scalars["String"]["output"]>;
-  readonly descriptionSv: Maybe<Scalars["String"]["output"]>;
+  readonly descriptionTranslations: Translatable;
   readonly email: Scalars["String"]["output"];
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly location: Maybe<LocationNode>;
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly paymentMerchant: Maybe<PaymentMerchantNode>;
   readonly phone: Scalars["String"]["output"];
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly reservationUnits: ReadonlyArray<ReservationUnitNode>;
   readonly shortDescription: Scalars["String"]["output"];
-  readonly shortDescriptionEn: Maybe<Scalars["String"]["output"]>;
-  readonly shortDescriptionFi: Maybe<Scalars["String"]["output"]>;
-  readonly shortDescriptionSv: Maybe<Scalars["String"]["output"]>;
+  readonly shortDescriptionTranslations: Translatable;
   readonly spaces: ReadonlyArray<SpaceNode>;
   readonly tprekId: Maybe<Scalars["String"]["output"]>;
   readonly unitGroups: ReadonlyArray<UnitGroupNode>;
@@ -5697,10 +5628,11 @@ export type BannerNotificationsListAllQuery = {
         readonly id: string;
         readonly level: BannerNotificationLevel;
         readonly activeFrom: string | null;
-        readonly message: string;
-        readonly messageEn: string | null;
-        readonly messageFi: string | null;
-        readonly messageSv: string | null;
+        readonly messageTranslations: {
+          readonly fi: string | null;
+          readonly en: string | null;
+          readonly sv: string | null;
+        };
       } | null;
     } | null>;
   } | null;
@@ -5717,10 +5649,11 @@ export type BannerNotificationsListQuery = {
         readonly id: string;
         readonly level: BannerNotificationLevel;
         readonly activeFrom: string | null;
-        readonly message: string;
-        readonly messageEn: string | null;
-        readonly messageFi: string | null;
-        readonly messageSv: string | null;
+        readonly messageTranslations: {
+          readonly fi: string | null;
+          readonly en: string | null;
+          readonly sv: string | null;
+        };
       } | null;
     } | null>;
   } | null;
@@ -5737,12 +5670,16 @@ export type TermsOfUseQuery = {
         readonly id: string;
         readonly pk: string | null;
         readonly termsType: TermsType;
-        readonly nameFi: string | null;
-        readonly nameEn: string | null;
-        readonly nameSv: string | null;
-        readonly textFi: string | null;
-        readonly textEn: string | null;
-        readonly textSv: string | null;
+        readonly nameTranslations: {
+          readonly fi: string | null;
+          readonly en: string | null;
+          readonly sv: string | null;
+        };
+        readonly textTranslations: {
+          readonly fi: string | null;
+          readonly en: string | null;
+          readonly sv: string | null;
+        };
       } | null;
     } | null>;
   } | null;
@@ -5753,8 +5690,8 @@ export type ApplicationNameFragment = {
   readonly applicantType: ApplicantTypeChoice | null;
   readonly organisation: {
     readonly id: string;
-    readonly nameFi: string | null;
     readonly organisationType: OrganizationTypeChoice;
+    readonly nameTranslations: { readonly fi: string | null };
   } | null;
   readonly contactPerson: {
     readonly id: string;
@@ -5820,33 +5757,43 @@ export type ApplicantFragment = {
   readonly organisation: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
     readonly identifier: string | null;
     readonly organisationType: OrganizationTypeChoice;
-    readonly coreBusinessFi: string | null;
     readonly yearEstablished: number | null;
+    readonly nameTranslations: { readonly fi: string | null };
+    readonly coreBusinessTranslations: { readonly fi: string | null };
     readonly address: {
       readonly id: string;
       readonly pk: number | null;
       readonly postCode: string;
-      readonly streetAddressFi: string | null;
-      readonly cityFi: string | null;
+      readonly streetAddressTranslations: { readonly fi: string | null };
+      readonly cityTranslations: { readonly fi: string | null };
     } | null;
   } | null;
   readonly homeCity: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
+    readonly nameTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
   } | null;
   readonly billingAddress: {
     readonly id: string;
     readonly pk: number | null;
     readonly postCode: string;
-    readonly streetAddressFi: string | null;
-    readonly cityFi: string | null;
+    readonly streetAddressTranslations: { readonly fi: string | null };
+    readonly cityTranslations: { readonly fi: string | null };
   } | null;
+};
+
+export type AddressFieldsFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly postCode: string;
+  readonly streetAddressTranslations: { readonly fi: string | null };
+  readonly cityTranslations: { readonly fi: string | null };
 };
 
 export type ReserveeNameFieldsFragment = {
@@ -5909,43 +5856,55 @@ export type MetaFieldsFragment = {
   readonly purpose: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
+    readonly nameTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
   } | null;
   readonly homeCity: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameSv: string | null;
-    readonly nameEn: string | null;
+    readonly nameTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
   } | null;
 };
 
 export type TermsOfUseNameFieldsFragment = {
   readonly id: string;
-  readonly nameFi: string | null;
-  readonly nameEn: string | null;
-  readonly nameSv: string | null;
+  readonly nameTranslations: {
+    readonly fi: string | null;
+    readonly en: string | null;
+    readonly sv: string | null;
+  };
 };
 
 export type TermsOfUseTextFieldsFragment = {
   readonly id: string;
-  readonly textFi: string | null;
-  readonly textEn: string | null;
-  readonly textSv: string | null;
+  readonly textTranslations: {
+    readonly fi: string | null;
+    readonly en: string | null;
+    readonly sv: string | null;
+  };
 };
 
 export type TermsOfUseFieldsFragment = {
   readonly pk: string | null;
   readonly termsType: TermsType;
   readonly id: string;
-  readonly nameFi: string | null;
-  readonly nameEn: string | null;
-  readonly nameSv: string | null;
-  readonly textFi: string | null;
-  readonly textEn: string | null;
-  readonly textSv: string | null;
+  readonly nameTranslations: {
+    readonly fi: string | null;
+    readonly en: string | null;
+    readonly sv: string | null;
+  };
+  readonly textTranslations: {
+    readonly fi: string | null;
+    readonly en: string | null;
+    readonly sv: string | null;
+  };
 };
 
 export type PricingFieldsFragment = {
@@ -5972,30 +5931,28 @@ export type ImageFragment = {
 
 export type LocationFieldsFragment = {
   readonly id: string;
-  readonly addressStreetFi: string | null;
   readonly addressZip: string;
-  readonly addressCityFi: string | null;
-};
-
-export type LocationFieldsI18nFragment = {
-  readonly addressStreetEn: string | null;
-  readonly addressStreetSv: string | null;
-  readonly addressCityEn: string | null;
-  readonly addressCitySv: string | null;
-  readonly id: string;
-  readonly addressStreetFi: string | null;
-  readonly addressZip: string;
-  readonly addressCityFi: string | null;
+  readonly addressStreetTranslations: {
+    readonly fi: string | null;
+    readonly en: string | null;
+    readonly sv: string | null;
+  };
+  readonly addressCityTranslations: {
+    readonly fi: string | null;
+    readonly en: string | null;
+    readonly sv: string | null;
+  };
 };
 
 export type BannerNotificationCommonFragment = {
   readonly id: string;
   readonly level: BannerNotificationLevel;
   readonly activeFrom: string | null;
-  readonly message: string;
-  readonly messageEn: string | null;
-  readonly messageFi: string | null;
-  readonly messageSv: string | null;
+  readonly messageTranslations: {
+    readonly fi: string | null;
+    readonly en: string | null;
+    readonly sv: string | null;
+  };
 };
 
 export type MetadataSetsFragment = {
@@ -6021,7 +5978,9 @@ export const ApplicationNameFragmentDoc = gql`
     applicantType
     organisation {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
       organisationType
     }
     contactPerson {
@@ -6073,6 +6032,19 @@ export const SuitableTimeFragmentDoc = gql`
     priority
   }
 `;
+export const AddressFieldsFragmentDoc = gql`
+  fragment AddressFields on AddressNode {
+    id
+    pk
+    postCode
+    streetAddressTranslations {
+      fi
+    }
+    cityTranslations {
+      fi
+    }
+  }
+`;
 export const ApplicantFragmentDoc = gql`
   fragment Applicant on ApplicationNode {
     id
@@ -6090,34 +6062,33 @@ export const ApplicantFragmentDoc = gql`
     organisation {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
       identifier
       organisationType
-      coreBusinessFi
+      coreBusinessTranslations {
+        fi
+      }
       yearEstablished
       address {
-        id
-        pk
-        postCode
-        streetAddressFi
-        cityFi
+        ...AddressFields
       }
     }
     homeCity {
       id
       pk
-      nameFi
-      nameEn
-      nameSv
+      nameTranslations {
+        fi
+        en
+        sv
+      }
     }
     billingAddress {
-      id
-      pk
-      postCode
-      streetAddressFi
-      cityFi
+      ...AddressFields
     }
   }
+  ${AddressFieldsFragmentDoc}
 `;
 export const ReserveeNameFieldsFragmentDoc = gql`
   fragment ReserveeNameFields on ReservationNode {
@@ -6165,16 +6136,20 @@ export const MetaFieldsFragmentDoc = gql`
     purpose {
       id
       pk
-      nameFi
-      nameEn
-      nameSv
+      nameTranslations {
+        fi
+        en
+        sv
+      }
     }
     homeCity {
       id
       pk
-      nameFi
-      nameSv
-      nameEn
+      nameTranslations {
+        fi
+        en
+        sv
+      }
     }
   }
   ${ReserveeNameFieldsFragmentDoc}
@@ -6183,17 +6158,21 @@ export const MetaFieldsFragmentDoc = gql`
 export const TermsOfUseNameFieldsFragmentDoc = gql`
   fragment TermsOfUseNameFields on TermsOfUseNode {
     id
-    nameFi
-    nameEn
-    nameSv
+    nameTranslations {
+      fi
+      en
+      sv
+    }
   }
 `;
 export const TermsOfUseTextFieldsFragmentDoc = gql`
   fragment TermsOfUseTextFields on TermsOfUseNode {
     id
-    textFi
-    textEn
-    textSv
+    textTranslations {
+      fi
+      en
+      sv
+    }
   }
 `;
 export const TermsOfUseFieldsFragmentDoc = gql`
@@ -6233,30 +6212,29 @@ export const ImageFragmentDoc = gql`
 export const LocationFieldsFragmentDoc = gql`
   fragment LocationFields on LocationNode {
     id
-    addressStreetFi
+    addressStreetTranslations {
+      fi
+      en
+      sv
+    }
     addressZip
-    addressCityFi
+    addressCityTranslations {
+      fi
+      en
+      sv
+    }
   }
-`;
-export const LocationFieldsI18nFragmentDoc = gql`
-  fragment LocationFieldsI18n on LocationNode {
-    ...LocationFields
-    addressStreetEn
-    addressStreetSv
-    addressCityEn
-    addressCitySv
-  }
-  ${LocationFieldsFragmentDoc}
 `;
 export const BannerNotificationCommonFragmentDoc = gql`
   fragment BannerNotificationCommon on BannerNotificationNode {
     id
     level
     activeFrom
-    message
-    messageEn
-    messageFi
-    messageSv
+    messageTranslations {
+      fi
+      en
+      sv
+    }
   }
 `;
 export const MetadataSetsFragmentDoc = gql`

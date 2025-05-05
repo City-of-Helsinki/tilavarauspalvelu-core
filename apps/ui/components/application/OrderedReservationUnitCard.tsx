@@ -12,7 +12,6 @@ import styled from "styled-components";
 import { Flex, H6, fontBold, fontMedium, fontRegular } from "common/styled";
 import { breakpoints } from "common/src/const";
 import type { OrderedReservationUnitCardFragment } from "@gql/gql-types";
-import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getImageSource, getMainImage } from "common/src/helpers";
 import Card from "common/src/components/Card";
 import { ErrorText } from "common/src/components/ErrorText";
@@ -213,7 +212,7 @@ export function OrderedReservationUnitCard({
   const lang = convertLanguageCode(i18n.language);
 
   const { unit } = reservationUnit;
-  const unitName = unit ? getTranslationSafe(unit, "name", lang) : "-";
+  const unitName = unit ? getTranslationSafe(unit.nameTranslations, lang) : "-";
 
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "medium");
@@ -229,7 +228,10 @@ export function OrderedReservationUnitCard({
         <OverlayContainer>
           <CardContainer>
             <Card
-              heading={getReservationUnitName(reservationUnit) ?? ""}
+              heading={getTranslationSafe(
+                reservationUnit.nameTranslations,
+                lang
+              )}
               text={unitName}
               imageSrc={imgSrc}
             />
@@ -277,17 +279,21 @@ export const ORDERED_RESERVATION_UNIT_CARD_FRAGMENT = gql`
   fragment OrderedReservationUnitCard on ReservationUnitNode {
     id
     pk
-    nameFi
-    nameEn
-    nameSv
+    nameTranslations {
+      fi
+      en
+      sv
+    }
     images {
       ...Image
     }
     unit {
       id
-      nameFi
-      nameSv
-      nameEn
+      nameTranslations {
+        fi
+        en
+        sv
+      }
     }
   }
 `;

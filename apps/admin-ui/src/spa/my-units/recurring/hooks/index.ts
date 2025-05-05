@@ -27,12 +27,16 @@ export const RECURRING_RESERVATION_UNIT_QUERY = gql`
   query RecurringReservationUnit($id: ID!) {
     unit(id: $id) {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
       pk
       reservationUnits {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         reservationStartInterval
         bufferTimeBefore
         bufferTimeAfter

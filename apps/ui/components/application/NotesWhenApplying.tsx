@@ -15,7 +15,7 @@ const NotesBox = styled.div`
 type NotesWhenApplyingProps = {
   applicationRound: Pick<
     ApplicationRoundNode,
-    "notesWhenApplyingFi" | "notesWhenApplyingSv" | "notesWhenApplyingEn"
+    "notesWhenApplyingTranslations"
   > | null;
   style?: React.CSSProperties;
   className?: string;
@@ -32,8 +32,7 @@ function NotesWhenApplying({
     return null;
   }
   const translatedNotes = getTranslationSafe(
-    applicationRound,
-    "notesWhenApplying",
+    applicationRound.notesWhenApplyingTranslations,
     getLocalizationLang(i18n.language)
   );
 

@@ -123,7 +123,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
   const round = applicationSection?.application?.applicationRound;
   const { termsOfUse } = round ?? {};
   const cancellationTerms = termsOfUse
-    ? getTranslationSafe(termsOfUse, "text", lang)
+    ? getTranslationSafe(termsOfUse.textTranslations, lang)
     : null;
 
   const modalTitle = t("reservations:cancelSection.modal.title");
@@ -214,7 +214,7 @@ function ApplicationSectionInfoCard({
 
   const reservationUnitName =
     firstReservationUnit != null
-      ? getTranslationSafe(firstReservationUnit, "name", lang)
+      ? getTranslationSafe(firstReservationUnit.nameTranslations, lang)
       : "-";
   const locationString = `${reservationUnitName}${reservationUnits.length > 1 ? ` +${reservationUnits.length - 1}` : ""}`;
 
@@ -333,9 +333,11 @@ export const APPLICATION_SECTION_CANCEL_QUERY = gql`
         reservationUnit {
           id
           pk
-          nameEn
-          nameFi
-          nameSv
+          nameTranslations {
+            fi
+            en
+            sv
+          }
         }
         allocatedTimeSlots {
           id

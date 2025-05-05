@@ -3,8 +3,8 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import type {
   Maybe,
-  LocationFieldsI18nFragment,
-  AddressFieldsFragment,
+  AddressSectionFragment,
+  LocationFieldsFragment,
 } from "@gql/gql-types";
 import { IconLinkExternal } from "hds-react";
 import { IconButton } from "common/src/components";
@@ -39,18 +39,20 @@ type UrlReturn = string;
 
 function createHslUrl(
   locale: LocalizationLanguages,
-  location: Maybe<LocationFieldsI18nFragment> | undefined
+  location: Maybe<LocationFieldsFragment> | undefined
 ): UrlReturn {
   if (!location) {
     return "";
   }
 
-  const addressStreet =
-    getTranslationSafe(location, "addressStreet", locale) ||
-    location.addressStreetFi;
-  const addressCity =
-    getTranslationSafe(location, "addressCity", locale) ||
-    location.addressCityFi;
+  const addressStreet = getTranslationSafe(
+    location.addressStreetTranslations,
+    locale
+  );
+  const addressCity = getTranslationSafe(
+    location.addressCityTranslations,
+    locale
+  );
 
   const destination = addressStreet
     ? encodeURI(`${addressStreet},${addressCity}`)
@@ -61,14 +63,20 @@ function createHslUrl(
 
 function createGoogleUrl(
   locale: LocalizationLanguages,
-  location: Maybe<LocationFieldsI18nFragment> | undefined
+  location: Maybe<LocationFieldsFragment> | undefined
 ): UrlReturn {
   if (!location) {
     return "";
   }
 
-  const addressStreet = getTranslationSafe(location, "addressStreet", locale);
-  const addressCity = getTranslationSafe(location, "addressCity", locale);
+  const addressStreet = getTranslationSafe(
+    location.addressStreetTranslations,
+    locale
+  );
+  const addressCity = getTranslationSafe(
+    location.addressCityTranslations,
+    locale
+  );
 
   const destination = addressStreet
     ? encodeURI(`${addressStreet},${addressCity}`)
@@ -79,7 +87,7 @@ function createGoogleUrl(
 
 function createMapUrl(
   locale: LocalizationLanguages,
-  unit: Maybe<Pick<AddressFieldsFragment, "tprekId">> | undefined
+  unit: Maybe<Pick<AddressSectionFragment, "tprekId">> | undefined
 ): string {
   if (!unit?.tprekId) {
     return "";
@@ -90,7 +98,7 @@ function createMapUrl(
 
 function createAccessibilityUrl(
   locale: LocalizationLanguages,
-  unit: Maybe<Pick<AddressFieldsFragment, "tprekId">> | undefined
+  unit: Maybe<Pick<AddressSectionFragment, "tprekId">> | undefined
 ): UrlReturn {
   if (!unit?.tprekId) {
     return "";
@@ -101,7 +109,7 @@ function createAccessibilityUrl(
 
 type Props = {
   title: string;
-  unit: Maybe<AddressFieldsFragment> | undefined;
+  unit: Maybe<AddressSectionFragment> | undefined;
 };
 
 export function AddressSection({ title, unit }: Props): JSX.Element {
@@ -111,10 +119,10 @@ export function AddressSection({ title, unit }: Props): JSX.Element {
   const lang = convertLanguageCode(i18n.language);
 
   const addressStreet = location
-    ? getTranslationSafe(location, "addressStreet", lang)
+    ? getTranslationSafe(location.addressStreetTranslations, lang)
     : undefined;
   const addressCity = location
-    ? getTranslationSafe(location, "addressCity", lang)
+    ? getTranslationSafe(location.addressCityTranslations, lang)
     : undefined;
 
   const unitMapUrl = createMapUrl(lang, unit);
@@ -156,12 +164,12 @@ export function AddressSection({ title, unit }: Props): JSX.Element {
 }
 
 export const ADDRESS_FIELDS = gql`
-  fragment AddressFields on UnitNode {
+  fragment AddressSection on UnitNode {
     id
     pk
     tprekId
     location {
-      ...LocationFieldsI18n
+      ...LocationFields
     }
   }
 `;

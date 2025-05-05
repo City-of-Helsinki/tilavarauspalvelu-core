@@ -56,7 +56,9 @@ export const APPLICATION_ROUND_QUERY = gql`
     applicationRound(id: $id) {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
       reservationUnitCount
       applicationPeriodBegin
       applicationPeriodEnd
@@ -65,14 +67,20 @@ export const APPLICATION_ROUND_QUERY = gql`
       reservationUnits {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         spaces {
           id
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
         unit {
           id
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
       }
     }
@@ -109,7 +117,7 @@ function Criteria({
   return (
     <>
       <TitleSection>
-        <H1 $noMargin>{applicationRound.nameFi}</H1>
+        <H1 $noMargin>{applicationRound.nameTranslations.fi}</H1>
         <Flex $direction="row" $justifyContent="space-between" $wrap="wrap">
           <TimeframeStatus
             applicationPeriodBegin={applicationRound.applicationPeriodBegin}
@@ -157,9 +165,11 @@ function Criteria({
           {reservationUnits?.map((reservationUnit) => (
             <ReservationUnit key={reservationUnit.pk}>
               <div>
-                <Strong>{reservationUnit.unit?.nameFi ?? "-"}</Strong>
+                <Strong>
+                  {reservationUnit.unit?.nameTranslations.fi || "-"}
+                </Strong>
               </div>
-              <div>{reservationUnit.nameFi}</div>
+              <div>{reservationUnit.nameTranslations.fi}</div>
             </ReservationUnit>
           ))}
         </ReservationUnits>

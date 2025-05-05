@@ -72,9 +72,9 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
     if (data?.space != null) {
       const { space: s } = data;
       reset({
-        nameFi: s.nameFi ?? "",
-        nameSv: s.nameSv ?? "",
-        nameEn: s.nameEn ?? "",
+        nameFi: s.nameTranslations.fi ?? "",
+        nameSv: s.nameTranslations.sv ?? "",
+        nameEn: s.nameTranslations.en ?? "",
         surfaceArea: s.surfaceArea ?? undefined,
         maxPersons: s.maxPersons ?? undefined,
         unit,
@@ -135,7 +135,9 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
     <>
       <LinkPrev route="../.." />
       <Head
-        title={data?.space?.parent?.nameFi || t("SpaceEditor.noParent")}
+        title={
+          data?.space?.parent?.nameTranslations.fi || t("SpaceEditor.noParent")
+        }
         space={data?.space}
         maxPersons={watch("maxPersons") || undefined}
         surfaceArea={watch("surfaceArea") || undefined}
@@ -207,32 +209,44 @@ export const SPACE_QUERY = gql`
     space(id: $id) {
       id
       pk
-      nameFi
-      nameSv
-      nameEn
+      nameTranslations {
+        fi
+        en
+        sv
+      }
       code
       surfaceArea
       maxPersons
       unit {
         id
         ...UnitSubpageHead
-        descriptionFi
+        descriptionTranslations {
+          fi
+        }
         spaces {
           id
           pk
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
       }
       parent {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         parent {
           id
-          nameFi
+          nameTranslations {
+            fi
+          }
           parent {
             id
-            nameFi
+            nameTranslations {
+              fi
+            }
           }
         }
       }

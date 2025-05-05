@@ -897,32 +897,32 @@ export function convertReservationUnit(
     reservationKind: data?.reservationKind ?? ReservationKind.DirectAndSeason,
     contactInformation: data?.contactInformation ?? "",
     reservationPendingInstructionsFi:
-      data?.reservationPendingInstructionsFi ?? "",
+      data?.reservationPendingInstructionsTranslations.fi ?? "",
     reservationPendingInstructionsEn:
-      data?.reservationPendingInstructionsEn ?? "",
+      data?.reservationPendingInstructionsTranslations.en ?? "",
     reservationPendingInstructionsSv:
-      data?.reservationPendingInstructionsSv ?? "",
+      data?.reservationPendingInstructionsTranslations.sv ?? "",
     reservationConfirmedInstructionsFi:
-      data?.reservationConfirmedInstructionsFi ?? "",
+      data?.reservationConfirmedInstructionsTranslations.fi ?? "",
     reservationConfirmedInstructionsEn:
-      data?.reservationConfirmedInstructionsEn ?? "",
+      data?.reservationConfirmedInstructionsTranslations.en ?? "",
     reservationConfirmedInstructionsSv:
-      data?.reservationConfirmedInstructionsSv ?? "",
+      data?.reservationConfirmedInstructionsTranslations.sv ?? "",
     reservationCancelledInstructionsFi:
-      data?.reservationCancelledInstructionsFi ?? "",
+      data?.reservationCancelledInstructionsTranslations.fi ?? "",
     reservationCancelledInstructionsEn:
-      data?.reservationCancelledInstructionsEn ?? "",
+      data?.reservationCancelledInstructionsTranslations.en ?? "",
     reservationCancelledInstructionsSv:
-      data?.reservationCancelledInstructionsSv ?? "",
-    descriptionFi: data?.descriptionFi ?? "",
-    descriptionEn: data?.descriptionEn ?? "",
-    descriptionSv: data?.descriptionSv ?? "",
-    nameFi: data?.nameFi ?? "",
-    nameEn: data?.nameEn ?? "",
-    nameSv: data?.nameSv ?? "",
-    termsOfUseFi: data?.termsOfUseFi ?? "",
-    termsOfUseEn: data?.termsOfUseEn ?? "",
-    termsOfUseSv: data?.termsOfUseSv ?? "",
+      data?.reservationCancelledInstructionsTranslations.sv ?? "",
+    descriptionFi: data?.descriptionTranslations.fi ?? "",
+    descriptionEn: data?.descriptionTranslations.en ?? "",
+    descriptionSv: data?.descriptionTranslations.sv ?? "",
+    nameFi: data?.nameTranslations.fi ?? "",
+    nameEn: data?.nameTranslations.en ?? "",
+    nameSv: data?.nameTranslations.sv ?? "",
+    termsOfUseFi: data?.termsOfUseTranslations.fi ?? "",
+    termsOfUseEn: data?.termsOfUseTranslations.en ?? "",
+    termsOfUseSv: data?.termsOfUseTranslations.sv ?? "",
     spaces: filterNonNullable(data?.spaces?.map((s) => s?.pk)),
     resources: filterNonNullable(data?.resources?.map((r) => r?.pk)),
     equipments: filterNonNullable(data?.equipments?.map((e) => e?.pk)),

@@ -60,14 +60,18 @@ export const EQUIPMENT_FRAGMENT = gql`
   fragment EquipmentFields on EquipmentNode {
     id
     pk
-    nameFi
-    nameEn
-    nameSv
+    nameTranslations {
+      fi
+      en
+      sv
+    }
     category {
       id
-      nameFi
-      nameEn
-      nameSv
+      nameTranslations {
+        fi
+        en
+        sv
+      }
     }
   }
 `;

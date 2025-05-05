@@ -74,7 +74,7 @@ export function useUnitResources(
       const events = filterNonNullable(affecting);
 
       return {
-        title: x.nameFi ?? "",
+        title: x.nameTranslations.fi || "-",
         url: String(x.pk ?? 0),
         isDraft: x.isDraft,
         pk: x.pk ?? 0,
@@ -103,7 +103,9 @@ export const RESERVATION_UNITS_BY_UNIT_QUERY = gql`
       reservationUnits {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         spaces {
           id
           pk

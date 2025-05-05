@@ -75,7 +75,7 @@ export function Units({ units }: Props): JSX.Element | null {
               href={`${singleSearchPrefix}?units=${unit.pk}#content`}
               data-testid="front-page__units--unit"
             >
-              {getTranslationSafe(unit, "name", lang) || "-"}
+              {getTranslationSafe(unit.nameTranslations, lang) || "-"}
               <IconArrowRight size={IconSize.Large} />
             </UnitItemLink>
           ))}
@@ -99,8 +99,10 @@ export const UNIT_LIST_FRAGMENT = gql`
   fragment UnitListFields on UnitNode {
     id
     pk
-    nameFi
-    nameEn
-    nameSv
+    nameTranslations {
+      fi
+      en
+      sv
+    }
   }
 `;

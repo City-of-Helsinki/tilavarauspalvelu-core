@@ -192,7 +192,10 @@ export function EditStep0({
   });
 
   const lang = convertLanguageCode(i18n.language);
-  const termsOfUse = getTranslationSafe(reservationUnit, "termsOfUse", lang);
+  const termsOfUse = getTranslationSafe(
+    reservationUnit.termsOfUseTranslations,
+    lang
+  );
 
   return (
     <>

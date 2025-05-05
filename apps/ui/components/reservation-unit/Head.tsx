@@ -107,8 +107,14 @@ export function Head({
 }: Readonly<HeadProps>): JSX.Element {
   const { i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
-  const reservationUnitName = getTranslationSafe(reservationUnit, "name", lang);
-  const unitName = getTranslationSafe(reservationUnit.unit ?? {}, "name", lang);
+  const reservationUnitName = getTranslationSafe(
+    reservationUnit.nameTranslations,
+    lang
+  );
+  const unitName =
+    reservationUnit.unit != null
+      ? getTranslationSafe(reservationUnit.unit.nameTranslations, lang)
+      : "-";
 
   return (
     <Wrapper>
@@ -220,8 +226,7 @@ function IconList({
           key: "reservationUnitType",
           icon: <IconHome size={IconSize.Small} />,
           text: getTranslationSafe(
-            reservationUnit.reservationUnitType,
-            "name",
+            reservationUnit.reservationUnitType.nameTranslations,
             lang
           ),
         }
@@ -319,14 +324,18 @@ export const RESERVATION_UNIT_HEAD_FRAGMENT = gql`
     id
     reservationKind
     reservationBegins
-    nameFi
-    nameSv
-    nameEn
+    nameTranslations {
+      fi
+      en
+      sv
+    }
     unit {
       id
-      nameFi
-      nameSv
-      nameEn
+      nameTranslations {
+        fi
+        en
+        sv
+      }
     }
     minReservationDuration
     maxReservationDuration
@@ -345,9 +354,11 @@ export const RESERVATION_UNIT_HEAD_FRAGMENT = gql`
     reservationUnitType {
       id
       pk
-      nameFi
-      nameEn
-      nameSv
+      nameTranslations {
+        fi
+        en
+        sv
+      }
     }
     images {
       ...Image

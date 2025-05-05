@@ -116,7 +116,7 @@ function appMapper(
       priority: eru?.preferredOrder ?? 0,
     }));
   const units = orderBy(uniqBy(applicationEvents, "pk"), "priority", "asc")
-    .map(({ pk, nameFi }) => ({ pk, name: nameFi }))
+    .map(({ pk, nameTranslations }) => ({ pk, name: nameTranslations?.fi }))
     .filter((u): u is UnitType => u.pk != null && u.name != null);
 
   const name = app.applicationSections?.find(() => true)?.name || "-";
@@ -211,7 +211,9 @@ export const APPLICATIONS_TABLE_ELEMENT_FRAGMENT = gql`
           unit {
             id
             pk
-            nameFi
+            nameTranslations {
+              fi
+            }
           }
         }
       }

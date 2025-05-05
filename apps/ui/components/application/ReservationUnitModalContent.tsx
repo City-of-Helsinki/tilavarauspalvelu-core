@@ -26,8 +26,6 @@ import {
   getImageSource,
   getMainImage,
 } from "common/src/helpers";
-import { getApplicationRoundName } from "@/modules/applicationRound";
-import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
 import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
@@ -75,12 +73,15 @@ function ReservationUnitCard({
   const buttonText = isSelected
     ? t("reservationUnitModal:unSelectReservationUnit")
     : t("reservationUnitModal:selectReservationUnit");
-  const name = getReservationUnitName(reservationUnit);
+  const name = getTranslationSafe(reservationUnit.nameTranslations, lang);
   const reservationUnitTypeName = reservationUnit.reservationUnitType
-    ? getTranslationSafe(reservationUnit.reservationUnitType, "name", lang)
+    ? getTranslationSafe(
+        reservationUnit.reservationUnitType.nameTranslations,
+        lang
+      )
     : undefined;
   const unitName = reservationUnit.unit
-    ? getUnitName(reservationUnit.unit, lang)
+    ? getTranslationSafe(reservationUnit.unit.nameTranslations, lang)
     : undefined;
 
   const img = getMainImage(reservationUnit);
@@ -185,7 +186,9 @@ export function ReservationUnitModalContent({
   return (
     <Flex>
       <H2 $noMargin>{t("reservationUnitModal:heading")}</H2>
-      <H3 as="p">{getApplicationRoundName(applicationRound, lang)}</H3>
+      <H3 as="p">
+        {getTranslationSafe(applicationRound.nameTranslations, lang)}
+      </H3>
       <SeasonalSearchForm
         isLoading={loading}
         options={options}

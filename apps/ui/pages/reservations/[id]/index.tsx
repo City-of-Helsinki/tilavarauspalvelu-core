@@ -39,10 +39,7 @@ import {
   getWhyReservationCantBeChanged,
   isReservationCancellable,
 } from "@/modules/reservation";
-import {
-  getReservationUnitName,
-  isReservationUnitFreeOfCharge,
-} from "@/modules/reservationUnit";
+import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { AddressSection } from "@/components/reservation-unit";
 import {
@@ -373,6 +370,11 @@ function Reservation({
     (order.status === OrderStatus.Paid ||
       order.status === OrderStatus.Refunded);
 
+  const reservationUnitName =
+    reservationUnit != null
+      ? getTranslationSafe(reservationUnit?.nameTranslations, lang)
+      : "-";
+
   return (
     <>
       <Breadcrumb routes={routes} />
@@ -419,7 +421,7 @@ function Reservation({
               data-testid="reservation__reservation-unit"
               href={getReservationUnitPath(reservationUnit?.pk)}
             >
-              {getReservationUnitName(reservationUnit, lang) ?? "-"}
+              {reservationUnitName}
             </Link>
             <NoWrap data-testid="reservation__time">{timeString}</NoWrap>
           </SubHeading>
@@ -509,7 +511,7 @@ function Reservation({
           )}
           <TermsInfo reservation={reservation} termsOfUse={termsOfUse} />
           <AddressSection
-            title={getReservationUnitName(reservationUnit, lang) ?? "-"}
+            title={reservationUnitName}
             unit={reservationUnit?.unit}
           />
         </Flex>
@@ -550,19 +552,25 @@ function TermsInfo({
   const lang = convertLanguageCode(i18n.language);
   const paymentTermsContent =
     reservationUnit?.paymentTerms != null
-      ? getTranslationSafe(reservationUnit.paymentTerms, "text", lang)
+      ? getTranslationSafe(reservationUnit.paymentTerms.textTranslations, lang)
       : undefined;
   const cancellationTermsContent =
     reservationUnit?.cancellationTerms != null
-      ? getTranslationSafe(reservationUnit.cancellationTerms, "text", lang)
+      ? getTranslationSafe(
+          reservationUnit.cancellationTerms.textTranslations,
+          lang
+        )
       : undefined;
   const pricingTermsContent =
     reservationUnit?.pricingTerms != null
-      ? getTranslationSafe(reservationUnit?.pricingTerms, "text", lang)
+      ? getTranslationSafe(reservationUnit?.pricingTerms.textTranslations, lang)
       : undefined;
   const serviceSpecificTermsContent =
     reservationUnit?.serviceSpecificTerms != null
-      ? getTranslationSafe(reservationUnit.serviceSpecificTerms, "text", lang)
+      ? getTranslationSafe(
+          reservationUnit.serviceSpecificTerms.textTranslations,
+          lang
+        )
       : undefined;
 
   return (
@@ -604,7 +612,10 @@ function TermsInfo({
         )}
         {termsOfUse?.genericTerms != null && (
           <Sanitize
-            html={getTranslationSafe(termsOfUse.genericTerms, "text", lang)}
+            html={getTranslationSafe(
+              termsOfUse.genericTerms.textTranslations,
+              lang
+            )}
           />
         )}
       </Accordion>
@@ -773,7 +784,7 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
       reservationUnits {
         id
         unit {
-          ...AddressFields
+          ...AddressSection
         }
         canApplyFreeOfCharge
         ...MetadataSets

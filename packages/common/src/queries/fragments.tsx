@@ -49,16 +49,20 @@ export const METAFIELDS_FRAGMENT = gql`
     purpose {
       id
       pk
-      nameFi
-      nameEn
-      nameSv
+      nameTranslations {
+        fi
+        en
+        sv
+      }
     }
     homeCity {
       id
       pk
-      nameFi
-      nameSv
-      nameEn
+      nameTranslations {
+        fi
+        en
+        sv
+      }
     }
   }
 `;
@@ -66,18 +70,22 @@ export const METAFIELDS_FRAGMENT = gql`
 export const TERMS_OF_USE_NAME_FRAGMENT = gql`
   fragment TermsOfUseNameFields on TermsOfUseNode {
     id
-    nameFi
-    nameEn
-    nameSv
+    nameTranslations {
+      fi
+      en
+      sv
+    }
   }
 `;
 
 export const TERMS_OF_USE_TEXT_FRAGMENT = gql`
   fragment TermsOfUseTextFields on TermsOfUseNode {
     id
-    textFi
-    textEn
-    textSv
+    textTranslations {
+      fi
+      en
+      sv
+    }
   }
 `;
 
@@ -120,19 +128,17 @@ export const IMAGE_FRAGMENT = gql`
 export const LOCATION_FRAGMENT = gql`
   fragment LocationFields on LocationNode {
     id
-    addressStreetFi
+    addressStreetTranslations {
+      fi
+      en
+      sv
+    }
     addressZip
-    addressCityFi
-  }
-`;
-
-export const LOCATION_FRAGMENT_I18N = gql`
-  fragment LocationFieldsI18n on LocationNode {
-    ...LocationFields
-    addressStreetEn
-    addressStreetSv
-    addressCityEn
-    addressCitySv
+    addressCityTranslations {
+      fi
+      en
+      sv
+    }
   }
 `;
 
@@ -141,10 +147,11 @@ export const BANNER_NOTIFICATION_COMMON_FRAGMENT = gql`
     id
     level
     activeFrom
-    message
-    messageEn
-    messageFi
-    messageSv
+    messageTranslations {
+      fi
+      en
+      sv
+    }
   }
 `;
 

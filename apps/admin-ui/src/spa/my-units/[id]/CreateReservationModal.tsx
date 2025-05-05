@@ -323,7 +323,7 @@ function DialogContent({
 
       successToast({
         text: t("ReservationDialog.saveSuccess", {
-          reservationUnit: reservationUnit.nameFi,
+          reservationUnit: reservationUnit.nameTranslations.fi,
         }),
       });
       onClose();
@@ -413,7 +413,7 @@ export function CreateReservationModal({
       <Dialog.Header
         id="modal-header"
         title={t("ReservationDialog.title", {
-          reservationUnit: reservationUnit?.nameFi,
+          reservationUnit: reservationUnit?.nameTranslations.fi,
         })}
       />
       {reservationUnit != null && (
@@ -441,7 +441,9 @@ export const RESERVATION_UNIT_QUERY = gql`
 export const CREATE_STAFF_RESERVATION_FRAGMENT = gql`
   fragment CreateStaffReservation on ReservationUnitNode {
     pk
-    nameFi
+    nameTranslations {
+      fi
+    }
     reservationStartInterval
     ...ReservationTypeFormFields
   }

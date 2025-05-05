@@ -154,7 +154,7 @@ export function DisplayUnit({
         </Flex>
       </TitleSection>
       <UnitInformationWrapper>
-        <div>{unit?.nameFi ?? "-"}</div>
+        <div>{unit?.nameTranslations.fi ?? "-"}</div>
         <div>{location != null ? parseAddress(location) : "-"}</div>
       </UnitInformationWrapper>
     </>

@@ -160,7 +160,7 @@ function ArchiveDialog({
   onClose,
   onAccept,
 }: {
-  reservationUnit: Pick<Node, "nameFi">;
+  reservationUnit: Pick<Node, "nameTranslations">;
   onClose: () => void;
   onAccept: () => void;
 }): JSX.Element {
@@ -172,7 +172,7 @@ function ArchiveDialog({
       onClose={onClose}
       description={t("ArchiveReservationUnitDialog.description")}
       title={t("ArchiveReservationUnitDialog.title", {
-        name: reservationUnit.nameFi ?? "-",
+        name: reservationUnit.nameTranslations.fi || "-",
       })}
       acceptLabel={t("ArchiveReservationUnitDialog.archive")}
     />

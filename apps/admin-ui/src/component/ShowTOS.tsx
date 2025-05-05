@@ -2,8 +2,9 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useGenericTerms } from "common/src/hooks/useGenericTerms";
-import { type Maybe, type TermsOfUseTextFieldsFragment } from "@gql/gql-types";
+import { type ShowTosFragment } from "@gql/gql-types";
 import { Sanitize } from "common/src/components/Sanitize";
+import { gql } from "@apollo/client";
 
 // NOTE This is partial duplicate from ui/application/Preview.tsx
 // see if we can combine them (and other Terms later with parameters)
@@ -40,15 +41,7 @@ function TOSElement({
   );
 }
 
-type TOSNode = Pick<TermsOfUseTextFieldsFragment, "textFi">;
-type Node = {
-  serviceSpecificTerms: Maybe<TOSNode>;
-  paymentTerms: Maybe<TOSNode>;
-  pricingTerms: Maybe<TOSNode>;
-  cancellationTerms: Maybe<TOSNode>;
-};
-
-function ShowTOS({ reservationUnit }: { reservationUnit: Node }) {
+function ShowTOS({ reservationUnit }: { reservationUnit: ShowTosFragment }) {
   const { t } = useTranslation();
 
   const serviceTerms = reservationUnit.serviceSpecificTerms;
@@ -60,37 +53,37 @@ function ShowTOS({ reservationUnit }: { reservationUnit: Node }) {
 
   return (
     <div>
-      {payTerms?.textFi && (
+      {payTerms?.textTranslations.fi && (
         <TOSElement
           title={t("tos.paymentTermsTitle")}
-          text={payTerms?.textFi ?? ""}
+          text={payTerms?.textTranslations.fi ?? ""}
           isHtml
         />
       )}
-      {priceTerms?.textFi && (
+      {priceTerms?.textTranslations.fi && (
         <TOSElement
           title={t("tos.priceTermsTitle")}
-          text={priceTerms?.textFi ?? ""}
+          text={priceTerms?.textTranslations.fi ?? ""}
           isHtml
         />
       )}
-      {cancelTerms?.textFi && (
+      {cancelTerms?.textTranslations.fi && (
         <TOSElement
           title={t("tos.cancelTermsTitle")}
-          text={cancelTerms?.textFi ?? ""}
+          text={cancelTerms?.textTranslations.fi ?? ""}
           isHtml
         />
       )}
-      {serviceTerms?.textFi && (
+      {serviceTerms?.textTranslations.fi && (
         <TOSElement
           title={t("tos.serviceTermsTitle")}
-          text={serviceTerms?.textFi ?? ""}
+          text={serviceTerms?.textTranslations.fi ?? ""}
           isHtml
         />
       )}
       <TOSElement
         title={t("tos.generalTermsTitle")}
-        text={genericTerms?.textFi ?? ""}
+        text={genericTerms?.textTranslations.fi ?? ""}
         isHtml
       />
     </div>
@@ -98,3 +91,37 @@ function ShowTOS({ reservationUnit }: { reservationUnit: Node }) {
 }
 
 export default ShowTOS;
+
+export const TERMS_TRANSLATION_FRAGMENT = gql`
+  fragment TermsTranslationFi on TermsOfUseNode {
+    id
+    textTranslations {
+      fi
+    }
+    nameTranslations {
+      fi
+    }
+  }
+`;
+
+export const SHOW_TOS_FRAGMENT = gql`
+  fragment ShowTOS on ReservationUnitNode {
+    id
+    serviceSpecificTerms {
+      id
+      ...TermsTranslationFi
+    }
+    paymentTerms {
+      id
+      ...TermsTranslationFi
+    }
+    pricingTerms {
+      id
+      ...TermsTranslationFi
+    }
+    cancellationTerms {
+      id
+      ...TermsTranslationFi
+    }
+  }
+`;

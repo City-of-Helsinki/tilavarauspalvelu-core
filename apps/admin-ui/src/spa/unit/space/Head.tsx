@@ -59,14 +59,14 @@ export function Head({
       <H1 $noMargin>{title}</H1>
       <Address>
         {unit?.location
-          ? formatAddress(unit?.location)
+          ? formatAddress(unit.location)
           : t("SpaceEditor.noAddress")}
       </Address>
       <Props>
         <Prop $disabled={!unit}>
           <IconLocation />{" "}
           {unit ? (
-            <Link to={unitUrl}>{unit?.nameFi}</Link>
+            <Link to={unitUrl}>{unit.nameTranslations.fi}</Link>
           ) : (
             t("SpaceEditor.noUnit")
           )}

@@ -105,8 +105,8 @@ export function formatAddress(
     return "-";
   }
   const res = trim(
-    `${location.addressStreetFi ?? ""}, ${location.addressZip} ${
-      location.addressCityFi ?? ""
+    `${location.addressStreetTranslations.fi ?? ""}, ${location.addressZip} ${
+      location.addressCityTranslations.fi ?? ""
     }`,
     ", "
   );

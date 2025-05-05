@@ -6,7 +6,9 @@ export const APPLICANT_NAME_FRAGMENT = gql`
     applicantType
     organisation {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
       organisationType
     }
     contactPerson {
@@ -79,32 +81,44 @@ export const APPLICANT_FRAGMENT = gql`
     organisation {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
       identifier
       organisationType
-      coreBusinessFi
+      coreBusinessTranslations {
+        fi
+      }
       yearEstablished
       address {
-        id
-        pk
-        postCode
-        streetAddressFi
-        cityFi
+        ...AddressFields
       }
     }
     homeCity {
       id
       pk
-      nameFi
-      nameEn
-      nameSv
+      nameTranslations {
+        fi
+        en
+        sv
+      }
     }
     billingAddress {
-      id
-      pk
-      postCode
-      streetAddressFi
-      cityFi
+      ...AddressFields
+    }
+  }
+`;
+
+export const ADDRESS_FRAGMENT = gql`
+  fragment AddressFields on AddressNode {
+    id
+    pk
+    postCode
+    streetAddressTranslations {
+      fi
+    }
+    cityTranslations {
+      fi
     }
   }
 `;

@@ -219,7 +219,7 @@ describe("Page1", () => {
     await selectOption(
       within(section),
       /application:Page1.purpose/,
-      purposeOptLabel
+      RegExp(purposeOptLabel)
     );
     const groupSize = within(section).getByLabelText(
       /application:Page1.groupSize/,

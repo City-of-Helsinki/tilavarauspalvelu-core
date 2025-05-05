@@ -26,7 +26,7 @@ function spacesAsHierarchy(
   ): SpaceNode[] {
     const newParent = {
       ...parent,
-      nameFi: "".padStart(depth, pad) + (parent.nameFi ?? "-"),
+      nameFi: "".padStart(depth, pad) + (parent.nameTranslations.fi ?? "-"),
     };
 
     const children = spaces.filter((e) => e.parent?.pk === parent.pk);
@@ -94,11 +94,13 @@ export function ParentSelector({
       (space) =>
         selfPk == null || (space.pk !== selfPk && space.parent?.pk !== selfPk)
     )
-    .map((space) => ({
-      label:
-        space.nameFi != null && space.nameFi.length > 0 ? space.nameFi : "-",
-      value: space.pk ?? 0,
-    }));
+    .map((space) => {
+      const nameFi = space.nameTranslations.fi;
+      return {
+        label: nameFi != null && nameFi.length > 0 ? nameFi : "-",
+        value: space.pk ?? 0,
+      };
+    });
 
   const options = noParentless ? opts : [...opts, parentLessOption(t)];
 
@@ -134,7 +136,9 @@ export const SPACE_HIERARCHY_QUERY = gql`
       spaces {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         parent {
           id
           pk

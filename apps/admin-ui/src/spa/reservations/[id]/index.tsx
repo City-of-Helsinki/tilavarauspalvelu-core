@@ -113,9 +113,9 @@ function ReservationSummary({
           )}`}
         </DataWrapper>
       )}
-      {reservation.purpose?.nameFi && (
+      {reservation.purpose?.nameTranslations.fi && (
         <DataWrapper isSummary label={t("filters.purpose")}>
-          {reservation.purpose.nameFi}
+          {reservation.purpose.nameTranslations.fi}
         </DataWrapper>
       )}
       {reservation.description && (
@@ -134,12 +134,12 @@ function ReservationSummary({
       )}
       {reservation.state === ReservationStateChoice.Cancelled && (
         <DataWrapper isSummary label={t("RequestedReservation.cancelReason")}>
-          {reservation?.cancelReason?.reasonFi || "-"}
+          {reservation?.cancelReason?.reasonTranslations.fi || "-"}
         </DataWrapper>
       )}
       {reservation.state === ReservationStateChoice.Denied && (
         <DataWrapper isSummary label={t("RequestedReservation.denyReason")}>
-          {reservation?.denyReason?.reasonFi || "-"}
+          {reservation?.denyReason?.reasonTranslations.fi || "-"}
         </DataWrapper>
       )}
       {reservation.handlingDetails && reservation.handlingDetails !== "" && (
@@ -212,7 +212,7 @@ function ReservationDetailsAccordion({
           </DataWrapper>
         )}
         <DataWrapper label={t("filters.purpose")}>
-          {reservation.purpose?.nameFi}
+          {reservation.purpose?.nameTranslations.fi}
         </DataWrapper>
         <DataWrapper label={t("RequestedReservation.description")}>
           {reservation.description}
@@ -248,7 +248,7 @@ function ReservationUserAccordion({
           {reservation.reserveeOrganisationName}
         </DataWrapper>
         <DataWrapper label={t("filters.homeCity")}>
-          {reservation.homeCity?.nameFi}
+          {reservation.homeCity?.nameTranslations.fi}
         </DataWrapper>
         <DataWrapper label={t("RequestedReservation.reserveeId")}>
           {reservation.reserveeId || t("RequestedReservation.noReserveeId")}
@@ -492,11 +492,15 @@ export const RESERVATION_PAGE_QUERY = gql`
       ...ApprovalButtons
       cancelReason {
         id
-        reasonFi
+        reasonTranslations {
+          fi
+        }
       }
       denyReason {
         id
-        reasonFi
+        reasonTranslations {
+          fi
+        }
       }
       reservationUnits {
         id

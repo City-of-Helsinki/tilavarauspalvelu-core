@@ -1,7 +1,8 @@
 import {
+  type AddressFieldsFragment,
   ApplicantTypeChoice,
   type ApplicationFormFragment,
-  ApplicationRoundFieldsFragment,
+  type ApplicationRoundFieldsFragment,
   ApplicationRoundStatusChoice,
   ApplicationSectionStatusChoice,
   ApplicationStatusChoice,
@@ -10,8 +11,8 @@ import {
   type CreateApplicationMutationVariables,
   CurrentUserDocument,
   type CurrentUserQuery,
-  IsReservableFieldsFragment,
-  OptionsQuery,
+  type IsReservableFieldsFragment,
+  type OptionsQuery,
   OrganizationTypeChoice,
   Priority,
   ReservationKind,
@@ -163,9 +164,7 @@ function createSearchQueryNode(
   return {
     id: base64encode(`ReservationUnitNode:${i}`),
     pk: i,
-    nameFi: `ReservationUnit ${i} FI`,
-    nameEn: `ReservationUnit ${i} EN`,
-    nameSv: `ReservationUnit ${i} SV`,
+    ...generateNameFragment(`ReservationUnit ${i}`),
     reservationBegins: addYears(new Date(), -1 * i).toISOString(),
     reservationEnds: addYears(new Date(), 1 * i).toISOString(),
     isClosed: false,
@@ -178,9 +177,7 @@ function createSearchQueryNode(
     pricings: [],
     unit: {
       id: base64encode(`UnitNode:${i}`),
-      nameFi: `Unit ${i} FI`,
-      nameEn: `Unit ${i} EN`,
-      nameSv: `Unit ${i} SV`,
+      ...generateNameFragment(`Unit ${i}`),
     },
     reservationUnitType: createMockReservationUnitType({
       name: "ReservationUnitType",
@@ -356,7 +353,22 @@ export function createMockApplicationFragment({
       ? ApplicationStatusChoice.Received
       : ApplicationStatusChoice.Draft;
 
-  const page3Data = {
+  const addressNode: AddressFieldsFragment = {
+    id: base64encode("AddressNode:1"),
+    pk: 1,
+    postCode: "00000",
+    streetAddressTranslations: {
+      fi: "Street address FI",
+    },
+    cityTranslations: {
+      fi: "City FI",
+    },
+  };
+
+  const page3Data: Omit<
+    ApplicationFormFragment,
+    "applicationRound" | "id" | "pk" | "applicationSections" | "status"
+  > = {
     applicantType: ApplicantTypeChoice.Association,
     additionalInformation: null,
     contactPerson: {
@@ -370,31 +382,23 @@ export function createMockApplicationFragment({
     organisation: {
       id: base64encode("OrganisationNode:1"),
       pk: 1,
-      nameFi: "Organisation FI",
+      nameTranslations: {
+        fi: "Organisation FI",
+      },
       identifier: "1234567-8",
       organisationType: OrganizationTypeChoice.PublicAssociation,
-      coreBusinessFi: "Core business FI",
-      yearEstablished: 2020,
-      address: {
-        id: base64encode("AddressNode:1"),
-        pk: 1,
-        postCode: "00000",
-        streetAddressFi: "Street address FI",
-        cityFi: "City FI",
+      coreBusinessTranslations: {
+        fi: "Core business FI",
       },
+      yearEstablished: 2020,
+      address: addressNode,
     },
     homeCity: {
       id: base64encode("CityNode:1"),
       pk: 1,
       ...generateNameFragment("CityNode"),
     },
-    billingAddress: {
-      id: base64encode("AddressNode:2"),
-      pk: 2,
-      postCode: "00000",
-      streetAddressFi: "Street address FI",
-      cityFi: "City FI",
-    },
+    billingAddress: addressNode,
   };
 
   const MockApplicationForm: Omit<ApplicationFormFragment, "applicationRound"> =
@@ -407,7 +411,9 @@ export function createMockApplicationFragment({
       applicationSections:
         page === "page0" ? [] : [createMockApplicationSection({ page })],
       ...(page === "page3" || page === "preview"
-        ? page3Data
+        ? {
+            ...page3Data,
+          }
         : {
             applicantType: null,
             billingAddress: null,
@@ -436,9 +442,11 @@ export function createMockApplicationFragment({
     ...MockApplicationForm,
     applicationRound: {
       id: base64encode("ApplicationRoundNode:1"),
-      notesWhenApplyingFi: "Notes when applying FI",
-      notesWhenApplyingEn: "Notes when applying EN",
-      notesWhenApplyingSv: "Notes when applying SV",
+      notesWhenApplyingTranslations: {
+        fi: "Notes when applying FI",
+        en: "Notes when applying EN",
+        sv: "Notes when applying SV",
+      },
       reservationPeriodBegin: addDays(now, 1).toISOString(),
       reservationPeriodEnd: addDays(now, 30 + 1).toISOString(),
       pk: 1,
@@ -456,9 +464,11 @@ export function createMockTermsOfUse(): TermsOfUseFieldsFragment {
     termsType: TermsType.RecurringTerms,
     id: base64encode("TermsOfUseNode:1"),
     ...generateNameFragment("TermsOfUseNode"),
-    textFi: "Yleiset käyttöehdot",
-    textEn: "General terms of use",
-    textSv: "Allmänna användningsvillkor",
+    textTranslations: {
+      fi: "Yleiset käyttöehdot",
+      en: "General terms of use",
+      sv: "Allmänna användningsvillkor",
+    },
   };
 }
 
@@ -489,9 +499,7 @@ export function createOptionQueryMock(): OptionsQuery {
         .map(({ value, label }) => ({
           id: base64encode(`ReservationPurposeNode:${value}`),
           pk: value,
-          nameFi: label,
-          nameSv: label,
-          nameEn: label,
+          ...generateNameFragment(label),
         }))
         .map((node) => ({ node })),
     },
@@ -575,9 +583,7 @@ export function createMockApplicationRound({
   return {
     id: base64encode(`ApplicationRoundNode:${pk}`),
     pk,
-    nameFi: `ApplicationRound ${pk} FI`,
-    nameSv: `ApplicationRound ${pk} SV`,
-    nameEn: `ApplicationRound ${pk} EN`,
+    ...generateNameFragment(`ApplicationRound ${pk}`),
     status,
     reservationPeriodBegin: "2024-02-01T00:00:00Z",
     reservationPeriodEnd: "2025-01-01T00:00:00Z",
@@ -585,12 +591,16 @@ export function createMockApplicationRound({
     publicDisplayEnd: "2025-01-01T00:00:00Z",
     applicationPeriodBegin: applicationPeriodBegin.toISOString(),
     applicationPeriodEnd: applicationPeriodEnd.toISOString(),
-    criteriaFi: null,
-    criteriaEn: null,
-    criteriaSv: null,
-    notesWhenApplyingFi: null,
-    notesWhenApplyingEn: null,
-    notesWhenApplyingSv: null,
+    criteriaTranslations: {
+      fi: null,
+      en: null,
+      sv: null,
+    },
+    notesWhenApplyingTranslations: {
+      fi: null,
+      en: null,
+      sv: null,
+    },
     reservationUnits: [1, 2, 3].map((pk) => ({
       id: base64encode(`ReservationUnitNode:${pk}`),
       pk,
@@ -618,8 +628,10 @@ export function createMockReservationUnitType(
 
 export function generateNameFragment(name: string) {
   return {
-    nameFi: `${name} FI`,
-    nameSv: `${name} SV`,
-    nameEn: `${name} EN`,
+    nameTranslations: {
+      fi: `${name} FI`,
+      sv: `${name} SV`,
+      en: `${name} EN`,
+    },
   };
 }

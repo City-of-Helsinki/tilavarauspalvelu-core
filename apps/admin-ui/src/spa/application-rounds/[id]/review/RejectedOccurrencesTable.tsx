@@ -43,8 +43,10 @@ function timeSlotMapper(
   const allocatedSlot = slot.recurringReservation?.allocatedTimeSlot;
   const allocatedReservationUnit =
     allocatedSlot?.reservationUnitOption.reservationUnit;
-  const allocatedReservationUnitName = allocatedReservationUnit?.nameFi ?? "-";
-  const allocatedUnit = allocatedReservationUnit?.unit?.nameFi ?? "-";
+  const allocatedReservationUnitName =
+    allocatedReservationUnit?.nameTranslations.fi ?? "-";
+  const allocatedUnit =
+    allocatedReservationUnit?.unit?.nameTranslations.fi ?? "-";
 
   const application =
     allocatedSlot?.reservationUnitOption.applicationSection?.application;
@@ -215,11 +217,15 @@ export const REJECTED_OCCURANCES_TABLE_ELEMENT_FRAGMENT = gql`
           }
           reservationUnit {
             id
-            nameFi
+            nameTranslations {
+              fi
+            }
             pk
             unit {
               id
-              nameFi
+              nameTranslations {
+                fi
+              }
             }
           }
         }

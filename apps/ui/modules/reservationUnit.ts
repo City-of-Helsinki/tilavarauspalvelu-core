@@ -15,18 +15,12 @@ import {
   set,
   sub,
 } from "date-fns";
-import { i18n } from "next-i18next";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-  toUIDate,
-} from "common/src/common/util";
+import { getTranslationSafe, toUIDate } from "common/src/common/util";
 import {
   ReservationUnitPublishingState,
   type ReservationUnitNode,
   PriceUnit,
   type EquipmentFieldsFragment,
-  type UnitNode,
   ReservationUnitReservationState,
   ReservationKind,
   type IsReservableFieldsFragment,
@@ -49,7 +43,6 @@ import {
 import { gql } from "@apollo/client";
 import { getIntervalMinutes } from "common/src/conversion";
 import {
-  capitalize,
   filterNonNullable,
   isPriceFree,
   type LocalizationLanguages,
@@ -103,7 +96,7 @@ export function getEquipmentCategories(
     filterNonNullable(
       equipment.map((n) => {
         const index = equipmentCategoryOrder.findIndex(
-          (order) => order === n.category?.nameFi
+          (order) => order === n.category?.nameTranslations.fi
         );
         if (index === -1) {
           return "Muu";
@@ -136,49 +129,23 @@ export function getEquipmentList(
     equipments
       .filter(
         (n) =>
-          n.category?.nameFi === category ||
+          n.category?.nameTranslations.fi === category ||
           (category === "Muu" &&
-            n.category?.nameFi &&
+            n.category?.nameTranslations.fi &&
             !equipmentCategoryOrder.find(
-              (order) => order === n.category.nameFi
+              (order) => order === n.category.nameTranslations.fi
             ))
       )
       .sort((a, b) =>
-        a.nameFi && b.nameFi ? a.nameFi.localeCompare(b.nameFi) : 0
+        a.nameTranslations.fi && b.nameTranslations.fi
+          ? a.nameTranslations.fi.localeCompare(b.nameTranslations.fi)
+          : 0
       )
   );
 
-  return sortedEquipment.map((n) => getTranslationSafe(n, "name", lang));
-}
-
-export function getReservationUnitName(
-  reservationUnit:
-    | Pick<ReservationUnitNode, "nameFi" | "nameSv" | "nameEn">
-    | undefined,
-  language: string = i18n?.language ?? "fi"
-): string | undefined {
-  if (!reservationUnit) {
-    return undefined;
-  }
-  const key = `name${capitalize(language)}`;
-  if (key in reservationUnit) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- silly magic to avoid implicit any type
-    const val: unknown = (reservationUnit as any)[key];
-    if (typeof val === "string" && val.length > 0) {
-      return val;
-    }
-  }
-  return reservationUnit.nameFi ?? "-";
-}
-
-export function getUnitName(
-  unit: Pick<UnitNode, "nameFi" | "nameSv" | "nameEn">,
-  locale: LocalizationLanguages
-): string | undefined {
-  if (unit == null) {
-    return undefined;
-  }
-  return getTranslationSafe(unit, "name", convertLanguageCode(locale));
+  return sortedEquipment.map((n) =>
+    getTranslationSafe(n.nameTranslations, lang)
+  );
 }
 
 function isActivePricing(pricing: PricingFieldsFragment): boolean {

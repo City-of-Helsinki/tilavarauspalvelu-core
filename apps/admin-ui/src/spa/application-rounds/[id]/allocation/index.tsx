@@ -142,7 +142,7 @@ function Filters({
   );
   const unitOptions = units.map((unit) => ({
     value: unit?.pk ?? 0,
-    label: unit?.nameFi ?? "",
+    label: unit?.nameTranslations.fi ?? "",
   }));
 
   const unitFilter = searchParams.get("unit");
@@ -541,7 +541,10 @@ function ApplicationRoundAllocation({
                 onClick={() => setSelectedReservationUnit(ru.pk ?? null)}
                 key={ru?.pk}
               >
-                {truncate(ru?.nameFi ?? "-", MAX_RES_UNIT_NAME_LENGTH)}
+                {truncate(
+                  ru?.nameTranslations.fi ?? "-",
+                  MAX_RES_UNIT_NAME_LENGTH
+                )}
               </Tab>
             ))}
           </TabList>
@@ -613,7 +616,10 @@ function AllocationWrapper({
   const filteredUnits = units
     .filter(hasAccess)
     // TODO name sort fails with numbers because 11 < 2
-    .sort((a, b) => a?.nameFi?.localeCompare(b?.nameFi ?? "") ?? 0);
+    .sort(
+      (a, b) =>
+        a?.nameTranslations.fi?.localeCompare(b?.nameTranslations.fi ?? "") ?? 0
+    );
 
   // user has no accesss to specific unit through URL with search params -> reset the filter
   const [searchParams, setParams] = useSearchParams();
@@ -643,10 +649,11 @@ function AllocationWrapper({
     return <div>{t("errors.noPermission")}</div>;
   }
 
-  const roundName = applicationRound?.nameFi ?? "-";
+  const roundName = applicationRound?.nameTranslations.fi ?? "-";
 
   const resUnits = uniqBy(filterNonNullable(reservationUnits), "pk").sort(
-    (a, b) => a?.nameFi?.localeCompare(b?.nameFi ?? "") ?? 0
+    (a, b) =>
+      a?.nameTranslations.fi?.localeCompare(b?.nameTranslations.fi ?? "") ?? 0
   );
 
   return (
@@ -783,7 +790,9 @@ export const ALL_EVENTS_PER_UNIT_QUERY = gql`
             reservationUnit {
               id
               pk
-              nameFi
+              nameTranslations {
+                fi
+              }
             }
           }
         }
@@ -801,18 +810,24 @@ export const APPLICATION_ROUND_FILTER_OPTIONS = gql`
   query ApplicationRoundFilter($id: ID!) {
     applicationRound(id: $id) {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
       status
       reservationPeriodBegin
       reservationPeriodEnd
       reservationUnits {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         unit {
           id
           pk
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
       }
     }

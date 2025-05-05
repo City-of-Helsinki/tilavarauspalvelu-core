@@ -74,9 +74,13 @@ const getColConfig = (t: TFunction) => [
   {
     headerName: t("ReservationUnits.headings.name"),
     key: "nameFi",
-    transform: ({ nameFi, pk, unit }: ReservationUnitTableElementFragment) => (
+    transform: ({
+      nameTranslations,
+      pk,
+      unit,
+    }: ReservationUnitTableElementFragment) => (
       <TableLink to={getReservationUnitUrl(pk, unit?.pk)}>
-        {truncate(nameFi ?? "-", MAX_NAME_LENGTH)}
+        {truncate(nameTranslations.fi || "-", MAX_NAME_LENGTH)}
       </TableLink>
     ),
     isSortable: true,
@@ -85,8 +89,8 @@ const getColConfig = (t: TFunction) => [
     headerName: t("ReservationUnits.headings.unitName"),
     key: "unitNameFi",
     isSortable: true,
-    transform: (resUnit: ReservationUnitTableElementFragment) =>
-      resUnit.unit?.nameFi ?? "-",
+    transform: ({ unit }: ReservationUnitTableElementFragment) =>
+      unit?.nameTranslations.fi || "-",
   },
   {
     headerName: t("ReservationUnits.headings.reservationUnitType"),
@@ -95,7 +99,7 @@ const getColConfig = (t: TFunction) => [
     transform: ({
       reservationUnitType,
     }: ReservationUnitTableElementFragment) => (
-      <span>{reservationUnitType?.nameFi ?? "-"}</span>
+      <span>{reservationUnitType?.nameTranslations.fi || "-"}</span>
     ),
   },
   {
@@ -177,15 +181,21 @@ export const RESERVATION_UNIT_TABLE_ELEMENT_FRAGMENT = gql`
   fragment ReservationUnitTableElement on ReservationUnitNode {
     id
     pk
-    nameFi
+    nameTranslations {
+      fi
+    }
     unit {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
       pk
     }
     reservationUnitType {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
     }
     maxPersons
     surfaceArea

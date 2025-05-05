@@ -64,14 +64,20 @@ function RelatedUnitCard({
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
-  const name = getTranslationSafe(reservationUnit, "name", lang);
-  const unitName = getTranslationSafe(reservationUnit.unit ?? {}, "name", lang);
+  const name = getTranslationSafe(reservationUnit.nameTranslations, lang);
+  const unitName =
+    reservationUnit.unit != null
+      ? getTranslationSafe(reservationUnit.unit.nameTranslations, lang)
+      : "";
   const pricing = getActivePricing(reservationUnit);
   const unitPrice =
     pricing != null ? getPriceString({ t, pricing }) : undefined;
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null
-      ? getTranslationSafe(reservationUnit.reservationUnitType, "name", lang)
+      ? getTranslationSafe(
+          reservationUnit.reservationUnitType.nameTranslations,
+          lang
+        )
       : undefined;
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "medium");
@@ -131,9 +137,11 @@ export const RELATED_UNIT_CARD_FRAGMENT = gql`
     reservationUnitType {
       id
       pk
-      nameFi
-      nameEn
-      nameSv
+      nameTranslations {
+        fi
+        en
+        sv
+      }
     }
     maxPersons
     pricings {

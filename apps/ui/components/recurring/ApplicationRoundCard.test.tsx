@@ -6,6 +6,7 @@ import { render } from "@testing-library/react";
 import { ApplicationRoundCard } from "./ApplicationRoundCard";
 import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 import { getApplicationRoundPath } from "@/modules/urls";
+import { generateNameFragment } from "@/test/test.gql.utils";
 
 function createApplicationRoundCard({
   status = ApplicationRoundStatusChoice.Open,
@@ -17,9 +18,7 @@ function createApplicationRoundCard({
   return {
     id: "1",
     pk: 1,
-    nameFi: `${name} FI`,
-    nameSv: `${name} SV`,
-    nameEn: `${name} EN`,
+    ...generateNameFragment(name),
     status,
     reservationPeriodBegin: "2024-02-01T00:00:00Z",
     reservationPeriodEnd: "2025-01-01T00:00:00Z",

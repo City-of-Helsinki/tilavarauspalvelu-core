@@ -14,26 +14,27 @@ export function useOptions() {
   });
 
   const purpose = filterNonNullable(
-    optionsData?.reservationPurposes?.edges
-  ).map((purposeType) => ({
-    label: purposeType?.node?.nameFi ?? "",
-    value: Number(purposeType?.node?.pk),
+    optionsData?.reservationPurposes?.edges.map((x) => x?.node)
+  ).map((n) => ({
+    label: n.nameTranslations.fi || "-",
+    value: n.pk ?? 0,
   }));
 
   const ageGroup = sortBy(
-    optionsData?.ageGroups?.edges || [],
-    "node.minimum"
-  ).map((group) => ({
-    label: `${group?.node?.minimum}-${group?.node?.maximum || ""}`,
-    value: Number(group?.node?.pk),
+    filterNonNullable(optionsData?.ageGroups?.edges.map((g) => g?.node)),
+    "minimum"
+  ).map(({ minimum, maximum, pk }) => ({
+    label: `${minimum}-${maximum || ""}`,
+    value: pk ?? 0,
   }));
 
-  const homeCity = sortBy(optionsData?.cities?.edges || [], "node.nameFi").map(
-    (cityType) => ({
-      label: cityType?.node?.nameFi ?? "",
-      value: Number(cityType?.node?.pk),
-    })
-  );
+  const homeCity = sortBy(
+    filterNonNullable(optionsData?.cities?.edges.map((x) => x?.node)),
+    "nameTranslations.fi"
+  ).map((n) => ({
+    label: n.nameTranslations.fi || "-",
+    value: n.pk ?? 0,
+  }));
 
   return { ageGroup, purpose, homeCity };
 }
@@ -47,7 +48,9 @@ export const OPTIONS_QUERY = gql`
         node {
           id
           pk
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
       }
     }
@@ -65,8 +68,10 @@ export const OPTIONS_QUERY = gql`
       edges {
         node {
           id
-          nameFi
           pk
+          nameTranslations {
+            fi
+          }
         }
       }
     }

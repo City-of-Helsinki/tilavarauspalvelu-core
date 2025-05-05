@@ -13,7 +13,6 @@ import {
 import React from "react";
 import { useTranslation } from "next-i18next";
 import type { RecurringCardFragment } from "@gql/gql-types";
-import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getImageSource, getMainImage } from "common/src/helpers";
 import Card, { CardInfoItem } from "common/src/components/Card";
 import { getReservationUnitPath } from "@/modules/urls";
@@ -41,15 +40,18 @@ export function RecurringCard({
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
-  const name = getReservationUnitName(reservationUnit);
+  const name = getTranslationSafe(reservationUnit.nameTranslations, lang);
 
   const unitName = reservationUnit.unit
-    ? getTranslationSafe(reservationUnit.unit, "name", lang)
+    ? getTranslationSafe(reservationUnit.unit.nameTranslations, lang)
     : "-";
 
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null
-      ? getTranslationSafe(reservationUnit.reservationUnitType, "name", lang)
+      ? getTranslationSafe(
+          reservationUnit.reservationUnitType.nameTranslations,
+          lang
+        )
       : undefined;
 
   const img = getMainImage(reservationUnit);
@@ -143,9 +145,11 @@ export const RECURRING_CARD_FRAGMENT = gql`
     ...OrderedReservationUnitCard
     reservationUnitType {
       id
-      nameFi
-      nameSv
-      nameEn
+      nameTranslations {
+        fi
+        en
+        sv
+      }
     }
     maxPersons
     currentAccessType

@@ -56,7 +56,7 @@ function getEventTitle({
 
   const reserveeName = getReserveeName(reservation, t);
   if (isOtherReservationUnit) {
-    const reservationUnitName = reservationUnit?.nameFi ?? "";
+    const reservationUnitName = reservationUnit?.nameTranslations.fi ?? "";
 
     return [reserveeName, reservationUnitName];
   }

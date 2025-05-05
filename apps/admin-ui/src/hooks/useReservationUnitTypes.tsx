@@ -15,7 +15,9 @@ export const RESERVATION_UNIT_TYPES_QUERY = gql`
         node {
           id
           pk
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
       }
       totalCount
@@ -34,7 +36,7 @@ export function useReservationUnitTypes() {
   const types = filterNonNullable(qd?.edges.map((x) => x?.node));
 
   const options = types.map((type) => ({
-    label: type?.nameFi ?? "",
+    label: type?.nameTranslations.fi ?? "",
     value: type?.pk ?? 0,
   }));
 

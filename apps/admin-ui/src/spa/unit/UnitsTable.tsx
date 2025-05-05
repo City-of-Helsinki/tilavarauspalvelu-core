@@ -31,9 +31,9 @@ function getColConfig(t: TFunction, isMyUnits?: boolean): ColumnType[] {
     {
       headerName: t("Units.headings.name"),
       key: "nameFi",
-      transform: ({ nameFi, pk }: UnitTableElementFragment) => (
+      transform: ({ nameTranslations, pk }: UnitTableElementFragment) => (
         <TableLink to={isMyUnits ? getMyUnitUrl(pk) : getUnitUrl(pk)}>
-          {truncate(nameFi ?? "-", MAX_UNIT_NAME_LENGTH)}
+          {truncate(nameTranslations.fi || "-", MAX_UNIT_NAME_LENGTH)}
         </TableLink>
       ),
       width: "75%",
@@ -53,7 +53,7 @@ function getColConfig(t: TFunction, isMyUnits?: boolean): ColumnType[] {
       isSortable: true,
       transform: (unit: UnitTableElementFragment) =>
         (unit?.unitGroups ?? [])
-          .map((unitGroup) => unitGroup?.nameFi)
+          .map((unitGroup) => unitGroup?.nameTranslations?.fi ?? "-")
           .join(", "),
       width: "25%",
     },
@@ -91,11 +91,15 @@ export function UnitsTable({
 export const UNIT_TABLE_ELEMET_FRAGMENT = gql`
   fragment UnitTableElement on UnitNode {
     id
-    nameFi
+    nameTranslations {
+      fi
+    }
     pk
     unitGroups {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
     }
     reservationUnits {
       id

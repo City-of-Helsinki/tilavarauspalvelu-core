@@ -41,8 +41,10 @@ function timeSlotMapper(
   slot: AllocatedSectionsTableElementFragment
 ): ApplicationScheduleView {
   const allocatedReservationUnit = slot.reservationUnitOption.reservationUnit;
-  const allocatedReservationUnitName = allocatedReservationUnit.nameFi ?? "-";
-  const allocatedUnit = allocatedReservationUnit.unit?.nameFi ?? "-";
+  const allocatedReservationUnitName =
+    allocatedReservationUnit.nameTranslations.fi || "-";
+  const allocatedUnit =
+    allocatedReservationUnit.unit?.nameTranslations.fi || "-";
 
   const application =
     slot.reservationUnitOption.applicationSection?.application;
@@ -234,10 +236,14 @@ export const ALLOCATED_SECTIONS_TABLE_ELEMENT_FRAGMENT = gql`
       }
       reservationUnit {
         id
-        nameFi
+        nameTranslations {
+          fi
+        }
         unit {
           id
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
       }
     }

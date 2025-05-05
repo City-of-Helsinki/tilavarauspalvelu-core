@@ -63,8 +63,8 @@ const GenericTerms = ({ genericTerms }: Props): JSX.Element => {
   }
 
   const lang = convertLanguageCode(i18n.language);
-  const title = getTranslationSafe(genericTerms, "name", lang);
-  const text = getTranslationSafe(genericTerms, "text", lang);
+  const title = getTranslationSafe(genericTerms.nameTranslations, lang);
+  const text = getTranslationSafe(genericTerms.textTranslations, lang);
 
   return (
     <>

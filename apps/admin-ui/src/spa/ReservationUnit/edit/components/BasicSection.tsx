@@ -44,12 +44,12 @@ export function BasicSection({
   const { errors } = formState;
 
   const spaceOptions = filterNonNullable(spaces).map((s) => ({
-    label: s?.nameFi ?? "-",
+    label: s?.nameTranslations.fi ?? "-",
     value: s?.pk ?? 0,
   }));
   const resourceOptions = filterNonNullable(
     spaces?.flatMap((s) => s?.resources)
-  ).map((r) => ({ label: r?.nameFi ?? "-", value: r?.pk ?? 0 }));
+  ).map((r) => ({ label: r?.nameTranslations.fi ?? "-", value: r?.pk ?? 0 }));
 
   const spacePks = watch("spaces");
   const selectedSpaces = filterNonNullable(

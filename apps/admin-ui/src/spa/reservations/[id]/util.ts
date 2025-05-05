@@ -32,9 +32,15 @@ type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 function reservationUnitName(
   reservationUnit: Maybe<CreateTagStringFragment["reservationUnits"][0]>
 ): string {
-  return reservationUnit
-    ? `${reservationUnit.nameFi}, ${reservationUnit.unit?.nameFi || ""}`
-    : "-";
+  if (!reservationUnit) {
+    return "-";
+  }
+  const unitName = reservationUnit.unit?.nameTranslations.fi || "";
+  const reservationUnitName = reservationUnit.nameTranslations.fi || "-";
+  if (unitName === "") {
+    return reservationUnitName;
+  }
+  return `${reservationUnitName}, ${unitName}`;
 }
 
 export function reservationPrice(
@@ -292,10 +298,14 @@ export const CREATE_TAG_STRING_FRAGMENT = gql`
     end
     reservationUnits {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
       unit {
         id
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
     }
     recurringReservation {

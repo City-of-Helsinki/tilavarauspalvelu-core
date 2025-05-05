@@ -9,9 +9,7 @@ type AbilityGroupNode implements Node {
   """
   id: ID!
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   pk: Int
 }
 
@@ -48,9 +46,7 @@ enum AccessTypeWithMultivalued {
 
 type AddressNode implements Node {
   city: String!
-  cityEn: String
-  cityFi: String
-  citySv: String
+  cityTranslations: Translatable!
   """
   The ID of the object
   """
@@ -58,9 +54,7 @@ type AddressNode implements Node {
   pk: Int
   postCode: String!
   streetAddress: String!
-  streetAddressEn: String
-  streetAddressFi: String
-  streetAddressSv: String
+  streetAddressTranslations: Translatable!
 }
 
 input AddressSerializerInput {
@@ -386,9 +380,7 @@ type ApplicationRoundNode implements Node {
   applicationPeriodEnd: DateTime!
   applicationsCount: Int!
   criteria: String!
-  criteriaEn: String
-  criteriaFi: String
-  criteriaSv: String
+  criteriaTranslations: Translatable!
   handledDate: DateTime
   """
   The ID of the object
@@ -396,13 +388,9 @@ type ApplicationRoundNode implements Node {
   id: ID!
   isSettingHandledAllowed: Boolean!
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   notesWhenApplying: String!
-  notesWhenApplyingEn: String
-  notesWhenApplyingFi: String
-  notesWhenApplyingSv: String
+  notesWhenApplyingTranslations: Translatable!
   pk: Int
   publicDisplayBegin: DateTime!
   publicDisplayEnd: DateTime!
@@ -904,6 +892,7 @@ type BannerNotificationNode implements Node {
   messageEn: String
   messageFi: String
   messageSv: String
+  messageTranslations: Translatable!
   name: String!
   pk: Int
   state: BannerNotificationState!
@@ -1018,9 +1007,7 @@ type CityNode implements Node {
   id: ID!
   municipalityCode: String!
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   pk: Int
 }
 
@@ -1101,9 +1088,7 @@ type EquipmentAllNode implements Node {
   """
   id: ID!
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   pk: Int
 }
 
@@ -1137,9 +1122,7 @@ type EquipmentCategoryNode implements Node {
   """
   id: ID!
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   pk: Int
 }
 
@@ -1226,9 +1209,7 @@ type EquipmentNode implements Node {
   """
   id: ID!
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   pk: Int
 }
 
@@ -1338,13 +1319,9 @@ enum ImageType {
 
 type LocationNode implements Node {
   addressCity: String!
-  addressCityEn: String
-  addressCityFi: String
-  addressCitySv: String
+  addressCityTranslations: Translatable!
   addressStreet: String!
-  addressStreetEn: String
-  addressStreetFi: String
-  addressStreetSv: String
+  addressStreetTranslations: Translatable!
   addressZip: String!
   """
   The ID of the object
@@ -1618,9 +1595,7 @@ type OrganisationNode implements Node {
   activeMembers: Int
   address: AddressNode
   coreBusiness: String!
-  coreBusinessEn: String
-  coreBusinessFi: String
-  coreBusinessSv: String
+  coreBusinessTranslations: Translatable!
   email: String!
   """
   The ID of the object
@@ -1628,9 +1603,7 @@ type OrganisationNode implements Node {
   id: ID!
   identifier: String
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   organisationType: OrganizationTypeChoice!
   pk: Int
   yearEstablished: Int
@@ -1904,9 +1877,7 @@ type PurposeNode implements Node {
   id: ID!
   imageUrl: String
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   pk: Int
   rank: Int!
   smallUrl: String
@@ -1974,9 +1945,7 @@ type QualifierNode implements Node {
   """
   id: ID!
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   pk: Int
 }
 
@@ -3007,9 +2976,7 @@ type ReservationCancelReasonNode implements Node {
   id: ID!
   pk: Int
   reason: String!
-  reasonEn: String
-  reasonFi: String
-  reasonSv: String
+  reasonTranslations: Translatable!
 }
 
 type ReservationCancelReasonNodeConnection {
@@ -3120,9 +3087,7 @@ type ReservationDenyReasonNode implements Node {
   id: ID!
   pk: Int
   reason: String!
-  reasonEn: String
-  reasonFi: String
-  reasonSv: String
+  reasonTranslations: Translatable!
 }
 
 type ReservationDenyReasonNodeConnection {
@@ -3431,9 +3396,7 @@ type ReservationPurposeNode implements Node {
   """
   id: ID!
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   pk: Int
   rank: Int!
 }
@@ -3949,15 +3912,18 @@ input ReservationUnitAccessTypeSerializerInput {
 This Node should be kept to the bare minimum and never expose any relations to avoid performance issues.
 """
 type ReservationUnitAllNode implements Node {
+  descriptionTranslations: Translatable!
   """
   The ID of the object
   """
   id: ID!
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   pk: Int
+  reservationCancelledInstructionsTranslations: Translatable!
+  reservationConfirmedInstructionsTranslations: Translatable!
+  reservationPendingInstructionsTranslations: Translatable!
+  termsOfUseTranslations: Translatable!
 }
 
 type ReservationUnitCancellationRuleNode implements Node {
@@ -3967,9 +3933,7 @@ type ReservationUnitCancellationRuleNode implements Node {
   """
   id: ID!
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   pk: Int
 }
 
@@ -4237,9 +4201,7 @@ type ReservationUnitNode implements Node {
   contactInformation: String!
   currentAccessType: AccessType
   description: String!
-  descriptionEn: String
-  descriptionFi: String
-  descriptionSv: String
+  descriptionTranslations: Translatable!
   effectiveAccessType: AccessType
   equipments(
     name: String
@@ -4280,9 +4242,7 @@ type ReservationUnitNode implements Node {
   minPersons: Int
   minReservationDuration: Duration
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   numActiveUserReservations: Int!
   paymentMerchant: PaymentMerchantNode
   paymentProduct: PaymentProductNode
@@ -4324,19 +4284,13 @@ type ReservationUnitNode implements Node {
   reservationBegins: DateTime
   reservationBlockWholeDay: Boolean!
   reservationCancelledInstructions: String!
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsSv: String
+  reservationCancelledInstructionsTranslations: Translatable!
   reservationConfirmedInstructions: String!
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsSv: String
+  reservationConfirmedInstructionsTranslations: Translatable!
   reservationEnds: DateTime
   reservationKind: ReservationKind!
   reservationPendingInstructions: String!
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsSv: String
+  reservationPendingInstructionsTranslations: Translatable!
   reservationStartInterval: ReservationStartInterval!
   reservationState: ReservationUnitReservationState!
   reservationUnitType: ReservationUnitTypeNode
@@ -4411,9 +4365,7 @@ type ReservationUnitNode implements Node {
   ): [SpaceNode!]!
   surfaceArea: Int
   termsOfUse: String
-  termsOfUseEn: String
-  termsOfUseFi: String
-  termsOfUseSv: String
+  termsOfUseTranslations: Translatable!
   unit: UnitNode
   uuid: UUID!
 }
@@ -4597,9 +4549,7 @@ type ReservationUnitTypeNode implements Node {
   """
   id: ID!
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   pk: Int
   rank: Int!
 }
@@ -4922,9 +4872,7 @@ type ResourceNode implements Node {
   id: ID!
   locationType: ResourceLocationType!
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   pk: Int
   space: SpaceNode
 }
@@ -5074,9 +5022,7 @@ type SpaceNode implements Node {
   id: ID!
   maxPersons: Int
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   parent: SpaceNode
   pk: Int
   resources(
@@ -5273,15 +5219,11 @@ type TermsOfUseNode implements Node {
   """
   id: ID!
   name: String
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   pk: String
   termsType: TermsType!
   text: String!
-  textEn: String
-  textFi: String
-  textSv: String
+  textTranslations: Translatable!
 }
 
 type TermsOfUseNodeConnection {
@@ -5363,6 +5305,21 @@ type TimeSlotType {
   end: Time!
 }
 
+type Translatable {
+  """
+  Translation in en.
+  """
+  en: String
+  """
+  Translation in fi.
+  """
+  fi: String
+  """
+  Translation in sv.
+  """
+  sv: String
+}
+
 """
 Leverages the internal Python implementation of UUID (uuid.UUID) to provide native UUID objects
 in fields, resolvers and input.
@@ -5373,15 +5330,15 @@ scalar UUID
 This Node should be kept to the bare minimum and never expose any relations to avoid performance issues.
 """
 type UnitAllNode implements Node {
+  descriptionTranslations: Translatable!
   """
   The ID of the object
   """
   id: ID!
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   pk: Int
+  shortDescriptionTranslations: Translatable!
   tprekId: String
 }
 
@@ -5391,9 +5348,7 @@ type UnitGroupNode implements Node {
   """
   id: ID!
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   pk: Int
   units(
     nameEn: String
@@ -5446,9 +5401,7 @@ type UnitGroupNodeEdge {
 
 type UnitNode implements Node {
   description: String!
-  descriptionEn: String
-  descriptionFi: String
-  descriptionSv: String
+  descriptionTranslations: Translatable!
   email: String!
   """
   The ID of the object
@@ -5456,9 +5409,7 @@ type UnitNode implements Node {
   id: ID!
   location: LocationNode
   name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  nameTranslations: Translatable!
   paymentMerchant: PaymentMerchantNode
   phone: String!
   pk: Int
@@ -5522,9 +5473,7 @@ type UnitNode implements Node {
     uuid: UUID
   ): [ReservationUnitNode!]!
   shortDescription: String!
-  shortDescriptionEn: String
-  shortDescriptionFi: String
-  shortDescriptionSv: String
+  shortDescriptionTranslations: Translatable!
   spaces(
     nameEn: String
     nameEn_Icontains: String

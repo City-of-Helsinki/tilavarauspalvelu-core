@@ -158,12 +158,16 @@ export const APPLICATION_ROUND_FRAGMENT = gql`
     ...ApplicationRoundCard
     publicDisplayBegin
     publicDisplayEnd
-    criteriaFi
-    criteriaEn
-    criteriaSv
-    notesWhenApplyingFi
-    notesWhenApplyingEn
-    notesWhenApplyingSv
+    criteriaTranslations {
+      fi
+      en
+      sv
+    }
+    notesWhenApplyingTranslations {
+      fi
+      en
+      sv
+    }
     reservationUnits {
       id
       pk

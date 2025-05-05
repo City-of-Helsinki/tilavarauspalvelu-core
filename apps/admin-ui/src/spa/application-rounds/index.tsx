@@ -120,8 +120,8 @@ function AllApplicationRounds(): JSX.Element | null {
       headerName: t("ApplicationRound.headings.name"),
       transform: (applicationRound: ApplicationRoundNode) => (
         <TableLink to={getApplicationRoundUrl(applicationRound.pk)}>
-          <span title={applicationRound.nameFi ?? ""}>
-            {truncate(applicationRound.nameFi ?? "", 50)}
+          <span title={applicationRound.nameTranslations.fi ?? ""}>
+            {truncate(applicationRound.nameTranslations.fi ?? "", 50)}
           </span>
         </TableLink>
       ),

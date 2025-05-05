@@ -135,7 +135,7 @@ function ApplicationInfoCard({
   const lang = convertLanguageCode(i18n.language);
   const reservationUnitName =
     reservationUnit != null
-      ? getTranslationSafe(reservationUnit, "name", lang)
+      ? getTranslationSafe(reservationUnit.nameTranslations, lang)
       : "-";
   const price = getPrice(t, reservation, lang);
 
@@ -207,13 +207,16 @@ function getTranslatedTerms(
         ?.applicationSection?.application?.applicationRound;
     const { termsOfUse } = round ?? {};
     if (termsOfUse) {
-      return getTranslationSafe(termsOfUse, "text", lang);
+      return getTranslationSafe(termsOfUse.textTranslations, lang);
     }
     return null;
   }
   const reservationUnit = reservation.reservationUnits.find(() => true);
   if (reservationUnit?.cancellationTerms != null) {
-    return getTranslationSafe(reservationUnit?.cancellationTerms, "text", lang);
+    return getTranslationSafe(
+      reservationUnit.cancellationTerms.textTranslations,
+      lang
+    );
   }
   return null;
 }

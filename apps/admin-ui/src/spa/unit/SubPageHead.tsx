@@ -26,7 +26,7 @@ export function SubPageHead({ title, unit }: IProps): JSX.Element {
       <Flex $gap="xs" $alignItems="center" $direction="row">
         <IconLocation />
         <div>
-          <Name>{unit?.nameFi}</Name>
+          <Name>{unit?.nameTranslations.fi}</Name>
           <span>{t("Unit.address")}</span>:{" "}
           <span>{formatAddress(unit.location)}</span>
         </div>
@@ -39,7 +39,9 @@ export const UNIT_SUBPAGE_HEAD_FRAGMENT = gql`
   fragment UnitSubpageHead on UnitNode {
     id
     pk
-    nameFi
+    nameTranslations {
+      fi
+    }
     location {
       ...LocationFields
     }

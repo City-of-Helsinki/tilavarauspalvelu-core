@@ -71,7 +71,7 @@ function Page1({
     .filter((u) => u.pk != null && unitsInApplicationRound.includes(u.pk))
     .map((u) => ({
       value: u.pk ?? 0,
-      label: getTranslationSafe(u, "name", lang),
+      label: getTranslationSafe(u.nameTranslations, lang),
     }));
   const { options } = useOptions();
 
@@ -86,8 +86,7 @@ function Page1({
   });
 
   const applicationRoundName = getTranslationSafe(
-    applicationRound,
-    "name",
+    applicationRound.nameTranslations,
     lang
   );
   const { handleSubmit } = form;
@@ -175,9 +174,11 @@ export const APPLICATION_PAGE1_QUERY = gql`
     ) {
       id
       pk
-      nameFi
-      nameEn
-      nameSv
+      nameTranslations {
+        fi
+        en
+        sv
+      }
     }
   }
 `;

@@ -4,14 +4,13 @@ import {
   useApplicationReservationsQuery,
   ReservationStateChoice,
   AccessType,
-  ReservationUnitNode,
   type ApplicationNode,
-  ApplicationSectionReservationUnitFragment,
+  type ApplicationSectionReservationUnitFragment,
   AccessTypeWithMultivalued,
-  PindoraSectionFragment,
-  PindoraReservationFragment,
-  ReservationUnitAccessTypeNode,
-  Maybe,
+  type PindoraSectionFragment,
+  type PindoraReservationFragment,
+  type ReservationUnitAccessTypeNode,
+  type Maybe,
 } from "@/gql/gql-types";
 import {
   getApplicationReservationPath,
@@ -211,8 +210,9 @@ function formatAesName(
     return "-";
   }
   const { unit } = firstResUnit;
-  const resUnitName = getTranslationSafe(firstResUnit, "name", lang);
-  const unitName = unit != null ? getTranslationSafe(unit, "name", lang) : "";
+  const resUnitName = getTranslationSafe(firstResUnit.nameTranslations, lang);
+  const unitName =
+    unit != null ? getTranslationSafe(unit.nameTranslations, lang) : "";
   return `${resUnitName}, ${unitName}`;
 }
 
@@ -469,12 +469,12 @@ function ReservationSeriesTable({
 
   const getTranslation = (
     elem: ModalT | null,
-    field: "name" | "reservationConfirmedInstructions"
+    field: "nameTranslations" | "reservationConfirmedInstructionsTranslations"
   ) => {
     if (elem == null) {
       return "";
     }
-    return getTranslationSafe(elem, field, lang);
+    return getTranslationSafe(elem[`${field}`], lang);
   };
 
   return (
@@ -499,12 +499,15 @@ function ReservationSeriesTable({
       >
         <Dialog.Header
           id="reservation-unit-modal-help-header"
-          title={getTranslation(modal, "name")}
+          title={getTranslation(modal, "nameTranslations")}
           iconStart={<IconInfoCircle />}
         />
         <Dialog.Content id="dialog-content">
           <Sanitize
-            html={getTranslation(modal, "reservationConfirmedInstructions")}
+            html={getTranslation(
+              modal,
+              "reservationConfirmedInstructionsTranslations"
+            )}
           />
           {modal?.accessTypes.some(
             (aT: { accessType: AccessType }) =>
@@ -660,12 +663,12 @@ function createReservationUnitLink({
 }: {
   lang: LocalizationLanguages;
   reservationUnit: Pick<
-    ReservationUnitNode,
-    "nameSv" | "nameFi" | "nameEn" | "id" | "pk"
+    ApplicationSectionReservationUnitFragment,
+    "nameTranslations" | "pk"
   >;
 }): JSX.Element {
   const { pk } = reservationUnit;
-  const name = getTranslationSafe(reservationUnit, "name", lang);
+  const name = getTranslationSafe(reservationUnit.nameTranslations, lang);
   if (pk == null || pk <= 0) {
     return <span>{name}</span>;
   }
@@ -1155,14 +1158,14 @@ export const APPLICATION_SECTION_RESERVATION_FRAGMENT = gql`
           }
           reservationUnit {
             ...ApplicationSectionReservationUnit
-            reservationConfirmedInstructionsFi
-            reservationConfirmedInstructionsEn
-            reservationConfirmedInstructionsSv
+
             unit {
               id
-              nameFi
-              nameEn
-              nameSv
+              nameTranslations {
+                fi
+                en
+                sv
+              }
             }
           }
           rejectedOccurrences {
@@ -1206,14 +1209,23 @@ export const APPLICATION_RESERVATIONS_QUERY = gql`
 
 export const APPLICATION_SECTION_RESERVATION_UNIT_FRAGMENT = gql`
   fragment ApplicationSectionReservationUnit on ReservationUnitNode {
-    nameFi
-    nameSv
-    nameEn
     id
     pk
-    reservationCancelledInstructionsFi
-    reservationCancelledInstructionsSv
-    reservationCancelledInstructionsEn
+    nameTranslations {
+      fi
+      en
+      sv
+    }
+    reservationConfirmedInstructionsTranslations {
+      fi
+      en
+      sv
+    }
+    reservationCancelledInstructionsTranslations {
+      fi
+      en
+      sv
+    }
     accessTypes {
       id
       pk

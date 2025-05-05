@@ -285,19 +285,19 @@ export async function getSearchOptions(
 
   const reservationUnitTypeOptions = reservationUnitTypes.map((n) => ({
     value: n.pk ?? 0,
-    label: getTranslationSafe(n, "name", lang),
+    label: getTranslationSafe(n.nameTranslations, lang),
   }));
   const purposeOptions = purposes.map((n) => ({
     value: n.pk ?? 0,
-    label: getTranslationSafe(n, "name", lang),
+    label: getTranslationSafe(n.nameTranslations, lang),
   }));
   const equipmentsOptions = equipments.map((n) => ({
     value: n.pk ?? 0,
-    label: getTranslationSafe(n, "name", lang),
+    label: getTranslationSafe(n.nameTranslations, lang),
   }));
   const unitOptions = filterNonNullable(optionsData?.unitsAll).map((node) => ({
     value: node.pk ?? 0,
-    label: getTranslationSafe(node, "name", lang),
+    label: getTranslationSafe(node.nameTranslations, lang),
   }));
 
   return {

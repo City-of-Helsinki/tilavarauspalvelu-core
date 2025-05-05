@@ -260,7 +260,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
       }
       successToast({
         text: t("ReservationDialog.saveSuccess", {
-          reservationUnit: reservationUnit.nameFi,
+          reservationUnit: reservationUnit.nameTranslations.fi,
         }),
       });
       refetch();
@@ -433,7 +433,9 @@ export const SERIES_PAGE_QUERY = gql`
       reservationUnits {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         bufferTimeBefore
         bufferTimeAfter
         reservationStartInterval

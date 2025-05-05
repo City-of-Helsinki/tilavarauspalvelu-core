@@ -476,12 +476,13 @@ function ReservationUnitOptionsSection({
     {
       key: "unit",
       transform: (reservationUnitOption: ReservationUnitOptionFieldsFragment) =>
-        reservationUnitOption?.reservationUnit?.unit?.nameFi ?? "-",
+        reservationUnitOption?.reservationUnit?.unit?.nameTranslations.fi ||
+        "-",
     },
     {
       key: "name",
       transform: (reservationUnitOption: ReservationUnitOptionFieldsFragment) =>
-        reservationUnitOption?.reservationUnit?.nameFi ?? "-",
+        reservationUnitOption?.reservationUnit?.nameTranslations.fi || "-",
     },
     {
       key: "status",
@@ -573,7 +574,7 @@ function ApplicationSectionDetails({
           />
           <ValueBox
             label={t("ApplicationEvent.purpose")}
-            value={section.purpose?.nameFi ?? undefined}
+            value={section.purpose?.nameTranslations.fi ?? undefined}
           />
           <ValueBox
             label={t("ApplicationEvent.eventDuration")}
@@ -786,7 +787,7 @@ function ApplicationDetails({
 
   const customerName = getApplicantName(application);
   // TODO where is this defined in the application form?
-  const homeCity = application.homeCity?.nameFi ?? "-";
+  const homeCity = application.homeCity?.nameTranslations.fi ?? "-";
 
   // TODO (test these and either change the query to do the sorting or sort on the client)
   // sort reservationUnitOptions by priority
@@ -831,7 +832,7 @@ function ApplicationDetails({
           {isOrganisation && (
             <KV
               k={t("Application.coreActivity")}
-              v={application.organisation?.coreBusinessFi || "-"}
+              v={application.organisation?.coreBusinessTranslations.fi || "-"}
             />
           )}
           <KV k={t("Application.numHours")} v="-" />
@@ -865,24 +866,22 @@ function ApplicationDetails({
           />
           <ValueBox
             label={t("Application.applicantType")}
-            value={t(
-              `Application.applicantTypes.${application?.applicantType}`
-            )}
+            value={t(`Application.applicantTypes.${application.applicantType}`)}
           />
           {isOrganisation && (
             <>
               <ValueBox
                 label={t("Application.organisationName")}
-                value={application.organisation?.nameFi}
+                value={application.organisation.nameTranslations.fi}
               />
               <ValueBox
                 label={t("Application.coreActivity")}
-                value={application.organisation?.coreBusinessFi}
+                value={application.organisation.coreBusinessTranslations.fi}
               />
               <ValueBox label={t("common.homeCity")} value={homeCity} />
               <ValueBox
                 label={t("Application.identificationNumber")}
-                value={application.organisation?.identifier}
+                value={application.organisation.identifier}
               />
             </>
           )}
@@ -924,7 +923,9 @@ function ApplicationDetails({
             <ApplicationDatas>
               <ValueBox
                 label={t("common.streetAddress")}
-                value={application.organisation?.address?.streetAddressFi}
+                value={
+                  application.organisation.address?.streetAddressTranslations.fi
+                }
               />
               <ValueBox
                 label={t("common.postalNumber")}
@@ -932,7 +933,7 @@ function ApplicationDetails({
               />
               <ValueBox
                 label={t("common.postalDistrict")}
-                value={application.organisation?.address?.cityFi}
+                value={application.organisation?.address?.cityTranslations.fi}
               />
             </ApplicationDatas>
           </>
@@ -947,7 +948,7 @@ function ApplicationDetails({
             <ApplicationDatas>
               <ValueBox
                 label={t("common.streetAddress")}
-                value={application.billingAddress?.streetAddressFi}
+                value={application.billingAddress?.streetAddressTranslations.fi}
               />
               <ValueBox
                 label={t("common.postalNumber")}
@@ -955,7 +956,7 @@ function ApplicationDetails({
               />
               <ValueBox
                 label={t("common.postalDistrict")}
-                value={application.billingAddress?.cityFi}
+                value={application.billingAddress?.cityTranslations.fi}
               />
             </ApplicationDatas>
           </>
@@ -993,7 +994,9 @@ export const APPLICATION_PAGE_SECTION_FRAGMENT = gql`
     purpose {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
     }
     allocations
     reservationUnitOptions {
@@ -1015,7 +1018,9 @@ export const APPLICATION_PAGE_FRAGMENT = gql`
     applicationRound {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
     }
     applicationSections {
       ...ApplicationPageSection
@@ -1036,11 +1041,15 @@ export const RESERVATION_UNIT_OPTION_FRAGMENT = gql`
     reservationUnit {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
       unit {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
       applicationRoundTimeSlots {
         ...ApplicationRoundTimeSlots

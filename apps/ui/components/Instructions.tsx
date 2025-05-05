@@ -23,7 +23,7 @@ export function Instructions({ reservation }: Props): JSX.Element | null {
   const instructionsKey = getReservationUnitInstructionsKey(reservation.state);
   const instructionsText =
     instructionsKey != null && reservationUnit != null
-      ? getTranslationSafe(reservationUnit, instructionsKey, lang)
+      ? getTranslationSafe(reservationUnit[`${instructionsKey}`], lang)
       : null;
   const showInstructions =
     reservationUnit != null &&
@@ -44,20 +44,20 @@ export function Instructions({ reservation }: Props): JSX.Element | null {
 }
 
 type InstructionsKey =
-  | "reservationPendingInstructions"
-  | "reservationCancelledInstructions"
-  | "reservationConfirmedInstructions";
+  | "reservationPendingInstructionsTranslations"
+  | "reservationCancelledInstructionsTranslations"
+  | "reservationConfirmedInstructionsTranslations";
 function getReservationUnitInstructionsKey(
   state: Maybe<ReservationStateChoice> | undefined
 ): InstructionsKey | null {
   switch (state) {
     case ReservationStateChoice.Created:
     case ReservationStateChoice.RequiresHandling:
-      return "reservationPendingInstructions";
+      return "reservationPendingInstructionsTranslations";
     case ReservationStateChoice.Cancelled:
-      return "reservationCancelledInstructions";
+      return "reservationCancelledInstructionsTranslations";
     case ReservationStateChoice.Confirmed:
-      return "reservationConfirmedInstructions";
+      return "reservationConfirmedInstructionsTranslations";
     case ReservationStateChoice.Denied:
     default:
       return null;
@@ -70,15 +70,21 @@ export const INSTRUCTIOSN_FRAGMENT = gql`
     state
     reservationUnits {
       id
-      reservationPendingInstructionsFi
-      reservationPendingInstructionsEn
-      reservationPendingInstructionsSv
-      reservationConfirmedInstructionsFi
-      reservationConfirmedInstructionsEn
-      reservationConfirmedInstructionsSv
-      reservationCancelledInstructionsFi
-      reservationCancelledInstructionsEn
-      reservationCancelledInstructionsSv
+      reservationPendingInstructionsTranslations {
+        fi
+        en
+        sv
+      }
+      reservationConfirmedInstructionsTranslations {
+        fi
+        en
+        sv
+      }
+      reservationCancelledInstructionsTranslations {
+        fi
+        en
+        sv
+      }
     }
   }
 `;

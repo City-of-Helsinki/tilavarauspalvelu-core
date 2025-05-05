@@ -9,7 +9,7 @@ import {
 } from "date-fns";
 import { fi } from "date-fns/locale";
 import { type TFunction } from "next-i18next";
-import { capitalize } from "../helpers";
+import { Translatable } from "../../gql/gql-types";
 
 export const parseDate = (date: string): Date => parseISO(date);
 
@@ -140,10 +140,13 @@ export const chunkArray = <T>(array: T[], size: number): T[][] => {
 // TODO key should not be a string (so we don't accidentially pass "nameFi" here)
 // gather all used keys and make a string literal for them (typically it's just name)
 export function getTranslationSafe(
-  parent: Record<string, unknown>,
-  key: string,
+  translatable: Required<Translatable>,
+  // Record<string, unknown>,
+  // key: string,
   lang: "fi" | "sv" | "en"
 ): string {
+  return translatable[lang] || translatable.fi || "";
+  /*
   const keyString = `${key}${capitalize(lang)}`;
   if (parent && parent[keyString]) {
     if (typeof parent[keyString] === "string") {
@@ -159,6 +162,7 @@ export function getTranslationSafe(
   }
 
   return "";
+    */
 }
 
 export function convertLanguageCode(lang: string): "fi" | "sv" | "en" {

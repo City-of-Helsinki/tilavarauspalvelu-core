@@ -63,7 +63,7 @@ export function ApplicationRoundCard({
 }: ApplicationCardProps): JSX.Element {
   const { t } = useTranslation();
 
-  const name = applicationRound.nameFi;
+  const name = applicationRound.nameTranslations.fi;
 
   const buttons = [
     <ButtonLikeLink
@@ -117,7 +117,9 @@ export const APPLICATION_ROUND_CARD_FRAGMENT = gql`
   fragment ApplicationRoundCard on ApplicationRoundNode {
     id
     pk
-    nameFi
+    nameTranslations {
+      fi
+    }
     status
     applicationPeriodBegin
     applicationPeriodEnd

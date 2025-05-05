@@ -42,15 +42,18 @@ function getColConfig({
 }: {
   unit?: Pick<ResourceTableFragment, "pk">;
   handleEditResource: (pk: number | null) => void;
-  handleDeleteResource: (resource: Pick<ResourceT, "pk" | "nameFi">) => void;
+  handleDeleteResource: (
+    resource: Pick<ResourceT, "pk" | "nameTranslations">
+  ) => void;
   t: TFunction;
 }) {
   return [
     {
       headerName: t("ResourceTable.headings.name"),
       key: `nameFi`,
-      transform: ({ pk, nameFi }: ResourceT) => {
+      transform: ({ pk, nameTranslations }: ResourceT) => {
         const link = getResourceUrl(pk, unit?.pk);
+        const nameFi = nameTranslations.fi;
         const name = nameFi != null && nameFi.length > 0 ? nameFi : "-";
         return (
           <TableLink to={link}>
@@ -89,7 +92,7 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
 
   const [resourceWaitingForDelete, setResourceWaitingForDelete] = useState<Pick<
     ResourceT,
-    "pk" | "nameFi"
+    "pk" | "nameTranslations"
   > | null>(null);
 
   function handleEditResource(pk: Maybe<number> | undefined) {
@@ -99,7 +102,9 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
     history(getResourceUrl(pk, unit.pk));
   }
 
-  function handleDeleteResource(resource: Pick<ResourceT, "pk" | "nameFi">) {
+  function handleDeleteResource(
+    resource: Pick<ResourceT, "pk" | "nameTranslations">
+  ) {
     if (resource.pk == null) {
       return;
     }
@@ -141,7 +146,7 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
           isOpen
           variant="danger"
           heading={t("ResourceTable.removeConfirmationTitle", {
-            name: resourceWaitingForDelete.nameFi,
+            name: resourceWaitingForDelete.nameTranslations.fi,
           })}
           content={t("ResourceTable.removeConfirmationMessage")}
           acceptLabel={t("ResourceTable.removeConfirmationAccept")}
@@ -205,7 +210,9 @@ export const RESOURCE_TABLE_FRAGMENT = gql`
       resources {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         locationType
       }
     }

@@ -34,7 +34,7 @@ function ViewAll({ applicationSection }: PropsNarrowed): JSX.Element {
     },
     {
       slug: getApplicationPath(application.pk, "view"),
-      title: getTranslationSafe(applicationRound, "name", lang),
+      title: getTranslationSafe(applicationRound.nameTranslations, lang),
     },
     {
       title: applicationSection.name,
@@ -69,9 +69,11 @@ export const APPLICATION_SECTION_VIEW_QUERY = gql`
             status
             applicationRound {
               id
-              nameEn
-              nameFi
-              nameSv
+              nameTranslations {
+                fi
+                en
+                sv
+              }
             }
           }
         }

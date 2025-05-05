@@ -153,14 +153,18 @@ export const APPLICATION_PAGE2_QUERY = gql`
           reservationUnit {
             id
             pk
-            nameFi
-            nameEn
-            nameSv
+            nameTranslations {
+              fi
+              en
+              sv
+            }
             unit {
               id
-              nameFi
-              nameEn
-              nameSv
+              nameTranslations {
+                fi
+                en
+                sv
+              }
             }
             applicationRoundTimeSlots {
               ...TimeSelector

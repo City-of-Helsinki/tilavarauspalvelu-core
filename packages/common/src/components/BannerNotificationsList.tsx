@@ -79,7 +79,7 @@ function NotificationsListItem({
   const { t, i18n } = useTranslation();
   const notificationType = convertNotificationType(notification.level);
   const lang = convertLanguageCode(i18n.language);
-  const innerHtml = getTranslationSafe(notification, "message", lang);
+  const innerHtml = getTranslationSafe(notification.messageTranslations, lang);
 
   return (
     <BannerNotificationBackground>

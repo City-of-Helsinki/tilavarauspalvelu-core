@@ -52,7 +52,6 @@ import {
   getFuturePricing,
   getPossibleTimesForDay,
   getPriceString,
-  getReservationUnitName,
   getTimeString,
   isReservationUnitPublished,
   isReservationUnitReservable,
@@ -546,21 +545,26 @@ function ReservationUnit({
   const shouldDisplayBottomWrapper = relatedReservationUnits?.length > 0;
 
   const termsOfUseContent = getTranslationSafe(
-    reservationUnit,
-    "termsOfUse",
+    reservationUnit.termsOfUseTranslations,
     lang
   );
   const paymentTermsContent = reservationUnit.paymentTerms
-    ? getTranslationSafe(reservationUnit.paymentTerms, "text", lang)
+    ? getTranslationSafe(reservationUnit.paymentTerms.textTranslations, lang)
     : undefined;
   const cancellationTermsContent = reservationUnit.cancellationTerms
-    ? getTranslationSafe(reservationUnit.cancellationTerms, "text", lang)
+    ? getTranslationSafe(
+        reservationUnit.cancellationTerms.textTranslations,
+        lang
+      )
     : undefined;
   const pricingTermsContent = reservationUnit.pricingTerms
-    ? getTranslationSafe(reservationUnit.pricingTerms, "text", lang)
+    ? getTranslationSafe(reservationUnit.pricingTerms.textTranslations, lang)
     : undefined;
   const serviceSpecificTermsContent = reservationUnit.serviceSpecificTerms
-    ? getTranslationSafe(reservationUnit.serviceSpecificTerms, "text", lang)
+    ? getTranslationSafe(
+        reservationUnit.serviceSpecificTerms.textTranslations,
+        lang
+      )
     : undefined;
 
   const equipment = filterNonNullable(reservationUnit.equipments);
@@ -634,7 +638,7 @@ function ReservationUnit({
         <JustForDesktop customBreakpoint={breakpoints.l}>
           <AddressSection
             unit={reservationUnit.unit}
-            title={getReservationUnitName(reservationUnit) ?? "-"}
+            title={getTranslationSafe(reservationUnit.nameTranslations, lang)}
           />
         </JustForDesktop>
       </div>
@@ -642,7 +646,10 @@ function ReservationUnit({
         <div data-testid="reservation-unit__description">
           <H4 as="h2">{t("reservationUnit:description")}</H4>
           <Sanitize
-            html={getTranslationSafe(reservationUnit, "description", lang)}
+            html={getTranslationSafe(
+              reservationUnit.descriptionTranslations,
+              lang
+            )}
           />
         </div>
         {equipment?.length > 0 && (
@@ -655,7 +662,10 @@ function ReservationUnit({
           <div data-testid="reservation-unit__calendar--wrapper">
             <H4 as="h2">
               {t("reservations:reservationCalendar", {
-                title: getTranslationSafe(reservationUnit, "name", lang),
+                title: getTranslationSafe(
+                  reservationUnit.nameTranslations,
+                  lang
+                ),
               })}
             </H4>
             <ReservationQuotaReached
@@ -714,7 +724,10 @@ function ReservationUnit({
             <JustForMobile customBreakpoint={breakpoints.l}>
               <AddressSection
                 unit={reservationUnit.unit}
-                title={getReservationUnitName(reservationUnit) ?? "-"}
+                title={getTranslationSafe(
+                  reservationUnit.nameTranslations,
+                  lang
+                )}
               />
             </JustForMobile>
             <MapComponent tprekId={reservationUnit.unit?.tprekId ?? ""} />
@@ -753,13 +766,14 @@ function ReservationUnit({
           {serviceSpecificTermsContent && (
             <Sanitize html={serviceSpecificTermsContent} />
           )}
-          <Sanitize
-            html={getTranslationSafe(
-              termsOfUse.genericTerms ?? {},
-              "text",
-              lang
-            )}
-          />
+          {termsOfUse.genericTerms?.textTranslations && (
+            <Sanitize
+              html={getTranslationSafe(
+                termsOfUse.genericTerms.textTranslations,
+                lang
+              )}
+            />
+          )}
         </Accordion>
       </PageContentWrapper>
       <InfoDialog
@@ -781,7 +795,10 @@ function ReservationUnitWrapped(props: PropsNarrowed) {
   const { t, i18n } = useTranslation();
   const { reservationUnit } = props;
   const lang = convertLanguageCode(i18n.language);
-  const reservationUnitName = getTranslationSafe(reservationUnit, "name", lang);
+  const reservationUnitName = getTranslationSafe(
+    reservationUnit.nameTranslations,
+    lang
+  );
   const routes = [
     { slug: getSingleSearchPath(), title: t("breadcrumb:searchSingle") },
     { title: reservationUnitName ?? "-" },
@@ -896,16 +913,18 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
     reservationUnit(id: $id) {
       id
       pk
-      nameFi
-      nameEn
-      nameSv
+      nameTranslations {
+        fi
+        en
+        sv
+      }
       ...AvailableTimesReservationUnitFields
       ...NotReservableFields
       ...ReservationTimePickerFields
       ...MetadataSets
       ...ReservationUnitHead
       unit {
-        ...AddressFields
+        ...AddressSection
       }
       uuid
       ...TermsOfUse
@@ -918,9 +937,11 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
         reservationPeriodBegin
         reservationPeriodEnd
       }
-      descriptionFi
-      descriptionEn
-      descriptionSv
+      descriptionTranslations {
+        fi
+        en
+        sv
+      }
       canApplyFreeOfCharge
       ...ReservationInfoContainer
       numActiveUserReservations

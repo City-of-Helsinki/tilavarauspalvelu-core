@@ -17,8 +17,10 @@ export const RESERVATION_UNITS_FILTER_PARAMS_QUERY = gql`
       orderBy: $orderBy
     ) {
       id
-      nameFi
       pk
+      nameTranslations {
+        fi
+      }
     }
   }
 `;
@@ -34,7 +36,7 @@ export function useReservationUnitOptions() {
 
   const options = filterNonNullable(data?.reservationUnitsAll).map(
     (reservationUnit) => ({
-      label: reservationUnit?.nameFi ?? "",
+      label: reservationUnit?.nameTranslations.fi ?? "",
       value: reservationUnit?.pk ?? 0,
     })
   );

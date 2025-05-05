@@ -73,7 +73,7 @@ export function Step0({
 
   const lang = convertLanguageCode(i18n.language);
   const pricingTerms = reservationUnit?.pricingTerms
-    ? getTranslationSafe(reservationUnit.pricingTerms, "text", lang)
+    ? getTranslationSafe(reservationUnit.pricingTerms.textTranslations, lang)
     : "";
 
   if (reservationUnit == null) {

@@ -72,7 +72,8 @@ export function NewResourceModal({
   };
 
   const parentName =
-    unit?.spaces.find((space) => space.pk === spacePk)?.nameFi ?? null;
+    unit?.spaces.find((space) => space.pk === spacePk)?.nameTranslations.fi ??
+    null;
 
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)}>

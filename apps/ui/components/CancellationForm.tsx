@@ -59,7 +59,7 @@ export function CancellationForm(props: {
   const lang = convertLanguageCode(i18n.language);
 
   const reasons = cancelReasons.map((node) => ({
-    label: getTranslationSafe(node, "reason", lang),
+    label: getTranslationSafe(node.reasonTranslations, lang),
     value: node?.pk ?? 0,
   }));
 

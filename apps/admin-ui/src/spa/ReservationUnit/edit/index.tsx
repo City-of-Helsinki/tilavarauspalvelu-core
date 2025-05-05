@@ -78,7 +78,7 @@ const makeTermsOptions = (
     .map((tou) => {
       return {
         value: tou?.pk ?? "",
-        label: tou?.nameFi ?? "no-name",
+        label: tou?.nameTranslations.fi ?? "-",
       };
     });
 };
@@ -212,13 +212,13 @@ function ReservationUnitEditor({
     parametersData?.metadataSets?.edges.map((e) => e?.node)
   ).map((n) => ({
     value: n?.pk ?? -1,
-    label: n?.name ?? "no-name",
+    label: n?.name ?? "-",
   }));
   const cancellationRuleOptions = filterNonNullable(
     parametersData?.reservationUnitCancellationRules?.edges.map((e) => e?.node)
   ).map((n) => ({
     value: n?.pk ?? -1,
-    label: n?.nameFi ?? "no-name",
+    label: n?.nameTranslations.fi ?? "-",
   }));
 
   // ----------------------------- Callbacks ----------------------------------
@@ -293,7 +293,8 @@ function ReservationUnitEditor({
       <StyledContainerMedium>
         <DisplayUnit
           heading={
-            reservationUnit?.nameFi ?? t("ReservationUnitEditor.defaultHeading")
+            reservationUnit?.nameTranslations.fi ??
+            t("ReservationUnitEditor.defaultHeading")
           }
           unit={unit}
           reservationState={reservationUnit?.reservationState ?? undefined}
@@ -442,13 +443,17 @@ export const RESERVATION_UNIT_EDIT_UNIT_FRAGMENT = gql`
     spaces {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
       maxPersons
       surfaceArea
       resources {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         locationType
       }
     }
@@ -472,25 +477,33 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
         pk
       }
       requireReservationHandling
-      nameFi
-      nameSv
-      nameEn
+      nameTranslations {
+        fi
+        en
+        sv
+      }
       isDraft
       authentication
       spaces {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
       resources {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
       purposes {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
       paymentTypes {
         id
@@ -503,23 +516,33 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
       reservationUnitType {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
       uuid
       requireAdultReservee
-      termsOfUseFi
-      termsOfUseSv
-      termsOfUseEn
+      termsOfUseTranslations {
+        fi
+        en
+        sv
+      }
       reservationKind
-      reservationPendingInstructionsFi
-      reservationPendingInstructionsSv
-      reservationPendingInstructionsEn
-      reservationConfirmedInstructionsFi
-      reservationConfirmedInstructionsSv
-      reservationConfirmedInstructionsEn
-      reservationCancelledInstructionsFi
-      reservationCancelledInstructionsSv
-      reservationCancelledInstructionsEn
+      reservationPendingInstructionsTranslations {
+        fi
+        en
+        sv
+      }
+      reservationConfirmedInstructionsTranslations {
+        fi
+        en
+        sv
+      }
+      reservationCancelledInstructionsTranslations {
+        fi
+        en
+        sv
+      }
       maxReservationDuration
       minReservationDuration
       reservationStartInterval
@@ -529,12 +552,16 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
       equipments {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
       qualifiers {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
       unit {
         ...ReservationUnitEditUnit
@@ -542,9 +569,11 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
       minPersons
       maxPersons
       surfaceArea
-      descriptionFi
-      descriptionSv
-      descriptionEn
+      descriptionTranslations {
+        fi
+        sv
+        en
+      }
       paymentTerms {
         id
         pk
@@ -646,9 +675,10 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
   ) {
     equipmentsAll(orderBy: [$equipmentsOrderBy]) {
       id
-      name
-      nameFi
       pk
+      nameTranslations {
+        fi
+      }
     }
     taxPercentages {
       edges {
@@ -664,7 +694,9 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
         node {
           id
           pk
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
       }
     }
@@ -672,8 +704,10 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
       edges {
         node {
           id
-          nameFi
           pk
+          nameTranslations {
+            fi
+          }
         }
       }
     }
@@ -682,8 +716,10 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
         node {
           id
           pk
-          nameFi
           termsType
+          nameTranslations {
+            fi
+          }
         }
       }
     }
@@ -691,8 +727,10 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
       edges {
         node {
           id
-          nameFi
           pk
+          nameTranslations {
+            fi
+          }
         }
       }
     }
@@ -709,8 +747,10 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
       edges {
         node {
           id
-          nameFi
           pk
+          nameTranslations {
+            fi
+          }
         }
       }
     }

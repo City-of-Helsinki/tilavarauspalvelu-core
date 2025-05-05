@@ -264,7 +264,7 @@ export function Review({
     <>
       <TitleSection>
         <div>
-          <H1 $noMargin>{applicationRound.nameFi}</H1>
+          <H1 $noMargin>{applicationRound.nameTranslations.fi}</H1>
           <Flex $justifyContent="flex-start" $direction="row" $marginTop="xs">
             <TimeframeStatus
               applicationPeriodBegin={applicationRound.applicationPeriodBegin}
@@ -381,7 +381,9 @@ export const APPLICATION_ROUND_ADMIN_FRAGMENT = gql`
   fragment ApplicationRoundAdmin on ApplicationRoundNode {
     id
     pk
-    nameFi
+    nameTranslations {
+      fi
+    }
     status
     applicationPeriodBegin
     applicationPeriodEnd
@@ -391,11 +393,15 @@ export const APPLICATION_ROUND_ADMIN_FRAGMENT = gql`
     reservationUnits {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
       unit {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
     }
   }

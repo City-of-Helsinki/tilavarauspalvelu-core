@@ -38,7 +38,7 @@ export function UnitInfo({
     <UnitInfoWrapper>
       <IconCheck />
       <div>
-        <Name>{unit?.nameFi}</Name>
+        <Name>{unit?.nameTranslations.fi || "-"}</Name>
         <Parent>{parentName}</Parent>
       </div>
       {unit?.location != null && (
@@ -52,7 +52,9 @@ export const UNIT_RESOURCE_INFO_FRAGMENT = gql`
   fragment UnitResourceInfoFields on UnitNode {
     id
     pk
-    nameFi
+    nameTranslations {
+      fi
+    }
     location {
       ...LocationFields
     }

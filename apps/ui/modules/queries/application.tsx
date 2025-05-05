@@ -11,9 +11,11 @@ export const APPLICATION_FORM_FRAGMENT = gql`
     applicationRound {
       id
       ...ApplicationRoundForApplication
-      notesWhenApplyingFi
-      notesWhenApplyingEn
-      notesWhenApplyingSv
+      notesWhenApplyingTranslations {
+        fi
+        en
+        sv
+      }
     }
     applicationSections {
       ...ApplicationSectionCommon
@@ -30,9 +32,11 @@ export const APPLICATION_FORM_FRAGMENT = gql`
       purpose {
         id
         pk
-        nameFi
-        nameEn
-        nameSv
+        nameTranslations {
+          fi
+          en
+          sv
+        }
       }
     }
   }

@@ -20,14 +20,16 @@ import {
   type ApplicationCardFragment,
 } from "@gql/gql-types";
 import { formatDateTime } from "@/modules/util";
-import { getApplicationRoundName } from "@/modules/applicationRound";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import Card from "common/src/components/Card";
 import { getApplicationPath } from "@/modules/urls";
 import { ApplicationStatusLabel } from "common/src/components/statuses";
 import { gql } from "@apollo/client";
-import { convertLanguageCode } from "common/src/common/util";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
 
 const StyledButton = styled(Button)`
   @media (max-width: ${breakpoints.s}) {
@@ -47,7 +49,9 @@ function getApplicant(
       type: t(
         `applicationCard:applicantType.${application.applicantType?.toLocaleLowerCase()}`
       ),
-      name: application.organisation?.nameFi || t("applicationCard:noName"),
+      name:
+        application.organisation?.nameTranslations.fi ||
+        t("applicationCard:noName"),
     });
   }
   if (application.contactPerson) {
@@ -145,7 +149,10 @@ export function ApplicationCard({
 
   return (
     <Card
-      heading={getApplicationRoundName(application.applicationRound, lang)}
+      heading={getTranslationSafe(
+        application.applicationRound.nameTranslations,
+        lang
+      )}
       headingLevel={3}
       text={getApplicant(application, t)}
       tags={tags}
@@ -180,9 +187,11 @@ export const APPLICATION_CARD_FRAGMENT = gql`
     lastModifiedDate
     applicationRound {
       id
-      nameFi
-      nameEn
-      nameSv
+      nameTranslations {
+        fi
+        en
+        sv
+      }
     }
   }
 `;

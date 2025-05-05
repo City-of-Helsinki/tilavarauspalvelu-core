@@ -50,7 +50,7 @@ export function ReservationPopupContent({
       <Flex $gap="xs">
         <Heading>
           {formatTime(reservation.begin)} - {formatTime(reservation.end)} /{" "}
-          {reservation.reservationUnits?.[0]?.nameFi ?? "-"}
+          {reservation.reservationUnits?.[0]?.nameTranslations.fi ?? "-"}
         </Heading>
         <VisibleIfPermission
           reservation={reservation}

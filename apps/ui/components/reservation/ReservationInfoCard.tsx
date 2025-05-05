@@ -124,13 +124,13 @@ export function ReservationInfoCard({
       ? isReservationUnitPaid(reservationUnit.pricings, new Date(begin))
       : Number(reservation?.price) > 0;
 
-  const name = getTranslationSafe(reservationUnit, "name", lang);
+  const name = getTranslationSafe(reservationUnit.nameTranslations, lang);
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "medium");
 
   const unitName =
     reservationUnit.unit != null
-      ? getTranslationSafe(reservationUnit.unit, "name", lang)
+      ? getTranslationSafe(reservationUnit.unit.nameTranslations, lang)
       : "-";
 
   // TODO why does this not use the Card component?
@@ -196,17 +196,21 @@ export const RESERVATION_INFO_CARD_FRAGMENT = gql`
     reservationUnits {
       id
       pk
-      nameFi
-      nameEn
-      nameSv
+      nameTranslations {
+        fi
+        en
+        sv
+      }
       images {
         ...Image
       }
       unit {
         id
-        nameFi
-        nameEn
-        nameSv
+        nameTranslations {
+          fi
+          en
+          sv
+        }
       }
     }
   }

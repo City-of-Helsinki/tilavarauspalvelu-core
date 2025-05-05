@@ -217,9 +217,11 @@ export const APPLICATION_RESERVATION_UNIT_LIST_FRAGMENT = gql`
   fragment ApplicationReservationUnitList on ApplicationRoundNode {
     id
     pk
-    nameFi
-    nameSv
-    nameEn
+    nameTranslations {
+      fi
+      en
+      sv
+    }
     reservationUnits {
       ...OrderedReservationUnitCard
       minPersons

@@ -18,7 +18,9 @@ export const CURRENT_USER = gql`
         units {
           id
           pk
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
         unitGroups {
           id

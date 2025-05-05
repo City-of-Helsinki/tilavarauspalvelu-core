@@ -27,7 +27,6 @@ import {
   getFuturePricing,
   getPossibleTimesForDay,
   getPriceString,
-  getReservationUnitName,
   getReservationUnitPrice,
   isReservationUnitPublished,
   isReservationUnitReservable,
@@ -411,9 +410,12 @@ function createMockEquipment({
     ...generateNameFragment(name),
     category: {
       id: cat,
-      ...generateNameFragment(cat),
       // category name does frontend matching to known list by nameFi
-      nameFi: cat,
+      nameTranslations: {
+        fi: cat,
+        en: cat,
+        sv: cat,
+      },
     },
   };
 }
@@ -504,25 +506,6 @@ describe("getEquipmentList", () => {
       "Item C 2 FI",
     ]);
   });
-});
-
-describe("getReservationUnitName", () => {
-  test.for([
-    ["fi", "Unit 1 FI"],
-    ["en", "Unit 1 EN"],
-    ["sv", "Unit 1 SV"],
-  ])("should return translated name of the unit", ([lang, name]) => {
-    const reservationUnit = generateNameFragment("Unit 1");
-    expect(getReservationUnitName(reservationUnit, lang)).toEqual(name);
-  });
-
-  test.for(["", undefined, "fr", "de"])(
-    "should default to fi if language is not found",
-    () => {
-      const reservationUnit = generateNameFragment("Unit 1");
-      expect(getReservationUnitName(reservationUnit)).toEqual("Unit 1 FI");
-    }
-  );
 });
 
 describe("getFuturePricing", () => {

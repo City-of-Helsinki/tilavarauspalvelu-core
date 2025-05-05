@@ -77,10 +77,14 @@ function constructReservation({
     reservationUnits: [
       {
         id: base64encode("ReservationUnitNode:1"),
-        nameFi: "Reservation unit 1",
+        nameTranslations: {
+          fi: "Reservation unit 1",
+        },
         unit: {
           id: base64encode("UnitNode:1"),
-          nameFi: "Unit 1",
+          nameTranslations: {
+            fi: "Unit 1",
+          },
         },
       },
     ],

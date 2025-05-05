@@ -76,10 +76,8 @@ export function Purposes({ purposes }: Props): JSX.Element {
     return item.smallUrl || item.imageUrl || pixel;
   };
   const lang = getLocalizationLang(i18n.language);
-  const getName = (
-    item: Pick<PurposeCardFragment, "nameFi" | "nameEn" | "nameSv">
-  ) => {
-    return getTranslationSafe(item, "name", lang);
+  const getName = (item: Pick<PurposeCardFragment, "nameTranslations">) => {
+    return getTranslationSafe(item.nameTranslations, lang);
   };
 
   const getSearchLink = (purpose: PurposeCardFragment): string => {
@@ -125,9 +123,11 @@ export const PURPOSE_CARD_FRAGMENT = gql`
   fragment PurposeCard on PurposeNode {
     id
     pk
-    nameFi
-    nameEn
-    nameSv
+    nameTranslations {
+      fi
+      en
+      sv
+    }
     imageUrl
     smallUrl
   }

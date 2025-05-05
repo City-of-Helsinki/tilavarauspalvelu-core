@@ -145,7 +145,9 @@ export const APPLICANT_NAME_FRAGMENT = gql`
     }
     organisation {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
     }
   }
 `;
@@ -158,7 +160,7 @@ export function getApplicantName(app: ApplicantNameFieldsFragment): string {
     const { firstName, lastName } = app.contactPerson || {};
     return `${firstName || "-"} ${lastName || "-"}`;
   }
-  return app.organisation?.nameFi || "-";
+  return app.organisation?.nameTranslations.fi || "-";
 }
 
 export function isApplicationRoundInProgress(

@@ -292,16 +292,16 @@ const convertPerson = (p: Maybe<PersonNode> | undefined): PersonFormValues => ({
 // TODO are these converters the wrong way around? (not input, but output)
 const convertAddress = (a: Address): AddressFormValues => ({
   pk: a?.pk ?? undefined,
-  streetAddress: a?.streetAddressFi ?? "",
-  city: a?.cityFi ?? "",
+  streetAddress: a?.streetAddressTranslations.fi ?? "",
+  city: a?.cityTranslations.fi ?? "",
   postCode: a?.postCode ?? "",
 });
 
 const convertOrganisation = (o: Organisation): OrganisationFormValues => ({
   pk: o?.pk ?? undefined,
-  name: o?.nameFi ?? "",
+  name: o?.nameTranslations.fi ?? "",
   identifier: o?.identifier ?? "",
-  coreBusiness: o?.coreBusinessFi ?? "",
+  coreBusiness: o?.coreBusinessTranslations.fi ?? "",
   address: convertAddress(o?.address ?? null),
 });
 
@@ -646,8 +646,8 @@ export function convertApplicationPage3(
 ): ApplicationPage3FormValues {
   const hasBillingAddress =
     app?.applicantType === ApplicantTypeChoice.Individual ||
-    (app?.billingAddress?.streetAddressFi != null &&
-      app?.billingAddress?.streetAddressFi !== "");
+    (app?.billingAddress?.streetAddressTranslations.fi != null &&
+      app?.billingAddress?.streetAddressTranslations.fi !== "");
   return {
     pk: app?.pk ?? 0,
     applicantType: app?.applicantType ?? undefined,

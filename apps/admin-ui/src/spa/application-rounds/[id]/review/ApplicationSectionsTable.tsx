@@ -62,7 +62,7 @@ function sectionMapper(
   const units = orderBy(uniqBy(resUnits, "pk"), "priority", "asc")
     .map((unit) => ({
       pk: unit.pk,
-      name: unit.nameFi,
+      name: unit.nameTranslations?.fi,
     }))
     .filter((unit): unit is UnitType => !!unit.pk && !!unit.name);
 

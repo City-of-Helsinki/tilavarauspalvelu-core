@@ -3,9 +3,11 @@ import { gql } from "@apollo/client";
 export const TERMS_OF_USE_FRAGMENT = gql`
   fragment TermsOfUse on ReservationUnitNode {
     id
-    termsOfUseFi
-    termsOfUseEn
-    termsOfUseSv
+    termsOfUseTranslations {
+      fi
+      en
+      sv
+    }
     serviceSpecificTerms {
       ...TermsOfUseTextFields
     }
@@ -26,9 +28,11 @@ export const CANCEL_REASON_FRAGMENT = gql`
   fragment CancelReasonFields on ReservationCancelReasonNode {
     id
     pk
-    reasonFi
-    reasonEn
-    reasonSv
+    reasonTranslations {
+      fi
+      en
+      sv
+    }
   }
 `;
 

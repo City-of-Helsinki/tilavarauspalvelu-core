@@ -10,8 +10,8 @@ export function useUnitOptions() {
   });
 
   const options = filterNonNullable(data?.unitsAll).map((unit) => ({
-    label: unit?.nameFi ?? "",
-    value: unit?.pk ?? 0,
+    label: unit.nameTranslations.fi || "-",
+    value: unit.pk ?? 0,
   }));
 
   return { options, loading };
@@ -23,7 +23,9 @@ export const UNITS_FILTER_QUERY = gql`
   query UnitsFilter($orderBy: [UnitOrderingChoices]) {
     unitsAll(onlyWithPermission: true, orderBy: $orderBy) {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
       pk
     }
   }

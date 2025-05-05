@@ -101,8 +101,8 @@ test("Render recurring reservation form with all but unit field disabled", async
   const listbox = view.getByRole("listbox");
 
   const units = createReservationUnits();
-  const name1 = units[0]?.nameFi;
-  const name2 = units[1]?.nameFi;
+  const name1 = units[0]?.nameTranslations?.fi;
+  const name2 = units[1]?.nameTranslations?.fi;
   if (name1 == null || name2 == null) {
     throw new Error("Reservation unit names not defined");
   }
@@ -156,7 +156,7 @@ async function selectUnit() {
 
   const listbox = screen.getByRole("listbox");
   const units = createReservationUnits();
-  const unitName = units[0]?.nameFi;
+  const unitName = units[0]?.nameTranslations?.fi;
   if (unitName == null) {
     throw new Error("Reservation unit name not defined");
   }

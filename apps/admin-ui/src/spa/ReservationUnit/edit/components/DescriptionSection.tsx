@@ -40,26 +40,26 @@ export function DescriptionSection({
 
   const equipmentOptions = filterNonNullable(equipments).map((n) => ({
     value: n.pk ?? -1,
-    label: n.nameFi ?? "no-name",
+    label: n.nameTranslations.fi || "-",
   }));
 
   const purposeOptions = filterNonNullable(
     purposes?.edges.map((n) => n?.node)
   ).map((n) => ({
     value: n.pk ?? -1,
-    label: n.nameFi ?? "no-name",
+    label: n.nameTranslations.fi || "-",
   }));
   const qualifierOptions = filterNonNullable(
     qualifiers?.edges.map((n) => n?.node)
   ).map((n) => ({
     value: n.pk ?? -1,
-    label: n.nameFi ?? "no-name",
+    label: n.nameTranslations.fi || "-",
   }));
   const reservationUnitTypeOptions = filterNonNullable(
     reservationUnitTypes?.edges.map((n) => n?.node)
   ).map((n) => ({
     value: n.pk ?? -1,
-    label: n.nameFi ?? "no-name",
+    label: n.nameTranslations.fi || "-",
   }));
 
   const hasErrors =

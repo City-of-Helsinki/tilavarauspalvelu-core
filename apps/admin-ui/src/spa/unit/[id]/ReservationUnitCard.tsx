@@ -44,7 +44,7 @@ export function ReservationUnitCard({
   if (reservationUnit.reservationUnitType) {
     infos.push({
       icon: <IconHome />,
-      value: reservationUnit.reservationUnitType.nameFi ?? "",
+      value: reservationUnit.reservationUnitType.nameTranslations.fi ?? "",
     });
   }
   if (reservationUnit.maxPersons) {
@@ -78,7 +78,7 @@ export function ReservationUnitCard({
 
   return (
     <Card
-      heading={reservationUnit.nameFi ?? ""}
+      heading={reservationUnit.nameTranslations.fi ?? ""}
       text={t(
         (reservationUnit?.resources?.length || 0) > 1
           ? "ReservationUnitCard.spaceAndResource"
@@ -97,12 +97,16 @@ export const RESERVATION_UNIT_CARD_FRAGMENT = gql`
   fragment ReservationUnitCard on ReservationUnitNode {
     id
     pk
-    nameFi
+    nameTranslations {
+      fi
+    }
     maxPersons
     isDraft
     reservationUnitType {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
     }
     images {
       ...Image

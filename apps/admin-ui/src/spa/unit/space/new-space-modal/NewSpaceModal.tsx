@@ -67,7 +67,8 @@ export function NewSpaceModal({
 
   const parentPk = watch("parent");
   const parentName =
-    unit?.spaces.find((space) => space.pk === parentPk)?.nameFi ?? null;
+    unit?.spaces.find((space) => space.pk === parentPk)?.nameTranslations.fi ??
+    null;
 
   return (
     <form noValidate onSubmit={form.handleSubmit(createSpaces)}>
@@ -101,7 +102,9 @@ export const NEW_RESOURCE_UNIT_FRAGMENT = gql`
     spaces {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
     }
   }
 `;

@@ -36,8 +36,16 @@ export function createReservationUnits(): CreateStaffReservationFragment[] {
 
 const emptyTerms = {
   id: "",
-  textFi: "",
-  nameFi: "",
+  textTranslations: {
+    fi: "",
+    en: "",
+    sv: "",
+  },
+  nameTranslations: {
+    fi: "",
+    en: "",
+    sv: "",
+  },
   termsType: TermsType.PaymentTerms,
 };
 
@@ -94,7 +102,9 @@ function createReservationUnitFragment({
 }): CreateStaffReservationFragment {
   return {
     authentication: Authentication.Weak,
-    nameFi,
+    nameTranslations: {
+      fi: nameFi,
+    },
     pk,
     id: base64encode(`ReservationUnitNode:${pk}`),
     minPersons: null,

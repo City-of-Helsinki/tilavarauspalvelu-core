@@ -55,7 +55,9 @@ export function ViewApplication({
       {tos && (
         <TermsBox
           id="preview.acceptTermsOfUse"
-          body={<Sanitize html={getTranslationSafe(tos, "text", lang)} />}
+          body={
+            <Sanitize html={getTranslationSafe(tos.textTranslations, lang)} />
+          }
           acceptLabel={t("application:preview.userAcceptsGeneralTerms")}
           accepted={isTermsAccepted?.general}
           setAccepted={
@@ -68,7 +70,9 @@ export function ViewApplication({
       {tos2 && (
         <TermsBox
           id="preview.acceptServiceSpecificTerms"
-          body={<Sanitize html={getTranslationSafe(tos2, "text", lang)} />}
+          body={
+            <Sanitize html={getTranslationSafe(tos2.textTranslations, lang)} />
+          }
           acceptLabel={t("application:preview.userAcceptsSpecificTerms")}
           accepted={isTermsAccepted?.specific}
           setAccepted={
@@ -102,9 +106,11 @@ export const APPLICATION_VIEW_FRAGMENT = gql`
         reservationUnit {
           id
           pk
-          nameFi
-          nameEn
-          nameSv
+          nameTranslations {
+            fi
+            en
+            sv
+          }
         }
       }
     }

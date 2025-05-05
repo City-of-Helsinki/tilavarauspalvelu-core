@@ -419,8 +419,8 @@ function AllocatedScheduleSection({
     allocatedReservationUnit != null &&
     allocatedReservationUnit.pk !== currentReservationUnit.pk;
 
-  const combinedName = `${allocatedReservationUnit?.nameFi ?? "-"}, ${
-    allocatedReservationUnit.unit?.nameFi ?? "-"
+  const combinedName = `${allocatedReservationUnit?.nameTranslations.fi || "-"}, ${
+    allocatedReservationUnit.unit?.nameTranslations.fi || "-"
   }`;
   return (
     <ScheduleCard key={allocatedTimeSlot.pk}>

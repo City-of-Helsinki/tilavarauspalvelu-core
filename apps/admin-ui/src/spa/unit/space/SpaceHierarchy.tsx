@@ -14,7 +14,7 @@ const Tree = styled.div`
   margin-bottom: var(--spacing-xs);
 `;
 
-type SpaceNode = Pick<NonNullable<Node>, "pk" | "nameFi" | "parent">;
+type SpaceNode = Pick<NonNullable<Node>, "pk" | "nameTranslations" | "parent">;
 
 function getParents(
   root: SpaceNode | null | undefined,
@@ -40,7 +40,9 @@ export function SpaceHierarchy({ space }: Props): JSX.Element {
 
   return (
     <Tree>
-      {tree.map((parent, i) => `${i !== 0 ? " › " : ""} ${parent.nameFi}`)}
+      {tree.map(
+        (parent, i) => `${i !== 0 ? " › " : ""} ${parent.nameTranslations.fi}`
+      )}
     </Tree>
   );
 }

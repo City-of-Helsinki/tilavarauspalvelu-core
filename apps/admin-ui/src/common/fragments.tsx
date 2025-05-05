@@ -17,7 +17,9 @@ export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
     purpose {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
     }
     application {
       id
@@ -30,11 +32,15 @@ export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
       reservationUnit {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         unit {
           id
           pk
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
       }
     }
@@ -81,7 +87,9 @@ export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
     reservationUnits {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
       bufferTimeBefore
       bufferTimeAfter
       unit {
@@ -103,12 +111,16 @@ export const RESERVATION_META_FRAGMENT = gql`
     }
     purpose {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
       pk
     }
     homeCity {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
       pk
     }
     numPersons

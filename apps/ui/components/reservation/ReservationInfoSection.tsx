@@ -63,7 +63,7 @@ function getReservationValue(
     return minimum && maximum ? `${minimum} - ${maximum}` : null;
   } else if (key === "purpose") {
     if (reservation.purpose != null) {
-      return getTranslationSafe(reservation.purpose, "name", lang);
+      return getTranslationSafe(reservation.purpose.nameTranslations, lang);
     }
     return null;
   } else if (key in reservation) {
@@ -82,9 +82,11 @@ export const RESERVATION_INFO_FRAGMENT = gql`
     purpose {
       id
       pk
-      nameFi
-      nameEn
-      nameSv
+      nameTranslations {
+        fi
+        en
+        sv
+      }
     }
     ageGroup {
       id

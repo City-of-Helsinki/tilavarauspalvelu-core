@@ -23,7 +23,7 @@ export function useDenyReasonOptions() {
     reservationDenyReasons?.edges.map((x) => x?.node)
   ).map((dr) => ({
     value: dr?.pk ?? 0,
-    label: dr?.reasonFi ?? "",
+    label: dr?.reasonTranslations.fi || "-",
   }));
 
   return { options: denyReasonOptions, loading };
@@ -38,7 +38,9 @@ export const RESERVATION_DENY_REASONS_QUERY = gql`
         node {
           id
           pk
-          reasonFi
+          reasonTranslations {
+            fi
+          }
         }
       }
     }

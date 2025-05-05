@@ -104,6 +104,6 @@ function SanitizedTerms({
     return null;
   }
 
-  const localTerms = getTranslationSafe(terms, "text", lang);
+  const localTerms = getTranslationSafe(terms.textTranslations, lang);
   return <Sanitize html={localTerms} />;
 }

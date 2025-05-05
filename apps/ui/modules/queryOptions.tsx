@@ -37,7 +37,7 @@ export async function queryOptions(
 
   const sortedAgeGroups = ageGroups.sort((a, b) => a.minimum - b.minimum);
   const purposeOptions = reservationPurposes.map((purpose) => ({
-    label: getTranslationSafe(purpose, "name", lang),
+    label: getTranslationSafe(purpose.nameTranslations, lang),
     value: purpose.pk ?? 0,
   }));
   const ageGroupOptions = [
@@ -49,7 +49,7 @@ export async function queryOptions(
     value: ageGroup.pk ?? 0,
   }));
   const homeCityOptions = cities.map((city) => ({
-    label: getTranslationSafe(city, "name", lang),
+    label: getTranslationSafe(city.nameTranslations, lang),
     value: city.pk ?? 0,
   }));
 

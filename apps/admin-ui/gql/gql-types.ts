@@ -41,9 +41,7 @@ export type AbilityGroupNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -78,17 +76,13 @@ export enum AccessTypeWithMultivalued {
 
 export type AddressNode = Node & {
   readonly city: Scalars["String"]["output"];
-  readonly cityEn: Maybe<Scalars["String"]["output"]>;
-  readonly cityFi: Maybe<Scalars["String"]["output"]>;
-  readonly citySv: Maybe<Scalars["String"]["output"]>;
+  readonly cityTranslations: Translatable;
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly postCode: Scalars["String"]["output"];
   readonly streetAddress: Scalars["String"]["output"];
-  readonly streetAddressEn: Maybe<Scalars["String"]["output"]>;
-  readonly streetAddressFi: Maybe<Scalars["String"]["output"]>;
-  readonly streetAddressSv: Maybe<Scalars["String"]["output"]>;
+  readonly streetAddressTranslations: Translatable;
 };
 
 export type AddressSerializerInput = {
@@ -379,21 +373,15 @@ export type ApplicationRoundNode = Node & {
   readonly applicationPeriodEnd: Scalars["DateTime"]["output"];
   readonly applicationsCount: Scalars["Int"]["output"];
   readonly criteria: Scalars["String"]["output"];
-  readonly criteriaEn: Maybe<Scalars["String"]["output"]>;
-  readonly criteriaFi: Maybe<Scalars["String"]["output"]>;
-  readonly criteriaSv: Maybe<Scalars["String"]["output"]>;
+  readonly criteriaTranslations: Translatable;
   readonly handledDate: Maybe<Scalars["DateTime"]["output"]>;
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly isSettingHandledAllowed: Scalars["Boolean"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly notesWhenApplying: Scalars["String"]["output"];
-  readonly notesWhenApplyingEn: Maybe<Scalars["String"]["output"]>;
-  readonly notesWhenApplyingFi: Maybe<Scalars["String"]["output"]>;
-  readonly notesWhenApplyingSv: Maybe<Scalars["String"]["output"]>;
+  readonly notesWhenApplyingTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly publicDisplayBegin: Scalars["DateTime"]["output"];
   readonly publicDisplayEnd: Scalars["DateTime"]["output"];
@@ -887,6 +875,7 @@ export type BannerNotificationNode = Node & {
   readonly messageEn: Maybe<Scalars["String"]["output"]>;
   readonly messageFi: Maybe<Scalars["String"]["output"]>;
   readonly messageSv: Maybe<Scalars["String"]["output"]>;
+  readonly messageTranslations: Translatable;
   readonly name: Scalars["String"]["output"];
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly state: BannerNotificationState;
@@ -977,9 +966,7 @@ export type CityNode = Node & {
   readonly id: Scalars["ID"]["output"];
   readonly municipalityCode: Scalars["String"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -1020,9 +1007,7 @@ export type EquipmentAllNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -1054,9 +1039,7 @@ export type EquipmentCategoryNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -1129,9 +1112,7 @@ export type EquipmentNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -1221,13 +1202,9 @@ export enum ImageType {
 
 export type LocationNode = Node & {
   readonly addressCity: Scalars["String"]["output"];
-  readonly addressCityEn: Maybe<Scalars["String"]["output"]>;
-  readonly addressCityFi: Maybe<Scalars["String"]["output"]>;
-  readonly addressCitySv: Maybe<Scalars["String"]["output"]>;
+  readonly addressCityTranslations: Translatable;
   readonly addressStreet: Scalars["String"]["output"];
-  readonly addressStreetEn: Maybe<Scalars["String"]["output"]>;
-  readonly addressStreetFi: Maybe<Scalars["String"]["output"]>;
-  readonly addressStreetSv: Maybe<Scalars["String"]["output"]>;
+  readonly addressStreetTranslations: Translatable;
   readonly addressZip: Scalars["String"]["output"];
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
@@ -1627,17 +1604,13 @@ export type OrganisationNode = Node & {
   readonly activeMembers: Maybe<Scalars["Int"]["output"]>;
   readonly address: Maybe<AddressNode>;
   readonly coreBusiness: Scalars["String"]["output"];
-  readonly coreBusinessEn: Maybe<Scalars["String"]["output"]>;
-  readonly coreBusinessFi: Maybe<Scalars["String"]["output"]>;
-  readonly coreBusinessSv: Maybe<Scalars["String"]["output"]>;
+  readonly coreBusinessTranslations: Translatable;
   readonly email: Scalars["String"]["output"];
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly identifier: Maybe<Scalars["String"]["output"]>;
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly organisationType: OrganizationTypeChoice;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly yearEstablished: Maybe<Scalars["Int"]["output"]>;
@@ -1849,9 +1822,7 @@ export type PurposeNode = Node & {
   readonly id: Scalars["ID"]["output"];
   readonly imageUrl: Maybe<Scalars["String"]["output"]>;
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly rank: Scalars["Int"]["output"];
   readonly smallUrl: Maybe<Scalars["String"]["output"]>;
@@ -1905,9 +1876,7 @@ export type QualifierNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -2931,9 +2900,7 @@ export type ReservationCancelReasonNode = Node & {
   readonly id: Scalars["ID"]["output"];
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly reason: Scalars["String"]["output"];
-  readonly reasonEn: Maybe<Scalars["String"]["output"]>;
-  readonly reasonFi: Maybe<Scalars["String"]["output"]>;
-  readonly reasonSv: Maybe<Scalars["String"]["output"]>;
+  readonly reasonTranslations: Translatable;
 };
 
 export type ReservationCancelReasonNodeConnection = {
@@ -3028,9 +2995,7 @@ export type ReservationDenyReasonNode = Node & {
   readonly id: Scalars["ID"]["output"];
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly reason: Scalars["String"]["output"];
-  readonly reasonEn: Maybe<Scalars["String"]["output"]>;
-  readonly reasonFi: Maybe<Scalars["String"]["output"]>;
-  readonly reasonSv: Maybe<Scalars["String"]["output"]>;
+  readonly reasonTranslations: Translatable;
 };
 
 export type ReservationDenyReasonNodeConnection = {
@@ -3296,9 +3261,7 @@ export type ReservationPurposeNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly rank: Scalars["Int"]["output"];
 };
@@ -3780,13 +3743,16 @@ export type ReservationUnitAccessTypeSerializerInput = {
 
 /** This Node should be kept to the bare minimum and never expose any relations to avoid performance issues. */
 export type ReservationUnitAllNode = Node & {
+  readonly descriptionTranslations: Translatable;
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly reservationCancelledInstructionsTranslations: Translatable;
+  readonly reservationConfirmedInstructionsTranslations: Translatable;
+  readonly reservationPendingInstructionsTranslations: Translatable;
+  readonly termsOfUseTranslations: Translatable;
 };
 
 export type ReservationUnitCancellationRuleNode = Node & {
@@ -3794,9 +3760,7 @@ export type ReservationUnitCancellationRuleNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -4103,9 +4067,7 @@ export type ReservationUnitNode = Node & {
   readonly contactInformation: Scalars["String"]["output"];
   readonly currentAccessType: Maybe<AccessType>;
   readonly description: Scalars["String"]["output"];
-  readonly descriptionEn: Maybe<Scalars["String"]["output"]>;
-  readonly descriptionFi: Maybe<Scalars["String"]["output"]>;
-  readonly descriptionSv: Maybe<Scalars["String"]["output"]>;
+  readonly descriptionTranslations: Translatable;
   readonly effectiveAccessType: Maybe<AccessType>;
   readonly equipments: ReadonlyArray<EquipmentNode>;
   readonly firstReservableDatetime: Maybe<Scalars["DateTime"]["output"]>;
@@ -4124,9 +4086,7 @@ export type ReservationUnitNode = Node & {
   readonly minPersons: Maybe<Scalars["Int"]["output"]>;
   readonly minReservationDuration: Maybe<Scalars["Duration"]["output"]>;
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly numActiveUserReservations: Scalars["Int"]["output"];
   readonly paymentMerchant: Maybe<PaymentMerchantNode>;
   readonly paymentProduct: Maybe<PaymentProductNode>;
@@ -4147,31 +4107,13 @@ export type ReservationUnitNode = Node & {
   readonly reservationBegins: Maybe<Scalars["DateTime"]["output"]>;
   readonly reservationBlockWholeDay: Scalars["Boolean"]["output"];
   readonly reservationCancelledInstructions: Scalars["String"]["output"];
-  readonly reservationCancelledInstructionsEn: Maybe<
-    Scalars["String"]["output"]
-  >;
-  readonly reservationCancelledInstructionsFi: Maybe<
-    Scalars["String"]["output"]
-  >;
-  readonly reservationCancelledInstructionsSv: Maybe<
-    Scalars["String"]["output"]
-  >;
+  readonly reservationCancelledInstructionsTranslations: Translatable;
   readonly reservationConfirmedInstructions: Scalars["String"]["output"];
-  readonly reservationConfirmedInstructionsEn: Maybe<
-    Scalars["String"]["output"]
-  >;
-  readonly reservationConfirmedInstructionsFi: Maybe<
-    Scalars["String"]["output"]
-  >;
-  readonly reservationConfirmedInstructionsSv: Maybe<
-    Scalars["String"]["output"]
-  >;
+  readonly reservationConfirmedInstructionsTranslations: Translatable;
   readonly reservationEnds: Maybe<Scalars["DateTime"]["output"]>;
   readonly reservationKind: ReservationKind;
   readonly reservationPendingInstructions: Scalars["String"]["output"];
-  readonly reservationPendingInstructionsEn: Maybe<Scalars["String"]["output"]>;
-  readonly reservationPendingInstructionsFi: Maybe<Scalars["String"]["output"]>;
-  readonly reservationPendingInstructionsSv: Maybe<Scalars["String"]["output"]>;
+  readonly reservationPendingInstructionsTranslations: Translatable;
   readonly reservationStartInterval: ReservationStartInterval;
   readonly reservationState: ReservationUnitReservationState;
   readonly reservationUnitType: Maybe<ReservationUnitTypeNode>;
@@ -4184,9 +4126,7 @@ export type ReservationUnitNode = Node & {
   readonly spaces: ReadonlyArray<SpaceNode>;
   readonly surfaceArea: Maybe<Scalars["Int"]["output"]>;
   readonly termsOfUse: Maybe<Scalars["String"]["output"]>;
-  readonly termsOfUseEn: Maybe<Scalars["String"]["output"]>;
-  readonly termsOfUseFi: Maybe<Scalars["String"]["output"]>;
-  readonly termsOfUseSv: Maybe<Scalars["String"]["output"]>;
+  readonly termsOfUseTranslations: Translatable;
   readonly unit: Maybe<UnitNode>;
   readonly uuid: Scalars["UUID"]["output"];
 };
@@ -4477,9 +4417,7 @@ export type ReservationUnitTypeNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly rank: Scalars["Int"]["output"];
 };
@@ -4852,9 +4790,7 @@ export type ResourceNode = Node & {
   readonly id: Scalars["ID"]["output"];
   readonly locationType: ResourceLocationType;
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly space: Maybe<SpaceNode>;
 };
@@ -4974,9 +4910,7 @@ export type SpaceNode = Node & {
   readonly id: Scalars["ID"]["output"];
   readonly maxPersons: Maybe<Scalars["Int"]["output"]>;
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly parent: Maybe<SpaceNode>;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly resources: ReadonlyArray<ResourceNode>;
@@ -5139,15 +5073,11 @@ export type TermsOfUseNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Maybe<Scalars["String"]["output"]>;
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["String"]["output"]>;
   readonly termsType: TermsType;
   readonly text: Scalars["String"]["output"];
-  readonly textEn: Maybe<Scalars["String"]["output"]>;
-  readonly textFi: Maybe<Scalars["String"]["output"]>;
-  readonly textSv: Maybe<Scalars["String"]["output"]>;
+  readonly textTranslations: Translatable;
 };
 
 export type TermsOfUseNodeConnection = {
@@ -5198,15 +5128,24 @@ export type TimeSlotType = {
   readonly end: Scalars["Time"]["output"];
 };
 
+export type Translatable = {
+  /** Translation in en. */
+  readonly en: Maybe<Scalars["String"]["output"]>;
+  /** Translation in fi. */
+  readonly fi: Maybe<Scalars["String"]["output"]>;
+  /** Translation in sv. */
+  readonly sv: Maybe<Scalars["String"]["output"]>;
+};
+
 /** This Node should be kept to the bare minimum and never expose any relations to avoid performance issues. */
 export type UnitAllNode = Node & {
+  readonly descriptionTranslations: Translatable;
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly shortDescriptionTranslations: Translatable;
   readonly tprekId: Maybe<Scalars["String"]["output"]>;
 };
 
@@ -5214,9 +5153,7 @@ export type UnitGroupNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly units: ReadonlyArray<UnitNode>;
 };
@@ -5258,25 +5195,19 @@ export type UnitGroupNodeEdge = {
 
 export type UnitNode = Node & {
   readonly description: Scalars["String"]["output"];
-  readonly descriptionEn: Maybe<Scalars["String"]["output"]>;
-  readonly descriptionFi: Maybe<Scalars["String"]["output"]>;
-  readonly descriptionSv: Maybe<Scalars["String"]["output"]>;
+  readonly descriptionTranslations: Translatable;
   readonly email: Scalars["String"]["output"];
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly location: Maybe<LocationNode>;
   readonly name: Scalars["String"]["output"];
-  readonly nameEn: Maybe<Scalars["String"]["output"]>;
-  readonly nameFi: Maybe<Scalars["String"]["output"]>;
-  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly nameTranslations: Translatable;
   readonly paymentMerchant: Maybe<PaymentMerchantNode>;
   readonly phone: Scalars["String"]["output"];
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly reservationUnits: ReadonlyArray<ReservationUnitNode>;
   readonly shortDescription: Scalars["String"]["output"];
-  readonly shortDescriptionEn: Maybe<Scalars["String"]["output"]>;
-  readonly shortDescriptionFi: Maybe<Scalars["String"]["output"]>;
-  readonly shortDescriptionSv: Maybe<Scalars["String"]["output"]>;
+  readonly shortDescriptionTranslations: Translatable;
   readonly spaces: ReadonlyArray<SpaceNode>;
   readonly tprekId: Maybe<Scalars["String"]["output"]>;
   readonly unitGroups: ReadonlyArray<UnitGroupNode>;
@@ -5697,10 +5628,11 @@ export type BannerNotificationsListAllQuery = {
         readonly id: string;
         readonly level: BannerNotificationLevel;
         readonly activeFrom: string | null;
-        readonly message: string;
-        readonly messageEn: string | null;
-        readonly messageFi: string | null;
-        readonly messageSv: string | null;
+        readonly messageTranslations: {
+          readonly fi: string | null;
+          readonly en: string | null;
+          readonly sv: string | null;
+        };
       } | null;
     } | null>;
   } | null;
@@ -5717,10 +5649,11 @@ export type BannerNotificationsListQuery = {
         readonly id: string;
         readonly level: BannerNotificationLevel;
         readonly activeFrom: string | null;
-        readonly message: string;
-        readonly messageEn: string | null;
-        readonly messageFi: string | null;
-        readonly messageSv: string | null;
+        readonly messageTranslations: {
+          readonly fi: string | null;
+          readonly en: string | null;
+          readonly sv: string | null;
+        };
       } | null;
     } | null>;
   } | null;
@@ -5737,12 +5670,16 @@ export type TermsOfUseQuery = {
         readonly id: string;
         readonly pk: string | null;
         readonly termsType: TermsType;
-        readonly nameFi: string | null;
-        readonly nameEn: string | null;
-        readonly nameSv: string | null;
-        readonly textFi: string | null;
-        readonly textEn: string | null;
-        readonly textSv: string | null;
+        readonly nameTranslations: {
+          readonly fi: string | null;
+          readonly en: string | null;
+          readonly sv: string | null;
+        };
+        readonly textTranslations: {
+          readonly fi: string | null;
+          readonly en: string | null;
+          readonly sv: string | null;
+        };
       } | null;
     } | null>;
   } | null;
@@ -5753,8 +5690,8 @@ export type ApplicationNameFragment = {
   readonly applicantType: ApplicantTypeChoice | null;
   readonly organisation: {
     readonly id: string;
-    readonly nameFi: string | null;
     readonly organisationType: OrganizationTypeChoice;
+    readonly nameTranslations: { readonly fi: string | null };
   } | null;
   readonly contactPerson: {
     readonly id: string;
@@ -5820,33 +5757,43 @@ export type ApplicantFragment = {
   readonly organisation: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
     readonly identifier: string | null;
     readonly organisationType: OrganizationTypeChoice;
-    readonly coreBusinessFi: string | null;
     readonly yearEstablished: number | null;
+    readonly nameTranslations: { readonly fi: string | null };
+    readonly coreBusinessTranslations: { readonly fi: string | null };
     readonly address: {
       readonly id: string;
       readonly pk: number | null;
       readonly postCode: string;
-      readonly streetAddressFi: string | null;
-      readonly cityFi: string | null;
+      readonly streetAddressTranslations: { readonly fi: string | null };
+      readonly cityTranslations: { readonly fi: string | null };
     } | null;
   } | null;
   readonly homeCity: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
+    readonly nameTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
   } | null;
   readonly billingAddress: {
     readonly id: string;
     readonly pk: number | null;
     readonly postCode: string;
-    readonly streetAddressFi: string | null;
-    readonly cityFi: string | null;
+    readonly streetAddressTranslations: { readonly fi: string | null };
+    readonly cityTranslations: { readonly fi: string | null };
   } | null;
+};
+
+export type AddressFieldsFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly postCode: string;
+  readonly streetAddressTranslations: { readonly fi: string | null };
+  readonly cityTranslations: { readonly fi: string | null };
 };
 
 export type ReserveeNameFieldsFragment = {
@@ -5909,43 +5856,55 @@ export type MetaFieldsFragment = {
   readonly purpose: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
+    readonly nameTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
   } | null;
   readonly homeCity: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameSv: string | null;
-    readonly nameEn: string | null;
+    readonly nameTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
   } | null;
 };
 
 export type TermsOfUseNameFieldsFragment = {
   readonly id: string;
-  readonly nameFi: string | null;
-  readonly nameEn: string | null;
-  readonly nameSv: string | null;
+  readonly nameTranslations: {
+    readonly fi: string | null;
+    readonly en: string | null;
+    readonly sv: string | null;
+  };
 };
 
 export type TermsOfUseTextFieldsFragment = {
   readonly id: string;
-  readonly textFi: string | null;
-  readonly textEn: string | null;
-  readonly textSv: string | null;
+  readonly textTranslations: {
+    readonly fi: string | null;
+    readonly en: string | null;
+    readonly sv: string | null;
+  };
 };
 
 export type TermsOfUseFieldsFragment = {
   readonly pk: string | null;
   readonly termsType: TermsType;
   readonly id: string;
-  readonly nameFi: string | null;
-  readonly nameEn: string | null;
-  readonly nameSv: string | null;
-  readonly textFi: string | null;
-  readonly textEn: string | null;
-  readonly textSv: string | null;
+  readonly nameTranslations: {
+    readonly fi: string | null;
+    readonly en: string | null;
+    readonly sv: string | null;
+  };
+  readonly textTranslations: {
+    readonly fi: string | null;
+    readonly en: string | null;
+    readonly sv: string | null;
+  };
 };
 
 export type PricingFieldsFragment = {
@@ -5972,30 +5931,28 @@ export type ImageFragment = {
 
 export type LocationFieldsFragment = {
   readonly id: string;
-  readonly addressStreetFi: string | null;
   readonly addressZip: string;
-  readonly addressCityFi: string | null;
-};
-
-export type LocationFieldsI18nFragment = {
-  readonly addressStreetEn: string | null;
-  readonly addressStreetSv: string | null;
-  readonly addressCityEn: string | null;
-  readonly addressCitySv: string | null;
-  readonly id: string;
-  readonly addressStreetFi: string | null;
-  readonly addressZip: string;
-  readonly addressCityFi: string | null;
+  readonly addressStreetTranslations: {
+    readonly fi: string | null;
+    readonly en: string | null;
+    readonly sv: string | null;
+  };
+  readonly addressCityTranslations: {
+    readonly fi: string | null;
+    readonly en: string | null;
+    readonly sv: string | null;
+  };
 };
 
 export type BannerNotificationCommonFragment = {
   readonly id: string;
   readonly level: BannerNotificationLevel;
   readonly activeFrom: string | null;
-  readonly message: string;
-  readonly messageEn: string | null;
-  readonly messageFi: string | null;
-  readonly messageSv: string | null;
+  readonly messageTranslations: {
+    readonly fi: string | null;
+    readonly en: string | null;
+    readonly sv: string | null;
+  };
 };
 
 export type MetadataSetsFragment = {
@@ -6036,7 +5993,7 @@ export type ApplicationSectionFieldsFragment = {
   readonly purpose: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
+    readonly nameTranslations: { readonly fi: string | null };
   } | null;
   readonly application: {
     readonly id: string;
@@ -6045,8 +6002,8 @@ export type ApplicationSectionFieldsFragment = {
     readonly applicantType: ApplicantTypeChoice | null;
     readonly organisation: {
       readonly id: string;
-      readonly nameFi: string | null;
       readonly organisationType: OrganizationTypeChoice;
+      readonly nameTranslations: { readonly fi: string | null };
     } | null;
     readonly contactPerson: {
       readonly id: string;
@@ -6061,11 +6018,11 @@ export type ApplicationSectionFieldsFragment = {
     readonly reservationUnit: {
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
       readonly unit: {
         readonly id: string;
         readonly pk: number | null;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
     };
   }>;
@@ -6122,9 +6079,9 @@ export type ReservationUnitReservationsFragment = {
   readonly reservationUnits: ReadonlyArray<{
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
     readonly bufferTimeBefore: number;
     readonly bufferTimeAfter: number;
+    readonly nameTranslations: { readonly fi: string | null };
     readonly unit: { readonly id: string; readonly pk: number | null } | null;
   }>;
   readonly paymentOrder: ReadonlyArray<{
@@ -6173,13 +6130,13 @@ export type ReservationMetaFieldsFragment = {
   } | null;
   readonly purpose: {
     readonly id: string;
-    readonly nameFi: string | null;
     readonly pk: number | null;
+    readonly nameTranslations: { readonly fi: string | null };
   } | null;
   readonly homeCity: {
     readonly id: string;
-    readonly nameFi: string | null;
     readonly pk: number | null;
+    readonly nameTranslations: { readonly fi: string | null };
   } | null;
 };
 
@@ -6362,26 +6319,6 @@ export type ReservationTypeFormFieldsFragment = {
   readonly id: string;
   readonly minPersons: number | null;
   readonly maxPersons: number | null;
-  readonly serviceSpecificTerms: {
-    readonly id: string;
-    readonly textFi: string | null;
-    readonly nameFi: string | null;
-  } | null;
-  readonly paymentTerms: {
-    readonly id: string;
-    readonly textFi: string | null;
-    readonly nameFi: string | null;
-  } | null;
-  readonly pricingTerms: {
-    readonly id: string;
-    readonly textFi: string | null;
-    readonly nameFi: string | null;
-  } | null;
-  readonly cancellationTerms: {
-    readonly id: string;
-    readonly textFi: string | null;
-    readonly nameFi: string | null;
-  } | null;
   readonly metadataSet: {
     readonly id: string;
     readonly requiredFields: ReadonlyArray<{
@@ -6392,6 +6329,26 @@ export type ReservationTypeFormFieldsFragment = {
       readonly id: string;
       readonly fieldName: string;
     }>;
+  } | null;
+  readonly serviceSpecificTerms: {
+    readonly id: string;
+    readonly textTranslations: { readonly fi: string | null };
+    readonly nameTranslations: { readonly fi: string | null };
+  } | null;
+  readonly paymentTerms: {
+    readonly id: string;
+    readonly textTranslations: { readonly fi: string | null };
+    readonly nameTranslations: { readonly fi: string | null };
+  } | null;
+  readonly pricingTerms: {
+    readonly id: string;
+    readonly textTranslations: { readonly fi: string | null };
+    readonly nameTranslations: { readonly fi: string | null };
+  } | null;
+  readonly cancellationTerms: {
+    readonly id: string;
+    readonly textTranslations: { readonly fi: string | null };
+    readonly nameTranslations: { readonly fi: string | null };
   } | null;
 };
 
@@ -6417,6 +6374,36 @@ export type ReservationToCopyFragment = {
     readonly weekdays: ReadonlyArray<number>;
     readonly beginDate: string | null;
     readonly endDate: string | null;
+  } | null;
+};
+
+export type TermsTranslationFiFragment = {
+  readonly id: string;
+  readonly textTranslations: { readonly fi: string | null };
+  readonly nameTranslations: { readonly fi: string | null };
+};
+
+export type ShowTosFragment = {
+  readonly id: string;
+  readonly serviceSpecificTerms: {
+    readonly id: string;
+    readonly textTranslations: { readonly fi: string | null };
+    readonly nameTranslations: { readonly fi: string | null };
+  } | null;
+  readonly paymentTerms: {
+    readonly id: string;
+    readonly textTranslations: { readonly fi: string | null };
+    readonly nameTranslations: { readonly fi: string | null };
+  } | null;
+  readonly pricingTerms: {
+    readonly id: string;
+    readonly textTranslations: { readonly fi: string | null };
+    readonly nameTranslations: { readonly fi: string | null };
+  } | null;
+  readonly cancellationTerms: {
+    readonly id: string;
+    readonly textTranslations: { readonly fi: string | null };
+    readonly nameTranslations: { readonly fi: string | null };
   } | null;
 };
 
@@ -6469,7 +6456,7 @@ export type ApplicantNameFieldsFragment = {
   } | null;
   readonly organisation: {
     readonly id: string;
-    readonly nameFi: string | null;
+    readonly nameTranslations: { readonly fi: string | null };
   } | null;
 };
 
@@ -6573,7 +6560,7 @@ export type ReservationDenyReasonsQuery = {
       readonly node: {
         readonly id: string;
         readonly pk: number | null;
-        readonly reasonFi: string | null;
+        readonly reasonTranslations: { readonly fi: string | null };
       } | null;
     } | null>;
   } | null;
@@ -6608,7 +6595,7 @@ export type OptionsQuery = {
       readonly node: {
         readonly id: string;
         readonly pk: number | null;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
     } | null>;
   } | null;
@@ -6626,8 +6613,8 @@ export type OptionsQuery = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly id: string;
-        readonly nameFi: string | null;
         readonly pk: number | null;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
     } | null>;
   } | null;
@@ -6700,8 +6687,8 @@ export type ReservationUnitsFilterParamsQueryVariables = Exact<{
 export type ReservationUnitsFilterParamsQuery = {
   readonly reservationUnitsAll: ReadonlyArray<{
     readonly id: string;
-    readonly nameFi: string | null;
     readonly pk: number | null;
+    readonly nameTranslations: { readonly fi: string | null };
   }> | null;
 };
 
@@ -6720,7 +6707,7 @@ export type ReservationUnitTypesFilterQuery = {
       readonly node: {
         readonly id: string;
         readonly pk: number | null;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
     } | null>;
   } | null;
@@ -6736,8 +6723,8 @@ export type UnitsFilterQueryVariables = Exact<{
 export type UnitsFilterQuery = {
   readonly unitsAll: ReadonlyArray<{
     readonly id: string;
-    readonly nameFi: string | null;
     readonly pk: number | null;
+    readonly nameTranslations: { readonly fi: string | null };
   }> | null;
 };
 
@@ -6759,7 +6746,7 @@ export type CurrentUserQuery = {
       readonly units: ReadonlyArray<{
         readonly id: string;
         readonly pk: number | null;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
       }>;
       readonly unitGroups: ReadonlyArray<{
         readonly id: string;
@@ -6780,25 +6767,33 @@ export type CurrentUserQuery = {
 export type ReservationUnitEditUnitFragment = {
   readonly id: string;
   readonly pk: number | null;
-  readonly nameFi: string | null;
   readonly spaces: ReadonlyArray<{
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
     readonly maxPersons: number | null;
     readonly surfaceArea: number | null;
+    readonly nameTranslations: { readonly fi: string | null };
     readonly resources: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
       readonly locationType: ResourceLocationType;
+      readonly nameTranslations: { readonly fi: string | null };
     }>;
   }>;
+  readonly nameTranslations: { readonly fi: string | null };
   readonly location: {
     readonly id: string;
-    readonly addressStreetFi: string | null;
     readonly addressZip: string;
-    readonly addressCityFi: string | null;
+    readonly addressStreetTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
+    readonly addressCityTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
   } | null;
 };
 
@@ -6814,26 +6809,11 @@ export type ReservationUnitEditQuery = {
     readonly reservationState: ReservationUnitReservationState;
     readonly haukiUrl: string | null;
     readonly requireReservationHandling: boolean;
-    readonly nameFi: string | null;
-    readonly nameSv: string | null;
-    readonly nameEn: string | null;
     readonly isDraft: boolean;
     readonly authentication: Authentication;
     readonly uuid: string;
     readonly requireAdultReservee: boolean;
-    readonly termsOfUseFi: string | null;
-    readonly termsOfUseSv: string | null;
-    readonly termsOfUseEn: string | null;
     readonly reservationKind: ReservationKind;
-    readonly reservationPendingInstructionsFi: string | null;
-    readonly reservationPendingInstructionsSv: string | null;
-    readonly reservationPendingInstructionsEn: string | null;
-    readonly reservationConfirmedInstructionsFi: string | null;
-    readonly reservationConfirmedInstructionsSv: string | null;
-    readonly reservationConfirmedInstructionsEn: string | null;
-    readonly reservationCancelledInstructionsFi: string | null;
-    readonly reservationCancelledInstructionsSv: string | null;
-    readonly reservationCancelledInstructionsEn: string | null;
     readonly maxReservationDuration: number | null;
     readonly minReservationDuration: number | null;
     readonly reservationStartInterval: ReservationStartInterval;
@@ -6843,9 +6823,6 @@ export type ReservationUnitEditQuery = {
     readonly minPersons: number | null;
     readonly maxPersons: number | null;
     readonly surfaceArea: number | null;
-    readonly descriptionFi: string | null;
-    readonly descriptionSv: string | null;
-    readonly descriptionEn: string | null;
     readonly reservationBlockWholeDay: boolean;
     readonly bufferTimeBefore: number;
     readonly bufferTimeAfter: number;
@@ -6868,20 +6845,25 @@ export type ReservationUnitEditQuery = {
       readonly id: string;
       readonly pk: number | null;
     } | null;
+    readonly nameTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
     readonly spaces: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
     }>;
     readonly resources: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
     }>;
     readonly purposes: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
     }>;
     readonly paymentTypes: ReadonlyArray<{
       readonly id: string;
@@ -6894,42 +6876,75 @@ export type ReservationUnitEditQuery = {
     readonly reservationUnitType: {
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
     } | null;
+    readonly termsOfUseTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
+    readonly reservationPendingInstructionsTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
+    readonly reservationConfirmedInstructionsTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
+    readonly reservationCancelledInstructionsTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
     readonly equipments: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
     }>;
     readonly qualifiers: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
     }>;
     readonly unit: {
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
       readonly spaces: ReadonlyArray<{
         readonly id: string;
         readonly pk: number | null;
-        readonly nameFi: string | null;
         readonly maxPersons: number | null;
         readonly surfaceArea: number | null;
+        readonly nameTranslations: { readonly fi: string | null };
         readonly resources: ReadonlyArray<{
           readonly id: string;
           readonly pk: number | null;
-          readonly nameFi: string | null;
           readonly locationType: ResourceLocationType;
+          readonly nameTranslations: { readonly fi: string | null };
         }>;
       }>;
+      readonly nameTranslations: { readonly fi: string | null };
       readonly location: {
         readonly id: string;
-        readonly addressStreetFi: string | null;
         readonly addressZip: string;
-        readonly addressCityFi: string | null;
+        readonly addressStreetTranslations: {
+          readonly fi: string | null;
+          readonly en: string | null;
+          readonly sv: string | null;
+        };
+        readonly addressCityTranslations: {
+          readonly fi: string | null;
+          readonly en: string | null;
+          readonly sv: string | null;
+        };
       } | null;
     } | null;
+    readonly descriptionTranslations: {
+      readonly fi: string | null;
+      readonly sv: string | null;
+      readonly en: string | null;
+    };
     readonly paymentTerms: {
       readonly id: string;
       readonly pk: string | null;
@@ -7032,9 +7047,8 @@ export type ReservationUnitEditorParametersQueryVariables = Exact<{
 export type ReservationUnitEditorParametersQuery = {
   readonly equipmentsAll: ReadonlyArray<{
     readonly id: string;
-    readonly name: string;
-    readonly nameFi: string | null;
     readonly pk: number | null;
+    readonly nameTranslations: { readonly fi: string | null };
   }> | null;
   readonly taxPercentages: {
     readonly edges: ReadonlyArray<{
@@ -7050,7 +7064,7 @@ export type ReservationUnitEditorParametersQuery = {
       readonly node: {
         readonly id: string;
         readonly pk: number | null;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
     } | null>;
   } | null;
@@ -7058,8 +7072,8 @@ export type ReservationUnitEditorParametersQuery = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly id: string;
-        readonly nameFi: string | null;
         readonly pk: number | null;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
     } | null>;
   } | null;
@@ -7068,8 +7082,8 @@ export type ReservationUnitEditorParametersQuery = {
       readonly node: {
         readonly id: string;
         readonly pk: string | null;
-        readonly nameFi: string | null;
         readonly termsType: TermsType;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
     } | null>;
   } | null;
@@ -7077,8 +7091,8 @@ export type ReservationUnitEditorParametersQuery = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly id: string;
-        readonly nameFi: string | null;
         readonly pk: number | null;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
     } | null>;
   } | null;
@@ -7095,8 +7109,8 @@ export type ReservationUnitEditorParametersQuery = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly id: string;
-        readonly nameFi: string | null;
         readonly pk: number | null;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
     } | null>;
   } | null;
@@ -7105,7 +7119,6 @@ export type ReservationUnitEditorParametersQuery = {
 export type ApplicationRoundCardFragment = {
   readonly id: string;
   readonly pk: number | null;
-  readonly nameFi: string | null;
   readonly status: ApplicationRoundStatusChoice;
   readonly applicationPeriodBegin: string;
   readonly applicationPeriodEnd: string;
@@ -7113,6 +7126,7 @@ export type ApplicationRoundCardFragment = {
   readonly reservationPeriodEnd: string;
   readonly reservationUnitCount: number;
   readonly applicationsCount: number;
+  readonly nameTranslations: { readonly fi: string | null };
 };
 
 export type RejectRestMutationVariables = Exact<{
@@ -7237,18 +7251,18 @@ export type ApplicationSectionAllocationsQuery = {
           readonly reservationUnit: {
             readonly id: string;
             readonly pk: number | null;
-            readonly nameFi: string | null;
+            readonly nameTranslations: { readonly fi: string | null };
             readonly unit: {
               readonly id: string;
               readonly pk: number | null;
-              readonly nameFi: string | null;
+              readonly nameTranslations: { readonly fi: string | null };
             } | null;
           };
         }>;
         readonly purpose: {
           readonly id: string;
           readonly pk: number | null;
-          readonly nameFi: string | null;
+          readonly nameTranslations: { readonly fi: string | null };
         } | null;
         readonly application: {
           readonly id: string;
@@ -7257,8 +7271,8 @@ export type ApplicationSectionAllocationsQuery = {
           readonly applicantType: ApplicantTypeChoice | null;
           readonly organisation: {
             readonly id: string;
-            readonly nameFi: string | null;
             readonly organisationType: OrganizationTypeChoice;
+            readonly nameTranslations: { readonly fi: string | null };
           } | null;
           readonly contactPerson: {
             readonly id: string;
@@ -7311,7 +7325,7 @@ export type AllApplicationEventsQuery = {
           readonly reservationUnit: {
             readonly id: string;
             readonly pk: number | null;
-            readonly nameFi: string | null;
+            readonly nameTranslations: { readonly fi: string | null };
           };
         }>;
       } | null;
@@ -7326,18 +7340,18 @@ export type ApplicationRoundFilterQueryVariables = Exact<{
 export type ApplicationRoundFilterQuery = {
   readonly applicationRound: {
     readonly id: string;
-    readonly nameFi: string | null;
     readonly status: ApplicationRoundStatusChoice;
     readonly reservationPeriodBegin: string;
     readonly reservationPeriodEnd: string;
+    readonly nameTranslations: { readonly fi: string | null };
     readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
       readonly unit: {
         readonly id: string;
         readonly pk: number | null;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
     }>;
   } | null;
@@ -7351,23 +7365,23 @@ export type ApplicationRoundCriteriaQuery = {
   readonly applicationRound: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
     readonly reservationUnitCount: number;
     readonly applicationPeriodBegin: string;
     readonly applicationPeriodEnd: string;
     readonly reservationPeriodBegin: string;
     readonly reservationPeriodEnd: string;
+    readonly nameTranslations: { readonly fi: string | null };
     readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
       readonly spaces: ReadonlyArray<{
         readonly id: string;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
       }>;
       readonly unit: {
         readonly id: string;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
     }>;
   } | null;
@@ -7381,21 +7395,21 @@ export type ApplicationRoundQuery = {
   readonly applicationRound: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
     readonly status: ApplicationRoundStatusChoice;
     readonly applicationPeriodBegin: string;
     readonly applicationPeriodEnd: string;
     readonly applicationsCount: number;
     readonly isSettingHandledAllowed: boolean;
     readonly reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice;
+    readonly nameTranslations: { readonly fi: string | null };
     readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
       readonly unit: {
         readonly id: string;
         readonly pk: number | null;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
     }>;
   } | null;
@@ -7473,8 +7487,8 @@ export type AllocatedTimeSlotsQuery = {
               readonly applicantType: ApplicantTypeChoice | null;
               readonly organisation: {
                 readonly id: string;
-                readonly nameFi: string | null;
                 readonly organisationType: OrganizationTypeChoice;
+                readonly nameTranslations: { readonly fi: string | null };
               } | null;
               readonly contactPerson: {
                 readonly id: string;
@@ -7485,10 +7499,10 @@ export type AllocatedTimeSlotsQuery = {
           };
           readonly reservationUnit: {
             readonly id: string;
-            readonly nameFi: string | null;
+            readonly nameTranslations: { readonly fi: string | null };
             readonly unit: {
               readonly id: string;
-              readonly nameFi: string | null;
+              readonly nameTranslations: { readonly fi: string | null };
             } | null;
           };
         };
@@ -7536,8 +7550,8 @@ export type AllocatedSectionsTableElementFragment = {
         readonly applicantType: ApplicantTypeChoice | null;
         readonly organisation: {
           readonly id: string;
-          readonly nameFi: string | null;
           readonly organisationType: OrganizationTypeChoice;
+          readonly nameTranslations: { readonly fi: string | null };
         } | null;
         readonly contactPerson: {
           readonly id: string;
@@ -7548,10 +7562,10 @@ export type AllocatedSectionsTableElementFragment = {
     };
     readonly reservationUnit: {
       readonly id: string;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
       readonly unit: {
         readonly id: string;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
     };
   };
@@ -7604,15 +7618,15 @@ export type ApplicationsQuery = {
               readonly unit: {
                 readonly id: string;
                 readonly pk: number | null;
-                readonly nameFi: string | null;
+                readonly nameTranslations: { readonly fi: string | null };
               } | null;
             };
           }>;
         }> | null;
         readonly organisation: {
           readonly id: string;
-          readonly nameFi: string | null;
           readonly organisationType: OrganizationTypeChoice;
+          readonly nameTranslations: { readonly fi: string | null };
         } | null;
         readonly contactPerson: {
           readonly id: string;
@@ -7715,18 +7729,18 @@ export type ApplicationSectionsQuery = {
           readonly reservationUnit: {
             readonly id: string;
             readonly pk: number | null;
-            readonly nameFi: string | null;
+            readonly nameTranslations: { readonly fi: string | null };
             readonly unit: {
               readonly id: string;
               readonly pk: number | null;
-              readonly nameFi: string | null;
+              readonly nameTranslations: { readonly fi: string | null };
             } | null;
           };
         }>;
         readonly purpose: {
           readonly id: string;
           readonly pk: number | null;
-          readonly nameFi: string | null;
+          readonly nameTranslations: { readonly fi: string | null };
         } | null;
         readonly application: {
           readonly id: string;
@@ -7735,8 +7749,8 @@ export type ApplicationSectionsQuery = {
           readonly applicantType: ApplicantTypeChoice | null;
           readonly organisation: {
             readonly id: string;
-            readonly nameFi: string | null;
             readonly organisationType: OrganizationTypeChoice;
+            readonly nameTranslations: { readonly fi: string | null };
           } | null;
           readonly contactPerson: {
             readonly id: string;
@@ -7792,18 +7806,18 @@ export type ApplicationSectionTableElementFragment = {
     readonly reservationUnit: {
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
       readonly unit: {
         readonly id: string;
         readonly pk: number | null;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
     };
   }>;
   readonly purpose: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
+    readonly nameTranslations: { readonly fi: string | null };
   } | null;
   readonly application: {
     readonly id: string;
@@ -7812,8 +7826,8 @@ export type ApplicationSectionTableElementFragment = {
     readonly applicantType: ApplicantTypeChoice | null;
     readonly organisation: {
       readonly id: string;
-      readonly nameFi: string | null;
       readonly organisationType: OrganizationTypeChoice;
+      readonly nameTranslations: { readonly fi: string | null };
     } | null;
     readonly contactPerson: {
       readonly id: string;
@@ -7850,15 +7864,15 @@ export type ApplicationsTableElementFragment = {
         readonly unit: {
           readonly id: string;
           readonly pk: number | null;
-          readonly nameFi: string | null;
+          readonly nameTranslations: { readonly fi: string | null };
         } | null;
       };
     }>;
   }> | null;
   readonly organisation: {
     readonly id: string;
-    readonly nameFi: string | null;
     readonly organisationType: OrganizationTypeChoice;
+    readonly nameTranslations: { readonly fi: string | null };
   } | null;
   readonly contactPerson: {
     readonly id: string;
@@ -7924,17 +7938,17 @@ export type RejectedOccurrencesQuery = {
                   } | null;
                   readonly organisation: {
                     readonly id: string;
-                    readonly nameFi: string | null;
+                    readonly nameTranslations: { readonly fi: string | null };
                   } | null;
                 };
               };
               readonly reservationUnit: {
                 readonly id: string;
-                readonly nameFi: string | null;
                 readonly pk: number | null;
+                readonly nameTranslations: { readonly fi: string | null };
                 readonly unit: {
                   readonly id: string;
-                  readonly nameFi: string | null;
+                  readonly nameTranslations: { readonly fi: string | null };
                 } | null;
               };
             };
@@ -7979,17 +7993,17 @@ export type RejectedOccurancesTableElementFragment = {
             } | null;
             readonly organisation: {
               readonly id: string;
-              readonly nameFi: string | null;
+              readonly nameTranslations: { readonly fi: string | null };
             } | null;
           };
         };
         readonly reservationUnit: {
           readonly id: string;
-          readonly nameFi: string | null;
           readonly pk: number | null;
+          readonly nameTranslations: { readonly fi: string | null };
           readonly unit: {
             readonly id: string;
-            readonly nameFi: string | null;
+            readonly nameTranslations: { readonly fi: string | null };
           } | null;
         };
       };
@@ -8004,21 +8018,21 @@ export type RejectedOccurancesTableElementFragment = {
 export type ApplicationRoundAdminFragment = {
   readonly id: string;
   readonly pk: number | null;
-  readonly nameFi: string | null;
   readonly status: ApplicationRoundStatusChoice;
   readonly applicationPeriodBegin: string;
   readonly applicationPeriodEnd: string;
   readonly applicationsCount: number;
   readonly isSettingHandledAllowed: boolean;
   readonly reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice;
+  readonly nameTranslations: { readonly fi: string | null };
   readonly reservationUnits: ReadonlyArray<{
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
+    readonly nameTranslations: { readonly fi: string | null };
     readonly unit: {
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
     } | null;
   }>;
 };
@@ -8045,7 +8059,6 @@ export type ApplicationRoundListElementFragment = {
   readonly statusTimestamp: string | null;
   readonly id: string;
   readonly pk: number | null;
-  readonly nameFi: string | null;
   readonly status: ApplicationRoundStatusChoice;
   readonly applicationPeriodBegin: string;
   readonly applicationPeriodEnd: string;
@@ -8053,6 +8066,7 @@ export type ApplicationRoundListElementFragment = {
   readonly reservationPeriodEnd: string;
   readonly reservationUnitCount: number;
   readonly applicationsCount: number;
+  readonly nameTranslations: { readonly fi: string | null };
 };
 
 export type ApplicationRoundListQueryVariables = Exact<{
@@ -8066,7 +8080,6 @@ export type ApplicationRoundListQuery = {
         readonly statusTimestamp: string | null;
         readonly id: string;
         readonly pk: number | null;
-        readonly nameFi: string | null;
         readonly status: ApplicationRoundStatusChoice;
         readonly applicationPeriodBegin: string;
         readonly applicationPeriodEnd: string;
@@ -8074,6 +8087,7 @@ export type ApplicationRoundListQuery = {
         readonly reservationPeriodEnd: string;
         readonly reservationUnitCount: number;
         readonly applicationsCount: number;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
     } | null>;
   } | null;
@@ -8102,7 +8116,7 @@ export type ApplicationPageSectionFragment = {
   readonly purpose: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
+    readonly nameTranslations: { readonly fi: string | null };
   } | null;
   readonly reservationUnitOptions: ReadonlyArray<{
     readonly id: string;
@@ -8116,11 +8130,11 @@ export type ApplicationPageSectionFragment = {
     readonly reservationUnit: {
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
       readonly unit: {
         readonly id: string;
         readonly pk: number | null;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
       readonly applicationRoundTimeSlots: ReadonlyArray<{
         readonly id: string;
@@ -8152,7 +8166,7 @@ export type ApplicationPageFieldsFragment = {
   readonly applicationRound: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
+    readonly nameTranslations: { readonly fi: string | null };
   };
   readonly applicationSections: ReadonlyArray<{
     readonly allocations: number;
@@ -8177,7 +8191,7 @@ export type ApplicationPageFieldsFragment = {
     readonly purpose: {
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
     } | null;
     readonly reservationUnitOptions: ReadonlyArray<{
       readonly id: string;
@@ -8191,11 +8205,11 @@ export type ApplicationPageFieldsFragment = {
       readonly reservationUnit: {
         readonly id: string;
         readonly pk: number | null;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
         readonly unit: {
           readonly id: string;
           readonly pk: number | null;
-          readonly nameFi: string | null;
+          readonly nameTranslations: { readonly fi: string | null };
         } | null;
         readonly applicationRoundTimeSlots: ReadonlyArray<{
           readonly id: string;
@@ -8227,32 +8241,34 @@ export type ApplicationPageFieldsFragment = {
   readonly organisation: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
     readonly identifier: string | null;
     readonly organisationType: OrganizationTypeChoice;
-    readonly coreBusinessFi: string | null;
     readonly yearEstablished: number | null;
+    readonly nameTranslations: { readonly fi: string | null };
+    readonly coreBusinessTranslations: { readonly fi: string | null };
     readonly address: {
       readonly id: string;
       readonly pk: number | null;
       readonly postCode: string;
-      readonly streetAddressFi: string | null;
-      readonly cityFi: string | null;
+      readonly streetAddressTranslations: { readonly fi: string | null };
+      readonly cityTranslations: { readonly fi: string | null };
     } | null;
   } | null;
   readonly homeCity: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
+    readonly nameTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
   } | null;
   readonly billingAddress: {
     readonly id: string;
     readonly pk: number | null;
     readonly postCode: string;
-    readonly streetAddressFi: string | null;
-    readonly cityFi: string | null;
+    readonly streetAddressTranslations: { readonly fi: string | null };
+    readonly cityTranslations: { readonly fi: string | null };
   } | null;
 };
 
@@ -8267,11 +8283,11 @@ export type ReservationUnitOptionFieldsFragment = {
   readonly reservationUnit: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
+    readonly nameTranslations: { readonly fi: string | null };
     readonly unit: {
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
     } | null;
     readonly applicationRoundTimeSlots: ReadonlyArray<{
       readonly id: string;
@@ -8303,7 +8319,7 @@ export type ApplicationAdminQuery = {
     readonly applicationRound: {
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
     };
     readonly applicationSections: ReadonlyArray<{
       readonly allocations: number;
@@ -8328,7 +8344,7 @@ export type ApplicationAdminQuery = {
       readonly purpose: {
         readonly id: string;
         readonly pk: number | null;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
       readonly reservationUnitOptions: ReadonlyArray<{
         readonly id: string;
@@ -8342,11 +8358,11 @@ export type ApplicationAdminQuery = {
         readonly reservationUnit: {
           readonly id: string;
           readonly pk: number | null;
-          readonly nameFi: string | null;
+          readonly nameTranslations: { readonly fi: string | null };
           readonly unit: {
             readonly id: string;
             readonly pk: number | null;
-            readonly nameFi: string | null;
+            readonly nameTranslations: { readonly fi: string | null };
           } | null;
           readonly applicationRoundTimeSlots: ReadonlyArray<{
             readonly id: string;
@@ -8378,32 +8394,34 @@ export type ApplicationAdminQuery = {
     readonly organisation: {
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
       readonly identifier: string | null;
       readonly organisationType: OrganizationTypeChoice;
-      readonly coreBusinessFi: string | null;
       readonly yearEstablished: number | null;
+      readonly nameTranslations: { readonly fi: string | null };
+      readonly coreBusinessTranslations: { readonly fi: string | null };
       readonly address: {
         readonly id: string;
         readonly pk: number | null;
         readonly postCode: string;
-        readonly streetAddressFi: string | null;
-        readonly cityFi: string | null;
+        readonly streetAddressTranslations: { readonly fi: string | null };
+        readonly cityTranslations: { readonly fi: string | null };
       } | null;
     } | null;
     readonly homeCity: {
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly nameEn: string | null;
-      readonly nameSv: string | null;
+      readonly nameTranslations: {
+        readonly fi: string | null;
+        readonly en: string | null;
+        readonly sv: string | null;
+      };
     } | null;
     readonly billingAddress: {
       readonly id: string;
       readonly pk: number | null;
       readonly postCode: string;
-      readonly streetAddressFi: string | null;
-      readonly cityFi: string | null;
+      readonly streetAddressTranslations: { readonly fi: string | null };
+      readonly cityTranslations: { readonly fi: string | null };
     } | null;
   } | null;
 };
@@ -8447,7 +8465,6 @@ export type ReservationUnitQueryVariables = Exact<{
 export type ReservationUnitQuery = {
   readonly reservationUnit: {
     readonly pk: number | null;
-    readonly nameFi: string | null;
     readonly reservationStartInterval: ReservationStartInterval;
     readonly authentication: Authentication;
     readonly bufferTimeBefore: number;
@@ -8455,26 +8472,7 @@ export type ReservationUnitQuery = {
     readonly id: string;
     readonly minPersons: number | null;
     readonly maxPersons: number | null;
-    readonly serviceSpecificTerms: {
-      readonly id: string;
-      readonly textFi: string | null;
-      readonly nameFi: string | null;
-    } | null;
-    readonly paymentTerms: {
-      readonly id: string;
-      readonly textFi: string | null;
-      readonly nameFi: string | null;
-    } | null;
-    readonly pricingTerms: {
-      readonly id: string;
-      readonly textFi: string | null;
-      readonly nameFi: string | null;
-    } | null;
-    readonly cancellationTerms: {
-      readonly id: string;
-      readonly textFi: string | null;
-      readonly nameFi: string | null;
-    } | null;
+    readonly nameTranslations: { readonly fi: string | null };
     readonly metadataSet: {
       readonly id: string;
       readonly requiredFields: ReadonlyArray<{
@@ -8486,12 +8484,31 @@ export type ReservationUnitQuery = {
         readonly fieldName: string;
       }>;
     } | null;
+    readonly serviceSpecificTerms: {
+      readonly id: string;
+      readonly textTranslations: { readonly fi: string | null };
+      readonly nameTranslations: { readonly fi: string | null };
+    } | null;
+    readonly paymentTerms: {
+      readonly id: string;
+      readonly textTranslations: { readonly fi: string | null };
+      readonly nameTranslations: { readonly fi: string | null };
+    } | null;
+    readonly pricingTerms: {
+      readonly id: string;
+      readonly textTranslations: { readonly fi: string | null };
+      readonly nameTranslations: { readonly fi: string | null };
+    } | null;
+    readonly cancellationTerms: {
+      readonly id: string;
+      readonly textTranslations: { readonly fi: string | null };
+      readonly nameTranslations: { readonly fi: string | null };
+    } | null;
   } | null;
 };
 
 export type CreateStaffReservationFragment = {
   readonly pk: number | null;
-  readonly nameFi: string | null;
   readonly reservationStartInterval: ReservationStartInterval;
   readonly authentication: Authentication;
   readonly bufferTimeBefore: number;
@@ -8499,26 +8516,7 @@ export type CreateStaffReservationFragment = {
   readonly id: string;
   readonly minPersons: number | null;
   readonly maxPersons: number | null;
-  readonly serviceSpecificTerms: {
-    readonly id: string;
-    readonly textFi: string | null;
-    readonly nameFi: string | null;
-  } | null;
-  readonly paymentTerms: {
-    readonly id: string;
-    readonly textFi: string | null;
-    readonly nameFi: string | null;
-  } | null;
-  readonly pricingTerms: {
-    readonly id: string;
-    readonly textFi: string | null;
-    readonly nameFi: string | null;
-  } | null;
-  readonly cancellationTerms: {
-    readonly id: string;
-    readonly textFi: string | null;
-    readonly nameFi: string | null;
-  } | null;
+  readonly nameTranslations: { readonly fi: string | null };
   readonly metadataSet: {
     readonly id: string;
     readonly requiredFields: ReadonlyArray<{
@@ -8529,6 +8527,26 @@ export type CreateStaffReservationFragment = {
       readonly id: string;
       readonly fieldName: string;
     }>;
+  } | null;
+  readonly serviceSpecificTerms: {
+    readonly id: string;
+    readonly textTranslations: { readonly fi: string | null };
+    readonly nameTranslations: { readonly fi: string | null };
+  } | null;
+  readonly paymentTerms: {
+    readonly id: string;
+    readonly textTranslations: { readonly fi: string | null };
+    readonly nameTranslations: { readonly fi: string | null };
+  } | null;
+  readonly pricingTerms: {
+    readonly id: string;
+    readonly textTranslations: { readonly fi: string | null };
+    readonly nameTranslations: { readonly fi: string | null };
+  } | null;
+  readonly cancellationTerms: {
+    readonly id: string;
+    readonly textTranslations: { readonly fi: string | null };
+    readonly nameTranslations: { readonly fi: string | null };
   } | null;
 };
 
@@ -8575,9 +8593,9 @@ export type ReservationUnitCalendarQuery = {
       readonly reservationUnits: ReadonlyArray<{
         readonly id: string;
         readonly pk: number | null;
-        readonly nameFi: string | null;
         readonly bufferTimeBefore: number;
         readonly bufferTimeAfter: number;
+        readonly nameTranslations: { readonly fi: string | null };
         readonly unit: {
           readonly id: string;
           readonly pk: number | null;
@@ -8616,9 +8634,9 @@ export type ReservationUnitCalendarQuery = {
     readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
       readonly bufferTimeBefore: number;
       readonly bufferTimeAfter: number;
+      readonly nameTranslations: { readonly fi: string | null };
       readonly unit: { readonly id: string; readonly pk: number | null } | null;
     }>;
     readonly paymentOrder: ReadonlyArray<{
@@ -8652,11 +8670,11 @@ export type ReservationUnitsByUnitQuery = {
     readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
       readonly bufferTimeBefore: number;
       readonly bufferTimeAfter: number;
       readonly isDraft: boolean;
       readonly authentication: Authentication;
+      readonly nameTranslations: { readonly fi: string | null };
       readonly spaces: ReadonlyArray<{
         readonly id: string;
         readonly pk: number | null;
@@ -8687,9 +8705,9 @@ export type ReservationUnitsByUnitQuery = {
     readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
       readonly bufferTimeBefore: number;
       readonly bufferTimeAfter: number;
+      readonly nameTranslations: { readonly fi: string | null };
       readonly unit: { readonly id: string; readonly pk: number | null } | null;
     }>;
     readonly paymentOrder: ReadonlyArray<{
@@ -8714,17 +8732,25 @@ export type UnitViewQuery = {
   readonly unit: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
+    readonly nameTranslations: { readonly fi: string | null };
     readonly location: {
       readonly id: string;
-      readonly addressStreetFi: string | null;
       readonly addressZip: string;
-      readonly addressCityFi: string | null;
+      readonly addressStreetTranslations: {
+        readonly fi: string | null;
+        readonly en: string | null;
+        readonly sv: string | null;
+      };
+      readonly addressCityTranslations: {
+        readonly fi: string | null;
+        readonly en: string | null;
+        readonly sv: string | null;
+      };
     } | null;
     readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
       readonly spaces: ReadonlyArray<{
         readonly id: string;
         readonly pk: number | null;
@@ -8740,15 +8766,15 @@ export type RecurringReservationUnitQueryVariables = Exact<{
 export type RecurringReservationUnitQuery = {
   readonly unit: {
     readonly id: string;
-    readonly nameFi: string | null;
     readonly pk: number | null;
+    readonly nameTranslations: { readonly fi: string | null };
     readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
       readonly reservationStartInterval: ReservationStartInterval;
       readonly bufferTimeBefore: number;
       readonly bufferTimeAfter: number;
+      readonly nameTranslations: { readonly fi: string | null };
     }>;
   } | null;
 };
@@ -8884,19 +8910,19 @@ export type SearchReservationUnitsQuery = {
       readonly node: {
         readonly id: string;
         readonly pk: number | null;
-        readonly nameFi: string | null;
         readonly maxPersons: number | null;
         readonly surfaceArea: number | null;
         readonly publishingState: ReservationUnitPublishingState;
         readonly reservationState: ReservationUnitReservationState;
+        readonly nameTranslations: { readonly fi: string | null };
         readonly unit: {
           readonly id: string;
-          readonly nameFi: string | null;
           readonly pk: number | null;
+          readonly nameTranslations: { readonly fi: string | null };
         } | null;
         readonly reservationUnitType: {
           readonly id: string;
-          readonly nameFi: string | null;
+          readonly nameTranslations: { readonly fi: string | null };
         } | null;
       } | null;
     } | null>;
@@ -8910,19 +8936,19 @@ export type SearchReservationUnitsQuery = {
 export type ReservationUnitTableElementFragment = {
   readonly id: string;
   readonly pk: number | null;
-  readonly nameFi: string | null;
   readonly maxPersons: number | null;
   readonly surfaceArea: number | null;
   readonly publishingState: ReservationUnitPublishingState;
   readonly reservationState: ReservationUnitReservationState;
+  readonly nameTranslations: { readonly fi: string | null };
   readonly unit: {
     readonly id: string;
-    readonly nameFi: string | null;
     readonly pk: number | null;
+    readonly nameTranslations: { readonly fi: string | null };
   } | null;
   readonly reservationUnitType: {
     readonly id: string;
-    readonly nameFi: string | null;
+    readonly nameTranslations: { readonly fi: string | null };
   } | null;
 };
 
@@ -8988,10 +9014,10 @@ export type ReservationListQuery = {
         readonly bufferTimeAfter: number;
         readonly reservationUnits: ReadonlyArray<{
           readonly id: string;
-          readonly nameFi: string | null;
+          readonly nameTranslations: { readonly fi: string | null };
           readonly unit: {
             readonly id: string;
-            readonly nameFi: string | null;
+            readonly nameTranslations: { readonly fi: string | null };
           } | null;
         }>;
         readonly paymentOrder: ReadonlyArray<{
@@ -9029,10 +9055,10 @@ export type ReservationTableElementFragment = {
   readonly bufferTimeAfter: number;
   readonly reservationUnits: ReadonlyArray<{
     readonly id: string;
-    readonly nameFi: string | null;
+    readonly nameTranslations: { readonly fi: string | null };
     readonly unit: {
       readonly id: string;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
     } | null;
   }>;
   readonly paymentOrder: ReadonlyArray<{
@@ -9336,35 +9362,15 @@ export type ReservationEditPageQuery = {
     readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
       readonly authentication: Authentication;
       readonly bufferTimeBefore: number;
       readonly bufferTimeAfter: number;
       readonly minPersons: number | null;
       readonly maxPersons: number | null;
+      readonly nameTranslations: { readonly fi: string | null };
       readonly unit: {
         readonly id: string;
-        readonly nameFi: string | null;
-      } | null;
-      readonly serviceSpecificTerms: {
-        readonly id: string;
-        readonly textFi: string | null;
-        readonly nameFi: string | null;
-      } | null;
-      readonly paymentTerms: {
-        readonly id: string;
-        readonly textFi: string | null;
-        readonly nameFi: string | null;
-      } | null;
-      readonly pricingTerms: {
-        readonly id: string;
-        readonly textFi: string | null;
-        readonly nameFi: string | null;
-      } | null;
-      readonly cancellationTerms: {
-        readonly id: string;
-        readonly textFi: string | null;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
       readonly metadataSet: {
         readonly id: string;
@@ -9376,6 +9382,26 @@ export type ReservationEditPageQuery = {
           readonly id: string;
           readonly fieldName: string;
         }>;
+      } | null;
+      readonly serviceSpecificTerms: {
+        readonly id: string;
+        readonly textTranslations: { readonly fi: string | null };
+        readonly nameTranslations: { readonly fi: string | null };
+      } | null;
+      readonly paymentTerms: {
+        readonly id: string;
+        readonly textTranslations: { readonly fi: string | null };
+        readonly nameTranslations: { readonly fi: string | null };
+      } | null;
+      readonly pricingTerms: {
+        readonly id: string;
+        readonly textTranslations: { readonly fi: string | null };
+        readonly nameTranslations: { readonly fi: string | null };
+      } | null;
+      readonly cancellationTerms: {
+        readonly id: string;
+        readonly textTranslations: { readonly fi: string | null };
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
     }>;
     readonly paymentOrder: ReadonlyArray<{
@@ -9396,13 +9422,13 @@ export type ReservationEditPageQuery = {
     } | null;
     readonly purpose: {
       readonly id: string;
-      readonly nameFi: string | null;
       readonly pk: number | null;
+      readonly nameTranslations: { readonly fi: string | null };
     } | null;
     readonly homeCity: {
       readonly id: string;
-      readonly nameFi: string | null;
       readonly pk: number | null;
+      readonly nameTranslations: { readonly fi: string | null };
     } | null;
   } | null;
 };
@@ -9491,46 +9517,26 @@ export type ReservationPageQuery = {
     } | null;
     readonly cancelReason: {
       readonly id: string;
-      readonly reasonFi: string | null;
+      readonly reasonTranslations: { readonly fi: string | null };
     } | null;
     readonly denyReason: {
       readonly id: string;
-      readonly reasonFi: string | null;
+      readonly reasonTranslations: { readonly fi: string | null };
     } | null;
     readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
       readonly reservationStartInterval: ReservationStartInterval;
-      readonly nameFi: string | null;
       readonly bufferTimeBefore: number;
       readonly bufferTimeAfter: number;
       readonly authentication: Authentication;
       readonly minPersons: number | null;
       readonly maxPersons: number | null;
+      readonly nameTranslations: { readonly fi: string | null };
       readonly unit: {
         readonly id: string;
-        readonly nameFi: string | null;
         readonly pk: number | null;
-      } | null;
-      readonly serviceSpecificTerms: {
-        readonly id: string;
-        readonly textFi: string | null;
-        readonly nameFi: string | null;
-      } | null;
-      readonly paymentTerms: {
-        readonly id: string;
-        readonly textFi: string | null;
-        readonly nameFi: string | null;
-      } | null;
-      readonly pricingTerms: {
-        readonly id: string;
-        readonly textFi: string | null;
-        readonly nameFi: string | null;
-      } | null;
-      readonly cancellationTerms: {
-        readonly id: string;
-        readonly textFi: string | null;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
       readonly pricings: ReadonlyArray<{
         readonly id: string;
@@ -9554,6 +9560,26 @@ export type ReservationPageQuery = {
           readonly id: string;
           readonly fieldName: string;
         }>;
+      } | null;
+      readonly serviceSpecificTerms: {
+        readonly id: string;
+        readonly textTranslations: { readonly fi: string | null };
+        readonly nameTranslations: { readonly fi: string | null };
+      } | null;
+      readonly paymentTerms: {
+        readonly id: string;
+        readonly textTranslations: { readonly fi: string | null };
+        readonly nameTranslations: { readonly fi: string | null };
+      } | null;
+      readonly pricingTerms: {
+        readonly id: string;
+        readonly textTranslations: { readonly fi: string | null };
+        readonly nameTranslations: { readonly fi: string | null };
+      } | null;
+      readonly cancellationTerms: {
+        readonly id: string;
+        readonly textTranslations: { readonly fi: string | null };
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
     }>;
     readonly paymentOrder: ReadonlyArray<{
@@ -9583,13 +9609,13 @@ export type ReservationPageQuery = {
     } | null;
     readonly purpose: {
       readonly id: string;
-      readonly nameFi: string | null;
       readonly pk: number | null;
+      readonly nameTranslations: { readonly fi: string | null };
     } | null;
     readonly homeCity: {
       readonly id: string;
-      readonly nameFi: string | null;
       readonly pk: number | null;
+      readonly nameTranslations: { readonly fi: string | null };
     } | null;
   } | null;
 };
@@ -9654,10 +9680,10 @@ export type SeriesPageQuery = {
     readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
       readonly bufferTimeBefore: number;
       readonly bufferTimeAfter: number;
       readonly reservationStartInterval: ReservationStartInterval;
+      readonly nameTranslations: { readonly fi: string | null };
     }>;
   } | null;
 };
@@ -9765,10 +9791,10 @@ export type CreateTagStringFragment = {
   readonly end: string;
   readonly reservationUnits: ReadonlyArray<{
     readonly id: string;
-    readonly nameFi: string | null;
+    readonly nameTranslations: { readonly fi: string | null };
     readonly unit: {
       readonly id: string;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
     } | null;
   }>;
   readonly recurringReservation: {
@@ -9840,8 +9866,8 @@ export type ResourceTableFragment = {
     readonly resources: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
       readonly locationType: ResourceLocationType;
+      readonly nameTranslations: { readonly fi: string | null };
     }>;
   }>;
 };
@@ -9854,12 +9880,20 @@ export type SpacesResourcesQuery = {
   readonly unit: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
+    readonly nameTranslations: { readonly fi: string | null };
     readonly location: {
       readonly id: string;
-      readonly addressStreetFi: string | null;
       readonly addressZip: string;
-      readonly addressCityFi: string | null;
+      readonly addressStreetTranslations: {
+        readonly fi: string | null;
+        readonly en: string | null;
+        readonly sv: string | null;
+      };
+      readonly addressCityTranslations: {
+        readonly fi: string | null;
+        readonly en: string | null;
+        readonly sv: string | null;
+      };
     } | null;
     readonly spaces: ReadonlyArray<{
       readonly id: string;
@@ -9867,14 +9901,14 @@ export type SpacesResourcesQuery = {
       readonly code: string;
       readonly surfaceArea: number | null;
       readonly maxPersons: number | null;
-      readonly nameFi: string | null;
       readonly resources: ReadonlyArray<{
         readonly id: string;
         readonly pk: number | null;
-        readonly nameFi: string | null;
         readonly locationType: ResourceLocationType;
+        readonly nameTranslations: { readonly fi: string | null };
       }>;
       readonly children: ReadonlyArray<{ readonly id: string }> | null;
+      readonly nameTranslations: { readonly fi: string | null };
     }>;
   } | null;
 };
@@ -9882,22 +9916,30 @@ export type SpacesResourcesQuery = {
 export type SpacesTableFragment = {
   readonly id: string;
   readonly pk: number | null;
-  readonly nameFi: string | null;
   readonly spaces: ReadonlyArray<{
     readonly id: string;
     readonly pk: number | null;
     readonly code: string;
     readonly surfaceArea: number | null;
     readonly maxPersons: number | null;
-    readonly nameFi: string | null;
     readonly resources: ReadonlyArray<{ readonly id: string }>;
     readonly children: ReadonlyArray<{ readonly id: string }> | null;
+    readonly nameTranslations: { readonly fi: string | null };
   }>;
+  readonly nameTranslations: { readonly fi: string | null };
   readonly location: {
     readonly id: string;
-    readonly addressStreetFi: string | null;
     readonly addressZip: string;
-    readonly addressCityFi: string | null;
+    readonly addressStreetTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
+    readonly addressCityTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
   } | null;
 };
 
@@ -9912,12 +9954,20 @@ export type DeleteSpaceMutation = {
 export type UnitSubpageHeadFragment = {
   readonly id: string;
   readonly pk: number | null;
-  readonly nameFi: string | null;
+  readonly nameTranslations: { readonly fi: string | null };
   readonly location: {
     readonly id: string;
-    readonly addressStreetFi: string | null;
     readonly addressZip: string;
-    readonly addressCityFi: string | null;
+    readonly addressStreetTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
+    readonly addressCityTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
   } | null;
 };
 
@@ -9937,11 +9987,11 @@ export type UnitListQuery = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly id: string;
-        readonly nameFi: string | null;
         readonly pk: number | null;
+        readonly nameTranslations: { readonly fi: string | null };
         readonly unitGroups: ReadonlyArray<{
           readonly id: string;
-          readonly nameFi: string | null;
+          readonly nameTranslations: { readonly fi: string | null };
         }>;
         readonly reservationUnits: ReadonlyArray<{
           readonly id: string;
@@ -9958,11 +10008,11 @@ export type UnitListQuery = {
 
 export type UnitTableElementFragment = {
   readonly id: string;
-  readonly nameFi: string | null;
   readonly pk: number | null;
+  readonly nameTranslations: { readonly fi: string | null };
   readonly unitGroups: ReadonlyArray<{
     readonly id: string;
-    readonly nameFi: string | null;
+    readonly nameTranslations: { readonly fi: string | null };
   }>;
   readonly reservationUnits: ReadonlyArray<{
     readonly id: string;
@@ -9973,12 +10023,12 @@ export type UnitTableElementFragment = {
 export type ReservationUnitCardFragment = {
   readonly id: string;
   readonly pk: number | null;
-  readonly nameFi: string | null;
   readonly maxPersons: number | null;
   readonly isDraft: boolean;
+  readonly nameTranslations: { readonly fi: string | null };
   readonly reservationUnitType: {
     readonly id: string;
-    readonly nameFi: string | null;
+    readonly nameTranslations: { readonly fi: string | null };
   } | null;
   readonly images: ReadonlyArray<{
     readonly id: string;
@@ -10000,18 +10050,18 @@ export type UnitPageQuery = {
   readonly unit: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
     readonly tprekId: string | null;
-    readonly shortDescriptionFi: string | null;
+    readonly nameTranslations: { readonly fi: string | null };
+    readonly shortDescriptionTranslations: { readonly fi: string | null };
     readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
       readonly maxPersons: number | null;
       readonly isDraft: boolean;
+      readonly nameTranslations: { readonly fi: string | null };
       readonly reservationUnitType: {
         readonly id: string;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
       } | null;
       readonly images: ReadonlyArray<{
         readonly id: string;
@@ -10027,13 +10077,21 @@ export type UnitPageQuery = {
     readonly spaces: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
     }>;
     readonly location: {
       readonly id: string;
-      readonly addressStreetFi: string | null;
       readonly addressZip: string;
-      readonly addressCityFi: string | null;
+      readonly addressStreetTranslations: {
+        readonly fi: string | null;
+        readonly en: string | null;
+        readonly sv: string | null;
+      };
+      readonly addressCityTranslations: {
+        readonly fi: string | null;
+        readonly en: string | null;
+        readonly sv: string | null;
+      };
     } | null;
   } | null;
 };
@@ -10055,20 +10113,30 @@ export type ResourceQuery = {
   readonly resource: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameSv: string | null;
-    readonly nameEn: string | null;
+    readonly nameTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
     readonly space: { readonly id: string; readonly pk: number | null } | null;
   } | null;
   readonly unit: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
+    readonly nameTranslations: { readonly fi: string | null };
     readonly location: {
       readonly id: string;
-      readonly addressStreetFi: string | null;
       readonly addressZip: string;
-      readonly addressCityFi: string | null;
+      readonly addressStreetTranslations: {
+        readonly fi: string | null;
+        readonly en: string | null;
+        readonly sv: string | null;
+      };
+      readonly addressCityTranslations: {
+        readonly fi: string | null;
+        readonly en: string | null;
+        readonly sv: string | null;
+      };
     } | null;
   } | null;
 };
@@ -10091,7 +10159,7 @@ export type UnitSpacesQuery = {
     readonly spaces: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
       readonly parent: {
         readonly id: string;
         readonly pk: number | null;
@@ -10116,39 +10184,49 @@ export type SpaceQuery = {
   readonly space: {
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameSv: string | null;
-    readonly nameEn: string | null;
     readonly code: string;
     readonly surfaceArea: number | null;
     readonly maxPersons: number | null;
+    readonly nameTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
     readonly unit: {
       readonly id: string;
-      readonly descriptionFi: string | null;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly descriptionTranslations: { readonly fi: string | null };
       readonly spaces: ReadonlyArray<{
         readonly id: string;
         readonly pk: number | null;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
       }>;
+      readonly nameTranslations: { readonly fi: string | null };
       readonly location: {
         readonly id: string;
-        readonly addressStreetFi: string | null;
         readonly addressZip: string;
-        readonly addressCityFi: string | null;
+        readonly addressStreetTranslations: {
+          readonly fi: string | null;
+          readonly en: string | null;
+          readonly sv: string | null;
+        };
+        readonly addressCityTranslations: {
+          readonly fi: string | null;
+          readonly en: string | null;
+          readonly sv: string | null;
+        };
       } | null;
     } | null;
     readonly parent: {
       readonly id: string;
       readonly pk: number | null;
-      readonly nameFi: string | null;
+      readonly nameTranslations: { readonly fi: string | null };
       readonly parent: {
         readonly id: string;
-        readonly nameFi: string | null;
+        readonly nameTranslations: { readonly fi: string | null };
         readonly parent: {
           readonly id: string;
-          readonly nameFi: string | null;
+          readonly nameTranslations: { readonly fi: string | null };
         } | null;
       } | null;
     } | null;
@@ -10158,29 +10236,45 @@ export type SpaceQuery = {
 export type UnitResourceInfoFieldsFragment = {
   readonly id: string;
   readonly pk: number | null;
-  readonly nameFi: string | null;
+  readonly nameTranslations: { readonly fi: string | null };
   readonly location: {
     readonly id: string;
-    readonly addressStreetFi: string | null;
     readonly addressZip: string;
-    readonly addressCityFi: string | null;
+    readonly addressStreetTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
+    readonly addressCityTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
   } | null;
 };
 
 export type NewResourceUnitFieldsFragment = {
   readonly id: string;
   readonly pk: number | null;
-  readonly nameFi: string | null;
   readonly spaces: ReadonlyArray<{
     readonly id: string;
     readonly pk: number | null;
-    readonly nameFi: string | null;
+    readonly nameTranslations: { readonly fi: string | null };
   }>;
+  readonly nameTranslations: { readonly fi: string | null };
   readonly location: {
     readonly id: string;
-    readonly addressStreetFi: string | null;
     readonly addressZip: string;
-    readonly addressCityFi: string | null;
+    readonly addressStreetTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
+    readonly addressCityTranslations: {
+      readonly fi: string | null;
+      readonly en: string | null;
+      readonly sv: string | null;
+    };
   } | null;
 };
 
@@ -10238,16 +10332,20 @@ export const MetaFieldsFragmentDoc = gql`
     purpose {
       id
       pk
-      nameFi
-      nameEn
-      nameSv
+      nameTranslations {
+        fi
+        en
+        sv
+      }
     }
     homeCity {
       id
       pk
-      nameFi
-      nameSv
-      nameEn
+      nameTranslations {
+        fi
+        en
+        sv
+      }
     }
   }
   ${ReserveeNameFieldsFragmentDoc}
@@ -10256,17 +10354,21 @@ export const MetaFieldsFragmentDoc = gql`
 export const TermsOfUseNameFieldsFragmentDoc = gql`
   fragment TermsOfUseNameFields on TermsOfUseNode {
     id
-    nameFi
-    nameEn
-    nameSv
+    nameTranslations {
+      fi
+      en
+      sv
+    }
   }
 `;
 export const TermsOfUseTextFieldsFragmentDoc = gql`
   fragment TermsOfUseTextFields on TermsOfUseNode {
     id
-    textFi
-    textEn
-    textSv
+    textTranslations {
+      fi
+      en
+      sv
+    }
   }
 `;
 export const TermsOfUseFieldsFragmentDoc = gql`
@@ -10279,33 +10381,16 @@ export const TermsOfUseFieldsFragmentDoc = gql`
   ${TermsOfUseNameFieldsFragmentDoc}
   ${TermsOfUseTextFieldsFragmentDoc}
 `;
-export const LocationFieldsFragmentDoc = gql`
-  fragment LocationFields on LocationNode {
-    id
-    addressStreetFi
-    addressZip
-    addressCityFi
-  }
-`;
-export const LocationFieldsI18nFragmentDoc = gql`
-  fragment LocationFieldsI18n on LocationNode {
-    ...LocationFields
-    addressStreetEn
-    addressStreetSv
-    addressCityEn
-    addressCitySv
-  }
-  ${LocationFieldsFragmentDoc}
-`;
 export const BannerNotificationCommonFragmentDoc = gql`
   fragment BannerNotificationCommon on BannerNotificationNode {
     id
     level
     activeFrom
-    message
-    messageEn
-    messageFi
-    messageSv
+    messageTranslations {
+      fi
+      en
+      sv
+    }
   }
 `;
 export const AllocatedTimeSlotFragmentDoc = gql`
@@ -10368,7 +10453,9 @@ export const ReservationUnitReservationsFragmentDoc = gql`
     reservationUnits {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
       bufferTimeBefore
       bufferTimeAfter
       unit {
@@ -10391,12 +10478,16 @@ export const ReservationMetaFieldsFragmentDoc = gql`
     }
     purpose {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
       pk
     }
     homeCity {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
       pk
     }
     numPersons
@@ -10497,11 +10588,29 @@ export const CalendarReservationFragmentDoc = gql`
     }
   }
 `;
+export const LocationFieldsFragmentDoc = gql`
+  fragment LocationFields on LocationNode {
+    id
+    addressStreetTranslations {
+      fi
+      en
+      sv
+    }
+    addressZip
+    addressCityTranslations {
+      fi
+      en
+      sv
+    }
+  }
+`;
 export const UnitSubpageHeadFragmentDoc = gql`
   fragment UnitSubpageHead on UnitNode {
     id
     pk
-    nameFi
+    nameTranslations {
+      fi
+    }
     location {
       ...LocationFields
     }
@@ -10514,13 +10623,17 @@ export const ReservationUnitEditUnitFragmentDoc = gql`
     spaces {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
       maxPersons
       surfaceArea
       resources {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         locationType
       }
     }
@@ -10533,7 +10646,9 @@ export const ApplicationNameFragmentDoc = gql`
     applicantType
     organisation {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
       organisationType
     }
     contactPerson {
@@ -10581,10 +10696,14 @@ export const AllocatedSectionsTableElementFragmentDoc = gql`
       }
       reservationUnit {
         id
-        nameFi
+        nameTranslations {
+          fi
+        }
         unit {
           id
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
       }
     }
@@ -10629,7 +10748,9 @@ export const ApplicationSectionFieldsFragmentDoc = gql`
     purpose {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
     }
     application {
       id
@@ -10642,11 +10763,15 @@ export const ApplicationSectionFieldsFragmentDoc = gql`
       reservationUnit {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         unit {
           id
           pk
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
       }
     }
@@ -10697,7 +10822,9 @@ export const ApplicationsTableElementFragmentDoc = gql`
           unit {
             id
             pk
-            nameFi
+            nameTranslations {
+              fi
+            }
           }
         }
       }
@@ -10717,7 +10844,9 @@ export const ApplicantNameFieldsFragmentDoc = gql`
     }
     organisation {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
     }
   }
 `;
@@ -10749,11 +10878,15 @@ export const RejectedOccurancesTableElementFragmentDoc = gql`
           }
           reservationUnit {
             id
-            nameFi
+            nameTranslations {
+              fi
+            }
             pk
             unit {
               id
-              nameFi
+              nameTranslations {
+                fi
+              }
             }
           }
         }
@@ -10770,7 +10903,9 @@ export const ApplicationRoundAdminFragmentDoc = gql`
   fragment ApplicationRoundAdmin on ApplicationRoundNode {
     id
     pk
-    nameFi
+    nameTranslations {
+      fi
+    }
     status
     applicationPeriodBegin
     applicationPeriodEnd
@@ -10780,11 +10915,15 @@ export const ApplicationRoundAdminFragmentDoc = gql`
     reservationUnits {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
       unit {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
     }
   }
@@ -10793,7 +10932,9 @@ export const ApplicationRoundCardFragmentDoc = gql`
   fragment ApplicationRoundCard on ApplicationRoundNode {
     id
     pk
-    nameFi
+    nameTranslations {
+      fi
+    }
     status
     applicationPeriodBegin
     applicationPeriodEnd
@@ -10809,6 +10950,19 @@ export const ApplicationRoundListElementFragmentDoc = gql`
     statusTimestamp
   }
   ${ApplicationRoundCardFragmentDoc}
+`;
+export const AddressFieldsFragmentDoc = gql`
+  fragment AddressFields on AddressNode {
+    id
+    pk
+    postCode
+    streetAddressTranslations {
+      fi
+    }
+    cityTranslations {
+      fi
+    }
+  }
 `;
 export const ApplicantFragmentDoc = gql`
   fragment Applicant on ApplicationNode {
@@ -10827,34 +10981,33 @@ export const ApplicantFragmentDoc = gql`
     organisation {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
       identifier
       organisationType
-      coreBusinessFi
+      coreBusinessTranslations {
+        fi
+      }
       yearEstablished
       address {
-        id
-        pk
-        postCode
-        streetAddressFi
-        cityFi
+        ...AddressFields
       }
     }
     homeCity {
       id
       pk
-      nameFi
-      nameEn
-      nameSv
+      nameTranslations {
+        fi
+        en
+        sv
+      }
     }
     billingAddress {
-      id
-      pk
-      postCode
-      streetAddressFi
-      cityFi
+      ...AddressFields
     }
   }
+  ${AddressFieldsFragmentDoc}
 `;
 export const SuitableTimeFragmentDoc = gql`
   fragment SuitableTime on SuitableTimeRangeNode {
@@ -10890,11 +11043,15 @@ export const ReservationUnitOptionFieldsFragmentDoc = gql`
     reservationUnit {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
       unit {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
       applicationRoundTimeSlots {
         ...ApplicationRoundTimeSlots
@@ -10912,7 +11069,9 @@ export const ApplicationPageSectionFragmentDoc = gql`
     purpose {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
     }
     allocations
     reservationUnitOptions {
@@ -10935,7 +11094,9 @@ export const ApplicationPageFieldsFragmentDoc = gql`
     applicationRound {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
     }
     applicationSections {
       ...ApplicationPageSection
@@ -10963,39 +11124,56 @@ export const MetadataSetsFragmentDoc = gql`
     }
   }
 `;
+export const TermsTranslationFiFragmentDoc = gql`
+  fragment TermsTranslationFi on TermsOfUseNode {
+    id
+    textTranslations {
+      fi
+    }
+    nameTranslations {
+      fi
+    }
+  }
+`;
+export const ShowTosFragmentDoc = gql`
+  fragment ShowTOS on ReservationUnitNode {
+    id
+    serviceSpecificTerms {
+      id
+      ...TermsTranslationFi
+    }
+    paymentTerms {
+      id
+      ...TermsTranslationFi
+    }
+    pricingTerms {
+      id
+      ...TermsTranslationFi
+    }
+    cancellationTerms {
+      id
+      ...TermsTranslationFi
+    }
+  }
+  ${TermsTranslationFiFragmentDoc}
+`;
 export const ReservationTypeFormFieldsFragmentDoc = gql`
   fragment ReservationTypeFormFields on ReservationUnitNode {
     ...MetadataSets
     authentication
     bufferTimeBefore
     bufferTimeAfter
-    serviceSpecificTerms {
-      id
-      textFi
-      nameFi
-    }
-    paymentTerms {
-      id
-      textFi
-      nameFi
-    }
-    pricingTerms {
-      id
-      textFi
-      nameFi
-    }
-    cancellationTerms {
-      id
-      textFi
-      nameFi
-    }
+    ...ShowTOS
   }
   ${MetadataSetsFragmentDoc}
+  ${ShowTosFragmentDoc}
 `;
 export const CreateStaffReservationFragmentDoc = gql`
   fragment CreateStaffReservation on ReservationUnitNode {
     pk
-    nameFi
+    nameTranslations {
+      fi
+    }
     reservationStartInterval
     ...ReservationTypeFormFields
   }
@@ -11017,15 +11195,21 @@ export const ReservationUnitTableElementFragmentDoc = gql`
   fragment ReservationUnitTableElement on ReservationUnitNode {
     id
     pk
-    nameFi
+    nameTranslations {
+      fi
+    }
     unit {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
       pk
     }
     reservationUnitType {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
     }
     maxPersons
     surfaceArea
@@ -11039,10 +11223,14 @@ export const ReservationTableElementFragmentDoc = gql`
     name
     reservationUnits {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
       unit {
         id
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
     }
   }
@@ -11234,10 +11422,14 @@ export const CreateTagStringFragmentDoc = gql`
     end
     reservationUnits {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
       unit {
         id
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
     }
     recurringReservation {
@@ -11269,7 +11461,9 @@ export const ResourceTableFragmentDoc = gql`
       resources {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         locationType
       }
     }
@@ -11279,7 +11473,9 @@ export const UnitResourceInfoFieldsFragmentDoc = gql`
   fragment UnitResourceInfoFields on UnitNode {
     id
     pk
-    nameFi
+    nameTranslations {
+      fi
+    }
     location {
       ...LocationFields
     }
@@ -11292,7 +11488,9 @@ export const NewResourceUnitFieldsFragmentDoc = gql`
     spaces {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
     }
   }
   ${UnitResourceInfoFieldsFragmentDoc}
@@ -11319,11 +11517,15 @@ export const SpacesTableFragmentDoc = gql`
 export const UnitTableElementFragmentDoc = gql`
   fragment UnitTableElement on UnitNode {
     id
-    nameFi
+    nameTranslations {
+      fi
+    }
     pk
     unitGroups {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
     }
     reservationUnits {
       id
@@ -11345,12 +11547,16 @@ export const ReservationUnitCardFragmentDoc = gql`
   fragment ReservationUnitCard on ReservationUnitNode {
     id
     pk
-    nameFi
+    nameTranslations {
+      fi
+    }
     maxPersons
     isDraft
     reservationUnitType {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
     }
     images {
       ...Image
@@ -12365,7 +12571,9 @@ export const ReservationDenyReasonsDocument = gql`
         node {
           id
           pk
-          reasonFi
+          reasonTranslations {
+            fi
+          }
         }
       }
     }
@@ -12546,7 +12754,9 @@ export const OptionsDocument = gql`
         node {
           id
           pk
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
       }
     }
@@ -12564,8 +12774,10 @@ export const OptionsDocument = gql`
       edges {
         node {
           id
-          nameFi
           pk
+          nameTranslations {
+            fi
+          }
         }
       }
     }
@@ -12727,8 +12939,10 @@ export const ReservationUnitsFilterParamsDocument = gql`
       orderBy: $orderBy
     ) {
       id
-      nameFi
       pk
+      nameTranslations {
+        fi
+      }
     }
   }
 `;
@@ -12814,7 +13028,9 @@ export const ReservationUnitTypesFilterDocument = gql`
         node {
           id
           pk
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
       }
       totalCount
@@ -12897,7 +13113,9 @@ export const UnitsFilterDocument = gql`
   query UnitsFilter($orderBy: [UnitOrderingChoices]) {
     unitsAll(onlyWithPermission: true, orderBy: $orderBy) {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
       pk
     }
   }
@@ -12987,7 +13205,9 @@ export const CurrentUserDocument = gql`
         units {
           id
           pk
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
         unitGroups {
           id
@@ -13091,25 +13311,33 @@ export const ReservationUnitEditDocument = gql`
         pk
       }
       requireReservationHandling
-      nameFi
-      nameSv
-      nameEn
+      nameTranslations {
+        fi
+        en
+        sv
+      }
       isDraft
       authentication
       spaces {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
       resources {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
       purposes {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
       paymentTypes {
         id
@@ -13122,23 +13350,33 @@ export const ReservationUnitEditDocument = gql`
       reservationUnitType {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
       uuid
       requireAdultReservee
-      termsOfUseFi
-      termsOfUseSv
-      termsOfUseEn
+      termsOfUseTranslations {
+        fi
+        en
+        sv
+      }
       reservationKind
-      reservationPendingInstructionsFi
-      reservationPendingInstructionsSv
-      reservationPendingInstructionsEn
-      reservationConfirmedInstructionsFi
-      reservationConfirmedInstructionsSv
-      reservationConfirmedInstructionsEn
-      reservationCancelledInstructionsFi
-      reservationCancelledInstructionsSv
-      reservationCancelledInstructionsEn
+      reservationPendingInstructionsTranslations {
+        fi
+        en
+        sv
+      }
+      reservationConfirmedInstructionsTranslations {
+        fi
+        en
+        sv
+      }
+      reservationCancelledInstructionsTranslations {
+        fi
+        en
+        sv
+      }
       maxReservationDuration
       minReservationDuration
       reservationStartInterval
@@ -13148,12 +13386,16 @@ export const ReservationUnitEditDocument = gql`
       equipments {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
       qualifiers {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
       }
       unit {
         ...ReservationUnitEditUnit
@@ -13161,9 +13403,11 @@ export const ReservationUnitEditDocument = gql`
       minPersons
       maxPersons
       surfaceArea
-      descriptionFi
-      descriptionSv
-      descriptionEn
+      descriptionTranslations {
+        fi
+        sv
+        en
+      }
       paymentTerms {
         id
         pk
@@ -13555,9 +13799,10 @@ export const ReservationUnitEditorParametersDocument = gql`
   ) {
     equipmentsAll(orderBy: [$equipmentsOrderBy]) {
       id
-      name
-      nameFi
       pk
+      nameTranslations {
+        fi
+      }
     }
     taxPercentages {
       edges {
@@ -13573,7 +13818,9 @@ export const ReservationUnitEditorParametersDocument = gql`
         node {
           id
           pk
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
       }
     }
@@ -13581,8 +13828,10 @@ export const ReservationUnitEditorParametersDocument = gql`
       edges {
         node {
           id
-          nameFi
           pk
+          nameTranslations {
+            fi
+          }
         }
       }
     }
@@ -13591,8 +13840,10 @@ export const ReservationUnitEditorParametersDocument = gql`
         node {
           id
           pk
-          nameFi
           termsType
+          nameTranslations {
+            fi
+          }
         }
       }
     }
@@ -13600,8 +13851,10 @@ export const ReservationUnitEditorParametersDocument = gql`
       edges {
         node {
           id
-          nameFi
           pk
+          nameTranslations {
+            fi
+          }
         }
       }
     }
@@ -13618,8 +13871,10 @@ export const ReservationUnitEditorParametersDocument = gql`
       edges {
         node {
           id
-          nameFi
           pk
+          nameTranslations {
+            fi
+          }
         }
       }
     }
@@ -14051,7 +14306,9 @@ export const AllApplicationEventsDocument = gql`
             reservationUnit {
               id
               pk
-              nameFi
+              nameTranslations {
+                fi
+              }
             }
           }
         }
@@ -14142,18 +14399,24 @@ export const ApplicationRoundFilterDocument = gql`
   query ApplicationRoundFilter($id: ID!) {
     applicationRound(id: $id) {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
       status
       reservationPeriodBegin
       reservationPeriodEnd
       reservationUnits {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         unit {
           id
           pk
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
       }
     }
@@ -14239,7 +14502,9 @@ export const ApplicationRoundCriteriaDocument = gql`
     applicationRound(id: $id) {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
       reservationUnitCount
       applicationPeriodBegin
       applicationPeriodEnd
@@ -14248,14 +14513,20 @@ export const ApplicationRoundCriteriaDocument = gql`
       reservationUnits {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         spaces {
           id
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
         unit {
           id
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
       }
     }
@@ -15650,7 +15921,9 @@ export const ReservationUnitsByUnitDocument = gql`
       reservationUnits {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         spaces {
           id
           pk
@@ -15760,14 +16033,18 @@ export const UnitViewDocument = gql`
     unit(id: $id) {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
       location {
         ...LocationFields
       }
       reservationUnits {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         spaces {
           id
           pk
@@ -15845,12 +16122,16 @@ export const RecurringReservationUnitDocument = gql`
   query RecurringReservationUnit($id: ID!) {
     unit(id: $id) {
       id
-      nameFi
+      nameTranslations {
+        fi
+      }
       pk
       reservationUnits {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         reservationStartInterval
         bufferTimeBefore
         bufferTimeAfter
@@ -17152,11 +17433,15 @@ export const ReservationPageDocument = gql`
       ...ApprovalButtons
       cancelReason {
         id
-        reasonFi
+        reasonTranslations {
+          fi
+        }
       }
       denyReason {
         id
-        reasonFi
+        reasonTranslations {
+          fi
+        }
       }
       reservationUnits {
         id
@@ -17266,7 +17551,9 @@ export const SeriesPageDocument = gql`
       reservationUnits {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         bufferTimeBefore
         bufferTimeAfter
         reservationStartInterval
@@ -17967,9 +18254,13 @@ export const UnitPageDocument = gql`
     unit(id: $id) {
       id
       pk
-      nameFi
       tprekId
-      shortDescriptionFi
+      nameTranslations {
+        fi
+      }
+      shortDescriptionTranslations {
+        fi
+      }
       reservationUnits {
         ...ReservationUnitCard
       }
@@ -18098,9 +18389,11 @@ export const ResourceDocument = gql`
     resource(id: $id) {
       id
       pk
-      nameFi
-      nameSv
-      nameEn
+      nameTranslations {
+        fi
+        en
+        sv
+      }
       space {
         id
         pk
@@ -18109,7 +18402,9 @@ export const ResourceDocument = gql`
     unit(id: $unitId) {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
       location {
         ...LocationFields
       }
@@ -18239,7 +18534,9 @@ export const UnitSpacesDocument = gql`
       spaces {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         parent {
           id
           pk
@@ -18373,32 +18670,44 @@ export const SpaceDocument = gql`
     space(id: $id) {
       id
       pk
-      nameFi
-      nameSv
-      nameEn
+      nameTranslations {
+        fi
+        en
+        sv
+      }
       code
       surfaceArea
       maxPersons
       unit {
         id
         ...UnitSubpageHead
-        descriptionFi
+        descriptionTranslations {
+          fi
+        }
         spaces {
           id
           pk
-          nameFi
+          nameTranslations {
+            fi
+          }
         }
       }
       parent {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         parent {
           id
-          nameFi
+          nameTranslations {
+            fi
+          }
           parent {
             id
-            nameFi
+            nameTranslations {
+              fi
+            }
           }
         }
       }

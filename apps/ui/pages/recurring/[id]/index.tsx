@@ -39,9 +39,11 @@ import { SortingComponent } from "@/components/SortingComponent";
 import { useSearchParams } from "next/navigation";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { getApplicationPath, seasonalPrefix } from "@/modules/urls";
-import { getApplicationRoundName } from "@/modules/applicationRound";
 import { gql } from "@apollo/client";
-import { convertLanguageCode } from "common/src/common/util";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
 import { useSearchModify } from "@/hooks/useSearchValues";
 
 type SeasonalSearchProps = ReadonlyDeep<
@@ -93,7 +95,7 @@ function SeasonalSearch({
       title: t("breadcrumb:recurring"),
     },
     {
-      title: getApplicationRoundName(applicationRound, lang),
+      title: getTranslationSafe(applicationRound.nameTranslations, lang),
     },
   ] as const;
 
@@ -233,9 +235,11 @@ export const APPLICATION_ROUND_QUERY = gql`
     applicationRound(id: $id) {
       id
       pk
-      nameFi
-      nameEn
-      nameSv
+      nameTranslations {
+        fi
+        en
+        sv
+      }
       reservationPeriodBegin
       reservationPeriodEnd
       reservationUnits {

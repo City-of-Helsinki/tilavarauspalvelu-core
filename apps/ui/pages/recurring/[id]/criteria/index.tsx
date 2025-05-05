@@ -51,7 +51,7 @@ function Criteria({
 }: Readonly<PropsNarrowed>): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
-  const name = getTranslationSafe(applicationRound, "name", lang);
+  const name = getTranslationSafe(applicationRound.nameTranslations, lang);
 
   const routes = [
     {
@@ -69,7 +69,10 @@ function Criteria({
 
   const title = capitalize(t("applicationRound:criteria"));
   const subtitle = `${name} ${t("applicationRound:criteria")}`;
-  const criteria = getTranslationSafe(applicationRound, "criteria", lang);
+  const criteria = getTranslationSafe(
+    applicationRound.criteriaTranslations,
+    lang
+  );
 
   return (
     <>
@@ -136,15 +139,21 @@ export const APPLICATION_ROUND_CRITERIA_QUERY = gql`
     applicationRound(id: $id) {
       pk
       id
-      nameFi
-      nameEn
-      nameSv
-      criteriaFi
-      criteriaEn
-      criteriaSv
-      notesWhenApplyingFi
-      notesWhenApplyingEn
-      notesWhenApplyingSv
+      nameTranslations {
+        fi
+        en
+        sv
+      }
+      criteriaTranslations {
+        fi
+        en
+        sv
+      }
+      notesWhenApplyingTranslations {
+        fi
+        en
+        sv
+      }
     }
   }
 `;

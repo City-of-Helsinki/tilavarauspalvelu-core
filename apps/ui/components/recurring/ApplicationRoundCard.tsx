@@ -54,7 +54,7 @@ export function ApplicationRoundCard({
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
-  const name = getTranslationSafe(applicationRound, "name", lang);
+  const name = getTranslationSafe(applicationRound.nameTranslations, lang);
   const timeString = translateRoundDate(t, applicationRound);
   const begin = new Date(applicationRound.reservationPeriodBegin);
   const end = new Date(applicationRound.reservationPeriodEnd);
@@ -102,9 +102,11 @@ export const APPLICATION_ROUND_CARD_FRAGMENT = gql`
   fragment ApplicationRoundCard on ApplicationRoundNode {
     id
     pk
-    nameFi
-    nameEn
-    nameSv
+    nameTranslations {
+      fi
+      en
+      sv
+    }
     reservationPeriodBegin
     reservationPeriodEnd
     applicationPeriodBegin

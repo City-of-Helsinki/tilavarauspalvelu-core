@@ -316,7 +316,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   const lang = convertLanguageCode(i18n.language);
   const termsOfUse =
     reservationUnit != null
-      ? getTranslationSafe(reservationUnit, "termsOfUse", lang)
+      ? getTranslationSafe(reservationUnit.termsOfUseTranslations, lang)
       : "";
 
   // TODO rework so we submit the form values here
@@ -396,7 +396,7 @@ function NewReservationWrapper(props: PropsNarrowed): JSX.Element | null {
   const { reservation } = props;
   const reservationUnit = reservation?.reservationUnits?.find(() => true);
   const reservationUnitName = reservationUnit
-    ? getTranslationSafe(reservationUnit, "name", lang)
+    ? getTranslationSafe(reservationUnit.nameTranslations, lang)
     : "";
   const routes = [
     {

@@ -76,15 +76,17 @@ export function MyUnitView() {
   const recurringReservationUrl = getRecurringReservationUrl(pk);
 
   const reservationUnitOptions = (unit?.reservationUnits ?? []).map(
-    ({ pk, nameFi }) => ({
-      label: nameFi ?? "-",
+    ({ pk, nameTranslations }) => ({
+      label: nameTranslations.fi ?? "-",
       value: pk ?? 0,
     })
   );
 
   const activeTab = selectedTab === "reservation-unit" ? 1 : 0;
 
-  const title = loading ? t("common.loading") : (unit?.nameFi ?? "-");
+  const title = loading
+    ? t("common.loading")
+    : unit?.nameTranslations.fi || "-";
   const location = unit?.location ? parseAddress(unit.location) : "-";
   return (
     <>
@@ -130,14 +132,18 @@ export const UNIT_VIEW_QUERY = gql`
     unit(id: $id) {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
       location {
         ...LocationFields
       }
       reservationUnits {
         id
         pk
-        nameFi
+        nameTranslations {
+          fi
+        }
         spaces {
           id
           pk

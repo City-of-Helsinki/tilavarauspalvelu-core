@@ -66,9 +66,9 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
     if (data?.resource) {
       const { resource } = data;
       reset({
-        nameFi: resource.nameFi ?? "",
-        nameEn: resource.nameEn,
-        nameSv: resource.nameSv,
+        nameFi: resource.nameTranslations.fi ?? "",
+        nameEn: resource.nameTranslations.en ?? "",
+        nameSv: resource.nameTranslations.sv ?? "",
         space: resource.space?.pk ?? undefined,
         pk: resource.pk ?? undefined,
       });
@@ -112,7 +112,9 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
       <LinkPrev route="../.." />
       <SubPageHead
         unit={unit}
-        title={resource.nameFi || t("ResourceEditor.defaultHeading")}
+        title={
+          resource.nameTranslations.fi || t("ResourceEditor.defaultHeading")
+        }
       />
       <FormErrorSummary errors={errors} />
       <form noValidate onSubmit={handleSubmit(onSubmit)}>
@@ -140,9 +142,11 @@ export const RESOURCE_QUERY = gql`
     resource(id: $id) {
       id
       pk
-      nameFi
-      nameSv
-      nameEn
+      nameTranslations {
+        fi
+        en
+        sv
+      }
       space {
         id
         pk
@@ -151,7 +155,9 @@ export const RESOURCE_QUERY = gql`
     unit(id: $unitId) {
       id
       pk
-      nameFi
+      nameTranslations {
+        fi
+      }
       location {
         ...LocationFields
       }

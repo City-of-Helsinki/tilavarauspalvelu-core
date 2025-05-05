@@ -102,7 +102,7 @@ function Unit(): JSX.Element {
       <Flex $direction="row" $alignItems="center">
         <Image src="https://tilavaraus.hel.fi/v1/media/reservation_unit_images/liikumistila2.jfif.250x250_q85_crop.jpg" />
         <Heading>
-          <H1 $noMargin>{unit?.nameFi}</H1>
+          <H1 $noMargin>{unit?.nameTranslations.fi || "-"}</H1>
           {unit?.location ? (
             <Address>{parseAddress(unit?.location)}</Address>
           ) : (
@@ -171,9 +171,13 @@ export const UNIT_PAGE_QUERY = gql`
     unit(id: $id) {
       id
       pk
-      nameFi
       tprekId
-      shortDescriptionFi
+      nameTranslations {
+        fi
+      }
+      shortDescriptionTranslations {
+        fi
+      }
       reservationUnits {
         ...ReservationUnitCard
       }

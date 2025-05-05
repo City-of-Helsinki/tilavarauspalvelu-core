@@ -90,10 +90,12 @@ interface PropsT {
 export function SingleSearchCard({ reservationUnit }: PropsT): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
-  const name = getTranslationSafe(reservationUnit, "name", lang);
+  const name = getTranslationSafe(reservationUnit.nameTranslations, lang);
 
   const link = useConstructLink(reservationUnit);
-  const unitName = getTranslationSafe(reservationUnit.unit ?? {}, "name", lang);
+  const unitName = reservationUnit.unit?.nameTranslations
+    ? getTranslationSafe(reservationUnit.unit.nameTranslations, lang)
+    : "-";
 
   const pricing = getActivePricing(reservationUnit);
   const unitPrice =
@@ -101,7 +103,10 @@ export function SingleSearchCard({ reservationUnit }: PropsT): JSX.Element {
 
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null
-      ? getTranslationSafe(reservationUnit.reservationUnitType, "name", lang)
+      ? getTranslationSafe(
+          reservationUnit.reservationUnitType.nameTranslations,
+          lang
+        )
       : undefined;
 
   const img = getMainImage(reservationUnit);

@@ -53,8 +53,11 @@ export function ReservationCard({
     return null;
   }
 
-  const name = getTranslationSafe(reservationUnit, "name", lang);
-  const unitName = getTranslationSafe(reservationUnit.unit ?? {}, "name", lang);
+  const name = getTranslationSafe(reservationUnit.nameTranslations, lang);
+  const unitName =
+    reservationUnit.unit?.nameTranslations != null
+      ? getTranslationSafe(reservationUnit.unit.nameTranslations, lang)
+      : "";
   const title = trim(`${name}, ${unitName}`, ", ");
 
   const normalizedOrderStatus =
@@ -151,17 +154,21 @@ export const RESERVATION_CARD_FRAGMENT = gql`
     accessType
     reservationUnits {
       id
-      nameFi
-      nameSv
-      nameEn
+      nameTranslations {
+        fi
+        en
+        sv
+      }
       images {
         ...Image
       }
       unit {
         id
-        nameFi
-        nameSv
-        nameEn
+        nameTranslations {
+          fi
+          en
+          sv
+        }
       }
     }
     ...ReservationPriceFields

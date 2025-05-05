@@ -66,8 +66,10 @@ function filterOutRemovedReservations(
 
 type Props = {
   reservationUnits: {
-    pk?: number | null | undefined;
-    nameFi?: string | null | undefined;
+    pk: number | null;
+    nameTranslations: {
+      fi: string | null;
+    }
   }[];
 };
 
@@ -75,8 +77,8 @@ type Props = {
 /// the schema validator requires us to know the start interval from reservationUnit
 function RecurringReservationFormWrapper({ reservationUnits }: Props) {
   const reservationUnitOptions = reservationUnits.map((unit) => ({
-    label: unit?.nameFi ?? "",
-    value: unit?.pk ?? 0,
+    label: unit.nameTranslations.fi ?? "-",
+    value: unit.pk ?? 0,
   }));
 
   const [params] = useSearchParams();

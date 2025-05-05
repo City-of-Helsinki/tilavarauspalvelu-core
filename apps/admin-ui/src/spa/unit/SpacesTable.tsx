@@ -84,11 +84,11 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
 
   const [spaceWaitingForDelete, setSpaceWaitingForDelete] = useState<Pick<
     SpaceT,
-    "pk" | "nameFi"
+    "pk" | "nameTranslations"
   > | null>(null);
 
   function handleRemoveSpace(
-    space: Pick<SpaceT, "resources" | "pk" | "nameFi">
+    space: Pick<SpaceT, "resources" | "pk" | "nameTranslations">
   ) {
     if (space && space.resources && space?.resources.length > 0) {
       errorToast({
@@ -128,8 +128,9 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
       headerName: t("Unit.headings.name"),
       key: "nameFi",
       transform: (space: SpaceT) => {
-        const { pk, nameFi } = space;
+        const { pk, nameTranslations } = space;
         const link = getSpaceUrl(pk, unit?.pk);
+        const nameFi = nameTranslations.fi;
         const name = nameFi != null && nameFi.length > 0 ? nameFi : "-";
         return (
           <TableLink to={link}>
@@ -228,7 +229,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
           isOpen
           variant="danger"
           heading={t("SpaceTable.removeConfirmationTitle", {
-            name: spaceWaitingForDelete.nameFi,
+            name: spaceWaitingForDelete.nameTranslations.fi,
           })}
           content={t("SpaceTable.removeConfirmationMessage")}
           acceptLabel={t("SpaceTable.removeConfirmationAccept")}

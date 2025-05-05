@@ -179,25 +179,6 @@ export const RESERVATION_TYPE_FORM_FRAGMENT = gql`
     authentication
     bufferTimeBefore
     bufferTimeAfter
-    serviceSpecificTerms {
-      id
-      textFi
-      nameFi
-    }
-    paymentTerms {
-      id
-      textFi
-      nameFi
-    }
-    pricingTerms {
-      id
-      textFi
-      nameFi
-    }
-    cancellationTerms {
-      id
-      textFi
-      nameFi
-    }
+    ...ShowTOS
   }
 `;

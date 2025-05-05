@@ -108,8 +108,7 @@ function View({
   const { applicationRound } = application;
   const lang = getLocalizationLang(i18n.language);
   const applicationRoundName = getTranslationSafe(
-    applicationRound,
-    "name",
+    applicationRound.nameTranslations,
     lang
   );
   const { sentDate } = applicationRound;
