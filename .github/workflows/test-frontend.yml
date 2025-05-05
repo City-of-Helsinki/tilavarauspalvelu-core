@@ -6,9 +6,6 @@ on:
       - main
   pull_request:
   workflow_dispatch:
-  repository_dispatch:
-    types:
-      - update-graphql-schema
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -41,6 +38,7 @@ jobs:
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
       - name: Lint admin ui
         run: |
+          pnpm codegen
           pnpm tsc:check --filter=admin-ui...
           pnpm lint --filter=admin-ui...
           pnpm lint:css --filter=admin-ui...
@@ -62,7 +60,9 @@ jobs:
         run: pnpm install --frozen-lockfile
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
       - name: Test admin ui
-        run: pnpm test --filter=admin-ui...
+        run: |
+          pnpm codegen
+          pnpm test --filter=admin-ui...
 
   lint-ui:
     name: Lint ui
@@ -82,6 +82,7 @@ jobs:
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
       - name: Lint ui
         run: |
+          pnpm codegen
           pnpm tsc:check --filter=ui...
           pnpm lint --filter=ui...
           pnpm lint:css --filter=ui...
@@ -103,4 +104,6 @@ jobs:
         run: pnpm install --frozen-lockfile
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
       - name: Test ui
-        run: pnpm test --filter=ui...
+        run: |
+          pnpm codegen
+          pnpm test --filter=ui...
