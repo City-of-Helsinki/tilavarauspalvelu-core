@@ -1,0 +1,91 @@
+name: "Upload frontend sentry sourcemaps"
+
+# release only (we upload to production sentry)
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+# Cancel a workflow from the same PR, branch or tag when a new workflow is triggered.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  SKIP_ENV_VALIDATION: "true"
+  SENTRY_ORG: "city-of-helsinki"
+  SENTRY_URL: "https://sentry.hel.fi/"
+
+jobs:
+  upload-customer-sentry-sourcemaps:
+    name: "Upload customer ui sentry sourcemaps"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Build customer ui and upload sentry sourcemaps
+        run: pnpm build --filter=ui...
+        # release name can't contain slashes e.g. merge/PR_number
+      - name: "Create release name"
+        id: release
+        run: >-
+          echo "release=$(
+            echo ${{ github.ref_name || github.sha }} | tr '/' '-'
+          )" >> $GITHUB_OUTPUT
+      - name: Create Sentry release
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_PROJECT: "tilavarauspalvelu-ui"
+        with:
+          environment: "prod"
+          sourcemaps: "./apps/ui/.next"
+          ignore_missing: true
+          release: ${{ steps.release.outputs.release }}
+
+  upload-admin-sentry-sourcemaps:
+    name: "Upload admin ui sentry sourcemaps"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Build admin ui and upload sentry sourcemaps
+        run: pnpm build --filter=admin-ui...
+        # release name can't contain slashes e.g. merge/PR_number
+      - name: "Create release name"
+        id: release
+        run: >-
+          echo "release=$(
+            echo ${{ github.ref_name || github.sha }} | tr '/' '-'
+          )" >> $GITHUB_OUTPUT
+      - name: Create Sentry release
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_PROJECT: "tilavarauspalvelu-admin-ui"
+        with:
+          environment: "prod"
+          sourcemaps: "./apps/admin-ui/.next"
+          ignore_missing: true
+          release: ${{ steps.release.outputs.release }}

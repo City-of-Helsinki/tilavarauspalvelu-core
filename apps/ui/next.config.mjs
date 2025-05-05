@@ -66,12 +66,10 @@ const nextConfig = {
 };
 
 export default withSentryConfig(nextConfig, {
-  // For all available options, see:
-  // https://github.com/getsentry/sentry-webpack-plugin#options
   org: "city-of-helsinki",
   project: "tilavarauspalvelu-ui",
-  sentryUrl: env.SENTRY_ENABLE_SOURCE_MAPS ? "https://sentry.hel.fi/" : "",
-  authToken: env.SENTRY_ENABLE_SOURCE_MAPS ? env.SENTRY_AUTH_TOKEN : "",
+  sentryUrl: "",
+  authToken: "",
   silent: !process.env.CI,
   // For all available options, see:
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
