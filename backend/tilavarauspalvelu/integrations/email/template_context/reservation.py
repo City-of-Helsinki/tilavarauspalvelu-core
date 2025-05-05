@@ -34,6 +34,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 __all__ = [
+    "get_context_for_reservation_access_code_added",
     "get_context_for_reservation_access_code_changed",
     "get_context_for_reservation_approved",
     "get_context_for_reservation_cancelled",
@@ -1109,4 +1110,55 @@ def get_context_for_reservation_requires_handling_staff_notification(
             begin_datetime=data["begin_datetime"],
             end_datetime=data["end_datetime"],
         ),
+    }
+
+
+# type: EmailType.RESERVATION_ACCESS_CODE_ADDED ##########################################################################
+
+
+@overload
+def get_context_for_reservation_access_code_added(
+    reservation: Reservation,
+    *,
+    language: Lang,
+) -> EmailContext: ...
+
+
+@overload
+def get_context_for_reservation_access_code_added(
+    *,
+    language: Lang,
+    email_recipient_name: str,
+    reservation_unit_name: str,
+    unit_name: str,
+    unit_location: str,
+    begin_datetime: datetime.datetime,
+    end_datetime: datetime.datetime,
+    price: Decimal,
+    tax_percentage: Decimal,
+    reservation_id: int,
+    instructions_confirmed: str,
+    access_code_is_used: bool,
+    access_code: str,
+    access_code_validity_period: str,
+) -> EmailContext: ...
+
+
+@get_translated
+def get_context_for_reservation_access_code_added(
+    reservation: Reservation | None = None,
+    *,
+    language: Lang,
+    **data: Any,
+) -> EmailContext:
+    if reservation is not None:
+        data = get_context_for_reservation_rescheduled(reservation=reservation, language=language)
+    else:
+        data = get_context_for_reservation_rescheduled(**data, language=language)
+
+    title = pgettext("Email", "A door code has been added to your booking")
+    return {
+        **data,
+        "title": title,
+        "text_reservation_modified": title,
     }
