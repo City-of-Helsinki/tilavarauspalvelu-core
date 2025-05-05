@@ -4,10 +4,12 @@ import dataclasses
 from dataclasses import asdict, dataclass
 from typing import TYPE_CHECKING, Any, Self
 
+from django.utils.functional import classproperty
 from django.utils.translation import pgettext_lazy
 
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import (
+    get_context_for_reservation_access_code_added,
     get_context_for_reservation_access_code_changed,
     get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
@@ -18,6 +20,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_reservation_requires_handling_staff_notification,
     get_context_for_reservation_requires_payment,
     get_context_for_reservation_rescheduled,
+    get_context_for_seasonal_booking_access_code_changed,
     get_context_for_seasonal_booking_application_received,
     get_context_for_seasonal_booking_application_round_handled,
     get_context_for_seasonal_booking_application_round_in_allocation,
@@ -30,9 +33,6 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_seasonal_booking_rescheduled_single,
     get_context_for_user_anonymization,
     get_context_for_user_permissions_deactivation,
-)
-from tilavarauspalvelu.integrations.email.template_context.reservation import (
-    get_context_for_seasonal_booking_access_code_changed,
 )
 
 if TYPE_CHECKING:
@@ -122,6 +122,26 @@ class EmailType(_EmailTypeOptions):
 
     # Reservation
 
+    RESERVATION_ACCESS_CODE_ADDED = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Reservation access code added"),
+        get_email_context=get_context_for_reservation_access_code_added,
+        context_variables=[
+            "language",
+            "email_recipient_name",
+            "reservation_unit_name",
+            "unit_name",
+            "unit_location",
+            "begin_datetime",
+            "end_datetime",
+            "price",
+            "tax_percentage",
+            "reservation_id",
+            "instructions_confirmed",
+            "access_code_is_used",
+            "access_code",
+            "access_code_validity_period",
+        ],
+    )
     RESERVATION_ACCESS_CODE_CHANGED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation access code changed"),
         get_email_context=get_context_for_reservation_access_code_changed,
@@ -450,3 +470,11 @@ class EmailType(_EmailTypeOptions):
         get_email_context=get_context_for_user_anonymization,
         context_variables=["language"],
     )
+
+    @classproperty
+    def access_code_always_used(cls) -> list[EmailTemplateType]:
+        return [
+            cls.RESERVATION_ACCESS_CODE_ADDED,
+            cls.RESERVATION_ACCESS_CODE_CHANGED,
+            cls.SEASONAL_BOOKING_ACCESS_CODE_CHANGED,
+        ]

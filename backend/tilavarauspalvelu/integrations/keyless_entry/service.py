@@ -460,7 +460,7 @@ class PindoraService:
                 # Since the access code was unable to be created when the reservation was initially made,
                 # send an email with the access code to the user.
                 if reservation.access_code_is_active and reservation.access_code_generated_at:
-                    EmailService.send_reservation_rescheduled_email(reservation=reservation)
+                    EmailService.send_reservation_access_code_added_email(reservation=reservation)
 
             except ExternalServiceError as error:
                 SentryLogger.log_exception(error, details=f"Reservation: {reservation.pk}")
@@ -534,7 +534,7 @@ class PindoraService:
 
                         # Access code was activated in Pindora, inform the user by email.
                         if reservation.access_code_is_active and reservation.access_code_generated_at:
-                            EmailService.send_reservation_rescheduled_email(reservation=reservation)
+                            EmailService.send_reservation_access_code_added_email(reservation=reservation)
 
                     else:
                         cls.deactivate_access_code(obj=reservation)

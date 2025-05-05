@@ -3483,6 +3483,11 @@ msgid ""
 msgstr ""
 "En ny bokningsförfrågan för %(reservation_unit_name)s väntar på at behandlats"
 
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "A door code has been added to your booking"
+msgstr "En dörrkod har lagts till i din bokning"
+
 #: tilavarauspalvelu/integrations/email/template_context/user.py
 msgctxt "Email"
 msgid "Your staff access to Varaamo is expiring"
@@ -3526,6 +3531,11 @@ msgid ""
 msgstr ""
 "Du kan förlänga giltigheten för ditt användarkonto genom att logga in på "
 "tjänsten på"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation access code added"
+msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
