@@ -46,6 +46,8 @@ def test_helsinki_profile_data__query__all_fields(graphql):
         streetAddress
         postalCode
         city
+        countryCode
+        additionalAddress
         municipalityCode
         municipalityName
         loginMethod
@@ -68,6 +70,8 @@ def test_helsinki_profile_data__query__all_fields(graphql):
         "streetAddress": profile_data["verifiedPersonalInformation"]["permanentAddress"]["streetAddress"],
         "postalCode": profile_data["verifiedPersonalInformation"]["permanentAddress"]["postalCode"],
         "city": profile_data["verifiedPersonalInformation"]["permanentAddress"]["postOffice"],
+        "countryCode": None,  # Only included in foreign country addresses
+        "additionalAddress": None,  # Only included in foreign country addresses
         "municipalityCode": profile_data["verifiedPersonalInformation"]["municipalityOfResidenceNumber"],
         "municipalityName": profile_data["verifiedPersonalInformation"]["municipalityOfResidence"],
         "loginMethod": LoginMethod.PROFILE.value,
