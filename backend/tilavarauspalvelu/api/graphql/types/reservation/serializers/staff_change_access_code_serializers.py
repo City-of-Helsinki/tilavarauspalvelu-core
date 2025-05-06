@@ -48,7 +48,7 @@ class StaffChangeReservationAccessCodeSerializer(NestingModelSerializer):
 
     def update(self, instance: Reservation, validated_data: dict[str, Any]) -> Reservation:  # noqa: ARG002
         try:
-            PindoraService.change_access_code(obj=instance)
+            response = PindoraService.change_access_code(obj=instance)
 
         except PindoraNotFoundError:
             instance.access_code_generated_at = None
@@ -59,13 +59,16 @@ class StaffChangeReservationAccessCodeSerializer(NestingModelSerializer):
         except ExternalServiceError as error:
             raise ValidationError(str(error), code=error_codes.PINDORA_ERROR) from error
 
-        if instance.access_code_should_be_active:
-            if not instance.access_code_is_active:
-                try:
-                    PindoraService.activate_access_code(obj=instance)
-                except ExternalServiceError as error:
-                    SentryLogger.log_exception(error, details=f"Reservation: {instance.pk}")
+        access_code_is_active = response["access_code_is_active"]
 
+        if not access_code_is_active:
+            try:
+                PindoraService.activate_access_code(obj=instance)
+                access_code_is_active = True
+            except ExternalServiceError as error:
+                SentryLogger.log_exception(error, details=f"Reservation: {instance.pk}")
+
+        if access_code_is_active:
             EmailService.send_reservation_access_code_changed_email(reservation=instance)
 
         return instance

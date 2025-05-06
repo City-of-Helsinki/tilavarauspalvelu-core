@@ -9,10 +9,11 @@ from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, Reservat
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
+from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraReservationResponse
 from tilavarauspalvelu.tasks import create_missing_pindora_reservations
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
-from tests.factories import RecurringReservationFactory, ReservationFactory
+from tests.factories import RecurringReservationFactory, ReservationFactory, ReservationUnitFactory
 from tests.helpers import patch_method
 
 
@@ -20,10 +21,10 @@ from tests.helpers import patch_method
 @freeze_time("2023-01-01")
 @patch_method(
     PindoraClient.create_reservation,
-    return_value={
-        "access_code_generated_at": datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE),
-        "access_code_is_active": True,
-    },
+    return_value=PindoraReservationResponse(
+        access_code_generated_at=datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+        access_code_is_active=True,
+    ),
 )
 @patch_method(EmailService.send_reservation_access_code_added_email)
 def test_create_missing_pindora_reservations__create_missing():
@@ -54,10 +55,10 @@ def test_create_missing_pindora_reservations__create_missing():
 @freeze_time("2023-01-01")
 @patch_method(
     PindoraClient.create_reservation,
-    return_value={
-        "access_code_generated_at": datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE),
-        "access_code_is_active": False,
-    },
+    return_value=PindoraReservationResponse(
+        access_code_generated_at=datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+        access_code_is_active=False,
+    ),
 )
 def test_create_missing_pindora_reservations__blocked():
     now = local_datetime()
@@ -111,10 +112,10 @@ def test_create_missing_pindora_reservations__in_the_past():
 @freeze_time("2023-01-01")
 @patch_method(
     PindoraClient.create_reservation,
-    return_value={
-        "access_code_generated_at": datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE),
-        "access_code_is_active": True,
-    },
+    return_value=PindoraReservationResponse(
+        access_code_generated_at=datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+        access_code_is_active=True,
+    ),
 )
 @patch_method(EmailService.send_reservation_access_code_added_email)
 def test_create_missing_pindora_reservations__ongoing():
@@ -220,15 +221,18 @@ def test_create_missing_pindora_reservations__already_generated():
 @freeze_time("2023-01-01")
 @patch_method(
     PindoraClient.create_reservation,
-    return_value={
-        "access_code_generated_at": datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE),
-        "access_code_is_active": False,
-    },
+    return_value=PindoraReservationResponse(
+        access_code_generated_at=datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+        access_code_is_active=False,
+    ),
 )
 def test_create_missing_pindora_reservations__multiple():
     now = local_datetime()
 
-    ReservationFactory.create(
+    reservation_unit = ReservationUnitFactory.create(name="foo")
+
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
         access_type=AccessType.ACCESS_CODE,
@@ -238,7 +242,8 @@ def test_create_missing_pindora_reservations__multiple():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    ReservationFactory.create(
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
         access_type=AccessType.ACCESS_CODE,

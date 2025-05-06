@@ -4,12 +4,14 @@ import dataclasses
 import datetime
 from typing import TYPE_CHECKING
 
+from lookup_property import L
+
 from tilavarauspalvelu.dataclasses import ReservationSeriesCalculationResults
 from tilavarauspalvelu.enums import AccessType, RejectionReadinessChoice
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.models import AffectingTimeSpan, ApplicationSection, RejectedOccurrence, Reservation
 from tilavarauspalvelu.typing import ReservationPeriod
-from utils.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between
+from utils.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between, local_datetime
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
@@ -260,3 +262,16 @@ class RecurringReservationActions:
         return ApplicationSection.objects.filter(
             reservation_unit_options__allocated_time_slots__recurring_reservation=self.recurring_reservation
         ).first()
+
+    def has_inactive_access_codes_which_should_be_active(self) -> bool:
+        return self.recurring_reservation.reservations.filter(
+            L(access_code_should_be_active=True),
+            access_code_is_active=False,
+            end__gt=local_datetime(),
+        ).exists()
+
+    def has_upcoming_or_ongoing_reservations_with_active_access_codes(self) -> bool:
+        return self.recurring_reservation.reservations.filter(
+            access_code_is_active=True,
+            end__gt=local_datetime(),
+        ).exists()
