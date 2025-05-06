@@ -41,7 +41,13 @@ class EmailService:
     @staticmethod
     def send_reservation_access_code_added_email(reservation: Reservation, *, language: Lang | None = None) -> None:
         """Sends an email to the user when an access code has been or added to or activated for their reservation."""
-        # TODO: Send different email for seasonal bookings
+        if reservation.type == ReservationTypeChoice.SEASONAL:
+            section = reservation.actions.get_application_section()
+            if section is None:
+                return
+
+            EmailService.send_seasonal_booking_access_code_added_email(section)
+            return
 
         if reservation.access_type != AccessType.ACCESS_CODE:
             return
@@ -71,6 +77,14 @@ class EmailService:
     @staticmethod
     def send_reservation_access_code_changed_email(reservation: Reservation, *, language: Lang | None = None) -> None:
         """Sends an email to the reservee when their reservation's access code has been modified."""
+        if reservation.type == ReservationTypeChoice.SEASONAL:
+            section = reservation.actions.get_application_section()
+            if section is None:
+                return
+
+            EmailService.send_seasonal_booking_access_code_changed_email(section)
+            return
+
         if reservation.access_type != AccessType.ACCESS_CODE:
             return
 
@@ -340,6 +354,38 @@ class EmailService:
         send_emails_in_batches_task.delay(email_data=email)
 
     # Seasonal booking #################################################################################################
+
+    @staticmethod
+    def send_seasonal_booking_access_code_added_email(
+        application_section: ApplicationSection,
+        *,
+        language: Lang | None = None,
+    ) -> None:
+        """
+        Sends an email to the applicant when an access code has been
+        or added to or activated for their seasonal booking.
+        """
+        if application_section.application.status != ApplicationStatusChoice.RESULTS_SENT:
+            return
+
+        if not application_section.actions.get_reservations().exists():
+            return
+
+        recipients = get_application_email_recipients(application=application_section.application)
+        if not recipients:
+            SentryLogger.log_message(
+                "No recipients for the 'seasonal booking access code added' email",
+                details={"application_section": application_section.pk},
+            )
+            return
+
+        if language is None:
+            language = get_application_email_language(application=application_section.application)
+
+        email_type = EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED
+        context = email_type.get_email_context(application_section, language=language)
+        email = EmailData.build(recipients, context, email_type)
+        send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
     def send_seasonal_booking_access_code_changed_email(

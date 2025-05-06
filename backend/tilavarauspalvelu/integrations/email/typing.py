@@ -34,6 +34,9 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_user_anonymization,
     get_context_for_user_permissions_deactivation,
 )
+from tilavarauspalvelu.integrations.email.template_context.reservation import (
+    get_context_for_seasonal_booking_access_code_added,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
@@ -327,6 +330,21 @@ class EmailType(_EmailTypeOptions):
 
     # Seasonal booking
 
+    SEASONAL_BOOKING_ACCESS_CODE_ADDED = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Seasonal reservation access code added"),
+        get_email_context=get_context_for_seasonal_booking_access_code_added,
+        context_variables=[
+            "language",
+            "email_recipient_name",
+            "application_section_name",
+            "application_round_name",
+            "application_id",
+            "application_section_id",
+            "access_code_is_used",
+            "access_code",
+            "allocations",
+        ],
+    )
     SEASONAL_BOOKING_ACCESS_CODE_CHANGED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal reservation access code changed"),
         get_email_context=get_context_for_seasonal_booking_access_code_changed,
@@ -476,5 +494,6 @@ class EmailType(_EmailTypeOptions):
         return [
             cls.RESERVATION_ACCESS_CODE_ADDED,
             cls.RESERVATION_ACCESS_CODE_CHANGED,
+            cls.SEASONAL_BOOKING_ACCESS_CODE_ADDED,
             cls.SEASONAL_BOOKING_ACCESS_CODE_CHANGED,
         ]

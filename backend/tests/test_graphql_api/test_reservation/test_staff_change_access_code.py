@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import datetime
 
+import freezegun
 import pytest
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
+from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraAccessCodeModifyResponse
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
@@ -21,9 +23,16 @@ pytestmark = [
 ]
 
 
-@patch_method(PindoraService.change_access_code)
+@patch_method(
+    PindoraService.change_access_code,
+    return_value=PindoraAccessCodeModifyResponse(
+        access_code_generated_at=local_datetime(2024, 1, 1),
+        access_code_is_active=True,
+    ),
+)
 @patch_method(PindoraService.activate_access_code)
 @patch_method(EmailService.send_reservation_access_code_changed_email)
+@freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_staff_change_access_code(graphql):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
@@ -49,9 +58,16 @@ def test_staff_change_access_code(graphql):
     assert EmailService.send_reservation_access_code_changed_email.call_count == 1
 
 
-@patch_method(PindoraService.change_access_code)
+@patch_method(
+    PindoraService.change_access_code,
+    return_value=PindoraAccessCodeModifyResponse(
+        access_code_generated_at=local_datetime(2024, 1, 1),
+        access_code_is_active=False,
+    ),
+)
 @patch_method(PindoraService.activate_access_code)
 @patch_method(EmailService.send_reservation_access_code_changed_email)
+@freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_staff_change_access_code__not_active(graphql):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
@@ -77,19 +93,27 @@ def test_staff_change_access_code__not_active(graphql):
     assert EmailService.send_reservation_access_code_changed_email.call_count == 1
 
 
-@patch_method(PindoraService.change_access_code)
+@patch_method(
+    PindoraService.change_access_code,
+    return_value=PindoraAccessCodeModifyResponse(
+        access_code_generated_at=local_datetime(2024, 1, 1),
+        access_code_is_active=False,
+    ),
+)
 @patch_method(PindoraService.activate_access_code, side_effect=PindoraAPIError("Pindora Error"))
 @patch_method(EmailService.send_reservation_access_code_changed_email)
 @patch_method(SentryLogger.log_exception)
 def test_staff_change_access_code__not_active__pindora_call_fails(graphql):
+    now = local_datetime()
+
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
         access_type=AccessType.ACCESS_CODE,
-        access_code_generated_at=datetime.datetime(2024, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+        access_code_generated_at=now,
         access_code_is_active=False,
-        begin=local_datetime() + datetime.timedelta(hours=1),
-        end=local_datetime() + datetime.timedelta(hours=2),
+        begin=now + datetime.timedelta(hours=1),
+        end=now + datetime.timedelta(hours=2),
     )
 
     data = {
@@ -103,7 +127,10 @@ def test_staff_change_access_code__not_active__pindora_call_fails(graphql):
 
     assert PindoraService.change_access_code.call_count == 1
     assert PindoraService.activate_access_code.call_count == 1
-    assert EmailService.send_reservation_access_code_changed_email.call_count == 1
+
+    # Email not sent since access code is not active due to activation failing
+    # This will be corrected by a background task, and an email will be sent then.
+    assert EmailService.send_reservation_access_code_changed_email.call_count == 0
 
     assert SentryLogger.log_exception.called is True
 
@@ -229,7 +256,13 @@ def test_staff_change_access_code__type_is_blocked(graphql):
     assert response.field_error_messages() == ["Reservation access code cannot be changed based on its type."]
 
 
-@patch_method(PindoraService.change_access_code)
+@patch_method(
+    PindoraService.change_access_code,
+    return_value=PindoraAccessCodeModifyResponse(
+        access_code_generated_at=local_datetime(2024, 1, 1),
+        access_code_is_active=True,
+    ),
+)
 @patch_method(PindoraService.activate_access_code)
 @patch_method(EmailService.send_reservation_access_code_changed_email)
 def test_staff_change_access_code__ongoing(graphql):

@@ -45,6 +45,7 @@ __all__ = [
     "get_context_for_reservation_requires_handling_staff_notification",
     "get_context_for_reservation_requires_payment",
     "get_context_for_reservation_rescheduled",
+    "get_context_for_seasonal_booking_access_code_added",
     "get_context_for_seasonal_booking_access_code_changed",
     "get_context_for_seasonal_booking_cancelled_single",
     "get_context_for_seasonal_booking_denied_series",
@@ -623,7 +624,11 @@ def get_context_for_reservation_requires_payment(
 
 
 @overload
-def get_context_for_seasonal_booking_cancelled_single(reservation: Reservation, *, language: Lang) -> EmailContext: ...
+def get_context_for_seasonal_booking_cancelled_single(
+    reservation: Reservation,
+    *,
+    language: Lang,
+) -> EmailContext: ...
 
 
 @overload
@@ -684,7 +689,9 @@ def get_context_for_seasonal_booking_cancelled_single(
 
 @overload
 def get_context_for_seasonal_booking_rescheduled_series(
-    application_section: ApplicationSection, *, language: Lang
+    application_section: ApplicationSection,
+    *,
+    language: Lang,
 ) -> EmailContext: ...
 
 
@@ -745,7 +752,9 @@ def get_context_for_seasonal_booking_rescheduled_series(
 
 @overload
 def get_context_for_seasonal_booking_access_code_changed(
-    application_section: ApplicationSection, *, language: Lang
+    application_section: ApplicationSection,
+    *,
+    language: Lang,
 ) -> EmailContext: ...
 
 
@@ -789,7 +798,9 @@ def get_context_for_seasonal_booking_access_code_changed(
 
 @overload
 def get_context_for_seasonal_booking_rescheduled_single(
-    reservation: Reservation, *, language: Lang
+    reservation: Reservation,
+    *,
+    language: Lang,
 ) -> EmailContext: ...
 
 
@@ -850,7 +861,9 @@ def get_context_for_seasonal_booking_rescheduled_single(
 
 @overload
 def get_context_for_seasonal_booking_denied_series(
-    application_section: ApplicationSection, *, language: Lang
+    application_section: ApplicationSection,
+    *,
+    language: Lang,
 ) -> EmailContext: ...
 
 
@@ -909,7 +922,11 @@ def get_context_for_seasonal_booking_denied_series(
 
 
 @overload
-def get_context_for_seasonal_booking_denied_single(reservation: Reservation, *, language: Lang) -> EmailContext: ...
+def get_context_for_seasonal_booking_denied_single(
+    reservation: Reservation,
+    *,
+    language: Lang,
+) -> EmailContext: ...
 
 
 @overload
@@ -1157,6 +1174,52 @@ def get_context_for_reservation_access_code_added(
         data = get_context_for_reservation_rescheduled(**data, language=language)
 
     title = pgettext("Email", "A door code has been added to your booking")
+    return {
+        **data,
+        "title": title,
+        "text_reservation_modified": title,
+    }
+
+
+# type: EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED #####################################################
+
+
+@overload
+def get_context_for_seasonal_booking_access_code_added(
+    application_section: ApplicationSection,
+    *,
+    language: Lang,
+) -> EmailContext: ...
+
+
+@overload
+def get_context_for_seasonal_booking_access_code_added(
+    *,
+    language: Lang,
+    email_recipient_name: str,
+    application_section_name: str,
+    application_round_name: str,
+    application_id: int | None,
+    application_section_id: int | None,
+    access_code_is_used: bool,
+    access_code: str,
+    allocations: list[dict[str, Any]],
+) -> EmailContext: ...
+
+
+@get_translated
+def get_context_for_seasonal_booking_access_code_added(
+    application_section: ApplicationSection | None = None,
+    *,
+    language: Lang,
+    **data: Any,
+) -> EmailContext:
+    if application_section is not None:
+        data = get_context_for_seasonal_booking_rescheduled_series(application_section, language=language)
+    else:
+        data = get_context_for_seasonal_booking_rescheduled_series(**data, language=language)
+
+    title = pgettext("Email", "A door code has been added to your seasonal booking")
     return {
         **data,
         "title": title,

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import freezegun
 import pytest
@@ -15,6 +16,9 @@ from tests.factories import ApplicationSectionFactory, RecurringReservationFacto
 from tests.helpers import patch_method
 
 from .helpers import REPAIR_ACCESS_CODE_SERIES_MUTATION
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import RecurringReservation
 
 pytestmark = [
     pytest.mark.django_db,
@@ -51,7 +55,7 @@ def test_repair_reservation_series_access_code(graphql):
 
 
 @patch_method(PindoraService.sync_access_code)
-@patch_method(EmailService.send_seasonal_booking_access_code_changed_email)
+@patch_method(EmailService.send_seasonal_booking_access_code_added_email)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_repair_reservation_series_access_code__in_seasonal_booking(graphql):
     user = UserFactory.create()
@@ -75,6 +79,11 @@ def test_repair_reservation_series_access_code__in_seasonal_booking(graphql):
         access_code_generated_at=local_datetime(2024, 1, 1),
     )
 
+    def hook(obj: RecurringReservation) -> None:
+        obj.reservations.update(access_code_is_active=True)
+
+    PindoraService.sync_access_code.side_effect = hook
+
     graphql.login_with_superuser()
     response = graphql(REPAIR_ACCESS_CODE_SERIES_MUTATION, input_data={"pk": series.pk})
 
@@ -83,9 +92,8 @@ def test_repair_reservation_series_access_code__in_seasonal_booking(graphql):
     assert PindoraService.sync_access_code.call_count == 1
 
     # Since connected to seasonal booking, email should be sent.
-    email = EmailService.send_seasonal_booking_access_code_changed_email
-    assert email.call_count == 1
-    assert email.call_args.args[0] == section
+    assert EmailService.send_seasonal_booking_access_code_added_email.call_count == 1
+    assert EmailService.send_seasonal_booking_access_code_added_email.call_args.args[0] == section
 
 
 @patch_method(PindoraService.sync_access_code)

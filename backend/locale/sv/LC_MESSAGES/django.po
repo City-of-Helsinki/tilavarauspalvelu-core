@@ -3488,6 +3488,11 @@ msgctxt "Email"
 msgid "A door code has been added to your booking"
 msgstr "En dörrkod har lagts till i din bokning"
 
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "A door code has been added to your seasonal booking"
+msgstr "En dörrkod har lagts till i din säsongsbokning"
+
 #: tilavarauspalvelu/integrations/email/template_context/user.py
 msgctxt "Email"
 msgid "Your staff access to Varaamo is expiring"
@@ -3585,6 +3590,11 @@ msgstr ""
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
 msgid "Reservation rescheduled"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation access code added"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py

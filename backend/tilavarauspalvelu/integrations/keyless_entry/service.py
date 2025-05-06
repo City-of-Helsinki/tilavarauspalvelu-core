@@ -443,11 +443,9 @@ class PindoraService:
         )
 
         for reservation in reservations:
-            is_active = reservation.access_code_should_be_active
-
             try:
                 try:
-                    cls.create_access_code(obj=reservation, is_active=is_active)
+                    cls.create_access_code(obj=reservation, is_active=reservation.access_code_should_be_active)
 
                 # If reservation already exists, fetch it and update instead.
                 except PindoraConflictError:
@@ -457,9 +455,9 @@ class PindoraService:
                     reservation.access_code_is_active = response.access_code_is_active
                     reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
 
-                # Since the access code was unable to be created when the reservation was initially made,
-                # send an email with the access code to the user.
-                if reservation.access_code_is_active and reservation.access_code_generated_at:
+                # User needs to be informed that their reservation now has an access code,
+                # since we previously thought there was no access code.
+                if reservation.access_code_should_be_active:
                     EmailService.send_reservation_access_code_added_email(reservation=reservation)
 
             except ExternalServiceError as error:
@@ -517,6 +515,11 @@ class PindoraService:
                     elif not is_active and response["access_code_is_active"]:
                         cls.deactivate_access_code(obj=section)
 
+                    # User needs to be informed that their seasonal booking now has an access code,
+                    # since we previously thought there was no access code.
+                    if is_active:
+                        EmailService.send_seasonal_booking_access_code_added_email(section)
+
             except ExternalServiceError as error:
                 SentryLogger.log_exception(error, details=f"Application section: {section.pk}")
 
@@ -532,9 +535,9 @@ class PindoraService:
                     if reservation.access_code_should_be_active:
                         cls.activate_access_code(obj=reservation)
 
-                        # Access code was activated in Pindora, inform the user by email.
-                        if reservation.access_code_is_active and reservation.access_code_generated_at:
-                            EmailService.send_reservation_access_code_added_email(reservation=reservation)
+                        # User needs to be informed that their reservation now has an access code,
+                        # since inactive access codes are not shown to users.
+                        EmailService.send_reservation_access_code_added_email(reservation=reservation)
 
                     else:
                         cls.deactivate_access_code(obj=reservation)
@@ -582,6 +585,11 @@ class PindoraService:
                 try:
                     if section.should_have_active_access_code:
                         cls.activate_access_code(obj=section)
+
+                        # User needs to be informed that their seasonal booking now has an access code,
+                        # since inactive access codes are not shown to users.
+                        EmailService.send_seasonal_booking_access_code_added_email(section)
+
                     else:
                         cls.deactivate_access_code(obj=section)
 
