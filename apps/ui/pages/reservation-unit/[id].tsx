@@ -106,12 +106,12 @@ import {
   useRemoveStoredReservation,
   useAvailableTimes,
   useToastIfQueryParam,
+  useBlockingReservations,
 } from "@/hooks";
 import { gql } from "@apollo/client";
 import { type ApiError, getApiErrors } from "common/src/apolloUtils";
 import { formatErrorMessage } from "common/src/hooks/useDisplayError";
 import { errorToast } from "common/src/common/toast";
-import { useBlockingReservations } from "@/hooks/useBlockingReservations";
 
 const StyledApplicationRoundScheduleDay = styled.p`
   span:first-child {
@@ -731,6 +731,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         end,
         reservationUnit: pk,
       };
+
       try {
         const res = await apolloClient.mutate<
           CreateReservationMutation,
