@@ -56,7 +56,7 @@ function View({
 
   useToastIfQueryParam({
     key: "deletedReservationPk",
-    successMessage: t("application:preview.reservationDeleted"),
+    message: t("application:preview.reservationDeleted"),
   });
 
   const translateDeletedSectionMessage = () => {
@@ -80,7 +80,7 @@ function View({
 
   useToastIfQueryParam({
     key: ["cancelled", "future"],
-    successMessage: translateDeletedSectionMessage,
+    message: translateDeletedSectionMessage,
   });
 
   const searchParams = useSearchParams();

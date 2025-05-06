@@ -260,7 +260,12 @@ function parseUserGQLquery(
 
   if ("reservation" in data) {
     const { reservation } = data;
-    if (
+
+    // Reservation doesn't exist or user has no access to it
+    // have to handle like this otherwise we can't redirect out of the funnel if the reservation was deleted
+    if (reservationId != null && reservation == null) {
+      hasAccess = true;
+    } else if (
       reservation != null &&
       typeof reservation === "object" &&
       "user" in reservation &&
@@ -269,6 +274,7 @@ function parseUserGQLquery(
       "pk" in reservation.user
     ) {
       const { pk } = reservation.user;
+
       if (pk != null && typeof pk === "number") {
         hasAccess = pk === userPk;
       }

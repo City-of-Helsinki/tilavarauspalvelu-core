@@ -77,7 +77,8 @@
     "bufferCollision": "Bokningen är för nära föregående eller nästa bokning. Ändra bokningens tidpunkt.",
     "collision": "Objektet är redan bokat vid den tidpunkt du valde. Ändra bokningens tidpunkt.",
     "unavailable": "Objektet går inte att boka vid den tidpunkt du valde. Ändra bokningens tidpunkt.",
-    "termsNotAccepted": "Godkänn avtalsvillkoren för att fortsätta bokningen."
+    "termsNotAccepted": "Godkänn avtalsvillkoren för att fortsätta bokningen.",
+    "invalidReservationRedirect": "Bokningen är inte längre giltig."
   },
   "reservingStartsAt": "Objektet går att boka från och med {{date}}.",
   "reservationQuotaLabel": "Befintliga bokningar",
