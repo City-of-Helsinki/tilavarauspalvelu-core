@@ -17,8 +17,9 @@ from tilavarauspalvelu.integrations.helauth.clients import KeyCloakClient
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
-from utils.external_service.errors import ExternalServiceError, ExternalServiceRequestError
+from utils.external_service.errors import ExternalServiceRequestError
 
+from .exceptions import HelsinkiProfileError
 from .parsers import ProfileDataParser
 
 if TYPE_CHECKING:
@@ -202,7 +203,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
             SentryLogger.log_message(message=msg, details=errors, level="warning")
 
             error_msg = f"{msg} {json.dumps(errors)}"
-            raise ExternalServiceError(error_msg)
+            raise HelsinkiProfileError(error_msg, extra_data=errors)
 
         return response_data
 
