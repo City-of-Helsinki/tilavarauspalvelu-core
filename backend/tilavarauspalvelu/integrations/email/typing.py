@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import dataclasses
-from dataclasses import asdict, dataclass
-from typing import TYPE_CHECKING, Any, Self
+from typing import TYPE_CHECKING, Any, ClassVar, Self, TypedDict
 
 from django.utils.functional import classproperty
 from django.utils.translation import pgettext_lazy
 
-from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
-from tilavarauspalvelu.integrations.email.template_context import (
+from .rendering import render_html, render_text
+from .template_context import (
     get_context_for_reservation_access_code_added,
     get_context_for_reservation_access_code_changed,
     get_context_for_reservation_approved,
@@ -20,6 +19,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_reservation_requires_handling_staff_notification,
     get_context_for_reservation_requires_payment,
     get_context_for_reservation_rescheduled,
+    get_context_for_seasonal_booking_access_code_added,
     get_context_for_seasonal_booking_access_code_changed,
     get_context_for_seasonal_booking_application_received,
     get_context_for_seasonal_booking_application_round_handled,
@@ -34,12 +34,11 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_user_anonymization,
     get_context_for_user_permissions_deactivation,
 )
-from tilavarauspalvelu.integrations.email.template_context.reservation import (
-    get_context_for_seasonal_booking_access_code_added,
-)
 
 if TYPE_CHECKING:
+    import datetime
     from collections.abc import Callable, Iterable
+    from decimal import Decimal
 
     from django.utils.functional import Promise
 
@@ -49,10 +48,30 @@ __all__ = [
     "EmailData",
     "EmailTemplateType",
     "EmailType",
+    "ReservationAccessCodeAddedContext",
+    "ReservationAccessCodeChangedContext",
+    "ReservationApprovedContext",
+    "ReservationCancelledContext",
+    "ReservationConfirmedContext",
+    "ReservationConfirmedStaffNotificationContext",
+    "ReservationDeniedContext",
+    "ReservationRequiresHandlingContext",
+    "ReservationRequiresHandlingStaffNotificationContext",
+    "ReservationRequiresPaymentContext",
+    "ReservationRescheduledContext",
+    "SeasonalBookingAccessCodeAddedContext",
+    "SeasonalBookingAccessCodeChangedContext",
+    "SeasonalBookingCancelledAllContext",
+    "SeasonalBookingCancelledAllStaffNotificationContext",
+    "SeasonalBookingCancelledSingleContext",
+    "SeasonalBookingDeniedSeriesContext",
+    "SeasonalBookingDeniedSingleContext",
+    "SeasonalBookingRescheduledSeriesContext",
+    "SeasonalBookingRescheduledSingleContext",
 ]
 
 
-@dataclass
+@dataclasses.dataclass
 class EmailData:
     recipients: Iterable[str]
     subject: str
@@ -66,7 +85,7 @@ class EmailData:
         recipients: Iterable[str],
         context: EmailContext,
         email_type: EmailTemplateType,
-        attachment: EmailAttachment = None,
+        attachment: EmailAttachment | None = None,
     ) -> Self:
         """Helper method to build an EmailData object with the given context and email type."""
         return cls(
@@ -79,10 +98,265 @@ class EmailData:
 
     def __json__(self) -> dict[str, Any]:  # noqa: PLW3201
         """Make the object JSON serializable to be used in Celery tasks."""
-        return asdict(self)
+        return dataclasses.asdict(self)
 
 
-####
+# Contexts
+
+
+class ReservationAccessCodeAddedContext(TypedDict, total=False):
+    email_recipient_name: str
+    reservation_unit_name: str
+    unit_name: str
+    unit_location: str
+    begin_datetime: datetime.datetime
+    end_datetime: datetime.datetime
+    price: Decimal
+    tax_percentage: Decimal
+    reservation_id: int
+    instructions_confirmed: str
+    access_code_is_used: bool
+    access_code: str
+    access_code_validity_period: str
+
+
+class ReservationAccessCodeChangedContext(TypedDict, total=False):
+    email_recipient_name: str
+    reservation_unit_name: str
+    unit_name: str
+    unit_location: str
+    begin_datetime: datetime.datetime
+    end_datetime: datetime.datetime
+    price: Decimal
+    tax_percentage: Decimal
+    reservation_id: int
+    instructions_confirmed: str
+    access_code_is_used: bool
+    access_code: str
+    access_code_validity_period: str
+
+
+class ReservationApprovedContext(TypedDict, total=False):
+    email_recipient_name: str
+    reservation_unit_name: str
+    unit_name: str
+    unit_location: str
+    begin_datetime: datetime.datetime
+    end_datetime: datetime.datetime
+    price: Decimal
+    non_subsidised_price: Decimal
+    tax_percentage: Decimal
+    reservation_id: int
+    instructions_confirmed: str
+    access_code_is_used: bool
+    access_code: str
+    access_code_validity_period: str
+
+
+class ReservationCancelledContext(TypedDict, total=False):
+    email_recipient_name: str
+    cancel_reason: str
+    reservation_unit_name: str
+    unit_name: str
+    unit_location: str
+    begin_datetime: datetime.datetime
+    end_datetime: datetime.datetime
+    price: Decimal
+    tax_percentage: Decimal
+    reservation_id: int
+    instructions_cancelled: str
+
+
+class ReservationConfirmedContext(TypedDict, total=False):
+    email_recipient_name: str
+    reservation_unit_name: str
+    unit_name: str
+    unit_location: str
+    begin_datetime: datetime.datetime
+    end_datetime: datetime.datetime
+    price: Decimal
+    tax_percentage: Decimal
+    reservation_id: int
+    instructions_confirmed: str
+    access_code_is_used: bool
+    access_code: str
+    access_code_validity_period: str
+
+
+class ReservationConfirmedStaffNotificationContext(TypedDict, total=False):
+    reservee_name: str
+    reservation_name: str
+    reservation_unit_name: str
+    unit_name: str
+    unit_location: str
+    begin_datetime: datetime.datetime
+    end_datetime: datetime.datetime
+    reservation_id: int
+
+
+class ReservationDeniedContext(TypedDict, total=False):
+    email_recipient_name: str
+    reservation_unit_name: str
+    unit_name: str
+    unit_location: str
+    begin_datetime: datetime.datetime
+    end_datetime: datetime.datetime
+    rejection_reason: str
+    reservation_id: int
+    instructions_cancelled: str
+
+
+class ReservationRequiresHandlingContext(TypedDict, total=False):
+    email_recipient_name: str
+    reservation_unit_name: str
+    unit_name: str
+    unit_location: str
+    begin_datetime: datetime.datetime
+    end_datetime: datetime.datetime
+    price: Decimal
+    subsidised_price: Decimal
+    applying_for_free_of_charge: bool
+    tax_percentage: Decimal
+    reservation_id: int
+    instructions_pending: str
+
+
+class ReservationRequiresHandlingStaffNotificationContext(TypedDict, total=False):
+    reservee_name: str
+    reservation_name: str
+    reservation_unit_name: str
+    unit_name: str
+    unit_location: str
+    begin_datetime: datetime.datetime
+    end_datetime: datetime.datetime
+    reservation_id: int
+
+
+class ReservationRequiresPaymentContext(TypedDict, total=False):
+    email_recipient_name: str
+    reservation_unit_name: str
+    unit_name: str
+    unit_location: str
+    begin_datetime: datetime.datetime
+    end_datetime: datetime.datetime
+    price: Decimal
+    tax_percentage: Decimal
+    payment_due_date: datetime.date
+    reservation_id: int
+    instructions_confirmed: str
+
+
+class ReservationRescheduledContext(TypedDict, total=False):
+    email_recipient_name: str
+    reservation_unit_name: str
+    unit_name: str
+    unit_location: str
+    begin_datetime: datetime.datetime
+    end_datetime: datetime.datetime
+    price: Decimal
+    tax_percentage: Decimal
+    reservation_id: int
+    instructions_confirmed: str
+    access_code_is_used: bool
+    access_code: str
+    access_code_validity_period: str
+
+
+class SeasonalBookingAccessCodeAddedContext(TypedDict, total=False):
+    email_recipient_name: str
+    application_section_name: str
+    application_round_name: str
+    application_id: int | None
+    application_section_id: int | None
+    access_code_is_used: bool
+    access_code: str
+    allocations: list[dict[str, Any]]
+
+
+class SeasonalBookingAccessCodeChangedContext(TypedDict, total=False):
+    email_recipient_name: str
+    application_section_name: str
+    application_round_name: str
+    application_id: int | None
+    application_section_id: int | None
+    access_code_is_used: bool
+    access_code: str
+    allocations: list[dict[str, Any]]
+
+
+class SeasonalBookingCancelledAllContext(TypedDict):
+    cancel_reason: str
+    email_recipient_name: str
+    application_section_name: str
+    application_round_name: str
+    application_id: int | None
+    application_section_id: int | None
+
+
+class SeasonalBookingCancelledAllStaffNotificationContext(TypedDict, total=False):
+    cancel_reason: str
+    application_section_name: str
+    application_round_name: str
+    cancelled_reservation_series: list[dict[str, str]]
+
+
+class SeasonalBookingCancelledSingleContext(TypedDict, total=False):
+    email_recipient_name: str
+    cancel_reason: str
+    reservation_unit_name: str
+    unit_name: str
+    unit_location: str
+    begin_datetime: datetime.datetime
+    end_datetime: datetime.datetime
+    application_id: int | None
+    application_section_id: int | None
+
+
+class SeasonalBookingDeniedSeriesContext(TypedDict, total=False):
+    rejection_reason: str
+    email_recipient_name: str
+    application_section_name: str
+    application_round_name: str
+    application_id: int | None
+    application_section_id: int | None
+    allocations: list[dict[str, Any]]
+
+
+class SeasonalBookingDeniedSingleContext(TypedDict, total=False):
+    email_recipient_name: str
+    reservation_unit_name: str
+    unit_name: str
+    unit_location: str
+    begin_datetime: datetime.datetime
+    end_datetime: datetime.datetime
+    rejection_reason: str
+    application_id: int | None
+    application_section_id: int | None
+
+
+class SeasonalBookingRescheduledSeriesContext(TypedDict, total=False):
+    email_recipient_name: str
+    application_section_name: str
+    application_round_name: str
+    application_id: int | None
+    application_section_id: int | None
+    access_code_is_used: bool
+    access_code: str
+    allocations: list[dict[str, Any]]
+
+
+class SeasonalBookingRescheduledSingleContext(TypedDict, total=False):
+    email_recipient_name: str
+    reservation_unit_name: str
+    unit_name: str
+    unit_location: str
+    begin_datetime: datetime.datetime
+    end_datetime: datetime.datetime
+    application_id: int | None
+    application_section_id: int | None
+
+
+# Email template types
 
 
 @dataclasses.dataclass
@@ -105,15 +379,15 @@ class EmailTemplateType:
 
 
 class _EmailTypeOptions:
+    options: ClassVar[list[EmailTemplateType]]
+
     def __init_subclass__(cls, **kwargs: Any) -> None:
         """Collect all defined EmailTemplateType attributes in the subclass to options."""
-        cls.options: list[EmailTemplateType] = [
-            option for option in cls.__dict__.values() if isinstance(option, EmailTemplateType)
-        ]
+        cls.options = [option for option in cls.__dict__.values() if isinstance(option, EmailTemplateType)]
 
 
 class EmailType(_EmailTypeOptions):
-    options: list[EmailTemplateType]
+    """Defines all possible email types that can be sent from the system."""
 
     @classmethod
     def get(cls, value: str, /) -> EmailTemplateType:
@@ -128,204 +402,57 @@ class EmailType(_EmailTypeOptions):
     RESERVATION_ACCESS_CODE_ADDED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation access code added"),
         get_email_context=get_context_for_reservation_access_code_added,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "reservation_unit_name",
-            "unit_name",
-            "unit_location",
-            "begin_datetime",
-            "end_datetime",
-            "price",
-            "tax_percentage",
-            "reservation_id",
-            "instructions_confirmed",
-            "access_code_is_used",
-            "access_code",
-            "access_code_validity_period",
-        ],
+        context_variables=list(ReservationAccessCodeAddedContext.__annotations__),
     )
     RESERVATION_ACCESS_CODE_CHANGED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation access code changed"),
         get_email_context=get_context_for_reservation_access_code_changed,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "reservation_unit_name",
-            "unit_name",
-            "unit_location",
-            "begin_datetime",
-            "end_datetime",
-            "price",
-            "tax_percentage",
-            "reservation_id",
-            "instructions_confirmed",
-            "access_code_is_used",
-            "access_code",
-            "access_code_validity_period",
-        ],
+        context_variables=list(ReservationAccessCodeChangedContext.__annotations__),
     )
     RESERVATION_APPROVED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation approved"),
         get_email_context=get_context_for_reservation_approved,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "reservation_unit_name",
-            "unit_name",
-            "unit_location",
-            "begin_datetime",
-            "end_datetime",
-            "price",
-            "non_subsidised_price",
-            "tax_percentage",
-            "reservation_id",
-            "instructions_confirmed",
-            "access_code_is_used",
-            "access_code",
-            "access_code_validity_period",
-        ],
+        context_variables=list(ReservationApprovedContext.__annotations__),
     )
     RESERVATION_CANCELLED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation cancelled"),
         get_email_context=get_context_for_reservation_cancelled,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "cancel_reason",
-            "reservation_unit_name",
-            "unit_name",
-            "unit_location",
-            "begin_datetime",
-            "end_datetime",
-            "price",
-            "tax_percentage",
-            "reservation_id",
-            "instructions_cancelled",
-        ],
+        context_variables=list(ReservationCancelledContext.__annotations__),
     )
     RESERVATION_CONFIRMED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation confirmed"),
         get_email_context=get_context_for_reservation_confirmed,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "reservation_unit_name",
-            "unit_name",
-            "unit_location",
-            "begin_datetime",
-            "end_datetime",
-            "price",
-            "tax_percentage",
-            "reservation_id",
-            "instructions_confirmed",
-            "access_code_is_used",
-            "access_code",
-            "access_code_validity_period",
-        ],
+        context_variables=list(ReservationConfirmedContext.__annotations__),
     )
     RESERVATION_CONFIRMED_STAFF_NOTIFICATION = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation confirmed staff notification"),
         get_email_context=get_context_for_reservation_confirmed_staff_notification,
-        context_variables=[
-            "language",
-            "reservee_name",
-            "reservation_name",
-            "reservation_unit_name",
-            "unit_name",
-            "unit_location",
-            "begin_datetime",
-            "end_datetime",
-            "reservation_id",
-        ],
+        context_variables=list(ReservationConfirmedStaffNotificationContext.__annotations__),
     )
     RESERVATION_DENIED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation denied"),
         get_email_context=get_context_for_reservation_denied,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "reservation_unit_name",
-            "unit_name",
-            "unit_location",
-            "begin_datetime",
-            "end_datetime",
-            "rejection_reason",
-            "reservation_id",
-            "instructions_cancelled",
-        ],
+        context_variables=list(ReservationDeniedContext.__annotations__),
     )
     RESERVATION_REQUIRES_HANDLING = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation requires handling"),
         get_email_context=get_context_for_reservation_requires_handling,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "reservation_unit_name",
-            "unit_name",
-            "unit_location",
-            "begin_datetime",
-            "end_datetime",
-            "price",
-            "subsidised_price",
-            "applying_for_free_of_charge",
-            "tax_percentage",
-            "reservation_id",
-            "instructions_pending",
-        ],
+        context_variables=list(ReservationRequiresHandlingContext.__annotations__),
     )
     RESERVATION_REQUIRES_HANDLING_STAFF_NOTIFICATION = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation requires handling staff notification"),
         get_email_context=get_context_for_reservation_requires_handling_staff_notification,
-        context_variables=[
-            "language",
-            "reservee_name",
-            "reservation_name",
-            "reservation_unit_name",
-            "unit_name",
-            "unit_location",
-            "begin_datetime",
-            "end_datetime",
-            "reservation_id",
-        ],
+        context_variables=list(ReservationRequiresHandlingStaffNotificationContext.__annotations__),
     )
     RESERVATION_REQUIRES_PAYMENT = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation requires payment"),
         get_email_context=get_context_for_reservation_requires_payment,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "reservation_unit_name",
-            "unit_name",
-            "unit_location",
-            "begin_datetime",
-            "end_datetime",
-            "price",
-            "tax_percentage",
-            "payment_due_date",
-            "reservation_id",
-            "instructions_confirmed",
-        ],
+        context_variables=list(ReservationRequiresPaymentContext.__annotations__),
     )
     RESERVATION_RESCHEDULED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation rescheduled"),
         get_email_context=get_context_for_reservation_rescheduled,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "reservation_unit_name",
-            "unit_name",
-            "unit_location",
-            "begin_datetime",
-            "end_datetime",
-            "price",
-            "tax_percentage",
-            "reservation_id",
-            "instructions_confirmed",
-            "access_code_is_used",
-            "access_code",
-            "access_code_validity_period",
-        ],
+        context_variables=list(ReservationRescheduledContext.__annotations__),
     )
 
     # Seasonal booking
@@ -333,147 +460,62 @@ class EmailType(_EmailTypeOptions):
     SEASONAL_BOOKING_ACCESS_CODE_ADDED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal reservation access code added"),
         get_email_context=get_context_for_seasonal_booking_access_code_added,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "application_section_name",
-            "application_round_name",
-            "application_id",
-            "application_section_id",
-            "access_code_is_used",
-            "access_code",
-            "allocations",
-        ],
+        context_variables=list(SeasonalBookingAccessCodeAddedContext.__annotations__),
     )
     SEASONAL_BOOKING_ACCESS_CODE_CHANGED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal reservation access code changed"),
         get_email_context=get_context_for_seasonal_booking_access_code_changed,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "application_section_name",
-            "application_round_name",
-            "application_id",
-            "application_section_id",
-            "access_code_is_used",
-            "access_code",
-            "allocations",
-        ],
+        context_variables=list(SeasonalBookingAccessCodeChangedContext.__annotations__),
     )
     SEASONAL_BOOKING_APPLICATION_RECEIVED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal booking application received"),
         get_email_context=get_context_for_seasonal_booking_application_received,
-        context_variables=["language"],
-    )
-    SEASONAL_BOOKING_APPLICATION_ROUND_IN_ALLOCATION = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Seasonal booking application round in allocation"),
-        get_email_context=get_context_for_seasonal_booking_application_round_in_allocation,
-        context_variables=["language"],
+        context_variables=[],
     )
     SEASONAL_BOOKING_APPLICATION_ROUND_HANDLED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal booking application round handled"),
         get_email_context=get_context_for_seasonal_booking_application_round_handled,
-        context_variables=["language"],
+        context_variables=[],
+    )
+    SEASONAL_BOOKING_APPLICATION_ROUND_IN_ALLOCATION = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Seasonal booking application round in allocation"),
+        get_email_context=get_context_for_seasonal_booking_application_round_in_allocation,
+        context_variables=[],
     )
     SEASONAL_BOOKING_CANCELLED_ALL = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal booking cancelled all"),
         get_email_context=get_context_for_seasonal_booking_cancelled_all,
-        context_variables=[
-            "language",
-            "cancel_reason",
-            "email_recipient_name",
-            "application_section_name",
-            "application_round_name",
-            "application_id",
-            "application_section_id",
-        ],
+        context_variables=list(SeasonalBookingCancelledAllContext.__annotations__),
     )
     SEASONAL_BOOKING_CANCELLED_ALL_STAFF_NOTIFICATION = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal booking cancelled all staff notification"),
         get_email_context=get_context_for_seasonal_booking_cancelled_all_staff_notification,
-        context_variables=[
-            "language",
-            "cancel_reason",
-            "application_section_name",
-            "application_round_name",
-            "cancelled_reservation_series",
-        ],
+        context_variables=list(SeasonalBookingCancelledAllStaffNotificationContext.__annotations__),
     )
     SEASONAL_BOOKING_CANCELLED_SINGLE = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal booking cancelled single"),
         get_email_context=get_context_for_seasonal_booking_cancelled_single,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "cancel_reason",
-            "reservation_unit_name",
-            "unit_name",
-            "unit_location",
-            "begin_datetime",
-            "end_datetime",
-            "application_id",
-            "application_section_id",
-        ],
+        context_variables=list(SeasonalBookingCancelledSingleContext.__annotations__),
     )
     SEASONAL_BOOKING_DENIED_SERIES = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal booking denied series"),
         get_email_context=get_context_for_seasonal_booking_denied_series,
-        context_variables=[
-            "language",
-            "rejection_reason",
-            "email_recipient_name",
-            "application_section_name",
-            "application_round_name",
-            "application_id",
-            "application_section_id",
-            "allocations",
-        ],
+        context_variables=list(SeasonalBookingDeniedSeriesContext.__annotations__),
     )
     SEASONAL_BOOKING_DENIED_SINGLE = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal booking denied single"),
         get_email_context=get_context_for_seasonal_booking_denied_single,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "reservation_unit_name",
-            "unit_name",
-            "unit_location",
-            "begin_datetime",
-            "end_datetime",
-            "rejection_reason",
-            "application_id",
-            "application_section_id",
-        ],
+        context_variables=list(SeasonalBookingDeniedSingleContext.__annotations__),
     )
     SEASONAL_BOOKING_RESCHEDULED_SERIES = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal booking rescheduled series"),
         get_email_context=get_context_for_seasonal_booking_rescheduled_series,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "application_section_name",
-            "application_round_name",
-            "application_id",
-            "application_section_id",
-            "access_code_is_used",
-            "access_code",
-            "allocations",
-        ],
+        context_variables=list(SeasonalBookingRescheduledSeriesContext.__annotations__),
     )
     SEASONAL_BOOKING_RESCHEDULED_SINGLE = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal booking rescheduled single"),
         get_email_context=get_context_for_seasonal_booking_rescheduled_single,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "reservation_unit_name",
-            "unit_name",
-            "unit_location",
-            "begin_datetime",
-            "end_datetime",
-            "application_id",
-            "application_section_id",
-        ],
+        context_variables=list(SeasonalBookingRescheduledSingleContext.__annotations__),
     )
 
     # User
@@ -481,12 +523,12 @@ class EmailType(_EmailTypeOptions):
     USER_PERMISSIONS_DEACTIVATION = EmailTemplateType(
         label=pgettext_lazy("EmailType", "User permissions deactivation"),
         get_email_context=get_context_for_user_permissions_deactivation,
-        context_variables=["language"],
+        context_variables=[],
     )
     USER_ANONYMIZATION = EmailTemplateType(
         label=pgettext_lazy("EmailType", "User anonymization"),
         get_email_context=get_context_for_user_anonymization,
-        context_variables=["language"],
+        context_variables=[],
     )
 
     @classproperty

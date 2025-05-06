@@ -63,7 +63,7 @@ type Lang = Literal["fi", "sv", "en"]
 type TextSearchLang = Literal["finnish", "english", "swedish"]
 type HTTPMethod = Literal["GET", "POST", "PUT", "PATCH", "DELETE"]
 type M2MAction = Literal["pre_add", "post_add", "pre_remove", "post_remove", "pre_clear", "post_clear"]
-type EmailContext = dict[str, str | int | Decimal | None]
+type EmailContext = dict[str, str | int | Decimal | EmailContext | list[EmailContext] | None]
 type Action = Literal["pre_add", "post_add", "pre_remove", "post_remove", "pre_clear", "post_clear"]
 type ErrorList = list[ValidationError]
 

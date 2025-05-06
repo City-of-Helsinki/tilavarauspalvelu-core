@@ -1,13 +1,6 @@
 from __future__ import annotations
 
-from tilavarauspalvelu.integrations.email.template_context.application import (
-    get_context_for_seasonal_booking_application_received,
-    get_context_for_seasonal_booking_application_round_handled,
-    get_context_for_seasonal_booking_application_round_in_allocation,
-    get_context_for_seasonal_booking_cancelled_all,
-    get_context_for_seasonal_booking_cancelled_all_staff_notification,
-)
-from tilavarauspalvelu.integrations.email.template_context.reservation import (
+from .reservation import (
     get_context_for_reservation_access_code_added,
     get_context_for_reservation_access_code_changed,
     get_context_for_reservation_approved,
@@ -19,17 +12,22 @@ from tilavarauspalvelu.integrations.email.template_context.reservation import (
     get_context_for_reservation_requires_handling_staff_notification,
     get_context_for_reservation_requires_payment,
     get_context_for_reservation_rescheduled,
+)
+from .seasonal_bookings import (
+    get_context_for_seasonal_booking_access_code_added,
     get_context_for_seasonal_booking_access_code_changed,
+    get_context_for_seasonal_booking_application_received,
+    get_context_for_seasonal_booking_application_round_handled,
+    get_context_for_seasonal_booking_application_round_in_allocation,
+    get_context_for_seasonal_booking_cancelled_all,
+    get_context_for_seasonal_booking_cancelled_all_staff_notification,
     get_context_for_seasonal_booking_cancelled_single,
     get_context_for_seasonal_booking_denied_series,
     get_context_for_seasonal_booking_denied_single,
     get_context_for_seasonal_booking_rescheduled_series,
     get_context_for_seasonal_booking_rescheduled_single,
 )
-from tilavarauspalvelu.integrations.email.template_context.user import (
-    get_context_for_user_anonymization,
-    get_context_for_user_permissions_deactivation,
-)
+from .user import get_context_for_user_anonymization, get_context_for_user_permissions_deactivation
 
 __all__ = [
     "get_context_for_reservation_access_code_added",
@@ -43,6 +41,7 @@ __all__ = [
     "get_context_for_reservation_requires_handling_staff_notification",
     "get_context_for_reservation_requires_payment",
     "get_context_for_reservation_rescheduled",
+    "get_context_for_seasonal_booking_access_code_added",
     "get_context_for_seasonal_booking_access_code_changed",
     "get_context_for_seasonal_booking_application_received",
     "get_context_for_seasonal_booking_application_round_handled",
