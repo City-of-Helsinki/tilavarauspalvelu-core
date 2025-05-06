@@ -590,7 +590,7 @@ describe("getFuturePricing", () => {
     { endDays: 5, index: 2 },
   ])("with reservation end time", ({ endDays, index }) => {
     const data = constructInput({
-      reservationEnds: endDays ? addDays(new Date(), endDays) : undefined,
+      reservationEnds: endDays ? addDays(new Date(), endDays + 1) : undefined,
       days: DAYS,
     });
     const val = index != null ? data.pricings[index] : null;
