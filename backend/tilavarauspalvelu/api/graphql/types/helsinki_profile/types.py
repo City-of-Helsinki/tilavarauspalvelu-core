@@ -12,6 +12,7 @@ from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProf
 from tilavarauspalvelu.integrations.helsinki_profile.typing import UserProfileInfo
 from tilavarauspalvelu.models import Application, Reservation
 from tilavarauspalvelu.tasks import save_personal_info_view_log
+from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     import datetime
@@ -86,12 +87,21 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         # Modify profile request based on the requested fields in the graphql query
         fields: list[str] = get_field_selections(info)
 
-        data = HelsinkiProfileClient.get_user_profile_info(
-            user=user,
-            request_user=info.context.user,
-            session=info.context.session,
-            fields=fields,
-        )
+        try:
+            data = HelsinkiProfileClient.get_user_profile_info(
+                user=user,
+                request_user=info.context.user,
+                session=info.context.session,
+                fields=fields,
+            )
+        except ExternalServiceError as e:
+            if type(e.extra_data) is list and len(e.extra_data):
+                profile_error = e.extra_data[0]
+                msg = profile_error.get("message", "Unknown Helsinki Profile error")
+                if profile_error.get("extensions", {}).get("code") == "PERMISSION_DENIED_ERROR":
+                    raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_PERMISSION_DENIED) from e
+            raise
+
         if info.context.session.get("keycloak_refresh_token_expired", False):
             msg = "Keycloak refresh token is expired. Please log out and back in again."
             raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_KEYCLOAK_REFRESH_TOKEN_EXPIRED)
