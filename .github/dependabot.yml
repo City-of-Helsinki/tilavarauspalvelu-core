@@ -121,7 +121,7 @@ updates:
 
   # Update Poetry dependencies
   - package-ecosystem: "pip"  # yes, this is correct
-    directory: "/"
+    directory: "/backend/"
     schedule:
       interval: "weekly"
     pull-request-branch-name:
@@ -137,7 +137,7 @@ updates:
 
   # Update Docker dependencies
   - package-ecosystem: "docker"
-    directory: "/docker/"
+    directory: "/backend/docker/"
     schedule:
       interval: "weekly"
     pull-request-branch-name:
