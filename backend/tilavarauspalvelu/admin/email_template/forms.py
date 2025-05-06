@@ -30,6 +30,7 @@ class EmailTesterForm(forms.BaseForm):
         form_fields = {field: email_tester_fields[field] for field in self.email_type.context_variables}
         self.base_fields = {
             "send_to": forms.EmailField(widget=email_widget),
+            "language": forms.ChoiceField(initial=Language.FI.value, choices=Language.choices),
             **form_fields,
         }
 
@@ -107,6 +108,5 @@ def get_email_tester_form_fields() -> dict[str, Any]:
         "access_code_validity_period": forms.CharField(
             initial=initial["access_code_validity_period"], widget=text_widget
         ),
-        "language": forms.ChoiceField(initial=Language.FI.value, choices=Language.choices),
         "allocations": forms.JSONField(initial=initial["allocations"]),
     }

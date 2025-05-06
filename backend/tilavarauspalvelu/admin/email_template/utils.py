@@ -28,7 +28,7 @@ __all__ = [
 
 
 @get_translated
-def get_mock_params(*, language: Lang, **kwargs: Any) -> EmailContext | datetime | bool:
+def get_mock_params(*, language: Lang, **kwargs: Any) -> EmailContext:
     """
     Return mock parameters that can be used for creating ANY email template context.
 
@@ -114,6 +114,9 @@ def get_mock_data(*, email_type: EmailTemplateType, language: Lang, **kwargs: An
 
     # Get only the relevant parameters
     context_params = {key: mock_params[key] for key in email_type.context_variables}
+    # Language is always needed
+    context_params["language"] = mock_params["language"]
+
     return email_type.get_email_context(**context_params)
 
 
