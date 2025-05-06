@@ -1,14 +1,16 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
-import { successToast } from "common/src/common/toast";
+import toast from "common/src/common/toast";
 
 export function useToastIfQueryParam({
   key,
-  successMessage,
+  message,
+  type = "success",
 }: {
   key: string | string[];
-  successMessage: string | (() => string);
+  message: string | (() => string);
+  type?: "success" | "error";
 }) {
   const router = useRouter();
   const { t } = useTranslation();
@@ -41,20 +43,20 @@ export function useToastIfQueryParam({
     };
     const q = router.query;
 
-    const text =
-      typeof successMessage === "string" ? successMessage : successMessage();
-    if (Array.isArray(key)) {
-      if (key.every((k) => q[k])) {
-        successToast({
-          text,
-        });
-        removeTimeUpdatedParam();
-      }
-    } else if (q[key]) {
-      successToast({
+    const text = typeof message === "string" ? message : message();
+    const handle = () => {
+      toast({
         text,
+        type,
       });
       removeTimeUpdatedParam();
+    };
+    if (Array.isArray(key)) {
+      if (key.every((k) => q[k])) {
+        handle();
+      }
+    } else if (q[key]) {
+      handle();
     }
-  }, [router, t, key, successMessage]);
+  }, [router, t, key, message, type]);
 }

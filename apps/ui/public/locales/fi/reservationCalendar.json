@@ -75,7 +75,8 @@
     "bufferCollision": "Varaus on liian lähellä edellistä tai seuraavaa varausta. Muuta varauksen ajankohtaa.",
     "collision": "Kohde on jo varattu valitsemanasi ajankohtana. Muuta varauksen ajankohtaa.",
     "unavailable": "Kohde ei ole varattavissa kyseisenä ajankohtana. Muuta varauksen ajankohtaa.",
-    "termsNotAccepted": "Hyväksy sopimusehdot jatkaaksesi varausta."
+    "termsNotAccepted": "Hyväksy sopimusehdot jatkaaksesi varausta.",
+    "invalidReservationRedirect": "Varaus ei ole enää voimassa."
   },
   "reservingStartsAt": "Kohde on varattavissa {{date}} alkaen.",
   "reservationQuotaLabel": "Olemassaolevia varauksia",
