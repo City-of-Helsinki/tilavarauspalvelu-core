@@ -3564,6 +3564,11 @@ msgctxt "Email"
 msgid "A door code has been added to your booking"
 msgstr "Varaukseesi on lisätty ovikoodi"
 
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "A door code has been added to your seasonal booking"
+msgstr "Kausivaraukseesi on lisätty ovikoodi"
+
 #: tilavarauspalvelu/integrations/email/template_context/user.py
 msgctxt "Email"
 msgid "Your staff access to Varaamo is expiring"
@@ -3661,6 +3666,11 @@ msgstr "Varaus odottaa maksua"
 msgctxt "EmailType"
 msgid "Reservation rescheduled"
 msgstr "Varauksen aikaa muutettu"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation access code added"
+msgstr "Kausivaraukseen lisätty ovikoodi"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
