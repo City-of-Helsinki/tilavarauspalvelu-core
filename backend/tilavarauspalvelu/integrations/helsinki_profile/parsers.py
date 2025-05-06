@@ -64,7 +64,7 @@ class ProfileDataParser:
         )
 
     def parse_user_profile_info(self, *, user: User) -> UserProfileInfo:
-        address = self.get_address(prefer_verified=True)
+        address = self.get_address(prefer_verified=True) or {}
         return UserProfileInfo(
             pk=user.pk,
             first_name=self.get_first_name(prefer_verified=True),
