@@ -2,8 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams, useSearchParams } from "react-router-dom";
-import { Tabs } from "hds-react";
-import { TabWrapper, TitleSection, H1 } from "common/styled";
+import { Button, ButtonVariant, Tabs } from "hds-react";
+import { Flex, H1, TabWrapper, TitleSection } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { parseAddress } from "@/common/util";
 import { getRecurringReservationUrl } from "@/common/urls";
@@ -16,6 +16,8 @@ import { useCheckPermission } from "@/hooks";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { LinkPrev } from "@/component/LinkPrev";
 import { gql } from "@apollo/client";
+import { useModal } from "@/context/ModalContext";
+import { CreateReservationModal } from "@/spa/my-units/[id]/CreateReservationModal";
 
 type Params = {
   unitId: string;
@@ -38,6 +40,7 @@ export function MyUnitView() {
   const { unitId } = useParams<Params>();
   const { t } = useTranslation();
   const pk = toNumber(unitId);
+  const { setModalContent } = useModal();
 
   const isPkValid = pk != null && pk > 0;
   const id = base64encode(`UnitNode:${pk}`);
@@ -92,14 +95,31 @@ export function MyUnitView() {
         <H1 $noMargin>{title}</H1>
         <LocationOnlyOnDesktop>{location}</LocationOnlyOnDesktop>
       </TitleSection>
-      <div>
+      <Flex $direction="row" $gap="m">
+        <Button
+          variant={ButtonVariant.Secondary}
+          onClick={() =>
+            setModalContent(
+              <CreateReservationModal
+                start={new Date()}
+                reservationUnitOptions={reservationUnitOptions}
+                onClose={() => {
+                  setModalContent(null);
+                }}
+              />
+            )
+          }
+          disabled={!canCreateReservations}
+        >
+          {t("MyUnits.Calendar.header.createReservation")}
+        </Button>
         <ButtonLikeLink
           to={canCreateReservations ? recurringReservationUrl : ""}
           disabled={!canCreateReservations}
         >
           {t("MyUnits.Calendar.header.recurringReservation")}
         </ButtonLikeLink>
-      </div>
+      </Flex>
       <TabWrapper>
         <Tabs initiallyActiveTab={activeTab}>
           <Tabs.TabList>
@@ -111,7 +131,7 @@ export function MyUnitView() {
             </Tabs.Tab>
           </Tabs.TabList>
           <TabPanel>
-            <UnitReservations />
+            <UnitReservations reservationUnitOptions={reservationUnitOptions} />
           </TabPanel>
           <TabPanel>
             <ReservationUnitCalendarView
