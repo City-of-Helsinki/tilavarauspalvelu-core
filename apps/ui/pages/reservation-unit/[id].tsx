@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import type { GetServerSidePropsContext } from "next";
 import { Trans, useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
@@ -112,6 +112,9 @@ import { useDisplayError } from "common/src/hooks";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
 import { gql } from "@apollo/client";
 import { useToastIfQueryParam } from "@/hooks";
+import { type ApiError, getApiErrors } from "common/src/apolloUtils";
+import { formatErrorMessage } from "common/src/hooks/useDisplayError";
+import { errorToast } from "common/src/common/toast";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -138,36 +141,41 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { data: userData } = await apolloClient.query<CurrentUserQuery>({
     query: CurrentUserDocument,
   });
+  let mutationErrors: ApiError[] | null = null;
   if (pk != null && pk > 0 && isPostLogin && userData?.currentUser != null) {
     const begin = ignoreMaybeArray(query.begin);
     const end = ignoreMaybeArray(query.end);
 
     if (begin != null && end != null) {
-      // FIXME handle errors (so user never ends to 500 page)
       const input: ReservationCreateMutationInput = {
         begin,
         end,
         reservationUnit: pk,
       };
-      const res = await apolloClient.mutate<
-        CreateReservationMutation,
-        CreateReservationMutationVariables
-      >({
-        mutation: CreateReservationDocument,
-        variables: {
-          input,
-        },
-      });
-      const { pk: reservationPk } = res.data?.createReservation ?? {};
-      return {
-        redirect: {
-          destination: getReservationInProgressPath(pk, reservationPk),
-          permanent: false,
-        },
-        props: {
-          notFound: true, // required for type narrowing
-        },
-      };
+      try {
+        const res = await apolloClient.mutate<
+          CreateReservationMutation,
+          CreateReservationMutationVariables
+        >({
+          mutation: CreateReservationDocument,
+          variables: {
+            input,
+          },
+        });
+        const { pk: reservationPk } = res.data?.createReservation ?? {};
+        return {
+          redirect: {
+            destination: getReservationInProgressPath(pk, reservationPk),
+            permanent: false,
+          },
+          props: {
+            notFound: true, // required for type narrowing
+          },
+        };
+      } catch (error) {
+        // Format errors so we can JSON.stringify them and toast them on client
+        mutationErrors = getApiErrors(error);
+      }
     }
   }
 
@@ -251,6 +259,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         searchDuration,
         searchDate,
         searchTime,
+        mutationErrors,
       },
     };
   }
@@ -388,6 +397,7 @@ function ReservationUnit({
   searchDuration,
   searchDate,
   searchTime,
+  mutationErrors,
 }: Readonly<PropsNarrowed>): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
@@ -434,6 +444,19 @@ function ReservationUnit({
   const durationValue = watch("duration");
   const dateValue = watch("date");
   const timeValue = watch("time");
+
+  const displayError = useDisplayError();
+
+  useEffect(() => {
+    if (mutationErrors != null && mutationErrors.length > 0) {
+      const msgs = mutationErrors.map((e) => formatErrorMessage(t, e));
+      for (const text of msgs) {
+        errorToast({
+          text,
+        });
+      }
+    }
+  }, [mutationErrors, t]);
 
   const focusDate = useMemo(() => {
     return createDateTime(dateValue, timeValue);
@@ -512,8 +535,6 @@ function ReservationUnit({
   }, [reservationUnit.canApplyFreeOfCharge, reservationUnit.pricings]);
 
   const [createReservationMutation] = useCreateReservationMutation();
-
-  const displayError = useDisplayError();
 
   const createReservation = async (
     input: ReservationCreateMutationInput

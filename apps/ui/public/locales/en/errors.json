@@ -58,6 +58,7 @@
     "RESERVATION_UNIT_TYPE_IS_SEASON": "You can only make a seasonal booking application for this item.",
     "CREATE_PERMISSION_DENIED": "No permission to create.",
     "validation": {
+      "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED": "You have the maximum number of bookings for this space.",
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "The person making the reservation must be 18 years old",
       "APPLICATION_ADULT_RESERVEE_REQUIRED": "The applicant must be 18 years old.",
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_TOO_SHORT": "The desired time is too short.",

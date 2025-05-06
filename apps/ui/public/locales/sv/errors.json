@@ -58,6 +58,7 @@
     "RESERVATION_UNIT_TYPE_IS_SEASON": "Du kan bara göra en ansökan om säsongsbokning för detta objekt.",
     "CREATE_PERMISSION_DENIED": "Ingen behörighet att skapa.",
     "validation": {
+      "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED": "Du har det maximala antalet bokningar för detta objekt.",
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "Personen som gör bokningen måste vara myndig.",
       "APPLICATION_ADULT_RESERVEE_REQUIRED": "Sökanden måste vara myndig.",
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_TOO_SHORT": "Önskad tid är för kort.",

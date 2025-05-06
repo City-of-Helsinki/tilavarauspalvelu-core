@@ -57,6 +57,7 @@
     "RESERVATION_UNIT_TYPE_IS_SEASON": "Tähän kohteeseen voit tehdä vain kausivaraushakemuksen.",
     "CREATE_PERMISSION_DENIED": "Ei lupaa luoda.",
     "validation": {
+      "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED": "Sinulla on maksimi määrä varauksia tässä kohteessa.",
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED":  "Varaajan on oltava täysi-ikäinen.",
       "APPLICATION_ADULT_RESERVEE_REQUIRED": "Hakijan on oltava täysi-ikäinen.",
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_TOO_SHORT": "Toivottu aika on liian lyhyt.",
