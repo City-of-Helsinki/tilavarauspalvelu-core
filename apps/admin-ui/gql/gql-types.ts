@@ -1195,8 +1195,10 @@ export type GeneralRoleNode = Node & {
 };
 
 export type HelsinkiProfileDataNode = {
+  readonly additionalAddress: Maybe<Scalars["String"]["output"]>;
   readonly birthday: Maybe<Scalars["Date"]["output"]>;
   readonly city: Maybe<Scalars["String"]["output"]>;
+  readonly countryCode: Maybe<Scalars["String"]["output"]>;
   readonly email: Maybe<Scalars["String"]["output"]>;
   readonly firstName: Maybe<Scalars["String"]["output"]>;
   readonly isStrongLogin: Scalars["Boolean"]["output"];
@@ -6099,6 +6101,8 @@ export type ReservationCommonFieldsFragment = {
     readonly email: string;
     readonly firstName: string;
     readonly lastName: string;
+    readonly isStronglyAuthenticated: boolean;
+    readonly isAdAuthenticated: boolean;
   } | null;
 };
 
@@ -6136,6 +6140,8 @@ export type ReservationUnitReservationsFragment = {
     readonly email: string;
     readonly firstName: string;
     readonly lastName: string;
+    readonly isStronglyAuthenticated: boolean;
+    readonly isAdAuthenticated: boolean;
     readonly pk: number | null;
   } | null;
 };
@@ -6235,21 +6241,6 @@ export type ApplicationRoundTimeSlotsFragment = {
     readonly begin: string;
     readonly end: string;
   } | null>;
-};
-
-export type ReservationDateOfBirthQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type ReservationDateOfBirthQuery = {
-  readonly reservation: {
-    readonly id: string;
-    readonly user: {
-      readonly id: string;
-      readonly pk: number | null;
-      readonly dateOfBirth: string | null;
-    } | null;
-  } | null;
 };
 
 export type ApplicationDateOfBirthQueryVariables = Exact<{
@@ -6746,12 +6737,13 @@ export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
 export type CurrentUserQuery = {
   readonly currentUser: {
     readonly id: string;
+    readonly pk: number | null;
     readonly username: string;
     readonly firstName: string;
     readonly lastName: string;
     readonly email: string;
     readonly isSuperuser: boolean;
-    readonly pk: number | null;
+    readonly isAdAuthenticated: boolean;
     readonly unitRoles: ReadonlyArray<{
       readonly id: string;
       readonly permissions: ReadonlyArray<UserPermissionChoice>;
@@ -8592,6 +8584,8 @@ export type ReservationUnitCalendarQuery = {
         readonly email: string;
         readonly firstName: string;
         readonly lastName: string;
+        readonly isStronglyAuthenticated: boolean;
+        readonly isAdAuthenticated: boolean;
         readonly pk: number | null;
       } | null;
     }> | null;
@@ -8630,6 +8624,8 @@ export type ReservationUnitCalendarQuery = {
       readonly email: string;
       readonly firstName: string;
       readonly lastName: string;
+      readonly isStronglyAuthenticated: boolean;
+      readonly isAdAuthenticated: boolean;
       readonly pk: number | null;
     } | null;
   }> | null;
@@ -8701,6 +8697,8 @@ export type ReservationUnitsByUnitQuery = {
       readonly email: string;
       readonly firstName: string;
       readonly lastName: string;
+      readonly isStronglyAuthenticated: boolean;
+      readonly isAdAuthenticated: boolean;
       readonly pk: number | null;
     } | null;
   }> | null;
@@ -9003,6 +9001,8 @@ export type ReservationListQuery = {
           readonly email: string;
           readonly firstName: string;
           readonly lastName: string;
+          readonly isStronglyAuthenticated: boolean;
+          readonly isAdAuthenticated: boolean;
         } | null;
       } | null;
     } | null>;
@@ -9044,6 +9044,8 @@ export type ReservationTableElementFragment = {
     readonly email: string;
     readonly firstName: string;
     readonly lastName: string;
+    readonly isStronglyAuthenticated: boolean;
+    readonly isAdAuthenticated: boolean;
   } | null;
 };
 
@@ -9200,6 +9202,50 @@ export type ReservationKeylessEntryFragment = {
       }>;
     } | null;
   } | null;
+};
+
+export type ReservationDateOfBirthQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ReservationDateOfBirthQuery = {
+  readonly reservation: {
+    readonly id: string;
+    readonly user: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly dateOfBirth: string | null;
+    } | null;
+  } | null;
+};
+
+export type ReservationProfileDataContactInfoQueryVariables = Exact<{
+  reservationId: Scalars["Int"]["input"];
+}>;
+
+export type ReservationProfileDataContactInfoQuery = {
+  readonly profileData: {
+    readonly pk: number;
+    readonly firstName: string | null;
+    readonly lastName: string | null;
+    readonly email: string | null;
+    readonly phone: string | null;
+    readonly municipalityCode: string | null;
+    readonly municipalityName: string | null;
+    readonly streetAddress: string | null;
+    readonly postalCode: string | null;
+    readonly city: string | null;
+    readonly countryCode: string | null;
+    readonly additionalAddress: string | null;
+  } | null;
+};
+
+export type ReservationProfileDataSsnQueryVariables = Exact<{
+  reservationId: Scalars["Int"]["input"];
+}>;
+
+export type ReservationProfileDataSsnQuery = {
+  readonly profileData: { readonly ssn: string | null } | null;
 };
 
 export type TimeBlockSectionFragment = {
@@ -9387,6 +9433,8 @@ export type ReservationEditPageQuery = {
       readonly email: string;
       readonly firstName: string;
       readonly lastName: string;
+      readonly isStronglyAuthenticated: boolean;
+      readonly isAdAuthenticated: boolean;
     } | null;
     readonly ageGroup: {
       readonly id: string;
@@ -9567,6 +9615,8 @@ export type ReservationPageQuery = {
       readonly email: string;
       readonly firstName: string;
       readonly lastName: string;
+      readonly isStronglyAuthenticated: boolean;
+      readonly isAdAuthenticated: boolean;
       readonly pk: number | null;
     } | null;
     readonly pindoraInfo: {
@@ -10337,6 +10387,8 @@ export const ReservationCommonFieldsFragmentDoc = gql`
       email
       firstName
       lastName
+      isStronglyAuthenticated
+      isAdAuthenticated
     }
     bufferTimeBefore
     bufferTimeAfter
@@ -11611,93 +11663,6 @@ export type TermsOfUseSuspenseQueryHookResult = ReturnType<
 export type TermsOfUseQueryResult = Apollo.QueryResult<
   TermsOfUseQuery,
   TermsOfUseQueryVariables
->;
-export const ReservationDateOfBirthDocument = gql`
-  query ReservationDateOfBirth($id: ID!) {
-    reservation(id: $id) {
-      id
-      user {
-        id
-        pk
-        dateOfBirth
-      }
-    }
-  }
-`;
-
-/**
- * __useReservationDateOfBirthQuery__
- *
- * To run a query within a React component, call `useReservationDateOfBirthQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationDateOfBirthQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReservationDateOfBirthQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useReservationDateOfBirthQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    ReservationDateOfBirthQuery,
-    ReservationDateOfBirthQueryVariables
-  > &
-    (
-      | { variables: ReservationDateOfBirthQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    ReservationDateOfBirthQuery,
-    ReservationDateOfBirthQueryVariables
-  >(ReservationDateOfBirthDocument, options);
-}
-export function useReservationDateOfBirthLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationDateOfBirthQuery,
-    ReservationDateOfBirthQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    ReservationDateOfBirthQuery,
-    ReservationDateOfBirthQueryVariables
-  >(ReservationDateOfBirthDocument, options);
-}
-export function useReservationDateOfBirthSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ReservationDateOfBirthQuery,
-        ReservationDateOfBirthQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ReservationDateOfBirthQuery,
-    ReservationDateOfBirthQueryVariables
-  >(ReservationDateOfBirthDocument, options);
-}
-export type ReservationDateOfBirthQueryHookResult = ReturnType<
-  typeof useReservationDateOfBirthQuery
->;
-export type ReservationDateOfBirthLazyQueryHookResult = ReturnType<
-  typeof useReservationDateOfBirthLazyQuery
->;
-export type ReservationDateOfBirthSuspenseQueryHookResult = ReturnType<
-  typeof useReservationDateOfBirthSuspenseQuery
->;
-export type ReservationDateOfBirthQueryResult = Apollo.QueryResult<
-  ReservationDateOfBirthQuery,
-  ReservationDateOfBirthQueryVariables
 >;
 export const ApplicationDateOfBirthDocument = gql`
   query ApplicationDateOfBirth($id: ID!) {
@@ -12975,12 +12940,13 @@ export const CurrentUserDocument = gql`
   query CurrentUser {
     currentUser {
       id
+      pk
       username
       firstName
       lastName
       email
       isSuperuser
-      pk
+      isAdAuthenticated
       unitRoles {
         id
         permissions
@@ -16876,6 +16842,270 @@ export type RepairReservationAccessCodeSeriesMutationOptions =
     RepairReservationAccessCodeSeriesMutation,
     RepairReservationAccessCodeSeriesMutationVariables
   >;
+export const ReservationDateOfBirthDocument = gql`
+  query ReservationDateOfBirth($id: ID!) {
+    reservation(id: $id) {
+      id
+      user {
+        id
+        pk
+        dateOfBirth
+      }
+    }
+  }
+`;
+
+/**
+ * __useReservationDateOfBirthQuery__
+ *
+ * To run a query within a React component, call `useReservationDateOfBirthQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationDateOfBirthQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationDateOfBirthQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useReservationDateOfBirthQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationDateOfBirthQuery,
+    ReservationDateOfBirthQueryVariables
+  > &
+    (
+      | { variables: ReservationDateOfBirthQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ReservationDateOfBirthQuery,
+    ReservationDateOfBirthQueryVariables
+  >(ReservationDateOfBirthDocument, options);
+}
+export function useReservationDateOfBirthLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationDateOfBirthQuery,
+    ReservationDateOfBirthQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationDateOfBirthQuery,
+    ReservationDateOfBirthQueryVariables
+  >(ReservationDateOfBirthDocument, options);
+}
+export function useReservationDateOfBirthSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationDateOfBirthQuery,
+        ReservationDateOfBirthQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationDateOfBirthQuery,
+    ReservationDateOfBirthQueryVariables
+  >(ReservationDateOfBirthDocument, options);
+}
+export type ReservationDateOfBirthQueryHookResult = ReturnType<
+  typeof useReservationDateOfBirthQuery
+>;
+export type ReservationDateOfBirthLazyQueryHookResult = ReturnType<
+  typeof useReservationDateOfBirthLazyQuery
+>;
+export type ReservationDateOfBirthSuspenseQueryHookResult = ReturnType<
+  typeof useReservationDateOfBirthSuspenseQuery
+>;
+export type ReservationDateOfBirthQueryResult = Apollo.QueryResult<
+  ReservationDateOfBirthQuery,
+  ReservationDateOfBirthQueryVariables
+>;
+export const ReservationProfileDataContactInfoDocument = gql`
+  query ReservationProfileDataContactInfo($reservationId: Int!) {
+    profileData(reservationId: $reservationId) {
+      pk
+      firstName
+      lastName
+      email
+      phone
+      municipalityCode
+      municipalityName
+      streetAddress
+      postalCode
+      city
+      countryCode
+      additionalAddress
+    }
+  }
+`;
+
+/**
+ * __useReservationProfileDataContactInfoQuery__
+ *
+ * To run a query within a React component, call `useReservationProfileDataContactInfoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationProfileDataContactInfoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationProfileDataContactInfoQuery({
+ *   variables: {
+ *      reservationId: // value for 'reservationId'
+ *   },
+ * });
+ */
+export function useReservationProfileDataContactInfoQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationProfileDataContactInfoQuery,
+    ReservationProfileDataContactInfoQueryVariables
+  > &
+    (
+      | {
+          variables: ReservationProfileDataContactInfoQueryVariables;
+          skip?: boolean;
+        }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ReservationProfileDataContactInfoQuery,
+    ReservationProfileDataContactInfoQueryVariables
+  >(ReservationProfileDataContactInfoDocument, options);
+}
+export function useReservationProfileDataContactInfoLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationProfileDataContactInfoQuery,
+    ReservationProfileDataContactInfoQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationProfileDataContactInfoQuery,
+    ReservationProfileDataContactInfoQueryVariables
+  >(ReservationProfileDataContactInfoDocument, options);
+}
+export function useReservationProfileDataContactInfoSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationProfileDataContactInfoQuery,
+        ReservationProfileDataContactInfoQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationProfileDataContactInfoQuery,
+    ReservationProfileDataContactInfoQueryVariables
+  >(ReservationProfileDataContactInfoDocument, options);
+}
+export type ReservationProfileDataContactInfoQueryHookResult = ReturnType<
+  typeof useReservationProfileDataContactInfoQuery
+>;
+export type ReservationProfileDataContactInfoLazyQueryHookResult = ReturnType<
+  typeof useReservationProfileDataContactInfoLazyQuery
+>;
+export type ReservationProfileDataContactInfoSuspenseQueryHookResult =
+  ReturnType<typeof useReservationProfileDataContactInfoSuspenseQuery>;
+export type ReservationProfileDataContactInfoQueryResult = Apollo.QueryResult<
+  ReservationProfileDataContactInfoQuery,
+  ReservationProfileDataContactInfoQueryVariables
+>;
+export const ReservationProfileDataSsnDocument = gql`
+  query ReservationProfileDataSSN($reservationId: Int!) {
+    profileData(reservationId: $reservationId) {
+      ssn
+    }
+  }
+`;
+
+/**
+ * __useReservationProfileDataSsnQuery__
+ *
+ * To run a query within a React component, call `useReservationProfileDataSsnQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationProfileDataSsnQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationProfileDataSsnQuery({
+ *   variables: {
+ *      reservationId: // value for 'reservationId'
+ *   },
+ * });
+ */
+export function useReservationProfileDataSsnQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationProfileDataSsnQuery,
+    ReservationProfileDataSsnQueryVariables
+  > &
+    (
+      | { variables: ReservationProfileDataSsnQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ReservationProfileDataSsnQuery,
+    ReservationProfileDataSsnQueryVariables
+  >(ReservationProfileDataSsnDocument, options);
+}
+export function useReservationProfileDataSsnLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationProfileDataSsnQuery,
+    ReservationProfileDataSsnQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationProfileDataSsnQuery,
+    ReservationProfileDataSsnQueryVariables
+  >(ReservationProfileDataSsnDocument, options);
+}
+export function useReservationProfileDataSsnSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationProfileDataSsnQuery,
+        ReservationProfileDataSsnQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationProfileDataSsnQuery,
+    ReservationProfileDataSsnQueryVariables
+  >(ReservationProfileDataSsnDocument, options);
+}
+export type ReservationProfileDataSsnQueryHookResult = ReturnType<
+  typeof useReservationProfileDataSsnQuery
+>;
+export type ReservationProfileDataSsnLazyQueryHookResult = ReturnType<
+  typeof useReservationProfileDataSsnLazyQuery
+>;
+export type ReservationProfileDataSsnSuspenseQueryHookResult = ReturnType<
+  typeof useReservationProfileDataSsnSuspenseQuery
+>;
+export type ReservationProfileDataSsnQueryResult = Apollo.QueryResult<
+  ReservationProfileDataSsnQuery,
+  ReservationProfileDataSsnQueryVariables
+>;
 export const ReservationApplicationLinkDocument = gql`
   query ReservationApplicationLink($id: ID!) {
     recurringReservation(id: $id) {
