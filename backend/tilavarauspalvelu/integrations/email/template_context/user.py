@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Annotated
 
 from django.utils.translation import pgettext
 
@@ -9,39 +9,20 @@ from tilavarauspalvelu.translation import get_translated
 from .common import create_anchor_tag, get_context_for_translations, get_staff_login_link, get_varaamo_ext_link
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.integrations.email.typing import EmailType
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 __all__ = [
+    "get_context_for_user_anonymization",
     "get_context_for_user_permissions_deactivation",
 ]
 
 
-# type: EmailType.USER_PERMISSIONS_DEACTIVATION ##############################################################################
-
-
 @get_translated
-def get_context_for_user_permissions_deactivation(*, language: Lang) -> EmailContext:
-    link = get_staff_login_link()
-    link_tag = create_anchor_tag(link=link)
-
-    return {
-        "title": pgettext("Email", "Your staff access to Varaamo is expiring"),
-        "text_permission_deactivation": pgettext(
-            "Email",
-            "Your staff access to Varaamo will expire if you do not log in to the service within two weeks.",
-        ),
-        "text_login_to_prevent": pgettext("Email", "Log in to the service at"),
-        "login_url": link,
-        "login_url_html": link_tag,
-        **get_context_for_translations(language=language, email_recipient_name=None),
-    }
-
-
-# type: EmailType.USER_ANONYMIZATION ###################################################################################
-
-
-@get_translated
-def get_context_for_user_anonymization(*, language: Lang) -> EmailContext:
+def get_context_for_user_anonymization(
+    *,
+    language: Lang,
+) -> Annotated[EmailContext, EmailType.USER_ANONYMIZATION]:
     link = get_varaamo_ext_link(language=language)
     link_tag = create_anchor_tag(link=link)
 
@@ -57,6 +38,27 @@ def get_context_for_user_anonymization(*, language: Lang) -> EmailContext:
             "Email",
             "You can extend the validity of your user account by logging into the service at",
         ),
+        "login_url": link,
+        "login_url_html": link_tag,
+        **get_context_for_translations(language=language, email_recipient_name=None),
+    }
+
+
+@get_translated
+def get_context_for_user_permissions_deactivation(
+    *,
+    language: Lang,
+) -> Annotated[EmailContext, EmailType.USER_PERMISSIONS_DEACTIVATION]:  # type: ignore
+    link = get_staff_login_link()
+    link_tag = create_anchor_tag(link=link)
+
+    return {
+        "title": pgettext("Email", "Your staff access to Varaamo is expiring"),
+        "text_permission_deactivation": pgettext(
+            "Email",
+            "Your staff access to Varaamo will expire if you do not log in to the service within two weeks.",
+        ),
+        "text_login_to_prevent": pgettext("Email", "Log in to the service at"),
         "login_url": link,
         "login_url_html": link_tag,
         **get_context_for_translations(language=language, email_recipient_name=None),
