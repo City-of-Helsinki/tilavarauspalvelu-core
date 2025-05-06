@@ -35,6 +35,8 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
     street_address = graphene.String()
     postal_code = graphene.String()
     city = graphene.String()
+    country_code = graphene.String()
+    additional_address = graphene.String()
     municipality_code = graphene.String()
     municipality_name = graphene.String()
     login_method = graphene.Field(graphene.Enum.from_enum(LoginMethod), required=True)
