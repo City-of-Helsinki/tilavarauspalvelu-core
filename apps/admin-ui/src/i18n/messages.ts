@@ -322,6 +322,7 @@ const translations: ITranslations = {
         byReservationUnit: ["Kaikki varaukset"],
       },
       header: {
+        createReservation: ["Tee varaus"],
         recurringReservation: ["Tee toistuva varaus"],
       },
       legend: {
@@ -1091,7 +1092,7 @@ const translations: ITranslations = {
     removeFailed: ["Tilan poistaminen ei onnistunut."],
   },
   ReservationDialog: {
-    title: ["Varaa {{reservationUnit}}"],
+    title: ["Tee varaus"],
     accept: ["Varaa"],
     saveSuccess: ["Varaus tehty kohteeseen {{reservationUnit}}"],
   },
