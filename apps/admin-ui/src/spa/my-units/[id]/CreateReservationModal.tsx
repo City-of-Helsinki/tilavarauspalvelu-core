@@ -25,7 +25,7 @@ import {
   type ReservationFormType,
   type ReservationFormMeta,
 } from "@/schemas";
-import { CenterSpinner } from "common/styled";
+import { CenterSpinner, Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useCheckCollisions } from "@/hooks";
 import {
@@ -38,9 +38,11 @@ import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
-import { base64encode } from "common/src/helpers";
+import { base64encode, toNumber } from "common/src/helpers";
 import { successToast } from "common/src/common/toast";
 import { useDisplayError } from "common/src/hooks";
+import { useSearchParams } from "react-router-dom";
+import { SelectFilter } from "@/component/QueryParamFilters";
 
 // NOTE HDS forces buttons over each other on mobile, we want them side-by-side
 const ActionButtons = styled(Dialog.ActionButtons)`
@@ -64,9 +66,6 @@ const FixedDialog = styled(Dialog)`
   & > div:nth-child(2) {
     /* don't layout shift when the modal content changes */
     height: min(80vh, 1024px);
-    > div:nth-child(1) {
-      height: 100%;
-    }
   }
 `;
 
@@ -81,7 +80,6 @@ type FormValueType = ReservationFormType & ReservationFormMeta;
 const Form = styled.form`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-  grid-template-rows: repeat(12, 1fr);
   gap: var(--spacing-l);
 
   height: 100%;
@@ -93,6 +91,231 @@ const StyledNotification = styled(Notification)`
   margin-right: auto;
   width: auto;
 `;
+
+type CreateReservationModalProps = {
+  reservationUnitOptions: { label: string; value: number }[];
+  onClose: () => void;
+  start?: Date;
+};
+
+export function CreateReservationModal({
+  reservationUnitOptions,
+  start,
+  onClose,
+}: CreateReservationModalProps): JSX.Element {
+  const { t } = useTranslation();
+  const { isOpen } = useModal();
+  const [params] = useSearchParams();
+  const reservationUnitPk =
+    toNumber(params.get("reservationUnit")) ?? reservationUnitOptions[0]?.value;
+
+  const id = base64encode(`ReservationUnitNode:${reservationUnitPk}`);
+  const { data, loading } = useReservationUnitQuery({
+    variables: { id },
+    skip: !reservationUnitPk,
+  });
+
+  const { reservationUnit } = data ?? {};
+
+  const interval = getNormalizedInterval(
+    reservationUnit?.reservationStartInterval
+  );
+  const startDate = start ?? new Date();
+  const form = useForm<FormValueType>({
+    // @ts-expect-error -- schema refinement breaks typing
+    resolver: zodResolver(ReservationFormSchema(interval)),
+    // TODO onBlur or onChange? onChange is anoying because it highlights even untouched fields
+    // onBlur on the other hand does no validation on the focused field till it's blurred
+
+    // I want show errors for touched fields onBlur + clear errors onChange
+    // I guess I just have to write logic for it using isTouched + onChange
+
+    mode: "onChange",
+    defaultValues: {
+      date: format(startDate, "dd.MM.yyyy"),
+      startTime: format(startDate, "HH:mm"),
+      enableBufferTimeBefore: false,
+      enableBufferTimeAfter: false,
+    },
+  });
+  const [create] = useCreateStaffReservationMutation();
+  const createStaffReservation = (input: ReservationStaffCreateMutationInput) =>
+    create({ variables: { input } });
+  const displayError = useDisplayError();
+  const onSubmit = async (values: FormValueType) => {
+    try {
+      if (!reservationUnit?.pk) {
+        throw new Error("Missing reservation unit");
+      }
+
+      const {
+        comments,
+        date,
+        startTime,
+        endTime,
+        type,
+        enableBufferTimeBefore,
+        enableBufferTimeAfter,
+        ...rest
+      } = values;
+
+      const bufferBefore = getBufferTime(
+        reservationUnit.bufferTimeBefore,
+        type,
+        enableBufferTimeBefore
+      );
+      const bufferAfter = getBufferTime(
+        reservationUnit.bufferTimeAfter,
+        type,
+        enableBufferTimeAfter
+      );
+      const input: ReservationStaffCreateMutationInput = {
+        ...rest,
+        reservationUnit: reservationUnit.pk,
+        type,
+        begin: dateTime(date, startTime),
+        end: dateTime(date, endTime),
+        bufferTimeBefore: bufferBefore,
+        bufferTimeAfter: bufferAfter,
+        workingMemo: comments,
+      };
+
+      await createStaffReservation(input);
+
+      successToast({
+        text: t("ReservationDialog.saveSuccess", {
+          reservationUnit: reservationUnit.nameFi,
+        }),
+      });
+      onClose();
+    } catch (err) {
+      displayError(err);
+    }
+  };
+
+  if (loading) {
+    return <CenterSpinner />;
+  }
+
+  return (
+    <FixedDialog
+      variant="primary"
+      id="info-dialog"
+      aria-labelledby="modal-header"
+      aria-describedby="modal-description"
+      isOpen={isOpen}
+      focusAfterCloseRef={undefined}
+      scrollable
+    >
+      <Dialog.Header id="modal-header" title={t("ReservationDialog.title")} />
+      <Dialog.Content>
+        <SelectFilter
+          name="reservationUnit"
+          sort
+          options={reservationUnitOptions}
+        />
+        {reservationUnit != null && (
+          <ErrorBoundary fallback={<div>{t("errors.unexpectedError")}</div>}>
+            <Flex>
+              <DialogContent
+                reservationUnit={reservationUnit}
+                startDate={startDate}
+                form={form}
+                onSubmit={onSubmit}
+              />
+              <ActionContainer
+                form={form}
+                reservationUnit={reservationUnit}
+                onCancel={onClose}
+                onSubmit={onSubmit}
+              />
+            </Flex>
+          </ErrorBoundary>
+        )}
+      </Dialog.Content>
+    </FixedDialog>
+  );
+}
+
+function DialogContent({
+  reservationUnit,
+  startDate,
+  form,
+  onSubmit,
+}: {
+  reservationUnit: CreateStaffReservationFragment;
+  startDate: Date;
+  form: UseFormReturn<FormValueType>;
+  onSubmit: (values: FormValueType) => void;
+}) {
+  const { t } = useTranslation();
+
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+    trigger,
+    watch,
+    getFieldState,
+  } = form;
+
+  // show errors if the clicked start date is invalid (both previous day and today but in the past)
+  useEffect(() => {
+    if (startDate < new Date()) {
+      trigger();
+    }
+  }, [startDate, trigger]);
+
+  // force form vaildation on date change but not on first render
+  const formDate = watch("date");
+  useEffect(() => {
+    // Is touched is always false with controller
+    if (getFieldState("date").isDirty) {
+      trigger();
+    }
+  }, [formDate, trigger, getFieldState]);
+
+  // force revalidation of end time on start time change
+  const formStartTime = watch("startTime");
+  useEffect(() => {
+    // Is touched is always false with controller
+    if (getFieldState("endTime").isDirty) {
+      trigger("endTime");
+    }
+  }, [formStartTime, trigger, getFieldState]);
+
+  const translateError = (errorMsg?: string) =>
+    errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "";
+
+  return (
+    <FormProvider {...form}>
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <MandatoryFieldsText>
+          {t("forms:mandatoryFieldsText")}
+        </MandatoryFieldsText>
+        <ControlledDateInput
+          name="date"
+          control={control}
+          error={translateError(errors.date?.message)}
+          required
+        />
+        <ControlledTimeInput
+          name="startTime"
+          control={control}
+          error={translateError(errors.startTime?.message)}
+          required
+        />
+        <ControlledTimeInput
+          name="endTime"
+          control={control}
+          error={translateError(errors.endTime?.message)}
+          required
+        />
+        <ReservationTypeForm reservationUnit={reservationUnit} />
+      </Form>
+    </FormProvider>
+  );
+}
 
 function useCheckFormCollisions({
   form,
@@ -207,225 +430,6 @@ function ActionContainer({
         {t("common.cancel")}
       </Button>
     </ActionButtons>
-  );
-}
-
-function DialogContent({
-  onClose,
-  reservationUnit,
-  start,
-}: {
-  onClose: () => void;
-  reservationUnit: CreateStaffReservationFragment;
-  start: Date;
-}) {
-  const { t } = useTranslation();
-  const interval = getNormalizedInterval(
-    reservationUnit.reservationStartInterval
-  );
-  const form = useForm<FormValueType>({
-    // @ts-expect-error -- schema refinement breaks typing
-    resolver: zodResolver(ReservationFormSchema(interval)),
-    // TODO onBlur or onChange? onChange is anoying because it highlights even untouched fields
-    // onBlur on the other hand does no validation on the focused field till it's blurred
-
-    // I want show errors for touched fields onBlur + clear errors onChange
-    // I guess I just have to write logic for it using isTouched + onChange
-
-    mode: "onChange",
-    defaultValues: {
-      date: format(start, "dd.MM.yyyy"),
-      startTime: format(start, "HH:mm"),
-      enableBufferTimeBefore: false,
-      enableBufferTimeAfter: false,
-    },
-  });
-
-  const {
-    handleSubmit,
-    control,
-    formState: { errors },
-    trigger,
-    watch,
-    getFieldState,
-  } = form;
-
-  // show errors if the clicked start date is invalid (both previous day and today but in the past)
-  useEffect(() => {
-    if (start < new Date()) {
-      trigger();
-    }
-  }, [start, trigger]);
-
-  // force form vaildation on date change but not on first render
-  const formDate = watch("date");
-  useEffect(() => {
-    // Is touched is always false with controller
-    if (getFieldState("date").isDirty) {
-      trigger();
-    }
-  }, [formDate, trigger, getFieldState]);
-
-  // force revalidation of end time on start time change
-  const formStartTime = watch("startTime");
-  useEffect(() => {
-    // Is touched is always false with controller
-    if (getFieldState("endTime").isDirty) {
-      trigger("endTime");
-    }
-  }, [formStartTime, trigger, getFieldState]);
-
-  const [create] = useCreateStaffReservationMutation();
-
-  const createStaffReservation = (input: ReservationStaffCreateMutationInput) =>
-    create({ variables: { input } });
-  const displayError = useDisplayError();
-
-  const onSubmit = async (values: FormValueType) => {
-    try {
-      if (!reservationUnit.pk) {
-        throw new Error("Missing reservation unit");
-      }
-
-      const {
-        comments,
-        date,
-        startTime,
-        endTime,
-        type,
-        enableBufferTimeBefore,
-        enableBufferTimeAfter,
-        ...rest
-      } = values;
-
-      const bufferBefore = getBufferTime(
-        reservationUnit.bufferTimeBefore,
-        type,
-        enableBufferTimeBefore
-      );
-      const bufferAfter = getBufferTime(
-        reservationUnit.bufferTimeAfter,
-        type,
-        enableBufferTimeAfter
-      );
-      const input: ReservationStaffCreateMutationInput = {
-        ...rest,
-        reservationUnit: reservationUnit.pk,
-        type,
-        begin: dateTime(date, startTime),
-        end: dateTime(date, endTime),
-        bufferTimeBefore: bufferBefore,
-        bufferTimeAfter: bufferAfter,
-        workingMemo: comments,
-      };
-
-      await createStaffReservation(input);
-
-      successToast({
-        text: t("ReservationDialog.saveSuccess", {
-          reservationUnit: reservationUnit.nameFi,
-        }),
-      });
-      onClose();
-    } catch (err) {
-      displayError(err);
-    }
-  };
-
-  const translateError = (errorMsg?: string) =>
-    errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "";
-
-  return (
-    <>
-      <Dialog.Content>
-        <FormProvider {...form}>
-          <Form onSubmit={handleSubmit(onSubmit)}>
-            <MandatoryFieldsText>
-              {t("forms:mandatoryFieldsText")}
-            </MandatoryFieldsText>
-            <ControlledDateInput
-              name="date"
-              control={control}
-              error={translateError(errors.date?.message)}
-              required
-            />
-            <ControlledTimeInput
-              name="startTime"
-              control={control}
-              error={translateError(errors.startTime?.message)}
-              required
-            />
-            <ControlledTimeInput
-              name="endTime"
-              control={control}
-              error={translateError(errors.endTime?.message)}
-              required
-            />
-            <ReservationTypeForm reservationUnit={reservationUnit} />
-          </Form>
-        </FormProvider>
-      </Dialog.Content>
-      <ActionContainer
-        form={form}
-        reservationUnit={reservationUnit}
-        onCancel={onClose}
-        onSubmit={onSubmit}
-      />
-    </>
-  );
-}
-
-export function CreateReservationModal({
-  reservationUnitPk: pk,
-  start,
-  onClose,
-}: {
-  reservationUnitPk: number;
-  start: Date;
-  onClose: () => void;
-}): JSX.Element {
-  const { isOpen } = useModal();
-  const { t } = useTranslation();
-
-  const isPkValid = pk > 0;
-  const id = base64encode(`ReservationUnitNode:${pk}`);
-  const { data, loading } = useReservationUnitQuery({
-    variables: { id },
-    skip: !isPkValid,
-  });
-
-  const { reservationUnit } = data ?? {};
-
-  if (loading) {
-    return <CenterSpinner />;
-  }
-
-  return (
-    <FixedDialog
-      variant="primary"
-      id="info-dialog"
-      aria-labelledby="modal-header"
-      aria-describedby="modal-description"
-      isOpen={isOpen}
-      focusAfterCloseRef={undefined}
-      scrollable
-    >
-      <Dialog.Header
-        id="modal-header"
-        title={t("ReservationDialog.title", {
-          reservationUnit: reservationUnit?.nameFi,
-        })}
-      />
-      {reservationUnit != null && (
-        <ErrorBoundary fallback={<div>{t("errors.unexpectedError")}</div>}>
-          <DialogContent
-            onClose={onClose}
-            reservationUnit={reservationUnit}
-            start={start}
-          />
-        </ErrorBoundary>
-      )}
-    </FixedDialog>
   );
 }
 

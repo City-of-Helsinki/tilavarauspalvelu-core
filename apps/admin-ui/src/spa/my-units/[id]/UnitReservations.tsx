@@ -30,11 +30,13 @@ const LegendContainer = styled.div`
 type InnerProps = {
   unitPk: string;
   reservationUnitTypes: number[];
+  reservationUnitOptions: { label: string; value: number }[];
 };
 
 function UnitReservationsInner({
   unitPk,
   reservationUnitTypes,
+  reservationUnitOptions,
 }: InnerProps): JSX.Element {
   const [searchParams] = useSearchParams();
   const { t } = useTranslation();
@@ -59,6 +61,7 @@ function UnitReservationsInner({
         refetch={refetch}
         unitPk={Number(unitPk)}
         isLoading={loading}
+        reservationUnitOptions={reservationUnitOptions}
       />
       <LegendContainer>
         <LegendsWrapper>
@@ -76,7 +79,11 @@ type Params = {
   reservationUnitId: string;
 };
 
-export function UnitReservations(): JSX.Element {
+export function UnitReservations({
+  reservationUnitOptions,
+}: {
+  reservationUnitOptions: { label: string; value: number }[];
+}): JSX.Element {
   const { unitId } = useParams<Params>();
   const { t } = useTranslation();
 
@@ -121,7 +128,10 @@ export function UnitReservations(): JSX.Element {
           options={reservationUnitTypeOptions}
         />
       </AutoGrid>
-      <SearchTags hide={["date", "tab"]} translateTag={translateTag} />
+      <SearchTags
+        hide={["date", "tab", "reservationUnit"]}
+        translateTag={translateTag}
+      />
       <HR />
       <Flex
         $gap="none"
@@ -148,6 +158,7 @@ export function UnitReservations(): JSX.Element {
         <UnitReservationsInner
           reservationUnitTypes={reservationUnitTypes}
           unitPk={unitId}
+          reservationUnitOptions={reservationUnitOptions}
         />
       ) : null}
     </Flex>

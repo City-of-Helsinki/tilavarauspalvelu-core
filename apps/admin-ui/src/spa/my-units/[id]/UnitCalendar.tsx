@@ -32,6 +32,7 @@ import { ReservationPopupContent } from "./ReservationPopupContent";
 import eventStyleGetter from "./eventStyleGetter";
 import { CreateReservationModal } from "./CreateReservationModal";
 import { useCheckPermission } from "@/hooks";
+import { useSearchParams } from "react-router-dom";
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
 type Resource = {
@@ -111,12 +112,12 @@ const rowCommonCss = css`
 // 1. Dynamically set an absolute size for the table and use CSS sticky (no vertical scroll because the container matches the content size).
 // 2. Use absolute position for the header and set it in JS (crude) (set element position, not CSS top).
 const HeadingRow = styled.div`
-  ${rowCommonCss}
   background: var(--color-white);
   position: sticky;
   top: 0;
   width: 100%;
   z-index: var(--tilavaraus-admin-stack-calendar-header-times);
+  ${rowCommonCss}
 `;
 
 const Time = styled.div`
@@ -206,6 +207,7 @@ function Cells({
   date,
   setModalContent,
   onComplete,
+  reservationUnitOptions,
 }: {
   cols: number;
   reservationUnitPk: number;
@@ -213,7 +215,9 @@ function Cells({
   date: Date;
   setModalContent: (content: JSX.Element | null, isHds?: boolean) => void;
   onComplete: () => void;
+  reservationUnitOptions: { label: string; value: number }[];
 }) {
+  const [searchParams, setParams] = useSearchParams();
   const now = new Date();
 
   const isPast = (index: number) => {
@@ -231,9 +235,12 @@ function Cells({
         return;
       }
       e.preventDefault();
+      const params = new URLSearchParams(searchParams);
+      params.set("reservationUnit", reservationUnitPk.toString());
+      setParams(params, { replace: true });
       setModalContent(
         <CreateReservationModal
-          reservationUnitPk={reservationUnitPk}
+          reservationUnitOptions={reservationUnitOptions}
           start={addMinutes(new Date(date), offset * 30)}
           onClose={() => {
             setModalContent(null);
@@ -457,6 +464,7 @@ type Props = {
   resources: Resource[];
   refetch: () => void;
   isLoading?: boolean;
+  reservationUnitOptions: { label: string; value: number }[];
 };
 
 export function UnitCalendar({
@@ -465,6 +473,7 @@ export function UnitCalendar({
   resources,
   refetch,
   isLoading,
+  reservationUnitOptions,
 }: Props): JSX.Element {
   const calendarRef = useRef<HTMLDivElement>(null);
   const orderedResources = sortByDraftStatusAndTitle([...resources]);
@@ -561,6 +570,7 @@ export function UnitCalendar({
                 cols={N_COLS}
                 date={startDate}
                 reservationUnitPk={row.pk}
+                reservationUnitOptions={reservationUnitOptions}
                 unitPk={unitPk}
                 setModalContent={setModalContent}
                 onComplete={refetch}
