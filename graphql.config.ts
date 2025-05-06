@@ -42,7 +42,7 @@ const gqlConfig = {
   scalars,
 };
 
-const schema = "http://localhost:8000/graphql/";
+const schema = "tilavaraus.graphql";
 const plugins = [
   "typescript",
   "typescript-operations",
@@ -60,12 +60,6 @@ const config: IGraphQLConfig = {
           generates: {
             "packages/common/gql/gql-types.ts": {
               plugins,
-            },
-            'tilavaraus.graphql': {
-              plugins: ['schema-ast'],
-              config: {
-                includeDirectives: true
-              },
             },
           },
           hooks: {
