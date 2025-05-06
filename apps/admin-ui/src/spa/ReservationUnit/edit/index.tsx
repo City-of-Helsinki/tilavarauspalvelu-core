@@ -646,7 +646,6 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
   ) {
     equipmentsAll(orderBy: [$equipmentsOrderBy]) {
       id
-      name
       nameFi
       pk
     }

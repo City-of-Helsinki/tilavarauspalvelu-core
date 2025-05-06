@@ -141,7 +141,6 @@ export const BANNER_NOTIFICATION_COMMON_FRAGMENT = gql`
     id
     level
     activeFrom
-    message
     messageEn
     messageFi
     messageSv

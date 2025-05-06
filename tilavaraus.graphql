@@ -8,7 +8,6 @@ type AbilityGroupNode implements Node {
   The ID of the object
   """
   id: ID!
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
@@ -47,7 +46,6 @@ enum AccessTypeWithMultivalued {
 }
 
 type AddressNode implements Node {
-  city: String!
   cityEn: String
   cityFi: String
   citySv: String
@@ -57,7 +55,6 @@ type AddressNode implements Node {
   id: ID!
   pk: Int
   postCode: String!
-  streetAddress: String!
   streetAddressEn: String
   streetAddressFi: String
   streetAddressSv: String
@@ -385,7 +382,6 @@ type ApplicationRoundNode implements Node {
   applicationPeriodBegin: DateTime!
   applicationPeriodEnd: DateTime!
   applicationsCount: Int!
-  criteria: String!
   criteriaEn: String
   criteriaFi: String
   criteriaSv: String
@@ -395,11 +391,9 @@ type ApplicationRoundNode implements Node {
   """
   id: ID!
   isSettingHandledAllowed: Boolean!
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
-  notesWhenApplying: String!
   notesWhenApplyingEn: String
   notesWhenApplyingFi: String
   notesWhenApplyingSv: String
@@ -900,7 +894,6 @@ type BannerNotificationNode implements Node {
   """
   id: ID!
   level: BannerNotificationLevel!
-  message: String!
   messageEn: String
   messageFi: String
   messageSv: String
@@ -1017,7 +1010,6 @@ type CityNode implements Node {
   """
   id: ID!
   municipalityCode: String!
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
@@ -1100,7 +1092,6 @@ type EquipmentAllNode implements Node {
   The ID of the object
   """
   id: ID!
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
@@ -1136,7 +1127,6 @@ type EquipmentCategoryNode implements Node {
   The ID of the object
   """
   id: ID!
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
@@ -1225,7 +1215,6 @@ type EquipmentNode implements Node {
   The ID of the object
   """
   id: ID!
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
@@ -1337,11 +1326,9 @@ enum ImageType {
 }
 
 type LocationNode implements Node {
-  addressCity: String!
   addressCityEn: String
   addressCityFi: String
   addressCitySv: String
-  addressStreet: String!
   addressStreetEn: String
   addressStreetFi: String
   addressStreetSv: String
@@ -1617,7 +1604,6 @@ enum OrderStatusWithFree {
 type OrganisationNode implements Node {
   activeMembers: Int
   address: AddressNode
-  coreBusiness: String!
   coreBusinessEn: String
   coreBusinessFi: String
   coreBusinessSv: String
@@ -1627,7 +1613,6 @@ type OrganisationNode implements Node {
   """
   id: ID!
   identifier: String
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
@@ -1903,7 +1888,6 @@ type PurposeNode implements Node {
   """
   id: ID!
   imageUrl: String
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
@@ -1973,7 +1957,6 @@ type QualifierNode implements Node {
   The ID of the object
   """
   id: ID!
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
@@ -3006,7 +2989,6 @@ type ReservationCancelReasonNode implements Node {
   """
   id: ID!
   pk: Int
-  reason: String!
   reasonEn: String
   reasonFi: String
   reasonSv: String
@@ -3119,7 +3101,6 @@ type ReservationDenyReasonNode implements Node {
   """
   id: ID!
   pk: Int
-  reason: String!
   reasonEn: String
   reasonFi: String
   reasonSv: String
@@ -3430,7 +3411,6 @@ type ReservationPurposeNode implements Node {
   The ID of the object
   """
   id: ID!
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
@@ -3953,7 +3933,6 @@ type ReservationUnitAllNode implements Node {
   The ID of the object
   """
   id: ID!
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
@@ -3966,7 +3945,6 @@ type ReservationUnitCancellationRuleNode implements Node {
   The ID of the object
   """
   id: ID!
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
@@ -4236,7 +4214,6 @@ type ReservationUnitNode implements Node {
   cancellationTerms: TermsOfUseNode
   contactInformation: String!
   currentAccessType: AccessType
-  description: String!
   descriptionEn: String
   descriptionFi: String
   descriptionSv: String
@@ -4279,7 +4256,6 @@ type ReservationUnitNode implements Node {
   metadataSet: ReservationMetadataSetNode
   minPersons: Int
   minReservationDuration: Duration
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
@@ -4323,17 +4299,14 @@ type ReservationUnitNode implements Node {
   ): [ReservableTimeSpanType!]
   reservationBegins: DateTime
   reservationBlockWholeDay: Boolean!
-  reservationCancelledInstructions: String!
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsSv: String
-  reservationConfirmedInstructions: String!
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsSv: String
   reservationEnds: DateTime
   reservationKind: ReservationKind!
-  reservationPendingInstructions: String!
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsSv: String
@@ -4410,7 +4383,6 @@ type ReservationUnitNode implements Node {
     pk: [Int]
   ): [SpaceNode!]!
   surfaceArea: Int
-  termsOfUse: String
   termsOfUseEn: String
   termsOfUseFi: String
   termsOfUseSv: String
@@ -4596,7 +4568,6 @@ type ReservationUnitTypeNode implements Node {
   The ID of the object
   """
   id: ID!
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
@@ -4921,7 +4892,6 @@ type ResourceNode implements Node {
   """
   id: ID!
   locationType: ResourceLocationType!
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
@@ -5073,7 +5043,6 @@ type SpaceNode implements Node {
   """
   id: ID!
   maxPersons: Int
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
@@ -5272,13 +5241,11 @@ type TermsOfUseNode implements Node {
   The ID of the object
   """
   id: ID!
-  name: String
   nameEn: String
   nameFi: String
   nameSv: String
   pk: String
   termsType: TermsType!
-  text: String!
   textEn: String
   textFi: String
   textSv: String
@@ -5377,7 +5344,6 @@ type UnitAllNode implements Node {
   The ID of the object
   """
   id: ID!
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
@@ -5390,7 +5356,6 @@ type UnitGroupNode implements Node {
   The ID of the object
   """
   id: ID!
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
@@ -5445,7 +5410,6 @@ type UnitGroupNodeEdge {
 }
 
 type UnitNode implements Node {
-  description: String!
   descriptionEn: String
   descriptionFi: String
   descriptionSv: String
@@ -5455,7 +5419,6 @@ type UnitNode implements Node {
   """
   id: ID!
   location: LocationNode
-  name: String!
   nameEn: String
   nameFi: String
   nameSv: String
@@ -5521,7 +5484,6 @@ type UnitNode implements Node {
     unit: [Int]
     uuid: UUID
   ): [ReservationUnitNode!]!
-  shortDescription: String!
   shortDescriptionEn: String
   shortDescriptionFi: String
   shortDescriptionSv: String
