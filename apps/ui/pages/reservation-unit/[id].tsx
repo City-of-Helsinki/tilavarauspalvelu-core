@@ -111,6 +111,7 @@ import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useDisplayError } from "common/src/hooks";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
 import { gql } from "@apollo/client";
+import { useToastIfQueryParam } from "@/hooks";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -142,6 +143,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const end = ignoreMaybeArray(query.end);
 
     if (begin != null && end != null) {
+      // FIXME handle errors (so user never ends to 500 page)
       const input: ReservationCreateMutationInput = {
         begin,
         end,
@@ -577,6 +579,12 @@ function ReservationUnit({
     ),
     [apiBaseUrl, focusSlot, reservationForm, t]
   );
+
+  useToastIfQueryParam({
+    key: "invalidReservation",
+    type: "error",
+    message: t("reservationCalendar:errors.invalidReservationRedirect"),
+  });
 
   const startingTimeOptions = getPossibleTimesForDay({
     reservableTimes,

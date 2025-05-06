@@ -92,11 +92,14 @@ export function getReservationInProgressPath(
   return `${reservationUnitPrefix}/${pk}/reservation/${reservationPk}`;
 }
 
-export function getReservationUnitPath(pk: Maybe<number> | undefined): string {
+export function getReservationUnitPath(
+  pk: Maybe<number> | undefined,
+  params?: Readonly<URLSearchParams>
+): string {
   if (pk == null) {
     return "";
   }
-  return `${reservationUnitPrefix}/${pk}`;
+  return `${reservationUnitPrefix}/${pk}?${params?.toString() ?? ""}`;
 }
 
 export function getFeedbackUrl(

@@ -427,61 +427,78 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
-  const [_, path, reservationPk] = params?.params ?? [];
+  const [reservationUnitPkStr, path, reservationPkStr] = params?.params ?? [];
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  const resPk = toNumber(reservationPk);
-  if (resPk != null && resPk > 0 && path === "reservation") {
-    const options = await queryOptions(apolloClient, locale ?? "");
+  const reservationPk = toNumber(reservationPkStr);
+  const reservationUnitPk = toNumber(reservationUnitPkStr);
+  const isInvalidReservationUnitPk =
+    reservationUnitPk == null || reservationUnitPk <= 0;
+  const isInvalidReservationPk = reservationPk == null || reservationPk <= 0;
+  const isInvalidPath =
+    isInvalidReservationUnitPk ||
+    isInvalidReservationPk ||
+    path !== "reservation";
 
-    const { data: resData } = await apolloClient.query<
-      ReservationQuery,
-      ReservationQueryVariables
-    >({
-      query: ReservationDocument,
-      variables: { id: base64encode(`ReservationNode:${resPk}`) },
-      fetchPolicy: "no-cache",
-    });
-
-    const { reservation } = resData;
-
-    if (
-      reservation?.pk != null &&
-      reservation.pk > 0 &&
-      reservation?.state !== ReservationStateChoice.Created
-    ) {
-      return {
-        redirect: {
-          permanent: false,
-          destination: getReservationPath(reservation.pk),
-        },
-        props: {
-          notFound: true, // for prop narrowing
-        },
-      };
-    }
-
-    if (reservation != null) {
-      return {
-        props: {
-          ...commonProps,
-          reservation,
-          options,
-          ...(await serverSideTranslations(locale ?? "fi")),
-        },
-      };
-    }
+  if (isInvalidPath) {
+    return {
+      props: {
+        // have to double up notFound inside the props to get TS types dynamically
+        notFound: true,
+        ...commonProps,
+        ...(await serverSideTranslations(locale ?? "fi")),
+      },
+      notFound: true,
+    };
   }
+
+  const { data: resData } = await apolloClient.query<
+    ReservationQuery,
+    ReservationQueryVariables
+  >({
+    query: ReservationDocument,
+    variables: { id: base64encode(`ReservationNode:${reservationPk}`) },
+  });
+
+  const { reservation } = resData;
+
+  // Valid path but no reservation found -> redirect to reservation unit page
+  if (reservation?.pk == null) {
+    const params = new URLSearchParams();
+    params.set("invalidReservation", reservationPk.toString());
+    return {
+      redirect: {
+        permanent: false,
+        destination: getReservationUnitPath(reservationUnitPk, params),
+      },
+      props: {
+        notFound: true, // for prop narrowing
+      },
+    };
+  }
+  // Valid reservation that is not in progress -> redirect to reservation page
+  else if (reservation.state !== ReservationStateChoice.Created) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: getReservationPath(reservation.pk),
+      },
+      props: {
+        notFound: true, // for prop narrowing
+      },
+    };
+  }
+
+  const options = await queryOptions(apolloClient, locale ?? "");
 
   return {
     props: {
-      // have to double up notFound inside the props to get TS types dynamically
-      notFound: true,
       ...commonProps,
+      reservation,
+      options,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
-    notFound: true,
   };
 }
 

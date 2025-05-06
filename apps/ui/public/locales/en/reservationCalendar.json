@@ -77,7 +77,8 @@
     "bufferCollision": "The booking is too close to the previous or next booking. Please change the booking time.",
     "collision": "The item is already booked at the time you selected. Please change the booking time.",
     "unavailable": "The item cannot be booked at the selected time. Please change the booking time.",
-    "termsNotAccepted": "You must agree to the terms and conditions of contract before continuing."
+    "termsNotAccepted": "You must agree to the terms and conditions of contract before continuing.",
+    "invalidReservationRedirect": "The booking is no longer valid."
   },
   "reservingStartsAt": "The item will be available from {{date}}.",
   "reservationQuotaLabel": "Existing bookings",
