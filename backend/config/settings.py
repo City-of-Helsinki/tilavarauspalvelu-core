@@ -519,6 +519,10 @@ class Common(Environment):
     ICAL_HASH_SECRET = values.StringValue()
     EXPORT_AUTHORIZATION_TOKEN = values.StringValue()
 
+    GRAPHENE_DJANGO_EXTENSIONS = {
+      "EXPERIMENTAL_REMOVE_TRANSLATION_BASE_FIELDS": True,
+    }
+
     # Allows faking membership to certain AD groups for testing automatic role assignment
     FAKE_SUPERUSER_AD_GROUPS = values.ListValue(default=[])
 

@@ -40,7 +40,6 @@ export type Scalars = {
 export type AbilityGroupNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
@@ -77,7 +76,6 @@ export enum AccessTypeWithMultivalued {
 }
 
 export type AddressNode = Node & {
-  readonly city: Scalars["String"]["output"];
   readonly cityEn: Maybe<Scalars["String"]["output"]>;
   readonly cityFi: Maybe<Scalars["String"]["output"]>;
   readonly citySv: Maybe<Scalars["String"]["output"]>;
@@ -85,7 +83,6 @@ export type AddressNode = Node & {
   readonly id: Scalars["ID"]["output"];
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly postCode: Scalars["String"]["output"];
-  readonly streetAddress: Scalars["String"]["output"];
   readonly streetAddressEn: Maybe<Scalars["String"]["output"]>;
   readonly streetAddressFi: Maybe<Scalars["String"]["output"]>;
   readonly streetAddressSv: Maybe<Scalars["String"]["output"]>;
@@ -378,7 +375,6 @@ export type ApplicationRoundNode = Node & {
   readonly applicationPeriodBegin: Scalars["DateTime"]["output"];
   readonly applicationPeriodEnd: Scalars["DateTime"]["output"];
   readonly applicationsCount: Scalars["Int"]["output"];
-  readonly criteria: Scalars["String"]["output"];
   readonly criteriaEn: Maybe<Scalars["String"]["output"]>;
   readonly criteriaFi: Maybe<Scalars["String"]["output"]>;
   readonly criteriaSv: Maybe<Scalars["String"]["output"]>;
@@ -386,11 +382,9 @@ export type ApplicationRoundNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly isSettingHandledAllowed: Scalars["Boolean"]["output"];
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
-  readonly notesWhenApplying: Scalars["String"]["output"];
   readonly notesWhenApplyingEn: Maybe<Scalars["String"]["output"]>;
   readonly notesWhenApplyingFi: Maybe<Scalars["String"]["output"]>;
   readonly notesWhenApplyingSv: Maybe<Scalars["String"]["output"]>;
@@ -883,7 +877,6 @@ export type BannerNotificationNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly level: BannerNotificationLevel;
-  readonly message: Scalars["String"]["output"];
   readonly messageEn: Maybe<Scalars["String"]["output"]>;
   readonly messageFi: Maybe<Scalars["String"]["output"]>;
   readonly messageSv: Maybe<Scalars["String"]["output"]>;
@@ -976,7 +969,6 @@ export type CityNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly municipalityCode: Scalars["String"]["output"];
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
@@ -1019,7 +1011,6 @@ export enum CustomerTypeChoice {
 export type EquipmentAllNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
@@ -1053,7 +1044,6 @@ export type EquipmentCategoryDeleteMutationPayload = {
 export type EquipmentCategoryNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
@@ -1128,7 +1118,6 @@ export type EquipmentNode = Node & {
   readonly category: EquipmentCategoryNode;
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
@@ -1220,11 +1209,9 @@ export enum ImageType {
 }
 
 export type LocationNode = Node & {
-  readonly addressCity: Scalars["String"]["output"];
   readonly addressCityEn: Maybe<Scalars["String"]["output"]>;
   readonly addressCityFi: Maybe<Scalars["String"]["output"]>;
   readonly addressCitySv: Maybe<Scalars["String"]["output"]>;
-  readonly addressStreet: Scalars["String"]["output"];
   readonly addressStreetEn: Maybe<Scalars["String"]["output"]>;
   readonly addressStreetFi: Maybe<Scalars["String"]["output"]>;
   readonly addressStreetSv: Maybe<Scalars["String"]["output"]>;
@@ -1626,7 +1613,6 @@ export enum OrderStatusWithFree {
 export type OrganisationNode = Node & {
   readonly activeMembers: Maybe<Scalars["Int"]["output"]>;
   readonly address: Maybe<AddressNode>;
-  readonly coreBusiness: Scalars["String"]["output"];
   readonly coreBusinessEn: Maybe<Scalars["String"]["output"]>;
   readonly coreBusinessFi: Maybe<Scalars["String"]["output"]>;
   readonly coreBusinessSv: Maybe<Scalars["String"]["output"]>;
@@ -1634,7 +1620,6 @@ export type OrganisationNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly identifier: Maybe<Scalars["String"]["output"]>;
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
@@ -1848,7 +1833,6 @@ export type PurposeNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly imageUrl: Maybe<Scalars["String"]["output"]>;
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
@@ -1904,7 +1888,6 @@ export type PurposeUpdateMutationPayload = {
 export type QualifierNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
@@ -2930,7 +2913,6 @@ export type ReservationCancelReasonNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly pk: Maybe<Scalars["Int"]["output"]>;
-  readonly reason: Scalars["String"]["output"];
   readonly reasonEn: Maybe<Scalars["String"]["output"]>;
   readonly reasonFi: Maybe<Scalars["String"]["output"]>;
   readonly reasonSv: Maybe<Scalars["String"]["output"]>;
@@ -3027,7 +3009,6 @@ export type ReservationDenyReasonNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly pk: Maybe<Scalars["Int"]["output"]>;
-  readonly reason: Scalars["String"]["output"];
   readonly reasonEn: Maybe<Scalars["String"]["output"]>;
   readonly reasonFi: Maybe<Scalars["String"]["output"]>;
   readonly reasonSv: Maybe<Scalars["String"]["output"]>;
@@ -3295,7 +3276,6 @@ export enum ReservationOrderingChoices {
 export type ReservationPurposeNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
@@ -3782,7 +3762,6 @@ export type ReservationUnitAccessTypeSerializerInput = {
 export type ReservationUnitAllNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
@@ -3793,7 +3772,6 @@ export type ReservationUnitCancellationRuleNode = Node & {
   readonly canBeCancelledTimeBefore: Maybe<Scalars["Duration"]["output"]>;
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
@@ -4102,7 +4080,6 @@ export type ReservationUnitNode = Node & {
   readonly cancellationTerms: Maybe<TermsOfUseNode>;
   readonly contactInformation: Scalars["String"]["output"];
   readonly currentAccessType: Maybe<AccessType>;
-  readonly description: Scalars["String"]["output"];
   readonly descriptionEn: Maybe<Scalars["String"]["output"]>;
   readonly descriptionFi: Maybe<Scalars["String"]["output"]>;
   readonly descriptionSv: Maybe<Scalars["String"]["output"]>;
@@ -4123,7 +4100,6 @@ export type ReservationUnitNode = Node & {
   readonly metadataSet: Maybe<ReservationMetadataSetNode>;
   readonly minPersons: Maybe<Scalars["Int"]["output"]>;
   readonly minReservationDuration: Maybe<Scalars["Duration"]["output"]>;
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
@@ -4146,7 +4122,6 @@ export type ReservationUnitNode = Node & {
   readonly reservableTimeSpans: Maybe<ReadonlyArray<ReservableTimeSpanType>>;
   readonly reservationBegins: Maybe<Scalars["DateTime"]["output"]>;
   readonly reservationBlockWholeDay: Scalars["Boolean"]["output"];
-  readonly reservationCancelledInstructions: Scalars["String"]["output"];
   readonly reservationCancelledInstructionsEn: Maybe<
     Scalars["String"]["output"]
   >;
@@ -4156,7 +4131,6 @@ export type ReservationUnitNode = Node & {
   readonly reservationCancelledInstructionsSv: Maybe<
     Scalars["String"]["output"]
   >;
-  readonly reservationConfirmedInstructions: Scalars["String"]["output"];
   readonly reservationConfirmedInstructionsEn: Maybe<
     Scalars["String"]["output"]
   >;
@@ -4168,7 +4142,6 @@ export type ReservationUnitNode = Node & {
   >;
   readonly reservationEnds: Maybe<Scalars["DateTime"]["output"]>;
   readonly reservationKind: ReservationKind;
-  readonly reservationPendingInstructions: Scalars["String"]["output"];
   readonly reservationPendingInstructionsEn: Maybe<Scalars["String"]["output"]>;
   readonly reservationPendingInstructionsFi: Maybe<Scalars["String"]["output"]>;
   readonly reservationPendingInstructionsSv: Maybe<Scalars["String"]["output"]>;
@@ -4183,7 +4156,6 @@ export type ReservationUnitNode = Node & {
   readonly serviceSpecificTerms: Maybe<TermsOfUseNode>;
   readonly spaces: ReadonlyArray<SpaceNode>;
   readonly surfaceArea: Maybe<Scalars["Int"]["output"]>;
-  readonly termsOfUse: Maybe<Scalars["String"]["output"]>;
   readonly termsOfUseEn: Maybe<Scalars["String"]["output"]>;
   readonly termsOfUseFi: Maybe<Scalars["String"]["output"]>;
   readonly termsOfUseSv: Maybe<Scalars["String"]["output"]>;
@@ -4476,7 +4448,6 @@ export enum ReservationUnitReservationState {
 export type ReservationUnitTypeNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
@@ -4851,7 +4822,6 @@ export type ResourceNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly locationType: ResourceLocationType;
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
@@ -4973,7 +4943,6 @@ export type SpaceNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly maxPersons: Maybe<Scalars["Int"]["output"]>;
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
@@ -5138,13 +5107,11 @@ export enum TaxPercentageOrderingChoices {
 export type TermsOfUseNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
-  readonly name: Maybe<Scalars["String"]["output"]>;
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
   readonly pk: Maybe<Scalars["String"]["output"]>;
   readonly termsType: TermsType;
-  readonly text: Scalars["String"]["output"];
   readonly textEn: Maybe<Scalars["String"]["output"]>;
   readonly textFi: Maybe<Scalars["String"]["output"]>;
   readonly textSv: Maybe<Scalars["String"]["output"]>;
@@ -5202,7 +5169,6 @@ export type TimeSlotType = {
 export type UnitAllNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
@@ -5213,7 +5179,6 @@ export type UnitAllNode = Node & {
 export type UnitGroupNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
@@ -5257,7 +5222,6 @@ export type UnitGroupNodeEdge = {
 };
 
 export type UnitNode = Node & {
-  readonly description: Scalars["String"]["output"];
   readonly descriptionEn: Maybe<Scalars["String"]["output"]>;
   readonly descriptionFi: Maybe<Scalars["String"]["output"]>;
   readonly descriptionSv: Maybe<Scalars["String"]["output"]>;
@@ -5265,7 +5229,6 @@ export type UnitNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly location: Maybe<LocationNode>;
-  readonly name: Scalars["String"]["output"];
   readonly nameEn: Maybe<Scalars["String"]["output"]>;
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
@@ -5273,7 +5236,6 @@ export type UnitNode = Node & {
   readonly phone: Scalars["String"]["output"];
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly reservationUnits: ReadonlyArray<ReservationUnitNode>;
-  readonly shortDescription: Scalars["String"]["output"];
   readonly shortDescriptionEn: Maybe<Scalars["String"]["output"]>;
   readonly shortDescriptionFi: Maybe<Scalars["String"]["output"]>;
   readonly shortDescriptionSv: Maybe<Scalars["String"]["output"]>;
@@ -5697,7 +5659,6 @@ export type BannerNotificationsListAllQuery = {
         readonly id: string;
         readonly level: BannerNotificationLevel;
         readonly activeFrom: string | null;
-        readonly message: string;
         readonly messageEn: string | null;
         readonly messageFi: string | null;
         readonly messageSv: string | null;
@@ -5717,7 +5678,6 @@ export type BannerNotificationsListQuery = {
         readonly id: string;
         readonly level: BannerNotificationLevel;
         readonly activeFrom: string | null;
-        readonly message: string;
         readonly messageEn: string | null;
         readonly messageFi: string | null;
         readonly messageSv: string | null;
@@ -5992,7 +5952,6 @@ export type BannerNotificationCommonFragment = {
   readonly id: string;
   readonly level: BannerNotificationLevel;
   readonly activeFrom: string | null;
-  readonly message: string;
   readonly messageEn: string | null;
   readonly messageFi: string | null;
   readonly messageSv: string | null;
@@ -6253,7 +6212,6 @@ export const BannerNotificationCommonFragmentDoc = gql`
     id
     level
     activeFrom
-    message
     messageEn
     messageFi
     messageSv
