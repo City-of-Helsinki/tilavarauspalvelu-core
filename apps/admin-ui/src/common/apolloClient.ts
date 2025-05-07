@@ -9,12 +9,12 @@ import {
 // @ts-ignore -- types require nodenext which breaks bundler option that breaks the build
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { getCookie } from "typescript-cookie";
-import { onError } from "@apollo/client/link/error";
 import { buildGraphQLUrl } from "common/src/urlBuilder";
 import { env } from "@/env.mjs";
 import { isBrowser } from "./const";
 import { relayStylePagination } from "@apollo/client/utilities";
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
+import { errorLink } from "common/src/apolloUtils";
 
 if (process.env.NODE_ENV !== "production") {
   // Adds messages only in a dev environment
@@ -37,20 +37,6 @@ const authLink = new ApolloLink((operation, forward) => {
   }));
 
   return forward(operation);
-});
-
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors) {
-    for (const error of graphQLErrors) {
-      // eslint-disable-next-line no-console
-      console.error(`GQL_ERROR: ${JSON.stringify(error, null, 2)}`);
-    }
-  }
-
-  if (networkError) {
-    // eslint-disable-next-line no-console
-    console.error(`NETWORK_ERROR: ${JSON.stringify(networkError, null, 2)}`);
-  }
 });
 
 export function createClient(apiBaseUrl: string) {
