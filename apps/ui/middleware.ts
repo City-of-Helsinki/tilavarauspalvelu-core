@@ -168,8 +168,11 @@ ${applicationId ? "$applicationId: ID!" : ""}
   if (!res.ok) {
     const text = await res.text();
     // eslint-disable-next-line no-console
-    console.warn(`request failed: ${res.status} with message: ${text}`);
-    return null;
+    console.warn(
+      `Middleware request failed: ${res.status} with message: ${text}`
+    );
+    // prefer throw here because we want all query failures -> end in same fail state
+    throw new Error(res.statusText);
   }
 
   const data: unknown = await res.json();
@@ -401,7 +404,10 @@ function isPageRequest(url: URL): boolean {
     url.pathname.startsWith("/_next") ||
     url.pathname.match(
       /\.(webmanifest|js|css|png|jpg|jpeg|svg|gif|ico|json|woff|woff2|ttf|eot|otf|pdf)$/
-    )
+    ) ||
+    url.pathname.startsWith("/503") ||
+    url.pathname.startsWith("/en/503") ||
+    url.pathname.startsWith("/sv/503")
   ) {
     return false;
   }
@@ -462,6 +468,17 @@ function doesUrlMatch(url: string, route: string) {
   return ref.includes(route);
 }
 
+function getLangPrefix(url: URL): "" | "en" | "sv" {
+  const capture = url.pathname.match(/^(\/en|\/sv)/);
+  const first = capture?.[0] ?? "";
+  if (first === "/en") {
+    return "en";
+  } else if (first === "/sv") {
+    return "sv";
+  }
+  return "";
+}
+
 export async function middleware(req: NextRequest) {
   const csrfRedirectUrl = redirectCsrfToken(req);
   if (csrfRedirectUrl) {
@@ -513,56 +530,66 @@ export async function middleware(req: NextRequest) {
     reservationPk,
   };
 
-  const data = await fetchUserData(req, options);
-  const user = data?.user ?? null;
-  if (user != null && !user.hasAccess) {
-    return NextResponse.error();
-  }
+  const langPrefix = getLangPrefix(url);
 
-  // only check /reservations/:id/* path (not the funnel page)
-  const reservationsPath = /^(\/\w+)?\/reservations\/\d+(\/?\w+)?/;
-  // listing page has no reservation data
-  const checkReservationPage = url.pathname.match(reservationsPath);
-  if (data?.reservation != null && checkReservationPage) {
-    // type can be null for regular users
-    if (data.reservation.state == null) {
+  // Fallback all query errors to 503 page
+  try {
+    const data = await fetchUserData(req, options);
+
+    const user = data?.user ?? null;
+    if (user != null && !user.hasAccess) {
       return NextResponse.error();
     }
 
-    if (data.reservation.state === ReservationStateChoice.Created) {
-      const langPrefix = checkReservationPage[1] ?? "";
-      const { resUnitPk } = data.reservation;
-      const redirectUrl = new URL(
-        `${langPrefix}${getReservationInProgressPath(resUnitPk, reservationPk)}`,
-        req.url
-      );
-      return NextResponse.redirect(redirectUrl);
-    }
-    // Because we use url rewrite for Seasonal we have to allow both here (and do per page SSR checks instead)
-    if (
-      data.reservation.type != null &&
-      data.reservation.type !== ReservationTypeChoice.Normal &&
-      data.reservation.type !== ReservationTypeChoice.Seasonal
-    ) {
-      return NextResponse.error();
-    }
-  }
+    // only check /reservations/:id/* path (not the funnel page)
+    const reservationsPath = /^(\/\w+)?\/reservations\/\d+(\/?\w+)?/;
+    // listing page has no reservation data
+    const checkReservationPage = url.pathname.match(reservationsPath);
+    if (data?.reservation != null && checkReservationPage) {
+      // type can be null for regular users
+      if (data.reservation.state == null) {
+        return NextResponse.error();
+      }
 
-  if (AUTHENTICATED_ROUTES.some((route) => doesUrlMatch(req.url, route))) {
-    const redirect = getRedirectProtectedRoute(req, user);
-    if (redirect) {
-      return NextResponse.redirect(new URL(redirect, req.url));
+      if (data.reservation.state === ReservationStateChoice.Created) {
+        const { resUnitPk } = data.reservation;
+        const redirectUrl = new URL(
+          `${langPrefix}${getReservationInProgressPath(resUnitPk, reservationPk)}`,
+          req.url
+        );
+        return NextResponse.redirect(redirectUrl);
+      }
+      // Because we use url rewrite for Seasonal we have to allow both here (and do per page SSR checks instead)
+      if (
+        data.reservation.type != null &&
+        data.reservation.type !== ReservationTypeChoice.Normal &&
+        data.reservation.type !== ReservationTypeChoice.Seasonal
+      ) {
+        return NextResponse.error();
+      }
     }
-  }
 
-  const lang = await maybeSaveUserLanguage(req, user);
+    if (AUTHENTICATED_ROUTES.some((route) => doesUrlMatch(req.url, route))) {
+      const redirect = getRedirectProtectedRoute(req, user);
+      if (redirect) {
+        return NextResponse.redirect(new URL(redirect, req.url));
+      }
+    }
 
-  if (lang != null) {
-    const n = NextResponse.next();
-    n.cookies.set("language", lang);
-    return n;
+    const lang = await maybeSaveUserLanguage(req, user);
+
+    if (lang != null) {
+      const n = NextResponse.next();
+      n.cookies.set("language", lang);
+      return n;
+    }
+    return NextResponse.next();
+  } catch (_) {
+    // NOTE all backend errors will return the 503 page
+    // if the middleware request fails there is no way to recover
+    const redirectUrl = new URL(`${langPrefix}/503`, req.url);
+    return NextResponse.rewrite(redirectUrl);
   }
-  return NextResponse.next();
 }
 
 export const config = {
