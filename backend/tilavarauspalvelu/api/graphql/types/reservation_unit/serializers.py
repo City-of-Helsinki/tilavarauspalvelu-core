@@ -252,6 +252,10 @@ class ReservationUnitSerializer(NestingModelSerializer):
                 msg = "Highest price cannot be less than lowest price."
                 raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_INVALID_PRICES)
 
+            if pricing.get("payment_type") is None:
+                msg = "Pricing has no payment type defined"
+                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICING_NO_PAYMENT_TYPE)
+
     def _validate_access_types(self, *, access_types: list[dict[str, Any]], is_draft: bool) -> None:  # noqa: PLR0912
         editing = getattr(self.instance, "pk", None) is not None
 
