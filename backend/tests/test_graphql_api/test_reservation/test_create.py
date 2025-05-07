@@ -643,6 +643,26 @@ def test_reservation__create__price_calculation__free_reservation_unit(graphql):
     assert reservation.tax_percentage_value == 0
 
 
+def test_reservation__create__pricing_requires_payment_type(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
+        allow_reservations_without_opening_hours=True,
+        pricings__lowest_price=Decimal(10),
+        pricings__highest_price=Decimal(20),
+        pricings__price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        pricings__tax_percentage__value=Decimal(10),
+        pricings__payment_type=None,
+        payment_product__id=uuid.uuid4(),
+    )
+
+    graphql.login_with_superuser()
+    data = get_create_data(reservation_unit)
+
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is True, response.errors
+    assert response.field_error_messages() == ["Pricing has no payment type defined"]
+
+
 def test_reservation__create__price_calculation__fixed_price_reservation_unit(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         allow_reservations_without_opening_hours=True,
