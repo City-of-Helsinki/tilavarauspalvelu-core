@@ -2,6 +2,8 @@ import { ApolloError } from "@apollo/client";
 import { type GraphQLFormattedError } from "graphql";
 import * as Sentry from "@sentry/nextjs";
 import { onError } from "@apollo/client/link/error";
+import toast from "./common/toast";
+import { isBrowser } from "./helpers";
 
 // TODO narrow down the error codes and transform unknowns to catch all
 type ErrorCode = string;
@@ -260,6 +262,23 @@ export const errorLink = onError(({ graphQLErrors, networkError }) => {
   };
   Sentry.captureMessage(`GraphQL error: ${apiErrorCodes.join(",")}`, context);
 
+  if (networkError != null && isBrowser) {
+    const errorToastId = "network_error";
+
+    // don't create multiple toasts
+    if (!document.querySelector(`#${errorToastId}`)) {
+      // Not translated because of how difficult it is to pass the translation function here
+      let errorMsg = "Network error";
+      if ("statusCode" in networkError) {
+        errorMsg += `: ${networkError.statusCode}`;
+      }
+      toast({
+        text: errorMsg,
+        type: "error",
+        options: { toastId: errorToastId },
+      });
+    }
+  }
   // During development (especially for SSR) log to console since there is no network tab
   // better method would be to use a logger / push errors to client side
   if (process.env.NODE_ENV !== "production") {
