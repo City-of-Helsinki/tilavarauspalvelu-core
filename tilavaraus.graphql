@@ -1481,7 +1481,6 @@ type Mutation {
   denyReservationSeries(
     input: ReservationSeriesDenyMutationInput!
   ): ReservationSeriesDenyMutationPayload
-  refreshOrder(input: RefreshOrderMutationInput!): RefreshOrderMutationPayload
   refundReservation(
     input: ReservationRefundMutationInput!
   ): ReservationRefundMutationPayload
@@ -1597,6 +1596,7 @@ enum OrderStatus {
   DRAFT
   EXPIRED
   PAID
+  PAID_BY_INVOICE
   PAID_MANUALLY
   REFUNDED
 }
@@ -1744,8 +1744,8 @@ type PaymentProductNode implements Node {
 An enumeration.
 """
 enum PaymentType {
-  INVOICE
   ONLINE
+  ONLINE_OR_INVOICE
   ON_SITE
 }
 
@@ -2853,16 +2853,6 @@ enum RecurringReservationOrderingChoices {
   unitNameFiDesc
   unitNameSvAsc
   unitNameSvDesc
-}
-
-input RefreshOrderMutationInput {
-  orderUuid: String!
-}
-
-type RefreshOrderMutationPayload {
-  orderUuid: String
-  reservationPk: Int
-  status: String
 }
 
 input RejectAllApplicationOptionsMutationInput {
@@ -4037,7 +4027,6 @@ input ReservationUnitCreateMutationInput {
   nameFi: String
   nameSv: String
   paymentTerms: String
-  paymentTypes: [String]
   pk: Int
   pricingTerms: String
   pricings: [ReservationUnitPricingSerializerInput]
@@ -4109,7 +4098,6 @@ type ReservationUnitCreateMutationPayload {
   nameFi: String
   nameSv: String
   paymentTerms: String
-  paymentTypes: [String]
   pk: Int
   pricingTerms: String
   pricings: [ReservationUnitPricingNode]
@@ -4287,7 +4275,6 @@ type ReservationUnitNode implements Node {
   paymentMerchant: PaymentMerchantNode
   paymentProduct: PaymentProductNode
   paymentTerms: TermsOfUseNode
-  paymentTypes: [ReservationUnitPaymentTypeNode!]!
   pk: Int
   pricingTerms: TermsOfUseNode
   pricings: [ReservationUnitPricingNode!]!
@@ -4532,14 +4519,6 @@ enum ReservationUnitOrderingChoices {
   unitNameSvDesc
 }
 
-type ReservationUnitPaymentTypeNode implements Node {
-  code: String!
-  """
-  The ID of the object
-  """
-  id: ID!
-}
-
 type ReservationUnitPricingNode implements Node {
   begins: Date!
   highestPrice: Decimal!
@@ -4674,7 +4653,6 @@ input ReservationUnitUpdateMutationInput {
   nameFi: String
   nameSv: String
   paymentTerms: String
-  paymentTypes: [String]
   pk: Int!
   pricingTerms: String
   pricings: [UpdateReservationUnitPricingSerializerInput]
@@ -4746,7 +4724,6 @@ type ReservationUnitUpdateMutationPayload {
   nameFi: String
   nameSv: String
   paymentTerms: String
-  paymentTypes: [String]
   pk: Int
   pricingTerms: String
   pricings: [ReservationUnitPricingNode]
