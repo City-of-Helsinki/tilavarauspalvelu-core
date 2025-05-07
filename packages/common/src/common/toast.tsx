@@ -2,6 +2,7 @@ import React from "react";
 import {
   ToastContainer as TC,
   toast as toastFn,
+  ToastOptions,
   type Id,
 } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,14 +14,14 @@ import {
 } from "hds-react";
 import styled from "styled-components";
 
-type ToastProps = {
+type ToastProps<T = unknown> = {
   text: string;
   type?: "success" | "error" | "alert" | "info";
   label?: string;
   ariaLabel?: string;
   duration?: number;
   dataTestId?: string;
-  options?: Record<string, unknown>;
+  options?: ToastOptions<T>;
   icon?: JSX.Element;
 };
 
@@ -128,9 +129,9 @@ export default function toast({
   duration = 5,
   dataTestId,
   ariaLabel = label,
-  options,
+  options = {},
 }: ToastProps): Id {
-  const toastOptions = options || {};
+  const toastOptions: ToastOptions = { ...options };
   if (duration) {
     toastOptions.autoClose = duration * 1000;
   }
