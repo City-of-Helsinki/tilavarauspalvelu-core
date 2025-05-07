@@ -1,7 +1,6 @@
 import { ApolloClient, HttpLink, InMemoryCache, from } from "@apollo/client";
 import { getCookie } from "typescript-cookie";
 import { relayStylePagination } from "@apollo/client/utilities";
-import { onError } from "@apollo/client/link/error";
 import qs, { ParsedUrlQuery } from "querystring";
 import { GetServerSidePropsContext, PreviewData } from "next";
 import { IncomingHttpHeaders } from "node:http";
@@ -9,26 +8,13 @@ import { buildGraphQLUrl } from "common/src/urlBuilder";
 import { env } from "@/env.mjs";
 import { isBrowser } from "./const";
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
+import { errorLink } from "common/src/apolloUtils";
 
 if (process.env.NODE_ENV !== "production") {
   // Adds messages only in a dev environment
   loadDevMessages();
   loadErrorMessages();
 }
-
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors) {
-    for (const error of graphQLErrors) {
-      // eslint-disable-next-line no-console
-      console.error(`GQL_ERROR: ${JSON.stringify(error, null, 2)}`);
-    }
-  }
-
-  if (networkError) {
-    // eslint-disable-next-line no-console
-    console.error(`NETWORK_ERROR: ${JSON.stringify(networkError, null, 2)}`);
-  }
-});
 
 function getServerCookie(
   headers: IncomingHttpHeaders | undefined,
