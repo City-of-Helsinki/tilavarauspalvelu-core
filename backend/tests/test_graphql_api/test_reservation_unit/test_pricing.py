@@ -95,11 +95,7 @@ def test_reservation_unit__create__pricing__free_pricing_doesnt_require_price_in
 
     graphql.login_with_superuser()
     data = get_create_draft_input_data(
-        pricings=[
-            {
-                "begins": local_date().isoformat(),
-            }
-        ],
+        pricings=[{"begins": local_date().isoformat()}],
     )
     response = graphql(CREATE_MUTATION, input_data=data)
 
@@ -115,6 +111,7 @@ def test_reservation_unit__create__pricing__free_pricing_doesnt_require_price_in
     assert pricing.lowest_price_net == 0
     assert pricing.highest_price_net == 0
     assert pricing.tax_percentage.value == 0
+    assert pricing.payment_type is None
 
 
 def test_reservation_unit__create__pricing__begins_is_required(graphql):
@@ -158,6 +155,19 @@ def test_reservation_unit__create__pricing__missing_one_price_field(graphql, mis
 
     assert response.has_errors is True, response
     assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICINGS_INVALID_PRICES
+    assert ReservationUnit.objects.count() == 0
+
+
+def test_reservation_unit__create__pricing__payment_type_field_is_required(graphql):
+    graphql.login_with_superuser()
+
+    pricing_data = get_pricing_data()
+    del pricing_data["paymentType"]
+    data = get_create_draft_input_data(pricings=[pricing_data])
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is True, response
+    assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICING_NO_PAYMENT_TYPE
     assert ReservationUnit.objects.count() == 0
 
 
