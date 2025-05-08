@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Self
 
 from django import forms
+from subforms.fields import DynamicArrayField, NestedFormField
 
 from tilavarauspalvelu.admin.email_template.utils import get_mock_params
 from tilavarauspalvelu.enums import AccessType, Language
@@ -39,12 +40,14 @@ class EmailTesterForm(forms.BaseForm):
     def to_context(self) -> EmailContext:
         """Return the correct EmailContext based on the email type from the form data."""
         context_params = {field: self.cleaned_data[field] for field in self.email_type.context_variables}
+        # Language is always needed
+        context_params["language"] = self.cleaned_data["language"]
         return self.email_type.get_email_context(**context_params)
 
     @classmethod
     def from_reservation_unit(cls, email_type: EmailTemplateType, instance: ReservationUnit, *, language: Lang) -> Self:
         """Initialise the form with data form from reservation unit information."""
-        initial = {
+        initial: dict[str, Any] = {
             "reservation_unit_name": get_attr_by_language(instance, "name", language),
             "unit_name": get_attr_by_language(instance.unit, "name", language),
             "unit_location": instance.actions.get_address(),
@@ -52,7 +55,7 @@ class EmailTesterForm(forms.BaseForm):
             "instructions_cancelled": get_attr_by_language(instance, "reservation_cancelled_instructions", language),
             "instructions_pending": get_attr_by_language(instance, "reservation_pending_instructions", language),
         }
-        if instance.access_type != AccessType.ACCESS_CODE:
+        if instance.current_access_type != AccessType.ACCESS_CODE:
             initial.update({
                 "access_code_is_used": False,
                 "access_code": "",
@@ -66,10 +69,18 @@ WIDTH = 50
 
 text_widget = forms.TextInput(attrs={"size": WIDTH})
 email_widget = forms.EmailInput(attrs={"size": WIDTH})
+url_widget = forms.URLInput(attrs={"size": WIDTH})
 text_area_widget = forms.Textarea(attrs={"size": WIDTH})
 datetime_widget = forms.SplitDateTimeWidget(date_format="%d.%m.%Y", time_format="%H:%M")
 date_widget = forms.DateInput(attrs={"size": WIDTH})
 number_widget = forms.NumberInput(attrs={"size": WIDTH})
+
+
+class AllocationForm(forms.Form):
+    weekday_value = forms.CharField(widget=text_widget)
+    time_value = forms.CharField(widget=text_widget)
+    access_code_validity_period = forms.CharField(widget=text_widget)
+    series_url = forms.URLField(widget=url_widget)
 
 
 def get_email_tester_form_fields() -> dict[str, Any]:
@@ -107,5 +118,5 @@ def get_email_tester_form_fields() -> dict[str, Any]:
         "access_code_validity_period": forms.CharField(
             initial=initial["access_code_validity_period"], widget=text_widget
         ),
-        "allocations": forms.JSONField(initial=initial["allocations"]),
+        "allocations": DynamicArrayField(NestedFormField(AllocationForm), initial=initial["allocations"]),
     }

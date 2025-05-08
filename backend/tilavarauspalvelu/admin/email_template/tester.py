@@ -112,6 +112,7 @@ def email_tester_admin_view(request: WSGIRequest, email_type: str) -> HttpRespon
         "template_switcher_form": TemplateSwitcherForm(initial={"email_type": email_type}),
         "links_html": get_preview_links(email_template_type),
         "links_text": get_preview_links(email_template_type, text=True),
+        "media": tester_form.media,
     }
 
     return TemplateResponse(request, "email/email_tester.html", context=context)
