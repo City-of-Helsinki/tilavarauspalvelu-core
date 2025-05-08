@@ -623,7 +623,7 @@ function AllocationWrapper({
   const [searchParams, setParams] = useSearchParams();
   useEffect(() => {
     const unit = toNumber(searchParams.get("unit"));
-    if (!loading && !filteredUnits.some((u) => u.pk === unit)) {
+    if (unit != null && !loading && !filteredUnits.some((u) => u.pk === unit)) {
       const p = new URLSearchParams(searchParams);
       p.delete("unit");
       setParams(p, { replace: true });
