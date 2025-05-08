@@ -1306,8 +1306,10 @@ type GeneralRoleNode implements Node {
 }
 
 type HelsinkiProfileDataNode {
+  additionalAddress: String
   birthday: Date
   city: String
+  countryCode: String
   email: String
   firstName: String
   isStrongLogin: Boolean!

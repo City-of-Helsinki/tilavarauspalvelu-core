@@ -1195,8 +1195,10 @@ export type GeneralRoleNode = Node & {
 };
 
 export type HelsinkiProfileDataNode = {
+  readonly additionalAddress: Maybe<Scalars["String"]["output"]>;
   readonly birthday: Maybe<Scalars["Date"]["output"]>;
   readonly city: Maybe<Scalars["String"]["output"]>;
+  readonly countryCode: Maybe<Scalars["String"]["output"]>;
   readonly email: Maybe<Scalars["String"]["output"]>;
   readonly firstName: Maybe<Scalars["String"]["output"]>;
   readonly isStrongLogin: Scalars["Boolean"]["output"];

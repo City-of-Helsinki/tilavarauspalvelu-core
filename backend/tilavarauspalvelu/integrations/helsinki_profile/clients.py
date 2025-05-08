@@ -200,7 +200,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
             SentryLogger.log_message(message=msg, details=errors, level="warning")
 
             error_msg = f"{msg} {json.dumps(errors)}"
-            raise ExternalServiceError(error_msg)
+            raise ExternalServiceError(error_msg, extra_data=errors)
 
         return response_data
 
