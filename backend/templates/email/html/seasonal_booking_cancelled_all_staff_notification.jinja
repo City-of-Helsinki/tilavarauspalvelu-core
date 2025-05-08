@@ -7,9 +7,9 @@
 
     <mj-spacer />
     <mj-text>{{ view_booking_at_label | safe }}:</mj-text>
-    {% for series in cancelled_reservation_series %}
-        <mj-text>{{ series.weekday_value | safe }}: {{ series.time_value | safe }}</mj-text>
-        <mj-text><a href="{{ series.reservation_url | safe }}">{{ series.reservation_url | safe }}</a></mj-text>
+    {% for allocation in allocations %}
+        <mj-text>{{ allocation.weekday_value | safe }}: {{ allocation.time_value | safe }}</mj-text>
+        <mj-text><a href="{{ allocation.series_url | safe }}">{{ allocation.series_url | safe }}</a></mj-text>
     {% endfor %}
 {% endblock %}
 

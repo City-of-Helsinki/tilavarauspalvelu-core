@@ -4,7 +4,7 @@
     <mj-text>{{ text_reservation_rejected | sentence | safe }}</mj-text>
     <mj-text>{{ reason_label | safe }}: {{ rejection_reason | safe }}</mj-text>
     {% include "email/html/partials/application_section_name.jinja" %}
-    {% include "email/html/partials/access_code_section.jinja" %}
+    {% include "email/html/partials/access_code_series.jinja" %}
     <mj-spacer />
     <mj-text>{{ check_booking_details_text | safe }}: {{ check_booking_details_url_html | safe }}</mj-text>
 {% endblock %}

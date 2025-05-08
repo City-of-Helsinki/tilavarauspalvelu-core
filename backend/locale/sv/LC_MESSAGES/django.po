@@ -3097,72 +3097,6 @@ msgctxt "AccessCodeState"
 msgid "Access code pending"
 msgstr ""
 
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-msgctxt "Email"
-msgid "'My applications' page"
-msgstr "'Mina ansökningar'"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-#, python-format
-msgctxt "Email"
-msgid "You can view the result of the processing on the %(page)s"
-msgstr "Du kan se resultatet av behandlingen på sidan %(page)s"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-msgctxt "Email"
-msgid "Your application has been processed"
-msgstr "Din ansökan har behandlats"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-#, python-format
-msgctxt "Email"
-msgid "You can view the application you have sent on the %(page)s"
-msgstr "Du kan se den ansökan du har skickat på sidan %(page)s"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-msgctxt "Email"
-msgid "Your application is being processed"
-msgstr "Din ansökan behandlas"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-msgctxt "Email"
-msgid ""
-"The application deadline has passed. We will notify you of the result when "
-"your application has been processed."
-msgstr ""
-"Ansökningstiden har löpt ut. Vi skickar ett meddelande till e-postadressen "
-"när din ansökan har behandlats."
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-#, python-format
-msgctxt "Email"
-msgid ""
-"You can edit your application on the %(page)s until the application deadline"
-msgstr ""
-"Du kan redigera din ansökan på sidan %(page)s till och med ansökningstidens "
-"utgång"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-msgctxt "Email"
-msgid "Your application has been received"
-msgstr "Din ansökan har mottagits"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-msgctxt "Email"
-msgid "Thank you for your application"
-msgstr "Tack för din ansökan"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Your seasonal booking has been cancelled"
-msgstr "Din säsongsbokning har avbokats"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-msgctxt "Email"
-msgid "The customer has canceled the seasonal booking"
-msgstr "Kunden har avbokat säsongsbokningen"
-
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
 msgid "Varaamo"
@@ -3266,7 +3200,7 @@ msgid "Your booking has been cancelled"
 msgstr "Din bokning har avbokats"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
 msgid ""
 "The space reservation included in your seasonal booking has been cancelled"
@@ -3374,6 +3308,17 @@ msgstr "Du kan kontrollera dina bokningsuppgifter på"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
+msgid "A door code has been added to your booking"
+msgstr "En dörrkod har lagts till i din bokning"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
+msgctxt "Email"
+msgid "The door code of your booking has changed"
+msgstr "Dörrkoden för din bokning har ändrats"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
 msgid "Your booking has been confirmed with the following discount:"
 msgstr "Din bokning har bekräftats med följande rabatt:"
 
@@ -3398,14 +3343,16 @@ msgid "You have made a new booking"
 msgstr "Du har gjort en ny bokning"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
+#, python-format
 msgctxt "Email"
-msgid "Your booking has been updated"
-msgstr "Din bokning har uppdaterats"
+msgid "New booking %(reservation_id)s has been made for %(unit_name)s"
+msgstr "Ny bokning %(reservation_id)s har gjorts för %(unit_name)s"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
+#, python-format
 msgctxt "Email"
-msgid "The door code of your booking has changed"
-msgstr "Dörrkoden för din bokning har ändrats"
+msgid "A new booking has been confirmed for %(reservation_unit_name)s"
+msgstr "En ny bokningsförfrågan för %(reservation_unit_name)s har bekräftats"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
@@ -3434,40 +3381,6 @@ msgstr ""
 "bokningsförfrågan."
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Pay the booking"
-msgstr "Betala bokningen"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Your booking has been confirmed, and can be paid"
-msgstr "Din bokning har bekräftats och kan betalas"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Due date"
-msgstr "Förfallodatum"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid ""
-"The time of the space reservation included in your seasonal booking has "
-"changed"
-msgstr "Tiden för lokalbokningen som ingår i din säsongsbokning har ändrats"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-#, python-format
-msgctxt "Email"
-msgid "New booking %(reservation_id)s has been made for %(unit_name)s"
-msgstr "Ny bokning %(reservation_id)s har gjorts för %(unit_name)s"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-#, python-format
-msgctxt "Email"
-msgid "A new booking has been confirmed for %(reservation_unit_name)s"
-msgstr "En ny bokningsförfrågan för %(reservation_unit_name)s har bekräftats"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format
 msgctxt "Email"
 msgid "New booking %(reservation_id)s requires handling at unit %(unit_name)s"
@@ -3485,32 +3398,100 @@ msgstr ""
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "A door code has been added to your booking"
-msgstr "En dörrkod har lagts till i din bokning"
+msgid "Pay the booking"
+msgstr "Betala bokningen"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Your booking has been confirmed, and can be paid"
+msgstr "Din bokning har bekräftats och kan betalas"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Due date"
+msgstr "Förfallodatum"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Your booking has been updated"
+msgstr "Din bokning har uppdaterats"
+
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
 msgid "A door code has been added to your seasonal booking"
 msgstr "En dörrkod har lagts till i din säsongsbokning"
 
-#: tilavarauspalvelu/integrations/email/template_context/user.py
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
-msgid "Your staff access to Varaamo is expiring"
-msgstr "Din personalåtkomst till Varaamo håller på att gå ut"
+msgid "'My applications' page"
+msgstr "'Mina ansökningar'"
 
-#: tilavarauspalvelu/integrations/email/template_context/user.py
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
+#, python-format
 msgctxt "Email"
 msgid ""
-"Your staff access to Varaamo will expire if you do not log in to the service "
-"within two weeks."
+"You can edit your application on the %(page)s until the application deadline"
 msgstr ""
-"Din personalåtkomst till Varaamo kommer att upphöra om du inte loggar in på "
-"tjänsten inom två veckor."
+"Du kan redigera din ansökan på sidan %(page)s till och med ansökningstidens "
+"utgång"
 
-#: tilavarauspalvelu/integrations/email/template_context/user.py
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
-msgid "Log in to the service at"
-msgstr "Logga in i tjänsten på"
+msgid "Your application has been received"
+msgstr "Din ansökan har mottagits"
+
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
+msgctxt "Email"
+msgid "Thank you for your application"
+msgstr "Tack för din ansökan"
+
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
+#, python-format
+msgctxt "Email"
+msgid "You can view the result of the processing on the %(page)s"
+msgstr "Du kan se resultatet av behandlingen på sidan %(page)s"
+
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
+msgctxt "Email"
+msgid "Your application has been processed"
+msgstr "Din ansökan har behandlats"
+
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
+#, python-format
+msgctxt "Email"
+msgid "You can view the application you have sent on the %(page)s"
+msgstr "Du kan se den ansökan du har skickat på sidan %(page)s"
+
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
+msgctxt "Email"
+msgid "Your application is being processed"
+msgstr "Din ansökan behandlas"
+
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
+msgctxt "Email"
+msgid ""
+"The application deadline has passed. We will notify you of the result when "
+"your application has been processed."
+msgstr ""
+"Ansökningstiden har löpt ut. Vi skickar ett meddelande till e-postadressen "
+"när din ansökan har behandlats."
+
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
+msgctxt "Email"
+msgid "Your seasonal booking has been cancelled"
+msgstr "Din säsongsbokning har avbokats"
+
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
+msgctxt "Email"
+msgid "The customer has canceled the seasonal booking"
+msgstr "Kunden har avbokat säsongsbokningen"
+
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
+msgctxt "Email"
+msgid ""
+"The time of the space reservation included in your seasonal booking has "
+"changed"
+msgstr "Tiden för lokalbokningen som ingår i din säsongsbokning har ändrats"
 
 #: tilavarauspalvelu/integrations/email/template_context/user.py
 msgctxt "Email"
@@ -3536,6 +3517,25 @@ msgid ""
 msgstr ""
 "Du kan förlänga giltigheten för ditt användarkonto genom att logga in på "
 "tjänsten på"
+
+#: tilavarauspalvelu/integrations/email/template_context/user.py
+msgctxt "Email"
+msgid "Your staff access to Varaamo is expiring"
+msgstr "Din personalåtkomst till Varaamo håller på att gå ut"
+
+#: tilavarauspalvelu/integrations/email/template_context/user.py
+msgctxt "Email"
+msgid ""
+"Your staff access to Varaamo will expire if you do not log in to the service "
+"within two weeks."
+msgstr ""
+"Din personalåtkomst till Varaamo kommer att upphöra om du inte loggar in på "
+"tjänsten inom två veckor."
+
+#: tilavarauspalvelu/integrations/email/template_context/user.py
+msgctxt "Email"
+msgid "Log in to the service at"
+msgstr "Logga in i tjänsten på"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
@@ -3609,12 +3609,12 @@ msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal booking application round in allocation"
+msgid "Seasonal booking application round handled"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal booking application round handled"
+msgid "Seasonal booking application round in allocation"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py

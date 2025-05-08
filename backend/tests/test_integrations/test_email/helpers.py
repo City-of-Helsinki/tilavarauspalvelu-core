@@ -5,6 +5,13 @@ from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
 from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraReservationResponse
+from tilavarauspalvelu.typing import (
+    PindoraReservationInfoData,
+    PindoraSectionInfoData,
+    PindoraSeriesInfoData,
+    PindoraValidityInfoData,
+)
+from utils.date_utils import local_datetime
 from utils.utils import html_2_text
 
 if TYPE_CHECKING:
@@ -422,3 +429,69 @@ def pindora_reservation_response(**kwargs: Any) -> PindoraReservationResponse:
     kwargs.setdefault("access_code_valid_minutes_before", 0)
     kwargs.setdefault("access_code_valid_minutes_after", 0)
     return PindoraReservationResponse(**kwargs)
+
+
+def pindora_reservation_info(**kwargs: Any) -> PindoraReservationInfoData:
+    return PindoraReservationInfoData(
+        access_code=kwargs.get("access_code", "123456"),
+        access_code_generated_at=kwargs.get("access_code_generated_at", local_datetime()),
+        access_code_is_active=kwargs.get("access_code_is_active", True),
+        access_code_keypad_url=kwargs.get("access_code_keypad_url", "https://fake.pindora.fi/keypad"),
+        access_code_phone_number=kwargs.get("access_code_phone_number", "+358123456789"),
+        access_code_sms_number=kwargs.get("access_code_sms_number", "+358123456789"),
+        access_code_sms_message=kwargs.get("access_code_sms_message", "123456"),
+        access_code_begins_at=kwargs.get("access_code_begins_at", datetime.datetime(2024, 1, 1, 11, 0)),
+        access_code_ends_at=kwargs.get("access_code_ends_at", datetime.datetime(2024, 1, 1, 15, 0)),
+    )
+
+
+def pindora_seasonal_booking_info(**kwargs: Any) -> PindoraSectionInfoData:
+    return PindoraSectionInfoData(
+        access_code=kwargs.get("access_code", "123456"),
+        access_code_generated_at=kwargs.get("access_code_generated_at", local_datetime()),
+        access_code_is_active=kwargs.get("access_code_is_active", True),
+        access_code_keypad_url=kwargs.get("access_code_keypad_url", "https://fake.pindora.fi/keypad"),
+        access_code_phone_number=kwargs.get("access_code_phone_number", "+358123456789"),
+        access_code_sms_number=kwargs.get("access_code_sms_number", "+358123456789"),
+        access_code_sms_message=kwargs.get("access_code_sms_message", "123456"),
+        access_code_validity=kwargs.get(
+            "access_code_validity",
+            [
+                PindoraValidityInfoData(
+                    reservation_id=kwargs.get("reservation_id__0", 1234),
+                    reservation_series_id=kwargs.get("reservation_series_id__0", 5678),
+                    access_code_begins_at=kwargs.get("access_code_begins_at__0", datetime.datetime(2024, 1, 1, 11, 0)),
+                    access_code_ends_at=kwargs.get("access_code_ends_at__0", datetime.datetime(2024, 1, 1, 15, 0)),
+                ),
+                PindoraValidityInfoData(
+                    reservation_id=kwargs.get("reservation_id__1", 4321),
+                    reservation_series_id=kwargs.get("reservation_series_id__1", 8765),
+                    access_code_begins_at=kwargs.get("access_code_begins_at__1", datetime.datetime(2024, 1, 2, 20, 45)),
+                    access_code_ends_at=kwargs.get("access_code_ends_at__1", datetime.datetime(2024, 1, 2, 22, 5)),
+                ),
+            ],
+        ),
+    )
+
+
+def pindora_seasonal_booking_series_info(**kwargs: Any) -> PindoraSeriesInfoData:
+    return PindoraSeriesInfoData(
+        access_code=kwargs.get("access_code", "123456"),
+        access_code_generated_at=kwargs.get("access_code_generated_at", local_datetime()),
+        access_code_is_active=kwargs.get("access_code_is_active", True),
+        access_code_keypad_url=kwargs.get("access_code_keypad_url", "https://fake.pindora.fi/keypad"),
+        access_code_phone_number=kwargs.get("access_code_phone_number", "+358123456789"),
+        access_code_sms_number=kwargs.get("access_code_sms_number", "+358123456789"),
+        access_code_sms_message=kwargs.get("access_code_sms_message", "123456"),
+        access_code_validity=kwargs.get(
+            "access_code_validity",
+            [
+                PindoraValidityInfoData(
+                    reservation_id=kwargs.get("reservation_id", 1234),
+                    reservation_series_id=kwargs.get("reservation_series_id", 5678),
+                    access_code_begins_at=kwargs.get("access_code_begins_at", datetime.datetime(2024, 1, 1, 11, 0)),
+                    access_code_ends_at=kwargs.get("access_code_ends_at", datetime.datetime(2024, 1, 1, 15, 0)),
+                ),
+            ],
+        ),
+    )

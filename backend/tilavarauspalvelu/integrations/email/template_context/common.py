@@ -1,22 +1,18 @@
 from __future__ import annotations
 
-import datetime
 from collections import defaultdict
-from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.utils.translation import pgettext
 
 from tilavarauspalvelu.enums import Weekday
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.translation import get_attr_by_language
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_time_string
 from utils.utils import update_query_params
 
 if TYPE_CHECKING:
-    import uuid
+    import datetime
     from decimal import Decimal
 
     from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation, ReservationUnit
@@ -260,135 +256,123 @@ def params_for_price_range_info(*, reservation: Reservation) -> dict[str, Any]:
 
 
 def params_for_access_code_reservation(*, reservation: Reservation) -> dict[str, Any]:
-    empty_response = {
-        "access_code_is_used": False,
+    from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+    from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
+
+    params = {
         "access_code": "",
+        "access_code_is_used": False,
         "access_code_validity_period": "",
     }
 
     if not reservation.access_code_should_be_active:
-        return empty_response
+        return params
 
-    empty_response["access_code_is_used"] = True
+    params["access_code_is_used"] = True
 
     try:
-        response = PindoraClient.get_reservation(reservation=reservation)
+        response = PindoraService.get_access_code(obj=reservation)
     except PindoraNotFoundError:
-        return empty_response
+        return params
 
     # If access code is not actually active, even when we think it should be, don't show it in emails
-    if not response["access_code_is_active"]:
-        return empty_response
+    if not response.access_code_is_active:
+        return params
 
-    valid_before = response["access_code_valid_minutes_before"]
-    valid_after = response["access_code_valid_minutes_after"]
+    params["access_code"] = response.access_code
 
-    begin = response["begin"] - datetime.timedelta(minutes=valid_before)
-    end = response["end"] + datetime.timedelta(minutes=valid_after)
+    begin_time = local_time_string(response.access_code_begins_at.time())
+    end_time = local_time_string(response.access_code_ends_at.time())
+    params["access_code_validity_period"] = f"{begin_time}-{end_time}"
 
-    begin_time = local_time_string(begin.time())
-    end_time = local_time_string(end.time())
+    return params
 
-    time_str = f"{begin_time}-{end_time}"
-    return {
-        "access_code_is_used": True,
-        "access_code": response["access_code"],
-        "access_code_validity_period": time_str,
+
+def params_for_access_code_series(*, series: RecurringReservation) -> dict[str, Any]:
+    from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+    from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
+
+    params = {
+        "access_code": "",
+        "access_code_is_used": False,
+        "access_code_validity_period": "",
     }
 
+    if not series.should_have_active_access_code:
+        return params
 
-def params_for_reservation_series_info(*, series: RecurringReservation) -> dict[str, str]:
-    weekdays = ", ".join(str(Weekday.from_week_day(int(val)).label) for val in series.weekdays.split(","))
-    start_time = series.begin_time
-    end_time = series.end_time
-    return {
-        "weekday_value": weekdays,
-        "time_value": f"{local_time_string(start_time)}-{local_time_string(end_time)}",
+    params["access_code_is_used"] = True
+
+    try:
+        response = PindoraService.get_access_code(series)
+    except PindoraNotFoundError:
+        return params
+
+    # If access code is not actually active, even when we think it should be, don't show it in emails
+    if not response.access_code_is_active:
+        return params
+
+    params["access_code"] = response.access_code
+
+    # All reservations in the series should start at the same time, so we can just use the first one.
+    validity = next(iter(response.access_code_validity), None)  # type: ignore
+    if validity is not None:
+        begin_time = local_time_string(validity.access_code_begins_at.time())
+        end_time = local_time_string(validity.access_code_ends_at.time())
+        params["access_code_validity_period"] = f"{begin_time}-{end_time}"
+
+    return params
+
+
+def params_for_access_code_section(*, section: ApplicationSection) -> dict[str, Any]:
+    from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+    from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
+
+    all_allocations = _initialize_allocations_map(section)
+
+    params = {
+        "access_code": "",
+        "access_code_is_used": False,
+        "allocations": _compile_allocations_map(all_allocations),
     }
 
+    if not section.should_have_active_access_code:
+        return params
 
-def params_for_application_section_info(
-    *,
-    section: ApplicationSection,
-    language: Lang,
-    get_access_code: bool = False,
-) -> dict[str, Any]:
-    # Use map to be able to add access codes to correct time slots if needed.
-    allocations_map: defaultdict[uuid.UUID, dict[Weekday, dict[str, str]]] = defaultdict(dict)
+    params["access_code_is_used"] = True
 
-    series: RecurringReservation
-    for series in section.actions.get_reservation_series():
-        reservation_unit_uuid = series.reservation_unit.uuid
+    try:
+        response = PindoraService.get_access_code(section)
+    except PindoraNotFoundError:
+        return params
 
-        for weekday_int in series.weekdays.split(","):
-            if not weekday_int.isdigit():
-                continue
+    # If access code is not actually active, even when we think it should be, don't show it in emails
+    if not response.access_code_is_active:
+        return params
 
-            weekday_int = int(weekday_int)
-            weekday = Weekday.from_week_day(weekday_int)
-            begin_time = local_time_string(series.begin_time)
-            end_time = local_time_string(series.end_time)
-            allocation = {
-                "time_value": f"{begin_time}-{end_time}",
-                "access_code_validity_period": "",  # Filled later if needed
-            }
-            allocations_map[reservation_unit_uuid][weekday] = allocation
+    params["access_code"] = response.access_code
 
-    access_code = ""
-    access_code_is_used = False
+    allocations_using_access_codes: defaultdict[int, dict[Weekday, dict[str, str]]] = defaultdict(dict)
 
-    if get_access_code and section.should_have_active_access_code:
-        access_code_is_used = True
+    for validity in response.access_code_validity:
+        weekday = Weekday.from_week_day(validity.access_code_begins_at.weekday())
 
-        with suppress(PindoraNotFoundError):
-            response = PindoraClient.get_seasonal_booking(section=section)
+        allocation = all_allocations[validity.reservation_series_id].get(weekday)
+        if allocation is None:
+            continue
 
-            # If access code is not actually active, even when we think it should be, don't show it in emails
-            if not response["access_code_is_active"]:
-                # NOTE: This just exists the 'suppress' block!
-                msg = "Access code is not active"
-                raise PindoraNotFoundError(msg)
+        # We only want to to include series that use access codes in the final output,
+        # so we need to transfer the data from the "all" map to the "final" map.
+        allocations_using_access_codes[validity.reservation_series_id][weekday] = allocation
 
-            access_code = response["access_code"]
+        begin_time = local_time_string(validity.access_code_begins_at.time())
+        end_time = local_time_string(validity.access_code_ends_at.time())
 
-            for validity in response["reservation_unit_code_validity"]:
-                reservation_unit_uuid = validity["reservation_unit_id"]
-                weekday = Weekday.from_week_day(validity["begin"].weekday())
+        allocation["access_code_validity_period"] = f"{begin_time}-{end_time}"
 
-                info = allocations_map[reservation_unit_uuid].get(weekday)
-                if info is None:
-                    continue
+    params["allocations"] = _compile_allocations_map(allocations_using_access_codes)
 
-                valid_before = validity["access_code_valid_minutes_before"]
-                valid_after = validity["access_code_valid_minutes_after"]
-
-                begin = validity["begin"] - datetime.timedelta(minutes=valid_before)
-                end = validity["end"] + datetime.timedelta(minutes=valid_after)
-
-                begin_time = local_time_string(begin.time())
-                end_time = local_time_string(end.time())
-
-                info["access_code_validity_period"] = f"{begin_time}-{end_time}"
-
-    allocations = [
-        {
-            "weekday_value": str(weekday.label),
-            "time_value": allocation["time_value"],
-            "access_code_validity_period": allocation["access_code_validity_period"],
-        }
-        for weekday_map in allocations_map.values()
-        for weekday, allocation in weekday_map.items()
-    ]
-
-    application_round = section.application.application_round
-
-    return {
-        "application_section_name": section.name,
-        "application_round_name": get_attr_by_language(application_round, "name", language=language),
-        "access_code_is_used": access_code_is_used,
-        "access_code": access_code,
-        "allocations": allocations,
-    }
+    return params
 
 
 # --- Links --------------------------------------------------------------------------------------------------------
@@ -442,3 +426,49 @@ def create_anchor_tag(*, link: str, text: str | None = None) -> str:
     if text is None:
         text = link
     return f'<a href="{link}">{text}</a>'
+
+
+# --- Helpers -----------------------------------------------------------------------------------------------------
+
+
+def get_section_allocation(*, section: ApplicationSection) -> list[dict[str, Any]]:
+    allocations_map = _initialize_allocations_map(section)
+    return _compile_allocations_map(allocations_map)
+
+
+def _initialize_allocations_map(section: ApplicationSection) -> defaultdict[int, dict[Weekday, dict[str, str]]]:
+    """
+    Initializes a map of allocation data for a given series.
+    Map can be compiled with `_compile_allocations_map` missing values have been filled in.
+    """
+    allocations_map: defaultdict[int, dict[Weekday, dict[str, str]]] = defaultdict(dict)
+
+    series: RecurringReservation
+    for series in section.actions.get_reservation_series():
+        begin_time = local_time_string(series.begin_time)  # type: ignore[arg-type]
+        end_time = local_time_string(series.end_time)  # type: ignore[arg-type]
+
+        reservation = series.reservations.last()
+
+        for weekday in series.actions.get_weekdays():
+            allocations_map[series.id][weekday] = {
+                "time_value": f"{begin_time}-{end_time}",
+                "access_code_validity_period": "",  # Can be filled in later if access codes are used
+                "series_url": get_staff_reservations_ext_link(reservation_id=reservation.pk),
+            }
+
+    return allocations_map
+
+
+def _compile_allocations_map(allocations_map: defaultdict[int, dict[Weekday, dict[str, str]]]) -> list[dict[str, Any]]:
+    """Complies the allocation map created with `_initialize_allocations_map`."""
+    return [
+        {
+            "weekday_value": str(weekday.label),
+            "time_value": allocation["time_value"],
+            "access_code_validity_period": allocation["access_code_validity_period"],
+            "series_url": allocation["series_url"],
+        }
+        for weekday_map in allocations_map.values()
+        for weekday, allocation in weekday_map.items()
+    ]

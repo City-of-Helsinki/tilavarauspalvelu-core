@@ -15,7 +15,7 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import get_context_for_reservation_confirmed
 from tilavarauspalvelu.integrations.email.typing import EmailType
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 
 from tests.factories import ReservationFactory
@@ -44,7 +44,7 @@ from tests.test_integrations.test_email.helpers import (
     RESERVATION_PRICE_INFO_CONTEXT_FI,
     RESERVATION_PRICE_INFO_CONTEXT_SV,
     html_email_to_text,
-    pindora_reservation_response,
+    pindora_reservation_info,
 )
 
 if TYPE_CHECKING:
@@ -129,7 +129,7 @@ def test_reservation_confirmed__get_context__instance(email_reservation):
     assert context == expected
 
 
-@patch_method(PindoraClient.get_reservation, return_value=pindora_reservation_response())
+@patch_method(PindoraService.get_access_code, return_value=pindora_reservation_info())
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 def test_reservation_confirmed__get_context__access_code(email_reservation):
@@ -148,7 +148,7 @@ def test_reservation_confirmed__get_context__access_code(email_reservation):
         assert context == expected
 
 
-@patch_method(PindoraClient.get_reservation, return_value=pindora_reservation_response(access_code_is_active=False))
+@patch_method(PindoraService.get_access_code, return_value=pindora_reservation_info(access_code_is_active=False))
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 def test_reservation_confirmed__get_context__access_code__inactive(email_reservation):
@@ -169,7 +169,7 @@ def test_reservation_confirmed__get_context__access_code__inactive(email_reserva
         assert context == expected
 
 
-@patch_method(PindoraClient.get_reservation, return_value=pindora_reservation_response())
+@patch_method(PindoraService.get_access_code, return_value=pindora_reservation_info())
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 def test_reservation_confirmed__get_context__instance__access_code(email_reservation):
@@ -187,7 +187,7 @@ def test_reservation_confirmed__get_context__instance__access_code(email_reserva
         assert context == expected
 
 
-@patch_method(PindoraClient.get_reservation, return_value=pindora_reservation_response(access_code_is_active=False))
+@patch_method(PindoraService.get_access_code, return_value=pindora_reservation_info(access_code_is_active=False))
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 def test_reservation_confirmed__get_context__instance__access_code__inactive(email_reservation):

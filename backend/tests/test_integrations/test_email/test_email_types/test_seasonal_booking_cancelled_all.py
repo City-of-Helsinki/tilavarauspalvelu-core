@@ -108,7 +108,7 @@ def test_seasonal_booking_cancelled_all__get_context__instance(email_reservation
     }
 
     with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_booking_cancelled_all(application_section=section, language="en")
+        context = get_context_for_seasonal_booking_cancelled_all(section, language="en")
 
     assert context == expected
 

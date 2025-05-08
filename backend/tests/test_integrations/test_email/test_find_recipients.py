@@ -8,10 +8,17 @@ from tilavarauspalvelu.integrations.email.find_recipients import (
     get_recipients_for_applications_by_language,
     get_reservation_email_recipients,
     get_reservation_staff_notification_recipients_by_language,
+    get_series_email_recipients,
     get_users_by_email_language,
 )
 
-from tests.factories import ApplicationFactory, ReservationFactory, ReservationUnitFactory, UserFactory
+from tests.factories import (
+    ApplicationFactory,
+    RecurringReservationFactory,
+    ReservationFactory,
+    ReservationUnitFactory,
+    UserFactory,
+)
 
 pytestmark = [
     pytest.mark.django_db,
@@ -46,6 +53,26 @@ def test_get_application_email_recipients__no_contact_person_or_applicant():
 
     result = get_application_email_recipients(application)
     assert result == []
+
+
+def test_get_series_email_recipients():
+    user = UserFactory.create(email="applicant@example.com")
+    application = ApplicationFactory.create(user=user, contact_person__email="contact@example.com")
+    series = RecurringReservationFactory.create(
+        user=user,
+        allocated_time_slot__reservation_unit_option__application_section__application=application,
+    )
+
+    result = get_series_email_recipients(series)
+    assert sorted(result) == ["applicant@example.com", "contact@example.com"]
+
+
+def test_get_series_email_recipients__no_application():
+    user = UserFactory.create(email="applicant@example.com")
+    series = RecurringReservationFactory.create(user=user)
+
+    result = get_series_email_recipients(series)
+    assert sorted(result) == ["applicant@example.com"]
 
 
 def test_get_reservation_email_recipients():

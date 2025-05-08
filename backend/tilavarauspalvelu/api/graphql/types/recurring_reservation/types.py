@@ -127,7 +127,7 @@ class RecurringReservationNode(DjangoNode):
 
     def resolve_weekdays(root: RecurringReservation, info: GQLInfo) -> list[int]:
         if root.weekdays:
-            return [int(i) for i in root.weekdays.split(",")]
+            return [weekday.as_weekday_number for weekday in root.actions.get_weekdays()]
         return []
 
     def resolve_pindora_info(root: RecurringReservation, info: GQLInfo) -> PindoraSeriesInfoData | None:

@@ -6,6 +6,7 @@ from django.utils.translation import pgettext
 
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
+from utils.date_utils import local_time_string
 
 from .common import (
     create_anchor_tag,
@@ -14,10 +15,10 @@ from .common import (
     get_context_for_keyless_entry,
     get_context_for_translations,
     get_my_applications_ext_link,
-    get_staff_reservations_ext_link,
-    params_for_application_section_info,
+    get_section_allocation,
+    params_for_access_code_section,
+    params_for_access_code_series,
     params_for_base_info,
-    params_for_reservation_series_info,
 )
 
 if TYPE_CHECKING:
@@ -33,7 +34,7 @@ if TYPE_CHECKING:
         SeasonalBookingRescheduledSeriesContext,
         SeasonalBookingRescheduledSingleContext,
     )
-    from tilavarauspalvelu.models import ApplicationSection, Reservation
+    from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 __all__ = [
@@ -54,15 +55,15 @@ __all__ = [
 
 @get_translated
 def get_context_for_seasonal_booking_access_code_added(
-    application_section: ApplicationSection | None = None,
+    section: ApplicationSection | None = None,
     *,
     language: Lang,
     **data: Unpack[SeasonalBookingAccessCodeAddedContext],
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED]:
-    if application_section is not None:
-        context = get_context_for_seasonal_booking_rescheduled_series(application_section, language=language)
+    if section is not None:
+        context = get_context_for_seasonal_booking_access_code_changed(section, language=language)
     else:
-        context = get_context_for_seasonal_booking_rescheduled_series(**data, language=language)
+        context = get_context_for_seasonal_booking_access_code_changed(**data, language=language)
 
     title = pgettext("Email", "A door code has been added to your seasonal booking")
 
@@ -74,22 +75,42 @@ def get_context_for_seasonal_booking_access_code_added(
 
 @get_translated
 def get_context_for_seasonal_booking_access_code_changed(
-    application_section: ApplicationSection | None = None,
+    section: ApplicationSection | None = None,
     *,
     language: Lang,
     **data: Unpack[SeasonalBookingAccessCodeChangedContext],
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_ACCESS_CODE_CHANGED]:
-    if application_section is not None:
-        context = get_context_for_seasonal_booking_rescheduled_series(application_section, language=language)
-    else:
-        context = get_context_for_seasonal_booking_rescheduled_series(**data, language=language)
+    if section is not None:
+        application_round = section.application.application_round
+
+        data["email_recipient_name"] = section.application.applicant
+        data["application_id"] = section.application.pk
+        data["application_section_id"] = section.pk
+        data["application_section_name"] = section.name
+        data["application_round_name"] = get_attr_by_language(application_round, "name", language)
+
+        data |= params_for_access_code_section(section=section)
 
     title = pgettext("Email", "The door code of your booking has changed")
-
-    context["title"] = title
-    context["text_reservation_modified"] = title
-
-    return context
+    return {
+        "title": title,
+        "text_reservation_modified": title,
+        "application_section_name": data["application_section_name"],
+        "application_round_name": data["application_round_name"],
+        "allocations": data["allocations"],
+        **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
+        **get_contex_for_seasonal_reservation_check_details_url(
+            language=language,
+            application_id=data["application_id"],
+            application_section_id=data["application_section_id"],
+        ),
+        **get_context_for_keyless_entry(
+            language=language,
+            access_code_is_used=data["access_code_is_used"],
+            access_code=data["access_code"],
+            access_code_validity_period="",  # Allocations have different validity periods
+        ),
+    }
 
 
 @get_translated
@@ -159,20 +180,21 @@ def get_context_for_seasonal_booking_application_round_in_allocation(
 
 @get_translated
 def get_context_for_seasonal_booking_cancelled_all(
-    application_section: ApplicationSection | None = None,
+    section: ApplicationSection | None = None,
     *,
     language: Lang,
     **data: Unpack[SeasonalBookingCancelledAllContext],
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_CANCELLED_ALL]:
-    if application_section is not None:
-        reservation = application_section.actions.get_last_reservation()
+    if section is not None:
+        reservation = section.actions.get_last_reservation()
+        application_round = section.application.application_round
 
-        data["email_recipient_name"] = application_section.application.applicant
+        data["email_recipient_name"] = section.application.applicant
         data["cancel_reason"] = get_attr_by_language(reservation.cancel_reason, "reason", language)
-        data["application_id"] = getattr(application_section, "application_id", None)
-        data["application_section_id"] = getattr(application_section, "id", None)
-
-        data |= params_for_application_section_info(section=application_section, language=language)
+        data["application_id"] = section.application.pk
+        data["application_section_id"] = section.pk
+        data["application_section_name"] = section.name
+        data["application_round_name"] = get_attr_by_language(application_round, "name", language=language)
 
     return {
         "title": pgettext("Email", "Your seasonal booking has been cancelled"),
@@ -190,33 +212,26 @@ def get_context_for_seasonal_booking_cancelled_all(
 
 @get_translated
 def get_context_for_seasonal_booking_cancelled_all_staff_notification(
-    application_section: ApplicationSection | None = None,
+    section: ApplicationSection | None = None,
     *,
     language: Lang,
     **data: Unpack[SeasonalBookingCancelledAllStaffNotificationContext],
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_CANCELLED_ALL_STAFF_NOTIFICATION]:
-    if application_section is not None:
-        reservation = application_section.actions.get_last_reservation()
+    if section is not None:
+        reservation = section.actions.get_last_reservation()
+        application_round = section.application.application_round
 
         data["cancel_reason"] = get_attr_by_language(reservation.cancel_reason, "reason", language)
-        data["cancelled_reservation_series"] = [
-            {
-                **params_for_reservation_series_info(series=series),
-                "reservation_url": get_staff_reservations_ext_link(
-                    reservation_id=series.reservations.values_list("pk", flat=True).last()
-                ),
-            }
-            for series in application_section.actions.get_reservation_series()
-        ]
-
-        data |= params_for_application_section_info(section=application_section, language=language)
+        data["application_section_name"] = section.name
+        data["application_round_name"] = get_attr_by_language(application_round, "name", language=language)
+        data["allocations"] = get_section_allocation(section=section)
 
     return {
         "title": pgettext("Email", "The customer has canceled the seasonal booking"),
         "cancel_reason": data["cancel_reason"],
         "application_section_name": data["application_section_name"],
         "application_round_name": data["application_round_name"],
-        "cancelled_reservation_series": data["cancelled_reservation_series"],
+        "allocations": data["allocations"],
         **get_context_for_translations(language=language, email_recipient_name=None),
     }
 
@@ -229,12 +244,12 @@ def get_context_for_seasonal_booking_cancelled_single(
     **data: Unpack[SeasonalBookingCancelledSingleContext],
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_CANCELLED_SINGLE]:
     if reservation is not None:
-        application_section = reservation.actions.get_application_section()
+        section = reservation.actions.get_application_section()
 
         data["email_recipient_name"] = reservation.actions.get_email_reservee_name()
         data["cancel_reason"] = get_attr_by_language(reservation.cancel_reason, "reason", language=language)
-        data["application_id"] = getattr(application_section, "application_id", None)
-        data["application_section_id"] = getattr(application_section, "id", None)
+        data["application_id"] = getattr(section, "application_id", None)
+        data["application_section_id"] = getattr(section, "id", None)
 
         data |= params_for_base_info(reservation=reservation, language=language)
 
@@ -259,31 +274,41 @@ def get_context_for_seasonal_booking_cancelled_single(
 
 @get_translated
 def get_context_for_seasonal_booking_denied_series(
-    application_section: ApplicationSection | None = None,
+    series: RecurringReservation | None = None,
     *,
     language: Lang,
     **data: Unpack[SeasonalBookingDeniedSeriesContext],
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_DENIED_SERIES]:
-    if application_section is not None:
-        reservations = application_section.actions.get_reservations()
-        latest_denied_reservation = reservations.filter(state=ReservationStateChoice.DENIED).last()
+    if series is not None:
+        # Should only be called for series that have been created from seasonal booking
+        section = series.allocated_time_slot.reservation_unit_option.application_section  # type: ignore[union-attr]
+        application_round = section.application.application_round
 
-        data["email_recipient_name"] = application_section.application.applicant
+        latest_denied_reservation = series.reservations.filter(state=ReservationStateChoice.DENIED).last()
+
+        begin_time = local_time_string(series.begin_time)
+        end_time = local_time_string(series.end_time)
+
+        data["email_recipient_name"] = section.application.applicant
         data["rejection_reason"] = get_attr_by_language(latest_denied_reservation.deny_reason, "reason", language)
-        data["application_id"] = getattr(application_section, "application_id", None)
-        data["application_section_id"] = getattr(application_section, "id", None)
-
-        data |= params_for_application_section_info(section=application_section, language=language)
+        data["application_id"] = section.application.pk
+        data["application_section_id"] = section.pk
+        data["application_section_name"] = section.name
+        data["application_round_name"] = get_attr_by_language(application_round, "name", language=language)
+        data["weekday_value"] = ", ".join(str(weekday.label) for weekday in series.actions.get_weekdays())
+        data["time_value"] = f"{begin_time}-{end_time}"
 
     return {
         "title": pgettext("Email", "Your seasonal booking has been cancelled"),
         "text_reservation_rejected": pgettext(
-            "Email", "The space reservation included in your seasonal booking has been cancelled"
+            "Email",
+            "The space reservation included in your seasonal booking has been cancelled",
         ),
         "rejection_reason": data["rejection_reason"],
         "application_section_name": data["application_section_name"],
         "application_round_name": data["application_round_name"],
-        "allocations": data["allocations"],
+        "weekday_value": data["weekday_value"],
+        "time_value": data["time_value"],
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_seasonal_reservation_check_details_url(
             language=language,
@@ -301,12 +326,12 @@ def get_context_for_seasonal_booking_denied_single(
     **data: Unpack[SeasonalBookingDeniedSingleContext],
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_DENIED_SINGLE]:
     if reservation is not None:
-        application_section = reservation.actions.get_application_section()
+        section = reservation.actions.get_application_section()
 
         data["email_recipient_name"] = reservation.actions.get_email_reservee_name()
         data["rejection_reason"] = get_attr_by_language(reservation.deny_reason, "reason", language)
-        data["application_id"] = getattr(application_section, "application_id", None)
-        data["application_section_id"] = getattr(application_section, "id", None)
+        data["application_id"] = getattr(section, "application_id", None)
+        data["application_section_id"] = getattr(section, "id", None)
 
         data |= params_for_base_info(reservation=reservation, language=language)
 
@@ -333,21 +358,29 @@ def get_context_for_seasonal_booking_denied_single(
 
 @get_translated
 def get_context_for_seasonal_booking_rescheduled_series(
-    application_section: ApplicationSection | None = None,
+    series: RecurringReservation | None = None,
     *,
     language: Lang,
     **data: Unpack[SeasonalBookingRescheduledSeriesContext],
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_RESCHEDULED_SERIES]:
-    if application_section is not None:
-        data["email_recipient_name"] = application_section.application.applicant
-        data["application_id"] = getattr(application_section, "application_id", None)
-        data["application_section_id"] = getattr(application_section, "id", None)
+    if series is not None:
+        # Should only be called for series that have been created from seasonal booking
+        section = series.allocated_time_slot.reservation_unit_option.application_section  # type: ignore[union-attr]
+        application_round = section.application.application_round
 
-        data |= params_for_application_section_info(
-            section=application_section,
-            language=language,
-            get_access_code=True,
-        )
+        begin_time = local_time_string(series.begin_time)
+        end_time = local_time_string(series.end_time)
+
+        data["email_recipient_name"] = section.application.applicant
+        data["application_id"] = section.application.pk
+        data["application_section_id"] = section.pk
+        data["application_section_name"] = section.name
+        data["application_round_name"] = get_attr_by_language(application_round, "name", language)
+
+        data["weekday_value"] = ", ".join(str(weekday.label) for weekday in series.actions.get_weekdays())
+        data["time_value"] = f"{begin_time}-{end_time}"
+
+        data |= params_for_access_code_series(series=series)
 
     title = pgettext("Email", "The time of the space reservation included in your seasonal booking has changed")
     return {
@@ -355,7 +388,8 @@ def get_context_for_seasonal_booking_rescheduled_series(
         "text_reservation_modified": title,
         "application_section_name": data["application_section_name"],
         "application_round_name": data["application_round_name"],
-        "allocations": data["allocations"],
+        "weekday_value": data["weekday_value"],
+        "time_value": data["time_value"],
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_seasonal_reservation_check_details_url(
             language=language,
@@ -366,7 +400,7 @@ def get_context_for_seasonal_booking_rescheduled_series(
             language=language,
             access_code_is_used=data["access_code_is_used"],
             access_code=data["access_code"],
-            access_code_validity_period="",
+            access_code_validity_period=data["access_code_validity_period"],
         ),
     }
 
@@ -379,11 +413,11 @@ def get_context_for_seasonal_booking_rescheduled_single(
     **data: Unpack[SeasonalBookingRescheduledSingleContext],
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_RESCHEDULED_SINGLE]:
     if reservation is not None:
-        application_section = reservation.actions.get_application_section()
+        section = reservation.actions.get_application_section()
 
         data["email_recipient_name"] = reservation.actions.get_email_reservee_name()
-        data["application_id"] = getattr(application_section, "application_id", None)
-        data["application_section_id"] = getattr(application_section, "id", None)
+        data["application_id"] = getattr(section, "application_id", None)
+        data["application_section_id"] = getattr(section, "id", None)
 
         data |= params_for_base_info(reservation=reservation, language=language)
 

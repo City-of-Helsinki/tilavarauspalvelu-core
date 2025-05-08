@@ -13,7 +13,6 @@ from tilavarauspalvelu.enums import (
     ReservationKind,
     ReservationStateChoice,
     ReservationTypeChoice,
-    Weekday,
     WeekdayChoice,
 )
 from tilavarauspalvelu.models import (
@@ -778,7 +777,7 @@ def _create_reservations_for_series(
     pricing: ReservationUnitPricing | None = series.reservation_unit.pricings.active().first()
     assert pricing is not None, "Reservation unit must have at least one pricing"
 
-    weekdays: list[Weekday] = [Weekday.from_week_day(int(val)) for val in series.weekdays.split(",") if val]
+    weekdays = series.actions.get_weekdays()
 
     reservations: list[Reservation] = []
     reservation_reservation_units: list[models.Model] = []
