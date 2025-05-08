@@ -51,10 +51,8 @@ LANGUAGE_CONTEXT = {
     "en": {
         "title": "Your seasonal booking has been cancelled",
         "text_reservation_rejected": "The space reservation included in your seasonal booking has been cancelled",
-        "allocations": [
-            {"weekday_value": "Monday", "time_value": "13:00-15:00", "access_code_validity_period": ""},
-            {"weekday_value": "Tuesday", "time_value": "21:00-22:00", "access_code_validity_period": ""},
-        ],
+        "weekday_value": "Monday",
+        "time_value": "13:00-15:00",
         **BASE_TEMPLATE_CONTEXT_EN,
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
         **COMMON_CONTEXT,
@@ -62,10 +60,8 @@ LANGUAGE_CONTEXT = {
     "fi": {
         "title": "Kausivarauksesi on peruttu",
         "text_reservation_rejected": "Kausivaraukseesi kuuluva tilavaraus on peruttu",
-        "allocations": [
-            {"weekday_value": "Maanantai", "time_value": "13:00-15:00", "access_code_validity_period": ""},
-            {"weekday_value": "Tiistai", "time_value": "21:00-22:00", "access_code_validity_period": ""},
-        ],
+        "weekday_value": "Maanantai",
+        "time_value": "13:00-15:00",
         **BASE_TEMPLATE_CONTEXT_FI,
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
         **COMMON_CONTEXT,
@@ -73,10 +69,8 @@ LANGUAGE_CONTEXT = {
     "sv": {
         "title": "Din säsongsbokning har avbokats",
         "text_reservation_rejected": "Lokalbokningen som ingår i din säsongsbokning har avbokats",
-        "allocations": [
-            {"weekday_value": "Måndag", "time_value": "13:00-15:00", "access_code_validity_period": ""},
-            {"weekday_value": "Tisdag", "time_value": "21:00-22:00", "access_code_validity_period": ""},
-        ],
+        "weekday_value": "Måndag",
+        "time_value": "13:00-15:00",
         **BASE_TEMPLATE_CONTEXT_SV,
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
         **COMMON_CONTEXT,
@@ -120,6 +114,7 @@ def test_seasonal_booking_denied_series__get_context__instance(email_reservation
     email_reservation.state = ReservationStateChoice.DENIED
     email_reservation.save()
 
+    series = email_reservation.recurring_reservation
     section = email_reservation.actions.get_application_section()
 
     expected = {
@@ -128,7 +123,7 @@ def test_seasonal_booking_denied_series__get_context__instance(email_reservation
     }
 
     with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_booking_denied_series(application_section=section, language="en")
+        context = get_context_for_seasonal_booking_denied_series(series, language="en")
 
     assert context == expected
 
@@ -154,9 +149,6 @@ def test_seasonal_booking_denied_series__render__text():
 
         Day: Monday
         Time: 13:00-15:00
-
-        Day: Tuesday
-        Time: 21:00-22:00
 
 
         You can check your booking details at: {url}
@@ -188,8 +180,6 @@ def test_seasonal_booking_denied_series__render__html():
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
         Day: Monday
         Time: 13:00-15:00
-        Day: Tuesday
-        Time: 21:00-22:00
         You can check your booking details at: [varaamo.hel.fi]({url})
 
         {EMAIL_CLOSING_HTML_EN}
@@ -209,16 +199,15 @@ def test_seasonal_booking_denied_series__send_email(outbox):
         user=user,
         contact_person__email="contact@email.com",
     )
-    reservation_series = create_reservation_series(
+    series = create_reservation_series(
         user=user,
         reservations__type=ReservationTypeChoice.SEASONAL,
         reservations__state=ReservationStateChoice.DENIED,
         allocated_time_slot__day_of_the_week=Weekday.MONDAY,
         allocated_time_slot__reservation_unit_option__application_section__application=application,
     )
-    section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
 
-    EmailService.send_seasonal_booking_denied_series_email(section)
+    EmailService.send_seasonal_booking_denied_series_email(series)
 
     assert len(outbox) == 1
 
@@ -235,14 +224,13 @@ def test_seasonal_booking_denied_series__send_email__no_reservations(outbox):
         user=user,
         contact_person__email="contact@email.com",
     )
-    reservation_series = RecurringReservationFactory.create(
+    series = RecurringReservationFactory.create(
         user=user,
         allocated_time_slot__day_of_the_week=Weekday.MONDAY,
         allocated_time_slot__reservation_unit_option__application_section__application=application,
     )
-    section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
 
-    EmailService.send_seasonal_booking_denied_series_email(section)
+    EmailService.send_seasonal_booking_denied_series_email(series)
 
     assert len(outbox) == 0
 
@@ -256,16 +244,15 @@ def test_seasonal_booking_denied_series__send_email__no_recipients(outbox):
         user=None,
         contact_person=None,
     )
-    reservation_series = create_reservation_series(
+    series = create_reservation_series(
         user=None,
         reservations__type=ReservationTypeChoice.SEASONAL,
         reservations__state=ReservationStateChoice.DENIED,
         allocated_time_slot__day_of_the_week=Weekday.MONDAY,
         allocated_time_slot__reservation_unit_option__application_section__application=application,
     )
-    section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
 
-    EmailService.send_seasonal_booking_denied_series_email(section)
+    EmailService.send_seasonal_booking_denied_series_email(series)
 
     assert len(outbox) == 0
 

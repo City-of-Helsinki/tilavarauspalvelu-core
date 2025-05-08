@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from lookup_property import L
 
 from tilavarauspalvelu.dataclasses import ReservationSeriesCalculationResults
-from tilavarauspalvelu.enums import AccessType, RejectionReadinessChoice
+from tilavarauspalvelu.enums import AccessType, RejectionReadinessChoice, Weekday
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.models import AffectingTimeSpan, ApplicationSection, RejectedOccurrence, Reservation
 from tilavarauspalvelu.typing import ReservationPeriod
@@ -73,7 +73,7 @@ class RecurringReservationActions:
         end_time: datetime.time = self.recurring_reservation.end_time
         reservation_unit = self.recurring_reservation.reservation_unit
 
-        weekdays: list[int] = [int(val) for val in self.recurring_reservation.weekdays.split(",") if val]
+        weekdays = [weekday.as_weekday_number for weekday in self.recurring_reservation.actions.get_weekdays()]
         if not weekdays:
             weekdays = [self.recurring_reservation.begin_date.weekday()]
 
@@ -275,3 +275,7 @@ class RecurringReservationActions:
             access_code_is_active=True,
             end__gt=local_datetime(),
         ).exists()
+
+    def get_weekdays(self) -> list[Weekday]:
+        weekdays = self.recurring_reservation.weekdays.split(",")
+        return [Weekday.from_week_day(int(weekday)) for weekday in weekdays if weekday.isdigit()]  # type: ignore
