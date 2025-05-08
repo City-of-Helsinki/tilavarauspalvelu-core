@@ -66,21 +66,6 @@ def get_mock_params(*, language: Lang, **kwargs: Any) -> EmailContext:
         "time_value": kwargs.get("time_value", "13:00-15:00"),
         "application_section_name": kwargs.get("application_section_name", "[HAKEMUKSEN OSAN NIMI]"),
         "application_round_name": kwargs.get("application_round_name", "[KAUSIVARAUSKIERROKSEN NIMI]"),
-        "cancelled_reservation_series": kwargs.get(
-            "cancelled_reservation_series",
-            [
-                {
-                    "weekday_value": str(WeekdayChoice.MONDAY.label),
-                    "time_value": "13:00-15:00",
-                    "reservation_url": get_staff_reservations_ext_link(reservation_id=1234),
-                },
-                {
-                    "weekday_value": str(WeekdayChoice.TUESDAY.label),
-                    "time_value": "21:00-22:00",
-                    "reservation_url": get_staff_reservations_ext_link(reservation_id=5678),
-                },
-            ],
-        ),
         "access_code_is_used": access_code_is_used,
         "access_code": kwargs.get("access_code", "123456") if access_code_is_used else "",
         "access_code_validity_period": (
@@ -93,11 +78,13 @@ def get_mock_params(*, language: Lang, **kwargs: Any) -> EmailContext:
                     "weekday_value": str(WeekdayChoice.MONDAY.label),
                     "time_value": "13:00-15:00",
                     "access_code_validity_period": "11:00-15:00" if access_code_is_used else "",
+                    "series_url": get_staff_reservations_ext_link(reservation_id=1234),
                 },
                 {
                     "weekday_value": str(WeekdayChoice.TUESDAY.label),
                     "time_value": "21:00-22:00",
                     "access_code_validity_period": "20:45-22:05" if access_code_is_used else "",
+                    "series_url": get_staff_reservations_ext_link(reservation_id=5678),
                 },
             ],
         ),

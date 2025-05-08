@@ -46,16 +46,18 @@ COMMON_CONTEXT = {
 LANGUAGE_CONTEXT = {
     "en": {
         "title": "The customer has canceled the seasonal booking",
-        "cancelled_reservation_series": [
+        "allocations": [
             {
                 "weekday_value": "Monday",
                 "time_value": "13:00-15:00",
-                "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
+                "access_code_validity_period": "",
+                "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
             },
             {
                 "weekday_value": "Tuesday",
                 "time_value": "21:00-22:00",
-                "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
+                "access_code_validity_period": "",
+                "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
             },
         ],
         **BASE_TEMPLATE_CONTEXT_EN,
@@ -63,16 +65,18 @@ LANGUAGE_CONTEXT = {
     },
     "fi": {
         "title": "Asiakas on perunut kausivarauksen",
-        "cancelled_reservation_series": [
+        "allocations": [
             {
                 "weekday_value": "Maanantai",
                 "time_value": "13:00-15:00",
-                "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
+                "access_code_validity_period": "",
+                "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
             },
             {
                 "weekday_value": "Tiistai",
                 "time_value": "21:00-22:00",
-                "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
+                "access_code_validity_period": "",
+                "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
             },
         ],
         **BASE_TEMPLATE_CONTEXT_FI,
@@ -80,16 +84,18 @@ LANGUAGE_CONTEXT = {
     },
     "sv": {
         "title": "Kunden har avbokat säsongsbokningen",
-        "cancelled_reservation_series": [
+        "allocations": [
             {
                 "weekday_value": "Måndag",
                 "time_value": "13:00-15:00",
-                "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
+                "access_code_validity_period": "",
+                "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
             },
             {
                 "weekday_value": "Tisdag",
                 "time_value": "21:00-22:00",
-                "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
+                "access_code_validity_period": "",
+                "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
             },
         ],
         **BASE_TEMPLATE_CONTEXT_SV,
@@ -130,16 +136,18 @@ def test_seasonal_booking_cancelled_all_staff_notification__get_context__instanc
 
     expected = {
         **LANGUAGE_CONTEXT["en"],
-        "cancelled_reservation_series": [
+        "allocations": [
             {
                 "weekday_value": "Monday",
                 "time_value": "13:00-15:00",
-                "reservation_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_1}",
+                "access_code_validity_period": "",
+                "series_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_1}",
             },
             {
                 "weekday_value": "Tuesday",
                 "time_value": "21:00-22:00",
-                "reservation_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_2}",
+                "access_code_validity_period": "",
+                "series_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_2}",
             },
         ],
     }

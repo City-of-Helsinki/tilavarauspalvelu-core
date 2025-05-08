@@ -102,7 +102,6 @@ def get_email_tester_form_fields() -> dict[str, Any]:
         "time_value": forms.CharField(initial=initial["time_value"], widget=text_widget),
         "application_section_name": forms.CharField(initial=initial["application_section_name"], widget=text_widget),
         "application_round_name": forms.CharField(initial=initial["application_round_name"], widget=text_widget),
-        "cancelled_reservation_series": forms.JSONField(initial=initial["cancelled_reservation_series"]),
         "access_code_is_used": forms.BooleanField(initial=initial["access_code_is_used"]),
         "access_code": forms.CharField(initial=initial["access_code"], widget=text_widget),
         "access_code_validity_period": forms.CharField(

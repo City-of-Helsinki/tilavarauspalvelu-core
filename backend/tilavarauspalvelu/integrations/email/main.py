@@ -12,20 +12,21 @@ from tilavarauspalvelu.models import Application, User
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from .attachements import get_reservation_ical_attachment
-from .find_language import get_application_email_language, get_reservation_email_language
+from .find_language import get_application_email_language, get_reservation_email_language, get_series_email_language
 from .find_recipients import (
     get_application_email_recipients,
     get_application_section_staff_notification_recipients_by_language,
     get_recipients_for_applications_by_language,
     get_reservation_email_recipients,
     get_reservation_staff_notification_recipients_by_language,
+    get_series_email_recipients,
     get_users_by_email_language,
 )
 from .sending import send_emails_in_batches_task, send_multiple_emails_in_batches_task
 from .typing import EmailData, EmailType
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ApplicationSection, Reservation
+    from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation
     from tilavarauspalvelu.typing import Lang
 
 __all__ = [
@@ -587,27 +588,32 @@ class EmailService:
 
     @staticmethod
     def send_seasonal_booking_denied_series_email(
-        application_section: ApplicationSection,
+        series: RecurringReservation,
         *,
         language: Lang | None = None,
     ) -> None:
         """Sends an email to the applicant when staff has denied a series in their seasonal booking."""
-        if not application_section.actions.get_reservations().exists():
+        # Should only be sent for series that have been created from seasonal booking
+        if series.allocated_time_slot is None:
             return
 
-        recipients = get_application_email_recipients(application=application_section.application)
+        # TODO: Is this ok?
+        if not series.reservations.exists():
+            return
+
+        recipients = get_series_email_recipients(series=series)
         if not recipients:
             SentryLogger.log_message(
                 "No recipients for the 'seasonal booking deny series' email",
-                details={"application_section": application_section.pk},
+                details={"series": series.pk},
             )
             return
 
         if language is None:
-            language = get_application_email_language(application=application_section.application)
+            language = get_series_email_language(series=series)
 
         email_type = EmailType.SEASONAL_BOOKING_DENIED_SERIES
-        context = email_type.get_email_context(application_section, language=language)
+        context = email_type.get_email_context(series, language=language)
         email = EmailData.build(recipients, context, email_type)
         send_emails_in_batches_task.delay(email_data=email)
 
@@ -645,27 +651,32 @@ class EmailService:
 
     @staticmethod
     def send_seasonal_booking_rescheduled_series_email(
-        application_section: ApplicationSection,
+        series: RecurringReservation,
         *,
         language: Lang | None = None,
     ) -> None:
         """Send an email to the applicant when staff has rescheduled a series in their seasonal booking."""
-        if not application_section.actions.get_reservations().exists():
+        # Should only be sent for series that have been created from seasonal booking
+        if series.allocated_time_slot is None:
             return
 
-        recipients = get_application_email_recipients(application=application_section.application)
+        # TODO: Is this ok?
+        if not series.reservations.exists():
+            return
+
+        recipients = get_series_email_recipients(series=series)
         if not recipients:
             SentryLogger.log_message(
                 "No recipients for the 'seasonal booking rescheduled series' email",
-                details={"application_section": application_section.pk},
+                details={"series": series.pk},
             )
             return
 
         if language is None:
-            language = get_application_email_language(application=application_section.application)
+            language = get_series_email_language(series=series)
 
         email_type = EmailType.SEASONAL_BOOKING_RESCHEDULED_SERIES
-        context = email_type.get_email_context(application_section, language=language)
+        context = email_type.get_email_context(series, language=language)
         email = EmailData.build(recipients, context, email_type)
         send_emails_in_batches_task.delay(email_data=email)
 

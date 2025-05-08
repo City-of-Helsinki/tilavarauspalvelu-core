@@ -297,7 +297,7 @@ class SeasonalBookingCancelledAllStaffNotificationContext(TypedDict, total=False
     cancel_reason: str
     application_section_name: str
     application_round_name: str
-    cancelled_reservation_series: list[dict[str, str]]
+    allocations: list[dict[str, Any]]
 
 
 class SeasonalBookingCancelledSingleContext(TypedDict, total=False):
@@ -319,7 +319,8 @@ class SeasonalBookingDeniedSeriesContext(TypedDict, total=False):
     application_round_name: str
     application_id: int | None
     application_section_id: int | None
-    allocations: list[dict[str, Any]]
+    weekday_value: str
+    time_value: str
 
 
 class SeasonalBookingDeniedSingleContext(TypedDict, total=False):
@@ -342,7 +343,9 @@ class SeasonalBookingRescheduledSeriesContext(TypedDict, total=False):
     application_section_id: int | None
     access_code_is_used: bool
     access_code: str
-    allocations: list[dict[str, Any]]
+    access_code_validity_period: str
+    weekday_value: str
+    time_value: str
 
 
 class SeasonalBookingRescheduledSingleContext(TypedDict, total=False):
@@ -457,12 +460,12 @@ class EmailType(_EmailTypeOptions):
 
     # Seasonal booking
 
-    SEASONAL_BOOKING_ACCESS_CODE_ADDED = EmailTemplateType(
+    SEASONAL_BOOKING_ACCESS_CODE_ADDED = EmailTemplateType(  # TODO: Only relevant series
         label=pgettext_lazy("EmailType", "Seasonal reservation access code added"),
         get_email_context=get_context_for_seasonal_booking_access_code_added,
         context_variables=list(SeasonalBookingAccessCodeAddedContext.__annotations__),
     )
-    SEASONAL_BOOKING_ACCESS_CODE_CHANGED = EmailTemplateType(
+    SEASONAL_BOOKING_ACCESS_CODE_CHANGED = EmailTemplateType(  # TODO: Only relevant series
         label=pgettext_lazy("EmailType", "Seasonal reservation access code changed"),
         get_email_context=get_context_for_seasonal_booking_access_code_changed,
         context_variables=list(SeasonalBookingAccessCodeChangedContext.__annotations__),
@@ -497,7 +500,7 @@ class EmailType(_EmailTypeOptions):
         get_email_context=get_context_for_seasonal_booking_cancelled_single,
         context_variables=list(SeasonalBookingCancelledSingleContext.__annotations__),
     )
-    SEASONAL_BOOKING_DENIED_SERIES = EmailTemplateType(
+    SEASONAL_BOOKING_DENIED_SERIES = EmailTemplateType(  # TODO: Only relevant series
         label=pgettext_lazy("EmailType", "Seasonal booking denied series"),
         get_email_context=get_context_for_seasonal_booking_denied_series,
         context_variables=list(SeasonalBookingDeniedSeriesContext.__annotations__),
@@ -507,7 +510,7 @@ class EmailType(_EmailTypeOptions):
         get_email_context=get_context_for_seasonal_booking_denied_single,
         context_variables=list(SeasonalBookingDeniedSingleContext.__annotations__),
     )
-    SEASONAL_BOOKING_RESCHEDULED_SERIES = EmailTemplateType(
+    SEASONAL_BOOKING_RESCHEDULED_SERIES = EmailTemplateType(  # TODO: Only relevant series
         label=pgettext_lazy("EmailType", "Seasonal booking rescheduled series"),
         get_email_context=get_context_for_seasonal_booking_rescheduled_series,
         context_variables=list(SeasonalBookingRescheduledSeriesContext.__annotations__),

@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import datetime
 import uuid
+from copy import deepcopy
 from inspect import cleandoc
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from django.test import override_settings
@@ -17,7 +18,7 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import get_context_for_seasonal_booking_access_code_changed
 from tilavarauspalvelu.integrations.email.typing import EmailType
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.typing import (
     PindoraSeasonalBookingAccessCodeValidity,
     PindoraSeasonalBookingResponse,
@@ -44,6 +45,7 @@ from tests.test_integrations.test_email.helpers import (
     SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
     get_application_details_urls,
     html_email_to_text,
+    pindora_seasonal_booking_info,
 )
 
 if TYPE_CHECKING:
@@ -63,8 +65,18 @@ LANGUAGE_CONTEXT = {
         "title": "The door code of your booking has changed",
         "text_reservation_modified": "The door code of your booking has changed",
         "allocations": [
-            {"weekday_value": "Monday", "time_value": "13:00-15:00", "access_code_validity_period": "11:00-15:00"},
-            {"weekday_value": "Tuesday", "time_value": "21:00-22:00", "access_code_validity_period": "20:45-22:05"},
+            {
+                "weekday_value": "Monday",
+                "time_value": "13:00-15:00",
+                "access_code_validity_period": "11:00-15:00",
+                "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
+            },
+            {
+                "weekday_value": "Tuesday",
+                "time_value": "21:00-22:00",
+                "access_code_validity_period": "20:45-22:05",
+                "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
+            },
         ],
         **BASE_TEMPLATE_CONTEXT_EN,
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
@@ -77,8 +89,18 @@ LANGUAGE_CONTEXT = {
         "title": "Varauksesi ovikoodi on vaihtunut",
         "text_reservation_modified": "Varauksesi ovikoodi on vaihtunut",
         "allocations": [
-            {"weekday_value": "Maanantai", "time_value": "13:00-15:00", "access_code_validity_period": "11:00-15:00"},
-            {"weekday_value": "Tiistai", "time_value": "21:00-22:00", "access_code_validity_period": "20:45-22:05"},
+            {
+                "weekday_value": "Maanantai",
+                "time_value": "13:00-15:00",
+                "access_code_validity_period": "11:00-15:00",
+                "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
+            },
+            {
+                "weekday_value": "Tiistai",
+                "time_value": "21:00-22:00",
+                "access_code_validity_period": "20:45-22:05",
+                "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
+            },
         ],
         **BASE_TEMPLATE_CONTEXT_FI,
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
@@ -91,8 +113,18 @@ LANGUAGE_CONTEXT = {
         "title": "Dörrkoden för din bokning har ändrats",
         "text_reservation_modified": "Dörrkoden för din bokning har ändrats",
         "allocations": [
-            {"weekday_value": "Måndag", "time_value": "13:00-15:00", "access_code_validity_period": "11:00-15:00"},
-            {"weekday_value": "Tisdag", "time_value": "21:00-22:00", "access_code_validity_period": "20:45-22:05"},
+            {
+                "weekday_value": "Måndag",
+                "time_value": "13:00-15:00",
+                "access_code_validity_period": "11:00-15:00",
+                "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
+            },
+            {
+                "weekday_value": "Tisdag",
+                "time_value": "21:00-22:00",
+                "access_code_validity_period": "20:45-22:05",
+                "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
+            },
         ],
         **BASE_TEMPLATE_CONTEXT_SV,
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
@@ -140,44 +172,31 @@ def test_seasonal_booking_access_code_changed__get_context__get_mock_data(lang: 
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-@patch_method(PindoraClient.get_seasonal_booking)
+@patch_method(PindoraService.get_access_code)
 def test_seasonal_booking_access_code_changed__get_context__instance(email_reservation):
     section = email_reservation.actions.get_application_section()
+    reservations = section.actions.get_reservations()
 
-    section.actions.get_reservations().update(access_type=AccessType.ACCESS_CODE)
+    reservations.update(access_type=AccessType.ACCESS_CODE)
 
-    all_series = section.actions.get_reservation_series()
-    reservation_unit_1 = all_series[0].reservation_unit
-    reservation_unit_2 = all_series[1].reservation_unit
+    assert len(reservations) == 2
+    reservation_1 = reservations[0]
+    reservation_2 = reservations[1]
 
-    allocation = email_reservation.recurring_reservation.allocated_time_slot
-    section = allocation.reservation_unit_option.application_section
-
-    PindoraClient.get_seasonal_booking.return_value = PindoraSeasonalBookingResponse(
-        access_code="123456",
-        access_code_is_active=True,
-        reservation_unit_code_validity=[
-            PindoraSeasonalBookingAccessCodeValidity(
-                reservation_unit_id=reservation_unit_1.uuid,
-                begin=datetime.datetime(2024, 1, 1, 11),
-                end=datetime.datetime(2024, 1, 1, 15),
-                access_code_valid_minutes_before=0,
-                access_code_valid_minutes_after=0,
-            ),
-            PindoraSeasonalBookingAccessCodeValidity(
-                reservation_unit_id=reservation_unit_2.uuid,
-                begin=datetime.datetime(2024, 1, 2, 20, 45),
-                end=datetime.datetime(2024, 1, 2, 22, 5),
-                access_code_valid_minutes_before=0,
-                access_code_valid_minutes_after=0,
-            ),
-        ],
+    PindoraService.get_access_code.return_value = pindora_seasonal_booking_info(
+        reservation_id__0=reservation_1.id,
+        reservation_id__1=reservation_2.id,
+        reservation_series_id__0=reservation_1.recurring_reservation.id,
+        reservation_series_id__1=reservation_2.recurring_reservation.id,
     )
 
-    expected = {
-        **LANGUAGE_CONTEXT["en"],
+    expected: dict[str, Any] = {
+        **deepcopy(LANGUAGE_CONTEXT["en"]),
         **get_application_details_urls(section),
     }
+
+    expected["allocations"][0]["series_url"] = f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_1.id}"
+    expected["allocations"][1]["series_url"] = f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_2.id}"
 
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_booking_access_code_changed(section, language="en")
@@ -187,50 +206,36 @@ def test_seasonal_booking_access_code_changed__get_context__instance(email_reser
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-@patch_method(PindoraClient.get_seasonal_booking)
+@patch_method(PindoraService.get_access_code)
 def test_seasonal_booking_access_code_changed__get_context__instance__inactive(email_reservation):
     section = email_reservation.actions.get_application_section()
+    reservations = section.actions.get_reservations()
 
-    section.actions.get_reservations().update(access_type=AccessType.ACCESS_CODE)
+    reservations.update(access_type=AccessType.ACCESS_CODE)
 
-    all_series = section.actions.get_reservation_series()
-    reservation_unit_1 = all_series[0].reservation_unit
-    reservation_unit_2 = all_series[1].reservation_unit
+    assert len(reservations) == 2
+    reservation_1 = reservations[0]
+    reservation_2 = reservations[1]
 
-    allocation = email_reservation.recurring_reservation.allocated_time_slot
-    section = allocation.reservation_unit_option.application_section
-
-    PindoraClient.get_seasonal_booking.return_value = PindoraSeasonalBookingResponse(
-        access_code="123456",
+    PindoraService.get_access_code.return_value = pindora_seasonal_booking_info(
         access_code_is_active=False,
-        reservation_unit_code_validity=[
-            PindoraSeasonalBookingAccessCodeValidity(
-                reservation_unit_id=reservation_unit_1.uuid,
-                begin=datetime.datetime(2024, 1, 1, 11),
-                end=datetime.datetime(2024, 1, 1, 15),
-                access_code_valid_minutes_before=0,
-                access_code_valid_minutes_after=0,
-            ),
-            PindoraSeasonalBookingAccessCodeValidity(
-                reservation_unit_id=reservation_unit_2.uuid,
-                begin=datetime.datetime(2024, 1, 2, 20, 45),
-                end=datetime.datetime(2024, 1, 2, 22, 5),
-                access_code_valid_minutes_before=0,
-                access_code_valid_minutes_after=0,
-            ),
-        ],
+        reservation_id__0=reservation_1.id,
+        reservation_id__1=reservation_2.id,
+        reservation_series_id__0=reservation_1.recurring_reservation.id,
+        reservation_series_id__1=reservation_2.recurring_reservation.id,
     )
 
-    expected = {
-        **LANGUAGE_CONTEXT["en"],
+    expected: dict[str, Any] = {
+        **deepcopy(LANGUAGE_CONTEXT["en"]),
         **get_application_details_urls(section),
         "access_code": "",
         "access_code_is_used": True,
-        "allocations": [
-            {"weekday_value": "Monday", "time_value": "13:00-15:00", "access_code_validity_period": ""},
-            {"weekday_value": "Tuesday", "time_value": "21:00-22:00", "access_code_validity_period": ""},
-        ],
     }
+
+    expected["allocations"][0]["access_code_validity_period"] = ""
+    expected["allocations"][0]["series_url"] = f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_1.id}"
+    expected["allocations"][1]["access_code_validity_period"] = ""
+    expected["allocations"][1]["series_url"] = f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_2.id}"
 
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_booking_access_code_changed(section, language="en")
@@ -312,11 +317,11 @@ def test_seasonal_booking_access_code_changed__render__html():
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-@patch_method(PindoraClient.get_seasonal_booking)
+@patch_method(PindoraService.get_access_code)
 def test_seasonal_booking_access_code_changed__send_email(outbox):
     ext_uuid = uuid.uuid4()
 
-    PindoraClient.get_seasonal_booking.return_value = PindoraSeasonalBookingResponse(
+    PindoraService.get_access_code.return_value = PindoraSeasonalBookingResponse(
         access_code="123456",
         reservation_unit_code_validity=[
             PindoraSeasonalBookingAccessCodeValidity(
