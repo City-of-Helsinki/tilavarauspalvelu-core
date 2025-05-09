@@ -80,11 +80,17 @@ function getLabelProps(
   }
 }
 
-function InfoListItem({ label, value }: { label: string; value: string }) {
+function InfoListItem({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | JSX.Element;
+}) {
   return (
     <li>
       <h4>{`${label}: `}</h4>
-      <span>{value}</span>
+      {value}
     </li>
   );
 }
@@ -130,27 +136,37 @@ function SingleApplicationSection({
     {
       key: "numPersons",
       label: t("application:preview.applicationEvent.numPersons"),
-      value: `${aes.numPersons} ${t("common:peopleSuffixShort")}`,
+      value: (
+        <span>{`${aes.numPersons} ${t("common:peopleSuffixShort")}`}</span>
+      ),
     },
     {
       key: "ageGroup",
       label: t("application:preview.applicationEvent.ageGroup"),
-      value: `${ageGroupToString(aes.ageGroup)} ${t("common:yearSuffixShort")}`,
+      value: (
+        <span>
+          {`${ageGroupToString(aes.ageGroup)} ${t("common:yearSuffixShort")}`}
+        </span>
+      ),
     },
     {
       key: "duration",
       label: t("application:preview.applicationEvent.duration"),
-      value: duration,
+      value: <span>{duration}</span>,
     },
     {
       key: "eventsPerWeek",
       label: t("application:preview.applicationEvent.eventsPerWeek"),
-      value: `${aes.appliedReservationsPerWeek} ${t("common:amountSuffixShort")}`,
+      value: (
+        <span>
+          {`${aes.appliedReservationsPerWeek} ${t("common:amountSuffixShort")}`}
+        </span>
+      ),
     },
     {
       key: "period",
       label: t("application:preview.applicationEvent.period"),
-      value: `${reservationsBegin} - ${reservationsEnd}`,
+      value: <span>{`${reservationsBegin} - ${reservationsEnd}`}</span>,
     },
     {
       key: "purpose",
@@ -194,7 +210,7 @@ function SingleApplicationSection({
             <ol>
               {filterNonNullable(reservationUnits).map((ru) => (
                 <li key={ru.pk}>
-                  {getTranslationSafe(ru, "name", lang).trim()}
+                  <h4>{getTranslationSafe(ru, "name", lang).trim()}</h4>
                 </li>
               ))}
             </ol>
