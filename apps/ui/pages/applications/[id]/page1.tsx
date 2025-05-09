@@ -37,6 +37,7 @@ import {
 import { gql } from "@apollo/client";
 import { useDisplayError } from "common/src/hooks";
 import { uniq } from "lodash-es";
+import { Flex } from "common/styled";
 
 function Page1({
   application,
@@ -98,7 +99,7 @@ function Page1({
 
   return (
     <FormProvider {...form}>
-      <form noValidate onSubmit={handleSubmit(onSubmit)}>
+      <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)}>
         <ApplicationPageWrapper
           subtitle={applicationRoundName}
           translationKeyPrefix="application:Page1"
@@ -109,7 +110,7 @@ function Page1({
             options={{ ...options, unitOptions }}
           />
         </ApplicationPageWrapper>
-      </form>
+      </Flex>
     </FormProvider>
   );
 }

@@ -15,9 +15,11 @@ export const autoGridCss = css`
 
 export const AutoGrid = styled.div<{
   $minWidth?: string;
-  $largeGap?: boolean;
   $alignCenter?: boolean;
-}>`
+  $gap?: SpacingSize;
+}
+
+export const AutoGrid = styled.div<AutoGridProps>`
   display: grid;
   grid-template-columns: repeat(
     auto-fill,
@@ -28,8 +30,7 @@ export const AutoGrid = styled.div<{
     )
   );
   align-items: ${({ $alignCenter }) => ($alignCenter ? "center" : "baseline")};
-  gap: ${({ $largeGap }) =>
-      $largeGap ? " var(--spacing-xl)" : "var(--spacing-m)"}
+  gap: ${({ $gap }) => ($gap ? `var(--spacing-${$gap})` : "var(--spacing-m)")}
     var(--spacing-m);
 
   & > :not(img):empty {

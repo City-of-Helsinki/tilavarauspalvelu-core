@@ -77,20 +77,19 @@
     "prioritySelectLabel": "Type of booking request",
     "reservationUnitSelectLabel": "Available seasonal booking times for",
     "priorityLabels": {
-      "300": "Select preferred time slots",
-      "200": "Select other time slots"
+      "primary": "Select preferred time slots",
+      "secondary": "Select other time slots"
     },
     "legend": {
       "unavailable": "Not available",
-      "selected-1": "Preferred time slots",
-      "selected-2": "Other request",
-      "within-opening-hours": "Reservable",
-      "outside-opening-hours": "Not for seasonal bookings"
+      "primary": "Preferred time slots",
+      "secondary": "Other request",
+      "open": "Reservable"
     },
     "primarySchedules": "Preferred time slots",
     "secondarySchedules": "Other time slots",
     "notification": {
-      "copyCells": "Times successfully copied for all booking requests"
+      "copyCells": "Times copied to all booking requests"
     }
   },
   "Page3": {
