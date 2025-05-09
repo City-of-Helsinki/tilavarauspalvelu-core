@@ -9,7 +9,7 @@ from django.conf import settings
 from django.db import models
 from lookup_property import L
 
-from tilavarauspalvelu.enums import AccessType, ApplicationRoundStatusChoice, PaymentType, ReservationStartInterval
+from tilavarauspalvelu.enums import AccessType, ApplicationRoundStatusChoice, ReservationStartInterval
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiTranslatedField
@@ -481,22 +481,6 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
     @property
     def start_interval_minutes(self) -> int:
         return ReservationStartInterval(self.reservation_unit.reservation_start_interval).as_number
-
-    def get_default_payment_type(self) -> PaymentType | None:
-        payment_types: set[str] = set(self.reservation_unit.payment_types.values_list("code", flat=True))
-        if not payment_types:
-            return None
-
-        # If only one payment type is defined, use that
-        if len(payment_types) == 1:
-            return PaymentType(payment_types.pop())
-
-        # If 'ONLINE' is accepted, use that
-        if PaymentType.ONLINE in payment_types:
-            return PaymentType.ONLINE
-
-        # Otherwise only combination left is {'INVOICE', 'ON_SITE'}, so use 'INVOICE'
-        return PaymentType.INVOICE
 
     def is_reservable_at(self, moment: datetime.datetime) -> bool:
         moment = moment.astimezone(DEFAULT_TIMEZONE)

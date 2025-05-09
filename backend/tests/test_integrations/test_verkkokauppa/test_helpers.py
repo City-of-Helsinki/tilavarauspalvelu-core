@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime
 
 import pytest
-from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import CustomerTypeChoice
@@ -13,6 +12,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.helpers import (
     get_meta_label,
     get_verkkokauppa_order_params,
 )
+from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory
 
@@ -33,7 +33,7 @@ pytestmark = [
 )
 @freeze_time("2022-11-05T10:00:00")
 def test_get_formatted_reservation_time(language, result):
-    begin = datetime.datetime.now().astimezone(tz=get_default_timezone())
+    begin = datetime.datetime.now().astimezone(tz=DEFAULT_TIMEZONE)
     end = begin + datetime.timedelta(hours=2)
     reservation = ReservationFactory.create(begin=begin, end=end, user__preferred_language=language)
     date = get_formatted_reservation_time(reservation)

@@ -92,11 +92,12 @@ class OrderStatus(models.TextChoices):
     EXPIRED = "EXPIRED", pgettext_lazy("OrderStatus", "Expired")
     CANCELLED = "CANCELLED", pgettext_lazy("OrderStatus", "Cancelled")
     PAID = "PAID", pgettext_lazy("OrderStatus", "Paid")
+    PAID_BY_INVOICE = "PAID_BY_INVOICE", pgettext_lazy("OrderStatus", "Paid by invoice")
     PAID_MANUALLY = "PAID_MANUALLY", pgettext_lazy("OrderStatus", "Paid manually")
     REFUNDED = "REFUNDED", pgettext_lazy("OrderStatus", "Refunded")
 
     @classproperty
-    def needs_update_statuses(cls) -> list[OrderStatus]:
+    def can_be_marked_paid_statuses(cls) -> list[OrderStatus]:
         return [
             OrderStatus.DRAFT,
             OrderStatus.EXPIRED,
@@ -108,6 +109,30 @@ class OrderStatus(models.TextChoices):
         return [
             OrderStatus.DRAFT,
             OrderStatus.EXPIRED,
+        ]
+
+    @classproperty
+    def can_be_refunded_statuses(cls) -> list[OrderStatus]:
+        return [
+            OrderStatus.PAID,
+        ]
+
+    @classproperty
+    def finalized(cls) -> list[OrderStatus]:
+        """Orders in these statuses should not be updated from webshop."""
+        return [
+            OrderStatus.REFUNDED,
+            OrderStatus.PAID,
+            OrderStatus.PAID_BY_INVOICE,
+            OrderStatus.PAID_MANUALLY,
+        ]
+
+    @classproperty
+    def paid_in_webshop(cls) -> list[OrderStatus]:
+        """Orders in these statuses are paid in the webshop."""
+        return [
+            OrderStatus.PAID,
+            OrderStatus.PAID_BY_INVOICE,
         ]
 
 
@@ -336,6 +361,10 @@ class CustomerTypeChoice(models.TextChoices):
             CustomerTypeChoice.BUSINESS.value,
             CustomerTypeChoice.NONPROFIT.value,
         ]
+
+    @enum.property
+    def is_organisation(self) -> bool:
+        return self in CustomerTypeChoice.organisation
 
 
 class ReservationStateChoice(models.TextChoices):
@@ -678,9 +707,16 @@ class PricingType(models.TextChoices):
 
 
 class PaymentType(models.TextChoices):
-    ONLINE = "ONLINE", pgettext_lazy("PaymentType", "Online")
     ON_SITE = "ON_SITE", pgettext_lazy("PaymentType", "On site")
-    INVOICE = "INVOICE", pgettext_lazy("PaymentType", "Invoice")
+    ONLINE = "ONLINE", pgettext_lazy("PaymentType", "Online")
+    ONLINE_OR_INVOICE = "ONLINE_OR_INVOICE", pgettext_lazy("PaymentType", "Online or invoice")
+
+    @classproperty
+    def requires_verkkokauppa(cls) -> list[PaymentType]:
+        return [
+            cls.ONLINE,
+            cls.ONLINE_OR_INVOICE,
+        ]
 
 
 class PriceUnit(models.TextChoices):
