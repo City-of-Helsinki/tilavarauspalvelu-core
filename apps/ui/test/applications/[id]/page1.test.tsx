@@ -1,26 +1,18 @@
-import {
-  OptionsDocument,
-  type OptionsQuery,
-  ReservationPurposeOrderingChoices,
-  ReservationUnitTypeOrderingChoices,
-  UpdateApplicationDocument,
-  type UpdateApplicationMutation,
-} from "@/gql/gql-types";
 import Page1 from "@/pages/applications/[id]/page1";
 import { MockedProvider } from "@apollo/client/testing";
 import { render, screen, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
 import {
+  createGraphQLApplicationIdMock,
   createMockApplicationFragment,
-  CreateMockApplicationFragmentProps,
-  createOptionQueryMock,
+  type CreateMockApplicationFragmentProps,
   mockAgeGroupOptions,
   mockDurationOptions,
   mockReservationPurposesOptions,
   type CreateGraphQLMocksReturn,
 } from "@/test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
-import { selectOption } from "../test.utils";
+import { selectOption } from "@test/test.utils";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 
 const { mockedRouterPush, useRouter } = vi.hoisted(() => {
@@ -63,6 +55,9 @@ vi.mock("next/router", () => ({
   useRouter,
 }));
 
+function createGraphQLMocks(): CreateGraphQLMocksReturn {
+  return createGraphQLApplicationIdMock();
+}
 function customRender(
   props: CreateMockApplicationFragmentProps = {}
 ): ReturnType<typeof render> {
@@ -75,49 +70,9 @@ function customRender(
   );
 }
 
-type CreateGraphQLMockProps = never;
-function createGraphQLMocks(
-  _props?: CreateGraphQLMockProps
-): CreateGraphQLMocksReturn {
-  const UpdateApplicationMutationMock: UpdateApplicationMutation = {
-    updateApplication: {
-      pk: 1,
-    },
-  };
-
-  const OptionsMock: OptionsQuery = createOptionQueryMock();
-
-  return [
-    {
-      request: {
-        query: UpdateApplicationDocument,
-      },
-      variableMatcher: () => true,
-      result: {
-        data: UpdateApplicationMutationMock,
-      },
-    },
-    {
-      request: {
-        query: OptionsDocument,
-        variables: {
-          reservationUnitTypesOrderBy:
-            ReservationUnitTypeOrderingChoices.RankAsc,
-          reservationPurposesOrderBy: ReservationPurposeOrderingChoices.RankAsc,
-          unitsOrderBy: [],
-          equipmentsOrderBy: [],
-          purposesOrderBy: [],
-        },
-      },
-      result: {
-        data: OptionsMock,
-      },
-    },
-  ];
-}
-
 describe("Page1", () => {
   test("should render empty application page", async () => {
+    // TODO all of this is common to all application funnel pages
     const view = customRender();
     expect(
       await view.findByRole("heading", { name: "application:Page1.heading" })
@@ -129,7 +84,10 @@ describe("Page1", () => {
       view.getByRole("link", { name: "breadcrumb:applications" })
     ).toBeInTheDocument();
     expect(view.getByText("breadcrumb:application")).toBeInTheDocument();
-    // TODO check notes when applying
+    expect(
+      view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })
+    ).toBeInTheDocument();
+    expect(view.getByText("Notes when applying FI")).toBeInTheDocument();
   });
 
   // special case requiring custom mocks
