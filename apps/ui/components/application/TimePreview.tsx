@@ -10,7 +10,7 @@ import type {
 } from "./form";
 import { useFormContext } from "react-hook-form";
 import { Priority } from "@/gql/gql-types";
-import { getDayTimes } from "./module";
+import { getDayTimes } from "@/modules/util";
 
 type Props = {
   index: number;

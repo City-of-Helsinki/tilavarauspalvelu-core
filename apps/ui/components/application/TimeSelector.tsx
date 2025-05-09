@@ -22,7 +22,7 @@ import {
   ApplicationEventSchedulePriority,
   type Cell,
   covertCellsToTimeRange,
-} from "./module";
+} from "./timeSelectorModule";
 import { successToast } from "common/src/common/toast";
 import { type TimeSelectorFragment } from "@/gql/gql-types";
 import { ErrorText } from "common/src/components/ErrorText";
@@ -127,7 +127,7 @@ function constructAriaLabel(
 function DayColumn({
   day,
   cells,
-  setCellValue,
+  updateCells,
   paintState,
   setPaintState,
   painting,
@@ -136,10 +136,7 @@ function DayColumn({
 }: {
   day: Day;
   cells: Cell[];
-  setCellValue: (
-    selection: Cell,
-    mode: ApplicationEventSchedulePriority | false
-  ) => void;
+  updateCells: (cells: Cell[]) => void;
   setPaintState: (state: ApplicationEventSchedulePriority | false) => void;
   paintState: ApplicationEventSchedulePriority | false;
   painting: boolean;
@@ -148,6 +145,17 @@ function DayColumn({
 }): JSX.Element {
   const { t } = useTranslation();
 
+  const setCellValue = (
+    selection: Cell,
+    value: ApplicationEventSchedulePriority | false
+  ): void => {
+    const newVal = cells.map((cell) =>
+      cell.key === selection.key
+        ? { ...cell, state: value === false ? 100 : value }
+        : cell
+    );
+    updateCells(newVal);
+  };
   const handleMouseDown = (cell: Cell, _evt: React.MouseEvent) => {
     const state = priority === cell.state ? false : priority;
 
@@ -159,6 +167,11 @@ function DayColumn({
     setPaintState(state);
     setCellValue(cell, state);
     setPainting(true);
+  };
+
+  // TODO why doesn't this check the key that is pressed?
+  const handleKeyDown = (cell: Cell, _evt: React.KeyboardEvent) => {
+    setCellValue(cell, priority === cell.state ? false : priority);
   };
 
   const head = t(`common:weekDayLong.${fromMondayFirstUnsafe(day)}`);
@@ -174,9 +187,7 @@ function DayColumn({
           type="button"
           onMouseDown={(evt) => handleMouseDown(cell, evt)}
           onMouseUp={() => setPainting(false)}
-          onKeyDown={() =>
-            setCellValue(cell, priority === cell.state ? false : priority)
-          }
+          onKeyDown={(evt) => handleKeyDown(cell, evt)}
           onMouseEnter={() => {
             if (painting) {
               setCellValue(cell, paintState);
@@ -198,7 +209,7 @@ const CalendarContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   column-gap: 6px;
-  overflow-x: scroll;
+  overflow-x: auto;
   width: 90vw;
   user-select: none;
 
@@ -248,7 +259,42 @@ export function TimeSelector({
   }));
 
   const { setValue, watch } = useFormContext<ApplicationPage2FormValues>();
-  const priority = watch(`applicationSections.${index}.priority`);
+
+  const setSelectorData = (index: number, selected: Cell[][]) => {
+    const formVals = covertCellsToTimeRange(selected);
+    setValue(`applicationSections.${index}.suitableTimeRanges`, formVals, {
+      shouldDirty: true,
+      shouldValidate: true,
+      shouldTouch: true,
+    });
+  };
+
+  const handleCellUpdate = (day: Day, newCells: Cell[]) => {
+    const thisSection = watch(
+      `applicationSections.${index}.suitableTimeRanges`
+    );
+    const tmp = aesToCells(thisSection, reservationUnitOpeningHours);
+    if (tmp[day] == null) {
+      throw new Error("day not found");
+    }
+    tmp[day] = newCells;
+    setSelectorData(index, tmp);
+  };
+
+  const copyCells = () => {
+    const thisSection = watch(
+      `applicationSections.${index}.suitableTimeRanges`
+    );
+    const srcCells = aesToCells(thisSection, reservationUnitOpeningHours);
+    const others = watch(`applicationSections`);
+    for (const i of others.keys()) {
+      setSelectorData(i, srcCells);
+    }
+    successToast({
+      text: t("application:Page2.notification.copyCells"),
+      dataTestId: "application__page2--notification-success",
+    });
+  };
 
   const applicationSections = filterNonNullable(watch("applicationSections"));
   const selectorData = applicationSections.map((ae) =>
@@ -256,74 +302,9 @@ export function TimeSelector({
   );
   const cells = selectorData[index] ?? [];
 
-  const setSelectorData = (selected: Cell[][][]) => {
-    const formVals = covertCellsToTimeRange(selected);
-    for (const i of formVals.keys()) {
-      const vals = formVals[i];
-      if (vals == null) {
-        continue;
-      }
-      setValue(`applicationSections.${i}.suitableTimeRanges`, vals, {
-        shouldDirty: true,
-        shouldValidate: true,
-        shouldTouch: true,
-      });
-    }
-  };
-
-  const getSelectorData = (): Cell[][][] => {
-    const applicationSections = filterNonNullable(watch("applicationSections"));
-    const selectorData = applicationSections.map((ae) =>
-      aesToCells(ae.suitableTimeRanges, reservationUnitOpeningHours)
-    );
-    return selectorData;
-  };
-
-  const updateCells = (newCells: Cell[][]) => {
-    const updated = [...getSelectorData()];
-    updated[index] = newCells;
-    setSelectorData(updated);
-  };
-
-  const copyCells = () => {
-    const updated = [...getSelectorData()];
-    const srcCells = updated[index];
-    srcCells?.forEach((day, i) => {
-      day.forEach((cell, j) => {
-        const { state } = cell;
-        for (let k = 0; k < updated.length; k += 1) {
-          if (k !== index && updated[k]?.[i]?.[j] != null) {
-            const elem = updated[k]?.[i]?.[j];
-            if (elem != null) {
-              elem.state = state;
-            }
-          }
-        }
-      });
-    });
-    setSelectorData(updated);
-    successToast({
-      text: t("application:Page2.notification.copyCells"),
-      dataTestId: "application__page2--notification-success",
-    });
-  };
-
-  const setCellValue = (
-    selection: Cell,
-    value: ApplicationEventSchedulePriority | false
-  ): void => {
-    const newVal = cells.map((day) => [
-      ...day.map((h) =>
-        h.key === selection.key
-          ? { ...h, state: value === false ? 100 : value }
-          : h
-      ),
-    ]);
-    updateCells(newVal);
-  };
-
   const enableCopyCells =
     filterNonNullable(watch("applicationSections")).length > 1;
+  const priority = watch(`applicationSections.${index}.priority`);
 
   return (
     // NOTE flex inside a grid container breaks overflow-x
@@ -354,7 +335,7 @@ export function TimeSelector({
             key={`day-${day}`}
             day={day}
             cells={cells[day] ?? []}
-            setCellValue={setCellValue}
+            updateCells={(toUpdate) => handleCellUpdate(day, toUpdate)}
             priority={priority ?? 200}
           />
         ))}

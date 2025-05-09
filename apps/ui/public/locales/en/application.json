@@ -89,7 +89,7 @@
     "primarySchedules": "Preferred time slots",
     "secondarySchedules": "Other time slots",
     "notification": {
-      "copyCells": "Times successfully copied for all booking requests"
+      "copyCells": "Times copied to all booking requests"
     }
   },
   "Page3": {

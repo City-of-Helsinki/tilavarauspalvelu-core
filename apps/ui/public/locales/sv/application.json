@@ -89,7 +89,7 @@
     "primarySchedules": "Prioriterade tidsönskemål",
     "secondarySchedules": "Alternativa tidsönskemål",
     "notification": {
-      "copyCells": "Kopieringen av tiderna till alla bokningsönskemål lyckades"
+      "copyCells": "Önskade tider kopierades till alla bokningar"
     }
   },
   "Page3": {
