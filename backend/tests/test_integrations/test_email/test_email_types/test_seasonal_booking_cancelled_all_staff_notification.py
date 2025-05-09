@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from inspect import cleandoc
 from typing import TYPE_CHECKING
 
@@ -52,12 +53,18 @@ LANGUAGE_CONTEXT = {
                 "time_value": "13:00-15:00",
                 "access_code_validity_period": "",
                 "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
+                "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+                "unit_name": "[TOIMIPISTEEN NIMI]",
+                "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             },
             {
                 "weekday_value": "Tuesday",
                 "time_value": "21:00-22:00",
                 "access_code_validity_period": "",
                 "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
+                "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+                "unit_name": "[TOIMIPISTEEN NIMI]",
+                "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             },
         ],
         **BASE_TEMPLATE_CONTEXT_EN,
@@ -71,12 +78,18 @@ LANGUAGE_CONTEXT = {
                 "time_value": "13:00-15:00",
                 "access_code_validity_period": "",
                 "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
+                "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+                "unit_name": "[TOIMIPISTEEN NIMI]",
+                "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             },
             {
                 "weekday_value": "Tiistai",
                 "time_value": "21:00-22:00",
                 "access_code_validity_period": "",
                 "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
+                "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+                "unit_name": "[TOIMIPISTEEN NIMI]",
+                "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             },
         ],
         **BASE_TEMPLATE_CONTEXT_FI,
@@ -90,12 +103,18 @@ LANGUAGE_CONTEXT = {
                 "time_value": "13:00-15:00",
                 "access_code_validity_period": "",
                 "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
+                "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+                "unit_name": "[TOIMIPISTEEN NIMI]",
+                "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             },
             {
                 "weekday_value": "Tisdag",
                 "time_value": "21:00-22:00",
                 "access_code_validity_period": "",
                 "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
+                "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+                "unit_name": "[TOIMIPISTEEN NIMI]",
+                "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             },
         ],
         **BASE_TEMPLATE_CONTEXT_SV,
@@ -134,23 +153,10 @@ def test_seasonal_booking_cancelled_all_staff_notification__get_context__instanc
 
     section = email_reservation.actions.get_application_section()
 
-    expected = {
-        **LANGUAGE_CONTEXT["en"],
-        "allocations": [
-            {
-                "weekday_value": "Monday",
-                "time_value": "13:00-15:00",
-                "access_code_validity_period": "",
-                "series_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_1}",
-            },
-            {
-                "weekday_value": "Tuesday",
-                "time_value": "21:00-22:00",
-                "access_code_validity_period": "",
-                "series_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_2}",
-            },
-        ],
-    }
+    expected = deepcopy(LANGUAGE_CONTEXT["en"])
+
+    expected["allocations"][0]["series_url"] = f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_1}"
+    expected["allocations"][1]["series_url"] = f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_2}"
 
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_booking_cancelled_all_staff_notification(section, language="en")
@@ -178,9 +184,10 @@ def test_seasonal_booking_cancelled_all_staff_notification__render__text():
 
         You can view the booking at:
 
-        Monday 13:00-15:00
+        Monday: 13:00-15:00
         https://fake.varaamo.hel.fi/kasittely/reservations/1234
-        Tuesday 21:00-22:00
+
+        Tuesday: 21:00-22:00
         https://fake.varaamo.hel.fi/kasittely/reservations/5678
 
         Kind regards

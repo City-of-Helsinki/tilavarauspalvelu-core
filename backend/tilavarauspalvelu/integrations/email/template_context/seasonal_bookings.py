@@ -283,6 +283,8 @@ def get_context_for_seasonal_booking_denied_series(
         # Should only be called for series that have been created from seasonal booking
         section = series.allocated_time_slot.reservation_unit_option.application_section  # type: ignore[union-attr]
         application_round = section.application.application_round
+        reservation_unit = series.reservation_unit
+        unit = reservation_unit.unit
 
         latest_denied_reservation = series.reservations.filter(state=ReservationStateChoice.DENIED).last()
 
@@ -297,6 +299,9 @@ def get_context_for_seasonal_booking_denied_series(
         data["application_round_name"] = get_attr_by_language(application_round, "name", language=language)
         data["weekday_value"] = ", ".join(str(weekday.label) for weekday in series.actions.get_weekdays())
         data["time_value"] = f"{begin_time}-{end_time}"
+        data["reservation_unit_name"] = get_attr_by_language(reservation_unit, "name", language)
+        data["unit_name"] = get_attr_by_language(unit, "name", language)
+        data["unit_location"] = series.reservation_unit.actions.get_address()
 
     return {
         "title": pgettext("Email", "Your seasonal booking has been cancelled"),
@@ -307,6 +312,9 @@ def get_context_for_seasonal_booking_denied_series(
         "rejection_reason": data["rejection_reason"],
         "application_section_name": data["application_section_name"],
         "application_round_name": data["application_round_name"],
+        "reservation_unit_name": data["reservation_unit_name"],
+        "unit_name": data["unit_name"],
+        "unit_location": data["unit_location"],
         "weekday_value": data["weekday_value"],
         "time_value": data["time_value"],
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
@@ -367,6 +375,8 @@ def get_context_for_seasonal_booking_rescheduled_series(
         # Should only be called for series that have been created from seasonal booking
         section = series.allocated_time_slot.reservation_unit_option.application_section  # type: ignore[union-attr]
         application_round = section.application.application_round
+        reservation_unit = series.reservation_unit
+        unit = reservation_unit.unit
 
         begin_time = local_time_string(series.begin_time)
         end_time = local_time_string(series.end_time)
@@ -376,9 +386,11 @@ def get_context_for_seasonal_booking_rescheduled_series(
         data["application_section_id"] = section.pk
         data["application_section_name"] = section.name
         data["application_round_name"] = get_attr_by_language(application_round, "name", language)
-
         data["weekday_value"] = ", ".join(str(weekday.label) for weekday in series.actions.get_weekdays())
         data["time_value"] = f"{begin_time}-{end_time}"
+        data["reservation_unit_name"] = get_attr_by_language(reservation_unit, "name", language)
+        data["unit_name"] = get_attr_by_language(unit, "name", language)
+        data["unit_location"] = series.reservation_unit.actions.get_address()
 
         data |= params_for_access_code_series(series=series)
 
@@ -388,6 +400,9 @@ def get_context_for_seasonal_booking_rescheduled_series(
         "text_reservation_modified": title,
         "application_section_name": data["application_section_name"],
         "application_round_name": data["application_round_name"],
+        "reservation_unit_name": data["reservation_unit_name"],
+        "unit_name": data["unit_name"],
+        "unit_location": data["unit_location"],
         "weekday_value": data["weekday_value"],
         "time_value": data["time_value"],
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),

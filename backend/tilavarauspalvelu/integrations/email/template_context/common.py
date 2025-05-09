@@ -449,12 +449,16 @@ def _initialize_allocations_map(section: ApplicationSection) -> defaultdict[int,
         end_time = local_time_string(series.end_time)  # type: ignore[arg-type]
 
         reservation = series.reservations.last()
+        reservation_unit = series.reservation_unit
 
         for weekday in series.actions.get_weekdays():
             allocations_map[series.id][weekday] = {
                 "time_value": f"{begin_time}-{end_time}",
                 "access_code_validity_period": "",  # Can be filled in later if access codes are used
                 "series_url": get_staff_reservations_ext_link(reservation_id=reservation.pk),
+                "unit_name": reservation_unit.unit.name,  # type: ignore[union-attr]
+                "unit_location": reservation_unit.actions.get_address(),
+                "reservation_unit_name": reservation_unit.name,
             }
 
     return allocations_map
@@ -468,6 +472,9 @@ def _compile_allocations_map(allocations_map: defaultdict[int, dict[Weekday, dic
             "time_value": allocation["time_value"],
             "access_code_validity_period": allocation["access_code_validity_period"],
             "series_url": allocation["series_url"],
+            "unit_name": allocation["unit_name"],
+            "unit_location": allocation["unit_location"],
+            "reservation_unit_name": allocation["reservation_unit_name"],
         }
         for weekday_map in allocations_map.values()
         for weekday, allocation in weekday_map.items()

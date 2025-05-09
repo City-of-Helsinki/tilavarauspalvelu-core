@@ -56,6 +56,9 @@ LANGUAGE_CONTEXT = {
     "en": {
         "title": "The time of the space reservation included in your seasonal booking has changed",
         "text_reservation_modified": "The time of the space reservation included in your seasonal booking has changed",
+        "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+        "unit_name": "[TOIMIPISTEEN NIMI]",
+        "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
         "weekday_value": "Monday",
         "time_value": "13:00-15:00",
         **BASE_TEMPLATE_CONTEXT_EN,
@@ -66,6 +69,9 @@ LANGUAGE_CONTEXT = {
     "fi": {
         "title": "Kausivaraukseesi kuuluvan tilavarauksen ajankohta on muuttunut",
         "text_reservation_modified": "Kausivaraukseesi kuuluvan tilavarauksen ajankohta on muuttunut",
+        "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+        "unit_name": "[TOIMIPISTEEN NIMI]",
+        "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
         "weekday_value": "Maanantai",
         "time_value": "13:00-15:00",
         **BASE_TEMPLATE_CONTEXT_FI,
@@ -76,6 +82,9 @@ LANGUAGE_CONTEXT = {
     "sv": {
         "title": "Tiden för lokalbokningen som ingår i din säsongsbokning har ändrats",
         "text_reservation_modified": "Tiden för lokalbokningen som ingår i din säsongsbokning har ändrats",
+        "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+        "unit_name": "[TOIMIPISTEEN NIMI]",
+        "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
         "weekday_value": "Måndag",
         "time_value": "13:00-15:00",
         **BASE_TEMPLATE_CONTEXT_SV,
@@ -236,6 +245,8 @@ def test_seasonal_booking_rescheduled_series__render__text():
 
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
 
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         Day: Monday
         Time: 13:00-15:00
 
@@ -267,6 +278,8 @@ def test_seasonal_booking_rescheduled_series__render__text__access_code_is_used(
 
         Door code: 123456
 
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         Day: Monday
         Time: 13:00-15:00
         Validity period of the door code: 11:00-15:00
@@ -297,6 +310,8 @@ def test_seasonal_booking_rescheduled_series__render__html():
         The time of the space reservation included in your seasonal booking has changed.
 
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
+        **[VARAUSYKSIKÖN NIMI]**
+        [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         Day: Monday
         Time: 13:00-15:00
         You can check your booking details at: [varaamo.hel.fi]({url})
@@ -327,6 +342,8 @@ def test_seasonal_booking_rescheduled_series__render__html__access_code_is_used(
 
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
         Door code: 123456
+        **[VARAUSYKSIKÖN NIMI]**
+        [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         Day: Monday
         Time: 13:00-15:00
         Validity period of the door code: 11:00-15:00

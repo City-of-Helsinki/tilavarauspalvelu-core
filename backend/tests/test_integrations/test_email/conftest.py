@@ -41,6 +41,7 @@ def email_reservation() -> Reservation:
         application__organisation__name_en="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
     )
     recurring_reservation = RecurringReservationFactory.create(
+        reservation_unit=reservation_unit,
         weekdays=f"{WeekdayChoice.MONDAY}",
         begin_date=datetime.date(2024, 1, 1),
         begin_time=datetime.time(13),
@@ -66,6 +67,7 @@ def email_reservation() -> Reservation:
     )
 
     recurring_reservation_2 = RecurringReservationFactory.create(
+        reservation_unit=reservation_unit,
         weekdays=f"{WeekdayChoice.TUESDAY}",
         begin_date=datetime.date(2024, 1, 2),
         begin_time=datetime.time(21),

@@ -51,6 +51,9 @@ LANGUAGE_CONTEXT = {
     "en": {
         "title": "Your seasonal booking has been cancelled",
         "text_reservation_rejected": "The space reservation included in your seasonal booking has been cancelled",
+        "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+        "unit_name": "[TOIMIPISTEEN NIMI]",
+        "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
         "weekday_value": "Monday",
         "time_value": "13:00-15:00",
         **BASE_TEMPLATE_CONTEXT_EN,
@@ -60,6 +63,9 @@ LANGUAGE_CONTEXT = {
     "fi": {
         "title": "Kausivarauksesi on peruttu",
         "text_reservation_rejected": "Kausivaraukseesi kuuluva tilavaraus on peruttu",
+        "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+        "unit_name": "[TOIMIPISTEEN NIMI]",
+        "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
         "weekday_value": "Maanantai",
         "time_value": "13:00-15:00",
         **BASE_TEMPLATE_CONTEXT_FI,
@@ -69,6 +75,9 @@ LANGUAGE_CONTEXT = {
     "sv": {
         "title": "Din säsongsbokning har avbokats",
         "text_reservation_rejected": "Lokalbokningen som ingår i din säsongsbokning har avbokats",
+        "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+        "unit_name": "[TOIMIPISTEEN NIMI]",
+        "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
         "weekday_value": "Måndag",
         "time_value": "13:00-15:00",
         **BASE_TEMPLATE_CONTEXT_SV,
@@ -147,9 +156,10 @@ def test_seasonal_booking_denied_series__render__text():
 
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
 
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         Day: Monday
         Time: 13:00-15:00
-
 
         You can check your booking details at: {url}
 
@@ -178,6 +188,8 @@ def test_seasonal_booking_denied_series__render__html():
 
         Reason: [HYLKÄYKSEN SYY]
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
+        **[VARAUSYKSIKÖN NIMI]**
+        [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         Day: Monday
         Time: 13:00-15:00
         You can check your booking details at: [varaamo.hel.fi]({url})
