@@ -330,12 +330,12 @@ function Reservation({
 
   useToastIfQueryParam({
     key: "timeUpdated",
-    successMessage: t("reservations:saveNewTimeSuccess"),
+    message: t("reservations:saveNewTimeSuccess"),
   });
 
   useToastIfQueryParam({
     key: "deleted",
-    successMessage: t("reservations:reservationCancelledTitle"),
+    message: t("reservations:reservationCancelledTitle"),
   });
 
   const { begin, end } = reservation;
