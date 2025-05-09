@@ -3,6 +3,8 @@
 {% elif access_code_is_used %}
 {{ text_access_code_unavailable_instructions_html | sentence }}
 {% endif %}{% for allocation in allocations %}
+{{ allocation.reservation_unit_name | safe }}
+{{ allocation.unit_name | safe }}, {{ allocation.unit_location | safe }}
 {{ weekday_label | safe }}: {{ allocation.weekday_value | safe }}
 {{ time_label | safe }}: {{ allocation.time_value | safe }}
 {% if access_code_is_used %}{{ access_code_validity_period_label | safe }}: {{ allocation.access_code_validity_period }}

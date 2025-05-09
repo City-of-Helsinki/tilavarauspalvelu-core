@@ -62,14 +62,19 @@ class ReservationSeriesChangeAccessCodeSerializer(NestingModelSerializer):
         except ExternalServiceError as error:
             raise ValidationError(str(error), code=error_codes.PINDORA_ERROR) from error
 
-        if not response["access_code_is_active"]:
+        access_code_is_active = response["access_code_is_active"]
+
+        if not access_code_is_active:
             try:
                 PindoraService.activate_access_code(obj=instance)
+                access_code_is_active = True
             except ExternalServiceError as error:
                 SentryLogger.log_exception(error, details=f"Reservation series: {instance.pk}")
 
         if instance.allocated_time_slot is not None:
             section = instance.allocated_time_slot.reservation_unit_option.application_section
-            EmailService.send_seasonal_booking_access_code_changed_email(section)
+
+            if access_code_is_active:
+                EmailService.send_seasonal_booking_access_code_changed_email(section)
 
         return instance

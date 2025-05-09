@@ -1,4 +1,4 @@
-# type: EmailType.SEASONAL_BOOKING_ACCESS_CODE_CHANGED
+# type: EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED
 
 from __future__ import annotations
 
@@ -16,9 +16,9 @@ from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock
 from tilavarauspalvelu.enums import AccessType, ReservationTypeChoice, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
-from tilavarauspalvelu.integrations.email.template_context import get_context_for_seasonal_booking_access_code_changed
+from tilavarauspalvelu.integrations.email.template_context import get_context_for_seasonal_booking_access_code_added
 from tilavarauspalvelu.integrations.email.typing import EmailType
-from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.typing import (
     PindoraSeasonalBookingAccessCodeValidity,
     PindoraSeasonalBookingResponse,
@@ -62,8 +62,8 @@ COMMON_CONTEXT = {
 }
 LANGUAGE_CONTEXT = {
     "en": {
-        "title": "The door code of your booking has changed",
-        "text_reservation_modified": "The door code of your booking has changed",
+        "title": "A door code has been added to your seasonal booking",
+        "text_reservation_modified": "A door code has been added to your seasonal booking",
         "allocations": [
             {
                 "weekday_value": "Monday",
@@ -92,8 +92,8 @@ LANGUAGE_CONTEXT = {
         "access_code_validity_period": "",
     },
     "fi": {
-        "title": "Varauksesi ovikoodi on vaihtunut",
-        "text_reservation_modified": "Varauksesi ovikoodi on vaihtunut",
+        "title": "Kausivaraukseesi on lisätty ovikoodi",
+        "text_reservation_modified": "Kausivaraukseesi on lisätty ovikoodi",
         "allocations": [
             {
                 "weekday_value": "Maanantai",
@@ -122,8 +122,8 @@ LANGUAGE_CONTEXT = {
         "access_code_validity_period": "",
     },
     "sv": {
-        "title": "Dörrkoden för din bokning har ändrats",
-        "text_reservation_modified": "Dörrkoden för din bokning har ändrats",
+        "title": "En dörrkod har lagts till i din säsongsbokning",
+        "text_reservation_modified": "En dörrkod har lagts till i din säsongsbokning",
         "allocations": [
             {
                 "weekday_value": "Måndag",
@@ -156,7 +156,7 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_seasonal_booking_access_code_changed__get_context(lang: Lang):
+def test_seasonal_booking_access_code_added__get_context(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     params = {
@@ -166,14 +166,14 @@ def test_seasonal_booking_access_code_changed__get_context(lang: Lang):
         "language": lang,
     }
     with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_booking_access_code_changed(**get_mock_params(**params))
+        context = get_context_for_seasonal_booking_access_code_added(**get_mock_params(**params))
 
     assert context == expected
 
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_seasonal_booking_access_code_changed__get_context__get_mock_data(lang: Lang):
+def test_seasonal_booking_access_code_added__get_context__get_mock_data(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     params = {
@@ -183,7 +183,7 @@ def test_seasonal_booking_access_code_changed__get_context__get_mock_data(lang: 
         "language": lang,
     }
     with TranslationsFromPOFiles():
-        context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_ACCESS_CODE_CHANGED, **params)
+        context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED, **params)
 
     assert context == expected
 
@@ -191,7 +191,7 @@ def test_seasonal_booking_access_code_changed__get_context__get_mock_data(lang: 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(PindoraService.get_access_code)
-def test_seasonal_booking_access_code_changed__get_context__instance(email_reservation):
+def test_seasonal_booking_access_code_added__get_context__instance(email_reservation):
     section = email_reservation.actions.get_application_section()
     reservations = section.actions.get_reservations()
 
@@ -217,7 +217,7 @@ def test_seasonal_booking_access_code_changed__get_context__instance(email_reser
     expected["allocations"][1]["series_url"] = f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_2.id}"
 
     with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_booking_access_code_changed(section, language="en")
+        context = get_context_for_seasonal_booking_access_code_added(section, language="en")
 
     assert context == expected
 
@@ -225,7 +225,7 @@ def test_seasonal_booking_access_code_changed__get_context__instance(email_reser
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(PindoraService.get_access_code)
-def test_seasonal_booking_access_code_changed__get_context__instance__inactive(email_reservation):
+def test_seasonal_booking_access_code_added__get_context__instance__inactive(email_reservation):
     section = email_reservation.actions.get_application_section()
     reservations = section.actions.get_reservations()
 
@@ -256,7 +256,7 @@ def test_seasonal_booking_access_code_changed__get_context__instance__inactive(e
     expected["allocations"][1]["series_url"] = f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_2.id}"
 
     with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_booking_access_code_changed(section, language="en")
+        context = get_context_for_seasonal_booking_access_code_added(section, language="en")
 
     assert context == expected
 
@@ -265,9 +265,9 @@ def test_seasonal_booking_access_code_changed__get_context__instance__inactive(e
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_access_code_changed__render__text():
-    context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_ACCESS_CODE_CHANGED, language="en")
-    text_content = render_text(email_type=EmailType.SEASONAL_BOOKING_ACCESS_CODE_CHANGED, context=context)
+def test_seasonal_booking_access_code_added__render__text():
+    context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED, language="en")
+    text_content = render_text(email_type=EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED, context=context)
     text_content = text_content.replace("&amp;", "&")
     url = "https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678"
 
@@ -275,7 +275,7 @@ def test_seasonal_booking_access_code_changed__render__text():
         f"""
         Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
-        The door code of your booking has changed.
+        A door code has been added to your seasonal booking.
 
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
 
@@ -304,9 +304,9 @@ def test_seasonal_booking_access_code_changed__render__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_access_code_changed__render__html():
-    context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_ACCESS_CODE_CHANGED, language="en")
-    html_content = render_html(email_type=EmailType.SEASONAL_BOOKING_ACCESS_CODE_CHANGED, context=context)
+def test_seasonal_booking_access_code_added__render__html():
+    context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED, language="en")
+    html_content = render_html(email_type=EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED, context=context)
     text_content = html_email_to_text(html_content)
     url = "https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678"
 
@@ -316,7 +316,7 @@ def test_seasonal_booking_access_code_changed__render__html():
 
         **Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],**
 
-        The door code of your booking has changed.
+        A door code has been added to your seasonal booking.
 
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
         Door code: 123456
@@ -343,11 +343,11 @@ def test_seasonal_booking_access_code_changed__render__html():
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-@patch_method(PindoraService.get_access_code)
-def test_seasonal_booking_access_code_changed__send_email(outbox):
+@patch_method(PindoraClient.get_seasonal_booking)
+def test_seasonal_booking_access_code_added__send_email(outbox):
     ext_uuid = uuid.uuid4()
 
-    PindoraService.get_access_code.return_value = PindoraSeasonalBookingResponse(
+    PindoraClient.get_seasonal_booking.return_value = PindoraSeasonalBookingResponse(
         access_code="123456",
         reservation_unit_code_validity=[
             PindoraSeasonalBookingAccessCodeValidity(
@@ -377,18 +377,18 @@ def test_seasonal_booking_access_code_changed__send_email(outbox):
 
     section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
 
-    EmailService.send_seasonal_booking_access_code_changed_email(section)
+    EmailService.send_seasonal_booking_access_code_added_email(section)
 
     assert len(outbox) == 1
 
-    assert outbox[0].subject == "The door code of your booking has changed"
+    assert outbox[0].subject == "A door code has been added to your seasonal booking"
     assert sorted(outbox[0].bcc) == ["contact@email.com", "user@email.com"]
 
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_access_code_changed__send_email__no_reservations(outbox):
+def test_seasonal_booking_access_code_added__send_email__no_reservations(outbox):
     user = UserFactory.create(email="user@email.com")
     application = ApplicationFactory.create(
         user=user,
@@ -404,7 +404,7 @@ def test_seasonal_booking_access_code_changed__send_email__no_reservations(outbo
 
     section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
 
-    EmailService.send_seasonal_booking_access_code_changed_email(section)
+    EmailService.send_seasonal_booking_access_code_added_email(section)
 
     assert len(outbox) == 0
 
@@ -413,7 +413,7 @@ def test_seasonal_booking_access_code_changed__send_email__no_reservations(outbo
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(SentryLogger.log_message)
-def test_seasonal_booking_access_code_changed__send_email__no_recipients(outbox):
+def test_seasonal_booking_access_code_added__send_email__no_recipients(outbox):
     application = ApplicationFactory.create(
         user=None,
         contact_person=None,
@@ -429,7 +429,7 @@ def test_seasonal_booking_access_code_changed__send_email__no_recipients(outbox)
 
     section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
 
-    EmailService.send_seasonal_booking_access_code_changed_email(section)
+    EmailService.send_seasonal_booking_access_code_added_email(section)
 
     assert len(outbox) == 0
 

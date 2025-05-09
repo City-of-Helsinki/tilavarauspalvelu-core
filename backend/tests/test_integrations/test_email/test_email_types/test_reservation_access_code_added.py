@@ -1,4 +1,4 @@
-# type: EmailType.RESERVATION_ACCESS_CODE_CHANGED
+# type: EmailType.RESERVATION_ACCESS_CODE_ADDED
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock
 from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
-from tilavarauspalvelu.integrations.email.template_context import get_context_for_reservation_access_code_changed
+from tilavarauspalvelu.integrations.email.template_context import get_context_for_reservation_access_code_added
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -62,8 +62,8 @@ COMMON_CONTEXT = {
 }
 LANGUAGE_CONTEXT = {
     "en": {
-        "title": "The door code of your booking has changed",
-        "text_reservation_modified": "The door code of your booking has changed",
+        "title": "A door code has been added to your booking",
+        "text_reservation_modified": "A door code has been added to your booking",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **RESERVATION_PRICE_INFO_CONTEXT_EN,
@@ -73,8 +73,8 @@ LANGUAGE_CONTEXT = {
         **COMMON_CONTEXT,
     },
     "fi": {
-        "title": "Varauksesi ovikoodi on vaihtunut",
-        "text_reservation_modified": "Varauksesi ovikoodi on vaihtunut",
+        "title": "Varaukseesi on lisätty ovikoodi",
+        "text_reservation_modified": "Varaukseesi on lisätty ovikoodi",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
         **RESERVATION_PRICE_INFO_CONTEXT_FI,
@@ -84,8 +84,8 @@ LANGUAGE_CONTEXT = {
         **COMMON_CONTEXT,
     },
     "sv": {
-        "title": "Dörrkoden för din bokning har ändrats",
-        "text_reservation_modified": "Dörrkoden för din bokning har ändrats",
+        "title": "En dörrkod har lagts till i din bokning",
+        "text_reservation_modified": "En dörrkod har lagts till i din bokning",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
         **RESERVATION_PRICE_INFO_CONTEXT_SV,
@@ -99,24 +99,24 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_reservation_access_code_changed__get_context(lang: Lang):
+def test_reservation_access_code_added__get_context(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
         params = get_mock_params(access_code_is_used=True, language=lang)
-        context = get_context_for_reservation_access_code_changed(**params)
+        context = get_context_for_reservation_access_code_added(**params)
 
     assert context == expected
 
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_reservation_access_code_changed__get_context__get_mock_data(lang: Lang):
+def test_reservation_access_code_added__get_context__get_mock_data(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
         context = get_mock_data(
-            email_type=EmailType.RESERVATION_ACCESS_CODE_CHANGED,
+            email_type=EmailType.RESERVATION_ACCESS_CODE_ADDED,
             access_code_is_used=True,
             language=lang,
         )
@@ -127,7 +127,7 @@ def test_reservation_access_code_changed__get_context__get_mock_data(lang: Lang)
 @patch_method(PindoraService.get_access_code, return_value=pindora_reservation_info())
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_access_code_changed__get_context__access_code(email_reservation):
+def test_reservation_access_code_added__get_context__access_code(email_reservation):
     expected = {
         **LANGUAGE_CONTEXT["en"],
         **KEYLESS_ENTRY_ACCESS_CODE_IS_USED_CONTEXT,
@@ -140,7 +140,7 @@ def test_reservation_access_code_changed__get_context__access_code(email_reserva
             reservation_id=email_reservation.id,
             language="en",
         )
-        context = get_context_for_reservation_access_code_changed(**params)
+        context = get_context_for_reservation_access_code_added(**params)
 
     assert context == expected
 
@@ -148,7 +148,7 @@ def test_reservation_access_code_changed__get_context__access_code(email_reserva
 @patch_method(PindoraService.get_access_code, return_value=pindora_reservation_info(access_code_is_active=False))
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_access_code_changed__get_context__access_code__inactive(email_reservation):
+def test_reservation_access_code_added__get_context__access_code__inactive(email_reservation):
     expected = {
         **LANGUAGE_CONTEXT["en"],
         **KEYLESS_ENTRY_ACCESS_CODE_NOT_USED_CONTEXT,
@@ -163,7 +163,7 @@ def test_reservation_access_code_changed__get_context__access_code__inactive(ema
     }
 
     with TranslationsFromPOFiles():
-        context = get_context_for_reservation_access_code_changed(**get_mock_params(**params, language="en"))
+        context = get_context_for_reservation_access_code_added(**get_mock_params(**params, language="en"))
 
     assert context == expected
 
@@ -171,7 +171,7 @@ def test_reservation_access_code_changed__get_context__access_code__inactive(ema
 @patch_method(PindoraService.get_access_code, return_value=pindora_reservation_info())
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_access_code_changed__get_context__instance__access_code(email_reservation):
+def test_reservation_access_code_added__get_context__instance__access_code(email_reservation):
     email_reservation.access_type = AccessType.ACCESS_CODE
     email_reservation.save()
 
@@ -182,7 +182,7 @@ def test_reservation_access_code_changed__get_context__instance__access_code(ema
     }
 
     with TranslationsFromPOFiles():
-        context = get_context_for_reservation_access_code_changed(reservation=email_reservation, language="en")
+        context = get_context_for_reservation_access_code_added(reservation=email_reservation, language="en")
 
     assert context == expected
 
@@ -190,7 +190,7 @@ def test_reservation_access_code_changed__get_context__instance__access_code(ema
 @patch_method(PindoraService.get_access_code, return_value=pindora_reservation_info(access_code_is_active=False))
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_access_code_changed__get_context__instance__access_code__inactive(email_reservation):
+def test_reservation_access_code_added__get_context__instance__access_code__inactive(email_reservation):
     email_reservation.access_type = AccessType.ACCESS_CODE
     email_reservation.save()
 
@@ -202,7 +202,7 @@ def test_reservation_access_code_changed__get_context__instance__access_code__in
     }
 
     with TranslationsFromPOFiles():
-        context = get_context_for_reservation_access_code_changed(reservation=email_reservation, language="en")
+        context = get_context_for_reservation_access_code_added(reservation=email_reservation, language="en")
 
     assert context == expected
 
@@ -211,19 +211,19 @@ def test_reservation_access_code_changed__get_context__instance__access_code__in
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_access_code_changed__render__text():
+def test_reservation_access_code_added__render__text():
     context = get_mock_data(
-        email_type=EmailType.RESERVATION_ACCESS_CODE_CHANGED,
+        email_type=EmailType.RESERVATION_ACCESS_CODE_ADDED,
         access_code_is_used=True,
         language="en",
     )
-    text_content = render_text(email_type=EmailType.RESERVATION_ACCESS_CODE_CHANGED, context=context)
+    text_content = render_text(email_type=EmailType.RESERVATION_ACCESS_CODE_ADDED, context=context)
 
     assert text_content == cleandoc(
         f"""
         Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
-        The door code of your booking has changed.
+        A door code has been added to your booking.
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI]
@@ -253,13 +253,13 @@ def test_reservation_access_code_changed__render__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_access_code_changed__render__html():
+def test_reservation_access_code_added__render__html():
     context = get_mock_data(
-        email_type=EmailType.RESERVATION_ACCESS_CODE_CHANGED,
+        email_type=EmailType.RESERVATION_ACCESS_CODE_ADDED,
         access_code_is_used=True,
         language="en",
     )
-    html_content = render_html(email_type=EmailType.RESERVATION_ACCESS_CODE_CHANGED, context=context)
+    html_content = render_html(email_type=EmailType.RESERVATION_ACCESS_CODE_ADDED, context=context)
     text_content = html_email_to_text(html_content)
 
     assert text_content == cleandoc(
@@ -268,7 +268,7 @@ def test_reservation_access_code_changed__render__html():
 
         **Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],**
 
-        The door code of your booking has changed.
+        A door code has been added to your booking.
 
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]
@@ -297,7 +297,7 @@ def test_reservation_access_code_changed__render__html():
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_access_code_changed__send_email(outbox):
+def test_reservation_access_code_added__send_email(outbox):
     reservation = ReservationFactory.create(
         reservee_email="reservee@email.com",
         user__email="user@email.com",
@@ -307,21 +307,18 @@ def test_reservation_access_code_changed__send_email(outbox):
         access_type=AccessType.ACCESS_CODE,
     )
 
-    EmailService.send_reservation_access_code_changed_email(reservation)
+    EmailService.send_reservation_access_code_added_email(reservation)
 
     assert len(outbox) == 1
 
-    assert outbox[0].subject == "The door code of your booking has changed"
+    assert outbox[0].subject == "A door code has been added to your booking"
     assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]
-
-    assert len(outbox[0].attachments) == 1
-    assert outbox[0].attachments[0][0] == "reservation_calendar.ics"
 
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_access_code_changed__send_email__wrong_access_type(outbox):
+def test_reservation_access_code_added__send_email__wrong_access_type(outbox):
     reservation = ReservationFactory.create(
         reservee_email="reservee@email.com",
         user__email="user@email.com",
@@ -331,7 +328,7 @@ def test_reservation_access_code_changed__send_email__wrong_access_type(outbox):
         access_type=AccessType.UNRESTRICTED,
     )
 
-    EmailService.send_reservation_access_code_changed_email(reservation)
+    EmailService.send_reservation_access_code_added_email(reservation)
 
     assert len(outbox) == 0
 
@@ -340,7 +337,7 @@ def test_reservation_access_code_changed__send_email__wrong_access_type(outbox):
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(SentryLogger.log_message)
-def test_reservation_access_code_changed__send_email__no_recipients(outbox):
+def test_reservation_access_code_added__send_email__no_recipients(outbox):
     reservation = ReservationFactory.create(
         reservee_email="",
         user__email="",
@@ -350,18 +347,18 @@ def test_reservation_access_code_changed__send_email__no_recipients(outbox):
         access_type=AccessType.ACCESS_CODE,
     )
 
-    EmailService.send_reservation_access_code_changed_email(reservation)
+    EmailService.send_reservation_access_code_added_email(reservation)
 
     assert len(outbox) == 0
 
     assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args[0] == "No recipients for the 'reservation access code changed' email"
+    assert SentryLogger.log_message.call_args.args[0] == "No recipients for the 'reservation access code added' email"
 
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-02")
-def test_reservation_access_code_changed__send_email__reservation_in_the_past(outbox):
+def test_reservation_access_code_added__send_email__reservation_in_the_past(outbox):
     reservation = ReservationFactory.create(
         reservee_email="reservee@email.com",
         user__email="user@email.com",
@@ -371,6 +368,6 @@ def test_reservation_access_code_changed__send_email__reservation_in_the_past(ou
         access_type=AccessType.ACCESS_CODE,
     )
 
-    EmailService.send_reservation_access_code_changed_email(reservation)
+    EmailService.send_reservation_access_code_added_email(reservation)
 
     assert len(outbox) == 0

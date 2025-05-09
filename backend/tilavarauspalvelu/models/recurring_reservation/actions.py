@@ -4,12 +4,14 @@ import dataclasses
 import datetime
 from typing import TYPE_CHECKING
 
+from lookup_property import L
+
 from tilavarauspalvelu.dataclasses import ReservationSeriesCalculationResults
-from tilavarauspalvelu.enums import AccessType, RejectionReadinessChoice
+from tilavarauspalvelu.enums import AccessType, RejectionReadinessChoice, Weekday
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.models import AffectingTimeSpan, ApplicationSection, RejectedOccurrence, Reservation
 from tilavarauspalvelu.typing import ReservationPeriod
-from utils.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between
+from utils.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between, local_datetime
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
@@ -71,7 +73,7 @@ class RecurringReservationActions:
         end_time: datetime.time = self.recurring_reservation.end_time
         reservation_unit = self.recurring_reservation.reservation_unit
 
-        weekdays: list[int] = [int(val) for val in self.recurring_reservation.weekdays.split(",") if val]
+        weekdays = [weekday.as_weekday_number for weekday in self.recurring_reservation.actions.get_weekdays()]
         if not weekdays:
             weekdays = [self.recurring_reservation.begin_date.weekday()]
 
@@ -260,3 +262,20 @@ class RecurringReservationActions:
         return ApplicationSection.objects.filter(
             reservation_unit_options__allocated_time_slots__recurring_reservation=self.recurring_reservation
         ).first()
+
+    def has_inactive_access_codes_which_should_be_active(self) -> bool:
+        return self.recurring_reservation.reservations.filter(
+            L(access_code_should_be_active=True),
+            access_code_is_active=False,
+            end__gt=local_datetime(),
+        ).exists()
+
+    def has_upcoming_or_ongoing_reservations_with_active_access_codes(self) -> bool:
+        return self.recurring_reservation.reservations.filter(
+            access_code_is_active=True,
+            end__gt=local_datetime(),
+        ).exists()
+
+    def get_weekdays(self) -> list[Weekday]:
+        weekdays = self.recurring_reservation.weekdays.split(",")
+        return [Weekday.from_week_day(int(weekday)) for weekday in weekdays if weekday.isdigit()]  # type: ignore

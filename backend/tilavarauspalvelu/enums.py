@@ -779,6 +779,9 @@ class Weekday(models.TextChoices):
                 return Weekday.FRIDAY
             case 6:
                 return Weekday.SATURDAY
+            case _:  # pragma: no cover
+                msg = f"Invalid weekday: {weekday}."
+                raise ValueError(msg)
 
     @classmethod
     def from_week_day(cls, weekday: Literal[0, 1, 2, 3, 4, 5, 6]) -> Weekday:
@@ -798,6 +801,9 @@ class Weekday(models.TextChoices):
                 return Weekday.SATURDAY
             case 6:
                 return Weekday.SUNDAY
+            case _:  # pragma: no cover
+                msg = f"Invalid weekday: {weekday}."
+                raise ValueError(msg)
 
     @enum.property
     def as_iso_weekday_number(self) -> int:
@@ -817,6 +823,9 @@ class Weekday(models.TextChoices):
                 return 6
             case Weekday.SUNDAY:
                 return 7
+            case _:  # pragma: no cover
+                msg = f"Invalid weekday {self}"
+                raise ValueError(msg)
 
     @enum.property
     def as_weekday_number(self) -> int:
@@ -836,6 +845,9 @@ class Weekday(models.TextChoices):
                 return 5
             case Weekday.SUNDAY:
                 return 6
+            case _:  # pragma: no cover
+                msg = f"Invalid weekday {self}"
+                raise ValueError(msg)
 
 
 class Priority(models.TextChoices):

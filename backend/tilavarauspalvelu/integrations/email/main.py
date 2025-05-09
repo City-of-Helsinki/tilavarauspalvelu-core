@@ -12,20 +12,21 @@ from tilavarauspalvelu.models import Application, User
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from .attachements import get_reservation_ical_attachment
-from .find_language import get_application_email_language, get_reservation_email_language
+from .find_language import get_application_email_language, get_reservation_email_language, get_series_email_language
 from .find_recipients import (
     get_application_email_recipients,
     get_application_section_staff_notification_recipients_by_language,
     get_recipients_for_applications_by_language,
     get_reservation_email_recipients,
     get_reservation_staff_notification_recipients_by_language,
+    get_series_email_recipients,
     get_users_by_email_language,
 )
 from .sending import send_emails_in_batches_task, send_multiple_emails_in_batches_task
 from .typing import EmailData, EmailType
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ApplicationSection, Reservation
+    from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation
     from tilavarauspalvelu.typing import Lang
 
 __all__ = [
@@ -39,8 +40,52 @@ class EmailService:
     # Reservation ######################################################################################################
 
     @staticmethod
+    def send_reservation_access_code_added_email(reservation: Reservation, *, language: Lang | None = None) -> None:
+        """Sends an email to the user when an access code has been or added to or activated for their reservation."""
+        if reservation.type == ReservationTypeChoice.SEASONAL:
+            section = reservation.actions.get_application_section()
+            if section is None:
+                return
+
+            EmailService.send_seasonal_booking_access_code_added_email(section)
+            return
+
+        if reservation.access_type != AccessType.ACCESS_CODE:
+            return
+
+        if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
+            return
+
+        if reservation.end.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+            return
+
+        recipients = get_reservation_email_recipients(reservation=reservation)
+        if not recipients:
+            SentryLogger.log_message(
+                "No recipients for the 'reservation access code added' email",
+                details={"reservation": reservation.pk},
+            )
+            return
+
+        if language is None:
+            language = get_reservation_email_language(reservation=reservation)
+
+        email_type = EmailType.RESERVATION_ACCESS_CODE_ADDED
+        context = email_type.get_email_context(reservation, language=language)
+        email = EmailData.build(recipients, context, email_type)
+        send_emails_in_batches_task.delay(email_data=email)
+
+    @staticmethod
     def send_reservation_access_code_changed_email(reservation: Reservation, *, language: Lang | None = None) -> None:
         """Sends an email to the reservee when their reservation's access code has been modified."""
+        if reservation.type == ReservationTypeChoice.SEASONAL:
+            section = reservation.actions.get_application_section()
+            if section is None:
+                return
+
+            EmailService.send_seasonal_booking_access_code_changed_email(section)
+            return
+
         if reservation.access_type != AccessType.ACCESS_CODE:
             return
 
@@ -312,6 +357,38 @@ class EmailService:
     # Seasonal booking #################################################################################################
 
     @staticmethod
+    def send_seasonal_booking_access_code_added_email(
+        application_section: ApplicationSection,
+        *,
+        language: Lang | None = None,
+    ) -> None:
+        """
+        Sends an email to the applicant when an access code has been
+        or added to or activated for their seasonal booking.
+        """
+        if application_section.application.status != ApplicationStatusChoice.RESULTS_SENT:
+            return
+
+        if not application_section.actions.get_reservations().exists():
+            return
+
+        recipients = get_application_email_recipients(application=application_section.application)
+        if not recipients:
+            SentryLogger.log_message(
+                "No recipients for the 'seasonal booking access code added' email",
+                details={"application_section": application_section.pk},
+            )
+            return
+
+        if language is None:
+            language = get_application_email_language(application=application_section.application)
+
+        email_type = EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED
+        context = email_type.get_email_context(application_section, language=language)
+        email = EmailData.build(recipients, context, email_type)
+        send_emails_in_batches_task.delay(email_data=email)
+
+    @staticmethod
     def send_seasonal_booking_access_code_changed_email(
         application_section: ApplicationSection,
         *,
@@ -511,27 +588,32 @@ class EmailService:
 
     @staticmethod
     def send_seasonal_booking_denied_series_email(
-        application_section: ApplicationSection,
+        series: RecurringReservation,
         *,
         language: Lang | None = None,
     ) -> None:
         """Sends an email to the applicant when staff has denied a series in their seasonal booking."""
-        if not application_section.actions.get_reservations().exists():
+        # Should only be sent for series that have been created from seasonal booking
+        if series.allocated_time_slot is None:
             return
 
-        recipients = get_application_email_recipients(application=application_section.application)
+        # TODO: Is this ok?
+        if not series.reservations.exists():
+            return
+
+        recipients = get_series_email_recipients(series=series)
         if not recipients:
             SentryLogger.log_message(
                 "No recipients for the 'seasonal booking deny series' email",
-                details={"application_section": application_section.pk},
+                details={"series": series.pk},
             )
             return
 
         if language is None:
-            language = get_application_email_language(application=application_section.application)
+            language = get_series_email_language(series=series)
 
         email_type = EmailType.SEASONAL_BOOKING_DENIED_SERIES
-        context = email_type.get_email_context(application_section, language=language)
+        context = email_type.get_email_context(series, language=language)
         email = EmailData.build(recipients, context, email_type)
         send_emails_in_batches_task.delay(email_data=email)
 
@@ -569,27 +651,32 @@ class EmailService:
 
     @staticmethod
     def send_seasonal_booking_rescheduled_series_email(
-        application_section: ApplicationSection,
+        series: RecurringReservation,
         *,
         language: Lang | None = None,
     ) -> None:
         """Send an email to the applicant when staff has rescheduled a series in their seasonal booking."""
-        if not application_section.actions.get_reservations().exists():
+        # Should only be sent for series that have been created from seasonal booking
+        if series.allocated_time_slot is None:
             return
 
-        recipients = get_application_email_recipients(application=application_section.application)
+        # TODO: Is this ok?
+        if not series.reservations.exists():
+            return
+
+        recipients = get_series_email_recipients(series=series)
         if not recipients:
             SentryLogger.log_message(
                 "No recipients for the 'seasonal booking rescheduled series' email",
-                details={"application_section": application_section.pk},
+                details={"series": series.pk},
             )
             return
 
         if language is None:
-            language = get_application_email_language(application=application_section.application)
+            language = get_series_email_language(series=series)
 
         email_type = EmailType.SEASONAL_BOOKING_RESCHEDULED_SERIES
-        context = email_type.get_email_context(application_section, language=language)
+        context = email_type.get_email_context(series, language=language)
         email = EmailData.build(recipients, context, email_type)
         send_emails_in_batches_task.delay(email_data=email)
 

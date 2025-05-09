@@ -65,13 +65,13 @@ class RecurringReservationFactory(GenericDjangoModelFactory[RecurringReservation
         sub_kwargs.setdefault("state", ReservationStateChoice.CONFIRMED)
 
         kwargs.setdefault("reservation_unit__reservation_start_interval", ReservationStartInterval.INTERVAL_15_MINUTES)
-        series = cls.create(**kwargs)
+        series: RecurringReservation = cls.create(**kwargs)
 
         # Add a space so that overlapping reservations can be checked.
         space = SpaceFactory.create(unit=series.reservation_unit.unit)
         series.reservation_unit.spaces.add(space)
 
-        weekdays: list[int] = [int(val) for val in series.weekdays.split(",") if val]
+        weekdays = [weekday.as_weekday_number for weekday in series.actions.get_weekdays()]
         if not weekdays:
             weekdays = [series.begin_date.weekday()]
 
