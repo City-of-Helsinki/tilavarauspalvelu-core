@@ -90,7 +90,7 @@
     "primarySchedules": "Ensisijaiset aikatoiveet",
     "secondarySchedules": "Muut aikatoiveet",
     "notification": {
-      "copyCells": "Ajat kopioitu onnistuneesti kaikille varaustoiveille"
+      "copyCells": "Ajat kopioitu kaikille varaustoiveille"
     }
   },
   "Page3": {
