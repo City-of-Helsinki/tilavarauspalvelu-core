@@ -1,4 +1,9 @@
-import { formatApiTimeInterval, formatMinutes } from "./helpers";
+import { type TFunction } from "i18next";
+import {
+  formatApiTimeInterval,
+  formatListToCSV,
+  formatMinutes,
+} from "./helpers";
 import { describe, test, expect } from "vitest";
 
 describe("formatMinutes", () => {
@@ -62,5 +67,31 @@ describe("formatApiTimeInterval", () => {
       trailingMinutes: true,
     });
     expect(result).toBe("12:00–14:00");
+  });
+});
+
+describe("formatListToCSV", () => {
+  const mockT: TFunction = ((text: string) => text) as TFunction;
+  test("should return empty string when given empty array", () => {
+    const result = formatListToCSV(mockT, []);
+    expect(result).toBe("");
+  });
+  test("should return single item when given single item array", () => {
+    const result = formatListToCSV(mockT, ["item"]);
+    expect(result).toBe("item");
+  });
+  test("should return and seperated when given two items", () => {
+    const result = formatListToCSV(mockT, ["item1", "item2"]);
+    expect(result).toBe("item1 common:and item2");
+  });
+  test("should return comma seperated when given three items", () => {
+    const result = formatListToCSV(mockT, ["item1", "item2", "item3"]);
+    expect(result).toBe("item1, item2 common:and item3");
+  });
+  test("should return comma seperated when given ten items", () => {
+    const list = Array.from({ length: 10 }, (_, i) => `item${i + 1}`);
+    const result = formatListToCSV(mockT, list);
+    const res = list.slice(0, 9).join(", ") + ` common:and item10`;
+    expect(result).toBe(res);
   });
 });
