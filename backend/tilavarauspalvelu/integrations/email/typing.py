@@ -8,35 +8,37 @@ from django.utils.translation import pgettext_lazy
 
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import (
-    get_context_for_application_handled,
-    get_context_for_application_in_allocation,
-    get_context_for_application_received,
-    get_context_for_application_section_cancelled,
-    get_context_for_permission_deactivation,
+    get_context_for_reservation_access_code_changed,
     get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
     get_context_for_reservation_confirmed,
-    get_context_for_reservation_modified,
-    get_context_for_reservation_modified_access_code,
-    get_context_for_reservation_rejected,
+    get_context_for_reservation_confirmed_staff_notification,
+    get_context_for_reservation_denied,
     get_context_for_reservation_requires_handling,
+    get_context_for_reservation_requires_handling_staff_notification,
     get_context_for_reservation_requires_payment,
-    get_context_for_seasonal_reservation_cancelled_single,
-    get_context_for_seasonal_reservation_modified_series,
-    get_context_for_seasonal_reservation_modified_single,
-    get_context_for_seasonal_reservation_rejected_series,
-    get_context_for_seasonal_reservation_rejected_single,
-    get_context_for_staff_notification_application_section_cancelled,
-    get_context_for_staff_notification_reservation_made,
-    get_context_for_staff_notification_reservation_requires_handling,
+    get_context_for_reservation_rescheduled,
+    get_context_for_seasonal_booking_application_received,
+    get_context_for_seasonal_booking_application_round_handled,
+    get_context_for_seasonal_booking_application_round_in_allocation,
+    get_context_for_seasonal_booking_cancelled_all,
+    get_context_for_seasonal_booking_cancelled_all_staff_notification,
+    get_context_for_seasonal_booking_cancelled_single,
+    get_context_for_seasonal_booking_denied_series,
+    get_context_for_seasonal_booking_denied_single,
+    get_context_for_seasonal_booking_rescheduled_series,
+    get_context_for_seasonal_booking_rescheduled_single,
     get_context_for_user_anonymization,
+    get_context_for_user_permissions_deactivation,
 )
 from tilavarauspalvelu.integrations.email.template_context.reservation import (
-    get_context_for_seasonal_reservation_modified_series_access_code,
+    get_context_for_seasonal_booking_access_code_changed,
 )
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
+
+    from django.utils.functional import Promise
 
     from tilavarauspalvelu.typing import EmailAttachment, EmailContext
 
@@ -82,7 +84,7 @@ class EmailData:
 
 @dataclasses.dataclass
 class EmailTemplateType:
-    label: str
+    label: str | Promise
     value: str = dataclasses.field(init=False)
     get_email_context: Callable
     context_variables: list[str]
@@ -118,53 +120,28 @@ class EmailType(_EmailTypeOptions):
     def choices(cls) -> list:
         return [(option.value, option.label) for option in cls.options]
 
-    # Application
-
-    APPLICATION_HANDLED = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Application handled"),
-        get_email_context=get_context_for_application_handled,
-        context_variables=["language"],
-    )
-    APPLICATION_IN_ALLOCATION = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Application in allocation"),
-        get_email_context=get_context_for_application_in_allocation,
-        context_variables=["language"],
-    )
-    APPLICATION_RECEIVED = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Application received"),
-        get_email_context=get_context_for_application_received,
-        context_variables=["language"],
-    )
-    APPLICATION_SECTION_CANCELLED = EmailTemplateType(
-        # User cancels all reservations in their application section
-        label=pgettext_lazy("EmailType", "Application section cancelled"),
-        get_email_context=get_context_for_application_section_cancelled,
-        context_variables=[
-            "language",
-            "cancel_reason",
-            "email_recipient_name",
-            "application_section_name",
-            "application_round_name",
-            "application_id",
-            "application_section_id",
-        ],
-    )
-
-    # Permissions
-
-    PERMISSION_DEACTIVATION = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Permission deactivation"),
-        get_email_context=get_context_for_permission_deactivation,
-        context_variables=["language"],
-    )
-    USER_ANONYMIZATION = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "User anonymization"),
-        get_email_context=get_context_for_user_anonymization,
-        context_variables=["language"],
-    )
-
     # Reservation
 
+    RESERVATION_ACCESS_CODE_CHANGED = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Reservation access code changed"),
+        get_email_context=get_context_for_reservation_access_code_changed,
+        context_variables=[
+            "language",
+            "email_recipient_name",
+            "reservation_unit_name",
+            "unit_name",
+            "unit_location",
+            "begin_datetime",
+            "end_datetime",
+            "price",
+            "tax_percentage",
+            "reservation_id",
+            "instructions_confirmed",
+            "access_code_is_used",
+            "access_code",
+            "access_code_validity_period",
+        ],
+    )
     RESERVATION_APPROVED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation approved"),
         get_email_context=get_context_for_reservation_approved,
@@ -224,49 +201,24 @@ class EmailType(_EmailTypeOptions):
             "access_code_validity_period",
         ],
     )
-    RESERVATION_MODIFIED = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Reservation modified"),
-        get_email_context=get_context_for_reservation_modified,
+    RESERVATION_CONFIRMED_STAFF_NOTIFICATION = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Reservation confirmed staff notification"),
+        get_email_context=get_context_for_reservation_confirmed_staff_notification,
         context_variables=[
             "language",
-            "email_recipient_name",
+            "reservee_name",
+            "reservation_name",
             "reservation_unit_name",
             "unit_name",
             "unit_location",
             "begin_datetime",
             "end_datetime",
-            "price",
-            "tax_percentage",
             "reservation_id",
-            "instructions_confirmed",
-            "access_code_is_used",
-            "access_code",
-            "access_code_validity_period",
         ],
     )
-    RESERVATION_MODIFIED_ACCESS_CODE = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Reservation modified access code"),
-        get_email_context=get_context_for_reservation_modified_access_code,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "reservation_unit_name",
-            "unit_name",
-            "unit_location",
-            "begin_datetime",
-            "end_datetime",
-            "price",
-            "tax_percentage",
-            "reservation_id",
-            "instructions_confirmed",
-            "access_code_is_used",
-            "access_code",
-            "access_code_validity_period",
-        ],
-    )
-    RESERVATION_REJECTED = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Reservation rejected"),
-        get_email_context=get_context_for_reservation_rejected,
+    RESERVATION_DENIED = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Reservation denied"),
+        get_email_context=get_context_for_reservation_denied,
         context_variables=[
             "language",
             "email_recipient_name",
@@ -299,6 +251,21 @@ class EmailType(_EmailTypeOptions):
             "instructions_pending",
         ],
     )
+    RESERVATION_REQUIRES_HANDLING_STAFF_NOTIFICATION = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Reservation requires handling staff notification"),
+        get_email_context=get_context_for_reservation_requires_handling_staff_notification,
+        context_variables=[
+            "language",
+            "reservee_name",
+            "reservation_name",
+            "reservation_unit_name",
+            "unit_name",
+            "unit_location",
+            "begin_datetime",
+            "end_datetime",
+            "reservation_id",
+        ],
+    )
     RESERVATION_REQUIRES_PAYMENT = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation requires payment"),
         get_email_context=get_context_for_reservation_requires_payment,
@@ -317,114 +284,75 @@ class EmailType(_EmailTypeOptions):
             "instructions_confirmed",
         ],
     )
-
-    # Reservation series
-
-    # Seasonal reservation
-
-    SEASONAL_RESERVATION_CANCELLED_SINGLE = EmailTemplateType(
-        # User cancels one of their seasonal reservations
-        label=pgettext_lazy("EmailType", "Seasonal reservation cancelled single"),
-        get_email_context=get_context_for_seasonal_reservation_cancelled_single,
+    RESERVATION_RESCHEDULED = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Reservation rescheduled"),
+        get_email_context=get_context_for_reservation_rescheduled,
         context_variables=[
             "language",
             "email_recipient_name",
+            "reservation_unit_name",
+            "unit_name",
+            "unit_location",
+            "begin_datetime",
+            "end_datetime",
+            "price",
+            "tax_percentage",
+            "reservation_id",
+            "instructions_confirmed",
+            "access_code_is_used",
+            "access_code",
+            "access_code_validity_period",
+        ],
+    )
+
+    # Seasonal booking
+
+    SEASONAL_BOOKING_ACCESS_CODE_CHANGED = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Seasonal reservation access code changed"),
+        get_email_context=get_context_for_seasonal_booking_access_code_changed,
+        context_variables=[
+            "language",
+            "email_recipient_name",
+            "application_section_name",
+            "application_round_name",
+            "application_id",
+            "application_section_id",
+            "access_code_is_used",
+            "access_code",
+            "allocations",
+        ],
+    )
+    SEASONAL_BOOKING_APPLICATION_RECEIVED = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Seasonal booking application received"),
+        get_email_context=get_context_for_seasonal_booking_application_received,
+        context_variables=["language"],
+    )
+    SEASONAL_BOOKING_APPLICATION_ROUND_IN_ALLOCATION = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Seasonal booking application round in allocation"),
+        get_email_context=get_context_for_seasonal_booking_application_round_in_allocation,
+        context_variables=["language"],
+    )
+    SEASONAL_BOOKING_APPLICATION_ROUND_HANDLED = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Seasonal booking application round handled"),
+        get_email_context=get_context_for_seasonal_booking_application_round_handled,
+        context_variables=["language"],
+    )
+    SEASONAL_BOOKING_CANCELLED_ALL = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Seasonal booking cancelled all"),
+        get_email_context=get_context_for_seasonal_booking_cancelled_all,
+        context_variables=[
+            "language",
             "cancel_reason",
-            "reservation_unit_name",
-            "unit_name",
-            "unit_location",
-            "begin_datetime",
-            "end_datetime",
-            "application_id",
-            "application_section_id",
-        ],
-    )
-    SEASONAL_RESERVATION_MODIFIED_SERIES = EmailTemplateType(
-        # Staff modifies a seasonal reservation series
-        label=pgettext_lazy("EmailType", "Seasonal reservation modified series"),
-        get_email_context=get_context_for_seasonal_reservation_modified_series,
-        context_variables=[
-            "language",
             "email_recipient_name",
             "application_section_name",
             "application_round_name",
             "application_id",
             "application_section_id",
-            "access_code_is_used",
-            "access_code",
-            "allocations",
         ],
     )
-    SEASONAL_RESERVATION_MODIFIED_SERIES_ACCESS_CODE = EmailTemplateType(
-        # Staff modifies a seasonal reservation series
-        label=pgettext_lazy("EmailType", "Seasonal reservation modified series access code"),
-        get_email_context=get_context_for_seasonal_reservation_modified_series_access_code,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "application_section_name",
-            "application_round_name",
-            "application_id",
-            "application_section_id",
-            "access_code_is_used",
-            "access_code",
-            "allocations",
-        ],
-    )
-    SEASONAL_RESERVATION_MODIFIED_SINGLE = EmailTemplateType(
-        # Staff modifies a single seasonal reservation
-        label=pgettext_lazy("EmailType", "Seasonal reservation modified single"),
-        get_email_context=get_context_for_seasonal_reservation_modified_single,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "reservation_unit_name",
-            "unit_name",
-            "unit_location",
-            "begin_datetime",
-            "end_datetime",
-            "application_id",
-            "application_section_id",
-        ],
-    )
-    SEASONAL_RESERVATION_REJECTED_SERIES = EmailTemplateType(
-        # Staff rejects a seasonal reservation series
-        label=pgettext_lazy("EmailType", "Seasonal reservation rejected series"),
-        get_email_context=get_context_for_seasonal_reservation_rejected_series,
-        context_variables=[
-            "language",
-            "rejection_reason",
-            "email_recipient_name",
-            "application_section_name",
-            "application_round_name",
-            "application_id",
-            "application_section_id",
-            "allocations",
-        ],
-    )
-    SEASONAL_RESERVATION_REJECTED_SINGLE = EmailTemplateType(
-        # Staff rejects a single reservation in a seasonal reservation series
-        label=pgettext_lazy("EmailType", "Seasonal reservation rejected single"),
-        get_email_context=get_context_for_seasonal_reservation_rejected_single,
-        context_variables=[
-            "language",
-            "email_recipient_name",
-            "reservation_unit_name",
-            "unit_name",
-            "unit_location",
-            "begin_datetime",
-            "end_datetime",
-            "rejection_reason",
-            "application_id",
-            "application_section_id",
-        ],
-    )
-
-    # Staff
-
-    STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Staff notification application section cancelled"),
-        get_email_context=get_context_for_staff_notification_application_section_cancelled,
+    SEASONAL_BOOKING_CANCELLED_ALL_STAFF_NOTIFICATION = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Seasonal booking cancelled all staff notification"),
+        get_email_context=get_context_for_seasonal_booking_cancelled_all_staff_notification,
         context_variables=[
             "language",
             "cancel_reason",
@@ -433,33 +361,92 @@ class EmailType(_EmailTypeOptions):
             "cancelled_reservation_series",
         ],
     )
-    STAFF_NOTIFICATION_RESERVATION_MADE = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Staff notification reservation made"),
-        get_email_context=get_context_for_staff_notification_reservation_made,
+    SEASONAL_BOOKING_CANCELLED_SINGLE = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Seasonal booking cancelled single"),
+        get_email_context=get_context_for_seasonal_booking_cancelled_single,
         context_variables=[
             "language",
-            "reservee_name",
-            "reservation_name",
+            "email_recipient_name",
+            "cancel_reason",
             "reservation_unit_name",
             "unit_name",
             "unit_location",
             "begin_datetime",
             "end_datetime",
-            "reservation_id",
+            "application_id",
+            "application_section_id",
         ],
     )
-    STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Staff notification reservation requires handling"),
-        get_email_context=get_context_for_staff_notification_reservation_requires_handling,
+    SEASONAL_BOOKING_DENIED_SERIES = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Seasonal booking denied series"),
+        get_email_context=get_context_for_seasonal_booking_denied_series,
         context_variables=[
             "language",
-            "reservee_name",
-            "reservation_name",
+            "rejection_reason",
+            "email_recipient_name",
+            "application_section_name",
+            "application_round_name",
+            "application_id",
+            "application_section_id",
+            "allocations",
+        ],
+    )
+    SEASONAL_BOOKING_DENIED_SINGLE = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Seasonal booking denied single"),
+        get_email_context=get_context_for_seasonal_booking_denied_single,
+        context_variables=[
+            "language",
+            "email_recipient_name",
             "reservation_unit_name",
             "unit_name",
             "unit_location",
             "begin_datetime",
             "end_datetime",
-            "reservation_id",
+            "rejection_reason",
+            "application_id",
+            "application_section_id",
         ],
+    )
+    SEASONAL_BOOKING_RESCHEDULED_SERIES = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Seasonal booking rescheduled series"),
+        get_email_context=get_context_for_seasonal_booking_rescheduled_series,
+        context_variables=[
+            "language",
+            "email_recipient_name",
+            "application_section_name",
+            "application_round_name",
+            "application_id",
+            "application_section_id",
+            "access_code_is_used",
+            "access_code",
+            "allocations",
+        ],
+    )
+    SEASONAL_BOOKING_RESCHEDULED_SINGLE = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Seasonal booking rescheduled single"),
+        get_email_context=get_context_for_seasonal_booking_rescheduled_single,
+        context_variables=[
+            "language",
+            "email_recipient_name",
+            "reservation_unit_name",
+            "unit_name",
+            "unit_location",
+            "begin_datetime",
+            "end_datetime",
+            "application_id",
+            "application_section_id",
+        ],
+    )
+
+    # User
+
+    USER_PERMISSIONS_DEACTIVATION = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "User permissions deactivation"),
+        get_email_context=get_context_for_user_permissions_deactivation,
+        context_variables=["language"],
+    )
+    USER_ANONYMIZATION = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "User anonymization"),
+        get_email_context=get_context_for_user_anonymization,
+        context_variables=["language"],
     )

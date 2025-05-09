@@ -19,6 +19,11 @@
         <table>{{ template_switcher_form.as_table }}</table>
     </form>
 
+    <h2>Preview with example data</h2>
+    <p>HTML: {{ links_html | safe }}</p>
+    <p>TEXT: {{ links_text | safe }}</p>
+    <hr>
+
     <form method="get" novalidate id="test_email_reservation_unit_select_form">
         <h2>Fill form with Reservation Unit data</h2>
         <table>{{ reservation_unit_form.as_table }}</table>

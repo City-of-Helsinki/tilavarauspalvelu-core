@@ -71,6 +71,8 @@ class RestoreAllSectionOptionsMutation(UpdateMutation):
 
 
 class ApplicationSectionReservationCancellationMutation(UpdateMutation):
+    """Cancel all reservations in the given application section that can be cancelled."""
+
     class Meta:
         serializer_class = ApplicationSectionReservationCancellationInputSerializer
         output_serializer_class = ApplicationSectionReservationCancellationOutputSerializer
