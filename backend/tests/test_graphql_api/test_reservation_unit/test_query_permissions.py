@@ -78,10 +78,10 @@ SENSITIVE_FIELDS = """
         reserveeId
         cancelDetails
         cancelReason {
-            reason
+            reasonFi
         }
         denyReason {
-            reason
+            reasonFi
         }
     }
 """
@@ -209,10 +209,10 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
                 "billingPhone": "67890",
                 "cancelDetails": "Cancel Details",
                 "cancelReason": {
-                    "reason": "Cancel Reason",
+                    "reasonFi": "Cancel Reason",
                 },
                 "denyReason": {
-                    "reason": "Deny Reason",
+                    "reasonFi": "Deny Reason",
                 },
                 "description": "Description",
                 "freeOfChargeReason": "Free of Charge Reason",

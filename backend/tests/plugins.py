@@ -101,9 +101,9 @@ def pytest_collection_modifyitems(config, items):
         raise ValueError(msg)
 
     for item in items:
-        is_slot_test = "slot" in item.keywords
+        is_slow_test = "slow" in item.keywords
 
-        if skip_slow and is_slot_test:
+        if skip_slow and is_slow_test:
             msg = "Skipped due to '--skip-slow' option"
             item.add_marker(pytest.mark.skip(reason=msg))
             continue
