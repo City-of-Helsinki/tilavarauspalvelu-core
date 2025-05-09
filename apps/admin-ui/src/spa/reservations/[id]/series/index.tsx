@@ -309,7 +309,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
       <H1 $noMargin>{t("ReservationEditSeries.heading")}</H1>
       <FormProvider {...form}>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <AutoGrid $minWidth="12rem" $largeGap>
+          <AutoGrid $minWidth="12rem" $gap="xl">
             <ControlledDateInput
               name="startingDate"
               control={control}

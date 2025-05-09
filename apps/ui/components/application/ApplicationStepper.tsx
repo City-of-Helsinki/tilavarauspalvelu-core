@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 import { type ApplicationFormFragment } from "@/gql/gql-types";
 import { type ReadonlyDeep } from "common/src/helpers";
 import { validateApplication } from "./form";
-import { isSent } from "./module";
+import { isSent } from "@/modules/util";
 import { getApplicationPath } from "@/modules/urls";
 
 // Ordered list of steps by page slug

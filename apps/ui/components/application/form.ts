@@ -24,6 +24,14 @@ import {
   lessThanMaybeDate,
 } from "common/src/schemas/schemaCommon";
 
+export const CELL_TYPES = [
+  "open",
+  "unavailable",
+  "secondary",
+  "primary",
+] as const;
+export type CellType = (typeof CELL_TYPES)[number];
+
 type Organisation = ApplicationFormFragment["organisation"];
 type Address = NonNullable<Organisation>["address"];
 type SectionType = NonNullable<
@@ -128,7 +136,7 @@ const ApplicationSectionPage2Schema = z
     minDuration: z.number().min(1, { message: "Required" }),
     name: z.string().min(1, { message: "Required" }).max(100),
     reservationUnitPk: z.number(),
-    priority: z.literal(200).or(z.literal(300)),
+    priority: z.enum(CELL_TYPES),
     // NOTE: not sent or modified here, but required for validation
     appliedReservationsPerWeek: z.number().min(1).max(7),
   })
@@ -187,7 +195,7 @@ function convertApplicationSectionPage2(
     minDuration: section.reservationMinDuration,
     appliedReservationsPerWeek,
     reservationUnitPk,
-    priority: 300,
+    priority: "primary",
   };
 }
 export const ApplicationPage2Schema = z.object({
