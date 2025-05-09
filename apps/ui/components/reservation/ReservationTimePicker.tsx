@@ -56,8 +56,7 @@ import { gql } from "@apollo/client";
 
 type WeekOptions = "day" | "week" | "month";
 
-const EventWrapper = styled.div``;
-
+// NOTE necessary for mobile touch events
 function TouchCellWrapper({
   children,
   value,
@@ -66,9 +65,6 @@ function TouchCellWrapper({
 any): JSX.Element {
   return cloneElement(Children.only(children), {
     onTouchEnd: () => onSelectSlot({ action: "click", slots: [value] }),
-    style: {
-      className: `${children}`,
-    },
   });
 }
 
@@ -420,8 +416,6 @@ export function ReservationTimePicker({
           reservable={!isReservationQuotaReached}
           toolbarComponent={Toolbar}
           dateCellWrapperComponent={TouchCellWrapper}
-          // @ts-expect-error: FIXME: fix this
-          eventWrapperComponent={EventWrapper}
           resizable={!isReservationQuotaReached}
           // NOTE there was logic here to disable dragging on mobile
           // it breaks SSR render because it swaps the whole Calendar component
