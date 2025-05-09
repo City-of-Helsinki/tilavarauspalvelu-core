@@ -13,15 +13,19 @@ import { breakpoints, WEEKDAYS } from "common/src/const";
 import { filterNonNullable, fromMondayFirstUnsafe } from "common/src/helpers";
 import { arrowDown, arrowUp } from "@/styled/util";
 import { TimePreview } from "./TimePreview";
-import { type ApplicationPage2FormValues } from "./form";
+import {
+  CELL_TYPES,
+  type CellType,
+  type ApplicationPage2FormValues,
+} from "./form";
 import { useFormContext } from "react-hook-form";
 import { ControlledSelect } from "common/src/components/form";
 import { isTouchDevice } from "@/modules/util";
 import {
   aesToCells,
-  ApplicationEventSchedulePriority,
   type Cell,
   covertCellsToTimeRange,
+  isSelected,
 } from "./timeSelectorModule";
 import { successToast } from "common/src/common/toast";
 import { type TimeSelectorFragment } from "@/gql/gql-types";
@@ -37,7 +41,7 @@ const CalendarHead = styled.div`
 `;
 
 const TimeSelectionButton = styled.button<{
-  $state: ApplicationEventSchedulePriority;
+  $type: CellType;
 }>`
   --border-color: var(--color-black-50);
 
@@ -53,21 +57,8 @@ const TimeSelectionButton = styled.button<{
   &:first-of-type {
     border-top: 1px solid var(--border-color);
   }
-  ${({ $state }) => cellTypeToCssFragment(cellStateToType($state))};
+  ${({ $type }) => cellTypeToCssFragment($type)};
 `;
-
-function cellStateToType(state: ApplicationEventSchedulePriority): CellType {
-  switch (state) {
-    case 300:
-      return "primary";
-    case 200:
-      return "secondary";
-    case 100:
-      return "open";
-    case 50:
-      return "unavailable";
-  }
-}
 
 function cellTypeToCssFragment(type: CellType): RuleSet<object> {
   switch (type) {
@@ -119,43 +110,37 @@ function constructAriaLabel(
   cell: Cell,
   labelHead: string
 ): string {
-  const type = cellStateToType(cell.state);
-  const base = t(`application:Page2.legend.${type}`);
+  const base = t(`application:Page2.legend.${cell.state}`);
   return `${base ? `${base}: ` : ""}${labelHead} ${cell.label}`;
 }
 
 function DayColumn({
+  index,
   day,
   cells,
   updateCells,
-  paintState,
-  setPaintState,
-  painting,
-  setPainting,
-  priority,
 }: {
+  index: number;
   day: Day;
   cells: Cell[];
   updateCells: (cells: Cell[]) => void;
-  setPaintState: (state: ApplicationEventSchedulePriority | false) => void;
-  paintState: ApplicationEventSchedulePriority | false;
-  painting: boolean;
-  setPainting: (state: boolean) => void;
-  priority: ApplicationEventSchedulePriority;
 }): JSX.Element {
   const { t } = useTranslation();
+  const [paintState, setPaintState] = useState<CellType | false>(false); // toggle value true = set, false = clear: ;
+  const [painting, setPainting] = useState(false); // is painting 'on'
 
-  const setCellValue = (
-    selection: Cell,
-    value: ApplicationEventSchedulePriority | false
-  ): void => {
+  const { watch } = useFormContext<ApplicationPage2FormValues>();
+  const priority = watch(`applicationSections.${index}.priority`);
+
+  const setCellValue = (selection: Cell, value: CellType | false): void => {
     const newVal = cells.map((cell) =>
       cell.key === selection.key
-        ? { ...cell, state: value === false ? 100 : value }
+        ? { ...cell, state: value === false ? "open" : value }
         : cell
     );
     updateCells(newVal);
   };
+
   const handleMouseDown = (cell: Cell, _evt: React.MouseEvent) => {
     const state = priority === cell.state ? false : priority;
 
@@ -178,12 +163,12 @@ function DayColumn({
   const labelHead = t(`common:weekDay.${fromMondayFirstUnsafe(day)}`);
 
   return (
-    <div>
+    <div onMouseLeave={() => setPainting(false)}>
       <CalendarHead>{head}</CalendarHead>
       {cells.map((cell) => (
         <TimeSelectionButton
           key={cell.key}
-          $state={cell.state}
+          $type={cell.state}
           type="button"
           onMouseDown={(evt) => handleMouseDown(cell, evt)}
           onMouseUp={() => setPainting(false)}
@@ -195,7 +180,7 @@ function DayColumn({
           }}
           role="option"
           aria-label={constructAriaLabel(t, cell, labelHead)}
-          aria-selected={cell.state > 100}
+          aria-selected={isSelected(cell.state)}
           data-testid={`time-selector__button--${cell.key}`}
         >
           {cell.label}
@@ -233,9 +218,6 @@ const LegendBox = styled.div<{ type: CellType }>`
   }
 `;
 
-const CELL_TYPES = ["open", "unavailable", "secondary", "primary"] as const;
-type CellType = (typeof CELL_TYPES)[number];
-
 type TimeSelectorProps = {
   index: number;
   reservationUnitOptions: { label: string; value: number }[];
@@ -248,10 +230,6 @@ export function TimeSelector({
   reservationUnitOpeningHours,
 }: TimeSelectorProps): JSX.Element | null {
   const { t } = useTranslation();
-  const [paintState, setPaintState] = useState<
-    ApplicationEventSchedulePriority | false
-  >(false); // toggle value true = set, false = clear: ;
-  const [painting, setPainting] = useState(false); // is painting 'on'
 
   const cellTypes = CELL_TYPES.map((val) => ({
     type: val,
@@ -304,7 +282,6 @@ export function TimeSelector({
 
   const enableCopyCells =
     filterNonNullable(watch("applicationSections")).length > 1;
-  const priority = watch(`applicationSections.${index}.priority`);
 
   return (
     // NOTE flex inside a grid container breaks overflow-x
@@ -321,22 +298,17 @@ export function TimeSelector({
         index={index}
       />
       <CalendarContainer
-        onMouseLeave={() => setPainting(false)}
         aria-multiselectable
         aria-labelledby={`timeSelector-${index}`}
         role="listbox"
       >
         {WEEKDAYS.map((day) => (
           <DayColumn
-            paintState={paintState}
-            setPaintState={setPaintState}
-            painting={painting}
-            setPainting={setPainting}
+            index={index}
             key={`day-${day}`}
             day={day}
             cells={cells[day] ?? []}
             updateCells={(toUpdate) => handleCellUpdate(day, toUpdate)}
-            priority={priority ?? 200}
           />
         ))}
       </CalendarContainer>

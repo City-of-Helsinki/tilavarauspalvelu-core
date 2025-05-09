@@ -1,4 +1,4 @@
-import { type SuitableTimeRangeFormValues } from "./form";
+import { type CellType, type SuitableTimeRangeFormValues } from "./form";
 import { type ApplicationRoundTimeSlotNode, Priority } from "@/gql/gql-types";
 import { convertWeekday, Day, transformWeekday } from "common/src/conversion";
 import {
@@ -7,20 +7,17 @@ import {
   timeToMinutes,
 } from "common/src/helpers";
 
-// TODO this is awful what do the numbers mean?
-export type ApplicationEventSchedulePriority = 50 | 100 | 200 | 300;
-
 export type Cell = {
   hour: number;
   label: string;
-  state: ApplicationEventSchedulePriority;
+  state: CellType;
   key: string;
 };
 
 type Timespan = {
   begin: number;
   end: number;
-  priority: ApplicationEventSchedulePriority;
+  priority: CellType;
 };
 
 export function aesToCells(
@@ -51,7 +48,7 @@ export function aesToCells(
         key: `${day}-${i}`,
         hour: i,
         label: cellLabel(i),
-        state: isAvailable ? 100 : 50,
+        state: isAvailable ? "open" : "unavailable",
       });
     }
     cells.push(cell);
@@ -61,7 +58,7 @@ export function aesToCells(
     const { dayOfTheWeek, priority } = aes;
     const hourBegin = timeToMinutes(aes.beginTime) / 60 - firstSlotStart;
     const hourEnd = (timeToMinutes(aes.endTime) / 60 || 24) - firstSlotStart;
-    const p = priority === Priority.Primary ? 300 : (200 as const);
+    const p = priority === Priority.Primary ? "primary" : "secondary";
     const day = convertWeekday(dayOfTheWeek);
     for (let h = hourBegin; h < hourEnd; h += 1) {
       const cell = cells[day]?.[h];
@@ -74,7 +71,7 @@ export function aesToCells(
   return cells;
 }
 
-type DailyOpeningHours = Readonly<
+export type DailyOpeningHours = Readonly<
   Pick<ApplicationRoundTimeSlotNode, "weekday" | "closed" | "reservableTimes">[]
 >;
 
@@ -112,19 +109,32 @@ export function covertCellsToTimeRange(
     return {
       beginTime: formatTimeStruct({ hour: begin, minute: 0 }),
       endTime: formatTimeStruct({ hour: end, minute: 0 }),
-      // The default will never happen (it's already filtered)
-      // TODO type this better
-      priority: priority === 300 ? Priority.Primary : Priority.Secondary,
+      priority: transformCellType(priority),
       dayOfTheWeek: transformWeekday(day),
     };
   });
+}
+
+export function isSelected(cellType: CellType): boolean {
+  return cellType === "primary" || cellType === "secondary";
+}
+
+function transformCellType(cellType: CellType): Priority {
+  switch (cellType) {
+    case "primary":
+      return Priority.Primary;
+    case "secondary":
+      return Priority.Secondary;
+    default:
+      throw new Error(`Unknown cell type: ${cellType}`);
+  }
 }
 
 type AesType = {
   day: Day;
   begin: number;
   end: number;
-  priority: ApplicationEventSchedulePriority;
+  priority: CellType;
 };
 
 function combineTimespans(
@@ -132,7 +142,7 @@ function combineTimespans(
   current: {
     begin: number;
     end: number;
-    priority: ApplicationEventSchedulePriority;
+    priority: CellType;
   }
 ): Timespan[] {
   if (!prev.length) {
@@ -167,7 +177,7 @@ function cellsToApplicationEventSchedules(cells: Cell[][]): AesType[] {
   for (const day of range) {
     const dayCells = cells[day] ?? [];
     const transformedDayCells = dayCells
-      .filter((cell) => cell.state !== 50 && cell.state !== 100)
+      .filter((cell) => cell.state !== "unavailable" && cell.state !== "open")
       .map((cell) => ({
         begin: cell.hour,
         end: cell.hour + 1,
