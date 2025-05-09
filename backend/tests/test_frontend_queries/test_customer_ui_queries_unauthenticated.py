@@ -100,7 +100,7 @@ def test_frontend_queries__customer_ui__ApplicationRound__unauthenticated(graphq
     factory_args["public_display_end"] = local_datetime(2024, 2, 2)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -127,7 +127,7 @@ def test_frontend_queries__customer_ui__ApplicationRoundCriteria__unauthenticate
     factory_args["public_display_end"] = local_datetime(2024, 2, 2)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -154,7 +154,7 @@ def test_frontend_queries__customer_ui__ApplicationRoundsUi__unauthenticated(gra
     factory_args["public_display_end"] = local_datetime(2024, 2, 2)
     query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -184,7 +184,7 @@ def test_frontend_queries__customer_ui__BannerNotificationsList__unauthenticated
     factory_args["target"] = BannerNotificationTarget.ALL
     obj: BannerNotification = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["target"] = obj.target
     assert_no_undefined_variables(variables)
 
@@ -216,7 +216,7 @@ def test_frontend_queries__customer_ui__BannerNotificationsListAll__unauthentica
     factory_args["target"] = BannerNotificationTarget.ALL
     query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -237,7 +237,7 @@ def test_frontend_queries__customer_ui__CurrentUser__unauthenticated(graphql):
     factory_args = deepcopy(query_info.factory_args)
     query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -282,7 +282,7 @@ def test_frontend_queries__customer_ui__ListInProgressReservations__unauthentica
     factory_args = deepcopy(query_info.factory_args)
     obj: Reservation = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["user"] = [obj.pk]
     variables["beginDate"] = obj.begin.date().isoformat()
     assert_no_undefined_variables(variables)
@@ -328,7 +328,7 @@ def test_frontend_queries__customer_ui__RelatedReservationUnits__unauthenticated
     factory_args["publish_ends"] = now + datetime.timedelta(days=1)
     obj: ReservationUnit = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["unit"] = [obj.unit.pk]
     variables["isDraft"] = False
     variables["isVisible"] = True
@@ -377,7 +377,7 @@ def test_frontend_queries__customer_ui__ReservationState__unauthenticated(graphq
     factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -407,7 +407,7 @@ def test_frontend_queries__customer_ui__ReservationUnitPage__unauthenticated(gra
 
     ReservationFactory.create_for_reservation_unit(obj)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     variables["pk"] = obj.pk
     variables["beginDate"] = local_date().isoformat()
@@ -431,7 +431,7 @@ def test_frontend_queries__customer_ui__SearchReservationUnits__unauthenticated(
     factory_args = deepcopy(query_info.factory_args)
     query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -451,7 +451,7 @@ def test_frontend_queries__customer_ui__TermsOfUse__unauthenticated(graphql):
     factory_args = deepcopy(query_info.factory_args)
     obj: TermsOfUse = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["termsType"] = obj.terms_type.upper()
     assert_no_undefined_variables(variables)
 
@@ -476,7 +476,7 @@ def test_frontend_queries__customer_ui__AccessCode__unauthenticated(graphql):
     factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -551,7 +551,7 @@ def test_frontend_queries__customer_ui__ApplicationPage2__unauthenticated(graphq
     factory_args["application_sections__suitable_time_ranges__end_time"] = local_time(10, 0)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -586,7 +586,7 @@ def test_frontend_queries__customer_ui__ApplicationPage3__unauthenticated(graphq
     factory_args["application_sections__suitable_time_ranges__end_time"] = local_time(10, 0)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -621,7 +621,7 @@ def test_frontend_queries__customer_ui__ApplicationPagePreview__unauthenticated(
     factory_args["application_sections__suitable_time_ranges__end_time"] = local_time(10, 0)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -642,7 +642,7 @@ def test_frontend_queries__customer_ui__ApplicationRecurringReservation__unauthe
     factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -664,7 +664,7 @@ def test_frontend_queries__customer_ui__ApplicationReservations__unauthenticated
     factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     variables["beginDate"] = local_date(2021, 1, 1).isoformat()
     assert_no_undefined_variables(variables)
@@ -711,7 +711,7 @@ def test_frontend_queries__customer_ui__ApplicationSectionView__unauthenticated(
     factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["pk"] = obj.pk
     assert_no_undefined_variables(variables)
 
@@ -732,7 +732,7 @@ def test_frontend_queries__customer_ui__ApplicationSentPage__unauthenticated(gra
     factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -768,7 +768,7 @@ def test_frontend_queries__customer_ui__ApplicationView__unauthenticated(graphql
     factory_args["application_sections__suitable_time_ranges__end_time"] = local_time(10, 0)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -789,7 +789,7 @@ def test_frontend_queries__customer_ui__Applications__unauthenticated(graphql):
     factory_args = deepcopy(query_info.factory_args)
     obj: Application = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["user"] = obj.user.pk
     variables["status"] = [obj.status.value]
     variables["orderBy"] = ["pkAsc"]
@@ -812,7 +812,7 @@ def test_frontend_queries__customer_ui__ListReservations__unauthenticated(graphq
     factory_args = deepcopy(query_info.factory_args)
     obj: Reservation = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["reservationType"] = [obj.type]
     assert_no_undefined_variables(variables)
 
@@ -835,7 +835,7 @@ def test_frontend_queries__customer_ui__Order__unauthenticated(graphql):
     factory_args["reservation__pk"] = 1
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["orderUuid"] = str(obj.remote_id)
     assert_no_undefined_variables(variables)
 
@@ -857,7 +857,7 @@ def test_frontend_queries__customer_ui__Reservation__unauthenticated(graphql):
     factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -903,7 +903,7 @@ def test_frontend_queries__customer_ui__ReservationConfirmationPage__unauthentic
     factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -933,7 +933,7 @@ def test_frontend_queries__customer_ui__ReservationEditPage__unauthenticated(gra
     begin = next_hour()
     end = begin + datetime.timedelta(hours=1)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     variables["beginDate"] = begin.date().isoformat()
     variables["endDate"] = end.date().isoformat()
@@ -956,7 +956,7 @@ def test_frontend_queries__customer_ui__ReservationPage__unauthenticated(graphql
     factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 

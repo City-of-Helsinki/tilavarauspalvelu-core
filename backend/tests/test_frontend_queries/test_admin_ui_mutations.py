@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import uuid
+from copy import deepcopy
 from inspect import isfunction
 from typing import Any
 from unittest.mock import MagicMock
@@ -84,7 +85,7 @@ def test_frontend_queries__customer_ui__AddReservationToSeries(graphql):
 
     now = next_hour()
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     factory_args["begin"] = now
     series = RecurringReservationFactory.create_with_matching_reservations(**factory_args)
 
@@ -93,7 +94,7 @@ def test_frontend_queries__customer_ui__AddReservationToSeries(graphql):
     new_begin = last_reservation.begin + datetime.timedelta(days=1)
     new_end = last_reservation.end + datetime.timedelta(days=1)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": series.pk,
         "begin": new_begin.isoformat(),
@@ -116,11 +117,11 @@ def test_frontend_queries__customer_ui__ApproveReservation(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     factory_args.pop("state")  # set by the factory
     reservation = ReservationFactory.create_for_approve(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation.pk,
         "price": str(reservation.price),
@@ -143,7 +144,7 @@ def test_frontend_queries__customer_ui__BannerNotificationCreate(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "name": "Test notification",
         "level": BannerNotificationLevel.NORMAL,
@@ -166,10 +167,10 @@ def test_frontend_queries__customer_ui__BannerNotificationDelete(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     notification = BannerNotificationFactory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": notification.pk,
     }
@@ -190,10 +191,10 @@ def test_frontend_queries__customer_ui__BannerNotificationUpdate(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     notification = BannerNotificationFactory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": notification.pk,
         "level": BannerNotificationLevel.EXCEPTION.value,
@@ -224,12 +225,12 @@ def test_frontend_queries__customer_ui__ChangeReservationAccessCodeSeries(graphq
 
     now = next_hour()
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     factory_args["begin"] = now
     factory_args["reservations__access_type"] = AccessType.ACCESS_CODE
     series = RecurringReservationFactory.create_with_matching_reservations(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": series.pk,
     }
@@ -258,12 +259,12 @@ def test_frontend_queries__customer_ui__ChangeReservationAccessCodeSingle(graphq
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     factory_args["begin"] = next_hour()
     factory_args["access_type"] = AccessType.ACCESS_CODE
     reservation = ReservationFactory.create_for_staff_update(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation.pk,
     }
@@ -289,7 +290,7 @@ def test_frontend_queries__customer_ui__CreateAllocatedTimeSlot(graphql):
     suitable = SuitableTimeRangeFactory.create(application_section=section)
     option = section.reservation_unit_options.first()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "beginTime": suitable.begin_time.isoformat(),
         "endTime": suitable.end_time.isoformat(),
@@ -315,7 +316,7 @@ def test_frontend_queries__customer_ui__CreateImage(graphql, mock_png):
 
     reservation_unit = ReservationUnitFactory.create()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["image"] = mock_png
     variables["reservationUnit"] = reservation_unit.pk
     variables["imageType"] = ReservationUnitImageType.MAIN.value.upper()
@@ -342,7 +343,7 @@ def test_frontend_queries__customer_ui__CreateReservationSeries(graphql):
     begin = next_hour()
     end = begin + datetime.timedelta(days=20)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "beginDate": begin.date().isoformat(),
         "beginTime": begin.time().isoformat(),
@@ -375,7 +376,7 @@ def test_frontend_queries__customer_ui__CreateReservationUnit(graphql):
 
     unit = UnitFactory.create()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "name": "Reservation unit",
         "unit": unit.pk,
@@ -398,7 +399,7 @@ def test_frontend_queries__customer_ui__CreateResource(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "name": "Resource",
         "locationType": ResourceLocationType.MOVABLE.value.upper(),
@@ -420,7 +421,7 @@ def test_frontend_queries__customer_ui__CreateSpace(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "name": "Resource",
     }
@@ -446,7 +447,7 @@ def test_frontend_queries__customer_ui__CreateStaffReservation(graphql):
     begin = next_hour()
     end = begin + datetime.timedelta(hours=1)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "begin": begin.isoformat(),
         "end": end.isoformat(),
@@ -476,7 +477,7 @@ def test_frontend_queries__customer_ui__DeleteAllocatedTimeSlot(graphql):
         reservation_unit_option__application_section__application__application_round=application_round,
     )
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": allocation.pk,
     }
@@ -499,7 +500,7 @@ def test_frontend_queries__customer_ui__DeleteImage(graphql):
 
     image = ReservationUnitImageFactory.create()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["pk"] = image.pk
     assert_no_undefined_variables(variables)
 
@@ -520,7 +521,7 @@ def test_frontend_queries__customer_ui__DeleteResource(graphql):
 
     resource = ResourceFactory.create()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": resource.pk,
     }
@@ -543,7 +544,7 @@ def test_frontend_queries__customer_ui__DeleteSpace(graphql):
 
     space = SpaceFactory.create()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": space.pk,
     }
@@ -567,7 +568,7 @@ def test_frontend_queries__customer_ui__DenyReservation(graphql):
     reservation = ReservationFactory.create_for_deny()
     deny_reason = ReservationDenyReasonFactory.create()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation.pk,
         "denyReason": deny_reason.pk,
@@ -596,7 +597,7 @@ def test_frontend_queries__customer_ui__DenyReservationSeries(graphql):
 
     deny_reason = ReservationDenyReasonFactory.create()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": series.pk,
         "denyReason": deny_reason.pk,
@@ -621,7 +622,7 @@ def test_frontend_queries__customer_ui__EndAllocation(graphql):
 
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["pk"] = application_round.pk
     assert_no_undefined_variables(variables)
 
@@ -643,7 +644,7 @@ def test_frontend_queries__customer_ui__RefundReservation(graphql):
 
     reservation = ReservationFactory.create_for_refund()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation.pk,
     }
@@ -666,7 +667,7 @@ def test_frontend_queries__customer_ui__RejectAllApplicationOptions(graphql):
 
     application = ApplicationFactory.create_in_status_in_allocation()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": application.pk,
     }
@@ -689,7 +690,7 @@ def test_frontend_queries__customer_ui__RejectAllSectionOptions(graphql):
 
     section = ApplicationSectionFactory.create_in_status_in_allocation()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": section.pk,
     }
@@ -712,7 +713,7 @@ def test_frontend_queries__customer_ui__RejectRest(graphql):
 
     option = ReservationUnitOptionFactory.create()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": option.pk,
         "locked": True,
@@ -741,7 +742,7 @@ def test_frontend_queries__customer_ui__RepairReservationAccessCodeSeries(graphq
 
     series = RecurringReservationFactory.create_with_matching_reservations(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": series.pk,
     }
@@ -769,7 +770,7 @@ def test_frontend_queries__customer_ui__RepairReservationAccessCodeSingle(graphq
 
     reservation = ReservationFactory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation.pk,
     }
@@ -792,7 +793,7 @@ def test_frontend_queries__customer_ui__RequireHandling(graphql):
 
     reservation = ReservationFactory.create_for_requires_handling()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation.pk,
     }
@@ -819,7 +820,7 @@ def test_frontend_queries__customer_ui__RescheduleReservationSeries(graphql):
 
     series = RecurringReservationFactory.create_with_matching_reservations(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": series.pk,
         "weekdays": [Weekday.TUESDAY.as_weekday_number],
@@ -846,7 +847,7 @@ def test_frontend_queries__customer_ui__RestoreAllApplicationOptions(graphql):
 
     application = ApplicationFactory.create_in_status_in_allocation(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": application.pk,
     }
@@ -872,7 +873,7 @@ def test_frontend_queries__customer_ui__RestoreAllSectionOptions(graphql):
 
     section = ApplicationSectionFactory.create_in_status_in_allocation(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": section.pk,
     }
@@ -895,7 +896,7 @@ def test_frontend_queries__customer_ui__SendResults(graphql):
 
     application_round = ApplicationRoundFactory.create_in_status_handled()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["pk"] = application_round.pk
     assert_no_undefined_variables(variables)
 
@@ -916,7 +917,7 @@ def test_frontend_queries__customer_ui__StaffAdjustReservationTime(graphql):
 
     reservation = ReservationFactory.create_for_time_adjustment()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation.pk,
         "begin": (reservation.begin + datetime.timedelta(hours=1)).isoformat(),
@@ -941,7 +942,7 @@ def test_frontend_queries__customer_ui__UpdateApplicationWorkingMemo(graphql):
 
     application = ApplicationFactory.create_in_status_in_allocation()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["pk"] = application.pk
     variables["workingMemo"] = "New working memo"
     assert_no_undefined_variables(variables)
@@ -963,7 +964,7 @@ def test_frontend_queries__customer_ui__UpdateImage(graphql):
 
     image = ReservationUnitImageFactory.create()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["pk"] = image.pk
     variables["imageType"] = ReservationUnitImageType.OTHER.value.upper()
     assert_no_undefined_variables(variables)
@@ -985,7 +986,7 @@ def test_frontend_queries__customer_ui__UpdateRecurringReservation(graphql):
 
     series = RecurringReservationFactory.create()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": series.pk,
         "name": "New name",
@@ -1009,7 +1010,7 @@ def test_frontend_queries__customer_ui__UpdateReservationUnit(graphql):
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation_unit.pk,
         "name": "New name",
@@ -1033,7 +1034,7 @@ def test_frontend_queries__customer_ui__UpdateReservationWorkingMemo(graphql):
 
     reservation = ReservationFactory.create()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["pk"] = reservation.pk
     variables["workingMemo"] = "New working memo"
     assert_no_undefined_variables(variables)
@@ -1055,7 +1056,7 @@ def test_frontend_queries__customer_ui__UpdateResource(graphql):
 
     resource = ResourceFactory.create()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": resource.pk,
         "name": "New name",
@@ -1079,7 +1080,7 @@ def test_frontend_queries__customer_ui__UpdateSpace(graphql):
 
     space = SpaceFactory.create()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": space.pk,
         "name": "New name",
