@@ -77,20 +77,19 @@
     "prioritySelectLabel": "Typ av tidsönskemål",
     "reservationUnitSelectLabel": "Visa säsongbokningstider för lokalen",
     "priorityLabels": {
-      "300": "Välj prioriterade tidsönskemål",
-      "200": "Välj alternativa tidsönskemål"
+      "primary": "Välj prioriterade tidsönskemål",
+      "secondary": "Välj alternativa tidsönskemål"
     },
     "legend": {
       "unavailable": "Kan inte bokas",
-      "selected-1": "Prioriterat önskemål",
-      "selected-2": "Alternativt önskemål",
-      "within-opening-hours": "Kan reserveras",
-      "outside-opening-hours": "Inte för säsongbokning"
+      "primary": "Prioriterat önskemål",
+      "secondary": "Alternativt önskemål",
+      "open":"Kan reserveras"
     },
     "primarySchedules": "Prioriterade tidsönskemål",
     "secondarySchedules": "Alternativa tidsönskemål",
     "notification": {
-      "copyCells": "Kopieringen av tiderna till alla bokningsönskemål lyckades"
+      "copyCells": "Önskade tider kopierades till alla bokningar"
     }
   },
   "Page3": {
