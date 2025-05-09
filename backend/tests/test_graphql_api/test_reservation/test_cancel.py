@@ -214,7 +214,7 @@ def test_reservation__cancel__sends_email_notification(graphql, outbox):
 
 
 @patch_method(VerkkokauppaAPIClient.refund_order)
-def test_reservation__cancel__starts_refund_process_for_paid_reservation(graphql):
+def test_reservation__cancel__refund_for_paid_reservation(graphql):
     reservation = ReservationFactory.create_for_cancellation(price=1)
 
     remote_id = uuid.uuid4()
@@ -239,12 +239,44 @@ def test_reservation__cancel__starts_refund_process_for_paid_reservation(graphql
     data = get_cancel_data(reservation)
     response = graphql(CANCEL_MUTATION, input_data=data)
 
-    assert response.has_errors is False
+    assert response.has_errors is False, response.errors
 
     VerkkokauppaAPIClient.refund_order.assert_called_with(order_uuid=remote_id)
 
     payment_order.refresh_from_db()
     assert payment_order.refund_id == refund_id
+    assert payment_order.status == OrderStatus.REFUNDED
+
+
+@patch_method(VerkkokauppaAPIClient.cancel_order)
+def test_reservation__cancel__cancellation_for_invoiced_reservation(graphql):
+    reservation = ReservationFactory.create_for_cancellation(price=1)
+
+    payment_order = PaymentOrderFactory.create(
+        reservation=reservation,
+        remote_id=uuid.uuid4(),
+        refund_id=None,
+        payment_type=PaymentType.ONLINE_OR_INVOICE,
+        status=OrderStatus.PAID_BY_INVOICE,
+        price_net=Decimal("100.00"),
+        price_vat=Decimal("24.00"),
+        price_total=Decimal("124.00"),
+        reservation_user_uuid=uuid.uuid4(),
+    )
+
+    graphql.login_with_superuser()
+    data = get_cancel_data(reservation)
+    response = graphql(CANCEL_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    VerkkokauppaAPIClient.cancel_order.assert_called_with(
+        order_uuid=payment_order.remote_id,
+        user_uuid=payment_order.reservation_user_uuid,
+    )
+
+    payment_order.refresh_from_db()
+    assert payment_order.status == OrderStatus.CANCELLED
 
 
 @patch_method(PindoraService.delete_access_code)
