@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from copy import deepcopy
 from inspect import isfunction
 
 import pytest
@@ -54,7 +55,7 @@ def test_frontend_queries__customer_ui__AdjustReservationTime(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     factory_args.pop("state")  # set by the factory
     factory_args.pop("begin")  # set by the factory
     factory_args.pop("end")  # set by the factory
@@ -63,7 +64,7 @@ def test_frontend_queries__customer_ui__AdjustReservationTime(graphql):
     new_begin = reservation.begin + datetime.timedelta(days=1)
     new_end = reservation.end + datetime.timedelta(days=1)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation.pk,
         "begin": new_begin.isoformat(),
@@ -86,10 +87,10 @@ def test_frontend_queries__customer_ui__CancelApplication(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     application = ApplicationFactory.create_in_status_received(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": application.pk,
     }
@@ -112,14 +113,14 @@ def test_frontend_queries__customer_ui__CancelApplicationSection(graphql):
 
     application_round = ApplicationRoundFactory.create_in_status_results_sent()
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     factory_args["application__application_round"] = application_round
     section = ApplicationSectionFactory.create_in_status_handled(**factory_args)
 
     user = section.application.user
     reason = ReservationCancelReasonFactory.create()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": section.pk,
         "cancelReason": reason.pk,
@@ -142,12 +143,12 @@ def test_frontend_queries__customer_ui__CancelReservation(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     reservation = ReservationFactory.create_for_cancellation(**factory_args)
 
     reason = ReservationCancelReasonFactory.create()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation.pk,
         "cancelReason": reason.pk,
@@ -170,10 +171,10 @@ def test_frontend_queries__customer_ui__ConfirmReservation(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     reservation = ReservationFactory.create_for_confirmation(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation.pk,
     }
@@ -202,7 +203,7 @@ def test_frontend_queries__customer_ui__CreateApplication(graphql):
     )
     application_round = ApplicationRoundFactory.create_in_status_open(reservation_units=[reservation_unit])
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "additionalInformation": "Additional information",
         "applicantType": ApplicantTypeChoice.INDIVIDUAL.value,
@@ -248,7 +249,7 @@ def test_frontend_queries__customer_ui__CreateReservation(graphql):
     begin = next_hour()
     end = begin + datetime.timedelta(hours=1)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "reservationUnit": reservation_unit.pk,
         "begin": begin.isoformat(),
@@ -273,7 +274,7 @@ def test_frontend_queries__customer_ui__DeleteReservation(graphql):
 
     reservation = ReservationFactory.create_for_delete()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation.pk,
     }
@@ -296,7 +297,7 @@ def test_frontend_queries__customer_ui__SendApplication(graphql):
 
     application = ApplicationFactory.create_application_ready_for_sending()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": application.pk,
     }
@@ -319,7 +320,7 @@ def test_frontend_queries__customer_ui__UpdateApplication(graphql):
 
     application = ApplicationFactory.create_application_ready_for_sending()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": application.pk,
         "additionalInformation": "Additional information",
@@ -343,7 +344,7 @@ def test_frontend_queries__customer_ui__UpdateReservation(graphql):
 
     reservation = ReservationFactory.create_for_update()
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation.pk,
         "name": "Reservation name",
