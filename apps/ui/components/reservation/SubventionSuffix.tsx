@@ -3,7 +3,6 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 
 type Props = {
-  placement: "reservation-unit-head" | "quick-reservation";
   setIsDialogOpen: (value: boolean) => void;
   ref?: RefObject<HTMLAnchorElement>;
 };
@@ -19,10 +18,7 @@ const Btn = styled.button`
   word-break: keep-all;
 `;
 
-export function SubventionSuffix({
-  placement,
-  setIsDialogOpen,
-}: Props): JSX.Element {
+export function SubventionSuffix({ setIsDialogOpen }: Props): JSX.Element {
   const { t } = useTranslation();
 
   return (
@@ -31,7 +27,6 @@ export function SubventionSuffix({
         e.preventDefault();
         setIsDialogOpen(true);
       }}
-      data-testid={`link__pricing-terms--${placement}`}
     >
       {t("reservationCalendar:subventionAvailable")}
     </Btn>

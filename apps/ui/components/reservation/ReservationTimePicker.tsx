@@ -35,7 +35,6 @@ import {
 } from "@/modules/reservation";
 import {
   type ReservableMap,
-  type RoundPeriod,
   getBoundCheckedReservation,
   getSlotPropGetter,
   isRangeReservable,
@@ -49,8 +48,8 @@ import {
 import { useTranslation } from "next-i18next";
 import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";
 import { getTimeString } from "@/modules/reservationUnit";
-import { UseFormReturn } from "react-hook-form";
-import { PendingReservationFormType } from "../reservation-unit/schema";
+import { type UseFormReturn } from "react-hook-form";
+import { type PendingReservationFormType } from "../reservation-unit/schema";
 import { useCurrentUser } from "@/hooks";
 import { gql } from "@apollo/client";
 
@@ -86,10 +85,9 @@ const CalendarFooter = styled.div`
   }
 `;
 
-type Props = {
+export type ReservationTimePickerProps = Readonly<{
   reservationUnit: ReservationTimePickerFieldsFragment;
   reservableTimes: ReservableMap;
-  activeApplicationRounds: readonly RoundPeriod[];
   blockingReservations: readonly BlockingReservationFieldsFragment[];
   reservationForm: UseFormReturn<PendingReservationFormType>;
   isReservationQuotaReached: boolean;
@@ -97,16 +95,15 @@ type Props = {
   // TODO replace with mode selector
   loginAndSubmitButton?: JSX.Element;
   startingTimeOptions: Array<{ value: string; label: string }>;
-};
+}>;
 
 function useSlotPropGetter({
   reservableTimes,
-  activeApplicationRounds,
   reservationUnit,
-}: Pick<
-  Props,
-  "reservableTimes" | "activeApplicationRounds" | "reservationUnit"
->): (date: Date) => SlotProps {
+}: Pick<ReservationTimePickerProps, "reservableTimes" | "reservationUnit">): (
+  date: Date
+) => SlotProps {
+  const activeApplicationRounds = reservationUnit.applicationRounds;
   return useMemo(() => {
     return getSlotPropGetter({
       reservableTimes,
@@ -134,7 +131,7 @@ function useCalendarEventChange({
   reservationUnit,
   focusSlot,
   blockingReservations,
-}: Pick<Props, "reservationUnit"> & {
+}: Pick<ReservationTimePickerProps, "reservationUnit"> & {
   focusSlot: ReturnType<typeof convertFormToFocustimeSlot>;
   blockingReservations: readonly BlockingReservationFieldsFragment[];
 }): Array<CalendarEventBuffer | CalendarEvent<ReservationNode>> {
@@ -144,8 +141,6 @@ function useCalendarEventChange({
   const calendarEvents: Array<
     CalendarEventBuffer | CalendarEvent<ReservationNode>
   > = useMemo(() => {
-    const existingReservations = blockingReservations;
-
     const shouldDisplayFocusSlot = focusSlot.isReservable;
 
     let focusEvent = null;
@@ -160,7 +155,7 @@ function useCalendarEventChange({
     }
 
     const events = [
-      ...existingReservations,
+      ...blockingReservations,
       ...(focusEvent != null ? [focusEvent] : []),
     ].map((n) => {
       const suffix = n.state === "INITIAL" ? n.durationString : "";
@@ -209,17 +204,17 @@ function useCalendarEventChange({
 export function ReservationTimePicker({
   reservationUnit,
   reservableTimes,
-  activeApplicationRounds,
   reservationForm,
   isReservationQuotaReached,
   loginAndSubmitButton,
   submitReservation,
   startingTimeOptions,
   blockingReservations,
-}: Readonly<Props>) {
+}: ReservationTimePickerProps): JSX.Element {
   const { t, i18n } = useTranslation();
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
   const { watch, setValue } = reservationForm;
+  const activeApplicationRounds = reservationUnit.applicationRounds;
 
   const dateValue = watch("date");
 
@@ -246,7 +241,6 @@ export function ReservationTimePicker({
   });
   const slotPropGetter = useSlotPropGetter({
     reservableTimes,
-    activeApplicationRounds,
     reservationUnit,
   });
 
@@ -467,5 +461,10 @@ export const RESERVATION_TIME_PICKER_FRAGMENT = gql`
     pk
     ...IsReservableFields
     ...PriceReservationUnitFields
+    applicationRounds(ongoing: true) {
+      id
+      reservationPeriodBegin
+      reservationPeriodEnd
+    }
   }
 `;

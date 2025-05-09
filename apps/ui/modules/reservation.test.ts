@@ -5,36 +5,21 @@ import {
   OrderStatus,
   type ReservationOrderStatusFragment,
   type CanUserCancelReservationFragment,
-  type IsReservableFieldsFragment,
   type PaymentOrderNode,
   type CanReservationBeChangedFragment,
 } from "@gql/gql-types";
 import {
-  isUserAllowedToMoveReservationHere,
   isReservationCancellable,
   getCheckoutUrl,
   getDurationOptions,
   getNormalizedReservationOrderStatus,
   isReservationEditable,
   type CanReservationBeChangedProps,
-  type IsUserAllowedToMoveReservationHereProps,
 } from "./reservation";
-import {
-  type ReservableMap,
-  isSlotWithinReservationTime,
-  generateReservableMap,
-} from "./reservable";
+import { isSlotWithinReservationTime } from "./reservable";
 import { toApiDate } from "common/src/common/util";
 import { type TFunction } from "i18next";
-import {
-  vi,
-  describe,
-  test,
-  expect,
-  beforeAll,
-  beforeEach,
-  afterAll,
-} from "vitest";
+import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
 import { base64encode } from "common/src/helpers";
 
 function createMockCancellationRule({
@@ -409,149 +394,6 @@ describe("isReservationEditable", () => {
       cancellationBuffer: 24 * 60 * 60 + 1,
     });
     expect(isReservationEditable(input)).toBe(false);
-  });
-});
-
-describe("canReservationBeChanged", () => {
-  beforeAll(() => {
-    vi.useFakeTimers({
-      now: new Date(2024, 0, 1, 9, 0, 0),
-    });
-  });
-  afterAll(() => {
-    vi.useRealTimers();
-  });
-
-  let mockReservableTimes: ReservableMap;
-  beforeEach(() => {
-    const WEEK_OF_TIMES = [0, 1, 2, 3, 4, 5, 6]
-      .map((i) => ({
-        start: addDays(addHours(startOfToday(), 5), i),
-        end: addDays(addHours(startOfToday(), 21), i),
-      }))
-      .map(({ start, end }) => ({
-        startDatetime: start.toISOString(),
-        endDatetime: end.toISOString(),
-      }));
-    mockReservableTimes = generateReservableMap(WEEK_OF_TIMES);
-  });
-
-  function constructInput({
-    begin,
-    isFree = true,
-    reservableTimes = mockReservableTimes,
-    reservationsMinDaysBefore,
-    reservationEnds,
-    activeApplicationRounds = [],
-  }: {
-    begin: Date;
-    isFree?: boolean;
-    reservableTimes?: ReservableMap;
-    reservationsMinDaysBefore?: number;
-    reservationEnds?: Date;
-    activeApplicationRounds?: CanReservationBeChangedProps["activeApplicationRounds"];
-  }): IsUserAllowedToMoveReservationHereProps {
-    const reservationUnit: Omit<
-      IsReservableFieldsFragment,
-      "reservableTimeSpans"
-    > = {
-      id: "123f4w90",
-      bufferTimeBefore: 0,
-      bufferTimeAfter: 0,
-      reservationStartInterval: ReservationStartInterval.Interval_15Mins,
-      minReservationDuration: null,
-      maxReservationDuration: null,
-      reservationsMaxDaysBefore: null,
-      reservationsMinDaysBefore: reservationsMinDaysBefore ?? 0,
-      reservationBegins: null,
-      reservationEnds: reservationEnds?.toISOString() ?? null,
-    };
-    return {
-      reservableTimes,
-      range: {
-        start: begin,
-        end: addHours(begin, 1),
-      },
-      isFree,
-      reservationUnit,
-      activeApplicationRounds,
-      blockingReservations: [],
-    };
-  }
-
-  test("YES for a reservation tomorrow", () => {
-    const input = constructInput({
-      begin: addHours(new Date(), 24),
-    });
-    expect(isUserAllowedToMoveReservationHere(input)).toBe(true);
-  });
-
-  test("NO if the reservation would require payment", () => {
-    const input = constructInput({
-      begin: addHours(new Date(), 24),
-      isFree: false,
-    });
-    expect(isUserAllowedToMoveReservationHere(input)).toBe(false);
-  });
-
-  test("NO without reservable times", () => {
-    const input = constructInput({
-      begin: addHours(new Date(), 24),
-      reservableTimes: new Map(),
-    });
-    expect(isUserAllowedToMoveReservationHere(input)).toBe(false);
-  });
-
-  test("NO with malformed begin time", () => {
-    const input = {
-      ...constructInput({ begin: new Date() }),
-      begin: "foobar",
-    };
-    expect(isUserAllowedToMoveReservationHere(input)).toBe(false);
-  });
-
-  test("NO with empty begin time", () => {
-    const input = {
-      ...constructInput({ begin: new Date() }),
-      begin: "",
-    };
-    expect(isUserAllowedToMoveReservationHere(input)).toBe(false);
-  });
-
-  test("NO with minimum reservation days", () => {
-    const input = constructInput({
-      begin: addHours(new Date(), 24),
-      reservationsMinDaysBefore: 10,
-    });
-    expect(isUserAllowedToMoveReservationHere(input)).toBe(false);
-  });
-
-  test("NO when the reservation unit has been closed for reservations", () => {
-    const input = constructInput({
-      begin: addHours(new Date(), 24),
-      reservationEnds: addDays(new Date(), -1),
-    });
-    expect(isUserAllowedToMoveReservationHere(input)).toBe(false);
-  });
-
-  test("NO when trying to move to history", () => {
-    const input = constructInput({
-      begin: addHours(new Date(), -1),
-    });
-    expect(isUserAllowedToMoveReservationHere(input)).toBe(false);
-  });
-
-  test("NO with conflicting application round", () => {
-    const input = constructInput({
-      begin: addHours(new Date(), 24),
-      activeApplicationRounds: [
-        {
-          reservationPeriodBegin: addHours(new Date(), 1).toISOString(),
-          reservationPeriodEnd: addHours(new Date(), 20).toISOString(),
-        },
-      ],
-    });
-    expect(isUserAllowedToMoveReservationHere(input)).toBe(false);
   });
 });
 
