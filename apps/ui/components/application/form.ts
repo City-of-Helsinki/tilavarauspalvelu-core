@@ -140,32 +140,42 @@ const ApplicationSectionPage2Schema = z
     // NOTE: not sent or modified here, but required for validation
     appliedReservationsPerWeek: z.number().min(1).max(7),
   })
-  .refine(
-    (s) =>
+  .superRefine((s, ctx) => {
+    const isValid =
       s.minDuration > 0 &&
       // No too short time ranges allowed
       s.suitableTimeRanges.filter((tr) => lengthOfTimeRange(tr) < s.minDuration)
-        .length === 0,
-    {
-      path: ["suitableTimeRanges"],
-      message:
-        "Suitable time range must be at least as long as the minimum duration",
+        .length === 0;
+    if (!isValid) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["suitableTimeRanges"],
+        message:
+          "Suitable time range must be at least as long as the minimum duration",
+      });
     }
-  )
-  .refine(
-    (s) =>
-      s.suitableTimeRanges.reduce<typeof s.suitableTimeRanges>((acc, tr) => {
-        if (acc.find((x) => x.dayOfTheWeek === tr.dayOfTheWeek)) {
-          return acc;
-        }
-        return [...acc, tr];
-      }, []).length >= s.appliedReservationsPerWeek,
-    {
-      path: ["suitableTimeRanges"],
-      message:
-        "At least as many suitable time ranges as applied reservations per week",
+  })
+  .superRefine((s, ctx) => {
+    const rangesPerWeek = s.suitableTimeRanges.reduce<
+      typeof s.suitableTimeRanges
+    >((acc, tr) => {
+      if (acc.find((x) => x.dayOfTheWeek === tr.dayOfTheWeek)) {
+        return acc;
+      }
+      return [...acc, tr];
+    }, []);
+
+    const isValid = rangesPerWeek.length >= s.appliedReservationsPerWeek;
+
+    if (!isValid) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["suitableTimeRanges"],
+        message:
+          "At least as many suitable time ranges as applied reservations per week",
+      });
     }
-  );
+  });
 
 function transformApplicationSectionPage2(
   values: ApplicationSectionPage2FormValues
