@@ -20,10 +20,23 @@ __all__ = [
 class UserValidator:
     user: User
 
-    def validate_is_of_age(self) -> None:
-        # AD users are always of age (students cannot log in to Varaamo)
-        if self.user.actions.is_ad_user or self.user.actions.is_of_age:
+    def validate_is_of_age(self, *, code: str = error_codes.USER_NOT_OF_AGE) -> None:
+        if self.user.actions.is_of_age:
+            return
+
+        # AD users are currently never under age since we have blocked students from signing in.
+        if self.user.actions.is_ad_user:
+            # Except there can be some guest-users whose age we don't know.
+            if not self.user.actions.is_internal_user:
+                msg = "AD user is not an internal user. Cannot verify age."
+                raise ValidationError(msg, code=code)
+
             return
 
         msg = "User is not of age"
-        raise ValidationError(msg, code=error_codes.USER_NOT_OF_AGE)
+        raise ValidationError(msg, code=code)
+
+    def validate_is_internal_user_if_ad_user(self) -> None:
+        if self.user.actions.is_ad_user and not self.user.actions.is_internal_user:
+            msg = "AD user is not an internal user."
+            raise ValidationError(msg, code=error_codes.USER_NOT_INTERNAL_USER)
