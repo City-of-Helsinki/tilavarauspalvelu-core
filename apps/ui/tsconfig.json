@@ -6,7 +6,8 @@
     "moduleResolution": "bundler",
     "paths": {
       "@/*": ["./*"],
-      "@gql/*": ["./gql/*"]
+      "@gql/*": ["./gql/*"],
+      "@test/*": ["./test/*"]
     }
   },
   "exclude": [
