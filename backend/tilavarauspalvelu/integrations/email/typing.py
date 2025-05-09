@@ -319,6 +319,9 @@ class SeasonalBookingDeniedSeriesContext(TypedDict, total=False):
     application_round_name: str
     application_id: int | None
     application_section_id: int | None
+    reservation_unit_name: str
+    unit_name: str
+    unit_location: str
     weekday_value: str
     time_value: str
 
@@ -344,6 +347,9 @@ class SeasonalBookingRescheduledSeriesContext(TypedDict, total=False):
     access_code_is_used: bool
     access_code: str
     access_code_validity_period: str
+    reservation_unit_name: str
+    unit_name: str
+    unit_location: str
     weekday_value: str
     time_value: str
 
