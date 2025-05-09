@@ -6,6 +6,8 @@
 <mj-text>{{ text_access_code_unavailable_instructions_html | sentence }}</mj-text>
 {% endif %}
 <mj-spacer />
+<mj-text><b>{{ reservation_unit_name | safe }}</b></mj-text>
+<mj-text>{{ unit_name | safe }}, {{ unit_location | safe }}</mj-text>
 <mj-text>{{ weekday_label | safe }}: {{ weekday_value | safe }}</mj-text>
 <mj-text>{{ time_label | safe }}: {{ time_value | safe }}</mj-text>
 {% if access_code_is_used %}

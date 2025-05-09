@@ -7,8 +7,8 @@
 {% include "email/text/partials/application_section_name.jinja" %}
 
 {{ view_booking_at_label | safe }}:
-
-{% for allocation in allocations %}{{ allocation.weekday_value | safe }} {{ allocation.time_value | safe }}
+{% for allocation in allocations %}
+{{ allocation.weekday_value | safe }}: {{ allocation.time_value | safe }}
 {{ allocation.series_url | safe }}
 {% endfor %}
 {% include "email/text/partials/closing_staff.jinja" %}

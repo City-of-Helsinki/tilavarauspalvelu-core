@@ -70,12 +70,18 @@ LANGUAGE_CONTEXT = {
                 "time_value": "13:00-15:00",
                 "access_code_validity_period": "11:00-15:00",
                 "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
+                "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+                "unit_name": "[TOIMIPISTEEN NIMI]",
+                "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             },
             {
                 "weekday_value": "Tuesday",
                 "time_value": "21:00-22:00",
                 "access_code_validity_period": "20:45-22:05",
                 "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
+                "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+                "unit_name": "[TOIMIPISTEEN NIMI]",
+                "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             },
         ],
         **BASE_TEMPLATE_CONTEXT_EN,
@@ -94,12 +100,18 @@ LANGUAGE_CONTEXT = {
                 "time_value": "13:00-15:00",
                 "access_code_validity_period": "11:00-15:00",
                 "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
+                "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+                "unit_name": "[TOIMIPISTEEN NIMI]",
+                "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             },
             {
                 "weekday_value": "Tiistai",
                 "time_value": "21:00-22:00",
                 "access_code_validity_period": "20:45-22:05",
                 "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
+                "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+                "unit_name": "[TOIMIPISTEEN NIMI]",
+                "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             },
         ],
         **BASE_TEMPLATE_CONTEXT_FI,
@@ -118,12 +130,18 @@ LANGUAGE_CONTEXT = {
                 "time_value": "13:00-15:00",
                 "access_code_validity_period": "11:00-15:00",
                 "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
+                "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+                "unit_name": "[TOIMIPISTEEN NIMI]",
+                "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             },
             {
                 "weekday_value": "Tisdag",
                 "time_value": "21:00-22:00",
                 "access_code_validity_period": "20:45-22:05",
                 "series_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
+                "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+                "unit_name": "[TOIMIPISTEEN NIMI]",
+                "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             },
         ],
         **BASE_TEMPLATE_CONTEXT_SV,
@@ -263,10 +281,14 @@ def test_seasonal_booking_access_code_added__render__text():
 
         Door code: 123456
 
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         Day: Monday
         Time: 13:00-15:00
         Validity period of the door code: 11:00-15:00
 
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         Day: Tuesday
         Time: 21:00-22:00
         Validity period of the door code: 20:45-22:05
@@ -298,9 +320,13 @@ def test_seasonal_booking_access_code_added__render__html():
 
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
         Door code: 123456
+        **[VARAUSYKSIKÖN NIMI]**
+        [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         Day: Monday
         Time: 13:00-15:00
         Validity period of the door code: 11:00-15:00
+        **[VARAUSYKSIKÖN NIMI]**
+        [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         Day: Tuesday
         Time: 21:00-22:00
         Validity period of the door code: 20:45-22:05
