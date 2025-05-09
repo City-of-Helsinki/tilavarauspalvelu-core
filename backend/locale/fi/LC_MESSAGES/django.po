@@ -3924,14 +3924,6 @@ msgstr "kirjanpidon tiliöintitieto"
 msgid "payment accountings"
 msgstr "kirjanpidon tiliöintitiedot"
 
-#: tilavarauspalvelu/models/payment_accounting/model.py
-msgid ""
-"One of the following fields must be given: internal_order, profit_center, "
-"project"
-msgstr ""
-"Jokin seuraavista kentistä täytyy olla annettu: internal_order, "
-"profit_center, project"
-
 #: tilavarauspalvelu/models/payment_merchant/model.py
 msgid "payment merchant"
 msgstr "kauppias"

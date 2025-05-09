@@ -10,6 +10,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
     CreateOrUpdateAccountingParams,
     CreateProductParams,
     Product,
+    ProductInvoicingParams,
 )
 
 
@@ -72,6 +73,12 @@ def test_verkkokauppa__product_types__create_or_update_accounting_params__to_jso
         company_code="company-code",
         main_ledger_account="main-ledger-account",
         balance_profit_center="2983300",
+        product_invoicing=ProductInvoicingParams(
+            sales_org="2900",
+            sales_office="2911",
+            material="12345678",
+            order_type="ZTY1",
+        ),
     )
     json = params.to_json()
     expected = {
@@ -83,25 +90,36 @@ def test_verkkokauppa__product_types__create_or_update_accounting_params__to_jso
         "companyCode": params.company_code,
         "mainLedgerAccount": params.main_ledger_account,
         "balanceProfitCenter": "2983300",
+        "productInvoicing": {
+            "salesOrg": "2900",
+            "salesOffice": "2911",
+            "material": "12345678",
+            "orderType": "ZTY1",
+        },
     }
     assert json == expected
 
 
-def test_verkkokauppa__product_types__create_or_update_accounting_params__to_json__drops_null_fields():
+def test_verkkokauppa__product_types__create_or_update_accounting_params__to_json__drops_empty_fields():
     params = CreateOrUpdateAccountingParams(
         vat_code="vat-code",
-        internal_order=None,
-        profit_center=None,
-        project=None,
-        operation_area="operation-area",
+        internal_order="",
+        profit_center="",
+        project="",
+        operation_area="",
         company_code="company-code",
         main_ledger_account="main-ledger-account",
         balance_profit_center="2983300",
+        product_invoicing=ProductInvoicingParams(
+            sales_org="",
+            sales_office="",
+            material="",
+            order_type="",
+        ),
     )
     json = params.to_json()
     expected = {
         "vatCode": params.vat_code,
-        "operationArea": params.operation_area,
         "companyCode": params.company_code,
         "mainLedgerAccount": params.main_ledger_account,
         "balanceProfitCenter": "2983300",
