@@ -30,19 +30,19 @@ class OrderingParams(NamedTuple):
             "Ascending order": OrderingParams(
                 order_by="stateAsc",
                 expected=[
-                    {"node": {"message": "2", "state": "ACTIVE"}},
-                    {"node": {"message": "3", "state": "SCHEDULED"}},
-                    {"node": {"message": "1", "state": "DRAFT"}},
-                    {"node": {"message": "4", "state": "DRAFT"}},
+                    {"node": {"messageFi": "2", "state": "ACTIVE"}},
+                    {"node": {"messageFi": "3", "state": "SCHEDULED"}},
+                    {"node": {"messageFi": "1", "state": "DRAFT"}},
+                    {"node": {"messageFi": "4", "state": "DRAFT"}},
                 ],
             ),
             "Descending order": OrderingParams(
                 order_by="stateDesc",
                 expected=[
-                    {"node": {"message": "4", "state": "DRAFT"}},
-                    {"node": {"message": "1", "state": "DRAFT"}},
-                    {"node": {"message": "3", "state": "SCHEDULED"}},
-                    {"node": {"message": "2", "state": "ACTIVE"}},
+                    {"node": {"messageFi": "4", "state": "DRAFT"}},
+                    {"node": {"messageFi": "1", "state": "DRAFT"}},
+                    {"node": {"messageFi": "3", "state": "SCHEDULED"}},
+                    {"node": {"messageFi": "2", "state": "ACTIVE"}},
                 ],
             ),
         },
@@ -80,7 +80,7 @@ def test_sort_banner_notifications_by_state(graphql, order_by, expected):
           bannerNotifications(orderBy: {order_by}) {{
             edges {{
               node {{
-                message
+                messageFi
                 state
               }}
             }}
@@ -100,15 +100,15 @@ def test_sort_banner_notifications_by_state(graphql, order_by, expected):
             "Ascending order": OrderingParams(
                 order_by="nameAsc",
                 expected=[
-                    {"node": {"message": "2", "name": "bar"}},
-                    {"node": {"message": "1", "name": "foo"}},
+                    {"node": {"messageFi": "2", "name": "bar"}},
+                    {"node": {"messageFi": "1", "name": "foo"}},
                 ],
             ),
             "Descending order": OrderingParams(
                 order_by="nameDesc",
                 expected=[
-                    {"node": {"message": "1", "name": "foo"}},
-                    {"node": {"message": "2", "name": "bar"}},
+                    {"node": {"messageFi": "1", "name": "foo"}},
+                    {"node": {"messageFi": "2", "name": "bar"}},
                 ],
             ),
         },
@@ -139,7 +139,7 @@ def test_sort_banner_notifications_by_name(graphql, order_by, expected):
           bannerNotifications(orderBy: {order_by}) {{
             edges {{
               node {{
-                message
+                messageFi
                 name
               }}
             }}
@@ -159,17 +159,17 @@ def test_sort_banner_notifications_by_name(graphql, order_by, expected):
             "Ascending order": OrderingParams(
                 order_by="startsAsc",
                 expected=[
-                    {"node": {"message": "2", "activeFrom": "2023-01-30T00:00:00+00:00"}},
-                    {"node": {"message": "1", "activeFrom": "2023-01-31T00:00:00+00:00"}},
-                    {"node": {"message": "3", "activeFrom": None}},
+                    {"node": {"messageFi": "2", "activeFrom": "2023-01-30T00:00:00+00:00"}},
+                    {"node": {"messageFi": "1", "activeFrom": "2023-01-31T00:00:00+00:00"}},
+                    {"node": {"messageFi": "3", "activeFrom": None}},
                 ],
             ),
             "Descending order": OrderingParams(
                 order_by="startsDesc",
                 expected=[
-                    {"node": {"message": "3", "activeFrom": None}},
-                    {"node": {"message": "1", "activeFrom": "2023-01-31T00:00:00+00:00"}},
-                    {"node": {"message": "2", "activeFrom": "2023-01-30T00:00:00+00:00"}},
+                    {"node": {"messageFi": "3", "activeFrom": None}},
+                    {"node": {"messageFi": "1", "activeFrom": "2023-01-31T00:00:00+00:00"}},
+                    {"node": {"messageFi": "2", "activeFrom": "2023-01-30T00:00:00+00:00"}},
                 ],
             ),
         },
@@ -207,7 +207,7 @@ def test_sort_banner_notifications_by_start_date(graphql, order_by, expected):
           bannerNotifications(orderBy: {order_by}) {{
             edges {{
               node {{
-                message
+                messageFi
                 activeFrom
               }}
             }}
@@ -227,17 +227,17 @@ def test_sort_banner_notifications_by_start_date(graphql, order_by, expected):
             "Ascending order": OrderingParams(
                 order_by="endsAsc",
                 expected=[
-                    {"node": {"message": "1", "activeUntil": "2023-02-02T00:00:00+00:00"}},
-                    {"node": {"message": "2", "activeUntil": "2023-02-03T00:00:00+00:00"}},
-                    {"node": {"message": "3", "activeUntil": None}},
+                    {"node": {"messageFi": "1", "activeUntil": "2023-02-02T00:00:00+00:00"}},
+                    {"node": {"messageFi": "2", "activeUntil": "2023-02-03T00:00:00+00:00"}},
+                    {"node": {"messageFi": "3", "activeUntil": None}},
                 ],
             ),
             "Descending order": OrderingParams(
                 order_by="endsDesc",
                 expected=[
-                    {"node": {"message": "3", "activeUntil": None}},
-                    {"node": {"message": "2", "activeUntil": "2023-02-03T00:00:00+00:00"}},
-                    {"node": {"message": "1", "activeUntil": "2023-02-02T00:00:00+00:00"}},
+                    {"node": {"messageFi": "3", "activeUntil": None}},
+                    {"node": {"messageFi": "2", "activeUntil": "2023-02-03T00:00:00+00:00"}},
+                    {"node": {"messageFi": "1", "activeUntil": "2023-02-02T00:00:00+00:00"}},
                 ],
             ),
         },
@@ -275,7 +275,7 @@ def test_sort_banner_notifications_by_end_date(graphql, order_by, expected):
           bannerNotifications(orderBy: {order_by}) {{
             edges {{
               node {{
-                message
+                messageFi
                 activeUntil
               }}
             }}
@@ -295,17 +295,17 @@ def test_sort_banner_notifications_by_end_date(graphql, order_by, expected):
             "Ascending order": OrderingParams(
                 order_by="targetAsc",
                 expected=[
-                    {"node": {"message": "1", "target": "ALL"}},
-                    {"node": {"message": "2", "target": "USER"}},
-                    {"node": {"message": "3", "target": "STAFF"}},
+                    {"node": {"messageFi": "1", "target": "ALL"}},
+                    {"node": {"messageFi": "2", "target": "USER"}},
+                    {"node": {"messageFi": "3", "target": "STAFF"}},
                 ],
             ),
             "Descending order": OrderingParams(
                 order_by="targetDesc",
                 expected=[
-                    {"node": {"message": "3", "target": "STAFF"}},
-                    {"node": {"message": "2", "target": "USER"}},
-                    {"node": {"message": "1", "target": "ALL"}},
+                    {"node": {"messageFi": "3", "target": "STAFF"}},
+                    {"node": {"messageFi": "2", "target": "USER"}},
+                    {"node": {"messageFi": "1", "target": "ALL"}},
                 ],
             ),
         },
@@ -338,7 +338,7 @@ def test_sort_banner_notifications_by_target(graphql, order_by, expected):
           bannerNotifications(orderBy: {order_by}) {{
             edges {{
               node {{
-                message
+                messageFi
                 target
               }}
             }}
@@ -358,17 +358,17 @@ def test_sort_banner_notifications_by_target(graphql, order_by, expected):
             "Ascending order": OrderingParams(
                 order_by="levelAsc",
                 expected=[
-                    {"node": {"message": "3", "level": "EXCEPTION"}},
-                    {"node": {"message": "2", "level": "WARNING"}},
-                    {"node": {"message": "1", "level": "NORMAL"}},
+                    {"node": {"messageFi": "3", "level": "EXCEPTION"}},
+                    {"node": {"messageFi": "2", "level": "WARNING"}},
+                    {"node": {"messageFi": "1", "level": "NORMAL"}},
                 ],
             ),
             "Descending order": OrderingParams(
                 order_by="levelDesc",
                 expected=[
-                    {"node": {"message": "1", "level": "NORMAL"}},
-                    {"node": {"message": "2", "level": "WARNING"}},
-                    {"node": {"message": "3", "level": "EXCEPTION"}},
+                    {"node": {"messageFi": "1", "level": "NORMAL"}},
+                    {"node": {"messageFi": "2", "level": "WARNING"}},
+                    {"node": {"messageFi": "3", "level": "EXCEPTION"}},
                 ],
             ),
         },
@@ -401,7 +401,7 @@ def test_sort_banner_notifications_by_level(graphql, order_by, expected):
           bannerNotifications(orderBy: {order_by}) {{
             edges {{
               node {{
-                message
+                messageFi
                 level
               }}
             }}
