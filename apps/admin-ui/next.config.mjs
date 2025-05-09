@@ -64,13 +64,10 @@ const config = {
 };
 
 export default withSentryConfig(config, {
-  // For all available options, see:
-  // https://github.com/getsentry/sentry-webpack-plugin#options
   org: "city-of-helsinki",
   project: "tilavarauspalvelu-admin-ui",
-  // only upload source maps to production sentry
-  sentryUrl: env.SENTRY_ENABLE_SOURCE_MAPS ? "https://sentry.hel.fi/" : "",
-  authToken: env.SENTRY_ENABLE_SOURCE_MAPS ? env.SENTRY_AUTH_TOKEN : "",
+  sentryUrl: "",
+  authToken: "",
   silent: !process.env.CI,
   // Hides source maps from generated client bundles
   hideSourceMaps: true,
