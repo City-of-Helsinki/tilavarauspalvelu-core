@@ -23,16 +23,10 @@ import { useReservationUnitList } from "@/hooks";
 import { useSearchParams } from "next/navigation";
 import { LoginFragment } from "../LoginFragment";
 import { getPostLoginUrl } from "@/modules/util";
+import { isBrowser } from "@/modules/const";
 
-const BackgroundContainer = styled.div`
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  z-index: var(--tilavaraus-stack-order-start-application-bar);
-
-  background-color: var(--color-bus);
-  color: var(--color-white);
+const SpaceWrapper = styled.div`
+  height: 76px;
 `;
 
 const InnerContainer = styled(Flex).attrs({
@@ -40,10 +34,17 @@ const InnerContainer = styled(Flex).attrs({
   $alignItems: "center",
   $wrap: "wrap",
 })`
-  ${pageSideMargins}
   margin: 0 auto;
   padding-bottom: var(--spacing-s);
   padding-top: var(--spacing-s);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: var(--tilavaraus-stack-order-start-application-bar);
+  background-color: var(--color-bus);
+  color: var(--color-white);
+  ${pageSideMargins}
 
   /* three div layout */
   & > :last-child {
@@ -71,7 +72,14 @@ export function StartApplicationBar({
   const { t } = useTranslation();
   const router = useRouter();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
-
+  let bottomOffset = 0;
+  if (isBrowser) {
+    bottomOffset =
+      (document
+        ?.querySelector(".hds-cc__target")
+        ?.shadowRoot?.querySelector(".hds-cc__container")?.clientHeight ?? -8) +
+      8; // CC-border width is 8px, which isn't included in clientHeight. If it's undefined, use -8 to nullify the result
+  }
   const { getReservationUnits, clearSelections, PARAM_NAME } =
     useReservationUnitList(applicationRound);
   const searchValues = useSearchParams();
@@ -117,9 +125,9 @@ export function StartApplicationBar({
   const count = getReservationUnits().length;
 
   return (
-    <BackgroundContainer>
+    <SpaceWrapper aria-live="polite">
       {count > 0 && (
-        <InnerContainer>
+        <InnerContainer style={{ bottom: bottomOffset + "px" }}>
           <NoWrap id="reservationUnitCount">
             {isMobile
               ? t("shoppingCart:countShort", { count })
@@ -157,6 +165,6 @@ export function StartApplicationBar({
           />
         </InnerContainer>
       )}
-    </BackgroundContainer>
+    </SpaceWrapper>
   );
 }

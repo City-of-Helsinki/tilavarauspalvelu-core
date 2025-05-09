@@ -44,6 +44,7 @@ import { getApplicationRoundName } from "@/modules/applicationRound";
 import { gql } from "@apollo/client";
 import { convertLanguageCode } from "common/src/common/util";
 import { useSearchModify } from "@/hooks/useSearchValues";
+import { createPortal } from "react-dom";
 
 type SeasonalSearchProps = ReadonlyDeep<
   Pick<NarrowedProps, "applicationRound" | "options" | "apiBaseUrl">
@@ -131,10 +132,13 @@ function SeasonalSearch({
         fetchMore={(cursor) => fetchMore(cursor)}
         sortingComponent={<SortingComponent />}
       />
-      <StartApplicationBar
-        applicationRound={applicationRound}
-        apiBaseUrl={apiBaseUrl}
-      />
+      {createPortal(
+        <StartApplicationBar
+          applicationRound={applicationRound}
+          apiBaseUrl={apiBaseUrl}
+        />,
+        document.body
+      )}
     </>
   );
 }
