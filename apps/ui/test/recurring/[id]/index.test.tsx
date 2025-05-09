@@ -3,7 +3,7 @@ import { render } from "@testing-library/react";
 import {
   createMockApplicationRound,
   CreateGraphQLMockProps,
-  createGraphQLMocks,
+  createApplicationSearchGraphQLMocks,
 } from "@/test/test.gql.utils";
 import { MockedProvider } from "@apollo/client/testing";
 import SeasonalSearch from "@/pages/recurring/[id]";
@@ -52,7 +52,7 @@ vi.mock("next/router", () => ({
 function customRender(
   props: CreateGraphQLMockProps = {}
 ): ReturnType<typeof render> {
-  const mocks = createGraphQLMocks(props);
+  const mocks = createApplicationSearchGraphQLMocks(props);
   const round = createApplicationRoundMock();
   const options = {
     unitOptions: [],
