@@ -7373,6 +7373,28 @@ export type ApplicationRoundCriteriaQuery = {
   } | null;
 };
 
+export type ApplicationRoundAdminFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly status: ApplicationRoundStatusChoice;
+  readonly applicationPeriodBegin: string;
+  readonly applicationPeriodEnd: string;
+  readonly applicationsCount: number;
+  readonly isSettingHandledAllowed: boolean;
+  readonly reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice;
+  readonly reservationUnits: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly unit: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+    } | null;
+  }>;
+};
+
 export type ApplicationRoundQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -7999,28 +8021,6 @@ export type RejectedOccurancesTableElementFragment = {
       readonly pk: number | null;
     }>;
   };
-};
-
-export type ApplicationRoundAdminFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly status: ApplicationRoundStatusChoice;
-  readonly applicationPeriodBegin: string;
-  readonly applicationPeriodEnd: string;
-  readonly applicationsCount: number;
-  readonly isSettingHandledAllowed: boolean;
-  readonly reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice;
-  readonly reservationUnits: ReadonlyArray<{
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly unit: {
-      readonly id: string;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-    } | null;
-  }>;
 };
 
 export type EndAllocationMutationVariables = Exact<{
@@ -10527,6 +10527,29 @@ export const ReservationUnitEditUnitFragmentDoc = gql`
   }
   ${UnitSubpageHeadFragmentDoc}
 `;
+export const ApplicationRoundAdminFragmentDoc = gql`
+  fragment ApplicationRoundAdmin on ApplicationRoundNode {
+    id
+    pk
+    nameFi
+    status
+    applicationPeriodBegin
+    applicationPeriodEnd
+    applicationsCount
+    isSettingHandledAllowed
+    reservationCreationStatus
+    reservationUnits {
+      id
+      pk
+      nameFi
+      unit {
+        id
+        pk
+        nameFi
+      }
+    }
+  }
+`;
 export const ApplicationNameFragmentDoc = gql`
   fragment ApplicationName on ApplicationNode {
     id
@@ -10765,29 +10788,6 @@ export const RejectedOccurancesTableElementFragmentDoc = gql`
     }
   }
   ${ApplicantNameFieldsFragmentDoc}
-`;
-export const ApplicationRoundAdminFragmentDoc = gql`
-  fragment ApplicationRoundAdmin on ApplicationRoundNode {
-    id
-    pk
-    nameFi
-    status
-    applicationPeriodBegin
-    applicationPeriodEnd
-    applicationsCount
-    isSettingHandledAllowed
-    reservationCreationStatus
-    reservationUnits {
-      id
-      pk
-      nameFi
-      unit {
-        id
-        pk
-        nameFi
-      }
-    }
-  }
 `;
 export const ApplicationRoundCardFragmentDoc = gql`
   fragment ApplicationRoundCard on ApplicationRoundNode {
