@@ -72,8 +72,8 @@ def test_reservation__query__all_fields(graphql):
         bufferTimeAfter
         bufferTimeBefore
         cancelDetails
-        cancelReason { reason }
-        denyReason { reason }
+        cancelReason { reasonFi }
+        denyReason { reasonFi }
         description
         end
         extUuid

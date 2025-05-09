@@ -119,7 +119,7 @@ def test_user_permissions_on_banner_notifications(graphql, target, user_type, ex
           bannerNotifications (isVisible: true){
             edges {
               node {
-                message
+                messageFi
               }
             }
           }
@@ -224,7 +224,7 @@ def test_user_permissions_on_banner_notifications_with_target_filter(graphql, ta
           bannerNotifications (isVisible: true, target: {target}){{
             edges {{
               node {{
-                message
+                messageFi
               }}
             }}
           }}
@@ -264,9 +264,9 @@ def test_user_permissions_on_banner_notifications_with_target_filter(graphql, ta
             "Notification manager should see notification meant for users & staff & all": UserTypeParams(
                 user_type=UserType.NOTIFICATION_MANAGER,
                 expected=[
-                    {"node": {"message": "1", "target": "ALL"}},
-                    {"node": {"message": "2", "target": "USER"}},
-                    {"node": {"message": "3", "target": "STAFF"}},
+                    {"node": {"messageFi": "1", "target": "ALL"}},
+                    {"node": {"messageFi": "2", "target": "USER"}},
+                    {"node": {"messageFi": "3", "target": "STAFF"}},
                 ],
             ),
         },
@@ -298,7 +298,7 @@ def test_user_permissions_on_banner_notifications_without_target_filter(graphql,
           bannerNotifications (isVisible: true, orderBy: pkAsc) {
             edges {
               node {
-                message
+                messageFi
                 target
               }
             }
@@ -419,7 +419,7 @@ def test_permissions_on_non_visible_banner_notifications(graphql, user_type, exp
           bannerNotifications (isVisible: false){
             edges {
               node {
-                message
+                messageFi
               }
             }
           }
@@ -470,7 +470,7 @@ def test_permission_on_both_non_visible_and_visible_banner_notifications(graphql
           bannerNotifications {
             edges {
               node {
-                message
+                messageFi
               }
             }
           }
