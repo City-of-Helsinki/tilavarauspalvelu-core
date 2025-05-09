@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from copy import deepcopy
 from inspect import isfunction
 from typing import TYPE_CHECKING
 
@@ -64,12 +65,12 @@ def test_frontend_queries__admin_ui__AllApplicationEvents(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now()
     application_round = ApplicationRoundFactory.create_in_status_in_allocation(reservation_units=[reservation_unit])
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     factory_args["application__application_round"] = application_round
     factory_args["reservation_unit_options__reservation_unit"] = reservation_unit
     obj: ApplicationSection = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["applicationRound"] = application_round.pk
     variables["applicationStatus"] = [obj.application.status.value]
     variables["unit"] = [reservation_unit.unit.pk]
@@ -97,7 +98,7 @@ def test_frontend_queries__admin_ui__AllocatedTimeSlots(graphql):
 
     section_key = "reservation_unit_option__application_section"
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     factory_args[f"{section_key}__application__application_round"] = application_round
     factory_args[f"{section_key}__reservation_min_duration"] = datetime.timedelta(minutes=30)
     factory_args[f"{section_key}__reservation_max_duration"] = datetime.timedelta(minutes=60)
@@ -105,7 +106,7 @@ def test_frontend_queries__admin_ui__AllocatedTimeSlots(graphql):
     factory_args["end_time"] = local_time(hour=12, minute=0)
     query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["applicationRound"] = application_round.pk
     assert_no_undefined_variables(variables)
 
@@ -127,7 +128,7 @@ def test_frontend_queries__admin_ui__ApplicationAdmin(graphql):
 
     arts_key = "application_sections__reservation_unit_options__reservation_unit__application_round_time_slots"
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     factory_args[f"{arts_key}__closed"] = False
     factory_args["application_sections__applied_reservations_per_week"] = 1
     factory_args["application_sections__reservation_min_duration"] = datetime.timedelta(minutes=30)
@@ -136,7 +137,7 @@ def test_frontend_queries__admin_ui__ApplicationAdmin(graphql):
     factory_args["application_sections__suitable_time_ranges__end_time"] = local_time(10, 0)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -155,10 +156,10 @@ def test_frontend_queries__admin_ui__ApplicationDateOfBirth(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -177,10 +178,10 @@ def test_frontend_queries__admin_ui__ApplicationRoundList(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -198,10 +199,10 @@ def test_frontend_queries__admin_ui__ApplicationRoundCriteria(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -220,10 +221,10 @@ def test_frontend_queries__admin_ui__ApplicationRound(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -242,10 +243,10 @@ def test_frontend_queries__admin_ui__ApplicationRoundFilter(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -267,7 +268,7 @@ def test_frontend_queries__admin_ui__ApplicationSectionAllocations(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now()
     application_round = ApplicationRoundFactory.create_in_status_open(reservation_units=[reservation_unit])
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     factory_args["applied_reservations_per_week"] = 1
     factory_args["reservation_min_duration"] = datetime.timedelta(minutes=30)
     factory_args["reservation_max_duration"] = datetime.timedelta(minutes=60)
@@ -277,7 +278,7 @@ def test_frontend_queries__admin_ui__ApplicationSectionAllocations(graphql):
     factory_args["reservation_unit_options__reservation_unit"] = reservation_unit
     obj: ApplicationSection = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["applicationRound"] = application_round.pk
     variables["applicationStatus"] = [obj.application.status.value]
     variables["reservationUnit"] = reservation_unit.pk
@@ -304,14 +305,14 @@ def test_frontend_queries__admin_ui__ApplicationSections(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now()
     application_round = ApplicationRoundFactory.create_in_status_open(reservation_units=[reservation_unit])
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     factory_args["applied_reservations_per_week"] = 1
     factory_args["reservation_min_duration"] = datetime.timedelta(minutes=30)
     factory_args["reservation_max_duration"] = datetime.timedelta(minutes=60)
     factory_args["application__application_round"] = application_round
     obj: ApplicationSection = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["applicationRound"] = application_round.pk
     variables["applicationStatus"] = [obj.application.status.value]
     assert_no_undefined_variables(variables)
@@ -335,14 +336,14 @@ def test_frontend_queries__admin_ui__Applications(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now()
     application_round = ApplicationRoundFactory.create_in_status_open(reservation_units=[reservation_unit])
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     factory_args["application_sections__applied_reservations_per_week"] = 1
     factory_args["application_sections__reservation_min_duration"] = datetime.timedelta(minutes=30)
     factory_args["application_sections__reservation_max_duration"] = datetime.timedelta(minutes=60)
     factory_args["application_round"] = application_round
     obj: Application = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["applicationRound"] = application_round.pk
     variables["status"] = [obj.status.value]
     assert_no_undefined_variables(variables)
@@ -363,10 +364,10 @@ def test_frontend_queries__admin_ui__BannerNotificationPage(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -385,10 +386,10 @@ def test_frontend_queries__admin_ui__BannerNotificationList(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -409,7 +410,7 @@ def test_frontend_queries__admin_ui__BannerNotificationsList(graphql):
 
     now = local_datetime()
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     factory_args["message"] = "foo"
     factory_args["message_en"] = "foo"
     factory_args["message_fi"] = "foo"
@@ -419,7 +420,7 @@ def test_frontend_queries__admin_ui__BannerNotificationsList(graphql):
     factory_args["active_until"] = now + datetime.timedelta(days=1)
     obj: BannerNotification = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["target"] = obj.target
     assert_no_undefined_variables(variables)
 
@@ -441,7 +442,7 @@ def test_frontend_queries__admin_ui__BannerNotificationsListAll(graphql):
 
     now = local_datetime()
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     factory_args["message"] = "foo"
     factory_args["message_en"] = "foo"
     factory_args["message_fi"] = "foo"
@@ -452,7 +453,7 @@ def test_frontend_queries__admin_ui__BannerNotificationsListAll(graphql):
     factory_args["target"] = BannerNotificationTarget.ALL
     query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -471,7 +472,7 @@ def test_frontend_queries__admin_ui__CheckPermissions(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["permission"] = UserPermissionChoice.CAN_VIEW_APPLICATIONS.value
     assert_no_undefined_variables(variables)
 
@@ -490,10 +491,10 @@ def test_frontend_queries__admin_ui__CurrentUser(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj: User = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -515,12 +516,12 @@ def test_frontend_queries__admin_ui__HandlingData(graphql):
     begin = next_hour()
     end = begin + datetime.timedelta(hours=1)
 
-    factory_args_1 = query_info_1.factory_args
+    factory_args_1 = deepcopy(query_info_1.factory_args)
     factory_args_1["begin"] = begin
     factory_args_1["end"] = end
     obj: Reservation = query_info_1.factory.create(**factory_args_1)
 
-    factory_args_2 = query_info_2.factory_args
+    factory_args_2 = deepcopy(query_info_2.factory_args)
     query_info_2.factory.create(**factory_args_2)
 
     variables = query_info_1.variables
@@ -546,13 +547,13 @@ def test_frontend_queries__admin_ui__Options(graphql):
     query_info_2 = factories[1]
     query_info_3 = factories[2]
 
-    factory_args_1 = query_info_1.factory_args
+    factory_args_1 = deepcopy(query_info_1.factory_args)
     query_info_1.factory.create(**factory_args_1)
 
-    factory_args_2 = query_info_2.factory_args
+    factory_args_2 = deepcopy(query_info_2.factory_args)
     query_info_2.factory.create(**factory_args_2)
 
-    factory_args_3 = query_info_3.factory_args
+    factory_args_3 = deepcopy(query_info_3.factory_args)
     query_info_3.factory.create(**factory_args_3)
 
     variables = query_info_1.variables
@@ -573,10 +574,10 @@ def test_frontend_queries__admin_ui__RecurringReservation(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -595,10 +596,10 @@ def test_frontend_queries__admin_ui__RecurringReservationUnit(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -617,10 +618,10 @@ def test_frontend_queries__admin_ui__RejectedOccurrences(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -639,10 +640,10 @@ def test_frontend_queries__admin_ui__ReservationPage(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -661,10 +662,10 @@ def test_frontend_queries__admin_ui__ReservationEditPage(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -683,10 +684,10 @@ def test_frontend_queries__admin_ui__ReservationApplicationLink(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -705,10 +706,10 @@ def test_frontend_queries__admin_ui__ReservationDateOfBirth(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -727,10 +728,10 @@ def test_frontend_queries__admin_ui__ReservationDenyReasons(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -749,10 +750,10 @@ def test_frontend_queries__admin_ui__ReservationPermissions(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -771,10 +772,10 @@ def test_frontend_queries__admin_ui__ReservationSeries(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -793,10 +794,10 @@ def test_frontend_queries__admin_ui__ReservationUnit(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -816,10 +817,10 @@ def test_frontend_queries__admin_ui__ReservationUnitCalendar(graphql):
     query_info_1 = factories[0]
     query_info_2 = factories[1]
 
-    factory_args_1 = query_info_1.factory_args
+    factory_args_1 = deepcopy(query_info_1.factory_args)
     obj: ReservationUnit = query_info_1.factory.create(**factory_args_1)
 
-    factory_args_2 = query_info_2.factory_args
+    factory_args_2 = deepcopy(query_info_2.factory_args)
     factory_args_2["reservation_units"] = [obj]
     query_info_2.factory.create(**factory_args_2)
 
@@ -843,10 +844,10 @@ def test_frontend_queries__admin_ui__ReservationUnitEdit(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -865,7 +866,7 @@ def test_frontend_queries__admin_ui__ReservationUnitEditorParameters(graphql):
     assert len(factories) == 8
 
     for query_info in factories:
-        factory_args = query_info.factory_args
+        factory_args = deepcopy(query_info.factory_args)
         query_info.factory.create(**factory_args)
 
     variables = factories[0].variables
@@ -886,10 +887,10 @@ def test_frontend_queries__admin_ui__ReservationUnitTypesFilter(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -909,10 +910,10 @@ def test_frontend_queries__admin_ui__ReservationUnitsByUnit(graphql):
     query_info_1 = factories[0]
     query_info_2 = factories[1]
 
-    factory_args_1 = query_info_1.factory_args
+    factory_args_1 = deepcopy(query_info_1.factory_args)
     obj: Unit = query_info_1.factory.create(**factory_args_1)
 
-    factory_args_2 = query_info_2.factory_args
+    factory_args_2 = deepcopy(query_info_2.factory_args)
     factory_args_2["reservation_units__unit"] = obj
     query_info_2.factory.create(**factory_args_2)
 
@@ -936,10 +937,10 @@ def test_frontend_queries__admin_ui__ReservationUnitsFilterParams(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -957,10 +958,10 @@ def test_frontend_queries__admin_ui__ReservationList(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -979,10 +980,10 @@ def test_frontend_queries__admin_ui__ReservationsByReservationUnit(graphql):
     query_info_1 = factories[0]
     query_info_2 = factories[1]
 
-    factory_args_1 = query_info_1.factory_args
+    factory_args_1 = deepcopy(query_info_1.factory_args)
     obj: ReservationUnit = query_info_1.factory.create(**factory_args_1)
 
-    factory_args_2 = query_info_2.factory_args
+    factory_args_2 = deepcopy(query_info_2.factory_args)
     factory_args_2["reservation_units"] = [obj]
     query_info_2.factory.create(**factory_args_2)
 
@@ -1007,10 +1008,10 @@ def test_frontend_queries__admin_ui__Resource(graphql):
     query_info_1 = factories[0]
     query_info_2 = factories[1]
 
-    factory_args_1 = query_info_1.factory_args
+    factory_args_1 = deepcopy(query_info_1.factory_args)
     resource: Resource = query_info_1.factory.create(**factory_args_1)
 
-    factory_args_2 = query_info_2.factory_args
+    factory_args_2 = deepcopy(query_info_2.factory_args)
     unit: Unit = query_info_2.factory.create(**factory_args_2)
 
     variables = query_info_1.variables
@@ -1033,10 +1034,10 @@ def test_frontend_queries__admin_ui__SearchReservationUnits(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -1055,10 +1056,10 @@ def test_frontend_queries__admin_ui__SeriesPage(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -1077,10 +1078,10 @@ def test_frontend_queries__admin_ui__Space(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -1099,10 +1100,10 @@ def test_frontend_queries__admin_ui__TermsOfUse(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -1120,10 +1121,10 @@ def test_frontend_queries__admin_ui__UnitPage(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -1142,10 +1143,10 @@ def test_frontend_queries__admin_ui__UnitSpaces(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -1164,10 +1165,10 @@ def test_frontend_queries__admin_ui__UnitView(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -1186,10 +1187,10 @@ def test_frontend_queries__admin_ui__SpacesResources(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     obj = query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
@@ -1208,10 +1209,10 @@ def test_frontend_queries__admin_ui__UnitList(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -1230,10 +1231,10 @@ def test_frontend_queries__admin_ui__UnitsFilter(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    factory_args = query_info.factory_args
+    factory_args = deepcopy(query_info.factory_args)
     query_info.factory.create(**factory_args)
 
-    variables = query_info.variables
+    variables = deepcopy(query_info.variables)
     assert_no_undefined_variables(variables)
 
     query = query_info.query
