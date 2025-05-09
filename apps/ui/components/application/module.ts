@@ -43,9 +43,9 @@ export function aesToCells(
 
   const cells: Cell[][] = [];
 
-  for (let j = 0; j < 7; j += 1) {
-    const day: Cell[] = [];
-    const openingHoursForADay = getOpeningHours(j, openingHours);
+  for (let day = 0; day < 7; day += 1) {
+    const cell: Cell[] = [];
+    const openingHoursForADay = getOpeningHours(day, openingHours);
     const dayOpeningHours = filterNonNullable(openingHoursForADay).map((t) => ({
       begin: t && +(t.begin.split(":")[0] ?? ""),
       end:
@@ -58,14 +58,14 @@ export function aesToCells(
       const isAvailable = dayOpeningHours.some(
         (t) => t.begin != null && t.end != null && t?.begin <= i && t?.end > i
       );
-      day.push({
-        key: `${i}-${j}`,
+      cell.push({
+        key: `${day}-${i}`,
         hour: i,
         label: cellLabel(i),
         state: isAvailable ? 100 : 50,
       });
     }
-    cells.push(day);
+    cells.push(cell);
   }
 
   for (const aes of schedule) {

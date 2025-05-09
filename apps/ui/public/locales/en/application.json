@@ -82,10 +82,9 @@
     },
     "legend": {
       "unavailable": "Not available",
-      "selected-1": "Preferred time slots",
-      "selected-2": "Other request",
-      "within-opening-hours": "Reservable",
-      "outside-opening-hours": "Not for seasonal bookings"
+      "primary": "Preferred time slots",
+      "secondary": "Other request",
+      "open": "Reservable"
     },
     "primarySchedules": "Preferred time slots",
     "secondarySchedules": "Other time slots",
