@@ -130,7 +130,7 @@ class ApplicationQuerySet(models.QuerySet):
         self.filter(
             L(status__in=[ApplicationStatusChoice.EXPIRED, ApplicationStatusChoice.CANCELLED])
             & L(application_round__status=ApplicationRoundStatusChoice.RESULTS_SENT)
-            & models.Q(application_round__application_period_end__lte=cutoff_date)
+            & models.Q(application_round__application_period_end__date__lte=cutoff_date)
         ).delete()
 
 

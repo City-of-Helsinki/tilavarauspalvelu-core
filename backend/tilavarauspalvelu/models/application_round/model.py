@@ -94,6 +94,42 @@ class ApplicationRound(models.Model):
         verbose_name = _("application round")
         verbose_name_plural = _("application rounds")
         ordering = ["pk"]
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(application_period_begin__lt=models.F("application_period_end")),
+                name="application_period_begin_before_end",
+                violation_error_message="Application period must begin before it ends",
+            ),
+            models.CheckConstraint(
+                check=models.Q(reservation_period_begin__lt=models.F("reservation_period_end")),
+                name="reservation_period_begin_before_end",
+                violation_error_message="Reservation period must begin before it ends",
+            ),
+            models.CheckConstraint(
+                check=models.Q(public_display_begin__lt=models.F("public_display_end")),
+                name="public_display_begin_before_end",
+                violation_error_message="Public display period must begin before it ends",
+            ),
+            models.CheckConstraint(
+                check=models.Q(application_period_end__date__lt=models.F("reservation_period_begin")),
+                name="applications_end_before_reservation_period_begins",
+                violation_error_message="Application period must end before reservation period begins",
+            ),
+            models.CheckConstraint(
+                check=(
+                    models.Q(handled_date__isnull=True, sent_date__isnull=True)
+                    | models.Q(handled_date__isnull=False, sent_date__isnull=True)
+                    | models.Q(handled_date__lte=models.F("sent_date"))
+                ),
+                name="must_handle_before_sending",
+                violation_error_message="Application round must be handled before it can be sent",
+            ),
+            models.CheckConstraint(
+                check=models.Q(handled_date=None) | models.Q(application_period_end__date__lt=models.F("handled_date")),
+                name="handling_after_application_period_end",
+                violation_error_message="Application round can only be handled after its application round has ended",
+            ),
+        ]
 
     def __str__(self) -> str:
         return f"{self.name} ({self.reservation_period_begin} - {self.reservation_period_end})"
