@@ -77,8 +77,8 @@
     "prioritySelectLabel": "Type of booking request",
     "reservationUnitSelectLabel": "Available seasonal booking times for",
     "priorityLabels": {
-      "300": "Select preferred time slots",
-      "200": "Select other time slots"
+      "primary": "Select preferred time slots",
+      "secondary": "Select other time slots"
     },
     "legend": {
       "unavailable": "Not available",

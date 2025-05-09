@@ -77,8 +77,8 @@
     "prioritySelectLabel": "Typ av tidsönskemål",
     "reservationUnitSelectLabel": "Visa säsongbokningstider för lokalen",
     "priorityLabels": {
-      "300": "Välj prioriterade tidsönskemål",
-      "200": "Välj alternativa tidsönskemål"
+      "primary": "Välj prioriterade tidsönskemål",
+      "secondary": "Välj alternativa tidsönskemål"
     },
     "legend": {
       "unavailable": "Kan inte bokas",

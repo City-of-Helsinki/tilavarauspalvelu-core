@@ -78,8 +78,8 @@
     "prioritySelectLabel": "Aikatoiveen tyyppi",
     "reservationUnitSelectLabel": "Näytä kausivarattavat ajankohdat tilalle",
     "priorityLabels": {
-      "300": "Valitse ensisijaiset aikatoiveet",
-      "200": "Valitse muut aikatoiveet"
+      "primary": "Valitse ensisijaiset aikatoiveet",
+      "secondary": "Valitse muut aikatoiveet"
     },
     "legend": {
       "unavailable": "Ei varattavissa",
