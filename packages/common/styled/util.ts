@@ -8,8 +8,8 @@ export const NoWrap = styled.span`
 
 interface AutoGridProps {
   $minWidth?: string;
-  $largeGap?: boolean;
   $alignCenter?: boolean;
+  $gap?: SpacingSize;
 }
 
 export const AutoGrid = styled.div<AutoGridProps>`
@@ -23,8 +23,7 @@ export const AutoGrid = styled.div<AutoGridProps>`
     )
   );
   align-items: ${({ $alignCenter }) => ($alignCenter ? "center" : "baseline")};
-  gap: ${({ $largeGap }) =>
-      $largeGap ? " var(--spacing-xl)" : "var(--spacing-m)"}
+  gap: ${({ $gap }) => ($gap ? `var(--spacing-${$gap})` : "var(--spacing-m)")}
     var(--spacing-m);
 
   & > :not(img):empty {

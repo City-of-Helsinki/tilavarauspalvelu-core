@@ -26,7 +26,9 @@ import { getApplicationPath } from "@/modules/urls";
 import { useDisplayError } from "common/src/hooks";
 import { gql } from "@apollo/client";
 
-function Page2({ application }: PropsNarrowed): JSX.Element {
+function Page2({
+  application,
+}: Pick<PropsNarrowed, "application">): JSX.Element {
   const router = useRouter();
   const [mutate] = useUpdateApplicationMutation();
   const dislayError = useDisplayError();

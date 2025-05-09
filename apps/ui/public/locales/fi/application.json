@@ -78,20 +78,19 @@
     "prioritySelectLabel": "Aikatoiveen tyyppi",
     "reservationUnitSelectLabel": "Näytä kausivarattavat ajankohdat tilalle",
     "priorityLabels": {
-      "300": "Valitse ensisijaiset aikatoiveet",
-      "200": "Valitse muut aikatoiveet"
+      "primary": "Valitse ensisijaiset aikatoiveet",
+      "secondary": "Valitse muut aikatoiveet"
     },
     "legend": {
       "unavailable": "Ei varattavissa",
-      "selected-1": "Ensisijainen toive",
-      "selected-2": "Muu toive",
-      "within-opening-hours": "Varattavissa",
-      "outside-opening-hours": "Ei merkitty kausivarattavaksi"
+      "primary": "Ensisijainen toive",
+      "secondary": "Muu toive",
+      "open": "Varattavissa"
     },
     "primarySchedules": "Ensisijaiset aikatoiveet",
     "secondarySchedules": "Muut aikatoiveet",
     "notification": {
-      "copyCells": "Ajat kopioitu onnistuneesti kaikille varaustoiveille"
+      "copyCells": "Ajat kopioitu kaikille varaustoiveille"
     }
   },
   "Page3": {
