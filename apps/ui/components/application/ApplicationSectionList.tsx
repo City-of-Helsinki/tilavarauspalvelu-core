@@ -33,8 +33,8 @@ import {
   IconQuestionCircleFill,
   Tooltip,
 } from "hds-react";
-import { getDayTimes } from "./module";
 import { NoWrap } from "common/styled";
+import { getDayTimes } from "@/modules/util";
 
 function formatDurationSeconds(seconds: number, t: TFunction): string {
   const hours = Math.floor(seconds / 3600);

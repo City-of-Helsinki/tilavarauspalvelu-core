@@ -331,3 +331,17 @@ export function formatListToCSV(
     ` ${t("common:and")} ${lastItem}`
   );
 }
+
+/// @description Converts time struct to string
+/// @param hour - hour in 24h format
+/// @param minute - minute in 24h format
+/// @return string in format HH:MM
+export function formatTimeStruct({
+  hour,
+  minute,
+}: {
+  hour: number;
+  minute: number;
+}): string {
+  return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+}
