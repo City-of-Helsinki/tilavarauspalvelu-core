@@ -10,7 +10,7 @@ from graphql import OperationType
 from graphql_relay import to_global_id
 
 from tilavarauspalvelu.enums import BannerNotificationTarget
-from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnitHierarchy
+from tilavarauspalvelu.models import ReservationUnitHierarchy
 from utils.date_utils import local_date, local_datetime, local_time, next_hour
 
 from tests.factories import ReservationFactory, ReservationUnitFactory
@@ -67,6 +67,40 @@ def test_frontend_queries__customer_ui__AccessCode(graphql):
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
+
+
+def test_frontend_queries__customer_ui__AffectingReservations(graphql):
+    customer_factories = get_customer_query_info()
+    factories = customer_factories["AffectingReservations"]
+
+    assert len(factories) == 1
+    query_info = factories[0]
+
+    reservation_unit = ReservationUnitFactory.create_reservable_now()
+
+    factory_args = query_info.factory_args
+    factory_args["reservation_units"] = [reservation_unit]
+    factory_args["begin"] = local_datetime(2024, 1, 1, 12, 0)
+    factory_args["end"] = local_datetime(2024, 1, 1, 15, 0)
+    query_info.factory.create(**factory_args)
+
+    ReservationUnitHierarchy.refresh()
+
+    variables = query_info.variables
+    variables["pk"] = reservation_unit.pk
+    variables["beginDate"] = local_date(2024, 1, 1).isoformat()
+    variables["endDate"] = local_date(2024, 1, 2).isoformat()
+    assert_no_undefined_variables(variables)
+
+    query = query_info.query
+    graphql.login_with_superuser()
+
+    response = graphql(query, variables=variables)
+
+    assert response.has_errors is False, response.errors
+
+    assert isinstance(response.first_query_object, list)
+    assert len(response.first_query_object) != 0
 
 
 def test_frontend_queries__customer_ui__ApplicationPage1(graphql):
@@ -534,42 +568,6 @@ def test_frontend_queries__customer_ui__BannerNotificationsListAll(graphql):
     assert len(response.edges) == 1
 
 
-def test_frontend_queries__customer_ui__BlockingReservations(graphql):
-    customer_factories = get_customer_query_info()
-    factories = customer_factories["BlockingReservations"]
-
-    assert len(factories) == 1
-    query_info = factories[0]
-
-    begin = next_hour()
-    end = begin + datetime.timedelta(hours=1)
-
-    reservation_unit = ReservationUnitFactory.create_reservable_now()
-
-    factory_args = query_info.factory_args
-    factory_args["begin"] = begin
-    factory_args["end"] = end
-    factory_args["reservation_units"] = [reservation_unit]
-    obj = query_info.factory.create(**factory_args)
-
-    ReservationUnitHierarchy.refresh()
-    AffectingTimeSpan.refresh()
-
-    variables = query_info.variables
-    variables["pk"] = reservation_unit.pk
-    variables["beginDate"] = obj.begin.date().isoformat()
-    variables["endDate"] = obj.end.date().isoformat()
-    assert_no_undefined_variables(variables)
-
-    query = query_info.query
-    graphql.login_with_superuser()
-
-    response = graphql(query, variables=variables)
-
-    assert response.has_errors is False, response.errors
-    assert len(response.data) == 1
-
-
 def test_frontend_queries__customer_ui__CurrentUser(graphql):
     customer_factories = get_customer_query_info()
     factories = customer_factories["CurrentUser"]
@@ -860,6 +858,28 @@ def test_frontend_queries__customer_ui__ReservationPage(graphql):
     assert response.has_errors is False, response.errors
 
 
+def test_frontend_queries__customer_ui__ReservationQuotaReached(graphql):
+    customer_factories = get_customer_query_info()
+    factories = customer_factories["ReservationQuotaReached"]
+
+    assert len(factories) == 1
+    query_info = factories[0]
+
+    factory_args = query_info.factory_args
+    obj = query_info.factory.create(**factory_args)
+
+    variables = query_info.variables
+    variables["id"] = to_global_id(query_info.typename, obj.id)
+    assert_no_undefined_variables(variables)
+
+    query = query_info.query
+    graphql.login_with_superuser()
+
+    response = graphql(query, variables=variables)
+
+    assert response.has_errors is False, response.errors
+
+
 def test_frontend_queries__customer_ui__ReservationState(graphql):
     customer_factories = get_customer_query_info()
     factories = customer_factories["ReservationState"]
@@ -886,7 +906,7 @@ def test_frontend_queries__customer_ui__ReservationUnitPage(graphql):
     customer_factories = get_customer_query_info()
     factories = customer_factories["ReservationUnitPage"]
 
-    assert len(factories) == 2  # also 'affectingReservations', not really tested here
+    assert len(factories) == 1
     query_info = factories[0]
 
     factory_args = query_info.factory_args

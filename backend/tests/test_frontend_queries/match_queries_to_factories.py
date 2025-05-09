@@ -371,11 +371,11 @@ def determine_value_for_field(field: ModelField) -> Any:  # noqa: PLR0911, PLR09
         case models.BooleanField():
             return False
 
-        case models.DateField():
-            return local_date()
-
         case models.DateTimeField():
             return local_datetime()
+
+        case models.DateField():
+            return local_date()
 
         case models.TimeField():
             return local_time()
