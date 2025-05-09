@@ -274,7 +274,7 @@ function RecurringReservationForm({
   return (
     <FormProvider {...form}>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <AutoGrid $largeGap>
+        <AutoGrid $gap="xl">
           <Element $start>
             {/* TODO trigger end date validation when start date changes */}
             <ControlledDateInput
