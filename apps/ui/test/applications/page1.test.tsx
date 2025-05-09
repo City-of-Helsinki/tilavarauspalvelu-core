@@ -129,7 +129,10 @@ describe("Page1", () => {
       view.getByRole("link", { name: "breadcrumb:applications" })
     ).toBeInTheDocument();
     expect(view.getByText("breadcrumb:application")).toBeInTheDocument();
-    // TODO check notes when applying
+    expect(
+      view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })
+    ).toBeInTheDocument();
+    expect(view.getByText("Notes when applying FI")).toBeInTheDocument();
   });
 
   // special case requiring custom mocks
