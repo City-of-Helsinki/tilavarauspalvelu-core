@@ -545,6 +545,12 @@ export const ReservationUnitEditSchema = z
       }
     }
 
+    if (!v.isDraft || v.pricings.length) {
+      for (let i = 0; i < v.pricings.length; i++) {
+        refinePricing(v.pricings[i], ctx, `pricings.${i}`);
+      }
+    }
+
     if (v.isDraft) {
       return;
     }
@@ -702,12 +708,6 @@ export const ReservationUnitEditSchema = z
           path: ["maxPersons"],
         });
       }
-    }
-
-    // refine pricing only if not draft and the pricing is enabled
-    for (let i = 0; i < v.pricings.length; i++) {
-      const p = v.pricings[i];
-      refinePricing(p, ctx, `pricings.${i}`);
     }
 
     // TODO if it includes futurePricing check that the futurePrice date is in the future (is today ok?)
