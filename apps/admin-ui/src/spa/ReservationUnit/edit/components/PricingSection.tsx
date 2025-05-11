@@ -1,8 +1,5 @@
 import { Controller, UseFormReturn } from "react-hook-form";
-import {
-  PaymentTypes,
-  ReservationUnitEditFormValues,
-} from "@/spa/ReservationUnit/edit/form";
+import { ReservationUnitEditFormValues } from "@/spa/ReservationUnit/edit/form";
 import { EditAccordion } from "@/spa/ReservationUnit/edit/components/styled";
 import { AutoGrid } from "common/styled";
 import { ControlledCheckbox } from "common/src/components/form/ControlledCheckbox";
@@ -15,7 +12,7 @@ import { getTranslatedError } from "@/common/util";
 import React from "react";
 import { FieldGroup } from "@/spa/ReservationUnit/edit/components/FieldGroup";
 import styled from "styled-components";
-import { PriceUnit } from "@gql/gql-types";
+import { PaymentType, PriceUnit } from "@gql/gql-types";
 import { addDays } from "date-fns";
 import { IconAlertCircleFill, RadioButton } from "hds-react";
 import { useTranslation } from "react-i18next";
@@ -69,13 +66,13 @@ function PaidPricingPart({
   const { errors } = formState;
 
   const unitPriceOptions = Object.values(PriceUnit).map((choice) => ({
-    value: choice,
     label: t(`priceUnit.${choice}`),
+    value: choice,
   }));
 
-  const paymentTypeOptions = PaymentTypes.map((value: string) => ({
-    label: t(`paymentType.${value}`),
-    value,
+  const paymentTypeOptions = Object.values(PaymentType).map((choice) => ({
+    label: t(`paymentType.${choice}`),
+    value: choice,
   }));
 
   const pricing = watch(`pricings.${index}`);
@@ -207,14 +204,16 @@ function PaidPricingPart({
       />
       <ControlledSelect
         // This is not pricing type specific
-        name="paymentTypes"
+        name={`pricings.${index}.paymentType`}
         control={control}
-        multiselect
         required
         options={paymentTypeOptions}
         label={t("ReservationUnitEditor.label.paymentTypes")}
         tooltip={t("ReservationUnitEditor.tooltip.paymentTypes")}
-        error={getTranslatedError(t, errors.paymentTypes?.message)}
+        error={getTranslatedError(
+          t,
+          errors.pricings?.[index]?.paymentType?.message
+        )}
       />
     </>
   );
@@ -339,7 +338,7 @@ export function PricingSection({
 
   const pricings = watch("pricings");
   const isPaid = pricings.filter((p) => p.isPaid).length > 0;
-  const hasErrors = errors.pricings != null || errors.paymentTypes != null;
+  const hasErrors = errors.pricings != null;
 
   return (
     <EditAccordion
