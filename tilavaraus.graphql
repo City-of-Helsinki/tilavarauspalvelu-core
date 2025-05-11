@@ -4529,6 +4529,7 @@ type ReservationUnitPricingNode implements Node {
   id: ID!
   lowestPrice: Decimal!
   lowestPriceNet: Decimal!
+  paymentType: PaymentType
   pk: Int
   priceUnit: PriceUnit!
   taxPercentage: TaxPercentageNode!
@@ -4541,6 +4542,7 @@ input ReservationUnitPricingSerializerInput {
   isActivatedOnBegins: Boolean
   lowestPrice: Decimal
   lowestPriceNet: String
+  paymentType: PaymentType
   pk: Int
   priceUnit: PriceUnit
   taxPercentage: Int
@@ -5768,6 +5770,7 @@ input UpdateReservationUnitPricingSerializerInput {
   isActivatedOnBegins: Boolean
   lowestPrice: Decimal
   lowestPriceNet: String
+  paymentType: PaymentType
   pk: Int
   priceUnit: PriceUnit
   taxPercentage: Int

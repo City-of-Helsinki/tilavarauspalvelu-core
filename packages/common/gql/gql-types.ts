@@ -4409,6 +4409,7 @@ export type ReservationUnitPricingNode = Node & {
   readonly id: Scalars["ID"]["output"];
   readonly lowestPrice: Scalars["Decimal"]["output"];
   readonly lowestPriceNet: Scalars["Decimal"]["output"];
+  readonly paymentType: Maybe<PaymentType>;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly priceUnit: PriceUnit;
   readonly taxPercentage: TaxPercentageNode;
@@ -4421,6 +4422,7 @@ export type ReservationUnitPricingSerializerInput = {
   readonly isActivatedOnBegins?: InputMaybe<Scalars["Boolean"]["input"]>;
   readonly lowestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   readonly lowestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly paymentType?: InputMaybe<PaymentType>;
   readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
   readonly priceUnit?: InputMaybe<PriceUnit>;
   readonly taxPercentage?: InputMaybe<Scalars["Int"]["input"]>;
@@ -5571,6 +5573,7 @@ export type UpdateReservationUnitPricingSerializerInput = {
   readonly isActivatedOnBegins?: InputMaybe<Scalars["Boolean"]["input"]>;
   readonly lowestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   readonly lowestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly paymentType?: InputMaybe<PaymentType>;
   readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
   readonly priceUnit?: InputMaybe<PriceUnit>;
   readonly taxPercentage?: InputMaybe<Scalars["Int"]["input"]>;
@@ -5919,6 +5922,7 @@ export type PricingFieldsFragment = {
   readonly id: string;
   readonly begins: string;
   readonly priceUnit: PriceUnit;
+  readonly paymentType: PaymentType | null;
   readonly lowestPrice: string;
   readonly highestPrice: string;
   readonly taxPercentage: {
@@ -6178,6 +6182,7 @@ export const PricingFieldsFragmentDoc = gql`
     id
     begins
     priceUnit
+    paymentType
     lowestPrice
     highestPrice
     taxPercentage {

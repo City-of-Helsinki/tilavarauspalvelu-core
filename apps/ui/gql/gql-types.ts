@@ -4409,6 +4409,7 @@ export type ReservationUnitPricingNode = Node & {
   readonly id: Scalars["ID"]["output"];
   readonly lowestPrice: Scalars["Decimal"]["output"];
   readonly lowestPriceNet: Scalars["Decimal"]["output"];
+  readonly paymentType: Maybe<PaymentType>;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly priceUnit: PriceUnit;
   readonly taxPercentage: TaxPercentageNode;
@@ -4421,6 +4422,7 @@ export type ReservationUnitPricingSerializerInput = {
   readonly isActivatedOnBegins?: InputMaybe<Scalars["Boolean"]["input"]>;
   readonly lowestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   readonly lowestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly paymentType?: InputMaybe<PaymentType>;
   readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
   readonly priceUnit?: InputMaybe<PriceUnit>;
   readonly taxPercentage?: InputMaybe<Scalars["Int"]["input"]>;
@@ -5571,6 +5573,7 @@ export type UpdateReservationUnitPricingSerializerInput = {
   readonly isActivatedOnBegins?: InputMaybe<Scalars["Boolean"]["input"]>;
   readonly lowestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   readonly lowestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly paymentType?: InputMaybe<PaymentType>;
   readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
   readonly priceUnit?: InputMaybe<PriceUnit>;
   readonly taxPercentage?: InputMaybe<Scalars["Int"]["input"]>;
@@ -6360,6 +6363,7 @@ export type ReservationUnitHeadFragment = {
     readonly id: string;
     readonly begins: string;
     readonly priceUnit: PriceUnit;
+    readonly paymentType: PaymentType | null;
     readonly lowestPrice: string;
     readonly highestPrice: string;
     readonly taxPercentage: {
@@ -6409,6 +6413,7 @@ export type RelatedUnitCardFieldsFragment = {
     readonly id: string;
     readonly begins: string;
     readonly priceUnit: PriceUnit;
+    readonly paymentType: PaymentType | null;
     readonly lowestPrice: string;
     readonly highestPrice: string;
     readonly taxPercentage: {
@@ -6482,6 +6487,7 @@ export type EditPageReservationUnitFragment = {
     readonly id: string;
     readonly begins: string;
     readonly priceUnit: PriceUnit;
+    readonly paymentType: PaymentType | null;
     readonly lowestPrice: string;
     readonly highestPrice: string;
     readonly taxPercentage: {
@@ -6609,6 +6615,7 @@ export type EditPageReservationFragment = {
       readonly id: string;
       readonly begins: string;
       readonly priceUnit: PriceUnit;
+      readonly paymentType: PaymentType | null;
       readonly lowestPrice: string;
       readonly highestPrice: string;
       readonly taxPercentage: {
@@ -6747,6 +6754,7 @@ export type ReservationCardFragment = {
       readonly id: string;
       readonly begins: string;
       readonly priceUnit: PriceUnit;
+      readonly paymentType: PaymentType | null;
       readonly lowestPrice: string;
       readonly highestPrice: string;
       readonly taxPercentage: {
@@ -6803,6 +6811,7 @@ export type ReservationInfoCardFragment = {
       readonly id: string;
       readonly begins: string;
       readonly priceUnit: PriceUnit;
+      readonly paymentType: PaymentType | null;
       readonly lowestPrice: string;
       readonly highestPrice: string;
       readonly taxPercentage: {
@@ -6853,6 +6862,7 @@ export type ReservationTimePickerFieldsFragment = {
     readonly id: string;
     readonly begins: string;
     readonly priceUnit: PriceUnit;
+    readonly paymentType: PaymentType | null;
     readonly lowestPrice: string;
     readonly highestPrice: string;
     readonly taxPercentage: {
@@ -6880,6 +6890,7 @@ export type SingleSearchCardFragment = {
     readonly id: string;
     readonly begins: string;
     readonly priceUnit: PriceUnit;
+    readonly paymentType: PaymentType | null;
     readonly lowestPrice: string;
     readonly highestPrice: string;
     readonly taxPercentage: {
@@ -7335,6 +7346,7 @@ export type PriceReservationUnitFieldsFragment = {
     readonly id: string;
     readonly begins: string;
     readonly priceUnit: PriceUnit;
+    readonly paymentType: PaymentType | null;
     readonly lowestPrice: string;
     readonly highestPrice: string;
     readonly taxPercentage: {
@@ -7360,6 +7372,7 @@ export type ReservationPriceFieldsFragment = {
       readonly id: string;
       readonly begins: string;
       readonly priceUnit: PriceUnit;
+      readonly paymentType: PaymentType | null;
       readonly lowestPrice: string;
       readonly highestPrice: string;
       readonly taxPercentage: {
@@ -7684,6 +7697,7 @@ export type PricingFieldsFragment = {
   readonly id: string;
   readonly begins: string;
   readonly priceUnit: PriceUnit;
+  readonly paymentType: PaymentType | null;
   readonly lowestPrice: string;
   readonly highestPrice: string;
   readonly taxPercentage: {
@@ -8997,6 +9011,7 @@ export type ReservationQuery = {
         readonly id: string;
         readonly begins: string;
         readonly priceUnit: PriceUnit;
+        readonly paymentType: PaymentType | null;
         readonly lowestPrice: string;
         readonly highestPrice: string;
         readonly taxPercentage: {
@@ -9180,6 +9195,7 @@ export type ReservationUnitPageQuery = {
       readonly id: string;
       readonly begins: string;
       readonly priceUnit: PriceUnit;
+      readonly paymentType: PaymentType | null;
       readonly lowestPrice: string;
       readonly highestPrice: string;
       readonly taxPercentage: {
@@ -9282,6 +9298,7 @@ export type RelatedReservationUnitsQuery = {
           readonly id: string;
           readonly begins: string;
           readonly priceUnit: PriceUnit;
+          readonly paymentType: PaymentType | null;
           readonly lowestPrice: string;
           readonly highestPrice: string;
           readonly taxPercentage: {
@@ -9369,6 +9386,7 @@ export type ReservationCancelPageQuery = {
         readonly id: string;
         readonly begins: string;
         readonly priceUnit: PriceUnit;
+        readonly paymentType: PaymentType | null;
         readonly lowestPrice: string;
         readonly highestPrice: string;
         readonly taxPercentage: {
@@ -9505,6 +9523,7 @@ export type ReservationConfirmationPageQuery = {
         readonly id: string;
         readonly begins: string;
         readonly priceUnit: PriceUnit;
+        readonly paymentType: PaymentType | null;
         readonly lowestPrice: string;
         readonly highestPrice: string;
         readonly taxPercentage: {
@@ -9608,6 +9627,7 @@ export type ReservationEditPageQuery = {
         readonly id: string;
         readonly begins: string;
         readonly priceUnit: PriceUnit;
+        readonly paymentType: PaymentType | null;
         readonly lowestPrice: string;
         readonly highestPrice: string;
         readonly taxPercentage: {
@@ -9876,6 +9896,7 @@ export type ReservationPageQuery = {
         readonly id: string;
         readonly begins: string;
         readonly priceUnit: PriceUnit;
+        readonly paymentType: PaymentType | null;
         readonly lowestPrice: string;
         readonly highestPrice: string;
         readonly taxPercentage: {
@@ -9967,6 +9988,7 @@ export type ListReservationsQuery = {
             readonly id: string;
             readonly begins: string;
             readonly priceUnit: PriceUnit;
+            readonly paymentType: PaymentType | null;
             readonly lowestPrice: string;
             readonly highestPrice: string;
             readonly taxPercentage: {
@@ -10060,6 +10082,7 @@ export type SearchReservationUnitsQuery = {
           readonly id: string;
           readonly begins: string;
           readonly priceUnit: PriceUnit;
+          readonly paymentType: PaymentType | null;
           readonly lowestPrice: string;
           readonly highestPrice: string;
           readonly taxPercentage: {
@@ -10647,6 +10670,7 @@ export const PricingFieldsFragmentDoc = gql`
     id
     begins
     priceUnit
+    paymentType
     lowestPrice
     highestPrice
     taxPercentage {
