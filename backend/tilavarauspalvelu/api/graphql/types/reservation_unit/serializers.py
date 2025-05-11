@@ -243,7 +243,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
             highest_price = pricing.get("highest_price")
             lowest_price = pricing.get("lowest_price")
 
-            if lowest_price is None and highest_price is None:  # = Free
+            if not lowest_price and not highest_price:  # = Free
                 continue
             if lowest_price is None or highest_price is None:
                 msg = "Both lowest and highest price must be given or neither."
