@@ -39,6 +39,7 @@
     "graphql": "^16.10.0",
     "hds-core": "^4.4.0",
     "hds-react": "^4.4.0",
+    "i18n-iso-countries": "^7.14.0",
     "i18next": "^23.15.1",
     "lodash-es": "^4.17.21",
     "next": "15.2.4",
