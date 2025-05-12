@@ -87,7 +87,9 @@ function Page3Form(): JSX.Element | null {
   }
 }
 
-function Page3({ application }: PropsNarrowed): JSX.Element {
+function Page3({
+  application,
+}: Pick<PropsNarrowed, "application">): JSX.Element {
   const router = useRouter();
 
   const form = useForm<ApplicationPage3FormValues>({
@@ -131,7 +133,12 @@ function Page3({ application }: PropsNarrowed): JSX.Element {
         translationKeyPrefix="application:Page3"
         application={application}
       >
-        <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)}>
+        <Flex
+          as="form"
+          noValidate
+          onSubmit={handleSubmit(onSubmit)}
+          data-testid="application__page3--form"
+        >
           <ApplicantTypeSelector />
           <AutoGrid>
             <FormSubHeading as="h2">
