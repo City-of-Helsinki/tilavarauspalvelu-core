@@ -24,6 +24,7 @@ export function ReservationOrderStatus({
         return "success";
       case OrderStatus.Draft:
       case OrderStatus.PaidManually:
+      case OrderStatus.PaidByInvoice:
         return "alert";
       case OrderStatus.Expired:
         return "error";

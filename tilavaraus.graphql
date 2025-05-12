@@ -1610,6 +1610,7 @@ enum OrderStatusWithFree {
   EXPIRED
   FREE
   PAID
+  PAID_BY_INVOICE
   PAID_MANUALLY
   REFUNDED
 }

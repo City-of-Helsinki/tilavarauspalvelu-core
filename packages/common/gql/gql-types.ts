@@ -1615,6 +1615,7 @@ export enum OrderStatusWithFree {
   Expired = "EXPIRED",
   Free = "FREE",
   Paid = "PAID",
+  PaidByInvoice = "PAID_BY_INVOICE",
   PaidManually = "PAID_MANUALLY",
   Refunded = "REFUNDED",
 }

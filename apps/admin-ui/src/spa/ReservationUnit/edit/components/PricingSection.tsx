@@ -1,5 +1,5 @@
 import { Controller, UseFormReturn } from "react-hook-form";
-import { ReservationUnitEditFormValues } from "@/spa/ReservationUnit/edit/form";
+import type { ReservationUnitEditFormValues } from "@/spa/ReservationUnit/edit/form";
 import { EditAccordion } from "@/spa/ReservationUnit/edit/components/styled";
 import { AutoGrid } from "common/styled";
 import { ControlledCheckbox } from "common/src/components/form/ControlledCheckbox";

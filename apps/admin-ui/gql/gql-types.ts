@@ -1615,6 +1615,7 @@ export enum OrderStatusWithFree {
   Expired = "EXPIRED",
   Free = "FREE",
   Paid = "PAID",
+  PaidByInvoice = "PAID_BY_INVOICE",
   PaidManually = "PAID_MANUALLY",
   Refunded = "REFUNDED",
 }
@@ -6241,6 +6242,7 @@ export type ApplicationDateOfBirthQuery = {
 export type DenyDialogFieldsFragment = {
   readonly id: string;
   readonly pk: number | null;
+  readonly begin: string;
   readonly handlingDetails: string | null;
   readonly price: string | null;
   readonly paymentOrder: ReadonlyArray<{
@@ -11025,6 +11027,7 @@ export const DenyDialogFieldsFragmentDoc = gql`
   fragment DenyDialogFields on ReservationNode {
     id
     pk
+    begin
     handlingDetails
     price
     paymentOrder {

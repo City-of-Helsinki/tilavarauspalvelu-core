@@ -103,7 +103,8 @@
     "paidManually": "Maksu paikan päällä",
     "cancelled": "Maksu Peruttu",
     "expired": "Maksamatta",
-    "refunded": "Maksu palautettu"
+    "refunded": "Maksu palautettu",
+    "paidByInvoice": "Maksu laskulla"
   },
   "reservationEditFailed": "Varauksen muokkaaminen epäonnistui",
   "backToReservationUnit": "Palaa kohteen sivulle",
