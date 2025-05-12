@@ -32,6 +32,7 @@ function getStatusLabelType(s?: Maybe<OrderStatus>): StatusLabelType {
       return "success";
     case OrderStatus.Expired:
       return "error";
+    case OrderStatus.PaidByInvoice:
     case OrderStatus.PaidManually:
     case OrderStatus.Draft:
       return "alert";

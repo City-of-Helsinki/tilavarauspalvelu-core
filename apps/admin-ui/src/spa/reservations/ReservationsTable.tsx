@@ -79,6 +79,7 @@ const getPaymentStatusLabelType = (
     case OrderStatus.Expired:
       return "error";
     case OrderStatus.PaidManually:
+    case OrderStatus.PaidByInvoice:
     case OrderStatus.Draft:
       return "alert";
     case OrderStatus.Cancelled:
