@@ -6242,6 +6242,7 @@ export type ApplicationDateOfBirthQuery = {
 export type DenyDialogFieldsFragment = {
   readonly id: string;
   readonly pk: number | null;
+  readonly begin: string;
   readonly handlingDetails: string | null;
   readonly price: string | null;
   readonly paymentOrder: ReadonlyArray<{
@@ -11026,6 +11027,7 @@ export const DenyDialogFieldsFragmentDoc = gql`
   fragment DenyDialogFields on ReservationNode {
     id
     pk
+    begin
     handlingDetails
     price
     paymentOrder {
