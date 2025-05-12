@@ -9,7 +9,7 @@ from graphql import OperationType
 from graphql_relay import to_global_id
 
 from tilavarauspalvelu.enums import BannerNotificationTarget, UserPermissionChoice
-from utils.date_utils import local_datetime, local_time, next_hour
+from utils.date_utils import local_date, local_datetime, local_time, next_hour
 
 from tests.factories import ApplicationRoundFactory, ReservationUnitFactory
 
@@ -178,6 +178,12 @@ def test_frontend_queries__admin_ui__ApplicationRoundList(graphql):
     query_info = factories[0]
 
     factory_args = query_info.factory_args
+    factory_args["application_period_begin"] = local_datetime(2024, 1, 1)
+    factory_args["application_period_end"] = local_datetime(2024, 2, 1)
+    factory_args["reservation_period_begin"] = local_date(2024, 2, 2)
+    factory_args["reservation_period_end"] = local_date(2024, 3, 1)
+    factory_args["public_display_begin"] = local_datetime(2024, 1, 1)
+    factory_args["public_display_end"] = local_datetime(2024, 2, 2)
     query_info.factory.create(**factory_args)
 
     variables = query_info.variables
@@ -199,6 +205,12 @@ def test_frontend_queries__admin_ui__ApplicationRoundCriteria(graphql):
     query_info = factories[0]
 
     factory_args = query_info.factory_args
+    factory_args["application_period_begin"] = local_datetime(2024, 1, 1)
+    factory_args["application_period_end"] = local_datetime(2024, 2, 1)
+    factory_args["reservation_period_begin"] = local_date(2024, 2, 2)
+    factory_args["reservation_period_end"] = local_date(2024, 3, 1)
+    factory_args["public_display_begin"] = local_datetime(2024, 1, 1)
+    factory_args["public_display_end"] = local_datetime(2024, 2, 2)
     obj = query_info.factory.create(**factory_args)
 
     variables = query_info.variables
@@ -221,6 +233,12 @@ def test_frontend_queries__admin_ui__ApplicationRound(graphql):
     query_info = factories[0]
 
     factory_args = query_info.factory_args
+    factory_args["application_period_begin"] = local_datetime(2024, 1, 1)
+    factory_args["application_period_end"] = local_datetime(2024, 2, 1)
+    factory_args["reservation_period_begin"] = local_date(2024, 2, 2)
+    factory_args["reservation_period_end"] = local_date(2024, 3, 1)
+    factory_args["public_display_begin"] = local_datetime(2024, 1, 1)
+    factory_args["public_display_end"] = local_datetime(2024, 2, 2)
     obj = query_info.factory.create(**factory_args)
 
     variables = query_info.variables
@@ -243,6 +261,12 @@ def test_frontend_queries__admin_ui__ApplicationRoundFilter(graphql):
     query_info = factories[0]
 
     factory_args = query_info.factory_args
+    factory_args["application_period_begin"] = local_datetime(2024, 1, 1)
+    factory_args["application_period_end"] = local_datetime(2024, 2, 1)
+    factory_args["reservation_period_begin"] = local_date(2024, 2, 2)
+    factory_args["reservation_period_end"] = local_date(2024, 3, 1)
+    factory_args["public_display_begin"] = local_datetime(2024, 1, 1)
+    factory_args["public_display_end"] = local_datetime(2024, 2, 2)
     obj = query_info.factory.create(**factory_args)
 
     variables = query_info.variables
