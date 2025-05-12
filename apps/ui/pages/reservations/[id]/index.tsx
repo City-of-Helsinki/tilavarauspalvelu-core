@@ -371,7 +371,8 @@ function Reservation({
   const hasReceipt =
     order?.receiptUrl &&
     (order.status === OrderStatus.Paid ||
-      order.status === OrderStatus.Refunded);
+      order.status === OrderStatus.Refunded ||
+      order.status === OrderStatus.PaidByInvoice);
 
   return (
     <>
