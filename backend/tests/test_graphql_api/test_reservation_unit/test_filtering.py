@@ -829,7 +829,7 @@ def test_reservation_unit__filter__by_access_type(graphql):
     ReservationUnitFactory.create(name="opened by staff", access_types__access_type=AccessType.OPENED_BY_STAFF)
 
     query = reservation_units_query(
-        fields="name",
+        fields="nameFi",
         access_type=AccessType.PHYSICAL_KEY,
         access_type_begin_date=today.isoformat(),
         access_type_end_date=(today + datetime.timedelta(days=1)).isoformat(),
@@ -838,7 +838,7 @@ def test_reservation_unit__filter__by_access_type(graphql):
 
     assert response.has_errors is False
     assert len(response.edges) == 1
-    assert response.node(0) == {"name": reservation_unit.name}
+    assert response.node(0) == {"nameFi": reservation_unit.name_fi}
 
 
 def test_reservation_unit__filter__by_access_type__no_period(graphql):
@@ -860,10 +860,10 @@ def test_reservation_unit__filter__by_access_type__no_period(graphql):
     ReservationUnitFactory.create(name="keyless", access_types__access_type=AccessType.ACCESS_CODE)
     ReservationUnitFactory.create(name="opened by staff", access_types__access_type=AccessType.OPENED_BY_STAFF)
 
-    query = reservation_units_query(fields="name", access_type=AccessType.PHYSICAL_KEY)
+    query = reservation_units_query(fields="nameFi", access_type=AccessType.PHYSICAL_KEY)
     graphql.login_with_superuser()
     response = graphql(query)
 
     assert response.has_errors is False
     assert len(response.edges) == 1
-    assert response.node(0) == {"name": reservation_unit.name}
+    assert response.node(0) == {"nameFi": reservation_unit.name_fi}

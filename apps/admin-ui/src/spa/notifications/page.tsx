@@ -698,7 +698,6 @@ export const BANNER_NOTIFICATION_PAGE_QUERY = gql`
       pk
       level
       activeFrom
-      message
       messageEn
       messageFi
       messageSv

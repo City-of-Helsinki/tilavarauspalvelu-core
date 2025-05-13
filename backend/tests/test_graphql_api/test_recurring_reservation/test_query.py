@@ -106,7 +106,7 @@ def test_recurring_reservations__query__relations(graphql):
             maximum
         }
         abilityGroup {
-            name
+            nameFi
         }
         reservationUnit {
             nameFi
@@ -147,7 +147,7 @@ def test_recurring_reservations__query__relations(graphql):
             "maximum": recurring_reservation.age_group.maximum,
         },
         "abilityGroup": {
-            "name": recurring_reservation.ability_group.name,
+            "nameFi": recurring_reservation.ability_group.name_fi,
         },
         "reservationUnit": {
             "nameFi": recurring_reservation.reservation_unit.name_fi,
