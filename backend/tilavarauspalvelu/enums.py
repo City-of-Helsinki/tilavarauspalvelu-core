@@ -89,6 +89,7 @@ class Language(models.TextChoices):
 
 class OrderStatus(models.TextChoices):
     DRAFT = "DRAFT", pgettext_lazy("OrderStatus", "Draft")  # Unpaid order
+    PENDING = "PENDING", pgettext_lazy("OrderStatus", "Pending")  # Unpaid order after handling
     EXPIRED = "EXPIRED", pgettext_lazy("OrderStatus", "Expired")
     CANCELLED = "CANCELLED", pgettext_lazy("OrderStatus", "Cancelled")
     PAID = "PAID", pgettext_lazy("OrderStatus", "Paid")
@@ -100,6 +101,7 @@ class OrderStatus(models.TextChoices):
     def can_be_marked_paid_statuses(cls) -> list[OrderStatus]:
         return [
             OrderStatus.DRAFT,
+            OrderStatus.PENDING,
             OrderStatus.EXPIRED,
             OrderStatus.CANCELLED,
         ]
@@ -108,6 +110,7 @@ class OrderStatus(models.TextChoices):
     def can_be_cancelled_statuses(cls) -> list[OrderStatus]:
         return [
             OrderStatus.DRAFT,
+            OrderStatus.PENDING,
             OrderStatus.EXPIRED,
         ]
 
@@ -141,6 +144,7 @@ class OrderStatusWithFree(models.TextChoices):
 
     # Note: Enums cannot be subclassed, so we have to redefine all "original" members.
     DRAFT = "DRAFT", pgettext_lazy("OrderStatus", "Draft")
+    PENDING = "PENDING", pgettext_lazy("OrderStatus", "Pending")
     EXPIRED = "EXPIRED", pgettext_lazy("OrderStatus", "Expired")
     CANCELLED = "CANCELLED", pgettext_lazy("OrderStatus", "Cancelled")
     PAID = "PAID", pgettext_lazy("OrderStatus", "Paid")
