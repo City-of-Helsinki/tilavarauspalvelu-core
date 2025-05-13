@@ -2490,17 +2490,22 @@ msgstr "Palvelukohtaiset ehdot"
 #: tilavarauspalvelu/enums.py
 msgctxt "OrderStatus"
 msgid "Draft"
-msgstr "Luonnos"
+msgstr "Maksu kesken"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrderStatus"
+msgid "Pending"
+msgstr "Odottaa maksua"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "OrderStatus"
 msgid "Expired"
-msgstr "Rauennut"
+msgstr "Ei maksettu"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "OrderStatus"
 msgid "Cancelled"
-msgstr "Peruttu"
+msgstr "Peruutettu"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "OrderStatus"
@@ -2515,12 +2520,12 @@ msgstr "Maksettu laskulla"
 #: tilavarauspalvelu/enums.py
 msgctxt "OrderStatus"
 msgid "Paid manually"
-msgstr "Maksettu manuaalisesti"
+msgstr "Maksetaan paikan päällä"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "OrderStatus"
 msgid "Refunded"
-msgstr "Palautettu"
+msgstr "Maksu palautettu"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "OrderStatus"
