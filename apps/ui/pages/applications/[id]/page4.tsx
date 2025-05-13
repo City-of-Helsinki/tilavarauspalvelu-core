@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import {
-  ApplicationPagePreviewDocument,
-  type ApplicationPagePreviewQuery,
-  type ApplicationPagePreviewQueryVariables,
+  ApplicationPage4Document,
+  type ApplicationPage4Query,
+  type ApplicationPage4QueryVariables,
   useSendApplicationMutation,
 } from "@gql/gql-types";
 import type { GetServerSidePropsContext } from "next";
@@ -163,10 +163,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   }
 
   const { data } = await apolloClient.query<
-    ApplicationPagePreviewQuery,
-    ApplicationPagePreviewQueryVariables
+    ApplicationPage4Query,
+    ApplicationPage4QueryVariables
   >({
-    query: ApplicationPagePreviewDocument,
+    query: ApplicationPage4Document,
     variables: { id: base64encode(`ApplicationNode:${pk}`) },
   });
   const { application } = data;
@@ -188,7 +188,7 @@ export default Preview;
 
 // TODO narrow down the query fragment (if possible), need at least TermsOfUse and ApplicationForm
 export const APPLICATION_PREVIEW_QUERY = gql`
-  query ApplicationPagePreview($id: ID!) {
+  query ApplicationPage4($id: ID!) {
     application(id: $id) {
       ...ApplicationView
     }

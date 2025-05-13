@@ -1,4 +1,8 @@
-import { type ApplicationPage3Query } from "@/gql/gql-types";
+import {
+  ApplicationRoundStatusChoice,
+  TermsType,
+  type ApplicationPage4Query,
+} from "@/gql/gql-types";
 import Page3 from "@/pages/applications/[id]/page3";
 import { MockedProvider } from "@apollo/client/testing";
 import { render, within } from "@testing-library/react";
@@ -8,11 +12,11 @@ import {
   CreateMockApplicationFragmentProps,
   type CreateGraphQLMocksReturn,
   createGraphQLApplicationIdMock,
+  generateNameFragment,
 } from "@/test/test.gql.utils";
-import userEvent from "@testing-library/user-event";
-import { getApplicationPath } from "@/modules/urls";
+import { base64encode } from "common/src/helpers";
 
-const { mockedRouterPush, useRouter } = vi.hoisted(() => {
+const { useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
   const mockedRouterPush = vi.fn();
   const query = {
@@ -55,15 +59,69 @@ vi.mock("next/router", () => ({
 function createGraphQLMocks(): CreateGraphQLMocksReturn {
   return createGraphQLApplicationIdMock();
 }
-type ApplicationPage3 = NonNullable<ApplicationPage3Query["application"]>;
+type ApplicationPage4 = NonNullable<ApplicationPage4Query["application"]>;
 function customRender(
   props: CreateMockApplicationFragmentProps = {}
 ): ReturnType<typeof render> {
   // TODO need a graphql mutation mock (but have to have separate error / success cases)
   if (props.page == null) {
-    props.page = "page2";
+    props.page = "page3";
   }
-  const application: ApplicationPage3 = createMockApplicationFragment(props);
+  const applicationRoundMock = {
+    id: base64encode("ApplicationRoundNode:1"),
+    sentDate: "2023-10-01T00:00:00Z",
+    status: ApplicationRoundStatusChoice.Open,
+    notesWhenApplyingFi: null,
+    notesWhenApplyingEn: null,
+    notesWhenApplyingSv: null,
+    reservationPeriodBegin: "2023-10-01T00:00:00Z",
+    reservationPeriodEnd: "2023-10-01T00:00:00Z",
+    pk: 1,
+    ...generateNameFragment("ApplicationRound"),
+    termsOfUse: {
+      id: base64encode("TermsOfUseNode:1"),
+      pk: null,
+      termsType: TermsType.RecurringTerms,
+      // TODO
+      nameFi: null,
+      nameEn: null,
+      nameSv: null,
+      textFi: null,
+      textEn: null,
+      textSv: null,
+    },
+    reservationUnits: [] as const,
+    /* TODO
+      readonly reservationUnits: ReadonlyArray<{
+        readonly minPersons: number | null;
+        readonly maxPersons: number | null;
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+        readonly nameEn: string | null;
+        readonly nameSv: string | null;
+        readonly unit: {
+          readonly id: string;
+          readonly pk: number | null;
+          readonly nameFi: string | null;
+          readonly nameSv: string | null;
+          readonly nameEn: string | null;
+        } | null;
+        readonly images: ReadonlyArray<{
+          readonly id: string;
+          readonly imageUrl: string | null;
+          readonly largeUrl: string | null;
+          readonly mediumUrl: string | null;
+          readonly smallUrl: string | null;
+          readonly imageType: ImageType;
+        }>;
+      }>;
+      */
+  };
+  const application: ApplicationPage4 = {
+    ...createMockApplicationFragment(props),
+    applicationRound: applicationRoundMock,
+  };
   const mocks = createGraphQLMocks();
   return render(
     <MockedProvider mocks={mocks} addTypename={false}>
@@ -73,7 +131,7 @@ function customRender(
 }
 
 //
-describe("Application Page3", () => {
+describe("Application Page4", () => {
   test("smoke: should render page with initial data", async () => {
     // TODO all of this is common to all application funnel pages
     const view = customRender();
@@ -95,26 +153,4 @@ describe("Application Page3", () => {
     expect(within(form).getByText("application:Page3.subHeading.basicInfo"));
     // TODO check that we have a single application section with the pick times calendar
   });
-
-  test.todo("new application should not have type selected");
-  test.todo("can't submit without selecting type");
-  test.todo("type: individual form should render correctly");
-  test.todo("type: organisation form should render correctly");
-  test.todo("type: company form should render correctly");
-  test.todo("toggling billing address should show/hide the section");
-  test.todo("organisation should allow toggling VAT number");
-  test.todo("individual should not have VAT number");
-  test.todo("company should not allow toggling VAT number");
-
-  test("should send the form when clicking next", async () => {
-    const view = customRender({ page: "page3" });
-    const nextButton = await view.findByRole("button", {
-      name: "common:next",
-    });
-    await userEvent.click(nextButton);
-    expect(mockedRouterPush).toHaveBeenCalledWith(
-      getApplicationPath(1, "page4")
-    );
-  });
-  test.todo("should fail to send if form is invalid");
 });

@@ -9,12 +9,7 @@ import { isSent } from "@/modules/util";
 import { getApplicationPath } from "@/modules/urls";
 
 // Ordered list of steps by page slug
-export const PAGES_WITH_STEPPER = [
-  "page1",
-  "page2",
-  "page3",
-  "preview",
-] as const;
+export const PAGES_WITH_STEPPER = ["page1", "page2", "page3", "page4"] as const;
 
 function getStep(slug: string) {
   const index = PAGES_WITH_STEPPER.findIndex((x) => x === slug);
