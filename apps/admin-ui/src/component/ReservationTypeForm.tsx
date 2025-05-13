@@ -153,9 +153,11 @@ function ReservationTypeForm({
                 showAllLabel={t("MyUnits.ReservationForm.showReserver")}
                 maximumNumber={0}
               >
-                <ReserverMetadataSetForm reservationUnit={reservationUnit} />
-                <HR style={{ gridColumn: "1 / -1" }} />
-                <ShowTOS reservationUnit={reservationUnit} />
+                <>
+                  <ReserverMetadataSetForm reservationUnit={reservationUnit} />
+                  <HR style={{ gridColumn: "1 / -1" }} />
+                  <ShowTOS reservationUnit={reservationUnit} />
+                </>
               </StyledShowAllContainer>
             ) : (
               <>

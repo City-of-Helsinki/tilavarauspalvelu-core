@@ -7,7 +7,7 @@ import {
   useUnitOptions,
   useReservationUnitOptions,
 } from "@/hooks";
-import { AutoGrid, Flex } from "common/styled";
+import { Flex } from "common/styled";
 import {
   CheckboxFilter,
   DateRangeFilter,
@@ -145,7 +145,11 @@ export function Filters({
 
   return (
     <Flex>
-      <AutoGrid $minWidth="18rem">
+      <MoreWrapper
+        showAllLabel={t("ReservationUnitsSearch.moreFilters")}
+        showLessLabel={t("ReservationUnitsSearch.lessFilters")}
+        maximumNumber={4}
+      >
         <MultiSelectFilter
           options={reservationTypeOptions}
           name="reservationType"
@@ -156,32 +160,21 @@ export function Filters({
           name="reservationUnit"
         />
         <SearchFilter name="search" labelKey="searchReservation" />
-      </AutoGrid>
-      <MoreWrapper
-        showAllLabel={t("ReservationUnitsSearch.moreFilters")}
-        showLessLabel={t("ReservationUnitsSearch.lessFilters")}
-        maximumNumber={0}
-      >
-        <AutoGrid $minWidth="18rem">
-          <DateRangeFilter name="date" />
-          <MultiSelectFilter options={unitOptions} name="unit" />
-          <MultiSelectFilter
-            options={reservationUnitTypeOptions}
-            name="reservationUnitType"
-          />
-          <RangeNumberFilter
-            label={t("filters.label.price")}
-            minName="minPrice"
-            maxName="maxPrice"
-          />
-          <MultiSelectFilter
-            name="orderStatus"
-            options={paymentStatusOptions}
-          />
-          <DateRangeFilter name="createdAt" />
-          <SelectFilter name="recurring" options={recurringOptions} clearable />
-          <CheckboxFilter name="freeOfCharge" />
-        </AutoGrid>
+        <DateRangeFilter name="date" />
+        <MultiSelectFilter options={unitOptions} name="unit" />
+        <MultiSelectFilter
+          options={reservationUnitTypeOptions}
+          name="reservationUnitType"
+        />
+        <RangeNumberFilter
+          label={t("filters.label.price")}
+          minName="minPrice"
+          maxName="maxPrice"
+        />
+        <MultiSelectFilter name="orderStatus" options={paymentStatusOptions} />
+        <DateRangeFilter name="createdAt" />
+        <SelectFilter name="recurring" options={recurringOptions} clearable />
+        <CheckboxFilter name="freeOfCharge" />
       </MoreWrapper>
       <SearchTags
         translateTag={translateTag}
