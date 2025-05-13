@@ -1962,7 +1962,7 @@ export type Query = {
   readonly equipmentsAll: Maybe<ReadonlyArray<EquipmentAllNode>>;
   readonly metadataSets: Maybe<ReservationMetadataSetNodeConnection>;
   readonly order: Maybe<PaymentOrderNode>;
-  /** Get information about a user from Helsinki profile. If user is not a profile user, still return data stored in our database, e.g. first and last name. Use only one of 'reservation_id' or 'application_id' to select the user. This determines the required permissions to view the user's data. */
+  /** Get information about a user from Helsinki profile. If user is not a profile user, still return data stored in our database, e.g. first and last name. Use only one of 'reservation_pk' or 'application_pk' to select the user. This determines the required permissions to view the user's data. */
   readonly profileData: Maybe<HelsinkiProfileDataNode>;
   readonly purposes: Maybe<PurposeNodeConnection>;
   readonly qualifiers: Maybe<QualifierNodeConnection>;
@@ -2250,8 +2250,8 @@ export type QueryOrderArgs = {
 };
 
 export type QueryProfileDataArgs = {
-  applicationId?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationId?: InputMaybe<Scalars["Int"]["input"]>;
+  applicationPk?: InputMaybe<Scalars["Int"]["input"]>;
+  reservationPk?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type QueryPurposesArgs = {
@@ -9220,7 +9220,7 @@ export type ReservationDateOfBirthQuery = {
 };
 
 export type ReservationProfileDataContactInfoQueryVariables = Exact<{
-  reservationId: Scalars["Int"]["input"];
+  reservationPk: Scalars["Int"]["input"];
 }>;
 
 export type ReservationProfileDataContactInfoQuery = {
@@ -9241,7 +9241,7 @@ export type ReservationProfileDataContactInfoQuery = {
 };
 
 export type ReservationProfileDataSsnQueryVariables = Exact<{
-  reservationId: Scalars["Int"]["input"];
+  reservationPk: Scalars["Int"]["input"];
 }>;
 
 export type ReservationProfileDataSsnQuery = {
@@ -16930,8 +16930,8 @@ export type ReservationDateOfBirthQueryResult = Apollo.QueryResult<
   ReservationDateOfBirthQueryVariables
 >;
 export const ReservationProfileDataContactInfoDocument = gql`
-  query ReservationProfileDataContactInfo($reservationId: Int!) {
-    profileData(reservationId: $reservationId) {
+  query ReservationProfileDataContactInfo($reservationPk: Int!) {
+    profileData(reservationPk: $reservationPk) {
       pk
       firstName
       lastName
@@ -16960,7 +16960,7 @@ export const ReservationProfileDataContactInfoDocument = gql`
  * @example
  * const { data, loading, error } = useReservationProfileDataContactInfoQuery({
  *   variables: {
- *      reservationId: // value for 'reservationId'
+ *      reservationPk: // value for 'reservationPk'
  *   },
  * });
  */
@@ -17025,8 +17025,8 @@ export type ReservationProfileDataContactInfoQueryResult = Apollo.QueryResult<
   ReservationProfileDataContactInfoQueryVariables
 >;
 export const ReservationProfileDataSsnDocument = gql`
-  query ReservationProfileDataSSN($reservationId: Int!) {
-    profileData(reservationId: $reservationId) {
+  query ReservationProfileDataSSN($reservationPk: Int!) {
+    profileData(reservationPk: $reservationPk) {
       ssn
     }
   }
@@ -17044,7 +17044,7 @@ export const ReservationProfileDataSsnDocument = gql`
  * @example
  * const { data, loading, error } = useReservationProfileDataSsnQuery({
  *   variables: {
- *      reservationId: // value for 'reservationId'
+ *      reservationPk: // value for 'reservationPk'
  *   },
  * });
  */
