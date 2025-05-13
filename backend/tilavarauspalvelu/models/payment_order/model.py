@@ -48,6 +48,8 @@ class PaymentOrder(models.Model):
 
     created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
     processed_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+    # Only set when reservation also requires handling, meaning user cannot pay directly during checkout.
+    handled_payment_due_by: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
 
     language: str = models.CharField(max_length=8, choices=Language.choices)
     reservation_user_uuid: uuid.UUID | None = models.UUIDField(blank=True, null=True)
@@ -64,6 +66,16 @@ class PaymentOrder(models.Model):
         verbose_name = _("payment order")
         verbose_name_plural = _("payment orders")
         ordering = ["pk"]
+        constraints = [
+            models.CheckConstraint(
+                check=(
+                    ~models.Q(status=OrderStatus.PENDING)
+                    | (models.Q(status=OrderStatus.PENDING) & models.Q(handled_payment_due_by__isnull=False))
+                ),
+                name="pending_orders_must_have_due_date",
+                violation_error_message="Orders in status 'PENDING' must have 'handled_payment_due_by' set.",
+            ),
+        ]
 
     def __str__(self) -> str:
         return f"PaymentOrder {self.pk}"
