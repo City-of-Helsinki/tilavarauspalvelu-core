@@ -35,6 +35,8 @@
   "general_error": "Tapahtui määrittämätön virhe.",
   "api": {
     "UNKNOWN": "Tapahtui virhe.",
+    "HELSINKI_PROFILE_PERMISSION_DENIED": "Käyttöoikeutesi eivät riitä henkilötietojen näyttämiseen",
+    "HELSINKI_PROFILE_KEYCLOAK_REFRESH_TOKEN_EXPIRED": "Henkilötietoja ei voida näyttää, koska niiden katselun vaatimaa käyttöoikeustunnusta ei saatu noudettua. Kirjaudu ulos ja takaisin sisään sen virkistämiseksi.",
     "validation": {
       "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Aloitusaika ei ole sallittu",
       "RESERVATION_END_DATE_TOO_FAR": "Ei pystytty luomaan varauksia yli 2 vuoden päähän",

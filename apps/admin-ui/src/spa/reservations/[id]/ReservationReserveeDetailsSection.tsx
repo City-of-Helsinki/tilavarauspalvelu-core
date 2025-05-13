@@ -30,6 +30,7 @@ import {
 } from "i18n-iso-countries";
 import countriesJson from "i18n-iso-countries/langs/fi.json";
 import { getApiErrors } from "common/src/apolloUtils";
+import { formatErrorMessage } from "common/src/hooks/useDisplayError";
 
 registerCountryLocale(countriesJson);
 
@@ -92,7 +93,7 @@ export function ReservationReserveeDetailsSection({
     loading: isSSNLoading,
     error: ssnError,
   } = useReservationProfileDataSsnQuery({
-    variables: { reservationId: Number(reservation.pk) },
+    variables: { reservationId: reservation.pk ?? 0 },
     fetchPolicy: "no-cache",
     skip: !reservation.id || !isSSNVisible,
   });
@@ -103,7 +104,7 @@ export function ReservationReserveeDetailsSection({
     loading: isContactInfoLoading,
     error: contactInfoError,
   } = useReservationProfileDataContactInfoQuery({
-    variables: { reservationId: Number(reservation.pk) },
+    variables: { reservationId: reservation.pk ?? 0 },
     fetchPolicy: "no-cache",
     skip: !reservation.id || !isContactInfoVisible,
   });
@@ -111,16 +112,10 @@ export function ReservationReserveeDetailsSection({
 
   const gqlError = dateOfBirthError || ssnError || contactInfoError;
   const apiErrors = getApiErrors(gqlError);
-  let errorMessage = String(gqlError?.message);
-  if (apiErrors.length) {
-    const apiErrorCode = apiErrors[0]?.code;
-    if (apiErrorCode === "HELSINKI_PROFILE_PERMISSION_DENIED") {
-      errorMessage = t("RequestedReservation.reserveePermissionError");
-    } else if (
-      apiErrorCode === "HELSINKI_PROFILE_KEYCLOAK_REFRESH_TOKEN_EXPIRED"
-    ) {
-      errorMessage = t("RequestedReservation.reserveeKeycloakExpiredError");
-    }
+  let errorMessage = "";
+  if (apiErrors.length > 0) {
+    const formatedErrors = apiErrors.map((e) => formatErrorMessage(t, e));
+    errorMessage = formatedErrors.join(", ");
   }
 
   return (

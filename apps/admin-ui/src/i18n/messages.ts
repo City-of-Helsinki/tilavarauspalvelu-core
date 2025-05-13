@@ -1912,12 +1912,6 @@ const translations: ITranslations = {
       "Tiedot haetaan Helsinki-profiilista ja sen kautta Väestötietovirastolta.",
     ],
     reserveeUnableToShowData: ["Tietoja ei voida näyttää"],
-    reserveePermissionError: [
-      "Käyttöoikeutesi eivät riitä henkilötietojen näyttämiseen.",
-    ],
-    reserveeKeycloakExpiredError: [
-      "Keycloakin päivitystunnus on vanhentunut. Kirjaudu ulos ja takaisin sisään.",
-    ],
     reserveeSSN: ["Henkilötunnus"],
     reserveeAuthenticationStrength: ["Tunnistautuminen"],
     reserveeAuthenticationWeak: ["Heikko"],
