@@ -8199,11 +8199,11 @@ export type ApplicationPage3Query = {
   } | null;
 };
 
-export type ApplicationPagePreviewQueryVariables = Exact<{
+export type ApplicationPage4QueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
 
-export type ApplicationPagePreviewQuery = {
+export type ApplicationPage4Query = {
   readonly application: {
     readonly id: string;
     readonly pk: number | null;
@@ -12503,8 +12503,8 @@ export type ApplicationPage3QueryResult = Apollo.QueryResult<
   ApplicationPage3Query,
   ApplicationPage3QueryVariables
 >;
-export const ApplicationPagePreviewDocument = gql`
-  query ApplicationPagePreview($id: ID!) {
+export const ApplicationPage4Document = gql`
+  query ApplicationPage4($id: ID!) {
     application(id: $id) {
       ...ApplicationView
     }
@@ -12513,55 +12513,55 @@ export const ApplicationPagePreviewDocument = gql`
 `;
 
 /**
- * __useApplicationPagePreviewQuery__
+ * __useApplicationPage4Query__
  *
- * To run a query within a React component, call `useApplicationPagePreviewQuery` and pass it any options that fit your needs.
- * When your component renders, `useApplicationPagePreviewQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useApplicationPage4Query` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationPage4Query` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useApplicationPagePreviewQuery({
+ * const { data, loading, error } = useApplicationPage4Query({
  *   variables: {
  *      id: // value for 'id'
  *   },
  * });
  */
-export function useApplicationPagePreviewQuery(
+export function useApplicationPage4Query(
   baseOptions: Apollo.QueryHookOptions<
-    ApplicationPagePreviewQuery,
-    ApplicationPagePreviewQueryVariables
+    ApplicationPage4Query,
+    ApplicationPage4QueryVariables
   > &
     (
-      | { variables: ApplicationPagePreviewQueryVariables; skip?: boolean }
+      | { variables: ApplicationPage4QueryVariables; skip?: boolean }
       | { skip: boolean }
     )
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    ApplicationPagePreviewQuery,
-    ApplicationPagePreviewQueryVariables
-  >(ApplicationPagePreviewDocument, options);
+  return Apollo.useQuery<ApplicationPage4Query, ApplicationPage4QueryVariables>(
+    ApplicationPage4Document,
+    options
+  );
 }
-export function useApplicationPagePreviewLazyQuery(
+export function useApplicationPage4LazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    ApplicationPagePreviewQuery,
-    ApplicationPagePreviewQueryVariables
+    ApplicationPage4Query,
+    ApplicationPage4QueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
-    ApplicationPagePreviewQuery,
-    ApplicationPagePreviewQueryVariables
-  >(ApplicationPagePreviewDocument, options);
+    ApplicationPage4Query,
+    ApplicationPage4QueryVariables
+  >(ApplicationPage4Document, options);
 }
-export function useApplicationPagePreviewSuspenseQuery(
+export function useApplicationPage4SuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
     | Apollo.SuspenseQueryHookOptions<
-        ApplicationPagePreviewQuery,
-        ApplicationPagePreviewQueryVariables
+        ApplicationPage4Query,
+        ApplicationPage4QueryVariables
       >
 ) {
   const options =
@@ -12569,22 +12569,22 @@ export function useApplicationPagePreviewSuspenseQuery(
       ? baseOptions
       : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
-    ApplicationPagePreviewQuery,
-    ApplicationPagePreviewQueryVariables
-  >(ApplicationPagePreviewDocument, options);
+    ApplicationPage4Query,
+    ApplicationPage4QueryVariables
+  >(ApplicationPage4Document, options);
 }
-export type ApplicationPagePreviewQueryHookResult = ReturnType<
-  typeof useApplicationPagePreviewQuery
+export type ApplicationPage4QueryHookResult = ReturnType<
+  typeof useApplicationPage4Query
 >;
-export type ApplicationPagePreviewLazyQueryHookResult = ReturnType<
-  typeof useApplicationPagePreviewLazyQuery
+export type ApplicationPage4LazyQueryHookResult = ReturnType<
+  typeof useApplicationPage4LazyQuery
 >;
-export type ApplicationPagePreviewSuspenseQueryHookResult = ReturnType<
-  typeof useApplicationPagePreviewSuspenseQuery
+export type ApplicationPage4SuspenseQueryHookResult = ReturnType<
+  typeof useApplicationPage4SuspenseQuery
 >;
-export type ApplicationPagePreviewQueryResult = Apollo.QueryResult<
-  ApplicationPagePreviewQuery,
-  ApplicationPagePreviewQueryVariables
+export type ApplicationPage4QueryResult = Apollo.QueryResult<
+  ApplicationPage4Query,
+  ApplicationPage4QueryVariables
 >;
 export const SendApplicationDocument = gql`
   mutation SendApplication($input: ApplicationSendMutationInput!) {
