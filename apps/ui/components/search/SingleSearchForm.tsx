@@ -17,15 +17,12 @@ import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { mapParamToNumber } from "@/modules/search";
-import {
-  Filters,
-  OptionalFilters,
-  SearchButtonContainer,
-  StyledSubmitButton,
-} from "./styled";
+import { SearchButtonContainer, StyledSubmitButton } from "./styled";
 import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
 import { ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { Flex } from "common/styled";
+import { ShowAllContainer } from "common/src/components";
 
 const StyledCheckBox = styled(Checkbox)`
   margin: 0 !important;
@@ -170,96 +167,95 @@ export function SingleSearchForm({
     formValues.textSearch !== "";
 
   return (
-    <form noValidate onSubmit={handleSubmit(onSearch)}>
-      <Filters>
-        <ControlledSelect
-          multiselect
-          clearable
-          enableSearch
-          name="purposes"
-          control={control}
-          options={purposeOptions}
-          label={t("searchForm:labels.purposes")}
-        />
-        <ControlledSelect
-          multiselect
-          clearable
-          enableSearch
-          name="units"
-          control={control}
-          options={unitOptions}
-          label={t("searchForm:labels.units")}
-        />
-        <ControlledSelect
-          multiselect
-          clearable
-          enableSearch
-          name="equipments"
-          control={control}
-          options={equipmentsOptions}
-          label={t("searchForm:labels.equipments")}
-        />
-        <SingleLabelInputGroup label={t("common:dateLabel")}>
-          <DateRangePicker
-            startDate={fromUIDate(getValues("startDate") ?? "")}
-            endDate={fromUIDate(getValues("endDate") ?? "")}
-            onChangeStartDate={(date: Date | null) =>
-              setValue("startDate", date != null ? toUIDate(date) : null)
-            }
-            onChangeEndDate={(date: Date | null) =>
-              setValue("endDate", date != null ? toUIDate(date) : null)
-            }
-            labels={{
-              begin: t("dateSelector:labelStartDate"),
-              end: t("dateSelector:labelEndDate"),
-            }}
-            placeholder={{
-              begin: t("common:beginLabel"),
-              end: t("common:endLabel"),
-            }}
-            limits={{
-              startMinDate: startOfDay(new Date()),
-              startMaxDate: addYears(new Date(), 2),
-              endMinDate: startOfDay(new Date()),
-              endMaxDate: addYears(new Date(), 2),
-            }}
-          />
-        </SingleLabelInputGroup>
-        <SingleLabelInputGroup label={t("common:timeLabel")}>
-          <TimeRangePicker
+    <Flex as="form" noValidate onSubmit={handleSubmit(onSearch)}>
+      <ShowAllContainer
+        showAllLabel={t("searchForm:showMoreFilters")}
+        showLessLabel={t("searchForm:showLessFilters")}
+        maximumNumber={6}
+        data-testid="search-form__filters--optional"
+        initiallyOpen={showOptionalFilters}
+        items={[
+          <ControlledSelect
+            multiselect
+            clearable
+            enableSearch
+            name="purposes"
             control={control}
-            names={{ begin: "timeBegin", end: "timeEnd" }}
-            labels={{
-              begin: `${t("common:timeLabelBegin")}`,
-              end: `${t("common:timeLabelEnd")}`,
-            }}
-            placeholders={{
-              begin: t("common:beginLabel"),
-              end: t("common:endLabel"),
-            }}
-            clearable={{ begin: true, end: true }}
-          />
-        </SingleLabelInputGroup>
-        <ControlledSelect
-          name="duration"
-          control={control}
-          clearable
-          options={durationOptions}
-          label={t("searchForm:labels.duration", { duration: "" })}
-        />
-        <OptionalFilters
-          showAllLabel={t("searchForm:showMoreFilters")}
-          showLessLabel={t("searchForm:showLessFilters")}
-          maximumNumber={0}
-          data-testid="search-form__filters--optional"
-          initiallyOpen={showOptionalFilters}
-        >
+            options={purposeOptions}
+            label={t("searchForm:labels.purposes")}
+          />,
+          <ControlledSelect
+            multiselect
+            clearable
+            enableSearch
+            name="units"
+            control={control}
+            options={unitOptions}
+            label={t("searchForm:labels.units")}
+          />,
+          <ControlledSelect
+            multiselect
+            clearable
+            enableSearch
+            name="equipments"
+            control={control}
+            options={equipmentsOptions}
+            label={t("searchForm:labels.equipments")}
+          />,
+          <SingleLabelInputGroup label={t("common:dateLabel")}>
+            <DateRangePicker
+              startDate={fromUIDate(getValues("startDate") ?? "")}
+              endDate={fromUIDate(getValues("endDate") ?? "")}
+              onChangeStartDate={(date: Date | null) =>
+                setValue("startDate", date != null ? toUIDate(date) : null)
+              }
+              onChangeEndDate={(date: Date | null) =>
+                setValue("endDate", date != null ? toUIDate(date) : null)
+              }
+              labels={{
+                begin: t("dateSelector:labelStartDate"),
+                end: t("dateSelector:labelEndDate"),
+              }}
+              placeholder={{
+                begin: t("common:beginLabel"),
+                end: t("common:endLabel"),
+              }}
+              limits={{
+                startMinDate: startOfDay(new Date()),
+                startMaxDate: addYears(new Date(), 2),
+                endMinDate: startOfDay(new Date()),
+                endMaxDate: addYears(new Date(), 2),
+              }}
+            />
+          </SingleLabelInputGroup>,
+          <SingleLabelInputGroup label={t("common:timeLabel")}>
+            <TimeRangePicker
+              control={control}
+              names={{ begin: "timeBegin", end: "timeEnd" }}
+              labels={{
+                begin: `${t("common:timeLabelBegin")}`,
+                end: `${t("common:timeLabelEnd")}`,
+              }}
+              placeholders={{
+                begin: t("common:beginLabel"),
+                end: t("common:endLabel"),
+              }}
+              clearable={{ begin: true, end: true }}
+            />
+          </SingleLabelInputGroup>,
+          <ControlledSelect
+            name="duration"
+            control={control}
+            clearable
+            options={durationOptions}
+            label={t("searchForm:labels.duration", { duration: "" })}
+          />,
           <ControlledNumberInput
             label={t("searchForm:labels.personsAllowed")}
             name="personsAllowed"
             control={control}
             min={1}
-          />
+          />,
           <ControlledSelect
             name="reservationUnitTypes"
             multiselect
@@ -268,7 +264,7 @@ export function SingleSearchForm({
             enableSearch
             clearable
             label={t("searchForm:labels.reservationUnitTypes")}
-          />
+          />,
           <TextInput
             id="search"
             label={t("searchForm:labels.textSearch")}
@@ -279,7 +275,7 @@ export function SingleSearchForm({
                 handleSubmit(onSearch)();
               }
             }}
-          />
+          />,
           <ControlledSelect
             multiselect
             clearable
@@ -287,8 +283,10 @@ export function SingleSearchForm({
             control={control}
             options={accessTypeOptions}
             label={t("searchForm:labels.accessTypes")}
-          />
-        </OptionalFilters>
+          />,
+        ]}
+      />
+      <Flex $direction="row-reverse">
         <Controller
           name="showOnlyReservable"
           control={control}
@@ -302,7 +300,7 @@ export function SingleSearchForm({
             />
           )}
         />
-      </Filters>
+      </Flex>
       <SearchButtonContainer>
         <FilterTagList
           translateTag={translateTag}
@@ -319,6 +317,6 @@ export function SingleSearchForm({
           {t("searchForm:searchButton")}
         </StyledSubmitButton>
       </SearchButtonContainer>
-    </form>
+    </Flex>
   );
 }

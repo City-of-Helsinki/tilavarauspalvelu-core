@@ -1,23 +1,18 @@
 import { Button, ButtonVariant, LoadingSpinner } from "hds-react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { breakpoints } from "../src/const";
 
 export const NoWrap = styled.span`
   white-space: nowrap;
 `;
 
-export const autoGridCss = css`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-  align-items: baseline;
-  gap: var(--spacing-m);
-`;
-
-export const AutoGrid = styled.div<{
+interface AutoGridProps {
   $minWidth?: string;
   $largeGap?: boolean;
   $alignCenter?: boolean;
-}>`
+}
+
+export const AutoGrid = styled.div<AutoGridProps>`
   display: grid;
   grid-template-columns: repeat(
     auto-fill,

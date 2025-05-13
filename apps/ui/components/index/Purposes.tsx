@@ -104,8 +104,7 @@ export function Purposes({ purposes }: Props): JSX.Element {
         maximumNumber={itemLimit}
         alignButton="right"
         data-testid="front-page__purposes"
-      >
-        {purposes.map((item) => (
+        items={purposes.map((item) => (
           <PurposeLink key={item.pk} href={getSearchLink(item)}>
             <PurposeItem data-testid="front-page__purposes--purpose">
               <Image src={getImg(item)} alt="" aria-hidden="true" />
@@ -116,7 +115,7 @@ export function Purposes({ purposes }: Props): JSX.Element {
             </PurposeItem>
           </PurposeLink>
         ))}
-      </PurposeContainer>
+      />
     </>
   );
 }
