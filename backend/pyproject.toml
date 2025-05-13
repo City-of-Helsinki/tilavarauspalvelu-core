@@ -65,8 +65,6 @@ django-celery-results = "2.6.0"
 
 [tool.poetry.group.test.dependencies]
 # Dependencies only required for running tests.
-django-debug-toolbar = "4.4.5"  # Can't be updated past 4.4.5 until django-graphiql-debug-toolbar is updated
-django-graphiql-debug-toolbar = "0.2.0"
 factory-boy = "3.3.3"
 faker = "37.1.0"
 freezegun = "1.5.1"

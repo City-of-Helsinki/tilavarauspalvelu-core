@@ -3,10 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 import graphene
-from django.conf import settings
 from django.contrib.auth import logout
 from graphene import Field
-from graphene_django.debug import DjangoDebug
 from graphene_django_extensions.errors import GQLNotFoundError
 from query_optimizer import DjangoListField, optimize_single
 from query_optimizer.compiler import optimize
@@ -237,10 +235,6 @@ class Query(graphene.ObjectType):
     banner_notification = BannerNotificationNode.Node()
     banner_notifications = BannerNotificationNode.Connection()
     unit_groups = UnitGroupNode.Connection()
-    #
-    # Debug
-    if "graphiql_debug_toolbar" in settings.INSTALLED_APPS:
-        debug = Field(DjangoDebug, name="_debug")
 
     def resolve_current_user(root: None, info: GQLInfo, **kwargs: Any) -> User | None:
         if not info.context.user.is_active:

@@ -590,17 +590,6 @@ class Local(Common, overrides_from=LocalMixin):
     SECRET_KEY = "secret"  # noqa: S105 # nosec # NOSONAR
     ALLOWED_HOSTS = ["*"]
 
-    INSTALLED_APPS = [
-        *Common.INSTALLED_APPS,
-        "debug_toolbar",
-        "graphiql_debug_toolbar",
-    ]
-
-    MIDDLEWARE = [
-        "graphiql_debug_toolbar.middleware.DebugToolbarMiddleware",
-        *Common.MIDDLEWARE,
-    ]
-
     # Hardcode to internal IPs as debug toolbar will expose internal information
     INTERNAL_IPS = ["127.0.0.1", "localhost"]
 
