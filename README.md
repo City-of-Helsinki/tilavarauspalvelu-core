@@ -396,12 +396,6 @@ The package has integrations in all the relevant parts of the project
 
 ### Debugging
 
-For debugging during development, the [Django Debug Toolbar] package can be used.
-The [Django GraphQL Debug Toolbar] extension is used for the GraphQL endpoint.
-
-[Django Debug Toolbar]: https://django-debug-toolbar.readthedocs.io/en/latest/
-[Django GraphQL Debug Toolbar]: https://github.com/flavors/django-graphiql-debug-toolbar
-
 The `local_settings.py` file added during setup can be used to change settings
 locally that are not configurable using environment variables.
 See documentation for [django-environment-config] for more details.
