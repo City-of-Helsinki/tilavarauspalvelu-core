@@ -52,7 +52,7 @@
     "react-router-dom": "^6.23.1",
     "react-use": "^17.6.0",
     "reactjs-popup": "^2.0.6",
-    "styled-components": "6.1.15",
+    "styled-components": "6.1.18",
     "tsconfig": "workspace:*",
     "typescript-cookie": "^1.0.6",
     "zod": "^3.24.2"
