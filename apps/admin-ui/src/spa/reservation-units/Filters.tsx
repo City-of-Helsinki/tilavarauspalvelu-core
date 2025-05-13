@@ -2,7 +2,6 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import ShowAllContainer from "common/src/components/ShowAllContainer";
-import { AutoGrid } from "common/styled";
 import { useReservationUnitTypes, useUnitOptions } from "@/hooks";
 import { ReservationUnitPublishingState } from "@gql/gql-types";
 import {
@@ -78,7 +77,11 @@ function Filters(): JSX.Element {
 
   return (
     <Wrapper>
-      <AutoGrid>
+      <MoreWrapper
+        showAllLabel={t("ReservationUnitsSearch.moreFilters")}
+        showLessLabel={t("ReservationUnitsSearch.lessFilters")}
+        maximumNumber={4}
+      >
         <SearchFilter name="search" labelKey="reservationUnit" />
         <MultiSelectFilter options={unitOptions} name="unit" />
         <MultiSelectFilter
@@ -89,24 +92,16 @@ function Filters(): JSX.Element {
           options={reservationUnitStateOptions}
           name="reservationUnitState"
         />
-      </AutoGrid>
-      <MoreWrapper
-        showAllLabel={t("ReservationUnitsSearch.moreFilters")}
-        showLessLabel={t("ReservationUnitsSearch.lessFilters")}
-        maximumNumber={0}
-      >
-        <AutoGrid>
-          <RangeNumberFilter
-            label={t("ReservationUnitsSearch.maxPersonsLabel")}
-            minName="maxPersonsGte"
-            maxName="maxPersonsLte"
-          />
-          <RangeNumberFilter
-            label={t("ReservationUnitsSearch.surfaceAreaLabel")}
-            minName="surfaceAreaGte"
-            maxName="surfaceAreaLte"
-          />
-        </AutoGrid>
+        <RangeNumberFilter
+          label={t("ReservationUnitsSearch.maxPersonsLabel")}
+          minName="maxPersonsGte"
+          maxName="maxPersonsLte"
+        />
+        <RangeNumberFilter
+          label={t("ReservationUnitsSearch.surfaceAreaLabel")}
+          minName="surfaceAreaGte"
+          maxName="surfaceAreaLte"
+        />
       </MoreWrapper>
       <SearchTags hide={[]} translateTag={translateTag} />
     </Wrapper>
