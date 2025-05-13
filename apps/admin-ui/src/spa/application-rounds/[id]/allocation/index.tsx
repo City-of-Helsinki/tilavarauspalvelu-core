@@ -8,7 +8,6 @@ import {
   CenterSpinner,
   TabWrapper,
   H1,
-  autoGridCss,
   fontBold,
   fontMedium,
 } from "common/styled";
@@ -104,98 +103,6 @@ const transformApplicantType = (value: string | null) => {
   }
   return null;
 };
-
-const MoreWrapper = styled(ShowAllContainer)`
-  .ShowAllContainer__ToggleButton {
-    color: var(--color-bus);
-  }
-  .ShowAllContainer__Content {
-    ${autoGridCss}
-  }
-`;
-
-type PriorityFilterOptions = { label: string; value: 200 | 300 };
-type PkFilterOptions = { label: string; value: number };
-
-function Filters({
-  units,
-  priorityOptions,
-  orderOptions,
-  cityOptions,
-  purposeOptions,
-  ageGroupOptions,
-}: {
-  units: UnitFilterQueryType[];
-  priorityOptions: PriorityFilterOptions[];
-  orderOptions: PkFilterOptions[];
-  cityOptions: PkFilterOptions[];
-  purposeOptions: PkFilterOptions[];
-  ageGroupOptions: PkFilterOptions[];
-}) {
-  const { t } = useTranslation();
-  const [searchParams, setParams] = useSearchParams();
-
-  const customerFilterOptions = Object.keys(ApplicantTypeChoice).map(
-    (value) => ({
-      label: t(`Application.applicantTypes.${value.toUpperCase()}`),
-      value: value as ApplicantTypeChoice,
-    })
-  );
-  const unitOptions = units.map((unit) => ({
-    value: unit?.pk ?? 0,
-    label: unit?.nameFi ?? "",
-  }));
-
-  const unitFilter = toNumber(searchParams.get("unit"));
-  const setUnitFilter = (value: number) => {
-    // NOTE different logic because values are not atomic and we need to set two params
-    const vals = new URLSearchParams(searchParams);
-    vals.set("unit", value.toString());
-    vals.delete("reservation-unit");
-    setParams(vals, { replace: true });
-  };
-
-  useEffect(() => {
-    if (units.length > 0 && (unitFilter == null || unitFilter < 1)) {
-      setUnitFilter(units[0]?.pk ?? 0);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- this is the correct list, but should be refactored
-  }, [units]);
-
-  return (
-    <>
-      {/* NOTE can't easily be refactored into reusable component because it has a side effect onChange */}
-      <Select
-        texts={{
-          label: t("filters.label.unit"),
-          placeholder: t("common.selectPlaceholder"),
-          clearButtonAriaLabel_multiple: t("common.clearAllSelections"),
-          clearButtonAriaLabel_one: t("common.removeValue"),
-        }}
-        clearable={false}
-        options={unitOptions.map(convertOptionToHDS)}
-        disabled={unitOptions.length === 0}
-        value={unitOptions
-          .find((v) => v.value === unitFilter)
-          ?.value?.toString()}
-        onChange={(selection) => {
-          const val = selection.find(() => true)?.value;
-          const v = toNumber(val);
-          if (v != null) {
-            setUnitFilter(v);
-          }
-        }}
-      />
-      <MultiSelectFilter name="priority" options={priorityOptions} />
-      <MultiSelectFilter name="order" options={orderOptions} />
-      <SearchFilter name="search" />
-      <MultiSelectFilter name="homeCity" options={cityOptions} />
-      <MultiSelectFilter name="applicantType" options={customerFilterOptions} />
-      <MultiSelectFilter name="ageGroup" options={ageGroupOptions} />
-      <MultiSelectFilter name="purpose" options={purposeOptions} />
-    </>
-  );
-}
 
 type ApplicationRoundFilterQueryType =
   NonNullable<ApplicationRoundFilterQuery>["applicationRound"];
@@ -506,26 +413,75 @@ function ApplicationRoundAllocation({
       (x) => x.pk != null && x.pk === reservationUnitFilterQuery
     ) ?? reservationUnits[0];
 
+  const customerFilterOptions = Object.keys(ApplicantTypeChoice).map(
+    (value) => ({
+      label: t(`Application.applicantTypes.${value.toUpperCase()}`),
+      value: value as ApplicantTypeChoice,
+    })
+  );
+  const unitOptions = units.map((unit) => ({
+    value: unit?.pk ?? 0,
+    label: unit?.nameFi ?? "",
+  }));
+
+  const setUnitFilter = (value: number) => {
+    // NOTE different logic because values are not atomic and we need to set two params
+    const vals = new URLSearchParams(searchParams);
+    vals.set("unit", value.toString());
+    vals.delete("reservation-unit");
+    setParams(vals, { replace: true });
+  };
+
+  useEffect(() => {
+    if (units.length > 0 && (unitFilter == null || unitFilter < 1)) {
+      setUnitFilter(units[0]?.pk ?? 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- this is the correct list, but should be refactored
+  }, [units]);
+
   return (
     <>
       <div>
         <H1 $noMargin>{t("Allocation.allocationTitle")}</H1>
         <Ingress>{roundName}</Ingress>
       </div>
-      <MoreWrapper
+      <ShowAllContainer
         showAllLabel={t("ReservationUnitsSearch.moreFilters")}
         showLessLabel={t("ReservationUnitsSearch.lessFilters")}
         maximumNumber={4}
       >
-        <Filters
-          units={units}
-          priorityOptions={priorityOptions}
-          orderOptions={orderOptions}
-          cityOptions={cityOptions}
-          purposeOptions={purposeOptions}
-          ageGroupOptions={ageGroupOptions}
+        <Select
+          texts={{
+            label: t("filters.label.unit"),
+            placeholder: t("common.selectPlaceholder"),
+            clearButtonAriaLabel_multiple: t("common.clearAllSelections"),
+            clearButtonAriaLabel_one: t("common.removeValue"),
+          }}
+          clearable={false}
+          options={unitOptions.map(convertOptionToHDS)}
+          disabled={unitOptions.length === 0}
+          value={unitOptions
+            .find((v) => v.value === unitFilter)
+            ?.value?.toString()}
+          onChange={(selection) => {
+            const val = selection.find(() => true)?.value;
+            const v = toNumber(val);
+            if (v != null) {
+              setUnitFilter(v);
+            }
+          }}
         />
-      </MoreWrapper>
+        <MultiSelectFilter name="priority" options={priorityOptions} />
+        <MultiSelectFilter name="order" options={orderOptions} />
+        <SearchFilter name="search" />
+        <MultiSelectFilter name="homeCity" options={cityOptions} />
+        <MultiSelectFilter
+          name="applicantType"
+          options={customerFilterOptions}
+        />
+        <MultiSelectFilter name="ageGroup" options={ageGroupOptions} />
+        <MultiSelectFilter name="purpose" options={purposeOptions} />
+      </ShowAllContainer>
       <SearchTags hide={hideSearchTags} translateTag={translateTag} />
       {/* using a key here is a hack to force remounting the tabs
        * remount causes flickering but HDS doesn't allow programmatically changing the active tab

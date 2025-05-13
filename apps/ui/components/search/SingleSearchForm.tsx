@@ -17,15 +17,12 @@ import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { mapParamToNumber } from "@/modules/search";
-import {
-  Filters,
-  OptionalFilters,
-  SearchButtonContainer,
-  StyledSubmitButton,
-} from "./styled";
+import { SearchButtonContainer, StyledSubmitButton } from "./styled";
 import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
 import { ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { Flex } from "common/styled";
+import { ShowAllContainer } from "common/src/components";
 
 const StyledCheckBox = styled(Checkbox)`
   margin: 0 !important;
@@ -170,8 +167,14 @@ export function SingleSearchForm({
     formValues.textSearch !== "";
 
   return (
-    <form noValidate onSubmit={handleSubmit(onSearch)}>
-      <Filters>
+    <Flex as="form" noValidate onSubmit={handleSubmit(onSearch)}>
+      <ShowAllContainer
+        showAllLabel={t("searchForm:showMoreFilters")}
+        showLessLabel={t("searchForm:showLessFilters")}
+        maximumNumber={6}
+        data-testid="search-form__filters--optional"
+        initiallyOpen={showOptionalFilters}
+      >
         <ControlledSelect
           multiselect
           clearable
@@ -247,48 +250,42 @@ export function SingleSearchForm({
           options={durationOptions}
           label={t("searchForm:labels.duration", { duration: "" })}
         />
-        <OptionalFilters
-          showAllLabel={t("searchForm:showMoreFilters")}
-          showLessLabel={t("searchForm:showLessFilters")}
-          maximumNumber={0}
-          data-testid="search-form__filters--optional"
-          initiallyOpen={showOptionalFilters}
-        >
-          <ControlledNumberInput
-            label={t("searchForm:labels.personsAllowed")}
-            name="personsAllowed"
-            control={control}
-            min={1}
-          />
-          <ControlledSelect
-            name="reservationUnitTypes"
-            multiselect
-            control={control}
-            options={reservationUnitTypeOptions}
-            enableSearch
-            clearable
-            label={t("searchForm:labels.reservationUnitTypes")}
-          />
-          <TextInput
-            id="search"
-            label={t("searchForm:labels.textSearch")}
-            {...register("textSearch")}
-            placeholder={t("searchForm:placeholders.textSearch")}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSubmit(onSearch)();
-              }
-            }}
-          />
-          <ControlledSelect
-            multiselect
-            clearable
-            name="accessTypes"
-            control={control}
-            options={accessTypeOptions}
-            label={t("searchForm:labels.accessTypes")}
-          />
-        </OptionalFilters>
+        <ControlledNumberInput
+          label={t("searchForm:labels.personsAllowed")}
+          name="personsAllowed"
+          control={control}
+          min={1}
+        />
+        <ControlledSelect
+          name="reservationUnitTypes"
+          multiselect
+          control={control}
+          options={reservationUnitTypeOptions}
+          enableSearch
+          clearable
+          label={t("searchForm:labels.reservationUnitTypes")}
+        />
+        <TextInput
+          id="search"
+          label={t("searchForm:labels.textSearch")}
+          {...register("textSearch")}
+          placeholder={t("searchForm:placeholders.textSearch")}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit(onSearch)();
+            }
+          }}
+        />
+        <ControlledSelect
+          multiselect
+          clearable
+          name="accessTypes"
+          control={control}
+          options={accessTypeOptions}
+          label={t("searchForm:labels.accessTypes")}
+        />
+      </ShowAllContainer>
+      <Flex $direction="row-reverse">
         <Controller
           name="showOnlyReservable"
           control={control}
@@ -302,7 +299,7 @@ export function SingleSearchForm({
             />
           )}
         />
-      </Filters>
+      </Flex>
       <SearchButtonContainer>
         <FilterTagList
           translateTag={translateTag}
@@ -319,6 +316,6 @@ export function SingleSearchForm({
           {t("searchForm:searchButton")}
         </StyledSubmitButton>
       </SearchButtonContainer>
-    </form>
+    </Flex>
   );
 }

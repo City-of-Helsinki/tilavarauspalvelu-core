@@ -1,4 +1,4 @@
-import React from "react";
+import React, { type HTMLAttributes } from "react";
 import Link from "next/link";
 import styled, { css } from "styled-components";
 import {
@@ -9,7 +9,7 @@ import {
   Flex,
 } from "../../styled";
 
-interface IconButtonProps {
+interface IconButtonProps extends HTMLAttributes<HTMLButtonElement> {
   // the button label text
   label: string;
   // a HDS-icon element (use `null` if no icon is desired)
@@ -20,9 +20,7 @@ interface IconButtonProps {
   openInNewTab?: boolean;
   // an optional function to call when clicking the button
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
-  className?: string;
-  style?: React.CSSProperties;
-  [rest: string]: unknown; // any other params, like id/aria/testing/etc
+  disabled?: boolean;
 }
 
 const linkStyles = css`
@@ -55,6 +53,7 @@ const StyledLinkButton = styled.button`
   padding: 0;
   ${linkStyles}
   ${focusStyles}
+  ${fontMedium}
 
   /* button user-agent sizes are supper small */
   font-size: var(--fontsize-body-m);
