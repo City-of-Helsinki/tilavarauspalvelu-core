@@ -282,6 +282,7 @@ const translations: ITranslations = {
   },
   User: {
     welcome: ["Tervetuloa"],
+    welcomeCustom: ["Moro nääs"],
   },
   MainMenu: {
     home: ["Etusivu"],

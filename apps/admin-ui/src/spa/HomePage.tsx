@@ -20,6 +20,13 @@ function HomePage(): JSX.Element {
   const { user } = useSession();
 
   let headingStr = t("User.welcome");
+  if (
+    user?.username === "u-gptwmnqqnjahlfj2uas2glyx5a" &&
+    Math.random() < 0.1 // 10% chance
+  ) {
+    headingStr = t("User.welcomeCustom");
+  }
+
   const name = user?.firstName;
   if (name) {
     headingStr += `, ${name}`;
