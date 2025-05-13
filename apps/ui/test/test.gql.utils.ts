@@ -367,7 +367,7 @@ export function createMockApplicationSection({
   };
 }
 
-export type PageOptions = "page0" | "page1" | "page2" | "page3" | "preview";
+export type PageOptions = "page0" | "page1" | "page2" | "page3" | "page4";
 export type CreateMockApplicationFragmentProps = {
   pk?: number;
   // completed page
@@ -381,7 +381,7 @@ export function createMockApplicationFragment({
   // TODO use page to generate the form values (applicationSections)
   // so it's filled with the correct values for that page
   const status =
-    page === "preview"
+    page === "page4"
       ? ApplicationStatusChoice.Received
       : ApplicationStatusChoice.Draft;
 
@@ -434,7 +434,7 @@ export function createMockApplicationFragment({
     // colliding with the same name (spread syntax)
     applicationSections:
       page === "page0" ? [] : [createMockApplicationSection({ page })],
-    ...(page === "page3" || page === "preview"
+    ...(page === "page3" || page === "page4"
       ? page3Data
       : {
           applicantType: null,

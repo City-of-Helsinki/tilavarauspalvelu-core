@@ -119,7 +119,7 @@ function Page3({
       if (pk == null) {
         throw new Error("Failed to save application");
       }
-      router.push(getApplicationPath(pk, "preview"));
+      router.push(getApplicationPath(pk, "page4"));
     } catch (err) {
       dislayError(err);
     }
