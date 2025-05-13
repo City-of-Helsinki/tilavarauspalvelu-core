@@ -1,45 +1,11 @@
 import styled from "styled-components";
-import { Flex, fontMedium } from "common/styled";
+import { Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
-import {
-  ShowAllContainer,
-  type ShowAllContainerProps,
-} from "common/src/components";
 import { SubmitButton } from "@/styled/util";
-
-/// Filter container using responsive grid
-export const Filters = styled.div`
-  /* TODO this should be a default value or a separate styled component */
-  label {
-    ${fontMedium}
-  }
-
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
-  align-items: baseline;
-  gap: var(--spacing-m);
-`;
-
-/// Optional filters (behind an accordion toggle) with responsive grid for content
-/// bit complex css because the component wasn't designed for this use case
-export const OptionalFilters = styled(ShowAllContainer)<ShowAllContainerProps>`
-  && {
-    grid-column: 1 / -1;
-    grid-template-columns: auto;
-    display: grid;
-  }
-  & > div {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
-    align-items: baseline;
-    gap: var(--spacing-s);
-  }
-`;
 
 export const SearchButtonContainer = styled(Flex).attrs({
   $justifyContent: "space-between",
   $alignItems: "center",
-  $marginTop: "m",
 })`
   && {
     /* have to use flex-flow: otherwise on desktop the button will be split to the second line */

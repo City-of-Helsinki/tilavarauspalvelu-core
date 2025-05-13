@@ -48,11 +48,10 @@ export function EquipmentList({
       maximumNumber={itemsToShow}
       renderAsUl
       data-testid="reservation-unit__equipment"
-    >
-      {equipmentList.map((item) => (
+      items={equipmentList.map((item) => (
         <EquipmentItem key={item}>{item}</EquipmentItem>
       ))}
-    </EquipmentContainer>
+    />
   );
 }
 

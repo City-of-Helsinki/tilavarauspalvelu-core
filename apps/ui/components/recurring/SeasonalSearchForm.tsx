@@ -10,15 +10,12 @@ import { type SubmitHandler, useForm } from "react-hook-form";
 import { FilterTagList } from "../FilterTagList";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { mapParamToNumber } from "@/modules/search";
-import {
-  Filters,
-  SearchButtonContainer,
-  StyledSubmitButton,
-} from "../search/styled";
+import { SearchButtonContainer, StyledSubmitButton } from "../search/styled";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
 import { ControlledNumberInput } from "common/src/components/form";
 import { toNumber } from "common/src/helpers";
+import { AutoGrid, Flex } from "common/styled";
 
 const filterOrder = [
   "textSearch",
@@ -119,7 +116,8 @@ export function SeasonalSearchForm({
   ] as const;
 
   return (
-    <form
+    <Flex
+      as="form"
       noValidate
       onSubmit={(evt) => {
         // React.createPortal does not stop propagation
@@ -131,7 +129,7 @@ export function SeasonalSearchForm({
         handleSubmit(onSubmit)();
       }}
     >
-      <Filters>
+      <AutoGrid>
         <TextInput
           id="search"
           label={t("searchForm:labels.textSearch")}
@@ -187,7 +185,7 @@ export function SeasonalSearchForm({
           options={accessTypeOptions}
           label={t("searchForm:labels.accessTypes")}
         />
-      </Filters>
+      </AutoGrid>
       <SearchButtonContainer>
         <FilterTagList
           translateTag={translateTag}
@@ -204,6 +202,6 @@ export function SeasonalSearchForm({
           {t("searchForm:searchButton")}
         </StyledSubmitButton>
       </SearchButtonContainer>
-    </form>
+    </Flex>
   );
 }
