@@ -9,10 +9,13 @@ import pytest
 from graphql import OperationType
 from graphql_relay import to_global_id
 
-from tilavarauspalvelu.enums import BannerNotificationTarget, UserPermissionChoice
+from tilavarauspalvelu.enums import BannerNotificationTarget, ProfileLoginAMR, UserPermissionChoice
+from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from utils.date_utils import local_date, local_datetime, local_time, next_hour
 
-from tests.factories import ApplicationRoundFactory, ReservationUnitFactory
+from tests.factories import ApplicationRoundFactory, ReservationFactory, ReservationUnitFactory, UserFactory
+from tests.factories.helsinki_profile import MyProfileDataFactory
+from tests.helpers import ResponseMock, patch_method
 
 from .helpers import assert_no_undefined_variables, get_admin_query_info
 
@@ -1281,6 +1284,64 @@ def test_frontend_queries__admin_ui__UnitsFilter(graphql):
     query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
+    assert_no_undefined_variables(variables)
+
+    query = query_info.query
+    graphql.login_with_superuser()
+
+    response = graphql(query, variables=variables)
+
+    assert response.has_errors is False, response.errors
+
+
+@patch_method(HelsinkiProfileClient.get_token, return_value="token")
+@patch_method(HelsinkiProfileClient.request)
+def test_frontend_queries__admin_ui__ReservationProfileDataContactInfo(graphql):
+    user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI)
+    reservation = ReservationFactory.create(user=user)
+    profile_data = MyProfileDataFactory.create_basic(
+        verifiedPersonalInformation__nationalIdentificationNumber="181106A830T",
+    )
+    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
+
+    admin_factories = get_admin_query_info()
+    factories = admin_factories["ReservationProfileDataContactInfo"]
+
+    assert len(factories) == 1
+    query_info = factories[0]
+    assert query_info.factory is None
+
+    variables = query_info.variables
+    variables["reservationId"] = reservation.pk
+    assert_no_undefined_variables(variables)
+
+    query = query_info.query
+    graphql.login_with_superuser()
+
+    response = graphql(query, variables=variables)
+
+    assert response.has_errors is False, response.errors
+
+
+@patch_method(HelsinkiProfileClient.get_token, return_value="token")
+@patch_method(HelsinkiProfileClient.request)
+def test_frontend_queries__admin_ui__ReservationProfileDataSSN(graphql):
+    user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI)
+    reservation = ReservationFactory.create(user=user)
+    profile_data = MyProfileDataFactory.create_basic(
+        verifiedPersonalInformation__nationalIdentificationNumber="181106A830T",
+    )
+    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
+
+    admin_factories = get_admin_query_info()
+    factories = admin_factories["ReservationProfileDataSSN"]
+
+    assert len(factories) == 1
+    query_info = factories[0]
+    assert query_info.factory is None
+
+    variables = query_info.variables
+    variables["reservationId"] = reservation.pk
     assert_no_undefined_variables(variables)
 
     query = query_info.query
