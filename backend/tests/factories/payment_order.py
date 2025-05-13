@@ -39,6 +39,8 @@ class PaymentOrderFactory(GenericDjangoModelFactory[PaymentOrder]):
     price_total = Decimal("12.0")
 
     processed_at = None
+    handled_payment_due_by = None
+
     language = Language.FI
     reservation_user_uuid = None
     checkout_url = ""
