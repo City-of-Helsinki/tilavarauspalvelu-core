@@ -28,7 +28,7 @@ __all__ = [
 
 
 class PaymentOrder(models.Model):
-    reservation: Reservation | None = models.ForeignKey(
+    reservation: Reservation | None = models.OneToOneField(
         "tilavarauspalvelu.Reservation",
         related_name="payment_order",
         on_delete=models.SET_NULL,
