@@ -74,11 +74,11 @@ function customRender(
 
 //
 describe("Application Page2", () => {
-  test("smoke: should render page properly", async () => {
+  test("smoke: should render page properly", () => {
     // TODO all of this is common to all application funnel pages
     const view = customRender();
     expect(
-      await view.findByRole("heading", { name: "application:Page2.heading" })
+      view.getByRole("heading", { name: "application:Page2.subHeading" })
     ).toBeInTheDocument();
     expect(view.getByRole("button", { name: "common:next" }));
     expect(
