@@ -57,6 +57,15 @@ class AllocatedTimeSlotAdmin(admin.ModelAdmin):
 
     # Form
     form = AllocatedTimeSlotAdminForm
+    fields = [
+        "reservation_unit_option",
+        "day_of_the_week",
+        "begin_time",
+        "end_time",
+    ]
+    readonly_fields = [
+        "reservation_unit_option",
+    ]
 
     @admin.display(
         description=_("Application"),
