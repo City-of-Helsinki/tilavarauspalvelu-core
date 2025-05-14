@@ -26,7 +26,7 @@ from ._base import (
     GenericDjangoModelFactory,
     ManyToManyFactory,
     ModelFactoryBuilder,
-    ReverseForeignKeyFactory,
+    ReverseOneToOneFactory,
 )
 
 if TYPE_CHECKING:
@@ -112,7 +112,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     home_city = ForeignKeyFactory("tests.factories.CityFactory")
     age_group = ForeignKeyFactory("tests.factories.AgeGroupFactory")
 
-    payment_order = ReverseForeignKeyFactory("tests.factories.PaymentOrderFactory")
+    payment_order = ReverseOneToOneFactory("tests.factories.PaymentOrderFactory")
 
     @classmethod
     def create_for_reservation_unit(cls, reservation_unit: ReservationUnit, **kwargs: Any) -> Reservation:

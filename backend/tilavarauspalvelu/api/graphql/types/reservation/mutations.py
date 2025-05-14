@@ -94,7 +94,7 @@ class ReservationConfirmMutation(UpdateMutation):
     @classmethod
     def get_serializer_output(cls, instance: Reservation) -> dict[str, Any]:
         output = super().get_serializer_output(instance)
-        output["order"] = instance.payment_order.first()
+        output["order"] = getattr(instance, "payment_order", None)
         return output
 
 
@@ -151,8 +151,8 @@ class ReservationDeleteTentativeMutation(DeleteMutation):
     def validate_deletion(cls, reservation: Reservation, user: AnyUser) -> None:
         reservation.validators.validate_can_be_deleted(reservation)
 
-        payment_order: PaymentOrder | None = reservation.payment_order.first()
-        if payment_order is not None:
+        if hasattr(reservation, "payment_order"):
+            payment_order: PaymentOrder = reservation.payment_order
             cls.validate_payment_order(payment_order)
 
         # Try Pindora delete, but if it fails, retry in background
