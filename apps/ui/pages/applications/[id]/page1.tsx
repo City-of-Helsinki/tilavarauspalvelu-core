@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
+import { ApplicationFunnelWrapper } from "@/components/application/ApplicationPageWrapper";
 import { Page1 as Page1Impl } from "@/components/application/Page1";
 import {
   type ApplicationPage1FormValues,
@@ -86,11 +86,6 @@ function Page1({
     resolver: zodResolver(ApplicationPage1SchemaRefined({ begin, end })),
   });
 
-  const applicationRoundName = getTranslationSafe(
-    applicationRound,
-    "name",
-    lang
-  );
   const { handleSubmit } = form;
 
   const onSubmit = (values: ApplicationPage1FormValues) => {
@@ -100,16 +95,12 @@ function Page1({
   return (
     <FormProvider {...form}>
       <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)}>
-        <ApplicationPageWrapper
-          subtitle={applicationRoundName}
-          translationKeyPrefix="application:Page1"
-          application={application}
-        >
+        <ApplicationFunnelWrapper page="page1" application={application}>
           <Page1Impl
             applicationRound={applicationRound}
             options={{ ...options, unitOptions }}
           />
-        </ApplicationPageWrapper>
+        </ApplicationFunnelWrapper>
       </Flex>
     </FormProvider>
   );

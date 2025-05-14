@@ -7,6 +7,8 @@ import { type ReadonlyDeep } from "common/src/helpers";
 import { validateApplication } from "./form";
 import { isSent } from "@/modules/util";
 import { getApplicationPath } from "@/modules/urls";
+import styled from "styled-components";
+import { breakpoints } from "common/src/const";
 
 // Ordered list of steps by page slug
 export const PAGES_WITH_STEPPER = ["page1", "page2", "page3", "page4"] as const;
@@ -42,6 +44,16 @@ function calculateAvailableStep(
   return StepState.disabled;
 }
 
+const StyledStepper = styled(HDSStepper)`
+  p {
+    /* HDS stepper line breaks aggressively while adding extra white space */
+    white-space: nowrap;
+    @media (max-width: ${breakpoints.m}) {
+      white-space: unset;
+    }
+  }
+`;
+
 type StepperProps = {
   application: ReadonlyDeep<ApplicationFormFragment>;
 };
@@ -72,7 +84,7 @@ export function ApplicationStepper({
   const selectedStep = getStep(pathname.split("/").pop() ?? "page1");
 
   return (
-    <HDSStepper
+    <StyledStepper
       language={i18n.language}
       steps={steps}
       selectedStep={selectedStep}

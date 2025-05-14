@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { AutoGrid } from "common/styled";
+import { AutoGrid, HR } from "common/styled";
 import { SearchTags } from "@/component/SearchTags";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import {
@@ -8,7 +8,6 @@ import {
   ApplicantTypeChoice,
   ApplicationSectionStatusChoice,
 } from "@gql/gql-types";
-import { HR } from "@/component/Table";
 import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
 
 type UnitPkName = {

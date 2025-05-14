@@ -6,6 +6,12 @@ export const NoWrap = styled.span`
   white-space: nowrap;
 `;
 
+export const HR = styled.hr`
+  border: 0;
+  border-top: 1px solid var(--color-black-20);
+  width: 100%;
+`;
+
 interface AutoGridProps {
   $minWidth?: string;
   $alignCenter?: boolean;

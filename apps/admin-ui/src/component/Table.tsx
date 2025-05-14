@@ -9,12 +9,6 @@ type TableWrapperProps = {
   $colWidths?: string[];
 };
 
-export const HR = styled.hr`
-  border: 0;
-  border-top: 1px solid var(--color-black-20);
-  width: 100%;
-`;
-
 // Required for overflow to work
 const Wrapper = styled.div`
   display: grid;

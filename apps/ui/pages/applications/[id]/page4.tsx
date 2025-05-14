@@ -11,7 +11,7 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ViewApplication } from "@/components/application/ViewApplication";
 import { createApolloClient } from "@/modules/apolloClient";
-import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
+import { ApplicationFunnelWrapper } from "@/components/application/ApplicationPageWrapper";
 import {
   getCommonServerSideProps,
   getGenericTerms,
@@ -37,7 +37,10 @@ import { gql } from "@apollo/client";
 // User has to accept the terms of service then on submit we change the application status
 // This uses separate Send mutation (not update) so no onNext like the other pages
 // we could also remove the FormContext here
-function Preview({ application, tos }: PropsNarrowed): JSX.Element {
+function Page4({
+  application,
+  tos,
+}: Pick<PropsNarrowed, "application" | "tos">): JSX.Element {
   const router = useRouter();
   const dislayError = useDisplayError();
   const { t } = useTranslation();
@@ -90,10 +93,7 @@ function Preview({ application, tos }: PropsNarrowed): JSX.Element {
   const isValid = validateApplication(application);
 
   return (
-    <ApplicationPageWrapper
-      translationKeyPrefix="application:preview"
-      application={application}
-    >
+    <ApplicationFunnelWrapper page="page4" application={application}>
       <Flex as="form" onSubmit={onSubmit}>
         <ViewApplication
           application={application}
@@ -134,7 +134,7 @@ function Preview({ application, tos }: PropsNarrowed): JSX.Element {
           </Button>
         </ButtonContainer>
       </Flex>
-    </ApplicationPageWrapper>
+    </ApplicationFunnelWrapper>
   );
 }
 
@@ -184,7 +184,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-export default Preview;
+export default Page4;
 
 // TODO narrow down the query fragment (if possible), need at least TermsOfUse and ApplicationForm
 export const APPLICATION_PREVIEW_QUERY = gql`
