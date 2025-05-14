@@ -1288,7 +1288,6 @@ export type Mutation = {
   readonly deleteTentativeReservation: Maybe<ReservationDeleteTentativeMutationPayload>;
   readonly denyReservation: Maybe<ReservationDenyMutationPayload>;
   readonly denyReservationSeries: Maybe<ReservationSeriesDenyMutationPayload>;
-  readonly refreshOrder: Maybe<RefreshOrderMutationPayload>;
   readonly refundReservation: Maybe<ReservationRefundMutationPayload>;
   readonly rejectAllApplicationOptions: Maybe<RejectAllApplicationOptionsMutationPayload>;
   readonly rejectAllSectionOptions: Maybe<RejectAllSectionOptionsMutationPayload>;
@@ -1460,10 +1459,6 @@ export type MutationDenyReservationSeriesArgs = {
   input: ReservationSeriesDenyMutationInput;
 };
 
-export type MutationRefreshOrderArgs = {
-  input: RefreshOrderMutationInput;
-};
-
 export type MutationRefundReservationArgs = {
   input: ReservationRefundMutationInput;
 };
@@ -1608,6 +1603,7 @@ export enum OrderStatus {
   Draft = "DRAFT",
   Expired = "EXPIRED",
   Paid = "PAID",
+  PaidByInvoice = "PAID_BY_INVOICE",
   PaidManually = "PAID_MANUALLY",
   Refunded = "REFUNDED",
 }
@@ -1719,8 +1715,8 @@ export type PaymentProductNode = Node & {
 
 /** An enumeration. */
 export enum PaymentType {
-  Invoice = "INVOICE",
   Online = "ONLINE",
+  OnlineOrInvoice = "ONLINE_OR_INVOICE",
   OnSite = "ON_SITE",
 }
 
@@ -2803,16 +2799,6 @@ export enum RecurringReservationOrderingChoices {
   UnitNameSvDesc = "unitNameSvDesc",
 }
 
-export type RefreshOrderMutationInput = {
-  readonly orderUuid: Scalars["String"]["input"];
-};
-
-export type RefreshOrderMutationPayload = {
-  readonly orderUuid: Maybe<Scalars["String"]["output"]>;
-  readonly reservationPk: Maybe<Scalars["Int"]["output"]>;
-  readonly status: Maybe<Scalars["String"]["output"]>;
-};
-
 export type RejectAllApplicationOptionsMutationInput = {
   readonly pk: Scalars["Int"]["input"];
 };
@@ -3862,9 +3848,6 @@ export type ReservationUnitCreateMutationInput = {
   readonly nameFi?: InputMaybe<Scalars["String"]["input"]>;
   readonly nameSv?: InputMaybe<Scalars["String"]["input"]>;
   readonly paymentTerms?: InputMaybe<Scalars["String"]["input"]>;
-  readonly paymentTypes?: InputMaybe<
-    ReadonlyArray<InputMaybe<Scalars["String"]["input"]>>
-  >;
   readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
   readonly pricingTerms?: InputMaybe<Scalars["String"]["input"]>;
   readonly pricings?: InputMaybe<
@@ -3978,9 +3961,6 @@ export type ReservationUnitCreateMutationPayload = {
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
   readonly paymentTerms: Maybe<Scalars["String"]["output"]>;
-  readonly paymentTypes: Maybe<
-    ReadonlyArray<Maybe<Scalars["String"]["output"]>>
-  >;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly pricingTerms: Maybe<Scalars["String"]["output"]>;
   readonly pricings: Maybe<ReadonlyArray<Maybe<ReservationUnitPricingNode>>>;
@@ -4131,7 +4111,6 @@ export type ReservationUnitNode = Node & {
   readonly paymentMerchant: Maybe<PaymentMerchantNode>;
   readonly paymentProduct: Maybe<PaymentProductNode>;
   readonly paymentTerms: Maybe<TermsOfUseNode>;
-  readonly paymentTypes: ReadonlyArray<ReservationUnitPaymentTypeNode>;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly pricingTerms: Maybe<TermsOfUseNode>;
   readonly pricings: ReadonlyArray<ReservationUnitPricingNode>;
@@ -4422,12 +4401,6 @@ export enum ReservationUnitOrderingChoices {
   UnitNameSvDesc = "unitNameSvDesc",
 }
 
-export type ReservationUnitPaymentTypeNode = Node & {
-  readonly code: Scalars["String"]["output"];
-  /** The ID of the object */
-  readonly id: Scalars["ID"]["output"];
-};
-
 export type ReservationUnitPricingNode = Node & {
   readonly begins: Scalars["Date"]["output"];
   readonly highestPrice: Scalars["Decimal"]["output"];
@@ -4436,6 +4409,7 @@ export type ReservationUnitPricingNode = Node & {
   readonly id: Scalars["ID"]["output"];
   readonly lowestPrice: Scalars["Decimal"]["output"];
   readonly lowestPriceNet: Scalars["Decimal"]["output"];
+  readonly paymentType: Maybe<PaymentType>;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly priceUnit: PriceUnit;
   readonly taxPercentage: TaxPercentageNode;
@@ -4448,6 +4422,7 @@ export type ReservationUnitPricingSerializerInput = {
   readonly isActivatedOnBegins?: InputMaybe<Scalars["Boolean"]["input"]>;
   readonly lowestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   readonly lowestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly paymentType?: InputMaybe<PaymentType>;
   readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
   readonly priceUnit?: InputMaybe<PriceUnit>;
   readonly taxPercentage?: InputMaybe<Scalars["Int"]["input"]>;
@@ -4552,9 +4527,6 @@ export type ReservationUnitUpdateMutationInput = {
   readonly nameFi?: InputMaybe<Scalars["String"]["input"]>;
   readonly nameSv?: InputMaybe<Scalars["String"]["input"]>;
   readonly paymentTerms?: InputMaybe<Scalars["String"]["input"]>;
-  readonly paymentTypes?: InputMaybe<
-    ReadonlyArray<InputMaybe<Scalars["String"]["input"]>>
-  >;
   readonly pk: Scalars["Int"]["input"];
   readonly pricingTerms?: InputMaybe<Scalars["String"]["input"]>;
   readonly pricings?: InputMaybe<
@@ -4668,9 +4640,6 @@ export type ReservationUnitUpdateMutationPayload = {
   readonly nameFi: Maybe<Scalars["String"]["output"]>;
   readonly nameSv: Maybe<Scalars["String"]["output"]>;
   readonly paymentTerms: Maybe<Scalars["String"]["output"]>;
-  readonly paymentTypes: Maybe<
-    ReadonlyArray<Maybe<Scalars["String"]["output"]>>
-  >;
   readonly pk: Maybe<Scalars["Int"]["output"]>;
   readonly pricingTerms: Maybe<Scalars["String"]["output"]>;
   readonly pricings: Maybe<ReadonlyArray<Maybe<ReservationUnitPricingNode>>>;
@@ -5604,6 +5573,7 @@ export type UpdateReservationUnitPricingSerializerInput = {
   readonly isActivatedOnBegins?: InputMaybe<Scalars["Boolean"]["input"]>;
   readonly lowestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   readonly lowestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly paymentType?: InputMaybe<PaymentType>;
   readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
   readonly priceUnit?: InputMaybe<PriceUnit>;
   readonly taxPercentage?: InputMaybe<Scalars["Int"]["input"]>;
@@ -5952,6 +5922,7 @@ export type PricingFieldsFragment = {
   readonly id: string;
   readonly begins: string;
   readonly priceUnit: PriceUnit;
+  readonly paymentType: PaymentType | null;
   readonly lowestPrice: string;
   readonly highestPrice: string;
   readonly taxPercentage: {
@@ -6883,10 +6854,6 @@ export type ReservationUnitEditQuery = {
       readonly pk: number | null;
       readonly nameFi: string | null;
     }>;
-    readonly paymentTypes: ReadonlyArray<{
-      readonly id: string;
-      readonly code: string;
-    }>;
     readonly pricingTerms: {
       readonly id: string;
       readonly pk: string | null;
@@ -6953,6 +6920,7 @@ export type ReservationUnitEditQuery = {
       readonly id: string;
       readonly begins: string;
       readonly priceUnit: PriceUnit;
+      readonly paymentType: PaymentType | null;
       readonly lowestPrice: string;
       readonly highestPrice: string;
       readonly taxPercentage: {
@@ -9073,6 +9041,7 @@ export type ApprovalButtonsFragment = {
       readonly id: string;
       readonly begins: string;
       readonly priceUnit: PriceUnit;
+      readonly paymentType: PaymentType | null;
       readonly lowestPrice: string;
       readonly highestPrice: string;
       readonly taxPercentage: {
@@ -9099,6 +9068,7 @@ export type ApprovalDialogFieldsFragment = {
       readonly id: string;
       readonly begins: string;
       readonly priceUnit: PriceUnit;
+      readonly paymentType: PaymentType | null;
       readonly lowestPrice: string;
       readonly highestPrice: string;
       readonly taxPercentage: {
@@ -9536,6 +9506,7 @@ export type ReservationPageQuery = {
         readonly id: string;
         readonly begins: string;
         readonly priceUnit: PriceUnit;
+        readonly paymentType: PaymentType | null;
         readonly lowestPrice: string;
         readonly highestPrice: string;
         readonly taxPercentage: {
@@ -9728,6 +9699,7 @@ export type ReservationUnitPricingFieldsFragment = {
     readonly id: string;
     readonly begins: string;
     readonly priceUnit: PriceUnit;
+    readonly paymentType: PaymentType | null;
     readonly lowestPrice: string;
     readonly highestPrice: string;
     readonly taxPercentage: {
@@ -9748,6 +9720,7 @@ export type ReservationPriceDetailsFieldsFragment = {
       readonly id: string;
       readonly begins: string;
       readonly priceUnit: PriceUnit;
+      readonly paymentType: PaymentType | null;
       readonly lowestPrice: string;
       readonly highestPrice: string;
       readonly taxPercentage: {
@@ -11067,6 +11040,7 @@ export const PricingFieldsFragmentDoc = gql`
     id
     begins
     priceUnit
+    paymentType
     lowestPrice
     highestPrice
     taxPercentage {
@@ -13110,10 +13084,6 @@ export const ReservationUnitEditDocument = gql`
         id
         pk
         nameFi
-      }
-      paymentTypes {
-        id
-        code
       }
       pricingTerms {
         id

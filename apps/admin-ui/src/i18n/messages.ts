@@ -67,7 +67,7 @@ const translations: ITranslations = {
     SEASONAL: ["Kausivaraus"],
   },
   paymentType: {
-    INVOICE: ["Laskutus"],
+    ONLINE_OR_INVOICE: ["Verkkomaksu tai laskutus"],
     ONLINE: ["Verkkomaksu"],
     ON_SITE: ["Maksu paikan päällä"],
   },

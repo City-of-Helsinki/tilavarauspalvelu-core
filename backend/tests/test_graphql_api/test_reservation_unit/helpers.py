@@ -7,7 +7,14 @@ from typing import TYPE_CHECKING, Any, NamedTuple
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from tilavarauspalvelu.enums import AccessType, AuthenticationType, PriceUnit, ReservationKind, ReservationStartInterval
+from tilavarauspalvelu.enums import (
+    AccessType,
+    AuthenticationType,
+    PaymentType,
+    PriceUnit,
+    ReservationKind,
+    ReservationStartInterval,
+)
 from utils.date_utils import local_date, local_datetime
 
 from tests.factories import (
@@ -101,6 +108,7 @@ def get_create_non_draft_input_data(**overrides: Any) -> dict[str, Any]:
                 "lowestPrice": "10.5",
                 "highestPrice": "18.8",
                 "taxPercentage": tax_percentage.id,
+                "paymentType": PaymentType.ONLINE_OR_INVOICE,
             }
         ],
         "accessTypes": [
@@ -146,6 +154,7 @@ def get_pricing_data(**overrides: Any) -> dict[str, Any]:
         "lowestPrice": "18.2",
         "highestPrice": "21.5",
         "taxPercentage": tax_percentage.id,
+        "paymentType": PaymentType.ONLINE_OR_INVOICE,
         **overrides,
     }
 

@@ -18,6 +18,7 @@ import {
   ReservationUnitReservationState,
   type PriceReservationUnitFieldsFragment,
   type EquipmentFieldsFragment,
+  PaymentType,
 } from "@gql/gql-types";
 import {
   type GetReservationUnitPriceProps,
@@ -666,6 +667,7 @@ function constructPricing({
       pk: 1,
       value: (taxPercentage ?? 24).toString(),
     },
+    paymentType: PaymentType.OnlineOrInvoice,
   };
 }
 
