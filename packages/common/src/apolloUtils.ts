@@ -1,5 +1,9 @@
 import { ApolloError } from "@apollo/client";
 import { type GraphQLFormattedError } from "graphql";
+import * as Sentry from "@sentry/nextjs";
+import { onError } from "@apollo/client/link/error";
+import toast from "./common/toast";
+import { isBrowser } from "./helpers";
 
 // TODO narrow down the error codes and transform unknowns to catch all
 type ErrorCode = string;
@@ -171,6 +175,26 @@ export function getSeriesOverlapErrors(error: unknown): OverlappingError[] {
   return [];
 }
 
+function mapGraphQLErrors(
+  graphQLErrors: readonly Readonly<GraphQLFormattedError>[]
+): ApiError[] {
+  if (graphQLErrors.length > 0) {
+    return graphQLErrors.flatMap((err) => {
+      const code = getExtensionCode(err);
+      if (code === "RESERVATION_SERIES_OVERLAPS") {
+        return mapOverlapError(err);
+      }
+      if (code === "MUTATION_VALIDATION_ERROR") {
+        return mapValidationError(err);
+      }
+      return {
+        code: code ?? "UNKNOWN",
+      };
+    });
+  }
+  return [];
+}
+
 // TODO add non-graphql errors code
 // TODO add no-extension errors
 export function getApiErrors(error: unknown): ApiError[] {
@@ -180,20 +204,7 @@ export function getApiErrors(error: unknown): ApiError[] {
 
   if (error instanceof ApolloError) {
     const { graphQLErrors } = error;
-    if (graphQLErrors.length > 0) {
-      return graphQLErrors.flatMap((err) => {
-        const code = getExtensionCode(err);
-        if (code === "RESERVATION_SERIES_OVERLAPS") {
-          return mapOverlapError(err);
-        }
-        if (code === "MUTATION_VALIDATION_ERROR") {
-          return mapValidationError(err);
-        }
-        return {
-          code: code ?? "UNKNOWN",
-        };
-      });
-    }
+    return mapGraphQLErrors(graphQLErrors);
   }
   return [];
 }
@@ -214,3 +225,73 @@ function getExtensionCode(e: GraphQLFormattedError): string | null {
   }
   return null;
 }
+
+function extractErrorCode(error: ApiError): string | string[] {
+  if (
+    "validation_code" in error &&
+    error.validation_code != null &&
+    typeof error.validation_code === "string"
+  ) {
+    return [error.code, error.validation_code];
+  }
+  if (error.code != null) {
+    return error.code;
+  }
+  return [];
+}
+
+/// Capture all graphql errors as warnings in Sentry
+/// if some errors are properly handled in the UI add filter here
+/// During development log to console
+export const errorLink = onError(({ graphQLErrors, networkError }) => {
+  // NOTE in case we have multiple errors in the response this will create separate buckets for those
+  const apiErrors = mapGraphQLErrors(graphQLErrors ?? []);
+  const apiErrorCodes = apiErrors.map((e) => extractErrorCode(e)).flat();
+  const context = {
+    level: "warning" as const,
+    // have to encode the errors [Object Object] otherwise
+    extra: {
+      ...(graphQLErrors != null
+        ? { graphQLErrors: JSON.stringify(graphQLErrors) }
+        : {}),
+      ...(networkError != null
+        ? { networkError: JSON.stringify(networkError) }
+        : {}),
+    },
+    fingerprint: ["graphql_error", ...apiErrorCodes],
+  };
+  Sentry.captureMessage(`GraphQL error: ${apiErrorCodes.join(",")}`, context);
+
+  if (networkError != null && isBrowser) {
+    const errorToastId = "network_error";
+
+    // don't create multiple toasts
+    if (!document.querySelector(`#${errorToastId}`)) {
+      // Not translated because of how difficult it is to pass the translation function here
+      let errorMsg = "Network error";
+      if ("statusCode" in networkError) {
+        errorMsg += `: ${networkError.statusCode}`;
+      }
+      toast({
+        text: errorMsg,
+        type: "error",
+        options: { toastId: errorToastId },
+      });
+    }
+  }
+  // During development (especially for SSR) log to console since there is no network tab
+  // better method would be to use a logger / push errors to client side
+  if (process.env.NODE_ENV !== "production") {
+    if (graphQLErrors) {
+      for (const error of graphQLErrors) {
+        // eslint-disable-next-line no-console
+        console.error(`GQL_ERROR: ${JSON.stringify(error, null, 2)}`);
+      }
+    }
+
+    if (networkError) {
+      // eslint-disable-next-line no-console
+      console.error(`NETWORK_ERROR: ${JSON.stringify(networkError, null, 2)}`);
+    }
+  }
+});
