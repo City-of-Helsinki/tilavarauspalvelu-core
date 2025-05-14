@@ -25,22 +25,7 @@ __all__ = [
 class PaymentOrderForm(forms.ModelForm):
     class Meta:
         model = PaymentOrder
-        fields = [
-            "reservation",
-            "remote_id",
-            "payment_id",
-            "refund_id",
-            "payment_type",
-            "status",
-            "price_net",
-            "price_vat",
-            "price_total",
-            "processed_at",
-            "language",
-            "reservation_user_uuid",
-            "checkout_url",
-            "receipt_url",
-        ]
+        fields = []  # Use fields from ModelAdmin
         labels = {
             "reservation": _("Reservation"),
             "remote_id": _("Remote order ID"),
@@ -129,6 +114,25 @@ class PaymentOrderAdmin(admin.ModelAdmin):
 
     # Form
     form = PaymentOrderForm
+    fields = [
+        "reservation",
+        "remote_id",
+        "payment_id",
+        "refund_id",
+        "payment_type",
+        "status",
+        "price_net",
+        "price_vat",
+        "price_total",
+        "processed_at",
+        "language",
+        "reservation_user_uuid",
+        "checkout_url",
+        "receipt_url",
+    ]
+    readonly_fields = [
+        "reservation",
+    ]
 
     def get_queryset(self, request: WSGIRequest) -> QuerySet:
         return super().get_queryset(request).select_related("reservation")
