@@ -429,15 +429,12 @@ def test_reservation__confirm__return_order_data(graphql):
     assert VerkkokauppaAPIClient.create_order.called is True
 
     reservation.refresh_from_db()
-    orders = list(reservation.payment_order.all())
-    assert len(orders) == 1
-    order: PaymentOrder = orders[0]
 
     assert response.first_query_object == {
         "state": reservation.state.upper(),
         "order": {
             "checkoutUrl": "https://checkout.url",
-            "paymentType": order.payment_type,
+            "paymentType": reservation.payment_order.payment_type,
         },
     }
 

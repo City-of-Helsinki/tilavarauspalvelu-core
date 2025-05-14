@@ -286,18 +286,21 @@ class ReservationActions:
 
     @property
     def is_refundable(self) -> bool:
-        payment_order: PaymentOrder | None = self.reservation.payment_order.first()
+        if not hasattr(self.reservation, "payment_order"):
+            return False
+
+        payment_order: PaymentOrder = self.reservation.payment_order
         return (
             self.reservation.price_net > 0  # Is a paid reservation
-            and payment_order is not None  # Has a payment order
             and payment_order.status == OrderStatus.PAID  # Has been paid in webshop using online payment
             and payment_order.refund_id is None  # Has not been refunded already
         )
 
     def refund_paid_reservation(self) -> None:
-        payment_order: PaymentOrder | None = self.reservation.payment_order.first()
-        if not payment_order:
+        if not hasattr(self.reservation, "payment_order"):
             return
+
+        payment_order: PaymentOrder = self.reservation.payment_order
 
         if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
             payment_order.refund_id = uuid.uuid4()
@@ -311,19 +314,22 @@ class ReservationActions:
 
     @property
     def is_cancellable_invoice(self) -> bool:
-        payment_order: PaymentOrder | None = self.reservation.payment_order.first()
+        if not hasattr(self.reservation, "payment_order"):
+            return False
+
+        payment_order = self.reservation.payment_order
         begin_date = self.reservation.begin.astimezone(DEFAULT_TIMEZONE).date()
         return (
             self.reservation.price_net > 0  # Is a paid reservation
             and local_date() <= begin_date  # Reservation start date is not in the past
-            and payment_order is not None  # Has a payment order
             and payment_order.status == OrderStatus.PAID_BY_INVOICE  # Has been paid in webshop using invoice
         )
 
     def cancel_invoiced_reservation(self) -> None:
-        payment_order: PaymentOrder | None = self.reservation.payment_order.first()
-        if payment_order is None:
+        if not hasattr(self.reservation, "payment_order"):
             return
+
+        payment_order: PaymentOrder = self.reservation.payment_order
 
         if not settings.MOCK_VERKKOKAUPPA_API_ENABLED:
             VerkkokauppaAPIClient.cancel_order(

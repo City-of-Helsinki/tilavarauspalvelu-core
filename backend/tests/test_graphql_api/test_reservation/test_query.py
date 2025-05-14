@@ -150,7 +150,7 @@ def test_reservation__query__all_fields(graphql):
         "isHandled": False,
         "name": reservation.name,
         "numPersons": reservation.num_persons,
-        "paymentOrder": [],
+        "paymentOrder": None,
         "price": f"{reservation.price:.2f}",
         "priceNet": f"{reservation.price_net:.2f}",
         "purpose": None,
@@ -396,18 +396,16 @@ def test_reservation__query__order__all_fields(graphql):
 
     assert response.has_errors is False, response
     assert response.node(0) == {
-        "paymentOrder": [
-            {
-                "reservationPk": str(reservation.pk),
-                "checkoutUrl": None,
-                "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
-                "paymentType": "ONLINE",
-                "receiptUrl": None,
-                "refundUuid": None,
-                "status": "DRAFT",
-                "expiresInMinutes": 5,
-            },
-        ],
+        "paymentOrder": {
+            "reservationPk": str(reservation.pk),
+            "checkoutUrl": None,
+            "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
+            "paymentType": "ONLINE",
+            "receiptUrl": None,
+            "refundUuid": None,
+            "status": "DRAFT",
+            "expiresInMinutes": 5,
+        },
     }
 
 
