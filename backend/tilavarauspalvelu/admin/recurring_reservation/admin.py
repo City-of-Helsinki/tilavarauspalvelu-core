@@ -86,6 +86,9 @@ class RecurringReservationAdmin(admin.ModelAdmin):
         "should_have_active_access_code",
         "access_type",
         "used_access_types",
+        "user",
+        "allocated_time_slot",
+        "reservation_unit",
     ]
     inlines = [ReservationInline]
 

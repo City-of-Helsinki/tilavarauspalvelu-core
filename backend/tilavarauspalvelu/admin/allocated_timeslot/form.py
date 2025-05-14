@@ -16,12 +16,7 @@ class AllocatedTimeSlotAdminForm(forms.ModelForm):
 
     class Meta:
         model = AllocatedTimeSlot
-        fields = [
-            "day_of_the_week",
-            "begin_time",
-            "end_time",
-            "reservation_unit_option",
-        ]
+        fields = []  # Use fields from ModelAdmin
         labels = {
             "day_of_the_week": _("Day of the week"),
             "begin_time": _("Begin time"),
