@@ -355,8 +355,9 @@ def _cancel_reservations(qs: ReservationQuerySet, cancel_reasons: list[Reservati
         reservation.cancel_reason = random.choice(cancel_reasons)
         reservations.append(reservation)
 
-        payment_order = reservation.payment_order.first()
-        if payment_order is not None:
+        if hasattr(reservation, "payment_order"):
+            payment_order: PaymentOrder = reservation.payment_order
+
             overdue = payment_order.handled_payment_due_by is not None and payment_order.handled_payment_due_by <= now
 
             match payment_order.status:
@@ -399,8 +400,9 @@ def _deny_reservations(qs: ReservationQuerySet, deny_reasons: list[ReservationDe
         reservation.deny_reason = random.choice(deny_reasons)
         reservations.append(reservation)
 
-        payment_order = reservation.payment_order.first()
-        if payment_order is not None:
+        if hasattr(reservation, "payment_order"):
+            payment_order: PaymentOrder = reservation.payment_order
+
             # Handler can choose to refund the payment, most of the time they do
             action = weighted_choice([OrderStatus.REFUNDED, OrderStatus.CANCELLED], weights=[3, 1])
 
