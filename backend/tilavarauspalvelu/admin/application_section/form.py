@@ -8,13 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
-from tilavarauspalvelu.models import (
-    Application,
-    ApplicationSection,
-    ReservationUnit,
-    ReservationUnitOption,
-    SuitableTimeRange,
-)
+from tilavarauspalvelu.models import ApplicationSection, ReservationUnit, ReservationUnitOption, SuitableTimeRange
 from utils.external_service.errors import ExternalServiceError
 from utils.fields.forms import disabled_widget
 
@@ -163,8 +157,6 @@ class ApplicationSectionAdminForm(forms.ModelForm):
         if instance:
             kwargs.setdefault("initial", {})
             kwargs["initial"]["status"] = ApplicationSectionStatusChoice(instance.status).label
-
-        self.base_fields["application"].queryset = Application.objects.select_related("user")
 
         super().__init__(*args, **kwargs)
 
