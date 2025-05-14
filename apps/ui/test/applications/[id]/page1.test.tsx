@@ -71,13 +71,12 @@ function customRender(
 }
 
 describe("Page1", () => {
-  test("should render empty application page", async () => {
+  test("should render empty application page", () => {
     // TODO all of this is common to all application funnel pages
     const view = customRender();
     expect(
-      await view.findByRole("heading", { name: "application:Page1.heading" })
+      view.getByRole("heading", { name: "application:Page1.subHeading" })
     ).toBeInTheDocument();
-    expect(view.getByText("ApplicationRoundNode FI")).toBeInTheDocument();
     expect(view.getByRole("button", { name: "application:Page1.createNew" }));
     expect(view.getByRole("button", { name: "common:next" }));
     expect(

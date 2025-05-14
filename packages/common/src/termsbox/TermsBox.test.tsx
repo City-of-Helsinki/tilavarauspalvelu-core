@@ -1,7 +1,8 @@
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import TermsBox, { type TermBoxProps } from "./TermsBox";
 import { vi, describe, test, expect } from "vitest";
+import userEvent from "@testing-library/user-event";
 
 const bodyText = `Excepteur ut veniam minim id. Veniam laboris laborum cupidatat nisi sunt est magna id voluptate. Ullamco elit do tempor et dolore. Sit dolore laborum excepteur laborum qui eiusmod. Nisi proident officia labore sunt sit labore. Non aute ut exercitation elit sint. Aute irure reprehenderit reprehenderit amet sunt velit irure voluptate.`;
 
@@ -20,55 +21,80 @@ const defaultProps = {
   setAccepted: vi.fn(),
 };
 
-const renderComponent = (props?: Partial<TermBoxProps>) =>
-  render(<TermsBox {...defaultProps} {...props} />);
+const renderComponent = (props: TermBoxProps) =>
+  render(<TermsBox {...props} />);
 
 describe("TermsBox", () => {
-  test("should render with default props", () => {
-    renderComponent();
-
-    const link1 = screen.getByText(defaultProps.links[0]?.text ?? "");
-    const link2 = screen.getByText(defaultProps.links[1]?.text ?? "");
-
-    expect(screen.getByText(defaultProps.heading)).toBeInTheDocument();
-
-    expect(screen.getByText(bodyText)).toBeInTheDocument();
-
-    expect(link1).toBeInTheDocument();
-    expect(link1).toHaveAttribute("href", defaultProps.links[0]?.href);
-    expect(link1).toHaveAttribute("target", "_blank");
-
-    expect(link2).toBeInTheDocument();
-    expect(link2).toHaveAttribute("href", defaultProps.links[1]?.href);
-    expect(link2).toHaveAttribute("target", "_blank");
-
-    expect(screen.getByText(defaultProps.acceptLabel)).toBeInTheDocument();
+  test("should render with all props", () => {
+    const view = renderComponent(defaultProps);
+    expect(view.getByText(defaultProps.heading)).toBeInTheDocument();
+    expect(view.getByText(bodyText)).toBeInTheDocument();
+    for (const link of defaultProps.links) {
+      const anchor = view.getByText(link.text);
+      expect(anchor).toBeInTheDocument();
+      expect(anchor).toHaveAttribute("href", link.href);
+      expect(anchor).toHaveAttribute("target", "_blank");
+    }
+    expect(view.getByText(defaultProps.acceptLabel)).toBeInTheDocument();
   });
 
-  test("should render without acceptance", () => {
-    renderComponent({ acceptLabel: undefined });
-
-    expect(
-      screen.queryByText(defaultProps.acceptLabel)
-    ).not.toBeInTheDocument();
+  test("should render with JSX body", () => {
+    const view = renderComponent({ body: defaultProps.body });
+    const body = view.getByText(bodyText);
+    expect(body).toBeInTheDocument();
+    expect(body.tagName).toBe("SPAN");
   });
 
-  test("should render without links", () => {
-    renderComponent({ links: undefined });
-
-    expect(screen.getByText(defaultProps.heading)).toBeInTheDocument();
-    expect(screen.getByText(bodyText)).toBeInTheDocument();
-    expect(screen.getByText(defaultProps.acceptLabel)).toBeInTheDocument();
+  test("should render with string body", () => {
+    const view = renderComponent({ body: "string body" });
+    const body = view.getByText("string body");
+    expect(body).toBeInTheDocument();
+    expect(body.tagName).toBe("P");
   });
 
-  test("should fire acceptance callback", () => {
-    renderComponent();
-
-    const checkbox = screen.getByTestId("terms-box__checkbox--accept-terms");
-
-    fireEvent.click(checkbox);
-    fireEvent.click(checkbox);
-
-    expect(defaultProps.setAccepted).toHaveBeenCalledTimes(2);
+  test("should render with only heading", () => {
+    const { heading } = defaultProps;
+    const view = renderComponent({ heading });
+    expect(view.getByRole("heading", { name: heading })).toBeInTheDocument();
   });
+
+  test("should render with only links", () => {
+    const view = renderComponent({ links: defaultProps.links });
+    expect(view.queryByRole("list")).toBeInTheDocument();
+  });
+
+  test("should not have link container with no links", () => {
+    const view = renderComponent({});
+    expect(view.queryByRole("list")).not.toBeInTheDocument();
+  });
+
+  test("should NOT render accept checkbox without setAccepted", () => {
+    const view = renderComponent({ ...defaultProps, setAccepted: undefined });
+    const checkbox = view.queryByRole("checkbox");
+    expect(checkbox).not.toBeInTheDocument();
+  });
+
+  test("should NOT render accept checkbox without acceptLabel", () => {
+    const view = renderComponent({
+      ...defaultProps,
+      acceptLabel: undefined,
+    });
+    const checkbox = view.queryByRole("checkbox");
+    expect(checkbox).not.toBeInTheDocument();
+  });
+
+  test.for([[true], [false]] as const)(
+    "should toggle acceptance callback ",
+    async ([accepted]) => {
+      const user = userEvent.setup();
+      const setAccepted = vi.fn();
+      const view = renderComponent({ ...defaultProps, setAccepted, accepted });
+      const checkbox = view.getByRole("checkbox", {
+        name: defaultProps.acceptLabel,
+      });
+      expect(checkbox).toBeInTheDocument();
+      await user.click(checkbox);
+      expect(setAccepted).toHaveBeenCalledExactlyOnceWith(!accepted);
+    }
+  );
 });

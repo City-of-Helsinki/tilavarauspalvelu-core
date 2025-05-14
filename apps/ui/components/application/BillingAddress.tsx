@@ -9,7 +9,7 @@ export function BillingAddress() {
   return (
     <>
       <FormSubHeading as="h2">
-        {t("application:Page3.subHeading.billingAddress")}
+        {t("application:Page3.sectionHeadings.billingAddress")}
       </FormSubHeading>
       <ApplicationFormTextInput name="billingAddress.streetAddress" />
       <ApplicationFormTextInput name="billingAddress.postCode" />

@@ -68,7 +68,7 @@ export function OrganisationForm({ homeCityOptions }: Props): JSX.Element {
         disabled={!hasRegistration}
       />
       <FormSubHeading>
-        {t("application:Page3.subHeading.postalAddress")}
+        {t("application:Page3.sectionHeadings.postalAddress")}
       </FormSubHeading>
       <ApplicationFormTextInput name="organisation.address.streetAddress" />
       <ApplicationFormTextInput name="organisation.address.postCode" />

@@ -22,7 +22,7 @@ import {
   convertApplicationPage3,
   transformPage3Application,
 } from "@/components/application/form";
-import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
+import { ApplicationFunnelWrapper } from "@/components/application/ApplicationPageWrapper";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { getApplicationPath } from "@/modules/urls";
@@ -129,10 +129,7 @@ function Page3({
 
   return (
     <FormProvider {...form}>
-      <ApplicationPageWrapper
-        translationKeyPrefix="application:Page3"
-        application={application}
-      >
+      <ApplicationFunnelWrapper page="page3" application={application}>
         <Flex
           as="form"
           noValidate
@@ -142,7 +139,7 @@ function Page3({
           <ApplicantTypeSelector />
           <AutoGrid>
             <FormSubHeading as="h2">
-              {t("application:Page3.subHeading.basicInfo")}
+              {t("application:Page3.sectionHeadings.basicInfo")}
             </FormSubHeading>
             <Page3Form />
           </AutoGrid>
@@ -165,7 +162,7 @@ function Page3({
             </Button>
           </ButtonContainer>
         </Flex>
-      </ApplicationPageWrapper>
+      </ApplicationFunnelWrapper>
     </FormProvider>
   );
 }

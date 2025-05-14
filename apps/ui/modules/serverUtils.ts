@@ -9,6 +9,7 @@ import {
   type OrderQuery,
   type OrderQueryVariables,
   OrderDocument,
+  TermsOfUseFieldsFragment,
 } from "@gql/gql-types";
 import { genericTermsVariant } from "./const";
 import { getVersion } from "./baseUtils.mjs";
@@ -39,7 +40,10 @@ export function getCommonServerSideProps() {
   };
 }
 
-export async function getGenericTerms(apolloClient: ApolloClient<unknown>) {
+type GetGenericTermsReturn = TermsOfUseFieldsFragment | null;
+export async function getGenericTerms(
+  apolloClient: ApolloClient<unknown>
+): Promise<GetGenericTermsReturn> {
   const { data: tosData } = await apolloClient.query<
     TermsOfUseQuery,
     TermsOfUseQueryVariables
