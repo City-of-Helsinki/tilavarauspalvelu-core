@@ -24,7 +24,7 @@ export const mainStyles = css`
   width: 100%;
 
   /* don't add gaps for empty elements */
-  & > :not(img):empty {
+  & > :not(img):not(hr):empty {
     display: none;
   }
 

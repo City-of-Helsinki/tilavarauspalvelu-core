@@ -1,11 +1,12 @@
 import {
   ApplicationRoundStatusChoice,
+  TermsOfUseFieldsFragment,
   TermsType,
   type ApplicationPage4Query,
 } from "@/gql/gql-types";
-import Page3 from "@/pages/applications/[id]/page3";
+import Page4 from "@/pages/applications/[id]/page4";
 import { MockedProvider } from "@apollo/client/testing";
-import { render, within } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
 import {
   createMockApplicationFragment,
@@ -13,8 +14,10 @@ import {
   type CreateGraphQLMocksReturn,
   createGraphQLApplicationIdMock,
   generateNameFragment,
+  generateTextFragment,
 } from "@/test/test.gql.utils";
 import { base64encode } from "common/src/helpers";
+import userEvent from "@testing-library/user-event";
 
 const { useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
@@ -67,90 +70,119 @@ function customRender(
   if (props.page == null) {
     props.page = "page3";
   }
+
   const applicationRoundMock = {
-    id: base64encode("ApplicationRoundNode:1"),
-    sentDate: "2023-10-01T00:00:00Z",
+    sentDate: new Date().toISOString(),
     status: ApplicationRoundStatusChoice.Open,
-    notesWhenApplyingFi: null,
-    notesWhenApplyingEn: null,
-    notesWhenApplyingSv: null,
-    reservationPeriodBegin: "2023-10-01T00:00:00Z",
-    reservationPeriodEnd: "2023-10-01T00:00:00Z",
-    pk: 1,
     ...generateNameFragment("ApplicationRound"),
     termsOfUse: {
       id: base64encode("TermsOfUseNode:1"),
-      pk: null,
+      pk: "recurring",
       termsType: TermsType.RecurringTerms,
-      // TODO
-      nameFi: null,
-      nameEn: null,
-      nameSv: null,
-      textFi: null,
-      textEn: null,
-      textSv: null,
+      ...generateNameFragment("TermsOfUse"),
+      ...generateTextFragment("Recurring Terms of Use"),
     },
-    reservationUnits: [] as const,
-    /* TODO
-      readonly reservationUnits: ReadonlyArray<{
-        readonly minPersons: number | null;
-        readonly maxPersons: number | null;
-        readonly id: string;
-        readonly pk: number | null;
-        readonly nameFi: string | null;
-        readonly nameEn: string | null;
-        readonly nameSv: string | null;
-        readonly unit: {
-          readonly id: string;
-          readonly pk: number | null;
-          readonly nameFi: string | null;
-          readonly nameSv: string | null;
-          readonly nameEn: string | null;
-        } | null;
-        readonly images: ReadonlyArray<{
-          readonly id: string;
-          readonly imageUrl: string | null;
-          readonly largeUrl: string | null;
-          readonly mediumUrl: string | null;
-          readonly smallUrl: string | null;
-          readonly imageType: ImageType;
-        }>;
-      }>;
-      */
   };
+  const baseFragment = createMockApplicationFragment(props);
   const application: ApplicationPage4 = {
-    ...createMockApplicationFragment(props),
-    applicationRound: applicationRoundMock,
+    ...baseFragment,
+    applicationRound: {
+      ...baseFragment.applicationRound,
+      ...applicationRoundMock,
+    },
+  };
+  const tos: TermsOfUseFieldsFragment = {
+    id: base64encode("TermsOfUseNode:1"),
+    pk: null,
+    termsType: TermsType.GenericTerms,
+    nameFi: null,
+    nameEn: null,
+    nameSv: null,
+    textFi: null,
+    textEn: null,
+    textSv: null,
   };
   const mocks = createGraphQLMocks();
   return render(
     <MockedProvider mocks={mocks} addTypename={false}>
-      <Page3 application={application} />
+      <Page4 application={application} tos={tos} />
     </MockedProvider>
   );
 }
 
 //
 describe("Application Page4", () => {
-  test("smoke: should render page with initial data", async () => {
-    // TODO all of this is common to all application funnel pages
+  test("smoke: should render page with initial data", () => {
+    // TODO some of this is common to all application funnel pages
+    // we could just remove it (it's tested by the ApplicationFunnel tests)
     const view = customRender();
     expect(
-      await view.findByRole("heading", { name: "application:Page3.heading" })
+      view.getByRole("heading", { name: "application:preview.subHeading" })
     ).toBeInTheDocument();
-    expect(view.getByRole("button", { name: "common:next" }));
+    expect(view.getByRole("button", { name: "common:submit" }));
     expect(
       view.getByRole("link", { name: "breadcrumb:applications" })
     ).toBeInTheDocument();
-    expect(view.getByText("breadcrumb:application")).toBeInTheDocument();
     expect(
       view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })
     ).toBeInTheDocument();
+    expect(view.getByText("Notes when applying FI")).toBeInTheDocument();
 
-    const form = view.getByTestId("application__page3--form");
-    expect(form).toBeInTheDocument();
-    // TODO this doesn't match getByRole("heading")
-    expect(within(form).getByText("application:Page3.subHeading.basicInfo"));
-    // TODO check that we have a single application section with the pick times calendar
+    // Check that we have the terms of use checkboxes
+    expect(
+      view.getByText("reservationCalendar:heading.cancellationPaymentTerms")
+    ).toBeInTheDocument();
+    expect(
+      view.getByText("reservationCalendar:heading.termsOfUse")
+    ).toBeInTheDocument();
+    const checkbox1 = view.getByRole("checkbox", {
+      name: "application:preview.userAcceptsGeneralTerms",
+    });
+    expect(checkbox1).toBeInTheDocument();
+    expect(checkbox1).not.toBeChecked();
+    const checkbox2 = view.getByRole("checkbox", {
+      name: "application:preview.userAcceptsSpecificTerms",
+    });
+    expect(checkbox2).toBeInTheDocument();
+    expect(checkbox2).not.toBeChecked();
+    // TODO check that we have the terms of use text
   });
+
+  test("submit should be disabled unless terms of use are accepted", () => {
+    const view = customRender();
+    const submitButton = view.getByRole("button", { name: "common:submit" });
+    expect(submitButton).toBeInTheDocument();
+    expect(submitButton).toBeDisabled();
+  });
+
+  test.todo("what happens if application round has no terms of use?");
+  test.todo("what happens if application round has empty terms of use?");
+
+  test("should allow submit if terms of use are accepted", async () => {
+    const view = customRender();
+    const user = userEvent.setup();
+    const submitButton = view.getByRole("button", { name: "common:submit" });
+    expect(submitButton).toBeInTheDocument();
+    expect(submitButton).toBeDisabled();
+    const checkbox = view.getByRole("checkbox", {
+      name: "application:preview.userAcceptsGeneralTerms",
+    });
+    expect(checkbox).toBeInTheDocument();
+    expect(checkbox).not.toBeChecked();
+    await user.click(checkbox);
+    expect(checkbox).toBeChecked();
+    const checkbox2 = view.getByRole("checkbox", {
+      name: "application:preview.userAcceptsSpecificTerms",
+    });
+    expect(checkbox2).toBeInTheDocument();
+    expect(checkbox2).not.toBeChecked();
+    await user.click(checkbox2);
+    expect(checkbox2).toBeChecked();
+    expect(submitButton).not.toBeDisabled();
+    // TODO what happens when we click the submit button?
+    // FIXME need to mock the sendApplication mutation
+    // expect url push to getApplicationPath(resPk, "sent")
+    // expect(mockedRouterPush).toHaveBeenCalledWith(getApplicationPath(1, "sent"));
+  });
+  test.todo("should show error if sendApplication fails and not url push");
 });

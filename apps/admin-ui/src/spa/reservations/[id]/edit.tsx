@@ -14,10 +14,9 @@ import {
   ReservationChangeFormSchema,
 } from "@/schemas";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
-import { HR } from "@/component/Table";
 import { useStaffReservationMutation } from "../hooks";
 import { errorToast } from "common/src/common/toast";
-import { ButtonContainer, CenterSpinner, Flex } from "common/styled";
+import { ButtonContainer, CenterSpinner, Flex, HR } from "common/styled";
 import { createTagString } from "./util";
 import ReservationTitleSection from "./ReservationTitleSection";
 import { LinkPrev } from "@/component/LinkPrev";

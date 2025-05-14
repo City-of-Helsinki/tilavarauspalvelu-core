@@ -39,8 +39,7 @@ export function ViewApplication({
 
   const tos2 = application.applicationRound?.termsOfUse;
   const shouldShowNotification =
-    application.status !== ApplicationStatusChoice.ResultsSent &&
-    application.status !== ApplicationStatusChoice.Draft;
+    application.status !== ApplicationStatusChoice.ResultsSent;
   return (
     <>
       <div>
@@ -55,6 +54,7 @@ export function ViewApplication({
       {tos && (
         <TermsBox
           id="preview.acceptTermsOfUse"
+          heading={t("reservationCalendar:heading.cancellationPaymentTerms")}
           body={<Sanitize html={getTranslationSafe(tos, "text", lang)} />}
           acceptLabel={t("application:preview.userAcceptsGeneralTerms")}
           accepted={isTermsAccepted?.general}
@@ -68,6 +68,7 @@ export function ViewApplication({
       {tos2 && (
         <TermsBox
           id="preview.acceptServiceSpecificTerms"
+          heading={t("reservationCalendar:heading.termsOfUse")}
           body={<Sanitize html={getTranslationSafe(tos2, "text", lang)} />}
           acceptLabel={t("application:preview.userAcceptsSpecificTerms")}
           accepted={isTermsAccepted?.specific}
