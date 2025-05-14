@@ -100,7 +100,14 @@ class ApplicationAdmin(admin.ModelAdmin):
         ],
     ]
     inlines = [ApplicationSectionInline]
-    readonly_fields = ["id"]
+    readonly_fields = [
+        "id",
+        "user",
+        "organisation",
+        "contact_person",
+        "billing_address",
+        "application_round",
+    ]
 
     def get_queryset(self, request: WSGIRequest) -> QuerySet:
         return (
