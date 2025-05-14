@@ -22,6 +22,7 @@ from .person.admin import PersonAdmin
 from .purpose.admin import PurposeAdmin
 from .qualifier.admin import QualifierAdmin
 from .recurring_reservation.admin import RecurringReservationAdmin
+from .rejected_occurrence.admin import RejectedOccurrenceAdmin
 from .request_log.admin import RequestLogAdmin
 from .reservation.admin import ReservationAdmin
 from .reservation_cancel_reason.admin import ReservationCancelReasonAdmin
@@ -34,6 +35,7 @@ from .reservation_unit.admin import ReservationUnitAdmin
 from .reservation_unit_access_type.admin import ReservationUnitAccessTypeAdmin
 from .reservation_unit_cancellation_rule.admin import ReservationUnitCancellationRuleAdmin
 from .reservation_unit_image.admin import ReservationUnitImageAdmin
+from .reservation_unit_option.admin import ReservationUnitOptionAdmin
 from .reservation_unit_pricing.admin import ReservationUnitPricingAdmin
 from .reservation_unit_type.admin import ReservationUnitTypeAdmin
 from .resource.admin import ResourceAdmin
@@ -69,6 +71,7 @@ __all__ = [
     "PurposeAdmin",
     "QualifierAdmin",
     "RecurringReservationAdmin",
+    "RejectedOccurrenceAdmin",
     "RequestLogAdmin",
     "ReservationAdmin",
     "ReservationCancelReasonAdmin",
@@ -81,6 +84,7 @@ __all__ = [
     "ReservationUnitAdmin",
     "ReservationUnitCancellationRuleAdmin",
     "ReservationUnitImageAdmin",
+    "ReservationUnitOptionAdmin",
     "ReservationUnitPricingAdmin",
     "ReservationUnitTypeAdmin",
     "ResourceAdmin",

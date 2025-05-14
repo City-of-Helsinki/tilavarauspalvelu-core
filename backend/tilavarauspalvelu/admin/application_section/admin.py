@@ -128,6 +128,7 @@ class ApplicationSectionAdmin(admin.ModelAdmin):
         "id",
         "ext_uuid",
         "should_have_active_access_code",
+        "application",
     ]
     inlines = [
         SuitableTimeRangeInline,
