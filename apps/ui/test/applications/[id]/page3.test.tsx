@@ -74,11 +74,11 @@ function customRender(
 
 //
 describe("Application Page3", () => {
-  test("smoke: should render page with initial data", async () => {
+  test("smoke: should render page with initial data", () => {
     // TODO all of this is common to all application funnel pages
     const view = customRender();
     expect(
-      await view.findByRole("heading", { name: "application:Page3.heading" })
+      view.getByRole("heading", { name: "application:Page3.subHeading" })
     ).toBeInTheDocument();
     expect(view.getByRole("button", { name: "common:next" }));
     expect(
@@ -92,7 +92,9 @@ describe("Application Page3", () => {
     const form = view.getByTestId("application__page3--form");
     expect(form).toBeInTheDocument();
     // TODO this doesn't match getByRole("heading")
-    expect(within(form).getByText("application:Page3.subHeading.basicInfo"));
+    expect(
+      within(form).getByText("application:Page3.sectionHeadings.basicInfo")
+    );
     // TODO check that we have a single application section with the pick times calendar
   });
 

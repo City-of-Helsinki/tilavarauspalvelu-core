@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
+import { ApplicationFunnelWrapper } from "@/components/application/ApplicationPageWrapper";
 import { Page2 as Page2Impl } from "@/components/application/Page2";
 import {
   type ApplicationPage2FormValues,
@@ -88,12 +88,9 @@ function Page2({
 
   return (
     <FormProvider {...form}>
-      <ApplicationPageWrapper
-        translationKeyPrefix="application:Page2"
-        application={application}
-      >
+      <ApplicationFunnelWrapper page="page2" application={application}>
         <Page2Impl application={application} onNext={saveAndNavigate} />
-      </ApplicationPageWrapper>
+      </ApplicationFunnelWrapper>
     </FormProvider>
   );
 }

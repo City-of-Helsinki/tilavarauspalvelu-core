@@ -33,14 +33,10 @@
     "previewError": "Sidan {{ page }} har ett fel.",
     "fix": "Korrigera"
   },
-  "Intro": {
-    "heading": "Säsongbokningsansökan",
-    "createFailedHeading": "Kunde inte skapa en ansökan"
-  },
   "applicationEventSaved": "Säsongsbokning sparad på ansökningen",
+  "heading": "Säsongbokningsansökan",
   "Page1": {
-    "heading": "1. Fyll i bokningsuppgifter",
-    "text": "Lägg till dina bokningsönskemål för nästa säsong",
+    "subHeading": "Fyll i bokningsuppgifter",
     "basicInformationSubHeading": "Grundläggande bokningsuppgifter",
     "name": "Säsongbokningens namn",
     "groupSize": "Gruppstorlek",
@@ -68,9 +64,8 @@
     "deleteEventContent": "Ansökningens information kan inte återställas då ansökningen har raderats."
   },
   "Page2": {
-    "heading": "2. Välj bokningens tidpunkt",
+    "heading": "Välj bokningens tidpunkt",
     "info": "Välj både de tider som du i första hand önskar och också tider som alternativt passar för dig. Att ange flera önskemål om lokaler och tider förbättrar dina chanser att få de lokaler och tider du vill ha.",
-    "text": "Ange de tidpunkter du önskar för säsongbokningen",
     "copyTimes": "Kopiera tiderna till alla önskemål",
     "resetTimes": "Töm kalendern",
     "summary": "Sammanfattning",
@@ -93,14 +88,13 @@
     }
   },
   "Page3": {
-    "heading": "3. Kontaktuppgifter",
-    "text": "Du kan lämna ansökningen som ett samfund, en privatperson eller ett företag. Den senaste ansökningen gäller.",
+    "subHeading": "Kontaktuppgifter",
     "firstName": "Förnamn",
     "homeCity": "Hemort",
     "lastName": "Efternamn",
     "phoneNumber": "Telefonnummer",
     "emailNotification": "Alla meddelanden som har att göra med ansökningen skickas till nedanstående e-postadress",
-    "subHeading": {
+    "sectionHeadings": {
       "basicInfo": "Bokningsinformation",
       "postalAddress": "Postadress",
       "billingAddress": "Fakturaadress",
@@ -139,6 +133,7 @@
     "additionalInformation": "Tilläggsinformation om bokningens ändamål"
   },
   "preview": {
+    "subHeading": "Kontrollera och lämna in ansökan",
     "applicantType": {
       "community": "Oregistrerad förening",
       "company": "Företag",
@@ -146,7 +141,6 @@
       "association": "Registrerad förening"
     },
     "homeCity": "Hemort",
-    "heading": "4. Kontrollera och lämna in ansökan",
     "text": "Sammandrag av din ansökan",
     "basicInfoSubHeading": "Ansökningsinformation",
     "contactPerson": "Kontaktperson",
@@ -173,16 +167,10 @@
       "scheduleTooltip": "Sekundära tidsönskemål i parentes ( )"
     },
     "applicationEventSchedules": "Önskade tider",
-    "noData": {
-      "heading": "Blankettens uppgifter existerar ännu inte",
-      "text": "Fyll i blanketten först"
-    },
     "notification": {
       "processing": "Behandling",
       "body": "Behandlingen av ansökningarna börjar när ansökningstiden har löpt ut. Vi skickar meddelanden till e-postadressen du har angett med information om de olika skedena."
     },
-    "reservationUnitTerms": "Kompletterande bokningssvillkor",
-    "termsOfService": "Bokningsvillkor för Helsingfors stads lokaler och utrustning",
     "userAcceptsGeneralTerms": "Jag har läst och godkänner avtalsvillkoren. (*)",
     "userAcceptsSpecificTerms": "Jag har läst och godkänner de kompletterande bokningsvillkoren. (*)",
     "reservationDeleted": "Bokning avbruten.",
@@ -238,6 +226,6 @@
     "page1": "Bokningsuppgifter",
     "page2": "Bokningstider",
     "page3": "Kontaktuppgifter",
-    "preview": "Kontrollera och skicka"
+    "page4": "Kontrollera och skicka"
   }
 }

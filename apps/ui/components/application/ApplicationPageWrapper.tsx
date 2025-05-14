@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
+import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/const";
 import { type ApplicationFormFragment } from "@gql/gql-types";
@@ -7,8 +7,9 @@ import NotesWhenApplying from "@/components/application/NotesWhenApplying";
 import { applicationsPrefix } from "@/modules/urls";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ApplicationHead } from "./ApplicationHead";
-import { ReadonlyDeep } from "common/src/helpers";
+import { type ReadonlyDeep } from "common/src/helpers";
 import { ApplicationStepper } from "./ApplicationStepper";
+import { H2, HR } from "common/styled";
 
 const InnerContainer = styled.div`
   display: grid;
@@ -32,25 +33,30 @@ const ChildWrapper = styled.div`
   }
 `;
 
+const StyledH2 = styled(H2)`
+  margin-bottom: var(--spacing-2-xs);
+  @media (min-width: ${breakpoints.m}) {
+    margin-bottom: var(--spacing-m);
+  }
+`;
+
+type ApplicationPageT = "page1" | "page2" | "page3" | "page4";
+
 type ApplicationPageProps = {
   application: ReadonlyDeep<ApplicationFormFragment>;
-  translationKeyPrefix:
-    | "application:Page1"
-    | "application:Page2"
-    | "application:Page3"
-    | "application:preview";
-  subtitle?: string;
+  page: ApplicationPageT;
   children?: React.ReactNode;
 };
 
-export function ApplicationPageWrapper({
+/// Page wrapper for application funnel pages (steps 1, 2, 3, 4)
+/// Includes general structure like breadcrumb and title
+/// and specific funnel elements like stepper and notes
+export function ApplicationFunnelWrapper({
   application,
-  translationKeyPrefix,
-  subtitle,
+  page,
   children,
 }: Readonly<ApplicationPageProps>): JSX.Element {
   const { t } = useTranslation();
-
   const routes = [
     {
       slug: applicationsPrefix,
@@ -61,27 +67,49 @@ export function ApplicationPageWrapper({
     },
   ] as const;
 
-  const title = t(`${translationKeyPrefix}.heading`);
-  const subtitle2 = subtitle || t(`${translationKeyPrefix}.text`);
+  const { heading, subtitle } = getApplicationPageTitle(t, page);
 
   return (
     <>
       <Breadcrumb routes={routes} />
-      <ApplicationHead
-        status={application.status}
-        title={title}
-        subTitle={subtitle2}
-      />
+      <ApplicationHead status={application.status} title={heading} />
       <ApplicationStepper application={application} />
+      {subtitle && <StyledH2 $marginTop="none">{subtitle}</StyledH2>}
+      <HR />
       <InnerContainer>
         <>
           {/* TODO preview / view should not maybe display these notes */}
           <StyledNotesWhenApplying
-            applicationRound={application?.applicationRound}
+            applicationRound={application.applicationRound}
           />
           <ChildWrapper>{children}</ChildWrapper>
         </>
       </InnerContainer>
     </>
   );
+}
+
+function getApplicationPageTitle(t: TFunction, page: ApplicationPageT) {
+  const tr = getTranslationPrefix(page);
+
+  const heading = t(`application:heading`);
+  const subtitle = t(`${tr}.subHeading`);
+
+  return {
+    heading,
+    subtitle,
+  };
+}
+
+function getTranslationPrefix(page: ApplicationPageT) {
+  switch (page) {
+    case "page1":
+      return "application:Page1";
+    case "page2":
+      return "application:Page2";
+    case "page3":
+      return "application:Page3";
+    case "page4":
+      return "application:preview";
+  }
 }
