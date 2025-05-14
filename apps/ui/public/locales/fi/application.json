@@ -33,14 +33,10 @@
     "previewError": "Sivu {{ page }} on virheellinen.",
     "fix": "Korjaa"
   },
-  "Intro": {
-    "heading": "Kausivaraushakemus",
-    "createFailedHeading": "Hakemuksen luominen epäonnistui"
-  },
   "applicationEventSaved": "Kausivaraus tallennettu hakemukselle",
+  "heading": "Kausivaraushakemus",
   "Page1": {
-    "heading": "1. Täytä varauksen tiedot",
-    "text": "Lisää hakemukselle ensi kauden varaustoiveesi",
+    "subHeading": "Täytä hakemuksen tiedot",
     "basicInformationSubHeading": "Varauksen perustiedot",
     "name": "Kausivarauksen nimi",
     "groupSize": "Ryhmän koko",
@@ -68,10 +64,8 @@
     "deleteEventContent": "Kun varaus on peruttu, sen tietoja ei ole mahdollista palauttaa."
   },
   "Page2": {
-    "heading": "2. Valitse varauksen ajankohta",
-    "subHeading": "Ilmoita kaikki sinulle sopivat ajankohdat. Tarkista aukioloajat tilan kuvauksesta.",
+    "subHeading": "Valitse hakemuksen aikatoiveet",
     "info": "Voit ilmoittaa sekä ensisijaisia että vaihtoehtoisia aikoja. Useamman tila- ja aikatoiveen ilmoittaminen parantaa mahdollisuuksiasi saada toiveidesi mukaiset tilat ja ajat.",
-    "text": "Ilmoita toivomasi ajankohdat kausivaraukselle",
     "copyTimes": "Kopioi ajat kaikille varaustoiveille",
     "resetTimes": "Tyhjennä kalenteri",
     "summary": "Yhteenveto",
@@ -94,14 +88,13 @@
     }
   },
   "Page3": {
-    "heading": "3. Täytä hakijan tiedot",
-    "text": "Voit jättää hakemuksen yhteisönä, yksityishenkilönä tai yrityksenä. Viimeisin hakemus on voimassa.",
+    "subHeading": "Täytä hakijan tiedot",
     "firstName": "Etunimi",
     "homeCity": "Kotipaikka",
     "lastName": "Sukunimi",
     "phoneNumber": "Puhelinnumero",
     "emailNotification": "Kaikki hakemukseen liittyvät viestit lähetetään alla olevaan sähköpostiin",
-    "subHeading": {
+    "sectionHeadings": {
       "basicInfo": "Hakijan perustiedot",
       "postalAddress": "Postiosoite",
       "billingAddress": "Laskutusosoite",
@@ -140,6 +133,7 @@
     "additionalInformation": "Lisätietoja varauksen käyttötarkoituksesta"
   },
   "preview": {
+    "subHeading": "Tarkista ja lähetä hakemus",
     "applicantType": {
       "COMMUNITY": "Rekisteröimätön yhdistys",
       "COMPANY": "Yritys",
@@ -147,8 +141,6 @@
       "ASSOCIATION": "Rekisteröity yhdistys"
     },
     "homeCity": "Kotipaikka",
-    "heading": "4. Tarkista ja lähetä hakemus",
-    "text": "Yhteenveto hakemuksestasi",
     "basicInfoSubHeading": "Hakijan tiedot",
     "contactPerson": "Yhteyshenkilö",
     "contactInfo": "Yhteystiedot",
@@ -175,16 +167,10 @@
       "scheduleTooltip": "Toissijaiset aikatoiveet merkitty sulkumerkeillä ( )"
     },
     "applicationEventSchedules": "Aikatoiveet",
-    "noData": {
-      "heading": "Lomakkeen tietoja ei ole vielä olemassa",
-      "text": "Täytä ensin lomake"
-    },
     "notification": {
       "processing": "Käsittely",
       "body": "Hakemusten käsittely aloitetaan, kun hakuaika on päättynyt. Ilmoitamme antamaasi sähköpostiosoitteeseen eri vaiheista."
     },
-    "reservationUnitTerms": "Täydentävät varausehdot",
-    "termsOfService": "Helsingin kaupungin tilojen ja laitteiden varausehdot",
     "userAcceptsGeneralTerms": "Olen lukenut ja hyväksyn sopimusehdot. (*)",
     "userAcceptsSpecificTerms": "Olen lukenut ja hyväksyn täydentävät varausehdot. (*)",
     "reservationDeleted": "Varaus peruttu.",
@@ -240,6 +226,6 @@
     "page1": "Varauksen tiedot",
     "page2": "Varauksen ajankohta",
     "page3": "Hakijan tiedot",
-    "preview": "Tarkista ja lähetä"
+    "page4": "Tarkista ja lähetä"
   }
 }

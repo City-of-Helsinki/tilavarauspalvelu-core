@@ -136,9 +136,9 @@ function View({
       <Breadcrumb routes={routes} />
       <ApplicationHead
         title={applicationRoundName}
-        subTitle={subTitle}
         status={application.status}
       />
+      <p style={{ marginTop: 0 }}>{subTitle}</p>
       {showReservations ? (
         <Tabs initiallyActiveTab={tab === "application" ? 1 : 0}>
           <Tabs.TabList>

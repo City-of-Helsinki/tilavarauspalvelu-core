@@ -20,7 +20,7 @@ export function CompanyForm(): JSX.Element {
       <ApplicationFormTextInput name="organisation.coreBusiness" />
       <ApplicationFormTextInput name="organisation.identifier" />
       <FormSubHeading>
-        {t("application:Page3.subHeading.postalAddress")}
+        {t("application:Page3.sectionHeadings.postalAddress")}
       </FormSubHeading>
       <ApplicationFormTextInput name="organisation.address.streetAddress" />
       <ApplicationFormTextInput name="organisation.address.postCode" />
@@ -43,7 +43,7 @@ export function ContactPersonSection(): JSX.Element {
   return (
     <>
       <FormSubHeading>
-        {t("application:Page3.subHeading.contactInfo")}
+        {t("application:Page3.sectionHeadings.contactInfo")}
       </FormSubHeading>
       <ApplicationFormTextInput name="contactPerson.firstName" />
       <ApplicationFormTextInput name="contactPerson.lastName" />

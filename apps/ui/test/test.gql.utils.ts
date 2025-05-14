@@ -372,10 +372,12 @@ export type CreateMockApplicationFragmentProps = {
   pk?: number;
   // completed page
   page?: PageOptions;
+  notesWhenApplying?: string | null;
 };
 export function createMockApplicationFragment({
   pk = 1,
   page = "page0",
+  notesWhenApplying = "Notes when applying",
 }: CreateMockApplicationFragmentProps = {}): ApplicationMockType {
   const now = new Date();
   // TODO use page to generate the form values (applicationSections)
@@ -464,9 +466,9 @@ export function createMockApplicationFragment({
     ...MockApplicationForm,
     applicationRound: {
       id: base64encode("ApplicationRoundNode:1"),
-      notesWhenApplyingFi: "Notes when applying FI",
-      notesWhenApplyingEn: "Notes when applying EN",
-      notesWhenApplyingSv: "Notes when applying SV",
+      notesWhenApplyingFi: notesWhenApplying ? `${notesWhenApplying} FI` : null,
+      notesWhenApplyingEn: notesWhenApplying ? `${notesWhenApplying} EN` : null,
+      notesWhenApplyingSv: notesWhenApplying ? `${notesWhenApplying} SV` : null,
       reservationPeriodBegin: addDays(now, 1).toISOString(),
       reservationPeriodEnd: addDays(now, 30 + 1).toISOString(),
       pk: 1,
@@ -649,5 +651,12 @@ export function generateNameFragment(name: string) {
     nameFi: `${name} FI`,
     nameSv: `${name} SV`,
     nameEn: `${name} EN`,
+  };
+}
+export function generateTextFragment(text: string) {
+  return {
+    textFi: `${text} FI`,
+    textSv: `${text} SV`,
+    textEn: `${text} EN`,
   };
 }

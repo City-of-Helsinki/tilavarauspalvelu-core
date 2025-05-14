@@ -33,14 +33,10 @@
     "previewError": "Page {{ page }} has an error.",
     "fix": "Fix"
   },
-  "Intro": {
-    "heading": "Seasonal booking application",
-    "createFailedHeading": "Application creation failed"
-  },
   "applicationEventSaved": "Booking saved",
+  "heading": "Seasonal booking application",
   "Page1": {
-    "heading": "1. Fill in the booking details",
-    "text": "Add your booking requests for next season",
+    "subHeading": "Fill in the application details",
     "basicInformationSubHeading": "Basic booking information",
     "name": "Name of seasonal booking",
     "groupSize": "Group size",
@@ -68,9 +64,8 @@
     "deleteEventContent": "Once removed, the application cannot be restored."
   },
   "Page2": {
-    "heading": "2. Select booking dates",
+    "subHeading": "Select booking dates",
     "info": "Please select both preferred times and also select other times that suit you. Providing more space and time options will improve your chances of getting spaces and times you like.",
-    "text": "Indicate your preferred dates for the seasonal booking",
     "copyTimes": "Copy times for all booking requests",
     "resetTimes": "Clear calendar",
     "summary": "Summary",
@@ -93,14 +88,13 @@
     }
   },
   "Page3": {
-    "heading": "3. Customer information",
-    "text": "You can apply as a community, private person or company. The latest application is valid.",
+    "subHeading": "Customer information",
     "firstName": "First name",
     "homeCity": "City",
     "lastName": "Surname",
     "phoneNumber": "Phone number",
     "emailNotification": "All messages concerning the application will be sent to the email address below",
-    "subHeading": {
+    "sectionHeadings": {
       "basicInfo": "Basic information",
       "postalAddress": "Postal address",
       "billingAddress": "Billing address",
@@ -139,6 +133,7 @@
     "additionalInformation": "Additional details about the purpose of the booking"
   },
   "preview": {
+    "heading": "Review and submit the application",
     "applicantType": {
       "community": "Unregistered association",
       "company": "Company",
@@ -146,8 +141,6 @@
       "association": "Registered association"
     },
     "homeCity": "City",
-    "heading": "4. Review and submit the application",
-    "text": "Summary of your application",
     "basicInfoSubHeading": "Applicant details",
     "contactPerson": "Contact person",
     "contactInfo": "Contact information",
@@ -176,21 +169,12 @@
       "scheduleTooltip": "Secondary time slots in parentheses ( )"
     },
     "applicationEventSchedules": "Requested time slots",
-    "noData": {
-      "heading": "Information on form does not yet exist",
-      "text": "First fill in the form"
-    },
     "notification": {
       "processing": "Processing",
       "body": "Processing of applications will start once the application deadline has passed. We will notify you of the different steps at the email address you provide."
     },
-    "reservationUnitTerms": "Additional booking conditions",
-    "termsOfService": "Booking conditions for City of Helsinki spaces and equipment",
     "userAcceptsGeneralTerms": "I have read and I accept the Terms of Agreement. (*)",
     "userAcceptsSpecificTerms": "I have read and I accept the Additional booking conditions. (*)",
-    "subHeading": {
-      "applicationInfo": "Application information"
-    },
     "reservationDeleted": "Booking cancelled.",
     "applicationSectionCancelled": "Cancelled {{ cancelled }} / {{ future }} booking.",
     "applicationSectionCancelledAll": "All {{ cancelled }} bookings cancelled."
@@ -244,6 +228,6 @@
     "page1": "Booking details",
     "page2": "Booking dates",
     "page3": "Customer information",
-    "preview": "Preview and send"
+    "page4": "Preview and send"
   }
 }
