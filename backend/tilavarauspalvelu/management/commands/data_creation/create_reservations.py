@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import random
+import uuid
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -42,7 +43,7 @@ from tests.factories.reservation import NextDateError, ReservationBuilder
 
 from .create_reservation_related_things import _create_cancel_reasons, _create_deny_reasons
 from .create_reservation_units import _create_reservation_unit_for_recurring_reservations
-from .utils import weighted_choice, with_logs
+from .utils import sample_qs, weighted_choice, with_logs
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.enums import TermsOfUseTypeChoices
@@ -57,6 +58,7 @@ if TYPE_CHECKING:
         TaxPercentage,
         TermsOfUse,
     )
+    from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
 
     from .utils import SetName
 
@@ -67,19 +69,10 @@ def _create_reservations(
     age_groups: list[AgeGroup],
     cities: list[City],
 ) -> None:
-    # --- Create dependencies for the reservations  -----------------------------------------------------------------
-
-    cancel_reasons = _create_cancel_reasons()
-    deny_reasons = _create_deny_reasons()
-
-    # --- Create reservations  --------------------------------------------------------------------------------------
-
     _create_normal_reservations(
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
         cities=cities,
-        cancel_reasons=cancel_reasons,
-        deny_reasons=deny_reasons,
     )
 
     _create_full_day_reservations(
@@ -100,8 +93,6 @@ def _create_normal_reservations(
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
     cities: list[City],
-    cancel_reasons: list[ReservationCancelReason],
-    deny_reasons: list[ReservationDenyReason],
 ) -> None:
     """
     Create reservations for all reservation units that:
@@ -153,7 +144,6 @@ def _create_normal_reservations(
     handling_state_choices: list[ReservationStateChoice] = [
         ReservationStateChoice.REQUIRES_HANDLING,
         ReservationStateChoice.CONFIRMED,
-        ReservationStateChoice.DENIED,
     ]
 
     ReservationUnitThroughModel: type[models.Model] = Reservation.reservation_units.through  # noqa: N806
@@ -164,7 +154,9 @@ def _create_normal_reservations(
 
     # --- Create reservations -------------------------------------------------------------------------------------
 
-    start_date = local_date()
+    # Create some reservations in the past, but mostly in the future
+    start_date = local_date() - datetime.timedelta(days=3)
+    number_of_days_that_have_reservations: int = 14
 
     for reservation_unit in reservation_units:
         # 1/10 of reservation units are "busy", meaning that there are more reservations per day.
@@ -191,13 +183,14 @@ def _create_normal_reservations(
         applying_for_free_of_charge: bool = False
         free_of_charge_reason: str | None = None
         deny_reason: ReservationDenyReason | None = None
+        handled_payment_due_by: datetime.datetime | None = None
 
-        if reservation_unit.require_reservation_handling:
-            reservation_state = weighted_choice(handling_state_choices, weights=[2, 5, 1])
-            if reservation_state in {ReservationStateChoice.CONFIRMED, ReservationStateChoice.DENIED}:
-                handled_at = local_datetime()
+        for reservation_date in get_date_range(start_date, number=number_of_days_that_have_reservations):
+            if reservation_unit.require_reservation_handling:
+                reservation_state = weighted_choice(handling_state_choices, weights=[2, 1])
+                if reservation_state == ReservationStateChoice.CONFIRMED:
+                    handled_at = local_datetime()
 
-        for reservation_date in get_date_range(start_date, number=14):
             begin_time = datetime.time(hour=random.randint(6, 10), tzinfo=DEFAULT_TIMEZONE)
             begin_datetime = combine(reservation_date, begin_time)
 
@@ -205,13 +198,16 @@ def _create_normal_reservations(
                 customer_type = weighted_choice(customer_type_choices, weights=[5, 1, 1])
                 reservation_type = weighted_choice(reservation_type_choices, weights=[5, 1, 1])
 
-                if reservation_state in handling_state_choices and pricing.highest_price != pricing.lowest_price:
+                if pricing.highest_price != pricing.lowest_price:
                     applying_for_free_of_charge = random.choice([True, False])
                     if applying_for_free_of_charge:
                         free_of_charge_reason = "Reason for applying for free of charge"
 
-                if reservation_state == ReservationStateChoice.DENIED:
-                    deny_reason = random.choice(deny_reasons)
+                    if (
+                        reservation_unit.require_reservation_handling
+                        and reservation_state == ReservationStateChoice.CONFIRMED
+                    ):
+                        handled_payment_due_by = begin_datetime - datetime.timedelta(minutes=50)
 
                 try:
                     reservation = (
@@ -254,50 +250,178 @@ def _create_normal_reservations(
                 )
 
                 if pricing.highest_price > 0:
-                    payment_order = _build_payment_order(reservation, payment_type)
+                    payment_order = _build_payment_order(reservation, payment_type, handled_payment_due_by)
                     payment_orders.append(payment_order)
 
                 begin_datetime += datetime.timedelta(hours=random.randint(min_interval_hours, max_interval_hours))
-
-    # Cancel 10 random reservations
-    for reservation in random.sample(reservation_units, 10):
-        reservation.state = ReservationStateChoice.CANCELLED
-        reservation.cancel_details = "Cancelled"
-        reservation.cancel_reason = random.choice(cancel_reasons)
-        # TODO: Doesn't cancel payment orders if present. Can't fetch them since they are not in the database yet.
 
     ReservationUnit.objects.bulk_update(reservation_units, fields=["name", "name_fi", "name_en", "name_sv"])
     Reservation.objects.bulk_create(reservations)
     ReservationUnitThroughModel.objects.bulk_create(reservation_reservation_units)
     PaymentOrder.objects.bulk_create(payment_orders)
 
+    _deny_and_cancel_normal_reservations()
 
-def _build_payment_order(reservation: Reservation, payment_type: PaymentType) -> PaymentOrder:
-    payment_order_builder: PaymentOrderBuilder = PaymentOrderBuilder().set(  # type: ignore[assignment]
+
+def _build_payment_order(
+    reservation: Reservation,
+    payment_type: PaymentType,
+    handled_payment_due_by: datetime.datetime | None = None,
+) -> PaymentOrder:
+    payment_order_builder = PaymentOrderBuilder().set(
         language=reservation.user.get_preferred_language(),
         price_net=reservation.price_net,
         price_vat=reservation.price_vat_amount,
         price_total=reservation.price,
         reservation=reservation,
         reservation_user_uuid=reservation.user.uuid,
+        payment_type=payment_type,
     )
 
     if payment_type == PaymentType.ON_SITE:
-        return payment_order_builder.build(
-            payment_type=payment_type,
-            status=OrderStatus.PAID_MANUALLY,
-        )
+        return payment_order_builder.build(status=OrderStatus.PAID_MANUALLY)
+
+    if handled_payment_due_by is not None:
+        payment_order_builder = payment_order_builder.set(handled_payment_due_by=handled_payment_due_by)
+
+        is_still_pending = weighted_choice([True, False], weights=[1, 3])
+        if is_still_pending:
+            return payment_order_builder.build(status=OrderStatus.PENDING)
 
     if payment_type == PaymentType.ONLINE_OR_INVOICE:
-        return payment_order_builder.for_mock_order(reservation).build(
-            payment_type=payment_type,
-            status=OrderStatus.PAID_BY_INVOICE,
-        )
+        return payment_order_builder.for_mock_order(reservation).build(status=OrderStatus.PAID_BY_INVOICE)
 
-    return payment_order_builder.for_mock_order(reservation).build(
-        payment_type=payment_type,
-        status=OrderStatus.PAID,
-    )
+    return payment_order_builder.for_mock_order(reservation).build(status=OrderStatus.PAID)
+
+
+def _deny_and_cancel_normal_reservations() -> None:
+    cancel_reasons = _create_cancel_reasons()
+    deny_reasons = _create_deny_reasons()
+
+    not_on_site = Reservation.objects.exclude(payment_order__status=OrderStatus.PAID_MANUALLY)
+
+    confirmed = not_on_site.filter(state=ReservationStateChoice.CONFIRMED)
+    in_handling = not_on_site.filter(state=ReservationStateChoice.REQUIRES_HANDLING)
+
+    free = confirmed.filter(payment_order__isnull=True)
+    free_in_handling = in_handling.filter(payment_order__isnull=True)
+
+    paid = confirmed.filter(payment_order__isnull=False)
+    paid_in_handling = in_handling.filter(payment_order__isnull=False)
+
+    paid_direct = paid.filter(handled_at__isnull=True)
+    paid_handled = paid.filter(handled_at__isnull=False)
+
+    paid_direct_online = paid_direct.filter(payment_order__status=OrderStatus.PAID)
+    paid_direct_invoiced = paid_direct.filter(payment_order__status=OrderStatus.PAID_BY_INVOICE)
+
+    paid_handled_online = paid_handled.filter(payment_order__status=OrderStatus.PAID)
+    paid_handled_invoiced = paid_handled.filter(payment_order__status=OrderStatus.PAID_BY_INVOICE)
+
+    now = local_datetime()
+    paid_handled_pending = paid_handled.filter(payment_order__status=OrderStatus.PENDING)
+    paid_handled_pending_due = paid_handled_pending.filter(payment_order__handled_payment_due_by__gt=now)
+    paid_handled_pending_overdue = paid_handled_pending.filter(payment_order__handled_payment_due_by__lte=now)
+
+    # Deny some reservations in handling
+    _deny_reservations(sample_qs(free_in_handling, size=5), deny_reasons)
+    _deny_reservations(sample_qs(paid_in_handling, size=5), deny_reasons)
+
+    # Cancel some free reservations
+    _cancel_reservations(sample_qs(free, size=5), cancel_reasons)
+
+    # Cancel some paid direct reservations
+    _cancel_reservations(sample_qs(paid_direct_online, size=2), cancel_reasons)
+    _cancel_reservations(sample_qs(paid_direct_invoiced, size=2), cancel_reasons)
+
+    # Cancel some paid handled reservations
+    _cancel_reservations(sample_qs(paid_handled_online, size=2), cancel_reasons)
+    _cancel_reservations(sample_qs(paid_handled_invoiced, size=2), cancel_reasons)
+    _cancel_reservations(sample_qs(paid_handled_pending_due, size=2), cancel_reasons)
+
+    # Cancel all handled pending reservations which are overdue
+    _cancel_reservations(paid_handled_pending_overdue, cancel_reasons)
+
+
+def _cancel_reservations(qs: ReservationQuerySet, cancel_reasons: list[ReservationCancelReason]) -> None:
+    reservations: list[Reservation] = []
+    payment_orders: list[PaymentOrder] = []
+
+    now = local_datetime()
+
+    for reservation in qs:
+        reservation.state = ReservationStateChoice.CANCELLED
+        reservation.cancel_details = "Cancelled by reservee"
+        reservation.cancel_reason = random.choice(cancel_reasons)
+        reservations.append(reservation)
+
+        payment_order = reservation.payment_order.first()
+        if payment_order is not None:
+            overdue = payment_order.handled_payment_due_by is not None and payment_order.handled_payment_due_by <= now
+
+            match payment_order.status:
+                case OrderStatus.PAID:
+                    payment_order.status = OrderStatus.REFUNDED
+                    payment_order.refund_id = uuid.uuid4()
+
+                case OrderStatus.PAID_BY_INVOICE:
+                    payment_order.status = OrderStatus.CANCELLED
+                    payment_order.processed_at = reservation.begin - datetime.timedelta(days=3)
+
+                case OrderStatus.PENDING if overdue:
+                    reservation.cancel_details = "Cancelled due to no payment"
+                    payment_order.status = OrderStatus.EXPIRED
+                    payment_order.processed_at = reservation.begin - datetime.timedelta(days=3)
+
+                case OrderStatus.PENDING:
+                    reservation.cancel_details = "Cancelled by the reservee"
+                    payment_order.status = OrderStatus.CANCELLED
+                    payment_order.processed_at = reservation.begin - datetime.timedelta(days=3)
+
+                case _:
+                    msg = f"Cannot cancel payment order in status '{payment_order.status}'"
+                    raise ValueError(msg)
+
+            payment_orders.append(payment_order)
+
+    Reservation.objects.bulk_update(reservations, fields=["state", "cancel_details", "cancel_reason"])
+    PaymentOrder.objects.bulk_update(payment_orders, fields=["status", "refund_id", "processed_at"])
+
+
+def _deny_reservations(qs: ReservationQuerySet, deny_reasons: list[ReservationDenyReason]) -> None:
+    reservations: list[Reservation] = []
+    payment_orders: list[PaymentOrder] = []
+
+    for reservation in qs:
+        reservation.state = ReservationStateChoice.DENIED
+        reservation.handling_details = "Denied by handler"
+        reservation.handled_at = local_datetime()
+        reservation.deny_reason = random.choice(deny_reasons)
+        reservations.append(reservation)
+
+        payment_order = reservation.payment_order.first()
+        if payment_order is not None:
+            # Handler can choose to refund the payment, most of the time they do
+            action = weighted_choice([OrderStatus.REFUNDED, OrderStatus.CANCELLED], weights=[3, 1])
+
+            match payment_order.status:
+                case OrderStatus.PAID if action == OrderStatus.REFUNDED:
+                    payment_order.status = OrderStatus.REFUNDED
+                    payment_order.refund_id = uuid.uuid4()
+
+                # Invoices are always cancelled, since no payment has been made
+                case OrderStatus.PAID | OrderStatus.PAID_BY_INVOICE | OrderStatus.PENDING:
+                    payment_order.status = OrderStatus.CANCELLED
+                    payment_order.processed_at = reservation.begin - datetime.timedelta(days=3)
+
+                case _:
+                    msg = f"Cannot deny payment order in status '{payment_order.status}'"
+                    raise ValueError(msg)
+
+            payment_orders.append(payment_order)
+
+    Reservation.objects.bulk_update(reservations, fields=["state", "handling_details", "handled_at", "deny_reason"])
+    PaymentOrder.objects.bulk_update(payment_orders, fields=["status", "refund_id", "processed_at"])
 
 
 @with_logs
