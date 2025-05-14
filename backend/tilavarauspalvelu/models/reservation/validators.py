@@ -12,7 +12,7 @@ from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_start_of_da
 from utils.utils import comma_sep_str
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import PaymentOrder, Reservation
+    from tilavarauspalvelu.models import Reservation
 
 __all__ = [
     "ReservationValidator",
@@ -29,7 +29,7 @@ class ReservationValidator:
             raise ValidationError(msg, code=error_codes.MULTIPLE_RESERVATION_UNITS)
 
     def validate_no_payment_order(self) -> None:
-        if self.reservation.payment_order.exists():
+        if hasattr(self.reservation, "payment_order"):
             msg = "Reservation cannot be changed anymore because it is attached to a payment order"
             raise ValidationError(msg, code=error_codes.CHANGES_NOT_ALLOWED)
 
@@ -145,17 +145,16 @@ class ReservationValidator:
             raise ValidationError(msg, code=error_codes.RESERVATION_STATE_CHANGE_NOT_ALLOWED)
 
     def validate_reservation_order_allows_refunding_or_cancellation(self) -> None:
-        payment_order: PaymentOrder | None = self.reservation.payment_order.first()
-        if payment_order is None:
+        if not hasattr(self.reservation, "payment_order"):
             msg = "Reservation doesn't have an order."
             raise ValidationError(msg, code=error_codes.RESERVATION_NO_PAYMENT_ORDER)
 
-        match payment_order.status:
+        match self.reservation.payment_order.status:
             case OrderStatus.PAID_BY_INVOICE:
-                payment_order.validators.validate_order_can_be_cancelled()
+                self.reservation.payment_order.validators.validate_order_can_be_cancelled()
 
             case OrderStatus.PAID:
-                payment_order.validators.validate_order_can_be_refunded()
+                self.reservation.payment_order.validators.validate_order_can_be_refunded()
 
             case _:
                 msg = "Reservation order is not in a state where it can be refunded or cancelled"
