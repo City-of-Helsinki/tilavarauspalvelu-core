@@ -8,26 +8,25 @@ const coerceBoolean = z
   // eslint-disable-next-line eqeqeq
   .transform((value) => value == "true" || value == "1");
 
+const urlOrEmpty = z.string().url().or(z.string().length(0)).optional();
+
 // Same as UI envs, Azure has prefix on the server variables
 const ServerSchema = z.object({
   // Uploading sourcemaps to Sentry requires an auth token - Required on CI
   SENTRY_AUTH_TOKEN: z.string().optional(),
   // Sentry DSN is used for error tracking - Required during runtime
   SENTRY_DSN: z.string().optional(),
-  // TODO enum?
   SENTRY_ENVIRONMENT: z.string().optional(),
   SENTRY_ENABLE_SOURCE_MAPS: coerceBoolean,
   ENABLE_FETCH_HACK: coerceBoolean,
   SKIP_ENV_VALIDATION: coerceBoolean,
-  MAPBOX_TOKEN: z.string().optional(),
-  COOKIEHUB_ENABLED: coerceBoolean,
   HOTJAR_ENABLED: coerceBoolean,
   MATOMO_ENABLED: coerceBoolean,
-  PROFILE_UI_URL: z.string().url().or(z.string().length(0)).optional(),
+  PROFILE_UI_URL: urlOrEmpty,
   // mandatory because the SSR can't connect to the API without it
   // frontend SSR is running on a different host than the backend
   TILAVARAUS_API_URL: z.string().url(),
-  EMAIL_VARAAMO_EXT_LINK: z.string().url().optional(),
+  EMAIL_VARAAMO_EXT_LINK: urlOrEmpty,
 });
 
 // NOTE if you add a new variable to client it will be fixed in the build
