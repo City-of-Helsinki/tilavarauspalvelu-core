@@ -1306,8 +1306,10 @@ type GeneralRoleNode implements Node {
 }
 
 type HelsinkiProfileDataNode {
+  additionalAddress: String
   birthday: Date
   city: String
+  countryCode: String
   email: String
   firstName: String
   isStrongLogin: Boolean!
@@ -2273,17 +2275,17 @@ type Query {
   ): ReservationMetadataSetNodeConnection
   order(orderUuid: String!): PaymentOrderNode
   """
-  Get information about a user from Helsinki profile. If user is not a profile user, still return data stored in our database, e.g. first and last name. Use only one of 'reservation_id' or 'application_id' to select the user. This determines the required permissions to view the user's data.
+  Get information about a user from Helsinki profile. If user is not a profile user, still return data stored in our database, e.g. first and last name. Use only one of 'reservation_pk' or 'application_pk' to select the user. This determines the required permissions to view the user's data.
   """
   profileData(
     """
     View profile data for this application's user.
     """
-    applicationId: Int
+    applicationPk: Int
     """
     View profile data for this reservation's user.
     """
-    reservationId: Int
+    reservationPk: Int
   ): HelsinkiProfileDataNode
   purposes(
     after: String
