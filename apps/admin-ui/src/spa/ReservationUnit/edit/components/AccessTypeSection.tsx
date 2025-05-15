@@ -18,6 +18,7 @@ import { KVWrapper, Label, Value } from "@/styled";
 import { Button, ButtonVariant, IconPlus, IconTrash } from "hds-react";
 import { formatDate, getTranslatedError } from "@/common/util";
 import { AccessType, ReservationUnitEditQuery } from "@gql/gql-types";
+import { NotificationInline } from "@/spa/application-rounds/[id]/allocation/NotificationInline";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
@@ -152,7 +153,10 @@ export function AccessTypeSection({
   accessTypes: Node["accessTypes"];
 }) {
   const { t } = useTranslation();
-  const { control } = form;
+  const {
+    control,
+    formState: { errors },
+  } = form;
   const { fields, append, remove } = useFieldArray({
     control,
     name: "accessTypes",
@@ -166,9 +170,21 @@ export function AccessTypeSection({
   };
 
   return (
-    <EditAccordion heading={t("accessType:accessTypeLabel")}>
+    <EditAccordion
+      heading={t("accessType:accessTypeLabel")}
+      open={!!errors?.accessTypes}
+    >
       <WidthLimitedContainer>
         <CurrentAccessType currentAccessType={accessTypes[0]} />
+
+        {errors?.accessTypes && fields.length === 0 && (
+          <NotificationInline type="error">
+            {getTranslatedError(
+              t,
+              errors?.accessTypes?.message ?? errors?.accessTypes?.root?.message
+            )}
+          </NotificationInline>
+        )}
 
         {fields.map((accessType, index) => (
           <AccessTypePart
