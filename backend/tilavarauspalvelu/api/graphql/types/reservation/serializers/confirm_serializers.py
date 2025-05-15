@@ -82,7 +82,7 @@ class ReservationConfirmSerializer(NestingModelSerializer):
         state = validated_data["state"]
 
         if self.instance.price_net > 0 and state.should_create_payment_order:
-            self.instance.actions.create_payment_order(payment_type=validated_data["payment_type"])
+            self.instance.actions.create_payment_order_paid_immediately(payment_type=validated_data["payment_type"])
 
         instance = super().update(instance=instance, validated_data=validated_data)
 
