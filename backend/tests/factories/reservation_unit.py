@@ -10,7 +10,14 @@ import factory
 from factory import LazyAttribute
 from factory.fuzzy import FuzzyInteger
 
-from tilavarauspalvelu.enums import AccessType, AuthenticationType, PriceUnit, ReservationKind, ReservationStartInterval
+from tilavarauspalvelu.enums import (
+    AccessType,
+    AuthenticationType,
+    PaymentType,
+    PriceUnit,
+    ReservationKind,
+    ReservationStartInterval,
+)
 from tilavarauspalvelu.models import ReservationUnit
 from utils.date_utils import local_start_of_day
 from utils.utils import as_p_tags
@@ -170,6 +177,23 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
         )
 
         return reservation_unit
+
+    @classmethod
+    def create_paid_on_site(cls, **kwargs: Any) -> ReservationUnit:
+        kwargs.setdefault("pricings__lowest_price", Decimal("10.00"))
+        kwargs.setdefault("pricings__highest_price", Decimal("20.00"))
+        kwargs.setdefault("pricings__tax_percentage__value", Decimal("25.50"))
+        kwargs.setdefault("pricings__payment_type", PaymentType.ON_SITE)
+        return cls.create(**kwargs)
+
+    @classmethod
+    def create_paid_in_webshop(cls, **kwargs: Any) -> ReservationUnit:
+        kwargs.setdefault("pricings__lowest_price", Decimal("10.00"))
+        kwargs.setdefault("pricings__highest_price", Decimal("20.00"))
+        kwargs.setdefault("pricings__tax_percentage__value", Decimal("25.50"))
+        kwargs.setdefault("pricings__payment_type", PaymentType.ONLINE)
+        kwargs.setdefault("payment_product__id", uuid.uuid4())
+        return cls.create(**kwargs)
 
 
 class ReservationUnitBuilder(ModelFactoryBuilder[ReservationUnit]):
