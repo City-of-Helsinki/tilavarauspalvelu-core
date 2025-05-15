@@ -250,6 +250,10 @@ class ReservationApproveData(TypedDict):
     handled_at: NotRequired[datetime.datetime]
     access_code_generated_at: NotRequired[datetime.datetime | None]
     access_code_is_active: NotRequired[bool]
+    payment_type: NotRequired[PaymentType]
+    handled_payment_due_by: NotRequired[datetime.datetime]
+    tax_percentage_value: NotRequired[Decimal]
+    should_delete_previous_payment_order: NotRequired[bool]
 
 
 class ReservationCancellationData(TypedDict):
