@@ -4,7 +4,7 @@ import pytest
 
 from tilavarauspalvelu.enums import ReservationStateChoice, UserRoleChoice
 
-from tests.factories import ReservationFactory
+from tests.factories import ReservationFactory, ReservationUnitFactory
 
 from .helpers import APPROVE_MUTATION, get_approve_data
 
@@ -15,10 +15,14 @@ pytestmark = [
 
 @pytest.mark.parametrize("role", [UserRoleChoice.HANDLER, UserRoleChoice.ADMIN])
 def test_reservation__approve__allowed(graphql, role):
-    graphql.login_user_with_role(role=role)
-    reservation = ReservationFactory.create(state=ReservationStateChoice.REQUIRES_HANDLING)
+    reservation_unit = ReservationUnitFactory.create_paid_on_site()
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_units=[reservation_unit],
+    )
 
     data = get_approve_data(reservation)
+    graphql.login_user_with_role(role=role)
     response = graphql(APPROVE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
@@ -27,7 +31,13 @@ def test_reservation__approve__allowed(graphql, role):
 def test_reservation__approve__allowed__own(graphql):
     # Reservers are allowed to approve their own reservations.
     user = graphql.login_user_with_role(role=UserRoleChoice.RESERVER)
-    reservation = ReservationFactory.create(state=ReservationStateChoice.REQUIRES_HANDLING, user=user)
+
+    reservation_unit = ReservationUnitFactory.create_paid_on_site()
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_units=[reservation_unit],
+        user=user,
+    )
 
     data = get_approve_data(reservation)
     response = graphql(APPROVE_MUTATION, input_data=data)
@@ -37,7 +47,12 @@ def test_reservation__approve__allowed__own(graphql):
 
 def test_reservation__approve__not_allowed(graphql):
     graphql.login_with_regular_user()
-    reservation = ReservationFactory.create(state=ReservationStateChoice.REQUIRES_HANDLING)
+
+    reservation_unit = ReservationUnitFactory.create_paid_on_site()
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_units=[reservation_unit],
+    )
 
     data = get_approve_data(reservation)
     response = graphql(APPROVE_MUTATION, input_data=data)
@@ -49,7 +64,13 @@ def test_reservation__approve__not_allowed(graphql):
 def test_reservation__approve__not_allowed__own(graphql):
     # Regular users are not approve to approve their own reservations without required role.
     user = graphql.login_with_regular_user()
-    reservation = ReservationFactory.create(state=ReservationStateChoice.REQUIRES_HANDLING, user=user)
+
+    reservation_unit = ReservationUnitFactory.create_paid_on_site()
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_units=[reservation_unit],
+        user=user,
+    )
 
     data = get_approve_data(reservation)
     response = graphql(APPROVE_MUTATION, input_data=data)
