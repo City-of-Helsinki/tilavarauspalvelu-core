@@ -11,7 +11,7 @@ import {
   useDeleteSpaceMutation,
 } from "@gql/gql-types";
 import { PopupMenu } from "common/src/components/PopupMenu";
-import Modal, { useModal as useHDSModal } from "@/component/HDSModal";
+import { HDSModal, useModal as useHDSModal } from "@/component/HDSModal";
 import { NewSpaceModal } from "./space/new-space-modal/NewSpaceModal";
 import { errorToast } from "common/src/common/toast";
 import { CustomTable } from "@/component/Table";
@@ -215,14 +215,14 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
         cols={cols}
         // no sort on purpose
       />
-      <Modal
+      <HDSModal
         id="modal-id"
-        open={isOpen}
-        close={closeModal}
-        afterCloseFocusRef={ref}
+        isOpen={isOpen}
+        onClose={closeModal}
+        focusAfterCloseRef={ref}
       >
         {modalContent}
-      </Modal>
+      </HDSModal>
       {spaceWaitingForDelete && (
         <ConfirmationDialog
           isOpen

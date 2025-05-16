@@ -7,7 +7,7 @@ import { useSpacesResourcesQuery } from "@gql/gql-types";
 import { ResourcesTable } from "./ResourcesTable";
 import { SpacesTable } from "./SpacesTable";
 import { SubPageHead } from "./SubPageHead";
-import Modal, { useModal } from "@/component/HDSModal";
+import { HDSModal, useModal } from "@/component/HDSModal";
 import { NewSpaceModal } from "./space/new-space-modal/NewSpaceModal";
 import { NewResourceModal } from "./resource/NewResourceModal";
 import { base64encode } from "common/src/helpers";
@@ -74,18 +74,18 @@ function SpacesResources(): JSX.Element {
 
   return (
     <>
-      <Modal
+      <HDSModal
         id="space-modal"
-        open={newSpaceDialogIsOpen}
-        close={() => closeNewSpaceModal()}
-        afterCloseFocusRef={newSpacesButtonRef}
+        isOpen={newSpaceDialogIsOpen}
+        onClose={closeNewSpaceModal}
+        focusAfterCloseRef={newSpacesButtonRef}
       >
         <NewSpaceModal
           unit={unit}
           closeModal={() => closeNewSpaceModal()}
           refetch={refetch}
         />
-      </Modal>
+      </HDSModal>
       <LinkPrev />
       <SubPageHead title={t("Unit.spacesAndResources")} unit={unit} />
       <Flex
@@ -97,7 +97,7 @@ function SpacesResources(): JSX.Element {
         <ActionButton
           ref={newSpacesButtonRef}
           variant={ButtonVariant.Supplementary}
-          iconStart={<IconPlusCircleFill aria-hidden="true" />}
+          iconStart={<IconPlusCircleFill />}
           onClick={() => openNewSpaceModal()}
         >
           {t("Unit.addSpace")}
@@ -112,7 +112,7 @@ function SpacesResources(): JSX.Element {
         <H2 $noMargin>{t("Unit.resources")}</H2>
         <ActionButton
           variant={ButtonVariant.Supplementary}
-          iconStart={<IconPlusCircleFill aria-hidden="true" />}
+          iconStart={<IconPlusCircleFill />}
           disabled={unit.spaces.length === 0}
           onClick={() => {
             openWithContent(
@@ -129,14 +129,14 @@ function SpacesResources(): JSX.Element {
         </ActionButton>
       </Flex>
       <ResourcesTable unit={unit} refetch={refetch} />
-      <Modal
+      <HDSModal
         id="resource-modal"
-        open={isNewResourceModalOpen}
-        close={closeNewResourceModal}
-        afterCloseFocusRef={newResourceButtonRef}
+        isOpen={isNewResourceModalOpen}
+        onClose={closeNewResourceModal}
+        focusAfterCloseRef={newResourceButtonRef}
       >
         {modalContent}
-      </Modal>
+      </HDSModal>
     </>
   );
 }
