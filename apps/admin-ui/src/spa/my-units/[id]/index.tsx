@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useRef } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams, useSearchParams } from "react-router-dom";
-import { Button, ButtonVariant, Tabs } from "hds-react";
+import { Button, ButtonSize, ButtonVariant, Tabs } from "hds-react";
 import { Flex, H1, TabWrapper, TitleSection } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { parseAddress } from "@/common/util";
@@ -54,7 +54,8 @@ export function MyUnitView() {
 
   const { unit } = data ?? {};
 
-  const { hasPermission: canCreateReservations } = useCheckPermission({
+  const createReservationBtnRef = useRef<HTMLButtonElement>(null);
+  const { hasPermission } = useCheckPermission({
     units: pk != null ? [pk] : [],
     permission: UserPermissionChoice.CanCreateStaffReservations,
   });
@@ -85,10 +86,25 @@ export function MyUnitView() {
     })
   );
 
+  const handleOpenModal = () => {
+    setModalContent(
+      <CreateReservationModal
+        start={new Date()}
+        focusAfterCloseRef={createReservationBtnRef}
+        reservationUnitOptions={reservationUnitOptions}
+        onClose={() => {
+          setModalContent(null);
+        }}
+      />
+    );
+  };
+
   const activeTab = selectedTab === "reservation-unit" ? 1 : 0;
 
   const title = loading ? t("common.loading") : (unit?.nameFi ?? "-");
   const location = unit?.location ? parseAddress(unit.location) : "-";
+  const canCreateReservations =
+    hasPermission && unit != null && reservationUnitOptions.length > 0;
   return (
     <>
       <TitleSection>
@@ -97,18 +113,10 @@ export function MyUnitView() {
       </TitleSection>
       <Flex $direction="row" $gap="m">
         <Button
+          ref={createReservationBtnRef}
           variant={ButtonVariant.Secondary}
-          onClick={() =>
-            setModalContent(
-              <CreateReservationModal
-                start={new Date()}
-                reservationUnitOptions={reservationUnitOptions}
-                onClose={() => {
-                  setModalContent(null);
-                }}
-              />
-            )
-          }
+          size={ButtonSize.Small}
+          onClick={handleOpenModal}
           disabled={!canCreateReservations}
         >
           {t("MyUnits.Calendar.header.createReservation")}

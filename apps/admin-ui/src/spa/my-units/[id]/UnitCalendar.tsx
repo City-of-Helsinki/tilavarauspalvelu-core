@@ -22,7 +22,7 @@ import {
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { CalendarEvent } from "common/src/calendar/Calendar";
-import { CenterSpinner } from "common/styled";
+import { CenterSpinner, focusStyles } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { POST_PAUSE, PRE_PAUSE } from "@/common/calendarStyling";
 import { getReserveeName, sortByName } from "@/common/util";
@@ -141,15 +141,6 @@ const CellContent = styled.div<{ $numCols: number }>`
   position: relative;
 `;
 
-const Cell = styled.div<{ $isPast?: boolean }>`
-  ${({ $isPast }) =>
-    $isPast ? "background: var(--tilavaraus-event-booking-past-date);" : ""}
-  height: 100%;
-  width: 100%;
-  border-left: ${CELL_BORDER};
-  border-top: ${CELL_BORDER};
-`;
-
 const RowCalendarArea = styled.div`
   width: 100%;
   position: relative;
@@ -200,73 +191,112 @@ const Container = styled.div<{ $height: number | "auto" }>`
     typeof $height === "number" ? `${$height}px` : "auto"};
 `;
 
-function Cells({
-  cols,
-  reservationUnitPk,
-  unitPk,
-  date,
-  setModalContent,
-  onComplete,
-  reservationUnitOptions,
-}: {
-  cols: number;
-  reservationUnitPk: number;
-  unitPk: number;
-  date: Date;
-  setModalContent: (content: JSX.Element | null, isHds?: boolean) => void;
-  onComplete: () => void;
-  reservationUnitOptions: { label: string; value: number }[];
-}) {
-  const [searchParams, setParams] = useSearchParams();
-  const now = new Date();
+function RowCells({ hasPermission, cols, ...rest }: CellProps): JSX.Element {
+  const testId = `UnitCalendar__RowCalendar--cells-${rest.reservationUnitPk}`;
 
-  const isPast = (index: number) => {
-    return setHours(date, Math.round(index / 2)) < now;
-  };
-
-  const { hasPermission } = useCheckPermission({
-    units: [unitPk],
-    permission: UserPermissionChoice.CanCreateStaffReservations,
-  });
-
-  const onClick =
-    (offset: number) => (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      if (!hasPermission) {
-        return;
-      }
-      e.preventDefault();
-      const params = new URLSearchParams(searchParams);
-      params.set("reservationUnit", reservationUnitPk.toString());
-      setParams(params, { replace: true });
-      setModalContent(
-        <CreateReservationModal
-          reservationUnitOptions={reservationUnitOptions}
-          start={addMinutes(new Date(date), offset * 30)}
-          onClose={() => {
-            setModalContent(null);
-            onComplete();
-          }}
-        />,
-        true
-      );
-    };
-
-  const testId = `UnitCalendar__RowCalendar--cells-${reservationUnitPk}`;
-  const cellTestId = `UnitCalendar__RowCalendar--cell-${reservationUnitPk}`;
   return (
     <CellContent $numCols={cols} data-testid={testId}>
       {Array.from(Array(cols).keys()).map((i) => (
         <Cell
+          {...rest}
           key={i}
-          onClick={onClick(i)}
-          $isPast={isPast(i)}
-          data-testid={`${cellTestId}-${i}`}
+          offset={i}
+          hasPermission={hasPermission ?? false}
         />
       ))}
     </CellContent>
   );
 }
-const PreBuffer = ({
+
+type CellProps = {
+  cols: number;
+  reservationUnitPk: number;
+  date: Date;
+  setModalContent: (content: JSX.Element | null, isHds?: boolean) => void;
+  onComplete: () => void;
+  reservationUnitOptions: { label: string; value: number }[];
+  hasPermission: boolean;
+};
+
+const CellStyled = styled.div<{ $isPast?: boolean }>`
+  ${({ $isPast }) =>
+    $isPast ? "background: var(--tilavaraus-event-booking-past-date);" : ""}
+  height: 100%;
+  width: 100%;
+  border-left: ${CELL_BORDER};
+  border-top: ${CELL_BORDER};
+  &:focus {
+    ${focusStyles}
+    z-index: var(--tilavaraus-admin-stack-calendar-pick-time-focus);
+  }
+`;
+
+/// Focusable cell that opens the reservation modal
+function Cell({
+  offset,
+  date,
+  hasPermission,
+  reservationUnitPk,
+  reservationUnitOptions,
+  onComplete,
+  setModalContent,
+}: { offset: number } & Omit<CellProps, "cols">): JSX.Element {
+  const ref = useRef<HTMLDivElement>(null);
+  const [searchParams, setParams] = useSearchParams();
+
+  const now = new Date();
+  const isPast = (index: number) => {
+    return setHours(date, Math.round(index / 2)) < now;
+  };
+
+  const handleOpenModal = () => {
+    if (!hasPermission) {
+      return;
+    }
+    const params = new URLSearchParams(searchParams);
+    params.set("reservationUnit", reservationUnitPk.toString());
+    setParams(params, { replace: true });
+    setModalContent(
+      <CreateReservationModal
+        reservationUnitOptions={reservationUnitOptions}
+        focusAfterCloseRef={ref}
+        start={addMinutes(new Date(date), offset * 30)}
+        onClose={() => {
+          setModalContent(null);
+          onComplete();
+        }}
+      />,
+      true
+    );
+  };
+
+  const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.preventDefault();
+    handleOpenModal();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleOpenModal();
+    }
+  };
+
+  const testId = `UnitCalendar__RowCalendar--cell-${reservationUnitPk}-${offset}`;
+
+  return (
+    <CellStyled
+      ref={ref}
+      onClick={handleClick}
+      $isPast={isPast(offset)}
+      data-testid={testId}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+    />
+  );
+}
+
+function PreBuffer({
   event,
   hourPercent,
   left,
@@ -276,7 +306,7 @@ const PreBuffer = ({
   hourPercent: number;
   left: string;
   style?: CSSProperties;
-}): JSX.Element | null => {
+}): JSX.Element | null {
   const buffer = event.event?.bufferTimeBefore;
   const { t } = useTranslation();
 
@@ -296,7 +326,7 @@ const PreBuffer = ({
     );
   }
   return null;
-};
+}
 
 function PostBuffer({
   event,
@@ -480,8 +510,7 @@ export function UnitCalendar({
   const { setModalContent } = useModal();
   const startDate = startOfDay(date);
 
-  // scroll to around 9 - 17 at load
-  // this is scetchy since it uses the hard endpoint (the calendar size changes)
+  // scroll to around 9 - 17 on load
   const scrollCalendar = useCallback(() => {
     const ref = calendarRef.current;
 
@@ -489,35 +518,22 @@ export function UnitCalendar({
       return;
     }
 
-    // TODO improve the calculations (less magic numbers)
     const FIRST_HOUR = 7;
-    const HOUR_CELL_WIDTH = 73;
-    // 768px is the mobile breakpoint (there is some funk in it at 768px vs 769px)
-    const TITLE_CELL_WIDTH = 105;
-    const MOBILE_BREAKPOINT = 768;
-    const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
-    // 48px on both sides on desktop, 16px on mobile
-    const CONTAINER_MARGIN = isMobile ? 16 * 2 : 48 * 2;
-    const SIDE_MENU_WIDTH = isMobile ? 0 : 300;
-    const MAX_CALENDAR_WIDTH = 1200 - 48 * 2;
-    const possibleCalendarWidth =
-      window.innerWidth -
-      (SIDE_MENU_WIDTH + CONTAINER_MARGIN + TITLE_CELL_WIDTH);
-    const calendarSectionSize = Math.min(
-      possibleCalendarWidth,
-      MAX_CALENDAR_WIDTH
-    );
-    const nCells = Math.round(calendarSectionSize / HOUR_CELL_WIDTH);
     const now = new Date();
     const cellToScroll = isToday(date)
-      ? Math.min(now.getHours() + nCells, 24)
-      : Math.min(FIRST_HOUR + nCells, 24);
-    const lastElementOfHeader = ref.querySelector(
+      ? Math.min(now.getHours(), 24)
+      : Math.min(FIRST_HOUR, 24);
+    const firstElementOfHeader = ref.querySelector(
       `.calendar-header > div:nth-of-type(${cellToScroll})`
     );
-    if (lastElementOfHeader) {
-      // horizontal scroll the calendar (as long as it's inside the view vertically, this doesn't scroll the page)
-      lastElementOfHeader.scrollIntoView(false);
+    // horizontal scroll the calendar element
+    // NOTE Don't use scrollIntoView because it changes focus on Chrome
+    if (firstElementOfHeader && ref.parentElement) {
+      const elementPos = firstElementOfHeader.getBoundingClientRect().left;
+      // move a bit backwards to handle row title on mobile
+      const x = elementPos - 35;
+      const originalScrollLeft = ref.parentElement.scrollLeft;
+      ref.parentElement.scrollTo(x + originalScrollLeft, 0);
     }
   }, [date]);
 
@@ -534,6 +550,11 @@ export function UnitCalendar({
     window.addEventListener("resize", updateSize);
     return () => window.removeEventListener("resize", updateSize);
   }, []);
+
+  const { hasPermission } = useCheckPermission({
+    units: [unitPk],
+    permission: UserPermissionChoice.CanCreateStaffReservations,
+  });
 
   const margins = windowHeight < MOBILE_CUTOFF ? MOBILE_MARGIN : DESKTOP_MARGIN;
   const containerHeight = windowHeight - margins;
@@ -566,15 +587,16 @@ export function UnitCalendar({
               <TitleCell>{row.title}</TitleCell>
             </ResourceNameContainer>
             <RowCalendarArea>
-              <Cells
+              <RowCells
                 cols={N_COLS}
                 date={startDate}
                 reservationUnitPk={row.pk}
                 reservationUnitOptions={reservationUnitOptions}
-                unitPk={unitPk}
+                hasPermission={hasPermission ?? false}
                 setModalContent={setModalContent}
                 onComplete={refetch}
               />
+              {/* TODO events should be over the cells (tabindex is not correct now) */}
               <Events
                 events={row.events}
                 styleGetter={eventStyleGetter(row.pk)}

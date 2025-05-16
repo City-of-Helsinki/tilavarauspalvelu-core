@@ -1,4 +1,4 @@
-import React from "react";
+import React, { type RefObject } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, ButtonVariant, Dialog, IconInfoCircle } from "hds-react";
 import {
@@ -15,10 +15,14 @@ type Props = {
   reservation: ReservationType;
   onClose: () => void;
   onAccept: () => void;
-  focusAfterCloseRef?: React.RefObject<HTMLButtonElement>;
+  focusAfterCloseRef: RefObject<HTMLButtonElement>;
 };
 
-function DialogContent({ reservation, onClose, onAccept }: Props) {
+function DialogContent({
+  reservation,
+  onClose,
+  onAccept,
+}: Omit<Props, "focusAfterCloseRef">): JSX.Element {
   const { t } = useTranslation();
   const displayError = useDisplayError();
 

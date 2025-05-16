@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { type RefObject, useEffect } from "react";
 import { gql } from "@apollo/client";
 import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
 import {
@@ -43,6 +43,7 @@ import { successToast } from "common/src/common/toast";
 import { useDisplayError } from "common/src/hooks";
 import { useSearchParams } from "react-router-dom";
 import { SelectFilter } from "@/component/QueryParamFilters";
+import { HDSModal } from "@/component/HDSModal";
 
 // NOTE HDS forces buttons over each other on mobile, we want them side-by-side
 const ActionButtons = styled(Dialog.ActionButtons)`
@@ -60,18 +61,9 @@ const ActionButtons = styled(Dialog.ActionButtons)`
   }
 `;
 
-const FixedDialog = styled(Dialog)`
-  /* Hack to deal with modal trying to fit content. So an error message -> layout shift */
-  width: min(calc(100vw - 2rem), var(--container-width-l)) !important;
-  & > div:nth-child(2) {
-    /* don't layout shift when the modal content changes */
-    height: min(80vh, 1024px);
-  }
-`;
-
 const MandatoryFieldsText = styled.div`
   margin-top: calc(var(--spacing-xs) * -1);
-  grid-column: 1 / span 3;
+  grid-column: 1 / -1;
   font-size: var(--fontsize-body-s);
 `;
 
@@ -96,12 +88,14 @@ type CreateReservationModalProps = {
   reservationUnitOptions: { label: string; value: number }[];
   onClose: () => void;
   start?: Date;
+  focusAfterCloseRef: RefObject<HTMLElement>;
 };
 
 export function CreateReservationModal({
   reservationUnitOptions,
   start,
   onClose,
+  focusAfterCloseRef,
 }: CreateReservationModalProps): JSX.Element {
   const { t } = useTranslation();
   const { isOpen } = useModal();
@@ -198,17 +192,15 @@ export function CreateReservationModal({
   }
 
   return (
-    <FixedDialog
-      variant="primary"
+    <HDSModal
       id="info-dialog"
-      aria-labelledby="modal-header"
-      aria-describedby="modal-description"
       isOpen={isOpen}
-      focusAfterCloseRef={undefined}
+      focusAfterCloseRef={focusAfterCloseRef}
       scrollable
+      onClose={onClose}
     >
       <Dialog.Header id="modal-header" title={t("ReservationDialog.title")} />
-      <Dialog.Content>
+      <Dialog.Content style={{ paddingTop: "var(--spacing-m)" }}>
         <SelectFilter
           name="reservationUnit"
           sort
@@ -233,7 +225,7 @@ export function CreateReservationModal({
           </ErrorBoundary>
         )}
       </Dialog.Content>
-    </FixedDialog>
+    </HDSModal>
   );
 }
 
