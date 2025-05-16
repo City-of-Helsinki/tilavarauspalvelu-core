@@ -115,6 +115,13 @@ class OrderStatus(models.TextChoices):
         ]
 
     @classproperty
+    def can_start_payment_statuses(cls) -> list[OrderStatus]:
+        return [
+            OrderStatus.DRAFT,
+            OrderStatus.PENDING,
+        ]
+
+    @classproperty
     def can_be_refunded_statuses(cls) -> list[OrderStatus]:
         return [
             OrderStatus.PAID,
