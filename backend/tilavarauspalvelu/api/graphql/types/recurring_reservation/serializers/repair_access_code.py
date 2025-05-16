@@ -44,12 +44,17 @@ class ReservationSeriesRepairAccessCodeSerializer(NestingModelSerializer):
         return data
 
     def update(self, instance: RecurringReservation, validated_data: dict[str, Any]) -> RecurringReservation:  # noqa: ARG002
+        no_access_code_before = instance.actions.has_inactive_access_codes_which_should_be_active()
+
         with external_service_errors_as_validation_errors(code=error_codes.PINDORA_ERROR):
             PindoraService.sync_access_code(obj=instance)
 
-        # TODO: Only send email if access code was not created before.
+        has_access_code_after = instance.actions.has_upcoming_or_ongoing_reservations_with_active_access_codes()
+
         if instance.allocated_time_slot is not None:
             section = instance.allocated_time_slot.reservation_unit_option.application_section
-            EmailService.send_seasonal_booking_access_code_changed_email(section)
+
+            if no_access_code_before and has_access_code_after:
+                EmailService.send_seasonal_booking_access_code_added_email(section)
 
         return instance

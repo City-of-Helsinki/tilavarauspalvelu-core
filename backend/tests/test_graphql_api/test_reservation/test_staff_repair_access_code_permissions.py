@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -13,6 +14,9 @@ from tests.factories import ReservationFactory, ReservationUnitFactory, UserFact
 from tests.helpers import patch_method
 from tests.test_graphql_api.test_reservation.helpers import REPAIR_ACCESS_CODE_STAFF_MUTATION
 
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import Reservation
+
 pytestmark = [
     pytest.mark.django_db,
 ]
@@ -20,14 +24,16 @@ pytestmark = [
 
 @patch_method(PindoraService.sync_access_code)
 def test_staff_repair_access_code__regular_user(graphql):
+    now = local_datetime()
+
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
         access_type=AccessType.ACCESS_CODE,
-        access_code_generated_at=local_datetime(),
+        access_code_generated_at=now,
         access_code_is_active=True,
-        begin=local_datetime() + datetime.timedelta(hours=1),
-        end=local_datetime() + datetime.timedelta(hours=2),
+        begin=now + datetime.timedelta(hours=1),
+        end=now + datetime.timedelta(hours=2),
     )
 
     data = {
@@ -43,19 +49,27 @@ def test_staff_repair_access_code__regular_user(graphql):
 
 
 @patch_method(PindoraService.sync_access_code)
-@patch_method(EmailService.send_reservation_rescheduled_email)
+@patch_method(EmailService.send_reservation_access_code_added_email)
 def test_staff_repair_access_code__unit_handler(graphql):
+    now = local_datetime()
+
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
         access_type=AccessType.ACCESS_CODE,
-        access_code_generated_at=local_datetime(),
-        access_code_is_active=True,
-        begin=local_datetime() + datetime.timedelta(hours=1),
-        end=local_datetime() + datetime.timedelta(hours=2),
+        access_code_generated_at=now,
+        access_code_is_active=False,
+        begin=now + datetime.timedelta(hours=1),
+        end=now + datetime.timedelta(hours=2),
         reservation_units=[reservation_unit],
     )
+
+    def hook(obj: Reservation) -> None:
+        obj.access_code_is_active = True
+        obj.save(update_fields=["access_code_is_active"])
+
+    PindoraService.sync_access_code.side_effect = hook
 
     data = {
         "pk": reservation.pk,
@@ -69,21 +83,29 @@ def test_staff_repair_access_code__unit_handler(graphql):
     assert response.has_errors is False, response.errors
 
     assert PindoraService.sync_access_code.call_count == 1
-    assert EmailService.send_reservation_rescheduled_email.call_count == 1
+    assert EmailService.send_reservation_access_code_added_email.call_count == 1
 
 
 @patch_method(PindoraService.sync_access_code)
-@patch_method(EmailService.send_reservation_rescheduled_email)
+@patch_method(EmailService.send_reservation_access_code_added_email)
 def test_staff_repair_access_code__general_handler(graphql):
+    now = local_datetime()
+
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
         access_type=AccessType.ACCESS_CODE,
-        access_code_generated_at=local_datetime(),
-        access_code_is_active=True,
-        begin=local_datetime() + datetime.timedelta(hours=1),
-        end=local_datetime() + datetime.timedelta(hours=2),
+        access_code_generated_at=now,
+        access_code_is_active=False,
+        begin=now + datetime.timedelta(hours=1),
+        end=now + datetime.timedelta(hours=2),
     )
+
+    def hook(obj: Reservation) -> None:
+        obj.access_code_is_active = True
+        obj.save(update_fields=["access_code_is_active"])
+
+    PindoraService.sync_access_code.side_effect = hook
 
     data = {
         "pk": reservation.pk,
@@ -97,4 +119,4 @@ def test_staff_repair_access_code__general_handler(graphql):
     assert response.has_errors is False, response.errors
 
     assert PindoraService.sync_access_code.call_count == 1
-    assert EmailService.send_reservation_rescheduled_email.call_count == 1
+    assert EmailService.send_reservation_access_code_added_email.call_count == 1
