@@ -33,6 +33,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "comma_sep_str",
+    "get_query_params",
     "get_text_search_language",
     "only_django_validation_errors",
     "only_drf_validation_errors",
@@ -213,6 +214,12 @@ def update_query_params(url: str, **params: str) -> str:
     query_params.update(params)
     url_parts["query"] = urllib.parse.urlencode(query_params)
     return urllib.parse.urlunparse(url_parts.values())  # type: ignore[return-value]
+
+
+def get_query_params(url: str) -> dict[str, str]:
+    """Get query params from the given URL."""
+    url_parts = urllib.parse.urlparse(url)._asdict()
+    return dict(urllib.parse.parse_qsl(url_parts["query"]))
 
 
 def as_p_tags(texts: Iterable[str]) -> str:

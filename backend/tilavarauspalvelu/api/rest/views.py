@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import hmac
 import io
 import json
@@ -8,6 +9,7 @@ from typing import TYPE_CHECKING, Any
 
 from django.apps import apps
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import connection
 from django.http import FileResponse, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.middleware.csrf import get_token
@@ -15,10 +17,13 @@ from django.views.csrf import csrf_failure
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
 from import_export.formats.base_formats import JSON
+from rest_framework.exceptions import ValidationError as DRFValidationError
 
+from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.models import ReservableTimeSpan, Reservation, ReservationStatistic, ReservationUnit, TermsOfUse
 from tilavarauspalvelu.services.export import ReservationUnitExporter
 from tilavarauspalvelu.services.pdf import render_to_pdf
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.utils import ical_hmac_signature
 
 from .utils import (
@@ -27,6 +32,8 @@ from .utils import (
     StatisticsParams,
     create_reservable_time_spans_exporter,
     create_statistics_exporter,
+    is_valid_url,
+    redirect_back_on_error,
     validate_pagination,
     validation_error_as_response,
 )
@@ -355,3 +362,73 @@ def reservable_time_spans_export(request: WSGIRequest) -> HttpResponse:
         headers=headers,
         json_dumps_params={"sort_keys": True},
     )
+
+
+@require_GET
+@redirect_back_on_error
+def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: int) -> HttpResponseRedirect:
+    """Redirect user to verkkokauppa for paying pending reservations."""
+    reservation: Reservation | None = Reservation.objects.filter(pk=pk).first()
+    if reservation is None:
+        msg = "Reservation not found"
+        raise ValidationError(msg, code="RESERVATION_NOT_FOUND")
+
+    if reservation.user != request.user:
+        msg = "Reservation is not owned by the requesting user"
+        raise ValidationError(msg, code="RESERVATION_NOT_OWNED_BY_USER")
+
+    if reservation.state != ReservationStateChoice.CONFIRMED:
+        msg = "Reservation is not confirmed"
+        raise ValidationError(msg, code="RESERVATION_NOT_CONFIRMED")
+
+    if not hasattr(reservation, "payment_order"):
+        msg = "Reservation does not have a payment order"
+        raise ValidationError(msg, code="RESERVATION_NO_PAYMENT_ORDER")
+
+    payment_order = reservation.payment_order
+
+    if payment_order.payment_type not in PaymentType.requires_verkkokauppa:
+        msg = "Reservation does not require verkkokauppa payment"
+        raise ValidationError(msg, code="RESERVATION_NO_VERKKOKAUPPA_PAYMENT")
+
+    if payment_order.status != OrderStatus.PENDING:
+        msg = "Payment for reservation is not in status 'PENDING'"
+        raise ValidationError(msg, code="RESERVATION_PAYMENT_ORDER_NOT_PENDING")
+
+    due_by = payment_order.handled_payment_due_by.astimezone(DEFAULT_TIMEZONE)
+    leeway = datetime.timedelta(seconds=3)
+    cutoff = local_datetime() - leeway
+
+    if due_by <= cutoff:
+        msg = "Reservation can no longer be paid since its due by date has passed"
+        raise ValidationError(msg, code="RESERVATION_PAYMENT_ORDER_PAST_DUE_BY")
+
+    # Could already have a verkkokauppa order from previous checkout attempt.
+    if is_valid_url(payment_order.checkout_url) and payment_order.expires_at > cutoff:
+        return HttpResponseRedirect(payment_order.checkout_url)
+
+    begin_date = reservation.begin.astimezone(DEFAULT_TIMEZONE).date()
+    reservation_unit: ReservationUnit = reservation.reservation_units.first()
+    pricing = reservation_unit.actions.get_active_pricing(by_date=begin_date)
+
+    if pricing is None:
+        msg = "Reservation unit has no active pricing information"
+        raise ValidationError(msg, code="RESERVATION_UNIT_NO_ACTIVE_PRICING")
+
+    # If creating a new payment order, tax percentage should be updated from the latest pricing
+    reservation.tax_percentage_value = pricing.tax_percentage.value
+    reservation.save(update_fields=["tax_percentage_value"])
+
+    try:
+        verkkokauppa_order = reservation.actions.create_order_in_verkkokauppa()
+    except DRFValidationError as error:
+        msg = "Payment for reservation could not be created in verkkokauppa"
+        raise ValidationError(msg, code="RESERVATION_PAYMENT_CREATION_FAILED") from error
+
+    payment_order.remote_id = verkkokauppa_order.order_id
+    payment_order.checkout_url = verkkokauppa_order.checkout_url
+    payment_order.receipt_url = verkkokauppa_order.receipt_url
+    payment_order.created_at = local_datetime()
+    payment_order.save(update_fields=["remote_id", "checkout_url", "receipt_url", "created_at"])
+
+    return HttpResponseRedirect(payment_order.checkout_url)
