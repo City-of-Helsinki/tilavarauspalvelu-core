@@ -2,7 +2,6 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import ShowAllContainer from "common/src/components/ShowAllContainer";
-import { AutoGrid } from "common/styled";
 import { useReservationUnitTypes, useUnitOptions } from "@/hooks";
 import { ReservationUnitPublishingState } from "@gql/gql-types";
 import {
@@ -78,36 +77,33 @@ function Filters(): JSX.Element {
 
   return (
     <Wrapper>
-      <AutoGrid>
-        <SearchFilter name="search" labelKey="reservationUnit" />
-        <MultiSelectFilter options={unitOptions} name="unit" />
-        <MultiSelectFilter
-          options={reservationUnitTypeOptions}
-          name="reservationUnitType"
-        />
-        <MultiSelectFilter
-          options={reservationUnitStateOptions}
-          name="reservationUnitState"
-        />
-      </AutoGrid>
       <MoreWrapper
         showAllLabel={t("ReservationUnitsSearch.moreFilters")}
         showLessLabel={t("ReservationUnitsSearch.lessFilters")}
-        maximumNumber={0}
-      >
-        <AutoGrid>
+        maximumNumber={4}
+        items={[
+          <SearchFilter name="search" labelKey="reservationUnit" />,
+          <MultiSelectFilter options={unitOptions} name="unit" />,
+          <MultiSelectFilter
+            options={reservationUnitTypeOptions}
+            name="reservationUnitType"
+          />,
+          <MultiSelectFilter
+            options={reservationUnitStateOptions}
+            name="reservationUnitState"
+          />,
           <RangeNumberFilter
             label={t("ReservationUnitsSearch.maxPersonsLabel")}
             minName="maxPersonsGte"
             maxName="maxPersonsLte"
-          />
+          />,
           <RangeNumberFilter
             label={t("ReservationUnitsSearch.surfaceAreaLabel")}
             minName="surfaceAreaGte"
             maxName="surfaceAreaLte"
-          />
-        </AutoGrid>
-      </MoreWrapper>
+          />,
+        ]}
+      />
       <SearchTags hide={[]} translateTag={translateTag} />
     </Wrapper>
   );
