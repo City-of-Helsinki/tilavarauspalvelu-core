@@ -28,7 +28,7 @@ REFUND = MagicMock(refund_id=uuid.uuid4())
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
 def test_reservation__refund__general_admin(graphql):
     reservation = ReservationFactory.create_for_refund()
-    payment_order = reservation.payment_order.first()
+    payment_order = reservation.payment_order
 
     admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
@@ -46,7 +46,7 @@ def test_reservation__refund__general_admin(graphql):
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
 def test_reservation__refund__regular_user(graphql):
     reservation = ReservationFactory.create_for_refund()
-    payment_order = reservation.payment_order.first()
+    payment_order = reservation.payment_order
 
     graphql.login_with_regular_user()
 
@@ -63,7 +63,7 @@ def test_reservation__refund__regular_user(graphql):
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
 def test_reservation__refund__correct_state(graphql):
     reservation = ReservationFactory.create_for_refund()
-    payment_order = reservation.payment_order.first()
+    payment_order = reservation.payment_order
 
     graphql.login_with_superuser()
 
@@ -96,7 +96,7 @@ def test_reservation__refund__invalid_state(graphql):
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
 def test_reservation__refund__reservation_price_is_zero(graphql):
     reservation = ReservationFactory.create_for_refund(price=Decimal(0))
-    payment_order = reservation.payment_order.first()
+    payment_order = reservation.payment_order
 
     graphql.login_with_superuser()
 
@@ -113,7 +113,7 @@ def test_reservation__refund__reservation_price_is_zero(graphql):
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
 def test_reservation__refund__payment_order_is_missing(graphql):
     reservation = ReservationFactory.create_for_refund()
-    reservation.payment_order.first().delete()
+    reservation.payment_order.delete()
 
     graphql.login_with_superuser()
     input_data = get_refund_data(reservation)
@@ -146,7 +146,7 @@ def test_reservation__refund__invoiced__cancel_if_paid_by_invoice(graphql):
     reservation = ReservationFactory.create_for_refund(
         payment_order__status=OrderStatus.PAID_BY_INVOICE,
     )
-    payment_order = reservation.payment_order.first()
+    payment_order = reservation.payment_order
 
     graphql.login_with_superuser()
     input_data = get_refund_data(reservation)
@@ -170,7 +170,6 @@ def test_reservation__refund__invoiced__date_in_the_past(graphql):
         begin=begin,
         end=begin + datetime.timedelta(hours=1),
     )
-    reservation.payment_order.first()
 
     graphql.login_with_superuser()
     input_data = get_refund_data(reservation)

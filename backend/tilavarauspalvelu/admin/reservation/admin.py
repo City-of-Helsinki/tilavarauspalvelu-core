@@ -197,6 +197,8 @@ class ReservationAdmin(admin.ModelAdmin):
         "access_code_should_be_active",
         "access_code_generated_at",
         "access_type",
+        "user",
+        "recurring_reservation",
     ]
     inlines = [PaymentOrderInline]
 
