@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import random
+from itertools import cycle
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -96,7 +97,7 @@ def _create_reservations(
 
 
 @with_logs
-def _create_normal_reservations(
+def _create_normal_reservations(  # noqa: PLR0912
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
     cities: list[City],
@@ -151,10 +152,12 @@ def _create_normal_reservations(
     ]
 
     handling_state_choices: list[ReservationStateChoice] = [
-        ReservationStateChoice.REQUIRES_HANDLING,
-        ReservationStateChoice.CONFIRMED,
+        *[ReservationStateChoice.REQUIRES_HANDLING] * 2,
+        *[ReservationStateChoice.CONFIRMED] * 5,
         ReservationStateChoice.DENIED,
     ]
+    random.shuffle(handling_state_choices)
+    handling_state_choices_cycle = cycle(handling_state_choices)
 
     ReservationUnitThroughModel: type[models.Model] = Reservation.reservation_units.through  # noqa: N806
 
@@ -191,13 +194,14 @@ def _create_normal_reservations(
         applying_for_free_of_charge: bool = False
         free_of_charge_reason: str | None = None
         deny_reason: ReservationDenyReason | None = None
-
-        if reservation_unit.require_reservation_handling:
-            reservation_state = weighted_choice(handling_state_choices, weights=[2, 5, 1])
-            if reservation_state in {ReservationStateChoice.CONFIRMED, ReservationStateChoice.DENIED}:
-                handled_at = local_datetime()
+        handled_payment_due_by: datetime.datetime | None = None
 
         for reservation_date in get_date_range(start_date, number=14):
+            if reservation_unit.require_reservation_handling:
+                reservation_state = next(handling_state_choices_cycle)
+                if reservation_state in {ReservationStateChoice.CONFIRMED, ReservationStateChoice.DENIED}:
+                    handled_at = local_datetime()
+
             begin_time = datetime.time(hour=random.randint(6, 10), tzinfo=DEFAULT_TIMEZONE)
             begin_datetime = combine(reservation_date, begin_time)
 
@@ -205,10 +209,16 @@ def _create_normal_reservations(
                 customer_type = weighted_choice(customer_type_choices, weights=[5, 1, 1])
                 reservation_type = weighted_choice(reservation_type_choices, weights=[5, 1, 1])
 
-                if reservation_state in handling_state_choices and pricing.highest_price != pricing.lowest_price:
+                if pricing.highest_price != pricing.lowest_price:
                     applying_for_free_of_charge = random.choice([True, False])
                     if applying_for_free_of_charge:
                         free_of_charge_reason = "Reason for applying for free of charge"
+
+                    if (
+                        reservation_unit.require_reservation_handling
+                        and reservation_state == ReservationStateChoice.CONFIRMED
+                    ):
+                        handled_payment_due_by = begin_datetime - datetime.timedelta(minutes=50)
 
                 if reservation_state == ReservationStateChoice.DENIED:
                     deny_reason = random.choice(deny_reasons)
@@ -254,7 +264,7 @@ def _create_normal_reservations(
                 )
 
                 if pricing.highest_price > 0:
-                    payment_order = _build_payment_order(reservation, payment_type)
+                    payment_order = _build_payment_order(reservation, payment_type, handled_payment_due_by)
                     payment_orders.append(payment_order)
 
                 begin_datetime += datetime.timedelta(hours=random.randint(min_interval_hours, max_interval_hours))
@@ -272,7 +282,11 @@ def _create_normal_reservations(
     PaymentOrder.objects.bulk_create(payment_orders)
 
 
-def _build_payment_order(reservation: Reservation, payment_type: PaymentType) -> PaymentOrder:
+def _build_payment_order(
+    reservation: Reservation,
+    payment_type: PaymentType,
+    handled_payment_due_by: datetime.datetime | None = None,
+) -> PaymentOrder:
     payment_order_builder: PaymentOrderBuilder = PaymentOrderBuilder().set(  # type: ignore[assignment]
         language=reservation.user.get_preferred_language(),
         price_net=reservation.price_net,
@@ -286,6 +300,13 @@ def _build_payment_order(reservation: Reservation, payment_type: PaymentType) ->
         return payment_order_builder.build(
             payment_type=payment_type,
             status=OrderStatus.PAID_MANUALLY,
+        )
+
+    if handled_payment_due_by is not None:
+        return payment_order_builder.build(
+            payment_type=payment_type,
+            handled_payment_due_by=handled_payment_due_by,
+            status=OrderStatus.PENDING,
         )
 
     if payment_type == PaymentType.ONLINE_OR_INVOICE:
