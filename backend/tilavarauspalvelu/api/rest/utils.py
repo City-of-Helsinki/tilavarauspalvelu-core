@@ -7,13 +7,15 @@ from functools import cache, wraps
 from typing import TYPE_CHECKING, Any
 
 from django.core.exceptions import ValidationError
-from django.http import JsonResponse
+from django.core.validators import URLValidator
+from django.http import HttpRequest, HttpResponseRedirect, JsonResponse
 from import_export.admin import ExportMixin
 from import_export.declarative import ModelDeclarativeMetaclass
 from import_export.resources import ModelResource
 from import_export.widgets import BooleanWidget, DateTimeWidget, DurationWidget, IntegerWidget, TimeWidget
 
 from tilavarauspalvelu.models import ReservableTimeSpan, ReservationStatistic
+from utils.utils import update_query_params
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -38,6 +40,59 @@ def validation_error_as_response[R, **P](func: Callable[P, R]) -> Callable[P, R]
             return func(*args, **kwargs)
         except ValidationError as error:
             return JsonResponse({"detail": str(error.message), "code": error.code or ""}, status=400)
+
+    return wrapper
+
+
+validate_url = URLValidator(schemes=["https"])
+
+
+def is_valid_url(url: str) -> bool:
+    try:
+        validate_url(url)
+    except Exception:  # noqa: BLE001
+        return False
+    return True
+
+
+def redirect_back_on_error[R, **P](func: Callable[P, R]) -> Callable[P, R]:
+    """
+    Error handler for endpoints that do redirects to other services.
+    Cannot simply return an error response, since these endpoints will not be called with 'fetch' in the frontend.
+    Instead, the endpoint should redirect back to the frontend with the error message and error code.
+    Validates that frontend provides a 'redirect_on_error' parameter, and that it is a valid URL.
+    """
+
+    @wraps(func)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        redirect_on_error: str | None = None
+
+        # If the first positional argument is the request object, try to get the 'redirect_on_error' parameter.
+        request: Any = next(iter(args), None)
+        if isinstance(request, HttpRequest):
+            redirect_on_error = request.GET.get("redirect_on_error", None)
+
+        # Try to use the 'Referrer' header, as it should be frontend's current URL.
+        if redirect_on_error is None:
+            redirect_on_error = request.META.get("HTTP_REFERER", None)
+
+        if redirect_on_error is None:
+            msg = "Request should include a 'redirect_on_error' parameter for error handling."
+            return JsonResponse({"detail": msg, "code": "REDIRECT_ON_ERROR_MISSING"}, status=400)
+
+        if not is_valid_url(redirect_on_error):
+            msg = "The 'redirect_on_error' parameter should be a valid URL."
+            return JsonResponse({"detail": msg, "code": "REDIRECT_ON_ERROR_INVALID"}, status=400)
+
+        try:
+            return func(*args, **kwargs)
+        except ValidationError as error:
+            redirect_on_error = update_query_params(
+                redirect_on_error,
+                error_message=str(error.message),
+                error_code=str(error.code or ""),
+            )
+            return HttpResponseRedirect(redirect_to=redirect_on_error)
 
     return wrapper
 
