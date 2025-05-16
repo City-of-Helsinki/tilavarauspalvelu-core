@@ -102,7 +102,7 @@ class PaymentOrder(models.Model):
 
     @property
     def expires_at(self) -> datetime.datetime | None:
-        if self.status != OrderStatus.DRAFT:
+        if self.status not in OrderStatus.can_start_payment_statuses:
             return None
 
         return self.created_at + datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
