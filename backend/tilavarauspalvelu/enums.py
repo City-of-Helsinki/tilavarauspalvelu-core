@@ -722,6 +722,13 @@ class PaymentType(models.TextChoices):
             cls.ONLINE_OR_INVOICE,
         ]
 
+    @classproperty
+    def types_that_can_be_pending(cls) -> list[PaymentType]:
+        return [
+            cls.ONLINE,
+            cls.ONLINE_OR_INVOICE,
+        ]
+
 
 class PriceUnit(models.TextChoices):
     PRICE_UNIT_PER_15_MINS = "per_15_mins", pgettext_lazy("PriceUnit", "per 15 minutes")
