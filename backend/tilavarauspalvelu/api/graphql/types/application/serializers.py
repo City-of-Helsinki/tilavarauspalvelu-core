@@ -400,7 +400,7 @@ class ApplicationSendSerializer(NestingModelSerializer):
     def save(self, **kwargs: Any) -> Application:
         self.instance.sent_date = local_datetime()
         self.instance.save()
-        EmailService.send_application_received_email(application=self.instance)
+        EmailService.send_seasonal_booking_application_received_email(application=self.instance)
         return self.instance
 
 

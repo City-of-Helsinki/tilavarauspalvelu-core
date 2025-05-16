@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
+from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraReservationResponse
 from utils.utils import html_2_text
 
 if TYPE_CHECKING:
@@ -410,3 +412,13 @@ EMAIL_CLOSING_HTML_EN = f"""Kind regards
 
         (C) City of Helsinki 2024
 """
+
+
+def pindora_reservation_response(**kwargs: Any) -> PindoraReservationResponse:
+    kwargs.setdefault("access_code", "123456")
+    kwargs.setdefault("access_code_is_active", True)
+    kwargs.setdefault("begin", datetime.datetime(2024, 1, 1, 11))
+    kwargs.setdefault("end", datetime.datetime(2024, 1, 1, 15))
+    kwargs.setdefault("access_code_valid_minutes_before", 0)
+    kwargs.setdefault("access_code_valid_minutes_after", 0)
+    return PindoraReservationResponse(**kwargs)

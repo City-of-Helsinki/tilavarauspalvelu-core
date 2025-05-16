@@ -2,14 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from admin_data_views.settings import admin_data_settings
 from admin_data_views.typing import TableContext
 from admin_data_views.utils import render_with_table_view
 from django.http import HttpResponse
-from django.urls import reverse
-from django.utils.html import format_html
 
-from tilavarauspalvelu.admin.email_template.utils import get_mock_data
+from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_preview_links, get_tester_link
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.typing import EmailType
 
@@ -26,34 +23,14 @@ def email_templates_admin_list_view(request: WSGIRequest, **kwargs: Any) -> Tabl
     links_text: list[SafeString] = []
     tester_links: list[SafeString] = []
 
-    for email_type in EmailType.options:
-        base_url = reverse(
-            viewname="admin:view_email_type",
-            kwargs={"email_type": email_type.value},
-            current_app=admin_data_settings.NAME,
-        )
-
-        link_html_fi = format_html('<a href="{}">{}</a>', base_url + "?lang=fi", "FI")
-        link_html_en = format_html('<a href="{}">{}</a>', base_url + "?lang=en", "EN")
-        link_html_sv = format_html('<a href="{}">{}</a>', base_url + "?lang=sv", "SV")
-        link_html = format_html("<span>{} / {} / {}</span>", link_html_fi, link_html_en, link_html_sv)
-
+    for email_template_type in EmailType.options:
+        link_html = get_preview_links(email_template_type)
         links_html.append(link_html)
 
-        link_text_fi = format_html('<a href="{}">{}</a>', base_url + "?lang=fi&text=true", "FI")
-        link_text_en = format_html('<a href="{}">{}</a>', base_url + "?lang=en&text=true", "EN")
-        link_text_sv = format_html('<a href="{}">{}</a>', base_url + "?lang=sv&text=true", "SV")
-        link_text = format_html("<span>{} / {} / {}</span>", link_text_fi, link_text_en, link_text_sv)
-
+        link_text = get_preview_links(email_template_type, text=True)
         links_text.append(link_text)
 
-        tester_url = reverse(
-            "admin:email_tester",
-            kwargs={"email_type": email_type.value},
-            current_app=admin_data_settings.NAME,
-        )
-
-        tester_link = format_html('<a href="{}">{}</a>', tester_url, email_type.label)
+        tester_link = get_tester_link(email_template_type)
         tester_links.append(tester_link)
 
     return TableContext(
