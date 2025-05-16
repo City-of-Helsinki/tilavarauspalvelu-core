@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import math
 import random
+import uuid
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Self
 
@@ -320,6 +321,39 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         kwargs.setdefault("begin", begin)
         kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
         kwargs.setdefault("reservation_units", [reservation_unit])
+        return cls.create(**kwargs)
+
+    @classmethod
+    def create_with_pending_payment(cls, **kwargs: Any) -> Reservation:
+        from .reservation_unit import ReservationUnitFactory
+
+        sub_kwargs = cls.pop_sub_kwargs("reservation_units", kwargs)
+        sub_kwargs.setdefault("payment_product__id", uuid.uuid4())
+        sub_kwargs.setdefault("pricings__lowest_price", Decimal(0))
+        sub_kwargs.setdefault("pricings__highest_price", Decimal(20))
+        sub_kwargs.setdefault("pricings__tax_percentage__value", Decimal("25.5"))
+        sub_kwargs.setdefault("pricings__payment_type", PaymentType.ONLINE)
+
+        reservation_unit = ReservationUnitFactory.create(**sub_kwargs)
+
+        begin = next_hour(plus_hours=1)
+        due_by = begin + datetime.timedelta(days=3)
+
+        kwargs.setdefault("state", ReservationStateChoice.CONFIRMED)
+        kwargs.setdefault("type", ReservationTypeChoice.NORMAL)
+        kwargs.setdefault("begin", begin)
+        kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
+        kwargs.setdefault("price", Decimal("12.4"))
+        kwargs.setdefault("tax_percentage_value", Decimal("24.0"))
+        kwargs.setdefault("reservation_units", [reservation_unit])
+
+        kwargs.setdefault("payment_order__status", OrderStatus.PENDING)
+        kwargs.setdefault("payment_order__payment_type", PaymentType.ONLINE)
+        kwargs.setdefault("payment_order__price_net", Decimal("10.0"))
+        kwargs.setdefault("payment_order__price_vat", Decimal("2.4"))
+        kwargs.setdefault("payment_order__price_total", Decimal("12.4"))
+        kwargs.setdefault("payment_order__handled_payment_due_by", due_by)
+
         return cls.create(**kwargs)
 
 
