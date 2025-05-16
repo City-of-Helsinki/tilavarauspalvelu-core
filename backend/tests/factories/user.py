@@ -15,7 +15,7 @@ from helusers.models import ADGroup
 from social_django.models import UserSocialAuth
 
 from tilavarauspalvelu.dataclasses import IDToken
-from tilavarauspalvelu.enums import ReservationNotification, UserRoleChoice
+from tilavarauspalvelu.enums import ADLoginAMR, ProfileLoginAMR, ReservationNotification, UserRoleChoice
 from tilavarauspalvelu.models import User
 from utils.date_utils import local_datetime
 
@@ -99,6 +99,26 @@ class UserFactory(GenericDjangoModelFactory[User]):
         kwargs["unit_roles__unit_groups"] = list(unit_groups)
         return cls.create(**kwargs)
 
+    @classmethod
+    def create_ad_user(cls, **kwargs: Any) -> User:
+        kwargs.setdefault("social_auth__extra_data__amr", ADLoginAMR.HELSINKIAZUREAD)
+        kwargs.setdefault("social_auth__extra_data__loa", "low")
+        return cls.create_superuser(**kwargs)
+
+    @classmethod
+    def create_internal_ad_user(cls, **kwargs: Any) -> User:
+        kwargs.setdefault("email", "test@hel.fi")
+        kwargs.setdefault("social_auth__extra_data__amr", ADLoginAMR.HELSINKIAZUREAD)
+        kwargs.setdefault("social_auth__extra_data__loa", "low")
+        return cls.create_superuser(**kwargs)
+
+    @classmethod
+    def create_profile_user(cls, **kwargs: Any) -> User:
+        kwargs.setdefault("profile_id", "foo")
+        kwargs.setdefault("social_auth__extra_data__amr", ProfileLoginAMR.SUOMI_FI)
+        kwargs.setdefault("social_auth__extra_data__loa", "substantial")
+        return cls.create_superuser(**kwargs)
+
 
 class UserSocialAuthFactory(GenericDjangoModelFactory[UserSocialAuth]):
     class Meta:
@@ -136,7 +156,7 @@ def get_extra_data(instance: UserSocialAuth, **kwargs: Any) -> dict[str, Any]:
 
 def get_id_token(
     instance: UserSocialAuth,
-    amr: str = "helsinkiazuread",
+    amr: ADLoginAMR | ProfileLoginAMR = ADLoginAMR.HELSINKIAZUREAD,
     loa: Literal["substantial", "low"] = "low",
     ad_groups: Iterable[str] = (),
 ) -> str:
@@ -175,7 +195,7 @@ def get_id_token(
                         azp="tilavaraus-test",
                         sid=uuid4().hex,
                         session_state=uuid4().hex,
-                        amr=amr,
+                        amr=amr.value,
                         loa=loa,
                     )
                 ),
