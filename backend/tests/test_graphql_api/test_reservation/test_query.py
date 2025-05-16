@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import uuid
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
 import freezegun
@@ -20,7 +21,7 @@ from tilavarauspalvelu.integrations.keyless_entry.typing import (
     PindoraSeasonalBookingResponse,
 )
 from tilavarauspalvelu.models import PersonalInfoViewLog
-from utils.date_utils import local_datetime
+from utils.date_utils import local_date, local_datetime
 
 from tests.factories import (
     ApplicationRoundFactory,
@@ -29,6 +30,7 @@ from tests.factories import (
     RecurringReservationFactory,
     ReservationFactory,
     ReservationUnitFactory,
+    ReservationUnitPricingFactory,
     UnitFactory,
     UnitGroupFactory,
     UserFactory,
@@ -433,6 +435,60 @@ def test_reservation__query__reservation_unit_is_archived_but_data_is_still_retu
     response = graphql(query)
     assert response.has_errors is False, response.errors
     assert response.node(0) == expected_response
+
+
+@freeze_time(local_datetime(2024, 1, 1))
+def test_reservation__query__applied_pricing(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+
+    # Currently active pricing, but not applied to below reservation
+    ReservationUnitPricingFactory.create(
+        reservation_unit=reservation_unit,
+        begins=local_date(2024, 1, 1),
+        lowest_price=Decimal(5),
+        highest_price=Decimal(10),
+        tax_percentage__value=Decimal("24.0"),
+    )
+
+    # Future pricing, which is applied to below reservation
+    ReservationUnitPricingFactory.create(
+        reservation_unit=reservation_unit,
+        begins=local_date(2024, 1, 2),
+        lowest_price=Decimal(10),
+        highest_price=Decimal(20),
+        tax_percentage__value=Decimal("25.5"),
+    )
+
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
+        begin=local_datetime(2024, 1, 2, 12),
+        end=local_datetime(2024, 1, 2, 13),
+    )
+
+    fields = """
+        appliedPricing {
+            begins
+            priceUnit
+            lowestPrice
+            highestPrice
+            taxPercentage
+        }
+    """
+    graphql.login_with_superuser()
+    query = reservations_query(fields=fields)
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1
+    assert response.node(0) == {
+        "appliedPricing": {
+            "begins": "2024-01-02",
+            "priceUnit": "PRICE_UNIT_PER_15_MINS",
+            "lowestPrice": "10.0",
+            "highestPrice": "20.0",
+            "taxPercentage": "25.5",
+        }
+    }
 
 
 # Pindora responses
