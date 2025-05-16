@@ -108,12 +108,11 @@ export function UnitReservations({
     .filter(Number.isInteger);
 
   useEffect(() => {
-    if (searchParams.get("date")) {
-      return;
+    if (searchParams.get("date") == null) {
+      const p = new URLSearchParams(searchParams);
+      p.set("date", toUIDate(new Date()));
+      setSearchParams(p, { replace: true });
     }
-    const p = new URLSearchParams(searchParams);
-    p.set("date", toUIDate(new Date()));
-    setSearchParams(p, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only on page load
   }, []);
 
