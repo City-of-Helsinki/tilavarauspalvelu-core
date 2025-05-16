@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime
 
 import pytest
-from django.utils.timezone import get_default_timezone
 
 from tilavarauspalvelu.exceptions import TPRekImportError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -67,7 +66,7 @@ def test_TprekUnitImporter__update_unit_data_from_tprek__no_last_modified_set__u
     assert unit.email == "email@example.fi"
     assert unit.phone == "+358 1 234 45678, +358 9 876 54321"
     assert unit.tprek_department_id == "test-department-id"
-    assert unit.tprek_last_modified.astimezone(get_default_timezone()) == local_datetime(2023, 5, 10, 8, 9, 0)
+    assert unit.tprek_last_modified.astimezone(tz=DEFAULT_TIMEZONE) == local_datetime(2023, 5, 10, 8, 9, 0)
 
     location = Location.objects.get(unit=unit)
     assert location.address_street == "Teststreet 1"
