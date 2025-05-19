@@ -1,17 +1,22 @@
 from __future__ import annotations
 
 import datetime
+import uuid
+from decimal import Decimal
 
 import pytest
 from django.test import override_settings
 
-from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import AccessType, OrderStatus, PaymentType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
+from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
+from tilavarauspalvelu.integrations.verkkokauppa.payment.types import WebShopPaymentStatus
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.date_utils import local_datetime
 
-from tests.factories import ReservationFactory
+from tests.factories import PaymentFactory, ReservationFactory
 from tests.helpers import patch_method
 
 from .helpers import DENY_MUTATION, get_deny_data
@@ -267,3 +272,105 @@ def test_reservation__deny__delete_from_pindora__call_fails__404(graphql):
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.DENIED
+
+
+@patch_method(VerkkokauppaAPIClient.get_payment)
+def test_reservation__deny__has_order__status_unchanged_after_webshop_refresh(graphql):
+    reservation = ReservationFactory.create_for_deny(
+        payment_order__remote_id=uuid.uuid4(),
+        payment_order__status=OrderStatus.PAID,
+        payment_order__payment_type=PaymentType.ONLINE,
+        payment_order__price_net=Decimal("10.0"),
+        payment_order__price_vat=Decimal("2.4"),
+        payment_order__price_total=Decimal("12.4"),
+    )
+
+    payment = PaymentFactory.create(status=WebShopPaymentStatus.PAID_ONLINE)
+    VerkkokauppaAPIClient.get_payment.return_value = payment
+
+    graphql.login_with_superuser()
+    input_data = get_deny_data(reservation)
+    response = graphql(DENY_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.DENIED
+
+
+@patch_method(VerkkokauppaAPIClient.get_payment)
+def test_reservation__deny__has_order__status_changed_after_webshop_refresh(graphql):
+    reservation = ReservationFactory.create_for_deny(
+        payment_order__remote_id=uuid.uuid4(),
+        payment_order__status=OrderStatus.PENDING,
+        payment_order__handled_payment_due_by=local_datetime(),
+        payment_order__payment_type=PaymentType.ONLINE,
+        payment_order__price_net=Decimal("10.0"),
+        payment_order__price_vat=Decimal("2.4"),
+        payment_order__price_total=Decimal("12.4"),
+    )
+    payment_order = reservation.payment_order
+
+    payment = PaymentFactory.create(status=WebShopPaymentStatus.PAID_ONLINE)
+    VerkkokauppaAPIClient.get_payment.return_value = payment
+
+    graphql.login_with_superuser()
+    input_data = get_deny_data(reservation)
+    response = graphql(DENY_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Payment order status has changed to paid. Must re-evaluate if reservation should be denied.",
+    ]
+
+    payment_order.refresh_from_db()
+    assert payment_order.status == OrderStatus.PAID
+
+
+@patch_method(VerkkokauppaAPIClient.get_payment)
+def test_reservation__deny__has_order__deny_successful_if_webshop_unresponsive(graphql):
+    reservation = ReservationFactory.create_for_deny(
+        payment_order__remote_id=uuid.uuid4(),
+        payment_order__status=OrderStatus.PENDING,
+        payment_order__handled_payment_due_by=local_datetime(),
+        payment_order__payment_type=PaymentType.ONLINE,
+        payment_order__price_net=Decimal("10.0"),
+        payment_order__price_vat=Decimal("2.4"),
+        payment_order__price_total=Decimal("12.4"),
+    )
+
+    VerkkokauppaAPIClient.get_payment.side_effect = GetPaymentError("Mock error")
+
+    graphql.login_with_superuser()
+    input_data = get_deny_data(reservation)
+    response = graphql(DENY_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.DENIED
+
+
+def test_reservation__deny__has_order__unpaid_payment_cancelled(graphql):
+    reservation = ReservationFactory.create_for_deny(
+        payment_order__remote_id=None,
+        payment_order__status=OrderStatus.PENDING,
+        payment_order__handled_payment_due_by=local_datetime(),
+        payment_order__payment_type=PaymentType.ONLINE,
+        payment_order__price_net=Decimal("10.0"),
+        payment_order__price_vat=Decimal("2.4"),
+        payment_order__price_total=Decimal("12.4"),
+    )
+    payment_order = reservation.payment_order
+
+    graphql.login_with_superuser()
+    input_data = get_deny_data(reservation)
+    response = graphql(DENY_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.DENIED
+
+    payment_order.refresh_from_db()
+    assert payment_order.status == OrderStatus.CANCELLED

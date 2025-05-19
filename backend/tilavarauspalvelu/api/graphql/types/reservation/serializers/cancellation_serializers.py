@@ -14,12 +14,16 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import Reservation, ReservationCancelReason
-from tilavarauspalvelu.tasks import cancel_reservation_invoice_task, refund_paid_reservation_task
+from tilavarauspalvelu.tasks import (
+    cancel_payment_order_for_invoice_task,
+    cancel_payment_order_without_webshop_payment_task,
+    refund_payment_order_for_webshop_task,
+)
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.errors import external_service_errors_as_validation_errors
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationUnit
+    from tilavarauspalvelu.models import PaymentOrder, ReservationUnit
     from tilavarauspalvelu.typing import ReservationCancellationData
 
 __all__ = [
@@ -79,10 +83,17 @@ class ReservationCancellationSerializer(NestingModelSerializer):
                 ):
                     PindoraService.delete_access_code(obj=instance)
 
-        if instance.actions.is_refundable:
-            refund_paid_reservation_task.delay(instance.pk)
-        elif instance.actions.is_cancellable_invoice:
-            cancel_reservation_invoice_task.delay(instance.pk)
+        if hasattr(instance, "payment_order"):
+            payment_order: PaymentOrder = instance.payment_order
+
+            if payment_order.actions.is_refundable():
+                refund_payment_order_for_webshop_task.delay(payment_order.pk)
+
+            elif payment_order.actions.is_cancellable_invoice():
+                cancel_payment_order_for_invoice_task.delay(payment_order.pk)
+
+            elif payment_order.actions.has_no_payment_through_webshop():
+                cancel_payment_order_without_webshop_payment_task.delay(payment_order.pk)
 
         EmailService.send_reservation_cancelled_email(reservation=instance)
 

@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime
 import uuid
 from decimal import Decimal
-from unittest import mock
 
 import pytest
 from django.test import override_settings
@@ -12,11 +11,12 @@ from tilavarauspalvelu.enums import AccessType, OrderStatus, PaymentType, Reserv
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
+from tilavarauspalvelu.integrations.verkkokauppa.order.types import WebShopOrderStatus
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import ReservationCancelReason
 from utils.date_utils import local_datetime
 
-from tests.factories import PaymentOrderFactory, ReservationFactory
+from tests.factories import OrderFactory, PaymentOrderFactory, RefundFactory, ReservationFactory
 from tests.helpers import patch_method
 
 from .helpers import CANCEL_MUTATION, get_cancel_data
@@ -217,11 +217,8 @@ def test_reservation__cancel__sends_email_notification(graphql, outbox):
 def test_reservation__cancel__refund_for_paid_reservation(graphql):
     reservation = ReservationFactory.create_for_cancellation(price=1)
 
-    remote_id = uuid.uuid4()
     payment_order = PaymentOrderFactory.create(
         reservation=reservation,
-        remote_id=remote_id,
-        refund_id=None,
         payment_type=PaymentType.ONLINE,
         status=OrderStatus.PAID,
         price_net=Decimal("100.00"),
@@ -229,11 +226,8 @@ def test_reservation__cancel__refund_for_paid_reservation(graphql):
         price_total=Decimal("124.00"),
     )
 
-    refund_id = uuid.uuid4()
-    mock_refund = mock.MagicMock()
-    mock_refund.refund_id = refund_id
-
-    VerkkokauppaAPIClient.refund_order.return_value = mock_refund
+    refund = RefundFactory.create()
+    VerkkokauppaAPIClient.refund_order.return_value = refund
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
@@ -241,15 +235,17 @@ def test_reservation__cancel__refund_for_paid_reservation(graphql):
 
     assert response.has_errors is False, response.errors
 
-    VerkkokauppaAPIClient.refund_order.assert_called_with(order_uuid=remote_id)
+    VerkkokauppaAPIClient.refund_order.assert_called_with(order_uuid=payment_order.remote_id)
 
     payment_order.refresh_from_db()
-    assert payment_order.refund_id == refund_id
-    assert payment_order.status == OrderStatus.REFUNDED
+    assert payment_order.refund_id == refund.refund_id
+
+    # Status will change when refund webhook is received
+    assert payment_order.status == OrderStatus.PAID
 
 
 @patch_method(VerkkokauppaAPIClient.cancel_order)
-def test_reservation__cancel__cancellation_for_invoiced_reservation(graphql):
+def test_reservation__cancel__cancel_invoiced_reservation(graphql):
     reservation = ReservationFactory.create_for_cancellation(price=1)
 
     payment_order = PaymentOrderFactory.create(
@@ -263,6 +259,68 @@ def test_reservation__cancel__cancellation_for_invoiced_reservation(graphql):
         price_total=Decimal("124.00"),
         reservation_user_uuid=uuid.uuid4(),
     )
+
+    order = OrderFactory.create(status=WebShopOrderStatus.CANCELLED)
+    VerkkokauppaAPIClient.cancel_order.return_value = order
+
+    graphql.login_with_superuser()
+    data = get_cancel_data(reservation)
+    response = graphql(CANCEL_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    VerkkokauppaAPIClient.cancel_order.assert_called_with(
+        order_uuid=payment_order.remote_id,
+        user_uuid=payment_order.reservation_user_uuid,
+    )
+
+    payment_order.refresh_from_db()
+    assert payment_order.status == OrderStatus.CANCELLED
+
+
+def test_reservation__cancel__cancel_unpaid_reservation(graphql):
+    reservation = ReservationFactory.create_for_cancellation(price=1)
+
+    payment_order = PaymentOrderFactory.create(
+        reservation=reservation,
+        remote_id=None,
+        refund_id=None,
+        payment_type=PaymentType.ONLINE,
+        status=OrderStatus.PENDING,
+        handled_payment_due_by=local_datetime(),
+        price_net=Decimal("100.00"),
+        price_vat=Decimal("24.00"),
+        price_total=Decimal("124.00"),
+    )
+
+    graphql.login_with_superuser()
+    data = get_cancel_data(reservation)
+    response = graphql(CANCEL_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    payment_order.refresh_from_db()
+    assert payment_order.status == OrderStatus.CANCELLED
+
+
+@patch_method(VerkkokauppaAPIClient.cancel_order)
+def test_reservation__cancel__cancel_unpaid_reservation__also_cancel_verkkokauppa_order(graphql):
+    reservation = ReservationFactory.create_for_cancellation(price=1)
+
+    payment_order = PaymentOrderFactory.create(
+        reservation=reservation,
+        remote_id=uuid.uuid4(),
+        refund_id=None,
+        payment_type=PaymentType.ONLINE,
+        status=OrderStatus.PENDING,
+        handled_payment_due_by=local_datetime(),
+        price_net=Decimal("100.00"),
+        price_vat=Decimal("24.00"),
+        price_total=Decimal("124.00"),
+    )
+
+    order = OrderFactory.create(status=WebShopOrderStatus.CANCELLED)
+    VerkkokauppaAPIClient.cancel_order.return_value = order
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)

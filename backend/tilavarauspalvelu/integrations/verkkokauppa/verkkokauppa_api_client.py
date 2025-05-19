@@ -198,7 +198,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             raise GetRefundStatusError(msg) from err
 
     @classmethod
-    def refund_order(cls, *, order_uuid: uuid.UUID) -> Refund | None:
+    def refund_order(cls, *, order_uuid: uuid.UUID) -> Refund:
         action_fail = "Payment refund failed"
         url = f"{settings.VERKKOKAUPPA_PAYMENT_API_URL}/refund/instant/{order_uuid}"
 

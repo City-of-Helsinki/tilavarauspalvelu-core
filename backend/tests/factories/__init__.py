@@ -48,7 +48,7 @@ from .unit import UnitFactory
 from .unit_group import UnitGroupFactory
 from .unit_role import UnitRoleFactory
 from .user import ADGroupFactory, UserFactory, UserSocialAuthFactory
-from .verkkokauppa import OrderCustomerFactory, OrderFactory, PaymentFactory
+from .verkkokauppa import OrderCustomerFactory, OrderFactory, PaymentFactory, RefundFactory, RefundStatusResultFactory
 
 __all__ = [
     "ADGroupFactory",
@@ -79,6 +79,8 @@ __all__ = [
     "PurposeFactory",
     "QualifierFactory",
     "RecurringReservationFactory",
+    "RefundFactory",
+    "RefundStatusResultFactory",
     "RejectedOccurrenceFactory",
     "ReservableTimeSpanFactory",
     "ReservationCancelReasonFactory",

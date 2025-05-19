@@ -3,20 +3,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 import graphene
-from django.conf import settings
-from django.core.exceptions import ValidationError
 from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
+from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.api.graphql.types.payment_order.types import PaymentOrderNode
 from tilavarauspalvelu.enums import AccessType, OrderStatus
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
-from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
-from tilavarauspalvelu.integrations.verkkokauppa.order.types import WebShopOrderStatus
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
-from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.tasks import delete_pindora_reservation
 
@@ -153,7 +148,20 @@ class ReservationDeleteTentativeMutation(DeleteMutation):
 
         if hasattr(reservation, "payment_order"):
             payment_order: PaymentOrder = reservation.payment_order
-            cls.validate_payment_order(payment_order)
+
+            try:
+                payment_order.actions.refresh_order_status_from_webshop()
+            except GetPaymentError as error:
+                raise ValidationError(str(error), code=error_codes.EXTERNAL_SERVICE_ERROR) from error
+
+            if payment_order.status in OrderStatus.paid_in_webshop:
+                msg = "Reservation which is paid cannot be deleted."
+                raise ValidationError(msg, code=error_codes.ORDER_CANCELLATION_NOT_ALLOWED)
+
+            if payment_order.status not in OrderStatus.can_be_cancelled_statuses:
+                return
+
+            payment_order.actions.cancel_together_with_verkkokauppa(cancel_on_error=True)
 
         # Try Pindora delete, but if it fails, retry in background
         if reservation.access_type == AccessType.ACCESS_CODE:
@@ -163,45 +171,6 @@ class ReservationDeleteTentativeMutation(DeleteMutation):
                 pass
             except Exception:  # noqa: BLE001
                 delete_pindora_reservation.delay(str(reservation.ext_uuid))
-
-    @classmethod
-    def validate_payment_order(cls, payment_order: PaymentOrder) -> None:
-        if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
-            if payment_order.status in OrderStatus.can_be_cancelled_statuses:
-                payment_order.actions.set_order_as_cancelled()
-            return
-
-        if not payment_order.remote_id:
-            return
-
-        try:
-            payment_order.actions.refresh_order_status_from_webshop()
-        except GetPaymentError as error:
-            raise ValidationError(str(error), code=error_codes.EXTERNAL_SERVICE_ERROR) from error
-
-        if payment_order.status in OrderStatus.paid_in_webshop:
-            msg = "Reservation which is paid cannot be deleted."
-            raise ValidationError(msg)
-
-        if payment_order.status not in OrderStatus.can_be_cancelled_statuses:
-            return
-
-        # If there is an unexpected response or error from verkkokauppa,
-        # payment order should still be cancelled
-        try:
-            webshop_order = VerkkokauppaAPIClient.cancel_order(
-                order_uuid=payment_order.remote_id,
-                user_uuid=payment_order.reservation_user_uuid,
-            )
-
-            # Don't update if order is missing or something other than cancelled
-            if webshop_order is None or webshop_order.status != WebShopOrderStatus.CANCELLED:
-                return
-
-        except CancelOrderError as error:
-            SentryLogger.log_message("Verkkokauppa: Failed to cancel order", details=str(error))
-
-        payment_order.actions.set_order_as_cancelled()
 
 
 class ReservationDeleteMutation(ReservationDeleteTentativeMutation):
