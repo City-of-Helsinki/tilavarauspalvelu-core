@@ -386,7 +386,12 @@ function getRedirectProtectedRoute(
     const protocol = headers.get("x-forwarded-proto") ?? "http";
     const host = headers.get("x-forwarded-host") ?? url.host;
     const origin = `${protocol}://${host}`;
-    return getSignInUrl(apiBaseUrl, url.pathname, origin);
+    return getSignInUrl(
+      apiBaseUrl,
+      url.pathname,
+      origin,
+      getLocalizationFromUrl(url).toString()
+    );
   }
   return null;
 }

@@ -18,13 +18,14 @@ export function LoginFragment({
   isActionDisabled,
   returnUrl,
   type,
-}: Props): JSX.Element {
+}: Readonly<Props>): JSX.Element {
   // TODO pass the isAuthenticated from SSR and remove the hook
   const { isAuthenticated } = useSession();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const handleClick = () => {
-    signIn(apiBaseUrl, returnUrl);
+    alert(i18n.language);
+    signIn(apiBaseUrl, returnUrl, i18n.language);
   };
 
   if (isAuthenticated) {

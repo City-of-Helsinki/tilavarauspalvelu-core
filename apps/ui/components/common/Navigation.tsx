@@ -248,7 +248,7 @@ function ActionBar({
   profileLink,
   languageOptions,
 }: Readonly<HeaderProps>) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { isAuthenticated, user } = useSession();
   const { firstName, lastName } = user ?? {};
 
@@ -299,7 +299,7 @@ function ActionBar({
           label={t("common:login")}
           onClick={(e) => {
             e.preventDefault();
-            signIn(apiBaseUrl);
+            signIn(apiBaseUrl, window.location.href, i18n.language);
           }}
           id="login"
           icon={<IconKey />}

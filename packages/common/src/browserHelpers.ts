@@ -16,15 +16,23 @@ function cleanupUrlParam(url: unknown): string | undefined {
 // Redirect the user to the sign in dialog and return to returnUrl (or
 // current url if none is provided) after sign in
 /// Thows if called on the server
-export function signIn(apiBaseUrl: string, returnUrl?: unknown) {
+export function signIn(
+  apiBaseUrl: string,
+  returnUrl?: unknown,
+  language?: string
+) {
   if (!isBrowser) {
     throw new Error("signIn can only be called in the browser");
   }
   const returnUrlParam = cleanupUrlParam(returnUrl);
   // encode otherwise backend will drop the query params
-  const returnTo = encodeURIComponent(returnUrlParam ?? window.location.href);
-  const url = getSignInUrl(apiBaseUrl, returnTo);
-  window.location.href = url;
+  const returnTo = returnUrlParam ?? window.location.href;
+  window.location.href = getSignInUrl(
+    apiBaseUrl,
+    returnTo,
+    undefined,
+    language
+  );
 }
 
 function removeTrailingSlash(url: string): string {

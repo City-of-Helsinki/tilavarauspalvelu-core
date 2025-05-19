@@ -1,4 +1,4 @@
-import { isBrowser } from "./helpers";
+import { getLocalizationLang, isBrowser } from "./helpers";
 
 /// Returns url for graphql endpoint
 /// @param apiUrl - base url for api (hostname typically)
@@ -27,18 +27,25 @@ function buildAuthUrl(apiUrl: string) {
 export function getSignInUrl(
   apiBaseUrl: string,
   callBackUrl: string,
-  originOverride?: string
+  originOverride?: string,
+  lang?: string
 ): string {
-  const authUrl = buildAuthUrl(apiBaseUrl);
+  const loginUrl = new URL(`${buildAuthUrl(apiBaseUrl)}login/`);
+
   if (callBackUrl.includes(`/logout`)) {
     // TODO this is unsound if the callback url is not a full url but this at least redirects to an error page
-    const baseUrl =
-      originOverride != null ? originOverride : new URL(callBackUrl).origin;
-    return `${authUrl}login?next=${baseUrl}`;
+    loginUrl.searchParams.set(
+      "next",
+      originOverride ?? new URL(callBackUrl).origin
+    );
+    return loginUrl.toString();
   }
-  const next =
-    originOverride != null ? `${originOverride}/${callBackUrl}` : callBackUrl;
-  return `${authUrl}login?next=${next}`;
+  loginUrl.searchParams.set("lang", getLocalizationLang(lang));
+  loginUrl.searchParams.set(
+    "next",
+    originOverride != null ? `${originOverride}/${callBackUrl}` : callBackUrl
+  );
+  return loginUrl.toString();
 }
 
 /// @param apiBaseUrl - base url for api (hostname typically)
