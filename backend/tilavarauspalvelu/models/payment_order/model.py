@@ -10,6 +10,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
@@ -101,8 +102,17 @@ class PaymentOrder(models.Model):
             raise ValidationError(validation_errors)
 
     @property
-    def expires_at(self) -> datetime.datetime | None:
-        if self.status not in OrderStatus.can_start_payment_statuses:
-            return None
+    def expires_at(self) -> datetime.datetime:
+        expiry_time = datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
+        return self.created_at.astimezone(DEFAULT_TIMEZONE) + expiry_time
 
-        return self.created_at + datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
+    @property
+    def is_handled_payment(self) -> bool:
+        return self.handled_payment_due_by is not None
+
+    @property
+    def is_overdue_handled_payment(self) -> bool:
+        return (
+            self.handled_payment_due_by is not None
+            and self.handled_payment_due_by.astimezone(DEFAULT_TIMEZONE) < local_datetime()
+        )

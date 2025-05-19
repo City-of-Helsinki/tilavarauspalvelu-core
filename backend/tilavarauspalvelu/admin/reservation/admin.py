@@ -13,7 +13,7 @@ from rangefilter.filters import DateRangeFilterBuilder
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import Reservation, ReservationDenyReason
-from tilavarauspalvelu.tasks import cancel_reservation_invoice_task, refund_paid_reservation_task
+from tilavarauspalvelu.tasks import cancel_payment_order_for_invoice_task, refund_payment_order_for_webshop_task
 from utils.date_utils import local_date, local_datetime
 
 from .filters import (
@@ -30,6 +30,7 @@ if TYPE_CHECKING:
 
     from django.db.models import QuerySet
 
+    from tilavarauspalvelu.models import PaymentOrder
     from tilavarauspalvelu.typing import WSGIRequest
 
 
@@ -347,7 +348,8 @@ class ReservationAdmin(admin.ModelAdmin):
             payment_order__refund_id__isnull=True,
         )
         for reservation in refund_queryset:
-            refund_paid_reservation_task.delay(reservation.pk)
+            payment_order: PaymentOrder = reservation.payment_order
+            refund_payment_order_for_webshop_task.delay(payment_order.pk)
 
         # Cancel invoiced reservations
         cancel_queryset = queryset.filter(
@@ -358,7 +360,8 @@ class ReservationAdmin(admin.ModelAdmin):
             begin__date__lte=local_date(),
         )
         for reservation in cancel_queryset:
-            cancel_reservation_invoice_task.delay(reservation.pk)
+            payment_order = reservation.payment_order
+            cancel_payment_order_for_invoice_task.delay(payment_order.pk)
 
         refunded = len(refund_queryset)
         canceled = len(cancel_queryset)
