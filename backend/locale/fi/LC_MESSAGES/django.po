@@ -3504,18 +3504,28 @@ msgstr ""
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Pay the booking"
-msgstr "Maksa varaus"
+msgid "Your booking is confirmed, please pay online"
+msgstr "Varauksesi on vahvistettu, maksa varaus verkossa"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Your booking has been confirmed, and can be paid"
-msgstr "Varauksesi on hyväksytty, ja sen voi maksaa pankkitunnuksilla"
+msgid ""
+"Your booking is now confirmed. Please pay online or choose invoice as the "
+"payment method by the deadline, otherwise, the booking will be automatically "
+"canceled."
+msgstr ""
+"Varauksesi on nyt vahvistettu. Maksa varaus verkossa tai valitse "
+"maksutavaksi lasku, muuten varaus peruuntuu automaattisesti."
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Due date"
-msgstr "Eräpäivä"
+msgid "Pay the booking at Varaamo"
+msgstr "Maksa varaus Varaamossa"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Deadline"
+msgstr "Määräaika"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
