@@ -859,7 +859,6 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
       applicationRoundTimeSlots {
         ...ApplicationRoundTimeSlotFields
       }
-
       descriptionFi
       descriptionEn
       descriptionSv

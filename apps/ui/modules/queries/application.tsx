@@ -7,7 +7,7 @@ export const APPLICATION_FORM_FRAGMENT = gql`
     id
     pk
     status
-    ...Applicant
+    ...ApplicantFields
     applicationRound {
       id
       ...ApplicationRoundForApplication
@@ -16,9 +16,26 @@ export const APPLICATION_FORM_FRAGMENT = gql`
       notesWhenApplyingSv
     }
     applicationSections {
-      ...ApplicationSectionCommon
+      id
+      pk
+      name
+      status
+      reservationsEndDate
+      reservationsBeginDate
+      appliedReservationsPerWeek
+      reservationMinDuration
+      reservationMaxDuration
+      ageGroup {
+        id
+        pk
+        minimum
+        maximum
+      }
+      numPersons
       reservationUnitOptions {
         id
+        pk
+        preferredOrder
         reservationUnit {
           id
           pk

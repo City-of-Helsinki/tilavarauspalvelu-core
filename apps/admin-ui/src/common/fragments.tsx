@@ -9,6 +9,33 @@ export const ALLOCATED_TIME_SLOT_FRAGMENT = gql`
   }
 `;
 
+// TODO don't use convenience fragments
+export const APPLICATION_SECTION_COMMON_FRAGMENT = gql`
+  fragment ApplicationSectionCommon on ApplicationSectionNode {
+    id
+    pk
+    name
+    status
+    reservationsEndDate
+    reservationsBeginDate
+    appliedReservationsPerWeek
+    reservationMinDuration
+    reservationMaxDuration
+    ageGroup {
+      id
+      pk
+      minimum
+      maximum
+    }
+    numPersons
+    reservationUnitOptions {
+      id
+      pk
+      preferredOrder
+    }
+  }
+`;
+
 // NOTE this is for allocation only (it includes the application name)
 // for regular application queries we don't need to query the name through the application relation
 export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
@@ -114,7 +141,6 @@ export const RESERVATION_META_FRAGMENT = gql`
     numPersons
     name
     description
-    ...ReserveeNameFields
     ...ReserveeBillingFields
     freeOfChargeReason
     applyingForFreeOfCharge
@@ -152,6 +178,7 @@ export const RECURRING_RESERVATION_FRAGMENT = gql`
   }
 `;
 
+// TODO don't use convenience fragments
 export const APPLICATION_ROUND_TIME_SLOTS_FRAGMENT = gql`
   fragment ApplicationRoundTimeSlots on ApplicationRoundTimeSlotNode {
     id
