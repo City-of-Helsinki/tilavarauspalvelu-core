@@ -6,6 +6,7 @@ import {
   ApplicationRoundStatusChoice,
   ApplicationSectionStatusChoice,
   ApplicationStatusChoice,
+  ApplicationViewFragment,
   CreateApplicationDocument,
   type CreateApplicationMutationResult,
   type CreateApplicationMutationVariables,
@@ -373,19 +374,15 @@ export type CreateMockApplicationFragmentProps = {
   // completed page
   page?: PageOptions;
   notesWhenApplying?: string | null;
+  status?: ApplicationStatusChoice;
 };
 export function createMockApplicationFragment({
   pk = 1,
   page = "page0",
   notesWhenApplying = "Notes when applying",
+  status = ApplicationStatusChoice.Draft,
 }: CreateMockApplicationFragmentProps = {}): ApplicationMockType {
   const now = new Date();
-  // TODO use page to generate the form values (applicationSections)
-  // so it's filled with the correct values for that page
-  const status =
-    page === "page4"
-      ? ApplicationStatusChoice.Received
-      : ApplicationStatusChoice.Draft;
 
   const page3Data = {
     applicantType: ApplicantTypeChoice.Association,
@@ -431,7 +428,7 @@ export function createMockApplicationFragment({
   const MockApplicationForm = {
     id: base64encode(`ApplicationNode:${pk}`),
     pk,
-    status,
+    status: page === "page4" ? ApplicationStatusChoice.Received : status,
     // TODO this can't be combined with the other Fragment
     // colliding with the same name (spread syntax)
     applicationSections:
@@ -476,6 +473,33 @@ export function createMockApplicationFragment({
       ...generateNameFragment("ApplicationRoundNode"),
     },
   };
+}
+
+type ApplicationPage4 = ApplicationViewFragment;
+export function createMockApplicationViewFragment(
+  props: CreateMockApplicationFragmentProps = {}
+) {
+  const applicationRoundMock = {
+    sentDate: new Date().toISOString(),
+    status: ApplicationRoundStatusChoice.Open,
+    ...generateNameFragment("ApplicationRound"),
+    termsOfUse: {
+      id: base64encode("TermsOfUseNode:1"),
+      pk: "recurring",
+      termsType: TermsType.RecurringTerms,
+      ...generateNameFragment("TermsOfUse"),
+      ...generateTextFragment("Recurring Terms of Use"),
+    },
+  };
+  const baseFragment = createMockApplicationFragment(props);
+  const application: ApplicationPage4 = {
+    ...baseFragment,
+    applicationRound: {
+      ...baseFragment.applicationRound,
+      ...applicationRoundMock,
+    },
+  };
+  return application;
 }
 
 export function createMockTermsOfUse(): TermsOfUseFieldsFragment {
