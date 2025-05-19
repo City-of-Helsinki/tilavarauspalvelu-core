@@ -82,7 +82,7 @@ def get_mock_params(*, language: Lang, **kwargs: Any) -> EmailContext:
         "instructions_pending": kwargs.get("instructions_pending", "[KÄSITELTÄVÄN VARAUKSEN OHJEET]"),
         "language": language,
         "non_subsidised_price": kwargs.get("non_subsidised_price", Decimal("12.30")),
-        "payment_due_date": kwargs.get("payment_due_date", end.date()),
+        "handled_payment_due_by": kwargs.get("handled_payment_due_by", begin - datetime.timedelta(hours=1)),
         "price": kwargs.get("price", Decimal("12.30")),
         "rejection_reason": kwargs.get("rejection_reason", "[HYLKÄYKSEN SYY]"),
         "reservation_id": kwargs.get("reservation_id", 1234),

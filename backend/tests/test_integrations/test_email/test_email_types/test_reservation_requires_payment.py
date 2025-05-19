@@ -14,10 +14,12 @@ from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import get_context_for_reservation_requires_payment
+from tilavarauspalvelu.integrations.email.template_context.common import create_anchor_tag
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from utils.date_utils import local_datetime
 
-from tests.factories import ReservationFactory
+from tests.factories import PaymentOrderFactory, ReservationFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
@@ -54,12 +56,20 @@ COMMON_CONTEXT = {
 }
 LANGUAGE_CONTEXT = {
     "en": {
-        "title": "Your booking has been confirmed, and can be paid",
-        "text_reservation_requires_payment": "Your booking has been confirmed, and can be paid",
-        "payment_due_date_label": "Due date",
-        "payment_due_date": "1.1.2024",
-        "pay_reservation_link_html": '<a href="https://fake.varaamo.hel.fi/en/reservations">Pay the booking</a>',
-        "pay_reservation_link": "Pay the booking: https://fake.varaamo.hel.fi/en/reservations",
+        "title": "Your booking is confirmed, please pay online",
+        "text_reservation_requires_payment": (
+            "Your booking is now confirmed. "
+            "Please pay online or choose invoice as the payment method by the deadline, "
+            "otherwise, the booking will be automatically canceled."
+        ),
+        "handled_payment_due_by_label": "Deadline",
+        "handled_payment_due_by": "1.1.2024 11:00",
+        "handled_payment_text": "Pay the booking at Varaamo",
+        "handled_payment_link": "https://fake.varaamo.hel.fi/en/reservations/1234",
+        "handled_payment_link_html": create_anchor_tag(
+            link="https://fake.varaamo.hel.fi/en/reservations/1234",
+            text="Pay the booking at Varaamo",
+        ),
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **RESERVATION_PRICE_INFO_CONTEXT_EN,
@@ -67,12 +77,19 @@ LANGUAGE_CONTEXT = {
         **COMMON_CONTEXT,
     },
     "fi": {
-        "title": "Varauksesi on hyväksytty, ja sen voi maksaa pankkitunnuksilla",
-        "text_reservation_requires_payment": "Varauksesi on hyväksytty, ja sen voi maksaa pankkitunnuksilla",
-        "payment_due_date_label": "Eräpäivä",
-        "payment_due_date": "1.1.2024",
-        "pay_reservation_link_html": '<a href="https://fake.varaamo.hel.fi/reservations">Maksa varaus</a>',
-        "pay_reservation_link": "Maksa varaus: https://fake.varaamo.hel.fi/reservations",
+        "title": "Varauksesi on vahvistettu, maksa varaus verkossa",
+        "text_reservation_requires_payment": (
+            "Varauksesi on nyt vahvistettu. Maksa varaus verkossa tai valitse "
+            "maksutavaksi lasku, muuten varaus peruuntuu automaattisesti."
+        ),
+        "handled_payment_due_by_label": "Määräaika",
+        "handled_payment_due_by": "1.1.2024 11:00",
+        "handled_payment_text": "Maksa varaus Varaamossa",
+        "handled_payment_link": "https://fake.varaamo.hel.fi/reservations/1234",
+        "handled_payment_link_html": create_anchor_tag(
+            link="https://fake.varaamo.hel.fi/reservations/1234",
+            text="Maksa varaus Varaamossa",
+        ),
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
         **RESERVATION_PRICE_INFO_CONTEXT_FI,
@@ -80,12 +97,20 @@ LANGUAGE_CONTEXT = {
         **COMMON_CONTEXT,
     },
     "sv": {
-        "title": "Din bokning har bekräftats och kan betalas",
-        "text_reservation_requires_payment": "Din bokning har bekräftats och kan betalas",
-        "pay_reservation_link": "Betala bokningen: https://fake.varaamo.hel.fi/sv/reservations",
-        "pay_reservation_link_html": '<a href="https://fake.varaamo.hel.fi/sv/reservations">Betala bokningen</a>',
-        "payment_due_date": "1.1.2024",
-        "payment_due_date_label": "Förfallodatum",
+        "title": "Din bokning är bekräftats, vänligen betala online",
+        "text_reservation_requires_payment": (
+            "Din bokning har bekräftats. Vänligen betala online eller välj faktura som "
+            "betalningsmetod inom tidsfristen, annars kommer bokningen automatiskt att "
+            "avbokas."
+        ),
+        "handled_payment_due_by_label": "Tidsfrist",
+        "handled_payment_due_by": "1.1.2024 11:00",
+        "handled_payment_text": "Betala bokningen på Varaamo",
+        "handled_payment_link": "https://fake.varaamo.hel.fi/sv/reservations/1234",
+        "handled_payment_link_html": create_anchor_tag(
+            link="https://fake.varaamo.hel.fi/sv/reservations/1234",
+            text="Betala bokningen på Varaamo",
+        ),
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
         **RESERVATION_PRICE_INFO_CONTEXT_SV,
@@ -128,11 +153,20 @@ def test_reservation_requires_payment__get_context__get_mock_data(lang: Lang):
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 def test_reservation_requires_payment__get_context__instance(email_reservation):
+    link = f"https://fake.varaamo.hel.fi/en/reservations/{email_reservation.id}"
+
+    PaymentOrderFactory.create(
+        reservation=email_reservation,
+        handled_payment_due_by=local_datetime(2024, 1, 1, 11, 0),
+    )
+
     expected = {
         **LANGUAGE_CONTEXT["en"],
         "reservation_id": f"{email_reservation.id}",
         "price_can_be_subsidised": False,
         "subsidised_price": Decimal("12.30"),
+        "handled_payment_link_html": create_anchor_tag(link=link, text="Pay the booking at Varaamo"),
+        "handled_payment_link": link,
     }
 
     with TranslationsFromPOFiles():
@@ -149,11 +183,20 @@ def test_reservation_requires_payment__render__text():
     context = get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_PAYMENT, language="en")
     text_content = render_text(email_type=EmailType.RESERVATION_REQUIRES_PAYMENT, context=context)
 
+    body_text = (
+        "Your booking is now confirmed. Please pay online or choose invoice as the "
+        "payment method by the deadline, otherwise, the booking will be automatically "
+        "canceled."
+    )
+
     assert text_content == cleandoc(
         f"""
         Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
-        Your booking has been confirmed, and can be paid.
+        {body_text}
+
+        Deadline: 1.1.2024 11:00
+        Pay the booking at Varaamo: https://fake.varaamo.hel.fi/en/reservations/1234
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI]
@@ -164,10 +207,6 @@ def test_reservation_requires_payment__render__text():
 
         Price: 12,30 € (incl. VAT 25.5 %)
         Booking number: 1234
-
-        Due date: 1.1.2024
-
-        Pay the booking: https://fake.varaamo.hel.fi/en/reservations
 
         Additional information about your booking:
         [HYVÄKSYTYN VARAUKSEN OHJEET]
@@ -189,14 +228,22 @@ def test_reservation_requires_payment__render__html():
     html_content = render_html(email_type=EmailType.RESERVATION_REQUIRES_PAYMENT, context=context)
     text_content = html_email_to_text(html_content)
 
+    body_text = (
+        "Your booking is now confirmed. Please pay online or choose invoice as the "
+        "payment method by the deadline, otherwise, the booking will be automatically "
+        "canceled."
+    )
+
     assert text_content == cleandoc(
         f"""
         {EMAIL_LOGO_HTML}
 
         **Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],**
 
-        Your booking has been confirmed, and can be paid.
+        {body_text}
 
+        Deadline: 1.1.2024 11:00
+        [Pay the booking at Varaamo](https://fake.varaamo.hel.fi/en/reservations/1234)
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]
         [TOIMIPISTEEN OSOITE], [KAUPUNKI]
@@ -204,8 +251,6 @@ def test_reservation_requires_payment__render__html():
         To: **1.1.2024** at **15:00**
         Price: **12,30 €** (incl. VAT 25.5 %)
         Booking number: 1234
-        Due date: **1.1.2024**
-        [Pay the booking](https://fake.varaamo.hel.fi/en/reservations)
 
         ## Additional information about your booking
 
@@ -229,13 +274,15 @@ def test_reservation_requires_payment__send_email(outbox):
         user__email="user@email.com",
         reservation_units__name="foo",
         price=1,
+        handled_at=local_datetime(),
+        payment_order__handled_payment_due_by=local_datetime(),
     )
 
     EmailService.send_reservation_requires_payment_email(reservation)
 
     assert len(outbox) == 1
 
-    assert outbox[0].subject == "Your booking has been confirmed, and can be paid"
+    assert outbox[0].subject == "Your booking is confirmed, please pay online"
     assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]
 
 
@@ -248,6 +295,8 @@ def test_reservation_requires_payment__send_email__no_recipients(outbox):
         user__email="",
         reservation_units__name="foo",
         price=1,
+        handled_at=local_datetime(),
+        payment_order__handled_payment_due_by=local_datetime(),
     )
 
     EmailService.send_reservation_requires_payment_email(reservation)
@@ -266,6 +315,59 @@ def test_reservation_requires_payment__send_email__price_zero(outbox):
         user__email="user@email.com",
         reservation_units__name="foo",
         price=0,
+        handled_at=local_datetime(),
+        payment_order__handled_payment_due_by=local_datetime(),
+    )
+
+    EmailService.send_reservation_requires_payment_email(reservation)
+
+    assert len(outbox) == 0
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+def test_reservation_requires_payment__send_email__not_handled(outbox):
+    reservation = ReservationFactory.create(
+        reservee_email="reservee@email.com",
+        user__email="user@email.com",
+        reservation_units__name="foo",
+        price=1,
+        handled_at=None,
+        payment_order__handled_payment_due_by=local_datetime(),
+    )
+
+    EmailService.send_reservation_requires_payment_email(reservation)
+
+    assert len(outbox) == 0
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+def test_reservation_requires_payment__send_email__no_payment_order(outbox):
+    reservation = ReservationFactory.create(
+        reservee_email="reservee@email.com",
+        user__email="user@email.com",
+        reservation_units__name="foo",
+        price=1,
+        handled_at=local_datetime(),
+        payment_order=None,
+    )
+
+    EmailService.send_reservation_requires_payment_email(reservation)
+
+    assert len(outbox) == 0
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+def test_reservation_requires_payment__send_email__payment_order_not_handled_payment(outbox):
+    reservation = ReservationFactory.create(
+        reservee_email="reservee@email.com",
+        user__email="user@email.com",
+        reservation_units__name="foo",
+        price=1,
+        handled_at=local_datetime(),
+        payment_order__handled_payment_due_by=None,
     )
 
     EmailService.send_reservation_requires_payment_email(reservation)
