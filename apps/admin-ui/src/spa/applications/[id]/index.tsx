@@ -31,6 +31,7 @@ import {
   filterNonNullable,
   formatTimeRange,
   timeToMinutes,
+  toNumber,
 } from "common/src/helpers";
 import {
   ApplicationStatusChoice,
@@ -974,8 +975,8 @@ function ApplicationDetailsRouted(): JSX.Element {
   const { t } = useTranslation();
   const { applicationId } = useParams<IRouteParams>();
 
-  const applicationPk = Number(applicationId);
-  if (!applicationId || Number.isNaN(applicationPk)) {
+  const applicationPk = toNumber(applicationId);
+  if (!applicationPk) {
     return <div>{t("errors.router.invalidApplicationNumber")}</div>;
   }
 
@@ -1010,7 +1011,7 @@ export const APPLICATION_PAGE_FRAGMENT = gql`
     pk
     status
     lastModifiedDate
-    ...Applicant
+    ...ApplicantFields
     ...ApplicantNameFields
     applicationRound {
       id

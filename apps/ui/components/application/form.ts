@@ -11,7 +11,7 @@ import {
   Weekday,
   Priority,
   type UpdateApplicationSectionForApplicationSerializerInput,
-  type ApplicantFragment,
+  type ApplicantFieldsFragment,
   type ApplicationPage2Query,
   type ApplicationFormFragment,
   type Maybe,
@@ -642,7 +642,7 @@ function transformOrganisation(org: OrganisationFormValues) {
 }
 
 export function convertApplicationPage3(
-  app?: Maybe<ApplicantFragment>
+  app?: Maybe<ApplicantFieldsFragment>
 ): ApplicationPage3FormValues {
   const hasBillingAddress =
     app?.applicantType === ApplicantTypeChoice.Individual ||

@@ -202,7 +202,10 @@ export const APPLICATIONS_TABLE_ELEMENT_FRAGMENT = gql`
       id
       pk
       name
-      ...ApplicationSectionDuration
+      reservationsEndDate
+      reservationsBeginDate
+      appliedReservationsPerWeek
+      reservationMinDuration
       reservationUnitOptions {
         id
         preferredOrder
