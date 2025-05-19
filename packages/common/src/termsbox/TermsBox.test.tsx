@@ -54,17 +54,17 @@ describe("TermsBox", () => {
 
   test("should render with only heading", () => {
     const { heading } = defaultProps;
-    const view = renderComponent({ heading });
+    const view = renderComponent({ heading, body: "" });
     expect(view.getByRole("heading", { name: heading })).toBeInTheDocument();
   });
 
   test("should render with only links", () => {
-    const view = renderComponent({ links: defaultProps.links });
+    const view = renderComponent({ links: defaultProps.links, body: "" });
     expect(view.queryByRole("list")).toBeInTheDocument();
   });
 
   test("should not have link container with no links", () => {
-    const view = renderComponent({});
+    const view = renderComponent({ body: "" });
     expect(view.queryByRole("list")).not.toBeInTheDocument();
   });
 
