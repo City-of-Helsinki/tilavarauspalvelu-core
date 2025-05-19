@@ -69,7 +69,12 @@ class WebhookOrderPaidViewSet(viewsets.GenericViewSet):
             SentryLogger.log_message(f"Verkkokauppa: {msg}", details=details)
             return Response(data={"message": msg}, status=400)
 
-        payment_order.actions.update_order_status(new_status=order_status, payment_id=payment_id)
+        payment_order.status = order_status
+        payment_order.processed_at = local_datetime()
+        payment_order.payment_id = payment_id
+        payment_order.save(update_fields=["status", "processed_at", "payment_id"])
+
+        payment_order.actions.complete_payment()
 
         return Response(data={"message": "Order payment completed successfully"}, status=200)
 
@@ -90,6 +95,10 @@ class WebhookOrderCancelViewSet(viewsets.ViewSet):
             msg = "Payment order not found"
             SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=404)
+
+        if payment_order.status == OrderStatus.PENDING:
+            msg = "Pending order remains payable until its due date"
+            return Response(data={"message": msg}, status=200)
 
         if payment_order.status not in OrderStatus.can_be_cancelled_statuses:
             msg = "Order is already in a state where no updates are needed"
@@ -117,7 +126,9 @@ class WebhookOrderCancelViewSet(viewsets.ViewSet):
             SentryLogger.log_message(f"Verkkokauppa: {msg}", details=details)
             return Response(data={"message": msg}, status=400)
 
-        payment_order.actions.set_order_as_cancelled()
+        payment_order.status = OrderStatus.CANCELLED
+        payment_order.processed_at = local_datetime()
+        payment_order.save(update_fields=["status", "processed_at"])
 
         return Response(data={"message": "Order cancellation completed successfully"}, status=200)
 
@@ -174,9 +185,8 @@ class WebhookRefundViewSet(viewsets.ViewSet):
             SentryLogger.log_message(f"Verkkokauppa: {msg}", details=details)
             return Response(data={"message": msg}, status=400)
 
-        payment_order.refund_id = refund_id
         payment_order.status = OrderStatus.REFUNDED
         payment_order.processed_at = local_datetime()
-        payment_order.save(update_fields=["refund_id", "status", "processed_at"])
+        payment_order.save(update_fields=["status", "processed_at"])
 
         return Response(data={"message": "Order refund completed successfully"}, status=200)
