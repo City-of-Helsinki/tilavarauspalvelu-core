@@ -33,6 +33,7 @@ import Link from "next/link";
 import { validateApplication } from "@/components/application/form";
 import { PAGES_WITH_STEPPER } from "@/components/application/ApplicationStepper";
 import { gql } from "@apollo/client";
+import { ApplicationTerms } from "@/components/application/ApplicationTerms";
 
 // User has to accept the terms of service then on submit we change the application status
 // This uses separate Send mutation (not update) so no onNext like the other pages
@@ -95,12 +96,14 @@ function Page4({
   return (
     <ApplicationFunnelWrapper page="page4" application={application}>
       <Flex as="form" onSubmit={onSubmit}>
-        <ViewApplication
-          application={application}
-          tos={tos}
-          isTermsAccepted={isTermsAccepted}
-          setIsTermsAccepted={handleTermsAcceptedChange}
-        />
+        <ViewApplication application={application}>
+          <ApplicationTerms
+            generalTos={tos}
+            serviceTos={application.applicationRound?.termsOfUse}
+            isTermsAccepted={isTermsAccepted}
+            setIsTermsAccepted={handleTermsAcceptedChange}
+          />
+        </ViewApplication>
         {!isValid.valid && (
           <ErrorText>
             {t("application:validation.previewError", {
