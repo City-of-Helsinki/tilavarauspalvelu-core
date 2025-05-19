@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import datetime
+import uuid
+from decimal import Decimal
 
 import pytest
 from django.test import override_settings
 
-from tilavarauspalvelu.enums import AccessType, ReservationNotification, ReservationStateChoice
+from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationNotification, ReservationStateChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -216,3 +218,54 @@ def test_reservation__requires_handling__denied_overlaps_with_existing_reservati
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.DENIED
+
+
+def test_reservation__requires_handling__cancel_order_if_not_paid_yet(graphql):
+    reservation = ReservationFactory.create_for_requires_handling(
+        price=Decimal("12.4"),
+        tax_percentage_value=Decimal("25.5"),
+        payment_order__remote_id=None,
+        payment_order__status=OrderStatus.PENDING,
+        payment_order__handled_payment_due_by=local_datetime(),
+        payment_order__price_net=Decimal("10.0"),
+        payment_order__price_vat=Decimal("2.4"),
+        payment_order__price_total=Decimal("12.4"),
+    )
+
+    graphql.login_with_superuser()
+    input_data = get_require_handling_data(reservation)
+    response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
+
+    payment_order = reservation.payment_order
+    assert payment_order.status == OrderStatus.CANCELLED
+
+
+def test_reservation__requires_handling__leave_order_paid(graphql):
+    reservation = ReservationFactory.create_for_requires_handling(
+        price=Decimal("12.4"),
+        tax_percentage_value=Decimal("25.5"),
+        payment_order__remote_id=uuid.uuid4(),
+        payment_order__status=OrderStatus.PAID,
+        payment_order__handled_payment_due_by=local_datetime(),
+        payment_order__price_net=Decimal("10.0"),
+        payment_order__price_vat=Decimal("2.4"),
+        payment_order__price_total=Decimal("12.4"),
+    )
+
+    graphql.login_with_superuser()
+    input_data = get_require_handling_data(reservation)
+    response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
+
+    # Order is left paid and can be refunded optionally during deny if wanted to
+    payment_order = reservation.payment_order
+    assert payment_order.status == OrderStatus.PAID

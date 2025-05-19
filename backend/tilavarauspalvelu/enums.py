@@ -112,6 +112,8 @@ class OrderStatus(models.TextChoices):
             OrderStatus.DRAFT,
             OrderStatus.PENDING,
             OrderStatus.EXPIRED,
+            OrderStatus.PAID_MANUALLY,
+            OrderStatus.PAID_BY_INVOICE,
         ]
 
     @classproperty
@@ -119,6 +121,14 @@ class OrderStatus(models.TextChoices):
         return [
             OrderStatus.DRAFT,
             OrderStatus.PENDING,
+        ]
+
+    @classproperty
+    def no_payment_from_webshop_statuses(cls) -> list[OrderStatus]:
+        return [
+            OrderStatus.DRAFT,
+            OrderStatus.PENDING,
+            OrderStatus.PAID_MANUALLY,
         ]
 
     @classproperty

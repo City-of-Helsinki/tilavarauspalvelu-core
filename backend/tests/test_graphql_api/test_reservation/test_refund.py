@@ -3,16 +3,16 @@ from __future__ import annotations
 import datetime
 import uuid
 from decimal import Decimal
-from unittest.mock import MagicMock
 
 import pytest
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
+from tilavarauspalvelu.integrations.verkkokauppa.order.types import WebShopOrderStatus
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.date_utils import local_datetime
 
-from tests.factories import ReservationFactory, UserFactory
+from tests.factories import OrderFactory, RefundFactory, ReservationFactory, UserFactory
 from tests.helpers import patch_method
 
 from .helpers import REFUND_MUTATION, get_refund_data
@@ -22,7 +22,7 @@ pytestmark = [
 ]
 
 
-REFUND = MagicMock(refund_id=uuid.uuid4())
+REFUND = RefundFactory.create()
 
 
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
@@ -76,7 +76,9 @@ def test_reservation__refund__correct_state(graphql):
 
     payment_order.refresh_from_db()
     assert payment_order.refund_id == REFUND.refund_id
-    assert payment_order.status == OrderStatus.REFUNDED
+
+    # Status will change when refund webhook is received
+    assert payment_order.status == OrderStatus.PAID
 
 
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
@@ -148,13 +150,19 @@ def test_reservation__refund__invoiced__cancel_if_paid_by_invoice(graphql):
     )
     payment_order = reservation.payment_order
 
+    order = OrderFactory.create(status=WebShopOrderStatus.CANCELLED)
+    VerkkokauppaAPIClient.cancel_order.return_value = order
+
     graphql.login_with_superuser()
     input_data = get_refund_data(reservation)
     response = graphql(REFUND_MUTATION, input_data=input_data)
 
     assert response.has_errors is False, response.errors
 
-    assert VerkkokauppaAPIClient.cancel_order.called is True
+    VerkkokauppaAPIClient.cancel_order.assert_called_with(
+        order_uuid=payment_order.remote_id,
+        user_uuid=payment_order.reservation_user_uuid,
+    )
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.CANCELLED
