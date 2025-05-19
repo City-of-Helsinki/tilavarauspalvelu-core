@@ -2,13 +2,12 @@
 
 {{ text_reservation_requires_payment | sentence | safe }}
 
+{{ handled_payment_due_by_label | safe }}: {{ handled_payment_due_by }}
+{{ handled_payment_text | safe }}: {{ handled_payment_link | safe }}
+
 {% include "email/text/partials/reservation_basic_info.jinja" %}
 
 {% include "email/text/partials/reservation_price.jinja" %}
-
-{{ payment_due_date_label | safe }}: {{ payment_due_date }}
-
-{{ pay_reservation_link }}
 
 {% include "email/text/partials/instructions.jinja" %}
 

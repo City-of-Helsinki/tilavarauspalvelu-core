@@ -109,7 +109,9 @@ def get_email_tester_form_fields() -> dict[str, Any]:
         "instructions_confirmed": forms.CharField(initial=initial["instructions_confirmed"], widget=text_area_widget),
         "instructions_pending": forms.CharField(initial=initial["instructions_pending"], widget=text_area_widget),
         "non_subsidised_price": forms.DecimalField(initial=initial["non_subsidised_price"], widget=number_widget),
-        "payment_due_date": forms.DateField(initial=initial["payment_due_date"], widget=date_widget),
+        "handled_payment_due_by": forms.SplitDateTimeField(
+            initial=initial["handled_payment_due_by"], widget=datetime_widget
+        ),
         "price": forms.DecimalField(initial=initial["price"], widget=number_widget),
         "rejection_reason": forms.CharField(initial=initial["rejection_reason"], widget=text_widget),
         "reservation_id": forms.IntegerField(initial=initial["reservation_id"], widget=number_widget),

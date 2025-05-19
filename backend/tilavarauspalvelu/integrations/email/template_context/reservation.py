@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Annotated, Unpack
 from django.utils.translation import pgettext
 
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
-from utils.date_utils import local_date
+from utils.date_utils import local_datetime_string
 from utils.utils import convert_html_to_text
 
 from .common import (
@@ -16,6 +16,7 @@ from .common import (
     get_context_for_keyless_entry,
     get_context_for_translations,
     get_my_reservations_ext_link,
+    get_reservation_ext_link,
     get_staff_reservations_ext_link,
     params_for_access_code_reservation,
     params_for_base_info,
@@ -414,22 +415,30 @@ def get_context_for_reservation_requires_payment(
 ) -> Annotated[EmailContext, EmailType.RESERVATION_REQUIRES_PAYMENT]:
     if reservation is not None:
         data["email_recipient_name"] = reservation.actions.get_email_reservee_name()
-        data["payment_due_date"] = local_date()
         data["instructions_confirmed"] = reservation.actions.get_instructions(kind="confirmed", language=language)
+        data["handled_payment_due_by"] = reservation.payment_order.handled_payment_due_by
 
         data |= params_for_base_info(reservation=reservation, language=language)
         data |= params_for_price_info(reservation=reservation)
 
-    link = get_my_reservations_ext_link(language=language)
-    text = pgettext("Email", "Pay the booking")
-    title = pgettext("Email", "Your booking has been confirmed, and can be paid")
+    title = pgettext("Email", "Your booking is confirmed, please pay online")
+    text_reservation_requires_payment = pgettext(
+        "Email",
+        "Your booking is now confirmed. "
+        "Please pay online or choose invoice as the payment method by the deadline, "
+        "otherwise, the booking will be automatically canceled.",
+    )
+    handled_payment_text = pgettext("Email", "Pay the booking at Varaamo")
+    handled_payment_link = get_reservation_ext_link(reservation_number=data["reservation_id"], language=language)
+
     return {
         "title": title,
-        "text_reservation_requires_payment": title,
-        "payment_due_date_label": pgettext("Email", "Due date"),
-        "payment_due_date": data["payment_due_date"].strftime("%-d.%-m.%Y"),
-        "pay_reservation_link_html": create_anchor_tag(link=link, text=text),
-        "pay_reservation_link": f"{text}: {link}",
+        "text_reservation_requires_payment": text_reservation_requires_payment,
+        "handled_payment_due_by_label": pgettext("Email", "Deadline"),
+        "handled_payment_due_by": local_datetime_string(data["handled_payment_due_by"]),
+        "handled_payment_text": handled_payment_text,
+        "handled_payment_link": handled_payment_link,
+        "handled_payment_link_html": create_anchor_tag(link=handled_payment_link, text=handled_payment_text),
         "instructions_confirmed_html": data["instructions_confirmed"],
         "instructions_confirmed_text": convert_html_to_text(data["instructions_confirmed"]),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
