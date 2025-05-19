@@ -7,7 +7,7 @@ from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.enums import OrderStatus
 from tilavarauspalvelu.models import Reservation
-from tilavarauspalvelu.tasks import cancel_reservation_invoice_task, refund_paid_reservation_task
+from tilavarauspalvelu.tasks import cancel_payment_order_for_invoice_task, refund_payment_order_for_webshop_task
 
 __all__ = [
     "ReservationRefundSerializer",
@@ -35,11 +35,13 @@ class ReservationRefundSerializer(NestingModelSerializer):
         if not hasattr(instance, "payment_order"):
             return instance
 
-        match instance.payment_order.status:
+        payment_order = instance.payment_order
+
+        match payment_order.status:
             case OrderStatus.PAID_BY_INVOICE:
-                cancel_reservation_invoice_task.delay(instance.pk)
+                cancel_payment_order_for_invoice_task.delay(payment_order.pk)
 
             case OrderStatus.PAID:
-                refund_paid_reservation_task.delay(instance.pk)
+                refund_payment_order_for_webshop_task.delay(payment_order.pk)
 
         return instance

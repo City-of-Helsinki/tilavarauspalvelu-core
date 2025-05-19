@@ -6,6 +6,7 @@ import uuid
 from decimal import Decimal
 from functools import wraps
 from typing import TYPE_CHECKING
+from warnings import deprecated
 
 from django.core.cache import cache
 from django.db import transaction
@@ -59,7 +60,6 @@ __all__ = [
     "rebuild_space_tree_hierarchy",
     "refresh_reservation_unit_accounting",
     "refresh_reservation_unit_product_mapping",
-    "refund_paid_reservation_task",
     "remove_old_personal_info_view_logs",
     "save_personal_info_view_log",
     "save_sql_queries_from_request",
@@ -219,28 +219,56 @@ def prune_recurring_reservations_task() -> None:
     RecurringReservation.objects.delete_empty_series()
 
 
+@app.task(name="refund_paid_reservation")
+@deprecated("Use 'refund_payment_order_for_webshop_task' instead. Can be removed in next release.")
+def refund_paid_reservation_task(reservation_pk: int) -> None:
+    payment_order: PaymentOrder | None = PaymentOrder.objects.filter(reservation__pk=reservation_pk).first()
+    if payment_order is not None:
+        refund_payment_order_for_webshop_task(payment_order.pk)
+
+
 @app.task(
     name="refund_paid_reservation",
     autoretry_for=(Exception,),
     max_retries=5,
     retry_backoff=True,
 )
-def refund_paid_reservation_task(reservation_pk: int) -> None:
-    reservation: Reservation | None = Reservation.objects.filter(pk=reservation_pk).first()
-    if reservation is not None:
-        reservation.actions.refund_paid_reservation()
+def refund_payment_order_for_webshop_task(payment_order_pk: int) -> None:
+    payment_order: PaymentOrder | None = PaymentOrder.objects.filter(pk=payment_order_pk).first()
+    if payment_order is not None:
+        payment_order.actions.issue_refund_in_verkkokauppa()
+
+
+@app.task(name="cancel_reservation_invoice")
+@deprecated("Use 'cancel_payment_order_for_invoice_task' instead. Can be removed in next release.")
+def cancel_reservation_invoice_task(reservation_pk: int) -> None:
+    payment_order: PaymentOrder | None = PaymentOrder.objects.filter(reservation__pk=reservation_pk).first()
+    if payment_order is not None:
+        cancel_payment_order_for_invoice_task(payment_order.pk)
 
 
 @app.task(
-    name="cancel_reservation_invoice",
+    name="cancel_payment_order_for_invoice",
     autoretry_for=(Exception,),
     max_retries=5,
     retry_backoff=True,
 )
-def cancel_reservation_invoice_task(reservation_pk: int) -> None:
-    reservation: Reservation | None = Reservation.objects.filter(pk=reservation_pk).first()
-    if reservation is not None:
-        reservation.actions.cancel_invoiced_reservation()
+def cancel_payment_order_for_invoice_task(payment_order_pk: int) -> None:
+    payment_order: PaymentOrder | None = PaymentOrder.objects.filter(pk=payment_order_pk).first()
+    if payment_order is not None:
+        payment_order.actions.cancel_together_with_verkkokauppa()
+
+
+@app.task(
+    name="cancel_payment_order_without_webshop_payment",
+    autoretry_for=(Exception,),
+    max_retries=5,
+    retry_backoff=True,
+)
+def cancel_payment_order_without_webshop_payment_task(payment_order_pk: int) -> None:
+    payment_order: PaymentOrder | None = PaymentOrder.objects.filter(pk=payment_order_pk).first()
+    if payment_order is not None:
+        payment_order.actions.cancel_together_with_verkkokauppa()
 
 
 @app.task(name="update_reservation_unit_hierarchy")

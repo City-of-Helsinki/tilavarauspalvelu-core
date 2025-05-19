@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 import graphene
@@ -8,7 +9,7 @@ from query_optimizer import MultiField
 
 from tilavarauspalvelu.enums import OrderStatus, PaymentType
 from tilavarauspalvelu.models import PaymentOrder
-from utils.date_utils import local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from .permissions import PaymentOrderPermission
 
@@ -60,10 +61,10 @@ class PaymentOrderNode(DjangoNode):
         return str(root.reservation_id) if root.reservation is not None else None
 
     def resolve_checkout_url(root: PaymentOrder, info: GQLInfo) -> str | None:
-        expires_at = root.expires_at
-        now = local_datetime()
+        if root.status not in OrderStatus.can_start_payment_statuses:
+            return None
 
-        if not expires_at or now >= expires_at:
+        if root.expires_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
             return None
 
         return root.checkout_url or None
@@ -72,10 +73,12 @@ class PaymentOrderNode(DjangoNode):
         return root.receipt_url or None
 
     def resolve_expires_in_minutes(root: PaymentOrder, info: GQLInfo) -> int | None:
-        expires_at = root.expires_at
-        now = local_datetime()
-
-        if not expires_at or now >= expires_at:
+        if root.status not in OrderStatus.can_start_payment_statuses:
             return None
 
-        return (expires_at - now).seconds // 60
+        time_left = root.expires_at.astimezone(DEFAULT_TIMEZONE) - local_datetime()
+
+        if time_left <= datetime.timedelta():
+            return None
+
+        return int(time_left.total_seconds()) // 60

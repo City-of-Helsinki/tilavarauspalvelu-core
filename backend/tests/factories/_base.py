@@ -172,23 +172,23 @@ class GenericDjangoModelFactory[TModel: Model](DjangoModelFactory):
     """
 
     @classmethod
-    def build(cls: TModel, **kwargs: Any) -> TModel:
+    def build(cls, **kwargs: Any) -> TModel:
         return super().build(**kwargs)
 
     @classmethod
-    def create(cls: TModel, **kwargs: Any) -> TModel:
+    def create(cls, **kwargs: Any) -> TModel:
         return super().create(**kwargs)
 
     @classmethod
-    def build_batch(cls: TModel, size: int, **kwargs: Any) -> list[TModel]:
+    def build_batch(cls, size: int, **kwargs: Any) -> list[TModel]:
         return super().build_batch(size, **kwargs)
 
     @classmethod
-    def create_batch(cls: TModel, size: int, **kwargs: Any) -> list[TModel]:
+    def create_batch(cls, size: int, **kwargs: Any) -> list[TModel]:
         return super().create_batch(size, **kwargs)
 
     @classmethod
-    def pop_sub_kwargs(cls: TModel, key: str, kwargs: dict[str, Any]) -> dict[str, Any]:
+    def pop_sub_kwargs(cls, key: str, kwargs: dict[str, Any]) -> dict[str, Any]:
         sub_kwargs = {}
         for kwarg in kwargs.copy():
             if kwarg.startswith(f"{key}__"):
@@ -196,7 +196,7 @@ class GenericDjangoModelFactory[TModel: Model](DjangoModelFactory):
         return sub_kwargs
 
     @classmethod
-    def has_sub_kwargs(cls: TModel, key: str, kwargs: dict[str, Any]) -> bool:
+    def has_sub_kwargs(cls, key: str, kwargs: dict[str, Any]) -> bool:
         return any(kwarg == key or kwarg.startswith(f"{key}__") for kwarg in kwargs)
 
 
@@ -204,19 +204,19 @@ class GenericFactory[T](Factory):
     """Same as `GenericDjangoModelFactory`, but for regular factories."""
 
     @classmethod
-    def build(cls: T, **kwargs: Any) -> T:
+    def build(cls, **kwargs: Any) -> T:
         return super().build(**kwargs)
 
     @classmethod
-    def create(cls: T, **kwargs: Any) -> T:
+    def create(cls, **kwargs: Any) -> T:
         return super().create(**kwargs)
 
     @classmethod
-    def build_batch(cls: T, size: int, **kwargs: Any) -> list[T]:
+    def build_batch(cls, size: int, **kwargs: Any) -> list[T]:
         return super().build_batch(size, **kwargs)
 
     @classmethod
-    def create_batch(cls: T, size: int, **kwargs: Any) -> list[T]:
+    def create_batch(cls, size: int, **kwargs: Any) -> list[T]:
         return super().create_batch(size, **kwargs)
 
 

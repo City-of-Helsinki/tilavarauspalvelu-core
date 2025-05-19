@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import datetime
+import uuid
 from contextlib import suppress
 from typing import TYPE_CHECKING
 
@@ -10,9 +11,12 @@ from django.conf import settings
 from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
+from tilavarauspalvelu.integrations.verkkokauppa.order.types import WebShopOrderStatus
 from tilavarauspalvelu.integrations.verkkokauppa.payment.types import WebShopPaymentGateway, WebShopPaymentStatus
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from utils.date_utils import local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -29,73 +33,92 @@ __all__ = [
 class PaymentOrderActions:
     payment_order: PaymentOrder
 
-    def set_order_as_cancelled(self) -> None:
-        self.payment_order.status = OrderStatus.CANCELLED
-        self.payment_order.processed_at = local_datetime()
-        self.payment_order.save(update_fields=["status", "processed_at"])
-
     def refresh_order_status_from_webshop(self) -> None:
         """Fetches the payment status from the webshop and updates the PaymentOrder status accordingly."""
-        webshop_payment = VerkkokauppaAPIClient.get_payment(order_uuid=self.payment_order.remote_id)
-        new_status = self.get_order_status_from_webshop_payment(webshop_payment)
-        self.update_order_status(new_status, webshop_payment.payment_id if webshop_payment else "")
+        if (
+            settings.MOCK_VERKKOKAUPPA_API_ENABLED
+            or self.payment_order.remote_id is None
+            or self.payment_order.status in OrderStatus.finalized
+        ):
+            return
 
-    def get_order_status_from_webshop_payment(self, webshop_payment: Payment | None) -> OrderStatus:
-        """Determines the order status based on the payment response from the webshop."""
-        order_status = OrderStatus(self.payment_order.status)
-        if order_status in OrderStatus.finalized:
-            return order_status
+        webshop_payment = VerkkokauppaAPIClient.get_payment(order_uuid=self.payment_order.remote_id)
 
         if webshop_payment is None:
-            # User has not entered payment phase in webshop within the expiration time
-            if self.payment_order.expires_at > local_datetime():
-                return OrderStatus.DRAFT
-            return OrderStatus.EXPIRED
+            new_status = self.get_order_status_if_no_webshop_payment()
+            payment_id: str = ""
+        else:
+            new_status = self.get_order_status_from_webshop_payment(webshop_payment)
+            payment_id = webshop_payment.payment_id
 
-        older_than_minutes = settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES
-        webshop_payment_expires_at = local_datetime() - datetime.timedelta(minutes=older_than_minutes)
+        if new_status == self.payment_order.status:
+            return
+
+        self.payment_order.status = new_status
+        self.payment_order.processed_at = local_datetime()
+        self.payment_order.payment_id = payment_id
+        self.payment_order.save(update_fields=["status", "processed_at", "payment_id"])
+
+        self.complete_payment()
+
+    def get_order_status_from_webshop_payment(self, webshop_payment: Payment) -> OrderStatus:
+        is_handled_payment = self.payment_order.is_handled_payment
+        is_handled_payment_overdue = self.payment_order.is_overdue_handled_payment
+        is_invoiced = webshop_payment.payment_gateway == WebShopPaymentGateway.INVOICE
+        webshop_payment_expiration_minutes = datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
+        webshop_payment_expires_at = webshop_payment.timestamp + webshop_payment_expiration_minutes
+        webshop_payment_expired = webshop_payment_expires_at <= local_datetime()
 
         match webshop_payment.status:
             case WebShopPaymentStatus.CANCELLED:
                 return OrderStatus.CANCELLED
 
-            case WebShopPaymentStatus.PAID_ONLINE if webshop_payment.payment_gateway == WebShopPaymentGateway.INVOICE:
+            case WebShopPaymentStatus.PAID_ONLINE if is_invoiced:
                 return OrderStatus.PAID_BY_INVOICE
 
             case WebShopPaymentStatus.PAID_ONLINE:
                 return OrderStatus.PAID
 
+            # Handled reservation payments expire immediately if they are overdue.
+            case WebShopPaymentStatus.CREATED if is_handled_payment_overdue:
+                return OrderStatus.EXPIRED
+
+            # Handled reservation payments do not expire even if the payment expires.
+            case WebShopPaymentStatus.CREATED if is_handled_payment:
+                return OrderStatus.PENDING
+
             # User has entered payment phase in webshop (Payment is created but not yet paid),
             # give more time to complete the payment before marking the order as expired.
-            case WebShopPaymentStatus.CREATED if webshop_payment.timestamp > webshop_payment_expires_at:
+            case WebShopPaymentStatus.CREATED if not webshop_payment_expired:
                 return OrderStatus.DRAFT
 
             # Other statuses are not supported by Varaamo, simply treat as expired.
             case _:
                 return OrderStatus.EXPIRED
 
-    def update_order_status(self, new_status: OrderStatus, payment_id: str = "") -> None:
-        """
-        Updates the PaymentOrder status and processed_at timestamp if the status has changed.
+    def get_order_status_if_no_webshop_payment(self) -> OrderStatus:
+        is_handled_payment = self.payment_order.is_handled_payment
+        is_handled_payment_overdue = self.payment_order.is_overdue_handled_payment
+        payment_expired = self.payment_order.expires_at <= local_datetime()
 
-        If the order is paid, updates the reservation state to confirmed and sends a confirmation email.
-        """
-        if new_status == self.payment_order.status:
-            return
+        if is_handled_payment_overdue:
+            return OrderStatus.EXPIRED
 
-        self.payment_order.status = new_status
-        self.payment_order.processed_at = local_datetime()
-        if payment_id:
-            self.payment_order.payment_id = payment_id
+        if is_handled_payment:
+            return OrderStatus.PENDING
 
-        self.payment_order.save(update_fields=["status", "processed_at", "payment_id"])
+        if payment_expired:
+            return OrderStatus.EXPIRED
 
+        return OrderStatus.DRAFT
+
+    def complete_payment(self) -> None:
         reservation = self.payment_order.reservation
 
-        if (
-            new_status not in OrderStatus.paid_in_webshop
-            or reservation is None
-            or reservation.state != ReservationStateChoice.WAITING_FOR_PAYMENT
+        if not (
+            self.payment_order.status in OrderStatus.paid_in_webshop
+            and reservation is not None
+            and reservation.state == ReservationStateChoice.WAITING_FOR_PAYMENT
         ):
             return
 
@@ -109,3 +132,80 @@ class PaymentOrderActions:
 
         EmailService.send_reservation_confirmed_email(reservation=reservation)
         EmailService.send_reservation_confirmed_staff_notification_email(reservation=reservation)
+
+    def cancel_together_with_verkkokauppa(self, *, cancel_on_error: bool = False) -> None:
+        if self.payment_order.status not in OrderStatus.can_be_cancelled_statuses:
+            return
+
+        if not settings.MOCK_VERKKOKAUPPA_API_ENABLED and self.payment_order.remote_id is not None:
+            try:
+                webshop_order = VerkkokauppaAPIClient.cancel_order(
+                    order_uuid=self.payment_order.remote_id,
+                    user_uuid=self.payment_order.reservation_user_uuid,
+                )
+
+                # Don't update if order is missing or something other than cancelled
+                if webshop_order is None or webshop_order.status != WebShopOrderStatus.CANCELLED:
+                    return
+
+            # If there is an unexpected response or error from verkkokauppa,
+            # payment order should still be cancelled
+            except CancelOrderError as error:
+                SentryLogger.log_message("Verkkokauppa: Failed to cancel order", details=str(error))
+
+                if not cancel_on_error:
+                    raise
+
+        self.payment_order.status = OrderStatus.CANCELLED
+        self.payment_order.processed_at = local_datetime()
+        self.payment_order.save(update_fields=["status", "processed_at"])
+
+    def issue_refund_in_verkkokauppa(self) -> None:
+        if self.payment_order.status not in OrderStatus.can_be_refunded_statuses:
+            return
+
+        # Refunds can only be made for orders paid through webshop.
+        if self.payment_order.remote_id is None:
+            return
+
+        # Refund has already been issued
+        if self.payment_order.refund_id is not None:
+            return
+
+        if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
+            self.payment_order.refund_id = uuid.uuid4()
+            self.payment_order.status = OrderStatus.REFUNDED
+            self.payment_order.processed_at = local_datetime()
+            self.payment_order.save(update_fields=["refund_id", "status", "processed_at"])
+            return
+
+        refund = VerkkokauppaAPIClient.refund_order(order_uuid=self.payment_order.remote_id)
+
+        # 'status' and 'processed_at' are updated from the webshop webhooks
+        self.payment_order.refund_id = refund.refund_id
+        self.payment_order.save(update_fields=["refund_id"])
+
+    def is_refundable(self) -> bool:
+        return (
+            # Is a paid reservation
+            self.payment_order.reservation is not None
+            and self.payment_order.reservation.price_net > 0
+            # Has been paid in webshop using online payment
+            and self.payment_order.status == OrderStatus.PAID
+            # Has not been refunded already
+            and self.payment_order.refund_id is None
+        )
+
+    def is_cancellable_invoice(self) -> bool:
+        return (
+            # Is a paid reservation
+            self.payment_order.reservation is not None
+            and self.payment_order.reservation.price_net > 0
+            # Reservation start date is not in the past
+            and local_date() <= self.payment_order.reservation.begin.astimezone(DEFAULT_TIMEZONE).date()
+            # Has been paid in webshop using invoice
+            and self.payment_order.status == OrderStatus.PAID_BY_INVOICE
+        )
+
+    def has_no_payment_through_webshop(self) -> bool:
+        return self.payment_order.status in OrderStatus.no_payment_from_webshop_statuses

@@ -9,7 +9,7 @@ from graphene_django_extensions.testing import build_mutation, build_query
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import PaymentOrder, User
+    from tilavarauspalvelu.models import PaymentOrder
 
 order_query = partial(
     build_query,
@@ -30,12 +30,9 @@ order_query = partial(
 REFRESH_MUTATION = build_mutation("refreshOrder", "RefreshOrderMutation", fields="orderUuid status")
 
 
-def get_order(*, user: User | None = None) -> PaymentOrder:
+def get_order() -> PaymentOrder:
     reservation_unit = ReservationUnitFactory.create()
-    reservation = ReservationFactory.create(
-        reservation_units=[reservation_unit],
-        **({"user": user} if user is not None else {}),
-    )
+    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
     return PaymentOrderFactory.create(
         reservation=reservation,
         remote_id=str(uuid.uuid4()),
