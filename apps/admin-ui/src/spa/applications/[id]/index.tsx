@@ -21,21 +21,13 @@ import {
   H1,
   H3,
   H4,
-  H5,
-  Strong,
   fontMedium,
 } from "common/styled";
-import { breakpoints, WEEKDAYS } from "common/src/const";
-import {
-  base64encode,
-  filterNonNullable,
-  formatTimeRange,
-  timeToMinutes,
-} from "common/src/helpers";
+import { breakpoints } from "common/src/const";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import {
   ApplicationStatusChoice,
   ApplicantTypeChoice,
-  Priority,
   type Maybe,
   useRestoreAllApplicationOptionsMutation,
   useRejectAllApplicationOptionsMutation,
@@ -45,13 +37,12 @@ import {
   type ApplicationAdminQuery,
   useRejectRestMutation,
   UserPermissionChoice,
-  type SuitableTimeFragment,
   type ReservationUnitOptionFieldsFragment,
   type ApplicationPageSectionFragment,
   type ApplicationPageFieldsFragment,
 } from "@gql/gql-types";
 import { formatDuration } from "common/src/common/util";
-import { convertWeekday, type Day } from "common/src/conversion";
+import { ApplicationTimePreview } from "common/src/components/ApplicationTimePreview";
 import {
   formatNumber,
   formatDate,
@@ -69,29 +60,10 @@ import { TimeSelector } from "../TimeSelector";
 import { getApplicantName } from "@/helpers";
 import Error404 from "@/common/Error404";
 import { useCheckPermission } from "@/hooks";
-import { errorToast } from "common/src/common/toast";
 import { ApplicationDatas, Summary } from "@/styled";
 import { ApplicationStatusLabel } from "common/src/components/statuses";
 import { useDisplayError } from "common/src/hooks";
-
-function printSuitableTimes(
-  timeRanges: Pick<
-    SuitableTimeFragment,
-    "dayOfTheWeek" | "beginTime" | "endTime" | "priority"
-  >[],
-  day: Day,
-  priority: Priority
-): string {
-  const schedules = timeRanges
-    .filter((s) => convertWeekday(s.dayOfTheWeek) === day)
-    .filter((s) => s.priority === priority);
-
-  return schedules
-    .map((s) =>
-      formatTimeRange(timeToMinutes(s.beginTime), timeToMinutes(s.endTime))
-    )
-    .join(", ");
-}
+import Error403 from "@/common/Error403";
 
 const Value = styled.span`
   ${fontMedium}
@@ -107,11 +79,6 @@ const Accordion = styled(AccordionBase)`
 
 const PreCard = styled.div`
   font-size: var(--fontsize-body-s);
-`;
-
-const EventSchedule = styled.div`
-  font-size: var(--fontsize-body-m);
-  line-height: 2em;
 `;
 
 const ApplicationSectionsContainer = styled.div`
@@ -213,39 +180,6 @@ function appEventDuration(
   return trim(duration, ", ");
 }
 
-function SchedulesContent({
-  as,
-  priority,
-}: {
-  as: ApplicationPageSectionFragment;
-  priority: Priority;
-}): JSX.Element {
-  const { t } = useTranslation();
-  const schedules = filterNonNullable(as.suitableTimeRanges);
-  const title =
-    priority === Priority.Primary
-      ? t("ApplicationEvent.primarySchedules")
-      : t("ApplicationEvent.secondarySchedules");
-  const calendar = WEEKDAYS.map((day) => {
-    const schedulesTxt = printSuitableTimes(schedules, day, priority);
-    return { day, schedulesTxt };
-  });
-
-  return (
-    <div>
-      <H5 as="h4" $marginTop="none">
-        {title}
-      </H5>
-      {calendar.map(({ day, schedulesTxt }) => (
-        <EventSchedule key={day}>
-          <Strong>{t(`dayLong.${day}`)}</Strong>
-          {schedulesTxt ? `: ${schedulesTxt}` : ""}
-        </EventSchedule>
-      ))}
-    </div>
-  );
-}
-
 function RejectOptionButton({
   option,
   applicationStatus,
@@ -297,12 +231,6 @@ function RejectOptionButton({
   };
 
   const isRejected = option.rejected;
-
-  // codegen types are allow nulls so have to do this for debugging
-  if (option.allocatedTimeSlots == null) {
-    // eslint-disable-next-line no-console
-    console.warn("no allocatedTimeSlots", option);
-  }
 
   const canReject =
     applicationStatus === ApplicationStatusChoice.InAllocation ||
@@ -607,10 +535,7 @@ function ApplicationSectionDetails({
         <H4 as="h3">{t("ApplicationEvent.requestedTimes")}</H4>
         <TimeSection>
           <TimeSelector applicationSection={section} />
-          <Summary>
-            <SchedulesContent as={section} priority={Priority.Primary} />
-            <SchedulesContent as={section} priority={Priority.Secondary} />
-          </Summary>
+          <ApplicationTimePreview schedules={section.suitableTimeRanges} />
         </TimeSection>
       </Accordion>
     </ScrollIntoView>
@@ -750,9 +675,6 @@ function ApplicationDetails({
   } = useApplicationAdminQuery({
     skip: !(applicationPk > 0),
     variables: { id },
-    onError: () => {
-      errorToast({ text: t("errors.errorFetchingApplication") });
-    },
   });
 
   const application = data?.application;
@@ -770,7 +692,7 @@ function ApplicationDetails({
   // we can't distinguish between these two cases
   const canView = application != null;
   if (!canView) {
-    return <div>{t("errors.noPermission")}</div>;
+    return <Error403 />;
   }
 
   if (applicationRound == null) {

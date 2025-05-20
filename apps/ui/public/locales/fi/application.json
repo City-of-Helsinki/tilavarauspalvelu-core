@@ -35,6 +35,8 @@
   },
   "applicationEventSaved": "Kausivaraus tallennettu hakemukselle",
   "heading": "Kausivaraushakemus",
+  "primarySchedules": "Ensisijaiset aikatoiveet",
+  "secondarySchedules": "Muut aikatoiveet",
   "Page1": {
     "subHeading": "Täytä hakemuksen tiedot",
     "basicInformationSubHeading": "Varauksen perustiedot",
@@ -81,8 +83,6 @@
       "secondary": "Muu toive",
       "open": "Varattavissa"
     },
-    "primarySchedules": "Ensisijaiset aikatoiveet",
-    "secondarySchedules": "Muut aikatoiveet",
     "notification": {
       "copyCells": "Ajat kopioitu kaikille varaustoiveille"
     }

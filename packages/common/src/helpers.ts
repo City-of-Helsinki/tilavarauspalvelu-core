@@ -4,10 +4,12 @@ import {
   type PricingFieldsFragment,
   type ImageFragment,
   type Maybe,
+  SuitableTimeFragment,
 } from "../gql/gql-types";
 import { type OptionInProps } from "hds-react";
 import { pixel } from "./const";
 import { type TFunction } from "i18next";
+import { convertWeekday } from "./conversion";
 
 /// Enforce readonly on all nested properties
 /// only single level deep i.e. {a: {b: {c: string}}} -> {readonly a: {b: {c: string}}}
@@ -264,6 +266,16 @@ export function formatApiTimeInterval({
     trailingMinutes
   );
   return `${btime}–${etime}`;
+}
+
+export function formatDayTimes(
+  schedule: Omit<SuitableTimeFragment, "pk" | "id" | "priority">[],
+  day: number
+): string {
+  return schedule
+    .filter((s) => convertWeekday(s.dayOfTheWeek) === day)
+    .map((s) => formatApiTimeInterval(s))
+    .join(", ");
 }
 
 /// Primary use case is to clip out seconds from backend time strings

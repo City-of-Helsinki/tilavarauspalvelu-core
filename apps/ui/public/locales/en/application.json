@@ -35,6 +35,8 @@
   },
   "applicationEventSaved": "Booking saved",
   "heading": "Seasonal booking application",
+  "primarySchedules": "Preferred time slots",
+  "secondarySchedules": "Other time slots",
   "Page1": {
     "subHeading": "Fill in the application details",
     "basicInformationSubHeading": "Basic booking information",
@@ -81,8 +83,6 @@
       "secondary": "Other request",
       "open": "Reservable"
     },
-    "primarySchedules": "Preferred time slots",
-    "secondarySchedules": "Other time slots",
     "notification": {
       "copyCells": "Times copied to all booking requests"
     }
