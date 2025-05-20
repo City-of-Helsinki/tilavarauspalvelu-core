@@ -93,7 +93,7 @@ export function ReservationReserveeDetailsSection({
     loading: isSSNLoading,
     error: ssnError,
   } = useReservationProfileDataSsnQuery({
-    variables: { reservationId: reservation.pk ?? 0 },
+    variables: { reservationPk: reservation.pk ?? 0 },
     fetchPolicy: "no-cache",
     skip: !reservation.id || !isSSNVisible,
   });
@@ -104,7 +104,7 @@ export function ReservationReserveeDetailsSection({
     loading: isContactInfoLoading,
     error: contactInfoError,
   } = useReservationProfileDataContactInfoQuery({
-    variables: { reservationId: reservation.pk ?? 0 },
+    variables: { reservationPk: reservation.pk ?? 0 },
     fetchPolicy: "no-cache",
     skip: !reservation.id || !isContactInfoVisible,
   });
@@ -314,8 +314,8 @@ export const RESERVATION_DATE_OF_BIRTH_QUERY = gql`
 `;
 
 export const RESERVATION_PROFILE_DATA_CONTACT_INFO_QUERY = gql`
-  query ReservationProfileDataContactInfo($reservationId: Int!) {
-    profileData(reservationId: $reservationId) {
+  query ReservationProfileDataContactInfo($reservationPk: Int!) {
+    profileData(reservationPk: $reservationPk) {
       pk
       firstName
       lastName
@@ -333,8 +333,8 @@ export const RESERVATION_PROFILE_DATA_CONTACT_INFO_QUERY = gql`
 `;
 
 export const RESERVATION_PROFILE_DATA_SSN_QUERY = gql`
-  query ReservationProfileDataSSN($reservationId: Int!) {
-    profileData(reservationId: $reservationId) {
+  query ReservationProfileDataSSN($reservationPk: Int!) {
+    profileData(reservationPk: $reservationPk) {
       ssn
     }
   }
