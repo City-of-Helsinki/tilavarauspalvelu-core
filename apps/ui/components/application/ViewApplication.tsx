@@ -4,14 +4,13 @@ import {
   ApplicationStatusChoice,
   type ApplicationViewFragment,
 } from "@gql/gql-types";
-import { ApplicantInfoPreview } from "./ApplicantInfoPreview";
+import { gql } from "@apollo/client";
 import {
   ApplicationSection,
   ApplicationSectionHeader,
   StyledNotification,
 } from "./styled";
-import { ApplicationSectionList } from "./ApplicationSectionList";
-import { gql } from "@apollo/client";
+import { ApplicantInfoPreview, ApplicationSectionList } from ".";
 
 type ViewApplicationProps = {
   application: ApplicationViewFragment;

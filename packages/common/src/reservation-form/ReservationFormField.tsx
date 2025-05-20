@@ -8,8 +8,7 @@ import { fontMedium, Strongish } from "../../styled";
 import { CustomerTypeChoice } from "../../gql/gql-types";
 import { Inputs, Reservation } from "./types";
 import { OptionType } from "../../types/common";
-import { ControlledSelect } from "../components/form";
-import { ControlledCheckbox } from "../components/form/ControlledCheckbox";
+import { ControlledSelect, ControlledCheckbox } from "../components/form";
 
 type Props = {
   field: keyof Inputs;

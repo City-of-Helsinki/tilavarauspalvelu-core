@@ -1,5 +1,5 @@
 import { vi, expect, test, describe } from "vitest";
-import { ApplicationFunnelWrapper } from "./ApplicationPageWrapper";
+import { ApplicationFunnelWrapper } from ".";
 import { render } from "@testing-library/react";
 import { createMockApplicationFragment } from "@/test/test.gql.utils";
 

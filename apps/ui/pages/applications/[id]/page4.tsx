@@ -8,10 +8,9 @@ import {
   useSendApplicationMutation,
 } from "@gql/gql-types";
 import type { GetServerSidePropsContext } from "next";
+import Link from "next/link";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { ViewApplication } from "@/components/application/ViewApplication";
 import { createApolloClient } from "@/modules/apolloClient";
-import { ApplicationFunnelWrapper } from "@/components/application/ApplicationPageWrapper";
 import {
   getCommonServerSideProps,
   getGenericTerms,
@@ -29,11 +28,14 @@ import {
 } from "hds-react";
 import { useDisplayError } from "common/src/hooks";
 import { ErrorText } from "common/src/components/ErrorText";
-import Link from "next/link";
-import { validateApplication } from "@/components/application/form";
-import { PAGES_WITH_STEPPER } from "@/components/application/ApplicationStepper";
+import {
+  validateApplication,
+  PAGES_WITH_STEPPER,
+  ApplicationTerms,
+  ApplicationFunnelWrapper,
+  ViewApplication,
+} from "@/components/application";
 import { gql } from "@apollo/client";
-import { ApplicationTerms } from "@/components/application/ApplicationTerms";
 
 // User has to accept the terms of service then on submit we change the application status
 // This uses separate Send mutation (not update) so no onNext like the other pages
