@@ -20,13 +20,13 @@ import {
 import {
   ApplicationFunnelWrapper,
   Page2 as Page2Impl,
-} from "@/components/application";
+} from "@/components/application/funnel";
 import {
   type ApplicationPage2FormValues,
   transformApplicationPage2,
   convertApplicationPage2,
   ApplicationPage2Schema,
-} from "@/components/application/form";
+} from "@/components/application/funnel/form";
 
 function Page2({
   application,

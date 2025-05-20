@@ -12,7 +12,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { ButtonContainer } from "common/styled";
 import { type ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { useReservationUnitList } from "@/hooks";
-import { type OptionTypes, ApplicationSection } from ".";
+import { type OptionTypes, ApplicationSectionPage1 } from ".";
 import { type ApplicationPage1FormValues } from "./form";
 
 type Props = {
@@ -96,7 +96,7 @@ export function Page1({
        * we could use findIndex with the formKey though */}
       {applicationSections?.map((event, index) =>
         event != null ? (
-          <ApplicationSection
+          <ApplicationSectionPage1
             key={event.formKey}
             index={index}
             applicationRound={applicationRound}

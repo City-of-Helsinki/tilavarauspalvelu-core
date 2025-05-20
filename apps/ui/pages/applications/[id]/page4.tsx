@@ -31,10 +31,9 @@ import { ErrorText } from "common/src/components/ErrorText";
 import {
   validateApplication,
   PAGES_WITH_STEPPER,
-  ApplicationTerms,
   ApplicationFunnelWrapper,
-  ViewApplication,
-} from "@/components/application";
+} from "@/components/application/funnel";
+import { ApplicationTerms, ViewApplication } from "@/components/application";
 import { gql } from "@apollo/client";
 
 // User has to accept the terms of service then on submit we change the application status

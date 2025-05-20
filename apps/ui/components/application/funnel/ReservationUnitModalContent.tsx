@@ -36,10 +36,11 @@ import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
+// TODO this is weird import path
 import {
   SearchFormValues,
   SeasonalSearchForm,
-} from "../recurring/SeasonalSearchForm";
+} from "@/components/recurring/SeasonalSearchForm";
 import { type OptionTypes } from ".";
 
 const ImageSizeWrapper = styled.div`
