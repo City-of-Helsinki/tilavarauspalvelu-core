@@ -16,9 +16,9 @@ import { appendFileSync, readFileSync, mkdirSync, rmSync } from "node:fs";
 import path from "node:path";
 import { glob } from "glob";
 
-const OUTPUT_DIR = './gql-pluck-output';
-const ADMIN_OUTPUT_FILE = 'admin-queries.graphql';
-const CUSTOMER_OUTPUT_FILE = 'customer-queries.graphql';
+const OUTPUT_DIR = "./gql-pluck-output";
+const ADMIN_OUTPUT_FILE = "admin-queries.graphql";
+const CUSTOMER_OUTPUT_FILE = "customer-queries.graphql";
 
 /** @param {string} outputFilePath */
 function cleanOutput(outputFilePath) {
@@ -36,16 +36,14 @@ function pluck(patterns, outputFile) {
   /** @type {string[]} */
   const files = glob.sync(patterns);
 
-  files.forEach(file => {
-    const content = readFileSync(file, 'utf-8');
+  files.forEach((file) => {
+    const content = readFileSync(file, "utf-8");
 
     const queries = gqlPluckFromCodeStringSync(file, content);
 
     if (queries.length > 0) {
       queries.forEach((query) => {
-        appendFileSync(outputFile,
-          query.body + '\n\n'
-        );
+        appendFileSync(outputFile, query.body + "\n\n");
       });
     }
   });
@@ -61,7 +59,7 @@ const admin_patterns = [
 ];
 const customer_patterns = [
   "apps/ui/**/!(*.d|gql-types).{ts,tsx}",
-  "packages/common/src/**/*.{ts,tsx}"
+  "packages/common/src/**/*.{ts,tsx}",
 ];
 
 mkdirSync(OUTPUT_DIR, { recursive: true });
