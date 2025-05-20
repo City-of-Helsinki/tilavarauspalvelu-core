@@ -1,44 +1,46 @@
 import React, { useEffect } from "react";
 import {
-  ApplicantTypeChoice,
-  ApplicationPage3Document,
-  useUpdateApplicationMutation,
-  type ApplicationPage3Query,
-  type ApplicationPage3QueryVariables,
-} from "@gql/gql-types";
-import { useTranslation } from "next-i18next";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
-import type { GetServerSidePropsContext } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
-import { CompanyForm } from "@/components/application/CompanyForm";
-import { IndividualForm } from "@/components/application/IndividualForm";
-import { OrganisationForm } from "@/components/application/OrganisationForm";
-import { ApplicantTypeSelector } from "@/components/application/ApplicantTypeSelector";
-import { useOptions } from "@/hooks/useOptions";
-import {
-  type ApplicationPage3FormValues,
-  ApplicationPage3Schema,
-  convertApplicationPage3,
-  transformPage3Application,
-} from "@/components/application/form";
-import { ApplicationFunnelWrapper } from "@/components/application/ApplicationPageWrapper";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { getApplicationPath } from "@/modules/urls";
-import {
   Button,
   ButtonSize,
   ButtonVariant,
   IconArrowLeft,
   IconArrowRight,
 } from "hds-react";
-import { AutoGrid, ButtonContainer, Flex } from "common/styled";
+import { useTranslation } from "next-i18next";
+import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import type { GetServerSidePropsContext } from "next";
+import { useRouter } from "next/router";
+import {
+  ApplicantTypeChoice,
+  ApplicationPage3Document,
+  useUpdateApplicationMutation,
+  type ApplicationPage3Query,
+  type ApplicationPage3QueryVariables,
+} from "@gql/gql-types";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { gql } from "@apollo/client";
+import { AutoGrid, ButtonContainer, Flex } from "common/styled";
+import { useDisplayError } from "common/src/hooks";
+import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import {
+  type ApplicationPage3FormValues,
+  ApplicationPage3Schema,
+  convertApplicationPage3,
+  transformPage3Application,
+} from "@/components/application/form";
+import {
+  ApplicationFunnelWrapper,
+  ApplicantTypeSelector,
+  CompanyForm,
+  IndividualForm,
+  OrganisationForm,
+} from "@/components/application";
 import { FormSubHeading } from "@/components/application/styled";
 import { createApolloClient } from "@/modules/apolloClient";
-import { gql } from "@apollo/client";
-import { useDisplayError } from "common/src/hooks";
+import { useOptions } from "@/hooks/useOptions";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getApplicationPath } from "@/modules/urls";
 
 function Page3Form(): JSX.Element | null {
   const { options } = useOptions();

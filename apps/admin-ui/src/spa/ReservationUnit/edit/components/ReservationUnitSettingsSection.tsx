@@ -13,11 +13,14 @@ import { Authentication, ReservationStartInterval } from "@gql/gql-types";
 import { EditAccordion } from "@/spa/ReservationUnit/edit/components/styled";
 import { AutoGrid, Flex } from "common/styled";
 import { FieldGroup } from "@/spa/ReservationUnit/edit/components/FieldGroup";
-import { ControlledSelect, DateTimeInput } from "common/src/components/form";
+import {
+  ControlledSelect,
+  ControlledCheckbox,
+  DateTimeInput,
+} from "common/src/components/form";
 import { getTranslatedError } from "@/common/util";
 import { CustomNumberInput } from "@/spa/ReservationUnit/edit/components/CustomNumberInput";
 import { SpecializedRadioGroup } from "@/spa/ReservationUnit/edit/components/SpecializedRadioGroup";
-import { ControlledCheckbox } from "common/src/components/form/ControlledCheckbox";
 import React from "react";
 import styled from "styled-components";
 import { Checkbox } from "hds-react";

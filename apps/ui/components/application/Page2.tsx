@@ -11,15 +11,15 @@ import { useRouter } from "next/router";
 import { useFormContext } from "react-hook-form";
 import { type ApplicationPage2Query } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { type ApplicationPage2FormValues } from "./form";
 import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
-import { AccordionWithState as Accordion } from "@/components/Accordion";
-import { TimeSelector } from "./TimeSelector";
 import { ButtonContainer } from "common/styled";
+import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { getApplicationPath } from "@/modules/urls";
+import { type ApplicationPage2FormValues } from "./form";
+import { TimeSelector } from ".";
 
 type Node = NonNullable<ApplicationPage2Query["application"]>;
 type Props = {
