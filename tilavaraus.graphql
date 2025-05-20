@@ -1595,7 +1595,7 @@ type ReservationNode implements Node {
   purpose: ReservationPurposeNode
   homeCity: CityNode
   ageGroup: AgeGroupNode
-  paymentOrder: [PaymentOrderNode!]!
+  paymentOrder: PaymentOrderNode
 
   """The ID of the object"""
   id: ID!
