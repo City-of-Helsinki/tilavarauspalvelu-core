@@ -13,9 +13,14 @@ import {
   Priority,
   ApplicationSectionStatusChoice,
   type ApplicationViewFragment,
+  type SuitableTimeFragment,
 } from "@gql/gql-types";
 import { WEEKDAYS } from "common/src/const";
-import { filterNonNullable, fromMondayFirstUnsafe } from "common/src/helpers";
+import {
+  filterNonNullable,
+  formatDayTimes,
+  fromMondayFirstUnsafe,
+} from "common/src/helpers";
 import StatusLabel from "common/src/components/StatusLabel";
 import type { StatusLabelType } from "common/src/tags";
 import { NoWrap } from "common/styled";
@@ -33,8 +38,7 @@ import {
   ScheduleDay,
   RegularText,
 } from "./styled";
-// TODO why does this use form values and not backend types?
-import { formatDayTimes, SuitableTimeRangeFormValues } from "./funnel/form";
+import { SuitableTimeRangeFormValues } from "./funnel/form";
 
 function formatDurationSeconds(seconds: number, t: TFunction): string {
   const hours = Math.floor(seconds / 3600);
@@ -263,12 +267,13 @@ export function ApplicationSectionList({
   );
 }
 
+type SchedulesT = Omit<SuitableTimeFragment, "pk" | "id" | "priority">;
 function Weekdays({
   primary,
   secondary,
 }: {
-  primary: Omit<SuitableTimeRangeFormValues, "pk">[];
-  secondary: Omit<SuitableTimeRangeFormValues, "pk">[];
+  primary: SchedulesT[];
+  secondary: SchedulesT[];
 }) {
   const { t } = useTranslation();
 
