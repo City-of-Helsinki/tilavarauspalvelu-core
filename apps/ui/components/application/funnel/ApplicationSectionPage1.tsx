@@ -305,7 +305,7 @@ function ApplicationDateRangePicker({
   );
 }
 
-export function ApplicationSection(props: Props): JSX.Element {
+export function ApplicationSectionPage1(props: Props): JSX.Element {
   const { index, isVisible, onDeleteEvent, onToggleAccordion } = props;
 
   const { t } = useTranslation();

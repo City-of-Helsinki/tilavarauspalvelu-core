@@ -56,7 +56,9 @@ function createGraphQLMocks(): CreateGraphQLMocksReturn {
   return createGraphQLApplicationIdMock();
 }
 
-function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnType<typeof render> {
+function customRender(
+  props: CreateMockApplicationFragmentProps = {}
+): ReturnType<typeof render> {
   // TODO need a graphql mutation mock (but have to have separate error / success cases)
   if (props.page == null) {
     props.page = "page3";
@@ -142,7 +144,7 @@ describe("Application Page4", () => {
 describe("Terms of Use", () => {
   test("should show terms of use", () => {
     const checkTerms = vi.fn();
-    const view = customRender({ });
+    const view = customRender({});
     // Check that we have the terms of use checkboxes
     expect(
       view.getByText("reservationCalendar:heading.cancellationPaymentTerms")

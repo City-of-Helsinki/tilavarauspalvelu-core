@@ -19,7 +19,6 @@ import { filterNonNullable, fromMondayFirstUnsafe } from "common/src/helpers";
 import StatusLabel from "common/src/components/StatusLabel";
 import type { StatusLabelType } from "common/src/tags";
 import { NoWrap } from "common/styled";
-import { getDayTimes } from "@/modules/util";
 import {
   convertLanguageCode,
   getTranslationSafe,
@@ -34,7 +33,8 @@ import {
   ScheduleDay,
   RegularText,
 } from "./styled";
-import { SuitableTimeRangeFormValues } from "./form";
+// TODO why does this use form values and not backend types?
+import { formatDayTimes, SuitableTimeRangeFormValues } from "./funnel/form";
 
 function formatDurationSeconds(seconds: number, t: TFunction): string {
   const hours = Math.floor(seconds / 3600);
@@ -274,19 +274,17 @@ function Weekdays({
 
   return (
     <>
-      {WEEKDAYS.map((day) => {
-        return (
-          <ScheduleDay key={day}>
-            <span>{t(`common:weekDay.${fromMondayFirstUnsafe(day)}`)}</span>
-            <span>{getDayTimes(primary, day) || "-"}</span>
-            <span>
-              {getDayTimes(secondary, day)
-                ? `(${getDayTimes(secondary, day)})`
-                : "-"}
-            </span>
-          </ScheduleDay>
-        );
-      })}
+      {WEEKDAYS.map((day) => (
+        <ScheduleDay key={day}>
+          <span>{t(`common:weekDay.${fromMondayFirstUnsafe(day)}`)}</span>
+          <span>{formatDayTimes(primary, day) || "-"}</span>
+          <span>
+            {formatDayTimes(secondary, day)
+              ? `(${formatDayTimes(secondary, day)})`
+              : "-"}
+          </span>
+        </ScheduleDay>
+      ))}
     </>
   );
 }

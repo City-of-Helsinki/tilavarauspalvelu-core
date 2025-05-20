@@ -1,6 +1,7 @@
 import { startOfDay } from "date-fns";
 import {
   filterNonNullable,
+  formatApiTimeInterval,
   type ReadonlyDeep,
   timeToMinutes,
 } from "common/src/helpers";
@@ -23,6 +24,7 @@ import {
   checkValidDateOnly,
   lessThanMaybeDate,
 } from "common/src/schemas/schemaCommon";
+import { convertWeekday } from "common/src/conversion";
 
 export const CELL_TYPES = [
   "open",
@@ -734,4 +736,14 @@ export function validateApplication(
     return { valid: false, page: 3 };
   }
   return { valid: true };
+}
+
+export function formatDayTimes(
+  schedule: Omit<SuitableTimeRangeFormValues, "pk" | "priority">[],
+  day: number
+): string {
+  return schedule
+    .filter((s) => convertWeekday(s.dayOfTheWeek) === day)
+    .map((s) => formatApiTimeInterval(s))
+    .join(", ");
 }

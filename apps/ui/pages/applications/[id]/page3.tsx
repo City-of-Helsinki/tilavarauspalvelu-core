@@ -28,15 +28,15 @@ import {
   ApplicationPage3Schema,
   convertApplicationPage3,
   transformPage3Application,
-} from "@/components/application/form";
+} from "@/components/application/funnel/form";
 import {
   ApplicationFunnelWrapper,
   ApplicantTypeSelector,
   CompanyForm,
   IndividualForm,
   OrganisationForm,
-} from "@/components/application";
-import { FormSubHeading } from "@/components/application/styled";
+} from "@/components/application/funnel/";
+import { FormSubHeading } from "@/components/application/funnel/styled";
 import { createApolloClient } from "@/modules/apolloClient";
 import { useOptions } from "@/hooks/useOptions";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
