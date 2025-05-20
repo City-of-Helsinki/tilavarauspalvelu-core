@@ -53,7 +53,7 @@ def test_helsinki_profile_data__query__all_fields(graphql):
         loginMethod
         isStrongLogin
     """
-    query = profile_query(fields=fields, application_id=application.id)
+    query = profile_query(fields=fields, application_pk=application.pk)
     response = graphql(query)
 
     assert HelsinkiProfileClient.request.call_count == 1
@@ -89,7 +89,7 @@ def test_helsinki_profile_data__query__application_user(graphql):
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
-    query = profile_query(application_id=application.id)
+    query = profile_query(application_pk=application.pk)
     response = graphql(query)
 
     assert HelsinkiProfileClient.request.call_count == 1
@@ -111,7 +111,7 @@ def test_helsinki_profile_data__query__reservation_user(graphql):
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
-    query = profile_query(reservation_id=reservation.id)
+    query = profile_query(reservation_pk=reservation.pk)
     response = graphql(query)
 
     assert HelsinkiProfileClient.request.call_count == 1
@@ -149,7 +149,7 @@ def test_helsinki_profile_data__query__ad_user(graphql):
         loginMethod
         isStrongLogin
     """
-    query = profile_query(fields=fields, application_id=application.id)
+    query = profile_query(fields=fields, application_pk=application.pk)
     response = graphql(query)
 
     assert HelsinkiProfileClient.request.call_count == 0
@@ -199,7 +199,7 @@ def test_helsinki_profile_data__query__non_helauth_user(graphql):
         loginMethod
         isStrongLogin
     """
-    query = profile_query(fields=fields, application_id=application.id)
+    query = profile_query(fields=fields, application_pk=application.pk)
     response = graphql(query)
 
     assert HelsinkiProfileClient.request.call_count == 0
@@ -233,7 +233,7 @@ def test_helsinki_profile_data__query__no_profile_id(graphql):
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
-    query = profile_query(application_id=application.id)
+    query = profile_query(application_pk=application.pk)
     response = graphql(query)
 
     assert HelsinkiProfileClient.request.call_count == 0
@@ -250,7 +250,7 @@ def test_helsinki_profile_data__query__no_token(graphql):
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
-    query = profile_query(application_id=application.id)
+    query = profile_query(application_pk=application.pk)
     response = graphql(query)
 
     assert HelsinkiProfileClient.request.call_count == 0
@@ -267,7 +267,7 @@ def test_helsinki_profile_data__query__profile_request_has_errors(graphql):
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"errors": [{"message": "foo"}]})
 
     graphql.login_with_superuser()
-    query = profile_query(application_id=application.id)
+    query = profile_query(application_pk=application.pk)
     response = graphql(query)
 
     assert HelsinkiProfileClient.request.call_count == 1
@@ -286,7 +286,7 @@ def test_helsinki_profile_data__query__no_permission(graphql):
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_regular_user()
-    query = profile_query(application_id=application.id)
+    query = profile_query(application_pk=application.pk)
     response = graphql(query)
 
     assert HelsinkiProfileClient.request.call_count == 0
@@ -305,7 +305,7 @@ def test_helsinki_profile_data__query__general_admin(graphql):
     admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
-    query = profile_query(application_id=application.id)
+    query = profile_query(application_pk=application.pk)
     response = graphql(query)
 
     assert HelsinkiProfileClient.request.call_count == 1
@@ -333,7 +333,7 @@ def test_helsinki_profile_data__query__unit_admin(graphql):
     admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
-    query = profile_query(application_id=application.id)
+    query = profile_query(application_pk=application.pk)
     response = graphql(query)
 
     assert HelsinkiProfileClient.request.call_count == 1
@@ -350,7 +350,7 @@ def test_helsinki_profile_data__query__keycloak_token_expired(graphql):
     application = ApplicationFactory.create(user=user)
 
     graphql.login_with_superuser()
-    query = profile_query(application_id=application.id)
+    query = profile_query(application_pk=application.pk)
 
     def change_session(session: SessionMapping, **kwargs: Any) -> None:
         session["keycloak_refresh_token_expired"] = True

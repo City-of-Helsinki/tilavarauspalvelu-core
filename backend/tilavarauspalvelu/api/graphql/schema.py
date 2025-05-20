@@ -219,12 +219,12 @@ class Query(graphene.ObjectType):
     )
     profile_data = Field(
         HelsinkiProfileDataNode,
-        reservation_id=graphene.Int(description="View profile data for this reservation's user."),
-        application_id=graphene.Int(description="View profile data for this application's user."),
+        application_pk=graphene.Int(description="View profile data for this application's user."),
+        reservation_pk=graphene.Int(description="View profile data for this reservation's user."),
         description=(
             "Get information about a user from Helsinki profile. "
             "If user is not a profile user, still return data stored in our database, e.g. first and last name. "
-            "Use only one of 'reservation_id' or 'application_id' to select the user. "
+            "Use only one of 'reservation_pk' or 'application_pk' to select the user. "
             "This determines the required permissions to view the user's data."
         ),
     )
@@ -247,9 +247,9 @@ class Query(graphene.ObjectType):
         return optimize_single(User.objects.all(), info, max_complexity=15, pk=info.context.user.pk)
 
     def resolve_profile_data(root: None, info: GQLInfo, **kwargs: Any) -> UserProfileInfo:
-        reservation_id: int | None = kwargs.get("reservation_id")
-        application_id: int | None = kwargs.get("application_id")
-        return HelsinkiProfileDataNode.get_data(info, application_id=application_id, reservation_id=reservation_id)
+        reservation_pk: int | None = kwargs.get("reservation_pk")
+        application_pk: int | None = kwargs.get("application_pk")
+        return HelsinkiProfileDataNode.get_data(info, application_pk=application_pk, reservation_pk=reservation_pk)
 
     def resolve_order(root: None, info: GQLInfo, *, order_uuid: str, **kwargs: Any) -> PaymentOrder | None:
         queryset = optimize(PaymentOrder.objects.filter(remote_id=order_uuid, reservation__isnull=False), info)

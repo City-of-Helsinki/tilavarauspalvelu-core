@@ -1312,7 +1312,7 @@ def test_frontend_queries__admin_ui__ReservationProfileDataContactInfo(graphql):
     assert query_info.factory is None
 
     variables = query_info.variables
-    variables["reservationId"] = reservation.pk
+    variables["reservationPk"] = reservation.pk
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -1341,7 +1341,7 @@ def test_frontend_queries__admin_ui__ReservationProfileDataSSN(graphql):
     assert query_info.factory is None
 
     variables = query_info.variables
-    variables["reservationId"] = reservation.pk
+    variables["reservationPk"] = reservation.pk
     assert_no_undefined_variables(variables)
 
     query = query_info.query
