@@ -1,6 +1,7 @@
 import type { TFunction } from "i18next";
 import {
   type CreateTagStringFragment,
+  PaymentType,
   PriceUnit,
   type PricingFieldsFragment,
   type ReservationUnitPricingFieldsFragment,
@@ -8,7 +9,7 @@ import {
 import { createTagString, getReservatinUnitPricing } from "./util";
 import { addHours, addMonths } from "date-fns";
 import { toApiDate } from "common/src/common/util";
-import { describe, test, expect } from "vitest";
+import { describe, expect, test } from "vitest";
 import { base64encode } from "common/src/helpers";
 
 const mockT = ((x: string) => x) as TFunction;
@@ -33,6 +34,7 @@ function constructPricing({
       pk: 1,
       value: "24",
     },
+    paymentType: PaymentType.Online,
   };
 }
 
