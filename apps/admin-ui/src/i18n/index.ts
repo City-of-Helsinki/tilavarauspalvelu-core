@@ -53,13 +53,13 @@ i18n.addResourceBundle("fi", "common", {
   remove: "Poista",
   scrollToTop: "Siirry ylös",
   helsinkiCity: ["Helsingin kaupunki"],
-});
-i18n.addResourceBundle("fi", "navigation", { navigation: "Päävalikko" });
-i18n.addResourceBundle("en", "common", {
-  day: "Day",
-  week: "Week",
-  month: "Month",
-  today: "Today",
+  "weekDayLong.0": "Sunnuntai",
+  "weekDayLong.1": "Maanantai",
+  "weekDayLong.2": "Tiistai",
+  "weekDayLong.3": "Keskiviikko",
+  "weekDayLong.4": "Torstai",
+  "weekDayLong.5": "Perjantai",
+  "weekDayLong.6": "Lauantai",
 });
 i18n.addResourceBundle("fi", "reservationCalendar", {
   showCurrentDay: "Näytä tämä päivä",
@@ -82,6 +82,8 @@ i18n.addResourceBundle("fi", "application", {
     RECEIVED: "Vastaanotettu",
     RESULTS_SENT: "Lähetetty",
   },
+  primarySchedules: "Ensisijaiset aikatoiveet",
+  secondarySchedules: "Muut aikatoiveet",
 });
 
 i18n.addResourceBundle("fi", "forms", {

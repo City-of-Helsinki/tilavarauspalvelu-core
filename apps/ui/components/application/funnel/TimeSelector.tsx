@@ -115,24 +115,25 @@ function constructAriaLabel(
 }
 
 function DayColumn({
-  index,
   day,
   cells,
   updateCells,
+  selectedPriority,
 }: {
-  index: number;
   day: Day;
   cells: Cell[];
-  updateCells: (cells: Cell[]) => void;
+  // use undefined to disable painting
+  updateCells?: (cells: Cell[]) => void;
+  selectedPriority?: CellType;
 }): JSX.Element {
   const { t } = useTranslation();
   const [paintState, setPaintState] = useState<CellType | false>(false); // toggle value true = set, false = clear: ;
   const [painting, setPainting] = useState(false); // is painting 'on'
 
-  const { watch } = useFormContext<ApplicationPage2FormValues>();
-  const priority = watch(`applicationSections.${index}.priority`);
-
   const setCellValue = (selection: Cell, value: CellType | false): void => {
+    if (updateCells == null) {
+      return;
+    }
     const newVal = cells.map((cell) =>
       cell.key === selection.key
         ? { ...cell, state: value === false ? "open" : value }
@@ -142,7 +143,10 @@ function DayColumn({
   };
 
   const handleMouseDown = (cell: Cell, _evt: React.MouseEvent) => {
-    const state = priority === cell.state ? false : priority;
+    if (selectedPriority == null) {
+      return;
+    }
+    const state = selectedPriority === cell.state ? false : selectedPriority;
 
     if (isTouchDevice()) {
       setCellValue(cell, state);
@@ -154,9 +158,17 @@ function DayColumn({
     setPainting(true);
   };
 
-  // TODO why doesn't this check the key that is pressed?
-  const handleKeyDown = (cell: Cell, _evt: React.KeyboardEvent) => {
-    setCellValue(cell, priority === cell.state ? false : priority);
+  const handleKeyDown = (cell: Cell, evt: React.KeyboardEvent) => {
+    if (selectedPriority == null) {
+      return;
+    }
+    if (evt.key !== "Enter" && evt.key !== " ") {
+      return;
+    }
+    setCellValue(
+      cell,
+      selectedPriority === cell.state ? false : selectedPriority
+    );
   };
 
   const head = t(`common:weekDayLong.${fromMondayFirstUnsafe(day)}`);
@@ -165,27 +177,39 @@ function DayColumn({
   return (
     <div onMouseLeave={() => setPainting(false)}>
       <CalendarHead>{head}</CalendarHead>
-      {cells.map((cell) => (
-        <TimeSelectionButton
-          key={cell.key}
-          $type={cell.state}
-          type="button"
-          onMouseDown={(evt) => handleMouseDown(cell, evt)}
-          onMouseUp={() => setPainting(false)}
-          onKeyDown={(evt) => handleKeyDown(cell, evt)}
-          onMouseEnter={() => {
-            if (painting) {
-              setCellValue(cell, paintState);
-            }
-          }}
-          role="option"
-          aria-label={constructAriaLabel(t, cell, labelHead)}
-          aria-selected={isSelected(cell.state)}
-          data-testid={`time-selector__button--${cell.key}`}
-        >
-          {cell.label}
-        </TimeSelectionButton>
-      ))}
+      {cells.map((cell) => {
+        const handlers =
+          updateCells != null
+            ? {
+                onMouseDown: (evt: React.MouseEvent) =>
+                  handleMouseDown(cell, evt),
+                onMouseUp: () => setPainting(false),
+                onKeyDown: (evt: React.KeyboardEvent) =>
+                  handleKeyDown(cell, evt),
+                onMouseEnter: () => {
+                  if (painting) {
+                    setCellValue(cell, paintState);
+                  }
+                },
+              }
+            : {};
+        return (
+          <TimeSelectionButton
+            key={cell.key}
+            $type={cell.state}
+            // TODO should not use a button if there are no handlers
+            disabled={updateCells == null}
+            type="button"
+            {...handlers}
+            role="option"
+            aria-label={constructAriaLabel(t, cell, labelHead)}
+            aria-selected={isSelected(cell.state)}
+            data-testid={`time-selector__button--${cell.key}`}
+          >
+            {cell.label}
+          </TimeSelectionButton>
+        );
+      })}
     </div>
   );
 }
@@ -281,6 +305,8 @@ export function TimeSelector({
   const enableCopyCells =
     filterNonNullable(watch("applicationSections")).length > 1;
 
+  const priority = watch(`applicationSections.${index}.priority`);
+
   return (
     // NOTE flex inside a grid container breaks overflow-x
     <Flex style={{ display: "grid" }} $marginTop="m">
@@ -302,11 +328,11 @@ export function TimeSelector({
       >
         {WEEKDAYS.map((day) => (
           <DayColumn
-            index={index}
             key={`day-${day}`}
             day={day}
             cells={cells[day] ?? []}
             updateCells={(toUpdate) => handleCellUpdate(day, toUpdate)}
+            selectedPriority={priority}
           />
         ))}
       </CalendarContainer>
