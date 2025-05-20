@@ -7,15 +7,9 @@ import {
 } from "common/src/common/util";
 import { isBrowser } from "./const";
 import { type LocalizationLanguages } from "common/src/urlBuilder";
-import {
-  formatApiTimeInterval,
-  formatMinutes,
-  timeToMinutes,
-} from "common/src/helpers";
+import { formatMinutes, timeToMinutes } from "common/src/helpers";
 import { ReadonlyURLSearchParams } from "next/navigation";
 import { type Maybe, ApplicationStatusChoice } from "@/gql/gql-types";
-import { convertWeekday } from "common/src/conversion";
-import { type SuitableTimeRangeFormValues } from "@/components/application/form";
 
 export { formatDuration } from "common/src/common/util";
 export { fromAPIDate, fromUIDate };
@@ -214,16 +208,6 @@ export function formatDateTimeStrings(
 /// Converts a date to minutes discarding date and seconds
 function toMinutes(d: Date): number {
   return d.getHours() * 60 + d.getMinutes();
-}
-
-export function getDayTimes(
-  schedule: Omit<SuitableTimeRangeFormValues, "pk" | "priority">[],
-  day: number
-) {
-  return schedule
-    .filter((s) => convertWeekday(s.dayOfTheWeek) === day)
-    .map((s) => formatApiTimeInterval(s))
-    .join(", ");
 }
 
 export function isSent(
