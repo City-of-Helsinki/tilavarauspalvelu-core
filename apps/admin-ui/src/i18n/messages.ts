@@ -623,8 +623,6 @@ const translations: ITranslations = {
     requestedTimes: ["Toivotut ajat"],
     requestedReservationUnits: ["Toivotut varausyksiköt"],
     gotoLink: ["Tarkastele vuoroehdotusta"],
-    primarySchedules: ["Ensisijaiset aikatoiveet"],
-    secondarySchedules: ["Muut aikatoiveet"],
     noSchedule: ["ei aikatoiveita"],
     statuses: {
       APPROVED: ["Hyväksytty"],
