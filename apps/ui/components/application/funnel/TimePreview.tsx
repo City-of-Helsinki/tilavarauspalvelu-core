@@ -4,13 +4,13 @@ import styled from "styled-components";
 import { fontBold, H4 } from "common/styled";
 import { breakpoints, WEEKDAYS } from "common/src/const";
 import { fromMondayFirstUnsafe } from "common/src/helpers";
-import type {
-  ApplicationPage2FormValues,
-  SuitableTimeRangeFormValues,
+import {
+  formatDayTimes,
+  type ApplicationPage2FormValues,
+  type SuitableTimeRangeFormValues,
 } from "./form";
 import { useFormContext } from "react-hook-form";
 import { Priority } from "@/gql/gql-types";
-import { getDayTimes } from "@/modules/util";
 
 type Props = {
   index: number;
@@ -34,7 +34,7 @@ function Weekdays({ schedules }: { schedules: SuitableTimeRangeFormValues[] }) {
     <>
       {WEEKDAYS.map((day) => ({
         day,
-        times: getDayTimes(schedules, day),
+        times: formatDayTimes(schedules, day),
       })).map(({ day, times }) => (
         <WeekWrapper key={day}>
           <Label>

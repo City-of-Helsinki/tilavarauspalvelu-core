@@ -33,13 +33,13 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
   ApplicationFunnelWrapper,
   Page1 as Page1Impl,
-} from "@/components/application";
+} from "@/components/application/funnel";
 import {
   type ApplicationPage1FormValues,
   ApplicationPage1SchemaRefined,
   transformApplicationPage1,
   convertApplicationPage1,
-} from "@/components/application/form";
+} from "@/components/application/funnel/form";
 
 function Page1({
   application,
