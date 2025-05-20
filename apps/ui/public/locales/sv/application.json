@@ -198,7 +198,7 @@
     "IN_ALLOCATION": "I behandling",
     "RECEIVED": "Skickat",
     "RESULTS_SENT": "Behandlad"
-   },
+  },
   "applicationEventStatus": {
     "UNALLOCATED": "Mottagen",
     "IN_ALLOCATION": "I behandling",

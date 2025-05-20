@@ -204,7 +204,7 @@
     "IN_ALLOCATION": "In process",
     "RECEIVED": "Sent",
     "RESULTS_SENT": "Processed"
-   },
+  },
   "applicationEventStatus": {
     "UNALLOCATED": "Unallocated",
     "IN_ALLOCATION": "In allocation",
