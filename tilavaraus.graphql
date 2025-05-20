@@ -2471,6 +2471,7 @@ enum ImageType {
 type ReservationUnitPricingNode implements Node {
   begins: Date!
   priceUnit: PriceUnit!
+  paymentType: PaymentType
   lowestPrice: Decimal!
   highestPrice: Decimal!
   taxPercentage: TaxPercentageNode!
@@ -4170,6 +4171,7 @@ input ReservationUnitPricingSerializerInput {
   pk: Int
   begins: Date!
   isActivatedOnBegins: Boolean
+  paymentType: PaymentType
   priceUnit: PriceUnit
   lowestPrice: Decimal
   lowestPriceNet: String
@@ -4351,6 +4353,7 @@ input UpdateReservationUnitPricingSerializerInput {
   pk: Int
   begins: Date
   isActivatedOnBegins: Boolean
+  paymentType: PaymentType
   priceUnit: PriceUnit
   lowestPrice: Decimal
   lowestPriceNet: String

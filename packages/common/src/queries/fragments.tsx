@@ -95,6 +95,7 @@ export const PRICING_FRAGMENT = gql`
     id
     begins
     priceUnit
+    paymentType
     lowestPrice
     highestPrice
     taxPercentage {
