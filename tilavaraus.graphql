@@ -3151,6 +3151,8 @@ type HelsinkiProfileDataNode {
   streetAddress: String
   postalCode: String
   city: String
+  countryCode: String
+  additionalAddress: String
   municipalityCode: String
   municipalityName: String
   loginMethod: LoginMethod!

@@ -6,12 +6,13 @@ export const CURRENT_USER = gql`
   query CurrentUser {
     currentUser {
       id
+      pk
       username
       firstName
       lastName
       email
       isSuperuser
-      pk
+      isAdAuthenticated
       unitRoles {
         id
         permissions

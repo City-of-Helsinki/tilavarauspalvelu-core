@@ -89,6 +89,8 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
       email
       firstName
       lastName
+      isStronglyAuthenticated
+      isAdAuthenticated
     }
     bufferTimeBefore
     bufferTimeAfter

@@ -191,6 +191,7 @@ const AdminUserMock: CurrentUserQuery = {
     lastName: "User",
     email: "test@foobar.com",
     isSuperuser: true,
+    isAdAuthenticated: true,
     pk: 1,
     unitRoles: [],
     generalRoles: [],

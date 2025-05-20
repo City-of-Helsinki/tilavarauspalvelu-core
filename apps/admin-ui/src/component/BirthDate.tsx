@@ -12,19 +12,6 @@ import { base64encode } from "common/src/helpers";
 
 // NOTE separate query because all requests for dateOfBirth are logged
 // so don't make them automatically or inside other queries
-export const RESERVATION_DATE_OF_BIRTH_QUERY = gql`
-  query ReservationDateOfBirth($id: ID!) {
-    reservation(id: $id) {
-      id
-      user {
-        id
-        pk
-        dateOfBirth
-      }
-    }
-  }
-`;
-
 export const APPLICATION_DATE_OF_BIRTH_QUERY = gql`
   query ApplicationDateOfBirth($id: ID!) {
     application(id: $id) {
