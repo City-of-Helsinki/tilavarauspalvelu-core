@@ -8,30 +8,30 @@ import {
   Notification,
   NotificationSize,
 } from "hds-react";
+import { useFormContext } from "react-hook-form";
 import { AutoGrid, Flex, NoWrap, fontBold } from "common/styled";
 import { breakpoints, WEEKDAYS } from "common/src/const";
 import { filterNonNullable, fromMondayFirstUnsafe } from "common/src/helpers";
-import { arrowDown, arrowUp } from "@/styled/util";
-import { TimePreview } from "./TimePreview";
-import {
-  CELL_TYPES,
-  type CellType,
-  type ApplicationPage2FormValues,
-} from "./form";
-import { useFormContext } from "react-hook-form";
 import { ControlledSelect } from "common/src/components/form";
+import { successToast } from "common/src/common/toast";
+import { ErrorText } from "common/src/components/ErrorText";
+import { type Day } from "common/src/conversion";
 import { isTouchDevice } from "@/modules/util";
+import { arrowDown, arrowUp } from "@/styled/util";
+import { type TimeSelectorFragment } from "@/gql/gql-types";
+import { gql } from "@apollo/client";
 import {
   aesToCells,
   type Cell,
   covertCellsToTimeRange,
   isSelected,
 } from "./timeSelectorModule";
-import { successToast } from "common/src/common/toast";
-import { type TimeSelectorFragment } from "@/gql/gql-types";
-import { ErrorText } from "common/src/components/ErrorText";
-import { gql } from "@apollo/client";
-import { type Day } from "common/src/conversion";
+import {
+  CELL_TYPES,
+  type CellType,
+  type ApplicationPage2FormValues,
+} from "./form";
+import { TimePreview } from ".";
 
 const CalendarHead = styled.div`
   ${fontBold}

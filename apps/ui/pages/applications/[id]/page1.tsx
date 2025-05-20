@@ -5,22 +5,20 @@ import { useTranslation } from "next-i18next";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ApplicationFunnelWrapper } from "@/components/application/ApplicationPageWrapper";
-import { Page1 as Page1Impl } from "@/components/application/Page1";
-import {
-  type ApplicationPage1FormValues,
-  ApplicationPage1SchemaRefined,
-  transformApplicationPage1,
-  convertApplicationPage1,
-} from "@/components/application/form";
-import { useOptions, useReservationUnitList } from "@/hooks";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
   base64encode,
   filterNonNullable,
   ignoreMaybeArray,
   toNumber,
 } from "common/src/helpers";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
+import { useDisplayError } from "common/src/hooks";
+import { Flex } from "common/styled";
+import { uniq } from "lodash-es";
+import { gql } from "@apollo/client";
 import { createApolloClient } from "@/modules/apolloClient";
 import {
   ApplicationPage1Document,
@@ -30,14 +28,18 @@ import {
   type ApplicationPage1QueryVariables,
 } from "@/gql/gql-types";
 import { getApplicationPath } from "@/modules/urls";
+import { useOptions, useReservationUnitList } from "@/hooks";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
-import { gql } from "@apollo/client";
-import { useDisplayError } from "common/src/hooks";
-import { uniq } from "lodash-es";
-import { Flex } from "common/styled";
+  ApplicationFunnelWrapper,
+  Page1 as Page1Impl,
+} from "@/components/application";
+import {
+  type ApplicationPage1FormValues,
+  ApplicationPage1SchemaRefined,
+  transformApplicationPage1,
+  convertApplicationPage1,
+} from "@/components/application/form";
 
 function Page1({
   application,

@@ -1,3 +1,5 @@
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   Button,
   ButtonVariant,
@@ -6,24 +8,21 @@ import {
   Notification,
   NotificationSize,
 } from "hds-react";
-import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 import type {
   ApplicationReservationUnitListFragment,
   OrderedReservationUnitCardFragment,
 } from "@gql/gql-types";
 import { IconButton } from "common/src/components";
 import { filterNonNullable } from "common/src/helpers";
-import { Modal } from "@/components/Modal";
-import { type ApplicationPage1FormValues } from "./form";
-import { OrderedReservationUnitCard } from "./OrderedReservationUnitCard";
 import { Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { ReservationUnitModalContent } from "./ReservationUnitModalContent";
-import { gql } from "@apollo/client";
 import { ErrorText } from "common/src/components/ErrorText";
-import { createPortal } from "react-dom";
+import { Modal } from "@/components/Modal";
+import { OrderedReservationUnitCard, ReservationUnitModalContent } from ".";
+import { type ApplicationPage1FormValues } from "./form";
 
 type ReservationUnitType = OrderedReservationUnitCardFragment;
 export type OptionType = Readonly<{ value: number; label: string }>;

@@ -5,11 +5,11 @@ import {
 } from "@/spa/ReservationUnit/edit/form";
 import { EditAccordion } from "@/spa/ReservationUnit/edit/components/styled";
 import { AutoGrid } from "common/styled";
-import { ControlledCheckbox } from "common/src/components/form/ControlledCheckbox";
 import {
   ControlledDateInput,
   ControlledNumberInput,
   ControlledSelect,
+  ControlledCheckbox,
 } from "common/src/components/form";
 import { getTranslatedError } from "@/common/util";
 import React from "react";

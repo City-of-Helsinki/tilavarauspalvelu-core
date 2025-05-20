@@ -1,11 +1,10 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
+import { ControlledCheckbox } from "common/src/components/form";
 import { FormSubHeading } from "./styled";
-import { BillingAddress } from "./BillingAddress";
 import { type ApplicationPage3FormValues } from "./form";
-import { ControlledCheckbox } from "common/src/components/form/ControlledCheckbox";
-import { ApplicationFormTextInput } from "./ApplicationFormTextInput";
+import { ApplicationFormTextInput, BillingAddress } from ".";
 
 export function CompanyForm(): JSX.Element {
   const { t } = useTranslation();
