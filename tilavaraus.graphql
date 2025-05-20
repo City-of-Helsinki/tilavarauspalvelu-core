@@ -1670,6 +1670,7 @@ type UserNode implements Node {
   name: String!
   isAdAuthenticated: Boolean!
   isStronglyAuthenticated: Boolean!
+  isInternalUser: Boolean!
   pk: Int
 }
 
@@ -2060,6 +2061,7 @@ type ApplicantNode implements Node {
   name: String!
   isAdAuthenticated: Boolean!
   isStronglyAuthenticated: Boolean!
+  isInternalUser: Boolean!
   pk: Int
 }
 
