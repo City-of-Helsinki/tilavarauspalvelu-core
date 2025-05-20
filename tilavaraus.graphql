@@ -3309,6 +3309,10 @@ type Mutation {
   restoreAllSectionOptions(input: RestoreAllSectionOptionsMutationInput!): RestoreAllSectionOptionsMutationPayload
   rejectAllApplicationOptions(input: RejectAllApplicationOptionsMutationInput!): RejectAllApplicationOptionsMutationPayload
   restoreAllApplicationOptions(input: RestoreAllApplicationOptionsMutationInput!): RestoreAllApplicationOptionsMutationPayload
+
+  """
+  Cancel all reservations in the given application section that can be cancelled.
+  """
   cancelAllApplicationSectionReservations(input: ApplicationSectionReservationCancellationMutationInput!): ApplicationSectionReservationCancellationMutationPayload
   setApplicationRoundHandled(input: SetApplicationRoundHandledMutationInput!): SetApplicationRoundHandledMutationPayload
   setApplicationRoundResultsSent(input: SetApplicationRoundResultsSentMutationInput!): SetApplicationRoundResultsSentMutationPayload
@@ -3751,6 +3755,9 @@ input RestoreAllApplicationOptionsMutationInput {
   pk: Int!
 }
 
+"""
+Cancel all reservations in the given application section that can be cancelled.
+"""
 type ApplicationSectionReservationCancellationMutationPayload {
   future: Int
   cancelled: Int
