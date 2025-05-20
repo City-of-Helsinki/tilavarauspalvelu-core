@@ -7,8 +7,9 @@ import { H2, HR } from "common/styled";
 import { type ApplicationFormFragment } from "@gql/gql-types";
 import { applicationsPrefix } from "@/modules/urls";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { ApplicationHead, ApplicationStepper, } from ".";
-import { NotesWhenApplying } from "./NotesWhenApplying";
+import { ApplicationHead } from "..";
+import { ApplicationStepper } from ".";
+import { NotesWhenApplying } from "../NotesWhenApplying";
 
 const InnerContainer = styled.div`
   display: grid;
