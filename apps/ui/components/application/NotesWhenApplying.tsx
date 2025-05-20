@@ -12,6 +12,7 @@ const NotesBox = styled.div`
   background-color: var(--color-gold-light);
 
   padding: var(--spacing-m);
+  max-width: 360px;
   @media (min-width: ${breakpoints.m}) {
     padding: var(--spacing-l);
   }

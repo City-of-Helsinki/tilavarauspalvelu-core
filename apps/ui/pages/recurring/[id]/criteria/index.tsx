@@ -8,7 +8,7 @@ import {
   type ApplicationRoundCriteriaQuery,
   type ApplicationRoundCriteriaQueryVariables,
 } from "@gql/gql-types";
-import { H1, H2, H3 } from "common/styled";
+import { Flex, H1 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { Sanitize } from "common/src/components/Sanitize";
 import {
@@ -32,17 +32,28 @@ type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 const ContentWrapper = styled.div`
-  display: flex;
-  gap: var(--spacing-m);
-  @media (max-width: ${breakpoints.m}) {
-    flex-flow: column-reverse;
-  }
-`;
+  display: grid;
+  gap: 1em;
+  grid-template-rows: repeat(4, auto);
+  grid-template-columns: 1fr;
 
-const NotesWrapper = styled.div`
-  margin-left: 0;
-  @media (min-width: ${breakpoints.m}) {
-    margin-left: auto;
+  :first-child {
+    grid-column-start: 1;
+    grid-row-start: 1;
+  }
+  :nth-child(2) {
+    grid-row: 3 / -1;
+    grid-column-start: 1;
+  }
+  :nth-child(3) {
+    grid-row-start: 2;
+  }
+  @media (min-width: ${breakpoints.l}) {
+    grid-template-columns: 1fr 21em;
+    :nth-child(2) {
+      grid-row-start: 2;
+      grid-column-start: 1;
+    }
   }
 `;
 
@@ -74,15 +85,13 @@ function Criteria({
   return (
     <>
       <Breadcrumb routes={routes} />
-      <H1 $noMargin>{title}</H1>
-      <H3 as={H2} $noMargin>
-        {subtitle}
-      </H3>
       <ContentWrapper>
+        <Flex $gap="none">
+          <H1 $noMargin>{title}</H1>
+          <p>{subtitle}</p>
+        </Flex>
         <Sanitize html={criteria} />
-        <NotesWrapper>
-          <NotesWhenApplying applicationRound={applicationRound} />
-        </NotesWrapper>
+        <NotesWhenApplying applicationRound={applicationRound} />
       </ContentWrapper>
     </>
   );
