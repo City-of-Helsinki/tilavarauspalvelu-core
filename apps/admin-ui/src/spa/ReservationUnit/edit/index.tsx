@@ -492,10 +492,6 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
         pk
         nameFi
       }
-      paymentTypes {
-        id
-        code
-      }
       pricingTerms {
         id
         pk
