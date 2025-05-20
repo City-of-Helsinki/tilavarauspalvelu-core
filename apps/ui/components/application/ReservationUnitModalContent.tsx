@@ -12,8 +12,6 @@ import {
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { CenterSpinner, Flex, H2, H3 } from "common/styled";
-import { breakpoints } from "common/src/const";
 import {
   ReservationUnitOrderingChoices,
   useSearchReservationUnitsQuery,
@@ -26,21 +24,23 @@ import {
   getImageSource,
   getMainImage,
 } from "common/src/helpers";
-import { getApplicationRoundName } from "@/modules/applicationRound";
-import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
-import { getReservationUnitPath } from "@/modules/urls";
+import { CenterSpinner, Flex, H2, H3 } from "common/styled";
+import { breakpoints } from "common/src/const";
 import Card from "common/src/components/Card";
-import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
-import { type OptionTypes } from "./ReservationUnitList";
 import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
+import { transformAccessTypeSafe } from "common/src/conversion";
+import { getApplicationRoundName } from "@/modules/applicationRound";
+import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
+import { getReservationUnitPath } from "@/modules/urls";
+import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import {
   SearchFormValues,
   SeasonalSearchForm,
 } from "../recurring/SeasonalSearchForm";
-import { transformAccessTypeSafe } from "common/src/conversion";
+import { type OptionTypes } from ".";
 
 const ImageSizeWrapper = styled.div`
   @media (min-width: ${breakpoints.m}) {

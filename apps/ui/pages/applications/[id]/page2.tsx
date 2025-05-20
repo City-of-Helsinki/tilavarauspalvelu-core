@@ -5,26 +5,28 @@ import { useRouter } from "next/router";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ApplicationFunnelWrapper } from "@/components/application/ApplicationPageWrapper";
-import { Page2 as Page2Impl } from "@/components/application/Page2";
-import {
-  type ApplicationPage2FormValues,
-  transformApplicationPage2,
-  convertApplicationPage2,
-  ApplicationPage2Schema,
-} from "@/components/application/form";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { gql } from "@apollo/client";
 import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { useDisplayError } from "common/src/hooks";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
+import { getApplicationPath } from "@/modules/urls";
 import {
   ApplicationPage2Document,
   useUpdateApplicationMutation,
   type ApplicationPage2Query,
   type ApplicationPage2QueryVariables,
 } from "@/gql/gql-types";
-import { getApplicationPath } from "@/modules/urls";
-import { useDisplayError } from "common/src/hooks";
-import { gql } from "@apollo/client";
+import {
+  ApplicationFunnelWrapper,
+  Page2 as Page2Impl,
+} from "@/components/application";
+import {
+  type ApplicationPage2FormValues,
+  transformApplicationPage2,
+  convertApplicationPage2,
+  ApplicationPage2Schema,
+} from "@/components/application/form";
 
 function Page2({
   application,

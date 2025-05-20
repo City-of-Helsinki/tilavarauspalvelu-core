@@ -1,6 +1,6 @@
+import React from "react";
 import { differenceInWeeks } from "date-fns";
 import { IconCalendar, IconClock, IconGroup } from "hds-react";
-import React from "react";
 import { Trans, useTranslation, TFunction } from "next-i18next";
 import styled from "styled-components";
 import { Flex, H4 } from "common/styled";

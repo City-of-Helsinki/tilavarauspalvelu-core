@@ -17,19 +17,16 @@ const NotesBox = styled.div`
   }
 `;
 
-type NotesWhenApplyingProps = {
+interface NotesWhenApplyingProps extends React.HTMLAttributes<HTMLDivElement> {
   applicationRound: Pick<
     ApplicationRoundNode,
     "notesWhenApplyingFi" | "notesWhenApplyingSv" | "notesWhenApplyingEn"
   >;
-  style?: React.CSSProperties;
-  className?: string;
-};
+}
 
-function NotesWhenApplying({
+export function NotesWhenApplying({
   applicationRound,
-  style,
-  className,
+  ...rest
 }: NotesWhenApplyingProps) {
   const { t, i18n } = useTranslation();
 
@@ -44,7 +41,7 @@ function NotesWhenApplying({
   }
 
   return (
-    <NotesBox style={style} className={className}>
+    <NotesBox {...rest}>
       <H4 as="h3" $marginTop="none">
         {t("applicationRound:notesWhenApplying")}
       </H4>
@@ -52,5 +49,3 @@ function NotesWhenApplying({
     </NotesBox>
   );
 }
-
-export default NotesWhenApplying;

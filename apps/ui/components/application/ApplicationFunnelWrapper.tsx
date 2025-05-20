@@ -2,14 +2,13 @@ import React from "react";
 import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/const";
+import { type ReadonlyDeep } from "common/src/helpers";
+import { H2, HR } from "common/styled";
 import { type ApplicationFormFragment } from "@gql/gql-types";
-import NotesWhenApplying from "@/components/application/NotesWhenApplying";
 import { applicationsPrefix } from "@/modules/urls";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { ApplicationHead } from "./ApplicationHead";
-import { type ReadonlyDeep } from "common/src/helpers";
-import { ApplicationStepper } from "./ApplicationStepper";
-import { H2, HR } from "common/styled";
+import { ApplicationHead, ApplicationStepper, } from ".";
+import { NotesWhenApplying } from "./NotesWhenApplying";
 
 const InnerContainer = styled.div`
   display: grid;

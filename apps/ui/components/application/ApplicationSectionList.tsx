@@ -2,12 +2,24 @@ import React from "react";
 import type { TFunction } from "i18next";
 import { useTranslation } from "next-i18next";
 import {
+  IconCheck,
+  IconCross,
+  IconQuestionCircleFill,
+  Tooltip,
+} from "hds-react";
+import {
   type AgeGroupNode,
   type Maybe,
   Priority,
   ApplicationSectionStatusChoice,
   type ApplicationViewFragment,
 } from "@gql/gql-types";
+import { WEEKDAYS } from "common/src/const";
+import { filterNonNullable, fromMondayFirstUnsafe } from "common/src/helpers";
+import StatusLabel from "common/src/components/StatusLabel";
+import type { StatusLabelType } from "common/src/tags";
+import { NoWrap } from "common/styled";
+import { getDayTimes } from "@/modules/util";
 import {
   convertLanguageCode,
   getTranslationSafe,
@@ -23,18 +35,6 @@ import {
   RegularText,
 } from "./styled";
 import { SuitableTimeRangeFormValues } from "./form";
-import { WEEKDAYS } from "common/src/const";
-import { filterNonNullable, fromMondayFirstUnsafe } from "common/src/helpers";
-import StatusLabel from "common/src/components/StatusLabel";
-import type { StatusLabelType } from "common/src/tags";
-import {
-  IconCheck,
-  IconCross,
-  IconQuestionCircleFill,
-  Tooltip,
-} from "hds-react";
-import { NoWrap } from "common/styled";
-import { getDayTimes } from "@/modules/util";
 
 function formatDurationSeconds(seconds: number, t: TFunction): string {
   const hours = Math.floor(seconds / 3600);

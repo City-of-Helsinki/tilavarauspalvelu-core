@@ -10,12 +10,7 @@ import {
 } from "@gql/gql-types";
 import { H1, H2, H3 } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { createApolloClient } from "@/modules/apolloClient";
 import { Sanitize } from "common/src/components/Sanitize";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import NotesWhenApplying from "@/components/application/NotesWhenApplying";
-import { getApplicationRoundPath, seasonalPrefix } from "@/modules/urls";
 import {
   base64encode,
   capitalize,
@@ -27,6 +22,11 @@ import {
   getTranslationSafe,
 } from "common/src/common/util";
 import { gql } from "@apollo/client";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { createApolloClient } from "@/modules/apolloClient";
+import { getApplicationRoundPath, seasonalPrefix } from "@/modules/urls";
+import { NotesWhenApplying } from "@/components/application";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
