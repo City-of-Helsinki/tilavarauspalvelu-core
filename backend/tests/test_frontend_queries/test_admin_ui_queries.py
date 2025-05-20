@@ -1159,6 +1159,28 @@ def test_frontend_queries__admin_ui__UnitPage(graphql):
     assert response.has_errors is False, response.errors
 
 
+def test_frontend_queries__admin_ui__ReservationUnitCreateUnit(graphql):
+    admin_factories = get_admin_query_info()
+    factories = admin_factories["ReservationUnitCreateUnit"]
+
+    assert len(factories) == 1
+    query_info = factories[0]
+
+    factory_args = query_info.factory_args
+    obj = query_info.factory.create(**factory_args)
+
+    variables = query_info.variables
+    variables["id"] = to_global_id(query_info.typename, obj.id)
+    assert_no_undefined_variables(variables)
+
+    query = query_info.query
+    graphql.login_with_superuser()
+
+    response = graphql(query, variables=variables)
+
+    assert response.has_errors is False, response.errors
+
+
 def test_frontend_queries__admin_ui__UnitSpaces(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["UnitSpaces"]
