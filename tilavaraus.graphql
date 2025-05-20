@@ -2296,6 +2296,7 @@ Same as OrderStatus, but includes the 'FREE' option used for filtering reservati
 """
 enum OrderStatusWithFree {
   DRAFT
+  PENDING
   EXPIRED
   CANCELLED
   PAID
@@ -2411,6 +2412,7 @@ enum PaymentType {
 """An enumeration."""
 enum OrderStatus {
   DRAFT
+  PENDING
   EXPIRED
   CANCELLED
   PAID
