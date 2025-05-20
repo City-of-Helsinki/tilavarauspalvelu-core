@@ -1,7 +1,8 @@
 import { type ApplicationRoundNode } from "common/gql/gql-types";
 import { type Maybe } from "@/gql/gql-types";
 import { getTranslationSafe } from "common/src/common/util";
-import type { LocalizationLanguages, ReadonlyDeep } from "common/src/helpers";
+import type { ReadonlyDeep } from "common/src/helpers";
+import { type LocalizationLanguages } from "common/src/urlBuilder";
 
 type ApplicationRoundType =
   | Maybe<

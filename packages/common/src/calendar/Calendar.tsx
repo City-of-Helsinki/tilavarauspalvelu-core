@@ -20,7 +20,7 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import { parseDate } from "../common/util";
-import { LocalizationLanguages } from "../helpers";
+import type { LocalizationLanguages } from "../urlBuilder";
 
 export type CalendarEvent<T> = {
   title?: string;

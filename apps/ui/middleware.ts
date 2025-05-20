@@ -8,8 +8,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { env } from "@/env.mjs";
-import { getSignInUrl, buildGraphQLUrl } from "common/src/urlBuilder";
-import { base64encode, type LocalizationLanguages } from "common/src/helpers";
+import {
+  getSignInUrl,
+  buildGraphQLUrl,
+  type LocalizationLanguages,
+} from "common/src/urlBuilder";
+import { base64encode, getLocalizationLang } from "common/src/helpers";
 import { ReservationStateChoice, ReservationTypeChoice } from "./gql/gql-types";
 import { getReservationInProgressPath } from "./modules/urls";
 
@@ -389,7 +393,13 @@ function getRedirectProtectedRoute(
     const protocol = headers.get("x-forwarded-proto") ?? "http";
     const host = headers.get("x-forwarded-host") ?? url.host;
     const origin = `${protocol}://${host}`;
-    return getSignInUrl(apiBaseUrl, url.pathname, origin);
+    return getSignInUrl({
+      apiBaseUrl,
+      callBackUrl: url.pathname,
+      language: getLocalizationLang(getLocalizationFromUrl(url)),
+      originOverride: origin,
+      client: "customer",
+    });
   }
   return null;
 }

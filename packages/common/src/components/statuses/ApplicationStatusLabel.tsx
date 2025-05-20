@@ -12,8 +12,7 @@ import { ApplicationStatusChoice, type Maybe } from "../../../gql/gql-types";
 import { type StatusLabelType } from "../../tags";
 import StatusLabel from "../StatusLabel";
 import { useTranslation } from "next-i18next";
-
-export type UserTypeChoice = "customer" | "admin";
+import type { UserTypeChoice } from "../../urlBuilder";
 
 function getAdminApplicationStatusLabelProps(status: ApplicationStatusChoice): {
   type: StatusLabelType;
