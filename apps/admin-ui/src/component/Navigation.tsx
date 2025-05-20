@@ -28,6 +28,7 @@ import {
   singleUnitUrl,
 } from "@/common/urls";
 import { UserPermissionChoice } from "@gql/gql-types";
+import { getLocalizationLang } from "common/src/helpers";
 
 type Props = {
   apiBaseUrl: string;
@@ -260,7 +261,7 @@ function NavigationLink({
   );
 }
 const Navigation = ({ apiBaseUrl }: Props) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useSession();
   const firstName = user?.firstName?.trim() ?? "";
   const lastName = user?.lastName?.trim() ?? "";
@@ -310,7 +311,13 @@ const Navigation = ({ apiBaseUrl }: Props) => {
         ) : (
           <Header.ActionBarButton
             label={t("Navigation.login")}
-            onClick={() => signIn(apiBaseUrl)}
+            onClick={() =>
+              signIn({
+                apiBaseUrl,
+                language: getLocalizationLang(i18n.language),
+                client: "admin",
+              })
+            }
           />
         )}
       </ActionBar>

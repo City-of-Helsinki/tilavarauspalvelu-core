@@ -58,9 +58,9 @@ import {
   timeToMinutes,
   filterNonNullable,
   isPriceFree,
-  type LocalizationLanguages,
   type ReadonlyDeep,
 } from "common/src/helpers";
+import { type LocalizationLanguages } from "common/src/urlBuilder";
 import { type TFunction } from "i18next";
 
 function formatTimeObject(time: { h: number; m: number }): string {

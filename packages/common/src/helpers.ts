@@ -8,6 +8,7 @@ import {
 import { type OptionInProps } from "hds-react";
 import { pixel } from "./const";
 import { type TFunction } from "i18next";
+import { type LocalizationLanguages } from "./urlBuilder";
 
 /// Enforce readonly on all nested properties
 /// only single level deep i.e. {a: {b: {c: string}}} -> {readonly a: {b: {c: string}}}
@@ -82,8 +83,6 @@ export const fromMondayFirstUnsafe = (day: number) => {
 
 export const fromMondayFirst = (day: 0 | 1 | 2 | 3 | 4 | 5 | 6) =>
   day === 6 ? 0 : day + 1;
-
-export type LocalizationLanguages = "fi" | "sv" | "en";
 
 export function getLocalizationLang(code?: string): LocalizationLanguages {
   if (code?.startsWith("fi")) {

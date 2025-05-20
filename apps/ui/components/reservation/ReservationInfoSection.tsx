@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
-import { LocalizationLanguages } from "common/src/helpers";
+import { type LocalizationLanguages } from "common/src/urlBuilder";
 import {
   type ReservationMetadataFieldNode,
   type ReservationInfoFragment,
