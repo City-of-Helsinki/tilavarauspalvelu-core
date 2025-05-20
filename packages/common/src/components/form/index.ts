@@ -5,3 +5,4 @@ export { ControlledDateInput } from "./ControlledDateInput";
 export { ControlledNumberInput } from "./ControlledNumberInput";
 export { ControlledSelect } from "./ControlledSelect";
 export { ControlledRadioGroup } from "./ControlledRadioGroup";
+export { ControlledCheckbox } from "./ControlledCheckbox";
