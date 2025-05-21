@@ -346,8 +346,8 @@ export function createMockApplicationSection({
     status: ApplicationSectionStatusChoice.Unallocated,
     // page 1 data
     name: "foobar",
-    reservationMinDuration: 1 * 60 * 60,
-    reservationMaxDuration: 2 * 60 * 60,
+    reservationMinDuration: 2 * 60 * 60,
+    reservationMaxDuration: 4 * 60 * 60,
     numPersons: 1,
     reservationsBeginDate: addDays(new Date(), 1).toISOString(),
     reservationsEndDate: addDays(new Date(), 30 + 1).toISOString(),

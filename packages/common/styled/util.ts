@@ -6,9 +6,11 @@ export const NoWrap = styled.span`
   white-space: nowrap;
 `;
 
-export const HR = styled.hr`
+export const HR = styled.hr<{
+  $type?: "dashed" | "solid";
+}>`
   border: 0;
-  border-top: 1px solid var(--color-black-20);
+  border-top: 1px ${({ $type }) => $type ?? "solid"} var(--color-black-20);
   width: 100%;
 `;
 
@@ -32,7 +34,7 @@ export const AutoGrid = styled.div<AutoGridProps>`
   gap: ${({ $gap }) => ($gap ? `var(--spacing-${$gap})` : "var(--spacing-m)")}
     var(--spacing-m);
 
-  & > :not(img):empty {
+  & > :not(img):not(hr):empty {
     display: none;
   }
 `;
