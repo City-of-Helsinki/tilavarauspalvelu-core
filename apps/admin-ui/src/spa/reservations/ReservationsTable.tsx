@@ -176,7 +176,7 @@ export function ReservationsTable({
   sortChanged: onSortChanged,
   isLoading,
   reservations,
-}: Props): JSX.Element {
+}: Readonly<Props>): JSX.Element {
   const { t } = useTranslation();
 
   const cols = memoize(() => getColConfig(t))();
