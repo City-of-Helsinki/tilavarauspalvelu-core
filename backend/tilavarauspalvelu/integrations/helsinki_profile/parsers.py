@@ -10,7 +10,13 @@ from graphene_django_extensions.utils import get_nested
 from tilavarauspalvelu.enums import LoginMethod
 from tilavarauspalvelu.models import City
 
-from .typing import BirthdayInfo, ProfileForeignAddress, ProfileLocalAddress, ReservationPrefillInfo, UserProfileInfo
+from .typing import (
+    AfterLoginAdditionalInfo,
+    ProfileForeignAddress,
+    ProfileLocalAddress,
+    ReservationPrefillInfo,
+    UserProfileInfo,
+)
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import User
@@ -48,10 +54,13 @@ class ProfileDataParser:
             home_city=self.get_user_home_city(),
         )
 
-    def parse_birthday_info(self) -> BirthdayInfo:
-        return BirthdayInfo(
+    def after_login_additional_info(self) -> AfterLoginAdditionalInfo:
+        reservation_prefill_data = self.parse_reservation_prefill_data()
+
+        return AfterLoginAdditionalInfo(
             id=self.data.get("id"),
             birthday=self.get_birthday(),
+            **reservation_prefill_data,
         )
 
     def parse_user_profile_info(self, *, user: User) -> UserProfileInfo:
