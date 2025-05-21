@@ -107,5 +107,5 @@ class PaymentOrderActions:
             with suppress(ExternalServiceError):
                 PindoraService.activate_access_code(obj=reservation)
 
-            EmailService.send_reservation_confirmed_email(reservation=reservation)
-            EmailService.send_reservation_confirmed_staff_notification_email(reservation=reservation)
+        EmailService.send_reservation_confirmed_email(reservation=reservation)
+        EmailService.send_reservation_confirmed_staff_notification_email(reservation=reservation)
