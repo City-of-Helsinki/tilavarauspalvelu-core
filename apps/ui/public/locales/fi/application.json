@@ -65,6 +65,15 @@
     "deleteEventHeading": "Oletko varma, että haluat poistaa varauksen?",
     "deleteEventContent": "Kun varaus on peruttu, sen tietoja ei ole mahdollista palauttaa."
   },
+  "TimeSelector": {
+    "calendarLabel": "Valitse aikatoiveet kalenterista",
+    "legend": {
+      "unavailable": "Ei varattavissa",
+      "primary": "Ensisijainen toive",
+      "secondary": "Muu toive",
+      "open": "Varattavissa"
+    }
+  },
   "Page2": {
     "subHeading": "Valitse hakemuksen aikatoiveet",
     "info": "Voit ilmoittaa sekä ensisijaisia että vaihtoehtoisia aikoja. Useamman tila- ja aikatoiveen ilmoittaminen parantaa mahdollisuuksiasi saada toiveidesi mukaiset tilat ja ajat.",
@@ -76,12 +85,6 @@
     "priorityLabels": {
       "primary": "Valitse ensisijaiset aikatoiveet",
       "secondary": "Valitse muut aikatoiveet"
-    },
-    "legend": {
-      "unavailable": "Ei varattavissa",
-      "primary": "Ensisijainen toive",
-      "secondary": "Muu toive",
-      "open": "Varattavissa"
     },
     "notification": {
       "copyCells": "Ajat kopioitu kaikille varaustoiveille"

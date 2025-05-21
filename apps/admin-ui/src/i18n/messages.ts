@@ -481,10 +481,6 @@ const translations: ITranslations = {
     allApplications: ["Kaikki hakemukset"],
     gotoLink: ["Tarkastele hakemusta"],
   },
-  TimeSelector: {
-    primary: ["Ensisijainen toive"],
-    secondary: ["Muu toive"],
-  },
   ApplicationRound: {
     noUpcoming: ["Ei tulossa olevia hakukierroksia."],
     statuses: {

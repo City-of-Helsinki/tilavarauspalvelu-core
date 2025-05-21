@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import styled, { css, type RuleSet } from "styled-components";
-import { type TFunction, useTranslation } from "next-i18next";
+import React from "react";
+import { useTranslation } from "next-i18next";
 import {
   Button,
   ButtonSize,
@@ -9,238 +8,22 @@ import {
   NotificationSize,
 } from "hds-react";
 import { useFormContext } from "react-hook-form";
-import { AutoGrid, Flex, NoWrap, fontBold } from "common/styled";
-import { breakpoints, WEEKDAYS } from "common/src/const";
-import { filterNonNullable, fromMondayFirstUnsafe } from "common/src/helpers";
+import { AutoGrid, Flex } from "common/styled";
+import { filterNonNullable } from "common/src/helpers";
 import { ControlledSelect } from "common/src/components/form";
+import {
+  ApplicationTimeSelector,
+  type CellState,
+  type Cell,
+  isCellEqual,
+} from "common/src/components/ApplicationTimeSelector";
 import { successToast } from "common/src/common/toast";
 import { ErrorText } from "common/src/components/ErrorText";
-import { type Day } from "common/src/conversion";
-import { isTouchDevice } from "@/modules/util";
-import { arrowDown, arrowUp } from "@/styled/util";
 import { type TimeSelectorFragment } from "@/gql/gql-types";
 import { gql } from "@apollo/client";
-import {
-  aesToCells,
-  type Cell,
-  covertCellsToTimeRange,
-  isSelected,
-} from "./timeSelectorModule";
-import {
-  CELL_TYPES,
-  type CellType,
-  type ApplicationPage2FormValues,
-} from "./form";
+import { aesToCells, covertCellsToTimeRange } from "./timeSelectorModule";
+import { type ApplicationPage2FormValues } from "./form";
 import { TimePreview } from ".";
-
-const CalendarHead = styled.div`
-  ${fontBold}
-  font-size: var(--fontsize-body-l);
-  text-align: center;
-  padding: var(--spacing-2-xs) 0;
-`;
-
-const TimeSelectionButton = styled.button<{
-  $type: CellType;
-}>`
-  --border-color: var(--color-black-50);
-
-  display: block;
-  width: 100%;
-  font-size: var(--fontsize-heading-m);
-  white-space: nowrap;
-  position: relative;
-  cursor: pointer;
-  padding: 0.24em 0.5em;
-  border: 1px solid var(--border-color);
-  border-top: none;
-  &:first-of-type {
-    border-top: 1px solid var(--border-color);
-  }
-  ${({ $type }) => cellTypeToCssFragment($type)};
-`;
-
-function cellTypeToCssFragment(type: CellType): RuleSet<object> {
-  switch (type) {
-    case "primary":
-      return primaryCssFragment;
-    case "secondary":
-      return secondaryCssFragment;
-    case "open":
-      return notSelectedCssFragment;
-    case "unavailable":
-      return notAvailableCssFragment;
-  }
-}
-
-const primaryCssFragment = css`
-  &:after {
-    ${arrowUp}
-    left: 4px;
-    top: 6px;
-    border-bottom-color: var(--color-white);
-  }
-  background: var(--tilavaraus-calendar-selected);
-  color: var(--color-white);
-  border-bottom-color: var(--color-black-60);
-`;
-
-const secondaryCssFragment = css`
-  &:after {
-    ${arrowDown}
-    left: 4px;
-    top: 6px;
-    border-top-color: var(--color-black);
-  }
-  background: var(--tilavaraus-calendar-selected-secondary);
-  color: var(--color-black);
-`;
-
-const notSelectedCssFragment = css`
-  background: var(--color-white);
-  color: var(--color-black);
-`;
-const notAvailableCssFragment = css`
-  background: var(--color-black-10);
-  color: var(--color-black);
-`;
-
-function constructAriaLabel(
-  t: TFunction,
-  cell: Cell,
-  labelHead: string
-): string {
-  const base = t(`application:Page2.legend.${cell.state}`);
-  return `${base ? `${base}: ` : ""}${labelHead} ${cell.label}`;
-}
-
-function DayColumn({
-  day,
-  cells,
-  updateCells,
-  selectedPriority,
-}: {
-  day: Day;
-  cells: Cell[];
-  // use undefined to disable painting
-  updateCells?: (cells: Cell[]) => void;
-  selectedPriority?: CellType;
-}): JSX.Element {
-  const { t } = useTranslation();
-  const [paintState, setPaintState] = useState<CellType | false>(false); // toggle value true = set, false = clear: ;
-  const [painting, setPainting] = useState(false); // is painting 'on'
-
-  const setCellValue = (selection: Cell, value: CellType | false): void => {
-    if (updateCells == null) {
-      return;
-    }
-    const newVal = cells.map((cell) =>
-      cell.key === selection.key
-        ? { ...cell, state: value === false ? "open" : value }
-        : cell
-    );
-    updateCells(newVal);
-  };
-
-  const handleMouseDown = (cell: Cell, _evt: React.MouseEvent) => {
-    if (selectedPriority == null) {
-      return;
-    }
-    const state = selectedPriority === cell.state ? false : selectedPriority;
-
-    if (isTouchDevice()) {
-      setCellValue(cell, state);
-      return;
-    }
-
-    setPaintState(state);
-    setCellValue(cell, state);
-    setPainting(true);
-  };
-
-  const handleKeyDown = (cell: Cell, evt: React.KeyboardEvent) => {
-    if (selectedPriority == null) {
-      return;
-    }
-    if (evt.key !== "Enter" && evt.key !== " ") {
-      return;
-    }
-    setCellValue(
-      cell,
-      selectedPriority === cell.state ? false : selectedPriority
-    );
-  };
-
-  const head = t(`common:weekDayLong.${fromMondayFirstUnsafe(day)}`);
-  const labelHead = t(`common:weekDay.${fromMondayFirstUnsafe(day)}`);
-
-  return (
-    <div onMouseLeave={() => setPainting(false)}>
-      <CalendarHead>{head}</CalendarHead>
-      {cells.map((cell) => {
-        const handlers =
-          updateCells != null
-            ? {
-                onMouseDown: (evt: React.MouseEvent) =>
-                  handleMouseDown(cell, evt),
-                onMouseUp: () => setPainting(false),
-                onKeyDown: (evt: React.KeyboardEvent) =>
-                  handleKeyDown(cell, evt),
-                onMouseEnter: () => {
-                  if (painting) {
-                    setCellValue(cell, paintState);
-                  }
-                },
-              }
-            : {};
-        return (
-          <TimeSelectionButton
-            key={cell.key}
-            $type={cell.state}
-            // TODO should not use a button if there are no handlers
-            disabled={updateCells == null}
-            type="button"
-            {...handlers}
-            role="option"
-            aria-label={constructAriaLabel(t, cell, labelHead)}
-            aria-selected={isSelected(cell.state)}
-            data-testid={`time-selector__button--${cell.key}`}
-          >
-            {cell.label}
-          </TimeSelectionButton>
-        );
-      })}
-    </div>
-  );
-}
-
-const CalendarContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  column-gap: 6px;
-  overflow-x: auto;
-  width: 90vw;
-  user-select: none;
-
-  @media (min-width: ${breakpoints.l}) {
-    overflow-x: auto;
-    width: 100%;
-  }
-`;
-
-const LegendBox = styled.div<{ type: CellType }>`
-  border: 1px solid var(--color-black-50);
-  ${({ type }) => cellTypeToCssFragment(type)}
-
-  box-sizing: border-box;
-  width: 30px;
-  height: 40px;
-  position: relative;
-
-  @media (max-width: ${breakpoints.s}) {
-    margin-right: var(spacing-xs);
-  }
-`;
 
 type TimeSelectorProps = {
   index: number;
@@ -248,7 +31,7 @@ type TimeSelectorProps = {
   reservationUnitOpeningHours: Readonly<TimeSelectorFragment[]>;
 };
 
-export function TimeSelector({
+function TimeSelectorForm({
   index,
   reservationUnitOptions,
   reservationUnitOpeningHours,
@@ -256,7 +39,10 @@ export function TimeSelector({
   const { t } = useTranslation();
   const { setValue, watch } = useFormContext<ApplicationPage2FormValues>();
 
-  const setSelectorData = (index: number, selected: Cell[][]) => {
+  const setSelectorData = (
+    index: number,
+    selected: Readonly<Readonly<Cell[]>[]>
+  ) => {
     const formVals = covertCellsToTimeRange(selected);
     setValue(`applicationSections.${index}.suitableTimeRanges`, formVals, {
       shouldDirty: true,
@@ -265,23 +51,35 @@ export function TimeSelector({
     });
   };
 
-  const handleCellUpdate = (day: Day, newCells: Cell[]) => {
-    const thisSection = watch(
-      `applicationSections.${index}.suitableTimeRanges`
-    );
-    const tmp = aesToCells(thisSection, reservationUnitOpeningHours);
+  const handleCellUpdate = (selection: Cell, value: CellState) => {
+    const { day } = selection;
+    const times = watch(`applicationSections.${index}.suitableTimeRanges`);
+    const tmp = aesToCells(times, reservationUnitOpeningHours);
     if (tmp[day] == null) {
       throw new Error("day not found");
     }
-    tmp[day] = newCells;
+    // TODO this is confusing
+    // the final conversion changes "open" to "unavailable" if needed but it's sitll confusing
+    // and we rely on the conversion function here
+    // problem: we don't known opening hours at this point
+    // - would have to refactor the cell type to include the open state e.g. separate selection and open state
+    const cellIndex = tmp[day].findIndex((cell) =>
+      isCellEqual(cell, selection)
+    );
+    if (cellIndex === -1) {
+      throw new Error("cell not found");
+    }
+    const cell = tmp[day][cellIndex];
+    if (cell == null) {
+      throw new Error("cell not found");
+    }
+    cell.state = value;
     setSelectorData(index, tmp);
   };
 
   const copyCells = () => {
-    const thisSection = watch(
-      `applicationSections.${index}.suitableTimeRanges`
-    );
-    const srcCells = aesToCells(thisSection, reservationUnitOpeningHours);
+    const times = watch(`applicationSections.${index}.suitableTimeRanges`);
+    const srcCells = aesToCells(times, reservationUnitOpeningHours);
     const others = watch(`applicationSections`);
     for (const i of others.keys()) {
       setSelectorData(i, srcCells);
@@ -292,20 +90,14 @@ export function TimeSelector({
     });
   };
 
-  const cellTypes = CELL_TYPES.map((val) => ({
-    type: val,
-    label: t(`application:Page2.legend.${val}`),
-  }));
-
   const cells = aesToCells(
     watch("applicationSections")[index]?.suitableTimeRanges ?? [],
     reservationUnitOpeningHours
   );
+  const priority = watch(`applicationSections.${index}.priority`);
 
   const enableCopyCells =
     filterNonNullable(watch("applicationSections")).length > 1;
-
-  const priority = watch(`applicationSections.${index}.priority`);
 
   return (
     // NOTE flex inside a grid container breaks overflow-x
@@ -321,34 +113,12 @@ export function TimeSelector({
         reservationUnitOptions={reservationUnitOptions}
         index={index}
       />
-      <CalendarContainer
-        aria-multiselectable
-        aria-labelledby={`timeSelector-${index}`}
-        role="listbox"
-      >
-        {WEEKDAYS.map((day) => (
-          <DayColumn
-            key={`day-${day}`}
-            day={day}
-            cells={cells[day] ?? []}
-            updateCells={(toUpdate) => handleCellUpdate(day, toUpdate)}
-            selectedPriority={priority}
-          />
-        ))}
-      </CalendarContainer>
-      <AutoGrid $minWidth="14rem" $gap="xs">
-        {cellTypes.map((cell) => (
-          <Flex
-            key={cell.label}
-            $gap="2-xs"
-            $alignItems="center"
-            $direction="row"
-          >
-            <LegendBox type={cell.type} />
-            <NoWrap>{cell.label}</NoWrap>
-          </Flex>
-        ))}
-      </AutoGrid>
+      <ApplicationTimeSelector
+        cells={cells}
+        onCellUpdate={handleCellUpdate}
+        selectedPriority={priority}
+        aria-label={t("application:TimeSelector.calendarLabel")}
+      />
       <div data-testid={`time-selector__preview-${index}`}>
         <TimePreview index={index} />
       </div>
@@ -368,6 +138,8 @@ export function TimeSelector({
     </Flex>
   );
 }
+
+export { TimeSelectorForm as TimeSelector };
 
 function OptionSelector({
   reservationUnitOptions,

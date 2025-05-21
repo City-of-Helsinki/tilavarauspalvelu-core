@@ -15,6 +15,7 @@ import {
   type ApplicationPage2Query,
   type ApplicationFormFragment,
   type Maybe,
+  type SuitableTimeRangeSerializerInput,
 } from "@gql/gql-types";
 import { z } from "zod";
 import { toApiDate, toUIDate } from "common/src/common/util";
@@ -23,14 +24,7 @@ import {
   checkValidDateOnly,
   lessThanMaybeDate,
 } from "common/src/schemas/schemaCommon";
-
-export const CELL_TYPES = [
-  "open",
-  "unavailable",
-  "secondary",
-  "primary",
-] as const;
-export type CellType = (typeof CELL_TYPES)[number];
+import { CELL_STATES } from "common/src/components/ApplicationTimeSelector";
 
 type Organisation = ApplicationFormFragment["organisation"];
 type Address = NonNullable<Organisation>["address"];
@@ -136,7 +130,7 @@ const ApplicationSectionPage2Schema = z
     minDuration: z.number().min(1, { message: "Required" }),
     name: z.string().min(1, { message: "Required" }).max(100),
     reservationUnitPk: z.number(),
-    priority: z.enum(CELL_TYPES),
+    priority: z.enum(CELL_STATES),
     // NOTE: not sent or modified here, but required for validation
     appliedReservationsPerWeek: z.number().min(1).max(7),
   })
@@ -504,14 +498,10 @@ const transformEventReservationUnit = (pk: number, priority: number) => ({
   reservationUnit: pk,
 });
 
-function transformSuitableTimeRange(timeRange: SuitableTimeRangeFormValues) {
-  return {
-    ...(timeRange.pk != null ? { pk: timeRange.pk } : {}),
-    beginTime: timeRange.beginTime ?? "",
-    endTime: timeRange.endTime ?? "",
-    priority: timeRange.priority ?? 50,
-    dayOfTheWeek: timeRange.dayOfTheWeek,
-  };
+function transformSuitableTimeRange(
+  timeRange: SuitableTimeRangeFormValues
+): SuitableTimeRangeSerializerInput {
+  return timeRange;
 }
 
 // NOTE this works only for subsections of an application mutation

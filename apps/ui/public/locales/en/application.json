@@ -65,6 +65,15 @@
     "deleteEventHeading": "Are you sure you want to remove the application?",
     "deleteEventContent": "Once removed, the application cannot be restored."
   },
+  "TimeSelector": {
+    "calendarLabel": "Select time slots from the calendar",
+    "legend": {
+      "unavailable": "Not available",
+      "primary": "Preferred time slots",
+      "secondary": "Other request",
+      "open": "Reservable"
+    }
+  },
   "Page2": {
     "subHeading": "Select booking dates",
     "info": "Please select both preferred times and also select other times that suit you. Providing more space and time options will improve your chances of getting spaces and times you like.",
@@ -76,12 +85,6 @@
     "priorityLabels": {
       "primary": "Select preferred time slots",
       "secondary": "Select other time slots"
-    },
-    "legend": {
-      "unavailable": "Not available",
-      "primary": "Preferred time slots",
-      "secondary": "Other request",
-      "open": "Reservable"
     },
     "notification": {
       "copyCells": "Times copied to all booking requests"

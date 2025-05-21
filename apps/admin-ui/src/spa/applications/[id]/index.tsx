@@ -81,50 +81,6 @@ const PreCard = styled.div`
   font-size: var(--fontsize-body-s);
 `;
 
-const ApplicationSectionsContainer = styled.div`
-  display: grid;
-
-  /* responsive shinanigans the tag takes too much space, so we only use 4 columns on mobile */
-  grid-template-columns: 1rem repeat(2, auto) 8rem;
-  align-items: stretch;
-  justify-content: stretch;
-  gap: 0;
-
-  border-collapse: collapse;
-  > div > div {
-    border: 1px solid var(--color-black-20);
-    border-left: none;
-    border-right: none;
-    display: flex;
-    align-items: center;
-    padding-left: 1rem;
-
-    /* when the button is hidden the row should still have the same height */
-    min-height: 46px;
-
-    /* responsive shinanigans the tag takes too much space */
-    :nth-child(4) {
-      display: none;
-    }
-  }
-
-  > div:nth-child(2n) {
-    > div {
-      border-top: none;
-    }
-  }
-
-  @media (min-width: ${breakpoints.m}) {
-    grid-template-columns: 3rem repeat(2, auto) repeat(2, 8rem);
-
-    /* undo responsive shinanigans, and align the HDS tag */
-    > div > div:nth-child(4) {
-      display: flex;
-      align-items: center;
-    }
-  }
-`;
-
 // the default HDS tag css can't align icons properly so we have to do this
 // TODO reusable Tags that allow setting both the background and optional Icon
 const DeclinedTag = styled(Tag)`
@@ -359,21 +315,18 @@ function RejectAllOptionsButton({
   );
 }
 
-const TimeSection = styled(Flex).attrs({
-  $gap: "l",
-})`
-  & > div:first-child {
-    flex-grow: 1;
-  }
-  & > div:last-child {
-    flex-shrink: 0;
-    grid-template-columns: repeat(2, 1fr);
-    @media (min-width: ${breakpoints.l}) {
-      grid-template-columns: 1fr;
-    }
-  }
+const TimeSection = styled.div`
+  display: grid;
+  grid-gap: var(--spacing-m);
+
+  grid-template-columns: 1fr;
   @media (min-width: ${breakpoints.l}) {
-    flex-direction: row;
+    grid-template-columns: minmax(0, max-content) min-content;
+  }
+
+  /* force legend to next row after calendar */
+  > :nth-child(2) {
+    grid-row: 2;
   }
 `;
 
@@ -384,6 +337,30 @@ type ColumnType = {
   key: string;
   transform: (data: DataType) => ReactNode;
 };
+
+const ReservationUnitOptionsTable = styled.table`
+  border-collapse: collapse;
+  width: 100%;
+`;
+
+const ReservationUnitOptionRow = styled.tr`
+  border-top: 1px solid var(--color-black-20);
+`;
+
+const ReservationUnitOptionElem = styled.td<{ $hideOnMobile?: boolean }>`
+  box-sizing: border-box;
+  padding: var(--spacing-2-xs);
+  display: ${({ $hideOnMobile }) => ($hideOnMobile ? "none" : "table-cell")};
+  @media (min-width: ${breakpoints.m}) {
+    display: table-cell;
+  }
+`;
+
+// Required for table overflow
+const TableWrapper = styled.div`
+  display: grid;
+  overflow-x: auto;
+`;
 
 function ReservationUnitOptionsSection({
   section,
@@ -446,15 +423,22 @@ function ReservationUnitOptionsSection({
   }));
 
   return (
-    <ApplicationSectionsContainer>
-      {rows.map((row) => (
-        <div style={{ display: "contents" }} key={row.pk}>
-          {cols.map((col) => (
-            <div key={`${col.key}-${row.pk}`}>{col.transform(row)}</div>
-          ))}
-        </div>
-      ))}
-    </ApplicationSectionsContainer>
+    <TableWrapper>
+      <ReservationUnitOptionsTable>
+        {rows.map((row) => (
+          <ReservationUnitOptionRow key={row.pk}>
+            {cols.map((col) => (
+              <ReservationUnitOptionElem
+                key={`${col.key}-${row.pk}`}
+                $hideOnMobile={col.key === "status"}
+              >
+                {col.transform(row)}
+              </ReservationUnitOptionElem>
+            ))}
+          </ReservationUnitOptionRow>
+        ))}
+      </ReservationUnitOptionsTable>
+    </TableWrapper>
   );
 }
 
@@ -482,61 +466,66 @@ function ApplicationSectionDetails({
   return (
     <ScrollIntoView key={section.pk} hash={hash}>
       <Accordion heading={heading} initiallyOpen>
-        <ApplicationDatas>
-          {section.ageGroup && (
+        <Flex>
+          <ApplicationDatas>
+            {section.ageGroup && (
+              <ValueBox
+                label={t("ApplicationEvent.ageGroup")}
+                value={formatAgeGroups(
+                  {
+                    minimum: section.ageGroup.minimum,
+                    maximum: section.ageGroup.maximum ?? undefined,
+                  },
+                  t
+                )}
+              />
+            )}
             <ValueBox
-              label={t("ApplicationEvent.ageGroup")}
-              value={formatAgeGroups(
-                {
-                  minimum: section.ageGroup.minimum,
-                  maximum: section.ageGroup.maximum ?? undefined,
-                },
-                t
+              label={t("ApplicationEvent.groupSize")}
+              value={formatNumber(
+                section.numPersons,
+                t("common.membersSuffix")
               )}
             />
-          )}
-          <ValueBox
-            label={t("ApplicationEvent.groupSize")}
-            value={formatNumber(section.numPersons, t("common.membersSuffix"))}
-          />
-          <ValueBox
-            label={t("ApplicationEvent.purpose")}
-            value={section.purpose?.nameFi ?? undefined}
-          />
-          <ValueBox
-            label={t("ApplicationEvent.eventDuration")}
-            value={duration}
-          />
-          <ValueBox
-            label={t("ApplicationEvent.eventsPerWeek")}
-            value={`${section.appliedReservationsPerWeek}`}
-          />
-          <ValueBox label={t("ApplicationEvent.dates")} value={dates} />
-        </ApplicationDatas>
-        <Flex
-          $justifyContent="space-between"
-          $direction="row"
-          $alignItems="center"
-        >
-          <H4 as="h3">{t("ApplicationEvent.requestedReservationUnits")}</H4>
-          <RejectAllOptionsButton
+            <ValueBox
+              label={t("ApplicationEvent.purpose")}
+              value={section.purpose?.nameFi ?? undefined}
+            />
+            <ValueBox
+              label={t("ApplicationEvent.eventDuration")}
+              value={duration}
+            />
+            <ValueBox
+              label={t("ApplicationEvent.eventsPerWeek")}
+              value={`${section.appliedReservationsPerWeek}`}
+            />
+            <ValueBox label={t("ApplicationEvent.dates")} value={dates} />
+          </ApplicationDatas>
+          <Flex
+            $justifyContent="space-between"
+            $direction="row"
+            $alignItems="center"
+          >
+            <H4 as="h3">{t("ApplicationEvent.requestedReservationUnits")}</H4>
+            <RejectAllOptionsButton
+              section={section}
+              refetch={refetch}
+              applicationStatus={
+                application?.status ?? ApplicationStatusChoice.Draft
+              }
+            />
+          </Flex>
+          <ReservationUnitOptionsSection
             section={section}
             refetch={refetch}
-            applicationStatus={
-              application?.status ?? ApplicationStatusChoice.Draft
-            }
+            applicationStatus={application?.status}
           />
+          <H4 as="h3">{t("ApplicationEvent.requestedTimes")}</H4>
+          <TimeSection>
+            <TimeSelector applicationSection={section} />
+            <ApplicationTimePreview schedules={section.suitableTimeRanges} />
+          </TimeSection>
         </Flex>
-        <ReservationUnitOptionsSection
-          section={section}
-          refetch={refetch}
-          applicationStatus={application?.status}
-        />
-        <H4 as="h3">{t("ApplicationEvent.requestedTimes")}</H4>
-        <TimeSection>
-          <TimeSelector applicationSection={section} />
-          <ApplicationTimePreview schedules={section.suitableTimeRanges} />
-        </TimeSection>
       </Accordion>
     </ScrollIntoView>
   );

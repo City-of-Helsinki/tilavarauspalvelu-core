@@ -59,6 +59,13 @@ i18n.addResourceBundle("fi", "common", {
   "weekDayLong.4": "Torstai",
   "weekDayLong.5": "Perjantai",
   "weekDayLong.6": "Lauantai",
+  "weekDay.0": "Su",
+  "weekDay.1": "Ma",
+  "weekDay.2": "Ti",
+  "weekDay.3": "Ke",
+  "weekDay.4": "To",
+  "weekDay.5": "Pe",
+  "weekDay.6": "La",
 });
 i18n.addResourceBundle("fi", "reservationCalendar", {
   showCurrentDay: "Näytä tämä päivä",
@@ -83,6 +90,15 @@ i18n.addResourceBundle("fi", "application", {
   },
   primarySchedules: "Ensisijaiset aikatoiveet",
   secondarySchedules: "Muut aikatoiveet",
+  TimeSelector: {
+    calendarLabel: "Toivotut ajat",
+    legend: {
+      unavailable: "Ei varattavissa",
+      primary: "Ensisijainen toive",
+      secondary: "Muu toive",
+      open: "Varattavissa",
+    },
+  },
 });
 
 i18n.addResourceBundle("fi", "forms", {

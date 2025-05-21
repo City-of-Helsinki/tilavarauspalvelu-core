@@ -65,6 +65,15 @@
     "deleteEventHeading": "Är du säker på att du vill radera ansökningen?",
     "deleteEventContent": "Ansökningens information kan inte återställas då ansökningen har raderats."
   },
+  "TimeSelector": {
+    "calendarLabel": "Välj önskade tider",
+    "legend": {
+      "unavailable": "Kan inte bokas",
+      "primary": "Prioriterat önskemål",
+      "secondary": "Alternativt önskemål",
+      "open":"Kan reserveras"
+    }
+  },
   "Page2": {
     "heading": "Välj bokningens tidpunkt",
     "info": "Välj både de tider som du i första hand önskar och också tider som alternativt passar för dig. Att ange flera önskemål om lokaler och tider förbättrar dina chanser att få de lokaler och tider du vill ha.",
@@ -76,12 +85,6 @@
     "priorityLabels": {
       "primary": "Välj prioriterade tidsönskemål",
       "secondary": "Välj alternativa tidsönskemål"
-    },
-    "legend": {
-      "unavailable": "Kan inte bokas",
-      "primary": "Prioriterat önskemål",
-      "secondary": "Alternativt önskemål",
-      "open":"Kan reserveras"
     },
     "notification": {
       "copyCells": "Önskade tider kopierades till alla bokningar"

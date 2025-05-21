@@ -14,9 +14,6 @@
   --tilavaraus-stack-order-calendar-gutter: 9;
   --tilavaraus-admin-stack-calendar-buffer: 2;
 
-  --tilavaraus-calendar-selected: var(--color-bus);
-  --tilavaraus-calendar-selected-secondary: #ffe977;
-
   /* button like links */
   --background-color-hover: var(--color-black-5);
   --background-color-focus: var(--color-black-5);

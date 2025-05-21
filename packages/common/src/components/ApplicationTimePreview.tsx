@@ -1,20 +1,20 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { fontBold, H4 } from "../../styled";
-import { breakpoints, WEEKDAYS } from "../const";
+import { AutoGrid, fontBold } from "../../styled";
+import { WEEKDAYS } from "../const";
 import { fromMondayFirstUnsafe, formatDayTimes } from "../helpers";
 import { Priority, SuitableTimeFragment } from "../../gql/gql-types";
 
 const WeekWrapper = styled.div`
   display: flex;
-  line-height: 2.2;
+  line-height: 1.8;
 `;
 
 const Label = styled.div`
   ${fontBold};
   padding-right: 4px;
-  max-width: 10ch;
+  max-width: 4ch;
   width: 100%;
 `;
 
@@ -32,7 +32,7 @@ function Weekdays({
       })).map(({ day, times }) => (
         <WeekWrapper key={day}>
           <Label>
-            {t(`common:weekDayLong.${fromMondayFirstUnsafe(day)}`)}
+            {t(`common:weekDay.${fromMondayFirstUnsafe(day)}`)}
             {times && ":"}
           </Label>
           <div>{times}</div>
@@ -42,23 +42,14 @@ function Weekdays({
   );
 }
 
-const Container = styled.div`
-  border: 2px solid var(--color-black);
-  padding: var(--spacing-m);
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--spacing-m);
-
-  @media (min-width: ${breakpoints.s}) {
-    grid-template-columns: 1fr 1fr;
-  }
+const Container = styled(AutoGrid)`
+  border: 1px solid var(--color-black-50);
+  padding: var(--spacing-s) var(--spacing-m);
 `;
 
-const Heading = styled(H4).attrs({
-  as: "div",
-})`
+const Heading = styled.p.attrs({ as: "h4" })`
   ${fontBold};
-  margin-top: 0;
+  margin: 0 0 var(--spacing-xs);
 `;
 
 type SchedulesT = Omit<SuitableTimeFragment, "pk" | "id">;
@@ -74,15 +65,18 @@ export function ApplicationTimePreview({
   const secondary = schedules.filter((n) => n.priority === Priority.Secondary);
 
   return (
-    <Container>
-      <div>
-        <Heading>{t("application:primarySchedules")}</Heading>
-        <Weekdays schedules={primary} />
-      </div>
-      <div>
-        <Heading>{t("application:secondarySchedules")}</Heading>
-        <Weekdays schedules={secondary} />
-      </div>
-    </Container>
+    // Extra div so the inner container is not full height but scales by content
+    <div>
+      <Container>
+        <div>
+          <Heading>{t("application:primarySchedules")}</Heading>
+          <Weekdays schedules={primary} />
+        </div>
+        <div>
+          <Heading>{t("application:secondarySchedules")}</Heading>
+          <Weekdays schedules={secondary} />
+        </div>
+      </Container>
+    </div>
   );
 }
