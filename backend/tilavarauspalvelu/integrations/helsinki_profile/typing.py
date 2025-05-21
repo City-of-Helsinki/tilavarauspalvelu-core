@@ -99,7 +99,7 @@ class ReservationPrefillInfo(TypedDict):
     home_city: City | None
 
 
-class BirthdayInfo(TypedDict):
+class AfterLoginAdditionalInfo(ReservationPrefillInfo):
     id: str | None  # random string
     birthday: datetime.date | None
 
