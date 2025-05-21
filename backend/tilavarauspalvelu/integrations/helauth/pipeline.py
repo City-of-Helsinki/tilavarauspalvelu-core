@@ -78,6 +78,9 @@ def update_user_from_profile(request: WSGIRequest, *, user: User | None = None) 
             user.date_of_birth = after_login_additional_info["birthday"]
         user.save()
 
+    # In case the user HelsinkiProfile authentication has expired, the profile info can not be fetched
+    # from during the reservation creation. In that case, we need to store the profile info in the session
+    # so that it can be used later when creating the reservation.
     # Extract only the prefill info from the response and store it in the session
     request.session["reservation_prefill_info"] = ReservationPrefillInfo(**{
         k: after_login_additional_info[k]  # type: ignore
