@@ -62,8 +62,18 @@ COMMON_CONTEXT = {
 }
 LANGUAGE_CONTEXT = {
     "en": {
-        "title": "A door code has been added to your booking",
-        "text_reservation_modified": "A door code has been added to your booking",
+        "title": "Access to the space has changed",
+        "text_reservation_modified": (
+            "Access to the space has changed. "
+            "You can find the door code in this message and at 'My bookings' "
+            "(https://fake.varaamo.hel.fi/en/reservations) page at Varaamo."
+        ),
+        "text_reservation_modified_html": (
+            "Access to the space has changed. "
+            "You can find the door code in this message and at "
+            '<a href="https://fake.varaamo.hel.fi/en/reservations">'
+            "'My bookings'</a> page at Varaamo."
+        ),
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **RESERVATION_PRICE_INFO_CONTEXT_EN,
@@ -73,8 +83,18 @@ LANGUAGE_CONTEXT = {
         **COMMON_CONTEXT,
     },
     "fi": {
-        "title": "Varaukseesi on lisätty ovikoodi",
-        "text_reservation_modified": "Varaukseesi on lisätty ovikoodi",
+        "title": "Sisäänpääsy tilaan on muuttunut",
+        "text_reservation_modified": (
+            "Sisäänpääsy tilaan on muuttunut. "
+            "Löydät ovikoodin tästä viestistä sekä 'Omat Varaukset' "
+            "(https://fake.varaamo.hel.fi/reservations) -sivulta Varaamossa."
+        ),
+        "text_reservation_modified_html": (
+            "Sisäänpääsy tilaan on muuttunut. "
+            "Löydät ovikoodin tästä viestistä sekä "
+            '<a href="https://fake.varaamo.hel.fi/reservations">'
+            "'Omat Varaukset'</a> -sivulta Varaamossa."
+        ),
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
         **RESERVATION_PRICE_INFO_CONTEXT_FI,
@@ -84,8 +104,18 @@ LANGUAGE_CONTEXT = {
         **COMMON_CONTEXT,
     },
     "sv": {
-        "title": "En dörrkod har lagts till i din bokning",
-        "text_reservation_modified": "En dörrkod har lagts till i din bokning",
+        "title": "Tillgången till utrymmet har ändrats",
+        "text_reservation_modified": (
+            "Tillgången till utrymmet har ändrats. "
+            "Du hittar dörrkoden i detta meddelande och på sidan 'Mina bokningar' "
+            "(https://fake.varaamo.hel.fi/sv/reservations) på Varaamo."
+        ),
+        "text_reservation_modified_html": (
+            "Tillgången till utrymmet har ändrats. "
+            "Du hittar dörrkoden i detta meddelande och på sidan "
+            '<a href="https://fake.varaamo.hel.fi/sv/reservations">'
+            "'Mina bokningar'</a> på Varaamo."
+        ),
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
         **RESERVATION_PRICE_INFO_CONTEXT_SV,
@@ -219,11 +249,17 @@ def test_reservation_access_code_added__render__text():
     )
     text_content = render_text(email_type=EmailType.RESERVATION_ACCESS_CODE_ADDED, context=context)
 
+    body = (
+        "Access to the space has changed. "
+        "You can find the door code in this message and at 'My bookings' "
+        "(https://fake.varaamo.hel.fi/en/reservations) page at Varaamo."
+    )
+
     assert text_content == cleandoc(
         f"""
         Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
-        A door code has been added to your booking.
+        {body}
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI]
@@ -262,13 +298,18 @@ def test_reservation_access_code_added__render__html():
     html_content = render_html(email_type=EmailType.RESERVATION_ACCESS_CODE_ADDED, context=context)
     text_content = html_email_to_text(html_content)
 
+    body = (
+        "Access to the space has changed. You can find the door code in this message "
+        "and at ['My bookings'](https://fake.varaamo.hel.fi/en/reservations) page at Varaamo."
+    )
+
     assert text_content == cleandoc(
         f"""
         {EMAIL_LOGO_HTML}
 
         **Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],**
 
-        A door code has been added to your booking.
+        {body}
 
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]
@@ -311,7 +352,7 @@ def test_reservation_access_code_added__send_email(outbox):
 
     assert len(outbox) == 1
 
-    assert outbox[0].subject == "A door code has been added to your booking"
+    assert outbox[0].subject == "Access to the space has changed"
     assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]
 
 

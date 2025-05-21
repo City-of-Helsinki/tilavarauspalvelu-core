@@ -367,9 +367,9 @@ def test_reservation_approved__render__text__access_code_error():
     text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
 
     access_code_error = (
-        "You can see the door code on the https://fake.varaamo.hel.fi/en/reservations: 'My bookings' page at Varaamo. "
+        "You can see the door code on the 'My bookings' (https://fake.varaamo.hel.fi/en/reservations) page at Varaamo. "
         "If the code is not visible in your booking details, please contact "
-        "https://fake.varaamo.hel.fi/feedback?lang=en: Varaamo customer service."
+        "Varaamo customer service (https://fake.varaamo.hel.fi/feedback?lang=en)."
     )
 
     assert text_content == cleandoc(
@@ -533,7 +533,7 @@ def test_reservation_approved__render__html__access_code_error():
     text_content = html_email_to_text(html_content)
 
     access_code_text = (
-        "You can see the door code on the ['My bookings' page](https://fake.varaamo.hel.fi/en/reservations) at "
+        "You can see the door code on the ['My bookings'](https://fake.varaamo.hel.fi/en/reservations) page at "
         "Varaamo. If the code is not visible in your booking details, "
         "please contact [Varaamo customer service](https://fake.varaamo.hel.fi/feedback?lang=en)."
     )

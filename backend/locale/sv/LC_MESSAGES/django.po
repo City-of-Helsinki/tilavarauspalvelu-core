@@ -3240,19 +3240,20 @@ msgid "at"
 msgstr "kl."
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "'My bookings' page"
-msgstr "'Mina bokningar'"
+msgid "My bookings"
+msgstr "Mina bokningar"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 #, python-format
 msgctxt "Email"
 msgid ""
 "Manage your booking at Varaamo. You can check the details of your booking "
-"and Varaamo's terms of contract and cancellation on the %(page)s."
+"and Varaamo's terms of contract and cancellation on the %(my_bookings)s page."
 msgstr ""
 "Hantera din bokning på Varaamo. Du kan kontrollera uppgifterna om din "
-"bokning samt Varaamos avtals- och avbokningsvillkor på sidan %(page)s."
+"bokning samt Varaamos avtals- och avbokningsvillkor på sidan %(my_bookings)s."
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
@@ -3273,8 +3274,9 @@ msgstr "Varaamo kundtjänst"
 #, python-format
 msgctxt "Email"
 msgid ""
-"You can see the door code on the %(my_reservations)s at Varaamo. If the code "
-"is not visible in your booking details, please contact %(customer_service)s."
+"You can see the door code on the %(my_reservations)s page at Varaamo. If the "
+"code is not visible in your booking details, please contact "
+"%(customer_service)s."
 msgstr ""
 "Du kan se dörrkoden på %(my_reservations)s i Varaamo. Om koden inte syns i "
 "dina bokningsuppgifter, vänligen kontakta %(customer_service)s."
@@ -3307,9 +3309,20 @@ msgid "You can check your booking details at"
 msgstr "Du kan kontrollera dina bokningsuppgifter på"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
-msgid "A door code has been added to your booking"
-msgstr "En dörrkod har lagts till i din bokning"
+msgid "Access to the space has changed"
+msgstr "Tillgången till utrymmet har ändrats"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+#, python-format
+msgctxt "Email"
+msgid ""
+"You can find the door code in this message and at %(my_reservations)s page "
+"at Varaamo"
+msgstr ""
+"Du hittar dörrkoden i detta meddelande och på sidan %(my_reservations)s på "
+"Varaamo"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
@@ -3422,11 +3435,6 @@ msgid "My applications"
 msgstr "Egna ansökningar"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
-msgctxt "Email"
-msgid "Access to the space has changed"
-msgstr "Tillgången till utrymmet har ändrats"
-
-#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 #, python-format
 msgctxt "Email"
 msgid ""
@@ -3457,6 +3465,7 @@ msgid "Thank you for your application"
 msgstr "Tack för din ansökan"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
+#, python-format
 msgctxt "Email"
 msgid ""
 "You can view the result of the processing on the %(my_applications)s page"
@@ -4007,19 +4016,19 @@ msgid "To"
 msgstr "Slutar"
 
 #: tilavarauspalvelu/models/reservation/actions.py
+msgctxt "ICAL"
+msgid "My bookings"
+msgstr "Mina bokningar"
+
+#: tilavarauspalvelu/models/reservation/actions.py
 #, python-format
 msgctxt "ICAL"
 msgid ""
 "Manage your booking at Varaamo. You can check the details of your booking "
-"and Varaamo's terms of contract and cancellation on the '%(bookings)s' page."
+"and Varaamo's terms of contract and cancellation on the %(my_bookings)s page."
 msgstr ""
 "Hantera din bokning på Varaamo. Du kan kontrollera uppgifterna om din "
-"bokning samt Varaamos avtals- och avbokningsvillkor på sidan '%(bookings)s'."
-
-#: tilavarauspalvelu/models/reservation/actions.py
-msgctxt "ICAL"
-msgid "My bookings"
-msgstr "Mina bokningar"
+"bokning samt Varaamos avtals- och avbokningsvillkor på sidan %(my_bookings)s."
 
 #: tilavarauspalvelu/models/reservation/model.py
 msgid "reservation"

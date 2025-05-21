@@ -229,14 +229,14 @@ KEYLESS_ENTRY_CONTEXT_EN = {
     "text_access_code_confirmed": "Here are your booking details and the door code for easy access to the space",
     "text_access_code_unavailable_instructions_html": (
         "You can see the door code on the "
-        "<a href=\"https://fake.varaamo.hel.fi/en/reservations\">'My bookings' page</a> at Varaamo. "
+        "<a href=\"https://fake.varaamo.hel.fi/en/reservations\">'My bookings'</a> page at Varaamo. "
         "If the code is not visible in your booking details, please contact "
         '<a href="https://fake.varaamo.hel.fi/feedback?lang=en">Varaamo customer service</a>.'
     ),
     "text_access_code_unavailable_instructions": (
-        "You can see the door code on the https://fake.varaamo.hel.fi/en/reservations: 'My bookings' page at Varaamo. "
+        "You can see the door code on the 'My bookings' (https://fake.varaamo.hel.fi/en/reservations) page at Varaamo. "
         "If the code is not visible in your booking details, please contact "
-        "https://fake.varaamo.hel.fi/feedback?lang=en: Varaamo customer service."
+        "Varaamo customer service (https://fake.varaamo.hel.fi/feedback?lang=en)."
     ),
 }
 KEYLESS_ENTRY_CONTEXT_FI = {
@@ -249,14 +249,14 @@ KEYLESS_ENTRY_CONTEXT_FI = {
     "text_access_code_confirmed": "Tässä ovat varauksesi tiedot ja ovikoodi, jolla pääset tilaan helposti",
     "text_access_code_unavailable_instructions_html": (
         "Näet ovikoodin Varaamon "
-        "<a href=\"https://fake.varaamo.hel.fi/reservations\">'Omat Varaukset' -sivulla</a>. "
+        "<a href=\"https://fake.varaamo.hel.fi/reservations\">'Omat Varaukset'</a> -sivulla. "
         "Jos koodi ei ole näkyvissä varauksesi tiedoissa, ota yhteyttä "
         '<a href="https://fake.varaamo.hel.fi/feedback?lang=fi">Varaamon asiakaspalveluun</a>.'
     ),
     "text_access_code_unavailable_instructions": (
-        "Näet ovikoodin Varaamon https://fake.varaamo.hel.fi/reservations: 'Omat Varaukset' -sivulla. "
+        "Näet ovikoodin Varaamon 'Omat Varaukset' (https://fake.varaamo.hel.fi/reservations) -sivulla. "
         "Jos koodi ei ole näkyvissä varauksesi tiedoissa, ota yhteyttä "
-        "https://fake.varaamo.hel.fi/feedback?lang=fi: Varaamon asiakaspalveluun."
+        "Varaamon asiakaspalveluun (https://fake.varaamo.hel.fi/feedback?lang=fi)."
     ),
 }
 KEYLESS_ENTRY_CONTEXT_SV = {
@@ -273,9 +273,9 @@ KEYLESS_ENTRY_CONTEXT_SV = {
         '<a href="https://fake.varaamo.hel.fi/feedback?lang=sv">Varaamo kundtjänst</a>.'
     ),
     "text_access_code_unavailable_instructions": (
-        "Du kan se dörrkoden på https://fake.varaamo.hel.fi/sv/reservations: 'Mina bokningar' i Varaamo. "
+        "Du kan se dörrkoden på 'Mina bokningar' (https://fake.varaamo.hel.fi/sv/reservations) i Varaamo. "
         "Om koden inte syns i dina bokningsuppgifter, vänligen kontakta "
-        "https://fake.varaamo.hel.fi/feedback?lang=sv: Varaamo kundtjänst."
+        "Varaamo kundtjänst (https://fake.varaamo.hel.fi/feedback?lang=sv)."
     ),
 }
 
@@ -334,33 +334,33 @@ RESERVATION_MANAGE_LINK_CONTEXT_EN = {
     "manage_reservation": (
         "Manage your booking at Varaamo. "
         "You can check the details of your booking and Varaamo's terms of contract and cancellation on the "
-        "'My bookings' page: https://fake.varaamo.hel.fi/en/reservations."
+        "'My bookings' (https://fake.varaamo.hel.fi/en/reservations) page."
     ),
     "manage_reservation_html": (
         "Manage your booking at Varaamo. "
         "You can check the details of your booking and Varaamo's terms of contract and cancellation on the "
         '<a href="https://fake.varaamo.hel.fi/en/reservations">'
-        "'My bookings' page</a>."
+        "'My bookings'</a> page."
     ),
 }
 RESERVATION_MANAGE_LINK_CONTEXT_FI = {
     "manage_reservation": (
         "Hallitse varaustasi Varaamossa. "
         "Voit perua varauksesi ja tarkistaa varauksen tiedot sekä Varaamon sopimus- ja peruutusehdot "
-        "'Omat Varaukset' -sivulla: https://fake.varaamo.hel.fi/reservations."
+        "'Omat Varaukset' (https://fake.varaamo.hel.fi/reservations) -sivulla."
     ),
     "manage_reservation_html": (
         "Hallitse varaustasi Varaamossa. "
         "Voit perua varauksesi ja tarkistaa varauksen tiedot sekä Varaamon sopimus- ja peruutusehdot "
         '<a href="https://fake.varaamo.hel.fi/reservations">'
-        "'Omat Varaukset' -sivulla</a>."
+        "'Omat Varaukset'</a> -sivulla."
     ),
 }
 RESERVATION_MANAGE_LINK_CONTEXT_SV = {
     "manage_reservation": (
         "Hantera din bokning på Varaamo. "
         "Du kan kontrollera uppgifterna om din bokning samt Varaamos avtals- och avbokningsvillkor "
-        "på sidan 'Mina bokningar': https://fake.varaamo.hel.fi/sv/reservations."
+        "på sidan 'Mina bokningar' (https://fake.varaamo.hel.fi/sv/reservations)."
     ),
     "manage_reservation_html": (
         "Hantera din bokning på Varaamo. "
@@ -394,11 +394,11 @@ EMAIL_LOGO_HTML = """![](https://makasiini.hel.ninja/helsinki-logos/helsinki-log
 
 MANAGE_RESERVATIONS_LINK_TEXT_EN = (
     "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's terms of contract "
-    "and cancellation on the 'My bookings' page: https://fake.varaamo.hel.fi/en/reservations."
+    "and cancellation on the 'My bookings' (https://fake.varaamo.hel.fi/en/reservations) page."
 )
 MANAGE_RESERVATIONS_LINK_HTML_EN = (
     "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's terms of contract "
-    "and cancellation on the ['My bookings' page](https://fake.varaamo.hel.fi/en/reservations)."
+    "and cancellation on the ['My bookings'](https://fake.varaamo.hel.fi/en/reservations) page."
 )
 
 EMAIL_CLOSING_TEXT_EN = """Kind regards

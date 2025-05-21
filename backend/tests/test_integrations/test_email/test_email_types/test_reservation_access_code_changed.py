@@ -64,6 +64,7 @@ LANGUAGE_CONTEXT = {
     "en": {
         "title": "The door code of your booking has changed",
         "text_reservation_modified": "The door code of your booking has changed",
+        "text_reservation_modified_html": "The door code of your booking has changed",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **RESERVATION_PRICE_INFO_CONTEXT_EN,
@@ -75,6 +76,7 @@ LANGUAGE_CONTEXT = {
     "fi": {
         "title": "Varauksesi ovikoodi on vaihtunut",
         "text_reservation_modified": "Varauksesi ovikoodi on vaihtunut",
+        "text_reservation_modified_html": "Varauksesi ovikoodi on vaihtunut",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
         **RESERVATION_PRICE_INFO_CONTEXT_FI,
@@ -86,6 +88,7 @@ LANGUAGE_CONTEXT = {
     "sv": {
         "title": "Dörrkoden för din bokning har ändrats",
         "text_reservation_modified": "Dörrkoden för din bokning har ändrats",
+        "text_reservation_modified_html": "Dörrkoden för din bokning har ändrats",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
         **RESERVATION_PRICE_INFO_CONTEXT_SV,

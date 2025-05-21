@@ -116,18 +116,21 @@ def get_contex_for_reservation_basic_info(
 
 def get_contex_for_reservation_manage_link(*, language: Lang) -> EmailContext:
     link = get_my_reservations_ext_link(language=language)
-    text = pgettext("Email", "'My bookings' page")
+    text = pgettext("Email", "My bookings")
+    text = f"{text!r}"
 
-    manage_reservation = pgettext(
+    body = pgettext(
         "Email",
         # NOTE: Must format like this so that Django can discover the translation.
         "Manage your booking at Varaamo. You can check the details of your booking and "
-        "Varaamo's terms of contract and cancellation on the %(page)s.",
+        "Varaamo's terms of contract and cancellation on the %(my_bookings)s page.",
     )
+    body_html = body % {"my_bookings": create_anchor_tag(link=link, text=text)}
+    body_text = body % {"my_bookings": f"{text} ({link})"}
 
     return {
-        "manage_reservation_html": manage_reservation % {"page": create_anchor_tag(link=link, text=text)},
-        "manage_reservation": manage_reservation % {"page": f"{text}: {link}"},
+        "manage_reservation_html": body_html,
+        "manage_reservation": body_text,
     }
 
 
@@ -161,16 +164,25 @@ def get_context_for_keyless_entry(
     access_code_validity_period: str,
 ) -> EmailContext:
     my_reservations_link = get_my_reservations_ext_link(language=language)
-    my_reservations_text = pgettext("Email", "'My bookings' page")
+    my_reservations_text = pgettext("Email", "My bookings")
+    my_reservations_text = f"{my_reservations_text!r}"
 
     feedback_link = get_feedback_ext_link(language=language)
     feedback_text = pgettext("Email", "Varaamo customer service")
 
-    unavailable_instructions = pgettext(
+    instructions = pgettext(
         "Email",
-        "You can see the door code on the %(my_reservations)s at Varaamo. "
+        "You can see the door code on the %(my_reservations)s page at Varaamo. "
         "If the code is not visible in your booking details, please contact %(customer_service)s.",
     )
+    instructions_html = instructions % {
+        "my_reservations": create_anchor_tag(link=my_reservations_link, text=my_reservations_text),
+        "customer_service": create_anchor_tag(link=feedback_link, text=feedback_text),
+    }
+    instructions_text = instructions % {
+        "my_reservations": f"{my_reservations_text} ({my_reservations_link})",
+        "customer_service": f"{feedback_text} ({feedback_link})",
+    }
 
     return {
         "access_code_is_used": access_code_is_used,
@@ -182,16 +194,8 @@ def get_context_for_keyless_entry(
         "text_access_code_confirmed": pgettext(
             "Email", "Here are your booking details and the door code for easy access to the space"
         ),
-        "text_access_code_unavailable_instructions_html": unavailable_instructions
-        % {
-            "my_reservations": create_anchor_tag(link=my_reservations_link, text=my_reservations_text),
-            "customer_service": create_anchor_tag(link=feedback_link, text=feedback_text),
-        },
-        "text_access_code_unavailable_instructions": unavailable_instructions
-        % {
-            "my_reservations": f"{my_reservations_link}: {my_reservations_text}",
-            "customer_service": f"{feedback_link}: {feedback_text}",
-        },
+        "text_access_code_unavailable_instructions_html": instructions_html,
+        "text_access_code_unavailable_instructions": instructions_text,
     }
 
 

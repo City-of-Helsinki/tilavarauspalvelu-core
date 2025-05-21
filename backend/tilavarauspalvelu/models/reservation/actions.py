@@ -156,19 +156,26 @@ class ReservationActions:
         end_date = end.date().strftime("%d.%m.%Y")
         end_time = end.time().strftime("%H:%M")
         time_delimiter = pgettext("ICAL", "at")
+
         if language == "sv":
             site_name += "/sv"
         elif language == "en":
             site_name += "/en"
+
         from_ = pgettext("ICAL", "From")
         to_ = pgettext("ICAL", "To")
+
+        text = pgettext("ICAL", "My bookings")
+        text = f"{text!r}"
+        link = f"<a href='{site_name}/reservations'>" + text + "</a>"
+
         footer = pgettext(
             "ICAL",
             # NOTE: Must format like this (not in braces '()' for example) so that translations pick it up.
             "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's "
-            "terms of contract and cancellation on the '%(bookings)s' page.",
+            "terms of contract and cancellation on the %(my_bookings)s page.",
         ) % {
-            "bookings": f"<a href='{site_name}/reservations'>" + pgettext("ICAL", "My bookings") + "</a>",
+            "my_bookings": link,
         }
 
         return (

@@ -3317,19 +3317,20 @@ msgid "at"
 msgstr "klo"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "'My bookings' page"
-msgstr "'Omat Varaukset' -sivulla"
+msgid "My bookings"
+msgstr "Omat Varaukset"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 #, python-format
 msgctxt "Email"
 msgid ""
 "Manage your booking at Varaamo. You can check the details of your booking "
-"and Varaamo's terms of contract and cancellation on the %(page)s."
+"and Varaamo's terms of contract and cancellation on the %(my_bookings)s page."
 msgstr ""
 "Hallitse varaustasi Varaamossa. Voit perua varauksesi ja tarkistaa varauksen "
-"tiedot sekä Varaamon sopimus- ja peruutusehdot %(page)s."
+"tiedot sekä Varaamon sopimus- ja peruutusehdot %(my_bookings)s -sivulla."
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
@@ -3350,11 +3351,12 @@ msgstr "Varaamon asiakaspalveluun"
 #, python-format
 msgctxt "Email"
 msgid ""
-"You can see the door code on the %(my_reservations)s at Varaamo. If the code "
-"is not visible in your booking details, please contact %(customer_service)s."
+"You can see the door code on the %(my_reservations)s page at Varaamo. If the "
+"code is not visible in your booking details, please contact "
+"%(customer_service)s."
 msgstr ""
-"Näet ovikoodin Varaamon %(my_reservations)s. Jos koodi ei ole näkyvissä "
-"varauksesi tiedoissa, ota yhteyttä %(customer_service)s."
+"Näet ovikoodin Varaamon %(my_reservations)s -sivulla. Jos koodi ei ole "
+"näkyvissä varauksesi tiedoissa, ota yhteyttä %(customer_service)s."
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
@@ -3383,9 +3385,19 @@ msgid "You can check your booking details at"
 msgstr "Voit käydä tarkistamassa varauksesi tiedot osoitteessa"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
-msgid "A door code has been added to your booking"
-msgstr "Varaukseesi on lisätty ovikoodi"
+msgid "Access to the space has changed"
+msgstr "Sisäänpääsy tilaan on muuttunut"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+#, python-format
+msgctxt "Email"
+msgid ""
+"You can find the door code in this message and at %(my_reservations)s page "
+"at Varaamo"
+msgstr ""
+"Löydät ovikoodin tästä viestistä sekä %(my_reservations)s -sivulta Varaamossa"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
@@ -3500,11 +3512,6 @@ msgid "My applications"
 msgstr "Omat hakemukset"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
-msgctxt "Email"
-msgid "Access to the space has changed"
-msgstr "Sisäänpääsy tilaan on muuttunut"
-
-#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 #, python-format
 msgctxt "Email"
 msgid ""
@@ -3534,6 +3541,7 @@ msgid "Thank you for your application"
 msgstr "Kiitos hakemuksestasi"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
+#, python-format
 msgctxt "Email"
 msgid ""
 "You can view the result of the processing on the %(my_applications)s page"
@@ -4090,19 +4098,19 @@ msgid "To"
 msgstr "Päättymisaika"
 
 #: tilavarauspalvelu/models/reservation/actions.py
+msgctxt "ICAL"
+msgid "My bookings"
+msgstr "Omat Varaukset"
+
+#: tilavarauspalvelu/models/reservation/actions.py
 #, python-format
 msgctxt "ICAL"
 msgid ""
 "Manage your booking at Varaamo. You can check the details of your booking "
-"and Varaamo's terms of contract and cancellation on the '%(bookings)s' page."
+"and Varaamo's terms of contract and cancellation on the %(my_bookings)s page."
 msgstr ""
 "Hallitse varaustasi Varaamossa. Voit perua varauksesi ja tarkistaa varauksen "
-"tiedot sekä Varaamon sopimus- ja peruutusehdot '%(bookings)s' -sivulla."
-
-#: tilavarauspalvelu/models/reservation/actions.py
-msgctxt "ICAL"
-msgid "My bookings"
-msgstr "Omat Varaukset"
+"tiedot sekä Varaamon sopimus- ja peruutusehdot %(my_bookings)s -sivulla."
 
 #: tilavarauspalvelu/models/reservation/model.py
 msgid "reservation"

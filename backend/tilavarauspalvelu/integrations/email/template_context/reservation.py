@@ -65,14 +65,23 @@ def get_context_for_reservation_access_code_added(
     **data: Unpack[ReservationAccessCodeAddedContext],
 ) -> Annotated[EmailContext, EmailType.RESERVATION_ACCESS_CODE_ADDED]:
     if reservation is not None:
-        context = get_context_for_reservation_rescheduled(reservation=reservation, language=language)
+        context = get_context_for_reservation_access_code_changed(reservation=reservation, language=language)
     else:
-        context = get_context_for_reservation_rescheduled(**data, language=language)
+        context = get_context_for_reservation_access_code_changed(**data, language=language)
 
-    title = pgettext("Email", "A door code has been added to your booking")
+    title = pgettext("Email", "Access to the space has changed")
+
+    text = pgettext("Email", "My bookings")
+    text = f"{text!r}"
+    link = get_my_reservations_ext_link(language=language)
+
+    body = pgettext("Email", "You can find the door code in this message and at %(my_reservations)s page at Varaamo")
+    body_html = body % {"my_reservations": create_anchor_tag(link=link, text=text)}
+    body_text = body % {"my_reservations": f"{text} ({link})"}
 
     context["title"] = title
-    context["text_reservation_modified"] = title
+    context["text_reservation_modified_html"] = f"{title}. {body_html}."
+    context["text_reservation_modified"] = f"{title}. {body_text}."
 
     return context
 
@@ -92,6 +101,7 @@ def get_context_for_reservation_access_code_changed(
     title = pgettext("Email", "The door code of your booking has changed")
 
     context["title"] = title
+    context["text_reservation_modified_html"] = title
     context["text_reservation_modified"] = title
 
     return context
