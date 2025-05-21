@@ -113,14 +113,17 @@ class ReservationCreateSerializer(NestingModelSerializer):
         try:
             prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session=request.session)
         except ExternalServiceError:
-            return
+            prefill_info = None
         except Exception as error:  # noqa: BLE001
             msg = "Unexpected error reading profile data"
             SentryLogger.log_exception(error, details=msg, user=user.pk)
             return
 
-        if prefill_info is not None:
-            data.update({key: value for key, value in prefill_info.items() if value is not None})
+        # Primarily use the prefill info directly from the profile, but if it is not available,
+        # use the prefill info stored in the session.
+        reservation_prefill_info = prefill_info or request.session.get("reservation_prefill_info")
+        if reservation_prefill_info is not None:
+            data.update({key: value for key, value in reservation_prefill_info.items() if value is not None})
 
     def create(self, validated_data: ReservationCreateData) -> Reservation:
         with transaction.atomic():
