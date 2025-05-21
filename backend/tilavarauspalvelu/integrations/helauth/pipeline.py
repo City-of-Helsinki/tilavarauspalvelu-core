@@ -8,6 +8,7 @@ from django.db.models.functions import Concat
 
 from tilavarauspalvelu.dataclasses import IDToken
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.helsinki_profile.typing import ReservationPrefillInfo
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Application, GeneralRole, RecurringReservation, Reservation, UnitRole, User
 
@@ -31,7 +32,7 @@ def fetch_additional_info_for_user_from_helsinki_profile(**kwargs: Unpack[Pipeli
         return {"user": user}
 
     id_token = IDToken.from_string(response["id_token"])
-    if id_token is not None and not id_token.is_ad_login and not user.profile_id:
+    if id_token is not None and not id_token.is_ad_login:
         update_user_from_profile(request, user=user)
 
     return {"user": user}
@@ -58,21 +59,30 @@ def update_user_from_profile(request: WSGIRequest, *, user: User | None = None) 
         return
 
     with use_request_user(request=request, user=user):
-        birthday_info = HelsinkiProfileClient.get_birthday_info(user=request.user, session=request.session)
+        after_login_additional_info = HelsinkiProfileClient.get_after_login_additional_info(
+            user=request.user, session=request.session
+        )
 
-    if birthday_info is None:
+    if after_login_additional_info is None:
         SentryLogger.log_message(
             "Helsinki profile: Could not fetch JWT from Tunnistamo.",
             details={"user_id": str(user.pk)},
         )
         return
 
-    if birthday_info["id"] is not None:
-        user.profile_id = birthday_info["id"]
-    if birthday_info["birthday"] is not None:
-        user.date_of_birth = birthday_info["birthday"]
+    # Update the user only if it's missing profile info
+    if not user.profile_id or user.date_of_birth:
+        if after_login_additional_info["id"] is not None:
+            user.profile_id = after_login_additional_info["id"]
+        if after_login_additional_info["birthday"] is not None:
+            user.date_of_birth = after_login_additional_info["birthday"]
+        user.save()
 
-    user.save()
+    # Extract only the prefill info from the response and store it in the session
+    request.session["reservation_prefill_info"] = ReservationPrefillInfo(**{
+        k: after_login_additional_info[k]  # type: ignore
+        for k in list(ReservationPrefillInfo.__annotations__)
+    })
 
 
 def migrate_user_from_tunnistamo_to_keycloak(**kwargs: Unpack[PipelineArgs]) -> dict[str, Any]:
