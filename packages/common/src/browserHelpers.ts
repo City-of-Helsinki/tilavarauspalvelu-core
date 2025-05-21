@@ -31,6 +31,9 @@ function removeTrailingSlash(url: string): string {
   return url.endsWith("/") ? url.slice(0, -1) : url;
 }
 
+export const isTouchDevice = (): boolean =>
+  isBrowser && window?.matchMedia("(any-hover: none)").matches;
+
 /// Sign the user out and redirect to route /auth/logout/ after the session is destroyed
 /// Thows if called on the server
 /// @param apiBaseUrl - base url for api
