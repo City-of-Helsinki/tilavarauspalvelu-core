@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.integrations.helauth.typing import RefreshResponse, TokenResponse
     from tilavarauspalvelu.typing import AnyUser, SessionMapping
 
-    from .typing import BirthdayInfo, ProfileData, ReservationPrefillInfo, UserProfileInfo
+    from .typing import AfterLoginAdditionalInfo, ProfileData, ReservationPrefillInfo, UserProfileInfo
 
 
 __all__ = [
@@ -51,12 +51,14 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         return ProfileDataParser(my_profile_data).parse_reservation_prefill_data()
 
     @classmethod
-    def get_birthday_info(cls, *, user: AnyUser, session: SessionMapping) -> BirthdayInfo | None:
-        """Fetch profile ID and birthday for the request user from Helsinki profile."""
-        my_profile_data = cls.graphql_request(user=user, session=session, query=cls.social_security_number_query)
+    def get_after_login_additional_info(
+        cls, *, user: AnyUser, session: SessionMapping
+    ) -> AfterLoginAdditionalInfo | None:
+        """Fetch profile ID, birthday and reservation prefill info for the request user from Helsinki profile."""
+        my_profile_data = cls.graphql_request(user=user, session=session, query=cls.after_login_additional_info_query)
         if my_profile_data is None:
             return None
-        return ProfileDataParser(my_profile_data).parse_birthday_info()
+        return ProfileDataParser(my_profile_data).after_login_additional_info()
 
     @classmethod
     def get_user_profile_info(
@@ -232,17 +234,33 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         )
 
     @classproperty
-    def social_security_number_query(cls) -> str:
-        return """
+    def after_login_additional_info_query(cls) -> str:
+        """In addition to reservation prefill info, query the profile ID."""
+        return (
+            """
             query {
                 myProfile {
                     id
-                    verifiedPersonalInformation {
-                        nationalIdentificationNumber
-                    }
+                    firstName
+                    lastName
+                    ...PrimaryEmail
+                    ...PrimaryPhone
+                    ...PrimaryAddress
+                    ...Emails
+                    ...Phones
+                    ...Addresses
+                    ...VerifiedPersonalInformation
                 }
             }
-        """
+            """
+            + cls._primary_email_fragment
+            + cls._primary_phone_fragment
+            + cls._primary_address_fragment
+            + cls._emails_fragment
+            + cls._phones_fragment
+            + cls._addresses_fragment
+            + cls._verified_info_fragment
+        )
 
     @classmethod
     def user_profile_data(cls, *, profile_id: str, fields: list[str]) -> str:
