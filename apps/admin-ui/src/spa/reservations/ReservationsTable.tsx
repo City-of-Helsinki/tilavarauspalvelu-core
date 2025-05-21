@@ -81,6 +81,7 @@ const getPaymentStatusLabelType = (
     case OrderStatus.PaidManually:
     case OrderStatus.PaidByInvoice:
     case OrderStatus.Draft:
+    case OrderStatus.Pending:
       return "alert";
     case OrderStatus.Cancelled:
     default:
@@ -176,7 +177,7 @@ export function ReservationsTable({
   sortChanged: onSortChanged,
   isLoading,
   reservations,
-}: Props): JSX.Element {
+}: Readonly<Props>): JSX.Element {
   const { t } = useTranslation();
 
   const cols = memoize(() => getColConfig(t))();
