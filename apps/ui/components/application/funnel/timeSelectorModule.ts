@@ -1,5 +1,13 @@
-import { type CellType, type SuitableTimeRangeFormValues } from "./form";
-import { type ApplicationRoundTimeSlotNode, Priority } from "@/gql/gql-types";
+import { type SuitableTimeRangeFormValues } from "./form";
+import {
+  type ApplicationRoundTimeSlotNode,
+  Priority,
+  SuitableTimeFragment,
+} from "@/gql/gql-types";
+import {
+  type Cell,
+  type CellState,
+} from "common/src/components/ApplicationTimeSelector";
 import { convertWeekday, Day, transformWeekday } from "common/src/conversion";
 import {
   filterNonNullable,
@@ -7,33 +15,28 @@ import {
   timeToMinutes,
 } from "common/src/helpers";
 
-export type Cell = {
-  hour: number;
-  label: string;
-  state: CellType;
-  key: string;
-};
+export type DailyOpeningHours = Readonly<
+  Pick<ApplicationRoundTimeSlotNode, "weekday" | "closed" | "reservableTimes">[]
+>;
 
-type Timespan = {
-  begin: number;
-  end: number;
-  priority: CellType;
-};
+type SchedulesT = Omit<SuitableTimeFragment, "pk" | "id">;
+
+type DayCells = Readonly<Cell[]>;
+type WeekCells = Readonly<DayCells[]>;
 
 export function aesToCells(
-  schedule: Readonly<SuitableTimeRangeFormValues[]>,
+  schedule: Readonly<SchedulesT[]>,
   openingHours: DailyOpeningHours
-): Cell[][] {
+): WeekCells {
   const firstSlotStart = 7;
   const lastSlotStart = 23;
 
   const cells: Cell[][] = [];
 
-  for (let day = 0; day < 7; day += 1) {
+  const days = [0, 1, 2, 3, 4, 5, 6] as const;
+  for (const day of days) {
     const cell: Cell[] = [];
-    const dayOpeningHours = filterNonNullable(
-      getOpeningHours(day, openingHours)
-    ).map((t) => {
+    const dayOpeningHours = getOpeningHours(day, openingHours).map((t) => {
       const beginMins = timeToMinutes(t.begin);
       const endMins = timeToMinutes(t.end);
       return {
@@ -47,10 +50,10 @@ export function aesToCells(
         (t) => t.begin != null && t.end != null && t?.begin <= i && t?.end > i
       );
       cell.push({
-        key: `${day}-${i}`,
+        day,
         hour: i,
-        label: cellLabel(i),
-        state: isAvailable ? "open" : "unavailable",
+        state: "none",
+        openState: isAvailable ? "open" : "unavailable",
       });
     }
     cells.push(cell);
@@ -73,40 +76,32 @@ export function aesToCells(
   return cells;
 }
 
-export type DailyOpeningHours = Readonly<
-  Pick<ApplicationRoundTimeSlotNode, "weekday" | "closed" | "reservableTimes">[]
->;
+type OpeningHourPeriod = {
+  begin: string;
+  end: string;
+};
 
 function getOpeningHours(
   day: number,
   openingHours?: DailyOpeningHours
-): Readonly<OpeningHourPeriod[]> | null {
+): Readonly<OpeningHourPeriod[]> {
   if (!openingHours) {
-    return null;
+    return [];
   }
   const dayOpeningHours = openingHours.find((oh) => oh.weekday === day);
   if (!dayOpeningHours) {
-    return null;
+    return [];
   }
   if (dayOpeningHours.closed) {
-    return null;
+    return [];
   }
-  return dayOpeningHours.reservableTimes ?? null;
-}
-
-type OpeningHourPeriod = {
-  begin: string;
-  end: string;
-} | null;
-
-function cellLabel(row: number): string {
-  return `${row} - ${row + 1}`;
+  return filterNonNullable(dayOpeningHours.reservableTimes);
 }
 
 export function covertCellsToTimeRange(
-  cells: Cell[][]
+  cells: WeekCells
 ): SuitableTimeRangeFormValues[] {
-  return cellsToApplicationEventSchedules(cells).map((aes) => {
+  return cellsToSections(cells).map((aes) => {
     const { day, begin, end, priority } = aes;
     return {
       beginTime: formatTimeStruct({ hour: begin, minute: 0 }),
@@ -117,11 +112,7 @@ export function covertCellsToTimeRange(
   });
 }
 
-export function isSelected(cellType: CellType): boolean {
-  return cellType === "primary" || cellType === "secondary";
-}
-
-function transformCellType(cellType: CellType): Priority {
+function transformCellType(cellType: CellState): Priority {
   switch (cellType) {
     case "primary":
       return Priority.Primary;
@@ -132,21 +123,16 @@ function transformCellType(cellType: CellType): Priority {
   }
 }
 
-type AesType = {
-  day: Day;
+export type TimeSpan = {
   begin: number;
   end: number;
-  priority: CellType;
+  priority: CellState;
 };
+interface AesType extends TimeSpan {
+  day: Day;
+}
 
-function combineTimespans(
-  prev: Timespan[],
-  current: {
-    begin: number;
-    end: number;
-    priority: CellType;
-  }
-): Timespan[] {
+function combineTimespans(prev: TimeSpan[], current: TimeSpan): TimeSpan[] {
   if (!prev.length) {
     return [current];
   }
@@ -170,7 +156,7 @@ function combineTimespans(
   return [...prev, current];
 }
 
-function cellsToApplicationEventSchedules(cells: Cell[][]): AesType[] {
+function cellsToSections(cells: WeekCells): AesType[] {
   const daySchedules: AesType[] = [];
   if (cells.length > 7) {
     throw new Error("Too many days");
@@ -179,17 +165,19 @@ function cellsToApplicationEventSchedules(cells: Cell[][]): AesType[] {
   for (const day of range) {
     const dayCells = cells[day] ?? [];
     const transformedDayCells = dayCells
-      .filter((cell) => cell.state !== "unavailable" && cell.state !== "open")
+      .filter((cell) => cell.state !== "none")
       .map((cell) => ({
         begin: cell.hour,
         end: cell.hour + 1,
         priority: cell.state,
       }))
-      .reduce<Timespan[]>(combineTimespans, [])
-      .map((span) => ({
+      .reduce<TimeSpan[]>(combineTimespans, [])
+      .map(({ end, ...span }) => ({
         ...span,
+        end: end % 24,
         day,
       }));
+
     daySchedules.push(...transformedDayCells);
   }
   return daySchedules;

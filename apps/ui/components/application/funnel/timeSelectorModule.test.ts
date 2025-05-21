@@ -1,33 +1,34 @@
 import { expect, describe, test } from "vitest";
 import {
   aesToCells,
-  type Cell,
   covertCellsToTimeRange,
+  type TimeSpan,
   type DailyOpeningHours,
 } from "./timeSelectorModule";
-import { type CellType, type SuitableTimeRangeFormValues } from "./form";
+import { type SuitableTimeRangeFormValues } from "./form";
 import { Priority, Weekday } from "@/gql/gql-types";
+import {
+  type Cell,
+} from "common/src/components/ApplicationTimeSelector";
+import { type Day } from "common/src/conversion";
 
 function createDayCells(
-  day: number,
-  openRanges?: { begin: number; end: number }[],
-  selectedRange?: { begin: number; end: number; type: CellType }[]
+  day: Day,
+  openRanges: { begin: number; end: number }[] = [] as const,
+  selectedRange: TimeSpan[] = [] as const,
 ): Cell[] {
   const dayStart = 7;
   const dayLength = 24 - 7;
   return Array.from({ length: dayLength }, (_, i) => i + dayStart).map((h) => {
     const selectedRangeType =
       selectedRange?.filter((x) => x.begin <= h && h < x.end) ?? [];
+    const state = selectedRangeType[0]?.priority ?? "none";
+    const openState = openRanges?.some((r) => h >= r.begin && h < r.end);
     return {
-      key: `${day}-${h}`,
+      day,
       hour: h,
-      label: `${h} - ${h + 1}`,
-      state:
-        selectedRangeType[0] != null
-          ? selectedRangeType[0].type
-          : openRanges?.some((r) => h >= r.begin && h < r.end)
-            ? "open"
-            : "unavailable",
+      state,
+      openState: openState ? "open" : "unavailable",
     };
   });
 }
@@ -64,7 +65,7 @@ describe("aesToCells", () => {
     expect(res).toHaveLength(7);
     for (const [i, cell] of res.entries()) {
       expect(cell).toHaveLength(17);
-      const expected = createDayCells(i);
+      const expected = createDayCells(i as Day);
       expect(cell).toEqual(expected);
     }
   });
@@ -79,7 +80,7 @@ describe("aesToCells", () => {
         { begin: 8, end: 12 },
         { begin: 13, end: 17 },
       ]),
-      ...Array.from({ length: 6 }, (_, i) => createDayCells(i + 1)),
+      ...Array.from({ length: 6 }, (_, i) => createDayCells((i + 1) as Day)),
     ];
     for (const [i, day] of res.entries()) {
       expect(day).toHaveLength(17);
@@ -93,7 +94,7 @@ describe("aesToCells", () => {
     const res = aesToCells(schedule, openingHours);
     expect(res).toHaveLength(7);
     const expected = Array.from({ length: 7 }, (_, i) =>
-      createDayCells(i, [
+      createDayCells(i as Day, [
         { begin: 8, end: 12 },
         { begin: 13, end: 17 },
       ])
@@ -110,12 +111,12 @@ describe("aesToCells", () => {
     const res = aesToCells(schedule, openingHours);
     expect(res).toHaveLength(7);
     const expected = [
-      ...Array.from({ length: 4 }, (_, i) => createDayCells(i)),
+      ...Array.from({ length: 4 }, (_, i) => createDayCells(i as Day)),
       createDayCells(4, [
         { begin: 8, end: 12 },
         { begin: 13, end: 17 },
       ]),
-      ...Array.from({ length: 2 }, (_, i) => createDayCells(i + 5)),
+      ...Array.from({ length: 2 }, (_, i) => createDayCells((i + 5) as Day)),
     ];
     for (const [i, day] of res.entries()) {
       expect(day).toHaveLength(17);
@@ -137,12 +138,12 @@ describe("aesToCells", () => {
     expect(res).toHaveLength(7);
     const expected = Array.from({ length: 7 }, (_, i) =>
       createDayCells(
-        i,
+        i as Day,
         [
           { begin: 8, end: 12 },
           { begin: 13, end: 17 },
         ],
-        i === 1 ? [{ begin: 8, end: 11, type: "primary" }] : undefined
+        i === 1 ? [{ begin: 8, end: 11, priority: "primary" }] : undefined
       )
     );
     for (const [i, day] of res.entries()) {
@@ -165,12 +166,12 @@ describe("aesToCells", () => {
     expect(res).toHaveLength(7);
     const expected = Array.from({ length: 7 }, (_, i) =>
       createDayCells(
-        i,
+        i as Day,
         [
           { begin: 8, end: 12 },
           { begin: 13, end: 17 },
         ],
-        i === 1 ? [{ begin: 18, end: 22, type: "primary" }] : undefined
+        i === 1 ? [{ begin: 18, end: 22, priority: "primary" }] : undefined
       )
     );
     for (const [i, day] of res.entries()) {
@@ -202,7 +203,7 @@ describe("covertCellsToTimeRange", () => {
 
   test("primary contiguous selection", () => {
     const cells: Cell[][] = [
-      createDayCells(0, [], [{ begin: 8, end: 12, type: "primary" }]),
+      createDayCells(0, [], [{ begin: 8, end: 12, priority: "primary" }]),
     ];
     const res = covertCellsToTimeRange(cells);
     const expected: SuitableTimeRangeFormValues[] = [
@@ -222,8 +223,8 @@ describe("covertCellsToTimeRange", () => {
         0,
         [],
         [
-          { begin: 8, end: 9, type: "primary" },
-          { begin: 11, end: 12, type: "primary" },
+          { begin: 8, end: 9, priority: "primary" },
+          { begin: 11, end: 12, priority: "primary" },
         ]
       ),
     ];
@@ -249,7 +250,7 @@ describe("covertCellsToTimeRange", () => {
 
   test("secondary selection", () => {
     const cells: Cell[][] = [
-      createDayCells(0, [], [{ begin: 8, end: 12, type: "secondary" }]),
+      createDayCells(0, [], [{ begin: 8, end: 12, priority: "secondary" }]),
     ];
     const res = covertCellsToTimeRange(cells);
     const expected: SuitableTimeRangeFormValues[] = [
@@ -269,8 +270,8 @@ describe("covertCellsToTimeRange", () => {
         0,
         [],
         [
-          { begin: 8, end: 10, type: "primary" },
-          { begin: 10, end: 12, type: "secondary" },
+          { begin: 8, end: 10, priority: "primary" },
+          { begin: 10, end: 12, priority: "secondary" },
         ]
       ),
     ];
@@ -287,6 +288,40 @@ describe("covertCellsToTimeRange", () => {
         endTime: "12:00",
         dayOfTheWeek: Weekday.Monday,
         priority: Priority.Secondary,
+      },
+    ] as const;
+    expect(res).toEqual(expected);
+  });
+
+  test("24:00 should be converted to 0:00", () => {
+    const cells: Cell[][] = [
+      createDayCells(0, [], [{ begin: 23, end: 24, priority: "secondary" }]),
+    ];
+    const res = covertCellsToTimeRange(cells);
+    const expected: SuitableTimeRangeFormValues[] = [
+      {
+        beginTime: "23:00",
+        endTime: "00:00",
+        dayOfTheWeek: Weekday.Monday,
+        priority: Priority.Secondary,
+      },
+    ] as const;
+    expect(res).toEqual(expected);
+  });
+
+  // NOTE implicit expectation that the first selectable slot is 7:00
+  // the UI calendar only shows 7 - 24 so it's limitation has bled into logic
+  test("full day range -> 07:00 - 0:00", () => {
+    const cells: Cell[][] = [
+      createDayCells(0, [], [{ begin: 0, end: 24, priority: "primary" }]),
+    ];
+    const res = covertCellsToTimeRange(cells);
+    const expected: SuitableTimeRangeFormValues[] = [
+      {
+        beginTime: "07:00",
+        endTime: "00:00",
+        dayOfTheWeek: Weekday.Monday,
+        priority: Priority.Primary,
       },
     ] as const;
     expect(res).toEqual(expected);
