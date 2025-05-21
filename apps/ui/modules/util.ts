@@ -56,9 +56,6 @@ export function getParameterLabel(
   return "no label";
 }
 
-export const isTouchDevice = (): boolean =>
-  isBrowser && window?.matchMedia("(any-hover: none)").matches;
-
 export function getPostLoginUrl(
   params: Readonly<URLSearchParams> = new ReadonlyURLSearchParams()
 ): string | undefined {
