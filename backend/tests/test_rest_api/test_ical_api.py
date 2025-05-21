@@ -73,7 +73,7 @@ def test_reservation_ical(api_client, settings):
         "<p>"
         "Manage your booking at Varaamo. You can check the details of your booking and "
         "Varaamo's terms of contract and cancellation on the "
-        "'<a href='https://fake.varaamo.hel.fi/reservations'>My bookings</a>' page."
+        "'<a href='https://fake.varaamo.hel.fi/reservations'>'My bookings'</a>' page."
         "</p>"
         "</body>"
         "</html>"

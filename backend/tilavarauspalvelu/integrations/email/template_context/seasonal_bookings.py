@@ -65,10 +65,19 @@ def get_context_for_seasonal_booking_access_code_added(
     else:
         context = get_context_for_seasonal_booking_access_code_changed(**data, language=language)
 
-    title = pgettext("Email", "A door code has been added to your seasonal booking")
+    title = pgettext("Email", "Access to the space has changed")
+
+    link = get_my_applications_ext_link(language=language)
+    text = pgettext("Email", "My applications")
+    text = f"{text!r}"
+
+    body = pgettext("Email", "You can find the door code in this message and at %(my_applications)s page at Varaamo")
+    body_html = body % {"my_applications": create_anchor_tag(link=link, text=text)}
+    body_text = body % {"my_applications": f"{text} ({link})"}
 
     context["title"] = title
-    context["text_reservation_modified"] = title
+    context["text_reservation_modified_html"] = f"{title}. {body_html}."
+    context["text_reservation_modified"] = f"{title}. {body_text}."
 
     return context
 
@@ -94,6 +103,7 @@ def get_context_for_seasonal_booking_access_code_changed(
     title = pgettext("Email", "The door code of your booking has changed")
     return {
         "title": title,
+        "text_reservation_modified_html": title,
         "text_reservation_modified": title,
         "application_section_name": data["application_section_name"],
         "application_round_name": data["application_round_name"],
@@ -119,18 +129,20 @@ def get_context_for_seasonal_booking_application_received(
     language: Lang,
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_APPLICATION_RECEIVED]:
     link = get_my_applications_ext_link(language=language)
-    text = pgettext("Email", "'My applications' page")
+    text = pgettext("Email", "My applications")
 
-    text_view_application = pgettext(
+    body = pgettext(
         "Email",
-        "You can edit your application on the %(page)s until the application deadline",
+        "You can edit your application on the %(my_applications)s page until the application deadline",
     )
+    body_html = body % {"my_applications": create_anchor_tag(link=link, text=f"{text!r}")}
+    body_text = body % {"my_applications": f"{text!r}"} + f": {link}"
 
     return {
         "title": pgettext("Email", "Your application has been received"),
         "text_application_received": pgettext("Email", "Thank you for your application"),
-        "text_view_application_html": text_view_application % {"page": create_anchor_tag(link=link, text=text)},
-        "text_view_application": text_view_application % {"page": text} + f": {link}",
+        "text_view_application_html": body_html,
+        "text_view_application": body_text,
         **get_context_for_translations(language=language, email_recipient_name=None),
     }
 
@@ -141,15 +153,17 @@ def get_context_for_seasonal_booking_application_round_handled(
     language: Lang,
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_HANDLED]:
     link = get_my_applications_ext_link(language=language)
-    text = pgettext("Email", "'My applications' page")
+    text = pgettext("Email", "My applications")
 
-    text_view_application = pgettext("Email", "You can view the result of the processing on the %(page)s")
+    body = pgettext("Email", "You can view the result of the processing on the %(my_applications)s page")
+    body_html = body % {"my_applications": create_anchor_tag(link=link, text=f"{text!r}")}
+    body_text = body % {"my_applications": f"{text!r}"} + f": {link}"
 
     return {
         "title": pgettext("Email", "Your application has been processed"),
         "text_application_handled": pgettext("Email", "Your application has been processed"),
-        "text_view_application_html": text_view_application % {"page": create_anchor_tag(link=link, text=text)},
-        "text_view_application": text_view_application % {"page": f"{text}: {link}"},
+        "text_view_application_html": body_html,
+        "text_view_application": body_text,
         **get_context_for_translations(language=language, email_recipient_name=None),
     }
 
@@ -160,9 +174,11 @@ def get_context_for_seasonal_booking_application_round_in_allocation(
     language: Lang,
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_IN_ALLOCATION]:
     link = get_my_applications_ext_link(language=language)
-    text = pgettext("Email", "'My applications' page")
+    text = pgettext("Email", "My applications")
 
-    text_view_application = pgettext("Email", "You can view the application you have sent on the %(page)s")
+    body = pgettext("Email", "You can view the application you have sent on the %(my_applications)s page")
+    body_html = body % {"my_applications": create_anchor_tag(link=link, text=f"{text!r}")}
+    body_text = body % {"my_applications": f"{text!r}"} + f": {link}"
 
     return {
         "title": pgettext("Email", "Your application is being processed"),
@@ -172,8 +188,8 @@ def get_context_for_seasonal_booking_application_round_in_allocation(
             "The application deadline has passed. "
             "We will notify you of the result when your application has been processed.",
         ),
-        "text_view_application_html": text_view_application % {"page": create_anchor_tag(link=link, text=text)},
-        "text_view_application": text_view_application % {"page": f"{text}: {link}"},
+        "text_view_application_html": body_html,
+        "text_view_application": body_text,
         **get_context_for_translations(language=language, email_recipient_name=None),
     }
 

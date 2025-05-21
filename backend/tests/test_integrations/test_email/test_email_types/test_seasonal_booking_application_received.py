@@ -46,7 +46,7 @@ LANGUAGE_CONTEXT = {
         "text_view_application_html": (
             "You can edit your application on the "
             '<a href="https://fake.varaamo.hel.fi/en/applications">'
-            "'My applications' page</a> until the application deadline"
+            "'My applications'</a> page until the application deadline"
         ),
         "title": "Your application has been received",
         **BASE_TEMPLATE_CONTEXT_EN,
@@ -61,7 +61,7 @@ LANGUAGE_CONTEXT = {
         "text_view_application_html": (
             "Voit muokata hakemustasi "
             '<a href="https://fake.varaamo.hel.fi/applications">'
-            "'Omat hakemukset' -sivulla</a> hakuajan päättymiseen asti"
+            "'Omat hakemukset'</a> -sivulla hakuajan päättymiseen asti"
         ),
         "title": "Hakemuksesi on vastaanotettu",
         **BASE_TEMPLATE_CONTEXT_FI,
@@ -70,13 +70,13 @@ LANGUAGE_CONTEXT = {
         "email_recipient_name": None,
         "text_application_received": "Tack för din ansökan",
         "text_view_application": (
-            "Du kan redigera din ansökan på sidan 'Mina ansökningar' till och med ansökningstidens utgång: "
+            "Du kan redigera din ansökan på sidan 'Egna ansökningar' till och med ansökningstidens utgång: "
             "https://fake.varaamo.hel.fi/sv/applications"
         ),
         "text_view_application_html": (
             "Du kan redigera din ansökan på sidan "
             '<a href="https://fake.varaamo.hel.fi/sv/applications">'
-            "'Mina ansökningar'</a> till och med ansökningstidens utgång"
+            "'Egna ansökningar'</a> till och med ansökningstidens utgång"
         ),
         "title": "Din ansökan har mottagits",
         **BASE_TEMPLATE_CONTEXT_SV,
@@ -151,7 +151,7 @@ def test_seasonal_booking_application_received_email__render__html():
 
         Thank you for your application.
 
-        You can edit your application on the ['My applications' page]({link}) until the application deadline.
+        You can edit your application on the ['My applications']({link}) page until the application deadline.
 
         Thank you for choosing Varaamo!
         {EMAIL_CLOSING_HTML_EN}

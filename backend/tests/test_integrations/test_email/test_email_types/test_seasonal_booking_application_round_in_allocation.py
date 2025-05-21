@@ -51,7 +51,7 @@ LANGUAGE_CONTEXT = {
         "text_view_application_html": (
             "You can view the application you have sent on the "
             '<a href="https://fake.varaamo.hel.fi/en/applications">'
-            "'My applications' page</a>"
+            "'My applications'</a> page"
         ),
         "title": "Your application is being processed",
         **BASE_TEMPLATE_CONTEXT_EN,
@@ -68,7 +68,7 @@ LANGUAGE_CONTEXT = {
         "text_view_application_html": (
             "Voit tarkastella lähettämääsi hakemusta "
             '<a href="https://fake.varaamo.hel.fi/applications">'
-            "'Omat hakemukset' -sivulla</a>"
+            "'Omat hakemukset'</a> -sivulla"
         ),
         "title": "Hakemustasi käsitellään",
         **BASE_TEMPLATE_CONTEXT_FI,
@@ -79,13 +79,13 @@ LANGUAGE_CONTEXT = {
             "Ansökningstiden har löpt ut. Vi skickar ett meddelande till e-postadressen när din ansökan har behandlats."
         ),
         "text_view_application": (
-            "Du kan se den ansökan du har skickat på sidan 'Mina ansökningar': "
+            "Du kan se den ansökan du har skickat på sidan 'Egna ansökningar': "
             "https://fake.varaamo.hel.fi/sv/applications"
         ),
         "text_view_application_html": (
             "Du kan se den ansökan du har skickat på sidan "
             '<a href="https://fake.varaamo.hel.fi/sv/applications">'
-            "'Mina ansökningar'</a>"
+            "'Egna ansökningar'</a>"
         ),
         "title": "Din ansökan behandlas",
         **BASE_TEMPLATE_CONTEXT_SV,
@@ -160,7 +160,7 @@ def test_seasonal_booking_application_round_in_allocation_email__render__html():
 
         The application deadline has passed. We will notify you of the result when your application has been processed.
 
-        You can view the application you have sent on the ['My applications' page]({link}).
+        You can view the application you have sent on the ['My applications']({link}) page.
 
         Thank you for choosing Varaamo!
         {EMAIL_CLOSING_HTML_EN}

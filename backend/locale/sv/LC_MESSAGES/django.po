@@ -3418,22 +3418,33 @@ msgstr "Din bokning har uppdaterats"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
-msgid "A door code has been added to your seasonal booking"
-msgstr "En dörrkod har lagts till i din säsongsbokning"
+msgid "My applications"
+msgstr "Egna ansökningar"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
-msgid "'My applications' page"
-msgstr "'Mina ansökningar'"
+msgid "Access to the space has changed"
+msgstr "Tillgången till utrymmet har ändrats"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 #, python-format
 msgctxt "Email"
 msgid ""
-"You can edit your application on the %(page)s until the application deadline"
+"You can find the door code in this message and at %(my_applications)s page "
+"at Varaamo"
 msgstr ""
-"Du kan redigera din ansökan på sidan %(page)s till och med ansökningstidens "
-"utgång"
+"Du hittar dörrkoden i detta meddelande och på sidan %(my_applications)s på "
+"Varaamo"
+
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
+#, python-format
+msgctxt "Email"
+msgid ""
+"You can edit your application on the %(my_applications)s page until the "
+"application deadline"
+msgstr ""
+"Du kan redigera din ansökan på sidan %(my_applications)s till och med "
+"ansökningstidens utgång"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
@@ -3446,10 +3457,10 @@ msgid "Thank you for your application"
 msgstr "Tack för din ansökan"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
-#, python-format
 msgctxt "Email"
-msgid "You can view the result of the processing on the %(page)s"
-msgstr "Du kan se resultatet av behandlingen på sidan %(page)s"
+msgid ""
+"You can view the result of the processing on the %(my_applications)s page"
+msgstr "Du kan se resultatet av behandlingen på sidan %(my_applications)s"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
@@ -3459,8 +3470,9 @@ msgstr "Din ansökan har behandlats"
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 #, python-format
 msgctxt "Email"
-msgid "You can view the application you have sent on the %(page)s"
-msgstr "Du kan se den ansökan du har skickat på sidan %(page)s"
+msgid ""
+"You can view the application you have sent on the %(my_applications)s page"
+msgstr "Du kan se den ansökan du har skickat på sidan %(my_applications)s"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"

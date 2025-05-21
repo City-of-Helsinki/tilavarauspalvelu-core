@@ -64,6 +64,7 @@ LANGUAGE_CONTEXT = {
     "en": {
         "title": "The door code of your booking has changed",
         "text_reservation_modified": "The door code of your booking has changed",
+        "text_reservation_modified_html": "The door code of your booking has changed",
         "allocations": [
             {
                 "weekday_value": "Monday",
@@ -94,6 +95,7 @@ LANGUAGE_CONTEXT = {
     "fi": {
         "title": "Varauksesi ovikoodi on vaihtunut",
         "text_reservation_modified": "Varauksesi ovikoodi on vaihtunut",
+        "text_reservation_modified_html": "Varauksesi ovikoodi on vaihtunut",
         "allocations": [
             {
                 "weekday_value": "Maanantai",
@@ -124,6 +126,7 @@ LANGUAGE_CONTEXT = {
     "sv": {
         "title": "Dörrkoden för din bokning har ändrats",
         "text_reservation_modified": "Dörrkoden för din bokning har ändrats",
+        "text_reservation_modified_html": "Dörrkoden för din bokning har ändrats",
         "allocations": [
             {
                 "weekday_value": "Måndag",

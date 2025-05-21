@@ -62,8 +62,18 @@ COMMON_CONTEXT = {
 }
 LANGUAGE_CONTEXT = {
     "en": {
-        "title": "A door code has been added to your seasonal booking",
-        "text_reservation_modified": "A door code has been added to your seasonal booking",
+        "title": "Access to the space has changed",
+        "text_reservation_modified": (
+            "Access to the space has changed. "
+            "You can find the door code in this message and at 'My applications' "
+            "(https://fake.varaamo.hel.fi/en/applications) page at Varaamo."
+        ),
+        "text_reservation_modified_html": (
+            "Access to the space has changed. "
+            "You can find the door code in this message and at "
+            '<a href="https://fake.varaamo.hel.fi/en/applications">'
+            "'My applications'</a> page at Varaamo."
+        ),
         "allocations": [
             {
                 "weekday_value": "Monday",
@@ -92,8 +102,18 @@ LANGUAGE_CONTEXT = {
         "access_code_validity_period": "",
     },
     "fi": {
-        "title": "Kausivaraukseesi on lisätty ovikoodi",
-        "text_reservation_modified": "Kausivaraukseesi on lisätty ovikoodi",
+        "title": "Sisäänpääsy tilaan on muuttunut",
+        "text_reservation_modified": (
+            "Sisäänpääsy tilaan on muuttunut. "
+            "Löydät ovikoodin tästä viestistä sekä 'Omat hakemukset' "
+            "(https://fake.varaamo.hel.fi/applications) -sivulta Varaamossa."
+        ),
+        "text_reservation_modified_html": (
+            "Sisäänpääsy tilaan on muuttunut. "
+            "Löydät ovikoodin tästä viestistä sekä "
+            '<a href="https://fake.varaamo.hel.fi/applications">'
+            "'Omat hakemukset'</a> -sivulta Varaamossa."
+        ),
         "allocations": [
             {
                 "weekday_value": "Maanantai",
@@ -122,8 +142,18 @@ LANGUAGE_CONTEXT = {
         "access_code_validity_period": "",
     },
     "sv": {
-        "title": "En dörrkod har lagts till i din säsongsbokning",
-        "text_reservation_modified": "En dörrkod har lagts till i din säsongsbokning",
+        "title": "Tillgången till utrymmet har ändrats",
+        "text_reservation_modified": (
+            "Tillgången till utrymmet har ändrats. "
+            "Du hittar dörrkoden i detta meddelande och på sidan 'Egna ansökningar' "
+            "(https://fake.varaamo.hel.fi/sv/applications) på Varaamo."
+        ),
+        "text_reservation_modified_html": (
+            "Tillgången till utrymmet har ändrats. "
+            "Du hittar dörrkoden i detta meddelande och på sidan "
+            '<a href="https://fake.varaamo.hel.fi/sv/applications">'
+            "'Egna ansökningar'</a> på Varaamo."
+        ),
         "allocations": [
             {
                 "weekday_value": "Måndag",
@@ -271,11 +301,16 @@ def test_seasonal_booking_access_code_added__render__text():
     text_content = text_content.replace("&amp;", "&")
     url = "https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678"
 
+    body = (
+        "Access to the space has changed. You can find the door code in this message and at "
+        "'My applications' (https://fake.varaamo.hel.fi/en/applications) page at Varaamo."
+    )
+
     assert text_content == cleandoc(
         f"""
         Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
-        A door code has been added to your seasonal booking.
+        {body}
 
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
 
@@ -310,13 +345,19 @@ def test_seasonal_booking_access_code_added__render__html():
     text_content = html_email_to_text(html_content)
     url = "https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678"
 
+    body = (
+        "Access to the space has changed. You can find the door code in this message and at "
+        "['My applications'](https://fake.varaamo.hel.fi/en/applications)"
+        " page at Varaamo."
+    )
+
     assert text_content == cleandoc(
         f"""
         {EMAIL_LOGO_HTML}
 
         **Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],**
 
-        A door code has been added to your seasonal booking.
+        {body}
 
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
         Door code: 123456
@@ -381,7 +422,7 @@ def test_seasonal_booking_access_code_added__send_email(outbox):
 
     assert len(outbox) == 1
 
-    assert outbox[0].subject == "A door code has been added to your seasonal booking"
+    assert outbox[0].subject == "Access to the space has changed"
     assert sorted(outbox[0].bcc) == ["contact@email.com", "user@email.com"]
 
 

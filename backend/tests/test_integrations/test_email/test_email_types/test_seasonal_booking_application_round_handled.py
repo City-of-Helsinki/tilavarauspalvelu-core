@@ -48,7 +48,7 @@ LANGUAGE_CONTEXT = {
         "text_view_application_html": (
             "You can view the result of the processing on "
             'the <a href="https://fake.varaamo.hel.fi/en/applications">'
-            "'My applications' page</a>"
+            "'My applications'</a> page"
         ),
         "title": "Your application has been processed",
         **BASE_TEMPLATE_CONTEXT_EN,
@@ -62,7 +62,7 @@ LANGUAGE_CONTEXT = {
         "text_view_application_html": (
             "Näet tiedon käsittelyn tuloksesta "
             '<a href="https://fake.varaamo.hel.fi/applications">'
-            "'Omat hakemukset' -sivulla</a>"
+            "'Omat hakemukset'</a> -sivulla"
         ),
         "title": "Hakemuksesi on käsitelty",
         **BASE_TEMPLATE_CONTEXT_FI,
@@ -71,13 +71,13 @@ LANGUAGE_CONTEXT = {
         "email_recipient_name": None,
         "text_application_handled": "Din ansökan har behandlats",
         "text_view_application": (
-            "Du kan se resultatet av behandlingen på sidan 'Mina ansökningar': "
+            "Du kan se resultatet av behandlingen på sidan 'Egna ansökningar': "
             "https://fake.varaamo.hel.fi/sv/applications"
         ),
         "text_view_application_html": (
             "Du kan se resultatet av behandlingen på sidan "
             '<a href="https://fake.varaamo.hel.fi/sv/applications">'
-            "'Mina ansökningar'</a>"
+            "'Egna ansökningar'</a>"
         ),
         "title": "Din ansökan har behandlats",
         **BASE_TEMPLATE_CONTEXT_SV,
@@ -152,7 +152,7 @@ def test_seasonal_booking_application_round_handled_email__render__html():
 
         Your application has been processed.
 
-        You can view the result of the processing on the ['My applications' page]({link}).
+        You can view the result of the processing on the ['My applications']({link}) page.
 
         Thank you for choosing Varaamo!
         {EMAIL_CLOSING_HTML_EN}

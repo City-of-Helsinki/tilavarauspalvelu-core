@@ -1,7 +1,7 @@
 {% extends "email/html/partials/base.jinja" %}
 
 {% block content_main %}
-    <mj-text>{{ text_reservation_modified | sentence | safe }}</mj-text>
+    <mj-text>{{ text_reservation_modified_html | sentence | safe }}</mj-text>
     {% include "email/html/partials/application_section_name.jinja" %}
     {% include "email/html/partials/access_code_section.jinja" %}
     <mj-spacer />

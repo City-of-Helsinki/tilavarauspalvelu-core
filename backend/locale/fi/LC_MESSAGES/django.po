@@ -3496,20 +3496,32 @@ msgstr "Varaustasi on muutettu"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
-msgid "A door code has been added to your seasonal booking"
-msgstr "Kausivaraukseesi on lisätty ovikoodi"
+msgid "My applications"
+msgstr "Omat hakemukset"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
-msgid "'My applications' page"
-msgstr "'Omat hakemukset' -sivulla"
+msgid "Access to the space has changed"
+msgstr "Sisäänpääsy tilaan on muuttunut"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 #, python-format
 msgctxt "Email"
 msgid ""
-"You can edit your application on the %(page)s until the application deadline"
-msgstr "Voit muokata hakemustasi %(page)s hakuajan päättymiseen asti"
+"You can find the door code in this message and at %(my_applications)s page "
+"at Varaamo"
+msgstr ""
+"Löydät ovikoodin tästä viestistä sekä %(my_applications)s -sivulta Varaamossa"
+
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
+#, python-format
+msgctxt "Email"
+msgid ""
+"You can edit your application on the %(my_applications)s page until the "
+"application deadline"
+msgstr ""
+"Voit muokata hakemustasi %(my_applications)s -sivulla hakuajan päättymiseen "
+"asti"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
@@ -3522,10 +3534,10 @@ msgid "Thank you for your application"
 msgstr "Kiitos hakemuksestasi"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
-#, python-format
 msgctxt "Email"
-msgid "You can view the result of the processing on the %(page)s"
-msgstr "Näet tiedon käsittelyn tuloksesta %(page)s"
+msgid ""
+"You can view the result of the processing on the %(my_applications)s page"
+msgstr "Näet tiedon käsittelyn tuloksesta %(my_applications)s -sivulla"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
@@ -3535,8 +3547,9 @@ msgstr "Hakemuksesi on käsitelty"
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 #, python-format
 msgctxt "Email"
-msgid "You can view the application you have sent on the %(page)s"
-msgstr "Voit tarkastella lähettämääsi hakemusta %(page)s"
+msgid ""
+"You can view the application you have sent on the %(my_applications)s page"
+msgstr "Voit tarkastella lähettämääsi hakemusta %(my_applications)s -sivulla"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
