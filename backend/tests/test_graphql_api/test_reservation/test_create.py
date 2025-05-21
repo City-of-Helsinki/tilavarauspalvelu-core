@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 from decimal import Decimal
-from typing import TYPE_CHECKING, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 import freezegun
 import pytest
@@ -21,6 +21,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
 )
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.helsinki_profile.typing import ReservationPrefillInfo
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -44,6 +45,7 @@ from .helpers import CREATE_MUTATION, get_create_data, mock_profile_reader
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
+    from tilavarauspalvelu.typing import SessionMapping
 
 # Applied to all tests
 pytestmark = [
@@ -915,6 +917,59 @@ def test_reservation__create__prefilled_with_profile_data__api_call_fails(graphq
 
     # External service call raises known exception, so no Sentry logging is done.
     assert SentryLogger.log_exception.call_count == 0
+
+
+@patch_method(HelsinkiProfileClient.request, return_value=ResponseMock(status_code=500, json_data={}))
+@patch_method(SentryLogger.log_exception)
+def test_reservation__create__prefilled_with_profile_data__api_call_fails__use_data_in_session(graphql, settings):
+    # given:
+    # - Prefill setting is on
+    # - There is a reservation unit in the system
+    # - The reservation unit has a reservable time span
+    # - There is a city in the system
+    # - A regular user who has logged in with Suomi.fi is using the system
+    settings.PREFILL_RESERVATION_WITH_PROFILE_DATA = True
+
+    reservation_unit = ReservationUnitFactory.create_reservable_now()
+    city = CityFactory.create(name="Helsinki")
+    user = UserFactory.create(social_auth__extra_data__amr="suomi_fi")
+    graphql.force_login(user)
+
+    # when:
+    # - The user tries to create a reservation, but the helsinki profile call fails.
+    # - The session has prefill data stored
+    def update_session_prefill_info(session: SessionMapping, **kwargs: Any) -> str:
+        """Update the session to include prefill data."""
+        session["reservation_prefill_info"] = ReservationPrefillInfo(
+            reservee_first_name="Example",
+            reservee_last_name="User",
+            reservee_email="user@example.com",
+            reservee_phone="0123456789",
+            reservee_address_street="Example street 1",
+            reservee_address_zip="00100",
+            reservee_address_city="Helsinki",
+            home_city=city,
+        )
+        return "foo"
+
+    data = get_create_data(reservation_unit)
+    with patch_method(HelsinkiProfileClient.get_token, side_effect=update_session_prefill_info):
+        response = graphql(CREATE_MUTATION, input_data=data)
+
+    # then:
+    # - There are no errors in the response
+    # - The reservation was prefilled from the users profile data that was stored in SessionStorage
+    assert response.has_errors is False, response.errors
+
+    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    assert reservation.reservee_first_name == "Example"
+    assert reservation.reservee_last_name == "User"
+    assert reservation.reservee_email == "user@example.com"
+    assert reservation.reservee_phone == "0123456789"
+    assert reservation.reservee_address_street == "Example street 1"
+    assert reservation.reservee_address_zip == "00100"
+    assert reservation.reservee_address_city == "Helsinki"
+    assert reservation.home_city.name == "Helsinki"
 
 
 @pytest.mark.parametrize("arm", ADLoginAMR)
