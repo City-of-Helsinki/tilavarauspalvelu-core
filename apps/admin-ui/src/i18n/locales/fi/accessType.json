@@ -25,7 +25,7 @@
     "change": "Vaihda ovikoodi",
     "changeMultiple": "Vaihda kausivarauksen ovikoodi",
     "changeConfirmation": "Uuden ovikoodin generointi nollaa aiemman ovikoodit. Haluatko varmasti generoida uuden ovikoodin?",
-    "changeMultipleConfirmation": "Ovikoodi vaihtuu myös muille tähän kausivaraukseen liittyville viikkovuoroille. Haluatko varmasti vaihtaa ovikoodin?",
+    "changeConfirmationMultiple": "Ovikoodi vaihtuu myös muille tähän kausivaraukseen liittyville viikkovuoroille. Haluatko varmasti vaihtaa ovikoodin?",
     "changeSuccess": "Ovikoodi vaihdettu",
     "repair": "Korjaa ovikoodi",
     "repairSuccess": "Ovikoodi korjattu",
