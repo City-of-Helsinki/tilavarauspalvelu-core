@@ -16,6 +16,7 @@ import {
   useDeleteImageMutation,
   useReservationUnitEditorParametersQuery,
   useReservationUnitEditQuery,
+  useReservationUnitCreateUnitQuery,
   useUpdateImageMutation,
   useUpdateReservationUnitMutation,
 } from "@gql/gql-types";
@@ -180,8 +181,15 @@ function ReservationUnitEditor({
     },
   });
 
+  // Fetch unit data only when creating a new reservation unit
+  const { data: unitData } = useReservationUnitCreateUnitQuery({
+    variables: { id: base64encode(`UnitNode:${unitPk}`) },
+    fetchPolicy: "network-only",
+    skip: !!reservationUnit?.unit,
+  });
+  const unit = reservationUnit?.unit ?? unitData?.unit;
+
   // ----------------------------- Constants ---------------------------------
-  const unit = reservationUnit?.unit;
 
   const taxPercentageOptions = filterNonNullable(
     parametersData?.taxPercentages?.edges.map((e) => e?.node)
@@ -708,6 +716,17 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
           pk
         }
       }
+    }
+  }
+`;
+
+export const RESERVATION_UNIT_CREATE_UNIT_QUERY = gql`
+  query ReservationUnitCreateUnit($id: ID!) {
+    unit(id: $id) {
+      id
+      pk
+      nameFi
+      ...ReservationUnitEditUnit
     }
   }
 `;

@@ -107,7 +107,8 @@
     "paidManually": "Betalas på plats",
     "cancelled": "Betalning avbokad",
     "expired": "Obetald",
-    "refunded": "Återbetald"
+    "refunded": "Återbetald",
+    "paidByInvoice": "Betalning mot faktura"
   },
   "reservationEditFailed": "Det gick inte att redigera bokningen",
   "backToReservationUnit": "Tillbaka till objektets sida",

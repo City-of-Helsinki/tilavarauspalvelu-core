@@ -1,9 +1,9 @@
 {
   "type": {
     "ACCESS_CODE": "Ovikoodi",
-    "OPENED_BY_STAFF": "Henkilökunnan toimesta",
-    "PHYSICAL_KEY": "Noudettavalla avaimella",
-    "UNRESTRICTED": "Rajoittamaton"
+    "OPENED_BY_STAFF": "Henkilökunta",
+    "PHYSICAL_KEY": "Avain",
+    "UNRESTRICTED": "Suora pääsy"
   },
   "accessCodeState": {
     "ACCESS_CODE_CREATED": "Ovikoodi luotu",
