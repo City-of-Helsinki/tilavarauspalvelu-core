@@ -443,9 +443,11 @@ class PindoraService:
         )
 
         for reservation in reservations:
+            should_be_active = reservation.access_code_should_be_active
+
             try:
                 try:
-                    cls.create_access_code(obj=reservation, is_active=reservation.access_code_should_be_active)
+                    cls.create_access_code(obj=reservation, is_active=should_be_active)
 
                 # If reservation already exists, fetch it and update instead.
                 except PindoraConflictError:
@@ -457,7 +459,7 @@ class PindoraService:
 
                 # User needs to be informed that their reservation now has an access code,
                 # since we previously thought there was no access code.
-                if reservation.access_code_should_be_active:
+                if should_be_active:
                     EmailService.send_reservation_access_code_added_email(reservation=reservation)
 
             except ExternalServiceError as error:
@@ -474,20 +476,20 @@ class PindoraService:
         )
 
         for series in all_series:
-            is_active: bool = series.should_have_active_access_code  # type: ignore[attr-defined]
+            should_be_active = series.should_have_active_access_code
 
             try:
                 try:
-                    cls.create_access_code(obj=series, is_active=is_active)
+                    cls.create_access_code(obj=series, is_active=should_be_active)
 
                 # If series already exists, reschedule and activate/deactivate instead.
                 except PindoraConflictError:
                     response = cls.reschedule_access_code(obj=series)
 
-                    if is_active and not response["access_code_is_active"]:
+                    if should_be_active and not response["access_code_is_active"]:
                         cls.activate_access_code(obj=series)
 
-                    elif not is_active and response["access_code_is_active"]:
+                    elif not should_be_active and response["access_code_is_active"]:
                         cls.deactivate_access_code(obj=series)
 
             except ExternalServiceError as error:
@@ -499,25 +501,25 @@ class PindoraService:
         sections: Iterable[ApplicationSection] = ApplicationSection.objects.requiring_access_code()
 
         for section in sections:
-            is_active: bool = section.should_have_active_access_code  # type: ignore[attr-defined]
+            should_be_active = section.should_have_active_access_code
 
             try:
                 try:
-                    cls.create_access_code(obj=section, is_active=is_active)
+                    cls.create_access_code(obj=section, is_active=should_be_active)
 
                 # If seasonal booking already exists, reschedule and activate/deactivate instead.
                 except PindoraConflictError:
                     response = cls.reschedule_access_code(obj=section)
 
-                    if is_active and not response["access_code_is_active"]:
+                    if should_be_active and not response["access_code_is_active"]:
                         cls.activate_access_code(obj=section)
 
-                    elif not is_active and response["access_code_is_active"]:
+                    elif not should_be_active and response["access_code_is_active"]:
                         cls.deactivate_access_code(obj=section)
 
                     # User needs to be informed that their seasonal booking now has an access code,
                     # since we previously thought there was no access code.
-                    if is_active:
+                    if should_be_active:
                         EmailService.send_seasonal_booking_access_code_added_email(section)
 
             except ExternalServiceError as error:
@@ -530,9 +532,11 @@ class PindoraService:
         )
 
         for reservation in reservations:
+            should_be_active = reservation.access_code_should_be_active
+
             try:
                 try:
-                    if reservation.access_code_should_be_active:
+                    if should_be_active:
                         cls.activate_access_code(obj=reservation)
 
                         # User needs to be informed that their reservation now has an access code,
@@ -561,11 +565,25 @@ class PindoraService:
         )
 
         for series in all_series:
+            should_be_active = series.should_have_active_access_code
+
             try:
                 try:
-                    if series.should_have_active_access_code:
+                    # We need to reschedule the series first, as one reason why the series might have
+                    # reservations with incorrect access code active status is that the access type
+                    # for the reservation units in the series has changed. Usually this means that
+                    # access type changes in the middle of the series to something other than
+                    # access code. This means that the access code is still active, but its no longer
+                    # valid for all reservations in the series. Rescheduling updates the series'
+                    # access code validity periods, fixing the issue.
+                    response = cls.reschedule_access_code(obj=series)
+
+                    # Only activate if was not already active
+                    if should_be_active and not response["access_code_is_active"]:
                         cls.activate_access_code(obj=series)
-                    else:
+
+                    # Only deactivate if was not already inactive
+                    elif not should_be_active and response["access_code_is_active"]:
                         cls.deactivate_access_code(obj=series)
 
                 # If we think an access code has been generated, but it's not found in Pindora,
@@ -581,16 +599,23 @@ class PindoraService:
         sections: Iterable[ApplicationSection] = ApplicationSection.objects.has_incorrect_access_code_is_active()
 
         for section in sections:
+            should_be_active = section.should_have_active_access_code
+
             try:
                 try:
-                    if section.should_have_active_access_code:
+                    # See explanation in '_update_access_code_is_active_for_reservations'
+                    response = cls.reschedule_access_code(obj=section)
+
+                    # Only activate if was not already active
+                    if should_be_active and not response["access_code_is_active"]:
                         cls.activate_access_code(obj=section)
 
                         # User needs to be informed that their seasonal booking now has an access code,
                         # since inactive access codes are not shown to users.
                         EmailService.send_seasonal_booking_access_code_added_email(section)
 
-                    else:
+                    # Only deactivate if was not already inactive
+                    elif not should_be_active and response["access_code_is_active"]:
                         cls.deactivate_access_code(obj=section)
 
                 # If we think an access code has been generated, but it's not found in Pindora,
