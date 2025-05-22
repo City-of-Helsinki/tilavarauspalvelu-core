@@ -107,7 +107,7 @@ describe("Page: SeasonalSearch", () => {
     ).toBeInTheDocument();
     expect(view.getByText("ApplicationRound 1 FI")).toBeInTheDocument();
 
-    await waitForSearchButton(view);
+    await isReady(view);
 
     // list of ten cards
     const cardsSelects = view.getAllByTestId("recurring-card__button--toggle");
@@ -125,7 +125,7 @@ describe("Page: SeasonalSearch", () => {
 
   test("selecting card should set query params", async () => {
     const view = customRender();
-    await waitForSearchButton(view);
+    await isReady(view);
     const user = userEvent.setup();
 
     expect(mockedRouterReplace).not.toHaveBeenCalled();
@@ -156,7 +156,7 @@ describe("Page: SeasonalSearch", () => {
     params.set(SEASONAL_SELECTED_PARAM_KEY, "1");
     mockedSearchParams.mockReturnValue(params);
     const view = customRender();
-    await waitForSearchButton(view);
+    await isReady(view);
     const user = userEvent.setup();
 
     expect(mockedRouterReplace).not.toHaveBeenCalled();
@@ -184,7 +184,7 @@ describe("Page: SeasonalSearch", () => {
     params.set(SEASONAL_SELECTED_PARAM_KEY, "4");
     mockedSearchParams.mockReturnValue(params);
     const view = customRender();
-    await waitForSearchButton(view);
+    await isReady(view);
     const user = userEvent.setup();
 
     expect(mockedRouterReplace).not.toHaveBeenCalled();
@@ -213,7 +213,7 @@ describe("Page: SeasonalSearch", () => {
     params.set(SEASONAL_SELECTED_PARAM_KEY, "1");
     mockedSearchParams.mockReturnValue(params);
     const view = customRender();
-    await waitForSearchButton(view);
+    await isReady(view);
 
     const cardsSelects = view.getAllByTestId("recurring-card__button--toggle");
     expect(cardsSelects).toHaveLength(10);
@@ -225,7 +225,7 @@ describe("Page: SeasonalSearch", () => {
 
   test("no start application bar if not selected", async () => {
     const view = customRender();
-    await waitForSearchButton(view);
+    await isReady(view);
 
     const cardsSelects = view.getAllByTestId("recurring-card__button--toggle");
     expect(cardsSelects).toHaveLength(10);
@@ -240,7 +240,7 @@ describe("Page: SeasonalSearch", () => {
     params.set(SEASONAL_SELECTED_PARAM_KEY, "1");
     mockedSearchParams.mockReturnValue(params);
     const view = customRender({ noUser: true });
-    await waitForSearchButton(view);
+    await isReady(view);
 
     const cardsSelects = view.getAllByTestId("recurring-card__button--toggle");
     expect(cardsSelects).toHaveLength(10);
@@ -255,7 +255,7 @@ describe("Page: SeasonalSearch", () => {
     params.set("textSearch", "foobar");
     mockedSearchParams.mockReturnValue(params);
     const view = customRender();
-    await waitForSearchButton(view);
+    await isReady(view);
     const cardsSelects = view.getAllByTestId("recurring-card__button--toggle");
     expect(cardsSelects).toHaveLength(1);
   });
@@ -266,7 +266,7 @@ describe("Page: SeasonalSearch", () => {
     mockedSearchParams.mockReturnValue(params);
     const user = userEvent.setup();
     const view = customRender();
-    await waitForSearchButton(view);
+    await isReady(view);
 
     const startBtn = view.getByRole("button", {
       name: "shoppingCart:nextShort",
@@ -280,7 +280,7 @@ describe("Page: SeasonalSearch", () => {
 
   test("should show an error if query fails", async () => {
     const view = customRender({ isSearchError: true });
-    await waitForSearchButton(view);
+    await isReady(view);
     expect(
       view.getByRole("heading", { name: "applicationRound:search.title" })
     ).toBeInTheDocument();
@@ -305,10 +305,9 @@ describe("SeasonalSearch Page SSR", () => {
   test.todo("isPostLogin param is ignored for non logged in users");
 });
 
-// If you don't wait for something the mock query is still loading
-// even if you don't need the search button
-// waiting for this is a proxy that the query has finished
-async function waitForSearchButton(
+// Client side query will return loading on first render
+// submit button in this case works as a proxy for the query loading state
+async function isReady(
   view: ReturnType<typeof customRender>
 ): Promise<HTMLElement> {
   const submitBtn = view.getByRole("button", {
