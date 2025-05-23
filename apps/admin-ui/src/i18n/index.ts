@@ -52,7 +52,9 @@ i18n.addResourceBundle("fi", "common", {
   cancel: "Peruuta",
   remove: "Poista",
   scrollToTop: "Siirry ylös",
+  helsinkiCity: ["Helsingin kaupunki"],
 });
+i18n.addResourceBundle("fi", "navigation", { navigation: "Päävalikko" });
 i18n.addResourceBundle("en", "common", {
   day: "Day",
   week: "Week",
