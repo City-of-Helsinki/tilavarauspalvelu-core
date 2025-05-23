@@ -25,6 +25,7 @@ from tests.factories import (
     UnitRoleFactory,
     UserFactory,
 )
+from tests.factories.helsinki_profile import MyProfileDataFactory
 from tests.helpers import ResponseMock, patch_method
 
 from .helpers import mock_request
@@ -56,20 +57,74 @@ class ErrorParams(NamedTuple):
         }
     ),
 )
-def test_update_user_from_profile():
+def test_update_user_from_profile__prefill_info_not_available_in_response():
     # given:
     # - There is a user without profile info
     user = UserFactory.create(profile_id="", date_of_birth=None)
 
     # when:
     # - This user's info is updated from profile
-    update_user_from_profile(mock_request(user))
+    request = mock_request(user)
+    update_user_from_profile(request)
 
     # then:
     # - The user's profile id and date of birth are updated
     user.refresh_from_db()
     assert user.profile_id == "foo"
     assert user.date_of_birth == datetime.date(2001, 1, 1)
+
+    # Session is mocked, so we need to check the set status from the mock call and its arguments
+    session_call = request.session.mock_calls[0].args
+    assert session_call[0] == "reservation_prefill_info"
+    assert session_call[1] == {
+        "home_city": None,
+        "reservee_address_city": None,
+        "reservee_address_street": None,
+        "reservee_address_zip": None,
+        "reservee_email": None,
+        "reservee_first_name": None,
+        "reservee_last_name": None,
+        "reservee_phone": None,
+    }
+
+
+@patch_method(HelsinkiProfileClient.get_token, return_value="foo")
+@patch_method(HelsinkiProfileClient.request)
+def test_update_user_from_profile__store_prefill_info_in_session_storage():
+    # given:
+    # - There is a user without profile info
+    user = UserFactory.create(profile_id="", date_of_birth=None)
+
+    # when:
+    # - This user's info is updated from profile
+    profile_data = MyProfileDataFactory.create_basic(
+        id="foo",
+        verifiedPersonalInformation__nationalIdentificationNumber="010101A1234",
+    )
+    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+
+    request = mock_request(user)
+    update_user_from_profile(request)
+
+    # then:
+    # - The user's profile id and date of birth are updated
+    user.refresh_from_db()
+    assert user.profile_id == "foo"
+    assert user.date_of_birth == datetime.date(2001, 1, 1)
+
+    # Session is mocked, so we need to check the set status from the mock call and its arguments
+    session_call = request.session.mock_calls[0].args
+    assert session_call[0] == "reservation_prefill_info"
+    assert session_call[1] == {
+        "home_city": None,
+        "reservee_address_city": "Helsinki",
+        "reservee_address_street": "Example street 1",
+        "reservee_address_zip": "00100",
+        "reservee_email": "user@example.com",
+        "reservee_first_name": "Example",
+        "reservee_last_name": "User",
+        "reservee_phone": "0123456789",
+    }
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value=None)
