@@ -3,6 +3,7 @@ import { useTranslation } from "next-i18next";
 import { signIn } from "common/src/browserHelpers";
 import { useSession } from "@/hooks/auth";
 import { Button, ButtonSize } from "hds-react";
+import { getLocalizationLang } from "common/src/helpers";
 
 type Props = {
   apiBaseUrl: string;
@@ -18,13 +19,18 @@ export function LoginFragment({
   isActionDisabled,
   returnUrl,
   type,
-}: Props): JSX.Element {
+}: Readonly<Props>): JSX.Element {
   // TODO pass the isAuthenticated from SSR and remove the hook
   const { isAuthenticated } = useSession();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const handleClick = () => {
-    signIn(apiBaseUrl, returnUrl);
+    signIn({
+      apiBaseUrl,
+      language: getLocalizationLang(i18n.language),
+      client: "customer",
+      returnUrl,
+    });
   };
 
   if (isAuthenticated) {

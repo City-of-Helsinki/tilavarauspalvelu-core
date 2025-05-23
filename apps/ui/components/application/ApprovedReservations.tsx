@@ -41,8 +41,8 @@ import {
   getLocalizationLang,
   sort,
   toNumber,
-  type LocalizationLanguages,
 } from "common/src/helpers";
+import type { LocalizationLanguages } from "common/src/urlBuilder";
 import {
   Button,
   ButtonSize,

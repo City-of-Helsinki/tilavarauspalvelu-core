@@ -6,11 +6,8 @@ import {
   fromUIDate,
 } from "common/src/common/util";
 import { isBrowser } from "./const";
-import {
-  formatMinutes,
-  timeToMinutes,
-  type LocalizationLanguages,
-} from "common/src/helpers";
+import { formatMinutes, timeToMinutes } from "common/src/helpers";
+import { type LocalizationLanguages } from "common/src/urlBuilder";
 import { ReadonlyURLSearchParams } from "next/navigation";
 
 export { formatDuration } from "common/src/common/util";

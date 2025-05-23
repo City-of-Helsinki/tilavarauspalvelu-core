@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { isBrowser } from "./helpers";
-import { getSignOutUrl, getSignInUrl } from "./urlBuilder";
+import {
+  getSignOutUrl,
+  getSignInUrl,
+  type LocalizationLanguages,
+  type UserTypeChoice,
+} from "./urlBuilder";
 import { getCookie } from "typescript-cookie";
 
 // TODO add wrapper a that blocks importing on nodejs
@@ -16,15 +21,29 @@ function cleanupUrlParam(url: unknown): string | undefined {
 // Redirect the user to the sign in dialog and return to returnUrl (or
 // current url if none is provided) after sign in
 /// Thows if called on the server
-export function signIn(apiBaseUrl: string, returnUrl?: unknown) {
+export function signIn({
+  apiBaseUrl,
+  language,
+  client,
+  returnUrl,
+}: {
+  apiBaseUrl: string;
+  language: LocalizationLanguages;
+  client: UserTypeChoice;
+  returnUrl?: unknown;
+}) {
   if (!isBrowser) {
     throw new Error("signIn can only be called in the browser");
   }
   const returnUrlParam = cleanupUrlParam(returnUrl);
   // encode otherwise backend will drop the query params
-  const returnTo = encodeURIComponent(returnUrlParam ?? window.location.href);
-  const url = getSignInUrl(apiBaseUrl, returnTo);
-  window.location.href = url;
+  const returnTo = returnUrlParam ?? window.location.href;
+  window.location.href = getSignInUrl({
+    apiBaseUrl,
+    language,
+    callBackUrl: returnTo,
+    client,
+  });
 }
 
 function removeTrailingSlash(url: string): string {
