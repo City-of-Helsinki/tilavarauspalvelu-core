@@ -50,8 +50,7 @@ function ReservationNotification({
   disabled?: boolean;
   isLoading?: boolean;
 }) {
-  const order = reservation.paymentOrder.find(() => true);
-  const startRemainingMinutes = order?.expiresInMinutes;
+  const startRemainingMinutes = reservation.paymentOrder?.expiresInMinutes;
   const [remainingMinutes, setRemainingMinutes] = useState(
     startRemainingMinutes
   );
@@ -175,8 +174,10 @@ export function InProgressReservationNotification() {
   const [deleteReservation, { loading: isDeleteLoading }] =
     useDeleteReservationMutation();
 
-  const order = unpaidReservation?.paymentOrder[0];
-  const checkoutUrl = getCheckoutUrl(order, i18n.language);
+  const checkoutUrl = getCheckoutUrl(
+    unpaidReservation?.paymentOrder,
+    i18n.language
+  );
 
   // Lazy minimal query to check if the reservation is still valid
   const [reservationQ] = useReservationStateLazyQuery({
