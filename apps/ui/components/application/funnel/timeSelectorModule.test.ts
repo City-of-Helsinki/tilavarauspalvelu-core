@@ -7,15 +7,13 @@ import {
 } from "./timeSelectorModule";
 import { type SuitableTimeRangeFormValues } from "./form";
 import { Priority, Weekday } from "@/gql/gql-types";
-import {
-  type Cell,
-} from "common/src/components/ApplicationTimeSelector";
+import { type Cell } from "common/src/components/ApplicationTimeSelector";
 import { type Day } from "common/src/conversion";
 
 function createDayCells(
   day: Day,
   openRanges: { begin: number; end: number }[] = [] as const,
-  selectedRange: TimeSpan[] = [] as const,
+  selectedRange: TimeSpan[] = [] as const
 ): Cell[] {
   const dayStart = 7;
   const dayLength = 24 - 7;
