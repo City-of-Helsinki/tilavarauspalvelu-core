@@ -132,7 +132,8 @@ class ReservationApproveSerializer(NestingModelSerializer):
         return instance
 
     def create_payment_order_if_required(self, validated_data: ReservationApproveData) -> None:
-        state = validated_data["state"]
+        if validated_data["price"] == 0:
+            return
 
         # Delete any non-paid/refunded payment order
         if validated_data["should_delete_previous_payment_order"]:
@@ -147,7 +148,7 @@ class ReservationApproveSerializer(NestingModelSerializer):
         self.instance.price = validated_data["price"]
         self.instance.tax_percentage_value = validated_data["tax_percentage_value"]
 
-        if self.instance.price_net > 0 and state.should_create_payment_order:
+        if self.instance.price_net > 0 and validated_data["state"].should_create_payment_order:
             self.instance.actions.create_payment_order_paid_after_handling(
                 payment_type=validated_data["payment_type"],
                 handled_payment_due_by=validated_data["handled_payment_due_by"],

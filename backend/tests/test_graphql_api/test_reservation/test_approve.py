@@ -26,7 +26,7 @@ pytestmark = [
 
 
 @patch_method(PindoraService.activate_access_code)
-def test_reservation__approve__succeeds(graphql):
+def test_reservation__approve__succeeds__paid(graphql):
     reservation_unit = ReservationUnitFactory.create_paid_on_site()
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
@@ -35,6 +35,27 @@ def test_reservation__approve__succeeds(graphql):
 
     graphql.login_with_superuser()
     data = get_approve_data(reservation)
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+
+    assert PindoraService.activate_access_code.call_count == 0
+
+
+@patch_method(PindoraService.activate_access_code)
+def test_reservation__approve__succeeds__free(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_on_site()
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_units=[reservation_unit],
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation)
+    data["price"] = 0
     response = graphql(APPROVE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
