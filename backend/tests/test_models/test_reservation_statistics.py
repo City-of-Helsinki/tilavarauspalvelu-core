@@ -5,13 +5,12 @@ from decimal import Decimal
 
 import pytest
 
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, Weekday
+from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationCancelReasonChoice, ReservationStateChoice, Weekday
 from tilavarauspalvelu.models import AgeGroup, City, ReservationStatistic
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import (
     RecurringReservationFactory,
-    ReservationCancelReasonFactory,
     ReservationFactory,
     ReservationPurposeFactory,
     ReservationUnitFactory,
@@ -64,21 +63,21 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     assert ReservationStatistic.objects.count() == 1
 
     stat: ReservationStatistic | None = ReservationStatistic.objects.first()
-    assert stat.ability_group is not None
+    assert stat.ability_group == reservation.recurring_reservation.ability_group.id
     assert stat.ability_group_name == reservation.recurring_reservation.ability_group.name
-    assert stat.age_group == reservation.age_group
+    assert stat.age_group == reservation.age_group.id
     assert stat.age_group_name == str(reservation.age_group)
     assert stat.applying_for_free_of_charge == reservation.applying_for_free_of_charge
     assert stat.begin == reservation.begin
     assert stat.buffer_time_after == reservation.buffer_time_after
     assert stat.buffer_time_before == reservation.buffer_time_before
-    assert stat.cancel_reason == reservation.cancel_reason
+    assert stat.cancel_reason is None
     assert stat.cancel_reason_text == ""
-    assert stat.deny_reason == reservation.deny_reason
+    assert stat.deny_reason is None
     assert stat.deny_reason_text == ""
     assert stat.duration_minutes == 120
     assert stat.end == reservation.end
-    assert stat.home_city == reservation.home_city
+    assert stat.home_city == reservation.home_city.id
     assert stat.home_city_municipality_code == reservation.home_city.municipality_code
     assert stat.home_city_name == reservation.home_city.name
     assert stat.is_applied is True
@@ -89,11 +88,11 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     assert stat.num_persons == reservation.num_persons
     assert stat.price == reservation.price
     assert stat.price_net == reservation.price_net
-    assert stat.primary_reservation_unit == reservation_unit
+    assert stat.primary_reservation_unit == reservation_unit.id
     assert stat.primary_reservation_unit_name == reservation_unit.name
     assert stat.primary_unit_name == reservation_unit.unit.name
     assert stat.primary_unit_tprek_id == reservation_unit.unit.tprek_id
-    assert stat.purpose == reservation.purpose
+    assert stat.purpose == reservation.purpose.id
     assert stat.purpose_name == reservation.purpose.name
     assert stat.recurrence_begin_date == recurring.begin_date
     assert stat.recurrence_end_date == recurring.end_date
@@ -102,8 +101,6 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     assert stat.reservation_confirmed_at == reservation.confirmed_at
     assert stat.reservation_created_at == reservation.created_at
     assert stat.reservation_handled_at == reservation.handled_at
-    assert stat.reservation_stats_reservation_units.count() == 1
-    assert stat.reservation_stats_reservation_units.first().reservation_unit == reservation_unit
     assert stat.reservation_type == reservation.type
     assert stat.reservee_address_zip == ""
     assert stat.reservee_id == ""
@@ -197,7 +194,7 @@ def test_statistics__update__purpose(settings):
     reservation.save()
 
     stat = ReservationStatistic.objects.first()
-    assert stat.purpose == reservation.purpose
+    assert stat.purpose == reservation.purpose.id
 
 
 def test_statistics__update__cancel_reason_text(settings):
@@ -208,11 +205,11 @@ def test_statistics__update__cancel_reason_text(settings):
     stat = ReservationStatistic.objects.first()
     assert stat.cancel_reason_text == ""
 
-    reservation.cancel_reason = ReservationCancelReasonFactory.create(reason="cancel")
+    reservation.cancel_reason = ReservationCancelReasonChoice.CHANGE_OF_PLANS
     reservation.save()
 
     stat = ReservationStatistic.objects.first()
-    assert stat.cancel_reason_text == "cancel"
+    assert stat.cancel_reason_text == "My plans have changed"
 
 
 def test_statistics__update__reservation_unit_updates_statistics(settings):
@@ -222,7 +219,7 @@ def test_statistics__update__reservation_unit_updates_statistics(settings):
     reservation = ReservationFactory.create(name="Test reservation", reservation_units=[reservation_unit])
 
     statistics = ReservationStatistic.objects.first()
-    assert statistics.primary_reservation_unit == reservation_unit
+    assert statistics.primary_reservation_unit == reservation_unit.id
 
     new_reservation_unit = ReservationUnitFactory.create(name="Another reservation unit", unit__name="Another unit")
     reservation.reservation_units.set([new_reservation_unit])
@@ -230,7 +227,7 @@ def test_statistics__update__reservation_unit_updates_statistics(settings):
 
     statistics = ReservationStatistic.objects.first()
     assert statistics.reservation == reservation
-    assert statistics.primary_reservation_unit == new_reservation_unit
+    assert statistics.primary_reservation_unit == new_reservation_unit.id
     assert statistics.primary_reservation_unit_name == new_reservation_unit.name
     assert statistics.primary_unit_name == new_reservation_unit.unit.name
     assert statistics.primary_unit_tprek_id is None

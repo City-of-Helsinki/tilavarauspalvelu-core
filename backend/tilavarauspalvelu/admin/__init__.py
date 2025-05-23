@@ -25,7 +25,6 @@ from .recurring_reservation.admin import RecurringReservationAdmin
 from .rejected_occurrence.admin import RejectedOccurrenceAdmin
 from .request_log.admin import RequestLogAdmin
 from .reservation.admin import ReservationAdmin
-from .reservation_cancel_reason.admin import ReservationCancelReasonAdmin
 from .reservation_deny_reason.admin import ReservationDenyReasonAdmin
 from .reservation_metadata_field.admin import ReservationMetadataFieldAdmin
 from .reservation_metadata_set.admin import ReservationMetadataSetAdmin
@@ -74,7 +73,6 @@ __all__ = [
     "RejectedOccurrenceAdmin",
     "RequestLogAdmin",
     "ReservationAdmin",
-    "ReservationCancelReasonAdmin",
     "ReservationDenyReasonAdmin",
     "ReservationMetadataFieldAdmin",
     "ReservationMetadataSetAdmin",

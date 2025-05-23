@@ -1,23 +1,25 @@
 from __future__ import annotations
 
-from graphene_django_extensions import DjangoNode
-from graphene_django_extensions.permissions import AllowAuthenticated
+from typing import TypedDict
 
-from tilavarauspalvelu.models import ReservationCancelReason
+import graphene
 
-from .filersets import ReservationCancelReasonFilterSet
+from tilavarauspalvelu.enums import ReservationCancelReasonChoice
 
 __all__ = [
-    "ReservationCancelReasonNode",
+    "ReservationCancelReasonType",
 ]
 
 
-class ReservationCancelReasonNode(DjangoNode):
-    class Meta:
-        model = ReservationCancelReason
-        fields = [
-            "pk",
-            "reason",
-        ]
-        filterset_class = ReservationCancelReasonFilterSet
-        permission_classes = [AllowAuthenticated]
+class ReservationCancelReasonType(graphene.ObjectType):
+    value = graphene.Field(graphene.Enum.from_enum(ReservationCancelReasonChoice), required=True)
+    reason_fi = graphene.String(required=True)
+    reason_en = graphene.String(required=True)
+    reason_sv = graphene.String(required=True)
+
+
+class CancelReasonDict(TypedDict):
+    value: ReservationCancelReasonChoice
+    reason_fi: str
+    reason_en: str
+    reason_sv: str

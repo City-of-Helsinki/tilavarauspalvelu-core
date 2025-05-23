@@ -32,7 +32,7 @@ from .types.qualifier.types import QualifierNode
 from .types.recurring_reservation.types import RecurringReservationNode
 from .types.rejected_occurrence.types import RejectedOccurrenceNode
 from .types.reservation.types import ReservationNode
-from .types.reservation_cancel_reason.types import ReservationCancelReasonNode
+from .types.reservation_cancel_reason.types import ReservationCancelReasonType
 from .types.reservation_deny_reason.types import ReservationDenyReasonNode
 from .types.reservation_metadata.types import ReservationMetadataFieldNode, ReservationMetadataSetNode
 from .types.reservation_purpose.types import ReservationPurposeNode
@@ -80,7 +80,7 @@ __all__ = [
     "QualifierNode",
     "RecurringReservationNode",
     "RejectedOccurrenceNode",
-    "ReservationCancelReasonNode",
+    "ReservationCancelReasonType",
     "ReservationDenyReasonNode",
     "ReservationMetadataFieldNode",
     "ReservationMetadataSetNode",

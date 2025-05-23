@@ -13,7 +13,13 @@ from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L, lookup_property
 
 from config.utils.auditlog_util import AuditLogger
-from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import (
+    AccessType,
+    CustomerTypeChoice,
+    ReservationCancelReasonChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
 from utils.date_utils import datetime_range_as_string
 from utils.decimal_utils import round_decimal
 from utils.lazy import LazyModelAttribute, LazyModelManager
@@ -23,7 +29,6 @@ if TYPE_CHECKING:
         AgeGroup,
         City,
         RecurringReservation,
-        ReservationCancelReason,
         ReservationDenyReason,
         ReservationPurpose,
         Unit,
@@ -60,9 +65,17 @@ class Reservation(SerializableMixin, models.Model):
         choices=ReservationTypeChoice.choices,
         default=ReservationTypeChoice.NORMAL,
     )
-    cancel_details: str = models.TextField(blank=True, default="")
     handling_details: str = models.TextField(blank=True, default="")
     working_memo: str = models.TextField(null=True, blank=True, default="")
+
+    # Cancellation information
+    cancel_details: str = models.TextField(blank=True, default="")
+    cancel_reason: ReservationCancelReasonChoice | None = models.CharField(
+        choices=ReservationCancelReasonChoice.choices,
+        max_length=255,
+        null=True,
+        blank=True,
+    )
 
     # Time information
     begin: datetime.datetime = models.DateTimeField(db_index=True)
@@ -142,13 +155,6 @@ class Reservation(SerializableMixin, models.Model):
     )
     deny_reason: ReservationDenyReason | None = models.ForeignKey(
         "tilavarauspalvelu.ReservationDenyReason",
-        related_name="reservations",
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-    )
-    cancel_reason: ReservationCancelReason | None = models.ForeignKey(
-        "tilavarauspalvelu.ReservationCancelReason",
         related_name="reservations",
         on_delete=models.PROTECT,
         null=True,

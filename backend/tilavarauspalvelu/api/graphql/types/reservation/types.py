@@ -17,6 +17,7 @@ from tilavarauspalvelu.enums import (
     AccessType,
     CustomerTypeChoice,
     PriceUnit,
+    ReservationCancelReasonChoice,
     ReservationStateChoice,
     ReservationTypeChoice,
 )
@@ -145,9 +146,11 @@ class ReservationNode(DjangoNode):
     num_persons = graphene.Int()
     state = graphene.Field(graphene.Enum.from_enum(ReservationStateChoice))
     type = graphene.Field(graphene.Enum.from_enum(ReservationTypeChoice))
-    cancel_details = graphene.String()
     handling_details = graphene.String()
     working_memo = graphene.String()
+    #
+    cancel_reason = graphene.Field(graphene.Enum.from_enum(ReservationCancelReasonChoice))
+    cancel_details = graphene.String()
     #
     handled_at = graphene.DateTime()
     created_at = graphene.DateTime()
