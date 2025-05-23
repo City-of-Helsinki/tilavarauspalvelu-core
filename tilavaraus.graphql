@@ -2398,6 +2398,7 @@ type PaymentOrderNode implements Node {
   paymentType: PaymentType!
   status: OrderStatus!
   processedAt: DateTime
+  handledPaymentDueBy: DateTime
   checkoutUrl: String
   receiptUrl: String
 
