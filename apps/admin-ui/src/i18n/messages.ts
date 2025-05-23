@@ -1650,9 +1650,12 @@ const translations: ITranslations = {
   orderStatus: {
     ALL: ["Maksuton"],
     PAID: ["Maksettu"],
+    PAID_BY_INVOICE: ["Maksu laskulla"],
     PAID_MANUALLY: ["Maksetaan paikan päällä"],
-    DRAFT: ["Odottaa maksua"],
-    REFUNDED: ["Hyvitetty"],
+    PENDING: ["Odottaa maksua"],
+    DRAFT: ["Maksu kesken"],
+    EXPIRED: ["Ei maksettu"],
+    REFUNDED: ["Maksu palautettu"],
     CANCELLED: ["Peruutettu"],
     FREE: ["Maksuton"],
   },
@@ -1704,12 +1707,14 @@ const translations: ITranslations = {
   },
   Payment: {
     status: {
-      DRAFT: ["Odottaa"],
-      EXPIRED: ["Rauennut"],
+      DRAFT: ["Maksu kesken"],
+      EXPIRED: ["Ei maksettu"],
       CANCELLED: ["Peruutettu"],
       PAID: ["Maksettu"],
+      PAID_BY_INVOICE: ["Maksu laskulla"],
       PAID_MANUALLY: ["Paikan päällä"],
-      REFUNDED: ["Hyvitetty"],
+      PENDING: ["Odottaa maksua"],
+      REFUNDED: ["Maksu palautettu"],
     },
   },
   Calendar: {

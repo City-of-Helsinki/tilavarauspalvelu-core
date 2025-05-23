@@ -50,12 +50,10 @@ export function Filters({
       label: t(`RequestedReservation.state.${s}`),
     }));
 
-  const paymentStatusOptions = Object.values(OrderStatusWithFree)
-    .filter((s) => s !== OrderStatusWithFree.Expired)
-    .map((s) => ({
-      value: s,
-      label: t(`orderStatus.${s}`),
-    }));
+  const paymentStatusOptions = Object.values(OrderStatusWithFree).map((s) => ({
+    value: s,
+    label: t(`orderStatus.${s}`),
+  }));
 
   const reservationTypeOptions = Object.values(ReservationTypeChoice).map(
     (s) => ({

@@ -24,6 +24,10 @@ function transformPaymentStatusSafe(t: string): OrderStatusWithFree | null {
       return OrderStatusWithFree.Paid;
     case OrderStatusWithFree.PaidManually:
       return OrderStatusWithFree.PaidManually;
+    case OrderStatusWithFree.PaidByInvoice:
+      return OrderStatusWithFree.PaidByInvoice;
+    case OrderStatusWithFree.Pending:
+      return OrderStatusWithFree.Pending;
     case OrderStatusWithFree.Draft:
       return OrderStatusWithFree.Draft;
     case OrderStatusWithFree.Expired:
