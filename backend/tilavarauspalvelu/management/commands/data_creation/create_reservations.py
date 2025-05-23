@@ -11,6 +11,7 @@ from tilavarauspalvelu.enums import (
     CustomerTypeChoice,
     OrderStatus,
     PaymentType,
+    ReservationCancelReasonChoice,
     ReservationKind,
     ReservationStateChoice,
     ReservationTypeChoice,
@@ -20,7 +21,6 @@ from tilavarauspalvelu.models import (
     PaymentOrder,
     RejectedOccurrence,
     Reservation,
-    ReservationCancelReason,
     ReservationDenyReason,
     ReservationUnit,
     ReservationUnitPricing,
@@ -40,7 +40,7 @@ from tests.factories import RecurringReservationFactory, RejectedOccurrenceFacto
 from tests.factories.payment_order import PaymentOrderBuilder
 from tests.factories.reservation import NextDateError, ReservationBuilder
 
-from .create_reservation_related_things import _create_cancel_reasons, _create_deny_reasons
+from .create_reservation_related_things import _create_deny_reasons
 from .create_reservation_units import _create_reservation_unit_for_recurring_reservations
 from .utils import sample_qs, weighted_choice, with_logs
 
@@ -294,9 +294,6 @@ def _build_payment_order(
 
 
 def _deny_and_cancel_normal_reservations() -> None:
-    cancel_reasons = _create_cancel_reasons()
-    deny_reasons = _create_deny_reasons()
-
     not_on_site = Reservation.objects.exclude(payment_order__status=OrderStatus.PAID_MANUALLY)
 
     confirmed = not_on_site.filter(state=ReservationStateChoice.CONFIRMED)
@@ -322,29 +319,32 @@ def _deny_and_cancel_normal_reservations() -> None:
     paid_handled_pending_due = paid_handled_pending.filter(payment_order__handled_payment_due_by__gt=now)
     paid_handled_pending_overdue = paid_handled_pending.filter(payment_order__handled_payment_due_by__lte=now)
 
+    deny_reasons = _create_deny_reasons()
+
     # Deny some reservations in handling
     _deny_reservations(sample_qs(free_in_handling, size=5), deny_reasons)
     _deny_reservations(sample_qs(paid_in_handling, size=5), deny_reasons)
 
     # Cancel some free reservations
-    _cancel_reservations(sample_qs(free, size=5), cancel_reasons)
+    _cancel_reservations(sample_qs(free, size=5))
 
     # Cancel some paid direct reservations
-    _cancel_reservations(sample_qs(paid_direct_online, size=2), cancel_reasons)
-    _cancel_reservations(sample_qs(paid_direct_invoiced, size=2), cancel_reasons)
+    _cancel_reservations(sample_qs(paid_direct_online, size=2))
+    _cancel_reservations(sample_qs(paid_direct_invoiced, size=2))
 
     # Cancel some paid handled reservations
-    _cancel_reservations(sample_qs(paid_handled_online, size=2), cancel_reasons)
-    _cancel_reservations(sample_qs(paid_handled_invoiced, size=2), cancel_reasons)
-    _cancel_reservations(sample_qs(paid_handled_pending_due, size=2), cancel_reasons)
+    _cancel_reservations(sample_qs(paid_handled_online, size=2))
+    _cancel_reservations(sample_qs(paid_handled_invoiced, size=2))
+    _cancel_reservations(sample_qs(paid_handled_pending_due, size=2))
 
     # Cancel all handled pending reservations which are overdue
-    _cancel_reservations(paid_handled_pending_overdue, cancel_reasons)
+    _cancel_reservations(paid_handled_pending_overdue)
 
 
-def _cancel_reservations(qs: ReservationQuerySet, cancel_reasons: list[ReservationCancelReason]) -> None:
+def _cancel_reservations(qs: ReservationQuerySet) -> None:
     reservations: list[Reservation] = []
     payment_orders: list[PaymentOrder] = []
+    cancel_reasons = ReservationCancelReasonChoice.user_selectable
 
     now = local_datetime()
 
@@ -369,6 +369,7 @@ def _cancel_reservations(qs: ReservationQuerySet, cancel_reasons: list[Reservati
                     payment_order.processed_at = reservation.begin - datetime.timedelta(days=3)
 
                 case OrderStatus.PENDING if overdue:
+                    reservation.cancel_reason = ReservationCancelReasonChoice.NOT_PAID
                     reservation.cancel_details = "Cancelled due to no payment"
                     payment_order.status = OrderStatus.EXPIRED
                     payment_order.processed_at = reservation.begin - datetime.timedelta(days=3)
@@ -968,8 +969,7 @@ def _create_reservations_for_series(
             )
 
     if cancel_random > 0:
-        cancel_reasons = list(ReservationCancelReason.objects.all())
-        assert cancel_reasons, "Reservation cancel reasons not found"
+        cancel_reasons = ReservationCancelReasonChoice.user_selectable
 
         for reservation in random.sample(reservations, cancel_random):
             reservation.state = ReservationStateChoice.CANCELLED

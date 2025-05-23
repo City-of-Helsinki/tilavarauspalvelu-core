@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from graphene_django_extensions.testing import build_query
 
-from tests.factories import ReservationCancelReasonFactory
+from tests.helpers import TranslationsFromPOFiles
 
 # Applied to all tests
 pytestmark = [
@@ -11,41 +11,63 @@ pytestmark = [
 ]
 
 
-def test_reservation_cancel_reasons__query(graphql):
-    cancel_reason = ReservationCancelReasonFactory.create()
+QUERY = build_query("reservationCancelReasons", fields="value reasonFi reasonEn reasonSv")
 
+DATA = [
+    {
+        "value": "CHANGE_OF_PLANS",
+        "reasonFi": "Suunnitelmiini tuli muutos",
+        "reasonEn": "My plans have changed",
+        "reasonSv": "Mina planer har ändrats",
+    },
+    {
+        "value": "FOUND_ANOTHER_SPACE_ELSEWHERE",
+        "reasonFi": "Löysin toisen tilan muualta",
+        "reasonEn": "I found another space somewhere else",
+        "reasonSv": "Jag hittade en annan lokal någon annanstans",
+    },
+    {
+        "value": "FOUND_ANOTHER_SPACE_VARAAMO",
+        "reasonFi": "Löysin toisen tilan Varaamosta",
+        "reasonEn": "I found another space through Varaamo",
+        "reasonSv": "Jag hittade en annan lokal på Varaamo",
+    },
+    {
+        "value": "OTHER",
+        "reasonFi": "Muu syy",
+        "reasonEn": "Other reason",
+        "reasonSv": "Annan orsak",
+    },
+    {
+        "value": "PROCESSING_TIME_TOO_LONG",
+        "reasonFi": "Varauksen käsittelyaika on liian pitkä",
+        "reasonEn": "The booking processing time is too long",
+        "reasonSv": "Bokningens handläggningstid är för lång",
+    },
+    {
+        "value": "UNSUITABLE_SPACE",
+        "reasonFi": "Tila ei sovellu käyttötarkoitukseeni",
+        "reasonEn": "The space is not suitable for my purpose",
+        "reasonSv": "Lokalen är inte lämplig för ändamålet",
+    },
+]
+
+
+def test_reservation_cancel_reasons__query(graphql):
     graphql.login_with_superuser()
 
-    fields = """
-        pk
-        reasonFi
-        reasonEn
-        reasonSv
-    """
-    query = build_query("reservationCancelReasons", fields=fields, connection=True)
-    response = graphql(query)
+    with TranslationsFromPOFiles():
+        response = graphql(QUERY)
 
     assert response.has_errors is False
 
-    assert len(response.edges) == 1
-    assert response.node() == {
-        "pk": cancel_reason.pk,
-        "reasonFi": cancel_reason.reason_fi,
-        "reasonEn": cancel_reason.reason_en,
-        "reasonSv": cancel_reason.reason_sv,
-    }
+    assert response.first_query_object == DATA
 
 
 def test_reservation_cancel_reasons__query__anonymous_user(graphql):
-    ReservationCancelReasonFactory.create()
+    with TranslationsFromPOFiles():
+        response = graphql(QUERY)
 
-    fields = """
-        pk
-        reasonFi
-        reasonEn
-        reasonSv
-    """
-    query = build_query("reservationCancelReasons", fields=fields, connection=True)
-    response = graphql(query)
+    assert response.has_errors is False
 
-    assert response.error_message() == "No permission to access node."
+    assert response.first_query_object == DATA

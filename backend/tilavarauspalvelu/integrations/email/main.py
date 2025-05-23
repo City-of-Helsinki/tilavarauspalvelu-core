@@ -147,6 +147,9 @@ class EmailService:
         if reservation.state != ReservationStateChoice.CANCELLED:
             return
 
+        if reservation.cancel_reason is None:
+            return
+
         recipients = get_reservation_email_recipients(reservation=reservation)
         if not recipients:
             SentryLogger.log_message(
@@ -507,7 +510,11 @@ class EmailService:
         if application_section.application.status != ApplicationStatusChoice.RESULTS_SENT:
             return
 
-        if application_section.actions.get_last_reservation() is None:
+        reservation = application_section.actions.get_last_reservation()
+        if reservation is None:
+            return
+
+        if reservation.cancel_reason is None:
             return
 
         recipients = get_application_email_recipients(application=application_section.application)
@@ -534,7 +541,11 @@ class EmailService:
         if application_section.application.status != ApplicationStatusChoice.RESULTS_SENT:
             return
 
-        if application_section.actions.get_last_reservation() is None:
+        reservation = application_section.actions.get_last_reservation()
+        if reservation is None:
+            return
+
+        if reservation.cancel_reason is None:
             return
 
         recipients_by_language = get_application_section_staff_notification_recipients_by_language(application_section)
@@ -563,6 +574,9 @@ class EmailService:
     ) -> None:
         """Sends an email to the applicant when they have cancelled a single reservation in their seasonal booking."""
         if reservation.state != ReservationStateChoice.CANCELLED:
+            return
+
+        if reservation.cancel_reason is None:
             return
 
         if reservation.type != ReservationTypeChoice.SEASONAL:

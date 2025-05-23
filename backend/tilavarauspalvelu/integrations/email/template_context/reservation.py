@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Annotated, Unpack
 
 from django.utils.translation import pgettext
 
+from tilavarauspalvelu.enums import ReservationCancelReasonChoice
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from utils.date_utils import local_datetime_string
 from utils.utils import convert_html_to_text
@@ -166,8 +167,10 @@ def get_context_for_reservation_cancelled(
     **data: Unpack[ReservationCancelledContext],
 ) -> Annotated[EmailContext, EmailType.RESERVATION_CANCELLED]:
     if reservation is not None:
+        cancel_reason = ReservationCancelReasonChoice(reservation.cancel_reason)
+
         data["email_recipient_name"] = reservation.actions.get_email_reservee_name()
-        data["cancel_reason"] = get_attr_by_language(reservation.cancel_reason, "reason", language=language)
+        data["cancel_reason"] = str(cancel_reason.label)
         data["instructions_cancelled"] = reservation.actions.get_instructions(kind="cancelled", language=language)
 
         data |= params_for_base_info(reservation=reservation, language=language)

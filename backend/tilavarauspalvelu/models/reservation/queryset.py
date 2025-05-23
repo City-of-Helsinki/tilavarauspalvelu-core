@@ -291,7 +291,6 @@ class ReservationQuerySet(models.QuerySet):
             "recurring_reservation__ability_group",
             "recurring_reservation__allocated_time_slot",
             "deny_reason",
-            "cancel_reason",
             "purpose",
             "home_city",
             "age_group",

@@ -10,7 +10,7 @@ from django.test import override_settings
 from freezegun import freeze_time
 
 from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
-from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.enums import ReservationCancelReasonChoice, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import get_context_for_reservation_cancelled
@@ -46,11 +46,11 @@ COMMON_CONTEXT = {
     "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
     "instructions_cancelled_html": "[PERUUTETUN VARAUKSEN OHJEET]",
     "instructions_cancelled_text": "[PERUUTETUN VARAUKSEN OHJEET]",
-    "cancel_reason": "[PERUUTUKSEN SYY]",
 }
 LANGUAGE_CONTEXT = {
     "en": {
         "title": "Your booking has been cancelled",
+        "cancel_reason": "My plans have changed",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **RESERVATION_PRICE_INFO_CONTEXT_EN,
@@ -58,6 +58,7 @@ LANGUAGE_CONTEXT = {
     },
     "fi": {
         "title": "Varauksesi on peruttu",
+        "cancel_reason": "Suunnitelmiini tuli muutos",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
         **RESERVATION_PRICE_INFO_CONTEXT_FI,
@@ -65,6 +66,7 @@ LANGUAGE_CONTEXT = {
     },
     "sv": {
         "title": "Din bokning har avbokats",
+        "cancel_reason": "Mina planer har ändrats",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
         **RESERVATION_PRICE_INFO_CONTEXT_SV,
@@ -98,6 +100,9 @@ def test_reservation_cancelled__get_context__mock_data(lang: Lang):
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 def test_reservation_cancelled__get_context__instance(email_reservation):
+    email_reservation.cancel_reason = ReservationCancelReasonChoice.CHANGE_OF_PLANS
+    email_reservation.save()
+
     expected = {
         **LANGUAGE_CONTEXT["en"],
         "reservation_id": f"{email_reservation.id}",
@@ -122,7 +127,7 @@ def test_reservation_cancelled__render__text():
         Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
         Your booking has been cancelled.
-        Your reason for cancellation: [PERUUTUKSEN SYY]
+        Your reason for cancellation: My plans have changed
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI]
@@ -160,7 +165,7 @@ def test_reservation_cancelled__render__html():
 
         Your booking has been cancelled.
 
-        Your reason for cancellation: [PERUUTUKSEN SYY]
+        Your reason for cancellation: My plans have changed
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]
         [TOIMIPISTEEN OSOITE], [KAUPUNKI]
@@ -189,6 +194,7 @@ def test_reservation_cancelled__send_email(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_units__name="foo",
+        cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS,
     )
 
     EmailService.send_reservation_cancelled_email(reservation)
@@ -207,6 +213,7 @@ def test_reservation_cancelled__send_email__wrong_state(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_units__name="foo",
+        cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS,
     )
 
     EmailService.send_reservation_cancelled_email(reservation)
@@ -223,6 +230,7 @@ def test_reservation_cancelled__send_email__no_recipients(outbox):
         reservee_email="",
         user__email="",
         reservation_units__name="foo",
+        cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS,
     )
 
     EmailService.send_reservation_cancelled_email(reservation)

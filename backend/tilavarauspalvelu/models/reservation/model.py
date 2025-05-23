@@ -65,9 +65,17 @@ class Reservation(SerializableMixin, models.Model):
         choices=ReservationTypeChoice.choices,
         default=ReservationTypeChoice.NORMAL,
     )
-    cancel_details: str = models.TextField(blank=True, default="")
     handling_details: str = models.TextField(blank=True, default="")
     working_memo: str = models.TextField(null=True, blank=True, default="")
+
+    # Cancellation information
+    cancel_details: str = models.TextField(blank=True, default="")
+    cancel_reason: ReservationCancelReasonChoice | None = models.CharField(
+        choices=ReservationCancelReasonChoice.choices,
+        max_length=255,
+        null=True,
+        blank=True,
+    )
 
     # Time information
     begin: datetime.datetime = models.DateTimeField(db_index=True)
@@ -149,12 +157,6 @@ class Reservation(SerializableMixin, models.Model):
         "tilavarauspalvelu.ReservationDenyReason",
         related_name="reservations",
         on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-    )
-    cancel_reason: ReservationCancelReasonChoice | None = models.CharField(
-        choices=ReservationCancelReasonChoice.choices,
-        max_length=255,
         null=True,
         blank=True,
     )

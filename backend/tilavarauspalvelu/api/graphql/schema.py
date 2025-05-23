@@ -9,10 +9,11 @@ from graphene_django_extensions.errors import GQLNotFoundError
 from query_optimizer import DjangoListField, optimize_single
 from query_optimizer.compiler import optimize
 
-from tilavarauspalvelu.enums import UserPermissionChoice
+from tilavarauspalvelu.enums import ReservationCancelReasonChoice, UserPermissionChoice
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from tilavarauspalvelu.models import AllocatedTimeSlot, PaymentOrder, Reservation, User
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
+from tilavarauspalvelu.translation import translated
 
 from .mutations import (
     AllocatedTimeSlotCreateMutation,
@@ -101,7 +102,7 @@ from .queries import (
     QualifierNode,
     RecurringReservationNode,
     RejectedOccurrenceNode,
-    ReservationCancelReasonNode,
+    ReservationCancelReasonType,
     ReservationDenyReasonNode,
     ReservationMetadataSetNode,
     ReservationNode,
@@ -120,6 +121,7 @@ from .queries import (
     UserNode,
 )
 from .types.payment_order.permissions import PaymentOrderPermission
+from .types.reservation_cancel_reason.types import CancelReasonDict
 
 if TYPE_CHECKING:
     import datetime
@@ -201,7 +203,7 @@ class Query(graphene.ObjectType):
     recurring_reservations = RecurringReservationNode.Connection()
     rejected_occurrence = RejectedOccurrenceNode.Node()
     rejected_occurrences = RejectedOccurrenceNode.Connection()
-    reservation_cancel_reasons = ReservationCancelReasonNode.Connection()
+    reservation_cancel_reasons = Field(graphene.List(graphene.NonNull(ReservationCancelReasonType)), required=True)
     reservation_deny_reasons = ReservationDenyReasonNode.Connection()
     reservation_purposes = ReservationPurposeNode.Connection()
     age_groups = AgeGroupNode.Connection()
@@ -295,6 +297,17 @@ class Query(graphene.ObjectType):
         **kwargs: Any,
     ) -> models.QuerySet:
         return Reservation.objects.affecting_reservations(for_units, for_reservation_units)
+
+    def resolve_reservation_cancel_reasons(root: None, info: GQLInfo, **kwargs: Any) -> list[CancelReasonDict]:
+        return [
+            CancelReasonDict(
+                value=reason.value,
+                reason_fi=translated(reason.label, "fi"),
+                reason_en=translated(reason.label, "en"),
+                reason_sv=translated(reason.label, "sv"),
+            )
+            for reason in ReservationCancelReasonChoice.user_selectable
+        ]
 
 
 class Mutation(graphene.ObjectType):
