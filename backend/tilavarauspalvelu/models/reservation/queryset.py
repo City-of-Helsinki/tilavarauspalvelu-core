@@ -12,7 +12,7 @@ from lookup_property import L
 
 from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.models import ReservationStatistic, ReservationStatisticsReservationUnit, ReservationUnit, Unit
+from tilavarauspalvelu.models import ReservationStatistic, ReservationUnit, Unit
 from tilavarauspalvelu.tasks import delete_pindora_reservation
 from utils.date_utils import local_datetime
 
@@ -302,14 +302,9 @@ class ReservationQuerySet(models.QuerySet):
             ),
         )
 
-        new_statistics: list[ReservationStatistic] = []
-        new_statistics_units: list[ReservationStatisticsReservationUnit] = []
-
-        for reservation in reservations:
-            statistic = ReservationStatistic.for_reservation(reservation)
-            statistic_units = ReservationStatisticsReservationUnit.for_statistic(statistic)
-            new_statistics.append(statistic)
-            new_statistics_units.extend(statistic_units)
+        new_statistics: list[ReservationStatistic] = [
+            ReservationStatistic.for_reservation(reservation) for reservation in reservations
+        ]
 
         fields_to_update: list[str] = [
             field.name
@@ -320,14 +315,12 @@ class ReservationQuerySet(models.QuerySet):
 
         try:
             with transaction.atomic():
-                new_statistics = ReservationStatistic.objects.bulk_create(
+                ReservationStatistic.objects.bulk_create(
                     new_statistics,
                     update_conflicts=True,
                     update_fields=fields_to_update,
                     unique_fields=["reservation"],
                 )
-                ReservationStatisticsReservationUnit.objects.filter(reservation_statistics__in=new_statistics).delete()
-                ReservationStatisticsReservationUnit.objects.bulk_create(new_statistics_units)
 
         except IntegrityError as error:
             # Avoid logging errors in Sentry for situations where the reservation is deleted

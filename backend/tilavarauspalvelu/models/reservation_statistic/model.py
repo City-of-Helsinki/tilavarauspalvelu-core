@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import CustomerTypeChoice
+from utils.date_utils import DEFAULT_TIMEZONE
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
@@ -21,6 +22,15 @@ if TYPE_CHECKING:
 
 
 class ReservationStatistic(models.Model):
+    # Link to the reservation
+
+    reservation = models.OneToOneField(
+        "tilavarauspalvelu.Reservation",
+        related_name="reservation_statistic",
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+
     # Copied from Reservation
 
     num_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
@@ -51,83 +61,35 @@ class ReservationStatistic(models.Model):
     reservee_type: str | None = models.CharField(max_length=255, null=True, blank=True)
 
     # Access type information
+
     access_type: str = models.CharField(max_length=255)
     access_code_generated_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
 
-    # Relations and static copies of their values
+    # Static copies of values from other related models
 
-    primary_reservation_unit = models.ForeignKey(
-        "tilavarauspalvelu.ReservationUnit",
-        related_name="reservation_statistics",
-        null=True,
-        on_delete=models.SET_NULL,
-    )
+    primary_reservation_unit: int | None = models.BigIntegerField(null=True, blank=True)
     primary_reservation_unit_name: str = models.CharField(max_length=255)
     primary_unit_tprek_id: str | None = models.CharField(max_length=255, null=True)
     primary_unit_name: str = models.CharField(max_length=255)
 
-    deny_reason = models.ForeignKey(
-        "tilavarauspalvelu.ReservationDenyReason",
-        related_name="reservation_statistics",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
+    deny_reason: int | None = models.BigIntegerField(null=True, blank=True)
     deny_reason_text: str = models.CharField(max_length=255)
 
-    cancel_reason = models.ForeignKey(
-        "tilavarauspalvelu.ReservationCancelReason",
-        related_name="reservation_statistics",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
+    cancel_reason: int | None = models.BigIntegerField(null=True, blank=True)
     cancel_reason_text: str = models.CharField(max_length=255)
 
-    purpose = models.ForeignKey(
-        "tilavarauspalvelu.ReservationPurpose",
-        related_name="reservation_statistics",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
+    purpose: int | None = models.BigIntegerField(null=True, blank=True)
     purpose_name: str = models.CharField(max_length=255, default="", blank=True)
 
-    home_city = models.ForeignKey(
-        "tilavarauspalvelu.City",
-        related_name="reservation_statistics",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
+    home_city: int | None = models.BigIntegerField(null=True, blank=True)
     home_city_name: str = models.CharField(max_length=255, default="", blank=True)
     home_city_municipality_code: str = models.CharField(max_length=255, default="")
 
-    age_group = models.ForeignKey(
-        "tilavarauspalvelu.AgeGroup",
-        related_name="reservation_statistics",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
+    age_group: int | None = models.BigIntegerField(null=True, blank=True)
     age_group_name: str = models.CharField(max_length=255, default="", blank=True)
 
-    # From RecurringReservation
-    ability_group = models.ForeignKey(
-        "tilavarauspalvelu.AbilityGroup",
-        related_name="reservation_statistics",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
-    ability_group_name: str = models.TextField()
-
-    reservation = models.OneToOneField(
-        "tilavarauspalvelu.Reservation",
-        related_name="reservation_statistic",
-        on_delete=models.SET_NULL,
-        null=True,
-    )
+    ability_group: int | None = models.BigIntegerField(null=True, blank=True)
+    ability_group_name: str = models.CharField(max_length=255, default="", blank=True)
 
     # Reservation statistics specific
 
@@ -165,33 +127,41 @@ class ReservationStatistic(models.Model):
         recurring_reservation = getattr(reservation, "recurring_reservation", None)
         ability_group = getattr(recurring_reservation, "ability_group", None)
         allocated_time_slot = getattr(recurring_reservation, "allocated_time_slot", None)
+        age_group = getattr(reservation, "age_group", None)
+        cancel_reason = getattr(reservation, "cancel_reason", None)
+        deny_reason = getattr(reservation, "deny_reason", None)
+        user = getattr(reservation, "user", None)
+        home_city = getattr(reservation, "home_city", None)
+        purpose = getattr(reservation, "purpose", None)
 
         requires_org_name = reservation.reservee_type != CustomerTypeChoice.INDIVIDUAL
         requires_org_id = not reservation.reservee_is_unregistered_association and requires_org_name
         by_profile_user = bool(getattr(reservation.user, "profile_id", ""))
+        begin = reservation.begin.astimezone(DEFAULT_TIMEZONE)
+        end = reservation.end.astimezone(DEFAULT_TIMEZONE)
+        duration = end - begin
 
         # Don't care about existing statistics, we can use `bulk_create` with `update_conflicts=True`
         # to upsert the statistic based on which reservation it belongs to.
         statistic = ReservationStatistic(reservation=reservation)
 
-        statistic.ability_group = ability_group
         statistic.access_code_generated_at = reservation.access_code_generated_at
         statistic.access_type = reservation.access_type
-        statistic.age_group = reservation.age_group
-        statistic.age_group_name = str(reservation.age_group)
+        statistic.age_group = getattr(age_group, "id", None)
+        statistic.age_group_name = str(age_group) if age_group is not None else ""
         statistic.applying_for_free_of_charge = reservation.applying_for_free_of_charge
-        statistic.begin = reservation.begin
+        statistic.begin = begin
         statistic.buffer_time_after = reservation.buffer_time_after
         statistic.buffer_time_before = reservation.buffer_time_before
-        statistic.cancel_reason = reservation.cancel_reason
-        statistic.cancel_reason_text = getattr(reservation.cancel_reason, "reason", "")
-        statistic.deny_reason = reservation.deny_reason
-        statistic.deny_reason_text = getattr(reservation.deny_reason, "reason", "")
-        statistic.duration_minutes = (reservation.end - reservation.begin).total_seconds() / 60
-        statistic.end = reservation.end
-        statistic.home_city = reservation.home_city
-        statistic.home_city_municipality_code = getattr(reservation.home_city, "municipality_code", "")
-        statistic.home_city_name = reservation.home_city.name if reservation.home_city else ""
+        statistic.cancel_reason = getattr(cancel_reason, "id", None)
+        statistic.cancel_reason_text = getattr(cancel_reason, "reason", "")
+        statistic.deny_reason = getattr(deny_reason, "id", None)
+        statistic.deny_reason_text = getattr(deny_reason, "reason", "")
+        statistic.duration_minutes = int(duration.total_seconds() / 60)
+        statistic.end = end
+        statistic.home_city = getattr(home_city, "id", None)
+        statistic.home_city_municipality_code = getattr(home_city, "municipality_code", "")
+        statistic.home_city_name = getattr(home_city, "name", "")
         statistic.is_applied = allocated_time_slot is not None
         statistic.is_recurring = recurring_reservation is not None
         statistic.is_subsidised = reservation.price < reservation.non_subsidised_price
@@ -200,8 +170,8 @@ class ReservationStatistic(models.Model):
         statistic.num_persons = reservation.num_persons
         statistic.price = reservation.price
         statistic.price_net = reservation.price_net
-        statistic.purpose = reservation.purpose
-        statistic.purpose_name = reservation.purpose.name if reservation.purpose else ""
+        statistic.purpose = getattr(purpose, "id", None)
+        statistic.purpose_name = getattr(purpose, "name", "")
         statistic.recurrence_begin_date = getattr(recurring_reservation, "begin_date", None)
         statistic.recurrence_end_date = getattr(recurring_reservation, "end_date", None)
         statistic.recurrence_uuid = str(getattr(recurring_reservation, "ext_uuid", ""))
@@ -214,23 +184,24 @@ class ReservationStatistic(models.Model):
         statistic.reservee_address_zip = reservation.reservee_address_zip if by_profile_user else ""
         statistic.reservee_id = reservation.reservee_id if requires_org_id else ""
         statistic.reservee_is_unregistered_association = reservation.reservee_is_unregistered_association
-        statistic.reservee_language = reservation.user.get_preferred_language()
+        statistic.reservee_language = user.get_preferred_language() if user else ""
         statistic.reservee_organisation_name = reservation.reservee_organisation_name if requires_org_name else ""
         statistic.reservee_type = reservation.reservee_type
         statistic.reservee_used_ad_login = reservation.reservee_used_ad_login
-        statistic.reservee_uuid = str(reservation.user.tvp_uuid) if reservation.user else ""
+        statistic.reservee_uuid = str(getattr(user, "tvp_uuid", ""))
         statistic.state = reservation.state
         statistic.tax_percentage_value = reservation.tax_percentage_value
 
         for res_unit in reservation.reservation_units.all():
-            statistic.primary_reservation_unit = res_unit
+            statistic.primary_reservation_unit = res_unit.id
             statistic.primary_reservation_unit_name = res_unit.name
             statistic.primary_unit_name = getattr(res_unit.unit, "name", "")
             statistic.primary_unit_tprek_id = getattr(res_unit.unit, "tprek_id", "")
             break
 
-        if statistic.is_applied and ability_group:
-            statistic.ability_group_name = ability_group.name
+        if statistic.is_applied:
+            statistic.ability_group = getattr(ability_group, "id", None)
+            statistic.ability_group_name = getattr(ability_group, "name", "")
 
         if save:
             statistic.save()
