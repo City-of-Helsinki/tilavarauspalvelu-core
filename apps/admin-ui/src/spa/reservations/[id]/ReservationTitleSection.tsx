@@ -92,8 +92,9 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
         ?.applicationSection?.pk;
     const applicationLink = getApplicationUrl(applicationPk, sectionPk);
 
-    const order = reservation.paymentOrder[0];
-    const paymentStatusLabelType = getStatusLabelType(order?.status);
+    const paymentStatusLabelType = getStatusLabelType(
+      reservation.paymentOrder?.status
+    );
     const reservationState = getReservationStateLabelProps(reservation.state);
 
     return (
@@ -101,13 +102,13 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
         <TitleSection $noMargin={noMargin} ref={ref}>
           <H1 $noMargin>{overrideTitle ?? getName(reservation, t)}</H1>
           <Flex $direction="row" $alignItems="center">
-            {order?.status != null && (
+            {reservation.paymentOrder?.status != null && (
               <StatusLabel
                 type={paymentStatusLabelType}
                 data-testid="reservation_title_section__order_status"
                 icon={<IconEuroSign aria-hidden="true" />}
               >
-                {t(`Payment.status.${order?.status}`)}
+                {t(`Payment.status.${reservation.paymentOrder?.status}`)}
               </StatusLabel>
             )}
             {reservation.state && (
