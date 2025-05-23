@@ -68,13 +68,13 @@ function convertToReturnState(
   >
 ): ReturnAllowedState {
   const { price, paymentOrder, begin } = reservation;
-  const order = paymentOrder[0] ?? null;
+
   const paid = {
     price: toNumber(price) ?? 0,
-    orderStatus: order?.status ?? null,
-    orderUuid: order?.orderUuid ?? null,
-    refundUuid: order?.refundUuid ?? null,
-    begin: begin,
+    orderStatus: paymentOrder?.status ?? null,
+    orderUuid: paymentOrder?.orderUuid ?? null,
+    refundUuid: paymentOrder?.refundUuid ?? null,
+    begin,
   };
 
   if (paid.refundUuid != null) {
