@@ -2300,6 +2300,7 @@ enum OrderStatusWithFree {
   CANCELLED
   PAID
   PAID_MANUALLY
+  PAID_BY_INVOICE
   REFUNDED
   FREE
 }
