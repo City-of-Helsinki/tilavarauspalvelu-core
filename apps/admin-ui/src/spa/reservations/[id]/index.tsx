@@ -276,7 +276,6 @@ function ReservationPricingDetailsAccordion({
   reservation: ReservationType;
 }>) {
   const { t } = useTranslation();
-  const order = reservation.paymentOrder.find(() => true);
 
   return (
     <Accordion
@@ -288,7 +287,9 @@ function ReservationPricingDetailsAccordion({
           {reservation.price && reservationPrice(reservation, t)}
         </DataWrapper>
         <DataWrapper label={t("RequestedReservation.paymentState")}>
-          {order?.status == null ? "-" : t(`Payment.status.${order?.status}`)}
+          {reservation.paymentOrder?.status == null
+            ? "-"
+            : t(`Payment.status.${reservation.paymentOrder?.status}`)}
         </DataWrapper>
         <DataWrapper label={t("RequestedReservation.applyingForFreeOfCharge")}>
           {t(

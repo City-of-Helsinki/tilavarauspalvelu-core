@@ -61,21 +61,21 @@ function convertToReturnState(
   reservation: Pick<DenyDialogFieldsFragment, "price" | "paymentOrder">
 ): ReturnAllowedState {
   const { price, paymentOrder } = reservation;
-  const order = paymentOrder[0] ?? null;
-  const payed = {
+
+  const paid = {
     price: toNumber(price) ?? 0,
-    orderStatus: order?.status ?? null,
-    orderUuid: order?.orderUuid ?? null,
-    refundUuid: order?.refundUuid ?? null,
+    orderStatus: paymentOrder?.status ?? null,
+    orderUuid: paymentOrder?.orderUuid ?? null,
+    refundUuid: paymentOrder?.refundUuid ?? null,
   };
 
-  if (payed.refundUuid != null) {
+  if (paid.refundUuid != null) {
     return "already-refunded";
   }
-  if (payed.price === 0) {
+  if (paid.price === 0) {
     return "free";
   }
-  if (isPriceReturnable(payed)) {
+  if (isPriceReturnable(paid)) {
     return "not-decided";
   }
   return "not-allowed";
