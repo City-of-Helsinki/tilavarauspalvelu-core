@@ -37,7 +37,6 @@ from .reservation_metadata_field.model import ReservationMetadataField
 from .reservation_metadata_set.model import ReservationMetadataSet
 from .reservation_purpose.model import ReservationPurpose
 from .reservation_statistic.model import ReservationStatistic
-from .reservation_statistic_unit.model import ReservationStatisticsReservationUnit
 from .reservation_unit.model import ReservationUnit
 from .reservation_unit_access_type.model import ReservationUnitAccessType
 from .reservation_unit_cancellation_rule.model import ReservationUnitCancellationRule
@@ -96,7 +95,6 @@ __all__ = [
     "ReservationMetadataSet",
     "ReservationPurpose",
     "ReservationStatistic",
-    "ReservationStatisticsReservationUnit",
     "ReservationUnit",
     "ReservationUnitAccessType",
     "ReservationUnitCancellationRule",
