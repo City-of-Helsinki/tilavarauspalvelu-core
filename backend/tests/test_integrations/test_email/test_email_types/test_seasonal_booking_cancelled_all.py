@@ -10,6 +10,7 @@ from django.test import override_settings
 from freezegun import freeze_time
 
 from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
+from tilavarauspalvelu.enums import ReservationCancelReasonChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import get_context_for_seasonal_booking_cancelled_all
@@ -43,23 +44,25 @@ COMMON_CONTEXT = {
     "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
     "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
     "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
-    "cancel_reason": "[PERUUTUKSEN SYY]",
 }
 LANGUAGE_CONTEXT = {
     "en": {
         "title": "Your seasonal booking has been cancelled",
+        "cancel_reason": "My plans have changed",
         **BASE_TEMPLATE_CONTEXT_EN,
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
         **COMMON_CONTEXT,
     },
     "fi": {
         "title": "Kausivarauksesi on peruttu",
+        "cancel_reason": "Suunnitelmiini tuli muutos",
         **BASE_TEMPLATE_CONTEXT_FI,
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
         **COMMON_CONTEXT,
     },
     "sv": {
         "title": "Din säsongsbokning har avbokats",
+        "cancel_reason": "Mina planer har ändrats",
         **BASE_TEMPLATE_CONTEXT_SV,
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
         **COMMON_CONTEXT,
@@ -101,6 +104,7 @@ def test_seasonal_booking_cancelled_all__get_context__get_mock_data(lang: Lang):
 @freeze_time("2024-01-01 12:00:00+02:00")
 def test_seasonal_booking_cancelled_all__get_context__instance(email_reservation):
     section = email_reservation.actions.get_application_section()
+    section.actions.get_reservations().update(cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS)
 
     expected = {
         **LANGUAGE_CONTEXT["en"],
@@ -129,7 +133,7 @@ def test_seasonal_booking_cancelled_all_email__render__text():
         Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
         All space reservations included in your seasonal booking have been cancelled.
-        Reason: [PERUUTUKSEN SYY]
+        Reason: My plans have changed
 
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
 
@@ -159,7 +163,7 @@ def test_seasonal_booking_cancelled_all_email__render__html():
 
         All space reservations included in your seasonal booking have been cancelled.
 
-        Reason: [PERUUTUKSEN SYY]
+        Reason: My plans have changed
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
         You can check your booking details at: [varaamo.hel.fi]({url})
 
@@ -184,6 +188,7 @@ def test_seasonal_booking_cancelled_all__send_email(outbox):
     create_reservation_series(
         user=application_section.application.user,
         allocated_time_slot__reservation_unit_option__application_section=application_section,
+        reservations__cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS,
     )
 
     EmailService.send_seasonal_booking_cancelled_all_email(application_section=application_section)

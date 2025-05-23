@@ -50,9 +50,11 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     num_persons = None
     state = ReservationStateChoice.CREATED
     type = ReservationTypeChoice.NORMAL
-    cancel_details = ""
     handling_details = ""
     working_memo = ""
+
+    cancel_reason = None
+    cancel_details = ""
 
     # Time information
     begin = fuzzy.FuzzyDateTime(start_dt=utc_datetime(2021, 1, 1))
@@ -108,7 +110,6 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     user = ForeignKeyFactory("tests.factories.UserFactory", required=True)
     recurring_reservation = ForeignKeyFactory("tests.factories.RecurringReservationFactory")
     deny_reason = ForeignKeyFactory("tests.factories.ReservationDenyReasonFactory")
-    cancel_reason = ForeignKeyFactory("tests.factories.ReservationCancelReasonFactory")
     purpose = ForeignKeyFactory("tests.factories.ReservationPurposeFactory")
     home_city = ForeignKeyFactory("tests.factories.CityFactory")
     age_group = ForeignKeyFactory("tests.factories.AgeGroupFactory")
