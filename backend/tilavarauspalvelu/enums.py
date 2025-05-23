@@ -89,6 +89,7 @@ class Language(models.TextChoices):
 
 class OrderStatus(models.TextChoices):
     DRAFT = "DRAFT", pgettext_lazy("OrderStatus", "Draft")  # Unpaid order
+    PENDING = "PENDING", pgettext_lazy("OrderStatus", "Pending")  # Unpaid order after handling
     EXPIRED = "EXPIRED", pgettext_lazy("OrderStatus", "Expired")
     CANCELLED = "CANCELLED", pgettext_lazy("OrderStatus", "Cancelled")
     PAID = "PAID", pgettext_lazy("OrderStatus", "Paid")
@@ -100,6 +101,7 @@ class OrderStatus(models.TextChoices):
     def can_be_marked_paid_statuses(cls) -> list[OrderStatus]:
         return [
             OrderStatus.DRAFT,
+            OrderStatus.PENDING,
             OrderStatus.EXPIRED,
             OrderStatus.CANCELLED,
         ]
@@ -108,7 +110,25 @@ class OrderStatus(models.TextChoices):
     def can_be_cancelled_statuses(cls) -> list[OrderStatus]:
         return [
             OrderStatus.DRAFT,
+            OrderStatus.PENDING,
             OrderStatus.EXPIRED,
+            OrderStatus.PAID_MANUALLY,
+            OrderStatus.PAID_BY_INVOICE,
+        ]
+
+    @classproperty
+    def can_start_payment_statuses(cls) -> list[OrderStatus]:
+        return [
+            OrderStatus.DRAFT,
+            OrderStatus.PENDING,
+        ]
+
+    @classproperty
+    def no_payment_from_webshop_statuses(cls) -> list[OrderStatus]:
+        return [
+            OrderStatus.DRAFT,
+            OrderStatus.PENDING,
+            OrderStatus.PAID_MANUALLY,
         ]
 
     @classproperty
@@ -141,6 +161,7 @@ class OrderStatusWithFree(models.TextChoices):
 
     # Note: Enums cannot be subclassed, so we have to redefine all "original" members.
     DRAFT = "DRAFT", pgettext_lazy("OrderStatus", "Draft")
+    PENDING = "PENDING", pgettext_lazy("OrderStatus", "Pending")
     EXPIRED = "EXPIRED", pgettext_lazy("OrderStatus", "Expired")
     CANCELLED = "CANCELLED", pgettext_lazy("OrderStatus", "Cancelled")
     PAID = "PAID", pgettext_lazy("OrderStatus", "Paid")
@@ -721,6 +742,13 @@ class PaymentType(models.TextChoices):
 
     @classproperty
     def requires_verkkokauppa(cls) -> list[PaymentType]:
+        return [
+            cls.ONLINE,
+            cls.ONLINE_OR_INVOICE,
+        ]
+
+    @classproperty
+    def types_that_can_be_pending(cls) -> list[PaymentType]:
         return [
             cls.ONLINE,
             cls.ONLINE_OR_INVOICE,

@@ -12,7 +12,7 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import GetOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.order.types import Order, WebShopOrderStatus
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from tests.factories import PaymentOrderFactory
 from tests.helpers import patch_method
@@ -48,12 +48,18 @@ def _create_mock_order(order_id: uuid.UUID, status: WebShopOrderStatus = "") -> 
     [
         OrderStatus.DRAFT,
         OrderStatus.EXPIRED,
+        OrderStatus.PAID_BY_INVOICE,
+        OrderStatus.PAID_MANUALLY,
     ],
 )
 def test_order_cancel_webhook__success(api_client, settings, status):
     order_id = uuid.uuid4()
     VerkkokauppaAPIClient.get_order.return_value = _create_mock_order(order_id)
-    payment_order = PaymentOrderFactory.create(remote_id=order_id, status=status, processed_at=None)
+    payment_order = PaymentOrderFactory.create(
+        remote_id=order_id,
+        status=status,
+        processed_at=None,
+    )
 
     data = {
         "orderId": str(order_id),
@@ -76,8 +82,6 @@ def test_order_cancel_webhook__success(api_client, settings, status):
     [
         OrderStatus.CANCELLED,
         OrderStatus.PAID,
-        OrderStatus.PAID_BY_INVOICE,
-        OrderStatus.PAID_MANUALLY,
         OrderStatus.REFUNDED,
     ],
 )
@@ -95,6 +99,29 @@ def test_order_cancel_webhook__no_action_needed(api_client, settings, status):
 
     assert response.status_code == 200, response.data
     assert response.data == {"message": "Order is already in a state where no updates are needed"}
+
+
+def test_order_cancel_webhook__pending_order(api_client, settings):
+    order_id = uuid.uuid4()
+    payment_order = PaymentOrderFactory.create(
+        remote_id=order_id,
+        status=OrderStatus.PENDING,
+        handled_payment_due_by=local_datetime(),
+        processed_at=None,
+    )
+
+    data = {
+        "orderId": str(order_id),
+        "namespace": settings.VERKKOKAUPPA_NAMESPACE,
+        "eventType": "ORDER_CANCELLED",
+    }
+    response = api_client.post(reverse("order-list"), data=data, format="json")
+
+    assert response.status_code == 200, response.data
+    assert response.data == {"message": "Pending order remains payable until its due date"}
+
+    payment_order.refresh_from_db()
+    assert payment_order.status == OrderStatus.PENDING
 
 
 @patch_method(VerkkokauppaAPIClient.get_order)

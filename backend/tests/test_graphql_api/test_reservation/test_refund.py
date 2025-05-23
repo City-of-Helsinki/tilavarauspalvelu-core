@@ -3,16 +3,16 @@ from __future__ import annotations
 import datetime
 import uuid
 from decimal import Decimal
-from unittest.mock import MagicMock
 
 import pytest
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
+from tilavarauspalvelu.integrations.verkkokauppa.order.types import WebShopOrderStatus
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.date_utils import local_datetime
 
-from tests.factories import ReservationFactory, UserFactory
+from tests.factories import OrderFactory, RefundFactory, ReservationFactory, UserFactory
 from tests.helpers import patch_method
 
 from .helpers import REFUND_MUTATION, get_refund_data
@@ -22,13 +22,13 @@ pytestmark = [
 ]
 
 
-REFUND = MagicMock(refund_id=uuid.uuid4())
+REFUND = RefundFactory.create()
 
 
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
 def test_reservation__refund__general_admin(graphql):
     reservation = ReservationFactory.create_for_refund()
-    payment_order = reservation.payment_order.first()
+    payment_order = reservation.payment_order
 
     admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
@@ -46,7 +46,7 @@ def test_reservation__refund__general_admin(graphql):
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
 def test_reservation__refund__regular_user(graphql):
     reservation = ReservationFactory.create_for_refund()
-    payment_order = reservation.payment_order.first()
+    payment_order = reservation.payment_order
 
     graphql.login_with_regular_user()
 
@@ -63,7 +63,7 @@ def test_reservation__refund__regular_user(graphql):
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
 def test_reservation__refund__correct_state(graphql):
     reservation = ReservationFactory.create_for_refund()
-    payment_order = reservation.payment_order.first()
+    payment_order = reservation.payment_order
 
     graphql.login_with_superuser()
 
@@ -76,7 +76,9 @@ def test_reservation__refund__correct_state(graphql):
 
     payment_order.refresh_from_db()
     assert payment_order.refund_id == REFUND.refund_id
-    assert payment_order.status == OrderStatus.REFUNDED
+
+    # Status will change when refund webhook is received
+    assert payment_order.status == OrderStatus.PAID
 
 
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
@@ -96,7 +98,7 @@ def test_reservation__refund__invalid_state(graphql):
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
 def test_reservation__refund__reservation_price_is_zero(graphql):
     reservation = ReservationFactory.create_for_refund(price=Decimal(0))
-    payment_order = reservation.payment_order.first()
+    payment_order = reservation.payment_order
 
     graphql.login_with_superuser()
 
@@ -113,7 +115,7 @@ def test_reservation__refund__reservation_price_is_zero(graphql):
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
 def test_reservation__refund__payment_order_is_missing(graphql):
     reservation = ReservationFactory.create_for_refund()
-    reservation.payment_order.first().delete()
+    reservation.payment_order.delete()
 
     graphql.login_with_superuser()
     input_data = get_refund_data(reservation)
@@ -146,7 +148,10 @@ def test_reservation__refund__invoiced__cancel_if_paid_by_invoice(graphql):
     reservation = ReservationFactory.create_for_refund(
         payment_order__status=OrderStatus.PAID_BY_INVOICE,
     )
-    payment_order = reservation.payment_order.first()
+    payment_order = reservation.payment_order
+
+    order = OrderFactory.create(status=WebShopOrderStatus.CANCELLED)
+    VerkkokauppaAPIClient.cancel_order.return_value = order
 
     graphql.login_with_superuser()
     input_data = get_refund_data(reservation)
@@ -154,7 +159,10 @@ def test_reservation__refund__invoiced__cancel_if_paid_by_invoice(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert VerkkokauppaAPIClient.cancel_order.called is True
+    VerkkokauppaAPIClient.cancel_order.assert_called_with(
+        order_uuid=payment_order.remote_id,
+        user_uuid=payment_order.reservation_user_uuid,
+    )
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.CANCELLED
@@ -170,7 +178,6 @@ def test_reservation__refund__invoiced__date_in_the_past(graphql):
         begin=begin,
         end=begin + datetime.timedelta(hours=1),
     )
-    reservation.payment_order.first()
 
     graphql.login_with_superuser()
     input_data = get_refund_data(reservation)

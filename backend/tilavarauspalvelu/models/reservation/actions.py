@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import dataclasses
 import datetime
-import uuid
 from typing import TYPE_CHECKING, Literal
 
 from django.conf import settings
@@ -32,7 +31,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateO
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, Reservation, ReservationMetadataField, Space
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
-from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -284,66 +283,28 @@ class ReservationActions:
 
         return list(qs.distinct().order_by("field_name").values_list("field_name", flat=True))
 
-    @property
-    def is_refundable(self) -> bool:
-        payment_order: PaymentOrder | None = self.reservation.payment_order.first()
-        return (
-            self.reservation.price_net > 0  # Is a paid reservation
-            and payment_order is not None  # Has a payment order
-            and payment_order.status == OrderStatus.PAID  # Has been paid in webshop using online payment
-            and payment_order.refund_id is None  # Has not been refunded already
-        )
-
-    def refund_paid_reservation(self) -> None:
-        payment_order: PaymentOrder | None = self.reservation.payment_order.first()
-        if not payment_order:
-            return
-
-        if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
-            payment_order.refund_id = uuid.uuid4()
-
-        else:
-            refund = VerkkokauppaAPIClient.refund_order(order_uuid=payment_order.remote_id)
-            payment_order.refund_id = refund.refund_id
-
-        payment_order.status = OrderStatus.REFUNDED
-        payment_order.save(update_fields=["refund_id", "status"])
-
-    @property
-    def is_cancellable_invoice(self) -> bool:
-        payment_order: PaymentOrder | None = self.reservation.payment_order.first()
-        begin_date = self.reservation.begin.astimezone(DEFAULT_TIMEZONE).date()
-        return (
-            self.reservation.price_net > 0  # Is a paid reservation
-            and local_date() <= begin_date  # Reservation start date is not in the past
-            and payment_order is not None  # Has a payment order
-            and payment_order.status == OrderStatus.PAID_BY_INVOICE  # Has been paid in webshop using invoice
-        )
-
-    def cancel_invoiced_reservation(self) -> None:
-        payment_order: PaymentOrder | None = self.reservation.payment_order.first()
-        if payment_order is None:
-            return
-
-        if not settings.MOCK_VERKKOKAUPPA_API_ENABLED:
-            VerkkokauppaAPIClient.cancel_order(
-                order_uuid=payment_order.remote_id,
-                user_uuid=payment_order.reservation_user_uuid,
-            )
-
-        payment_order.actions.set_order_as_cancelled()
-
-    def create_payment_order(self, payment_type: PaymentType) -> PaymentOrder:
+    def create_payment_order_paid_immediately(self, payment_type: PaymentType) -> PaymentOrder:
         if payment_type == PaymentType.ON_SITE:
-            return PaymentOrder.objects.create(
-                payment_type=payment_type,
-                status=OrderStatus.PAID_MANUALLY,
-                language=self.reservation.user.get_preferred_language(),
-                price_net=self.reservation.price_net,
-                price_vat=self.reservation.price_vat_amount,
-                price_total=self.reservation.price,
-                reservation=self.reservation,
-            )
+            return self.reservation.actions.create_payment_order_paid_on_site()
+        return self.reservation.actions.create_payment_order_paid_online(payment_type)
+
+    def create_payment_order_paid_after_handling(
+        self,
+        payment_type: PaymentType,
+        handled_payment_due_by: datetime.datetime,
+    ) -> PaymentOrder:
+        if payment_type == PaymentType.ON_SITE:
+            return self.reservation.actions.create_payment_order_paid_on_site()
+
+        return self.reservation.actions.create_payment_order_pending_after_handling(
+            payment_type=payment_type,
+            handled_payment_due_by=handled_payment_due_by,
+        )
+
+    def create_payment_order_paid_online(self, payment_type: PaymentType) -> PaymentOrder:
+        if payment_type not in PaymentType.requires_verkkokauppa:
+            msg = f"Payment type {payment_type!r} cannot be paid online"
+            raise ValidationError(msg)
 
         verkkokauppa_order = self.create_order_in_verkkokauppa()
 
@@ -359,6 +320,37 @@ class ReservationActions:
             remote_id=verkkokauppa_order.order_id,
             checkout_url=verkkokauppa_order.checkout_url,
             receipt_url=verkkokauppa_order.receipt_url,
+        )
+
+    def create_payment_order_paid_on_site(self) -> PaymentOrder:
+        return PaymentOrder.objects.create(
+            payment_type=PaymentType.ON_SITE,
+            status=OrderStatus.PAID_MANUALLY,
+            language=self.reservation.user.get_preferred_language(),
+            price_net=self.reservation.price_net,
+            price_vat=self.reservation.price_vat_amount,
+            price_total=self.reservation.price,
+            reservation=self.reservation,
+        )
+
+    def create_payment_order_pending_after_handling(
+        self,
+        payment_type: PaymentType,
+        handled_payment_due_by: datetime.datetime,
+    ) -> PaymentOrder:
+        if payment_type not in PaymentType.types_that_can_be_pending:
+            msg = f"Payment type {payment_type!r} cannot have a pending payment order"
+            raise ValidationError(msg)
+
+        return PaymentOrder.objects.create(
+            payment_type=payment_type,
+            status=OrderStatus.PENDING,
+            language=self.reservation.user.get_preferred_language(),
+            price_net=self.reservation.price_net,
+            price_vat=self.reservation.price_vat_amount,
+            price_total=self.reservation.price,
+            reservation=self.reservation,
+            handled_payment_due_by=handled_payment_due_by,
         )
 
     def create_order_in_verkkokauppa(self) -> Order:

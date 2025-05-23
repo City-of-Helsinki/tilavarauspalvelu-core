@@ -1595,7 +1595,7 @@ type ReservationNode implements Node {
   purpose: ReservationPurposeNode
   homeCity: CityNode
   ageGroup: AgeGroupNode
-  paymentOrder: [PaymentOrderNode!]!
+  paymentOrder: PaymentOrderNode
 
   """The ID of the object"""
   id: ID!
@@ -1610,6 +1610,11 @@ type ReservationNode implements Node {
   Which reservation units' reserveability is affected by this reservation?
   """
   affectedReservationUnits: [Int]
+
+  """
+  Details on the pricing that should be currently applied to this reservation.
+  """
+  appliedPricing: AppliedPricingInfo
 
   """
   Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple reservations, queries to Pindora are not optimized.
@@ -2296,6 +2301,7 @@ Same as OrderStatus, but includes the 'FREE' option used for filtering reservati
 """
 enum OrderStatusWithFree {
   DRAFT
+  PENDING
   EXPIRED
   CANCELLED
   PAID
@@ -2390,6 +2396,7 @@ type PaymentOrderNode implements Node {
   paymentType: PaymentType!
   status: OrderStatus!
   processedAt: DateTime
+  handledPaymentDueBy: DateTime
   checkoutUrl: String
   receiptUrl: String
 
@@ -2411,12 +2418,47 @@ enum PaymentType {
 """An enumeration."""
 enum OrderStatus {
   DRAFT
+  PENDING
   EXPIRED
   CANCELLED
   PAID
   PAID_BY_INVOICE
   PAID_MANUALLY
   REFUNDED
+}
+
+type AppliedPricingInfo {
+  """
+  This is a 'Date', but graphene doesn't know how to serialize it from string...
+  """
+  begins: String!
+  priceUnit: PriceUnit!
+
+  """
+  This is a 'Decimal', but graphene doesn't know how to serialize it from string...
+  """
+  lowestPrice: String!
+
+  """
+  This is a 'Decimal', but graphene doesn't know how to serialize it from string...
+  """
+  highestPrice: String!
+
+  """
+  This is a 'Decimal', but graphene doesn't know how to serialize it from string...
+  """
+  taxPercentage: String!
+}
+
+"""An enumeration."""
+enum PriceUnit {
+  PRICE_UNIT_PER_15_MINS
+  PRICE_UNIT_PER_30_MINS
+  PRICE_UNIT_PER_HOUR
+  PRICE_UNIT_PER_HALF_DAY
+  PRICE_UNIT_PER_DAY
+  PRICE_UNIT_PER_WEEK
+  PRICE_UNIT_FIXED
 }
 
 type PindoraReservationInfoType {
@@ -2482,30 +2524,6 @@ type ReservationUnitPricingNode implements Node {
   lowestPriceNet: Decimal!
   highestPriceNet: Decimal!
   pk: Int
-}
-
-"""An enumeration."""
-enum PriceUnit {
-  """per 15 minutes"""
-  PER_15_MINS
-
-  """per 30 minutes"""
-  PER_30_MINS
-
-  """per hour"""
-  PER_HOUR
-
-  """per half a day"""
-  PER_HALF_DAY
-
-  """per day"""
-  PER_DAY
-
-  """per week"""
-  PER_WEEK
-
-  """fixed"""
-  FIXED
 }
 
 type TaxPercentageNode implements Node {
