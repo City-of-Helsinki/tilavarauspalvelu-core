@@ -74,7 +74,7 @@ function customRender(
 
 //
 describe("Application Page2", () => {
-  test("smoke: should render page properly", () => {
+  test("should render page properly", () => {
     // TODO all of this is common to all application funnel pages
     const view = customRender();
     expect(
@@ -124,15 +124,86 @@ describe("Application Page2", () => {
     );
   });
 
-  test("invalid form has submit disabled", async () => {
+  test("submit button is disabled without selection", async () => {
     const view = customRender({ page: "page1" });
     const nextButton = await view.findByRole("button", {
       name: "common:next",
     });
     expect(nextButton).toBeDisabled();
   });
+});
 
-  test.todo("too short time selection adds an error message after click");
+describe("Application time selection", () => {
+  test.todo("should submit correct time ranges");
+  test.todo("should submit disjoint time ranges");
+  test.todo("should submit correct day");
+  test.todo("should submit correct priority");
+});
+
+// errors require form context so have to test on this level
+describe("Application page2 validation errors", () => {
+  test("no error messages by default", () => {
+    const view = customRender({ page: "page1" });
+    const validationErrors = view.queryAllByText(/application:validation/);
+    expect(validationErrors).toHaveLength(0);
+  });
+
+  // TODO requires changing the mocks (allow override to add more weekly reservations)
+  test.todo(
+    "At least as many suitable time ranges as applied reservations per week"
+  );
+
+  test("error message should be shown if times are not long enough", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page1" });
+    const select = view.getByTestId("time-selector__button--1-14");
+    await user.click(select);
+    expect(view.getByText("application:validation.calendar.title"));
+    expect(
+      view.getByText(
+        "application:validation.calendar.Suitable time range must be at least as long as the minimum duration"
+      )
+    );
+    const validationErrors = view.getAllByText(/application:validation/);
+    // title + message nothing else
+    expect(validationErrors).toHaveLength(2);
+  });
+
+  test("error message should disappear if times are long enough", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page1" });
+    const select = view.getByTestId("time-selector__button--1-14");
+    await user.click(select);
+    expect(view.queryAllByText(/application:validation/)).toHaveLength(2);
+    const select2 = view.getByTestId("time-selector__button--1-15");
+    await user.click(select2);
+    expect(view.queryAllByText(/application:validation/)).toHaveLength(0);
+  });
+
+  test("two disjointed time ranges are too short", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page1" });
+    const select = view.getByTestId("time-selector__button--1-14");
+    await user.click(select);
+    const select2 = view.getByTestId("time-selector__button--1-16");
+    await user.click(select2);
+    expect(view.queryAllByText(/application:validation/)).toHaveLength(2);
+  });
+
+  test("submit button should be disabled if there are errors", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page1" });
+    const select = view.getByTestId("time-selector__button--1-14");
+    await user.click(select);
+    expect(view.queryAllByText(/application:validation/)).toHaveLength(2);
+    expect(view.getByRole("button", { name: "common:next" })).toBeDisabled();
+    const select2 = view.getByTestId("time-selector__button--1-15");
+    await user.click(select2);
+    expect(view.queryAllByText(/application:validation/)).toHaveLength(0);
+    expect(
+      view.getByRole("button", { name: "common:next" })
+    ).not.toBeDisabled();
+  });
 });
 
 describe("multiple application sections", () => {
