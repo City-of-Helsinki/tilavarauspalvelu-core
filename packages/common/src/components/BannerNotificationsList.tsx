@@ -87,7 +87,7 @@ function NotificationsListItem({
         type={notificationType}
         dismissible
         closeButtonLabelText={t("common:close")}
-        data-testid="BannerNotificationList__Notitification"
+        data-testid="BannerNotificationList__Notification"
         onClose={() =>
           closeFn([
             ...closedArray,
