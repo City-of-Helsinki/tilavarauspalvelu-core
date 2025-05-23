@@ -121,6 +121,22 @@ export function toUIDate(date: Date | null, formatStr = "d.M.yyyy"): string {
   }
 }
 
+// Returns a string in "d.M.yyyy klo hh:mm" format from a Date object
+// TODO returning undefined would be preferably (specificity) but breaks the users of this function
+export function toUIDateTime(
+  date: Date | null,
+  formatStr = "d.M.yyyy"
+): string {
+  if (!date || !isValidDate(date)) {
+    return "";
+  }
+  try {
+    return `${format(date, formatStr, { locale: fi })} klo ${format(date, "hh:mm", { locale: fi })}`;
+  } catch (_) {
+    return "";
+  }
+}
+
 export const chunkArray = <T>(array: T[], size: number): T[][] => {
   const result = [];
   let index = 0;
