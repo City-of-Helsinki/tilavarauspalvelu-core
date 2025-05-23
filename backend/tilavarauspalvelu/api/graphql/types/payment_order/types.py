@@ -48,6 +48,7 @@ class PaymentOrderNode(DjangoNode):
             "expires_in_minutes",
             "processed_at",
             "reservation_pk",
+            "handled_payment_due_by",
         ]
         permission_classes = [PaymentOrderPermission]
 
