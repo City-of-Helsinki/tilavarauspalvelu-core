@@ -266,12 +266,10 @@ function createReservationOrderStatusFragment({
   return {
     id: base64encode("ReservationNode:1"),
     state,
-    paymentOrder: [
-      {
-        id: base64encode("PaymentOrderNode:1"),
-        status: orderStatus,
-      },
-    ],
+    paymentOrder: {
+      id: base64encode("PaymentOrderNode:1"),
+      status: orderStatus,
+    },
   };
 }
 

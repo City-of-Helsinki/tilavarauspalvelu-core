@@ -223,7 +223,7 @@ export function getNormalizedReservationOrderStatus(
   }
 
   if (shouldShowOrderStatus(reservation.state)) {
-    return reservation.paymentOrder[0]?.status ?? null;
+    return reservation.paymentOrder?.status ?? null;
   }
 
   return null;

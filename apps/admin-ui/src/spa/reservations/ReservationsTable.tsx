@@ -144,14 +144,13 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     key: "orderStatus",
     isSortable: true,
     transform: ({ paymentOrder }: ReservationTableElementFragment) => {
-      const order = paymentOrder?.[0];
-      if (!order) {
+      if (!paymentOrder) {
         return "-";
       }
-      const labelType = getPaymentStatusLabelType(order.status);
+      const labelType = getPaymentStatusLabelType(paymentOrder.status);
       return (
         <StatusLabel type={labelType} icon={<IconEuroSign />} slim>
-          {t(`Payment.status.${order.status}`)}
+          {t(`Payment.status.${paymentOrder.status}`)}
         </StatusLabel>
       );
     },

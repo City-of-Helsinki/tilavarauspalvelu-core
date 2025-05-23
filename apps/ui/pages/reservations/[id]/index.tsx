@@ -319,7 +319,6 @@ function Reservation({
   const pindoraInfo = accessCodeData?.reservation?.pindoraInfo ?? null;
 
   // NOTE typescript can't type array off index
-  const order = reservation.paymentOrder.find(() => true);
   const reservationUnit = reservation.reservationUnits.find(() => true);
 
   const modifyTimeReason = getWhyReservationCantBeChanged(reservation);
@@ -352,7 +351,7 @@ function Reservation({
   const isCancellable = isReservationCancellable(reservation);
 
   const lang = convertLanguageCode(i18n.language);
-  const checkoutUrl = getCheckoutUrl(order, lang);
+  const checkoutUrl = getCheckoutUrl(reservation.paymentOrder, lang);
 
   const hasCheckoutUrl = !!checkoutUrl;
   const isWaitingForPayment =
@@ -369,10 +368,10 @@ function Reservation({
   ] as const;
 
   const hasReceipt =
-    order?.receiptUrl &&
-    (order.status === OrderStatus.Paid ||
-      order.status === OrderStatus.Refunded ||
-      order.status === OrderStatus.PaidByInvoice);
+    reservation.paymentOrder?.receiptUrl &&
+    (reservation.paymentOrder?.status === OrderStatus.Paid ||
+      reservation.paymentOrder?.status === OrderStatus.Refunded ||
+      reservation.paymentOrder?.status === OrderStatus.PaidByInvoice);
 
   return (
     <>
@@ -443,7 +442,7 @@ function Reservation({
               <ButtonLikeExternalLink
                 size="large"
                 data-testid="reservation__confirmation--button__receipt-link"
-                href={`${order.receiptUrl}&lang=${lang}`}
+                href={`${reservation.paymentOrder?.receiptUrl}&lang=${lang}`}
                 target="_blank"
               >
                 {t("reservations:downloadReceipt")}
