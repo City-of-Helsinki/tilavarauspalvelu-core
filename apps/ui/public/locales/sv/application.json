@@ -33,7 +33,6 @@
     "previewError": "Sidan {{ page }} har ett fel.",
     "fix": "Korrigera"
   },
-  "applicationEventSaved": "Säsongsbokning sparad på ansökningen",
   "heading": "Säsongbokningsansökan",
   "primarySchedules": "Prioriterade tidsönskemål",
   "secondarySchedules": "Alternativa tidsönskemål",
@@ -56,14 +55,11 @@
     "biweekly": "",
     "defaultDurationLabel": "1 timme 30 min",
     "createNew": "Lägg till en bokning",
-    "applicationEventName": "Namnlös säsongbokning",
-    "applicationEventSummary": "Sammanfattning",
-    "applicationEventSaved": "Säsongbokningsönskemål sparat på ansökningen",
-    "saveEvent": "Spara",
-    "deleteEvent": "Radera",
-    "deleteEventCancel": "Tillbaka",
-    "deleteEventHeading": "Är du säker på att du vill radera ansökningen?",
-    "deleteEventContent": "Ansökningens information kan inte återställas då ansökningen har raderats."
+    "defaultSectionName": "Namnlös säsongbokning",
+    "deleteDialog": {
+      "heading": "Är du säker på att du vill radera ansökningen?",
+      "content": "Ansökningens information kan inte återställas då ansökningen har raderats."
+    }
   },
   "TimeSelector": {
     "calendarLabel": "Välj önskade tider",
@@ -189,7 +185,7 @@
     "RECEIVED": "Skickat",
     "RESULTS_SENT": "Behandlad"
    },
-  "applicationEventStatus": {
+  "applicationSectionStatus":{
     "UNALLOCATED": "Mottagen",
     "IN_ALLOCATION": "I behandling",
     "HANDLED": "Behandlad",

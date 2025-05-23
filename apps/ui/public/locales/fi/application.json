@@ -33,7 +33,6 @@
     "previewError": "Sivu {{ page }} on virheellinen.",
     "fix": "Korjaa"
   },
-  "applicationEventSaved": "Kausivaraus tallennettu hakemukselle",
   "heading": "Kausivaraushakemus",
   "primarySchedules": "Ensisijaiset aikatoiveet",
   "secondarySchedules": "Muut aikatoiveet",
@@ -56,14 +55,11 @@
     "biweekly": "Varaus vain joka toinen viikko",
     "defaultDurationLabel": "1 tunti 30 min",
     "createNew": "Lisää uusi kausivaraus",
-    "applicationEventName": "Nimetön kausivaraus",
-    "applicationEventSummary": "Yhteenveto",
-    "applicationEventSaved": "Kausivaraustoive tallennettu hakemukselle",
-    "saveEvent": "Tallenna",
-    "deleteEvent": "Poista varaus",
-    "deleteEventCancel": "Palaa poistamatta",
-    "deleteEventHeading": "Oletko varma, että haluat poistaa varauksen?",
-    "deleteEventContent": "Kun varaus on peruttu, sen tietoja ei ole mahdollista palauttaa."
+    "defaultSectionName": "Nimetön kausivaraus" ,
+    "deleteDialog": {
+      "heading": "Oletko varma, että haluat poistaa varauksen?",
+      "content": "Kun varaus on peruttu, sen tietoja ei ole mahdollista palauttaa."
+    }
   },
   "TimeSelector": {
     "calendarLabel": "Valitse aikatoiveet kalenterista",
@@ -189,7 +185,7 @@
     "RECEIVED": "Lähetetty",
     "RESULTS_SENT": "Käsitelty"
   },
-  "applicationEventStatus": {
+  "applicationSectionStatus":{
     "UNALLOCATED": "Vastaanotettu",
     "IN_ALLOCATION": "Käsittelyssä",
     "HANDLED": "Hyväksytty",
