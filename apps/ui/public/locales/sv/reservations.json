@@ -105,6 +105,8 @@
     "draft": "Inväntar betalning",
     "paid": "Betald",
     "paidManually": "Betalas på plats",
+    "paidByInvoice": "Betalas med faktura",
+    "pending": "Inväntar betalning",
     "cancelled": "Betalning avbokad",
     "expired": "Obetald",
     "refunded": "Återbetald",

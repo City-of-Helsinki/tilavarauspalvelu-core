@@ -20,6 +20,8 @@ export function ReservationOrderStatus({ orderStatus, testId }: Props): JSX.Elem
       case OrderStatus.Refunded:
         return "success";
       case OrderStatus.Draft:
+      case OrderStatus.PaidByInvoice:
+      case OrderStatus.Pending:
       case OrderStatus.PaidManually:
       case OrderStatus.PaidByInvoice:
         return "alert";
