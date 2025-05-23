@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar
+from warnings import deprecated
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -17,7 +18,8 @@ __all__ = [
 ]
 
 
-class ReservationCancelReason(models.Model):
+@deprecated("Use ReservationCancelReasonChoice instead")
+class ReservationCancelReason(models.Model):  # TODO: remove
     reason: str = models.CharField(max_length=255)
 
     # Translated field hints
