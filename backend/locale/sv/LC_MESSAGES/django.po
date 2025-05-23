@@ -50,6 +50,10 @@ msgid "of which can be refunded:"
 msgstr ""
 
 #: templates/admin/deny_reservation_confirmation.html
+msgid "of which can be cancelled:"
+msgstr ""
+
+#: templates/admin/deny_reservation_confirmation.html
 msgid "Number of ended reservations, which can't be denied:"
 msgstr ""
 
@@ -1422,11 +1426,17 @@ msgid "Deny selected reservations and refund"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/admin.py
-msgid "Refund has been initiated for selected reservations."
+#, python-format
+msgid "Refund has been initiated for %(count)s paid reservations."
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/admin.py
-msgid "No reservations with paid orders to refund."
+#, python-format
+msgid "Cancellation has been initiated for %(count)s invoiced reservations."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "No reservations with paid orders to refund or cancel."
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/filters.py
@@ -2027,10 +2037,6 @@ msgid "Reservation kind"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Payment types"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Reservation block whole day"
 msgstr ""
 
@@ -2427,6 +2433,11 @@ msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgctxt "OrderStatus"
+msgid "Paid by invoice"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrderStatus"
 msgid "Paid manually"
 msgstr ""
 
@@ -2746,17 +2757,17 @@ msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgctxt "PaymentType"
-msgid "Online"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "PaymentType"
 msgid "On site"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgctxt "PaymentType"
-msgid "Invoice"
+msgid "Online"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PaymentType"
+msgid "Online or invoice"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
@@ -3885,12 +3896,6 @@ msgstr ""
 msgid "payment accountings"
 msgstr ""
 
-#: tilavarauspalvelu/models/payment_accounting/model.py
-msgid ""
-"One of the following fields must be given: internal_order, profit_center, "
-"project"
-msgstr ""
-
 #: tilavarauspalvelu/models/payment_merchant/model.py
 msgid "payment merchant"
 msgstr ""
@@ -4152,14 +4157,6 @@ msgstr ""
 
 #: tilavarauspalvelu/models/reservation_unit_option/model.py
 msgid "Preferred order must be unique for each application section"
-msgstr ""
-
-#: tilavarauspalvelu/models/reservation_unit_payment_type/model.py
-msgid "reservation unit payment type"
-msgstr ""
-
-#: tilavarauspalvelu/models/reservation_unit_payment_type/model.py
-msgid "reservation unit payment types"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation_unit_pricing/model.py

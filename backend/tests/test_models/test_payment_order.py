@@ -5,6 +5,8 @@ from decimal import Decimal
 import pytest
 from django.core.exceptions import ValidationError
 
+from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, OrderStatus, OrderStatusWithFree
+
 from tests.factories import PaymentOrderFactory
 
 # Applied to all tests
@@ -44,3 +46,27 @@ def test_order_price_total_fails_when_sum_is_not_correct():
         )
 
     assert error.value.message_dict == {"price_total": ["Must be the sum of net and vat amounts"]}
+
+
+def test_order_status_and_order_status_with_free_match():
+    order_statuses = sorted(OrderStatus)
+    order_free_statuses = sorted(OrderStatusWithFree)
+
+    assert "FREE" in order_free_statuses
+    assert "FREE" not in order_statuses
+
+    order_free_statuses.remove("FREE")
+
+    assert order_statuses == order_free_statuses
+
+
+def test_access_type_and_access_type_with_multivalued_match():
+    access_types = sorted(AccessType)
+    access_types_with_multivalued = sorted(AccessTypeWithMultivalued)
+
+    assert "MULTIVALUED" in access_types_with_multivalued
+    assert "MULTIVALUED" not in access_types
+
+    access_types_with_multivalued.remove("MULTIVALUED")
+
+    assert access_types == access_types_with_multivalued

@@ -216,7 +216,7 @@ def test_order_payment_webhook__payment_order_not_found(api_client, settings):
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 404, response.data
-    assert response.data == {"message": f"Payment order '{order_id}' not found"}
+    assert response.data == {"message": "Payment order not found"}
 
     assert SentryLogger.log_message.call_count == 1
 
@@ -241,7 +241,7 @@ def test_order_payment_webhook__payment_fetch_failed(api_client, settings):
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 500, response.data
-    assert response.data == {"message": f"Checking payment for order '{order_id}' failed"}
+    assert response.data == {"message": "Could not get payment from verkkokauppa"}
 
     assert SentryLogger.log_message.call_count == 1
 
@@ -266,7 +266,7 @@ def test_order_payment_webhook__no_payment_from_verkkokauppa(api_client, setting
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 404, response.data
-    assert response.data == {"message": f"Payment '{order_id}' not found from verkkokauppa"}
+    assert response.data == {"message": "Payment not found from verkkokauppa"}
 
     assert SentryLogger.log_message.call_count == 1
 
@@ -292,6 +292,6 @@ def test_order_payment_webhook__invalid_payment_status(api_client, settings):
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
-    assert response.data == {"message": "Invalid payment status: 'foo'"}
+    assert response.data == {"message": "Payment order doesn't require update based webshop payment status"}
 
     assert SentryLogger.log_message.call_count == 1

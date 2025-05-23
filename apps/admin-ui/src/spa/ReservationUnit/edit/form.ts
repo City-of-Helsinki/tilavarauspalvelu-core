@@ -19,6 +19,7 @@ import {
   type ReservationUnitEditQuery,
   type ReservationUnitPricingSerializerInput,
   AccessType,
+  PaymentType,
 } from "@gql/gql-types";
 import { addDays, endOfDay, format } from "date-fns";
 import { z } from "zod";
@@ -29,7 +30,6 @@ import {
 import { fromUIDateTime } from "@/helpers";
 import { intervalToNumber } from "@/schemas/utils";
 
-export const PaymentTypes = ["ONLINE", "INVOICE", "ON_SITE"] as const;
 export const AccessTypes = [
   "ACCESS_CODE",
   "OPENED_BY_STAFF",
@@ -62,6 +62,7 @@ const PricingFormSchema = z.object({
   highestPrice: z.number(),
   highestPriceNet: z.number(),
   priceUnit: z.nativeEnum(PriceUnit).nullable(),
+  paymentType: z.nativeEnum(PaymentType).nullable(),
   // NOTE this has to be a string because of HDS date input in ui format: "d.M.yyyy"
   begins: z.string(),
   // frontend only value, otherwise invalid begin values will break future dates
@@ -146,6 +147,14 @@ function refinePricing(
       ctx.addIssue({
         message: "lowestPrice must be lower than highestPrice",
         path: [`${path}.lowestPrice`],
+        code: z.ZodIssueCode.custom,
+      });
+    }
+
+    if (!data.paymentType) {
+      ctx.addIssue({
+        message: "Required",
+        path: [`${path}.paymentType`],
         code: z.ZodIssueCode.custom,
       });
     }
@@ -448,7 +457,6 @@ export const ReservationUnitEditSchema = z
     equipments: z.array(z.number()),
     purposes: z.array(z.number()),
     qualifiers: z.array(z.number()),
-    paymentTypes: z.array(z.string()),
     pricings: z.array(PricingFormSchema),
     seasons: z.array(SeasonalFormSchema),
     // "Not draft reservation unit must have a reservation unit type."
@@ -542,6 +550,12 @@ export const ReservationUnitEditSchema = z
           message: "duration can't be less than reservation start interval",
           path: ["maxReservationDuration"],
         });
+      }
+    }
+
+    if (!v.isDraft || v.pricings.length) {
+      for (let i = 0; i < v.pricings.length; i++) {
+        refinePricing(v.pricings[i], ctx, `pricings.${i}`);
       }
     }
 
@@ -704,21 +718,8 @@ export const ReservationUnitEditSchema = z
       }
     }
 
-    // refine pricing only if not draft and the pricing is enabled
-    for (let i = 0; i < v.pricings.length; i++) {
-      const p = v.pricings[i];
-      refinePricing(p, ctx, `pricings.${i}`);
-    }
-
     // TODO if it includes futurePricing check that the futurePrice date is in the future (is today ok?)
     const isPaid = v.pricings.some((p) => p.highestPrice > 0);
-    if (isPaid && v.paymentTypes.length === 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Required",
-        path: ["paymentTypes"],
-      });
-    }
     if (v.canApplyFreeOfCharge && isPaid && v.pricingTerms == null) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -757,6 +758,7 @@ function convertPricing(p?: PricingNode): PricingFormValues {
     isPaid: (toNumber(p?.highestPrice) ?? 0) > 0,
     isFuture: new Date(p?.begins ?? "") > new Date(),
     priceUnit: p?.priceUnit ?? null,
+    paymentType: p?.paymentType ?? null,
     begins: convertBegins(p?.begins),
   };
 }
@@ -793,6 +795,7 @@ function convertPricingList(pricings: PricingNode[]): PricingFormValues[] {
       isFuture,
       isPaid: false,
       priceUnit: null,
+      paymentType: null,
       begins,
     });
   }
@@ -937,7 +940,6 @@ export function convertReservationUnit(
     serviceSpecificTerms: data?.serviceSpecificTerms?.pk ?? null,
     cancellationTerms: data?.cancellationTerms?.pk ?? null,
     cancellationRule: data?.cancellationRule?.pk ?? null,
-    paymentTypes: filterNonNullable(data?.paymentTypes?.map((pt) => pt?.code)),
     pricings: convertPricingList(filterNonNullable(data?.pricings)),
     images: filterNonNullable(data?.images).map((i) => convertImage(i)),
     isDraft: data?.isDraft ?? false,
@@ -1090,5 +1092,6 @@ function transformPricing(
     lowestPrice: p.isPaid ? p.lowestPrice.toString() : "0",
     ...(p.pk > 0 ? { pk: p.pk } : {}),
     ...(p.priceUnit != null ? { priceUnit: p.priceUnit } : {}),
+    ...(p.paymentType != null ? { paymentType: p.paymentType } : {}),
   };
 }

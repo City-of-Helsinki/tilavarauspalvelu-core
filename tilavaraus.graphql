@@ -854,7 +854,6 @@ type ReservationUnitNode implements Node {
     """Ordering"""
     orderBy: [EquipmentOrderingChoices]
   ): [EquipmentNode!]!
-  paymentTypes: [ReservationUnitPaymentTypeNode!]!
   qualifiers(
     nameFi: String
     nameEn: String
@@ -1450,13 +1449,6 @@ enum EquipmentOrderingChoices {
   nameSvDesc
   categoryRankAsc
   categoryRankDesc
-}
-
-type ReservationUnitPaymentTypeNode implements Node {
-  code: String!
-
-  """The ID of the object"""
-  id: ID!
 }
 
 type QualifierNode implements Node {
@@ -2308,6 +2300,7 @@ enum OrderStatusWithFree {
   CANCELLED
   PAID
   PAID_MANUALLY
+  PAID_BY_INVOICE
   REFUNDED
   FREE
 }
@@ -2410,9 +2403,9 @@ type PaymentOrderNode implements Node {
 
 """An enumeration."""
 enum PaymentType {
-  ONLINE
   ON_SITE
-  INVOICE
+  ONLINE
+  ONLINE_OR_INVOICE
 }
 
 """An enumeration."""
@@ -2421,6 +2414,7 @@ enum OrderStatus {
   EXPIRED
   CANCELLED
   PAID
+  PAID_BY_INVOICE
   PAID_MANUALLY
   REFUNDED
 }
@@ -2478,6 +2472,7 @@ enum ImageType {
 type ReservationUnitPricingNode implements Node {
   begins: Date!
   priceUnit: PriceUnit!
+  paymentType: PaymentType
   lowestPrice: Decimal!
   highestPrice: Decimal!
   taxPercentage: TaxPercentageNode!
@@ -3362,7 +3357,6 @@ type Mutation {
   denyReservationSeries(input: ReservationSeriesDenyMutationInput!): ReservationSeriesDenyMutationPayload
   changeReservationSeriesAccessCode(input: ReservationSeriesChangeAccessCodeMutationInput!): ReservationSeriesChangeAccessCodeMutationPayload
   repairReservationSeriesAccessCode(input: ReservationSeriesRepairAccessCodeMutationInput!): ReservationSeriesRepairAccessCodeMutationPayload
-  refreshOrder(input: RefreshOrderMutationInput!): RefreshOrderMutationPayload
   updateCurrentUser(input: CurrentUserUpdateMutationInput!): CurrentUserUpdateMutationPayload
   updateStaffUser(input: UserStaffUpdateMutationInput!): UserStaffUpdateMutationPayload
   createBannerNotification(input: BannerNotificationCreateMutationInput!): BannerNotificationCreateMutationPayload
@@ -4092,7 +4086,6 @@ type ReservationUnitCreateMutationPayload {
   resources: [Int]
   purposes: [Int]
   equipments: [Int]
-  paymentTypes: [String]
   qualifiers: [Int]
   images: [ReservationUnitImageNode]
   pricings: [ReservationUnitPricingNode]
@@ -4164,7 +4157,6 @@ input ReservationUnitCreateMutationInput {
   resources: [Int]
   purposes: [Int]
   equipments: [Int]
-  paymentTypes: [String]
   qualifiers: [Int]
   images: [ReservationUnitImageFieldSerializerInput]
   pricings: [ReservationUnitPricingSerializerInput]
@@ -4187,6 +4179,7 @@ input ReservationUnitPricingSerializerInput {
   pk: Int
   begins: Date!
   isActivatedOnBegins: Boolean
+  paymentType: PaymentType
   priceUnit: PriceUnit
   lowestPrice: Decimal
   lowestPriceNet: String
@@ -4278,7 +4271,6 @@ type ReservationUnitUpdateMutationPayload {
   resources: [Int]
   purposes: [Int]
   equipments: [Int]
-  paymentTypes: [String]
   qualifiers: [Int]
   images: [ReservationUnitImageNode]
   pricings: [ReservationUnitPricingNode]
@@ -4350,7 +4342,6 @@ input ReservationUnitUpdateMutationInput {
   resources: [Int]
   purposes: [Int]
   equipments: [Int]
-  paymentTypes: [String]
   qualifiers: [Int]
   images: [UpdateReservationUnitImageFieldSerializerInput]
   pricings: [UpdateReservationUnitPricingSerializerInput]
@@ -4370,6 +4361,7 @@ input UpdateReservationUnitPricingSerializerInput {
   pk: Int
   begins: Date
   isActivatedOnBegins: Boolean
+  paymentType: PaymentType
   priceUnit: PriceUnit
   lowestPrice: Decimal
   lowestPriceNet: String
@@ -5022,16 +5014,6 @@ type ReservationSeriesRepairAccessCodeMutationPayload {
 
 input ReservationSeriesRepairAccessCodeMutationInput {
   pk: Int!
-}
-
-type RefreshOrderMutationPayload {
-  orderUuid: String
-  status: String
-  reservationPk: Int
-}
-
-input RefreshOrderMutationInput {
-  orderUuid: String!
 }
 
 type CurrentUserUpdateMutationPayload {

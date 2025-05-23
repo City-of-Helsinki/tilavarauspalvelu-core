@@ -21,8 +21,10 @@ from .types.equipment.types import EquipmentAllNode, EquipmentNode
 from .types.equipment_category.types import EquipmentCategoryNode
 from .types.helsinki_profile.types import HelsinkiProfileDataNode
 from .types.location.types import LocationNode
-from .types.merchants.types import PaymentMerchantNode, PaymentOrderNode, PaymentProductNode
 from .types.organisation.types import OrganisationNode
+from .types.payment_merchant.types import PaymentMerchantNode
+from .types.payment_order.types import PaymentOrderNode
+from .types.payment_product.types import PaymentProductNode
 from .types.permissions.types import GeneralRoleNode, PermissionCheckerType, UnitRoleNode
 from .types.person.types import PersonNode
 from .types.purpose.types import PurposeNode
@@ -39,7 +41,6 @@ from .types.reservation_unit_access_type.types import ReservationUnitAccessTypeN
 from .types.reservation_unit_cancellation_rule.types import ReservationUnitCancellationRuleNode
 from .types.reservation_unit_image.types import ReservationUnitImageNode
 from .types.reservation_unit_option.types import ReservationUnitOptionNode
-from .types.reservation_unit_payment_type.types import ReservationUnitPaymentTypeNode
 from .types.reservation_unit_pricing.types import ReservationUnitPricingNode
 from .types.reservation_unit_type.types import ReservationUnitTypeNode
 from .types.resource.types import ResourceNode
@@ -91,7 +92,6 @@ __all__ = [
     "ReservationUnitImageNode",
     "ReservationUnitNode",
     "ReservationUnitOptionNode",
-    "ReservationUnitPaymentTypeNode",
     "ReservationUnitPricingNode",
     "ReservationUnitTypeNode",
     "ResourceNode",

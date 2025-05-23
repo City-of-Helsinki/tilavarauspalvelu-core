@@ -110,7 +110,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "resources",
             "purposes",
             "equipments",
-            "payment_types",
             "qualifiers",
             #
             # Reverse one-to-many related
@@ -244,7 +243,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
             highest_price = pricing.get("highest_price")
             lowest_price = pricing.get("lowest_price")
 
-            if lowest_price is None and highest_price is None:  # = Free
+            if not lowest_price and not highest_price:  # = Free
                 continue
             if lowest_price is None or highest_price is None:
                 msg = "Both lowest and highest price must be given or neither."
@@ -252,6 +251,10 @@ class ReservationUnitSerializer(NestingModelSerializer):
             if highest_price < lowest_price:
                 msg = "Highest price cannot be less than lowest price."
                 raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_INVALID_PRICES)
+
+            if pricing.get("payment_type") is None:
+                msg = "Pricing has no payment type defined"
+                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICING_NO_PAYMENT_TYPE)
 
     def _validate_access_types(self, *, access_types: list[dict[str, Any]], is_draft: bool) -> None:  # noqa: PLR0912
         editing = getattr(self.instance, "pk", None) is not None

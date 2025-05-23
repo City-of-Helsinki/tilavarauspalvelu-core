@@ -3,12 +3,12 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any, Self
 
-from django.utils.timezone import get_default_timezone, now
+from django.utils.timezone import now
 from factory import fuzzy
 
 from tilavarauspalvelu.enums import ApplicantTypeChoice, ApplicationStatusChoice, Priority, Weekday
 from tilavarauspalvelu.models import Application
-from utils.date_utils import local_datetime, local_time
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_time
 
 from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder, ReverseForeignKeyFactory
 
@@ -248,8 +248,8 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
                 application_section=application_section,
                 priority=Priority.PRIMARY,
                 day_of_the_week=day_of_the_week,
-                begin_time=datetime.time(10, 0, tzinfo=get_default_timezone()),
-                end_time=datetime.time(14, 0, tzinfo=get_default_timezone()),
+                begin_time=datetime.time(10, 0, tzinfo=DEFAULT_TIMEZONE),
+                end_time=datetime.time(14, 0, tzinfo=DEFAULT_TIMEZONE),
             )
             if not pre_allocated:
                 continue
@@ -257,8 +257,8 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
             AllocatedTimeSlotFactory.create(
                 reservation_unit_option=reservation_unit_option,
                 day_of_the_week=day_of_the_week,
-                begin_time=datetime.time(10, 0, tzinfo=get_default_timezone()),
-                end_time=datetime.time(10 + max_duration_hours, 0, tzinfo=get_default_timezone()),
+                begin_time=datetime.time(10, 0, tzinfo=DEFAULT_TIMEZONE),
+                end_time=datetime.time(10 + max_duration_hours, 0, tzinfo=DEFAULT_TIMEZONE),
             )
 
         return application

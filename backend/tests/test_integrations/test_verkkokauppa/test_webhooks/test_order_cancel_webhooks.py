@@ -6,13 +6,13 @@ from decimal import Decimal
 
 import pytest
 from django.urls import reverse
-from django.utils.timezone import get_default_timezone
 
 from tilavarauspalvelu.enums import OrderStatus
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import GetOrderError
-from tilavarauspalvelu.integrations.verkkokauppa.order.types import Order
+from tilavarauspalvelu.integrations.verkkokauppa.order.types import Order, WebShopOrderStatus
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import PaymentOrderFactory
 from tests.helpers import patch_method
@@ -23,12 +23,12 @@ pytestmark = [
 ]
 
 
-def _create_mock_order(order_id: uuid.UUID, status: str = "") -> Order:
+def _create_mock_order(order_id: uuid.UUID, status: WebShopOrderStatus = "") -> Order:
     return Order(
         order_id=order_id,
         namespace="tilanvaraus",
         user=str(uuid.uuid4()),
-        created_at=datetime.datetime.now(tz=get_default_timezone()),
+        created_at=datetime.datetime.now(tz=DEFAULT_TIMEZONE),
         items=[],
         price_net=Decimal(100),
         price_vat=Decimal(24),
@@ -36,17 +36,24 @@ def _create_mock_order(order_id: uuid.UUID, status: str = "") -> Order:
         checkout_url="https://checkout.url",
         receipt_url="https://receipt.url",
         customer=None,
-        status=status or "cancelled",
+        status=status or WebShopOrderStatus.CANCELLED,
         subscription_id=None,
         type="order",
     )
 
 
 @patch_method(VerkkokauppaAPIClient.get_order)
-def test_order_cancel_webhook__success(api_client, settings):
+@pytest.mark.parametrize(
+    "status",
+    [
+        OrderStatus.DRAFT,
+        OrderStatus.EXPIRED,
+    ],
+)
+def test_order_cancel_webhook__success(api_client, settings, status):
     order_id = uuid.uuid4()
     VerkkokauppaAPIClient.get_order.return_value = _create_mock_order(order_id)
-    payment_order = PaymentOrderFactory.create(remote_id=order_id, status=OrderStatus.DRAFT, processed_at=None)
+    payment_order = PaymentOrderFactory.create(remote_id=order_id, status=status, processed_at=None)
 
     data = {
         "orderId": str(order_id),
@@ -67,9 +74,9 @@ def test_order_cancel_webhook__success(api_client, settings):
 @pytest.mark.parametrize(
     "status",
     [
-        OrderStatus.EXPIRED,
         OrderStatus.CANCELLED,
         OrderStatus.PAID,
+        OrderStatus.PAID_BY_INVOICE,
         OrderStatus.PAID_MANUALLY,
         OrderStatus.REFUNDED,
     ],
@@ -166,7 +173,7 @@ def test_order_cancel_webhook__payment_order_not_found(api_client, settings):
     response = api_client.post(reverse("order-list"), data=data, format="json")
 
     assert response.status_code == 404, response.data
-    assert response.data == {"message": f"Payment order '{order_id}' not found"}
+    assert response.data == {"message": "Payment order not found"}
 
     assert SentryLogger.log_message.call_count == 1
 
@@ -186,7 +193,7 @@ def test_order_cancel_webhook__order_fetch_failed(api_client, settings):
     response = api_client.post(reverse("order-list"), data=data, format="json")
 
     assert response.status_code == 500, response.data
-    assert response.data == {"message": f"Checking order '{order_id}' failed"}
+    assert response.data == {"message": "Could not get order from verkkokauppa"}
 
     assert SentryLogger.log_message.call_count == 1
 
@@ -206,7 +213,7 @@ def test_order_cancel_webhook__no_order_from_verkkokauppa(api_client, settings):
     response = api_client.post(reverse("order-list"), data=data, format="json")
 
     assert response.status_code == 404, response.data
-    assert response.data == {"message": f"Order '{order_id}' not found from verkkokauppa"}
+    assert response.data == {"message": "Order not found from verkkokauppa"}
 
     assert SentryLogger.log_message.call_count == 1
 
@@ -226,6 +233,6 @@ def test_order_cancel_webhook__invalid_order_status(api_client, settings):
     response = api_client.post(reverse("order-list"), data=data, format="json")
 
     assert response.status_code == 400, response.data
-    assert response.data == {"message": "Invalid order status: 'foo'"}
+    assert response.data == {"message": "Payment order cannot be cancelled based webshop order status"}
 
     assert SentryLogger.log_message.call_count == 1

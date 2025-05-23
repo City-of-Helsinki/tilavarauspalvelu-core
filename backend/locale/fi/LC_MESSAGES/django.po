@@ -50,6 +50,10 @@ msgid "of which can be refunded:"
 msgstr "joista voidaan hyvittää:"
 
 #: templates/admin/deny_reservation_confirmation.html
+msgid "of which can be cancelled:"
+msgstr "joista voidaan perua:"
+
+#: templates/admin/deny_reservation_confirmation.html
 msgid "Number of ended reservations, which can't be denied:"
 msgstr "Valittujen varausten määrä, jota ei voida hylätä:"
 
@@ -1470,12 +1474,18 @@ msgid "Deny selected reservations and refund"
 msgstr "Hylkää valitut varaukset ja hyvitä"
 
 #: tilavarauspalvelu/admin/reservation/admin.py
-msgid "Refund has been initiated for selected reservations."
-msgstr "Hyvitys on aloitettu valituille varauksille."
+#, python-format
+msgid "Refund has been initiated for %(count)s paid reservations."
+msgstr "Hyvitys on aloitettu %(count)s maksetulle varaukselle."
 
 #: tilavarauspalvelu/admin/reservation/admin.py
-msgid "No reservations with paid orders to refund."
-msgstr "Ei varauksia hyvitettävillä maksetuilla tilauksilla."
+#, python-format
+msgid "Cancellation has been initiated for %(count)s invoiced reservations."
+msgstr "Peruutus on aloitettu %(count)s laskutetulle varaukselle."
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "No reservations with paid orders to refund or cancel."
+msgstr "Ei hyvitettäviä tai peruutettavia maksettuja varauksia."
 
 #: tilavarauspalvelu/admin/reservation/filters.py
 #: tilavarauspalvelu/admin/reservation/form.py
@@ -2080,10 +2090,6 @@ msgid "Reservation kind"
 msgstr "Varauksen tyyppi"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Payment types"
-msgstr "Maksutyyppi"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Reservation block whole day"
 msgstr "Varaukset sulkevat koko päivän"
 
@@ -2503,6 +2509,11 @@ msgstr "Maksettu"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "OrderStatus"
+msgid "Paid by invoice"
+msgstr "Maksettu laskulla"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrderStatus"
 msgid "Paid manually"
 msgstr "Maksettu manuaalisesti"
 
@@ -2822,18 +2833,18 @@ msgstr "Maksuton"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "PaymentType"
-msgid "Online"
-msgstr "Verkossa"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "PaymentType"
 msgid "On site"
 msgstr "Paikan päällä"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "PaymentType"
-msgid "Invoice"
-msgstr "Lasku"
+msgid "Online"
+msgstr "Verkossa"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PaymentType"
+msgid "Online or invoice"
+msgstr "Verkossa tai laskulla"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "PriceUnit"
@@ -3965,14 +3976,6 @@ msgstr "kirjanpidon tiliöintitieto"
 msgid "payment accountings"
 msgstr "kirjanpidon tiliöintitiedot"
 
-#: tilavarauspalvelu/models/payment_accounting/model.py
-msgid ""
-"One of the following fields must be given: internal_order, profit_center, "
-"project"
-msgstr ""
-"Jokin seuraavista kentistä täytyy olla annettu: internal_order, "
-"profit_center, project"
-
 #: tilavarauspalvelu/models/payment_merchant/model.py
 msgid "payment merchant"
 msgstr "kauppias"
@@ -4235,14 +4238,6 @@ msgstr "varausyksikkövaihtoehtot"
 #: tilavarauspalvelu/models/reservation_unit_option/model.py
 msgid "Preferred order must be unique for each application section"
 msgstr "Suosittu järjestys tulee olla uniikki jokaiselle hakemuksen osalle"
-
-#: tilavarauspalvelu/models/reservation_unit_payment_type/model.py
-msgid "reservation unit payment type"
-msgstr "varausyksikön maksutyyppi"
-
-#: tilavarauspalvelu/models/reservation_unit_payment_type/model.py
-msgid "reservation unit payment types"
-msgstr "varausyksikön maksutyypit"
 
 #: tilavarauspalvelu/models/reservation_unit_pricing/model.py
 msgid "reservation unit pricing"

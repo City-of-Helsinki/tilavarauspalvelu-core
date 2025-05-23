@@ -10,10 +10,10 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
-from tilavarauspalvelu.integrations.verkkokauppa.payment.types import PaymentStatus
+from tilavarauspalvelu.integrations.verkkokauppa.payment.types import WebShopPaymentStatus
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.tasks import update_expired_orders_task
-from utils.date_utils import local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from tests.factories import PaymentFactory, PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
@@ -32,7 +32,7 @@ def order():
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 def test_verkkokauppa_pruning__update_expired_orders__handle_cancelled_orders(order):
-    VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory.create(status=PaymentStatus.CANCELLED.value)
+    VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory.create(status=WebShopPaymentStatus.CANCELLED)
 
     with freeze_time(order.created_at + datetime.timedelta(minutes=6)):
         update_expired_orders_task()
@@ -46,7 +46,7 @@ def test_verkkokauppa_pruning__update_expired_orders__handle_cancelled_orders(or
 @patch_method(VerkkokauppaAPIClient.cancel_order)
 def test_verkkokauppa_pruning__update_expired_orders__handle_expired_orders(order):
     VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory.create(
-        status=PaymentStatus.CREATED.value,
+        status=WebShopPaymentStatus.CREATED,
         timestamp=order.created_at,
     )
 
@@ -63,7 +63,9 @@ def test_verkkokauppa_pruning__update_expired_orders__handle_expired_orders(orde
 @patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
 @patch_method(VerkkokauppaAPIClient.get_payment)
 def test_verkkokauppa_pruning__update_expired_orders__handle_paid_orders(order):
-    VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory.create(status=PaymentStatus.PAID_ONLINE.value)
+    VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory.create(
+        status=WebShopPaymentStatus.PAID_ONLINE,
+    )
 
     with freeze_time(order.created_at + datetime.timedelta(minutes=6)):
         update_expired_orders_task()
@@ -91,7 +93,7 @@ def test_verkkokauppa_pruning__update_expired_orders__handle_missing_payment(ord
     assert VerkkokauppaAPIClient.cancel_order.called is True
 
 
-@patch_method(SentryLogger.log_exception)
+@patch_method(SentryLogger.log_message)
 @patch_method(VerkkokauppaAPIClient.get_payment, side_effect=GetPaymentError("mock-error"))
 def test_verkkokauppa_pruning__update_expired_orders__get_payment_errors_are_logged(order):
     with freeze_time(order.created_at + datetime.timedelta(minutes=6)):
@@ -100,16 +102,16 @@ def test_verkkokauppa_pruning__update_expired_orders__get_payment_errors_are_log
     order.refresh_from_db()
     assert order.status == OrderStatus.DRAFT
     assert VerkkokauppaAPIClient.get_payment.called is True
-    assert SentryLogger.log_exception.call_count == 1
+    assert SentryLogger.log_message.call_count == 1
 
 
-@patch_method(SentryLogger.log_exception)
+@patch_method(SentryLogger.log_message)
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(VerkkokauppaAPIClient.cancel_order, side_effect=CancelOrderError("mock-error"))
 def test_verkkokauppa_pruning__update_expired_orders__cancel_error_errors_are_logged(order):
     VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory.create(
-        status=PaymentStatus.CREATED.value,
-        timestamp=order.created_at,
+        status=WebShopPaymentStatus.CREATED,
+        timestamp=order.created_at.astimezone(tz=DEFAULT_TIMEZONE),
     )
 
     with freeze_time(order.created_at + datetime.timedelta(minutes=6)):
@@ -119,14 +121,14 @@ def test_verkkokauppa_pruning__update_expired_orders__cancel_error_errors_are_lo
     assert order.status == OrderStatus.DRAFT
     assert VerkkokauppaAPIClient.get_payment.called is True
     assert VerkkokauppaAPIClient.cancel_order.called is True
-    assert SentryLogger.log_exception.call_count == 1
+    assert SentryLogger.log_message.call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(VerkkokauppaAPIClient.cancel_order)
 def test_verkkokauppa_pruning__update_expired_orders__give_more_time_if_user_entered_to_payment_phase(order):
     VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory.create(
-        status=PaymentStatus.CREATED.value,
+        status=WebShopPaymentStatus.CREATED,
         timestamp=order.created_at + datetime.timedelta(minutes=4),
     )
 
