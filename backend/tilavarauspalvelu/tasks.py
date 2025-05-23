@@ -20,7 +20,6 @@ from tilavarauspalvelu.models import (
     ApplicationRound,
     PaymentOrder,
     PersonalInfoViewLog,
-    RecurringReservation,
     Reservation,
     ReservationStatistic,
     ReservationUnit,
@@ -52,7 +51,6 @@ __all__ = [
     "delete_expired_applications",
     "delete_pindora_reservation",
     "generate_reservation_series_from_allocations",
-    "prune_recurring_reservations_task",
     "prune_reservation_statistics_task",
     "prune_reservations_task",
     "purge_image_cache",
@@ -212,11 +210,6 @@ def update_expired_orders_task() -> None:
 @app.task(name="prune_reservation_statistics")
 def prune_reservation_statistics_task() -> None:
     ReservationStatistic.objects.delete_expired_statistics()
-
-
-@app.task(name="prune_recurring_reservations")
-def prune_recurring_reservations_task() -> None:
-    RecurringReservation.objects.delete_empty_series()
 
 
 @app.task(
