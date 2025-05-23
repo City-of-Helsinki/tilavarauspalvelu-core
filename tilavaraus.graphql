@@ -527,18 +527,7 @@ type Query {
     """Ordering"""
     orderBy: [RejectedOccurrenceOrderingChoices]
   ): RejectedOccurrenceNodeConnection
-  reservationCancelReasons(
-    first: Int
-    last: Int
-    offset: Int
-    after: String
-    before: String
-    reason: String
-    pk: [Int]
-
-    """Ordering"""
-    orderBy: [ReservationCancelReasonOrderingChoices]
-  ): ReservationCancelReasonNodeConnection
+  reservationCancelReasons: [ReservationCancelReasonType!]!
   reservationDenyReasons(
     first: Int
     last: Int
@@ -1495,9 +1484,10 @@ type ReservationNode implements Node {
   numPersons: Int
   state: ReservationStateChoice
   type: ReservationTypeChoice
-  cancelDetails: String
   handlingDetails: String
   workingMemo: String
+  cancelDetails: String
+  cancelReason: ReservationCancelReasonChoice
   begin: DateTime!
   end: DateTime!
   bufferTimeBefore: Duration!
@@ -1591,7 +1581,6 @@ type ReservationNode implements Node {
   user: UserNode
   recurringReservation: RecurringReservationNode
   denyReason: ReservationDenyReasonNode
-  cancelReason: ReservationCancelReasonNode
   purpose: ReservationPurposeNode
   homeCity: CityNode
   ageGroup: AgeGroupNode
@@ -1641,6 +1630,17 @@ enum ReservationTypeChoice {
   STAFF
   BEHALF
   SEASONAL
+}
+
+"""Reasons why user has cancelled their reservation"""
+enum ReservationCancelReasonChoice {
+  FOUND_ANOTHER_SPACE_VARAAMO
+  FOUND_ANOTHER_SPACE_ELSEWHERE
+  CHANGE_OF_PLANS
+  UNSUITABLE_SPACE
+  PROCESSING_TIME_TOO_LONG
+  OTHER
+  NOT_PAID
 }
 
 """The `Decimal` scalar type represents a python Decimal."""
@@ -2384,16 +2384,6 @@ type ReservationDenyReasonNode implements Node {
   pk: Int
 }
 
-type ReservationCancelReasonNode implements Node {
-  reasonFi: String
-  reasonEn: String
-  reasonSv: String
-
-  """The ID of the object"""
-  id: ID!
-  pk: Int
-}
-
 type PaymentOrderNode implements Node {
   paymentType: PaymentType!
   status: OrderStatus!
@@ -3050,30 +3040,11 @@ type RejectedOccurrenceNodeEdge {
   cursor: String!
 }
 
-type ReservationCancelReasonNodeConnection {
-  """Pagination data for this connection."""
-  pageInfo: PageInfo!
-
-  """Contains the nodes in this connection."""
-  edges: [ReservationCancelReasonNodeEdge]!
-  totalCount: Int
-}
-
-"""
-A Relay edge containing a `ReservationCancelReasonNode` and its cursor.
-"""
-type ReservationCancelReasonNodeEdge {
-  """The item at the end of the edge"""
-  node: ReservationCancelReasonNode
-
-  """A cursor for use in pagination"""
-  cursor: String!
-}
-
-"""Ordering fields for the 'ReservationCancelReason' model."""
-enum ReservationCancelReasonOrderingChoices {
-  pkAsc
-  pkDesc
+type ReservationCancelReasonType {
+  value: ReservationCancelReasonChoice!
+  reasonFi: String!
+  reasonEn: String!
+  reasonSv: String!
 }
 
 type ReservationDenyReasonNodeConnection {
@@ -3781,7 +3752,7 @@ type ApplicationSectionReservationCancellationMutationPayload {
 
 input ApplicationSectionReservationCancellationMutationInput {
   pk: Int!
-  cancelReason: Int!
+  cancelReason: ReservationCancelReasonChoice!
   cancelDetails: String
 }
 
@@ -4627,14 +4598,14 @@ input ReservationConfirmMutationInput {
 
 type ReservationCancellationMutationPayload {
   pk: Int
-  cancelReason: Int
+  cancelReason: ReservationCancelReasonChoice
   cancelDetails: String
   state: ReservationStateChoice
 }
 
 input ReservationCancellationMutationInput {
   pk: Int!
-  cancelReason: Int!
+  cancelReason: ReservationCancelReasonChoice!
   cancelDetails: String
 }
 

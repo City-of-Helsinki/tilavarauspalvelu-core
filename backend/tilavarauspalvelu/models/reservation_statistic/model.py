@@ -7,7 +7,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from tilavarauspalvelu.enums import CustomerTypeChoice
+from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationCancelReasonChoice
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
@@ -124,15 +124,20 @@ class ReservationStatistic(models.Model):
 
     @classmethod
     def for_reservation(cls, reservation: Reservation, *, save: bool = False) -> ReservationStatistic:  # noqa: PLR0915
+        from tilavarauspalvelu.translation import translated
+
         recurring_reservation = getattr(reservation, "recurring_reservation", None)
         ability_group = getattr(recurring_reservation, "ability_group", None)
         allocated_time_slot = getattr(recurring_reservation, "allocated_time_slot", None)
         age_group = getattr(reservation, "age_group", None)
-        cancel_reason = getattr(reservation, "cancel_reason", None)
         deny_reason = getattr(reservation, "deny_reason", None)
         user = getattr(reservation, "user", None)
         home_city = getattr(reservation, "home_city", None)
         purpose = getattr(reservation, "purpose", None)
+
+        cancel_reason: ReservationCancelReasonChoice | None = None
+        if reservation.cancel_reason is not None:
+            cancel_reason = ReservationCancelReasonChoice(reservation.cancel_reason)
 
         requires_org_name = reservation.reservee_type != CustomerTypeChoice.INDIVIDUAL
         requires_org_id = not reservation.reservee_is_unregistered_association and requires_org_name
@@ -153,8 +158,7 @@ class ReservationStatistic(models.Model):
         statistic.begin = begin
         statistic.buffer_time_after = reservation.buffer_time_after
         statistic.buffer_time_before = reservation.buffer_time_before
-        statistic.cancel_reason = getattr(cancel_reason, "id", None)
-        statistic.cancel_reason_text = getattr(cancel_reason, "reason", "")
+        statistic.cancel_reason_text = translated(cancel_reason.label, "fi") if cancel_reason is not None else ""
         statistic.deny_reason = getattr(deny_reason, "id", None)
         statistic.deny_reason_text = getattr(deny_reason, "reason", "")
         statistic.duration_minutes = int(duration.total_seconds() / 60)

@@ -5,17 +5,17 @@ import datetime
 import pytest
 from freezegun import freeze_time
 
-from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import (
+    AccessType,
+    ReservationCancelReasonChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from utils.date_utils import local_date, local_datetime
 
-from tests.factories import (
-    AllocatedTimeSlotFactory,
-    ApplicationRoundFactory,
-    ReservationCancelReasonFactory,
-    UserFactory,
-)
+from tests.factories import AllocatedTimeSlotFactory, ApplicationRoundFactory, UserFactory
 from tests.helpers import patch_method
 
 from .helpers import CANCEL_SECTION_SERIES_MUTATION, create_reservation_series
@@ -30,7 +30,6 @@ pytestmark = [
 @patch_method(EmailService.send_seasonal_booking_cancelled_all_staff_notification_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__cancel_section_series__cancel_whole_remaining(graphql):
-    reason = ReservationCancelReasonFactory.create()
     user = UserFactory.create()
 
     reservation_series = create_reservation_series(
@@ -52,7 +51,7 @@ def test_recurring_reservations__cancel_section_series__cancel_whole_remaining(g
 
     data = {
         "pk": section.pk,
-        "cancelReason": reason.pk,
+        "cancelReason": ReservationCancelReasonChoice.CHANGE_OF_PLANS,
         "cancelDetails": "Cancellation details",
     }
 
@@ -70,7 +69,6 @@ def test_recurring_reservations__cancel_section_series__cancel_whole_remaining(g
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__cancel_section_series__cancel_details_not_required(graphql):
-    reason = ReservationCancelReasonFactory.create()
     user = UserFactory.create()
 
     reservation_series = create_reservation_series(
@@ -92,7 +90,7 @@ def test_recurring_reservations__cancel_section_series__cancel_details_not_requi
 
     data = {
         "pk": section.pk,
-        "cancelReason": reason.pk,
+        "cancelReason": ReservationCancelReasonChoice.CHANGE_OF_PLANS,
     }
 
     graphql.force_login(user)
@@ -106,7 +104,6 @@ def test_recurring_reservations__cancel_section_series__cancel_details_not_requi
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__cancel_section_series__not_seasonal_type(graphql):
-    reason = ReservationCancelReasonFactory.create()
     user = UserFactory.create()
 
     reservation_series = create_reservation_series(
@@ -128,7 +125,7 @@ def test_recurring_reservations__cancel_section_series__not_seasonal_type(graphq
 
     data = {
         "pk": section.pk,
-        "cancelReason": reason.pk,
+        "cancelReason": ReservationCancelReasonChoice.CHANGE_OF_PLANS,
         "cancelDetails": "Cancellation details",
     }
 
@@ -143,7 +140,6 @@ def test_recurring_reservations__cancel_section_series__not_seasonal_type(graphq
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__cancel_section_series__paid(graphql):
-    reason = ReservationCancelReasonFactory.create()
     user = UserFactory.create()
 
     reservation_series = create_reservation_series(
@@ -165,7 +161,7 @@ def test_recurring_reservations__cancel_section_series__paid(graphql):
 
     data = {
         "pk": section.pk,
-        "cancelReason": reason.pk,
+        "cancelReason": ReservationCancelReasonChoice.CHANGE_OF_PLANS,
         "cancelDetails": "Cancellation details",
     }
 
@@ -180,7 +176,6 @@ def test_recurring_reservations__cancel_section_series__paid(graphql):
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__cancel_section_series__not_confirmed_state(graphql):
-    reason = ReservationCancelReasonFactory.create()
     user = UserFactory.create()
 
     reservation_series = create_reservation_series(
@@ -203,7 +198,7 @@ def test_recurring_reservations__cancel_section_series__not_confirmed_state(grap
 
     data = {
         "pk": section.pk,
-        "cancelReason": reason.pk,
+        "cancelReason": ReservationCancelReasonChoice.CHANGE_OF_PLANS,
         "cancelDetails": "Cancellation details",
     }
 
@@ -218,7 +213,6 @@ def test_recurring_reservations__cancel_section_series__not_confirmed_state(grap
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__cancel_section_series__cancellation_rule(graphql):
-    reason = ReservationCancelReasonFactory.create()
     user = UserFactory.create()
 
     reservation_series = create_reservation_series(
@@ -240,7 +234,7 @@ def test_recurring_reservations__cancel_section_series__cancellation_rule(graphq
 
     data = {
         "pk": section.pk,
-        "cancelReason": reason.pk,
+        "cancelReason": ReservationCancelReasonChoice.CHANGE_OF_PLANS,
         "cancelDetails": "Cancellation details",
     }
 
@@ -269,7 +263,6 @@ def test_recurring_reservations__cancel_section_series__cancellation_rule(graphq
 @patch_method(EmailService.send_seasonal_booking_cancelled_all_staff_notification_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__cancel_section_series__access_codes(graphql):
-    reason = ReservationCancelReasonFactory.create()
     user = UserFactory.create()
 
     reservation_series = create_reservation_series(
@@ -292,7 +285,7 @@ def test_recurring_reservations__cancel_section_series__access_codes(graphql):
 
     data = {
         "pk": section.pk,
-        "cancelReason": reason.pk,
+        "cancelReason": ReservationCancelReasonChoice.CHANGE_OF_PLANS,
         "cancelDetails": "Cancellation details",
     }
 

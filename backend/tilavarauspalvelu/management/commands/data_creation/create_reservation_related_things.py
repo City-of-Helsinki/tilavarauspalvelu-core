@@ -25,7 +25,6 @@ from tilavarauspalvelu.models import (
     Purpose,
     Qualifier,
     ReservableTimeSpan,
-    ReservationCancelReason,
     ReservationDenyReason,
     ReservationMetadataField,
     ReservationMetadataSet,
@@ -50,7 +49,6 @@ from tests.factories import (
     PurposeFactory,
     QualifierFactory,
     ReservableTimeSpanFactory,
-    ReservationCancelReasonFactory,
     ReservationDenyReasonFactory,
     ReservationMetadataFieldFactory,
     ReservationMetadataSetFactory,
@@ -592,15 +590,6 @@ def _create_reservation_purposes() -> list[ReservationPurpose]:
         for _ in range(10)
     ]
     return ReservationPurpose.objects.bulk_create(reservation_purposes)
-
-
-@with_logs
-def _create_cancel_reasons() -> list[ReservationCancelReason]:
-    cancel_reasons = [
-        ReservationCancelReasonFactory.build()  #
-        for _ in range(10)
-    ]
-    return ReservationCancelReason.objects.bulk_create(cancel_reasons)
 
 
 @with_logs

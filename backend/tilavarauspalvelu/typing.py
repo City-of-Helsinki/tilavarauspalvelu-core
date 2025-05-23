@@ -19,6 +19,7 @@ if TYPE_CHECKING:
         AccessType,
         CustomerTypeChoice,
         PaymentType,
+        ReservationCancelReasonChoice,
         ReservationStateChoice,
         ReservationTypeChoice,
         ReservationTypeStaffChoice,
@@ -27,7 +28,6 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import (
         AgeGroup,
         City,
-        ReservationCancelReason,
         ReservationDenyReason,
         ReservationPurpose,
         ReservationUnit,
@@ -260,7 +260,7 @@ class ReservationCancellationData(TypedDict):
     pk: int
 
     cancel_details: str
-    cancel_reason: ReservationCancelReason
+    cancel_reason: ReservationCancelReasonChoice
 
     state: NotRequired[ReservationStateChoice]
     access_code_generated_at: NotRequired[datetime.datetime | None]
