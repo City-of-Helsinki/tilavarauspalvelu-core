@@ -1,3 +1,13 @@
+backend
+.pre-commit-config.yaml
+docker-compose.yml
+.github/
+
+# auto gen
+tilavaraus.graphql
+
+pnpm-lock.yaml
+
 # defaults
 **/.git
 **/.husky

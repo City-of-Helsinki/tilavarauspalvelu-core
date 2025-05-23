@@ -207,7 +207,6 @@ export const CONFIRMATION_QUERY = gql`
       id
       pk
       name
-      ...ReserveeNameFields
       ...ReserveeBillingFields
       ...ReservationInfo
       ...ReservationInfoCard
