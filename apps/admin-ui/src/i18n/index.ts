@@ -53,6 +53,7 @@ i18n.addResourceBundle("fi", "common", {
   remove: "Poista",
   scrollToTop: "Siirry ylös",
 });
+i18n.addResourceBundle("fi", "navigation", { navigation: "Päävalikko" });
 i18n.addResourceBundle("en", "common", {
   day: "Day",
   week: "Week",
