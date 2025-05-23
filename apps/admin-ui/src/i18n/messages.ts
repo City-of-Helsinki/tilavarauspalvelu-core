@@ -1929,6 +1929,7 @@ const translations: ITranslations = {
     showBirthDate: ["Näytä"],
     alreadyEnded: ["Päättynyt"],
     keylessEntryHeader: ["Avaimeton kulku"],
+    dueByParenthesis: ["(määräaika {{date}})"],
     DenyDialog: {
       reject: ["Hylkää varaus"],
       denyReason: ["Hylkäyksen syy"],

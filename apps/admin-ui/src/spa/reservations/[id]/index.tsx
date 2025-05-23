@@ -34,6 +34,7 @@ import { ApplicationDatas, Summary } from "@/styled";
 import { Accordion, DataWrapper } from "./components";
 import { ReservationKeylessEntry } from "./ReservationKeylessEntrySection";
 import { TimeBlockSection } from "./ReservationTimeBlockSection";
+import { toUIDateTime } from "common/src/common/util";
 
 type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
@@ -126,6 +127,14 @@ function ReservationSummary({
       {!isFree && (
         <DataWrapper isSummary label={t("RequestedReservation.price")}>
           {`${reservationPrice(reservation, t)}${
+            reservation.paymentOrder?.handledPaymentDueBy
+              ? ` ${t("RequestedReservation.dueByParenthesis", {
+                  date: toUIDateTime(
+                    new Date(reservation.paymentOrder?.handledPaymentDueBy)
+                  ),
+                })}`
+              : ""
+          }${
             reservation.applyingForFreeOfCharge
               ? `, ${t("RequestedReservation.appliesSubvention")}`
               : ""
