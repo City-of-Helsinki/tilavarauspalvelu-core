@@ -81,7 +81,7 @@ function createReservation({
   return {
     bufferTimeAfter: 0,
     bufferTimeBefore: 0,
-    paymentOrder: [],
+    paymentOrder: null,
     reservationUnits: [],
     type: ReservationTypeChoice.Behalf,
     handlingDetails: null,
