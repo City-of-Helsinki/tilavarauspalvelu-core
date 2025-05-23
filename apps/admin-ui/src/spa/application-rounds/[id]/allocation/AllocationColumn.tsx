@@ -457,10 +457,8 @@ export function AllocationColumn({
       <TimeLabel>{getTimeLabel(selection, t)}</TimeLabel>
       <StyledShowAllContainer
         showAllLabel={t("Allocation.changeTime")}
-        maximumNumber={0}
-      >
-        <TimeSelection />
-      </StyledShowAllContainer>
+        items={<TimeSelection />}
+      />
       {allocatedData.map((props) => (
         <AllocatedCard
           {...props}
