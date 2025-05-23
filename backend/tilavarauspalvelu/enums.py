@@ -40,6 +40,7 @@ __all__ = [
     "PricingType",
     "Priority",
     "RejectionReadinessChoice",
+    "ReservationCancelReasonChoice",
     "ReservationKind",
     "ReservationNotification",
     "ReservationStartInterval",
@@ -708,6 +709,50 @@ class ReservationStartInterval(models.TextChoices):
     @enum.property
     def as_timedelta(self) -> datetime.timedelta:
         return datetime.timedelta(minutes=self.as_number)
+
+
+class ReservationCancelReasonChoice(models.TextChoices):
+    """Reasons why user has cancelled their reservation"""
+
+    FOUND_ANOTHER_SPACE_VARAAMO = (
+        "FOUND_ANOTHER_SPACE_VARAAMO",
+        pgettext_lazy("ReservationCancelReason", "I found another space through Varaamo"),
+    )
+    FOUND_ANOTHER_SPACE_ELSEWHERE = (
+        "FOUND_ANOTHER_SPACE_ELSEWHERE",
+        pgettext_lazy("ReservationCancelReason", "I found another space somewhere else"),
+    )
+    CHANGE_OF_PLANS = (
+        "CHANGE_OF_PLANS",
+        pgettext_lazy("ReservationCancelReason", "My plans have changed"),
+    )
+    UNSUITABLE_SPACE = (
+        "UNSUITABLE_SPACE",
+        pgettext_lazy("ReservationCancelReason", "The space is not suitable for my purpose"),
+    )
+    PROCESSING_TIME_TOO_LONG = (
+        "PROCESSING_TIME_TOO_LONG",
+        pgettext_lazy("ReservationCancelReason", "The booking processing time is too long"),
+    )
+    OTHER = (
+        "OTHER",
+        pgettext_lazy("ReservationCancelReason", "Other reason"),
+    )
+
+    # Not selectable by user
+
+    NOT_PAID = (
+        "NOT_PAID",
+        pgettext_lazy(
+            "ReservationCancelReason",
+            "The booking was not paid for or invoice was not selected as the payment method by the deadline.",
+        ),
+    )
+
+    @classproperty
+    def user_selectable(cls) -> list[ReservationCancelReasonChoice]:
+        """These reasons are selectable by the user"""
+        return sorted(set(cls) - {cls.NOT_PAID})  # type: ignore[return-type]
 
 
 class ReservationKind(models.TextChoices):
