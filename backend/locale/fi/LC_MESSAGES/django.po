@@ -108,6 +108,7 @@ msgstr ""
 #: tilavarauspalvelu/admin/allocated_timeslot/admin.py
 #: tilavarauspalvelu/admin/application/admin.py
 #: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation_unit_option/admin.py
 msgid "Application"
 msgstr "Hakemus"
 
@@ -2812,6 +2813,43 @@ msgid "7 hours"
 msgstr "7 tuntia"
 
 #: tilavarauspalvelu/enums.py
+msgctxt "ReservationCancelReason"
+msgid "I found another space through Varaamo"
+msgstr "Löysin toisen tilan Varaamosta"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationCancelReason"
+msgid "I found another space somewhere else"
+msgstr "Löysin toisen tilan muualta"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationCancelReason"
+msgid "My plans have changed"
+msgstr "Suunnitelmiini tuli muutos"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationCancelReason"
+msgid "The space is not suitable for my purpose"
+msgstr "Tila ei sovellu käyttötarkoitukseeni"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationCancelReason"
+msgid "The booking processing time is too long"
+msgstr "Varauksen käsittelyaika on liian pitkä"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationCancelReason"
+msgid "Other reason"
+msgstr "Muu syy"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationCancelReason"
+msgid ""
+"The booking was not paid for or invoice was not selected as the payment "
+"method by the deadline."
+msgstr "Varausta ei maksettu tai laskua valittu maksutavaksi määräpäivään mennessä"
+
+#: tilavarauspalvelu/enums.py
 msgctxt "ReservationKind"
 msgid "Direct"
 msgstr "Suora"
@@ -4193,14 +4231,6 @@ msgstr "varausstatistiikka"
 #: tilavarauspalvelu/models/reservation_statistic/model.py
 msgid "reservation statistics"
 msgstr "varausstatistiikat"
-
-#: tilavarauspalvelu/models/reservation_statistic_unit/model.py
-msgid "reservation statistics reservation unit"
-msgstr "varausstatistiikan varausyksikkö"
-
-#: tilavarauspalvelu/models/reservation_statistic_unit/model.py
-msgid "reservation statistics reservation units"
-msgstr "varausstatistiikkojen varausyksiköt"
 
 #: tilavarauspalvelu/models/reservation_unit/model.py
 msgid "reservation units"
