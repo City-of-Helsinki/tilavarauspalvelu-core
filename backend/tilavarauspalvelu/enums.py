@@ -145,6 +145,7 @@ class OrderStatusWithFree(models.TextChoices):
     CANCELLED = "CANCELLED", pgettext_lazy("OrderStatus", "Cancelled")
     PAID = "PAID", pgettext_lazy("OrderStatus", "Paid")
     PAID_MANUALLY = "PAID_MANUALLY", pgettext_lazy("OrderStatus", "Paid manually")
+    PAID_BY_INVOICE = "PAID_BY_INVOICE", pgettext_lazy("OrderStatus", "Paid by invoice")
     REFUNDED = "REFUNDED", pgettext_lazy("OrderStatus", "Refunded")
 
     FREE = "FREE", pgettext_lazy("OrderStatus", "Free")
