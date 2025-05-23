@@ -1,4 +1,5 @@
 {
+  "title": "Yhteenveto",
   "message": "Olet tekemässä hakemusta {{name}} kaudeksi <bold>{{startDate}}–{{endDate}}</bold>.",
   "time_summary_one": "Varausten yhteenlaskettu kesto on vähintään <bold>{{hours}} tunti</bold>.",
   "time_summary_other": "Varausten yhteenlaskettu kesto on vähintään <bold>{{hours}} tuntia</bold>.",
