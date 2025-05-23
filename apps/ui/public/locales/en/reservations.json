@@ -105,6 +105,8 @@
     "draft": "Awaiting payment",
     "paid": "Paid",
     "paidManually": "Payment on site",
+    "paidByInvoice": "Payment by invoice",
+    "pending": "Awaiting payment",
     "cancelled": "Payment cancelled",
     "expired": "Unpaid",
     "refunded": "Refunded"

@@ -101,6 +101,8 @@
     "draft": "Odottaa maksua",
     "paid": "Maksettu",
     "paidManually": "Maksu paikan päällä",
+    "paidByInvoice": "Maksu laskulla",
+    "pending": "Odottaa maksua",
     "cancelled": "Maksu Peruttu",
     "expired": "Maksamatta",
     "refunded": "Maksu palautettu"

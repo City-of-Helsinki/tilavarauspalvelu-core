@@ -23,6 +23,8 @@ export function ReservationOrderStatus({
       case OrderStatus.Refunded:
         return "success";
       case OrderStatus.Draft:
+      case OrderStatus.PaidByInvoice:
+      case OrderStatus.Pending:
       case OrderStatus.PaidManually:
         return "alert";
       case OrderStatus.Expired:
