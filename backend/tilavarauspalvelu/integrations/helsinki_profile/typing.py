@@ -86,6 +86,7 @@ class ProfileLocalAddress(TypedDict):
 class ProfileForeignAddress(TypedDict):
     address: str | None
     countryCode: str | None
+    additionalAddress: str | None
 
 
 class ReservationPrefillInfo(TypedDict):
@@ -115,6 +116,8 @@ class UserProfileInfo(TypedDict):
     street_address: str | None
     postal_code: str | None
     city: str | None
+    country_code: str | None
+    additional_address: str | None
     municipality_code: str | None
     municipality_name: str | None
     login_method: LoginMethod
