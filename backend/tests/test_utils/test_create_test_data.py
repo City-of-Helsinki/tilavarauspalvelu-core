@@ -13,7 +13,6 @@ from tilavarauspalvelu.models import (
     RecurringReservation,
     RejectedOccurrence,
     ReservationStatistic,
-    ReservationStatisticsReservationUnit,
     ReservationUnitImage,
 )
 from tilavarauspalvelu.models.request_log.model import RequestLog
@@ -30,7 +29,6 @@ models_that_should_be_empty: list[type[models.Model]] = [
     RejectedOccurrence,
     RequestLog,
     ReservationStatistic,
-    ReservationStatisticsReservationUnit,
     ReservationUnitImage,
     SQLLog,
 ]
