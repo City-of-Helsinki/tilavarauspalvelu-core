@@ -1,4 +1,4 @@
-import { ApolloError } from "@apollo/client";
+import { ApolloError, ServerError, ServerParseError } from "@apollo/client";
 import { type GraphQLFormattedError } from "graphql";
 import * as Sentry from "@sentry/nextjs";
 import { onError } from "@apollo/client/link/error";
@@ -262,23 +262,12 @@ export const errorLink = onError(({ graphQLErrors, networkError }) => {
   };
   Sentry.captureMessage(`GraphQL error: ${apiErrorCodes.join(",")}`, context);
 
-  if (networkError != null && isBrowser) {
-    const errorToastId = "network_error";
-
-    // don't create multiple toasts
-    if (!document.querySelector(`#${errorToastId}`)) {
-      // Not translated because of how difficult it is to pass the translation function here
-      let errorMsg = "Network error";
-      if ("statusCode" in networkError) {
-        errorMsg += `: ${networkError.statusCode}`;
-      }
-      toast({
-        text: errorMsg,
-        type: "error",
-        options: { toastId: errorToastId },
-      });
-    }
+  // graphQLError can also raise 400 network error
+  // don't toast that, but allow 400 errors in case they are not graphql errors
+  if (graphQLErrors == null && networkError != null && isBrowser) {
+    toastNetworkError(networkError);
   }
+
   // During development (especially for SSR) log to console since there is no network tab
   // better method would be to use a logger / push errors to client side
   if (process.env.NODE_ENV !== "production") {
@@ -287,11 +276,34 @@ export const errorLink = onError(({ graphQLErrors, networkError }) => {
         // eslint-disable-next-line no-console
         console.error(`GQL_ERROR: ${JSON.stringify(error, null, 2)}`);
       }
-    }
-
-    if (networkError) {
+    } else if (networkError) {
       // eslint-disable-next-line no-console
       console.error(`NETWORK_ERROR: ${JSON.stringify(networkError, null, 2)}`);
     }
   }
 });
+
+function toastNetworkError(error: Error | ServerParseError | ServerError) {
+  const statusCode = "statusCode" in error ? error.statusCode : null;
+  // ignore 403 errors: these are typically caused by CSRF token
+  // admin ui has no middleware that could redirect to backend when it's missing
+  if (statusCode != null && statusCode === 403) {
+    return;
+  }
+
+  const errorToastId = "network_error";
+
+  // don't create multiple toasts
+  if (!document.querySelector(`#${errorToastId}`)) {
+    // Not translated because of how difficult it is to pass the translation function here
+    let errorMsg = "Network error";
+    if ("statusCode" in error) {
+      errorMsg += `: ${error.statusCode}`;
+    }
+    toast({
+      text: errorMsg,
+      type: "error",
+      options: { toastId: errorToastId },
+    });
+  }
+}
