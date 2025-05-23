@@ -7,14 +7,13 @@ from inspect import isfunction
 import pytest
 from graphql import OperationType
 
-from tilavarauspalvelu.enums import ApplicantTypeChoice
+from tilavarauspalvelu.enums import ApplicantTypeChoice, ReservationCancelReasonChoice
 from utils.date_utils import next_hour
 
 from tests.factories import (
     ApplicationFactory,
     ApplicationRoundFactory,
     ApplicationSectionFactory,
-    ReservationCancelReasonFactory,
     ReservationFactory,
     ReservationUnitFactory,
 )
@@ -118,12 +117,11 @@ def test_frontend_queries__customer_ui__CancelApplicationSection(graphql):
     section = ApplicationSectionFactory.create_in_status_handled(**factory_args)
 
     user = section.application.user
-    reason = ReservationCancelReasonFactory.create()
 
     variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": section.pk,
-        "cancelReason": reason.pk,
+        "cancelReason": ReservationCancelReasonChoice.CHANGE_OF_PLANS,
         "cancelDetails": "Cancel details",
     }
     assert_no_undefined_variables(variables)
@@ -146,12 +144,10 @@ def test_frontend_queries__customer_ui__CancelReservation(graphql):
     factory_args = deepcopy(query_info.factory_args)
     reservation = ReservationFactory.create_for_cancellation(**factory_args)
 
-    reason = ReservationCancelReasonFactory.create()
-
     variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation.pk,
-        "cancelReason": reason.pk,
+        "cancelReason": ReservationCancelReasonChoice.CHANGE_OF_PLANS,
         "cancelDetails": "Cancel details",
     }
     assert_no_undefined_variables(variables)

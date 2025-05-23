@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, TypedDict
 
 from django.db import models
 from graphene_django_extensions import NestingModelSerializer
+from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from graphene_django_extensions.serializers import NotProvided
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -14,17 +15,15 @@ from tilavarauspalvelu.api.graphql.types.reservation_unit_option.serializers imp
     ReservationUnitOptionApplicantSerializer,
 )
 from tilavarauspalvelu.api.graphql.types.suitable_time_range.serializers import SuitableTimeRangeSerializer
-from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import (
+    ApplicationRoundStatusChoice,
+    ReservationCancelReasonChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
-from tilavarauspalvelu.models import (
-    AllocatedTimeSlot,
-    Application,
-    ApplicationRound,
-    ApplicationSection,
-    Reservation,
-    ReservationCancelReason,
-)
+from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ApplicationRound, ApplicationSection, Reservation
 from utils.date_utils import local_datetime
 from utils.db import NowTT
 from utils.utils import comma_sep_str
@@ -223,7 +222,11 @@ class CancellationOutput(TypedDict):
 class ApplicationSectionReservationCancellationInputSerializer(NestingModelSerializer):
     instance: ApplicationSection
 
-    cancel_reason = serializers.IntegerField(required=True)
+    cancel_reason = EnumFriendlyChoiceField(
+        choices=ReservationCancelReasonChoice.user_selectable,
+        enum=ReservationCancelReasonChoice,
+        required=True,
+    )
     cancel_details = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
@@ -237,13 +240,6 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
             "cancel_reason": {"required": True},
             "cancel_details": {"required": False},
         }
-
-    @staticmethod
-    def validate_cancel_reason(value: int) -> int:
-        if ReservationCancelReason.objects.filter(pk=value).exists():
-            return value
-        msg = f"Cancel reason with pk {value} does not exist."
-        raise ValidationError(msg, code=error_codes.CANCEL_REASON_DOES_NOT_EXIST)
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         if self.instance.application.application_round.status != ApplicationRoundStatusChoice.RESULTS_SENT:

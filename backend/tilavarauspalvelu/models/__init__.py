@@ -31,7 +31,6 @@ from .rejected_occurrence.model import RejectedOccurrence
 from .request_log.model import RequestLog
 from .reservable_time_span.model import ReservableTimeSpan
 from .reservation.model import Reservation
-from .reservation_cancel_reason.model import ReservationCancelReason
 from .reservation_deny_reason.model import ReservationDenyReason
 from .reservation_metadata_field.model import ReservationMetadataField
 from .reservation_metadata_set.model import ReservationMetadataSet
@@ -89,7 +88,6 @@ __all__ = [
     "RequestLog",
     "ReservableTimeSpan",
     "Reservation",
-    "ReservationCancelReason",
     "ReservationDenyReason",
     "ReservationMetadataField",
     "ReservationMetadataSet",

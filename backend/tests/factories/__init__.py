@@ -28,7 +28,6 @@ from .recurring_reservation import RecurringReservationFactory
 from .rejected_occurrence import RejectedOccurrenceFactory
 from .reservable_time_span import ReservableTimeSpanFactory
 from .reservation import ReservationFactory
-from .reservation_cancel_reason import ReservationCancelReasonFactory
 from .reservation_deny_reason import ReservationDenyReasonFactory
 from .reservation_metadata_field import ReservationMetadataFieldFactory
 from .reservation_metadata_set import ReservationMetadataSetFactory
@@ -86,7 +85,6 @@ __all__ = [
     "RefundStatusResultFactory",
     "RejectedOccurrenceFactory",
     "ReservableTimeSpanFactory",
-    "ReservationCancelReasonFactory",
     "ReservationDenyReasonFactory",
     "ReservationFactory",
     "ReservationMetadataFieldFactory",

@@ -11,7 +11,7 @@ from django.test import override_settings
 from freezegun import freeze_time
 
 from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
-from tilavarauspalvelu.enums import ReservationNotification
+from tilavarauspalvelu.enums import ReservationCancelReasonChoice, ReservationNotification
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import (
@@ -42,11 +42,11 @@ COMMON_CONTEXT = {
     "email_recipient_name": None,
     "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
     "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
-    "cancel_reason": "[PERUUTUKSEN SYY]",
 }
 LANGUAGE_CONTEXT = {
     "en": {
         "title": "The customer has canceled the seasonal booking",
+        "cancel_reason": "My plans have changed",
         "allocations": [
             {
                 "weekday_value": "Monday",
@@ -72,6 +72,7 @@ LANGUAGE_CONTEXT = {
     },
     "fi": {
         "title": "Asiakas on perunut kausivarauksen",
+        "cancel_reason": "Suunnitelmiini tuli muutos",
         "allocations": [
             {
                 "weekday_value": "Maanantai",
@@ -97,6 +98,7 @@ LANGUAGE_CONTEXT = {
     },
     "sv": {
         "title": "Kunden har avbokat säsongsbokningen",
+        "cancel_reason": "Mina planer har ändrats",
         "allocations": [
             {
                 "weekday_value": "Måndag",
@@ -152,6 +154,9 @@ def test_seasonal_booking_cancelled_all_staff_notification__get_context__instanc
     reservation_id_2 = Reservation.objects.exclude(id=reservation_id_1).first().id
 
     section = email_reservation.actions.get_application_section()
+    section = email_reservation.actions.get_application_section()
+
+    section.actions.get_reservations().update(cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS)
 
     expected = deepcopy(LANGUAGE_CONTEXT["en"])
 
@@ -178,7 +183,7 @@ def test_seasonal_booking_cancelled_all_staff_notification__render__text():
 
         The customer has canceled all space reservations included in the seasonal booking.
 
-        Reason: [PERUUTUKSEN SYY]
+        Reason: My plans have changed
 
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
 
@@ -215,7 +220,7 @@ def test_seasonal_booking_cancelled_all_staff_notification__render__html():
 
         The customer has canceled all space reservations included in the seasonal booking.
 
-        Reason: [PERUUTUKSEN SYY]
+        Reason: My plans have changed
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
         You can view the booking at:
         Monday: 13:00-15:00
@@ -266,6 +271,7 @@ def test_seasonal_booking_cancelled_all_staff_notification__send_email(outbox):
         allocated_time_slot__reservation_unit_option__reservation_unit=reservation_unit_1,
         allocated_time_slot__reservation_unit_option__application_section=application_section,
         reservations__reservee_email="reservee@email.com",
+        reservations__cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS,
     )
     create_reservation_series(
         user=application.user,
@@ -273,6 +279,7 @@ def test_seasonal_booking_cancelled_all_staff_notification__send_email(outbox):
         allocated_time_slot__reservation_unit_option__reservation_unit=reservation_unit_2,
         allocated_time_slot__reservation_unit_option__application_section=application_section,
         reservations__reservee_email="reservee@email.com",
+        reservations__cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS,
     )
 
     with TranslationsFromPOFiles():
