@@ -89,21 +89,20 @@ describe("Page1", () => {
     expect(view.getByText("Notes when applying FI")).toBeInTheDocument();
   });
 
-  // special case requiring custom mocks
-  // happens when application doesn't contain any sections
+  // this case only happens if user manually removes the last section
   test("empty application should not allow submitting", async () => {
     const view = customRender();
     const submitBtn = view.getByRole("button", { name: "common:next" });
     const user = userEvent.setup();
     const removeBtn = view.getByRole("button", {
-      name: "application:Page1.deleteEvent",
+      name: "common:remove",
     });
     expect(removeBtn).not.toBeDisabled();
     await user.click(removeBtn);
     const dialog = screen.getByRole("dialog");
     expect(dialog).toBeInTheDocument();
     const confirmBtn = within(dialog).getByRole("button", {
-      name: "application:Page1.deleteEvent",
+      name: "common:remove",
     });
     expect(confirmBtn).not.toBeDisabled();
     await user.click(confirmBtn);
