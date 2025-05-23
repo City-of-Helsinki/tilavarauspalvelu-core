@@ -6,20 +6,15 @@ from typing import TYPE_CHECKING
 import pytest
 from freezegun import freeze_time
 
-from tilavarauspalvelu.enums import ReservationTypeChoice, UserRoleChoice
+from tilavarauspalvelu.enums import ReservationCancelReasonChoice, ReservationTypeChoice, UserRoleChoice
 from utils.date_utils import local_datetime
 
-from tests.factories import (
-    AllocatedTimeSlotFactory,
-    ApplicationRoundFactory,
-    ReservationCancelReasonFactory,
-    UserFactory,
-)
+from tests.factories import AllocatedTimeSlotFactory, ApplicationRoundFactory, UserFactory
 
 from .helpers import CANCEL_SECTION_SERIES_MUTATION, create_reservation_series
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ApplicationSection, ReservationCancelReason, User
+    from tilavarauspalvelu.models import ApplicationSection
 
 # Applied to all tests
 pytestmark = [
@@ -27,8 +22,7 @@ pytestmark = [
 ]
 
 
-def create_data_for_cancellation() -> tuple[ReservationCancelReason, ApplicationSection, User]:
-    reason = ReservationCancelReasonFactory.create()
+def create_section_for_cancellation() -> ApplicationSection:
     user = UserFactory.create()
 
     reservation_series = create_reservation_series(
@@ -47,16 +41,17 @@ def create_data_for_cancellation() -> tuple[ReservationCancelReason, Application
 
     reservation_series.allocated_time_slot = allocation
     reservation_series.save()
-    return reason, section, user
+    return section
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__cancel_section_series__applicant(graphql):
-    reason, section, user = create_data_for_cancellation()
+    section = create_section_for_cancellation()
+    user = section.application.user
 
     data = {
         "pk": section.pk,
-        "cancelReason": reason.pk,
+        "cancelReason": ReservationCancelReasonChoice.CHANGE_OF_PLANS,
         "cancelDetails": "Cancellation details",
     }
 
@@ -68,11 +63,11 @@ def test_recurring_reservations__cancel_section_series__applicant(graphql):
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__cancel_section_series__superuser(graphql):
-    reason, section, _ = create_data_for_cancellation()
+    section = create_section_for_cancellation()
 
     data = {
         "pk": section.pk,
-        "cancelReason": reason.pk,
+        "cancelReason": ReservationCancelReasonChoice.CHANGE_OF_PLANS,
         "cancelDetails": "Cancellation details",
     }
 
@@ -84,11 +79,11 @@ def test_recurring_reservations__cancel_section_series__superuser(graphql):
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__cancel_section_series__general_admin(graphql):
-    reason, section, _ = create_data_for_cancellation()
+    section = create_section_for_cancellation()
 
     data = {
         "pk": section.pk,
-        "cancelReason": reason.pk,
+        "cancelReason": ReservationCancelReasonChoice.CHANGE_OF_PLANS,
         "cancelDetails": "Cancellation details",
     }
 

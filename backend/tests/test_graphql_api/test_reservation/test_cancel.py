@@ -7,13 +7,19 @@ from decimal import Decimal
 import pytest
 from django.test import override_settings
 
-from tilavarauspalvelu.enums import AccessType, OrderStatus, PaymentType, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import (
+    AccessType,
+    OrderStatus,
+    PaymentType,
+    ReservationCancelReasonChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
 from tilavarauspalvelu.integrations.verkkokauppa.order.types import WebShopOrderStatus
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from tilavarauspalvelu.models import ReservationCancelReason
 from utils.date_utils import local_datetime
 
 from tests.factories import OrderFactory, PaymentOrderFactory, RefundFactory, ReservationFactory
@@ -37,12 +43,9 @@ def test_reservation__cancel__success(graphql, reservation_type):
 
     assert response.has_errors is False, response.errors
 
-    reasons = list(ReservationCancelReason.objects.all())
-    assert len(reasons) == 1
-
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CANCELLED
-    assert reservation.cancel_reason == reasons[0]
+    assert reservation.cancel_reason == ReservationCancelReasonChoice.CHANGE_OF_PLANS
 
     assert EmailService.send_reservation_cancelled_email.called is True
 

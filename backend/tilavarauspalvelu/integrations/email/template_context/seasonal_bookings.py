@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Annotated, Unpack
 
 from django.utils.translation import pgettext
 
-from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.enums import ReservationCancelReasonChoice, ReservationStateChoice
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from utils.date_utils import local_time_string
 
@@ -202,11 +202,13 @@ def get_context_for_seasonal_booking_cancelled_all(
     **data: Unpack[SeasonalBookingCancelledAllContext],
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_CANCELLED_ALL]:
     if section is not None:
-        reservation = section.actions.get_last_reservation()
+        reservation: Reservation = section.actions.get_last_reservation()
         application_round = section.application.application_round
 
+        cancel_reason = ReservationCancelReasonChoice(reservation.cancel_reason)
+
         data["email_recipient_name"] = section.application.applicant
-        data["cancel_reason"] = get_attr_by_language(reservation.cancel_reason, "reason", language)
+        data["cancel_reason"] = str(cancel_reason.label)
         data["application_id"] = section.application.pk
         data["application_section_id"] = section.pk
         data["application_section_name"] = section.name
@@ -234,10 +236,12 @@ def get_context_for_seasonal_booking_cancelled_all_staff_notification(
     **data: Unpack[SeasonalBookingCancelledAllStaffNotificationContext],
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_CANCELLED_ALL_STAFF_NOTIFICATION]:
     if section is not None:
-        reservation = section.actions.get_last_reservation()
+        reservation: Reservation = section.actions.get_last_reservation()
         application_round = section.application.application_round
 
-        data["cancel_reason"] = get_attr_by_language(reservation.cancel_reason, "reason", language)
+        cancel_reason = ReservationCancelReasonChoice(reservation.cancel_reason)
+
+        data["cancel_reason"] = str(cancel_reason.label)
         data["application_section_name"] = section.name
         data["application_round_name"] = get_attr_by_language(application_round, "name", language=language)
         data["allocations"] = get_section_allocation(section=section)
@@ -262,8 +266,10 @@ def get_context_for_seasonal_booking_cancelled_single(
     if reservation is not None:
         section = reservation.actions.get_application_section()
 
+        cancel_reason = ReservationCancelReasonChoice(reservation.cancel_reason)
+
         data["email_recipient_name"] = reservation.actions.get_email_reservee_name()
-        data["cancel_reason"] = get_attr_by_language(reservation.cancel_reason, "reason", language=language)
+        data["cancel_reason"] = str(cancel_reason.label)
         data["application_id"] = getattr(section, "application_id", None)
         data["application_section_id"] = getattr(section, "id", None)
 

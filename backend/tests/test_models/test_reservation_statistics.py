@@ -5,13 +5,12 @@ from decimal import Decimal
 
 import pytest
 
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, Weekday
+from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationCancelReasonChoice, ReservationStateChoice, Weekday
 from tilavarauspalvelu.models import AgeGroup, City, ReservationStatistic
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import (
     RecurringReservationFactory,
-    ReservationCancelReasonFactory,
     ReservationFactory,
     ReservationPurposeFactory,
     ReservationUnitFactory,
@@ -206,11 +205,11 @@ def test_statistics__update__cancel_reason_text(settings):
     stat = ReservationStatistic.objects.first()
     assert stat.cancel_reason_text == ""
 
-    reservation.cancel_reason = ReservationCancelReasonFactory.create(reason="cancel")
+    reservation.cancel_reason = ReservationCancelReasonChoice.CHANGE_OF_PLANS
     reservation.save()
 
     stat = ReservationStatistic.objects.first()
-    assert stat.cancel_reason_text == "cancel"
+    assert stat.cancel_reason_text == "My plans have changed"
 
 
 def test_statistics__update__reservation_unit_updates_statistics(settings):
