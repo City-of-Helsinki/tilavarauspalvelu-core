@@ -96,14 +96,14 @@ export function ApplicationSectionSummary({
   const icons = [
     {
       icon: <IconGroup style={{ flexShrink: 0 }} />,
-      text: t("applicationEventSummary:numPersons", {
+      text: t("applicationSectionSummary:numPersons", {
         count: numPersons ?? 0,
       }),
     },
     {
       icon: <IconClock style={{ flexShrink: 0 }} />,
       text: t(
-        `applicationEventSummary:${
+        `applicationSectionSummary:${
           minDuration === maxDuration ? "minDuration" : "durations"
         }`,
         {
@@ -114,7 +114,7 @@ export function ApplicationSectionSummary({
     },
     {
       icon: <IconCalendar style={{ flexShrink: 0 }} />,
-      text: t("applicationEventSummary:eventsPerWeek", {
+      text: t("applicationSectionSummary:eventsPerWeek", {
         count: appliedReservationsPerWeek ?? 1,
       }),
     },
@@ -122,11 +122,11 @@ export function ApplicationSectionSummary({
 
   return (
     <>
-      <H4 as="h3">{t("application:Page1.applicationEventSummary")}</H4>
+      <H4 as="h3">{t("applicationSectionSummary:title")}</H4>
       <Box>
         <Message>
           <Trans
-            i18nKey="applicationEventSummary:message"
+            i18nKey="applicationSectionSummary:message"
             defaults="Olet tekemässä varausta {{ name }} kaudeksi <bold>{{startDate}}–{{endDate}}</bold>."
             values={{ name, startDate: begin, endDate: end }}
             components={{ bold: <strong /> }}
@@ -134,7 +134,7 @@ export function ApplicationSectionSummary({
         </Message>
         <Message>
           <Trans
-            i18nKey="applicationEventSummary:time_summary"
+            i18nKey="applicationSectionSummary:time_summary"
             defaults="Varausten yhteenlaskettu kesto on vähintään <bold>{{hours}} tuntia</bold>."
             count={hours}
             values={{ hours }}

@@ -33,7 +33,6 @@
     "previewError": "Page {{ page }} has an error.",
     "fix": "Fix"
   },
-  "applicationEventSaved": "Booking saved",
   "heading": "Seasonal booking application",
   "primarySchedules": "Preferred time slots",
   "secondarySchedules": "Other time slots",
@@ -56,14 +55,11 @@
     "biweekly": "",
     "defaultDurationLabel": "1 hour 30 min",
     "createNew": "Create a new season booking",
-    "applicationEventName": "Untitled booking",
-    "applicationEventSummary": "Summary",
-    "applicationEventSaved": "Seasonal booking request saved",
-    "saveEvent": "Save",
-    "deleteEvent": "Remove",
-    "deleteEventCancel": "Cancel",
-    "deleteEventHeading": "Are you sure you want to remove the application?",
-    "deleteEventContent": "Once removed, the application cannot be restored."
+    "defaultSectionName": "Untitled booking",
+    "deleteDialog": {
+      "heading": "Are you sure you want to remove the application?",
+      "content": "Once removed, the application cannot be restored."
+    }
   },
   "TimeSelector": {
     "calendarLabel": "Select time slots from the calendar",
@@ -191,7 +187,7 @@
     "RECEIVED": "Sent",
     "RESULTS_SENT": "Processed"
    },
-  "applicationEventStatus": {
+  "applicationSectionStatus":{
     "UNALLOCATED": "Unallocated",
     "IN_ALLOCATION": "In allocation",
     "HANDLED": "Handled",

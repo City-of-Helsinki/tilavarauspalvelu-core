@@ -117,15 +117,17 @@ function SingleApplicationSection({
 }) {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
-  const reservationUnits = filterNonNullable(aes.reservationUnitOptions).map(
-    (eru, index) => ({
-      pk: eru.reservationUnit.pk,
-      priority: index,
-      nameFi: eru.reservationUnit.nameFi,
-      nameSv: eru.reservationUnit.nameSv,
-      nameEn: eru.reservationUnit.nameEn,
-    })
-  );
+  const reservationUnits = filterNonNullable(aes.reservationUnitOptions)
+    .map(({ reservationUnit }) => ({
+      pk: reservationUnit.pk ?? 0,
+      nameFi: reservationUnit.nameFi,
+      nameSv: reservationUnit.nameSv,
+      nameEn: reservationUnit.nameEn,
+    }))
+    .map((ru) => ({
+      pk: ru.pk,
+      name: getTranslationSafe(ru, "name", lang).trim(),
+    }));
   const shouldShowStatusLabel =
     aes.status === ApplicationSectionStatusChoice.Rejected ||
     aes.status === ApplicationSectionStatusChoice.Handled;
@@ -191,7 +193,7 @@ function SingleApplicationSection({
             icon={statusProps.icon}
             data-testid="application-section__status"
           >
-            {t(`application:applicationEventStatus.${aes.status}`)}
+            {t(`application:applicationSectionStatus.${aes.status}`)}
           </StatusLabel>
         )}
       </ApplicationSectionHeader>
@@ -214,11 +216,9 @@ function SingleApplicationSection({
               {t("application:preview.applicationEvent.appliedSpaces")}
             </h3>
             <ol>
-              {filterNonNullable(reservationUnits).map((ru) => (
-                <li key={ru.pk}>
-                  <RegularText>
-                    {getTranslationSafe(ru, "name", lang).trim()}
-                  </RegularText>
+              {reservationUnits.map(({ pk, name }) => (
+                <li key={pk}>
+                  <RegularText>{name}</RegularText>
                 </li>
               ))}
             </ol>

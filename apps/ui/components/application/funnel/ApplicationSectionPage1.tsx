@@ -217,16 +217,16 @@ function ApplicationSectionInner({
         id={`applicationSections.${index}.delete`}
         onClick={() => setIsWaitingForDelete(true)}
       >
-        {t("application:Page1.deleteEvent")}
+        {t("common:remove")}
       </Button>
       {isWaitingForDelete && (
         <ConfirmationDialog
           id="application-event-confirmation"
           isOpen
-          acceptLabel={t("application:Page1.deleteEvent")}
-          cancelLabel={t("application:Page1.deleteEventCancel")}
-          heading={t("application:Page1.deleteEventHeading")}
-          content={t("application:Page1.deleteEventContent")}
+          acceptLabel={t("common:remove")}
+          cancelLabel={t("common:cancel")}
+          heading={t("application:Page1.deleteDialog.heading")}
+          content={t("application:Page1.deleteDialog.content")}
           onAccept={del}
           onCancel={() => setIsWaitingForDelete(false)}
           variant="danger"
@@ -328,7 +328,7 @@ export function ApplicationSectionPage1(props: Props): JSX.Element {
     <Accordion
       onToggle={onToggleAccordion}
       open={shouldRenderInner}
-      heading={eventName || t("application:Page1.applicationEventName")}
+      heading={eventName || t("application:Page1.defaultSectionName")}
       theme="thin"
     >
       {/* Accordion doesn't remove from DOM on hide, but this is too slow if it's visible */}
