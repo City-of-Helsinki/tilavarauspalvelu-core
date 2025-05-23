@@ -83,6 +83,7 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
     paymentOrder {
       id
       status
+      handledPaymentDueBy
     }
     user {
       id
