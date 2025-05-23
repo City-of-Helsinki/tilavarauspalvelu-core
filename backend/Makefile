@@ -13,6 +13,7 @@
 .PHONY: migrate
 .PHONY: migrations
 .PHONY: scheduler
+.PHONY: schema
 .PHONY: translate
 .PHONY: translations
 .PHONY: worker
@@ -41,6 +42,7 @@ define helptext
   migrate                            Run database migrations.
   migrations                         Compile database migrations.
   scheduler                          Run a local celery beat scheduler.
+  schema                             Update the GraphQL schema file.
   translate                          Compile translation strings.
   translations                       Fetch all translation strings under ./locale/.
   worker                             Run a local celery worker.
@@ -85,6 +87,9 @@ migrations:
 
 scheduler:
 	@celery -A config beat --loglevel=INFO --scheduler=config.celery.beat:VaraamoDatabaseScheduler
+
+schema:
+	@python manage.py update_graphql_schema
 
 translate:
 	@echo ""
