@@ -10,7 +10,13 @@ import pytest
 from freezegun import freeze_time
 from graphql_relay import to_global_id
 
-from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import (
+    AccessType,
+    CustomerTypeChoice,
+    PriceUnit,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.keyless_entry.typing import (
@@ -483,7 +489,7 @@ def test_reservation__query__applied_pricing(graphql):
     assert response.node(0) == {
         "appliedPricing": {
             "begins": "2024-01-02",
-            "priceUnit": "PRICE_UNIT_PER_15_MINS",
+            "priceUnit": PriceUnit.PER_15_MINS.value.upper(),
             "lowestPrice": "10.0",
             "highestPrice": "20.0",
             "taxPercentage": "25.5",

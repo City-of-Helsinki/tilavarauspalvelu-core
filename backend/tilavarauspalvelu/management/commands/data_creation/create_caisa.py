@@ -749,7 +749,7 @@ def _create_caisa() -> None:
     ReservationUnitPricingFactory.create(
         reservation_unit=aina_kasiteltava_kellarikerros,
         begins=datetime.date(2023, 1, 1),
-        price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
+        price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=40.0,
         tax_percentage=tax_percentage_255,
@@ -846,7 +846,7 @@ def _create_caisa() -> None:
     ReservationUnitPricingFactory.create(
         reservation_unit=maksuton_mankeli,
         begins=datetime.date(2023, 1, 1),
-        price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
+        price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
         tax_percentage=tax_percentage_0,
@@ -974,7 +974,7 @@ def _create_caisa() -> None:
     ReservationUnitPricingFactory.create(
         reservation_unit=aina_maksullinen_aitio,
         begins=datetime.date(2023, 1, 1),
-        price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
+        price_unit=PriceUnit.PER_HOUR,
         lowest_price=40.0,
         highest_price=40.0,
         tax_percentage=tax_percentage_255,
@@ -1086,7 +1086,7 @@ def _create_caisa() -> None:
     ReservationUnitPricingFactory.create(
         reservation_unit=alennuskelpoinen_aula,
         begins=datetime.date(2023, 1, 1),
-        price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
+        price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=30.0,
         tax_percentage=tax_percentage_255,
@@ -1175,7 +1175,7 @@ def _create_caisa() -> None:
     ReservationUnitPricingFactory.create(
         reservation_unit=perumiskelvoton_parveke,
         begins=datetime.date(2023, 1, 1),
-        price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
+        price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
         tax_percentage=tax_percentage_0,
@@ -1273,7 +1273,7 @@ def _create_caisa() -> None:
     ReservationUnitPricingFactory.create(
         reservation_unit=perumiskelvoton_patio,
         begins=datetime.date(2023, 1, 1),
-        price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
+        price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=30.0,
         tax_percentage=tax_percentage_255,
@@ -1379,7 +1379,7 @@ def _create_caisa() -> None:
     ReservationUnitPricingFactory.create(
         reservation_unit=toistuvien_varausten_toimisto,
         begins=datetime.date(2023, 1, 1),
-        price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
+        price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
         tax_percentage=tax_percentage_0,
@@ -1471,7 +1471,7 @@ def _create_caisa() -> None:
     ReservationUnitPricingFactory.create(
         reservation_unit=tauotettu_takkahuone,
         begins=datetime.date(2023, 1, 1),
-        price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
+        price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
         tax_percentage=tax_percentage_0,
@@ -1575,7 +1575,7 @@ def _create_caisa() -> None:
     ReservationUnitPricingFactory.create(
         reservation_unit=aina_kasiteltava_kammio,
         begins=datetime.date(2023, 1, 1),
-        price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
+        price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
         tax_percentage=tax_percentage_0,
