@@ -120,8 +120,8 @@ type ProcessVariablesParams =
       language: string;
       kind: ReservationKind.Season;
       applicationRound: number;
-      reservationPeriodBegin: string;
-      reservationPeriodEnd: string;
+      reservationPeriodBegin?: string;
+      reservationPeriodEnd?: string;
     };
 
 export function processVariables({

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
 import {
   Button,
@@ -23,6 +23,8 @@ import { ErrorText } from "common/src/components/ErrorText";
 import { Modal } from "@/components/Modal";
 import { OrderedReservationUnitCard, ReservationUnitModalContent } from ".";
 import { type ApplicationPage1FormValues } from "./form";
+import { useSearchParams } from "next/navigation";
+import { useSearchModify } from "@/hooks/useSearchValues";
 
 type ReservationUnitType = OrderedReservationUnitCardFragment;
 export type OptionType = Readonly<{ value: number; label: string }>;
@@ -41,6 +43,21 @@ type Props = {
   minSize?: number;
 };
 
+function isValid(
+  units: ApplicationReservationUnitListFragment["reservationUnits"],
+  minSize: number
+) {
+  const error = units
+    .map(
+      (resUnit) =>
+        minSize != null &&
+        resUnit.maxPersons != null &&
+        resUnit.maxPersons < minSize
+    )
+    .find((a) => a);
+  return !error;
+}
+
 // selected reservation units are applicationEvent.eventReservationUnits
 // available reservation units are applicationRound.reservationUnits
 export function ReservationUnitList({
@@ -50,31 +67,30 @@ export function ReservationUnitList({
   minSize,
 }: Readonly<Props>): JSX.Element {
   const { t } = useTranslation();
-  const [showModal, setShowModal] = useState(false);
+
+  const { handleRouteChange } = useSearchModify();
+  const searchValues = useSearchParams();
 
   const form = useFormContext<ApplicationPage1FormValues>();
   const { clearErrors, setError, watch, setValue, formState } = form;
   const { errors } = formState;
-
-  const isValid = (
-    units: ApplicationReservationUnitListFragment["reservationUnits"]
-  ) => {
-    const error = units
-      .map(
-        (resUnit) =>
-          minSize != null &&
-          resUnit.maxPersons != null &&
-          resUnit.maxPersons < minSize
-      )
-      .find((a) => a);
-    return !error;
-  };
 
   const fieldName = `applicationSections.${index}.reservationUnits` as const;
 
   const reservationUnits = watch(fieldName);
   const setReservationUnits = (units: number[]) => {
     setValue(fieldName, units);
+  };
+
+  const showModal = searchValues.get("modalShown") === fieldName;
+  const setShowModal = (show: boolean) => {
+    const params = new URLSearchParams(searchValues);
+    if (show) {
+      params.set("modalShown", fieldName);
+    } else {
+      params.delete("modalShown");
+    }
+    handleRouteChange(params);
   };
 
   // TODO these could be prefiltered on the Page level similar to the addition of a new application section
@@ -85,7 +101,7 @@ export function ReservationUnitList({
   );
 
   useEffect(() => {
-    const valid = isValid(currentReservationUnits);
+    const valid = isValid(currentReservationUnits, minSize ?? 0);
     if (valid) {
       clearErrors([fieldName]);
     } else {
