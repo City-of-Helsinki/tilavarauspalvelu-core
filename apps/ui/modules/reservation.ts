@@ -211,6 +211,7 @@ export const RESERVATION_ORDER_STATUS_FRAGMENT = gql`
     paymentOrder {
       id
       status
+      checkoutUrl
     }
   }
 `;
