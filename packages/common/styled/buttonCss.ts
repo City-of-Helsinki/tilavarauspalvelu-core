@@ -38,6 +38,9 @@ export const ButtonCss = css<ButtonStyleProps>`
   line-height: 1;
   text-align: center;
   min-height: 44px;
+  &:visited[variant="primary"] {
+    color: var(--color-white);
+  }
   &:hover,
   &:focus-visible {
     transition-property: background-color, border-color, color;
