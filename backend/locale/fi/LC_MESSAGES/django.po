@@ -2847,7 +2847,8 @@ msgctxt "ReservationCancelReason"
 msgid ""
 "The booking was not paid for or invoice was not selected as the payment "
 "method by the deadline."
-msgstr "Varausta ei maksettu tai laskua valittu maksutavaksi määräpäivään mennessä"
+msgstr ""
+"Varausta ei maksettu tai laskua valittu maksutavaksi määräpäivään mennessä"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationKind"
@@ -4183,14 +4184,6 @@ msgstr "Varauksella ei voi olla aktiivista ovikoodia jota ei ole luotu"
 #: tilavarauspalvelu/models/reservation/model.py
 msgid "Closed"
 msgstr "suljettu"
-
-#: tilavarauspalvelu/models/reservation_cancel_reason/model.py
-msgid "reservation cancel reason"
-msgstr "varauksen peruutuksen syy"
-
-#: tilavarauspalvelu/models/reservation_cancel_reason/model.py
-msgid "reservation cancel reasons"
-msgstr "varauksen peruutuksen syyt"
 
 #: tilavarauspalvelu/models/reservation_deny_reason/model.py
 msgid "reservation deny reason"

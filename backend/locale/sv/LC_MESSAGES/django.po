@@ -2772,6 +2772,8 @@ msgid ""
 "The booking was not paid for or invoice was not selected as the payment "
 "method by the deadline."
 msgstr ""
+"Bokningen betalades inte eller faktura valdes inte som betalningsmetod inom "
+"angiven tid."
 
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationKind"
@@ -4103,14 +4105,6 @@ msgstr ""
 
 #: tilavarauspalvelu/models/reservation/model.py
 msgid "Closed"
-msgstr ""
-
-#: tilavarauspalvelu/models/reservation_cancel_reason/model.py
-msgid "reservation cancel reason"
-msgstr ""
-
-#: tilavarauspalvelu/models/reservation_cancel_reason/model.py
-msgid "reservation cancel reasons"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation_deny_reason/model.py
