@@ -33,7 +33,7 @@ def email_reservation() -> Reservation:
         reservation_pending_instructions_en="[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
         pricings__lowest_price=Decimal("10.00"),
         pricings__highest_price=Decimal("12.30"),
-        pricings__price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        pricings__price_unit=PriceUnit.FIXED,
     )
     application_section = ApplicationSectionFactory.create(
         name="[HAKEMUKSEN OSAN NIMI]",

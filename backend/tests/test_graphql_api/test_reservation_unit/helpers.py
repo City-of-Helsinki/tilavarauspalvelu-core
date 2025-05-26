@@ -104,7 +104,7 @@ def get_create_non_draft_input_data(**overrides: Any) -> dict[str, Any]:
         "pricings": [
             {
                 "begins": today.isoformat(),
-                "priceUnit": PriceUnit.PRICE_UNIT_PER_15_MINS.name,
+                "priceUnit": PriceUnit.PER_15_MINS.name,
                 "lowestPrice": "10.5",
                 "highestPrice": "18.8",
                 "taxPercentage": tax_percentage.id,
@@ -150,7 +150,7 @@ def get_pricing_data(**overrides: Any) -> dict[str, Any]:
 
     return {
         "begins": "2022-09-11",
-        "priceUnit": PriceUnit.PRICE_UNIT_PER_15_MINS.name,
+        "priceUnit": PriceUnit.PER_15_MINS.name,
         "lowestPrice": "18.2",
         "highestPrice": "21.5",
         "taxPercentage": tax_percentage.id,
