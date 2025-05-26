@@ -33,7 +33,7 @@ import {
   Weekday,
 } from "@/gql/gql-types";
 import { base64encode } from "common/src/helpers";
-import { addDays, addYears } from "date-fns";
+import { addDays, addMonths, addYears } from "date-fns";
 import { type DocumentNode } from "graphql";
 import { type TFunction } from "i18next";
 import { getDurationOptions } from "@/modules/const";
@@ -42,6 +42,7 @@ import { type ReservableMap, type RoundPeriod } from "@/modules/reservable";
 export type CreateGraphQLMockProps = {
   noUser?: boolean;
   isSearchError?: boolean;
+  dateOverride?: Date | null;
 };
 
 export type CreateGraphQLMocksReturn = Array<{
@@ -137,11 +138,22 @@ export function createApplicationSearchGraphQLMocks({
     {
       request: {
         query: SearchReservationUnitsDocument,
+        variables: createSearchVariablesMock({ date: null }),
+      },
+      result: {
+        data: SearchReservationUnitsQueryMock,
+      },
+      error: isSearchError ? new Error("Search error") : undefined,
+    },
+    {
+      request: {
+        query: SearchReservationUnitsDocument,
         variables: createSearchVariablesMock({ textSearch: "foobar" }),
       },
       result: {
         data: SearchReservationUnitsQueryMockWithParams,
       },
+      error: isSearchError ? new Error("Search error") : undefined,
     },
     {
       request: {
@@ -238,8 +250,10 @@ function createSearchQueryNode(
 
 function createSearchVariablesMock({
   textSearch = null,
+  date = new Date(2024, 1, 1),
 }: {
   textSearch?: string | null;
+  date?: Date | null;
   // TODO return type issues because all of them are optional (by backend)
   // we'd need to match them to a Required return type that we actully use
   // so what happens:
@@ -253,9 +267,13 @@ function createSearchVariablesMock({
     reservationUnitType: [],
     equipments: [],
     accessType: [],
-    accessTypeBeginDate: "2024-02-01T00:00:00Z",
-    accessTypeEndDate: "2025-01-01T00:00:00Z",
-    reservableDateStart: "2024-02-01T00:00:00Z",
+    accessTypeBeginDate: date ? date.toISOString() : null,
+    accessTypeEndDate: date ? addYears(date, 1).toISOString() : null,
+    reservableDateStart: date ? date.toISOString() : null,
+    reservableDateEnd: null,
+    reservableTimeStart: null,
+    reservableTimeEnd: null,
+    reservableMinimumDurationMinutes: null,
     applicationRound: [1],
     personsAllowed: null,
     first: 36,
@@ -617,15 +635,23 @@ export function createMockReservationUnit({
 
 export function createMockApplicationRound({
   pk = 1,
-  status,
-  applicationPeriodEnd,
-  applicationPeriodBegin,
+  status = ApplicationRoundStatusChoice.Open,
+  applicationPeriodEnd = new Date(2024, 0, 1, 0, 0, 0),
+  applicationPeriodBegin = addYears(new Date(2024, 0, 1, 0, 0, 0), 1),
 }: {
   pk?: number;
-  status: ApplicationRoundStatusChoice;
-  applicationPeriodEnd: Date;
-  applicationPeriodBegin: Date;
-}): Readonly<ApplicationRoundFieldsFragment> {
+  status?: ApplicationRoundStatusChoice;
+  applicationPeriodEnd?: Date;
+  applicationPeriodBegin?: Date;
+} = {}): Readonly<ApplicationRoundFieldsFragment> {
+  // There is an implicit relation between reservationPeriodBegin and SearchQuery
+  // so not mocking reservationPeriodBegin will break search query mock
+  if (applicationPeriodBegin.getMilliseconds() !== 0) {
+    throw new Error(
+      "Application period millis should be 0. You most likely you forgot to set a mock date"
+    );
+  }
+  const reservationPeriodBegin = addMonths(applicationPeriodBegin, 1);
   return {
     id: base64encode(`ApplicationRoundNode:${pk}`),
     pk,
@@ -633,10 +659,12 @@ export function createMockApplicationRound({
     nameSv: `ApplicationRound ${pk} SV`,
     nameEn: `ApplicationRound ${pk} EN`,
     status,
-    reservationPeriodBegin: "2024-02-01T00:00:00Z",
-    reservationPeriodEnd: "2025-01-01T00:00:00Z",
-    publicDisplayBegin: "2024-02-01T00:00:00Z",
-    publicDisplayEnd: "2025-01-01T00:00:00Z",
+    // TODO these are not all DateTime
+    // some are DateTime (ISO), some are just Date
+    reservationPeriodBegin: reservationPeriodBegin.toISOString(),
+    reservationPeriodEnd: addYears(reservationPeriodBegin, 1).toISOString(),
+    publicDisplayBegin: applicationPeriodBegin.toISOString(),
+    publicDisplayEnd: applicationPeriodEnd.toISOString(),
     applicationPeriodBegin: applicationPeriodBegin.toISOString(),
     applicationPeriodEnd: applicationPeriodEnd.toISOString(),
     criteriaFi: null,

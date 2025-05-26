@@ -109,6 +109,10 @@ function transformSortString(
   return [transformed, sec];
 }
 
+function filterEmpty(str: string | null | undefined): string | null {
+  return str && str.trim() !== "" ? str : null;
+}
+
 type ProcessVariablesParams =
   | {
       values: ReadonlyURLSearchParams;
@@ -175,13 +179,9 @@ export function processVariables({
   const timeEnd = ignoreMaybeArray(values.getAll("timeEnd"));
   const timeBegin = ignoreMaybeArray(values.getAll("timeBegin"));
   const accessType = values.getAll("accessTypes").map(transformAccessTypeSafe);
+
   return {
-    ...(textSearch !== ""
-      ? {
-          textSearch,
-        }
-      : {}),
-    personsAllowed,
+    textSearch: filterEmpty(textSearch),
     purposes,
     unit,
     reservationUnitType: reservationUnitTypes,
@@ -198,26 +198,10 @@ export function processVariables({
             reservableDateStart,
           }
       : {}),
-    ...(endDate != null
-      ? {
-          reservableDateEnd,
-        }
-      : {}),
-    ...(timeBegin != null && timeBegin !== ""
-      ? {
-          reservableTimeStart: timeBegin,
-        }
-      : {}),
-    ...(timeEnd != null && timeEnd !== ""
-      ? {
-          reservableTimeEnd: timeEnd,
-        }
-      : {}),
-    ...(duration != null
-      ? {
-          reservableMinimumDurationMinutes: duration,
-        }
-      : {}),
+    reservableDateEnd: filterEmpty(reservableDateEnd),
+    reservableTimeStart: filterEmpty(timeBegin),
+    reservableTimeEnd: filterEmpty(timeEnd),
+    reservableMinimumDurationMinutes: duration,
     ...(!isSeasonal && showOnlyReservable
       ? {
           showOnlyReservable: true,
@@ -226,6 +210,7 @@ export function processVariables({
     ...(isSeasonal && applicationRound != null && applicationRound > 0
       ? { applicationRound: [applicationRound] }
       : {}),
+    personsAllowed,
     first: SEARCH_PAGING_LIMIT,
     orderBy,
     isDraft: false,

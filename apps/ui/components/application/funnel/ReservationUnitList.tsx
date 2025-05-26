@@ -26,9 +26,9 @@ import { type ApplicationPage1FormValues } from "./form";
 import { useSearchParams } from "next/navigation";
 import { useSearchModify } from "@/hooks/useSearchValues";
 
-type ReservationUnitType = OrderedReservationUnitCardFragment;
+type ReservationUnitType = Pick<OrderedReservationUnitCardFragment, "pk">;
 export type OptionType = Readonly<{ value: number; label: string }>;
-type OptionListType = Readonly<{ value: number; label: string }[]>;
+type OptionListType = Readonly<Array<OptionType>>;
 export type OptionTypes = Readonly<{
   ageGroupOptions?: OptionListType;
   purposeOptions: OptionListType;
@@ -36,7 +36,7 @@ export type OptionTypes = Readonly<{
   unitOptions: OptionListType;
 }>;
 
-type Props = {
+export type ReservationUnitListProps = {
   index: number;
   applicationRound: ApplicationReservationUnitListFragment;
   options: OptionTypes;
@@ -65,7 +65,7 @@ export function ReservationUnitList({
   applicationRound,
   options,
   minSize,
-}: Readonly<Props>): JSX.Element {
+}: Readonly<ReservationUnitListProps>): JSX.Element {
   const { t } = useTranslation();
 
   const { handleRouteChange } = useSearchModify();
