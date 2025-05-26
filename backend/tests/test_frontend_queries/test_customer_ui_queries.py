@@ -378,21 +378,17 @@ def test_frontend_queries__customer_ui__ApplicationSectionCancel(graphql):
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationSectionCancel"]
 
-    assert len(factories) == 2
-    query_info_1 = factories[0]
-    query_info_2 = factories[1]
+    assert len(factories) == 2  # Second query is cancel reasons, but those are static.
+    query_info = factories[0]
 
-    factory_args_1 = deepcopy(query_info_1.factory_args)
-    obj = query_info_1.factory.create(**factory_args_1)
+    factory_args_1 = deepcopy(query_info.factory_args)
+    obj = query_info.factory.create(**factory_args_1)
 
-    factory_args_2 = deepcopy(query_info_2.factory_args)
-    query_info_2.factory.create(**factory_args_2)
-
-    variables = query_info_1.variables
-    variables["id"] = to_global_id(query_info_1.typename, obj.id)
+    variables = query_info.variables
+    variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
-    query = query_info_1.query
+    query = query_info.query
     graphql.login_with_superuser()
 
     response = graphql(query, variables=variables)
@@ -760,21 +756,17 @@ def test_frontend_queries__customer_ui__ReservationCancelPage(graphql):
     customer_factories = get_customer_query_info()
     factories = customer_factories["ReservationCancelPage"]
 
-    assert len(factories) == 2
-    query_info_1 = factories[0]
-    query_info_2 = factories[1]
+    assert len(factories) == 2  # Second query is cancel reasons, but those are static.
+    query_info = factories[0]
 
-    factory_args_1 = deepcopy(query_info_1.factory_args)
-    obj = query_info_1.factory.create(**factory_args_1)
+    factory_args_1 = deepcopy(query_info.factory_args)
+    obj = query_info.factory.create(**factory_args_1)
 
-    factory_args_2 = deepcopy(query_info_2.factory_args)
-    query_info_2.factory.create(**factory_args_2)
-
-    variables = query_info_1.variables
-    variables["id"] = to_global_id(query_info_1.typename, obj.id)
+    variables = query_info.variables
+    variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
-    query = query_info_1.query
+    query = query_info.query
     graphql.login_with_superuser()
 
     response = graphql(query, variables=variables)
