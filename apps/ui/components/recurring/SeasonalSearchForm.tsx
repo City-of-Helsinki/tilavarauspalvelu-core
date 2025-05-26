@@ -36,7 +36,9 @@ export type SearchFormValues = {
 };
 
 // TODO combine as much as possible with the one in single-search (move them to a common place)
-function mapQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
+function mapSeasonalQueryToForm(
+  params: ReadonlyURLSearchParams
+): SearchFormValues {
   return {
     purposes: mapParamToNumber(params.getAll("purposes"), 1),
     units: mapParamToNumber(params.getAll("units"), 1),
@@ -67,10 +69,9 @@ export function SeasonalSearchForm({
   handleSearch,
 }: Readonly<SearchFormProps>): JSX.Element | null {
   const { t } = useTranslation();
-
   const searchValues = useSearchParams();
   const { control, register, handleSubmit } = useForm<SearchFormValues>({
-    values: mapQueryToForm(searchValues),
+    values: mapSeasonalQueryToForm(searchValues),
   });
 
   const onSubmit: SubmitHandler<SearchFormValues> = (
@@ -113,6 +114,7 @@ export function SeasonalSearchForm({
     "sort",
     "ref",
     "selectedReservationUnits",
+    "modalShown",
   ] as const;
 
   return (
