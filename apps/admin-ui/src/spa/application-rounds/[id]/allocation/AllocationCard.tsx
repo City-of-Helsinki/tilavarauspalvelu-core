@@ -26,7 +26,7 @@ import {
   useRemoveAllocation,
 } from "./hooks";
 import { getApplicantName } from "@/helpers";
-import { NotificationInline } from "./NotificationInline";
+import { NotificationInline } from "../../../../component/NotificationInline";
 
 type Props = {
   applicationSection: SectionNodeT;

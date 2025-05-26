@@ -18,7 +18,7 @@ import { KVWrapper, Label, Value } from "@/styled";
 import { Button, ButtonVariant, IconPlus, IconTrash } from "hds-react";
 import { formatDate, getTranslatedError } from "@/common/util";
 import { AccessType, ReservationUnitEditQuery } from "@gql/gql-types";
-import { NotificationInline } from "@/spa/application-rounds/[id]/allocation/NotificationInline";
+import { NotificationInline } from "@/component/NotificationInline";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
