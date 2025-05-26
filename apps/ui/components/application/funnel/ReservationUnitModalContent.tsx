@@ -13,11 +13,9 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import {
-  ReservationUnitOrderingChoices,
-  useSearchReservationUnitsQuery,
   type ApplicationReservationUnitListFragment,
-  type SearchReservationUnitsQueryVariables,
   type RecurringCardFragment,
+  ReservationKind,
 } from "@gql/gql-types";
 import {
   filterNonNullable,
@@ -31,7 +29,6 @@ import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
-import { transformAccessTypeSafe } from "common/src/conversion";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
@@ -42,6 +39,10 @@ import {
   SeasonalSearchForm,
 } from "@/components/recurring/SeasonalSearchForm";
 import { type OptionTypes } from ".";
+import { useSearchModify } from "@/hooks/useSearchValues";
+import { processVariables } from "@/modules/search";
+import { useSearchParams } from "next/navigation";
+import { useSearchQuery } from "@/hooks";
 
 const ImageSizeWrapper = styled.div`
   @media (min-width: ${breakpoints.m}) {
@@ -134,13 +135,7 @@ type AppRoundNode = Omit<
   "reservationUnits"
 >;
 
-export function ReservationUnitModalContent({
-  applicationRound,
-  handleAdd,
-  handleRemove,
-  currentReservationUnits,
-  options,
-}: Readonly<{
+export type ReservationUnitModalProps = Readonly<{
   applicationRound: AppRoundNode;
   handleAdd: (ru: RecurringCardFragment) => void;
   handleRemove: (ru: RecurringCardFragment) => void;
@@ -149,34 +144,33 @@ export function ReservationUnitModalContent({
     OptionTypes,
     "purposeOptions" | "reservationUnitTypeOptions" | "unitOptions"
   >;
-}>): JSX.Element {
+}>;
+
+/// Does queries to get a list of reservation units based on user selected filters
+/// search queries do not change query params (unlike other pages)
+export function ReservationUnitModalContent({
+  applicationRound,
+  handleAdd,
+  handleRemove,
+  currentReservationUnits,
+  options,
+}: ReservationUnitModalProps): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
-  const baseVariables: SearchReservationUnitsQueryVariables = {
-    applicationRound: [applicationRound.pk ?? 0],
-    orderBy: [ReservationUnitOrderingChoices.NameFiAsc],
-    isDraft: false,
-    isVisible: true,
-  };
-  const { data, refetch, loading } = useSearchReservationUnitsQuery({
-    skip: !applicationRound.pk,
-    variables: baseVariables,
-    notifyOnNetworkStatusChange: true,
+  const searchValues = useSearchParams();
+  const variables = processVariables({
+    values: searchValues,
+    language: i18n.language,
+    kind: ReservationKind.Season,
+    applicationRound: applicationRound.pk ?? 0,
   });
 
-  const onSearch = (data: SearchFormValues) => {
-    // TODO should update url query vars if possible since Tags come from the url query
-    const variables: SearchReservationUnitsQueryVariables = {
-      ...baseVariables,
-      textSearch: data.textSearch,
-      personsAllowed: data.personsAllowed,
-      reservationUnitType: data.reservationUnitTypes,
-      unit: data.units,
-      purposes: data.purposes,
-      accessType: data.accessTypes.map(transformAccessTypeSafe),
-    };
-    refetch(variables);
+  const query = useSearchQuery(variables);
+  const { data, isLoading } = query;
+  const { handleSearch } = useSearchModify();
+  const onSearch = (criteria: SearchFormValues) => {
+    handleSearch(criteria, true);
   };
 
   const reservationUnits = filterNonNullable(
@@ -188,11 +182,11 @@ export function ReservationUnitModalContent({
       <H2 $noMargin>{t("reservationUnitModal:heading")}</H2>
       <H3 as="p">{getApplicationRoundName(applicationRound, lang)}</H3>
       <SeasonalSearchForm
-        isLoading={loading}
+        isLoading={isLoading}
         options={options}
         handleSearch={onSearch}
       />
-      {loading ? (
+      {isLoading ? (
         <CenterSpinner />
       ) : reservationUnits.length === 0 ? (
         <div>{t("common:noResults")}</div>
