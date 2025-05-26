@@ -1,6 +1,5 @@
 import { type ApplicationPage3Query } from "@/gql/gql-types";
 import Page3 from "@/pages/applications/[id]/page3";
-import { MockedProvider } from "@apollo/client/testing";
 import { render, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
 import {
@@ -11,6 +10,7 @@ import {
 } from "@/test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
 import { getApplicationPath } from "@/modules/urls";
+import { MockedGraphQLProvider } from "@/test/test.react.utils";
 
 const { mockedRouterPush, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
@@ -66,9 +66,9 @@ function customRender(
   const application: ApplicationPage3 = createMockApplicationFragment(props);
   const mocks = createGraphQLMocks();
   return render(
-    <MockedProvider mocks={mocks} addTypename={false}>
+    <MockedGraphQLProvider mocks={mocks}>
       <Page3 application={application} />
-    </MockedProvider>
+    </MockedGraphQLProvider>
   );
 }
 

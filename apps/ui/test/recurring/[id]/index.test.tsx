@@ -5,16 +5,12 @@ import {
   CreateGraphQLMockProps,
   createApplicationSearchGraphQLMocks,
 } from "@/test/test.gql.utils";
-import { MockedProvider } from "@apollo/client/testing";
 import SeasonalSearch from "@/pages/recurring/[id]";
-import {
-  type ApplicationRoundQuery,
-  ApplicationRoundStatusChoice,
-} from "@/gql/gql-types";
 import { addYears } from "date-fns";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import userEvent from "@testing-library/user-event";
 import { getApplicationPath } from "@/modules/urls";
+import { MockedGraphQLProvider } from "@/test/test.react.utils";
 
 const { mockedRouterReplace, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
@@ -53,7 +49,10 @@ function customRender(
   props: CreateGraphQLMockProps = {}
 ): ReturnType<typeof render> {
   const mocks = createApplicationSearchGraphQLMocks(props);
-  const round = createApplicationRoundMock();
+  const round = createMockApplicationRound({
+    applicationPeriodBegin: new Date(2024, 0, 1, 0, 0, 0),
+    applicationPeriodEnd: addYears(new Date(), 1),
+  });
   const options = {
     unitOptions: [],
     equipmentsOptions: [],
@@ -61,36 +60,28 @@ function customRender(
     reservationUnitTypeOptions: [],
   } as const;
   return render(
-    <MockedProvider
-      mocks={mocks}
-      addTypename={false}
-      // Have to cache bypass (setting cache to InMemoryCache is not enough)
-      // NOTE if copying this approach any override in the query will take precedence
-      // so for query specific fetchPolicies an alternative approach to cache is required
-      defaultOptions={{
-        watchQuery: { fetchPolicy: "no-cache" },
-        query: { fetchPolicy: "no-cache" },
-        mutate: { fetchPolicy: "no-cache" },
-      }}
-    >
+    <MockedGraphQLProvider mocks={mocks}>
       <SeasonalSearch
         applicationRound={round}
         apiBaseUrl="http://localhost:8000"
         options={options}
       />
-    </MockedProvider>
+    </MockedGraphQLProvider>
   );
 }
 
+beforeEach(() => {
+  mockedSearchParams.mockReturnValue(new URLSearchParams());
+  // Timezone breaks toISOString for GraphQL query mocks
+  vi.stubEnv("TZ", "UTC");
+});
+
+afterEach(() => {
+  vi.resetAllMocks();
+  vi.unstubAllEnvs();
+});
+
 describe("Page: SeasonalSearch", () => {
-  beforeEach(() => {
-    mockedSearchParams.mockReturnValue(new URLSearchParams());
-  });
-
-  afterEach(() => {
-    vi.resetAllMocks();
-  });
-
   test("should render page", async () => {
     const view = customRender();
     const title = view.getByRole("heading", {
@@ -316,16 +307,4 @@ async function isReady(
   expect(submitBtn).toBeInTheDocument();
   await expect.poll(() => submitBtn).not.toBeDisabled();
   return submitBtn;
-}
-
-function createApplicationRoundMock(): Readonly<
-  NonNullable<ApplicationRoundQuery["applicationRound"]>
-> {
-  const begin = new Date();
-  const end = addYears(new Date(), 1);
-  return createMockApplicationRound({
-    status: ApplicationRoundStatusChoice.Open,
-    applicationPeriodBegin: begin,
-    applicationPeriodEnd: end,
-  });
 }

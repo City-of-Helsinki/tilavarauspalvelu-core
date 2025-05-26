@@ -14,6 +14,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import {
   type ApplicationReservationUnitListFragment,
+  type Maybe,
   type RecurringCardFragment,
   ReservationKind,
 } from "@gql/gql-types";
@@ -52,30 +53,35 @@ const ImageSizeWrapper = styled.div`
   }
 `;
 
+type ReservationUnitCardProps = Readonly<{
+  reservationUnit: Omit<
+    RecurringCardFragment,
+    "currentAccessType" | "effectiveAccessType"
+  >;
+  isSelected: boolean;
+  handleAdd: (pk: Maybe<number>) => void;
+  handleRemove: (pk: Maybe<number>) => void;
+}>;
+
 function ReservationUnitCard({
   reservationUnit,
   handleAdd,
   handleRemove,
   isSelected,
-}: Readonly<{
-  reservationUnit: RecurringCardFragment;
-  isSelected: boolean;
-  handleAdd: (ru: RecurringCardFragment) => void;
-  handleRemove: (ru: RecurringCardFragment) => void;
-}>) {
+}: ReservationUnitCardProps) {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
   const toggleSelection = () => {
     if (isSelected) {
-      handleRemove(reservationUnit);
+      handleRemove(reservationUnit.pk);
     } else {
-      handleAdd(reservationUnit);
+      handleAdd(reservationUnit.pk);
     }
   };
 
   const buttonText = isSelected
-    ? t("reservationUnitModal:unSelectReservationUnit")
+    ? t("reservationUnitModal:deselectReservationUnit")
     : t("reservationUnitModal:selectReservationUnit");
   const name = getReservationUnitName(reservationUnit);
   const reservationUnitTypeName = reservationUnit.reservationUnitType
@@ -125,6 +131,7 @@ function ReservationUnitCard({
         text={unitName}
         infos={infos}
         buttons={buttons}
+        testId="ModalContent__reservationUnitCard"
       />
     </ImageSizeWrapper>
   );
@@ -137,8 +144,8 @@ type AppRoundNode = Omit<
 
 export type ReservationUnitModalProps = Readonly<{
   applicationRound: AppRoundNode;
-  handleAdd: (ru: RecurringCardFragment) => void;
-  handleRemove: (ru: RecurringCardFragment) => void;
+  handleAdd: (ru: Pick<RecurringCardFragment, "pk">) => void;
+  handleRemove: (ru: Pick<RecurringCardFragment, "pk">) => void;
   currentReservationUnits: Pick<RecurringCardFragment, "pk">[];
   options: Pick<
     OptionTypes,
@@ -167,7 +174,7 @@ export function ReservationUnitModalContent({
   });
 
   const query = useSearchQuery(variables);
-  const { data, isLoading } = query;
+  const { data, isLoading, error } = query;
   const { handleSearch } = useSearchModify();
   const onSearch = (criteria: SearchFormValues) => {
     handleSearch(criteria, true);
@@ -188,13 +195,15 @@ export function ReservationUnitModalContent({
       />
       {isLoading ? (
         <CenterSpinner />
+      ) : error ? (
+        <div>{t("errors:search")}</div>
       ) : reservationUnits.length === 0 ? (
         <div>{t("common:noResults")}</div>
       ) : (
         reservationUnits.map((ru) => (
           <ReservationUnitCard
-            handleAdd={() => handleAdd(ru)}
-            handleRemove={() => handleRemove(ru)}
+            handleAdd={(pk) => handleAdd({ pk })}
+            handleRemove={(pk) => handleRemove({ pk })}
             isSelected={
               currentReservationUnits.find((i) => i.pk === ru.pk) !== undefined
             }
