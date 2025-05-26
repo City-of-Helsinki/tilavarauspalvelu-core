@@ -21,7 +21,7 @@ def test_calculate_reservation_price__subsidised_price_is_equal_to_lowest_price_
     begin = local_datetime()
     end = begin + datetime.timedelta(hours=2)
 
-    pricing = ReservationUnitPricingFactory.create(price_unit=PriceUnit.PRICE_UNIT_FIXED)
+    pricing = ReservationUnitPricingFactory.create(price_unit=PriceUnit.FIXED)
 
     price = pricing.actions.calculate_reservation_price(duration=end - begin)
     subsidised_price = pricing.actions.calculate_reservation_price(duration=end - begin, subsidised=True)
@@ -34,7 +34,7 @@ def test_calculate_reservation_price__subsidised_price_is_equal_to_lowest_price_
     begin = local_datetime()
     end = begin + datetime.timedelta(hours=2)
 
-    pricing = ReservationUnitPricingFactory.create(price_unit=PriceUnit.PRICE_UNIT_PER_HOUR)
+    pricing = ReservationUnitPricingFactory.create(price_unit=PriceUnit.PER_HOUR)
 
     price = pricing.actions.calculate_reservation_price(duration=end - begin)
     subsidised_price = pricing.actions.calculate_reservation_price(duration=end - begin, subsidised=True)
@@ -48,7 +48,7 @@ def test_calculate_reservation_price__pricing_is_calculated_per_15_min_with_pric
     end = begin + datetime.timedelta(hours=1, minutes=15)
 
     pricing = ReservationUnitPricingFactory.create(
-        price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
+        price_unit=PriceUnit.PER_HOUR,
         lowest_price=Decimal("40.0"),
         highest_price=Decimal("40.0"),
     )
@@ -63,7 +63,7 @@ def test_calculate_reservation_price__pricing_is_fixed_with_pricing_unit_more_th
     end = begin + datetime.timedelta(hours=14)
 
     pricing = ReservationUnitPricingFactory.create(
-        price_unit=PriceUnit.PRICE_UNIT_PER_HALF_DAY,
+        price_unit=PriceUnit.PER_HALF_DAY,
         lowest_price=Decimal("100.0"),
         highest_price=Decimal("100.0"),
     )
@@ -78,7 +78,7 @@ def test_calculate_reservation_price__pricing_is_fixed_even_when_duration_is_dou
     end = begin + datetime.timedelta(days=1)
 
     pricing = ReservationUnitPricingFactory.create(
-        price_unit=PriceUnit.PRICE_UNIT_PER_HALF_DAY,
+        price_unit=PriceUnit.PER_HALF_DAY,
         lowest_price=Decimal("100.0"),
         highest_price=Decimal("100.0"),
     )
@@ -97,13 +97,13 @@ def test_get_active_pricing__future_has_same_tax_percentage():
         reservation_unit=reservation_unit,
         begins=day_1,
         tax_percentage__value=Decimal(24),
-        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        price_unit=PriceUnit.FIXED,
     )
     pricing_2 = ReservationUnitPricingFactory.create(
         reservation_unit=reservation_unit,
         begins=day_2,
         tax_percentage__value=Decimal(24),
-        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        price_unit=PriceUnit.FIXED,
         highest_price=Decimal("100.0"),
     )
 
@@ -123,13 +123,13 @@ def test_get_active_pricing__is_activated_on_begins():
         reservation_unit=reservation_unit,
         begins=day_1,
         tax_percentage__value=Decimal(24),
-        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        price_unit=PriceUnit.FIXED,
     )
     pricing_2 = ReservationUnitPricingFactory.create(
         reservation_unit=reservation_unit,
         begins=day_2,
         tax_percentage__value=Decimal("25.5"),
-        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        price_unit=PriceUnit.FIXED,
         is_activated_on_begins=True,
     )
 
@@ -155,13 +155,13 @@ def test_get_active_pricing__active_is_free_future_is_paid_and_different_tax_per
     ReservationUnitPricingFactory.create_free(
         reservation_unit=reservation_unit,
         begins=day_1,
-        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        price_unit=PriceUnit.FIXED,
     )
     ReservationUnitPricingFactory.create(
         reservation_unit=reservation_unit,
         begins=day_2,
         tax_percentage__value=Decimal("25.5"),
-        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        price_unit=PriceUnit.FIXED,
     )
 
     pricing = reservation_unit.actions.get_active_pricing(by_date=day_1.date())
@@ -180,12 +180,12 @@ def test_get_active_pricing__active_is_paid_future_is_free_and_different_tax_per
         reservation_unit=reservation_unit,
         begins=day_1,
         tax_percentage__value=Decimal("25.5"),
-        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        price_unit=PriceUnit.FIXED,
     )
     ReservationUnitPricingFactory.create_free(
         reservation_unit=reservation_unit,
         begins=day_2,
-        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        price_unit=PriceUnit.FIXED,
     )
 
     pricing = reservation_unit.actions.get_active_pricing(by_date=day_1.date())

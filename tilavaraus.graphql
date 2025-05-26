@@ -2454,13 +2454,13 @@ type AppliedPricingInfo {
 
 """An enumeration."""
 enum PriceUnit {
-  PRICE_UNIT_PER_15_MINS
-  PRICE_UNIT_PER_30_MINS
-  PRICE_UNIT_PER_HOUR
-  PRICE_UNIT_PER_HALF_DAY
-  PRICE_UNIT_PER_DAY
-  PRICE_UNIT_PER_WEEK
-  PRICE_UNIT_FIXED
+  PER_15_MINS
+  PER_30_MINS
+  PER_HOUR
+  PER_HALF_DAY
+  PER_DAY
+  PER_WEEK
+  FIXED
 }
 
 type PindoraReservationInfoType {
