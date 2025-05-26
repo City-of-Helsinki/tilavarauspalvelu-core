@@ -1,10 +1,10 @@
 import React from "react";
-import { IconEuroSign, IconCross, IconArrowRight, IconLock } from "hds-react";
+import { ButtonVariant, IconArrowRight, IconCross, IconEuroSign, IconLock } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { trim } from "lodash-es";
-import { AccessType, type ReservationCardFragment, ReservationStateChoice } from "@gql/gql-types";
+import { AccessType, OrderStatus, type ReservationCardFragment, ReservationStateChoice } from "@gql/gql-types";
 import { formatDateTimeRange } from "@/modules/util";
-import { isReservationCancellable, getNormalizedReservationOrderStatus } from "@/modules/reservation";
+import { getNormalizedReservationOrderStatus, isReservationCancellable } from "@/modules/reservation";
 import { getPrice } from "@/modules/reservationUnit";
 import { ReservationOrderStatus } from "./ReservationOrderStatus";
 import { ReservationStatus } from "./ReservationStatus";
@@ -98,7 +98,20 @@ export function ReservationCard({ reservation, type }: Readonly<PropsT>): JSX.El
       <IconArrowRight />
     </ButtonLikeLink>
   );
-
+  if (reservation.paymentOrder?.status === OrderStatus.Pending) {
+    buttons.push(
+      <ButtonLikeLink
+        variant={ButtonVariant.Primary}
+        href={reservation.paymentOrder?.checkoutUrl ?? ""}
+        data-testid="reservation-card__button--goto-payment"
+        key="payment"
+        width="full"
+      >
+        {t("reservations:payReservation")}
+        <IconArrowRight />
+      </ButtonLikeLink>
+    );
+  }
   return (
     <Card
       heading={title}
