@@ -1,5 +1,4 @@
 import Page1 from "@/pages/applications/[id]/page1";
-import { MockedProvider } from "@apollo/client/testing";
 import { render, screen, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
 import {
@@ -14,6 +13,7 @@ import {
 import userEvent from "@testing-library/user-event";
 import { selectOption } from "@test/test.utils";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
+import { MockedGraphQLProvider } from "@/test/test.react.utils";
 
 const { mockedRouterPush, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
@@ -64,9 +64,9 @@ function customRender(
   const mocks = createGraphQLMocks();
   const application = createMockApplicationFragment(props);
   return render(
-    <MockedProvider mocks={mocks} addTypename={false}>
+    <MockedGraphQLProvider mocks={mocks}>
       <Page1 application={application} unitsAll={[]} />
-    </MockedProvider>
+    </MockedGraphQLProvider>
   );
 }
 

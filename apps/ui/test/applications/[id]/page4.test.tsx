@@ -1,6 +1,5 @@
 import { type TermsOfUseFieldsFragment, TermsType } from "@/gql/gql-types";
 import Page4 from "@/pages/applications/[id]/page4";
-import { MockedProvider } from "@apollo/client/testing";
 import { render, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
 import {
@@ -11,6 +10,7 @@ import {
 } from "@/test/test.gql.utils";
 import { base64encode } from "common/src/helpers";
 import userEvent from "@testing-library/user-event";
+import { MockedGraphQLProvider } from "@/test/test.react.utils";
 
 const { useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
@@ -77,9 +77,9 @@ function customRender(
   };
   const mocks = createGraphQLMocks();
   return render(
-    <MockedProvider mocks={mocks} addTypename={false}>
+    <MockedGraphQLProvider mocks={mocks}>
       <Page4 application={application} tos={tos} />
-    </MockedProvider>
+    </MockedGraphQLProvider>
   );
 }
 
