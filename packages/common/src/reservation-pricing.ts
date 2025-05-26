@@ -4,15 +4,15 @@ import formatters from "./number-formatters";
 
 function getPriceUnitMinutes(unit: PriceUnit): number {
   switch (unit) {
-    case PriceUnit.Per_15Mins:
+    case PriceUnit.PriceUnitPer_15Mins:
       return 15;
-    case PriceUnit.Per_30Mins:
+    case PriceUnit.PriceUnitPer_30Mins:
       return 30;
-    case PriceUnit.PerHour:
+    case PriceUnit.PriceUnitPerHour:
       return 60;
-    case PriceUnit.PerHalfDay:
-    case PriceUnit.PerDay:
-    case PriceUnit.PerWeek:
+    case PriceUnit.PriceUnitPerHalfDay:
+    case PriceUnit.PriceUnitPerDay:
+    case PriceUnit.PriceUnitPerWeek:
     default:
       return 1;
   }
@@ -20,9 +20,9 @@ function getPriceUnitMinutes(unit: PriceUnit): number {
 
 function getPriceFractionMinutes(unit: PriceUnit): number {
   switch (unit) {
-    case PriceUnit.Per_15Mins:
-    case PriceUnit.Per_30Mins:
-    case PriceUnit.PerHour:
+    case PriceUnit.PriceUnitPer_15Mins:
+    case PriceUnit.PriceUnitPer_30Mins:
+    case PriceUnit.PriceUnitPerHour:
       return 15;
     default:
       return 1;

@@ -26,7 +26,7 @@ function constructPricing({
   return {
     begins: toApiDate(begin) ?? "",
     id: "1",
-    priceUnit: PriceUnit.PerHour,
+    priceUnit: PriceUnit.PriceUnitPerHour,
     lowestPrice: lowestPrice.toString(),
     highestPrice: highestPrice.toString(),
     taxPercentage: {

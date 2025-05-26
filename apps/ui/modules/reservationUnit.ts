@@ -308,7 +308,7 @@ export function getPriceString(props: GetPriceType): string {
       ? formatPrice(lowestPrice, true)
       : `${formatPrice(lowestPrice)} - ${formatPrice(highestPrice, true)}`;
   const unitString =
-    pricing.priceUnit === PriceUnit.Fixed || minutes
+    pricing.priceUnit === PriceUnit.PriceUnitFixed || minutes
       ? ""
       : t(`prices:priceUnits.${pricing.priceUnit}`);
   return trim(`${priceString} / ${unitString}`, " / ");

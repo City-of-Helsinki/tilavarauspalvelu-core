@@ -246,7 +246,7 @@ describe("getPriceString", () => {
     const input = constructInput({
       lowestPrice: 10,
       highestPrice: 50.5,
-      priceUnit: PriceUnit.Per_15Mins,
+      priceUnit: PriceUnit.PriceUnitPer_15Mins,
     });
     expect(getPriceString(input)).toBe("10,00 - 50,50 € / 15 min");
   });
@@ -255,7 +255,7 @@ describe("getPriceString", () => {
     const input = constructInput({
       lowestPrice: 0.0,
       highestPrice: 50.5,
-      priceUnit: PriceUnit.Per_15Mins,
+      priceUnit: PriceUnit.PriceUnitPer_15Mins,
     });
     expect(getPriceString(input)).toBe("0 - 50,50 € / 15 min");
   });
@@ -310,7 +310,7 @@ describe("getPriceString", () => {
       lowestPrice: 0.0,
       highestPrice: 30,
       minutes: 60,
-      priceUnit: PriceUnit.Per_15Mins,
+      priceUnit: PriceUnit.PriceUnitPer_15Mins,
     });
     expect(getPriceString(input)).toBe("0 - 120,00 €");
   });
@@ -320,7 +320,7 @@ describe("getPriceString", () => {
       lowestPrice: 0.0,
       highestPrice: 30,
       minutes: 60,
-      priceUnit: PriceUnit.Per_30Mins,
+      priceUnit: PriceUnit.PriceUnitPer_30Mins,
     });
     expect(getPriceString(input)).toBe("0 - 60,00 €");
   });
@@ -330,7 +330,7 @@ describe("getPriceString", () => {
       lowestPrice: 0.0,
       highestPrice: 30,
       minutes: 61,
-      priceUnit: PriceUnit.Per_30Mins,
+      priceUnit: PriceUnit.PriceUnitPer_30Mins,
     });
     expect(getPriceString(input)).toBe("0 - 75,00 €");
   });
@@ -340,7 +340,7 @@ describe("getPriceString", () => {
       lowestPrice: 10,
       highestPrice: 100,
       minutes: 61,
-      priceUnit: PriceUnit.PerHalfDay,
+      priceUnit: PriceUnit.PriceUnitPerHalfDay,
     });
     expect(getPriceString(input)).toBe("10,00 - 100,00 €");
   });
@@ -350,7 +350,7 @@ describe("getPriceString", () => {
       lowestPrice: 10,
       highestPrice: 100,
       minutes: 1234,
-      priceUnit: PriceUnit.PerDay,
+      priceUnit: PriceUnit.PriceUnitPerDay,
     });
     expect(getPriceString(input)).toBe("10,00 - 100,00 €");
   });
@@ -360,7 +360,7 @@ describe("getPriceString", () => {
       lowestPrice: 10,
       highestPrice: 100,
       minutes: 1234,
-      priceUnit: PriceUnit.PerWeek,
+      priceUnit: PriceUnit.PriceUnitPerWeek,
     });
     expect(getPriceString(input)).toBe("10,00 - 100,00 €");
   });
@@ -369,7 +369,7 @@ describe("getPriceString", () => {
     const input = constructInput({
       lowestPrice: 50,
       highestPrice: 50,
-      priceUnit: PriceUnit.Fixed,
+      priceUnit: PriceUnit.PriceUnitFixed,
     });
     expect(getPriceString(input)).toBe("50,00 €");
   });
@@ -387,7 +387,7 @@ describe("getPriceString", () => {
       lowestPrice: 0,
       highestPrice: 50.5,
       minutes: 180,
-      priceUnit: PriceUnit.Per_15Mins,
+      priceUnit: PriceUnit.PriceUnitPer_15Mins,
     });
     expect(getPriceString(input)).toBe("0 - 606,00 €");
   });
@@ -673,7 +673,7 @@ function constructPricing({
   return {
     id: "1",
     begins: toApiDateUnsafe(begins ?? new Date()),
-    priceUnit: priceUnit ?? PriceUnit.PerHour,
+    priceUnit: priceUnit ?? PriceUnit.PriceUnitPerHour,
     lowestPrice: lowestPrice?.toString() ?? p.toString(),
     highestPrice: highestPrice?.toString() ?? p.toString(),
     taxPercentage: {

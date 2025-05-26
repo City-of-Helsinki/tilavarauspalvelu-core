@@ -1,12 +1,12 @@
 {
   "reservationUnitPriceLabel": "Varauksen hinta",
   "priceUnits": {
-    "PER_15_MINS": "15 min",
-    "PER_30_MINS": "30 min",
-    "PER_HOUR": "tunti",
-    "PER_HALF_DAY": "½ pv",
-    "PER_DAY": "päivä",
-    "PER_WEEK": "viikko"
+    "PRICE_UNIT_PER_15_MINS": "15 min",
+    "PRICE_UNIT_PER_30_MINS": "30 min",
+    "PRICE_UNIT_PER_HOUR": "tunti",
+    "PRICE_UNIT_PER_HALF_DAY": "½ pv",
+    "PRICE_UNIT_PER_DAY": "päivä",
+    "PRICE_UNIT_PER_WEEK": "viikko"
   },
   "priceFree": "Maksuton",
   "taxPercentage": "alv {{count}}%",

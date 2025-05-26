@@ -120,7 +120,7 @@ export function getReservationPriceDetails(
   const formatters = getFormatters("fi");
 
   const taxPercentage = toNumber(pricing.taxPercentage.value) ?? 0;
-  return priceUnit === PriceUnit.Fixed
+  return priceUnit === PriceUnit.PriceUnitFixed
     ? getReservationPrice(maxPrice, t("RequestedReservation.noPrice"), false)
     : t("RequestedReservation.ApproveDialog.priceBreakdown", {
         volume: formatters.strippedDecimal?.format(volume),
