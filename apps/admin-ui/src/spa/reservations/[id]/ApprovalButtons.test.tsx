@@ -36,7 +36,7 @@ function createInput({
     state,
     begin: end.toISOString(),
     end: end.toISOString(),
-    paymentOrder: [],
+    paymentOrder: null,
     recurringReservation: null,
     reservationUnits: [],
     price: null,
