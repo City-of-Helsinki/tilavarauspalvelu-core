@@ -272,7 +272,7 @@ class ReservationUnitBuilder(ModelFactoryBuilder[ReservationUnit]):
 
     def with_free_pricing(self, *, begin_date: datetime.date | None = None) -> Self:
         self.set(
-            pricings__price_unit=PriceUnit.PRICE_UNIT_FIXED,
+            pricings__price_unit=PriceUnit.FIXED,
             pricings__lowest_price=Decimal(0),
             pricings__highest_price=Decimal(0),
             pricings__tax_percentage__value=Decimal(0),

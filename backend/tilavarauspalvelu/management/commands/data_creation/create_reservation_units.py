@@ -393,7 +393,7 @@ def _create_free_reservation_units(
 
         pricing = ReservationUnitPricingFactory.build(
             begins=datetime.date(2021, 1, 1),
-            price_unit=PriceUnit.PRICE_UNIT_FIXED,
+            price_unit=PriceUnit.FIXED,
             lowest_price=Decimal(0),
             highest_price=Decimal(0),
             reservation_unit=reservation_unit,
@@ -461,21 +461,21 @@ def _create_paid_reservation_units(
             name="fixed price",
             highest_price=Decimal(10),
             lowest_price=Decimal(10),
-            price_unit=PriceUnit.PRICE_UNIT_FIXED,
+            price_unit=PriceUnit.FIXED,
             can_apply_free_of_charge=False,
         ),
         PriceInfo(
             name="hourly price",
             highest_price=Decimal(10),
             lowest_price=Decimal(10),
-            price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
+            price_unit=PriceUnit.PER_HOUR,
             can_apply_free_of_charge=False,
         ),
         PriceInfo(
             name="can ask for subvention",
             highest_price=Decimal(15),
             lowest_price=Decimal(10),
-            price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
+            price_unit=PriceUnit.PER_HOUR,
             can_apply_free_of_charge=True,
         ),
     ]
@@ -827,7 +827,7 @@ def _create_seasonal_bookable_reservation_units(
 
         pricing = ReservationUnitPricingFactory.build(
             begins=datetime.date(2021, 1, 1),
-            price_unit=PriceUnit.PRICE_UNIT_FIXED,
+            price_unit=PriceUnit.FIXED,
             lowest_price=Decimal(0),
             highest_price=Decimal(0),
             reservation_unit=reservation_unit,
@@ -893,7 +893,7 @@ def _create_empty_reservation_units(
 
     ReservationUnitPricingFactory.create(
         begins=datetime.date(2021, 1, 1),
-        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        price_unit=PriceUnit.FIXED,
         lowest_price=Decimal(0),
         highest_price=Decimal(0),
         reservation_unit=reservation_unit,
@@ -964,7 +964,7 @@ def _create_archived_reservation_units(
 
     ReservationUnitPricingFactory.create(
         begins=datetime.date(2021, 1, 1),
-        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        price_unit=PriceUnit.FIXED,
         lowest_price=Decimal(0),
         highest_price=Decimal(0),
         reservation_unit=reservation_unit,
@@ -1027,7 +1027,7 @@ def _create_single_reservation_per_user_reservation_units(
 
     ReservationUnitPricingFactory.create(
         begins=datetime.date(2021, 1, 1),
-        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        price_unit=PriceUnit.FIXED,
         lowest_price=Decimal(0),
         highest_price=Decimal(0),
         reservation_unit=reservation_unit,
@@ -1117,7 +1117,7 @@ def _create_full_day_reservation_units(
 
         pricing = ReservationUnitPricingFactory.build(
             begins=datetime.date(2021, 1, 1),
-            price_unit=PriceUnit.PRICE_UNIT_FIXED,
+            price_unit=PriceUnit.FIXED,
             lowest_price=Decimal(0),
             highest_price=Decimal(0),
             reservation_unit=reservation_unit,
@@ -1220,7 +1220,7 @@ def _create_reservation_units_in_space_hierarchies(
 
     pricing_base = ReservationUnitPricingBuilder().set(
         begins=datetime.date(2021, 1, 1),
-        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        price_unit=PriceUnit.FIXED,
         lowest_price=Decimal(0),
         highest_price=Decimal(0),
         tax_percentage=tax_percentages["0"],
@@ -1603,7 +1603,7 @@ def _create_reservation_units_in_resource_hierarchies(
 
     pricing_base = ReservationUnitPricingBuilder().set(
         begins=datetime.date(2021, 1, 1),
-        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        price_unit=PriceUnit.FIXED,
         lowest_price=Decimal(0),
         highest_price=Decimal(0),
         tax_percentage=tax_percentages["0"],
@@ -1785,7 +1785,7 @@ def _create_reservation_unit_for_recurring_reservations(
 
     ReservationUnitPricingFactory.create(
         begins=datetime.date(2021, 1, 1),
-        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        price_unit=PriceUnit.FIXED,
         lowest_price=Decimal(0),
         highest_price=Decimal(0),
         reservation_unit=reservation_unit,

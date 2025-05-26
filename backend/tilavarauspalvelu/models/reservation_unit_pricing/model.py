@@ -33,7 +33,7 @@ def get_default_tax_percentage() -> int:
 
 class ReservationUnitPricing(models.Model):
     begins: datetime.date = models.DateField()
-    price_unit: str = models.CharField(max_length=20, choices=PriceUnit.choices, default=PriceUnit.PRICE_UNIT_PER_HOUR)
+    price_unit: str = models.CharField(max_length=20, choices=PriceUnit.choices, default=PriceUnit.PER_HOUR)
 
     payment_type: str | None = models.CharField(max_length=20, choices=PaymentType.choices, null=True, blank=True)
 

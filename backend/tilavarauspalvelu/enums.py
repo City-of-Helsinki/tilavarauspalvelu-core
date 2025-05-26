@@ -756,37 +756,37 @@ class PaymentType(models.TextChoices):
 
 
 class PriceUnit(models.TextChoices):
-    PRICE_UNIT_PER_15_MINS = "per_15_mins", pgettext_lazy("PriceUnit", "per 15 minutes")
-    PRICE_UNIT_PER_30_MINS = "per_30_mins", pgettext_lazy("PriceUnit", "per 30 minutes")
-    PRICE_UNIT_PER_HOUR = "per_hour", pgettext_lazy("PriceUnit", "per hour")
-    PRICE_UNIT_PER_HALF_DAY = "per_half_day", pgettext_lazy("PriceUnit", "per half a day")
-    PRICE_UNIT_PER_DAY = "per_day", pgettext_lazy("PriceUnit", "per day")
-    PRICE_UNIT_PER_WEEK = "per_week", pgettext_lazy("PriceUnit", "per week")
-    PRICE_UNIT_FIXED = "fixed", pgettext_lazy("PriceUnit", "fixed")
+    PER_15_MINS = "per_15_mins", pgettext_lazy("PriceUnit", "per 15 minutes")
+    PER_30_MINS = "per_30_mins", pgettext_lazy("PriceUnit", "per 30 minutes")
+    PER_HOUR = "per_hour", pgettext_lazy("PriceUnit", "per hour")
+    PER_HALF_DAY = "per_half_day", pgettext_lazy("PriceUnit", "per half a day")
+    PER_DAY = "per_day", pgettext_lazy("PriceUnit", "per day")
+    PER_WEEK = "per_week", pgettext_lazy("PriceUnit", "per week")
+    FIXED = "fixed", pgettext_lazy("PriceUnit", "fixed")
 
     @enum.property
     def is_fixed(self) -> bool:
         return self in {
-            PriceUnit.PRICE_UNIT_FIXED,
-            PriceUnit.PRICE_UNIT_PER_HALF_DAY,
-            PriceUnit.PRICE_UNIT_PER_DAY,
-            PriceUnit.PRICE_UNIT_PER_WEEK,
+            PriceUnit.FIXED,
+            PriceUnit.PER_HALF_DAY,
+            PriceUnit.PER_DAY,
+            PriceUnit.PER_WEEK,
         }
 
     @enum.property
     def in_minutes(self) -> int:
         match self:
-            case PriceUnit.PRICE_UNIT_PER_15_MINS:
+            case PriceUnit.PER_15_MINS:
                 return 15
-            case PriceUnit.PRICE_UNIT_PER_30_MINS:
+            case PriceUnit.PER_30_MINS:
                 return 30
-            case PriceUnit.PRICE_UNIT_PER_HOUR:
+            case PriceUnit.PER_HOUR:
                 return 60
-            case PriceUnit.PRICE_UNIT_PER_HALF_DAY:
+            case PriceUnit.PER_HALF_DAY:
                 return 120
-            case PriceUnit.PRICE_UNIT_PER_DAY:
+            case PriceUnit.PER_DAY:
                 return 1440
-            case PriceUnit.PRICE_UNIT_PER_WEEK:
+            case PriceUnit.PER_WEEK:
                 return 10080
             case _:
                 msg = f"Price unit {self} cannot be represented in minutes."
