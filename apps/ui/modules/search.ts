@@ -5,8 +5,8 @@ import {
   getLocalizationLang,
   ignoreMaybeArray,
   toNumber,
-  type LocalizationLanguages,
 } from "common/src/helpers";
+import { type LocalizationLanguages } from "common/src/urlBuilder";
 import {
   EquipmentOrderingChoices,
   OptionsDocument,

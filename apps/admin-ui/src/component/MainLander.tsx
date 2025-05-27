@@ -7,6 +7,7 @@ import { fontBold, H2 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { HERO_IMAGE_URL } from "@/common/const";
 import { KorosHeading, Heading } from "./KorosHeading";
+import { getLocalizationLang } from "common/src/helpers";
 
 const LoginBtn = styled(Button)`
   --background-color: var(--color-white);
@@ -41,8 +42,8 @@ const Ingress = styled(H2)`
   line-height: 1.8125rem;
 `;
 
-export function MainLander({ apiBaseUrl }: { apiBaseUrl: string }) {
-  const { t } = useTranslation();
+export function MainLander({ apiBaseUrl }: Readonly<{ apiBaseUrl: string }>) {
+  const { t, i18n } = useTranslation();
 
   return (
     <>
@@ -51,7 +52,13 @@ export function MainLander({ apiBaseUrl }: { apiBaseUrl: string }) {
         <LoginBtn
           iconStart={<IconGroup />}
           iconEnd={<IconArrowRight />}
-          onClick={() => signIn(apiBaseUrl)}
+          onClick={() =>
+            signIn({
+              apiBaseUrl,
+              language: getLocalizationLang(i18n.language),
+              client: "admin",
+            })
+          }
         >
           {t("Navigation.login")}
         </LoginBtn>
