@@ -287,20 +287,15 @@ function createSearchVariablesMock({
   } as const;
 }
 
-type ApplicationMockType = NonNullable<ApplicationPage2Query["application"]>;
-type ApplicationSectionMockType = NonNullable<
-  ApplicationMockType["applicationSections"]
->[number];
-/// @param page which page is valid (page0 => nothing is valid), preview => it's sent
-export function createMockApplicationSection({
-  page = "page0",
-  pk = 1,
+type CreateReservationUnitOption =
+  ApplicationSectionMockType["reservationUnitOptions"][0];
+function createReservationUnitOption({
+  order,
+  page,
 }: {
-  page?: PageOptions;
-  pk?: number;
-} = {}): ApplicationSectionMockType {
-  // TODO parametrize so we can zero this for page0 (nothing filled yet)
-
+  order: number;
+  page: PageOptions;
+}): CreateReservationUnitOption {
   const timeSelector: TimeSelectorFragment = {
     id: base64encode(`ApplicationRoundTimeSlotNode:1`),
     weekday: 1,
@@ -315,25 +310,46 @@ export function createMockApplicationSection({
 
   // NOTE even though the queries for other pages than page2 don't include most of this
   // typing becomes too complicated if we don't include it (use empty time slots array)
-  const reservationUnit: ApplicationSectionMockType["reservationUnitOptions"][0]["reservationUnit"] =
-    {
-      id: base64encode(`ReservationUnitNode:1`),
-      pk: 1,
-      ...generateNameFragment("ReservationUnitNode"),
-      unit: {
-        id: base64encode(`UnitNode:1`),
-        ...generateNameFragment("UnitNode"),
-      },
-      applicationRoundTimeSlots: page === "page2" ? [timeSelector] : [],
-    };
-  const opt1: ApplicationSectionMockType["reservationUnitOptions"][0] = {
+  const reservationUnit: CreateReservationUnitOption["reservationUnit"] = {
+    id: base64encode(`ReservationUnitNode:${order}`),
+    pk: order,
+    ...generateNameFragment(`Reservation Unit ${order}`),
+    unit: {
+      id: base64encode(`UnitNode:1`),
+      ...generateNameFragment("Unit"),
+    },
+    applicationRoundTimeSlots: page === "page2" ? [timeSelector] : [],
+  };
+  return {
     id: base64encode(`ReservationUnitOptionNode:1`),
-    pk: 1,
-    preferredOrder: 1,
+    pk: order,
+    preferredOrder: order,
     reservationUnit,
   };
+}
+
+type ApplicationMockType = NonNullable<ApplicationPage2Query["application"]>;
+type ApplicationSectionMockType = NonNullable<
+  ApplicationMockType["applicationSections"]
+>[number];
+/// @param page which page is valid (page0 => nothing is valid), preview => it's sent
+export function createMockApplicationSection({
+  page = "page0",
+  pk = 1,
+  nReservationUnitOptions = 1,
+}: {
+  page?: PageOptions;
+  pk?: number;
+  nReservationUnitOptions?: number;
+} = {}): ApplicationSectionMockType {
+  // TODO parametrize so we can zero this for page0 (nothing filled yet)
+
   const reservationUnitOptions: ApplicationSectionMockType["reservationUnitOptions"] =
-    page !== "page0" ? [opt1] : [];
+    page !== "page0"
+      ? Array.from({ length: nReservationUnitOptions }).map((_, i) =>
+          createReservationUnitOption({ order: i + 1, page })
+        )
+      : [];
 
   const page2Data = {
     // TODO add other options
@@ -393,12 +409,15 @@ export type CreateMockApplicationFragmentProps = {
   page?: PageOptions;
   notesWhenApplying?: string | null;
   status?: ApplicationStatusChoice;
+  nReservationUnitOptions?: number;
 };
+
 export function createMockApplicationFragment({
   pk = 1,
   page = "page0",
   notesWhenApplying = "Notes when applying",
   status = ApplicationStatusChoice.Draft,
+  nReservationUnitOptions = 1,
 }: CreateMockApplicationFragmentProps = {}): ApplicationMockType {
   const now = new Date();
 
@@ -450,7 +469,9 @@ export function createMockApplicationFragment({
     // TODO this can't be combined with the other Fragment
     // colliding with the same name (spread syntax)
     applicationSections:
-      page === "page0" ? [] : [createMockApplicationSection({ page })],
+      page === "page0"
+        ? []
+        : [createMockApplicationSection({ page, nReservationUnitOptions })],
     ...(page === "page3" || page === "page4"
       ? page3Data
       : {
