@@ -256,9 +256,14 @@ describe("Page1", () => {
   // due to temporary backend error or a software bug?
   test.todo("What should happen if options are not available?");
 
-  test.todo("should allow adding new application section");
   test.todo("should not allow navigation by default");
   test.todo("should update application on submit");
   test.todo("should not allow saving for invalid form");
   test.todo("mutation should toast on error");
+});
+
+describe("Page1: multiple sections", () => {
+  test.todo("should allow adding new application section");
+  // the select modal should only modify the section it was opened for
+  test.todo("adding reservation units should not affect other sections");
 });
