@@ -1,6 +1,9 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { type ApplicantFragment, ApplicantTypeChoice } from "@gql/gql-types";
+import {
+  type ApplicantFieldsFragment,
+  ApplicantTypeChoice,
+} from "@gql/gql-types";
 import {
   ApplicationInfoContainer,
   InfoItemContainer,
@@ -26,7 +29,10 @@ const LabelValue = ({
   );
 };
 
-type ApplicantT = Omit<ApplicantFragment, "homeCity" | "additionalInformation">;
+type ApplicantT = Omit<
+  ApplicantFieldsFragment,
+  "homeCity" | "additionalInformation"
+>;
 
 export function ApplicantInfoPreview({
   application,

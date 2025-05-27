@@ -1,16 +1,16 @@
 // @ts-check
-import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
+import eslint from "@eslint/js";
+import tseslint from "typescript-eslint";
 import globals from "globals";
-import reactPlugin from 'eslint-plugin-react';
+import reactPlugin from "eslint-plugin-react";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore -- types missing?
 import eslintPluginReactHooks from "eslint-plugin-react-hooks";
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
-import graphqlPlugin from '@graphql-eslint/eslint-plugin'
-import eslintPluginImportX from 'eslint-plugin-import-x'
+import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
+import graphqlPlugin from "@graphql-eslint/eslint-plugin";
+import eslintPluginImportX from "eslint-plugin-import-x";
 
-const SCHEMA_FILE = '../../tilavaraus.graphql';
+const SCHEMA_FILE = "../../tilavaraus.graphql";
 
 /** Construct a graphql config and only include that project's gql files
  *  @param path {string}
@@ -18,27 +18,27 @@ const SCHEMA_FILE = '../../tilavaraus.graphql';
  * */
 export function constructGQLConfig(path, disableUnusedFragments = false) {
   return {
-    files: ['**/*.graphql'],
+    files: ["**/*.graphql"],
     languageOptions: {
       parser: graphqlPlugin.parser,
       parserOptions: {
         graphQLConfig: {
           schema: SCHEMA_FILE,
-          documents: [
-            `${path}/**/!(*.d|gql-types).{ts,tsx}`,
-          ],
+          documents: [`${path}/**/!(*.d|gql-types).{ts,tsx}`],
         },
       },
     },
     plugins: {
-      '@graphql-eslint': graphqlPlugin
+      "@graphql-eslint": graphqlPlugin,
     },
     rules: {
-      ...graphqlPlugin.configs['flat/operations-recommended'].rules,
+      ...graphqlPlugin.configs["flat/operations-recommended"].rules,
       "@graphql-eslint/selection-set-depth": ["error", { maxDepth: 10 }],
       // can't use shared fragments in common if this rule is on
       // disabling rules inside gql doesn't work sometimes
-      "@graphql-eslint/no-unused-fragments": disableUnusedFragments ? "off" : "error",
+      "@graphql-eslint/no-unused-fragments": disableUnusedFragments
+        ? "off"
+        : "error",
     },
   };
 }
@@ -91,15 +91,15 @@ const myRules = {
   "import-x/no-named-as-default": "off",
   // breaks admin-ui typescript paths
   "import-x/no-unresolved": "off",
-  'import-x/no-dynamic-require': 'warn',
+  "import-x/no-dynamic-require": "warn",
   // mixing mjs with ts in nextjs causes issues
   "import-x/extensions": [
     "error",
     "never",
     {
-      "mjs": "always",
-      "cjs": "always",
-      "json": "always",
+      mjs: "always",
+      cjs: "always",
+      json: "always",
     },
   ],
 };
@@ -148,7 +148,7 @@ const ignores = [
 
 export default [
   ...tsConfig,
-  reactPlugin.configs.flat['jsx-runtime'],
+  reactPlugin.configs.flat["jsx-runtime"],
   {
     plugins: {
       "react-hooks": eslintPluginReactHooks,

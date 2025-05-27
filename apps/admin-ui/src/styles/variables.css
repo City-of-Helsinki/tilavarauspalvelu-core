@@ -42,21 +42,21 @@
   --tilavaraus-event-booking-closed-border: var(--color-black);
 
   /* Allocation calendar colours */
-  --tilavaraus-allocation-calendar-colour-bg-one: #DFF7EB;
-  --tilavaraus-allocation-calendar-colour-text-one: #1A1A1A;
-  --tilavaraus-allocation-calendar-colour-bg-few: #FFDD82;
-  --tilavaraus-allocation-calendar-colour-text-few: #1A1A1A;
-  --tilavaraus-allocation-calendar-colour-bg-many: #DE9621;
-  --tilavaraus-allocation-calendar-colour-text-many: #1A1A1A;
-  --tilavaraus-allocation-calendar-colour-bg-full: #C85029;
-  --tilavaraus-allocation-calendar-colour-text-full: #FFFFFF;
-  --tilavaraus-allocation-calendar-colour-bg-none: #E5E5E5;
-  --tilavaraus-allocation-calendar-colour-bg-disabled: #B2B2B2;
-  --tilavaraus-allocation-calendar-colour-text-disabled: #1A1A1A;
+  --tilavaraus-allocation-calendar-colour-bg-one: #dff7eb;
+  --tilavaraus-allocation-calendar-colour-text-one: #1a1a1a;
+  --tilavaraus-allocation-calendar-colour-bg-few: #ffdd82;
+  --tilavaraus-allocation-calendar-colour-text-few: #1a1a1a;
+  --tilavaraus-allocation-calendar-colour-bg-many: #de9621;
+  --tilavaraus-allocation-calendar-colour-text-many: #1a1a1a;
+  --tilavaraus-allocation-calendar-colour-bg-full: #c85029;
+  --tilavaraus-allocation-calendar-colour-text-full: #ffffff;
+  --tilavaraus-allocation-calendar-colour-bg-none: #e5e5e5;
+  --tilavaraus-allocation-calendar-colour-bg-disabled: #b2b2b2;
+  --tilavaraus-allocation-calendar-colour-text-disabled: #1a1a1a;
   --tilavaraus-allocation-calendar-colour-bg-allocated: #006631;
-  --tilavaraus-allocation-calendar-colour-text-allocated: #FFFFFF;
-  --tilavaraus-allocation-calendar-colour-bg-allocated-elsewhere: #1A1A1A;
-  --tilavaraus-allocation-calendar-colour-text-allocated-elsewhere: #FFFFFF;
+  --tilavaraus-allocation-calendar-colour-text-allocated: #ffffff;
+  --tilavaraus-allocation-calendar-colour-bg-allocated-elsewhere: #1a1a1a;
+  --tilavaraus-allocation-calendar-colour-text-allocated-elsewhere: #ffffff;
 
   /* layout size, these are the same as HDS uses, but for forward compatibility define them here */
   --tilavaraus-page-max-width: 1440px;
@@ -64,7 +64,9 @@
 
 /* override HDS variables (components define their own variables) */
 * {
-  --notification-z-index-toast: var(--tilavaraus-admin-stack-notification) !important;
+  --notification-z-index-toast: var(
+    --tilavaraus-admin-stack-notification
+  ) !important;
   --header-z-index: var(--tilavaraus-admin-stack-main-menu);
   --header-max-width: var(--tilavaraus-page-max-width);
 }

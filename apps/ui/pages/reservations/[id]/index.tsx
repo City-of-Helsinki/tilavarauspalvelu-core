@@ -757,7 +757,6 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
     reservation(id: $id) {
       id
       pk
-      ...ReserveeNameFields
       ...ReserveeBillingFields
       ...ReservationInfo
       ...ReservationInfoCard

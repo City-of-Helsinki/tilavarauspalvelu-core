@@ -17,40 +17,6 @@ export const APPLICANT_NAME_FRAGMENT = gql`
   }
 `;
 
-export const APPLICATION_SECTION_DURATION_FRAGMENT = gql`
-  fragment ApplicationSectionDuration on ApplicationSectionNode {
-    id
-    reservationsEndDate
-    reservationsBeginDate
-    appliedReservationsPerWeek
-    reservationMinDuration
-  }
-`;
-
-// TODO don't use convenience fragments
-export const APPLICATION_SECTION_COMMON_FRAGMENT = gql`
-  fragment ApplicationSectionCommon on ApplicationSectionNode {
-    id
-    pk
-    name
-    status
-    ...ApplicationSectionDuration
-    reservationMaxDuration
-    ageGroup {
-      id
-      pk
-      minimum
-      maximum
-    }
-    numPersons
-    reservationUnitOptions {
-      id
-      pk
-      preferredOrder
-    }
-  }
-`;
-
 export const SUITABLE_TIME_FRAGMENT = gql`
   fragment SuitableTime on SuitableTimeRangeNode {
     id
@@ -62,8 +28,8 @@ export const SUITABLE_TIME_FRAGMENT = gql`
   }
 `;
 
-export const APPLICANT_FRAGMENT = gql`
-  fragment Applicant on ApplicationNode {
+export const APPLICANT_FIELDS_FRAGMENT = gql`
+  fragment ApplicantFields on ApplicationNode {
     id
     pk
     applicantType
