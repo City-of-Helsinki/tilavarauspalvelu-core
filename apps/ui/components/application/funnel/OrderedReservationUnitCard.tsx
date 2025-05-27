@@ -1,3 +1,4 @@
+import React, { type HTMLAttributes } from "react";
 import {
   IconArrowDown,
   IconArrowUp,
@@ -6,7 +7,6 @@ import {
   Button,
   ButtonPresetTheme,
 } from "hds-react";
-import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Flex, H6, fontBold, fontMedium, fontRegular } from "common/styled";
@@ -21,19 +21,6 @@ import {
   getTranslationSafe,
 } from "common/src/common/util";
 import { gql } from "@apollo/client";
-
-type ReservationUnitType = OrderedReservationUnitCardFragment;
-
-type Props = {
-  order: number;
-  reservationUnit: ReservationUnitType;
-  onDelete: (reservationUnit: ReservationUnitType) => void;
-  first: boolean;
-  last: boolean;
-  onMoveUp: (reservationUnit: ReservationUnitType) => void;
-  onMoveDown: (reservationUnit: ReservationUnitType) => void;
-  error?: string;
-};
 
 const NameCardContainer = styled(Flex).attrs({ $gap: "none" })`
   flex-direction: column;
@@ -198,6 +185,18 @@ const DownButton = styled(OrderButton)`
   }
 `;
 
+type ReservationUnitType = OrderedReservationUnitCardFragment;
+interface Props extends HTMLAttributes<HTMLDivElement> {
+  order: number;
+  reservationUnit: ReservationUnitType;
+  onDelete: (reservationUnit: ReservationUnitType) => void;
+  first: boolean;
+  last: boolean;
+  onMoveUp: (reservationUnit: ReservationUnitType) => void;
+  onMoveDown: (reservationUnit: ReservationUnitType) => void;
+  error?: string;
+}
+
 /// Custom card for selecting reservation units for application
 export function OrderedReservationUnitCard({
   reservationUnit,
@@ -208,6 +207,7 @@ export function OrderedReservationUnitCard({
   onMoveUp,
   onMoveDown,
   error,
+  ...rest
 }: Readonly<Props>): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
@@ -219,7 +219,7 @@ export function OrderedReservationUnitCard({
   const imgSrc = getImageSource(img, "medium");
 
   return (
-    <>
+    <Flex {...rest} $gap="xs">
       {error && <ErrorText>{error}</ErrorText>}
       <NameCardContainer>
         <PreCardLabel>
@@ -269,7 +269,7 @@ export function OrderedReservationUnitCard({
           </OrderButtonContainer>
         </OverlayContainer>
       </NameCardContainer>
-    </>
+    </Flex>
   );
 }
 
