@@ -66,7 +66,7 @@ const CloseButton = styled.button`
   ${focusStyles}
 `;
 
-type Props = {
+type ModalProps = {
   handleClose: () => void;
   show: boolean;
   children: React.ReactNode;
@@ -87,7 +87,7 @@ export function Modal({
   actions,
   maxWidth,
   fullHeight,
-}: Readonly<Props>): JSX.Element | null {
+}: Readonly<ModalProps>): JSX.Element | null {
   const { t } = useTranslation();
 
   if (!isBrowser) {

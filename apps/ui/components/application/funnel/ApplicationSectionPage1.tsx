@@ -146,7 +146,8 @@ function ApplicationSectionInner({
       </AutoGrid>
       <H4 as="h3"> {t("application:Page1.spacesSubHeading")}</H4>
       <ReservationUnitList
-        index={index}
+        name={`applicationSections.${index}.reservationUnits`}
+        control={control}
         applicationRound={applicationRound}
         minSize={numPersons}
         options={options}
