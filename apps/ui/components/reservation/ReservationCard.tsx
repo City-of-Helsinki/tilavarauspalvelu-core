@@ -134,7 +134,7 @@ export function ReservationCard({
   if (reservation.paymentOrder?.status === OrderStatus.Pending) {
     buttons.push(
       <ButtonLikeLink
-        variant={ButtonVariant.Secondary}
+        variant={ButtonVariant.Primary}
         href={reservation.paymentOrder?.checkoutUrl ?? ""}
         data-testid="reservation-card__button--goto-payment"
         key="payment"
