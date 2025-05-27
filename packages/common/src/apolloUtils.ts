@@ -270,7 +270,7 @@ export const errorLink = onError(({ graphQLErrors, networkError }) => {
 
   // During development (especially for SSR) log to console since there is no network tab
   // better method would be to use a logger / push errors to client side
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env.NODE_ENV === "development") {
     if (graphQLErrors) {
       for (const error of graphQLErrors) {
         // eslint-disable-next-line no-console
