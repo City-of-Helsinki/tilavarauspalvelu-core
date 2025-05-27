@@ -55,7 +55,7 @@ class ProfileDataParser:
         )
 
     def parse_user_profile_info(self, *, user: User) -> UserProfileInfo:
-        address = self.get_address(prefer_verified=True)
+        address = self.get_address(prefer_verified=True) or {}
         return UserProfileInfo(
             pk=user.pk,
             first_name=self.get_first_name(prefer_verified=True),
@@ -67,6 +67,8 @@ class ProfileDataParser:
             street_address=address.get("address"),
             postal_code=address.get("postalCode"),
             city=address.get("city"),
+            country_code=address.get("countryCode"),
+            additional_address=address.get("additionalAddress"),
             municipality_code=self.get_municipality_code(),
             municipality_name=self.get_municipality_name(),
             login_method=LoginMethod.PROFILE,
@@ -175,6 +177,7 @@ class ProfileDataParser:
             return ProfileForeignAddress(
                 address=address.get("streetAddress"),
                 countryCode=address.get("countryCode"),
+                additionalAddress=address.get("additionalAddress"),
             )
 
         return None

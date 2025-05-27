@@ -12,6 +12,7 @@ from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProf
 from tilavarauspalvelu.integrations.helsinki_profile.typing import UserProfileInfo
 from tilavarauspalvelu.models import Application, Reservation
 from tilavarauspalvelu.tasks import save_personal_info_view_log
+from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     import datetime
@@ -35,6 +36,8 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
     street_address = graphene.String()
     postal_code = graphene.String()
     city = graphene.String()
+    country_code = graphene.String()
+    additional_address = graphene.String()
     municipality_code = graphene.String()
     municipality_name = graphene.String()
     login_method = graphene.Field(graphene.Enum.from_enum(LoginMethod), required=True)
@@ -45,15 +48,15 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         cls,
         info: GQLInfo,
         *,
-        application_id: int | None = None,
-        reservation_id: int | None = None,
+        application_pk: int | None = None,
+        reservation_pk: int | None = None,
     ) -> UserProfileInfo:
-        if reservation_id is not None:
-            user = cls.get_user_from_reservation(reservation_id, info=info)
-        elif application_id is not None:
-            user = cls.get_user_from_application(application_id, info=info)
+        if reservation_pk is not None:
+            user = cls.get_user_from_reservation(reservation_pk, info=info)
+        elif application_pk is not None:
+            user = cls.get_user_from_application(application_pk, info=info)
         else:
-            msg = "Either 'reservation_id' or 'application_id' required."
+            msg = "Either 'reservation_pk' or 'reservation_pk' required."
             raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_INVALID_PARAMS)
 
         id_token = user.id_token
@@ -84,12 +87,21 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         # Modify profile request based on the requested fields in the graphql query
         fields: list[str] = get_field_selections(info)
 
-        data = HelsinkiProfileClient.get_user_profile_info(
-            user=user,
-            request_user=info.context.user,
-            session=info.context.session,
-            fields=fields,
-        )
+        try:
+            data = HelsinkiProfileClient.get_user_profile_info(
+                user=user,
+                request_user=info.context.user,
+                session=info.context.session,
+                fields=fields,
+            )
+        except ExternalServiceError as e:
+            if type(e.extra_data) is list and len(e.extra_data):
+                profile_error = e.extra_data[0]
+                msg = profile_error.get("message", "Unknown Helsinki Profile error")
+                if profile_error.get("extensions", {}).get("code") == "PERMISSION_DENIED_ERROR":
+                    raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_PERMISSION_DENIED) from e
+            raise
+
         if info.context.session.get("keycloak_refresh_token_expired", False):
             msg = "Keycloak refresh token is expired. Please log out and back in again."
             raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_KEYCLOAK_REFRESH_TOKEN_EXPIRED)
@@ -101,15 +113,15 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         return data
 
     @classmethod
-    def get_user_from_application(cls, application_id: int, info: GQLInfo) -> User:
+    def get_user_from_application(cls, application_pk: int, info: GQLInfo) -> User:
         application: Application | None = (
             Application.objects.select_related("user")  #
-            .filter(pk=application_id)
+            .filter(pk=application_pk)
             .with_permissions()
             .first()
         )
         if application is None:
-            msg = f"Application with id {application_id} not found."
+            msg = f"Application with id {application_pk} not found."
             raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_APPLICATION_USER_NOT_FOUND)
 
         user: AnyUser = info.context.user
@@ -118,21 +130,21 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
 
         user: User | None = application.user
         if user is None:
-            msg = f"Application with id {application_id} does not have a user."
+            msg = f"Application with id {application_pk} does not have a user."
             raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_APPLICATION_USER_MISSING)
 
         return user
 
     @classmethod
-    def get_user_from_reservation(cls, reservation_id: int, info: GQLInfo) -> User:
+    def get_user_from_reservation(cls, application_pk: int, info: GQLInfo) -> User:
         reservation: Reservation | None = (
             Reservation.objects.select_related("user")  #
-            .filter(pk=reservation_id)
+            .filter(pk=application_pk)
             .with_permissions()
             .first()
         )
         if reservation is None:
-            msg = f"Reservation with id {reservation_id} not found."
+            msg = f"Reservation with id {application_pk} not found."
             raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_RESERVATION_USER_NOT_FOUND)
 
         user: AnyUser = info.context.user
@@ -141,7 +153,7 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
 
         user: User | None = reservation.user
         if user is None:
-            msg = f"Reservation with id {reservation_id} does not have a user."
+            msg = f"Reservation with id {application_pk} does not have a user."
             raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_RESERVATION_USER_MISSING)
 
         return user
