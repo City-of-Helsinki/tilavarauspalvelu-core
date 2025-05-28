@@ -122,7 +122,6 @@ function Actions({
   >;
 }) {
   const { t, i18n } = useTranslation();
-  const order = reservation.paymentOrder.find(() => true);
 
   // Reservation can be in either RequiresHandling or Confirmed state on this page
   if (reservation.state !== ReservationStateChoice.Confirmed) {
@@ -141,11 +140,14 @@ function Actions({
         {t("reservations:saveToCalendar")}
         <IconCalendar />
       </ButtonLikeExternalLink>
-      {order?.receiptUrl && (
+      {reservation.paymentOrder?.receiptUrl && (
         <Button
           data-testid="reservation__confirmation--button__receipt-link"
           onClick={() =>
-            window.open(`${order.receiptUrl}&lang=${i18n.language}`, "_blank")
+            window.open(
+              `${reservation.paymentOrder?.receiptUrl}&lang=${i18n.language}`,
+              "_blank"
+            )
           }
           variant={ButtonVariant.Secondary}
           iconEnd={<IconLinkExternal />}

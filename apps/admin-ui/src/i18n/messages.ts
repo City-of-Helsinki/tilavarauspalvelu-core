@@ -81,6 +81,7 @@ const translations: ITranslations = {
     allResults: ["Kaikki {{totalCount}} tulosta näytetty"],
   },
   common: {
+    helsinkiCity: ["Helsingin kaupunki"],
     showMore: ["Näytä lisää"],
     view: ["Näytä"],
     clearAllSelections: ["Tyhjennä valinnat"],
@@ -1929,6 +1930,7 @@ const translations: ITranslations = {
     showBirthDate: ["Näytä"],
     alreadyEnded: ["Päättynyt"],
     keylessEntryHeader: ["Avaimeton kulku"],
+    dueByParenthesis: ["(määräaika {{date}})"],
     DenyDialog: {
       reject: ["Hylkää varaus"],
       denyReason: ["Hylkäyksen syy"],

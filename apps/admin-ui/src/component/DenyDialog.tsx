@@ -27,6 +27,7 @@ import { successToast } from "common/src/common/toast";
 import { ApolloError, gql } from "@apollo/client";
 import { convertOptionToHDS, toNumber } from "common/src/helpers";
 import { useDisplayError } from "common/src/hooks";
+import { isBefore } from "date-fns";
 
 const ActionButtons = styled(Dialog.ActionButtons)`
   justify-content: end;
@@ -48,36 +49,44 @@ function isPriceReturnable(x: {
   orderStatus: OrderStatus | null;
   orderUuid: string | null;
   refundUuid: string | null;
+  begin: string;
 }): boolean {
   return (
     x.price > 0 &&
-    x.orderStatus === OrderStatus.Paid &&
+    (x.orderStatus === OrderStatus.Paid ||
+      (x.orderStatus === OrderStatus.PaidByInvoice &&
+        isBefore(new Date(), new Date(x.begin)))) &&
     x.orderUuid != null &&
     x.refundUuid == null
   );
 }
 
 function convertToReturnState(
-  reservation: Pick<DenyDialogFieldsFragment, "price" | "paymentOrder">
+  reservation: Pick<
+    DenyDialogFieldsFragment,
+    "price" | "paymentOrder" | "begin"
+  >
 ): ReturnAllowedState {
-  const { price, paymentOrder } = reservation;
-  const order = paymentOrder[0] ?? null;
-  const payed = {
+  const { price, paymentOrder, begin } = reservation;
+
+  const paid = {
     price: toNumber(price) ?? 0,
-    orderStatus: order?.status ?? null,
-    orderUuid: order?.orderUuid ?? null,
-    refundUuid: order?.refundUuid ?? null,
+    orderStatus: paymentOrder?.status ?? null,
+    orderUuid: paymentOrder?.orderUuid ?? null,
+    refundUuid: paymentOrder?.refundUuid ?? null,
+    begin,
   };
 
-  if (payed.refundUuid != null) {
+  if (paid.refundUuid != null) {
     return "already-refunded";
   }
-  if (payed.price === 0) {
+  if (paid.price === 0) {
     return "free";
   }
-  if (isPriceReturnable(payed)) {
+  if (isPriceReturnable(paid)) {
     return "not-decided";
   }
+
   return "not-allowed";
 }
 
@@ -420,6 +429,7 @@ export const DENY_DIALOG_FRAGMENT = gql`
   fragment DenyDialogFields on ReservationNode {
     id
     pk
+    begin
     handlingDetails
     price
     paymentOrder {

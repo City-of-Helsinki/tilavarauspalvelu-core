@@ -34,6 +34,7 @@ import { ApplicationDatas, Summary } from "@/styled";
 import { Accordion, DataWrapper } from "./components";
 import { ReservationKeylessEntry } from "./ReservationKeylessEntrySection";
 import { TimeBlockSection } from "./ReservationTimeBlockSection";
+import { toUIDateTime } from "common/src/common/util";
 
 type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
@@ -126,6 +127,14 @@ function ReservationSummary({
       {!isFree && (
         <DataWrapper isSummary label={t("RequestedReservation.price")}>
           {`${reservationPrice(reservation, t)}${
+            reservation.paymentOrder?.handledPaymentDueBy
+              ? ` ${t("RequestedReservation.dueByParenthesis", {
+                  date: toUIDateTime(
+                    new Date(reservation.paymentOrder?.handledPaymentDueBy)
+                  ),
+                })}`
+              : ""
+          }${
             reservation.applyingForFreeOfCharge
               ? `, ${t("RequestedReservation.appliesSubvention")}`
               : ""
@@ -276,7 +285,6 @@ function ReservationPricingDetailsAccordion({
   reservation: ReservationType;
 }>) {
   const { t } = useTranslation();
-  const order = reservation.paymentOrder.find(() => true);
 
   return (
     <Accordion
@@ -288,7 +296,9 @@ function ReservationPricingDetailsAccordion({
           {reservation.price && reservationPrice(reservation, t)}
         </DataWrapper>
         <DataWrapper label={t("RequestedReservation.paymentState")}>
-          {order?.status == null ? "-" : t(`Payment.status.${order?.status}`)}
+          {reservation.paymentOrder?.status == null
+            ? "-"
+            : t(`Payment.status.${reservation.paymentOrder?.status}`)}
         </DataWrapper>
         <DataWrapper label={t("RequestedReservation.applyingForFreeOfCharge")}>
           {t(
