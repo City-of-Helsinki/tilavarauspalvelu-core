@@ -72,7 +72,7 @@ def get_approve_data(reservation: Reservation, **overrides: Any) -> dict[str, An
     return {
         "pk": reservation.pk,
         "handlingDetails": "You're welcome.",
-        "price": "10.59",
+        "price": "0",
         **overrides,
     }
 
