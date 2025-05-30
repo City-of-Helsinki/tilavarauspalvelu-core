@@ -31,20 +31,16 @@ import {
 type Props = {
   index: number;
   applicationRound: ApplicationRoundForApplicationFragment;
-  optionTypes: OptionTypes;
-  isVisible: boolean;
-  onToggleAccordion: () => void;
+  options: OptionTypes;
   onDeleteEvent: () => void;
 };
 
 function ApplicationSectionInner({
   index,
   applicationRound,
-  optionTypes,
-  del,
-}: Omit<Props, "onToggleAccordion" | "onDeleteEvent"> & {
-  del: () => void;
-}): JSX.Element {
+  options,
+  onDeleteEvent: del,
+}: Props): JSX.Element {
   const { t } = useTranslation();
   const form = useFormContext<ApplicationPage1FormValues>();
   const {
@@ -58,13 +54,6 @@ function ApplicationSectionInner({
   } = form;
 
   const [isWaitingForDelete, setIsWaitingForDelete] = useState(false);
-
-  const {
-    ageGroupOptions,
-    purposeOptions,
-    reservationUnitTypeOptions,
-    unitOptions,
-  } = optionTypes;
 
   const periodStartDate = new Date(applicationRound.reservationPeriodBegin);
   const periodEndDate = new Date(applicationRound.reservationPeriodEnd);
@@ -143,12 +132,12 @@ function ApplicationSectionInner({
           required
           name={`applicationSections.${index}.ageGroup`}
           label={t("application:Page1.ageGroup")}
-          options={ageGroupOptions ?? []}
+          options={options.ageGroupOptions ?? []}
           error={getTranslatedError("ageGroup")}
         />
         <ControlledSelect
           control={control}
-          options={purposeOptions}
+          options={options.purposeOptions}
           name={`applicationSections.${index}.purpose`}
           label={t("application:Page1.purpose")}
           required
@@ -157,14 +146,10 @@ function ApplicationSectionInner({
       </AutoGrid>
       <H4 as="h3"> {t("application:Page1.spacesSubHeading")}</H4>
       <ReservationUnitList
-        applicationRound={applicationRound}
         index={index}
+        applicationRound={applicationRound}
         minSize={numPersons}
-        options={{
-          purposeOptions,
-          reservationUnitTypeOptions,
-          unitOptions,
-        }}
+        options={options}
       />
       <H4 as="h3">{t("application:Page1.applicationRoundSubHeading")}</H4>
       <Checkbox
@@ -306,23 +291,34 @@ function ApplicationDateRangePicker({
 }
 
 export function ApplicationSectionPage1(props: Props): JSX.Element {
-  const { index, isVisible, onDeleteEvent, onToggleAccordion } = props;
+  const { index } = props;
 
   const { t } = useTranslation();
 
   const form = useFormContext<ApplicationPage1FormValues>();
   const {
     watch,
+    setValue,
     formState: { errors },
   } = form;
 
   const eventName = watch(`applicationSections.${index}.name`);
   watch(`applicationSections.${index}.appliedReservationsPerWeek`);
+  const openByDefault = watch(`applicationSections`)?.length === 1;
+  const isVisible =
+    openByDefault || watch(`applicationSections.${index}.isAccordionOpen`);
 
   // TODO requires us to use the accordion from admin-ui instead (or add force open)
   const hasErrors = errors.applicationSections?.[index] != null;
 
   const shouldRenderInner = isVisible || hasErrors;
+  const onToggleAccordion = () => {
+    const val = watch(`applicationSections.${index}.isAccordionOpen`);
+    setValue(`applicationSections.${index}.isAccordionOpen`, !val, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  };
 
   return (
     <Accordion
@@ -332,9 +328,7 @@ export function ApplicationSectionPage1(props: Props): JSX.Element {
       theme="thin"
     >
       {/* Accordion doesn't remove from DOM on hide, but this is too slow if it's visible */}
-      {shouldRenderInner && (
-        <ApplicationSectionInner {...props} del={onDeleteEvent} />
-      )}
+      {shouldRenderInner && <ApplicationSectionInner {...props} />}
     </Accordion>
   );
 }
