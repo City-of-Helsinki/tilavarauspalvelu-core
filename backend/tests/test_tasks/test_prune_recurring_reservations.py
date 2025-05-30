@@ -6,6 +6,7 @@ import pytest
 from freezegun import freeze_time
 
 from tilavarauspalvelu.models import RecurringReservation
+from tilavarauspalvelu.tasks import prune_recurring_reservations_task
 from utils.date_utils import local_datetime
 
 from tests.factories import RecurringReservationFactory
@@ -20,7 +21,7 @@ def test_prune_recurring_reservations__recurring_reservations_without_reservatio
     with freeze_time(local_datetime() - datetime.timedelta(days=1)):
         RecurringReservationFactory.create()
 
-    RecurringReservation.objects.delete_empty_series()
+    prune_recurring_reservations_task()
 
     assert RecurringReservation.objects.exists() is False
 
@@ -29,7 +30,7 @@ def test_prune_recurring_reservations__recurring_reservations_with_reservations_
     with freeze_time(local_datetime() - datetime.timedelta(days=1)):
         RecurringReservationFactory.create(reservations__name="foo")
 
-    RecurringReservation.objects.delete_empty_series()
+    prune_recurring_reservations_task()
 
     assert RecurringReservation.objects.exists() is True
 
@@ -38,6 +39,6 @@ def test_prune_recurring_reservations__recurring_reservations_deletion_respects_
     with freeze_time(local_datetime() - datetime.timedelta(hours=23, minutes=59)):
         RecurringReservationFactory.create()
 
-    RecurringReservation.objects.delete_empty_series()
+    prune_recurring_reservations_task()
 
     assert RecurringReservation.objects.exists() is True
