@@ -10,7 +10,14 @@ from django.db.models.functions import Coalesce
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L
 
-from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import (
+    AccessType,
+    OrderStatus,
+    ReservationCancelReasonChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import ReservationStatistic, ReservationUnit, Unit
 from tilavarauspalvelu.tasks import delete_pindora_reservation
@@ -144,23 +151,6 @@ class ReservationQuerySet(models.QuerySet):
 
     def unconfirmed(self) -> Self:
         return self.exclude(state=ReservationStateChoice.CONFIRMED)
-
-    def inactive(self) -> Self:
-        """Filter 'draft' reservations, which are older than X minutes old, and can be assumed to be inactive."""
-        expiration_time = local_datetime() - datetime.timedelta(minutes=settings.PRUNE_RESERVATIONS_OLDER_THAN_MINUTES)
-        return self.filter(
-            state=ReservationStateChoice.CREATED,
-            created_at__lte=expiration_time,
-        )
-
-    def with_inactive_payments(self) -> Self:
-        expiration_time = local_datetime() - datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
-        return self.filter(
-            state=ReservationStateChoice.WAITING_FOR_PAYMENT,
-            payment_order__remote_id__isnull=False,
-            payment_order__status__in=[OrderStatus.EXPIRED, OrderStatus.CANCELLED],
-            payment_order__created_at__lte=expiration_time,
-        )
 
     def affecting_reservations(self, units: list[int] = (), reservation_units: list[int] = ()) -> Self:
         """Filter reservations that affect other reservations in the given units and/or reservation units."""
@@ -329,36 +319,6 @@ class ReservationQuerySet(models.QuerySet):
             if reservation_missing not in str(error):
                 raise
 
-    def delete_inactive(self) -> None:
-        """
-        Finds inactive reservations that are older than the given
-        number of minutes, and deletes them.
-        """
-        qs = self.inactive()
-
-        for reservation in qs.filter(access_code_generated_at__isnull=False):
-            try:
-                PindoraClient.delete_reservation(reservation=reservation)
-            except Exception:  # noqa: BLE001
-                delete_pindora_reservation.delay(str(reservation.ext_uuid))
-
-        qs.delete()
-
-    def delete_with_inactive_payments(self) -> None:
-        """
-        Finds reservations with order that was created given minutes ago and
-        are expired or cancelled, and deletes them.
-        """
-        qs = self.with_inactive_payments()
-
-        for reservation in qs.filter(access_code_generated_at__isnull=False):
-            try:
-                PindoraClient.delete_reservation(reservation=reservation)
-            except Exception:  # noqa: BLE001
-                delete_pindora_reservation.delay(str(reservation.ext_uuid))
-
-        qs.delete()
-
     def requiring_access_code(self) -> Self:
         """Return all reservations that should have an access code but don't."""
         return self.filter(
@@ -395,6 +355,82 @@ class ReservationQuerySet(models.QuerySet):
         )
         return self.filter(**{lookup: ref})
 
+    def unfinished(self) -> Self:
+        """Reservations that have not completed checkout in time."""
+        now = local_datetime()
 
-class ReservationManager(SerializableMixin.SerializableManager.from_queryset(ReservationQuerySet)):
-    """Contains custom queryset methods and GDPR serialization."""
+        max_checkout_time = datetime.timedelta(minutes=settings.PRUNE_RESERVATIONS_OLDER_THAN_MINUTES)
+        draft_expires_at = now - max_checkout_time
+
+        order_expiration = datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
+        order_expires_at = now - order_expiration
+
+        return self.filter(
+            models.Q(
+                state=ReservationStateChoice.CREATED,
+                created_at__lte=draft_expires_at,
+            )
+            | models.Q(
+                state=ReservationStateChoice.WAITING_FOR_PAYMENT,
+                payment_order__isnull=False,
+                payment_order__remote_id__isnull=False,
+                payment_order__status__in=[OrderStatus.EXPIRED, OrderStatus.CANCELLED],
+                payment_order__created_at__lte=order_expires_at,
+            )
+        )
+
+    def unpaid_handled(self) -> Self:
+        """Reservations that where handled by then left unpaid are thus not valid."""
+        now = local_datetime()
+        return self.filter(
+            state=ReservationStateChoice.CONFIRMED,
+            type__in=ReservationTypeChoice.types_created_by_the_reservee,
+            begin__gt=now,
+            payment_order__isnull=False,
+            payment_order__status__in=[OrderStatus.EXPIRED, OrderStatus.CANCELLED],
+            payment_order__handled_payment_due_by__lt=now,
+        )
+
+
+# Need to do this to get proper type hints in the manager methods, since
+# 'from_queryset' returns a subclass of Manager, but is not typed correctly...
+# 'SerializableMixin.SerializableManager' contains custom queryset methods and GDPR serialization
+_BaseManager: type[models.Manager] = SerializableMixin.SerializableManager.from_queryset(ReservationQuerySet)  # type: ignore[assignment]
+
+
+class ReservationManager(_BaseManager):
+    # Define to get type hints for queryset methods.
+    def all(self) -> ReservationQuerySet:
+        return super().all()  # type: ignore[return-value]
+
+    def delete_unfinished(self) -> None:
+        """Delete any reservations that have not completed checkout in time. Handle required integrations."""
+        qs = self.all().unfinished()
+
+        reservation: Reservation
+        for reservation in qs:
+            if reservation.access_code_generated_at is not None:
+                try:
+                    PindoraClient.delete_reservation(reservation=reservation)
+                except Exception:  # noqa: BLE001
+                    delete_pindora_reservation.delay(str(reservation.ext_uuid))
+
+            reservation.delete()
+
+    def cancel_handled_with_payment_overdue(self) -> None:
+        """Cancel all unpaid handled reservations that were not paid on time. Handle required integrations."""
+        qs = self.all().unpaid_handled()
+
+        reservation: Reservation
+        for reservation in qs:
+            if reservation.access_code_generated_at is not None:
+                try:
+                    PindoraClient.delete_reservation(reservation=reservation)
+                except Exception:  # noqa: BLE001
+                    delete_pindora_reservation.delay(str(reservation.ext_uuid))
+
+            reservation.state = ReservationStateChoice.CANCELLED
+            reservation.cancel_reason = ReservationCancelReasonChoice.NOT_PAID
+            reservation.save(update_fields=["state", "cancel_reason"])
+
+            EmailService.send_reservation_cancelled_email(reservation=reservation)

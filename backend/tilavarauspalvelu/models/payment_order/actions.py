@@ -14,6 +14,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.order.types import WebShopOrderStatus
+from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.types import WebShopPaymentGateway, WebShopPaymentStatus
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
@@ -42,7 +43,16 @@ class PaymentOrderActions:
         ):
             return
 
-        webshop_payment = VerkkokauppaAPIClient.get_payment(order_uuid=self.payment_order.remote_id)
+        try:
+            webshop_payment = VerkkokauppaAPIClient.get_payment(order_uuid=self.payment_order.remote_id)
+        except GetPaymentError as error:
+            msg = "Verkkokauppa: Failed to fetch payment status from webshop"
+            details = {
+                "error": str(error),
+                "payment_order": self.payment_order.pk,
+            }
+            SentryLogger.log_message(msg, details=details)
+            raise
 
         if webshop_payment is None:
             new_status = self.get_order_status_if_no_webshop_payment()
@@ -69,32 +79,28 @@ class PaymentOrderActions:
         webshop_payment_expires_at = webshop_payment.timestamp + webshop_payment_expiration_minutes
         webshop_payment_expired = webshop_payment_expires_at <= local_datetime()
 
-        match webshop_payment.status:
-            case WebShopPaymentStatus.CANCELLED:
-                return OrderStatus.CANCELLED
-
-            case WebShopPaymentStatus.PAID_ONLINE if is_invoiced:
+        if webshop_payment.status == WebShopPaymentStatus.PAID_ONLINE:
+            if is_invoiced:
                 return OrderStatus.PAID_BY_INVOICE
+            return OrderStatus.PAID
 
-            case WebShopPaymentStatus.PAID_ONLINE:
-                return OrderStatus.PAID
-
-            # Handled reservation payments expire immediately if they are overdue.
-            case WebShopPaymentStatus.CREATED if is_handled_payment_overdue:
+        if is_handled_payment:
+            # Handled paid reservations expire when payment is overdue AND expired.
+            # User should not be able to enter webshop if payment is overdue.
+            if is_handled_payment_overdue and webshop_payment_expired:
                 return OrderStatus.EXPIRED
+            return OrderStatus.PENDING
 
-            # Handled reservation payments do not expire even if the payment expires.
-            case WebShopPaymentStatus.CREATED if is_handled_payment:
-                return OrderStatus.PENDING
+        if webshop_payment.status == WebShopPaymentStatus.CANCELLED:
+            return OrderStatus.CANCELLED
 
-            # User has entered payment phase in webshop (Payment is created but not yet paid),
-            # give more time to complete the payment before marking the order as expired.
-            case WebShopPaymentStatus.CREATED if not webshop_payment_expired:
-                return OrderStatus.DRAFT
+        # User has entered payment phase in webshop (Payment is created but not yet paid),
+        # give more time to complete the payment before marking the order as expired.
+        if webshop_payment.status == WebShopPaymentStatus.CREATED and not webshop_payment_expired:
+            return OrderStatus.DRAFT
 
-            # Other statuses are not supported by Varaamo, simply treat as expired.
-            case _:
-                return OrderStatus.EXPIRED
+        # Other statuses are not supported by Varaamo, simply treat as expired.
+        return OrderStatus.EXPIRED
 
     def get_order_status_if_no_webshop_payment(self) -> OrderStatus:
         is_handled_payment = self.payment_order.is_handled_payment
@@ -113,19 +119,23 @@ class PaymentOrderActions:
         return OrderStatus.DRAFT
 
     def complete_payment(self) -> None:
-        reservation = self.payment_order.reservation
+        if self.payment_order.status not in OrderStatus.paid_in_webshop:
+            return
 
-        if not (
-            self.payment_order.status in OrderStatus.paid_in_webshop
-            and reservation is not None
-            and reservation.state == ReservationStateChoice.WAITING_FOR_PAYMENT
-        ):
+        reservation = self.payment_order.reservation
+        if reservation is None:
+            return
+
+        if self.payment_order.is_handled_payment:
+            if reservation.state != ReservationStateChoice.CONFIRMED:
+                return
+        elif reservation.state != ReservationStateChoice.WAITING_FOR_PAYMENT:
             return
 
         reservation.state = ReservationStateChoice.CONFIRMED
         reservation.save(update_fields=["state"])
 
-        if reservation.access_type == AccessType.ACCESS_CODE:
+        if reservation.access_type == AccessType.ACCESS_CODE and not reservation.access_code_is_active:
             # Allow activation in Pindora to fail, will be handled by a background task.
             with suppress(ExternalServiceError):
                 PindoraService.activate_access_code(obj=reservation)
@@ -151,7 +161,12 @@ class PaymentOrderActions:
             # If there is an unexpected response or error from verkkokauppa,
             # payment order should still be cancelled
             except CancelOrderError as error:
-                SentryLogger.log_message("Verkkokauppa: Failed to cancel order", details=str(error))
+                msg = "Verkkokauppa: Failed to cancel order"
+                details = {
+                    "error": str(error),
+                    "payment_order": self.payment_order.pk,
+                }
+                SentryLogger.log_message(msg, details=details)
 
                 if not cancel_on_error:
                     raise
