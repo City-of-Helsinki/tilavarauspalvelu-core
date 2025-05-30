@@ -12,9 +12,7 @@ from django.core.cache import cache
 from django.db import transaction
 
 from config.celery import app
-from tilavarauspalvelu.enums import OrderStatus
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
     Application,
@@ -163,9 +161,18 @@ def update_origin_hauki_resource_reservable_time_spans() -> None:
 
 
 @app.task(name="prune_reservations")
+@deprecated("Use 'handle_unfinished_reservations' instead. This can be removed in next release.")
 def prune_reservations_task() -> None:
-    Reservation.objects.delete_inactive()
-    Reservation.objects.delete_with_inactive_payments()
+    handle_unfinished_reservations()
+
+
+@app.task(name="handle_unfinished_reservations")
+def handle_unfinished_reservations() -> None:
+    # Remove reservations that did not complete checkout in time.
+    Reservation.objects.delete_unfinished()
+
+    # Cancel handled paid reservations that were not paid on time.
+    Reservation.objects.cancel_handled_with_payment_overdue()
 
 
 @app.task(name="send_application_in_allocation_email")
@@ -184,27 +191,7 @@ def send_application_handled_email_task() -> None:
 
 @app.task(name="update_expired_orders")
 def update_expired_orders_task() -> None:
-    from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
-    from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
-
-    for payment_order in PaymentOrder.objects.expired():
-        try:
-            # Do not update PaymentOrder status if an error occurs
-            with transaction.atomic():
-                payment_order.actions.refresh_order_status_from_webshop()
-                if payment_order.status == OrderStatus.EXPIRED:
-                    VerkkokauppaAPIClient.cancel_order(
-                        order_uuid=payment_order.remote_id,
-                        user_uuid=payment_order.reservation_user_uuid,
-                    )
-
-        except (GetPaymentError, CancelOrderError) as error:
-            msg = "Failed to cancel expired payment order"
-            details = {
-                "error": str(error),
-                "payment_order": payment_order.pk,
-            }
-            SentryLogger.log_message(msg, details=details)
+    PaymentOrder.objects.cancel_expired_payments_in_verkkokauppa()
 
 
 @app.task(name="prune_reservation_statistics")

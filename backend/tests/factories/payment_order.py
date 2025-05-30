@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 from decimal import Decimal
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Any, Self
 
 import factory
 from django.conf import settings
@@ -14,6 +14,8 @@ from tilavarauspalvelu.models import PaymentOrder
 from ._base import ForwardOneToOneFactory, GenericDjangoModelFactory, ModelFactoryBuilder
 
 if TYPE_CHECKING:
+    import datetime
+
     from tilavarauspalvelu.models import Reservation
 
 __all__ = [
@@ -45,6 +47,14 @@ class PaymentOrderFactory(GenericDjangoModelFactory[PaymentOrder]):
     reservation_user_uuid = None
     checkout_url = ""
     receipt_url = ""
+
+    @classmethod
+    def create_at(cls, created_at: datetime.datetime, **kwargs: Any) -> PaymentOrder:
+        payment_order = cls.create(**kwargs)
+        # 'created_at' is a 'auto_now_add' field, so we need to set it manually after creation.
+        payment_order.created_at = created_at
+        payment_order.save(update_fields=["created_at"])
+        return payment_order
 
 
 class PaymentOrderBuilder(ModelFactoryBuilder[PaymentOrder]):
