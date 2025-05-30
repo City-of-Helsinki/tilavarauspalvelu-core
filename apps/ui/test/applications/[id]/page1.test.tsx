@@ -70,7 +70,7 @@ function customRender(
   );
 }
 
-describe("Page1", () => {
+describe("Page1 common to all funnel pages", () => {
   test("should render empty application page", () => {
     // TODO all of this is common to all application funnel pages
     const view = customRender();
@@ -83,12 +83,19 @@ describe("Page1", () => {
       view.getByRole("link", { name: "breadcrumb:applications" })
     ).toBeInTheDocument();
     expect(view.getByText("breadcrumb:application")).toBeInTheDocument();
+  });
+
+  test("should render notes when applying", () => {
+    const view = customRender();
     expect(
       view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })
     ).toBeInTheDocument();
     expect(view.getByText("Notes when applying FI")).toBeInTheDocument();
   });
+  test.todo("should not render notes if they are empty or null");
+});
 
+describe("Page1", () => {
   // this case only happens if user manually removes the last section
   test("empty application should not allow submitting", async () => {
     const view = customRender();
@@ -205,16 +212,18 @@ describe("Page1", () => {
       dur.label
     );
 
+    // don't expect a default value for eventsPerWeek
     const eventsPerWeek = within(section).getByLabelText(
       /application:Page1.eventsPerWeek/,
       { selector: "input" }
     );
     expect(eventsPerWeek).toBeInTheDocument();
+    await user.clear(eventsPerWeek);
     await user.type(eventsPerWeek, "1");
 
     const submitBtn = view.getByRole("button", { name: "common:next" });
     await user.click(submitBtn);
-    expect(view.queryAllByText(/application:validation/)).toHaveLength(0);
+    expect(view.queryAllByText(/application:validation/)).toStrictEqual([]);
     expect(mockedRouterPush).toHaveBeenCalled();
   });
 
