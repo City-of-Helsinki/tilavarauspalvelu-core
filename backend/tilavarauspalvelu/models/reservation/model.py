@@ -312,6 +312,15 @@ class Reservation(SerializableMixin, models.Model):
         )
 
     @property
+    def is_handled_paid(self) -> bool:
+        return (
+            self.price > 0
+            and self.handled_at is not None
+            and hasattr(self, "payment_order")
+            and self.payment_order.is_handled_payment
+        )
+
+    @property
     def units_for_permissions(self) -> list[Unit]:
         from tilavarauspalvelu.models import Unit
 
