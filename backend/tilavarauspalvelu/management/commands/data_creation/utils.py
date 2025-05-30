@@ -6,11 +6,11 @@ import functools
 import itertools
 import operator
 import random
-from collections.abc import Callable
 from enum import StrEnum
 from functools import wraps
-from typing import TYPE_CHECKING, Annotated, Any, Literal, NamedTuple
+from typing import TYPE_CHECKING, Annotated, Any, Literal, NamedTuple, TypeVar
 
+from django.db import models
 from django.test import override_settings
 
 from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnit, ReservationUnitHierarchy
@@ -42,6 +42,7 @@ if TYPE_CHECKING:
 
 
 type Percentage = Literal["0", "10", "14", "24", "25.5"]
+TQuerySet = TypeVar("TQuerySet", bound=models.QuerySet)
 
 
 def random_subset[T](
@@ -56,6 +57,11 @@ def random_subset[T](
         max_size = len(sequence)
     size = random.randint(min_size, max_size)
     return random.sample(sequence, counts=counts, k=size)
+
+
+def sample_qs[TQuerySet: models.QuerySet](qs: TQuerySet, *, size: int) -> TQuerySet:
+    """Select a random subset of the given QuerySet."""
+    return qs.order_by("?")[:size]
 
 
 def weighted_choice[T](choices: Sequence[T], weights: list[int]) -> T:

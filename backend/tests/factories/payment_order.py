@@ -11,7 +11,7 @@ from django.urls import reverse
 from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.models import PaymentOrder
 
-from ._base import ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder
+from ._base import ForwardOneToOneFactory, GenericDjangoModelFactory, ModelFactoryBuilder
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation
@@ -26,7 +26,7 @@ class PaymentOrderFactory(GenericDjangoModelFactory[PaymentOrder]):
     class Meta:
         model = PaymentOrder
 
-    reservation = ForeignKeyFactory("tests.factories.ReservationFactory")
+    reservation = ForwardOneToOneFactory("tests.factories.ReservationFactory")
 
     remote_id = factory.LazyFunction(uuid.uuid4)
     payment_id = ""  # uuid.UUID
@@ -39,6 +39,8 @@ class PaymentOrderFactory(GenericDjangoModelFactory[PaymentOrder]):
     price_total = Decimal("12.0")
 
     processed_at = None
+    handled_payment_due_by = None
+
     language = Language.FI
     reservation_user_uuid = None
     checkout_url = ""

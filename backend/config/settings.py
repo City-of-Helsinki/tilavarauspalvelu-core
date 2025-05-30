@@ -498,6 +498,7 @@ class Common(Environment):
     UPDATE_RESERVATION_UNIT_THUMBNAILS = True
     DOWNLOAD_IMAGES_FOR_TEST_DATA = True
     FRONTEND_TESTING_API_ENABLED = False
+    PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED = values.BooleanValue(default=False)
 
     PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
     REMOVE_RESERVATION_STATS_OLDER_THAN_YEARS = 5
@@ -519,7 +520,7 @@ class Common(Environment):
     EXPORT_AUTHORIZATION_TOKEN = values.StringValue()
 
     GRAPHENE_DJANGO_EXTENSIONS = {
-      "EXPERIMENTAL_REMOVE_TRANSLATION_BASE_FIELDS": True,
+        "EXPERIMENTAL_REMOVE_TRANSLATION_BASE_FIELDS": True,
     }
 
     # Allows faking membership to certain AD groups for testing automatic role assignment
@@ -862,6 +863,8 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     SENTRY_LOGGER_ALWAYS_RE_RAISE = True
     # Enable frontend testing API for testing
     FRONTEND_TESTING_API_ENABLED = True
+    # Enable feature flag for testing
+    PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED = True
 
     EMAIL_VARAAMO_EXT_LINK = "https://fake.varaamo.hel.fi"
     EMAIL_FEEDBACK_EXT_LINK = "https://fake.varaamo.hel.fi/feedback"

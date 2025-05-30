@@ -34,7 +34,7 @@ class ReservationUnitPricingQuerySet(models.QuerySet):
             )
         ).filter(begins__gte=models.F("reservation_unit_active_pricing_begins_date"))
 
-    def past_or_active(self, from_date: datetime.date | None = None) -> Self:
+    def past_or_active(self, from_date: datetime.date | models.F | None = None) -> Self:
         """Get only past or active pricings, ordered from most recent to oldest."""
         today = local_date()
         if from_date is None:
@@ -45,7 +45,7 @@ class ReservationUnitPricingQuerySet(models.QuerySet):
             | models.Q(begins__lte=from_date, is_activated_on_begins=False)
         ).order_by("-begins")
 
-    def active(self, from_date: datetime.date | None = None) -> Self:
+    def active(self, from_date: datetime.date | models.F | None = None) -> Self:
         """Get only active pricings for each reservation unit."""
         return (
             self.past_or_active(from_date=from_date)

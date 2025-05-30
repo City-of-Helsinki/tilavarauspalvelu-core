@@ -89,6 +89,7 @@ class Language(models.TextChoices):
 
 class OrderStatus(models.TextChoices):
     DRAFT = "DRAFT", pgettext_lazy("OrderStatus", "Draft")  # Unpaid order
+    PENDING = "PENDING", pgettext_lazy("OrderStatus", "Pending")  # Unpaid order after handling
     EXPIRED = "EXPIRED", pgettext_lazy("OrderStatus", "Expired")
     CANCELLED = "CANCELLED", pgettext_lazy("OrderStatus", "Cancelled")
     PAID = "PAID", pgettext_lazy("OrderStatus", "Paid")
@@ -100,6 +101,7 @@ class OrderStatus(models.TextChoices):
     def can_be_marked_paid_statuses(cls) -> list[OrderStatus]:
         return [
             OrderStatus.DRAFT,
+            OrderStatus.PENDING,
             OrderStatus.EXPIRED,
             OrderStatus.CANCELLED,
         ]
@@ -108,7 +110,25 @@ class OrderStatus(models.TextChoices):
     def can_be_cancelled_statuses(cls) -> list[OrderStatus]:
         return [
             OrderStatus.DRAFT,
+            OrderStatus.PENDING,
             OrderStatus.EXPIRED,
+            OrderStatus.PAID_MANUALLY,
+            OrderStatus.PAID_BY_INVOICE,
+        ]
+
+    @classproperty
+    def can_start_payment_statuses(cls) -> list[OrderStatus]:
+        return [
+            OrderStatus.DRAFT,
+            OrderStatus.PENDING,
+        ]
+
+    @classproperty
+    def no_payment_from_webshop_statuses(cls) -> list[OrderStatus]:
+        return [
+            OrderStatus.DRAFT,
+            OrderStatus.PENDING,
+            OrderStatus.PAID_MANUALLY,
         ]
 
     @classproperty
@@ -141,6 +161,7 @@ class OrderStatusWithFree(models.TextChoices):
 
     # Note: Enums cannot be subclassed, so we have to redefine all "original" members.
     DRAFT = "DRAFT", pgettext_lazy("OrderStatus", "Draft")
+    PENDING = "PENDING", pgettext_lazy("OrderStatus", "Pending")
     EXPIRED = "EXPIRED", pgettext_lazy("OrderStatus", "Expired")
     CANCELLED = "CANCELLED", pgettext_lazy("OrderStatus", "Cancelled")
     PAID = "PAID", pgettext_lazy("OrderStatus", "Paid")
@@ -726,39 +747,46 @@ class PaymentType(models.TextChoices):
             cls.ONLINE_OR_INVOICE,
         ]
 
+    @classproperty
+    def types_that_can_be_pending(cls) -> list[PaymentType]:
+        return [
+            cls.ONLINE,
+            cls.ONLINE_OR_INVOICE,
+        ]
+
 
 class PriceUnit(models.TextChoices):
-    PRICE_UNIT_PER_15_MINS = "per_15_mins", pgettext_lazy("PriceUnit", "per 15 minutes")
-    PRICE_UNIT_PER_30_MINS = "per_30_mins", pgettext_lazy("PriceUnit", "per 30 minutes")
-    PRICE_UNIT_PER_HOUR = "per_hour", pgettext_lazy("PriceUnit", "per hour")
-    PRICE_UNIT_PER_HALF_DAY = "per_half_day", pgettext_lazy("PriceUnit", "per half a day")
-    PRICE_UNIT_PER_DAY = "per_day", pgettext_lazy("PriceUnit", "per day")
-    PRICE_UNIT_PER_WEEK = "per_week", pgettext_lazy("PriceUnit", "per week")
-    PRICE_UNIT_FIXED = "fixed", pgettext_lazy("PriceUnit", "fixed")
+    PER_15_MINS = "per_15_mins", pgettext_lazy("PriceUnit", "per 15 minutes")
+    PER_30_MINS = "per_30_mins", pgettext_lazy("PriceUnit", "per 30 minutes")
+    PER_HOUR = "per_hour", pgettext_lazy("PriceUnit", "per hour")
+    PER_HALF_DAY = "per_half_day", pgettext_lazy("PriceUnit", "per half a day")
+    PER_DAY = "per_day", pgettext_lazy("PriceUnit", "per day")
+    PER_WEEK = "per_week", pgettext_lazy("PriceUnit", "per week")
+    FIXED = "fixed", pgettext_lazy("PriceUnit", "fixed")
 
     @enum.property
     def is_fixed(self) -> bool:
         return self in {
-            PriceUnit.PRICE_UNIT_FIXED,
-            PriceUnit.PRICE_UNIT_PER_HALF_DAY,
-            PriceUnit.PRICE_UNIT_PER_DAY,
-            PriceUnit.PRICE_UNIT_PER_WEEK,
+            PriceUnit.FIXED,
+            PriceUnit.PER_HALF_DAY,
+            PriceUnit.PER_DAY,
+            PriceUnit.PER_WEEK,
         }
 
     @enum.property
     def in_minutes(self) -> int:
         match self:
-            case PriceUnit.PRICE_UNIT_PER_15_MINS:
+            case PriceUnit.PER_15_MINS:
                 return 15
-            case PriceUnit.PRICE_UNIT_PER_30_MINS:
+            case PriceUnit.PER_30_MINS:
                 return 30
-            case PriceUnit.PRICE_UNIT_PER_HOUR:
+            case PriceUnit.PER_HOUR:
                 return 60
-            case PriceUnit.PRICE_UNIT_PER_HALF_DAY:
+            case PriceUnit.PER_HALF_DAY:
                 return 120
-            case PriceUnit.PRICE_UNIT_PER_DAY:
+            case PriceUnit.PER_DAY:
                 return 1440
-            case PriceUnit.PRICE_UNIT_PER_WEEK:
+            case PriceUnit.PER_WEEK:
                 return 10080
             case _:
                 msg = f"Price unit {self} cannot be represented in minutes."

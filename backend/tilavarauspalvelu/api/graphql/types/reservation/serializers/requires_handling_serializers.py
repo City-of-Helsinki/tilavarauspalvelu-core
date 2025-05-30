@@ -17,7 +17,7 @@ from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationUnit
+    from tilavarauspalvelu.models import PaymentOrder, ReservationUnit
 
 __all__ = [
     "ReservationRequiresHandlingSerializer",
@@ -65,9 +65,15 @@ class ReservationRequiresHandlingSerializer(NestingModelSerializer):
     def update(self, instance: Reservation, validated_data: dict[str, Any]) -> Reservation:
         previous_state = instance.state
 
-        instance: Reservation = super().update(instance=instance, validated_data=validated_data)
+        if hasattr(instance, "payment_order"):
+            payment_order: PaymentOrder = instance.payment_order
 
-        # If in this mutation, the reservation was changed from 'DENIED' to 'REQUIRES_HANDLING',
+            if payment_order.actions.has_no_payment_through_webshop():
+                payment_order.actions.cancel_together_with_verkkokauppa(cancel_on_error=True)
+
+        instance = super().update(instance=instance, validated_data=validated_data)
+
+        # If the reservation was changed from 'DENIED' to 'REQUIRES_HANDLING' in this mutation,
         # it means that the reservation is going to happen again. This is analogous to creating a new reservation,
         # so we must check for overlapping reservations again. This can fail if another reservation
         # is created (or "un-denied") for the same reservation unit at almost the same time.

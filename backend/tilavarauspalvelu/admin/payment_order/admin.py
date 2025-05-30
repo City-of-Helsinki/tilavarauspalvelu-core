@@ -25,22 +25,7 @@ __all__ = [
 class PaymentOrderForm(forms.ModelForm):
     class Meta:
         model = PaymentOrder
-        fields = [
-            "reservation",
-            "remote_id",
-            "payment_id",
-            "refund_id",
-            "payment_type",
-            "status",
-            "price_net",
-            "price_vat",
-            "price_total",
-            "processed_at",
-            "language",
-            "reservation_user_uuid",
-            "checkout_url",
-            "receipt_url",
-        ]
+        fields = []  # Use fields from ModelAdmin
         labels = {
             "reservation": _("Reservation"),
             "remote_id": _("Remote order ID"),
@@ -63,16 +48,6 @@ class PaymentOrderForm(forms.ModelForm):
             "payment_id": _("eCommerce payment ID"),
             "refund_id": _("Available only when order has been refunded"),
         }
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        """Add reservation and reservation unit to the reservation field help text."""
-        super().__init__(*args, **kwargs)
-        payment_order: PaymentOrder | None = kwargs.get("instance")
-        if payment_order and payment_order.id and payment_order.reservation:
-            self.fields["reservation"].help_text += (
-                "<br>" + _("Reservation") + f": {payment_order.reservation.id}"
-                "<br>" + _("Reservation unit") + f": {payment_order.reservation.reservation_units.first()}"
-            )
 
 
 class ReservationUnitFilter(admin.SimpleListFilter):
@@ -129,6 +104,27 @@ class PaymentOrderAdmin(admin.ModelAdmin):
 
     # Form
     form = PaymentOrderForm
+    fields = [
+        "reservation",
+        "reservation_unit",
+        "remote_id",
+        "payment_id",
+        "refund_id",
+        "payment_type",
+        "status",
+        "price_net",
+        "price_vat",
+        "price_total",
+        "processed_at",
+        "language",
+        "reservation_user_uuid",
+        "checkout_url",
+        "receipt_url",
+    ]
+    readonly_fields = [
+        "reservation",
+        "reservation_unit",
+    ]
 
     def get_queryset(self, request: WSGIRequest) -> QuerySet:
         return super().get_queryset(request).select_related("reservation")

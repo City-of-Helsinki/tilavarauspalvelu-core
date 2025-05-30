@@ -6,15 +6,22 @@ from typing import TYPE_CHECKING
 import graphene
 from django.db import models
 from django.db.models import OuterRef
+from django.db.models.functions import JSONObject
 from graphene_django_extensions import DjangoNode
 from lookup_property import L
-from query_optimizer import AnnotatedField, MultiField
+from query_optimizer import AnnotatedField, ManuallyOptimizedField, MultiField
 from query_optimizer.optimizer import QueryOptimizer
 from rest_framework.reverse import reverse
 
-from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import (
+    AccessType,
+    CustomerTypeChoice,
+    PriceUnit,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
-from tilavarauspalvelu.models import Reservation, ReservationUnit, User
+from tilavarauspalvelu.models import Reservation, ReservationUnit, ReservationUnitPricing, User
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.db import SubqueryArray
 from utils.utils import ical_hmac_signature
@@ -43,6 +50,29 @@ class PindoraReservationInfoType(graphene.ObjectType):
 
     access_code_begins_at = graphene.DateTime(required=True)
     access_code_ends_at = graphene.DateTime(required=True)
+
+
+class AppliedPricingInfo(graphene.ObjectType):
+    begins = graphene.String(
+        required=True,
+        description="This is a 'Date', but graphene doesn't know how to serialize it from string...",
+    )
+    price_unit = graphene.Field(
+        graphene.Enum.from_enum(PriceUnit),
+        required=True,
+    )
+    lowest_price = graphene.String(
+        required=True,
+        description="This is a 'Decimal', but graphene doesn't know how to serialize it from string...",
+    )
+    highest_price = graphene.String(
+        required=True,
+        description="This is a 'Decimal', but graphene doesn't know how to serialize it from string...",
+    )
+    tax_percentage = graphene.String(
+        required=True,
+        description="This is a 'Decimal', but graphene doesn't know how to serialize it from string...",
+    )
 
 
 def private_field_check(user: AnyUser, reservation: Reservation) -> bool | None:
@@ -91,6 +121,11 @@ class ReservationNode(DjangoNode):
                 distinct=True,
             )
         ),
+    )
+
+    applied_pricing = ManuallyOptimizedField(
+        AppliedPricingInfo,
+        description="Details on the pricing that should be currently applied to this reservation.",
     )
 
     pindora_info = MultiField(
@@ -220,6 +255,7 @@ class ReservationNode(DjangoNode):
             "is_handled",
             "payment_order",
             "calendar_url",
+            "applied_pricing",
         ]
         restricted_fields = {
             field: (
@@ -231,6 +267,7 @@ class ReservationNode(DjangoNode):
                     "handling_details",
                     "working_memo",
                     "handled_at",
+                    "applied_pricing",
                 }
                 # FIELDS ARE PRIVATE BY DEFAULT
                 else private_field_check
@@ -312,3 +349,27 @@ class ReservationNode(DjangoNode):
             return None
 
         return response
+
+    @staticmethod
+    def optimize_applied_pricing(queryset: ReservationQuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        optimizer.annotations["applied_pricing"] = models.Subquery(
+            queryset=(
+                ReservationUnitPricing.objects.filter(
+                    reservation_unit=models.OuterRef("reservation_units"),
+                )
+                .active(from_date=models.OuterRef("begin__date"))
+                .annotate(
+                    data=JSONObject(
+                        begins=models.F("begins"),
+                        price_unit=models.F("price_unit"),
+                        lowest_price=models.F("lowest_price"),
+                        highest_price=models.F("highest_price"),
+                        tax_percentage=models.F("tax_percentage__value"),
+                    ),
+                )
+                .values("data")[:1]
+            ),
+            output_field=models.JSONField(),
+        )
+
+        return queryset
