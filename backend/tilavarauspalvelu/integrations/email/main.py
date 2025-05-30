@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from warnings import deprecated
 
 from django.conf import settings
 from django.db import models
@@ -146,6 +145,9 @@ class EmailService:
             return
 
         if reservation.state != ReservationStateChoice.CANCELLED:
+            return
+
+        if reservation.cancel_reason is None:
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -302,10 +304,9 @@ class EmailService:
         send_multiple_emails_in_batches_task.delay(emails=emails)
 
     @staticmethod
-    @deprecated("This doesn't seem to be used anywhere")
     def send_reservation_requires_payment_email(reservation: Reservation, *, language: Lang | None = None) -> None:
-        """Sends an email to the reservee when their reservation requires payment."""
-        if reservation.price <= 0:
+        """Sends an email to the reservee when their reservation has been approved, but still requires payment."""
+        if not reservation.is_handled_paid:
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -509,7 +510,11 @@ class EmailService:
         if application_section.application.status != ApplicationStatusChoice.RESULTS_SENT:
             return
 
-        if application_section.actions.get_last_reservation() is None:
+        reservation = application_section.actions.get_last_reservation()
+        if reservation is None:
+            return
+
+        if reservation.cancel_reason is None:
             return
 
         recipients = get_application_email_recipients(application=application_section.application)
@@ -536,7 +541,11 @@ class EmailService:
         if application_section.application.status != ApplicationStatusChoice.RESULTS_SENT:
             return
 
-        if application_section.actions.get_last_reservation() is None:
+        reservation = application_section.actions.get_last_reservation()
+        if reservation is None:
+            return
+
+        if reservation.cancel_reason is None:
             return
 
         recipients_by_language = get_application_section_staff_notification_recipients_by_language(application_section)
@@ -565,6 +574,9 @@ class EmailService:
     ) -> None:
         """Sends an email to the applicant when they have cancelled a single reservation in their seasonal booking."""
         if reservation.state != ReservationStateChoice.CANCELLED:
+            return
+
+        if reservation.cancel_reason is None:
             return
 
         if reservation.type != ReservationTypeChoice.SEASONAL:

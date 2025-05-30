@@ -176,14 +176,20 @@ class TranslationsFromPOFiles:
     def gettext(self, message: str) -> str:
         if self.language == "en":
             return message
-        return self.translations[self.language].find(message, by="msgid").msgstr
+        entry = self.translations[self.language].find(message, by="msgid")
+        if entry is None:
+            return message
+        return entry.msgstr
 
     gettext_lazy = lazy(gettext, str)
 
     def pgettext(self, context: str, message: str) -> str:
         if self.language == "en":
             return message
-        return self.translations[self.language].find(message, by="msgid", msgctxt=context).msgstr
+        entry = self.translations[self.language].find(message, by="msgid", msgctxt=context)
+        if entry is None:
+            return message
+        return entry.msgstr
 
     pgettext_lazy = lazy(pgettext, str)
 

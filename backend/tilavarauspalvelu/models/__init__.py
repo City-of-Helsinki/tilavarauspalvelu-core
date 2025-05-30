@@ -31,13 +31,11 @@ from .rejected_occurrence.model import RejectedOccurrence
 from .request_log.model import RequestLog
 from .reservable_time_span.model import ReservableTimeSpan
 from .reservation.model import Reservation
-from .reservation_cancel_reason.model import ReservationCancelReason
 from .reservation_deny_reason.model import ReservationDenyReason
 from .reservation_metadata_field.model import ReservationMetadataField
 from .reservation_metadata_set.model import ReservationMetadataSet
 from .reservation_purpose.model import ReservationPurpose
 from .reservation_statistic.model import ReservationStatistic
-from .reservation_statistic_unit.model import ReservationStatisticsReservationUnit
 from .reservation_unit.model import ReservationUnit
 from .reservation_unit_access_type.model import ReservationUnitAccessType
 from .reservation_unit_cancellation_rule.model import ReservationUnitCancellationRule
@@ -90,13 +88,11 @@ __all__ = [
     "RequestLog",
     "ReservableTimeSpan",
     "Reservation",
-    "ReservationCancelReason",
     "ReservationDenyReason",
     "ReservationMetadataField",
     "ReservationMetadataSet",
     "ReservationPurpose",
     "ReservationStatistic",
-    "ReservationStatisticsReservationUnit",
     "ReservationUnit",
     "ReservationUnitAccessType",
     "ReservationUnitCancellationRule",

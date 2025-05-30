@@ -106,6 +106,7 @@ msgstr ""
 #: tilavarauspalvelu/admin/allocated_timeslot/admin.py
 #: tilavarauspalvelu/admin/application/admin.py
 #: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation_unit_option/admin.py
 msgid "Application"
 msgstr ""
 
@@ -2736,6 +2737,45 @@ msgid "7 hours"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
+msgctxt "ReservationCancelReason"
+msgid "I found another space through Varaamo"
+msgstr "Jag hittade en annan lokal på Varaamo"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationCancelReason"
+msgid "I found another space somewhere else"
+msgstr "Jag hittade en annan lokal någon annanstans"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationCancelReason"
+msgid "My plans have changed"
+msgstr "Mina planer har ändrats"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationCancelReason"
+msgid "The space is not suitable for my purpose"
+msgstr "Lokalen är inte lämplig för ändamålet"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationCancelReason"
+msgid "The booking processing time is too long"
+msgstr "Bokningens handläggningstid är för lång"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationCancelReason"
+msgid "Other reason"
+msgstr "Annan orsak"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationCancelReason"
+msgid ""
+"The booking was not paid for or invoice was not selected as the payment "
+"method by the deadline."
+msgstr ""
+"Bokningen betalades inte eller faktura valdes inte som betalningsmetod inom "
+"angiven tid."
+
+#: tilavarauspalvelu/enums.py
 msgctxt "ReservationKind"
 msgid "Direct"
 msgstr ""
@@ -3427,18 +3467,29 @@ msgstr ""
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Pay the booking"
-msgstr "Betala bokningen"
+msgid "Your booking is confirmed, please pay online"
+msgstr "Din bokning är bekräftats, vänligen betala online"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Your booking has been confirmed, and can be paid"
-msgstr "Din bokning har bekräftats och kan betalas"
+msgid ""
+"Your booking is now confirmed. Please pay online or choose invoice as the "
+"payment method by the deadline, otherwise, the booking will be automatically "
+"canceled."
+msgstr ""
+"Din bokning har bekräftats. Vänligen betala online eller välj faktura som "
+"betalningsmetod inom tidsfristen, annars kommer bokningen automatiskt att "
+"avbokas."
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Due date"
-msgstr "Förfallodatum"
+msgid "Pay the booking at Varaamo"
+msgstr "Betala bokningen på Varaamo"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Deadline"
+msgstr "Tidsfrist"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
@@ -4056,14 +4107,6 @@ msgstr ""
 msgid "Closed"
 msgstr ""
 
-#: tilavarauspalvelu/models/reservation_cancel_reason/model.py
-msgid "reservation cancel reason"
-msgstr ""
-
-#: tilavarauspalvelu/models/reservation_cancel_reason/model.py
-msgid "reservation cancel reasons"
-msgstr ""
-
 #: tilavarauspalvelu/models/reservation_deny_reason/model.py
 msgid "reservation deny reason"
 msgstr ""
@@ -4102,14 +4145,6 @@ msgstr ""
 
 #: tilavarauspalvelu/models/reservation_statistic/model.py
 msgid "reservation statistics"
-msgstr ""
-
-#: tilavarauspalvelu/models/reservation_statistic_unit/model.py
-msgid "reservation statistics reservation unit"
-msgstr ""
-
-#: tilavarauspalvelu/models/reservation_statistic_unit/model.py
-msgid "reservation statistics reservation units"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation_unit/model.py

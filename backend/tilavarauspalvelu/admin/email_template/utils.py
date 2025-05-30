@@ -8,7 +8,7 @@ from admin_data_views.settings import admin_data_settings
 from django.urls import reverse
 from django.utils.html import format_html
 
-from tilavarauspalvelu.enums import WeekdayChoice
+from tilavarauspalvelu.enums import ReservationCancelReasonChoice, WeekdayChoice
 from tilavarauspalvelu.integrations.email.template_context.common import get_staff_reservations_ext_link
 from tilavarauspalvelu.integrations.email.typing import EmailTemplateType, EmailType
 from tilavarauspalvelu.translation import get_translated
@@ -74,7 +74,7 @@ def get_mock_params(*, language: Lang, **kwargs: Any) -> EmailContext:
         "application_section_name": kwargs.get("application_section_name", "[HAKEMUKSEN OSAN NIMI]"),
         "applying_for_free_of_charge": kwargs.get("applying_for_free_of_charge", True),
         "begin_datetime": begin,
-        "cancel_reason": kwargs.get("cancel_reason", "[PERUUTUKSEN SYY]"),
+        "cancel_reason": kwargs.get("cancel_reason", str(ReservationCancelReasonChoice.CHANGE_OF_PLANS.label)),
         "email_recipient_name": kwargs.get("email_recipient_name", "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]"),
         "end_datetime": end,
         "instructions_cancelled": kwargs.get("instructions_cancelled", "[PERUUTETUN VARAUKSEN OHJEET]"),
@@ -82,7 +82,7 @@ def get_mock_params(*, language: Lang, **kwargs: Any) -> EmailContext:
         "instructions_pending": kwargs.get("instructions_pending", "[KÄSITELTÄVÄN VARAUKSEN OHJEET]"),
         "language": language,
         "non_subsidised_price": kwargs.get("non_subsidised_price", Decimal("12.30")),
-        "payment_due_date": kwargs.get("payment_due_date", end.date()),
+        "handled_payment_due_by": kwargs.get("handled_payment_due_by", begin - datetime.timedelta(hours=1)),
         "price": kwargs.get("price", Decimal("12.30")),
         "rejection_reason": kwargs.get("rejection_reason", "[HYLKÄYKSEN SYY]"),
         "reservation_id": kwargs.get("reservation_id", 1234),

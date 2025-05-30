@@ -4,13 +4,13 @@ import datetime
 
 import pytest
 
+from tilavarauspalvelu.enums import ReservationCancelReasonChoice
 from tilavarauspalvelu.models import PersonalInfoViewLog
 
 from tests.factories import (
     ApplicationRoundTimeSlotFactory,
     PaymentMerchantFactory,
     PaymentProductFactory,
-    ReservationCancelReasonFactory,
     ReservationDenyReasonFactory,
     ReservationFactory,
     ReservationUnitFactory,
@@ -77,9 +77,7 @@ SENSITIVE_FIELDS = """
         description
         reserveeId
         cancelDetails
-        cancelReason {
-            reasonFi
-        }
+        cancelReason
         denyReason {
             reasonFi
         }
@@ -100,7 +98,7 @@ def test_reservation_unit__query__sensitive_information__regular_user(graphql):
         billing_last_name="Billing Admin",
         billing_phone="67890",
         cancel_details="Cancel Details",
-        cancel_reason=ReservationCancelReasonFactory(reason="Cancel Reason"),
+        cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS,
         deny_reason=ReservationDenyReasonFactory(reason="Deny Reason"),
         description="Description",
         free_of_charge_reason="Free of Charge Reason",
@@ -170,7 +168,7 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
         billing_last_name="Billing Admin",
         billing_phone="67890",
         cancel_details="Cancel Details",
-        cancel_reason=ReservationCancelReasonFactory(reason="Cancel Reason"),
+        cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS,
         deny_reason=ReservationDenyReasonFactory(reason="Deny Reason"),
         description="Description",
         free_of_charge_reason="Free of Charge Reason",
@@ -208,12 +206,8 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
                 "billingLastName": "Billing Admin",
                 "billingPhone": "67890",
                 "cancelDetails": "Cancel Details",
-                "cancelReason": {
-                    "reasonFi": "Cancel Reason",
-                },
-                "denyReason": {
-                    "reasonFi": "Deny Reason",
-                },
+                "cancelReason": ReservationCancelReasonChoice.CHANGE_OF_PLANS.value,
+                "denyReason": {"reasonFi": "Deny Reason"},
                 "description": "Description",
                 "freeOfChargeReason": "Free of Charge Reason",
                 "handlingDetails": "Handling Details",

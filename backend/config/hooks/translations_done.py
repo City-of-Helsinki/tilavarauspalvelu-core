@@ -39,7 +39,8 @@ def main() -> int:
 
     items = _get_current_translations()
     _run_translation_command()
-    missing = _find_missing_translations(items, check_swedish_for_contexts=("Email", "ICAL"))
+    check_swedish_for_contexts = ["Email", "ICAL", "ReservationCancelReason"]
+    missing = _find_missing_translations(items, check_swedish_for_contexts=check_swedish_for_contexts)
 
     if missing:
         _print_errors(missing)

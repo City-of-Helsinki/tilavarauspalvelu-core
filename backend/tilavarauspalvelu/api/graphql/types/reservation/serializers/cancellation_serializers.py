@@ -5,15 +5,15 @@ from typing import TYPE_CHECKING
 
 from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
-from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
+from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.fields import CharField, IntegerField
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
+from tilavarauspalvelu.enums import AccessType, ReservationCancelReasonChoice, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
-from tilavarauspalvelu.models import Reservation, ReservationCancelReason
+from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.tasks import (
     cancel_payment_order_for_invoice_task,
     cancel_payment_order_without_webshop_payment_task,
@@ -38,7 +38,11 @@ class ReservationCancellationSerializer(NestingModelSerializer):
 
     pk = IntegerField(required=True)
 
-    cancel_reason = IntegerPrimaryKeyField(queryset=ReservationCancelReason.objects, required=True)
+    cancel_reason = EnumFriendlyChoiceField(
+        choices=ReservationCancelReasonChoice.user_selectable,
+        enum=ReservationCancelReasonChoice,
+        required=True,
+    )
     cancel_details = CharField(required=False, allow_blank=True)
 
     state = EnumFriendlyChoiceField(

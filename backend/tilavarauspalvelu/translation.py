@@ -20,7 +20,6 @@ from .models import (
     Organisation,
     Purpose,
     Qualifier,
-    ReservationCancelReason,
     ReservationDenyReason,
     ReservationPurpose,
     ReservationUnit,
@@ -47,6 +46,7 @@ __all__ = [
     "get_translated",
     "get_translated",
     "translate_for_user",
+    "translated",
 ]
 
 
@@ -88,11 +88,6 @@ class AbilityGroupTranslationOptions(TranslationOptions):
 @register(ReservationPurpose)
 class ReservationPurposeTranslationOptions(TranslationOptions):
     fields = ["name"]
-
-
-@register(ReservationCancelReason)
-class ReservationCancelReasonTranslationOptions(TranslationOptions):
-    fields = ["reason"]
 
 
 @register(ReservationDenyReason)
@@ -196,4 +191,10 @@ def translate_for_user(text: Promise, user: User) -> str:
     If the user has no language set, use the default language of Finnish.
     """
     with translation.override(user.get_preferred_language()):
+        return str(text)
+
+
+def translated(text: Promise | str, lang: Lang) -> str:
+    """Translate the given text based the given language."""
+    with translation.override(lang):
         return str(text)

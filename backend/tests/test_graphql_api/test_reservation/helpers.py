@@ -7,11 +7,11 @@ from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from tilavarauspalvelu.enums import ReservationTypeChoice
+from tilavarauspalvelu.enums import ReservationCancelReasonChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from utils.date_utils import next_hour
 
-from tests.factories import ReservationCancelReasonFactory, ReservationDenyReasonFactory
+from tests.factories import ReservationDenyReasonFactory
 from tests.factories.helsinki_profile import MyProfileDataFactory
 from tests.helpers import ResponseMock, patch_method
 
@@ -72,16 +72,15 @@ def get_approve_data(reservation: Reservation, **overrides: Any) -> dict[str, An
     return {
         "pk": reservation.pk,
         "handlingDetails": "You're welcome.",
-        "price": "10.59",
+        "price": "0",
         **overrides,
     }
 
 
 def get_cancel_data(reservation: Reservation, **overrides: Any) -> dict[str, Any]:
-    reason = ReservationCancelReasonFactory.create()
     return {
         "pk": reservation.pk,
-        "cancelReason": reason.pk,
+        "cancelReason": ReservationCancelReasonChoice.CHANGE_OF_PLANS,
         **overrides,
     }
 

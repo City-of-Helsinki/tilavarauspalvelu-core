@@ -81,7 +81,7 @@ def test_reservation__query__all_fields(graphql):
         bufferTimeAfter
         bufferTimeBefore
         cancelDetails
-        cancelReason { reasonFi }
+        cancelReason
         denyReason { reasonFi }
         description
         end
