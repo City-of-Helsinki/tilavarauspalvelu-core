@@ -125,6 +125,7 @@ class Common(Environment):
     CSRF_TRUSTED_ORIGINS = values.ListValue()
     CORS_ALLOWED_ORIGIN_REGEXES = values.ListValue(default=[])
     CORS_ALLOW_CREDENTIALS = True
+    CSRF_FAILURE_VIEW = "tilavarauspalvelu.api.rest.views.csrf_failure_view"
 
     # --- Proxy settings ---------------------------------------------------------------------------------------------
 
@@ -519,7 +520,7 @@ class Common(Environment):
     EXPORT_AUTHORIZATION_TOKEN = values.StringValue()
 
     GRAPHENE_DJANGO_EXTENSIONS = {
-      "EXPERIMENTAL_REMOVE_TRANSLATION_BASE_FIELDS": True,
+        "EXPERIMENTAL_REMOVE_TRANSLATION_BASE_FIELDS": True,
     }
 
     # Allows faking membership to certain AD groups for testing automatic role assignment
