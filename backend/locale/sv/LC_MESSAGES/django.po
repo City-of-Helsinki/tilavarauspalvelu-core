@@ -3427,18 +3427,29 @@ msgstr ""
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Pay the booking"
-msgstr "Betala bokningen"
+msgid "Your booking is confirmed, please pay online"
+msgstr "Din bokning är bekräftats, vänligen betala online"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Your booking has been confirmed, and can be paid"
-msgstr "Din bokning har bekräftats och kan betalas"
+msgid ""
+"Your booking is now confirmed. Please pay online or choose invoice as the "
+"payment method by the deadline, otherwise, the booking will be automatically "
+"canceled."
+msgstr ""
+"Din bokning har bekräftats. Vänligen betala online eller välj faktura som "
+"betalningsmetod inom tidsfristen, annars kommer bokningen automatiskt att "
+"avbokas."
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Due date"
-msgstr "Förfallodatum"
+msgid "Pay the booking at Varaamo"
+msgstr "Betala bokningen på Varaamo"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Deadline"
+msgstr "Tidsfrist"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"

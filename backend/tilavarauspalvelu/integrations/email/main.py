@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from warnings import deprecated
 
 from django.conf import settings
 from django.db import models
@@ -302,10 +301,9 @@ class EmailService:
         send_multiple_emails_in_batches_task.delay(emails=emails)
 
     @staticmethod
-    @deprecated("This doesn't seem to be used anywhere")
     def send_reservation_requires_payment_email(reservation: Reservation, *, language: Lang | None = None) -> None:
-        """Sends an email to the reservee when their reservation requires payment."""
-        if reservation.price <= 0:
+        """Sends an email to the reservee when their reservation has been approved, but still requires payment."""
+        if not reservation.is_handled_paid:
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)

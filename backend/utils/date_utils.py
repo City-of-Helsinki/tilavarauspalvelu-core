@@ -24,6 +24,7 @@ __all__ = [
     "local_datetime",
     "local_datetime_max",
     "local_datetime_min",
+    "local_datetime_string",
     "local_end_of_day",
     "local_from_iso_format",
     "local_iso_format",
@@ -227,19 +228,24 @@ def local_from_iso_format(_string: str, /) -> datetime.datetime:
 
 
 def local_datetime_string(_datetime: datetime.datetime, /, *, seconds: bool = False) -> str:
-    """Get the datetime in the local timezone in the finnish datetime format."""
-    fmt = "%d.%m.%Y %H:%M:%S" if seconds else "%d.%m.%Y %H:%M"
+    """Get the datetime in the local timezone in "the Finnish" datetime format."""
+    fmt = "%-d.%-m.%Y %-H:%M"
+    if seconds:
+        fmt += ":%S"
     return _datetime.astimezone(DEFAULT_TIMEZONE).strftime(fmt)
 
 
 def local_date_string(_date: datetime.date, /) -> str:
-    """Format a date to a string in the finnish local format."""
-    return _date.strftime("%d.%m.%Y")
+    """Format a date to a string in "the Finnish" local format."""
+    return _date.strftime("%-d.%-m.%Y")
 
 
-def local_time_string(_time: datetime.time, /) -> str:
-    """Format a time to a string in the finnish local format."""
-    return _time.strftime("%H:%M")
+def local_time_string(_time: datetime.time, /, *, seconds: bool = False) -> str:
+    """Format a time to a string in "the Finnish" local format."""
+    fmt = "%-H:%M"
+    if seconds:
+        fmt += ":%S"
+    return _time.strftime(fmt)
 
 
 def local_timedelta_string(delta: datetime.timedelta, /) -> str:
