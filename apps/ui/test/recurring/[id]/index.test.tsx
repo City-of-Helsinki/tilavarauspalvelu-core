@@ -3,18 +3,14 @@ import { render } from "@testing-library/react";
 import {
   createMockApplicationRound,
   CreateGraphQLMockProps,
-  createGraphQLMocks,
+  createApplicationSearchGraphQLMocks,
 } from "@/test/test.gql.utils";
-import { MockedProvider } from "@apollo/client/testing";
 import SeasonalSearch from "@/pages/recurring/[id]";
-import {
-  type ApplicationRoundQuery,
-  ApplicationRoundStatusChoice,
-} from "@/gql/gql-types";
 import { addYears } from "date-fns";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import userEvent from "@testing-library/user-event";
 import { getApplicationPath } from "@/modules/urls";
+import { MockedGraphQLProvider } from "@/test/test.react.utils";
 
 const { mockedRouterReplace, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
@@ -52,8 +48,11 @@ vi.mock("next/router", () => ({
 function customRender(
   props: CreateGraphQLMockProps = {}
 ): ReturnType<typeof render> {
-  const mocks = createGraphQLMocks(props);
-  const round = createApplicationRoundMock();
+  const mocks = createApplicationSearchGraphQLMocks(props);
+  const round = createMockApplicationRound({
+    applicationPeriodBegin: new Date(2024, 0, 1, 0, 0, 0),
+    applicationPeriodEnd: addYears(new Date(), 1),
+  });
   const options = {
     unitOptions: [],
     equipmentsOptions: [],
@@ -61,36 +60,28 @@ function customRender(
     reservationUnitTypeOptions: [],
   } as const;
   return render(
-    <MockedProvider
-      mocks={mocks}
-      addTypename={false}
-      // Have to cache bypass (setting cache to InMemoryCache is not enough)
-      // NOTE if copying this approach any override in the query will take precedence
-      // so for query specific fetchPolicies an alternative approach to cache is required
-      defaultOptions={{
-        watchQuery: { fetchPolicy: "no-cache" },
-        query: { fetchPolicy: "no-cache" },
-        mutate: { fetchPolicy: "no-cache" },
-      }}
-    >
+    <MockedGraphQLProvider mocks={mocks}>
       <SeasonalSearch
         applicationRound={round}
         apiBaseUrl="http://localhost:8000"
         options={options}
       />
-    </MockedProvider>
+    </MockedGraphQLProvider>
   );
 }
 
+beforeEach(() => {
+  mockedSearchParams.mockReturnValue(new URLSearchParams());
+  // Timezone breaks toISOString for GraphQL query mocks
+  vi.stubEnv("TZ", "UTC");
+});
+
+afterEach(() => {
+  vi.resetAllMocks();
+  vi.unstubAllEnvs();
+});
+
 describe("Page: SeasonalSearch", () => {
-  beforeEach(() => {
-    mockedSearchParams.mockReturnValue(new URLSearchParams());
-  });
-
-  afterEach(() => {
-    vi.resetAllMocks();
-  });
-
   test("should render page", async () => {
     const view = customRender();
     const title = view.getByRole("heading", {
@@ -107,7 +98,7 @@ describe("Page: SeasonalSearch", () => {
     ).toBeInTheDocument();
     expect(view.getByText("ApplicationRound 1 FI")).toBeInTheDocument();
 
-    await waitForSearchButton(view);
+    await isReady(view);
 
     // list of ten cards
     const cardsSelects = view.getAllByTestId("recurring-card__button--toggle");
@@ -125,7 +116,7 @@ describe("Page: SeasonalSearch", () => {
 
   test("selecting card should set query params", async () => {
     const view = customRender();
-    await waitForSearchButton(view);
+    await isReady(view);
     const user = userEvent.setup();
 
     expect(mockedRouterReplace).not.toHaveBeenCalled();
@@ -156,7 +147,7 @@ describe("Page: SeasonalSearch", () => {
     params.set(SEASONAL_SELECTED_PARAM_KEY, "1");
     mockedSearchParams.mockReturnValue(params);
     const view = customRender();
-    await waitForSearchButton(view);
+    await isReady(view);
     const user = userEvent.setup();
 
     expect(mockedRouterReplace).not.toHaveBeenCalled();
@@ -184,7 +175,7 @@ describe("Page: SeasonalSearch", () => {
     params.set(SEASONAL_SELECTED_PARAM_KEY, "4");
     mockedSearchParams.mockReturnValue(params);
     const view = customRender();
-    await waitForSearchButton(view);
+    await isReady(view);
     const user = userEvent.setup();
 
     expect(mockedRouterReplace).not.toHaveBeenCalled();
@@ -213,7 +204,7 @@ describe("Page: SeasonalSearch", () => {
     params.set(SEASONAL_SELECTED_PARAM_KEY, "1");
     mockedSearchParams.mockReturnValue(params);
     const view = customRender();
-    await waitForSearchButton(view);
+    await isReady(view);
 
     const cardsSelects = view.getAllByTestId("recurring-card__button--toggle");
     expect(cardsSelects).toHaveLength(10);
@@ -225,7 +216,7 @@ describe("Page: SeasonalSearch", () => {
 
   test("no start application bar if not selected", async () => {
     const view = customRender();
-    await waitForSearchButton(view);
+    await isReady(view);
 
     const cardsSelects = view.getAllByTestId("recurring-card__button--toggle");
     expect(cardsSelects).toHaveLength(10);
@@ -240,7 +231,7 @@ describe("Page: SeasonalSearch", () => {
     params.set(SEASONAL_SELECTED_PARAM_KEY, "1");
     mockedSearchParams.mockReturnValue(params);
     const view = customRender({ noUser: true });
-    await waitForSearchButton(view);
+    await isReady(view);
 
     const cardsSelects = view.getAllByTestId("recurring-card__button--toggle");
     expect(cardsSelects).toHaveLength(10);
@@ -255,7 +246,7 @@ describe("Page: SeasonalSearch", () => {
     params.set("textSearch", "foobar");
     mockedSearchParams.mockReturnValue(params);
     const view = customRender();
-    await waitForSearchButton(view);
+    await isReady(view);
     const cardsSelects = view.getAllByTestId("recurring-card__button--toggle");
     expect(cardsSelects).toHaveLength(1);
   });
@@ -266,7 +257,7 @@ describe("Page: SeasonalSearch", () => {
     mockedSearchParams.mockReturnValue(params);
     const user = userEvent.setup();
     const view = customRender();
-    await waitForSearchButton(view);
+    await isReady(view);
 
     const startBtn = view.getByRole("button", {
       name: "shoppingCart:nextShort",
@@ -280,7 +271,7 @@ describe("Page: SeasonalSearch", () => {
 
   test("should show an error if query fails", async () => {
     const view = customRender({ isSearchError: true });
-    await waitForSearchButton(view);
+    await isReady(view);
     expect(
       view.getByRole("heading", { name: "applicationRound:search.title" })
     ).toBeInTheDocument();
@@ -305,10 +296,9 @@ describe("SeasonalSearch Page SSR", () => {
   test.todo("isPostLogin param is ignored for non logged in users");
 });
 
-// If you don't wait for something the mock query is still loading
-// even if you don't need the search button
-// waiting for this is a proxy that the query has finished
-async function waitForSearchButton(
+// Client side query will return loading on first render
+// submit button in this case works as a proxy for the query loading state
+async function isReady(
   view: ReturnType<typeof customRender>
 ): Promise<HTMLElement> {
   const submitBtn = view.getByRole("button", {
@@ -317,16 +307,4 @@ async function waitForSearchButton(
   expect(submitBtn).toBeInTheDocument();
   await expect.poll(() => submitBtn).not.toBeDisabled();
   return submitBtn;
-}
-
-function createApplicationRoundMock(): Readonly<
-  NonNullable<ApplicationRoundQuery["applicationRound"]>
-> {
-  const begin = new Date();
-  const end = addYears(new Date(), 1);
-  return createMockApplicationRound({
-    status: ApplicationRoundStatusChoice.Open,
-    applicationPeriodBegin: begin,
-    applicationPeriodEnd: end,
-  });
 }

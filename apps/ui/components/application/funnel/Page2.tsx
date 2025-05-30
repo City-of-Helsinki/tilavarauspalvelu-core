@@ -11,16 +11,15 @@ import { useRouter } from "next/router";
 import { useFormContext } from "react-hook-form";
 import { type ApplicationPage2Query } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { type ApplicationPage2FormValues } from "./form";
 import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
-import { AccordionWithState as Accordion } from "@/components/Accordion";
-import { TimeSelector } from "./TimeSelector";
-import { aesToCells } from "./module";
 import { ButtonContainer } from "common/styled";
+import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { getApplicationPath } from "@/modules/urls";
+import { type ApplicationPage2FormValues } from "./form";
+import { TimeSelector } from ".";
 
 type Node = NonNullable<ApplicationPage2Query["application"]>;
 type Props = {
@@ -35,6 +34,8 @@ export function Page2({ application, onNext }: Props): JSX.Element {
     useFormContext<ApplicationPage2FormValues>();
 
   const applicationSections = filterNonNullable(watch("applicationSections"));
+
+  const onBack = () => router.push(getApplicationPath(application.pk, "page1"));
 
   const { isSubmitting, isValid } = formState;
   const enableSubmit = !isSubmitting && isValid;
@@ -54,9 +55,7 @@ export function Page2({ application, onNext }: Props): JSX.Element {
         <Button
           variant={ButtonVariant.Secondary}
           size={ButtonSize.Small}
-          onClick={() =>
-            router.push(getApplicationPath(application.pk, "page1"))
-          }
+          onClick={onBack}
           iconStart={<IconArrowLeft />}
         >
           {t("common:prev")}
@@ -108,10 +107,6 @@ function ApplicationSectionTimePicker({
       label: `${n.unit && getTranslationSafe(n.unit, "name", language) + ": "}${getTranslationSafe(n, "name", language)}`,
     }));
 
-  const applicationSections = filterNonNullable(watch("applicationSections"));
-  const selectorData = applicationSections.map((ae) =>
-    aesToCells(ae.suitableTimeRanges, reservationUnitOpeningHours)
-  );
   const aes = watch(`applicationSections.${sectionIndex}`);
 
   return (
@@ -124,7 +119,6 @@ function ApplicationSectionTimePicker({
     >
       <TimeSelector
         index={sectionIndex}
-        cells={selectorData[sectionIndex] ?? []}
         reservationUnitOptions={reservationUnitOptions}
         reservationUnitOpeningHours={reservationUnitOpeningHours}
       />

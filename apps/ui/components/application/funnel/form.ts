@@ -15,6 +15,7 @@ import {
   type ApplicationPage2Query,
   type ApplicationFormFragment,
   type Maybe,
+  type SuitableTimeRangeSerializerInput,
 } from "@gql/gql-types";
 import { z } from "zod";
 import { toApiDate, toUIDate } from "common/src/common/util";
@@ -23,6 +24,7 @@ import {
   checkValidDateOnly,
   lessThanMaybeDate,
 } from "common/src/schemas/schemaCommon";
+import { CELL_STATES } from "common/src/components/ApplicationTimeSelector";
 
 type Organisation = ApplicationFormFragment["organisation"];
 type Address = NonNullable<Organisation>["address"];
@@ -128,36 +130,46 @@ const ApplicationSectionPage2Schema = z
     minDuration: z.number().min(1, { message: "Required" }),
     name: z.string().min(1, { message: "Required" }).max(100),
     reservationUnitPk: z.number(),
-    priority: z.literal(200).or(z.literal(300)),
+    priority: z.enum(CELL_STATES),
     // NOTE: not sent or modified here, but required for validation
     appliedReservationsPerWeek: z.number().min(1).max(7),
   })
-  .refine(
-    (s) =>
+  .superRefine((s, ctx) => {
+    const isValid =
       s.minDuration > 0 &&
       // No too short time ranges allowed
       s.suitableTimeRanges.filter((tr) => lengthOfTimeRange(tr) < s.minDuration)
-        .length === 0,
-    {
-      path: ["suitableTimeRanges"],
-      message:
-        "Suitable time range must be at least as long as the minimum duration",
+        .length === 0;
+    if (!isValid) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["suitableTimeRanges"],
+        message:
+          "Suitable time range must be at least as long as the minimum duration",
+      });
     }
-  )
-  .refine(
-    (s) =>
-      s.suitableTimeRanges.reduce<typeof s.suitableTimeRanges>((acc, tr) => {
-        if (acc.find((x) => x.dayOfTheWeek === tr.dayOfTheWeek)) {
-          return acc;
-        }
-        return [...acc, tr];
-      }, []).length >= s.appliedReservationsPerWeek,
-    {
-      path: ["suitableTimeRanges"],
-      message:
-        "At least as many suitable time ranges as applied reservations per week",
+  })
+  .superRefine((s, ctx) => {
+    const rangesPerWeek = s.suitableTimeRanges.reduce<
+      typeof s.suitableTimeRanges
+    >((acc, tr) => {
+      if (acc.find((x) => x.dayOfTheWeek === tr.dayOfTheWeek)) {
+        return acc;
+      }
+      return [...acc, tr];
+    }, []);
+
+    const isValid = rangesPerWeek.length >= s.appliedReservationsPerWeek;
+
+    if (!isValid) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["suitableTimeRanges"],
+        message:
+          "At least as many suitable time ranges as applied reservations per week",
+      });
     }
-  );
+  });
 
 function transformApplicationSectionPage2(
   values: ApplicationSectionPage2FormValues
@@ -187,7 +199,7 @@ function convertApplicationSectionPage2(
     minDuration: section.reservationMinDuration,
     appliedReservationsPerWeek,
     reservationUnitPk,
-    priority: 300,
+    priority: "primary",
   };
 }
 export const ApplicationPage2Schema = z.object({
@@ -486,14 +498,10 @@ const transformEventReservationUnit = (pk: number, priority: number) => ({
   reservationUnit: pk,
 });
 
-function transformSuitableTimeRange(timeRange: SuitableTimeRangeFormValues) {
-  return {
-    ...(timeRange.pk != null ? { pk: timeRange.pk } : {}),
-    beginTime: timeRange.beginTime ?? "",
-    endTime: timeRange.endTime ?? "",
-    priority: timeRange.priority ?? 50,
-    dayOfTheWeek: timeRange.dayOfTheWeek,
-  };
+function transformSuitableTimeRange(
+  timeRange: SuitableTimeRangeFormValues
+): SuitableTimeRangeSerializerInput {
+  return timeRange;
 }
 
 // NOTE this works only for subsections of an application mutation

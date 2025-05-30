@@ -13,11 +13,21 @@ export const autoGridCss = css`
   gap: var(--spacing-m);
 `;
 
-export const AutoGrid = styled.div<{
-  $minWidth?: string;
-  $largeGap?: boolean;
-  $alignCenter?: boolean;
+export const HR = styled.hr<{
+  $type?: "dashed" | "solid";
 }>`
+  border: 0;
+  border-top: 1px ${({ $type }) => $type ?? "solid"} var(--color-black-20);
+  width: 100%;
+`;
+
+interface AutoGridProps {
+  $minWidth?: string;
+  $alignCenter?: boolean;
+  $gap?: SpacingSize;
+}
+
+export const AutoGrid = styled.div<AutoGridProps>`
   display: grid;
   grid-template-columns: repeat(
     auto-fill,
@@ -28,11 +38,10 @@ export const AutoGrid = styled.div<{
     )
   );
   align-items: ${({ $alignCenter }) => ($alignCenter ? "center" : "baseline")};
-  gap: ${({ $largeGap }) =>
-      $largeGap ? " var(--spacing-xl)" : "var(--spacing-m)"}
+  gap: ${({ $gap }) => ($gap ? `var(--spacing-${$gap})` : "var(--spacing-m)")}
     var(--spacing-m);
 
-  & > :not(img):empty {
+  & > :not(img):not(hr):empty {
     display: none;
   }
 `;

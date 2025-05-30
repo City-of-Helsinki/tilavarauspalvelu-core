@@ -1,11 +1,10 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
+import { ControlledCheckbox } from "common/src/components/form";
 import { FormSubHeading } from "./styled";
-import { BillingAddress } from "./BillingAddress";
 import { type ApplicationPage3FormValues } from "./form";
-import { ControlledCheckbox } from "common/src/components/form/ControlledCheckbox";
-import { ApplicationFormTextInput } from "./ApplicationFormTextInput";
+import { ApplicationFormTextInput, BillingAddress } from ".";
 
 export function CompanyForm(): JSX.Element {
   const { t } = useTranslation();
@@ -20,7 +19,7 @@ export function CompanyForm(): JSX.Element {
       <ApplicationFormTextInput name="organisation.coreBusiness" />
       <ApplicationFormTextInput name="organisation.identifier" />
       <FormSubHeading>
-        {t("application:Page3.subHeading.postalAddress")}
+        {t("application:Page3.sectionHeadings.postalAddress")}
       </FormSubHeading>
       <ApplicationFormTextInput name="organisation.address.streetAddress" />
       <ApplicationFormTextInput name="organisation.address.postCode" />
@@ -43,7 +42,7 @@ export function ContactPersonSection(): JSX.Element {
   return (
     <>
       <FormSubHeading>
-        {t("application:Page3.subHeading.contactInfo")}
+        {t("application:Page3.sectionHeadings.contactInfo")}
       </FormSubHeading>
       <ApplicationFormTextInput name="contactPerson.firstName" />
       <ApplicationFormTextInput name="contactPerson.lastName" />

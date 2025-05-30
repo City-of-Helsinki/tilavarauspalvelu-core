@@ -35,6 +35,7 @@ import { useToastIfQueryParam } from "@/hooks";
 import { useRouter } from "next/router";
 import { useSearchParams } from "next/navigation";
 import { applicationsPrefix } from "@/modules/urls";
+import { ApplicationTerms } from "@/components/application/ApplicationTerms";
 
 const TabPanel = styled(Tabs.TabPanel)`
   && {
@@ -136,9 +137,9 @@ function View({
       <Breadcrumb routes={routes} />
       <ApplicationHead
         title={applicationRoundName}
-        subTitle={subTitle}
         status={application.status}
       />
+      <p style={{ marginTop: 0 }}>{subTitle}</p>
       {showReservations ? (
         <Tabs initiallyActiveTab={tab === "application" ? 1 : 0}>
           <Tabs.TabList>
@@ -156,13 +157,27 @@ function View({
             />
           </TabPanel>
           <TabPanel>
-            <ViewApplication application={application} tos={tos} />
+            <WrappedViewApplication application={application} tos={tos} />
           </TabPanel>
         </Tabs>
       ) : (
-        <ViewApplication application={application} tos={tos} />
+        <WrappedViewApplication application={application} tos={tos} />
       )}
     </>
+  );
+}
+
+function WrappedViewApplication({
+  application,
+  tos,
+}: Readonly<Pick<PropsNarrowed, "application" | "tos">>) {
+  return (
+    <ViewApplication application={application}>
+      <ApplicationTerms
+        generalTos={tos}
+        serviceTos={application.applicationRound?.termsOfUse}
+      />
+    </ViewApplication>
   );
 }
 

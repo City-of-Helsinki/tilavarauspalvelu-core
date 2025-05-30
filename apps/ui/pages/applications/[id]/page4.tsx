@@ -2,16 +2,15 @@ import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import {
-  ApplicationPagePreviewDocument,
-  type ApplicationPagePreviewQuery,
-  type ApplicationPagePreviewQueryVariables,
+  ApplicationPage4Document,
+  type ApplicationPage4Query,
+  type ApplicationPage4QueryVariables,
   useSendApplicationMutation,
 } from "@gql/gql-types";
 import type { GetServerSidePropsContext } from "next";
+import Link from "next/link";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { ViewApplication } from "@/components/application/ViewApplication";
 import { createApolloClient } from "@/modules/apolloClient";
-import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import {
   getCommonServerSideProps,
   getGenericTerms,
@@ -29,15 +28,21 @@ import {
 } from "hds-react";
 import { useDisplayError } from "common/src/hooks";
 import { ErrorText } from "common/src/components/ErrorText";
-import Link from "next/link";
-import { validateApplication } from "@/components/application/form";
-import { PAGES_WITH_STEPPER } from "@/components/application/ApplicationStepper";
+import {
+  validateApplication,
+  PAGES_WITH_STEPPER,
+  ApplicationFunnelWrapper,
+} from "@/components/application/funnel";
+import { ApplicationTerms, ViewApplication } from "@/components/application";
 import { gql } from "@apollo/client";
 
 // User has to accept the terms of service then on submit we change the application status
 // This uses separate Send mutation (not update) so no onNext like the other pages
 // we could also remove the FormContext here
-function Preview({ application, tos }: PropsNarrowed): JSX.Element {
+function Page4({
+  application,
+  tos,
+}: Pick<PropsNarrowed, "application" | "tos">): JSX.Element {
   const router = useRouter();
   const dislayError = useDisplayError();
   const { t } = useTranslation();
@@ -90,17 +95,16 @@ function Preview({ application, tos }: PropsNarrowed): JSX.Element {
   const isValid = validateApplication(application);
 
   return (
-    <ApplicationPageWrapper
-      translationKeyPrefix="application:preview"
-      application={application}
-    >
+    <ApplicationFunnelWrapper page="page4" application={application}>
       <Flex as="form" onSubmit={onSubmit}>
-        <ViewApplication
-          application={application}
-          tos={tos}
-          isTermsAccepted={isTermsAccepted}
-          setIsTermsAccepted={handleTermsAcceptedChange}
-        />
+        <ViewApplication application={application}>
+          <ApplicationTerms
+            generalTos={tos}
+            serviceTos={application.applicationRound?.termsOfUse}
+            isTermsAccepted={isTermsAccepted}
+            setIsTermsAccepted={handleTermsAcceptedChange}
+          />
+        </ViewApplication>
         {!isValid.valid && (
           <ErrorText>
             {t("application:validation.previewError", {
@@ -134,7 +138,7 @@ function Preview({ application, tos }: PropsNarrowed): JSX.Element {
           </Button>
         </ButtonContainer>
       </Flex>
-    </ApplicationPageWrapper>
+    </ApplicationFunnelWrapper>
   );
 }
 
@@ -163,10 +167,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   }
 
   const { data } = await apolloClient.query<
-    ApplicationPagePreviewQuery,
-    ApplicationPagePreviewQueryVariables
+    ApplicationPage4Query,
+    ApplicationPage4QueryVariables
   >({
-    query: ApplicationPagePreviewDocument,
+    query: ApplicationPage4Document,
     variables: { id: base64encode(`ApplicationNode:${pk}`) },
   });
   const { application } = data;
@@ -184,11 +188,11 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-export default Preview;
+export default Page4;
 
 // TODO narrow down the query fragment (if possible), need at least TermsOfUse and ApplicationForm
 export const APPLICATION_PREVIEW_QUERY = gql`
-  query ApplicationPagePreview($id: ID!) {
+  query ApplicationPage4($id: ID!) {
     application(id: $id) {
       ...ApplicationView
     }

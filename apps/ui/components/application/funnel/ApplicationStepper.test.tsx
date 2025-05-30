@@ -75,7 +75,7 @@ describe("Stepper when page 2 is valid", () => {
   test.for(
     PAGES_WITH_STEPPER.map((x) => ({
       label: x,
-      isDisabled: x === "preview",
+      isDisabled: x === "page4",
     }))
   )(
     "stepper step $label should render and be disabled = $isDisabled",
@@ -103,7 +103,7 @@ describe("Stepper when application has been sent", () => {
     "stepper step $label should render and be disabled = $isDisabled",
     ({ label, isDisabled }) => {
       const application = createMockApplicationFragment({
-        page: "preview",
+        page: "page4",
       });
       const view = render(<ApplicationStepper application={application} />);
       checkStepperStep(view, label, isDisabled, true);

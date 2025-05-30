@@ -1,7 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { H1 } from "common/styled";
-import { HR } from "@/component/Table";
+import { H1, HR } from "common/styled";
 import Filters from "./Filters";
 import { ReservationUnitsDataReader } from "./ReservationUnitsDataLoader";
 

@@ -1,10 +1,9 @@
 import React from "react";
 import { Link, LinkSize } from "hds-react";
-import { H1 } from "common/styled";
+import { H1, HR } from "common/styled";
 import { useTranslation } from "next-i18next";
 import { Filters } from "./Filters";
 import { UnitsDataLoader } from "./UnitsDataLoader";
-import { HR } from "@/component/Table";
 
 function Units(): JSX.Element {
   const { t } = useTranslation();

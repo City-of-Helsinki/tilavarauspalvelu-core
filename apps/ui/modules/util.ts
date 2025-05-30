@@ -12,6 +12,7 @@ import {
   type LocalizationLanguages,
 } from "common/src/helpers";
 import { ReadonlyURLSearchParams } from "next/navigation";
+import { type Maybe, ApplicationStatusChoice } from "@/gql/gql-types";
 
 export { formatDuration } from "common/src/common/util";
 export { fromAPIDate, fromUIDate };
@@ -57,9 +58,6 @@ export function getParameterLabel(
   }
   return "no label";
 }
-
-export const isTouchDevice = (): boolean =>
-  isBrowser && window?.matchMedia("(any-hover: none)").matches;
 
 export function getPostLoginUrl(
   params: Readonly<URLSearchParams> = new ReadonlyURLSearchParams()
@@ -210,4 +208,23 @@ export function formatDateTimeStrings(
 /// Converts a date to minutes discarding date and seconds
 function toMinutes(d: Date): number {
   return d.getHours() * 60 + d.getMinutes();
+}
+
+export function isSent(
+  status: Maybe<ApplicationStatusChoice> | undefined
+): boolean {
+  if (status == null) {
+    return false;
+  }
+  switch (status) {
+    case ApplicationStatusChoice.Draft:
+    case ApplicationStatusChoice.Expired:
+    case ApplicationStatusChoice.Cancelled:
+      return false;
+    case ApplicationStatusChoice.Received:
+    case ApplicationStatusChoice.ResultsSent:
+    case ApplicationStatusChoice.Handled:
+    case ApplicationStatusChoice.InAllocation:
+      return true;
+  }
 }

@@ -10,7 +10,7 @@ import { isBrowser } from "./const";
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
 import { errorLink } from "common/src/apolloUtils";
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV === "development") {
   // Adds messages only in a dev environment
   loadDevMessages();
   loadErrorMessages();

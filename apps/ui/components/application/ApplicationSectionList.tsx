@@ -2,12 +2,28 @@ import React from "react";
 import type { TFunction } from "i18next";
 import { useTranslation } from "next-i18next";
 import {
+  IconCheck,
+  IconCross,
+  IconQuestionCircleFill,
+  Tooltip,
+} from "hds-react";
+import {
   type AgeGroupNode,
   type Maybe,
   Priority,
   ApplicationSectionStatusChoice,
   type ApplicationViewFragment,
+  type SuitableTimeFragment,
 } from "@gql/gql-types";
+import { WEEKDAYS } from "common/src/const";
+import {
+  filterNonNullable,
+  formatDayTimes,
+  fromMondayFirstUnsafe,
+} from "common/src/helpers";
+import StatusLabel from "common/src/components/StatusLabel";
+import type { StatusLabelType } from "common/src/tags";
+import { NoWrap } from "common/styled";
 import {
   convertLanguageCode,
   getTranslationSafe,
@@ -22,19 +38,7 @@ import {
   ScheduleDay,
   RegularText,
 } from "./styled";
-import { SuitableTimeRangeFormValues } from "./form";
-import { WEEKDAYS } from "common/src/const";
-import { filterNonNullable, fromMondayFirstUnsafe } from "common/src/helpers";
-import StatusLabel from "common/src/components/StatusLabel";
-import type { StatusLabelType } from "common/src/tags";
-import {
-  IconCheck,
-  IconCross,
-  IconQuestionCircleFill,
-  Tooltip,
-} from "hds-react";
-import { getDayTimes } from "./module";
-import { NoWrap } from "common/styled";
+import { SuitableTimeRangeFormValues } from "./funnel/form";
 
 function formatDurationSeconds(seconds: number, t: TFunction): string {
   const hours = Math.floor(seconds / 3600);
@@ -113,15 +117,17 @@ function SingleApplicationSection({
 }) {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
-  const reservationUnits = filterNonNullable(aes.reservationUnitOptions).map(
-    (eru, index) => ({
-      pk: eru.reservationUnit.pk,
-      priority: index,
-      nameFi: eru.reservationUnit.nameFi,
-      nameSv: eru.reservationUnit.nameSv,
-      nameEn: eru.reservationUnit.nameEn,
-    })
-  );
+  const reservationUnits = filterNonNullable(aes.reservationUnitOptions)
+    .map(({ reservationUnit }) => ({
+      pk: reservationUnit.pk ?? 0,
+      nameFi: reservationUnit.nameFi,
+      nameSv: reservationUnit.nameSv,
+      nameEn: reservationUnit.nameEn,
+    }))
+    .map((ru) => ({
+      pk: ru.pk,
+      name: getTranslationSafe(ru, "name", lang).trim(),
+    }));
   const shouldShowStatusLabel =
     aes.status === ApplicationSectionStatusChoice.Rejected ||
     aes.status === ApplicationSectionStatusChoice.Handled;
@@ -187,7 +193,7 @@ function SingleApplicationSection({
             icon={statusProps.icon}
             data-testid="application-section__status"
           >
-            {t(`application:applicationEventStatus.${aes.status}`)}
+            {t(`application:applicationSectionStatus.${aes.status}`)}
           </StatusLabel>
         )}
       </ApplicationSectionHeader>
@@ -210,11 +216,9 @@ function SingleApplicationSection({
               {t("application:preview.applicationEvent.appliedSpaces")}
             </h3>
             <ol>
-              {filterNonNullable(reservationUnits).map((ru) => (
-                <li key={ru.pk}>
-                  <RegularText>
-                    {getTranslationSafe(ru, "name", lang).trim()}
-                  </RegularText>
+              {reservationUnits.map(({ pk, name }) => (
+                <li key={pk}>
+                  <RegularText>{name}</RegularText>
                 </li>
               ))}
             </ol>
@@ -263,30 +267,29 @@ export function ApplicationSectionList({
   );
 }
 
+type SchedulesT = Omit<SuitableTimeFragment, "pk" | "id" | "priority">;
 function Weekdays({
   primary,
   secondary,
 }: {
-  primary: Omit<SuitableTimeRangeFormValues, "pk">[];
-  secondary: Omit<SuitableTimeRangeFormValues, "pk">[];
+  primary: SchedulesT[];
+  secondary: SchedulesT[];
 }) {
   const { t } = useTranslation();
 
   return (
     <>
-      {WEEKDAYS.map((day) => {
-        return (
-          <ScheduleDay key={day}>
-            <span>{t(`common:weekDay.${fromMondayFirstUnsafe(day)}`)}</span>
-            <span>{getDayTimes(primary, day) || "-"}</span>
-            <span>
-              {getDayTimes(secondary, day)
-                ? `(${getDayTimes(secondary, day)})`
-                : "-"}
-            </span>
-          </ScheduleDay>
-        );
-      })}
+      {WEEKDAYS.map((day) => (
+        <ScheduleDay key={day}>
+          <span>{t(`common:weekDay.${fromMondayFirstUnsafe(day)}`)}</span>
+          <span>{formatDayTimes(primary, day) || "-"}</span>
+          <span>
+            {formatDayTimes(secondary, day)
+              ? `(${formatDayTimes(secondary, day)})`
+              : "-"}
+          </span>
+        </ScheduleDay>
+      ))}
     </>
   );
 }

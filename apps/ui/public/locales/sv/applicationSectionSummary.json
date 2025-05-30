@@ -1,4 +1,5 @@
 {
+  "title": "Sammanfattning",
   "message": "Du håller på att göra en bokning {{name}} för säsongen <bold>{{startDate}}–{{endDate}}</bold>.",
   "time_summary_one": "Bokningarnas sammanlagda varaktighet är minst <bold>{{hours}} timme</bold>.",
   "time_summary_other": "Bokningarnas sammanlagda varaktighet är minst <bold>{{hours}} timmar</bold>.",
