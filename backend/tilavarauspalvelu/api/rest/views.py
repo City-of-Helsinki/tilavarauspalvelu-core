@@ -3,13 +3,15 @@ from __future__ import annotations
 import hmac
 import io
 import json
-from typing import TYPE_CHECKING
+from http import HTTPStatus
+from typing import TYPE_CHECKING, Any
 
 from django.apps import apps
 from django.conf import settings
 from django.db import connection
 from django.http import FileResponse, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.middleware.csrf import get_token
+from django.views.csrf import csrf_failure
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
 from import_export.formats.base_formats import JSON
@@ -97,6 +99,21 @@ def csrf_view(request: WSGIRequest) -> HttpResponseRedirect | JsonResponse:  # N
     if redirect_to is None:
         return JsonResponse(data={"csrfToken": request.META["CSRF_COOKIE"]}, status=200, headers=headers)
     return HttpResponseRedirect(redirect_to=redirect_to, headers=headers)  # NOSONAR
+
+
+@csrf_exempt  # NOSONAR
+def csrf_failure_view(request: WSGIRequest, **kwargs: Any) -> JsonResponse | HttpResponseForbidden:
+    if not any(media_type.match("application/json") for media_type in request.accepted_types):
+        return csrf_failure(request, **kwargs)
+
+    # Called by CSRF middleware since set in 'CSRF_FAILURE_VIEW' setting.
+    data = {
+        "error": "CSRF verification failed. Request aborted.",
+        "code": "CSRF_FAILURE",
+        "reason": kwargs.get("reason", "unknown"),
+    }
+
+    return JsonResponse(data=data, status=HTTPStatus.FORBIDDEN)
 
 
 @require_GET

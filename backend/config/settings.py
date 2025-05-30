@@ -125,6 +125,7 @@ class Common(Environment):
     CSRF_TRUSTED_ORIGINS = values.ListValue()
     CORS_ALLOWED_ORIGIN_REGEXES = values.ListValue(default=[])
     CORS_ALLOW_CREDENTIALS = True
+    CSRF_FAILURE_VIEW = "tilavarauspalvelu.api.rest.views.csrf_failure_view"
 
     # --- Proxy settings ---------------------------------------------------------------------------------------------
 
