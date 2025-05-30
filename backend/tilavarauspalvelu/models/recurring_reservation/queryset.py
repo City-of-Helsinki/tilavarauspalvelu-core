@@ -63,4 +63,12 @@ class RecurringReservationQuerySet(models.QuerySet):
         return self.filter(**{lookup: ref})
 
 
-class RecurringReservationManager(models.Manager.from_queryset(RecurringReservationQuerySet)): ...
+# Need to do this to get proper type hints in the manager methods, since
+# 'from_queryset' returns a subclass of Manager, but is not typed correctly...
+_BaseManager: type[models.Manager] = models.Manager.from_queryset(RecurringReservationQuerySet)  # type: ignore[assignment]
+
+
+class RecurringReservationManager(_BaseManager):
+    # Define to get type hints for queryset methods.
+    def all(self) -> RecurringReservationQuerySet:
+        return super().all()  # type: ignore[return-value]
