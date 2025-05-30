@@ -303,12 +303,7 @@ class EmailService:
     @staticmethod
     def send_reservation_requires_payment_email(reservation: Reservation, *, language: Lang | None = None) -> None:
         """Sends an email to the reservee when their reservation has been approved, but still requires payment."""
-        if (
-            reservation.price <= 0
-            or reservation.handled_at is None
-            or not hasattr(reservation, "payment_order")
-            or reservation.payment_order.handled_payment_due_by is None
-        ):
+        if not reservation.is_handled_paid:
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)

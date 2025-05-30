@@ -179,6 +179,14 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
         return reservation_unit
 
     @classmethod
+    def create_free(cls, **kwargs: Any) -> ReservationUnit:
+        kwargs.setdefault("pricings__lowest_price", Decimal(0))
+        kwargs.setdefault("pricings__highest_price", Decimal(0))
+        kwargs.setdefault("pricings__tax_percentage__value", Decimal(0))
+        kwargs.setdefault("pricings__payment_type", None)
+        return cls.create(**kwargs)
+
+    @classmethod
     def create_paid_on_site(cls, **kwargs: Any) -> ReservationUnit:
         kwargs.setdefault("pricings__lowest_price", Decimal("10.00"))
         kwargs.setdefault("pricings__highest_price", Decimal("20.00"))
