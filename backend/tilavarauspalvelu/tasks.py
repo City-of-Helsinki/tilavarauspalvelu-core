@@ -26,7 +26,6 @@ from tilavarauspalvelu.models import (
     ReservationUnitImage,
     ReservationUnitPricing,
     Space,
-    SQLLog,
     TaxPercentage,
     Unit,
     User,
@@ -38,8 +37,6 @@ if TYPE_CHECKING:
     from collections.abc import Collection
 
     from celery.contrib.django.task import Task
-
-    from tilavarauspalvelu.typing import QueryInfo
 
 
 __all__ = [
@@ -59,7 +56,6 @@ __all__ = [
     "refresh_reservation_unit_product_mapping",
     "remove_old_personal_info_view_logs",
     "save_personal_info_view_log",
-    "save_sql_queries_from_request",
     "send_application_handled_email_task",
     "send_application_in_allocation_email_task",
     "send_permission_deactivation_email_task",
@@ -388,11 +384,6 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
 @app.task(name="delete_expired_applications")
 def delete_expired_applications() -> None:
     Application.objects.delete_expired_applications()
-
-
-@app.task(name="save_sql_queries_from_request")
-def save_sql_queries_from_request(queries: list[QueryInfo], path: str, body: bytes, duration_ms: int) -> None:
-    SQLLog.actions.create_for_request(queries, path, body, duration_ms)
 
 
 @app.task(name="Update ReservationUnit Search vectors")
