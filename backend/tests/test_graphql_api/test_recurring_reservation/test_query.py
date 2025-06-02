@@ -90,7 +90,6 @@ def test_recurring_reservations__query__relations(graphql):
         reservations__name="foo",
         age_group__minimum=18,
         age_group__maximum=30,
-        ability_group__name="foo",
         rejected_occurrences__rejection_reason=RejectionReadinessChoice.INTERVAL_NOT_ALLOWED,
         allocated_time_slot__day_of_the_week=Weekday.MONDAY,
     )
@@ -104,9 +103,6 @@ def test_recurring_reservations__query__relations(graphql):
         ageGroup {
             minimum
             maximum
-        }
-        abilityGroup {
-            nameFi
         }
         reservationUnit {
             nameFi
@@ -145,9 +141,6 @@ def test_recurring_reservations__query__relations(graphql):
         "ageGroup": {
             "minimum": recurring_reservation.age_group.minimum,
             "maximum": recurring_reservation.age_group.maximum,
-        },
-        "abilityGroup": {
-            "nameFi": recurring_reservation.ability_group.name_fi,
         },
         "reservationUnit": {
             "nameFi": recurring_reservation.reservation_unit.name_fi,

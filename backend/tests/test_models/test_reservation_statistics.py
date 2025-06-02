@@ -28,7 +28,6 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
 
     reservation_unit = ReservationUnitFactory.create(name="resu", unit=UnitFactory(name="mesta", tprek_id="1234"))
     recurring = RecurringReservationFactory.create(
-        ability_group__name="group",
         allocated_time_slot__day_of_the_week=Weekday.MONDAY,
     )
     reservation = ReservationFactory.create(
@@ -63,8 +62,6 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     assert ReservationStatistic.objects.count() == 1
 
     stat: ReservationStatistic | None = ReservationStatistic.objects.first()
-    assert stat.ability_group == reservation.recurring_reservation.ability_group.id
-    assert stat.ability_group_name == reservation.recurring_reservation.ability_group.name
     assert stat.age_group == reservation.age_group.id
     assert stat.age_group_name == str(reservation.age_group)
     assert stat.applying_for_free_of_charge == reservation.applying_for_free_of_charge

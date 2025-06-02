@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from .ability_group.model import AbilityGroup
 from .address.model import Address
 from .affecting_time_span.model import AffectingTimeSpan
 from .age_group.model import AgeGroup
@@ -52,7 +51,6 @@ from .unit_role.model import UnitRole
 from .user.model import ProfileUser, User
 
 __all__ = [
-    "AbilityGroup",
     "Address",
     "AffectingTimeSpan",
     "AgeGroup",

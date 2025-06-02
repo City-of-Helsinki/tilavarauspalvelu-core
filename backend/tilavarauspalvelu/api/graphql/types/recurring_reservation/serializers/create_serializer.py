@@ -130,7 +130,6 @@ class ReservationSeriesCreateSerializer(NestingModelSerializer):
             "description",
             "reservation_unit",
             "age_group",
-            "ability_group",
             "recurrence_in_days",
             "weekdays",
             "begin_time",
