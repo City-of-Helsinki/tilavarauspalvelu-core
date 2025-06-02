@@ -82,7 +82,6 @@ class ReservationAdmin(admin.ModelAdmin):
                 "fields": [
                     "id",
                     "ext_uuid",
-                    "sku",
                     "name",
                     "description",
                     "num_persons",

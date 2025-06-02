@@ -44,7 +44,6 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         model = Reservation
 
     # Basic information
-    sku = FakerFI("word")
     name = FakerFI("word")
     description = FakerFI("sentence")
     num_persons = None
