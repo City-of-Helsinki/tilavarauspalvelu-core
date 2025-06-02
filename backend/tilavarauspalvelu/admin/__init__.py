@@ -8,7 +8,6 @@ from .application.admin import ApplicationAdmin
 from .application_round.admin import ApplicationRoundAdmin
 from .application_section.admin import ApplicationSectionAdmin
 from .banner_notification.admin import BannerNotificationAdmin
-from .bug_report.admin import BugReportAdmin
 from .city.admin import CityAdmin
 from .equipment.admin import EquipmentAdmin
 from .equipment_category.admin import EquipmentCategoryAdmin
@@ -22,7 +21,6 @@ from .person.admin import PersonAdmin
 from .purpose.admin import PurposeAdmin
 from .recurring_reservation.admin import RecurringReservationAdmin
 from .rejected_occurrence.admin import RejectedOccurrenceAdmin
-from .request_log.admin import RequestLogAdmin
 from .reservation.admin import ReservationAdmin
 from .reservation_deny_reason.admin import ReservationDenyReasonAdmin
 from .reservation_metadata_field.admin import ReservationMetadataFieldAdmin
@@ -38,7 +36,6 @@ from .reservation_unit_pricing.admin import ReservationUnitPricingAdmin
 from .reservation_unit_type.admin import ReservationUnitTypeAdmin
 from .resource.admin import ResourceAdmin
 from .space.admin import SpaceAdmin
-from .sql_log.admin import SQLLogAdmin
 from .tax_percentage.admin import TaxPercentageAdmin
 from .terms_of_use.admin import TermsOfUseAdmin
 from .unit.admin import UnitAdmin
@@ -55,7 +52,6 @@ __all__ = [
     "ApplicationRoundAdmin",
     "ApplicationSectionAdmin",
     "BannerNotificationAdmin",
-    "BugReportAdmin",
     "CityAdmin",
     "EquipmentAdmin",
     "EquipmentCategoryAdmin",
@@ -69,7 +65,6 @@ __all__ = [
     "PurposeAdmin",
     "RecurringReservationAdmin",
     "RejectedOccurrenceAdmin",
-    "RequestLogAdmin",
     "ReservationAdmin",
     "ReservationDenyReasonAdmin",
     "ReservationMetadataFieldAdmin",
@@ -84,7 +79,6 @@ __all__ = [
     "ReservationUnitPricingAdmin",
     "ReservationUnitTypeAdmin",
     "ResourceAdmin",
-    "SQLLogAdmin",
     "SpaceAdmin",
     "TaxPercentageAdmin",
     "TermsOfUseAdmin",
