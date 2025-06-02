@@ -126,10 +126,12 @@ class PaymentOrderActions:
         if reservation is None:
             return
 
+        previous_state = reservation.state
+
         if self.payment_order.is_handled_payment:
-            if reservation.state != ReservationStateChoice.CONFIRMED:
+            if previous_state != ReservationStateChoice.CONFIRMED:
                 return
-        elif reservation.state != ReservationStateChoice.WAITING_FOR_PAYMENT:
+        elif previous_state != ReservationStateChoice.WAITING_FOR_PAYMENT:
             return
 
         reservation.state = ReservationStateChoice.CONFIRMED
@@ -140,8 +142,9 @@ class PaymentOrderActions:
             with suppress(ExternalServiceError):
                 PindoraService.activate_access_code(obj=reservation)
 
-        EmailService.send_reservation_confirmed_email(reservation=reservation)
-        EmailService.send_reservation_confirmed_staff_notification_email(reservation=reservation)
+        if previous_state == ReservationStateChoice.WAITING_FOR_PAYMENT:
+            EmailService.send_reservation_confirmed_email(reservation=reservation)
+            EmailService.send_reservation_confirmed_staff_notification_email(reservation=reservation)
 
     def cancel_together_with_verkkokauppa(self, *, cancel_on_error: bool = False) -> None:
         if self.payment_order.status not in OrderStatus.can_be_cancelled_statuses:
