@@ -2,12 +2,12 @@ import { type TermsOfUseFieldsFragment, TermsType } from "@/gql/gql-types";
 import Page4 from "@/pages/applications/[id]/page4";
 import { render, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
+import { type CreateGraphQLMocksReturn } from "@/test/test.gql.utils";
 import {
-  CreateMockApplicationFragmentProps,
-  type CreateGraphQLMocksReturn,
+  type CreateMockApplicationFragmentProps,
   createGraphQLApplicationIdMock,
   createMockApplicationViewFragment,
-} from "@/test/test.gql.utils";
+} from "@/test/test.application.mocks";
 import { base64encode } from "common/src/helpers";
 import userEvent from "@testing-library/user-event";
 import { MockedGraphQLProvider } from "@/test/test.react.utils";

@@ -5,6 +5,8 @@ import {
   createGraphQLApplicationIdMock,
   createMockApplicationFragment,
   type CreateMockApplicationFragmentProps,
+} from "@/test/test.application.mocks";
+import {
   mockAgeGroupOptions,
   mockDurationOptions,
   mockReservationPurposesOptions,

@@ -39,7 +39,7 @@ function ApplicationSectionInner({
   index,
   applicationRound,
   options,
-  onDeleteEvent: del,
+  onDeleteEvent,
 }: Props): JSX.Element {
   const { t } = useTranslation();
   const form = useFormContext<ApplicationPage1FormValues>();
@@ -213,7 +213,7 @@ function ApplicationSectionInner({
           cancelLabel={t("common:cancel")}
           heading={t("application:Page1.deleteDialog.heading")}
           content={t("application:Page1.deleteDialog.content")}
-          onAccept={del}
+          onAccept={onDeleteEvent}
           onCancel={() => setIsWaitingForDelete(false)}
           variant="danger"
         />

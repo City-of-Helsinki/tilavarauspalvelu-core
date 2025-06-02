@@ -2,7 +2,7 @@ import { expect, test, describe } from "vitest";
 import {
   CreateMockApplicationFragmentProps,
   createMockApplicationViewFragment,
-} from "@/test/test.gql.utils";
+} from "@/test/test.application.mocks";
 import { render } from "@testing-library/react";
 import { ViewApplication } from "./ViewApplication";
 import { ApplicationStatusChoice } from "@/gql/gql-types";
