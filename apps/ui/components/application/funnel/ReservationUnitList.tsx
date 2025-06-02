@@ -48,6 +48,7 @@ export interface ReservationUnitListProps<T extends FieldValues>
   applicationRound: ApplicationReservationUnitListFragment;
   options: OptionTypes;
   minSize?: number;
+  error?: string;
 }
 
 // selected reservation units are applicationEvent.eventReservationUnits
@@ -58,18 +59,17 @@ export function ReservationUnitList<T extends FieldValues>({
   applicationRound,
   options,
   minSize,
+  error,
 }: Readonly<ReservationUnitListProps<T>>): JSX.Element {
   const { t } = useTranslation();
   const ref = useRef<HTMLButtonElement>(null);
   const { handleRouteChange } = useSearchModify();
   const searchValues = useSearchParams();
 
-  const { formState, field } = useController({
+  const { field } = useController({
     name,
     control,
-    rules: { required: true },
   });
-  const { errors } = formState;
   const { value, onChange } = field;
 
   const showModal = searchValues.get("modalShown") === name;
@@ -129,8 +129,6 @@ export function ReservationUnitList<T extends FieldValues>({
     value.map((pk: T) => avail.find((ru) => ru.pk === Number(pk)))
   );
 
-  // TODO add a translate function for errors
-  const hasError = errors[name] != null;
   return (
     <Flex>
       <Notification
@@ -139,8 +137,8 @@ export function ReservationUnitList<T extends FieldValues>({
       >
         {t("reservationUnitList:infoReservationUnits")}
       </Notification>
-      {hasError && (
-        <ErrorText>{t("application:validation.noReservationUnits")}</ErrorText>
+      {error && (
+        <ErrorText data-testid="ReservationUnitList__error">{error}</ErrorText>
       )}
       <Flex $gap="m" $direction="column" aria-live="polite">
         {selected.map((ru, i, all) => (
