@@ -10,7 +10,6 @@ from .application_round.model import ApplicationRound
 from .application_round_time_slot.model import ApplicationRoundTimeSlot
 from .application_section.model import ApplicationSection
 from .banner_notification.model import BannerNotification
-from .bug_report.model import BugReport
 from .city.model import City
 from .equipment.model import Equipment
 from .equipment_category.model import EquipmentCategory
@@ -27,7 +26,6 @@ from .personal_info_view_log.model import PersonalInfoViewLog
 from .purpose.model import Purpose
 from .recurring_reservation.model import RecurringReservation
 from .rejected_occurrence.model import RejectedOccurrence
-from .request_log.model import RequestLog
 from .reservable_time_span.model import ReservableTimeSpan
 from .reservation.model import Reservation
 from .reservation_deny_reason.model import ReservationDenyReason
@@ -45,7 +43,6 @@ from .reservation_unit_pricing.model import ReservationUnitPricing
 from .reservation_unit_type.model import ReservationUnitType
 from .resource.model import Resource
 from .space.model import Space
-from .sql_log.model import SQLLog
 from .suitable_time_range.model import SuitableTimeRange
 from .tax_percentage.model import TaxPercentage
 from .terms_of_use.model import TermsOfUse
@@ -65,7 +62,6 @@ __all__ = [
     "ApplicationRoundTimeSlot",
     "ApplicationSection",
     "BannerNotification",
-    "BugReport",
     "City",
     "Equipment",
     "EquipmentCategory",
@@ -83,7 +79,6 @@ __all__ = [
     "Purpose",
     "RecurringReservation",
     "RejectedOccurrence",
-    "RequestLog",
     "ReservableTimeSpan",
     "Reservation",
     "ReservationDenyReason",
@@ -101,7 +96,6 @@ __all__ = [
     "ReservationUnitPricing",
     "ReservationUnitType",
     "Resource",
-    "SQLLog",
     "Space",
     "SuitableTimeRange",
     "TaxPercentage",
