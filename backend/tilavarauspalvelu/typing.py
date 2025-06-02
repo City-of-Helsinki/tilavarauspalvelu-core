@@ -350,7 +350,6 @@ class ReservationSeriesCreateData(TypedDict):
     description: str
     reservation_unit: int
     age_group: int
-    ability_group: int
     recurrence_in_days: int
     weekdays: list[int]
     begin_time: datetime.time

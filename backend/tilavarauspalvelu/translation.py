@@ -9,7 +9,6 @@ from modeltranslation.decorators import register
 from modeltranslation.translator import TranslationOptions
 
 from .models import (
-    AbilityGroup,
     Address,
     ApplicationRound,
     BannerNotification,
@@ -77,11 +76,6 @@ class UnitTranslationOptions(TranslationOptions):
 @register(Location)
 class LocationTranslationOptions(TranslationOptions):
     fields = ["address_street", "address_city"]
-
-
-@register(AbilityGroup)
-class AbilityGroupTranslationOptions(TranslationOptions):
-    fields = ["name"]
 
 
 @register(ReservationPurpose)

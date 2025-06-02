@@ -32,8 +32,8 @@ def test_reservation_statistics_export(api_client, settings):
     # Assume that the data per reservation statistic is correct from the exporter
     # -> Simply check the keys are what we expect
     assert list(data[0]) == [
-        "ability_group",
-        "ability_group_name",
+        "ability_group",  # Removed from series model
+        "ability_group_name",  # Removed from series model
         "access_code_generated_at",
         "access_type",
         "age_group",
