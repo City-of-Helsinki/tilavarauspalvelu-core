@@ -1,4 +1,5 @@
 import {
+  AccessType,
   ApplicantTypeChoice,
   type ApplicationFormFragment,
   ApplicationRoundFieldsFragment,
@@ -10,12 +11,21 @@ import {
   type CreateApplicationMutationVariables,
   CurrentUserDocument,
   type CurrentUserQuery,
+  CustomerTypeChoice,
+  ImageType,
   IsReservableFieldsFragment,
   OptionsQuery,
+  OrderFieldsFragment,
+  OrderStatus,
+  OrderStatusWithFree,
   OrganizationTypeChoice,
+  PaymentType,
   Priority,
   ReservationKind,
+  ReservationPageQuery,
   ReservationStartInterval,
+  ReservationStateChoice,
+  ReservationTypeChoice,
   ReservationUnitOrderingChoices,
   SearchReservationUnitsDocument,
   type SearchReservationUnitsQuery,
@@ -25,11 +35,12 @@ import {
   Weekday,
 } from "@/gql/gql-types";
 import { base64encode } from "common/src/helpers";
-import { addDays, addYears } from "date-fns";
+import { addDays, addHours, addYears } from "date-fns";
 import { type DocumentNode } from "graphql";
 import { type TFunction } from "i18next";
 import { getDurationOptions } from "@/modules/const";
 import { type ReservableMap, type RoundPeriod } from "@/modules/reservable";
+import { undefined } from "zod";
 
 export type CreateGraphQLMockProps = {
   noUser?: boolean;
@@ -621,5 +632,214 @@ export function generateNameFragment(name: string) {
     nameFi: `${name} FI`,
     nameSv: `${name} SV`,
     nameEn: `${name} EN`,
+  };
+}
+
+export function generateTextFragment(text: string) {
+  return {
+    textFi: `${text} FI`,
+    textSv: `${text} SV`,
+    textEn: `${text} EN`,
+  };
+}
+
+export function generateDescriptionFragment(description: string) {
+  return {
+    descriptionFi: `${description} FI`,
+    descriptionSv: `${description} SV`,
+    descriptionEn: `${description} EN`,
+  };
+}
+
+export function generatePurposeFragment(name: string) {
+  return {
+    id: base64encode(`PurposeNode:${name}`),
+    pk: 1,
+    ...generateNameFragment(name),
+  };
+}
+
+export function generateAgeGroupFragment(props: {
+  id: number;
+  minimum: number;
+  maximum: number;
+}) {
+  const { id, minimum, maximum } = props;
+  return {
+    id: base64encode(`AgeGroupNode:${id}`),
+    pk: id,
+    minimum,
+    maximum,
+  };
+}
+
+export function createMockReservation(props: {
+  pk: number;
+  state: ReservationStateChoice;
+  begin: string;
+  end: string;
+  isHandled: boolean;
+  type: ReservationTypeChoice;
+  paymentOrder: OrderFieldsFragment;
+  cancelable?: boolean;
+}): Readonly<NonNullable<ReservationPageQuery["reservation"]>> {
+  const { pk, state, begin, end, isHandled, type, paymentOrder, cancelable } =
+    props;
+  return {
+    id: base64encode(`ReservationNode:${pk}`),
+    pk: pk ?? 1,
+    description: "Test reservation description",
+    state: state ?? ReservationStateChoice.Confirmed,
+    type: type ?? ReservationTypeChoice.Normal,
+    purpose: {
+      ...generatePurposeFragment("Test Purpose"),
+    },
+    ageGroup: {
+      ...generateAgeGroupFragment({ id: 1, minimum: 0, maximum: 100 }),
+    },
+    numPersons: 5,
+    begin: begin ?? new Date(2024, 0, 1, 0, 0, 0, 0).toISOString(),
+    end: end ?? addHours(new Date(2024, 0, 1, 0, 0, 0, 0), 2).toISOString(),
+    calendarUrl:
+      "https:type: ReservationTypeChoice.Normal,//example.com/calendar.ics",
+    isHandled: isHandled ?? true,
+    recurringReservation: null,
+    accessType: AccessType.Unrestricted,
+    pindoraInfo: null,
+    // Price & payment details
+    price: "10.0",
+    taxPercentageValue: "24.5",
+    applyingForFreeOfCharge: true,
+    paymentOrder: [
+      paymentOrder ?? {
+        id: "1",
+        reservationPk: `${pk ?? 1}`,
+        status: OrderStatus.PaidManually,
+        paymentType: PaymentType.OnSite,
+        receiptUrl: "https://example.com/receipt",
+        checkoutUrl: "https://example.com/checkout",
+      },
+    ],
+    // Reservee details
+    reserveeId: "1",
+    reserveeFirstName: "Teppo",
+    reserveeLastName: "Testaaja",
+    reserveeEmail: "teppo.testaaja@hel.fi",
+    reserveePhone: "0401234567",
+    reserveeType: CustomerTypeChoice.Individual,
+    reserveeOrganisationName: "Test Organisation",
+    reserveeIsUnregisteredAssociation: false,
+    reserveeAddressStreet: "Testikatu 1",
+    reserveeAddressCity: "Helsinki",
+    reserveeAddressZip: "00100",
+    billingFirstName: "Laura",
+    billingLastName: "Laskuttaja",
+    billingPhone: "0501234567",
+    billingEmail: "laura.laskuttaja@hel.fi",
+    billingAddressStreet: "Laskutuskuja 2",
+    billingAddressCity: "Helsinki",
+    billingAddressZip: "00200",
+    // Reservation unit details
+    reservationUnits: [
+      {
+        id: base64encode(`ReservationUnitNode:1`),
+        pk: 1,
+        ...generateNameFragment("Test Reservation Unit"),
+        ...generateDescriptionFragment("Test reservation unit description"),
+        images: [
+          {
+            id: base64encode(`ReservationUnitImageNode:1`),
+            largeUrl: "https://example.com/image-large.jpg",
+            mediumUrl: "https://example.com/image-medium.jpg",
+            smallUrl: "https://example.com/image-small.jpg",
+            imageUrl: "https://example.com/image-image.jpg",
+            imageType: ImageType.Main,
+          },
+        ],
+        unit: {
+          id: base64encode("UnitNode:1"),
+          pk: 1,
+          tprekId: "123456",
+          location: {
+            id: base64encode("LocationNode:1"),
+            addressStreetFi: "Varausyksikkökatu 1",
+            addressZip: "00100",
+            addressCityFi: "Helsinki",
+            addressStreetEn: "Reservation Unit Street 1",
+            addressStreetSv: "Varausyksikkögatan 1",
+            addressCityEn: "Helsinki",
+            addressCitySv: "Helsingfors",
+          },
+          ...generateNameFragment("Test Unit"),
+        },
+        canApplyFreeOfCharge: true,
+        minPersons: 1,
+        maxPersons: 100,
+        metadataSet: {
+          id: base64encode(`MetadataSetNode:1`),
+          requiredFields: [
+            {
+              id: base64encode(`RequiredFieldsNode:1`),
+              fieldName: "Test required field",
+            },
+          ],
+          supportedFields: [
+            {
+              id: base64encode(`SupportedFieldsNode:1`),
+              fieldName: "Test supported field",
+            },
+          ],
+        },
+        reservationPendingInstructionsFi: "Test pending instructions FI",
+        reservationPendingInstructionsEn: "Test pending instructions EN",
+        reservationPendingInstructionsSv: "Test pending instructions SV",
+        reservationConfirmedInstructionsFi: "Test confirmed instructions FI",
+        reservationConfirmedInstructionsEn: "Test confirmed instructions EN",
+        reservationConfirmedInstructionsSv: "Test confirmed instructions SV",
+        reservationCancelledInstructionsFi: "Test cancelled instructions FI",
+        reservationCancelledInstructionsEn: "Test cancelled instructions EN",
+        reservationCancelledInstructionsSv: "Test cancelled instructions SV",
+        termsOfUseFi: "Test terms of use FI",
+        termsOfUseEn: "Test terms of use EN",
+        termsOfUseSv: "Test terms of use SV",
+        serviceSpecificTerms: {
+          id: base64encode(`ServiceSpecificTermsNode:1`),
+          ...generateTextFragment("Test service specific terms"),
+        },
+        cancellationTerms: {
+          id: base64encode(`CancellationTermsNode:1`),
+          ...generateTextFragment("Test cancellation terms"),
+        },
+        paymentTerms: {
+          id: base64encode(`PaymentTermsNode:1`),
+          ...generateTextFragment("Test payment terms"),
+        },
+        pricingTerms: {
+          id: base64encode(`PricingTermsNode:1`),
+          ...generateNameFragment("Test Pricing Terms"),
+          ...generateTextFragment("Test pricing terms text"),
+        },
+        reservationBegins: null,
+        reservationEnds: null,
+        pricings: [],
+        cancellationRule: {
+          id: base64encode("ReservationUnitCancellationRuleNode:1"),
+          canBeCancelledTimeBefore: cancelable ? 0 : null,
+          ...(cancelable ? generateNameFragment("Test cancelation rule") : {}),
+        },
+      },
+    ],
+  };
+}
+
+export function createTermsOfUseMock() {
+  return {
+    genericTerms: {
+      id: base64encode("TermsOfUseNode:1"),
+      pk: "1",
+      ...generateNameFragment("TermsOfUseNode"),
+      termsType: TermsType.RecurringTerms,
+      ...generateTextFragment("Test terms of use"),
+    },
   };
 }

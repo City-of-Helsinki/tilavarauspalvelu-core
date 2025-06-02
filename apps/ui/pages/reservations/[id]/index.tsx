@@ -304,7 +304,9 @@ function Reservation({
   termsOfUse,
   reservation,
   feedbackUrl,
-}: Readonly<PropsNarrowed>): JSX.Element | null {
+}: Readonly<
+  Pick<PropsNarrowed, "termsOfUse" | "reservation" | "feedbackUrl">
+>): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const shouldShowAccessCode =
     isBefore(sub(new Date(), { days: 1 }), new Date(reservation.end)) &&
@@ -373,7 +375,7 @@ function Reservation({
     (order.status === OrderStatus.Paid ||
       order.status === OrderStatus.Refunded ||
       order.status === OrderStatus.PaidByInvoice);
-
+  console.log(reservation);
   return (
     <>
       <Breadcrumb routes={routes} />
@@ -434,6 +436,7 @@ function Reservation({
                 disabled={!reservation.calendarUrl}
                 data-testid="reservation__button--calendar-link"
                 href={reservation.calendarUrl ?? ""}
+                role="button"
               >
                 {t("reservations:saveToCalendar")}
                 <IconCalendar />
@@ -445,6 +448,7 @@ function Reservation({
                 data-testid="reservation__confirmation--button__receipt-link"
                 href={`${order.receiptUrl}&lang=${lang}`}
                 target="_blank"
+                role="button"
               >
                 {t("reservations:downloadReceipt")}
                 <IconLinkExternal />
@@ -460,6 +464,7 @@ function Reservation({
                 disabled={!hasCheckoutUrl}
                 href={checkoutUrl ?? ""}
                 data-testid="reservation-detail__button--checkout"
+                role="button"
               >
                 {t("reservations:payReservation")}
                 <IconArrowRight />
@@ -470,6 +475,7 @@ function Reservation({
                 size="large"
                 href={getReservationPath(reservation.pk, "edit")}
                 data-testid="reservation-detail__button--edit"
+                role="button"
               >
                 {t("reservations:modifyReservationTime")}
                 <IconCalendar />
@@ -480,6 +486,7 @@ function Reservation({
                 size="large"
                 href={getReservationPath(reservation.pk, "cancel")}
                 data-testid="reservation-detail__button--cancel"
+                role="button"
               >
                 {t(
                   `reservations:cancel.${
@@ -757,6 +764,8 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
     reservation(id: $id) {
       id
       pk
+      type
+      ...ReserveeNameFields
       ...ReserveeBillingFields
       ...ReservationInfo
       ...ReservationInfoCard
