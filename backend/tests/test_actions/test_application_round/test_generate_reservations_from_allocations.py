@@ -20,9 +20,9 @@ from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiA
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIDatePeriod
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
-    RecurringReservation,
     RejectedOccurrence,
     Reservation,
+    ReservationSeries,
     ReservationUnitHierarchy,
 )
 from tilavarauspalvelu.typing import Allocation
@@ -68,7 +68,7 @@ def test_generate_reservation_series_from_allocations():
 
     assert HaukiAPIClient.get_date_periods.call_count == 1
 
-    all_series: list[RecurringReservation] = list(RecurringReservation.objects.all())
+    all_series: list[ReservationSeries] = list(ReservationSeries.objects.all())
     assert len(all_series) == 1
 
     series = all_series[0]
@@ -394,7 +394,7 @@ def test_generate_reservation_series_from_allocations__overlapping_reservation()
     assert len(reservations) == 1
 
     assert reservations[0] == existing_reservation
-    assert reservations[0].recurring_reservation is None
+    assert reservations[0].reservation_series is None
 
     rejected: list[RejectedOccurrence] = list(RejectedOccurrence.objects.all())
     assert len(rejected) == 1

@@ -12,7 +12,7 @@ from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraAccessCod
 from tilavarauspalvelu.typing import PindoraReservationInfoData
 from utils.date_utils import local_datetime
 
-from tests.factories import ApplicationSectionFactory, RecurringReservationFactory, ReservationFactory, UserFactory
+from tests.factories import ApplicationSectionFactory, ReservationFactory, ReservationSeriesFactory, UserFactory
 from tests.helpers import patch_method
 
 pytestmark = [
@@ -25,7 +25,7 @@ pytestmark = [
 def test_create_missing_access_codes__reservation():
     reservation = ReservationFactory.create(
         reservation_units__uuid=uuid.uuid4(),
-        recurring_reservation=None,
+        reservation_series=None,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -47,7 +47,7 @@ def test_create_missing_access_codes__reservation():
 def test_create_missing_access_codes__reservation__as_inactive():
     reservation = ReservationFactory.create(
         reservation_units__uuid=uuid.uuid4(),
-        recurring_reservation=None,
+        reservation_series=None,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -69,7 +69,7 @@ def test_create_missing_access_codes__reservation__as_inactive():
 def test_create_missing_access_codes__reservation__not_confirmed():
     ReservationFactory.create(
         reservation_units__uuid=uuid.uuid4(),
-        recurring_reservation=None,
+        reservation_series=None,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -89,7 +89,7 @@ def test_create_missing_access_codes__reservation__not_confirmed():
 def test_create_missing_access_codes__reservation__already_generated():
     ReservationFactory.create(
         reservation_units__uuid=uuid.uuid4(),
-        recurring_reservation=None,
+        reservation_series=None,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -123,7 +123,7 @@ def test_create_missing_access_codes__reservation__already_generated():
 def test_create_missing_access_codes__reservation__get_if_exists():
     reservation = ReservationFactory.create(
         reservation_units__uuid=uuid.uuid4(),
-        recurring_reservation=None,
+        reservation_series=None,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -147,10 +147,10 @@ def test_create_missing_access_codes__reservation__get_if_exists():
 @patch_method(PindoraService.create_access_code)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__series():
-    series = RecurringReservationFactory.create()
+    series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -170,10 +170,10 @@ def test_create_missing_access_codes__series():
 @patch_method(PindoraService.create_access_code)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__series__as_inactive():
-    series = RecurringReservationFactory.create()
+    series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -193,10 +193,10 @@ def test_create_missing_access_codes__series__as_inactive():
 @patch_method(PindoraService.create_access_code)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__series__not_confirmed():
-    series = RecurringReservationFactory.create()
+    series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -214,10 +214,10 @@ def test_create_missing_access_codes__series__not_confirmed():
 @patch_method(PindoraService.create_access_code)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__series__already_generated():
-    series = RecurringReservationFactory.create()
+    series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -244,10 +244,10 @@ def test_create_missing_access_codes__series__already_generated():
 @patch_method(PindoraService.deactivate_access_code)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__series__reschedule_if_exists():
-    series = RecurringReservationFactory.create()
+    series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -279,10 +279,10 @@ def test_create_missing_access_codes__series__reschedule_if_exists():
 @patch_method(PindoraService.deactivate_access_code)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__series__reschedule_if_exists__activate():
-    series = RecurringReservationFactory.create()
+    series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -314,10 +314,10 @@ def test_create_missing_access_codes__series__reschedule_if_exists__activate():
 @patch_method(PindoraService.deactivate_access_code)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__series__reschedule_if_exists__deactivate():
-    series = RecurringReservationFactory.create()
+    series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -344,13 +344,13 @@ def test_create_missing_access_codes__seasonal_booking():
     section = ApplicationSectionFactory.create(
         application__user=user,
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     ReservationFactory.create(
         user=user,
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -374,13 +374,13 @@ def test_create_missing_access_codes__seasonal_booking__as_inactive():
     section = ApplicationSectionFactory.create(
         application__user=user,
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     ReservationFactory.create(
         user=user,
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -404,13 +404,13 @@ def test_create_missing_access_codes__seasonal_booking__not_confirmed():
     section = ApplicationSectionFactory.create(
         application__user=user,
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     ReservationFactory.create(
         user=user,
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -432,13 +432,13 @@ def test_create_missing_access_codes__seasonal_booking__already_generated():
     section = ApplicationSectionFactory.create(
         application__user=user,
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     ReservationFactory.create(
         user=user,
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -469,13 +469,13 @@ def test_create_missing_access_codes__seasonal_booking__reschedule_if_exists():
     section = ApplicationSectionFactory.create(
         application__user=user,
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     ReservationFactory.create(
         user=user,
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -511,13 +511,13 @@ def test_create_missing_access_codes__seasonal_booking__reschedule_if_exists__ac
     section = ApplicationSectionFactory.create(
         application__user=user,
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     ReservationFactory.create(
         user=user,
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -553,13 +553,13 @@ def test_create_missing_access_codes__seasonal_booking__reschedule_if_exists__de
     section = ApplicationSectionFactory.create(
         application__user=user,
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     ReservationFactory.create(
         user=user,
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,

@@ -107,7 +107,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     reservation_units = ManyToManyFactory("tests.factories.ReservationUnitFactory")
 
     user = ForeignKeyFactory("tests.factories.UserFactory", required=True)
-    recurring_reservation = ForeignKeyFactory("tests.factories.RecurringReservationFactory")
+    reservation_series = ForeignKeyFactory("tests.factories.ReservationSeriesFactory")
     deny_reason = ForeignKeyFactory("tests.factories.ReservationDenyReasonFactory")
     purpose = ForeignKeyFactory("tests.factories.ReservationPurposeFactory")
     home_city = ForeignKeyFactory("tests.factories.CityFactory")

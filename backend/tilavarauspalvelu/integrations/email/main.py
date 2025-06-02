@@ -25,7 +25,7 @@ from .sending import send_emails_in_batches_task, send_multiple_emails_in_batche
 from .typing import EmailData, EmailType
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation
+    from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationSeries
     from tilavarauspalvelu.typing import Lang
 
 __all__ = [
@@ -600,7 +600,7 @@ class EmailService:
 
     @staticmethod
     def send_seasonal_booking_denied_series_email(
-        series: RecurringReservation,
+        series: ReservationSeries,
         *,
         language: Lang | None = None,
     ) -> None:
@@ -663,7 +663,7 @@ class EmailService:
 
     @staticmethod
     def send_seasonal_booking_rescheduled_series_email(
-        series: RecurringReservation,
+        series: ReservationSeries,
         *,
         language: Lang | None = None,
     ) -> None:

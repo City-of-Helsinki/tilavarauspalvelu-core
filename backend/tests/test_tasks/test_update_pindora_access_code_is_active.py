@@ -12,7 +12,7 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIEr
 from tilavarauspalvelu.tasks import update_pindora_access_code_is_active_task
 from utils.date_utils import local_datetime
 
-from tests.factories import RecurringReservationFactory, ReservationFactory
+from tests.factories import ReservationFactory, ReservationSeriesFactory
 from tests.helpers import patch_method
 
 
@@ -230,7 +230,7 @@ def test_update_pindora_access_code_is_active__deactivate__pindora_error__404():
 @freeze_time("2023-01-01")
 @patch_method(PindoraClient.activate_reservation_access_code)
 @patch_method(PindoraClient.deactivate_reservation_access_code)
-def test_update_pindora_access_code_is_active__recurring_reservation_is_ignored():
+def test_update_pindora_access_code_is_active__reservation_series_is_ignored():
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -241,7 +241,7 @@ def test_update_pindora_access_code_is_active__recurring_reservation_is_ignored(
         access_code_is_active=False,
         begin=now + datetime.timedelta(days=1),
         end=now + datetime.timedelta(days=1, hours=1),
-        recurring_reservation=RecurringReservationFactory.create(),
+        reservation_series=ReservationSeriesFactory.create(),
     )
 
     update_pindora_access_code_is_active_task()

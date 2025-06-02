@@ -19,7 +19,7 @@ from utils.date_utils import local_date, local_datetime
 from .filters import (
     AccessCodeGeneratedFilter,
     PaidReservationListFilter,
-    RecurringReservationListFilter,
+    ReservationSeriesListFilter,
     ReservationUnitFilter,
     UnitFilter,
 )
@@ -64,7 +64,7 @@ class ReservationAdmin(admin.ModelAdmin):
         ("begin", DateRangeFilterBuilder(title=_("Begin time"))),
         ("type", MultiSelectFilter),
         ("state", MultiSelectFilter),
-        RecurringReservationListFilter,
+        ReservationSeriesListFilter,
         PaidReservationListFilter,
         ("reservation_units__unit", UnitFilter),
         ("reservation_units", ReservationUnitFilter),
@@ -172,7 +172,7 @@ class ReservationAdmin(admin.ModelAdmin):
             {
                 "fields": [
                     "user",
-                    "recurring_reservation",
+                    "reservation_series",
                     "deny_reason",
                     "cancel_reason",
                     "purpose",
@@ -198,7 +198,7 @@ class ReservationAdmin(admin.ModelAdmin):
         "access_code_generated_at",
         "access_type",
         "user",
-        "recurring_reservation",
+        "reservation_series",
     ]
     inlines = [PaymentOrderInline]
 
