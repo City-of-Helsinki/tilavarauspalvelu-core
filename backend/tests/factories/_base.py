@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import datetime
+import logging
+from contextlib import suppress
 from copy import copy, deepcopy
-from typing import TYPE_CHECKING, Any, Self
+from types import UnionType
+from typing import TYPE_CHECKING, Any, Literal, Self, Union, get_origin, get_type_hints, is_typeddict
 
 import faker
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -29,10 +32,15 @@ __all__ = [
     "ForwardOneToOneFactory",
     "GenericDjangoModelFactory",
     "GenericFactory",
+    "GenericListFactory",
     "ManyToManyFactory",
     "ReverseForeignKeyFactory",
     "ReverseOneToOneFactory",
+    "ValidatedGenericFactory",
 ]
+
+
+logger = logging.getLogger(__name__)
 
 
 class BaseFaker(Faker):
@@ -131,7 +139,7 @@ class _CustomFactoryWrapper:
         return self.factory
 
 
-class _PostFactory[TModel: Model](PostGeneration):
+class _PostFactory[T](PostGeneration):
     def __init__(self, factory: FactoryType) -> None:
         super().__init__(function=self.generate)
         self.field_name: str = ""
@@ -144,21 +152,8 @@ class _PostFactory[TModel: Model](PostGeneration):
     def get_factory(self) -> BaseFactory:
         return self.factory_wrapper.get()
 
-    def generate(self, instance: Model, create: bool, models: Iterable[TModel] | None, **kwargs: Any) -> None:
+    def generate(self, instance: Model, create: bool, values: Iterable[T] | None, **kwargs: Any) -> None:
         raise NotImplementedError
-
-    def manager(self, instance: Model) -> Any:
-        """
-        Find the related manager for the instance based on the field name it was defined with on the factory.
-
-        Note that due to how Django handles related fields, the manager type is created dynamically at runtime.
-
-        For one-to-many fields:
-        - django.db.models.fields.related_descriptors.create_reverse_many_to_one_manager -> RelatedManager
-        For many-to-many fields:
-        - django.db.models.fields.related_descriptors.create_forward_many_to_many_manager -> ManyRelatedManager
-        """
-        return getattr(instance, self.field_name)
 
 
 # --- Generic factories --------------------------------------------------------------------------------------------
@@ -172,23 +167,23 @@ class GenericDjangoModelFactory[TModel: Model](DjangoModelFactory):
     """
 
     @classmethod
-    def build(cls: TModel, **kwargs: Any) -> TModel:
+    def build(cls, **kwargs: Any) -> TModel:
         return super().build(**kwargs)
 
     @classmethod
-    def create(cls: TModel, **kwargs: Any) -> TModel:
+    def create(cls, **kwargs: Any) -> TModel:
         return super().create(**kwargs)
 
     @classmethod
-    def build_batch(cls: TModel, size: int, **kwargs: Any) -> list[TModel]:
+    def build_batch(cls, size: int, **kwargs: Any) -> list[TModel]:
         return super().build_batch(size, **kwargs)
 
     @classmethod
-    def create_batch(cls: TModel, size: int, **kwargs: Any) -> list[TModel]:
+    def create_batch(cls, size: int, **kwargs: Any) -> list[TModel]:
         return super().create_batch(size, **kwargs)
 
     @classmethod
-    def pop_sub_kwargs(cls: TModel, key: str, kwargs: dict[str, Any]) -> dict[str, Any]:
+    def pop_sub_kwargs(cls, key: str, kwargs: dict[str, Any]) -> dict[str, Any]:
         sub_kwargs = {}
         for kwarg in kwargs.copy():
             if kwarg.startswith(f"{key}__"):
@@ -196,28 +191,241 @@ class GenericDjangoModelFactory[TModel: Model](DjangoModelFactory):
         return sub_kwargs
 
     @classmethod
-    def has_sub_kwargs(cls: TModel, key: str, kwargs: dict[str, Any]) -> bool:
+    def has_sub_kwargs(cls, key: str, kwargs: dict[str, Any]) -> bool:
         return any(kwarg == key or kwarg.startswith(f"{key}__") for kwarg in kwargs)
+
+
+class GenericFactoryValidationError(Exception):
+    """Raised when a generic factory fails to create an object."""
 
 
 class GenericFactory[T](Factory):
     """Same as `GenericDjangoModelFactory`, but for regular factories."""
 
     @classmethod
-    def build(cls: T, **kwargs: Any) -> T:
+    def build(cls, **kwargs: Any) -> T:
         return super().build(**kwargs)
 
     @classmethod
-    def create(cls: T, **kwargs: Any) -> T:
+    def create(cls, **kwargs: Any) -> T:
         return super().create(**kwargs)
 
     @classmethod
-    def build_batch(cls: T, size: int, **kwargs: Any) -> list[T]:
+    def build_batch(cls, size: int, **kwargs: Any) -> list[T]:
         return super().build_batch(size, **kwargs)
 
     @classmethod
-    def create_batch(cls: T, size: int, **kwargs: Any) -> list[T]:
+    def create_batch(cls, size: int, **kwargs: Any) -> list[T]:
         return super().create_batch(size, **kwargs)
+
+
+class ValidatedGenericFactory[T](GenericFactory[T]):
+    """
+    Adds some validation logic to the output of the GenericFactory.
+
+    Assumes that the model for the Factory is a TypedDict of a dataclass,
+    in which case we can check the output against its annotations.
+    """
+
+    @classmethod
+    def _generate(cls, strategy: str, params: dict[str, Any]) -> T:
+        result = super()._generate(strategy, params)
+        cls._check_result_matches_model(result)
+        return result
+
+    @classmethod
+    def _check_result_matches_model(cls, result: Any) -> None:
+        model: type[T] = cls._meta.model
+        if model is None:
+            return
+
+        msg = (
+            f"Factory {cls.__name__!r} returned an object of type {type(result)!r}, "
+            f"but expected an object of type {model!r}."
+        )
+        error = GenericFactoryValidationError(msg)
+
+        # Assume model is a TypedDict if it's a dict subclass
+        # (TypedDicts cannot be used in isinstance checks)
+        if issubclass(model, dict):
+            if not isinstance(result, dict):
+                raise error
+
+        elif not isinstance(result, model):
+            raise error
+
+        errors: list[GenericFactoryValidationError] = []
+
+        # Attempt to do some simple type checking on the fields of the model.
+        # This should catch most of the common cases, like missing fields,
+        # wrong types, but won't cover nested objects.
+        try:
+            type_hints = get_type_hints(model)
+        except Exception as error:
+            msg = f"Factory {cls.__name__!r} output cannot be checked. Failed to get type hints for {model!r}."
+            logger.exception(msg, exc_info=error)
+            return
+
+        for field, field_type in type_hints.items():
+            value = cls._get_object_value(result=result, field=field)
+
+            try:
+                cls._check_value(field=field, field_type=field_type, value=value)
+            except GenericFactoryValidationError as error:
+                errors.append(error)
+                continue
+
+        if errors:
+            msg = f"Factory {cls.__name__!r} returned an object with invalid data."
+            raise ExceptionGroup(msg, errors)
+
+    @classmethod
+    def _get_object_value(cls, result: Any, field: str) -> Any:
+        with suppress(KeyError, TypeError):
+            return result[field]
+
+        with suppress(AttributeError):
+            return getattr(result, field)
+
+        return ...  # Sentinel value, indicating that the field was not found
+
+    @classmethod
+    def _check_value(cls, field: str, field_type: Any, value: Any) -> None:
+        if value is ...:
+            msg = f"Factory {cls.__name__!r} returned an object with missing field {field!r}."
+            raise GenericFactoryValidationError(msg)
+
+        # Get the origin of a type if it is a Generic, e.g. list[int] -> list
+        origin_type = get_origin(field_type) or field_type
+
+        if origin_type is Any:
+            return
+
+        if is_typeddict(field_type):
+            return
+
+        if origin_type is Literal:
+            cls._check_literal(field, field_type, value)
+            return
+
+        if origin_type in {Union, UnionType}:
+            cls._check_union(field, field_type, value)
+            return
+
+        if origin_type is list:
+            cls._check_list(field, field_type, value)
+            return
+
+        if origin_type is dict:
+            cls._check_dict(field, field_type, value)
+            return
+
+        cls._check_leaf_type(field, field_type, value)
+
+    @classmethod
+    def _check_literal(cls, field: str, field_type: Any, value: Any) -> None:
+        if value not in field_type.__args__:
+            msg = (
+                f"Factory {cls.__name__!r} returned an object with field {field!r} with "
+                f"value {value!r}, but expected one of {field_type.__args__!r}."
+            )
+            raise GenericFactoryValidationError(msg)
+
+    @classmethod
+    def _check_union(cls, field: str, field_type: Any, value: Any) -> None:
+        for sub_type in field_type.__args__:
+            with suppress(GenericFactoryValidationError):
+                cls._check_value(field, sub_type, value)
+            return
+
+        msg = (
+            f"Factory {cls.__name__!r} returned an object with field {field!r} with "
+            f"value {value!r}, but expected one of {field_type.__args__!r}."
+        )
+        raise GenericFactoryValidationError(msg)
+
+    @classmethod
+    def _check_list(cls, field: str, field_type: Any, value: Any) -> None:
+        if not isinstance(value, list):
+            msg = (
+                f"Factory {cls.__name__!r} returned an object with field {field!r} with "
+                f"value {value!r}, but expected a list."
+            )
+            raise GenericFactoryValidationError(msg)
+
+        list_type = field_type.__args__[0]
+
+        for i, item in enumerate(value):
+            try:
+                cls._check_value(f"{field}[{i}]", list_type, item)
+            except GenericFactoryValidationError as error:
+                msg = (
+                    f"Factory {cls.__name__!r} returned an object with field {field!r} with "
+                    f"list containing {value!r}, but expected a list of {list_type!r}."
+                )
+                raise GenericFactoryValidationError(msg) from error
+
+    @classmethod
+    def _check_dict(cls, field: str, field_type: Any, value: Any) -> None:
+        if not isinstance(value, dict):
+            msg = (
+                f"Factory {cls.__name__!r} returned an object with field {field!r} of "
+                f"value {value!r}, but expected a dict."
+            )
+            raise GenericFactoryValidationError(msg)
+
+        key_type, value_type = field_type.__args__
+
+        for key, item in value.items():
+            try:
+                cls._check_value(f"{field}[{key}]", key_type, key)
+            except GenericFactoryValidationError as error:
+                msg = (
+                    f"Factory {cls.__name__!r} returned an object with field {field!r} with "
+                    f"dict containing key {value!r}, but expected keys to be of type {key_type!r}."
+                )
+                raise GenericFactoryValidationError(msg) from error
+
+            try:
+                cls._check_value(f"{field}[{key}]", value_type, item)
+            except GenericFactoryValidationError as error:
+                msg = (
+                    f"Factory {cls.__name__!r} returned an object with field {field!r} with "
+                    f"dict containing value {item!r}, but expected values to be of type {value_type!r}."
+                )
+                raise GenericFactoryValidationError(msg) from error
+
+    @classmethod
+    def _check_leaf_type(cls, field: str, field_type: Any, value: Any) -> None:
+        origin_type = get_origin(field_type) or field_type
+
+        try:
+            is_correct_type = isinstance(value, origin_type)
+        except TypeError as err:
+            logger.exception(f"Failed to check type of {value!r} for {field!r}", exc_info=err)
+            return
+
+        if not is_correct_type:
+            msg = (
+                f"Factory {cls.__name__!r} returned an object with field {field!r} of type "
+                f"{type(value)!r}, but expected an object of type {origin_type!r}."
+            )
+            raise GenericFactoryValidationError(msg)
+
+
+class GenericListFactory[T](_PostFactory[T]):
+    """Field factory for generating a list of values using another GenericFactory."""
+
+    def generate(self, instance: Any, create: bool, values: Iterable[T] | None, **kwargs: Any) -> None:
+        if values is None:
+            factory = self.get_factory()
+            item = factory.create(**kwargs) if create else factory.build(**kwargs)
+            values = [item]
+
+        if isinstance(instance, dict):
+            instance[self.field_name] = values
+        else:
+            setattr(instance, self.field_name, values)
 
 
 class ModelFactoryBuilder[TModel: Model]:
@@ -326,7 +534,7 @@ class ReverseForeignKeyFactory[TModel: Model](_PostFactory[TModel]):
     def generate(self, instance: Model, create: bool, models: Iterable[TModel] | None, **kwargs: Any) -> None:
         if not models and kwargs:
             factory = self.get_factory()
-            manager = self.manager(instance)
+            manager = getattr(instance, self.field_name)
             try:
                 field_name = manager.field.name
             except AttributeError:
@@ -356,13 +564,13 @@ class ManyToManyFactory[TModel: Model](_PostFactory[TModel]):
         if models:
             if create:
                 for model in models or []:
-                    self.manager(instance).add(model)
+                    getattr(instance, self.field_name).add(model)
 
         elif kwargs:
             factory = self.get_factory()
             if create:
                 model = factory.create(**kwargs)
-                self.manager(instance).add(model)
+                getattr(instance, self.field_name).add(model)
             else:
                 factory.build(**kwargs)
 
