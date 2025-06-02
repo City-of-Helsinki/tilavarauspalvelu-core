@@ -1,8 +1,8 @@
 import {
-  createApplicationSearchGraphQLMocks,
   type CreateGraphQLMockProps,
   generateNameFragment,
 } from "@/test/test.gql.utils";
+import { createApplicationSearchGraphQLMocks } from "@/test/test.application.mocks";
 import { render, within } from "@testing-library/react";
 import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { ReservationUnitList } from "./ReservationUnitList";

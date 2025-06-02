@@ -2,12 +2,12 @@ import { type ApplicationPage2Query } from "@/gql/gql-types";
 import Page2 from "@/pages/applications/[id]/page2";
 import { render } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
+import { type CreateGraphQLMocksReturn } from "@/test/test.gql.utils";
 import {
   createGraphQLApplicationIdMock,
-  type CreateGraphQLMocksReturn,
   createMockApplicationFragment,
   type CreateMockApplicationFragmentProps,
-} from "@/test/test.gql.utils";
+} from "@/test/test.application.mocks";
 import userEvent from "@testing-library/user-event";
 import { getApplicationPath } from "@/modules/urls";
 import { MockedGraphQLProvider } from "@/test/test.react.utils";

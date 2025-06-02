@@ -3,8 +3,8 @@ import { render } from "@testing-library/react";
 import {
   createMockApplicationRound,
   CreateGraphQLMockProps,
-  createApplicationSearchGraphQLMocks,
 } from "@/test/test.gql.utils";
+import { createApplicationSearchGraphQLMocks } from "@/test/test.application.mocks";
 import SeasonalSearch from "@/pages/recurring/[id]";
 import { addYears } from "date-fns";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
