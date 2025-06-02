@@ -277,17 +277,38 @@ export const errorLink = onError(({ graphQLErrors, networkError }) => {
         console.error(`GQL_ERROR: ${JSON.stringify(error, null, 2)}`);
       }
     } else if (networkError) {
+      if (isCSRFError(networkError)) {
+        // don't log CSRF errors to console
+        return;
+      }
       // eslint-disable-next-line no-console
       console.error(`NETWORK_ERROR: ${JSON.stringify(networkError, null, 2)}`);
     }
   }
 });
 
-function toastNetworkError(error: Error | ServerParseError | ServerError) {
+// helper to ignore 403 CSRF errors
+// admin ui has no middleware that could redirect to backend when it's missing
+// in practice this is not a problem because login sets the CSRF token and login page is static
+function isCSRFError(error: Error | ServerParseError | ServerError): boolean {
   const statusCode = "statusCode" in error ? error.statusCode : null;
-  // ignore 403 errors: these are typically caused by CSRF token
-  // admin ui has no middleware that could redirect to backend when it's missing
-  if (statusCode != null && statusCode === 403) {
+
+  if (statusCode === 403) {
+    if ("result" in error && error.result != null) {
+      if (typeof error.result === "object" && "code" in error.result) {
+        const code = error.result.code;
+        if (code === "CSRF_FAILURE") {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+function toastNetworkError(error: Error | ServerParseError | ServerError) {
+  // don't toast CSRF errors
+  if (isCSRFError(error)) {
     return;
   }
 
