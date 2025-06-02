@@ -22,7 +22,7 @@ from tilavarauspalvelu.models import Reservation
 
 from tests.factories import ApplicationFactory, ReservationUnitFactory, UserFactory
 from tests.helpers import TranslationsFromPOFiles
-from tests.test_graphql_api.test_recurring_reservation.helpers import create_reservation_series
+from tests.test_graphql_api.test_reservation_series.helpers import create_reservation_series
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,

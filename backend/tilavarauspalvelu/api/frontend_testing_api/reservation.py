@@ -13,9 +13,9 @@ from tilavarauspalvelu.models import ReservationMetadataField
 from utils.date_utils import local_datetime
 
 from tests.factories import (
-    RecurringReservationFactory,
     ReservationMetadataFieldFactory,
     ReservationMetadataSetFactory,
+    ReservationSeriesFactory,
     ReservationUnitFactory,
     ReservationUnitPricingFactory,
 )
@@ -71,7 +71,7 @@ class TestingReservationParamsSerializer(TestingBaseSerializer):
             self._create_payment_order(validated_data, reservation)
 
         if validated_data["is_part_of_series"]:
-            self._create_recurring_reservation(reservation)
+            self._create_reservation_series(reservation)
 
         return reservation
 
@@ -131,8 +131,8 @@ class TestingReservationParamsSerializer(TestingBaseSerializer):
                 order_builder.set(status=OrderStatus.PAID_MANUALLY)
         order_builder.create()
 
-    def _create_recurring_reservation(self, reservation: Reservation) -> None:
-        recurring_reservation = RecurringReservationFactory.create(
+    def _create_reservation_series(self, reservation: Reservation) -> None:
+        reservation_series = ReservationSeriesFactory.create(
             reservation_unit=reservation.reservation_units.first(),
             user=self.context["user"],
             begin_date=(reservation.begin - datetime.timedelta(days=7)).date(),
@@ -141,7 +141,7 @@ class TestingReservationParamsSerializer(TestingBaseSerializer):
             begin_time=reservation.end.time(),
             weekdays=f"{reservation.begin.weekday()}",
         )
-        reservation.recurring_reservation = recurring_reservation
+        reservation.reservation_series = reservation_series
         reservation.save()
 
 

@@ -36,12 +36,12 @@ from utils.date_utils import (
     next_date_matching_weekday,
 )
 
-from tests.factories import RecurringReservationFactory, RejectedOccurrenceFactory
+from tests.factories import RejectedOccurrenceFactory, ReservationSeriesFactory
 from tests.factories.payment_order import PaymentOrderBuilder
 from tests.factories.reservation import NextDateError, ReservationBuilder
 
 from .create_reservation_related_things import _create_deny_reasons
-from .create_reservation_units import _create_reservation_unit_for_recurring_reservations
+from .create_reservation_units import _create_reservation_unit_for_reservation_series
 from .utils import sample_qs, weighted_choice, with_logs
 
 if TYPE_CHECKING:
@@ -50,9 +50,9 @@ if TYPE_CHECKING:
         AgeGroup,
         City,
         OriginHaukiResource,
-        RecurringReservation,
         ReservationMetadataSet,
         ReservationPurpose,
+        ReservationSeries,
         ReservationUnitCancellationRule,
         TaxPercentage,
         TermsOfUse,
@@ -695,7 +695,7 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
 
 
 @with_logs
-def _create_recurring_reservations(
+def _create_reservation_series(
     metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     cancellation_rules: list[ReservationUnitCancellationRule],
@@ -707,7 +707,7 @@ def _create_recurring_reservations(
 ) -> None:
     user = User.objects.get(username="tvp")
 
-    reservation_unit = _create_reservation_unit_for_recurring_reservations(
+    reservation_unit = _create_reservation_unit_for_reservation_series(
         metadata_sets=metadata_sets,
         terms_of_use=terms_of_use,
         cancellation_rules=cancellation_rules,
@@ -715,7 +715,7 @@ def _create_recurring_reservations(
         tax_percentage=tax_percentage,
     )
 
-    _create_past_recurring_reservation(
+    _create_past_reservation_series(
         name="Viime kauden futistreenit",
         weekdays=[WeekdayChoice.MONDAY],
         reservation_unit=reservation_unit,
@@ -725,7 +725,7 @@ def _create_recurring_reservations(
         cities=cities,
     )
 
-    _create_future_recurring_reservation(
+    _create_future_reservation_series(
         name="Tulevan kauden futistreenit",
         weekdays=[WeekdayChoice.MONDAY],
         reservation_unit=reservation_unit,
@@ -735,7 +735,7 @@ def _create_recurring_reservations(
         cities=cities,
     )
 
-    _create_ongoing_recurring_reservation(
+    _create_ongoing_reservation_series(
         name="Aikuisten treenit kaksi kertaa viikossa",
         weekdays=[WeekdayChoice.WEDNESDAY, WeekdayChoice.FRIDAY],
         reservation_unit=reservation_unit,
@@ -745,7 +745,7 @@ def _create_recurring_reservations(
         cities=cities,
     )
 
-    _create_ongoing_recurring_reservation(
+    _create_ongoing_reservation_series(
         name="Ajoittaiset viikonloppupelit",
         weekdays=[WeekdayChoice.SATURDAY],
         reservation_unit=reservation_unit,
@@ -760,7 +760,7 @@ def _create_recurring_reservations(
 
 
 @with_logs
-def _create_past_recurring_reservation(
+def _create_past_reservation_series(
     name: str,
     weekdays: list[WeekdayChoice],
     reservation_unit: ReservationUnit,
@@ -776,7 +776,7 @@ def _create_past_recurring_reservation(
     today = local_date()
 
     age_group = random.choice(age_groups)
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         name=name,
         #
         begin_date=today - datetime.timedelta(days=90),
@@ -802,7 +802,7 @@ def _create_past_recurring_reservation(
 
 
 @with_logs
-def _create_future_recurring_reservation(
+def _create_future_reservation_series(
     name: str,
     weekdays: list[WeekdayChoice],
     reservation_unit: ReservationUnit,
@@ -818,7 +818,7 @@ def _create_future_recurring_reservation(
     today = local_date()
 
     age_group = random.choice(age_groups)
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         name=name,
         #
         begin_date=today + datetime.timedelta(days=1),
@@ -844,7 +844,7 @@ def _create_future_recurring_reservation(
 
 
 @with_logs
-def _create_ongoing_recurring_reservation(
+def _create_ongoing_reservation_series(
     name: str,
     weekdays: list[WeekdayChoice],
     reservation_unit: ReservationUnit,
@@ -860,7 +860,7 @@ def _create_ongoing_recurring_reservation(
     today = local_date()
 
     age_group = random.choice(age_groups)
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         name=name,
         #
         begin_date=today - datetime.timedelta(days=30),
@@ -886,7 +886,7 @@ def _create_ongoing_recurring_reservation(
 
 
 def _create_reservations_for_series(
-    series: RecurringReservation,
+    series: ReservationSeries,
     reservation_purposes: list[ReservationPurpose],
     cities: list[City],
     age_group: AgeGroup,
@@ -928,7 +928,7 @@ def _create_reservations_for_series(
                 .for_reservation_unit(series.reservation_unit)
                 .for_nonprofit()
                 .build(
-                    recurring_reservation=series,
+                    reservation_series=series,
                     #
                     begin=begin,
                     end=end,
@@ -1000,7 +1000,7 @@ def _create_reservations_for_series(
             occurrence = RejectedOccurrenceFactory.build(
                 begin_datetime=reservation.begin,
                 end_datetime=reservation.end,
-                recurring_reservation=reservation.recurring_reservation,
+                reservation_series=reservation.reservation_series,
                 created_at=local_datetime(),
             )
             occurrences.append(occurrence)

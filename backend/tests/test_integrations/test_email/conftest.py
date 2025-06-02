@@ -11,8 +11,8 @@ from utils.date_utils import local_datetime
 
 from tests.factories import (
     ApplicationSectionFactory,
-    RecurringReservationFactory,
     ReservationFactory,
+    ReservationSeriesFactory,
     ReservationUnitFactory,
 )
 
@@ -40,7 +40,7 @@ def email_reservation() -> Reservation:
         application__application_round__name_en="[KAUSIVARAUSKIERROKSEN NIMI]",
         application__organisation__name_en="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
     )
-    recurring_reservation = RecurringReservationFactory.create(
+    reservation_series = ReservationSeriesFactory.create(
         reservation_unit=reservation_unit,
         weekdays=f"{WeekdayChoice.MONDAY}",
         begin_date=datetime.date(2024, 1, 1),
@@ -60,13 +60,13 @@ def email_reservation() -> Reservation:
         deny_reason__reason_en="[HYLKÄYKSEN SYY]",
         begin=local_datetime(2024, 1, 1, 12, 0),
         end=local_datetime(2024, 1, 1, 15, 0),
-        recurring_reservation=recurring_reservation,
+        reservation_series=reservation_series,
         price=Decimal("12.30"),
         non_subsidised_price=Decimal("12.30"),
         tax_percentage_value=Decimal("25.5"),
     )
 
-    recurring_reservation_2 = RecurringReservationFactory.create(
+    reservation_series_2 = ReservationSeriesFactory.create(
         reservation_unit=reservation_unit,
         weekdays=f"{WeekdayChoice.TUESDAY}",
         begin_date=datetime.date(2024, 1, 2),
@@ -85,7 +85,7 @@ def email_reservation() -> Reservation:
         deny_reason__reason_en="[HYLKÄYKSEN SYY]",
         begin=local_datetime(2024, 1, 2, 12, 0),
         end=local_datetime(2024, 1, 2, 15, 0),
-        recurring_reservation=recurring_reservation_2,
+        reservation_series=reservation_series_2,
     )
 
     return reservation

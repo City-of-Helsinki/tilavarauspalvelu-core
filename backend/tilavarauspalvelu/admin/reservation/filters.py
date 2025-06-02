@@ -16,15 +16,15 @@ if TYPE_CHECKING:
 __all__ = [
     "AccessCodeGeneratedFilter",
     "PaidReservationListFilter",
-    "RecurringReservationListFilter",
+    "ReservationSeriesListFilter",
     "ReservationUnitFilter",
     "UnitFilter",
 ]
 
 
-class RecurringReservationListFilter(admin.SimpleListFilter):
-    title = _("Recurring reservation")
-    parameter_name = "recurring_reservation"
+class ReservationSeriesListFilter(admin.SimpleListFilter):
+    title = _("reservation series")
+    parameter_name = "reservation_series"
 
     def lookups(self, *args: Any) -> list[tuple[str, str]]:
         return [
@@ -34,9 +34,9 @@ class RecurringReservationListFilter(admin.SimpleListFilter):
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet[Reservation]) -> QuerySet[Reservation]:
         if self.value() == "1":
-            return queryset.filter(recurring_reservation__isnull=False)
+            return queryset.filter(reservation_series__isnull=False)
         if self.value() == "0":
-            return queryset.filter(recurring_reservation__isnull=True)
+            return queryset.filter(reservation_series__isnull=True)
         return queryset
 
 

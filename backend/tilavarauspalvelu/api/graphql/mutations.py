@@ -47,15 +47,6 @@ from .types.equipment_category.mutations import (
     EquipmentCategoryUpdateMutation,
 )
 from .types.purpose.mutations import PurposeCreateMutation, PurposeUpdateMutation
-from .types.recurring_reservation.mutations import (
-    ReservationSeriesAddMutation,
-    ReservationSeriesChangeAccessCodeMutation,
-    ReservationSeriesCreateMutation,
-    ReservationSeriesDenyMutation,
-    ReservationSeriesRepairAccessCodeMutation,
-    ReservationSeriesRescheduleMutation,
-    ReservationSeriesUpdateMutation,
-)
 from .types.reservation.mutations import (
     ReservationAdjustTimeMutation,
     ReservationApproveMutation,
@@ -74,6 +65,15 @@ from .types.reservation.mutations import (
     ReservationStaffRepairAccessCodeMutation,
     ReservationUpdateMutation,
     ReservationWorkingMemoMutation,
+)
+from .types.reservation_series.mutations import (
+    ReservationSeriesAddMutation,
+    ReservationSeriesChangeAccessCodeMutation,
+    ReservationSeriesCreateMutation,
+    ReservationSeriesDenyMutation,
+    ReservationSeriesRepairAccessCodeMutation,
+    ReservationSeriesRescheduleMutation,
+    ReservationSeriesUpdateMutation,
 )
 from .types.reservation_unit.mutations import ReservationUnitCreateMutation, ReservationUnitUpdateMutation
 from .types.reservation_unit_image.mutations import (

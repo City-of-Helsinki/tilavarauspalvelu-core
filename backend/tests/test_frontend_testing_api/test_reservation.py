@@ -80,7 +80,7 @@ def test_frontend_api__reservation__set_datetime__default_options(api_client):
     reservation = Reservation.objects.first()
     assert reservation.begin == local_datetime(2022, 1, 2, 12)
     assert reservation.state == ReservationStateChoice.CONFIRMED
-    assert reservation.recurring_reservation is None
+    assert reservation.reservation_series is None
 
     pricing = ReservationUnitPricing.objects.first()
     assert pricing.highest_price == 0
@@ -118,7 +118,7 @@ def test_frontend_api__reservation__set_datetime__non_default_options(api_client
     reservation = Reservation.objects.first()
     assert reservation.begin == local_datetime(2029, 12, 31, 00)
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
-    assert reservation.recurring_reservation is not None
+    assert reservation.reservation_series is not None
 
     assert ReservationUnitPricing.objects.count() == 1
     pricing = ReservationUnitPricing.objects.first()

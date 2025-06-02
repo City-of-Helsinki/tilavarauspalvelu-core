@@ -12,7 +12,7 @@ from utils.lazy import LazyModelAttribute, LazyModelManager
 if TYPE_CHECKING:
     import datetime
 
-    from tilavarauspalvelu.models import RecurringReservation
+    from tilavarauspalvelu.models import ReservationSeries
 
     from .actions import RejectedOccurrenceActions
     from .queryset import RejectedOccurrenceManager
@@ -30,8 +30,8 @@ class RejectedOccurrence(models.Model):
     rejection_reason: str = StrChoiceField(enum=RejectionReadinessChoice)
     created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
 
-    recurring_reservation: RecurringReservation = models.ForeignKey(
-        "tilavarauspalvelu.RecurringReservation",
+    reservation_series: ReservationSeries = models.ForeignKey(
+        "tilavarauspalvelu.ReservationSeries",
         related_name="rejected_occurrences",
         on_delete=models.CASCADE,
     )

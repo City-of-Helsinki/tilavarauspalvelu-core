@@ -13,7 +13,7 @@ from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraAccessCod
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
-from tests.factories import RecurringReservationFactory, ReservationFactory
+from tests.factories import ReservationFactory, ReservationSeriesFactory
 from tests.helpers import patch_method
 
 from .helpers import CHANGE_ACCESS_CODE_STAFF_MUTATION
@@ -194,7 +194,7 @@ def test_staff_change_access_code__in_series(graphql):
         access_code_is_active=True,
         begin=local_datetime() + datetime.timedelta(hours=1),
         end=local_datetime() + datetime.timedelta(hours=2),
-        recurring_reservation=RecurringReservationFactory.create(),
+        reservation_series=ReservationSeriesFactory.create(),
     )
 
     data = {

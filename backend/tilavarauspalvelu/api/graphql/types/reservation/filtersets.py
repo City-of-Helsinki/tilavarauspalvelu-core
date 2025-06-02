@@ -37,7 +37,7 @@ class ReservationFilterSet(ModelFilterSet):
     unit = IntMultipleChoiceFilter(field_name="reservation_units__unit")
     user = IntMultipleChoiceFilter(field_name="user")
     reservation_unit_type = IntMultipleChoiceFilter(field_name="reservation_units__reservation_unit_type")
-    recurring_reservation = IntMultipleChoiceFilter(field_name="recurring_reservation")
+    reservation_series = IntMultipleChoiceFilter(field_name="reservation_series")
 
     reservation_unit_name_fi = django_filters.CharFilter(method="filter_by_reservation_unit_name")
     reservation_unit_name_en = django_filters.CharFilter(method="filter_by_reservation_unit_name")
@@ -53,7 +53,7 @@ class ReservationFilterSet(ModelFilterSet):
     price_lte = django_filters.NumberFilter(field_name="price", lookup_expr="lte")
 
     applying_for_free_of_charge = django_filters.BooleanFilter(field_name="applying_for_free_of_charge")
-    is_recurring = django_filters.BooleanFilter(field_name="recurring_reservation", lookup_expr="isnull", exclude=True)
+    is_recurring = django_filters.BooleanFilter(field_name="reservation_series", lookup_expr="isnull", exclude=True)
     requested = django_filters.BooleanFilter(method="filter_by_requested")
     only_with_permission = django_filters.BooleanFilter(method="filter_by_only_with_permission")
     only_with_handling_permission = django_filters.BooleanFilter(method="filter_by_only_with_handling_permission")
@@ -191,7 +191,7 @@ class ReservationFilterSet(ModelFilterSet):
                 "user__email",
                 "user__first_name",
                 "user__last_name",
-                "recurring_reservation__name",
+                "reservation_series__name",
             )
             return text_search(qs=qs, fields=fields, text=value)
 

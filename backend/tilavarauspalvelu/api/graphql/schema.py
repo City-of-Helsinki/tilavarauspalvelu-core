@@ -99,13 +99,13 @@ from .queries import (
     PaymentOrderNode,
     PermissionCheckerType,
     PurposeNode,
-    RecurringReservationNode,
     RejectedOccurrenceNode,
     ReservationCancelReasonType,
     ReservationDenyReasonNode,
     ReservationMetadataSetNode,
     ReservationNode,
     ReservationPurposeNode,
+    ReservationSeriesNode,
     ReservationUnitAllNode,
     ReservationUnitCancellationRuleNode,
     ReservationUnitNode,
@@ -197,8 +197,8 @@ class Query(graphene.ObjectType):
             description="Reservations should contain at least one these reservation units.",
         ),
     )
-    recurring_reservation = RecurringReservationNode.Node()
-    recurring_reservations = RecurringReservationNode.Connection()
+    reservation_series = ReservationSeriesNode.Node()
+    paged_reservation_series = ReservationSeriesNode.Connection()
     rejected_occurrence = RejectedOccurrenceNode.Node()
     rejected_occurrences = RejectedOccurrenceNode.Connection()
     reservation_cancel_reasons = Field(graphene.List(graphene.NonNull(ReservationCancelReasonType)), required=True)

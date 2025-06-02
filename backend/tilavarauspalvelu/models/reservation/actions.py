@@ -246,7 +246,7 @@ class ReservationActions:
 
     def get_application_section(self) -> ApplicationSection | None:
         return ApplicationSection.objects.filter(
-            reservation_unit_options__allocated_time_slots__recurring_reservation__reservations=self.reservation
+            reservation_unit_options__allocated_time_slots__reservation_series__reservations=self.reservation
         ).first()
 
     def get_state_on_reservation_confirmed(self, payment_type: PaymentType | None) -> ReservationStateChoice:

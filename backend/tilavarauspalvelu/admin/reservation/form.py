@@ -84,7 +84,7 @@ class ReservationAdminForm(forms.ModelForm):
             "billing_address_zip": _("Billing address zip code"),
             #
             "user": _("User"),
-            "recurring_reservation": _("Recurring reservation"),
+            "reservation_series": _("Recurring reservation"),
             "deny_reason": _("Reason for deny"),
             "cancel_reason": _("Reason for cancellation"),
             "purpose": _("Reservation purpose"),
@@ -147,7 +147,7 @@ class ReservationAdminForm(forms.ModelForm):
             "billing_address_zip": _("Billing address zip code"),
             #
             "user": _("User who made the reservation"),
-            "recurring_reservation": _("Recurring reservation"),
+            "reservation_series": _("Recurring reservation"),
             "deny_reason": _("Reason for denying the reservation"),
             "cancel_reason": _("Reason for cancelling the reservation"),
             "purpose": _("Purpose of the reservation"),
