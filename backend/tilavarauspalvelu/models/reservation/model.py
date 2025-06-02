@@ -48,7 +48,6 @@ __all__ = [
 class Reservation(SerializableMixin, models.Model):
     # Basic information
     ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
-    sku: str = models.CharField(max_length=255, blank=True, default="")
     name: str = models.CharField(max_length=255, blank=True, default="")
     description: str = models.CharField(max_length=255, blank=True, default="")
     num_persons: int | None = models.PositiveIntegerField(null=True, blank=True)

@@ -47,7 +47,6 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
         model = ReservationUnit
 
     # IDs
-    sku = FakerFI("word")
     uuid = factory.LazyFunction(uuid.uuid4)  # For Verkkokauppa and Hauki APIs
     rank = factory.Sequence(lambda n: n)
 
