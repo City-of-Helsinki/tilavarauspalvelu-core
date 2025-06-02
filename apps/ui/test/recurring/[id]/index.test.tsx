@@ -2,9 +2,9 @@ import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
 import {
   createMockApplicationRound,
-  CreateGraphQLMockProps,
-} from "@/test/test.gql.utils";
-import { createApplicationSearchGraphQLMocks } from "@/test/test.application.mocks";
+  createApplicationSearchGraphQLMocks,
+} from "@test/application.mocks";
+import { CreateGraphQLMockProps } from "@/test/test.gql.utils";
 import SeasonalSearch from "@/pages/recurring/[id]";
 import { addYears } from "date-fns";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";

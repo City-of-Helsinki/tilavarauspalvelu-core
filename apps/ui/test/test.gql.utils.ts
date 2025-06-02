@@ -1,14 +1,13 @@
 import {
-  type ApplicationRoundFieldsFragment,
-  ApplicationRoundStatusChoice,
   type IsReservableFieldsFragment,
   type OptionsQuery,
   ReservationStartInterval,
+  ReservationUnitTypeNode,
   type TermsOfUseFieldsFragment,
   TermsType,
 } from "@/gql/gql-types";
 import { base64encode } from "common/src/helpers";
-import { addDays, addMonths, addYears } from "date-fns";
+import { addDays } from "date-fns";
 import { type DocumentNode } from "graphql";
 import { type TFunction } from "i18next";
 import { getDurationOptions } from "@/modules/const";
@@ -121,6 +120,8 @@ type MockReservationUnitProps = {
   reservationsMaxDaysBefore?: number | null;
 };
 /// create a mock for IsReservableFragment (not a full reservation unit)
+// TODO use the version in (in application.mocks.ts)
+// or alternatively move it to reservation-unit.mocks.ts
 export function createMockReservationUnit({
   bufferTimeBefore = 0,
   bufferTimeAfter = 0,
@@ -145,67 +146,17 @@ export function createMockReservationUnit({
   return reservationUnit;
 }
 
-export function createMockApplicationRound({
-  pk = 1,
-  status = ApplicationRoundStatusChoice.Open,
-  applicationPeriodEnd = new Date(2024, 0, 1, 0, 0, 0),
-  applicationPeriodBegin = addYears(new Date(2024, 0, 1, 0, 0, 0), 1),
-}: {
-  pk?: number;
-  status?: ApplicationRoundStatusChoice;
-  applicationPeriodEnd?: Date;
-  applicationPeriodBegin?: Date;
-} = {}): Readonly<ApplicationRoundFieldsFragment> {
-  // There is an implicit relation between reservationPeriodBegin and SearchQuery
-  // so not mocking reservationPeriodBegin will break search query mock
-  if (applicationPeriodBegin.getMilliseconds() !== 0) {
-    throw new Error(
-      "Application period millis should be 0. You most likely you forgot to set a mock date"
-    );
-  }
-  const reservationPeriodBegin = addMonths(applicationPeriodBegin, 1);
-  return {
-    id: base64encode(`ApplicationRoundNode:${pk}`),
-    pk,
-    nameFi: `ApplicationRound ${pk} FI`,
-    nameSv: `ApplicationRound ${pk} SV`,
-    nameEn: `ApplicationRound ${pk} EN`,
-    status,
-    // TODO these are not all DateTime
-    // some are DateTime (ISO), some are just Date
-    reservationPeriodBegin: reservationPeriodBegin.toISOString(),
-    reservationPeriodEnd: addYears(reservationPeriodBegin, 1).toISOString(),
-    publicDisplayBegin: applicationPeriodBegin.toISOString(),
-    publicDisplayEnd: applicationPeriodEnd.toISOString(),
-    applicationPeriodBegin: applicationPeriodBegin.toISOString(),
-    applicationPeriodEnd: applicationPeriodEnd.toISOString(),
-    criteriaFi: null,
-    criteriaEn: null,
-    criteriaSv: null,
-    notesWhenApplyingFi: null,
-    notesWhenApplyingEn: null,
-    notesWhenApplyingSv: null,
-    reservationUnits: [1, 2, 3].map((pk) => ({
-      id: base64encode(`ReservationUnitNode:${pk}`),
-      pk,
-      unit: {
-        id: base64encode(`UnitNode:${pk}`),
-        pk,
-      },
-    })),
-  };
-}
-
 export function createMockReservationUnitType(
   props: { name: string; pk?: number } | null
-) {
+): ReservationUnitTypeNode | null {
   if (props == null) {
     return null;
   }
-  const { name, pk } = props;
+  const { name, pk = 1 } = props;
   return {
-    id: `ReservationUnitTypeNode:${pk ?? 1}`,
-    pk: pk ?? 1,
+    id: `ReservationUnitTypeNode:${pk}`,
+    pk,
+    rank: pk,
     ...generateNameFragment(name),
   };
 }
@@ -217,6 +168,15 @@ export function generateNameFragment(name: string) {
     nameEn: `${name} EN`,
   };
 }
+
+export function generateDescriptionFragment(description: string) {
+  return {
+    descriptionFi: `${description} FI`,
+    descriptionSv: `${description} SV`,
+    descriptionEn: `${description} EN`,
+  };
+}
+
 export function generateTextFragment(text: string) {
   return {
     textFi: `${text} FI`,
