@@ -2,15 +2,15 @@ import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { render, within } from "@testing-library/react";
 import {
   createMockApplicationRound,
-  type CreateGraphQLMockProps,
-} from "@/test/test.gql.utils";
-import { createApplicationSearchGraphQLMocks } from "@/test/test.application.mocks";
+  createApplicationSearchGraphQLMocks,
+} from "@test/application.mocks";
+import { type CreateGraphQLMockProps } from "@test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
 import {
   ReservationUnitModalContent,
   type ReservationUnitModalProps,
 } from "./ReservationUnitModalContent";
-import { MockedGraphQLProvider } from "@/test/test.react.utils";
+import { MockedGraphQLProvider } from "@test/test.react.utils";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
   const params = vi.fn();

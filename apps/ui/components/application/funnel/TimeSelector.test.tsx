@@ -8,7 +8,7 @@ import { TimeSelector } from "./TimeSelector";
 import {
   createMockApplicationFragment,
   type CreateMockApplicationFragmentProps,
-} from "@/test/test.application.mocks";
+} from "@test/application.mocks";
 import { type ApplicationPage2Query, Priority } from "@/gql/gql-types";
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
