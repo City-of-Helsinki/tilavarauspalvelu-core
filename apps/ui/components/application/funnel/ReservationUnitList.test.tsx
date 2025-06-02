@@ -1,8 +1,8 @@
 import {
   type CreateGraphQLMockProps,
   generateNameFragment,
-} from "@/test/test.gql.utils";
-import { createApplicationSearchGraphQLMocks } from "@/test/test.application.mocks";
+} from "@test/test.gql.utils";
+import { createApplicationSearchGraphQLMocks } from "@test/application.mocks";
 import { render, within } from "@testing-library/react";
 import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { ReservationUnitList } from "./ReservationUnitList";
@@ -11,7 +11,7 @@ import {
   ImageType,
 } from "@/gql/gql-types";
 import { base64encode } from "common/src/helpers";
-import { MockedGraphQLProvider } from "@/test/test.react.utils";
+import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import userEvent from "@testing-library/user-event";
 

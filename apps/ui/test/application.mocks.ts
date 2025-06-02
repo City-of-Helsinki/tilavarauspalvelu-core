@@ -1,11 +1,15 @@
 import {
+  type AgeGroupNode,
   ApplicantTypeChoice,
-  type ApplicationFormFragment,
   type ApplicationPage2Query,
+  type ApplicationRoundNode,
+  ApplicationRoundReservationCreationStatusChoice,
   ApplicationRoundStatusChoice,
+  type ApplicationRoundTimeSlotNode,
   ApplicationSectionStatusChoice,
   ApplicationStatusChoice,
   type ApplicationViewFragment,
+  Authentication,
   CreateApplicationDocument,
   type CreateApplicationMutationResult,
   type CreateApplicationMutationVariables,
@@ -15,24 +19,30 @@ import {
   type OptionsQuery,
   OrganizationTypeChoice,
   Priority,
+  type PurposeNode,
   ReservationKind,
   ReservationPurposeOrderingChoices,
+  ReservationStartInterval,
+  type ReservationUnitNode,
   ReservationUnitOrderingChoices,
+  ReservationUnitPublishingState,
+  ReservationUnitReservationState,
   ReservationUnitTypeOrderingChoices,
   SearchReservationUnitsDocument,
   type SearchReservationUnitsQuery,
   type SearchReservationUnitsQueryVariables,
   TermsType,
-  type TimeSelectorFragment,
+  type UnitNode,
   UpdateApplicationDocument,
   type UpdateApplicationMutation,
   Weekday,
 } from "@/gql/gql-types";
 import { base64encode } from "common/src/helpers";
-import { addDays, addYears } from "date-fns";
+import { addDays, addMonths, addYears } from "date-fns";
 import {
   createMockReservationUnitType,
   createOptionQueryMock,
+  generateDescriptionFragment,
   generateNameFragment,
   generateTextFragment,
   type CreateGraphQLMockProps,
@@ -49,8 +59,8 @@ export function createApplicationSearchGraphQLMocks({
   const SearchReservationUnitsQueryMock: SearchReservationUnitsQuery = {
     reservationUnits: {
       totalCount: 10,
-      edges: Array.from({ length: 10 }, (_, i) => ({
-        node: createSearchQueryNode(i + 1),
+      edges: Array.from({ length: 10 }, (_, i) => i + 1).map((pk) => ({
+        node: createMockReservationUnit({ pk }),
       })),
       pageInfo: {
         // TOOD how to mock this?
@@ -65,7 +75,7 @@ export function createApplicationSearchGraphQLMocks({
         totalCount: 1,
         edges: [
           {
-            node: createSearchQueryNode(1),
+            node: createMockReservationUnit({ pk: 1 }),
           },
         ],
         pageInfo: {
@@ -190,41 +200,6 @@ export function createGraphQLApplicationIdMock(): CreateGraphQLMocksReturn {
   ];
 }
 
-function createSearchQueryNode(
-  i: number
-): NonNullable<
-  NonNullable<SearchReservationUnitsQuery["reservationUnits"]>["edges"][number]
->["node"] {
-  return {
-    id: base64encode(`ReservationUnitNode:${i}`),
-    pk: i,
-    nameFi: `ReservationUnit ${i} FI`,
-    nameEn: `ReservationUnit ${i} EN`,
-    nameSv: `ReservationUnit ${i} SV`,
-    reservationBegins: addYears(new Date(), -1 * i).toISOString(),
-    reservationEnds: addYears(new Date(), 1 * i).toISOString(),
-    isClosed: false,
-    // TODO implement though for Seasonal this doesn't matter
-    firstReservableDatetime: null,
-    currentAccessType: null,
-    effectiveAccessType: null,
-    maxPersons: null,
-    // TODO implement though for Seasonal this doesn't matter
-    pricings: [],
-    unit: {
-      id: base64encode(`UnitNode:${i}`),
-      nameFi: `Unit ${i} FI`,
-      nameEn: `Unit ${i} EN`,
-      nameSv: `Unit ${i} SV`,
-    },
-    reservationUnitType: createMockReservationUnitType({
-      name: "ReservationUnitType",
-    }),
-    images: [],
-    accessTypes: [],
-  };
-}
-
 function createSearchVariablesMock({
   textSearch = null,
   date = new Date(2024, 1, 1),
@@ -264,6 +239,145 @@ function createSearchVariablesMock({
   } as const;
 }
 
+function createMockReservationUnit({
+  pk,
+}: {
+  pk: number;
+}): ReservationUnitNode {
+  const timeSelector: ApplicationRoundTimeSlotNode = {
+    id: base64encode(`ApplicationRoundTimeSlotNode:1`),
+    pk,
+    weekday: 1,
+    closed: false,
+    reservableTimes: [
+      {
+        begin: "08:00",
+        end: "16:00",
+      },
+    ],
+  };
+  return {
+    id: base64encode(`ReservationUnitNode:${pk}`),
+    pk,
+    ...generateNameFragment(`ReservationUnit ${pk}`),
+    // TODO this is weird
+    reservationBegins: addYears(new Date(), -1 * pk).toISOString(),
+    reservationEnds: addYears(new Date(), 1 * pk).toISOString(),
+    isClosed: false,
+    // TODO implement though for Seasonal this doesn't matter
+    firstReservableDatetime: null,
+    currentAccessType: null,
+    effectiveAccessType: null,
+    maxPersons: null,
+    // TODO implement though for Seasonal this doesn't matter
+    pricings: [],
+    unit: createMockUnit({ pk }),
+    reservationUnitType: createMockReservationUnitType({
+      name: "ReservationUnitType",
+    }),
+    images: [],
+    accessTypes: [],
+    // Everything below is only for completeness of the mock type (not used for application tests)
+    // TODO this can be removed
+    allowReservationsWithoutOpeningHours: false,
+    // applicationRoundTimeSlots: [] as const, // ReadonlyArray<ApplicationRoundTimeSlotNode>;
+    applicationRoundTimeSlots: [timeSelector],
+    applicationRounds: [] as const, // ReadonlyArray<ApplicationRoundNode>;
+    authentication: Authentication.Weak,
+    bufferTimeAfter: 0, //Scalars["Duration"]["output"];
+    bufferTimeBefore: 0, // Scalars["Duration"]["output"];
+    calculatedSurfaceArea: 0, // Scalars["Int"]["output"];
+    canApplyFreeOfCharge: false, // Scalars["Boolean"]["output"];
+    cancellationRule: null, // Maybe<ReservationUnitCancellationRuleNode>;
+    cancellationTerms: null, // Maybe<TermsOfUseNode>;
+    contactInformation: "", // admin-ui only feature
+    descriptionEn: "Description EN",
+    descriptionFi: "Description FI",
+    descriptionSv: "Description SV",
+    equipments: [] as const, // ReadonlyArray<EquipmentNode>;
+    haukiUrl: null, // Maybe<Scalars["String"]["output"]>;
+    isArchived: false,
+    isDraft: false,
+    location: null,
+    maxReservationDuration: null, // Maybe<Scalars["Duration"]["output"]>;
+    maxReservationsPerUser: null, //Maybe<Scalars["Int"]["output"]>;
+    metadataSet: null, //Maybe<ReservationMetadataSetNode>;
+    minPersons: null, //Maybe<Scalars["Int"]["output"]>;
+    minReservationDuration: null, // Maybe<Scalars["Duration"]["output"]>;
+    numActiveUserReservations: 0, // Scalars["Int"]["output"];
+    paymentMerchant: null, //Maybe<PaymentMerchantNode>;
+    paymentProduct: null, //Maybe<PaymentProductNode>;
+    paymentTerms: null, // Maybe<TermsOfUseNode>;
+    pricingTerms: null, //Maybe<TermsOfUseNode>;
+    publishBegins: null, // Maybe<Scalars["DateTime"]["output"]>;
+    publishEnds: null, // Maybe<Scalars["DateTime"]["output"]>;
+    publishingState: ReservationUnitPublishingState.Published,
+    purposes: [] as const, // ReadonlyArray<PurposeNode>;
+    qualifiers: [] as const, // ReadonlyArray<QualifierNode>;
+    rank: pk, // Scalars["Int"]["output"];
+    requireAdultReservee: true, // Scalars["Boolean"]["output"];
+    requireReservationHandling: false, // Scalars["Boolean"]["output"];
+    reservableTimeSpans: [] as const, // Maybe<ReadonlyArray<ReservableTimeSpanType>>;
+    reservationBlockWholeDay: false, // Scalars["Boolean"]["output"];
+    reservationCancelledInstructionsEn:
+      null /* Maybe< Scalars["String"]["output"] >;*/,
+    reservationCancelledInstructionsFi: null, // Maybe< Scalars["String"]["output"] >;
+    reservationCancelledInstructionsSv: null, // Maybe< Scalars["String"]["output"] >;
+    reservationConfirmedInstructionsEn: null, // Maybe< Scalars["String"]["output"] >;
+    reservationConfirmedInstructionsFi: null, // Maybe< Scalars["String"]["output"] >;
+    reservationConfirmedInstructionsSv: null, // Maybe< Scalars["String"]["output"] >;
+    reservationKind: ReservationKind.DirectAndSeason,
+    reservationPendingInstructionsEn: null, // Maybe<Scalars["String"]["output"]>;
+    reservationPendingInstructionsFi: null, // Maybe<Scalars["String"]["output"]>;
+    reservationPendingInstructionsSv: null, // Maybe<Scalars["String"]["output"]>;
+    reservationStartInterval: ReservationStartInterval.Interval_30Mins,
+    reservationState: ReservationUnitReservationState.Reservable,
+    reservations: null, //Maybe<ReadonlyArray<ReservationNode>>;
+    reservationsMaxDaysBefore: null, // Maybe<Scalars["Int"]["output"]>;
+    reservationsMinDaysBefore: null, // Maybe<Scalars["Int"]["output"]>;
+    resources: [] as const, // ReadonlyArray<ResourceNode>;
+    searchTerms: [] as const, // ReadonlyArray<Scalars["String"]["output"]>;
+    serviceSpecificTerms: null, // Maybe<TermsOfUseNode>;
+    spaces: [] as const, // ReadonlyArray<SpaceNode>;
+    surfaceArea: null, // Maybe<Scalars["Int"]["output"]>;
+    termsOfUseEn: null, // Maybe<Scalars["String"]["output"]>;
+    termsOfUseFi: null, // Maybe<Scalars["String"]["output"]>;
+    termsOfUseSv: null, // Maybe<Scalars["String"]["output"]>;
+    uuid: "dummy-uuid", // Scalars["UUID"]["output"];
+  };
+}
+
+function createMockUnit({ pk }: { pk: number }): UnitNode {
+  return {
+    id: base64encode(`UnitNode:${pk}`),
+    pk, // Maybe<Scalars["Int"]["output"]>;
+    ...generateNameFragment(`Unit ${pk}`),
+    ...generateDescriptionFragment(`Unit Description ${pk}`),
+    email: "", // Scalars["String"]["output"];
+    location: null, // Maybe<LocationNode>;
+    paymentMerchant: null, // Maybe<PaymentMerchantNode>;
+    phone: "", // Scalars["String"]["output"];
+    reservationUnits: [] as const, // ReadonlyArray<ReservationUnitNode>;
+    shortDescriptionEn: `Short description ${pk} EN`, // Scalars["String"]["output"];
+    shortDescriptionFi: `Short description ${pk} FI`, // Scalars["String"]["output"];
+    shortDescriptionSv: `Short description ${pk} SV`, // Scalars["String"]["output"];
+    spaces: [] as const, //; ReadonlyArray<SpaceNode>;
+    tprekId: null, // Maybe<Scalars["String"]["output"]>;
+    unitGroups: [] as const, // ReadonlyArray<UnitGroupNode>;
+    webPage: "", // Scalars["String"]["output"];
+  };
+}
+
+function createMockReservationUnits({
+  nReservationUnits = 1,
+}: {
+  nReservationUnits?: number;
+}): Array<ReservationUnitNode> {
+  return Array.from({ length: nReservationUnits }, (_, i) =>
+    createMockReservationUnit({ pk: i + 1 })
+  );
+}
+
 type ApplicationMockType = NonNullable<ApplicationPage2Query["application"]>;
 type ApplicationSectionMockType = NonNullable<
   ApplicationMockType["applicationSections"]
@@ -284,7 +398,7 @@ function createMockApplicationSection({
   const reservationUnitOptions: ApplicationSectionMockType["reservationUnitOptions"] =
     page !== "page0"
       ? Array.from({ length: nReservationUnitOptions }).map((_, i) =>
-          createReservationUnitOption({ order: i + 1, page })
+          createReservationUnitOption({ order: i + 1 })
         )
       : [];
 
@@ -323,19 +437,32 @@ function createMockApplicationSection({
     reservationsBeginDate: addDays(new Date(), 1).toISOString(),
     reservationsEndDate: addDays(new Date(), 30 + 1).toISOString(),
     appliedReservationsPerWeek: 1,
-    ageGroup: {
-      id: base64encode(`AgeGroupNode:1`),
-      pk: 1,
-      minimum: 1,
-      maximum: null,
-    },
-    purpose: {
-      id: base64encode(`PurposeNode:1`),
-      pk: 1,
-      ...generateNameFragment("PurposeNode"),
-    },
+    ageGroup: createMockAgeGroupNode(),
+    purpose: createMockPurposeNode(),
     reservationUnitOptions,
     ...page2Data,
+  };
+}
+
+function createMockAgeGroupNode({
+  pk = 1,
+}: { pk?: number } = {}): AgeGroupNode {
+  return {
+    id: base64encode(`AgeGroupNode:1`),
+    pk,
+    minimum: 1,
+    maximum: null,
+  };
+}
+
+function createMockPurposeNode({ pk = 1 }: { pk?: number } = {}): PurposeNode {
+  return {
+    id: base64encode(`PurposeNode:1`),
+    pk,
+    rank: pk,
+    ...generateNameFragment("PurposeNode"),
+    imageUrl: null,
+    smallUrl: null,
   };
 }
 
@@ -343,35 +470,11 @@ type CreateReservationUnitOption =
   ApplicationSectionMockType["reservationUnitOptions"][0];
 function createReservationUnitOption({
   order,
-  page,
 }: {
   order: number;
-  page: PageOptions;
 }): CreateReservationUnitOption {
-  const timeSelector: TimeSelectorFragment = {
-    id: base64encode(`ApplicationRoundTimeSlotNode:1`),
-    weekday: 1,
-    closed: false,
-    reservableTimes: [
-      {
-        begin: "08:00",
-        end: "16:00",
-      },
-    ],
-  };
-
-  // NOTE even though the queries for other pages than page2 don't include most of this
-  // typing becomes too complicated if we don't include it (use empty time slots array)
-  const reservationUnit: CreateReservationUnitOption["reservationUnit"] = {
-    id: base64encode(`ReservationUnitNode:${order}`),
-    pk: order,
-    ...generateNameFragment(`Reservation Unit ${order}`),
-    unit: {
-      id: base64encode(`UnitNode:1`),
-      ...generateNameFragment("Unit"),
-    },
-    applicationRoundTimeSlots: page === "page2" ? [timeSelector] : [],
-  };
+  const reservationUnit: CreateReservationUnitOption["reservationUnit"] =
+    createMockReservationUnit({ pk: order });
   return {
     id: base64encode(`ReservationUnitOptionNode:1`),
     pk: order,
@@ -397,8 +500,6 @@ export function createMockApplicationFragment({
   status = ApplicationStatusChoice.Draft,
   nReservationUnitOptions = 1,
 }: CreateMockApplicationFragmentProps = {}): ApplicationMockType {
-  const now = new Date();
-
   const page3Data = {
     applicantType: ApplicantTypeChoice.Association,
     additionalInformation: null,
@@ -461,34 +562,65 @@ export function createMockApplicationFragment({
           homeCity: null,
         }),
   };
-  const reservationUnits: ApplicationFormFragment["applicationRound"]["reservationUnits"] =
-    Array.from({ length: 10 }, (_, i) => ({
-      id: base64encode(`ReservationUnitNode:${i}`),
-      pk: i,
-      ...generateNameFragment("ReservationUnitNode"),
-      minPersons: 1,
-      maxPersons: 10,
-      images: [],
-      unit: {
-        id: base64encode(`UnitNode:${i}`),
-        pk: i,
-        ...generateNameFragment("UnitNode"),
-      },
-      accessTypes: [],
-    }));
   return {
     ...MockApplicationForm,
-    applicationRound: {
-      id: base64encode("ApplicationRoundNode:1"),
-      notesWhenApplyingFi: notesWhenApplying ? `${notesWhenApplying} FI` : null,
-      notesWhenApplyingEn: notesWhenApplying ? `${notesWhenApplying} EN` : null,
-      notesWhenApplyingSv: notesWhenApplying ? `${notesWhenApplying} SV` : null,
-      reservationPeriodBegin: addDays(now, 1).toISOString(),
-      reservationPeriodEnd: addDays(now, 30 + 1).toISOString(),
-      pk: 1,
-      reservationUnits,
-      ...generateNameFragment("ApplicationRoundNode"),
-    },
+    applicationRound: createMockApplicationRound({ pk, notesWhenApplying }),
+  };
+}
+
+export function createMockApplicationRound({
+  pk = 1,
+  notesWhenApplying,
+  status = ApplicationRoundStatusChoice.Open,
+  applicationPeriodEnd = new Date(2024, 0, 1, 0, 0, 0),
+  applicationPeriodBegin = addYears(new Date(2024, 0, 1, 0, 0, 0), 1),
+}: {
+  pk?: number;
+  status?: ApplicationRoundStatusChoice;
+  notesWhenApplying?: string | null;
+  applicationPeriodEnd?: Date;
+  applicationPeriodBegin?: Date;
+} = {}): ApplicationRoundNode {
+  // There is an implicit relation between reservationPeriodBegin and SearchQuery
+  // so not mocking reservationPeriodBegin will break search query mock
+  if (applicationPeriodBegin.getMilliseconds() !== 0) {
+    throw new Error(
+      "Application period millis should be 0. You most likely you forgot to set a mock date"
+    );
+  }
+  const reservationPeriodBegin = addMonths(applicationPeriodBegin, 1);
+  const reservationUnits = createMockReservationUnits({
+    nReservationUnits: 10,
+  });
+
+  return {
+    id: base64encode(`ApplicationRoundNode:${pk}`),
+    pk,
+    ...generateNameFragment(`ApplicationRound ${pk}`),
+    notesWhenApplyingFi: notesWhenApplying ? `${notesWhenApplying} FI` : null,
+    notesWhenApplyingEn: notesWhenApplying ? `${notesWhenApplying} EN` : null,
+    notesWhenApplyingSv: notesWhenApplying ? `${notesWhenApplying} SV` : null,
+    reservationPeriodBegin: reservationPeriodBegin.toISOString(),
+    reservationPeriodEnd: addYears(reservationPeriodBegin, 1).toISOString(),
+    publicDisplayBegin: applicationPeriodBegin.toISOString(),
+    publicDisplayEnd: applicationPeriodEnd.toISOString(),
+    applicationPeriodBegin: applicationPeriodBegin.toISOString(),
+    applicationPeriodEnd: applicationPeriodEnd.toISOString(),
+    status,
+    reservationUnits,
+    applicationsCount: 0, // Scalars["Int"]["output"];
+    criteriaEn: null, // Maybe<Scalars["String"]["output"]>;
+    criteriaFi: null, // Maybe<Scalars["String"]["output"]>;
+    criteriaSv: null, // Maybe<Scalars["String"]["output"]>;
+    handledDate: null, // Maybe<Scalars["DateTime"]["output"]>;
+    isSettingHandledAllowed: false, // Scalars["Boolean"]["output"];
+    purposes: [] as const, // ReadonlyArray<ReservationPurposeNode>;
+    reservationCreationStatus:
+      ApplicationRoundReservationCreationStatusChoice.NotCompleted,
+    reservationUnitCount: 10, // Scalars["Int"]["output"];
+    sentDate: null, // Maybe<Scalars["DateTime"]["output"]>;
+    statusTimestamp: null, // Maybe<Scalars["DateTime"]["output"]>;
+    termsOfUse: null, // Maybe<TermsOfUseNode>;
   };
 }
 

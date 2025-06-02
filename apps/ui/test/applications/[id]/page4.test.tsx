@@ -2,15 +2,15 @@ import { type TermsOfUseFieldsFragment, TermsType } from "@/gql/gql-types";
 import Page4 from "@/pages/applications/[id]/page4";
 import { render, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
-import { type CreateGraphQLMocksReturn } from "@/test/test.gql.utils";
+import { type CreateGraphQLMocksReturn } from "@test/test.gql.utils";
 import {
   type CreateMockApplicationFragmentProps,
   createGraphQLApplicationIdMock,
   createMockApplicationViewFragment,
-} from "@/test/test.application.mocks";
+} from "@test/application.mocks";
 import { base64encode } from "common/src/helpers";
 import userEvent from "@testing-library/user-event";
-import { MockedGraphQLProvider } from "@/test/test.react.utils";
+import { MockedGraphQLProvider } from "@test/test.react.utils";
 
 const { useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
