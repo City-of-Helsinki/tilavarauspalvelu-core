@@ -22,7 +22,6 @@ from tests.factories import (
     PaymentAccountingFactory,
     PaymentMerchantFactory,
     PaymentProductFactory,
-    QualifierFactory,
     ReservableTimeSpanFactory,
     ReservationUnitAccessTypeFactory,
     ReservationUnitCancellationRuleFactory,
@@ -320,17 +319,6 @@ def _create_caisa() -> None:
         name_fi="Työpiste",
         name_en="Workstation",
         name_sv="Arbetsstation",
-    )
-
-    ###########################################################################################################
-    # Create qualifiers
-    ###########################################################################################################
-
-    qualifier_under_15 = QualifierFactory.create(
-        name="varattavissa alle 15-vuotiaille",
-        name_fi="varattavissa alle 15-vuotiaille",
-        name_en="Available for below 15 years of age",
-        name_sv="kan bokas för under 15 år",
     )
 
     ###########################################################################################################
@@ -842,7 +830,6 @@ def _create_caisa() -> None:
         ),
     )
     maksuton_mankeli.equipments.add(equipment_click_share)
-    maksuton_mankeli.qualifiers.add(qualifier_under_15)
     ReservationUnitPricingFactory.create(
         reservation_unit=maksuton_mankeli,
         begins=datetime.date(2023, 1, 1),

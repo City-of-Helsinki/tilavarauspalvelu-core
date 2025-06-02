@@ -99,7 +99,6 @@ from .queries import (
     PaymentOrderNode,
     PermissionCheckerType,
     PurposeNode,
-    QualifierNode,
     RecurringReservationNode,
     RejectedOccurrenceNode,
     ReservationCancelReasonType,
@@ -178,7 +177,6 @@ class Query(graphene.ObjectType):
     tax_percentages = TaxPercentageNode.Connection()
     metadata_sets = ReservationMetadataSetNode.Connection()
     purposes = PurposeNode.Connection()
-    qualifiers = QualifierNode.Connection()
     #
     # Reservations
     reservation = ReservationNode.Node()

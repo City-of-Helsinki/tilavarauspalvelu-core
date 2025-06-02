@@ -47,7 +47,6 @@ class ReservationUnitExportRow(BaseExportRow):
     publish_ends: str = ""
     spaces: str = ""
     resources: str = ""
-    qualifiers: str = ""
     payment_terms: str = ""
     cancellation_terms: str = ""
     pricing_terms: str = ""
@@ -128,7 +127,6 @@ class ReservationUnitExporter(BaseCSVExporter):
                 "resources",
                 "purposes",
                 "equipments",
-                "qualifiers",
                 models.Prefetch("pricings", ReservationUnitPricing.objects.active()),
             )
             .annotate(
@@ -168,7 +166,6 @@ class ReservationUnitExporter(BaseCSVExporter):
                 publish_ends="Publish ends",
                 spaces="Spaces",
                 resources="Resources",
-                qualifiers="Qualifiers",
                 payment_terms="Payment terms",
                 cancellation_terms="Cancellation terms",
                 pricing_terms="Pricing terms",
@@ -264,7 +261,6 @@ class ReservationUnitExporter(BaseCSVExporter):
                 publish_ends=self.format_datetime(instance.publish_ends),
                 spaces=", ".join(space.name_fi for space in instance.spaces.all()),
                 resources=", ".join(resource.name_fi for resource in instance.resources.all()),
-                qualifiers=", ".join(qualifier.name_fi for qualifier in instance.qualifiers.all()),
                 payment_terms=getattr(instance.payment_terms, "name", ""),
                 cancellation_terms=getattr(instance.cancellation_terms, "name", ""),
                 pricing_terms=getattr(instance.pricing_terms, "name", ""),

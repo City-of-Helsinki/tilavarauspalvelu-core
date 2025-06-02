@@ -73,7 +73,6 @@ def test_reservation_unit_export(api_client, settings):
         "publish_begins",
         "publish_ends",
         "purposes",
-        "qualifiers",
         "require_a_handling",
         "reservation_begins",
         "reservation_ends",
