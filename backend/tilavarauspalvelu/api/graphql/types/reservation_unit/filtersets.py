@@ -74,7 +74,6 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
     text_search = django_filters.CharFilter(method="get_text_search")
 
     purposes = IntMultipleChoiceFilter()
-    qualifiers = IntMultipleChoiceFilter()
     equipments = IntMultipleChoiceFilter(conjoined=True)
 
     is_draft = django_filters.BooleanFilter()

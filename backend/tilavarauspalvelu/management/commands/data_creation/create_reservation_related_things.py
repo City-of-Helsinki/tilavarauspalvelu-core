@@ -23,7 +23,6 @@ from tilavarauspalvelu.models import (
     PaymentAccounting,
     PaymentMerchant,
     Purpose,
-    Qualifier,
     ReservableTimeSpan,
     ReservationDenyReason,
     ReservationMetadataField,
@@ -47,7 +46,6 @@ from tests.factories import (
     PaymentAccountingFactory,
     PaymentMerchantFactory,
     PurposeFactory,
-    QualifierFactory,
     ReservableTimeSpanFactory,
     ReservationDenyReasonFactory,
     ReservationMetadataFieldFactory,
@@ -73,12 +71,6 @@ def _create_equipments() -> list[Equipment]:
     equipment_categories = EquipmentCategory.objects.bulk_create(equipment_categories)
     equipments = [EquipmentFactory.build(category=random.choice(equipment_categories)) for _ in range(30)]
     return Equipment.objects.bulk_create(equipments)
-
-
-@with_logs
-def _create_qualifiers() -> list[Qualifier]:
-    qualifiers = [QualifierFactory.build() for _ in range(3)]
-    return Qualifier.objects.bulk_create(qualifiers)
 
 
 @with_logs
