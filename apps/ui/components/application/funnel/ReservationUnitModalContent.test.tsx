@@ -3,8 +3,8 @@ import { render, within } from "@testing-library/react";
 import {
   createMockApplicationRound,
   CreateGraphQLMockProps,
-  createApplicationSearchGraphQLMocks,
 } from "@/test/test.gql.utils";
+import { createApplicationSearchGraphQLMocks } from "@/test/test.application.mocks";
 import userEvent from "@testing-library/user-event";
 import {
   ReservationUnitModalContent,
