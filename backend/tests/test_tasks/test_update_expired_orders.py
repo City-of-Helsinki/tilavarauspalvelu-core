@@ -505,8 +505,8 @@ def test_update_expired_orders__handled_payment__paid(settings):
 
     assert VerkkokauppaAPIClient.get_payment.called is True
     assert VerkkokauppaAPIClient.cancel_order.called is False
-    assert EmailService.send_reservation_confirmed_email.called is True
-    assert EmailService.send_reservation_confirmed_staff_notification_email.called is True
+    assert EmailService.send_reservation_confirmed_email.called is False
+    assert EmailService.send_reservation_confirmed_staff_notification_email.called is False
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
@@ -538,8 +538,8 @@ def test_update_expired_orders__handled_payment__paid_with_invoice(settings):
 
     assert VerkkokauppaAPIClient.get_payment.called is True
     assert VerkkokauppaAPIClient.cancel_order.called is False
-    assert EmailService.send_reservation_confirmed_email.called is True
-    assert EmailService.send_reservation_confirmed_staff_notification_email.called is True
+    assert EmailService.send_reservation_confirmed_email.called is False
+    assert EmailService.send_reservation_confirmed_staff_notification_email.called is False
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
@@ -576,8 +576,8 @@ def test_update_expired_orders__handled_payment__paid__has_access_code(settings)
 
     assert VerkkokauppaAPIClient.get_payment.called is True
     assert VerkkokauppaAPIClient.cancel_order.called is False
-    assert EmailService.send_reservation_confirmed_email.called is True
-    assert EmailService.send_reservation_confirmed_staff_notification_email.called is True
+    assert EmailService.send_reservation_confirmed_email.called is False
+    assert EmailService.send_reservation_confirmed_staff_notification_email.called is False
     assert PindoraService.activate_access_code.called is True
 
 
@@ -615,8 +615,8 @@ def test_update_expired_orders__handled_payment__paid__has_access_code__already_
 
     assert VerkkokauppaAPIClient.get_payment.called is True
     assert VerkkokauppaAPIClient.cancel_order.called is False
-    assert EmailService.send_reservation_confirmed_email.called is True
-    assert EmailService.send_reservation_confirmed_staff_notification_email.called is True
+    assert EmailService.send_reservation_confirmed_email.called is False
+    assert EmailService.send_reservation_confirmed_staff_notification_email.called is False
     assert PindoraService.activate_access_code.called is False
 
 
