@@ -19,7 +19,7 @@ from .create_reservation_related_things import (
     _create_tax_percentages,
 )
 from .create_reservation_units import _create_reservation_units
-from .create_reservations import _create_recurring_reservations, _create_reservations
+from .create_reservations import _create_reservation_series, _create_reservations
 from .create_seasonal_booking import _create_application_rounds
 from .create_users import _create_users
 from .utils import refresh_materialized_views_at_the_end, with_logs
@@ -58,7 +58,7 @@ def create_test_data(*, flush: bool = True) -> None:
         cities=cities,
     )
 
-    _create_recurring_reservations(
+    _create_reservation_series(
         metadata_sets=metadata_sets,
         terms_of_use=terms_of_use,
         cancellation_rules=cancellation_rules,

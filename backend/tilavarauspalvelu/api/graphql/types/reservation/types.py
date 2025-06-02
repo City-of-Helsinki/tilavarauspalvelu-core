@@ -247,7 +247,7 @@ class ReservationNode(DjangoNode):
             #
             "reservation_units",
             "user",
-            "recurring_reservation",
+            "reservation_series",
             "deny_reason",
             "cancel_reason",
             "purpose",
@@ -334,8 +334,8 @@ class ReservationNode(DjangoNode):
         if not has_perms and root.state != ReservationStateChoice.CONFIRMED:
             return None
 
-        if root.recurring_reservation is not None and root.recurring_reservation.allocated_time_slot is not None:
-            section = root.recurring_reservation.allocated_time_slot.reservation_unit_option.application_section
+        if root.reservation_series is not None and root.reservation_series.allocated_time_slot is not None:
+            section = root.reservation_series.allocated_time_slot.reservation_unit_option.application_section
             application_round = section.application.application_round
 
             # Don't show Pindora info without permissions if the application round results haven't been sent yet

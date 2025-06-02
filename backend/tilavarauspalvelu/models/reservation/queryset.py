@@ -277,8 +277,8 @@ class ReservationQuerySet(models.QuerySet):
     def upsert_statistics(self) -> None:
         reservations = self.select_related(
             "user",
-            "recurring_reservation",
-            "recurring_reservation__allocated_time_slot",
+            "reservation_series",
+            "reservation_series__allocated_time_slot",
             "deny_reason",
             "purpose",
             "home_city",
@@ -340,12 +340,12 @@ class ReservationQuerySet(models.QuerySet):
 
     def for_application_section(self, ref: ApplicationSection | models.OuterRef) -> Self:
         """Return all reservations for the given application section."""
-        return self.filter(recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=ref)
+        return self.filter(reservation_series__allocated_time_slot__reservation_unit_option__application_section=ref)
 
     def for_application_round(self, ref: ApplicationRound | models.OuterRef) -> Self:
         """Return all reservations for the given application round."""
         lookup = (
-            "recurring_reservation"  #
+            "reservation_series"  #
             "__allocated_time_slot"
             "__reservation_unit_option"
             "__application_section"

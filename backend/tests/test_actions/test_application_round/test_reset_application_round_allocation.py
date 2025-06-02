@@ -9,7 +9,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
-from tilavarauspalvelu.models import AllocatedTimeSlot, RecurringReservation, Reservation, ReservationUnitOption
+from tilavarauspalvelu.models import AllocatedTimeSlot, Reservation, ReservationSeries, ReservationUnitOption
 
 from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory, ApplicationRoundFactory, ReservationFactory
 from tests.helpers import patch_method
@@ -58,16 +58,16 @@ def test_reset_application_round_allocation__handled():
     )
     ReservationFactory.create(
         type=ReservationTypeChoice.SEASONAL,
-        recurring_reservation__allocated_time_slot=allocation_1,
+        reservation_series__allocated_time_slot=allocation_1,
     )
     ReservationFactory.create(
         type=ReservationTypeChoice.SEASONAL,
-        recurring_reservation__allocated_time_slot=allocation_2,
+        reservation_series__allocated_time_slot=allocation_2,
     )
 
     assert AllocatedTimeSlot.objects.count() == 2
     assert ReservationUnitOption.objects.count() == 2
-    assert RecurringReservation.objects.count() == 2
+    assert ReservationSeries.objects.count() == 2
     assert Reservation.objects.count() == 2
     assert ReservationUnitOption.objects.filter(locked=True).count() == 1
     assert application_round.handled_date is not None
@@ -80,7 +80,7 @@ def test_reset_application_round_allocation__handled():
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
     assert AllocatedTimeSlot.objects.count() == 2
     assert ReservationUnitOption.objects.count() == 2
-    assert RecurringReservation.objects.count() == 0
+    assert ReservationSeries.objects.count() == 0
     assert Reservation.objects.count() == 0
     assert ReservationUnitOption.objects.filter(locked=True).count() == 1
     assert application_round.handled_date is None
@@ -101,13 +101,13 @@ def test_reset_application_round_allocation__handled__call_pindora_if_has_access
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.SEASONAL,
-        recurring_reservation__allocated_time_slot=allocation_1,
+        reservation_series__allocated_time_slot=allocation_1,
     )
     ReservationFactory.create(
         access_type=AccessType.UNRESTRICTED,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.SEASONAL,
-        recurring_reservation__allocated_time_slot=allocation_2,
+        reservation_series__allocated_time_slot=allocation_2,
     )
 
     application_round.actions.reset_application_round_allocation()

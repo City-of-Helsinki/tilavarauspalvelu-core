@@ -14,7 +14,7 @@ from tilavarauspalvelu.typing import (
 )
 from utils.date_utils import local_datetime
 
-from tests.factories import ApplicationSectionFactory, RecurringReservationFactory, ReservationFactory
+from tests.factories import ApplicationSectionFactory, ReservationFactory, ReservationSeriesFactory
 from tests.helpers import ResponseMock, patch_method
 from tests.test_integrations.test_keyless_entry.helpers import (
     default_reservation_response,
@@ -29,7 +29,7 @@ pytestmark = [
 
 def test_get_access_code__reservation():
     reservation = ReservationFactory.create(
-        recurring_reservation=None,
+        reservation_series=None,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -61,9 +61,9 @@ def test_get_access_code__reservation():
 
 
 def test_get_access_code__reservation__in_series():
-    series = RecurringReservationFactory.create()
+    series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -100,9 +100,9 @@ def test_get_access_code__reservation__in_series():
 
 
 def test_get_access_code__reservation__in_series__pick_correct_reservation():
-    series = RecurringReservationFactory.create()
+    series = ReservationSeriesFactory.create()
     reservation_1 = ReservationFactory.create(
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -110,7 +110,7 @@ def test_get_access_code__reservation__in_series__pick_correct_reservation():
         type=ReservationTypeChoice.NORMAL,
     )
     reservation_2 = ReservationFactory.create(
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 2, 12),
         end=local_datetime(2024, 1, 2, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -154,11 +154,11 @@ def test_get_access_code__reservation__in_series__pick_correct_reservation():
 
 def test_get_access_code__reservation__in_series__in_seasonal_booking():
     section = ApplicationSectionFactory.create()
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     reservation = ReservationFactory.create(
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -195,9 +195,9 @@ def test_get_access_code__reservation__in_series__in_seasonal_booking():
 
 
 def test_get_access_code__series():
-    series = RecurringReservationFactory.create()
+    series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -241,11 +241,11 @@ def test_get_access_code__series():
 
 def test_get_access_code__series__in_seasonal_booking():
     section = ApplicationSectionFactory.create()
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     reservation = ReservationFactory.create(
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -290,11 +290,11 @@ def test_get_access_code__series__in_seasonal_booking():
 def test_get_access_code__series__in_seasonal_booking__remove_other_series_values():
     section = ApplicationSectionFactory.create()
 
-    series_1 = RecurringReservationFactory.create(
+    series_1 = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     reservation_1 = ReservationFactory.create(
-        recurring_reservation=series_1,
+        reservation_series=series_1,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -302,11 +302,11 @@ def test_get_access_code__series__in_seasonal_booking__remove_other_series_value
         type=ReservationTypeChoice.NORMAL,
     )
 
-    series_2 = RecurringReservationFactory.create(
+    series_2 = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     reservation_2 = ReservationFactory.create(
-        recurring_reservation=series_2,
+        reservation_series=series_2,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -357,11 +357,11 @@ def test_get_access_code__series__in_seasonal_booking__remove_other_series_value
 
 def test_get_access_code__seasonal_booking():
     section = ApplicationSectionFactory.create()
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     reservation = ReservationFactory.create(
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,

@@ -9,8 +9,8 @@ from tilavarauspalvelu.management.commands.create_test_data import create_test_d
 from tilavarauspalvelu.models import (
     PaymentOrder,
     PersonalInfoViewLog,
-    RecurringReservation,
     RejectedOccurrence,
+    ReservationSeries,
     ReservationStatistic,
     ReservationUnitImage,
 )
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 models_that_should_be_empty: list[type[models.Model]] = [
     PaymentOrder,
     PersonalInfoViewLog,
-    RecurringReservation,
+    ReservationSeries,
     RejectedOccurrence,
     ReservationStatistic,
     ReservationUnitImage,

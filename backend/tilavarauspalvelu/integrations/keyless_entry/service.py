@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, overload
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation
+from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationSeries
 from tilavarauspalvelu.typing import (
     PindoraReservationInfoData,
     PindoraSectionInfoData,
@@ -46,7 +46,7 @@ class PindoraService:
 
     @classmethod
     @overload
-    def get_access_code(cls, obj: RecurringReservation) -> PindoraSeriesInfoData: ...
+    def get_access_code(cls, obj: ReservationSeries) -> PindoraSeriesInfoData: ...
 
     @classmethod
     @overload
@@ -59,7 +59,7 @@ class PindoraService:
             case ApplicationSection():
                 response = PindoraClient.get_seasonal_booking(obj)
 
-                series_for_section = RecurringReservation.objects.filter(
+                series_for_section = ReservationSeries.objects.filter(
                     allocated_time_slot__reservation_unit_option__application_section=obj
                 )
 
@@ -79,7 +79,7 @@ class PindoraService:
                     access_code_validity=access_code_validity,
                 )
 
-            case RecurringReservation():
+            case ReservationSeries():
                 if obj.allocated_time_slot is None:
                     response = PindoraClient.get_reservation_series(obj)
                     validity = cls._parse_series_validity_info(obj, response["reservation_unit_code_validity"])
@@ -111,7 +111,7 @@ class PindoraService:
                 )
 
             case Reservation():
-                if obj.recurring_reservation is None:
+                if obj.reservation_series is None:
                     response = PindoraClient.get_reservation(obj)
                     period = cls._parse_code_valid_period(response)
                     return PindoraReservationInfoData(
@@ -126,7 +126,7 @@ class PindoraService:
                         access_code_ends_at=period["access_code_ends_at"],
                     )
 
-                series = obj.recurring_reservation
+                series = obj.reservation_series
                 series_data: PindoraSeriesInfoData = cls.get_access_code(series)
 
                 next_valid = (acv for acv in series_data.access_code_validity if acv.reservation_id == obj.id)
@@ -154,7 +154,7 @@ class PindoraService:
 
     @classmethod
     def create_access_code(
-        cls, obj: ApplicationSection | RecurringReservation | Reservation, *, is_active: bool = False
+        cls, obj: ApplicationSection | ReservationSeries | Reservation, *, is_active: bool = False
     ) -> PindoraAccessCodeModifyResponse:
         """Create access code in Pindora through the correct Pindora API endpoint according to the object's type."""
         match obj:
@@ -165,7 +165,7 @@ class PindoraService:
                     access_code_is_active=response["access_code_is_active"],
                 )
 
-            case RecurringReservation():
+            case ReservationSeries():
                 if obj.allocated_time_slot is None:
                     response = PindoraClient.create_reservation_series(obj, is_active=is_active)
                     obj.reservations.requires_active_access_code().update(
@@ -177,13 +177,13 @@ class PindoraService:
                     response = cls.create_access_code(section, is_active=is_active)
 
             case Reservation():
-                if obj.recurring_reservation is None:
+                if obj.reservation_series is None:
                     response = PindoraClient.create_reservation(obj, is_active=is_active)
                     obj.access_code_generated_at = response["access_code_generated_at"]
                     obj.access_code_is_active = response["access_code_is_active"]
                     obj.save(update_fields=["access_code_generated_at", "access_code_is_active"])
                 else:
-                    series = obj.recurring_reservation
+                    series = obj.reservation_series
                     response = cls.create_access_code(series, is_active=is_active)
 
             case _:
@@ -197,7 +197,7 @@ class PindoraService:
 
     @classmethod
     def reschedule_access_code(
-        cls, obj: ApplicationSection | RecurringReservation | Reservation
+        cls, obj: ApplicationSection | ReservationSeries | Reservation
     ) -> PindoraAccessCodeModifyResponse:
         """Reschedule Pindora access code through the correct Pindora API endpoint according to the object's type."""
         match obj:
@@ -209,7 +209,7 @@ class PindoraService:
                 )
                 return response
 
-            case RecurringReservation():
+            case ReservationSeries():
                 if obj.allocated_time_slot is None:
                     response = PindoraClient.reschedule_reservation_series(obj)
                     obj.reservations.update_access_code_info(
@@ -222,14 +222,14 @@ class PindoraService:
                 return cls.reschedule_access_code(section)
 
             case Reservation():
-                if obj.recurring_reservation is None:
+                if obj.reservation_series is None:
                     response = PindoraClient.reschedule_reservation(obj)
                     obj.access_code_generated_at = response["access_code_generated_at"]
                     obj.access_code_is_active = response["access_code_is_active"]
                     obj.save(update_fields=["access_code_generated_at", "access_code_is_active"])
                     return response
 
-                series = obj.recurring_reservation
+                series = obj.reservation_series
                 return cls.reschedule_access_code(series)
 
             case _:
@@ -238,7 +238,7 @@ class PindoraService:
 
     @classmethod
     def change_access_code(
-        cls, obj: ApplicationSection | RecurringReservation | Reservation
+        cls, obj: ApplicationSection | ReservationSeries | Reservation
     ) -> PindoraAccessCodeModifyResponse:
         """Change Pindora access code through the correct Pindora API endpoint according to the object's type."""
         match obj:
@@ -250,7 +250,7 @@ class PindoraService:
                 )
                 return response
 
-            case RecurringReservation():
+            case ReservationSeries():
                 if obj.allocated_time_slot is None:
                     response = PindoraClient.change_reservation_series_access_code(obj)
                     obj.reservations.requires_active_access_code().update(
@@ -263,14 +263,14 @@ class PindoraService:
                 return cls.change_access_code(section)
 
             case Reservation():
-                if obj.recurring_reservation is None:
+                if obj.reservation_series is None:
                     response = PindoraClient.change_reservation_access_code(obj)
                     obj.access_code_generated_at = response["access_code_generated_at"]
                     obj.access_code_is_active = response["access_code_is_active"]
                     obj.save(update_fields=["access_code_generated_at", "access_code_is_active"])
                     return response
 
-                series = obj.recurring_reservation
+                series = obj.reservation_series
                 return cls.change_access_code(series)
 
             case _:
@@ -278,14 +278,14 @@ class PindoraService:
                 raise PindoraClientError(msg)
 
     @classmethod
-    def activate_access_code(cls, obj: ApplicationSection | RecurringReservation | Reservation) -> None:
+    def activate_access_code(cls, obj: ApplicationSection | ReservationSeries | Reservation) -> None:
         """Activate Pindora access code through the correct Pindora API endpoint according to the object's type."""
         match obj:
             case ApplicationSection():
                 PindoraClient.activate_seasonal_booking_access_code(obj)
                 obj.actions.get_reservations().update_access_code_is_active()
 
-            case RecurringReservation():
+            case ReservationSeries():
                 if obj.allocated_time_slot is None:
                     PindoraClient.activate_reservation_series_access_code(obj)
                     obj.reservations.update_access_code_is_active()
@@ -295,13 +295,13 @@ class PindoraService:
                 cls.activate_access_code(section)
 
             case Reservation():
-                if obj.recurring_reservation is None:
+                if obj.reservation_series is None:
                     PindoraClient.activate_reservation_access_code(obj)
                     obj.access_code_is_active = True
                     obj.save(update_fields=["access_code_is_active"])
                     return
 
-                series = obj.recurring_reservation
+                series = obj.reservation_series
                 cls.activate_access_code(series)
 
             case _:
@@ -309,14 +309,14 @@ class PindoraService:
                 raise PindoraClientError(msg)
 
     @classmethod
-    def deactivate_access_code(cls, obj: ApplicationSection | RecurringReservation | Reservation) -> None:
+    def deactivate_access_code(cls, obj: ApplicationSection | ReservationSeries | Reservation) -> None:
         """Deactivate Pindora access code through the correct Pindora API endpoint according to the object's type."""
         match obj:
             case ApplicationSection():
                 PindoraClient.deactivate_seasonal_booking_access_code(obj)
                 obj.actions.get_reservations().update_access_code_is_active()
 
-            case RecurringReservation():
+            case ReservationSeries():
                 if obj.allocated_time_slot is None:
                     PindoraClient.deactivate_reservation_series_access_code(obj)
                     obj.reservations.update_access_code_is_active()
@@ -326,13 +326,13 @@ class PindoraService:
                 cls.deactivate_access_code(section)
 
             case Reservation():
-                if obj.recurring_reservation is None:
+                if obj.reservation_series is None:
                     PindoraClient.deactivate_reservation_access_code(obj)
                     obj.access_code_is_active = False
                     obj.save(update_fields=["access_code_is_active"])
                     return
 
-                series = obj.recurring_reservation
+                series = obj.reservation_series
                 cls.deactivate_access_code(series)
 
             case _:
@@ -340,7 +340,7 @@ class PindoraService:
                 raise PindoraClientError(msg)
 
     @classmethod
-    def delete_access_code(cls, obj: ApplicationSection | RecurringReservation | Reservation) -> None:
+    def delete_access_code(cls, obj: ApplicationSection | ReservationSeries | Reservation) -> None:
         """Delete Pindora access code through the correct Pindora API endpoint according to the object's type."""
         match obj:
             case ApplicationSection():
@@ -351,7 +351,7 @@ class PindoraService:
                     access_code_is_active=False,
                 )
 
-            case RecurringReservation():
+            case ReservationSeries():
                 if obj.allocated_time_slot is None:
                     PindoraClient.delete_reservation_series(obj)
 
@@ -365,14 +365,14 @@ class PindoraService:
                 cls.reschedule_access_code(section)
 
             case Reservation():
-                if obj.recurring_reservation is None:
+                if obj.reservation_series is None:
                     PindoraClient.delete_reservation(obj)
                     obj.access_code_generated_at = None
                     obj.access_code_is_active = False
                     obj.save(update_fields=["access_code_generated_at", "access_code_is_active"])
                     return
 
-                series = obj.recurring_reservation
+                series = obj.reservation_series
                 # If the reservation is part of a series, should only remove the reservation from the series
                 # instead of deleting the access code for the whole series.
                 cls.reschedule_access_code(series)
@@ -382,7 +382,7 @@ class PindoraService:
                 raise PindoraClientError(msg)
 
     @classmethod
-    def sync_access_code(cls, obj: ApplicationSection | RecurringReservation | Reservation) -> None:
+    def sync_access_code(cls, obj: ApplicationSection | ReservationSeries | Reservation) -> None:
         """
         Synchronizes the access code through the correct Pindora API endpoints according to the object's type
         so that it matches what Varaamo thinks is the correct state.
@@ -391,7 +391,7 @@ class PindoraService:
             case ApplicationSection():
                 cls._sync_series_or_seasonal_booking_access_code(obj)
 
-            case RecurringReservation():
+            case ReservationSeries():
                 if obj.allocated_time_slot is None:
                     cls._sync_series_or_seasonal_booking_access_code(obj)
                     return
@@ -400,11 +400,11 @@ class PindoraService:
                 cls.sync_access_code(obj=section)
 
             case Reservation():
-                if obj.recurring_reservation is None:
+                if obj.reservation_series is None:
                     cls._sync_reservation_access_code(obj)
                     return
 
-                series = obj.recurring_reservation
+                series = obj.reservation_series
                 cls.sync_access_code(obj=series)
 
             case _:
@@ -439,7 +439,7 @@ class PindoraService:
         Do not include reservations in series or seasonal bookings.
         """
         reservations: Iterable[Reservation] = Reservation.objects.requiring_access_code().filter(
-            recurring_reservation__isnull=True
+            reservation_series__isnull=True
         )
 
         for reservation in reservations:
@@ -466,10 +466,10 @@ class PindoraService:
     @classmethod
     def _create_missing_access_codes_for_series(cls) -> None:
         """
-        Create access codes for recurring reservations that are missing them.
+        Create access codes for reservation series that are missing them.
         Do not include series in seasonal bookings.
         """
-        all_series: Iterable[RecurringReservation] = RecurringReservation.objects.requiring_access_code().filter(
+        all_series: Iterable[ReservationSeries] = ReservationSeries.objects.requiring_access_code().filter(
             allocated_time_slot__isnull=True
         )
 
@@ -526,7 +526,7 @@ class PindoraService:
     @classmethod
     def _update_access_code_is_active_for_reservations(cls) -> None:
         reservations: Iterable[Reservation] = Reservation.objects.has_incorrect_access_code_is_active().filter(
-            recurring_reservation__isnull=True,
+            reservation_series__isnull=True,
         )
 
         for reservation in reservations:
@@ -554,8 +554,8 @@ class PindoraService:
 
     @classmethod
     def _update_access_code_is_active_for_series(cls) -> None:
-        all_series: Iterable[RecurringReservation] = (
-            RecurringReservation.objects.has_incorrect_access_code_is_active().filter(
+        all_series: Iterable[ReservationSeries] = (
+            ReservationSeries.objects.has_incorrect_access_code_is_active().filter(
                 allocated_time_slot__isnull=True,
             )
         )
@@ -636,7 +636,7 @@ class PindoraService:
         reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
 
     @classmethod
-    def _sync_series_or_seasonal_booking_access_code(cls, obj: RecurringReservation | ApplicationSection) -> None:
+    def _sync_series_or_seasonal_booking_access_code(cls, obj: ReservationSeries | ApplicationSection) -> None:
         should_be_active: bool = obj.should_have_active_access_code  # type: ignore[attr-defined]
 
         try:
@@ -655,7 +655,7 @@ class PindoraService:
     @classmethod
     def _parse_series_validity_info(
         cls,
-        series: RecurringReservation,
+        series: ReservationSeries,
         validities: list[PindoraReservationSeriesAccessCodeValidity | PindoraSeasonalBookingAccessCodeValidity],
     ) -> list[PindoraValidityInfoData]:
         """
