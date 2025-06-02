@@ -23,6 +23,27 @@ export const anchorStyles = css`
   }
 `;
 
+// should be default to all components but for legacy reasons have to be per component
+export const borderBoxSizing = css`
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box
+  box-sizing: border-box;
+`;
+
+export const removeButtonStyles = css`
+  ${borderBoxSizing}
+  /* without flex we have extra padding */
+  display: flex;
+  background-color: transparent;
+  border-width: 0;
+  font-family: inherit;
+  font-size: inherit;
+  font-style: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  padding: 0;
+`;
+
 // default z-order > 0 to draw the box shadow over other elements
 export const focusStyles = css`
   --background-color-focus: transparent;

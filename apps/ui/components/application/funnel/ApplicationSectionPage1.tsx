@@ -245,9 +245,8 @@ function ApplicationDateRangePicker({
     return undefined;
   };
 
-  const field = "applicationSections" as const;
-  const beginField = `${field}.${index}.begin` as const;
-  const endField = `${field}.${index}.end` as const;
+  const beginField = `applicationSections.${index}.begin` as const;
+  const endField = `applicationSections.${index}.end` as const;
   const beginState = getFieldState(beginField);
   const endState = getFieldState(endField);
 
