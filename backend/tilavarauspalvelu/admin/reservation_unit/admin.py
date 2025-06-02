@@ -99,7 +99,6 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
                     "description",
                     "unit",
                     "reservation_unit_type",
-                    "sku",
                     "contact_information",
                     "max_persons",
                     "min_persons",
