@@ -54,12 +54,14 @@ afterEach(() => {
 
 interface CustomRenderProps extends CreateGraphQLMockProps {
   nReservationUnits?: number;
+  error?: string;
   onSubmit?: (values: FormValues) => void;
 }
 
 function customRender({
   nReservationUnits = 1,
   onSubmit = vi.fn(),
+  error,
   ...mockProps
 }: CustomRenderProps): ReturnType<typeof render> {
   const mocks = createApplicationSearchGraphQLMocks(mockProps);
@@ -98,6 +100,7 @@ function customRender({
     <MockedGraphQLProvider mocks={mocks}>
       <WrappedRender
         values={values}
+        error={error}
         applicationRound={applicationRound}
         nReservationUnitOptions={nReservationUnits}
         onSubmit={onSubmit}
@@ -117,6 +120,7 @@ function WrappedRender({
   ...props
 }: {
   values?: FormValues["reservationUnits"];
+  error?: string;
   nReservationUnitOptions: number;
   onSubmit: SubmitHandler<FormValues>;
   applicationRound: ApplicationReservationUnitListFragment;
@@ -204,9 +208,21 @@ describe("reservation unit list render", () => {
     expect(cardTexts.length).toBe(3);
   });
 
-  // error notifications
-  // single error message if the list is empty durring submit
-  test.todo("empty should show no reservation units error message");
+  test("should display error message", () => {
+    const view = customRender({ error: "Test error message" });
+    const errorMessage = view.getAllByText("Test error message");
+    expect(errorMessage).toHaveLength(2); // HDS notification double labels
+    // check by test id so the negative test doesn't give false positive
+    const errorNotification = view.getByTestId("ReservationUnitList__error");
+    expect(errorNotification).toBeInTheDocument();
+  });
+
+  test("should not display error message by default", () => {
+    const view = customRender({});
+    const errorNotification = view.queryByTestId("ReservationUnitList__error");
+    expect(errorNotification).not.toBeInTheDocument();
+  });
+
   // per reservation unit cards
   // case: run a for loop with
   // - no min size
