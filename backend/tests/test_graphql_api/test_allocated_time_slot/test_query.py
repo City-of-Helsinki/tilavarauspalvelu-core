@@ -5,7 +5,7 @@ from graphene_django_extensions.testing import build_query
 
 from tilavarauspalvelu.models import ReservationUnitHierarchy
 
-from tests.factories import AllocatedTimeSlotFactory, RecurringReservationFactory, ReservationUnitFactory, SpaceFactory
+from tests.factories import AllocatedTimeSlotFactory, ReservationSeriesFactory, ReservationUnitFactory, SpaceFactory
 
 from .helpers import allocations_query
 
@@ -19,7 +19,7 @@ def test_allocated_time_slot__query__all_fields(graphql):
     # given:
     # - There is an allocated time slot
     allocation = AllocatedTimeSlotFactory.create()
-    RecurringReservationFactory.create(allocated_time_slot=allocation)
+    ReservationSeriesFactory.create(allocated_time_slot=allocation)
     graphql.login_with_superuser()
 
     fields = """
@@ -37,7 +37,7 @@ def test_allocated_time_slot__query__all_fields(graphql):
                 nameFi
             }
         }
-        recurringReservation {
+        reservationSeries {
             pk
             name
             reservations {
@@ -69,9 +69,9 @@ def test_allocated_time_slot__query__all_fields(graphql):
                 "nameFi": allocation.reservation_unit_option.reservation_unit.name,
             },
         },
-        "recurringReservation": {
-            "pk": allocation.recurring_reservation.pk,
-            "name": allocation.recurring_reservation.name,
+        "reservationSeries": {
+            "pk": allocation.reservation_series.pk,
+            "name": allocation.reservation_series.name,
             "reservations": [],
         },
     }

@@ -168,8 +168,8 @@ def test_anonymization__reservation():
         free_of_charge_reason="Test reason",
         cancel_details="Test cancel details",
         handling_details="Test handling details",
-        recurring_reservation__name="foo",
-        recurring_reservation__description="bar",
+        reservation_series__name="foo",
+        reservation_series__description="bar",
     )
 
     mr_anonymous.actions.anonymize_user_reservations()
@@ -201,8 +201,8 @@ def test_anonymization__reservation():
     assert reservation.cancel_details == SENSITIVE_RESERVATION
     assert reservation.handling_details == SENSITIVE_RESERVATION
 
-    assert reservation.recurring_reservation.name == ANONYMIZED
-    assert reservation.recurring_reservation.description == ANONYMIZED
+    assert reservation.reservation_series.name == ANONYMIZED
+    assert reservation.reservation_series.description == ANONYMIZED
 
     # Check that auditlog entries are removed also
     assert LogEntry.objects.get_for_object(reservation).count() == 0

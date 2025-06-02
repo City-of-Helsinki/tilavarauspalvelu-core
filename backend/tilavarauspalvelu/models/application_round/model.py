@@ -250,11 +250,11 @@ class ApplicationRound(models.Model):
 
     @lookup_property(skip_codegen=True)
     def reservation_creation_status() -> ApplicationRoundReservationCreationStatusChoice:
-        from tilavarauspalvelu.models import RecurringReservation
+        from tilavarauspalvelu.models import ReservationSeries
 
         timeout = datetime.timedelta(minutes=settings.APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES)
 
-        recurring_reservation_filters = {
+        reservation_series_filters = {
             "allocated_time_slot__reservation_unit_option__application_section__application__application_round": (
                 models.OuterRef("id")
             )
@@ -266,7 +266,7 @@ class ApplicationRound(models.Model):
                 then=models.Value(ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED.value),
             ),
             models.When(
-                models.Exists(RecurringReservation.objects.filter(**recurring_reservation_filters)),
+                models.Exists(ReservationSeries.objects.filter(**reservation_series_filters)),
                 then=models.Value(ApplicationRoundReservationCreationStatusChoice.COMPLETED.value),
             ),
             models.When(
@@ -279,7 +279,7 @@ class ApplicationRound(models.Model):
 
     @reservation_creation_status.override
     def _(self) -> ApplicationRoundReservationCreationStatusChoice:
-        from tilavarauspalvelu.models import RecurringReservation
+        from tilavarauspalvelu.models import ReservationSeries
 
         now = local_datetime()
         timeout = datetime.timedelta(minutes=settings.APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES)
@@ -287,7 +287,7 @@ class ApplicationRound(models.Model):
         if self.handled_date is None:
             return ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED
 
-        if RecurringReservation.objects.filter(
+        if ReservationSeries.objects.filter(
             allocated_time_slot__reservation_unit_option__application_section__application__application_round=self
         ).exists():
             return ApplicationRoundReservationCreationStatusChoice.COMPLETED

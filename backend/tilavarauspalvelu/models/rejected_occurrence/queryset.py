@@ -16,7 +16,7 @@ __all__ = [
 class RejectedOccurrenceQuerySet(models.QuerySet):
     def order_by_applicant(self, *, desc: bool = False) -> Self:
         applicant_ref = (
-            "recurring_reservation"
+            "reservation_series"
             "__allocated_time_slot"
             "__reservation_unit_option"
             "__application_section"

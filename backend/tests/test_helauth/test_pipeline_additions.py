@@ -20,8 +20,8 @@ from utils.external_service.errors import ExternalServiceError
 from tests.factories import (
     ApplicationFactory,
     GeneralRoleFactory,
-    RecurringReservationFactory,
     ReservationFactory,
+    ReservationSeriesFactory,
     UnitRoleFactory,
     UserFactory,
 )
@@ -208,7 +208,7 @@ def test_migrate_from_tunnistamo_to_keycloak():
 
     application = ApplicationFactory.create(user=old_user)
     reservation = ReservationFactory.create(user=old_user)
-    recurring_reservation = RecurringReservationFactory.create(user=old_user)
+    reservation_series = ReservationSeriesFactory.create(user=old_user)
     general_role = GeneralRoleFactory.create(user=old_user)
     unit_role = UnitRoleFactory.create(user=old_user)
 
@@ -227,7 +227,7 @@ def test_migrate_from_tunnistamo_to_keycloak():
 
     application.refresh_from_db()
     reservation.refresh_from_db()
-    recurring_reservation.refresh_from_db()
+    reservation_series.refresh_from_db()
     general_role.refresh_from_db()
     unit_role.refresh_from_db()
 
@@ -237,7 +237,7 @@ def test_migrate_from_tunnistamo_to_keycloak():
 
     assert application.user == new_user
     assert reservation.user == new_user
-    assert recurring_reservation.user == new_user
+    assert reservation_series.user == new_user
     assert general_role.user == new_user
     assert unit_role.user == new_user
 

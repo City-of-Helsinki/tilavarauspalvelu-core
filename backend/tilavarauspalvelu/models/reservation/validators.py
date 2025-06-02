@@ -195,7 +195,7 @@ class ReservationValidator:
             raise ValidationError(msg, code=error_codes.RESERVATION_ACCESS_CODE_NOT_GENERATED)
 
     def validate_not_in_reservation_series(self) -> None:
-        if self.reservation.recurring_reservation is not None:
+        if self.reservation.reservation_series is not None:
             msg = "Reservation cannot be in a reservation series."
             raise ValidationError(msg, code=error_codes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 

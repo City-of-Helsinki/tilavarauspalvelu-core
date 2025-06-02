@@ -11,8 +11,8 @@ from tilavarauspalvelu.models import (
     AllocatedTimeSlot,
     ApplicationRound,
     ApplicationSection,
-    RecurringReservation,
     Reservation,
+    ReservationSeries,
     ReservationUnitOption,
 )
 from utils.date_utils import get_periods_between, local_datetime, local_start_of_day, next_date_matching_weekday
@@ -134,9 +134,9 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         from .allocated_time_slot import AllocatedTimeSlotFactory
         from .application import ApplicationFactory
         from .application_section import ApplicationSectionFactory
-        from .recurring_reservation import RecurringReservationFactory
         from .reservation import ReservationFactory
         from .reservation_purpose import ReservationPurposeFactory
+        from .reservation_series import ReservationSeriesFactory
         from .reservation_unit_option import ReservationUnitOptionFactory
 
         purpose = ReservationPurposeFactory.create()
@@ -158,7 +158,7 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         sections: list[ApplicationSection] = []
         options: list[ReservationUnitOption] = []
         allocated_time_slots: list[AllocatedTimeSlot] = []
-        allocation_series: list[RecurringReservation] = []
+        allocation_series: list[ReservationSeries] = []
         reservations: list[Reservation] = []
         reservation_reservation_units: list[models.Model] = []
         application_round_reservation_units: list[models.Model] = []
@@ -204,7 +204,7 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
             allocated_time_slots.append(allocated_time_slot)
 
             if with_reservations:
-                series = RecurringReservationFactory.build(
+                series = ReservationSeriesFactory.build(
                     weekdays=str(allocation["day_of_the_week"]),
                     begin_date=reservation_period_begin_date,
                     begin_time=allocation["begin_time"],
@@ -234,7 +234,7 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
                         user=user,
                         purpose=purpose,
                         age_group=age_group,
-                        recurring_reservation=series,
+                        reservation_series=series,
                     )
                     reservations.append(reservation)
 
@@ -247,7 +247,7 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         ApplicationSection.objects.bulk_create(sections)
         ReservationUnitOption.objects.bulk_create(options)
         AllocatedTimeSlot.objects.bulk_create(allocated_time_slots)
-        RecurringReservation.objects.bulk_create(allocation_series)
+        ReservationSeries.objects.bulk_create(allocation_series)
         Reservation.objects.bulk_create(reservations)
         ReservationReservationUnit.objects.bulk_create(reservation_reservation_units)
         ApplicationRoundReservationUnit.objects.bulk_create(application_round_reservation_units)

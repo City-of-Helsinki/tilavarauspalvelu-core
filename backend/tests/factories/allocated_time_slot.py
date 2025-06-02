@@ -24,7 +24,7 @@ class AllocatedTimeSlotFactory(GenericDjangoModelFactory[AllocatedTimeSlot]):
     end_time = datetime.time(14, 0, tzinfo=DEFAULT_TIMEZONE)
 
     reservation_unit_option = ForeignKeyFactory("tests.factories.ReservationUnitOptionFactory")
-    recurring_reservation = ReverseOneToOneFactory("tests.factories.RecurringReservationFactory")
+    reservation_series = ReverseOneToOneFactory("tests.factories.ReservationSeriesFactory")
 
     @classmethod
     def create_ready_for_reservation(

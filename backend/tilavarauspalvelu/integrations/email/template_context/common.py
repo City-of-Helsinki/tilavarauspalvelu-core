@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     import datetime
     from decimal import Decimal
 
-    from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation, ReservationUnit
+    from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationSeries, ReservationUnit
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 
@@ -292,7 +292,7 @@ def params_for_access_code_reservation(*, reservation: Reservation) -> dict[str,
     return params
 
 
-def params_for_access_code_series(*, series: RecurringReservation) -> dict[str, Any]:
+def params_for_access_code_series(*, series: ReservationSeries) -> dict[str, Any]:
     from tilavarauspalvelu.integrations.keyless_entry import PindoraService
     from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 
@@ -454,7 +454,7 @@ def _initialize_allocations_map(section: ApplicationSection) -> defaultdict[int,
     """
     allocations_map: defaultdict[int, dict[Weekday, dict[str, str]]] = defaultdict(dict)
 
-    series: RecurringReservation
+    series: ReservationSeries
     for series in section.actions.get_reservation_series():
         begin_time = local_time_string(series.begin_time)  # type: ignore[arg-type]
         end_time = local_time_string(series.end_time)  # type: ignore[arg-type]
