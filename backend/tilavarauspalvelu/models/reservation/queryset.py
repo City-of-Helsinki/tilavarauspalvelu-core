@@ -278,7 +278,6 @@ class ReservationQuerySet(models.QuerySet):
         reservations = self.select_related(
             "user",
             "recurring_reservation",
-            "recurring_reservation__ability_group",
             "recurring_reservation__allocated_time_slot",
             "deny_reason",
             "purpose",

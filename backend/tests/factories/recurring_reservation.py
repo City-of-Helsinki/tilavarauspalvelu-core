@@ -50,8 +50,6 @@ class RecurringReservationFactory(GenericDjangoModelFactory[RecurringReservation
     allocated_time_slot = ForwardOneToOneFactory("tests.factories.AllocatedTimeSlotFactory")
     age_group = ForeignKeyFactory("tests.factories.AgeGroupFactory")
 
-    ability_group = ForeignKeyFactory("tests.factories.AbilityGroupFactory")
-
     rejected_occurrences = ReverseForeignKeyFactory("tests.factories.RejectedOccurrenceFactory")
     reservations = ReverseForeignKeyFactory("tests.factories.ReservationFactory")
 

@@ -19,7 +19,7 @@ from utils.lazy import LazyModelAttribute, LazyModelManager
 if TYPE_CHECKING:
     import datetime
 
-    from tilavarauspalvelu.models import AbilityGroup, AgeGroup, AllocatedTimeSlot, ReservationUnit, User
+    from tilavarauspalvelu.models import AgeGroup, AllocatedTimeSlot, ReservationUnit, User
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
 
     from .actions import RecurringReservationActions
@@ -76,15 +76,6 @@ class RecurringReservation(models.Model):
     )
     age_group: AgeGroup | None = models.ForeignKey(
         "tilavarauspalvelu.AgeGroup",
-        related_name="recurring_reservations",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
-
-    # TODO: Remove these fields
-    ability_group: AbilityGroup | None = models.ForeignKey(
-        "tilavarauspalvelu.AbilityGroup",
         related_name="recurring_reservations",
         on_delete=models.SET_NULL,
         null=True,
