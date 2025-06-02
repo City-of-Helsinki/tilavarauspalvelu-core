@@ -86,7 +86,6 @@ class RecurringReservationNode(DjangoNode):
             "ext_uuid",
             "user",
             "age_group",
-            "ability_group",
             "name",
             "description",
             "reservation_unit",
