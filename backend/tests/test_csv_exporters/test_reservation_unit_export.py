@@ -31,7 +31,6 @@ def test_reservation_unit_export_multiple():
         reservation_ends=datetime.datetime(2022, 2, 1, tzinfo=DEFAULT_TIMEZONE),
         spaces__name="Space",
         resources__name="Resource",
-        qualifiers__name="Qualifier",
         purposes__name="Purpose",
         equipments__name="Equipment",
         payment_terms__name="Payment terms",
@@ -89,7 +88,6 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.publish_ends
     assert row_2[next(index)] == reservation_unit_1.spaces.first().name_fi
     assert row_2[next(index)] == reservation_unit_1.resources.first().name_fi
-    assert row_2[next(index)] == reservation_unit_1.qualifiers.first().name_fi
     assert row_2[next(index)] == reservation_unit_1.payment_terms.name
     assert row_2[next(index)] == reservation_unit_1.cancellation_terms.name
     assert row_2[next(index)] == reservation_unit_1.pricing_terms.name
@@ -149,10 +147,6 @@ def test_reservation_unit_export_multiple():
             "Missing Resources": MissingParams(
                 missing=Missing(deleted=["resources__name"]),
                 column_value_mapping={"Resources": ""},
-            ),
-            "Missing Qualifiers": MissingParams(
-                missing=Missing(deleted=["qualifiers__name"]),
-                column_value_mapping={"Qualifiers": ""},
             ),
             "Missing Purposes": MissingParams(
                 missing=Missing(deleted=["purposes__name"]),
@@ -225,7 +219,6 @@ def test_reservation_unit_export_missing_relations(column_value_mapping, missing
         "reservation_ends": datetime.datetime(2022, 2, 1, tzinfo=DEFAULT_TIMEZONE),
         "spaces__name": "Space",
         "resources__name": "Resource",
-        "qualifiers__name": "Qualifier",
         "purposes__name": "Purpose",
         "equipments__name": "Equipment",
         "payment_terms__name": "Payment terms",

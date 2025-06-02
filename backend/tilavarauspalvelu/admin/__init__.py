@@ -20,7 +20,6 @@ from .payment_merchant.admin import PaymentMerchantAdmin
 from .payment_order.admin import PaymentOrderAdmin
 from .person.admin import PersonAdmin
 from .purpose.admin import PurposeAdmin
-from .qualifier.admin import QualifierAdmin
 from .recurring_reservation.admin import RecurringReservationAdmin
 from .rejected_occurrence.admin import RejectedOccurrenceAdmin
 from .request_log.admin import RequestLogAdmin
@@ -68,7 +67,6 @@ __all__ = [
     "PaymentOrderAdmin",
     "PersonAdmin",
     "PurposeAdmin",
-    "QualifierAdmin",
     "RecurringReservationAdmin",
     "RejectedOccurrenceAdmin",
     "RequestLogAdmin",

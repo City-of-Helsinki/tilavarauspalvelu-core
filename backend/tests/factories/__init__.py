@@ -23,7 +23,6 @@ from .payment_order import PaymentOrderFactory
 from .payment_product import PaymentProductFactory
 from .person import PersonFactory
 from .purpose import PurposeFactory
-from .qualifier import QualifierFactory
 from .recurring_reservation import RecurringReservationFactory
 from .rejected_occurrence import RejectedOccurrenceFactory
 from .reservable_time_span import ReservableTimeSpanFactory
@@ -79,7 +78,6 @@ __all__ = [
     "PaymentProductFactory",
     "PersonFactory",
     "PurposeFactory",
-    "QualifierFactory",
     "RecurringReservationFactory",
     "RefundFactory",
     "RefundStatusResultFactory",
