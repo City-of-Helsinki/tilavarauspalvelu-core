@@ -9,7 +9,7 @@ from tilavarauspalvelu.integrations.email.find_language import (
     get_series_email_language,
 )
 
-from tests.factories import ApplicationFactory, RecurringReservationFactory, ReservationFactory
+from tests.factories import ApplicationFactory, ReservationFactory, ReservationSeriesFactory
 
 pytestmark = [
     pytest.mark.django_db,
@@ -35,7 +35,7 @@ def test_get_application_email_language__invalid_language():
 
 @pytest.mark.parametrize("preferred_language", Language.values)
 def test_get_series_email_language(preferred_language):
-    series = RecurringReservationFactory.create(user__preferred_language=preferred_language)
+    series = ReservationSeriesFactory.create(user__preferred_language=preferred_language)
 
     lang = get_series_email_language(series)
 
@@ -43,7 +43,7 @@ def test_get_series_email_language(preferred_language):
 
 
 def test_get_series_email_language__invalid_language():
-    series = RecurringReservationFactory.create(user__preferred_language="uk")
+    series = ReservationSeriesFactory.create(user__preferred_language="uk")
 
     lang = get_series_email_language(series)
 

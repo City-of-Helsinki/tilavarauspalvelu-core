@@ -127,8 +127,8 @@ class ReservationStatistic(models.Model):
     def for_reservation(cls, reservation: Reservation, *, save: bool = False) -> ReservationStatistic:  # noqa: PLR0915
         from tilavarauspalvelu.translation import translated
 
-        recurring_reservation = getattr(reservation, "recurring_reservation", None)
-        allocated_time_slot = getattr(recurring_reservation, "allocated_time_slot", None)
+        reservation_series = getattr(reservation, "reservation_series", None)
+        allocated_time_slot = getattr(reservation_series, "allocated_time_slot", None)
         age_group = getattr(reservation, "age_group", None)
         deny_reason = getattr(reservation, "deny_reason", None)
         user = getattr(reservation, "user", None)
@@ -167,7 +167,7 @@ class ReservationStatistic(models.Model):
         statistic.home_city_municipality_code = getattr(home_city, "municipality_code", "")
         statistic.home_city_name = getattr(home_city, "name", "")
         statistic.is_applied = allocated_time_slot is not None
-        statistic.is_recurring = recurring_reservation is not None
+        statistic.is_recurring = reservation_series is not None
         statistic.is_subsidised = reservation.price < reservation.non_subsidised_price
         statistic.non_subsidised_price = reservation.non_subsidised_price
         statistic.non_subsidised_price_net = reservation.non_subsidised_price_net
@@ -176,9 +176,9 @@ class ReservationStatistic(models.Model):
         statistic.price_net = reservation.price_net
         statistic.purpose = getattr(purpose, "id", None)
         statistic.purpose_name = getattr(purpose, "name", "")
-        statistic.recurrence_begin_date = getattr(recurring_reservation, "begin_date", None)
-        statistic.recurrence_end_date = getattr(recurring_reservation, "end_date", None)
-        statistic.recurrence_uuid = str(getattr(recurring_reservation, "ext_uuid", ""))
+        statistic.recurrence_begin_date = getattr(reservation_series, "begin_date", None)
+        statistic.recurrence_end_date = getattr(reservation_series, "end_date", None)
+        statistic.recurrence_uuid = str(getattr(reservation_series, "ext_uuid", ""))
         statistic.reservation = reservation
         statistic.reservation_confirmed_at = reservation.confirmed_at
         statistic.reservation_created_at = reservation.created_at

@@ -10,9 +10,9 @@ from tilavarauspalvelu.models import AgeGroup, City, ReservationStatistic
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import (
-    RecurringReservationFactory,
     ReservationFactory,
     ReservationPurposeFactory,
+    ReservationSeriesFactory,
     ReservationUnitFactory,
     UnitFactory,
 )
@@ -27,7 +27,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     settings.SAVE_RESERVATION_STATISTICS = True
 
     reservation_unit = ReservationUnitFactory.create(name="resu", unit=UnitFactory(name="mesta", tprek_id="1234"))
-    recurring = RecurringReservationFactory.create(
+    reservation_series = ReservationSeriesFactory.create(
         allocated_time_slot__day_of_the_week=Weekday.MONDAY,
     )
     reservation = ReservationFactory.create(
@@ -42,7 +42,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
         non_subsidised_price=Decimal("11.00"),
         price=10,
         purpose=ReservationPurposeFactory(name="PurpleChoice"),
-        recurring_reservation=recurring,
+        reservation_series=reservation_series,
         reservation_units=[reservation_unit],
         reservee_address_zip="12345",
         reservee_id="123456789",
@@ -57,7 +57,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     )
 
     reservation_unit = reservation.reservation_units.first()
-    recurring = reservation.recurring_reservation
+    reservation_series = reservation.reservation_series
 
     assert ReservationStatistic.objects.count() == 1
 
@@ -91,9 +91,9 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     assert stat.primary_unit_tprek_id == reservation_unit.unit.tprek_id
     assert stat.purpose == reservation.purpose.id
     assert stat.purpose_name == reservation.purpose.name
-    assert stat.recurrence_begin_date == recurring.begin_date
-    assert stat.recurrence_end_date == recurring.end_date
-    assert stat.recurrence_uuid == str(recurring.ext_uuid)
+    assert stat.recurrence_begin_date == reservation_series.begin_date
+    assert stat.recurrence_end_date == reservation_series.end_date
+    assert stat.recurrence_uuid == str(reservation_series.ext_uuid)
     assert stat.reservation == reservation
     assert stat.reservation_confirmed_at == reservation.confirmed_at
     assert stat.reservation_created_at == reservation.created_at

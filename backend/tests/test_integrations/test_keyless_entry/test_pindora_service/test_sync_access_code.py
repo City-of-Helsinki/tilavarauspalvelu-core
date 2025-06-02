@@ -11,7 +11,7 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraConfl
 from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraAccessCodeModifyResponse
 from utils.date_utils import local_datetime
 
-from tests.factories import ApplicationSectionFactory, RecurringReservationFactory, ReservationFactory, UserFactory
+from tests.factories import ApplicationSectionFactory, ReservationFactory, ReservationSeriesFactory, UserFactory
 from tests.helpers import patch_method
 
 pytestmark = [
@@ -33,7 +33,7 @@ def access_code_response(**kwargs: Any) -> PindoraAccessCodeModifyResponse:
 def test_sync_access_code__reservation__generated(is_active):
     reservation = ReservationFactory.create(
         reservation_units__uuid=uuid.uuid4(),
-        recurring_reservation=None,
+        reservation_series=None,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -61,7 +61,7 @@ def test_sync_access_code__reservation__generated(is_active):
 def test_sync_access_code__reservation__generated__doesnt_exist(is_active):
     reservation = ReservationFactory.create(
         reservation_units__uuid=uuid.uuid4(),
-        recurring_reservation=None,
+        reservation_series=None,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -89,7 +89,7 @@ def test_sync_access_code__reservation__generated__doesnt_exist(is_active):
 def test_sync_access_code__reservation__not_generated(is_active):
     reservation = ReservationFactory.create(
         reservation_units__uuid=uuid.uuid4(),
-        recurring_reservation=None,
+        reservation_series=None,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -117,7 +117,7 @@ def test_sync_access_code__reservation__not_generated(is_active):
 def test_sync_access_code__reservation__not_generated__already_exists(is_active):
     reservation = ReservationFactory.create(
         reservation_units__uuid=uuid.uuid4(),
-        recurring_reservation=None,
+        reservation_series=None,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -144,7 +144,7 @@ def test_sync_access_code__reservation__not_generated__already_exists(is_active)
 def test_sync_access_code__reservation__not_access_code():
     reservation = ReservationFactory.create(
         reservation_units__uuid=uuid.uuid4(),
-        recurring_reservation=None,
+        reservation_series=None,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.UNRESTRICTED,
@@ -167,7 +167,7 @@ def test_sync_access_code__reservation__not_access_code():
 def test_sync_access_code__reservation__not_access_code__not_found():
     reservation = ReservationFactory.create(
         reservation_units__uuid=uuid.uuid4(),
-        recurring_reservation=None,
+        reservation_series=None,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.UNRESTRICTED,
@@ -191,7 +191,7 @@ def test_sync_access_code__reservation__not_access_code__not_found():
 def test_sync_access_code__reservation__state_indicates_no_access_code(state):
     reservation = ReservationFactory.create(
         reservation_units__uuid=uuid.uuid4(),
-        recurring_reservation=None,
+        reservation_series=None,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.UNRESTRICTED,
@@ -214,10 +214,10 @@ def test_sync_access_code__reservation__state_indicates_no_access_code(state):
 @patch_method(PindoraService.deactivate_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
 def test_sync_access_code__reservation__in_series(is_active):
-    series = RecurringReservationFactory.create()
+    series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -241,10 +241,10 @@ def test_sync_access_code__reservation__in_series(is_active):
 @patch_method(PindoraService.deactivate_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
 def test_sync_access_code__reservation__in_series__not_found(is_active):
-    series = RecurringReservationFactory.create()
+    series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -273,13 +273,13 @@ def test_sync_access_code__reservation__in_series__in_seasonal_booking(is_active
     section = ApplicationSectionFactory.create(
         application__user=user,
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     reservation = ReservationFactory.create(
         user=user,
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -307,13 +307,13 @@ def test_sync_access_code__reservation__in_series__in_seasonal_booking__not_foun
     section = ApplicationSectionFactory.create(
         application__user=user,
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     reservation = ReservationFactory.create(
         user=user,
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -338,10 +338,10 @@ def test_sync_access_code__reservation__in_series__in_seasonal_booking__not_foun
 @patch_method(PindoraService.deactivate_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
 def test_sync_access_code__series(is_active):
-    series = RecurringReservationFactory.create()
+    series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -365,10 +365,10 @@ def test_sync_access_code__series(is_active):
 @patch_method(PindoraService.deactivate_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
 def test_sync_access_code__series__not_found(is_active):
-    series = RecurringReservationFactory.create()
+    series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -397,13 +397,13 @@ def test_sync_access_code__series__in_seasonal_booking(is_active):
     section = ApplicationSectionFactory.create(
         application__user=user,
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     ReservationFactory.create(
         user=user,
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -431,13 +431,13 @@ def test_sync_access_code__series__in_seasonal_booking__not_found(is_active):
     section = ApplicationSectionFactory.create(
         application__user=user,
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     ReservationFactory.create(
         user=user,
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -466,13 +466,13 @@ def test_sync_access_code__seasonal_booking(is_active):
     section = ApplicationSectionFactory.create(
         application__user=user,
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     ReservationFactory.create(
         user=user,
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
@@ -500,13 +500,13 @@ def test_sync_access_code__seasonal_booking__not_found(is_active):
     section = ApplicationSectionFactory.create(
         application__user=user,
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     ReservationFactory.create(
         user=user,
         reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_series=series,
         begin=local_datetime(2024, 1, 1, 12),
         end=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,

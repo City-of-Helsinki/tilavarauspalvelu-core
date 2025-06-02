@@ -112,11 +112,11 @@ class AllocatedTimeSlotQuerySet(models.QuerySet):
         return self.alias(
             access_code_state=models.Case(
                 models.When(
-                    ~L(recurring_reservation__used_access_types__contains=[AccessType.ACCESS_CODE]),
+                    ~L(reservation_series__used_access_types__contains=[AccessType.ACCESS_CODE]),
                     then=models.Value(AccessCodeState.ACCESS_CODE_NOT_REQUIRED.value),
                 ),
                 models.When(
-                    L(recurring_reservation__is_access_code_is_active_correct=True),
+                    L(reservation_series__is_access_code_is_active_correct=True),
                     then=models.Value(AccessCodeState.ACCESS_CODE_CREATED.value),
                 ),
                 default=models.Value(AccessCodeState.ACCESS_CODE_PENDING.value),

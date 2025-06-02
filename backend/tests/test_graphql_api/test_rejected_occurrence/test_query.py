@@ -26,7 +26,7 @@ def test_rejected_recurrence__query__all_fields(graphql):
         endDatetime
         rejectionReason
         createdAt
-        recurringReservation {
+        reservationSeries {
             pk
             name
         }
@@ -43,9 +43,9 @@ def test_rejected_recurrence__query__all_fields(graphql):
         "endDatetime": occurrence.end_datetime.isoformat(),
         "rejectionReason": occurrence.rejection_reason,
         "createdAt": occurrence.created_at.isoformat(),
-        "recurringReservation": {
-            "pk": occurrence.recurring_reservation.pk,
-            "name": occurrence.recurring_reservation.name,
+        "reservationSeries": {
+            "pk": occurrence.reservation_series.pk,
+            "name": occurrence.reservation_series.name,
         },
     }
 
@@ -66,13 +66,13 @@ def test_rejected_recurrence__filter__by_pk(graphql):
     assert response.node(1) == {"pk": occurrence_2.pk}
 
 
-def test_rejected_recurrence__filter__by_recurring_reservation(graphql):
+def test_rejected_recurrence__filter__by_reservation_series(graphql):
     RejectedOccurrenceFactory.create()
     occurrence = RejectedOccurrenceFactory.create()
     RejectedOccurrenceFactory.create()
 
     graphql.login_with_superuser()
-    query = rejected_occurrence_query(recurring_reservation=occurrence.recurring_reservation.pk)
+    query = rejected_occurrence_query(reservation_series=occurrence.reservation_series.pk)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -84,11 +84,11 @@ def test_rejected_recurrence__filter__by_recurring_reservation(graphql):
 def test_rejected_recurrence__filter__by_application_round(graphql):
     RejectedOccurrenceFactory.create()
     occurrence = RejectedOccurrenceFactory.create(
-        recurring_reservation__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+        reservation_series__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
     )
     RejectedOccurrenceFactory.create()
 
-    option = occurrence.recurring_reservation.allocated_time_slot.reservation_unit_option
+    option = occurrence.reservation_series.allocated_time_slot.reservation_unit_option
     application_round = option.application_section.application.application_round
 
     graphql.login_with_superuser()
@@ -106,7 +106,7 @@ def test_rejected_recurrence__filter__by_reservation_unit(graphql):
     occurrence = RejectedOccurrenceFactory.create()
     RejectedOccurrenceFactory.create()
 
-    reservation_unit = occurrence.recurring_reservation.reservation_unit
+    reservation_unit = occurrence.reservation_series.reservation_unit
 
     graphql.login_with_superuser()
     query = rejected_occurrence_query(reservation_unit=reservation_unit.pk)
@@ -123,7 +123,7 @@ def test_rejected_recurrence__filter__by_unit(graphql):
     occurrence = RejectedOccurrenceFactory.create()
     RejectedOccurrenceFactory.create()
 
-    unit = occurrence.recurring_reservation.reservation_unit.unit
+    unit = occurrence.reservation_series.reservation_unit.unit
 
     graphql.login_with_superuser()
     query = rejected_occurrence_query(unit=unit.pk)
@@ -138,7 +138,7 @@ def test_rejected_recurrence__filter__by_unit(graphql):
 def test_rejected_recurrence__filter__by_text_search(graphql):
     # Works similarly to allocated time slot text search.
     # No need to test as thoroughly.
-    section_ref = "recurring_reservation__allocated_time_slot__reservation_unit_option__application_section"
+    section_ref = "reservation_series__allocated_time_slot__reservation_unit_option__application_section"
     occurrence = RejectedOccurrenceFactory.create(**{
         f"{section_ref}__application__organisation": None,
         f"{section_ref}__application__contact_person": None,
@@ -272,13 +272,13 @@ def test_rejected_recurrence__order__by_rejection_reason(graphql):
 
 def test_rejected_recurrence__order__by_application_pk(graphql):
     occurrence_1 = RejectedOccurrenceFactory.create(
-        recurring_reservation__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+        reservation_series__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
     )
     occurrence_2 = RejectedOccurrenceFactory.create(
-        recurring_reservation__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+        reservation_series__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
     )
     occurrence_3 = RejectedOccurrenceFactory.create(
-        recurring_reservation__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+        reservation_series__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
     )
 
     graphql.login_with_superuser()
@@ -305,13 +305,13 @@ def test_rejected_recurrence__order__by_application_pk(graphql):
 
 def test_rejected_recurrence__order__by_application_section_pk(graphql):
     occurrence_1 = RejectedOccurrenceFactory.create(
-        recurring_reservation__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+        reservation_series__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
     )
     occurrence_2 = RejectedOccurrenceFactory.create(
-        recurring_reservation__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+        reservation_series__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
     )
     occurrence_3 = RejectedOccurrenceFactory.create(
-        recurring_reservation__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+        reservation_series__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
     )
 
     graphql.login_with_superuser()
@@ -364,9 +364,9 @@ def test_rejected_recurrence__order__by_reservation_unit_pk(graphql):
 
 
 def test_rejected_recurrence__order__by_reservation_unit_name(graphql):
-    occurrence_1 = RejectedOccurrenceFactory.create(recurring_reservation__reservation_unit__name="A")
-    occurrence_2 = RejectedOccurrenceFactory.create(recurring_reservation__reservation_unit__name="C")
-    occurrence_3 = RejectedOccurrenceFactory.create(recurring_reservation__reservation_unit__name="B")
+    occurrence_1 = RejectedOccurrenceFactory.create(reservation_series__reservation_unit__name="A")
+    occurrence_2 = RejectedOccurrenceFactory.create(reservation_series__reservation_unit__name="C")
+    occurrence_3 = RejectedOccurrenceFactory.create(reservation_series__reservation_unit__name="B")
 
     graphql.login_with_superuser()
     query = rejected_occurrence_query(order_by="reservationUnitNameAsc")
@@ -418,7 +418,7 @@ def test_rejected_recurrence__order__by_unit_pk(graphql):
 
 
 def test_rejected_recurrence__order__by_applicant(graphql):
-    section_ref = "recurring_reservation__allocated_time_slot__reservation_unit_option__application_section"
+    section_ref = "reservation_series__allocated_time_slot__reservation_unit_option__application_section"
     occurrence_1 = RejectedOccurrenceFactory.create(**{f"{section_ref}__application__organisation__name": "A"})
     occurrence_2 = RejectedOccurrenceFactory.create(**{f"{section_ref}__application__organisation__name": "B"})
     occurrence_3 = RejectedOccurrenceFactory.create(**{f"{section_ref}__application__organisation__name": "C"})

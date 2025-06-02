@@ -18,13 +18,13 @@ from .payment_merchant.admin import PaymentMerchantAdmin
 from .payment_order.admin import PaymentOrderAdmin
 from .person.admin import PersonAdmin
 from .purpose.admin import PurposeAdmin
-from .recurring_reservation.admin import RecurringReservationAdmin
 from .rejected_occurrence.admin import RejectedOccurrenceAdmin
 from .reservation.admin import ReservationAdmin
 from .reservation_deny_reason.admin import ReservationDenyReasonAdmin
 from .reservation_metadata_field.admin import ReservationMetadataFieldAdmin
 from .reservation_metadata_set.admin import ReservationMetadataSetAdmin
 from .reservation_purpose.admin import ReservationPurposeAdmin
+from .reservation_series.admin import ReservationSeriesAdmin
 from .reservation_statistic.admin import ReservationStatisticAdmin
 from .reservation_unit.admin import ReservationUnitAdmin
 from .reservation_unit_access_type.admin import ReservationUnitAccessTypeAdmin
@@ -61,13 +61,13 @@ __all__ = [
     "PaymentOrderAdmin",
     "PersonAdmin",
     "PurposeAdmin",
-    "RecurringReservationAdmin",
     "RejectedOccurrenceAdmin",
     "ReservationAdmin",
     "ReservationDenyReasonAdmin",
     "ReservationMetadataFieldAdmin",
     "ReservationMetadataSetAdmin",
     "ReservationPurposeAdmin",
+    "ReservationSeriesAdmin",
     "ReservationStatisticAdmin",
     "ReservationUnitAccessTypeAdmin",
     "ReservationUnitAdmin",

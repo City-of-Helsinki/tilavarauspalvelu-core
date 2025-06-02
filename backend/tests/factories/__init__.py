@@ -22,7 +22,6 @@ from .payment_order import PaymentOrderFactory
 from .payment_product import PaymentProductFactory
 from .person import PersonFactory
 from .purpose import PurposeFactory
-from .recurring_reservation import RecurringReservationFactory
 from .rejected_occurrence import RejectedOccurrenceFactory
 from .reservable_time_span import ReservableTimeSpanFactory
 from .reservation import ReservationFactory
@@ -30,6 +29,7 @@ from .reservation_deny_reason import ReservationDenyReasonFactory
 from .reservation_metadata_field import ReservationMetadataFieldFactory
 from .reservation_metadata_set import ReservationMetadataSetFactory
 from .reservation_purpose import ReservationPurposeFactory
+from .reservation_series import ReservationSeriesFactory
 from .reservation_unit import ReservationUnitFactory
 from .reservation_unit_access_type import ReservationUnitAccessTypeFactory
 from .reservation_unit_cancellation_rule import ReservationUnitCancellationRuleFactory
@@ -76,7 +76,6 @@ __all__ = [
     "PaymentProductFactory",
     "PersonFactory",
     "PurposeFactory",
-    "RecurringReservationFactory",
     "RefundFactory",
     "RefundStatusResultFactory",
     "RejectedOccurrenceFactory",
@@ -86,6 +85,7 @@ __all__ = [
     "ReservationMetadataFieldFactory",
     "ReservationMetadataSetFactory",
     "ReservationPurposeFactory",
+    "ReservationSeriesFactory",
     "ReservationUnitAccessTypeFactory",
     "ReservationUnitCancellationRuleFactory",
     "ReservationUnitFactory",

@@ -249,7 +249,7 @@ def test_application_round_query__reservation_creation_status__COMPLETED__before
     )
     application = ApplicationFactory.create_in_status_handled(application_round=application_round)
     ReservationFactory(
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section__application=application
+        reservation_series__allocated_time_slot__reservation_unit_option__application_section__application=application
     )
 
     graphql.login_with_superuser()
@@ -266,7 +266,7 @@ def test_application_round_query__reservation_creation_status__COMPLETED__after_
     )
     application = ApplicationFactory.create_in_status_handled(application_round=application_round)
     ReservationFactory(
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section__application=application
+        reservation_series__allocated_time_slot__reservation_unit_option__application_section__application=application
     )
 
     graphql.login_with_superuser()

@@ -20,5 +20,5 @@ class AgeGroupFactory(GenericDjangoModelFactory[AgeGroup]):
     maximum = LazyAttribute(lambda i: min(i.minimum + 20, 100))
 
     application_sections = ReverseForeignKeyFactory("tests.factories.ApplicationSectionFactory")
-    recurring_reservations = ReverseForeignKeyFactory("tests.factories.RecurringReservationFactory")
+    reservation_series = ReverseForeignKeyFactory("tests.factories.ReservationSeriesFactory")
     reservations = ReverseForeignKeyFactory("tests.factories.ReservationFactory")

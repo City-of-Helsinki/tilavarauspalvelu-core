@@ -184,7 +184,7 @@ def test_application_section__usable_reservation_unit_options():
 def test_application_section__should_have_active_access_code__active():
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -196,7 +196,7 @@ def test_application_section__should_have_active_access_code__active():
 def test_application_section__should_have_active_access_code__blocked():
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.BLOCKED,
@@ -208,7 +208,7 @@ def test_application_section__should_have_active_access_code__blocked():
 def test_application_section__should_have_active_access_code__not_confirmed():
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CREATED,
         type=ReservationTypeChoice.NORMAL,
@@ -220,7 +220,7 @@ def test_application_section__should_have_active_access_code__not_confirmed():
 def test_application_section__is_access_code_is_active_correct__active_when_should_be():
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -234,7 +234,7 @@ def test_application_section__is_access_code_is_active_correct__active_when_shou
 def test_application_section__is_access_code_is_active_correct__active_when_should_not_be():
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.BLOCKED,
@@ -248,7 +248,7 @@ def test_application_section__is_access_code_is_active_correct__active_when_shou
 def test_application_section__is_access_code_is_active_correct__inactive_when_should_not_be():
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -261,7 +261,7 @@ def test_application_section__is_access_code_is_active_correct__inactive_when_sh
 def test_application_section__is_access_code_is_active_correct__inactive_when_should_be():
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.BLOCKED,

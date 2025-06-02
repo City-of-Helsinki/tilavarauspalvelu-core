@@ -67,7 +67,7 @@ class UserFactory(GenericDjangoModelFactory[User]):
     sent_email_about_anonymization = False
 
     reservations = ReverseForeignKeyFactory("tests.factories.ReservationFactory")
-    recurring_reservations = ReverseForeignKeyFactory("tests.factories.RecurringReservationFactory")
+    reservation_series = ReverseForeignKeyFactory("tests.factories.ReservationSeriesFactory")
     applications = ReverseForeignKeyFactory("tests.factories.ApplicationFactory")
     general_roles = ReverseForeignKeyFactory("tests.factories.GeneralRoleFactory")
     assigned_general_roles = ReverseForeignKeyFactory("tests.factories.GeneralRoleFactory")

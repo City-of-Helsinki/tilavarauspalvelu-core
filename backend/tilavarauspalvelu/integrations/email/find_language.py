@@ -7,7 +7,7 @@ from django.conf import settings
 from tilavarauspalvelu.enums import Language
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Application, RecurringReservation, Reservation
+    from tilavarauspalvelu.models import Application, Reservation, ReservationSeries
     from tilavarauspalvelu.typing import Lang
 
 __all__ = [
@@ -26,7 +26,7 @@ def get_application_email_language(application: Application) -> Lang:
     return settings.LANGUAGE_CODE  # type: ignore[return-value]
 
 
-def get_series_email_language(series: RecurringReservation) -> Lang:
+def get_series_email_language(series: ReservationSeries) -> Lang:
     """Get email notification language for the given series."""
     if series.user is None:
         return settings.LANGUAGE_CODE  # type: ignore[return-value]

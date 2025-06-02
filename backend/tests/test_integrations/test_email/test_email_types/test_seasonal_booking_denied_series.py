@@ -17,9 +17,9 @@ from tilavarauspalvelu.integrations.email.template_context import get_context_fo
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 
-from tests.factories import ApplicationFactory, RecurringReservationFactory, UserFactory
+from tests.factories import ApplicationFactory, ReservationSeriesFactory, UserFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
-from tests.test_graphql_api.test_recurring_reservation.helpers import create_reservation_series
+from tests.test_graphql_api.test_reservation_series.helpers import create_reservation_series
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
@@ -123,7 +123,7 @@ def test_seasonal_booking_denied_series__get_context__instance(email_reservation
     email_reservation.state = ReservationStateChoice.DENIED
     email_reservation.save()
 
-    series = email_reservation.recurring_reservation
+    series = email_reservation.reservation_series
     section = email_reservation.actions.get_application_section()
 
     expected = {
@@ -236,7 +236,7 @@ def test_seasonal_booking_denied_series__send_email__no_reservations(outbox):
         user=user,
         contact_person__email="contact@email.com",
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         user=user,
         allocated_time_slot__day_of_the_week=Weekday.MONDAY,
         allocated_time_slot__reservation_unit_option__application_section__application=application,
