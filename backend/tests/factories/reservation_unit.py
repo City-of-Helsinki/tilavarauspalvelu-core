@@ -145,7 +145,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     # Reverse one-to-many
     images = ReverseForeignKeyFactory("tests.factories.ReservationUnitImageFactory")
     pricings = ReverseForeignKeyFactory("tests.factories.ReservationUnitPricingFactory")
-    recurring_reservations = ReverseForeignKeyFactory("tests.factories.RecurringReservationFactory")
+    reservation_series = ReverseForeignKeyFactory("tests.factories.ReservationSeriesFactory")
     application_round_time_slots = ReverseForeignKeyFactory("tests.factories.ApplicationRoundTimeSlotFactory")
     reservation_unit_options = ReverseForeignKeyFactory("tests.factories.ReservationUnitOptionFactory")
     access_types = ReverseForeignKeyFactory("tests.factories.ReservationUnitAccessTypeFactory")

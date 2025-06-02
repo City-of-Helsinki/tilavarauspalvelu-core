@@ -27,8 +27,8 @@ from tilavarauspalvelu.models import (
     ApplicationSection,
     GeneralRole,
     Person,
-    RecurringReservation,
     Reservation,
+    ReservationSeries,
     Unit,
     UnitRole,
 )
@@ -86,7 +86,7 @@ class UserActions:
         reservations: Iterable[Reservation] = Reservation.objects.filter(user=self.user).exclude(
             type__in=ReservationTypeChoice.should_not_anonymize,
         )
-        recurring_reservations = RecurringReservation.objects.filter(reservations__in=reservations)
+        reservation_series = ReservationSeries.objects.filter(reservations__in=reservations)
 
         for reservation in reservations:
             reservation.name = ANONYMIZED
@@ -110,9 +110,9 @@ class UserActions:
             reservation.cancel_details = SENSITIVE_RESERVATION
             reservation.handling_details = SENSITIVE_RESERVATION
 
-        for recurring_reservation in recurring_reservations:
-            recurring_reservation.name = ANONYMIZED
-            recurring_reservation.description = ANONYMIZED
+        for series in reservation_series:
+            series.name = ANONYMIZED
+            series.description = ANONYMIZED
 
         Reservation.objects.bulk_update(
             reservations,
@@ -140,8 +140,8 @@ class UserActions:
             ],
         )
 
-        RecurringReservation.objects.bulk_update(
-            recurring_reservations,
+        ReservationSeries.objects.bulk_update(
+            reservation_series,
             [
                 "name",
                 "description",

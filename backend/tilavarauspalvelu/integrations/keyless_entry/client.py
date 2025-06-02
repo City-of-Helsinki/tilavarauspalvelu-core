@@ -50,7 +50,7 @@ from .typing import (
 if TYPE_CHECKING:
     from requests import Response
 
-    from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation, ReservationUnit
+    from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationSeries, ReservationUnit
 
 __all__ = [
     "PindoraClient",
@@ -464,14 +464,14 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
         reservations: list[Reservation] = list(
             section.actions.get_reservations()
             .requires_active_access_code()
-            .select_related("recurring_reservation__reservation_unit")
+            .select_related("reservation_series__reservation_unit")
         )
 
         data = PindoraSeasonalBookingCreateData(
             seasonal_booking_id=str(section.ext_uuid),
             series=[
                 PindoraSeasonalBookingReservationData(
-                    reservation_unit_id=str(reservation.recurring_reservation.reservation_unit.uuid),
+                    reservation_unit_id=str(reservation.reservation_series.reservation_unit.uuid),
                     begin=local_iso_format(reservation.begin),
                     end=local_iso_format(reservation.end),
                 )
@@ -501,13 +501,13 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
         reservations: list[Reservation] = list(
             section.actions.get_reservations()
             .requires_active_access_code()
-            .select_related("recurring_reservation__reservation_unit")
+            .select_related("reservation_series__reservation_unit")
         )
 
         data = PindoraSeasonalBookingRescheduleData(
             series=[
                 PindoraSeasonalBookingReservationData(
-                    reservation_unit_id=str(reservation.recurring_reservation.reservation_unit.uuid),
+                    reservation_unit_id=str(reservation.reservation_series.reservation_unit.uuid),
                     begin=local_iso_format(reservation.begin),
                     end=local_iso_format(reservation.end),
                 )
@@ -673,10 +673,10 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
 
 
 class PindoraReservationSeriesClient(BasePindoraClient):
-    """Pindora client for working with reservation series (recurring reservations)"""
+    """Pindora client for working with reservation series (reservation series)"""
 
     @classmethod
-    def get_reservation_series(cls, series: RecurringReservation | uuid.UUID) -> PindoraReservationSeriesResponse:
+    def get_reservation_series(cls, series: ReservationSeries | uuid.UUID) -> PindoraReservationSeriesResponse:
         """Fetch a reservation series from Pindora."""
         series_uuid = series if isinstance(series, uuid.UUID) else series.ext_uuid
 
@@ -701,7 +701,7 @@ class PindoraReservationSeriesClient(BasePindoraClient):
     @classmethod
     def create_reservation_series(
         cls,
-        series: RecurringReservation,
+        series: ReservationSeries,
         *,
         is_active: bool = True,
     ) -> PindoraReservationSeriesResponse:
@@ -736,7 +736,7 @@ class PindoraReservationSeriesClient(BasePindoraClient):
         return parsed_data
 
     @classmethod
-    def reschedule_reservation_series(cls, series: RecurringReservation) -> PindoraAccessCodeModifyResponse:
+    def reschedule_reservation_series(cls, series: ReservationSeries) -> PindoraAccessCodeModifyResponse:
         """Reschedule a reservation series in Pindora."""
         url = cls._build_url(f"reservation-series/reschedule/{series.ext_uuid}")
 
@@ -769,7 +769,7 @@ class PindoraReservationSeriesClient(BasePindoraClient):
     @classmethod
     def change_reservation_series_access_code(
         cls,
-        series: RecurringReservation | uuid.UUID,
+        series: ReservationSeries | uuid.UUID,
     ) -> PindoraAccessCodeModifyResponse:
         """Change a reservation series' access code in Pindora."""
         series_uuid = series if isinstance(series, uuid.UUID) else series.ext_uuid
@@ -790,7 +790,7 @@ class PindoraReservationSeriesClient(BasePindoraClient):
         return cls._parse_access_code_modify_response(data)
 
     @classmethod
-    def activate_reservation_series_access_code(cls, series: RecurringReservation | uuid.UUID) -> None:
+    def activate_reservation_series_access_code(cls, series: ReservationSeries | uuid.UUID) -> None:
         """Activate a reservation series' access code in Pindora."""
         series_uuid = series if isinstance(series, uuid.UUID) else series.ext_uuid
 
@@ -806,7 +806,7 @@ class PindoraReservationSeriesClient(BasePindoraClient):
         cls._clear_cached_reservation_series_response(ext_uuid=series_uuid)
 
     @classmethod
-    def deactivate_reservation_series_access_code(cls, series: RecurringReservation | uuid.UUID) -> None:
+    def deactivate_reservation_series_access_code(cls, series: ReservationSeries | uuid.UUID) -> None:
         """Deactivate a reservation series' access code in Pindora."""
         series_uuid = series if isinstance(series, uuid.UUID) else series.ext_uuid
 
@@ -822,7 +822,7 @@ class PindoraReservationSeriesClient(BasePindoraClient):
         cls._clear_cached_reservation_series_response(ext_uuid=series_uuid)
 
     @classmethod
-    def delete_reservation_series(cls, series: RecurringReservation | uuid.UUID) -> None:
+    def delete_reservation_series(cls, series: ReservationSeries | uuid.UUID) -> None:
         """Delete a reservation series from Pindora."""
         series_uuid = series if isinstance(series, uuid.UUID) else series.ext_uuid
 

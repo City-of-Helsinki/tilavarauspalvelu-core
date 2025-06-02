@@ -11,8 +11,8 @@ from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import (
     PaymentOrderFactory,
-    RecurringReservationFactory,
     ReservationFactory,
+    ReservationSeriesFactory,
     ReservationUnitFactory,
     UnitFactory,
     UnitGroupFactory,
@@ -426,15 +426,15 @@ def test_reservation__filter__by_price_gte(graphql):
     assert response.node(0) == {"pk": reservation.pk}
 
 
-def test_reservation__filter__by_recurring_reservation(graphql):
-    recurring_reservation = RecurringReservationFactory.create()
+def test_reservation__filter__by_reservation_series(graphql):
+    reservation_series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
-        recurring_reservation=recurring_reservation,
-        reservation_units=[recurring_reservation.reservation_unit],
+        reservation_series=reservation_series,
+        reservation_units=[reservation_series.reservation_unit],
     )
 
     graphql.login_with_superuser()
-    query = reservations_query(recurring_reservation=recurring_reservation.pk)
+    query = reservations_query(reservation_series=reservation_series.pk)
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -443,12 +443,12 @@ def test_reservation__filter__by_recurring_reservation(graphql):
 
 
 def test_reservation__filter__by_is_recurring(graphql):
-    recurring_reservation = RecurringReservationFactory.create()
+    reservation_series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
-        recurring_reservation=recurring_reservation,
-        reservation_units=[recurring_reservation.reservation_unit],
+        reservation_series=reservation_series,
+        reservation_units=[reservation_series.reservation_unit],
     )
-    ReservationFactory.create(recurring_reservation=None)
+    ReservationFactory.create(reservation_series=None)
 
     graphql.login_with_superuser()
     query = reservations_query(is_recurring=True)
@@ -643,12 +643,12 @@ def test_reservation__filter__by_text_search__user_last_name(graphql):
     assert response.node(0) == {"pk": reservation.pk}
 
 
-def test_reservation__filter__by_text_search__recurring_reservation_name(graphql):
-    reservation = ReservationFactory.create(recurring_reservation__name="foo")
-    recurring_reservation = reservation.recurring_reservation
+def test_reservation__filter__by_text_search__reservation_series_name(graphql):
+    reservation = ReservationFactory.create(reservation_series__name="foo")
+    reservation_series = reservation.reservation_series
 
     graphql.login_with_superuser()
-    query = reservations_query(text_search=recurring_reservation.name)
+    query = reservations_query(text_search=reservation_series.name)
     response = graphql(query)
 
     assert response.has_errors is False, response

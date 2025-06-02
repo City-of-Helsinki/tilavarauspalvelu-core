@@ -13,7 +13,7 @@ from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraReservati
 from tilavarauspalvelu.tasks import create_missing_pindora_reservations_task
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
-from tests.factories import RecurringReservationFactory, ReservationFactory, ReservationUnitFactory
+from tests.factories import ReservationFactory, ReservationSeriesFactory, ReservationUnitFactory
 from tests.helpers import patch_method
 
 
@@ -286,7 +286,7 @@ def test_create_missing_pindora_reservations__pindora_error():
 @pytest.mark.django_db
 @freeze_time("2023-01-01")
 @patch_method(PindoraClient.create_reservation)
-def test_create_missing_pindora_reservations__recurring_reservation_is_ignored():
+def test_create_missing_pindora_reservations__reservation_series_is_ignored():
     now = local_datetime()
 
     ReservationFactory.create(
@@ -297,7 +297,7 @@ def test_create_missing_pindora_reservations__recurring_reservation_is_ignored()
         access_code_is_active=False,
         begin=now + datetime.timedelta(days=1),
         end=now + datetime.timedelta(days=1, hours=1),
-        recurring_reservation=RecurringReservationFactory.create(),
+        reservation_series=ReservationSeriesFactory.create(),
     )
 
     create_missing_pindora_reservations_task()

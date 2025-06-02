@@ -22,9 +22,9 @@ class RejectedOccurrenceAdmin(admin.ModelAdmin):
     # Functions
     search_fields = [
         "rejection_reason",
-        "recurring_reservation__name",
+        "reservation_series__name",
     ]
-    search_help_text = "Search by rejection reason or recurring reservation's name"
+    search_help_text = "Search by rejection reason or reservation series' name"
 
     # List
     list_display = [
@@ -32,16 +32,16 @@ class RejectedOccurrenceAdmin(admin.ModelAdmin):
         "begin_datetime",
         "end_datetime",
         "rejection_reason",
-        "recurring_reservation",
+        "reservation_series",
     ]
     ordering = [
         "-id",
-        "recurring_reservation",
+        "reservation_series",
     ]
 
     # Form
     fields = [
-        "recurring_reservation",
+        "reservation_series",
         "created_at",
         "begin_datetime",
         "end_datetime",
@@ -49,8 +49,8 @@ class RejectedOccurrenceAdmin(admin.ModelAdmin):
     ]
     readonly_fields = [
         "created_at",
-        "recurring_reservation",
+        "reservation_series",
     ]
 
     def get_queryset(self, request: WSGIRequest) -> QuerySet:
-        return super().get_queryset(request).select_related("recurring_reservation")
+        return super().get_queryset(request).select_related("reservation_series")

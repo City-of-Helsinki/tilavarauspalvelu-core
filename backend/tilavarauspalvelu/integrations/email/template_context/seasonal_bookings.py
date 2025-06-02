@@ -34,7 +34,7 @@ if TYPE_CHECKING:
         SeasonalBookingRescheduledSeriesContext,
         SeasonalBookingRescheduledSingleContext,
     )
-    from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation
+    from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationSeries
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 __all__ = [
@@ -296,7 +296,7 @@ def get_context_for_seasonal_booking_cancelled_single(
 
 @get_translated
 def get_context_for_seasonal_booking_denied_series(
-    series: RecurringReservation | None = None,
+    series: ReservationSeries | None = None,
     *,
     language: Lang,
     **data: Unpack[SeasonalBookingDeniedSeriesContext],
@@ -388,7 +388,7 @@ def get_context_for_seasonal_booking_denied_single(
 
 @get_translated
 def get_context_for_seasonal_booking_rescheduled_series(
-    series: RecurringReservation | None = None,
+    series: ReservationSeries | None = None,
     *,
     language: Lang,
     **data: Unpack[SeasonalBookingRescheduledSeriesContext],

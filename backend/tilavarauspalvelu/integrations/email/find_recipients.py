@@ -10,7 +10,7 @@ from tilavarauspalvelu.models import Unit, User
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from tilavarauspalvelu.models import Application, ApplicationSection, RecurringReservation, Reservation
+    from tilavarauspalvelu.models import Application, ApplicationSection, Reservation, ReservationSeries
     from tilavarauspalvelu.typing import Lang
 
 __all__ = [
@@ -37,7 +37,7 @@ def get_application_email_recipients(application: Application) -> list[str]:
     return list(recipients)
 
 
-def get_series_email_recipients(series: RecurringReservation) -> list[str]:
+def get_series_email_recipients(series: ReservationSeries) -> list[str]:
     """Get email notification recipients for the given series."""
     recipients: set[str] = set()
 
@@ -161,7 +161,7 @@ def get_application_section_staff_notification_recipients_by_language(
         .filter(
             # The ReservationUnits must be fetched through AllocatedTimeSlot, since ReservationUnitOptions may contain
             # ReservationUnits which has not been allocated any slots in application handling
-            reservation_units__recurring_reservations__allocated_time_slot__reservation_unit_option__application_section=application_section
+            reservation_units__reservation_series__allocated_time_slot__reservation_unit_option__application_section=application_section
         )
         .distinct()
     )

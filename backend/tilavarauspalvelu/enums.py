@@ -73,7 +73,7 @@ class TermsOfUseTypeChoices(models.TextChoices):
     GENERIC = "generic_terms", _("Generic terms")
     PAYMENT = "payment_terms", _("Payment terms")
     CANCELLATION = "cancellation_terms", _("Cancellation terms")
-    RECURRING = "recurring_terms", _("Recurring reservation terms")
+    RECURRING = "recurring_terms", _("Reservation series terms")
     SERVICE = "service_terms", _("Service-specific terms")
     PRICING = "pricing_terms", _("Pricing terms")
 
@@ -212,7 +212,7 @@ class UserRoleChoice(models.TextChoices):
     def can_view_reservations(cls) -> list[UserRoleChoice]:
         """
         Permission required to view reservation data, and comment on them,
-        as well as to view some restricted information on recurring reservations.
+        as well as to view some restricted information on reservation series.
         """
         return [UserRoleChoice.VIEWER, UserRoleChoice.HANDLER, UserRoleChoice.ADMIN]
 
@@ -221,7 +221,7 @@ class UserRoleChoice(models.TextChoices):
         """
         Permission required to create different types of reservations,
         like those on behalf of another user, or once that block reservable time.,
-        or to create or modify recurring reservations.
+        or to create or modify reservation series.
         """
         return [UserRoleChoice.RESERVER, UserRoleChoice.HANDLER, UserRoleChoice.ADMIN]
 

@@ -14,8 +14,8 @@ from tilavarauspalvelu.integrations.email.find_recipients import (
 
 from tests.factories import (
     ApplicationFactory,
-    RecurringReservationFactory,
     ReservationFactory,
+    ReservationSeriesFactory,
     ReservationUnitFactory,
     UserFactory,
 )
@@ -58,7 +58,7 @@ def test_get_application_email_recipients__no_contact_person_or_applicant():
 def test_get_series_email_recipients():
     user = UserFactory.create(email="applicant@example.com")
     application = ApplicationFactory.create(user=user, contact_person__email="contact@example.com")
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         user=user,
         allocated_time_slot__reservation_unit_option__application_section__application=application,
     )
@@ -69,7 +69,7 @@ def test_get_series_email_recipients():
 
 def test_get_series_email_recipients__no_application():
     user = UserFactory.create(email="applicant@example.com")
-    series = RecurringReservationFactory.create(user=user)
+    series = ReservationSeriesFactory.create(user=user)
 
     result = get_series_email_recipients(series)
     assert sorted(result) == ["applicant@example.com"]

@@ -16,8 +16,8 @@ from utils.date_utils import local_datetime
 from tests.factories import (
     AllocatedTimeSlotFactory,
     ApplicationSectionFactory,
-    RecurringReservationFactory,
     ReservationFactory,
+    ReservationSeriesFactory,
     ReservationUnitFactory,
 )
 
@@ -624,9 +624,9 @@ def test_application__filter__by_text_search__not_found(graphql):
 )
 def test_allocated_time_slot__filter__by_access_code_state(graphql, access_code_state):
     allocation_1 = AllocatedTimeSlotFactory.create()
-    series_1 = RecurringReservationFactory.create(allocated_time_slot=allocation_1)
+    series_1 = ReservationSeriesFactory.create(allocated_time_slot=allocation_1)
     ReservationFactory.create(
-        recurring_reservation=series_1,
+        reservation_series=series_1,
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=True,
         access_code_generated_at=local_datetime(),
@@ -635,9 +635,9 @@ def test_allocated_time_slot__filter__by_access_code_state(graphql, access_code_
     )
 
     allocation_2 = AllocatedTimeSlotFactory.create()
-    series_2 = RecurringReservationFactory.create(allocated_time_slot=allocation_2)
+    series_2 = ReservationSeriesFactory.create(allocated_time_slot=allocation_2)
     ReservationFactory.create(
-        recurring_reservation=series_2,
+        reservation_series=series_2,
         access_type=AccessType.UNRESTRICTED,
         access_code_is_active=False,
         access_code_generated_at=None,
@@ -646,9 +646,9 @@ def test_allocated_time_slot__filter__by_access_code_state(graphql, access_code_
     )
 
     allocation_3 = AllocatedTimeSlotFactory.create()
-    series_3 = RecurringReservationFactory.create(allocated_time_slot=allocation_3)
+    series_3 = ReservationSeriesFactory.create(allocated_time_slot=allocation_3)
     ReservationFactory.create(
-        recurring_reservation=series_3,
+        reservation_series=series_3,
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=False,
         access_code_generated_at=None,

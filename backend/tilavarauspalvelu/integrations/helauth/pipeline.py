@@ -10,7 +10,7 @@ from tilavarauspalvelu.dataclasses import IDToken
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.helsinki_profile.typing import ReservationPrefillInfo
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import Application, GeneralRole, RecurringReservation, Reservation, UnitRole, User
+from tilavarauspalvelu.models import Application, GeneralRole, Reservation, ReservationSeries, UnitRole, User
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import WSGIRequest
@@ -135,8 +135,8 @@ def migrate_from_tunnistamo_to_keycloak(*, email: str) -> None:
     Application.objects.filter(user=old_user).update(user=new_user)
     # Migrate reservations.
     Reservation.objects.filter(user=old_user).update(user=new_user)
-    # Migrate recurring reservations.
-    RecurringReservation.objects.filter(user=old_user).update(user=new_user)
+    # Migrate reservation series.
+    ReservationSeries.objects.filter(user=old_user).update(user=new_user)
 
     # Mark the old user as inactive.
     old_user.is_active = False

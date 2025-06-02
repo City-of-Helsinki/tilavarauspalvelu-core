@@ -28,8 +28,8 @@ from utils.external_service.errors import ExternalServiceRequestError
 from tests.factories import (
     AllocatedTimeSlotFactory,
     ApplicationSectionFactory,
-    RecurringReservationFactory,
     ReservationFactory,
+    ReservationSeriesFactory,
     ReservationUnitOptionFactory,
 )
 from tests.helpers import ResponseMock, exact, patch_method, use_retries
@@ -133,10 +133,10 @@ def test_pindora_client__create_seasonal_booking(is_active: bool):
     application_section = ApplicationSectionFactory.create()
     reservation_unit_option = ReservationUnitOptionFactory.create(application_section=application_section)
     allocation = AllocatedTimeSlotFactory.create(reservation_unit_option=reservation_unit_option)
-    recurring_reservation = RecurringReservationFactory.create(allocated_time_slot=allocation)
+    reservation_series = ReservationSeriesFactory.create(allocated_time_slot=allocation)
 
     ReservationFactory.create(
-        recurring_reservation=recurring_reservation,
+        reservation_series=reservation_series,
         created_at=local_datetime(),
         user=application_section.application.user,
         state=ReservationStateChoice.CONFIRMED,
@@ -181,10 +181,10 @@ def test_pindora_client__create_seasonal_booking__errors(status_code, exception,
     application_section = ApplicationSectionFactory.create()
     reservation_unit_option = ReservationUnitOptionFactory.create(application_section=application_section)
     allocation = AllocatedTimeSlotFactory.create(reservation_unit_option=reservation_unit_option)
-    recurring_reservation = RecurringReservationFactory.create(allocated_time_slot=allocation)
+    reservation_series = ReservationSeriesFactory.create(allocated_time_slot=allocation)
 
     ReservationFactory.create(
-        recurring_reservation=recurring_reservation,
+        reservation_series=reservation_series,
         created_at=local_datetime(),
         user=application_section.application.user,
         state=ReservationStateChoice.CONFIRMED,
@@ -216,10 +216,10 @@ def test_pindora_client__create_seasonal_booking__no_confirmed_reservations():
     application_section = ApplicationSectionFactory.create()
     reservation_unit_option = ReservationUnitOptionFactory.create(application_section=application_section)
     allocation = AllocatedTimeSlotFactory.create(reservation_unit_option=reservation_unit_option)
-    recurring_reservation = RecurringReservationFactory.create(allocated_time_slot=allocation)
+    reservation_series = ReservationSeriesFactory.create(allocated_time_slot=allocation)
 
     ReservationFactory.create(
-        recurring_reservation=recurring_reservation,
+        reservation_series=reservation_series,
         created_at=local_datetime(),
         user=application_section.application.user,
         state=ReservationStateChoice.DENIED,
@@ -239,10 +239,10 @@ def test_pindora_client__reschedule_seasonal_booking():
     application_section = ApplicationSectionFactory.create()
     reservation_unit_option = ReservationUnitOptionFactory.create(application_section=application_section)
     allocation = AllocatedTimeSlotFactory.create(reservation_unit_option=reservation_unit_option)
-    recurring_reservation = RecurringReservationFactory.create(allocated_time_slot=allocation)
+    reservation_series = ReservationSeriesFactory.create(allocated_time_slot=allocation)
 
     ReservationFactory.create(
-        recurring_reservation=recurring_reservation,
+        reservation_series=reservation_series,
         created_at=local_datetime(),
         user=application_section.application.user,
         state=ReservationStateChoice.CONFIRMED,
@@ -283,10 +283,10 @@ def test_pindora_client__reschedule_seasonal_booking__errors(status_code, except
     application_section = ApplicationSectionFactory.create()
     reservation_unit_option = ReservationUnitOptionFactory.create(application_section=application_section)
     allocation = AllocatedTimeSlotFactory.create(reservation_unit_option=reservation_unit_option)
-    recurring_reservation = RecurringReservationFactory.create(allocated_time_slot=allocation)
+    reservation_series = ReservationSeriesFactory.create(allocated_time_slot=allocation)
 
     ReservationFactory.create(
-        recurring_reservation=recurring_reservation,
+        reservation_series=reservation_series,
         created_at=local_datetime(),
         user=application_section.application.user,
         state=ReservationStateChoice.CONFIRMED,
@@ -318,10 +318,10 @@ def test_pindora_client__reschedule_seasonal_booking__no_confirmed_reservations(
     application_section = ApplicationSectionFactory.create()
     reservation_unit_option = ReservationUnitOptionFactory.create(application_section=application_section)
     allocation = AllocatedTimeSlotFactory.create(reservation_unit_option=reservation_unit_option)
-    recurring_reservation = RecurringReservationFactory.create(allocated_time_slot=allocation)
+    reservation_series = ReservationSeriesFactory.create(allocated_time_slot=allocation)
 
     ReservationFactory.create(
-        recurring_reservation=recurring_reservation,
+        reservation_series=reservation_series,
         created_at=local_datetime(),
         user=application_section.application.user,
         state=ReservationStateChoice.DENIED,
