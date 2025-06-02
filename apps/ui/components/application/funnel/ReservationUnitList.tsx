@@ -1,10 +1,10 @@
-import React from "react";
-import { createPortal } from "react-dom";
+import React, { useRef } from "react";
 import {
   Button,
   ButtonPresetTheme,
   ButtonSize,
   ButtonVariant,
+  Dialog,
   IconArrowUndo,
   IconPlus,
   Notification,
@@ -25,12 +25,11 @@ import type {
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { Flex } from "common/styled";
-import { breakpoints } from "common/src/const";
 import { ErrorText } from "common/src/components/ErrorText";
-import { Modal } from "@/components/Modal";
 import { OrderedReservationUnitCard, ReservationUnitModalContent } from ".";
 import { useSearchParams } from "next/navigation";
 import { useSearchModify } from "@/hooks/useSearchValues";
+import { HDSModal } from "common/src/components/HDSModal";
 
 type ReservationUnitType = Pick<OrderedReservationUnitCardFragment, "pk">;
 export type OptionType = Readonly<{ value: number; label: string }>;
@@ -61,7 +60,7 @@ export function ReservationUnitList<T extends FieldValues>({
   minSize,
 }: Readonly<ReservationUnitListProps<T>>): JSX.Element {
   const { t } = useTranslation();
-
+  const ref = useRef<HTMLButtonElement>(null);
   const { handleRouteChange } = useSearchModify();
   const searchValues = useSearchParams();
 
@@ -167,6 +166,7 @@ export function ReservationUnitList<T extends FieldValues>({
       </Flex>
       <Flex $alignItems="center">
         <Button
+          ref={ref}
           iconStart={<IconPlus />}
           variant={ButtonVariant.Supplementary}
           theme={ButtonPresetTheme.Black}
@@ -176,24 +176,20 @@ export function ReservationUnitList<T extends FieldValues>({
           {t("reservationUnitList:add")}
         </Button>
       </Flex>
-      {createPortal(
-        <Modal
-          show={showModal}
-          handleClose={() => setShowModal(false)}
-          maxWidth={breakpoints.l}
-          fullHeight
-          actions={
-            <Flex $alignItems="center">
-              <Button
-                iconStart={<IconArrowUndo />}
-                onClick={() => setShowModal(false)}
-                variant={ButtonVariant.Supplementary}
-              >
-                {t("reservationUnitModal:returnToApplication")}
-              </Button>
-            </Flex>
-          }
-        >
+      <HDSModal
+        id={name}
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        fixedHeight
+        maxWidth="xl"
+        focusAfterCloseRef={ref}
+        scrollable
+      >
+        <Dialog.Header
+          id="modal-header"
+          title={t("reservationUnitModal:heading")}
+        />
+        <Dialog.Content>
           <ReservationUnitModalContent
             currentReservationUnits={selected}
             applicationRound={applicationRound}
@@ -201,9 +197,17 @@ export function ReservationUnitList<T extends FieldValues>({
             handleRemove={handleRemove}
             options={options}
           />
-        </Modal>,
-        document.body
-      )}
+        </Dialog.Content>
+        <Dialog.ActionButtons style={{ justifyContent: "flex-end" }}>
+          <Button
+            iconStart={<IconArrowUndo />}
+            onClick={() => setShowModal(false)}
+            variant={ButtonVariant.Supplementary}
+          >
+            {t("reservationUnitModal:returnToApplication")}
+          </Button>
+        </Dialog.ActionButtons>
+      </HDSModal>
     </Flex>
   );
 }

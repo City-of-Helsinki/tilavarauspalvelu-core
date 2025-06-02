@@ -23,7 +23,7 @@ import {
   getImageSource,
   getMainImage,
 } from "common/src/helpers";
-import { CenterSpinner, Flex, H2, H3 } from "common/styled";
+import { CenterSpinner, Flex, H3 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import Card from "common/src/components/Card";
 import {
@@ -186,7 +186,6 @@ export function ReservationUnitModalContent({
 
   return (
     <Flex>
-      <H2 $noMargin>{t("reservationUnitModal:heading")}</H2>
       <H3 as="p">{getApplicationRoundName(applicationRound, lang)}</H3>
       <SeasonalSearchForm
         isLoading={isLoading}
