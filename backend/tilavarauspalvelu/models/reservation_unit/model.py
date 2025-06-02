@@ -234,11 +234,6 @@ class ReservationUnit(models.Model):
         related_name="reservation_units",
         blank=True,
     )
-    qualifiers = models.ManyToManyField(  # Deprecated
-        "tilavarauspalvelu.Qualifier",
-        related_name="reservation_units",
-        blank=True,
-    )
 
     # Pre-calculated search vectors.
 

@@ -25,7 +25,6 @@ from .payment_product.model import PaymentProduct
 from .person.model import Person
 from .personal_info_view_log.model import PersonalInfoViewLog
 from .purpose.model import Purpose
-from .qualifier.model import Qualifier
 from .recurring_reservation.model import RecurringReservation
 from .rejected_occurrence.model import RejectedOccurrence
 from .request_log.model import RequestLog
@@ -82,7 +81,6 @@ __all__ = [
     "PersonalInfoViewLog",
     "ProfileUser",
     "Purpose",
-    "Qualifier",
     "RecurringReservation",
     "RejectedOccurrence",
     "RequestLog",
