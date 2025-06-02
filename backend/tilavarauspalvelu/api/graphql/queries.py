@@ -28,7 +28,6 @@ from .types.payment_product.types import PaymentProductNode
 from .types.permissions.types import GeneralRoleNode, PermissionCheckerType, UnitRoleNode
 from .types.person.types import PersonNode
 from .types.purpose.types import PurposeNode
-from .types.qualifier.types import QualifierNode
 from .types.recurring_reservation.types import RecurringReservationNode
 from .types.rejected_occurrence.types import RejectedOccurrenceNode
 from .types.reservation.types import ReservationNode
@@ -77,7 +76,6 @@ __all__ = [
     "PermissionCheckerType",
     "PersonNode",
     "PurposeNode",
-    "QualifierNode",
     "RecurringReservationNode",
     "RejectedOccurrenceNode",
     "ReservationCancelReasonType",

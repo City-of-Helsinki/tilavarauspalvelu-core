@@ -19,7 +19,6 @@ from .models import (
     Location,
     Organisation,
     Purpose,
-    Qualifier,
     ReservationDenyReason,
     ReservationPurpose,
     ReservationUnit,
@@ -114,11 +113,6 @@ class ReservationUnitTypeTranslationOptions(TranslationOptions):
 
 @register(Purpose)
 class PurposeTranslationOptions(TranslationOptions):
-    fields = ["name"]
-
-
-@register(Qualifier)
-class QualifierTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 

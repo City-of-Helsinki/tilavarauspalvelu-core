@@ -250,37 +250,6 @@ def test_reservation_unit__filter__by_multiple_purposes(graphql):
     assert response.node(1) == {"pk": reservation_unit_2.pk}
 
 
-def test_reservation_unit__filter__by_qualifier(graphql):
-    reservation_unit = ReservationUnitFactory.create(qualifiers__name="foo")
-    ReservationUnitFactory.create(qualifiers__name="bar")
-
-    query = reservation_units_query(qualifiers=reservation_unit.qualifiers.first().pk)
-    response = graphql(query)
-
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 1
-    assert response.node(0) == {"pk": reservation_unit.pk}
-
-
-def test_reservation_unit__filter__by_qualifiers__multiple(graphql):
-    reservation_unit_1 = ReservationUnitFactory.create(qualifiers__name="foo")
-    reservation_unit_2 = ReservationUnitFactory.create(qualifiers__name="bar")
-    ReservationUnitFactory.create(qualifiers__name="baz")
-
-    query = reservation_units_query(
-        qualifiers=[
-            reservation_unit_1.qualifiers.first().pk,
-            reservation_unit_2.qualifiers.first().pk,
-        ]
-    )
-    response = graphql(query)
-
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": reservation_unit_1.pk}
-    assert response.node(1) == {"pk": reservation_unit_2.pk}
-
-
 def test_reservation_unit__filter__by_max_persons_gte(graphql):
     reservation_unit_1 = ReservationUnitFactory.create(max_persons=None)
     reservation_unit_2 = ReservationUnitFactory.create(max_persons=201)
