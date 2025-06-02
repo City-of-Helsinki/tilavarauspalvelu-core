@@ -163,7 +163,6 @@ class ReservationCreateData(TypedDict):
     end: datetime.datetime
 
     # Added automatically
-    sku: NotRequired[str]
     buffer_time_before: NotRequired[datetime.timedelta]
     buffer_time_after: NotRequired[datetime.timedelta]
     user: NotRequired[User]

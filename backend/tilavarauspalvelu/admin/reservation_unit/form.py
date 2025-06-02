@@ -134,7 +134,6 @@ class ReservationUnitAdminForm(forms.ModelForm):
         }
         labels = {
             "uuid": _("External UUID"),
-            "sku": _("SKU"),
             "name": _("Name"),
             "name_fi": _("Name (Finnish)"),
             "name_en": _("Name (English)"),
@@ -206,7 +205,6 @@ class ReservationUnitAdminForm(forms.ModelForm):
         }
         help_texts = {
             "uuid": _("ID for external systems to use"),
-            "sku": _("SKU"),
             "name": _("Name"),
             "name_fi": _("Name (Finnish)"),
             "name_en": _("Name (English)"),

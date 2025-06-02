@@ -83,7 +83,6 @@ class ReservationCreateSerializer(NestingModelSerializer):
             if pricing.payment_type != PaymentType.ON_SITE:
                 reservation_unit.validators.validate_has_payment_product()
 
-        data["sku"] = reservation_unit.sku
         data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
         data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)
         data["user"] = user
