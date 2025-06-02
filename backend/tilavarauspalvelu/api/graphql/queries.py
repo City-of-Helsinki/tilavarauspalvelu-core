@@ -7,7 +7,6 @@ simply so that it's registered before any mutations.
 
 from __future__ import annotations
 
-from .types.ability_group.types import AbilityGroupNode
 from .types.address.types import AddressNode
 from .types.age_group.types import AgeGroupNode
 from .types.allocated_time_slot.types import AllocatedTimeSlotNode
@@ -52,7 +51,6 @@ from .types.unit_group.types import UnitGroupNode
 from .types.user.types import ApplicantNode, UserNode
 
 __all__ = [
-    "AbilityGroupNode",
     "AddressNode",
     "AgeGroupNode",
     "AllocatedTimeSlotNode",
