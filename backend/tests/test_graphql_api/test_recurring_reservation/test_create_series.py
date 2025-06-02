@@ -18,7 +18,6 @@ from tilavarauspalvelu.models import AffectingTimeSpan, RecurringReservation, Re
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_end_of_day, local_start_of_day
 
 from tests.factories import (
-    AbilityGroupFactory,
     AgeGroupFactory,
     CityFactory,
     ReservableTimeSpanFactory,
@@ -39,7 +38,6 @@ pytestmark = [
 
 
 def test_recurring_reservations__create_series(graphql):
-    ability_group = AbilityGroupFactory.create()
     age_group = AgeGroupFactory.create()
     reservation_unit = ReservationUnitFactory.create()
     user = graphql.login_with_superuser()
@@ -47,7 +45,6 @@ def test_recurring_reservations__create_series(graphql):
     data = get_minimal_series_data(reservation_unit, user)
     data["name"] = "foo"
     data["description"] = "bar"
-    data["abilityGroup"] = ability_group.pk
     data["ageGroup"] = age_group.pk
 
     response = graphql(CREATE_SERIES_MUTATION, input_data=data)
@@ -66,7 +63,6 @@ def test_recurring_reservations__create_series(graphql):
     assert recurring_reservation.reservation_unit == reservation_unit
     assert recurring_reservation.user == user
     assert recurring_reservation.age_group == age_group
-    assert recurring_reservation.ability_group == ability_group
 
     reservations = list(recurring_reservation.reservations.order_by("begin").all())
     assert len(reservations) == 1

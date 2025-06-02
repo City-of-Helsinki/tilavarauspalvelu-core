@@ -88,6 +88,7 @@ class ReservationStatistic(models.Model):
     age_group: int | None = models.BigIntegerField(null=True, blank=True)
     age_group_name: str = models.CharField(max_length=255, default="", blank=True)
 
+    # Removed from series model
     ability_group: int | None = models.BigIntegerField(null=True, blank=True)
     ability_group_name: str = models.CharField(max_length=255, default="", blank=True)
 
@@ -127,7 +128,6 @@ class ReservationStatistic(models.Model):
         from tilavarauspalvelu.translation import translated
 
         recurring_reservation = getattr(reservation, "recurring_reservation", None)
-        ability_group = getattr(recurring_reservation, "ability_group", None)
         allocated_time_slot = getattr(recurring_reservation, "allocated_time_slot", None)
         age_group = getattr(reservation, "age_group", None)
         deny_reason = getattr(reservation, "deny_reason", None)
@@ -202,10 +202,6 @@ class ReservationStatistic(models.Model):
             statistic.primary_unit_name = getattr(res_unit.unit, "name", "")
             statistic.primary_unit_tprek_id = getattr(res_unit.unit, "tprek_id", "")
             break
-
-        if statistic.is_applied:
-            statistic.ability_group = getattr(ability_group, "id", None)
-            statistic.ability_group_name = getattr(ability_group, "name", "")
 
         if save:
             statistic.save()
