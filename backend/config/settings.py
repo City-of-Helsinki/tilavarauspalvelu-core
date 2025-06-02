@@ -91,7 +91,6 @@ class Common(Environment):
     ]
 
     MIDDLEWARE = [
-        "config.middleware.QueryLoggingMiddleware",
         "config.middleware.MultipleProxyMiddleware",
         "corsheaders.middleware.CorsMiddleware",
         "django.middleware.security.SecurityMiddleware",

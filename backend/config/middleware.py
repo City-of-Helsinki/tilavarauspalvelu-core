@@ -1,24 +1,18 @@
 from __future__ import annotations
 
-import contextlib
 import logging
-import time
 import traceback
-from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.core.signals import got_request_exception
-from django.db import connection
 from graphql import GraphQLFieldResolver
 
-from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.typing import QueryInfo
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Generator
+    from collections.abc import Callable
 
     from django.http import HttpResponse
 
@@ -86,89 +80,6 @@ class GraphQLErrorLoggingMiddleware:
         except Exception as err:  # noqa: BLE001
             logger.info(traceback.format_exc())
             return err
-
-
-class QueryLoggingMiddleware:
-    """Middleware that logs SQL queries made during the duration of a request."""
-
-    # Middlewares in this path are not relevant for debugging.
-    THIS_FILE = str(Path(__file__).resolve())
-
-    def __init__(self, get_response: Callable[[WSGIRequest], HttpResponse]) -> None:
-        self.get_response = get_response
-
-    def __call__(self, request: WSGIRequest) -> HttpResponse:
-        skipped_route = any(request.path.startswith(path) for path in settings.QUERY_LOGGING_SKIP_ROUTES)
-        if skipped_route or settings.QUERY_LOGGING_ENABLED is False:
-            return self.get_response(request)
-
-        with self.query_logger(request):
-            return self.get_response(request)
-
-    @contextlib.contextmanager
-    def query_logger(self, request: WSGIRequest) -> Generator[None]:
-        query_log = []
-        start = time.perf_counter_ns()
-        try:
-            with connection.execute_wrapper(partial(self.log, query_log=query_log)):
-                yield
-        finally:
-            try:
-                from tilavarauspalvelu.tasks import save_sql_queries_from_request_task
-
-                total_duration_ms = (time.perf_counter_ns() - start) // 1_000_000
-
-                # TODO: Only save when optimizer counted different number of queries than what was actually executed.
-                if (
-                    total_duration_ms >= settings.QUERY_LOGGING_DURATION_MS_THRESHOLD
-                    or len(query_log) >= settings.QUERY_LOGGING_QUERY_COUNT_THRESHOLD
-                    or (request.body and len(request.body) >= settings.QUERY_LOGGING_BODY_LENGTH_THRESHOLD)
-                ):
-                    save_sql_queries_from_request_task.delay(
-                        queries=query_log,
-                        path=request.path,
-                        body=request.body,
-                        duration_ms=total_duration_ms,
-                    )
-            except Exception as error:  # noqa: BLE001
-                SentryLogger.log_exception(error, "Error in QueryLoggingMiddleware")
-
-    def log(  # noqa: PLR0917
-        self,
-        execute: Callable[..., Any],
-        sql: str,
-        params: tuple[Any, ...],
-        many: bool,  # noqa: FBT001
-        context: dict[str, Any],
-        query_log: list[QueryInfo],
-    ) -> Any:
-        query_info = QueryInfo(sql=sql, duration_ns=0, succeeded=True, stack_info=self.get_stack_info())
-        query_log.append(query_info)
-
-        start = time.perf_counter_ns()
-        try:
-            result = execute(sql, params, many, context)
-        except Exception:
-            query_info["succeeded"] = False
-            raise
-        finally:
-            query_info["duration_ns"] = time.perf_counter_ns() - start
-
-        return result
-
-    def get_stack_info(self) -> str:
-        frame: traceback.FrameSummary | None = None
-
-        for frame in reversed(traceback.extract_stack()):
-            if frame.filename == self.THIS_FILE:
-                continue
-            is_own_file = frame.filename.startswith(str(settings.BASE_DIR))
-            if is_own_file:
-                return "".join(traceback.StackSummary.from_list([frame]).format())
-
-        if frame is None:
-            return "No info"
-        return "Likely fetched through the optimizer"
 
 
 class ProfilerMiddleware:
