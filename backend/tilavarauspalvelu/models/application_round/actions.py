@@ -28,8 +28,8 @@ from tilavarauspalvelu.models import (
     AllocatedTimeSlot,
     Application,
     ApplicationSection,
-    RecurringReservation,
     Reservation,
+    ReservationSeries,
     ReservationUnitOption,
 )
 from tilavarauspalvelu.tasks import create_statistics_for_reservations_task, update_affecting_time_spans_task
@@ -72,10 +72,10 @@ class ApplicationRoundActions:
                     with suppress(PindoraNotFoundError):
                         PindoraService.delete_access_code(obj=section)
 
-                # Remove all recurring reservations, and set application round back to HANDLED
+                # Remove all reservation series, and set application round back to HANDLED
                 # NOTE: This triggers _a lot_ of `post_delete` signals fo reservations.
                 Reservation.objects.for_application_round(self.application_round).delete()
-                RecurringReservation.objects.for_application_round(self.application_round).delete()
+                ReservationSeries.objects.for_application_round(self.application_round).delete()
 
                 self.application_round.handled_date = None
                 self.application_round.save()
@@ -103,8 +103,8 @@ class ApplicationRoundActions:
 
         closed_time_spans: dict[int, list[TimeSpanElement]] = self._get_series_override_closed_time_spans(allocations)
 
-        recurring_reservations: list[RecurringReservation] = [
-            RecurringReservation(
+        reservation_series: list[ReservationSeries] = [
+            ReservationSeries(
                 name=allocation.reservation_unit_option.application_section.name,
                 description=translate_for_user(
                     _("Seasonal Booking"),
@@ -127,24 +127,24 @@ class ApplicationRoundActions:
         reservation_pks: set[int] = set()
 
         with transaction.atomic():
-            recurring_reservations = RecurringReservation.objects.bulk_create(recurring_reservations)
+            reservation_series = ReservationSeries.objects.bulk_create(reservation_series)
 
-            for recurring_reservation in recurring_reservations:
-                reservation_details = self._get_recurring_reservation_details(recurring_reservation)
+            for series in reservation_series:
+                reservation_details = self._get_reservation_series_details(series)
 
-                hauki_resource_id = getattr(recurring_reservation.reservation_unit.origin_hauki_resource, "id", None)
-                slots = recurring_reservation.actions.pre_calculate_slots(
+                hauki_resource_id = getattr(series.reservation_unit.origin_hauki_resource, "id", None)
+                slots = series.actions.pre_calculate_slots(
                     check_start_interval=True,
                     closed_hours=closed_time_spans.get(hauki_resource_id, []),
                 )
 
-                reservations = recurring_reservation.actions.bulk_create_reservation_for_periods(
+                reservations = series.actions.bulk_create_reservation_for_periods(
                     periods=slots.possible,
                     reservation_details=reservation_details,
                 )
                 reservation_pks.update(reservation.pk for reservation in reservations)
 
-                recurring_reservation.actions.bulk_create_rejected_occurrences_for_periods(
+                series.actions.bulk_create_rejected_occurrences_for_periods(
                     overlapping=slots.overlapping,
                     not_reservable=slots.not_reservable,
                     invalid_start_interval=slots.invalid_start_interval,
@@ -195,8 +195,8 @@ class ApplicationRoundActions:
 
         return closed_time_spans
 
-    def _get_recurring_reservation_details(self, recurring_reservation: RecurringReservation) -> ReservationDetails:
-        application_section = recurring_reservation.allocated_time_slot.reservation_unit_option.application_section
+    def _get_reservation_series_details(self, reservation_series: ReservationSeries) -> ReservationDetails:
+        application_section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
         application = application_section.application
 
         reservee_type = ApplicantTypeChoice(application.applicant_type).customer_type_choice
@@ -204,11 +204,11 @@ class ApplicationRoundActions:
         billing_address: Address | None = getattr(application, "billing_address", None)
 
         reservation_details = ReservationDetails(
-            name=recurring_reservation.name,
+            name=reservation_series.name,
             type=ReservationTypeChoice.SEASONAL,
             reservee_type=reservee_type,
             state=ReservationStateChoice.CONFIRMED,
-            user=recurring_reservation.user,
+            user=reservation_series.user,
             handled_at=application.application_round.handled_date,
             num_persons=application_section.num_persons,
             buffer_time_before=datetime.timedelta(0),

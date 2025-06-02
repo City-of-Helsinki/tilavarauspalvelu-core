@@ -25,20 +25,20 @@ class Params(NamedTuple):
             fields={"type": ReservationTypeChoice.STAFF},
             result="",
         ),
-        "Type: STAFF | Recurring Reservation": Params(
+        "Type: STAFF | Reservation Series": Params(
             fields={
                 "type": ReservationTypeChoice.STAFF,
-                "recurring_reservation__name": "Recurring",
+                "reservation_series__name": "Recurring",
                 "name": "Reservation Name",
                 "reservee_first_name": "First",
                 "reservee_last_name": "Last",
             },
             result="Recurring",
         ),
-        "Type: STAFF | Recurring Reservation has no name": Params(
+        "Type: STAFF | Reservation Series has no name": Params(
             fields={
                 "type": ReservationTypeChoice.STAFF,
-                "recurring_reservation__name": "",
+                "reservation_series__name": "",
                 "name": "Reservation Name",
                 "reservee_first_name": "First",
                 "reservee_last_name": "Last",

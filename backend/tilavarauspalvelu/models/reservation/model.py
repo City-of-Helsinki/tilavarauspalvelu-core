@@ -28,9 +28,9 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import (
         AgeGroup,
         City,
-        RecurringReservation,
         ReservationDenyReason,
         ReservationPurpose,
+        ReservationSeries,
         Unit,
         User,
     )
@@ -145,8 +145,8 @@ class Reservation(SerializableMixin, models.Model):
         null=True,
         blank=True,
     )
-    recurring_reservation: RecurringReservation | None = models.ForeignKey(
-        "tilavarauspalvelu.RecurringReservation",
+    reservation_series: ReservationSeries | None = models.ForeignKey(
+        "tilavarauspalvelu.ReservationSeries",
         related_name="reservations",
         on_delete=models.PROTECT,
         null=True,
@@ -246,7 +246,7 @@ class Reservation(SerializableMixin, models.Model):
     def non_subsidised_price_net(self) -> Decimal:
         return round_decimal(self.non_subsidised_price / (1 + self.tax_percentage_value / Decimal(100)), 2)
 
-    @lookup_property(joins=["recurring_reservation", "user"])
+    @lookup_property(joins=["reservation_series", "user"])
     def reservee_name() -> str:
         return models.Case(  # type: ignore[return-value]
             # Blocking reservation
@@ -260,15 +260,15 @@ class Reservation(SerializableMixin, models.Model):
             models.When(
                 condition=(
                     models.Q(type=ReservationTypeChoice.STAFF.value)  #
-                    & models.Q(recurring_reservation__isnull=False)
-                    & ~models.Q(recurring_reservation__name="")
+                    & models.Q(reservation_series__isnull=False)
+                    & ~models.Q(reservation_series__name="")
                 ),
-                then=models.F("recurring_reservation__name"),
+                then=models.F("reservation_series__name"),
             ),
             models.When(
                 condition=(
                     models.Q(type=ReservationTypeChoice.STAFF.value)  #
-                    & (models.Q(recurring_reservation__isnull=True) | models.Q(recurring_reservation__name=""))
+                    & (models.Q(reservation_series__isnull=True) | models.Q(reservation_series__name=""))
                     & ~models.Q(name="")
                 ),
                 then=models.F("name"),

@@ -17,7 +17,7 @@ class RejectedOccurrenceNode(DjangoNode):
             "end_datetime",
             "rejection_reason",
             "created_at",
-            "recurring_reservation",
+            "reservation_series",
         ]
         filterset_class = RejectedOccurrenceFilterSet
         permission_classes = [RejectedOccurrencePermission]

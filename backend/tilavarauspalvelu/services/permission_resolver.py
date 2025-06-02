@@ -14,8 +14,8 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import (
         Application,
         ApplicationRound,
-        RecurringReservation,
         Reservation,
+        ReservationSeries,
         ReservationUnit,
         Space,
         Unit,
@@ -434,9 +434,9 @@ class PermissionResolver:
             role_choices=role_choices,
         )
 
-    def can_view_recurring_reservation(
+    def can_view_reservation_series(
         self,
-        recurring_reservation: RecurringReservation,
+        reservation_series: ReservationSeries,
         *,
         reserver_needs_role: bool = False,
     ) -> bool:
@@ -444,7 +444,7 @@ class PermissionResolver:
             return False
         if self.user.is_superuser:
             return True
-        if self.user == recurring_reservation.user and (self.has_any_role() if reserver_needs_role else True):
+        if self.user == reservation_series.user and (self.has_any_role() if reserver_needs_role else True):
             return True
 
         role_choices = UserRoleChoice.can_view_reservations()
@@ -452,7 +452,7 @@ class PermissionResolver:
             return True
 
         return self.has_role_for_units_or_their_unit_groups(
-            units=[recurring_reservation.reservation_unit.unit],
+            units=[reservation_series.reservation_unit.unit],
             role_choices=role_choices,
         )
 

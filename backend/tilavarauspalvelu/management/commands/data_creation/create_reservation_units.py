@@ -1737,7 +1737,7 @@ def _create_reservation_units_in_resource_hierarchies(
 
 
 @with_logs
-def _create_reservation_unit_for_recurring_reservations(
+def _create_reservation_unit_for_reservation_series(
     metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     cancellation_rules: list[ReservationUnitCancellationRule],

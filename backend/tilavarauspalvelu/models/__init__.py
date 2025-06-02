@@ -23,7 +23,6 @@ from .payment_product.model import PaymentProduct
 from .person.model import Person
 from .personal_info_view_log.model import PersonalInfoViewLog
 from .purpose.model import Purpose
-from .recurring_reservation.model import RecurringReservation
 from .rejected_occurrence.model import RejectedOccurrence
 from .reservable_time_span.model import ReservableTimeSpan
 from .reservation.model import Reservation
@@ -31,6 +30,7 @@ from .reservation_deny_reason.model import ReservationDenyReason
 from .reservation_metadata_field.model import ReservationMetadataField
 from .reservation_metadata_set.model import ReservationMetadataSet
 from .reservation_purpose.model import ReservationPurpose
+from .reservation_series.model import ReservationSeries
 from .reservation_statistic.model import ReservationStatistic
 from .reservation_unit.model import ReservationUnit
 from .reservation_unit_access_type.model import ReservationUnitAccessType
@@ -75,7 +75,6 @@ __all__ = [
     "PersonalInfoViewLog",
     "ProfileUser",
     "Purpose",
-    "RecurringReservation",
     "RejectedOccurrence",
     "ReservableTimeSpan",
     "Reservation",
@@ -83,6 +82,7 @@ __all__ = [
     "ReservationMetadataField",
     "ReservationMetadataSet",
     "ReservationPurpose",
+    "ReservationSeries",
     "ReservationStatistic",
     "ReservationUnit",
     "ReservationUnitAccessType",

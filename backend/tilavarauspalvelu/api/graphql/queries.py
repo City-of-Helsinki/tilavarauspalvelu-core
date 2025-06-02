@@ -27,13 +27,13 @@ from .types.payment_product.types import PaymentProductNode
 from .types.permissions.types import GeneralRoleNode, PermissionCheckerType, UnitRoleNode
 from .types.person.types import PersonNode
 from .types.purpose.types import PurposeNode
-from .types.recurring_reservation.types import RecurringReservationNode
 from .types.rejected_occurrence.types import RejectedOccurrenceNode
 from .types.reservation.types import ReservationNode
 from .types.reservation_cancel_reason.types import ReservationCancelReasonType
 from .types.reservation_deny_reason.types import ReservationDenyReasonNode
 from .types.reservation_metadata.types import ReservationMetadataFieldNode, ReservationMetadataSetNode
 from .types.reservation_purpose.types import ReservationPurposeNode
+from .types.reservation_series.types import ReservationSeriesNode
 from .types.reservation_unit.types import ReservationUnitAllNode, ReservationUnitNode
 from .types.reservation_unit_access_type.types import ReservationUnitAccessTypeNode
 from .types.reservation_unit_cancellation_rule.types import ReservationUnitCancellationRuleNode
@@ -74,7 +74,6 @@ __all__ = [
     "PermissionCheckerType",
     "PersonNode",
     "PurposeNode",
-    "RecurringReservationNode",
     "RejectedOccurrenceNode",
     "ReservationCancelReasonType",
     "ReservationDenyReasonNode",
@@ -82,6 +81,7 @@ __all__ = [
     "ReservationMetadataSetNode",
     "ReservationNode",
     "ReservationPurposeNode",
+    "ReservationSeriesNode",
     "ReservationUnitAccessTypeNode",
     "ReservationUnitAllNode",
     "ReservationUnitCancellationRuleNode",
