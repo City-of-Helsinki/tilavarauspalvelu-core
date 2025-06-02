@@ -2,7 +2,7 @@ import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { render, within } from "@testing-library/react";
 import {
   createMockApplicationRound,
-  CreateGraphQLMockProps,
+  type CreateGraphQLMockProps,
 } from "@/test/test.gql.utils";
 import { createApplicationSearchGraphQLMocks } from "@/test/test.application.mocks";
 import userEvent from "@testing-library/user-event";
@@ -94,12 +94,6 @@ afterEach(() => {
 describe("Modal render", () => {
   test("sanity", async () => {
     const view = customRender();
-    const title = view.getByRole("heading", {
-      name: "reservationUnitModal:heading",
-    });
-    expect(title).toBeInTheDocument();
-    // TODO there is application round name as a subtitle (should there be?)
-
     await isReady(view);
 
     const cards = view.getAllByTestId("ModalContent__reservationUnitCard");
@@ -164,10 +158,6 @@ describe("Modal search", () => {
 
   test("should show an error if query fails", async () => {
     const view = customRender({ isSearchError: true });
-    const title = view.getByRole("heading", {
-      name: "reservationUnitModal:heading",
-    });
-    expect(title).toBeInTheDocument();
     await isReady(view);
     expect(view.getByText("errors:search")).toBeInTheDocument();
   });

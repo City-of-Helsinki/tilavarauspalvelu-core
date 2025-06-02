@@ -43,7 +43,7 @@ import { successToast } from "common/src/common/toast";
 import { useDisplayError } from "common/src/hooks";
 import { useSearchParams } from "react-router-dom";
 import { SelectFilter } from "@/component/QueryParamFilters";
-import { HDSModal } from "@/component/HDSModal";
+import { HDSModal } from "common/src/components/HDSModal";
 
 // NOTE HDS forces buttons over each other on mobile, we want them side-by-side
 const ActionButtons = styled(Dialog.ActionButtons)`
