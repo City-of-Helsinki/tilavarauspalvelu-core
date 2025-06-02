@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from .ability_group import AbilityGroupFactory
 from .address import AddressFactory
 from .age_group import AgeGroupFactory
 from .allocated_time_slot import AllocatedTimeSlotFactory
@@ -51,7 +50,6 @@ from .verkkokauppa import OrderCustomerFactory, OrderFactory, PaymentFactory, Re
 
 __all__ = [
     "ADGroupFactory",
-    "AbilityGroupFactory",
     "AddressFactory",
     "AgeGroupFactory",
     "AllocatedTimeSlotFactory",

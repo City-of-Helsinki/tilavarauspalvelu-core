@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from .ability_group.admin import AbilityGroupAdmin
 from .address.admin import AddressAdmin
 from .age_group.admin import AgeGroupAdmin
 from .allocated_timeslot.admin import AllocatedTimeSlotAdmin
@@ -44,7 +43,6 @@ from .unit_role.admin import UnitRoleAdmin
 from .user.admin import UserAdmin
 
 __all__ = [
-    "AbilityGroupAdmin",
     "AddressAdmin",
     "AgeGroupAdmin",
     "AllocatedTimeSlotAdmin",
