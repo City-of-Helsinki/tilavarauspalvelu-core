@@ -254,6 +254,21 @@ describe("Page1", () => {
   // TODO should these be schema tests
   test.todo("applied events less than 1 should be invalid");
 
+  // requires form context because schema validators are for the full form only
+  test("should show an error message for no reservation units", async () => {
+    const params = new URLSearchParams();
+    mockedSearchParams.mockReturnValue(params);
+    const view = customRender();
+    const user = userEvent.setup();
+    const submitBtn = view.getByRole("button", { name: "common:next" });
+    expect(submitBtn).not.toBeDisabled();
+    await user.click(submitBtn);
+    const section = view.getByTestId("application__applicationSection_0");
+    expect(
+      within(section).getAllByText("application:validation.noReservationUnits")
+    ).toHaveLength(2);
+  });
+
   // it's an error not to select all fields, but what if we have no options?
   // due to temporary backend error or a software bug?
   test.todo("What should happen if options are not available?");
@@ -265,7 +280,25 @@ describe("Page1", () => {
 });
 
 describe("Page1: multiple sections", () => {
-  test.todo("should allow adding new application section");
+  test("should allow adding new application section", async () => {
+    const view = customRender();
+    const user = userEvent.setup();
+
+    const headingsStart = view.getAllByRole("heading", {
+      name: "application:Page1.basicInformationSubHeading",
+    });
+    expect(headingsStart).toHaveLength(1);
+    const addSectionBtn = view.getByRole("button", {
+      name: "application:Page1.createNew",
+    });
+    expect(addSectionBtn).toBeInTheDocument();
+    await user.click(addSectionBtn);
+    const headings = view.getAllByRole("heading", {
+      name: "application:Page1.basicInformationSubHeading",
+    });
+    expect(headings).toHaveLength(2);
+  });
+
   // the select modal should only modify the section it was opened for
   test.todo("adding reservation units should not affect other sections");
 });

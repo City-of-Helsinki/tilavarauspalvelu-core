@@ -93,8 +93,14 @@ function ApplicationSectionInner({
   const getTranslatedError = (field: FieldName): string | undefined => {
     const error = errors.applicationSections?.[index]?.[field];
     if (error?.message != null) {
+      // TODO this could be changed in the validation schema
+      // so it follows the same pattern as the other fields
+      if (field === "reservationUnits" && error.type === "too_small") {
+        return t("application:validation.noReservationUnits");
+      }
       return t(`application:validation.${error.message}`);
     }
+
     return undefined;
   };
 
@@ -151,6 +157,7 @@ function ApplicationSectionInner({
         applicationRound={applicationRound}
         minSize={numPersons}
         options={options}
+        error={getTranslatedError("reservationUnits")}
       />
       <H4 as="h3">{t("application:Page1.applicationRoundSubHeading")}</H4>
       <Checkbox
