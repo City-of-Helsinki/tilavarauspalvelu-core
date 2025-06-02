@@ -52,7 +52,6 @@ __all__ = [
 class ReservationUnit(models.Model):
     # IDs
 
-    sku: str = models.CharField(max_length=255, blank=True, default="")
     uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     rank: int = models.PositiveIntegerField(default=0, db_index=True)  # Used for ordering
 

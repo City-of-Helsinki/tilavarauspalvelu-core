@@ -549,19 +549,6 @@ def test_reservation__create__max_reservations_per_user__reservations_for_other_
     assert Reservation.objects.count() == 2
 
 
-def test_reservation__create__copy_sku_to_reservation(graphql):
-    reservation_unit = ReservationUnitFactory.create_reservable_now(sku="foo")
-
-    graphql.login_with_superuser()
-    data = get_create_data(reservation_unit)
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
-    assert reservation.sku == "foo"
-
-
 class ReservationsMinMaxDaysParams(NamedTuple):
     reservation_days_delta: int
     reservations_max_days_before: int | None = None
