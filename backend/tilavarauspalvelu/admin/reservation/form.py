@@ -31,7 +31,6 @@ class ReservationAdminForm(forms.ModelForm):
         labels = {
             #
             "ext_uuid": _("External UUID"),
-            "sku": _("SKU"),
             "name": _("Name"),
             "description": _("Description"),
             "num_persons": _("Number of persons"),
@@ -95,7 +94,6 @@ class ReservationAdminForm(forms.ModelForm):
         help_texts = {
             #
             "ext_uuid": _("ID for external systems to use"),
-            "sku": _("SKU for this particular reservation"),
             "name": _("Name of the reservation"),
             "description": _("Description of the reservation"),
             "num_persons": _("Number of persons in the reservation"),
