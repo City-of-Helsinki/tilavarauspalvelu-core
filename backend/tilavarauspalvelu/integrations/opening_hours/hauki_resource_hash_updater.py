@@ -25,13 +25,13 @@ class HaukiResourceHashUpdater:
     total_time_spans_created: int
 
     def __init__(self, hauki_resource_ids: list[int] | None = None) -> None:
+        # Initialise the list of resource ids if it is not provided
+        if hauki_resource_ids is None:
+            hauki_resource_ids = list(OriginHaukiResource.objects.values_list("id", flat=True))
+
         self.hauki_resource_ids = hauki_resource_ids
         self.resources_updated = []
         self.total_time_spans_created = 0
-
-        # Initialise the list of resource ids if it is not provided
-        if self.hauki_resource_ids is None:
-            self.hauki_resource_ids = OriginHaukiResource.objects.values_list("id", flat=True)
 
     def run(self, *, force_refetch: bool = False) -> None:
         fetched_hauki_resources = HaukiAPIClient.get_resources_all_pages(hauki_resource_ids=self.hauki_resource_ids)

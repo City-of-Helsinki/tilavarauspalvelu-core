@@ -47,7 +47,7 @@ def test__HaukiResourceHashUpdater__init__pass_empty_list():
     assert hash_updater.hauki_resource_ids == []
 
 
-@patch_method(HaukiAPIClient.get_resources)
+@patch_method(HaukiAPIClient._get_resources)
 @patch_method(ReservableTimeSpanClient.run, return_value=[])
 def test__HaukiResourceHashUpdater__no_initial_hash():
     origin_hauki_resource: OriginHaukiResource = OriginHaukiResourceFactory.create(
@@ -56,7 +56,7 @@ def test__HaukiResourceHashUpdater__no_initial_hash():
         latest_fetched_date=None,
     )
 
-    HaukiAPIClient.get_resources.return_value = {"results": [{"id": 999, "date_periods_hash": "OLD"}]}
+    HaukiAPIClient._get_resources.return_value = {"results": [{"id": 999, "date_periods_hash": "OLD"}]}
 
     hash_updater = HaukiResourceHashUpdater()
     hash_updater.run()
@@ -68,7 +68,7 @@ def test__HaukiResourceHashUpdater__no_initial_hash():
 
 
 @freezegun.freeze_time("2020-01-01 08:00:00")
-@patch_method(HaukiAPIClient.get_resources)
+@patch_method(HaukiAPIClient._get_resources)
 @patch_method(ReservableTimeSpanClient.run, return_value=[])
 def test__HaukiResourceHashUpdater__handle_existing_reservable_time_spans():
     origin_hauki_resource: OriginHaukiResource = OriginHaukiResourceFactory.create(
@@ -77,7 +77,7 @@ def test__HaukiResourceHashUpdater__handle_existing_reservable_time_spans():
         latest_fetched_date=datetime.date(2019, 12, 31),  # in the past
     )
 
-    HaukiAPIClient.get_resources.return_value = {"results": [{"id": 999, "date_periods_hash": "UPDATED"}]}
+    HaukiAPIClient._get_resources.return_value = {"results": [{"id": 999, "date_periods_hash": "UPDATED"}]}
 
     # In the past: Should be kept as is
     rts1 = ReservableTimeSpanFactory.create(
@@ -122,13 +122,13 @@ def test__HaukiResourceHashUpdater__handle_existing_reservable_time_spans():
 
 
 @freezegun.freeze_time("2020-01-01")
-@patch_method(HaukiAPIClient.get_resources)
+@patch_method(HaukiAPIClient._get_resources)
 @patch_method(ReservableTimeSpanClient.run, return_value=[])
 def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_changed():
     hauki_resource = OriginHaukiResourceFactory.create(id=999, opening_hours_hash="OLD", latest_fetched_date=None)
 
     # Hash is changed so it should be updated
-    HaukiAPIClient.get_resources.return_value = {"results": [{"id": 999, "date_periods_hash": "UPDATED"}]}
+    HaukiAPIClient._get_resources.return_value = {"results": [{"id": 999, "date_periods_hash": "UPDATED"}]}
 
     hash_updater = HaukiResourceHashUpdater()
     hash_updater.run()
@@ -138,13 +138,13 @@ def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_changed(
 
 
 @freezegun.freeze_time("2020-01-01")
-@patch_method(HaukiAPIClient.get_resources)
+@patch_method(HaukiAPIClient._get_resources)
 @patch_method(ReservableTimeSpanClient.run, return_value=[])
 def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_unchanged__no_latest_fetched_date():
     hauki_resource = OriginHaukiResourceFactory.create(id=999, opening_hours_hash="OLD", latest_fetched_date=None)
 
     # Hash not changed, but has no latest_fetched_date so it should be updated
-    HaukiAPIClient.get_resources.return_value = {"results": [{"id": 999, "date_periods_hash": "OLD"}]}
+    HaukiAPIClient._get_resources.return_value = {"results": [{"id": 999, "date_periods_hash": "OLD"}]}
 
     hash_updater = HaukiResourceHashUpdater()
     hash_updater.run()
@@ -154,7 +154,7 @@ def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_unchange
 
 
 @freezegun.freeze_time("2020-01-01")
-@patch_method(HaukiAPIClient.get_resources)
+@patch_method(HaukiAPIClient._get_resources)
 @patch_method(ReservableTimeSpanClient.run, return_value=[])
 def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_unchanged__latest_fetched_date_is_stale():
     hauki_resource = OriginHaukiResourceFactory.create(
@@ -162,7 +162,7 @@ def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_unchange
     )
 
     # Hash not changed, but latest_fetched_date is early enough to warrant an update
-    HaukiAPIClient.get_resources.return_value = {"results": [{"id": 999, "date_periods_hash": "OLD"}]}
+    HaukiAPIClient._get_resources.return_value = {"results": [{"id": 999, "date_periods_hash": "OLD"}]}
 
     hash_updater = HaukiResourceHashUpdater()
     hash_updater.run()
@@ -172,7 +172,7 @@ def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_unchange
 
 
 @freezegun.freeze_time("2020-01-01")
-@patch_method(HaukiAPIClient.get_resources)
+@patch_method(HaukiAPIClient._get_resources)
 @patch_method(ReservableTimeSpanClient.run, return_value=[])
 def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_unchanged__latest_fetched_date_is_up_to_date():
     cutoff_date = local_date() + datetime.timedelta(days=settings.HAUKI_DAYS_TO_FETCH + 1)  # Late enough to not update
@@ -180,7 +180,7 @@ def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_unchange
     OriginHaukiResourceFactory.create(id=999, opening_hours_hash="OLD", latest_fetched_date=cutoff_date)
 
     # Hash not changed and latest_fetched_date late enough to not warrant an update
-    HaukiAPIClient.get_resources.return_value = {"results": [{"id": 999, "date_periods_hash": "OLD"}]}
+    HaukiAPIClient._get_resources.return_value = {"results": [{"id": 999, "date_periods_hash": "OLD"}]}
 
     hash_updater = HaukiResourceHashUpdater()
     hash_updater.run()
@@ -190,13 +190,13 @@ def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_unchange
 
 
 @freezegun.freeze_time("2020-01-01")
-@patch_method(HaukiAPIClient.get_resources)
+@patch_method(HaukiAPIClient._get_resources)
 @patch_method(ReservableTimeSpanClient.run, return_value=[])
 def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_updated__never_any_opening_hours_hash():
     hauki_resource = OriginHaukiResourceFactory.create(id=999, opening_hours_hash="OLD", latest_fetched_date=None)
 
     # Hash is updated, but is known to not have hours
-    HaukiAPIClient.get_resources.return_value = {
+    HaukiAPIClient._get_resources.return_value = {
         "results": [{"id": 999, "date_periods_hash": NEVER_ANY_OPENING_HOURS_HASH}]
     }
 

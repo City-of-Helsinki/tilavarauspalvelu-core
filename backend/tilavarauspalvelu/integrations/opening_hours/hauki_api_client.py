@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 from typing import TYPE_CHECKING, Any, NotRequired, TypedDict, Unpack
 
 from django.conf import settings
@@ -9,6 +10,7 @@ from utils.external_service.base_external_service_client import BaseExternalServ
 
 if TYPE_CHECKING:
     import datetime
+    from collections.abc import Sequence
 
     from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import (
         HaukiAPIDatePeriod,
@@ -49,10 +51,49 @@ class HaukiAPIClient(BaseExternalServiceClient):
     ############
 
     @classmethod
-    def get_resources(
+    def get_resources_all_pages(
         cls,
         *,
-        hauki_resource_ids: list[int | str],
+        hauki_resource_ids: Sequence[int | str],
+        **kwargs: Unpack[HaukiGetResourcesParams],
+    ) -> list[HaukiAPIResource]:
+        """Fetch resources from Hauki API based on the given resource ids."""
+        batch_size = settings.HAUKI_RESOURCE_BATCH_SIZE
+        fetched_hauki_resources: list[HaukiAPIResource] = []
+
+        # Fetching is batched since the resource ids are added as query parameters,
+        # which may cause the URI to become too long. From manual testing, it seems that
+        # the limit is around 8k bytes. Assuming 7 char resource ids separated by a comma
+        # ('%2C' url-encoded) -> 10 chars per resource id ->  8k / 10 = 800 resources per batch.
+        # Should set limit lower for future proofing.
+        for resources in itertools.batched(hauki_resource_ids, batch_size, strict=False):
+            results = cls._get_resources_batch(hauki_resource_ids=resources, **kwargs)
+            fetched_hauki_resources.extend(results)
+
+        return fetched_hauki_resources
+
+    @classmethod
+    def _get_resources_batch(
+        cls,
+        *,
+        hauki_resource_ids: Sequence[int | str],
+        **kwargs: Unpack[HaukiGetResourcesParams],
+    ) -> list[HaukiAPIResource]:
+        response_json = HaukiAPIClient._get_resources(hauki_resource_ids=hauki_resource_ids, **kwargs)
+        fetched_hauki_resources: list[HaukiAPIResource] = response_json["results"]
+
+        # In case of multiple pages, keep fetching resources until there are no more pages
+        while next_page_url := response_json.get("next"):
+            response_json = cls.response_json(cls.get(url=next_page_url))  # type: ignore[assignment]
+            fetched_hauki_resources.extend(response_json["results"])
+
+        return fetched_hauki_resources
+
+    @classmethod
+    def _get_resources(
+        cls,
+        *,
+        hauki_resource_ids: Sequence[int | str],
         **kwargs: Unpack[HaukiGetResourcesParams],
     ) -> HaukiAPIResourceListResponse:
         # Prepare the URL
@@ -63,28 +104,7 @@ class HaukiAPIClient(BaseExternalServiceClient):
         }
 
         response = cls.get(url=url, params=query_params)
-        response_json: HaukiAPIResourceListResponse = cls.response_json(response)
-        return response_json
-
-    @classmethod
-    def get_resources_all_pages(
-        cls,
-        *,
-        hauki_resource_ids: list[int | str],
-        **kwargs: Unpack[HaukiGetResourcesParams],
-    ) -> list[HaukiAPIResource]:
-        """Fetch resources from Hauki API based on the given resource ids."""
-        response_json = HaukiAPIClient.get_resources(hauki_resource_ids=hauki_resource_ids, **kwargs)
-        fetched_hauki_resources: list[HaukiAPIResource] = response_json["results"]
-
-        # In case of multiple pages, keep fetching resources until there are no more pages
-        resource_page_counter = 1
-        while next_page_url := response_json.get("next"):
-            resource_page_counter += 1
-            response_json: HaukiAPIResourceListResponse = cls.response_json(cls.get(url=next_page_url))
-            fetched_hauki_resources.extend(response_json["results"])
-
-        return fetched_hauki_resources
+        return cls.response_json(response)  # type: ignore[return-value]
 
     @classmethod
     def get_resource(cls, *, hauki_resource_id: str) -> HaukiAPIResource:

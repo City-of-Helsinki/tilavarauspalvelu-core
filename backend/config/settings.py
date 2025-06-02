@@ -364,6 +364,7 @@ class Common(Environment):
     HAUKI_SECRET = values.StringValue()
     HAUKI_API_KEY = values.StringValue()
     HAUKI_DAYS_TO_FETCH = 730  # 2 years
+    HAUKI_RESOURCE_BATCH_SIZE = values.IntegerValue(default=500)
 
     # --- Verkkokauppa settings --------------------------------------------------------------------------------------
 
@@ -519,7 +520,7 @@ class Common(Environment):
     EXPORT_AUTHORIZATION_TOKEN = values.StringValue()
 
     GRAPHENE_DJANGO_EXTENSIONS = {
-      "EXPERIMENTAL_REMOVE_TRANSLATION_BASE_FIELDS": True,
+        "EXPERIMENTAL_REMOVE_TRANSLATION_BASE_FIELDS": True,
     }
 
     # Allows faking membership to certain AD groups for testing automatic role assignment

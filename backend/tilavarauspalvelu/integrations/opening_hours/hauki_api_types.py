@@ -16,13 +16,14 @@ class HaukiTranslatedField(TypedDict):
     en: str | None
 
 
-class HaukiAPIOrigin(TypedDict):
-    class DataSource(TypedDict):
-        id: str
-        name: HaukiTranslatedField
+class HaukiDataSource(TypedDict):
+    id: str
+    name: HaukiTranslatedField
 
+
+class HaukiAPIOrigin(TypedDict):
     origin_id: str
-    data_source: DataSource
+    data_source: HaukiDataSource
 
 
 ############
@@ -62,28 +63,30 @@ class HaukiAPIResourceListResponse(TypedDict):
 ###############
 
 
+class HaukiTimeSpan(TypedDict):
+    id: int
+    group: int
+    name: HaukiTranslatedField
+    description: HaukiTranslatedField
+    start_time: str | None  # Time, e.g. "08:00:00"
+    end_time: str | None  # Time, e.g. "09:00:00"
+    end_time_on_next_day: bool
+    full_day: bool
+    weekdays: list[int]
+    resource_state: HaukiResourceState
+    created: str  # Timestamp, e.g. "2023-09-06T09:14:12.834385+03:00"
+    modified: str  # Timestamp, e.g. "2023-09-06T09:14:12.834385+03:00"
+
+
+class HaukiTimeSpanGroup(TypedDict):
+    id: int
+    period: int
+    time_spans: list[HaukiTimeSpan]
+    rules: list[Any]
+    is_removed: bool
+
+
 class HaukiAPIDatePeriod(TypedDict):
-    class TimeSpanGroup(TypedDict):
-        class TimeSpan(TypedDict):
-            id: int
-            group: int
-            name: HaukiTranslatedField
-            description: HaukiTranslatedField
-            start_time: str | None  # Time, e.g. "08:00:00"
-            end_time: str | None  # Time, e.g. "09:00:00"
-            end_time_on_next_day: bool
-            full_day: bool
-            weekdays: list[int]
-            resource_state: HaukiResourceState
-            created: str  # Timestamp, e.g. "2023-09-06T09:14:12.834385+03:00"
-            modified: str  # Timestamp, e.g. "2023-09-06T09:14:12.834385+03:00"
-
-        id: int
-        period: int
-        time_spans: list[TimeSpan]
-        rules: list[Any]
-        is_removed: bool
-
     id: int  # date period id
     resource: int  # resource id
     name: HaukiTranslatedField
@@ -97,7 +100,7 @@ class HaukiAPIDatePeriod(TypedDict):
     origins: list[HaukiAPIOrigin]
     created: str  # Timestamp, e.g. "2023-09-06T09:14:12.671531+03:00"
     modified: str  # Timestamp, e.g. "2023-09-06T09:14:12.671531+03:00"
-    time_span_groups: list[TimeSpanGroup]
+    time_span_groups: list[HaukiTimeSpanGroup]
 
 
 #################
