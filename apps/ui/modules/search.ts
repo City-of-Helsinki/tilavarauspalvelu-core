@@ -27,7 +27,7 @@ import {
 import { fromUIDate } from "./util";
 import { startOfDay } from "date-fns";
 import { SEARCH_PAGING_LIMIT } from "./const";
-import { type ApolloClient } from "@apollo/client";
+import { gql, type ApolloClient } from "@apollo/client";
 import { type ReadonlyURLSearchParams } from "next/navigation";
 import { transformAccessTypeSafe } from "common/src/conversion";
 
@@ -224,11 +224,21 @@ export function mapParamToNumber(param: string[], min?: number): number[] {
   return min != null ? numbers.filter((n) => n >= min) : numbers;
 }
 
+type OptionT = Readonly<{ value: number; label: string }>;
+export type OptionsT = Readonly<{
+  units: Readonly<OptionT[]>;
+  equipments: Readonly<OptionT[]>;
+  purposes: Readonly<OptionT[]>;
+  reservationUnitTypes: Readonly<OptionT[]>;
+  ageGroups: Readonly<OptionT[]>;
+  cities: Readonly<OptionT[]>;
+}>;
+
 export async function getSearchOptions(
   apolloClient: ApolloClient<unknown>,
   page: "seasonal" | "direct",
   locale: string
-) {
+): Promise<OptionsT> {
   const lang = convertLanguageCode(locale);
   const { data: optionsData } = await apolloClient.query<
     OptionsQuery,
@@ -247,33 +257,132 @@ export async function getSearchOptions(
 
   const reservationUnitTypes = filterNonNullable(
     optionsData?.reservationUnitTypes?.edges?.map((edge) => edge?.node)
-  );
+  ).map((n) => ({
+    value: n.pk ?? 0,
+    label: getTranslationSafe(n, "name", lang),
+  }));
   const purposes = filterNonNullable(
     optionsData?.purposes?.edges?.map((edge) => edge?.node)
-  );
-  const equipments = filterNonNullable(optionsData?.equipmentsAll);
+  ).map((n) => ({
+    value: n.pk ?? 0,
+    label: getTranslationSafe(n, "name", lang),
+  }));
 
-  const reservationUnitTypeOptions = reservationUnitTypes.map((n) => ({
+  const equipments = filterNonNullable(optionsData?.equipmentsAll).map((n) => ({
     value: n.pk ?? 0,
     label: getTranslationSafe(n, "name", lang),
   }));
-  const purposeOptions = purposes.map((n) => ({
-    value: n.pk ?? 0,
-    label: getTranslationSafe(n, "name", lang),
-  }));
-  const equipmentsOptions = equipments.map((n) => ({
-    value: n.pk ?? 0,
-    label: getTranslationSafe(n, "name", lang),
-  }));
-  const unitOptions = filterNonNullable(optionsData?.unitsAll).map((node) => ({
+
+  const units = filterNonNullable(optionsData?.unitsAll).map((node) => ({
     value: node.pk ?? 0,
     label: getTranslationSafe(node, "name", lang),
   }));
+  const ageGroups = filterNonNullable(
+    optionsData?.ageGroups?.edges?.map((edge) => edge?.node)
+  ).map((n) => ({
+    value: n.pk ?? 0,
+    label: getTranslationSafe(n, "name", lang),
+  }));
+  const cities = filterNonNullable(
+    optionsData?.cities?.edges?.map((edge) => edge?.node)
+  ).map((n) => ({
+    value: n.pk ?? 0,
+    label: getTranslationSafe(n, "name", lang),
+  }));
 
   return {
-    unitOptions,
-    equipmentsOptions,
-    purposeOptions,
-    reservationUnitTypeOptions,
+    units,
+    equipments,
+    purposes,
+    reservationUnitTypes,
+    ageGroups,
+    cities,
   };
 }
+
+// There is a duplicate in admin-ui but it doesn't have translations
+export const OPTIONS_QUERY = gql`
+  query Options(
+    $reservationUnitTypesOrderBy: [ReservationUnitTypeOrderingChoices]
+    $purposesOrderBy: [PurposeOrderingChoices]
+    $unitsOrderBy: [UnitOrderingChoices]
+    $equipmentsOrderBy: [EquipmentOrderingChoices]
+    $reservationPurposesOrderBy: [ReservationPurposeOrderingChoices]
+    $onlyDirectBookable: Boolean
+    $onlySeasonalBookable: Boolean
+  ) {
+    reservationUnitTypes(orderBy: $reservationUnitTypesOrderBy) {
+      edges {
+        node {
+          id
+          pk
+          nameFi
+          nameEn
+          nameSv
+        }
+      }
+    }
+    purposes(orderBy: $purposesOrderBy) {
+      edges {
+        node {
+          id
+          pk
+          nameFi
+          nameEn
+          nameSv
+        }
+      }
+    }
+    reservationPurposes(orderBy: $reservationPurposesOrderBy) {
+      edges {
+        node {
+          id
+          pk
+          nameFi
+          nameEn
+          nameSv
+        }
+      }
+    }
+    ageGroups {
+      edges {
+        node {
+          id
+          pk
+          minimum
+          maximum
+        }
+      }
+    }
+    cities {
+      edges {
+        node {
+          id
+          pk
+          nameFi
+          nameEn
+          nameSv
+        }
+      }
+    }
+    equipmentsAll(orderBy: $equipmentsOrderBy) {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+    }
+    unitsAll(
+      publishedReservationUnits: true
+      onlyDirectBookable: $onlyDirectBookable
+      onlySeasonalBookable: $onlySeasonalBookable
+      orderBy: $unitsOrderBy
+    ) {
+      id
+      pk
+      nameFi
+      nameSv
+      nameEn
+    }
+  }
+`;

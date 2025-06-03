@@ -4,13 +4,17 @@ import {
   createMockApplicationRound,
   createApplicationSearchGraphQLMocks,
 } from "@test/application.mocks";
-import { CreateGraphQLMockProps } from "@/test/test.gql.utils";
+import {
+  type CreateGraphQLMockProps,
+  createOptionMock,
+} from "@/test/test.gql.utils";
 import SeasonalSearch from "@/pages/recurring/[id]";
 import { addYears } from "date-fns";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import userEvent from "@testing-library/user-event";
 import { getApplicationPath } from "@/modules/urls";
 import { MockedGraphQLProvider } from "@/test/test.react.utils";
+import { type OptionsT } from "@/modules/search";
 
 const { mockedRouterReplace, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
@@ -53,12 +57,7 @@ function customRender(
     applicationPeriodBegin: new Date(2024, 0, 1, 0, 0, 0),
     applicationPeriodEnd: addYears(new Date(), 1),
   });
-  const options = {
-    unitOptions: [],
-    equipmentsOptions: [],
-    purposeOptions: [],
-    reservationUnitTypeOptions: [],
-  } as const;
+  const options: OptionsT = createOptionMock();
   return render(
     <MockedGraphQLProvider mocks={mocks}>
       <SeasonalSearch

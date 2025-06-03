@@ -6,11 +6,15 @@ import {
   createMockApplicationFragment,
   type CreateMockApplicationFragmentProps,
 } from "@test/application.mocks";
-import { type CreateGraphQLMocksReturn } from "@test/test.gql.utils";
+import {
+  createOptionMock,
+  type CreateGraphQLMocksReturn,
+} from "@test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
 import { selectFirstOption } from "@test/test.utils";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
+import { type OptionsT } from "@/modules/search";
 
 const { mockedRouterPush, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
@@ -60,9 +64,10 @@ function customRender(
 ): ReturnType<typeof render> {
   const mocks = createGraphQLMocks();
   const application = createMockApplicationFragment(props);
+  const options: OptionsT = createOptionMock();
   return render(
     <MockedGraphQLProvider mocks={mocks}>
-      <Page1 application={application} unitsAll={[]} />
+      <Page1 application={application} options={options} />
     </MockedGraphQLProvider>
   );
 }
