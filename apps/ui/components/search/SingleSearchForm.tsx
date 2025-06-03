@@ -16,7 +16,7 @@ import { FilterTagList } from "../FilterTagList";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { mapParamToNumber } from "@/modules/search";
+import { mapParamToNumber, type OptionsT } from "@/modules/search";
 import { SearchButtonContainer, StyledSubmitButton } from "./styled";
 import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
@@ -97,20 +97,16 @@ const multiSelectFilters = [
 // we don't want to show "showOnlyReservable" as a FilterTag, as it has its own checkbox in the form
 const hideTagList = ["showOnlyReservable", "order", "sort", "ref"];
 
+type SingleSearchFormProps = {
+  options: OptionsT;
+  isLoading: boolean;
+};
+
 // TODO rewrite this witout the form state (use query params directly, but don't refresh the page)
 export function SingleSearchForm({
-  reservationUnitTypeOptions,
-  purposeOptions,
-  unitOptions,
-  equipmentsOptions,
+  options: { reservationUnitTypes, purposes, units, equipments },
   isLoading,
-}: Readonly<{
-  reservationUnitTypeOptions: Array<{ value: number; label: string }>;
-  purposeOptions: Array<{ value: number; label: string }>;
-  unitOptions: Array<{ value: number; label: string }>;
-  equipmentsOptions: Array<{ value: number; label: string }>;
-  isLoading: boolean;
-}>): JSX.Element | null {
+}: Readonly<SingleSearchFormProps>): JSX.Element | null {
   const { handleSearch } = useSearchModify();
   const { t } = useTranslation();
   const searchValues = useSearchParams();
@@ -134,13 +130,13 @@ export function SingleSearchForm({
     // TODO should rework the find matcher (typing issues) (it works but it's confusing)
     switch (key) {
       case "units":
-        return unitOptions.find((n) => compFn(n, value))?.label;
+        return units.find((n) => compFn(n, value))?.label;
       case "reservationUnitTypes":
-        return reservationUnitTypeOptions.find((n) => compFn(n, value))?.label;
+        return reservationUnitTypes.find((n) => compFn(n, value))?.label;
       case "purposes":
-        return purposeOptions.find((n) => compFn(n, value))?.label;
+        return purposes.find((n) => compFn(n, value))?.label;
       case "equipments":
-        return equipmentsOptions.find((n) => compFn(n, value))?.label;
+        return equipments.find((n) => compFn(n, value))?.label;
       case "duration":
         return durationOptions.find((n) => compFn(n, value))?.label;
       case "accessTypes":
@@ -181,7 +177,7 @@ export function SingleSearchForm({
           enableSearch
           name="purposes"
           control={control}
-          options={purposeOptions}
+          options={purposes}
           label={t("searchForm:labels.purposes")}
         />
         <ControlledSelect
@@ -190,7 +186,7 @@ export function SingleSearchForm({
           enableSearch
           name="units"
           control={control}
-          options={unitOptions}
+          options={units}
           label={t("searchForm:labels.units")}
         />
         <ControlledSelect
@@ -199,7 +195,7 @@ export function SingleSearchForm({
           enableSearch
           name="equipments"
           control={control}
-          options={equipmentsOptions}
+          options={equipments}
           label={t("searchForm:labels.equipments")}
         />
         <SingleLabelInputGroup label={t("common:dateLabel")}>
@@ -260,7 +256,7 @@ export function SingleSearchForm({
           name="reservationUnitTypes"
           multiselect
           control={control}
-          options={reservationUnitTypeOptions}
+          options={reservationUnitTypes}
           enableSearch
           clearable
           label={t("searchForm:labels.reservationUnitTypes")}

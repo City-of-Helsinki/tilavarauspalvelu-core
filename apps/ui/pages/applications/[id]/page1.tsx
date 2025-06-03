@@ -1,7 +1,6 @@
 import React from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useRouter } from "next/router";
-import { useTranslation } from "next-i18next";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,10 +10,6 @@ import {
   ignoreMaybeArray,
   toNumber,
 } from "common/src/helpers";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
 import { useDisplayError } from "common/src/hooks";
 import { Flex } from "common/styled";
 import { uniq } from "lodash-es";
@@ -22,13 +17,12 @@ import { gql } from "@apollo/client";
 import { createApolloClient } from "@/modules/apolloClient";
 import {
   ApplicationPage1Document,
-  UnitOrderingChoices,
   useUpdateApplicationMutation,
   type ApplicationPage1Query,
   type ApplicationPage1QueryVariables,
 } from "@/gql/gql-types";
 import { getApplicationPath } from "@/modules/urls";
-import { useOptions, useReservationUnitList } from "@/hooks";
+import { useReservationUnitList } from "@/hooks";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
   ApplicationFunnelWrapper,
@@ -40,13 +34,13 @@ import {
   transformApplicationPage1,
   convertApplicationPage1,
 } from "@/components/application/funnel/form";
+import { getSearchOptions } from "@/modules/search";
 
 function Page1({
   application,
-  unitsAll,
-}: Pick<PropsNarrowed, "application" | "unitsAll">): JSX.Element {
+  options: optionsOrig,
+}: Pick<PropsNarrowed, "application" | "options">): JSX.Element {
   const router = useRouter();
-  const { i18n } = useTranslation();
   const dislayError = useDisplayError();
   const [mutate] = useUpdateApplicationMutation();
 
@@ -64,20 +58,18 @@ function Page1({
     }
   };
 
-  const lang = convertLanguageCode(i18n.language);
   const { applicationRound } = application;
   const resUnitPks = applicationRound.reservationUnits?.map(
     (resUnit) => resUnit.unit?.pk
   );
   const unitsInApplicationRound = filterNonNullable(uniq(resUnitPks));
-  const unitOptions = unitsAll
-    .filter((u) => u.pk != null && unitsInApplicationRound.includes(u.pk))
-    .map((u) => ({
-      value: u.pk ?? 0,
-      label: getTranslationSafe(u, "name", lang),
-    }));
-  const { options } = useOptions();
 
+  const options = {
+    ...optionsOrig,
+    units: optionsOrig.units.filter((u) =>
+      unitsInApplicationRound.includes(u.value)
+    ),
+  };
   const { getReservationUnits } = useReservationUnitList(applicationRound);
 
   const begin = new Date(applicationRound.reservationPeriodBegin);
@@ -98,10 +90,7 @@ function Page1({
     <FormProvider {...form}>
       <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)}>
         <ApplicationFunnelWrapper page="page1" application={application}>
-          <Page1Impl
-            applicationRound={applicationRound}
-            options={{ ...options, unitOptions }}
-          />
+          <Page1Impl applicationRound={applicationRound} options={options} />
         </ApplicationFunnelWrapper>
       </Flex>
     </FormProvider>
@@ -136,20 +125,20 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     query: ApplicationPage1Document,
     variables: {
       id: base64encode(`ApplicationNode:${pk}`),
-      orderUnitsBy: [UnitOrderingChoices.RankAsc],
     },
   });
   const { application } = data;
   if (application == null) {
     return notFound;
   }
-  const unitsAll = filterNonNullable(data.unitsAll);
+
+  const options = await getSearchOptions(client, "seasonal", locale ?? "fi");
 
   return {
     props: {
       ...commonProps,
       application,
-      unitsAll,
+      options,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
@@ -158,20 +147,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 export default Page1;
 
 export const APPLICATION_PAGE1_QUERY = gql`
-  query ApplicationPage1($id: ID!, $orderUnitsBy: [UnitOrderingChoices]) {
+  query ApplicationPage1($id: ID!) {
     application(id: $id) {
       ...ApplicationForm
-    }
-    unitsAll(
-      publishedReservationUnits: true
-      onlySeasonalBookable: true
-      orderBy: $orderUnitsBy
-    ) {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
     }
   }
 `;

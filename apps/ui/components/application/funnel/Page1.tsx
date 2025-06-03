@@ -12,21 +12,22 @@ import { filterNonNullable } from "common/src/helpers";
 import { ButtonContainer } from "common/styled";
 import { type ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { useReservationUnitList } from "@/hooks";
-import { type OptionTypes, ApplicationSectionPage1 } from ".";
+import { ApplicationSectionPage1 } from ".";
 import {
   type ApplicationPage1FormValues,
   createDefaultPage1Section,
 } from "./form";
+import { type OptionsT } from "@/modules/search";
 
-type Props = {
-  applicationRound: ApplicationRoundForApplicationFragment;
-  options: OptionTypes;
-};
+type Page1Props = Readonly<{
+  applicationRound: Readonly<ApplicationRoundForApplicationFragment>;
+  options: Readonly<OptionsT>;
+}>;
 
 export function Page1({
   applicationRound,
   options,
-}: Props): JSX.Element | null {
+}: Page1Props): JSX.Element | null {
   const { t } = useTranslation();
 
   // get the user selected defaults for reservationUnits field

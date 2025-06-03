@@ -126,10 +126,12 @@ function WrappedRender({
   applicationRound: ApplicationReservationUnitListFragment;
 }): JSX.Element {
   const options = {
-    unitOptions: [],
-    equipmentsOptions: [],
-    purposeOptions: [],
-    reservationUnitTypeOptions: [],
+    units: [],
+    equipments: [],
+    purposes: [],
+    reservationUnitTypes: [],
+    ageGroups: [],
+    cities: [],
   } as const;
 
   const form = useForm<FormValues>({
