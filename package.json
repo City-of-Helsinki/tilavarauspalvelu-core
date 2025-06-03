@@ -36,7 +36,7 @@
     "glob": "^11.0.1",
     "graphql-config": "^5.1.4",
     "npkill": "^0.12.2",
-    "turbo": "^2.5.3"
+    "turbo": "^2.5.4"
   },
   "packageManager": "pnpm@9.11.0"
 }
