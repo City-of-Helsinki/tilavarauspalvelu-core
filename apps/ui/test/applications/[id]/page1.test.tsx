@@ -6,14 +6,9 @@ import {
   createMockApplicationFragment,
   type CreateMockApplicationFragmentProps,
 } from "@test/application.mocks";
-import {
-  mockAgeGroupOptions,
-  mockDurationOptions,
-  mockReservationPurposesOptions,
-  type CreateGraphQLMocksReturn,
-} from "@test/test.gql.utils";
+import { type CreateGraphQLMocksReturn } from "@test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
-import { selectOption } from "@test/test.utils";
+import { selectFirstOption } from "@test/test.utils";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 
@@ -166,26 +161,8 @@ describe("Page1", () => {
     const name = within(section).getByLabelText(/application:Page1.name/);
     expect(name).toBeInTheDocument();
     await user.type(name, "Test section name");
-    const ageGroupOpt = mockAgeGroupOptions[0];
-    if (ageGroupOpt == null) {
-      throw new Error("expected age group option");
-    }
-    const ageGroupOptLabel = `${ageGroupOpt.minimum} - ${ageGroupOpt.maximum}`;
-    await selectOption(
-      within(section),
-      /application:Page1.ageGroup/,
-      ageGroupOptLabel
-    );
-    const purposeOpt = mockReservationPurposesOptions[0];
-    if (purposeOpt == null) {
-      throw new Error("expected purpose option");
-    }
-    const purposeOptLabel = purposeOpt.label;
-    await selectOption(
-      within(section),
-      /application:Page1.purpose/,
-      purposeOptLabel
-    );
+    await selectFirstOption(within(section), /application:Page1.ageGroup/);
+    await selectFirstOption(within(section), /application:Page1.purpose/);
     const groupSize = within(section).getByLabelText(
       /application:Page1.groupSize/,
       { selector: "input" }
@@ -199,20 +176,8 @@ describe("Page1", () => {
     expect(checkDefaultPeriod).toBeInTheDocument();
     await user.click(checkDefaultPeriod);
 
-    const dur = mockDurationOptions[0];
-    if (dur == null) {
-      throw new Error("expected duration option");
-    }
-    await selectOption(
-      within(section),
-      /application:Page1.minDuration/,
-      dur.label
-    );
-    await selectOption(
-      within(section),
-      /application:Page1.maxDuration/,
-      dur.label
-    );
+    await selectFirstOption(within(section), /application:Page1.minDuration/);
+    await selectFirstOption(within(section), /application:Page1.maxDuration/);
 
     // don't expect a default value for eventsPerWeek
     const eventsPerWeek = within(section).getByLabelText(
