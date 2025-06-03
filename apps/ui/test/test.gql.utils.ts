@@ -2,15 +2,11 @@ import {
   type IsReservableFieldsFragment,
   type OptionsQuery,
   ReservationStartInterval,
-  ReservationUnitTypeNode,
-  type TermsOfUseFieldsFragment,
-  TermsType,
+  type ReservationUnitTypeNode,
 } from "@/gql/gql-types";
 import { base64encode } from "common/src/helpers";
 import { addDays } from "date-fns";
 import { type DocumentNode } from "graphql";
-import { type TFunction } from "i18next";
-import { getDurationOptions } from "@/modules/const";
 import { type ReservableMap, type RoundPeriod } from "@/modules/reservable";
 
 export type CreateGraphQLMockProps = {
@@ -31,41 +27,22 @@ export type CreateGraphQLMocksReturn = Array<{
   error?: Error | undefined;
 }>;
 
-export function createMockTermsOfUse(): TermsOfUseFieldsFragment {
-  return {
-    // TODO what is the slug on this page? or does it matter
-    // should be RecurringTerms (but not sure if it matters)
-    pk: "generic",
-    termsType: TermsType.RecurringTerms,
-    id: base64encode("TermsOfUseNode:1"),
-    ...generateNameFragment("TermsOfUseNode"),
-    textFi: "Yleiset käyttöehdot",
-    textEn: "General terms of use",
-    textSv: "Allmänna användningsvillkor",
-  };
-}
+export function createOptionQueryMock({
+  nCount = 5,
+}: {
+  nCount?: number;
+} = {}): OptionsQuery {
+  const pks = Array.from({ length: nCount }, (_, i) => i + 1);
+  const mockReservationPurposesOptions = pks.map((pk) => ({
+    value: pk,
+    label: `Reservation Purpose ${pk}`,
+  }));
+  const mockAgeGroupOptions = pks.map((v) => ({
+    pk: v,
+    maximum: v,
+    minimum: v,
+  }));
 
-// Option mocks
-// TODO should move to test.utils.ts
-// TODO improve mockT so that we pull through the duration value (not just the minutes / hours)
-export const mockT: TFunction = ((key: string) => key) as TFunction;
-export const mockDurationOptions = getDurationOptions(mockT);
-export const mockReservationPurposesOptions = Array.from(
-  { length: 5 },
-  (_, i) => ({
-    pk: i + 1,
-  })
-).map(({ pk }) => ({ value: pk, label: `Reservation Purpose ${pk}` }));
-export const mockAgeGroupOptions = Array.from(
-  { length: 5 },
-  (_, i) => i + 1
-).map((v) => ({
-  pk: v,
-  maximum: v,
-  minimum: v,
-}));
-
-export function createOptionQueryMock(): OptionsQuery {
   return {
     reservationPurposes: {
       edges: mockReservationPurposesOptions
@@ -80,18 +57,21 @@ export function createOptionQueryMock(): OptionsQuery {
     },
     ageGroups: {
       edges: mockAgeGroupOptions
-        .map(({ pk, maximum, minimum }) => ({
-          id: base64encode(`ReservationPurposeNode:${pk}`),
-          pk,
-          minimum,
-          maximum,
+        .map((val) => ({
+          ...val,
+          id: base64encode(`ReservationPurposeNode:${val.pk}`),
         }))
         .map((node) => ({ node })),
     },
-    // NOT defining these atm because Seasonal Form doesn't use them
-    // but the query requires matching keys
     reservationUnitTypes: {
-      edges: [],
+      edges: pks
+        .map((pk) =>
+          createMockReservationUnitType({
+            name: `Reservation Unit Type ${pk}`,
+            pk,
+          })
+        )
+        .map((node) => ({ node })),
     },
     purposes: {
       edges: [],
@@ -146,13 +126,13 @@ export function createMockReservationUnit({
   return reservationUnit;
 }
 
-export function createMockReservationUnitType(
-  props: { name: string; pk?: number } | null
-): ReservationUnitTypeNode | null {
-  if (props == null) {
-    return null;
-  }
-  const { name, pk = 1 } = props;
+export function createMockReservationUnitType({
+  name,
+  pk = 1,
+}: {
+  name: string;
+  pk?: number;
+}): ReservationUnitTypeNode {
   return {
     id: `ReservationUnitTypeNode:${pk}`,
     pk,
