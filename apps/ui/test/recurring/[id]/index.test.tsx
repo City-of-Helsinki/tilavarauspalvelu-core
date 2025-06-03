@@ -130,15 +130,7 @@ describe("Page: SeasonalSearch", () => {
     params.set(SEASONAL_SELECTED_PARAM_KEY, "1");
     params.set("id", "1");
     expect(mockedRouterReplace).toHaveBeenCalledTimes(1);
-
-    expect(mockedRouterReplace).toHaveBeenLastCalledWith(
-      { query: params.toString() },
-      undefined,
-      {
-        shallow: true,
-        scroll: false,
-      }
-    );
+    expect(mockedRouterReplace).searchParamCall(params);
   });
 
   test("selecting another card should add to query params", async () => {
@@ -159,14 +151,7 @@ describe("Page: SeasonalSearch", () => {
     await user.click(select);
     expect(mockedRouterReplace).toHaveBeenCalledTimes(1);
     params.append(SEASONAL_SELECTED_PARAM_KEY, "3");
-    expect(mockedRouterReplace).toHaveBeenLastCalledWith(
-      { query: params.toString() },
-      undefined,
-      {
-        shallow: true,
-        scroll: false,
-      }
-    );
+    expect(mockedRouterReplace).searchParamCall(params);
   });
 
   test("deselecting should remove from query params", async () => {
@@ -187,14 +172,7 @@ describe("Page: SeasonalSearch", () => {
     await user.click(select);
     expect(mockedRouterReplace).toHaveBeenCalledTimes(1);
     params.delete(SEASONAL_SELECTED_PARAM_KEY);
-    expect(mockedRouterReplace).toHaveBeenLastCalledWith(
-      { query: params.toString() },
-      undefined,
-      {
-        shallow: true,
-        scroll: false,
-      }
-    );
+    expect(mockedRouterReplace).searchParamCall(params);
   });
 
   // doesn't require interaction, just check the query params
