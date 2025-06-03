@@ -67,12 +67,11 @@ function customRender(
   const mocks = createGraphQLMocks();
   return render(
     <MockedGraphQLProvider mocks={mocks}>
-      <Page3 application={application} />
+      <Page3 application={application} cityOptions={[]} />
     </MockedGraphQLProvider>
   );
 }
 
-//
 describe("Application Page3", () => {
   test("smoke: should render page with initial data", () => {
     // TODO all of this is common to all application funnel pages

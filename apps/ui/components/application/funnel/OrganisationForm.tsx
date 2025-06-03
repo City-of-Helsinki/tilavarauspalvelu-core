@@ -14,13 +14,10 @@ import {
 } from ".";
 import { type ApplicationPage3FormValues } from "./form";
 import { FormSubHeading } from "./styled";
+import { type OptionsT } from "@/modules/search";
 
-type OptionType = {
-  label: string;
-  value: number;
-};
 type Props = {
-  homeCityOptions: OptionType[];
+  homeCityOptions: OptionsT["cities"];
 };
 
 export function OrganisationForm({ homeCityOptions }: Props): JSX.Element {

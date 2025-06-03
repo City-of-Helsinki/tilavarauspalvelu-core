@@ -30,23 +30,17 @@ import { OrderedReservationUnitCard, ReservationUnitModalContent } from ".";
 import { useSearchParams } from "next/navigation";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { HDSModal } from "common/src/components/HDSModal";
+import { type OptionsT } from "@/modules/search";
 
 type ReservationUnitType = Pick<OrderedReservationUnitCardFragment, "pk">;
 export type OptionType = Readonly<{ value: number; label: string }>;
-type OptionListType = Readonly<Array<OptionType>>;
-export type OptionTypes = Readonly<{
-  ageGroupOptions?: OptionListType;
-  purposeOptions: OptionListType;
-  reservationUnitTypeOptions: OptionListType;
-  unitOptions: OptionListType;
-}>;
 
 export interface ReservationUnitListProps<T extends FieldValues>
   extends UseControllerProps<T> {
   name: Path<T>;
   control: Control<T>;
-  applicationRound: ApplicationReservationUnitListFragment;
-  options: OptionTypes;
+  applicationRound: Readonly<ApplicationReservationUnitListFragment>;
+  options: Readonly<OptionsT>;
   minSize?: number;
   error?: string;
 }

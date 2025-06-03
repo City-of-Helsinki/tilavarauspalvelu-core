@@ -30,19 +30,14 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     props: {
       ...getCommonServerSideProps(),
       ...(await serverSideTranslations(locale ?? "fi")),
-      ...opts,
+      options: opts,
     },
   };
 }
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-function SearchSingle({
-  unitOptions,
-  reservationUnitTypeOptions,
-  purposeOptions,
-  equipmentsOptions,
-}: Readonly<Props>): JSX.Element {
+function SearchSingle({ options }: Readonly<Props>): JSX.Element {
   const { t, i18n } = useTranslation();
 
   const searchValues = useSearchParams();
@@ -96,13 +91,7 @@ function SearchSingle({
           {t("searchResultList:error")}
         </Notification>
       ) : null}
-      <SingleSearchForm
-        unitOptions={unitOptions}
-        reservationUnitTypeOptions={reservationUnitTypeOptions}
-        purposeOptions={purposeOptions}
-        equipmentsOptions={equipmentsOptions}
-        isLoading={isLoading}
-      />
+      <SingleSearchForm options={options} isLoading={isLoading} />
       <Flex as="section" ref={content}>
         <ListWithPagination
           items={filterNonNullable(reservationUnits).map((ru) => (

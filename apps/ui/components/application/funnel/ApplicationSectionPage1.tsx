@@ -22,18 +22,15 @@ import { toUIDate } from "common/src/common/util";
 import { Accordion } from "@/components/Accordion";
 import { getDurationOptions } from "@/modules/const";
 import { type ApplicationPage1FormValues } from "./form";
-import {
-  ApplicationSectionSummary,
-  type OptionTypes,
-  ReservationUnitList,
-} from ".";
+import { ApplicationSectionSummary, ReservationUnitList } from ".";
+import { type OptionsT } from "@/modules/search";
 
-type Props = {
+type Props = Readonly<{
   index: number;
   applicationRound: ApplicationRoundForApplicationFragment;
-  options: OptionTypes;
+  options: Readonly<OptionsT>;
   onDeleteEvent: () => void;
-};
+}>;
 
 function ApplicationSectionInner({
   index,
@@ -138,12 +135,12 @@ function ApplicationSectionInner({
           required
           name={`applicationSections.${index}.ageGroup`}
           label={t("application:Page1.ageGroup")}
-          options={options.ageGroupOptions ?? []}
+          options={options.ageGroups}
           error={getTranslatedError("ageGroup")}
         />
         <ControlledSelect
           control={control}
-          options={options.purposeOptions}
+          options={options.purposes}
           name={`applicationSections.${index}.purpose`}
           label={t("application:Page1.purpose")}
           required

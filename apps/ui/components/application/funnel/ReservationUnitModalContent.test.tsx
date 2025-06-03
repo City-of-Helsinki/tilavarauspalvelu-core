@@ -60,11 +60,10 @@ function customRender(
 ): ReturnType<typeof render> {
   const mocks = createApplicationSearchGraphQLMocks(mockProps);
   const round = createMockApplicationRound();
-  const options = {
-    unitOptions: [],
-    equipmentsOptions: [],
-    purposeOptions: [],
-    reservationUnitTypeOptions: [],
+  const options: ReservationUnitModalProps["options"] = {
+    units: [],
+    purposes: [],
+    reservationUnitTypes: [],
   } as const;
   const props: ReservationUnitModalProps = {
     handleAdd,
