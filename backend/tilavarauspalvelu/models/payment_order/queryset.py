@@ -54,7 +54,7 @@ class PaymentOrderManager(_BaseManager):
     def all(self) -> PaymentOrderQuerySet:
         return super().all()  # type: ignore[return-value]
 
-    def cancel_expired_payments_in_verkkokauppa(self) -> None:
+    def refresh_expired_payments_from_verkkokauppa(self) -> None:
         for payment_order in self.all().expired_direct_payments():
             # Do not update PaymentOrder status if an error occurs
             with suppress(GetPaymentError, CancelOrderError), transaction.atomic():
