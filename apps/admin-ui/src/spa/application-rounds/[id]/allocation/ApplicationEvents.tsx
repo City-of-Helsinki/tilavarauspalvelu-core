@@ -35,8 +35,11 @@ const Content = styled.div`
   font-size: var(--fontsize-body-s);
   line-height: var(--lineheight-xl);
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
   gap: var(--spacing-s);
+  grid-template-columns: 1fr;
+  @media (min-width: ${breakpoints.m}) {
+    grid-template-columns: 1fr auto 1fr;
+  }
   @media (min-width: ${breakpoints.l}) {
     gap: var(--spacing-l);
   }

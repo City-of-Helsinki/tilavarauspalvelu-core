@@ -69,7 +69,6 @@ const Card = styled.div<{ $type: AllocationApplicationSectionCardType }>`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: 100%;
   padding: var(--spacing-2-xs) var(--spacing-xs) var(--spacing-xs);
   line-height: var(--lineheight-xl);
   font-size: var(--fontsize-body-s);
