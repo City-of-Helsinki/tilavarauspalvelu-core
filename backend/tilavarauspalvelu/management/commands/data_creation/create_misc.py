@@ -10,8 +10,8 @@ from tilavarauspalvelu.models.banner_notification.model import BannerNotificatio
 from tilavarauspalvelu.tasks import (
     create_missing_pindora_reservations,
     prune_reservations_task,
+    refresh_expired_payments_in_verkkokauppa_task,
     update_affecting_time_spans_task,
-    update_expired_orders_task,
     update_pindora_access_code_is_active,
 )
 from utils.date_utils import DEFAULT_TIMEZONE
@@ -106,7 +106,7 @@ def _create_periodic_tasks() -> None:
 
     PeriodicTask.objects.create(
         name="Maksamattomien tilausten rauetus",
-        task=update_expired_orders_task.name,
+        task=refresh_expired_payments_in_verkkokauppa_task.name,
         crontab=off_5_minute,
         description=(
             "Merkitsee rauenneiksi ja peruuu verkkokaupan rajapinnasta maksutilaukset, "
