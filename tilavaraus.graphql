@@ -2389,6 +2389,7 @@ type ReservationCancelReasonNode implements Node {
 }
 
 type PaymentOrderNode implements Node {
+  reservation: ReservationNode
   paymentType: PaymentType!
   status: OrderStatus!
   processedAt: DateTime
@@ -2400,7 +2401,7 @@ type PaymentOrderNode implements Node {
   orderUuid: UUID
   refundUuid: UUID
   expiresInMinutes: Int
-  reservationPk: String
+  reservationPk: String @deprecated(reason: "Use `reservation` instead.")
 }
 
 """An enumeration."""
