@@ -418,6 +418,17 @@ def test_reservation__adjust_time__non_internal_ad_user(graphql):
     assert response.field_error_messages() == ["AD user is not an internal user."]
 
 
+def test_reservation__adjust_time__non_internal_ad_user__is_superuser(graphql):
+    user = UserFactory.create_ad_user(is_superuser=True, email="test@example.com")
+    reservation = ReservationFactory.create_for_time_adjustment(user=user)
+
+    graphql.login_with_superuser()
+    data = get_adjust_data(reservation)
+    response = graphql(ADJUST_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+
 @override_settings(SEND_EMAILS=True)
 def test_reservation__adjust_time__needs_handling_after_time_change(graphql, outbox):
     reservation = ReservationFactory.create_for_time_adjustment(reservation_units__require_reservation_handling=True)

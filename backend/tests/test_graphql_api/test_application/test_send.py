@@ -766,3 +766,18 @@ def test_send_application__is_ad_user__not_internal_user(graphql):
 
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == ["AD user is not an internal user."]
+
+
+def test_send_application__is_ad_user__not_internal_user__is_superuser(graphql):
+    user = UserFactory.create_ad_user(
+        is_superuser=True,
+        date_of_birth=local_datetime(2006, 1, 1),
+        email="test@example.com",
+    )
+
+    application = ApplicationFactory.create_application_ready_for_sending(user=user)
+
+    graphql.login_with_superuser()
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+
+    assert response.has_errors is False, response.errors

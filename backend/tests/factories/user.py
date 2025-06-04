@@ -103,21 +103,21 @@ class UserFactory(GenericDjangoModelFactory[User]):
     def create_ad_user(cls, **kwargs: Any) -> User:
         kwargs.setdefault("social_auth__extra_data__amr", ADLoginAMR.HELSINKIAZUREAD)
         kwargs.setdefault("social_auth__extra_data__loa", "low")
-        return cls.create_superuser(**kwargs)
+        return cls.create(**kwargs)
 
     @classmethod
     def create_internal_ad_user(cls, **kwargs: Any) -> User:
         kwargs.setdefault("email", "test@hel.fi")
         kwargs.setdefault("social_auth__extra_data__amr", ADLoginAMR.HELSINKIAZUREAD)
         kwargs.setdefault("social_auth__extra_data__loa", "low")
-        return cls.create_superuser(**kwargs)
+        return cls.create(**kwargs)
 
     @classmethod
     def create_profile_user(cls, **kwargs: Any) -> User:
         kwargs.setdefault("profile_id", "foo")
         kwargs.setdefault("social_auth__extra_data__amr", ProfileLoginAMR.SUOMI_FI)
         kwargs.setdefault("social_auth__extra_data__loa", "substantial")
-        return cls.create_superuser(**kwargs)
+        return cls.create(**kwargs)
 
 
 class UserSocialAuthFactory(GenericDjangoModelFactory[UserSocialAuth]):

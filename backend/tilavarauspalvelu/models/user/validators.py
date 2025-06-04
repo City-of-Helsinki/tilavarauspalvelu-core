@@ -28,6 +28,10 @@ class UserValidator:
         if self.user.actions.is_ad_user:
             # Except there can be some guest-users whose age we don't know.
             if not self.user.actions.is_internal_user:
+                # But allow superusers to be external/guest users.
+                if self.user.is_superuser:
+                    return
+
                 msg = "AD user is not an internal user. Cannot verify age."
                 raise ValidationError(msg, code=code)
 
@@ -37,6 +41,10 @@ class UserValidator:
         raise ValidationError(msg, code=code)
 
     def validate_is_internal_user_if_ad_user(self) -> None:
+        # Superusers can be external/guest users (e.g. developers)
+        if self.user.is_superuser:
+            return
+
         if self.user.actions.is_ad_user and not self.user.actions.is_internal_user:
             msg = "AD user is not an internal user."
             raise ValidationError(msg, code=error_codes.USER_NOT_INTERNAL_USER)

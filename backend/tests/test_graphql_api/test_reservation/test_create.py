@@ -1235,6 +1235,19 @@ def test_reservation__create__require_adult_reservee__is_ad_user__not_internal(g
     assert response.field_error_messages() == ["AD user is not an internal user."]
 
 
+def test_reservation__create__require_adult_reservee__is_ad_user__not_internal__is_superuser(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=True)
+
+    user = UserFactory.create_ad_user(is_superuser=True, email="test@example.com")
+
+    graphql.force_login(user)
+
+    data = get_create_data(reservation_unit)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+
 def test_reservation__create__dont_require_adult_reservee__is_ad_user__internal(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=False)
 
@@ -1260,6 +1273,19 @@ def test_reservation__create__dont_require_adult_reservee__is_ad_user__not_inter
 
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == ["AD user is not an internal user."]
+
+
+def test_reservation__create__dont_require_adult_reservee__is_ad_user__not_internal__is_superuser(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=False)
+
+    user = UserFactory.create_ad_user(is_superuser=True, email="test@example.com")
+
+    graphql.force_login(user)
+
+    data = get_create_data(reservation_unit)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
 
 
 @patch_method(PindoraService.create_access_code)
