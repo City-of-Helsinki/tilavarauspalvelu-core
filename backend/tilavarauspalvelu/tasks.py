@@ -54,6 +54,7 @@ __all__ = [
     "prune_reservations_task",
     "purge_image_cache",
     "rebuild_space_tree_hierarchy",
+    "refresh_expired_payments_in_verkkokauppa_task",
     "refresh_reservation_unit_accounting",
     "refresh_reservation_unit_product_mapping",
     "remove_old_personal_info_view_logs",
@@ -64,7 +65,6 @@ __all__ = [
     "send_permission_deactivation_email_task",
     "send_user_anonymization_email_task",
     "update_affecting_time_spans_task",
-    "update_expired_orders_task",
     "update_origin_hauki_resource_reservable_time_spans",
     "update_pindora_access_code_is_active",
     "update_reservation_unit_hierarchy_task",
@@ -190,8 +190,14 @@ def send_application_handled_email_task() -> None:
 
 
 @app.task(name="update_expired_orders")
+@deprecated("Use 'refresh_expired_payments_in_verkkokauppa_task' instead. Can be removed in next release.")
 def update_expired_orders_task() -> None:
-    PaymentOrder.objects.cancel_expired_payments_in_verkkokauppa()
+    refresh_expired_payments_in_verkkokauppa_task()
+
+
+@app.task(name="refresh_expired_payments_in_verkkokauppa")
+def refresh_expired_payments_in_verkkokauppa_task() -> None:
+    PaymentOrder.objects.refresh_expired_payments_from_verkkokauppa()
 
 
 @app.task(name="prune_reservation_statistics")
