@@ -59,12 +59,8 @@ class PaymentOrderManager(_BaseManager):
             # Do not update PaymentOrder status if an error occurs
             with suppress(GetPaymentError, CancelOrderError), transaction.atomic():
                 payment_order.actions.refresh_order_status_from_webshop()
-                if payment_order.status == OrderStatus.EXPIRED:
-                    payment_order.actions.cancel_together_with_verkkokauppa()
 
         for payment_order in self.all().expired_handled_payments():
             # Do not update PaymentOrder status if an error occurs
             with suppress(GetPaymentError, CancelOrderError), transaction.atomic():
                 payment_order.actions.refresh_order_status_from_webshop()
-                if payment_order.status == OrderStatus.EXPIRED:
-                    payment_order.actions.cancel_together_with_verkkokauppa()
