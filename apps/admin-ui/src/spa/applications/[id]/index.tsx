@@ -305,11 +305,12 @@ function RejectOptionButton({
     console.warn("no allocatedTimeSlots", option);
   }
 
-  const canReject =
+  const isRejectionAllowed =
     applicationStatus === ApplicationStatusChoice.InAllocation ||
     applicationStatus === ApplicationStatusChoice.Handled;
+  const hasAllocations = option.allocatedTimeSlots?.length > 0;
   const isDisabled =
-    !canReject || option.allocatedTimeSlots?.length > 0 || !hasPermission;
+    !isRejectionAllowed || hasAllocations || !hasPermission || option.locked;
 
   if (!hasPermission) {
     return null;
@@ -409,10 +410,14 @@ function RejectAllOptionsButton({
   const inAllocation =
     applicationStatus === ApplicationStatusChoice.InAllocation ||
     applicationStatus === ApplicationStatusChoice.Handled;
-  const isRejected = section.reservationUnitOptions.every((x) => x.rejected);
+  const isRejected = section.reservationUnitOptions.every(
+    (x) => x.rejected || x.locked
+  );
+  // edge case: only locked options -> rejection has no effect
+  const isAllLocked = section.reservationUnitOptions.every((x) => x.locked);
   const hasAllocations = section.allocations != null && section.allocations > 0;
   const canReject = inAllocation && !hasAllocations;
-  const isDisabled = !canReject || !hasPermission;
+  const isDisabled = !canReject || !hasPermission || isAllLocked;
 
   if (!hasPermission) {
     return null;
@@ -486,8 +491,11 @@ function ReservationUnitOptionsSection({
     },
     {
       key: "status",
-      transform: ({ rejected }: ReservationUnitOptionFieldsFragment) => {
-        if (rejected) {
+      transform: ({
+        rejected,
+        locked,
+      }: ReservationUnitOptionFieldsFragment) => {
+        if (rejected || locked) {
           return (
             <DeclinedTag iconStart={<IconCross />}>
               {t("Application.rejected")}
@@ -704,18 +712,23 @@ function RejectApplicationButton({
   const isInAllocation =
     application.status === ApplicationStatusChoice.InAllocation ||
     application.status === ApplicationStatusChoice.Handled;
-  const hasBeenAllocated =
-    application.applicationSections?.some((section) =>
-      section.reservationUnitOptions.some(
-        (option) => option.allocatedTimeSlots?.length > 0
-      )
-    ) ?? false;
+  const aes = application.applicationSections ?? [];
+  const hasBeenAllocated = aes.some((section) =>
+    section.reservationUnitOptions.some(
+      (option) => option.allocatedTimeSlots?.length > 0
+    )
+  );
   const canReject = isInAllocation && !hasBeenAllocated;
-  const isRejected =
-    application.applicationSections?.every((section) =>
-      section.reservationUnitOptions.every((option) => option.rejected)
-    ) ?? false;
-  const isDisabled = !canReject || !hasPermission;
+  const isRejected = aes.every((section) =>
+    section.reservationUnitOptions.every(
+      (option) => option.rejected || option.locked
+    )
+  );
+  // edge case: only locked options -> rejection has no effect
+  const isAllLocked = aes.every((section) =>
+    section.reservationUnitOptions.every((x) => x.locked)
+  );
+  const isDisabled = !canReject || !hasPermission || isAllLocked;
 
   if (!hasPermission) {
     return null;
@@ -1030,6 +1043,7 @@ export const RESERVATION_UNIT_OPTION_FRAGMENT = gql`
     id
     pk
     rejected
+    locked
     allocatedTimeSlots {
       pk
       id
