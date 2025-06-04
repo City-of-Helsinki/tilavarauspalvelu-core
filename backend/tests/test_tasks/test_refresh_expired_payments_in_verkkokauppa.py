@@ -10,7 +10,7 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.types import WebShopPaymentGateway, WebShopPaymentStatus
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from tilavarauspalvelu.tasks import update_expired_orders_task
+from tilavarauspalvelu.tasks import refresh_expired_payments_in_verkkokauppa_task
 from utils.date_utils import local_datetime
 
 from tests.factories import PaymentFactory, PaymentOrderFactory, ReservationFactory
@@ -24,7 +24,7 @@ pytestmark = [
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__direct_payment__cancelled(settings):
+def test_refresh_expired_payments_in_verkkokauppa__direct_payment__cancelled(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
@@ -39,7 +39,7 @@ def test_update_expired_orders__direct_payment__cancelled(settings):
         timestamp=local_datetime(2024, 1, 1, 11, 55),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.CANCELLED
@@ -49,7 +49,7 @@ def test_update_expired_orders__direct_payment__cancelled(settings):
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__direct_payment__expired(settings):
+def test_refresh_expired_payments_in_verkkokauppa__direct_payment__expired(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
@@ -64,7 +64,7 @@ def test_update_expired_orders__direct_payment__expired(settings):
         timestamp=local_datetime(2024, 1, 1, 11, 55),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.EXPIRED
@@ -74,7 +74,7 @@ def test_update_expired_orders__direct_payment__expired(settings):
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__direct_payment__expired__not_cancelled_in_verkkokauppa(settings):
+def test_refresh_expired_payments_in_verkkokauppa__direct_payment__expired__not_cancelled_in_verkkokauppa(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
@@ -89,7 +89,7 @@ def test_update_expired_orders__direct_payment__expired__not_cancelled_in_verkko
         timestamp=local_datetime(2024, 1, 1, 11, 55),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.EXPIRED
@@ -101,7 +101,7 @@ def test_update_expired_orders__direct_payment__expired__not_cancelled_in_verkko
 @patch_method(EmailService.send_reservation_confirmed_email)
 @patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__direct_payment__paid(settings):
+def test_refresh_expired_payments_in_verkkokauppa__direct_payment__paid(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
@@ -116,7 +116,7 @@ def test_update_expired_orders__direct_payment__paid(settings):
         timestamp=local_datetime(2024, 1, 1, 11, 55),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.PAID
@@ -134,7 +134,7 @@ def test_update_expired_orders__direct_payment__paid(settings):
 @patch_method(EmailService.send_reservation_confirmed_email)
 @patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__direct_payment__paid_with_invoice(settings):
+def test_refresh_expired_payments_in_verkkokauppa__direct_payment__paid_with_invoice(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
@@ -150,7 +150,7 @@ def test_update_expired_orders__direct_payment__paid_with_invoice(settings):
         timestamp=local_datetime(2024, 1, 1, 11, 55),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.PAID_BY_INVOICE
@@ -169,7 +169,7 @@ def test_update_expired_orders__direct_payment__paid_with_invoice(settings):
 @patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
 @patch_method(PindoraService.activate_access_code)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__direct_payment__paid__has_access_code(settings):
+def test_refresh_expired_payments_in_verkkokauppa__direct_payment__paid__has_access_code(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(
@@ -189,7 +189,7 @@ def test_update_expired_orders__direct_payment__paid__has_access_code(settings):
         timestamp=local_datetime(2024, 1, 1, 11, 55),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.PAID
@@ -206,7 +206,7 @@ def test_update_expired_orders__direct_payment__paid__has_access_code(settings):
 
 @patch_method(VerkkokauppaAPIClient.get_payment, return_value=None)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__direct_payment__missing_from_verkkokauppa(settings):
+def test_refresh_expired_payments_in_verkkokauppa__direct_payment__missing_from_verkkokauppa(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
@@ -216,7 +216,7 @@ def test_update_expired_orders__direct_payment__missing_from_verkkokauppa(settin
         created_at=local_datetime(2024, 1, 1, 11, 55),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.EXPIRED
@@ -227,7 +227,7 @@ def test_update_expired_orders__direct_payment__missing_from_verkkokauppa(settin
 @patch_method(SentryLogger.log_message)
 @patch_method(VerkkokauppaAPIClient.get_payment, side_effect=GetPaymentError("mock-error"))
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__direct_payment__refresh_errors_are_logged(settings):
+def test_refresh_expired_payments_in_verkkokauppa__direct_payment__refresh_errors_are_logged(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
@@ -237,7 +237,7 @@ def test_update_expired_orders__direct_payment__refresh_errors_are_logged(settin
         created_at=local_datetime(2024, 1, 1, 11, 55),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.DRAFT
@@ -249,7 +249,7 @@ def test_update_expired_orders__direct_payment__refresh_errors_are_logged(settin
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__direct_payment__calculate_expiration_from_verkkokauppa_timestamp(settings):
+def test_refresh_expired_payments_in_verkkokauppa__direct_payment__expiration_from_verkkokauppa_timestamp(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
@@ -266,7 +266,7 @@ def test_update_expired_orders__direct_payment__calculate_expiration_from_verkko
         timestamp=local_datetime(2024, 1, 1, 11, 56),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     assert VerkkokauppaAPIClient.get_payment.called is True
 
@@ -276,7 +276,7 @@ def test_update_expired_orders__direct_payment__calculate_expiration_from_verkko
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__handled_payment__cancelled_before_overdue(settings):
+def test_refresh_expired_payments_in_verkkokauppa__handled_payment__cancelled_before_overdue(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(state=ReservationStateChoice.CONFIRMED)
@@ -292,7 +292,7 @@ def test_update_expired_orders__handled_payment__cancelled_before_overdue(settin
         timestamp=local_datetime(2024, 1, 1, 11, 55),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.PENDING
@@ -303,7 +303,7 @@ def test_update_expired_orders__handled_payment__cancelled_before_overdue(settin
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__handled_payment__cancelled_after_overdue(settings):
+def test_refresh_expired_payments_in_verkkokauppa__handled_payment__cancelled_after_overdue(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(state=ReservationStateChoice.CONFIRMED)
@@ -319,7 +319,7 @@ def test_update_expired_orders__handled_payment__cancelled_after_overdue(setting
         timestamp=local_datetime(2024, 1, 1, 11, 55),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.EXPIRED
@@ -329,7 +329,7 @@ def test_update_expired_orders__handled_payment__cancelled_after_overdue(setting
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__handled_payment__payment_expired_but_not_overdue(settings):
+def test_refresh_expired_payments_in_verkkokauppa__handled_payment__payment_expired_but_not_overdue(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(state=ReservationStateChoice.CONFIRMED)
@@ -345,7 +345,7 @@ def test_update_expired_orders__handled_payment__payment_expired_but_not_overdue
         timestamp=local_datetime(2024, 1, 1, 11, 55),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.PENDING
@@ -356,7 +356,7 @@ def test_update_expired_orders__handled_payment__payment_expired_but_not_overdue
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__handled_payment__payment_not_expired_but_overdue(settings):
+def test_refresh_expired_payments_in_verkkokauppa__handled_payment__payment_not_expired_but_overdue(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(state=ReservationStateChoice.CONFIRMED)
@@ -372,7 +372,7 @@ def test_update_expired_orders__handled_payment__payment_not_expired_but_overdue
         timestamp=local_datetime(2024, 1, 1, 11, 56),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.PENDING
@@ -382,7 +382,7 @@ def test_update_expired_orders__handled_payment__payment_not_expired_but_overdue
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__handled_payment__payment_expired_and_overdue(settings):
+def test_refresh_expired_payments_in_verkkokauppa__handled_payment__payment_expired_and_overdue(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(state=ReservationStateChoice.CONFIRMED)
@@ -398,7 +398,7 @@ def test_update_expired_orders__handled_payment__payment_expired_and_overdue(set
         timestamp=local_datetime(2024, 1, 1, 11, 55),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.EXPIRED
@@ -410,7 +410,7 @@ def test_update_expired_orders__handled_payment__payment_expired_and_overdue(set
 @patch_method(EmailService.send_reservation_confirmed_email)
 @patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__handled_payment__paid(settings):
+def test_refresh_expired_payments_in_verkkokauppa__handled_payment__paid(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(state=ReservationStateChoice.CONFIRMED)
@@ -426,7 +426,7 @@ def test_update_expired_orders__handled_payment__paid(settings):
         timestamp=local_datetime(2024, 1, 1, 11, 55),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.PAID
@@ -441,7 +441,7 @@ def test_update_expired_orders__handled_payment__paid(settings):
 @patch_method(EmailService.send_reservation_confirmed_email)
 @patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__handled_payment__paid_with_invoice(settings):
+def test_refresh_expired_payments_in_verkkokauppa__handled_payment__paid_with_invoice(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(state=ReservationStateChoice.CONFIRMED)
@@ -458,7 +458,7 @@ def test_update_expired_orders__handled_payment__paid_with_invoice(settings):
         timestamp=local_datetime(2024, 1, 1, 11, 55),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.PAID_BY_INVOICE
@@ -474,7 +474,7 @@ def test_update_expired_orders__handled_payment__paid_with_invoice(settings):
 @patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
 @patch_method(PindoraService.activate_access_code)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__handled_payment__paid__has_access_code(settings):
+def test_refresh_expired_payments_in_verkkokauppa__handled_payment__paid__has_access_code(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(
@@ -495,7 +495,7 @@ def test_update_expired_orders__handled_payment__paid__has_access_code(settings)
         timestamp=local_datetime(2024, 1, 1, 11, 55),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.PAID
@@ -512,7 +512,7 @@ def test_update_expired_orders__handled_payment__paid__has_access_code(settings)
 @patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
 @patch_method(PindoraService.activate_access_code)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__handled_payment__paid__has_access_code__already_active(settings):
+def test_refresh_expired_payments_in_verkkokauppa__handled_payment__paid__has_access_code__already_active(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(
@@ -533,7 +533,7 @@ def test_update_expired_orders__handled_payment__paid__has_access_code__already_
         timestamp=local_datetime(2024, 1, 1, 11, 55),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.PAID
@@ -547,7 +547,7 @@ def test_update_expired_orders__handled_payment__paid__has_access_code__already_
 
 @patch_method(VerkkokauppaAPIClient.get_payment, return_value=None)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__handled_payment__missing_from_verkkokauppa(settings):
+def test_refresh_expired_payments_in_verkkokauppa__handled_payment__missing_from_verkkokauppa(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(state=ReservationStateChoice.CONFIRMED)
@@ -558,7 +558,7 @@ def test_update_expired_orders__handled_payment__missing_from_verkkokauppa(setti
         created_at=local_datetime(2024, 1, 1, 11, 55),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.EXPIRED
@@ -568,7 +568,7 @@ def test_update_expired_orders__handled_payment__missing_from_verkkokauppa(setti
 
 @patch_method(VerkkokauppaAPIClient.get_payment, side_effect=GetPaymentError("mock-error"))
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_update_expired_orders__handled_payment__refresh_errors_are_logged(settings):
+def test_refresh_expired_payments_in_verkkokauppa__handled_payment__refresh_errors_are_logged(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     reservation = ReservationFactory.create(state=ReservationStateChoice.CONFIRMED)
@@ -579,7 +579,7 @@ def test_update_expired_orders__handled_payment__refresh_errors_are_logged(setti
         created_at=local_datetime(2024, 1, 1, 11, 55),
     )
 
-    update_expired_orders_task()
+    refresh_expired_payments_in_verkkokauppa_task()
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.PENDING
