@@ -34,6 +34,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Run codegen
+        run: pnpm codegen
       - name: Build customer ui and upload sentry sourcemaps
         run: pnpm build --filter=ui...
         # release name can't contain slashes e.g. merge/PR_number
@@ -70,6 +72,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Run codegen
+        run: pnpm codegen
       - name: Build admin ui and upload sentry sourcemaps
         run: pnpm build --filter=admin-ui...
         # release name can't contain slashes e.g. merge/PR_number
