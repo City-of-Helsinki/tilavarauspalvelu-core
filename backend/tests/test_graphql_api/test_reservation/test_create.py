@@ -932,7 +932,7 @@ def test_reservation__create__prefilled_with_profile_data__api_call_fails__use_d
 
     reservation_unit = ReservationUnitFactory.create_reservable_now()
     city = CityFactory.create(name="Helsinki")
-    user = UserFactory.create(social_auth__extra_data__amr="suomi_fi")
+    user = UserFactory.create(social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI)
     graphql.force_login(user)
 
     # when:
