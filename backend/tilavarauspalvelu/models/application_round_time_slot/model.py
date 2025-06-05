@@ -28,7 +28,7 @@ class ApplicationRoundTimeSlot(models.Model):
     )
 
     weekday: int = IntChoiceField(enum=WeekdayChoice)
-    closed: bool = models.BooleanField(default=False)
+    is_closed: bool = models.BooleanField(default=False)
     reservable_times: list[TimeSlotDB] = ArrayField(
         base_field=HStoreField(),
         blank=True,
@@ -60,8 +60,8 @@ class ApplicationRoundTimeSlot(models.Model):
             ),
             models.CheckConstraint(
                 check=(
-                    (models.Q(closed=True) & models.Q(reservable_times__len=0))
-                    | (models.Q(closed=False) & ~models.Q(reservable_times__len=0))
+                    (models.Q(is_closed=True) & models.Q(reservable_times__len=0))
+                    | (models.Q(is_closed=False) & ~models.Q(reservable_times__len=0))
                 ),
                 name="closed_no_slots_check",
                 violation_error_message="Closed timeslots cannot have reservable times, but open timeslots must.",
