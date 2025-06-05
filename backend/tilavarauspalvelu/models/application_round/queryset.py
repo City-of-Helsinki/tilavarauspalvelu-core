@@ -21,7 +21,7 @@ __all__ = [
 
 class ApplicationRoundQuerySet(QuerySet):
     def active(self) -> Self:
-        return self.filter(sent_date=None)
+        return self.filter(sent_at=None)
 
     def _fetch_all(self) -> None:
         super()._fetch_all()

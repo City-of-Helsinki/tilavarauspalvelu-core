@@ -381,8 +381,8 @@ def test_update_application__application_sections__too_many(graphql, settings):
             {
                 "name": "foo",
                 "numPersons": 1,
-                "reservationsBeginDate": application.application_round.reservation_period_begin.isoformat(),
-                "reservationsEndDate": application.application_round.reservation_period_end.isoformat(),
+                "reservationsBeginDate": application.application_round.reservation_period_begin_date.isoformat(),
+                "reservationsEndDate": application.application_round.reservation_period_end_date.isoformat(),
                 "reservationMinDuration": 100,
                 "reservationMaxDuration": 100,
                 "appliedReservationsPerWeek": 1,
