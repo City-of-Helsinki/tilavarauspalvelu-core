@@ -222,7 +222,7 @@ def _create_handled_application_rounds(
     ):
         results = _create_application_for_round(
             application_round=handled_round,
-            sent_date=handled_round.application_period_end - datetime.timedelta(days=1),
+            sent_at=handled_round.application_period_end - datetime.timedelta(days=1),
             age_groups=age_groups,
             cities=cities,
             purposes=selected_purposes,
@@ -380,7 +380,7 @@ def _create_application_round_in_allocations(
 
         results = _create_application_for_round(
             application_round=in_allocation_round,
-            sent_date=sent_date,
+            sent_at=sent_date,
             age_groups=age_groups,
             cities=cities,
             purposes=selected_purposes,
@@ -401,12 +401,12 @@ def _create_application_round_in_allocations(
 
     # Cancel 3 random applications
     for application in random.sample(applications, k=3):
-        application.cancelled_date = in_allocation_round.application_period_end - datetime.timedelta(days=1)
+        application.cancelled_at = in_allocation_round.application_period_end - datetime.timedelta(days=1)
 
     # Create an extra application with a lot of sections
     results = _create_application_for_round(
         application_round=in_allocation_round,
-        sent_date=in_allocation_round.application_period_end - datetime.timedelta(days=1),
+        sent_at=in_allocation_round.application_period_end - datetime.timedelta(days=1),
         age_groups=age_groups,
         cities=cities,
         purposes=selected_purposes,
@@ -568,7 +568,7 @@ def _create_open_application_rounds(
 
         results = _create_application_for_round(
             application_round=open_round,
-            sent_date=sent_date,
+            sent_at=sent_date,
             age_groups=age_groups,
             cities=cities,
             purposes=selected_purposes,
@@ -589,7 +589,7 @@ def _create_open_application_rounds(
 
     # Cancel 3 random applications
     for application in random.sample(applications, k=3):
-        application.cancelled_date = open_round.application_period_end - datetime.timedelta(days=1)
+        application.cancelled_at = open_round.application_period_end - datetime.timedelta(days=1)
 
     Address.objects.bulk_create(addresses)
     Organisation.objects.bulk_create(organisations)
@@ -677,7 +677,7 @@ def _create_application_round_time_slots(reservation_units: list[ReservationUnit
 
 def _create_application_for_round(
     application_round: ApplicationRound,
-    sent_date: datetime.datetime | None,
+    sent_at: datetime.datetime | None,
     age_groups: list[AgeGroup],
     cities: list[City],
     purposes: list[ReservationPurpose],
@@ -727,8 +727,8 @@ def _create_application_for_round(
             option=option_info.name,
         )
         .build(
-            cancelled_date=None,
-            sent_date=sent_date,
+            cancelled_at=None,
+            sent_at=sent_at,
             user=random.choice(users),
             organisation=organisation,
             contact_person=contact_person,

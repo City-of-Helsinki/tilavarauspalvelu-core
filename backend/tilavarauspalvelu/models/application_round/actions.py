@@ -83,7 +83,7 @@ class ApplicationRoundActions:
             case ApplicationRoundStatusChoice.RESULTS_SENT:
                 # Reset handling email dates and round sent date
                 Application.objects.filter(application_round=self.application_round).update(
-                    results_ready_notification_sent_date=None,
+                    results_ready_notification_sent_at=None,
                 )
 
                 self.application_round.sent_date = None
