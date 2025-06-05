@@ -47,16 +47,6 @@ export function getDurationOptions(t: TFunction): DurationOption[] {
   return durationMinuteOptions(t).concat(times);
 }
 
-export const daysByMonths: Array<{ label: string; value: number }> = [
-  { label: "2", value: 14 },
-  { label: "1", value: 30 },
-  { label: "2", value: 60 },
-  { label: "3", value: 90 },
-  { label: "6", value: 182 },
-  { label: "12", value: 365 },
-  { label: "24", value: 730 },
-];
-
 // TODO the validation needs to go to env.mjs because this reloads the page constantly
 // TODO we should default to this host if the env variable is not set
 // allowing us to host the api and the frontend on the same host without rebuilding the Docker container

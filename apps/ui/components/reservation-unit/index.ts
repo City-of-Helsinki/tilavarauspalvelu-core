@@ -1,5 +1,5 @@
 export { QuickReservation } from "./QuickReservation";
-export { ReservationInfoContainer } from "./ReservationInfoContainer";
+export { ReservationInfoSection } from "./ReservationInfoSection";
 export { ReservationUnitCalendarSection } from "./ReservationUnitCalendarSection";
 export { Head } from "./Head";
 export { RelatedUnits } from "./RelatedUnits";

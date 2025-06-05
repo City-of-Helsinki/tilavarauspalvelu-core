@@ -1,4 +1,4 @@
-import { isSameDay, parseISO } from "date-fns";
+import { isSameDay } from "date-fns";
 import { type TFunction } from "next-i18next";
 import {
   toUIDate,
@@ -13,15 +13,6 @@ import { type Maybe, ApplicationStatusChoice } from "@/gql/gql-types";
 export { formatDuration } from "common/src/common/util";
 export { fromAPIDate, fromUIDate };
 
-// TODO why? where is this used? why not use toUIDate(new Date(string))
-// TODO why return "-" instead of null or ""?
-export const formatDate = (date: string, formatStr?: string): string => {
-  if (!date) {
-    return "-";
-  }
-  return toUIDate(parseISO(date), formatStr);
-};
-
 export function getPostLoginUrl(
   params: Readonly<URLSearchParams> = new ReadonlyURLSearchParams()
 ): string | undefined {
@@ -35,6 +26,32 @@ export function getPostLoginUrl(
   }
   p.set("isPostLogin", "true");
   return `${origin}${pathname}?${p.toString()}`;
+}
+
+function formatDurationSeconds(seconds: number, t: TFunction): string {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds - hours * 3600) / 60);
+
+  if (hours === 0) {
+    return t("common:abbreviations:minute", { count: minutes });
+  }
+  if (minutes === 0) {
+    return t("common:abbreviations:hour", { count: hours });
+  }
+  return `${t("common:abbreviations:hour", { count: hours })} ${t(
+    "common:abbreviations:minute",
+    { count: minutes }
+  )}`;
+}
+
+export function formatDurationRange(
+  t: TFunction,
+  beginSecs: number,
+  endSecs: number
+): string {
+  const beginHours = formatDurationSeconds(beginSecs, t);
+  const endHours = formatDurationSeconds(endSecs, t);
+  return beginSecs === endSecs ? beginHours : `${beginHours} – ${endHours}`;
 }
 
 // date format should always be in finnish, but the weekday and time separator should be localized
