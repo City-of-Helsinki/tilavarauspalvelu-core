@@ -434,7 +434,7 @@ def test_reservation_series__query__pindora_info__in_application_section(graphql
 @freeze_time(local_datetime(2022, 1, 1))
 def test_reservation_series__query__pindora_info__in_application_section__not_sent(graphql):
     section = ApplicationSectionFactory.create(
-        application__application_round__sent_date=None,
+        application__application_round__sent_at=None,
     )
     reservation_unit = ReservationUnitFactory.create()
     series = ReservationSeriesFactory.create(

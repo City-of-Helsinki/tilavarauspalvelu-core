@@ -97,12 +97,12 @@ def test_frontend_queries__customer_ui__ApplicationRound__regular(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
-    factory_args["application_period_begin"] = local_datetime(2024, 1, 1)
-    factory_args["application_period_end"] = local_datetime(2024, 2, 1)
-    factory_args["reservation_period_begin"] = local_date(2024, 2, 2)
-    factory_args["reservation_period_end"] = local_date(2024, 3, 1)
-    factory_args["public_display_begin"] = local_datetime(2024, 1, 1)
-    factory_args["public_display_end"] = local_datetime(2024, 2, 2)
+    factory_args["application_period_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["application_period_ends_at"] = local_datetime(2024, 2, 1)
+    factory_args["reservation_period_begin_date"] = local_date(2024, 2, 2)
+    factory_args["reservation_period_end_date"] = local_date(2024, 3, 1)
+    factory_args["public_display_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["public_display_ends_at"] = local_datetime(2024, 2, 2)
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -147,12 +147,12 @@ def test_frontend_queries__customer_ui__ApplicationRoundsUi__regular(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
-    factory_args["application_period_begin"] = local_datetime(2024, 1, 1)
-    factory_args["application_period_end"] = local_datetime(2024, 2, 1)
-    factory_args["reservation_period_begin"] = local_date(2024, 2, 2)
-    factory_args["reservation_period_end"] = local_date(2024, 3, 1)
-    factory_args["public_display_begin"] = local_datetime(2024, 1, 1)
-    factory_args["public_display_end"] = local_datetime(2024, 2, 2)
+    factory_args["application_period_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["application_period_ends_at"] = local_datetime(2024, 2, 1)
+    factory_args["reservation_period_begin_date"] = local_date(2024, 2, 2)
+    factory_args["reservation_period_end_date"] = local_date(2024, 3, 1)
+    factory_args["public_display_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["public_display_ends_at"] = local_datetime(2024, 2, 2)
     query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -407,12 +407,12 @@ def test_frontend_queries__customer_ui__ReservationUnitPage__regular(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
-    factory_args["application_rounds__application_period_begin"] = local_datetime(2024, 1, 1)
-    factory_args["application_rounds__application_period_end"] = local_datetime(2024, 2, 1)
-    factory_args["application_rounds__reservation_period_begin"] = local_date(2024, 2, 2)
-    factory_args["application_rounds__reservation_period_end"] = local_date(2024, 3, 1)
-    factory_args["application_rounds__public_display_begin"] = local_datetime(2024, 1, 1)
-    factory_args["application_rounds__public_display_end"] = local_datetime(2024, 2, 2)
+    factory_args["application_rounds__application_period_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["application_rounds__application_period_ends_at"] = local_datetime(2024, 2, 1)
+    factory_args["application_rounds__reservation_period_begin_date"] = local_date(2024, 2, 2)
+    factory_args["application_rounds__reservation_period_end_date"] = local_date(2024, 3, 1)
+    factory_args["application_rounds__public_display_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["application_rounds__public_display_ends_at"] = local_datetime(2024, 2, 2)
     factory_args["application_round_time_slots__closed"] = False
     obj: ReservationUnit = query_info.factory.create(**factory_args)
 
@@ -544,12 +544,12 @@ def test_frontend_queries__customer_ui__ApplicationPage1__regular(graphql):
 
     factory_args_1 = deepcopy(query_info_1.factory_args)
     factory_args_1["user"] = user
-    factory_args_1["application_round__application_period_begin"] = local_datetime(2024, 1, 1)
-    factory_args_1["application_round__application_period_end"] = local_datetime(2024, 2, 1)
-    factory_args_1["application_round__reservation_period_begin"] = local_date(2024, 2, 2)
-    factory_args_1["application_round__reservation_period_end"] = local_date(2024, 3, 1)
-    factory_args_1["application_round__public_display_begin"] = local_datetime(2024, 1, 1)
-    factory_args_1["application_round__public_display_end"] = local_datetime(2024, 2, 2)
+    factory_args_1["application_round__application_period_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args_1["application_round__application_period_ends_at"] = local_datetime(2024, 2, 1)
+    factory_args_1["application_round__reservation_period_begin_date"] = local_date(2024, 2, 2)
+    factory_args_1["application_round__reservation_period_end_date"] = local_date(2024, 3, 1)
+    factory_args_1["application_round__public_display_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args_1["application_round__public_display_ends_at"] = local_datetime(2024, 2, 2)
     factory_args_1[f"{arts_key}__closed"] = False
     factory_args_1["application_sections__applied_reservations_per_week"] = 1
     factory_args_1["application_sections__reservation_min_duration"] = datetime.timedelta(minutes=30)
@@ -583,12 +583,12 @@ def test_frontend_queries__customer_ui__ApplicationPage2__regular(graphql):
 
     factory_args = deepcopy(query_info.factory_args)
     factory_args["user"] = user
-    factory_args["application_round__application_period_begin"] = local_datetime(2024, 1, 1)
-    factory_args["application_round__application_period_end"] = local_datetime(2024, 2, 1)
-    factory_args["application_round__reservation_period_begin"] = local_date(2024, 2, 2)
-    factory_args["application_round__reservation_period_end"] = local_date(2024, 3, 1)
-    factory_args["application_round__public_display_begin"] = local_datetime(2024, 1, 1)
-    factory_args["application_round__public_display_end"] = local_datetime(2024, 2, 2)
+    factory_args["application_round__application_period_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["application_round__application_period_ends_at"] = local_datetime(2024, 2, 1)
+    factory_args["application_round__reservation_period_begin_date"] = local_date(2024, 2, 2)
+    factory_args["application_round__reservation_period_end_date"] = local_date(2024, 3, 1)
+    factory_args["application_round__public_display_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["application_round__public_display_ends_at"] = local_datetime(2024, 2, 2)
     factory_args[f"{arts_key}__closed"] = False
     factory_args["application_sections__applied_reservations_per_week"] = 1
     factory_args["application_sections__reservation_min_duration"] = datetime.timedelta(minutes=30)
@@ -622,12 +622,12 @@ def test_frontend_queries__customer_ui__ApplicationPage3__regular(graphql):
 
     factory_args = deepcopy(query_info.factory_args)
     factory_args["user"] = user
-    factory_args["application_round__application_period_begin"] = local_datetime(2024, 1, 1)
-    factory_args["application_round__application_period_end"] = local_datetime(2024, 2, 1)
-    factory_args["application_round__reservation_period_begin"] = local_date(2024, 2, 2)
-    factory_args["application_round__reservation_period_end"] = local_date(2024, 3, 1)
-    factory_args["application_round__public_display_begin"] = local_datetime(2024, 1, 1)
-    factory_args["application_round__public_display_end"] = local_datetime(2024, 2, 2)
+    factory_args["application_round__application_period_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["application_round__application_period_ends_at"] = local_datetime(2024, 2, 1)
+    factory_args["application_round__reservation_period_begin_date"] = local_date(2024, 2, 2)
+    factory_args["application_round__reservation_period_end_date"] = local_date(2024, 3, 1)
+    factory_args["application_round__public_display_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["application_round__public_display_ends_at"] = local_datetime(2024, 2, 2)
     factory_args[f"{arts_key}__closed"] = False
     factory_args["application_sections__applied_reservations_per_week"] = 1
     factory_args["application_sections__reservation_min_duration"] = datetime.timedelta(minutes=30)
@@ -661,12 +661,12 @@ def test_frontend_queries__customer_ui__ApplicationPage4__regular(graphql):
 
     factory_args = deepcopy(query_info.factory_args)
     factory_args["user"] = user
-    factory_args["application_round__application_period_begin"] = local_datetime(2024, 1, 1)
-    factory_args["application_round__application_period_end"] = local_datetime(2024, 2, 1)
-    factory_args["application_round__reservation_period_begin"] = local_date(2024, 2, 2)
-    factory_args["application_round__reservation_period_end"] = local_date(2024, 3, 1)
-    factory_args["application_round__public_display_begin"] = local_datetime(2024, 1, 1)
-    factory_args["application_round__public_display_end"] = local_datetime(2024, 2, 2)
+    factory_args["application_round__application_period_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["application_round__application_period_ends_at"] = local_datetime(2024, 2, 1)
+    factory_args["application_round__reservation_period_begin_date"] = local_date(2024, 2, 2)
+    factory_args["application_round__reservation_period_end_date"] = local_date(2024, 3, 1)
+    factory_args["application_round__public_display_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["application_round__public_display_ends_at"] = local_datetime(2024, 2, 2)
     factory_args[f"{arts_key}__closed"] = False
     factory_args["application_sections__applied_reservations_per_week"] = 1
     factory_args["application_sections__reservation_min_duration"] = datetime.timedelta(minutes=30)
@@ -758,8 +758,8 @@ def test_frontend_queries__customer_ui__ApplicationSectionCancel__regular(graphq
     # Make sure the application has been handled and results sent to users
     factory_args_1 = deepcopy(query_info_1.factory_args)
     factory_args_1["application__user"] = user
-    factory_args_1["application__application_round__handled_date"] = local_datetime()
-    factory_args_1["application__application_round__sent_date"] = local_datetime()
+    factory_args_1["application__application_round__handled_at"] = local_datetime()
+    factory_args_1["application__application_round__sent_at"] = local_datetime()
     factory_args_1[f"{series_key}__user"] = user
     factory_args_1[f"{series_key}__reservations__user"] = user
     obj = ApplicationSectionFactory.create_in_status_handled(**factory_args_1)
@@ -792,8 +792,8 @@ def test_frontend_queries__customer_ui__ApplicationSectionView__regular(graphql)
     # Make sure the application has been handled and results sent to users
     factory_args = deepcopy(query_info.factory_args)
     factory_args["application__user"] = user
-    factory_args["application__application_round__handled_date"] = local_datetime()
-    factory_args["application__application_round__sent_date"] = local_datetime()
+    factory_args["application__application_round__handled_at"] = local_datetime()
+    factory_args["application__application_round__sent_at"] = local_datetime()
     factory_args[f"{series_key}__user"] = user
     factory_args[f"{series_key}__reservations__user"] = user
     obj = ApplicationSectionFactory.create_in_status_handled(**factory_args)
@@ -848,12 +848,12 @@ def test_frontend_queries__customer_ui__ApplicationView__regular(graphql):
 
     factory_args = deepcopy(query_info.factory_args)
     factory_args["user"] = user
-    factory_args["application_round__application_period_begin"] = local_datetime(2024, 1, 1)
-    factory_args["application_round__application_period_end"] = local_datetime(2024, 2, 1)
-    factory_args["application_round__reservation_period_begin"] = local_date(2024, 2, 2)
-    factory_args["application_round__reservation_period_end"] = local_date(2024, 3, 1)
-    factory_args["application_round__public_display_begin"] = local_datetime(2024, 1, 1)
-    factory_args["application_round__public_display_end"] = local_datetime(2024, 2, 2)
+    factory_args["application_round__application_period_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["application_round__application_period_ends_at"] = local_datetime(2024, 2, 1)
+    factory_args["application_round__reservation_period_begin_date"] = local_date(2024, 2, 2)
+    factory_args["application_round__reservation_period_end_date"] = local_date(2024, 3, 1)
+    factory_args["application_round__public_display_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["application_round__public_display_ends_at"] = local_datetime(2024, 2, 2)
     factory_args[f"{arts_key}__closed"] = False
     factory_args["application_sections__applied_reservations_per_week"] = 1
     factory_args["application_sections__reservation_min_duration"] = datetime.timedelta(minutes=30)
@@ -1047,12 +1047,12 @@ def test_frontend_queries__customer_ui__ReservationEditPage__regular(graphql):
 
     factory_args = deepcopy(query_info.factory_args)
     factory_args["user"] = user
-    factory_args["reservation_units__application_rounds__application_period_begin"] = local_datetime(2024, 1, 1)
-    factory_args["reservation_units__application_rounds__application_period_end"] = local_datetime(2024, 2, 1)
-    factory_args["reservation_units__application_rounds__reservation_period_begin"] = local_date(2024, 2, 2)
-    factory_args["reservation_units__application_rounds__reservation_period_end"] = local_date(2024, 3, 1)
-    factory_args["reservation_units__application_rounds__public_display_begin"] = local_datetime(2024, 1, 1)
-    factory_args["reservation_units__application_rounds__public_display_end"] = local_datetime(2024, 2, 2)
+    factory_args["reservation_units__application_rounds__application_period_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["reservation_units__application_rounds__application_period_ends_at"] = local_datetime(2024, 2, 1)
+    factory_args["reservation_units__application_rounds__reservation_period_begin_date"] = local_date(2024, 2, 2)
+    factory_args["reservation_units__application_rounds__reservation_period_end_date"] = local_date(2024, 3, 1)
+    factory_args["reservation_units__application_rounds__public_display_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["reservation_units__application_rounds__public_display_ends_at"] = local_datetime(2024, 2, 2)
     obj = query_info.factory.create(**factory_args)
 
     begin = next_hour()

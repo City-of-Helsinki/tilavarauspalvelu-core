@@ -39,23 +39,23 @@ class ApplicationRound(models.Model):
     """
 
     name: str = models.CharField(max_length=255)
-    criteria: str = models.TextField(default="")
+    criteria: str = models.TextField(blank=True, default="")
     notes_when_applying: str = models.TextField(blank=True, default="")
 
     # Period when the application round accepts applications
-    application_period_begin: datetime.datetime = models.DateTimeField()
-    application_period_end: datetime.datetime = models.DateTimeField()
+    application_period_begins_at: datetime.datetime = models.DateTimeField()
+    application_period_ends_at: datetime.datetime = models.DateTimeField()
 
     # Period where the reservations from the application round's applications will be allocated to
-    reservation_period_begin: datetime.date = models.DateField()
-    reservation_period_end: datetime.date = models.DateField()
+    reservation_period_begin_date: datetime.date = models.DateField()
+    reservation_period_end_date: datetime.date = models.DateField()
 
     # When the application round is visible to the public
-    public_display_begin: datetime.datetime = models.DateTimeField()
-    public_display_end: datetime.datetime = models.DateTimeField()
+    public_display_begins_at: datetime.datetime = models.DateTimeField()
+    public_display_ends_at: datetime.datetime = models.DateTimeField()
 
-    handled_date: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=None)
-    sent_date: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=None)
+    handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+    sent_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
 
     reservation_units = models.ManyToManyField(
         "tilavarauspalvelu.ReservationUnit",
@@ -96,61 +96,63 @@ class ApplicationRound(models.Model):
         ordering = ["pk"]
         constraints = [
             models.CheckConstraint(
-                check=models.Q(application_period_begin__lt=models.F("application_period_end")),
+                check=models.Q(application_period_begins_at__lt=models.F("application_period_ends_at")),
                 name="application_period_begin_before_end",
                 violation_error_message="Application period must begin before it ends",
             ),
             models.CheckConstraint(
-                check=models.Q(reservation_period_begin__lt=models.F("reservation_period_end")),
+                check=models.Q(reservation_period_begin_date__lt=models.F("reservation_period_end_date")),
                 name="reservation_period_begin_before_end",
                 violation_error_message="Reservation period must begin before it ends",
             ),
             models.CheckConstraint(
-                check=models.Q(public_display_begin__lt=models.F("public_display_end")),
+                check=models.Q(public_display_begins_at__lt=models.F("public_display_ends_at")),
                 name="public_display_begin_before_end",
                 violation_error_message="Public display period must begin before it ends",
             ),
             models.CheckConstraint(
-                check=models.Q(application_period_end__date__lt=models.F("reservation_period_begin")),
+                check=models.Q(application_period_ends_at__date__lt=models.F("reservation_period_begin_date")),
                 name="applications_end_before_reservation_period_begins",
                 violation_error_message="Application period must end before reservation period begins",
             ),
             models.CheckConstraint(
                 check=(
-                    models.Q(handled_date__isnull=True, sent_date__isnull=True)
-                    | models.Q(handled_date__isnull=False, sent_date__isnull=True)
-                    | models.Q(handled_date__lte=models.F("sent_date"))
+                    models.Q(handled_at__isnull=True, sent_at__isnull=True)
+                    | models.Q(handled_at__isnull=False, sent_at__isnull=True)
+                    | models.Q(handled_at__lte=models.F("sent_at"))
                 ),
                 name="must_handle_before_sending",
                 violation_error_message="Application round must be handled before it can be sent",
             ),
             models.CheckConstraint(
-                check=models.Q(handled_date=None) | models.Q(application_period_end__date__lt=models.F("handled_date")),
+                check=(
+                    models.Q(handled_at=None) | models.Q(application_period_ends_at__date__lt=models.F("handled_at"))
+                ),
                 name="handling_after_application_period_end",
                 violation_error_message="Application round can only be handled after its application round has ended",
             ),
         ]
 
     def __str__(self) -> str:
-        return f"{self.name} ({self.reservation_period_begin} - {self.reservation_period_end})"
+        return f"{self.name} ({self.reservation_period_begin_date} - {self.reservation_period_end_date})"
 
     @lookup_property(skip_codegen=True)
     def status() -> ApplicationRoundStatusChoice:
         return models.Case(  # type: ignore[return-value]
             models.When(
-                models.Q(sent_date__isnull=False),
+                models.Q(sent_at__isnull=False),
                 then=models.Value(ApplicationRoundStatusChoice.RESULTS_SENT.value),
             ),
             models.When(
-                models.Q(handled_date__isnull=False),
+                models.Q(handled_at__isnull=False),
                 then=models.Value(ApplicationRoundStatusChoice.HANDLED.value),
             ),
             models.When(
-                models.Q(application_period_begin__gt=NowTT()),
+                models.Q(application_period_begins_at__gt=NowTT()),
                 then=models.Value(ApplicationRoundStatusChoice.UPCOMING.value),
             ),
             models.When(
-                models.Q(application_period_end__gt=NowTT()),
+                models.Q(application_period_ends_at__gt=NowTT()),
                 then=models.Value(ApplicationRoundStatusChoice.OPEN.value),
             ),
             default=models.Value(ApplicationRoundStatusChoice.IN_ALLOCATION.value),
@@ -160,13 +162,13 @@ class ApplicationRound(models.Model):
     @status.override
     def _(self) -> ApplicationRoundStatusChoice:
         now = local_datetime()
-        if self.sent_date is not None:
+        if self.sent_at is not None:
             return ApplicationRoundStatusChoice.RESULTS_SENT
-        if self.handled_date is not None:
+        if self.handled_at is not None:
             return ApplicationRoundStatusChoice.HANDLED
-        if self.application_period_begin > now:
+        if self.application_period_begins_at > now:
             return ApplicationRoundStatusChoice.UPCOMING
-        if self.application_period_end > now:
+        if self.application_period_ends_at > now:
             return ApplicationRoundStatusChoice.OPEN
         return ApplicationRoundStatusChoice.IN_ALLOCATION
 
@@ -174,22 +176,22 @@ class ApplicationRound(models.Model):
     def status_timestamp() -> datetime.datetime | None:
         return models.Case(  # type: ignore[return-value]
             models.When(
-                models.Q(sent_date__isnull=False),  # RESULTS_SENT
-                then=models.F("sent_date"),
+                models.Q(sent_at__isnull=False),  # RESULTS_SENT
+                then=models.F("sent_at"),
             ),
             models.When(
-                models.Q(handled_date__isnull=False),  # HANDLED
-                then=models.F("handled_date"),
+                models.Q(handled_at__isnull=False),  # HANDLED
+                then=models.F("handled_at"),
             ),
             models.When(
-                models.Q(application_period_begin__gt=NowTT()),  # UPCOMING
-                then=models.F("public_display_begin"),
+                models.Q(application_period_begins_at__gt=NowTT()),  # UPCOMING
+                then=models.F("public_display_begins_at"),
             ),
             models.When(
-                models.Q(application_period_end__gt=NowTT()),  # OPEN
-                then=models.F("application_period_begin"),
+                models.Q(application_period_ends_at__gt=NowTT()),  # OPEN
+                then=models.F("application_period_begins_at"),
             ),
-            default=models.F("application_period_end"),  # IN_ALLOCATION
+            default=models.F("application_period_ends_at"),  # IN_ALLOCATION
             output_field=models.DateTimeField(),
         )
 
@@ -197,15 +199,15 @@ class ApplicationRound(models.Model):
     def _(self) -> datetime.datetime | None:
         match self.status:
             case ApplicationRoundStatusChoice.UPCOMING:
-                return self.public_display_begin
+                return self.public_display_begins_at
             case ApplicationRoundStatusChoice.OPEN:
-                return self.application_period_begin
+                return self.application_period_begins_at
             case ApplicationRoundStatusChoice.IN_ALLOCATION:
-                return self.application_period_end
+                return self.application_period_ends_at
             case ApplicationRoundStatusChoice.HANDLED:
-                return self.handled_date
+                return self.handled_at
             case ApplicationRoundStatusChoice.RESULTS_SENT:
-                return self.sent_date
+                return self.sent_at
 
     @lookup_property(skip_codegen=True)
     def is_setting_handled_allowed() -> bool:
@@ -262,7 +264,7 @@ class ApplicationRound(models.Model):
 
         return models.Case(  # type: ignore[return-value]
             models.When(
-                models.Q(handled_date__isnull=True),
+                models.Q(handled_at__isnull=True),
                 then=models.Value(ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED.value),
             ),
             models.When(
@@ -270,7 +272,7 @@ class ApplicationRound(models.Model):
                 then=models.Value(ApplicationRoundReservationCreationStatusChoice.COMPLETED.value),
             ),
             models.When(
-                models.Q(handled_date__lte=NowTT() - timeout),
+                models.Q(handled_at__lte=NowTT() - timeout),
                 then=models.Value(ApplicationRoundReservationCreationStatusChoice.FAILED.value),
             ),
             default=models.Value(ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED.value),
@@ -284,7 +286,7 @@ class ApplicationRound(models.Model):
         now = local_datetime()
         timeout = datetime.timedelta(minutes=settings.APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES)
 
-        if self.handled_date is None:
+        if self.handled_at is None:
             return ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED
 
         if ReservationSeries.objects.filter(
@@ -292,7 +294,7 @@ class ApplicationRound(models.Model):
         ).exists():
             return ApplicationRoundReservationCreationStatusChoice.COMPLETED
 
-        if self.handled_date < now - timeout:
+        if self.handled_at < now - timeout:
             return ApplicationRoundReservationCreationStatusChoice.FAILED
 
         return ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED

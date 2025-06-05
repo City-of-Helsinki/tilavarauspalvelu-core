@@ -844,7 +844,7 @@ def test_reservation__query__pindora_info__in_application_section__not_sent(grap
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
-        application__application_round__sent_date=None,
+        application__application_round__sent_at=None,
     )
     series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,

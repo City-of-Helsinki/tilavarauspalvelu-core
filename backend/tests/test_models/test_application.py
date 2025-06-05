@@ -28,8 +28,8 @@ pytestmark = [
 def test_application__status():
     now = datetime.datetime.now(tz=datetime.UTC)
     application_round = ApplicationRoundFactory.create(
-        application_period_begin=now - datetime.timedelta(days=7),
-        application_period_end=now + datetime.timedelta(days=1),
+        application_period_begins_at=now - datetime.timedelta(days=7),
+        application_period_ends_at=now + datetime.timedelta(days=1),
     )
     application = ApplicationFactory.create(application_round=application_round)
 
@@ -38,7 +38,7 @@ def test_application__status():
     assert Application.objects.filter(L(status=ApplicationStatusChoice.DRAFT)).exists()
 
     # Application round has moved to allocation, but application was not sent -> application is EXPIRED
-    application_round.application_period_end = now - datetime.timedelta(days=1)
+    application_round.application_period_ends_at = now - datetime.timedelta(days=1)
     application_round.save()
     assert application.status == ApplicationStatusChoice.EXPIRED
     assert Application.objects.filter(L(status=ApplicationStatusChoice.EXPIRED)).exists()
@@ -56,11 +56,11 @@ def test_application__status():
     assert Application.objects.filter(L(status=ApplicationStatusChoice.IN_ALLOCATION)).exists()
 
     # Application is not yet allocated, but round marked handled -> application is HANDLED
-    application_round.handled_date = now
+    application_round.handled_at = now
     application_round.save()
     assert application.status == ApplicationStatusChoice.HANDLED
     assert Application.objects.filter(L(status=ApplicationStatusChoice.HANDLED)).exists()
-    application_round.handled_date = None
+    application_round.handled_at = None
     application_round.save()
 
     # All reservation unit options have been locked -> application is HANDLED
@@ -86,8 +86,8 @@ def test_application__status():
     assert Application.objects.filter(L(status=ApplicationStatusChoice.HANDLED)).exists()
 
     # Application round has been marked as sent -> application is RESULTS_SENT
-    application_round.handled_date = now
-    application_round.sent_date = now
+    application_round.handled_at = now
+    application_round.sent_at = now
     application_round.save()
     assert application.status == ApplicationStatusChoice.RESULTS_SENT
     assert Application.objects.filter(L(status=ApplicationStatusChoice.RESULTS_SENT)).exists()
@@ -102,8 +102,8 @@ def test_application__status():
 def test_application__all_sections_allocated():
     now = datetime.datetime.now(tz=datetime.UTC)
     application_round = ApplicationRoundFactory.create(
-        application_period_begin=now - datetime.timedelta(days=7),
-        application_period_end=now + datetime.timedelta(days=1),
+        application_period_begins_at=now - datetime.timedelta(days=7),
+        application_period_ends_at=now + datetime.timedelta(days=1),
     )
     application = ApplicationFactory.create(application_round=application_round)
     section = ApplicationSectionFactory.create(application=application, applied_reservations_per_week=1)
@@ -115,7 +115,7 @@ def test_application__all_sections_allocated():
 
     # Application round has entered allocation, but there are no
     # allocations for the application yet -> all_sections_allocated is False
-    application_round.application_period_end = now - datetime.timedelta(days=1)
+    application_round.application_period_ends_at = now - datetime.timedelta(days=1)
     application_round.save()
     assert application.all_sections_allocated is False
     assert Application.objects.filter(L(all_sections_allocated=False)).exists()
