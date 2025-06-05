@@ -37,33 +37,33 @@ class UnitRoleAdmin(admin.ModelAdmin):
         "user_email",
         "unit_names",
         "unit_group_names",
-        "role_active",
+        "is_role_active",
         "is_from_ad_group",
     ]
     list_filter = [
         "role",
         "units",
         "unit_groups",
-        "role_active",
+        "is_role_active",
         "is_from_ad_group",
     ]
 
     # Form
     fields = [
-        "role_active",
+        "is_role_active",
         "role",
         "user",
         "assigner",
-        "created",
-        "modified",
+        "created_at",
+        "updated_at",
         "is_from_ad_group",
         "units",
         "unit_groups",
     ]
     readonly_fields = [
         "assigner",
-        "created",
-        "modified",
+        "created_at",
+        "updated_at",
         "is_from_ad_group",
     ]
     autocomplete_fields = [

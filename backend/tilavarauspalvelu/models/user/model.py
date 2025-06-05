@@ -147,7 +147,7 @@ class User(AbstractUser):
         self._unit_group_roles: dict[int, list[UserRoleChoice]] = {}
 
         unit_role: UnitRole
-        for unit_role in self.unit_roles.filter(role_active=True).prefetch_related("units", "unit_groups"):
+        for unit_role in self.unit_roles.filter(is_role_active=True).prefetch_related("units", "unit_groups"):
             for unit in unit_role.units.all():
                 if unit_role.is_from_ad_group and not unit.allow_permissions_from_ad_groups:
                     continue
