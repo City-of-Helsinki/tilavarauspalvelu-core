@@ -42,7 +42,7 @@ class UserQuerySet(models.QuerySet):
                 | models.Q(is_superuser=True)
                 | (
                     models.Q(general_roles__isnull=False)  #
-                    & models.Q(general_roles__role_active=True)
+                    & models.Q(general_roles__is_role_active=True)
                 )
                 | (
                     models.Q(unit_roles__isnull=False)  #
