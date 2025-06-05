@@ -325,9 +325,7 @@ describe("Tags should modify search params", () => {
     expect(tags.children).toHaveLength(3);
     expect(within(tags).getByText("searchForm:resetForm")).toBeInTheDocument();
     const tagBtns = within(tags).getAllByRole("button", {
-      // NOTE problematic because we can't search by the inner <span> but only by the aria-label
-      // the aria-label is the same for all tags because of our mocked TFunction
-      name: "searchForm:removeFilter",
+      name: 'searchForm:removeFilter {"value":"purposes 1"}',
     });
     const removeBtn = tagBtns[0];
     if (!removeBtn) {
