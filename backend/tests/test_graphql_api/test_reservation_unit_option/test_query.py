@@ -25,8 +25,8 @@ def test_reservation_unit_option__query__through_application_sections(graphql):
         reservationUnitOptions {
             pk
             preferredOrder
-            locked
-            rejected
+            isLocked
+            isRejected
             reservationUnit {
                 pk
             }
@@ -47,8 +47,8 @@ def test_reservation_unit_option__query__through_application_sections(graphql):
             {
                 "pk": option.pk,
                 "preferredOrder": option.preferred_order,
-                "locked": option.locked,
-                "rejected": option.rejected,
+                "isLocked": option.is_locked,
+                "isRejected": option.is_rejected,
                 "reservationUnit": {"pk": option.reservation_unit.pk},
                 "allocatedTimeSlots": [{"pk": allocation.pk}],
             }

@@ -17,7 +17,7 @@ pytestmark = [
 def test_application_section__reject_all_options(graphql):
     application_section = ApplicationSectionFactory.create_in_status_in_allocation()
     option = application_section.reservation_unit_options.first()
-    assert option.rejected is False
+    assert option.is_rejected is False
 
     graphql.login_with_superuser()
     response = graphql(REJECT_MUTATION, input_data={"pk": application_section.pk})
@@ -25,16 +25,16 @@ def test_application_section__reject_all_options(graphql):
     assert response.has_errors is False, response
 
     option.refresh_from_db()
-    assert option.rejected is True
+    assert option.is_rejected is True
 
 
 def test_application_section__reject_all_options__has_allocations(graphql):
     application_section = ApplicationSectionFactory.create_in_status_in_allocation(
-        reservation_unit_options__rejected=False,
+        reservation_unit_options__is_rejected=False,
         reservation_unit_options__allocated_time_slots__day_of_the_week=Weekday.MONDAY,
     )
     option = application_section.reservation_unit_options.first()
-    assert option.rejected is False
+    assert option.is_rejected is False
     assert option.allocated_time_slots.exists()
 
     graphql.login_with_superuser()
