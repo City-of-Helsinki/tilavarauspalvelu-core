@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
@@ -8,6 +10,9 @@ from tests.factories import UnitFactory, UserFactory
 from tests.helpers import patch_method
 
 from .helpers import current_user_query
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import GeneralRole
 
 # Applied to all tests
 pytestmark = [
@@ -107,7 +112,7 @@ def test_query_current_user__general_roles(graphql):
     # - There is a general admin in the system
     # - That admin is using the system
     user = UserFactory.create_with_general_role()
-    general_role = user.general_roles.first()
+    general_role: GeneralRole = user.general_roles.first()
     graphql.force_login(user)
 
     fields = """
@@ -118,8 +123,8 @@ def test_query_current_user__general_roles(graphql):
                 firstName
                 lastName
             }
-            created
-            modified
+            createdAt
+            updatedAt
             permissions
         }
     """
@@ -137,8 +142,8 @@ def test_query_current_user__general_roles(graphql):
             {
                 "role": general_role.role,
                 "assigner": None,
-                "created": general_role.created.isoformat(),
-                "modified": general_role.modified.isoformat(),
+                "createdAt": general_role.created_at.isoformat(),
+                "updatedAt": general_role.updated_at.isoformat(),
                 "permissions": [
                     "CAN_CREATE_STAFF_RESERVATIONS",
                     "CAN_MANAGE_APPLICATIONS",
