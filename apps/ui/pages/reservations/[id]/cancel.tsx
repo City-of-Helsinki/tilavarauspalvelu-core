@@ -93,10 +93,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     });
     const { reservation } = data || {};
 
-    const reasons = filterNonNullable(
-      data?.reservationCancelReasons?.edges.map((edge) => edge?.node)
-    );
-
+    const reasons = filterNonNullable(data?.reservationCancelReasons);
     const canCancel =
       reservation != null && isReservationCancellable(reservation);
     if (canCancel) {
@@ -169,12 +166,9 @@ export const RESERVATION_CANCEL_PAGE_QUERY = gql`
         }
       }
     }
+
     reservationCancelReasons {
-      edges {
-        node {
-          ...CancelReasonFields
-        }
-      }
+      ...CancelReasonFields
     }
   }
 `;

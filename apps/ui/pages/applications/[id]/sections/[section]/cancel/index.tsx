@@ -271,10 +271,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const { applicationSection } = data || {};
     const section = applicationSection;
 
-    const reasons = filterNonNullable(
-      data?.reservationCancelReasons?.edges.map((edge) => edge?.node)
-    );
-
     // TODO do we need a check for all sections? so do we have to query their reservations also?
     // or is it just reservationUnit since the cancel reason is tied to the unit not the reservation
     //
@@ -282,6 +278,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     // but that requires we query the CancelFields for the reservations
     // - should we disable the cancel button? probably
     // - should we redirect here or show an error if the section can't be cancelled? (assuming url access)
+    const reasons = filterNonNullable(data?.reservationCancelReasons);
     const canCancel = section != null; // && isReservationCancellable(reservation);
     if (canCancel) {
       return {
@@ -363,12 +360,9 @@ export const APPLICATION_SECTION_CANCEL_QUERY = gql`
         }
       }
     }
+
     reservationCancelReasons {
-      edges {
-        node {
-          ...CancelReasonFields
-        }
-      }
+      ...CancelReasonFields
     }
   }
 `;
