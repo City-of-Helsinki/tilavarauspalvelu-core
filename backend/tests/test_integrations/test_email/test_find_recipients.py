@@ -222,7 +222,7 @@ def test_get_reservation_staff_notification_recipients__dont_include_if_role_dea
         units=[reservation_unit.unit],
         email="admin@example.com",
         reservation_notification=ReservationNotification.ALL,
-        unit_roles__role_active=False,
+        unit_roles__is_role_active=False,
         preferred_language="fi",
     )
 
@@ -241,7 +241,7 @@ def test_get_reservation_staff_notification_recipients__dont_include_if_role_dea
         units=[reservation_unit.unit],
         email="admin@example.com",
         reservation_notification=ReservationNotification.ALL,
-        unit_roles__role_active=False,
+        unit_roles__is_role_active=False,
         preferred_language="fi",
         is_superuser=True,
     )
