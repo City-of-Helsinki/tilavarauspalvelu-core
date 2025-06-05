@@ -61,8 +61,8 @@ class UnitRoleNode(DjangoNode):
             "units",
             "unit_groups",
             "assigner",
-            "created",
-            "modified",
+            "created_at",
+            "updated_at",
             "permissions",
         ]
 

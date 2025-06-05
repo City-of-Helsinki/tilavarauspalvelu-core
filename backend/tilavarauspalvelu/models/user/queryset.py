@@ -46,7 +46,7 @@ class UserQuerySet(models.QuerySet):
                 )
                 | (
                     models.Q(unit_roles__isnull=False)  #
-                    & models.Q(unit_roles__role_active=True)
+                    & models.Q(unit_roles__is_role_active=True)
                 )
             )
             & models.Q(last_login__date__lt=cutoff)

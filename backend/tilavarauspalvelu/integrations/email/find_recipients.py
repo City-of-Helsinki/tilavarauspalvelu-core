@@ -109,7 +109,7 @@ def get_reservation_staff_notification_recipients_by_language(
     # Only fetch users with active unit roles and appropriate notification settings.
     users = User.objects.filter(
         unit_roles__isnull=False,
-        unit_roles__role_active=True,
+        unit_roles__is_role_active=True,
         reservation_notification__in=notification_settings,
     ).exclude(email="")
 
@@ -148,7 +148,7 @@ def get_application_section_staff_notification_recipients_by_language(
     # Only fetch users with active unit roles and appropriate notification settings.
     users = User.objects.filter(
         unit_roles__isnull=False,
-        unit_roles__role_active=True,
+        unit_roles__is_role_active=True,
         reservation_notification__in=notification_settings,
     ).exclude(email="")
 

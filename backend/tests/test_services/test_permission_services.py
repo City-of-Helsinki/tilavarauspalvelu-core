@@ -32,8 +32,8 @@ def test_deactivate_old_permissions__deactivates(settings):
 
     assert general_role_1.is_role_active is True
     assert general_role_2.is_role_active is True
-    assert unit_role_1.role_active is True
-    assert unit_role_2.role_active is True
+    assert unit_role_1.is_role_active is True
+    assert unit_role_2.is_role_active is True
     assert user.is_staff is True
     assert user.is_superuser is True
 
@@ -47,8 +47,8 @@ def test_deactivate_old_permissions__deactivates(settings):
 
     assert general_role_1.is_role_active is False
     assert general_role_2.is_role_active is False
-    assert unit_role_1.role_active is False
-    assert unit_role_2.role_active is False
+    assert unit_role_1.is_role_active is False
+    assert unit_role_2.is_role_active is False
     assert user.is_staff is False
     assert user.is_superuser is False
 
@@ -69,8 +69,8 @@ def test_deactivate_old_permissions__doesnt_deactivate(settings):
 
     assert general_role_1.is_role_active is True
     assert general_role_2.is_role_active is True
-    assert unit_role_1.role_active is True
-    assert unit_role_2.role_active is True
+    assert unit_role_1.is_role_active is True
+    assert unit_role_2.is_role_active is True
     assert user.is_staff is True
     assert user.is_superuser is True
 
@@ -84,7 +84,7 @@ def test_deactivate_old_permissions__doesnt_deactivate(settings):
 
     assert general_role_1.is_role_active is True
     assert general_role_2.is_role_active is True
-    assert unit_role_1.role_active is True
-    assert unit_role_2.role_active is True
+    assert unit_role_1.is_role_active is True
+    assert unit_role_2.is_role_active is True
     assert user.is_staff is True
     assert user.is_superuser is True

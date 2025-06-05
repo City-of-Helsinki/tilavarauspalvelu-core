@@ -185,8 +185,8 @@ def test_query_current_user__unit_admin(graphql):
                 firstName
                 lastName
             }
-            created
-            modified
+            createdAt
+            updatedAt
             permissions
         }
     """
@@ -210,8 +210,8 @@ def test_query_current_user__unit_admin(graphql):
                 ],
                 "unitGroups": [],
                 "assigner": None,
-                "created": unit_role.created.isoformat(),
-                "modified": unit_role.modified.isoformat(),
+                "createdAt": unit_role.created_at.isoformat(),
+                "updatedAt": unit_role.updated_at.isoformat(),
                 "permissions": [
                     "CAN_CREATE_STAFF_RESERVATIONS",
                     "CAN_MANAGE_APPLICATIONS",
