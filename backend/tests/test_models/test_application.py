@@ -44,7 +44,7 @@ def test_application__status():
     assert Application.objects.filter(L(status=ApplicationStatusChoice.EXPIRED)).exists()
 
     # Application was sent, but without any sections -> application is HANDLED
-    application.sent_date = now
+    application.sent_at = now
     application.save()
     assert application.status == ApplicationStatusChoice.HANDLED
     assert Application.objects.filter(L(status=ApplicationStatusChoice.HANDLED)).exists()
@@ -93,7 +93,7 @@ def test_application__status():
     assert Application.objects.filter(L(status=ApplicationStatusChoice.RESULTS_SENT)).exists()
 
     # Application has been cancelled -> application is CANCELLED
-    application.cancelled_date = now
+    application.cancelled_at = now
     application.save()
     assert application.status == ApplicationStatusChoice.CANCELLED
     assert Application.objects.filter(L(status=ApplicationStatusChoice.CANCELLED)).exists()

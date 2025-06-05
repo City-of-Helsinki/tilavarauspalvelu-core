@@ -93,10 +93,10 @@ class ApplicationAdminForm(forms.ModelForm):
             "home_city": _("Home city"),
             "additional_information": _("Additional information"),
             "working_memo": _("Working memo"),
-            "sent_date": _("Sent date"),
-            "cancelled_date": _("Cancelled date"),
-            "in_allocation_notification_sent_date": _("In allocation notification sent date"),
-            "results_ready_notification_sent_date": _("Results ready notification sent date"),
+            "sent_at": _("Sent date"),
+            "cancelled_at": _("Cancelled date"),
+            "in_allocation_notification_sent_at": _("In allocation notification sent date"),
+            "results_ready_notification_sent_at": _("Results ready notification sent date"),
         }
         help_texts = {
             "applicant_type": _("Applicant type."),
@@ -108,12 +108,12 @@ class ApplicationAdminForm(forms.ModelForm):
             "home_city": _("Home city for the application."),
             "additional_information": _("Additional information for the application."),
             "working_memo": _("Working memo for staff users."),
-            "sent_date": _("Date when the application was sent."),
-            "cancelled_date": _("Date when the application was cancelled."),
-            "in_allocation_notification_sent_date": _(
+            "sent_at": _("Date when the application was sent."),
+            "cancelled_at": _("Date when the application was cancelled."),
+            "in_allocation_notification_sent_at": _(
                 "Date when the applicant was notified that this application round is now in allocation."
             ),
-            "results_ready_notification_sent_date": _(
+            "results_ready_notification_sent_at": _(
                 "Date when the applicant was notified that this application round results are now ready."
             ),
         }

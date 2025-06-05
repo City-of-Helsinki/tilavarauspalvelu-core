@@ -41,11 +41,11 @@ class ApplicationAdmin(admin.ModelAdmin):
         "id",
         "_name",
         "application_round",
-        "created_date",
-        "last_modified_date",
+        "created_at",
+        "updated_at",
     ]
     list_filter = [
-        ("created_date", DateRangeFilterBuilder(title=_("Created at"))),
+        ("created_at", DateRangeFilterBuilder(title=_("Created at"))),
         ApplicationStatusFilter,
         ApplicationRoundStatusFilter,
         ApplicationRoundFilter,
@@ -82,10 +82,10 @@ class ApplicationAdmin(admin.ModelAdmin):
             _("Time"),
             {
                 "fields": [
-                    "sent_date",
-                    "cancelled_date",
-                    "in_allocation_notification_sent_date",
-                    "results_ready_notification_sent_date",
+                    "sent_at",
+                    "cancelled_at",
+                    "in_allocation_notification_sent_at",
+                    "results_ready_notification_sent_at",
                 ],
             },
         ],

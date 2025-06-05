@@ -125,4 +125,4 @@ def test_reset_application_round_allocation__results_sent():
     application.refresh_from_db()
 
     assert application_round.status == ApplicationRoundStatusChoice.HANDLED
-    assert application.results_ready_notification_sent_date is None
+    assert application.results_ready_notification_sent_at is None
