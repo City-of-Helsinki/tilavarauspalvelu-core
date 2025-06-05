@@ -95,8 +95,20 @@ export function createOptionQueryMock({
       nameEn: label,
     })
   );
-  const units = [] as const;
-  const equipments = [] as const;
+  const units = Array.from({ length: nCount }, (_, i) => ({
+    id: base64encode(`UnitNode:${i + 1}`),
+    pk: i + 1,
+    nameFi: `Unit ${i + 1} FI`,
+    nameSv: `Unit ${i + 1} SV`,
+    nameEn: `Unit ${i + 1} EN`,
+  }));
+  const equipments = Array.from({ length: nCount }, (_, i) => ({
+    id: base64encode(`EquipmentNode:${i + 1}`),
+    pk: i + 1,
+    nameFi: `Equipment ${i + 1} FI`,
+    nameSv: `Equipment ${i + 1} SV`,
+    nameEn: `Equipment ${i + 1} EN`,
+  }));
   const purposes = Array.from({ length: nCount }, (_, i) => ({
     id: base64encode(`PurposeNode:${i + 1}`),
     pk: i + 1,
