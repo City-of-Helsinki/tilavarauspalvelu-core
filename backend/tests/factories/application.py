@@ -26,13 +26,13 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
         model = Application
 
     applicant_type = fuzzy.FuzzyChoice(choices=ApplicantTypeChoice.values)
-
-    cancelled_date = None
-    sent_date = None
-    in_allocation_notification_sent_date = None
-    results_ready_notification_sent_date = None
     additional_information = FakerFI("sentence")
     working_memo = FakerFI("sentence")
+
+    cancelled_at = None
+    sent_at = None
+    in_allocation_notification_sent_at = None
+    results_ready_notification_sent_at = None
 
     application_round = ForeignKeyFactory("tests.factories.ApplicationRoundFactory")
 
@@ -129,8 +129,8 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
         defaults: dict[str, Any] = {
             "application_round": application_round,
             "applicant_type": ApplicantTypeChoice.INDIVIDUAL,
-            "cancelled_date": None,
-            "sent_date": None,
+            "cancelled_at": None,
+            "sent_at": None,
             "user__date_of_birth": datetime.date(1980, 1, 1),
             **kwargs,
         }
@@ -222,8 +222,8 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
 
         this_moment = now()
         application = cls.create(
-            cancelled_date=None,
-            sent_date=this_moment - datetime.timedelta(days=2),
+            cancelled_at=None,
+            sent_at=this_moment - datetime.timedelta(days=2),
             application_round=application_round,
         )
         application_section = ApplicationSectionFactory.create(
@@ -294,8 +294,8 @@ class ApplicationBuilder(ModelFactoryBuilder[Application]):
         from .application_round import ApplicationRoundBuilder
         from .application_section import ApplicationSectionBuilder
 
-        self.kwargs.setdefault("cancelled_date", None)
-        self.kwargs.setdefault("sent_date", None)
+        self.kwargs.setdefault("cancelled_at", None)
+        self.kwargs.setdefault("sent_at", None)
 
         for key, value in ApplicationRoundBuilder().open().kwargs.items():
             self.kwargs.setdefault(f"application_round__{key}", value)
@@ -316,8 +316,8 @@ class ApplicationBuilder(ModelFactoryBuilder[Application]):
         from .application_round import ApplicationRoundBuilder
         from .application_section import ApplicationSectionBuilder
 
-        self.kwargs.setdefault("cancelled_date", None)
-        self.kwargs.setdefault("sent_date", local_datetime())
+        self.kwargs.setdefault("cancelled_at", None)
+        self.kwargs.setdefault("sent_at", local_datetime())
 
         for key, value in ApplicationRoundBuilder().open().kwargs.items():
             self.kwargs.setdefault(f"application_round__{key}", value)
@@ -338,9 +338,9 @@ class ApplicationBuilder(ModelFactoryBuilder[Application]):
         from .application_round import ApplicationRoundBuilder
         from .application_section import ApplicationSectionBuilder
 
-        self.kwargs.setdefault("cancelled_date", None)
-        self.kwargs.setdefault("sent_date", local_datetime())
-        self.kwargs.setdefault("in_allocation_notification_sent_date", local_datetime())
+        self.kwargs.setdefault("cancelled_at", None)
+        self.kwargs.setdefault("sent_at", local_datetime())
+        self.kwargs.setdefault("in_allocation_notification_sent_at", local_datetime())
 
         for key, value in ApplicationRoundBuilder().in_allocation().kwargs.items():
             self.kwargs.setdefault(f"application_round__{key}", value)
@@ -362,9 +362,9 @@ class ApplicationBuilder(ModelFactoryBuilder[Application]):
         from .application_round import ApplicationRoundBuilder
         from .application_section import ApplicationSectionBuilder
 
-        self.kwargs.setdefault("cancelled_date", None)
-        self.kwargs.setdefault("sent_date", local_datetime())
-        self.kwargs.setdefault("in_allocation_notification_sent_date", local_datetime())
+        self.kwargs.setdefault("cancelled_at", None)
+        self.kwargs.setdefault("sent_at", local_datetime())
+        self.kwargs.setdefault("in_allocation_notification_sent_at", local_datetime())
 
         for key, value in ApplicationRoundBuilder().handled().kwargs.items():
             self.kwargs.setdefault(f"application_round__{key}", value)
@@ -386,10 +386,10 @@ class ApplicationBuilder(ModelFactoryBuilder[Application]):
         from .application_round import ApplicationRoundBuilder
         from .application_section import ApplicationSectionBuilder
 
-        self.kwargs.setdefault("cancelled_date", None)
-        self.kwargs.setdefault("sent_date", local_datetime())
-        self.kwargs.setdefault("in_allocation_notification_sent_date", local_datetime())
-        self.kwargs.setdefault("results_ready_notification_sent_date", local_datetime())
+        self.kwargs.setdefault("cancelled_at", None)
+        self.kwargs.setdefault("sent_at", local_datetime())
+        self.kwargs.setdefault("in_allocation_notification_sent_at", local_datetime())
+        self.kwargs.setdefault("results_ready_notification_sent_at", local_datetime())
 
         for key, value in ApplicationRoundBuilder().results_sent().kwargs.items():
             self.kwargs.setdefault(f"application_round__{key}", value)
@@ -410,8 +410,8 @@ class ApplicationBuilder(ModelFactoryBuilder[Application]):
         from .application_round import ApplicationRoundBuilder
         from .application_section import ApplicationSectionBuilder
 
-        self.kwargs.setdefault("cancelled_date", None)
-        self.kwargs.setdefault("sent_date", None)
+        self.kwargs.setdefault("cancelled_at", None)
+        self.kwargs.setdefault("sent_at", None)
 
         for key, value in ApplicationRoundBuilder().handled().kwargs.items():
             self.kwargs.setdefault(f"application_round__{key}", value)
@@ -432,7 +432,7 @@ class ApplicationBuilder(ModelFactoryBuilder[Application]):
         from .application_round import ApplicationRoundBuilder
         from .application_section import ApplicationSectionBuilder
 
-        self.kwargs.setdefault("cancelled_date", now())
+        self.kwargs.setdefault("cancelled_at", now())
 
         for key, value in ApplicationRoundBuilder().open().kwargs.items():
             self.kwargs.setdefault(f"application_round__{key}", value)

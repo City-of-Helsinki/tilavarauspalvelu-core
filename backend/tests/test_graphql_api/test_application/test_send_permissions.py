@@ -34,7 +34,7 @@ def test_application__send__regular_user__own_application(graphql):
     assert response.has_errors is False, response
 
     application.refresh_from_db()
-    assert application.sent_date is not None
+    assert application.sent_at is not None
 
 
 def test_application__send__regular_user__own_application__application_period_over(graphql):

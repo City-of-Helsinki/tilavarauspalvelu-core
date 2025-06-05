@@ -174,7 +174,7 @@ def test_seasonal_booking_application_round_in_allocation_email__render__html():
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 def test__seasonal_booking_application_round_in_allocation__send_email(outbox):
-    application = ApplicationFactory.create_in_status_in_allocation(in_allocation_notification_sent_date=None)
+    application = ApplicationFactory.create_in_status_in_allocation(in_allocation_notification_sent_at=None)
 
     EmailService.send_seasonal_booking_application_round_in_allocation_emails()
 
@@ -199,11 +199,11 @@ def test__seasonal_booking_application_round_in_allocation__send_email__already_
 def test__seasonal_booking_application_round_in_allocation__send_email__multiple_languages(outbox):
     application_1 = ApplicationFactory.create_in_status_in_allocation(
         user__preferred_language="fi",
-        in_allocation_notification_sent_date=None,
+        in_allocation_notification_sent_at=None,
     )
     application_2 = ApplicationFactory.create_in_status_in_allocation(
         user__preferred_language="en",
-        in_allocation_notification_sent_date=None,
+        in_allocation_notification_sent_at=None,
     )
 
     with TranslationsFromPOFiles():
@@ -235,7 +235,7 @@ def test__seasonal_booking_application_round_in_allocation__send_email__no_recip
     ApplicationFactory.create_in_status_in_allocation(
         user__email="",
         contact_person__email="",
-        in_allocation_notification_sent_date=None,
+        in_allocation_notification_sent_at=None,
     )
 
     EmailService.send_seasonal_booking_application_round_in_allocation_emails()

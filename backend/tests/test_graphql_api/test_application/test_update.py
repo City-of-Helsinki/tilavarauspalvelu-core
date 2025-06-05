@@ -459,13 +459,13 @@ def test_update_application__application_round(graphql):
     assert response.has_schema_errors is True, response
 
 
-def test_update_application__sent_date(graphql):
+def test_update_application__sent_at(graphql):
     application = ApplicationFactory.create_in_status_draft()
     graphql.login_with_superuser()
 
     input_data = {
         "pk": application.id,
-        "sentDate": local_date().isoformat(),
+        "sentAt": local_date().isoformat(),
     }
     response = graphql(UPDATE_MUTATION, input_data=input_data)
 

@@ -167,9 +167,9 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         application = ApplicationFactory.create(
             application_round=application_round,
             user=user,
-            cancelled_date=None,
-            sent_date=local_datetime(),
-            in_allocation_notification_sent_date=local_datetime(),
+            cancelled_at=None,
+            sent_at=local_datetime(),
+            in_allocation_notification_sent_at=local_datetime(),
         )
 
         for allocation in allocations:

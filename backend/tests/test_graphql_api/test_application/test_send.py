@@ -30,14 +30,14 @@ def test_send_application__draft(graphql):
     assert response.has_errors is False, response
 
     application.refresh_from_db()
-    assert application.sent_date is not None
+    assert application.sent_at is not None
 
     assert EmailService.send_seasonal_booking_application_received_email.called is True
 
 
 @patch_method(EmailService.send_seasonal_booking_application_received_email)
 def test_send_application__sent(graphql):
-    application = ApplicationFactory.create_application_ready_for_sending(sent_date=local_datetime())
+    application = ApplicationFactory.create_application_ready_for_sending(sent_at=local_datetime())
 
     graphql.login_with_superuser()
     response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
@@ -45,13 +45,13 @@ def test_send_application__sent(graphql):
     assert response.has_errors is False, response.errors
 
     application.refresh_from_db()
-    assert application.sent_date is not None
+    assert application.sent_at is not None
 
     assert EmailService.send_seasonal_booking_application_received_email.called is True
 
 
 def test_send_application__cancelled(graphql):
-    application = ApplicationFactory.create_application_ready_for_sending(cancelled_date=local_datetime())
+    application = ApplicationFactory.create_application_ready_for_sending(cancelled_at=local_datetime())
 
     graphql.login_with_superuser()
     response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
@@ -446,7 +446,7 @@ def test_send_application__community_applicant(graphql):
     assert response.has_errors is False, response.errors
 
     application.refresh_from_db()
-    assert application.sent_date is not None
+    assert application.sent_at is not None
 
     assert EmailService.send_seasonal_booking_application_received_email.called is True
 
@@ -679,7 +679,7 @@ def test_send_application__association_applicant(graphql):
     assert response.has_errors is False, response.errors
 
     application.refresh_from_db()
-    assert application.sent_date is not None
+    assert application.sent_at is not None
 
     assert EmailService.send_seasonal_booking_application_received_email.called is True
 
@@ -700,7 +700,7 @@ def test_send_application__company_applicant(graphql):
     assert response.has_errors is False, response.errors
 
     application.refresh_from_db()
-    assert application.sent_date is not None
+    assert application.sent_at is not None
 
     assert EmailService.send_seasonal_booking_application_received_email.called is True
 
