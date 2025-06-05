@@ -140,17 +140,17 @@ def _create_handled_application_rounds(
         name_en="Handled application round",
         name_sv="Hanterade ansökningsrunda",
         #
-        application_period_begin=now - datetime.timedelta(days=30),
-        application_period_end=now - datetime.timedelta(days=1),
+        application_period_begins_at=now - datetime.timedelta(days=30),
+        application_period_ends_at=now - datetime.timedelta(days=1),
         #
-        reservation_period_begin=today,
-        reservation_period_end=today + datetime.timedelta(days=100),
+        reservation_period_begin_date=today,
+        reservation_period_end_date=today + datetime.timedelta(days=100),
         #
-        handled_date=None,  # Don't set this to allow ending handling and generating reservations
-        sent_date=None,
+        handled_at=None,  # Don't set this to allow ending handling and generating reservations
+        sent_at=None,
         #
-        public_display_begin=now - datetime.timedelta(days=1),
-        public_display_end=now + datetime.timedelta(days=720),
+        public_display_begins_at=now - datetime.timedelta(days=1),
+        public_display_ends_at=now + datetime.timedelta(days=720),
         #
         terms_of_use=terms_of_use,
     )
@@ -222,7 +222,7 @@ def _create_handled_application_rounds(
     ):
         results = _create_application_for_round(
             application_round=handled_round,
-            sent_at=handled_round.application_period_end - datetime.timedelta(days=1),
+            sent_at=handled_round.application_period_ends_at - datetime.timedelta(days=1),
             age_groups=age_groups,
             cities=cities,
             purposes=selected_purposes,
@@ -283,17 +283,17 @@ def _create_application_round_in_allocations(
         name_en="Application round in allocation",
         name_sv="Ansökningsomgång i tilldelning",
         #
-        application_period_begin=now - datetime.timedelta(days=30),
-        application_period_end=now - datetime.timedelta(days=1),
+        application_period_begins_at=now - datetime.timedelta(days=30),
+        application_period_ends_at=now - datetime.timedelta(days=1),
         #
-        reservation_period_begin=today + datetime.timedelta(days=50),
-        reservation_period_end=today + datetime.timedelta(days=100),
+        reservation_period_begin_date=today + datetime.timedelta(days=50),
+        reservation_period_end_date=today + datetime.timedelta(days=100),
         #
-        handled_date=None,
-        sent_date=None,
+        handled_at=None,
+        sent_at=None,
         #
-        public_display_begin=now - datetime.timedelta(days=1),
-        public_display_end=now + datetime.timedelta(days=720),
+        public_display_begins_at=now - datetime.timedelta(days=1),
+        public_display_ends_at=now + datetime.timedelta(days=720),
         #
         terms_of_use=terms_of_use,
     )
@@ -373,14 +373,14 @@ def _create_application_round_in_allocations(
         ],
         output_type=ApplicationRoundData,
     ):
-        sent_date: datetime.datetime | None = in_allocation_round.application_period_end - datetime.timedelta(days=1)
+        sent_at: datetime.datetime | None = in_allocation_round.application_period_ends_at - datetime.timedelta(days=1)
         if weighted_choice([True, False], weights=[1, 9]):
             # 1/10 of applications have not been sent (=expired)
-            sent_date = None
+            sent_at = None
 
         results = _create_application_for_round(
             application_round=in_allocation_round,
-            sent_at=sent_date,
+            sent_at=sent_at,
             age_groups=age_groups,
             cities=cities,
             purposes=selected_purposes,
@@ -401,12 +401,12 @@ def _create_application_round_in_allocations(
 
     # Cancel 3 random applications
     for application in random.sample(applications, k=3):
-        application.cancelled_at = in_allocation_round.application_period_end - datetime.timedelta(days=1)
+        application.cancelled_at = in_allocation_round.application_period_ends_at - datetime.timedelta(days=1)
 
     # Create an extra application with a lot of sections
     results = _create_application_for_round(
         application_round=in_allocation_round,
-        sent_at=in_allocation_round.application_period_end - datetime.timedelta(days=1),
+        sent_at=in_allocation_round.application_period_ends_at - datetime.timedelta(days=1),
         age_groups=age_groups,
         cities=cities,
         purposes=selected_purposes,
@@ -470,17 +470,17 @@ def _create_open_application_rounds(
         name_en="Open application round",
         name_sv="Öppen ansökningsomgång",
         #
-        application_period_begin=now - datetime.timedelta(days=1),
-        application_period_end=now + datetime.timedelta(days=30),
+        application_period_begins_at=now - datetime.timedelta(days=1),
+        application_period_ends_at=now + datetime.timedelta(days=30),
         #
-        reservation_period_begin=today + datetime.timedelta(days=100),
-        reservation_period_end=today + datetime.timedelta(days=150),
+        reservation_period_begin_date=today + datetime.timedelta(days=100),
+        reservation_period_end_date=today + datetime.timedelta(days=150),
         #
-        sent_date=None,
-        handled_date=None,
+        handled_at=None,
+        sent_at=None,
         #
-        public_display_begin=now - datetime.timedelta(days=1),
-        public_display_end=now + datetime.timedelta(days=720),
+        public_display_begins_at=now - datetime.timedelta(days=1),
+        public_display_ends_at=now + datetime.timedelta(days=720),
         #
         terms_of_use=terms_of_use,
     )
@@ -560,15 +560,15 @@ def _create_open_application_rounds(
         ],
         output_type=ApplicationRoundData,
     ):
-        sent_date: datetime.datetime | None = None
+        sent_at: datetime.datetime | None = None
         if random.choice([True, False]):
-            period = open_round.application_period_end - open_round.application_period_begin
+            period = open_round.application_period_ends_at - open_round.application_period_begins_at
             offset_days = random.randint(0, period.days + 1)
-            sent_date = open_round.application_period_begin + datetime.timedelta(days=offset_days)
+            sent_at = open_round.application_period_begins_at + datetime.timedelta(days=offset_days)
 
         results = _create_application_for_round(
             application_round=open_round,
-            sent_at=sent_date,
+            sent_at=sent_at,
             age_groups=age_groups,
             cities=cities,
             purposes=selected_purposes,
@@ -589,7 +589,7 @@ def _create_open_application_rounds(
 
     # Cancel 3 random applications
     for application in random.sample(applications, k=3):
-        application.cancelled_at = open_round.application_period_end - datetime.timedelta(days=1)
+        application.cancelled_at = open_round.application_period_ends_at - datetime.timedelta(days=1)
 
     Address.objects.bulk_create(addresses)
     Organisation.objects.bulk_create(organisations)
@@ -615,17 +615,17 @@ def _create_upcoming_application_rounds(
         name_en="Upcoming application round",
         name_sv="Kommande ansökningsomgång",
         #
-        application_period_begin=now + datetime.timedelta(days=30),
-        application_period_end=now + datetime.timedelta(days=60),
+        application_period_begins_at=now + datetime.timedelta(days=30),
+        application_period_ends_at=now + datetime.timedelta(days=60),
         #
-        reservation_period_begin=today + datetime.timedelta(days=150),
-        reservation_period_end=today + datetime.timedelta(days=200),
+        reservation_period_begin_date=today + datetime.timedelta(days=150),
+        reservation_period_end_date=today + datetime.timedelta(days=200),
         #
-        sent_date=None,
-        handled_date=None,
+        handled_at=None,
+        sent_at=None,
         #
-        public_display_begin=now - datetime.timedelta(days=1),
-        public_display_end=now + datetime.timedelta(days=720),
+        public_display_begins_at=now - datetime.timedelta(days=1),
+        public_display_ends_at=now + datetime.timedelta(days=720),
         #
         terms_of_use=terms_of_use,
     )
@@ -777,8 +777,8 @@ def _create_application_sections_for_application(
     allocated_time_slots: list[AllocatedTimeSlot] = []
 
     for _ in range(section_info.number):
-        reservations_begin_date = application.application_round.reservation_period_begin
-        reservations_end_date = application.application_round.reservation_period_end
+        reservations_begin_date = application.application_round.reservation_period_begin_date
+        reservations_end_date = application.application_round.reservation_period_end_date
 
         if random.choice([True, False]):
             reservations_begin_date += datetime.timedelta(days=random.randint(0, 10))

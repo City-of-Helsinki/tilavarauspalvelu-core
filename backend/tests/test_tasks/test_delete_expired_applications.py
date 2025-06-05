@@ -20,16 +20,16 @@ pytestmark = [
 def test_delete_expired_applications():
     now = local_datetime()
     application_round_old = ApplicationRoundFactory.create_in_status_results_sent(
-        application_period_begin=now - datetime.timedelta(days=400),
-        application_period_end=now - datetime.timedelta(days=365),
+        application_period_begins_at=now - datetime.timedelta(days=400),
+        application_period_ends_at=now - datetime.timedelta(days=365),
     )
     application_sent = ApplicationFactory.create_in_status_results_sent(application_round=application_round_old)  # Kept
     ApplicationFactory.create_in_status_expired(application_round=application_round_old)  # Deleted
     ApplicationFactory.create_in_status_cancelled(application_round=application_round_old)  # Deleted
 
     application_round_new = ApplicationRoundFactory.create_in_status_results_sent(
-        application_period_begin=now - datetime.timedelta(days=400),
-        application_period_end=now - datetime.timedelta(days=364),  # Not old enough to delete applications
+        application_period_begins_at=now - datetime.timedelta(days=400),
+        application_period_ends_at=now - datetime.timedelta(days=364),  # Not old enough to delete applications
     )
     application_new = ApplicationFactory.create_in_status_expired(application_round=application_round_new)  # Kept
 

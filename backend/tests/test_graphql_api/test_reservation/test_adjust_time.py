@@ -317,7 +317,7 @@ def test_reservation__adjust_time__reservation_unit_in_open_application_round(gr
 
     application_round = ApplicationRoundFactory.create_in_status_open(reservation_units=[reservation_unit])
 
-    begin = local_start_of_day(application_round.reservation_period_begin) + datetime.timedelta(days=1)
+    begin = local_start_of_day(application_round.reservation_period_begin_date) + datetime.timedelta(days=1)
     end = begin + datetime.timedelta(hours=1)
 
     ReservableTimeSpanFactory.create(

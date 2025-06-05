@@ -62,8 +62,8 @@ def test_send_application__cancelled(graphql):
 
 def test_send_application__expired(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
-        application_round__application_period_begin=local_start_of_day() - datetime.timedelta(days=4),
-        application_round__application_period_end=local_start_of_day() - datetime.timedelta(days=2),
+        application_round__application_period_begins_at=local_start_of_day() - datetime.timedelta(days=4),
+        application_round__application_period_ends_at=local_start_of_day() - datetime.timedelta(days=2),
     )
 
     graphql.login_with_superuser()

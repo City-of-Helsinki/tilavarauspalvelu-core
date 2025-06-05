@@ -95,7 +95,7 @@ class ApplicationNode(DjangoNode):
                 parent=optimizer,
             ),
         )
-        application_round_optimizer.only_fields.append("application_period_end")
+        application_round_optimizer.only_fields.append("application_period_ends_at")
 
         return queryset
 

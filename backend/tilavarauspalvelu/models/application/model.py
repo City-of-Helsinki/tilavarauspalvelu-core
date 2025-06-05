@@ -129,9 +129,9 @@ class Application(SerializableMixin, models.Model):
                 (
                     models.Q(sent_at__isnull=True)
                     # NOTE: Some copy-pasta from Application Round status for efficiency
-                    & models.Q(application_round__sent_date__isnull=True)
-                    & models.Q(application_round__handled_date__isnull=True)
-                    & models.Q(application_round__application_period_end__gt=NowTT())
+                    & models.Q(application_round__sent_at__isnull=True)
+                    & models.Q(application_round__handled_at__isnull=True)
+                    & models.Q(application_round__application_period_ends_at__gt=NowTT())
                 ),
                 then=models.Value(ApplicationStatusChoice.DRAFT.value),
             ),
@@ -144,17 +144,17 @@ class Application(SerializableMixin, models.Model):
             # NOTE: Some copy-pasta from Application Round status for efficiency
             models.When(
                 # If the application round has been marked as sent
-                models.Q(application_round__sent_date__isnull=False),
+                models.Q(application_round__sent_at__isnull=False),
                 then=models.Value(ApplicationStatusChoice.RESULTS_SENT.value),
             ),
             models.When(
                 # If the application round has been marked as handled
-                models.Q(application_round__handled_date__isnull=False),
+                models.Q(application_round__handled_at__isnull=False),
                 then=models.Value(ApplicationStatusChoice.HANDLED.value),
             ),
             models.When(
                 # If the application round application period has not ended
-                models.Q(application_round__application_period_end__gt=NowTT()),
+                models.Q(application_round__application_period_ends_at__gt=NowTT()),
                 then=models.Value(ApplicationStatusChoice.RECEIVED.value),
             ),
             models.When(
