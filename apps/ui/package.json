@@ -38,7 +38,7 @@
     "react-hook-form": "^7.54.2",
     "react-transition-group": "^4.4.5",
     "react-use": "^17.6.0",
-    "styled-components": "6.1.15",
+    "styled-components": "6.1.18",
     "tsconfig": "workspace:*",
     "typescript-cookie": "^1.0.6",
     "zod": "^3.24.2"
