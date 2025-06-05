@@ -9,9 +9,10 @@ import {
 import { type LocalizationLanguages } from "common/src/urlBuilder";
 import {
   EquipmentOrderingChoices,
+  type Maybe,
   OptionsDocument,
   type OptionsQuery,
-  OptionsQueryVariables,
+  type OptionsQueryVariables,
   PurposeOrderingChoices,
   type QueryReservationUnitsArgs,
   ReservationKind,
@@ -224,6 +225,21 @@ export function mapParamToNumber(param: string[], min?: number): number[] {
   return min != null ? numbers.filter((n) => n >= min) : numbers;
 }
 
+export function translateOption(
+  val: {
+    pk: Maybe<number>;
+    nameFi: Maybe<string>;
+    nameEn: Maybe<string>;
+    nameSv: Maybe<string>;
+  },
+  lang: LocalizationLanguages
+): OptionT {
+  return {
+    value: val.pk ?? 0,
+    label: getTranslationSafe(val, "name", lang),
+  };
+}
+
 type OptionT = Readonly<{ value: number; label: string }>;
 export type OptionsT = Readonly<{
   units: Readonly<OptionT[]>;
@@ -257,38 +273,26 @@ export async function getSearchOptions(
 
   const reservationUnitTypes = filterNonNullable(
     optionsData?.reservationUnitTypes?.edges?.map((edge) => edge?.node)
-  ).map((n) => ({
-    value: n.pk ?? 0,
-    label: getTranslationSafe(n, "name", lang),
-  }));
+  ).map((n) => translateOption(n, lang));
   const purposes = filterNonNullable(
     optionsData?.purposes?.edges?.map((edge) => edge?.node)
+  ).map((n) => translateOption(n, lang));
+
+  const equipments = filterNonNullable(optionsData?.equipmentsAll).map((n) =>
+    translateOption(n, lang)
+  );
+  const units = filterNonNullable(optionsData?.unitsAll).map((n) =>
+    translateOption(n, lang)
+  );
+  const ageGroups = sortAgeGroups(
+    optionsData?.ageGroups?.edges?.map((edge) => edge?.node ?? null) ?? []
   ).map((n) => ({
     value: n.pk ?? 0,
-    label: getTranslationSafe(n, "name", lang),
-  }));
-
-  const equipments = filterNonNullable(optionsData?.equipmentsAll).map((n) => ({
-    value: n.pk ?? 0,
-    label: getTranslationSafe(n, "name", lang),
-  }));
-
-  const units = filterNonNullable(optionsData?.unitsAll).map((node) => ({
-    value: node.pk ?? 0,
-    label: getTranslationSafe(node, "name", lang),
-  }));
-  const ageGroups = filterNonNullable(
-    optionsData?.ageGroups?.edges?.map((edge) => edge?.node)
-  ).map((n) => ({
-    value: n.pk ?? 0,
-    label: getTranslationSafe(n, "name", lang),
+    label: `${n.minimum || ""} - ${n.maximum || ""}`,
   }));
   const cities = filterNonNullable(
     optionsData?.cities?.edges?.map((edge) => edge?.node)
-  ).map((n) => ({
-    value: n.pk ?? 0,
-    label: getTranslationSafe(n, "name", lang),
-  }));
+  ).map((n) => translateOption(n, lang));
 
   return {
     units,
@@ -298,6 +302,21 @@ export async function getSearchOptions(
     ageGroups,
     cities,
   };
+}
+
+type AgeGroup = NonNullable<
+  NonNullable<OptionsQuery["ageGroups"]>["edges"][0]
+>["node"];
+function sortAgeGroups(ageGroups: AgeGroup[]): NonNullable<AgeGroup>[] {
+  return filterNonNullable(ageGroups).sort((a, b) => {
+    const order = ["1-99"];
+    const strA = `${a.minimum || ""}-${a.maximum || ""}`;
+    const strB = `${b.minimum || ""}-${b.maximum || ""}`;
+
+    return order.includes(strA) || order.includes(strB)
+      ? order.indexOf(strA) - order.indexOf(strB)
+      : a.minimum - b.minimum;
+  });
 }
 
 // There is a duplicate in admin-ui but it doesn't have translations
