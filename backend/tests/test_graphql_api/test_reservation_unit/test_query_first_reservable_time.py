@@ -200,10 +200,10 @@ class ReservationUnitOverrides:
 @dataclass
 class ApplicationStatusParams:
     status: ApplicationRoundStatusChoice
-    sent_date: datetime.datetime | None = None
-    handled_date: datetime.datetime | None = None
-    reservation_period_begin: datetime.date | None = None
-    reservation_period_end: datetime.date | None = None
+    sent_at: datetime.datetime | None = None
+    handled_at: datetime.datetime | None = None
+    reservation_period_begin_date: datetime.date | None = None
+    reservation_period_end_date: datetime.date | None = None
     reservation_units: list[ReservationUnit] | None = None
 
 
@@ -1092,8 +1092,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period overlaps, Status=OPEN, ReservationUnit not part of round": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.OPEN,
-                reservation_period_begin=_date(day=6),
-                reservation_period_end=_date(day=20),
+                reservation_period_begin_date=_date(day=6),
+                reservation_period_end_date=_date(day=20),
                 reservation_units=[],
             ),
             filters=ReservableFilters(),
@@ -1105,8 +1105,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period overlaps, STATUS=UPCOMING": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.UPCOMING,
-                reservation_period_begin=_date(day=6),
-                reservation_period_end=_date(day=20),
+                reservation_period_begin_date=_date(day=6),
+                reservation_period_end_date=_date(day=20),
             ),
             filters=ReservableFilters(),
             result=ReservableNode(
@@ -1117,8 +1117,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period overlaps, Status=OPEN": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.OPEN,
-                reservation_period_begin=_date(day=6),
-                reservation_period_end=_date(day=20),
+                reservation_period_begin_date=_date(day=6),
+                reservation_period_end_date=_date(day=20),
             ),
             filters=ReservableFilters(),
             result=ReservableNode(
@@ -1129,8 +1129,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period overlaps, Status=IN_ALLOCATION": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.IN_ALLOCATION,
-                reservation_period_begin=_date(day=1),
-                reservation_period_end=_date(day=20),
+                reservation_period_begin_date=_date(day=1),
+                reservation_period_end_date=_date(day=20),
             ),
             filters=ReservableFilters(),
             result=ReservableNode(
@@ -1141,8 +1141,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period overlaps, Status=HANDLED": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.HANDLED,
-                reservation_period_begin=_date(day=1),
-                reservation_period_end=_date(day=20),
+                reservation_period_begin_date=_date(day=1),
+                reservation_period_end_date=_date(day=20),
             ),
             filters=ReservableFilters(),
             result=ReservableNode(
@@ -1153,8 +1153,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period overlaps, Status=RESULTS_SENT": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.RESULTS_SENT,
-                reservation_period_begin=_date(day=1),
-                reservation_period_end=_date(day=20),
+                reservation_period_begin_date=_date(day=1),
+                reservation_period_end_date=_date(day=20),
             ),
             filters=ReservableFilters(),
             result=ReservableNode(
@@ -1165,8 +1165,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Not overlapping, Period in the past, Status=UPCOMING": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.UPCOMING,
-                reservation_period_begin=_date(day=6),
-                reservation_period_end=_date(day=10),
+                reservation_period_begin_date=_date(day=6),
+                reservation_period_end_date=_date(day=10),
             ),
             filters=ReservableFilters(),
             result=ReservableNode(
@@ -1177,8 +1177,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Not overlapping, Period in the future, Status=OPEN": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.OPEN,
-                reservation_period_begin=_date(day=20),
-                reservation_period_end=_date(day=30),
+                reservation_period_begin_date=_date(day=20),
+                reservation_period_end_date=_date(day=30),
             ),
             filters=ReservableFilters(),
             result=ReservableNode(
@@ -1189,8 +1189,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period partially overlaps, Status=OPEN": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.OPEN,
-                reservation_period_begin=_date(day=14),
-                reservation_period_end=_date(day=15),
+                reservation_period_begin_date=_date(day=14),
+                reservation_period_end_date=_date(day=15),
             ),
             filters=ReservableFilters(),
             result=ReservableNode(
@@ -1201,8 +1201,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period partially overlaps, Status=OPEN, Min duration too long": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.OPEN,
-                reservation_period_begin=_date(day=14),
-                reservation_period_end=_date(day=15),
+                reservation_period_begin_date=_date(day=14),
+                reservation_period_end_date=_date(day=15),
             ),
             filters=ReservableFilters(
                 minimum_duration_minutes=61,
@@ -1215,8 +1215,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period ends on the day of time span, STATUS=OPEN": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.OPEN,
-                reservation_period_begin=_date(day=14),
-                reservation_period_end=_date(day=16),
+                reservation_period_begin_date=_date(day=14),
+                reservation_period_end_date=_date(day=16),
             ),
             filters=ReservableFilters(),
             result=ReservableNode(
@@ -1287,8 +1287,8 @@ def test__reservation_unit__first_reservable_time__filters__application_rounds__
     """
     ApplicationRoundFactory.create_in_status_open(
         reservation_units=[reservation_unit],
-        reservation_period_begin=_date(day=29),
-        reservation_period_end=_date(day=30),
+        reservation_period_begin_date=_date(day=29),
+        reservation_period_end_date=_date(day=30),
     )
 
     # 29th Jan 11:00 - 12:00 (1h)

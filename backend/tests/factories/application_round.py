@@ -62,21 +62,25 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
 
     timestamp = factory.LazyFunction(local_start_of_day)  # private helper (see Meta.exclude)
 
-    application_period_begin = factory.LazyAttribute(lambda i: i.timestamp)
-    application_period_end = factory.LazyAttribute(lambda i: i.application_period_begin + datetime.timedelta(weeks=4))
-
-    reservation_period_begin = factory.LazyAttribute(
-        lambda i: coerce_date(i.application_period_end) + datetime.timedelta(days=1),
-    )
-    reservation_period_end = factory.LazyAttribute(
-        lambda i: coerce_date(i.reservation_period_begin) + datetime.timedelta(weeks=4),
+    application_period_begins_at = factory.LazyAttribute(lambda i: i.timestamp)
+    application_period_ends_at = factory.LazyAttribute(
+        lambda i: i.application_period_begins_at + datetime.timedelta(weeks=4)
     )
 
-    public_display_begin = factory.LazyAttribute(lambda i: i.application_period_begin - datetime.timedelta(days=7))
-    public_display_end = factory.LazyAttribute(lambda i: i.application_period_end + datetime.timedelta(days=4))
+    reservation_period_begin_date = factory.LazyAttribute(
+        lambda i: coerce_date(i.application_period_ends_at) + datetime.timedelta(days=1),
+    )
+    reservation_period_end_date = factory.LazyAttribute(
+        lambda i: coerce_date(i.reservation_period_begin_date) + datetime.timedelta(weeks=4),
+    )
 
-    handled_date = None
-    sent_date = None
+    public_display_begins_at = factory.LazyAttribute(
+        lambda i: i.application_period_begins_at - datetime.timedelta(days=7)
+    )
+    public_display_ends_at = factory.LazyAttribute(lambda i: i.application_period_ends_at + datetime.timedelta(days=4))
+
+    handled_at = None
+    sent_at = None
 
     reservation_units = ManyToManyFactory("tests.factories.ReservationUnitFactory")
     purposes = ManyToManyFactory("tests.factories.ReservationPurposeFactory")
@@ -146,8 +150,8 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
             ApplicationRoundBuilder()
             .handled()
             .create(
-                reservation_period_begin=reservation_period_begin_date,
-                reservation_period_end=reservation_period_end_date,
+                reservation_period_begin_date=reservation_period_begin_date,
+                reservation_period_end_date=reservation_period_end_date,
                 purposes=[purpose],
             )
         )
@@ -274,44 +278,44 @@ class ApplicationRoundBuilder(ModelFactoryBuilder[ApplicationRound]):
     def upcoming(self) -> Self:
         now = local_start_of_day()
         return self.set(
-            sent_date=None,
-            handled_date=None,
-            application_period_begin=now + datetime.timedelta(days=2),
-            application_period_end=now + datetime.timedelta(days=4),
+            sent_at=None,
+            handled_at=None,
+            application_period_begins_at=now + datetime.timedelta(days=2),
+            application_period_ends_at=now + datetime.timedelta(days=4),
         )
 
     def open(self) -> Self:
         now = local_start_of_day()
         return self.set(
-            sent_date=None,
-            handled_date=None,
-            application_period_begin=now - datetime.timedelta(days=2),
-            application_period_end=now + datetime.timedelta(days=2),
+            sent_at=None,
+            handled_at=None,
+            application_period_begins_at=now - datetime.timedelta(days=2),
+            application_period_ends_at=now + datetime.timedelta(days=2),
         )
 
     def in_allocation(self) -> Self:
         now = local_start_of_day()
         return self.set(
-            sent_date=None,
-            handled_date=None,
-            application_period_begin=now - datetime.timedelta(days=4),
-            application_period_end=now - datetime.timedelta(days=2),
+            sent_at=None,
+            handled_at=None,
+            application_period_begins_at=now - datetime.timedelta(days=4),
+            application_period_ends_at=now - datetime.timedelta(days=2),
         )
 
     def handled(self) -> Self:
         now = local_start_of_day()
         return self.set(
-            sent_date=None,
-            handled_date=now,
-            application_period_begin=now - datetime.timedelta(days=4),
-            application_period_end=now - datetime.timedelta(days=2),
+            sent_at=None,
+            handled_at=now,
+            application_period_begins_at=now - datetime.timedelta(days=4),
+            application_period_ends_at=now - datetime.timedelta(days=2),
         )
 
     def results_sent(self) -> Self:
         now = local_start_of_day()
         return self.set(
-            sent_date=now,
-            handled_date=now,
-            application_period_begin=now - datetime.timedelta(days=4),
-            application_period_end=now - datetime.timedelta(days=2),
+            sent_at=now,
+            handled_at=now,
+            application_period_begins_at=now - datetime.timedelta(days=4),
+            application_period_ends_at=now - datetime.timedelta(days=2),
         )

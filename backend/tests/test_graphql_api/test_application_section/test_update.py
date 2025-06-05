@@ -190,7 +190,9 @@ def test_application_section__update__reservations_begin_date_not_in_round_reser
     # - User tries to update the application section
     #   with a reservations begin date outside the application round
     data = get_application_section_update_data(application_section=application_section)
-    new_date = application_section.application.application_round.reservation_period_begin - datetime.timedelta(days=1)
+    new_date = application_section.application.application_round.reservation_period_begin_date - datetime.timedelta(
+        days=1
+    )
     data["reservationsBeginDate"] = new_date.isoformat()
     response = graphql(UPDATE_MUTATION, input_data=data)
 
@@ -212,7 +214,9 @@ def test_application_section__update__reservations_end_date_not_in_round_reserva
     # - User tries to update the application section
     #   with a reservations end date outside the application round
     data = get_application_section_update_data(application_section=application_section)
-    new_date = application_section.application.application_round.reservation_period_end + datetime.timedelta(days=1)
+    new_date = application_section.application.application_round.reservation_period_end_date + datetime.timedelta(
+        days=1
+    )
     data["reservationsEndDate"] = new_date.isoformat()
     response = graphql(UPDATE_MUTATION, input_data=data)
 

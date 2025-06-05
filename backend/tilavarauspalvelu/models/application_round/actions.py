@@ -77,7 +77,7 @@ class ApplicationRoundActions:
                 Reservation.objects.for_application_round(self.application_round).delete()
                 ReservationSeries.objects.for_application_round(self.application_round).delete()
 
-                self.application_round.handled_date = None
+                self.application_round.handled_at = None
                 self.application_round.save()
 
             case ApplicationRoundStatusChoice.RESULTS_SENT:
@@ -86,7 +86,7 @@ class ApplicationRoundActions:
                     results_ready_notification_sent_at=None,
                 )
 
-                self.application_round.sent_date = None
+                self.application_round.sent_at = None
                 self.application_round.save()
 
             case _:
@@ -177,8 +177,8 @@ class ApplicationRoundActions:
             # Fetch periods from Hauki API
             date_periods = HaukiAPIClient.get_date_periods(
                 hauki_resource_id=resource.id,
-                start_date_lte=application_round.reservation_period_end.isoformat(),  # Starts before period ends
-                end_date_gte=application_round.reservation_period_begin.isoformat(),  # Ends after period begins
+                start_date_lte=application_round.reservation_period_end_date.isoformat(),  # Starts before period ends
+                end_date_gte=application_round.reservation_period_begin_date.isoformat(),  # Ends after period begins
             )
 
             # Convert periods to TimeSpanElements
@@ -209,7 +209,7 @@ class ApplicationRoundActions:
             reservee_type=reservee_type,
             state=ReservationStateChoice.CONFIRMED,
             user=reservation_series.user,
-            handled_at=application.application_round.handled_date,
+            handled_at=application.application_round.handled_at,
             num_persons=application_section.num_persons,
             buffer_time_before=datetime.timedelta(0),
             buffer_time_after=datetime.timedelta(0),

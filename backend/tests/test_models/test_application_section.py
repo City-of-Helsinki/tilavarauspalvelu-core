@@ -32,8 +32,8 @@ pytestmark = [
 def test_application_section__status():
     now = datetime.datetime.now(tz=datetime.UTC)
     application_round = ApplicationRoundFactory.create(
-        application_period_begin=now - datetime.timedelta(days=7),
-        application_period_end=now + datetime.timedelta(days=1),
+        application_period_begins_at=now - datetime.timedelta(days=7),
+        application_period_ends_at=now + datetime.timedelta(days=1),
     )
     section = ApplicationSectionFactory.create(
         application__application_round=application_round,
@@ -48,7 +48,7 @@ def test_application_section__status():
     assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.UNALLOCATED)).exists()
 
     # Application round has entered allocation -> status is IN_ALLOCATION
-    application_round.application_period_end = now - datetime.timedelta(days=1)
+    application_round.application_period_ends_at = now - datetime.timedelta(days=1)
     application_round.save()
     assert section.status == ApplicationSectionStatusChoice.IN_ALLOCATION
     assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.IN_ALLOCATION)).exists()
@@ -59,11 +59,11 @@ def test_application_section__status():
     assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.IN_ALLOCATION)).exists()
 
     # 1/2 allocations have been made, but application round has been handled -> status is HANDLED
-    application_round.handled_date = now
+    application_round.handled_at = now
     application_round.save()
     assert section.status == ApplicationSectionStatusChoice.HANDLED
     assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.HANDLED)).exists()
-    application_round.handled_date = None
+    application_round.handled_at = None
     application_round.save()
 
     # All reservation unit options have been locked -> status is HANDLED

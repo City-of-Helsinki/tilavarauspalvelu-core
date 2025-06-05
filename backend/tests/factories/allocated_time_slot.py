@@ -53,8 +53,8 @@ class AllocatedTimeSlotFactory(GenericDjangoModelFactory[AllocatedTimeSlot]):
 
         application_round = ApplicationRoundFactory.create_in_status_handled(
             reservation_units=[reservation_unit],
-            reservation_period_begin=start_of_today.date(),
-            reservation_period_end=(start_of_today + datetime.timedelta(days=7 * (num - 1))).date(),
+            reservation_period_begin_date=start_of_today.date(),
+            reservation_period_end_date=(start_of_today + datetime.timedelta(days=7 * (num - 1))).date(),
         )
 
         return cls.create(
