@@ -67,19 +67,19 @@ def test_application_section__status():
     application_round.save()
 
     # All reservation unit options have been locked -> status is HANDLED
-    option.locked = True
+    option.is_locked = True
     option.save()
     assert section.status == ApplicationSectionStatusChoice.HANDLED
     assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.HANDLED)).exists()
-    option.locked = False
+    option.is_locked = False
     option.save()
 
     # All reservation unit options have been rejected -> status is HANDLED
-    option.rejected = True
+    option.is_rejected = True
     option.save()
     assert section.status == ApplicationSectionStatusChoice.HANDLED
     assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.HANDLED)).exists()
-    option.rejected = False
+    option.is_rejected = False
     option.save()
 
     # 2/2 allocations have been made -> status is HANDLED
@@ -94,13 +94,13 @@ def test_application_section__status__partially_allocated__option_unusable():
         application__application_round=application_round,
         applied_reservations_per_week=2,
     )
-    option = ReservationUnitOptionFactory.create(application_section=section, locked=True)
+    option = ReservationUnitOptionFactory.create(application_section=section, is_locked=True)
 
     assert section.status == ApplicationSectionStatusChoice.REJECTED
     assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.REJECTED)).exists()
 
-    option.locked = False
-    option.rejected = True
+    option.is_locked = False
+    option.is_rejected = True
     option.save()
 
     assert section.status == ApplicationSectionStatusChoice.REJECTED
@@ -162,15 +162,15 @@ def test_application_section__usable_reservation_unit_options():
     assert ApplicationSection.objects.filter(L(usable_reservation_unit_options=1)).exists()
 
     # Reservation unit locked -> Application section has 0 usable reservation unit options
-    option.locked = True
+    option.is_locked = True
     option.save()
     assert section.usable_reservation_unit_options == 0
     assert ApplicationSection.objects.filter(L(usable_reservation_unit_options=0)).exists()
-    option.locked = False
+    option.is_locked = False
     option.save()
 
     # Reservation unit rejected -> Application section has 0 usable reservation unit options
-    option.rejected = True
+    option.is_rejected = True
     option.save()
     assert section.usable_reservation_unit_options == 0
     assert ApplicationSection.objects.filter(L(usable_reservation_unit_options=0)).exists()

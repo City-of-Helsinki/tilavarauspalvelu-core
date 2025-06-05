@@ -91,11 +91,11 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
 
     @staticmethod
     def validate_reservation_unit_option_available(option: ReservationUnitOption) -> None:
-        if option.rejected:
+        if option.is_rejected:
             msg = "This reservation unit option has been rejected."
             raise ValidationError(msg, code=error_codes.ALLOCATION_OPTION_REJECTED)
 
-        if option.locked:
+        if option.is_locked:
             msg = "This reservation unit option has been locked."
             raise ValidationError(msg, code=error_codes.ALLOCATION_OPTION_LOCKED)
 

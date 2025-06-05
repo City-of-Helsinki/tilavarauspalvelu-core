@@ -157,7 +157,7 @@ def test_allocated_time_slot__create__application_not_in_allocation_anymore__REJ
     application = ApplicationFactory.create_application_ready_for_allocation(application_round)
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
-    option.rejected = True
+    option.is_rejected = True
     option.save()
     graphql.login_with_superuser()
 
@@ -387,7 +387,7 @@ def test_allocated_time_slot__create__reservation_unit_rejected(graphql, force):
     section = application.application_sections.first()
     ReservationUnitOptionFactory.create(application_section=section)
     option = section.reservation_unit_options.first()
-    option.rejected = True
+    option.is_rejected = True
     option.save()
 
     graphql.login_with_superuser()
@@ -414,7 +414,7 @@ def test_allocated_time_slot__create__reservation_unit_locked(graphql, force):
     section = application.application_sections.first()
     ReservationUnitOptionFactory.create(application_section=section)
     option = section.reservation_unit_options.first()
-    option.locked = True
+    option.is_locked = True
     option.save()
 
     graphql.login_with_superuser()
