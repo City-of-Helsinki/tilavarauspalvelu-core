@@ -23,7 +23,7 @@ class ApplicationActions:
         Remove application allocations, and unlock locked reservation unit options.
         Rejected options stay rejected.
         """
-        ReservationUnitOption.objects.filter(application_section__application=self.application).update(locked=False)
+        ReservationUnitOption.objects.filter(application_section__application=self.application).update(is_locked=False)
 
         AllocatedTimeSlot.objects.filter(
             reservation_unit_option__application_section__application=self.application,
