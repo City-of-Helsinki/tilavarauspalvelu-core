@@ -147,7 +147,7 @@ class ReservationSeriesNode(DjangoNode):
             application_round = section.application.application_round
 
             # Don't show Pindora info without permissions if the application round results haven't been sent yet
-            if not has_perms and application_round.sent_date is None:
+            if not has_perms and application_round.sent_at is None:
                 return None
 
         try:

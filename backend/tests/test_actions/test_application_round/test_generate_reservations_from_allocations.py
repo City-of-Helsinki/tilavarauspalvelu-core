@@ -94,7 +94,7 @@ def test_generate_reservation_series_from_allocations():
     assert reservations[0].type == ReservationTypeChoice.SEASONAL.value
     assert reservations[0].state == ReservationStateChoice.CONFIRMED.value
     assert reservations[0].user == section.application.user
-    assert reservations[0].handled_at == application_round.handled_date
+    assert reservations[0].handled_at == application_round.handled_at
     assert reservations[0].num_persons == section.num_persons
     assert reservations[0].buffer_time_before == datetime.timedelta(0)
     assert reservations[0].buffer_time_after == datetime.timedelta(0)

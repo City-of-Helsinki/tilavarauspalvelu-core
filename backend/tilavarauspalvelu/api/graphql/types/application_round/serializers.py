@@ -37,7 +37,7 @@ class SetApplicationRoundHandledSerializer(NestingModelSerializer):
         return attrs
 
     def save(self, **kwargs: Any) -> ApplicationRound:
-        kwargs["handled_date"] = local_datetime()
+        kwargs["handled_at"] = local_datetime()
         instance = super().save(**kwargs)
         generate_reservation_series_from_allocations_task.delay(instance.pk)
         return instance
@@ -60,7 +60,7 @@ class SetApplicationRoundResultsSentSerializer(NestingModelSerializer):
         return attrs
 
     def save(self, **kwargs: Any) -> ApplicationRound:
-        kwargs["sent_date"] = local_datetime()
+        kwargs["sent_at"] = local_datetime()
         instance = super().save(**kwargs)
         send_application_handled_email_task.delay()
         return instance

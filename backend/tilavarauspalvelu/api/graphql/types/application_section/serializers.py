@@ -144,7 +144,7 @@ class ApplicationSectionSerializer(NestingModelSerializer):
 
             reservation_period = (
                 ApplicationRound.objects.filter(pk=application_round)
-                .values("reservation_period_begin", "reservation_period_end")
+                .values("reservation_period_begin_date", "reservation_period_end_date")
                 .first()
             )
 
@@ -153,18 +153,18 @@ class ApplicationSectionSerializer(NestingModelSerializer):
                 Application.objects.select_related("application_round")
                 .filter(pk=application.pk)
                 .annotate(
-                    reservation_period_begin=models.F("application_round__reservation_period_begin"),
-                    reservation_period_end=models.F("application_round__reservation_period_end"),
+                    reservation_period_begin_date=models.F("application_round__reservation_period_begin_date"),
+                    reservation_period_end_date=models.F("application_round__reservation_period_end_date"),
                 )
-                .values("reservation_period_begin", "reservation_period_end")
+                .values("reservation_period_begin_date", "reservation_period_end_date")
                 .first()
             )
 
-        if reservation_period["reservation_period_begin"] > reservations_begin_date:
+        if reservation_period["reservation_period_begin_date"] > reservations_begin_date:
             msg = "Reservations begin date cannot be before the application round's reservation period begin date."
             errors.append(msg)
 
-        if reservation_period["reservation_period_end"] < reservations_end_date:
+        if reservation_period["reservation_period_end_date"] < reservations_end_date:
             msg = "Reservations end date cannot be after the application round's reservation period end date."
             errors.append(msg)
 

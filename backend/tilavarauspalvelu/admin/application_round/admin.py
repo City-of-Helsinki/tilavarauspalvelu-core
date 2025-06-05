@@ -32,14 +32,14 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
     # List
     list_display = [
         "name",
-        "reservation_period_begin",
-        "reservation_period_end",
+        "reservation_period_begin_date",
+        "reservation_period_end_date",
         "_status",
-        "handled_date",
-        "sent_date",
+        "handled_at",
+        "sent_at",
     ]
     list_filter = ["_status"]
-    ordering = ["-reservation_period_begin"]
+    ordering = ["-reservation_period_begin_date"]
 
     # Form
     form = ApplicationRoundAdminForm
@@ -61,14 +61,14 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
             _("Time"),
             {
                 "fields": [
-                    "application_period_begin",
-                    "application_period_end",
-                    "reservation_period_begin",
-                    "reservation_period_end",
-                    "public_display_begin",
-                    "public_display_end",
-                    "handled_date",
-                    "sent_date",
+                    "application_period_begins_at",
+                    "application_period_ends_at",
+                    "reservation_period_begin_date",
+                    "reservation_period_end_date",
+                    "public_display_begins_at",
+                    "public_display_ends_at",
+                    "handled_at",
+                    "sent_at",
                 ],
             },
         ],
