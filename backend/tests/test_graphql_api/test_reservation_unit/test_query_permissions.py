@@ -29,7 +29,7 @@ def test_reservation_unit__query__anonymous_user(graphql):
     reservation_unit = ReservationUnitFactory.create()
     ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit)
 
-    fields = "applicationRoundTimeSlots { weekday closed reservableTimes { begin end } }"
+    fields = "applicationRoundTimeSlots { weekday isClosed reservableTimes { begin end } }"
     query = reservation_units_query(fields=fields)
     response = graphql(query)
 
@@ -42,7 +42,7 @@ def test_reservation_unit__query__regular_user(graphql):
     ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit)
     graphql.login_with_regular_user()
 
-    fields = "applicationRoundTimeSlots { weekday closed reservableTimes { begin end } }"
+    fields = "applicationRoundTimeSlots { weekday isClosed reservableTimes { begin end } }"
     query = reservation_units_query(fields=fields)
     response = graphql(query)
 

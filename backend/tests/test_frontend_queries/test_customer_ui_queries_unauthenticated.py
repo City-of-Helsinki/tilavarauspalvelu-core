@@ -402,7 +402,7 @@ def test_frontend_queries__customer_ui__ReservationUnitPage__unauthenticated(gra
     factory_args["application_rounds__reservation_period_end_date"] = local_date(2024, 3, 1)
     factory_args["application_rounds__public_display_begins_at"] = local_datetime(2024, 1, 1)
     factory_args["application_rounds__public_display_ends_at"] = local_datetime(2024, 2, 2)
-    factory_args["application_round_time_slots__closed"] = False
+    factory_args["application_round_time_slots__is_closed"] = False
     obj: ReservationUnit = query_info.factory.create(**factory_args)
 
     ReservationFactory.create_for_reservation_unit(obj)
@@ -504,7 +504,7 @@ def test_frontend_queries__customer_ui__ApplicationPage1__unauthenticated(graphq
     factory_args_1["application_round__reservation_period_end_date"] = local_date(2024, 3, 1)
     factory_args_1["application_round__public_display_begins_at"] = local_datetime(2024, 1, 1)
     factory_args_1["application_round__public_display_ends_at"] = local_datetime(2024, 2, 2)
-    factory_args_1[f"{arts_key}__closed"] = False
+    factory_args_1[f"{arts_key}__is_closed"] = False
     factory_args_1["application_sections__applied_reservations_per_week"] = 1
     factory_args_1["application_sections__reservation_min_duration"] = datetime.timedelta(minutes=30)
     factory_args_1["application_sections__reservation_max_duration"] = datetime.timedelta(minutes=60)
@@ -539,7 +539,7 @@ def test_frontend_queries__customer_ui__ApplicationPage2__unauthenticated(graphq
     factory_args["application_round__reservation_period_end_date"] = local_date(2024, 3, 1)
     factory_args["application_round__public_display_begins_at"] = local_datetime(2024, 1, 1)
     factory_args["application_round__public_display_ends_at"] = local_datetime(2024, 2, 2)
-    factory_args[f"{arts_key}__closed"] = False
+    factory_args[f"{arts_key}__is_closed"] = False
     factory_args["application_sections__applied_reservations_per_week"] = 1
     factory_args["application_sections__reservation_min_duration"] = datetime.timedelta(minutes=30)
     factory_args["application_sections__reservation_max_duration"] = datetime.timedelta(minutes=60)
@@ -574,7 +574,7 @@ def test_frontend_queries__customer_ui__ApplicationPage3__unauthenticated(graphq
     factory_args["application_round__reservation_period_end_date"] = local_date(2024, 3, 1)
     factory_args["application_round__public_display_begins_at"] = local_datetime(2024, 1, 1)
     factory_args["application_round__public_display_ends_at"] = local_datetime(2024, 2, 2)
-    factory_args[f"{arts_key}__closed"] = False
+    factory_args[f"{arts_key}__is_closed"] = False
     factory_args["application_sections__applied_reservations_per_week"] = 1
     factory_args["application_sections__reservation_min_duration"] = datetime.timedelta(minutes=30)
     factory_args["application_sections__reservation_max_duration"] = datetime.timedelta(minutes=60)
@@ -609,7 +609,7 @@ def test_frontend_queries__customer_ui__ApplicationPage4__unauthenticated(graphq
     factory_args["application_round__reservation_period_end_date"] = local_date(2024, 3, 1)
     factory_args["application_round__public_display_begins_at"] = local_datetime(2024, 1, 1)
     factory_args["application_round__public_display_ends_at"] = local_datetime(2024, 2, 2)
-    factory_args[f"{arts_key}__closed"] = False
+    factory_args[f"{arts_key}__is_closed"] = False
     factory_args["application_sections__applied_reservations_per_week"] = 1
     factory_args["application_sections__reservation_min_duration"] = datetime.timedelta(minutes=30)
     factory_args["application_sections__reservation_max_duration"] = datetime.timedelta(minutes=60)
@@ -755,7 +755,7 @@ def test_frontend_queries__customer_ui__ApplicationView__unauthenticated(graphql
     factory_args["application_round__reservation_period_end_date"] = local_date(2024, 3, 1)
     factory_args["application_round__public_display_begins_at"] = local_datetime(2024, 1, 1)
     factory_args["application_round__public_display_ends_at"] = local_datetime(2024, 2, 2)
-    factory_args[f"{arts_key}__closed"] = False
+    factory_args[f"{arts_key}__is_closed"] = False
     factory_args["application_sections__applied_reservations_per_week"] = 1
     factory_args["application_sections__reservation_min_duration"] = datetime.timedelta(minutes=30)
     factory_args["application_sections__reservation_max_duration"] = datetime.timedelta(minutes=60)

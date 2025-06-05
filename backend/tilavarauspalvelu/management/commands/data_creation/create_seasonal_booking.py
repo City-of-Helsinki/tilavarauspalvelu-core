@@ -667,7 +667,7 @@ def _create_application_round_time_slots(reservation_units: list[ReservationUnit
                 ApplicationRoundTimeSlotFactory.build(
                     reservation_unit=reservation_unit,
                     weekday=weekday,
-                    closed=closed,
+                    is_closed=closed,
                     reservable_times=reservable_times,
                 )
             )
