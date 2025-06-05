@@ -47,7 +47,7 @@ class ReservationSeriesAdmin(admin.ModelAdmin):
                     "ext_uuid",
                     "name",
                     "description",
-                    "created",
+                    "created_at",
                     "reservation_unit",
                     "user",
                     "age_group",
@@ -82,7 +82,7 @@ class ReservationSeriesAdmin(admin.ModelAdmin):
     ]
     readonly_fields = [
         "ext_uuid",
-        "created",
+        "created_at",
         "should_have_active_access_code",
         "access_type",
         "used_access_types",
