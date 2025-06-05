@@ -81,21 +81,21 @@ class FirstReservableTimeHelper:
 
     Variables which affect the first reservable time span and also can cause
     the ReservationUnit to be "closed" if no valid reservable times are found because of them:
-    ┌──────────────────┬──────────────────────────────┐
-    │ Source           │ Value                        │
-    ├──────────────────┼──────────────────────────────┤
-    │ Filters          │ filter_date_start            │
-    │                  │ filter_date_end              │
-    │                  │ filter_time_start            │
-    │                  │ filter_time_end              │
-    ├──────────────────┼──────────────────────────────┤
-    │ ReservationUnit  │ reservation_begins           │
-    │                  │ reservation_ends             │
-    │                  │ publish_ends                 │
-    ├──────────────────┼──────────────────────────────┤
-    │ ApplicationRound │ reservation_period_begin     │
-    │                  │ reservation_period_end       │
-    └──────────────────┴──────────────────────────────┘
+    ┌──────────────────┬───────────────────────────────────┐
+    │ Source           │ Value                             │
+    ├──────────────────┼───────────────────────────────────┤
+    │ Filters          │ filter_date_start                 │
+    │                  │ filter_date_end                   │
+    │                  │ filter_time_start                 │
+    │                  │ filter_time_end                   │
+    ├──────────────────┼───────────────────────────────────┤
+    │ ReservationUnit  │ reservation_begins                │
+    │                  │ reservation_ends                  │
+    │                  │ publish_ends                      │
+    ├──────────────────┼───────────────────────────────────┤
+    │ ApplicationRound │ reservation_period_begin_date     │
+    │                  │ reservation_period_end_date       │
+    └──────────────────┴───────────────────────────────────┘
 
     Variables which only affect the first reservable time span, but allow
     the ReservationUnit to be "open" if there would otherwise be valid time spans on the filtered date range:
@@ -442,8 +442,8 @@ class FirstReservableTimeHelper:
                 models.Prefetch(
                     "application_rounds",
                     ApplicationRound.objects.filter(
-                        reservation_period_begin__lte=self.filter_date_end,
-                        reservation_period_end__gte=self.filter_date_start,
+                        reservation_period_begin_date__lte=self.filter_date_end,
+                        reservation_period_end_date__gte=self.filter_date_start,
                     ).exclude(L(status=ApplicationRoundStatusChoice.RESULTS_SENT.value)),
                 ),
                 models.Prefetch(

@@ -40,10 +40,10 @@ def reservation_unit() -> ReservationUnit:
 
     ApplicationRoundFactory.create(
         reservation_units=[reservation_unit],
-        reservation_period_begin=_get_date(month=8, day=1),
-        reservation_period_end=_get_date(month=12, day=31),
-        application_period_begin=_get_dt(month=4, day=1, hour=9),
-        application_period_end=_get_dt(month=4, day=30, hour=16),
+        reservation_period_begin_date=_get_date(month=8, day=1),
+        reservation_period_end_date=_get_date(month=12, day=31),
+        application_period_begins_at=_get_dt(month=4, day=1, hour=9),
+        application_period_ends_at=_get_dt(month=4, day=30, hour=16),
     )
     ReservationFactory.create(
         begin=_get_dt(month=4, day=15, hour=12),

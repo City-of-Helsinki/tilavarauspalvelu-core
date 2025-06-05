@@ -154,8 +154,8 @@ class ReservationUnitFirstReservableTimeHelper:
         - reservation_unit.reservation_begins
         - reservation_unit.reservation_ends
         - reservation_unit.publish_ends
-        - reservation_unit.application_rounds.reservation_period_begin
-        - reservation_unit.application_rounds.reservation_period_end
+        - reservation_unit.application_rounds.reservation_period_begin_date
+        - reservation_unit.application_rounds.reservation_period_end_date
         """
         reservation_unit_closed_time_spans: list[TimeSpanElement] = []
 
@@ -189,8 +189,10 @@ class ReservationUnitFirstReservableTimeHelper:
         # so we don't need to filter those away here.
         reservation_unit_closed_time_spans.extend(
             TimeSpanElement(
-                start_datetime=local_start_of_day(application_round.reservation_period_begin),
-                end_datetime=local_start_of_day(application_round.reservation_period_end) + datetime.timedelta(days=1),
+                start_datetime=local_start_of_day(application_round.reservation_period_begin_date),
+                end_datetime=(
+                    local_start_of_day(application_round.reservation_period_end_date) + datetime.timedelta(days=1)
+                ),
                 is_reservable=False,
             )
             for application_round in self.reservation_unit.application_rounds.all()

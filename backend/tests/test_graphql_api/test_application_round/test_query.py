@@ -39,14 +39,14 @@ def test_application_round_query__all_fields(graphql):
         notesWhenApplyingFi
         notesWhenApplyingEn
         notesWhenApplyingSv
-        applicationPeriodBegin
-        applicationPeriodEnd
-        reservationPeriodBegin
-        reservationPeriodEnd
-        publicDisplayBegin
-        publicDisplayEnd
-        handledDate
-        sentDate
+        applicationPeriodBeginsAt
+        applicationPeriodEndsAt
+        reservationPeriodBeginDate
+        reservationPeriodEndDate
+        publicDisplayBeginsAt
+        publicDisplayEndsAt
+        handledAt
+        sentAt
         reservationUnits {
             nameFi
         }
@@ -80,14 +80,16 @@ def test_application_round_query__all_fields(graphql):
         "notesWhenApplyingFi": application_round.notes_when_applying_fi,
         "notesWhenApplyingEn": application_round.notes_when_applying_en,
         "notesWhenApplyingSv": application_round.notes_when_applying_sv,
-        "applicationPeriodBegin": application_round.application_period_begin.astimezone(datetime.UTC).isoformat(),
-        "applicationPeriodEnd": application_round.application_period_end.astimezone(datetime.UTC).isoformat(),
-        "reservationPeriodBegin": application_round.reservation_period_begin.isoformat(),
-        "reservationPeriodEnd": application_round.reservation_period_end.isoformat(),
-        "publicDisplayBegin": application_round.public_display_begin.astimezone(datetime.UTC).isoformat(),
-        "publicDisplayEnd": application_round.public_display_end.astimezone(datetime.UTC).isoformat(),
-        "handledDate": None,
-        "sentDate": None,
+        "applicationPeriodBeginsAt": (
+            application_round.application_period_begins_at.astimezone(datetime.UTC).isoformat()
+        ),
+        "applicationPeriodEndsAt": application_round.application_period_ends_at.astimezone(datetime.UTC).isoformat(),
+        "reservationPeriodBeginDate": application_round.reservation_period_begin_date.isoformat(),
+        "reservationPeriodEndDate": application_round.reservation_period_end_date.isoformat(),
+        "publicDisplayBeginsAt": application_round.public_display_begins_at.astimezone(datetime.UTC).isoformat(),
+        "publicDisplayEndsAt": application_round.public_display_ends_at.astimezone(datetime.UTC).isoformat(),
+        "handledAt": None,
+        "sentAt": None,
         "reservationUnits": [],
         "purposes": [],
         "termsOfUse": {"nameFi": application_round.terms_of_use.name_fi},
@@ -204,7 +206,7 @@ def test_application_round_query__is_setting_handled_allowed__application_status
 
 
 def test_application_round_query__reservation_creation_status__NOT_COMPLETED__not_set_as_handled(graphql):
-    application_round = ApplicationRoundFactory.create_in_status_handled(handled_date=None)
+    application_round = ApplicationRoundFactory.create_in_status_handled(handled_at=None)
     ApplicationFactory.create_in_status_handled(application_round=application_round)
 
     graphql.login_with_superuser()
@@ -217,7 +219,7 @@ def test_application_round_query__reservation_creation_status__NOT_COMPLETED__no
 
 def test_application_round_query__reservation_creation_status__NOT_COMPLETED__before_timeout(graphql):
     application_round = ApplicationRoundFactory.create_in_status_handled(
-        handled_date=local_datetime() - datetime.timedelta(minutes=9)
+        handled_at=local_datetime() - datetime.timedelta(minutes=9)
     )
     ApplicationFactory.create_in_status_handled(application_round=application_round)
 
@@ -231,7 +233,7 @@ def test_application_round_query__reservation_creation_status__NOT_COMPLETED__be
 
 def test_application_round_query__reservation_creation_status__FAILED__after_timeout(graphql):
     application_round = ApplicationRoundFactory.create_in_status_handled(
-        handled_date=local_datetime() - datetime.timedelta(minutes=11)
+        handled_at=local_datetime() - datetime.timedelta(minutes=11)
     )
     ApplicationFactory.create_in_status_handled(application_round=application_round)
 
@@ -245,7 +247,7 @@ def test_application_round_query__reservation_creation_status__FAILED__after_tim
 
 def test_application_round_query__reservation_creation_status__COMPLETED__before_timeout(graphql):
     application_round = ApplicationRoundFactory.create_in_status_handled(
-        handled_date=local_datetime() - datetime.timedelta(minutes=9)
+        handled_at=local_datetime() - datetime.timedelta(minutes=9)
     )
     application = ApplicationFactory.create_in_status_handled(application_round=application_round)
     ReservationFactory(
@@ -262,7 +264,7 @@ def test_application_round_query__reservation_creation_status__COMPLETED__before
 
 def test_application_round_query__reservation_creation_status__COMPLETED__after_timeout(graphql):
     application_round = ApplicationRoundFactory.create_in_status_handled(
-        handled_date=local_datetime() - datetime.timedelta(minutes=11)
+        handled_at=local_datetime() - datetime.timedelta(minutes=11)
     )
     application = ApplicationFactory.create_in_status_handled(application_round=application_round)
     ReservationFactory(

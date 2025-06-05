@@ -205,11 +205,11 @@ def test_reservation__create__reservation_unit_in_open_application_round(graphql
 
     application_round = ApplicationRoundFactory.create_in_status_open(
         reservation_units=[reservation_unit],
-        application_period_begin=start_of_today - datetime.timedelta(days=1),
-        application_period_end=start_of_today + datetime.timedelta(days=1),
+        application_period_begins_at=start_of_today - datetime.timedelta(days=1),
+        application_period_ends_at=start_of_today + datetime.timedelta(days=1),
     )
 
-    begin = combine(application_round.reservation_period_begin, datetime.time(hour=12), tzinfo=DEFAULT_TIMEZONE)
+    begin = combine(application_round.reservation_period_begin_date, datetime.time(hour=12), tzinfo=DEFAULT_TIMEZONE)
     end = begin + datetime.timedelta(days=1)
 
     graphql.login_with_superuser()

@@ -379,8 +379,8 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         return (
             ApplicationRound.objects.filter(
                 reservation_units=self.reservation_unit,
-                reservation_period_end__gte=start_date,
-                reservation_period_begin__lte=end_date,
+                reservation_period_end_date__gte=start_date,
+                reservation_period_begin_date__lte=end_date,
             )
             .exclude(
                 L(status=ApplicationRoundStatusChoice.RESULTS_SENT),
