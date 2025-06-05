@@ -17,8 +17,8 @@ class ReservationUnitOptionFactory(GenericDjangoModelFactory[ReservationUnitOpti
         model = ReservationUnitOption
 
     preferred_order = factory.Sequence(lambda n: n)
-    rejected = False
-    locked = False
+    is_rejected = False
+    is_locked = False
 
     application_section = ForeignKeyFactory("tests.factories.ApplicationSectionFactory")
     reservation_unit = ForeignKeyFactory("tests.factories.ReservationUnitFactory")

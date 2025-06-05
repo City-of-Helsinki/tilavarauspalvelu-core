@@ -27,13 +27,13 @@ def test_reset_application_round_allocation__in_allocation():
         reservation_unit_option__application_section__application__application_round=application_round,
     )
     AllocatedTimeSlotFactory.create(
-        reservation_unit_option__locked=True,
+        reservation_unit_option__is_locked=True,
         reservation_unit_option__application_section__application__application_round=application_round,
     )
 
     assert AllocatedTimeSlot.objects.count() == 2
     assert ReservationUnitOption.objects.count() == 2
-    assert ReservationUnitOption.objects.filter(locked=True).count() == 1
+    assert ReservationUnitOption.objects.filter(is_locked=True).count() == 1
 
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
 
@@ -43,7 +43,7 @@ def test_reset_application_round_allocation__in_allocation():
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
     assert AllocatedTimeSlot.objects.count() == 0
     assert ReservationUnitOption.objects.count() == 2
-    assert ReservationUnitOption.objects.filter(locked=True).count() == 0
+    assert ReservationUnitOption.objects.filter(is_locked=True).count() == 0
 
 
 def test_reset_application_round_allocation__handled():
@@ -53,7 +53,7 @@ def test_reset_application_round_allocation__handled():
         reservation_unit_option__application_section__application__application_round=application_round,
     )
     allocation_2 = AllocatedTimeSlotFactory.create(
-        reservation_unit_option__locked=True,
+        reservation_unit_option__is_locked=True,
         reservation_unit_option__application_section__application__application_round=application_round,
     )
     ReservationFactory.create(
@@ -69,7 +69,7 @@ def test_reset_application_round_allocation__handled():
     assert ReservationUnitOption.objects.count() == 2
     assert ReservationSeries.objects.count() == 2
     assert Reservation.objects.count() == 2
-    assert ReservationUnitOption.objects.filter(locked=True).count() == 1
+    assert ReservationUnitOption.objects.filter(is_locked=True).count() == 1
     assert application_round.handled_at is not None
 
     assert application_round.status == ApplicationRoundStatusChoice.HANDLED
@@ -82,7 +82,7 @@ def test_reset_application_round_allocation__handled():
     assert ReservationUnitOption.objects.count() == 2
     assert ReservationSeries.objects.count() == 0
     assert Reservation.objects.count() == 0
-    assert ReservationUnitOption.objects.filter(locked=True).count() == 1
+    assert ReservationUnitOption.objects.filter(is_locked=True).count() == 1
     assert application_round.handled_at is None
 
 
@@ -94,7 +94,7 @@ def test_reset_application_round_allocation__handled__call_pindora_if_has_access
         reservation_unit_option__application_section__application__application_round=application_round,
     )
     allocation_2 = AllocatedTimeSlotFactory.create(
-        reservation_unit_option__locked=True,
+        reservation_unit_option__is_locked=True,
         reservation_unit_option__application_section__application__application_round=application_round,
     )
     ReservationFactory.create(

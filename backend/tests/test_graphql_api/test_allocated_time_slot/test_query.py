@@ -30,8 +30,8 @@ def test_allocated_time_slot__query__all_fields(graphql):
         reservationUnitOption {
             pk
             preferredOrder
-            locked
-            rejected
+            isLocked
+            isRejected
             reservationUnit {
                 pk
                 nameFi
@@ -62,8 +62,8 @@ def test_allocated_time_slot__query__all_fields(graphql):
         "reservationUnitOption": {
             "pk": allocation.reservation_unit_option.pk,
             "preferredOrder": allocation.reservation_unit_option.preferred_order,
-            "locked": allocation.reservation_unit_option.locked,
-            "rejected": allocation.reservation_unit_option.rejected,
+            "isLocked": allocation.reservation_unit_option.is_locked,
+            "isRejected": allocation.reservation_unit_option.is_rejected,
             "reservationUnit": {
                 "pk": allocation.reservation_unit_option.reservation_unit.pk,
                 "nameFi": allocation.reservation_unit_option.reservation_unit.name,

@@ -22,8 +22,8 @@ __all__ = [
 
 class ReservationUnitOption(models.Model):
     preferred_order: int = models.PositiveIntegerField()
-    rejected: bool = models.BooleanField(default=False, blank=True)
-    locked: bool = models.BooleanField(default=False, blank=True)
+    is_rejected: bool = models.BooleanField(default=False, blank=True)
+    is_locked: bool = models.BooleanField(default=False, blank=True)
 
     application_section: ApplicationSection = models.ForeignKey(
         "tilavarauspalvelu.ApplicationSection",

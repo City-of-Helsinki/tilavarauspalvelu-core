@@ -716,7 +716,7 @@ def test_frontend_queries__customer_ui__RejectRest(graphql):
     variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": option.pk,
-        "locked": True,
+        "isLocked": True,
     }
     assert_no_undefined_variables(variables)
 
@@ -843,7 +843,7 @@ def test_frontend_queries__customer_ui__RestoreAllApplicationOptions(graphql):
     query_info = factories[0]
 
     factory_args: dict[str, Any] = {}
-    factory_args["application_sections__reservation_unit_options__rejected"] = True
+    factory_args["application_sections__reservation_unit_options__is_rejected"] = True
 
     application = ApplicationFactory.create_in_status_in_allocation(**factory_args)
 
@@ -869,7 +869,7 @@ def test_frontend_queries__customer_ui__RestoreAllSectionOptions(graphql):
     query_info = factories[0]
 
     factory_args: dict[str, Any] = {}
-    factory_args["reservation_unit_options__rejected"] = True
+    factory_args["reservation_unit_options__is_rejected"] = True
 
     section = ApplicationSectionFactory.create_in_status_in_allocation(**factory_args)
 

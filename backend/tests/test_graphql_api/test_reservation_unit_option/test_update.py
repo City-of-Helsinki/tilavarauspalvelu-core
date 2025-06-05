@@ -14,7 +14,7 @@ pytestmark = [
 ]
 
 
-def test_reservation_unit_option__update__locked(graphql):
+def test_reservation_unit_option__update__is_locked(graphql):
     # given:
     # - There is a usable reservation unit option
     # - A superuser is using the system
@@ -25,7 +25,7 @@ def test_reservation_unit_option__update__locked(graphql):
     # - User tries to update the reservation unit option
     input_data = {
         "pk": option.pk,
-        "locked": True,
+        "isLocked": True,
     }
     response = graphql(UPDATE_MUTATION, input_data=input_data)
 
@@ -35,10 +35,10 @@ def test_reservation_unit_option__update__locked(graphql):
     assert response.has_errors is False, response
 
     option.refresh_from_db()
-    assert option.locked is True
+    assert option.is_locked is True
 
 
-def test_reservation_unit_option__update__rejected(graphql):
+def test_reservation_unit_option__update__is_rejected(graphql):
     # given:
     # - There is a usable reservation unit option
     # - A superuser is using the system
@@ -49,7 +49,7 @@ def test_reservation_unit_option__update__rejected(graphql):
     # - User tries to update the reservation unit option
     input_data = {
         "pk": option.pk,
-        "rejected": True,
+        "isRejected": True,
     }
     response = graphql(UPDATE_MUTATION, input_data=input_data)
 
@@ -59,10 +59,10 @@ def test_reservation_unit_option__update__rejected(graphql):
     assert response.has_errors is False, response
 
     option.refresh_from_db()
-    assert option.rejected is True
+    assert option.is_rejected is True
 
 
-def test_reservation_unit_option__update__rejected__has_allocations(graphql):
+def test_reservation_unit_option__update__is_rejected__has_allocations(graphql):
     # given:
     # - There is a usable reservation unit option with allocations
     # - A superuser is using the system
@@ -73,11 +73,11 @@ def test_reservation_unit_option__update__rejected__has_allocations(graphql):
     # - User tries to update the reservation unit option
     input_data = {
         "pk": option.pk,
-        "rejected": True,
+        "isRejected": True,
     }
     response = graphql(UPDATE_MUTATION, input_data=input_data)
 
     # then:
     # - The response contains no errors
     # - The reservation unit is now rejected
-    assert response.field_error_messages("rejected") == ["Cannot reject a reservation unit option with allocations"]
+    assert response.field_error_messages("isRejected") == ["Cannot reject a reservation unit option with allocations"]
