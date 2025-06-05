@@ -192,6 +192,7 @@ export function DateRangePicker({
         invalid={startDateError != null}
         required={required?.begin}
         placeholder={placeholder?.begin ?? t("dateSelector:placeholderBegin")}
+        data-testid="search-form__filter--fields--startDate"
       />
       <DateInput
         autoComplete="off"
@@ -214,6 +215,7 @@ export function DateRangePicker({
         invalid={endDateError != null}
         required={required?.end}
         placeholder={placeholder?.end ?? t("dateSelector:placeholderEnd")}
+        data-testid="search-form__filter--fields--endDate"
       />
     </>
   );
