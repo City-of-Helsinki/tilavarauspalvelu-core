@@ -58,7 +58,7 @@ def test_reservation_series__query(graphql):
         endTime
         recurrenceInDays
         weekdays
-        created
+        createdAt
         shouldHaveActiveAccessCode
         accessType
     """
@@ -79,7 +79,7 @@ def test_reservation_series__query(graphql):
         "endTime": reservation_series.end_time.isoformat(),
         "recurrenceInDays": reservation_series.recurrence_in_days,
         "weekdays": [0],
-        "created": reservation_series.created.isoformat(),
+        "createdAt": reservation_series.created_at.isoformat(),
         "shouldHaveActiveAccessCode": False,
         "accessType": AccessType.UNRESTRICTED.value,
     }
