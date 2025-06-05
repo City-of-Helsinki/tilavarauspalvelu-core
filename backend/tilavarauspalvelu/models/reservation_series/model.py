@@ -36,7 +36,7 @@ class ReservationSeries(models.Model):
     ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
     name: str = models.CharField(max_length=255, blank=True, default="")
     description: str = models.CharField(max_length=500, blank=True, default="")
-    created: datetime.datetime = models.DateTimeField(auto_now_add=True)
+    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
 
     begin_date: datetime.date | None = models.DateField(null=True)
     begin_time: datetime.time | None = models.TimeField(null=True)

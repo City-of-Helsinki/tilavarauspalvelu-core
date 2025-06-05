@@ -49,7 +49,7 @@ class ReservationSeriesFilterSet(ModelFilterSet):
         order_by = [
             "pk",
             "name",
-            "created",
+            "created_at",
             "begin_date",
             "begin_time",
             "end_date",
