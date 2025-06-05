@@ -85,7 +85,7 @@ def test_reservation_series__order__by_crated(graphql):
 
     graphql.login_with_superuser()
 
-    query = reservation_series_many_query(order_by="createdAsc")
+    query = reservation_series_many_query(order_by="createdAtAsc")
     response = graphql(query)
 
     assert response.has_errors is False
