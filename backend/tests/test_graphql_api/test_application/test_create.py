@@ -201,12 +201,12 @@ def test_application__create__is_ad_user__not_internal_user__is_superuser(graphq
     assert response.has_errors is False, response
 
 
-def test_application__create__sent_date(graphql):
+def test_application__create__sent_at(graphql):
     application_round = ApplicationRoundFactory.create_in_status_open()
     graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 
     input_data = get_application_create_data(application_round)
-    input_data["sentDate"] = local_date().isoformat()
+    input_data["sentAt"] = local_date().isoformat()
 
     response = graphql(CREATE_MUTATION, input_data=input_data)
 
