@@ -30,8 +30,8 @@ def test_deactivate_old_permissions__deactivates(settings):
     unit_role_1 = UnitRoleFactory.create(user=user, role=UserRoleChoice.ADMIN)
     unit_role_2 = UnitRoleFactory.create(user=user, role=UserRoleChoice.HANDLER)
 
-    assert general_role_1.role_active is True
-    assert general_role_2.role_active is True
+    assert general_role_1.is_role_active is True
+    assert general_role_2.is_role_active is True
     assert unit_role_1.role_active is True
     assert unit_role_2.role_active is True
     assert user.is_staff is True
@@ -45,8 +45,8 @@ def test_deactivate_old_permissions__deactivates(settings):
     unit_role_2.refresh_from_db()
     user.refresh_from_db()
 
-    assert general_role_1.role_active is False
-    assert general_role_2.role_active is False
+    assert general_role_1.is_role_active is False
+    assert general_role_2.is_role_active is False
     assert unit_role_1.role_active is False
     assert unit_role_2.role_active is False
     assert user.is_staff is False
@@ -67,8 +67,8 @@ def test_deactivate_old_permissions__doesnt_deactivate(settings):
     unit_role_1 = UnitRoleFactory.create(user=user, role=UserRoleChoice.ADMIN)
     unit_role_2 = UnitRoleFactory.create(user=user, role=UserRoleChoice.HANDLER)
 
-    assert general_role_1.role_active is True
-    assert general_role_2.role_active is True
+    assert general_role_1.is_role_active is True
+    assert general_role_2.is_role_active is True
     assert unit_role_1.role_active is True
     assert unit_role_2.role_active is True
     assert user.is_staff is True
@@ -82,8 +82,8 @@ def test_deactivate_old_permissions__doesnt_deactivate(settings):
     unit_role_2.refresh_from_db()
     user.refresh_from_db()
 
-    assert general_role_1.role_active is True
-    assert general_role_2.role_active is True
+    assert general_role_1.is_role_active is True
+    assert general_role_2.is_role_active is True
     assert unit_role_1.role_active is True
     assert unit_role_2.role_active is True
     assert user.is_staff is True

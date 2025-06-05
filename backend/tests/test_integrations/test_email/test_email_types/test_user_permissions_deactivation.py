@@ -241,7 +241,7 @@ def test_user_permissions_deactivation__send_email__general_admin__role_inactive
         email="user@email.com",
         preferred_language=Language.EN.value,
         last_login=local_datetime() - datetime.timedelta(days=20),
-        general_roles__role_active=False,
+        general_roles__is_role_active=False,
     )
 
     EmailService.send_user_permissions_deactivation_emails()
