@@ -8,7 +8,7 @@ import { base64encode, filterNonNullable } from "common/src/helpers";
 import { addDays } from "date-fns";
 import { type DocumentNode } from "graphql";
 import { type ReservableMap, type RoundPeriod } from "@/modules/reservable";
-import { type OptionsT } from "@/modules/search";
+import { translateOption, type OptionsT } from "@/modules/search";
 
 export type CreateGraphQLMockProps = {
   noUser?: boolean;
@@ -34,28 +34,20 @@ export function createOptionMock(
   } = {}
 ): OptionsT {
   const opts = createOptionQueryMock(props);
-  // TODO this conversion should be a utility function
+  const lang = "fi" as const;
   return {
-    units: filterNonNullable(opts.unitsAll).map((op) => ({
-      value: op.pk ?? 0,
-      label: op.nameFi ?? "",
-    })),
-    equipments: filterNonNullable(opts.equipmentsAll).map((op) => ({
-      value: op.pk ?? 0,
-      label: op.nameFi ?? "",
-    })),
+    units: filterNonNullable(opts.unitsAll).map((n) =>
+      translateOption(n, lang)
+    ),
+    equipments: filterNonNullable(opts.equipmentsAll).map((n) =>
+      translateOption(n, lang)
+    ),
     purposes: filterNonNullable(
       opts.purposes?.edges.map((edge) => edge?.node)
-    ).map((op) => ({
-      value: op.pk ?? 0,
-      label: op.nameFi ?? "",
-    })),
+    ).map((n) => translateOption(n, lang)),
     reservationUnitTypes: filterNonNullable(
       opts.reservationUnitTypes?.edges.map((edge) => edge?.node)
-    ).map((op) => ({
-      value: op.pk ?? 0,
-      label: op.nameFi ?? "",
-    })),
+    ).map((n) => translateOption(n, lang)),
     ageGroups: filterNonNullable(
       opts.ageGroups?.edges.map((edge) => edge?.node)
     ).map((op) => ({
@@ -63,10 +55,7 @@ export function createOptionMock(
       label: `${op.minimum ?? ""}-${op.maximum ?? ""}`,
     })),
     cities: filterNonNullable(opts.cities?.edges.map((edge) => edge?.node)).map(
-      (op) => ({
-        value: op.pk ?? 0,
-        label: op.nameFi ?? "",
-      })
+      (n) => translateOption(n, lang)
     ),
   };
 }
