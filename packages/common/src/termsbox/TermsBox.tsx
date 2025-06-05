@@ -1,4 +1,4 @@
-import React from "react";
+import React, { type HTMLAttributes } from "react";
 import { Checkbox, IconLinkExternal } from "hds-react";
 import styled from "styled-components";
 import Link from "next/link";
@@ -70,27 +70,27 @@ const StyledCheckbox = styled(Checkbox)`
   }
 `;
 
-export type TermBoxProps = {
+export interface TermBoxProps extends HTMLAttributes<HTMLDivElement> {
   id?: string;
   heading?: string;
-  body?: string | JSX.Element;
+  body: string | JSX.Element;
   links?: LinkT[];
   acceptLabel?: string;
   accepted?: boolean;
   setAccepted?: (accepted: boolean) => void;
-} & React.HTMLAttributes<HTMLDivElement>;
+}
 
 function TermsBox({
   id,
   heading,
   body,
-  links,
+  links = [],
   acceptLabel,
   accepted,
   setAccepted,
   ...rest
 }: TermBoxProps): JSX.Element {
-  const canAccept = Boolean(acceptLabel) && Boolean(setAccepted);
+  const canAccept = Boolean(acceptLabel) && setAccepted != null;
 
   return (
     <Wrapper {...rest} id={id}>
@@ -101,7 +101,7 @@ function TermsBox({
           </H6>
         )}
         {typeof body === "string" ? <p>{body}</p> : body}
-        {links && links?.length > 0 && (
+        {links.length > 0 && (
           <LinkList>
             {links.map((link) => (
               <li key={link.href}>
@@ -111,7 +111,7 @@ function TermsBox({
                   rel="noopener noreferrer"
                 >
                   {link.text}
-                  <IconLinkExternal aria-hidden />
+                  <IconLinkExternal />
                 </Anchor>
               </li>
             ))}
@@ -126,7 +126,7 @@ function TermsBox({
             data-testid="terms-box__checkbox--accept-terms"
             label={acceptLabel}
             checked={accepted}
-            onChange={() => setAccepted && setAccepted(!accepted)}
+            onChange={() => setAccepted(!accepted)}
           />
         </Actions>
       )}

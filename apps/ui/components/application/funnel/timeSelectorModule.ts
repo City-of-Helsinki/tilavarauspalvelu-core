@@ -1,0 +1,184 @@
+import { type SuitableTimeRangeFormValues } from "./form";
+import {
+  type ApplicationRoundTimeSlotNode,
+  Priority,
+  SuitableTimeFragment,
+} from "@/gql/gql-types";
+import {
+  type Cell,
+  type CellState,
+} from "common/src/components/ApplicationTimeSelector";
+import { convertWeekday, Day, transformWeekday } from "common/src/conversion";
+import {
+  filterNonNullable,
+  formatTimeStruct,
+  timeToMinutes,
+} from "common/src/helpers";
+
+export type DailyOpeningHours = Readonly<
+  Pick<ApplicationRoundTimeSlotNode, "weekday" | "closed" | "reservableTimes">[]
+>;
+
+type SchedulesT = Omit<SuitableTimeFragment, "pk" | "id">;
+
+type DayCells = Readonly<Cell[]>;
+type WeekCells = Readonly<DayCells[]>;
+
+export function aesToCells(
+  schedule: Readonly<SchedulesT[]>,
+  openingHours: DailyOpeningHours
+): WeekCells {
+  const firstSlotStart = 7;
+  const lastSlotStart = 23;
+
+  const cells: Cell[][] = [];
+
+  const days = [0, 1, 2, 3, 4, 5, 6] as const;
+  for (const day of days) {
+    const cell: Cell[] = [];
+    const dayOpeningHours = getOpeningHours(day, openingHours).map((t) => {
+      const beginMins = timeToMinutes(t.begin);
+      const endMins = timeToMinutes(t.end);
+      return {
+        begin: Math.round(beginMins / 60),
+        end: endMins === 0 ? 24 : Math.round(endMins / 60),
+      };
+    });
+    // state is 50 if the cell is outside the opening hours, 100 if it's inside
+    for (let i = firstSlotStart; i <= lastSlotStart; i += 1) {
+      const isAvailable = dayOpeningHours.some(
+        (t) => t.begin != null && t.end != null && t?.begin <= i && t?.end > i
+      );
+      cell.push({
+        day,
+        hour: i,
+        state: "none",
+        openState: isAvailable ? "open" : "unavailable",
+      });
+    }
+    cells.push(cell);
+  }
+
+  for (const aes of schedule) {
+    const { dayOfTheWeek, priority } = aes;
+    const hourBegin = timeToMinutes(aes.beginTime) / 60 - firstSlotStart;
+    const hourEnd = (timeToMinutes(aes.endTime) / 60 || 24) - firstSlotStart;
+    const p = priority === Priority.Primary ? "primary" : "secondary";
+    const day = convertWeekday(dayOfTheWeek);
+    for (let h = hourBegin; h < hourEnd; h += 1) {
+      const cell = cells[day]?.[h];
+      if (cell) {
+        cell.state = p;
+      }
+    }
+  }
+
+  return cells;
+}
+
+type OpeningHourPeriod = {
+  begin: string;
+  end: string;
+};
+
+function getOpeningHours(
+  day: number,
+  openingHours?: DailyOpeningHours
+): Readonly<OpeningHourPeriod[]> {
+  if (!openingHours) {
+    return [];
+  }
+  const dayOpeningHours = openingHours.find((oh) => oh.weekday === day);
+  if (!dayOpeningHours) {
+    return [];
+  }
+  if (dayOpeningHours.closed) {
+    return [];
+  }
+  return filterNonNullable(dayOpeningHours.reservableTimes);
+}
+
+export function covertCellsToTimeRange(
+  cells: WeekCells
+): SuitableTimeRangeFormValues[] {
+  return cellsToSections(cells).map((aes) => {
+    const { day, begin, end, priority } = aes;
+    return {
+      beginTime: formatTimeStruct({ hour: begin, minute: 0 }),
+      endTime: formatTimeStruct({ hour: end, minute: 0 }),
+      priority: transformCellType(priority),
+      dayOfTheWeek: transformWeekday(day),
+    };
+  });
+}
+
+function transformCellType(cellType: CellState): Priority {
+  switch (cellType) {
+    case "primary":
+      return Priority.Primary;
+    case "secondary":
+      return Priority.Secondary;
+    default:
+      throw new Error(`Unknown cell type: ${cellType}`);
+  }
+}
+
+export type TimeSpan = {
+  begin: number;
+  end: number;
+  priority: CellState;
+};
+interface AesType extends TimeSpan {
+  day: Day;
+}
+
+function combineTimespans(prev: TimeSpan[], current: TimeSpan): TimeSpan[] {
+  if (!prev.length) {
+    return [current];
+  }
+  const prevCell = prev[prev.length - 1];
+  if (prevCell == null) {
+    throw new Error("prevCell is null");
+  }
+  if (
+    prevCell.end === current.begin &&
+    prevCell.priority === current.priority
+  ) {
+    return [
+      ...prev.slice(0, prev.length - 1),
+      {
+        begin: prevCell.begin,
+        end: prevCell.end + 1,
+        priority: prevCell.priority,
+      },
+    ];
+  }
+  return [...prev, current];
+}
+
+function cellsToSections(cells: WeekCells): AesType[] {
+  const daySchedules: AesType[] = [];
+  if (cells.length > 7) {
+    throw new Error("Too many days");
+  }
+  const range = [0, 1, 2, 3, 4, 5, 6] as const;
+  for (const day of range) {
+    const dayCells = cells[day] ?? [];
+    const transformedDayCells = dayCells
+      .filter((cell) => cell.state !== "none")
+      .map((cell) => ({
+        begin: cell.hour,
+        end: cell.hour + 1,
+        priority: cell.state,
+      }))
+      .reduce<TimeSpan[]>(combineTimespans, [])
+      .map(({ end, ...span }) => ({
+        ...span,
+        end: end % 24,
+        day,
+      }));
+
+    daySchedules.push(...transformedDayCells);
+  }
+  return daySchedules;
+}

@@ -67,7 +67,7 @@ describe.for([
   [ApplicationRoundStatusChoice.Upcoming],
   [ApplicationRoundStatusChoice.ResultsSent],
   [ApplicationRoundStatusChoice.InAllocation],
-])("should not render start round for %s", ([status]) => {
+] as const)("should not render start round for %s", ([status]) => {
   test("should not render start for invalid round status", () => {
     const card = createApplicationRoundCard({ name: "Test", status });
     const view = render(<ApplicationRoundCard applicationRound={card} />);

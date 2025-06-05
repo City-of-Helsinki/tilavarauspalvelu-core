@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { FormSubHeading } from "./styled";
-import { ApplicationFormTextInput } from "./ApplicationFormTextInput";
+import { ApplicationFormTextInput } from ".";
 
 export function BillingAddress() {
   const { t } = useTranslation();
@@ -9,7 +9,7 @@ export function BillingAddress() {
   return (
     <>
       <FormSubHeading as="h2">
-        {t("application:Page3.subHeading.billingAddress")}
+        {t("application:Page3.sectionHeadings.billingAddress")}
       </FormSubHeading>
       <ApplicationFormTextInput name="billingAddress.streetAddress" />
       <ApplicationFormTextInput name="billingAddress.postCode" />

@@ -1,31 +1,39 @@
 import {
   ApplicantTypeChoice,
   type ApplicationFormFragment,
+  type ApplicationPage2Query,
   ApplicationRoundFieldsFragment,
   ApplicationRoundStatusChoice,
   ApplicationSectionStatusChoice,
   ApplicationStatusChoice,
+  ApplicationViewFragment,
   CreateApplicationDocument,
   type CreateApplicationMutationResult,
   type CreateApplicationMutationVariables,
   CurrentUserDocument,
   type CurrentUserQuery,
-  IsReservableFieldsFragment,
-  OptionsQuery,
+  type IsReservableFieldsFragment,
+  OptionsDocument,
+  type OptionsQuery,
   OrganizationTypeChoice,
   Priority,
   ReservationKind,
+  ReservationPurposeOrderingChoices,
   ReservationStartInterval,
   ReservationUnitOrderingChoices,
+  ReservationUnitTypeOrderingChoices,
   SearchReservationUnitsDocument,
   type SearchReservationUnitsQuery,
   type SearchReservationUnitsQueryVariables,
   type TermsOfUseFieldsFragment,
   TermsType,
+  TimeSelectorFragment,
+  UpdateApplicationDocument,
+  type UpdateApplicationMutation,
   Weekday,
 } from "@/gql/gql-types";
 import { base64encode } from "common/src/helpers";
-import { addDays, addYears } from "date-fns";
+import { addDays, addMonths, addYears } from "date-fns";
 import { type DocumentNode } from "graphql";
 import { type TFunction } from "i18next";
 import { getDurationOptions } from "@/modules/const";
@@ -34,6 +42,7 @@ import { type ReservableMap, type RoundPeriod } from "@/modules/reservable";
 export type CreateGraphQLMockProps = {
   noUser?: boolean;
   isSearchError?: boolean;
+  dateOverride?: Date | null;
 };
 
 export type CreateGraphQLMocksReturn = Array<{
@@ -53,7 +62,7 @@ export type CreateGraphQLMocksReturn = Array<{
 // - no user
 // - query var version
 // - error version
-export function createGraphQLMocks({
+export function createApplicationSearchGraphQLMocks({
   noUser = false,
   isSearchError = false,
 }: CreateGraphQLMockProps = {}): CreateGraphQLMocksReturn {
@@ -129,11 +138,22 @@ export function createGraphQLMocks({
     {
       request: {
         query: SearchReservationUnitsDocument,
+        variables: createSearchVariablesMock({ date: null }),
+      },
+      result: {
+        data: SearchReservationUnitsQueryMock,
+      },
+      error: isSearchError ? new Error("Search error") : undefined,
+    },
+    {
+      request: {
+        query: SearchReservationUnitsDocument,
         variables: createSearchVariablesMock({ textSearch: "foobar" }),
       },
       result: {
         data: SearchReservationUnitsQueryMockWithParams,
       },
+      error: isSearchError ? new Error("Search error") : undefined,
     },
     {
       request: {
@@ -150,6 +170,44 @@ export function createGraphQLMocks({
       },
       result: {
         data: CurrentUserMock,
+      },
+    },
+  ];
+}
+
+export function createGraphQLApplicationIdMock(): CreateGraphQLMocksReturn {
+  const UpdateApplicationMutationMock: UpdateApplicationMutation = {
+    updateApplication: {
+      pk: 1,
+    },
+  };
+
+  const OptionsMock: OptionsQuery = createOptionQueryMock();
+
+  return [
+    {
+      request: {
+        query: UpdateApplicationDocument,
+      },
+      variableMatcher: () => true,
+      result: {
+        data: UpdateApplicationMutationMock,
+      },
+    },
+    {
+      request: {
+        query: OptionsDocument,
+        variables: {
+          reservationUnitTypesOrderBy:
+            ReservationUnitTypeOrderingChoices.RankAsc,
+          reservationPurposesOrderBy: ReservationPurposeOrderingChoices.RankAsc,
+          unitsOrderBy: [],
+          equipmentsOrderBy: [],
+          purposesOrderBy: [],
+        },
+      },
+      result: {
+        data: OptionsMock,
       },
     },
   ];
@@ -192,8 +250,10 @@ function createSearchQueryNode(
 
 function createSearchVariablesMock({
   textSearch = null,
+  date = new Date(2024, 1, 1),
 }: {
   textSearch?: string | null;
+  date?: Date | null;
   // TODO return type issues because all of them are optional (by backend)
   // we'd need to match them to a Required return type that we actully use
   // so what happens:
@@ -207,9 +267,13 @@ function createSearchVariablesMock({
     reservationUnitType: [],
     equipments: [],
     accessType: [],
-    accessTypeBeginDate: "2024-02-01T00:00:00Z",
-    accessTypeEndDate: "2025-01-01T00:00:00Z",
-    reservableDateStart: "2024-02-01T00:00:00Z",
+    accessTypeBeginDate: date ? date.toISOString() : null,
+    accessTypeEndDate: date ? addYears(date, 1).toISOString() : null,
+    reservableDateStart: date ? date.toISOString() : null,
+    reservableDateEnd: null,
+    reservableTimeStart: null,
+    reservableTimeEnd: null,
+    reservableMinimumDurationMinutes: null,
     applicationRound: [1],
     personsAllowed: null,
     first: 36,
@@ -223,80 +287,54 @@ function createSearchVariablesMock({
   } as const;
 }
 
+type ApplicationMockType = NonNullable<ApplicationPage2Query["application"]>;
+type ApplicationSectionMockType = NonNullable<
+  ApplicationMockType["applicationSections"]
+>[number];
 /// @param page which page is valid (page0 => nothing is valid), preview => it's sent
-function createMockApplicationSection({
+export function createMockApplicationSection({
   page = "page0",
+  pk = 1,
 }: {
   page?: PageOptions;
-} = {}): NonNullable<ApplicationFormFragment["applicationSections"]>[number] {
-  const pk = 1;
+  pk?: number;
+} = {}): ApplicationSectionMockType {
   // TODO parametrize so we can zero this for page0 (nothing filled yet)
 
-  const resUnitCommon = {
-    id: base64encode(`ReservationUnitNode:1`),
-    pk: 1,
+  const timeSelector: TimeSelectorFragment = {
+    id: base64encode(`ApplicationRoundTimeSlotNode:1`),
+    weekday: 1,
+    closed: false,
+    reservableTimes: [
+      {
+        begin: "08:00",
+        end: "16:00",
+      },
+    ],
   };
-  const opt1 = {
+
+  // NOTE even though the queries for other pages than page2 don't include most of this
+  // typing becomes too complicated if we don't include it (use empty time slots array)
+  const reservationUnit: ApplicationSectionMockType["reservationUnitOptions"][0]["reservationUnit"] =
+    {
+      id: base64encode(`ReservationUnitNode:1`),
+      pk: 1,
+      ...generateNameFragment("ReservationUnitNode"),
+      unit: {
+        id: base64encode(`UnitNode:1`),
+        ...generateNameFragment("UnitNode"),
+      },
+      applicationRoundTimeSlots: page === "page2" ? [timeSelector] : [],
+    };
+  const opt1: ApplicationSectionMockType["reservationUnitOptions"][0] = {
     id: base64encode(`ReservationUnitOptionNode:1`),
     pk: 1,
     preferredOrder: 1,
-    ...(page === "page2"
-      ? {
-          reservationUnit: {
-            ...resUnitCommon,
-            ...generateNameFragment("ReservationUnitNode"),
-            unit: {
-              id: base64encode(`UnitNode:1`),
-              pk: 1,
-              ...generateNameFragment("UnitNode"),
-            },
-            applicationRoundTimeSlots: [
-              {
-                id: base64encode(`ApplicationRoundTimeSlotNode:1`),
-                pk: 1,
-                weekday: 1,
-                closed: false,
-                reservableTimes: [
-                  {
-                    begin: "08:00",
-                    end: "16:00",
-                  },
-                ],
-              },
-            ],
-          },
-        }
-      : {
-          reservationUnit: resUnitCommon,
-        }),
+    reservationUnit,
   };
-  const reservationUnitOptions = page !== "page0" ? [opt1] : [];
+  const reservationUnitOptions: ApplicationSectionMockType["reservationUnitOptions"] =
+    page !== "page0" ? [opt1] : [];
 
-  const page1Data: Omit<
-    NonNullable<ApplicationFormFragment["applicationSections"]>[number],
-    "status" | "suitableTimeRanges" | "id" | "pk"
-  > = {
-    // page 1 data
-    name: "foobar",
-    reservationMinDuration: 1 * 60 * 60,
-    reservationMaxDuration: 2 * 60 * 60,
-    numPersons: 1,
-    reservationsBeginDate: addDays(new Date(), 1).toISOString(),
-    reservationsEndDate: addDays(new Date(), 30 + 1).toISOString(),
-    appliedReservationsPerWeek: 1,
-    ageGroup: {
-      id: base64encode(`AgeGroupNode:1`),
-      pk: 1,
-      minimum: 1,
-      maximum: null,
-    },
-    purpose: {
-      id: base64encode(`PurposeNode:1`),
-      pk: 1,
-      ...generateNameFragment("PurposeNode"),
-    },
-    reservationUnitOptions,
-  };
   const page2Data = {
     // TODO add other options
     suitableTimeRanges:
@@ -318,43 +356,51 @@ function createMockApplicationSection({
     if (page2Data.suitableTimeRanges.length === 0) {
       throw new Error("SuitableTimeRanges must be filled for page2");
     }
-    if (
-      page1Data.appliedReservationsPerWeek !==
-      page1Data.reservationUnitOptions.length
-    ) {
-      throw new Error(
-        "AppliedReservationsPerWeek must match the number of reservationUnitOptions"
-      );
-    }
   }
 
   return {
     id: base64encode(`ApplicationSectionNode:${pk}`),
     pk,
     status: ApplicationSectionStatusChoice.Unallocated,
-    ...page1Data,
+    // page 1 data
+    name: "foobar",
+    reservationMinDuration: 2 * 60 * 60,
+    reservationMaxDuration: 4 * 60 * 60,
+    numPersons: 1,
+    reservationsBeginDate: addDays(new Date(), 1).toISOString(),
+    reservationsEndDate: addDays(new Date(), 30 + 1).toISOString(),
+    appliedReservationsPerWeek: 1,
+    ageGroup: {
+      id: base64encode(`AgeGroupNode:1`),
+      pk: 1,
+      minimum: 1,
+      maximum: null,
+    },
+    purpose: {
+      id: base64encode(`PurposeNode:1`),
+      pk: 1,
+      ...generateNameFragment("PurposeNode"),
+    },
+    reservationUnitOptions,
     ...page2Data,
   };
 }
 
-export type PageOptions = "page0" | "page1" | "page2" | "page3" | "preview";
-
+export type PageOptions = "page0" | "page1" | "page2" | "page3" | "page4";
 export type CreateMockApplicationFragmentProps = {
   pk?: number;
   // completed page
   page?: PageOptions;
+  notesWhenApplying?: string | null;
+  status?: ApplicationStatusChoice;
 };
 export function createMockApplicationFragment({
   pk = 1,
   page = "page0",
-}: CreateMockApplicationFragmentProps = {}): ApplicationFormFragment {
+  notesWhenApplying = "Notes when applying",
+  status = ApplicationStatusChoice.Draft,
+}: CreateMockApplicationFragmentProps = {}): ApplicationMockType {
   const now = new Date();
-  // TODO use page to generate the form values (applicationSections)
-  // so it's filled with the correct values for that page
-  const status =
-    page === "preview"
-      ? ApplicationStatusChoice.Received
-      : ApplicationStatusChoice.Draft;
 
   const page3Data = {
     applicantType: ApplicantTypeChoice.Association,
@@ -397,26 +443,25 @@ export function createMockApplicationFragment({
     },
   };
 
-  const MockApplicationForm: Omit<ApplicationFormFragment, "applicationRound"> =
-    {
-      id: base64encode(`ApplicationNode:${pk}`),
-      pk,
-      status,
-      // TODO this can't be combined with the other Fragment
-      // colliding with the same name (spread syntax)
-      applicationSections:
-        page === "page0" ? [] : [createMockApplicationSection({ page })],
-      ...(page === "page3" || page === "preview"
-        ? page3Data
-        : {
-            applicantType: null,
-            billingAddress: null,
-            additionalInformation: null,
-            contactPerson: null,
-            organisation: null,
-            homeCity: null,
-          }),
-    };
+  const MockApplicationForm = {
+    id: base64encode(`ApplicationNode:${pk}`),
+    pk,
+    status: page === "page4" ? ApplicationStatusChoice.Received : status,
+    // TODO this can't be combined with the other Fragment
+    // colliding with the same name (spread syntax)
+    applicationSections:
+      page === "page0" ? [] : [createMockApplicationSection({ page })],
+    ...(page === "page3" || page === "page4"
+      ? page3Data
+      : {
+          applicantType: null,
+          billingAddress: null,
+          additionalInformation: null,
+          contactPerson: null,
+          organisation: null,
+          homeCity: null,
+        }),
+  };
   const reservationUnits: ApplicationFormFragment["applicationRound"]["reservationUnits"] =
     Array.from({ length: 10 }, (_, i) => ({
       id: base64encode(`ReservationUnitNode:${i}`),
@@ -436,9 +481,9 @@ export function createMockApplicationFragment({
     ...MockApplicationForm,
     applicationRound: {
       id: base64encode("ApplicationRoundNode:1"),
-      notesWhenApplyingFi: "Notes when applying FI",
-      notesWhenApplyingEn: "Notes when applying EN",
-      notesWhenApplyingSv: "Notes when applying SV",
+      notesWhenApplyingFi: notesWhenApplying ? `${notesWhenApplying} FI` : null,
+      notesWhenApplyingEn: notesWhenApplying ? `${notesWhenApplying} EN` : null,
+      notesWhenApplyingSv: notesWhenApplying ? `${notesWhenApplying} SV` : null,
       reservationPeriodBegin: addDays(now, 1).toISOString(),
       reservationPeriodEnd: addDays(now, 30 + 1).toISOString(),
       pk: 1,
@@ -446,6 +491,33 @@ export function createMockApplicationFragment({
       ...generateNameFragment("ApplicationRoundNode"),
     },
   };
+}
+
+type ApplicationPage4 = ApplicationViewFragment;
+export function createMockApplicationViewFragment(
+  props: CreateMockApplicationFragmentProps = {}
+) {
+  const applicationRoundMock = {
+    sentDate: new Date().toISOString(),
+    status: ApplicationRoundStatusChoice.Open,
+    ...generateNameFragment("ApplicationRound"),
+    termsOfUse: {
+      id: base64encode("TermsOfUseNode:1"),
+      pk: "recurring",
+      termsType: TermsType.RecurringTerms,
+      ...generateNameFragment("TermsOfUse"),
+      ...generateTextFragment("Recurring Terms of Use"),
+    },
+  };
+  const baseFragment = createMockApplicationFragment(props);
+  const application: ApplicationPage4 = {
+    ...baseFragment,
+    applicationRound: {
+      ...baseFragment.applicationRound,
+      ...applicationRoundMock,
+    },
+  };
+  return application;
 }
 
 export function createMockTermsOfUse(): TermsOfUseFieldsFragment {
@@ -563,15 +635,23 @@ export function createMockReservationUnit({
 
 export function createMockApplicationRound({
   pk = 1,
-  status,
-  applicationPeriodEnd,
-  applicationPeriodBegin,
+  status = ApplicationRoundStatusChoice.Open,
+  applicationPeriodEnd = new Date(2024, 0, 1, 0, 0, 0),
+  applicationPeriodBegin = addYears(new Date(2024, 0, 1, 0, 0, 0), 1),
 }: {
   pk?: number;
-  status: ApplicationRoundStatusChoice;
-  applicationPeriodEnd: Date;
-  applicationPeriodBegin: Date;
-}): Readonly<ApplicationRoundFieldsFragment> {
+  status?: ApplicationRoundStatusChoice;
+  applicationPeriodEnd?: Date;
+  applicationPeriodBegin?: Date;
+} = {}): Readonly<ApplicationRoundFieldsFragment> {
+  // There is an implicit relation between reservationPeriodBegin and SearchQuery
+  // so not mocking reservationPeriodBegin will break search query mock
+  if (applicationPeriodBegin.getMilliseconds() !== 0) {
+    throw new Error(
+      "Application period millis should be 0. You most likely you forgot to set a mock date"
+    );
+  }
+  const reservationPeriodBegin = addMonths(applicationPeriodBegin, 1);
   return {
     id: base64encode(`ApplicationRoundNode:${pk}`),
     pk,
@@ -579,10 +659,12 @@ export function createMockApplicationRound({
     nameSv: `ApplicationRound ${pk} SV`,
     nameEn: `ApplicationRound ${pk} EN`,
     status,
-    reservationPeriodBegin: "2024-02-01T00:00:00Z",
-    reservationPeriodEnd: "2025-01-01T00:00:00Z",
-    publicDisplayBegin: "2024-02-01T00:00:00Z",
-    publicDisplayEnd: "2025-01-01T00:00:00Z",
+    // TODO these are not all DateTime
+    // some are DateTime (ISO), some are just Date
+    reservationPeriodBegin: reservationPeriodBegin.toISOString(),
+    reservationPeriodEnd: addYears(reservationPeriodBegin, 1).toISOString(),
+    publicDisplayBegin: applicationPeriodBegin.toISOString(),
+    publicDisplayEnd: applicationPeriodEnd.toISOString(),
     applicationPeriodBegin: applicationPeriodBegin.toISOString(),
     applicationPeriodEnd: applicationPeriodEnd.toISOString(),
     criteriaFi: null,
@@ -621,5 +703,12 @@ export function generateNameFragment(name: string) {
     nameFi: `${name} FI`,
     nameSv: `${name} SV`,
     nameEn: `${name} EN`,
+  };
+}
+export function generateTextFragment(text: string) {
+  return {
+    textFi: `${text} FI`,
+    textSv: `${text} SV`,
+    textEn: `${text} EN`,
   };
 }

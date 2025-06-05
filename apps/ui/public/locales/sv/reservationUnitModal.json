@@ -1,6 +1,6 @@
 {
   "selectReservationUnit": "Lägg till ansökningen",
-  "unSelectReservationUnit": "Redigera",
+  "deselectReservationUnit": "Redigera",
   "heading": "Lägg till lokaler till ansökningen",
   "searchTermLabel": "Sök med ord",
   "searchPurposeLabel": "Användningsändamål",

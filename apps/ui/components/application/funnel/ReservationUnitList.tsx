@@ -1,3 +1,5 @@
+import React, { useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   Button,
   ButtonVariant,
@@ -6,28 +8,27 @@ import {
   Notification,
   NotificationSize,
 } from "hds-react";
-import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 import type {
   ApplicationReservationUnitListFragment,
   OrderedReservationUnitCardFragment,
 } from "@gql/gql-types";
 import { IconButton } from "common/src/components";
 import { filterNonNullable } from "common/src/helpers";
-import { Modal } from "@/components/Modal";
-import { type ApplicationPage1FormValues } from "./form";
-import { OrderedReservationUnitCard } from "./OrderedReservationUnitCard";
 import { Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { ReservationUnitModalContent } from "./ReservationUnitModalContent";
-import { gql } from "@apollo/client";
 import { ErrorText } from "common/src/components/ErrorText";
-import { createPortal } from "react-dom";
+import { Modal } from "@/components/Modal";
+import { OrderedReservationUnitCard, ReservationUnitModalContent } from ".";
+import { type ApplicationPage1FormValues } from "./form";
+import { useSearchParams } from "next/navigation";
+import { useSearchModify } from "@/hooks/useSearchValues";
 
-type ReservationUnitType = OrderedReservationUnitCardFragment;
+type ReservationUnitType = Pick<OrderedReservationUnitCardFragment, "pk">;
 export type OptionType = Readonly<{ value: number; label: string }>;
-type OptionListType = Readonly<{ value: number; label: string }[]>;
+type OptionListType = Readonly<Array<OptionType>>;
 export type OptionTypes = Readonly<{
   ageGroupOptions?: OptionListType;
   purposeOptions: OptionListType;
@@ -35,12 +36,27 @@ export type OptionTypes = Readonly<{
   unitOptions: OptionListType;
 }>;
 
-type Props = {
+export type ReservationUnitListProps = {
   index: number;
   applicationRound: ApplicationReservationUnitListFragment;
   options: OptionTypes;
   minSize?: number;
 };
+
+function isValid(
+  units: ApplicationReservationUnitListFragment["reservationUnits"],
+  minSize: number
+) {
+  const error = units
+    .map(
+      (resUnit) =>
+        minSize != null &&
+        resUnit.maxPersons != null &&
+        resUnit.maxPersons < minSize
+    )
+    .find((a) => a);
+  return !error;
+}
 
 // selected reservation units are applicationEvent.eventReservationUnits
 // available reservation units are applicationRound.reservationUnits
@@ -49,33 +65,32 @@ export function ReservationUnitList({
   applicationRound,
   options,
   minSize,
-}: Readonly<Props>): JSX.Element {
+}: Readonly<ReservationUnitListProps>): JSX.Element {
   const { t } = useTranslation();
-  const [showModal, setShowModal] = useState(false);
+
+  const { handleRouteChange } = useSearchModify();
+  const searchValues = useSearchParams();
 
   const form = useFormContext<ApplicationPage1FormValues>();
   const { clearErrors, setError, watch, setValue, formState } = form;
   const { errors } = formState;
-
-  const isValid = (
-    units: ApplicationReservationUnitListFragment["reservationUnits"]
-  ) => {
-    const error = units
-      .map(
-        (resUnit) =>
-          minSize != null &&
-          resUnit.maxPersons != null &&
-          resUnit.maxPersons < minSize
-      )
-      .find((a) => a);
-    return !error;
-  };
 
   const fieldName = `applicationSections.${index}.reservationUnits` as const;
 
   const reservationUnits = watch(fieldName);
   const setReservationUnits = (units: number[]) => {
     setValue(fieldName, units);
+  };
+
+  const showModal = searchValues.get("modalShown") === fieldName;
+  const setShowModal = (show: boolean) => {
+    const params = new URLSearchParams(searchValues);
+    if (show) {
+      params.set("modalShown", fieldName);
+    } else {
+      params.delete("modalShown");
+    }
+    handleRouteChange(params);
   };
 
   // TODO these could be prefiltered on the Page level similar to the addition of a new application section
@@ -86,7 +101,7 @@ export function ReservationUnitList({
   );
 
   useEffect(() => {
-    const valid = isValid(currentReservationUnits);
+    const valid = isValid(currentReservationUnits, minSize ?? 0);
     if (valid) {
       clearErrors([fieldName]);
     } else {

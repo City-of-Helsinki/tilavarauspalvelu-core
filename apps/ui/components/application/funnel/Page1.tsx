@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Button,
   ButtonSize,
@@ -5,16 +6,14 @@ import {
   IconArrowRight,
   IconPlus,
 } from "hds-react";
-import React from "react";
 import { useTranslation } from "next-i18next";
-import { type ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { useFormContext } from "react-hook-form";
 import { filterNonNullable } from "common/src/helpers";
-import { ApplicationSection } from "./ApplicationSection";
-import { type ApplicationPage1FormValues } from "./form";
-import { useReservationUnitList } from "@/hooks";
 import { ButtonContainer } from "common/styled";
-import { type OptionTypes } from "./ReservationUnitList";
+import { type ApplicationRoundForApplicationFragment } from "@gql/gql-types";
+import { useReservationUnitList } from "@/hooks";
+import { type OptionTypes, ApplicationSectionPage1 } from ".";
+import { type ApplicationPage1FormValues } from "./form";
 
 type Props = {
   applicationRound: ApplicationRoundForApplicationFragment;
@@ -97,7 +96,7 @@ export function Page1({
        * we could use findIndex with the formKey though */}
       {applicationSections?.map((event, index) =>
         event != null ? (
-          <ApplicationSection
+          <ApplicationSectionPage1
             key={event.formKey}
             index={index}
             applicationRound={applicationRound}

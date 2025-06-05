@@ -12,35 +12,38 @@ import {
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { CenterSpinner, Flex, H2, H3 } from "common/styled";
-import { breakpoints } from "common/src/const";
 import {
-  ReservationUnitOrderingChoices,
-  useSearchReservationUnitsQuery,
   type ApplicationReservationUnitListFragment,
-  type SearchReservationUnitsQueryVariables,
+  type Maybe,
   type RecurringCardFragment,
+  ReservationKind,
 } from "@gql/gql-types";
 import {
   filterNonNullable,
   getImageSource,
   getMainImage,
 } from "common/src/helpers";
-import { getApplicationRoundName } from "@/modules/applicationRound";
-import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
-import { getReservationUnitPath } from "@/modules/urls";
+import { CenterSpinner, Flex, H2, H3 } from "common/styled";
+import { breakpoints } from "common/src/const";
 import Card from "common/src/components/Card";
-import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
-import { type OptionTypes } from "./ReservationUnitList";
 import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
+import { getApplicationRoundName } from "@/modules/applicationRound";
+import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
+import { getReservationUnitPath } from "@/modules/urls";
+import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
+// TODO this is weird import path
 import {
   SearchFormValues,
   SeasonalSearchForm,
-} from "../recurring/SeasonalSearchForm";
-import { transformAccessTypeSafe } from "common/src/conversion";
+} from "@/components/recurring/SeasonalSearchForm";
+import { type OptionTypes } from ".";
+import { useSearchModify } from "@/hooks/useSearchValues";
+import { processVariables } from "@/modules/search";
+import { useSearchParams } from "next/navigation";
+import { useSearchQuery } from "@/hooks";
 
 const ImageSizeWrapper = styled.div`
   @media (min-width: ${breakpoints.m}) {
@@ -50,30 +53,35 @@ const ImageSizeWrapper = styled.div`
   }
 `;
 
+type ReservationUnitCardProps = Readonly<{
+  reservationUnit: Omit<
+    RecurringCardFragment,
+    "currentAccessType" | "effectiveAccessType"
+  >;
+  isSelected: boolean;
+  handleAdd: (pk: Maybe<number>) => void;
+  handleRemove: (pk: Maybe<number>) => void;
+}>;
+
 function ReservationUnitCard({
   reservationUnit,
   handleAdd,
   handleRemove,
   isSelected,
-}: Readonly<{
-  reservationUnit: RecurringCardFragment;
-  isSelected: boolean;
-  handleAdd: (ru: RecurringCardFragment) => void;
-  handleRemove: (ru: RecurringCardFragment) => void;
-}>) {
+}: ReservationUnitCardProps) {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
   const toggleSelection = () => {
     if (isSelected) {
-      handleRemove(reservationUnit);
+      handleRemove(reservationUnit.pk);
     } else {
-      handleAdd(reservationUnit);
+      handleAdd(reservationUnit.pk);
     }
   };
 
   const buttonText = isSelected
-    ? t("reservationUnitModal:unSelectReservationUnit")
+    ? t("reservationUnitModal:deselectReservationUnit")
     : t("reservationUnitModal:selectReservationUnit");
   const name = getReservationUnitName(reservationUnit);
   const reservationUnitTypeName = reservationUnit.reservationUnitType
@@ -123,6 +131,7 @@ function ReservationUnitCard({
         text={unitName}
         infos={infos}
         buttons={buttons}
+        testId="ModalContent__reservationUnitCard"
       />
     </ImageSizeWrapper>
   );
@@ -133,49 +142,42 @@ type AppRoundNode = Omit<
   "reservationUnits"
 >;
 
+export type ReservationUnitModalProps = Readonly<{
+  applicationRound: AppRoundNode;
+  handleAdd: (ru: Pick<RecurringCardFragment, "pk">) => void;
+  handleRemove: (ru: Pick<RecurringCardFragment, "pk">) => void;
+  currentReservationUnits: Pick<RecurringCardFragment, "pk">[];
+  options: Pick<
+    OptionTypes,
+    "purposeOptions" | "reservationUnitTypeOptions" | "unitOptions"
+  >;
+}>;
+
+/// Does queries to get a list of reservation units based on user selected filters
+/// search queries do not change query params (unlike other pages)
 export function ReservationUnitModalContent({
   applicationRound,
   handleAdd,
   handleRemove,
   currentReservationUnits,
   options,
-}: Readonly<{
-  applicationRound: AppRoundNode;
-  handleAdd: (ru: RecurringCardFragment) => void;
-  handleRemove: (ru: RecurringCardFragment) => void;
-  currentReservationUnits: Pick<RecurringCardFragment, "pk">[];
-  options: Pick<
-    OptionTypes,
-    "purposeOptions" | "reservationUnitTypeOptions" | "unitOptions"
-  >;
-}>): JSX.Element {
+}: ReservationUnitModalProps): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
-  const baseVariables: SearchReservationUnitsQueryVariables = {
-    applicationRound: [applicationRound.pk ?? 0],
-    orderBy: [ReservationUnitOrderingChoices.NameFiAsc],
-    isDraft: false,
-    isVisible: true,
-  };
-  const { data, refetch, loading } = useSearchReservationUnitsQuery({
-    skip: !applicationRound.pk,
-    variables: baseVariables,
-    notifyOnNetworkStatusChange: true,
+  const searchValues = useSearchParams();
+  const variables = processVariables({
+    values: searchValues,
+    language: i18n.language,
+    kind: ReservationKind.Season,
+    applicationRound: applicationRound.pk ?? 0,
   });
 
-  const onSearch = (data: SearchFormValues) => {
-    // TODO should update url query vars if possible since Tags come from the url query
-    const variables: SearchReservationUnitsQueryVariables = {
-      ...baseVariables,
-      textSearch: data.textSearch,
-      personsAllowed: data.personsAllowed,
-      reservationUnitType: data.reservationUnitTypes,
-      unit: data.units,
-      purposes: data.purposes,
-      accessType: data.accessTypes.map(transformAccessTypeSafe),
-    };
-    refetch(variables);
+  const query = useSearchQuery(variables);
+  const { data, isLoading, error } = query;
+  const { handleSearch } = useSearchModify();
+  const onSearch = (criteria: SearchFormValues) => {
+    handleSearch(criteria, true);
   };
 
   const reservationUnits = filterNonNullable(
@@ -187,19 +189,21 @@ export function ReservationUnitModalContent({
       <H2 $noMargin>{t("reservationUnitModal:heading")}</H2>
       <H3 as="p">{getApplicationRoundName(applicationRound, lang)}</H3>
       <SeasonalSearchForm
-        isLoading={loading}
+        isLoading={isLoading}
         options={options}
         handleSearch={onSearch}
       />
-      {loading ? (
+      {isLoading ? (
         <CenterSpinner />
+      ) : error ? (
+        <div>{t("errors:search")}</div>
       ) : reservationUnits.length === 0 ? (
         <div>{t("common:noResults")}</div>
       ) : (
         reservationUnits.map((ru) => (
           <ReservationUnitCard
-            handleAdd={() => handleAdd(ru)}
-            handleRemove={() => handleRemove(ru)}
+            handleAdd={(pk) => handleAdd({ pk })}
+            handleRemove={(pk) => handleRemove({ pk })}
             isSelected={
               currentReservationUnits.find((i) => i.pk === ru.pk) !== undefined
             }

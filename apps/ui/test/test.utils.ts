@@ -1,4 +1,4 @@
-import { fireEvent, render, within } from "@testing-library/react";
+import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect } from "vitest";
 
@@ -13,21 +13,6 @@ export const TIMERS_TO_FAKE = [
   "Date",
 ] as const;
 
-export const arrowUpKeyPressHelper = (): boolean =>
-  fireEvent.keyDown(document, { code: 38, key: "ArrowUp" });
-
-export const arrowDownKeyPressHelper = (): boolean =>
-  fireEvent.keyDown(document, { code: 40, key: "ArrowDown" });
-
-export const enterKeyPressHelper = (): boolean =>
-  fireEvent.keyDown(document, { code: 13, key: "Enter" });
-
-export const escKeyPressHelper = (): boolean =>
-  fireEvent.keyDown(document, { code: 27, key: "Escape" });
-
-export const tabKeyPressHelper = (): boolean =>
-  fireEvent.keyDown(document, { code: 9, key: "Tab" });
-
 // TODO test if we can refactor this not to include any expect calls
 // use throws instead so the error bubbles to the caller
 export async function selectOption(
@@ -39,9 +24,15 @@ export async function selectOption(
   const btn = view.getByLabelText(listLabel, {
     selector: "button",
   });
-  expect(btn).toBeInTheDocument();
+  if (btn == null) {
+    throw new Error("Select button not found");
+  }
+
   expect(btn).not.toHaveAttribute("aria-disabled", "true");
   await user.click(btn);
+  // NOTE using "listbox" forces the users to narrow down the view
+  // if this finds multiple elements, the test will fail
+  // not an issue with multiple HDS selects since "listbox" is only visible after click
   const listbox = view.getByRole("listbox");
   // Hack to deal with options not having unique labels due to translation mocks
   const opts = within(listbox).getAllByText(optionLabel);
@@ -51,4 +42,8 @@ export async function selectOption(
   }
   expect(opt).toBeInTheDocument();
   await user.click(opt);
+}
+
+export function formatHtmlElement(e: HTMLElement): string {
+  return e.textContent ?? "";
 }

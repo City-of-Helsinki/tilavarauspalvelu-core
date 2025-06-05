@@ -11,6 +11,7 @@ import {
   OrderDocument,
   type ReservationStateQueryVariables,
   ReservationStateDocument,
+  TermsOfUseFieldsFragment,
 } from "@gql/gql-types";
 import { genericTermsVariant } from "./const";
 import { base64encode } from "common/src/helpers";
@@ -42,7 +43,10 @@ export function getCommonServerSideProps() {
   };
 }
 
-export async function getGenericTerms(apolloClient: ApolloClient<unknown>) {
+type GetGenericTermsReturn = TermsOfUseFieldsFragment | null;
+export async function getGenericTerms(
+  apolloClient: ApolloClient<unknown>
+): Promise<GetGenericTermsReturn> {
   const { data: tosData } = await apolloClient.query<
     TermsOfUseQuery,
     TermsOfUseQueryVariables

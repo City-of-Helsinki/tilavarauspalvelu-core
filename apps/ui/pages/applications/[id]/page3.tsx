@@ -1,44 +1,46 @@
 import React, { useEffect } from "react";
 import {
-  ApplicantTypeChoice,
-  ApplicationPage3Document,
-  useUpdateApplicationMutation,
-  type ApplicationPage3Query,
-  type ApplicationPage3QueryVariables,
-} from "@gql/gql-types";
-import { useTranslation } from "next-i18next";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
-import type { GetServerSidePropsContext } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
-import { CompanyForm } from "@/components/application/CompanyForm";
-import { IndividualForm } from "@/components/application/IndividualForm";
-import { OrganisationForm } from "@/components/application/OrganisationForm";
-import { ApplicantTypeSelector } from "@/components/application/ApplicantTypeSelector";
-import { useOptions } from "@/hooks/useOptions";
-import {
-  type ApplicationPage3FormValues,
-  ApplicationPage3Schema,
-  convertApplicationPage3,
-  transformPage3Application,
-} from "@/components/application/form";
-import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { getApplicationPath } from "@/modules/urls";
-import {
   Button,
   ButtonSize,
   ButtonVariant,
   IconArrowLeft,
   IconArrowRight,
 } from "hds-react";
-import { AutoGrid, ButtonContainer, Flex } from "common/styled";
+import { useTranslation } from "next-i18next";
+import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import type { GetServerSidePropsContext } from "next";
+import { useRouter } from "next/router";
+import {
+  ApplicantTypeChoice,
+  ApplicationPage3Document,
+  useUpdateApplicationMutation,
+  type ApplicationPage3Query,
+  type ApplicationPage3QueryVariables,
+} from "@gql/gql-types";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormSubHeading } from "@/components/application/styled";
-import { createApolloClient } from "@/modules/apolloClient";
 import { gql } from "@apollo/client";
+import { AutoGrid, ButtonContainer, Flex } from "common/styled";
 import { useDisplayError } from "common/src/hooks";
+import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import {
+  type ApplicationPage3FormValues,
+  ApplicationPage3Schema,
+  convertApplicationPage3,
+  transformPage3Application,
+} from "@/components/application/funnel/form";
+import {
+  ApplicationFunnelWrapper,
+  ApplicantTypeSelector,
+  CompanyForm,
+  IndividualForm,
+  OrganisationForm,
+} from "@/components/application/funnel/";
+import { FormSubHeading } from "@/components/application/funnel/styled";
+import { createApolloClient } from "@/modules/apolloClient";
+import { useOptions } from "@/hooks/useOptions";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getApplicationPath } from "@/modules/urls";
 
 function Page3Form(): JSX.Element | null {
   const { options } = useOptions();
@@ -87,7 +89,9 @@ function Page3Form(): JSX.Element | null {
   }
 }
 
-function Page3({ application }: PropsNarrowed): JSX.Element {
+function Page3({
+  application,
+}: Pick<PropsNarrowed, "application">): JSX.Element {
   const router = useRouter();
 
   const form = useForm<ApplicationPage3FormValues>({
@@ -117,7 +121,7 @@ function Page3({ application }: PropsNarrowed): JSX.Element {
       if (pk == null) {
         throw new Error("Failed to save application");
       }
-      router.push(getApplicationPath(pk, "preview"));
+      router.push(getApplicationPath(pk, "page4"));
     } catch (err) {
       dislayError(err);
     }
@@ -127,15 +131,17 @@ function Page3({ application }: PropsNarrowed): JSX.Element {
 
   return (
     <FormProvider {...form}>
-      <ApplicationPageWrapper
-        translationKeyPrefix="application:Page3"
-        application={application}
-      >
-        <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)}>
+      <ApplicationFunnelWrapper page="page3" application={application}>
+        <Flex
+          as="form"
+          noValidate
+          onSubmit={handleSubmit(onSubmit)}
+          data-testid="application__page3--form"
+        >
           <ApplicantTypeSelector />
           <AutoGrid>
             <FormSubHeading as="h2">
-              {t("application:Page3.subHeading.basicInfo")}
+              {t("application:Page3.sectionHeadings.basicInfo")}
             </FormSubHeading>
             <Page3Form />
           </AutoGrid>
@@ -158,7 +164,7 @@ function Page3({ application }: PropsNarrowed): JSX.Element {
             </Button>
           </ButtonContainer>
         </Flex>
-      </ApplicationPageWrapper>
+      </ApplicationFunnelWrapper>
     </FormProvider>
   );
 }

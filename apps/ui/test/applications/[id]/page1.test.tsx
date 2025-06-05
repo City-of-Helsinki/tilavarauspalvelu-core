@@ -1,27 +1,19 @@
-import {
-  OptionsDocument,
-  type OptionsQuery,
-  ReservationPurposeOrderingChoices,
-  ReservationUnitTypeOrderingChoices,
-  UpdateApplicationDocument,
-  type UpdateApplicationMutation,
-} from "@/gql/gql-types";
 import Page1 from "@/pages/applications/[id]/page1";
-import { MockedProvider } from "@apollo/client/testing";
 import { render, screen, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
 import {
+  createGraphQLApplicationIdMock,
   createMockApplicationFragment,
-  CreateMockApplicationFragmentProps,
-  createOptionQueryMock,
+  type CreateMockApplicationFragmentProps,
   mockAgeGroupOptions,
   mockDurationOptions,
   mockReservationPurposesOptions,
   type CreateGraphQLMocksReturn,
 } from "@/test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
-import { selectOption } from "../test.utils";
+import { selectOption } from "@test/test.utils";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
+import { MockedGraphQLProvider } from "@/test/test.react.utils";
 
 const { mockedRouterPush, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
@@ -63,90 +55,54 @@ vi.mock("next/router", () => ({
   useRouter,
 }));
 
+function createGraphQLMocks(): CreateGraphQLMocksReturn {
+  return createGraphQLApplicationIdMock();
+}
 function customRender(
   props: CreateMockApplicationFragmentProps = {}
 ): ReturnType<typeof render> {
   const mocks = createGraphQLMocks();
   const application = createMockApplicationFragment(props);
   return render(
-    <MockedProvider mocks={mocks} addTypename={false}>
+    <MockedGraphQLProvider mocks={mocks}>
       <Page1 application={application} unitsAll={[]} />
-    </MockedProvider>
+    </MockedGraphQLProvider>
   );
 }
 
-type CreateGraphQLMockProps = never;
-function createGraphQLMocks(
-  _props?: CreateGraphQLMockProps
-): CreateGraphQLMocksReturn {
-  const UpdateApplicationMutationMock: UpdateApplicationMutation = {
-    updateApplication: {
-      pk: 1,
-    },
-  };
-
-  const OptionsMock: OptionsQuery = createOptionQueryMock();
-
-  return [
-    {
-      request: {
-        query: UpdateApplicationDocument,
-      },
-      variableMatcher: () => true,
-      result: {
-        data: UpdateApplicationMutationMock,
-      },
-    },
-    {
-      request: {
-        query: OptionsDocument,
-        variables: {
-          reservationUnitTypesOrderBy:
-            ReservationUnitTypeOrderingChoices.RankAsc,
-          reservationPurposesOrderBy: ReservationPurposeOrderingChoices.RankAsc,
-          unitsOrderBy: [],
-          equipmentsOrderBy: [],
-          purposesOrderBy: [],
-        },
-      },
-      result: {
-        data: OptionsMock,
-      },
-    },
-  ];
-}
-
 describe("Page1", () => {
-  test("should render empty application page", async () => {
+  test("should render empty application page", () => {
+    // TODO all of this is common to all application funnel pages
     const view = customRender();
     expect(
-      await view.findByRole("heading", { name: "application:Page1.heading" })
+      view.getByRole("heading", { name: "application:Page1.subHeading" })
     ).toBeInTheDocument();
-    expect(view.getByText("ApplicationRoundNode FI")).toBeInTheDocument();
     expect(view.getByRole("button", { name: "application:Page1.createNew" }));
     expect(view.getByRole("button", { name: "common:next" }));
     expect(
       view.getByRole("link", { name: "breadcrumb:applications" })
     ).toBeInTheDocument();
     expect(view.getByText("breadcrumb:application")).toBeInTheDocument();
-    // TODO check notes when applying
+    expect(
+      view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })
+    ).toBeInTheDocument();
+    expect(view.getByText("Notes when applying FI")).toBeInTheDocument();
   });
 
-  // special case requiring custom mocks
-  // happens when application doesn't contain any sections
+  // this case only happens if user manually removes the last section
   test("empty application should not allow submitting", async () => {
     const view = customRender();
     const submitBtn = view.getByRole("button", { name: "common:next" });
     const user = userEvent.setup();
     const removeBtn = view.getByRole("button", {
-      name: "application:Page1.deleteEvent",
+      name: "common:remove",
     });
     expect(removeBtn).not.toBeDisabled();
     await user.click(removeBtn);
     const dialog = screen.getByRole("dialog");
     expect(dialog).toBeInTheDocument();
     const confirmBtn = within(dialog).getByRole("button", {
-      name: "application:Page1.deleteEvent",
+      name: "common:remove",
     });
     expect(confirmBtn).not.toBeDisabled();
     await user.click(confirmBtn);

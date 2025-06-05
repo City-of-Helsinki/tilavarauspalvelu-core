@@ -4,11 +4,13 @@ import {
   type PricingFieldsFragment,
   type ImageFragment,
   type Maybe,
+  SuitableTimeFragment,
 } from "../gql/gql-types";
 import { type OptionInProps } from "hds-react";
 import { pixel } from "./const";
 import { type TFunction } from "i18next";
 import { type LocalizationLanguages } from "./urlBuilder";
+import { convertWeekday } from "./conversion";
 
 /// Enforce readonly on all nested properties
 /// only single level deep i.e. {a: {b: {c: string}}} -> {readonly a: {b: {c: string}}}
@@ -265,6 +267,16 @@ export function formatApiTimeInterval({
   return `${btime}–${etime}`;
 }
 
+export function formatDayTimes(
+  schedule: Omit<SuitableTimeFragment, "pk" | "id" | "priority">[],
+  day: number
+): string {
+  return schedule
+    .filter((s) => convertWeekday(s.dayOfTheWeek) === day)
+    .map((s) => formatApiTimeInterval(s))
+    .join(", ");
+}
+
 /// Primary use case is to clip out seconds from backend time strings
 /// Assumed only to be used for backend time strings which are in format HH:MM or HH:MM:SS
 /// NOTE does not handle incorrect time strings (ex. bar:foo)
@@ -330,4 +342,18 @@ export function formatListToCSV(
     list.slice(0, list.length - 1).join(", ") +
     ` ${t("common:and")} ${lastItem}`
   );
+}
+
+/// @description Converts time struct to string
+/// @param hour - hour in 24h format
+/// @param minute - minute in 24h format
+/// @return string in format HH:MM
+export function formatTimeStruct({
+  hour,
+  minute,
+}: {
+  hour: number;
+  minute: number;
+}): string {
+  return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
 }

@@ -481,10 +481,6 @@ const translations: ITranslations = {
     allApplications: ["Kaikki hakemukset"],
     gotoLink: ["Tarkastele hakemusta"],
   },
-  TimeSelector: {
-    primary: ["Ensisijainen toive"],
-    secondary: ["Muu toive"],
-  },
   ApplicationRound: {
     noUpcoming: ["Ei tulossa olevia hakukierroksia."],
     statuses: {
@@ -623,8 +619,6 @@ const translations: ITranslations = {
     requestedTimes: ["Toivotut ajat"],
     requestedReservationUnits: ["Toivotut varausyksiköt"],
     gotoLink: ["Tarkastele vuoroehdotusta"],
-    primarySchedules: ["Ensisijaiset aikatoiveet"],
-    secondarySchedules: ["Muut aikatoiveet"],
     noSchedule: ["ei aikatoiveita"],
     statuses: {
       APPROVED: ["Hyväksytty"],

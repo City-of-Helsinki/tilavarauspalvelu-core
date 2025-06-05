@@ -9,21 +9,24 @@ import {
 } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
+import { gql } from "@apollo/client";
 import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { AutoGrid, Flex, H4 } from "common/styled";
 import { getLocalizationLang } from "common/src/helpers";
-import { type OptionTypes, ReservationUnitList } from "./ReservationUnitList";
-import { ApplicationSectionSummary } from "./ApplicationSectionSummary";
-import { Accordion } from "@/components/Accordion";
-import { getDurationOptions } from "@/modules/const";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
-import { type ApplicationPage1FormValues } from "./form";
 import {
   ControlledNumberInput,
   ControlledSelect,
 } from "common/src/components/form";
 import { toUIDate } from "common/src/common/util";
-import { gql } from "@apollo/client";
+import { Accordion } from "@/components/Accordion";
+import { getDurationOptions } from "@/modules/const";
+import { type ApplicationPage1FormValues } from "./form";
+import {
+  ApplicationSectionSummary,
+  type OptionTypes,
+  ReservationUnitList,
+} from ".";
 
 type Props = {
   index: number;
@@ -214,16 +217,16 @@ function ApplicationSectionInner({
         id={`applicationSections.${index}.delete`}
         onClick={() => setIsWaitingForDelete(true)}
       >
-        {t("application:Page1.deleteEvent")}
+        {t("common:remove")}
       </Button>
       {isWaitingForDelete && (
         <ConfirmationDialog
           id="application-event-confirmation"
           isOpen
-          acceptLabel={t("application:Page1.deleteEvent")}
-          cancelLabel={t("application:Page1.deleteEventCancel")}
-          heading={t("application:Page1.deleteEventHeading")}
-          content={t("application:Page1.deleteEventContent")}
+          acceptLabel={t("common:remove")}
+          cancelLabel={t("common:cancel")}
+          heading={t("application:Page1.deleteDialog.heading")}
+          content={t("application:Page1.deleteDialog.content")}
           onAccept={del}
           onCancel={() => setIsWaitingForDelete(false)}
           variant="danger"
@@ -302,7 +305,7 @@ function ApplicationDateRangePicker({
   );
 }
 
-export function ApplicationSection(props: Props): JSX.Element {
+export function ApplicationSectionPage1(props: Props): JSX.Element {
   const { index, isVisible, onDeleteEvent, onToggleAccordion } = props;
 
   const { t } = useTranslation();
@@ -325,7 +328,7 @@ export function ApplicationSection(props: Props): JSX.Element {
     <Accordion
       onToggle={onToggleAccordion}
       open={shouldRenderInner}
-      heading={eventName || t("application:Page1.applicationEventName")}
+      heading={eventName || t("application:Page1.defaultSectionName")}
       theme="thin"
     >
       {/* Accordion doesn't remove from DOM on hide, but this is too slow if it's visible */}

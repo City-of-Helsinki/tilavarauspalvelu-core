@@ -17,9 +17,9 @@ import {
 } from "./MetadataSetForm";
 import { BufferToggles } from "./BufferToggles";
 import ShowTOS from "./ShowTOS";
-import { HR } from "@/component/Table";
 import { Element } from "@/styled";
 import { gql } from "@apollo/client";
+import { HR } from "common/styled";
 
 const CommentsTextArea = styled(TextArea)`
   grid-column: 1 / -1;

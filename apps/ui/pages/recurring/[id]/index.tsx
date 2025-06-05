@@ -77,8 +77,8 @@ function SeasonalSearch({
     language: i18n.language,
     kind: ReservationKind.Season,
     applicationRound: applicationRound.pk ?? 0,
-    reservationPeriodBegin: applicationRound?.reservationPeriodBegin ?? "",
-    reservationPeriodEnd: applicationRound?.reservationPeriodEnd ?? "",
+    reservationPeriodBegin: applicationRound?.reservationPeriodBegin,
+    reservationPeriodEnd: applicationRound?.reservationPeriodEnd,
   });
   const query = useSearchQuery(variables);
   const { data, isLoading, error, fetchMore, previousData } = query;

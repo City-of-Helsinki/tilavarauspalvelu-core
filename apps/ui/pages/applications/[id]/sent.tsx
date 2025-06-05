@@ -20,7 +20,7 @@ import {
   type ApplicationSentPageQuery,
 } from "@/gql/gql-types";
 import { createApolloClient } from "@/modules/apolloClient";
-import { isSent } from "@/components/application/module";
+import { isSent } from "@/modules/util";
 
 const Paragraph = styled.p`
   max-width: var(--prose-width);

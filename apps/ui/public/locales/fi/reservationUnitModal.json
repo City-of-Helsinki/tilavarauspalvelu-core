@@ -1,6 +1,6 @@
 {
   "selectReservationUnit": "Lisää hakemukselle",
-  "unSelectReservationUnit": "Poista hakemukselta",
+  "deselectReservationUnit": "Poista hakemukselta",
   "heading": "Lisää tiloja hakemukselle",
   "searchTermLabel": "Haku",
   "searchPurposeLabel": "Käyttötarkoitus",
