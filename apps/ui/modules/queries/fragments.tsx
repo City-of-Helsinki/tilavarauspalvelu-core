@@ -23,9 +23,8 @@ export const TERMS_OF_USE_FRAGMENT = gql`
 `;
 
 export const CANCEL_REASON_FRAGMENT = gql`
-  fragment CancelReasonFields on ReservationCancelReasonNode {
-    id
-    pk
+  fragment CancelReasonFields on ReservationCancelReasonType {
+    value
     reasonFi
     reasonEn
     reasonSv

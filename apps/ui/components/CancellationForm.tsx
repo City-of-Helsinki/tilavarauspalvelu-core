@@ -5,7 +5,10 @@ import { Button, ButtonVariant, IconCross, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { AutoGrid, ButtonContainer, Flex, fontMedium } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { type CancelReasonFieldsFragment } from "@gql/gql-types";
+import {
+  type CancelReasonFieldsFragment,
+  ReservationCancelReasonChoice,
+} from "@gql/gql-types";
 import {
   convertLanguageCode,
   getTranslationSafe,
@@ -29,7 +32,7 @@ const Form = styled.form`
 `;
 
 export type CancelFormValues = {
-  reason: number;
+  reason: ReservationCancelReasonChoice;
 };
 
 const FormWrapper = styled(Flex)`
@@ -60,7 +63,7 @@ export function CancellationForm(props: {
 
   const reasons = cancelReasons.map((node) => ({
     label: getTranslationSafe(node, "reason", lang),
-    value: node?.pk ?? 0,
+    value: node?.value,
   }));
 
   const form = useForm<CancelFormValues>();
