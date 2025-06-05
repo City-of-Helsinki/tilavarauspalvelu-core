@@ -19,7 +19,7 @@ class ApplicationRoundTimeSlotSerializer(NestingModelSerializer):
         model = ApplicationRoundTimeSlot
         fields = [
             "weekday",
-            "closed",
+            "is_closed",
             "reservable_times",
         ]
         extra_kwargs = {

@@ -132,7 +132,7 @@ def test_frontend_queries__admin_ui__ApplicationAdmin(graphql):
     arts_key = "application_sections__reservation_unit_options__reservation_unit__application_round_time_slots"
 
     factory_args = deepcopy(query_info.factory_args)
-    factory_args[f"{arts_key}__closed"] = False
+    factory_args[f"{arts_key}__is_closed"] = False
     factory_args["application_sections__applied_reservations_per_week"] = 1
     factory_args["application_sections__reservation_min_duration"] = datetime.timedelta(minutes=30)
     factory_args["application_sections__reservation_max_duration"] = datetime.timedelta(minutes=60)
