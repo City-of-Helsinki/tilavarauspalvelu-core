@@ -19,10 +19,10 @@ class UnitRoleQuerySet(models.QuerySet):
         cutoff = today - datetime.timedelta(days=settings.PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS)
 
         self.filter(
-            role_active=True,
+            is_role_active=True,
             user__is_active=True,
             user__last_login__date__lt=cutoff,
-        ).update(role_active=False)
+        ).update(is_role_active=False)
 
 
 class UnitRoleManager(models.Manager.from_queryset(UnitRoleQuerySet)): ...
