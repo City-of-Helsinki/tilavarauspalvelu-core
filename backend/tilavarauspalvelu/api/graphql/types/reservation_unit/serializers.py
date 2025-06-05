@@ -330,7 +330,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
 
         for timeslot in timeslots:
             weekday = timeslot["weekday"]
-            closed = timeslot.get("closed", False)
+            closed = timeslot.get("is_closed", False)
             reservable_times = timeslot.get("reservable_times", [])
 
             if closed and len(reservable_times) > 0:
