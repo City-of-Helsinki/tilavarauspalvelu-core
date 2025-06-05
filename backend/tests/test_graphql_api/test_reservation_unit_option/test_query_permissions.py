@@ -67,7 +67,7 @@ def test_reservation_unit_option__query__perms__application_owner(graphql):
     assert response.node(0) == {"reservationUnitOptions": [{"pk": option.pk}]}
 
 
-@pytest.mark.parametrize("field", ["locked", "rejected"])
+@pytest.mark.parametrize("field", ["isLocked", "isRejected"])
 def test_reservation_unit_option__query__perms__application_owner__cant_see_restricted_info(graphql, field):
     application = ApplicationFactory.create_in_status_handled()
     section = application.application_sections.first()
@@ -80,7 +80,6 @@ def test_reservation_unit_option__query__perms__application_owner__cant_see_rest
     fields = f"""
         reservationUnitOptions {{
             pk
-            locked
             {field}
         }}
     """

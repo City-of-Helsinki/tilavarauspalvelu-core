@@ -957,4 +957,4 @@ def _create_allocated_time_slots_for_section(
     # Mark all reservation unit options as locked to indicate that we are done allocating them.
     # This will make the application section status change to "HANDLED".
     for option in reservation_unit_options:
-        option.locked = True
+        option.is_locked = True

@@ -64,19 +64,19 @@ def test_application__status():
     application_round.save()
 
     # All reservation unit options have been locked -> application is HANDLED
-    option.locked = True
+    option.is_locked = True
     option.save()
     assert application.status == ApplicationStatusChoice.HANDLED
     assert Application.objects.filter(L(status=ApplicationStatusChoice.HANDLED)).exists()
-    option.locked = False
+    option.is_locked = False
     option.save()
 
     # All reservation unit options have been rejected -> application is HANDLED
-    option.rejected = True
+    option.is_rejected = True
     option.save()
     assert application.status == ApplicationStatusChoice.HANDLED
     assert Application.objects.filter(L(status=ApplicationStatusChoice.HANDLED)).exists()
-    option.rejected = False
+    option.is_rejected = False
     option.save()
 
     # All application sections' applied reservations per week equals
@@ -121,19 +121,19 @@ def test_application__all_sections_allocated():
     assert Application.objects.filter(L(all_sections_allocated=False)).exists()
 
     # All reservation unit options have been locked -> all_sections_allocated is True
-    option.locked = True
+    option.is_locked = True
     option.save()
     assert application.all_sections_allocated is True
     assert Application.objects.filter(L(all_sections_allocated=True)).exists()
-    option.locked = False
+    option.is_locked = False
     option.save()
 
     # All reservation unit options have been rejected -> all_sections_allocated is True
-    option.rejected = True
+    option.is_rejected = True
     option.save()
     assert application.all_sections_allocated is True
     assert Application.objects.filter(L(all_sections_allocated=True)).exists()
-    option.rejected = False
+    option.is_rejected = False
     option.save()
 
     # All application sections' applied reservations per week equals

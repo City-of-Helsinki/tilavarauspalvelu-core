@@ -58,7 +58,7 @@ class ApplicationRoundActions:
         match self.application_round.status:
             case ApplicationRoundStatusChoice.IN_ALLOCATION:
                 # Unlock all reservation unit options, and remove all allocated time slots
-                ReservationUnitOption.objects.for_application_round(self.application_round).update(locked=False)
+                ReservationUnitOption.objects.for_application_round(self.application_round).update(is_locked=False)
                 AllocatedTimeSlot.objects.for_application_round(self.application_round).delete()
 
             case ApplicationRoundStatusChoice.HANDLED:
