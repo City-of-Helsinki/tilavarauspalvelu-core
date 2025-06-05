@@ -33,26 +33,26 @@ class GeneralRoleAdmin(admin.ModelAdmin):
     list_display = [
         "role",
         "user_email",
-        "role_active",
+        "is_role_active",
     ]
     list_filter = [
         "role",
-        "role_active",
+        "is_role_active",
     ]
 
     # Form
     fields = [
-        "role_active",
+        "is_role_active",
         "role",
         "user",
         "assigner",
-        "created",
-        "modified",
+        "created_at",
+        "updated_at",
     ]
     readonly_fields = [
         "assigner",
-        "created",
-        "modified",
+        "created_at",
+        "updated_at",
         "assigner",
     ]
     autocomplete_fields = [

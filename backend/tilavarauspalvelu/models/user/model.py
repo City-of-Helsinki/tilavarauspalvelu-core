@@ -88,7 +88,7 @@ class User(AbstractUser):
         if hasattr(self, "_general_roles"):
             return self._general_roles
 
-        qs = self.general_roles.filter(role_active=True).values_list("role", flat=True)
+        qs = self.general_roles.filter(is_role_active=True).values_list("role", flat=True)
         self._general_roles = [UserRoleChoice(role) for role in qs]
         return self._general_roles
 
