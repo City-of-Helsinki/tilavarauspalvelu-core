@@ -35,10 +35,10 @@ class ApplicationSectionFactory(GenericDjangoModelFactory[ApplicationSection]):
     num_persons = fuzzy.FuzzyInteger(low=1, high=1000)
 
     reservations_begin_date = factory.LazyAttribute(
-        lambda i: coerce_date(i.application.application_round.reservation_period_begin),
+        lambda i: coerce_date(i.application.application_round.reservation_period_begin_date),
     )
     reservations_end_date = factory.LazyAttribute(
-        lambda i: coerce_date(i.application.application_round.reservation_period_end),
+        lambda i: coerce_date(i.application.application_round.reservation_period_end_date),
     )
 
     reservation_min_duration = datetime.timedelta(hours=1)

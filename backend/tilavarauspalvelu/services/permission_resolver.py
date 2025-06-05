@@ -259,7 +259,7 @@ class PermissionResolver:
         if (
             not reserver_needs_role
             and self.user == application.user
-            and local_datetime() < application.application_round.application_period_end
+            and local_datetime() < application.application_round.application_period_ends_at
         ):
             return True
 

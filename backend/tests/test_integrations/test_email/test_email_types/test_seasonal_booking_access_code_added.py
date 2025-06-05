@@ -406,7 +406,7 @@ def test_seasonal_booking_access_code_added__send_email(outbox):
         user=user,
         contact_person__email="contact@email.com",
         sent_at=local_datetime(),
-        application_round__sent_date=local_datetime(),
+        application_round__sent_at=local_datetime(),
     )
     reservation_series = create_reservation_series(
         user=user,
@@ -435,7 +435,7 @@ def test_seasonal_booking_access_code_added__send_email__no_reservations(outbox)
         user=user,
         contact_person__email="contact@email.com",
         sent_at=local_datetime(),
-        application_round__sent_date=local_datetime(),
+        application_round__sent_at=local_datetime(),
     )
     reservation_series = ReservationSeriesFactory.create(
         user=user,
@@ -459,7 +459,7 @@ def test_seasonal_booking_access_code_added__send_email__no_recipients(outbox):
         user=None,
         contact_person=None,
         sent_at=local_datetime(),
-        application_round__sent_date=local_datetime(),
+        application_round__sent_at=local_datetime(),
     )
     reservation_series = create_reservation_series(
         user=None,

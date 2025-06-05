@@ -66,8 +66,8 @@ class ReservationQuerySet(models.QuerySet):
 
     def within_application_round_period(self, app_round: ApplicationRound) -> Self:
         return self.within_period(
-            app_round.reservation_period_begin,
-            app_round.reservation_period_end,
+            app_round.reservation_period_begin_date,
+            app_round.reservation_period_end_date,
         )
 
     def within_period(self, period_start: datetime.date, period_end: datetime.date) -> Self:

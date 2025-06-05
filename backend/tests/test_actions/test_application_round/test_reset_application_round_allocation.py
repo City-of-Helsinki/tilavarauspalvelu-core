@@ -70,7 +70,7 @@ def test_reset_application_round_allocation__handled():
     assert ReservationSeries.objects.count() == 2
     assert Reservation.objects.count() == 2
     assert ReservationUnitOption.objects.filter(locked=True).count() == 1
-    assert application_round.handled_date is not None
+    assert application_round.handled_at is not None
 
     assert application_round.status == ApplicationRoundStatusChoice.HANDLED
 
@@ -83,7 +83,7 @@ def test_reset_application_round_allocation__handled():
     assert ReservationSeries.objects.count() == 0
     assert Reservation.objects.count() == 0
     assert ReservationUnitOption.objects.filter(locked=True).count() == 1
-    assert application_round.handled_date is None
+    assert application_round.handled_at is None
 
 
 @patch_method(PindoraService.delete_access_code)
