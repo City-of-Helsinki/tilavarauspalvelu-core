@@ -1,5 +1,4 @@
 import React from "react";
-import type { TFunction } from "i18next";
 import { useTranslation } from "next-i18next";
 import {
   IconCheck,
@@ -39,32 +38,7 @@ import {
   RegularText,
 } from "./styled";
 import { SuitableTimeRangeFormValues } from "./funnel/form";
-
-function formatDurationSeconds(seconds: number, t: TFunction): string {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds - hours * 3600) / 60);
-
-  if (hours === 0) {
-    return t("common:abbreviations:minute", { count: minutes });
-  }
-  if (minutes === 0) {
-    return t("common:abbreviations:hour", { count: hours });
-  }
-  return `${t("common:abbreviations:hour", { count: hours })} ${t(
-    "common:abbreviations:minute",
-    { count: minutes }
-  )}`;
-}
-
-function formatDurationRange(
-  beginSecs: number,
-  endSecs: number,
-  t: TFunction
-): string {
-  const beginHours = formatDurationSeconds(beginSecs, t);
-  const endHours = formatDurationSeconds(endSecs, t);
-  return beginSecs === endSecs ? beginHours : `${beginHours} - ${endHours}`;
-}
+import { formatDurationRange } from "@/modules/util";
 
 function ageGroupToString(ag: Maybe<AgeGroupNode> | undefined): string {
   if (!ag) {
@@ -136,9 +110,9 @@ function SingleApplicationSection({
   const reservationsBegin = toUIDate(new Date(aes.reservationsBeginDate));
   const reservationsEnd = toUIDate(new Date(aes.reservationsEndDate));
   const duration = formatDurationRange(
+    t,
     aes.reservationMinDuration,
-    aes.reservationMaxDuration,
-    t
+    aes.reservationMaxDuration
   );
   const infos = [
     {

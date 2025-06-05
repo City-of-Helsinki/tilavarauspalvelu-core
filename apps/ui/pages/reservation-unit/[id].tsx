@@ -78,7 +78,7 @@ import {
   EquipmentList,
   QuickReservation,
   RelatedUnits,
-  ReservationInfoContainer,
+  ReservationInfoSection,
   ReservationUnitCalendarSection,
 } from "@/components/reservation-unit";
 import {
@@ -516,7 +516,7 @@ function ReservationUnit({
             submitReservation={submitReservation}
           />
         )}
-        <ReservationInfoContainer
+        <ReservationInfoSection
           reservationUnit={reservationUnit}
           reservationUnitIsReservable={reservationUnitIsReservable}
         />
@@ -863,7 +863,7 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
       descriptionEn
       descriptionSv
       canApplyFreeOfCharge
-      ...ReservationInfoContainer
+      ...ReservationInfoSection
       ...ReservationQuotaReached
       publishingState
       equipments {
