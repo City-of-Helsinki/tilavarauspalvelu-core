@@ -31,7 +31,7 @@ def test_cancel_application(graphql):
     # - The application has a send date
     assert response.has_errors is False, response
     application.refresh_from_db()
-    assert application.cancelled_date is not None
+    assert application.cancelled_at is not None
 
 
 @pytest.mark.parametrize(

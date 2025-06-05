@@ -61,18 +61,18 @@ class ApplicationCreateSerializer(NestingModelSerializer):
             "application_sections",
             # Read-only
             "user",
-            "created_date",
-            "last_modified_date",
-            "cancelled_date",
-            "sent_date",
+            "created_at",
+            "updated_at",
+            "cancelled_at",
+            "sent_at",
             "status",
         ]
         extra_kwargs = {
             "home_city": {"required": False, "allow_null": True},
-            "created_date": {"read_only": True},
-            "last_modified_date": {"read_only": True},
-            "cancelled_date": {"read_only": True},
-            "sent_date": {"read_only": True},
+            "created_at": {"read_only": True},
+            "updated_at": {"read_only": True},
+            "cancelled_at": {"read_only": True},
+            "sent_at": {"read_only": True},
         }
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
@@ -111,7 +111,7 @@ class ApplicationUpdateSerializer(ApplicationCreateSerializer):
 
     def update(self, instance: Application, validated_data: dict[str, Any]) -> Application:
         # If a sent application is updated, it needs to be sent and validated again
-        instance.sent_date = None
+        instance.sent_at = None
         return super().update(instance, validated_data)
 
 
@@ -401,7 +401,7 @@ class ApplicationSendSerializer(NestingModelSerializer):
             errors.append(error)
 
     def save(self, **kwargs: Any) -> Application:
-        self.instance.sent_date = local_datetime()
+        self.instance.sent_at = local_datetime()
         self.instance.save()
         EmailService.send_seasonal_booking_application_received_email(application=self.instance)
         return self.instance
@@ -430,7 +430,7 @@ class ApplicationCancelSerializer(NestingModelSerializer):
         return data
 
     def save(self, **kwargs: Any) -> Application:
-        self.instance.cancelled_date = local_datetime()
+        self.instance.cancelled_at = local_datetime()
         self.instance.save()
         return self.instance
 

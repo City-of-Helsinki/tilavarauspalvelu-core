@@ -45,8 +45,8 @@ class ApplicationRoundNode(DjangoNode):
         expression=SubqueryCount(
             queryset=Application.objects.filter(
                 application_round=models.OuterRef("pk"),
-                cancelled_date__isnull=True,
-                sent_date__isnull=False,
+                cancelled_at__isnull=True,
+                sent_at__isnull=False,
             ),
         ),
         required=True,

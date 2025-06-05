@@ -40,18 +40,17 @@ class Application(SerializableMixin, models.Model):
     """
 
     applicant_type: str | None = StrChoiceField(enum=ApplicantTypeChoice, null=True, db_index=True)
-    created_date: datetime.datetime = models.DateTimeField(auto_now_add=True)
-    last_modified_date: datetime.datetime = models.DateTimeField(auto_now=True)
-    cancelled_date: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=None)
-    sent_date: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=None)
-    in_allocation_notification_sent_date: datetime.datetime | None = models.DateTimeField(
-        null=True, blank=True, default=None
-    )
-    results_ready_notification_sent_date: datetime.datetime | None = models.DateTimeField(
-        null=True, blank=True, default=None
-    )
-    additional_information: str | None = models.TextField(null=True, blank=True)
+    additional_information: str = models.TextField(blank=True, default="")
     working_memo: str = models.TextField(blank=True, default="")
+
+    cancelled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+    sent_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+
+    in_allocation_notification_sent_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+    results_ready_notification_sent_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+
+    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
+    updated_at: datetime.datetime = models.DateTimeField(auto_now=True)
 
     application_round: ApplicationRound = models.ForeignKey(
         "tilavarauspalvelu.ApplicationRound",
@@ -114,21 +113,21 @@ class Application(SerializableMixin, models.Model):
     )
 
     def __str__(self) -> str:
-        return f"{self.user} ({self.created_date.date()})"
+        return f"{self.user} ({self.created_at.date()})"
 
     @lookup_property(joins=["application_round"], skip_codegen=True)
     def status() -> ApplicationStatusChoice:
         return models.Case(  # type: ignore[return-value]
             models.When(
                 # If there is a cancelled date
-                models.Q(cancelled_date__isnull=False),
+                models.Q(cancelled_at__isnull=False),
                 then=models.Value(ApplicationStatusChoice.CANCELLED.value),
             ),
             models.When(
                 # If there is no sent date in the application
                 # AND application round is upcoming or open
                 (
-                    models.Q(sent_date__isnull=True)
+                    models.Q(sent_at__isnull=True)
                     # NOTE: Some copy-pasta from Application Round status for efficiency
                     & models.Q(application_round__sent_date__isnull=True)
                     & models.Q(application_round__handled_date__isnull=True)
@@ -139,7 +138,7 @@ class Application(SerializableMixin, models.Model):
             models.When(
                 # If there is no sent date in the application
                 # (and the application round has moved on according to the previous cases)
-                models.Q(sent_date__isnull=True),
+                models.Q(sent_at__isnull=True),
                 then=models.Value(ApplicationStatusChoice.EXPIRED.value),
             ),
             # NOTE: Some copy-pasta from Application Round status for efficiency
@@ -169,10 +168,10 @@ class Application(SerializableMixin, models.Model):
 
     @status.override
     def _(self) -> ApplicationStatusChoice:
-        if self.cancelled_date is not None:
+        if self.cancelled_at is not None:
             return ApplicationStatusChoice.CANCELLED
 
-        if self.sent_date is None:
+        if self.sent_at is None:
             if self.application_round.status.is_allocation_upcoming:
                 return ApplicationStatusChoice.DRAFT
             return ApplicationStatusChoice.EXPIRED
