@@ -6,6 +6,7 @@ import {
   CustomerTypeChoice,
   type ReservationPageQuery,
   ReservationStateChoice,
+  useReservationCancelReasonsQuery,
   useReservationPageQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
@@ -94,6 +95,18 @@ function ReservationSummary({
 }>) {
   const { t } = useTranslation();
 
+  const { data } = useReservationCancelReasonsQuery({
+    skip: reservation.state !== ReservationStateChoice.Cancelled,
+  });
+
+  const reservationCancelReasons = data?.reservationCancelReasons ?? [];
+  let cancelReason;
+  if (reservationCancelReasons) {
+    cancelReason = reservationCancelReasons.find(
+      (reason) => reservation.cancelReason === reason.value
+    )?.reasonFi;
+  }
+
   return (
     <Summary>
       {reservation.reserveeType && (
@@ -142,7 +155,7 @@ function ReservationSummary({
       )}
       {reservation.state === ReservationStateChoice.Cancelled && (
         <DataWrapper isSummary label={t("RequestedReservation.cancelReason")}>
-          {reservation?.cancelReason?.reasonFi || "-"}
+          {cancelReason || reservation.cancelReason || "-"}
         </DataWrapper>
       )}
       {reservation.state === ReservationStateChoice.Denied && (
@@ -316,7 +329,7 @@ function RequestedReservation({
   reservation,
   refetch,
 }: {
-  reservation: NonNullable<ReservationPageQuery["reservation"]>;
+  reservation: ReservationType;
   refetch: () => Promise<ApolloQueryResult<ReservationPageQuery>>;
 }): JSX.Element | null {
   const { t } = useTranslation();
@@ -456,10 +469,7 @@ export const RESERVATION_PAGE_QUERY = gql`
         description
       }
       ...ApprovalButtons
-      cancelReason {
-        id
-        reasonFi
-      }
+      cancelReason
       denyReason {
         id
         reasonFi
@@ -471,6 +481,14 @@ export const RESERVATION_PAGE_QUERY = gql`
         ...ReservationTypeFormFields
       }
       ...ReservationMetaFields
+    }
+  }
+`;
+
+export const RESERVATION_CANCEL_REASONS_QUERY = gql`
+  query ReservationCancelReasons {
+    reservationCancelReasons {
+      ...CancelReasonFields
     }
   }
 `;
