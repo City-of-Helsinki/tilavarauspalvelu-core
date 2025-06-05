@@ -95,7 +95,7 @@ class ReservationSeriesNode(DjangoNode):
             "end_date",
             "recurrence_in_days",
             "weekdays",
-            "created",
+            "created_at",
             "reservations",
             "rejected_occurrences",
             "allocated_time_slot",
