@@ -456,7 +456,7 @@ class RejectAllApplicationOptionsSerializer(NestingModelSerializer):
         return data
 
     def save(self, **kwargs: Any) -> Application:
-        ReservationUnitOption.objects.filter(application_section__application=self.instance).update(rejected=True)
+        ReservationUnitOption.objects.filter(application_section__application=self.instance).update(is_rejected=True)
         return self.instance
 
 
@@ -470,5 +470,5 @@ class RestoreAllApplicationOptionsSerializer(NestingModelSerializer):
         ]
 
     def save(self, **kwargs: Any) -> Application:
-        ReservationUnitOption.objects.filter(application_section__application=self.instance).update(rejected=False)
+        ReservationUnitOption.objects.filter(application_section__application=self.instance).update(is_rejected=False)
         return self.instance
