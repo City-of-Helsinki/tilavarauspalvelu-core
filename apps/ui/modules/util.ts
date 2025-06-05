@@ -6,7 +6,6 @@ import {
   fromUIDate,
 } from "common/src/common/util";
 import { isBrowser } from "./const";
-import { type LocalizationLanguages } from "common/src/urlBuilder";
 import { formatMinutes, timeToMinutes } from "common/src/helpers";
 import { ReadonlyURLSearchParams } from "next/navigation";
 import { type Maybe, ApplicationStatusChoice } from "@/gql/gql-types";
@@ -22,39 +21,6 @@ export const formatDate = (date: string, formatStr?: string): string => {
   }
   return toUIDate(parseISO(date), formatStr);
 };
-
-type ParameterType =
-  | {
-      pk: number;
-      nameFi: string;
-      nameEn?: string;
-      nameSv?: string;
-    }
-  | { pk: number; name: string };
-
-export function getParameterLabel(
-  parameter:
-    | ParameterType
-    | { minimum?: number | null; maximum?: number | null },
-  lang: LocalizationLanguages = "fi"
-): string {
-  if ("minimum" in parameter) {
-    return `${parameter.minimum || ""} - ${parameter.maximum || ""}`;
-  }
-  if ("name" in parameter) {
-    return parameter.name;
-  }
-  if ("nameEn" in parameter && parameter.nameEn != null && lang === "en") {
-    return parameter.nameEn;
-  }
-  if ("nameSv" in parameter && parameter.nameSv != null && lang === "sv") {
-    return parameter.nameSv;
-  }
-  if ("nameFi" in parameter) {
-    return parameter.nameFi;
-  }
-  return "no label";
-}
 
 export function getPostLoginUrl(
   params: Readonly<URLSearchParams> = new ReadonlyURLSearchParams()
