@@ -7,7 +7,7 @@ import { useSpacesResourcesQuery } from "@gql/gql-types";
 import { ResourcesTable } from "./ResourcesTable";
 import { SpacesTable } from "./SpacesTable";
 import { SubPageHead } from "./SubPageHead";
-import { HDSModal, useModal } from "@/component/HDSModal";
+import { HDSModal, useModal } from "common/src/components/HDSModal";
 import { NewSpaceModal } from "./space/new-space-modal/NewSpaceModal";
 import { NewResourceModal } from "./resource/NewResourceModal";
 import { base64encode } from "common/src/helpers";

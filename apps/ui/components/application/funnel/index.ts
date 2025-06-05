@@ -14,5 +14,5 @@ export { BillingAddress } from "./BillingAddress";
 export { CompanyForm, ContactPersonSection } from "./CompanyForm";
 export { IndividualForm } from "./IndividualForm";
 export { OrganisationForm } from "./OrganisationForm";
-export { type OptionTypes, ReservationUnitList } from "./ReservationUnitList";
+export { ReservationUnitList } from "./ReservationUnitList";
 export { ApplicationSectionSummary } from "./ApplicationSectionSummary";

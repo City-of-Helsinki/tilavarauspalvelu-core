@@ -22,29 +22,22 @@ import { toUIDate } from "common/src/common/util";
 import { Accordion } from "@/components/Accordion";
 import { getDurationOptions } from "@/modules/const";
 import { type ApplicationPage1FormValues } from "./form";
-import {
-  ApplicationSectionSummary,
-  type OptionTypes,
-  ReservationUnitList,
-} from ".";
+import { ApplicationSectionSummary, ReservationUnitList } from ".";
+import { type OptionsT } from "@/modules/search";
 
-type Props = {
+type Props = Readonly<{
   index: number;
   applicationRound: ApplicationRoundForApplicationFragment;
-  optionTypes: OptionTypes;
-  isVisible: boolean;
-  onToggleAccordion: () => void;
+  options: Readonly<OptionsT>;
   onDeleteEvent: () => void;
-};
+}>;
 
 function ApplicationSectionInner({
   index,
   applicationRound,
-  optionTypes,
-  del,
-}: Omit<Props, "onToggleAccordion" | "onDeleteEvent"> & {
-  del: () => void;
-}): JSX.Element {
+  options,
+  onDeleteEvent,
+}: Props): JSX.Element {
   const { t } = useTranslation();
   const form = useFormContext<ApplicationPage1FormValues>();
   const {
@@ -58,13 +51,6 @@ function ApplicationSectionInner({
   } = form;
 
   const [isWaitingForDelete, setIsWaitingForDelete] = useState(false);
-
-  const {
-    ageGroupOptions,
-    purposeOptions,
-    reservationUnitTypeOptions,
-    unitOptions,
-  } = optionTypes;
 
   const periodStartDate = new Date(applicationRound.reservationPeriodBegin);
   const periodEndDate = new Date(applicationRound.reservationPeriodEnd);
@@ -104,8 +90,14 @@ function ApplicationSectionInner({
   const getTranslatedError = (field: FieldName): string | undefined => {
     const error = errors.applicationSections?.[index]?.[field];
     if (error?.message != null) {
+      // TODO this could be changed in the validation schema
+      // so it follows the same pattern as the other fields
+      if (field === "reservationUnits" && error.type === "too_small") {
+        return t("application:validation.noReservationUnits");
+      }
       return t(`application:validation.${error.message}`);
     }
+
     return undefined;
   };
 
@@ -143,12 +135,12 @@ function ApplicationSectionInner({
           required
           name={`applicationSections.${index}.ageGroup`}
           label={t("application:Page1.ageGroup")}
-          options={ageGroupOptions ?? []}
+          options={options.ageGroups}
           error={getTranslatedError("ageGroup")}
         />
         <ControlledSelect
           control={control}
-          options={purposeOptions}
+          options={options.purposes}
           name={`applicationSections.${index}.purpose`}
           label={t("application:Page1.purpose")}
           required
@@ -157,14 +149,12 @@ function ApplicationSectionInner({
       </AutoGrid>
       <H4 as="h3"> {t("application:Page1.spacesSubHeading")}</H4>
       <ReservationUnitList
+        name={`applicationSections.${index}.reservationUnits`}
+        control={control}
         applicationRound={applicationRound}
-        index={index}
         minSize={numPersons}
-        options={{
-          purposeOptions,
-          reservationUnitTypeOptions,
-          unitOptions,
-        }}
+        options={options}
+        error={getTranslatedError("reservationUnits")}
       />
       <H4 as="h3">{t("application:Page1.applicationRoundSubHeading")}</H4>
       <Checkbox
@@ -227,7 +217,7 @@ function ApplicationSectionInner({
           cancelLabel={t("common:cancel")}
           heading={t("application:Page1.deleteDialog.heading")}
           content={t("application:Page1.deleteDialog.content")}
-          onAccept={del}
+          onAccept={onDeleteEvent}
           onCancel={() => setIsWaitingForDelete(false)}
           variant="danger"
         />
@@ -259,9 +249,8 @@ function ApplicationDateRangePicker({
     return undefined;
   };
 
-  const field = "applicationSections" as const;
-  const beginField = `${field}.${index}.begin` as const;
-  const endField = `${field}.${index}.end` as const;
+  const beginField = `applicationSections.${index}.begin` as const;
+  const endField = `applicationSections.${index}.end` as const;
   const beginState = getFieldState(beginField);
   const endState = getFieldState(endField);
 
@@ -306,23 +295,34 @@ function ApplicationDateRangePicker({
 }
 
 export function ApplicationSectionPage1(props: Props): JSX.Element {
-  const { index, isVisible, onDeleteEvent, onToggleAccordion } = props;
+  const { index } = props;
 
   const { t } = useTranslation();
 
   const form = useFormContext<ApplicationPage1FormValues>();
   const {
     watch,
+    setValue,
     formState: { errors },
   } = form;
 
   const eventName = watch(`applicationSections.${index}.name`);
   watch(`applicationSections.${index}.appliedReservationsPerWeek`);
+  const openByDefault = watch(`applicationSections`)?.length === 1;
+  const isVisible =
+    openByDefault || watch(`applicationSections.${index}.isAccordionOpen`);
 
   // TODO requires us to use the accordion from admin-ui instead (or add force open)
   const hasErrors = errors.applicationSections?.[index] != null;
 
   const shouldRenderInner = isVisible || hasErrors;
+  const onToggleAccordion = () => {
+    const val = watch(`applicationSections.${index}.isAccordionOpen`);
+    setValue(`applicationSections.${index}.isAccordionOpen`, !val, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  };
 
   return (
     <Accordion
@@ -332,9 +332,7 @@ export function ApplicationSectionPage1(props: Props): JSX.Element {
       theme="thin"
     >
       {/* Accordion doesn't remove from DOM on hide, but this is too slow if it's visible */}
-      {shouldRenderInner && (
-        <ApplicationSectionInner {...props} del={onDeleteEvent} />
-      )}
+      {shouldRenderInner && <ApplicationSectionInner {...props} />}
     </Accordion>
   );
 }

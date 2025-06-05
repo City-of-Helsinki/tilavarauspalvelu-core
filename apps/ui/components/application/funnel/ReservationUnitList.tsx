@@ -1,120 +1,87 @@
-import React, { useEffect } from "react";
-import { createPortal } from "react-dom";
+import React, { useRef } from "react";
 import {
   Button,
+  ButtonPresetTheme,
+  ButtonSize,
   ButtonVariant,
+  Dialog,
   IconArrowUndo,
   IconPlus,
   Notification,
   NotificationSize,
 } from "hds-react";
-import { useFormContext } from "react-hook-form";
+import {
+  Control,
+  FieldValues,
+  Path,
+  useController,
+  UseControllerProps,
+} from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import type {
   ApplicationReservationUnitListFragment,
   OrderedReservationUnitCardFragment,
 } from "@gql/gql-types";
-import { IconButton } from "common/src/components";
 import { filterNonNullable } from "common/src/helpers";
 import { Flex } from "common/styled";
-import { breakpoints } from "common/src/const";
 import { ErrorText } from "common/src/components/ErrorText";
-import { Modal } from "@/components/Modal";
 import { OrderedReservationUnitCard, ReservationUnitModalContent } from ".";
-import { type ApplicationPage1FormValues } from "./form";
 import { useSearchParams } from "next/navigation";
 import { useSearchModify } from "@/hooks/useSearchValues";
+import { HDSModal } from "common/src/components/HDSModal";
+import { type OptionsT } from "@/modules/search";
 
 type ReservationUnitType = Pick<OrderedReservationUnitCardFragment, "pk">;
 export type OptionType = Readonly<{ value: number; label: string }>;
-type OptionListType = Readonly<Array<OptionType>>;
-export type OptionTypes = Readonly<{
-  ageGroupOptions?: OptionListType;
-  purposeOptions: OptionListType;
-  reservationUnitTypeOptions: OptionListType;
-  unitOptions: OptionListType;
-}>;
 
-export type ReservationUnitListProps = {
-  index: number;
-  applicationRound: ApplicationReservationUnitListFragment;
-  options: OptionTypes;
+export interface ReservationUnitListProps<T extends FieldValues>
+  extends UseControllerProps<T> {
+  name: Path<T>;
+  control: Control<T>;
+  applicationRound: Readonly<ApplicationReservationUnitListFragment>;
+  options: Readonly<OptionsT>;
   minSize?: number;
-};
-
-function isValid(
-  units: ApplicationReservationUnitListFragment["reservationUnits"],
-  minSize: number
-) {
-  const error = units
-    .map(
-      (resUnit) =>
-        minSize != null &&
-        resUnit.maxPersons != null &&
-        resUnit.maxPersons < minSize
-    )
-    .find((a) => a);
-  return !error;
+  error?: string;
 }
 
 // selected reservation units are applicationEvent.eventReservationUnits
 // available reservation units are applicationRound.reservationUnits
-export function ReservationUnitList({
-  index,
+export function ReservationUnitList<T extends FieldValues>({
+  name,
+  control,
   applicationRound,
   options,
   minSize,
-}: Readonly<ReservationUnitListProps>): JSX.Element {
+  error,
+}: Readonly<ReservationUnitListProps<T>>): JSX.Element {
   const { t } = useTranslation();
-
+  const ref = useRef<HTMLButtonElement>(null);
   const { handleRouteChange } = useSearchModify();
   const searchValues = useSearchParams();
 
-  const form = useFormContext<ApplicationPage1FormValues>();
-  const { clearErrors, setError, watch, setValue, formState } = form;
-  const { errors } = formState;
+  const { field } = useController({
+    name,
+    control,
+  });
+  const { value, onChange } = field;
 
-  const fieldName = `applicationSections.${index}.reservationUnits` as const;
-
-  const reservationUnits = watch(fieldName);
-  const setReservationUnits = (units: number[]) => {
-    setValue(fieldName, units);
-  };
-
-  const showModal = searchValues.get("modalShown") === fieldName;
+  const showModal = searchValues.get("modalShown") === name;
   const setShowModal = (show: boolean) => {
     const params = new URLSearchParams(searchValues);
     if (show) {
-      params.set("modalShown", fieldName);
+      params.set("modalShown", name);
     } else {
       params.delete("modalShown");
     }
     handleRouteChange(params);
   };
 
-  // TODO these could be prefiltered on the Page level similar to the addition of a new application section
-  // but requires a bit different mechanic because forms are separate from the selected resservation units hook that uses session storage
-  const avail = filterNonNullable(applicationRound.reservationUnits);
-  const currentReservationUnits = filterNonNullable(
-    reservationUnits.map((pk) => avail.find((ru) => ru.pk === pk))
-  );
-
-  useEffect(() => {
-    const valid = isValid(currentReservationUnits, minSize ?? 0);
-    if (valid) {
-      clearErrors([fieldName]);
-    } else {
-      setError(fieldName, { message: "reservationUnitTooSmall" });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reservationUnits, minSize]);
-
   const handleAdd = (ru: ReservationUnitType) => {
     if (ru.pk == null) {
       return;
     }
-    setReservationUnits([...reservationUnits, ru.pk]);
+    onChange([...value, ru.pk]);
   };
 
   const move = (units: number[], from: number, to: number): number[] => {
@@ -128,50 +95,49 @@ export function ReservationUnitList({
     return copy;
   };
 
-  const remove = (reservationUnit: ReservationUnitType) => {
-    setReservationUnits([
-      ...reservationUnits.filter((pk) => pk !== reservationUnit.pk),
-    ]);
+  const handleRemove = (ru: ReservationUnitType) => {
+    onChange([...value.filter((pk: T) => Number(pk) !== ru.pk)]);
   };
 
   const moveUp = (reservationUnit: ReservationUnitType) => {
     if (reservationUnit.pk == null) {
       return;
     }
-    const from = reservationUnits.indexOf(reservationUnit.pk);
+    const from = value.indexOf(reservationUnit.pk);
     const to = from - 1;
-    setReservationUnits(move(reservationUnits, from, to));
+    onChange(move(value, from, to));
   };
 
   const moveDown = (reservationUnit: ReservationUnitType) => {
     if (reservationUnit.pk == null) {
       return;
     }
-    const from = reservationUnits.indexOf(reservationUnit.pk);
+    const from = value.indexOf(reservationUnit.pk);
     const to = from + 1;
-    setReservationUnits(move(reservationUnits, from, to));
+    onChange(move(value, from, to));
   };
 
-  // Only checking for the required error here, other errors are handled in the ReservationUnitCard
-  const unitErrors = errors.applicationSections?.[index]?.reservationUnits;
-  const hasNoUnitsError =
-    unitErrors != null && unitErrors.message === "Required";
+  // Form only stores pks so turn those into Card Fragments
+  const avail = filterNonNullable(applicationRound.reservationUnits);
+  const selected: typeof avail = filterNonNullable(
+    value.map((pk: T) => avail.find((ru) => ru.pk === Number(pk)))
+  );
 
   return (
     <Flex>
-      {hasNoUnitsError && (
-        <ErrorText>{t("application:validation.noReservationUnits")}</ErrorText>
-      )}
       <Notification
         size={NotificationSize.Small}
         label={t("reservationUnitList:infoReservationUnits")}
       >
         {t("reservationUnitList:infoReservationUnits")}
       </Notification>
+      {error && (
+        <ErrorText data-testid="ReservationUnitList__error">{error}</ErrorText>
+      )}
       <Flex $gap="m" $direction="column" aria-live="polite">
-        {currentReservationUnits.map((ru, i, all) => (
+        {selected.map((ru, i, all) => (
           <OrderedReservationUnitCard
-            key={ru.pk}
+            key={`reservation-unit_${ru.pk}`}
             error={
               minSize != null &&
               ru.maxPersons != null &&
@@ -179,51 +145,61 @@ export function ReservationUnitList({
                 ? t("application:validation.reservationUnitTooSmall")
                 : undefined
             }
-            onDelete={remove}
+            onDelete={handleRemove}
             reservationUnit={ru}
             order={i}
             first={i === 0}
             last={i === all.length - 1}
             onMoveDown={moveDown}
             onMoveUp={moveUp}
+            data-testid={`ReservationUnitList__ordered-reservation-unit-card-${ru.pk}`}
           />
         ))}
       </Flex>
       <Flex $alignItems="center">
-        <IconButton
+        <Button
+          ref={ref}
+          iconStart={<IconPlus />}
+          variant={ButtonVariant.Supplementary}
+          theme={ButtonPresetTheme.Black}
+          size={ButtonSize.Small}
           onClick={() => setShowModal(true)}
-          icon={<IconPlus />}
-          label={t("reservationUnitList:add")}
-        />
-      </Flex>
-      {createPortal(
-        <Modal
-          show={showModal}
-          handleClose={() => setShowModal(false)}
-          maxWidth={breakpoints.l}
-          fullHeight
-          actions={
-            <Flex $alignItems="center">
-              <Button
-                iconStart={<IconArrowUndo />}
-                onClick={() => setShowModal(false)}
-                variant={ButtonVariant.Supplementary}
-              >
-                {t("reservationUnitModal:returnToApplication")}
-              </Button>
-            </Flex>
-          }
         >
+          {t("reservationUnitList:add")}
+        </Button>
+      </Flex>
+      <HDSModal
+        id={name}
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        fixedHeight
+        maxWidth="xl"
+        focusAfterCloseRef={ref}
+        scrollable
+      >
+        <Dialog.Header
+          id="modal-header"
+          title={t("reservationUnitModal:heading")}
+        />
+        <Dialog.Content>
           <ReservationUnitModalContent
-            currentReservationUnits={currentReservationUnits}
+            currentReservationUnits={selected}
             applicationRound={applicationRound}
             handleAdd={handleAdd}
-            handleRemove={remove}
+            handleRemove={handleRemove}
             options={options}
           />
-        </Modal>,
-        document.body
-      )}
+        </Dialog.Content>
+        <Dialog.ActionButtons style={{ justifyContent: "flex-end" }}>
+          <Button
+            iconStart={<IconArrowUndo />}
+            onClick={() => setShowModal(false)}
+            variant={ButtonVariant.Supplementary}
+          >
+            {t("reservationUnitModal:returnToApplication")}
+          </Button>
+        </Dialog.ActionButtons>
+      </HDSModal>
     </Flex>
   );
 }

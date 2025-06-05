@@ -11,7 +11,7 @@ import {
   useDeleteSpaceMutation,
 } from "@gql/gql-types";
 import { PopupMenu } from "common/src/components/PopupMenu";
-import { HDSModal, useModal as useHDSModal } from "@/component/HDSModal";
+import { HDSModal, useModal } from "common/src/components/HDSModal";
 import { NewSpaceModal } from "./space/new-space-modal/NewSpaceModal";
 import { errorToast } from "common/src/common/toast";
 import { CustomTable } from "@/component/Table";
@@ -51,7 +51,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     openWithContent,
     closeModal,
     modalContent,
-  } = useHDSModal();
+  } = useModal();
 
   const [deleteSpaceMutation] = useDeleteSpaceMutation();
   const displayError = useDisplayError();

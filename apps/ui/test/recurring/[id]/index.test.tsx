@@ -2,8 +2,11 @@ import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
 import {
   createMockApplicationRound,
-  CreateGraphQLMockProps,
   createApplicationSearchGraphQLMocks,
+} from "@test/application.mocks";
+import {
+  type CreateGraphQLMockProps,
+  createOptionMock,
 } from "@/test/test.gql.utils";
 import SeasonalSearch from "@/pages/recurring/[id]";
 import { addYears } from "date-fns";
@@ -11,6 +14,7 @@ import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import userEvent from "@testing-library/user-event";
 import { getApplicationPath } from "@/modules/urls";
 import { MockedGraphQLProvider } from "@/test/test.react.utils";
+import { type OptionsT } from "@/modules/search";
 
 const { mockedRouterReplace, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
@@ -53,12 +57,7 @@ function customRender(
     applicationPeriodBegin: new Date(2024, 0, 1, 0, 0, 0),
     applicationPeriodEnd: addYears(new Date(), 1),
   });
-  const options = {
-    unitOptions: [],
-    equipmentsOptions: [],
-    purposeOptions: [],
-    reservationUnitTypeOptions: [],
-  } as const;
+  const options: OptionsT = createOptionMock();
   return render(
     <MockedGraphQLProvider mocks={mocks}>
       <SeasonalSearch
@@ -130,15 +129,7 @@ describe("Page: SeasonalSearch", () => {
     params.set(SEASONAL_SELECTED_PARAM_KEY, "1");
     params.set("id", "1");
     expect(mockedRouterReplace).toHaveBeenCalledTimes(1);
-
-    expect(mockedRouterReplace).toHaveBeenLastCalledWith(
-      { query: params.toString() },
-      undefined,
-      {
-        shallow: true,
-        scroll: false,
-      }
-    );
+    expect(mockedRouterReplace).searchParamCall(params);
   });
 
   test("selecting another card should add to query params", async () => {
@@ -159,14 +150,7 @@ describe("Page: SeasonalSearch", () => {
     await user.click(select);
     expect(mockedRouterReplace).toHaveBeenCalledTimes(1);
     params.append(SEASONAL_SELECTED_PARAM_KEY, "3");
-    expect(mockedRouterReplace).toHaveBeenLastCalledWith(
-      { query: params.toString() },
-      undefined,
-      {
-        shallow: true,
-        scroll: false,
-      }
-    );
+    expect(mockedRouterReplace).searchParamCall(params);
   });
 
   test("deselecting should remove from query params", async () => {
@@ -187,14 +171,7 @@ describe("Page: SeasonalSearch", () => {
     await user.click(select);
     expect(mockedRouterReplace).toHaveBeenCalledTimes(1);
     params.delete(SEASONAL_SELECTED_PARAM_KEY);
-    expect(mockedRouterReplace).toHaveBeenLastCalledWith(
-      { query: params.toString() },
-      undefined,
-      {
-        shallow: true,
-        scroll: false,
-      }
-    );
+    expect(mockedRouterReplace).searchParamCall(params);
   });
 
   // doesn't require interaction, just check the query params

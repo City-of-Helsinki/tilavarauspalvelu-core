@@ -38,14 +38,15 @@ import {
 } from "@/components/application/funnel/";
 import { FormSubHeading } from "@/components/application/funnel/styled";
 import { createApolloClient } from "@/modules/apolloClient";
-import { useOptions } from "@/hooks/useOptions";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
+import { getSearchOptions, type OptionsT } from "@/modules/search";
 
-function Page3Form(): JSX.Element | null {
-  const { options } = useOptions();
-  const { cityOptions } = options;
+type Page3FormProps = {
+  cityOptions: OptionsT["cities"];
+};
 
+function Page3Form({ cityOptions }: Page3FormProps): JSX.Element | null {
   const { watch, unregister, register, setValue } =
     useFormContext<ApplicationPage3FormValues>();
   const type = watch("applicantType");
@@ -91,7 +92,8 @@ function Page3Form(): JSX.Element | null {
 
 function Page3({
   application,
-}: Pick<PropsNarrowed, "application">): JSX.Element {
+  cityOptions,
+}: Pick<PropsNarrowed, "application" | "cityOptions">): JSX.Element {
   const router = useRouter();
 
   const form = useForm<ApplicationPage3FormValues>({
@@ -143,7 +145,7 @@ function Page3({
             <FormSubHeading as="h2">
               {t("application:Page3.sectionHeadings.basicInfo")}
             </FormSubHeading>
-            <Page3Form />
+            <Page3Form cityOptions={cityOptions} />
           </AutoGrid>
           <ButtonContainer>
             <Button
@@ -201,9 +203,16 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFound;
   }
 
+  const options = await getSearchOptions(
+    apolloClient,
+    "seasonal",
+    locale ?? "fi"
+  );
+
   return {
     props: {
       application,
+      cityOptions: options.cities,
       ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
     },

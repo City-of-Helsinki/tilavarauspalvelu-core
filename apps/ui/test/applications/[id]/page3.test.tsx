@@ -2,15 +2,15 @@ import { type ApplicationPage3Query } from "@/gql/gql-types";
 import Page3 from "@/pages/applications/[id]/page3";
 import { render, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
+import { type CreateGraphQLMocksReturn } from "@test/test.gql.utils";
 import {
   createMockApplicationFragment,
-  CreateMockApplicationFragmentProps,
-  type CreateGraphQLMocksReturn,
+  type CreateMockApplicationFragmentProps,
   createGraphQLApplicationIdMock,
-} from "@/test/test.gql.utils";
+} from "@test/application.mocks";
 import userEvent from "@testing-library/user-event";
 import { getApplicationPath } from "@/modules/urls";
-import { MockedGraphQLProvider } from "@/test/test.react.utils";
+import { MockedGraphQLProvider } from "@test/test.react.utils";
 
 const { mockedRouterPush, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
@@ -67,12 +67,11 @@ function customRender(
   const mocks = createGraphQLMocks();
   return render(
     <MockedGraphQLProvider mocks={mocks}>
-      <Page3 application={application} />
+      <Page3 application={application} cityOptions={[]} />
     </MockedGraphQLProvider>
   );
 }
 
-//
 describe("Application Page3", () => {
   test("smoke: should render page with initial data", () => {
     // TODO all of this is common to all application funnel pages

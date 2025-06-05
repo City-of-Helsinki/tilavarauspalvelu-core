@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
-import { vi, afterEach, afterAll, beforeAll } from "vitest";
+import { vi, expect, afterEach, afterAll, beforeAll, type Mock } from "vitest";
 // TODO add vitest-axe
 
 beforeAll(() => {
@@ -37,4 +37,38 @@ vi.mock("next-i18next", async (importOriginal) => {
       };
     },
   };
+});
+
+expect.extend({
+  // specialised version to match next/navigation updates when
+  // we only save values to search params without causing side effects on the UI (e.g. scroll)
+  // expect the nth call to have url params
+  searchParamCall(received: Mock, params: URLSearchParams, nth = 0) {
+    const { isNot } = this;
+    if (received.mock.calls.length < nth + 1) {
+      return {
+        pass: false,
+        message: () =>
+          `Expected at least ${nth + 1} calls, but received ${received.mock.calls.length}`,
+      };
+    }
+    const [one, two, three] = received.mock.calls[nth] ?? [];
+    const prefix = nth !== 0 ? `${nth}th ` : "";
+    if (one == null) {
+      return {
+        pass: isNot && one == null && two == null && three == null,
+        message: () => `${prefix}mock was not called with any parameters`,
+      };
+    }
+    return {
+      pass:
+        three != null &&
+        one?.query === params.toString() &&
+        two === undefined &&
+        three?.scroll === false &&
+        three?.shallow === true,
+      message: () =>
+        `Expected ${prefix}mock call ${params.toString()} to ${isNot ? " not" : ""}be ${one.query}`,
+    };
+  },
 });

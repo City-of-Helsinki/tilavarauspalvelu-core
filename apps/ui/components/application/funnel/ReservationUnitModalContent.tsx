@@ -23,7 +23,7 @@ import {
   getImageSource,
   getMainImage,
 } from "common/src/helpers";
-import { CenterSpinner, Flex, H2, H3 } from "common/styled";
+import { CenterSpinner, Flex, H3 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import Card from "common/src/components/Card";
 import {
@@ -39,9 +39,8 @@ import {
   SearchFormValues,
   SeasonalSearchForm,
 } from "@/components/recurring/SeasonalSearchForm";
-import { type OptionTypes } from ".";
 import { useSearchModify } from "@/hooks/useSearchValues";
-import { processVariables } from "@/modules/search";
+import { type OptionsT, processVariables } from "@/modules/search";
 import { useSearchParams } from "next/navigation";
 import { useSearchQuery } from "@/hooks";
 
@@ -147,10 +146,7 @@ export type ReservationUnitModalProps = Readonly<{
   handleAdd: (ru: Pick<RecurringCardFragment, "pk">) => void;
   handleRemove: (ru: Pick<RecurringCardFragment, "pk">) => void;
   currentReservationUnits: Pick<RecurringCardFragment, "pk">[];
-  options: Pick<
-    OptionTypes,
-    "purposeOptions" | "reservationUnitTypeOptions" | "unitOptions"
-  >;
+  options: Pick<OptionsT, "purposes" | "reservationUnitTypes" | "units">;
 }>;
 
 /// Does queries to get a list of reservation units based on user selected filters
@@ -186,7 +182,6 @@ export function ReservationUnitModalContent({
 
   return (
     <Flex>
-      <H2 $noMargin>{t("reservationUnitModal:heading")}</H2>
       <H3 as="p">{getApplicationRoundName(applicationRound, lang)}</H3>
       <SeasonalSearchForm
         isLoading={isLoading}

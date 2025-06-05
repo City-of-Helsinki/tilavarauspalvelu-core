@@ -19,6 +19,7 @@
     "types/**/*.d.ts",
     "next.config.mjs",
     "next-env.d.ts",
+    "vitest.d.ts",
     "next-i18next.config.cjs",
     "prettier.config.mjs",
     "vitest.config.mts",

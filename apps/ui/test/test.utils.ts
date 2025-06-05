@@ -44,6 +44,32 @@ export async function selectOption(
   await user.click(opt);
 }
 
+export async function selectFirstOption(
+  view: ReturnType<typeof render> | ReturnType<typeof within>,
+  listLabel: RegExp | string
+) {
+  const user = userEvent.setup();
+  const btn = view.getByLabelText(listLabel, {
+    selector: "button",
+  });
+  if (btn == null) {
+    throw new Error("Select button not found");
+  }
+
+  expect(btn).not.toHaveAttribute("aria-disabled", "true");
+  await user.click(btn);
+  // NOTE using "listbox" forces the users to narrow down the view
+  // if this finds multiple elements, the test will fail
+  // not an issue with multiple HDS selects since "listbox" is only visible after click
+  const listbox = view.getByRole("listbox");
+  const opt = within(listbox).getAllByRole("option")[0];
+  if (opt == null) {
+    throw new Error("Option not found");
+  }
+  expect(opt).toBeInTheDocument();
+  await user.click(opt);
+}
+
 export function formatHtmlElement(e: HTMLElement): string {
   return e.textContent ?? "";
 }

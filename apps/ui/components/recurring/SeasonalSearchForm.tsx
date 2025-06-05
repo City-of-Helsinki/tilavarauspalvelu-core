@@ -9,7 +9,7 @@ import {
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { FilterTagList } from "../FilterTagList";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { mapParamToNumber } from "@/modules/search";
+import { mapParamToNumber, type OptionsT } from "@/modules/search";
 import { SearchButtonContainer, StyledSubmitButton } from "../search/styled";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
@@ -52,13 +52,8 @@ function mapSeasonalQueryToForm(
   };
 }
 
-type OptionType = { value: number; label: string };
 export type SearchFormProps = {
-  options: Readonly<{
-    reservationUnitTypeOptions: Readonly<OptionType[]>;
-    purposeOptions: Readonly<OptionType[]>;
-    unitOptions: Readonly<OptionType[]>;
-  }>;
+  options: Pick<OptionsT, "purposes" | "reservationUnitTypes" | "units">;
   handleSearch: SubmitHandler<SearchFormValues>;
   isLoading: boolean;
 };
@@ -84,17 +79,17 @@ export function SeasonalSearchForm({
     value,
     label: t(`reservationUnit:accessTypes.${value}`),
   }));
-  const { reservationUnitTypeOptions, purposeOptions, unitOptions } = options;
 
   const translateTag = (key: string, value: string): string | undefined => {
     switch (key) {
       case "units":
-        return unitOptions.find((n) => String(n.value) === value)?.label;
+        return options.units.find((n) => String(n.value) === value)?.label;
       case "reservationUnitTypes":
-        return reservationUnitTypeOptions.find((n) => String(n.value) === value)
-          ?.label;
+        return options.reservationUnitTypes.find(
+          (n) => String(n.value) === value
+        )?.label;
       case "purposes":
-        return purposeOptions.find((n) => String(n.value) === value)?.label;
+        return options.purposes.find((n) => String(n.value) === value)?.label;
       case "accessTypes":
         return accessTypeOptions.find((n) => String(n.value) === value)?.label;
       default:
@@ -155,8 +150,8 @@ export function SeasonalSearchForm({
           clearable
           name="reservationUnitTypes"
           control={control}
-          options={reservationUnitTypeOptions}
-          disabled={reservationUnitTypeOptions.length === 0}
+          options={options.reservationUnitTypes}
+          disabled={options.reservationUnitTypes.length === 0}
           label={t("searchForm:labels.reservationUnitTypes")}
         />
         <ControlledSelect
@@ -165,8 +160,8 @@ export function SeasonalSearchForm({
           clearable
           name="units"
           control={control}
-          options={unitOptions}
-          disabled={unitOptions.length === 0}
+          options={options.units}
+          disabled={options.units.length === 0}
           label={t("searchForm:labels.units")}
         />
         <ControlledSelect
@@ -175,8 +170,8 @@ export function SeasonalSearchForm({
           clearable
           name="purposes"
           control={control}
-          options={purposeOptions}
-          disabled={purposeOptions.length === 0}
+          options={options.purposes}
+          disabled={options.purposes.length === 0}
           label={t("searchForm:labels.purposes")}
         />
         <ControlledSelect

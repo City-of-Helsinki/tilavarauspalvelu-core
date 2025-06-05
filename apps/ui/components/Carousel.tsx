@@ -1,4 +1,4 @@
-import React from "react";
+import React, { forwardRef, type Ref } from "react";
 import NukaCarousel from "nuka-carousel";
 import { IconAngleLeft, IconAngleRight, IconSize } from "hds-react";
 import styled from "styled-components";
@@ -80,20 +80,24 @@ const CustomBottomControls = styled.div`
   }
 `;
 
-function Carousel({
-  children,
-  slidesToShow = 1,
-  slidesToScroll = 1,
-  cellSpacing = 1,
-  wrapAround = true,
-  hideCenterControls = false,
-  controlAriaLabel = "",
-  ...rest
-}: Readonly<Props>): JSX.Element {
+const Carousel = forwardRef(function Carousel(
+  {
+    children,
+    slidesToShow = 1,
+    slidesToScroll = 1,
+    cellSpacing = 1,
+    wrapAround = true,
+    hideCenterControls = false,
+    controlAriaLabel = "",
+    ...rest
+  }: Readonly<Props>,
+  ref: Ref<HTMLDivElement>
+): JSX.Element {
   const { t } = useTranslation();
 
   return (
     <StyledCarousel
+      ref={ref}
       renderCenterLeftControls={({ previousSlide, previousDisabled }) => (
         <SmallArrowButton
           disabled={previousDisabled}
@@ -152,6 +156,6 @@ function Carousel({
       {children}
     </StyledCarousel>
   );
-}
+});
 
 export default Carousel;

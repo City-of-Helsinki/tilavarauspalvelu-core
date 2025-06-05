@@ -45,12 +45,12 @@ function constructOptions({
   nUnitOptions = 8,
 } = {}): SearchFormProps["options"] {
   return {
-    reservationUnitTypeOptions: constructOption(
+    reservationUnitTypes: constructOption(
       "reservationUnitTypes",
       nReservationUnitTypeOptions
     ),
-    purposeOptions: constructOption("purposes", nPurposeOptions),
-    unitOptions: constructOption("units", nUnitOptions),
+    purposes: constructOption("purposes", nPurposeOptions),
+    units: constructOption("units", nUnitOptions),
   } as const;
 }
 
@@ -103,7 +103,7 @@ describe("SeasonalSearchForm", () => {
       />
     );
     const user = userEvent.setup();
-    const selected = options.purposeOptions[0] ?? { label: "", value: 0 };
+    const selected = options.purposes[0] ?? { label: "", value: 0 };
     await selectOption(view, "searchForm:labels.purposes", selected.label);
     expect(handleSearch).toHaveBeenCalledTimes(0);
     const searchBtn = view.getByRole("button", {
@@ -115,14 +115,14 @@ describe("SeasonalSearchForm", () => {
   });
 
   test.for([
-    { key: "purposes", optionKey: "purposeOptions" },
-    { key: "reservationUnitTypes", optionKey: "reservationUnitTypeOptions" },
-    { key: "units", optionKey: "unitOptions" },
+    { key: "purposes" },
+    { key: "reservationUnitTypes" },
+    { key: "units" },
   ] as const)(
     "should disable %key select if no options are available",
-    ({ key, optionKey }) => {
+    ({ key }) => {
       const options = { ...constructOptions() };
-      options[optionKey] = [];
+      options[key] = [];
       const view = render(
         <SeasonalSearchForm {...constructProps({ options })} />
       );
@@ -138,7 +138,7 @@ describe("SeasonalSearchForm", () => {
 
   test("should preselect based on query params", () => {
     const options = constructOptions();
-    const selected = options.purposeOptions[0] ?? { label: "", value: 0 };
+    const selected = options.purposes[0] ?? { label: "", value: 0 };
     const params = new URLSearchParams();
     params.set("purposes", selected.value.toString());
     mockedSearchParams.mockReturnValue(params);
@@ -209,7 +209,7 @@ describe("Tags should modify search params", () => {
     const handleSearch = vi.fn();
     const params = new URLSearchParams();
     const options = constructOptions();
-    const selected = options.purposeOptions[0] ?? { label: "", value: 0 };
+    const selected = options.purposes[0] ?? { label: "", value: 0 };
     params.set("purposes", selected.value.toString());
     mockedSearchParams.mockReturnValue(params);
     const view = render(
@@ -229,15 +229,15 @@ describe("Tags should modify search params", () => {
   });
 
   test.for([
-    { key: "purposes", optionKey: "purposeOptions" },
-    { key: "reservationUnitTypes", optionKey: "reservationUnitTypeOptions" },
-    { key: "units", optionKey: "unitOptions" },
+    { key: "purposes" },
+    { key: "reservationUnitTypes" },
+    { key: "units" },
   ] as const)(
     "multiple tags for same option should be visible $key",
-    ({ key, optionKey }) => {
+    ({ key }) => {
       const handleSearch = vi.fn();
       const options = constructOptions();
-      const list = options[optionKey];
+      const list = options[key];
       const params = new URLSearchParams();
       const selected1 = list[0];
       const selected2 = list[1];
@@ -272,8 +272,8 @@ describe("Tags should modify search params", () => {
     const handleSearch = vi.fn();
     const params = new URLSearchParams();
     const options = constructOptions();
-    const selected1 = options.purposeOptions[0];
-    const selected2 = options.reservationUnitTypeOptions[1];
+    const selected1 = options.purposes[0];
+    const selected2 = options.reservationUnitTypes[1];
     if (selected1 == null || selected2 == null) {
       throw new Error("No option found");
     }
@@ -305,8 +305,8 @@ describe("Tags should modify search params", () => {
     const handleSearch = vi.fn();
     const params = new URLSearchParams();
     const options = constructOptions();
-    const selected = options.purposeOptions[0];
-    const selected2 = options.purposeOptions[1];
+    const selected = options.purposes[0];
+    const selected2 = options.purposes[1];
     if (selected == null || selected2 == null) {
       throw new Error("No option found");
     }
@@ -351,8 +351,8 @@ describe("Tags should modify search params", () => {
     // TODO add more tags
     const params = new URLSearchParams();
     const options = constructOptions();
-    const selected = options.purposeOptions[0] ?? { label: "", value: 0 };
-    const selected2 = options.purposeOptions[1] ?? { label: "", value: 0 };
+    const selected = options.purposes[0] ?? { label: "", value: 0 };
+    const selected2 = options.purposes[1] ?? { label: "", value: 0 };
     params.append("purposes", selected.value.toString());
     params.append("purposes", selected2.value.toString());
     mockedSearchParams.mockReturnValue(params);

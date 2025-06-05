@@ -75,7 +75,7 @@ const ApplicationSectionPage1Schema = z
     // TODO do we want to keep the pk of the options? so we can update them when the order changes and not recreate the whole list on save?
     reservationUnits: z.array(z.number()).min(1, { message: "Required" }),
     // frontend only props
-    accordionOpen: z.boolean(),
+    isAccordionOpen: z.boolean(),
     // form specific: new events don't have pks and we need a unique identifier
     formKey: z.string(),
   })
@@ -242,7 +242,7 @@ function convertApplicationSectionPage1(
     // TODO why do these default to undefined instead of empty string?
     begin: convertDate(section.reservationsBeginDate) ?? "",
     end: convertDate(section.reservationsEndDate) ?? "",
-    accordionOpen: false,
+    isAccordionOpen: false,
   };
 }
 
@@ -579,9 +579,19 @@ export function convertApplicationPage1(
   const formAes = filterNonNullable(app?.applicationSections).map((ae) =>
     convertApplicationSectionPage1(ae)
   );
+  const defaultAes = createDefaultPage1Section(reservationUnits);
+  return {
+    pk: app?.pk ?? 0,
+    applicantType: app?.applicantType ?? undefined,
+    applicationSections: formAes.length > 0 ? formAes : [defaultAes],
+  };
+}
+export function createDefaultPage1Section(
+  reservationUnits: number[]
+): NonNullable<ApplicationPage1FormValues["applicationSections"]>[0] {
   // TODO do we need to set default values?
-  const defaultAes: (typeof formAes)[0] = {
-    pk: undefined,
+  return {
+    pk: 0,
     name: "",
     // TODO this is not unique if the user adds multiple new sections
     // it doesn't matter as long as any newly added sections have different keys
@@ -594,14 +604,9 @@ export function convertApplicationPage1(
     maxDuration: 0,
     begin: "",
     end: "",
-    appliedReservationsPerWeek: null,
+    appliedReservationsPerWeek: 1,
     reservationUnits,
-    accordionOpen: true,
-  };
-  return {
-    pk: app?.pk ?? 0,
-    applicantType: app?.applicantType ?? undefined,
-    applicationSections: formAes.length > 0 ? formAes : [defaultAes],
+    isAccordionOpen: true,
   };
 }
 

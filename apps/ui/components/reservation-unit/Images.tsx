@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import dynamic from "next/dynamic";
 import { breakpoints } from "common/src/const";
 import type { ImageFragment } from "@gql/gql-types";
 import Carousel from "@/components/Carousel";
 import { getImageSource } from "common/src/helpers";
+import { HDSModal } from "common/src/components/HDSModal";
+import { Dialog } from "hds-react";
+import { focusStyles, removeButtonStyles } from "common/styled";
 
-const Modal = dynamic(() => import("../Modal").then((module) => module.Modal));
 type Props = {
   images: Readonly<ImageFragment[]>;
   contextName?: string;
@@ -15,58 +16,37 @@ type Props = {
 
 const CarouselImage = styled.img`
   width: 100%;
-  height: 300px;
+  max-height: 300px;
   object-fit: cover;
   cursor: pointer;
 
   @media (max-width: ${breakpoints.l}) {
-    width: 100%;
-    height: 200px;
+    max-height: 200px;
   }
 `;
 
 const ThumbnailImage = styled.img`
-  &:hover {
-    opacity: 0.9;
-  }
-
   object-fit: cover;
   width: 122px;
   height: 122px;
-
-  @media (max-width: ${breakpoints.l}) {
-    max-width: 100%;
-    height: auto;
-  }
-`;
-
-const ModalContent = styled.div`
-  @media (max-width: ${breakpoints.s}) {
-    margin: 0.5em;
-    margin-top: var(--spacing-layout-m);
-  }
 `;
 
 const ThumbnailButton = styled.button`
-  cursor: pointer;
-  border: 0;
-  background-color: transparent;
-  padding: 0;
+  &:hover {
+    cursor: pointer;
+    opacity: 0.8;
+  }
+  ${removeButtonStyles}
+  ${focusStyles}
 `;
 
 const ModalImages = styled.div`
   display: flex;
   max-width: 100%;
   overflow-x: auto;
-  margin-top: var(--spacing-2-xs);
-
-  button {
-    margin-right: 1em;
-  }
-
-  @media (max-width: ${breakpoints.s}) {
-    margin-top: 0.25em;
-  }
+  gap: var(--spacing-xs);
+  /* padding is necessary for focus effect to work */
+  padding: var(--spacing-3-xs);
 `;
 
 const LargeImage = styled.img`
@@ -75,39 +55,51 @@ const LargeImage = styled.img`
 
 export function Images({ images, contextName }: Props): JSX.Element {
   const { t } = useTranslation();
+  const ref = useRef<HTMLDivElement>(null);
   const [showModal, setShowModal] = useState(false);
   const [currentImage, setCurrentImage] = useState<ImageFragment>();
+
+  const handleShowModal = (image: ImageFragment) => {
+    setCurrentImage(image);
+    setShowModal(true);
+  };
 
   if (images.length === 0) {
     return <div />;
   }
 
+  const label = t("common:imgAltForSpace", { name: contextName });
   return (
     <>
-      <Carousel
-        controlAriaLabel={t("common:imgAltForSpace", {
-          name: contextName,
-        })}
-      >
+      <Carousel controlAriaLabel={label} ref={ref}>
         {images.map((image, index) => (
           <CarouselImage
+            tabIndex={0}
             key={image.imageUrl}
             alt={`${t("common:imgAltForSpace", { name: contextName })} #${
               index + 1
             }`}
             src={getImageSource(image, "large")}
-            onClick={() => {
-              setCurrentImage(image);
-              setShowModal(true);
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleShowModal(image);
+              }
             }}
+            onClick={() => handleShowModal(image)}
             aria-label={`${t("common:imgAltForSpace", {
               name: contextName,
             })} #${index + 1}`}
           />
         ))}
       </Carousel>
-      <Modal handleClose={() => setShowModal(false)} show={showModal}>
-        <ModalContent>
+      <HDSModal
+        id="reservation-unit-images-modal"
+        onClose={() => setShowModal(false)}
+        isOpen={showModal}
+        focusAfterCloseRef={ref}
+      >
+        <Dialog.Header id="modal-header" title={label} />
+        <Dialog.Content>
           {currentImage ? (
             <LargeImage
               alt={t("common:imgAltForSpace")}
@@ -130,8 +122,8 @@ export function Images({ images, contextName }: Props): JSX.Element {
               </ThumbnailButton>
             ))}
           </ModalImages>
-        </ModalContent>
-      </Modal>
+        </Dialog.Content>
+      </HDSModal>
     </>
   );
 }
