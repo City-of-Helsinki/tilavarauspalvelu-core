@@ -122,6 +122,7 @@ export function TimeRangePicker<T extends FieldValues>({
         options={populatedTimeOptions}
         required={required?.begin}
         clearable={clearable?.begin}
+        data-testid="search-form__filter--fields--timeBegin"
       />
       <ControlledSelect
         name={names.end}
@@ -131,6 +132,7 @@ export function TimeRangePicker<T extends FieldValues>({
         options={populatedTimeOptions}
         required={required?.end}
         clearable={clearable?.end}
+        data-testid="search-form__filter--fields--timeEnd"
       />
       {endTimeIsBeforeStartTime && (
         <StartBeforeEndError>
