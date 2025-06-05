@@ -96,7 +96,7 @@ class ApplicationSectionBuilder(ModelFactoryBuilder[ApplicationSection]):
         for key, value in ApplicationBuilder().draft(sections=False).kwargs.items():
             self.kwargs.setdefault(f"application__{key}", value)
 
-        self.kwargs["reservation_unit_options__rejected"] = False
+        self.kwargs["reservation_unit_options__is_rejected"] = False
         return self
 
     def in_allocation(self) -> Self:
@@ -111,7 +111,7 @@ class ApplicationSectionBuilder(ModelFactoryBuilder[ApplicationSection]):
         for key, value in ApplicationBuilder().in_allocation(sections=False).kwargs.items():
             self.kwargs.setdefault(f"application__{key}", value)
 
-        self.kwargs["reservation_unit_options__rejected"] = False
+        self.kwargs["reservation_unit_options__is_rejected"] = False
         return self
 
     def handled(self, *, allocations: bool = True) -> Self:
@@ -128,7 +128,7 @@ class ApplicationSectionBuilder(ModelFactoryBuilder[ApplicationSection]):
             self.kwargs.setdefault(f"application__{key}", value)
 
         self.kwargs["applied_reservations_per_week"] = 1
-        self.kwargs["reservation_unit_options__rejected"] = False
+        self.kwargs["reservation_unit_options__is_rejected"] = False
 
         if allocations:
             self.kwargs["reservation_unit_options__allocated_time_slots__day_of_the_week"] = Weekday.MONDAY
@@ -148,8 +148,8 @@ class ApplicationSectionBuilder(ModelFactoryBuilder[ApplicationSection]):
             self.kwargs.setdefault(f"application__{key}", value)
 
         self.kwargs["applied_reservations_per_week"] = 1
-        self.kwargs["reservation_unit_options__rejected"] = True
-        self.kwargs["reservation_unit_options__locked"] = False
+        self.kwargs["reservation_unit_options__is_rejected"] = True
+        self.kwargs["reservation_unit_options__is_locked"] = False
         return self
 
     def in_application(self, application: Application) -> Self:
