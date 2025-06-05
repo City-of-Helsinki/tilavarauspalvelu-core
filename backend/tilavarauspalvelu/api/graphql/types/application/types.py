@@ -39,20 +39,26 @@ class ApplicationNode(DjangoNode):
         fields = [
             "pk",
             "applicant_type",
-            "created_date",
-            "last_modified_date",
-            "cancelled_date",
-            "sent_date",
             "additional_information",
             "working_memo",
+            #
+            # Datetimes
+            "cancelled_at",
+            "sent_at",
+            "created_at",
+            "updated_at",
+            #
+            # Lookup properties
+            "status",
+            #
+            # Relations
             "application_round",
+            "application_sections",
             "organisation",
             "contact_person",
             "user",
             "billing_address",
             "home_city",
-            "application_sections",
-            "status",
         ]
         restricted_fields = {
             "working_memo": lambda user, application: user.permissions.can_view_application(

@@ -193,7 +193,7 @@ def test_application_round_applications_export__missing_data(graphql, column_val
     # - There is one non-draft application with the given missing data in the system
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     data = {
-        "sent_date": local_datetime(),
+        "sent_at": local_datetime(),
         "application_round": application_round,
         "applicant_type": ApplicantTypeChoice.COMPANY.value,
         "home_city__name": "Helsinki",

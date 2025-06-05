@@ -44,7 +44,7 @@ def test_application__cancel__regular_user__own_application(graphql):
     # - The application has a send date
     assert response.has_errors is False, response
     application.refresh_from_db()
-    assert application.cancelled_date is not None
+    assert application.cancelled_at is not None
 
 
 def test_application__cancel__regular_user__own_application__application_period_over(graphql):
@@ -80,7 +80,7 @@ def test_application__cancel__general_user(graphql):
     # - The application has a send date
     assert response.has_errors is False, response
     application.refresh_from_db()
-    assert application.cancelled_date is not None
+    assert application.cancelled_at is not None
 
 
 def test_application__update__unit_admin(graphql):
