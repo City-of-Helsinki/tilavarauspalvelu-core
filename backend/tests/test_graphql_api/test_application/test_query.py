@@ -46,8 +46,8 @@ def test_can_query_application__all_fields(graphql):
         homeCity {
             pk
         }
-        createdDate
-        lastModifiedDate
+        createdAt
+        updatedAt
         additionalInformation
         workingMemo
         status
@@ -88,8 +88,8 @@ def test_can_query_application__all_fields(graphql):
         "homeCity": {
             "pk": application.home_city.pk,
         },
-        "createdDate": application.created_date.isoformat(),
-        "lastModifiedDate": application.last_modified_date.isoformat(),
+        "createdAt": application.created_at.isoformat(),
+        "updatedAt": application.updated_at.isoformat(),
         "additionalInformation": application.additional_information,
         "workingMemo": application.working_memo,
     }
