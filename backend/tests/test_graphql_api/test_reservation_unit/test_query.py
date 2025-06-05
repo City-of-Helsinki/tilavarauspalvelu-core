@@ -326,7 +326,7 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
             largeUrl
         }
         applicationRoundTimeSlots {
-            closed
+            isClosed
         }
         accessTypes {
             accessType
@@ -337,7 +337,7 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
     reservation_unit = ReservationUnitFactory.create(
         pricings__highest_price=20,
         images__large_url="https://example.com",
-        application_round_time_slots__closed=False,
+        application_round_time_slots__is_closed=False,
         access_types__begin_date=local_date(),
     )
     graphql.login_with_superuser()
@@ -363,7 +363,7 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
         ],
         "applicationRoundTimeSlots": [
             {
-                "closed": reservation_unit.application_round_time_slots.first().closed,
+                "isClosed": reservation_unit.application_round_time_slots.first().is_closed,
             },
         ],
         "accessTypes": [
@@ -576,7 +576,7 @@ def test_reservation_unit__query__timeslots(graphql):
 
     # when:
     # - The reservation unit timeslots are queried
-    fields = "applicationRoundTimeSlots { weekday closed reservableTimes { begin end } }"
+    fields = "applicationRoundTimeSlots { weekday isClosed reservableTimes { begin end } }"
     query = reservation_units_query(fields=fields)
     response = graphql(query)
 
@@ -588,7 +588,7 @@ def test_reservation_unit__query__timeslots(graphql):
         "applicationRoundTimeSlots": [
             {
                 "weekday": WeekdayChoice.MONDAY.value,
-                "closed": False,
+                "isClosed": False,
                 "reservableTimes": [
                     {
                         "begin": "10:00:00",
@@ -598,7 +598,7 @@ def test_reservation_unit__query__timeslots(graphql):
             },
             {
                 "weekday": WeekdayChoice.WEDNESDAY.value,
-                "closed": True,
+                "isClosed": True,
                 "reservableTimes": [],
             },
         ]
@@ -614,7 +614,7 @@ def test_reservation_unit__query__timeslots__not_found(graphql):
 
     # when:
     # - The reservation unit timeslots are queried
-    fields = "applicationRoundTimeSlots { weekday closed reservableTimes { begin end } }"
+    fields = "applicationRoundTimeSlots { weekday isClosed reservableTimes { begin end } }"
     query = reservation_units_query(fields=fields)
     response = graphql(query)
 
