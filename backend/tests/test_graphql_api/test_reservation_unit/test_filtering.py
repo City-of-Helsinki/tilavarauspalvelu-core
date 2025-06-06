@@ -440,44 +440,44 @@ def test_reservation_unit__filter__by_is_visible(graphql):
 
     # No publish times -> VISIBLE
     reservation_unit_1 = ReservationUnitFactory.create(
-        publish_begins=None,
-        publish_ends=None,
+        publish_begins_at=None,
+        publish_ends_at=None,
     )
 
     # Publish begins before today -> VISIBLE
     reservation_unit_2 = ReservationUnitFactory.create(
-        publish_begins=now - datetime.timedelta(days=5),
-        publish_ends=now + datetime.timedelta(days=10),
+        publish_begins_at=now - datetime.timedelta(days=5),
+        publish_ends_at=now + datetime.timedelta(days=10),
     )
 
     # Publish begins after today -> NOT VISIBLE
     reservation_unit_3 = ReservationUnitFactory.create(
-        publish_begins=now + datetime.timedelta(days=5),
-        publish_ends=now + datetime.timedelta(days=10),
+        publish_begins_at=now + datetime.timedelta(days=5),
+        publish_ends_at=now + datetime.timedelta(days=10),
     )
 
     # Publish begins before today, ends null -> VISIBLE
     reservation_unit_4 = ReservationUnitFactory.create(
-        publish_begins=now - datetime.timedelta(days=5),
-        publish_ends=None,
+        publish_begins_at=now - datetime.timedelta(days=5),
+        publish_ends_at=None,
     )
 
     # Publish begins null, ends after today -> VISIBLE
     reservation_unit_5 = ReservationUnitFactory.create(
-        publish_begins=None,
-        publish_ends=now + datetime.timedelta(days=5),
+        publish_begins_at=None,
+        publish_ends_at=now + datetime.timedelta(days=5),
     )
 
     # Publish begins null, ends before today -> NOT VISIBLE
     reservation_unit_6 = ReservationUnitFactory.create(
-        publish_begins=None,
-        publish_ends=now - datetime.timedelta(days=1),
+        publish_begins_at=None,
+        publish_ends_at=now - datetime.timedelta(days=1),
     )
 
     # Archived -> NEVER SHOWN
     ReservationUnitFactory.create(
-        publish_begins=now - datetime.timedelta(days=5),
-        publish_ends=now + datetime.timedelta(days=10),
+        publish_begins_at=now - datetime.timedelta(days=5),
+        publish_ends_at=now + datetime.timedelta(days=10),
         is_archived=True,
     )
 

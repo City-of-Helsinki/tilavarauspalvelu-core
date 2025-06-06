@@ -707,8 +707,8 @@ def test_frontend_queries__customer_ui__RelatedReservationUnits(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
-    factory_args["publish_begins"] = now - datetime.timedelta(days=1)
-    factory_args["publish_ends"] = now + datetime.timedelta(days=1)
+    factory_args["publish_begins_at"] = now - datetime.timedelta(days=1)
+    factory_args["publish_ends_at"] = now + datetime.timedelta(days=1)
     obj: ReservationUnit = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)

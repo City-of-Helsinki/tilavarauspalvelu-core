@@ -318,8 +318,8 @@ def test_reservation__create__reservation_unit_reservation_in_the_past_or_future
     end = begin + datetime.timedelta(hours=1)
 
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        reservation_begins=next_hour(plus_days=reservation_begins_delta) if reservation_begins_delta else None,
-        reservation_ends=next_hour(plus_days=reservation_ends_delta) if reservation_ends_delta else None,
+        reservation_begins_at=next_hour(plus_days=reservation_begins_delta) if reservation_begins_delta else None,
+        reservation_ends_at=next_hour(plus_days=reservation_ends_delta) if reservation_ends_delta else None,
     )
 
     graphql.login_with_superuser()
@@ -360,8 +360,8 @@ def test_reservation__create__reservation_unit_publish_in_the_past_or_future(
     end = begin + datetime.timedelta(hours=1)
 
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        publish_begins=next_hour(plus_days=publish_begins_delta) if publish_begins_delta else None,
-        publish_ends=next_hour(plus_days=publish_ends_delta) if publish_ends_delta else None,
+        publish_begins_at=next_hour(plus_days=publish_begins_delta) if publish_begins_delta else None,
+        publish_ends_at=next_hour(plus_days=publish_ends_delta) if publish_ends_delta else None,
     )
 
     graphql.login_with_superuser()

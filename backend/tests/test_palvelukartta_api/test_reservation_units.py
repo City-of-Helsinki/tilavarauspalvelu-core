@@ -42,7 +42,7 @@ def test_palvelukartta_api__reservation_units(api_client):
 def test_palvelukartta_api__reservation_units__only_visible(api_client):
     unit = UnitFactory.create(tprek_id="1234")
     reservation_unit = ReservationUnitFactory.create(unit=unit)
-    ReservationUnitFactory.create(unit=unit, publish_ends=local_datetime(year=2022, month=1, day=1))
+    ReservationUnitFactory.create(unit=unit, publish_ends_at=local_datetime(year=2022, month=1, day=1))
 
     url = reverse("palvelukartta:reservation_units", args=["1234"])
     response = api_client.get(url)

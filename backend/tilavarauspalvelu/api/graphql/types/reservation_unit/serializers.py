@@ -48,12 +48,12 @@ class ReservationUnitSerializer(NestingModelSerializer):
             #
             # IDs
             "pk",
-            "uuid",
+            "ext_uuid",
             #
             # Strings
             "name",
             "description",
-            "terms_of_use",
+            "notes_when_applying",
             "contact_information",
             "reservation_pending_instructions",
             "reservation_confirmed_instructions",
@@ -68,10 +68,10 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "reservations_max_days_before",
             #
             # Datetime
-            "reservation_begins",
-            "reservation_ends",
-            "publish_begins",
-            "publish_ends",
+            "reservation_begins_at",
+            "reservation_ends_at",
+            "publish_begins_at",
+            "publish_ends_at",
             "min_reservation_duration",
             "max_reservation_duration",
             "buffer_time_before",
