@@ -73,7 +73,7 @@ def test_get_verkkokauppa_order_params__to_json():
     assert json["items"][0]["vatPercentage"] == "24.0"
     assert len(json["items"][0]["meta"]) == 3
     assert json["items"][0]["meta"][0]["key"] == "namespaceProductId"
-    assert json["items"][0]["meta"][0]["value"] == str(reservation.reservation_units.first().uuid)
+    assert json["items"][0]["meta"][0]["value"] == str(reservation.reservation_units.first().ext_uuid)
     assert json["items"][0]["meta"][0]["label"] is None
     assert json["items"][0]["meta"][0]["visibleInCheckout"] is False
     assert json["items"][0]["meta"][0]["ordinal"] == "0"

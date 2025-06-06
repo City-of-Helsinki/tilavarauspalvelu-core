@@ -39,7 +39,7 @@ def test_reservation_unit_state_helper__get_state_with_scheduled_publishing_and_
     reservation_unit = ReservationUnitFactory.create(
         is_archived=False,
         is_draft=False,
-        publish_begins=now + datetime.timedelta(hours=1),
+        publish_begins_at=now + datetime.timedelta(hours=1),
     )
     assert reservation_unit.publishing_state == ReservationUnitPublishingState.SCHEDULED_PUBLISHING
 
@@ -49,8 +49,8 @@ def test_reservation_unit_state_helper__get_state_with_scheduled_publishing_when
     reservation_unit = ReservationUnitFactory.create(
         is_archived=False,
         is_draft=False,
-        publish_begins=now + datetime.timedelta(hours=1),
-        publish_ends=now - datetime.timedelta(hours=1),
+        publish_begins_at=now + datetime.timedelta(hours=1),
+        publish_ends_at=now - datetime.timedelta(hours=1),
     )
     assert reservation_unit.publishing_state == ReservationUnitPublishingState.SCHEDULED_PUBLISHING
 
@@ -60,8 +60,8 @@ def test_reservation_unit_state_helper__get_state_with_hidden():
     reservation_unit = ReservationUnitFactory.create(
         is_archived=False,
         is_draft=False,
-        publish_begins=now - datetime.timedelta(hours=2),
-        publish_ends=now - datetime.timedelta(hours=1),
+        publish_begins_at=now - datetime.timedelta(hours=2),
+        publish_ends_at=now - datetime.timedelta(hours=1),
     )
     assert reservation_unit.publishing_state == ReservationUnitPublishingState.HIDDEN
 
@@ -71,8 +71,8 @@ def test_reservation_unit_state_helper__get_state_with_scheduled_hiding():
     reservation_unit = ReservationUnitFactory.create(
         is_archived=False,
         is_draft=False,
-        publish_begins=now - datetime.timedelta(hours=1),
-        publish_ends=now + datetime.timedelta(hours=1),
+        publish_begins_at=now - datetime.timedelta(hours=1),
+        publish_ends_at=now + datetime.timedelta(hours=1),
     )
     assert reservation_unit.publishing_state == ReservationUnitPublishingState.SCHEDULED_HIDING
 
@@ -82,8 +82,8 @@ def test_reservation_unit_state_helper__get_state_with_scheduled_period():
     reservation_unit = ReservationUnitFactory.create(
         is_archived=False,
         is_draft=False,
-        publish_begins=now + datetime.timedelta(hours=1),
-        publish_ends=now + datetime.timedelta(days=1),
+        publish_begins_at=now + datetime.timedelta(hours=1),
+        publish_ends_at=now + datetime.timedelta(days=1),
     )
     assert reservation_unit.publishing_state == ReservationUnitPublishingState.SCHEDULED_PERIOD
 
@@ -93,7 +93,7 @@ def test_reservation_unit_state_helper__state_is_hidden_when_publish_end_and_beg
     reservation_unit = ReservationUnitFactory.create(
         is_archived=False,
         is_draft=False,
-        publish_begins=now - datetime.timedelta(hours=1),
-        publish_ends=now - datetime.timedelta(hours=1),
+        publish_begins_at=now - datetime.timedelta(hours=1),
+        publish_ends_at=now - datetime.timedelta(hours=1),
     )
     assert reservation_unit.publishing_state == ReservationUnitPublishingState.HIDDEN
