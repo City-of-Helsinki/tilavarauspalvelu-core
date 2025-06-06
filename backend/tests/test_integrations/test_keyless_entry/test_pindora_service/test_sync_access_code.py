@@ -32,7 +32,7 @@ def access_code_response(**kwargs: Any) -> PindoraAccessCodeModifyResponse:
 @pytest.mark.parametrize("is_active", [True, False])
 def test_sync_access_code__reservation__generated(is_active):
     reservation = ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
+        reservation_units__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -60,7 +60,7 @@ def test_sync_access_code__reservation__generated(is_active):
 @pytest.mark.parametrize("is_active", [True, False])
 def test_sync_access_code__reservation__generated__doesnt_exist(is_active):
     reservation = ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
+        reservation_units__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -88,7 +88,7 @@ def test_sync_access_code__reservation__generated__doesnt_exist(is_active):
 @pytest.mark.parametrize("is_active", [True, False])
 def test_sync_access_code__reservation__not_generated(is_active):
     reservation = ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
+        reservation_units__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -116,7 +116,7 @@ def test_sync_access_code__reservation__not_generated(is_active):
 @pytest.mark.parametrize("is_active", [True, False])
 def test_sync_access_code__reservation__not_generated__already_exists(is_active):
     reservation = ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
+        reservation_units__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -143,7 +143,7 @@ def test_sync_access_code__reservation__not_generated__already_exists(is_active)
 @patch_method(PindoraClient.reschedule_reservation, side_effect=access_code_response)
 def test_sync_access_code__reservation__not_access_code():
     reservation = ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
+        reservation_units__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -166,7 +166,7 @@ def test_sync_access_code__reservation__not_access_code():
 @patch_method(PindoraClient.reschedule_reservation, side_effect=access_code_response)
 def test_sync_access_code__reservation__not_access_code__not_found():
     reservation = ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
+        reservation_units__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -190,7 +190,7 @@ def test_sync_access_code__reservation__not_access_code__not_found():
 @pytest.mark.parametrize("state", [ReservationStateChoice.DENIED, ReservationStateChoice.CANCELLED])
 def test_sync_access_code__reservation__state_indicates_no_access_code(state):
     reservation = ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
+        reservation_units__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),

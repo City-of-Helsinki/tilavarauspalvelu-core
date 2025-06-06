@@ -192,7 +192,7 @@ def pindora_response(reservation_unit: ReservationUnit) -> PindoraSeasonalBookin
         access_code_sms_message="123456789",
         reservation_unit_code_validity=[
             PindoraSeasonalBookingAccessCodeValidity(
-                reservation_unit_id=reservation_unit.uuid,
+                reservation_unit_id=reservation_unit.ext_uuid,
                 access_code_valid_minutes_before=10,
                 access_code_valid_minutes_after=5,
                 begin=local_datetime(2022, 1, 1, 12),

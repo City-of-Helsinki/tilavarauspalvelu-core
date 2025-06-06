@@ -24,7 +24,7 @@ pytestmark = [
 
 def test_create_access_code__reservation():
     reservation = ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
+        reservation_units__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),

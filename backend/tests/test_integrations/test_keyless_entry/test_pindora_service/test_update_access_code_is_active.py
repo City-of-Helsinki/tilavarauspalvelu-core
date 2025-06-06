@@ -23,7 +23,7 @@ pytestmark = [
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_update_access_code_is_active__reservation__active_when_should_be_inactive():
     reservation = ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
+        reservation_units__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -46,7 +46,7 @@ def test_update_access_code_is_active__reservation__active_when_should_be_inacti
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_update_access_code_is_active__reservation__active_when_should_be_active():
     ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
+        reservation_units__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -68,7 +68,7 @@ def test_update_access_code_is_active__reservation__active_when_should_be_active
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_update_access_code_is_active__reservation__inactive_when_should_be_active():
     reservation = ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
+        reservation_units__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -91,7 +91,7 @@ def test_update_access_code_is_active__reservation__inactive_when_should_be_acti
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_update_access_code_is_active__reservation__inactive_when_should_be_inactive():
     ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
+        reservation_units__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -113,7 +113,7 @@ def test_update_access_code_is_active__reservation__inactive_when_should_be_inac
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_update_access_code_is_active__reservation__not_found():
     reservation = ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
+        reservation_units__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),

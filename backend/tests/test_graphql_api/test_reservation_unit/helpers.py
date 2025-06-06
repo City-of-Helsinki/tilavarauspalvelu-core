@@ -89,10 +89,10 @@ def get_create_non_draft_input_data(**overrides: Any) -> dict[str, Any]:
         "bufferTimeAfter": 3600,
         "cancellationRule": rule.pk,
         "reservationStartInterval": ReservationStartInterval.INTERVAL_60_MINUTES.value.upper(),
-        "publishBegins": "2021-05-03T00:00:00+00:00",
-        "publishEnds": "2021-05-03T00:00:00+00:00",
-        "reservationBegins": "2021-05-03T00:00:00+00:00",
-        "reservationEnds": "2021-05-03T00:00:00+00:00",
+        "publishBeginsAt": "2021-05-03T00:00:00+00:00",
+        "publishEndsAt": "2021-05-03T00:00:00+00:00",
+        "reservationBeginsAt": "2021-05-03T00:00:00+00:00",
+        "reservationEndsAt": "2021-05-03T00:00:00+00:00",
         "metadataSet": metadata_set.pk,
         "maxReservationsPerUser": 2,
         "requireReservationHandling": True,
@@ -204,7 +204,7 @@ def create_reservation_units_for_reservation_state_filtering() -> ReservationSta
     now = local_datetime()
 
     scheduled_reservation = ReservationUnitFactory.create(
-        reservation_begins=(now + datetime.timedelta(hours=1)),
+        reservation_begins_at=(now + datetime.timedelta(hours=1)),
     )
     reservable_paid = ReservationUnitFactory.create(
         payment_product=PaymentProductFactory.create(),
@@ -215,18 +215,18 @@ def create_reservation_units_for_reservation_state_filtering() -> ReservationSta
         pricings__highest_price=0,
     )
     scheduled_period = ReservationUnitFactory.create(
-        reservation_begins=(now + datetime.timedelta(days=1)),
-        reservation_ends=(now + datetime.timedelta(days=2)),
+        reservation_begins_at=(now + datetime.timedelta(days=1)),
+        reservation_ends_at=(now + datetime.timedelta(days=2)),
     )
     scheduled_closing = ReservationUnitFactory.create(
         pricings__lowest_price=0,
         pricings__highest_price=0,
-        reservation_begins=(now - datetime.timedelta(days=1)),
-        reservation_ends=(now + datetime.timedelta(days=1)),
+        reservation_begins_at=(now - datetime.timedelta(days=1)),
+        reservation_ends_at=(now + datetime.timedelta(days=1)),
     )
     closed = ReservationUnitFactory.create(
-        reservation_begins=(now - datetime.timedelta(days=2)),
-        reservation_ends=(now - datetime.timedelta(days=1)),
+        reservation_begins_at=(now - datetime.timedelta(days=2)),
+        reservation_ends_at=(now - datetime.timedelta(days=1)),
     )
     missing_pricing = ReservationUnitFactory.create()
     missing_payment_product = ReservationUnitFactory.create(
@@ -267,7 +267,7 @@ def create_reservation_units_for_reservation_unit_state_filtering() -> Reservati
     scheduled_publishing_reservation_unit = ReservationUnitFactory.create(
         is_archived=False,
         is_draft=False,
-        publish_begins=(now + datetime.timedelta(hours=1)),
+        publish_begins_at=(now + datetime.timedelta(hours=1)),
     )
     published_reservation_unit = ReservationUnitFactory.create(
         is_archived=False,
@@ -276,20 +276,20 @@ def create_reservation_units_for_reservation_unit_state_filtering() -> Reservati
     scheduled_period = ReservationUnitFactory.create(
         is_archived=False,
         is_draft=False,
-        publish_begins=(now + datetime.timedelta(days=1)),
-        publish_ends=(now + datetime.timedelta(days=2)),
+        publish_begins_at=(now + datetime.timedelta(days=1)),
+        publish_ends_at=(now + datetime.timedelta(days=2)),
     )
     scheduled_hiding = ReservationUnitFactory.create(
         is_archived=False,
         is_draft=False,
-        publish_begins=(now - datetime.timedelta(days=1)),
-        publish_ends=(now + datetime.timedelta(days=1)),
+        publish_begins_at=(now - datetime.timedelta(days=1)),
+        publish_ends_at=(now + datetime.timedelta(days=1)),
     )
     hidden = ReservationUnitFactory.create(
         is_archived=False,
         is_draft=False,
-        publish_begins=(now - datetime.timedelta(days=2)),
-        publish_ends=(now - datetime.timedelta(days=1)),
+        publish_begins_at=(now - datetime.timedelta(days=2)),
+        publish_ends_at=(now - datetime.timedelta(days=1)),
     )
 
     return ReservationUnitStateFiltering(
