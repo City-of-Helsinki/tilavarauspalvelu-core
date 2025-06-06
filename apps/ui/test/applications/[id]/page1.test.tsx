@@ -2,14 +2,11 @@ import Page1 from "@/pages/applications/[id]/page1";
 import { render, screen, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
 import {
-  createGraphQLApplicationIdMock,
+  createGraphQLMocks,
   createMockApplicationFragment,
   type CreateMockApplicationFragmentProps,
 } from "@test/application.mocks";
-import {
-  createOptionMock,
-  type CreateGraphQLMocksReturn,
-} from "@test/test.gql.utils";
+import { createOptionMock } from "@test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
 import { selectFirstOption } from "@test/test.utils";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
@@ -56,9 +53,6 @@ vi.mock("next/router", () => ({
   useRouter,
 }));
 
-function createGraphQLMocks(): CreateGraphQLMocksReturn {
-  return createGraphQLApplicationIdMock();
-}
 function customRender(
   props: CreateMockApplicationFragmentProps = {}
 ): ReturnType<typeof render> {

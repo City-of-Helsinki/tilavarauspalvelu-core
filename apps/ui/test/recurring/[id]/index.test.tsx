@@ -1,8 +1,8 @@
 import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
 import {
+  createGraphQLMocks,
   createMockApplicationRound,
-  createApplicationSearchGraphQLMocks,
 } from "@test/application.mocks";
 import {
   type CreateGraphQLMockProps,
@@ -52,7 +52,7 @@ vi.mock("next/router", () => ({
 function customRender(
   props: CreateGraphQLMockProps = {}
 ): ReturnType<typeof render> {
-  const mocks = createApplicationSearchGraphQLMocks(props);
+  const mocks = createGraphQLMocks(props);
   const round = createMockApplicationRound({
     applicationPeriodBegin: new Date(2024, 0, 1, 0, 0, 0),
     applicationPeriodEnd: addYears(new Date(), 1),

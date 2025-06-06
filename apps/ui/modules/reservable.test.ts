@@ -2,7 +2,6 @@ import {
   addDays,
   addHours,
   endOfDay,
-  format,
   startOfDay,
   startOfToday,
 } from "date-fns";
@@ -19,9 +18,12 @@ import {
   ReservationStartInterval,
   ReservationStateChoice,
 } from "@/gql/gql-types";
-import { createMockReservationUnit } from "@/test/test.gql.utils";
 import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 import { base64encode, toNumber } from "common/src/helpers";
+import {
+  createMockIsReservableFieldsFragment,
+  createMockReservableTimes,
+} from "@/test/reservation-unit.mocks";
 
 describe("generateReservableMap", () => {
   beforeEach(() => {
@@ -239,23 +241,12 @@ describe("generateReservableMap", () => {
 });
 
 describe("isStartTimeValid", () => {
-  function mockReservableTimes(): ReservableMap {
-    const map: ReservableMap = new Map();
-    for (let i = 0; i < 30; i++) {
-      const date = addDays(startOfToday(), i);
-      const key = format(date, "yyyy-MM-dd");
-      // TODO need to have holes in this
-      const value = [{ start: startOfDay(date), end: endOfDay(date) }];
-      map.set(key, value);
-    }
-    return map;
-  }
   // TODO fuzzy this
   test("YES for 15 min intervals", () => {
     const date = startOfDay(addDays(new Date(), 1));
     const start = addHours(date, 9);
     const interval = ReservationStartInterval.Interval_15Mins;
-    const reservableTimes = mockReservableTimes();
+    const reservableTimes = createMockReservableTimes();
     expect(isStartTimeValid(start, reservableTimes, interval)).toBe(true);
   });
   // TODO fuzzy
@@ -263,53 +254,41 @@ describe("isStartTimeValid", () => {
     const date = startOfDay(addDays(new Date(), 1));
     const start = addHours(date, 9);
     const interval = ReservationStartInterval.Interval_30Mins;
-    const reservableTimes = mockReservableTimes();
+    const reservableTimes = createMockReservableTimes();
     expect(isStartTimeValid(start, reservableTimes, interval)).toBe(true);
   });
   test("YES for 60 min intervals", () => {
     const date = startOfDay(addDays(new Date(), 1));
     const start = addHours(date, 9);
     const interval = ReservationStartInterval.Interval_60Mins;
-    const reservableTimes = mockReservableTimes();
+    const reservableTimes = createMockReservableTimes();
     expect(isStartTimeValid(start, reservableTimes, interval)).toBe(true);
   });
   test("NO for 60 min intervals", () => {
     const date = startOfDay(addDays(new Date(), 1));
     const start = addHours(date, 9.5);
     const interval = ReservationStartInterval.Interval_60Mins;
-    const reservableTimes = mockReservableTimes();
+    const reservableTimes = createMockReservableTimes();
     expect(isStartTimeValid(start, reservableTimes, interval)).toBe(false);
   });
   test("YES for 120 min intervals", () => {
     const date = startOfDay(addDays(new Date(), 1));
     const start = addHours(date, 10);
     const interval = ReservationStartInterval.Interval_120Mins;
-    const reservableTimes = mockReservableTimes();
+    const reservableTimes = createMockReservableTimes();
     expect(isStartTimeValid(start, reservableTimes, interval)).toBe(true);
   });
   test("NO for 120 min intervals", () => {
     const date = startOfDay(addDays(new Date(), 1));
     const start = addHours(date, 9);
     const interval = ReservationStartInterval.Interval_120Mins;
-    const reservableTimes = mockReservableTimes();
+    const reservableTimes = createMockReservableTimes();
     expect(isStartTimeValid(start, reservableTimes, interval)).toBe(false);
   });
 });
 
 describe("isRangeReservable", () => {
   // TODO mock time
-
-  // one month of reservable times
-  function mockReservableTimes(): ReservableMap {
-    const map: ReservableMap = new Map();
-    for (let i = 0; i < 30; i++) {
-      const date = addDays(startOfToday(), i);
-      const key = format(date, "yyyy-MM-dd");
-      const value = [{ start: startOfDay(date), end: endOfDay(date) }];
-      map.set(key, value);
-    }
-    return map;
-  }
 
   function createInput({
     start,
@@ -336,9 +315,9 @@ describe("isRangeReservable", () => {
         start,
         end,
       },
-      reservationUnit: createMockReservationUnit(rest),
+      reservationUnit: createMockIsReservableFieldsFragment(rest),
       activeApplicationRounds: activeApplicationRounds ?? [],
-      reservableTimes: reservableTimes ?? mockReservableTimes(),
+      reservableTimes: reservableTimes ?? createMockReservableTimes(),
       blockingReservations: rest.reservations ?? [],
     };
   }

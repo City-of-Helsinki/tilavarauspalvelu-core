@@ -2,11 +2,10 @@ import { type ApplicationPage3Query } from "@/gql/gql-types";
 import Page3 from "@/pages/applications/[id]/page3";
 import { render, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
-import { type CreateGraphQLMocksReturn } from "@test/test.gql.utils";
 import {
+  createGraphQLMocks,
   createMockApplicationFragment,
   type CreateMockApplicationFragmentProps,
-  createGraphQLApplicationIdMock,
 } from "@test/application.mocks";
 import userEvent from "@testing-library/user-event";
 import { getApplicationPath } from "@/modules/urls";
@@ -52,9 +51,6 @@ vi.mock("next/router", () => ({
   useRouter,
 }));
 
-function createGraphQLMocks(): CreateGraphQLMocksReturn {
-  return createGraphQLApplicationIdMock();
-}
 type ApplicationPage3 = NonNullable<ApplicationPage3Query["application"]>;
 function customRender(
   props: CreateMockApplicationFragmentProps = {}

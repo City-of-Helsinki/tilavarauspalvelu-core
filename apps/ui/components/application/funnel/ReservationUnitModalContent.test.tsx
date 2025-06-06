@@ -2,7 +2,7 @@ import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { render, within } from "@testing-library/react";
 import {
   createMockApplicationRound,
-  createApplicationSearchGraphQLMocks,
+  createGraphQLMocks,
 } from "@test/application.mocks";
 import { type CreateGraphQLMockProps } from "@test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
@@ -58,7 +58,7 @@ function customRender(
     isSearchError: false,
   }
 ): ReturnType<typeof render> {
-  const mocks = createApplicationSearchGraphQLMocks(mockProps);
+  const mocks = createGraphQLMocks(mockProps);
   const round = createMockApplicationRound();
   const options: ReservationUnitModalProps["options"] = {
     units: [],

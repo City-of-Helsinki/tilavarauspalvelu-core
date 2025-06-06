@@ -11,10 +11,11 @@ import {
   type ApplicationViewFragment,
   Authentication,
   CreateApplicationDocument,
-  type CreateApplicationMutationResult,
+  type CreateApplicationMutation,
   type CreateApplicationMutationVariables,
   CurrentUserDocument,
   type CurrentUserQuery,
+  ImageType,
   OptionsDocument,
   type OptionsQuery,
   OrganizationTypeChoice,
@@ -45,14 +46,122 @@ import {
   generateDescriptionFragment,
   generateNameFragment,
   generateTextFragment,
+  type ICreateGraphQLMock,
   type CreateGraphQLMockProps,
   type CreateGraphQLMocksReturn,
 } from "./test.gql.utils";
 
-export function createApplicationSearchGraphQLMocks({
+export function createGraphQLMocks({
   noUser = false,
   isSearchError = false,
 }: CreateGraphQLMockProps = {}): CreateGraphQLMocksReturn {
+  return [
+    ...createSearchQueryMocks({ isSearchError }),
+    ...createOptionsQueryMocks(),
+    ...createCurrentUserQueryMocks({ noUser }),
+    ...createApplicationMutationMocks(),
+  ];
+}
+
+function createApplicationMutationMocks(): CreateGraphQLMocksReturn {
+  const createVariables: CreateApplicationMutationVariables = {
+    input: {
+      applicationRound: 1,
+    },
+  };
+  const updateMutation: UpdateApplicationMutation = {
+    updateApplication: {
+      pk: 1,
+    },
+  };
+  const createMutation: CreateApplicationMutation = {
+    createApplication: {
+      pk: 1,
+    },
+  };
+
+  return [
+    {
+      request: {
+        query: UpdateApplicationDocument,
+      },
+      variableMatcher: () => true,
+      result: {
+        data: updateMutation,
+      },
+    },
+    {
+      request: {
+        query: CreateApplicationDocument,
+        variables: createVariables,
+      },
+      result: {
+        data: createMutation,
+      },
+    },
+  ];
+}
+
+interface CurrentUserQueryMocksProps extends ICreateGraphQLMock {
+  noUser: boolean;
+}
+
+function createCurrentUserQueryMocks({
+  noUser,
+}: CurrentUserQueryMocksProps): CreateGraphQLMocksReturn {
+  const CurrentUserMock: CurrentUserQuery = {
+    currentUser: !noUser
+      ? {
+          id: base64encode("UserNode:1"),
+          pk: 1,
+          firstName: "Test",
+          lastName: "User",
+          email: "test@user",
+          isAdAuthenticated: false,
+        }
+      : null,
+  };
+
+  return [
+    {
+      request: {
+        query: CurrentUserDocument,
+      },
+      result: {
+        data: CurrentUserMock,
+      },
+    },
+  ];
+}
+
+function createOptionsQueryMocks(): CreateGraphQLMocksReturn {
+  const OptionsMock: OptionsQuery = createOptionQueryMock();
+  return [
+    {
+      request: {
+        query: OptionsDocument,
+        variables: {
+          reservationUnitTypesOrderBy:
+            ReservationUnitTypeOrderingChoices.RankAsc,
+          reservationPurposesOrderBy: ReservationPurposeOrderingChoices.RankAsc,
+          unitsOrderBy: [],
+          equipmentsOrderBy: [],
+          purposesOrderBy: [],
+        },
+      },
+      result: {
+        data: OptionsMock,
+      },
+    },
+  ];
+}
+
+interface SearchQueryProps extends ICreateGraphQLMock {
+  isSearchError: boolean;
+}
+function createSearchQueryMocks({
+  isSearchError,
+}: SearchQueryProps): CreateGraphQLMocksReturn {
   // TODO this should enforce non nullable for the query
   // it can be null when the query is loading, but when we mock it it should be non nullable
   // Q: what about failed queries? (though they should have different type)
@@ -83,30 +192,6 @@ export function createApplicationSearchGraphQLMocks({
           endCursor: null,
           hasNextPage: false,
         },
-      },
-    };
-  const CurrentUserMock: CurrentUserQuery = {
-    currentUser: !noUser
-      ? {
-          id: base64encode("UserNode:1"),
-          pk: 1,
-          firstName: "Test",
-          lastName: "User",
-          email: "test@user",
-          isAdAuthenticated: false,
-        }
-      : null,
-  };
-  const CreateApplicationMutationMock: CreateApplicationMutationResult["data"] =
-    {
-      createApplication: {
-        pk: 1,
-      },
-    };
-  const CreateApplicationMutationMockVariables: CreateApplicationMutationVariables =
-    {
-      input: {
-        applicationRound: 1,
       },
     };
 
@@ -141,61 +226,6 @@ export function createApplicationSearchGraphQLMocks({
         data: SearchReservationUnitsQueryMockWithParams,
       },
       error: isSearchError ? new Error("Search error") : undefined,
-    },
-    {
-      request: {
-        query: CreateApplicationDocument,
-        variables: CreateApplicationMutationMockVariables,
-      },
-      result: {
-        data: CreateApplicationMutationMock,
-      },
-    },
-    {
-      request: {
-        query: CurrentUserDocument,
-      },
-      result: {
-        data: CurrentUserMock,
-      },
-    },
-  ];
-}
-
-export function createGraphQLApplicationIdMock(): CreateGraphQLMocksReturn {
-  const UpdateApplicationMutationMock: UpdateApplicationMutation = {
-    updateApplication: {
-      pk: 1,
-    },
-  };
-
-  const OptionsMock: OptionsQuery = createOptionQueryMock();
-
-  return [
-    {
-      request: {
-        query: UpdateApplicationDocument,
-      },
-      variableMatcher: () => true,
-      result: {
-        data: UpdateApplicationMutationMock,
-      },
-    },
-    {
-      request: {
-        query: OptionsDocument,
-        variables: {
-          reservationUnitTypesOrderBy:
-            ReservationUnitTypeOrderingChoices.RankAsc,
-          reservationPurposesOrderBy: ReservationPurposeOrderingChoices.RankAsc,
-          unitsOrderBy: [],
-          equipmentsOrderBy: [],
-          purposesOrderBy: [],
-        },
-      },
-      result: {
-        data: OptionsMock,
-      },
     },
   ];
 }
@@ -239,7 +269,7 @@ function createSearchVariablesMock({
   } as const;
 }
 
-function createMockReservationUnit({
+export function createMockReservationUnit({
   pk,
 }: {
   pk: number;
@@ -275,7 +305,17 @@ function createMockReservationUnit({
     reservationUnitType: createMockReservationUnitType({
       name: "ReservationUnitType",
     }),
-    images: [],
+    images: [
+      {
+        id: base64encode("Image:1"),
+        pk: 1,
+        imageUrl: "https://example.com/image1.jpg",
+        largeUrl: "https://example.com/image1_large.jpg",
+        mediumUrl: "https://example.com/image1_medium.jpg",
+        smallUrl: "https://example.com/image1_small.jpg",
+        imageType: ImageType.Main,
+      },
+    ] as const,
     accessTypes: [],
     // Everything below is only for completeness of the mock type (not used for application tests)
     // TODO this can be removed
