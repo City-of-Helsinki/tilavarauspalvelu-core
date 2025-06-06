@@ -687,8 +687,7 @@ def test_frontend_queries__customer_ui__ApplicationSectionCancel__unauthenticate
     factory_args_1 = deepcopy(query_info_1.factory_args)
     obj = query_info_1.factory.create(**factory_args_1)
 
-    factory_args_2 = deepcopy(query_info_2.factory_args)
-    query_info_2.factory.create(**factory_args_2)
+    assert query_info_2.factory is None  # ReservationCancelReason is an enum, no factory is needed.
 
     variables = query_info_1.variables
     variables["id"] = to_global_id(query_info_1.typename, obj.id)
@@ -879,8 +878,7 @@ def test_frontend_queries__customer_ui__ReservationCancelPage__unauthenticated(g
     factory_args_1 = deepcopy(query_info_1.factory_args)
     obj = query_info_1.factory.create(**factory_args_1)
 
-    factory_args_2 = deepcopy(query_info_2.factory_args)
-    query_info_2.factory.create(**factory_args_2)
+    assert query_info_2.factory is None  # ReservationCancelReason is an enum, no factory is needed.
 
     variables = query_info_1.variables
     variables["id"] = to_global_id(query_info_1.typename, obj.id)

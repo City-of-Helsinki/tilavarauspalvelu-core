@@ -768,8 +768,7 @@ def test_frontend_queries__customer_ui__ApplicationSectionCancel__regular(graphq
     factory_args_1[f"{series_key}__reservations__user"] = user
     obj = ApplicationSectionFactory.create_in_status_handled(**factory_args_1)
 
-    factory_args_2 = deepcopy(query_info_2.factory_args)
-    query_info_2.factory.create(**factory_args_2)
+    assert query_info_2.factory is None  # ReservationCancelReason is an enum, no factory is needed.
 
     variables = query_info_1.variables
     variables["id"] = to_global_id(query_info_1.typename, obj.id)
@@ -1002,8 +1001,7 @@ def test_frontend_queries__customer_ui__ReservationCancelPage__regular(graphql):
     factory_args_1[f"{apl_key}__user"] = user
     obj = query_info_1.factory.create(**factory_args_1)
 
-    factory_args_2 = deepcopy(query_info_2.factory_args)
-    query_info_2.factory.create(**factory_args_2)
+    assert query_info_2.factory is None  # ReservationCancelReason is an enum, no factory is needed.
 
     variables = query_info_1.variables
     variables["id"] = to_global_id(query_info_1.typename, obj.id)

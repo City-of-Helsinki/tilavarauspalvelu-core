@@ -1350,3 +1350,18 @@ def test_frontend_queries__admin_ui__ReservationProfileDataSSN(graphql):
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
+
+
+def test_frontend_queries__admin_ui__ReservationCancelReasons(graphql):
+    admin_factories = get_admin_query_info()
+    factories = admin_factories["ReservationCancelReasons"]
+
+    assert len(factories) == 1
+    query_info = factories[0]
+    assert query_info.factory is None
+
+    query = query_info.query
+    graphql.login_with_superuser()
+
+    response = graphql(query)
+    assert response.has_errors is False, response.errors
