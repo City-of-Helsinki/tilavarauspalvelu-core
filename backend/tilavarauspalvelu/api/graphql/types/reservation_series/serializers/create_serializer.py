@@ -12,6 +12,7 @@ from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import (
+    MunicipalityChoice,
     ReservationStartInterval,
     ReservationStateChoice,
     ReservationTypeStaffChoice,
@@ -45,6 +46,14 @@ class ReservationSeriesReservationCreateSerializer(NestingModelSerializer):
     state = EnumFriendlyChoiceField(
         choices=ReservationStateChoice.choices,
         enum=ReservationStateChoice,
+        required=False,
+    )
+
+    municipality = EnumFriendlyChoiceField(
+        choices=MunicipalityChoice.choices,
+        enum=MunicipalityChoice,
+        allow_null=True,
+        default=None,
         required=False,
     )
 
@@ -89,7 +98,7 @@ class ReservationSeriesReservationCreateSerializer(NestingModelSerializer):
             #
             "user",
             "purpose",
-            "home_city",
+            "municipality",
             "age_group",
         ]
         extra_kwargs = {field: {"required": field in {"type", "user"}} for field in fields}

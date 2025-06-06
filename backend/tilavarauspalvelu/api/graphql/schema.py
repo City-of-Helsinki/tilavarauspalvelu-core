@@ -91,7 +91,6 @@ from .queries import (
     ApplicationRoundNode,
     ApplicationSectionNode,
     BannerNotificationNode,
-    CityNode,
     EquipmentAllNode,
     EquipmentCategoryNode,
     EquipmentNode,
@@ -205,7 +204,6 @@ class Query(graphene.ObjectType):
     reservation_deny_reasons = ReservationDenyReasonNode.Connection()
     reservation_purposes = ReservationPurposeNode.Connection()
     age_groups = AgeGroupNode.Connection()
-    cities = CityNode.Connection()
     order = Field(PaymentOrderNode, order_uuid=graphene.String(required=True))
     #
     # User

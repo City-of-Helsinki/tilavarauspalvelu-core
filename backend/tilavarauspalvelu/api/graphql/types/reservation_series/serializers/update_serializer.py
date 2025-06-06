@@ -52,7 +52,7 @@ class ReservationSeriesReservationUpdateSerializer(NestingModelSerializer):
             "billing_address_zip",
             #
             "purpose",
-            "home_city",
+            "municipality",
             "age_group",
         ]
         extra_kwargs = {field: {"required": False} for field in fields}

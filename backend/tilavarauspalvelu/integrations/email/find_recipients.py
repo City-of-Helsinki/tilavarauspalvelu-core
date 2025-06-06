@@ -26,9 +26,8 @@ def get_application_email_recipients(application: Application) -> list[str]:
     """Get email notification recipients for the given application."""
     recipients: set[str] = set()
 
-    contact_person_email = getattr(application.contact_person, "email", None)
-    if contact_person_email:
-        recipients.add(contact_person_email.lower())
+    if application.contact_person_email:
+        recipients.add(application.contact_person_email.lower())
 
     applicant_email = getattr(application.user, "email", None)
     if applicant_email:

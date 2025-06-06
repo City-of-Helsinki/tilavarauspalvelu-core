@@ -77,7 +77,7 @@ def test_update_user_from_profile__prefill_info_not_available_in_response():
     session_call = request.session.mock_calls[0].args
     assert session_call[0] == "reservation_prefill_info"
     assert session_call[1] == {
-        "home_city": None,
+        "municipality": None,
         "reservee_address_city": None,
         "reservee_address_street": None,
         "reservee_address_zip": None,
@@ -116,7 +116,7 @@ def test_update_user_from_profile__store_prefill_info_in_session_storage():
     session_call = request.session.mock_calls[0].args
     assert session_call[0] == "reservation_prefill_info"
     assert session_call[1] == {
-        "home_city": None,
+        "municipality": None,
         "reservee_address_city": "Helsinki",
         "reservee_address_street": "Example street 1",
         "reservee_address_zip": "00100",

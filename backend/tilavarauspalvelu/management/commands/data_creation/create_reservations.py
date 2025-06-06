@@ -9,6 +9,7 @@ from django.db import models
 
 from tilavarauspalvelu.enums import (
     CustomerTypeChoice,
+    MunicipalityChoice,
     OrderStatus,
     PaymentType,
     ReservationCancelReasonChoice,
@@ -48,7 +49,6 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.enums import TermsOfUseTypeChoices
     from tilavarauspalvelu.models import (
         AgeGroup,
-        City,
         OriginHaukiResource,
         ReservationMetadataSet,
         ReservationPurpose,
@@ -66,24 +66,20 @@ if TYPE_CHECKING:
 def _create_reservations(
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
 ) -> None:
     _create_normal_reservations(
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
-        cities=cities,
     )
 
     _create_full_day_reservations(
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
-        cities=cities,
     )
 
     _create_reservations_for_reservation_units_affecting_other_reservation_units(
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
-        cities=cities,
     )
 
 
@@ -91,7 +87,6 @@ def _create_reservations(
 def _create_normal_reservations(
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
 ) -> None:
     """
     Create reservations for all reservation units that:
@@ -228,7 +223,7 @@ def _create_normal_reservations(
                             #
                             purpose=random.choice(reservation_purposes),
                             age_group=random.choice(age_groups),
-                            home_city=random.choice(cities),
+                            municipality=MunicipalityChoice.HELSINKI,
                             #
                             deny_reason=deny_reason,
                             cancel_reason=None,
@@ -430,7 +425,6 @@ def _deny_reservations(qs: ReservationQuerySet, deny_reasons: list[ReservationDe
 def _create_full_day_reservations(
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
 ) -> None:
     """
     Create reservations for all reservation units that require full day booking.
@@ -517,7 +511,7 @@ def _create_full_day_reservations(
                     #
                     purpose=random.choice(reservation_purposes),
                     age_group=random.choice(age_groups),
-                    home_city=random.choice(cities),
+                    municipality=MunicipalityChoice.HELSINKI,
                 )
             )
             reservations.append(reservation)
@@ -537,7 +531,6 @@ def _create_full_day_reservations(
 def _create_reservations_for_reservation_units_affecting_other_reservation_units(
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
 ) -> None:
     """
     Create reservations for all reservation units that are in a space or resource hierarchy.
@@ -633,7 +626,7 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
                 #
                 purpose=random.choice(reservation_purposes),
                 age_group=random.choice(age_groups),
-                home_city=random.choice(cities),
+                municipality=MunicipalityChoice.HELSINKI,
             )
         )
         reservations.append(reservation)
@@ -675,7 +668,7 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
                 #
                 purpose=random.choice(reservation_purposes),
                 age_group=random.choice(age_groups),
-                home_city=random.choice(cities),
+                municipality=MunicipalityChoice.HELSINKI,
             )
         )
         reservations.append(reservation)
@@ -703,7 +696,6 @@ def _create_reservation_series(
     tax_percentage: TaxPercentage,
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
 ) -> None:
     user = User.objects.get(username="tvp")
 
@@ -722,7 +714,6 @@ def _create_reservation_series(
         user=user,
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
-        cities=cities,
     )
 
     _create_future_reservation_series(
@@ -732,7 +723,6 @@ def _create_reservation_series(
         user=user,
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
-        cities=cities,
     )
 
     _create_ongoing_reservation_series(
@@ -742,7 +732,6 @@ def _create_reservation_series(
         user=user,
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
-        cities=cities,
     )
 
     _create_ongoing_reservation_series(
@@ -752,7 +741,6 @@ def _create_reservation_series(
         user=user,
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
-        cities=cities,
         cancel_random=3,
         deny_random=3,
         reject_random=3,
@@ -767,7 +755,6 @@ def _create_past_reservation_series(
     user: User,
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
     *,
     cancel_random: int = 0,
     deny_random: int = 0,
@@ -794,7 +781,6 @@ def _create_past_reservation_series(
         series=series,
         reservation_purposes=reservation_purposes,
         age_group=age_group,
-        cities=cities,
         cancel_random=cancel_random,
         deny_random=deny_random,
         reject_random=reject_random,
@@ -809,7 +795,6 @@ def _create_future_reservation_series(
     user: User,
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
     *,
     cancel_random: int = 0,
     deny_random: int = 0,
@@ -836,7 +821,6 @@ def _create_future_reservation_series(
         series=series,
         reservation_purposes=reservation_purposes,
         age_group=age_group,
-        cities=cities,
         cancel_random=cancel_random,
         deny_random=deny_random,
         reject_random=reject_random,
@@ -851,7 +835,6 @@ def _create_ongoing_reservation_series(
     user: User,
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
     *,
     cancel_random: int = 0,
     deny_random: int = 0,
@@ -878,7 +861,6 @@ def _create_ongoing_reservation_series(
         series=series,
         reservation_purposes=reservation_purposes,
         age_group=age_group,
-        cities=cities,
         cancel_random=cancel_random,
         deny_random=deny_random,
         reject_random=reject_random,
@@ -888,7 +870,6 @@ def _create_ongoing_reservation_series(
 def _create_reservations_for_series(
     series: ReservationSeries,
     reservation_purposes: list[ReservationPurpose],
-    cities: list[City],
     age_group: AgeGroup,
     *,
     cancel_random: int = 0,
@@ -952,7 +933,7 @@ def _create_reservations_for_series(
                     #
                     purpose=random.choice(reservation_purposes),
                     age_group=age_group,
-                    home_city=random.choice(cities),
+                    municipality=MunicipalityChoice.HELSINKI,
                     #
                     deny_reason=None,
                     cancel_reason=None,

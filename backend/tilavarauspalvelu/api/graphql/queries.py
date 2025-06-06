@@ -7,7 +7,6 @@ simply so that it's registered before any mutations.
 
 from __future__ import annotations
 
-from .types.address.types import AddressNode
 from .types.age_group.types import AgeGroupNode
 from .types.allocated_time_slot.types import AllocatedTimeSlotNode
 from .types.application.types import ApplicationNode
@@ -15,16 +14,13 @@ from .types.application_round.types import ApplicationRoundNode
 from .types.application_round_time_slot.types import ApplicationRoundTimeSlotNode
 from .types.application_section.types import ApplicationSectionNode
 from .types.banner_notification.types import BannerNotificationNode
-from .types.city.types import CityNode
 from .types.equipment.types import EquipmentAllNode, EquipmentNode
 from .types.equipment_category.types import EquipmentCategoryNode
 from .types.helsinki_profile.types import HelsinkiProfileDataNode
-from .types.organisation.types import OrganisationNode
 from .types.payment_merchant.types import PaymentMerchantNode
 from .types.payment_order.types import PaymentOrderNode
 from .types.payment_product.types import PaymentProductNode
 from .types.permissions.types import GeneralRoleNode, PermissionCheckerType, UnitRoleNode
-from .types.person.types import PersonNode
 from .types.purpose.types import PurposeNode
 from .types.rejected_occurrence.types import RejectedOccurrenceNode
 from .types.reservation.types import ReservationNode
@@ -50,7 +46,6 @@ from .types.unit_group.types import UnitGroupNode
 from .types.user.types import ApplicantNode, UserNode
 
 __all__ = [
-    "AddressNode",
     "AgeGroupNode",
     "AllocatedTimeSlotNode",
     "ApplicantNode",
@@ -59,18 +54,15 @@ __all__ = [
     "ApplicationRoundTimeSlotNode",
     "ApplicationSectionNode",
     "BannerNotificationNode",
-    "CityNode",
     "EquipmentAllNode",
     "EquipmentCategoryNode",
     "EquipmentNode",
     "GeneralRoleNode",
     "HelsinkiProfileDataNode",
-    "OrganisationNode",
     "PaymentMerchantNode",
     "PaymentOrderNode",
     "PaymentProductNode",
     "PermissionCheckerType",
-    "PersonNode",
     "PurposeNode",
     "RejectedOccurrenceNode",
     "ReservationCancelReasonType",

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from .address import AddressFactory
 from .age_group import AgeGroupFactory
 from .allocated_time_slot import AllocatedTimeSlotFactory
 from .application import ApplicationFactory
@@ -8,18 +7,15 @@ from .application_round import ApplicationRoundFactory
 from .application_round_time_slot import ApplicationRoundTimeSlotFactory
 from .application_section import ApplicationSectionFactory
 from .banner_notification import BannerNotificationFactory
-from .city import CityFactory
 from .equipment import EquipmentFactory
 from .equipment_category import EquipmentCategoryFactory
 from .general_role import GeneralRoleFactory
 from .hauki import HaukiAPIResourceFactory, HaukiAPIResourceListResponseFactory
-from .organisation import OrganisationFactory
 from .origin_hauki_resource import OriginHaukiResourceFactory
 from .payment_accounting import PaymentAccountingFactory
 from .payment_merchant import PaymentMerchantFactory
 from .payment_order import PaymentOrderFactory
 from .payment_product import PaymentProductFactory
-from .person import PersonFactory
 from .purpose import PurposeFactory
 from .rejected_occurrence import RejectedOccurrenceFactory
 from .reservable_time_span import ReservableTimeSpanFactory
@@ -49,7 +45,6 @@ from .verkkokauppa import OrderCustomerFactory, OrderFactory, PaymentFactory, Re
 
 __all__ = [
     "ADGroupFactory",
-    "AddressFactory",
     "AgeGroupFactory",
     "AllocatedTimeSlotFactory",
     "ApplicationFactory",
@@ -57,7 +52,6 @@ __all__ = [
     "ApplicationRoundTimeSlotFactory",
     "ApplicationSectionFactory",
     "BannerNotificationFactory",
-    "CityFactory",
     "EquipmentCategoryFactory",
     "EquipmentFactory",
     "GeneralRoleFactory",
@@ -65,14 +59,12 @@ __all__ = [
     "HaukiAPIResourceListResponseFactory",
     "OrderCustomerFactory",
     "OrderFactory",
-    "OrganisationFactory",
     "OriginHaukiResourceFactory",
     "PaymentAccountingFactory",
     "PaymentFactory",
     "PaymentMerchantFactory",
     "PaymentOrderFactory",
     "PaymentProductFactory",
-    "PersonFactory",
     "PurposeFactory",
     "RefundFactory",
     "RefundStatusResultFactory",

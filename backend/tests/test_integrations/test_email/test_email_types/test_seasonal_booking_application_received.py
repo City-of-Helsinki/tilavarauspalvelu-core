@@ -172,7 +172,7 @@ def test_seasonal_booking_application_received__send_email(outbox):
     assert len(outbox) == 1
 
     assert outbox[0].subject == "Your application has been received"
-    assert sorted(outbox[0].bcc) == sorted([application.user.email, application.contact_person.email])
+    assert sorted(outbox[0].bcc) == sorted([application.user.email, application.contact_person_email])
 
 
 @pytest.mark.django_db

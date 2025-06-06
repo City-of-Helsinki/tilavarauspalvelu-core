@@ -58,7 +58,7 @@ class ApplicationNode(DjangoNode):
             "contact_person",
             "user",
             "billing_address",
-            "home_city",
+            "municipality",
         ]
         restricted_fields = {
             "working_memo": lambda user, application: user.permissions.can_view_application(

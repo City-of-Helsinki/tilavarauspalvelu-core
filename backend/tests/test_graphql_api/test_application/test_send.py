@@ -5,11 +5,11 @@ import datetime
 import pytest
 from freezegun import freeze_time
 
-from tilavarauspalvelu.enums import ApplicantTypeChoice, Priority, Weekday
+from tilavarauspalvelu.enums import ApplicantTypeChoice, MunicipalityChoice, Priority, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
 from utils.date_utils import local_datetime, local_start_of_day, local_time
 
-from tests.factories import ApplicationFactory, OrganisationFactory, SuitableTimeRangeFactory, UserFactory
+from tests.factories import ApplicationFactory, SuitableTimeRangeFactory, UserFactory
 from tests.helpers import patch_method
 
 from .helpers import SEND_MUTATION
@@ -419,7 +419,7 @@ def test_send_application__no_organisation(graphql, applicant_type):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=applicant_type,
         organisation=None,
-        home_city__name="Helsinki",
+        municipality=MunicipalityChoice.HELSINKI,
     )
 
     graphql.login_with_superuser()
@@ -431,13 +431,8 @@ def test_send_application__no_organisation(graphql, applicant_type):
 
 @patch_method(EmailService.send_seasonal_booking_application_received_email)
 def test_send_application__community_applicant(graphql):
-    org = OrganisationFactory.create_for_community_applicant()
-
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ApplicantTypeChoice.COMMUNITY,
-        organisation=org,
-        home_city__name="Helsinki",
-        billing_address=None,
     )
 
     graphql.login_with_superuser()
@@ -452,14 +447,9 @@ def test_send_application__community_applicant(graphql):
 
 
 def test_send_application__community_applicant__contact_person_missing(graphql):
-    org = OrganisationFactory.create_for_community_applicant()
-
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ApplicantTypeChoice.COMMUNITY,
         contact_person=None,
-        organisation=org,
-        home_city__name="Helsinki",
-        billing_address=None,
     )
 
     graphql.login_with_superuser()
@@ -470,13 +460,9 @@ def test_send_application__community_applicant__contact_person_missing(graphql):
 
 
 def test_send_application__community_applicant__org_name_missing(graphql):
-    org = OrganisationFactory.create_for_community_applicant(name="")
-
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ApplicantTypeChoice.COMMUNITY,
-        organisation=org,
-        home_city__name="Helsinki",
-        billing_address=None,
+        organisation_name="",
     )
 
     graphql.login_with_superuser()
@@ -487,13 +473,9 @@ def test_send_application__community_applicant__org_name_missing(graphql):
 
 
 def test_send_application__community_applicant__org_core_business_missing(graphql):
-    org = OrganisationFactory.create_for_community_applicant(core_business="")
-
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ApplicantTypeChoice.COMMUNITY,
-        organisation=org,
-        home_city__name="Helsinki",
-        billing_address=None,
+        organisation_core_business="",
     )
 
     graphql.login_with_superuser()
@@ -503,13 +485,10 @@ def test_send_application__community_applicant__org_core_business_missing(graphq
     assert response.field_error_messages() == ["Application organisation must have a core business."]
 
 
-def test_send_application__community_applicant__missing_home_city(graphql):
-    org = OrganisationFactory.create_for_community_applicant()
-
+def test_send_application__community_applicant__missing_municipality(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ApplicantTypeChoice.COMMUNITY,
-        organisation=org,
-        billing_address=None,
+        municipality=None,
     )
 
     graphql.login_with_superuser()
@@ -519,31 +498,10 @@ def test_send_application__community_applicant__missing_home_city(graphql):
     assert response.field_error_messages() == ["Application home city is required with organisation."]
 
 
-def test_send_application__community_applicant__address_missing(graphql):
-    org = OrganisationFactory.create_for_community_applicant(address=None)
-
+def test_send_application__community_applicant__organisation_street_address_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ApplicantTypeChoice.COMMUNITY,
-        organisation=org,
-        home_city__name="Helsinki",
-        billing_address=None,
-    )
-
-    graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
-
-    assert response.has_errors is True
-    assert response.field_error_messages() == ["Application organisation address is required."]
-
-
-def test_send_application__community_applicant__address_street_address_missing(graphql):
-    org = OrganisationFactory.create_for_community_applicant(address__street_address="")
-
-    application = ApplicationFactory.create_application_ready_for_sending(
-        applicant_type=ApplicantTypeChoice.COMMUNITY,
-        organisation=org,
-        home_city__name="Helsinki",
-        billing_address=None,
+        organisation_street_address="",
     )
 
     graphql.login_with_superuser()
@@ -553,14 +511,10 @@ def test_send_application__community_applicant__address_street_address_missing(g
     assert response.field_error_messages() == ["Application organisation address must have a street address."]
 
 
-def test_send_application__community_applicant__address_post_code_missing(graphql):
-    org = OrganisationFactory.create_for_community_applicant(address__post_code="")
-
+def test_send_application__community_applicant__organisation_post_code_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ApplicantTypeChoice.COMMUNITY,
-        organisation=org,
-        home_city__name="Helsinki",
-        billing_address=None,
+        organisation_post_code="",
     )
 
     graphql.login_with_superuser()
@@ -570,14 +524,10 @@ def test_send_application__community_applicant__address_post_code_missing(graphq
     assert response.field_error_messages() == ["Application organisation address must have a post code."]
 
 
-def test_send_application__community_applicant__address_city_missing(graphql):
-    org = OrganisationFactory.create_for_community_applicant(address__city="")
-
+def test_send_application__community_applicant__organisation_city_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ApplicantTypeChoice.COMMUNITY,
-        organisation=org,
-        home_city__name="Helsinki",
-        billing_address=None,
+        organisation_city="",
     )
 
     graphql.login_with_superuser()
@@ -587,16 +537,12 @@ def test_send_application__community_applicant__address_city_missing(graphql):
     assert response.field_error_messages() == ["Application organisation address must have a city."]
 
 
-def test_send_application__community_applicant__billing_address(graphql):
-    org = OrganisationFactory.create_for_community_applicant()
-
+def test_send_application__community_applicant__billing_details_not_given(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ApplicantTypeChoice.COMMUNITY,
-        organisation=org,
-        home_city__name="Helsinki",
-        billing_address__street_address="Billing address",
-        billing_address__post_code="54321",
-        billing_address__city="City",
+        billing_street_address="",
+        billing_post_code="",
+        billing_city="",
     )
 
     graphql.login_with_superuser()
@@ -605,16 +551,10 @@ def test_send_application__community_applicant__billing_address(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_send_application__community_applicant__billing_address__street_address_missing(graphql):
-    org = OrganisationFactory.create_for_community_applicant()
-
+def test_send_application__community_applicant__billing_street_address_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ApplicantTypeChoice.COMMUNITY,
-        organisation=org,
-        home_city__name="Helsinki",
-        billing_address__street_address="",
-        billing_address__post_code="54321",
-        billing_address__city="City",
+        billing_street_address="Billing address",
     )
 
     graphql.login_with_superuser()
@@ -624,16 +564,10 @@ def test_send_application__community_applicant__billing_address__street_address_
     assert response.field_error_messages() == ["Application billing address must have a street address."]
 
 
-def test_send_application__community_applicant__billing_address__post_code_missing(graphql):
-    org = OrganisationFactory.create_for_community_applicant()
-
+def test_send_application__community_applicant__billing_post_code_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ApplicantTypeChoice.COMMUNITY,
-        organisation=org,
-        home_city__name="Helsinki",
-        billing_address__street_address="Billing address",
-        billing_address__post_code="",
-        billing_address__city="City",
+        billing_post_code="54321",
     )
 
     graphql.login_with_superuser()
@@ -643,16 +577,10 @@ def test_send_application__community_applicant__billing_address__post_code_missi
     assert response.field_error_messages() == ["Application billing address must have a post code."]
 
 
-def test_send_application__community_applicant__billing_address__city_missing(graphql):
-    org = OrganisationFactory.create_for_community_applicant()
-
+def test_send_application__community_applicant__billing_city_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ApplicantTypeChoice.COMMUNITY,
-        organisation=org,
-        home_city__name="Helsinki",
-        billing_address__street_address="Billing address",
-        billing_address__post_code="54321",
-        billing_address__city="",
+        billing_city="City",
     )
 
     graphql.login_with_superuser()
@@ -664,13 +592,8 @@ def test_send_application__community_applicant__billing_address__city_missing(gr
 
 @patch_method(EmailService.send_seasonal_booking_application_received_email)
 def test_send_application__association_applicant(graphql):
-    org = OrganisationFactory.create_for_association_applicant()
-
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ApplicantTypeChoice.ASSOCIATION,
-        organisation=org,
-        home_city__name="Helsinki",
-        billing_address=None,
     )
 
     graphql.login_with_superuser()
@@ -686,12 +609,8 @@ def test_send_application__association_applicant(graphql):
 
 @patch_method(EmailService.send_seasonal_booking_application_received_email)
 def test_send_application__company_applicant(graphql):
-    org = OrganisationFactory.create_for_company_applicant()
-
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ApplicantTypeChoice.COMPANY,
-        organisation=org,
-        billing_address=None,
     )
 
     graphql.login_with_superuser()
@@ -706,13 +625,9 @@ def test_send_application__company_applicant(graphql):
 
 
 def test_send_application__company_applicant__no_contact_person(graphql):
-    org = OrganisationFactory.create_for_company_applicant()
-
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ApplicantTypeChoice.COMPANY,
-        organisation=org,
         contact_person=None,
-        billing_address=None,
     )
 
     graphql.login_with_superuser()
@@ -723,12 +638,9 @@ def test_send_application__company_applicant__no_contact_person(graphql):
 
 
 def test_send_application__company_applicant__identifier_missing(graphql):
-    org = OrganisationFactory.create_for_company_applicant(identifier=None)
-
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ApplicantTypeChoice.COMPANY,
-        organisation=org,
-        billing_address=None,
+        organisation_identifier="",
     )
 
     graphql.login_with_superuser()

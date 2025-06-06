@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from .address.model import Address
 from .affecting_time_span.model import AffectingTimeSpan
 from .age_group.model import AgeGroup
 from .allocated_timeslot.model import AllocatedTimeSlot
@@ -9,17 +8,14 @@ from .application_round.model import ApplicationRound
 from .application_round_time_slot.model import ApplicationRoundTimeSlot
 from .application_section.model import ApplicationSection
 from .banner_notification.model import BannerNotification
-from .city.model import City
 from .equipment.model import Equipment
 from .equipment_category.model import EquipmentCategory
 from .general_role.model import GeneralRole
-from .organisation.model import Organisation
 from .origin_hauki_resource.model import OriginHaukiResource
 from .payment_accounting.model import PaymentAccounting
 from .payment_merchant.model import PaymentMerchant
 from .payment_order.model import PaymentOrder
 from .payment_product.model import PaymentProduct
-from .person.model import Person
 from .personal_info_view_log.model import PersonalInfoViewLog
 from .purpose.model import Purpose
 from .rejected_occurrence.model import RejectedOccurrence
@@ -50,7 +46,6 @@ from .unit_role.model import UnitRole
 from .user.model import ProfileUser, User
 
 __all__ = [
-    "Address",
     "AffectingTimeSpan",
     "AgeGroup",
     "AllocatedTimeSlot",
@@ -59,17 +54,14 @@ __all__ = [
     "ApplicationRoundTimeSlot",
     "ApplicationSection",
     "BannerNotification",
-    "City",
     "Equipment",
     "EquipmentCategory",
     "GeneralRole",
-    "Organisation",
     "OriginHaukiResource",
     "PaymentAccounting",
     "PaymentMerchant",
     "PaymentOrder",
     "PaymentProduct",
-    "Person",
     "PersonalInfoViewLog",
     "ProfileUser",
     "Purpose",

@@ -110,7 +110,6 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     reservation_series = ForeignKeyFactory("tests.factories.ReservationSeriesFactory")
     deny_reason = ForeignKeyFactory("tests.factories.ReservationDenyReasonFactory")
     purpose = ForeignKeyFactory("tests.factories.ReservationPurposeFactory")
-    home_city = ForeignKeyFactory("tests.factories.CityFactory")
     age_group = ForeignKeyFactory("tests.factories.AgeGroupFactory")
 
     payment_order = ReverseOneToOneFactory("tests.factories.PaymentOrderFactory")
