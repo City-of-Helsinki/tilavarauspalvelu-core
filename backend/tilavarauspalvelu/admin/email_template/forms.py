@@ -50,7 +50,7 @@ class EmailTesterForm(forms.BaseForm):
         initial: dict[str, Any] = {
             "reservation_unit_name": get_attr_by_language(instance, "name", language),
             "unit_name": get_attr_by_language(instance.unit, "name", language),
-            "unit_location": instance.actions.get_address(),
+            "unit_location": instance.unit.address,
             "instructions_confirmed": get_attr_by_language(instance, "reservation_confirmed_instructions", language),
             "instructions_cancelled": get_attr_by_language(instance, "reservation_cancelled_instructions", language),
             "instructions_pending": get_attr_by_language(instance, "reservation_pending_instructions", language),

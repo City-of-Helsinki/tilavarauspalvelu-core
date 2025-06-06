@@ -40,7 +40,6 @@ if TYPE_CHECKING:
 
     from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIResource
     from tilavarauspalvelu.models import (
-        Location,
         PaymentAccounting,
         PaymentMerchant,
         ReservationUnitAccessType,
@@ -203,17 +202,6 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         if override is not None:
             return override
         return self.reservation_unit.buffer_time_after
-
-    def get_location(self) -> Location:
-        # For now, we assume that if reservation has multiple spaces they all have same location
-        spaces = self.reservation_unit.spaces.all()
-        return next((space.location for space in spaces if hasattr(space, "location")), None)
-
-    def get_address(self) -> str:
-        location = getattr(self.reservation_unit.unit, "location", None)
-        if location is None:
-            return ""
-        return location.address
 
     def get_max_persons(self) -> int | None:
         # Sum of max persons for all spaces because group can be divided to different spaces
