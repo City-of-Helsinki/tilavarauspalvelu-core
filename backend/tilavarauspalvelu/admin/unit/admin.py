@@ -9,7 +9,6 @@ from django.contrib import admin, messages
 from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TabbedTranslationAdmin
 
-from tilavarauspalvelu.admin.location.admin import LocationInline
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.tprek.tprek_unit_importer import TprekUnitImporter
 from tilavarauspalvelu.models import Unit
@@ -100,8 +99,18 @@ class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TabbedTranslationAdmin):
                 ],
             },
         ],
+        [
+            _("Location"),
+            {
+                "fields": [
+                    "address_street",
+                    "address_zip",
+                    "address_city",
+                    "coordinates",
+                ],
+            },
+        ],
     ]
-    inlines = [LocationInline]
     readonly_fields = [
         "tprek_last_modified",
     ]

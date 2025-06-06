@@ -25,9 +25,9 @@ def email_reservation() -> Reservation:
     reservation_unit = ReservationUnitFactory.create(
         name_en="[VARAUSYKSIKÖN NIMI]",
         unit__name_en="[TOIMIPISTEEN NIMI]",
-        unit__location__address_street_en="[TOIMIPISTEEN OSOITE]",
-        unit__location__address_zip="",
-        unit__location__address_city_en="[KAUPUNKI]",
+        unit__address_street="[TOIMIPISTEEN OSOITE]",
+        unit__address_zip="",
+        unit__address_city_en="[KAUPUNKI]",
         reservation_confirmed_instructions_en="[HYVÄKSYTYN VARAUKSEN OHJEET]",
         reservation_cancelled_instructions_en="[PERUUTETUN VARAUKSEN OHJEET]",
         reservation_pending_instructions_en="[KÄSITELTÄVÄN VARAUKSEN OHJEET]",

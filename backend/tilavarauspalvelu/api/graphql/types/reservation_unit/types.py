@@ -12,19 +12,10 @@ from query_optimizer import AnnotatedField, DjangoListField, ManuallyOptimizedFi
 from query_optimizer.optimizer import QueryOptimizer
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.api.graphql.types.location.types import LocationNode
 from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
 from tilavarauspalvelu.enums import AccessType, ReservationUnitPublishingState, ReservationUnitReservationState
 from tilavarauspalvelu.integrations.opening_hours.hauki_link_generator import generate_hauki_link
-from tilavarauspalvelu.models import (
-    Location,
-    OriginHaukiResource,
-    PaymentMerchant,
-    Reservation,
-    ReservationUnit,
-    Space,
-    Unit,
-)
+from tilavarauspalvelu.models import OriginHaukiResource, PaymentMerchant, Reservation, ReservationUnit, Unit
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.db import SubqueryCount
 
@@ -63,8 +54,6 @@ class ReservationUnitNode(DjangoNode):
         expression=L("reservation_state"),
         required=True,
     )
-
-    location = ManuallyOptimizedField(LocationNode)
 
     is_closed = graphene.Boolean(required=True)
     first_reservable_datetime = graphene.DateTime()
@@ -154,7 +143,6 @@ class ReservationUnitNode(DjangoNode):
             "payment_terms",
             "payment_product",
             "payment_merchant",
-            "location",
             #
             # Forward many-to-many related
             "spaces",
@@ -230,34 +218,6 @@ class ReservationUnitNode(DjangoNode):
             "Did you forget to set `calculateFirstReservableTime:true`?"
         )
         raise GQLCodeError(msg, code=error_codes.RESERVATION_UNIT_FIRST_RESERVABLE_DATETIME_NOT_CALCULATED)
-
-    @staticmethod
-    def optimize_location(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
-        # Fetch `space` and space's `location` if not fetched yet.
-        space_optimizer = optimizer.get_or_set_child_optimizer(
-            name="spaces",
-            optimizer=QueryOptimizer(
-                Space,
-                optimizer.info,
-                name="spaces",
-                parent=optimizer,
-            ),
-            set_as="prefetch_related",
-        )
-        space_optimizer.get_or_set_child_optimizer(
-            name="location",
-            optimizer=QueryOptimizer(
-                Location,
-                optimizer.info,
-                name="location",
-                parent=space_optimizer,
-            ),
-        )
-
-        return queryset
-
-    def resolve_location(root: ReservationUnit, info: GQLInfo) -> Location:
-        return root.actions.get_location()
 
     @staticmethod
     def optimize_payment_merchant(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:

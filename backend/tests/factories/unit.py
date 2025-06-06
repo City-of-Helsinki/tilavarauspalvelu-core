@@ -16,7 +16,6 @@ from ._base import (
     ManyToManyFactory,
     ModelFactoryBuilder,
     ReverseForeignKeyFactory,
-    ReverseOneToOneFactory,
 )
 
 __all__ = [
@@ -56,13 +55,25 @@ class UnitFactory(GenericDjangoModelFactory[Unit]):
 
     rank = factory.Sequence(lambda i: i)
 
+    address_street = FakerFI("street_address")
+    address_street_fi = LazyAttribute(lambda i: i.address_street)
+    address_street_en = FakerEN("street_address")
+    address_street_sv = FakerSV("street_address")
+
+    address_zip = FakerFI("postcode")
+
+    address_city = FakerFI("city")
+    address_city_fi = LazyAttribute(lambda i: i.address_city)
+    address_city_en = FakerEN("city")
+    address_city_sv = FakerSV("city")
+
+    coordinates = None  # `django.contrib.gis.geos.Point`
+
     allow_permissions_from_ad_groups = False
 
     origin_hauki_resource = ForeignKeyFactory("tests.factories.OriginHaukiResourceFactory")
     payment_merchant = ForeignKeyFactory("tests.factories.PaymentMerchantFactory")
     payment_accounting = ForeignKeyFactory("tests.factories.PaymentAccountingFactory")
-
-    location = ReverseOneToOneFactory("tests.factories.LocationFactory")
 
     reservation_units = ReverseForeignKeyFactory("tests.factories.ReservationUnitFactory")
     spaces = ReverseForeignKeyFactory("tests.factories.SpaceFactory")

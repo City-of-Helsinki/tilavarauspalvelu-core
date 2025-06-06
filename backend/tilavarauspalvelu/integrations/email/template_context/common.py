@@ -225,12 +225,12 @@ def get_contex_for_seasonal_reservation_check_details_url(
 
 def params_for_base_info(*, reservation: Reservation, language: Lang) -> dict[str, Any]:
     # Currently, there is ever only one reservation unit per reservation.
-    primary: ReservationUnit = reservation.reservation_units.select_related("unit__location").first()
+    reservation_unit: ReservationUnit = reservation.reservation_units.select_related("unit").first()
 
     return {
-        "reservation_unit_name": get_attr_by_language(primary, "name", language),
-        "unit_name": get_attr_by_language(primary.unit, "name", language),
-        "unit_location": primary.actions.get_address(),
+        "reservation_unit_name": get_attr_by_language(reservation_unit, "name", language),
+        "unit_name": get_attr_by_language(reservation_unit.unit, "name", language),
+        "unit_location": reservation_unit.unit.address,
         "begin_datetime": reservation.begins_at.astimezone(DEFAULT_TIMEZONE),
         "end_datetime": reservation.ends_at.astimezone(DEFAULT_TIMEZONE),
     }
@@ -468,7 +468,7 @@ def _initialize_allocations_map(section: ApplicationSection) -> defaultdict[int,
                 "access_code_validity_period": "",  # Can be filled in later if access codes are used
                 "series_url": get_staff_reservations_ext_link(reservation_id=reservation.pk),
                 "unit_name": reservation_unit.unit.name,  # type: ignore[union-attr]
-                "unit_location": reservation_unit.actions.get_address(),
+                "unit_location": reservation_unit.unit.address,
                 "reservation_unit_name": reservation_unit.name,
             }
 

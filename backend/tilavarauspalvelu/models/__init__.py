@@ -13,7 +13,6 @@ from .city.model import City
 from .equipment.model import Equipment
 from .equipment_category.model import EquipmentCategory
 from .general_role.model import GeneralRole
-from .location.model import Location
 from .organisation.model import Organisation
 from .origin_hauki_resource.model import OriginHaukiResource
 from .payment_accounting.model import PaymentAccounting
@@ -64,7 +63,6 @@ __all__ = [
     "Equipment",
     "EquipmentCategory",
     "GeneralRole",
-    "Location",
     "Organisation",
     "OriginHaukiResource",
     "PaymentAccounting",
