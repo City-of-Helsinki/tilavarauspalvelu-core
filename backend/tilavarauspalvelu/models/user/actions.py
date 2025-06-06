@@ -180,7 +180,7 @@ class UserActions:
         month_ago = local_datetime() - relativedelta(months=1)
 
         has_open_reservations = (
-            self.user.reservations.filter(end__gte=month_ago)
+            self.user.reservations.filter(ends_at__gte=month_ago)
             .exclude(state__in=ReservationStateChoice.doesnt_block_anonymization)
             .exists()
         )

@@ -48,8 +48,8 @@ def test_reservation_series__deny_series(graphql):
     assert response.first_query_object == {"denied": 5, "future": 5}
     assert reservation_series.reservations.count() == 9
 
-    future_reservations: Iterable[Reservation] = reservation_series.reservations.filter(begin__gt=local_datetime())
-    past_reservations: Iterable[Reservation] = reservation_series.reservations.filter(begin__lte=local_datetime())
+    future_reservations: Iterable[Reservation] = reservation_series.reservations.filter(begins_at__gt=local_datetime())
+    past_reservations: Iterable[Reservation] = reservation_series.reservations.filter(begins_at__lte=local_datetime())
 
     assert all(reservation.state == ReservationStateChoice.DENIED for reservation in future_reservations)
     assert all(reservation.deny_reason == reason for reservation in future_reservations)
@@ -106,7 +106,7 @@ def test_reservation_series__deny_series__only_deny_certain_states(graphql):
 
     reservation_series = create_reservation_series()
 
-    last_reservation = reservation_series.reservations.order_by("begin").last()
+    last_reservation = reservation_series.reservations.order_by("begins_at").last()
     last_reservation.state = ReservationStateChoice.WAITING_FOR_PAYMENT
     last_reservation.save()
 
@@ -172,7 +172,7 @@ def test_reservation_series__deny_series__has_access_codes__pindora_not_found(gr
     assert PindoraService.reschedule_access_code.called is True
 
     # Future reservations were still denied.
-    future_reservations: Iterable[Reservation] = reservation_series.reservations.filter(begin__gt=local_datetime())
+    future_reservations: Iterable[Reservation] = reservation_series.reservations.filter(begins_at__gt=local_datetime())
     assert all(reservation.state == ReservationStateChoice.DENIED for reservation in future_reservations)
 
 
@@ -202,7 +202,7 @@ def test_reservation_series__deny_series__has_access_codes__pindora_call_fails(g
     assert PindoraService.reschedule_access_code.called is True
 
     # Future reservation were not denied.
-    future_reservations: Iterable[Reservation] = reservation_series.reservations.filter(begin__gt=local_datetime())
+    future_reservations: Iterable[Reservation] = reservation_series.reservations.filter(begins_at__gt=local_datetime())
     assert all(reservation.state != ReservationStateChoice.DENIED for reservation in future_reservations)
 
 

@@ -30,8 +30,8 @@ def test_update_pindora_access_code_is_active__activate():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=local_datetime(),
         access_code_is_active=False,
-        begin=now + datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now + datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
     )
 
     update_pindora_access_code_is_active_task()
@@ -57,8 +57,8 @@ def test_update_pindora_access_code_is_active__deactivate():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=local_datetime(),
         access_code_is_active=True,
-        begin=now + datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now + datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
     )
 
     update_pindora_access_code_is_active_task()
@@ -83,8 +83,8 @@ def test_update_pindora_access_code_is_active__already_active():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=local_datetime(),
         access_code_is_active=True,
-        begin=now + datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now + datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
     )
 
     update_pindora_access_code_is_active_task()
@@ -109,8 +109,8 @@ def test_update_pindora_access_code_is_active__already_not_active():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=local_datetime(),
         access_code_is_active=False,
-        begin=now + datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now + datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
     )
 
     update_pindora_access_code_is_active_task()
@@ -135,8 +135,8 @@ def test_update_pindora_access_code_is_active__activate__pindora_error():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=local_datetime(),
         access_code_is_active=False,
-        begin=now + datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now + datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
     )
 
     update_pindora_access_code_is_active_task()
@@ -161,8 +161,8 @@ def test_update_pindora_access_code_is_active__activate__pindora_error__404():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=local_datetime(),
         access_code_is_active=False,
-        begin=now + datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now + datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
     )
 
     update_pindora_access_code_is_active_task()
@@ -187,8 +187,8 @@ def test_update_pindora_access_code_is_active__deactivate__pindora_error():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=local_datetime(),
         access_code_is_active=True,
-        begin=now + datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now + datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
     )
 
     update_pindora_access_code_is_active_task()
@@ -213,8 +213,8 @@ def test_update_pindora_access_code_is_active__deactivate__pindora_error__404():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=local_datetime(),
         access_code_is_active=True,
-        begin=now + datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now + datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
     )
 
     update_pindora_access_code_is_active_task()
@@ -239,8 +239,8 @@ def test_update_pindora_access_code_is_active__reservation_series_is_ignored():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=local_datetime(),
         access_code_is_active=False,
-        begin=now + datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now + datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
         reservation_series=ReservationSeriesFactory.create(),
     )
 

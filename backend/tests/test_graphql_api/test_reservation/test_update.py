@@ -127,7 +127,7 @@ def test_reservation__update__cannot_update_time(graphql):
     reservation = ReservationFactory.create_for_update()
 
     graphql.login_with_superuser()
-    data = get_update_data(reservation, begin=local_datetime().isoformat())
+    data = get_update_data(reservation, beginsAt=local_datetime().isoformat())
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     # Actual error doesn't matter too much, as long as price can't be updated.

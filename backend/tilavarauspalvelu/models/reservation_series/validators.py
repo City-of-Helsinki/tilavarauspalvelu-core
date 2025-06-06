@@ -81,6 +81,6 @@ class ReservationSeriesValidator:
             msg = "Reservation series has no reservations."
             raise ValidationError(msg, code=error_codes.RESERVATION_SERIES_NO_RESERVATION)
 
-        if reservation.end < local_datetime():
+        if reservation.ends_at < local_datetime():
             msg = "Last reservation in the series has already ended."
             raise ValidationError(msg, code=error_codes.RESERVATION_SERIES_HAS_ENDED)

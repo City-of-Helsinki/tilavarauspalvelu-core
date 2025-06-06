@@ -544,8 +544,8 @@ def test_frontend_queries__admin_ui__HandlingData(graphql):
     end = begin + datetime.timedelta(hours=1)
 
     factory_args_1 = deepcopy(query_info_1.factory_args)
-    factory_args_1["begin"] = begin
-    factory_args_1["end"] = end
+    factory_args_1["begins_at"] = begin
+    factory_args_1["ends_at"] = end
     obj: Reservation = query_info_1.factory.create(**factory_args_1)
 
     factory_args_2 = deepcopy(query_info_2.factory_args)

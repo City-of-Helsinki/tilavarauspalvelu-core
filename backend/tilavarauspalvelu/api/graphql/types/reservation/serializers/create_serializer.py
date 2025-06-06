@@ -36,22 +36,22 @@ class ReservationCreateSerializer(NestingModelSerializer):
     pk = IntegerField(read_only=True)
     reservation_unit = IntegerPrimaryKeyField(queryset=ReservationUnit.objects, required=True, write_only=True)
 
-    begin = DateTimeField(required=True, write_only=True)
-    end = DateTimeField(required=True, write_only=True)
+    begins_at = DateTimeField(required=True, write_only=True)
+    ends_at = DateTimeField(required=True, write_only=True)
 
     class Meta:
         model = Reservation
         fields = [
             "pk",
             "reservation_unit",
-            "begin",
-            "end",
+            "begins_at",
+            "ends_at",
         ]
 
     def validate(self, data: ReservationCreateData) -> ReservationCreateData:
         reservation_unit = data["reservation_unit"]
-        begin = data["begin"].astimezone(DEFAULT_TIMEZONE)
-        end = data["end"].astimezone(DEFAULT_TIMEZONE)
+        begins_at = data["begins_at"].astimezone(DEFAULT_TIMEZONE)
+        ends_at = data["ends_at"].astimezone(DEFAULT_TIMEZONE)
 
         # Endpoint requires users to be logged in
         user: User = self.context["request"].user
@@ -60,18 +60,18 @@ class ReservationCreateSerializer(NestingModelSerializer):
 
         reservation_unit.validators.validate_reservation_unit_is_direct_bookable()
         reservation_unit.validators.validate_reservation_unit_is_published()
-        reservation_unit.validators.validate_reservation_unit_is_reservable_at(begin=begin)
+        reservation_unit.validators.validate_reservation_unit_is_reservable_at(begin=begins_at)
         reservation_unit.validators.validate_user_is_adult_if_required(user=user)
         reservation_unit.validators.validate_user_has_not_exceeded_max_reservations(user=user)
-        reservation_unit.validators.validate_begin_before_end(begin=begin, end=end)
-        reservation_unit.validators.validate_duration_is_allowed(duration=end - begin)
-        reservation_unit.validators.validate_reservation_days_before(begin=begin)
-        reservation_unit.validators.validate_reservation_unit_is_open(begin=begin, end=end)
-        reservation_unit.validators.validate_not_in_open_application_round(begin=begin.date(), end=end.date())
-        reservation_unit.validators.validate_reservation_begin_time(begin=begin)
-        reservation_unit.validators.validate_no_overlapping_reservations(begin=begin, end=end)
+        reservation_unit.validators.validate_begin_before_end(begin=begins_at, end=ends_at)
+        reservation_unit.validators.validate_duration_is_allowed(duration=ends_at - begins_at)
+        reservation_unit.validators.validate_reservation_days_before(begin=begins_at)
+        reservation_unit.validators.validate_reservation_unit_is_open(begin=begins_at, end=ends_at)
+        reservation_unit.validators.validate_not_in_open_application_round(begin=begins_at.date(), end=ends_at.date())
+        reservation_unit.validators.validate_reservation_begin_time(begin=begins_at)
+        reservation_unit.validators.validate_no_overlapping_reservations(begins_at=begins_at, ends_at=ends_at)
 
-        pricing = reservation_unit.actions.get_active_pricing(by_date=begin.date())
+        pricing = reservation_unit.actions.get_active_pricing(by_date=begins_at.date())
 
         if pricing is None:
             msg = "No pricing found for the given date."
@@ -83,16 +83,16 @@ class ReservationCreateSerializer(NestingModelSerializer):
             if pricing.payment_type != PaymentType.ON_SITE:
                 reservation_unit.validators.validate_has_payment_product()
 
-        data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
-        data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)
+        data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begins_at)
+        data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(ends_at)
         data["user"] = user
         data["reservee_used_ad_login"] = getattr(user.id_token, "is_ad_login", False)
 
-        data["price"] = pricing.actions.calculate_reservation_price(duration=end - begin)
+        data["price"] = pricing.actions.calculate_reservation_price(duration=ends_at - begins_at)
         data["unit_price"] = pricing.highest_price
         data["tax_percentage_value"] = pricing.tax_percentage.value
         data["non_subsidised_price"] = data["price"]
-        data["access_type"] = reservation_unit.actions.get_access_type_at(begin, default=AccessType.UNRESTRICTED)
+        data["access_type"] = reservation_unit.actions.get_access_type_at(begins_at, default=AccessType.UNRESTRICTED)
 
         if settings.PREFILL_RESERVATION_WITH_PROFILE_DATA:
             self.prefill_reservation_from_profile(data)

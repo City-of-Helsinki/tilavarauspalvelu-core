@@ -168,8 +168,8 @@ def test_reservation__cancel__fails_when_cancellation_time_is_over(graphql):
 def test_reservation__cancel__fails_when_reservation_in_the_past(graphql):
     now = local_datetime()
     reservation = ReservationFactory.create_for_cancellation(
-        begin=now - datetime.timedelta(hours=2),
-        end=now - datetime.timedelta(hours=1),
+        begins_at=now - datetime.timedelta(hours=2),
+        ends_at=now - datetime.timedelta(hours=1),
     )
 
     graphql.login_with_superuser()

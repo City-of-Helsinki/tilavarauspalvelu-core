@@ -38,8 +38,8 @@ class ReservationQuerySet(models.QuerySet):
     def with_buffered_begin_and_end(self) -> Self:
         """Annotate the queryset with buffered begin and end times."""
         return self.annotate(
-            buffered_begin=models.F("begin") - models.F("buffer_time_before"),
-            buffered_end=models.F("end") + models.F("buffer_time_after"),
+            buffered_begins_at=models.F("begins_at") - models.F("buffer_time_before"),
+            buffered_ends_at=models.F("ends_at") + models.F("buffer_time_after"),
         )
 
     def filter_buffered_reservations_period(self, start_date: datetime.date, end_date: datetime.date) -> Self:
@@ -47,8 +47,8 @@ class ReservationQuerySet(models.QuerySet):
         return (
             self.with_buffered_begin_and_end()
             .filter(
-                buffered_begin__date__lte=end_date,
-                buffered_end__date__gte=start_date,
+                buffered_begins_at__date__lte=end_date,
+                buffered_ends_at__date__gte=start_date,
             )
             .distinct()
             .order_by("buffered_begin")
@@ -56,7 +56,7 @@ class ReservationQuerySet(models.QuerySet):
 
     def total_duration(self) -> datetime.timedelta:
         return (
-            self.annotate(duration=models.F("end") - models.F("begin"))
+            self.annotate(duration=models.F("ends_at") - models.F("begins_at"))
             .aggregate(total_duration=models.Sum("duration"))
             .get("total_duration")
         ) or datetime.timedelta()
@@ -73,15 +73,15 @@ class ReservationQuerySet(models.QuerySet):
     def within_period(self, period_start: datetime.date, period_end: datetime.date) -> Self:
         """All reservation fully withing a period."""
         return self.filter(
-            begin__date__gte=period_start,
-            end__date__lte=period_end,
+            begins_at__date__gte=period_start,
+            ends_at__date__lte=period_end,
         )
 
     def overlapping_period(self, period_start: datetime.date, period_end: datetime.date) -> Self:
         """All reservations that overlap with a period, even partially."""
         return self.filter(
-            begin__date__lte=period_end,
-            end__date__gte=period_start,
+            begins_at__date__lte=period_end,
+            ends_at__date__gte=period_start,
         )
 
     def overlapping_reservations(
@@ -119,13 +119,16 @@ class ReservationQuerySet(models.QuerySet):
                 # Don't account for buffers on blocked reservations
                 models.When(
                     type=ReservationTypeChoice.BLOCKED,
-                    then=models.Q(end__gt=begin, begin__lt=end),
+                    then=models.Q(ends_at__gt=begin, begins_at__lt=end),
                 ),
                 default=(
                     # Existing reservations (with buffers) overlap the given period (without buffers)
-                    (models.Q(buffered_end__gt=begin) & models.Q(buffered_begin__lt=end))
+                    (models.Q(buffered_ends_at__gt=begin) & models.Q(buffered_begins_at__lt=end))
                     # The given period (with buffers) overlap the existing reservations (without buffers)
-                    | (models.Q(end__gt=begin - buffer_time_before) & models.Q(begin__lt=end + buffer_time_after))
+                    | (
+                        models.Q(ends_at__gt=begin - buffer_time_before)
+                        & models.Q(begins_at__lt=end + buffer_time_after)
+                    )
                 ),
                 output_field=models.BooleanField(),
             ),
@@ -143,11 +146,11 @@ class ReservationQuerySet(models.QuerySet):
           even if the reservation itself is not returned by this queryset.
         - Returned data may contain some 'Inactive' reservations, before they are deleted by a periodic task.
         """
-        return self.going_to_occur().filter(end__gte=local_datetime())
+        return self.going_to_occur().filter(ends_at__gte=local_datetime())
 
     def future(self) -> Self:
         """Filter reservations have yet not begun."""
-        return self.going_to_occur().filter(begin__gt=local_datetime())
+        return self.going_to_occur().filter(begins_at__gt=local_datetime())
 
     def unconfirmed(self) -> Self:
         return self.exclude(state=ReservationStateChoice.CONFIRMED)
@@ -324,7 +327,7 @@ class ReservationQuerySet(models.QuerySet):
             state=ReservationStateChoice.CONFIRMED,
             access_type=AccessType.ACCESS_CODE,
             access_code_generated_at=None,
-            end__gt=local_datetime(),
+            ends_at__gt=local_datetime(),
         )
 
     def has_incorrect_access_code_is_active(self) -> Self:
@@ -335,7 +338,7 @@ class ReservationQuerySet(models.QuerySet):
                 | (models.Q(access_code_is_active=False) & L(access_code_should_be_active=True))
             ),
             access_code_generated_at__isnull=False,
-            end__gt=local_datetime(),
+            ends_at__gt=local_datetime(),
         )
 
     def for_application_section(self, ref: ApplicationSection | models.OuterRef) -> Self:
@@ -384,7 +387,7 @@ class ReservationQuerySet(models.QuerySet):
         return self.filter(
             state=ReservationStateChoice.CONFIRMED,
             type__in=ReservationTypeChoice.types_created_by_the_reservee,
-            begin__gt=now,
+            begins_at__gt=now,
             payment_order__isnull=False,
             payment_order__status__in=[OrderStatus.EXPIRED, OrderStatus.CANCELLED],
             payment_order__handled_payment_due_by__lt=now,

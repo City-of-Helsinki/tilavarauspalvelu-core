@@ -35,8 +35,8 @@ def test_staff_repair_access_code(graphql):
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=now,
         access_code_is_active=False,
-        begin=now + datetime.timedelta(hours=1),
-        end=now + datetime.timedelta(hours=2),
+        begins_at=now + datetime.timedelta(hours=1),
+        ends_at=now + datetime.timedelta(hours=2),
     )
 
     def hook(obj: Reservation) -> None:
@@ -73,8 +73,8 @@ def test_staff_repair_access_code__was_active(graphql):
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=now,
         access_code_is_active=True,
-        begin=now + datetime.timedelta(hours=1),
-        end=now + datetime.timedelta(hours=2),
+        begins_at=now + datetime.timedelta(hours=1),
+        ends_at=now + datetime.timedelta(hours=2),
     )
 
     data = {
@@ -102,8 +102,8 @@ def test_staff_repair_access_code__access_type_not_access_code(graphql):
         access_type=AccessType.UNRESTRICTED,
         access_code_generated_at=local_datetime(),
         access_code_is_active=True,
-        begin=local_datetime() + datetime.timedelta(hours=1),
-        end=local_datetime() + datetime.timedelta(hours=2),
+        begins_at=local_datetime() + datetime.timedelta(hours=1),
+        ends_at=local_datetime() + datetime.timedelta(hours=2),
     )
 
     data = {
@@ -124,8 +124,8 @@ def test_staff_repair_access_code__in_series(graphql):
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=local_datetime(),
         access_code_is_active=True,
-        begin=local_datetime() + datetime.timedelta(hours=1),
-        end=local_datetime() + datetime.timedelta(hours=2),
+        begins_at=local_datetime() + datetime.timedelta(hours=1),
+        ends_at=local_datetime() + datetime.timedelta(hours=2),
         reservation_series=ReservationSeriesFactory.create(),
     )
 
@@ -149,8 +149,8 @@ def test_staff_repair_access_code__ongoing(graphql):
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=local_datetime(),
         access_code_is_active=False,
-        begin=local_datetime() - datetime.timedelta(hours=1),
-        end=local_datetime() + datetime.timedelta(hours=1),
+        begins_at=local_datetime() - datetime.timedelta(hours=1),
+        ends_at=local_datetime() + datetime.timedelta(hours=1),
     )
 
     def hook(obj: Reservation) -> None:
@@ -178,8 +178,8 @@ def test_staff_repair_access_code__has_ended(graphql):
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=local_datetime(),
         access_code_is_active=True,
-        begin=local_datetime() - datetime.timedelta(hours=2),
-        end=local_datetime() - datetime.timedelta(hours=1),
+        begins_at=local_datetime() - datetime.timedelta(hours=2),
+        ends_at=local_datetime() - datetime.timedelta(hours=1),
     )
 
     data = {
@@ -201,8 +201,8 @@ def test_staff_repair_access_code__pindora_call_fails(graphql):
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=local_datetime(),
         access_code_is_active=True,
-        begin=local_datetime() + datetime.timedelta(hours=1),
-        end=local_datetime() + datetime.timedelta(hours=2),
+        begins_at=local_datetime() + datetime.timedelta(hours=1),
+        ends_at=local_datetime() + datetime.timedelta(hours=2),
     )
 
     data = {

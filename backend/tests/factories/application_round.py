@@ -233,8 +233,8 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
 
                 for begin, end in reservation_times:
                     reservation = ReservationFactory.build(
-                        begin=begin,
-                        end=end,
+                        begins_at=begin,
+                        ends_at=end,
                         user=user,
                         purpose=purpose,
                         age_group=age_group,

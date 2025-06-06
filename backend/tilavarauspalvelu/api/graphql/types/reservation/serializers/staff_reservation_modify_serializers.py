@@ -90,8 +90,8 @@ class StaffReservationModifySerializer(NestingModelSerializer):
             "confirmed_at",
             "state",
             # Time info
-            "begin",
-            "end",
+            "begins_at",
+            "ends_at",
             "buffer_time_after",
             "buffer_time_before",
             # Price info
@@ -105,8 +105,8 @@ class StaffReservationModifySerializer(NestingModelSerializer):
         extra_kwargs = {
             "confirmed_at": {"read_only": True},
             # Time info
-            "begin": {"read_only": True},
-            "end": {"read_only": True},
+            "begins_at": {"read_only": True},
+            "ends_at": {"read_only": True},
             "buffer_time_after": {"read_only": True},
             "buffer_time_before": {"read_only": True},
             # Price info

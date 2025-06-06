@@ -35,7 +35,7 @@ pytestmark = [
 def test_get_formatted_reservation_time(language, result):
     begin = datetime.datetime.now().astimezone(tz=DEFAULT_TIMEZONE)
     end = begin + datetime.timedelta(hours=2)
-    reservation = ReservationFactory.create(begin=begin, end=end, user__preferred_language=language)
+    reservation = ReservationFactory.create(begins_at=begin, ends_at=end, user__preferred_language=language)
     date = get_formatted_reservation_time(reservation)
     assert date == result
 

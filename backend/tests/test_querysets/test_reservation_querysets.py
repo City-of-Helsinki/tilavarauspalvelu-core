@@ -36,8 +36,8 @@ def _create_test_reservations_for_all_reservation_units() -> None:
     """
     for i, reservation_unit in enumerate(ReservationUnit.objects.order_by("pk").all(), start=1):
         ReservationFactory.create(
-            begin=_datetime(minute=i),
-            end=_datetime(minute=0),
+            begins_at=_datetime(minute=i),
+            ends_at=_datetime(minute=0),
             reservation_units=[reservation_unit],
             user=None,
             state=ReservationStateChoice.CREATED,
@@ -59,8 +59,8 @@ def _validate_time_spans(
     """
     closed_time_spans: set[TimeSpanElement] = {
         TimeSpanElement(
-            start_datetime=reservation.buffered_begin,
-            end_datetime=reservation.buffered_end,
+            start_datetime=reservation.buffered_begins_at,
+            end_datetime=reservation.buffered_ends_at,
             is_reservable=False,
         )
         for reservation in Reservation.objects.with_buffered_begin_and_end().filter(

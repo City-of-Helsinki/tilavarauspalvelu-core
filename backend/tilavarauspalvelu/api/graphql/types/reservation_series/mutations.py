@@ -65,7 +65,7 @@ class ReservationSeriesDenyMutation(UpdateMutation):
 
     @classmethod
     def get_serializer_output(cls, instance: ReservationSeries) -> dict[str, Any]:
-        future_reservations = instance.reservations.filter(begin__gt=local_datetime())
+        future_reservations = instance.reservations.filter(begins_at__gt=local_datetime())
         return {
             "denied": future_reservations.filter(state=ReservationStateChoice.DENIED).count(),
             "future": future_reservations.count(),

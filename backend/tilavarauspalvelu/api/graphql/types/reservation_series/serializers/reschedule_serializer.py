@@ -102,8 +102,8 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
 
         # We know there is at least one future reservation, so we can safely assume
         # that we will have at least one reservation in the series
-        first_reservation: Reservation = self.instance.reservations.order_by("begin").first()  # type: ignore[attr-defined]
-        if begin_date != self.instance.begin_date and first_reservation.begin < now:
+        first_reservation: Reservation = self.instance.reservations.order_by("begins_at").first()  # type: ignore[attr-defined]
+        if begin_date != self.instance.begin_date and first_reservation.begins_at < now:
             msg = (
                 "Reservation series' begin date cannot be changed after its "
                 "first reservation's start time is in the past."
@@ -178,7 +178,7 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
         # Skip generating reservations for any dates where there is currently a non-confirmed reservation.
         # It's unlikely that the reserver will want or can have the same date even if the time is changed.
         # Any exceptions can be handled after the fact.
-        skip_dates |= set(instance.reservations.unconfirmed().values_list("begin__date", flat=True))
+        skip_dates |= set(instance.reservations.unconfirmed().values_list("begins_at__date", flat=True))
 
         reservation_details = self.get_reservation_details(instance)
         reservation_details["buffer_time_before"] = buffer_time_before or datetime.timedelta()
@@ -197,8 +197,8 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
                 skip_dates.add(today)
 
             # If series already has a reservation that is ongoing or in the past, don't create new one for today.
-            todays_reservation: Reservation | None = instance.reservations.filter(begin__date=today).first()
-            if todays_reservation is not None and todays_reservation.begin.astimezone(DEFAULT_TIMEZONE) <= now:
+            todays_reservation: Reservation | None = instance.reservations.filter(begins_at__date=today).first()
+            if todays_reservation is not None and todays_reservation.begins_at.astimezone(DEFAULT_TIMEZONE) <= now:
                 skip_dates.add(today)
 
         slots = instance.actions.pre_calculate_slots(
@@ -219,7 +219,7 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
 
         # Remove CONFIRMED reservations that have not yet begun.
         # Also remove any statistics for these reservations, since they are being replaced by the new ones.
-        old_reservations = instance.reservations.filter(begin__gt=now, state=ReservationStateChoice.CONFIRMED)
+        old_reservations = instance.reservations.filter(begins_at__gt=now, state=ReservationStateChoice.CONFIRMED)
         ReservationStatistic.objects.filter(reservation__in=old_reservations).delete()
         old_reservations.delete()
 
@@ -231,7 +231,7 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
         # Use reservation details from the next reservation relative to the current time that is going to occur.
         # We validated previously that there is at least one future reservation in the series,
         # so we can safely assume that we will have at least one reservation to get details from.
-        next_reservation: Reservation = instance.reservations.future().order_by("begin").first()
+        next_reservation: Reservation = instance.reservations.future().order_by("begins_at").first()
 
         return ReservationDetails(
             name=next_reservation.name,

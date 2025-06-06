@@ -247,14 +247,14 @@ def test_reservation_series__cancel_section_series__cancellation_rule(graphql):
     assert response.first_query_object == {"cancelled": 4, "future": 5}
     assert reservation_series.reservations.count() == 9
 
-    future_reservations = reservation_series.reservations.filter(begin__date__gte=local_date()).iterator()
+    future_reservations = reservation_series.reservations.filter(begins_at__date__gte=local_date()).iterator()
 
     reservation_1 = next(future_reservations)
-    assert reservation_1.begin.date() == datetime.date(2024, 1, 1)
+    assert reservation_1.begins_at.date() == datetime.date(2024, 1, 1)
     assert reservation_1.state == ReservationStateChoice.CONFIRMED
 
     reservation_2 = next(future_reservations)
-    assert reservation_2.begin.date() == datetime.date(2024, 1, 8)
+    assert reservation_2.begins_at.date() == datetime.date(2024, 1, 8)
     assert reservation_2.state == ReservationStateChoice.CANCELLED
 
 

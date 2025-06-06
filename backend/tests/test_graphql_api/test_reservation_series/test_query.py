@@ -218,8 +218,8 @@ def test_reservation_series__query__pindora_info(graphql):
         end=local_datetime(2022, 1, 1, 12),
     )
     reservation = ReservationFactory.create(
-        begin=local_datetime(2022, 1, 1, 12),
-        end=local_datetime(2022, 1, 1, 13),
+        begins_at=local_datetime(2022, 1, 1, 12),
+        ends_at=local_datetime(2022, 1, 1, 13),
         reservation_series=series,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
@@ -376,8 +376,8 @@ def test_reservation_series__query__pindora_info__in_application_section(graphql
         reservation_unit=reservation_unit,
     )
     reservation = ReservationFactory.create(
-        begin=local_datetime(2022, 1, 1, 12),
-        end=local_datetime(2022, 1, 1, 13),
+        begins_at=local_datetime(2022, 1, 1, 12),
+        ends_at=local_datetime(2022, 1, 1, 13),
         reservation_series=series,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
@@ -444,8 +444,8 @@ def test_reservation_series__query__pindora_info__in_application_section__not_se
         reservation_unit=reservation_unit,
     )
     ReservationFactory.create(
-        begin=local_datetime(2022, 1, 1, 12),
-        end=local_datetime(2022, 1, 1, 13),
+        begins_at=local_datetime(2022, 1, 1, 12),
+        ends_at=local_datetime(2022, 1, 1, 13),
         reservation_series=series,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,

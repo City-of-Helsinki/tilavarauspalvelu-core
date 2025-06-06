@@ -28,8 +28,8 @@ def test_staff_change_access_code__regular_user(graphql):
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=local_datetime(),
         access_code_is_active=True,
-        begin=local_datetime() + datetime.timedelta(hours=1),
-        end=local_datetime() + datetime.timedelta(hours=2),
+        begins_at=local_datetime() + datetime.timedelta(hours=1),
+        ends_at=local_datetime() + datetime.timedelta(hours=2),
     )
 
     data = {
@@ -62,8 +62,8 @@ def test_staff_change_access_code__unit_handler(graphql):
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=local_datetime(),
         access_code_is_active=True,
-        begin=local_datetime() + datetime.timedelta(hours=1),
-        end=local_datetime() + datetime.timedelta(hours=2),
+        begins_at=local_datetime() + datetime.timedelta(hours=1),
+        ends_at=local_datetime() + datetime.timedelta(hours=2),
         reservation_units=[reservation_unit],
     )
 
@@ -99,8 +99,8 @@ def test_staff_change_access_code__general_handler(graphql):
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=local_datetime(),
         access_code_is_active=True,
-        begin=local_datetime() + datetime.timedelta(hours=1),
-        end=local_datetime() + datetime.timedelta(hours=2),
+        begins_at=local_datetime() + datetime.timedelta(hours=1),
+        ends_at=local_datetime() + datetime.timedelta(hours=2),
     )
 
     data = {

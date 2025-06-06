@@ -36,8 +36,8 @@ def test_create_missing_pindora_reservations__create_missing():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=None,
         access_code_is_active=False,
-        begin=now + datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now + datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
     )
 
     create_missing_pindora_reservations_task()
@@ -69,8 +69,8 @@ def test_create_missing_pindora_reservations__blocked():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=None,
         access_code_is_active=False,
-        begin=now + datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now + datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
     )
 
     create_missing_pindora_reservations_task()
@@ -95,8 +95,8 @@ def test_create_missing_pindora_reservations__in_the_past():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=None,
         access_code_is_active=False,
-        begin=now - datetime.timedelta(days=1),
-        end=now - datetime.timedelta(days=1, hours=1),
+        begins_at=now - datetime.timedelta(days=1),
+        ends_at=now - datetime.timedelta(days=1, hours=1),
     )
 
     create_missing_pindora_reservations_task()
@@ -127,8 +127,8 @@ def test_create_missing_pindora_reservations__ongoing():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=None,
         access_code_is_active=False,
-        begin=now - datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now - datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
     )
 
     create_missing_pindora_reservations_task()
@@ -154,8 +154,8 @@ def test_create_missing_pindora_reservations__not_confirmed():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=None,
         access_code_is_active=False,
-        begin=now + datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now + datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
     )
 
     create_missing_pindora_reservations_task()
@@ -179,8 +179,8 @@ def test_create_missing_pindora_reservations__not_access_code():
         access_type=AccessType.UNRESTRICTED,
         access_code_generated_at=None,
         access_code_is_active=False,
-        begin=now + datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now + datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
     )
 
     create_missing_pindora_reservations_task()
@@ -204,8 +204,8 @@ def test_create_missing_pindora_reservations__already_generated():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=now,
         access_code_is_active=False,
-        begin=now + datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now + datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
     )
 
     create_missing_pindora_reservations_task()
@@ -238,8 +238,8 @@ def test_create_missing_pindora_reservations__multiple():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=None,
         access_code_is_active=False,
-        begin=now + datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now + datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
     )
 
     ReservationFactory.create_for_reservation_unit(
@@ -249,8 +249,8 @@ def test_create_missing_pindora_reservations__multiple():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=None,
         access_code_is_active=False,
-        begin=now + datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now + datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
     )
 
     create_missing_pindora_reservations_task()
@@ -270,8 +270,8 @@ def test_create_missing_pindora_reservations__pindora_error():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=None,
         access_code_is_active=False,
-        begin=now + datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now + datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
     )
 
     create_missing_pindora_reservations_task()
@@ -295,8 +295,8 @@ def test_create_missing_pindora_reservations__reservation_series_is_ignored():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=None,
         access_code_is_active=False,
-        begin=now + datetime.timedelta(days=1),
-        end=now + datetime.timedelta(days=1, hours=1),
+        begins_at=now + datetime.timedelta(days=1),
+        ends_at=now + datetime.timedelta(days=1, hours=1),
         reservation_series=ReservationSeriesFactory.create(),
     )
 
