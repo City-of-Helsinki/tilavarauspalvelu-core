@@ -92,13 +92,13 @@ class ReservationUnitNode(DjangoNode):
             #
             # IDs
             "pk",
-            "uuid",
+            "ext_uuid",
             "rank",
             #
             # Strings
             "name",
             "description",
-            "terms_of_use",
+            "notes_when_applying",
             "contact_information",
             "reservation_pending_instructions",
             "reservation_confirmed_instructions",
@@ -114,10 +114,10 @@ class ReservationUnitNode(DjangoNode):
             "reservations_max_days_before",
             #
             # Datetime
-            "reservation_begins",
-            "reservation_ends",
-            "publish_begins",
-            "publish_ends",
+            "reservation_begins_at",
+            "reservation_ends_at",
+            "publish_begins_at",
+            "publish_ends_at",
             "min_reservation_duration",
             "max_reservation_duration",
             "buffer_time_before",
@@ -304,7 +304,7 @@ class ReservationUnitNode(DjangoNode):
     @staticmethod
     def optimize_hauki_url(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
         # Fetch `uuid` if not fetched yet.
-        optimizer.only_fields.append("uuid")
+        optimizer.only_fields.append("ext_uuid")
 
         # Fetch `origin_hauki_resource` if not fetched yet.
         optimizer.get_or_set_child_optimizer(
@@ -337,7 +337,7 @@ class ReservationUnitNode(DjangoNode):
         if root.origin_hauki_resource is None:
             return None
 
-        return generate_hauki_link(root.uuid, info.context.user.email, root.unit.hauki_department_id)
+        return generate_hauki_link(root.ext_uuid, info.context.user.email, root.unit.hauki_department_id)
 
     def resolve_reservable_time_spans(
         root: ReservationUnit,

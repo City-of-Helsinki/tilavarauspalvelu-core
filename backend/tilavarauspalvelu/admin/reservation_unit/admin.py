@@ -94,7 +94,7 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
             {
                 "fields": [
                     "id",
-                    "uuid",
+                    "ext_uuid",
                     "name",
                     "description",
                     "unit",
@@ -131,10 +131,10 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
                     "buffer_time_after",
                     "reservations_min_days_before",
                     "reservations_max_days_before",
-                    "reservation_begins",
-                    "reservation_ends",
-                    "publish_begins",
-                    "publish_ends",
+                    "reservation_begins_at",
+                    "reservation_ends_at",
+                    "publish_begins_at",
+                    "publish_ends_at",
                     "max_reservations_per_user",
                 ],
             },
@@ -169,7 +169,7 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
                     "cancellation_terms",
                     "service_specific_terms",
                     "pricing_terms",
-                    "terms_of_use",
+                    "notes_when_applying",
                 ],
             },
         ],
@@ -208,7 +208,7 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
     ]
     readonly_fields = [
         "id",
-        "uuid",
+        "ext_uuid",
         "payment_product",
         "publishing_state",
         "reservation_state",
