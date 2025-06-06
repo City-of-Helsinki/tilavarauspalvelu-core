@@ -2,9 +2,8 @@ import { type ApplicationPage2Query } from "@/gql/gql-types";
 import Page2 from "@/pages/applications/[id]/page2";
 import { render } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
-import { type CreateGraphQLMocksReturn } from "@test/test.gql.utils";
 import {
-  createGraphQLApplicationIdMock,
+  createGraphQLMocks,
   createMockApplicationFragment,
   type CreateMockApplicationFragmentProps,
 } from "@test/application.mocks";
@@ -52,9 +51,6 @@ vi.mock("next/router", () => ({
   useRouter,
 }));
 
-function createGraphQLMocks(): CreateGraphQLMocksReturn {
-  return createGraphQLApplicationIdMock();
-}
 type ApplicationPage2 = NonNullable<ApplicationPage2Query["application"]>;
 function customRender(
   props: CreateMockApplicationFragmentProps = {}

@@ -44,10 +44,7 @@ import {
 } from "./reservationUnit";
 import mockTranslations from "./../public/locales/fi/prices.json";
 import { type ReservableMap, dateToKey, type RoundPeriod } from "./reservable";
-import {
-  createMockReservationUnit,
-  generateNameFragment,
-} from "@/test/test.gql.utils";
+import { generateNameFragment } from "@/test/test.gql.utils";
 import { TIMERS_TO_FAKE } from "@/test/test.utils";
 import { base64encode, ReadonlyDeep } from "common/src/helpers";
 import { type TFunction } from "i18next";
@@ -62,6 +59,7 @@ import {
   afterAll,
 } from "vitest";
 import { type DeepRequired } from "react-hook-form";
+import { createMockIsReservableFieldsFragment } from "@/test/reservation-unit.mocks";
 
 // Turn into describe block and spec the tests
 describe("getPossibleTimesForDay", () => {
@@ -102,7 +100,7 @@ describe("getPossibleTimesForDay", () => {
   }): GetPossibleTimesForDayProps {
     return {
       date,
-      reservationUnit: createMockReservationUnit({ interval }),
+      reservationUnit: createMockIsReservableFieldsFragment({ interval }),
       activeApplicationRounds: [] as const,
       reservableTimes,
       duration,

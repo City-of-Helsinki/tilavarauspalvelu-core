@@ -2,14 +2,14 @@ import {
   type CreateGraphQLMockProps,
   generateNameFragment,
 } from "@test/test.gql.utils";
-import { createApplicationSearchGraphQLMocks } from "@test/application.mocks";
+import {
+  createGraphQLMocks,
+  createMockReservationUnit,
+} from "@test/application.mocks";
 import { render, within } from "@testing-library/react";
 import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { ReservationUnitList } from "./ReservationUnitList";
-import {
-  type ApplicationReservationUnitListFragment,
-  ImageType,
-} from "@/gql/gql-types";
+import { type ApplicationReservationUnitListFragment } from "@/gql/gql-types";
 import { base64encode } from "common/src/helpers";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { type SubmitHandler, useForm } from "react-hook-form";
@@ -64,7 +64,7 @@ function customRender({
   error,
   ...mockProps
 }: CustomRenderProps): ReturnType<typeof render> {
-  const mocks = createApplicationSearchGraphQLMocks(mockProps);
+  const mocks = createGraphQLMocks(mockProps);
   const values: FormValues["reservationUnits"] = Array.from({
     length: nReservationUnits,
   }).map((_, i) => i + 1);
@@ -72,28 +72,7 @@ function customRender({
     id: base64encode("ApplicationRound:1"),
     pk: 1,
     ...generateNameFragment("ApplicationRound 1"),
-    reservationUnits: values.map((i) => ({
-      id: base64encode(`ReservationUnit:${i}`),
-      pk: i,
-      minPersons: 1,
-      maxPersons: null,
-      ...generateNameFragment(`Reservation Unit ${i}`),
-      unit: {
-        id: base64encode("Unit:1"),
-        pk: 1,
-        ...generateNameFragment("Unit 1"),
-      },
-      images: [
-        {
-          id: base64encode("Image:1"),
-          imageUrl: "https://example.com/image1.jpg",
-          largeUrl: "https://example.com/image1_large.jpg",
-          mediumUrl: "https://example.com/image1_medium.jpg",
-          smallUrl: "https://example.com/image1_small.jpg",
-          imageType: ImageType.Main,
-        } as const,
-      ],
-    })),
+    reservationUnits: values.map((pk) => createMockReservationUnit({ pk })),
   } as const;
 
   return render(
@@ -184,7 +163,7 @@ describe("reservation unit list render", () => {
     });
     expect(delBtn).not.toBeDisabled();
     const cardHeading = view.getByRole("heading", {
-      name: "Reservation Unit 1 FI",
+      name: "ReservationUnit 1 FI",
     });
     expect(cardHeading).toBeInTheDocument();
 
@@ -202,7 +181,7 @@ describe("reservation unit list render", () => {
     });
     expect(delBtns.length).toBe(3);
     const cardHeadings = view.getAllByRole("heading", {
-      name: /Reservation Unit \d+ FI/,
+      name: /ReservationUnit \d+ FI/,
     });
     expect(cardHeadings.length).toBe(3);
 

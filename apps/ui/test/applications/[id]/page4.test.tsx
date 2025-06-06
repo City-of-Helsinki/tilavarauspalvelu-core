@@ -2,10 +2,9 @@ import { type TermsOfUseFieldsFragment, TermsType } from "@/gql/gql-types";
 import Page4 from "@/pages/applications/[id]/page4";
 import { render, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
-import { type CreateGraphQLMocksReturn } from "@test/test.gql.utils";
 import {
+  createGraphQLMocks,
   type CreateMockApplicationFragmentProps,
-  createGraphQLApplicationIdMock,
   createMockApplicationViewFragment,
 } from "@test/application.mocks";
 import { base64encode } from "common/src/helpers";
@@ -51,10 +50,6 @@ vi.mock("next/navigation", async (importOriginal) => {
 vi.mock("next/router", () => ({
   useRouter,
 }));
-
-function createGraphQLMocks(): CreateGraphQLMocksReturn {
-  return createGraphQLApplicationIdMock();
-}
 
 function customRender(
   props: CreateMockApplicationFragmentProps = {}
