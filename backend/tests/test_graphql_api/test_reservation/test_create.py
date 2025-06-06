@@ -90,14 +90,14 @@ def test_reservation__create__overlapping_reservation(graphql):
 
     # An overlapping reservation
     ReservationFactory.create(
-        begin=begin,
-        end=end,
+        begins_at=begin,
+        ends_at=end,
         state=ReservationStateChoice.CONFIRMED,
         reservation_units=[reservation_unit],
     )
 
     graphql.login_with_superuser()
-    data = get_create_data(reservation_unit, begin=begin, end=end)
+    data = get_create_data(reservation_unit, begins_at=begin, ends_at=end)
 
     ReservationUnitHierarchy.refresh()
 
@@ -149,8 +149,8 @@ def test_reservation__create__overlaps_with_reservation_buffer_before_or_after(
     end = begin + datetime.timedelta(hours=1)
 
     ReservationFactory.create(
-        begin=begin + reservation_delta_time,
-        end=end + reservation_delta_time,
+        begins_at=begin + reservation_delta_time,
+        ends_at=end + reservation_delta_time,
         state=ReservationStateChoice.CONFIRMED,
         reservation_units=[reservation_unit],
         buffer_time_before=datetime.timedelta(),
@@ -159,7 +159,7 @@ def test_reservation__create__overlaps_with_reservation_buffer_before_or_after(
     )
 
     graphql.login_with_superuser()
-    data = get_create_data(reservation_unit, begin=begin, end=end)
+    data = get_create_data(reservation_unit, begins_at=begin, ends_at=end)
 
     ReservationUnitHierarchy.refresh()
 
@@ -213,7 +213,7 @@ def test_reservation__create__reservation_unit_in_open_application_round(graphql
     end = begin + datetime.timedelta(days=1)
 
     graphql.login_with_superuser()
-    data = get_create_data(reservation_unit, begin=begin, end=end)
+    data = get_create_data(reservation_unit, begins_at=begin, ends_at=end)
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.field_error_messages() == ["Reservation unit is in an open application round."]
@@ -260,7 +260,7 @@ def test_reservation__create__start_time_does_not_match_reservation_start_interv
     end = begin + datetime.timedelta(hours=1)
 
     graphql.login_with_superuser()
-    data = get_create_data(reservation_unit, begin=begin, end=end)
+    data = get_create_data(reservation_unit, begins_at=begin, ends_at=end)
     response = graphql(CREATE_MUTATION, input_data=data)
 
     if allow_reservations_without_opening_hours:
@@ -323,7 +323,7 @@ def test_reservation__create__reservation_unit_reservation_in_the_past_or_future
     )
 
     graphql.login_with_superuser()
-    data = get_create_data(reservation_unit, begin=begin, end=end)
+    data = get_create_data(reservation_unit, begins_at=begin, ends_at=end)
     response = graphql(CREATE_MUTATION, input_data=data)
 
     if is_error:
@@ -365,7 +365,7 @@ def test_reservation__create__reservation_unit_publish_in_the_past_or_future(
     )
 
     graphql.login_with_superuser()
-    data = get_create_data(reservation_unit, begin=begin, end=end)
+    data = get_create_data(reservation_unit, begins_at=begin, ends_at=end)
     response = graphql(CREATE_MUTATION, input_data=data)
 
     if is_error:
@@ -407,8 +407,8 @@ def test_reservation__create__max_reservations_per_user__over(graphql):
 
     user = graphql.login_with_superuser()
     ReservationFactory.create(
-        begin=begin,
-        end=end,
+        begins_at=begin,
+        ends_at=end,
         state=ReservationStateChoice.CONFIRMED,
         reservation_units=[reservation_unit],
         user=user,
@@ -416,8 +416,8 @@ def test_reservation__create__max_reservations_per_user__over(graphql):
 
     data = get_create_data(
         reservation_unit,
-        begin=begin + datetime.timedelta(hours=1),
-        end=end + datetime.timedelta(hours=1),
+        begins_at=begin + datetime.timedelta(hours=1),
+        ends_at=end + datetime.timedelta(hours=1),
     )
     response = graphql(CREATE_MUTATION, input_data=data)
 
@@ -443,8 +443,8 @@ def test_reservation__create__max_reservations_per_user__non_normal_reservation(
         ReservationTypeChoice.SEASONAL,
     ]:
         ReservationFactory.create(
-            begin=begin,
-            end=end,
+            begins_at=begin,
+            ends_at=end,
             state=ReservationStateChoice.CONFIRMED,
             reservation_units=[reservation_unit],
             user=user,
@@ -469,14 +469,14 @@ def test_reservation__create__max_reservations_per_user__past_reservations(graph
 
     user = graphql.login_with_superuser()
     ReservationFactory.create(
-        begin=begin - datetime.timedelta(hours=3),
-        end=end - datetime.timedelta(hours=3),
+        begins_at=begin - datetime.timedelta(hours=3),
+        ends_at=end - datetime.timedelta(hours=3),
         state=ReservationStateChoice.CONFIRMED,
         reservation_units=[reservation_unit],
         user=user,
     )
 
-    data = get_create_data(reservation_unit, begin=begin, end=end)
+    data = get_create_data(reservation_unit, begins_at=begin, ends_at=end)
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
@@ -496,14 +496,14 @@ def test_reservation__create__max_reservations_per_user__reservations_for_other_
 
     user = graphql.login_with_superuser()
     ReservationFactory.create(
-        begin=begin,
-        end=end,
+        begins_at=begin,
+        ends_at=end,
         state=ReservationStateChoice.CONFIRMED,
         reservation_units=[reservation_unit_2],
         user=user,
     )
 
-    data = get_create_data(reservation_unit_1, begin=begin, end=end)
+    data = get_create_data(reservation_unit_1, begins_at=begin, ends_at=end)
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
@@ -531,14 +531,14 @@ def test_reservation__create__max_reservations_per_user__reservations_for_other_
 
     user = graphql.login_with_superuser()
     ReservationFactory.create(
-        begin=begin + datetime.timedelta(hours=1),
-        end=end + datetime.timedelta(hours=1),
+        begins_at=begin + datetime.timedelta(hours=1),
+        ends_at=end + datetime.timedelta(hours=1),
         state=ReservationStateChoice.CONFIRMED,
         reservation_units=[reservation_unit_2],
         user=user,
     )
 
-    data = get_create_data(reservation_unit_1, begin=begin, end=end)
+    data = get_create_data(reservation_unit_1, begins_at=begin, ends_at=end)
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
@@ -596,7 +596,7 @@ def test_reservation__create__reservation_unit_reservations_min_and_max_days_bef
     end = next_hour(plus_hours=2, plus_days=reservation_days_delta)
 
     graphql.login_with_superuser()
-    data = get_create_data(reservation_unit, begin=begin, end=end)
+    data = get_create_data(reservation_unit, begins_at=begin, ends_at=end)
     response = graphql(CREATE_MUTATION, input_data=data)
 
     if error_message:
@@ -727,7 +727,7 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
     )
 
     graphql.login_with_superuser()
-    data = get_create_data(reservation_unit, begin=now + datetime.timedelta(days=1, hours=1))
+    data = get_create_data(reservation_unit, begins_at=now + datetime.timedelta(days=1, hours=1))
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
@@ -773,7 +773,7 @@ def test_reservation__create__duration_is_not_multiple_of_interval(graphql):
     end = next_hour(plus_hours=2, plus_minutes=1)
 
     graphql.login_with_superuser()
-    input_data = get_create_data(reservation_unit, begin=begin, end=end)
+    input_data = get_create_data(reservation_unit, begins_at=begin, ends_at=end)
 
     response = graphql(CREATE_MUTATION, input_data=input_data)
 
@@ -1010,8 +1010,8 @@ def test_reservation__create__reservation_block_whole_day__non_reserved_time_is_
     graphql.login_with_regular_user()
 
     input_data = {
-        "begin": datetime.datetime(2023, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
-        "end": datetime.datetime(2023, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "beginsAt": datetime.datetime(2023, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "endsAt": datetime.datetime(2023, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE).isoformat(),
         "reservationUnit": reservation_unit.pk,
     }
 
@@ -1020,8 +1020,8 @@ def test_reservation__create__reservation_block_whole_day__non_reserved_time_is_
 
     reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
 
-    assert reservation.begin == datetime.datetime(2023, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE)
-    assert reservation.end == datetime.datetime(2023, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.begins_at == datetime.datetime(2023, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.ends_at == datetime.datetime(2023, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE)
     assert reservation.buffer_time_before == datetime.timedelta(hours=12)
     assert reservation.buffer_time_after == datetime.timedelta(hours=11)
 
@@ -1043,8 +1043,8 @@ def test_reservation__create__reservation_block_whole_day__start_and_end_at_midn
     graphql.login_with_regular_user()
 
     input_data = {
-        "begin": datetime.datetime(2023, 1, 1, hour=0, tzinfo=DEFAULT_TIMEZONE).isoformat(),
-        "end": datetime.datetime(2023, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "beginsAt": datetime.datetime(2023, 1, 1, hour=0, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "endsAt": datetime.datetime(2023, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE).isoformat(),
         "reservationUnit": reservation_unit.pk,
     }
 
@@ -1053,8 +1053,8 @@ def test_reservation__create__reservation_block_whole_day__start_and_end_at_midn
 
     reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
 
-    assert reservation.begin == datetime.datetime(2023, 1, 1, hour=0, tzinfo=DEFAULT_TIMEZONE)
-    assert reservation.end == datetime.datetime(2023, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.begins_at == datetime.datetime(2023, 1, 1, hour=0, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.ends_at == datetime.datetime(2023, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE)
     assert reservation.buffer_time_before == datetime.timedelta(hours=0)
     assert reservation.buffer_time_after == datetime.timedelta(hours=0)
 
@@ -1087,13 +1087,13 @@ def test_reservation__create__reservation_block_whole_day__blocks_reserving_for_
     begin = next_hour(plus_hours=5)
     end = begin + datetime.timedelta(hours=1)
 
-    ReservationFactory.create_for_reservation_unit(reservation_unit=reservation_unit, begin=begin, end=end)
+    ReservationFactory.create_for_reservation_unit(reservation_unit=reservation_unit, begins_at=begin, ends_at=end)
 
     graphql.login_with_regular_user()
 
     input_data = {
-        "begin": (begin + new_reservation_begin_delta).isoformat(),
-        "end": (end + new_reservation_begin_delta).isoformat(),
+        "beginsAt": (begin + new_reservation_begin_delta).isoformat(),
+        "endsAt": (end + new_reservation_begin_delta).isoformat(),
         "reservationUnit": reservation_unit.pk,
     }
 
@@ -1346,8 +1346,8 @@ def test_reservation__create__two_overlapping_reservation_created_at_the_same_ti
         nonlocal reservation
         reservation = ReservationFactory.create_for_reservation_unit(
             reservation_unit=reservation_unit,
-            begin=datetime.datetime.fromisoformat(data["begin"]),
-            end=datetime.datetime.fromisoformat(data["end"]),
+            begins_at=datetime.datetime.fromisoformat(data["beginsAt"]),
+            ends_at=datetime.datetime.fromisoformat(data["endsAt"]),
         )
         return Reservation.objects.filter(pk=reservation.pk)
 

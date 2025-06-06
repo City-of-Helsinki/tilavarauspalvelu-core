@@ -80,7 +80,7 @@ class ReservationValidator:
             raise ValidationError(msg, code=error_codes.ORDER_REFUND_NOT_ALLOWED)
 
     def validate_reservation_not_past_or_ongoing(self) -> None:
-        if self.reservation.begin.astimezone(DEFAULT_TIMEZONE) < local_datetime():
+        if self.reservation.begins_at.astimezone(DEFAULT_TIMEZONE) < local_datetime():
             msg = "Past or ongoing reservations cannot be modified"
             raise ValidationError(msg, code=error_codes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
@@ -93,7 +93,7 @@ class ReservationValidator:
         if now.hour == 0:
             min_allowed_datetime -= datetime.timedelta(days=1)
 
-        end = self.reservation.end.astimezone(DEFAULT_TIMEZONE)
+        end = self.reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
         if end < min_allowed_datetime:
             msg = "Reservation cannot be changed anymore."
             raise ValidationError(msg, code=error_codes.RESERVATION_MODIFICATION_NOT_ALLOWED)
@@ -133,7 +133,7 @@ class ReservationValidator:
             raise ValidationError(msg, code=error_codes.RESERVATION_DENYING_NOT_ALLOWED)
 
         now = local_datetime()
-        end = self.reservation.end.astimezone(DEFAULT_TIMEZONE)
+        end = self.reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
 
         if self.reservation.state == ReservationStateChoice.CONFIRMED.value and end < now:
             msg = "Reservation cannot be denied after it has ended."
@@ -211,7 +211,7 @@ class ReservationValidator:
 
     def validate_reservation_has_not_ended(self) -> None:
         now = local_datetime()
-        end = self.reservation.end.astimezone(DEFAULT_TIMEZONE)
+        end = self.reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
 
         if end <= now:
             msg = "Reservation has already ended."

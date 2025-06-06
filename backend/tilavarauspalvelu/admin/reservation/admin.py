@@ -53,7 +53,7 @@ class ReservationAdmin(admin.ModelAdmin):
         "name",
         "type",
         "state",
-        "begin",
+        "begins_at",
         "reservation_units_admin",
         "access_type",
         "access_code_is_active",
@@ -61,7 +61,7 @@ class ReservationAdmin(admin.ModelAdmin):
     ]
     list_filter = [
         ("created_at", DateRangeFilterBuilder(title=_("Created at"))),
-        ("begin", DateRangeFilterBuilder(title=_("Begin time"))),
+        ("begins_at", DateRangeFilterBuilder(title=_("Begin time"))),
         ("type", MultiSelectFilter),
         ("state", MultiSelectFilter),
         ReservationSeriesListFilter,
@@ -98,8 +98,8 @@ class ReservationAdmin(admin.ModelAdmin):
             _("Time"),
             {
                 "fields": [
-                    "begin",
-                    "end",
+                    "begins_at",
+                    "ends_at",
                     "buffer_time_before",
                     "buffer_time_after",
                     "handled_at",
@@ -245,9 +245,9 @@ class ReservationAdmin(admin.ModelAdmin):
             return None
 
         queryset = queryset.filter(state__in=ReservationStateChoice.states_that_can_change_to_deny)
-        queryset_ended_reservation_count = queryset.filter(end__lt=local_datetime()).count()
+        queryset_ended_reservation_count = queryset.filter(ends_at__lt=local_datetime()).count()
 
-        queryset = queryset.filter(end__gte=local_datetime())
+        queryset = queryset.filter(ends_at__gte=local_datetime())
         queryset_unpaid_reservation_count = queryset.filter(price=0).count()
         queryset_paid_reservation_count = queryset.filter(price__gt=0).count()
 
@@ -262,7 +262,7 @@ class ReservationAdmin(admin.ModelAdmin):
             price__gt=0,
             payment_order__isnull=False,
             payment_order__status=OrderStatus.PAID_BY_INVOICE,
-            begin__date__lte=local_date(),
+            begins_at__date__lte=local_date(),
         ).count()
 
         deny_reasons = ReservationDenyReason.objects.all().order_by("reason")
@@ -290,7 +290,7 @@ class ReservationAdmin(admin.ModelAdmin):
         deny_reason = request.POST.get("deny_reason")
         queryset.filter(
             state__in=ReservationStateChoice.states_that_can_change_to_deny,
-            end__gte=local_datetime(),
+            ends_at__gte=local_datetime(),
         ).update(
             state=ReservationStateChoice.DENIED,
             handled_at=local_datetime(),
@@ -356,7 +356,7 @@ class ReservationAdmin(admin.ModelAdmin):
             price__gt=0,
             payment_order__isnull=False,
             payment_order__status=OrderStatus.PAID_BY_INVOICE,
-            begin__date__lte=local_date(),
+            begins_at__date__lte=local_date(),
         )
         for reservation in cancel_queryset:
             payment_order = reservation.payment_order

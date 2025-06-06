@@ -363,8 +363,8 @@ def test_reservation_rescheduled__send_email(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_rescheduled_email(reservation)
@@ -387,8 +387,8 @@ def test_reservation_rescheduled__send_email__no_recipients(outbox):
         reservee_email="",
         user__email="",
         reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_rescheduled_email(reservation)
@@ -407,8 +407,8 @@ def test_reservation_rescheduled__send_email__reservation_in_the_past(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_rescheduled_email(reservation)

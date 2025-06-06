@@ -48,7 +48,7 @@ def test_reservation__staff_modify__end_date_passed(graphql):
     end = next_hour(plus_hours=-1, plus_days=-2)
     begin = end - datetime.timedelta(hours=1)
 
-    reservation = ReservationFactory.create_for_staff_update(begin=begin, end=end)
+    reservation = ReservationFactory.create_for_staff_update(begins_at=begin, ends_at=end)
 
     graphql.login_with_superuser()
     data = get_staff_modify_data(reservation)

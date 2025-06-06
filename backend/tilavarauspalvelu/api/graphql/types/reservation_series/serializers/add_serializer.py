@@ -33,8 +33,8 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
 
     pk = serializers.IntegerField(required=True)
 
-    begin = serializers.DateTimeField(required=True, write_only=True)
-    end = serializers.DateTimeField(required=True, write_only=True)
+    begins_at = serializers.DateTimeField(required=True, write_only=True)
+    ends_at = serializers.DateTimeField(required=True, write_only=True)
 
     buffer_time_before = serializers.DurationField(required=False, write_only=True)
     buffer_time_after = serializers.DurationField(required=False, write_only=True)
@@ -43,8 +43,8 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
         model = ReservationSeries
         fields = [
             "pk",
-            "begin",
-            "end",
+            "begins_at",
+            "ends_at",
             "buffer_time_before",
             "buffer_time_after",
         ]
@@ -56,12 +56,12 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
         first_reservation: Reservation = self.instance.reservations.first()
         reservation_type = first_reservation.type
 
-        begin: datetime.datetime = data["begin"].astimezone(DEFAULT_TIMEZONE)
-        end: datetime.datetime = data["end"].astimezone(DEFAULT_TIMEZONE)
+        begins_at: datetime.datetime = data["begins_at"].astimezone(DEFAULT_TIMEZONE)
+        ends_at: datetime.datetime = data["ends_at"].astimezone(DEFAULT_TIMEZONE)
 
         if reservation_unit.reservation_block_whole_day:
-            data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
-            data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)
+            data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begins_at)
+            data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(ends_at)
 
         # Buffers should not be used for blocking reservations
         elif reservation_type == ReservationTypeChoice.BLOCKED:
@@ -71,16 +71,16 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
         buffer_time_before = data.setdefault("buffer_time_before", reservation_unit.buffer_time_before)
         buffer_time_after = data.setdefault("buffer_time_after", reservation_unit.buffer_time_after)
 
-        reservation_unit.validators.validate_begin_before_end(begin, end)
-        reservation_unit.validators.validate_reservation_begin_time_staff(begin=begin)
+        reservation_unit.validators.validate_begin_before_end(begins_at, ends_at)
+        reservation_unit.validators.validate_reservation_begin_time_staff(begin=begins_at)
         reservation_unit.validators.validate_no_overlapping_reservations(
-            begin=begin,
-            end=end,
+            begins_at=begins_at,
+            ends_at=ends_at,
             new_buffer_time_before=buffer_time_before,
             new_buffer_time_after=buffer_time_after,
         )
 
-        data["access_type"] = reservation_unit.actions.get_access_type_at(begin, default=AccessType.UNRESTRICTED)
+        data["access_type"] = reservation_unit.actions.get_access_type_at(begins_at, default=AccessType.UNRESTRICTED)
 
         return data
 
@@ -99,8 +99,8 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
         reservation._state.adding = True  # noqa: SLF001
         reservation.id = None
 
-        reservation.begin = validated_data["begin"]
-        reservation.end = validated_data["end"]
+        reservation.begins_at = validated_data["begins_at"]
+        reservation.ends_at = validated_data["begins_at"]
         reservation.buffer_time_before = validated_data["buffer_time_before"]
         reservation.buffer_time_after = validated_data["buffer_time_after"]
         reservation.access_type = validated_data["access_type"]

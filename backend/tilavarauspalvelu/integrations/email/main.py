@@ -55,7 +55,7 @@ class EmailService:
         if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
             return
 
-        if reservation.end.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -91,7 +91,7 @@ class EmailService:
         if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
             return
 
-        if reservation.end.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -117,7 +117,7 @@ class EmailService:
         if reservation.state != ReservationStateChoice.CONFIRMED:
             return
 
-        if reservation.end.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -229,7 +229,7 @@ class EmailService:
         if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
             return
 
-        if reservation.end.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -257,7 +257,7 @@ class EmailService:
         if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
             return
 
-        if reservation.end.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -335,7 +335,7 @@ class EmailService:
         if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
             return
 
-        if reservation.end.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -642,7 +642,7 @@ class EmailService:
         if reservation.type != ReservationTypeChoice.SEASONAL:
             return
 
-        if reservation.end.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -702,7 +702,7 @@ class EmailService:
         if reservation.type != ReservationTypeChoice.SEASONAL:
             return
 
-        if reservation.end.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)

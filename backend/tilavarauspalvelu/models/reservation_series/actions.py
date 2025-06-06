@@ -195,8 +195,8 @@ class ReservationSeriesActions:
             access_type = access_type_map.get(period["begin"].date(), AccessType.UNRESTRICTED)
 
             reservation = Reservation(
-                begin=period["begin"],
-                end=period["end"],
+                begins_at=period["begin"],
+                ends_at=period["end"],
                 reservation_series=self.reservation_series,
                 age_group=self.reservation_series.age_group,
                 access_type=access_type,
@@ -267,13 +267,13 @@ class ReservationSeriesActions:
         return self.reservation_series.reservations.filter(
             L(access_code_should_be_active=True),
             access_code_is_active=False,
-            end__gt=local_datetime(),
+            ends_at__gt=local_datetime(),
         ).exists()
 
     def has_upcoming_or_ongoing_reservations_with_active_access_codes(self) -> bool:
         return self.reservation_series.reservations.filter(
             access_code_is_active=True,
-            end__gt=local_datetime(),
+            ends_at__gt=local_datetime(),
         ).exists()
 
     def get_weekdays(self) -> list[Weekday]:

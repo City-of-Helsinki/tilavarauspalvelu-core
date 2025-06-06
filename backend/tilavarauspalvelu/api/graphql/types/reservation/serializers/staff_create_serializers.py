@@ -64,8 +64,8 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
             "type",
             #
             # Time information
-            "begin",
-            "end",
+            "begins_at",
+            "ends_at",
             "buffer_time_before",
             "buffer_time_after",
             #
@@ -112,16 +112,16 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
         }
 
     def validate(self, data: StaffCreateReservationData) -> StaffCreateReservationData:
-        begin = data.get("begin").astimezone(DEFAULT_TIMEZONE)
-        end = data.get("end").astimezone(DEFAULT_TIMEZONE)
+        begins_at = data.get("begins_at").astimezone(DEFAULT_TIMEZONE)
+        ends_at = data.get("ends_at").astimezone(DEFAULT_TIMEZONE)
 
         # Endpoint requires user to be logged in
         user: User = self.context["request"].user
         reservation_unit: ReservationUnit = data["reservation_unit"]
 
         if reservation_unit.reservation_block_whole_day:
-            data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
-            data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)
+            data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begins_at)
+            data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(ends_at)
 
         reservation_type = data.get("type")
         reservation_unit.validators.validate_can_create_reservation_type(reservation_type=reservation_type)
@@ -134,11 +134,11 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
             buffer_time_before = data.get("buffer_time_before")
             buffer_time_after = data.get("buffer_time_after")
 
-        reservation_unit.validators.validate_begin_before_end(begin=begin, end=end)
-        reservation_unit.validators.validate_reservation_begin_time_staff(begin=begin)
+        reservation_unit.validators.validate_begin_before_end(begin=begins_at, end=ends_at)
+        reservation_unit.validators.validate_reservation_begin_time_staff(begin=begins_at)
         reservation_unit.validators.validate_no_overlapping_reservations(
-            begin=begin,
-            end=end,
+            begins_at=begins_at,
+            ends_at=ends_at,
             new_buffer_time_before=buffer_time_before,
             new_buffer_time_after=buffer_time_after,
         )
@@ -151,7 +151,7 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
         data["state"] = ReservationStateChoice.CONFIRMED
         data["user"] = user
         data["reservee_used_ad_login"] = False if id_token is None else id_token.is_ad_login
-        data["access_type"] = reservation_unit.actions.get_access_type_at(begin, default=AccessType.UNRESTRICTED)
+        data["access_type"] = reservation_unit.actions.get_access_type_at(begins_at, default=AccessType.UNRESTRICTED)
 
         return data
 

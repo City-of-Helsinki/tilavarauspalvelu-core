@@ -97,8 +97,8 @@ def test_frontend_queries__customer_ui__AddReservationToSeries(graphql):
     variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": series.pk,
-        "begin": new_begin.isoformat(),
-        "end": new_end.isoformat(),
+        "beginsAt": new_begin.isoformat(),
+        "endsAt": new_end.isoformat(),
     }
     assert_no_undefined_variables(variables)
 
@@ -260,7 +260,7 @@ def test_frontend_queries__customer_ui__ChangeReservationAccessCodeSingle(graphq
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
-    factory_args["begin"] = next_hour()
+    factory_args["begins_at"] = next_hour()
     factory_args["access_type"] = AccessType.ACCESS_CODE
     reservation = ReservationFactory.create_for_staff_update(**factory_args)
 
@@ -449,8 +449,8 @@ def test_frontend_queries__customer_ui__CreateStaffReservation(graphql):
 
     variables = deepcopy(query_info.variables)
     variables["input"] = {
-        "begin": begin.isoformat(),
-        "end": end.isoformat(),
+        "beginsAt": begin.isoformat(),
+        "endsAt": end.isoformat(),
         "reservationUnit": reservation_unit.pk,
         "type": ReservationTypeChoice.STAFF.value,
     }
@@ -766,7 +766,7 @@ def test_frontend_queries__customer_ui__RepairReservationAccessCodeSingle(graphq
 
     factory_args: dict[str, Any] = {}
     factory_args["access_type"] = AccessType.ACCESS_CODE
-    factory_args["begin"] = next_hour()
+    factory_args["begins_at"] = next_hour()
 
     reservation = ReservationFactory.create(**factory_args)
 
@@ -920,8 +920,8 @@ def test_frontend_queries__customer_ui__StaffAdjustReservationTime(graphql):
     variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation.pk,
-        "begin": (reservation.begin + datetime.timedelta(hours=1)).isoformat(),
-        "end": (reservation.end + datetime.timedelta(hours=1)).isoformat(),
+        "beginsAt": (reservation.begins_at + datetime.timedelta(hours=1)).isoformat(),
+        "endsAt": (reservation.ends_at + datetime.timedelta(hours=1)).isoformat(),
     }
     assert_no_undefined_variables(variables)
 

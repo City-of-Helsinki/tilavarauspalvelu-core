@@ -149,8 +149,8 @@ def test_redirect_to_verkkokauppa__reservation_no_payment_order(api_client):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
-        begin=begin,
-        end=begin + datetime.timedelta(hours=1),
+        begins_at=begin,
+        ends_at=begin + datetime.timedelta(hours=1),
         reservation_units=[reservation_unit],
         payment_order=None,
     )

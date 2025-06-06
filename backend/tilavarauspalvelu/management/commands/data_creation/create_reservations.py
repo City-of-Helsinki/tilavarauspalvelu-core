@@ -998,8 +998,8 @@ def _create_reservations_for_series(
             reservation = reservations.pop(index)
             reservation_reservation_units.pop(index)
             occurrence = RejectedOccurrenceFactory.build(
-                begin_datetime=reservation.begin,
-                end_datetime=reservation.end,
+                begin_datetime=reservation.begins_at,
+                end_datetime=reservation.ends_at,
                 reservation_series=reservation.reservation_series,
                 created_at=local_datetime(),
             )

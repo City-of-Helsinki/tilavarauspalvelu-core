@@ -23,15 +23,15 @@ def test_reservation_unit__get_previous_reservation():
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
     reservation_blocked = ReservationFactory.create(
-        begin=(NOW - datetime.timedelta(hours=2)),
-        end=(NOW - datetime.timedelta(hours=1)),
+        begins_at=(NOW - datetime.timedelta(hours=2)),
+        ends_at=(NOW - datetime.timedelta(hours=1)),
         reservation_units=[reservation_unit],
         type=ReservationTypeChoice.BLOCKED,
         state=ReservationStateChoice.CONFIRMED,
     )
     reservation = ReservationFactory.create(
-        begin=(NOW - datetime.timedelta(hours=3)),
-        end=(NOW - datetime.timedelta(hours=2)),
+        begins_at=(NOW - datetime.timedelta(hours=3)),
+        ends_at=(NOW - datetime.timedelta(hours=2)),
         reservation_units=[reservation_unit],
         state=ReservationStateChoice.CONFIRMED,
     )
