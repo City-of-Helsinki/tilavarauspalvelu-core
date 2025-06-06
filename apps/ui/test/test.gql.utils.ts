@@ -1,20 +1,19 @@
 import {
-  type IsReservableFieldsFragment,
   type OptionsQuery,
-  ReservationStartInterval,
   type ReservationUnitTypeNode,
 } from "@/gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
-import { addDays } from "date-fns";
 import { type DocumentNode } from "graphql";
-import { type ReservableMap, type RoundPeriod } from "@/modules/reservable";
 import { translateOption, type OptionsT } from "@/modules/search";
 
-export type CreateGraphQLMockProps = {
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface ICreateGraphQLMock {}
+
+export interface CreateGraphQLMockProps extends ICreateGraphQLMock {
   noUser?: boolean;
   isSearchError?: boolean;
   dateOverride?: Date | null;
-};
+}
 
 export type CreateGraphQLMocksReturn = Array<{
   request: {
@@ -132,48 +131,6 @@ export function createOptionQueryMock({
     equipmentsAll: equipments,
     unitsAll: units,
   };
-}
-
-type ReservationUnitType = Omit<
-  IsReservableFieldsFragment,
-  "reservableTimeSpans"
->;
-type MockReservationUnitProps = {
-  bufferTimeBefore?: number;
-  bufferTimeAfter?: number;
-  reservableTimes?: ReservableMap;
-  interval?: ReservationStartInterval;
-  maxReservationDuration?: IsReservableFieldsFragment["maxReservationDuration"];
-  minReservationDuration?: IsReservableFieldsFragment["minReservationDuration"];
-  activeApplicationRounds?: RoundPeriod[];
-  reservationsMinDaysBefore?: number;
-  reservationsMaxDaysBefore?: number | null;
-};
-/// create a mock for IsReservableFragment (not a full reservation unit)
-// TODO use the version in (in application.mocks.ts)
-// or alternatively move it to reservation-unit.mocks.ts
-export function createMockReservationUnit({
-  bufferTimeBefore = 0,
-  bufferTimeAfter = 0,
-  interval = ReservationStartInterval.Interval_15Mins,
-  maxReservationDuration = 0,
-  minReservationDuration = 0,
-  reservationsMinDaysBefore = 0,
-  reservationsMaxDaysBefore = null,
-}: MockReservationUnitProps): ReservationUnitType {
-  const reservationUnit: ReservationUnitType = {
-    id: "1",
-    bufferTimeBefore: 60 * 60 * bufferTimeBefore,
-    bufferTimeAfter: 60 * 60 * bufferTimeAfter,
-    maxReservationDuration,
-    minReservationDuration,
-    reservationStartInterval: interval,
-    reservationsMaxDaysBefore,
-    reservationsMinDaysBefore,
-    reservationBegins: addDays(new Date(), -1).toISOString(),
-    reservationEnds: addDays(new Date(), 180).toISOString(),
-  };
-  return reservationUnit;
 }
 
 export function createMockReservationUnitType({
