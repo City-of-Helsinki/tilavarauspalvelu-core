@@ -175,8 +175,8 @@ def test_reservation__refund__invoiced__date_in_the_past(graphql):
 
     reservation = ReservationFactory.create_for_refund(
         payment_order__status=OrderStatus.PAID_BY_INVOICE,
-        begin=begin,
-        end=begin + datetime.timedelta(hours=1),
+        begins_at=begin,
+        ends_at=begin + datetime.timedelta(hours=1),
     )
 
     graphql.login_with_superuser()

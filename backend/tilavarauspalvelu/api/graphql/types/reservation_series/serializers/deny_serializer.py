@@ -57,7 +57,7 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
         now = local_datetime()
 
         reservations: ReservationQuerySet = instance.reservations.filter(  # type: ignore[attr-defined]
-            begin__gt=now,
+            begins_at__gt=now,
             state__in=ReservationStateChoice.states_that_can_change_to_deny,
         )
 

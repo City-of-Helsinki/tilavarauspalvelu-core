@@ -31,48 +31,48 @@ def test_reservation__affecting__time_and_state(graphql):
     # Not affecting, since cancelled
     ReservationFactory.create(
         reservation_units=[reservation_unit],
-        begin=datetime.datetime(2023, 1, 2, hour=12, tzinfo=DEFAULT_TIMEZONE),
-        end=datetime.datetime(2023, 1, 2, hour=13, tzinfo=DEFAULT_TIMEZONE),
+        begins_at=datetime.datetime(2023, 1, 2, hour=12, tzinfo=DEFAULT_TIMEZONE),
+        ends_at=datetime.datetime(2023, 1, 2, hour=13, tzinfo=DEFAULT_TIMEZONE),
         state=ReservationStateChoice.CANCELLED,
     )
 
     # Not affecting, since denied
     ReservationFactory.create(
         reservation_units=[reservation_unit],
-        begin=datetime.datetime(2023, 1, 2, hour=13, tzinfo=DEFAULT_TIMEZONE),
-        end=datetime.datetime(2023, 1, 2, hour=14, tzinfo=DEFAULT_TIMEZONE),
+        begins_at=datetime.datetime(2023, 1, 2, hour=13, tzinfo=DEFAULT_TIMEZONE),
+        ends_at=datetime.datetime(2023, 1, 2, hour=14, tzinfo=DEFAULT_TIMEZONE),
         state=ReservationStateChoice.DENIED,
     )
 
     # Not affecting, since outside the range (last hour before start date)
     ReservationFactory.create(
         reservation_units=[reservation_unit],
-        begin=datetime.datetime(2023, 1, 1, hour=23, tzinfo=DEFAULT_TIMEZONE),
-        end=datetime.datetime(2023, 1, 1, hour=0, tzinfo=DEFAULT_TIMEZONE) - datetime.timedelta(seconds=1),
+        begins_at=datetime.datetime(2023, 1, 1, hour=23, tzinfo=DEFAULT_TIMEZONE),
+        ends_at=datetime.datetime(2023, 1, 1, hour=0, tzinfo=DEFAULT_TIMEZONE) - datetime.timedelta(seconds=1),
         state=ReservationStateChoice.CREATED,
     )
 
     # Affecting, since inside the range (first hour)
     reservation_1 = ReservationFactory.create(
         reservation_units=[reservation_unit],
-        begin=datetime.datetime(2023, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE),
-        end=datetime.datetime(2023, 1, 2, hour=1, tzinfo=DEFAULT_TIMEZONE),
+        begins_at=datetime.datetime(2023, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE),
+        ends_at=datetime.datetime(2023, 1, 2, hour=1, tzinfo=DEFAULT_TIMEZONE),
         state=ReservationStateChoice.CREATED,
     )
 
     # Affecting, since inside the range (last hour)
     reservation_2 = ReservationFactory.create(
         reservation_units=[reservation_unit],
-        begin=datetime.datetime(2023, 1, 3, hour=23, tzinfo=DEFAULT_TIMEZONE),
-        end=datetime.datetime(2023, 1, 4, hour=0, tzinfo=DEFAULT_TIMEZONE) - datetime.timedelta(seconds=1),
+        begins_at=datetime.datetime(2023, 1, 3, hour=23, tzinfo=DEFAULT_TIMEZONE),
+        ends_at=datetime.datetime(2023, 1, 4, hour=0, tzinfo=DEFAULT_TIMEZONE) - datetime.timedelta(seconds=1),
         state=ReservationStateChoice.CREATED,
     )
 
     # Not affecting, since outside the range (first hour after end date)
     ReservationFactory.create(
         reservation_units=[reservation_unit],
-        begin=datetime.datetime(2023, 1, 4, hour=0, tzinfo=DEFAULT_TIMEZONE),
-        end=datetime.datetime(2023, 1, 4, hour=1, tzinfo=DEFAULT_TIMEZONE),
+        begins_at=datetime.datetime(2023, 1, 4, hour=0, tzinfo=DEFAULT_TIMEZONE),
+        ends_at=datetime.datetime(2023, 1, 4, hour=1, tzinfo=DEFAULT_TIMEZONE),
         state=ReservationStateChoice.CREATED,
     )
 

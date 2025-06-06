@@ -46,8 +46,8 @@ def reservation_unit() -> ReservationUnit:
         application_period_ends_at=_get_dt(month=4, day=30, hour=16),
     )
     ReservationFactory.create(
-        begin=_get_dt(month=4, day=15, hour=12),
-        end=_get_dt(month=4, day=15, hour=14),
+        begins_at=_get_dt(month=4, day=15, hour=12),
+        ends_at=_get_dt(month=4, day=15, hour=14),
         reservation_units=[reservation_unit],
         state=ReservationStateChoice.CREATED.value,
     )

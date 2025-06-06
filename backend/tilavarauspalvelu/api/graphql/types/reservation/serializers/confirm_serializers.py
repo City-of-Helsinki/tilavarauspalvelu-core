@@ -61,7 +61,7 @@ class ReservationConfirmSerializer(NestingModelSerializer):
             return data
 
         reservation_unit: ReservationUnit = self.instance.reservation_units.first()
-        pricing = reservation_unit.actions.get_active_pricing(by_date=self.instance.begin.date())
+        pricing = reservation_unit.actions.get_active_pricing(by_date=self.instance.begins_at.date())
 
         if pricing is None:
             msg = "No pricing found for the given date."

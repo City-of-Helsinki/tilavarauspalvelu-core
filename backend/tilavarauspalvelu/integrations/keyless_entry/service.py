@@ -666,8 +666,8 @@ class PindoraService:
         reservations_by_period: dict[tuple[datetime.datetime, datetime.datetime, uuid.UUID], int] = {}
 
         for reservation in series.reservations.requires_active_access_code():
-            begin = reservation.begin.astimezone(DEFAULT_TIMEZONE)
-            end = reservation.end.astimezone(DEFAULT_TIMEZONE)
+            begin = reservation.begins_at.astimezone(DEFAULT_TIMEZONE)
+            end = reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
             reservations_by_period[begin, end, series.reservation_unit.uuid] = reservation.pk
 
         access_code_validity: list[PindoraValidityInfoData] = []

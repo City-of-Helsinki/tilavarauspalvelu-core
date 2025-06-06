@@ -343,8 +343,8 @@ def test_reservation_access_code_added__send_email(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
         access_type=AccessType.ACCESS_CODE,
     )
 
@@ -364,8 +364,8 @@ def test_reservation_access_code_added__send_email__wrong_access_type(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
         access_type=AccessType.UNRESTRICTED,
     )
 
@@ -383,8 +383,8 @@ def test_reservation_access_code_added__send_email__no_recipients(outbox):
         reservee_email="",
         user__email="",
         reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
         access_type=AccessType.ACCESS_CODE,
     )
 
@@ -404,8 +404,8 @@ def test_reservation_access_code_added__send_email__reservation_in_the_past(outb
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
         access_type=AccessType.ACCESS_CODE,
     )
 

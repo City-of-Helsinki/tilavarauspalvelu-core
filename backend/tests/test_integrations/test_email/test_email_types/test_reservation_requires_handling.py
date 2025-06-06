@@ -407,8 +407,8 @@ def test_reservation_requires_handling__send_email(outbox):
         reservation_units__name="foo",
         reservation_units__pricings__lowest_price=0,
         reservation_units__pricings__highest_price=0,
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_requires_handling_email(reservation)
@@ -430,8 +430,8 @@ def test_reservation_requires_handling__send_email__wrong_state(outbox):
         reservation_units__name="foo",
         reservation_units__pricings__lowest_price=0,
         reservation_units__pricings__highest_price=0,
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_requires_handling_email(reservation)
@@ -451,8 +451,8 @@ def test_reservation_requires_handling__send_email__no_recipients(outbox):
         reservation_units__name="foo",
         reservation_units__pricings__lowest_price=0,
         reservation_units__pricings__highest_price=0,
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_requires_handling_email(reservation)
@@ -474,8 +474,8 @@ def test_reservation_requires_handling__send_email__reservation_in_the_past(outb
         reservation_units__name="foo",
         reservation_units__pricings__lowest_price=0,
         reservation_units__pricings__highest_price=0,
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_requires_handling_email(reservation)

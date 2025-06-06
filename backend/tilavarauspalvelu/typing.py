@@ -159,8 +159,8 @@ class ExtraData(TypedDict):
 class ReservationCreateData(TypedDict):
     reservation_unit: NotRequired[ReservationUnit]  # Required but removed before mutation
 
-    begin: datetime.datetime
-    end: datetime.datetime
+    begins_at: datetime.datetime
+    ends_at: datetime.datetime
 
     # Added automatically
     buffer_time_before: NotRequired[datetime.timedelta]
@@ -231,8 +231,8 @@ class ReservationConfirmData(TypedDict):
 
 class ReservationAdjustTimeData(TypedDict):
     pk: NotRequired[int]
-    begin: datetime.datetime
-    end: datetime.datetime
+    begins_at: datetime.datetime
+    ends_at: datetime.datetime
 
     state: NotRequired[ReservationStateChoice]
     buffer_time_before: NotRequired[datetime.timedelta]
@@ -287,8 +287,8 @@ class StaffCreateReservationData(TypedDict):
     working_memo: NotRequired[str]
     type: NotRequired[ReservationTypeChoice]
 
-    begin: NotRequired[datetime.datetime]
-    end: NotRequired[datetime.datetime]
+    begins_at: NotRequired[datetime.datetime]
+    ends_at: NotRequired[datetime.datetime]
     buffer_time_before: NotRequired[datetime.timedelta]
     buffer_time_after: NotRequired[datetime.timedelta]
 
@@ -334,8 +334,8 @@ class StaffReservationData(StaffCreateReservationData):
 
 class StaffReservationAdjustTimeData(TypedDict):
     pk: NotRequired[int]
-    begin: datetime.datetime
-    end: datetime.datetime
+    begins_at: datetime.datetime
+    ends_at: datetime.datetime
 
     buffer_time_before: NotRequired[datetime.timedelta]
     buffer_time_after: NotRequired[datetime.timedelta]
@@ -359,8 +359,8 @@ class ReservationSeriesCreateData(TypedDict):
 
 class ReservationSeriesAddData(TypedDict):
     pk: int
-    begin: datetime.datetime
-    end: datetime.datetime
+    begins_at: datetime.datetime
+    ends_at: datetime.datetime
     buffer_time_before: datetime.timedelta
     buffer_time_after: datetime.timedelta
     access_type: AccessType

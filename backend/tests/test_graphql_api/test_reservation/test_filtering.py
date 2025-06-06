@@ -676,18 +676,18 @@ def test_reservation__filter__by_begin_and_end_dates_is_timezone_aware(graphql):
 
     # 2021-01-01
     reservation_1 = ReservationFactory.create(
-        begin=datetime.datetime(2021, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE),
-        end=datetime.datetime(2021, 1, 1, 13, tzinfo=DEFAULT_TIMEZONE),
+        begins_at=datetime.datetime(2021, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE),
+        ends_at=datetime.datetime(2021, 1, 1, 13, tzinfo=DEFAULT_TIMEZONE),
     )
     # 2021-01-02 - 2021-01-03
     reservation_2 = ReservationFactory.create(
-        begin=datetime.datetime(2021, 1, 2, 12, tzinfo=DEFAULT_TIMEZONE),
-        end=datetime.datetime(2021, 1, 3, 0, tzinfo=DEFAULT_TIMEZONE),
+        begins_at=datetime.datetime(2021, 1, 2, 12, tzinfo=DEFAULT_TIMEZONE),
+        ends_at=datetime.datetime(2021, 1, 3, 0, tzinfo=DEFAULT_TIMEZONE),
     )
     # 2021-01-03 - 2021-01-04
     reservation_3 = ReservationFactory.create(
-        begin=datetime.datetime(2021, 1, 3, 12, tzinfo=datetime.UTC),  # 2021-01-03 14:00 local time
-        end=datetime.datetime(2021, 1, 3, 22, tzinfo=datetime.UTC),  # 2021-01-04 00:00 local time
+        begins_at=datetime.datetime(2021, 1, 3, 12, tzinfo=datetime.UTC),  # 2021-01-03 14:00 local time
+        ends_at=datetime.datetime(2021, 1, 3, 22, tzinfo=datetime.UTC),  # 2021-01-04 00:00 local time
     )
 
     graphql.login_with_superuser()

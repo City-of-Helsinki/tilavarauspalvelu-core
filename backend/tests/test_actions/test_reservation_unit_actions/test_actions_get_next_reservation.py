@@ -28,15 +28,15 @@ def test_reservation_unit__get_next_reservation():
     reservation_unit: ReservationUnit = ReservationUnitFactory.create(spaces=[space])
     now = datetime.datetime.now(tz=datetime.UTC)
     reservation_blocked = ReservationFactory.create(
-        begin=(now + datetime.timedelta(hours=1)),
-        end=(now + datetime.timedelta(hours=2)),
+        begins_at=(now + datetime.timedelta(hours=1)),
+        ends_at=(now + datetime.timedelta(hours=2)),
         reservation_units=[reservation_unit],
         type=ReservationTypeChoice.BLOCKED,
         state=ReservationStateChoice.CONFIRMED,
     )
     reservation = ReservationFactory.create(
-        begin=(now + datetime.timedelta(hours=2)),
-        end=(now + datetime.timedelta(hours=3)),
+        begins_at=(now + datetime.timedelta(hours=2)),
+        ends_at=(now + datetime.timedelta(hours=3)),
         reservation_units=[reservation_unit],
         state=ReservationStateChoice.CONFIRMED,
     )

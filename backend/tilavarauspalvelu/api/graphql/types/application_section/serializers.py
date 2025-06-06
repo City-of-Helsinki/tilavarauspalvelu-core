@@ -251,7 +251,7 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
     def save(self, **kwargs: Any) -> CancellationOutput:
         future_reservations = Reservation.objects.for_application_section(self.instance).filter(
             user=self.instance.application.user,
-            begin__gt=local_datetime(),
+            begins_at__gt=local_datetime(),
         )
 
         cancellable_reservations: ReservationQuerySet = (
@@ -266,7 +266,7 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
                 cancellation_cutoff=NowTT() + models.F("cancellation_time"),
             )
             .filter(
-                begin__gt=models.F("cancellation_cutoff"),
+                begins_at__gt=models.F("cancellation_cutoff"),
             )
             .distinct()
         )
