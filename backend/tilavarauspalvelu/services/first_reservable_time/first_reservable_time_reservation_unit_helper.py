@@ -159,27 +159,27 @@ class ReservationUnitFirstReservableTimeHelper:
         """
         reservation_unit_closed_time_spans: list[TimeSpanElement] = []
 
-        if self.reservation_unit.reservation_begins:
+        if self.reservation_unit.reservation_begins_at:
             reservation_unit_closed_time_spans.append(
                 TimeSpanElement(
                     start_datetime=local_datetime_min(),
-                    end_datetime=self.reservation_unit.reservation_begins,
+                    end_datetime=self.reservation_unit.reservation_begins_at,
                     is_reservable=False,
                 )
             )
-        if self.reservation_unit.reservation_ends:
+        if self.reservation_unit.reservation_ends_at:
             reservation_unit_closed_time_spans.append(
                 TimeSpanElement(
-                    start_datetime=self.reservation_unit.reservation_ends,
+                    start_datetime=self.reservation_unit.reservation_ends_at,
                     end_datetime=local_datetime_max(),
                     is_reservable=False,
                 )
             )
 
-        if self.reservation_unit.publish_ends:
+        if self.reservation_unit.publish_ends_at:
             reservation_unit_closed_time_spans.append(
                 TimeSpanElement(
-                    start_datetime=self.reservation_unit.publish_ends,
+                    start_datetime=self.reservation_unit.publish_ends_at,
                     end_datetime=local_datetime_max(),
                     is_reservable=False,
                 )

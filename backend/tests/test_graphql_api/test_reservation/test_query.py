@@ -812,7 +812,7 @@ def test_reservation__query__pindora_info__in_application_section(graphql):
         access_code_is_active=True,
         reservation_unit_code_validity=[
             PindoraSeasonalBookingAccessCodeValidity(
-                reservation_unit_id=series.reservation_unit.uuid,
+                reservation_unit_id=series.reservation_unit.ext_uuid,
                 access_code_valid_minutes_before=10,
                 access_code_valid_minutes_after=5,
                 begin=reservation.begins_at,

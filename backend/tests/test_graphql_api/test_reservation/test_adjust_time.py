@@ -164,7 +164,7 @@ def test_reservation__adjust_time__change_would_make_unit_reservation_unit_paid(
 
 def test_reservation__adjust_time__reservation_unit_not_reservable_in_new_time(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
-        reservation_units__reservation_begins=local_datetime() + datetime.timedelta(days=1),
+        reservation_units__reservation_begins_at=local_datetime() + datetime.timedelta(days=1),
     )
 
     graphql.login_with_superuser()

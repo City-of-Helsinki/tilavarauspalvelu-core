@@ -72,7 +72,7 @@ def test_get_access_code__reservation__in_series():
     )
 
     data = default_reservation_series_response(
-        reservation_unit_id=str(series.reservation_unit.uuid),
+        reservation_unit_id=str(series.reservation_unit.ext_uuid),
         reservation_unit_code_validity=[
             {
                 "begin": reservation.begins_at.isoformat(),
@@ -119,7 +119,7 @@ def test_get_access_code__reservation__in_series__pick_correct_reservation():
     )
 
     data = default_reservation_series_response(
-        reservation_unit_id=str(series.reservation_unit.uuid),
+        reservation_unit_id=str(series.reservation_unit.ext_uuid),
         reservation_unit_code_validity=[
             {
                 "begin": reservation_1.begins_at.isoformat(),
@@ -169,7 +169,7 @@ def test_get_access_code__reservation__in_series__in_seasonal_booking():
     data = default_seasonal_booking_response(
         reservation_unit_code_validity=[
             {
-                "reservation_unit_id": str(series.reservation_unit.uuid),
+                "reservation_unit_id": str(series.reservation_unit.ext_uuid),
                 "begin": reservation.begins_at.isoformat(),
                 "end": reservation.ends_at.isoformat(),
                 "access_code_valid_minutes_before": 10,
@@ -206,7 +206,7 @@ def test_get_access_code__series():
     )
 
     data = default_reservation_series_response(
-        reservation_unit_id=str(series.reservation_unit.uuid),
+        reservation_unit_id=str(series.reservation_unit.ext_uuid),
         reservation_unit_code_validity=[
             {
                 "begin": reservation.begins_at.isoformat(),
@@ -256,7 +256,7 @@ def test_get_access_code__series__in_seasonal_booking():
     data = default_seasonal_booking_response(
         reservation_unit_code_validity=[
             {
-                "reservation_unit_id": str(series.reservation_unit.uuid),
+                "reservation_unit_id": str(series.reservation_unit.ext_uuid),
                 "begin": reservation.begins_at.isoformat(),
                 "end": reservation.ends_at.isoformat(),
                 "access_code_valid_minutes_before": 10,
@@ -317,14 +317,14 @@ def test_get_access_code__series__in_seasonal_booking__remove_other_series_value
     data = default_seasonal_booking_response(
         reservation_unit_code_validity=[
             {
-                "reservation_unit_id": str(series_1.reservation_unit.uuid),
+                "reservation_unit_id": str(series_1.reservation_unit.ext_uuid),
                 "begin": reservation_1.begins_at.isoformat(),
                 "end": reservation_1.ends_at.isoformat(),
                 "access_code_valid_minutes_before": 10,
                 "access_code_valid_minutes_after": 5,
             },
             {
-                "reservation_unit_id": str(series_2.reservation_unit.uuid),
+                "reservation_unit_id": str(series_2.reservation_unit.ext_uuid),
                 "begin": reservation_2.begins_at.isoformat(),
                 "end": reservation_2.ends_at.isoformat(),
                 "access_code_valid_minutes_before": 10,
@@ -372,7 +372,7 @@ def test_get_access_code__seasonal_booking():
     data = default_seasonal_booking_response(
         reservation_unit_code_validity=[
             {
-                "reservation_unit_id": str(series.reservation_unit.uuid),
+                "reservation_unit_id": str(series.reservation_unit.ext_uuid),
                 "begin": reservation.begins_at.isoformat(),
                 "end": reservation.ends_at.isoformat(),
                 "access_code_valid_minutes_before": 10,

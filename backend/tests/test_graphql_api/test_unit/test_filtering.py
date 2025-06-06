@@ -50,12 +50,12 @@ def test_units__filter__by_published_reservation_units(graphql, gql_query):
 
     # Returned
     ReservationUnitFactory.create(unit=unit_1)
-    ReservationUnitFactory.create(publish_begins=publish_date, unit=unit_2)
-    ReservationUnitFactory.create(reservation_begins=publish_date + datetime.timedelta(days=30), unit=unit_3)
+    ReservationUnitFactory.create(publish_begins_at=publish_date, unit=unit_2)
+    ReservationUnitFactory.create(reservation_begins_at=publish_date + datetime.timedelta(days=30), unit=unit_3)
 
     # Filtered out
     ReservationUnitFactory.create(is_archived=True, unit=unit_4)
-    ReservationUnitFactory.create(publish_begins=publish_date + datetime.timedelta(days=30), unit=unit_4)
+    ReservationUnitFactory.create(publish_begins_at=publish_date + datetime.timedelta(days=30), unit=unit_4)
 
     graphql.login_with_superuser()
 
