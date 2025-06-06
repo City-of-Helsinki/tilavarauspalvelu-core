@@ -40,7 +40,7 @@ class PaymentOrderValidator:
             msg = "Only orders paid by invoice can be cancelled."
             raise ValidationError(msg, code=error_codes.ORDER_CANCELLATION_NOT_ALLOWED)
 
-        begin_date = self.payment_order.reservation.begin.astimezone(DEFAULT_TIMEZONE).date()
+        begin_date = self.payment_order.reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
 
         if local_date() > begin_date:
             msg = "Order cannot be cancelled after its reservation start date."

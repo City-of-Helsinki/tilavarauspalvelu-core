@@ -77,8 +77,8 @@ class Reservation(SerializableMixin, models.Model):
     )
 
     # Time information
-    begin: datetime.datetime = models.DateTimeField(db_index=True)
-    end: datetime.datetime = models.DateTimeField(db_index=True)
+    begins_at: datetime.datetime = models.DateTimeField(db_index=True)
+    ends_at: datetime.datetime = models.DateTimeField(db_index=True)
     buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
     buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
     handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
@@ -190,7 +190,7 @@ class Reservation(SerializableMixin, models.Model):
         base_manager_name = "objects"
         verbose_name = _("reservation")
         verbose_name_plural = _("reservations")
-        ordering = ["begin"]
+        ordering = ["begins_at"]
         constraints = [
             models.CheckConstraint(
                 check=~models.Q(access_code_generated_at=None, access_code_is_active=True),
@@ -203,8 +203,8 @@ class Reservation(SerializableMixin, models.Model):
     serialize_fields = (
         {"name": "name"},
         {"name": "description"},
-        {"name": "begin"},
-        {"name": "end"},
+        {"name": "begins_at"},
+        {"name": "ends_at"},
         {"name": "reservee_first_name"},
         {"name": "reservee_last_name"},
         {"name": "reservee_email"},
@@ -229,7 +229,7 @@ class Reservation(SerializableMixin, models.Model):
         return _("reservation") + f" {self.name} ({self.type})"
 
     def __repr__(self) -> str:
-        dt_range = datetime_range_as_string(start_datetime=self.begin, end_datetime=self.end)
+        dt_range = datetime_range_as_string(start_datetime=self.begins_at, end_datetime=self.ends_at)
         return f"<Reservation {self.name} ({dt_range})>"
 
     @property

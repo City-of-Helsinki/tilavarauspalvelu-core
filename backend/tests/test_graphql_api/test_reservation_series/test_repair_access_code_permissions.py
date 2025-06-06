@@ -24,8 +24,8 @@ def test_repair_reservation_series_access_code__regular_user(graphql):
     ReservationFactory.create(
         reservation_units=[series.reservation_unit],
         reservation_series=series,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -47,8 +47,8 @@ def test_repair_reservation_series_access_code__general_admin(graphql):
     ReservationFactory.create(
         reservation_units=[series.reservation_unit],
         reservation_series=series,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,

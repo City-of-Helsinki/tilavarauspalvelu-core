@@ -64,14 +64,14 @@ def test_reservation_series__create_series(graphql):
     assert reservation_series.user == user
     assert reservation_series.age_group == age_group
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 1
 
     begin = datetime.datetime(2024, 1, 1, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
     end = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
 
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE) == begin
-    assert reservations[0].end.astimezone(DEFAULT_TIMEZONE) == end
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == begin
+    assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == end
     assert reservations[0].type == ReservationTypeChoice.STAFF
     assert reservations[0].user == user
     assert reservations[0].age_group == age_group
@@ -127,7 +127,7 @@ def test_reservation_series__create_series__reservation_details(graphql):
     assert response.has_errors is False
 
     reservation_series = ReservationSeries.objects.get(pk=response.first_query_object["pk"])
-    reservations: list[Reservation] = list(reservation_series.reservations.order_by("begin").all())
+    reservations: list[Reservation] = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 1
 
     begin = datetime.datetime(2024, 1, 1, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
@@ -139,8 +139,8 @@ def test_reservation_series__create_series__reservation_details(graphql):
     assert reservations[0].state == ReservationStateChoice.CONFIRMED
     assert reservations[0].type == ReservationTypeChoice.BEHALF
     assert reservations[0].working_memo == "memo"
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE) == begin
-    assert reservations[0].end.astimezone(DEFAULT_TIMEZONE) == end
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == begin
+    assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == end
     assert reservations[0].buffer_time_before == datetime.timedelta(minutes=15)
     assert reservations[0].buffer_time_after == datetime.timedelta(minutes=30)
     assert reservations[0].handled_at == datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE)
@@ -188,26 +188,26 @@ def test_reservation_series__create_series__multiple_recurrences(graphql):
     assert reservation_series.begin_date == datetime.date(2024, 1, 1)
     assert reservation_series.end_date == datetime.date(2024, 1, 15)
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 3
 
     begin = datetime.datetime(2024, 1, 1, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
     end = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
 
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE) == begin
-    assert reservations[0].end.astimezone(DEFAULT_TIMEZONE) == end
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == begin
+    assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == end
 
     begin = datetime.datetime(2024, 1, 8, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
     end = datetime.datetime(2024, 1, 8, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
 
-    assert reservations[1].begin.astimezone(DEFAULT_TIMEZONE) == begin
-    assert reservations[1].end.astimezone(DEFAULT_TIMEZONE) == end
+    assert reservations[1].begins_at.astimezone(DEFAULT_TIMEZONE) == begin
+    assert reservations[1].ends_at.astimezone(DEFAULT_TIMEZONE) == end
 
     begin = datetime.datetime(2024, 1, 15, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
     end = datetime.datetime(2024, 1, 15, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
 
-    assert reservations[2].begin.astimezone(DEFAULT_TIMEZONE) == begin
-    assert reservations[2].end.astimezone(DEFAULT_TIMEZONE) == end
+    assert reservations[2].begins_at.astimezone(DEFAULT_TIMEZONE) == begin
+    assert reservations[2].ends_at.astimezone(DEFAULT_TIMEZONE) == end
 
 
 def test_reservation_series__create_series__multiple_weekdays(graphql):
@@ -226,26 +226,26 @@ def test_reservation_series__create_series__multiple_weekdays(graphql):
     assert reservation_series.begin_date == datetime.date(2024, 1, 1)
     assert reservation_series.end_date == datetime.date(2024, 1, 7)
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 3
 
     begin = datetime.datetime(2024, 1, 1, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
     end = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
 
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE) == begin
-    assert reservations[0].end.astimezone(DEFAULT_TIMEZONE) == end
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == begin
+    assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == end
 
     begin = datetime.datetime(2024, 1, 3, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
     end = datetime.datetime(2024, 1, 3, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
 
-    assert reservations[1].begin.astimezone(DEFAULT_TIMEZONE) == begin
-    assert reservations[1].end.astimezone(DEFAULT_TIMEZONE) == end
+    assert reservations[1].begins_at.astimezone(DEFAULT_TIMEZONE) == begin
+    assert reservations[1].ends_at.astimezone(DEFAULT_TIMEZONE) == end
 
     begin = datetime.datetime(2024, 1, 5, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
     end = datetime.datetime(2024, 1, 5, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
 
-    assert reservations[2].begin.astimezone(DEFAULT_TIMEZONE) == begin
-    assert reservations[2].end.astimezone(DEFAULT_TIMEZONE) == end
+    assert reservations[2].begins_at.astimezone(DEFAULT_TIMEZONE) == begin
+    assert reservations[2].ends_at.astimezone(DEFAULT_TIMEZONE) == end
 
 
 @pytest.mark.parametrize("reservation_type", ReservationTypeStaffChoice.values)
@@ -260,7 +260,7 @@ def test_reservation_series__create_series__reservation_type(graphql, reservatio
     assert response.has_errors is False
 
     reservation_series = ReservationSeries.objects.get(pk=response.first_query_object["pk"])
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 1
 
     assert reservations[0].type == reservation_type
@@ -291,7 +291,7 @@ def test_reservation_series__create_series__different_reservation_user(graphql):
 
     assert reservation_series.user == admin
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 1
 
     assert reservations[0].user == user
@@ -313,20 +313,20 @@ def test_reservation_series__create_series__skip_dates(graphql):
     assert reservation_series.begin_date == datetime.date(2024, 1, 1)
     assert reservation_series.end_date == datetime.date(2024, 1, 15)
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 2
 
     begin = datetime.datetime(2024, 1, 1, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
     end = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
 
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE) == begin
-    assert reservations[0].end.astimezone(DEFAULT_TIMEZONE) == end
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == begin
+    assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == end
 
     begin = datetime.datetime(2024, 1, 15, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
     end = datetime.datetime(2024, 1, 15, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
 
-    assert reservations[1].begin.astimezone(DEFAULT_TIMEZONE) == begin
-    assert reservations[1].end.astimezone(DEFAULT_TIMEZONE) == end
+    assert reservations[1].begins_at.astimezone(DEFAULT_TIMEZONE) == begin
+    assert reservations[1].ends_at.astimezone(DEFAULT_TIMEZONE) == end
 
 
 def test_reservation_series__create_series__daylight_savings(graphql):
@@ -346,20 +346,20 @@ def test_reservation_series__create_series__daylight_savings(graphql):
     assert reservation_series.begin_date == datetime.date(2024, 3, 25)
     assert reservation_series.end_date == datetime.date(2024, 4, 1)
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 2
 
     begin_1 = datetime.datetime(2024, 3, 25, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
     end_1 = datetime.datetime(2024, 3, 25, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
 
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE) == begin_1
-    assert reservations[0].end.astimezone(DEFAULT_TIMEZONE) == end_1
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == begin_1
+    assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == end_1
 
     begin_2 = datetime.datetime(2024, 4, 1, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
     end_2 = datetime.datetime(2024, 4, 1, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
 
-    assert reservations[1].begin.astimezone(DEFAULT_TIMEZONE) == begin_2
-    assert reservations[1].end.astimezone(DEFAULT_TIMEZONE) == end_2
+    assert reservations[1].begins_at.astimezone(DEFAULT_TIMEZONE) == begin_2
+    assert reservations[1].ends_at.astimezone(DEFAULT_TIMEZONE) == end_2
 
     # Double check that we did indeed cross the daylight savings time
     assert begin_1.utcoffset() != begin_2.utcoffset()
@@ -438,20 +438,20 @@ def test_reservation_series__create_series__check_opening_hours__no_missing_hour
     assert reservation_series.begin_date == datetime.date(2024, 1, 1)
     assert reservation_series.end_date == datetime.date(2024, 1, 8)
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 2
 
     begin = datetime.datetime(2024, 1, 1, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
     end = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
 
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE) == begin
-    assert reservations[0].end.astimezone(DEFAULT_TIMEZONE) == end
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == begin
+    assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == end
 
     begin = datetime.datetime(2024, 1, 8, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
     end = datetime.datetime(2024, 1, 8, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
 
-    assert reservations[1].begin.astimezone(DEFAULT_TIMEZONE) == begin
-    assert reservations[1].end.astimezone(DEFAULT_TIMEZONE) == end
+    assert reservations[1].begins_at.astimezone(DEFAULT_TIMEZONE) == begin
+    assert reservations[1].ends_at.astimezone(DEFAULT_TIMEZONE) == end
 
 
 def test_reservation_series__create_series__check_opening_hours__partially_missing_hours(graphql):
@@ -521,14 +521,14 @@ def test_reservation_series__create_series__check_opening_hours__skip_dates_wher
     assert reservation_series.begin_date == datetime.date(2024, 1, 1)
     assert reservation_series.end_date == datetime.date(2024, 1, 8)
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 1
 
     begin = datetime.datetime(2024, 1, 1, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
     end = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
 
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE) == begin
-    assert reservations[0].end.astimezone(DEFAULT_TIMEZONE) == end
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == begin
+    assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == end
 
 
 def test_reservation_series__create_series__overlapping_reservations(graphql):
@@ -544,8 +544,8 @@ def test_reservation_series__create_series__overlapping_reservations(graphql):
 
     ReservationFactory.create(
         reservation_units=[reservation_unit],
-        begin=reservation_begin,
-        end=reservation_end,
+        begins_at=reservation_begin,
+        ends_at=reservation_end,
         state=ReservationStateChoice.CONFIRMED,
     )
 
@@ -585,11 +585,11 @@ def test_reservation_series__create_series__block_whole_day(graphql):
     assert response.has_errors is False, response.errors
 
     reservation_series = ReservationSeries.objects.get(pk=response.first_query_object["pk"])
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 1
 
-    assert reservations[0].begin == datetime.datetime(2024, 1, 1, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
-    assert reservations[0].end == datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
+    assert reservations[0].begins_at == datetime.datetime(2024, 1, 1, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
+    assert reservations[0].ends_at == datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
 
     assert reservations[0].buffer_time_before == datetime.timedelta(hours=10)
     assert reservations[0].buffer_time_after == datetime.timedelta(hours=12)
@@ -633,7 +633,7 @@ def test_reservation_series__create_series__access_type_access_code__only_some_r
     assert PindoraService.create_access_code.called is True
 
     pk = response.first_query_object["pk"]
-    reservations: list[Reservation] = list(Reservation.objects.order_by("begin").filter(reservation_series=pk))
+    reservations: list[Reservation] = list(Reservation.objects.order_by("begins_at").filter(reservation_series=pk))
     assert len(reservations) == 2
 
     assert reservations[0].access_type == AccessType.UNRESTRICTED

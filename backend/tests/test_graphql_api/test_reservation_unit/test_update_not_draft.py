@@ -289,8 +289,8 @@ def test_reservation_unit__update__archiving_is_blocked_if_reservation_unit_has_
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit,
-        begin=next_hour(plus_days=1),
-        end=next_hour(plus_days=1, plus_hours=1),
+        begins_at=next_hour(plus_days=1),
+        ends_at=next_hour(plus_days=1, plus_hours=1),
     )
     data = get_non_draft_update_input_data(
         reservation_unit,
@@ -313,8 +313,8 @@ def test_reservation_unit__update__archiving_not_blocked_if_reservation_unit_has
     ReservationFactory.create_for_reservation_unit(
         reservation_unit,
         state=ReservationStateChoice.CANCELLED,
-        begin=next_hour(plus_days=1),
-        end=next_hour(plus_days=1, plus_hours=1),
+        begins_at=next_hour(plus_days=1),
+        ends_at=next_hour(plus_days=1, plus_hours=1),
     )
     data = get_non_draft_update_input_data(
         reservation_unit,
@@ -341,14 +341,14 @@ def test_reservation_unit__update__access_type__change_future_reservations(graph
     past_reservation = ReservationFactory.create(
         reservation_units=[reservation_unit],
         access_type=AccessType.UNRESTRICTED,
-        begin=local_datetime(2023, 12, 1, 12),
-        end=local_datetime(2023, 12, 1, 13),
+        begins_at=local_datetime(2023, 12, 1, 12),
+        ends_at=local_datetime(2023, 12, 1, 13),
     )
     future_reservation = ReservationFactory.create(
         reservation_units=[reservation_unit],
         access_type=AccessType.UNRESTRICTED,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
     )
 
     access_type_data = {
@@ -379,20 +379,20 @@ def test_reservation_unit__update__access_type__change_period(graphql):
     before_period_reservation = ReservationFactory.create(
         reservation_units=[reservation_unit],
         access_type=AccessType.PHYSICAL_KEY,
-        begin=local_datetime(2023, 12, 31, 12),
-        end=local_datetime(2023, 12, 31, 13),
+        begins_at=local_datetime(2023, 12, 31, 12),
+        ends_at=local_datetime(2023, 12, 31, 13),
     )
     on_period_reservation = ReservationFactory.create(
         reservation_units=[reservation_unit],
         access_type=AccessType.UNRESTRICTED,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
     )
     after_period_reservation = ReservationFactory.create(
         reservation_units=[reservation_unit],
         access_type=AccessType.PHYSICAL_KEY,
-        begin=local_datetime(2024, 1, 3, 12),
-        end=local_datetime(2024, 1, 3, 13),
+        begins_at=local_datetime(2024, 1, 3, 12),
+        ends_at=local_datetime(2024, 1, 3, 13),
     )
 
     data = get_non_draft_update_input_data(

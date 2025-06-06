@@ -407,7 +407,7 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
     if is_valid_url(payment_order.checkout_url) and payment_order.expires_at > cutoff:
         return HttpResponseRedirect(payment_order.checkout_url)
 
-    begin_date = reservation.begin.astimezone(DEFAULT_TIMEZONE).date()
+    begin_date = reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
     reservation_unit: ReservationUnit = reservation.reservation_units.first()
     pricing = reservation_unit.actions.get_active_pricing(by_date=begin_date)
 

@@ -68,7 +68,7 @@ class ReservationCancellationSerializer(NestingModelSerializer):
 
         reservation_unit: ReservationUnit = self.instance.reservation_units.first()
 
-        begin = self.instance.begin.astimezone(DEFAULT_TIMEZONE)
+        begin = self.instance.begins_at.astimezone(DEFAULT_TIMEZONE)
 
         reservation_unit.validators.validate_cancellation_rule(begin=begin)
 

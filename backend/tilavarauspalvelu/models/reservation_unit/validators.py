@@ -116,16 +116,16 @@ class ReservationUnitValidator:
 
     def validate_no_overlapping_reservations(
         self,
-        begin: datetime.datetime,
-        end: datetime.datetime,
+        begins_at: datetime.datetime,
+        ends_at: datetime.datetime,
         *,
         new_buffer_time_before: datetime.timedelta | None = None,
         new_buffer_time_after: datetime.timedelta | None = None,
         ignore_ids: Collection[int] = (),
     ) -> None:
         if self.reservation_unit.actions.has_overlapping_reservations(
-            start_datetime=begin,
-            end_datetime=end,
+            start_datetime=begins_at,
+            end_datetime=ends_at,
             buffer_time_before=new_buffer_time_before,
             buffer_time_after=new_buffer_time_after,
             ignore_ids=ignore_ids,

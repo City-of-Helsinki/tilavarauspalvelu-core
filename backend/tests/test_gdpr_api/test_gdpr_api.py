@@ -128,12 +128,12 @@ def test_query_user_data__full(api_client, settings):
                                 "value": reservation.description,
                             },
                             {
-                                "key": "BEGIN",
-                                "value": reservation.begin,
+                                "key": "BEGINS_AT",
+                                "value": reservation.begins_at,
                             },
                             {
-                                "key": "END",
-                                "value": reservation.end,
+                                "key": "ENDS_AT",
+                                "value": reservation.ends_at,
                             },
                             {
                                 "key": "RESERVEE_FIRST_NAME",
@@ -570,8 +570,8 @@ def test_delete_user_data__dont_anonymize_if_open_payments(api_client, settings)
     user = UserFactory.create(username="foo")
     reservation = ReservationFactory.create(
         user=user,
-        begin=datetime.datetime(2020, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE),
-        end=datetime.datetime(2020, 1, 1, 14, tzinfo=DEFAULT_TIMEZONE),
+        begins_at=datetime.datetime(2020, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE),
+        ends_at=datetime.datetime(2020, 1, 1, 14, tzinfo=DEFAULT_TIMEZONE),
     )
     PaymentOrderFactory.create(reservation=reservation, status=OrderStatus.DRAFT, remote_id=uuid.uuid4())
 
@@ -604,7 +604,7 @@ def test_delete_user_data__dont_anonymize_if_open_reservations(api_client, setti
     user = UserFactory.create(username="foo")
     begin = local_datetime()
     end = begin + datetime.timedelta(hours=2)
-    ReservationFactory.create(user=user, begin=begin, end=end, state=ReservationStateChoice.CREATED)
+    ReservationFactory.create(user=user, begins_at=begin, ends_at=end, state=ReservationStateChoice.CREATED)
 
     settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
     auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_DELETE_SCOPE])
@@ -635,7 +635,7 @@ def test_delete_user_data__dont_anonymize_if_reservation_one_month_ago(api_clien
     user = UserFactory.create(username="foo")
     begin = local_datetime() - relativedelta(months=1)
     end = begin + datetime.timedelta(hours=2)
-    ReservationFactory.create(user=user, begin=begin, end=end, state=ReservationStateChoice.CONFIRMED)
+    ReservationFactory.create(user=user, begins_at=begin, ends_at=end, state=ReservationStateChoice.CONFIRMED)
 
     settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
     auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_DELETE_SCOPE])

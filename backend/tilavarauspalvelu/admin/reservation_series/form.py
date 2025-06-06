@@ -103,8 +103,8 @@ class ReservationInline(admin.TabularInline):
     fields = [
         "id",
         "name",
-        "begin",
-        "end",
+        "begins_at",
+        "ends_at",
         "state",
         "type",
         "price",

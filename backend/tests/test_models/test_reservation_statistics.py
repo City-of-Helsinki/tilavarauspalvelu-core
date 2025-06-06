@@ -33,9 +33,9 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     reservation = ReservationFactory.create(
         age_group=AgeGroup.objects.create(minimum=18, maximum=30),
         applying_for_free_of_charge=True,
-        begin=datetime.datetime(2020, 1, 1, 12, 0, tzinfo=DEFAULT_TIMEZONE),
+        begins_at=datetime.datetime(2020, 1, 1, 12, 0, tzinfo=DEFAULT_TIMEZONE),
         description="movies&popcorn",
-        end=datetime.datetime(2020, 1, 1, 14, 0, tzinfo=DEFAULT_TIMEZONE),
+        ends_at=datetime.datetime(2020, 1, 1, 14, 0, tzinfo=DEFAULT_TIMEZONE),
         free_of_charge_reason="This is some reason.",
         home_city=City.objects.create(name="Test", municipality_code="1234"),
         name="movies",
@@ -65,7 +65,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     assert stat.age_group == reservation.age_group.id
     assert stat.age_group_name == str(reservation.age_group)
     assert stat.applying_for_free_of_charge == reservation.applying_for_free_of_charge
-    assert stat.begin == reservation.begin
+    assert stat.begin == reservation.begins_at
     assert stat.buffer_time_after == reservation.buffer_time_after
     assert stat.buffer_time_before == reservation.buffer_time_before
     assert stat.cancel_reason is None
@@ -73,7 +73,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     assert stat.deny_reason is None
     assert stat.deny_reason_text == ""
     assert stat.duration_minutes == 120
-    assert stat.end == reservation.end
+    assert stat.end == reservation.ends_at
     assert stat.home_city == reservation.home_city.id
     assert stat.home_city_municipality_code == reservation.home_city.municipality_code
     assert stat.home_city_name == reservation.home_city.name

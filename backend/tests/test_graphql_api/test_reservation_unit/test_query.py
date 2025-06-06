@@ -396,7 +396,7 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
             nameFi
         }
         reservations {
-            begin
+            beginsAt
         }
     """
 
@@ -446,7 +446,7 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
         ],
         "reservations": [
             {
-                "begin": reservation_unit.reservations.first().begin.isoformat(),
+                "beginsAt": reservation_unit.reservations.first().begins_at.isoformat(),
             },
         ],
     }
@@ -683,39 +683,39 @@ def test_reservation_unit__query__num_active_user_reservations(graphql):
 
     # Correct user
     ReservationFactory.create_for_reservation_unit(
-        begin=begin,
-        end=end,
+        begins_at=begin,
+        ends_at=end,
         reservation_unit=reservation_unit,
         user=user,
     )
     # Another user
     ReservationFactory.create_for_reservation_unit(
-        begin=begin,
-        end=end,
+        begins_at=begin,
+        ends_at=end,
         reservation_unit=reservation_unit,
         user=other_user,
     )
     # Unauthenticated user
     ReservationFactory.create_for_reservation_unit(
-        begin=begin,
-        end=end,
+        begins_at=begin,
+        ends_at=end,
         reservation_unit=reservation_unit,
     )
     # Another reservation unit
-    ReservationFactory.create(begin=begin, end=end)
+    ReservationFactory.create(begins_at=begin, ends_at=end)
     # Another reservation unit with correct user
-    ReservationFactory.create(begin=begin, end=end, user=user)
+    ReservationFactory.create(begins_at=begin, ends_at=end, user=user)
     # Past reservation
     ReservationFactory.create_for_reservation_unit(
-        begin=begin - datetime.timedelta(days=1),
-        end=end - datetime.timedelta(days=1),
+        begins_at=begin - datetime.timedelta(days=1),
+        ends_at=end - datetime.timedelta(days=1),
         reservation_unit=reservation_unit,
         user=user,
     )
     # Denied reservation
     ReservationFactory.create_for_reservation_unit(
-        begin=begin,
-        end=end,
+        begins_at=begin,
+        ends_at=end,
         reservation_unit=reservation_unit,
         user=user,
         state=ReservationStateChoice.DENIED,
@@ -728,8 +728,8 @@ def test_reservation_unit__query__num_active_user_reservations(graphql):
         ReservationTypeChoice.SEASONAL,
     ]:
         ReservationFactory.create_for_reservation_unit(
-            begin=begin,
-            end=end,
+            begins_at=begin,
+            ends_at=end,
             reservation_unit=reservation_unit,
             user=user,
             type=type_choice,
@@ -751,9 +751,11 @@ def test_reservation_unit__query__num_active_user_reservations__user_unauthentic
 
     # Reservation with a user
     user = UserFactory.create()
-    ReservationFactory.create_for_reservation_unit(begin=begin, end=end, reservation_unit=reservation_unit, user=user)
+    ReservationFactory.create_for_reservation_unit(
+        begins_at=begin, ends_at=end, reservation_unit=reservation_unit, user=user
+    )
     # Reservation without a user
-    ReservationFactory.create_for_reservation_unit(begin=begin, end=end, reservation_unit=reservation_unit)
+    ReservationFactory.create_for_reservation_unit(begins_at=begin, ends_at=end, reservation_unit=reservation_unit)
 
     query = reservation_units_query(fields="numActiveUserReservations", pk=reservation_unit.pk)
     response = graphql(query)
