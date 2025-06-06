@@ -25,13 +25,13 @@ import { aesToCells, covertCellsToTimeRange } from "./timeSelectorModule";
 import { type ApplicationPage2FormValues } from "./form";
 import { TimePreview } from ".";
 
-type TimeSelectorProps = {
+export type TimeSelectorProps = {
   index: number;
   reservationUnitOptions: { label: string; value: number }[];
   reservationUnitOpeningHours: Readonly<TimeSelectorFragment[]>;
 };
 
-function TimeSelectorForm({
+export function TimeSelectorForm({
   index,
   reservationUnitOptions,
   reservationUnitOpeningHours,
@@ -139,8 +139,6 @@ function TimeSelectorForm({
   );
 }
 
-export { TimeSelectorForm as TimeSelector };
-
 function OptionSelector({
   reservationUnitOptions,
   index,
@@ -154,7 +152,7 @@ function OptionSelector({
   }));
 
   return (
-    <AutoGrid $minWidth="20rem">
+    <AutoGrid $minWidth="20rem" data-testid={`time-selector__options-${index}`}>
       <ControlledSelect
         name={`applicationSections.${index}.priority`}
         label={t("application:Page2.prioritySelectLabel")}

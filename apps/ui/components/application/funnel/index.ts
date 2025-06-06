@@ -9,7 +9,7 @@ export { ApplicantTypeSelector } from "./ApplicantTypeSelector";
 export { ApplicationFormTextInput } from "./ApplicationFormTextInput";
 export { OrderedReservationUnitCard } from "./OrderedReservationUnitCard";
 export { ReservationUnitModalContent } from "./ReservationUnitModalContent";
-export { TimeSelector } from "./TimeSelector";
+export { TimeSelectorForm } from "./TimeSelector";
 export { BillingAddress } from "./BillingAddress";
 export { CompanyForm, ContactPersonSection } from "./CompanyForm";
 export { IndividualForm } from "./IndividualForm";

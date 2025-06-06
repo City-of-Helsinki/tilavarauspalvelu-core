@@ -32,10 +32,6 @@ export function isCellEqual(a: Cell, b: Cell): boolean {
   return a.hour === b.hour && a.day === b.day;
 }
 
-function formatCell(cell: Cell): string {
-  return `${cell.hour} - ${cell.hour + 1}`;
-}
-
 function DayColumn({
   day,
   cells,
@@ -89,7 +85,7 @@ function DayColumn({
   };
 
   const head = t(`common:weekDayLong.${fromMondayFirstUnsafe(day)}`);
-  const labelHead = t(`common:weekDay.${fromMondayFirstUnsafe(day)}`);
+  const weekdayStr = t(`common:weekDay.${fromMondayFirstUnsafe(day)}`);
 
   const getHandlers = (cell: Cell) => {
     if (updateCell == null) {
@@ -119,7 +115,7 @@ function DayColumn({
           type="button"
           {...getHandlers(cell)}
           role="option"
-          aria-label={formatButtonAriaLabel(t, cell, labelHead)}
+          aria-label={formatButtonAriaLabel(t, cell, weekdayStr)}
           aria-selected={isSelected(cell.state)}
           data-testid={`time-selector__button--${cell.day}-${cell.hour}`}
         >
@@ -158,14 +154,18 @@ function translateCellType(t: TFunction, state: CombinedCellState): string {
   return t(`application:TimeSelector.legend.${state}`);
 }
 
+function formatCell(cell: Cell): string {
+  return `${cell.hour} - ${cell.hour + 1}`;
+}
+
 function formatButtonAriaLabel(
   t: TFunction,
   cell: Cell,
-  labelHead: string
+  weekday: string
 ): string {
   const s = cell.state !== "none" ? cell.state : cell.openState;
   const base = translateCellType(t, s);
-  return `${base ? `${base}: ` : ""}${labelHead} ${formatCell(cell)}`;
+  return `${base}: ${weekday} ${formatCell(cell)}`;
 }
 
 interface ApplicationTimeSelectorProps extends HTMLAttributes<HTMLDivElement> {

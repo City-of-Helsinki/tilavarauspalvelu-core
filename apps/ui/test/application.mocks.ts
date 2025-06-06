@@ -531,6 +531,7 @@ export type CreateMockApplicationFragmentProps = {
   notesWhenApplying?: string | null;
   status?: ApplicationStatusChoice;
   nReservationUnitOptions?: number;
+  nSections?: number;
 };
 
 export function createMockApplicationFragment({
@@ -539,6 +540,7 @@ export function createMockApplicationFragment({
   notesWhenApplying = "Notes when applying",
   status = ApplicationStatusChoice.Draft,
   nReservationUnitOptions = 1,
+  nSections = 1,
 }: CreateMockApplicationFragmentProps = {}): ApplicationMockType {
   const page3Data = {
     applicantType: ApplicantTypeChoice.Association,
@@ -590,7 +592,13 @@ export function createMockApplicationFragment({
     applicationSections:
       page === "page0"
         ? []
-        : [createMockApplicationSection({ page, nReservationUnitOptions })],
+        : Array.from({ length: nSections }, (_, i) =>
+            createMockApplicationSection({
+              pk: i + 1,
+              page,
+              nReservationUnitOptions,
+            })
+          ),
     ...(page === "page3" || page === "page4"
       ? page3Data
       : {
