@@ -4,10 +4,10 @@ import {
   type PricingFieldsFragment,
   type ImageFragment,
   type Maybe,
-  SuitableTimeFragment,
+  type SuitableTimeFragment,
 } from "../gql/gql-types";
 import { type OptionInProps } from "hds-react";
-import { pixel } from "./const";
+import { type DayT, pixel } from "./const";
 import { type TFunction } from "i18next";
 import { type LocalizationLanguages } from "./urlBuilder";
 import { convertWeekday } from "./conversion";
@@ -66,25 +66,27 @@ export function pick<T, K extends keyof T>(
   );
 }
 
-export const toMondayFirstUnsafe = (day: number) => {
+export function toMondayFirstUnsafe(day: number): DayT {
   if (day < 0 || day > 6) {
     throw new Error(`Invalid day ${day}`);
   }
-  return day === 0 ? 6 : day - 1;
-};
+  return day === 0 ? 6 : ((day - 1) as DayT);
+}
 
-export const toMondayFirst = (day: 0 | 1 | 2 | 3 | 4 | 5 | 6) =>
-  day === 0 ? 6 : day - 1;
+export function toMondayFirst(day: DayT): DayT {
+  return day === 0 ? 6 : ((day - 1) as DayT);
+}
 
-export const fromMondayFirstUnsafe = (day: number) => {
+export function fromMondayFirstUnsafe(day: number): DayT {
   if (day < 0 || day > 6) {
     throw new Error(`Invalid day ${day}`);
   }
-  return day === 6 ? 0 : day + 1;
-};
+  return day === 6 ? 0 : ((day + 1) as DayT);
+}
 
-export const fromMondayFirst = (day: 0 | 1 | 2 | 3 | 4 | 5 | 6) =>
-  day === 6 ? 0 : day + 1;
+export function fromMondayFirst(day: DayT): DayT {
+  return day === 6 ? 0 : ((day + 1) as DayT);
+}
 
 export function getLocalizationLang(code?: string): LocalizationLanguages {
   if (code?.startsWith("fi")) {

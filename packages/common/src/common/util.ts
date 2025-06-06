@@ -54,10 +54,39 @@ export function addYears(date: Date, years: number): Date {
   return newDate;
 }
 
+type TimeStruct = {
+  hours: number;
+  minutes?: number;
+};
+
+export function toApiTime({ hours, minutes = 0 }: TimeStruct): string | null {
+  if (
+    (hours === 24 && minutes !== 0) ||
+    hours < 0 ||
+    hours > 24 ||
+    minutes < 0 ||
+    minutes > 59
+  ) {
+    return null;
+  }
+  const hNormalized = hours === 24 ? 0 : hours;
+  const timeStr = `${String(hNormalized).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  return timeStr;
+}
+
+export function toApiTimeUnsafe({ hours, minutes = 0 }: TimeStruct): string {
+  const time = toApiTime({ hours, minutes });
+  if (time == null) {
+    throw new Error("Invalid time: " + JSON.stringify({ hours, minutes }));
+  }
+  return time;
+}
+
 // Returns a string in specified format (default: "yyyy-MM-dd") from a Date object,
 // pass a format string as a second parameter to change the format
 // TODO rename to API
-export function toApiDate(date: Date, formatStr = "yyyy-MM-dd"): string | null {
+export function toApiDate(date: Date): string | null {
+  const formatStr = "yyyy-MM-dd";
   if (!date || Number.isNaN(date.getTime())) {
     return null;
   }
@@ -70,8 +99,10 @@ export function toApiDate(date: Date, formatStr = "yyyy-MM-dd"): string | null {
 
 // May crash on invalid dates
 // TODO rename to API
-export const toApiDateUnsafe = (date: Date, formatStr = "yyyy-MM-dd") =>
-  format(date, formatStr);
+export function toApiDateUnsafe(date: Date) {
+  const formatStr = "yyyy-MM-dd";
+  return format(date, formatStr);
+}
 
 // Returns a Date from a string in format "yyyy-MM-dd"
 // TODO rename to API

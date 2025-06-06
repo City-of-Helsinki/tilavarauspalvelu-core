@@ -8,8 +8,7 @@ import {
   type SuitableTimeRangeNode,
 } from "@gql/gql-types";
 import { fontMedium } from "common/styled";
-import { breakpoints, WEEKDAYS } from "common/src/const";
-import { type Day } from "common/src/conversion";
+import { breakpoints, type DayT, WEEKDAYS } from "common/src/const";
 import { transformWeekday } from "common/src/conversion";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
 import {
@@ -214,7 +213,7 @@ const isSlotLast = (selection: string[], slot: string): boolean => {
 // Assume that this is already filtered by the day
 // TODO Not a good name it should match the Cell type (which isn't great either)
 type Slot = {
-  day: Day;
+  day: DayT;
   cell: string;
   allocated: boolean;
   minutes: number;
@@ -222,7 +221,7 @@ type Slot = {
 function addTimeSlotToArray(
   arr: Slot[],
   slot: { beginTime: string; endTime: string },
-  day: Day,
+  day: DayT,
   allocated: boolean
 ) {
   const { beginTime, endTime } = slot;
@@ -239,7 +238,7 @@ function addTimeSlotToArray(
 
 function generateAllocatedSlots(
   allocated: ReservationUnitOptionNodeT[],
-  day: Day
+  day: DayT
 ): Slot[] {
   const arr: Slot[] = [];
   for (const a of allocated) {
@@ -253,7 +252,7 @@ function generateAllocatedSlots(
   return arr;
 }
 
-function isDay(slot: Pick<SuitableTimeRangeNode, "dayOfTheWeek">, day: Day) {
+function isDay(slot: Pick<SuitableTimeRangeNode, "dayOfTheWeek">, day: DayT) {
   return slot.dayOfTheWeek === transformWeekday(day);
 }
 
@@ -261,7 +260,7 @@ function isDay(slot: Pick<SuitableTimeRangeNode, "dayOfTheWeek">, day: Day) {
 /// at some point (either here or in the draw function) those other days have to be removed
 function removeOtherAllocatedDays(
   a: ReservationUnitOptionNodeT,
-  day: Day
+  day: DayT
 ): ReservationUnitOptionNodeT {
   return {
     ...a,
@@ -270,7 +269,7 @@ function removeOtherAllocatedDays(
 }
 
 // Generate the focused slots for a selected application section
-function generateFocusedSlots(focusedAes: SectionNodeT, day: Day): Slot[] {
+function generateFocusedSlots(focusedAes: SectionNodeT, day: DayT): Slot[] {
   const focusedTimeSlots = focusedAes.suitableTimeRanges.filter((ts) =>
     isDay(ts, day)
   );
@@ -288,14 +287,14 @@ function generateFocusedSlots(focusedAes: SectionNodeT, day: Day): Slot[] {
   return focusedSlots.concat(generateAllocatedSlots(tmp, day));
 }
 
-function isInRange(ae: SectionNodeT, cell: Cell, day: Day): boolean {
+function isInRange(ae: SectionNodeT, cell: Cell, day: DayT): boolean {
   return ae.suitableTimeRanges?.some((tr) => isInsideCell(day, cell, tr));
 }
 
 function isAllocated(
   ae: ReservationUnitOptionNodeT,
   cell: Cell,
-  day: Day
+  day: DayT
 ): boolean {
   return ae.allocatedTimeSlots
     .map((tr) => isInsideCell(day, cell, tr))
@@ -436,7 +435,7 @@ function CalendarDay({
 }: {
   allocated: ReservationUnitOptionNodeT[];
   suitable: SectionNodeT[];
-  day: Day;
+  day: DayT;
   cells: Cell[];
   focusedSlots: Slot[];
   relatedTimeSpans: RelatedSlot[];
