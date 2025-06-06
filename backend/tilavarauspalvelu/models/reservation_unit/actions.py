@@ -101,7 +101,7 @@ class ReservationUnitHaukiExporter:
                         "id": "tvp",
                         "name": "Tilavarauspalvelu",
                     },
-                    "origin_id": str(self.reservation_unit.uuid),
+                    "origin_id": str(self.reservation_unit.ext_uuid),
                 }
             ],
             "parents": [parent_unit_resource_id],
@@ -485,10 +485,10 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
     def is_reservable_at(self, moment: datetime.datetime) -> bool:
         moment = moment.astimezone(DEFAULT_TIMEZONE)
 
-        reservation_begins = self.reservation_unit.reservation_begins or local_datetime_min()
+        reservation_begins = self.reservation_unit.reservation_begins_at or local_datetime_min()
         reservation_begins = reservation_begins.astimezone(DEFAULT_TIMEZONE)
 
-        reservation_ends = self.reservation_unit.reservation_ends or local_datetime_max()
+        reservation_ends = self.reservation_unit.reservation_ends_at or local_datetime_max()
         reservation_ends = reservation_ends.astimezone(DEFAULT_TIMEZONE)
 
         if reservation_begins == reservation_ends:

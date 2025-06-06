@@ -370,7 +370,7 @@ def test_seasonal_booking_rescheduled_series__send_email(outbox):
     )
     series = create_reservation_series(
         user=user,
-        reservation_unit__uuid=ext_uuid,
+        reservation_unit__ext_uuid=ext_uuid,
         reservations__type=ReservationTypeChoice.SEASONAL,
         allocated_time_slot__day_of_the_week=Weekday.MONDAY,
         allocated_time_slot__reservation_unit_option__application_section__application=application,

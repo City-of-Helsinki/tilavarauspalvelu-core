@@ -52,7 +52,7 @@ __all__ = [
 class ReservationUnit(models.Model):
     # IDs
 
-    uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
     rank: int = models.PositiveIntegerField(default=0, db_index=True)  # Used for ordering
 
     # Strings
@@ -60,7 +60,7 @@ class ReservationUnit(models.Model):
     name: str = models.CharField(max_length=255)
     description: str = models.TextField(blank=True, default="")
     contact_information: str = models.TextField(blank=True, default="")
-    terms_of_use: str | None = models.TextField(null=True, blank=True, max_length=2000)
+    notes_when_applying: str | None = models.TextField(null=True, blank=True, max_length=2000)
     reservation_pending_instructions: str = models.TextField(blank=True, default="")
     reservation_confirmed_instructions: str = models.TextField(blank=True, default="")
     reservation_cancelled_instructions: str = models.TextField(blank=True, default="")
@@ -81,10 +81,10 @@ class ReservationUnit(models.Model):
 
     # Datetime
 
-    reservation_begins: datetime.datetime | None = models.DateTimeField(null=True, blank=True, db_index=True)
-    reservation_ends: datetime.datetime | None = models.DateTimeField(null=True, blank=True, db_index=True)
-    publish_begins: datetime.datetime | None = models.DateTimeField(null=True, blank=True, db_index=True)
-    publish_ends: datetime.datetime | None = models.DateTimeField(null=True, blank=True, db_index=True)
+    reservation_begins_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, db_index=True)
+    reservation_ends_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, db_index=True)
+    publish_begins_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, db_index=True)
+    publish_ends_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, db_index=True)
     min_reservation_duration: datetime.timedelta | None = models.DurationField(null=True, blank=True)
     max_reservation_duration: datetime.timedelta | None = models.DurationField(null=True, blank=True)
     buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
@@ -247,9 +247,9 @@ class ReservationUnit(models.Model):
     description_fi: str | None
     description_sv: str | None
     description_en: str | None
-    terms_of_use_fi: str | None
-    terms_of_use_sv: str | None
-    terms_of_use_en: str | None
+    notes_when_applying_fi: str | None
+    notes_when_applying_sv: str | None
+    notes_when_applying_en: str | None
     reservation_pending_instructions_fi: str | None
     reservation_pending_instructions_sv: str | None
     reservation_pending_instructions_en: str | None
@@ -310,13 +310,13 @@ class ReservationUnit(models.Model):
             models.When(
                 (
                     # Publishes in the future.
-                    models.Q(publish_begins__isnull=False)
-                    & models.Q(publish_begins__gt=NowTT())
+                    models.Q(publish_begins_at__isnull=False)
+                    & models.Q(publish_begins_at__gt=NowTT())
                     & (
                         # Does not unpublish.
-                        models.Q(publish_ends__isnull=True)
+                        models.Q(publish_ends_at__isnull=True)
                         # Was previously unpublished.
-                        | models.Q(publish_ends__lte=NowTT())
+                        | models.Q(publish_ends_at__lte=NowTT())
                     )
                 ),
                 then=models.Value(ReservationUnitPublishingState.SCHEDULED_PUBLISHING.value),
@@ -326,23 +326,23 @@ class ReservationUnit(models.Model):
                 (
                     (
                         # Is unpublished.
-                        models.Q(publish_ends__isnull=False)
-                        & models.Q(publish_ends__lte=NowTT())
+                        models.Q(publish_ends_at__isnull=False)
+                        & models.Q(publish_ends_at__lte=NowTT())
                         & (
                             # Was previously always published.
-                            models.Q(publish_begins__isnull=True)
+                            models.Q(publish_begins_at__isnull=True)
                             # Was previously published, but before it was unpublished.
                             | (
-                                models.Q(publish_begins__lte=NowTT())  #
-                                & models.Q(publish_begins__lte=models.F("publish_ends"))
+                                models.Q(publish_begins_at__lte=NowTT())  #
+                                & models.Q(publish_begins_at__lte=models.F("publish_ends_at"))
                             )
                         )
                     )
                     | (
                         # Publishes and unpublishes at the exact same time.
-                        models.Q(publish_begins__isnull=False)
-                        & models.Q(publish_ends__isnull=False)
-                        & models.Q(publish_begins=models.F("publish_ends"))
+                        models.Q(publish_begins_at__isnull=False)
+                        & models.Q(publish_ends_at__isnull=False)
+                        & models.Q(publish_begins_at=models.F("publish_ends_at"))
                     )
                 ),
                 then=models.Value(ReservationUnitPublishingState.HIDDEN.value),
@@ -352,15 +352,15 @@ class ReservationUnit(models.Model):
             models.When(
                 (
                     # Unpublishes in the future.
-                    models.Q(publish_ends__isnull=False)
-                    & models.Q(publish_ends__gt=NowTT())
+                    models.Q(publish_ends_at__isnull=False)
+                    & models.Q(publish_ends_at__gt=NowTT())
                     & (
                         # Was always published.
-                        models.Q(publish_begins__isnull=True)
+                        models.Q(publish_begins_at__isnull=True)
                         # Was published in the past.
-                        | models.Q(publish_begins__lte=NowTT())
+                        | models.Q(publish_begins_at__lte=NowTT())
                         # Publishing begins again in the future, but after it first unpublishes.
-                        | models.Q(publish_begins__gt=models.F("publish_ends"))
+                        | models.Q(publish_begins_at__gt=models.F("publish_ends_at"))
                     )
                 ),
                 then=models.Value(ReservationUnitPublishingState.SCHEDULED_HIDING.value),
@@ -370,13 +370,13 @@ class ReservationUnit(models.Model):
             models.When(
                 (
                     # Publishes in the future.
-                    models.Q(publish_begins__isnull=False)
-                    & models.Q(publish_begins__gt=NowTT())
+                    models.Q(publish_begins_at__isnull=False)
+                    & models.Q(publish_begins_at__gt=NowTT())
                     # Unpublishes in the future.
-                    & models.Q(publish_ends__isnull=False)
-                    & models.Q(publish_ends__gt=NowTT())
+                    & models.Q(publish_ends_at__isnull=False)
+                    & models.Q(publish_ends_at__gt=NowTT())
                     # Publishes before it unpublishes.
-                    & models.Q(publish_begins__lt=models.F("publish_ends"))
+                    & models.Q(publish_begins_at__lt=models.F("publish_ends_at"))
                 ),
                 then=models.Value(ReservationUnitPublishingState.SCHEDULED_PERIOD.value),
             ),
@@ -393,13 +393,13 @@ class ReservationUnit(models.Model):
             models.When(
                 (
                     # Reservation period begins in the future.
-                    models.Q(reservation_begins__isnull=False)
-                    & models.Q(reservation_begins__gt=NowTT())
+                    models.Q(reservation_begins_at__isnull=False)
+                    & models.Q(reservation_begins_at__gt=NowTT())
                     & (
                         # No previous reservation period.
-                        models.Q(reservation_ends__isnull=True)
+                        models.Q(reservation_ends_at__isnull=True)
                         # Previous reservation period ended in the past.
-                        | models.Q(reservation_ends__lte=NowTT())
+                        | models.Q(reservation_ends_at__lte=NowTT())
                     )
                 ),
                 then=models.Value(ReservationUnitReservationState.SCHEDULED_RESERVATION.value),
@@ -408,13 +408,13 @@ class ReservationUnit(models.Model):
             models.When(
                 (
                     # Reservation period begins in the future.
-                    models.Q(reservation_begins__isnull=False)
-                    & models.Q(reservation_begins__gt=NowTT())
+                    models.Q(reservation_begins_at__isnull=False)
+                    & models.Q(reservation_begins_at__gt=NowTT())
                     # Reservation period ends in the future
-                    & models.Q(reservation_ends__isnull=False)
-                    & models.Q(reservation_ends__gt=NowTT())
+                    & models.Q(reservation_ends_at__isnull=False)
+                    & models.Q(reservation_ends_at__gt=NowTT())
                     # Reservation period begins before it ends.
-                    & models.Q(reservation_begins__lt=models.F("reservation_ends"))
+                    & models.Q(reservation_begins_at__lt=models.F("reservation_ends_at"))
                 ),
                 then=models.Value(ReservationUnitReservationState.SCHEDULED_PERIOD.value),
             ),
@@ -435,23 +435,23 @@ class ReservationUnit(models.Model):
                     )
                     | (
                         # Reservation period ended now or in the past.
-                        models.Q(reservation_ends__isnull=False)
-                        & models.Q(reservation_ends__lte=NowTT())
+                        models.Q(reservation_ends_at__isnull=False)
+                        & models.Q(reservation_ends_at__lte=NowTT())
                         & (
                             # Reservation period was previously open.
-                            models.Q(reservation_begins__isnull=True)
+                            models.Q(reservation_begins_at__isnull=True)
                             # Reservation period begun before it ended.
                             | (
-                                models.Q(reservation_begins__isnull=False)
-                                & models.Q(reservation_begins__lt=models.F("reservation_ends"))
+                                models.Q(reservation_begins_at__isnull=False)
+                                & models.Q(reservation_begins_at__lt=models.F("reservation_ends_at"))
                             )
                         )
                     )
                     | (
                         # Reservation period begins and ends at the exact same time.
-                        models.Q(reservation_begins__isnull=False)
-                        & models.Q(reservation_ends__isnull=False)
-                        & models.Q(reservation_ends=models.F("reservation_begins"))
+                        models.Q(reservation_begins_at__isnull=False)
+                        & models.Q(reservation_ends_at__isnull=False)
+                        & models.Q(reservation_ends_at=models.F("reservation_begins_at"))
                     )
                 ),
                 then=models.Value(ReservationUnitReservationState.RESERVATION_CLOSED.value),
@@ -461,15 +461,15 @@ class ReservationUnit(models.Model):
             models.When(
                 (
                     # Reservation period ends in the future.
-                    models.Q(reservation_ends__isnull=False)
-                    & models.Q(reservation_ends__gt=NowTT())
+                    models.Q(reservation_ends_at__isnull=False)
+                    & models.Q(reservation_ends_at__gt=NowTT())
                     & (
                         # Reservation period has never been closed.
-                        models.Q(reservation_begins__isnull=True)
+                        models.Q(reservation_begins_at__isnull=True)
                         # Reservation period has begun in the past.
-                        | models.Q(reservation_begins__lte=NowTT())
+                        | models.Q(reservation_begins_at__lte=NowTT())
                         # Reservation period has begins again in the future, but after it first ends.
-                        | models.Q(reservation_begins__gt=models.F("reservation_ends"))
+                        | models.Q(reservation_begins_at__gt=models.F("reservation_ends_at"))
                     )
                 ),
                 then=models.Value(ReservationUnitReservationState.SCHEDULED_CLOSING.value),

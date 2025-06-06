@@ -668,11 +668,11 @@ class PindoraService:
         for reservation in series.reservations.requires_active_access_code():
             begin = reservation.begins_at.astimezone(DEFAULT_TIMEZONE)
             end = reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
-            reservations_by_period[begin, end, series.reservation_unit.uuid] = reservation.pk
+            reservations_by_period[begin, end, series.reservation_unit.ext_uuid] = reservation.pk
 
         access_code_validity: list[PindoraValidityInfoData] = []
         for validity in validities:
-            reservation_unit_uuid = validity.get("reservation_unit_id", series.reservation_unit.uuid)
+            reservation_unit_uuid = validity.get("reservation_unit_id", series.reservation_unit.ext_uuid)
             key = (validity["begin"], validity["end"], reservation_unit_uuid)
             reservation_id = reservations_by_period.get(key)
 

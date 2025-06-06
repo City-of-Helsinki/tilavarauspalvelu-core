@@ -75,7 +75,7 @@ def get_verkkokauppa_order_params(
     *,
     invoicing_date: datetime.date | None = None,
 ) -> CreateOrderParams:
-    reservation_unit = reservation.reservation_units.first()
+    reservation_unit: ReservationUnit = reservation.reservation_units.first()
     preferred_language = reservation.user.get_preferred_language()
     items = [
         OrderItemParams(
@@ -94,7 +94,7 @@ def get_verkkokauppa_order_params(
             meta=[
                 OrderItemMetaParams(
                     key="namespaceProductId",
-                    value=reservation_unit.uuid,
+                    value=str(reservation_unit.ext_uuid),
                     label=None,
                     visible_in_checkout=False,
                     ordinal="0",

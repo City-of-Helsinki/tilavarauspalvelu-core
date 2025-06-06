@@ -76,16 +76,19 @@ class UnitFilterSetMixin:
             query = (
                 Q(reservation_units__is_archived=False)
                 & Q(reservation_units__is_draft=False)
-                & (Q(reservation_units__publish_begins__isnull=True) | Q(reservation_units__publish_begins__lte=now))
-                & (Q(reservation_units__publish_ends__isnull=True) | Q(reservation_units__publish_ends__gt=now))
+                & (
+                    Q(reservation_units__publish_begins_at__isnull=True)
+                    | Q(reservation_units__publish_begins_at__lte=now)
+                )
+                & (Q(reservation_units__publish_ends_at__isnull=True) | Q(reservation_units__publish_ends_at__gt=now))
             )
 
         else:
             query = (
                 Q(reservation_units__is_archived=True)
                 | Q(reservation_units__is_draft=True)
-                | (Q(reservation_units__publish_begins__gte=now))
-                | (Q(reservation_units__publish_ends__lt=now))
+                | (Q(reservation_units__publish_begins_at__gte=now))
+                | (Q(reservation_units__publish_ends_at__lt=now))
             )
 
         # Prevent multiple joins, see explanation above.
