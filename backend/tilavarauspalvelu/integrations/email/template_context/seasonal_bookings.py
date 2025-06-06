@@ -323,7 +323,7 @@ def get_context_for_seasonal_booking_denied_series(
         data["time_value"] = f"{begin_time}-{end_time}"
         data["reservation_unit_name"] = get_attr_by_language(reservation_unit, "name", language)
         data["unit_name"] = get_attr_by_language(unit, "name", language)
-        data["unit_location"] = series.reservation_unit.actions.get_address()
+        data["unit_location"] = series.reservation_unit.unit.address
 
     return {
         "title": pgettext("Email", "Your seasonal booking has been cancelled"),
@@ -412,7 +412,7 @@ def get_context_for_seasonal_booking_rescheduled_series(
         data["time_value"] = f"{begin_time}-{end_time}"
         data["reservation_unit_name"] = get_attr_by_language(reservation_unit, "name", language)
         data["unit_name"] = get_attr_by_language(unit, "name", language)
-        data["unit_location"] = series.reservation_unit.actions.get_address()
+        data["unit_location"] = series.reservation_unit.unit.address
 
         data |= params_for_access_code_series(series=series)
 
