@@ -88,7 +88,7 @@ class ReservationApproveSerializer(NestingModelSerializer):
                 return data
 
         reservation_unit: ReservationUnit = self.instance.reservation_units.first()
-        begin = self.instance.begin.astimezone(DEFAULT_TIMEZONE)
+        begin = self.instance.begins_at.astimezone(DEFAULT_TIMEZONE)
 
         pricing = reservation_unit.actions.get_active_pricing(by_date=begin.date())
         if pricing is None:

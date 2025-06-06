@@ -56,18 +56,18 @@ def test_frontend_queries__customer_ui__AdjustReservationTime(graphql):
 
     factory_args = deepcopy(query_info.factory_args)
     factory_args.pop("state")  # set by the factory
-    factory_args.pop("begin")  # set by the factory
-    factory_args.pop("end")  # set by the factory
+    factory_args.pop("begins_at")  # set by the factory
+    factory_args.pop("ends_at")  # set by the factory
     reservation = ReservationFactory.create_for_time_adjustment(**factory_args)
 
-    new_begin = reservation.begin + datetime.timedelta(days=1)
-    new_end = reservation.end + datetime.timedelta(days=1)
+    new_begin = reservation.begins_at + datetime.timedelta(days=1)
+    new_end = reservation.ends_at + datetime.timedelta(days=1)
 
     variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation.pk,
-        "begin": new_begin.isoformat(),
-        "end": new_end.isoformat(),
+        "beginsAt": new_begin.isoformat(),
+        "endsAt": new_end.isoformat(),
     }
     assert_no_undefined_variables(variables)
 
@@ -248,8 +248,8 @@ def test_frontend_queries__customer_ui__CreateReservation(graphql):
     variables = deepcopy(query_info.variables)
     variables["input"] = {
         "reservationUnit": reservation_unit.pk,
-        "begin": begin.isoformat(),
-        "end": end.isoformat(),
+        "beginsAt": begin.isoformat(),
+        "endsAt": end.isoformat(),
     }
     assert_no_undefined_variables(variables)
 

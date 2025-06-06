@@ -29,7 +29,7 @@ class ReservationSeriesQuerySet(models.QuerySet):
                     state=ReservationStateChoice.CONFIRMED,
                     access_type=AccessType.ACCESS_CODE,
                     access_code_generated_at=None,
-                    end__gt=NowTT(),
+                    ends_at__gt=NowTT(),
                 ),
             )
         ).filter(has_missing_access_codes=True)
@@ -51,7 +51,7 @@ class ReservationSeriesQuerySet(models.QuerySet):
                         | (models.Q(access_code_is_active=False) & L(access_code_should_be_active=True))
                     ),
                     access_code_generated_at__isnull=False,
-                    end__gt=local_datetime(),
+                    ends_at__gt=local_datetime(),
                     reservation_series=models.OuterRef("pk"),
                 ),
             )

@@ -49,8 +49,8 @@ def test_reservation_series__add_reservation__overlapping(graphql):
 
     data = get_minimal_add_data(
         series,
-        begin=datetime.datetime(2024, 1, 1, 10, tzinfo=DEFAULT_TIMEZONE).isoformat(),
-        end=datetime.datetime(2024, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        beginsAt=datetime.datetime(2024, 1, 1, 10, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        endsAt=datetime.datetime(2024, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
     )
 
     graphql.login_with_superuser()
@@ -70,8 +70,8 @@ def test_reservation_series__add_reservation__begin_after_end(graphql):
 
     data = get_minimal_add_data(
         series,
-        begin=datetime.datetime(2024, 1, 2, 12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
-        end=datetime.datetime(2024, 1, 2, 10, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        beginsAt=datetime.datetime(2024, 1, 2, 12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        endsAt=datetime.datetime(2024, 1, 2, 10, tzinfo=DEFAULT_TIMEZONE).isoformat(),
     )
 
     graphql.login_with_superuser()

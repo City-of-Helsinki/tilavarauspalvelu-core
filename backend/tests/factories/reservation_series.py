@@ -94,8 +94,8 @@ class ReservationSeriesFactory(GenericDjangoModelFactory[ReservationSeries]):
                 reservation = ReservationFactory.build(
                     reservation_series=series,
                     user=series.user,
-                    begin=begin,
-                    end=end,
+                    begins_at=begin,
+                    ends_at=end,
                     **sub_kwargs,
                 )
                 reservations.append(reservation)

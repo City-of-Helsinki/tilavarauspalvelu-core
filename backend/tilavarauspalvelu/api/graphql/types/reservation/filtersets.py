@@ -43,8 +43,8 @@ class ReservationFilterSet(ModelFilterSet):
     reservation_unit_name_en = django_filters.CharFilter(method="filter_by_reservation_unit_name")
     reservation_unit_name_sv = django_filters.CharFilter(method="filter_by_reservation_unit_name")
 
-    begin_date = TimezoneAwareDateFilter(field_name="end", lookup_expr="gte", use_end_of_day=False)
-    end_date = TimezoneAwareDateFilter(field_name="begin", lookup_expr="lte", use_end_of_day=True)
+    begin_date = TimezoneAwareDateFilter(field_name="ends_at", lookup_expr="gte", use_end_of_day=False)
+    end_date = TimezoneAwareDateFilter(field_name="begins_at", lookup_expr="lte", use_end_of_day=True)
 
     created_at_gte = TimezoneAwareDateFilter(field_name="created_at", lookup_expr="gte", use_end_of_day=False)
     created_at_lte = TimezoneAwareDateFilter(field_name="created_at", lookup_expr="lte", use_end_of_day=True)
@@ -69,8 +69,8 @@ class ReservationFilterSet(ModelFilterSet):
         order_by = [
             "pk",
             "name",
-            "begin",
-            "end",
+            "begins_at",
+            "ends_at",
             "created_at",
             "state",
             "price",

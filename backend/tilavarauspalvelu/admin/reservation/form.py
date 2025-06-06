@@ -40,8 +40,8 @@ class ReservationAdminForm(forms.ModelForm):
             "handling_details": _("Handling details"),
             "working_memo": _("Working memo"),
             #
-            "begin": _("Begin time"),
-            "end": _("End time"),
+            "begins_at": _("Begin time"),
+            "ends_at": _("End time"),
             "buffer_time_before": _("Buffer time before"),
             "buffer_time_after": _("Buffer time after"),
             "handled_at": _("Handled at"),
@@ -103,8 +103,8 @@ class ReservationAdminForm(forms.ModelForm):
             "handling_details": _("Additional details for denying or approving the reservation"),
             "working_memo": _("Working memo for staff users"),
             #
-            "begin": _("Reservation begin date and time"),
-            "end": _("Reservation end date and time"),
+            "begins_at": _("Reservation begin date and time"),
+            "ends_at": _("Reservation end date and time"),
             "buffer_time_before": _("Buffer time before reservation"),
             "buffer_time_after": _("Buffer time after reservation"),
             "handled_at": _("When this reservation was handled"),

@@ -174,8 +174,8 @@ def test_reservation_statistics_export__begins_after(api_client, settings):
     begin_1 = local_datetime(2022, 1, 2, 12)
     begin_2 = begin_1 - datetime.timedelta(days=1)
 
-    reservation = ReservationFactory.create(begin=begin_1)
-    ReservationFactory.create(begin=begin_2)
+    reservation = ReservationFactory.create(begins_at=begin_1)
+    ReservationFactory.create(begins_at=begin_2)
 
     url = reverse("reservation_statistics_export") + f"?begins_after={begin_1.isoformat()}"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
@@ -193,8 +193,8 @@ def test_reservation_statistics_export__begins_before(api_client, settings):
     begin_1 = local_datetime(2022, 1, 2, 12)
     begin_2 = begin_1 - datetime.timedelta(days=1)
 
-    ReservationFactory.create(begin=begin_1)
-    reservation = ReservationFactory.create(begin=begin_2)
+    ReservationFactory.create(begins_at=begin_1)
+    reservation = ReservationFactory.create(begins_at=begin_2)
 
     url = reverse("reservation_statistics_export") + f"?begins_before={begin_1.isoformat()}"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})

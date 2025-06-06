@@ -131,7 +131,7 @@ class ReservationNode(DjangoNode):
 
     pindora_info = MultiField(
         PindoraReservationInfoType,
-        fields=["access_type", "ext_uuid", "state", "end"],
+        fields=["access_type", "ext_uuid", "state", "ends_at"],
         description=(
             "Info fetched from Pindora API. Cached per reservation for 30s. "
             "Please don't use this when filtering multiple reservations, queries to Pindora are not optimized."
@@ -202,8 +202,8 @@ class ReservationNode(DjangoNode):
             "handling_details",
             "working_memo",
             #
-            "begin",
-            "end",
+            "begins_at",
+            "ends_at",
             "buffer_time_before",
             "buffer_time_after",
             "handled_at",
@@ -281,8 +281,8 @@ class ReservationNode(DjangoNode):
                 # PUBLIC FIELDS
                 "pk",
                 "state",
-                "begin",
-                "end",
+                "begins_at",
+                "ends_at",
                 "buffer_time_before",
                 "buffer_time_after",
                 "reservation_units",
@@ -324,7 +324,7 @@ class ReservationNode(DjangoNode):
 
         # No need to show Pindora info after 24 hours have passed since it ended
         now = local_datetime()
-        cutoff = root.end.astimezone(DEFAULT_TIMEZONE) + datetime.timedelta(hours=24)
+        cutoff = root.ends_at.astimezone(DEFAULT_TIMEZONE) + datetime.timedelta(hours=24)
         if now > cutoff:
             return None
 
@@ -360,7 +360,7 @@ class ReservationNode(DjangoNode):
                 ReservationUnitPricing.objects.filter(
                     reservation_unit=models.OuterRef("reservation_units"),
                 )
-                .active(from_date=models.OuterRef("begin__date"))
+                .active(from_date=models.OuterRef("begins_at__date"))
                 .annotate(
                     data=JSONObject(
                         begins=models.F("begins"),

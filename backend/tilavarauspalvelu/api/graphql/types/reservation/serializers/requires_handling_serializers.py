@@ -51,12 +51,12 @@ class ReservationRequiresHandlingSerializer(NestingModelSerializer):
         ]
 
     def validate(self, data: ReservationHandlingData) -> ReservationHandlingData:
-        begin = self.instance.begin.astimezone(DEFAULT_TIMEZONE)
-        end = self.instance.end.astimezone(DEFAULT_TIMEZONE)
+        begin = self.instance.begins_at.astimezone(DEFAULT_TIMEZONE)
+        end = self.instance.ends_at.astimezone(DEFAULT_TIMEZONE)
 
         if self.instance.state == ReservationStateChoice.DENIED:
             reservation_unit: ReservationUnit = self.instance.reservation_units.first()
-            reservation_unit.validators.validate_no_overlapping_reservations(begin=begin, end=end)
+            reservation_unit.validators.validate_no_overlapping_reservations(begins_at=begin, ends_at=end)
 
         self.instance.validators.validate_reservation_state_allows_handling()
         data["state"] = ReservationStateChoice.REQUIRES_HANDLING

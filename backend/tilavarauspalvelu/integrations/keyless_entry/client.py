@@ -245,8 +245,8 @@ class PindoraReservationClient(BasePindoraClient):
         data = PindoraReservationCreateData(
             reservation_id=str(reservation.ext_uuid),
             reservation_unit_id=str(reservation_unit.uuid),
-            begin=local_iso_format(reservation.begin),
-            end=local_iso_format(reservation.end),
+            begin=local_iso_format(reservation.begins_at),
+            end=local_iso_format(reservation.ends_at),
             is_active=is_active,
         )
 
@@ -270,8 +270,8 @@ class PindoraReservationClient(BasePindoraClient):
         url = cls._build_url(f"reservation/reschedule/{reservation.ext_uuid}")
 
         data = PindoraReservationRescheduleData(
-            begin=local_iso_format(reservation.begin),
-            end=local_iso_format(reservation.end),
+            begin=local_iso_format(reservation.begins_at),
+            end=local_iso_format(reservation.ends_at),
         )
         if is_active is not ...:
             data["is_active"] = is_active
@@ -472,8 +472,8 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
             series=[
                 PindoraSeasonalBookingReservationData(
                     reservation_unit_id=str(reservation.reservation_series.reservation_unit.uuid),
-                    begin=local_iso_format(reservation.begin),
-                    end=local_iso_format(reservation.end),
+                    begin=local_iso_format(reservation.begins_at),
+                    end=local_iso_format(reservation.ends_at),
                 )
                 for reservation in reservations
             ],
@@ -508,8 +508,8 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
             series=[
                 PindoraSeasonalBookingReservationData(
                     reservation_unit_id=str(reservation.reservation_series.reservation_unit.uuid),
-                    begin=local_iso_format(reservation.begin),
-                    end=local_iso_format(reservation.end),
+                    begin=local_iso_format(reservation.begins_at),
+                    end=local_iso_format(reservation.ends_at),
                 )
                 for reservation in reservations
             ],
@@ -715,8 +715,8 @@ class PindoraReservationSeriesClient(BasePindoraClient):
             reservation_unit_id=str(series.reservation_unit.uuid),
             series=[
                 PindoraReservationSeriesReservationData(
-                    begin=local_iso_format(reservation.begin),
-                    end=local_iso_format(reservation.end),
+                    begin=local_iso_format(reservation.begins_at),
+                    end=local_iso_format(reservation.ends_at),
                 )
                 for reservation in reservations
             ],
@@ -746,8 +746,8 @@ class PindoraReservationSeriesClient(BasePindoraClient):
         data = PindoraReservationSeriesRescheduleData(
             series=[
                 PindoraReservationSeriesReservationData(
-                    begin=local_iso_format(reservation.begin),
-                    end=local_iso_format(reservation.end),
+                    begin=local_iso_format(reservation.begins_at),
+                    end=local_iso_format(reservation.ends_at),
                 )
                 for reservation in reservations
             ],
