@@ -14,7 +14,8 @@ import {
   toNumber,
 } from "common/src/helpers";
 import { formatDuration } from "common/src/common/util";
-import { Day, convertWeekday, transformWeekday } from "common/src/conversion";
+import { convertWeekday, transformWeekday } from "common/src/conversion";
+import { type DayT } from "common/src/const";
 import { set } from "date-fns";
 
 // TODO use a fragment
@@ -81,7 +82,7 @@ export function timeSlotKeyToTime(slot: string): number {
 }
 
 export function getTimeSlotOptions(
-  day: Day,
+  day: DayT,
   startHours: number,
   startMinutes: number,
   endHours: number,
@@ -271,7 +272,7 @@ export function getRelatedTimeSlots(
 }
 
 export function isInsideSelection(
-  selection: { day: Day; start: number; end: number },
+  selection: { day: DayT; start: number; end: number },
   tr: {
     dayOfTheWeek: Weekday;
     beginTime: string;
@@ -302,7 +303,7 @@ export function isInsideSelection(
 
 // TODO combine common functionaility with isInsideSelection
 export function isInsideCell(
-  day: Day,
+  day: DayT,
   cell: Cell,
   ts: {
     dayOfTheWeek: Weekday;

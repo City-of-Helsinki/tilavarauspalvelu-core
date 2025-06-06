@@ -8,7 +8,8 @@ import {
   type Cell,
   type CellState,
 } from "common/src/components/ApplicationTimeSelector";
-import { convertWeekday, Day, transformWeekday } from "common/src/conversion";
+import { WEEKDAYS, DayT } from "common/src/const";
+import { convertWeekday, transformWeekday } from "common/src/conversion";
 import {
   filterNonNullable,
   formatTimeStruct,
@@ -24,18 +25,13 @@ type SchedulesT = Omit<SuitableTimeFragment, "pk" | "id">;
 type DayCells = Readonly<Cell[]>;
 type WeekCells = Readonly<DayCells[]>;
 
-export function aesToCells(
-  schedule: Readonly<SchedulesT[]>,
-  openingHours: DailyOpeningHours
-): WeekCells {
-  const firstSlotStart = 7;
-  const lastSlotStart = 23;
+const FIRST_SLOT_START = 7;
+const LAST_SLOT_START = 23;
 
+export function createCells(openingHours: DailyOpeningHours): WeekCells {
   const cells: Cell[][] = [];
 
-  const days = [0, 1, 2, 3, 4, 5, 6] as const;
-  for (const day of days) {
-    const cell: Cell[] = [];
+  for (const day of WEEKDAYS) {
     const dayOpeningHours = getOpeningHours(day, openingHours).map((t) => {
       const beginMins = timeToMinutes(t.begin);
       const endMins = timeToMinutes(t.end);
@@ -44,8 +40,9 @@ export function aesToCells(
         end: endMins === 0 ? 24 : Math.round(endMins / 60),
       };
     });
-    // state is 50 if the cell is outside the opening hours, 100 if it's inside
-    for (let i = firstSlotStart; i <= lastSlotStart; i += 1) {
+
+    const cell: Cell[] = [];
+    for (let i = FIRST_SLOT_START; i <= LAST_SLOT_START; i += 1) {
       const isAvailable = dayOpeningHours.some(
         (t) => t.begin != null && t.end != null && t?.begin <= i && t?.end > i
       );
@@ -59,10 +56,18 @@ export function aesToCells(
     cells.push(cell);
   }
 
+  return cells;
+}
+
+export function aesToCells(
+  schedule: Readonly<SchedulesT[]>,
+  openingHours: DailyOpeningHours
+): WeekCells {
+  const cells = createCells(openingHours);
   for (const aes of schedule) {
     const { dayOfTheWeek, priority } = aes;
-    const hourBegin = timeToMinutes(aes.beginTime) / 60 - firstSlotStart;
-    const hourEnd = (timeToMinutes(aes.endTime) / 60 || 24) - firstSlotStart;
+    const hourBegin = timeToMinutes(aes.beginTime) / 60 - FIRST_SLOT_START;
+    const hourEnd = (timeToMinutes(aes.endTime) / 60 || 24) - FIRST_SLOT_START;
     const p = priority === Priority.Primary ? "primary" : "secondary";
     const day = convertWeekday(dayOfTheWeek);
     for (let h = hourBegin; h < hourEnd; h += 1) {
@@ -72,7 +77,6 @@ export function aesToCells(
       }
     }
   }
-
   return cells;
 }
 
@@ -129,7 +133,7 @@ export type TimeSpan = {
   priority: CellState;
 };
 interface AesType extends TimeSpan {
-  day: Day;
+  day: DayT;
 }
 
 function combineTimespans(prev: TimeSpan[], current: TimeSpan): TimeSpan[] {

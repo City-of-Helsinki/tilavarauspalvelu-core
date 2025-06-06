@@ -19,7 +19,7 @@ import { ButtonContainer } from "common/styled";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { getApplicationPath } from "@/modules/urls";
 import { type ApplicationPage2FormValues } from "./form";
-import { TimeSelector } from ".";
+import { TimeSelectorForm } from ".";
 
 type Node = NonNullable<ApplicationPage2Query["application"]>;
 type Props = {
@@ -117,7 +117,7 @@ function ApplicationSectionTimePicker({
       heading={aes.name}
       theme="thin"
     >
-      <TimeSelector
+      <TimeSelectorForm
         index={sectionIndex}
         reservationUnitOptions={reservationUnitOptions}
         reservationUnitOpeningHours={reservationUnitOpeningHours}
