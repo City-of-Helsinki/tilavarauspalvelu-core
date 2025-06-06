@@ -3,14 +3,18 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from django.conf import settings
+from django.contrib.gis.db.models import PointField
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from tilavarauspalvelu.constants import COORDINATE_SYSTEM_ID
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
+
+    from django.contrib.gis.geos import Point
 
     from .actions import UnitActions
     from .queryset import UnitManager
@@ -37,6 +41,12 @@ class Unit(models.Model):
     web_page: str = models.URLField(max_length=255, blank=True, default="")
     email: str = models.EmailField(max_length=255, blank=True, default="")
     phone: str = models.CharField(max_length=255, blank=True, default="")
+
+    address_street: str = models.CharField(max_length=255, blank=True, default="")
+    address_zip: str = models.CharField(max_length=255, blank=True, default="")
+    address_city: str = models.CharField(max_length=255, blank=True, default="")
+
+    coordinates: Point | None = PointField(null=True, blank=True, srid=COORDINATE_SYSTEM_ID)
 
     search_terms = ArrayField(models.CharField(max_length=255), blank=True, default=list)
 
@@ -74,6 +84,12 @@ class Unit(models.Model):
     short_description_fi: str | None
     short_description_en: str | None
     short_description_sv: str | None
+    address_street_fi: str | None
+    address_street_en: str | None
+    address_street_sv: str | None
+    address_city_fi: str | None
+    address_city_en: str | None
+    address_city_sv: str | None
 
     objects: ClassVar[UnitManager] = LazyModelManager.new()
     actions: UnitActions = LazyModelAttribute.new()
@@ -110,3 +126,15 @@ class Unit(models.Model):
     @property
     def hauki_department_id(self) -> str:
         return f"tprek:{self.tprek_department_id}"
+
+    @property
+    def address(self) -> str:
+        return ", ".join([self.address_street, f"{self.address_zip} {self.address_city}".strip()])
+
+    @property
+    def lat(self) -> float | None:
+        return self.coordinates.y if self.coordinates else None
+
+    @property
+    def lon(self) -> float | None:
+        return self.coordinates.x if self.coordinates else None

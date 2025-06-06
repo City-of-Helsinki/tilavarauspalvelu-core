@@ -13,7 +13,7 @@ from rest_framework.reverse import reverse
 from utils.date_utils import local_datetime
 from utils.utils import ical_hmac_signature
 
-from tests.factories import LocationFactory, ReservationFactory, ReservationUnitFactory, UnitFactory, UserFactory
+from tests.factories import ReservationFactory, ReservationUnitFactory, UnitFactory, UserFactory
 
 pytestmark = [
     pytest.mark.django_db,
@@ -27,9 +27,8 @@ def test_reservation_ical(api_client, settings):
 
     api_client.force_authenticate(user=user)
 
-    unit = UnitFactory.create(name="Caisa")
-    LocationFactory.create(
-        unit=unit,
+    unit = UnitFactory.create(
+        name="Caisa",
         address_street="Street",
         address_zip="12345",
         address_city="City",
