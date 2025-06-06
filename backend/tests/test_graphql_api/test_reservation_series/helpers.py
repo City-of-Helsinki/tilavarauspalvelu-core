@@ -76,8 +76,8 @@ def get_minimal_reschedule_data(reservation_series: ReservationSeries, **overrid
 def get_minimal_add_data(reservation_series: ReservationSeries, **overrides: Any) -> dict[str, Any]:
     return {
         "pk": reservation_series.pk,
-        "begin": datetime.datetime(2024, 1, 2, 10, tzinfo=DEFAULT_TIMEZONE).isoformat(),
-        "end": datetime.datetime(2024, 1, 2, 12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "beginsAt": datetime.datetime(2024, 1, 2, 10, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "endsAt": datetime.datetime(2024, 1, 2, 12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
         **overrides,
     }
 

@@ -255,7 +255,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
 
         qs = Reservation.objects.filter(
             reservation_units__in=self.reservation_units_with_common_hierarchy,
-            begin__gte=end_time,
+            begins_at__gte=end_time,
         ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
 
         if reservation:
@@ -264,7 +264,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         if exclude_blocked:
             qs = qs.exclude(type=ReservationTypeChoice.BLOCKED)
 
-        return qs.order_by("begin").first()
+        return qs.order_by("begins_at").first()
 
     def get_previous_reservation(
         self,
@@ -278,7 +278,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
 
         qs = Reservation.objects.filter(
             reservation_units__in=self.reservation_units_with_common_hierarchy,
-            end__lte=start_time,
+            ends_at__lte=start_time,
         ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
 
         if reservation:
@@ -287,7 +287,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         if exclude_blocked:
             qs = qs.exclude(type=ReservationTypeChoice.BLOCKED)
 
-        return qs.order_by("-end").first()
+        return qs.order_by("-ends_at").first()
 
     @property
     def reservation_units_with_common_hierarchy(self) -> models.QuerySet:
@@ -518,14 +518,14 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         # This way reservations will get the correct access type given the currently defined ones.
         whens: list[models.When] = [
             models.When(
-                models.Q(begin__date__gte=access_type.begin_date),
+                models.Q(begins_at__date__gte=access_type.begin_date),
                 then=models.Value(access_type.access_type),
             )
             for access_type in access_types
         ]
 
         # Update all future or ongoing reservations in the reservation unit to their current access types
-        Reservation.objects.filter(reservation_units=self.reservation_unit, end__gt=now).update(
+        Reservation.objects.filter(reservation_units=self.reservation_unit, ends_at__gt=now).update(
             access_type=models.Case(
                 *whens,
                 # Use the active access type as the default (even though we should never reach this)

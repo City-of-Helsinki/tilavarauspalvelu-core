@@ -252,20 +252,20 @@ def test_reservation_unit__update__access_types__set_new_access_type_to_reservat
     )
 
     past_reservation = ReservationFactory.create(
-        begin=combine(today - datetime.timedelta(days=1), local_time(12)),
-        end=combine(today - datetime.timedelta(days=1), local_time(13)),
+        begins_at=combine(today - datetime.timedelta(days=1), local_time(12)),
+        ends_at=combine(today - datetime.timedelta(days=1), local_time(13)),
         access_type=AccessType.PHYSICAL_KEY,
         reservation_units=[reservation_unit],
     )
     todays_reservation = ReservationFactory.create(
-        begin=combine(today, local_time(12)),
-        end=combine(today, local_time(13)),
+        begins_at=combine(today, local_time(12)),
+        ends_at=combine(today, local_time(13)),
         access_type=AccessType.PHYSICAL_KEY,
         reservation_units=[reservation_unit],
     )
     future_reservation = ReservationFactory.create(
-        begin=combine(today + datetime.timedelta(days=1), local_time(12)),
-        end=combine(today + datetime.timedelta(days=1), local_time(13)),
+        begins_at=combine(today + datetime.timedelta(days=1), local_time(12)),
+        ends_at=combine(today + datetime.timedelta(days=1), local_time(13)),
         access_type=AccessType.PHYSICAL_KEY,
         reservation_units=[reservation_unit],
     )

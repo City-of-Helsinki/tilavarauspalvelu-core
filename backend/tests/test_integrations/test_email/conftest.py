@@ -58,8 +58,8 @@ def email_reservation() -> Reservation:
         reservee_last_name="",
         cancel_reason__reason_en="[PERUUTUKSEN SYY]",
         deny_reason__reason_en="[HYLKÄYKSEN SYY]",
-        begin=local_datetime(2024, 1, 1, 12, 0),
-        end=local_datetime(2024, 1, 1, 15, 0),
+        begins_at=local_datetime(2024, 1, 1, 12, 0),
+        ends_at=local_datetime(2024, 1, 1, 15, 0),
         reservation_series=reservation_series,
         price=Decimal("12.30"),
         non_subsidised_price=Decimal("12.30"),
@@ -83,8 +83,8 @@ def email_reservation() -> Reservation:
         reservee_last_name="",
         cancel_reason__reason_en="[PERUUTUKSEN SYY]",
         deny_reason__reason_en="[HYLKÄYKSEN SYY]",
-        begin=local_datetime(2024, 1, 2, 12, 0),
-        end=local_datetime(2024, 1, 2, 15, 0),
+        begins_at=local_datetime(2024, 1, 2, 12, 0),
+        ends_at=local_datetime(2024, 1, 2, 15, 0),
         reservation_series=reservation_series_2,
     )
 

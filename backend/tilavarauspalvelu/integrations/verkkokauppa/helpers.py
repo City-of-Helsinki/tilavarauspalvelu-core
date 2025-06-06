@@ -37,8 +37,8 @@ def get_formatted_reservation_time(reservation: Reservation) -> str:
     Weekday is localized based on user's preferred language, but rest
     of the format is always the same: ww dd.mm.yyyy hh:mm-hh:mm
     """
-    begin = reservation.begin.astimezone(DEFAULT_TIMEZONE)
-    end = reservation.end.astimezone(DEFAULT_TIMEZONE)
+    begin = reservation.begins_at.astimezone(DEFAULT_TIMEZONE)
+    end = reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
 
     preferred_language = reservation.user.get_preferred_language()
     weekday = localized_short_weekday(begin.weekday(), preferred_language)

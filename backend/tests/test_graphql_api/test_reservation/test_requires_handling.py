@@ -161,14 +161,14 @@ def test_reservation__requires_handling__denied_overlaps_with_existing_reservati
     ReservationUnitHierarchy.refresh()
 
     ReservationFactory.create(
-        begin=now + datetime.timedelta(hours=1),
-        end=now + datetime.timedelta(hours=2),
+        begins_at=now + datetime.timedelta(hours=1),
+        ends_at=now + datetime.timedelta(hours=2),
         state=ReservationStateChoice.CONFIRMED,
         reservation_units=[reservation_unit],
     )
     reservation = ReservationFactory.create_for_requires_handling(
-        begin=now + datetime.timedelta(hours=1),
-        end=now + datetime.timedelta(hours=2),
+        begins_at=now + datetime.timedelta(hours=1),
+        ends_at=now + datetime.timedelta(hours=2),
         state=ReservationStateChoice.DENIED,
         reservation_units=[reservation_unit],
     )
@@ -192,8 +192,8 @@ def test_reservation__requires_handling__denied_overlaps_with_existing_reservati
     ReservationUnitHierarchy.refresh()
 
     reservation = ReservationFactory.create_for_reservation_unit(
-        begin=now + datetime.timedelta(hours=1),
-        end=now + datetime.timedelta(hours=2),
+        begins_at=now + datetime.timedelta(hours=1),
+        ends_at=now + datetime.timedelta(hours=2),
         state=ReservationStateChoice.DENIED,
         reservation_unit=reservation_unit,
     )
@@ -203,8 +203,8 @@ def test_reservation__requires_handling__denied_overlaps_with_existing_reservati
 
     def callback(*args, **kwargs):
         ReservationFactory.create_for_reservation_unit(
-            begin=now + datetime.timedelta(hours=1),
-            end=now + datetime.timedelta(hours=2),
+            begins_at=now + datetime.timedelta(hours=1),
+            ends_at=now + datetime.timedelta(hours=2),
             state=ReservationStateChoice.CONFIRMED,
             reservation_unit=reservation_unit,
         )

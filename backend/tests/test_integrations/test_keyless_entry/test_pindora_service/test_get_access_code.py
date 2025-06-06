@@ -30,16 +30,16 @@ pytestmark = [
 def test_get_access_code__reservation():
     reservation = ReservationFactory.create(
         reservation_series=None,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
     )
 
     data = default_reservation_response(
-        begin=reservation.begin.isoformat(),
-        end=reservation.end.isoformat(),
+        begin=reservation.begins_at.isoformat(),
+        end=reservation.ends_at.isoformat(),
         access_code_valid_minutes_before=10,
         access_code_valid_minutes_after=5,
     )
@@ -55,8 +55,8 @@ def test_get_access_code__reservation():
         access_code_phone_number="+358407089833",
         access_code_sms_number="+358407089834",
         access_code_sms_message="a13245",
-        access_code_begins_at=reservation.begin - datetime.timedelta(minutes=10),
-        access_code_ends_at=reservation.end + datetime.timedelta(minutes=5),
+        access_code_begins_at=reservation.begins_at - datetime.timedelta(minutes=10),
+        access_code_ends_at=reservation.ends_at + datetime.timedelta(minutes=5),
     )
 
 
@@ -64,8 +64,8 @@ def test_get_access_code__reservation__in_series():
     series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
         reservation_series=series,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -75,8 +75,8 @@ def test_get_access_code__reservation__in_series():
         reservation_unit_id=str(series.reservation_unit.uuid),
         reservation_unit_code_validity=[
             {
-                "begin": reservation.begin.isoformat(),
-                "end": reservation.end.isoformat(),
+                "begin": reservation.begins_at.isoformat(),
+                "end": reservation.ends_at.isoformat(),
                 "access_code_valid_minutes_before": 10,
                 "access_code_valid_minutes_after": 5,
             },
@@ -94,8 +94,8 @@ def test_get_access_code__reservation__in_series():
         access_code_phone_number="+358407089833",
         access_code_sms_number="+358407089834",
         access_code_sms_message="a13245",
-        access_code_begins_at=reservation.begin - datetime.timedelta(minutes=10),
-        access_code_ends_at=reservation.end + datetime.timedelta(minutes=5),
+        access_code_begins_at=reservation.begins_at - datetime.timedelta(minutes=10),
+        access_code_ends_at=reservation.ends_at + datetime.timedelta(minutes=5),
     )
 
 
@@ -103,16 +103,16 @@ def test_get_access_code__reservation__in_series__pick_correct_reservation():
     series = ReservationSeriesFactory.create()
     reservation_1 = ReservationFactory.create(
         reservation_series=series,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
     )
     reservation_2 = ReservationFactory.create(
         reservation_series=series,
-        begin=local_datetime(2024, 1, 2, 12),
-        end=local_datetime(2024, 1, 2, 13),
+        begins_at=local_datetime(2024, 1, 2, 12),
+        ends_at=local_datetime(2024, 1, 2, 13),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -122,14 +122,14 @@ def test_get_access_code__reservation__in_series__pick_correct_reservation():
         reservation_unit_id=str(series.reservation_unit.uuid),
         reservation_unit_code_validity=[
             {
-                "begin": reservation_1.begin.isoformat(),
-                "end": reservation_1.end.isoformat(),
+                "begin": reservation_1.begins_at.isoformat(),
+                "end": reservation_1.ends_at.isoformat(),
                 "access_code_valid_minutes_before": 10,
                 "access_code_valid_minutes_after": 5,
             },
             {
-                "begin": reservation_2.begin.isoformat(),
-                "end": reservation_2.end.isoformat(),
+                "begin": reservation_2.begins_at.isoformat(),
+                "end": reservation_2.ends_at.isoformat(),
                 "access_code_valid_minutes_before": 10,
                 "access_code_valid_minutes_after": 5,
             },
@@ -147,8 +147,8 @@ def test_get_access_code__reservation__in_series__pick_correct_reservation():
         access_code_phone_number="+358407089833",
         access_code_sms_number="+358407089834",
         access_code_sms_message="a13245",
-        access_code_begins_at=reservation_1.begin - datetime.timedelta(minutes=10),
-        access_code_ends_at=reservation_1.end + datetime.timedelta(minutes=5),
+        access_code_begins_at=reservation_1.begins_at - datetime.timedelta(minutes=10),
+        access_code_ends_at=reservation_1.ends_at + datetime.timedelta(minutes=5),
     )
 
 
@@ -159,8 +159,8 @@ def test_get_access_code__reservation__in_series__in_seasonal_booking():
     )
     reservation = ReservationFactory.create(
         reservation_series=series,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -170,8 +170,8 @@ def test_get_access_code__reservation__in_series__in_seasonal_booking():
         reservation_unit_code_validity=[
             {
                 "reservation_unit_id": str(series.reservation_unit.uuid),
-                "begin": reservation.begin.isoformat(),
-                "end": reservation.end.isoformat(),
+                "begin": reservation.begins_at.isoformat(),
+                "end": reservation.ends_at.isoformat(),
                 "access_code_valid_minutes_before": 10,
                 "access_code_valid_minutes_after": 5,
             },
@@ -189,8 +189,8 @@ def test_get_access_code__reservation__in_series__in_seasonal_booking():
         access_code_phone_number="+358407089833",
         access_code_sms_number="+358407089834",
         access_code_sms_message="a13245",
-        access_code_begins_at=reservation.begin - datetime.timedelta(minutes=10),
-        access_code_ends_at=reservation.end + datetime.timedelta(minutes=5),
+        access_code_begins_at=reservation.begins_at - datetime.timedelta(minutes=10),
+        access_code_ends_at=reservation.ends_at + datetime.timedelta(minutes=5),
     )
 
 
@@ -198,8 +198,8 @@ def test_get_access_code__series():
     series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
         reservation_series=series,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -209,8 +209,8 @@ def test_get_access_code__series():
         reservation_unit_id=str(series.reservation_unit.uuid),
         reservation_unit_code_validity=[
             {
-                "begin": reservation.begin.isoformat(),
-                "end": reservation.end.isoformat(),
+                "begin": reservation.begins_at.isoformat(),
+                "end": reservation.ends_at.isoformat(),
                 "access_code_valid_minutes_before": 10,
                 "access_code_valid_minutes_after": 5,
             },
@@ -232,8 +232,8 @@ def test_get_access_code__series():
             PindoraValidityInfoData(
                 reservation_id=reservation.pk,
                 reservation_series_id=series.pk,
-                access_code_begins_at=reservation.begin - datetime.timedelta(minutes=10),
-                access_code_ends_at=reservation.end + datetime.timedelta(minutes=5),
+                access_code_begins_at=reservation.begins_at - datetime.timedelta(minutes=10),
+                access_code_ends_at=reservation.ends_at + datetime.timedelta(minutes=5),
             )
         ],
     )
@@ -246,8 +246,8 @@ def test_get_access_code__series__in_seasonal_booking():
     )
     reservation = ReservationFactory.create(
         reservation_series=series,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -257,8 +257,8 @@ def test_get_access_code__series__in_seasonal_booking():
         reservation_unit_code_validity=[
             {
                 "reservation_unit_id": str(series.reservation_unit.uuid),
-                "begin": reservation.begin.isoformat(),
-                "end": reservation.end.isoformat(),
+                "begin": reservation.begins_at.isoformat(),
+                "end": reservation.ends_at.isoformat(),
                 "access_code_valid_minutes_before": 10,
                 "access_code_valid_minutes_after": 5,
             },
@@ -280,8 +280,8 @@ def test_get_access_code__series__in_seasonal_booking():
             PindoraValidityInfoData(
                 reservation_id=reservation.pk,
                 reservation_series_id=series.pk,
-                access_code_begins_at=reservation.begin - datetime.timedelta(minutes=10),
-                access_code_ends_at=reservation.end + datetime.timedelta(minutes=5),
+                access_code_begins_at=reservation.begins_at - datetime.timedelta(minutes=10),
+                access_code_ends_at=reservation.ends_at + datetime.timedelta(minutes=5),
             )
         ],
     )
@@ -295,8 +295,8 @@ def test_get_access_code__series__in_seasonal_booking__remove_other_series_value
     )
     reservation_1 = ReservationFactory.create(
         reservation_series=series_1,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -307,8 +307,8 @@ def test_get_access_code__series__in_seasonal_booking__remove_other_series_value
     )
     reservation_2 = ReservationFactory.create(
         reservation_series=series_2,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -318,15 +318,15 @@ def test_get_access_code__series__in_seasonal_booking__remove_other_series_value
         reservation_unit_code_validity=[
             {
                 "reservation_unit_id": str(series_1.reservation_unit.uuid),
-                "begin": reservation_1.begin.isoformat(),
-                "end": reservation_1.end.isoformat(),
+                "begin": reservation_1.begins_at.isoformat(),
+                "end": reservation_1.ends_at.isoformat(),
                 "access_code_valid_minutes_before": 10,
                 "access_code_valid_minutes_after": 5,
             },
             {
                 "reservation_unit_id": str(series_2.reservation_unit.uuid),
-                "begin": reservation_2.begin.isoformat(),
-                "end": reservation_2.end.isoformat(),
+                "begin": reservation_2.begins_at.isoformat(),
+                "end": reservation_2.ends_at.isoformat(),
                 "access_code_valid_minutes_before": 10,
                 "access_code_valid_minutes_after": 5,
             },
@@ -348,8 +348,8 @@ def test_get_access_code__series__in_seasonal_booking__remove_other_series_value
             PindoraValidityInfoData(
                 reservation_id=reservation_1.pk,
                 reservation_series_id=series_1.pk,
-                access_code_begins_at=reservation_1.begin - datetime.timedelta(minutes=10),
-                access_code_ends_at=reservation_1.end + datetime.timedelta(minutes=5),
+                access_code_begins_at=reservation_1.begins_at - datetime.timedelta(minutes=10),
+                access_code_ends_at=reservation_1.ends_at + datetime.timedelta(minutes=5),
             )
         ],
     )
@@ -362,8 +362,8 @@ def test_get_access_code__seasonal_booking():
     )
     reservation = ReservationFactory.create(
         reservation_series=series,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -373,8 +373,8 @@ def test_get_access_code__seasonal_booking():
         reservation_unit_code_validity=[
             {
                 "reservation_unit_id": str(series.reservation_unit.uuid),
-                "begin": reservation.begin.isoformat(),
-                "end": reservation.end.isoformat(),
+                "begin": reservation.begins_at.isoformat(),
+                "end": reservation.ends_at.isoformat(),
                 "access_code_valid_minutes_before": 10,
                 "access_code_valid_minutes_after": 5,
             },
@@ -396,8 +396,8 @@ def test_get_access_code__seasonal_booking():
             PindoraValidityInfoData(
                 reservation_id=reservation.pk,
                 reservation_series_id=series.pk,
-                access_code_begins_at=reservation.begin - datetime.timedelta(minutes=10),
-                access_code_ends_at=reservation.end + datetime.timedelta(minutes=5),
+                access_code_begins_at=reservation.begins_at - datetime.timedelta(minutes=10),
+                access_code_ends_at=reservation.ends_at + datetime.timedelta(minutes=5),
             )
         ],
     )
