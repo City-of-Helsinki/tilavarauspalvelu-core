@@ -150,12 +150,12 @@ class ReservationUnitQuerySet(models.QuerySet):
     @property
     def _is_visible(self) -> Q:
         return (
-            Q(publish_begins__lte=NowTT())  #
-            | Q(publish_begins__isnull=True)
+            Q(publish_begins_at__lte=NowTT())  #
+            | Q(publish_begins_at__isnull=True)
         ) & (
-            Q(publish_ends__gt=NowTT())  #
-            | Q(publish_ends__isnull=True)
-            | Q(publish_ends__lt=models.F("publish_begins"))
+            Q(publish_ends_at__gt=NowTT())  #
+            | Q(publish_ends_at__isnull=True)
+            | Q(publish_ends_at__lt=models.F("publish_begins_at"))
         )
 
     def visible(self) -> Self:

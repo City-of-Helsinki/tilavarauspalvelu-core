@@ -27,8 +27,8 @@ def test_reservation_unit_export_multiple():
     # - There are two "complete"/"full" reservation units in the system
     reservation_units = ReservationUnitFactory.create_batch(
         2,
-        reservation_begins=datetime.datetime(2022, 1, 1, tzinfo=DEFAULT_TIMEZONE),
-        reservation_ends=datetime.datetime(2022, 2, 1, tzinfo=DEFAULT_TIMEZONE),
+        reservation_begins_at=datetime.datetime(2022, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+        reservation_ends_at=datetime.datetime(2022, 2, 1, tzinfo=DEFAULT_TIMEZONE),
         spaces__name="Space",
         resources__name="Resource",
         purposes__name="Purpose",
@@ -75,17 +75,17 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.description_en
     assert row_2[next(index)] == reservation_unit_1.description_sv
     assert row_2[next(index)] == reservation_unit_1.reservation_unit_type.name
-    assert row_2[next(index)] == reservation_unit_1.terms_of_use
-    assert row_2[next(index)] == reservation_unit_1.terms_of_use_fi
-    assert row_2[next(index)] == reservation_unit_1.terms_of_use_en
-    assert row_2[next(index)] == reservation_unit_1.terms_of_use_sv
+    assert row_2[next(index)] == reservation_unit_1.notes_when_applying
+    assert row_2[next(index)] == reservation_unit_1.notes_when_applying_fi
+    assert row_2[next(index)] == reservation_unit_1.notes_when_applying_en
+    assert row_2[next(index)] == reservation_unit_1.notes_when_applying_sv
     assert row_2[next(index)] == reservation_unit_1.service_specific_terms.name
     assert row_2[next(index)] == reservation_unit_1.unit.tprek_id
     assert row_2[next(index)] == reservation_unit_1.unit.name
     assert row_2[next(index)] == reservation_unit_1.contact_information
     assert row_2[next(index)] == reservation_unit_1.is_draft
-    assert row_2[next(index)] == reservation_unit_1.publish_begins
-    assert row_2[next(index)] == reservation_unit_1.publish_ends
+    assert row_2[next(index)] == reservation_unit_1.publish_begins_at
+    assert row_2[next(index)] == reservation_unit_1.publish_ends_at
     assert row_2[next(index)] == reservation_unit_1.spaces.first().name_fi
     assert row_2[next(index)] == reservation_unit_1.resources.first().name_fi
     assert row_2[next(index)] == reservation_unit_1.payment_terms.name
@@ -96,8 +96,8 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.pricings.first().lowest_price
     assert row_2[next(index)] == reservation_unit_1.pricings.first().highest_price
     assert row_2[next(index)] == reservation_unit_1.pricings.first().tax_percentage
-    assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_begins)
-    assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_ends)
+    assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_begins_at)
+    assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_ends_at)
     assert row_2[next(index)] == reservation_unit_1.metadata_set.name
     assert row_2[next(index)] == reservation_unit_1.require_reservation_handling
     assert row_2[next(index)] == AuthenticationType(reservation_unit_1.authentication).label
@@ -190,11 +190,11 @@ def test_reservation_unit_export_multiple():
                 },
             ),
             "Missing Reservation begins": MissingParams(
-                missing=Missing(deleted=["reservation_begins"]),
+                missing=Missing(deleted=["reservation_begins_at"]),
                 column_value_mapping={"Reservation begins": None},
             ),
             "Missing Reservation ends": MissingParams(
-                missing=Missing(deleted=["reservation_ends"]),
+                missing=Missing(deleted=["reservation_ends_at"]),
                 column_value_mapping={"Reservation ends": None},
             ),
             "Missing Reservation unit type": MissingParams(
@@ -215,8 +215,8 @@ def test_reservation_unit_export_missing_relations(column_value_mapping, missing
     # given:
     # - There is one reservation unit with the given missing data in the system
     data = {
-        "reservation_begins": datetime.datetime(2022, 1, 1, tzinfo=DEFAULT_TIMEZONE),
-        "reservation_ends": datetime.datetime(2022, 2, 1, tzinfo=DEFAULT_TIMEZONE),
+        "reservation_begins_at": datetime.datetime(2022, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+        "reservation_ends_at": datetime.datetime(2022, 2, 1, tzinfo=DEFAULT_TIMEZONE),
         "spaces__name": "Space",
         "resources__name": "Resource",
         "purposes__name": "Purpose",

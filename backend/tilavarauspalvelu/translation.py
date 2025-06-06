@@ -93,7 +93,7 @@ class ReservationUnitTranslationOptions(TranslationOptions):
     fields = [
         "name",
         "description",
-        "terms_of_use",
+        "notes_when_applying",
         "reservation_pending_instructions",
         "reservation_confirmed_instructions",
         "reservation_cancelled_instructions",

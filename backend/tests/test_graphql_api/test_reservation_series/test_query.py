@@ -170,7 +170,7 @@ def test_reservation_series__query__relations(graphql):
 
 def pindora_response(series: ReservationSeries) -> PindoraReservationSeriesResponse:
     return PindoraReservationSeriesResponse(
-        reservation_unit_id=series.reservation_unit.uuid,
+        reservation_unit_id=series.reservation_unit.ext_uuid,
         access_code="1234",
         access_code_generated_at=local_datetime(2022, 1, 1, 12),
         access_code_is_active=True,
@@ -398,7 +398,7 @@ def test_reservation_series__query__pindora_info__in_application_section(graphql
         access_code_is_active=True,
         reservation_unit_code_validity=[
             PindoraSeasonalBookingAccessCodeValidity(
-                reservation_unit_id=reservation_unit.uuid,
+                reservation_unit_id=reservation_unit.ext_uuid,
                 access_code_valid_minutes_before=10,
                 access_code_valid_minutes_after=5,
                 begin=local_datetime(2022, 1, 1, 12),
@@ -466,7 +466,7 @@ def test_reservation_series__query__pindora_info__in_application_section__not_se
         access_code_is_active=True,
         reservation_unit_code_validity=[
             PindoraSeasonalBookingAccessCodeValidity(
-                reservation_unit_id=reservation_unit.uuid,
+                reservation_unit_id=reservation_unit.ext_uuid,
                 access_code_valid_minutes_before=10,
                 access_code_valid_minutes_after=5,
                 begin=local_datetime(2022, 1, 1, 12),

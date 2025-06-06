@@ -24,7 +24,7 @@ pytestmark = [
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__reservation():
     reservation = ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
+        reservation_units__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -46,7 +46,7 @@ def test_create_missing_access_codes__reservation():
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__reservation__as_inactive():
     reservation = ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
+        reservation_units__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -68,7 +68,7 @@ def test_create_missing_access_codes__reservation__as_inactive():
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__reservation__not_confirmed():
     ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
+        reservation_units__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -88,7 +88,7 @@ def test_create_missing_access_codes__reservation__not_confirmed():
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__reservation__already_generated():
     ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
+        reservation_units__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -122,7 +122,7 @@ def test_create_missing_access_codes__reservation__already_generated():
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__reservation__get_if_exists():
     reservation = ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
+        reservation_units__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),

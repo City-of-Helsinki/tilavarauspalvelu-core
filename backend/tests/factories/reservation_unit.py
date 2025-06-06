@@ -47,7 +47,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
         model = ReservationUnit
 
     # IDs
-    uuid = factory.LazyFunction(uuid.uuid4)  # For Verkkokauppa and Hauki APIs
+    ext_uuid = factory.LazyFunction(uuid.uuid4)
     rank = factory.Sequence(lambda n: n)
 
     # Strings
@@ -63,10 +63,10 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
 
     contact_information = FakerFI("sentence")
 
-    terms_of_use = FakerFI("p_tags")
-    terms_of_use_fi = LazyAttribute(lambda i: i.terms_of_use)
-    terms_of_use_en = FakerEN("p_tags")
-    terms_of_use_sv = FakerSV("p_tags")
+    notes_when_applying = FakerFI("p_tags")
+    notes_when_applying_fi = LazyAttribute(lambda i: i.notes_when_applying)
+    notes_when_applying_en = FakerEN("p_tags")
+    notes_when_applying_sv = FakerSV("p_tags")
 
     reservation_pending_instructions = FakerFI("p_tags")
     reservation_pending_instructions_fi = LazyAttribute(lambda i: i.reservation_pending_instructions)
@@ -92,10 +92,10 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     reservations_max_days_before = None
 
     # Datetime
-    reservation_begins = None
-    reservation_ends = None
-    publish_begins = None
-    publish_ends = None
+    reservation_begins_at = None
+    reservation_ends_at = None
+    publish_begins_at = None
+    publish_ends_at = None
     max_reservation_duration = None
     min_reservation_duration = None
     buffer_time_before = factory.LazyFunction(datetime.timedelta)

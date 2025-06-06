@@ -118,8 +118,8 @@ def reservation_unit() -> ReservationUnit:
     return ReservationUnitFactory.create(
         origin_hauki_resource=origin_hauki_resource,
         reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES.value,
-        reservation_begins=None,
-        reservation_ends=None,
+        reservation_begins_at=None,
+        reservation_ends_at=None,
         reservations_min_days_before=None,
         reservations_max_days_before=None,
         min_reservation_duration=None,
@@ -142,8 +142,8 @@ def create_child_for_reservation_unit(reservation_unit: ReservationUnit) -> Rese
     child_space = SpaceFactory.create(parent=parent_space)
 
     return ReservationUnitFactory.create(
-        reservation_begins=None,
-        reservation_ends=None,
+        reservation_begins_at=None,
+        reservation_ends_at=None,
         reservations_min_days_before=None,
         reservations_max_days_before=None,
         min_reservation_duration=None,
@@ -186,9 +186,9 @@ class ReservableFilters:
 @dataclass
 class ReservationUnitOverrides:
     reservation_start_interval: str | None = None
-    reservation_begins: datetime.datetime | None = None
-    reservation_ends: datetime.datetime | None = None
-    publish_ends: datetime.datetime | None = None
+    reservation_begins_at: datetime.datetime | None = None
+    reservation_ends_at: datetime.datetime | None = None
+    publish_ends_at: datetime.datetime | None = None
     reservations_min_days_before: int | None = None
     reservations_max_days_before: int | None = None
     min_reservation_duration: datetime.timedelta | None = None
@@ -820,9 +820,9 @@ def test__reservation_unit__first_reservable_time__filters__multiple_days_long_t
 
 @pytest.mark.parametrize(
     **parametrize_helper({
-        "ReservationUnit Settings | reservation_begins": RU_ReservableParams(
+        "ReservationUnit Settings | reservation_begins_at": RU_ReservableParams(
             reservation_unit_settings=ReservationUnitOverrides(
-                reservation_begins=_datetime(day=20, hour=17),
+                reservation_begins_at=_datetime(day=20, hour=17),
             ),
             result=ReservableNode(
                 is_closed=False,
@@ -831,7 +831,7 @@ def test__reservation_unit__first_reservable_time__filters__multiple_days_long_t
         ),
         "ReservationUnit Settings | reservation_begins in the middle of time span": RU_ReservableParams(
             reservation_unit_settings=ReservationUnitOverrides(
-                reservation_begins=_datetime(day=20, hour=18, minute=1),
+                reservation_begins_at=_datetime(day=20, hour=18, minute=1),
             ),
             result=ReservableNode(
                 is_closed=False,
@@ -840,7 +840,7 @@ def test__reservation_unit__first_reservable_time__filters__multiple_days_long_t
         ),
         "ReservationUnit Settings | reservation_ends causes no results": RU_ReservableParams(
             reservation_unit_settings=ReservationUnitOverrides(
-                reservation_ends=_datetime(day=11),
+                reservation_ends_at=_datetime(day=11),
             ),
             result=ReservableNode(
                 is_closed=True,
@@ -849,7 +849,7 @@ def test__reservation_unit__first_reservable_time__filters__multiple_days_long_t
         ),
         "ReservationUnit Settings | publish_ends causes no results": RU_ReservableParams(
             reservation_unit_settings=ReservationUnitOverrides(
-                publish_ends=_datetime(day=11, hour=13),
+                publish_ends_at=_datetime(day=11, hour=13),
             ),
             result=ReservableNode(
                 is_closed=True,
