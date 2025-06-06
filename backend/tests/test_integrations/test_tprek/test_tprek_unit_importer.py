@@ -8,7 +8,6 @@ from tilavarauspalvelu.exceptions import TPRekImportError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.tprek.tprek_api_client import TprekAPIClient
 from tilavarauspalvelu.integrations.tprek.tprek_unit_importer import TprekUnitHaukiResourceIdImporter, TprekUnitImporter
-from tilavarauspalvelu.models import Location
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from tests.factories import UnitFactory
@@ -67,20 +66,18 @@ def test_TprekUnitImporter__update_unit_data_from_tprek__no_last_modified_set__u
     assert unit.phone == "+358 1 234 45678, +358 9 876 54321"
     assert unit.tprek_department_id == "test-department-id"
     assert unit.tprek_last_modified.astimezone(tz=DEFAULT_TIMEZONE) == local_datetime(2023, 5, 10, 8, 9, 0)
-
-    location = Location.objects.get(unit=unit)
-    assert location.address_street == "Teststreet 1"
-    assert location.address_street_fi == "Teststreet 1"
-    assert location.address_street_en == "Teststreet 1"
-    assert location.address_street_sv == "Testvägen 1"
-    assert location.address_zip == "00002"
-    assert location.address_city == "Helsinki"
-    assert location.address_city_fi == "Helsinki"
-    assert location.address_city_en == "Helsinki"
-    assert location.address_city_sv == "Helsingfors"
-    assert location.coordinates is not None
-    assert location.coordinates.x == 24.654321
-    assert location.coordinates.y == 78.123456
+    assert unit.address_street == "Teststreet 1"
+    assert unit.address_street_fi == "Teststreet 1"
+    assert unit.address_street_en == "Teststreet 1"
+    assert unit.address_street_sv == "Testvägen 1"
+    assert unit.address_zip == "00002"
+    assert unit.address_city == "Helsinki"
+    assert unit.address_city_fi == "Helsinki"
+    assert unit.address_city_en == "Helsinki"
+    assert unit.address_city_sv == "Helsingfors"
+    assert unit.coordinates is not None
+    assert unit.coordinates.x == 24.654321
+    assert unit.coordinates.y == 78.123456
 
 
 @patch_method(TprekAPIClient.get, return_value=ResponseMock(status_code=200, json_data=SINGLE_TPREK_UNIT_JSON))

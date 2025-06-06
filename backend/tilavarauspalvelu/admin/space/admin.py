@@ -7,7 +7,6 @@ from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
 from mptt.admin import MPTTModelAdmin
 
-from tilavarauspalvelu.admin.location.admin import LocationInline
 from tilavarauspalvelu.models import Space
 
 if TYPE_CHECKING:
@@ -61,7 +60,6 @@ class SpaceAdmin(TranslationAdmin, MPTTModelAdmin):
     ]
     inlines = [
         SpaceInline,
-        LocationInline,
     ]
 
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
