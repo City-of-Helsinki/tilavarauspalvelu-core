@@ -13,7 +13,8 @@ import {
   type ReservationUnitNode,
 } from "@gql/gql-types";
 import { ShowAllContainer } from "common/src/components/";
-import { transformWeekday, type Day } from "common/src/conversion";
+import { transformWeekday } from "common/src/conversion";
+import { type DayT } from "common/src/const";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
 import {
   type RelatedSlot,
@@ -128,7 +129,7 @@ function getTimeLabel(selection: string[], t: TFunction): string {
 
 function deserializeSlot(
   slot: string
-): { day: Day; hour: number; mins: number } | null {
+): { day: DayT; hour: number; mins: number } | null {
   const res = slot.split("-").map(toNumber);
   if (res.length !== 3) {
     return null;
@@ -142,7 +143,7 @@ function deserializeSlot(
     return null;
   }
 
-  return { day: day as Day, hour, mins };
+  return { day: day as DayT, hour, mins };
 }
 
 function TimeSelection(): JSX.Element {
@@ -160,7 +161,7 @@ function TimeSelection(): JSX.Element {
       const end = ALLOCATION_CALENDAR_TIMES[1];
       // TODO unsafe
       return getTimeSlotOptions(
-        Number(day) as Day,
+        Number(day) as DayT,
         start,
         0,
         end,
@@ -317,7 +318,7 @@ function TimeSelection(): JSX.Element {
 
 function getAllocatedTimeSlot(
   section: SectionNodeT,
-  selection: { day: Day; startHour: number; endHour: number }
+  selection: { day: DayT; startHour: number; endHour: number }
 ): AllocatedTimeSlotNodeT | null {
   const { day, startHour, endHour } = selection;
   return (
@@ -331,7 +332,7 @@ function getAllocatedTimeSlot(
 
 function getSuitableTimeSlot(
   section: SectionNodeT,
-  selection: { day: Day; startHour: number; endHour: number }
+  selection: { day: DayT; startHour: number; endHour: number }
 ): SuitableTimeRangeNodeT | null {
   const { day, startHour, endHour } = selection;
   return (
@@ -354,8 +355,8 @@ export function AllocationColumn({
   const slots = selection.map((s) => decodeTimeSlot(s));
   const day = slots
     .map((s) => s.day)
-    .filter((d): d is Day => d >= 0 && d <= 6)
-    .reduce<Day>((acc, d) => (d > acc ? d : acc), 0);
+    .filter((d): d is DayT => d >= 0 && d <= 6)
+    .reduce<DayT>((acc, d) => (d > acc ? d : acc), 0);
   const startHour = slots[0]?.hour ?? 0;
   const endHour = slots[slots.length - 1]?.hour ?? 0;
 
