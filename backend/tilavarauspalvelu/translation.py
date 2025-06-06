@@ -15,7 +15,6 @@ from .models import (
     City,
     Equipment,
     EquipmentCategory,
-    Location,
     Organisation,
     Purpose,
     ReservationDenyReason,
@@ -70,12 +69,13 @@ class UnitGroupTranslationOptions(TranslationOptions):
 
 @register(Unit)
 class UnitTranslationOptions(TranslationOptions):
-    fields = ["name", "description", "short_description"]
-
-
-@register(Location)
-class LocationTranslationOptions(TranslationOptions):
-    fields = ["address_street", "address_city"]
+    fields = [
+        "name",
+        "description",
+        "short_description",
+        "address_street",
+        "address_city",
+    ]
 
 
 @register(ReservationPurpose)

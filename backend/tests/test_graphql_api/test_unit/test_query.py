@@ -32,21 +32,17 @@ def test_units__query(graphql):
         webPage
         email
         phone
-        reservationUnits {
-            nameFi
-        }
-        spaces {
-            nameFi
-        }
-        location {
-            addressStreetFi
-        }
-        unitGroups {
-            nameFi
-        }
-        paymentMerchant {
-            name
-        }
+        addressStreetFi
+        addressStreetEn
+        addressStreetSv
+        addressZip
+        addressCityFi
+        addressCityEn
+        addressCitySv
+        reservationUnits { nameFi }
+        spaces { nameFi }
+        unitGroups { nameFi }
+        paymentMerchant { name }
     """
     response = graphql(units_query(fields=fields))
 
@@ -67,11 +63,17 @@ def test_units__query(graphql):
         "webPage": unit.web_page,
         "email": unit.email,
         "phone": unit.phone,
-        "location": None,
-        "paymentMerchant": None,
+        "addressStreetFi": unit.address_street_fi,
+        "addressStreetEn": unit.address_street_en,
+        "addressStreetSv": unit.address_street_sv,
+        "addressZip": unit.address_zip,
+        "addressCityFi": unit.address_city_fi,
+        "addressCityEn": unit.address_city_en,
+        "addressCitySv": unit.address_city_sv,
         "reservationUnits": [],
         "unitGroups": [],
         "spaces": [],
+        "paymentMerchant": None,
     }
 
 

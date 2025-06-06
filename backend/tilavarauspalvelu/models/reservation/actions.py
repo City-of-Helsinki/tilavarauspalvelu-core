@@ -5,7 +5,6 @@ import datetime
 from typing import TYPE_CHECKING, Literal
 
 from django.conf import settings
-from django.db.models import Prefetch
 from django.utils.translation import pgettext
 from icalendar import Calendar, Event, Timezone, TimezoneDaylight, TimezoneStandard
 from rest_framework.exceptions import ValidationError
@@ -29,7 +28,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.helpers import (
 )
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, Reservation, ReservationMetadataField, Space
+from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, Reservation, ReservationMetadataField
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
@@ -37,7 +36,7 @@ if TYPE_CHECKING:
     from decimal import Decimal
 
     from tilavarauspalvelu.integrations.verkkokauppa.order.types import Order
-    from tilavarauspalvelu.models import Location, ReservationUnit, Unit
+    from tilavarauspalvelu.models import ReservationUnit, Unit
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
     from tilavarauspalvelu.typing import Lang
 
@@ -117,13 +116,14 @@ class ReservationActions:
         """Adds the actual event information to the ical file."""
         ical_event = Event()
 
+        unit: Unit = self.reservation.reservation_units.first().unit
+
         site_name = str(settings.EMAIL_VARAAMO_EXT_LINK).removesuffix("/")
         # This should be unique such that if another iCal file is created
         # for the same reservation, it will be the same as the previous one.
         uid = f"varaamo.reservation.{self.reservation.pk}@{site_name}"
         summary = self.get_ical_summary(language=language)
         description = self.get_ical_description(site_name=site_name, language=language)
-        location = self.get_location()
 
         ical_event.add(name=EventProperty.UID, value=uid)
         ical_event.add(name=EventProperty.DTSTAMP, value=local_datetime())
@@ -134,10 +134,9 @@ class ReservationActions:
         ical_event.add(name=EventProperty.DESCRIPTION, value=description, parameters={"FMTTYPE": "text/html"})
         ical_event.add(name=EventProperty.X_ALT_DESC, value=description, parameters={"FMTTYPE": "text/html"})
 
-        if location is not None:
-            ical_event.add(name=EventProperty.LOCATION, value=location.address)
-            if location.coordinates is not None:
-                ical_event.add(name=EventProperty.GEO, value=(location.lat, location.lon))
+        ical_event.add(name=EventProperty.LOCATION, value=unit.address)
+        if unit.coordinates is not None:
+            ical_event.add(name=EventProperty.GEO, value=(unit.lat, unit.lon))
 
         return ical_event
 
@@ -157,8 +156,7 @@ class ReservationActions:
         title = pgettext("ICAL", "Booking details")
         reservation_unit_name = get_attr_by_language(reservation_unit, "name", language)
         unit_name = get_attr_by_language(unit, "name", language)
-        location = self.get_location()
-        address = location.address if location is not None else ""
+        address = unit.address
         start_date = begin.date().strftime("%d.%m.%Y")
         start_time = begin.time().strftime("%H:%M")
         end_date = end.date().strftime("%d.%m.%Y")
@@ -198,18 +196,6 @@ class ReservationActions:
             f"</body>"
             f"</html>"
         )
-
-    def get_location(self) -> Location | None:
-        reservation_unit: ReservationUnit = (
-            self.reservation.reservation_units.select_related("unit__location")
-            .prefetch_related(Prefetch("spaces", Space.objects.select_related("location")))
-            .first()
-        )
-        unit: Unit = reservation_unit.unit
-        location: Location | None = getattr(unit, "location", None)
-        if location is None:
-            return reservation_unit.actions.get_location()
-        return location
 
     def get_email_reservee_name(self) -> str:
         # Note: Different from 'reservation.reservee_name' (simpler, mainly)

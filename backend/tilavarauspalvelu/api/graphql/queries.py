@@ -19,7 +19,6 @@ from .types.city.types import CityNode
 from .types.equipment.types import EquipmentAllNode, EquipmentNode
 from .types.equipment_category.types import EquipmentCategoryNode
 from .types.helsinki_profile.types import HelsinkiProfileDataNode
-from .types.location.types import LocationNode
 from .types.organisation.types import OrganisationNode
 from .types.payment_merchant.types import PaymentMerchantNode
 from .types.payment_order.types import PaymentOrderNode
@@ -66,7 +65,6 @@ __all__ = [
     "EquipmentNode",
     "GeneralRoleNode",
     "HelsinkiProfileDataNode",
-    "LocationNode",
     "OrganisationNode",
     "PaymentMerchantNode",
     "PaymentOrderNode",

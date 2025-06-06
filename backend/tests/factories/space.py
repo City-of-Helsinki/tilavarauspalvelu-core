@@ -41,7 +41,6 @@ class SpaceFactory(GenericDjangoModelFactory[Space]):
     parent = ForeignKeyFactory("tests.factories.SpaceFactory")
     unit = ForeignKeyFactory("tests.factories.UnitFactory", required=True)
 
-    location = ReverseOneToOneFactory("tests.factories.LocationFactory")
     children = ReverseOneToOneFactory("tests.factories.SpaceFactory")
 
     resources = ReverseForeignKeyFactory("tests.factories.ResourceFactory")
