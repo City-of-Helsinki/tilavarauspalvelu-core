@@ -4,14 +4,16 @@ import {
   covertCellsToTimeRange,
   type TimeSpan,
   type DailyOpeningHours,
+  createCells,
 } from "./timeSelectorModule";
 import { type SuitableTimeRangeFormValues } from "./form";
 import { Priority, Weekday } from "@/gql/gql-types";
 import { type Cell } from "common/src/components/ApplicationTimeSelector";
-import { type Day } from "common/src/conversion";
+import { type DayT } from "common/src/const";
+import { toApiTimeUnsafe } from "common/src/common/util";
 
 function createDayCells(
-  day: Day,
+  day: DayT,
   openRanges: { begin: number; end: number }[] = [] as const,
   selectedRange: TimeSpan[] = [] as const
 ): Cell[] {
@@ -30,6 +32,146 @@ function createDayCells(
     };
   });
 }
+
+describe("createCells", () => {
+  test.for([
+    {
+      begin: "08:00",
+      end: "12:00",
+      expectedCount: 4,
+    },
+    {
+      begin: "09:00",
+      end: "19:00",
+      expectedCount: 10,
+    },
+    {
+      begin: "09:00",
+      end: "19:00",
+      expectedCount: 10,
+    },
+    {
+      begin: "11:00",
+      end: "19:00",
+      expectedCount: 8,
+    },
+  ])(
+    "open without gaps from $begin to $end is $expectedCount",
+    ({ begin, end, expectedCount }) => {
+      const openingHours: DailyOpeningHours = [
+        {
+          weekday: 0,
+          closed: false,
+          reservableTimes: [{ begin, end }],
+        },
+      ];
+      const res = createCells(openingHours);
+      expect(res).toHaveLength(7);
+      const openCount = res.reduce((acc, dayCells) => {
+        return (
+          acc + dayCells.filter((cell) => cell.openState === "open").length
+        );
+      }, 0);
+      expect(openCount).toBe(expectedCount);
+    }
+  );
+
+  test.for([
+    {
+      times: [
+        {
+          begin: "08:00",
+          end: "12:00",
+        },
+        {
+          begin: "14:00",
+          end: "18:00",
+        },
+      ],
+      expectedOpenCount: 4 + 4,
+    },
+    {
+      times: [
+        {
+          begin: "07:00",
+          end: "11:00",
+        },
+        {
+          begin: "14:00",
+          end: "18:00",
+        },
+      ],
+      expectedOpenCount: 4 + 4,
+    },
+    {
+      times: [
+        {
+          begin: "09:00",
+          end: "10:00",
+        },
+        {
+          begin: "22:00",
+          end: "23:00",
+        },
+      ],
+      expectedOpenCount: 1 + 1,
+    },
+    {
+      times: [
+        {
+          begin: "09:00",
+          end: "10:00",
+        },
+        {
+          begin: "22:00",
+          end: "00:00",
+        },
+      ],
+      expectedOpenCount: 1 + 2,
+    },
+    // one hour slots with holes
+    {
+      times: [7, 9, 11, 13, 15, 17].map((i) => ({
+        begin: toApiTimeUnsafe({ hours: i }),
+        end: toApiTimeUnsafe({ hours: i + 1 }),
+      })),
+      expectedOpenCount: 6,
+    },
+    // maximum holes: because calendar is 7:00 - 24:00 -> 8 slots
+    // API allows 0:00 - 24:00, but we remove the first 7 hours
+    {
+      times: Array.from({ length: 12 }, (_, i) => ({
+        begin: toApiTimeUnsafe({ hours: 2 * i }),
+        end: toApiTimeUnsafe({ hours: 2 * i + 1 }),
+      })),
+      expectedOpenCount: 8,
+    },
+    // every hour is set as individual span -> maximum open slots (7:00 - 24:00)
+    {
+      times: Array.from({ length: 24 }, (_, i) => ({
+        begin: toApiTimeUnsafe({ hours: i }),
+        end: toApiTimeUnsafe({ hours: i + 1 }),
+      })),
+      expectedOpenCount: 24 - 7,
+    },
+  ])("open time with gaps", ({ times, expectedOpenCount }) => {
+    const openTimes: DailyOpeningHours = [
+      {
+        // TODO fuzzy the weekday
+        weekday: 0,
+        closed: false,
+        reservableTimes: times,
+      },
+    ];
+
+    const res = createCells(openTimes);
+    expect(res).toHaveLength(7);
+    const openCount = res.reduce((acc, dayCells) => {
+      return acc + dayCells.filter((cell) => cell.openState === "open").length;
+    }, 0);
+    expect(openCount).toBe(expectedOpenCount);
+  });
+});
 
 describe("aesToCells", () => {
   function createInputDay({
@@ -63,7 +205,7 @@ describe("aesToCells", () => {
     expect(res).toHaveLength(7);
     for (const [i, cell] of res.entries()) {
       expect(cell).toHaveLength(17);
-      const expected = createDayCells(i as Day);
+      const expected = createDayCells(i as DayT);
       expect(cell).toEqual(expected);
     }
   });
@@ -78,7 +220,7 @@ describe("aesToCells", () => {
         { begin: 8, end: 12 },
         { begin: 13, end: 17 },
       ]),
-      ...Array.from({ length: 6 }, (_, i) => createDayCells((i + 1) as Day)),
+      ...Array.from({ length: 6 }, (_, i) => createDayCells((i + 1) as DayT)),
     ];
     for (const [i, day] of res.entries()) {
       expect(day).toHaveLength(17);
@@ -92,7 +234,7 @@ describe("aesToCells", () => {
     const res = aesToCells(schedule, openingHours);
     expect(res).toHaveLength(7);
     const expected = Array.from({ length: 7 }, (_, i) =>
-      createDayCells(i as Day, [
+      createDayCells(i as DayT, [
         { begin: 8, end: 12 },
         { begin: 13, end: 17 },
       ])
@@ -109,12 +251,12 @@ describe("aesToCells", () => {
     const res = aesToCells(schedule, openingHours);
     expect(res).toHaveLength(7);
     const expected = [
-      ...Array.from({ length: 4 }, (_, i) => createDayCells(i as Day)),
+      ...Array.from({ length: 4 }, (_, i) => createDayCells(i as DayT)),
       createDayCells(4, [
         { begin: 8, end: 12 },
         { begin: 13, end: 17 },
       ]),
-      ...Array.from({ length: 2 }, (_, i) => createDayCells((i + 5) as Day)),
+      ...Array.from({ length: 2 }, (_, i) => createDayCells((i + 5) as DayT)),
     ];
     for (const [i, day] of res.entries()) {
       expect(day).toHaveLength(17);
@@ -136,7 +278,7 @@ describe("aesToCells", () => {
     expect(res).toHaveLength(7);
     const expected = Array.from({ length: 7 }, (_, i) =>
       createDayCells(
-        i as Day,
+        i as DayT,
         [
           { begin: 8, end: 12 },
           { begin: 13, end: 17 },
@@ -164,7 +306,7 @@ describe("aesToCells", () => {
     expect(res).toHaveLength(7);
     const expected = Array.from({ length: 7 }, (_, i) =>
       createDayCells(
-        i as Day,
+        i as DayT,
         [
           { begin: 8, end: 12 },
           { begin: 13, end: 17 },

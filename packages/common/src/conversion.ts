@@ -6,9 +6,9 @@ import {
   ReserveeType,
   Weekday,
 } from "../gql/gql-types";
+import { type DayT } from "./const";
 
-export type Day = 0 | 1 | 2 | 3 | 4 | 5 | 6;
-export function transformWeekday(d: Day): Weekday {
+export function transformWeekday(d: DayT): Weekday {
   switch (d) {
     case 0:
       return Weekday.Monday;
@@ -27,7 +27,7 @@ export function transformWeekday(d: Day): Weekday {
   }
 }
 
-export function convertWeekday(d: Weekday): Day {
+export function convertWeekday(d: Weekday): DayT {
   switch (d) {
     case Weekday.Monday:
       return 0;

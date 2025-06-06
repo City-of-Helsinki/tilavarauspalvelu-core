@@ -18,7 +18,8 @@ import {
 } from "./utils";
 import { useSearchParams } from "react-router-dom";
 import { AllocatedSectionsTable, SORT_KEYS } from "./AllocatedSectionsTable";
-import { transformWeekday, type Day } from "common/src/conversion";
+import { transformWeekday } from "common/src/conversion";
+import { type DayT } from "common/src/const";
 import { getPermissionErrors } from "common/src/apolloUtils";
 import { CenterSpinner } from "common/styled";
 
@@ -55,7 +56,7 @@ export function TimeSlotDataLoader({
       dayOfTheWeek: weekDayFilter
         .map(Number)
         .filter(Number.isFinite)
-        .filter((n): n is Day => n >= 0 && n <= 6)
+        .filter((n): n is DayT => n >= 0 && n <= 6)
         .map(transformWeekday),
       allocatedReservationUnit: reservationUnitFilter
         .map(Number)
