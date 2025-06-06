@@ -213,7 +213,7 @@ def test_anonymization__can_anonymize__open_reservations():
     user = UserFactory.create(first_name="foo")
 
     now = local_datetime()
-    ReservationFactory.create(user=user, begin=now, end=now + datetime.timedelta(days=1))
+    ReservationFactory.create(user=user, begins_at=now, ends_at=now + datetime.timedelta(days=1))
 
     can_anonymize = user.actions.can_anonymize()
 
@@ -240,8 +240,8 @@ def test_anonymization__can_anonymize__open_payments():
 
     PaymentOrderFactory.create(
         reservation__user=user,
-        reservation__begin=datetime.datetime(2022, 1, 1),
-        reservation__end=datetime.datetime(2022, 1, 2),
+        reservation__begins_at=datetime.datetime(2022, 1, 1),
+        reservation__ends_at=datetime.datetime(2022, 1, 2),
         remote_id=uuid.uuid4(),
         status=OrderStatus.DRAFT,
     )
@@ -264,7 +264,7 @@ def test_anonymization__anonymize_inactive_users():
     user_4 = UserFactory.create(first_name="bax", last_login=None, date_joined=now - datetime.timedelta(days=11))
 
     # User 2 cannot be anonymized, since it has open reservations
-    ReservationFactory.create(user=user_2, begin=now, end=now + datetime.timedelta(days=1))
+    ReservationFactory.create(user=user_2, begins_at=now, ends_at=now + datetime.timedelta(days=1))
 
     User.objects.anonymize_inactive_users()
 

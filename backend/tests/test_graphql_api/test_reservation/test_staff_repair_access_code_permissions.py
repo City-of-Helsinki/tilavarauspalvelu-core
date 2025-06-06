@@ -32,8 +32,8 @@ def test_staff_repair_access_code__regular_user(graphql):
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=now,
         access_code_is_active=True,
-        begin=now + datetime.timedelta(hours=1),
-        end=now + datetime.timedelta(hours=2),
+        begins_at=now + datetime.timedelta(hours=1),
+        ends_at=now + datetime.timedelta(hours=2),
     )
 
     data = {
@@ -60,8 +60,8 @@ def test_staff_repair_access_code__unit_handler(graphql):
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=now,
         access_code_is_active=False,
-        begin=now + datetime.timedelta(hours=1),
-        end=now + datetime.timedelta(hours=2),
+        begins_at=now + datetime.timedelta(hours=1),
+        ends_at=now + datetime.timedelta(hours=2),
         reservation_units=[reservation_unit],
     )
 
@@ -97,8 +97,8 @@ def test_staff_repair_access_code__general_handler(graphql):
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=now,
         access_code_is_active=False,
-        begin=now + datetime.timedelta(hours=1),
-        end=now + datetime.timedelta(hours=2),
+        begins_at=now + datetime.timedelta(hours=1),
+        ends_at=now + datetime.timedelta(hours=2),
     )
 
     def hook(obj: Reservation) -> None:

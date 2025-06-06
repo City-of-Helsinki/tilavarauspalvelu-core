@@ -56,8 +56,8 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     cancel_details = ""
 
     # Time information
-    begin = fuzzy.FuzzyDateTime(start_dt=utc_datetime(2021, 1, 1))
-    end = LazyAttribute(lambda i: i.begin + datetime.timedelta(hours=2))
+    begins_at = fuzzy.FuzzyDateTime(start_dt=utc_datetime(2021, 1, 1))
+    ends_at = LazyAttribute(lambda i: i.begins_at + datetime.timedelta(hours=2))
 
     buffer_time_before = datetime.timedelta()
     buffer_time_after = datetime.timedelta()
@@ -157,8 +157,8 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         begin = next_hour(plus_hours=1)
         kwargs.setdefault("state", ReservationStateChoice.CONFIRMED)
         kwargs.setdefault("type", ReservationTypeChoice.NORMAL)
-        kwargs.setdefault("begin", begin)
-        kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
+        kwargs.setdefault("begins_at", begin)
+        kwargs.setdefault("ends_at", begin + datetime.timedelta(hours=1))
         kwargs.setdefault("reservation_units", [reservation_unit])
         return cls.create(**kwargs)
 
@@ -174,8 +174,8 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         begin = next_hour(plus_hours=1)
         kwargs.setdefault("state", ReservationStateChoice.CONFIRMED)
         kwargs.setdefault("type", ReservationTypeChoice.NORMAL)
-        kwargs.setdefault("begin", begin)
-        kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
+        kwargs.setdefault("begins_at", begin)
+        kwargs.setdefault("ends_at", begin + datetime.timedelta(hours=1))
         kwargs.setdefault("reservation_units", [reservation_unit])
         return cls.create(**kwargs)
 
@@ -204,8 +204,8 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
 
         begin = next_hour(plus_hours=1)
         kwargs.setdefault("state", ReservationStateChoice.CREATED)
-        kwargs.setdefault("begin", begin)
-        kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
+        kwargs.setdefault("begins_at", begin)
+        kwargs.setdefault("ends_at", begin + datetime.timedelta(hours=1))
         kwargs.setdefault("price", Decimal("12.4"))
         kwargs.setdefault("tax_percentage_value", Decimal("25.5"))
         kwargs.setdefault("reservation_units", [reservation_unit])
@@ -227,8 +227,8 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
 
         begin = next_hour(plus_hours=1)
         kwargs.setdefault("state", ReservationStateChoice.CONFIRMED)
-        kwargs.setdefault("begin", begin)
-        kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
+        kwargs.setdefault("begins_at", begin)
+        kwargs.setdefault("ends_at", begin + datetime.timedelta(hours=1))
         kwargs.setdefault("reservation_units", [reservation_unit])
         return cls.create(**kwargs)
 
@@ -242,8 +242,8 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
 
         begin = next_hour(plus_hours=1)
         kwargs.setdefault("state", ReservationStateChoice.CREATED)
-        kwargs.setdefault("begin", begin)
-        kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
+        kwargs.setdefault("begins_at", begin)
+        kwargs.setdefault("ends_at", begin + datetime.timedelta(hours=1))
         kwargs.setdefault("reservation_units", [reservation_unit])
         return cls.create(**kwargs)
 
@@ -258,8 +258,8 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         begin = next_hour(plus_hours=1)
         kwargs.setdefault("state", ReservationStateChoice.REQUIRES_HANDLING)
         kwargs.setdefault("type", ReservationTypeChoice.NORMAL)
-        kwargs.setdefault("begin", begin)
-        kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
+        kwargs.setdefault("begins_at", begin)
+        kwargs.setdefault("ends_at", begin + datetime.timedelta(hours=1))
         kwargs.setdefault("reservation_units", [reservation_unit])
         return cls.create(**kwargs)
 
@@ -274,8 +274,8 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         begin = next_hour(plus_hours=1)
         kwargs.setdefault("state", ReservationStateChoice.REQUIRES_HANDLING)
         kwargs.setdefault("type", ReservationTypeChoice.NORMAL)
-        kwargs.setdefault("begin", begin)
-        kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
+        kwargs.setdefault("begins_at", begin)
+        kwargs.setdefault("ends_at", begin + datetime.timedelta(hours=1))
         kwargs.setdefault("reservation_units", [reservation_unit])
         return cls.create(**kwargs)
 
@@ -289,8 +289,8 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
 
         begin = next_hour(plus_hours=-1)
         kwargs.setdefault("state", ReservationStateChoice.DENIED)
-        kwargs.setdefault("begin", begin - datetime.timedelta(hours=2))
-        kwargs.setdefault("end", begin - datetime.timedelta(hours=1))
+        kwargs.setdefault("begins_at", begin - datetime.timedelta(hours=2))
+        kwargs.setdefault("ends_at", begin - datetime.timedelta(hours=1))
         kwargs.setdefault("price", Decimal("12.4"))
         kwargs.setdefault("tax_percentage_value", Decimal("24.0"))
         kwargs.setdefault("payment_order__status", OrderStatus.PAID)
@@ -318,8 +318,8 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         begin = next_hour(plus_hours=1)
         kwargs.setdefault("state", ReservationStateChoice.CONFIRMED)
         kwargs.setdefault("type", ReservationTypeChoice.NORMAL)
-        kwargs.setdefault("begin", begin)
-        kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
+        kwargs.setdefault("begins_at", begin)
+        kwargs.setdefault("ends_at", begin + datetime.timedelta(hours=1))
         kwargs.setdefault("reservation_units", [reservation_unit])
         return cls.create(**kwargs)
 
@@ -341,8 +341,8 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
 
         kwargs.setdefault("state", ReservationStateChoice.CONFIRMED)
         kwargs.setdefault("type", ReservationTypeChoice.NORMAL)
-        kwargs.setdefault("begin", begin)
-        kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
+        kwargs.setdefault("begins_at", begin)
+        kwargs.setdefault("ends_at", begin + datetime.timedelta(hours=1))
         kwargs.setdefault("price", Decimal("12.4"))
         kwargs.setdefault("tax_percentage_value", Decimal("24.0"))
         kwargs.setdefault("reservation_units", [reservation_unit])
@@ -381,10 +381,10 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
             buffer_time_after=reservation_unit.buffer_time_after,
         )
 
-        if self.kwargs.get("begin") and self.kwargs.get("end"):
+        if self.kwargs.get("begins_at") and self.kwargs.get("ends_at"):
             self.set(
-                buffer_time_before=reservation_unit.actions.get_actual_before_buffer(self.kwargs["begin"]),
-                buffer_time_after=reservation_unit.actions.get_actual_after_buffer(self.kwargs["end"]),
+                buffer_time_before=reservation_unit.actions.get_actual_before_buffer(self.kwargs["begins_at"]),
+                buffer_time_after=reservation_unit.actions.get_actual_after_buffer(self.kwargs["ends_at"]),
             )
 
         return self
@@ -449,7 +449,7 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
 
     def starting_at(
         self,
-        begin: datetime.datetime,
+        begins_at: datetime.datetime,
         reservation_unit: ReservationUnit,
         *,
         allow_overnight: bool = False,
@@ -462,25 +462,25 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
 
         if not allow_overnight:
             # Reservation must end before midnight (=hour is 23)
-            max_hours = min(max_hours, 23 - begin.hour)
+            max_hours = min(max_hours, 23 - begins_at.hour)
 
             # If reservations cannot be this short on this day, go to the next day.
             if max_hours < min_hours:
                 raise NextDateError
 
         duration = random.choice(range(min_hours, max_hours + 1))  # '+ 1' is for inclusive range maximum
-        end = begin + datetime.timedelta(hours=duration)
+        ends_at = begins_at + datetime.timedelta(hours=duration)
 
         self.set(
-            begin=begin,
-            end=end,
-            buffer_time_before=reservation_unit.actions.get_actual_before_buffer(begin),
-            buffer_time_after=reservation_unit.actions.get_actual_after_buffer(end),
+            begins_at=begins_at,
+            ends_at=ends_at,
+            buffer_time_before=reservation_unit.actions.get_actual_before_buffer(begins_at),
+            buffer_time_after=reservation_unit.actions.get_actual_after_buffer(ends_at),
         )
 
         if pricing is not None:
             self.set(
-                price=round_decimal(pricing.actions.calculate_reservation_price(duration=end - begin), 2),
+                price=round_decimal(pricing.actions.calculate_reservation_price(duration=ends_at - begins_at), 2),
                 non_subsidised_price=pricing.highest_price,
                 unit_price=pricing.lowest_price if subsidised else pricing.highest_price,
                 tax_percentage_value=pricing.tax_percentage.value,
@@ -489,9 +489,9 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
         return self
 
     def use_reservation_unit_price(self) -> Self:
-        begin = self.kwargs.get("begin")
-        end = self.kwargs.get("end")
-        if not all([begin, end]):
+        begins_at = self.kwargs.get("begins_at")
+        ends_at = self.kwargs.get("ends_at")
+        if not all([begins_at, ends_at]):
             msg = "begin and end times must be set before using reservation unit pricing"
             raise ValueError(msg)
 
@@ -500,13 +500,13 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
             msg = "reservation unit must be set before using reservation unit pricing"
             raise ValueError(msg)
 
-        pricing = reservation_units[0].actions.get_active_pricing(by_date=begin)
+        pricing = reservation_units[0].actions.get_active_pricing(by_date=begins_at)
         if pricing is None:
             msg = "reservation unit must have active pricing for the given date"
             raise ValueError(msg)
 
         self.set(
-            price=round_decimal(pricing.actions.calculate_reservation_price(duration=end - begin), 2),
+            price=round_decimal(pricing.actions.calculate_reservation_price(duration=ends_at - begins_at), 2),
             non_subsidised_price=pricing.highest_price,
             unit_price=pricing.lowest_price,
             tax_percentage_value=pricing.tax_percentage.value,

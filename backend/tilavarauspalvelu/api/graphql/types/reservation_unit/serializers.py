@@ -368,7 +368,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
     def update(self, instance: ReservationUnit, validated_data: dict[str, Any]) -> ReservationUnit:
         # The ReservationUnit can't be archived if it has active reservations in the future
         if instance.publishing_state != ReservationUnitPublishingState.ARCHIVED and validated_data.get("is_archived"):
-            future_reservations = instance.reservations.going_to_occur().filter(end__gt=local_datetime())
+            future_reservations = instance.reservations.going_to_occur().filter(ends_at__gt=local_datetime())
             if future_reservations.exists():
                 msg = "Reservation unit can't be archived if it has any reservations in the future"
                 raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS)

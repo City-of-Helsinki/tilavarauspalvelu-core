@@ -37,13 +37,13 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
         model = Reservation
         fields = [
             "pk",
-            "begin",
-            "end",
+            "begins_at",
+            "ends_at",
             "state",
         ]
         extra_kwargs = {
-            "begin": {"required": True},
-            "end": {"required": True},
+            "begins_at": {"required": True},
+            "ends_at": {"required": True},
         }
 
     def validate(self, data: ReservationAdjustTimeData) -> ReservationAdjustTimeData:
@@ -56,41 +56,41 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
         self.instance.validators.validate_reservation_not_past_or_ongoing()
         self.instance.validators.validate_single_reservation_unit()
 
-        begin = data["begin"].astimezone(DEFAULT_TIMEZONE)
-        end = data["end"].astimezone(DEFAULT_TIMEZONE)
+        begins_at = data["begins_at"].astimezone(DEFAULT_TIMEZONE)
+        ends_at = data["ends_at"].astimezone(DEFAULT_TIMEZONE)
 
-        current_begin = self.instance.begin.astimezone(DEFAULT_TIMEZONE)
+        current_begin = self.instance.begins_at.astimezone(DEFAULT_TIMEZONE)
 
         reservation_unit: ReservationUnit = self.instance.reservation_units.first()
 
         reservation_unit.validators.validate_reservation_unit_is_direct_bookable()
         reservation_unit.validators.validate_reservation_unit_is_published()
-        reservation_unit.validators.validate_reservation_unit_is_reservable_at(begin=begin)
-        reservation_unit.validators.validate_begin_before_end(begin=begin, end=end)
-        reservation_unit.validators.validate_duration_is_allowed(duration=end - begin)
-        reservation_unit.validators.validate_reservation_days_before(begin=begin)
-        reservation_unit.validators.validate_reservation_unit_is_open(begin=begin, end=end)
-        reservation_unit.validators.validate_not_rescheduled_to_paid_date(begin=begin)
+        reservation_unit.validators.validate_reservation_unit_is_reservable_at(begin=begins_at)
+        reservation_unit.validators.validate_begin_before_end(begin=begins_at, end=ends_at)
+        reservation_unit.validators.validate_duration_is_allowed(duration=ends_at - begins_at)
+        reservation_unit.validators.validate_reservation_days_before(begin=begins_at)
+        reservation_unit.validators.validate_reservation_unit_is_open(begin=begins_at, end=ends_at)
+        reservation_unit.validators.validate_not_rescheduled_to_paid_date(begin=begins_at)
         reservation_unit.validators.validate_cancellation_rule(begin=current_begin)
-        reservation_unit.validators.validate_not_in_open_application_round(begin=begin.date(), end=end.date())
-        reservation_unit.validators.validate_reservation_begin_time(begin=begin)
+        reservation_unit.validators.validate_not_in_open_application_round(begin=begins_at.date(), end=ends_at.date())
+        reservation_unit.validators.validate_reservation_begin_time(begin=begins_at)
         reservation_unit.validators.validate_no_overlapping_reservations(
-            begin=begin, end=end, ignore_ids=[self.instance.pk]
+            begins_at=begins_at, ends_at=ends_at, ignore_ids=[self.instance.pk]
         )
 
         if self.instance.requires_handling:
             data["state"] = ReservationStateChoice.REQUIRES_HANDLING
 
-        data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
-        data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)
-        data["access_type"] = reservation_unit.actions.get_access_type_at(begin, default=AccessType.UNRESTRICTED)
+        data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begins_at)
+        data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(ends_at)
+        data["access_type"] = reservation_unit.actions.get_access_type_at(begins_at, default=AccessType.UNRESTRICTED)
 
         return data
 
     def update(self, instance: Reservation, validated_data: ReservationAdjustTimeData) -> Reservation:
         previous_data = ReservationAdjustTimeData(
-            begin=instance.begin,
-            end=instance.end,
+            begins_at=instance.begins_at,
+            ends_at=instance.ends_at,
             state=ReservationStateChoice(instance.state),
             buffer_time_before=instance.buffer_time_before,
             buffer_time_after=instance.buffer_time_after,

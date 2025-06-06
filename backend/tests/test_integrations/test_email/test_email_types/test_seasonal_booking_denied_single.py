@@ -196,8 +196,8 @@ def test_seasonal_booking_denied_single__send_email(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_seasonal_booking_denied_single_email(reservation)

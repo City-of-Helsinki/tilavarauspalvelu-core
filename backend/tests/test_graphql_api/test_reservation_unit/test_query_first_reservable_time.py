@@ -1351,8 +1351,8 @@ def test__reservation_unit__first_reservable_time__reservations__own_reservation
     # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=12),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=12),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -1401,8 +1401,8 @@ def test__reservation_unit__first_reservable_time__reservations__unrelated_reser
     # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_2,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=12),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=12),
     )
 
     response = graphql(reservation_units_reservable_query())
@@ -1445,15 +1445,15 @@ def test__reservation_unit__first_reservable_time__reservations__dont_include_ca
     # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=12),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=12),
         state=ReservationStateChoice.CANCELLED,
     )
     # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=12),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=12),
         state=ReservationStateChoice.DENIED,
     )
 
@@ -1501,8 +1501,8 @@ def test__reservation_unit__first_reservable_time__reservations__date_filters_on
     # 1st Jan 12:00 - 17:00 (5h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=_datetime(hour=12),
-        end=_datetime(hour=17),
+        begins_at=_datetime(hour=12),
+        ends_at=_datetime(hour=17),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -1557,8 +1557,8 @@ def test__reservation_unit__first_reservable_time__reservations__filter_start_ti
     # 1st Jan 14:00 - 15:30 (1h 30min)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=_datetime(hour=14),
-        end=_datetime(hour=15, minute=30),
+        begins_at=_datetime(hour=14),
+        ends_at=_datetime(hour=15, minute=30),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -1620,8 +1620,8 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_2,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=12),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=12),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -1683,8 +1683,8 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_2,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=12),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=12),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -1752,8 +1752,8 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_2,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=12),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=12),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -1888,14 +1888,14 @@ def test__reservation_unit__first_reservable_time__buffers__different_length_buf
     # 1st Jan 10:00 - 11:30 (1h 30min) | Buffer: 9:30-10:00 + 11:30-12:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=11, minute=30),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=11, minute=30),
     )
     # 1st Jan 13:00 - 15:30 (1h 30min) | Buffer: (?) + 15:30-16:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=_datetime(hour=13),
-        end=_datetime(hour=15, minute=30),
+        begins_at=_datetime(hour=13),
+        ends_at=_datetime(hour=15, minute=30),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -1971,14 +1971,14 @@ def test__reservation_unit__first_reservable_time__buffers__start_and_end_same_t
     # 1st Jan 10:00 - 11:30 (1h 30min) | Buffer: 11:30-12:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_30,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=11, minute=30),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=11, minute=30),
     )
     # 1st Jan 10:00 - 11:30 (1h 30min) | Buffer: 11:30-12:30
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_60,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=11, minute=30),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=11, minute=30),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -2058,20 +2058,20 @@ def test__reservation_unit__first_reservable_time__buffers__different_before_buf
     # 1st Jan 10:00 - 10:30 (30min)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=10, minute=30),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=10, minute=30),
     )
     # 1st Jan 12:00 - 13:00 (1h) | Buffer: 11:30-12:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_30,
-        begin=_datetime(hour=12),
-        end=_datetime(hour=13),
+        begins_at=_datetime(hour=12),
+        ends_at=_datetime(hour=13),
     )
     # 1st Jan 12:00 - 13:00 (1h) | Buffer: 11:00-12:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_60,
-        begin=_datetime(hour=12),
-        end=_datetime(hour=13),
+        begins_at=_datetime(hour=12),
+        ends_at=_datetime(hour=13),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -2151,15 +2151,15 @@ def test__reservation_unit__first_reservable_time__buffers__different_before_buf
     # 1st Jan 12:00-13:00 (1h) | Buffer: 11:30-12:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_30,
-        begin=_datetime(hour=12),
-        end=_datetime(hour=13),
+        begins_at=_datetime(hour=12),
+        ends_at=_datetime(hour=13),
     )
 
     # 1st Jan 12:00-13:00 (1h) | Buffer: 11:00-12:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_60,
-        begin=_datetime(hour=12),
-        end=_datetime(hour=13),
+        begins_at=_datetime(hour=12),
+        ends_at=_datetime(hour=13),
     )
 
     response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
@@ -2248,8 +2248,8 @@ def test__reservation_unit__first_reservable_time__extra_long_interval(graphql, 
     # 1st Jan 13:00 - 16:00 (3h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=_datetime(hour=13),
-        end=_datetime(hour=16),
+        begins_at=_datetime(hour=13),
+        ends_at=_datetime(hour=16),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -2320,8 +2320,8 @@ def test__reservation_unit__first_reservable_time__blocked_type_reservation_can_
     # 1st Jan 12:00 - 14:00 (2h)
     ReservationFactory.create(
         reservation_units=[reservation_unit],
-        begin=_datetime(hour=12),
-        end=_datetime(hour=14),
+        begins_at=_datetime(hour=12),
+        ends_at=_datetime(hour=14),
         buffer_time_before=datetime.timedelta(minutes=300),  # This buffer should be completely ignored
         buffer_time_after=datetime.timedelta(minutes=300),  # This buffer should be completely ignored
         type=ReservationTypeChoice.BLOCKED,
@@ -2396,8 +2396,8 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
 
     # 1st Jan 17:00-18:00 (1h) | Buffer: none
     ReservationFactory.create(
-        begin=_datetime(hour=17),
-        end=_datetime(hour=18),
+        begins_at=_datetime(hour=17),
+        ends_at=_datetime(hour=18),
         buffer_time_before=datetime.timedelta(),
         buffer_time_after=datetime.timedelta(),
         reservation_units=[reservation_unit],
@@ -2406,8 +2406,8 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
 
     # 1st Jan 18:30-19:30 (1h) | Buffer: none
     ReservationFactory.create(
-        begin=_datetime(hour=18, minute=30),
-        end=_datetime(hour=19, minute=30),
+        begins_at=_datetime(hour=18, minute=30),
+        ends_at=_datetime(hour=19, minute=30),
         buffer_time_before=datetime.timedelta(),
         buffer_time_after=datetime.timedelta(),
         reservation_units=[reservation_unit],
@@ -2416,8 +2416,8 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
 
     # 1st Jan 20:00-21:00 (1h) | Buffer: 19:45-21:30
     ReservationFactory.create(
-        begin=_datetime(hour=20),
-        end=_datetime(hour=21),
+        begins_at=_datetime(hour=20),
+        ends_at=_datetime(hour=21),
         buffer_time_before=datetime.timedelta(minutes=15),
         buffer_time_after=datetime.timedelta(minutes=30),
         reservation_units=[reservation_unit],

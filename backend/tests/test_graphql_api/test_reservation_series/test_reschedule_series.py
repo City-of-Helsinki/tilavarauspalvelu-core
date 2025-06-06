@@ -45,16 +45,16 @@ def test_reservation_series__reschedule_series__change_begin_date(graphql):
     reservation_series.refresh_from_db()
     reservation_series.begin_date = local_date(year=2023, month=12, day=11)
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 8
-    assert reservations[0].begin.date() == local_date(year=2023, month=12, day=11)
-    assert reservations[1].begin.date() == local_date(year=2023, month=12, day=18)
-    assert reservations[2].begin.date() == local_date(year=2023, month=12, day=25)
-    assert reservations[3].begin.date() == local_date(year=2024, month=1, day=1)
-    assert reservations[4].begin.date() == local_date(year=2024, month=1, day=8)
-    assert reservations[5].begin.date() == local_date(year=2024, month=1, day=15)
-    assert reservations[6].begin.date() == local_date(year=2024, month=1, day=22)
-    assert reservations[7].begin.date() == local_date(year=2024, month=1, day=29)
+    assert reservations[0].begins_at.date() == local_date(year=2023, month=12, day=11)
+    assert reservations[1].begins_at.date() == local_date(year=2023, month=12, day=18)
+    assert reservations[2].begins_at.date() == local_date(year=2023, month=12, day=25)
+    assert reservations[3].begins_at.date() == local_date(year=2024, month=1, day=1)
+    assert reservations[4].begins_at.date() == local_date(year=2024, month=1, day=8)
+    assert reservations[5].begins_at.date() == local_date(year=2024, month=1, day=15)
+    assert reservations[6].begins_at.date() == local_date(year=2024, month=1, day=22)
+    assert reservations[7].begins_at.date() == local_date(year=2024, month=1, day=29)
 
     assert EmailService.send_seasonal_booking_rescheduled_series_email.called is True
 
@@ -74,17 +74,17 @@ def test_reservation_series__reschedule_series__change_begin_time(graphql):
     reservation_series.refresh_from_db()
     assert reservation_series.begin_time == local_time(hour=8)
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 9
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=8)
-    assert reservations[1].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=8)
-    assert reservations[2].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=8)
-    assert reservations[3].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=8)
-    assert reservations[4].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=8)
-    assert reservations[5].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=8)
-    assert reservations[6].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=8)
-    assert reservations[7].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=8)
-    assert reservations[8].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=8)
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=8)
+    assert reservations[1].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=8)
+    assert reservations[2].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=8)
+    assert reservations[3].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=8)
+    assert reservations[4].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=8)
+    assert reservations[5].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=8)
+    assert reservations[6].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=8)
+    assert reservations[7].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=8)
+    assert reservations[8].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=8)
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
@@ -107,16 +107,16 @@ def test_reservation_series__reschedule_series__change_end_date(graphql):
     reservation_series.refresh_from_db()
     reservation_series.end_date = local_date(year=2024, month=1, day=28)
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 8
-    assert reservations[0].end.date() == local_date(year=2023, month=12, day=4)
-    assert reservations[1].end.date() == local_date(year=2023, month=12, day=11)
-    assert reservations[2].end.date() == local_date(year=2023, month=12, day=18)
-    assert reservations[3].end.date() == local_date(year=2023, month=12, day=25)
-    assert reservations[4].end.date() == local_date(year=2024, month=1, day=1)
-    assert reservations[5].end.date() == local_date(year=2024, month=1, day=8)
-    assert reservations[6].end.date() == local_date(year=2024, month=1, day=15)
-    assert reservations[7].end.date() == local_date(year=2024, month=1, day=22)
+    assert reservations[0].ends_at.date() == local_date(year=2023, month=12, day=4)
+    assert reservations[1].ends_at.date() == local_date(year=2023, month=12, day=11)
+    assert reservations[2].ends_at.date() == local_date(year=2023, month=12, day=18)
+    assert reservations[3].ends_at.date() == local_date(year=2023, month=12, day=25)
+    assert reservations[4].ends_at.date() == local_date(year=2024, month=1, day=1)
+    assert reservations[5].ends_at.date() == local_date(year=2024, month=1, day=8)
+    assert reservations[6].ends_at.date() == local_date(year=2024, month=1, day=15)
+    assert reservations[7].ends_at.date() == local_date(year=2024, month=1, day=22)
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
@@ -134,17 +134,17 @@ def test_reservation_series__reschedule_series__change_end_time(graphql):
     reservation_series.refresh_from_db()
     assert reservation_series.end_time == local_time(hour=14)
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 9
-    assert reservations[0].end.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=14)
-    assert reservations[1].end.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=14)
-    assert reservations[2].end.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=14)
-    assert reservations[3].end.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=14)
-    assert reservations[4].end.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=14)
-    assert reservations[5].end.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=14)
-    assert reservations[6].end.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=14)
-    assert reservations[7].end.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=14)
-    assert reservations[8].end.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=14)
+    assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=14)
+    assert reservations[1].ends_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=14)
+    assert reservations[2].ends_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=14)
+    assert reservations[3].ends_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=14)
+    assert reservations[4].ends_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=14)
+    assert reservations[5].ends_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=14)
+    assert reservations[6].ends_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=14)
+    assert reservations[7].ends_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=14)
+    assert reservations[8].ends_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=14)
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))  # Monday
@@ -177,17 +177,17 @@ def test_reservation_series__reschedule_series__change_weekdays(graphql):
     reservation_series.refresh_from_db()
     reservation_series.weekdays = f"{WeekdayChoice.TUESDAY}"
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 9
-    assert reservations[0].begin.date() == local_date(year=2023, month=12, day=5)
-    assert reservations[1].begin.date() == local_date(year=2023, month=12, day=12)
-    assert reservations[2].begin.date() == local_date(year=2023, month=12, day=19)
-    assert reservations[3].begin.date() == local_date(year=2023, month=12, day=26)
-    assert reservations[4].begin.date() == local_date(year=2024, month=1, day=2)
-    assert reservations[5].begin.date() == local_date(year=2024, month=1, day=9)
-    assert reservations[6].begin.date() == local_date(year=2024, month=1, day=16)
-    assert reservations[7].begin.date() == local_date(year=2024, month=1, day=23)
-    assert reservations[8].begin.date() == local_date(year=2024, month=1, day=30)
+    assert reservations[0].begins_at.date() == local_date(year=2023, month=12, day=5)
+    assert reservations[1].begins_at.date() == local_date(year=2023, month=12, day=12)
+    assert reservations[2].begins_at.date() == local_date(year=2023, month=12, day=19)
+    assert reservations[3].begins_at.date() == local_date(year=2023, month=12, day=26)
+    assert reservations[4].begins_at.date() == local_date(year=2024, month=1, day=2)
+    assert reservations[5].begins_at.date() == local_date(year=2024, month=1, day=9)
+    assert reservations[6].begins_at.date() == local_date(year=2024, month=1, day=16)
+    assert reservations[7].begins_at.date() == local_date(year=2024, month=1, day=23)
+    assert reservations[8].begins_at.date() == local_date(year=2024, month=1, day=30)
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
@@ -215,7 +215,7 @@ def test_reservation_series__reschedule_series__change_buffer_times(graphql):
     assert response.has_errors is False
 
     # Reservation buffer times are set.
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 9
     for reservation in reservations:
         assert reservation.buffer_time_before == datetime.timedelta(minutes=30)
@@ -263,19 +263,25 @@ def test_reservation_series__reschedule_series__change_part_of_the_series(graphq
 
     assert response.has_errors is False
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 9
     # Start times stay the same for past reservations.
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2023, month=12, day=4, hour=10)
-    assert reservations[1].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2023, month=12, day=11, hour=10)
-    assert reservations[2].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2023, month=12, day=18, hour=10)
-    assert reservations[3].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2023, month=12, day=25, hour=10)
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2023, month=12, day=4, hour=10)
+    assert reservations[1].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(
+        year=2023, month=12, day=11, hour=10
+    )
+    assert reservations[2].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(
+        year=2023, month=12, day=18, hour=10
+    )
+    assert reservations[3].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(
+        year=2023, month=12, day=25, hour=10
+    )
     # Start times change for future reservations.
-    assert reservations[4].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=1, hour=8)
-    assert reservations[5].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=8, hour=8)
-    assert reservations[6].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=15, hour=8)
-    assert reservations[7].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=22, hour=8)
-    assert reservations[8].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=29, hour=8)
+    assert reservations[4].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=1, hour=8)
+    assert reservations[5].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=8, hour=8)
+    assert reservations[6].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=15, hour=8)
+    assert reservations[7].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=22, hour=8)
+    assert reservations[8].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=29, hour=8)
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1, hour=11))  # Monday
@@ -289,20 +295,26 @@ def test_reservation_series__reschedule_series__change_part_of_the_series__durin
 
     assert response.has_errors is False
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 9
     # Start times stay the same for past reservations.
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2023, month=12, day=4, hour=10)
-    assert reservations[1].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2023, month=12, day=11, hour=10)
-    assert reservations[2].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2023, month=12, day=18, hour=10)
-    assert reservations[3].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2023, month=12, day=25, hour=10)
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2023, month=12, day=4, hour=10)
+    assert reservations[1].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(
+        year=2023, month=12, day=11, hour=10
+    )
+    assert reservations[2].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(
+        year=2023, month=12, day=18, hour=10
+    )
+    assert reservations[3].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(
+        year=2023, month=12, day=25, hour=10
+    )
     # Start time stays the same for ongoing reservation.
-    assert reservations[4].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=1, hour=10)
+    assert reservations[4].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=1, hour=10)
     # Start times change for future reservations.
-    assert reservations[5].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=8, hour=8)
-    assert reservations[6].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=15, hour=8)
-    assert reservations[7].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=22, hour=8)
-    assert reservations[8].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=29, hour=8)
+    assert reservations[5].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=8, hour=8)
+    assert reservations[6].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=15, hour=8)
+    assert reservations[7].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=22, hour=8)
+    assert reservations[8].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(year=2024, month=1, day=29, hour=8)
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
@@ -310,7 +322,7 @@ def test_reservation_series__reschedule_series__change_part_of_the_series__durin
 def test_reservation_series__reschedule_series__dont_remove_unconfirmed_reservations(graphql, state):
     reservation_series = create_reservation_series()
 
-    reservation: Reservation = reservation_series.reservations.order_by("begin").first()
+    reservation: Reservation = reservation_series.reservations.order_by("begins_at").first()
     reservation.state = state
     reservation.save()
 
@@ -321,14 +333,14 @@ def test_reservation_series__reschedule_series__dont_remove_unconfirmed_reservat
 
     assert response.has_errors is False
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 10
     # The unconfirmed reservation is still there.
     assert reservations[0].state == state
-    assert reservations[0].begin.date() == local_date(year=2023, month=12, day=4)
+    assert reservations[0].begins_at.date() == local_date(year=2023, month=12, day=4)
     # New reservations start from the new weekday.
     assert reservations[1].state == ReservationStateChoice.CONFIRMED
-    assert reservations[1].begin.date() == local_date(year=2023, month=12, day=5)
+    assert reservations[1].begins_at.date() == local_date(year=2023, month=12, day=5)
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))  # Friday
@@ -337,7 +349,7 @@ def test_reservation_series__reschedule_series__details_from_reservation__use_ne
 
     # Change name for the next reservation.
     # This should be enough to determine that we used this reservation's details.
-    reservation: Reservation = reservation_series.reservations.filter(begin__date=local_date()).first()
+    reservation: Reservation = reservation_series.reservations.filter(begins_at__date=local_date()).first()
     reservation.name = "bar"
     reservation.save()
 
@@ -348,7 +360,7 @@ def test_reservation_series__reschedule_series__details_from_reservation__use_ne
 
     assert response.has_errors is False
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 9
     # Past reservations don't have their details changed.
     assert reservations[0].name == "foo"
@@ -367,7 +379,7 @@ def test_reservation_series__reschedule_series__details_from_reservation__use_ne
 def test_reservation_series__reschedule_series__details_from_reservation__next_is_cancelled(graphql):
     reservation_series = create_reservation_series(reservations__name="foo")
 
-    reservations = reservation_series.reservations.filter(begin__date__gte=local_date()).iterator()
+    reservations = reservation_series.reservations.filter(begins_at__date__gte=local_date()).iterator()
 
     # The next reservation is cancelled, so we shouldn't use its details.
     reservation: Reservation = next(reservations)
@@ -387,7 +399,7 @@ def test_reservation_series__reschedule_series__details_from_reservation__next_i
 
     assert response.has_errors is False
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 10
     # Past reservations don't have their details changed.
     assert reservations[0].name == "foo"
@@ -397,11 +409,11 @@ def test_reservation_series__reschedule_series__details_from_reservation__next_i
 
     # Cancelled reservations don't have their details changed.
     assert reservations[4].name == "bar"
-    assert reservations[4].begin.date() == local_date(year=2024, month=1, day=1)
+    assert reservations[4].begins_at.date() == local_date(year=2024, month=1, day=1)
 
     # New reservation created since weekdays changed.
     assert reservations[5].name == "baz"
-    assert reservations[5].begin.date() == local_date(year=2024, month=1, day=2)
+    assert reservations[5].begins_at.date() == local_date(year=2024, month=1, day=2)
 
     # Other future reservations have details from the next reservation confirmed reservation.
     assert reservations[6].name == "baz"
@@ -497,14 +509,14 @@ def test_reservation_series__reschedule_series__invalid_start_interval(graphql):
 def test_reservation_series__reschedule_series__overlapping_reservations(graphql):
     reservation_series = create_reservation_series()
 
-    reservation: Reservation = reservation_series.reservations.order_by("begin").first()
-    begin_date = reservation.begin.date()
+    reservation: Reservation = reservation_series.reservations.order_by("begins_at").first()
+    begin_date = reservation.begins_at.date()
 
     # Add overlapping reservation
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_series.reservation_unit,
-        begin=combine(begin_date, local_time(hour=8, minute=0)),
-        end=combine(begin_date, local_time(hour=8, minute=30)),
+        begins_at=combine(begin_date, local_time(hour=8, minute=0)),
+        ends_at=combine(begin_date, local_time(hour=8, minute=30)),
         state=ReservationStateChoice.CONFIRMED,
     )
 
@@ -532,14 +544,14 @@ def test_reservation_series__reschedule_series__overlapping_reservations__buffer
         reservation_unit__buffer_time_before=datetime.timedelta(minutes=30),
     )
 
-    reservation: Reservation = reservation_series.reservations.order_by("begin").first()
-    begin_date = reservation.begin.date()
+    reservation: Reservation = reservation_series.reservations.order_by("begins_at").first()
+    begin_date = reservation.begins_at.date()
 
     # Add overlapping reservation, but only with the buffer time.
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_series.reservation_unit,
-        begin=combine(begin_date, local_time(hour=7, minute=0)),
-        end=combine(begin_date, local_time(hour=8, minute=00)),
+        begins_at=combine(begin_date, local_time(hour=7, minute=0)),
+        ends_at=combine(begin_date, local_time(hour=8, minute=00)),
         state=ReservationStateChoice.CONFIRMED,
     )
 
@@ -567,14 +579,14 @@ def test_reservation_series__reschedule_series__overlapping_reservations__buffer
         reservation_unit__buffer_time_after=datetime.timedelta(minutes=30),
     )
 
-    reservation: Reservation = reservation_series.reservations.order_by("begin").first()
-    begin_date = reservation.begin.date()
+    reservation: Reservation = reservation_series.reservations.order_by("begins_at").first()
+    begin_date = reservation.begins_at.date()
 
     # Add overlapping reservation, but only with the buffer time.
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_series.reservation_unit,
-        begin=combine(begin_date, local_time(hour=13, minute=0)),
-        end=combine(begin_date, local_time(hour=14, minute=00)),
+        begins_at=combine(begin_date, local_time(hour=13, minute=0)),
+        ends_at=combine(begin_date, local_time(hour=14, minute=00)),
         state=ReservationStateChoice.CONFIRMED,
     )
 
@@ -603,14 +615,14 @@ def test_reservation_series__reschedule_series__overlapping_reservations__only_b
         reservation_unit__buffer_time_after=datetime.timedelta(minutes=60),
     )
 
-    reservation: Reservation = reservation_series.reservations.order_by("begin").first()
-    begin_date = reservation.begin.date()
+    reservation: Reservation = reservation_series.reservations.order_by("begins_at").first()
+    begin_date = reservation.begins_at.date()
 
     # Add overlapping reservation, but only with the buffer time.
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_series.reservation_unit,
-        begin=combine(begin_date, local_time(hour=14, minute=0)),
-        end=combine(begin_date, local_time(hour=15, minute=00)),
+        begins_at=combine(begin_date, local_time(hour=14, minute=0)),
+        ends_at=combine(begin_date, local_time(hour=15, minute=00)),
         state=ReservationStateChoice.CONFIRMED,
     )
 
@@ -640,15 +652,15 @@ def test_reservation_series__reschedule_series__skip_dates(graphql):
     assert response.has_errors is False
 
     # Series is missing the two dates that were skipped.
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 7
-    assert reservations[0].begin.date() == local_date(year=2023, month=12, day=11)
-    assert reservations[1].begin.date() == local_date(year=2023, month=12, day=18)
-    assert reservations[2].begin.date() == local_date(year=2023, month=12, day=25)
-    assert reservations[3].begin.date() == local_date(year=2024, month=1, day=8)
-    assert reservations[4].begin.date() == local_date(year=2024, month=1, day=15)
-    assert reservations[5].begin.date() == local_date(year=2024, month=1, day=22)
-    assert reservations[6].begin.date() == local_date(year=2024, month=1, day=29)
+    assert reservations[0].begins_at.date() == local_date(year=2023, month=12, day=11)
+    assert reservations[1].begins_at.date() == local_date(year=2023, month=12, day=18)
+    assert reservations[2].begins_at.date() == local_date(year=2023, month=12, day=25)
+    assert reservations[3].begins_at.date() == local_date(year=2024, month=1, day=8)
+    assert reservations[4].begins_at.date() == local_date(year=2024, month=1, day=15)
+    assert reservations[5].begins_at.date() == local_date(year=2024, month=1, day=22)
+    assert reservations[6].begins_at.date() == local_date(year=2024, month=1, day=29)
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
@@ -722,17 +734,17 @@ def test_reservation_series__reschedule_series__same_day_ongoing_reservation(gra
     reservation_series.refresh_from_db()
     assert reservation_series.begin_time == local_time(hour=11)
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 9
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=10)
-    assert reservations[1].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
-    assert reservations[2].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
-    assert reservations[3].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
-    assert reservations[4].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
-    assert reservations[5].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
-    assert reservations[6].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
-    assert reservations[7].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
-    assert reservations[8].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=10)
+    assert reservations[1].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[2].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[3].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[4].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[5].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[6].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[7].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[8].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=4, hour=8))  # Monday
@@ -750,17 +762,17 @@ def test_reservation_series__reschedule_series__same_day_future_reservation(grap
     reservation_series.refresh_from_db()
     assert reservation_series.begin_time == local_time(hour=11)
 
-    reservations = list(reservation_series.reservations.order_by("begin").all())
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 9
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
-    assert reservations[1].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
-    assert reservations[2].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
-    assert reservations[3].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
-    assert reservations[4].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
-    assert reservations[5].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
-    assert reservations[6].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
-    assert reservations[7].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
-    assert reservations[8].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[1].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[2].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[3].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[4].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[5].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[6].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[7].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[8].begins_at.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))

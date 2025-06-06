@@ -86,7 +86,7 @@ def test_generate_reservation_series_from_allocations():
     assert series.user == user
     assert series.age_group == section.age_group
 
-    reservations: list[Reservation] = list(series.reservations.order_by("begin").all())
+    reservations: list[Reservation] = list(series.reservations.order_by("begins_at").all())
 
     assert len(reservations) == 3
 
@@ -106,14 +106,14 @@ def test_generate_reservation_series_from_allocations():
     assert reservations[0].billing_address_city == section.application.billing_address.city
     assert reservations[0].billing_address_zip == section.application.billing_address.post_code
 
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 12)
-    assert reservations[0].end.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 14)
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 12)
+    assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 14)
 
-    assert reservations[1].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 8, 12)
-    assert reservations[1].end.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 8, 14)
+    assert reservations[1].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 8, 12)
+    assert reservations[1].ends_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 8, 14)
 
-    assert reservations[2].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 15, 12)
-    assert reservations[2].end.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 15, 14)
+    assert reservations[2].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 15, 12)
+    assert reservations[2].ends_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 15, 14)
 
     assert RejectedOccurrence.objects.count() == 0
 
@@ -313,11 +313,11 @@ def test_generate_reservation_series_from_allocations__multiple_allocations():
 
     assert len(reservations) == 2
 
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 12)
-    assert reservations[0].end.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 14)
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 12)
+    assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 14)
 
-    assert reservations[1].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 2, 12)
-    assert reservations[1].end.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 2, 14)
+    assert reservations[1].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 2, 12)
+    assert reservations[1].ends_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 2, 14)
 
     assert HaukiAPIClient.get_date_periods.call_count == 1
 
@@ -381,8 +381,8 @@ def test_generate_reservation_series_from_allocations__overlapping_reservation()
 
     existing_reservation = ReservationFactory.create(
         reservation_units=[reservation_unit],
-        begin=local_datetime(2024, 1, 1, 12, 0),
-        end=local_datetime(2024, 1, 1, 14, 0),
+        begins_at=local_datetime(2024, 1, 1, 12, 0),
+        ends_at=local_datetime(2024, 1, 1, 14, 0),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -501,8 +501,8 @@ def test_generate_reservation_series_from_allocations__explicitly_closed_opening
     reservations: list[Reservation] = list(Reservation.objects.all())
     assert len(reservations) == 1
 
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 12)
-    assert reservations[0].end.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 14)
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 12)
+    assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 14)
 
     assert HaukiAPIClient.get_date_periods.call_count == 1
 
@@ -611,7 +611,7 @@ def test_generate_reservation_series_from_allocations__two_reservation_units_wit
 
     application_round.actions.generate_reservations_from_allocations()
 
-    qs = Reservation.objects.order_by("begin")
+    qs = Reservation.objects.order_by("begins_at")
 
     reservations: list[Reservation] = list(qs.filter(reservation_units=reservation_unit_1))
     assert len(reservations) == 3

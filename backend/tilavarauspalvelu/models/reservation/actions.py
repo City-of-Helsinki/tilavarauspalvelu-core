@@ -55,7 +55,7 @@ class ReservationActions:
         buffer_time_before: datetime.timedelta = self.reservation.buffer_time_before or datetime.timedelta()
         reservation_unit: ReservationUnit
         for reservation_unit in self.reservation.reservation_units.all():
-            before = reservation_unit.actions.get_actual_before_buffer(self.reservation.begin)
+            before = reservation_unit.actions.get_actual_before_buffer(self.reservation.begins_at)
             buffer_time_before = max(before, buffer_time_before)
         return buffer_time_before
 
@@ -63,7 +63,7 @@ class ReservationActions:
         buffer_time_after: datetime.timedelta = self.reservation.buffer_time_after or datetime.timedelta()
         reservation_unit: ReservationUnit
         for reservation_unit in self.reservation.reservation_units.all():
-            after = reservation_unit.actions.get_actual_after_buffer(self.reservation.end)
+            after = reservation_unit.actions.get_actual_after_buffer(self.reservation.ends_at)
             buffer_time_after = max(after, buffer_time_after)
         return buffer_time_after
 
@@ -127,8 +127,8 @@ class ReservationActions:
 
         ical_event.add(name=EventProperty.UID, value=uid)
         ical_event.add(name=EventProperty.DTSTAMP, value=local_datetime())
-        ical_event.add(name=EventProperty.DTSTART, value=self.reservation.begin.astimezone(DEFAULT_TIMEZONE))
-        ical_event.add(name=EventProperty.DTEND, value=self.reservation.end.astimezone(DEFAULT_TIMEZONE))
+        ical_event.add(name=EventProperty.DTSTART, value=self.reservation.begins_at.astimezone(DEFAULT_TIMEZONE))
+        ical_event.add(name=EventProperty.DTEND, value=self.reservation.ends_at.astimezone(DEFAULT_TIMEZONE))
 
         ical_event.add(name=EventProperty.SUMMARY, value=summary)
         ical_event.add(name=EventProperty.DESCRIPTION, value=description, parameters={"FMTTYPE": "text/html"})
@@ -151,8 +151,8 @@ class ReservationActions:
     def get_ical_description(self, *, site_name: str, language: Lang = "fi") -> str:
         reservation_unit: ReservationUnit = self.reservation.reservation_units.first()
         unit: Unit = reservation_unit.unit
-        begin = self.reservation.begin.astimezone(DEFAULT_TIMEZONE)
-        end = self.reservation.end.astimezone(DEFAULT_TIMEZONE)
+        begin = self.reservation.begins_at.astimezone(DEFAULT_TIMEZONE)
+        end = self.reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
 
         title = pgettext("ICAL", "Booking details")
         reservation_unit_name = get_attr_by_language(reservation_unit, "name", language)
@@ -359,7 +359,7 @@ class ReservationActions:
 
         invoicing_date: datetime.date | None = None
         if self.should_offer_invoicing():
-            invoicing_date = self.reservation.begin.date()
+            invoicing_date = self.reservation.begins_at.date()
 
         order_params = get_verkkokauppa_order_params(self.reservation, invoicing_date=invoicing_date)
 
@@ -376,8 +376,8 @@ class ReservationActions:
         reservation_unit = self.reservation.reservation_units.first()
         return Reservation.objects.overlapping_reservations(
             reservation_unit=reservation_unit,
-            begin=self.reservation.begin,
-            end=self.reservation.end,
+            begin=self.reservation.begins_at,
+            end=self.reservation.ends_at,
             buffer_time_before=self.reservation.buffer_time_before,
             buffer_time_after=self.reservation.buffer_time_after,
         ).exclude(id=self.reservation.id)
@@ -395,7 +395,7 @@ class ReservationActions:
 
         reservation_unit: ReservationUnit = self.reservation.reservation_units.first()
 
-        pricing = reservation_unit.actions.get_active_pricing(by_date=self.reservation.begin.date())
+        pricing = reservation_unit.actions.get_active_pricing(by_date=self.reservation.begins_at.date())
         if pricing is None:
             return False
 

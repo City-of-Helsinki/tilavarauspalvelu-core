@@ -231,8 +231,8 @@ def params_for_base_info(*, reservation: Reservation, language: Lang) -> dict[st
         "reservation_unit_name": get_attr_by_language(primary, "name", language),
         "unit_name": get_attr_by_language(primary.unit, "name", language),
         "unit_location": primary.actions.get_address(),
-        "begin_datetime": reservation.begin.astimezone(DEFAULT_TIMEZONE),
-        "end_datetime": reservation.end.astimezone(DEFAULT_TIMEZONE),
+        "begin_datetime": reservation.begins_at.astimezone(DEFAULT_TIMEZONE),
+        "end_datetime": reservation.ends_at.astimezone(DEFAULT_TIMEZONE),
     }
 
 
@@ -245,8 +245,8 @@ def params_for_price_info(*, reservation: Reservation) -> dict[str, Any]:
 
 
 def params_for_price_range_info(*, reservation: Reservation) -> dict[str, Any]:
-    begin_datetime = reservation.begin.astimezone(DEFAULT_TIMEZONE)
-    end_datetime = reservation.end.astimezone(DEFAULT_TIMEZONE)
+    begin_datetime = reservation.begins_at.astimezone(DEFAULT_TIMEZONE)
+    end_datetime = reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
 
     subsidised_price = reservation.actions.calculate_full_price(begin_datetime, end_datetime, subsidised=True)
 

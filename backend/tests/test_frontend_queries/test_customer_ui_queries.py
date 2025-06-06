@@ -81,8 +81,8 @@ def test_frontend_queries__customer_ui__AffectingReservations(graphql):
 
     factory_args = query_info.factory_args
     factory_args["reservation_units"] = [reservation_unit]
-    factory_args["begin"] = local_datetime(2024, 1, 1, 12, 0)
-    factory_args["end"] = local_datetime(2024, 1, 1, 15, 0)
+    factory_args["begins_at"] = local_datetime(2024, 1, 1, 12, 0)
+    factory_args["ends_at"] = local_datetime(2024, 1, 1, 15, 0)
     query_info.factory.create(**factory_args)
 
     ReservationUnitHierarchy.refresh()
@@ -619,7 +619,7 @@ def test_frontend_queries__customer_ui__ListInProgressReservations(graphql):
 
     variables = deepcopy(query_info.variables)
     variables["user"] = [obj.pk]
-    variables["beginDate"] = obj.begin.date().isoformat()
+    variables["beginDate"] = obj.begins_at.date().isoformat()
     assert_no_undefined_variables(variables)
 
     query = query_info.query

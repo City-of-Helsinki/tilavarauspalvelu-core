@@ -78,7 +78,7 @@ def test_frontend_api__reservation__set_datetime__default_options(api_client):
     assert reservation_unit.cancellation_rule.can_be_cancelled_time_before is None
 
     reservation = Reservation.objects.first()
-    assert reservation.begin == local_datetime(2022, 1, 2, 12)
+    assert reservation.begins_at == local_datetime(2022, 1, 2, 12)
     assert reservation.state == ReservationStateChoice.CONFIRMED
     assert reservation.reservation_series is None
 
@@ -116,7 +116,7 @@ def test_frontend_api__reservation__set_datetime__non_default_options(api_client
 
     assert Reservation.objects.count() == 1
     reservation = Reservation.objects.first()
-    assert reservation.begin == local_datetime(2029, 12, 31, 00)
+    assert reservation.begins_at == local_datetime(2029, 12, 31, 00)
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
     assert reservation.reservation_series is not None
 
@@ -162,7 +162,7 @@ def test_frontend_api__reservation__set_datetime__multiple_api_calls(api_client)
 
     assert Reservation.objects.count() == 1
     reservation = Reservation.objects.first()
-    assert reservation.begin == local_datetime(2022, 1, 2, 12)
+    assert reservation.begins_at == local_datetime(2022, 1, 2, 12)
 
     data = {
         "current_datetime": "2030-01-01T12:00:00",
@@ -175,4 +175,4 @@ def test_frontend_api__reservation__set_datetime__multiple_api_calls(api_client)
 
     assert Reservation.objects.count() == 2  # Database is not flushed when running automated tests
     reservation = Reservation.objects.last()
-    assert reservation.begin == local_datetime(2030, 1, 2, 12)
+    assert reservation.begins_at == local_datetime(2030, 1, 2, 12)
