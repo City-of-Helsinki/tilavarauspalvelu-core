@@ -19,7 +19,7 @@ function customRender(proper = true): ReturnType<typeof render> {
   );
 }
 
-describe("Component: ReservationInfoSection | With content", () => {
+describe("Component: ReservationInfoSection | All values present", () => {
   it.for(createSupportedFieldsMock())(
     `should render %o with correct value`,
     (field) => {
