@@ -47,7 +47,8 @@ type InstructionsKey =
   | "reservationPendingInstructions"
   | "reservationCancelledInstructions"
   | "reservationConfirmedInstructions";
-function getReservationUnitInstructionsKey(
+
+export function getReservationUnitInstructionsKey(
   state: Maybe<ReservationStateChoice> | undefined
 ): InstructionsKey | null {
   switch (state) {
@@ -64,7 +65,7 @@ function getReservationUnitInstructionsKey(
   }
 }
 
-export const INSTRUCTIOSN_FRAGMENT = gql`
+export const INSTRUCTIONS_FRAGMENT = gql`
   fragment Instructions on ReservationNode {
     id
     state
