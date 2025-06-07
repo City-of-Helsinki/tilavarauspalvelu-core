@@ -71,12 +71,12 @@ import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
-import { Instructions } from "@/components/Instructions";
 import { gql } from "@apollo/client";
 import StatusLabel from "common/src/components/StatusLabel";
 import IconButton from "common/src/components/IconButton";
 import {
   NotModifiableReason,
+  Instructions,
   LabelValuePair,
   ReservationStatus,
   ReservationInfoCard,

@@ -1,6 +1,7 @@
 export { LabelValuePair } from "./LabelValuePair";
 export { NotModifiableReason } from "./NotModifiableReason";
 export { AcceptTerms } from "./AcceptTerms";
+export { Instructions } from "./Instructions";
 export { ReservationCard } from "./ReservationCard";
 export { ReservationInfoCard } from "./ReservationInfoCard";
 export { ReservationStatus } from "./ReservationStatus";
