@@ -32,7 +32,7 @@ import { Flex, H1 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
 import { BackLinkList } from "@/components/reservation/CancelledLinkSet";
-import { Instructions } from "@/components/Instructions";
+import { Instructions } from "@/components/reservation/Instructions";
 import { gql } from "@apollo/client";
 
 function Confirmation({ apiBaseUrl, reservation }: PropsNarrowed) {
