@@ -145,7 +145,9 @@ function Reservation({
   reservation,
   feedbackUrl,
   options,
-}: Readonly<PropsNarrowed>): JSX.Element | null {
+}: Readonly<
+  Pick<PropsNarrowed, "termsOfUse" | "reservation" | "feedbackUrl" | "options">
+>): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const shouldShowAccessCode =
     isBefore(sub(new Date(), { days: 1 }), new Date(reservation.end)) &&
@@ -274,6 +276,7 @@ function Reservation({
                 disabled={!reservation.calendarUrl}
                 data-testid="reservation__button--calendar-link"
                 href={reservation.calendarUrl ?? ""}
+                role="button"
               >
                 {t("reservations:saveToCalendar")}
                 <IconCalendar />
@@ -285,6 +288,7 @@ function Reservation({
                 data-testid="reservation__confirmation--button__receipt-link"
                 href={`${reservation.paymentOrder?.receiptUrl}&lang=${lang}`}
                 target="_blank"
+                role="button"
               >
                 {t("reservations:downloadReceipt")}
                 <IconLinkExternal />
@@ -300,6 +304,7 @@ function Reservation({
                 disabled={!hasCheckoutUrl}
                 href={checkoutUrl ?? ""}
                 data-testid="reservation-detail__button--checkout"
+                role="button"
               >
                 {t("reservations:payReservation")}
                 <IconArrowRight />
@@ -310,6 +315,7 @@ function Reservation({
                 size="large"
                 href={getReservationPath(reservation.pk, "edit")}
                 data-testid="reservation-detail__button--edit"
+                role="button"
               >
                 {t("reservations:modifyReservationTime")}
                 <IconCalendar />
@@ -320,6 +326,7 @@ function Reservation({
                 size="large"
                 href={getReservationPath(reservation.pk, "cancel")}
                 data-testid="reservation-detail__button--cancel"
+                role="button"
               >
                 {t(
                   `reservations:cancel.${
@@ -600,6 +607,7 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
   query ReservationPage($id: ID!) {
     reservation(id: $id) {
       id
+      type
       ...MetaFields
       ...ReservationInfoCard
       ...Instructions
