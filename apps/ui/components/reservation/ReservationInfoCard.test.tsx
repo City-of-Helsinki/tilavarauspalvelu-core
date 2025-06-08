@@ -1,7 +1,7 @@
 import { ReservationInfoCard } from "./";
-import { render } from "@testing-library/react";
-import { future1hReservation } from "@/components/reservation/reservation.gql.utils";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { future1hReservation } from "@test/reservation.mocks";
+import { describe, expect, it } from "vitest";
 import {
   AccessType,
   ImageType,
@@ -12,137 +12,104 @@ import {
 } from "@gql/gql-types";
 import {
   type CreateGraphQLMockProps,
-  createGraphQLMocks,
   generateNameFragment,
 } from "@/test/test.gql.utils";
-import { MockedProvider } from "@apollo/client/testing";
 import { base64encode } from "common/src/helpers";
+import { createGraphQLMocks } from "@test/gql.mocks";
+import { MockedGraphQLProvider } from "@test/test.react.utils";
 
 interface CustomRenderProps extends CreateGraphQLMockProps {
   reservation?: ReservationInfoCardFragment;
 }
 
-const { useRouter } = vi.hoisted(() => {
-  const mockedRouterReplace = vi.fn();
-  const query = {
-    id: "1",
-  };
-  return {
-    useRouter: () => ({
-      replace: mockedRouterReplace,
-      query,
-    }),
-    mockedRouterReplace,
-  };
-});
-
-vi.mock("next/router", () => ({
-  useRouter,
-}));
-
 const customRender = (
   { reservation, ...mockProps }: CustomRenderProps = {
-    reservation: createMockInfoCardReservation(),
+    reservation: createMockReservationInfoCard(),
   }
 ) => {
   const renderReservation = reservation ?? createInfoCardReservationMock();
+  // TODO: replace with new helper
   return render(
-    <MockedProvider
-      mocks={createGraphQLMocks(mockProps)}
-      defaultOptions={{
-        watchQuery: { fetchPolicy: "no-cache" },
-        query: { fetchPolicy: "no-cache" },
-        mutate: { fetchPolicy: "no-cache" },
-      }}
-    >
+    <MockedGraphQLProvider mocks={createGraphQLMocks(mockProps)}>
       <ReservationInfoCard reservation={renderReservation} />
-    </MockedProvider>
+    </MockedGraphQLProvider>
   );
 };
 
-beforeEach(() => {
-  vi.useFakeTimers({
-    now: new Date(2024, 0, 1, 0, 0, 0),
-  });
-});
-afterEach(() => {
-  vi.runOnlyPendingTimers();
-  vi.useRealTimers();
-});
-
 describe("Component: ReservationInfoCard", () => {
-  it("should render the component", async () => {
-    const view = customRender();
-    await waitForPrice(view);
-
-    const contentSection = view.getByTestId(
+  it("should render the component", () => {
+    customRender();
+    const contentSection = screen.getByTestId(
       "reservation__reservation-info-card__content"
     );
     expect(contentSection).toBeInTheDocument();
   });
 
   it("should show reservation unit name according to the reservation unit for the reservation", () => {
-    const view = customRender();
-    const mockReservationData = createMockInfoCardReservation();
+    customRender();
+    const mockReservationData = createMockReservationInfoCard();
     const reservationUnit = mockReservationData.reservationUnits[0];
-    const reservationUnitNameElement = view.getByTestId(
-      "reservation__reservation-info-card__reservationUnit"
-    );
-
-    expect(reservationUnitNameElement).toHaveTextContent(
-      reservationUnit?.nameFi ?? "Test Reservation Unit FI"
-    );
+    expect(
+      screen.getByText(reservationUnit?.nameFi ?? "Test Reservation Unit FI")
+    ).toBeInTheDocument();
   });
 
   it("should show the reservation id", () => {
-    const view = customRender();
-    const mockReservationData = createMockInfoCardReservation();
-    const reservationIdElement = view.getByTestId(
-      "reservation__reservation-info-card__reservationNumber"
-    );
-
-    expect(reservationIdElement).toHaveTextContent(
-      `${mockReservationData.pk ?? "1"}`
-    );
+    customRender();
+    const mockReservationData = createMockReservationInfoCard();
+    expect(
+      screen.getByText(`${mockReservationData.pk ?? "1"}`)
+    ).toBeInTheDocument();
   });
 
   it("should show the reservation duration", () => {
-    const view = customRender();
-    const reservationDurationElement = view.getByTestId(
-      "reservation__reservation-info-card__duration"
-    );
+    customRender();
+    const durationText =
+      "Common:dateWithWeekday common:dateWithWeekdaycommon:dayTimeSeparator common:dateWithWeekday–common:dateWithWeekday, common:abbreviations:hour";
 
-    expect(reservationDurationElement).toHaveTextContent(
-      "Common:dateWithWeekday common:dateWithWeekdaycommon:dayTimeSeparator common:dateWithWeekday–common:dateWithWeekday, common:abbreviations.hour"
-    );
+    expect(
+      screen.getByTestId("reservation__reservation-info-card__duration")
+    ).toHaveTextContent(durationText);
   });
 
-  it("should show the reservation price if it's defined and exceeds 0€, otherwise a text for being free of charge", () => {
-    const view = customRender({
-      reservation: createMockInfoCardReservation("0"),
+  it("should show the a text for being free of charge when the price is 0", () => {
+    customRender({
+      reservation: createMockReservationInfoCard("0"),
     });
-    const reservationPriceElement = view.getByTestId(
-      "reservation__reservation-info-card__price"
-    );
 
-    expect(reservationPriceElement).toHaveTextContent(
-      "common:price: prices:priceFree"
-    );
+    expect(
+      screen.getByText((_, element) => {
+        return (
+          element?.textContent?.trim() === "common:price: prices:priceFree"
+        );
+      })
+    ).toBeInTheDocument();
   });
-  it("should show the reservation price if it's defined", () => {
-    const view = customRender();
-    const reservationPriceElement = view.getByTestId(
-      "reservation__reservation-info-card__price"
-    );
 
-    // default reservationRenderProps has a price of 10 €
-    expect(reservationPriceElement).toHaveTextContent(
-      `common:price: 10,00 € (common:inclTax)`
-    );
+  it("should show the reservation price if it's defined", () => {
+    customRender({
+      reservation: createMockReservationInfoCard("10"),
+    });
+
+    expect(
+      screen.getByText((_, element) => {
+        return (
+          element?.textContent?.trim() ===
+          "common:price: 10,00 € (common:inclTax)"
+        );
+      })
+    ).toBeInTheDocument();
   });
 });
 
-function createMockInfoCardReservation(
+describe("Access code", () => {
+  it.todo(
+    "should show the access code if the reservationType is ACCESS_CODE and it exists",
+    () => {}
+  );
+});
+
+function createMockReservationInfoCard(
   price?: string
 ): ReservationInfoCardFragment {
   return {
@@ -198,18 +165,8 @@ function createMockInfoCardReservation(
   };
 }
 
-async function waitForPrice(
-  view: ReturnType<typeof customRender>
-): Promise<HTMLElement> {
-  const priceSection = view.getByTestId(
-    "reservation__reservation-info-card__duration"
-  );
-  await expect.poll(() => priceSection).toBeInTheDocument();
-  return priceSection;
-}
-
 function createInfoCardReservationMock(): Readonly<
   NonNullable<ReservationInfoCardFragment>
 > {
-  return createMockInfoCardReservation();
+  return createMockReservationInfoCard();
 }
