@@ -9,6 +9,7 @@ export { ReservationOrderStatus } from "./ReservationOrderStatus";
 export { CancelledLinkSet } from "./CancelledLinkSet";
 export { ReservationTimePicker } from "./ReservationTimePicker";
 export { SubventionSuffix } from "./SubventionSuffix";
+export { TermsInfoSection } from "./TermsInfoSection";
 export {
   getGeneralFields,
   getApplicationFields,
