@@ -9,12 +9,11 @@ import {
 } from "@gql/gql-types";
 import { camelCase } from "lodash-es";
 import {
-  reservationRenderProps,
-  createMockReservation,
   createOptionsMock,
   createReservationPageMock,
   createTermsOfUseMock,
   type ReservationPaymentOrderFragment,
+  reservationRenderProps,
 } from "@test/reservation.mocks";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
@@ -57,6 +56,7 @@ function customRender(
     end,
     isHandled,
     type,
+    price,
     paymentOrder,
     cancellable,
     ...mockProps
@@ -71,6 +71,7 @@ function customRender(
     end,
     isHandled,
     type,
+    price,
     paymentOrder,
     cancellable,
   });
