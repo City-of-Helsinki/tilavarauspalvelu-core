@@ -140,14 +140,16 @@ def test_rejected_recurrence__filter__by_text_search(graphql):
     # No need to test as thoroughly.
     section_ref = "reservation_series__allocated_time_slot__reservation_unit_option__application_section"
     occurrence = RejectedOccurrenceFactory.create(**{
-        f"{section_ref}__application__organisation": None,
-        f"{section_ref}__application__contact_person": None,
+        f"{section_ref}__application__organisation_name": "",
+        f"{section_ref}__application__contact_person_first_name": "",
+        f"{section_ref}__application__contact_person_last_name": "",
         f"{section_ref}__application__user": None,
         f"{section_ref}__name": "foo",
     })
     RejectedOccurrenceFactory.create(**{
-        f"{section_ref}__application__organisation": None,
-        f"{section_ref}__application__contact_person": None,
+        f"{section_ref}__application__organisation_name": "",
+        f"{section_ref}__application__contact_person_first_name": "",
+        f"{section_ref}__application__contact_person_last_name": "",
         f"{section_ref}__application__user": None,
         f"{section_ref}__name": "bar",
     })
@@ -419,9 +421,9 @@ def test_rejected_recurrence__order__by_unit_pk(graphql):
 
 def test_rejected_recurrence__order__by_applicant(graphql):
     section_ref = "reservation_series__allocated_time_slot__reservation_unit_option__application_section"
-    occurrence_1 = RejectedOccurrenceFactory.create(**{f"{section_ref}__application__organisation__name": "A"})
-    occurrence_2 = RejectedOccurrenceFactory.create(**{f"{section_ref}__application__organisation__name": "B"})
-    occurrence_3 = RejectedOccurrenceFactory.create(**{f"{section_ref}__application__organisation__name": "C"})
+    occurrence_1 = RejectedOccurrenceFactory.create(**{f"{section_ref}__application__organisation_name": "A"})
+    occurrence_2 = RejectedOccurrenceFactory.create(**{f"{section_ref}__application__organisation_name": "B"})
+    occurrence_3 = RejectedOccurrenceFactory.create(**{f"{section_ref}__application__organisation_name": "C"})
 
     graphql.login_with_superuser()
     query = rejected_occurrence_query(order_by="applicantAsc")

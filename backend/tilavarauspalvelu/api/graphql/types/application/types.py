@@ -42,6 +42,26 @@ class ApplicationNode(DjangoNode):
             "additional_information",
             "working_memo",
             #
+            "billing_street_address",
+            "billing_post_code",
+            "billing_city",
+            #
+            "organisation_name",
+            "organisation_email",
+            "organisation_identifier",
+            "organisation_year_established",
+            "organisation_active_members",
+            "organisation_core_business",
+            "organisation_street_address",
+            "organisation_post_code",
+            "organisation_city",
+            #
+            # Contact person
+            "contact_person_first_name",
+            "contact_person_last_name",
+            "contact_person_email",
+            "contact_person_phone_number",
+            #
             # Datetimes
             "cancelled_at",
             "sent_at",
@@ -54,11 +74,8 @@ class ApplicationNode(DjangoNode):
             # Relations
             "application_round",
             "application_sections",
-            "organisation",
-            "contact_person",
             "user",
-            "billing_address",
-            "home_city",
+            "municipality",
         ]
         restricted_fields = {
             "working_memo": lambda user, application: user.permissions.can_view_application(

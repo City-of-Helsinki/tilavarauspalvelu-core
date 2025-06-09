@@ -9,13 +9,10 @@ from modeltranslation.decorators import register
 from modeltranslation.translator import TranslationOptions
 
 from .models import (
-    Address,
     ApplicationRound,
     BannerNotification,
-    City,
     Equipment,
     EquipmentCategory,
-    Organisation,
     Purpose,
     ReservationDenyReason,
     ReservationPurpose,
@@ -125,24 +122,9 @@ class ReservationUnitCancellationRuleTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-@register(Address)
-class AddressTranslationOptions(TranslationOptions):
-    fields = ["street_address", "city"]
-
-
-@register(Organisation)
-class OrganisationTranslationOptions(TranslationOptions):
-    fields = ["name", "core_business"]
-
-
 @register(ApplicationRound)
 class ApplicationRoundTranslationOptions(TranslationOptions):
     fields = ["name", "criteria", "notes_when_applying"]
-
-
-@register(City)
-class CityTranslationOptions(TranslationOptions):
-    fields = ["name"]
 
 
 @register(BannerNotification)

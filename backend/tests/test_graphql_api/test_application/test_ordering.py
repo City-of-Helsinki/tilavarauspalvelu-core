@@ -47,8 +47,8 @@ def test_application__order__by_applicant(graphql):
     # given:
     # - There are two applications in the system with different applicants
     # - A superuser is using the system
-    application_1 = ApplicationFactory.create_in_status_draft(organisation__name="aaa")
-    application_2 = ApplicationFactory.create_in_status_draft(organisation__name="bbb")
+    application_1 = ApplicationFactory.create_in_status_draft(organisation_name="aaa")
+    application_2 = ApplicationFactory.create_in_status_draft(organisation_name="bbb")
     graphql.login_with_superuser()
 
     # when:

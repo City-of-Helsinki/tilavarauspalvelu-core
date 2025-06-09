@@ -176,7 +176,7 @@ class ReservationAdmin(admin.ModelAdmin):
                     "deny_reason",
                     "cancel_reason",
                     "purpose",
-                    "home_city",
+                    "municipality",
                     "age_group",
                 ],
             },

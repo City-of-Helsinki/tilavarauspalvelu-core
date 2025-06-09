@@ -10,9 +10,24 @@ from django.conf import settings
 from django.db import migrations, models
 
 import tilavarauspalvelu.enums
-import tilavarauspalvelu.models.organisation.model
 import tilavarauspalvelu.validators
 import utils.fields.model
+
+
+def year_not_in_future(year: int | None) -> None:
+    from django.core.exceptions import ValidationError
+    from django.utils.text import format_lazy
+
+    from utils.date_utils import local_datetime
+
+    if year is None:
+        return
+
+    current_date = local_datetime()
+
+    if current_date.year < year:
+        msg = "is after current year"
+        raise ValidationError(format_lazy("{year} {msg}", year=year, msg=msg))
 
 
 class Migration(migrations.Migration):
@@ -326,7 +341,7 @@ class Migration(migrations.Migration):
                     models.PositiveIntegerField(
                         blank=True,
                         null=True,
-                        validators=[tilavarauspalvelu.models.organisation.model.year_not_in_future],
+                        validators=[year_not_in_future],
                     ),
                 ),
                 ("active_members", models.PositiveIntegerField(null=True)),

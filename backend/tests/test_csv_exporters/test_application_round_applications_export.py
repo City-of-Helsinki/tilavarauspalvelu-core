@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from tilavarauspalvelu.enums import ApplicantTypeChoice, Priority, Weekday
+from tilavarauspalvelu.enums import ApplicantTypeChoice, MunicipalityChoice, Priority, Weekday
 from tilavarauspalvelu.services.export import ApplicationRoundApplicationsCSVExporter
 from tilavarauspalvelu.services.export.application_round_applications_exporter import ApplicationExportRow
 from utils.date_utils import local_date_string, local_datetime, local_timedelta_string
@@ -29,9 +29,9 @@ def test_application_round_applications_export__multiple_applications(graphql):
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     application_1 = ApplicationFactory.create_in_status_in_allocation(
         application_round=application_round,
-        organisation__name="aaa",
-        contact_person__first_name="foo",
-        home_city__name="Helsinki",
+        organisation_name="aaa",
+        contact_person_first_name="foo",
+        municipality=MunicipalityChoice.HELSINKI,
         application_sections__purpose__name="purpose",
         application_sections__age_group__minimum=18,
         application_sections__age_group__maximum=100,
@@ -42,9 +42,9 @@ def test_application_round_applications_export__multiple_applications(graphql):
     )
     application_2 = ApplicationFactory.create_in_status_in_allocation(
         application_round=application_round,
-        organisation__name="bbb",
-        contact_person__first_name="bar",
-        home_city__name="Helsinki",
+        organisation_name="bbb",
+        contact_person_first_name="bar",
+        municipality=MunicipalityChoice.HELSINKI,
         application_sections__purpose__name="free",
         application_sections__age_group__minimum=18,
         application_sections__age_group__maximum=100,
@@ -72,18 +72,18 @@ def test_application_round_applications_export__multiple_applications(graphql):
         *ApplicationExportRow(
             application_id=str(application_1.id),
             application_status=application_1.status.value,
-            applicant=application_1.organisation.name,
-            organisation_id=application_1.organisation.identifier,
-            contact_person_first_name=application_1.contact_person.first_name,
-            contact_person_last_name=application_1.contact_person.last_name,
-            contact_person_email=application_1.contact_person.email,
-            contact_person_phone=application_1.contact_person.phone_number,
+            applicant=application_1.organisation_name,
+            organisation_id=application_1.organisation_identifier,
+            contact_person_first_name=application_1.contact_person_first_name,
+            contact_person_last_name=application_1.contact_person_last_name,
+            contact_person_email=application_1.contact_person_email,
+            contact_person_phone=application_1.contact_person_phone_number,
             section_id=str(section_1.id),
             section_status=section_1.status.value,
             section_name=section_1.name,
             reservations_begin_date=local_date_string(section_1.reservations_begin_date),
             reservations_end_date=local_date_string(section_1.reservations_end_date),
-            home_city_name=application_1.home_city.name,
+            municipality=application_1.municipality,
             purpose_name=section_1.purpose.name,
             age_group_str=str(section_1.age_group),
             num_persons=str(section_1.num_persons),
@@ -113,18 +113,18 @@ def test_application_round_applications_export__multiple_applications(graphql):
         *ApplicationExportRow(
             application_id=str(application_2.id),
             application_status=application_2.status.value,
-            applicant=application_2.organisation.name,
-            organisation_id=application_2.organisation.identifier,
-            contact_person_first_name=application_2.contact_person.first_name,
-            contact_person_last_name=application_2.contact_person.last_name,
-            contact_person_email=application_2.contact_person.email,
-            contact_person_phone=application_2.contact_person.phone_number,
+            applicant=application_2.organisation_name,
+            organisation_id=application_2.organisation_identifier,
+            contact_person_first_name=application_2.contact_person_first_name,
+            contact_person_last_name=application_2.contact_person_last_name,
+            contact_person_email=application_2.contact_person_email,
+            contact_person_phone=application_2.contact_person_phone_number,
             section_id=str(section_2.id),
             section_status=section_2.status.value,
             section_name=section_2.name,
             reservations_begin_date=local_date_string(section_2.reservations_begin_date),
             reservations_end_date=local_date_string(section_2.reservations_end_date),
-            home_city_name=application_2.home_city.name,
+            municipality=application_2.municipality,
             purpose_name=section_2.purpose.name,
             age_group_str=str(section_2.age_group),
             num_persons=str(section_2.num_persons),
@@ -154,19 +154,47 @@ def test_application_round_applications_export__multiple_applications(graphql):
 @pytest.mark.parametrize(
     **parametrize_helper({
         "Missing organisation name": MissingParams(
-            missing=Missing(empty=["organisation__name"]),
+            missing=Missing(empty=["organisation_name"]),
             column_value_mapping={"hakija": "first last"},
         ),
         "Missing organisation name and contact person": MissingParams(
-            missing=Missing(empty=["organisation__name"], null=["contact_person"]),
+            missing=Missing(
+                empty=[
+                    "organisation_name",
+                    "contact_person_first_name",
+                    "contact_person_last_name",
+                    "contact_person_email",
+                    "contact_person_phone_number",
+                ]
+            ),
+            column_value_mapping={"hakija": "second last"},
+        ),
+        "Missing applicant": MissingParams(
+            missing=Missing(
+                empty=[
+                    "organisation_name",
+                    "contact_person_first_name",
+                    "contact_person_last_name",
+                    "contact_person_email",
+                    "contact_person_phone_number",
+                ],
+                null=["user"],
+            ),
             column_value_mapping={"hakija": ""},
         ),
         "Missing organisation identifier": MissingParams(
-            missing=Missing(empty=["organisation__identifier"]),
+            missing=Missing(empty=["organisation_identifier"]),
             column_value_mapping={"y-tunnus": ""},
         ),
         "Missing contact person": MissingParams(
-            missing=Missing(null=["contact_person"]),
+            missing=Missing(
+                empty=[
+                    "contact_person_first_name",
+                    "contact_person_last_name",
+                    "contact_person_email",
+                    "contact_person_phone_number",
+                ]
+            ),
             column_value_mapping={
                 "yhteyshenkilö etunimi": "",
                 "yhteyshenkilö sukunimi": "",
@@ -174,9 +202,9 @@ def test_application_round_applications_export__multiple_applications(graphql):
                 "yhteyshenkilön puh": "",
             },
         ),
-        "Missing home city": MissingParams(
-            missing=Missing(null=["home_city"]),
-            column_value_mapping={"kotikunta": "muu"},
+        "Missing municipality": MissingParams(
+            missing=Missing(null=["municipality"]),
+            column_value_mapping={"kotikunta": ""},
         ),
         "Missing purpose": MissingParams(
             missing=Missing(null=["application_sections__purpose"]),
@@ -196,13 +224,15 @@ def test_application_round_applications_export__missing_data(graphql, column_val
         "sent_at": local_datetime(),
         "application_round": application_round,
         "applicant_type": ApplicantTypeChoice.COMPANY.value,
-        "home_city__name": "Helsinki",
-        "organisation__name": "aaa",
-        "organisation__identifier": "123456-7",
-        "contact_person__first_name": "first",
-        "contact_person__last_name": "last",
-        "contact_person__email": "email@example.com",
-        "contact_person__phone_number": "123467890",
+        "municipality": MunicipalityChoice.HELSINKI.value,
+        "organisation_name": "aaa",
+        "organisation_identifier": "123456-7",
+        "contact_person_first_name": "first",
+        "contact_person_last_name": "last",
+        "contact_person_email": "email@example.com",
+        "contact_person_phone_number": "123467890",
+        "user__first_name": "second",
+        "user__last_name": "last",
         "application_sections__reservation_min_duration": datetime.timedelta(hours=1),
         "application_sections__reservation_max_duration": datetime.timedelta(hours=2),
         "application_sections__applied_reservations_per_week": 1,

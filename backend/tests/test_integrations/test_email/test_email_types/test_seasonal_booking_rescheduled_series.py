@@ -366,7 +366,7 @@ def test_seasonal_booking_rescheduled_series__send_email(outbox):
     user = UserFactory.create(email="user@email.com")
     application = ApplicationFactory.create(
         user=user,
-        contact_person__email="contact@email.com",
+        contact_person_email="contact@email.com",
     )
     series = create_reservation_series(
         user=user,
@@ -391,7 +391,7 @@ def test_seasonal_booking_rescheduled_series__send_email__no_reservations(outbox
     user = UserFactory.create(email="user@email.com")
     application = ApplicationFactory.create(
         user=user,
-        contact_person__email="contact@email.com",
+        contact_person_email="contact@email.com",
     )
     series = ReservationSeriesFactory.create(
         user=user,
@@ -411,7 +411,7 @@ def test_seasonal_booking_rescheduled_series__send_email__no_reservations(outbox
 def test_seasonal_booking_rescheduled_series__send_email__no_recipients(outbox):
     application = ApplicationFactory.create(
         user=None,
-        contact_person=None,
+        contact_person_email=None,
     )
     series = create_reservation_series(
         user=None,
