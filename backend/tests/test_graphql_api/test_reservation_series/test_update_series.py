@@ -4,16 +4,10 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from tilavarauspalvelu.enums import CustomerTypeChoice
+from tilavarauspalvelu.enums import CustomerTypeChoice, MunicipalityChoice
 from tilavarauspalvelu.models import ReservationStatistic
 
-from tests.factories import (
-    AgeGroupFactory,
-    CityFactory,
-    ReservationFactory,
-    ReservationPurposeFactory,
-    ReservationSeriesFactory,
-)
+from tests.factories import AgeGroupFactory, ReservationFactory, ReservationPurposeFactory, ReservationSeriesFactory
 
 from .helpers import UPDATE_SERIES_MUTATION
 
@@ -31,8 +25,6 @@ def test_reservation_series__update_series(graphql):
     age_group_2 = AgeGroupFactory.create(minimum=0, maximum=17)
     purpose_1 = ReservationPurposeFactory.create()
     purpose_2 = ReservationPurposeFactory.create()
-    city_1 = CityFactory.create()
-    city_2 = CityFactory.create()
 
     reservation_series = ReservationSeriesFactory.create(
         name="Recurring reservation",
@@ -40,7 +32,7 @@ def test_reservation_series__update_series(graphql):
         age_group=age_group_1,
         reservations__name="Hello",
         reservations__purpose=purpose_1,
-        reservations__home_city=city_1,
+        reservations__municipality=MunicipalityChoice.HELSINKI.value,
         reservations__age_group=age_group_1,
     )
 
@@ -75,7 +67,7 @@ def test_reservation_series__update_series(graphql):
             "billingAddressCity": "town",
             "billingAddressZip": "postal",
             "purpose": purpose_2.pk,
-            "homeCity": city_2.pk,
+            "municipality": MunicipalityChoice.HELSINKI.value,
             "ageGroup": age_group_2.pk,
         },
     }
@@ -112,7 +104,7 @@ def test_reservation_series__update_series(graphql):
     assert reservation.billing_last_name == "Admin"
     assert reservation.age_group == age_group_2
     assert reservation.purpose == purpose_2
-    assert reservation.home_city == city_2
+    assert reservation.municipality == MunicipalityChoice.HELSINKI
 
 
 def test_reservation_series__update_series__skip_reservations(graphql):

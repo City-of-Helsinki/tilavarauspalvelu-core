@@ -198,6 +198,7 @@ class ReservationNode(DjangoNode):
             "num_persons",
             "state",
             "type",
+            "municipality",
             "cancel_details",
             "handling_details",
             "working_memo",
@@ -251,7 +252,6 @@ class ReservationNode(DjangoNode):
             "deny_reason",
             "cancel_reason",
             "purpose",
-            "home_city",
             "age_group",
             #
             "is_blocked",

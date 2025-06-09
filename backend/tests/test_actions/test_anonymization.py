@@ -21,12 +21,9 @@ from tilavarauspalvelu.models.user.actions import (
 from utils.date_utils import local_datetime
 
 from tests.factories import (
-    AddressFactory,
     ApplicationFactory,
     ApplicationSectionFactory,
-    OrganisationFactory,
     PaymentOrderFactory,
-    PersonFactory,
     ReservationFactory,
     UnitFactory,
     UserFactory,
@@ -88,16 +85,7 @@ def test_anonymization__application():
         email="anony.mous@foo.com",
         reservation_notification=ReservationNotification.ALL,
     )
-    billing_address = AddressFactory()
-    organisation_address = AddressFactory.create()
-    contact_person = PersonFactory.create()
-    organisation = OrganisationFactory.create(address=organisation_address)
-    application = ApplicationFactory.create(
-        user=mr_anonymous,
-        billing_address=billing_address,
-        contact_person=contact_person,
-        organisation=organisation,
-    )
+    application = ApplicationFactory.create(user=mr_anonymous)
     app_section = ApplicationSectionFactory.create(application=application)
 
     mr_anonymous.actions.anonymize_user_applications()
@@ -112,41 +100,26 @@ def test_anonymization__application():
     assert application.working_memo == SENSITIVE_APPLICATION
 
     # Application billing address
-    assert application.billing_address.post_code == "99999"
-    assert application.billing_address.street_address == ANONYMIZED
-    assert application.billing_address.street_address_fi == ANONYMIZED
-    assert application.billing_address.street_address_en == ANONYMIZED
-    assert application.billing_address.street_address_sv == ANONYMIZED
-    assert application.billing_address.city == ANONYMIZED
-    assert application.billing_address.city_fi == ANONYMIZED
-    assert application.billing_address.city_en == ANONYMIZED
-    assert application.billing_address.city_sv == ANONYMIZED
+    assert application.billing_post_code == "99999"
+    assert application.billing_street_address == ANONYMIZED
+    assert application.billing_city == ANONYMIZED
 
     # Contact person
-    assert application.contact_person.first_name == mr_anonymous.first_name
-    assert application.contact_person.last_name == mr_anonymous.last_name
-    assert application.contact_person.email == mr_anonymous.email
-    assert application.contact_person.phone_number == ""
+    assert application.contact_person_first_name == mr_anonymous.first_name
+    assert application.contact_person_last_name == mr_anonymous.last_name
+    assert application.contact_person_email == mr_anonymous.email
+    assert application.contact_person_phone_number == ""
 
     # Organisation data should not be anonymized
-    assert application.organisation.name != ANONYMIZED
-    assert application.organisation.identifier != "1234567-2"
-    assert application.organisation.email != mr_anonymous.email
-    assert application.organisation.core_business != ANONYMIZED
-    assert application.organisation.core_business_fi != ANONYMIZED
-    assert application.organisation.core_business_en != ANONYMIZED
-    assert application.organisation.core_business_sv != ANONYMIZED
+    assert application.organisation_name != ANONYMIZED
+    assert application.organisation_identifier != "1234567-2"
+    assert application.organisation_email != mr_anonymous.email
+    assert application.organisation_core_business != ANONYMIZED
 
     # Organisation address should not be anonymized
-    assert application.organisation.address.post_code != "99999"
-    assert application.organisation.address.street_address != ANONYMIZED
-    assert application.organisation.address.street_address_fi != ANONYMIZED
-    assert application.organisation.address.street_address_en != ANONYMIZED
-    assert application.organisation.address.street_address_sv != ANONYMIZED
-    assert application.organisation.address.city != ANONYMIZED
-    assert application.organisation.address.city_fi != ANONYMIZED
-    assert application.organisation.address.city_en != ANONYMIZED
-    assert application.organisation.address.city_sv != ANONYMIZED
+    assert application.organisation_post_code != "99999"
+    assert application.organisation_street_address != ANONYMIZED
+    assert application.organisation_city != ANONYMIZED
 
 
 def test_anonymization__reservation():

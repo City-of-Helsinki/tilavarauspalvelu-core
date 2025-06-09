@@ -6,9 +6,9 @@ from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from tilavarauspalvelu.enums import ApplicantTypeChoice, Priority, Weekday
+from tilavarauspalvelu.enums import ApplicantTypeChoice, MunicipalityChoice, Priority, Weekday
 
-from tests.factories import AgeGroupFactory, CityFactory, ReservationPurposeFactory, ReservationUnitFactory
+from tests.factories import AgeGroupFactory, ReservationPurposeFactory, ReservationUnitFactory
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Application, ApplicationRound
@@ -59,7 +59,6 @@ def get_application_create_data(
     create_sections: bool = False,
 ) -> dict[str, Any]:
     sections: list[dict[str, Any]] = []
-    home_city = CityFactory.create()
 
     if create_sections:
         reservation_purpose = ReservationPurposeFactory.create()
@@ -98,29 +97,21 @@ def get_application_create_data(
 
     return {
         "applicantType": ApplicantTypeChoice.COMPANY.value,
-        "organisation": {
-            "identifier": "123-identifier",
-            "name": "Super organisation",
-            "address": {
-                "streetAddress": "Testikatu 28",
-                "postCode": "33540",
-                "city": "Tampere",
-            },
-        },
-        "contactPerson": {
-            "firstName": "John",
-            "lastName": "Wayne",
-            "email": "john@test.com",
-            "phoneNumber": "123-123",
-        },
+        "organisationIdentifier": "123-identifier",
+        "organisationName": "Super organisation",
+        "organisationStreetAddress": "Testikatu 28",
+        "organisationPostCode": "33540",
+        "organisationCity": "Tampere",
+        "contactPersonFirstName": "John",
+        "contactPersonLastName": "Wayne",
+        "contactPersonEmail": "john@test.com",
+        "contactPersonPhoneNumber": "123-123",
         "applicationRound": application_round.pk,
         "applicationSections": sections,
-        "billingAddress": {
-            "streetAddress": "Laskukatu 1c",
-            "postCode": "33540",
-            "city": "Tampere",
-        },
-        "homeCity": home_city.id,
+        "billingStreetAddress": "Laskukatu 1c",
+        "billingPostCode": "33540",
+        "billingCity": "Tampere",
+        "municipality": MunicipalityChoice.HELSINKI.value,
     }
 
 

@@ -25,7 +25,7 @@ def email_reservation() -> Reservation:
     reservation_unit = ReservationUnitFactory.create(
         name_en="[VARAUSYKSIKÖN NIMI]",
         unit__name_en="[TOIMIPISTEEN NIMI]",
-        unit__address_street="[TOIMIPISTEEN OSOITE]",
+        unit__address_street_en="[TOIMIPISTEEN OSOITE]",
         unit__address_zip="",
         unit__address_city_en="[KAUPUNKI]",
         reservation_confirmed_instructions_en="[HYVÄKSYTYN VARAUKSEN OHJEET]",
@@ -38,7 +38,7 @@ def email_reservation() -> Reservation:
     application_section = ApplicationSectionFactory.create(
         name="[HAKEMUKSEN OSAN NIMI]",
         application__application_round__name_en="[KAUSIVARAUSKIERROKSEN NIMI]",
-        application__organisation__name_en="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        application__organisation_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
     )
     reservation_series = ReservationSeriesFactory.create(
         reservation_unit=reservation_unit,

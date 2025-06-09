@@ -181,7 +181,7 @@ def test_seasonal_booking_cancelled_all_email__render__html():
 def test_seasonal_booking_cancelled_all__send_email(outbox):
     application = ApplicationFactory.create_in_status_results_sent(
         user__email="user@email.com",
-        contact_person__email="contact@email.com",
+        contact_person_email="contact@email.com",
     )
     application_section = application.application_sections.first()
 
