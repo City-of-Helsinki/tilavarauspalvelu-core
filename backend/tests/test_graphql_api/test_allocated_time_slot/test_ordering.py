@@ -57,10 +57,10 @@ def test_allocated_time_slot__order__by_applicant(graphql):
     # given:
     # - There are two allocated time slots
     allocation_1 = AllocatedTimeSlotFactory.create(
-        reservation_unit_option__application_section__application__organisation__name="A",
+        reservation_unit_option__application_section__application__organisation_name="A",
     )
     allocation_2 = AllocatedTimeSlotFactory.create(
-        reservation_unit_option__application_section__application__organisation__name="B",
+        reservation_unit_option__application_section__application__organisation_name="B",
     )
     graphql.login_with_superuser()
 

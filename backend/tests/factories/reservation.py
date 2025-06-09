@@ -12,6 +12,7 @@ from factory import LazyAttribute, fuzzy
 from tilavarauspalvelu.enums import (
     AccessType,
     CustomerTypeChoice,
+    MunicipalityChoice,
     OrderStatus,
     PaymentType,
     ReservationStateChoice,
@@ -103,6 +104,8 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     billing_address_city = FakerFI("city")
     billing_address_zip = FakerFI("postcode")
 
+    municipality = MunicipalityChoice.HELSINKI
+
     # Relations
     reservation_units = ManyToManyFactory("tests.factories.ReservationUnitFactory")
 
@@ -110,7 +113,6 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     reservation_series = ForeignKeyFactory("tests.factories.ReservationSeriesFactory")
     deny_reason = ForeignKeyFactory("tests.factories.ReservationDenyReasonFactory")
     purpose = ForeignKeyFactory("tests.factories.ReservationPurposeFactory")
-    home_city = ForeignKeyFactory("tests.factories.CityFactory")
     age_group = ForeignKeyFactory("tests.factories.AgeGroupFactory")
 
     payment_order = ReverseOneToOneFactory("tests.factories.PaymentOrderFactory")

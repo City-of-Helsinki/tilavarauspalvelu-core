@@ -22,11 +22,9 @@ from tilavarauspalvelu.enums import (
     UserRoleChoice,
 )
 from tilavarauspalvelu.models import (
-    Address,
     Application,
     ApplicationSection,
     GeneralRole,
-    Person,
     Reservation,
     ReservationSeries,
     Unit,
@@ -154,26 +152,16 @@ class UserActions:
         ApplicationSection.objects.filter(application__user=self.user).update(
             name=SENSITIVE_APPLICATION,
         )
-        Person.objects.filter(applications__user=self.user).update(
-            first_name=self.user.first_name,
-            last_name=self.user.last_name,
-            email=self.user.email,
-            phone_number="",
-        )
-        Address.objects.filter(applications__user=self.user).update(
-            post_code="99999",
-            city=ANONYMIZED,
-            city_fi=ANONYMIZED,
-            city_en=ANONYMIZED,
-            city_sv=ANONYMIZED,
-            street_address=ANONYMIZED,
-            street_address_fi=ANONYMIZED,
-            street_address_en=ANONYMIZED,
-            street_address_sv=ANONYMIZED,
-        )
         Application.objects.filter(user=self.user).update(
             additional_information=SENSITIVE_APPLICATION,
             working_memo=SENSITIVE_APPLICATION,
+            contact_person_first_name=self.user.first_name,
+            contact_person_last_name=self.user.last_name,
+            contact_person_email=self.user.email,
+            contact_person_phone_number="",
+            billing_street_address=ANONYMIZED,
+            billing_post_code="99999",
+            billing_city=ANONYMIZED,
         )
 
     def can_anonymize(self) -> UserAnonymizationInfo:
