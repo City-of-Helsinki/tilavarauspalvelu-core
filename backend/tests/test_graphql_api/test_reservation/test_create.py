@@ -13,6 +13,7 @@ from graphene_django_extensions.testing import parametrize_helper
 from tilavarauspalvelu.enums import (
     AccessType,
     ADLoginAMR,
+    MunicipalityChoice,
     PaymentType,
     PriceUnit,
     ProfileLoginAMR,
@@ -31,7 +32,6 @@ from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_dateti
 
 from tests.factories import (
     ApplicationRoundFactory,
-    CityFactory,
     OriginHaukiResourceFactory,
     ReservationFactory,
     ReservationUnitFactory,
@@ -788,12 +788,10 @@ def test_reservation__create__prefill_profile_data(graphql, settings, arm):
     # - Prefill setting is on
     # - There is a reservation unit in the system
     # - The reservation unit has a reservable time span
-    # - There is a city in the system
     # - A regular user who has logged in with Suomi.fi is using the system
     settings.PREFILL_RESERVATION_WITH_PROFILE_DATA = True
 
     reservation_unit = ReservationUnitFactory.create_reservable_now()
-    CityFactory.create(name="Helsinki")
     user = UserFactory.create(social_auth__extra_data__amr=arm)
     graphql.force_login(user)
 
@@ -818,7 +816,7 @@ def test_reservation__create__prefill_profile_data(graphql, settings, arm):
     assert reservation.reservee_address_street == "Example street 1"
     assert reservation.reservee_address_zip == "00100"
     assert reservation.reservee_address_city == "Helsinki"
-    assert reservation.home_city.name == "Helsinki"
+    assert reservation.municipality == MunicipalityChoice.HELSINKI
 
 
 def test_reservation__create__prefill_profile_data__null_values(graphql, settings):
@@ -831,7 +829,6 @@ def test_reservation__create__prefill_profile_data__null_values(graphql, setting
     settings.PREFILL_RESERVATION_WITH_PROFILE_DATA = True
 
     reservation_unit = ReservationUnitFactory.create_reservable_now()
-    CityFactory.create(name="Helsinki")
     user = UserFactory.create_profile_user()
     graphql.force_login(user)
 
@@ -864,7 +861,7 @@ def test_reservation__create__prefill_profile_data__null_values(graphql, setting
     assert reservation.reservee_address_street == ""
     assert reservation.reservee_address_zip == ""
     assert reservation.reservee_address_city == ""
-    assert reservation.home_city is None
+    assert reservation.municipality is None
 
 
 @patch_method(HelsinkiProfileClient.request, return_value=ResponseMock(status_code=500, json_data={}))
@@ -875,12 +872,10 @@ def test_reservation__create__prefilled_with_profile_data__api_call_fails(graphq
     # - Prefill setting is on
     # - There is a reservation unit in the system
     # - The reservation unit has a reservable time span
-    # - There is a city in the system
     # - A regular user who has logged in with Suomi.fi is using the system
     settings.PREFILL_RESERVATION_WITH_PROFILE_DATA = True
 
     reservation_unit = ReservationUnitFactory.create_reservable_now()
-    CityFactory.create(name="Helsinki")
     user = UserFactory.create_profile_user()
     graphql.force_login(user)
 
@@ -900,7 +895,7 @@ def test_reservation__create__prefilled_with_profile_data__api_call_fails(graphq
     assert reservation.reservee_address_city == ""
     assert reservation.reservee_address_street == ""
     assert reservation.reservee_address_zip == ""
-    assert reservation.home_city is None
+    assert reservation.municipality is None
 
     # External service call raises known exception, so no Sentry logging is done.
     assert SentryLogger.log_exception.call_count == 0
@@ -913,12 +908,10 @@ def test_reservation__create__prefilled_with_profile_data__api_call_fails__use_d
     # - Prefill setting is on
     # - There is a reservation unit in the system
     # - The reservation unit has a reservable time span
-    # - There is a city in the system
     # - A regular user who has logged in with Suomi.fi is using the system
     settings.PREFILL_RESERVATION_WITH_PROFILE_DATA = True
 
     reservation_unit = ReservationUnitFactory.create_reservable_now()
-    city = CityFactory.create(name="Helsinki")
     user = UserFactory.create(social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI)
     graphql.force_login(user)
 
@@ -935,7 +928,7 @@ def test_reservation__create__prefilled_with_profile_data__api_call_fails__use_d
             reservee_address_street="Example street 1",
             reservee_address_zip="00100",
             reservee_address_city="Helsinki",
-            home_city=city,
+            municipality=MunicipalityChoice.HELSINKI.value,
         )
         return "foo"
 
@@ -956,7 +949,7 @@ def test_reservation__create__prefilled_with_profile_data__api_call_fails__use_d
     assert reservation.reservee_address_street == "Example street 1"
     assert reservation.reservee_address_zip == "00100"
     assert reservation.reservee_address_city == "Helsinki"
-    assert reservation.home_city.name == "Helsinki"
+    assert reservation.municipality == MunicipalityChoice.HELSINKI
 
 
 @pytest.mark.parametrize("arm", ADLoginAMR)
@@ -969,7 +962,6 @@ def test_reservation__create__prefilled_with_profile_data__ad_login(graphql, set
     settings.PREFILL_RESERVATION_WITH_PROFILE_DATA = True
 
     reservation_unit = ReservationUnitFactory.create_reservable_now()
-    CityFactory.create(name="Helsinki")
     user = UserFactory.create(social_auth__extra_data__amr=arm, email="test@hel.fi")
     graphql.force_login(user)
 
@@ -990,7 +982,7 @@ def test_reservation__create__prefilled_with_profile_data__ad_login(graphql, set
     assert reservation.reservee_address_city == ""
     assert reservation.reservee_address_street == ""
     assert reservation.reservee_address_zip == ""
-    assert reservation.home_city is None
+    assert reservation.municipality is None
 
 
 @freezegun.freeze_time("2021-01-01")
@@ -1112,7 +1104,6 @@ def test_reservation__create__reservation_block_whole_day__blocks_reserving_for_
 )
 def test_reservation__create__reservee_used_ad_login(graphql, amr, expected):
     reservation_unit = ReservationUnitFactory.create_reservable_now()
-    CityFactory.create(name="Helsinki")
     user = UserFactory.create(social_auth__extra_data__amr=amr, email="test@hel.fi")
     graphql.force_login(user)
 

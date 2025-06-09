@@ -7,6 +7,7 @@ import pytest
 from tilavarauspalvelu.enums import (
     AccessType,
     CustomerTypeChoice,
+    MunicipalityChoice,
     ReservationStateChoice,
     ReservationTypeChoice,
     ReservationTypeStaffChoice,
@@ -19,7 +20,6 @@ from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_end_of
 
 from tests.factories import (
     AgeGroupFactory,
-    CityFactory,
     ReservableTimeSpanFactory,
     ReservationFactory,
     ReservationPurposeFactory,
@@ -83,7 +83,6 @@ def test_reservation_series__create_series(graphql):
 def test_reservation_series__create_series__reservation_details(graphql):
     age_group = AgeGroupFactory.create()
     purpose = ReservationPurposeFactory.create()
-    city = CityFactory.create()
     reservation_unit = ReservationUnitFactory.create()
     user = graphql.login_with_superuser()
 
@@ -120,7 +119,7 @@ def test_reservation_series__create_series__reservation_details(graphql):
     data["reservationDetails"]["billingAddressCity"] = "town"
     data["reservationDetails"]["billingAddressZip"] = "postal"
     data["reservationDetails"]["purpose"] = purpose.pk
-    data["reservationDetails"]["homeCity"] = city.pk
+    data["reservationDetails"]["municipality"] = MunicipalityChoice.HELSINKI.value
 
     response = graphql(CREATE_SERIES_MUTATION, input_data=data)
 
@@ -166,7 +165,7 @@ def test_reservation_series__create_series__reservation_details(graphql):
     assert reservations[0].billing_address_city == "town"
     assert reservations[0].billing_address_zip == "postal"
     assert reservations[0].purpose == purpose
-    assert reservations[0].home_city == city
+    assert reservations[0].municipality == MunicipalityChoice.HELSINKI
     assert reservations[0].user == user
     assert reservations[0].age_group == age_group
     assert reservations[0].reservation_units.count() == 1

@@ -25,31 +25,31 @@ def test_can_query_application__all_fields(graphql):
     fields = """
         pk
         applicantType
-        organisation {
-            pk
-        }
-        applicationRound {
-            pk
-        }
-        user {
-            pk
-        }
-        contactPerson {
-            pk
-        }
-        applicationSections {
-            pk
-        }
-        billingAddress {
-            pk
-        }
-        homeCity {
-            pk
-        }
+        additionalInformation
+        additionalInformation
+        municipality
+        contactPersonFirstName
+        contactPersonLastName
+        contactPersonEmail
+        contactPersonPhoneNumber
+        organisationName
+        organisationEmail
+        organisationIdentifier
+        organisationYearEstablished
+        organisationActiveMembers
+        organisationCoreBusiness
+        organisationStreetAddress
+        organisationPostCode
+        organisationCity
+        billingStreetAddress
+        billingPostCode
+        billingCity
         createdAt
         updatedAt
-        additionalInformation
         workingMemo
+        applicationRound { pk }
+        user { pk }
+        applicationSections { pk }
         status
     """
 
@@ -64,34 +64,31 @@ def test_can_query_application__all_fields(graphql):
     assert response.node(0) == {
         "pk": application.pk,
         "applicantType": application.applicant_type,
-        "organisation": {
-            "pk": application.organisation.pk,
-        },
-        "applicationRound": {
-            "pk": application.application_round.pk,
-        },
-        "user": {
-            "pk": application.user.pk,
-        },
-        "contactPerson": {
-            "pk": application.contact_person.pk,
-        },
-        "applicationSections": [
-            {
-                "pk": section.pk,
-            },
-        ],
-        "status": application.status.value,
-        "billingAddress": {
-            "pk": application.billing_address.pk,
-        },
-        "homeCity": {
-            "pk": application.home_city.pk,
-        },
+        "additionalInformation": application.additional_information,
+        "municipality": application.municipality,
+        "contactPersonFirstName": application.contact_person_first_name,
+        "contactPersonLastName": application.contact_person_last_name,
+        "contactPersonEmail": application.contact_person_email,
+        "contactPersonPhoneNumber": application.contact_person_phone_number,
+        "organisationName": application.organisation_name,
+        "organisationEmail": application.organisation_email,
+        "organisationIdentifier": application.organisation_identifier,
+        "organisationYearEstablished": application.organisation_year_established,
+        "organisationActiveMembers": application.organisation_active_members,
+        "organisationCoreBusiness": application.organisation_core_business,
+        "organisationStreetAddress": application.organisation_street_address,
+        "organisationPostCode": application.organisation_post_code,
+        "organisationCity": application.organisation_city,
+        "billingStreetAddress": application.billing_street_address,
+        "billingPostCode": application.billing_post_code,
+        "billingCity": application.billing_city,
         "createdAt": application.created_at.isoformat(),
         "updatedAt": application.updated_at.isoformat(),
-        "additionalInformation": application.additional_information,
         "workingMemo": application.working_memo,
+        "applicationRound": {"pk": application.application_round.pk},
+        "user": {"pk": application.user.pk},
+        "applicationSections": [{"pk": section.pk}],
+        "status": application.status.value,
     }
 
 

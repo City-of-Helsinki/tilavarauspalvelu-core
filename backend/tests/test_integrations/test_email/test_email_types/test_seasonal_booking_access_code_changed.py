@@ -367,7 +367,7 @@ def test_seasonal_booking_access_code_changed__send_email(outbox):
     application_round = ApplicationRoundFactory.create_in_status_results_sent()
     application = ApplicationFactory.create(
         user=user,
-        contact_person__email="contact@email.com",
+        contact_person_email="contact@email.com",
         sent_at=local_datetime(),
         application_round=application_round,
     )
@@ -397,7 +397,7 @@ def test_seasonal_booking_access_code_changed__send_email__no_reservations(outbo
     application_round = ApplicationRoundFactory.create_in_status_results_sent()
     application = ApplicationFactory.create(
         user=user,
-        contact_person__email="contact@email.com",
+        contact_person_email="contact@email.com",
         sent_at=local_datetime(),
         application_round=application_round,
     )
@@ -422,7 +422,7 @@ def test_seasonal_booking_access_code_changed__send_email__no_recipients(outbox)
     application_round = ApplicationRoundFactory.create_in_status_results_sent()
     application = ApplicationFactory.create(
         user=None,
-        contact_person=None,
+        contact_person_email=None,
         sent_at=local_datetime(),
         application_round=application_round,
     )

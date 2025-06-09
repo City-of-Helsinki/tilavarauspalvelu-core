@@ -267,7 +267,13 @@ class ReservationActions:
         if reservee_is_unregistered_association:
             qs = qs.exclude(field_name__in=["reservee_id"])
 
-        return list(qs.distinct().order_by("field_name").values_list("field_name", flat=True))
+        required_fields = list(qs.distinct().order_by("field_name").values_list("field_name", flat=True))
+
+        # Home city removed and replaced with municipality
+        if "home_city" in required_fields:
+            required_fields.remove("home_city")
+
+        return required_fields
 
     def create_payment_order_paid_immediately(self, payment_type: PaymentType) -> PaymentOrder:
         if payment_type == PaymentType.ON_SITE:

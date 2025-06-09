@@ -9,6 +9,7 @@ from tilavarauspalvelu.enums import (
     AccessType,
     ADLoginAMR,
     CustomerTypeChoice,
+    MunicipalityChoice,
     ProfileLoginAMR,
     ReservationStateChoice,
     ReservationTypeChoice,
@@ -22,7 +23,6 @@ from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, next_
 
 from tests.factories import (
     AgeGroupFactory,
-    CityFactory,
     OriginHaukiResourceFactory,
     ReservableTimeSpanFactory,
     ReservationFactory,
@@ -265,7 +265,7 @@ def test_reservation__staff_create__optional_fields(graphql):
         bufferTimeBefore=int(datetime.timedelta(minutes=30).total_seconds()),
         description="Test description",
         freeOfChargeReason="Some reason here.",
-        homeCity=CityFactory.create(name="Helsinki").pk,
+        municipality=MunicipalityChoice.HELSINKI.value,
         name="Test reservation",
         numPersons=1,
         purpose=ReservationPurposeFactory.create(name="purpose").pk,
@@ -304,7 +304,7 @@ def test_reservation__staff_create__optional_fields(graphql):
     assert reservation.buffer_time_before == datetime.timedelta(minutes=30)
     assert reservation.description == "Test description"
     assert reservation.free_of_charge_reason == "Some reason here."
-    assert reservation.home_city.name == "Helsinki"
+    assert reservation.municipality == MunicipalityChoice.HELSINKI
     assert reservation.name == "Test reservation"
     assert reservation.num_persons == 1
     assert reservation.purpose.name == "purpose"
@@ -482,7 +482,6 @@ def test_reservation__staff_create__reservation_type_behalf_accepted(graphql):
 )
 def test_reservation__staff_create__reservee_used_ad_login(graphql, amr, expected):
     reservation_unit = ReservationUnitFactory.create_reservable_now()
-    CityFactory.create(name="Helsinki")
     user = UserFactory.create_superuser(social_auth__extra_data__amr=amr)
     graphql.force_login(user)
 

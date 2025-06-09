@@ -38,7 +38,7 @@ from tilavarauspalvelu.typing import ReservationDetails
 from utils.date_utils import local_end_of_day, local_start_of_day
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Address, ApplicationRound, Organisation, Person
+    from tilavarauspalvelu.models import ApplicationRound
 
 
 __all__ = [
@@ -195,33 +195,31 @@ class ApplicationRoundActions:
 
         return closed_time_spans
 
-    def _get_reservation_series_details(self, reservation_series: ReservationSeries) -> ReservationDetails:
-        application_section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
+    def _get_reservation_series_details(self, series: ReservationSeries) -> ReservationDetails:
+        application_section = series.allocated_time_slot.reservation_unit_option.application_section
         application = application_section.application
 
         reservee_type = ApplicantTypeChoice(application.applicant_type).customer_type_choice
-        contact_person: Person | None = getattr(application, "contact_person", None)
-        billing_address: Address | None = getattr(application, "billing_address", None)
 
         reservation_details = ReservationDetails(
-            name=reservation_series.name,
+            name=series.name,
             type=ReservationTypeChoice.SEASONAL,
             reservee_type=reservee_type,
             state=ReservationStateChoice.CONFIRMED,
-            user=reservation_series.user,
+            user=series.user,
             handled_at=application.application_round.handled_at,
             num_persons=application_section.num_persons,
             buffer_time_before=datetime.timedelta(0),
             buffer_time_after=datetime.timedelta(0),
-            reservee_first_name=getattr(contact_person, "first_name", ""),
-            reservee_last_name=getattr(contact_person, "last_name", ""),
-            reservee_email=getattr(contact_person, "email", ""),
-            reservee_phone=getattr(contact_person, "phone_number", ""),
-            billing_address_street=getattr(billing_address, "street_address", ""),
-            billing_address_city=getattr(billing_address, "city", ""),
-            billing_address_zip=getattr(billing_address, "post_code", ""),
+            reservee_first_name=application.contact_person_first_name,
+            reservee_last_name=application.contact_person_last_name,
+            reservee_email=application.contact_person_email,
+            reservee_phone=application.contact_person_phone_number,
+            billing_address_street=application.billing_street_address,
+            billing_address_city=application.billing_city,
+            billing_address_zip=application.billing_post_code,
             purpose=application_section.purpose,
-            home_city=application.home_city,
+            municipality=application.municipality,
         )
 
         if reservee_type == CustomerTypeChoice.INDIVIDUAL:
@@ -231,16 +229,14 @@ class ApplicationRoundActions:
             reservation_details["reservee_address_zip"] = reservation_details["billing_address_zip"]
 
         else:
-            organisation: Organisation | None = getattr(application, "organisation", None)
-            organisation_identifier: str = getattr(organisation, "identifier", "") or ""
-            organisation_address: Address | None = getattr(organisation, "address", None)
+            organisation_identifier = application.organisation_identifier
 
-            reservation_details["description"] = getattr(organisation, "core_business", "")
-            reservation_details["reservee_organisation_name"] = getattr(organisation, "name", "")
+            reservation_details["description"] = application.organisation_core_business
+            reservation_details["reservee_organisation_name"] = application.organisation_name
             reservation_details["reservee_id"] = organisation_identifier
             reservation_details["reservee_is_unregistered_association"] = not organisation_identifier
-            reservation_details["reservee_address_street"] = getattr(organisation_address, "street_address", "")
-            reservation_details["reservee_address_city"] = getattr(organisation_address, "city", "")
-            reservation_details["reservee_address_zip"] = getattr(organisation_address, "post_code", "")
+            reservation_details["reservee_address_street"] = application.organisation_street_address
+            reservation_details["reservee_address_city"] = application.organisation_city
+            reservation_details["reservee_address_zip"] = application.organisation_post_code
 
         return reservation_details

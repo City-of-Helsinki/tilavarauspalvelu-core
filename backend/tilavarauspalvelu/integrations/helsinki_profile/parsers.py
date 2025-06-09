@@ -4,11 +4,9 @@ import datetime
 import re
 from typing import TYPE_CHECKING
 
-from django.conf import settings
 from graphene_django_extensions.utils import get_nested
 
-from tilavarauspalvelu.enums import LoginMethod
-from tilavarauspalvelu.models import City
+from tilavarauspalvelu.enums import LoginMethod, MunicipalityChoice
 
 from .typing import (
     AfterLoginAdditionalInfo,
@@ -51,7 +49,7 @@ class ProfileDataParser:
             reservee_address_street=address.get("address"),
             reservee_address_zip=address.get("postalCode"),
             reservee_address_city=address.get("city"),
-            home_city=self.get_user_home_city(),
+            municipality=self.get_user_municipality(),
         )
 
     def after_login_additional_info(self) -> AfterLoginAdditionalInfo:
@@ -205,26 +203,23 @@ class ProfileDataParser:
 
         return verified_info.get("municipalityOfResidenceNumber")
 
-    def get_user_home_city(self) -> City | None:
+    def get_user_municipality(self) -> str | None:
         verified_info: VerifiedPersonalInfo | None = self.data.get("verifiedPersonalInformation")
         if verified_info is None:
             return None
 
         municipality_code = self.get_municipality_code()
+        if municipality_code is None:
+            return None
 
-        if municipality_code == settings.PRIMARY_MUNICIPALITY_NUMBER:
-            city: City | None = City.objects.filter(municipality_code=municipality_code).first()
-            if city is not None:
-                return city
+        if municipality_code == MunicipalityChoice.HELSINKI.code:
+            return MunicipalityChoice.HELSINKI.value
 
         municipality_name = self.get_municipality_name()
+        if municipality_name == MunicipalityChoice.HELSINKI.value:
+            return MunicipalityChoice.HELSINKI.value
 
-        if municipality_name == settings.PRIMARY_MUNICIPALITY_NAME:
-            city: City | None = City.objects.filter(name__iexact=municipality_name).first()
-            if city is not None:
-                return city
-
-        return City.objects.filter(name__iexact=settings.SECONDARY_MUNICIPALITY_NAME).first()
+        return MunicipalityChoice.OTHER.value
 
     def get_social_security_number(self) -> str | None:
         return get_nested(

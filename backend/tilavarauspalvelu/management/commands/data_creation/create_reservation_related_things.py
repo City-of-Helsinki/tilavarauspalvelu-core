@@ -13,7 +13,6 @@ from django.conf import settings
 from tilavarauspalvelu.enums import ReservationUnitImageType, TermsOfUseTypeChoices
 from tilavarauspalvelu.models import (
     AgeGroup,
-    City,
     Equipment,
     EquipmentCategory,
     OriginHaukiResource,
@@ -33,7 +32,6 @@ from utils.date_utils import DEFAULT_TIMEZONE, combine, local_start_of_day
 
 from tests.factories import (
     AgeGroupFactory,
-    CityFactory,
     EquipmentCategoryFactory,
     EquipmentFactory,
     OriginHaukiResourceFactory,
@@ -608,15 +606,6 @@ def _create_age_groups() -> list[AgeGroup]:
     ]
 
     return AgeGroup.objects.bulk_create(age_groups)
-
-
-@with_logs
-def _create_cities() -> list[City]:
-    cities = [
-        CityFactory.build()  #
-        for _ in range(10)
-    ]
-    return City.objects.bulk_create(cities)
 
 
 @with_logs

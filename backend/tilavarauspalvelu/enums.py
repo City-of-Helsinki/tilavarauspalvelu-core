@@ -31,6 +31,7 @@ __all__ = [
     "EventProperty",
     "HaukiResourceState",
     "Language",
+    "MunicipalityChoice",
     "OrderStatus",
     "OrderStatusWithFree",
     "OrganizationTypeChoice",
@@ -983,20 +984,23 @@ class ApplicantTypeChoice(models.TextChoices):
             case ApplicantTypeChoice.COMPANY:
                 return CustomerTypeChoice.BUSINESS
 
-    @enum.property
-    def should_have_organisation(self) -> bool:
-        return self in {
-            ApplicantTypeChoice.ASSOCIATION,
-            ApplicantTypeChoice.COMMUNITY,
-            ApplicantTypeChoice.COMPANY,
-        }
+
+class MunicipalityChoice(models.TextChoices):
+    """Municipality choices"""
+
+    HELSINKI = "HELSINKI", _("Helsinki")
+    OTHER = "OTHER", _("Other")
 
     @enum.property
-    def should_have_home_city(self) -> bool:
-        return self in {
-            ApplicantTypeChoice.ASSOCIATION,
-            ApplicantTypeChoice.COMMUNITY,
-        }
+    def code(self) -> str:
+        match self:
+            case MunicipalityChoice.HELSINKI:
+                return "091"
+            case MunicipalityChoice.OTHER:
+                return "199"
+            case _:
+                msg = f"Unknown municipality code for {self}"
+                raise ValueError(msg)
 
 
 class ApplicationRoundStatusChoice(models.TextChoices):

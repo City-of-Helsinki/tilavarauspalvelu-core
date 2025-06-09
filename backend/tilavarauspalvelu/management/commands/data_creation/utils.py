@@ -29,12 +29,9 @@ if TYPE_CHECKING:
         Weekday,
     )
     from tilavarauspalvelu.models import (
-        Address,
         AllocatedTimeSlot,
         Application,
         ApplicationSection,
-        Organisation,
-        Person,
         ReservationUnitCancellationRule,
         ReservationUnitOption,
         SuitableTimeRange,
@@ -314,9 +311,6 @@ class ApplicationRoundData:
 @dataclasses.dataclass(frozen=True, slots=True)
 class CreatedApplicationInfo:
     application: Application
-    addresses: list[Address]
-    contact_persons: list[Person]
-    organisations: list[Organisation]
     application_sections: list[ApplicationSection]
     suitable_time_ranges: list[SuitableTimeRange]
     reservation_unit_options: list[ReservationUnitOption]
