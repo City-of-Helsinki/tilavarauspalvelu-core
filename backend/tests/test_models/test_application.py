@@ -13,8 +13,6 @@ from tests.factories import (
     ApplicationFactory,
     ApplicationRoundFactory,
     ApplicationSectionFactory,
-    OrganisationFactory,
-    PersonFactory,
     ReservationUnitOptionFactory,
     UserFactory,
 )
@@ -144,26 +142,32 @@ def test_application__all_sections_allocated():
 
 
 def test_application__applicant():
-    application = ApplicationFactory.create(organisation=None, contact_person=None, user=None)
+    application = ApplicationFactory.create(
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user=None,
+    )
 
-    # Application has no user, organisation or contact person -> applicant is empty
+    # Application has no user, organisation name or contact person name -> applicant is empty
     assert application.applicant == ""
     assert Application.objects.filter(L(applicant="")).exists()
 
-    # Application has a user, but no organisation or contact person -> applicant is user's name
+    # Application has a user, but no organisation name or contact person name -> applicant is user's name
     application.user = UserFactory.create(first_name="John", last_name="Doe")
     application.save()
     assert application.applicant == "John Doe"
     assert Application.objects.filter(L(applicant="John Doe")).exists()
 
-    # Application has a user and a contact person, but no organisation -> applicant is contact person's name
-    application.contact_person = PersonFactory.create(first_name="Jane", last_name="Doe")
+    # Application has a user and a contact person name, but no organisation name -> applicant is contact person name
+    application.contact_person_first_name = "Jane"
+    application.contact_person_last_name = "Doe"
     application.save()
     assert application.applicant == "Jane Doe"
     assert Application.objects.filter(L(applicant="Jane Doe")).exists()
 
-    # Application an organisation -> applicant is organisation's name
-    application.organisation = OrganisationFactory.create(name="Test Organisation")
+    # Application an organisation name -> applicant is organisation name
+    application.organisation_name = "Test Organisation"
     application.save()
     assert application.applicant == "Test Organisation"
     assert Application.objects.filter(L(applicant="Test Organisation")).exists()

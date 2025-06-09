@@ -34,7 +34,7 @@ def test_application_round_results_export__single_application__all_fields(graphq
     application_round = ApplicationRoundFactory.create_in_status_handled()
     application = ApplicationFactory.create_in_status_in_allocation(
         application_round=application_round,
-        organisation__name="aaa",
+        organisation_name="aaa",
         application_sections__suitable_time_ranges__day_of_the_week=Weekday.TUESDAY,
         application_sections__reservation_unit_options__reservation_unit__name="foo",
         application_sections__reservation_unit_options__reservation_unit__unit__name="fizz",
@@ -58,7 +58,7 @@ def test_application_round_results_export__single_application__all_fields(graphq
         ApplicationSectionExportRow(
             application_id=str(application.id),
             application_status=application.status.value,
-            applicant=application.organisation.name,
+            applicant=application.organisation_name,
             section_id=str(section.id),
             section_status=section.status.value,
             section_name=section.name,

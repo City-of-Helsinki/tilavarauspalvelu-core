@@ -4,12 +4,11 @@ import datetime
 
 import pytest
 
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import CustomerTypeChoice, MunicipalityChoice, ReservationTypeChoice
 from utils.date_utils import local_datetime
 
 from tests.factories import (
     AgeGroupFactory,
-    CityFactory,
     ReservationFactory,
     ReservationMetadataSetFactory,
     ReservationPurposeFactory,
@@ -40,7 +39,6 @@ def test_reservation__update__with_additional_data(graphql):
     reservation = ReservationFactory.create_for_update()
 
     age_group = AgeGroupFactory.create(minimum=18, maximum=30)
-    city = CityFactory.create(name="Helsinki")
     purpose = ReservationPurposeFactory.create(name="Test purpose")
 
     additional_data = {
@@ -55,7 +53,7 @@ def test_reservation__update__with_additional_data(graphql):
         "billingPhone": "+358234567890",
         "description": "Test description",
         "freeOfChargeReason": "Free of charge reason",
-        "homeCity": city.pk,
+        "municipality": MunicipalityChoice.HELSINKI.value,
         "name": "Test reservation",
         "numPersons": 1,
         "purpose": purpose.pk,
@@ -94,7 +92,7 @@ def test_reservation__update__with_additional_data(graphql):
     assert reservation.buffer_time_before == datetime.timedelta()
     assert reservation.description == "Test description"
     assert reservation.free_of_charge_reason == "Free of charge reason"
-    assert reservation.home_city.name == "Helsinki"
+    assert reservation.municipality == MunicipalityChoice.HELSINKI
     assert reservation.name == "Test reservation"
     assert reservation.num_persons == 1
     assert reservation.purpose.name == "Test purpose"
@@ -222,7 +220,6 @@ def test_reservation__update__missing_home_city_for_individual(graphql):
         ],
     )
     reservation = ReservationFactory.create_for_update(reservation_units__metadata_set=metadata_set)
-    CityFactory.create(name="Helsinki")  # Create some city, but it should not be used
 
     data = get_update_data(reservation)
     data["reserveeFirstName"] = "John"
@@ -238,7 +235,7 @@ def test_reservation__update__missing_home_city_for_individual(graphql):
     assert reservation.reservee_first_name == data["reserveeFirstName"]
     assert reservation.reservee_last_name == data["reserveeLastName"]
     assert reservation.reservee_type == CustomerTypeChoice.INDIVIDUAL.value
-    assert reservation.home_city is None
+    assert reservation.municipality == MunicipalityChoice.HELSINKI.value
 
 
 def test_reservation__update__missing_reservee_id_for_individual(graphql):
@@ -260,7 +257,6 @@ def test_reservation__update__missing_reservee_id_for_individual(graphql):
         reservation_units__metadata_set=metadata_set,
         reservee_id="",
     )
-    CityFactory.create(name="Helsinki")  # Create some city, but it should not be used
 
     data = get_update_data(reservation)
     data["reserveeFirstName"] = "John"
@@ -298,7 +294,6 @@ def test_reservation__update__missing_reservee_organisation_name_for_individual(
         reservation_units__metadata_set=metadata_set,
         reservee_organisation_name="",
     )
-    CityFactory.create(name="Helsinki")  # Create some city, but it should not be used
 
     data = get_update_data(reservation)
     data["reserveeFirstName"] = "John"

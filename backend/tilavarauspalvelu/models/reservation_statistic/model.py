@@ -7,7 +7,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationCancelReasonChoice
+from tilavarauspalvelu.enums import CustomerTypeChoice, MunicipalityChoice, ReservationCancelReasonChoice
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
@@ -132,7 +132,6 @@ class ReservationStatistic(models.Model):
         age_group = getattr(reservation, "age_group", None)
         deny_reason = getattr(reservation, "deny_reason", None)
         user = getattr(reservation, "user", None)
-        home_city = getattr(reservation, "home_city", None)
         purpose = getattr(reservation, "purpose", None)
 
         cancel_reason: ReservationCancelReasonChoice | None = None
@@ -163,9 +162,6 @@ class ReservationStatistic(models.Model):
         statistic.deny_reason_text = getattr(deny_reason, "reason", "")
         statistic.duration_minutes = int(duration.total_seconds() / 60)
         statistic.end = end
-        statistic.home_city = getattr(home_city, "id", None)
-        statistic.home_city_municipality_code = getattr(home_city, "municipality_code", "")
-        statistic.home_city_name = getattr(home_city, "name", "")
         statistic.is_applied = allocated_time_slot is not None
         statistic.is_recurring = reservation_series is not None
         statistic.is_subsidised = reservation.price < reservation.non_subsidised_price
@@ -195,6 +191,11 @@ class ReservationStatistic(models.Model):
         statistic.reservee_uuid = str(getattr(user, "tvp_uuid", ""))
         statistic.state = reservation.state
         statistic.tax_percentage_value = reservation.tax_percentage_value
+
+        if reservation.municipality is not None:
+            municipality = MunicipalityChoice(reservation.municipality)
+            statistic.home_city_municipality_code = municipality.code
+            statistic.home_city_name = str(municipality.value)
 
         for res_unit in reservation.reservation_units.all():
             statistic.primary_reservation_unit = res_unit.id

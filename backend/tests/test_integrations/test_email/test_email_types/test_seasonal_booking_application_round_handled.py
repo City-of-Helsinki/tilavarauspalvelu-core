@@ -174,7 +174,7 @@ def test_seasonal_booking_application_round_handled__send_email(outbox):
     assert len(outbox) == 1
 
     assert outbox[0].subject == "Your application has been processed"
-    assert sorted(outbox[0].bcc) == sorted([application.user.email, application.contact_person.email])
+    assert sorted(outbox[0].bcc) == sorted([application.user.email, application.contact_person_email])
 
 
 @pytest.mark.django_db
@@ -196,10 +196,10 @@ def test_seasonal_booking_application_round_handled__send_email__multiple_langua
     assert len(outbox) == 2
 
     assert outbox[0].subject == "Hakemuksesi on käsitelty"
-    assert sorted(outbox[0].bcc) == sorted([application_1.user.email, application_1.contact_person.email])
+    assert sorted(outbox[0].bcc) == sorted([application_1.user.email, application_1.contact_person_email])
 
     assert outbox[1].subject == "Your application has been processed"
-    assert sorted(outbox[1].bcc) == sorted([application_2.user.email, application_2.contact_person.email])
+    assert sorted(outbox[1].bcc) == sorted([application_2.user.email, application_2.contact_person_email])
 
 
 @pytest.mark.django_db
@@ -224,7 +224,7 @@ def test_seasonal_booking_application_round_handled__send_email__wrong_status(ou
 def test_seasonal_booking_application_round_handled__send_email__no_recipients(outbox):
     application_round = ApplicationRoundFactory.create_in_status_results_sent()
     ApplicationFactory.create_in_status_handled(
-        application_round=application_round, user__email="", contact_person__email=""
+        application_round=application_round, user__email="", contact_person_email=""
     )
 
     EmailService.send_seasonal_booking_application_round_handled_emails()

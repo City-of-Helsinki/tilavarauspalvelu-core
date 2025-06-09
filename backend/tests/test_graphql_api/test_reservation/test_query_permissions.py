@@ -4,11 +4,15 @@ import datetime
 
 import pytest
 
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import (
+    CustomerTypeChoice,
+    MunicipalityChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
 
 from tests.factories import (
     AgeGroupFactory,
-    CityFactory,
     PaymentOrderFactory,
     ReservationFactory,
     ReservationPurposeFactory,
@@ -122,7 +126,7 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         description
         reserveeId
         cancelDetails
-        homeCity { nameFi }
+        municipality
         reserveeType
         reserveeIsUnregisteredAssociation
         applyingForFreeOfCharge
@@ -155,7 +159,7 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         "cancelDetails": None,
         "description": None,
         "freeOfChargeReason": None,
-        "homeCity": None,
+        "municipality": None,
         "isHandled": None,
         "name": None,
         "numPersons": None,
@@ -254,7 +258,7 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
         cancel_details="cancel details",
         description="desc",
         free_of_charge_reason="reason",
-        home_city=CityFactory.create(),
+        municipality=MunicipalityChoice.HELSINKI,
         name="foo",
         num_persons=1,
         price=123,
@@ -295,7 +299,7 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
         cancelDetails
         description
         freeOfChargeReason
-        homeCity { nameFi }
+        municipality
         isHandled
         name
         numPersons
@@ -338,7 +342,7 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
     assert response.node(0)["cancelDetails"] is not None, "field not found"
     assert response.node(0)["description"] is not None, "field not found"
     assert response.node(0)["freeOfChargeReason"] is not None, "field not found"
-    assert response.node(0)["homeCity"] is not None, "field not found"
+    assert response.node(0)["municipality"] is not None, "field not found"
     assert response.node(0)["isHandled"] is not None, "field not found"
     assert response.node(0)["name"] is not None, "field not found"
     assert response.node(0)["numPersons"] is not None, "field not found"

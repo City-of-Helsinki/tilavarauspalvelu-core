@@ -5,8 +5,14 @@ from decimal import Decimal
 
 import pytest
 
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationCancelReasonChoice, ReservationStateChoice, Weekday
-from tilavarauspalvelu.models import AgeGroup, City, ReservationStatistic
+from tilavarauspalvelu.enums import (
+    CustomerTypeChoice,
+    MunicipalityChoice,
+    ReservationCancelReasonChoice,
+    ReservationStateChoice,
+    Weekday,
+)
+from tilavarauspalvelu.models import AgeGroup, ReservationStatistic
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import (
@@ -37,7 +43,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
         description="movies&popcorn",
         ends_at=datetime.datetime(2020, 1, 1, 14, 0, tzinfo=DEFAULT_TIMEZONE),
         free_of_charge_reason="This is some reason.",
-        home_city=City.objects.create(name="Test", municipality_code="1234"),
+        municipality=MunicipalityChoice.HELSINKI,
         name="movies",
         non_subsidised_price=Decimal("11.00"),
         price=10,
@@ -74,9 +80,9 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     assert stat.deny_reason_text == ""
     assert stat.duration_minutes == 120
     assert stat.end == reservation.ends_at
-    assert stat.home_city == reservation.home_city.id
-    assert stat.home_city_municipality_code == reservation.home_city.municipality_code
-    assert stat.home_city_name == reservation.home_city.name
+    assert stat.home_city is None
+    assert stat.home_city_municipality_code == MunicipalityChoice(reservation.municipality).code
+    assert stat.home_city_name == MunicipalityChoice(reservation.municipality).value
     assert stat.is_applied is True
     assert stat.is_recurring is True
     assert stat.is_subsidised is True

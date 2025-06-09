@@ -17,6 +17,7 @@ from tilavarauspalvelu.enums import (
     ApplicantTypeChoice,
     ApplicationSectionStatusChoice,
     ApplicationStatusChoice,
+    MunicipalityChoice,
     Priority,
 )
 from tilavarauspalvelu.models import ApplicationSection
@@ -51,7 +52,7 @@ class ApplicationSectionFilterSet(ModelFilterSet):
     preferred_order = IntMultipleChoiceFilter(method="filter_include_preferred_order")
     include_preferred_order_10_or_higher = django_filters.BooleanFilter(method="filter_include_preferred_order")
 
-    home_city = IntMultipleChoiceFilter(field_name="application__home_city")
+    municipality = EnumMultipleChoiceFilter(field_name="application__municipality", enum=MunicipalityChoice)
     age_group = IntMultipleChoiceFilter()
     purpose = IntMultipleChoiceFilter()
 

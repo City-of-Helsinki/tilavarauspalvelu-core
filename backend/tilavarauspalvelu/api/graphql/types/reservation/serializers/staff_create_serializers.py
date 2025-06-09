@@ -10,10 +10,16 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import (
+    AccessType,
+    CustomerTypeChoice,
+    MunicipalityChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose, ReservationUnit
+from tilavarauspalvelu.models import AgeGroup, Reservation, ReservationPurpose, ReservationUnit
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
@@ -40,9 +46,15 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
         enum=ReservationTypeChoice,
         required=True,
     )
+    municipality = EnumFriendlyChoiceField(
+        choices=MunicipalityChoice.choices,
+        enum=MunicipalityChoice,
+        allow_null=True,
+        default=None,
+        required=False,
+    )
 
     purpose = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects, allow_null=True, required=False)
-    home_city = IntegerPrimaryKeyField(queryset=City.objects, allow_null=True, required=False)
     age_group = IntegerPrimaryKeyField(queryset=AgeGroup.objects, allow_null=True, required=False)
 
     state = EnumFriendlyChoiceField(
@@ -62,6 +74,7 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
             "num_persons",
             "working_memo",
             "type",
+            "municipality",
             #
             # Time information
             "begins_at",
@@ -98,7 +111,6 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
             # Relations
             "reservation_unit",
             "age_group",
-            "home_city",
             "purpose",
             #
             # Read only

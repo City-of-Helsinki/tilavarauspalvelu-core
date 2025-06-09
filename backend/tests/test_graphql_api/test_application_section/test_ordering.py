@@ -155,8 +155,8 @@ def test_application_section__order__by_applicant__asc(graphql):
     # given:
     # - There are two application sections
     # - A superuser is using the system
-    section_1 = ApplicationSectionFactory.create_in_status_unallocated(application__organisation__name="A")
-    section_2 = ApplicationSectionFactory.create_in_status_unallocated(application__organisation__name="B")
+    section_1 = ApplicationSectionFactory.create_in_status_unallocated(application__organisation_name="A")
+    section_2 = ApplicationSectionFactory.create_in_status_unallocated(application__organisation_name="B")
     graphql.login_with_superuser()
 
     # when:
@@ -175,8 +175,8 @@ def test_application_section__order__by_applicant__desc(graphql):
     # given:
     # - There are two application sections
     # - A superuser is using the system
-    section_1 = ApplicationSectionFactory.create_in_status_unallocated(application__organisation__name="A")
-    section_2 = ApplicationSectionFactory.create_in_status_unallocated(application__organisation__name="B")
+    section_1 = ApplicationSectionFactory.create_in_status_unallocated(application__organisation_name="A")
+    section_2 = ApplicationSectionFactory.create_in_status_unallocated(application__organisation_name="B")
     graphql.login_with_superuser()
 
     # when:

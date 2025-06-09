@@ -270,5 +270,5 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
             #
             user=next_reservation.user,
             purpose=next_reservation.purpose,
-            home_city=next_reservation.home_city,
+            municipality=next_reservation.municipality,
         )

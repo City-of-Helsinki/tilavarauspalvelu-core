@@ -32,9 +32,34 @@ class ApplicationAdmin(admin.ModelAdmin):
     search_fields = [
         "user__first_name",
         "user__last_name",
-        "application_round__reservation_units__name",
+        "organisation_name",
+        "organisation_identifier",
+        "organisation_street_address",
+        "organisation_post_code__iexact",
+        "organisation_city",
+        "contact_person_first_name",
+        "contact_person_last_name",
+        "billing_street_address",
+        "billing_post_code__iexact",
+        "billing_city",
+        "municipality",
     ]
-    search_help_text = _("Search by user's first name, last name or reservation units name")
+    search_help_text = (
+        "Search by one of these fields: "
+        "user's first name, "
+        "user's last name, "
+        "organisation's name, "
+        "organisation's identifier, "
+        "organisation's street address, "
+        "organisation's post code, "
+        "organisation's city, "
+        "contact person's first name, "
+        "contact person's last name, "
+        "billing address's street address, "
+        "billing address's post code, "
+        "billing address's city, "
+        "or municipality"
+    )
 
     # List
     list_display = [
@@ -62,6 +87,10 @@ class ApplicationAdmin(admin.ModelAdmin):
                     "id",
                     "status",
                     "application_round",
+                    "sent_at",
+                    "cancelled_at",
+                    "in_allocation_notification_sent_at",
+                    "results_ready_notification_sent_at",
                 ],
             },
         ],
@@ -69,23 +98,46 @@ class ApplicationAdmin(admin.ModelAdmin):
             _("Applicant"),
             {
                 "fields": [
-                    "applicant_type",
-                    "organisation",
-                    "contact_person",
                     "user",
-                    "billing_address",
-                    "home_city",
+                    "applicant_type",
                 ],
             },
         ],
         [
-            _("Time"),
+            _("Contact person"),
             {
                 "fields": [
-                    "sent_at",
-                    "cancelled_at",
-                    "in_allocation_notification_sent_at",
-                    "results_ready_notification_sent_at",
+                    "contact_person_first_name",
+                    "contact_person_last_name",
+                    "contact_person_email",
+                    "contact_person_phone_number",
+                ],
+            },
+        ],
+        [
+            _("Organisation"),
+            {
+                "fields": [
+                    "organisation_name",
+                    "organisation_email",
+                    "organisation_identifier",
+                    "organisation_year_established",
+                    "organisation_active_members",
+                    "organisation_core_business",
+                    "organisation_street_address",
+                    "organisation_post_code",
+                    "organisation_city",
+                    "municipality",
+                ],
+            },
+        ],
+        [
+            _("Billing address"),
+            {
+                "fields": [
+                    "billing_street_address",
+                    "billing_post_code",
+                    "billing_city",
                 ],
             },
         ],
@@ -103,9 +155,6 @@ class ApplicationAdmin(admin.ModelAdmin):
     readonly_fields = [
         "id",
         "user",
-        "organisation",
-        "contact_person",
-        "billing_address",
         "application_round",
     ]
 
@@ -116,11 +165,7 @@ class ApplicationAdmin(admin.ModelAdmin):
             .annotate(status=L("status"))
             .select_related(
                 "application_round",
-                "organisation",
-                "contact_person",
                 "user",
-                "home_city",
-                "billing_address",
             )
         )
 

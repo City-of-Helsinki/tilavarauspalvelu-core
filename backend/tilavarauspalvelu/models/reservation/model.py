@@ -16,18 +16,19 @@ from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import (
     AccessType,
     CustomerTypeChoice,
+    MunicipalityChoice,
     ReservationCancelReasonChoice,
     ReservationStateChoice,
     ReservationTypeChoice,
 )
 from utils.date_utils import datetime_range_as_string
 from utils.decimal_utils import round_decimal
+from utils.fields.model import StrChoiceField
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import (
         AgeGroup,
-        City,
         ReservationDenyReason,
         ReservationPurpose,
         ReservationSeries,
@@ -64,6 +65,7 @@ class Reservation(SerializableMixin, models.Model):
         choices=ReservationTypeChoice.choices,
         default=ReservationTypeChoice.NORMAL,
     )
+    municipality: str | None = StrChoiceField(enum=MunicipalityChoice, null=True, blank=True)
     handling_details: str = models.TextField(blank=True, default="")
     working_memo: str = models.TextField(null=True, blank=True, default="")
 
@@ -161,13 +163,6 @@ class Reservation(SerializableMixin, models.Model):
     )
     purpose: ReservationPurpose | None = models.ForeignKey(
         "tilavarauspalvelu.ReservationPurpose",
-        related_name="reservations",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
-    home_city: City | None = models.ForeignKey(
-        "tilavarauspalvelu.City",
         related_name="reservations",
         on_delete=models.SET_NULL,
         null=True,

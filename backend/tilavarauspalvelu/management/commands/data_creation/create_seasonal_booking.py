@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import random
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.enums import (
     ApplicantTypeChoice,
@@ -13,13 +13,10 @@ from tilavarauspalvelu.enums import (
     WeekdayChoice,
 )
 from tilavarauspalvelu.models import (
-    Address,
     AllocatedTimeSlot,
     Application,
     ApplicationRoundTimeSlot,
     ApplicationSection,
-    Organisation,
-    Person,
     ReservationUnit,
     ReservationUnitOption,
     SuitableTimeRange,
@@ -29,13 +26,7 @@ from tilavarauspalvelu.models import (
 from tilavarauspalvelu.typing import TimeSlotDB
 from utils.date_utils import DEFAULT_TIMEZONE, get_time_range, local_datetime
 
-from tests.factories import (
-    AddressFactory,
-    AllocatedTimeSlotFactory,
-    ApplicationRoundTimeSlotFactory,
-    OrganisationFactory,
-    PersonFactory,
-)
+from tests.factories import AllocatedTimeSlotFactory, ApplicationRoundTimeSlotFactory
 from tests.factories.application import ApplicationBuilder
 from tests.factories.application_round import ApplicationRoundBuilder
 from tests.factories.application_section import ApplicationSectionBuilder
@@ -61,14 +52,13 @@ from .utils import (
 if TYPE_CHECKING:
     from collections.abc import Generator
 
-    from tilavarauspalvelu.models import AgeGroup, ApplicationRound, City, ReservationPurpose
+    from tilavarauspalvelu.models import AgeGroup, ApplicationRound, ReservationPurpose
 
 
 @with_logs
 def _create_application_rounds(
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
 ) -> None:
     # --- Setup ----------------------------------------------------------------------------------------------------
 
@@ -93,7 +83,6 @@ def _create_application_rounds(
         reservation_units,
         reservation_purposes,
         age_groups,
-        cities,
         users,
     )
 
@@ -102,7 +91,6 @@ def _create_application_rounds(
         reservation_units,
         reservation_purposes,
         age_groups,
-        cities,
         users,
     )
 
@@ -111,7 +99,6 @@ def _create_application_rounds(
         reservation_units,
         reservation_purposes,
         age_groups,
-        cities,
         users,
     )
 
@@ -128,7 +115,6 @@ def _create_handled_application_rounds(
     reservation_units: list[ReservationUnit],
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
     users: list[User],
 ) -> None:
     now = local_datetime()
@@ -160,9 +146,6 @@ def _create_handled_application_rounds(
     selected_purposes = random_subset(reservation_purposes, min_size=1, max_size=min(4, len(reservation_purposes)))
     handled_round.purposes.add(*selected_purposes)
 
-    organisations: list[Organisation] = []
-    addresses: list[Address] = []
-    contact_persons: list[Person] = []
     applications: list[Application] = []
     application_sections: list[ApplicationSection] = []
     suitable_time_ranges: list[SuitableTimeRange] = []
@@ -224,7 +207,6 @@ def _create_handled_application_rounds(
             application_round=handled_round,
             sent_at=handled_round.application_period_ends_at - datetime.timedelta(days=1),
             age_groups=age_groups,
-            cities=cities,
             purposes=selected_purposes,
             reservation_units=reservation_units,
             users=users,
@@ -235,17 +217,11 @@ def _create_handled_application_rounds(
             allocation_info=allocation_info,
         )
         applications.append(results.application)
-        addresses.extend(results.addresses)
-        contact_persons.extend(results.contact_persons)
-        organisations.extend(results.organisations)
         application_sections.extend(results.application_sections)
         suitable_time_ranges.extend(results.suitable_time_ranges)
         reservation_unit_options.extend(results.reservation_unit_options)
         allocated_time_slots.extend(results.allocated_time_slots)
 
-    Address.objects.bulk_create(addresses)
-    Organisation.objects.bulk_create(organisations)
-    Person.objects.bulk_create(contact_persons)
     Application.objects.bulk_create(applications)
     ApplicationSection.objects.bulk_create(application_sections)
     SuitableTimeRange.objects.bulk_create(suitable_time_ranges)
@@ -259,7 +235,6 @@ def _create_application_round_in_allocations(
     reservation_units: list[ReservationUnit],
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
     users: list[User],
 ) -> None:
     """
@@ -303,9 +278,6 @@ def _create_application_round_in_allocations(
     selected_purposes = random_subset(reservation_purposes, min_size=1, max_size=min(4, len(reservation_purposes)))
     in_allocation_round.purposes.add(*selected_purposes)
 
-    organisations: list[Organisation] = []
-    addresses: list[Address] = []
-    contact_persons: list[Person] = []
     applications: list[Application] = []
     application_sections: list[ApplicationSection] = []
     suitable_time_ranges: list[SuitableTimeRange] = []
@@ -382,7 +354,6 @@ def _create_application_round_in_allocations(
             application_round=in_allocation_round,
             sent_at=sent_at,
             age_groups=age_groups,
-            cities=cities,
             purposes=selected_purposes,
             reservation_units=reservation_units,
             users=users,
@@ -392,9 +363,6 @@ def _create_application_round_in_allocations(
             option_info=data.option_info,
         )
         applications.append(results.application)
-        addresses.extend(results.addresses)
-        contact_persons.extend(results.contact_persons)
-        organisations.extend(results.organisations)
         application_sections.extend(results.application_sections)
         suitable_time_ranges.extend(results.suitable_time_ranges)
         reservation_unit_options.extend(results.reservation_unit_options)
@@ -408,7 +376,6 @@ def _create_application_round_in_allocations(
         application_round=in_allocation_round,
         sent_at=in_allocation_round.application_period_ends_at - datetime.timedelta(days=1),
         age_groups=age_groups,
-        cities=cities,
         purposes=selected_purposes,
         reservation_units=reservation_units,
         users=users,
@@ -424,16 +391,10 @@ def _create_application_round_in_allocations(
         option_info=OptionInfo(name="Multiple", number=3),
     )
     applications.append(results.application)
-    addresses.extend(results.addresses)
-    contact_persons.extend(results.contact_persons)
-    organisations.extend(results.organisations)
     application_sections.extend(results.application_sections)
     suitable_time_ranges.extend(results.suitable_time_ranges)
     reservation_unit_options.extend(results.reservation_unit_options)
 
-    Address.objects.bulk_create(addresses)
-    Organisation.objects.bulk_create(organisations)
-    Person.objects.bulk_create(contact_persons)
     Application.objects.bulk_create(applications)
     ApplicationSection.objects.bulk_create(application_sections)
     SuitableTimeRange.objects.bulk_create(suitable_time_ranges)
@@ -446,7 +407,6 @@ def _create_open_application_rounds(
     reservation_units: list[ReservationUnit],
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
     users: list[User],
 ) -> None:
     """
@@ -490,9 +450,6 @@ def _create_open_application_rounds(
     selected_purposes = random_subset(reservation_purposes, min_size=1, max_size=min(4, len(reservation_purposes)))
     open_round.purposes.add(*selected_purposes)
 
-    organisations: list[Organisation] = []
-    addresses: list[Address] = []
-    contact_persons: list[Person] = []
     applications: list[Application] = []
     application_sections: list[ApplicationSection] = []
     suitable_time_ranges: list[SuitableTimeRange] = []
@@ -570,7 +527,6 @@ def _create_open_application_rounds(
             application_round=open_round,
             sent_at=sent_at,
             age_groups=age_groups,
-            cities=cities,
             purposes=selected_purposes,
             reservation_units=reservation_units,
             users=users,
@@ -580,9 +536,6 @@ def _create_open_application_rounds(
             option_info=data.option_info,
         )
         applications.append(results.application)
-        addresses.extend(results.addresses)
-        contact_persons.extend(results.contact_persons)
-        organisations.extend(results.organisations)
         application_sections.extend(results.application_sections)
         suitable_time_ranges.extend(results.suitable_time_ranges)
         reservation_unit_options.extend(results.reservation_unit_options)
@@ -591,9 +544,6 @@ def _create_open_application_rounds(
     for application in random.sample(applications, k=3):
         application.cancelled_at = open_round.application_period_ends_at - datetime.timedelta(days=1)
 
-    Address.objects.bulk_create(addresses)
-    Organisation.objects.bulk_create(organisations)
-    Person.objects.bulk_create(contact_persons)
     Application.objects.bulk_create(applications)
     ApplicationSection.objects.bulk_create(application_sections)
     SuitableTimeRange.objects.bulk_create(suitable_time_ranges)
@@ -679,7 +629,6 @@ def _create_application_for_round(
     application_round: ApplicationRound,
     sent_at: datetime.datetime | None,
     age_groups: list[AgeGroup],
-    cities: list[City],
     purposes: list[ReservationPurpose],
     reservation_units: list[ReservationUnit],
     users: list[User],
@@ -689,37 +638,13 @@ def _create_application_for_round(
     option_info: OptionInfo,
     allocation_info: AllocationInfo | None = None,
 ) -> CreatedApplicationInfo:
-    addresses: list[Address] = []
-    contact_persons: list[Person] = []
-    organisations: list[Organisation] = []
-
-    contact_person = PersonFactory.build()
-    contact_persons.append(contact_person)
-
-    billing_address = AddressFactory.build()
-    addresses.append(billing_address)
-
-    organisation: Organisation | None = None
-    if applicant_type_info.applicant_type.should_have_organisation:
-        address = billing_address
-        if applicant_type_info.different_billing_address:
-            address = AddressFactory.build()
-            addresses.append(address)
-
-        kwargs: dict[str, Any] = {"address": address}
-        if applicant_type_info.unregistered:
-            kwargs["identifier"] = None
-
-        organisation = OrganisationFactory.build(**kwargs)
-        organisations.append(organisation)
-
-    home_city: City | None = None
-    if applicant_type_info.applicant_type.should_have_home_city:
-        home_city = random.choice(cities)
-
     application = (
         ApplicationBuilder()
         .in_application_round(application_round)
+        .for_applicant_type(
+            applicant_type=applicant_type_info.applicant_type,
+            unregistered=applicant_type_info.unregistered,
+        )
         .set_description_info(
             applicant_type=applicant_type_info.name,
             suitable_time=suitable_time_info.name,
@@ -730,11 +655,6 @@ def _create_application_for_round(
             cancelled_at=None,
             sent_at=sent_at,
             user=random.choice(users),
-            organisation=organisation,
-            contact_person=contact_person,
-            billing_address=billing_address,
-            home_city=home_city,
-            applicant_type=applicant_type_info.applicant_type,
         )
     )
 
@@ -751,9 +671,6 @@ def _create_application_for_round(
 
     return CreatedApplicationInfo(
         application=application,
-        addresses=addresses,
-        contact_persons=contact_persons,
-        organisations=organisations,
         application_sections=results.application_sections,
         suitable_time_ranges=results.suitable_time_ranges,
         reservation_unit_options=results.reservation_unit_options,

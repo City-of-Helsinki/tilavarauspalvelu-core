@@ -27,7 +27,7 @@ pytestmark = [
 
 def test_get_application_email_recipients():
     user = UserFactory.create(email="applicant@example.com")
-    application = ApplicationFactory.create(user=user, contact_person__email="contact@example.com")
+    application = ApplicationFactory.create(user=user, contact_person_email="contact@example.com")
 
     result = get_application_email_recipients(application)
     assert sorted(result) == ["applicant@example.com", "contact@example.com"]
@@ -35,21 +35,21 @@ def test_get_application_email_recipients():
 
 def test_get_application_email_recipients__no_contact_person():
     user = UserFactory.create(email="applicant@example.com")
-    application = ApplicationFactory.create(user=user, contact_person=None)
+    application = ApplicationFactory.create(user=user, contact_person_email=None)
 
     result = get_application_email_recipients(application)
     assert result == ["applicant@example.com"]
 
 
 def test_get_application_email_recipients__no_applicant():
-    application = ApplicationFactory.create(user=None, contact_person__email="contact@example.com")
+    application = ApplicationFactory.create(user=None, contact_person_email="contact@example.com")
 
     result = get_application_email_recipients(application)
     assert result == ["contact@example.com"]
 
 
 def test_get_application_email_recipients__no_contact_person_or_applicant():
-    application = ApplicationFactory.create(user=None, contact_person=None)
+    application = ApplicationFactory.create(user=None, contact_person_email=None)
 
     result = get_application_email_recipients(application)
     assert result == []
@@ -57,7 +57,7 @@ def test_get_application_email_recipients__no_contact_person_or_applicant():
 
 def test_get_series_email_recipients():
     user = UserFactory.create(email="applicant@example.com")
-    application = ApplicationFactory.create(user=user, contact_person__email="contact@example.com")
+    application = ApplicationFactory.create(user=user, contact_person_email="contact@example.com")
     series = ReservationSeriesFactory.create(
         user=user,
         allocated_time_slot__reservation_unit_option__application_section__application=application,
@@ -116,12 +116,12 @@ def test_get_recipients_for_applications_by_language():
         ApplicationFactory.create(
             user__email="applicant1@example.com",
             user__preferred_language="fi",
-            contact_person__email="contact1@example.com",
+            contact_person_email="contact1@example.com",
         ),
         ApplicationFactory.create(
             user__email="applicant2@example.com",
             user__preferred_language="en",
-            contact_person__email="contact2@example.com",
+            contact_person_email="contact2@example.com",
         ),
     ]
 

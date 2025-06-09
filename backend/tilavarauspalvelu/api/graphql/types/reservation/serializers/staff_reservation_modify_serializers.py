@@ -6,10 +6,16 @@ from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework.fields import IntegerField
 
-from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import (
+    AccessType,
+    CustomerTypeChoice,
+    MunicipalityChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose
+from tilavarauspalvelu.models import AgeGroup, Reservation, ReservationPurpose
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -31,9 +37,15 @@ class StaffReservationModifySerializer(NestingModelSerializer):
         enum=ReservationTypeChoice,
         required=False,
     )
+    municipality = EnumFriendlyChoiceField(
+        choices=MunicipalityChoice.choices,
+        enum=MunicipalityChoice,
+        allow_null=True,
+        default=None,
+        required=False,
+    )
 
     age_group = IntegerPrimaryKeyField(queryset=AgeGroup.objects, required=False, allow_null=True)
-    home_city = IntegerPrimaryKeyField(queryset=City.objects, required=False, allow_null=True)
     purpose = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects, required=False, allow_null=True)
 
     state = EnumFriendlyChoiceField(
@@ -52,6 +64,7 @@ class StaffReservationModifySerializer(NestingModelSerializer):
             "description",
             "num_persons",
             "type",
+            "municipality",
             #
             # Free of charge information
             "applying_for_free_of_charge",
@@ -83,7 +96,6 @@ class StaffReservationModifySerializer(NestingModelSerializer):
             #
             # Relations
             "age_group",
-            "home_city",
             "purpose",
             #
             # Read only

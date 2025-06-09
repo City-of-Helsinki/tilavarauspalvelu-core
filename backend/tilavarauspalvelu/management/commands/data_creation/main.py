@@ -10,7 +10,6 @@ from .create_permissions import _create_unit_groups, _set_user_group_permissions
 from .create_reservation_related_things import (
     _create_age_groups,
     _create_cancellation_rules,
-    _create_cities,
     _create_hauki_resources,
     _create_reservation_metadata_sets,
     _create_reservation_purposes,
@@ -49,12 +48,10 @@ def create_test_data(*, flush: bool = True) -> None:
 
     reservation_purposes = _create_reservation_purposes()
     age_groups = _create_age_groups()
-    cities = _create_cities()
 
     _create_reservations(
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
-        cities=cities,
     )
 
     _create_reservation_series(
@@ -65,7 +62,6 @@ def create_test_data(*, flush: bool = True) -> None:
         tax_percentage=tax_percentages["0"],
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
-        cities=cities,
     )
 
     _create_unit_groups()
@@ -76,7 +72,6 @@ def create_test_data(*, flush: bool = True) -> None:
     _create_application_rounds(
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
-        cities=cities,
     )
 
     _create_banner_notifications()
