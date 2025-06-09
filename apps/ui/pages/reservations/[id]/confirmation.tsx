@@ -215,7 +215,8 @@ export const CONFIRMATION_QUERY = gql`
       ...Instructions
       calendarUrl
       paymentOrder {
-        ...OrderFields
+        id
+        receiptUrl
       }
       reservationUnits {
         id

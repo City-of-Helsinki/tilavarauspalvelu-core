@@ -764,7 +764,10 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
       applyingForFreeOfCharge
       calendarUrl
       paymentOrder {
-        ...OrderFields
+        id
+        status
+        checkoutUrl
+        receiptUrl
       }
       recurringReservation {
         id

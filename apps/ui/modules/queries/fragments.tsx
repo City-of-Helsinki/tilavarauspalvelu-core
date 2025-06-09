@@ -41,18 +41,6 @@ export const CANCELLATION_RULE_FRAGMENT = gql`
   }
 `;
 
-// TODO don't use convenience fragment
-export const ORDER_FRAGMENT = gql`
-  fragment OrderFields on PaymentOrderNode {
-    id
-    reservationPk
-    status
-    paymentType
-    receiptUrl
-    checkoutUrl
-  }
-`;
-
 export const BLOCKING_RESERVATION_FRAGMENT = gql`
   fragment BlockingReservationFields on ReservationNode {
     pk

@@ -513,9 +513,6 @@ export const RESERVATION_IN_PROGRESS_QUERY = gql`
       bufferTimeBefore
       bufferTimeAfter
       calendarUrl
-      paymentOrder {
-        ...OrderFields
-      }
       reservationUnits {
         id
         canApplyFreeOfCharge

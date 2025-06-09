@@ -9,11 +9,8 @@ import {
   type OrderQuery,
   type OrderQueryVariables,
   OrderDocument,
-  type ReservationStateQueryVariables,
-  ReservationStateDocument,
 } from "@gql/gql-types";
 import { genericTermsVariant } from "./const";
-import { base64encode } from "common/src/helpers";
 import { getVersion } from "./baseUtils.mjs";
 
 export { getVersion };
@@ -76,36 +73,33 @@ export async function getReservationByOrderUuid(
   uuid: string
 ): Promise<NonNullable<ReservationStateQuery["reservation"]> | null> {
   // TODO retry once if not found (or increase the timeout so the webhook from store has fired)
-  const { data: orderData } = await apolloClient.query<
-    OrderQuery,
-    OrderQueryVariables
-  >({
+  const { data } = await apolloClient.query<OrderQuery, OrderQueryVariables>({
     query: OrderDocument,
     variables: { orderUuid: uuid },
   });
 
-  const order = orderData?.order ?? undefined;
-  const { reservationPk: pk } = order ?? {};
+  const order = data?.order;
+  const pk = order?.reservation?.pk;
   if (!pk) {
     return null;
   }
 
-  const id = base64encode(`ReservationNode:${pk}`);
-  const { data } = await apolloClient.query<
-    ReservationStateQuery,
-    ReservationStateQueryVariables
-  >({
-    query: ReservationStateDocument,
-    variables: { id },
-  });
-
-  return data?.reservation ?? null;
+  return order.reservation ?? null;
 }
 
 export const GET_ORDER = gql`
   query Order($orderUuid: String!) {
     order(orderUuid: $orderUuid) {
-      ...OrderFields
+      id
+      reservation {
+        id
+        pk
+        state
+      }
+      status
+      paymentType
+      receiptUrl
+      checkoutUrl
     }
   }
 `;
