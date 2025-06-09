@@ -14,12 +14,12 @@ dynamic = ["dependencies"]  # Use tool.poetry for dependency management
 requires-poetry = ">=2.0"
 
 [tool.poetry.dependencies]
-Django = "5.1.9"
+Django = "5.1.10"
 django-auditlog = "3.1.2"
 django-cors-headers = "4.7.0"
 django-environment-config = { version = "0.2.2", extras = ["db"] }
 django-filter = "25.1"
-django-health-check = "3.18.3"
+django-health-check = "3.19.0"
 django-helusers = "0.13.3"
 django-jinja = "2.11.0"
 django-lookup-property = "0.1.8"
@@ -41,7 +41,7 @@ sentry-sdk = "2.29.1"
 social-auth-app-django = "5.4.3"
 stamina = "25.1.0"
 # Skip installation on Windows as uWSGI does not support it without Cygwin.
-uWSGI = { version = "2.0.29", markers = "sys_platform != 'win32'" }
+uWSGI = { version = "2.0.30", markers = "sys_platform != 'win32'" }
 whitenoise = "6.9.0"
 xhtml2pdf = "0.2.17"
 
@@ -53,7 +53,7 @@ django-admin-rangefilter = "0.13.2"
 django-admin-sortable2 = "2.2.8"
 django-extensions = "4.1"
 django-import-export = "4.3.7"
-django-more-admin-filters = "1.12"
+django-more-admin-filters = "1.13"
 django-subforms = "0.3.1"
 django-tinymce = "4.1.0"
 
@@ -71,7 +71,7 @@ freezegun = "1.5.2"
 polib = "1.2.0"
 pyinstrument = "5.0.2"
 pypdf2 = "3.0.1"
-pytest = "8.3.5"
+pytest = "8.4.0"
 pytest-cov = "6.1.1"
 pytest-django = "4.11.1"
 pytest-split = "0.10.0"
@@ -80,7 +80,7 @@ pytest-xdist = "3.7.0"
 [tool.poetry.group.lint.dependencies]
 # Dependencies only required for linting.
 pre-commit = "4.2.0"
-ruff = "0.11.12"
+ruff = "0.11.13"
 
 [project.entry-points.pytest11]
 tilavarauspalvelu = "tests.plugins"
