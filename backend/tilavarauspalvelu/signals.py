@@ -16,6 +16,7 @@ from django.contrib.auth import user_logged_in
 from django.core.signals import got_request_exception
 from django.db.models.signals import m2m_changed, post_delete, post_save, pre_save
 from django.dispatch import receiver
+from easy_thumbnails.files import get_thumbnailer
 from graphene_django_extensions.errors import (
     GQLCreatePermissionDeniedError,
     GQLDeletePermissionDeniedError,
@@ -31,7 +32,6 @@ from rest_framework.exceptions import ValidationError
 from sentry_sdk.integrations.django import _got_request_exception  # noqa: PLC2701
 from social_core.exceptions import AuthCanceled, AuthFailed, AuthStateForbidden, AuthStateMissing, AuthTokenError
 
-from tilavarauspalvelu.integrations.image_cache import purge_previous_image_cache
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import (
     PaymentAccounting,
@@ -43,12 +43,13 @@ from tilavarauspalvelu.models import (
     Unit,
 )
 from tilavarauspalvelu.tasks import (
-    create_or_update_reservation_statistics,
-    create_reservation_unit_thumbnails_and_urls,
-    refresh_reservation_unit_accounting,
-    refresh_reservation_unit_product_mapping,
+    create_statistics_for_reservations_task,
+    purge_image_cache_task,
+    refresh_reservation_unit_accounting_task,
+    refresh_reservation_unit_product_mapping_task,
     update_affecting_time_spans_task,
     update_reservation_unit_hierarchy_task,
+    update_reservation_unit_image_urls_task,
     update_reservation_unit_search_vectors_task,
 )
 from utils.date_utils import local_datetime
@@ -65,16 +66,26 @@ if TYPE_CHECKING:
 def _purpose_pre_save(sender: Any, **kwargs: Unpack[PreSaveKwargs[Purpose]]) -> None:
     instance = kwargs["instance"]
 
-    if settings.IMAGE_CACHE_ENABLED:
-        purge_previous_image_cache(instance)
+    if settings.IMAGE_CACHE_ENABLED and instance.pk is not None:
+        previous: Purpose | None = Purpose.objects.filter(pk=instance.pk).first()
+        if previous is not None and previous.image is not None:
+            aliases = settings.THUMBNAIL_ALIASES[""]
+            for conf_key in list(aliases.keys()):
+                image_path = get_thumbnailer(previous.image)[conf_key].url
+                purge_image_cache_task.delay(image_path)
 
 
 @receiver(pre_save, sender=ReservationUnitImage, dispatch_uid="reservation_unit_image_pre_save")
 def _reservation_unit_image_pre_save(sender: Any, **kwargs: Unpack[PreSaveKwargs[ReservationUnitImage]]) -> None:
     instance = kwargs["instance"]
 
-    if settings.UPDATE_RESERVATION_UNIT_THUMBNAILS and settings.IMAGE_CACHE_ENABLED:
-        purge_previous_image_cache(instance)
+    if settings.UPDATE_RESERVATION_UNIT_THUMBNAILS and settings.IMAGE_CACHE_ENABLED and instance.pk is not None:
+        previous: ReservationUnitImage | None = ReservationUnitImage.objects.filter(pk=instance.pk).first()
+        if previous is not None and previous.image is not None:
+            aliases = settings.THUMBNAIL_ALIASES[""]
+            for conf_key in list(aliases.keys()):
+                image_path = get_thumbnailer(previous.image)[conf_key].url
+                purge_image_cache_task.delay(image_path)
 
 
 # --- Post save signals -------------------------------------------------------------------------------------------
@@ -97,7 +108,7 @@ def _reservation_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Reservat
     using = kwargs["using"]
 
     if settings.SAVE_RESERVATION_STATISTICS:
-        create_or_update_reservation_statistics.delay(reservation_pks=[instance.pk])
+        create_statistics_for_reservations_task.delay(reservation_pks=[instance.pk])
 
     if settings.UPDATE_AFFECTING_TIME_SPANS:
         update_affecting_time_spans_task.delay(using=using)
@@ -110,7 +121,7 @@ def _reservation_unit_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Res
     using = kwargs["using"]
 
     if settings.UPDATE_PRODUCT_MAPPING:
-        refresh_reservation_unit_product_mapping.delay(instance.pk)
+        refresh_reservation_unit_product_mapping_task.delay(instance.pk)
 
     if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and created:
         update_reservation_unit_hierarchy_task.delay(using=using)
@@ -124,7 +135,7 @@ def _reservation_unit_image_post_save(sender: Any, **kwargs: Unpack[PostSaveKwar
     instance = kwargs["instance"]
 
     if settings.UPDATE_RESERVATION_UNIT_THUMBNAILS:
-        create_reservation_unit_thumbnails_and_urls.delay(instance.pk)
+        update_reservation_unit_image_urls_task.delay(instance.pk)
 
 
 @receiver(post_save, sender=Unit, dispatch_uid="unit_post_save")
@@ -144,7 +155,7 @@ def _payment_accounting_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[P
         reservation_units_from_units = ReservationUnit.objects.filter(unit__in=instance.units.all())
         reservation_units = reservation_units_from_units.union(instance.reservation_units.all())
         for reservation_unit in reservation_units:
-            refresh_reservation_unit_accounting.delay(reservation_unit.pk)
+            refresh_reservation_unit_accounting_task.delay(reservation_unit.pk)
 
 
 # --- Post delete signals -----------------------------------------------------------------------------------------
@@ -188,7 +199,7 @@ def _reservation_reservation_units_m2m(sender: Any, **kwargs: Unpack[M2MChangedK
     using = kwargs["using"]
 
     if action == "post_add" and not reverse and settings.SAVE_RESERVATION_STATISTICS:
-        create_or_update_reservation_statistics.delay(reservation_pks=[instance.pk])
+        create_statistics_for_reservations_task.delay(reservation_pks=[instance.pk])
 
     if settings.UPDATE_AFFECTING_TIME_SPANS:
         update_affecting_time_spans_task.delay(using=using)

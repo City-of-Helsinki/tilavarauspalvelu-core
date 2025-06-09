@@ -9,7 +9,7 @@ from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, Reservat
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
-from tilavarauspalvelu.tasks import update_pindora_access_code_is_active
+from tilavarauspalvelu.tasks import update_pindora_access_code_is_active_task
 from utils.date_utils import local_datetime
 
 from tests.factories import RecurringReservationFactory, ReservationFactory
@@ -34,7 +34,7 @@ def test_update_pindora_access_code_is_active__activate():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    update_pindora_access_code_is_active()
+    update_pindora_access_code_is_active_task()
 
     assert PindoraClient.activate_reservation_access_code.call_count == 1
     assert PindoraClient.deactivate_reservation_access_code.call_count == 0
@@ -61,7 +61,7 @@ def test_update_pindora_access_code_is_active__deactivate():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    update_pindora_access_code_is_active()
+    update_pindora_access_code_is_active_task()
 
     assert PindoraClient.activate_reservation_access_code.call_count == 0
     assert PindoraClient.deactivate_reservation_access_code.call_count == 1
@@ -87,7 +87,7 @@ def test_update_pindora_access_code_is_active__already_active():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    update_pindora_access_code_is_active()
+    update_pindora_access_code_is_active_task()
 
     assert PindoraClient.activate_reservation_access_code.call_count == 0
     assert PindoraClient.deactivate_reservation_access_code.call_count == 0
@@ -113,7 +113,7 @@ def test_update_pindora_access_code_is_active__already_not_active():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    update_pindora_access_code_is_active()
+    update_pindora_access_code_is_active_task()
 
     assert PindoraClient.activate_reservation_access_code.call_count == 0
     assert PindoraClient.deactivate_reservation_access_code.call_count == 0
@@ -139,7 +139,7 @@ def test_update_pindora_access_code_is_active__activate__pindora_error():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    update_pindora_access_code_is_active()
+    update_pindora_access_code_is_active_task()
 
     assert PindoraClient.activate_reservation_access_code.call_count == 1
     assert PindoraClient.deactivate_reservation_access_code.call_count == 0
@@ -165,7 +165,7 @@ def test_update_pindora_access_code_is_active__activate__pindora_error__404():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    update_pindora_access_code_is_active()
+    update_pindora_access_code_is_active_task()
 
     assert PindoraClient.activate_reservation_access_code.call_count == 1
     assert PindoraClient.deactivate_reservation_access_code.call_count == 0
@@ -191,7 +191,7 @@ def test_update_pindora_access_code_is_active__deactivate__pindora_error():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    update_pindora_access_code_is_active()
+    update_pindora_access_code_is_active_task()
 
     assert PindoraClient.activate_reservation_access_code.call_count == 0
     assert PindoraClient.deactivate_reservation_access_code.call_count == 1
@@ -217,7 +217,7 @@ def test_update_pindora_access_code_is_active__deactivate__pindora_error__404():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    update_pindora_access_code_is_active()
+    update_pindora_access_code_is_active_task()
 
     assert PindoraClient.activate_reservation_access_code.call_count == 0
     assert PindoraClient.deactivate_reservation_access_code.call_count == 1
@@ -244,7 +244,7 @@ def test_update_pindora_access_code_is_active__recurring_reservation_is_ignored(
         recurring_reservation=RecurringReservationFactory.create(),
     )
 
-    update_pindora_access_code_is_active()
+    update_pindora_access_code_is_active_task()
 
     assert PindoraClient.activate_reservation_access_code.call_count == 0
     assert PindoraClient.deactivate_reservation_access_code.call_count == 0

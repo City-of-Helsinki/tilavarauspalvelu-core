@@ -22,7 +22,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
 )
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import OriginHaukiResource, PaymentProduct, Reservation, ReservationUnit
-from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting
+from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting_task
 from utils.date_utils import (
     DEFAULT_TIMEZONE,
     local_date,
@@ -552,7 +552,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             # Use 'qs.update()' instead of 'model.save()' to avoid triggering signals and creating an infinite loop.
             ReservationUnit.objects.filter(pk=self.reservation_unit.pk).update(payment_product=payment_product)
 
-            refresh_reservation_unit_accounting.delay(self.reservation_unit.pk)
+            refresh_reservation_unit_accounting_task.delay(self.reservation_unit.pk)
 
         # Remove product mapping if merchant is removed
         if self.reservation_unit.payment_product and not payment_merchant:

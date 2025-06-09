@@ -114,7 +114,7 @@ class QueryLoggingMiddleware:
                 yield
         finally:
             try:
-                from tilavarauspalvelu.tasks import save_sql_queries_from_request
+                from tilavarauspalvelu.tasks import save_sql_queries_from_request_task
 
                 total_duration_ms = (time.perf_counter_ns() - start) // 1_000_000
 
@@ -124,7 +124,7 @@ class QueryLoggingMiddleware:
                     or len(query_log) >= settings.QUERY_LOGGING_QUERY_COUNT_THRESHOLD
                     or (request.body and len(request.body) >= settings.QUERY_LOGGING_BODY_LENGTH_THRESHOLD)
                 ):
-                    save_sql_queries_from_request.delay(
+                    save_sql_queries_from_request_task.delay(
                         queries=query_log,
                         path=request.path,
                         body=request.body,

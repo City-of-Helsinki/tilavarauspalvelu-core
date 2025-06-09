@@ -44,33 +44,33 @@ if TYPE_CHECKING:
 
 __all__ = [
     "anonymize_old_users_task",
-    "create_missing_pindora_reservations",
-    "create_reservation_unit_thumbnails_and_urls",
+    "create_missing_pindora_reservations_task",
     "deactivate_old_permissions_task",
-    "delete_expired_applications",
-    "delete_pindora_reservation",
-    "generate_reservation_series_from_allocations",
+    "delete_expired_applications_task",
+    "delete_pindora_reservation_task",
+    "generate_reservation_series_from_allocations_task",
     "prune_reservation_statistics_task",
     "prune_reservations_task",
-    "purge_image_cache",
-    "rebuild_space_tree_hierarchy",
+    "purge_image_cache_task",
+    "rebuild_space_tree_hierarchy_task",
     "refresh_expired_payments_in_verkkokauppa_task",
-    "refresh_reservation_unit_accounting",
-    "refresh_reservation_unit_product_mapping",
-    "remove_old_personal_info_view_logs",
-    "save_personal_info_view_log",
-    "save_sql_queries_from_request",
+    "refresh_reservation_unit_accounting_task",
+    "refresh_reservation_unit_product_mapping_task",
+    "remove_old_personal_info_view_logs_task",
+    "save_personal_info_view_log_task",
+    "save_sql_queries_from_request_task",
     "send_application_handled_email_task",
     "send_application_in_allocation_email_task",
     "send_permission_deactivation_email_task",
     "send_user_anonymization_email_task",
     "update_affecting_time_spans_task",
-    "update_origin_hauki_resource_reservable_time_spans",
-    "update_pindora_access_code_is_active",
+    "update_origin_hauki_resource_reservable_time_spans_task",
+    "update_pindora_access_code_is_active_task",
     "update_reservation_unit_hierarchy_task",
-    "update_reservation_unit_pricings_tax_percentage",
+    "update_reservation_unit_image_urls_task",
+    "update_reservation_unit_pricings_tax_percentage_task",
     "update_reservation_unit_search_vectors_task",
-    "update_units_from_tprek",
+    "update_units_from_tprek_task",
 ]
 
 
@@ -113,14 +113,14 @@ def singleton_task[**P](task: Task) -> Task:
 
 
 @app.task(name="rebuild_space_tree_hierarchy")
-def rebuild_space_tree_hierarchy() -> None:
+def rebuild_space_tree_hierarchy_task() -> None:
     with transaction.atomic():
         Space.objects.rebuild()
         ReservationUnitHierarchy.refresh()
 
 
 @app.task(name="update_units_from_tprek")
-def update_units_from_tprek() -> None:
+def update_units_from_tprek_task() -> None:
     from tilavarauspalvelu.integrations.tprek.tprek_unit_importer import TprekUnitImporter
 
     units_to_update = Unit.objects.exclude(tprek_id__isnull=True)
@@ -129,7 +129,7 @@ def update_units_from_tprek() -> None:
 
 
 @app.task(name="save_personal_info_view_log")
-def save_personal_info_view_log(user_id: int, viewer_user_id: int, field: str) -> None:
+def save_personal_info_view_log_task(user_id: int, viewer_user_id: int, field: str) -> None:
     user = User.objects.filter(id=user_id).first()
     viewer_user = User.objects.filter(id=viewer_user_id).first()
 
@@ -148,13 +148,13 @@ def save_personal_info_view_log(user_id: int, viewer_user_id: int, field: str) -
 
 
 @app.task(name="remove_old_personal_info_view_logs")
-def remove_old_personal_info_view_logs() -> None:
+def remove_old_personal_info_view_logs_task() -> None:
     remove_lt = local_datetime() - datetime.timedelta(days=365 * 2)
     PersonalInfoViewLog.objects.filter(access_time__lt=remove_lt).delete()
 
 
 @app.task(name="update_origin_hauki_resource_reservable_time_spans")
-def update_origin_hauki_resource_reservable_time_spans() -> None:
+def update_origin_hauki_resource_reservable_time_spans_task() -> None:
     from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 
     HaukiResourceHashUpdater().run()
@@ -163,11 +163,11 @@ def update_origin_hauki_resource_reservable_time_spans() -> None:
 @app.task(name="prune_reservations")
 @deprecated("Use 'handle_unfinished_reservations' instead. This can be removed in next release.")
 def prune_reservations_task() -> None:
-    handle_unfinished_reservations()
+    handle_unfinished_reservations_task()
 
 
 @app.task(name="handle_unfinished_reservations")
-def handle_unfinished_reservations() -> None:
+def handle_unfinished_reservations_task() -> None:
     # Remove reservations that did not complete checkout in time.
     Reservation.objects.delete_unfinished()
 
@@ -214,7 +214,7 @@ def refund_paid_reservation_task(reservation_pk: int) -> None:
 
 
 @app.task(
-    name="refund_paid_reservation",
+    name="refund_payment_order_for_webshop",
     autoretry_for=(Exception,),
     max_retries=5,
     retry_backoff=True,
@@ -268,12 +268,12 @@ def update_affecting_time_spans_task(using: str | None = None) -> None:
 
 
 @app.task(name="create_statistics_for_reservations")
-def create_or_update_reservation_statistics(reservation_pks: list[int]) -> None:
+def create_statistics_for_reservations_task(reservation_pks: list[int]) -> None:
     Reservation.objects.filter(pk__in=reservation_pks).upsert_statistics()
 
 
 @app.task(name="update_reservation_unit_pricings_tax_percentage")
-def update_reservation_unit_pricings_tax_percentage(
+def update_reservation_unit_pricings_tax_percentage_task(
     change_date: str,
     current_tax: str,
     future_tax: str,
@@ -322,7 +322,7 @@ def update_reservation_unit_pricings_tax_percentage(
     max_retries=5,
     retry_backoff=True,
 )
-def refresh_reservation_unit_product_mapping(reservation_unit_pk: int) -> None:
+def refresh_reservation_unit_product_mapping_task(reservation_unit_pk: int) -> None:
     reservation_unit: ReservationUnit | None = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
     if reservation_unit is None:
         SentryLogger.log_message(
@@ -341,7 +341,7 @@ def refresh_reservation_unit_product_mapping(reservation_unit_pk: int) -> None:
     max_retries=5,
     retry_backoff=True,
 )
-def refresh_reservation_unit_accounting(reservation_unit_pk: int) -> None:
+def refresh_reservation_unit_accounting_task(reservation_unit_pk: int) -> None:
     reservation_unit: ReservationUnit | None = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
     if reservation_unit is None:
         SentryLogger.log_message(
@@ -355,7 +355,7 @@ def refresh_reservation_unit_accounting(reservation_unit_pk: int) -> None:
 
 
 @app.task(name="update_reservation_unit_image_urls")
-def create_reservation_unit_thumbnails_and_urls(pk: int | None = None) -> None:
+def update_reservation_unit_image_urls_task(pk: int | None = None) -> None:
     """Create optimized thumbnail images and update URLs to the reservation unit instances."""
     images = ReservationUnitImage.objects.all()
     if pk is not None:
@@ -365,7 +365,7 @@ def create_reservation_unit_thumbnails_and_urls(pk: int | None = None) -> None:
 
 
 @app.task(name="purge_image_cache")
-def purge_image_cache(image_path: str) -> None:
+def purge_image_cache_task(image_path: str) -> None:
     from tilavarauspalvelu.integrations.image_cache import purge
 
     purge(image_path)
@@ -374,7 +374,7 @@ def purge_image_cache(image_path: str) -> None:
 @singleton_task
 @app.task(name="generate_reservation_series_from_allocations")
 @SentryLogger.log_if_raises("Failed to generate reservation series from allocations")
-def generate_reservation_series_from_allocations(application_round_id: int) -> None:
+def generate_reservation_series_from_allocations_task(application_round_id: int) -> None:
     application_round: ApplicationRound | None = ApplicationRound.objects.filter(pk=application_round_id).first()
     if application_round is None:
         return
@@ -382,20 +382,20 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
     application_round.actions.generate_reservations_from_allocations()
 
     # Run creation of missing Pindora reservations ahead of its normal background task schedule
-    create_missing_pindora_reservations.delay()
+    create_missing_pindora_reservations_task.delay()
 
 
 @app.task(name="delete_expired_applications")
-def delete_expired_applications() -> None:
+def delete_expired_applications_task() -> None:
     Application.objects.delete_expired_applications()
 
 
 @app.task(name="save_sql_queries_from_request")
-def save_sql_queries_from_request(queries: list[QueryInfo], path: str, body: bytes, duration_ms: int) -> None:
+def save_sql_queries_from_request_task(queries: list[QueryInfo], path: str, body: bytes, duration_ms: int) -> None:
     SQLLog.actions.create_for_request(queries, path, body, duration_ms)
 
 
-@app.task(name="Update ReservationUnit Search vectors")
+@app.task(name="update_reservation_unit_search_vectors")
 def update_reservation_unit_search_vectors_task(pks: list[int] | None = None) -> None:
     ReservationUnit.objects.update_search_vectors(pks=pks)
 
@@ -432,7 +432,7 @@ def anonymize_old_users_task() -> None:
     max_retries=5,
     retry_backoff=True,
 )
-def delete_pindora_reservation(reservation_uuid: str) -> None:
+def delete_pindora_reservation_task(reservation_uuid: str) -> None:
     """
     Task that can be used to retry a Pindora reservation deletion if it fails
     in the endpoint. This should only be called if the access code is known to
@@ -446,7 +446,7 @@ def delete_pindora_reservation(reservation_uuid: str) -> None:
 
 @singleton_task
 @app.task(name="create_missing_pindora_reservations")
-def create_missing_pindora_reservations() -> None:
+def create_missing_pindora_reservations_task() -> None:
     from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 
     PindoraService.create_missing_access_codes()
@@ -454,7 +454,7 @@ def create_missing_pindora_reservations() -> None:
 
 @singleton_task
 @app.task(name="update_pindora_access_code_is_active")
-def update_pindora_access_code_is_active() -> None:
+def update_pindora_access_code_is_active_task() -> None:
     from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 
     PindoraService.update_access_code_is_active()

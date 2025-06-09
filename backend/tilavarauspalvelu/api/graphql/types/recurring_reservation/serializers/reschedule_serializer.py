@@ -15,7 +15,7 @@ from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateCh
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import RecurringReservation, ReservationStatistic
-from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
+from tilavarauspalvelu.tasks import create_statistics_for_reservations_task, update_affecting_time_spans_task
 from tilavarauspalvelu.typing import ReservationDetails
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_datetime
 from utils.external_service.errors import external_service_errors_as_validation_errors
@@ -152,7 +152,7 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
             update_affecting_time_spans_task.delay()
 
         if settings.SAVE_RESERVATION_STATISTICS:
-            create_or_update_reservation_statistics.delay(
+            create_statistics_for_reservations_task.delay(
                 reservation_pks=[reservation.pk for reservation in reservations],
             )
 

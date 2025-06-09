@@ -20,8 +20,11 @@ SET_RESULTS_SENT_MUTATION = build_mutation(
 
 @contextlib.contextmanager
 def disable_reservation_generation():
-    path = (
-        "tilavarauspalvelu.api.graphql.types.application_round.serializers.generate_reservation_series_from_allocations"
-    )
+    from tilavarauspalvelu.tasks import generate_reservation_series_from_allocations_task
+
+    path = "tilavarauspalvelu.api.graphql.types.application_round.serializers."
+    path += generate_reservation_series_from_allocations_task.__name__
+    path += ".delay"
+
     with patch(path, return_value=None) as mock:
         yield mock

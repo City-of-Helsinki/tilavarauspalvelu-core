@@ -15,6 +15,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelO
 from tilavarauspalvelu.integrations.verkkokauppa.payment.types import WebShopPaymentStatus
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import Reservation
+from tilavarauspalvelu.tasks import delete_pindora_reservation_task
 
 from tests.factories import OrderFactory, PaymentFactory, PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
@@ -214,7 +215,9 @@ def test_reservation__delete__delete_from_pindora__call_fails_runs_task(graphql)
     graphql.login_with_superuser()
     data = get_delete_data(reservation)
 
-    path = "tilavarauspalvelu.api.graphql.types.reservation.mutations.delete_pindora_reservation.delay"
+    path = "tilavarauspalvelu.api.graphql.types.reservation.mutations."
+    path += delete_pindora_reservation_task.__name__
+    path += ".delay"
 
     with mock.patch(path) as task:
         response = graphql(DELETE_MUTATION, input_data=data)

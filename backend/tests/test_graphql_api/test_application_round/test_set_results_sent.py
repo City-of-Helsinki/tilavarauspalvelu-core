@@ -18,7 +18,12 @@ pytestmark = [
 
 @contextmanager
 def mock_send_application_handled_email_task():
-    path = "tilavarauspalvelu.api.graphql.types.application_round.serializers.send_application_handled_email_task.delay"
+    from tilavarauspalvelu.tasks import send_application_handled_email_task
+
+    path = "tilavarauspalvelu.api.graphql.types.application_round.serializers."
+    path += send_application_handled_email_task.__name__
+    path += ".delay"
+
     with patch(path) as mock:
         yield mock
 

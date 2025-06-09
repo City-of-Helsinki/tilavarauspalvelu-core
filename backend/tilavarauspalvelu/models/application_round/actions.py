@@ -32,7 +32,7 @@ from tilavarauspalvelu.models import (
     Reservation,
     ReservationUnitOption,
 )
-from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
+from tilavarauspalvelu.tasks import create_statistics_for_reservations_task, update_affecting_time_spans_task
 from tilavarauspalvelu.translation import translate_for_user
 from tilavarauspalvelu.typing import ReservationDetails
 from utils.date_utils import local_end_of_day, local_start_of_day
@@ -155,7 +155,7 @@ class ApplicationRoundActions:
             update_affecting_time_spans_task.delay()
 
         if settings.SAVE_RESERVATION_STATISTICS:
-            create_or_update_reservation_statistics.delay(reservation_pks=list(reservation_pks))
+            create_statistics_for_reservations_task.delay(reservation_pks=list(reservation_pks))
 
     def _get_series_override_closed_time_spans(
         self, allocations: list[AllocatedTimeSlot]

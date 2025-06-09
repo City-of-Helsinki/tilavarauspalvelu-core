@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tilavarauspalvelu.models import PersonalInfoViewLog
-from tilavarauspalvelu.tasks import save_personal_info_view_log
+from tilavarauspalvelu.tasks import save_personal_info_view_log_task
 
 from tests.factories import UserFactory
 
@@ -15,7 +15,7 @@ pytestmark = [
 def test_save_personal_info_view_log__as_own_user_does_not_save():
     user = UserFactory.create()
 
-    save_personal_info_view_log(user.id, user.id, "first_name")
+    save_personal_info_view_log_task(user.id, user.id, "first_name")
 
     assert PersonalInfoViewLog.objects.exists() is False
 
@@ -24,7 +24,7 @@ def test_save_personal_info_view_log__as_other_user_saves():
     user = UserFactory.create()
     other_user = UserFactory.create()
 
-    save_personal_info_view_log(user.id, other_user.id, "first_name")
+    save_personal_info_view_log_task(user.id, other_user.id, "first_name")
 
     assert PersonalInfoViewLog.objects.exists() is True
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from contextlib import contextmanager
 from unittest import mock
 
 import pytest
@@ -17,7 +18,7 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.models import Reservation
-from tilavarauspalvelu.tasks import handle_unfinished_reservations
+from tilavarauspalvelu.tasks import delete_pindora_reservation_task, handle_unfinished_reservations_task
 from utils.date_utils import local_datetime
 
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
@@ -27,6 +28,16 @@ from tests.helpers import patch_method
 pytestmark = [
     pytest.mark.django_db,
 ]
+
+
+@contextmanager
+def mock_delete_pindora_reservation_task():
+    path = "tilavarauspalvelu.models.reservation.queryset."
+    path += delete_pindora_reservation_task.__name__
+    path += ".delay"
+
+    with mock.patch(path) as task:
+        yield task
 
 
 # --- Free -----------------------------------------------------------------------------------------------------
@@ -40,7 +51,7 @@ def test_handle_unfinished_reservations__direct__free(settings):
         state=ReservationStateChoice.CREATED,
     )
 
-    handle_unfinished_reservations()
+    handle_unfinished_reservations_task()
 
     assert Reservation.objects.exists() is False
 
@@ -53,7 +64,7 @@ def test_handle_unfinished_reservations__direct__free__do_not_delete_too_early(s
         state=ReservationStateChoice.CREATED,
     )
 
-    handle_unfinished_reservations()
+    handle_unfinished_reservations_task()
 
     assert Reservation.objects.exists() is True
 
@@ -69,7 +80,7 @@ def test_handle_unfinished_reservations__direct__free__delete_from_pindora(setti
         access_code_generated_at=local_datetime(),
     )
 
-    handle_unfinished_reservations()
+    handle_unfinished_reservations_task()
 
     assert Reservation.objects.exists() is False
 
@@ -87,10 +98,8 @@ def test_handle_unfinished_reservations__direct__free__delete_from_pindora__call
         access_code_generated_at=local_datetime(),
     )
 
-    path = "tilavarauspalvelu.models.reservation.queryset.delete_pindora_reservation.delay"
-
-    with mock.patch(path) as task:
-        handle_unfinished_reservations()
+    with mock_delete_pindora_reservation_task() as task:
+        handle_unfinished_reservations_task()
 
     assert Reservation.objects.exists() is False
 
@@ -110,7 +119,7 @@ def test_handle_unfinished_reservations__direct__waiting_for_payment__expired(se
         created_at=local_datetime() - datetime.timedelta(minutes=5),
     )
 
-    handle_unfinished_reservations()
+    handle_unfinished_reservations_task()
 
     assert Reservation.objects.exists() is False
 
@@ -124,7 +133,7 @@ def test_handle_unfinished_reservations__direct__waiting_for_payment__cancelled(
         created_at=local_datetime() - datetime.timedelta(minutes=5),
     )
 
-    handle_unfinished_reservations()
+    handle_unfinished_reservations_task()
 
     assert Reservation.objects.exists() is False
 
@@ -138,7 +147,7 @@ def test_handle_unfinished_reservations__direct__waiting_for_payment__dont_delet
         created_at=local_datetime() - datetime.timedelta(minutes=4),
     )
 
-    handle_unfinished_reservations()
+    handle_unfinished_reservations_task()
 
     assert Reservation.objects.exists() is True
 
@@ -152,7 +161,7 @@ def test_handle_unfinished_reservations__direct__waiting_for_payment__paid(setti
         created_at=local_datetime() - datetime.timedelta(minutes=5),
     )
 
-    handle_unfinished_reservations()
+    handle_unfinished_reservations_task()
 
     assert Reservation.objects.exists() is True
 
@@ -167,7 +176,7 @@ def test_handle_unfinished_reservations__direct__waiting_for_payment__no_remote_
         remote_id=None,
     )
 
-    handle_unfinished_reservations()
+    handle_unfinished_reservations_task()
 
     assert Reservation.objects.exists() is True
 
@@ -175,7 +184,7 @@ def test_handle_unfinished_reservations__direct__waiting_for_payment__no_remote_
 def test_handle_unfinished_reservations__direct__waiting_for_payment__no_payment():
     ReservationFactory.create(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
 
-    handle_unfinished_reservations()
+    handle_unfinished_reservations_task()
 
     assert Reservation.objects.exists() is True
 
@@ -190,7 +199,7 @@ def test_handle_unfinished_reservations__direct__waiting_for_payment__delete_fro
         created_at=local_datetime() - datetime.timedelta(minutes=5),
     )
 
-    handle_unfinished_reservations()
+    handle_unfinished_reservations_task()
 
     assert Reservation.objects.exists() is False
 
@@ -207,10 +216,8 @@ def test_handle_unfinished_reservations__direct__waiting_for_payment__delete_fro
         created_at=local_datetime() - datetime.timedelta(minutes=5),
     )
 
-    path = "tilavarauspalvelu.models.reservation.queryset.delete_pindora_reservation.delay"
-
-    with mock.patch(path) as task:
-        handle_unfinished_reservations()
+    with mock_delete_pindora_reservation_task() as task:
+        handle_unfinished_reservations_task()
 
     assert Reservation.objects.exists() is False
 
@@ -239,7 +246,7 @@ def test_handle_unfinished_reservations__handled__overdue():
         handled_payment_due_by=local_datetime(2024, 1, 1, 11, 59),
     )
 
-    handle_unfinished_reservations()
+    handle_unfinished_reservations_task()
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CANCELLED
@@ -266,7 +273,7 @@ def test_handle_unfinished_reservations__handled__overdue__dont_delete_too_early
         handled_payment_due_by=local_datetime(2024, 1, 1, 12),
     )
 
-    handle_unfinished_reservations()
+    handle_unfinished_reservations_task()
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
@@ -295,7 +302,7 @@ def test_handle_unfinished_reservations__handled__overdue__delete_from_pindora()
         handled_payment_due_by=local_datetime(2024, 1, 1, 11, 59),
     )
 
-    handle_unfinished_reservations()
+    handle_unfinished_reservations_task()
 
     assert PindoraClient.delete_reservation.called is True
 
@@ -324,10 +331,8 @@ def test_handle_unfinished_reservations__handled__overdue__delete_from_pindora__
         handled_payment_due_by=local_datetime(2024, 1, 1, 11, 59),
     )
 
-    path = "tilavarauspalvelu.models.reservation.queryset.delete_pindora_reservation.delay"
-
-    with mock.patch(path) as task:
-        handle_unfinished_reservations()
+    with mock_delete_pindora_reservation_task() as task:
+        handle_unfinished_reservations_task()
 
     assert PindoraClient.delete_reservation.called is True
     assert task.called is True

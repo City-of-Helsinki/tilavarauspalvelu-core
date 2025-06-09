@@ -30,7 +30,7 @@ from tilavarauspalvelu.models import (
     Space,
     Unit,
 )
-from tilavarauspalvelu.tasks import create_reservation_unit_thumbnails_and_urls
+from tilavarauspalvelu.tasks import update_reservation_unit_image_urls_task
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import (
@@ -182,7 +182,7 @@ def _create_reservation_units(
     )
 
     if settings.UPDATE_RESERVATION_UNIT_THUMBNAILS:
-        create_reservation_unit_thumbnails_and_urls()
+        update_reservation_unit_image_urls_task()
 
     # --- Add reservables ------------------------------------------------------------------------------------------
 

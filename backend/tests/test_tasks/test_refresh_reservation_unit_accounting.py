@@ -13,7 +13,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
     ProductInvoicingParams,
 )
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting
+from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting_task
 
 from tests.factories import (
     PaymentAccountingFactory,
@@ -126,6 +126,6 @@ def test_refresh_reservation_unit_accounting__capture_error__api_errors():
 
 @patch_method(SentryLogger.log_message)
 def test_refresh_reservation_unit_accounting__capture_error__reservation_unit_does_not_exist():
-    refresh_reservation_unit_accounting(0)
+    refresh_reservation_unit_accounting_task(0)
 
     assert SentryLogger.log_message.call_count == 1

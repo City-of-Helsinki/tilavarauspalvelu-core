@@ -23,10 +23,10 @@ def test_application_round__set_handled(graphql):
 
     graphql.login_with_superuser()
 
-    with disable_reservation_generation() as mock_disable_reservation_generation:
+    with disable_reservation_generation() as mock:
         response = graphql(SET_HANDLED_MUTATION, input_data={"pk": application_round.pk})
 
-    assert len(mock_disable_reservation_generation.method_calls) == 1
+    assert mock.call_count == 1
 
     assert response.has_errors is False, response.errors
 

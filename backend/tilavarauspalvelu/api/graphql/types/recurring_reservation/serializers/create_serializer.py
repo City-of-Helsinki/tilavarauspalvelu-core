@@ -20,7 +20,7 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import RecurringReservation, Reservation
-from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
+from tilavarauspalvelu.tasks import create_statistics_for_reservations_task, update_affecting_time_spans_task
 from utils.external_service.errors import ExternalServiceError
 from utils.fields.serializer import CurrentUserDefaultNullable, input_only_field
 
@@ -212,7 +212,7 @@ class ReservationSeriesCreateSerializer(NestingModelSerializer):
             update_affecting_time_spans_task.delay()
 
         if settings.SAVE_RESERVATION_STATISTICS:
-            create_or_update_reservation_statistics.delay(
+            create_statistics_for_reservations_task.delay(
                 reservation_pks=[reservation.pk for reservation in reservations],
             )
 

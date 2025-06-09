@@ -7,7 +7,7 @@ import pytest
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ReservationUnitPricing
-from tilavarauspalvelu.tasks import update_reservation_unit_pricings_tax_percentage
+from tilavarauspalvelu.tasks import update_reservation_unit_pricings_tax_percentage_task
 
 from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory
 from tests.helpers import patch_method
@@ -30,7 +30,7 @@ def test_reservation_unit__update_pricings__tax_percentage__no_future_pricing():
         tax_percentage__value=CURRENT_TAX,
     )
 
-    update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
+    update_reservation_unit_pricings_tax_percentage_task(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
 
     future_pricings = ReservationUnitPricing.objects.filter(begins=TAX_CHANGE_DATE)
     assert future_pricings.count() == 1  # New pricing should be created for the change date
@@ -57,7 +57,7 @@ def test_reservation_unit__update_pricings__tax_percentage__future_pricing_befor
         highest_price=Decimal(20),
     )
 
-    update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
+    update_reservation_unit_pricings_tax_percentage_task(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
 
     # New pricing should be created, since the future pricing is before change date
     assert ReservationUnitPricing.objects.count() == 3
@@ -89,7 +89,7 @@ def test_reservation_unit__update_pricings__tax_percentage__future_pricing_after
         tax_percentage__value=CURRENT_TAX,
     )
 
-    update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
+    update_reservation_unit_pricings_tax_percentage_task(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
 
     # No new pricings should be created, since a pricing after the change date exists
     assert ReservationUnitPricing.objects.count() == 2
@@ -110,7 +110,7 @@ def test_reservation_unit__update_pricings__tax_percentage__free_future_pricing_
         tax_percentage__value=CURRENT_TAX,
     )
 
-    update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
+    update_reservation_unit_pricings_tax_percentage_task(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
 
     # No new pricings should be created, since a pricing on the change date exists
     assert ReservationUnitPricing.objects.count() == 2
@@ -128,7 +128,7 @@ def test_reservation_unit__update_pricings__tax_percentage__free_future_pricing_
         tax_percentage__value=CURRENT_TAX,
     )
 
-    update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
+    update_reservation_unit_pricings_tax_percentage_task(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
 
     # New pricing should be created, since the FREE pricing is after the change date
     assert ReservationUnitPricing.objects.count() == 3
@@ -151,7 +151,7 @@ def test_reservation_unit__update_pricings__tax_percentage__different_tax_percen
         tax_percentage__value=Decimal(10),  # Tax percentage is different
     )
 
-    update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
+    update_reservation_unit_pricings_tax_percentage_task(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
 
     # No new pricing should be created
     assert ReservationUnitPricing.objects.count() == 1
@@ -168,7 +168,7 @@ def test_reservation_unit__update_pricings__tax_percentage__free_pricing_is_igno
         tax_percentage__value=CURRENT_TAX,
     )
 
-    update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
+    update_reservation_unit_pricings_tax_percentage_task(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
 
     # No new pricing should be created
     assert ReservationUnitPricing.objects.count() == 1
@@ -196,7 +196,9 @@ def test_reservation_unit__update_pricings__tax_percentage__ignored_company_code
         **{company_code_path: "5678"},
     )
 
-    update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX), ["5678"])
+    update_reservation_unit_pricings_tax_percentage_task(
+        str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX), ["5678"]
+    )
 
     # One new pricing should be created for the change date
     assert pricing_1.reservation_unit.pricings.count() == 2

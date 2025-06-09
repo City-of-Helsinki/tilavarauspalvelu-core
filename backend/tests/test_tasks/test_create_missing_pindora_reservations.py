@@ -10,7 +10,7 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraReservationResponse
-from tilavarauspalvelu.tasks import create_missing_pindora_reservations
+from tilavarauspalvelu.tasks import create_missing_pindora_reservations_task
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from tests.factories import RecurringReservationFactory, ReservationFactory, ReservationUnitFactory
@@ -40,7 +40,7 @@ def test_create_missing_pindora_reservations__create_missing():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    create_missing_pindora_reservations()
+    create_missing_pindora_reservations_task()
 
     assert PindoraClient.create_reservation.call_count == 1
     assert PindoraClient.create_reservation.call_args.kwargs["is_active"] is True
@@ -73,7 +73,7 @@ def test_create_missing_pindora_reservations__blocked():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    create_missing_pindora_reservations()
+    create_missing_pindora_reservations_task()
 
     assert PindoraClient.create_reservation.call_count == 1
     assert PindoraClient.create_reservation.call_args.kwargs["is_active"] is False
@@ -99,7 +99,7 @@ def test_create_missing_pindora_reservations__in_the_past():
         end=now - datetime.timedelta(days=1, hours=1),
     )
 
-    create_missing_pindora_reservations()
+    create_missing_pindora_reservations_task()
 
     assert PindoraClient.create_reservation.call_count == 0
 
@@ -131,7 +131,7 @@ def test_create_missing_pindora_reservations__ongoing():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    create_missing_pindora_reservations()
+    create_missing_pindora_reservations_task()
 
     assert PindoraClient.create_reservation.call_count == 1
     assert PindoraClient.create_reservation.call_args.kwargs["is_active"] is True
@@ -158,7 +158,7 @@ def test_create_missing_pindora_reservations__not_confirmed():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    create_missing_pindora_reservations()
+    create_missing_pindora_reservations_task()
 
     assert PindoraClient.create_reservation.call_count == 0
 
@@ -183,7 +183,7 @@ def test_create_missing_pindora_reservations__not_access_code():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    create_missing_pindora_reservations()
+    create_missing_pindora_reservations_task()
 
     assert PindoraClient.create_reservation.call_count == 0
 
@@ -208,7 +208,7 @@ def test_create_missing_pindora_reservations__already_generated():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    create_missing_pindora_reservations()
+    create_missing_pindora_reservations_task()
 
     assert PindoraClient.create_reservation.call_count == 0
 
@@ -253,7 +253,7 @@ def test_create_missing_pindora_reservations__multiple():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    create_missing_pindora_reservations()
+    create_missing_pindora_reservations_task()
 
     assert PindoraClient.create_reservation.call_count == 2
 
@@ -274,7 +274,7 @@ def test_create_missing_pindora_reservations__pindora_error():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    create_missing_pindora_reservations()
+    create_missing_pindora_reservations_task()
 
     assert PindoraClient.create_reservation.call_count == 1
 
@@ -300,6 +300,6 @@ def test_create_missing_pindora_reservations__recurring_reservation_is_ignored()
         recurring_reservation=RecurringReservationFactory.create(),
     )
 
-    create_missing_pindora_reservations()
+    create_missing_pindora_reservations_task()
 
     assert PindoraClient.create_reservation.call_count == 0

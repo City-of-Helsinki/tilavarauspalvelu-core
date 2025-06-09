@@ -9,7 +9,10 @@ from rest_framework.exceptions import ValidationError
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
 from tilavarauspalvelu.models import ApplicationRound
-from tilavarauspalvelu.tasks import generate_reservation_series_from_allocations, send_application_handled_email_task
+from tilavarauspalvelu.tasks import (
+    generate_reservation_series_from_allocations_task,
+    send_application_handled_email_task,
+)
 from utils.date_utils import local_datetime
 
 
@@ -36,7 +39,7 @@ class SetApplicationRoundHandledSerializer(NestingModelSerializer):
     def save(self, **kwargs: Any) -> ApplicationRound:
         kwargs["handled_date"] = local_datetime()
         instance = super().save(**kwargs)
-        generate_reservation_series_from_allocations.delay(instance.pk)
+        generate_reservation_series_from_allocations_task.delay(instance.pk)
         return instance
 
 

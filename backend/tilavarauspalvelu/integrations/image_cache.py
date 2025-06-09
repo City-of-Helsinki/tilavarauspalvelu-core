@@ -1,31 +1,16 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
 from urllib.parse import urljoin
 
 from django.conf import settings
-from easy_thumbnails.files import get_thumbnailer
 from requests import request
 from rest_framework.status import HTTP_200_OK
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.tasks import purge_image_cache
-
-if TYPE_CHECKING:
-    from django.db import models
 
 
 class ImageCacheConfigurationError(Exception):
     pass
-
-
-def purge_previous_image_cache(instance: models.Model) -> None:
-    previous_data = instance.__class__.objects.filter(pk=instance.pk).first()
-    if previous_data and previous_data.image:
-        aliases = settings.THUMBNAIL_ALIASES[""]
-        for conf_key in list(aliases.keys()):
-            image_path = get_thumbnailer(previous_data.image)[conf_key].url
-            purge_image_cache.delay(image_path)
 
 
 def purge(path: str) -> None:

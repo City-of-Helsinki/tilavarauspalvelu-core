@@ -8,11 +8,11 @@ from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationT
 from tilavarauspalvelu.models import TermsOfUse
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
 from tilavarauspalvelu.tasks import (
-    create_missing_pindora_reservations,
-    prune_reservations_task,
+    create_missing_pindora_reservations_task,
+    handle_unfinished_reservations_task,
     refresh_expired_payments_in_verkkokauppa_task,
     update_affecting_time_spans_task,
-    update_pindora_access_code_is_active,
+    update_pindora_access_code_is_active_task,
 )
 from utils.date_utils import DEFAULT_TIMEZONE
 
@@ -116,7 +116,7 @@ def _create_periodic_tasks() -> None:
 
     PeriodicTask.objects.create(
         name="Vahvistamattomien väliaikaisten varausten poisto",
-        task=prune_reservations_task.name,
+        task=handle_unfinished_reservations_task.name,
         crontab=even_5_minute,
         description=(
             "Poistaa väliaikaiset varaukset, joita ei ole vahvistettu (lähetetty), "
@@ -139,7 +139,7 @@ def _create_periodic_tasks() -> None:
 
     PeriodicTask.objects.create(
         name="Puuttuvien ovikoodien luominen",
-        task=create_missing_pindora_reservations.name,
+        task=create_missing_pindora_reservations_task.name,
         crontab=even_5_minute,
         description=(
             "Luo puuttuvat ovikoodit varauksiin, joiden kulkutapa on ovikoodi ja "
@@ -149,7 +149,7 @@ def _create_periodic_tasks() -> None:
 
     PeriodicTask.objects.create(
         name="Ovikoodin aktiivisuustilan korjaaminen",
-        task=update_pindora_access_code_is_active.name,
+        task=update_pindora_access_code_is_active_task.name,
         crontab=off_5_minute,
         description=(
             "Korjaa ovikoodillisten varausten ovikoodien aktiivisuuden tilan. "

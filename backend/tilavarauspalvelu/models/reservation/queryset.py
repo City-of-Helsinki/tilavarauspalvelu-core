@@ -20,7 +20,7 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import ReservationStatistic, ReservationUnit, Unit
-from tilavarauspalvelu.tasks import delete_pindora_reservation
+from tilavarauspalvelu.tasks import delete_pindora_reservation_task
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
@@ -413,7 +413,7 @@ class ReservationManager(_BaseManager):
                 try:
                     PindoraClient.delete_reservation(reservation=reservation)
                 except Exception:  # noqa: BLE001
-                    delete_pindora_reservation.delay(str(reservation.ext_uuid))
+                    delete_pindora_reservation_task.delay(str(reservation.ext_uuid))
 
             reservation.delete()
 
@@ -427,7 +427,7 @@ class ReservationManager(_BaseManager):
                 try:
                     PindoraClient.delete_reservation(reservation=reservation)
                 except Exception:  # noqa: BLE001
-                    delete_pindora_reservation.delay(str(reservation.ext_uuid))
+                    delete_pindora_reservation_task.delay(str(reservation.ext_uuid))
 
             reservation.state = ReservationStateChoice.CANCELLED
             reservation.cancel_reason = ReservationCancelReasonChoice.NOT_PAID

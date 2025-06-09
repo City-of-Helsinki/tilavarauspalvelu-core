@@ -8,7 +8,7 @@ from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 
 from tilavarauspalvelu.models import RecurringReservation, Reservation
-from tilavarauspalvelu.tasks import create_or_update_reservation_statistics
+from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
 from utils.fields.serializer import input_only_field
 
 if TYPE_CHECKING:
@@ -111,7 +111,7 @@ class ReservationSeriesUpdateSerializer(NestingModelSerializer):
             reservations.update(**reservation_details)
 
         if settings.SAVE_RESERVATION_STATISTICS:
-            create_or_update_reservation_statistics.delay(
+            create_statistics_for_reservations_task.delay(
                 reservation_pks=list(reservations.values_list("pk", flat=True)),
             )
 

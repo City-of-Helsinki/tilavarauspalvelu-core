@@ -4,7 +4,7 @@ import pytest
 from freezegun import freeze_time
 
 from tilavarauspalvelu.models import PersonalInfoViewLog
-from tilavarauspalvelu.tasks import remove_old_personal_info_view_logs
+from tilavarauspalvelu.tasks import remove_old_personal_info_view_logs_task
 
 from tests.factories import UserFactory
 
@@ -28,6 +28,6 @@ def test_remove_old_personal_info_view_logs():
     assert PersonalInfoViewLog.objects.exists() is True
 
     with freeze_time("2023-02-22 06:00"):
-        remove_old_personal_info_view_logs()
+        remove_old_personal_info_view_logs_task()
 
     assert PersonalInfoViewLog.objects.exists() is False

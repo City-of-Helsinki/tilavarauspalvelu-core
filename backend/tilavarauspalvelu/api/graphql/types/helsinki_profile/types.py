@@ -11,7 +11,7 @@ from tilavarauspalvelu.enums import LoginMethod
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.helsinki_profile.typing import UserProfileInfo
 from tilavarauspalvelu.models import Application, Reservation
-from tilavarauspalvelu.tasks import save_personal_info_view_log
+from tilavarauspalvelu.tasks import save_personal_info_view_log_task
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -159,17 +159,17 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         return user
 
     def resolve_birthday(root: UserProfileInfo, info: GQLInfo) -> datetime.date | None:
-        save_personal_info_view_log.delay(root["pk"], info.context.user.id, "profile.birthday")
+        save_personal_info_view_log_task.delay(root["pk"], info.context.user.id, "profile.birthday")
         return root["birthday"]
 
     def resolve_ssn(root: UserProfileInfo, info: GQLInfo) -> str | None:
-        save_personal_info_view_log.delay(root["pk"], info.context.user.id, "profile.ssn")
+        save_personal_info_view_log_task.delay(root["pk"], info.context.user.id, "profile.ssn")
         return root["ssn"]
 
     def resolve_municipality_code(root: UserProfileInfo, info: GQLInfo) -> str | None:
-        save_personal_info_view_log.delay(root["pk"], info.context.user.id, "profile.municipality_code")
+        save_personal_info_view_log_task.delay(root["pk"], info.context.user.id, "profile.municipality_code")
         return root["municipality_code"]
 
     def resolve_municipality_name(root: UserProfileInfo, info: GQLInfo) -> str | None:
-        save_personal_info_view_log.delay(root["pk"], info.context.user.id, "profile.municipality_name")
+        save_personal_info_view_log_task.delay(root["pk"], info.context.user.id, "profile.municipality_name")
         return root["municipality_name"]

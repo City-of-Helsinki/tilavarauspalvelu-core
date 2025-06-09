@@ -10,7 +10,7 @@ from query_optimizer import AnnotatedField, MultiField
 
 from tilavarauspalvelu.enums import ReservationNotification
 from tilavarauspalvelu.models import User
-from tilavarauspalvelu.tasks import save_personal_info_view_log
+from tilavarauspalvelu.tasks import save_personal_info_view_log_task
 
 from .permissions import UserPermission
 
@@ -67,7 +67,7 @@ class UserNode(DjangoNode):
         return None
 
     def resolve_date_of_birth(root: User, info: GQLInfo) -> datetime.date | None:
-        save_personal_info_view_log.delay(root.pk, info.context.user.id, "User.date_of_birth")
+        save_personal_info_view_log_task.delay(root.pk, info.context.user.id, "User.date_of_birth")
         return root.date_of_birth
 
     def resolve_is_ad_authenticated(root: User, info: GQLInfo) -> bool:

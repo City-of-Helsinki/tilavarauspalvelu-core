@@ -6,7 +6,7 @@ import pytest
 from django.test import override_settings
 
 from tilavarauspalvelu.models import Application
-from tilavarauspalvelu.tasks import delete_expired_applications
+from tilavarauspalvelu.tasks import delete_expired_applications_task
 from utils.date_utils import local_datetime
 
 from tests.factories import ApplicationFactory, ApplicationRoundFactory
@@ -33,7 +33,7 @@ def test_delete_expired_applications():
     )
     application_new = ApplicationFactory.create_in_status_expired(application_round=application_round_new)  # Kept
 
-    delete_expired_applications()
+    delete_expired_applications_task()
 
     applications = Application.objects.all().order_by("application_round")
     assert len(applications) == 2

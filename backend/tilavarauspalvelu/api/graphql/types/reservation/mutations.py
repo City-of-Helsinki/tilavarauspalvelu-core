@@ -13,7 +13,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.models import Reservation
-from tilavarauspalvelu.tasks import delete_pindora_reservation
+from tilavarauspalvelu.tasks import delete_pindora_reservation_task
 
 from .permissions import (
     ReservationCommentPermission,
@@ -170,7 +170,7 @@ class ReservationDeleteTentativeMutation(DeleteMutation):
             except PindoraNotFoundError:
                 pass
             except Exception:  # noqa: BLE001
-                delete_pindora_reservation.delay(str(reservation.ext_uuid))
+                delete_pindora_reservation_task.delay(str(reservation.ext_uuid))
 
 
 class ReservationDeleteMutation(ReservationDeleteTentativeMutation):
