@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Self
 from django.utils.timezone import now
 from factory import fuzzy
 
-from tilavarauspalvelu.enums import ApplicantTypeChoice, ApplicationStatusChoice, Priority, Weekday
+from tilavarauspalvelu.enums import ApplicantTypeChoice, ApplicationStatusChoice, MunicipalityChoice, Priority, Weekday
 from tilavarauspalvelu.models import Application
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_time
 
@@ -34,13 +34,29 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
     in_allocation_notification_sent_at = None
     results_ready_notification_sent_at = None
 
-    application_round = ForeignKeyFactory("tests.factories.ApplicationRoundFactory")
+    contact_person_first_name = FakerFI("first_name")
+    contact_person_last_name = FakerFI("last_name")
+    contact_person_email = FakerFI("email")
+    contact_person_phone_number = FakerFI("phone_number")
 
+    organisation_name = FakerFI("company")
+    organisation_email = FakerFI("email")
+    organisation_identifier = FakerFI("company_business_id")
+    organisation_year_established = fuzzy.FuzzyInteger(low=2000, high=2025)
+    organisation_active_members = fuzzy.FuzzyInteger(low=1, high=500)
+    organisation_core_business = FakerFI("sentence")
+    organisation_street_address = FakerFI("address")
+    organisation_post_code = FakerFI("postcode")
+    organisation_city = FakerFI("city")
+
+    billing_street_address = FakerFI("address")
+    billing_post_code = FakerFI("postcode")
+    billing_city = FakerFI("city")
+
+    municipality = MunicipalityChoice.HELSINKI
+
+    application_round = ForeignKeyFactory("tests.factories.ApplicationRoundFactory")
     user = ForeignKeyFactory("tests.factories.UserFactory", required=True)
-    organisation = ForeignKeyFactory("tests.factories.OrganisationFactory", required=True)
-    contact_person = ForeignKeyFactory("tests.factories.PersonFactory", required=True)
-    billing_address = ForeignKeyFactory("tests.factories.AddressFactory", required=True)
-    home_city = ForeignKeyFactory("tests.factories.CityFactory", required=True)
 
     application_sections = ReverseForeignKeyFactory("tests.factories.ApplicationSectionFactory")
 
@@ -103,7 +119,13 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
         return ApplicationBuilder().cancelled().create(**kwargs)
 
     @classmethod
-    def create_application_ready_for_sending(cls, **kwargs: Any) -> Application:
+    def create_application_ready_for_sending(
+        cls,
+        *,
+        applicant_type: ApplicantTypeChoice = ApplicantTypeChoice.INDIVIDUAL,
+        unregistered: bool = False,
+        **kwargs: Any,
+    ) -> Application:
         """
         Create an application that is ready to be sent (for individual applicant by default):
         - is in an open application round
@@ -118,39 +140,39 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
         - section has one suitable timeslot, that is at least as long as the minimum reservation duration
         - section has at lest one reservation unit option
         - application is for an individual
-        - application has a contact person
-        - application has a billing address
         """
         from .application_round import ApplicationRoundFactory
 
         round_kwargs = cls.pop_sub_kwargs("application_round", kwargs)
         application_round = ApplicationRoundFactory.create_in_status_open(**round_kwargs)
 
+        builder = ApplicationBuilder()
+        match applicant_type:
+            case ApplicantTypeChoice.INDIVIDUAL:
+                builder = builder.for_individual()
+            case ApplicantTypeChoice.ASSOCIATION:
+                builder = builder.for_association(unregistered=unregistered)
+            case ApplicantTypeChoice.COMMUNITY:
+                builder = builder.for_community(unregistered=unregistered)
+            case ApplicantTypeChoice.COMPANY:
+                builder = builder.for_company()
+
         defaults: dict[str, Any] = {
             "application_round": application_round,
-            "applicant_type": ApplicantTypeChoice.INDIVIDUAL,
+            #
+            # Is of age
+            "user__date_of_birth": datetime.date(1980, 1, 1),
+            #
+            # Not sent or handled
             "cancelled_at": None,
             "sent_at": None,
-            "user__date_of_birth": datetime.date(1980, 1, 1),
+            #
+            # Applicant data
+            **builder.kwargs,
+            #
+            # Overrides.
             **kwargs,
         }
-
-        if not any(arg.startswith("organisation") for arg in kwargs):
-            defaults.setdefault("organisation", None)
-
-        if not any(arg.startswith("home_city") for arg in kwargs):
-            defaults.setdefault("home_city", None)
-
-        if "contact_person" not in defaults:
-            defaults.setdefault("contact_person__first_name", "Test")
-            defaults.setdefault("contact_person__last_name", "User")
-            defaults.setdefault("contact_person__email", "test@example.com")
-            defaults.setdefault("contact_person__phone_number", "1234567890")
-
-        if "billing_address" not in defaults:
-            defaults.setdefault("billing_address__street_address", "Street")
-            defaults.setdefault("billing_address__post_code", "12345")
-            defaults.setdefault("billing_address__city", "City")
 
         if "application_sections" not in kwargs:
             defaults.setdefault("application_sections__name", "Test application section")
@@ -451,43 +473,67 @@ class ApplicationBuilder(ModelFactoryBuilder[Application]):
         self.kwargs.setdefault("application_round", application_round)
         return self
 
-    def for_applicant_type(self, applicant_type: ApplicantTypeChoice) -> Self:
+    def for_applicant_type(
+        self,
+        *,
+        applicant_type: ApplicantTypeChoice,
+        unregistered: bool = False,
+    ) -> ApplicationBuilder:
         match applicant_type:
             case ApplicantTypeChoice.INDIVIDUAL:
                 return self.for_individual()
             case ApplicantTypeChoice.ASSOCIATION:
-                return self.for_association(unregistered=False)
+                return self.for_association(unregistered=unregistered)
             case ApplicantTypeChoice.COMMUNITY:
-                return self.for_community(unregistered=False)
+                return self.for_community(unregistered=unregistered)
             case ApplicantTypeChoice.COMPANY:
                 return self.for_company()
+            case _:
+                msg = f"Unknown applicant type: {applicant_type}"
+                raise ValueError(msg)
 
-    def for_individual(self) -> Self:
+    def for_individual(self) -> ApplicationBuilder:
         self.kwargs["applicant_type"] = ApplicantTypeChoice.INDIVIDUAL
-        self.kwargs["organisation"] = None
-        self.kwargs["home_city"] = None
+
+        self.kwargs["organisation_name"] = ""
+        self.kwargs["organisation_email"] = None
+        self.kwargs["organisation_identifier"] = ""
+        self.kwargs["organisation_year_established"] = None
+        self.kwargs["organisation_active_members"] = None
+        self.kwargs["organisation_core_business"] = ""
+        self.kwargs["organisation_street_address"] = ""
+        self.kwargs["organisation_post_code"] = ""
+        self.kwargs["organisation_city"] = ""
+
+        self.kwargs["municipality"] = None
+
         return self
 
-    def for_association(self, unregistered: bool) -> Self:
-        from .organisation import OrganisationFactory
-
+    def for_association(self, *, unregistered: bool) -> ApplicationBuilder:
         self.kwargs["applicant_type"] = ApplicantTypeChoice.ASSOCIATION
-        self.kwargs["organisation__identifier"] = None if unregistered else OrganisationFactory.identifier.generate()
+        self.kwargs["organisation_identifier"] = ""
+
+        if not unregistered:
+            self.kwargs["organisation_identifier"] = ApplicationFactory.organisation_identifier.generate()
+
         return self
 
-    def for_community(self, unregistered: bool) -> Self:
-        from .organisation import OrganisationFactory
-
+    def for_community(self, *, unregistered: bool) -> ApplicationBuilder:
         self.kwargs["applicant_type"] = ApplicantTypeChoice.COMMUNITY
-        self.kwargs["organisation__identifier"] = None if unregistered else OrganisationFactory.identifier.generate()
+        self.kwargs["organisation_identifier"] = ""
+
+        if not unregistered:
+            self.kwargs["organisation_identifier"] = ApplicationFactory.organisation_identifier.generate()
+
         return self
 
-    def for_company(self) -> Self:
-        from .organisation import OrganisationFactory
-
+    def for_company(self) -> ApplicationBuilder:
         self.kwargs["applicant_type"] = ApplicantTypeChoice.COMPANY
-        self.kwargs["organisation__identifier"] = OrganisationFactory.identifier.generate()
-        self.kwargs["home_city"] = None
+
+        self.kwargs["organisation_identifier"] = ApplicationFactory.organisation_identifier.generate()
+
+        self.kwargs["municipality"] = None
+
         return self
 
     def set_description_info(

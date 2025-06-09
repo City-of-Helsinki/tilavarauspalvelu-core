@@ -5,9 +5,9 @@ from typing import NamedTuple
 from unittest.mock import MagicMock
 
 import pytest
-from django.conf import settings
 from graphene_django_extensions.testing import parametrize_helper
 
+from tilavarauspalvelu.enums import MunicipalityChoice
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.external_service.errors import (
@@ -16,7 +16,7 @@ from utils.external_service.errors import (
     ExternalServiceRequestError,
 )
 
-from tests.factories import CityFactory, UserFactory
+from tests.factories import UserFactory
 from tests.factories.helsinki_profile import (
     MyProfileDataFactory,
     ProfileAddressFactory,
@@ -38,8 +38,6 @@ class Params(NamedTuple):
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
 def test_helsinki_profile_client__prefill_info__all_primary():
-    city = CityFactory.create(name="Helsinki")
-
     profile_data = MyProfileDataFactory.create_basic()
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
@@ -54,7 +52,7 @@ def test_helsinki_profile_client__prefill_info__all_primary():
         "reservee_address_street": "Example street 1",
         "reservee_address_zip": "00100",
         "reservee_address_city": "Helsinki",
-        "home_city": city,
+        "municipality": MunicipalityChoice.HELSINKI.value,
     }
 
 
@@ -262,41 +260,35 @@ def test_helsinki_profile_client__prefill_info__no_email():
 
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
-def test_helsinki_profile_client__prefill_info__home_city_matching_municipality_number():
-    city = CityFactory.create(municipality_code=settings.PRIMARY_MUNICIPALITY_NUMBER)
-
+def test_helsinki_profile_client__prefill_info__municipality_matching_municipality_number():
     profile_data = MyProfileDataFactory.create_basic(
-        verifiedPersonalInformation__municipalityOfResidenceNumber=settings.PRIMARY_MUNICIPALITY_NUMBER,
+        verifiedPersonalInformation__municipalityOfResidenceNumber=MunicipalityChoice.HELSINKI.code,
     )
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
-    assert prefill_info["home_city"] == city
+    assert prefill_info["municipality"] == MunicipalityChoice.HELSINKI.value
 
 
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
-def test_helsinki_profile_client__prefill_info__home_city_matching_municipality_name():
-    city = CityFactory.create(name=settings.PRIMARY_MUNICIPALITY_NAME)
-
+def test_helsinki_profile_client__prefill_info__municipality_matching_municipality_name():
     profile_data = MyProfileDataFactory.create_basic(
-        verifiedPersonalInformation__municipalityOfResidence=settings.PRIMARY_MUNICIPALITY_NAME,
+        verifiedPersonalInformation__municipalityOfResidence=MunicipalityChoice.HELSINKI.value,
     )
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
-    assert prefill_info["home_city"] == city
+    assert prefill_info["municipality"] == MunicipalityChoice.HELSINKI.value
 
 
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
 def test_helsinki_profile_client__prefill_info__secondary_city():
-    city = CityFactory.create(name=settings.SECONDARY_MUNICIPALITY_NAME)
-
     profile_data = MyProfileDataFactory.create_basic(
         verifiedPersonalInformation__municipalityOfResidence="foo",
         verifiedPersonalInformation__municipalityOfResidenceNumber="bar",
@@ -306,25 +298,7 @@ def test_helsinki_profile_client__prefill_info__secondary_city():
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
-    assert prefill_info["home_city"] == city
-
-
-@patch_method(HelsinkiProfileClient.request)
-@patch_method(HelsinkiProfileClient.get_token, return_value="foo")
-def test_helsinki_profile_client__prefill_info__no_city():
-    # This city doesn't match the predefined values, so it's not used.
-    CityFactory.create(name="foo", municipality_code="bar")
-
-    profile_data = MyProfileDataFactory.create_basic(
-        verifiedPersonalInformation__municipalityOfResidence="fizz",
-        verifiedPersonalInformation__municipalityOfResidenceNumber="buzz",
-    )
-    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
-
-    user = UserFactory.create()
-    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
-
-    assert prefill_info["home_city"] is None
+    assert prefill_info["municipality"] == MunicipalityChoice.OTHER.value
 
 
 @patch_method(HelsinkiProfileClient.request)

@@ -13,6 +13,7 @@ from tilavarauspalvelu.enums import (
     ApplicationRoundStatusChoice,
     ApplicationSectionStatusChoice,
     ApplicationStatusChoice,
+    MunicipalityChoice,
 )
 from utils.db import NowTT
 from utils.fields.model import StrChoiceField
@@ -21,7 +22,7 @@ from utils.lazy import LazyModelAttribute, LazyModelManager
 if TYPE_CHECKING:
     import datetime
 
-    from tilavarauspalvelu.models import Address, ApplicationRound, City, Organisation, Person, Unit, User
+    from tilavarauspalvelu.models import ApplicationRound, Unit, User
 
     from .actions import ApplicationActions
     from .queryset import ApplicationManager
@@ -39,16 +40,43 @@ class Application(SerializableMixin, models.Model):
     as well as information about the applicant.
     """
 
+    # Basic information
     applicant_type: str | None = StrChoiceField(enum=ApplicantTypeChoice, null=True, db_index=True)
     additional_information: str = models.TextField(blank=True, default="")
-    working_memo: str = models.TextField(blank=True, default="")
 
+    # Handling data
     cancelled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
     sent_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+    working_memo: str = models.TextField(blank=True, default="")
 
+    # Email notification flags
     in_allocation_notification_sent_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
     results_ready_notification_sent_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
 
+    # Contact person data
+    contact_person_first_name: str = models.CharField(max_length=255, blank=True, default="")
+    contact_person_last_name: str = models.CharField(max_length=255, blank=True, default="")
+    contact_person_email: str | None = models.EmailField(null=True, blank=True)
+    contact_person_phone_number: str = models.CharField(max_length=255, blank=True, default="")
+
+    # Billing address
+    billing_street_address: str = models.TextField(max_length=255, blank=True, default="")
+    billing_post_code: str = models.CharField(max_length=255, blank=True, default="")
+    billing_city: str = models.TextField(max_length=255, blank=True, default="")
+
+    # Organisation data
+    organisation_name: str = models.CharField(max_length=255, blank=True, default="")
+    organisation_email: str | None = models.EmailField(null=True, blank=True)
+    organisation_identifier: str = models.CharField(max_length=255, blank=True, default="")
+    organisation_year_established: int | None = models.PositiveIntegerField(null=True, blank=True)
+    organisation_active_members: int | None = models.PositiveIntegerField(null=True, blank=True)
+    organisation_core_business: str = models.TextField(blank=True, default="")
+    organisation_street_address: str = models.TextField(max_length=255, blank=True, default="")
+    organisation_post_code: str = models.CharField(max_length=255, blank=True, default="")
+    organisation_city: str = models.TextField(max_length=255, blank=True, default="")
+    municipality: str | None = StrChoiceField(enum=MunicipalityChoice, null=True, blank=True)
+
+    # Auto-filled fields
     created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
     updated_at: datetime.datetime = models.DateTimeField(auto_now=True)
 
@@ -57,39 +85,12 @@ class Application(SerializableMixin, models.Model):
         related_name="applications",
         on_delete=models.PROTECT,
     )
-    organisation: Organisation | None = models.ForeignKey(
-        "tilavarauspalvelu.Organisation",
-        related_name="applications",
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-    )
-    contact_person: Person | None = models.ForeignKey(
-        "tilavarauspalvelu.Person",
-        related_name="applications",
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-    )
     user: User | None = models.ForeignKey(
         "tilavarauspalvelu.User",
         related_name="applications",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
-    )
-    billing_address: Address | None = models.ForeignKey(
-        "tilavarauspalvelu.Address",
-        related_name="applications",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
-    home_city: City | None = models.ForeignKey(
-        "tilavarauspalvelu.City",
-        related_name="applications",
-        on_delete=models.SET_NULL,
-        null=True,
     )
 
     objects: ClassVar[ApplicationManager] = LazyModelManager.new()
@@ -106,10 +107,21 @@ class Application(SerializableMixin, models.Model):
     # For GDPR API
     serialize_fields = (
         {"name": "additional_information"},
+        {"name": "contact_person_first_name"},
+        {"name": "contact_person_last_name"},
+        {"name": "contact_person_email"},
+        {"name": "contact_person_phone_number"},
+        {"name": "billing_street_address"},
+        {"name": "billing_post_code"},
+        {"name": "billing_city"},
+        {"name": "organisation_name"},
+        {"name": "organisation_identifier"},
+        {"name": "organisation_email"},
+        {"name": "organisation_core_business"},
+        {"name": "organisation_street_address"},
+        {"name": "organisation_post_code"},
+        {"name": "organisation_city"},
         {"name": "application_sections"},
-        {"name": "contact_person"},
-        {"name": "organisation"},
-        {"name": "billing_address"},
     )
 
     def __str__(self) -> str:
@@ -218,16 +230,16 @@ class Application(SerializableMixin, models.Model):
             .exists()
         )
 
-    @lookup_property(joins=["organisation", "contact_person", "user"], skip_codegen=True)
+    @lookup_property
     def applicant() -> str:
         return models.Case(  # type: ignore[return-value]
             models.When(
-                models.Q(organisation__isnull=False),
-                then=models.F("organisation__name"),
+                ~models.Q(organisation_name=""),
+                then=models.F("organisation_name"),
             ),
             models.When(
-                models.Q(contact_person__isnull=False),
-                then=Concat("contact_person__first_name", models.Value(" "), "contact_person__last_name"),
+                (~models.Q(contact_person_first_name="") & ~models.Q(contact_person_last_name="")),
+                then=Concat("contact_person_first_name", models.Value(" "), "contact_person_last_name"),
             ),
             models.When(
                 models.Q(user__isnull=False),
@@ -236,16 +248,6 @@ class Application(SerializableMixin, models.Model):
             default=models.Value(""),
             output_field=models.CharField(),
         )
-
-    @applicant.override
-    def _(self) -> str:
-        if self.organisation is not None:
-            return self.organisation.name
-        if self.contact_person is not None:
-            return f"{self.contact_person.first_name} {self.contact_person.last_name}"
-        if self.user is not None:
-            return f"{self.user.first_name} {self.user.last_name}"
-        return ""
 
     @lookup_property
     def status_sort_order() -> int:
@@ -291,3 +293,11 @@ class Application(SerializableMixin, models.Model):
         # The setter is used by ApplicationQuerySet to pre-evaluate units for multiple Applications.
         # Should not be used by anything else!
         self._units_for_permissions = value
+
+    @property
+    def full_billing_address(self) -> str:
+        return f"{self.billing_street_address}, {self.billing_post_code} {self.billing_city}"
+
+    @property
+    def full_organisation_address(self) -> str:
+        return f"{self.organisation_street_address}, {self.organisation_post_code} {self.organisation_city}"

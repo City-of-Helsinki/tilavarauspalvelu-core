@@ -13,6 +13,7 @@ from graphql_relay import to_global_id
 from tilavarauspalvelu.enums import (
     AccessType,
     CustomerTypeChoice,
+    MunicipalityChoice,
     PriceUnit,
     ReservationStateChoice,
     ReservationTypeChoice,
@@ -89,7 +90,7 @@ def test_reservation__query__all_fields(graphql):
         freeOfChargeReason
         handledAt
         handlingDetails
-        homeCity { nameFi }
+        municipality
         isBlocked
         isHandled
         name
@@ -153,7 +154,7 @@ def test_reservation__query__all_fields(graphql):
         "freeOfChargeReason": reservation.free_of_charge_reason,
         "handledAt": reservation.handled_at,
         "handlingDetails": reservation.handling_details,
-        "homeCity": None,
+        "municipality": MunicipalityChoice.HELSINKI.value,
         "isBlocked": False,
         "isHandled": False,
         "name": reservation.name,

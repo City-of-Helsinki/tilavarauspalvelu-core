@@ -284,7 +284,6 @@ class ReservationQuerySet(models.QuerySet):
             "reservation_series__allocated_time_slot",
             "deny_reason",
             "purpose",
-            "home_city",
             "age_group",
         ).prefetch_related(
             models.Prefetch(

@@ -172,7 +172,7 @@ def test_seasonal_booking_application_received__send_email(outbox):
     assert len(outbox) == 1
 
     assert outbox[0].subject == "Your application has been received"
-    assert sorted(outbox[0].bcc) == sorted([application.user.email, application.contact_person.email])
+    assert sorted(outbox[0].bcc) == sorted([application.user.email, application.contact_person_email])
 
 
 @pytest.mark.django_db
@@ -189,7 +189,7 @@ def test_seasonal_booking_application_received__send_email__wrong_status(outbox)
 @override_settings(SEND_EMAILS=True)
 @patch_method(SentryLogger.log_message)
 def test_seasonal_booking_application_received__send_email__no_recipients(outbox):
-    application = ApplicationFactory.create_in_status_received(user__email="", contact_person__email="")
+    application = ApplicationFactory.create_in_status_received(user__email="", contact_person_email="")
 
     EmailService.send_seasonal_booking_application_received_email(application=application)
 

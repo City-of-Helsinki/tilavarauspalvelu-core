@@ -98,13 +98,13 @@ def test_generate_reservation_series_from_allocations():
     assert reservations[0].num_persons == section.num_persons
     assert reservations[0].buffer_time_before == datetime.timedelta(0)
     assert reservations[0].buffer_time_after == datetime.timedelta(0)
-    assert reservations[0].reservee_first_name == section.application.contact_person.first_name
-    assert reservations[0].reservee_last_name == section.application.contact_person.last_name
-    assert reservations[0].reservee_email == section.application.contact_person.email
-    assert reservations[0].reservee_phone == section.application.contact_person.phone_number
-    assert reservations[0].billing_address_street == section.application.billing_address.street_address
-    assert reservations[0].billing_address_city == section.application.billing_address.city
-    assert reservations[0].billing_address_zip == section.application.billing_address.post_code
+    assert reservations[0].reservee_first_name == section.application.contact_person_first_name
+    assert reservations[0].reservee_last_name == section.application.contact_person_last_name
+    assert reservations[0].reservee_email == section.application.contact_person_email
+    assert reservations[0].reservee_phone == section.application.contact_person_phone_number
+    assert reservations[0].billing_address_street == section.application.billing_street_address
+    assert reservations[0].billing_address_city == section.application.billing_city
+    assert reservations[0].billing_address_zip == section.application.billing_post_code
 
     assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 12)
     assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 14)
@@ -152,9 +152,9 @@ def test_generate_reservation_series_from_allocations__individual():
 
     assert reservations[0].description == application.additional_information
     assert reservations[0].reservee_type == CustomerTypeChoice.INDIVIDUAL
-    assert reservations[0].reservee_address_street == application.billing_address.street_address
-    assert reservations[0].reservee_address_city == application.billing_address.city
-    assert reservations[0].reservee_address_zip == application.billing_address.post_code
+    assert reservations[0].reservee_address_street == application.billing_street_address
+    assert reservations[0].reservee_address_city == application.billing_city
+    assert reservations[0].reservee_address_zip == application.billing_post_code
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
@@ -188,14 +188,14 @@ def test_generate_reservation_series_from_allocations__company():
     reservations: list[Reservation] = list(Reservation.objects.all())
     assert len(reservations) == 1
 
-    assert reservations[0].description == application.organisation.core_business
+    assert reservations[0].description == application.organisation_core_business
     assert reservations[0].reservee_type == CustomerTypeChoice.BUSINESS
-    assert reservations[0].reservee_organisation_name == application.organisation.name
-    assert reservations[0].reservee_id == application.organisation.identifier
+    assert reservations[0].reservee_organisation_name == application.organisation_name
+    assert reservations[0].reservee_id == application.organisation_identifier
     assert reservations[0].reservee_is_unregistered_association is False
-    assert reservations[0].reservee_address_street == application.organisation.address.street_address
-    assert reservations[0].reservee_address_city == application.organisation.address.city
-    assert reservations[0].reservee_address_zip == application.organisation.address.post_code
+    assert reservations[0].reservee_address_street == application.organisation_street_address
+    assert reservations[0].reservee_address_city == application.organisation_city
+    assert reservations[0].reservee_address_zip == application.organisation_post_code
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
@@ -229,14 +229,14 @@ def test_generate_reservation_series_from_allocations__association():
     reservations: list[Reservation] = list(Reservation.objects.all())
     assert len(reservations) == 1
 
-    assert reservations[0].description == application.organisation.core_business
+    assert reservations[0].description == application.organisation_core_business
     assert reservations[0].reservee_type == CustomerTypeChoice.NONPROFIT
-    assert reservations[0].reservee_organisation_name == application.organisation.name
-    assert reservations[0].reservee_id == application.organisation.identifier
+    assert reservations[0].reservee_organisation_name == application.organisation_name
+    assert reservations[0].reservee_id == application.organisation_identifier
     assert reservations[0].reservee_is_unregistered_association is False
-    assert reservations[0].reservee_address_street == application.organisation.address.street_address
-    assert reservations[0].reservee_address_city == application.organisation.address.city
-    assert reservations[0].reservee_address_zip == application.organisation.address.post_code
+    assert reservations[0].reservee_address_street == application.organisation_street_address
+    assert reservations[0].reservee_address_city == application.organisation_city
+    assert reservations[0].reservee_address_zip == application.organisation_post_code
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
@@ -271,12 +271,12 @@ def test_generate_reservation_series_from_allocations__community():
     assert len(reservations) == 1
 
     assert reservations[0].reservee_type == CustomerTypeChoice.NONPROFIT
-    assert reservations[0].reservee_organisation_name == application.organisation.name
-    assert reservations[0].reservee_id == application.organisation.identifier
+    assert reservations[0].reservee_organisation_name == application.organisation_name
+    assert reservations[0].reservee_id == application.organisation_identifier
     assert reservations[0].reservee_is_unregistered_association is False
-    assert reservations[0].reservee_address_street == application.organisation.address.street_address
-    assert reservations[0].reservee_address_city == application.organisation.address.city
-    assert reservations[0].reservee_address_zip == application.organisation.address.post_code
+    assert reservations[0].reservee_address_street == application.organisation_street_address
+    assert reservations[0].reservee_address_city == application.organisation_city
+    assert reservations[0].reservee_address_zip == application.organisation_post_code
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
