@@ -52,6 +52,7 @@ def required_reservation_unit_form_data(reservation_unit: ReservationUnit) -> di
         "reservation_kind": reservation_unit.reservation_kind,
         "authentication": reservation_unit.authentication,
         "reservation_start_interval": reservation_unit.reservation_start_interval,
+        "reservation_form": reservation_unit.reservation_form,
         #
         # Inline form metadata
         **management_form_data("images"),
