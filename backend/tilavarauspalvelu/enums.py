@@ -776,6 +776,28 @@ class ReservationKind(models.TextChoices):
         ]
 
 
+class ReservationFormType(models.TextChoices):
+    """Reservation forms for that are supported by the system."""
+
+    CONTACT_INFO_FORM = "CONTACT_INFO_FORM", _("Contact info form")
+    """Asks for user's contact information."""
+
+    RESERVEE_INFO_FORM = "RESERVEE_INFO_FORM", _("Reservee info form")
+    """Asks for reservee information depending on the user's reservee type, in addition to contact information."""
+
+    PURPOSE_FORM = "PURPOSE_FORM", _("Purpose form")
+    """Asks for user's purpose of use, in addition to contact and reservee information."""
+
+    AGE_GROUP_FORM = "AGE_GROUP_FORM", _("Age group form")
+    """Asks for user's age group, in addition to contact and reservee information, and purpose of use."""
+
+    PURPOSE_SUBVENTION_FORM = "PURPOSE_SUBVENTION_FORM", _("Purpose subvention form")
+    """Adds option to apply for subvention to the purpose form."""
+
+    AGE_GROUP_SUBVENTION_FORM = "AGE_GROUP_SUBVENTION_FORM", _("Age group subvention form")
+    """Adds option to apply for subvention to the age group form."""
+
+
 class PricingType(models.TextChoices):
     PAID = "paid", pgettext_lazy("PricingType", "Paid")
     FREE = "free", pgettext_lazy("PricingType", "Free")
