@@ -151,7 +151,7 @@ def test_redirect_to_verkkokauppa__reservation_no_payment_order(api_client):
         type=ReservationTypeChoice.NORMAL,
         begins_at=begin,
         ends_at=begin + datetime.timedelta(hours=1),
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         payment_order=None,
     )
 
@@ -274,7 +274,7 @@ def test_redirect_to_verkkokauppa__reservation_already_has_verkkokauppa_order__e
 
 def test_redirect_to_verkkokauppa__reservation_unit_has_no_active_pricing(api_client):
     reservation = ReservationFactory.create_with_pending_payment()
-    reservation.reservation_units.first().pricings.clear()
+    reservation.reservation_unit.pricings.clear()
 
     url = reverse("verkkokauppa_pending_reservation", kwargs={"pk": reservation.pk})
     url = update_query_params(url, redirect_on_error="https://fake.varaamo.hel.fi")

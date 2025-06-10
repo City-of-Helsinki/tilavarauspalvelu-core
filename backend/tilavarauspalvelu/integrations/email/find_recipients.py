@@ -117,9 +117,7 @@ def get_reservation_staff_notification_recipients_by_language(
         users = users.exclude(pk=reservation.user.pk)
 
     units = (
-        Unit.objects.filter(
-            reservation_units__in=reservation.reservation_units.all(),
-        )
+        Unit.objects.filter(reservation_units__in=[reservation.reservation_unit])
         .prefetch_related("unit_groups")
         .distinct()
     )

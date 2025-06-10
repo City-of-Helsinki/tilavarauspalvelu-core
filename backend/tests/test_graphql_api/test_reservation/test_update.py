@@ -145,7 +145,7 @@ def test_reservation__update__regular_user(graphql):
 def test_reservation__update__all_required_fields_are_filled(graphql):
     metadata_set = ReservationMetadataSetFactory.create_basic()
     reservation = ReservationFactory.create_for_update(
-        reservation_units__metadata_set=metadata_set,
+        reservation_unit__metadata_set=metadata_set,
     )
 
     data = get_update_data(reservation)
@@ -182,7 +182,7 @@ def test_reservation__update__missing_reservee_id_for_unregistered_organisation(
         ],
     )
     reservation = ReservationFactory.create_for_update(
-        reservation_units__metadata_set=metadata_set,
+        reservation_unit__metadata_set=metadata_set,
         reservee_id="",
     )
 
@@ -219,7 +219,7 @@ def test_reservation__update__missing_home_city_for_individual(graphql):
             "home_city",
         ],
     )
-    reservation = ReservationFactory.create_for_update(reservation_units__metadata_set=metadata_set)
+    reservation = ReservationFactory.create_for_update(reservation_unit__metadata_set=metadata_set)
 
     data = get_update_data(reservation)
     data["reserveeFirstName"] = "John"
@@ -254,7 +254,7 @@ def test_reservation__update__missing_reservee_id_for_individual(graphql):
         ],
     )
     reservation = ReservationFactory.create_for_update(
-        reservation_units__metadata_set=metadata_set,
+        reservation_unit__metadata_set=metadata_set,
         reservee_id="",
     )
 
@@ -291,7 +291,7 @@ def test_reservation__update__missing_reservee_organisation_name_for_individual(
         ],
     )
     reservation = ReservationFactory.create_for_update(
-        reservation_units__metadata_set=metadata_set,
+        reservation_unit__metadata_set=metadata_set,
         reservee_organisation_name="",
     )
 
@@ -314,7 +314,7 @@ def test_reservation__update__missing_reservee_organisation_name_for_individual(
 
 def test_reservation__update__some_required_fields_are_missing(graphql):
     metadata_set = ReservationMetadataSetFactory.create_basic()
-    reservation = ReservationFactory.create_for_update(reservation_units__metadata_set=metadata_set, reservee_phone="")
+    reservation = ReservationFactory.create_for_update(reservation_unit__metadata_set=metadata_set, reservee_phone="")
 
     data = get_update_data(reservation)
     data["reserveeFirstName"] = "John"
@@ -329,7 +329,7 @@ def test_reservation__update__some_required_fields_are_missing(graphql):
 
 
 def test_reservation__update__already_has_max_reservations_per_user(graphql):
-    reservation = ReservationFactory.create_for_update(reservation_units__max_reservations_per_user=1)
+    reservation = ReservationFactory.create_for_update(reservation_unit__max_reservations_per_user=1)
 
     graphql.login_with_superuser()
     update_data = get_update_data(reservation)

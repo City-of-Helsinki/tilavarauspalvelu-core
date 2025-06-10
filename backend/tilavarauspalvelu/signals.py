@@ -191,20 +191,6 @@ def _reservation_unit_post_delete(sender: Any, **kwargs: Unpack[PostDeleteKwargs
 # --- M2M changed signals -----------------------------------------------------------------------------------------
 
 
-@receiver(m2m_changed, sender=Reservation.reservation_units.through, dispatch_uid="reservation_reservation_units_m2m")
-def _reservation_reservation_units_m2m(sender: Any, **kwargs: Unpack[M2MChangedKwargs[Reservation]]) -> None:
-    action = kwargs["action"]
-    instance = kwargs["instance"]
-    reverse = kwargs["reverse"]
-    using = kwargs["using"]
-
-    if action == "post_add" and not reverse and settings.SAVE_RESERVATION_STATISTICS:
-        create_statistics_for_reservations_task.delay(reservation_pks=[instance.pk])
-
-    if settings.UPDATE_AFFECTING_TIME_SPANS:
-        update_affecting_time_spans_task.delay(using=using)
-
-
 @receiver(m2m_changed, sender=ReservationUnit.spaces.through, dispatch_uid="reservation_unit_spaces_m2m")
 def _reservation_unit_spaces_m2m(sender: Any, **kwargs: Unpack[M2MChangedKwargs[ReservationUnit]]) -> None:
     action = kwargs["action"]

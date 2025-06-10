@@ -22,7 +22,7 @@ pytestmark = [
 def test_repair_reservation_series_access_code__regular_user(graphql):
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -45,7 +45,7 @@ def test_repair_reservation_series_access_code__regular_user(graphql):
 def test_repair_reservation_series_access_code__general_admin(graphql):
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),

@@ -140,10 +140,7 @@ def _create_normal_reservations(
         ReservationStateChoice.CONFIRMED,
     ]
 
-    ReservationUnitThroughModel: type[models.Model] = Reservation.reservation_units.through  # noqa: N806
-
     reservations: list[Reservation] = []
-    reservation_reservation_units: list[models.Model] = []
     payment_orders: list[PaymentOrder] = []
 
     # --- Create reservations -------------------------------------------------------------------------------------
@@ -211,6 +208,7 @@ def _create_normal_reservations(
                         .for_customer_type(customer_type)
                         .starting_at(begin_datetime, reservation_unit, pricing=pricing)
                         .build(
+                            reservation_unit=reservation_unit,
                             type=reservation_type,
                             state=reservation_state,
                             #
@@ -236,13 +234,6 @@ def _create_normal_reservations(
 
                 reservations.append(reservation)
 
-                reservation_reservation_units.append(
-                    ReservationUnitThroughModel(
-                        reservation=reservation,
-                        reservationunit=reservation_unit,
-                    )
-                )
-
                 if pricing.highest_price > 0:
                     payment_order = _build_payment_order(reservation, payment_type, handled_payment_due_by)
                     payment_orders.append(payment_order)
@@ -251,7 +242,6 @@ def _create_normal_reservations(
 
     ReservationUnit.objects.bulk_update(reservation_units, fields=["name", "name_fi", "name_en", "name_sv"])
     Reservation.objects.bulk_create(reservations)
-    ReservationUnitThroughModel.objects.bulk_create(reservation_reservation_units)
     PaymentOrder.objects.bulk_create(payment_orders)
 
     _deny_and_cancel_normal_reservations()
@@ -465,10 +455,7 @@ def _create_full_day_reservations(
         ReservationTypeChoice.STAFF,
     ]
 
-    ReservationUnitThroughModel: type[models.Model] = Reservation.reservation_units.through  # noqa: N806
-
     reservations: list[Reservation] = []
-    reservation_reservation_units: list[models.Model] = []
 
     # --- Create reservations -------------------------------------------------------------------------------------
 
@@ -500,6 +487,7 @@ def _create_full_day_reservations(
                 .for_customer_type(customer_type)
                 .starting_at(begin_datetime, reservation_unit, pricing=pricing)
                 .build(
+                    reservation_unit=reservation_unit,
                     type=reservation_type,
                     state=ReservationStateChoice.CONFIRMED,
                     #
@@ -516,15 +504,7 @@ def _create_full_day_reservations(
             )
             reservations.append(reservation)
 
-            reservation_reservation_units.append(
-                ReservationUnitThroughModel(
-                    reservation=reservation,
-                    reservationunit=reservation_unit,
-                )
-            )
-
     Reservation.objects.bulk_create(reservations)
-    ReservationUnitThroughModel.objects.bulk_create(reservation_reservation_units)
 
 
 @with_logs
@@ -590,10 +570,7 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
         CustomerTypeChoice.NONPROFIT,
     ]
 
-    ReservationUnitThroughModel: type[models.Model] = Reservation.reservation_units.through  # noqa: N806
-
     reservations: list[Reservation] = []
-    reservation_reservation_units: list[models.Model] = []
 
     # --- Create reservations -------------------------------------------------------------------------------------
 
@@ -615,6 +592,7 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
             .for_customer_type(customer_type)
             .starting_at(begin_datetime, reservation_unit, pricing=pricing)
             .build(
+                reservation_unit=reservation_unit,
                 type=ReservationTypeChoice.NORMAL,
                 state=ReservationStateChoice.CONFIRMED,
                 #
@@ -630,13 +608,6 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
             )
         )
         reservations.append(reservation)
-
-        reservation_reservation_units.append(
-            ReservationUnitThroughModel(
-                reservation=reservation,
-                reservationunit=reservation_unit,
-            )
-        )
 
         # Only one reservation per day, so that we don't accidentally create overlapping reservations
         reservation_date += datetime.timedelta(days=1)
@@ -657,6 +628,7 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
             .for_customer_type(customer_type)
             .starting_at(begin_datetime, reservation_unit, pricing=pricing)
             .build(
+                reservation_unit=reservation_unit,
                 type=ReservationTypeChoice.NORMAL,
                 state=ReservationStateChoice.CONFIRMED,
                 #
@@ -673,18 +645,10 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
         )
         reservations.append(reservation)
 
-        reservation_reservation_units.append(
-            ReservationUnitThroughModel(
-                reservation=reservation,
-                reservationunit=reservation_unit,
-            )
-        )
-
         # Only one reservation per day, so that we don't accidentally create overlapping reservations
         reservation_date += datetime.timedelta(days=1)
 
     Reservation.objects.bulk_create(reservations)
-    ReservationUnitThroughModel.objects.bulk_create(reservation_reservation_units)
 
 
 @with_logs
@@ -876,15 +840,12 @@ def _create_reservations_for_series(
     deny_random: int = 0,
     reject_random: int = 0,
 ) -> None:
-    ReservationUnitThroughModel: type[models.Model] = Reservation.reservation_units.through  # noqa: N806
-
     pricing: ReservationUnitPricing | None = series.reservation_unit.pricings.active().first()
     assert pricing is not None, "Reservation unit must have at least one pricing"
 
     weekdays = series.actions.get_weekdays()
 
     reservations: list[Reservation] = []
-    reservation_reservation_units: list[models.Model] = []
     occurrences: list[RejectedOccurrence] = []
 
     for weekday in weekdays:
@@ -909,6 +870,7 @@ def _create_reservations_for_series(
                 .for_reservation_unit(series.reservation_unit)
                 .for_nonprofit()
                 .build(
+                    reservation_unit=series.reservation_unit,
                     reservation_series=series,
                     #
                     begin=begin,
@@ -942,13 +904,6 @@ def _create_reservations_for_series(
 
             reservations.append(reservation)
 
-            reservation_reservation_units.append(
-                ReservationUnitThroughModel(
-                    reservation=reservation,
-                    reservationunit=series.reservation_unit,
-                )
-            )
-
     if cancel_random > 0:
         cancel_reasons = ReservationCancelReasonChoice.user_selectable
 
@@ -977,7 +932,6 @@ def _create_reservations_for_series(
             # Replace the reservation with a rejected occurrence.
             index = random.randint(0, len(reservations) - 1)
             reservation = reservations.pop(index)
-            reservation_reservation_units.pop(index)
             occurrence = RejectedOccurrenceFactory.build(
                 begin_datetime=reservation.begins_at,
                 end_datetime=reservation.ends_at,
@@ -988,5 +942,4 @@ def _create_reservations_for_series(
             rejected_count += 1
 
     Reservation.objects.bulk_create(reservations)
-    ReservationUnitThroughModel.objects.bulk_create(reservation_reservation_units)
     RejectedOccurrence.objects.bulk_create(occurrences)

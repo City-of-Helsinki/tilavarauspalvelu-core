@@ -218,7 +218,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
     ) -> bool:
         from tilavarauspalvelu.models import Reservation
 
-        qs = Reservation.objects.overlapping_reservations(
+        qs = Reservation.objects.all().overlapping_reservations(
             reservation_unit=self.reservation_unit,
             begin=start_datetime,
             end=end_datetime,
@@ -242,7 +242,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         from tilavarauspalvelu.models import Reservation
 
         qs = Reservation.objects.filter(
-            reservation_units__in=self.reservation_units_with_common_hierarchy,
+            reservation_unit__in=self.reservation_units_with_common_hierarchy,
             begins_at__gte=end_time,
         ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
 
@@ -265,7 +265,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         from tilavarauspalvelu.models import Reservation
 
         qs = Reservation.objects.filter(
-            reservation_units__in=self.reservation_units_with_common_hierarchy,
+            reservation_unit__in=self.reservation_units_with_common_hierarchy,
             ends_at__lte=start_time,
         ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
 
@@ -513,7 +513,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         ]
 
         # Update all future or ongoing reservations in the reservation unit to their current access types
-        Reservation.objects.filter(reservation_units=self.reservation_unit, ends_at__gt=now).update(
+        Reservation.objects.filter(reservation_unit=self.reservation_unit, ends_at__gt=now).update(
             access_type=models.Case(
                 *whens,
                 # Use the active access type as the default (even though we should never reach this)

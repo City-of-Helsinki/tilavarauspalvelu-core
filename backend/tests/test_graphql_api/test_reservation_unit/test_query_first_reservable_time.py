@@ -2319,7 +2319,7 @@ def test__reservation_unit__first_reservable_time__blocked_type_reservation_can_
 
     # 1st Jan 12:00 - 14:00 (2h)
     ReservationFactory.create(
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         begins_at=_datetime(hour=12),
         ends_at=_datetime(hour=14),
         buffer_time_before=datetime.timedelta(minutes=300),  # This buffer should be completely ignored
@@ -2400,7 +2400,7 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
         ends_at=_datetime(hour=18),
         buffer_time_before=datetime.timedelta(),
         buffer_time_after=datetime.timedelta(),
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         state=ReservationStateChoice.CREATED,
     )
 
@@ -2410,7 +2410,7 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
         ends_at=_datetime(hour=19, minute=30),
         buffer_time_before=datetime.timedelta(),
         buffer_time_after=datetime.timedelta(),
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         state=ReservationStateChoice.CREATED,
     )
 
@@ -2420,7 +2420,7 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
         ends_at=_datetime(hour=21),
         buffer_time_before=datetime.timedelta(minutes=15),
         buffer_time_after=datetime.timedelta(minutes=30),
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         state=ReservationStateChoice.CREATED,
     )
 

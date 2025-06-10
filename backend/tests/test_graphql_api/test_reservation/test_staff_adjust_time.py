@@ -233,7 +233,7 @@ def test_reservation__staff_adjust_time__overlaps_with_another_reservation(graph
     ReservationFactory.create(
         begins_at=blocking_begin,
         ends_at=blocking_end,
-        reservation_units=[reservation.reservation_units.first()],
+        reservation_unit=reservation.reservation_unit,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
     )
@@ -270,7 +270,7 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_before_due_to
     ReservationFactory.create(
         begins_at=blocking_begin,
         ends_at=blocking_end,
-        reservation_units=[reservation.reservation_units.first()],
+        reservation_unit=reservation.reservation_unit,
         buffer_time_after=datetime.timedelta(minutes=1),
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -308,7 +308,7 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_after_due_to_
     ReservationFactory.create(
         begins_at=blocking_begin,
         ends_at=blocking_end,
-        reservation_units=[reservation.reservation_units.first()],
+        reservation_unit=reservation.reservation_unit,
         buffer_time_before=datetime.timedelta(minutes=1),
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -346,7 +346,7 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_before_due_to
     ReservationFactory.create(
         begins_at=blocking_begin,
         ends_at=blocking_end,
-        reservation_units=[reservation.reservation_units.first()],
+        reservation_unit=reservation.reservation_unit,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
     )
@@ -390,7 +390,7 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_after_due_to_
     ReservationFactory.create(
         begins_at=blocking_begin,
         ends_at=blocking_end,
-        reservation_units=[reservation.reservation_units.first()],
+        reservation_unit=reservation.reservation_unit,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
     )
@@ -437,7 +437,7 @@ def test_reservation__staff_adjust_time__reservation_start_time_not_in_interval(
 
 @pytest.mark.parametrize("interval", ReservationStartInterval.values)
 def test_reservation__staff_adjust_time__reservation_start_interval_over_30_treated_as_30(graphql, interval):
-    reservation = ReservationFactory.create_for_time_adjustment(reservation_units__reservation_start_interval=interval)
+    reservation = ReservationFactory.create_for_time_adjustment(reservation_unit__reservation_start_interval=interval)
 
     now = local_datetime()
     last_hour = now.replace(minute=0, second=0, microsecond=0)
@@ -542,7 +542,7 @@ def test_reservation__staff_adjust_time__same_access_type(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.ACCESS_CODE,
-        reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
+        reservation_unit__access_types__access_type=AccessType.ACCESS_CODE,
         access_code_is_active=True,
         access_code_generated_at=local_datetime(),
     )
@@ -561,8 +561,8 @@ def test_reservation__staff_adjust_time__same_access_type__requires_handling(gra
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.ACCESS_CODE,
-        reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
-        reservation_units__require_reservation_handling=True,
+        reservation_unit__access_types__access_type=AccessType.ACCESS_CODE,
+        reservation_unit__require_reservation_handling=True,
         access_code_is_active=True,
         access_code_generated_at=local_datetime(),
     )
@@ -584,7 +584,7 @@ def test_reservation__staff_adjust_time__change_to_access_code(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.UNRESTRICTED,
-        reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
+        reservation_unit__access_types__access_type=AccessType.ACCESS_CODE,
         access_code_is_active=False,
     )
 
@@ -602,8 +602,8 @@ def test_reservation__staff_adjust_time__change_to_access_code__requires_handlin
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.UNRESTRICTED,
-        reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
-        reservation_units__require_reservation_handling=True,
+        reservation_unit__access_types__access_type=AccessType.ACCESS_CODE,
+        reservation_unit__require_reservation_handling=True,
         access_code_is_active=False,
     )
 
@@ -621,7 +621,7 @@ def test_reservation__staff_adjust_time__change_from_access_code(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.ACCESS_CODE,
-        reservation_units__access_types__access_type=AccessType.UNRESTRICTED,
+        reservation_unit__access_types__access_type=AccessType.UNRESTRICTED,
         access_code_generated_at=datetime.datetime(2025, 1, 1, tzinfo=DEFAULT_TIMEZONE),
         access_code_is_active=True,
     )
@@ -640,7 +640,7 @@ def test_reservation__staff_adjust_time__pindora_call_failed(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.ACCESS_CODE,
-        reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
+        reservation_unit__access_types__access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=datetime.datetime(2025, 1, 1, tzinfo=DEFAULT_TIMEZONE),
         access_code_is_active=True,
     )
@@ -659,7 +659,7 @@ def test_reservation__staff_adjust_time__overlapping_reservation_created_at_the_
     reservation = ReservationFactory.create_for_time_adjustment()
     reservation_begin = reservation.begins_at
     reservation_end = reservation.ends_at
-    reservation_unit = reservation.reservation_units.first()
+    reservation_unit = reservation.reservation_unit
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation)

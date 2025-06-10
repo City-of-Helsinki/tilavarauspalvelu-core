@@ -110,7 +110,7 @@ class ReservationQuerySet(models.QuerySet):
             .going_to_occur()
             .filter(
                 # In any reservation unit related through the reservation unit hierarchy
-                models.Q(reservation_units__in=reservation_unit.actions.reservation_units_with_common_hierarchy),
+                models.Q(reservation_unit__in=reservation_unit.actions.reservation_units_with_common_hierarchy),
             )
         )
 
@@ -164,7 +164,7 @@ class ReservationQuerySet(models.QuerySet):
             qs = qs.filter(pk__in=reservation_units)
 
         return self.filter(
-            reservation_units__in=models.Subquery(qs.affected_reservation_unit_ids),
+            reservation_unit__in=models.Subquery(qs.affected_reservation_unit_ids),
         ).exclude(
             # Cancelled or denied reservations never affect any reservations
             state__in=[
@@ -221,7 +221,7 @@ class ReservationQuerySet(models.QuerySet):
         user: AnyUser,
     ) -> Self:
         return self.active().filter(
-            reservation_units=reservation_unit,
+            reservation_unit=reservation_unit,
             user=user,
             type=ReservationTypeChoice.NORMAL.value,
         )
@@ -285,11 +285,8 @@ class ReservationQuerySet(models.QuerySet):
             "deny_reason",
             "purpose",
             "age_group",
-        ).prefetch_related(
-            models.Prefetch(
-                "reservation_units",
-                queryset=ReservationUnit.objects.select_related("unit"),
-            ),
+            "reservation_unit",
+            "reservation_unit__unit",
         )
 
         new_statistics: list[ReservationStatistic] = [

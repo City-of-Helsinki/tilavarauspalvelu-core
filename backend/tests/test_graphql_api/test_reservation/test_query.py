@@ -100,7 +100,7 @@ def test_reservation__query__all_fields(graphql):
         priceNet
         purpose { nameFi }
         reservationSeries { user { email } }
-        reservationUnits { nameFi }
+        reservationUnit { nameFi }
         reserveeAddressCity
         reserveeAddressStreet
         reserveeAddressZip
@@ -164,7 +164,7 @@ def test_reservation__query__all_fields(graphql):
         "priceNet": f"{reservation.price_net:.2f}",
         "purpose": None,
         "reservationSeries": None,
-        "reservationUnits": [],
+        "reservationUnit": {"nameFi": reservation.reservation_unit.name_fi},
         "reserveeAddressCity": reservation.reservee_address_city,
         "reserveeAddressStreet": reservation.reservee_address_street,
         "reserveeAddressZip": reservation.reservee_address_zip,
@@ -293,7 +293,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__general_
 def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_admin(graphql):
     unit = UnitFactory.create()
     reservation_unit = ReservationUnitFactory.create(unit=unit)
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
     admin = UserFactory.create_with_unit_role(units=[unit])
 
     graphql.force_login(admin)
@@ -321,7 +321,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_gro
     unit_group = UnitGroupFactory.create()
     unit = UnitFactory.create(unit_groups=[unit_group])
     reservation_unit = ReservationUnitFactory.create(unit=unit)
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
     admin = UserFactory.create_with_unit_role(unit_groups=[unit_group])
 
     graphql.force_login(admin)
@@ -419,16 +419,16 @@ def test_reservation__query__order__all_fields(graphql):
 
 
 def test_reservation__query__reservation_unit_is_archived_but_data_is_still_returned_through_relation(graphql):
-    reservation = ReservationFactory.create(reservation_units__is_archived=True)
-    reservation_unit = reservation.reservation_units.first()
+    reservation = ReservationFactory.create(reservation_unit__is_archived=True)
+    reservation_unit = reservation.reservation_unit
 
     graphql.login_with_superuser()
     global_id = to_global_id("ReservationNode", reservation.pk)
 
-    fields = "pk reservationUnits { pk isArchived }"
+    fields = "pk reservationUnit { pk isArchived }"
     expected_response = {
         "pk": reservation.pk,
-        "reservationUnits": [{"pk": reservation_unit.pk, "isArchived": True}],
+        "reservationUnit": {"pk": reservation_unit.pk, "isArchived": True},
     }
 
     # Single
@@ -791,7 +791,7 @@ def test_reservation__query__pindora_info__in_application_section(graphql):
     )
     reservation = ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
@@ -852,7 +852,7 @@ def test_reservation__query__pindora_info__in_application_section__not_sent(grap
     )
     reservation = ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,

@@ -332,6 +332,9 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
             accessType
             beginDate
         }
+        reservations {
+            beginsAt
+        }
     """
 
     reservation_unit = ReservationUnitFactory.create(
@@ -340,6 +343,8 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
         application_round_time_slots__is_closed=False,
         access_types__begin_date=local_date(),
     )
+    ReservationFactory.create(reservation_unit=reservation_unit)
+
     graphql.login_with_superuser()
     query = reservation_units_query(fields=fields)
     response = graphql(query)
@@ -372,6 +377,11 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
                 "beginDate": reservation_unit.access_types.first().begin_date.isoformat(),
             },
         ],
+        "reservations": [
+            {
+                "beginsAt": reservation_unit.reservations.first().begins_at.isoformat(),
+            },
+        ],
     }
 
 
@@ -395,9 +405,6 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
         applicationRounds {
             nameFi
         }
-        reservations {
-            beginsAt
-        }
     """
 
     reservation_unit = ReservationUnitFactory.create(
@@ -406,8 +413,8 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
         purposes=[PurposeFactory.create()],
         equipments=[EquipmentFactory.create()],
         application_rounds=[ApplicationRoundFactory.create()],
-        reservations=[ReservationFactory.create()],
     )
+
     query = reservation_units_query(fields=fields)
     response = graphql(query)
 
@@ -442,11 +449,6 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
         "applicationRounds": [
             {
                 "nameFi": reservation_unit.application_rounds.first().name_fi,
-            },
-        ],
-        "reservations": [
-            {
-                "beginsAt": reservation_unit.reservations.first().begins_at.isoformat(),
             },
         ],
     }

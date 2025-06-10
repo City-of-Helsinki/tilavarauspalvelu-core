@@ -46,19 +46,19 @@ def test_units__order__by_reservations_count(graphql):
         3: UnitFactory.create(name="4"),  # 2 Reservations in 2 ReservationUnits
     }
 
-    res_unit_1 = ReservationUnitFactory.create(unit=units[0])
-    res_unit_2 = ReservationUnitFactory.create(unit=units[0])
-    res_unit_3 = ReservationUnitFactory.create(unit=units[1])
-    res_unit_4 = ReservationUnitFactory.create(unit=units[2])
-    res_unit_5 = ReservationUnitFactory.create(unit=units[3])
-    res_unit_6 = ReservationUnitFactory.create(unit=units[3])
+    reservation_unit_1 = ReservationUnitFactory.create(unit=units[0])
+    reservation_unit_2 = ReservationUnitFactory.create(unit=units[0])
+    reservation_unit_3 = ReservationUnitFactory.create(unit=units[1])
+    reservation_unit_4 = ReservationUnitFactory.create(unit=units[2])
+    reservation_unit_5 = ReservationUnitFactory.create(unit=units[3])
+    reservation_unit_6 = ReservationUnitFactory.create(unit=units[3])
 
-    ReservationFactory.create_batch(3, reservation_units=[res_unit_1])
-    ReservationFactory.create_batch(1, reservation_units=[res_unit_2])
-    ReservationFactory.create_batch(2, reservation_units=[res_unit_3])
-    ReservationFactory.create_batch(3, reservation_units=[res_unit_4])
-    ReservationFactory.create_batch(1, reservation_units=[res_unit_5])
-    ReservationFactory.create_batch(1, reservation_units=[res_unit_6])
+    ReservationFactory.create_batch(3, reservation_unit=reservation_unit_1)
+    ReservationFactory.create_batch(1, reservation_unit=reservation_unit_2)
+    ReservationFactory.create_batch(2, reservation_unit=reservation_unit_3)
+    ReservationFactory.create_batch(3, reservation_unit=reservation_unit_4)
+    ReservationFactory.create_batch(1, reservation_unit=reservation_unit_5)
+    ReservationFactory.create_batch(1, reservation_unit=reservation_unit_6)
 
     # Descending
     query_1 = units_query(order_by=["reservationCountDesc", "pkDesc"])
@@ -97,21 +97,21 @@ def test_units__order__by_reservations_count__only_own_reservations(graphql):
         3: UnitFactory.create(name="4"),  # 1 Reservation for user (total 2)
     }
 
-    res_unit_1 = ReservationUnitFactory.create(unit=units[0])
-    res_unit_2 = ReservationUnitFactory.create(unit=units[0])
-    res_unit_3 = ReservationUnitFactory.create(unit=units[1])
-    res_unit_4 = ReservationUnitFactory.create(unit=units[2])
-    res_unit_5 = ReservationUnitFactory.create(unit=units[3])
-    res_unit_6 = ReservationUnitFactory.create(unit=units[3])
+    reservation_unit_1 = ReservationUnitFactory.create(unit=units[0])
+    reservation_unit_2 = ReservationUnitFactory.create(unit=units[0])
+    reservation_unit_3 = ReservationUnitFactory.create(unit=units[1])
+    reservation_unit_4 = ReservationUnitFactory.create(unit=units[2])
+    reservation_unit_5 = ReservationUnitFactory.create(unit=units[3])
+    reservation_unit_6 = ReservationUnitFactory.create(unit=units[3])
 
     user = UserFactory.create()
 
-    ReservationFactory.create_batch(3, reservation_units=[res_unit_1], user=user)
-    ReservationFactory.create_batch(1, reservation_units=[res_unit_2])
-    ReservationFactory.create_batch(2, reservation_units=[res_unit_3], user=user)
-    ReservationFactory.create_batch(3, reservation_units=[res_unit_4])
-    ReservationFactory.create_batch(1, reservation_units=[res_unit_5], user=user)
-    ReservationFactory.create_batch(1, reservation_units=[res_unit_6])
+    ReservationFactory.create_batch(3, reservation_unit=reservation_unit_1, user=user)
+    ReservationFactory.create_batch(1, reservation_unit=reservation_unit_2)
+    ReservationFactory.create_batch(2, reservation_unit=reservation_unit_3, user=user)
+    ReservationFactory.create_batch(3, reservation_unit=reservation_unit_4)
+    ReservationFactory.create_batch(1, reservation_unit=reservation_unit_5, user=user)
+    ReservationFactory.create_batch(1, reservation_unit=reservation_unit_6)
 
     graphql.force_login(user)
 

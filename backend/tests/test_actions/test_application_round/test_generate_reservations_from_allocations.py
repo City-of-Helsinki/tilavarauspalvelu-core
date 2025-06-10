@@ -380,7 +380,7 @@ def test_generate_reservation_series_from_allocations__overlapping_reservation()
     )
 
     existing_reservation = ReservationFactory.create(
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         begins_at=local_datetime(2024, 1, 1, 12, 0),
         ends_at=local_datetime(2024, 1, 1, 14, 0),
     )
@@ -613,14 +613,14 @@ def test_generate_reservation_series_from_allocations__two_reservation_units_wit
 
     qs = Reservation.objects.order_by("begins_at")
 
-    reservations: list[Reservation] = list(qs.filter(reservation_units=reservation_unit_1))
+    reservations: list[Reservation] = list(qs.filter(reservation_unit=reservation_unit_1))
     assert len(reservations) == 3
 
     assert reservations[0].access_type == AccessType.UNRESTRICTED
     assert reservations[1].access_type == AccessType.UNRESTRICTED
     assert reservations[2].access_type == AccessType.UNRESTRICTED
 
-    reservations: list[Reservation] = list(qs.filter(reservation_units=reservation_unit_2))
+    reservations: list[Reservation] = list(qs.filter(reservation_unit=reservation_unit_2))
     assert len(reservations) == 3
 
     assert reservations[0].access_type == AccessType.ACCESS_CODE

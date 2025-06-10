@@ -23,7 +23,7 @@ pytestmark = [
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_update_access_code_is_active__reservation__active_when_should_be_inactive():
     reservation = ReservationFactory.create(
-        reservation_units__ext_uuid=uuid.uuid4(),
+        reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -46,7 +46,7 @@ def test_update_access_code_is_active__reservation__active_when_should_be_inacti
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_update_access_code_is_active__reservation__active_when_should_be_active():
     ReservationFactory.create(
-        reservation_units__ext_uuid=uuid.uuid4(),
+        reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -68,7 +68,7 @@ def test_update_access_code_is_active__reservation__active_when_should_be_active
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_update_access_code_is_active__reservation__inactive_when_should_be_active():
     reservation = ReservationFactory.create(
-        reservation_units__ext_uuid=uuid.uuid4(),
+        reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -91,7 +91,7 @@ def test_update_access_code_is_active__reservation__inactive_when_should_be_acti
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_update_access_code_is_active__reservation__inactive_when_should_be_inactive():
     ReservationFactory.create(
-        reservation_units__ext_uuid=uuid.uuid4(),
+        reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -113,7 +113,7 @@ def test_update_access_code_is_active__reservation__inactive_when_should_be_inac
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_update_access_code_is_active__reservation__not_found():
     reservation = ReservationFactory.create(
-        reservation_units__ext_uuid=uuid.uuid4(),
+        reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -141,7 +141,7 @@ def test_update_access_code_is_active__reservation__not_found():
 def test_update_access_code_is_active__series__active_when_should_be_inactive():
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -165,7 +165,7 @@ def test_update_access_code_is_active__series__active_when_should_be_inactive():
 def test_update_access_code_is_active__series__active_when_should_be_active():
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -188,7 +188,7 @@ def test_update_access_code_is_active__series__active_when_should_be_active():
 def test_update_access_code_is_active__series__inactive_when_should_be_active():
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -212,7 +212,7 @@ def test_update_access_code_is_active__series__inactive_when_should_be_active():
 def test_update_access_code_is_active__series__inactive_when_should_be_inactive():
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -235,7 +235,7 @@ def test_update_access_code_is_active__series__inactive_when_should_be_inactive(
 def test_update_access_code_is_active__series__not_found():
     series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -268,7 +268,7 @@ def test_update_access_code_is_active__seasonal_booking__active_when_should_be_i
     series = ReservationSeriesFactory.create(allocated_time_slot__reservation_unit_option__application_section=section)
     ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -297,7 +297,7 @@ def test_update_access_code_is_active__seasonal_booking__active_when_should_be_a
     series = ReservationSeriesFactory.create(allocated_time_slot__reservation_unit_option__application_section=section)
     ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -325,7 +325,7 @@ def test_update_access_code_is_active__seasonal_booking__inactive_when_should_be
     series = ReservationSeriesFactory.create(allocated_time_slot__reservation_unit_option__application_section=section)
     ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -354,7 +354,7 @@ def test_update_access_code_is_active__seasonal_booking__inactive_when_should_be
     series = ReservationSeriesFactory.create(allocated_time_slot__reservation_unit_option__application_section=section)
     ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -382,7 +382,7 @@ def test_update_access_code_is_active__seasonal_booking__not_found():
     series = ReservationSeriesFactory.create(allocated_time_slot__reservation_unit_option__application_section=section)
     reservation = ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
