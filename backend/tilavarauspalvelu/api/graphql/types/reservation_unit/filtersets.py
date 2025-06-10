@@ -12,6 +12,7 @@ from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntChoi
 
 from tilavarauspalvelu.enums import (
     AccessType,
+    ReservationFormType,
     ReservationKind,
     ReservationUnitPublishingState,
     ReservationUnitReservationState,
@@ -104,6 +105,7 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
         method="filter_by_reservation_state",
         enum=ReservationUnitReservationState,
     )
+    reservation_form = EnumMultipleChoiceFilter(enum=ReservationFormType)
 
     access_type = EnumMultipleChoiceFilter(method="filter_by_access_type", enum=AccessType)
     access_type_begin_date = django_filters.DateFilter(method="filter_by_access_type")
