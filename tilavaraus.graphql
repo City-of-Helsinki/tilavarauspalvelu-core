@@ -294,6 +294,7 @@ type Query {
     reservationKind: String
     publishingState: [ReservationUnitPublishingState]
     reservationState: [ReservationUnitReservationState]
+    reservationForm: [ReservationFormType]
     accessType: [AccessType]
     accessTypeBeginDate: Date
     accessTypeEndDate: Date
@@ -651,6 +652,7 @@ type ApplicationRoundNode implements Node {
     reservationKind: String
     publishingState: [ReservationUnitPublishingState]
     reservationState: [ReservationUnitReservationState]
+    reservationForm: [ReservationFormType]
     accessType: [AccessType]
     accessTypeBeginDate: Date
     accessTypeEndDate: Date
@@ -754,6 +756,7 @@ type ReservationUnitNode implements Node {
   authentication: Authentication!
   reservationStartInterval: ReservationStartInterval!
   reservationKind: ReservationKind!
+  reservationForm: ReservationForm!
   searchTerms: [String!]!
   unit: UnitNode
   reservationUnitType: ReservationUnitTypeNode
@@ -955,6 +958,27 @@ enum ReservationKind {
   DIRECT_AND_SEASON
 }
 
+"""An enumeration."""
+enum ReservationForm {
+  """Contact info form"""
+  CONTACT_INFO_FORM
+
+  """Reservee info form"""
+  RESERVEE_INFO_FORM
+
+  """Purpose form"""
+  PURPOSE_FORM
+
+  """Age group form"""
+  AGE_GROUP_FORM
+
+  """Purpose subvention form"""
+  PURPOSE_SUBVENTION_FORM
+
+  """Age group subvention form"""
+  AGE_GROUP_SUBVENTION_FORM
+}
+
 type UnitNode implements Node {
   tprekId: String
   nameFi: String
@@ -1019,6 +1043,7 @@ type UnitNode implements Node {
     reservationKind: String
     publishingState: [ReservationUnitPublishingState]
     reservationState: [ReservationUnitReservationState]
+    reservationForm: [ReservationFormType]
     accessType: [AccessType]
     accessTypeBeginDate: Date
     accessTypeEndDate: Date
@@ -1083,6 +1108,16 @@ enum ReservationUnitReservationState {
   RESERVABLE
   SCHEDULED_CLOSING
   RESERVATION_CLOSED
+}
+
+"""Reservation forms for that are supported by the system."""
+enum ReservationFormType {
+  CONTACT_INFO_FORM
+  RESERVEE_INFO_FORM
+  PURPOSE_FORM
+  AGE_GROUP_FORM
+  PURPOSE_SUBVENTION_FORM
+  AGE_GROUP_SUBVENTION_FORM
 }
 
 """How is the reservee able to enter the space in their reservation unit?"""
@@ -3825,6 +3860,7 @@ type ReservationUnitCreateMutationPayload {
   authentication: Authentication
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
+  reservationForm: ReservationForm
   publishingState: String
   searchTerms: [String]
   unit: Int
@@ -3896,6 +3932,7 @@ input ReservationUnitCreateMutationInput {
   authentication: Authentication
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
+  reservationForm: ReservationForm
   searchTerms: [String]
   unit: Int
   reservationUnitType: Int
@@ -4008,6 +4045,7 @@ type ReservationUnitUpdateMutationPayload {
   authentication: Authentication
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
+  reservationForm: ReservationForm
   publishingState: String
   searchTerms: [String]
   unit: Int
@@ -4079,6 +4117,7 @@ input ReservationUnitUpdateMutationInput {
   authentication: Authentication
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
+  reservationForm: ReservationForm
   searchTerms: [String]
   unit: Int
   reservationUnitType: Int
