@@ -125,6 +125,7 @@ class ReservationUnitNode(DjangoNode):
             "authentication",
             "reservation_start_interval",
             "reservation_kind",
+            "reservation_form",
             "publishing_state",
             "reservation_state",
             "current_access_type",
