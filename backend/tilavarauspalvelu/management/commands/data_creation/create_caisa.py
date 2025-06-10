@@ -651,7 +651,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     aina_kasiteltava_kellarikerros = ReservationUnitFactory.create(
-        uuid="293d595f-738d-4e21-91fd-9c68d5a83dc5",
+        ext_uuid="293d595f-738d-4e21-91fd-9c68d5a83dc5",
         name="Aina käsiteltävä kellarikerros",
         name_fi="Aina käsiteltävä kellarikerros FI",
         name_en="Aina käsiteltävä kellarikerros EN",
@@ -765,7 +765,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     maksuton_mankeli = ReservationUnitFactory.create(
-        uuid="2160b0cf-518a-482f-bd6c-2676e5682045",
+        ext_uuid="2160b0cf-518a-482f-bd6c-2676e5682045",
         name="Maksuton mankeli",
         name_fi="Maksuton mankeli FI",
         name_en="Maksuton mankeli EN",
@@ -878,7 +878,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     aina_maksullinen_aitio = ReservationUnitFactory.create(
-        uuid="349b8fb8-105d-40ee-a1a1-a515cd1a7c12",
+        ext_uuid="349b8fb8-105d-40ee-a1a1-a515cd1a7c12",
         name="Aina maksullinen Aitio",
         name_fi="Aina maksullinen Aitio FI",
         name_en="Aina maksullinen Aitio EN",
@@ -987,7 +987,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     alennuskelpoinen_aula = ReservationUnitFactory.create(
-        uuid="0f022f59-4b21-44d7-83fb-5bb9a9e1759a",
+        ext_uuid="0f022f59-4b21-44d7-83fb-5bb9a9e1759a",
         name="Alennuskelpoinen aula",
         name_fi="Alennuskelpoinen aula FI",
         name_en="Alennuskelpoinen aula EN",
@@ -1099,7 +1099,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     perumiskelvoton_parveke = ReservationUnitFactory.create(
-        uuid="67dd01ea-1115-442e-86ed-79c144cd281c",
+        ext_uuid="67dd01ea-1115-442e-86ed-79c144cd281c",
         name="Perumiskelvoton parveke, maksuton",
         name_fi="Perumiskelvoton parveke, maksuton FI",
         name_en="Perumiskelvoton parveke, maksuton EN",
@@ -1187,7 +1187,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     perumiskelvoton_patio = ReservationUnitFactory.create(
-        uuid="9a09d859-62eb-4d8d-ae2b-1823d1e7644b",
+        ext_uuid="9a09d859-62eb-4d8d-ae2b-1823d1e7644b",
         name="Perumiskelvoton patio, maksullinen",
         name_fi="Perumiskelvoton patio, maksullinen FI",
         name_en="Perumiskelvoton patio, maksullinen EN",
@@ -1288,7 +1288,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     toistuvien_varausten_toimisto = ReservationUnitFactory.create(
-        uuid="4310564b-2c03-48d2-9d31-ea4d244471ef",
+        ext_uuid="4310564b-2c03-48d2-9d31-ea4d244471ef",
         name="Toistuvien varausten Toimisto",
         name_fi="Toistuvien varausten Toimisto FI",
         name_en="Toistuvien varausten Toimisto EN",
@@ -1393,7 +1393,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     tauotettu_takkahuone = ReservationUnitFactory.create(
-        uuid="e8611183-86e0-4730-aae6-eeaa75b9211f",
+        ext_uuid="e8611183-86e0-4730-aae6-eeaa75b9211f",
         name="Tauotettu Takkahuone",
         name_fi="Tauotettu Takkahuone FI",
         name_en="Tauotettu Takkahuone EN",
@@ -1485,7 +1485,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     aina_kasiteltava_kammio = ReservationUnitFactory.create(
-        uuid="8488f2a7-8476-43ad-a51d-a0995dd21b18",
+        ext_uuid="8488f2a7-8476-43ad-a51d-a0995dd21b18",
         name="Aina käsiteltävä Kammio, maksuton",
         name_fi="Aina käsiteltävä Kammio, maksuton FI",
         name_en="Aina käsiteltävä Kammio, maksuton EN",
