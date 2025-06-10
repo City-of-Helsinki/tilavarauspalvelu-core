@@ -15,7 +15,7 @@ pytestmark = [
 
 def test_reservation__update__working_memo__general_admin(graphql):
     reservation_unit = ReservationUnitFactory.create()
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
 
     admin = UserFactory.create_with_general_role()
 
@@ -31,7 +31,7 @@ def test_reservation__update__working_memo__general_admin(graphql):
 
 def test_reservation__update__working_memo__general_commenter(graphql):
     reservation_unit = ReservationUnitFactory.create()
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
 
     admin = UserFactory.create_with_general_role()
 
@@ -47,7 +47,7 @@ def test_reservation__update__working_memo__general_commenter(graphql):
 
 def test_reservation__update__working_memo__unit_commenter(graphql):
     reservation_unit = ReservationUnitFactory.create()
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
 
     admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
 
@@ -63,7 +63,7 @@ def test_reservation__update__working_memo__unit_commenter(graphql):
 
 def test_reservation__update__working_memo__regular_user(graphql):
     reservation_unit = ReservationUnitFactory.create()
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
 
     graphql.login_with_regular_user()
     data = get_working_memo_update_data(reservation)
@@ -80,7 +80,7 @@ def test_reservation__update__working_memo__staff_and_own_reservation(graphql):
 
     admin = UserFactory.create_with_general_role()
 
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit], user=admin)
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit, user=admin)
 
     graphql.force_login(admin)
     data = get_working_memo_update_data(reservation)
@@ -97,7 +97,7 @@ def test_reservation__update__working_memo__reserver_staff_user_and_not_own_rese
 
     admin = UserFactory.create_with_general_role(role=UserRoleChoice.RESERVER)
 
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
 
     graphql.force_login(admin)
     data = get_working_memo_update_data(reservation)

@@ -39,6 +39,7 @@ class ReservationAdminForm(forms.ModelForm):
             "cancel_details": _("Cancel details"),
             "handling_details": _("Handling details"),
             "working_memo": _("Working memo"),
+            "reservation_unit": _("Reservation unit"),
             #
             "begins_at": _("Begin time"),
             "ends_at": _("End time"),
@@ -102,6 +103,7 @@ class ReservationAdminForm(forms.ModelForm):
             "cancel_details": _("Details for this reservation's cancellation"),
             "handling_details": _("Additional details for denying or approving the reservation"),
             "working_memo": _("Working memo for staff users"),
+            "reservation_unit": _("Reservation unit"),
             #
             "begins_at": _("Reservation begin date and time"),
             "ends_at": _("Reservation end date and time"),

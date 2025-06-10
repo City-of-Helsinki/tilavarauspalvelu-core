@@ -246,7 +246,7 @@ class ReservationNode(DjangoNode):
             "billing_address_city",
             "billing_address_zip",
             #
-            "reservation_units",
+            "reservation_unit",
             "user",
             "reservation_series",
             "deny_reason",
@@ -285,7 +285,7 @@ class ReservationNode(DjangoNode):
                 "ends_at",
                 "buffer_time_before",
                 "buffer_time_after",
-                "reservation_units",
+                "reservation_unit",
                 "is_blocked",
             }
         }
@@ -358,7 +358,7 @@ class ReservationNode(DjangoNode):
         optimizer.annotations["applied_pricing"] = models.Subquery(
             queryset=(
                 ReservationUnitPricing.objects.filter(
-                    reservation_unit=models.OuterRef("reservation_units"),
+                    reservation_unit=models.OuterRef("reservation_unit"),
                 )
                 .active(from_date=models.OuterRef("begins_at__date"))
                 .annotate(

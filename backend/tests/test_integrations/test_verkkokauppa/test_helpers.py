@@ -42,7 +42,7 @@ def test_get_formatted_reservation_time(language, result):
 
 def test_get_verkkokauppa_order_params__respect_reservee_language():
     payment_product = PaymentProductFactory.create()
-    runit = ReservationUnitFactory.create(
+    reservation_unit = ReservationUnitFactory.create(
         payment_product=payment_product,
         name_fi="Nimi",
         name_en="Name",
@@ -50,7 +50,7 @@ def test_get_verkkokauppa_order_params__respect_reservee_language():
     )
 
     reservation_en = ReservationFactory.create(
-        reservation_units=[runit],
+        reservation_unit=reservation_unit,
         user__preferred_language="en",
         reservee_type=CustomerTypeChoice.INDIVIDUAL,
     )
@@ -58,7 +58,7 @@ def test_get_verkkokauppa_order_params__respect_reservee_language():
     assert order_params.items[0].product_name == "Name"
 
     reservation_sv = ReservationFactory.create(
-        reservation_units=[runit],
+        reservation_unit=reservation_unit,
         user__preferred_language="sv",
         reservee_type=CustomerTypeChoice.INDIVIDUAL,
     )

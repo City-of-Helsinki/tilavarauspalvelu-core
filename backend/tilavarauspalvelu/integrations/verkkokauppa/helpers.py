@@ -75,7 +75,7 @@ def get_verkkokauppa_order_params(
     *,
     invoicing_date: datetime.date | None = None,
 ) -> CreateOrderParams:
-    reservation_unit: ReservationUnit = reservation.reservation_units.first()
+    reservation_unit: ReservationUnit = reservation.reservation_unit
     preferred_language = reservation.user.get_preferred_language()
     items = [
         OrderItemParams(
@@ -137,7 +137,7 @@ def get_verkkokauppa_order_params(
 
 
 def create_mock_verkkokauppa_order(reservation: Reservation) -> Order:
-    reservation_unit: ReservationUnit = reservation.reservation_units.first()
+    reservation_unit: ReservationUnit = reservation.reservation_unit
 
     if reservation_unit.payment_product is None:
         payment_merchant = reservation_unit.actions.get_merchant()

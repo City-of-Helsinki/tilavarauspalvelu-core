@@ -1,6 +1,7 @@
-# ruff: noqa: E501
+from __future__ import annotations
 
 import uuid
+from inspect import cleandoc
 
 import django.db.models.deletion
 from django.contrib.postgres.fields import ArrayField
@@ -8,8 +9,163 @@ from django.db import migrations, models
 
 import tilavarauspalvelu.enums
 import utils.fields.model
-from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnitHierarchy
 from utils.db import NowTT
+
+
+def create_reservation_unit_hierarchy():
+    # "SELECT 1;" for syntax highlighting
+    return cleandoc(
+        """
+        SELECT 1;
+
+        CREATE MATERIALIZED VIEW reservation_unit_hierarchy AS
+            SELECT
+                subquery.reservation_unit_id,
+                subquery.related_reservation_unit_ids
+            FROM (
+                SELECT
+                    target_reservation_unit.id as reservation_unit_id,
+                    (
+                        SELECT
+                            ARRAY_AGG(DISTINCT reservation_ids.id)
+                        FROM (
+                            SELECT
+                                agg_res_unit.id
+                            FROM "reservation_unit" agg_res_unit
+                            LEFT OUTER JOIN reservation_unit_spaces res_space ON (
+                                agg_res_unit.id = res_space.reservationunit_id
+                            )
+                            LEFT OUTER JOIN reservation_unit_resources res_resource ON (
+                                agg_res_unit.id = res_resource.reservationunit_id
+                            )
+                            WHERE (
+                                agg_res_unit.id = target_reservation_unit.id
+                                OR res_space.space_id IN (
+                                    SELECT
+                                        UNNEST((
+                                            SELECT
+                                                ARRAY_AGG(id)
+                                            FROM (
+                                                SELECT
+                                                    family_space.id
+                                                FROM "space" family_space
+                                                WHERE (
+                                                    (
+                                                        family_space.lft <= (target_space.lft)
+                                                        AND family_space.rght >= (target_space.rght)
+                                                        AND family_space.tree_id = (target_space.tree_id)
+                                                    )
+                                                    OR (
+                                                        family_space.lft >= (target_space.lft)
+                                                        AND family_space.rght <= (target_space.rght)
+                                                        AND family_space.tree_id = (target_space.tree_id)
+                                                    )
+                                                )
+                                                ORDER BY family_space.tree_id, family_space.lft
+                                            ) space_ids
+                                        )) AS all_families
+                                    FROM
+                                        "space" target_space
+                                    INNER JOIN reservation_unit_spaces target_rus ON (
+                                        target_space.id = target_rus.space_id
+                                    )
+                                    WHERE target_rus.reservationunit_id = target_reservation_unit.id
+                                    ORDER BY target_space.tree_id, target_space.lft
+                                )
+                                OR res_resource.resource_id IN (
+                                    SELECT
+                                        resource.id
+                                    FROM "resource" resource
+                                    INNER JOIN reservation_unit_resources ON (
+                                        resource.id = reservation_unit_resources.resource_id
+                                    )
+                                    WHERE reservation_unit_resources.reservationunit_id = target_reservation_unit.id
+                                    ORDER BY agg_res_unit.id
+                                )
+                            )
+                            ORDER BY agg_res_unit.rank, agg_res_unit.id
+                        ) reservation_ids
+                    ) AS related_reservation_unit_ids
+                FROM "reservation_unit" target_reservation_unit
+            ) subquery;
+
+        CREATE UNIQUE INDEX reservation_unit_hierarchy_reservation_unit_id ON reservation_unit_hierarchy (
+            reservation_unit_id
+        );
+        """
+    )
+
+
+def remove_reservation_unit_hierarchy():
+    return cleandoc(
+        """
+        DROP INDEX IF EXISTS reservation_unit_hierarchy_reservation_unit_id;
+        DROP MATERIALIZED VIEW IF EXISTS reservation_unit_hierarchy;
+        """
+    )
+
+
+def create_affecting_reservations() -> str:
+    # "SELECT 1;" for syntax highlighting
+    return cleandoc(
+        """
+        SELECT 1;
+
+        CREATE MATERIALIZED VIEW affecting_time_spans AS
+            SELECT
+                res.reservation_id,
+                array_agg(res.ru_id ORDER BY res.ru_id) AS affected_reservation_unit_ids,
+                res.buffered_start_datetime,
+                res.buffered_end_datetime,
+                res.buffer_time_before,
+                res.buffer_time_after,
+                res.is_blocking
+            FROM (
+                SELECT DISTINCT
+                    r.id as reservation_id,
+                    unnest(ruh.related_reservation_unit_ids) as ru_id,
+                    (r.begin - r.buffer_time_before) as buffered_start_datetime,
+                    (r.end + r.buffer_time_after) as buffered_end_datetime,
+                    r.buffer_time_before as buffer_time_before,
+                    r.buffer_time_after as buffer_time_after,
+                    (CASE WHEN UPPER(r."type") = 'BLOCKED' THEN true ELSE false END) as is_blocking
+                FROM reservation r
+                INNER JOIN "reservation_reservation_unit" rru ON r.id = rru.reservation_id
+                INNER JOIN "reservation_unit_hierarchy" ruh ON rru.reservationunit_id = ruh.reservation_unit_id
+                WHERE (
+                    (r.end + r.buffer_time_after)::date >= NOW_TT()::date
+                    AND UPPER(r.state) IN ('CREATED', 'CONFIRMED', 'WAITING_FOR_PAYMENT', 'REQUIRES_HANDLING')
+                )
+            ) res
+            GROUP BY
+                res.reservation_id,
+                res.buffered_start_datetime,
+                res.buffered_end_datetime,
+                res.buffer_time_before,
+                res.buffer_time_after,
+                res.is_blocking
+            ORDER BY res.buffered_start_datetime, res.reservation_id;
+
+        CREATE UNIQUE INDEX idx_reservation_id ON affecting_time_spans (reservation_id);
+        CREATE INDEX idx_affected_reservation_unit_ids on affecting_time_spans USING GIN (
+            affected_reservation_unit_ids gin__int_ops
+        );
+        CREATE INDEX idx_buffered_start_datetime ON affecting_time_spans (buffered_start_datetime);
+        CREATE INDEX idx_buffered_end_datetime ON affecting_time_spans (buffered_end_datetime);
+        """
+    )
+
+
+def remove_affecting_reservations() -> str:
+    return cleandoc(
+        """
+        DROP INDEX IF EXISTS idx_buffered_end_datetime;
+        DROP INDEX IF EXISTS idx_buffered_start_datetime;
+        DROP INDEX IF EXISTS idx_affected_reservation_unit_ids;
+        DROP INDEX IF EXISTS idx_reservation_id;
+        DROP MATERIALIZED VIEW IF EXISTS affecting_time_spans;
+        """
+    )
 
 
 class Migration(migrations.Migration):
@@ -166,7 +322,7 @@ class Migration(migrations.Migration):
         NowTT.migration(),
         #
         # Create the ReservationUnitHierarchy materialized view
-        ReservationUnitHierarchy.create_migration(),
+        migrations.RunSQL(sql=create_reservation_unit_hierarchy(), reverse_sql=remove_reservation_unit_hierarchy()),
         # Add the model
         migrations.CreateModel(
             name="ReservationUnitHierarchy",
@@ -197,7 +353,7 @@ class Migration(migrations.Migration):
         ),
         #
         # Create the AffectingTimeSpan materialized view
-        AffectingTimeSpan.create_migration(),
+        migrations.RunSQL(sql=create_affecting_reservations(), reverse_sql=remove_affecting_reservations()),
         # Create the model
         migrations.CreateModel(
             name="AffectingTimeSpan",

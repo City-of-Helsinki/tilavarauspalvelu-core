@@ -186,7 +186,7 @@ def test_reservation_denied__send_email(outbox):
         type=ReservationTypeChoice.NORMAL,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_units__name="foo",
+        reservation_unit__name="foo",
         begins_at=datetime.datetime(2024, 1, 1, 20, 0),
         ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
@@ -209,7 +209,7 @@ def test_reservation_denied__send_email__no_recipients(outbox):
         type=ReservationTypeChoice.NORMAL,
         reservee_email="",
         user__email="",
-        reservation_units__name="foo",
+        reservation_unit__name="foo",
         begins_at=datetime.datetime(2024, 1, 1, 20, 0),
         ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
@@ -231,7 +231,7 @@ def test_reservation_denied__send_email__wrong_state(outbox):
         type=ReservationTypeChoice.NORMAL,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_units__name="foo",
+        reservation_unit__name="foo",
         begins_at=datetime.datetime(2024, 1, 1, 20, 0),
         ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
@@ -250,7 +250,7 @@ def test_reservation_denied__send_email__reservation_in_the_past(outbox):
         type=ReservationTypeChoice.NORMAL,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_units__name="foo",
+        reservation_unit__name="foo",
         begins_at=datetime.datetime(2024, 1, 1, 20, 0),
         ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
@@ -269,7 +269,7 @@ def test_reservation_denied__send_email__no_normal_reservation(outbox):
         type=ReservationTypeChoice.BEHALF,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_units__name="foo",
+        reservation_unit__name="foo",
         begins_at=datetime.datetime(2024, 1, 1, 20, 0),
         ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )

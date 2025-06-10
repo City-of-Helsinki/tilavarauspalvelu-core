@@ -38,7 +38,7 @@ def _create_test_reservations_for_all_reservation_units() -> None:
         ReservationFactory.create(
             begins_at=_datetime(minute=i),
             ends_at=_datetime(minute=0),
-            reservation_units=[reservation_unit],
+            reservation_unit=reservation_unit,
             user=None,
             state=ReservationStateChoice.CREATED,
             type=ReservationTypeChoice.NORMAL,
@@ -64,7 +64,7 @@ def _validate_time_spans(
             is_reservable=False,
         )
         for reservation in Reservation.objects.with_buffered_begin_and_end().filter(
-            reservation_units__pk__in=[*related_reservation_unit_ids, reservation_unit_id]
+            reservation_unit__pk__in=[*related_reservation_unit_ids, reservation_unit_id]
         )
     }
 
