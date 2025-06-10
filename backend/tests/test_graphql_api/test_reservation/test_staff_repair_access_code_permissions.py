@@ -62,7 +62,7 @@ def test_staff_repair_access_code__unit_handler(graphql):
         access_code_is_active=False,
         begins_at=now + datetime.timedelta(hours=1),
         ends_at=now + datetime.timedelta(hours=2),
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
 
     def hook(obj: Reservation) -> None:

@@ -35,7 +35,7 @@ pytestmark = [
 def test_change_reservation_series_access_code(graphql):
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -81,7 +81,7 @@ def test_change_reservation_series_access_code__in_seasonal_booking(graphql):
     )
     ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -118,7 +118,7 @@ def test_change_reservation_series_access_code__in_seasonal_booking(graphql):
 def test_change_reservation_series_access_code__activate_if_inactive(graphql):
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -151,7 +151,7 @@ def test_change_reservation_series_access_code__activate_if_inactive(graphql):
 def test_change_reservation_series_access_code__activate_if_inactive__pindora_call_fails(graphql):
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -185,7 +185,7 @@ def test_change_reservation_series_access_code__activate_if_inactive__pindora_ca
 def test_change_reservation_series_access_code__no_future_reservations(graphql):
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -234,7 +234,7 @@ def test_change_reservation_series_access_code__no_reservations(graphql):
 def test_change_reservation_series_access_code__not_using_access_codes(graphql):
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -266,7 +266,7 @@ def test_change_reservation_series_access_code__not_using_access_codes(graphql):
 def test_change_reservation_series_access_code__not_requiring_active_access_codes(graphql):
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -289,7 +289,7 @@ def test_change_reservation_series_access_code__not_requiring_active_access_code
 def test_change_reservation_series_access_code__pindora_call_fails(graphql):
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),

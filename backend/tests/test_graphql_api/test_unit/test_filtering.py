@@ -81,18 +81,18 @@ def test_units__filter__by_own_reservations(graphql, gql_query):
     unit_2 = UnitFactory.create(name="2")
     unit_3 = UnitFactory.create(name="3")
 
-    res_unit_1 = ReservationUnitFactory.create(unit=unit_1)
-    res_unit_2 = ReservationUnitFactory.create(unit=unit_2)
-    res_unit_3 = ReservationUnitFactory.create(unit=unit_3)
-    res_unit_4 = ReservationUnitFactory.create(unit=unit_3)
+    reservation_unit_1 = ReservationUnitFactory.create(unit=unit_1)
+    reservation_unit_2 = ReservationUnitFactory.create(unit=unit_2)
+    reservation_unit_3 = ReservationUnitFactory.create(unit=unit_3)
+    reservation_unit_4 = ReservationUnitFactory.create(unit=unit_3)
 
     user_1 = UserFactory.create()
     user_2 = UserFactory.create()
 
-    ReservationFactory.create(reservation_units=[res_unit_1], user=user_1)
-    ReservationFactory.create(reservation_units=[res_unit_2], user=user_1)
-    ReservationFactory.create(reservation_units=[res_unit_3], user=user_2)
-    ReservationFactory.create(reservation_units=[res_unit_4], user=user_2)
+    ReservationFactory.create(reservation_unit=reservation_unit_1, user=user_1)
+    ReservationFactory.create(reservation_unit=reservation_unit_2, user=user_1)
+    ReservationFactory.create(reservation_unit=reservation_unit_3, user=user_2)
+    ReservationFactory.create(reservation_unit=reservation_unit_4, user=user_2)
 
     graphql.force_login(user_1)
 

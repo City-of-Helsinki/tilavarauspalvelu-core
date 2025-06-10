@@ -24,7 +24,7 @@ pytestmark = [
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__reservation():
     reservation = ReservationFactory.create(
-        reservation_units__ext_uuid=uuid.uuid4(),
+        reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -46,7 +46,7 @@ def test_create_missing_access_codes__reservation():
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__reservation__as_inactive():
     reservation = ReservationFactory.create(
-        reservation_units__ext_uuid=uuid.uuid4(),
+        reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -68,7 +68,7 @@ def test_create_missing_access_codes__reservation__as_inactive():
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__reservation__not_confirmed():
     ReservationFactory.create(
-        reservation_units__ext_uuid=uuid.uuid4(),
+        reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -88,7 +88,7 @@ def test_create_missing_access_codes__reservation__not_confirmed():
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__reservation__already_generated():
     ReservationFactory.create(
-        reservation_units__ext_uuid=uuid.uuid4(),
+        reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -122,7 +122,7 @@ def test_create_missing_access_codes__reservation__already_generated():
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__reservation__get_if_exists():
     reservation = ReservationFactory.create(
-        reservation_units__ext_uuid=uuid.uuid4(),
+        reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -149,7 +149,7 @@ def test_create_missing_access_codes__reservation__get_if_exists():
 def test_create_missing_access_codes__series():
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -172,7 +172,7 @@ def test_create_missing_access_codes__series():
 def test_create_missing_access_codes__series__as_inactive():
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -195,7 +195,7 @@ def test_create_missing_access_codes__series__as_inactive():
 def test_create_missing_access_codes__series__not_confirmed():
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -216,7 +216,7 @@ def test_create_missing_access_codes__series__not_confirmed():
 def test_create_missing_access_codes__series__already_generated():
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -246,7 +246,7 @@ def test_create_missing_access_codes__series__already_generated():
 def test_create_missing_access_codes__series__reschedule_if_exists():
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -281,7 +281,7 @@ def test_create_missing_access_codes__series__reschedule_if_exists():
 def test_create_missing_access_codes__series__reschedule_if_exists__activate():
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -316,7 +316,7 @@ def test_create_missing_access_codes__series__reschedule_if_exists__activate():
 def test_create_missing_access_codes__series__reschedule_if_exists__deactivate():
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -349,7 +349,7 @@ def test_create_missing_access_codes__seasonal_booking():
     )
     ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -379,7 +379,7 @@ def test_create_missing_access_codes__seasonal_booking__as_inactive():
     )
     ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -409,7 +409,7 @@ def test_create_missing_access_codes__seasonal_booking__not_confirmed():
     )
     ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -437,7 +437,7 @@ def test_create_missing_access_codes__seasonal_booking__already_generated():
     )
     ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -474,7 +474,7 @@ def test_create_missing_access_codes__seasonal_booking__reschedule_if_exists():
     )
     ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -516,7 +516,7 @@ def test_create_missing_access_codes__seasonal_booking__reschedule_if_exists__ac
     )
     ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -558,7 +558,7 @@ def test_create_missing_access_codes__seasonal_booking__reschedule_if_exists__de
     )
     ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),

@@ -32,6 +32,7 @@ if TYPE_CHECKING:
         ReservationDenyReason,
         ReservationPurpose,
         ReservationSeries,
+        ReservationUnit,
         Unit,
         User,
     )
@@ -135,9 +136,11 @@ class Reservation(SerializableMixin, models.Model):
     billing_address_zip: str = models.CharField(max_length=255, blank=True, default="")
 
     # Relations
-    reservation_units = models.ManyToManyField(
+    reservation_units: int
+    reservation_unit: ReservationUnit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
         related_name="reservations",
+        on_delete=models.PROTECT,
     )
 
     user: User | None = models.ForeignKey(
@@ -306,10 +309,7 @@ class Reservation(SerializableMixin, models.Model):
 
     @property
     def requires_handling(self) -> bool:
-        return (
-            self.reservation_units.filter(require_reservation_handling=True).exists()
-            or self.applying_for_free_of_charge
-        )
+        return self.reservation_unit.require_reservation_handling or self.applying_for_free_of_charge
 
     @property
     def is_handled_paid(self) -> bool:

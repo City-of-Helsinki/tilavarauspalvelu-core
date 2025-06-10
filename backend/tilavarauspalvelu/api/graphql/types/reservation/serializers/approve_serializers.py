@@ -20,7 +20,6 @@ from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationUnit
     from tilavarauspalvelu.typing import ReservationApproveData
 
 __all__ = [
@@ -87,7 +86,7 @@ class ReservationApproveSerializer(NestingModelSerializer):
                 # If price hasn't changed, we can just use the existing payment order.
                 return data
 
-        reservation_unit: ReservationUnit = self.instance.reservation_units.first()
+        reservation_unit = self.instance.reservation_unit
         begin = self.instance.begins_at.astimezone(DEFAULT_TIMEZONE)
 
         pricing = reservation_unit.actions.get_active_pricing(by_date=begin.date())

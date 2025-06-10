@@ -55,7 +55,7 @@ class TestingReservationParamsSerializer(TestingBaseSerializer):
         reservation = (
             ReservationBuilder()
             .set(
-                reservation_units=[reservation_unit],
+                reservation_unit=reservation_unit,
                 begins_at=begin_datetime,
                 ends_at=begin_datetime + datetime.timedelta(hours=2),
             )
@@ -133,7 +133,7 @@ class TestingReservationParamsSerializer(TestingBaseSerializer):
 
     def _create_reservation_series(self, reservation: Reservation) -> None:
         reservation_series = ReservationSeriesFactory.create(
-            reservation_unit=reservation.reservation_units.first(),
+            reservation_unit=reservation.reservation_unit,
             user=self.context["user"],
             begin_date=(reservation.begins_at - datetime.timedelta(days=7)).date(),
             end_date=(reservation.ends_at + datetime.timedelta(days=7)).date(),

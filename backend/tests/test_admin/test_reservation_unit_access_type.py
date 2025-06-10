@@ -395,19 +395,19 @@ def test_reservation_unit_admin__access_types__set_new_access_type_to_reservatio
         begins_at=combine(today - datetime.timedelta(days=1), local_time(12)),
         ends_at=combine(today - datetime.timedelta(days=1), local_time(13)),
         access_type=AccessType.PHYSICAL_KEY,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
     todays_reservation = ReservationFactory.create(
         begins_at=combine(today, local_time(12)),
         ends_at=combine(today, local_time(13)),
         access_type=AccessType.PHYSICAL_KEY,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
     future_reservation = ReservationFactory.create(
         begins_at=combine(today + datetime.timedelta(days=1), local_time(12)),
         ends_at=combine(today + datetime.timedelta(days=1), local_time(13)),
         access_type=AccessType.PHYSICAL_KEY,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
 
     url = reverse("admin:tilavarauspalvelu_reservationunit_change", args=[reservation_unit.pk])

@@ -44,7 +44,7 @@ class ReservationUnitValidator:
         if self.reservation_unit.max_reservations_per_user is None:
             return
 
-        qs = Reservation.objects.filter_for_user_num_active_reservations(self.reservation_unit, user)
+        qs = Reservation.objects.all().filter_for_user_num_active_reservations(self.reservation_unit, user)
 
         num_active_user_reservations = qs.count()
         if num_active_user_reservations >= self.reservation_unit.max_reservations_per_user:

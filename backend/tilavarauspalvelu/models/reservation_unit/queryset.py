@@ -69,7 +69,7 @@ class ReservationUnitQuerySet(models.QuerySet):
         >>> sq = ReservationUnit.objects.filter(...)
         >>>
         >>> # 1
-        >>> qs.filter(reservation_units__in=Subquery(sq.affected_reservation_unit_ids))
+        >>> qs.filter(reservation_unit__in=Subquery(sq.affected_reservation_unit_ids))
         >>>
         >>> # 2
         >>> qs.annotate(affected=SubqueryArray(sq.affected_reservation_unit_ids, agg_field="ids", distinct=True))
