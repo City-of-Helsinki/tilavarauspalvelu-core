@@ -123,6 +123,7 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
             {
                 "fields": [
                     "reservation_kind",
+                    "reservation_form",
                     "authentication",
                     "reservation_start_interval",
                     "min_reservation_duration",
