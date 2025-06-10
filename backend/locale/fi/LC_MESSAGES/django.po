@@ -79,24 +79,6 @@ msgstr "Nollaa allokoinnit"
 msgid "Email Template Testing"
 msgstr "Email-pohjan testaus"
 
-#: tilavarauspalvelu/admin/address/admin.py
-#: tilavarauspalvelu/admin/payment_merchant/admin.py
-msgid "Street address"
-msgstr "Katuosoite"
-
-#: tilavarauspalvelu/admin/address/admin.py
-msgid "Post code"
-msgstr "Postinumero"
-
-#: tilavarauspalvelu/admin/address/admin.py
-#: tilavarauspalvelu/admin/payment_merchant/admin.py
-msgid "City"
-msgstr "Kaupunki"
-
-#: tilavarauspalvelu/admin/address/admin.py
-msgid "Search by street address, post code or city"
-msgstr "Etsi katuosoitteella, postinumerolla tai kaupungilla"
-
 #: tilavarauspalvelu/admin/allocated_timeslot/admin.py
 msgid ""
 "Search by day of the week, reservation unit, unit, application section, "
@@ -176,10 +158,6 @@ msgid "Allocated end time."
 msgstr "Allokoitu lopetusaika"
 
 #: tilavarauspalvelu/admin/application/admin.py
-msgid "Search by user's first name, last name or reservation units name"
-msgstr "Etsi käyttäjän etu- tai sukunimellä tai varausyksikön nimellä"
-
-#: tilavarauspalvelu/admin/application/admin.py
 #: tilavarauspalvelu/admin/reservation/admin.py
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Created at"
@@ -201,12 +179,16 @@ msgid "Applicant"
 msgstr "Hakija"
 
 #: tilavarauspalvelu/admin/application/admin.py
-#: tilavarauspalvelu/admin/application_round/admin.py
-#: tilavarauspalvelu/admin/application_section/admin.py
-#: tilavarauspalvelu/admin/reservation/admin.py
-#: tilavarauspalvelu/admin/reservation_series/admin.py
-msgid "Time"
-msgstr "Aika"
+msgid "Contact person"
+msgstr "Yhteyshenkilö"
+
+#: tilavarauspalvelu/admin/application/admin.py
+msgid "Organisation"
+msgstr "Organisaatio"
+
+#: tilavarauspalvelu/admin/application/admin.py
+msgid "Billing address"
+msgstr "Laskutusosoite"
 
 #: tilavarauspalvelu/admin/application/admin.py
 #: tilavarauspalvelu/admin/application_round/admin.py
@@ -296,23 +278,6 @@ msgid "Application round"
 msgstr "Kausivarauskierros"
 
 #: tilavarauspalvelu/admin/application/form.py
-msgid "Organisation"
-msgstr "Organisaatio"
-
-#: tilavarauspalvelu/admin/application/form.py
-msgid "Contact person"
-msgstr "Yhteyshenkilö"
-
-#: tilavarauspalvelu/admin/application/form.py
-msgid "Billing address"
-msgstr "Laskutusosoite"
-
-#: tilavarauspalvelu/admin/application/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Home city"
-msgstr "Kotikunta"
-
-#: tilavarauspalvelu/admin/application/form.py
 #: tilavarauspalvelu/admin/reservation/admin.py
 #: tilavarauspalvelu/admin/user/admin.py
 msgid "Additional information"
@@ -341,6 +306,64 @@ msgid "Results ready notification sent date"
 msgstr "'Käsitelty' ilmoituksen lähettämispäivä ja -aika"
 
 #: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/application_round/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_series/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+#: tilavarauspalvelu/admin/unit/form.py
+msgid "Name"
+msgstr "Nimi"
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/unit/form.py
+msgid "Email"
+msgstr "Sähköposti"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Company code"
+msgstr "Y-tunnus"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Year established"
+msgstr "Perustamisvuosi"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Active members"
+msgstr "Aktiivisia jäseniä"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Core business area"
+msgstr "Ydinliiketoiminta-alue"
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "Street address"
+msgstr "Katuosoite"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Post code"
+msgstr "Postinumero"
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "City"
+msgstr "Kaupunki"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "First name"
+msgstr "Etunimi"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Last name"
+msgstr "Sukunimi"
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "Phone number"
+msgstr "Puhelinnumero"
+
+#: tilavarauspalvelu/admin/application/form.py
 msgid "Applicant type."
 msgstr "Hakijan tyyppi."
 
@@ -349,24 +372,8 @@ msgid "Application round the application is in."
 msgstr "Hakemuksen kausivarauskierros"
 
 #: tilavarauspalvelu/admin/application/form.py
-msgid "Organisation the application is for."
-msgstr "Hakemuksen organisaatio"
-
-#: tilavarauspalvelu/admin/application/form.py
-msgid "Contact person for the application."
-msgstr "Hakemuksen yhteyshenkilö"
-
-#: tilavarauspalvelu/admin/application/form.py
 msgid "Applicant for the application."
 msgstr "Hakemuksen hakija"
-
-#: tilavarauspalvelu/admin/application/form.py
-msgid "Billing address for the application."
-msgstr "Hakemuksen laskutusosoite"
-
-#: tilavarauspalvelu/admin/application/form.py
-msgid "Home city for the application."
-msgstr "Hakemuksen kotipaikka"
 
 #: tilavarauspalvelu/admin/application/form.py
 msgid "Additional information for the application."
@@ -396,6 +403,77 @@ msgid ""
 "now ready."
 msgstr "Päivä ja aika, millon hakija sai tiedon, että hakemus on käsitelty."
 
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Name of the organisation."
+msgstr "Organisaation nimi."
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Email address of the organisation."
+msgstr "Organisaation sähköpostiosoite."
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Organisation company code."
+msgstr "Organisaation y-tunnus."
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Year the organisation was established."
+msgstr "Organisaation perustamisvuosi."
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Number of active members in the organisation."
+msgstr "Organisaation aktiivisten jäsenten määrä."
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Organisation core business area."
+msgstr "Organisaation ydinliiketoiminta-alue."
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Street address of the organisation."
+msgstr "Organisaation katuosoite."
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Post code of the organisation."
+msgstr "Organisaation postinumero."
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "City of the organisation."
+msgstr "Organisaation kotikunta."
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "First name of the contact person."
+msgstr "Kontaktihenkilön etunimi."
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Last name of the contact person."
+msgstr "Kontaktihenkilön sukunimi."
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Email address of the contact person."
+msgstr "Kontaktihenkilön sähköpostiosoite."
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Phone number of the contact person."
+msgstr "Kontaktihenkilön puhelinnumero"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Street address of the billing address."
+msgstr "Laskutuksen katuosoite."
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Post code of the billing address."
+msgstr "Laskutuksen postinumero."
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "City of the billing address."
+msgstr "Laskutuksen kotikunta."
+
+#: tilavarauspalvelu/admin/application_round/admin.py
+#: tilavarauspalvelu/admin/application_section/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation_series/admin.py
+msgid "Time"
+msgstr "Aika"
+
 #: tilavarauspalvelu/admin/application_round/admin.py
 msgid "Criteria"
 msgstr "Kriteeri"
@@ -421,17 +499,6 @@ msgstr ""
 "tehdä. <br>%(in_allocation)s: Hakemuksiin jaetaan vuoroja. <br>%(handled)s: "
 "Kierros on käsitelty. <br>%(results_sent)s: Tulokset on lähetetty "
 "hakijoille. <br>"
-
-#: tilavarauspalvelu/admin/application_round/form.py
-#: tilavarauspalvelu/admin/application_section/form.py
-#: tilavarauspalvelu/admin/city/admin.py
-#: tilavarauspalvelu/admin/organisation/admin.py
-#: tilavarauspalvelu/admin/reservation/form.py
-#: tilavarauspalvelu/admin/reservation_series/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-#: tilavarauspalvelu/admin/unit/form.py
-msgid "Name"
-msgstr "Nimi"
 
 #: tilavarauspalvelu/admin/application_round/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
@@ -507,18 +574,22 @@ msgid "Application criteria (Swedish)"
 msgstr "Hakukriteerit (ruotsiksi)"
 
 #: tilavarauspalvelu/admin/application_round/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Notes when applying"
 msgstr "Huomioi hakiessa"
 
 #: tilavarauspalvelu/admin/application_round/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Notes when applying (Finnish)"
 msgstr "Huomioi hakiessa (Suomeksi)"
 
 #: tilavarauspalvelu/admin/application_round/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Notes when applying (English)"
 msgstr "Huomioi hakiessa (Englanniksi)"
 
 #: tilavarauspalvelu/admin/application_round/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Notes when applying (Swedish)"
 msgstr "Huomioi hakiessa (Ruotsiksi)"
 
@@ -644,6 +715,7 @@ msgid "Reservation purpose"
 msgstr "Varaustarkoitukset"
 
 #: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 #: tilavarauspalvelu/admin/reservation_series/form.py
 msgid "Reservation unit"
 msgstr "Varausyksikkö"
@@ -848,18 +920,6 @@ msgstr ""
 "Onko ilmoitus luonnos. Luonnoksia ei näytetä käyttäjille, vaikka ne olisivat "
 "aktiivisia."
 
-#: tilavarauspalvelu/admin/city/admin.py
-msgid "Municipality"
-msgstr "Kunta"
-
-#: tilavarauspalvelu/admin/city/admin.py
-msgid "Name of the city."
-msgstr "Kunnan nimi"
-
-#: tilavarauspalvelu/admin/city/admin.py
-msgid "Municipality code for the city."
-msgstr "Kuntanumero"
-
 #: tilavarauspalvelu/admin/email_template/tester.py
 #, python-format
 msgid "Test email '%(email_type)s' successfully sent."
@@ -868,71 +928,6 @@ msgstr "Testisähköposti %(email_type)s' lähetetty onnistuneesti."
 #: tilavarauspalvelu/admin/general_role/admin.py
 msgid "Search by username, email, first name or last name"
 msgstr "Etsi käyttäjänimellä, sähköpostilla, etu- tai sukunimellä"
-
-#: tilavarauspalvelu/admin/organisation/admin.py
-#: tilavarauspalvelu/admin/person/admin.py tilavarauspalvelu/admin/unit/form.py
-msgid "Email"
-msgstr "Sähköposti"
-
-#: tilavarauspalvelu/admin/organisation/admin.py
-msgid "Company code"
-msgstr "Y-tunnus"
-
-#: tilavarauspalvelu/admin/organisation/admin.py
-msgid "Year established"
-msgstr "Perustamisvuosi"
-
-#: tilavarauspalvelu/admin/organisation/admin.py
-msgid "Active members"
-msgstr "Aktiivisia jäseniä"
-
-#: tilavarauspalvelu/admin/organisation/admin.py
-msgid "Core business area"
-msgstr "Ydinliiketoiminta-alue"
-
-#: tilavarauspalvelu/admin/organisation/admin.py
-msgid "Organisation type"
-msgstr "Organisaation tyyppi"
-
-#: tilavarauspalvelu/admin/organisation/admin.py
-msgid "Address"
-msgstr "Osoite"
-
-#: tilavarauspalvelu/admin/organisation/admin.py
-msgid "Name of the organisation."
-msgstr "Organisaation nimi"
-
-#: tilavarauspalvelu/admin/organisation/admin.py
-msgid "Email address of the organisation."
-msgstr "Organisaation sähköpostiosoite"
-
-#: tilavarauspalvelu/admin/organisation/admin.py
-msgid "Organisation company code."
-msgstr "Organisaation y-tunnus"
-
-#: tilavarauspalvelu/admin/organisation/admin.py
-msgid "Year the organisation was established."
-msgstr "Organisaation perustamisvuosi"
-
-#: tilavarauspalvelu/admin/organisation/admin.py
-msgid "Number of active members in the organisation."
-msgstr "Organisaation aktiivisten jäsenten määrä"
-
-#: tilavarauspalvelu/admin/organisation/admin.py
-msgid "Organisation core business area."
-msgstr "Organisaation ydinliiketoiminta-alue"
-
-#: tilavarauspalvelu/admin/organisation/admin.py
-msgid "Organisation type."
-msgstr "Organisaation tyyppi"
-
-#: tilavarauspalvelu/admin/organisation/admin.py
-msgid "Organisation address."
-msgstr "Organisaation osoite"
-
-#: tilavarauspalvelu/admin/organisation/admin.py
-msgid "Search by organisation name or identifier"
-msgstr "Etsi organisaation nimellä tai tunnisteella"
 
 #: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
 msgid ""
@@ -984,11 +979,6 @@ msgstr "Postinumero"
 #: tilavarauspalvelu/admin/payment_merchant/admin.py
 msgid "Email address"
 msgstr "Sähköpostiosoite"
-
-#: tilavarauspalvelu/admin/payment_merchant/admin.py
-#: tilavarauspalvelu/admin/person/admin.py
-msgid "Phone number"
-msgstr "Puhelinnumero"
 
 #: tilavarauspalvelu/admin/payment_merchant/admin.py
 msgid "URL"
@@ -1098,34 +1088,6 @@ msgstr ""
 #: tilavarauspalvelu/admin/payment_order/admin.py
 msgid "processed at"
 msgstr "käsitelty alkaen"
-
-#: tilavarauspalvelu/admin/person/admin.py
-msgid "First name"
-msgstr "Etunimi"
-
-#: tilavarauspalvelu/admin/person/admin.py
-msgid "Last name"
-msgstr "Sukunimi"
-
-#: tilavarauspalvelu/admin/person/admin.py
-msgid "Person's first name."
-msgstr "Henkilön etunimi"
-
-#: tilavarauspalvelu/admin/person/admin.py
-msgid "Person's last name."
-msgstr "Henkilön sukunimi"
-
-#: tilavarauspalvelu/admin/person/admin.py
-msgid "Person's email address."
-msgstr "Henkilön sähköpostiosoite"
-
-#: tilavarauspalvelu/admin/person/admin.py
-msgid "Person's phone number."
-msgstr "Henkilön puhelinnumero"
-
-#: tilavarauspalvelu/admin/person/admin.py
-msgid "Search by first name or last name."
-msgstr "Etsi etu- tai sukunimellä."
 
 #: tilavarauspalvelu/admin/reservation/admin.py
 msgid "Search by Reservation ID or name"
@@ -1378,6 +1340,10 @@ msgid "Reason for cancellation"
 msgstr "Syy perumiselle"
 
 #: tilavarauspalvelu/admin/reservation/form.py
+msgid "Municipality"
+msgstr "Kunta"
+
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Name of the reservation"
 msgstr "Varauksen nimi"
 
@@ -1524,7 +1490,7 @@ msgid "Purpose of the reservation"
 msgstr "Varauksen käyttötarkoitus"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservee's home city"
+msgid "Reservee's municipality"
 msgstr "Varaajan kotikunta"
 
 #: tilavarauspalvelu/admin/reservation/form.py
@@ -1658,7 +1624,6 @@ msgid "Payment"
 msgstr "Maksu"
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Terms of use"
 msgstr "Käyttöehdot"
 
@@ -1732,18 +1697,6 @@ msgstr "Varausyksikön tyyppi"
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Equipments"
 msgstr "Varusteet"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Terms of use (Finnish)"
-msgstr "Käyttöehdot (Suomeksi)"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Terms of use (English)"
-msgstr "Käyttöehdot (Englanniksi)"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Terms of use (Swedish)"
-msgstr "Käyttöehdot (Ruotsiksi)"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py tilavarauspalvelu/enums.py
 msgid "Payment terms"
@@ -2142,6 +2095,10 @@ msgstr "Maksutiedot"
 #: tilavarauspalvelu/admin/unit/admin.py
 msgid "Permission information"
 msgstr "Käyttöoikeustiedot"
+
+#: tilavarauspalvelu/admin/unit/admin.py
+msgid "Location"
+msgstr "Sijainti"
 
 #: tilavarauspalvelu/admin/unit/form.py
 msgid ""
@@ -2788,6 +2745,14 @@ msgstr "Yhteisö"
 msgctxt "ApplicantType"
 msgid "Company"
 msgstr "Yritys"
+
+#: tilavarauspalvelu/enums.py
+msgid "Helsinki"
+msgstr "Helsinki"
+
+#: tilavarauspalvelu/enums.py
+msgid "Other"
+msgstr "Muu"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "ApplicationRoundStatus"
@@ -3594,14 +3559,6 @@ msgctxt "EmailType"
 msgid "User anonymization"
 msgstr "Käyttäjän anonymisointi"
 
-#: tilavarauspalvelu/models/address/model.py
-msgid "address"
-msgstr "osoite"
-
-#: tilavarauspalvelu/models/address/model.py
-msgid "addresses"
-msgstr "osoitteet"
-
 #: tilavarauspalvelu/models/affecting_time_span/model.py
 msgid "affecting time span"
 msgstr "vaikuttava aikaväli"
@@ -3709,14 +3666,6 @@ msgstr ""
 "'active_from' ja 'active_until' täytyy olla joko tyhjiä tai asetettuja. Jos "
 "molemmat on asetettu, 'active_until' täytyy olla 'active_from' jälkeen."
 
-#: tilavarauspalvelu/models/city/model.py
-msgid "city"
-msgstr "kotikunta"
-
-#: tilavarauspalvelu/models/city/model.py
-msgid "cities"
-msgstr "kotikunnat"
-
 #: tilavarauspalvelu/models/equipment/model.py
 msgid "equipment"
 msgstr "varuste"
@@ -3740,26 +3689,6 @@ msgstr "yleinen rooli"
 #: tilavarauspalvelu/models/general_role/model.py
 msgid "general roles"
 msgstr "yleiset roolit"
-
-#: tilavarauspalvelu/models/location/model.py
-msgid "location"
-msgstr "sijainti"
-
-#: tilavarauspalvelu/models/location/model.py
-msgid "locations"
-msgstr "sijainnit"
-
-#: tilavarauspalvelu/models/organisation/model.py
-msgid "is after current year"
-msgstr "on nykyvuoden jälkeen"
-
-#: tilavarauspalvelu/models/organisation/model.py
-msgid "organisation"
-msgstr "organisaatio"
-
-#: tilavarauspalvelu/models/organisation/model.py
-msgid "organisations"
-msgstr "organisaatiot"
 
 #: tilavarauspalvelu/models/origin_hauki_resource/model.py
 msgid "origin hauki resource"
@@ -3812,14 +3741,6 @@ msgstr "maksutuote"
 #: tilavarauspalvelu/models/payment_product/model.py
 msgid "payment products"
 msgstr "maksutuotteet"
-
-#: tilavarauspalvelu/models/person/model.py
-msgid "person"
-msgstr "henkilö"
-
-#: tilavarauspalvelu/models/person/model.py
-msgid "persons"
-msgstr "henkilöt"
 
 #: tilavarauspalvelu/models/personal_info_view_log/model.py
 msgid "personal info view log"
