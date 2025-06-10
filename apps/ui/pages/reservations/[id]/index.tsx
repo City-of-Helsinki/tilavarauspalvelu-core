@@ -13,9 +13,7 @@ import { useTranslation } from "next-i18next";
 import { Flex, NoWrap, H1, H4, fontRegular } from "common/styled";
 import { breakpoints } from "common/src/const";
 import {
-  CustomerTypeChoice,
   ReservationStateChoice,
-  type ReservationMetadataFieldNode,
   type ReservationPageQuery,
   type ReservationPageQueryVariables,
   ReservationPageDocument,
@@ -56,7 +54,6 @@ import {
   ignoreMaybeArray,
   toNumber,
 } from "common/src/helpers";
-import { containsField, containsNameField } from "common/src/metaFieldsHelpers";
 import {
   ButtonLikeLink,
   ButtonLikeExternalLink,
@@ -80,12 +77,14 @@ import StatusLabel from "common/src/components/StatusLabel";
 import IconButton from "common/src/components/IconButton";
 import {
   NotModifiableReason,
-  ReservationInfoSection,
   LabelValuePair,
   ReservationStatus,
   ReservationInfoCard,
   ReservationOrderStatus,
+  GeneralFields,
+  ApplicationFields,
 } from "@/components/reservation";
+import { queryOptions } from "@/modules/queryOptions";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -139,171 +138,13 @@ const SecondaryActions = styled(Flex)`
   margin-top: var(--spacing-l);
 `;
 
-function formatReserveeName(
-  reservation: Pick<NodeT, "reserveeFirstName" | "reserveeLastName">
-): string {
-  return `${reservation.reserveeFirstName || ""} ${
-    reservation.reserveeLastName || ""
-  }`.trim();
-}
-
-function ReserveeBusinessInfo({
-  reservation,
-  supportedFields,
-}: Readonly<{
-  reservation: Pick<
-    NodeT,
-    | "reserveeOrganisationName"
-    | "reserveeId"
-    | "reserveeFirstName"
-    | "reserveeLastName"
-    | "reserveePhone"
-    | "reserveeEmail"
-  >;
-  supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
-}>): JSX.Element {
-  const { t } = useTranslation();
-  const arr = [];
-  if (containsField(supportedFields, "reserveeOrganisationName")) {
-    arr.push({
-      key: "organisationName",
-      label: t("reservations:organisationName"),
-      value: reservation.reserveeOrganisationName || "-",
-      testId: "reservation__reservee-organisation-name",
-    });
-  }
-  if (containsField(supportedFields, "reserveeId")) {
-    arr.push({
-      key: "id",
-      label: t("reservations:reserveeId"),
-      value: reservation.reserveeId || "-",
-      testId: "reservation__reservee-id",
-    });
-  }
-  if (containsNameField(supportedFields)) {
-    arr.push({
-      key: "name",
-      label: t("reservations:contactName"),
-      value: formatReserveeName(reservation),
-      testId: "reservation__reservee-name",
-    });
-  }
-  if (containsField(supportedFields, "reserveePhone")) {
-    arr.push({
-      key: "phone",
-      label: t("reservations:contactPhone"),
-      value: reservation.reserveePhone ?? "-",
-      testId: "reservation__reservee-phone",
-    });
-  }
-  if (containsField(supportedFields, "reserveeEmail")) {
-    arr.push({
-      key: "email",
-      label: t("reservations:contactEmail"),
-      value: reservation.reserveeEmail ?? "-",
-      testId: "reservation__reservee-email",
-    });
-  }
-  return (
-    <>
-      {arr.map(({ key, ...rest }) => (
-        <LabelValuePair key={key} {...rest} />
-      ))}
-    </>
-  );
-}
-
-function ReserveePersonInfo({
-  reservation,
-  supportedFields,
-}: Readonly<{
-  reservation: Pick<
-    NodeT,
-    "reserveeEmail" | "reserveeFirstName" | "reserveeLastName" | "reserveePhone"
-  >;
-  supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
-}>) {
-  const { t } = useTranslation();
-  const arr = [];
-  if (containsNameField(supportedFields)) {
-    arr.push({
-      key: "name",
-      value: formatReserveeName(reservation),
-    });
-  }
-  if (containsField(supportedFields, "reserveePhone")) {
-    arr.push({
-      key: "phone",
-      value: reservation.reserveePhone ?? "-",
-    });
-  }
-  if (containsField(supportedFields, "reserveeEmail")) {
-    arr.push({
-      key: "email",
-      value: reservation.reserveeEmail ?? "-",
-    });
-  }
-  return (
-    <>
-      {arr
-        .map(({ key, value }) => ({
-          key,
-          label: t(`common:${key}`),
-          value,
-          testId: `reservation__reservee-${key}`,
-        }))
-        .map(({ key, ...rest }) => (
-          <LabelValuePair key={key} {...rest} />
-        ))}
-    </>
-  );
-}
-
-function ReserveeInfo({
-  reservation,
-  supportedFields,
-}: Readonly<{
-  reservation: Pick<
-    NodeT,
-    | "reserveeType"
-    | "reserveeOrganisationName"
-    | "reserveeId"
-    | "reserveeFirstName"
-    | "reserveeLastName"
-    | "reserveePhone"
-    | "reserveeEmail"
-  >;
-  supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
-}>) {
-  const { t } = useTranslation();
-  const showBusinessFields =
-    CustomerTypeChoice.Business === reservation.reserveeType ||
-    CustomerTypeChoice.Nonprofit === reservation.reserveeType;
-
-  return (
-    <div>
-      <H4 as="h2">{t("reservationCalendar:reserverInfo")}</H4>
-      {showBusinessFields ? (
-        <ReserveeBusinessInfo
-          reservation={reservation}
-          supportedFields={supportedFields}
-        />
-      ) : (
-        <ReserveePersonInfo
-          reservation={reservation}
-          supportedFields={supportedFields}
-        />
-      )}
-    </div>
-  );
-}
-
 // TODO add a state check => if state is Created redirect to the reservation funnel
 // if state is Cancelled, Denied, WaitingForPayment what then?
 function Reservation({
   termsOfUse,
   reservation,
   feedbackUrl,
+  options,
 }: Readonly<PropsNarrowed>): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const shouldShowAccessCode =
@@ -493,12 +334,14 @@ function Reservation({
         </div>
         <Flex>
           <Instructions reservation={reservation} />
-          <ReservationInfoSection
-            reservation={reservation}
+          <GeneralFields
             supportedFields={supportedFields}
-          />
-          <ReserveeInfo
             reservation={reservation}
+            options={options}
+          />
+          <ApplicationFields
+            reservation={reservation}
+            options={options}
             supportedFields={supportedFields}
           />
           {shouldShowAccessCode && (
@@ -712,10 +555,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         },
       };
     } else if (reservation != null) {
+      const options = await queryOptions(apolloClient, locale ?? "");
       return {
         props: {
           ...commonProps,
           ...(await serverSideTranslations(locale ?? "fi")),
+          options,
           reservation,
           termsOfUse: {
             genericTerms: bookingTerms ?? null,
@@ -755,13 +600,10 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
   query ReservationPage($id: ID!) {
     reservation(id: $id) {
       id
-      pk
-      ...ReserveeBillingFields
-      ...ReservationInfo
+      ...MetaFields
       ...ReservationInfoCard
       ...Instructions
       ...CanReservationBeChanged
-      applyingForFreeOfCharge
       calendarUrl
       paymentOrder {
         id

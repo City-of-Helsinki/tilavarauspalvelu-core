@@ -210,7 +210,6 @@ export const CONFIRMATION_QUERY = gql`
       pk
       name
       ...ReserveeBillingFields
-      ...ReservationInfo
       ...ReservationInfoCard
       ...Instructions
       calendarUrl
