@@ -136,7 +136,6 @@ class Reservation(SerializableMixin, models.Model):
     billing_address_zip: str = models.CharField(max_length=255, blank=True, default="")
 
     # Relations
-    reservation_units: int
     reservation_unit: ReservationUnit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
         related_name="reservations",
