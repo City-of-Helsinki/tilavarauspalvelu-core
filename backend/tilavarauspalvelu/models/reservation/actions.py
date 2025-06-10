@@ -52,19 +52,15 @@ class ReservationActions:
 
     def get_actual_before_buffer(self) -> datetime.timedelta:
         buffer_time_before: datetime.timedelta = self.reservation.buffer_time_before or datetime.timedelta()
-        reservation_unit: ReservationUnit
-        for reservation_unit in self.reservation.reservation_units.all():
-            before = reservation_unit.actions.get_actual_before_buffer(self.reservation.begins_at)
-            buffer_time_before = max(before, buffer_time_before)
-        return buffer_time_before
+        reservation_unit = self.reservation.reservation_unit
+        before = reservation_unit.actions.get_actual_before_buffer(self.reservation.begins_at)
+        return max(before, buffer_time_before)
 
     def get_actual_after_buffer(self) -> datetime.timedelta:
         buffer_time_after: datetime.timedelta = self.reservation.buffer_time_after or datetime.timedelta()
-        reservation_unit: ReservationUnit
-        for reservation_unit in self.reservation.reservation_units.all():
-            after = reservation_unit.actions.get_actual_after_buffer(self.reservation.ends_at)
-            buffer_time_after = max(after, buffer_time_after)
-        return buffer_time_after
+        reservation_unit = self.reservation.reservation_unit
+        after = reservation_unit.actions.get_actual_after_buffer(self.reservation.ends_at)
+        return max(after, buffer_time_after)
 
     def to_ical(self) -> bytes:
         language = self.reservation.user.get_preferred_language()
@@ -116,7 +112,7 @@ class ReservationActions:
         """Adds the actual event information to the ical file."""
         ical_event = Event()
 
-        unit: Unit = self.reservation.reservation_units.first().unit
+        unit: Unit = self.reservation.reservation_unit.unit
 
         site_name = str(settings.EMAIL_VARAAMO_EXT_LINK).removesuffix("/")
         # This should be unique such that if another iCal file is created
@@ -142,13 +138,13 @@ class ReservationActions:
 
     @get_translated
     def get_ical_summary(self, *, language: Lang = "fi") -> str:
-        unit: Unit = self.reservation.reservation_units.first().unit
+        unit: Unit = self.reservation.reservation_unit.unit
         unit_name = get_attr_by_language(unit, "name", language)
         return pgettext("ICAL", "Reservation for %(name)s") % {"name": unit_name}
 
     @get_translated
     def get_ical_description(self, *, site_name: str, language: Lang = "fi") -> str:
-        reservation_unit: ReservationUnit = self.reservation.reservation_units.first()
+        reservation_unit: ReservationUnit = self.reservation.reservation_unit
         unit: Unit = reservation_unit.unit
         begin = self.reservation.begins_at.astimezone(DEFAULT_TIMEZONE)
         end = self.reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
@@ -204,10 +200,7 @@ class ReservationActions:
         return self.reservation.reservee_organisation_name
 
     def get_instructions(self, *, kind: Literal["confirmed", "pending", "cancelled"], language: Lang) -> str:
-        return "\n-\n".join(
-            get_attr_by_language(reservation_unit, f"reservation_{kind}_instructions", language)
-            for reservation_unit in self.reservation.reservation_units.all()
-        )
+        return get_attr_by_language(self.reservation.reservation_unit, f"reservation_{kind}_instructions", language)
 
     def calculate_full_price(
         self,
@@ -217,7 +210,7 @@ class ReservationActions:
         subsidised: bool = False,
     ) -> Decimal:
         # Currently, there is ever only one reservation unit per reservation
-        reservation_unit: ReservationUnit | None = self.reservation.reservation_units.first()
+        reservation_unit: ReservationUnit | None = self.reservation.reservation_unit
         if reservation_unit is None:
             msg = "Reservation has no reservation unit"
             raise ReservationPriceCalculationError(msg)
@@ -365,7 +358,7 @@ class ReservationActions:
 
     def overlapping_reservations(self) -> ReservationQuerySet:
         """Find all reservations that overlap with this reservation."""
-        reservation_unit = self.reservation.reservation_units.first()
+        reservation_unit = self.reservation.reservation_unit
         return Reservation.objects.overlapping_reservations(
             reservation_unit=reservation_unit,
             begin=self.reservation.begins_at,
@@ -385,7 +378,7 @@ class ReservationActions:
         if reservee_type == CustomerTypeChoice.NONPROFIT and self.reservation.reservee_is_unregistered_association:
             return False
 
-        reservation_unit: ReservationUnit = self.reservation.reservation_units.first()
+        reservation_unit: ReservationUnit = self.reservation.reservation_unit
 
         pricing = reservation_unit.actions.get_active_pricing(by_date=self.reservation.begins_at.date())
         if pricing is None:

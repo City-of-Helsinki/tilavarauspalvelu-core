@@ -25,14 +25,14 @@ def test_reservation_unit__get_previous_reservation():
     reservation_blocked = ReservationFactory.create(
         begins_at=(NOW - datetime.timedelta(hours=2)),
         ends_at=(NOW - datetime.timedelta(hours=1)),
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         type=ReservationTypeChoice.BLOCKED,
         state=ReservationStateChoice.CONFIRMED,
     )
     reservation = ReservationFactory.create(
         begins_at=(NOW - datetime.timedelta(hours=3)),
         ends_at=(NOW - datetime.timedelta(hours=2)),
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         state=ReservationStateChoice.CONFIRMED,
     )
 

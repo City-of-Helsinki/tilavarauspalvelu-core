@@ -23,7 +23,7 @@ from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.errors import external_service_errors_as_validation_errors
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import PaymentOrder, ReservationUnit
+    from tilavarauspalvelu.models import PaymentOrder
     from tilavarauspalvelu.typing import ReservationCancellationData
 
 __all__ = [
@@ -64,9 +64,8 @@ class ReservationCancellationSerializer(NestingModelSerializer):
         self.instance.validators.validate_reservation_state_allows_cancelling()
         self.instance.validators.validate_reservation_type_allows_cancelling()
         self.instance.validators.validate_reservation_not_past_or_ongoing()
-        self.instance.validators.validate_single_reservation_unit()
 
-        reservation_unit: ReservationUnit = self.instance.reservation_units.first()
+        reservation_unit = self.instance.reservation_unit
 
         begin = self.instance.begins_at.astimezone(DEFAULT_TIMEZONE)
 

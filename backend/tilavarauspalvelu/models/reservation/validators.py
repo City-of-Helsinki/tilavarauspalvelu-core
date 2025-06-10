@@ -23,11 +23,6 @@ __all__ = [
 class ReservationValidator:
     reservation: Reservation
 
-    def validate_single_reservation_unit(self) -> None:
-        if self.reservation.reservation_units.count() > 1:
-            msg = "Reservations with multiple reservation units are not supported yet."
-            raise ValidationError(msg, code=error_codes.MULTIPLE_RESERVATION_UNITS)
-
     def validate_no_payment_order(self) -> None:
         if hasattr(self.reservation, "payment_order"):
             msg = "Reservation cannot be changed anymore because it is attached to a payment order"

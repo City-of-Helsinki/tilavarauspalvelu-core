@@ -155,8 +155,8 @@ def test_reservation_statistics_export__only_two(api_client, settings):
 def test_reservation_statistics_export__tprek_id(api_client, settings):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    reservation = ReservationFactory.create(reservation_units__unit__tprek_id="1")
-    ReservationFactory.create(reservation_units__unit__tprek_id="2")
+    reservation = ReservationFactory.create(reservation_unit__unit__tprek_id="1")
+    ReservationFactory.create(reservation_unit__unit__tprek_id="2")
 
     url = reverse("reservation_statistics_export") + "?tprek_id=1"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})

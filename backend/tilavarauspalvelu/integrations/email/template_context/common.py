@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     import datetime
     from decimal import Decimal
 
-    from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationSeries, ReservationUnit
+    from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationSeries, Unit
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 
@@ -224,13 +224,13 @@ def get_contex_for_seasonal_reservation_check_details_url(
 
 
 def params_for_base_info(*, reservation: Reservation, language: Lang) -> dict[str, Any]:
-    # Currently, there is ever only one reservation unit per reservation.
-    reservation_unit: ReservationUnit = reservation.reservation_units.select_related("unit").first()
+    reservation_unit = reservation.reservation_unit
+    unit: Unit = reservation_unit.unit
 
     return {
         "reservation_unit_name": get_attr_by_language(reservation_unit, "name", language),
-        "unit_name": get_attr_by_language(reservation_unit.unit, "name", language),
-        "unit_location": reservation_unit.unit.address,
+        "unit_name": get_attr_by_language(unit, "name", language),
+        "unit_location": unit.address,
         "begin_datetime": reservation.begins_at.astimezone(DEFAULT_TIMEZONE),
         "end_datetime": reservation.ends_at.astimezone(DEFAULT_TIMEZONE),
     }

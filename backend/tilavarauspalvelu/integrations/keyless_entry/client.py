@@ -242,7 +242,7 @@ class PindoraReservationClient(BasePindoraClient):
         """Create a new reservation in Pindora."""
         url = cls._build_url("reservation")
 
-        reservation_unit: ReservationUnit = reservation.reservation_units.first()
+        reservation_unit: ReservationUnit = reservation.reservation_unit
 
         data = PindoraReservationCreateData(
             reservation_id=str(reservation.ext_uuid),

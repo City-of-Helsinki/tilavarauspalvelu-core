@@ -54,7 +54,7 @@ class ReservationAdmin(admin.ModelAdmin):
         "type",
         "state",
         "begins_at",
-        "reservation_units_admin",
+        "reservation_unit",
         "access_type",
         "access_code_is_active",
         "access_code_generated_at",
@@ -66,8 +66,8 @@ class ReservationAdmin(admin.ModelAdmin):
         ("state", MultiSelectFilter),
         ReservationSeriesListFilter,
         PaidReservationListFilter,
-        ("reservation_units__unit", UnitFilter),
-        ("reservation_units", ReservationUnitFilter),
+        ("reservation_unit__unit", UnitFilter),
+        ("reservation_unit", ReservationUnitFilter),
         "access_type",
         "access_code_is_active",
         AccessCodeGeneratedFilter,
@@ -90,7 +90,7 @@ class ReservationAdmin(admin.ModelAdmin):
                     "cancel_details",
                     "handling_details",
                     "working_memo",
-                    "reservation_units",
+                    "reservation_unit",
                 ],
             },
         ],
@@ -182,9 +182,6 @@ class ReservationAdmin(admin.ModelAdmin):
             },
         ],
     ]
-    filter_horizontal = [
-        "reservation_units",
-    ]
     readonly_fields = [
         "id",
         "ext_uuid",
@@ -199,6 +196,7 @@ class ReservationAdmin(admin.ModelAdmin):
         "access_type",
         "user",
         "reservation_series",
+        "reservation_unit",
     ]
     inlines = [PaymentOrderInline]
 
@@ -207,7 +205,7 @@ class ReservationAdmin(admin.ModelAdmin):
             super()
             .get_queryset(request)
             .annotate(access_code_should_be_active=L("access_code_should_be_active"))
-            .prefetch_related("reservation_units")
+            .select_related("reservation_unit")
         )
 
     def get_search_results(
@@ -222,10 +220,6 @@ class ReservationAdmin(admin.ModelAdmin):
             queryset |= self.model.objects.filter(id__exact=int(search_term))
 
         return queryset, may_have_duplicates
-
-    @admin.display(ordering="reservation_units__name", description="Reservation units")
-    def reservation_units_admin(self, obj: Reservation) -> str:
-        return ", ".join(str(reservation_unit) for reservation_unit in obj.reservation_units.all())
 
     def price_net(self, obj: Reservation) -> Decimal:
         return obj.price_net

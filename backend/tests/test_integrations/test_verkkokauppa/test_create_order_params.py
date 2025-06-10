@@ -31,7 +31,7 @@ def test_get_verkkokauppa_order_params__to_json():
         preferred_language="fi",
     )
     reservation = ReservationFactory.create(
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         user=user,
         price=Decimal("12.55"),
         tax_percentage_value=Decimal(24),
@@ -60,8 +60,8 @@ def test_get_verkkokauppa_order_params__to_json():
     ).strftime("%Y-%m-%dT%H:%M:%S")
 
     assert len(json["items"]) == 1
-    assert json["items"][0]["productId"] == str(reservation.reservation_units.first().payment_product.id)
-    assert json["items"][0]["productName"] == reservation.reservation_units.first().name_fi
+    assert json["items"][0]["productId"] == str(reservation.reservation_unit.payment_product.id)
+    assert json["items"][0]["productName"] == reservation.reservation_unit.name_fi
     assert json["items"][0]["quantity"] == 1
     assert json["items"][0]["unit"] == "pcs"
     assert json["items"][0]["rowPriceNet"] == "10.12"
@@ -73,7 +73,7 @@ def test_get_verkkokauppa_order_params__to_json():
     assert json["items"][0]["vatPercentage"] == "24.0"
     assert len(json["items"][0]["meta"]) == 3
     assert json["items"][0]["meta"][0]["key"] == "namespaceProductId"
-    assert json["items"][0]["meta"][0]["value"] == str(reservation.reservation_units.first().ext_uuid)
+    assert json["items"][0]["meta"][0]["value"] == str(reservation.reservation_unit.ext_uuid)
     assert json["items"][0]["meta"][0]["label"] is None
     assert json["items"][0]["meta"][0]["visibleInCheckout"] is False
     assert json["items"][0]["meta"][0]["ordinal"] == "0"
@@ -96,7 +96,7 @@ def test_get_verkkokauppa_order_params__to_json__meta_label_language_support():
         preferred_language="en",
     )
     reservation = ReservationFactory.create(
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         user=user,
         price=Decimal("12.5488"),
         tax_percentage_value=Decimal(24),

@@ -93,7 +93,7 @@ def test_reservation__create__overlapping_reservation(graphql):
         begins_at=begin,
         ends_at=end,
         state=ReservationStateChoice.CONFIRMED,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
 
     graphql.login_with_superuser()
@@ -152,7 +152,7 @@ def test_reservation__create__overlaps_with_reservation_buffer_before_or_after(
         begins_at=begin + reservation_delta_time,
         ends_at=end + reservation_delta_time,
         state=ReservationStateChoice.CONFIRMED,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         buffer_time_before=datetime.timedelta(),
         buffer_time_after=datetime.timedelta(),
         type=reservation_type,
@@ -410,7 +410,7 @@ def test_reservation__create__max_reservations_per_user__over(graphql):
         begins_at=begin,
         ends_at=end,
         state=ReservationStateChoice.CONFIRMED,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         user=user,
     )
 
@@ -446,7 +446,7 @@ def test_reservation__create__max_reservations_per_user__non_normal_reservation(
             begins_at=begin,
             ends_at=end,
             state=ReservationStateChoice.CONFIRMED,
-            reservation_units=[reservation_unit],
+            reservation_unit=reservation_unit,
             user=user,
             type=type_choice,
         )
@@ -472,7 +472,7 @@ def test_reservation__create__max_reservations_per_user__past_reservations(graph
         begins_at=begin - datetime.timedelta(hours=3),
         ends_at=end - datetime.timedelta(hours=3),
         state=ReservationStateChoice.CONFIRMED,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         user=user,
     )
 
@@ -499,7 +499,7 @@ def test_reservation__create__max_reservations_per_user__reservations_for_other_
         begins_at=begin,
         ends_at=end,
         state=ReservationStateChoice.CONFIRMED,
-        reservation_units=[reservation_unit_2],
+        reservation_unit=reservation_unit_2,
         user=user,
     )
 
@@ -534,7 +534,7 @@ def test_reservation__create__max_reservations_per_user__reservations_for_other_
         begins_at=begin + datetime.timedelta(hours=1),
         ends_at=end + datetime.timedelta(hours=1),
         state=ReservationStateChoice.CONFIRMED,
-        reservation_units=[reservation_unit_2],
+        reservation_unit=reservation_unit_2,
         user=user,
     )
 

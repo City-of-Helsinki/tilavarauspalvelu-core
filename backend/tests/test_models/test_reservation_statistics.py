@@ -49,7 +49,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
         price=10,
         purpose=ReservationPurposeFactory(name="PurpleChoice"),
         reservation_series=reservation_series,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         reservee_address_zip="12345",
         reservee_id="123456789",
         reservee_is_unregistered_association=False,
@@ -62,7 +62,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
         user__preferred_language="fi",
     )
 
-    reservation_unit = reservation.reservation_units.first()
+    reservation_unit = reservation.reservation_unit
     reservation_series = reservation.reservation_series
 
     assert ReservationStatistic.objects.count() == 1
@@ -219,13 +219,13 @@ def test_statistics__update__reservation_unit_updates_statistics(settings):
     settings.SAVE_RESERVATION_STATISTICS = True
 
     reservation_unit = ReservationUnitFactory.create(name="Test reservation unit", unit__name="Test unit")
-    reservation = ReservationFactory.create(name="Test reservation", reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(name="Test reservation", reservation_unit=reservation_unit)
 
     statistics = ReservationStatistic.objects.first()
     assert statistics.primary_reservation_unit == reservation_unit.id
 
     new_reservation_unit = ReservationUnitFactory.create(name="Another reservation unit", unit__name="Another unit")
-    reservation.reservation_units.set([new_reservation_unit])
+    reservation.reservation_unit = new_reservation_unit
     reservation.save()
 
     statistics = ReservationStatistic.objects.first()

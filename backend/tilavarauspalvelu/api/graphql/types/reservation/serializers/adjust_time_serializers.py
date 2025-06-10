@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.exceptions import ValidationError
@@ -15,9 +13,6 @@ from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.typing import ReservationAdjustTimeData
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.errors import ExternalServiceError
-
-if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationUnit
 
 
 class ReservationAdjustTimeSerializer(NestingModelSerializer):
@@ -54,14 +49,13 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
         self.instance.validators.validate_reservation_not_handled()
         self.instance.validators.validate_reservation_not_paid()
         self.instance.validators.validate_reservation_not_past_or_ongoing()
-        self.instance.validators.validate_single_reservation_unit()
 
         begins_at = data["begins_at"].astimezone(DEFAULT_TIMEZONE)
         ends_at = data["ends_at"].astimezone(DEFAULT_TIMEZONE)
 
         current_begin = self.instance.begins_at.astimezone(DEFAULT_TIMEZONE)
 
-        reservation_unit: ReservationUnit = self.instance.reservation_units.first()
+        reservation_unit = self.instance.reservation_unit
 
         reservation_unit.validators.validate_reservation_unit_is_direct_bookable()
         reservation_unit.validators.validate_reservation_unit_is_published()

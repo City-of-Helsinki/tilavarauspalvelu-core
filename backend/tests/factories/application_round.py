@@ -156,7 +156,6 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
             )
         )
 
-        ReservationReservationUnit: type[models.Model] = Reservation.reservation_units.through
         ApplicationRoundReservationUnit: type[models.Model] = ApplicationRound.reservation_units.through
 
         sections: list[ApplicationSection] = []
@@ -164,7 +163,6 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         allocated_time_slots: list[AllocatedTimeSlot] = []
         allocation_series: list[ReservationSeries] = []
         reservations: list[Reservation] = []
-        reservation_reservation_units: list[models.Model] = []
         application_round_reservation_units: list[models.Model] = []
         reservation_units: list[ReservationUnit] = []
 
@@ -239,21 +237,15 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
                         purpose=purpose,
                         age_group=age_group,
                         reservation_series=series,
+                        reservation_unit=allocation["reservation_unit"],
                     )
                     reservations.append(reservation)
-
-                    reservation_reservation_unit = ReservationReservationUnit(
-                        reservation=reservation,
-                        reservationunit=allocation["reservation_unit"],
-                    )
-                    reservation_reservation_units.append(reservation_reservation_unit)
 
         ApplicationSection.objects.bulk_create(sections)
         ReservationUnitOption.objects.bulk_create(options)
         AllocatedTimeSlot.objects.bulk_create(allocated_time_slots)
         ReservationSeries.objects.bulk_create(allocation_series)
         Reservation.objects.bulk_create(reservations)
-        ReservationReservationUnit.objects.bulk_create(reservation_reservation_units)
         ApplicationRoundReservationUnit.objects.bulk_create(application_round_reservation_units)
 
         return application_round
