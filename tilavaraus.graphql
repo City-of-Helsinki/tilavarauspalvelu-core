@@ -63,7 +63,7 @@ type Query {
     priority: [Priority]
     preferredOrder: [Int]
     includePreferredOrder10OrHigher: Boolean
-    homeCity: [Int]
+    municipality: [MunicipalityChoice]
     ageGroup: [Int]
     purpose: [Int]
     textSearch: String
@@ -281,7 +281,6 @@ type Query {
     personsAllowed: Int
     textSearch: String
     purposes: [Int]
-    qualifiers: [Int]
     equipments: [Int]
     isDraft: Boolean
     isVisible: Boolean
@@ -385,20 +384,6 @@ type Query {
     """Ordering"""
     orderBy: [PurposeOrderingChoices]
   ): PurposeNodeConnection
-  qualifiers(
-    first: Int
-    last: Int
-    offset: Int
-    after: String
-    before: String
-    nameFi: String
-    nameEn: String
-    nameSv: String
-    pk: [Int]
-
-    """Ordering"""
-    orderBy: [QualifierOrderingChoices]
-  ): QualifierNodeConnection
   reservation(
     """The ID of the object"""
     id: ID!
@@ -415,7 +400,7 @@ type Query {
     unit: [Int]
     user: [Int]
     reservationUnitType: [Int]
-    recurringReservation: [Int]
+    reservationSeries: [Int]
     reservationUnitNameFi: String
     reservationUnitNameEn: String
     reservationUnitNameSv: String
@@ -456,7 +441,7 @@ type Query {
     unit: [Int]
     user: [Int]
     reservationUnitType: [Int]
-    recurringReservation: [Int]
+    reservationSeries: [Int]
     reservationUnitNameFi: String
     reservationUnitNameEn: String
     reservationUnitNameSv: String
@@ -479,11 +464,11 @@ type Query {
     """Ordering"""
     orderBy: [ReservationOrderingChoices]
   ): [ReservationNode!]
-  recurringReservation(
+  reservationSeries(
     """The ID of the object"""
     id: ID!
-  ): RecurringReservationNode
-  recurringReservations(
+  ): ReservationSeriesNode
+  pagedReservationSeries(
     first: Int
     last: Int
     offset: Int
@@ -505,8 +490,8 @@ type Query {
     reservationUnitType: [ID]
 
     """Ordering"""
-    orderBy: [RecurringReservationOrderingChoices]
-  ): RecurringReservationNodeConnection
+    orderBy: [ReservationSeriesOrderingChoices]
+  ): ReservationSeriesNodeConnection
   rejectedOccurrence(
     """The ID of the object"""
     id: ID!
@@ -518,7 +503,7 @@ type Query {
     after: String
     before: String
     pk: [Int]
-    recurringReservation: Int
+    reservationSeries: Int
     applicationRound: Int
     reservationUnit: [Int]
     unit: [Int]
@@ -555,7 +540,6 @@ type Query {
     orderBy: [ReservationPurposeOrderingChoices]
   ): ReservationPurposeNodeConnection
   ageGroups(first: Int, last: Int, offset: Int, after: String, before: String): AgeGroupNodeConnection
-  cities(first: Int, last: Int, offset: Int, after: String, before: String): CityNodeConnection
   order(orderUuid: String!): PaymentOrderNode
   user(
     """The ID of the object"""
@@ -617,14 +601,14 @@ type ApplicationRoundNode implements Node {
   notesWhenApplyingFi: String
   notesWhenApplyingEn: String
   notesWhenApplyingSv: String
-  applicationPeriodBegin: DateTime!
-  applicationPeriodEnd: DateTime!
-  reservationPeriodBegin: Date!
-  reservationPeriodEnd: Date!
-  publicDisplayBegin: DateTime!
-  publicDisplayEnd: DateTime!
-  handledDate: DateTime
-  sentDate: DateTime
+  applicationPeriodBeginsAt: DateTime!
+  applicationPeriodEndsAt: DateTime!
+  reservationPeriodBeginDate: Date!
+  reservationPeriodEndDate: Date!
+  publicDisplayBeginsAt: DateTime!
+  publicDisplayEndsAt: DateTime!
+  handledAt: DateTime
+  sentAt: DateTime
   reservationUnits(
     nameFi: String
     nameFi_Icontains: String
@@ -654,7 +638,6 @@ type ApplicationRoundNode implements Node {
     personsAllowed: Int
     textSearch: String
     purposes: [Int]
-    qualifiers: [Int]
     equipments: [Int]
     isDraft: Boolean
     isVisible: Boolean
@@ -726,7 +709,7 @@ value as specified by
 scalar Date
 
 type ReservationUnitNode implements Node {
-  uuid: UUID!
+  extUuid: UUID!
   rank: Int!
   nameFi: String
   nameEn: String
@@ -735,9 +718,9 @@ type ReservationUnitNode implements Node {
   descriptionEn: String
   descriptionSv: String
   contactInformation: String!
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  notesWhenApplyingFi: String
+  notesWhenApplyingEn: String
+  notesWhenApplyingSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
@@ -753,10 +736,10 @@ type ReservationUnitNode implements Node {
   maxReservationsPerUser: Int
   reservationsMinDaysBefore: Int
   reservationsMaxDaysBefore: Int
-  reservationBegins: DateTime
-  reservationEnds: DateTime
-  publishBegins: DateTime
-  publishEnds: DateTime
+  reservationBeginsAt: DateTime
+  reservationEndsAt: DateTime
+  publishBeginsAt: DateTime
+  publishEndsAt: DateTime
   minReservationDuration: Duration
   maxReservationDuration: Duration
   bufferTimeBefore: Duration!
@@ -843,15 +826,6 @@ type ReservationUnitNode implements Node {
     """Ordering"""
     orderBy: [EquipmentOrderingChoices]
   ): [EquipmentNode!]!
-  qualifiers(
-    nameFi: String
-    nameEn: String
-    nameSv: String
-    pk: [Int]
-
-    """Ordering"""
-    orderBy: [QualifierOrderingChoices]
-  ): [QualifierNode!]!
   applicationRounds(
     pk: [Int]
     name: String
@@ -870,7 +844,7 @@ type ReservationUnitNode implements Node {
     unit: [Int]
     user: [Int]
     reservationUnitType: [Int]
-    recurringReservation: [Int]
+    reservationSeries: [Int]
     reservationUnitNameFi: String
     reservationUnitNameEn: String
     reservationUnitNameSv: String
@@ -907,7 +881,6 @@ type ReservationUnitNode implements Node {
   id: ID!
   publishingState: ReservationUnitPublishingState!
   reservationState: ReservationUnitReservationState!
-  location: LocationNode
   isClosed: Boolean!
   firstReservableDatetime: DateTime
   effectiveAccessType: AccessType
@@ -996,8 +969,14 @@ type UnitNode implements Node {
   webPage: String!
   email: String!
   phone: String!
+  addressStreetFi: String
+  addressStreetEn: String
+  addressStreetSv: String
+  addressZip: String!
+  addressCityFi: String
+  addressCityEn: String
+  addressCitySv: String
   paymentMerchant: PaymentMerchantNode
-  location: LocationNode
   reservationUnits(
     nameFi: String
     nameFi_Icontains: String
@@ -1027,7 +1006,6 @@ type UnitNode implements Node {
     personsAllowed: Int
     textSearch: String
     purposes: [Int]
-    qualifiers: [Int]
     equipments: [Int]
     isDraft: Boolean
     isVisible: Boolean
@@ -1085,22 +1063,6 @@ type PaymentMerchantNode implements Node {
   """The ID of the object"""
   id: ID!
   pk: UUID!
-}
-
-type LocationNode implements Node {
-  addressStreetFi: String
-  addressStreetEn: String
-  addressStreetSv: String
-  addressZip: String!
-  addressCityFi: String
-  addressCityEn: String
-  addressCitySv: String
-
-  """The ID of the object"""
-  id: ID!
-  longitude: String
-  latitude: String
-  pk: Int
 }
 
 """An enumeration."""
@@ -1362,7 +1324,7 @@ enum TermsType {
   """Cancellation terms"""
   CANCELLATION_TERMS
 
-  """Recurring reservation terms"""
+  """Reservation series terms"""
   RECURRING_TERMS
 
   """Service-specific terms"""
@@ -1440,22 +1402,6 @@ enum EquipmentOrderingChoices {
   categoryRankDesc
 }
 
-type QualifierNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
-
-  """The ID of the object"""
-  id: ID!
-  pk: Int
-}
-
-"""Ordering fields for the 'Qualifier' model."""
-enum QualifierOrderingChoices {
-  pkAsc
-  pkDesc
-}
-
 """Ordering fields for the 'ApplicationRound' model."""
 enum ApplicationRoundOrderingChoices {
   pkAsc
@@ -1464,7 +1410,7 @@ enum ApplicationRoundOrderingChoices {
 
 type ApplicationRoundTimeSlotNode implements Node {
   weekday: Int!
-  closed: Boolean!
+  isClosed: Boolean!
   reservableTimes: [TimeSlotType]!
 
   """The ID of the object"""
@@ -1484,12 +1430,13 @@ type ReservationNode implements Node {
   numPersons: Int
   state: ReservationStateChoice
   type: ReservationTypeChoice
+  municipality: MunicipalityChoice
   handlingDetails: String
   workingMemo: String
   cancelDetails: String
   cancelReason: ReservationCancelReasonChoice
-  begin: DateTime!
-  end: DateTime!
+  beginsAt: DateTime!
+  endsAt: DateTime!
   bufferTimeBefore: Duration!
   bufferTimeAfter: Duration!
   handledAt: DateTime
@@ -1520,69 +1467,11 @@ type ReservationNode implements Node {
   billingAddressStreet: String
   billingAddressCity: String
   billingAddressZip: String
-  reservationUnits(
-    nameFi: String
-    nameFi_Icontains: String
-    nameFi_Istartswith: String
-    nameSv: String
-    nameSv_Icontains: String
-    nameSv_Istartswith: String
-    nameEn: String
-    nameEn_Icontains: String
-    nameEn_Istartswith: String
-    descriptionFi: String
-    descriptionFi_Icontains: String
-    descriptionSv: String
-    descriptionSv_Icontains: String
-    descriptionEn: String
-    descriptionEn_Icontains: String
-    pk: [Int]
-    uuid: UUID
-    tprekId: String
-    tprekDepartmentId: String
-    unit: [Int]
-    reservationUnitType: [Int]
-    minPersonsGte: Int
-    minPersonsLte: Int
-    maxPersonsGte: Int
-    maxPersonsLte: Int
-    personsAllowed: Int
-    textSearch: String
-    purposes: [Int]
-    qualifiers: [Int]
-    equipments: [Int]
-    isDraft: Boolean
-    isVisible: Boolean
-    applicationRound: [Int]
-    surfaceAreaGte: Int
-    surfaceAreaLte: Int
-    rankGte: Int
-    rankLte: Int
-    typeRankGte: Int
-    typeRankLte: Int
-    reservationKind: String
-    publishingState: [ReservationUnitPublishingState]
-    reservationState: [ReservationUnitReservationState]
-    accessType: [AccessType]
-    accessTypeBeginDate: Date
-    accessTypeEndDate: Date
-    onlyWithPermission: Boolean
-    reservableDateStart: Date
-    reservableDateEnd: Date
-    reservableTimeStart: Time
-    reservableTimeEnd: Time
-    reservableMinimumDurationMinutes: Int
-    showOnlyReservable: Boolean
-    calculateFirstReservableTime: Boolean
-
-    """Ordering"""
-    orderBy: [ReservationUnitOrderingChoices]
-  ): [ReservationUnitNode!]!
+  reservationUnit: ReservationUnitNode!
   user: UserNode
-  recurringReservation: RecurringReservationNode
+  reservationSeries: ReservationSeriesNode
   denyReason: ReservationDenyReasonNode
   purpose: ReservationPurposeNode
-  homeCity: CityNode
   ageGroup: AgeGroupNode
   paymentOrder: PaymentOrderNode
 
@@ -1630,6 +1519,12 @@ enum ReservationTypeChoice {
   STAFF
   BEHALF
   SEASONAL
+}
+
+"""Municipality choices"""
+enum MunicipalityChoice {
+  HELSINKI
+  OTHER
 }
 
 """Reasons why user has cancelled their reservation"""
@@ -1690,8 +1585,8 @@ type GeneralRoleNode implements Node {
   user: UserNode!
   role: UserRoleChoice!
   assigner: UserNode
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 
   """The ID of the object"""
   id: ID!
@@ -1754,19 +1649,19 @@ type UnitRoleNode implements Node {
   ): [UnitNode!]!
   unitGroups: [UnitGroupNode!]!
   assigner: UserNode
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 
   """The ID of the object"""
   id: ID!
   permissions: [UserPermissionChoice!]!
 }
 
-type RecurringReservationNode implements Node {
+type ReservationSeriesNode implements Node {
   extUuid: UUID!
   name: String!
   description: String!
-  created: DateTime!
+  createdAt: DateTime!
   beginDate: Date
   beginTime: Time
   endDate: Date
@@ -1777,10 +1672,9 @@ type RecurringReservationNode implements Node {
   user: UserNode
   allocatedTimeSlot: AllocatedTimeSlotNode
   ageGroup: AgeGroupNode
-  abilityGroup: AbilityGroupNode
   rejectedOccurrences(
     pk: [Int]
-    recurringReservation: Int
+    reservationSeries: Int
     applicationRound: Int
     reservationUnit: [Int]
     unit: [Int]
@@ -1796,7 +1690,7 @@ type RecurringReservationNode implements Node {
     unit: [Int]
     user: [Int]
     reservationUnitType: [Int]
-    recurringReservation: [Int]
+    reservationSeries: [Int]
     reservationUnitNameFi: String
     reservationUnitNameEn: String
     reservationUnitNameSv: String
@@ -1839,7 +1733,7 @@ type AllocatedTimeSlotNode implements Node {
   beginTime: Time!
   endTime: Time!
   reservationUnitOption: ReservationUnitOptionNode!
-  recurringReservation: RecurringReservationNode
+  reservationSeries: ReservationSeriesNode
 
   """The ID of the object"""
   id: ID!
@@ -1859,8 +1753,8 @@ enum Weekday {
 
 type ReservationUnitOptionNode implements Node {
   preferredOrder: Int!
-  rejected: Boolean!
-  locked: Boolean!
+  isRejected: Boolean!
+  isLocked: Boolean!
   applicationSection: ApplicationSectionNode!
   reservationUnit: ReservationUnitNode!
   allocatedTimeSlots(
@@ -1928,18 +1822,31 @@ type ApplicationSectionNode implements Node {
 
 type ApplicationNode implements Node {
   applicantType: ApplicantTypeChoice
-  createdDate: DateTime!
-  lastModifiedDate: DateTime!
-  cancelledDate: DateTime
-  sentDate: DateTime
-  additionalInformation: String
+  additionalInformation: String!
+  cancelledAt: DateTime
+  sentAt: DateTime
   workingMemo: String!
+  contactPersonFirstName: String!
+  contactPersonLastName: String!
+  contactPersonEmail: String
+  contactPersonPhoneNumber: String!
+  billingStreetAddress: String!
+  billingPostCode: String!
+  billingCity: String!
+  organisationName: String!
+  organisationEmail: String
+  organisationIdentifier: String!
+  organisationYearEstablished: Int
+  organisationActiveMembers: Int
+  organisationCoreBusiness: String!
+  organisationStreetAddress: String!
+  organisationPostCode: String!
+  organisationCity: String!
+  municipality: MunicipalityChoice
+  createdAt: DateTime!
+  updatedAt: DateTime!
   applicationRound: ApplicationRoundNode!
-  organisation: OrganisationNode
-  contactPerson: PersonNode
   user: ApplicantNode
-  billingAddress: AddressNode
-  homeCity: CityNode
   applicationSections(
     pk: [Int]
     extUuid: UUID
@@ -1955,7 +1862,7 @@ type ApplicationNode implements Node {
     priority: [Priority]
     preferredOrder: [Int]
     includePreferredOrder10OrHigher: Boolean
-    homeCity: [Int]
+    municipality: [MunicipalityChoice]
     ageGroup: [Int]
     purpose: [Int]
     textSearch: String
@@ -1977,71 +1884,6 @@ enum ApplicantTypeChoice {
   ASSOCIATION
   COMMUNITY
   COMPANY
-}
-
-type OrganisationNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  email: String!
-  identifier: String
-  yearEstablished: Int
-  activeMembers: Int
-  coreBusinessFi: String
-  coreBusinessEn: String
-  coreBusinessSv: String
-  organisationType: OrganizationTypeChoice!
-  address: AddressNode
-
-  """The ID of the object"""
-  id: ID!
-  pk: Int
-}
-
-"""An enumeration."""
-enum OrganizationTypeChoice {
-  """Company"""
-  COMPANY
-
-  """Registered association"""
-  REGISTERED_ASSOCIATION
-
-  """Public association"""
-  PUBLIC_ASSOCIATION
-
-  """Unregistered association"""
-  UNREGISTERED_ASSOCIATION
-
-  """Municipality consortium"""
-  MUNICIPALITY_CONSORTIUM
-
-  """Religious community"""
-  RELIGIOUS_COMMUNITY
-}
-
-type AddressNode implements Node {
-  streetAddressFi: String
-  streetAddressEn: String
-  streetAddressSv: String
-  postCode: String!
-  cityFi: String
-  cityEn: String
-  citySv: String
-
-  """The ID of the object"""
-  id: ID!
-  pk: Int
-}
-
-type PersonNode implements Node {
-  firstName: String!
-  lastName: String!
-  email: String
-  phoneNumber: String
-
-  """The ID of the object"""
-  id: ID!
-  pk: Int
 }
 
 type ApplicantNode implements Node {
@@ -2067,17 +1909,6 @@ type ApplicantNode implements Node {
   isAdAuthenticated: Boolean!
   isStronglyAuthenticated: Boolean!
   isInternalUser: Boolean!
-  pk: Int
-}
-
-type CityNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  municipalityCode: String!
-
-  """The ID of the object"""
-  id: ID!
   pk: Int
 }
 
@@ -2236,22 +2067,12 @@ enum AllocatedTimeSlotOrderingChoices {
   applicationSectionStatusDesc
 }
 
-type AbilityGroupNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
-
-  """The ID of the object"""
-  id: ID!
-  pk: Int
-}
-
 type RejectedOccurrenceNode implements Node {
   beginDatetime: DateTime!
   endDatetime: DateTime!
   rejectionReason: RejectionReadinessChoice!
   createdAt: DateTime!
-  recurringReservation: RecurringReservationNode!
+  reservationSeries: ReservationSeriesNode!
 
   """The ID of the object"""
   id: ID!
@@ -2319,10 +2140,10 @@ enum ReservationOrderingChoices {
   pkDesc
   nameAsc
   nameDesc
-  beginAsc
-  beginDesc
-  endAsc
-  endDesc
+  beginsAtAsc
+  beginsAtDesc
+  endsAtAsc
+  endsAtDesc
   createdAtAsc
   createdAtDesc
   stateAsc
@@ -2629,8 +2450,8 @@ enum ApplicationOrderingChoices {
   preferredUnitNameSvDesc
   statusAsc
   statusDesc
-  sentDateAsc
-  sentDateDesc
+  sentAtAsc
+  sentAtDesc
 }
 
 type ApplicationSectionNodeConnection {
@@ -2939,24 +2760,6 @@ type PurposeNodeEdge {
   cursor: String!
 }
 
-type QualifierNodeConnection {
-  """Pagination data for this connection."""
-  pageInfo: PageInfo!
-
-  """Contains the nodes in this connection."""
-  edges: [QualifierNodeEdge]!
-  totalCount: Int
-}
-
-"""A Relay edge containing a `QualifierNode` and its cursor."""
-type QualifierNodeEdge {
-  """The item at the end of the edge"""
-  node: QualifierNode
-
-  """A cursor for use in pagination"""
-  cursor: String!
-}
-
 type ReservationNodeConnection {
   """Pagination data for this connection."""
   pageInfo: PageInfo!
@@ -2975,32 +2778,32 @@ type ReservationNodeEdge {
   cursor: String!
 }
 
-type RecurringReservationNodeConnection {
+type ReservationSeriesNodeConnection {
   """Pagination data for this connection."""
   pageInfo: PageInfo!
 
   """Contains the nodes in this connection."""
-  edges: [RecurringReservationNodeEdge]!
+  edges: [ReservationSeriesNodeEdge]!
   totalCount: Int
 }
 
-"""A Relay edge containing a `RecurringReservationNode` and its cursor."""
-type RecurringReservationNodeEdge {
+"""A Relay edge containing a `ReservationSeriesNode` and its cursor."""
+type ReservationSeriesNodeEdge {
   """The item at the end of the edge"""
-  node: RecurringReservationNode
+  node: ReservationSeriesNode
 
   """A cursor for use in pagination"""
   cursor: String!
 }
 
-"""Ordering fields for the 'RecurringReservation' model."""
-enum RecurringReservationOrderingChoices {
+"""Ordering fields for the 'ReservationSeries' model."""
+enum ReservationSeriesOrderingChoices {
   pkAsc
   pkDesc
   nameAsc
   nameDesc
-  createdAsc
-  createdDesc
+  createdAtAsc
+  createdAtDesc
   beginDateAsc
   beginDateDesc
   beginTimeAsc
@@ -3103,24 +2906,6 @@ type AgeGroupNodeConnection {
 type AgeGroupNodeEdge {
   """The item at the end of the edge"""
   node: AgeGroupNode
-
-  """A cursor for use in pagination"""
-  cursor: String!
-}
-
-type CityNodeConnection {
-  """Pagination data for this connection."""
-  pageInfo: PageInfo!
-
-  """Contains the nodes in this connection."""
-  edges: [CityNodeEdge]!
-  totalCount: Int
-}
-
-"""A Relay edge containing a `CityNode` and its cursor."""
-type CityNodeEdge {
-  """The item at the end of the edge"""
-  node: CityNode
 
   """A cursor for use in pagination"""
   cursor: String!
@@ -3361,17 +3146,30 @@ type Mutation {
 type ApplicationCreateMutationPayload {
   pk: Int
   applicationRound: Int
+  applicationSections: [ApplicationSectionNode]
   applicantType: ApplicantTypeChoice
   additionalInformation: String
-  organisation: OrganisationNode
-  contactPerson: PersonNode
-  billingAddress: AddressNode
-  homeCity: Int
-  applicationSections: [ApplicationSectionNode]
-  createdDate: DateTime
-  lastModifiedDate: DateTime
-  cancelledDate: DateTime
-  sentDate: DateTime
+  contactPersonFirstName: String
+  contactPersonLastName: String
+  contactPersonEmail: String
+  contactPersonPhoneNumber: String
+  billingStreetAddress: String
+  billingPostCode: String
+  billingCity: String
+  organisationName: String
+  organisationEmail: String
+  organisationIdentifier: String
+  organisationYearEstablished: Int
+  organisationActiveMembers: Int
+  organisationCoreBusiness: String
+  organisationStreetAddress: String
+  organisationPostCode: String
+  organisationCity: String
+  municipality: MunicipalityChoice
+  createdAt: DateTime
+  updatedAt: DateTime
+  cancelledAt: DateTime
+  sentAt: DateTime
   status: Status
 }
 
@@ -3402,52 +3200,26 @@ enum Status {
 input ApplicationCreateMutationInput {
   pk: Int
   applicationRound: Int!
+  applicationSections: [ApplicationSectionForApplicationSerializerInput]
   applicantType: ApplicantTypeChoice
   additionalInformation: String
-  organisation: OrganisationSerializerInput
-  contactPerson: PersonSerializerInput
-  billingAddress: AddressSerializerInput
-  homeCity: Int
-  applicationSections: [ApplicationSectionForApplicationSerializerInput]
-}
-
-input OrganisationSerializerInput {
-  pk: Int
-  name: String!
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  identifier: String
-  yearEstablished: Int
-  address: AddressSerializerInput!
-  activeMembers: Int
-  coreBusiness: String
-  coreBusinessFi: String
-  coreBusinessEn: String
-  coreBusinessSv: String
-  organisationType: OrganizationTypeChoice
-  email: String
-}
-
-input AddressSerializerInput {
-  pk: Int
-  streetAddress: String!
-  streetAddressFi: String
-  streetAddressEn: String
-  streetAddressSv: String
-  postCode: String!
-  city: String!
-  cityFi: String
-  cityEn: String
-  citySv: String
-}
-
-input PersonSerializerInput {
-  pk: Int
-  firstName: String!
-  lastName: String!
-  email: String
-  phoneNumber: String
+  contactPersonFirstName: String
+  contactPersonLastName: String
+  contactPersonEmail: String
+  contactPersonPhoneNumber: String
+  billingStreetAddress: String
+  billingPostCode: String
+  billingCity: String
+  organisationName: String
+  organisationEmail: String
+  organisationIdentifier: String
+  organisationYearEstablished: Int
+  organisationActiveMembers: Int
+  organisationCoreBusiness: String
+  organisationStreetAddress: String
+  organisationPostCode: String
+  organisationCity: String
+  municipality: MunicipalityChoice
 }
 
 input ApplicationSectionForApplicationSerializerInput {
@@ -3482,69 +3254,56 @@ input SuitableTimeRangeSerializerInput {
 type ApplicationUpdateMutationPayload {
   pk: Int
   applicationRound: ID
+  applicationSections: [ApplicationSectionNode]
   applicantType: ApplicantTypeChoice
   additionalInformation: String
-  organisation: OrganisationNode
-  contactPerson: PersonNode
-  billingAddress: AddressNode
-  homeCity: Int
-  applicationSections: [ApplicationSectionNode]
+  contactPersonFirstName: String
+  contactPersonLastName: String
+  contactPersonEmail: String
+  contactPersonPhoneNumber: String
+  billingStreetAddress: String
+  billingPostCode: String
+  billingCity: String
+  organisationName: String
+  organisationEmail: String
+  organisationIdentifier: String
+  organisationYearEstablished: Int
+  organisationActiveMembers: Int
+  organisationCoreBusiness: String
+  organisationStreetAddress: String
+  organisationPostCode: String
+  organisationCity: String
+  municipality: MunicipalityChoice
   user: ID
-  createdDate: DateTime
-  lastModifiedDate: DateTime
-  cancelledDate: DateTime
-  sentDate: DateTime
+  createdAt: DateTime
+  updatedAt: DateTime
+  cancelledAt: DateTime
+  sentAt: DateTime
   status: Status
 }
 
 input ApplicationUpdateMutationInput {
   pk: Int!
+  applicationSections: [UpdateApplicationSectionForApplicationSerializerInput]
   applicantType: ApplicantTypeChoice
   additionalInformation: String
-  organisation: UpdateOrganisationSerializerInput
-  contactPerson: UpdatePersonSerializerInput
-  billingAddress: UpdateAddressSerializerInput
-  homeCity: Int
-  applicationSections: [UpdateApplicationSectionForApplicationSerializerInput]
-}
-
-input UpdateOrganisationSerializerInput {
-  pk: Int
-  name: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  identifier: String
-  yearEstablished: Int
-  address: UpdateAddressSerializerInput
-  activeMembers: Int
-  coreBusiness: String
-  coreBusinessFi: String
-  coreBusinessEn: String
-  coreBusinessSv: String
-  organisationType: OrganizationTypeChoice
-  email: String
-}
-
-input UpdateAddressSerializerInput {
-  pk: Int
-  streetAddress: String
-  streetAddressFi: String
-  streetAddressEn: String
-  streetAddressSv: String
-  postCode: String
-  city: String
-  cityFi: String
-  cityEn: String
-  citySv: String
-}
-
-input UpdatePersonSerializerInput {
-  pk: Int
-  firstName: String
-  lastName: String
-  email: String
-  phoneNumber: String
+  contactPersonFirstName: String
+  contactPersonLastName: String
+  contactPersonEmail: String
+  contactPersonPhoneNumber: String
+  billingStreetAddress: String
+  billingPostCode: String
+  billingCity: String
+  organisationName: String
+  organisationEmail: String
+  organisationIdentifier: String
+  organisationYearEstablished: Int
+  organisationActiveMembers: Int
+  organisationCoreBusiness: String
+  organisationStreetAddress: String
+  organisationPostCode: String
+  organisationCity: String
+  municipality: MunicipalityChoice
 }
 
 input UpdateApplicationSectionForApplicationSerializerInput {
@@ -3701,14 +3460,14 @@ input AllocatedTimeSlotDeleteMutationInput {
 
 type ReservationUnitOptionUpdateMutationPayload {
   pk: Int
-  rejected: Boolean
-  locked: Boolean
+  isRejected: Boolean
+  isLocked: Boolean
 }
 
 input ReservationUnitOptionUpdateMutationInput {
   pk: Int!
-  rejected: Boolean
-  locked: Boolean
+  isRejected: Boolean
+  isLocked: Boolean
 }
 
 type RejectAllSectionOptionsMutationPayload {
@@ -4016,7 +3775,7 @@ input EquipmentCategoryDeleteMutationInput {
 
 type ReservationUnitCreateMutationPayload {
   pk: Int
-  uuid: String
+  extUuid: String
   name: String
   nameFi: String
   nameEn: String
@@ -4025,10 +3784,10 @@ type ReservationUnitCreateMutationPayload {
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUse: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  notesWhenApplying: String
+  notesWhenApplyingFi: String
+  notesWhenApplyingEn: String
+  notesWhenApplyingSv: String
   contactInformation: String
   reservationPendingInstructions: String
   reservationPendingInstructionsFi: String
@@ -4048,10 +3807,10 @@ type ReservationUnitCreateMutationPayload {
   maxReservationsPerUser: Int
   reservationsMinDaysBefore: Int
   reservationsMaxDaysBefore: Int
-  reservationBegins: DateTime
-  reservationEnds: DateTime
-  publishBegins: DateTime
-  publishEnds: DateTime
+  reservationBeginsAt: DateTime
+  reservationEndsAt: DateTime
+  publishBeginsAt: DateTime
+  publishEndsAt: DateTime
   minReservationDuration: Duration
   maxReservationDuration: Duration
   bufferTimeBefore: Duration
@@ -4080,7 +3839,6 @@ type ReservationUnitCreateMutationPayload {
   resources: [Int]
   purposes: [Int]
   equipments: [Int]
-  qualifiers: [Int]
   images: [ReservationUnitImageNode]
   pricings: [ReservationUnitPricingNode]
   accessTypes: [ReservationUnitAccessTypeNode]
@@ -4097,10 +3855,10 @@ input ReservationUnitCreateMutationInput {
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUse: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  notesWhenApplying: String
+  notesWhenApplyingFi: String
+  notesWhenApplyingEn: String
+  notesWhenApplyingSv: String
   contactInformation: String
   reservationPendingInstructions: String
   reservationPendingInstructionsFi: String
@@ -4120,10 +3878,10 @@ input ReservationUnitCreateMutationInput {
   maxReservationsPerUser: Int
   reservationsMinDaysBefore: Int
   reservationsMaxDaysBefore: Int
-  reservationBegins: DateTime
-  reservationEnds: DateTime
-  publishBegins: DateTime
-  publishEnds: DateTime
+  reservationBeginsAt: DateTime
+  reservationEndsAt: DateTime
+  publishBeginsAt: DateTime
+  publishEndsAt: DateTime
   minReservationDuration: Duration
   maxReservationDuration: Duration
   bufferTimeBefore: Duration
@@ -4151,7 +3909,6 @@ input ReservationUnitCreateMutationInput {
   resources: [Int]
   purposes: [Int]
   equipments: [Int]
-  qualifiers: [Int]
   images: [ReservationUnitImageFieldSerializerInput]
   pricings: [ReservationUnitPricingSerializerInput]
   accessTypes: [ReservationUnitAccessTypeSerializerInput]
@@ -4190,7 +3947,7 @@ input ReservationUnitAccessTypeSerializerInput {
 
 input ApplicationRoundTimeSlotSerializerInput {
   weekday: Int!
-  closed: Boolean
+  isClosed: Boolean
   reservableTimes: [TimeSlotSerializerInput]
 }
 
@@ -4201,7 +3958,7 @@ input TimeSlotSerializerInput {
 
 type ReservationUnitUpdateMutationPayload {
   pk: Int
-  uuid: String
+  extUuid: String
   name: String
   nameFi: String
   nameEn: String
@@ -4210,10 +3967,10 @@ type ReservationUnitUpdateMutationPayload {
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUse: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  notesWhenApplying: String
+  notesWhenApplyingFi: String
+  notesWhenApplyingEn: String
+  notesWhenApplyingSv: String
   contactInformation: String
   reservationPendingInstructions: String
   reservationPendingInstructionsFi: String
@@ -4233,10 +3990,10 @@ type ReservationUnitUpdateMutationPayload {
   maxReservationsPerUser: Int
   reservationsMinDaysBefore: Int
   reservationsMaxDaysBefore: Int
-  reservationBegins: DateTime
-  reservationEnds: DateTime
-  publishBegins: DateTime
-  publishEnds: DateTime
+  reservationBeginsAt: DateTime
+  reservationEndsAt: DateTime
+  publishBeginsAt: DateTime
+  publishEndsAt: DateTime
   minReservationDuration: Duration
   maxReservationDuration: Duration
   bufferTimeBefore: Duration
@@ -4265,7 +4022,6 @@ type ReservationUnitUpdateMutationPayload {
   resources: [Int]
   purposes: [Int]
   equipments: [Int]
-  qualifiers: [Int]
   images: [ReservationUnitImageNode]
   pricings: [ReservationUnitPricingNode]
   accessTypes: [ReservationUnitAccessTypeNode]
@@ -4282,10 +4038,10 @@ input ReservationUnitUpdateMutationInput {
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUse: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  notesWhenApplying: String
+  notesWhenApplyingFi: String
+  notesWhenApplyingEn: String
+  notesWhenApplyingSv: String
   contactInformation: String
   reservationPendingInstructions: String
   reservationPendingInstructionsFi: String
@@ -4305,10 +4061,10 @@ input ReservationUnitUpdateMutationInput {
   maxReservationsPerUser: Int
   reservationsMinDaysBefore: Int
   reservationsMaxDaysBefore: Int
-  reservationBegins: DateTime
-  reservationEnds: DateTime
-  publishBegins: DateTime
-  publishEnds: DateTime
+  reservationBeginsAt: DateTime
+  reservationEndsAt: DateTime
+  publishBeginsAt: DateTime
+  publishEndsAt: DateTime
   minReservationDuration: Duration
   maxReservationDuration: Duration
   bufferTimeBefore: Duration
@@ -4336,7 +4092,6 @@ input ReservationUnitUpdateMutationInput {
   resources: [Int]
   purposes: [Int]
   equipments: [Int]
-  qualifiers: [Int]
   images: [UpdateReservationUnitImageFieldSerializerInput]
   pricings: [UpdateReservationUnitPricingSerializerInput]
   accessTypes: [UpdateReservationUnitAccessTypeSerializerInput]
@@ -4372,7 +4127,7 @@ input UpdateReservationUnitAccessTypeSerializerInput {
 
 input UpdateApplicationRoundTimeSlotSerializerInput {
   weekday: Int!
-  closed: Boolean
+  isClosed: Boolean
   reservableTimes: [TimeSlotSerializerInput]
 }
 
@@ -4446,8 +4201,8 @@ type ReservationCreateMutationPayload {
 input ReservationCreateMutationInput {
   pk: Int
   reservationUnit: Int!
-  begin: DateTime!
-  end: DateTime!
+  beginsAt: DateTime!
+  endsAt: DateTime!
 }
 
 type ReservationStaffCreateMutationPayload {
@@ -4457,8 +4212,9 @@ type ReservationStaffCreateMutationPayload {
   numPersons: Int
   workingMemo: String
   type: ReservationTypeChoice
-  begin: DateTime
-  end: DateTime
+  municipality: MunicipalityChoice
+  beginsAt: DateTime
+  endsAt: DateTime
   bufferTimeBefore: Duration
   bufferTimeAfter: Duration
   applyingForFreeOfCharge: Boolean
@@ -4482,7 +4238,6 @@ type ReservationStaffCreateMutationPayload {
   billingAddressCity: String
   billingAddressZip: String
   ageGroup: Int
-  homeCity: Int
   purpose: Int
   state: ReservationStateChoice
   confirmedAt: DateTime
@@ -4496,8 +4251,9 @@ input ReservationStaffCreateMutationInput {
   numPersons: Int
   workingMemo: String
   type: ReservationTypeChoice!
-  begin: DateTime!
-  end: DateTime!
+  municipality: MunicipalityChoice
+  beginsAt: DateTime!
+  endsAt: DateTime!
   bufferTimeBefore: Duration
   bufferTimeAfter: Duration
   applyingForFreeOfCharge: Boolean
@@ -4522,7 +4278,6 @@ input ReservationStaffCreateMutationInput {
   billingAddressZip: String
   reservationUnit: Int!
   ageGroup: Int
-  homeCity: Int
   purpose: Int
 }
 
@@ -4531,6 +4286,7 @@ type ReservationUpdateMutationPayload {
   name: String
   description: String
   numPersons: Int
+  municipality: MunicipalityChoice
   applyingForFreeOfCharge: Boolean
   freeOfChargeReason: String
   reserveeId: String
@@ -4552,7 +4308,6 @@ type ReservationUpdateMutationPayload {
   billingAddressCity: String
   billingAddressZip: String
   ageGroup: Int
-  homeCity: Int
   purpose: Int
   state: ReservationStateChoice
 }
@@ -4562,6 +4317,7 @@ input ReservationUpdateMutationInput {
   name: String
   description: String
   numPersons: Int
+  municipality: MunicipalityChoice
   applyingForFreeOfCharge: Boolean
   freeOfChargeReason: String
   reserveeId: String
@@ -4583,7 +4339,6 @@ input ReservationUpdateMutationInput {
   billingAddressCity: String
   billingAddressZip: String
   ageGroup: Int
-  homeCity: Int
   purpose: Int
 }
 
@@ -4684,21 +4439,21 @@ input ReservationWorkingMemoMutationInput {
 
 type ReservationAdjustTimeMutationPayload {
   pk: Int
-  begin: DateTime
-  end: DateTime
+  beginsAt: DateTime
+  endsAt: DateTime
   state: ReservationStateChoice
 }
 
 input ReservationAdjustTimeMutationInput {
   pk: Int!
-  begin: DateTime!
-  end: DateTime!
+  beginsAt: DateTime!
+  endsAt: DateTime!
 }
 
 type ReservationStaffAdjustTimeMutationPayload {
   pk: Int
-  begin: DateTime
-  end: DateTime
+  beginsAt: DateTime
+  endsAt: DateTime
   bufferTimeBefore: Duration
   bufferTimeAfter: Duration
   state: ReservationStateChoice
@@ -4706,8 +4461,8 @@ type ReservationStaffAdjustTimeMutationPayload {
 
 input ReservationStaffAdjustTimeMutationInput {
   pk: Int!
-  begin: DateTime
-  end: DateTime
+  beginsAt: DateTime
+  endsAt: DateTime
   bufferTimeBefore: Duration
   bufferTimeAfter: Duration
 }
@@ -4718,6 +4473,7 @@ type ReservationStaffModifyMutationPayload {
   description: String
   numPersons: Int
   type: ReservationTypeChoice
+  municipality: MunicipalityChoice
   applyingForFreeOfCharge: Boolean
   freeOfChargeReason: String
   reserveeFirstName: String
@@ -4739,12 +4495,11 @@ type ReservationStaffModifyMutationPayload {
   billingLastName: String
   billingPhone: String
   ageGroup: Int
-  homeCity: Int
   purpose: Int
   confirmedAt: DateTime
   state: ReservationStateChoice
-  begin: DateTime
-  end: DateTime
+  beginsAt: DateTime
+  endsAt: DateTime
   bufferTimeAfter: Duration
   bufferTimeBefore: Duration
   price: Decimal
@@ -4761,6 +4516,7 @@ input ReservationStaffModifyMutationInput {
   description: String
   numPersons: Int
   type: ReservationTypeChoice
+  municipality: MunicipalityChoice
   applyingForFreeOfCharge: Boolean
   freeOfChargeReason: String
   reserveeFirstName: String
@@ -4782,7 +4538,6 @@ input ReservationStaffModifyMutationInput {
   billingLastName: String
   billingPhone: String
   ageGroup: Int
-  homeCity: Int
   purpose: Int
 }
 
@@ -4812,7 +4567,6 @@ type ReservationSeriesCreateMutationPayload {
   description: String
   reservationUnit: Int
   ageGroup: Int
-  abilityGroup: Int
   recurrenceInDays: Int
   weekdays: [Int]
   beginTime: Time
@@ -4827,7 +4581,6 @@ input ReservationSeriesCreateMutationInput {
   description: String
   reservationUnit: Int!
   ageGroup: Int
-  abilityGroup: Int
   recurrenceInDays: Int!
   weekdays: [Int]!
   beginTime: Time!
@@ -4872,7 +4625,7 @@ input ReservationSeriesReservationCreateSerializerInput {
   billingAddressZip: String
   user: Int!
   purpose: Int
-  homeCity: Int
+  municipality: MunicipalityChoice
   ageGroup: Int
 }
 
@@ -4942,7 +4695,7 @@ input UpdateReservationSeriesReservationUpdateSerializerInput {
   billingAddressCity: String
   billingAddressZip: String
   purpose: Int
-  homeCity: Int
+  municipality: MunicipalityChoice
   ageGroup: Int
 }
 
@@ -4952,8 +4705,8 @@ type ReservationSeriesAddMutationPayload {
 
 input ReservationSeriesAddMutationInput {
   pk: Int!
-  begin: DateTime!
-  end: DateTime!
+  beginsAt: DateTime!
+  endsAt: DateTime!
   bufferTimeBefore: String
   bufferTimeAfter: String
 }
