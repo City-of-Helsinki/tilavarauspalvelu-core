@@ -187,6 +187,7 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "publish_begins_at": _("Publish begins"),
             "publish_ends_at": _("Publish ends"),
             "metadata_set": _("Reservation metadata set"),
+            "reservation_form": _("Reservation form"),
             "max_reservations_per_user": _("Max reservations per user"),
             "require_adult_reservee": _("Require adult reservee"),
             "require_reservation_handling": _("Require reservation handling"),
@@ -265,6 +266,7 @@ class ReservationUnitAdminForm(forms.ModelForm):
                 "Reservation metadata set that defines the set of supported "
                 "and required form fields for this reservation unit."
             ),
+            "reservation_form": _("Which reservation form is used for this reservation unit?"),
             "max_reservations_per_user": _("Maximum number of active reservations per user"),
             "require_adult_reservee": _(
                 "Do reservations to this reservation unit require the reservee to be a legal adult?",
