@@ -333,6 +333,7 @@ def _cancel_reservations(qs: ReservationQuerySet) -> None:
 
     now = local_datetime()
 
+    reservation: Reservation
     for reservation in qs:
         reservation.state = ReservationStateChoice.CANCELLED
         reservation.cancel_details = "Cancelled by reservee"
@@ -351,18 +352,18 @@ def _cancel_reservations(qs: ReservationQuerySet) -> None:
 
                 case OrderStatus.PAID_BY_INVOICE:
                     payment_order.status = OrderStatus.CANCELLED
-                    payment_order.processed_at = reservation.begin - datetime.timedelta(days=3)
+                    payment_order.processed_at = reservation.begins_at - datetime.timedelta(days=3)
 
                 case OrderStatus.PENDING if overdue:
                     reservation.cancel_reason = ReservationCancelReasonChoice.NOT_PAID
                     reservation.cancel_details = "Cancelled due to no payment"
                     payment_order.status = OrderStatus.EXPIRED
-                    payment_order.processed_at = reservation.begin - datetime.timedelta(days=3)
+                    payment_order.processed_at = reservation.begins_at - datetime.timedelta(days=3)
 
                 case OrderStatus.PENDING:
                     reservation.cancel_details = "Cancelled by the reservee"
                     payment_order.status = OrderStatus.CANCELLED
-                    payment_order.processed_at = reservation.begin - datetime.timedelta(days=3)
+                    payment_order.processed_at = reservation.begins_at - datetime.timedelta(days=3)
 
                 case _:
                     msg = f"Cannot cancel payment order in status '{payment_order.status}'"
@@ -378,6 +379,7 @@ def _deny_reservations(qs: ReservationQuerySet, deny_reasons: list[ReservationDe
     reservations: list[Reservation] = []
     payment_orders: list[PaymentOrder] = []
 
+    reservation: Reservation
     for reservation in qs:
         reservation.state = ReservationStateChoice.DENIED
         reservation.handling_details = "Denied by handler"
@@ -399,7 +401,7 @@ def _deny_reservations(qs: ReservationQuerySet, deny_reasons: list[ReservationDe
                 # Invoices are always cancelled, since no payment has been made
                 case OrderStatus.PAID | OrderStatus.PAID_BY_INVOICE | OrderStatus.PENDING:
                     payment_order.status = OrderStatus.CANCELLED
-                    payment_order.processed_at = reservation.begin - datetime.timedelta(days=3)
+                    payment_order.processed_at = reservation.begins_at - datetime.timedelta(days=3)
 
                 case _:
                     msg = f"Cannot deny payment order in status '{payment_order.status}'"
@@ -873,8 +875,8 @@ def _create_reservations_for_series(
                     reservation_unit=series.reservation_unit,
                     reservation_series=series,
                     #
-                    begin=begin,
-                    end=end,
+                    begins_at=begin,
+                    ends_at=end,
                     buffer_time_before=buffer_time_before,
                     buffer_time_after=buffer_time_after,
                     #
