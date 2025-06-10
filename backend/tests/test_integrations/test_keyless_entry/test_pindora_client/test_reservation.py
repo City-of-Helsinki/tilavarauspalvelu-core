@@ -148,7 +148,7 @@ def test_pindora_client__get_reservation__retry__succeeds_after_retry():
 @pytest.mark.django_db
 @pytest.mark.parametrize("is_active", [True, False])
 def test_pindora_client__create_reservation(is_active):
-    reservation = ReservationFactory.create(created_at=local_datetime(), reservation_units__name="foo")
+    reservation = ReservationFactory.create(created_at=local_datetime(), reservation_unit__name="foo")
 
     data = default_reservation_response()
     data["access_code_is_active"] = is_active
@@ -185,7 +185,7 @@ def test_pindora_client__create_reservation(is_active):
 )
 @pytest.mark.django_db
 def test_pindora_client__create_reservation__errors(status_code, exception, error_msg):
-    reservation = ReservationFactory.create(created_at=local_datetime(), reservation_units__name="foo")
+    reservation = ReservationFactory.create(created_at=local_datetime(), reservation_unit__name="foo")
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
 

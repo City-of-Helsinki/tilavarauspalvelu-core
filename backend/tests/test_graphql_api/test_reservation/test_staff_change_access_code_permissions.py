@@ -64,7 +64,7 @@ def test_staff_change_access_code__unit_handler(graphql):
         access_code_is_active=True,
         begins_at=local_datetime() + datetime.timedelta(hours=1),
         ends_at=local_datetime() + datetime.timedelta(hours=2),
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
 
     data = {

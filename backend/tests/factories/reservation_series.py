@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from factory import LazyAttribute, fuzzy
 
@@ -16,9 +16,6 @@ from ._base import (
     GenericDjangoModelFactory,
     ReverseForeignKeyFactory,
 )
-
-if TYPE_CHECKING:
-    from django.db import models
 
 __all__ = [
     "ReservationSeriesFactory",
@@ -96,21 +93,10 @@ class ReservationSeriesFactory(GenericDjangoModelFactory[ReservationSeries]):
                     user=series.user,
                     begins_at=begin,
                     ends_at=end,
+                    reservation_unit=series.reservation_unit,
                     **sub_kwargs,
                 )
                 reservations.append(reservation)
 
         Reservation.objects.bulk_create(reservations)
-
-        # Add reservation units.
-        ReservationReservationUnit: type[models.Model] = Reservation.reservation_units.through
-        reservation_reservation_units: list[ReservationReservationUnit] = [
-            ReservationReservationUnit(
-                reservation=reservation,
-                reservationunit=series.reservation_unit,
-            )
-            for reservation in reservations
-        ]
-        ReservationReservationUnit.objects.bulk_create(reservation_reservation_units)
-
         return series

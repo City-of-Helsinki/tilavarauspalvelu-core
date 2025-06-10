@@ -267,7 +267,7 @@ def reservation_statistics_export(request: WSGIRequest) -> HttpResponse:
     if params.reservations:
         queryset = queryset.filter(reservation__ext_uuid__in=params.reservations)
     if params.tprek_id:
-        queryset = queryset.filter(reservation__reservation_units__unit__tprek_id=params.tprek_id)
+        queryset = queryset.filter(reservation__reservation_unit__unit__tprek_id=params.tprek_id)
     if params.begins_after:
         queryset = queryset.filter(begin__gte=params.begins_after)
     if params.begins_before:
@@ -408,7 +408,7 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
         return HttpResponseRedirect(payment_order.checkout_url)
 
     begin_date = reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
-    reservation_unit: ReservationUnit = reservation.reservation_units.first()
+    reservation_unit: ReservationUnit = reservation.reservation_unit
     pricing = reservation_unit.actions.get_active_pricing(by_date=begin_date)
 
     if pricing is None:

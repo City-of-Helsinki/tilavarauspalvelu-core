@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from django.conf import settings
-from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import IntegerPrimaryKeyField
 from rest_framework.exceptions import ValidationError
@@ -125,11 +124,7 @@ class ReservationCreateSerializer(NestingModelSerializer):
             data.update({key: value for key, value in reservation_prefill_info.items() if value is not None})
 
     def create(self, validated_data: ReservationCreateData) -> Reservation:
-        with transaction.atomic():
-            # Must be able to link reservation unit to the reservation
-            reservation_unit: ReservationUnit = validated_data.pop("reservation_unit")
-            reservation: Reservation = super().create(validated_data)
-            reservation.reservation_units.set([reservation_unit])
+        reservation: Reservation = super().create(validated_data)
 
         # After creating the reservation, check again if there are any overlapping reservations.
         # This can fail if two reservations are created for reservation units in the same

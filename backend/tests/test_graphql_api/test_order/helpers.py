@@ -32,7 +32,7 @@ REFRESH_MUTATION = build_mutation("refreshOrder", "RefreshOrderMutation", fields
 
 def get_order() -> PaymentOrder:
     reservation_unit = ReservationUnitFactory.create()
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
     return PaymentOrderFactory.create(
         reservation=reservation,
         remote_id=str(uuid.uuid4()),
