@@ -1785,6 +1785,13 @@ msgid "Reservation metadata set"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+#, fuzzy
+#| msgctxt "ICAL"
+#| msgid "Reservation for %(name)s"
+msgid "Reservation form"
+msgstr "Bokning för %(name)s"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Max reservations per user"
 msgstr ""
 
@@ -1951,6 +1958,10 @@ msgstr ""
 msgid ""
 "Reservation metadata set that defines the set of supported and required form "
 "fields for this reservation unit."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Which reservation form is used for this reservation unit?"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
@@ -2519,6 +2530,33 @@ msgstr ""
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationKind"
 msgid "Direct and season"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Contact info form"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+#, fuzzy
+#| msgctxt "Email"
+#| msgid "Reservee name"
+msgid "Reservee info form"
+msgstr "Bokare"
+
+#: tilavarauspalvelu/enums.py
+msgid "Purpose form"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Age group form"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Purpose subvention form"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Age group subvention form"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
