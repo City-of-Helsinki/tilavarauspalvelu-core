@@ -259,10 +259,10 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
                 type=ReservationTypeChoice.SEASONAL,
                 state=ReservationStateChoice.CONFIRMED,
                 price=0,
-                reservation_units__cancellation_rule__isnull=False,
+                reservation_unit__cancellation_rule__isnull=False,
             )
             .alias(
-                cancellation_time=models.F("reservation_units__cancellation_rule__can_be_cancelled_time_before"),
+                cancellation_time=models.F("reservation_unit__cancellation_rule__can_be_cancelled_time_before"),
                 cancellation_cutoff=NowTT() + models.F("cancellation_time"),
             )
             .filter(

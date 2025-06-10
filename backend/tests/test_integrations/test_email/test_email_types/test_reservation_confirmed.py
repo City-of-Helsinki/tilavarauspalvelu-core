@@ -357,7 +357,7 @@ def test_reservation_confirmed__send_email(outbox):
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_units__name="foo",
+        reservation_unit__name="foo",
     )
 
     EmailService.send_reservation_confirmed_email(reservation)
@@ -378,7 +378,7 @@ def test_reservation_confirmed__send_email__wrong_state(outbox):
         state=ReservationStateChoice.CANCELLED,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_units__name="foo",
+        reservation_unit__name="foo",
     )
 
     EmailService.send_reservation_confirmed_email(reservation)
@@ -394,7 +394,7 @@ def test_reservation_confirmed__send_email__no_recipients(outbox):
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="",
         user__email="",
-        reservation_units__name="foo",
+        reservation_unit__name="foo",
     )
 
     EmailService.send_reservation_confirmed_email(reservation)

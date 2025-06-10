@@ -197,12 +197,10 @@ class ReservationStatistic(models.Model):
             statistic.home_city_municipality_code = municipality.code
             statistic.home_city_name = str(municipality.value)
 
-        for res_unit in reservation.reservation_units.all():
-            statistic.primary_reservation_unit = res_unit.id
-            statistic.primary_reservation_unit_name = res_unit.name
-            statistic.primary_unit_name = getattr(res_unit.unit, "name", "")
-            statistic.primary_unit_tprek_id = getattr(res_unit.unit, "tprek_id", "")
-            break
+        statistic.primary_reservation_unit = reservation.reservation_unit.id
+        statistic.primary_reservation_unit_name = reservation.reservation_unit.name
+        statistic.primary_unit_name = getattr(reservation.reservation_unit.unit, "name", "")
+        statistic.primary_unit_tprek_id = getattr(reservation.reservation_unit.unit, "tprek_id", "")
 
         if save:
             statistic.save()

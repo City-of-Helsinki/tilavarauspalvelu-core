@@ -139,22 +139,22 @@ def test_units__query__check_duplication_is_prevented(graphql):
     reservation_unit_7 = ReservationUnitFactory.create(name="A7", unit=unit_4)
     reservation_unit_8 = ReservationUnitFactory.create(name="A8", unit=unit_4)
 
-    reservation_01 = ReservationFactory.create(name="A01", reservation_units=[reservation_unit_1], user=user)
-    reservation_02 = ReservationFactory.create(name="A02", reservation_units=[reservation_unit_1])
-    reservation_03 = ReservationFactory.create(name="A03", reservation_units=[reservation_unit_2], user=user)
-    reservation_04 = ReservationFactory.create(name="A04", reservation_units=[reservation_unit_2])
-    reservation_05 = ReservationFactory.create(name="A05", reservation_units=[reservation_unit_3], user=user)
-    reservation_06 = ReservationFactory.create(name="A06", reservation_units=[reservation_unit_3])
-    reservation_07 = ReservationFactory.create(name="A07", reservation_units=[reservation_unit_4], user=user)
-    reservation_08 = ReservationFactory.create(name="A08", reservation_units=[reservation_unit_4])
-    reservation_09 = ReservationFactory.create(name="A09", reservation_units=[reservation_unit_5], user=user)
-    reservation_10 = ReservationFactory.create(name="A10", reservation_units=[reservation_unit_5])
-    reservation_11 = ReservationFactory.create(name="A11", reservation_units=[reservation_unit_6], user=user)
-    reservation_12 = ReservationFactory.create(name="A12", reservation_units=[reservation_unit_6])
-    reservation_13 = ReservationFactory.create(name="A13", reservation_units=[reservation_unit_7], user=user)
-    reservation_14 = ReservationFactory.create(name="A14", reservation_units=[reservation_unit_7])
-    reservation_15 = ReservationFactory.create(name="A15", reservation_units=[reservation_unit_8], user=user)
-    reservation_16 = ReservationFactory.create(name="A16", reservation_units=[reservation_unit_8])
+    reservation_01 = ReservationFactory.create(name="A01", reservation_unit=reservation_unit_1, user=user)
+    reservation_02 = ReservationFactory.create(name="A02", reservation_unit=reservation_unit_1)
+    reservation_03 = ReservationFactory.create(name="A03", reservation_unit=reservation_unit_2, user=user)
+    reservation_04 = ReservationFactory.create(name="A04", reservation_unit=reservation_unit_2)
+    reservation_05 = ReservationFactory.create(name="A05", reservation_unit=reservation_unit_3, user=user)
+    reservation_06 = ReservationFactory.create(name="A06", reservation_unit=reservation_unit_3)
+    reservation_07 = ReservationFactory.create(name="A07", reservation_unit=reservation_unit_4, user=user)
+    reservation_08 = ReservationFactory.create(name="A08", reservation_unit=reservation_unit_4)
+    reservation_09 = ReservationFactory.create(name="A09", reservation_unit=reservation_unit_5, user=user)
+    reservation_10 = ReservationFactory.create(name="A10", reservation_unit=reservation_unit_5)
+    reservation_11 = ReservationFactory.create(name="A11", reservation_unit=reservation_unit_6, user=user)
+    reservation_12 = ReservationFactory.create(name="A12", reservation_unit=reservation_unit_6)
+    reservation_13 = ReservationFactory.create(name="A13", reservation_unit=reservation_unit_7, user=user)
+    reservation_14 = ReservationFactory.create(name="A14", reservation_unit=reservation_unit_7)
+    reservation_15 = ReservationFactory.create(name="A15", reservation_unit=reservation_unit_8, user=user)
+    reservation_16 = ReservationFactory.create(name="A16", reservation_unit=reservation_unit_8)
 
     group_1 = UnitGroupFactory.create(name="A1", units=[unit_1, unit_2])
     group_2 = UnitGroupFactory.create(name="A2", units=[unit_2, unit_3])
@@ -162,7 +162,7 @@ def test_units__query__check_duplication_is_prevented(graphql):
     group_4 = UnitGroupFactory.create(name="A4", units=[unit_4, unit_1])
 
     # Create testing enum since test client doesn't correctly handle
-    # ordering enums from strings in sub-entities (e.g. 'reservation_units__order_by').
+    # ordering enums from strings in sub-entities (e.g. 'reservation_unit__order_by').
     class TestEnum(Enum):
         pkAsc = "pkAsc"
 

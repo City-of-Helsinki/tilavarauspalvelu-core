@@ -64,7 +64,7 @@ def test_reservation_series__create_series(graphql):
     assert reservation_series.user == user
     assert reservation_series.age_group == age_group
 
-    reservations = list(reservation_series.reservations.order_by("begins_at").all())
+    reservations: list[Reservation] = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 1
 
     begin = datetime.datetime(2024, 1, 1, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
@@ -76,8 +76,7 @@ def test_reservation_series__create_series(graphql):
     assert reservations[0].user == user
     assert reservations[0].age_group == age_group
 
-    assert reservations[0].reservation_units.count() == 1
-    assert reservations[0].reservation_units.first() == reservation_unit
+    assert reservations[0].reservation_unit == reservation_unit
 
 
 def test_reservation_series__create_series__reservation_details(graphql):
@@ -168,8 +167,7 @@ def test_reservation_series__create_series__reservation_details(graphql):
     assert reservations[0].municipality == MunicipalityChoice.HELSINKI
     assert reservations[0].user == user
     assert reservations[0].age_group == age_group
-    assert reservations[0].reservation_units.count() == 1
-    assert reservations[0].reservation_units.first() == reservation_unit
+    assert reservations[0].reservation_unit == reservation_unit
 
 
 def test_reservation_series__create_series__multiple_recurrences(graphql):
@@ -542,7 +540,7 @@ def test_reservation_series__create_series__overlapping_reservations(graphql):
     reservation_end = combine(end, datetime.time(12), tzinfo=DEFAULT_TIMEZONE)
 
     ReservationFactory.create(
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         begins_at=reservation_begin,
         ends_at=reservation_end,
         state=ReservationStateChoice.CONFIRMED,

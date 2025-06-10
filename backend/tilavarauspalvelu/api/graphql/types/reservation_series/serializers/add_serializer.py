@@ -4,7 +4,6 @@ import datetime
 import uuid
 from typing import TYPE_CHECKING
 
-from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 
@@ -116,9 +115,7 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
         reservation.handling_details = ""
         reservation.cancel_details = ""
 
-        with transaction.atomic():
-            reservation.save()
-            reservation.reservation_units.set([instance.reservation_unit])
+        reservation.save()
 
         # Reschedule Pindora series or seasonal booking if new reservation uses access code
         if validated_data["access_type"] == AccessType.ACCESS_CODE:

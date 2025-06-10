@@ -17,7 +17,6 @@ from utils.date_utils import local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationUnit
     from tilavarauspalvelu.typing import ReservationConfirmData
 
 
@@ -50,7 +49,6 @@ class ReservationConfirmSerializer(NestingModelSerializer):
         self.instance.validators.validate_can_change_reservation()
         self.instance.validators.validate_no_payment_order()
         self.instance.validators.validate_required_metadata_fields()
-        self.instance.validators.validate_single_reservation_unit()
 
         data["confirmed_at"] = local_datetime()
 
@@ -60,7 +58,7 @@ class ReservationConfirmSerializer(NestingModelSerializer):
             data["state"] = self.instance.actions.get_state_on_reservation_confirmed(payment_type=None)
             return data
 
-        reservation_unit: ReservationUnit = self.instance.reservation_units.first()
+        reservation_unit = self.instance.reservation_unit
         pricing = reservation_unit.actions.get_active_pricing(by_date=self.instance.begins_at.date())
 
         if pricing is None:

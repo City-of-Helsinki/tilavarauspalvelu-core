@@ -16,8 +16,6 @@ from utils.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between, loc
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
 
-    from django.db import models
-
     from tilavarauspalvelu.models import ReservableTimeSpan, ReservationSeries
     from tilavarauspalvelu.typing import ReservationDetails
 
@@ -169,9 +167,6 @@ class ReservationSeriesActions:
         if not periods:
             return []
 
-        # Pick out the through model for the many-to-many relationship and use if for bulk creation
-        ThroughModel: type[models.Model] = Reservation.reservation_units.through  # noqa: N806
-
         reservation_unit = self.reservation_series.reservation_unit
 
         begin_date = min(period["begin"].date() for period in periods)
@@ -179,7 +174,6 @@ class ReservationSeriesActions:
         access_type_map = reservation_unit.actions.get_access_types_on_period(begin_date, end_date)
 
         reservations: list[Reservation] = []
-        through_models: list[models.Model] = []
 
         for period in periods:
             if reservation_unit.reservation_block_whole_day:
@@ -200,18 +194,12 @@ class ReservationSeriesActions:
                 reservation_series=self.reservation_series,
                 age_group=self.reservation_series.age_group,
                 access_type=access_type,
+                reservation_unit=reservation_unit,
                 **reservation_details,
             )
-            through = ThroughModel(
-                reservation=reservation,
-                reservationunit=reservation_unit,
-            )
             reservations.append(reservation)
-            through_models.append(through)
 
-        reservations = Reservation.objects.bulk_create(reservations)
-        ThroughModel.objects.bulk_create(through_models)
-        return reservations
+        return Reservation.objects.bulk_create(reservations)
 
     def bulk_create_rejected_occurrences_for_periods(
         self,

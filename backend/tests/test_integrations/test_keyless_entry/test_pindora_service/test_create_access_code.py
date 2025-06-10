@@ -24,7 +24,7 @@ pytestmark = [
 
 def test_create_access_code__reservation():
     reservation = ReservationFactory.create(
-        reservation_units__ext_uuid=uuid.uuid4(),
+        reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -53,7 +53,7 @@ def test_create_access_code__reservation():
 def test_create_access_code__reservation__in_series():
     series = ReservationSeriesFactory.create()
     reservation_1 = ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -62,7 +62,7 @@ def test_create_access_code__reservation__in_series():
         type=ReservationTypeChoice.NORMAL,
     )
     reservation_2 = ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 14),
         ends_at=local_datetime(2024, 1, 1, 15),
@@ -100,7 +100,7 @@ def test_create_access_code__reservation__in_series__in_seasonal_booking():
     )
     reservation_1 = ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -110,7 +110,7 @@ def test_create_access_code__reservation__in_series__in_seasonal_booking():
     )
     reservation_2 = ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 14),
         ends_at=local_datetime(2024, 1, 1, 15),
@@ -141,7 +141,7 @@ def test_create_access_code__reservation__in_series__in_seasonal_booking():
 def test_create_access_code__series():
     series = ReservationSeriesFactory.create()
     reservation_1 = ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -150,7 +150,7 @@ def test_create_access_code__series():
         type=ReservationTypeChoice.NORMAL,
     )
     reservation_2 = ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 14),
         ends_at=local_datetime(2024, 1, 1, 15),
@@ -188,7 +188,7 @@ def test_create_access_code__series__in_seasonal_booking():
     )
     reservation_1 = ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -198,7 +198,7 @@ def test_create_access_code__series__in_seasonal_booking():
     )
     reservation_2 = ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 14),
         ends_at=local_datetime(2024, 1, 1, 15),
@@ -236,7 +236,7 @@ def test_create_access_code__seasonal_booking():
     )
     reservation_1 = ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),
@@ -246,7 +246,7 @@ def test_create_access_code__seasonal_booking():
     )
     reservation_2 = ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
+        reservation_unit=series.reservation_unit,
         reservation_series=series,
         begins_at=local_datetime(2024, 1, 1, 14),
         ends_at=local_datetime(2024, 1, 1, 15),

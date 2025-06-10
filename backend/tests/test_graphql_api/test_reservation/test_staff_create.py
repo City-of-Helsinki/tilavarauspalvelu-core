@@ -333,7 +333,7 @@ def test_reservation__staff_create__reservation_overlapping_fails(graphql):
         begins_at=begin,
         ends_at=end,
         state=ReservationStateChoice.CONFIRMED,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
 
     graphql.login_with_superuser()
@@ -359,7 +359,7 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails(graphql):
         ends_at=end + datetime.timedelta(hours=1),
         buffer_time_before=datetime.timedelta(minutes=1),
         state=ReservationStateChoice.CONFIRMED,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
 
     graphql.login_with_superuser()
@@ -384,7 +384,7 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer
         begins_at=begin,
         ends_at=end,
         state=ReservationStateChoice.CONFIRMED,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
 
     graphql.login_with_superuser()
@@ -414,7 +414,7 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer
         begins_at=begin + datetime.timedelta(hours=1),
         ends_at=end + datetime.timedelta(hours=1),
         state=ReservationStateChoice.CONFIRMED,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
 
     graphql.login_with_superuser()

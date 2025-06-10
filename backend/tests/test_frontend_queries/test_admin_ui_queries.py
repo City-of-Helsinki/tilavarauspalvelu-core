@@ -941,7 +941,7 @@ def test_frontend_queries__admin_ui__ReservationUnitsByUnit(graphql):
     obj: Unit = query_info_1.factory.create(**factory_args_1)
 
     factory_args_2 = deepcopy(query_info_2.factory_args)
-    factory_args_2["reservation_units__unit"] = obj
+    factory_args_2["reservation_unit__unit"] = obj
     query_info_2.factory.create(**factory_args_2)
 
     variables = query_info_1.variables
