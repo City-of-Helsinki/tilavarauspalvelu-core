@@ -90,6 +90,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "authentication",
             "reservation_start_interval",
             "reservation_kind",
+            "reservation_form",
             "publishing_state",
             #
             # List fields
