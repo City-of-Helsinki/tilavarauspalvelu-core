@@ -80,8 +80,8 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.notes_when_applying_en
     assert row_2[next(index)] == reservation_unit_1.notes_when_applying_sv
     assert row_2[next(index)] == reservation_unit_1.service_specific_terms.name
-    assert row_2[next(index)] == reservation_unit_1.unit.tprek_id
-    assert row_2[next(index)] == reservation_unit_1.unit.name
+    assert row_2[next(index)] == (reservation_unit_1.unit.tprek_id or "")
+    assert row_2[next(index)] == (reservation_unit_1.unit.name or "")
     assert row_2[next(index)] == reservation_unit_1.contact_information
     assert row_2[next(index)] == reservation_unit_1.is_draft
     assert row_2[next(index)] == reservation_unit_1.publish_begins_at
@@ -200,13 +200,6 @@ def test_reservation_unit_export_multiple():
             "Missing Reservation unit type": MissingParams(
                 missing=Missing(null=["reservation_unit_type"]),
                 column_value_mapping={"Type": ""},
-            ),
-            "Missing Unit": MissingParams(
-                missing=Missing(null=["unit"]),
-                column_value_mapping={
-                    "TPRek ID": "",
-                    "Unit": "",
-                },
             ),
         },
     ),

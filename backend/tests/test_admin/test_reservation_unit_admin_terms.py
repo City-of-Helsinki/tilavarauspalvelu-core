@@ -22,10 +22,11 @@ pytestmark = [
 ]
 
 
-def get_valid_data():
+def get_valid_data(reservation_unit: ReservationUnit):
     return {
-        "name_fi": "test",
-        "description": "testing besthing",
+        "unit": reservation_unit.unit.pk,
+        "name_fi": reservation_unit.name_fi,
+        "description": reservation_unit.description,
         "reservation_start_interval": ReservationStartInterval.INTERVAL_15_MINUTES.value,
         "authentication": "weak",
         "reservation_kind": ReservationKind.DIRECT_AND_SEASON,
@@ -41,7 +42,7 @@ def test_reservation_unit_admin__terms_validation__pricing_terms__accepts_type_p
 
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
 
-    data = get_valid_data()
+    data = get_valid_data(reservation_unit=reservation_unit)
     data["pricing_terms"] = pricing_terms
 
     reservation_unit_admin = ReservationUnitAdmin(ReservationUnit, AdminSite())
@@ -58,7 +59,7 @@ def test_reservation_unit_admin__terms_validation__pricing_terms__errors_when_ty
 
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
 
-    data = get_valid_data()
+    data = get_valid_data(reservation_unit=reservation_unit)
     data["pricing_terms"] = wrong_terms
 
     reservation_unit_admin = ReservationUnitAdmin(ReservationUnit, AdminSite())
@@ -75,7 +76,7 @@ def test_reservation_unit_admin__terms_validation__payment_terms__accepts_type_p
 
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
 
-    data = get_valid_data()
+    data = get_valid_data(reservation_unit=reservation_unit)
     data["payment_terms"] = payment_terms
 
     reservation_unit_admin = ReservationUnitAdmin(ReservationUnit, AdminSite())
@@ -92,7 +93,7 @@ def test_reservation_unit_admin__terms_validation__payment_terms__errors_when_ty
 
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
 
-    data = get_valid_data()
+    data = get_valid_data(reservation_unit=reservation_unit)
     data["payment_terms"] = wrong_terms
 
     reservation_unit_admin = ReservationUnitAdmin(ReservationUnit, AdminSite())
@@ -109,7 +110,7 @@ def test_reservation_unit_admin__terms_validation__cancellation_terms__accepts_t
 
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
 
-    data = get_valid_data()
+    data = get_valid_data(reservation_unit=reservation_unit)
     data["cancellation_terms"] = cancellation_terms
 
     reservation_unit_admin = ReservationUnitAdmin(ReservationUnit, AdminSite())
@@ -126,7 +127,7 @@ def test_reservation_unit_admin__terms_validation__cancellation_terms__errors_wh
 
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
 
-    data = get_valid_data()
+    data = get_valid_data(reservation_unit=reservation_unit)
     data["cancellation_terms"] = wrong_terms
 
     reservation_unit_admin = ReservationUnitAdmin(ReservationUnit, AdminSite())
@@ -143,7 +144,7 @@ def test_reservation_unit_admin__terms_validation__service_specific_terms__accep
 
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
 
-    data = get_valid_data()
+    data = get_valid_data(reservation_unit=reservation_unit)
     data["service_specific_terms"] = service_specific_terms
 
     reservation_unit_admin = ReservationUnitAdmin(ReservationUnit, AdminSite())
@@ -160,7 +161,7 @@ def test_reservation_unit_admin__terms_validation__service_specific_terms__error
 
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
 
-    data = get_valid_data()
+    data = get_valid_data(reservation_unit=reservation_unit)
     data["service_specific_terms"] = wrong_terms
 
     reservation_unit_admin = ReservationUnitAdmin(ReservationUnit, AdminSite())

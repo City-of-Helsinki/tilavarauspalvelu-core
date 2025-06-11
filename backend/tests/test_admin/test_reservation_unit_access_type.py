@@ -17,6 +17,7 @@ from tests.factories import (
     ReservationUnitAccessTypeFactory,
     ReservationUnitFactory,
     TaxPercentageFactory,
+    UnitFactory,
     UserFactory,
 )
 from tests.helpers import patch_method
@@ -494,7 +495,8 @@ def test_reservation_unit_admin__access_types__new(api_client):
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
-    reservation_unit = ReservationUnitFactory.build()
+    unit = UnitFactory.create()
+    reservation_unit = ReservationUnitFactory.build(unit=unit)
 
     url = reverse("admin:tilavarauspalvelu_reservationunit_add")
     data = {
@@ -528,7 +530,8 @@ def test_reservation_unit_admin__access_types__new__access_code(api_client):
     # Needed to get default tax percentage
     TaxPercentageFactory.create()
 
-    reservation_unit = ReservationUnitFactory.build()
+    unit = UnitFactory.create()
+    reservation_unit = ReservationUnitFactory.build(unit=unit)
 
     url = reverse("admin:tilavarauspalvelu_reservationunit_add")
     data = {
@@ -566,7 +569,8 @@ def test_reservation_unit_admin__access_types__new__cannot_be_access_type_on_cre
     # Needed to get default tax percentage
     TaxPercentageFactory.create()
 
-    reservation_unit = ReservationUnitFactory.build()
+    unit = UnitFactory.create()
+    reservation_unit = ReservationUnitFactory.build(unit=unit)
 
     url = reverse("admin:tilavarauspalvelu_reservationunit_add")
     data = {

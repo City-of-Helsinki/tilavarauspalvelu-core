@@ -133,12 +133,10 @@ class ReservationUnit(models.Model):
 
     # Many-to-One related
 
-    unit: Unit | None = models.ForeignKey(
+    unit: Unit = models.ForeignKey(
         "tilavarauspalvelu.Unit",
         related_name="reservation_units",
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
     )
     origin_hauki_resource: OriginHaukiResource | None = models.ForeignKey(
         "tilavarauspalvelu.OriginHaukiResource",
@@ -150,51 +148,51 @@ class ReservationUnit(models.Model):
     reservation_unit_type: ReservationUnitType | None = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnitType",
         related_name="reservation_units",
+        on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        on_delete=models.SET_NULL,
     )
     cancellation_rule: ReservationUnitCancellationRule | None = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnitCancellationRule",
         related_name="reservation_units",
+        on_delete=models.PROTECT,
         blank=True,
         null=True,
-        on_delete=models.PROTECT,
     )
     metadata_set: ReservationMetadataSet | None = models.ForeignKey(
         "tilavarauspalvelu.ReservationMetadataSet",
         related_name="reservation_units",
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
     )
     cancellation_terms: TermsOfUse | None = models.ForeignKey(
         "tilavarauspalvelu.TermsOfUse",
         related_name="cancellation_terms_reservation_units",
+        on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        on_delete=models.SET_NULL,
     )
     service_specific_terms: TermsOfUse | None = models.ForeignKey(
         "tilavarauspalvelu.TermsOfUse",
         related_name="service_specific_terms_reservation_units",
+        on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        on_delete=models.SET_NULL,
     )
     pricing_terms: TermsOfUse | None = models.ForeignKey(
         "tilavarauspalvelu.TermsOfUse",
         related_name="pricing_terms_reservation_units",
+        on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        on_delete=models.SET_NULL,
     )
     payment_terms: TermsOfUse | None = models.ForeignKey(
         "tilavarauspalvelu.TermsOfUse",
         related_name="payment_terms_reservation_units",
+        on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        on_delete=models.SET_NULL,
     )
     payment_product: PaymentProduct | None = models.ForeignKey(
         "tilavarauspalvelu.PaymentProduct",
