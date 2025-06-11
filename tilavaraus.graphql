@@ -1694,13 +1694,13 @@ type UnitRoleNode implements Node {
 
 type ReservationSeriesNode implements Node {
   extUuid: UUID!
+  createdAt: DateTime!
   name: String!
   description: String!
-  createdAt: DateTime!
-  beginDate: Date
-  beginTime: Time
-  endDate: Date
-  endTime: Time
+  beginDate: Date!
+  beginTime: Time!
+  endDate: Date!
+  endTime: Time!
   recurrenceInDays: Int
   weekdays: [Int!]!
   reservationUnit: ReservationUnitNode!
