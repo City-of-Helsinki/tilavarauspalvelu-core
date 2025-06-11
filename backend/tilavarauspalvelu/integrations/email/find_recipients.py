@@ -56,8 +56,7 @@ def get_reservation_email_recipients(reservation: Reservation) -> list[str]:
     if reservation.reservee_email:
         recipients.add(reservation.reservee_email.lower())
 
-    reservation_user_email = getattr(reservation.user, "email", None)
-    if reservation_user_email:
+    if reservation.user.email:
         recipients.add(reservation.user.email.lower())
 
     return list(recipients)
@@ -112,8 +111,7 @@ def get_reservation_staff_notification_recipients_by_language(
     ).exclude(email="")
 
     # Skip the reservation creator
-    if reservation.user:
-        users = users.exclude(pk=reservation.user.pk)
+    users = users.exclude(pk=reservation.user.pk)
 
     units = (
         Unit.objects.filter(reservation_units__in=[reservation.reservation_unit])
