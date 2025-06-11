@@ -39,7 +39,7 @@ def get_series_email_recipients(series: ReservationSeries) -> list[str]:
     """Get email notification recipients for the given series."""
     recipients: set[str] = set()
 
-    if series.user is not None and series.user.email:
+    if series.user.email:
         recipients.add(series.user.email.lower())
 
     if series.allocated_time_slot is not None:
