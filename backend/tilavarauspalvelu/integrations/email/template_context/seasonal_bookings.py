@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Annotated, Unpack
 
 from django.utils.translation import pgettext
 
-from tilavarauspalvelu.enums import ReservationCancelReasonChoice, ReservationStateChoice
+from tilavarauspalvelu.enums import ReservationCancelReasonChoice, ReservationStateChoice, Weekday
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from utils.date_utils import local_time_string
 
@@ -319,7 +319,7 @@ def get_context_for_seasonal_booking_denied_series(
         data["application_section_id"] = section.pk
         data["application_section_name"] = section.name
         data["application_round_name"] = get_attr_by_language(application_round, "name", language=language)
-        data["weekday_value"] = ", ".join(str(weekday.label) for weekday in series.actions.get_weekdays())
+        data["weekday_value"] = ", ".join(str(Weekday(weekday).label) for weekday in series.weekdays)
         data["time_value"] = f"{begin_time}-{end_time}"
         data["reservation_unit_name"] = get_attr_by_language(reservation_unit, "name", language)
         data["unit_name"] = get_attr_by_language(unit, "name", language)
@@ -408,7 +408,7 @@ def get_context_for_seasonal_booking_rescheduled_series(
         data["application_section_id"] = section.pk
         data["application_section_name"] = section.name
         data["application_round_name"] = get_attr_by_language(application_round, "name", language)
-        data["weekday_value"] = ", ".join(str(weekday.label) for weekday in series.actions.get_weekdays())
+        data["weekday_value"] = ", ".join(str(Weekday(weekday).label) for weekday in series.weekdays)
         data["time_value"] = f"{begin_time}-{end_time}"
         data["reservation_unit_name"] = get_attr_by_language(reservation_unit, "name", language)
         data["unit_name"] = get_attr_by_language(unit, "name", language)

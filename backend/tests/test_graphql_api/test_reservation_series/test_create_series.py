@@ -11,6 +11,7 @@ from tilavarauspalvelu.enums import (
     ReservationStateChoice,
     ReservationTypeChoice,
     ReservationTypeStaffChoice,
+    Weekday,
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
@@ -54,7 +55,7 @@ def test_reservation_series__create_series(graphql):
     reservation_series = ReservationSeries.objects.get(pk=response.first_query_object["pk"])
     assert reservation_series.name == "foo"
     assert reservation_series.description == "bar"
-    assert reservation_series.weekdays == "0"
+    assert reservation_series.weekdays == [Weekday.MONDAY]
     assert reservation_series.begin_date == datetime.date(2024, 1, 1)
     assert reservation_series.end_date == datetime.date(2024, 1, 2)
     assert reservation_series.begin_time == datetime.time(10, 0, 0)
@@ -212,7 +213,7 @@ def test_reservation_series__create_series__multiple_weekdays(graphql):
     user = graphql.login_with_superuser()
 
     end = datetime.date(2024, 1, 7).isoformat()
-    weekdays = [0, 2, 4]  # Mon, Wed, Fri
+    weekdays = [Weekday.MONDAY.value, Weekday.WEDNESDAY.value, Weekday.FRIDAY.value]
     data = get_minimal_series_data(reservation_unit, user, endDate=end, weekdays=weekdays)
     response = graphql(CREATE_SERIES_MUTATION, input_data=data)
 
@@ -552,7 +553,7 @@ def test_reservation_series__create_series__overlapping_reservations(graphql):
     data = get_minimal_series_data(
         reservation_unit,
         user,
-        weekdays=[start.weekday()],
+        weekdays=[Weekday.from_week_day(start.weekday())],
         beginDate=start.isoformat(),
         endDate=end.isoformat(),
     )
