@@ -91,9 +91,9 @@ def test_get_reservation_email_recipients__no_reservee_email():
     assert sorted(result) == ["user@example.com"]
 
 
-def test_get_reservation_email_recipients__no_user():
+def test_get_reservation_email_recipients__no_user_email():
     reservation = ReservationFactory.create(
-        user=None,
+        user__email="",
         reservee_email="reservee@example.com",
     )
 
@@ -101,9 +101,9 @@ def test_get_reservation_email_recipients__no_user():
     assert result == ["reservee@example.com"]
 
 
-def test_get_reservation_email_recipients__no_reservee_email_or_user():
+def test_get_reservation_email_recipients__no_reservee_email_or_user_email():
     reservation = ReservationFactory.create(
-        user=None,
+        user__email="",
         reservee_email="",
     )
 

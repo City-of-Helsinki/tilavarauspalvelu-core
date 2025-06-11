@@ -140,7 +140,7 @@ class ReservationStatistic(models.Model):
 
         requires_org_name = reservation.reservee_type != CustomerTypeChoice.INDIVIDUAL
         requires_org_id = not reservation.reservee_is_unregistered_association and requires_org_name
-        by_profile_user = bool(getattr(reservation.user, "profile_id", ""))
+        by_profile_user = bool(reservation.user.profile_id)
         begin = reservation.begins_at.astimezone(DEFAULT_TIMEZONE)
         end = reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
         duration = end - begin
