@@ -37,12 +37,10 @@ class Space(MPTTModel):
         null=True,
         blank=True,
     )
-    unit: Unit | None = models.ForeignKey(
+    unit: Unit = models.ForeignKey(
         "tilavarauspalvelu.Unit",
         related_name="spaces",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
+        on_delete=models.PROTECT,
     )
 
     # MPTT field hints
