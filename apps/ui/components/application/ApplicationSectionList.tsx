@@ -25,6 +25,7 @@ import type { StatusLabelType } from "common/src/tags";
 import { NoWrap } from "common/styled";
 import {
   convertLanguageCode,
+  formatDurationRange,
   getTranslationSafe,
   toUIDate,
 } from "common/src/common/util";
@@ -38,7 +39,6 @@ import {
   RegularText,
 } from "./styled";
 import { SuitableTimeRangeFormValues } from "./funnel/form";
-import { formatDurationRange } from "@/modules/util";
 
 function ageGroupToString(ag: Maybe<AgeGroupNode> | undefined): string {
   if (!ag) {

@@ -9,7 +9,7 @@ import {
 } from "@gql/gql-types";
 import { filterNonNullable, timeToMinutes } from "common/src/helpers";
 import { H5, Strong, Flex, SemiBold, fontMedium } from "common/styled";
-import { formatDuration } from "@/common/util";
+import { formatDuration } from "common/src/common/util";
 import { Accordion } from "@/component/Accordion";
 import {
   formatTimeRangeList,
@@ -239,10 +239,10 @@ export function SuitableTimeCard({
   const isDisabled = !reservationUnitOptionPk || !isAllocationEnabled;
 
   // Time interval checks
-  const selectionDurationMins = selection.length * 30;
+  const selectionMins = selection.length * 30;
   const minDurationSeconds = applicationSection.reservationMinDuration ?? 0;
   const maxDurationSeconds = applicationSection.reservationMaxDuration ?? 0;
-  const selectionDurationString = formatDuration(selectionDurationMins, t);
+  const selectionDurationString = formatDuration(t, { minutes: selectionMins });
   // TODO this should be cleaner, only pass things we need here
   // TODO should not default to empty string (unless this is designed zero by default)
   const firstSelected = selection[0] ?? "";
@@ -250,8 +250,8 @@ export function SuitableTimeCard({
   const selectionBegin = decodeTimeSlot(firstSelected);
   const selectionEnd = decodeTimeSlot(lastSelected);
   // Duration checks
-  const isTooShort = selectionDurationMins < minDurationSeconds / 60;
-  const isTooLong = selectionDurationMins > maxDurationSeconds / 60;
+  const isTooShort = selectionMins < minDurationSeconds / 60;
+  const isTooLong = selectionMins > maxDurationSeconds / 60;
   const durationIsInvalid = isTooShort || isTooLong;
 
   const isTimeMismatch = isOutsideOfRequestedTimes(
