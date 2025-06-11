@@ -421,13 +421,13 @@ def test_seasonal_booking_access_code_changed__send_email__no_reservations(outbo
 def test_seasonal_booking_access_code_changed__send_email__no_recipients(outbox):
     application_round = ApplicationRoundFactory.create_in_status_results_sent()
     application = ApplicationFactory.create(
-        user=None,
+        user__email="",
         contact_person_email=None,
         sent_at=local_datetime(),
         application_round=application_round,
     )
     reservation_series = create_reservation_series(
-        user=None,
+        user__email="",
         reservations__type=ReservationTypeChoice.SEASONAL,
         allocated_time_slot__day_of_the_week=Weekday.MONDAY,
         allocated_time_slot__reservation_unit_option__application_section__application=application,

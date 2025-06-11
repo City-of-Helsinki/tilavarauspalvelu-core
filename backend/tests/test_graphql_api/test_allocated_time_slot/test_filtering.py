@@ -327,7 +327,8 @@ def test_application__filter__by_text_search__section_id(graphql):
         reservation_unit_option__application_section__application__organisation_name="",
         reservation_unit_option__application_section__application__contact_person_first_name="",
         reservation_unit_option__application_section__application__contact_person_last_name="",
-        reservation_unit_option__application_section__application__user=None,
+        reservation_unit_option__application_section__application__user__first_name="",
+        reservation_unit_option__application_section__application__user__last_name="",
         reservation_unit_option__application_section__application__id=1,
         reservation_unit_option__application_section__name="foo",
         reservation_unit_option__application_section__id=2,
@@ -336,7 +337,8 @@ def test_application__filter__by_text_search__section_id(graphql):
         reservation_unit_option__application_section__application__organisation_name="",
         reservation_unit_option__application_section__application__contact_person_first_name="",
         reservation_unit_option__application_section__application__contact_person_last_name="",
-        reservation_unit_option__application_section__application__user=None,
+        reservation_unit_option__application_section__application__user__first_name="",
+        reservation_unit_option__application_section__application__user__last_name="",
         reservation_unit_option__application_section__application__id=3,
         reservation_unit_option__application_section__name="bar",
         reservation_unit_option__application_section__id=4,
@@ -364,14 +366,16 @@ def test_application__filter__by_text_search__section_name(graphql):
         reservation_unit_option__application_section__application__organisation_name="",
         reservation_unit_option__application_section__application__contact_person_first_name="",
         reservation_unit_option__application_section__application__contact_person_last_name="",
-        reservation_unit_option__application_section__application__user=None,
+        reservation_unit_option__application_section__application__user__first_name="",
+        reservation_unit_option__application_section__application__user__last_name="",
         reservation_unit_option__application_section__name="foo",
     )
     AllocatedTimeSlotFactory.create(
         reservation_unit_option__application_section__application__organisation_name="",
         reservation_unit_option__application_section__application__contact_person_first_name="",
         reservation_unit_option__application_section__application__contact_person_last_name="",
-        reservation_unit_option__application_section__application__user=None,
+        reservation_unit_option__application_section__application__user__first_name="",
+        reservation_unit_option__application_section__application__user__last_name="",
         reservation_unit_option__application_section__name="bar",
     )
     graphql.login_with_superuser()
@@ -398,7 +402,8 @@ def test_application__filter__by_text_search__application_id(graphql):
         reservation_unit_option__application_section__application__organisation_name="",
         reservation_unit_option__application_section__application__contact_person_first_name="",
         reservation_unit_option__application_section__application__contact_person_last_name="",
-        reservation_unit_option__application_section__application__user=None,
+        reservation_unit_option__application_section__application__user__first_name="",
+        reservation_unit_option__application_section__application__user__last_name="",
         reservation_unit_option__application_section__id=3,
         reservation_unit_option__application_section__name="foo",
     )
@@ -407,7 +412,8 @@ def test_application__filter__by_text_search__application_id(graphql):
         reservation_unit_option__application_section__application__organisation_name="",
         reservation_unit_option__application_section__application__contact_person_first_name="",
         reservation_unit_option__application_section__application__contact_person_last_name="",
-        reservation_unit_option__application_section__application__user=None,
+        reservation_unit_option__application_section__application__user__first_name="",
+        reservation_unit_option__application_section__application__user__last_name="",
         reservation_unit_option__application_section__id=4,
         reservation_unit_option__application_section__name="bar",
     )
@@ -435,14 +441,16 @@ def test_application__filter__by_text_search__applicant__organisation_name(graph
         reservation_unit_option__application_section__application__organisation_name="foo",
         reservation_unit_option__application_section__application__contact_person_first_name="",
         reservation_unit_option__application_section__application__contact_person_last_name="",
-        reservation_unit_option__application_section__application__user=None,
+        reservation_unit_option__application_section__application__user__first_name="",
+        reservation_unit_option__application_section__application__user__last_name="",
         reservation_unit_option__application_section__name=".",
     )
     AllocatedTimeSlotFactory.create(
         reservation_unit_option__application_section__application__organisation_name="bar",
         reservation_unit_option__application_section__application__contact_person_first_name="",
         reservation_unit_option__application_section__application__contact_person_last_name="",
-        reservation_unit_option__application_section__application__user=None,
+        reservation_unit_option__application_section__application__user__first_name="",
+        reservation_unit_option__application_section__application__user__last_name="",
         reservation_unit_option__application_section__name=".",
     )
     graphql.login_with_superuser()
@@ -468,14 +476,16 @@ def test_application__filter__by_text_search__applicant__contact_person_first_na
         reservation_unit_option__application_section__application__organisation_name="",
         reservation_unit_option__application_section__application__contact_person_first_name="foo",
         reservation_unit_option__application_section__application__contact_person_last_name="none",
-        reservation_unit_option__application_section__application__user=None,
+        reservation_unit_option__application_section__application__user__first_name="",
+        reservation_unit_option__application_section__application__user__last_name="",
         reservation_unit_option__application_section__name=".",
     )
     AllocatedTimeSlotFactory.create(
         reservation_unit_option__application_section__application__organisation_name="",
         reservation_unit_option__application_section__application__contact_person_first_name="bar",
         reservation_unit_option__application_section__application__contact_person_last_name="none",
-        reservation_unit_option__application_section__application__user=None,
+        reservation_unit_option__application_section__application__user__first_name="",
+        reservation_unit_option__application_section__application__user__last_name="",
         reservation_unit_option__application_section__name=".",
     )
     graphql.login_with_superuser()
@@ -501,14 +511,16 @@ def test_application__filter__by_text_search__applicant__contact_person_last_nam
         reservation_unit_option__application_section__application__organisation_name="",
         reservation_unit_option__application_section__application__contact_person_first_name="none",
         reservation_unit_option__application_section__application__contact_person_last_name="foo",
-        reservation_unit_option__application_section__application__user=None,
+        reservation_unit_option__application_section__application__user__first_name="",
+        reservation_unit_option__application_section__application__user__last_name="",
         reservation_unit_option__application_section__name=".",
     )
     AllocatedTimeSlotFactory.create(
         reservation_unit_option__application_section__application__organisation_name="",
         reservation_unit_option__application_section__application__contact_person_first_name="none",
         reservation_unit_option__application_section__application__contact_person_last_name="bar",
-        reservation_unit_option__application_section__application__user=None,
+        reservation_unit_option__application_section__application__user__first_name="",
+        reservation_unit_option__application_section__application__user__last_name="",
         reservation_unit_option__application_section__name=".",
     )
     graphql.login_with_superuser()
@@ -604,14 +616,16 @@ def test_application__filter__by_text_search__not_found(graphql):
         reservation_unit_option__application_section__application__organisation_name="",
         reservation_unit_option__application_section__application__contact_person_first_name="",
         reservation_unit_option__application_section__application__contact_person_last_name="",
-        reservation_unit_option__application_section__application__user=None,
+        reservation_unit_option__application_section__application__user__first_name="",
+        reservation_unit_option__application_section__application__user__last_name="",
         reservation_unit_option__application_section__name="foo",
     )
     AllocatedTimeSlotFactory.create(
         reservation_unit_option__application_section__application__organisation_name="",
         reservation_unit_option__application_section__application__contact_person_first_name="",
         reservation_unit_option__application_section__application__contact_person_last_name="",
-        reservation_unit_option__application_section__application__user=None,
+        reservation_unit_option__application_section__application__user__first_name="",
+        reservation_unit_option__application_section__application__user__last_name="",
         reservation_unit_option__application_section__name="bar",
     )
     graphql.login_with_superuser()
