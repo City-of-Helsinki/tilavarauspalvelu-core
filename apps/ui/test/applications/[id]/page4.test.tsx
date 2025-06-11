@@ -2,8 +2,8 @@ import { type TermsOfUseFieldsFragment, TermsType } from "@/gql/gql-types";
 import Page4 from "@/pages/applications/[id]/page4";
 import { render, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
+import { createGraphQLMocks } from "@test/gql.mocks";
 import {
-  createGraphQLMocks,
   type CreateMockApplicationFragmentProps,
   createMockApplicationViewFragment,
 } from "@test/application.mocks";
