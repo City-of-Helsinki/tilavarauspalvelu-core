@@ -3,18 +3,12 @@ from __future__ import annotations
 import datetime
 import re
 import zoneinfo
-from typing import NamedTuple
+from typing import TYPE_CHECKING, NamedTuple
 
 import freezegun
 import pytest
 from graphene_django_extensions.testing import parametrize_helper
 
-from config.utils.date_util import (
-    InvalidWeekdayError,
-    localized_short_weekday,
-    next_or_current_matching_weekday,
-    previous_or_current_matching_weekday,
-)
 from utils.date_utils import (
     DEFAULT_TIMEZONE,
     combine,
@@ -28,6 +22,7 @@ from utils.date_utils import (
     local_time,
     local_time_max,
     local_time_min,
+    localized_short_weekday,
     utc_date,
     utc_datetime,
     utc_datetime_max,
@@ -37,43 +32,12 @@ from utils.date_utils import (
     utc_time_min,
 )
 
-
-def test_should_return_next_tuesday():
-    next_tuesday = next_or_current_matching_weekday(datetime.date(year=2020, month=1, day=1), 1)
-    assert next_tuesday == datetime.date(year=2020, month=1, day=7)
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import Lang
 
 
-def test_next_should_return_current_date_if_weekday_matches():
-    next_tuesday = next_or_current_matching_weekday(datetime.date(year=2020, month=1, day=7), 1)
-    assert next_tuesday == datetime.date(year=2020, month=1, day=7)
-
-
-def test_should_return_previous_tuesday():
-    next_tuesday = previous_or_current_matching_weekday(datetime.date(year=2020, month=2, day=28), 1)
-    assert next_tuesday == datetime.date(year=2020, month=2, day=25)
-
-
-def test_previous_should_return_current_date_if_weekday_matches():
-    next_tuesday = previous_or_current_matching_weekday(datetime.date(year=2020, month=2, day=25), 1)
-    assert next_tuesday == datetime.date(year=2020, month=2, day=25)
-
-
-def test_next_match_should_validate_weekday():
-    with pytest.raises(InvalidWeekdayError):
-        next_or_current_matching_weekday(datetime.date(year=2020, month=1, day=1), 7)
-    with pytest.raises(InvalidWeekdayError):
-        next_or_current_matching_weekday(datetime.date(year=2020, month=1, day=1), -1)
-
-
-def test_previous_match_should_validate_weekday():
-    with pytest.raises(InvalidWeekdayError):
-        previous_or_current_matching_weekday(datetime.date(year=2020, month=1, day=1), 7)
-    with pytest.raises(InvalidWeekdayError):
-        previous_or_current_matching_weekday(datetime.date(year=2020, month=1, day=1), -1)
-
-
-def test_localized_short_weekday_fi():
-    lang_code = "fi"
+def test_localized_short_weekday_fi() -> None:
+    lang_code: Lang = "fi"
     assert localized_short_weekday(0, lang_code) == "Ma"
     assert localized_short_weekday(1, lang_code) == "Ti"
     assert localized_short_weekday(2, lang_code) == "Ke"
@@ -83,8 +47,8 @@ def test_localized_short_weekday_fi():
     assert localized_short_weekday(6, lang_code) == "Su"
 
 
-def test_localized_short_weekday_sv():
-    lang_code = "sv"
+def test_localized_short_weekday_sv() -> None:
+    lang_code: Lang = "sv"
     assert localized_short_weekday(0, lang_code) == "Må"
     assert localized_short_weekday(1, lang_code) == "Ti"
     assert localized_short_weekday(2, lang_code) == "On"
@@ -94,8 +58,8 @@ def test_localized_short_weekday_sv():
     assert localized_short_weekday(6, lang_code) == "Sö"
 
 
-def test_localized_short_weekday_en():
-    lang_code = "en"
+def test_localized_short_weekday_en() -> None:
+    lang_code: Lang = "en"
     assert localized_short_weekday(0, lang_code) == "Mo"
     assert localized_short_weekday(1, lang_code) == "Tu"
     assert localized_short_weekday(2, lang_code) == "We"

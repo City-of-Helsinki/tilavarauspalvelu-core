@@ -16,7 +16,7 @@ from tilavarauspalvelu.enums import (
     ReservationKind,
     ReservationStateChoice,
     ReservationTypeChoice,
-    WeekdayChoice,
+    Weekday,
 )
 from tilavarauspalvelu.models import (
     PaymentOrder,
@@ -675,7 +675,7 @@ def _create_reservation_series(
 
     _create_past_reservation_series(
         name="Viime kauden futistreenit",
-        weekdays=[WeekdayChoice.MONDAY],
+        weekdays=[Weekday.MONDAY],
         reservation_unit=reservation_unit,
         user=user,
         reservation_purposes=reservation_purposes,
@@ -684,7 +684,7 @@ def _create_reservation_series(
 
     _create_future_reservation_series(
         name="Tulevan kauden futistreenit",
-        weekdays=[WeekdayChoice.MONDAY],
+        weekdays=[Weekday.MONDAY],
         reservation_unit=reservation_unit,
         user=user,
         reservation_purposes=reservation_purposes,
@@ -693,7 +693,7 @@ def _create_reservation_series(
 
     _create_ongoing_reservation_series(
         name="Aikuisten treenit kaksi kertaa viikossa",
-        weekdays=[WeekdayChoice.WEDNESDAY, WeekdayChoice.FRIDAY],
+        weekdays=[Weekday.WEDNESDAY, Weekday.FRIDAY],
         reservation_unit=reservation_unit,
         user=user,
         reservation_purposes=reservation_purposes,
@@ -702,7 +702,7 @@ def _create_reservation_series(
 
     _create_ongoing_reservation_series(
         name="Ajoittaiset viikonloppupelit",
-        weekdays=[WeekdayChoice.SATURDAY],
+        weekdays=[Weekday.SATURDAY],
         reservation_unit=reservation_unit,
         user=user,
         reservation_purposes=reservation_purposes,
@@ -716,7 +716,7 @@ def _create_reservation_series(
 @with_logs
 def _create_past_reservation_series(
     name: str,
-    weekdays: list[WeekdayChoice],
+    weekdays: list[Weekday],
     reservation_unit: ReservationUnit,
     user: User,
     reservation_purposes: list[ReservationPurpose],
@@ -738,7 +738,7 @@ def _create_past_reservation_series(
         end_time=datetime.time(hour=11, minute=0),
         begin_time=datetime.time(hour=9, minute=0),
         #
-        weekdays=",".join(str(day.value) for day in weekdays),
+        weekdays=weekdays,
         reservation_unit=reservation_unit,
         user=user,
         age_group=age_group,
@@ -756,7 +756,7 @@ def _create_past_reservation_series(
 @with_logs
 def _create_future_reservation_series(
     name: str,
-    weekdays: list[WeekdayChoice],
+    weekdays: list[Weekday],
     reservation_unit: ReservationUnit,
     user: User,
     reservation_purposes: list[ReservationPurpose],
@@ -778,7 +778,7 @@ def _create_future_reservation_series(
         begin_time=datetime.time(hour=8, minute=0),
         end_time=datetime.time(hour=10, minute=0),
         #
-        weekdays=",".join(str(day.value) for day in weekdays),
+        weekdays=weekdays,
         reservation_unit=reservation_unit,
         user=user,
         age_group=age_group,
@@ -796,7 +796,7 @@ def _create_future_reservation_series(
 @with_logs
 def _create_ongoing_reservation_series(
     name: str,
-    weekdays: list[WeekdayChoice],
+    weekdays: list[Weekday],
     reservation_unit: ReservationUnit,
     user: User,
     reservation_purposes: list[ReservationPurpose],
@@ -818,7 +818,7 @@ def _create_ongoing_reservation_series(
         begin_time=datetime.time(hour=14, minute=0),
         end_time=datetime.time(hour=16, minute=0),
         #
-        weekdays=",".join(str(day.value) for day in weekdays),
+        weekdays=weekdays,
         reservation_unit=reservation_unit,
         user=user,
         age_group=age_group,
@@ -845,7 +845,7 @@ def _create_reservations_for_series(
     pricing: ReservationUnitPricing | None = series.reservation_unit.pricings.active().first()
     assert pricing is not None, "Reservation unit must have at least one pricing"
 
-    weekdays = series.actions.get_weekdays()
+    weekdays: list[Weekday] = [Weekday(weekday) for weekday in series.weekdays]
 
     reservations: list[Reservation] = []
     occurrences: list[RejectedOccurrence] = []

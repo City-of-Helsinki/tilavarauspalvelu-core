@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 import pytest
 from freezegun import freeze_time
 
-from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, Weekday, WeekdayChoice
+from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.keyless_entry.service import PindoraService
@@ -166,16 +166,14 @@ def test_reservation_series__reschedule_series__change_begin_date__reservations_
 def test_reservation_series__reschedule_series__change_weekdays(graphql):
     reservation_series = create_reservation_series()
 
-    data = get_minimal_reschedule_data(reservation_series, weekdays=[WeekdayChoice.TUESDAY])
+    data = get_minimal_reschedule_data(reservation_series, weekdays=[Weekday.TUESDAY.value])
 
     graphql.login_with_superuser()
     response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
-    # Series repeat on Tuesdays.
     reservation_series.refresh_from_db()
-    reservation_series.weekdays = f"{WeekdayChoice.TUESDAY}"
 
     reservations = list(reservation_series.reservations.order_by("begins_at").all())
     assert len(reservations) == 9
@@ -199,8 +197,7 @@ def test_reservation_series__reschedule_series__change_weekdays__invalid_weekday
     graphql.login_with_superuser()
     response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages("weekdays") == ["Invalid weekday: 8."]
+    assert response.has_schema_errors
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
@@ -326,7 +323,7 @@ def test_reservation_series__reschedule_series__dont_remove_unconfirmed_reservat
     reservation.state = state
     reservation.save()
 
-    data = get_minimal_reschedule_data(reservation_series, weekdays=[WeekdayChoice.TUESDAY])
+    data = get_minimal_reschedule_data(reservation_series, weekdays=[Weekday.TUESDAY.value])
 
     graphql.login_with_superuser()
     response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
@@ -353,7 +350,7 @@ def test_reservation_series__reschedule_series__details_from_reservation__use_ne
     reservation.name = "bar"
     reservation.save()
 
-    data = get_minimal_reschedule_data(reservation_series, weekdays=[WeekdayChoice.TUESDAY])
+    data = get_minimal_reschedule_data(reservation_series, weekdays=[Weekday.TUESDAY.value])
 
     graphql.login_with_superuser()
     response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
@@ -392,7 +389,7 @@ def test_reservation_series__reschedule_series__details_from_reservation__next_i
     reservation.name = "baz"
     reservation.save()
 
-    data = get_minimal_reschedule_data(reservation_series, weekdays=[WeekdayChoice.TUESDAY])
+    data = get_minimal_reschedule_data(reservation_series, weekdays=[Weekday.TUESDAY.value])
 
     graphql.login_with_superuser()
     response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)

@@ -447,12 +447,15 @@ def get_section_allocation(*, section: ApplicationSection) -> list[dict[str, Any
     return _compile_allocations_map(allocations_map)
 
 
-def _initialize_allocations_map(section: ApplicationSection) -> defaultdict[int, dict[Weekday, dict[str, str]]]:
+type AllocationsMap = defaultdict[int, dict[Weekday, dict[str, str]]]
+
+
+def _initialize_allocations_map(section: ApplicationSection) -> AllocationsMap:
     """
     Initializes a map of allocation data for a given series.
     Map can be compiled with `_compile_allocations_map` missing values have been filled in.
     """
-    allocations_map: defaultdict[int, dict[Weekday, dict[str, str]]] = defaultdict(dict)
+    allocations_map: AllocationsMap = defaultdict(dict)
 
     series: ReservationSeries
     for series in section.actions.get_reservation_series():
@@ -462,8 +465,8 @@ def _initialize_allocations_map(section: ApplicationSection) -> defaultdict[int,
         reservation = series.reservations.last()
         reservation_unit = series.reservation_unit
 
-        for weekday in series.actions.get_weekdays():
-            allocations_map[series.id][weekday] = {
+        for weekday in series.weekdays:
+            allocations_map[series.id][Weekday(weekday)] = {
                 "time_value": f"{begin_time}-{end_time}",
                 "access_code_validity_period": "",  # Can be filled in later if access codes are used
                 "series_url": get_staff_reservations_ext_link(reservation_id=reservation.pk),
@@ -475,7 +478,7 @@ def _initialize_allocations_map(section: ApplicationSection) -> defaultdict[int,
     return allocations_map
 
 
-def _compile_allocations_map(allocations_map: defaultdict[int, dict[Weekday, dict[str, str]]]) -> list[dict[str, Any]]:
+def _compile_allocations_map(allocations_map: AllocationsMap) -> list[dict[str, Any]]:
     """Complies the allocation map created with `_initialize_allocations_map`."""
     return [
         {

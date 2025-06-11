@@ -78,7 +78,7 @@ def test_reservation_series__query(graphql):
         "beginTime": reservation_series.begin_time.isoformat(),
         "endTime": reservation_series.end_time.isoformat(),
         "recurrenceInDays": reservation_series.recurrence_in_days,
-        "weekdays": [0],
+        "weekdays": [Weekday.MONDAY.value],
         "createdAt": reservation_series.created_at.isoformat(),
         "shouldHaveActiveAccessCode": False,
         "accessType": AccessType.UNRESTRICTED.value,

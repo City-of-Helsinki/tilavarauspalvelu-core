@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any
+from typing import Any, Literal
 
 from factory import LazyAttribute, fuzzy
 
-from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice, WeekdayChoice
+from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice, Weekday
 from tilavarauspalvelu.models import Reservation, ReservationSeries
 from utils.date_utils import DEFAULT_TIMEZONE, get_periods_between, local_datetime
 
@@ -30,7 +30,7 @@ class ReservationSeriesFactory(GenericDjangoModelFactory[ReservationSeries]):
     name = FakerFI("word")
     description = FakerFI("sentence")
     recurrence_in_days = 7
-    weekdays = str(WeekdayChoice.MONDAY)
+    weekdays = [Weekday.MONDAY.value]
 
     begin = fuzzy.FuzzyDateTime(start_dt=local_datetime(2023, 1, 1))
     end = LazyAttribute(lambda r: r.begin + datetime.timedelta(days=30, hours=1))
@@ -66,14 +66,16 @@ class ReservationSeriesFactory(GenericDjangoModelFactory[ReservationSeries]):
         space = SpaceFactory.create(unit=series.reservation_unit.unit)
         series.reservation_unit.spaces.add(space)
 
-        weekdays = [weekday.as_weekday_number for weekday in series.actions.get_weekdays()]
+        weekdays: list[Weekday] = [Weekday(weekday) for weekday in series.weekdays]
         if not weekdays:
-            weekdays = [series.begin_date.weekday()]
+            weekday_number: Literal[0, 1, 2, 3, 4, 5, 6] = series.begin_date.weekday()  # type: ignore[assignment]
+            weekdays = [Weekday.from_week_day(weekday_number)]
 
         reservations: list[Reservation] = []
 
+        weekday: Weekday
         for weekday in weekdays:
-            delta: int = weekday - series.begin_date.weekday()
+            delta: int = weekday.as_weekday_number - series.begin_date.weekday()
             if delta < 0:
                 delta += 7
 
