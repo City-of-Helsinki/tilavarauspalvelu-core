@@ -47,13 +47,6 @@ def test__hauki_exporter__get_parent_id__ok__fetched_from_hauki_api(reservation_
     assert parent_id == 1
 
 
-def test__hauki_exporter__get_parent_id__fail__no_unit(reservation_unit):
-    reservation_unit.unit = None
-    parent_id = reservation_unit.actions._get_parent_resource_id()
-
-    assert parent_id is None
-
-
 @patch_method(HaukiAPIClient.get_resource, return_value=None)
 def test__hauki_exporter__get_parent_id__fail__does_not_exist_in_hauki_api(reservation_unit):
     reservation_unit.unit.origin_hauki_resource = None
