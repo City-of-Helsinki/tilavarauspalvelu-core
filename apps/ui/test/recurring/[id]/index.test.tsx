@@ -1,9 +1,7 @@
 import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
-import {
-  createGraphQLMocks,
-  createMockApplicationRound,
-} from "@test/application.mocks";
+import { createGraphQLMocks } from "@test/gql.mocks";
+import { createMockApplicationRound } from "@test/application.mocks";
 import {
   type CreateGraphQLMockProps,
   createOptionMock,

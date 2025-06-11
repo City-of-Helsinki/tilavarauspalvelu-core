@@ -2,8 +2,8 @@ import { type ApplicationPage2Query } from "@/gql/gql-types";
 import Page2 from "@/pages/applications/[id]/page2";
 import { render } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
+import { createGraphQLMocks } from "@test/gql.mocks";
 import {
-  createGraphQLMocks,
   createMockApplicationFragment,
   type CreateMockApplicationFragmentProps,
 } from "@test/application.mocks";
