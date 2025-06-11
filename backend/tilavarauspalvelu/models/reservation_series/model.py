@@ -33,15 +33,18 @@ __all__ = [
 
 
 class ReservationSeries(models.Model):
+    """Defines a series of reservations that are created using given recurrence rules."""
+
     ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
-    name: str = models.CharField(max_length=255, blank=True, default="")
-    description: str = models.CharField(max_length=500, blank=True, default="")
     created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
 
-    begin_date: datetime.date | None = models.DateField(null=True)
-    begin_time: datetime.time | None = models.TimeField(null=True)
-    end_date: datetime.date | None = models.DateField(null=True)
-    end_time: datetime.time | None = models.TimeField(null=True)
+    name: str = models.CharField(max_length=255, blank=True, default="")
+    description: str = models.CharField(max_length=500, blank=True, default="")
+
+    begin_date: datetime.date = models.DateField()
+    begin_time: datetime.time = models.TimeField()
+    end_date: datetime.date = models.DateField()
+    end_time: datetime.time = models.TimeField()
 
     recurrence_in_days: int | None = models.PositiveIntegerField(null=True, blank=True)
 
