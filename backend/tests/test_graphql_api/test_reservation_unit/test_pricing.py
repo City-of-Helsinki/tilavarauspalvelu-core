@@ -91,11 +91,16 @@ def test_reservation_unit__create__pricing__is_required_for_non_drafts(graphql):
 
 
 def test_reservation_unit__create__pricing__free_pricing_doesnt_require_price_information(graphql):
-    TaxPercentageFactory.create(value=Decimal("0.0"))
+    tax_percentage = TaxPercentageFactory.create(value=Decimal("0.0"))
 
     graphql.login_with_superuser()
     data = get_create_draft_input_data(
-        pricings=[{"begins": local_date().isoformat()}],
+        pricings=[
+            {
+                "begins": local_date().isoformat(),
+                "taxPercentage": tax_percentage.id,
+            },
+        ],
     )
     response = graphql(CREATE_MUTATION, input_data=data)
 
