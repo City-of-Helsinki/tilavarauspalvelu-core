@@ -16,7 +16,7 @@ from tilavarauspalvelu.enums import (
     ReservationStartInterval,
     ReservationStateChoice,
     ReservationTypeStaffChoice,
-    WeekdayChoice,
+    Weekday,
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -109,7 +109,11 @@ class ReservationSeriesCreateSerializer(NestingModelSerializer):
 
     instance: None
 
-    weekdays = serializers.ListField(child=serializers.IntegerField(), allow_empty=False, required=True)
+    weekdays = serializers.ListField(
+        child=EnumFriendlyChoiceField(choices=Weekday.choices, enum=Weekday, required=False),
+        allow_empty=False,
+        required=True,
+    )
     user = serializers.HiddenField(default=CurrentUserDefaultNullable())
 
     reservation_details = ReservationSeriesReservationCreateSerializer(
@@ -174,15 +178,6 @@ class ReservationSeriesCreateSerializer(NestingModelSerializer):
         )
 
         return data
-
-    def validate_weekdays(self, weekdays: list[int]) -> str:
-        weekdays = list(set(weekdays))
-        for weekday in weekdays:
-            if weekday not in WeekdayChoice.values:
-                msg = f"Invalid weekday: {weekday}."
-                raise ValidationError(msg, code=error_codes.RESERVATION_SERIES_INVALID_WEEKDAY)
-
-        return ",".join(str(day) for day in weekdays)
 
     def validate_recurrence_in_days(self, recurrence_in_days: int) -> int:
         if recurrence_in_days == 0 or recurrence_in_days % 7 != 0:

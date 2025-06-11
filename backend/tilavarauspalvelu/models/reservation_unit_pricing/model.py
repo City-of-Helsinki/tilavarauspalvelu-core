@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, ClassVar
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import PaymentType, PriceUnit
+from utils.auditlog_util import AuditLogger
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:

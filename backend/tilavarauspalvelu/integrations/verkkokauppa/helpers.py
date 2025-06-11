@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from django.urls import reverse
 
-from config.utils.date_util import localized_short_weekday
 from tilavarauspalvelu.integrations.verkkokauppa.exceptions import UnsupportedMetaKeyError
 from tilavarauspalvelu.integrations.verkkokauppa.order.types import (
     CreateOrderParams,
@@ -19,7 +18,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.order.types import (
     WebShopOrderStatus,
 )
 from tilavarauspalvelu.models import PaymentMerchant, PaymentProduct
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, localized_short_weekday
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation, ReservationUnit

@@ -17,7 +17,6 @@ from tilavarauspalvelu.enums import (
     HaukiResourceState,
     ReservationStateChoice,
     ReservationTypeChoice,
-    Weekday,
 )
 from tilavarauspalvelu.exceptions import ApplicationRoundResetError
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
@@ -115,7 +114,7 @@ class ApplicationRoundActions:
                 end_date=allocation.reservation_unit_option.application_section.reservations_end_date,
                 end_time=allocation.end_time,
                 recurrence_in_days=7,
-                weekdays=str(Weekday(allocation.day_of_the_week).as_weekday_number),
+                weekdays=[allocation.day_of_the_week],
                 reservation_unit=allocation.reservation_unit_option.reservation_unit,
                 user=allocation.reservation_unit_option.application_section.application.user,
                 allocated_time_slot=allocation,

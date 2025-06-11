@@ -4,15 +4,14 @@ import uuid
 from typing import TYPE_CHECKING, ClassVar
 
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.contrib.postgres.fields.array import IndexTransform
-from django.core.validators import validate_comma_separated_integer_list
+from django.contrib.postgres.fields.array import ArrayField, IndexTransform
 from django.db import models
 from django.db.models import Exists
 from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L, lookup_property
 
-from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, WeekdayChoice
+from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, Weekday
 from utils.db import SubqueryArray
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
@@ -48,12 +47,10 @@ class ReservationSeries(models.Model):
 
     recurrence_in_days: int | None = models.PositiveIntegerField(null=True, blank=True)
 
-    weekdays: str = models.CharField(
-        max_length=16,
-        validators=[validate_comma_separated_integer_list],
-        choices=WeekdayChoice.choices,
-        blank=True,
-        default="",
+    weekdays: list[str] = ArrayField(
+        models.CharField(choices=Weekday.choices, max_length=255),
+        size=7,
+        default=list,
     )
 
     # Relations

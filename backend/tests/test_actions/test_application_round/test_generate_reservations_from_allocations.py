@@ -81,7 +81,7 @@ def test_generate_reservation_series_from_allocations():
     assert series.end_date == section.reservations_end_date
     assert series.end_time == local_time(14, 0).replace(tzinfo=DEFAULT_TIMEZONE)
     assert series.recurrence_in_days == 7
-    assert series.weekdays == str(Weekday.MONDAY.as_weekday_number)
+    assert series.weekdays == [Weekday.MONDAY]
     assert series.reservation_unit == reservation_unit
     assert series.user == user
     assert series.age_group == section.age_group

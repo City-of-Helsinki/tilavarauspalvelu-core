@@ -12,7 +12,6 @@ from django.db.models import Subquery
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L, lookup_property
 
-from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import (
     AuthenticationType,
     ReservationFormType,
@@ -21,6 +20,7 @@ from tilavarauspalvelu.enums import (
     ReservationUnitPublishingState,
     ReservationUnitReservationState,
 )
+from utils.auditlog_util import AuditLogger
 from utils.db import NowTT
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
