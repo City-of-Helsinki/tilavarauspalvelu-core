@@ -12,7 +12,6 @@ from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L, lookup_property
 
-from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import (
     AccessType,
     CustomerTypeChoice,
@@ -21,6 +20,7 @@ from tilavarauspalvelu.enums import (
     ReservationStateChoice,
     ReservationTypeChoice,
 )
+from utils.auditlog_util import AuditLogger
 from utils.date_utils import datetime_range_as_string
 from utils.decimal_utils import round_decimal
 from utils.fields.model import StrChoiceField
