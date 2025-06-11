@@ -146,12 +146,7 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         if not user.permissions.can_view_reservation(reservation):
             raise GQLNodePermissionDeniedError
 
-        user: User | None = reservation.user
-        if user is None:
-            msg = f"Reservation with id {application_pk} does not have a user."
-            raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_RESERVATION_USER_MISSING)
-
-        return user
+        return reservation.user
 
     def resolve_birthday(root: UserProfileInfo, info: GQLInfo) -> datetime.date | None:
         save_personal_info_view_log_task.delay(root["pk"], info.context.user.id, "profile.birthday")

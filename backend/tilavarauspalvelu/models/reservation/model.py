@@ -141,14 +141,12 @@ class Reservation(SerializableMixin, models.Model):
         related_name="reservations",
         on_delete=models.PROTECT,
     )
-
-    user: User | None = models.ForeignKey(
+    user: User = models.ForeignKey(
         "tilavarauspalvelu.User",
         related_name="reservations",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
+        on_delete=models.PROTECT,
     )
+
     reservation_series: ReservationSeries | None = models.ForeignKey(
         "tilavarauspalvelu.ReservationSeries",
         related_name="reservations",
