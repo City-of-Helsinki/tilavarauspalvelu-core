@@ -9,7 +9,11 @@ import easy_thumbnails.fields
 from django.conf import settings
 from django.db import migrations, models
 
-import tilavarauspalvelu.models.reservation_unit_pricing.model
+
+def get_default_tax_percentage() -> int:
+    from tilavarauspalvelu.models import TaxPercentage
+
+    return TaxPercentage.objects.order_by("value").first().pk
 
 
 class Migration(migrations.Migration):
@@ -597,7 +601,7 @@ class Migration(migrations.Migration):
                 (
                     "tax_percentage",
                     models.ForeignKey(
-                        default=tilavarauspalvelu.models.reservation_unit_pricing.model.get_default_tax_percentage,
+                        default=get_default_tax_percentage,
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name="reservation_unit_pricings",
                         to="tilavarauspalvelu.taxpercentage",

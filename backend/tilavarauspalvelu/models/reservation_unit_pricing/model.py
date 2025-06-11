@@ -25,12 +25,6 @@ __all__ = [
 ]
 
 
-def get_default_tax_percentage() -> int:
-    from tilavarauspalvelu.models import TaxPercentage
-
-    return TaxPercentage.objects.order_by("value").first().pk
-
-
 class ReservationUnitPricing(models.Model):
     begins: datetime.date = models.DateField()
     price_unit: str = models.CharField(max_length=20, choices=PriceUnit.choices, default=PriceUnit.PER_HOUR)
@@ -48,7 +42,6 @@ class ReservationUnitPricing(models.Model):
         "tilavarauspalvelu.TaxPercentage",
         related_name="reservation_unit_pricings",
         on_delete=models.PROTECT,
-        default=get_default_tax_percentage,
     )
 
     reservation_unit: ReservationUnit = models.ForeignKey(
