@@ -1,8 +1,8 @@
 import Page1 from "@/pages/applications/[id]/page1";
 import { render, screen, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
+import { createGraphQLMocks } from "@test/gql.mocks";
 import {
-  createGraphQLMocks,
   createMockApplicationFragment,
   type CreateMockApplicationFragmentProps,
 } from "@test/application.mocks";
