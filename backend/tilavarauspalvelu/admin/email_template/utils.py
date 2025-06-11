@@ -8,7 +8,7 @@ from admin_data_views.settings import admin_data_settings
 from django.urls import reverse
 from django.utils.html import format_html
 
-from tilavarauspalvelu.enums import ReservationCancelReasonChoice, WeekdayChoice
+from tilavarauspalvelu.enums import ReservationCancelReasonChoice, Weekday
 from tilavarauspalvelu.integrations.email.template_context.common import get_staff_reservations_ext_link
 from tilavarauspalvelu.integrations.email.typing import EmailTemplateType, EmailType
 from tilavarauspalvelu.translation import get_translated
@@ -49,7 +49,7 @@ def get_mock_params(*, language: Lang, **kwargs: Any) -> EmailContext:
             "allocations",
             [
                 {
-                    "weekday_value": str(WeekdayChoice.MONDAY.label),
+                    "weekday_value": str(Weekday.MONDAY.label),
                     "time_value": "13:00-15:00",
                     "access_code_validity_period": "11:00-15:00" if access_code_is_used else "",
                     "series_url": get_staff_reservations_ext_link(reservation_id=1234),
@@ -58,7 +58,7 @@ def get_mock_params(*, language: Lang, **kwargs: Any) -> EmailContext:
                     "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
                 },
                 {
-                    "weekday_value": str(WeekdayChoice.TUESDAY.label),
+                    "weekday_value": str(Weekday.TUESDAY.label),
                     "time_value": "21:00-22:00",
                     "access_code_validity_period": "20:45-22:05" if access_code_is_used else "",
                     "series_url": get_staff_reservations_ext_link(reservation_id=5678),
@@ -94,7 +94,7 @@ def get_mock_params(*, language: Lang, **kwargs: Any) -> EmailContext:
         "time_value": kwargs.get("time_value", "13:00-15:00"),
         "unit_location": kwargs.get("unit_location", "[TOIMIPISTEEN OSOITE], [KAUPUNKI]"),
         "unit_name": kwargs.get("unit_name", "[TOIMIPISTEEN NIMI]"),
-        "weekday_value": kwargs.get("weekday_value", str(WeekdayChoice.MONDAY.label)),
+        "weekday_value": kwargs.get("weekday_value", str(Weekday.MONDAY.label)),
     }
 
 

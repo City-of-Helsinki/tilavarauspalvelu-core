@@ -47,8 +47,6 @@ class PindoraSeriesInfoType(graphene.ObjectType):
 
 
 class ReservationSeriesNode(DjangoNode):
-    weekdays = graphene.List(graphene.NonNull(graphene.Int), required=True)
-
     access_type = AnnotatedField(
         graphene.Enum.from_enum(AccessTypeWithMultivalued),
         expression=L("access_type"),
@@ -123,11 +121,6 @@ class ReservationSeriesNode(DjangoNode):
         if not user.permissions.has_any_role():
             return queryset.filter(user=user)
         return queryset
-
-    def resolve_weekdays(root: ReservationSeries, info: GQLInfo) -> list[int]:
-        if root.weekdays:
-            return [weekday.as_weekday_number for weekday in root.actions.get_weekdays()]
-        return []
 
     def resolve_pindora_info(root: ReservationSeries, info: GQLInfo) -> PindoraSeriesInfoData | None:
         # Not using access codes
