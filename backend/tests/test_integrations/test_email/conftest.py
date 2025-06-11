@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from tilavarauspalvelu.enums import PriceUnit, ReservationStateChoice, WeekdayChoice
+from tilavarauspalvelu.enums import PriceUnit, ReservationStateChoice, Weekday
 from utils.date_utils import local_datetime
 
 from tests.factories import (
@@ -42,7 +42,7 @@ def email_reservation() -> Reservation:
     )
     reservation_series = ReservationSeriesFactory.create(
         reservation_unit=reservation_unit,
-        weekdays=f"{WeekdayChoice.MONDAY}",
+        weekdays=[Weekday.MONDAY.value],
         begin_date=datetime.date(2024, 1, 1),
         begin_time=datetime.time(13),
         end_time=datetime.time(15),
@@ -68,7 +68,7 @@ def email_reservation() -> Reservation:
 
     reservation_series_2 = ReservationSeriesFactory.create(
         reservation_unit=reservation_unit,
-        weekdays=f"{WeekdayChoice.TUESDAY}",
+        weekdays=[Weekday.TUESDAY.value],
         begin_date=datetime.date(2024, 1, 2),
         begin_time=datetime.time(21),
         end_time=datetime.time(22),

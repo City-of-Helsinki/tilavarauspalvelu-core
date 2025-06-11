@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from tilavarauspalvelu.enums import ReservationTypeChoice, WeekdayChoice
+from tilavarauspalvelu.enums import ReservationTypeChoice, Weekday
 from tilavarauspalvelu.integrations.keyless_entry.typing import (
     PindoraReservationSeriesAccessCodeValidity,
     PindoraReservationSeriesResponse,
@@ -51,7 +51,7 @@ REPAIR_ACCESS_CODE_SERIES_MUTATION = build_mutation(
 
 def get_minimal_series_data(reservation_unit: ReservationUnit, user: User, **overrides: Any) -> dict[str, Any]:
     return {
-        "weekdays": [0],  # Mon
+        "weekdays": [Weekday.MONDAY.value],
         "beginDate": datetime.date(2024, 1, 1).isoformat(),  # Mon
         "endDate": datetime.date(2024, 1, 2).isoformat(),  # Tue
         "beginTime": datetime.time(10, 0, 0).isoformat(),
@@ -100,7 +100,7 @@ def create_reservation_series(**kwargs: Any) -> ReservationSeries:
         begin_time=local_time(hour=10),
         end_date=local_date(year=2024, month=2, day=1),  # Thursday
         end_time=local_time(hour=12),
-        weekdays=f"{WeekdayChoice.MONDAY}",
+        weekdays=[Weekday.MONDAY.value],
         **kwargs,
     )
 

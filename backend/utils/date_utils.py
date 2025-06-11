@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from collections.abc import Generator
 
     from tilavarauspalvelu.enums import Weekday
+    from tilavarauspalvelu.typing import Lang
 
 __all__ = [
     "DEFAULT_TIMEZONE",
@@ -578,3 +579,16 @@ def next_date_matching_weekday(date: datetime.date, weekday: Weekday) -> datetim
         delta += 7
 
     return date + datetime.timedelta(days=delta)
+
+
+def localized_short_weekday(weekday: int, lang_code: Lang) -> str:
+    weekdays = {
+        "fi": ["Ma", "Ti", "Ke", "To", "Pe", "La", "Su"],
+        "sv": ["Må", "Ti", "On", "To", "Fr", "Lö", "Sö"],
+        "en": ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+    }
+
+    if lang_code.lower() not in weekdays:
+        lang_code = "fi"
+
+    return weekdays[lang_code][weekday]
