@@ -60,13 +60,12 @@ class ReservationSeries(models.Model):
         related_name="reservation_series",
         on_delete=models.PROTECT,
     )
-    user: User | None = models.ForeignKey(
+    user: User = models.ForeignKey(
         "tilavarauspalvelu.User",
         related_name="reservation_series",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
+        on_delete=models.PROTECT,
     )
+
     allocated_time_slot: AllocatedTimeSlot | None = models.OneToOneField(
         "tilavarauspalvelu.AllocatedTimeSlot",
         related_name="reservation_series",
