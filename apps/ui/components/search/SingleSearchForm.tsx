@@ -72,7 +72,7 @@ function mapQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
   };
 }
 
-// TODO is this the full list? can we filter out all the rest? (i.e. remove the hideList)
+// TODO is this the full list? can we filter out all the rest? (i.e. remove the hideTagList)
 const filterOrder = [
   "textSearch",
   "timeBegin",
@@ -102,7 +102,7 @@ type SingleSearchFormProps = {
   isLoading: boolean;
 };
 
-// TODO rewrite this witout the form state (use query params directly, but don't refresh the page)
+// TODO rewrite this without the form state (use query params directly, but don't refresh the page)
 export function SingleSearchForm({
   options: { reservationUnitTypes, purposes, units, equipments },
   isLoading,
@@ -115,18 +115,19 @@ export function SingleSearchForm({
   const form = useForm<SearchFormValues>({
     values: formValues,
   });
+  const { handleSubmit, setValue, getValues, control, register } = form;
+
+  const durationOptions = getDurationOptions(t);
   const accessTypeOptions = Object.values(AccessType).map((value) => ({
     value,
     label: t(`reservationUnit:accessTypes.${value}`),
   }));
 
-  const { handleSubmit, setValue, getValues, control, register } = form;
-  const durationOptions = getDurationOptions(t);
-
   const translateTag = (key: string, value: string): string | undefined => {
     // Handle possible number / string comparison
     const compFn = (a: { value: unknown }, b: string) =>
       a != null && String(a.value) === b;
+
     // TODO should rework the find matcher (typing issues) (it works but it's confusing)
     switch (key) {
       case "units":
@@ -141,6 +142,7 @@ export function SingleSearchForm({
         return durationOptions.find((n) => compFn(n, value))?.label;
       case "accessTypes":
         return accessTypeOptions.find((n) => compFn(n, value))?.label;
+      // FIXME: Invalid date/time values are not validated and are shown in the tag list but not in the form
       case "startDate":
       case "endDate":
       case "timeBegin":
@@ -154,49 +156,57 @@ export function SingleSearchForm({
   const onSearch: SubmitHandler<SearchFormValues> = (
     criteria: SearchFormValues
   ) => {
+    // We need to pass all form values, even empty ones, to the search handler
+    // to ensure that all search params are updated/cleared correctly
     handleSearch(criteria, true);
   };
 
-  const showOptionalFilters =
-    formValues.reservationUnitTypes.length !== 0 ||
-    formValues.personsAllowed != null ||
-    formValues.textSearch !== "";
+  // All fields that are normally initially hidden
+  const showOptionalFilters = !!(
+    formValues.units.length ||
+    formValues.equipments.length ||
+    formValues.reservationUnitTypes.length ||
+    formValues.timeBegin ||
+    formValues.timeEnd ||
+    formValues.duration ||
+    formValues.personsAllowed ||
+    formValues.accessTypes.length
+  );
 
   return (
     <Flex as="form" noValidate onSubmit={handleSubmit(onSearch)}>
       <ShowAllContainer
         showAllLabel={t("searchForm:showMoreFilters")}
         showLessLabel={t("searchForm:showLessFilters")}
-        maximumNumber={6}
+        maximumNumber={3}
         data-testid="search-form__filters--optional"
         initiallyOpen={showOptionalFilters}
+        extraShowMoreContent={
+          <Controller
+            name="showOnlyReservable"
+            control={control}
+            render={({ field: { value, onChange } }) => (
+              <StyledCheckBox
+                id="showOnlyReservable"
+                name="showOnlyReservable"
+                label={t("searchForm:labels.showOnlyReservable")}
+                onChange={onChange}
+                checked={value}
+              />
+            )}
+          />
+        }
       >
-        <ControlledSelect
-          multiselect
-          clearable
-          enableSearch
-          name="purposes"
-          control={control}
-          options={purposes}
-          label={t("searchForm:labels.purposes")}
-        />
-        <ControlledSelect
-          multiselect
-          clearable
-          enableSearch
-          name="units"
-          control={control}
-          options={units}
-          label={t("searchForm:labels.units")}
-        />
-        <ControlledSelect
-          multiselect
-          clearable
-          enableSearch
-          name="equipments"
-          control={control}
-          options={equipments}
-          label={t("searchForm:labels.equipments")}
+        <TextInput
+          id="search"
+          label={t("searchForm:labels.textSearch")}
+          {...register("textSearch")}
+          placeholder={t("searchForm:placeholders.textSearch")}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit(onSearch)();
+            }
+          }}
         />
         <SingleLabelInputGroup label={t("common:dateLabel")}>
           <DateRangePicker
@@ -224,6 +234,42 @@ export function SingleSearchForm({
             }}
           />
         </SingleLabelInputGroup>
+        <ControlledSelect
+          multiselect
+          clearable
+          enableSearch
+          name="purposes"
+          control={control}
+          options={purposes}
+          label={t("searchForm:labels.purposes")}
+        />
+        <ControlledSelect
+          multiselect
+          clearable
+          enableSearch
+          name="units"
+          control={control}
+          options={units}
+          label={t("searchForm:labels.units")}
+        />
+        <ControlledSelect
+          multiselect
+          clearable
+          enableSearch
+          name="equipments"
+          control={control}
+          options={equipments}
+          label={t("searchForm:labels.equipments")}
+        />
+        <ControlledSelect
+          name="reservationUnitTypes"
+          multiselect
+          control={control}
+          options={reservationUnitTypes}
+          enableSearch
+          clearable
+          label={t("searchForm:labels.reservationUnitTypes")}
+        />
         <SingleLabelInputGroup label={t("common:timeLabel")}>
           <TimeRangePicker
             control={control}
@@ -253,26 +299,6 @@ export function SingleSearchForm({
           min={1}
         />
         <ControlledSelect
-          name="reservationUnitTypes"
-          multiselect
-          control={control}
-          options={reservationUnitTypes}
-          enableSearch
-          clearable
-          label={t("searchForm:labels.reservationUnitTypes")}
-        />
-        <TextInput
-          id="search"
-          label={t("searchForm:labels.textSearch")}
-          {...register("textSearch")}
-          placeholder={t("searchForm:placeholders.textSearch")}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleSubmit(onSearch)();
-            }
-          }}
-        />
-        <ControlledSelect
           multiselect
           clearable
           name="accessTypes"
@@ -281,21 +307,6 @@ export function SingleSearchForm({
           label={t("searchForm:labels.accessTypes")}
         />
       </ShowAllContainer>
-      <Flex $direction="row-reverse">
-        <Controller
-          name="showOnlyReservable"
-          control={control}
-          render={({ field: { value, onChange } }) => (
-            <StyledCheckBox
-              id="showOnlyReservable"
-              name="showOnlyReservable"
-              label={t("searchForm:labels.showOnlyReservable")}
-              onChange={onChange}
-              checked={value}
-            />
-          )}
-        />
-      </Flex>
       <SearchButtonContainer>
         <FilterTagList
           translateTag={translateTag}
