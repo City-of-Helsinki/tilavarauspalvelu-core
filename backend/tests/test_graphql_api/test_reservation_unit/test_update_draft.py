@@ -4,10 +4,10 @@ import pytest
 from auditlog.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 
-from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType, AuthenticationType, TermsOfUseTypeChoices
 from tilavarauspalvelu.models import ReservationUnit
+from utils.auditlog_util import AuditLogger
 
 from tests.factories import ReservationMetadataSetFactory, ReservationUnitFactory, TermsOfUseFactory
 

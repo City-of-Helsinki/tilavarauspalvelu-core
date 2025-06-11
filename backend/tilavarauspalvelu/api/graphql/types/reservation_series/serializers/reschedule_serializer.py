@@ -6,12 +6,13 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
+from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from graphql import GraphQLError
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice, WeekdayChoice
+from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import ReservationSeries, ReservationStatistic
@@ -36,7 +37,7 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
     instance: ReservationSeries
 
     weekdays = serializers.ListField(
-        child=serializers.IntegerField(),
+        child=EnumFriendlyChoiceField(choices=Weekday.choices, enum=Weekday, required=False),
         allow_empty=False,
         required=False,
     )
@@ -77,15 +78,6 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
             "end_date": {"required": False},
             "end_time": {"required": False},
         }
-
-    def validate_weekdays(self, weekdays: list[int]) -> str:
-        weekdays = list(set(weekdays))
-        for weekday in weekdays:
-            if weekday not in WeekdayChoice.values:
-                msg = f"Invalid weekday: {weekday}."
-                raise ValidationError(msg, code=error_codes.RESERVATION_SERIES_INVALID_WEEKDAY)
-
-        return ",".join(str(day) for day in weekdays)
 
     def validate(self, data: ReservationSeriesRescheduleData) -> ReservationSeriesRescheduleData:
         begin_date: datetime.date = self.get_or_default("begin_date", data)

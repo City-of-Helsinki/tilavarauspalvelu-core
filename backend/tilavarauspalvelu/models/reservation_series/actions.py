@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from lookup_property import L
 
@@ -71,12 +71,13 @@ class ReservationSeriesActions:
         end_time: datetime.time = self.reservation_series.end_time
         reservation_unit = self.reservation_series.reservation_unit
 
-        weekdays = [weekday.as_weekday_number for weekday in self.reservation_series.actions.get_weekdays()]
+        weekdays: list[Weekday] = [Weekday(weekday) for weekday in self.reservation_series.weekdays]
         if not weekdays:
-            weekdays = [self.reservation_series.begin_date.weekday()]
+            weekday_num: Literal[0, 1, 2, 3, 4, 5, 6] = self.reservation_series.begin_date.weekday()  # type: ignore[assignment]
+            weekdays = [Weekday.from_week_day(weekday_num)]
 
         for weekday in weekdays:
-            delta: int = weekday - self.reservation_series.begin_date.weekday()
+            delta: int = weekday.as_weekday_number - self.reservation_series.begin_date.weekday()
             if delta < 0:
                 delta += 7
 
@@ -263,7 +264,3 @@ class ReservationSeriesActions:
             access_code_is_active=True,
             ends_at__gt=local_datetime(),
         ).exists()
-
-    def get_weekdays(self) -> list[Weekday]:
-        weekdays = self.reservation_series.weekdays.split(",")
-        return [Weekday.from_week_day(int(weekday)) for weekday in weekdays if weekday.isdigit()]  # type: ignore
