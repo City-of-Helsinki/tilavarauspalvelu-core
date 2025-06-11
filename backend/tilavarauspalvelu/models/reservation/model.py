@@ -68,7 +68,7 @@ class Reservation(SerializableMixin, models.Model):
     )
     municipality: str | None = StrChoiceField(enum=MunicipalityChoice, null=True, blank=True)
     handling_details: str = models.TextField(blank=True, default="")
-    working_memo: str = models.TextField(null=True, blank=True, default="")
+    working_memo: str = models.TextField(blank=True, default="")
 
     # Cancellation information
     cancel_details: str = models.TextField(blank=True, default="")
