@@ -19,9 +19,7 @@ __all__ = [
 
 def get_application_email_language(application: Application) -> Lang:
     """Get email notification language for the given application."""
-    if application.user is None:
-        return settings.LANGUAGE_CODE  # type: ignore[return-value]
-    if getattr(application.user, "preferred_language", None) in Language.values:
+    if application.user.preferred_language in Language.values:
         return application.user.preferred_language  # type: ignore[return-value]
     return settings.LANGUAGE_CODE  # type: ignore[return-value]
 

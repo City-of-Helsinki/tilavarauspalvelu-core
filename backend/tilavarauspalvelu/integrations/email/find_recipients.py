@@ -29,9 +29,8 @@ def get_application_email_recipients(application: Application) -> list[str]:
     if application.contact_person_email:
         recipients.add(application.contact_person_email.lower())
 
-    applicant_email = getattr(application.user, "email", None)
-    if applicant_email:
-        recipients.add(applicant_email.lower())
+    if application.user.email:
+        recipients.add(application.user.email.lower())
 
     return list(recipients)
 
@@ -150,8 +149,7 @@ def get_application_section_staff_notification_recipients_by_language(
     ).exclude(email="")
 
     # Skip the application creator
-    if application_section.application.user:
-        users = users.exclude(pk=application_section.application.user.pk)
+    users = users.exclude(pk=application_section.application.user.pk)
 
     units = (
         Unit.objects.prefetch_related("unit_groups")
