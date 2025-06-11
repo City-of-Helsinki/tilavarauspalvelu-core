@@ -3973,7 +3973,7 @@ input ReservationUnitPricingSerializerInput {
   lowestPriceNet: String
   highestPrice: Decimal
   highestPriceNet: String
-  taxPercentage: Int
+  taxPercentage: Int!
 }
 
 input ReservationUnitAccessTypeSerializerInput {
