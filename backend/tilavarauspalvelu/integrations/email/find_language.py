@@ -26,9 +26,7 @@ def get_application_email_language(application: Application) -> Lang:
 
 def get_series_email_language(series: ReservationSeries) -> Lang:
     """Get email notification language for the given series."""
-    if series.user is None:
-        return settings.LANGUAGE_CODE  # type: ignore[return-value]
-    if getattr(series.user, "preferred_language", None) in Language.values:
+    if series.user.preferred_language in Language.values:
         return series.user.preferred_language  # type: ignore[return-value]
     return settings.LANGUAGE_CODE  # type: ignore[return-value]
 
