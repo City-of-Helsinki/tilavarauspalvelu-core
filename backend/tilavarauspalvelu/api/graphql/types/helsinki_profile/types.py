@@ -128,12 +128,7 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         if not user.permissions.can_view_application(application):
             raise GQLNodePermissionDeniedError
 
-        user: User | None = application.user
-        if user is None:
-            msg = f"Application with id {application_pk} does not have a user."
-            raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_APPLICATION_USER_MISSING)
-
-        return user
+        return application.user
 
     @classmethod
     def get_user_from_reservation(cls, application_pk: int, info: GQLInfo) -> User:
