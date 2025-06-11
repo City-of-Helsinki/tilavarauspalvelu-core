@@ -143,14 +143,16 @@ def test_rejected_recurrence__filter__by_text_search(graphql):
         f"{section_ref}__application__organisation_name": "",
         f"{section_ref}__application__contact_person_first_name": "",
         f"{section_ref}__application__contact_person_last_name": "",
-        f"{section_ref}__application__user": None,
+        f"{section_ref}__application__user__first_name": "",
+        f"{section_ref}__application__user__last_name": "",
         f"{section_ref}__name": "foo",
     })
     RejectedOccurrenceFactory.create(**{
         f"{section_ref}__application__organisation_name": "",
         f"{section_ref}__application__contact_person_first_name": "",
         f"{section_ref}__application__contact_person_last_name": "",
-        f"{section_ref}__application__user": None,
+        f"{section_ref}__application__user__first_name": "",
+        f"{section_ref}__application__user__last_name": "",
         f"{section_ref}__name": "bar",
     })
 

@@ -42,14 +42,14 @@ def test_get_application_email_recipients__no_contact_person():
 
 
 def test_get_application_email_recipients__no_applicant():
-    application = ApplicationFactory.create(user=None, contact_person_email="contact@example.com")
+    application = ApplicationFactory.create(user__email="", contact_person_email="contact@example.com")
 
     result = get_application_email_recipients(application)
     assert result == ["contact@example.com"]
 
 
 def test_get_application_email_recipients__no_contact_person_or_applicant():
-    application = ApplicationFactory.create(user=None, contact_person_email=None)
+    application = ApplicationFactory.create(user__email="", contact_person_email=None)
 
     result = get_application_email_recipients(application)
     assert result == []
