@@ -819,7 +819,8 @@ def test_application_section__filter__by_text_search__section_name(graphql):
         organisation_name="",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
     )
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
     ApplicationSectionFactory.create_in_status_unallocated(application=application, name="bar")
@@ -846,7 +847,8 @@ def test_application_section__filter__by_text_search__section_name__prefix(graph
         organisation_name="",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
     )
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
     ApplicationSectionFactory.create_in_status_unallocated(application=application, name="bar")
@@ -873,7 +875,8 @@ def test_application_section__filter__by_text_search__section_name__has_quotes(g
         organisation_name="",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
     )
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="Moe's Bar")
     ApplicationSectionFactory.create_in_status_unallocated(application=application, name="Bar")
@@ -900,7 +903,8 @@ def test_application_section__filter__by_text_search__applicant__organisation_na
         organisation_name="fizz",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
     )
     section = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
     graphql.login_with_superuser()
@@ -926,7 +930,8 @@ def test_application_section__filter__by_text_search__applicant__contact_person_
         organisation_name="",
         contact_person_first_name="fizz",
         contact_person_last_name="none",
-        user=None,
+        user__first_name="",
+        user__last_name="",
     )
     section = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
     graphql.login_with_superuser()
@@ -952,7 +957,8 @@ def test_application_section__filter__by_text_search__applicant__contact_person_
         organisation_name="",
         contact_person_first_name="none",
         contact_person_last_name="fizz",
-        user=None,
+        user__first_name="",
+        user__last_name="",
     )
     section = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
     graphql.login_with_superuser()
@@ -1033,7 +1039,8 @@ def test_application_section__filter__by_text_search__section_id(graphql):
         organisation_name="",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
     )
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(id=2, application=application, name="foo")
     ApplicationSectionFactory.create_in_status_unallocated(id=3, application=application, name="bar")
@@ -1061,14 +1068,16 @@ def test_application_section__filter__by_text_search__application_id(graphql):
         organisation_name="",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
     )
     application_2 = ApplicationFactory.create_in_status_draft_no_sections(
         id=2,
         organisation_name="",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
     )
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(id=3, application=application_1, name="foo")
     ApplicationSectionFactory.create_in_status_unallocated(id=4, application=application_2, name="bar")

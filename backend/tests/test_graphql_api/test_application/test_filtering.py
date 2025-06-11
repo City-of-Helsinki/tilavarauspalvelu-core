@@ -232,14 +232,16 @@ def test_application__filter__by_text_search__section_name(graphql):
         organisation_name="",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
         application_sections__name="foo",
     )
     ApplicationFactory.create_in_status_draft(
         organisation_name="",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
         application_sections__name="bar",
     )
     graphql.login_with_superuser()
@@ -265,14 +267,16 @@ def test_application__filter__by_text_search__section_name__prefix(graphql):
         organisation_name="",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
         application_sections__name="kirjastoryhmä",
     )
     ApplicationFactory.create_in_status_draft(
         organisation_name="",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
         application_sections__name="suunnistusryhmä",
     )
     graphql.login_with_superuser()
@@ -298,14 +302,16 @@ def test_application__filter__by_text_search__section_name__has_quotes(graphql):
         organisation_name="",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
         application_sections__name="Moe's Bar",
     )
     ApplicationFactory.create_in_status_draft(
         organisation_name="",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
         application_sections__name="Bar",
     )
     graphql.login_with_superuser()
@@ -331,14 +337,16 @@ def test_application__filter__by_text_search__applicant__organisation_name(graph
         organisation_name="foo",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
         application_sections__name="aaaa",
     )
     ApplicationFactory.create_in_status_draft(
         organisation_name="bar",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
         application_sections__name="bbbb",
     )
     graphql.login_with_superuser()
@@ -364,14 +372,16 @@ def test_application__filter__by_text_search__applicant__contact_person_first_na
         organisation_name="",
         contact_person_first_name="foo",
         contact_person_last_name="none",
-        user=None,
+        user__first_name="",
+        user__last_name="",
         application_sections__name="aaaa",
     )
     ApplicationFactory.create_in_status_draft(
         organisation_name="",
         contact_person_first_name="bar",
         contact_person_last_name="none",
-        user=None,
+        user__first_name="",
+        user__last_name="",
         application_sections__name="bbbb",
     )
     graphql.login_with_superuser()
@@ -397,14 +407,16 @@ def test_application__filter__by_text_search__applicant__contact_person_last_nam
         organisation_name="",
         contact_person_first_name="none",
         contact_person_last_name="foo",
-        user=None,
+        user__first_name="",
+        user__last_name="",
         application_sections__name="aaaa",
     )
     ApplicationFactory.create_in_status_draft(
         organisation_name="",
         contact_person_first_name="none",
         contact_person_last_name="bar",
-        user=None,
+        user__first_name="",
+        user__last_name="",
         application_sections__name="bbbb",
     )
     graphql.login_with_superuser()
@@ -501,7 +513,8 @@ def test_application__filter__by_text_search__section_id(graphql):
         organisation_name="",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
         application_sections__id=3,
         application_sections__name="foo",
     )
@@ -510,7 +523,8 @@ def test_application__filter__by_text_search__section_id(graphql):
         organisation_name="",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
         application_sections__id=4,
         application_sections__name="bar",
     )
@@ -538,7 +552,8 @@ def test_application__filter__by_text_search__application_id(graphql):
         organisation_name="",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
         application_sections__id=3,
         application_sections__name="aaaa",
     )
@@ -547,7 +562,8 @@ def test_application__filter__by_text_search__application_id(graphql):
         organisation_name="",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
         application_sections__id=4,
         application_sections__name="bbbb",
     )
