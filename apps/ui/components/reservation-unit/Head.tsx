@@ -205,8 +205,8 @@ function IconList({
   const lang = convertLanguageCode(i18n.language);
   const minDur = reservationUnit.minReservationDuration ?? 0;
   const maxDur = reservationUnit.maxReservationDuration ?? 0;
-  const minReservationDuration = formatDuration(minDur / 60, t, true);
-  const maxReservationDuration = formatDuration(maxDur / 60, t, true);
+  const minReservationDuration = formatDuration(t, { seconds: minDur }, true);
+  const maxReservationDuration = formatDuration(t, { seconds: maxDur }, true);
   const pricing = getActivePricing(reservationUnit);
   const isPaid = isReservationUnitPaid(reservationUnit.pricings);
   const unitPrice = pricing ? getPriceString({ t, pricing }) : undefined;

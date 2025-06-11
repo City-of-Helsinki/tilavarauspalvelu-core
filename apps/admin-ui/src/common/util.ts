@@ -10,8 +10,6 @@ import {
 import type { TFunction } from "next-i18next";
 import { toMondayFirstUnsafe, truncate } from "common/src/helpers";
 
-export { formatDuration } from "common/src/common/util";
-
 export const DATE_FORMAT = "d.M.yyyy";
 export const DATE_FORMAT_SHORT = "d.M.";
 

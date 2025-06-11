@@ -233,8 +233,7 @@ function createSingleTagString(
     .join(", ");
 
   const durMinutes = differenceInMinutes(end, begin);
-  const abbreviated = true;
-  const durationTag = formatDuration(durMinutes, t, abbreviated);
+  const durationTag = formatDuration(t, { minutes: durMinutes });
 
   return `${singleDateTimeTag}, ${durationTag} | ${unitTag}`;
 }
@@ -275,8 +274,7 @@ function createRecurringTagString(
     new Date(reservation.end),
     new Date(reservation.begin)
   );
-  const abbreviated = true;
-  const durationTag = formatDuration(durMinutes, t, abbreviated);
+  const durationTag = formatDuration(t, { minutes: durMinutes });
 
   const recurringDateTag = `${weekDayTag} ${format(begin, "HH:mm")}–${format(end, "HH:mm")}`;
 
