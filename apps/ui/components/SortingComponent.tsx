@@ -111,6 +111,13 @@ export function SortingComponent() {
   const handleOrderChange = (order: "asc" | "desc") => {
     const params = new URLSearchParams(searchValues);
     params.set("order", order);
+
+    // If no sort is set, default to "name" sorting
+    // This is to ensure that the user can always sort by name if no other sorting is set
+    if (!params.get("sort")) {
+      params.set("sort", sortingOptions?.[0]?.value ?? "");
+    }
+
     handleRouteChange(params);
   };
 
