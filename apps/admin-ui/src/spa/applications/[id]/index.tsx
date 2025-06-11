@@ -116,9 +116,8 @@ function formatApplicationDuration(
   if (!durationSeconds) {
     return "";
   }
-  const durMinutes = durationSeconds / 60;
   const translationKey = `common.${type}Amount`;
-  return `${type ? t(translationKey) : ""} ${formatDuration(durMinutes, t)}`;
+  return `${type ? t(translationKey) : ""} ${formatDuration(t, { seconds: durationSeconds })}`;
 }
 
 function appEventDuration(

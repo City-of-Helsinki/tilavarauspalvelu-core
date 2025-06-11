@@ -146,7 +146,8 @@ function useCalendarEventChange({
         begin: start,
         end,
         state: "INITIAL",
-        durationString: diff >= 90 ? `(${formatDuration(diff, t)})` : "",
+        durationString:
+          diff >= 90 ? `(${formatDuration(t, { minutes: diff })})` : "",
       };
     }
 
