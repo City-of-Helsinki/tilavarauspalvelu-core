@@ -1171,7 +1171,7 @@ type SpaceNode implements Node {
   maxPersons: Int
   code: String!
   parent: SpaceNode
-  unit: UnitNode
+  unit: UnitNode!
   resources(
     nameFi: String
     nameFi_Icontains: String
@@ -3686,7 +3686,7 @@ input SpaceCreateMutationInput {
   surfaceArea: Int
   maxPersons: Int
   code: String
-  unit: Int
+  unit: Int!
   parent: Int
 }
 
