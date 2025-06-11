@@ -55,7 +55,6 @@ class ReservationUnitPricing(models.Model):
         "tilavarauspalvelu.ReservationUnit",
         related_name="pricings",
         on_delete=models.CASCADE,
-        null=True,
     )
 
     objects: ClassVar[ReservationUnitPricingManager] = LazyModelManager.new()
