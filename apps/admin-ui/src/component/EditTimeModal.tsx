@@ -98,7 +98,9 @@ type EditFormValueType = z.infer<typeof TimeFormSchema>;
 
 function formatDateInterval(t: TFunction, begin: Date, end: Date) {
   const dateString = formatDateTimeRange(t, begin, end);
-  const durationString = formatDuration(differenceInMinutes(end, begin), t);
+  const durationString = formatDuration(t, {
+    minutes: differenceInMinutes(end, begin),
+  });
   return `${dateString} (${durationString})`;
 }
 

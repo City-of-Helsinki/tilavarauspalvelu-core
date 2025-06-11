@@ -1,10 +1,10 @@
 import React from "react";
 import { differenceInWeeks } from "date-fns";
 import { IconCalendar, IconClock, IconGroup } from "hds-react";
-import { Trans, useTranslation, TFunction } from "next-i18next";
+import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Flex, H4 } from "common/styled";
-import { fromUIDate } from "common/src/common/util";
+import { formatDuration, fromUIDate } from "common/src/common/util";
 import { type ApplicationSectionPage1FormValues } from "./form";
 import { IconWithText } from "@/components/common/IconWithText";
 
@@ -20,33 +20,18 @@ const Box = styled(Flex).attrs({
 `;
 
 function getHours(
-  startDate: string,
-  endDate: string,
+  start: Date | null,
+  end: Date | null,
   eventsPerWeek: number,
   minDurationMinutes: number
 ) {
-  const sd = fromUIDate(startDate);
-  const ed = fromUIDate(endDate);
-  if (!sd || !ed) {
+  if (!start || !end) {
     return 0;
   }
-  const numWeeks = differenceInWeeks(ed, sd);
+  const numWeeks = differenceInWeeks(end, start);
 
   const hours = (numWeeks * eventsPerWeek * minDurationMinutes) / 60;
   return hours;
-}
-
-function displayDuration(duration: number, t: TFunction) {
-  if (!duration) {
-    return "";
-  }
-  const durMinutes = duration / 60;
-  const displayHours = Math.floor(durMinutes / 60);
-  const displayMinutes = durMinutes % 60;
-
-  return `${t("common:hour", { count: displayHours })} ${
-    displayMinutes ? t("common:minute", { count: displayMinutes }) : ""
-  }`;
 }
 
 type Props = {
@@ -87,8 +72,8 @@ export function ApplicationSectionSummary({
   }
 
   const hours = getHours(
-    begin,
-    end,
+    fromUIDate(begin),
+    fromUIDate(end),
     appliedReservationsPerWeek ?? 1,
     minDuration / 60
   );
@@ -107,8 +92,8 @@ export function ApplicationSectionSummary({
           minDuration === maxDuration ? "minDuration" : "durations"
         }`,
         {
-          minDuration: displayDuration(minDuration, t),
-          maxDuration: displayDuration(maxDuration, t),
+          minDuration: formatDuration(t, { seconds: minDuration }, false),
+          maxDuration: formatDuration(t, { seconds: maxDuration }, false),
         }
       ),
     },

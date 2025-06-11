@@ -157,7 +157,7 @@ export function ReservationInfoCard({
         <Subheading>{unitName}</Subheading>
         <div data-testid="reservation__reservation-info-card__duration">
           <Strong>
-            {capitalize(timeString)}, {formatDuration(duration, t)}
+            {capitalize(timeString)}, {formatDuration(t, { minutes: duration })}
           </Strong>
         </div>
         <div data-testid="reservation__reservation-info-card__price">

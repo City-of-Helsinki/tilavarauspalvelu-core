@@ -20,20 +20,26 @@ export const endOfWeek = (d: Date): Date =>
   dateFnsEndOfWeek(d, { weekStartsOn: 1 });
 
 export function formatDuration(
-  durationMinutes: number,
   t: TFunction,
+  duration: {
+    hours?: number;
+    minutes?: number;
+    seconds?: number;
+  },
   abbreviated = true
 ): string {
-  if (!durationMinutes) {
+  const { hours = 0, minutes = 0, seconds = 0 } = duration;
+  const secs = hours * 3600 + minutes * 60 + seconds;
+  if (!secs) {
     return "-";
   }
 
-  const hour = Math.floor(durationMinutes / 60);
-  const min = Math.floor(durationMinutes % 60);
+  const hour = Math.floor(secs / 60 / 60);
+  const min = Math.floor((secs / 60) % 60);
 
-  const hourKey = abbreviated ? "common:abbreviations.hour" : "common:hour";
+  const hourKey = abbreviated ? "common:abbreviations:hour" : "common:hour";
   const minuteKey = abbreviated
-    ? "common:abbreviations.minute"
+    ? "common:abbreviations:minute"
     : "common:minute";
 
   const p = [];
@@ -46,6 +52,20 @@ export function formatDuration(
   }
 
   return p.join(" ");
+}
+
+function formatDurationSeconds(seconds: number, t: TFunction): string {
+  return formatDuration(t, { seconds }, true);
+}
+
+export function formatDurationRange(
+  t: TFunction,
+  beginSecs: number,
+  endSecs: number
+): string {
+  const beginHours = formatDurationSeconds(beginSecs, t);
+  const endHours = formatDurationSeconds(endSecs, t);
+  return beginSecs === endSecs ? beginHours : `${beginHours} – ${endHours}`;
 }
 
 export function addYears(date: Date, years: number): Date {

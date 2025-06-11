@@ -219,10 +219,8 @@ export function createDurationString(
   const minDuration = section.reservationMinDuration;
   const maxDuration = section.reservationMaxDuration;
 
-  const minDurString =
-    minDuration != null ? formatDuration(minDuration / 60, t) : undefined;
-  const maxDurString =
-    maxDuration != null ? formatDuration(maxDuration / 60, t) : undefined;
+  const minDurString = formatDuration(t, { seconds: minDuration });
+  const maxDurString = formatDuration(t, { seconds: maxDuration });
   const durationString =
     minDuration === maxDuration
       ? minDurString

@@ -82,7 +82,6 @@ function WrapTimeSelector({
   );
 }
 
-// FIXME tie this to the original mock value
 function createMockSubmitValues(
   vals: { pk?: number; day: DayT; start: number; end: number }[]
 ): ApplicationPage2FormValues {
