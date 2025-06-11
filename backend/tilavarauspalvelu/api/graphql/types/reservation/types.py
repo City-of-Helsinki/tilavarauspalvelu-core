@@ -13,6 +13,7 @@ from query_optimizer import AnnotatedField, ManuallyOptimizedField, MultiField
 from query_optimizer.optimizer import QueryOptimizer
 from rest_framework.reverse import reverse
 
+from tilavarauspalvelu.api.graphql.types.user.types import UserNode
 from tilavarauspalvelu.enums import (
     AccessType,
     CustomerTypeChoice,
@@ -186,6 +187,8 @@ class ReservationNode(DjangoNode):
     billing_address_street = graphene.String()
     billing_address_city = graphene.String()
     billing_address_zip = graphene.String()
+    #
+    user = graphene.Field(UserNode)
 
     class Meta:
         model = Reservation
