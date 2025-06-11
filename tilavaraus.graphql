@@ -758,7 +758,7 @@ type ReservationUnitNode implements Node {
   reservationKind: ReservationKind!
   reservationForm: ReservationForm!
   searchTerms: [String!]!
-  unit: UnitNode
+  unit: UnitNode!
   reservationUnitType: ReservationUnitTypeNode
   cancellationRule: ReservationUnitCancellationRuleNode
   metadataSet: ReservationMetadataSetNode
@@ -3934,7 +3934,7 @@ input ReservationUnitCreateMutationInput {
   reservationKind: ReservationKind
   reservationForm: ReservationForm
   searchTerms: [String]
-  unit: Int
+  unit: Int!
   reservationUnitType: Int
   cancellationRule: Int
   metadataSet: Int

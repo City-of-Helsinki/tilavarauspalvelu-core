@@ -116,10 +116,6 @@ class ReservationUnitHaukiExporter:
         """Get the parent units hauki resource id, so that the reservation unit can be added as a child in Hauki API."""
         parent_unit = self.reservation_unit.unit
 
-        # No parent, no way to get the id
-        if parent_unit is None:
-            return None
-
         # If the parent has an origin_hauki_resource_id, use that
         if parent_unit.origin_hauki_resource is not None:
             return parent_unit.origin_hauki_resource.id
