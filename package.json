@@ -33,7 +33,7 @@
     "@graphql-codegen/typescript-react-apollo": "^4.3.3",
     "@graphql-tools/graphql-tag-pluck": "^8.3.19",
     "@parcel/watcher": "^2.5.1",
-    "glob": "^11.0.1",
+    "glob": "^11.0.2",
     "graphql-config": "^5.1.5",
     "npkill": "^0.12.2",
     "turbo": "^2.5.4"
