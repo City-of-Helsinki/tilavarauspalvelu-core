@@ -6,9 +6,9 @@ from django.contrib.postgres.fields import ArrayField, HStoreField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from tilavarauspalvelu.enums import WeekdayChoice
+from tilavarauspalvelu.enums import Weekday
 from tilavarauspalvelu.validators import validate_reservable_times
-from utils.fields.model import IntChoiceField
+from utils.fields.model import StrChoiceField
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
@@ -27,7 +27,7 @@ class ApplicationRoundTimeSlot(models.Model):
         on_delete=models.CASCADE,
     )
 
-    weekday: int = IntChoiceField(enum=WeekdayChoice)
+    weekday: str = StrChoiceField(enum=Weekday)
     is_closed: bool = models.BooleanField(default=False)
     reservable_times: list[TimeSlotDB] = ArrayField(
         base_field=HStoreField(),
@@ -69,4 +69,4 @@ class ApplicationRoundTimeSlot(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f"Timeslots for {self.reservation_unit.name} on {WeekdayChoice(self.weekday).name.capitalize()}"
+        return f"Timeslots for {self.reservation_unit.name} on {Weekday(self.weekday).name.capitalize()}"

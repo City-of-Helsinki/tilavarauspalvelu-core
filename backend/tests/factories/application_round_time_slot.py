@@ -6,7 +6,7 @@ from typing import Any
 import factory
 from factory import fuzzy
 
-from tilavarauspalvelu.enums import WeekdayChoice
+from tilavarauspalvelu.enums import Weekday
 from tilavarauspalvelu.models import ApplicationRoundTimeSlot
 from tilavarauspalvelu.typing import TimeSlotDB
 
@@ -23,7 +23,7 @@ class ApplicationRoundTimeSlotFactory(GenericDjangoModelFactory[ApplicationRound
 
     reservation_unit = ForeignKeyFactory("tests.factories.ReservationUnitFactory")
 
-    weekday = fuzzy.FuzzyChoice(choices=WeekdayChoice.values)
+    weekday = fuzzy.FuzzyChoice(choices=Weekday.values)
     is_closed = False
     reservable_times = factory.LazyAttribute(
         lambda _: [
