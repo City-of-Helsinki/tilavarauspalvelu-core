@@ -22,6 +22,7 @@ from tilavarauspalvelu.enums import (
 )
 from utils.auditlog_util import AuditLogger
 from utils.db import NowTT
+from utils.fields.model import StrChoiceField
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
@@ -114,9 +115,8 @@ class ReservationUnit(models.Model):
         choices=ReservationStartInterval.choices,
         default=ReservationStartInterval.INTERVAL_15_MINUTES.value,
     )
-    reservation_kind: str = models.CharField(
-        max_length=20,
-        choices=ReservationKind.choices,
+    reservation_kind: str = StrChoiceField(
+        enum=ReservationKind,
         default=ReservationKind.DIRECT_AND_SEASON.value,
         db_index=True,
     )
