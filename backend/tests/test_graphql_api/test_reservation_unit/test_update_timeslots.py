@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from tilavarauspalvelu.enums import WeekdayChoice
+from tilavarauspalvelu.enums import Weekday
 
 from tests.factories import ApplicationRoundTimeSlotFactory, ReservationUnitFactory
 
@@ -25,13 +25,13 @@ def test_reservation_unit__update__timeslots__add(graphql):
         "pk": reservation_unit.pk,
         "applicationRoundTimeSlots": [
             {
-                "weekday": WeekdayChoice.MONDAY.value,
+                "weekday": Weekday.MONDAY.value,
                 "reservableTimes": [
                     {"begin": "10:00", "end": "12:00"},
                 ],
             },
             {
-                "weekday": WeekdayChoice.TUESDAY.value,
+                "weekday": Weekday.TUESDAY.value,
                 "isClosed": True,
             },
         ],
@@ -49,8 +49,8 @@ def test_reservation_unit__update__timeslots__add(graphql):
     reservation_unit.refresh_from_db()
     time_slots = list(reservation_unit.application_round_time_slots.all())
     assert len(time_slots) == 2
-    assert time_slots[0].weekday == WeekdayChoice.MONDAY
-    assert time_slots[1].weekday == WeekdayChoice.TUESDAY
+    assert time_slots[0].weekday == Weekday.MONDAY
+    assert time_slots[1].weekday == Weekday.TUESDAY
 
 
 def test_reservation_unit__update__timeslots__replace(graphql):
@@ -58,21 +58,21 @@ def test_reservation_unit__update__timeslots__replace(graphql):
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit, weekday=WeekdayChoice.MONDAY)
-    ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit, weekday=WeekdayChoice.FRIDAY)
+    ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit, weekday=Weekday.MONDAY)
+    ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit, weekday=Weekday.FRIDAY)
     graphql.login_with_superuser()
 
     data = {
         "pk": reservation_unit.pk,
         "applicationRoundTimeSlots": [
             {
-                "weekday": WeekdayChoice.MONDAY.value,
+                "weekday": Weekday.MONDAY.value,
                 "reservableTimes": [
                     {"begin": "10:00", "end": "12:00"},
                 ],
             },
             {
-                "weekday": WeekdayChoice.TUESDAY.value,
+                "weekday": Weekday.TUESDAY.value,
                 "isClosed": True,
             },
         ],
@@ -90,8 +90,8 @@ def test_reservation_unit__update__timeslots__replace(graphql):
     reservation_unit.refresh_from_db()
     time_slots = list(reservation_unit.application_round_time_slots.all())
     assert len(time_slots) == 2
-    assert time_slots[0].weekday == WeekdayChoice.MONDAY
-    assert time_slots[1].weekday == WeekdayChoice.TUESDAY
+    assert time_slots[0].weekday == Weekday.MONDAY
+    assert time_slots[1].weekday == Weekday.TUESDAY
 
 
 def test_reservation_unit__update__timeslots__remove_all(graphql):
@@ -99,7 +99,7 @@ def test_reservation_unit__update__timeslots__remove_all(graphql):
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit, weekday=WeekdayChoice.FRIDAY)
+    ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit, weekday=Weekday.FRIDAY)
     graphql.login_with_superuser()
 
     data = {
@@ -162,7 +162,7 @@ def test_reservation_unit__update__timeslots__begin_before_end(graphql):
         "pk": reservation_unit.pk,
         "applicationRoundTimeSlots": [
             {
-                "weekday": WeekdayChoice.MONDAY.value,
+                "weekday": Weekday.MONDAY.value,
                 "reservableTimes": [
                     {"begin": "12:00", "end": "10:00"},
                 ],
@@ -200,7 +200,7 @@ def test_reservation_unit__update__timeslots__overlapping_reservable_times(graph
         "pk": reservation_unit.pk,
         "applicationRoundTimeSlots": [
             {
-                "weekday": WeekdayChoice.MONDAY.value,
+                "weekday": Weekday.MONDAY.value,
                 "reservableTimes": [
                     {"begin": "10:00", "end": "12:00"},
                     {"begin": "11:00", "end": "15:00"},
@@ -239,13 +239,13 @@ def test_reservation_unit__update__timeslots__two_for_same_day(graphql):
         "pk": reservation_unit.pk,
         "applicationRoundTimeSlots": [
             {
-                "weekday": WeekdayChoice.MONDAY.value,
+                "weekday": Weekday.MONDAY.value,
                 "reservableTimes": [
                     {"begin": "10:00", "end": "12:00"},
                 ],
             },
             {
-                "weekday": WeekdayChoice.MONDAY.value,
+                "weekday": Weekday.MONDAY.value,
                 "isClosed": True,
             },
         ],
@@ -277,7 +277,7 @@ def test_reservation_unit__update__timeslots__open_has_no_reservable_times(graph
         "pk": reservation_unit.pk,
         "applicationRoundTimeSlots": [
             {
-                "weekday": WeekdayChoice.MONDAY.value,
+                "weekday": Weekday.MONDAY.value,
                 "reservableTimes": [],
             },
         ],
@@ -309,7 +309,7 @@ def test_reservation_unit__update__timeslots__closed_has_reservable_times(graphq
         "pk": reservation_unit.pk,
         "applicationRoundTimeSlots": [
             {
-                "weekday": WeekdayChoice.MONDAY.value,
+                "weekday": Weekday.MONDAY.value,
                 "isClosed": True,
                 "reservableTimes": [
                     {"begin": "10:00", "end": "12:00"},
