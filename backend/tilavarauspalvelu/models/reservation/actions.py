@@ -12,11 +12,11 @@ from rest_framework.exceptions import ValidationError
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import (
     CalendarProperty,
-    CustomerTypeChoice,
     EventProperty,
     OrderStatus,
     PaymentType,
     ReservationStateChoice,
+    ReserveeType,
     TimezoneProperty,
     TimezoneRuleProperty,
 )
@@ -195,7 +195,7 @@ class ReservationActions:
 
     def get_email_reservee_name(self) -> str:
         # Note: Different from 'reservation.reservee_name' (simpler, mainly)
-        if self.reservation.reservee_type in {CustomerTypeChoice.INDIVIDUAL.value, None}:
+        if self.reservation.reservee_type in {ReserveeType.INDIVIDUAL.value, None}:
             return f"{self.reservation.reservee_first_name} {self.reservation.reservee_last_name}".strip()
         return self.reservation.reservee_organisation_name
 
@@ -240,33 +240,24 @@ class ReservationActions:
     def get_required_fields(
         self,
         *,
-        reservee_type: CustomerTypeChoice | None = None,
-        reservee_is_unregistered_association: bool | None = None,
+        reservee_type: ReserveeType | None = None,
     ) -> list[str]:
         if reservee_type is None:
             reservee_type = self.reservation.reservee_type
-        if reservee_is_unregistered_association is None:
-            reservee_is_unregistered_association = self.reservation.reservee_is_unregistered_association
 
         qs = ReservationMetadataField.objects.filter(
             metadata_sets_required__reservation_units__reservations=self.reservation,
         )
 
         # Some fields are never mandatory for an individual reserver even if marked so in the metadata.
-        if reservee_type == CustomerTypeChoice.INDIVIDUAL:
-            qs = qs.exclude(field_name__in=["home_city", "reservee_id", "reservee_organisation_name"])
+        if reservee_type == ReserveeType.INDIVIDUAL:
+            qs = qs.exclude(field_name__in=["reservee_identifier", "reservee_organisation_name"])
 
-        # `reservee_id` is not mandatory for unregistered associations.
-        if reservee_is_unregistered_association:
-            qs = qs.exclude(field_name__in=["reservee_id"])
+        # Reservee identifier is optional for non-profit reservers (they can be unregistered)
+        if reservee_type == ReserveeType.NONPROFIT:
+            qs = qs.exclude(field_name__in=["reservee_identifier"])
 
-        required_fields = list(qs.distinct().order_by("field_name").values_list("field_name", flat=True))
-
-        # Home city removed and replaced with municipality
-        if "home_city" in required_fields:
-            required_fields.remove("home_city")
-
-        return required_fields
+        return list(qs.distinct().order_by("field_name").values_list("field_name", flat=True))
 
     def create_payment_order_paid_immediately(self, payment_type: PaymentType) -> PaymentOrder:
         if payment_type == PaymentType.ON_SITE:
@@ -371,11 +362,11 @@ class ReservationActions:
         if self.reservation.reservee_type is None:
             return False
 
-        reservee_type = CustomerTypeChoice(self.reservation.reservee_type)
-        if not reservee_type.is_organisation:
+        reservee_type = ReserveeType(self.reservation.reservee_type)
+        if reservee_type not in ReserveeType.organisation_types:
             return False
 
-        if reservee_type == CustomerTypeChoice.NONPROFIT and self.reservation.reservee_is_unregistered_association:
+        if reservee_type == ReserveeType.NONPROFIT and not self.reservation.reservee_identifier:
             return False
 
         reservation_unit: ReservationUnit = self.reservation.reservation_unit

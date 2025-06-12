@@ -12,11 +12,11 @@ from graphql_relay import to_global_id
 
 from tilavarauspalvelu.enums import (
     AccessType,
-    CustomerTypeChoice,
     MunicipalityChoice,
     PriceUnit,
     ReservationStateChoice,
     ReservationTypeChoice,
+    ReserveeType,
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
@@ -106,8 +106,7 @@ def test_reservation__query__all_fields(graphql):
         reserveeAddressZip
         reserveeEmail
         reserveeFirstName
-        reserveeId
-        reserveeIsUnregisteredAssociation
+        reserveeIdentifier
         reserveeLastName
         reserveeName
         reserveeOrganisationName
@@ -170,8 +169,7 @@ def test_reservation__query__all_fields(graphql):
         "reserveeAddressZip": reservation.reservee_address_zip,
         "reserveeEmail": reservation.reservee_email,
         "reserveeFirstName": reservation.reservee_first_name,
-        "reserveeId": reservation.reservee_id,
-        "reserveeIsUnregisteredAssociation": reservation.reservee_is_unregistered_association,
+        "reserveeIdentifier": reservation.reservee_identifier,
         "reserveeLastName": reservation.reservee_last_name,
         "reserveeName": f"{reservation.reservee_first_name} {reservation.reservee_last_name}",
         "reserveeOrganisationName": reservation.reservee_organisation_name,
@@ -201,7 +199,7 @@ def test_reservation__query__single(graphql):
 
 def test_reservation__query__reservee_name_for_individual_reservee(graphql):
     reservation = ReservationFactory.create(
-        reservee_type=CustomerTypeChoice.INDIVIDUAL,
+        reservee_type=ReserveeType.INDIVIDUAL,
         reservee_first_name="First",
         reservee_last_name="Last",
     )
@@ -219,7 +217,7 @@ def test_reservation__query__reservee_name_for_individual_reservee(graphql):
 
 def test_reservation__query__reservee_name_for_business_reservee(graphql):
     reservation = ReservationFactory.create(
-        reservee_type=CustomerTypeChoice.BUSINESS,
+        reservee_type=ReserveeType.COMPANY,
         reservee_organisation_name="Business Oy",
     )
 
@@ -236,7 +234,7 @@ def test_reservation__query__reservee_name_for_business_reservee(graphql):
 
 def test_reservation__query__reservee_name_for_nonprofit_reservee(graphql):
     reservation = ReservationFactory(
-        reservee_type=CustomerTypeChoice.NONPROFIT,
+        reservee_type=ReserveeType.NONPROFIT,
         reservee_organisation_name="Nonprofit Ry",
     )
 

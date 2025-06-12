@@ -166,7 +166,7 @@ def test_anonymization__reservation():
     assert reservation.billing_address_street == ANONYMIZED
 
     # Reservee_id and organisation name should not be anonymized
-    assert reservation.reservee_id != "1234567-2"
+    assert reservation.reservee_identifier != "1234567-2"
     assert reservation.reservee_organisation_name != ANONYMIZED
 
     assert reservation.working_memo == ""

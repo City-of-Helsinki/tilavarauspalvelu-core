@@ -183,7 +183,7 @@ class ReservationFilterSet(ModelFilterSet):
             fields = (
                 "pk",
                 "name",
-                "reservee_id",
+                "reservee_identifier",
                 "reservee_email",
                 "reservee_first_name",
                 "reservee_last_name",

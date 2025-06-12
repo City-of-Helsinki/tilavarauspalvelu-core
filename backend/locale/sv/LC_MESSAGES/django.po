@@ -1246,10 +1246,6 @@ msgid "Reservee address zip code"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservee is an unregistered association"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Type of reservee"
 msgstr ""
 
@@ -1785,11 +1781,8 @@ msgid "Reservation metadata set"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-#, fuzzy
-#| msgctxt "ICAL"
-#| msgid "Reservation for %(name)s"
 msgid "Reservation form"
-msgstr "Bokning för %(name)s"
+msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Max reservations per user"
@@ -2295,18 +2288,18 @@ msgid "Maintenance"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
-msgctxt "CustomerType"
-msgid "Business"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "CustomerType"
-msgid "Nonprofit"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "CustomerType"
+msgctxt "ReserveeType"
 msgid "Individual"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReserveeType"
+msgid "Company"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReserveeType"
+msgid "Nonprofit"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
@@ -2537,11 +2530,8 @@ msgid "Contact info form"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
-#, fuzzy
-#| msgctxt "Email"
-#| msgid "Reservee name"
 msgid "Reservee info form"
-msgstr "Bokare"
+msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgid "Purpose form"
@@ -2693,26 +2683,6 @@ msgid "Secondary"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
-msgctxt "ApplicantType"
-msgid "Individual"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "ApplicantType"
-msgid "Association"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "ApplicantType"
-msgid "Community"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "ApplicantType"
-msgid "Company"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
 msgid "Helsinki"
 msgstr ""
 
@@ -2813,36 +2783,6 @@ msgstr ""
 #: tilavarauspalvelu/enums.py
 msgctxt "ApplicationSectionStatus"
 msgid "Rejected"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "OrganizationType"
-msgid "Company"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "OrganizationType"
-msgid "Registered association"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "OrganizationType"
-msgid "Public association"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "OrganizationType"
-msgid "Unregistered association"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "OrganizationType"
-msgid "Municipality consortium"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "OrganizationType"
-msgid "Religious community"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py

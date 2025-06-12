@@ -47,10 +47,7 @@ class ReservationValidator:
             raise ValidationError(msg, code=error_codes.REQUIRES_REASON_FOR_APPLYING_FREE_OF_CHARGE)
 
     def validate_required_metadata_fields(self, **metadata: Any) -> None:
-        required_fields = self.reservation.actions.get_required_fields(
-            reservee_type=metadata.get("reservee_type"),
-            reservee_is_unregistered_association=metadata.get("reservee_is_unregistered_association"),
-        )
+        required_fields = self.reservation.actions.get_required_fields(reservee_type=metadata.get("reservee_type"))
 
         for required_field in required_fields:
             value = metadata.get(required_field, getattr(self.reservation, required_field, None))
