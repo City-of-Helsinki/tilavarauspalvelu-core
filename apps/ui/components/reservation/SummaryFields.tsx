@@ -95,6 +95,7 @@ export function ApplicationFields({
   const { t } = useTranslation();
 
   const includesReserveeType = containsField(supportedFields, "reserveeType");
+
   if (includesReserveeType && reservation.reserveeType == null) {
     // eslint-disable-next-line no-console
     console.warn(
@@ -124,7 +125,7 @@ export function ApplicationFields({
               <PreviewLabel>
                 {t("reservationApplication:reserveeTypePrefix")}
               </PreviewLabel>
-              <PreviewValue data-testid="reservation-confirm__reserveeType">
+              <PreviewValue data-testid="reservation__reserveeType">
                 {capitalize(
                   t(
                     `reservationApplication:reserveeTypes.labels.${reserveeType.toLowerCase()}`
@@ -139,7 +140,7 @@ export function ApplicationFields({
               reserveeType?.toLocaleLowerCase() || "individual";
             const labelKey = `reservationApplication:label.${typeNamespace}.${key}`;
             const label = t(labelKey);
-            const testId = `confirm_${key}`;
+            const testId = `reservation__${key}`;
             return (
               <LabelValuePair
                 key={key}
@@ -187,7 +188,7 @@ export function GeneralFields({
                 (x) => x === key
               ) != null;
             const label = t(`reservationApplication:label.common.${key}`);
-            const testId = `confirm_${key}`;
+            const testId = `reservation__${key}`;
             return (
               <LabelValuePair
                 key={key}

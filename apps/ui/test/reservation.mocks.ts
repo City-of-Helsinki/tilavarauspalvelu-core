@@ -13,13 +13,9 @@ import {
   TermsType,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
-<<<<<<< HEAD
-import { addHours } from "date-fns";
-import { generateNameFragment } from "@test/test.gql.utils";
-=======
->>>>>>> f4d8dacc6 (status)
 import { OptionsRecord } from "@/components/reservation/SummaryFields";
 import type { FieldName } from "common/src/metaFieldsHelpers";
+import { generateNameFragment } from "@/test/test.gql.utils";
 
 export function generateTextFragment(text: string) {
   return {
