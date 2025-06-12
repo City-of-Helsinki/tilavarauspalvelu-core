@@ -97,6 +97,11 @@ updates:
       # requires an upstream upgrade of vercel-style-guide to support a flat config
       - dependency-name: "eslint"
         update-types: ["version-update:semver-major"]
+      # hookform has decided to break typescript compatibility in a minor update
+      - dependency-name: "react-hook-form"
+      # resolvers depend on react-hook-form upgrade
+      - dependency-name: "@hookform/resolvers"
+        update-types: ["version-update:semver-major"]
     # NOTE can't do a single group for all it will fail to update
     # either just accept multiple PRs or do fine grained groups manually
     groups:
