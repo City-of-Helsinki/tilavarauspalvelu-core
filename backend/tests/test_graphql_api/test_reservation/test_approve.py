@@ -152,6 +152,39 @@ def test_reservation__approve__paid__in_webshop__close_to_begin_date(graphql):
     assert handled_payment_due_by == local_datetime(2024, 1, 2, 11)
 
 
+@patch_method(EmailService.send_reservation_approved_email)
+@patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
+@freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation__approve__paid__in_webshop__paid_on_site_since_begin_too_close(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 1, 13),
+        ends_at=local_datetime(2024, 1, 1, 14),
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation, price="10.59")
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert EmailService.send_reservation_approved_email.called is True
+    assert EmailService.send_reservation_confirmed_staff_notification_email.called is True
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+
+    assert hasattr(reservation, "payment_order")
+
+    payment_order = reservation.payment_order
+
+    assert payment_order.payment_type == PaymentType.ON_SITE
+    assert payment_order.status == OrderStatus.PAID_MANUALLY
+
+
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_reservation__approve__paid__in_webshop__has_payment__paid_online__with_same_price(graphql):
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
