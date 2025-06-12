@@ -8,7 +8,7 @@ from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntChoiceFilter, IntMultipleChoiceFilter
 from lookup_property import L
 
-from tilavarauspalvelu.enums import ApplicantTypeChoice, ApplicationStatusChoice
+from tilavarauspalvelu.enums import ApplicationStatusChoice, ReserveeType
 from tilavarauspalvelu.models import Application
 from utils.db import text_search
 from utils.utils import log_text_search
@@ -28,7 +28,7 @@ class ApplicationFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
     application_round = IntChoiceFilter()
     user = IntChoiceFilter()
-    applicant_type = EnumMultipleChoiceFilter(enum=ApplicantTypeChoice)
+    applicant_type = EnumMultipleChoiceFilter(enum=ReserveeType)
     status = EnumMultipleChoiceFilter(method="filter_by_status", enum=ApplicationStatusChoice)
     unit = IntMultipleChoiceFilter(field_name="application_sections__reservation_unit_options__reservation_unit__unit")
     text_search = django_filters.CharFilter(method="filter_by_text_search")

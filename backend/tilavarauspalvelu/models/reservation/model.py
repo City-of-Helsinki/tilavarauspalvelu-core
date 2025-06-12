@@ -14,11 +14,11 @@ from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import (
     AccessType,
-    CustomerTypeChoice,
     MunicipalityChoice,
     ReservationCancelReasonChoice,
     ReservationStateChoice,
     ReservationTypeChoice,
+    ReserveeType,
 )
 from utils.auditlog_util import AuditLogger
 from utils.date_utils import datetime_range_as_string
@@ -108,7 +108,7 @@ class Reservation(SerializableMixin, models.Model):
     free_of_charge_reason: str | None = models.TextField(null=True, blank=True)
 
     # Reservee information
-    reservee_id: str = models.CharField(max_length=255, blank=True, default="")
+    reservee_identifier: str = models.CharField(max_length=255, blank=True, default="")
     reservee_first_name: str = models.CharField(max_length=255, blank=True, default="")
     reservee_last_name: str = models.CharField(max_length=255, blank=True, default="")
     reservee_email: str | None = models.EmailField(null=True, blank=True)
@@ -117,14 +117,8 @@ class Reservation(SerializableMixin, models.Model):
     reservee_address_street: str = models.CharField(max_length=255, blank=True, default="")
     reservee_address_city: str = models.CharField(max_length=255, blank=True, default="")
     reservee_address_zip: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_is_unregistered_association: bool = models.BooleanField(default=False, blank=True)
     reservee_used_ad_login: bool = models.BooleanField(default=False, blank=True)
-    reservee_type: str | None = models.CharField(
-        max_length=50,
-        choices=CustomerTypeChoice.choices,
-        null=True,
-        blank=True,
-    )
+    reservee_type: str | None = StrChoiceField(enum=ReserveeType, null=True, blank=True)
 
     # Billing information
     billing_first_name: str = models.CharField(max_length=255, blank=True, default="")
@@ -214,7 +208,7 @@ class Reservation(SerializableMixin, models.Model):
         {"name": "billing_address_zip"},
         {"name": "billing_address_city"},
         {"name": "billing_address_street"},
-        {"name": "reservee_id"},
+        {"name": "reservee_identifier"},
         {"name": "reservee_organisation_name"},
         {"name": "free_of_charge_reason"},
         {"name": "cancel_details"},
@@ -271,7 +265,7 @@ class Reservation(SerializableMixin, models.Model):
             # Organisation reservee
             models.When(
                 condition=(
-                    models.Q(reservee_type__in=CustomerTypeChoice.organisation)  #
+                    models.Q(reservee_type__in=ReserveeType.organisation_types)  #
                     & ~models.Q(reservee_organisation_name="")
                 ),
                 then=models.F("reservee_organisation_name"),
@@ -279,7 +273,7 @@ class Reservation(SerializableMixin, models.Model):
             # Individual reservee
             models.When(
                 condition=(
-                    ~models.Q(reservee_type__in=CustomerTypeChoice.organisation)  #
+                    ~models.Q(reservee_type__in=ReserveeType.organisation_types)  #
                     & (~models.Q(reservee_first_name="") | ~models.Q(reservee_last_name=""))
                 ),
                 then=Trim(Concat("reservee_first_name", models.Value(" "), "reservee_last_name")),

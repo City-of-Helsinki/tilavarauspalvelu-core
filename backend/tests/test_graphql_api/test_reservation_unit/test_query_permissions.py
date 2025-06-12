@@ -75,7 +75,7 @@ SENSITIVE_FIELDS = """
         billingPhone
         billingEmail
         description
-        reserveeId
+        reserveeIdentifier
         cancelDetails
         cancelReason
         denyReason {
@@ -109,7 +109,7 @@ def test_reservation_unit__query__sensitive_information__regular_user(graphql):
         reservee_address_zip="Zip",
         reservee_email="admin@localhost",
         reservee_first_name="General",
-        reservee_id="Reservee ID",
+        reservee_identifier="Reservee ID",
         reservee_last_name="Admin",
         reservee_organisation_name="Organisation",
         reservee_phone="123435",
@@ -144,7 +144,7 @@ def test_reservation_unit__query__sensitive_information__regular_user(graphql):
                 "reserveeAddressZip": None,
                 "reserveeEmail": None,
                 "reserveeFirstName": None,
-                "reserveeId": None,
+                "reserveeIdentifier": None,
                 "reserveeLastName": None,
                 "reserveeOrganisationName": None,
                 "reserveePhone": None,
@@ -179,7 +179,7 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
         reservee_address_zip="Zip",
         reservee_email="admin@localhost",
         reservee_first_name="General",
-        reservee_id="Reservee ID",
+        reservee_identifier="Reservee ID",
         reservee_last_name="Admin",
         reservee_organisation_name="Organisation",
         reservee_phone="123435",
@@ -216,7 +216,7 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
                 "reserveeAddressZip": "Zip",
                 "reserveeEmail": "admin@localhost",
                 "reserveeFirstName": "General",
-                "reserveeId": "Reservee ID",
+                "reserveeIdentifier": "Reservee ID",
                 "reserveeLastName": "Admin",
                 "reserveeOrganisationName": "Organisation",
                 "reserveePhone": "123435",

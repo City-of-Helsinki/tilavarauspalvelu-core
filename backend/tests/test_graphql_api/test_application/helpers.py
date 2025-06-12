@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from tilavarauspalvelu.enums import ApplicantTypeChoice, MunicipalityChoice, Priority, Weekday
+from tilavarauspalvelu.enums import MunicipalityChoice, Priority, ReserveeType, Weekday
 
 from tests.factories import AgeGroupFactory, ReservationPurposeFactory, ReservationUnitFactory
 
@@ -96,7 +96,7 @@ def get_application_create_data(
         ]
 
     return {
-        "applicantType": ApplicantTypeChoice.COMPANY.value,
+        "applicantType": ReserveeType.COMPANY.value,
         "organisationIdentifier": "123-identifier",
         "organisationName": "Super organisation",
         "organisationStreetAddress": "Testikatu 28",
