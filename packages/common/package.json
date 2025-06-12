@@ -22,7 +22,7 @@
     "date-fns": "^4.1.0",
     "eslint-config-custom": "workspace:*",
     "focus-trap-react": "^11.0.3",
-    "graphql": "^16.10.0",
+    "graphql": "^16.11.0",
     "hds-react": "^4.4.0",
     "i18next": "^25.2.1",
     "lodash-es": "^4.17.21",
