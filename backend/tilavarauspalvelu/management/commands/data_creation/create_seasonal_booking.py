@@ -4,14 +4,7 @@ import datetime
 import random
 from typing import TYPE_CHECKING
 
-from tilavarauspalvelu.enums import (
-    ApplicantTypeChoice,
-    Priority,
-    ReservationKind,
-    TermsOfUseTypeChoices,
-    Weekday,
-    WeekdayChoice,
-)
+from tilavarauspalvelu.enums import ApplicantTypeChoice, Priority, ReservationKind, TermsOfUseTypeChoices, Weekday
 from tilavarauspalvelu.models import (
     AllocatedTimeSlot,
     Application,
@@ -589,7 +582,7 @@ def _create_upcoming_application_rounds(
 @with_logs
 def _create_application_round_time_slots(reservation_units: list[ReservationUnit]) -> list[ApplicationRoundTimeSlot]:
     time_slots: list[ApplicationRoundTimeSlot] = []
-    weekdays: list[int] = random_subset(WeekdayChoice.values)
+    weekdays: list[int] = random_subset(Weekday.values)
 
     for reservation_unit in reservation_units:
         for weekday in weekdays:
