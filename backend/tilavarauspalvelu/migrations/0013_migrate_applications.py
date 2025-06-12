@@ -14,6 +14,16 @@ import tilavarauspalvelu.validators
 import utils.fields.model
 
 
+class WeekdayChoice(models.IntegerChoices):
+    MONDAY = 0, "Monday"
+    TUESDAY = 1, "Tuesday"
+    WEDNESDAY = 2, "Wednesday"
+    THURSDAY = 3, "Thursday"
+    FRIDAY = 4, "Friday"
+    SATURDAY = 5, "Saturday"
+    SUNDAY = 6, "Sunday"
+
+
 def year_not_in_future(year: int | None) -> None:
     from django.core.exceptions import ValidationError
     from django.utils.text import format_lazy
@@ -478,7 +488,7 @@ class Migration(migrations.Migration):
                 (
                     "weekday",
                     utils.fields.model.IntChoiceField(
-                        enum=tilavarauspalvelu.enums.WeekdayChoice,
+                        enum=WeekdayChoice,
                         validators=[
                             django.core.validators.MinValueValidator(
                                 limit_value=0, message="Value must be between 0 and 6."

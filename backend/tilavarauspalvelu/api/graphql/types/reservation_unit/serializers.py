@@ -19,7 +19,7 @@ from tilavarauspalvelu.api.graphql.types.reservation_unit_access_type.serializer
 )
 from tilavarauspalvelu.api.graphql.types.reservation_unit_image.serializers import ReservationUnitImageFieldSerializer
 from tilavarauspalvelu.api.graphql.types.reservation_unit_pricing.serializers import ReservationUnitPricingSerializer
-from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, ReservationUnitPublishingState, WeekdayChoice
+from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, ReservationUnitPublishingState, Weekday
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, ReservationUnitPricing
@@ -340,7 +340,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
                 errors.append("Open timeslots must have reservable times.")
 
             if weekday in weekdays_seen:
-                day = WeekdayChoice(weekday).name.capitalize()
+                day = Weekday(weekday).name.capitalize()
                 errors.append(f"Got multiple timeslots for {day}.")
 
             weekdays_seen.add(weekday)
