@@ -97,12 +97,11 @@ class TestingReservationParamsSerializer(TestingBaseSerializer):
     def _create_metadata_set(self) -> ReservationMetadataSet:
         required_fields = {
             "description",
-            "home_city",
             "num_persons",
             "purpose",
             "reservee_email",
             "reservee_first_name",
-            "reservee_id",
+            "reservee_identifier",
             "reservee_last_name",
             "reservee_organisation_name",
             "reservee_phone",
@@ -110,7 +109,6 @@ class TestingReservationParamsSerializer(TestingBaseSerializer):
         }
         supported_fields = {
             "name",
-            "reservee_is_unregistered_association",
         } | required_fields
 
         ReservationMetadataField.objects.bulk_create(

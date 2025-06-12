@@ -9,11 +9,11 @@ from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import (
-    ApplicantTypeChoice,
     ApplicationRoundStatusChoice,
     ApplicationSectionStatusChoice,
     ApplicationStatusChoice,
     MunicipalityChoice,
+    ReserveeType,
 )
 from utils.db import NowTT
 from utils.fields.model import StrChoiceField
@@ -41,7 +41,7 @@ class Application(SerializableMixin, models.Model):
     """
 
     # Basic information
-    applicant_type: str | None = StrChoiceField(enum=ApplicantTypeChoice, null=True, db_index=True)
+    applicant_type: str | None = StrChoiceField(enum=ReserveeType, null=True, blank=True)
     additional_information: str = models.TextField(blank=True, default="")
 
     # Handling data
@@ -264,11 +264,10 @@ class Application(SerializableMixin, models.Model):
     @lookup_property
     def applicant_type_sort_order() -> int:
         return models.Case(  # type: ignore[return-value]
-            models.When(models.Q(applicant_type=ApplicantTypeChoice.ASSOCIATION.value), then=models.Value(1)),
-            models.When(models.Q(applicant_type=ApplicantTypeChoice.COMMUNITY.value), then=models.Value(2)),
-            models.When(models.Q(applicant_type=ApplicantTypeChoice.INDIVIDUAL.value), then=models.Value(3)),
-            models.When(models.Q(applicant_type=ApplicantTypeChoice.COMPANY.value), then=models.Value(4)),
-            default=models.Value(5),
+            models.When(models.Q(applicant_type=ReserveeType.NONPROFIT.value), then=models.Value(1)),
+            models.When(models.Q(applicant_type=ReserveeType.INDIVIDUAL.value), then=models.Value(2)),
+            models.When(models.Q(applicant_type=ReserveeType.COMPANY.value), then=models.Value(3)),
+            default=models.Value(4),
             output_field=models.IntegerField(),
         )
 

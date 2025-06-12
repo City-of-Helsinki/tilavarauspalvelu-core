@@ -8,12 +8,11 @@ import pytest
 
 from tilavarauspalvelu.enums import (
     AccessType,
-    ApplicantTypeChoice,
-    CustomerTypeChoice,
     HaukiResourceState,
     RejectionReadinessChoice,
     ReservationStateChoice,
     ReservationTypeChoice,
+    ReserveeType,
     Weekday,
 )
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
@@ -141,7 +140,7 @@ def test_generate_reservation_series_from_allocations__individual():
     )
 
     application: Application = application_round.applications.first()
-    application.applicant_type = ApplicantTypeChoice.INDIVIDUAL
+    application.applicant_type = ReserveeType.INDIVIDUAL
     application.save()
 
     application_round.actions.generate_reservations_from_allocations()
@@ -151,7 +150,7 @@ def test_generate_reservation_series_from_allocations__individual():
     assert len(reservations) == 1
 
     assert reservations[0].description == application.additional_information
-    assert reservations[0].reservee_type == CustomerTypeChoice.INDIVIDUAL
+    assert reservations[0].reservee_type == ReserveeType.INDIVIDUAL
     assert reservations[0].reservee_address_street == application.billing_street_address
     assert reservations[0].reservee_address_city == application.billing_city
     assert reservations[0].reservee_address_zip == application.billing_post_code
@@ -180,7 +179,7 @@ def test_generate_reservation_series_from_allocations__company():
     )
 
     application: Application = application_round.applications.first()
-    application.applicant_type = ApplicantTypeChoice.COMPANY
+    application.applicant_type = ReserveeType.COMPANY
     application.save()
 
     application_round.actions.generate_reservations_from_allocations()
@@ -189,10 +188,9 @@ def test_generate_reservation_series_from_allocations__company():
     assert len(reservations) == 1
 
     assert reservations[0].description == application.organisation_core_business
-    assert reservations[0].reservee_type == CustomerTypeChoice.BUSINESS
+    assert reservations[0].reservee_type == ReserveeType.COMPANY
     assert reservations[0].reservee_organisation_name == application.organisation_name
-    assert reservations[0].reservee_id == application.organisation_identifier
-    assert reservations[0].reservee_is_unregistered_association is False
+    assert reservations[0].reservee_identifier == application.organisation_identifier
     assert reservations[0].reservee_address_street == application.organisation_street_address
     assert reservations[0].reservee_address_city == application.organisation_city
     assert reservations[0].reservee_address_zip == application.organisation_post_code
@@ -221,7 +219,7 @@ def test_generate_reservation_series_from_allocations__association():
     )
 
     application: Application = application_round.applications.first()
-    application.applicant_type = ApplicantTypeChoice.ASSOCIATION
+    application.applicant_type = ReserveeType.NONPROFIT
     application.save()
 
     application_round.actions.generate_reservations_from_allocations()
@@ -230,10 +228,9 @@ def test_generate_reservation_series_from_allocations__association():
     assert len(reservations) == 1
 
     assert reservations[0].description == application.organisation_core_business
-    assert reservations[0].reservee_type == CustomerTypeChoice.NONPROFIT
+    assert reservations[0].reservee_type == ReserveeType.NONPROFIT
     assert reservations[0].reservee_organisation_name == application.organisation_name
-    assert reservations[0].reservee_id == application.organisation_identifier
-    assert reservations[0].reservee_is_unregistered_association is False
+    assert reservations[0].reservee_identifier == application.organisation_identifier
     assert reservations[0].reservee_address_street == application.organisation_street_address
     assert reservations[0].reservee_address_city == application.organisation_city
     assert reservations[0].reservee_address_zip == application.organisation_post_code
@@ -262,7 +259,7 @@ def test_generate_reservation_series_from_allocations__community():
     )
 
     application: Application = application_round.applications.first()
-    application.applicant_type = ApplicantTypeChoice.COMMUNITY
+    application.applicant_type = ReserveeType.NONPROFIT
     application.save()
 
     application_round.actions.generate_reservations_from_allocations()
@@ -270,10 +267,9 @@ def test_generate_reservation_series_from_allocations__community():
     reservations: list[Reservation] = list(Reservation.objects.all())
     assert len(reservations) == 1
 
-    assert reservations[0].reservee_type == CustomerTypeChoice.NONPROFIT
+    assert reservations[0].reservee_type == ReserveeType.NONPROFIT
     assert reservations[0].reservee_organisation_name == application.organisation_name
-    assert reservations[0].reservee_id == application.organisation_identifier
-    assert reservations[0].reservee_is_unregistered_association is False
+    assert reservations[0].reservee_identifier == application.organisation_identifier
     assert reservations[0].reservee_address_street == application.organisation_street_address
     assert reservations[0].reservee_address_city == application.organisation_city
     assert reservations[0].reservee_address_zip == application.organisation_post_code

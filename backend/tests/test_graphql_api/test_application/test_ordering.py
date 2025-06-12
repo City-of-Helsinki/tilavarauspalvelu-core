@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from tilavarauspalvelu.enums import ApplicantTypeChoice
+from tilavarauspalvelu.enums import ReserveeType
 
 from tests.factories import ApplicationFactory, ApplicationSectionFactory, ReservationUnitOptionFactory
 
@@ -76,10 +76,9 @@ def test_application__order__by_applicant_type(graphql):
     # given:
     # - There are four applications in the system with different applicant types
     # - A superuser is using the system
-    application_1 = ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.ASSOCIATION)
-    application_2 = ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.INDIVIDUAL)
-    application_3 = ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.COMMUNITY)
-    application_4 = ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.COMPANY)
+    application_1 = ApplicationFactory.create_in_status_draft(applicant_type=ReserveeType.NONPROFIT)
+    application_2 = ApplicationFactory.create_in_status_draft(applicant_type=ReserveeType.INDIVIDUAL)
+    application_3 = ApplicationFactory.create_in_status_draft(applicant_type=ReserveeType.COMPANY)
     graphql.login_with_superuser()
 
     # when:
@@ -88,11 +87,10 @@ def test_application__order__by_applicant_type(graphql):
 
     # then:
     # - The response contains the application in the wanted order
-    assert len(response.edges) == 4
+    assert len(response.edges) == 3
     assert response.node(0) == {"pk": application_1.pk}
-    assert response.node(1) == {"pk": application_3.pk}
-    assert response.node(2) == {"pk": application_2.pk}
-    assert response.node(3) == {"pk": application_4.pk}
+    assert response.node(1) == {"pk": application_2.pk}
+    assert response.node(2) == {"pk": application_3.pk}
 
     # when:
     # - User tries to search for applications ordered by applicant type descending
@@ -100,11 +98,10 @@ def test_application__order__by_applicant_type(graphql):
 
     # then:
     # - The response contains the application in the wanted order
-    assert len(response.edges) == 4
-    assert response.node(0) == {"pk": application_4.pk}
+    assert len(response.edges) == 3
+    assert response.node(0) == {"pk": application_3.pk}
     assert response.node(1) == {"pk": application_2.pk}
-    assert response.node(2) == {"pk": application_3.pk}
-    assert response.node(3) == {"pk": application_1.pk}
+    assert response.node(2) == {"pk": application_1.pk}
 
 
 def test_application__order__by_status(graphql):

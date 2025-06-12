@@ -31,7 +31,7 @@ type Query {
     pk: [Int]
     applicationRound: Int
     user: Int
-    applicantType: [ApplicantTypeChoice]
+    applicantType: [ReserveeType]
     status: [ApplicationStatusChoice]
     unit: [Int]
     textSearch: String
@@ -57,7 +57,7 @@ type Query {
     applicationRound: Int
     reservationUnit: [Int]
     unit: [Int]
-    applicantType: [ApplicantTypeChoice]
+    applicantType: [ReserveeType]
     status: [ApplicationSectionStatusChoice]
     applicationStatus: [ApplicationStatusChoice]
     priority: [Priority]
@@ -82,7 +82,7 @@ type Query {
     dayOfTheWeek: [Weekday]
     applicationRound: Int
     applicationSectionStatus: [ApplicationSectionStatusChoice]
-    applicantType: [ApplicantTypeChoice]
+    applicantType: [ReserveeType]
     allocatedUnit: [Int]
     allocatedReservationUnit: [Int]
     accessCodeState: [AccessCodeState]
@@ -1495,7 +1495,7 @@ type ReservationNode implements Node {
   taxPercentageValue: Decimal
   applyingForFreeOfCharge: Boolean
   freeOfChargeReason: String
-  reserveeId: String
+  reserveeIdentifier: String
   reserveeFirstName: String
   reserveeLastName: String
   reserveeEmail: String
@@ -1504,8 +1504,7 @@ type ReservationNode implements Node {
   reserveeAddressStreet: String
   reserveeAddressCity: String
   reserveeAddressZip: String
-  reserveeIsUnregisteredAssociation: Boolean
-  reserveeType: CustomerTypeChoice
+  reserveeType: ReserveeType
   billingFirstName: String
   billingLastName: String
   billingEmail: String
@@ -1588,10 +1587,10 @@ enum ReservationCancelReasonChoice {
 scalar Decimal
 
 """An enumeration."""
-enum CustomerTypeChoice {
-  BUSINESS
-  NONPROFIT
+enum ReserveeType {
   INDIVIDUAL
+  COMPANY
+  NONPROFIT
 }
 
 type UserNode implements Node {
@@ -1797,7 +1796,7 @@ type ReservationUnitOptionNode implements Node {
     dayOfTheWeek: [Weekday]
     applicationRound: Int
     applicationSectionStatus: [ApplicationSectionStatusChoice]
-    applicantType: [ApplicantTypeChoice]
+    applicantType: [ReserveeType]
     allocatedUnit: [Int]
     allocatedReservationUnit: [Int]
     accessCodeState: [AccessCodeState]
@@ -1856,7 +1855,7 @@ type ApplicationSectionNode implements Node {
 }
 
 type ApplicationNode implements Node {
-  applicantType: ApplicantTypeChoice
+  applicantType: ReserveeType
   additionalInformation: String!
   cancelledAt: DateTime
   sentAt: DateTime
@@ -1891,7 +1890,7 @@ type ApplicationNode implements Node {
     applicationRound: Int
     reservationUnit: [Int]
     unit: [Int]
-    applicantType: [ApplicantTypeChoice]
+    applicantType: [ReserveeType]
     status: [ApplicationSectionStatusChoice]
     applicationStatus: [ApplicationStatusChoice]
     priority: [Priority]
@@ -1911,14 +1910,6 @@ type ApplicationNode implements Node {
   id: ID!
   status: ApplicationStatusChoice!
   pk: Int
-}
-
-"""An enumeration."""
-enum ApplicantTypeChoice {
-  INDIVIDUAL
-  ASSOCIATION
-  COMMUNITY
-  COMPANY
 }
 
 type ApplicantNode implements Node {
@@ -3182,7 +3173,7 @@ type ApplicationCreateMutationPayload {
   pk: Int
   applicationRound: Int
   applicationSections: [ApplicationSectionNode]
-  applicantType: ApplicantTypeChoice
+  applicantType: ReserveeType
   additionalInformation: String
   contactPersonFirstName: String
   contactPersonLastName: String
@@ -3236,7 +3227,7 @@ input ApplicationCreateMutationInput {
   pk: Int
   applicationRound: Int!
   applicationSections: [ApplicationSectionForApplicationSerializerInput]
-  applicantType: ApplicantTypeChoice
+  applicantType: ReserveeType
   additionalInformation: String
   contactPersonFirstName: String
   contactPersonLastName: String
@@ -3290,7 +3281,7 @@ type ApplicationUpdateMutationPayload {
   pk: Int
   applicationRound: ID
   applicationSections: [ApplicationSectionNode]
-  applicantType: ApplicantTypeChoice
+  applicantType: ReserveeType
   additionalInformation: String
   contactPersonFirstName: String
   contactPersonLastName: String
@@ -3320,7 +3311,7 @@ type ApplicationUpdateMutationPayload {
 input ApplicationUpdateMutationInput {
   pk: Int!
   applicationSections: [UpdateApplicationSectionForApplicationSerializerInput]
-  applicantType: ApplicantTypeChoice
+  applicantType: ReserveeType
   additionalInformation: String
   contactPersonFirstName: String
   contactPersonLastName: String
@@ -4258,7 +4249,7 @@ type ReservationStaffCreateMutationPayload {
   bufferTimeAfter: Duration
   applyingForFreeOfCharge: Boolean
   freeOfChargeReason: String
-  reserveeId: String
+  reserveeIdentifier: String
   reserveeFirstName: String
   reserveeLastName: String
   reserveeEmail: String
@@ -4267,8 +4258,7 @@ type ReservationStaffCreateMutationPayload {
   reserveeAddressStreet: String
   reserveeAddressCity: String
   reserveeAddressZip: String
-  reserveeIsUnregisteredAssociation: Boolean
-  reserveeType: CustomerTypeChoice
+  reserveeType: ReserveeType
   billingFirstName: String
   billingLastName: String
   billingPhone: String
@@ -4297,7 +4287,7 @@ input ReservationStaffCreateMutationInput {
   bufferTimeAfter: Duration
   applyingForFreeOfCharge: Boolean
   freeOfChargeReason: String
-  reserveeId: String
+  reserveeIdentifier: String
   reserveeFirstName: String
   reserveeLastName: String
   reserveeEmail: String
@@ -4306,8 +4296,7 @@ input ReservationStaffCreateMutationInput {
   reserveeAddressStreet: String
   reserveeAddressCity: String
   reserveeAddressZip: String
-  reserveeIsUnregisteredAssociation: Boolean
-  reserveeType: CustomerTypeChoice
+  reserveeType: ReserveeType
   billingFirstName: String
   billingLastName: String
   billingPhone: String
@@ -4328,7 +4317,7 @@ type ReservationUpdateMutationPayload {
   municipality: MunicipalityChoice
   applyingForFreeOfCharge: Boolean
   freeOfChargeReason: String
-  reserveeId: String
+  reserveeIdentifier: String
   reserveeFirstName: String
   reserveeLastName: String
   reserveeEmail: String
@@ -4337,8 +4326,7 @@ type ReservationUpdateMutationPayload {
   reserveeAddressStreet: String
   reserveeAddressCity: String
   reserveeAddressZip: String
-  reserveeIsUnregisteredAssociation: Boolean
-  reserveeType: CustomerTypeChoice
+  reserveeType: ReserveeType
   billingFirstName: String
   billingLastName: String
   billingEmail: String
@@ -4359,7 +4347,7 @@ input ReservationUpdateMutationInput {
   municipality: MunicipalityChoice
   applyingForFreeOfCharge: Boolean
   freeOfChargeReason: String
-  reserveeId: String
+  reserveeIdentifier: String
   reserveeFirstName: String
   reserveeLastName: String
   reserveeEmail: String
@@ -4368,8 +4356,7 @@ input ReservationUpdateMutationInput {
   reserveeAddressStreet: String
   reserveeAddressCity: String
   reserveeAddressZip: String
-  reserveeIsUnregisteredAssociation: Boolean
-  reserveeType: CustomerTypeChoice
+  reserveeType: ReserveeType
   billingFirstName: String
   billingLastName: String
   billingEmail: String
@@ -4523,9 +4510,8 @@ type ReservationStaffModifyMutationPayload {
   reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeEmail: String
-  reserveeType: CustomerTypeChoice
-  reserveeId: String
-  reserveeIsUnregisteredAssociation: Boolean
+  reserveeType: ReserveeType
+  reserveeIdentifier: String
   billingAddressCity: String
   billingAddressStreet: String
   billingAddressZip: String
@@ -4566,9 +4552,8 @@ input ReservationStaffModifyMutationInput {
   reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeEmail: String
-  reserveeType: CustomerTypeChoice
-  reserveeId: String
-  reserveeIsUnregisteredAssociation: Boolean
+  reserveeType: ReserveeType
+  reserveeIdentifier: String
   billingAddressCity: String
   billingAddressStreet: String
   billingAddressZip: String
@@ -4644,7 +4629,7 @@ input ReservationSeriesReservationCreateSerializerInput {
   confirmedAt: DateTime
   applyingForFreeOfCharge: Boolean
   freeOfChargeReason: String
-  reserveeId: String
+  reserveeIdentifier: String
   reserveeFirstName: String
   reserveeLastName: String
   reserveeEmail: String
@@ -4653,7 +4638,6 @@ input ReservationSeriesReservationCreateSerializerInput {
   reserveeAddressStreet: String
   reserveeAddressCity: String
   reserveeAddressZip: String
-  reserveeIsUnregisteredAssociation: Boolean
   reserveeType: ReserveeType
   billingFirstName: String
   billingLastName: String
@@ -4680,18 +4664,6 @@ enum ReservationTypeStaffChoice {
   BEHALF
 }
 
-"""An enumeration."""
-enum ReserveeType {
-  """Business"""
-  BUSINESS
-
-  """Nonprofit"""
-  NONPROFIT
-
-  """Individual"""
-  INDIVIDUAL
-}
-
 type ReservationSeriesUpdateMutationPayload {
   pk: Int
   name: String
@@ -4715,7 +4687,7 @@ input UpdateReservationSeriesReservationUpdateSerializerInput {
   workingMemo: String
   applyingForFreeOfCharge: Boolean
   freeOfChargeReason: String
-  reserveeId: String
+  reserveeIdentifier: String
   reserveeFirstName: String
   reserveeLastName: String
   reserveeEmail: String
@@ -4724,7 +4696,6 @@ input UpdateReservationSeriesReservationUpdateSerializerInput {
   reserveeAddressStreet: String
   reserveeAddressCity: String
   reserveeAddressZip: String
-  reserveeIsUnregisteredAssociation: Boolean
   reserveeType: ReserveeType
   billingFirstName: String
   billingLastName: String

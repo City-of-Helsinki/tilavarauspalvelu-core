@@ -24,6 +24,22 @@ class WeekdayChoice(models.IntegerChoices):
     SUNDAY = 6, "Sunday"
 
 
+class OrganizationTypeChoice(models.TextChoices):
+    COMPANY = "COMPANY", "Company"
+    REGISTERED_ASSOCIATION = "REGISTERED_ASSOCIATION", "Registered association"
+    PUBLIC_ASSOCIATION = "PUBLIC_ASSOCIATION", "Public association"
+    UNREGISTERED_ASSOCIATION = "UNREGISTERED_ASSOCIATION", "Unregistered association"
+    MUNICIPALITY_CONSORTIUM = "MUNICIPALITY_CONSORTIUM", "Municipality consortium"
+    RELIGIOUS_COMMUNITY = "RELIGIOUS_COMMUNITY", "Religious community"
+
+
+class ApplicantTypeChoice(models.TextChoices):
+    INDIVIDUAL = "INDIVIDUAL", "Individual"
+    COMPANY = "COMPANY", "Company"
+    ASSOCIATION = "ASSOCIATION", "Association"
+    COMMUNITY = "COMMUNITY", "Community"
+
+
 def year_not_in_future(year: int | None) -> None:
     from django.core.exceptions import ValidationError
     from django.utils.text import format_lazy
@@ -219,7 +235,7 @@ class Migration(migrations.Migration):
                             ("COMPANY", "Company"),
                         ],
                         db_index=True,
-                        enum=tilavarauspalvelu.enums.ApplicantTypeChoice,
+                        enum=ApplicantTypeChoice,
                         max_length=11,
                         null=True,
                     ),
@@ -371,7 +387,7 @@ class Migration(migrations.Migration):
                             ("RELIGIOUS_COMMUNITY", "Religious community"),
                         ],
                         default="COMPANY",
-                        enum=tilavarauspalvelu.enums.OrganizationTypeChoice,
+                        enum=OrganizationTypeChoice,
                         max_length=24,
                     ),
                 ),

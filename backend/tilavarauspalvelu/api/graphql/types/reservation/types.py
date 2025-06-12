@@ -16,11 +16,11 @@ from rest_framework.reverse import reverse
 from tilavarauspalvelu.api.graphql.types.user.types import UserNode
 from tilavarauspalvelu.enums import (
     AccessType,
-    CustomerTypeChoice,
     PriceUnit,
     ReservationCancelReasonChoice,
     ReservationStateChoice,
     ReservationTypeChoice,
+    ReserveeType,
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Reservation, ReservationUnit, ReservationUnitPricing, User
@@ -168,7 +168,7 @@ class ReservationNode(DjangoNode):
     applying_for_free_of_charge = graphene.Boolean()
     free_of_charge_reason = graphene.String()
     #
-    reservee_id = graphene.String()
+    reservee_identifier = graphene.String()
     reservee_first_name = graphene.String()
     reservee_last_name = graphene.String()
     reservee_email = graphene.String()
@@ -176,9 +176,8 @@ class ReservationNode(DjangoNode):
     reservee_address_street = graphene.String()
     reservee_address_city = graphene.String()
     reservee_address_zip = graphene.String()
-    reservee_is_unregistered_association = graphene.Boolean()
     reservee_organisation_name = graphene.String()
-    reservee_type = graphene.Field(graphene.Enum.from_enum(CustomerTypeChoice))
+    reservee_type = graphene.Field(graphene.Enum.from_enum(ReserveeType))
     #
     billing_first_name = graphene.String()
     billing_last_name = graphene.String()
@@ -228,7 +227,7 @@ class ReservationNode(DjangoNode):
             "applying_for_free_of_charge",
             "free_of_charge_reason",
             #
-            "reservee_id",
+            "reservee_identifier",
             "reservee_name",
             "reservee_first_name",
             "reservee_last_name",
@@ -237,7 +236,6 @@ class ReservationNode(DjangoNode):
             "reservee_address_street",
             "reservee_address_city",
             "reservee_address_zip",
-            "reservee_is_unregistered_association",
             "reservee_organisation_name",
             "reservee_type",
             #

@@ -5,10 +5,10 @@ import pytest
 from tilavarauspalvelu.enums import (
     AccessCodeState,
     AccessType,
-    ApplicantTypeChoice,
     ApplicationSectionStatusChoice,
     ReservationStateChoice,
     ReservationTypeChoice,
+    ReserveeType,
     Weekday,
 )
 from utils.date_utils import local_datetime
@@ -146,10 +146,10 @@ def test_allocated_time_slot__filter__by_applicant_type(graphql):
     # - There are two allocated time slots with different applicant types
     # - A superuser is using the system
     allocation = AllocatedTimeSlotFactory.create(
-        reservation_unit_option__application_section__application__applicant_type=ApplicantTypeChoice.INDIVIDUAL,
+        reservation_unit_option__application_section__application__applicant_type=ReserveeType.INDIVIDUAL,
     )
     AllocatedTimeSlotFactory.create(
-        reservation_unit_option__application_section__application__applicant_type=ApplicantTypeChoice.COMPANY,
+        reservation_unit_option__application_section__application__applicant_type=ReserveeType.COMPANY,
     )
     graphql.login_with_superuser()
 
@@ -170,10 +170,10 @@ def test_allocated_time_slot__filter__by_applicant_type__multiple(graphql):
     # - There are two allocated time slots with different applicant types
     # - A superuser is using the system
     allocation_1 = AllocatedTimeSlotFactory.create(
-        reservation_unit_option__application_section__application__applicant_type=ApplicantTypeChoice.INDIVIDUAL,
+        reservation_unit_option__application_section__application__applicant_type=ReserveeType.INDIVIDUAL,
     )
     allocation_2 = AllocatedTimeSlotFactory.create(
-        reservation_unit_option__application_section__application__applicant_type=ApplicantTypeChoice.COMPANY,
+        reservation_unit_option__application_section__application__applicant_type=ReserveeType.COMPANY,
     )
     graphql.login_with_superuser()
 
