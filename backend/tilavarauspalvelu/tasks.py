@@ -201,6 +201,11 @@ def prune_reservation_statistics_task() -> None:
     ReservationStatistic.objects.delete_expired_statistics()
 
 
+@app.task(name="create_missing_reservation_statistics")
+def create_missing_reservation_statistics_task() -> None:
+    Reservation.objects.create_missing_statistics()
+
+
 @app.task(name="refund_paid_reservation")
 @deprecated("Use 'refund_payment_order_for_webshop_task' instead. Can be removed in next release.")
 def refund_paid_reservation_task(reservation_pk: int) -> None:
