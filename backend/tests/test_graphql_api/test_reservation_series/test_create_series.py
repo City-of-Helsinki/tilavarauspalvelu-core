@@ -6,11 +6,11 @@ import pytest
 
 from tilavarauspalvelu.enums import (
     AccessType,
-    CustomerTypeChoice,
     MunicipalityChoice,
     ReservationStateChoice,
     ReservationTypeChoice,
     ReservationTypeStaffChoice,
+    ReserveeType,
     Weekday,
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
@@ -100,7 +100,7 @@ def test_reservation_series__create_series__reservation_details(graphql):
     data["reservationDetails"]["confirmedAt"] = datetime.datetime(2023, 1, 2).isoformat(timespec="seconds")
     data["reservationDetails"]["applyingForFreeOfCharge"] = True
     data["reservationDetails"]["freeOfChargeReason"] = "reason"
-    data["reservationDetails"]["reserveeId"] = "id"
+    data["reservationDetails"]["reserveeIdentifier"] = "id"
     data["reservationDetails"]["reserveeFirstName"] = "User"
     data["reservationDetails"]["reserveeLastName"] = "Admin"
     data["reservationDetails"]["reserveeEmail"] = "user@admin.com"
@@ -109,8 +109,7 @@ def test_reservation_series__create_series__reservation_details(graphql):
     data["reservationDetails"]["reserveeAddressStreet"] = "street"
     data["reservationDetails"]["reserveeAddressCity"] = "city"
     data["reservationDetails"]["reserveeAddressZip"] = "cip"
-    data["reservationDetails"]["reserveeIsUnregisteredAssociation"] = False
-    data["reservationDetails"]["reserveeType"] = CustomerTypeChoice.BUSINESS.upper()
+    data["reservationDetails"]["reserveeType"] = ReserveeType.COMPANY.value
     data["reservationDetails"]["billingFirstName"] = "Bill"
     data["reservationDetails"]["billingLastName"] = "Admin"
     data["reservationDetails"]["billingEmail"] = "bill@admin.com"
@@ -146,7 +145,7 @@ def test_reservation_series__create_series__reservation_details(graphql):
     assert reservations[0].confirmed_at == datetime.datetime(2023, 1, 2, tzinfo=DEFAULT_TIMEZONE)
     assert reservations[0].applying_for_free_of_charge is True
     assert reservations[0].free_of_charge_reason == "reason"
-    assert reservations[0].reservee_id == "id"
+    assert reservations[0].reservee_identifier == "id"
     assert reservations[0].reservee_first_name == "User"
     assert reservations[0].reservee_last_name == "Admin"
     assert reservations[0].reservee_email == "user@admin.com"
@@ -155,8 +154,7 @@ def test_reservation_series__create_series__reservation_details(graphql):
     assert reservations[0].reservee_address_street == "street"
     assert reservations[0].reservee_address_city == "city"
     assert reservations[0].reservee_address_zip == "cip"
-    assert reservations[0].reservee_is_unregistered_association is False
-    assert reservations[0].reservee_type == CustomerTypeChoice.BUSINESS
+    assert reservations[0].reservee_type == ReserveeType.COMPANY
     assert reservations[0].billing_first_name == "Bill"
     assert reservations[0].billing_last_name == "Admin"
     assert reservations[0].billing_email == "bill@admin.com"

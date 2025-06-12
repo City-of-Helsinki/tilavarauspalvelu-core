@@ -11,12 +11,12 @@ from factory import LazyAttribute, fuzzy
 
 from tilavarauspalvelu.enums import (
     AccessType,
-    CustomerTypeChoice,
     MunicipalityChoice,
     OrderStatus,
     PaymentType,
     ReservationStateChoice,
     ReservationTypeChoice,
+    ReserveeType,
 )
 from tilavarauspalvelu.models import Reservation
 from utils.date_utils import local_datetime, local_start_of_day, next_hour, utc_datetime
@@ -75,7 +75,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     free_of_charge_reason = None
 
     # Reservee information
-    reservee_id = FakerFI("company_business_id")
+    reservee_identifier = FakerFI("company_business_id")
     reservee_first_name = FakerFI("first_name")
     reservee_last_name = FakerFI("last_name")
     reservee_email = FakerFI("email")
@@ -84,9 +84,8 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     reservee_address_street = FakerFI("street_address")
     reservee_address_city = FakerFI("city")
     reservee_address_zip = FakerFI("postcode")
-    reservee_is_unregistered_association = False
     reservee_used_ad_login = False
-    reservee_type = CustomerTypeChoice.INDIVIDUAL
+    reservee_type = ReserveeType.INDIVIDUAL
 
     # Billing information
     billing_first_name = FakerFI("first_name")
@@ -383,13 +382,13 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
 
         return self
 
-    def for_customer_type(self, customer_type: CustomerTypeChoice) -> Self:
-        match customer_type:
-            case CustomerTypeChoice.BUSINESS:
-                return self.for_business()
-            case CustomerTypeChoice.NONPROFIT:
+    def for_reservee_type(self, reservee_type: ReserveeType) -> Self:
+        match reservee_type:
+            case ReserveeType.COMPANY:
+                return self.for_company()
+            case ReserveeType.NONPROFIT:
                 return self.for_nonprofit()
-            case CustomerTypeChoice.INDIVIDUAL:
+            case ReserveeType.INDIVIDUAL:
                 return self.for_individual()
 
     def for_state(self, state: ReservationStateChoice) -> Self:
@@ -414,30 +413,27 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
                 )
         return self
 
-    def for_business(self) -> Self:
+    def for_company(self) -> Self:
         self.set(
-            reservee_type=CustomerTypeChoice.BUSINESS,
+            reservee_type=ReserveeType.COMPANY,
             reservee_organisation_name=self.factory.reservee_organisation_name.generate(),
-            reservee_id=self.factory.reservee_id.generate(),
-            reservee_is_unregistered_association=False,
+            reservee_identifier=self.factory.reservee_identifier.generate(),
         )
         return self
 
     def for_nonprofit(self, *, unregistered: bool = False) -> Self:
         self.set(
-            reservee_type=CustomerTypeChoice.NONPROFIT,
+            reservee_type=ReserveeType.NONPROFIT,
             reservee_organisation_name="",
-            reservee_id="" if unregistered else self.factory.reservee_id.generate(),
-            reservee_is_unregistered_association=False,
+            reservee_identifier="" if unregistered else self.factory.reservee_identifier.generate(),
         )
         return self
 
     def for_individual(self) -> Self:
         self.set(
-            reservee_type=CustomerTypeChoice.INDIVIDUAL,
+            reservee_type=ReserveeType.INDIVIDUAL,
             reservee_organisation_name="",
-            reservee_id="",
-            reservee_is_unregistered_association=False,
+            reservee_identifier="",
         )
         return self
 
