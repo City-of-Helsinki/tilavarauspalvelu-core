@@ -8,11 +8,11 @@ import pytest
 from tilavarauspalvelu.enums import (
     AccessType,
     ADLoginAMR,
-    CustomerTypeChoice,
     MunicipalityChoice,
     ProfileLoginAMR,
     ReservationStateChoice,
     ReservationTypeChoice,
+    ReserveeType,
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
@@ -274,12 +274,11 @@ def test_reservation__staff_create__optional_fields(graphql):
         reserveeAddressZip="00100",
         reserveeEmail="john.doe@example.com",
         reserveeFirstName="John",
-        reserveeId="2882333-2",
-        reserveeIsUnregisteredAssociation=False,
+        reserveeIdentifier="2882333-2",
         reserveeLastName="Doe",
         reserveeOrganisationName="Test Organisation ry",
         reserveePhone="+358123456789",
-        reserveeType=CustomerTypeChoice.INDIVIDUAL,
+        reserveeType=ReserveeType.INDIVIDUAL,
         type=ReservationTypeChoice.BLOCKED,
     )
 
@@ -313,8 +312,7 @@ def test_reservation__staff_create__optional_fields(graphql):
     assert reservation.reservee_address_zip == "00100"
     assert reservation.reservee_email == "john.doe@example.com"
     assert reservation.reservee_first_name == "John"
-    assert reservation.reservee_id == "2882333-2"
-    assert reservation.reservee_is_unregistered_association is False
+    assert reservation.reservee_identifier == "2882333-2"
     assert reservation.reservee_last_name == "Doe"
     assert reservation.reservee_organisation_name == "Test Organisation ry"
     assert reservation.reservee_phone == "+358123456789"

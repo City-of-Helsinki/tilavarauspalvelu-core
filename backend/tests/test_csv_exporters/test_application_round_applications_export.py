@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from tilavarauspalvelu.enums import ApplicantTypeChoice, MunicipalityChoice, Priority, Weekday
+from tilavarauspalvelu.enums import MunicipalityChoice, Priority, ReserveeType, Weekday
 from tilavarauspalvelu.services.export import ApplicationRoundApplicationsCSVExporter
 from tilavarauspalvelu.services.export.application_round_applications_exporter import ApplicationExportRow
 from utils.date_utils import local_date_string, local_datetime, local_timedelta_string
@@ -224,7 +224,7 @@ def test_application_round_applications_export__missing_data(graphql, column_val
     data = {
         "sent_at": local_datetime(),
         "application_round": application_round,
-        "applicant_type": ApplicantTypeChoice.COMPANY.value,
+        "applicant_type": ReserveeType.COMPANY.value,
         "municipality": MunicipalityChoice.HELSINKI.value,
         "organisation_name": "aaa",
         "organisation_identifier": "123456-7",

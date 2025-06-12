@@ -4,7 +4,7 @@ import datetime
 
 from factory import fuzzy
 
-from tilavarauspalvelu.enums import ApplicantTypeChoice, Weekday
+from tilavarauspalvelu.enums import ReserveeType, Weekday
 from tilavarauspalvelu.models import AllocatedTimeSlot
 from utils.date_utils import DEFAULT_TIMEZONE, local_start_of_day
 
@@ -33,7 +33,7 @@ class AllocatedTimeSlotFactory(GenericDjangoModelFactory[AllocatedTimeSlot]):
         num: int = 1,
         start_time: datetime.time | None = None,
         end_time: datetime.time | None = None,
-        applicant_type: ApplicantTypeChoice = ApplicantTypeChoice.INDIVIDUAL,
+        applicant_type: ReserveeType = ReserveeType.INDIVIDUAL,
     ) -> AllocatedTimeSlot:
         from .application_round import ApplicationRoundFactory
         from .origin_hauki_resource import OriginHaukiResourceFactory

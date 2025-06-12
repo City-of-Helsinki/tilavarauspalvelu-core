@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING
 import pytest
 
 from tilavarauspalvelu.enums import (
-    ApplicantTypeChoice,
     ApplicationSectionStatusChoice,
     ApplicationStatusChoice,
     MunicipalityChoice,
     Priority,
+    ReserveeType,
     Weekday,
 )
 
@@ -289,15 +289,15 @@ def test_application_section__filter__by_applicant_type(graphql):
     # given:
     # - There is a draft application in an application round with three application sections
     # - A superuser is using the system
-    application_1 = ApplicationFactory.create_in_status_draft_no_sections(applicant_type=ApplicantTypeChoice.COMPANY)
-    application_2 = ApplicationFactory.create_in_status_draft_no_sections(applicant_type=ApplicantTypeChoice.INDIVIDUAL)
+    application_1 = ApplicationFactory.create_in_status_draft_no_sections(applicant_type=ReserveeType.COMPANY)
+    application_2 = ApplicationFactory.create_in_status_draft_no_sections(applicant_type=ReserveeType.INDIVIDUAL)
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application_1)
     ApplicationSectionFactory.create_in_status_unallocated(application=application_2)
     graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections of a specific applicant type
-    query = sections_query(applicant_type=ApplicantTypeChoice.COMPANY)
+    query = sections_query(applicant_type=ReserveeType.COMPANY)
     response = graphql(query)
 
     # then:
@@ -310,15 +310,15 @@ def test_application_section__filter__by_applicant_type__multiple(graphql):
     # given:
     # - There is a draft application in an application round with three application sections
     # - A superuser is using the system
-    application_1 = ApplicationFactory.create_in_status_draft_no_sections(applicant_type=ApplicantTypeChoice.COMPANY)
-    application_2 = ApplicationFactory.create_in_status_draft_no_sections(applicant_type=ApplicantTypeChoice.INDIVIDUAL)
+    application_1 = ApplicationFactory.create_in_status_draft_no_sections(applicant_type=ReserveeType.COMPANY)
+    application_2 = ApplicationFactory.create_in_status_draft_no_sections(applicant_type=ReserveeType.INDIVIDUAL)
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application_1)
     section_2 = ApplicationSectionFactory.create_in_status_unallocated(application=application_2)
     graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with any of the given applicant types
-    query = sections_query(applicant_type=[ApplicantTypeChoice.COMPANY, ApplicantTypeChoice.INDIVIDUAL])
+    query = sections_query(applicant_type=[ReserveeType.COMPANY, ReserveeType.INDIVIDUAL])
     response = graphql(query)
 
     # then:

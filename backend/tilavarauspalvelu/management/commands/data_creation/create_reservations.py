@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING
 from django.db import models
 
 from tilavarauspalvelu.enums import (
-    CustomerTypeChoice,
     MunicipalityChoice,
     OrderStatus,
     PaymentType,
@@ -16,6 +15,7 @@ from tilavarauspalvelu.enums import (
     ReservationKind,
     ReservationStateChoice,
     ReservationTypeChoice,
+    ReserveeType,
     Weekday,
 )
 from tilavarauspalvelu.models import (
@@ -129,10 +129,10 @@ def _create_normal_reservations(
         ReservationTypeChoice.STAFF,
     ]
 
-    customer_type_choices: list[CustomerTypeChoice] = [
-        CustomerTypeChoice.INDIVIDUAL,
-        CustomerTypeChoice.BUSINESS,
-        CustomerTypeChoice.NONPROFIT,
+    reservee_type_choice: list[ReserveeType] = [
+        ReserveeType.INDIVIDUAL,
+        ReserveeType.COMPANY,
+        ReserveeType.NONPROFIT,
     ]
 
     handling_state_choices: list[ReservationStateChoice] = [
@@ -186,7 +186,7 @@ def _create_normal_reservations(
             begin_datetime = combine(reservation_date, begin_time)
 
             while reservation_date == begin_datetime.date():
-                customer_type = weighted_choice(customer_type_choices, weights=[5, 1, 1])
+                customer_type = weighted_choice(reservee_type_choice, weights=[5, 1, 1])
                 reservation_type = weighted_choice(reservation_type_choices, weights=[5, 1, 1])
 
                 if pricing.highest_price != pricing.lowest_price:
@@ -205,7 +205,7 @@ def _create_normal_reservations(
                         ReservationBuilder()
                         .for_user(user)
                         .for_reservation_unit(reservation_unit)
-                        .for_customer_type(customer_type)
+                        .for_reservee_type(customer_type)
                         .starting_at(begin_datetime, reservation_unit, pricing=pricing)
                         .build(
                             reservation_unit=reservation_unit,
@@ -445,10 +445,10 @@ def _create_full_day_reservations(
 
     user = User.objects.get(username="tvp")
 
-    customer_type_choices: list[CustomerTypeChoice] = [
-        CustomerTypeChoice.INDIVIDUAL,
-        CustomerTypeChoice.BUSINESS,
-        CustomerTypeChoice.NONPROFIT,
+    reservee_type_choices: list[ReserveeType] = [
+        ReserveeType.INDIVIDUAL,
+        ReserveeType.COMPANY,
+        ReserveeType.NONPROFIT,
     ]
 
     reservation_type_choices: list[ReservationTypeChoice] = [
@@ -479,14 +479,14 @@ def _create_full_day_reservations(
             begin_time = datetime.time(hour=random.randint(6, 10), tzinfo=DEFAULT_TIMEZONE)
             begin_datetime = combine(reservation_date, begin_time)
 
-            customer_type = weighted_choice(customer_type_choices, weights=[5, 1, 1])
+            customer_type = weighted_choice(reservee_type_choices, weights=[5, 1, 1])
             reservation_type = weighted_choice(reservation_type_choices, weights=[5, 1, 1])
 
             reservation = (
                 ReservationBuilder()
                 .for_user(user)
                 .for_reservation_unit(reservation_unit)
-                .for_customer_type(customer_type)
+                .for_reservee_type(customer_type)
                 .starting_at(begin_datetime, reservation_unit, pricing=pricing)
                 .build(
                     reservation_unit=reservation_unit,
@@ -566,10 +566,10 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
 
     user = User.objects.get(username="tvp")
 
-    customer_type_choices: list[CustomerTypeChoice] = [
-        CustomerTypeChoice.INDIVIDUAL,
-        CustomerTypeChoice.BUSINESS,
-        CustomerTypeChoice.NONPROFIT,
+    reservee_type_choices: list[ReserveeType] = [
+        ReserveeType.INDIVIDUAL,
+        ReserveeType.COMPANY,
+        ReserveeType.NONPROFIT,
     ]
 
     reservations: list[Reservation] = []
@@ -585,13 +585,13 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
         begin_time = datetime.time(hour=random.randint(8, 12), tzinfo=DEFAULT_TIMEZONE)
         begin_datetime = combine(reservation_date, begin_time)
 
-        customer_type = weighted_choice(customer_type_choices, weights=[5, 1, 1])
+        customer_type = weighted_choice(reservee_type_choices, weights=[5, 1, 1])
 
         reservation = (
             ReservationBuilder()
             .for_user(user)
             .for_reservation_unit(reservation_unit)
-            .for_customer_type(customer_type)
+            .for_reservee_type(customer_type)
             .starting_at(begin_datetime, reservation_unit, pricing=pricing)
             .build(
                 reservation_unit=reservation_unit,
@@ -621,13 +621,13 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
         begin_time = datetime.time(hour=random.randint(8, 12), tzinfo=DEFAULT_TIMEZONE)
         begin_datetime = combine(reservation_date, begin_time)
 
-        customer_type = weighted_choice(customer_type_choices, weights=[5, 1, 1])
+        customer_type = weighted_choice(reservee_type_choices, weights=[5, 1, 1])
 
         reservation = (
             ReservationBuilder()
             .for_user(user)
             .for_reservation_unit(reservation_unit)
-            .for_customer_type(customer_type)
+            .for_reservee_type(customer_type)
             .starting_at(begin_datetime, reservation_unit, pricing=pricing)
             .build(
                 reservation_unit=reservation_unit,

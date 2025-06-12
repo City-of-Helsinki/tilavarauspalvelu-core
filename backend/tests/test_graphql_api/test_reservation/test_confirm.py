@@ -9,11 +9,11 @@ from graphene_django_extensions.testing import build_mutation
 
 from tilavarauspalvelu.enums import (
     AccessType,
-    CustomerTypeChoice,
     OrderStatus,
     PaymentType,
     ReservationNotification,
     ReservationStateChoice,
+    ReserveeType,
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
@@ -357,7 +357,7 @@ def test_reservation__confirm__default_payment_type__online(graphql):
 def test_reservation__confirm__default_payment_type__online_or_invoice(graphql):
     reservation = ReservationFactory.create_for_confirmation(
         # Required params for invoicing to work
-        reservee_type=CustomerTypeChoice.BUSINESS,
+        reservee_type=ReserveeType.COMPANY,
         reservation_unit__pricings__payment_type=PaymentType.ONLINE_OR_INVOICE,
         reservation_unit__payment_accounting__product_invoicing_sales_org="2900",
         reservation_unit__payment_accounting__product_invoicing_sales_office="2911",

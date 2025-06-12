@@ -12,7 +12,7 @@ from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.api.graphql.types.application_section.serializers import (
     ApplicationSectionForApplicationSerializer,
 )
-from tilavarauspalvelu.enums import ApplicantTypeChoice, ApplicationStatusChoice, Weekday
+from tilavarauspalvelu.enums import ApplicationStatusChoice, ReserveeType, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ReservationUnitOption
 from utils.date_utils import TimeSlot, local_datetime, local_timedelta_string, merge_time_slots, time_difference
@@ -262,30 +262,23 @@ class ApplicationSendSerializer(NestingModelSerializer):
             errors.append(error)
             return
 
-        applicant_type = ApplicantTypeChoice(self.instance.applicant_type)
+        applicant_type = ReserveeType(self.instance.applicant_type)
 
         match applicant_type:
-            case ApplicantTypeChoice.INDIVIDUAL:
+            case ReserveeType.INDIVIDUAL:
                 self.validate_individual_applicant(errors)
 
-            case ApplicantTypeChoice.COMMUNITY:
-                self.validate_community_applicant(errors)
+            case ReserveeType.NONPROFIT:
+                self.validate_non_profit_applicant(errors)
 
-            case ApplicantTypeChoice.ASSOCIATION:
-                self.validate_association_applicant(errors)
-
-            case ApplicantTypeChoice.COMPANY:
+            case ReserveeType.COMPANY:
                 self.validate_company_applicant(errors)
 
     def validate_individual_applicant(self, errors: ErrorList) -> None:
         self.validate_contact_person(errors)
         self.validate_billing_address(errors)
 
-    def validate_community_applicant(self, errors: ErrorList) -> None:
-        self.validate_contact_person(errors)
-        self.validate_organisation(errors, require_municipality=True)
-
-    def validate_association_applicant(self, errors: ErrorList) -> None:
+    def validate_non_profit_applicant(self, errors: ErrorList) -> None:
         self.validate_contact_person(errors)
         self.validate_organisation(errors, require_municipality=True)
 

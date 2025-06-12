@@ -14,11 +14,11 @@ from graphene_django_extensions.filters import (
 from lookup_property import L
 
 from tilavarauspalvelu.enums import (
-    ApplicantTypeChoice,
     ApplicationSectionStatusChoice,
     ApplicationStatusChoice,
     MunicipalityChoice,
     Priority,
+    ReserveeType,
 )
 from tilavarauspalvelu.models import ApplicationSection
 from utils.db import text_search
@@ -44,7 +44,7 @@ class ApplicationSectionFilterSet(ModelFilterSet):
     reservation_unit = IntMultipleChoiceFilter(field_name="reservation_unit_options__reservation_unit")
     unit = IntMultipleChoiceFilter(field_name="reservation_unit_options__reservation_unit__unit")
 
-    applicant_type = EnumMultipleChoiceFilter(field_name="application__applicant_type", enum=ApplicantTypeChoice)
+    applicant_type = EnumMultipleChoiceFilter(field_name="application__applicant_type", enum=ReserveeType)
     status = EnumMultipleChoiceFilter(method="filter_by_status", enum=ApplicationSectionStatusChoice)
     application_status = EnumMultipleChoiceFilter(method="filter_by_application_status", enum=ApplicationStatusChoice)
     priority = EnumMultipleChoiceFilter(field_name="suitable_time_ranges__priority", enum=Priority)

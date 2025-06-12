@@ -240,7 +240,7 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
             applying_for_free_of_charge=next_reservation.applying_for_free_of_charge,
             free_of_charge_reason=next_reservation.free_of_charge_reason,
             #
-            reservee_id=next_reservation.reservee_id,
+            reservee_identifier=next_reservation.reservee_identifier,
             reservee_first_name=next_reservation.reservee_first_name,
             reservee_last_name=next_reservation.reservee_last_name,
             reservee_email=next_reservation.reservee_email,
@@ -249,7 +249,6 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
             reservee_address_street=next_reservation.reservee_address_street,
             reservee_address_city=next_reservation.reservee_address_city,
             reservee_address_zip=next_reservation.reservee_address_zip,
-            reservee_is_unregistered_association=next_reservation.reservee_is_unregistered_association,
             reservee_type=next_reservation.reservee_type,
             #
             billing_first_name=next_reservation.billing_first_name,

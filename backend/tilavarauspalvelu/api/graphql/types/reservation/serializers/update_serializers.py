@@ -6,7 +6,7 @@ from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework.fields import IntegerField
 
-from tilavarauspalvelu.enums import CustomerTypeChoice, MunicipalityChoice, ReservationStateChoice
+from tilavarauspalvelu.enums import MunicipalityChoice, ReservationStateChoice, ReserveeType
 from tilavarauspalvelu.models import AgeGroup, Reservation, ReservationPurpose
 
 if TYPE_CHECKING:
@@ -21,8 +21,8 @@ class ReservationUpdateSerializer(NestingModelSerializer):
     pk = IntegerField(required=True)
 
     reservee_type = EnumFriendlyChoiceField(
-        choices=CustomerTypeChoice.choices,
-        enum=CustomerTypeChoice,
+        choices=ReserveeType.choices,
+        enum=ReserveeType,
         required=False,
     )
     municipality = EnumFriendlyChoiceField(
@@ -58,7 +58,7 @@ class ReservationUpdateSerializer(NestingModelSerializer):
             "free_of_charge_reason",
             #
             # Reservee information
-            "reservee_id",
+            "reservee_identifier",
             "reservee_first_name",
             "reservee_last_name",
             "reservee_email",
@@ -67,7 +67,6 @@ class ReservationUpdateSerializer(NestingModelSerializer):
             "reservee_address_street",
             "reservee_address_city",
             "reservee_address_zip",
-            "reservee_is_unregistered_association",
             "reservee_type",
             #
             # Billing information

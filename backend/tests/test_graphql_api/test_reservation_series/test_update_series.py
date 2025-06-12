@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from tilavarauspalvelu.enums import CustomerTypeChoice, MunicipalityChoice
+from tilavarauspalvelu.enums import MunicipalityChoice, ReserveeType
 from tilavarauspalvelu.models import ReservationStatistic
 
 from tests.factories import AgeGroupFactory, ReservationFactory, ReservationPurposeFactory, ReservationSeriesFactory
@@ -48,7 +48,7 @@ def test_reservation_series__update_series(graphql):
             "workingMemo": "memo",
             "applyingForFreeOfCharge": True,
             "freeOfChargeReason": "reason",
-            "reserveeId": "id",
+            "reserveeIdentifier": "id",
             "reserveeFirstName": "User",
             "reserveeLastName": "Admin",
             "reserveeEmail": "user@admin.com",
@@ -57,8 +57,7 @@ def test_reservation_series__update_series(graphql):
             "reserveeAddressStreet": "street",
             "reserveeAddressCity": "city",
             "reserveeAddressZip": "cip",
-            "reserveeIsUnregisteredAssociation": False,
-            "reserveeType": CustomerTypeChoice.BUSINESS.upper(),
+            "reserveeType": ReserveeType.COMPANY.value,
             "billingFirstName": "Bill",
             "billingLastName": "Admin",
             "billingEmail": "bill@admin.com",
@@ -89,7 +88,7 @@ def test_reservation_series__update_series(graphql):
     assert reservation.working_memo == "memo"
     assert reservation.applying_for_free_of_charge is True
     assert reservation.free_of_charge_reason == "reason"
-    assert reservation.reservee_id == "id"
+    assert reservation.reservee_identifier == "id"
     assert reservation.reservee_first_name == "User"
     assert reservation.reservee_last_name == "Admin"
     assert reservation.reservee_email == "user@admin.com"
@@ -98,8 +97,7 @@ def test_reservation_series__update_series(graphql):
     assert reservation.reservee_address_street == "street"
     assert reservation.reservee_address_city == "city"
     assert reservation.reservee_address_zip == "cip"
-    assert reservation.reservee_is_unregistered_association is False
-    assert reservation.reservee_type == CustomerTypeChoice.BUSINESS
+    assert reservation.reservee_type == ReserveeType.COMPANY.value
     assert reservation.billing_first_name == "Bill"
     assert reservation.billing_last_name == "Admin"
     assert reservation.age_group == age_group_2
