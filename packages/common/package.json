@@ -34,7 +34,7 @@
     "react-toastify": "^10.0.5",
     "react-use": "^17.6.0",
     "sanitize-html": "^2.17.0",
-    "styled-components": "6.1.15",
+    "styled-components": "6.1.18",
     "tsconfig": "workspace:*",
     "zod": "^3.25.63"
   },
