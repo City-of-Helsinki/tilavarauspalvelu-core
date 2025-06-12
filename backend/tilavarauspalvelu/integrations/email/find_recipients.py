@@ -29,9 +29,8 @@ def get_application_email_recipients(application: Application) -> list[str]:
     if application.contact_person_email:
         recipients.add(application.contact_person_email.lower())
 
-    applicant_email = getattr(application.user, "email", None)
-    if applicant_email:
-        recipients.add(applicant_email.lower())
+    if application.user.email:
+        recipients.add(application.user.email.lower())
 
     return list(recipients)
 
@@ -40,7 +39,7 @@ def get_series_email_recipients(series: ReservationSeries) -> list[str]:
     """Get email notification recipients for the given series."""
     recipients: set[str] = set()
 
-    if series.user is not None and series.user.email:
+    if series.user.email:
         recipients.add(series.user.email.lower())
 
     if series.allocated_time_slot is not None:
@@ -57,8 +56,7 @@ def get_reservation_email_recipients(reservation: Reservation) -> list[str]:
     if reservation.reservee_email:
         recipients.add(reservation.reservee_email.lower())
 
-    reservation_user_email = getattr(reservation.user, "email", None)
-    if reservation_user_email:
+    if reservation.user.email:
         recipients.add(reservation.user.email.lower())
 
     return list(recipients)
@@ -113,8 +111,7 @@ def get_reservation_staff_notification_recipients_by_language(
     ).exclude(email="")
 
     # Skip the reservation creator
-    if reservation.user:
-        users = users.exclude(pk=reservation.user.pk)
+    users = users.exclude(pk=reservation.user.pk)
 
     units = (
         Unit.objects.filter(reservation_units__in=[reservation.reservation_unit])
@@ -150,8 +147,7 @@ def get_application_section_staff_notification_recipients_by_language(
     ).exclude(email="")
 
     # Skip the application creator
-    if application_section.application.user:
-        users = users.exclude(pk=application_section.application.user.pk)
+    users = users.exclude(pk=application_section.application.user.pk)
 
     units = (
         Unit.objects.prefetch_related("unit_groups")

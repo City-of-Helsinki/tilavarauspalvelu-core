@@ -68,7 +68,7 @@ class Reservation(SerializableMixin, models.Model):
     )
     municipality: str | None = StrChoiceField(enum=MunicipalityChoice, null=True, blank=True)
     handling_details: str = models.TextField(blank=True, default="")
-    working_memo: str = models.TextField(null=True, blank=True, default="")
+    working_memo: str = models.TextField(blank=True, default="")
 
     # Cancellation information
     cancel_details: str = models.TextField(blank=True, default="")
@@ -141,14 +141,12 @@ class Reservation(SerializableMixin, models.Model):
         related_name="reservations",
         on_delete=models.PROTECT,
     )
-
-    user: User | None = models.ForeignKey(
+    user: User = models.ForeignKey(
         "tilavarauspalvelu.User",
         related_name="reservations",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
+        on_delete=models.PROTECT,
     )
+
     reservation_series: ReservationSeries | None = models.ForeignKey(
         "tilavarauspalvelu.ReservationSeries",
         related_name="reservations",

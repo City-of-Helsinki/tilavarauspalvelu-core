@@ -264,11 +264,8 @@ class ReservationUnitBuilder(ModelFactoryBuilder[ReservationUnit]):
         self.set(
             unit=space.unit,
             spaces=[space],
+            origin_hauki_resource=space.unit.origin_hauki_resource,
         )
-        if space.unit and space.unit.origin_hauki_resource:
-            self.set(
-                origin_hauki_resource=space.unit.origin_hauki_resource,
-            )
         if use_name:
             self.set(
                 name=space.name,

@@ -42,14 +42,14 @@ def test_get_application_email_recipients__no_contact_person():
 
 
 def test_get_application_email_recipients__no_applicant():
-    application = ApplicationFactory.create(user=None, contact_person_email="contact@example.com")
+    application = ApplicationFactory.create(user__email="", contact_person_email="contact@example.com")
 
     result = get_application_email_recipients(application)
     assert result == ["contact@example.com"]
 
 
 def test_get_application_email_recipients__no_contact_person_or_applicant():
-    application = ApplicationFactory.create(user=None, contact_person_email=None)
+    application = ApplicationFactory.create(user__email="", contact_person_email=None)
 
     result = get_application_email_recipients(application)
     assert result == []
@@ -91,9 +91,9 @@ def test_get_reservation_email_recipients__no_reservee_email():
     assert sorted(result) == ["user@example.com"]
 
 
-def test_get_reservation_email_recipients__no_user():
+def test_get_reservation_email_recipients__no_user_email():
     reservation = ReservationFactory.create(
-        user=None,
+        user__email="",
         reservee_email="reservee@example.com",
     )
 
@@ -101,9 +101,9 @@ def test_get_reservation_email_recipients__no_user():
     assert result == ["reservee@example.com"]
 
 
-def test_get_reservation_email_recipients__no_reservee_email_or_user():
+def test_get_reservation_email_recipients__no_reservee_email_or_user_email():
     reservation = ReservationFactory.create(
-        user=None,
+        user__email="",
         reservee_email="",
     )
 

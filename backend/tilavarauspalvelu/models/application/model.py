@@ -85,12 +85,10 @@ class Application(SerializableMixin, models.Model):
         related_name="applications",
         on_delete=models.PROTECT,
     )
-    user: User | None = models.ForeignKey(
+    user: User = models.ForeignKey(
         "tilavarauspalvelu.User",
         related_name="applications",
         on_delete=models.PROTECT,
-        null=True,
-        blank=True,
     )
 
     objects: ClassVar[ApplicationManager] = LazyModelManager.new()
@@ -242,7 +240,7 @@ class Application(SerializableMixin, models.Model):
                 then=Concat("contact_person_first_name", models.Value(" "), "contact_person_last_name"),
             ),
             models.When(
-                models.Q(user__isnull=False),
+                (~models.Q(user__first_name="") & ~models.Q(user__last_name="")),
                 then=Concat("user__first_name", models.Value(" "), "user__last_name"),
             ),
             default=models.Value(""),

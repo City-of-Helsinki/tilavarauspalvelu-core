@@ -39,7 +39,6 @@ def _create_test_reservations_for_all_reservation_units() -> None:
             begins_at=_datetime(minute=i),
             ends_at=_datetime(minute=0),
             reservation_unit=reservation_unit,
-            user=None,
             state=ReservationStateChoice.CREATED,
             type=ReservationTypeChoice.NORMAL,
         )

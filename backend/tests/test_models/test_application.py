@@ -14,7 +14,6 @@ from tests.factories import (
     ApplicationRoundFactory,
     ApplicationSectionFactory,
     ReservationUnitOptionFactory,
-    UserFactory,
 )
 
 # Applied to all tests
@@ -146,7 +145,8 @@ def test_application__applicant():
         organisation_name="",
         contact_person_first_name="",
         contact_person_last_name="",
-        user=None,
+        user__first_name="",
+        user__last_name="",
     )
 
     # Application has no user, organisation name or contact person name -> applicant is empty
@@ -154,8 +154,9 @@ def test_application__applicant():
     assert Application.objects.filter(L(applicant="")).exists()
 
     # Application has a user, but no organisation name or contact person name -> applicant is user's name
-    application.user = UserFactory.create(first_name="John", last_name="Doe")
-    application.save()
+    application.user.first_name = "John"
+    application.user.last_name = "Doe"
+    application.user.save()
     assert application.applicant == "John Doe"
     assert Application.objects.filter(L(applicant="John Doe")).exists()
 

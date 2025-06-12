@@ -19,26 +19,20 @@ __all__ = [
 
 def get_application_email_language(application: Application) -> Lang:
     """Get email notification language for the given application."""
-    if application.user is None:
-        return settings.LANGUAGE_CODE  # type: ignore[return-value]
-    if getattr(application.user, "preferred_language", None) in Language.values:
+    if application.user.preferred_language in Language.values:
         return application.user.preferred_language  # type: ignore[return-value]
     return settings.LANGUAGE_CODE  # type: ignore[return-value]
 
 
 def get_series_email_language(series: ReservationSeries) -> Lang:
     """Get email notification language for the given series."""
-    if series.user is None:
-        return settings.LANGUAGE_CODE  # type: ignore[return-value]
-    if getattr(series.user, "preferred_language", None) in Language.values:
+    if series.user.preferred_language in Language.values:
         return series.user.preferred_language  # type: ignore[return-value]
     return settings.LANGUAGE_CODE  # type: ignore[return-value]
 
 
 def get_reservation_email_language(reservation: Reservation) -> Lang:
     """Get email notification language for the given reservation."""
-    if reservation.user is None:
-        return settings.LANGUAGE_CODE  # type: ignore[return-value]
-    if getattr(reservation.user, "preferred_language", None) in Language.values:
+    if reservation.user.preferred_language in Language.values:
         return reservation.user.preferred_language  # type: ignore[return-value]
     return settings.LANGUAGE_CODE  # type: ignore[return-value]

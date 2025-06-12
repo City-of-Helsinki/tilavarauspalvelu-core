@@ -47,6 +47,7 @@ def required_reservation_unit_form_data(reservation_unit: ReservationUnit) -> di
     return {
         #
         # Required fields
+        "unit": reservation_unit.unit.pk,
         "name": reservation_unit.name,
         "name_fi": reservation_unit.name_fi,
         "reservation_kind": reservation_unit.reservation_kind,
