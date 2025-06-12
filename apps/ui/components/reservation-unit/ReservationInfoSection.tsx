@@ -1,11 +1,12 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import { type ReservationInfoSectionFragment } from "@gql/gql-types";
-import { type TFunction, useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
 import { H4, Strong } from "common/styled";
 import styled from "styled-components";
 import { formatDateTime } from "@/modules/util";
 import { formatDurationRange } from "common/src/common/util";
+import { formatNDays } from "@/modules/reservationUnit";
 
 const Subheading = styled(H4).attrs({ as: "h2", $noMargin: true })`
   border-bottom: 1px solid var(--color-black-50);
@@ -77,25 +78,6 @@ export function ReservationInfoSection({
       <ReservationMaxReservationsPerUser {...reservationUnit} />
     </div>
   );
-}
-
-// Just an approximation if it's weeks or months
-function formatNDays(t: TFunction, days: number): string {
-  if (days === 0) {
-    return "";
-  }
-  const unit = days < 7 ? "days" : days < 30 ? "weeks" : "months";
-  const unitTr = t(`reservationUnit:reservationInfoSection.${unit}`);
-  if (days < 14) {
-    return `${days} ${unitTr}`;
-  }
-
-  if (days < 30) {
-    const norm = Math.floor(days / 7);
-    return `${norm} ${unitTr}`;
-  }
-
-  return `${Math.floor(days / 30)} ${unitTr}`;
 }
 
 function ReservationMinMaxDaysBefore(

@@ -46,10 +46,7 @@
     "duration": "Bokningens längd ska vara mellan",
     "maxReservationsPerUserPrefix": "Du kan ha",
     "maxReservationsPerUser_one": "högst en bokning i taget",
-    "maxReservationsPerUser_other": "högst {{count}} bokningar i taget",
-    "days": "dagar",
-    "weeks": "veckor",
-    "months": "månader"
+    "maxReservationsPerUser_other": "högst {{count}} bokningar i taget"
   },
   "futurePricingNotice": "<bold>Priset ändras från och med {{date}}. Det nya priset är {{price}}</bold>.",
   "futurePriceNoticeTax": "(inkl. moms {{tax}} %)",
