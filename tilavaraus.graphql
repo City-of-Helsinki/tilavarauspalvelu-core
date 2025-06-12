@@ -291,7 +291,7 @@ type Query {
     rankLte: Int
     typeRankGte: Int
     typeRankLte: Int
-    reservationKind: String
+    reservationKind: ReservationKind
     publishingState: [ReservationUnitPublishingState]
     reservationState: [ReservationUnitReservationState]
     reservationForm: [ReservationFormType]
@@ -649,7 +649,7 @@ type ApplicationRoundNode implements Node {
     rankLte: Int
     typeRankGte: Int
     typeRankLte: Int
-    reservationKind: String
+    reservationKind: ReservationKind
     publishingState: [ReservationUnitPublishingState]
     reservationState: [ReservationUnitReservationState]
     reservationForm: [ReservationFormType]
@@ -948,13 +948,8 @@ enum ReservationStartInterval {
 
 """An enumeration."""
 enum ReservationKind {
-  """Direct"""
   DIRECT
-
-  """Season"""
   SEASON
-
-  """Direct and season"""
   DIRECT_AND_SEASON
 }
 
@@ -1040,7 +1035,7 @@ type UnitNode implements Node {
     rankLte: Int
     typeRankGte: Int
     typeRankLte: Int
-    reservationKind: String
+    reservationKind: ReservationKind
     publishingState: [ReservationUnitPublishingState]
     reservationState: [ReservationUnitReservationState]
     reservationForm: [ReservationFormType]
