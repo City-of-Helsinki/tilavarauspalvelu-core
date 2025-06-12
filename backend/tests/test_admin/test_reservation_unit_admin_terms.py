@@ -5,7 +5,13 @@ from django.contrib.admin import AdminSite
 from django.test import RequestFactory
 
 from tilavarauspalvelu.admin.reservation_unit.admin import ReservationUnitAdmin
-from tilavarauspalvelu.enums import AccessType, ReservationKind, ReservationStartInterval, TermsOfUseTypeChoices
+from tilavarauspalvelu.enums import (
+    AccessType,
+    ReservationFormType,
+    ReservationKind,
+    ReservationStartInterval,
+    TermsOfUseTypeChoices,
+)
 from tilavarauspalvelu.models import ReservationUnit
 
 from tests.factories import ReservationUnitFactory, TermsOfUseFactory
@@ -24,6 +30,7 @@ def get_valid_data():
         "authentication": "weak",
         "reservation_kind": ReservationKind.DIRECT_AND_SEASON,
         "access_type": AccessType.UNRESTRICTED,
+        "reservation_form": ReservationFormType.CONTACT_INFO_FORM,
     }
 
 

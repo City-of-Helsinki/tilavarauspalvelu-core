@@ -705,6 +705,7 @@ def _create_caisa() -> None:
         pricing_terms=pricing_terms_youth,
         cancellation_rule=cancel_rule_14_days,
         metadata_set=metadata_sets[SetName.set_4],
+        reservation_form=SetName.set_4.reservation_form,
         payment_merchant=payment_merchant_library_pih,
         payment_accounting=payment_accounting_library_pih,
         origin_hauki_resource=aina_kasiteltava_kellarikerros_hauki,
@@ -816,6 +817,7 @@ def _create_caisa() -> None:
         service_specific_terms=service_terms_gadgets,
         cancellation_rule=cancel_rule_until_begin,
         metadata_set=metadata_sets[SetName.set_1],
+        reservation_form=SetName.set_1.reservation_form,
         origin_hauki_resource=maksuton_mankeli_hauki,
     )
     maksuton_mankeli.spaces.add(
@@ -933,6 +935,7 @@ def _create_caisa() -> None:
         service_specific_terms=service_terms_oodi,
         cancellation_rule=cancel_rule_until_begin,
         metadata_set=metadata_sets[SetName.set_3],
+        reservation_form=SetName.set_3.reservation_form,
         payment_merchant=payment_merchant_library_ita,
         payment_accounting=payment_accounting_library_ita,
         origin_hauki_resource=aina_maksullinen_aitio_hauki,
@@ -1044,6 +1047,7 @@ def _create_caisa() -> None:
         pricing_terms=pricing_terms_youth,
         cancellation_rule=cancel_rule_14_days,
         metadata_set=metadata_sets[SetName.set_6],
+        reservation_form=SetName.set_6.reservation_form,
         payment_merchant=payment_merchant_library_pih,
         payment_accounting=payment_accounting_library_pih,
         origin_hauki_resource=alennuskelpoinen_aula_hauki,
@@ -1145,6 +1149,7 @@ def _create_caisa() -> None:
         cancellation_terms=cancel_terms_cannot_cancel,
         service_specific_terms=service_terms_library,
         metadata_set=metadata_sets[SetName.set_2],
+        reservation_form=SetName.set_2.reservation_form,
         origin_hauki_resource=perumiskelvoton_parveke_hauki,
     )
     perumiskelvoton_parveke.spaces.add(
@@ -1228,6 +1233,7 @@ def _create_caisa() -> None:
         cancellation_terms=cancel_terms_cannot_cancel,
         service_specific_terms=service_terms_library,
         metadata_set=metadata_sets[SetName.set_3],
+        reservation_form=SetName.set_3.reservation_form,
         payment_merchant=payment_merchant_library_pih,
         origin_hauki_resource=perumiskelvoton_patio_hauki,
         payment_product=PaymentProductFactory.create(
@@ -1336,6 +1342,7 @@ def _create_caisa() -> None:
         service_specific_terms=service_terms_library,
         cancellation_rule=cancel_rule_14_days,
         metadata_set=metadata_sets[SetName.set_2],
+        reservation_form=SetName.set_2.reservation_form,
         origin_hauki_resource=toistuvien_varausten_toimisto_hauki,
     )
     toistuvien_varausten_toimisto.spaces.add(
@@ -1437,6 +1444,7 @@ def _create_caisa() -> None:
         service_specific_terms=service_terms_library,
         cancellation_rule=cancel_rule_until_begin,
         metadata_set=metadata_sets[SetName.set_2],
+        reservation_form=SetName.set_2.reservation_form,
         origin_hauki_resource=tauotettu_takkahuone_hauki,
     )
     tauotettu_takkahuone.spaces.add(
@@ -1539,6 +1547,7 @@ def _create_caisa() -> None:
         service_specific_terms=service_terms_library,
         cancellation_rule=cancel_rule_until_begin,
         metadata_set=metadata_sets[SetName.set_3],
+        reservation_form=SetName.set_3.reservation_form,
         origin_hauki_resource=aina_kasiteltava_kammio_hauki,
     )
     aina_kasiteltava_kammio.spaces.add(

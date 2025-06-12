@@ -15,6 +15,7 @@ from lookup_property import L, lookup_property
 from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import (
     AuthenticationType,
+    ReservationFormType,
     ReservationKind,
     ReservationStartInterval,
     ReservationUnitPublishingState,
@@ -117,6 +118,12 @@ class ReservationUnit(models.Model):
         max_length=20,
         choices=ReservationKind.choices,
         default=ReservationKind.DIRECT_AND_SEASON.value,
+        db_index=True,
+    )
+    reservation_form: str = models.CharField(
+        max_length=255,
+        choices=ReservationFormType.choices,
+        default=ReservationFormType.CONTACT_INFO_FORM.value,
         db_index=True,
     )
 

@@ -15,6 +15,7 @@ from tilavarauspalvelu.enums import (
     AuthenticationType,
     PaymentType,
     PriceUnit,
+    ReservationFormType,
     ReservationKind,
     ReservationStartInterval,
 )
@@ -114,6 +115,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     authentication = AuthenticationType.WEAK.value
     reservation_start_interval = ReservationStartInterval.INTERVAL_15_MINUTES.value
     reservation_kind = ReservationKind.DIRECT_AND_SEASON.value
+    reservation_form = ReservationFormType.CONTACT_INFO_FORM.value
 
     # Lists
     search_terms = LazyAttribute(lambda i: [])

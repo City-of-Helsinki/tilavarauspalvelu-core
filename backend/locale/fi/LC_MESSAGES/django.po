@@ -1835,6 +1835,10 @@ msgid "Reservation metadata set"
 msgstr "Varauslomake"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation form"
+msgstr "Varauslomake"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Max reservations per user"
 msgstr "Maksimi varauksia per käyttäjä"
 
@@ -2013,6 +2017,10 @@ msgid ""
 msgstr ""
 "Varauslomake, joka määrittelee tuetut ja vaaditut lomakkeen kentät tälle "
 "varausyksikölle."
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Which reservation form is used for this reservation unit?"
+msgstr "Mikä varauslomake on käytössä tässä varausyksikössä?"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Maximum number of active reservations per user"
@@ -2592,6 +2600,30 @@ msgstr "Kausi"
 msgctxt "ReservationKind"
 msgid "Direct and season"
 msgstr "Suora ja kausi"
+
+#: tilavarauspalvelu/enums.py
+msgid "Contact info form"
+msgstr "Yhteystietolomake"
+
+#: tilavarauspalvelu/enums.py
+msgid "Reservee info form"
+msgstr "Varaajatietolomake"
+
+#: tilavarauspalvelu/enums.py
+msgid "Purpose form"
+msgstr "Käyttötarkoituslomake"
+
+#: tilavarauspalvelu/enums.py
+msgid "Age group form"
+msgstr "Ikäryhmälomake"
+
+#: tilavarauspalvelu/enums.py
+msgid "Purpose subvention form"
+msgstr "Käyttötarkoituslomake subventiolla"
+
+#: tilavarauspalvelu/enums.py
+msgid "Age group subvention form"
+msgstr "Ikäryhmälomake subventiolla"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "PricingType"
