@@ -535,9 +535,8 @@ def test_frontend_queries__customer_ui__ApplicationPage1__regular(graphql):
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationPage1"]
 
-    assert len(factories) == 2
+    assert len(factories) == 1
     query_info_1 = factories[0]
-    query_info_2 = factories[1]
 
     user = graphql.login_with_regular_user()
 
@@ -558,9 +557,6 @@ def test_frontend_queries__customer_ui__ApplicationPage1__regular(graphql):
     factory_args_1["application_sections__suitable_time_ranges__begin_time"] = local_time(8, 0)
     factory_args_1["application_sections__suitable_time_ranges__end_time"] = local_time(10, 0)
     obj = query_info_1.factory.create(**factory_args_1)
-
-    factory_args_2 = deepcopy(query_info_2.factory_args)
-    query_info_2.factory.create(**factory_args_2)
 
     variables = query_info_1.variables
     variables["id"] = to_global_id(query_info_1.typename, obj.id)
@@ -652,9 +648,9 @@ def test_frontend_queries__customer_ui__ApplicationPage3__regular(graphql):
     assert isinstance(response.first_query_object, dict)
 
 
-def test_frontend_queries__customer_ui__ApplicationPagePreview__regular(graphql):
+def test_frontend_queries__customer_ui__ApplicationPage4__regular(graphql):
     customer_factories = get_customer_query_info()
-    factories = customer_factories["ApplicationPagePreview"]
+    factories = customer_factories["ApplicationPage4"]
 
     assert len(factories) == 1
     query_info = factories[0]
