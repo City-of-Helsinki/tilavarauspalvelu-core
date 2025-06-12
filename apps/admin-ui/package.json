@@ -27,7 +27,7 @@
     "*.{tsx,css,scss}": "stylelint"
   },
   "dependencies": {
-    "@apollo/client": "^3.13.1",
+    "@apollo/client": "^3.13.8",
     "@hookform/resolvers": "^4.1.2",
     "@n8tb1t/use-scroll-position": "^2.0.3",
     "@sentry/nextjs": "^8.29.0",
@@ -56,7 +56,7 @@
     "styled-components": "6.1.15",
     "tsconfig": "workspace:*",
     "typescript-cookie": "^1.0.6",
-    "zod": "^3.24.2"
+    "zod": "^3.25.63"
   },
   "devDependencies": {
     "@graphql-tools/graphql-tag-pluck": "^8.3.19",
