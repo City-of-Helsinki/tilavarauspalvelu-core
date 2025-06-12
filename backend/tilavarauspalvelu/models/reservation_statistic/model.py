@@ -7,7 +7,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from tilavarauspalvelu.enums import CustomerTypeChoice, MunicipalityChoice, ReservationCancelReasonChoice
+from tilavarauspalvelu.enums import MunicipalityChoice, ReservationCancelReasonChoice, ReserveeType
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
@@ -138,8 +138,7 @@ class ReservationStatistic(models.Model):
         if reservation.cancel_reason is not None:
             cancel_reason = ReservationCancelReasonChoice(reservation.cancel_reason)
 
-        requires_org_name = reservation.reservee_type != CustomerTypeChoice.INDIVIDUAL
-        requires_org_id = not reservation.reservee_is_unregistered_association and requires_org_name
+        requires_org_data = reservation.reservee_type != ReserveeType.INDIVIDUAL
         by_profile_user = bool(reservation.user.profile_id)
         begin = reservation.begins_at.astimezone(DEFAULT_TIMEZONE)
         end = reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
@@ -182,11 +181,11 @@ class ReservationStatistic(models.Model):
         statistic.reservation_type = reservation.type
         statistic.reservation_uuid = str(reservation.ext_uuid)
         statistic.reservee_address_zip = reservation.reservee_address_zip if by_profile_user else ""
-        statistic.reservee_id = reservation.reservee_id if requires_org_id else ""
-        statistic.reservee_is_unregistered_association = reservation.reservee_is_unregistered_association
+        statistic.reservee_id = reservation.reservee_identifier if requires_org_data else ""
+        statistic.reservee_is_unregistered_association = not reservation.reservee_identifier
         statistic.reservee_language = user.get_preferred_language() if user else ""
-        statistic.reservee_organisation_name = reservation.reservee_organisation_name if requires_org_name else ""
-        statistic.reservee_type = reservation.reservee_type
+        statistic.reservee_organisation_name = reservation.reservee_organisation_name if requires_org_data else ""
+        statistic.reservee_type = str(reservation.reservee_type)
         statistic.reservee_used_ad_login = reservation.reservee_used_ad_login
         statistic.reservee_uuid = str(getattr(user, "tvp_uuid", ""))
         statistic.state = reservation.state

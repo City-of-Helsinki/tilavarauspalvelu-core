@@ -8,10 +8,10 @@ from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.enums import (
     AccessType,
-    CustomerTypeChoice,
     MunicipalityChoice,
     ReservationStateChoice,
     ReservationTypeChoice,
+    ReserveeType,
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -28,8 +28,8 @@ class StaffReservationModifySerializer(NestingModelSerializer):
     pk = IntegerField(required=True)
 
     reservee_type = EnumFriendlyChoiceField(
-        choices=CustomerTypeChoice.choices,
-        enum=CustomerTypeChoice,
+        choices=ReserveeType.choices,
+        enum=ReserveeType,
         required=False,
     )
     type = EnumFriendlyChoiceField(
@@ -82,8 +82,7 @@ class StaffReservationModifySerializer(NestingModelSerializer):
             "reservee_address_zip",
             "reservee_email",
             "reservee_type",
-            "reservee_id",
-            "reservee_is_unregistered_association",
+            "reservee_identifier",
             #
             # Billing information
             "billing_address_city",

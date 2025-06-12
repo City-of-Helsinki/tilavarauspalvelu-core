@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from tilavarauspalvelu.enums import ApplicantTypeChoice
+from tilavarauspalvelu.enums import ReserveeType
 
 from tests.factories import ApplicationFactory
 
@@ -72,8 +72,8 @@ def test_application__filter__by_applicant_type__single(graphql):
     # given:
     # - There are two applications in the system with different applicant types
     # - A superuser is using the system
-    application = ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.COMPANY)
-    ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.INDIVIDUAL)
+    application = ApplicationFactory.create_in_status_draft(applicant_type=ReserveeType.COMPANY)
+    ApplicationFactory.create_in_status_draft(applicant_type=ReserveeType.INDIVIDUAL)
     graphql.login_with_superuser()
 
     # when:
@@ -90,8 +90,8 @@ def test_application__filter__by_applicant_type__multiple(graphql):
     # given:
     # - There are two applications in the system with different applicant types
     # - A superuser is using the system
-    application_1 = ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.COMPANY)
-    application_2 = ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.INDIVIDUAL)
+    application_1 = ApplicationFactory.create_in_status_draft(applicant_type=ReserveeType.COMPANY)
+    application_2 = ApplicationFactory.create_in_status_draft(applicant_type=ReserveeType.INDIVIDUAL)
     graphql.login_with_superuser()
 
     # when:

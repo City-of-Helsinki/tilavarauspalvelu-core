@@ -5,7 +5,7 @@ import datetime
 import pytest
 from django.utils import timezone
 
-from tilavarauspalvelu.enums import CustomerTypeChoice, OrderStatus
+from tilavarauspalvelu.enums import OrderStatus, ReserveeType
 
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
 from tests.test_graphql_api.test_reservation.helpers import reservations_query
@@ -60,15 +60,15 @@ def test_reservation__order__by_reservation_unit_name__desc(graphql, lang):
 
 def test_reservation__order__by_reservee_name__asc(graphql):
     reservation_1 = ReservationFactory.create(
-        reservee_type=CustomerTypeChoice.BUSINESS,
+        reservee_type=ReserveeType.COMPANY,
         reservee_organisation_name="A",
     )
     reservation_2 = ReservationFactory.create(
-        reservee_type=CustomerTypeChoice.BUSINESS,
+        reservee_type=ReserveeType.COMPANY,
         reservee_organisation_name="B",
     )
     reservation_3 = ReservationFactory.create(
-        reservee_type=CustomerTypeChoice.BUSINESS,
+        reservee_type=ReserveeType.COMPANY,
         reservee_organisation_name="C",
     )
 
@@ -85,15 +85,15 @@ def test_reservation__order__by_reservee_name__asc(graphql):
 
 def test_reservation__order__by_reservee_name__desc(graphql):
     reservation_1 = ReservationFactory.create(
-        reservee_type=CustomerTypeChoice.BUSINESS,
+        reservee_type=ReserveeType.COMPANY,
         reservee_organisation_name="A",
     )
     reservation_2 = ReservationFactory.create(
-        reservee_type=CustomerTypeChoice.BUSINESS,
+        reservee_type=ReserveeType.COMPANY,
         reservee_organisation_name="B",
     )
     reservation_3 = ReservationFactory.create(
-        reservee_type=CustomerTypeChoice.BUSINESS,
+        reservee_type=ReserveeType.COMPANY,
         reservee_organisation_name="C",
     )
 

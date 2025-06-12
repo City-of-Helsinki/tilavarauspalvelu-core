@@ -175,8 +175,8 @@ def test_query_user_data__full(api_client, settings):
                                 "value": reservation.billing_address_street,
                             },
                             {
-                                "key": "RESERVEE_ID",
-                                "value": reservation.reservee_id,
+                                "key": "RESERVEE_IDENTIFIER",
+                                "value": reservation.reservee_identifier,
                             },
                             {
                                 "key": "RESERVEE_ORGANISATION_NAME",

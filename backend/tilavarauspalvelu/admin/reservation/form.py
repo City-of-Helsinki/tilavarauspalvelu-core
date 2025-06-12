@@ -64,7 +64,7 @@ class ReservationAdminForm(forms.ModelForm):
             "applying_for_free_of_charge": _("Applying free of charge"),
             "free_of_charge_reason": _("Free of charge reason"),
             #
-            "reservee_id": _("Reservee ID"),
+            "reservee_identifier": _("Reservee ID"),
             "reservee_first_name": _("Reservee first name"),
             "reservee_last_name": _("Reservee last name"),
             "reservee_email": _("Reservee email"),
@@ -73,7 +73,6 @@ class ReservationAdminForm(forms.ModelForm):
             "reservee_address_street": _("Reservee address street"),
             "reservee_address_city": _("Reservee address city"),
             "reservee_address_zip": _("Reservee address zip code"),
-            "reservee_is_unregistered_association": _("Reservee is an unregistered association"),
             "reservee_type": _("Type of reservee"),
             #
             "billing_first_name": _("Billing first name"),
@@ -128,7 +127,7 @@ class ReservationAdminForm(forms.ModelForm):
             "applying_for_free_of_charge": _("Reservee is applying for a free-of-charge reservation"),
             "free_of_charge_reason": _("Reason for applying for a free-of-charge reservation"),
             #
-            "reservee_id": _("Reservee's business or association identity code"),
+            "reservee_identifier": _("Reservee's business or association identity code"),
             "reservee_first_name": _("Reservee's first name"),
             "reservee_last_name": _("Reservee's last name"),
             "reservee_email": _("Reservee's email address"),
@@ -137,7 +136,6 @@ class ReservationAdminForm(forms.ModelForm):
             "reservee_address_street": _("Reservee's street address"),
             "reservee_address_city": _("Reservee's city"),
             "reservee_address_zip": _("Reservee's zip code"),
-            "reservee_is_unregistered_association": _("Reservee is an unregistered association"),
             "reservee_type": _("Type of reservee"),
             #
             "billing_first_name": _("Billing first name"),

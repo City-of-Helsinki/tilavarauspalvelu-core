@@ -5,7 +5,7 @@ import datetime
 import pytest
 from freezegun import freeze_time
 
-from tilavarauspalvelu.enums import CustomerTypeChoice
+from tilavarauspalvelu.enums import ReserveeType
 from tilavarauspalvelu.integrations.verkkokauppa.exceptions import UnsupportedMetaKeyError
 from tilavarauspalvelu.integrations.verkkokauppa.helpers import (
     get_formatted_reservation_time,
@@ -52,7 +52,7 @@ def test_get_verkkokauppa_order_params__respect_reservee_language():
     reservation_en = ReservationFactory.create(
         reservation_unit=reservation_unit,
         user__preferred_language="en",
-        reservee_type=CustomerTypeChoice.INDIVIDUAL,
+        reservee_type=ReserveeType.INDIVIDUAL,
     )
     order_params = get_verkkokauppa_order_params(reservation_en)
     assert order_params.items[0].product_name == "Name"
@@ -60,7 +60,7 @@ def test_get_verkkokauppa_order_params__respect_reservee_language():
     reservation_sv = ReservationFactory.create(
         reservation_unit=reservation_unit,
         user__preferred_language="sv",
-        reservee_type=CustomerTypeChoice.INDIVIDUAL,
+        reservee_type=ReserveeType.INDIVIDUAL,
     )
     order_params = get_verkkokauppa_order_params(reservation_sv)
     assert order_params.items[0].product_name == "Namn"

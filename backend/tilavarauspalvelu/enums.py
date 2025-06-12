@@ -17,7 +17,6 @@ from tilavarauspalvelu.typing import permission
 
 __all__ = [
     "AccessType",
-    "ApplicantTypeChoice",
     "ApplicationRoundReservationCreationStatusChoice",
     "ApplicationRoundStatusChoice",
     "ApplicationSectionStatusChoice",
@@ -27,14 +26,12 @@ __all__ = [
     "BannerNotificationState",
     "BannerNotificationTarget",
     "CalendarProperty",
-    "CustomerTypeChoice",
     "EventProperty",
     "HaukiResourceState",
     "Language",
     "MunicipalityChoice",
     "OrderStatus",
     "OrderStatusWithFree",
-    "OrganizationTypeChoice",
     "PaymentType",
     "PriceUnit",
     "PricingStatus",
@@ -373,21 +370,17 @@ class HaukiResourceState(models.TextChoices):
             return HaukiResourceState.UNDEFINED
 
 
-class CustomerTypeChoice(models.TextChoices):
-    BUSINESS = "BUSINESS", pgettext_lazy("CustomerType", "Business")
-    NONPROFIT = "NONPROFIT", pgettext_lazy("CustomerType", "Nonprofit")
-    INDIVIDUAL = "INDIVIDUAL", pgettext_lazy("CustomerType", "Individual")
+class ReserveeType(models.TextChoices):
+    INDIVIDUAL = "INDIVIDUAL", pgettext_lazy("ReserveeType", "Individual")
+    COMPANY = "COMPANY", pgettext_lazy("ReserveeType", "Company")
+    NONPROFIT = "NONPROFIT", pgettext_lazy("ReserveeType", "Nonprofit")
 
     @classproperty
-    def organisation(cls) -> list[str]:
-        return [  # type: ignore[return-value]
-            CustomerTypeChoice.BUSINESS.value,
-            CustomerTypeChoice.NONPROFIT.value,
+    def organisation_types(cls) -> list[str]:
+        return [  # type: ignore
+            ReserveeType.COMPANY.value,  # type: ignore
+            ReserveeType.NONPROFIT.value,  # type: ignore
         ]
-
-    @enum.property
-    def is_organisation(self) -> bool:
-        return self in CustomerTypeChoice.organisation
 
 
 class ReservationStateChoice(models.TextChoices):
@@ -977,25 +970,6 @@ class Priority(models.TextChoices):
     SECONDARY = "SECONDARY", pgettext_lazy("Priority", "Secondary")
 
 
-class ApplicantTypeChoice(models.TextChoices):
-    INDIVIDUAL = "INDIVIDUAL", pgettext_lazy("ApplicantType", "Individual")
-    ASSOCIATION = "ASSOCIATION", pgettext_lazy("ApplicantType", "Association")
-    COMMUNITY = "COMMUNITY", pgettext_lazy("ApplicantType", "Community")
-    COMPANY = "COMPANY", pgettext_lazy("ApplicantType", "Company")
-
-    @enum.property
-    def customer_type_choice(self) -> CustomerTypeChoice:
-        match self:
-            case ApplicantTypeChoice.INDIVIDUAL:
-                return CustomerTypeChoice.INDIVIDUAL
-            case ApplicantTypeChoice.ASSOCIATION:
-                return CustomerTypeChoice.NONPROFIT
-            case ApplicantTypeChoice.COMMUNITY:
-                return CustomerTypeChoice.NONPROFIT
-            case ApplicantTypeChoice.COMPANY:
-                return CustomerTypeChoice.BUSINESS
-
-
 class MunicipalityChoice(models.TextChoices):
     """Municipality choices"""
 
@@ -1171,31 +1145,6 @@ class ApplicationSectionStatusChoice(models.TextChoices):
             ApplicationSectionStatusChoice.IN_ALLOCATION,
             ApplicationSectionStatusChoice.HANDLED,
         }
-
-
-class OrganizationTypeChoice(models.TextChoices):
-    COMPANY = "COMPANY", pgettext_lazy("OrganizationType", "Company")
-    REGISTERED_ASSOCIATION = "REGISTERED_ASSOCIATION", pgettext_lazy("OrganizationType", "Registered association")
-    PUBLIC_ASSOCIATION = "PUBLIC_ASSOCIATION", pgettext_lazy("OrganizationType", "Public association")
-    UNREGISTERED_ASSOCIATION = "UNREGISTERED_ASSOCIATION", pgettext_lazy("OrganizationType", "Unregistered association")
-    MUNICIPALITY_CONSORTIUM = "MUNICIPALITY_CONSORTIUM", pgettext_lazy("OrganizationType", "Municipality consortium")
-    RELIGIOUS_COMMUNITY = "RELIGIOUS_COMMUNITY", pgettext_lazy("OrganizationType", "Religious community")
-
-    @enum.property
-    def applicant_type(self) -> ApplicantTypeChoice:
-        match self:
-            case OrganizationTypeChoice.COMPANY:
-                return ApplicantTypeChoice.COMPANY
-            case OrganizationTypeChoice.REGISTERED_ASSOCIATION:
-                return ApplicantTypeChoice.ASSOCIATION
-            case OrganizationTypeChoice.PUBLIC_ASSOCIATION:
-                return ApplicantTypeChoice.ASSOCIATION
-            case OrganizationTypeChoice.UNREGISTERED_ASSOCIATION:
-                return ApplicantTypeChoice.ASSOCIATION
-            case OrganizationTypeChoice.RELIGIOUS_COMMUNITY:
-                return ApplicantTypeChoice.COMMUNITY
-            case OrganizationTypeChoice.MUNICIPALITY_CONSORTIUM:
-                return ApplicantTypeChoice.ASSOCIATION
 
 
 class BannerNotificationLevel(models.TextChoices):
