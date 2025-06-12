@@ -17,7 +17,7 @@
     "format": "prettier --ignore-path \"../.prettierignore\" --write \"**/*.{js,jsx,ts,tsx,json}\""
   },
   "dependencies": {
-    "@apollo/client": "^3.13.1",
+    "@apollo/client": "^3.13.8",
     "@hookform/resolvers": "^4.1.2",
     "@sentry/nextjs": "^8.29.0",
     "common": "workspace:*",
@@ -41,7 +41,7 @@
     "styled-components": "6.1.15",
     "tsconfig": "workspace:*",
     "typescript-cookie": "^1.0.6",
-    "zod": "^3.24.2"
+    "zod": "^3.25.63"
   },
   "devDependencies": {
     "@happy-dom/jest-environment": "^18.0.1",
