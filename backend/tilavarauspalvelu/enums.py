@@ -749,9 +749,9 @@ class ReservationCancelReasonChoice(models.TextChoices):
 
 
 class ReservationKind(models.TextChoices):
-    DIRECT = "direct", pgettext_lazy("ReservationKind", "Direct")
-    SEASON = "season", pgettext_lazy("ReservationKind", "Season")
-    DIRECT_AND_SEASON = "direct_and_season", pgettext_lazy("ReservationKind", "Direct and season")
+    DIRECT = "DIRECT", pgettext_lazy("ReservationKind", "Direct")
+    SEASON = "SEASON", pgettext_lazy("ReservationKind", "Season")
+    DIRECT_AND_SEASON = "DIRECT_AND_SEASON", pgettext_lazy("ReservationKind", "Direct and season")
 
     @classproperty
     def allows_direct(cls) -> list[str]:
