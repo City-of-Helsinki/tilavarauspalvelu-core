@@ -548,10 +548,10 @@ def test_reservation__filter__by_text_search__name(graphql):
 
 
 def test_reservation__filter__by_text_search__reservee_id(graphql):
-    reservation = ReservationFactory.create(reservee_id="foo")
+    reservation = ReservationFactory.create(reservee_identifier="foo")
 
     graphql.login_with_superuser()
-    query = reservations_query(text_search=reservation.reservee_id)
+    query = reservations_query(text_search=reservation.reservee_identifier)
     response = graphql(query)
 
     assert response.has_errors is False, response

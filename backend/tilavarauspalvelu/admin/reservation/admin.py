@@ -127,7 +127,7 @@ class ReservationAdmin(admin.ModelAdmin):
             _("Reservee information"),
             {
                 "fields": [
-                    "reservee_id",
+                    "reservee_identifier",
                     "reservee_first_name",
                     "reservee_last_name",
                     "reservee_email",
@@ -136,7 +136,6 @@ class ReservationAdmin(admin.ModelAdmin):
                     "reservee_address_street",
                     "reservee_address_city",
                     "reservee_address_zip",
-                    "reservee_is_unregistered_association",
                     "reservee_type",
                 ],
             },

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Self
 from django.utils.timezone import now
 from factory import fuzzy
 
-from tilavarauspalvelu.enums import ApplicantTypeChoice, ApplicationStatusChoice, MunicipalityChoice, Priority, Weekday
+from tilavarauspalvelu.enums import ApplicationStatusChoice, MunicipalityChoice, Priority, ReserveeType, Weekday
 from tilavarauspalvelu.models import Application
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_time
 
@@ -25,7 +25,7 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
     class Meta:
         model = Application
 
-    applicant_type = fuzzy.FuzzyChoice(choices=ApplicantTypeChoice.values)
+    applicant_type = fuzzy.FuzzyChoice(choices=ReserveeType.values)
     additional_information = FakerFI("sentence")
     working_memo = FakerFI("sentence")
 
@@ -122,7 +122,7 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
     def create_application_ready_for_sending(
         cls,
         *,
-        applicant_type: ApplicantTypeChoice = ApplicantTypeChoice.INDIVIDUAL,
+        applicant_type: ReserveeType = ReserveeType.INDIVIDUAL,
         unregistered: bool = False,
         **kwargs: Any,
     ) -> Application:
@@ -148,13 +148,11 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
 
         builder = ApplicationBuilder()
         match applicant_type:
-            case ApplicantTypeChoice.INDIVIDUAL:
+            case ReserveeType.INDIVIDUAL:
                 builder = builder.for_individual()
-            case ApplicantTypeChoice.ASSOCIATION:
-                builder = builder.for_association(unregistered=unregistered)
-            case ApplicantTypeChoice.COMMUNITY:
-                builder = builder.for_community(unregistered=unregistered)
-            case ApplicantTypeChoice.COMPANY:
+            case ReserveeType.NONPROFIT:
+                builder = builder.for_non_profit(unregistered=unregistered)
+            case ReserveeType.COMPANY:
                 builder = builder.for_company()
 
         defaults: dict[str, Any] = {
@@ -476,24 +474,22 @@ class ApplicationBuilder(ModelFactoryBuilder[Application]):
     def for_applicant_type(
         self,
         *,
-        applicant_type: ApplicantTypeChoice,
+        applicant_type: ReserveeType,
         unregistered: bool = False,
     ) -> ApplicationBuilder:
         match applicant_type:
-            case ApplicantTypeChoice.INDIVIDUAL:
+            case ReserveeType.INDIVIDUAL:
                 return self.for_individual()
-            case ApplicantTypeChoice.ASSOCIATION:
-                return self.for_association(unregistered=unregistered)
-            case ApplicantTypeChoice.COMMUNITY:
-                return self.for_community(unregistered=unregistered)
-            case ApplicantTypeChoice.COMPANY:
+            case ReserveeType.NONPROFIT:
+                return self.for_non_profit(unregistered=unregistered)
+            case ReserveeType.COMPANY:
                 return self.for_company()
             case _:
                 msg = f"Unknown applicant type: {applicant_type}"
                 raise ValueError(msg)
 
     def for_individual(self) -> ApplicationBuilder:
-        self.kwargs["applicant_type"] = ApplicantTypeChoice.INDIVIDUAL
+        self.kwargs["applicant_type"] = ReserveeType.INDIVIDUAL
 
         self.kwargs["organisation_name"] = ""
         self.kwargs["organisation_email"] = None
@@ -509,17 +505,8 @@ class ApplicationBuilder(ModelFactoryBuilder[Application]):
 
         return self
 
-    def for_association(self, *, unregistered: bool) -> ApplicationBuilder:
-        self.kwargs["applicant_type"] = ApplicantTypeChoice.ASSOCIATION
-        self.kwargs["organisation_identifier"] = ""
-
-        if not unregistered:
-            self.kwargs["organisation_identifier"] = ApplicationFactory.organisation_identifier.generate()
-
-        return self
-
-    def for_community(self, *, unregistered: bool) -> ApplicationBuilder:
-        self.kwargs["applicant_type"] = ApplicantTypeChoice.COMMUNITY
+    def for_non_profit(self, *, unregistered: bool) -> ApplicationBuilder:
+        self.kwargs["applicant_type"] = ReserveeType.NONPROFIT
         self.kwargs["organisation_identifier"] = ""
 
         if not unregistered:
@@ -528,7 +515,7 @@ class ApplicationBuilder(ModelFactoryBuilder[Application]):
         return self
 
     def for_company(self) -> ApplicationBuilder:
-        self.kwargs["applicant_type"] = ApplicantTypeChoice.COMPANY
+        self.kwargs["applicant_type"] = ReserveeType.COMPANY
 
         self.kwargs["organisation_identifier"] = ApplicationFactory.organisation_identifier.generate()
 

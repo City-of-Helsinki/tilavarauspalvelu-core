@@ -1287,10 +1287,6 @@ msgid "Reservee address zip code"
 msgstr "Varaajan postinumero"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservee is an unregistered association"
-msgstr "Varaaja on rekisteröimätön yhdistys"
-
-#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Type of reservee"
 msgstr "Varaajan tyyppi"
 
@@ -2365,19 +2361,19 @@ msgid "Maintenance"
 msgstr "Siivoustauko/huoltotauko"
 
 #: tilavarauspalvelu/enums.py
-msgctxt "CustomerType"
-msgid "Business"
+msgctxt "ReserveeType"
+msgid "Individual"
+msgstr "Yksityishenkilö"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReserveeType"
+msgid "Company"
 msgstr "Yritys"
 
 #: tilavarauspalvelu/enums.py
-msgctxt "CustomerType"
+msgctxt "ReserveeType"
 msgid "Nonprofit"
-msgstr "Voittoa tavoittelematon"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "CustomerType"
-msgid "Individual"
-msgstr "Yksityinen"
+msgstr "Järjestö tai yhdistys"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationState"
@@ -2759,26 +2755,6 @@ msgid "Secondary"
 msgstr "Toissijainen"
 
 #: tilavarauspalvelu/enums.py
-msgctxt "ApplicantType"
-msgid "Individual"
-msgstr "Yksityinen"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "ApplicantType"
-msgid "Association"
-msgstr "Yhdistys"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "ApplicantType"
-msgid "Community"
-msgstr "Yhteisö"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "ApplicantType"
-msgid "Company"
-msgstr "Yritys"
-
-#: tilavarauspalvelu/enums.py
 msgid "Helsinki"
 msgstr "Helsinki"
 
@@ -2880,36 +2856,6 @@ msgstr "Käsitelty"
 msgctxt "ApplicationSectionStatus"
 msgid "Rejected"
 msgstr "Hylätty"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "OrganizationType"
-msgid "Company"
-msgstr "Yritys"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "OrganizationType"
-msgid "Registered association"
-msgstr "Rekisteröity yhdistys"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "OrganizationType"
-msgid "Public association"
-msgstr "Julkinen yhdistys"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "OrganizationType"
-msgid "Unregistered association"
-msgstr "Rekisteröimätön yhdistys"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "OrganizationType"
-msgid "Municipality consortium"
-msgstr "Kuntakonsortio"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "OrganizationType"
-msgid "Religious community"
-msgstr "Uskonnollinen yhteisö"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "BannerNotificationLevel"

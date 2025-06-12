@@ -23,11 +23,11 @@ if TYPE_CHECKING:
 
     from tilavarauspalvelu.enums import (
         AccessType,
-        ApplicantTypeChoice,
         PaymentType,
         PriceUnit,
         ReservationKind,
         ReservationStartInterval,
+        ReserveeType,
         Weekday,
     )
     from tilavarauspalvelu.models import (
@@ -286,7 +286,7 @@ class SeasonalReservationUnitData:
 @dataclasses.dataclass(frozen=True, slots=True)
 class ApplicantTypeInfo:
     name: str
-    applicant_type: ApplicantTypeChoice
+    applicant_type: ReserveeType
     unregistered: bool = False
     different_billing_address: bool = False
 
