@@ -123,8 +123,8 @@ importers:
         specifier: ^2.0.6
         version: 2.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       styled-components:
-        specifier: 6.1.15
-        version: 6.1.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 6.1.18
+        version: 6.1.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tsconfig:
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -230,7 +230,7 @@ importers:
         version: 4.4.0
       hds-react:
         specifier: ^4.4.0
-        version: 4.4.0(@types/react@18.2.7)(eslint@9.28.0(jiti@2.4.2))(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.2))(postcss@8.5.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+        version: 4.4.0(@types/react@18.2.7)(eslint@9.28.0(jiti@2.4.2))(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.2))(postcss@8.5.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
       i18next:
         specifier: ^25.2.1
         version: 25.2.1(typescript@5.8.3)
@@ -265,8 +265,8 @@ importers:
         specifier: ^17.6.0
         version: 17.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       styled-components:
-        specifier: 6.1.15
-        version: 6.1.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 6.1.18
+        version: 6.1.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tsconfig:
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -315,7 +315,7 @@ importers:
         version: 17.4.4
       postcss-styled-syntax:
         specifier: ^0.7.1
-        version: 0.7.1(postcss@8.5.3)
+        version: 0.7.1(postcss@8.5.5)
       prettier:
         specifier: ^3.5.3
         version: 3.5.3
@@ -354,7 +354,7 @@ importers:
         version: 16.10.0
       hds-react:
         specifier: ^4.4.0
-        version: 4.4.0(@types/react@18.2.7)(eslint@9.28.0(jiti@2.4.2))(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.2))(postcss@8.5.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+        version: 4.4.0(@types/react@18.2.7)(eslint@9.28.0(jiti@2.4.2))(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.2))(postcss@8.5.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
       i18next:
         specifier: ^25.2.1
         version: 25.2.1(typescript@5.8.3)
@@ -386,8 +386,8 @@ importers:
         specifier: ^2.14.0
         version: 2.14.0
       styled-components:
-        specifier: 6.1.15
-        version: 6.1.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 6.1.18
+        version: 6.1.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
@@ -442,7 +442,7 @@ importers:
         version: 15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.81.0)
       postcss-styled-syntax:
         specifier: ^0.7.1
-        version: 0.7.1(postcss@8.5.3)
+        version: 0.7.1(postcss@8.5.5)
       prettier:
         specifier: ^3.5.3
         version: 3.5.3
@@ -5380,6 +5380,10 @@ packages:
     resolution: {integrity: sha512-dle9A3yYxlBSrt8Fu+IpjGT8SY8hN0mlaA6GY8t0P5PjIOZemULz/E2Bnm/2dcUOena75OTNkHI76uZBNUUq3A==}
     engines: {node: ^10 || ^12 || >=14}
 
+  postcss@8.5.5:
+    resolution: {integrity: sha512-d/jtm+rdNT8tpXuHY5MMtcbJFBkhXE6593XVR9UoGCH8jSFGci7jGvMGH5RYd5PBJW+00NZQt6gf7CbagJCrhg==}
+    engines: {node: ^10 || ^12 || >=14}
+
   postgres-array@2.0.0:
     resolution: {integrity: sha512-VpZrUqU5A69eQyW2c5CA1jtLecCsN2U/bD6VilrFDWq5+5UIEVO7nazS3TEcHf1zuPYO/sqGvUvW62g86RXZuA==}
     engines: {node: '>=4'}
@@ -6019,8 +6023,8 @@ packages:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
 
-  styled-components@6.1.15:
-    resolution: {integrity: sha512-PpOTEztW87Ua2xbmLa7yssjNyUF9vE7wdldRfn1I2E6RTkqknkBYpj771OxM/xrvRGinLy2oysa7GOd7NcZZIA==}
+  styled-components@6.1.18:
+    resolution: {integrity: sha512-Mvf3gJFzZCkhjY2Y/Fx9z1m3dxbza0uI9H1CbNZm/jSHCojzJhQ0R7bByrlFJINnMzz/gPulpoFFGymNwrsMcw==}
     engines: {node: '>= 16'}
     peerDependencies:
       react: '>= 16.8.0'
@@ -11491,6 +11495,48 @@ snapshots:
       - supports-color
       - typescript
 
+  hds-react@4.4.0(@types/react@18.2.7)(eslint@9.28.0(jiti@2.4.2))(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.2))(postcss@8.5.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3):
+    dependencies:
+      '@apollo/client': 3.13.1(@types/react@18.2.7)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.2))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@babel/runtime': 7.17.9
+      '@emotion/styled-base': 11.0.0
+      '@hookform/resolvers': 2.9.11(react-hook-form@7.54.2(react@18.3.1))
+      '@juggle/resize-observer': 3.2.0
+      '@popperjs/core': 2.11.5
+      '@react-aria/visually-hidden': 3.8.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-spring/web': 9.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@types/cookie': 0.4.1
+      '@typescript-eslint/parser': 6.21.0(eslint@9.28.0(jiti@2.4.2))(typescript@5.8.3)
+      await-to-js: 3.0.0
+      cookie: 0.4.2
+      crc-32: 1.2.0
+      date-fns: 2.16.1
+      downshift: 6.0.6(react@18.3.1)
+      graphql: 16.10.0
+      hds-core: 4.4.0
+      jwt-decode: 3.1.2
+      kashe: 1.0.4
+      lodash: 4.17.21
+      memoize-one: 5.2.1
+      oidc-client-ts: 2.4.1
+      postcss: 8.5.5
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-hook-form: 7.54.2(react@18.3.1)
+      react-merge-refs: 1.1.0
+      react-popper: 2.2.5(@popperjs/core@2.11.5)(react@18.3.1)
+      react-use-measure: 2.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-virtual: 2.10.4(react@18.3.1)
+      uuid: 9.0.1
+      yup: 1.6.1
+    transitivePeerDependencies:
+      - '@types/react'
+      - eslint
+      - graphql-ws
+      - subscriptions-transport-ws
+      - supports-color
+      - typescript
+
   header-case@2.0.4:
     dependencies:
       capital-case: 1.0.4
@@ -12495,6 +12541,11 @@ snapshots:
       postcss: 8.5.3
       typescript: 5.8.3
 
+  postcss-styled-syntax@0.7.1(postcss@8.5.5):
+    dependencies:
+      postcss: 8.5.5
+      typescript: 5.8.3
+
   postcss-value-parser@4.2.0: {}
 
   postcss@8.4.31:
@@ -12512,6 +12563,12 @@ snapshots:
   postcss@8.5.3:
     dependencies:
       nanoid: 3.3.8
+      picocolors: 1.1.1
+      source-map-js: 1.2.1
+
+  postcss@8.5.5:
+    dependencies:
+      nanoid: 3.3.11
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
@@ -13278,7 +13335,7 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
-  styled-components@6.1.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  styled-components@6.1.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@emotion/is-prop-valid': 1.2.2
       '@emotion/unitless': 0.8.1
@@ -13758,7 +13815,7 @@ snapshots:
   vite@6.2.0(@types/node@24.0.0)(jiti@2.4.2)(sass@1.81.0)(terser@5.42.0)(yaml@2.7.0):
     dependencies:
       esbuild: 0.25.0
-      postcss: 8.5.3
+      postcss: 8.5.5
       rollup: 4.34.8
     optionalDependencies:
       '@types/node': 24.0.0
@@ -13771,7 +13828,7 @@ snapshots:
   vite@6.2.0(@types/node@24.0.1)(jiti@2.4.2)(sass@1.81.0)(terser@5.42.0)(yaml@2.7.0):
     dependencies:
       esbuild: 0.25.0
-      postcss: 8.5.3
+      postcss: 8.5.5
       rollup: 4.34.8
     optionalDependencies:
       '@types/node': 24.0.1
