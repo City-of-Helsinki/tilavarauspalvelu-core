@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import datetime
+from typing import NamedTuple
 
 import pytest
+from graphene_django_extensions.testing import parametrize_helper
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -498,18 +500,26 @@ def test_reservation_unit__filter__by_is_visible(graphql):
     assert response.node(1) == {"pk": reservation_unit_6.pk}
 
 
+class Params(NamedTuple):
+    kind: ReservationKind
+    units: list[int]
+
+
 @pytest.mark.parametrize(
-    ("kind", "units"),
-    [
-        (ReservationKind.DIRECT.value, [1, 3]),
-        (ReservationKind.SEASON.value, [2, 3]),
-        (ReservationKind.DIRECT_AND_SEASON.value, [3]),
-    ],
-    ids=[
-        ReservationKind.DIRECT.value,
-        ReservationKind.SEASON.value,
-        ReservationKind.DIRECT_AND_SEASON.value,
-    ],
+    **parametrize_helper({
+        "DIRECT": Params(
+            kind=ReservationKind.DIRECT,
+            units=[1, 3],
+        ),
+        "SEASON": Params(
+            kind=ReservationKind.SEASON,
+            units=[2, 3],
+        ),
+        "DIRECT_AND_SEASON": Params(
+            kind=ReservationKind.DIRECT_AND_SEASON,
+            units=[3],
+        ),
+    })
 )
 def test_reservation_unit__filter__by_reservation_kind(graphql, kind, units):
     reservation_units = {
