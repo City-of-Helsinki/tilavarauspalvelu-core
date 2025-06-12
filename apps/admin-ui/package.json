@@ -40,7 +40,7 @@
     "hds-core": "^4.4.0",
     "hds-react": "^4.4.0",
     "i18n-iso-countries": "^7.14.0",
-    "i18next": "^23.15.1",
+    "i18next": "^25.2.1",
     "lodash-es": "^4.17.21",
     "next": "15.3.3",
     "next-i18next": "^15.4.2",
