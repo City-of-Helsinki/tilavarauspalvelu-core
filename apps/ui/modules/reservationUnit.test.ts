@@ -41,6 +41,7 @@ import {
   getLastPossibleReservationDate,
   type AvailableTimesProps,
   getNextAvailableTime,
+  formatNDays,
 } from "./reservationUnit";
 import mockTranslations from "./../public/locales/fi/prices.json";
 import { type ReservableMap, dateToKey, type RoundPeriod } from "./reservable";
@@ -1536,5 +1537,71 @@ describe("getNextAvailableTime", () => {
       expect(val).toBeInstanceOf(Date);
       expect(perfTime).toBeLessThan(100);
     });
+  });
+});
+
+describe("formatNDays", () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mockT = ((key: string, record: any) =>
+    `${record.count} ${key}`) as TFunction;
+
+  // Same list of options available in the admin-ui
+  // this is the primary use case
+  test.for([
+    { value: 14, label: "2 common:weeks" },
+    { value: 30, label: "1 common:months" },
+    { value: 60, label: "2 common:months" },
+    { value: 90, label: "3 common:months" },
+    { value: 182, label: "6 common:months" },
+    { value: 365, label: "12 common:months" },
+    { value: 730, label: "24 common:months" },
+  ])("formats $value days correctly as $label", ({ value, label }) => {
+    const res = formatNDays(mockT, value);
+    expect(res).toBe(label);
+  });
+
+  test.for([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13])(
+    "formats < 2 weeks as days",
+    (val) => {
+      const res = formatNDays(mockT, val);
+      expect(res).toBe(`${val} common:days`);
+    }
+  );
+
+  test("formats 0 days as a empty string", () => {
+    const res = formatNDays(mockT, 0);
+    expect(res).toBe("");
+  });
+
+  test.for([14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29])(
+    "formats %s days as weeks",
+    (val) => {
+      const res = formatNDays(mockT, val);
+      expect(res).toBe(`${Math.floor(val / 7)} common:weeks`);
+    }
+  );
+
+  test.for(
+    Array.from({ length: 30 }, (_, i) => 30 + Math.random() * 10 * i).map(
+      Math.floor
+    )
+  )("formats %s days > as months", (days) => {
+    const res = formatNDays(mockT, days);
+    expect(res).toBe(`${Math.floor(days / 30)} common:months`);
+  });
+
+  test.for(Array.from({ length: 30 }, () => Math.random() * 365))(
+    "removes decimals from %s",
+    (days) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const t = ((_key: string, record: any) => `${record.count}`) as TFunction;
+      const res = formatNDays(t, days);
+      expect(res).toBe(Math.floor(Number(res)).toString());
+    }
+  );
+
+  test("formats negative days as empty string", () => {
+    const res = formatNDays(mockT, -5);
+    expect(res).toBe("");
   });
 });
