@@ -46,10 +46,7 @@
     "duration": "Varauksen keston tulee olla välillä",
     "maxReservationsPerUserPrefix": "Sinulla voi olla samanaikaisesti",
     "maxReservationsPerUser_one": "vain yksi varaus",
-    "maxReservationsPerUser_other": "enintään {{count}} varausta",
-    "days": "päivää",
-    "weeks": "viikkoa",
-    "months": "kuukautta"
+    "maxReservationsPerUser_other": "enintään {{count}} varausta"
   },
   "futurePricingNotice": "<bold>Tämän kohteen hinta muuttuu {{date}} alkaen. Uusi hinta on {{price}}</bold>",
   "futurePriceNoticeTax": " (sis. alv. {{tax}}%)",

@@ -907,3 +907,21 @@ export function getReservationUnitAccessPeriods(
     { nextEndDate: null, array: [] }
   ).array;
 }
+
+// Format an approximation of days based on the number of days
+export function formatNDays(t: TFunction, days: number): string {
+  if (days <= 0) {
+    return "";
+  }
+  if (days < 14) {
+    return t("common:days", { count: Math.floor(days) });
+  }
+
+  if (days < 30) {
+    const weeks = Math.floor(days / 7);
+    return t("common:weeks", { count: weeks });
+  }
+
+  const months = Math.floor(days / 30);
+  return t("common:months", { count: months });
+}
