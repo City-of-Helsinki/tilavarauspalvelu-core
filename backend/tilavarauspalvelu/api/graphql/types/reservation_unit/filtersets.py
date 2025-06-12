@@ -8,7 +8,12 @@ from django.contrib.postgres.search import SearchQuery
 from django.db import models
 from django.db.models import Q
 from graphene_django_extensions import ModelFilterSet
-from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntChoiceFilter, IntMultipleChoiceFilter
+from graphene_django_extensions.filters import (
+    EnumChoiceFilter,
+    EnumMultipleChoiceFilter,
+    IntChoiceFilter,
+    IntMultipleChoiceFilter,
+)
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -95,8 +100,10 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
     type_rank_gte = IntChoiceFilter(field_name="reservation_unit_type__rank", lookup_expr="gte")
     type_rank_lte = IntChoiceFilter(field_name="reservation_unit_type__rank", lookup_expr="lte")
 
-    reservation_kind = django_filters.CharFilter(field_name="reservation_kind", method="get_reservation_kind")
-
+    reservation_kind = EnumChoiceFilter(
+        method="filter_by_reservation_kind",
+        enum=ReservationKind,
+    )
     publishing_state = EnumMultipleChoiceFilter(
         method="filter_by_publishing_state",
         enum=ReservationUnitPublishingState,
@@ -105,7 +112,9 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
         method="filter_by_reservation_state",
         enum=ReservationUnitReservationState,
     )
-    reservation_form = EnumMultipleChoiceFilter(enum=ReservationFormType)
+    reservation_form = EnumMultipleChoiceFilter(
+        enum=ReservationFormType,
+    )
 
     access_type = EnumMultipleChoiceFilter(method="filter_by_access_type", enum=AccessType)
     access_type_begin_date = django_filters.DateFilter(method="filter_by_access_type")
@@ -196,10 +205,15 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
         return qs.visible() if value else qs.hidden()
 
     @staticmethod
-    def get_reservation_kind(qs: ReservationUnitQuerySet, name: str, value: str) -> QuerySet:
-        if name.upper() == ReservationKind.DIRECT_AND_SEASON:
-            return qs.filter(reservation_kind__isnull=False)
-        return qs.filter(reservation_kind__icontains=value)
+    def filter_by_reservation_kind(qs: ReservationUnitQuerySet, name: str, value: str) -> QuerySet:
+        match value:
+            case ReservationKind.DIRECT:
+                qs = qs.filter(reservation_kind__in=ReservationKind.allows_direct)
+            case ReservationKind.SEASON:
+                qs = qs.filter(reservation_kind__in=ReservationKind.allows_season)
+            case ReservationKind.DIRECT_AND_SEASON:
+                qs = qs.filter(reservation_kind=value)
+        return qs
 
     @staticmethod
     def filter_by_publishing_state(qs: ReservationUnitQuerySet, name: str, value: list[str]) -> models.QuerySet:
