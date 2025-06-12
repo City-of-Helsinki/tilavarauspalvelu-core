@@ -1444,13 +1444,24 @@ enum ApplicationRoundOrderingChoices {
 }
 
 type ApplicationRoundTimeSlotNode implements Node {
-  weekday: Int!
+  weekday: Weekday!
   isClosed: Boolean!
   reservableTimes: [TimeSlotType]!
 
   """The ID of the object"""
   id: ID!
   pk: Int
+}
+
+"""An enumeration."""
+enum Weekday {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
 }
 
 type TimeSlotType {
@@ -1702,7 +1713,7 @@ type ReservationSeriesNode implements Node {
   endDate: Date!
   endTime: Time!
   recurrenceInDays: Int
-  weekdays: [Int!]!
+  weekdays: [String!]!
   reservationUnit: ReservationUnitNode!
   user: UserNode!
   allocatedTimeSlot: AllocatedTimeSlotNode
@@ -1773,17 +1784,6 @@ type AllocatedTimeSlotNode implements Node {
   """The ID of the object"""
   id: ID!
   pk: Int
-}
-
-"""An enumeration."""
-enum Weekday {
-  MONDAY
-  TUESDAY
-  WEDNESDAY
-  THURSDAY
-  FRIDAY
-  SATURDAY
-  SUNDAY
 }
 
 type ReservationUnitOptionNode implements Node {
@@ -3983,7 +3983,7 @@ input ReservationUnitAccessTypeSerializerInput {
 }
 
 input ApplicationRoundTimeSlotSerializerInput {
-  weekday: Int!
+  weekday: Weekday!
   isClosed: Boolean
   reservableTimes: [TimeSlotSerializerInput]
 }
@@ -4165,7 +4165,7 @@ input UpdateReservationUnitAccessTypeSerializerInput {
 }
 
 input UpdateApplicationRoundTimeSlotSerializerInput {
-  weekday: Int!
+  weekday: Weekday!
   isClosed: Boolean
   reservableTimes: [TimeSlotSerializerInput]
 }
@@ -4607,7 +4607,7 @@ type ReservationSeriesCreateMutationPayload {
   reservationUnit: Int
   ageGroup: Int
   recurrenceInDays: Int
-  weekdays: [Int]
+  weekdays: [Weekday]
   beginTime: Time
   endTime: Time
   beginDate: Date
@@ -4621,7 +4621,7 @@ input ReservationSeriesCreateMutationInput {
   reservationUnit: Int!
   ageGroup: Int
   recurrenceInDays: Int!
-  weekdays: [Int]!
+  weekdays: [Weekday]!
   beginTime: Time!
   endTime: Time!
   beginDate: Date!
@@ -4756,7 +4756,7 @@ type ReservationSeriesRescheduleMutationPayload {
   beginTime: Time
   endDate: Date
   endTime: Time
-  weekdays: [Int]
+  weekdays: [Weekday]
 }
 
 input ReservationSeriesRescheduleMutationInput {
@@ -4765,7 +4765,7 @@ input ReservationSeriesRescheduleMutationInput {
   beginTime: Time
   endDate: Date
   endTime: Time
-  weekdays: [Int]
+  weekdays: [Weekday]
   skipDates: [Date]
   bufferTimeBefore: String
   bufferTimeAfter: String
