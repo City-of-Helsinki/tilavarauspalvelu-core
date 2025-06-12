@@ -432,3 +432,7 @@ class ReservationManager(_BaseManager):
             reservation.save(update_fields=["state", "cancel_reason"])
 
             EmailService.send_reservation_cancelled_email(reservation=reservation)
+
+    def create_missing_statistics(self) -> None:
+        """Create missing statistics for reservations that don't have any."""
+        self.all().filter(reservation_statistic__isnull=True).upsert_statistics()
