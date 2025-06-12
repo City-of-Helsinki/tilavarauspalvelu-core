@@ -46,10 +46,7 @@
     "duration": "The duration of the booking should be between ",
     "maxReservationsPerUserPrefix": "You can have",
     "maxReservationsPerUser_one": "only one booking at a time",
-    "maxReservationsPerUser_other": "up to {{count}} bookings at a time",
-    "days": "days",
-    "weeks": "weeks",
-    "months": "months"
+    "maxReservationsPerUser_other": "up to {{count}} bookings at a time"
   },
   "futurePricingNotice": "<bold>The price will change on {{date}}. The new price is {{price}}</bold>.",
   "futurePriceNoticeTax": "(incl. VAT {{tax}} %)",
