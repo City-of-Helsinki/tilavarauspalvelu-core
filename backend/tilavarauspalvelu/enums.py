@@ -707,17 +707,18 @@ class ReservationStartInterval(models.TextChoices):
 class ReservationCancelReasonChoice(models.TextChoices):
     """Reasons why user has cancelled their reservation"""
 
-    FOUND_ANOTHER_SPACE_VARAAMO = (
-        "FOUND_ANOTHER_SPACE_VARAAMO",
-        pgettext_lazy("ReservationCancelReason", "I found another space through Varaamo"),
+    # Reasons refined in the order they should appear in the the frontend.
+    CHANGE_OF_PLANS = (
+        "CHANGE_OF_PLANS",
+        pgettext_lazy("ReservationCancelReason", "My plans have changed"),
     )
     FOUND_ANOTHER_SPACE_ELSEWHERE = (
         "FOUND_ANOTHER_SPACE_ELSEWHERE",
         pgettext_lazy("ReservationCancelReason", "I found another space somewhere else"),
     )
-    CHANGE_OF_PLANS = (
-        "CHANGE_OF_PLANS",
-        pgettext_lazy("ReservationCancelReason", "My plans have changed"),
+    FOUND_ANOTHER_SPACE_VARAAMO = (
+        "FOUND_ANOTHER_SPACE_VARAAMO",
+        pgettext_lazy("ReservationCancelReason", "I found another space through Varaamo"),
     )
     UNSUITABLE_SPACE = (
         "UNSUITABLE_SPACE",
@@ -745,7 +746,9 @@ class ReservationCancelReasonChoice(models.TextChoices):
     @classproperty
     def user_selectable(cls) -> list[ReservationCancelReasonChoice]:
         """These reasons are selectable by the user"""
-        return sorted(set(cls) - {cls.NOT_PAID})  # type: ignore[return-type]
+        values = list(cls)
+        values.remove(cls.NOT_PAID)
+        return values  # type: ignore[return-type]
 
 
 class ReservationKind(models.TextChoices):
