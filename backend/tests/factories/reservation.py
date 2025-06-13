@@ -87,15 +87,6 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     reservee_used_ad_login = False
     reservee_type = ReserveeType.INDIVIDUAL
 
-    # Billing information
-    billing_first_name = FakerFI("first_name")
-    billing_last_name = FakerFI("last_name")
-    billing_email = FakerFI("email")
-    billing_phone = FakerFI("phone_number")
-    billing_address_street = FakerFI("street_address")
-    billing_address_city = FakerFI("city")
-    billing_address_zip = FakerFI("postcode")
-
     municipality = MunicipalityChoice.HELSINKI
 
     # Relations
