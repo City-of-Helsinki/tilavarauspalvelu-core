@@ -101,9 +101,6 @@ def test_generate_reservation_series_from_allocations():
     assert reservations[0].reservee_last_name == section.application.contact_person_last_name
     assert reservations[0].reservee_email == section.application.contact_person_email
     assert reservations[0].reservee_phone == section.application.contact_person_phone_number
-    assert reservations[0].billing_address_street == section.application.billing_street_address
-    assert reservations[0].billing_address_city == section.application.billing_city
-    assert reservations[0].billing_address_zip == section.application.billing_post_code
 
     assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 12)
     assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 14)
@@ -151,9 +148,6 @@ def test_generate_reservation_series_from_allocations__individual():
 
     assert reservations[0].description == application.additional_information
     assert reservations[0].reservee_type == ReserveeType.INDIVIDUAL
-    assert reservations[0].reservee_address_street == application.billing_street_address
-    assert reservations[0].reservee_address_city == application.billing_city
-    assert reservations[0].reservee_address_zip == application.billing_post_code
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday

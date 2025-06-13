@@ -135,9 +135,6 @@ def test_anonymization__reservation():
         reservee_address_zip="0100",
         reservee_address_city="Helsinki",
         reservee_address_street="Test Address 1",
-        billing_address_zip="01000",
-        billing_address_city="Helsinki",
-        billing_address_street="Test Address 1",
         free_of_charge_reason="Test reason",
         cancel_details="Test cancel details",
         handling_details="Test handling details",
@@ -157,13 +154,6 @@ def test_anonymization__reservation():
     assert reservation.reservee_address_zip == "99999"
     assert reservation.reservee_address_city == ANONYMIZED
     assert reservation.reservee_address_street == ANONYMIZED
-    assert reservation.billing_first_name == mr_anonymous.first_name
-    assert reservation.billing_last_name == mr_anonymous.last_name
-    assert reservation.billing_email == mr_anonymous.email
-    assert reservation.billing_phone == ""
-    assert reservation.billing_address_zip == "99999"
-    assert reservation.billing_address_city == ANONYMIZED
-    assert reservation.billing_address_street == ANONYMIZED
 
     # Reservee_id and organisation name should not be anonymized
     assert reservation.reservee_identifier != "1234567-2"

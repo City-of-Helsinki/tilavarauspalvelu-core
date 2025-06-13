@@ -1103,10 +1103,6 @@ msgid "Reservee information"
 msgstr "Varaajan tiedot"
 
 #: tilavarauspalvelu/admin/reservation/admin.py
-msgid "Billing information"
-msgstr "Laskutustiedot"
-
-#: tilavarauspalvelu/admin/reservation/admin.py
 msgid "None of the selected reservations can be denied."
 msgstr "Yhtään valittua varausta ei voida hylätä."
 
@@ -1289,34 +1285,6 @@ msgstr "Varaajan postinumero"
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Type of reservee"
 msgstr "Varaajan tyyppi"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Billing first name"
-msgstr "Varauksen maksajan etunimi"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Billing last name"
-msgstr "Varauksen maksajan sukunimi"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Billing email"
-msgstr "Varauksen maksajan sähköposti"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Billing phone"
-msgstr "Varauksen maksajan puhelinnumero"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Billing address street"
-msgstr "Varauksen maksajan katuosoite"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Billing address city"
-msgstr "Varauksen maksajan postitoimipaikka"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Billing address zip code"
-msgstr "Varauksen maksajan postinumero"
 
 #: tilavarauspalvelu/admin/reservation/form.py
 #: tilavarauspalvelu/admin/reservation_series/form.py
@@ -2546,8 +2514,8 @@ msgstr "7 tuntia"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationCancelReason"
-msgid "I found another space through Varaamo"
-msgstr "Löysin toisen tilan Varaamosta"
+msgid "My plans have changed"
+msgstr "Suunnitelmiini tuli muutos"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationCancelReason"
@@ -2556,8 +2524,8 @@ msgstr "Löysin toisen tilan muualta"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationCancelReason"
-msgid "My plans have changed"
-msgstr "Suunnitelmiini tuli muutos"
+msgid "I found another space through Varaamo"
+msgstr "Löysin toisen tilan Varaamosta"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationCancelReason"
