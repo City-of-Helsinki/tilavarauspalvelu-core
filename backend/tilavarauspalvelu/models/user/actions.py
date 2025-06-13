@@ -96,13 +96,6 @@ class UserActions:
             reservation.reservee_address_zip = "99999"
             reservation.reservee_address_city = ANONYMIZED
             reservation.reservee_address_street = ANONYMIZED
-            reservation.billing_first_name = self.user.first_name
-            reservation.billing_last_name = self.user.last_name
-            reservation.billing_email = self.user.email
-            reservation.billing_phone = ""
-            reservation.billing_address_zip = "99999"
-            reservation.billing_address_city = ANONYMIZED
-            reservation.billing_address_street = ANONYMIZED
             reservation.working_memo = ""
             reservation.free_of_charge_reason = SENSITIVE_RESERVATION
             reservation.cancel_details = SENSITIVE_RESERVATION
@@ -124,13 +117,6 @@ class UserActions:
                 "reservee_address_zip",
                 "reservee_address_city",
                 "reservee_address_street",
-                "billing_first_name",
-                "billing_last_name",
-                "billing_email",
-                "billing_phone",
-                "billing_address_zip",
-                "billing_address_city",
-                "billing_address_street",
                 "working_memo",
                 "free_of_charge_reason",
                 "cancel_details",

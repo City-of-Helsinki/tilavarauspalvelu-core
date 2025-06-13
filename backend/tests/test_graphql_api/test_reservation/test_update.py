@@ -44,13 +44,6 @@ def test_reservation__update__with_additional_data(graphql):
     additional_data = {
         "ageGroup": age_group.pk,
         "applyingForFreeOfCharge": True,
-        "billingAddressCity": "Turku",
-        "billingAddressStreet": "Auratie 12B",
-        "billingAddressZip": "20100",
-        "billingEmail": "jane.doe@example.com",
-        "billingFirstName": "Jane",
-        "billingLastName": "Doe",
-        "billingPhone": "+358234567890",
         "description": "Test description",
         "freeOfChargeReason": "Free of charge reason",
         "municipality": MunicipalityChoice.HELSINKI.value,
@@ -80,13 +73,6 @@ def test_reservation__update__with_additional_data(graphql):
     assert reservation.age_group.maximum == 30
     assert reservation.age_group.minimum == 18
     assert reservation.applying_for_free_of_charge is True
-    assert reservation.billing_address_city == "Turku"
-    assert reservation.billing_address_street == "Auratie 12B"
-    assert reservation.billing_address_zip == "20100"
-    assert reservation.billing_email == "jane.doe@example.com"
-    assert reservation.billing_first_name == "Jane"
-    assert reservation.billing_last_name == "Doe"
-    assert reservation.billing_phone == "+358234567890"
     assert reservation.buffer_time_after == datetime.timedelta()
     assert reservation.buffer_time_before == datetime.timedelta()
     assert reservation.description == "Test description"

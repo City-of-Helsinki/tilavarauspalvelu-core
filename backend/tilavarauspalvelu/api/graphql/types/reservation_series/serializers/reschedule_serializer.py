@@ -251,14 +251,6 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
             reservee_address_zip=next_reservation.reservee_address_zip,
             reservee_type=next_reservation.reservee_type,
             #
-            billing_first_name=next_reservation.billing_first_name,
-            billing_last_name=next_reservation.billing_last_name,
-            billing_email=next_reservation.billing_email,
-            billing_phone=next_reservation.billing_phone,
-            billing_address_street=next_reservation.billing_address_street,
-            billing_address_city=next_reservation.billing_address_city,
-            billing_address_zip=next_reservation.billing_address_zip,
-            #
             user=next_reservation.user,
             purpose=next_reservation.purpose,
             municipality=next_reservation.municipality,

@@ -72,13 +72,6 @@ def test_reservation__query__all_fields(graphql):
         ageGroup { minimum maximum }
         applyingForFreeOfCharge
         beginsAt
-        billingAddressCity
-        billingAddressStreet
-        billingAddressZip
-        billingEmail
-        billingFirstName
-        billingLastName
-        billingPhone
         bufferTimeAfter
         bufferTimeBefore
         cancelDetails
@@ -135,13 +128,6 @@ def test_reservation__query__all_fields(graphql):
         "ageGroup": None,
         "applyingForFreeOfCharge": reservation.applying_for_free_of_charge,
         "beginsAt": reservation.begins_at.isoformat(),
-        "billingAddressCity": reservation.billing_address_city,
-        "billingAddressStreet": reservation.billing_address_street,
-        "billingAddressZip": reservation.billing_address_zip,
-        "billingEmail": reservation.billing_email,
-        "billingFirstName": reservation.billing_first_name,
-        "billingLastName": reservation.billing_last_name,
-        "billingPhone": reservation.billing_phone,
         "bufferTimeAfter": int(reservation.buffer_time_after.total_seconds()),
         "bufferTimeBefore": int(reservation.buffer_time_before.total_seconds()),
         "cancelDetails": reservation.cancel_details,
