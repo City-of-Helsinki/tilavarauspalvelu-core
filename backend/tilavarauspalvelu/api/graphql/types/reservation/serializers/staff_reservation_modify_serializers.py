@@ -84,15 +84,6 @@ class StaffReservationModifySerializer(NestingModelSerializer):
             "reservee_type",
             "reservee_identifier",
             #
-            # Billing information
-            "billing_address_city",
-            "billing_address_street",
-            "billing_address_zip",
-            "billing_email",
-            "billing_first_name",
-            "billing_last_name",
-            "billing_phone",
-            #
             # Relations
             "age_group",
             "purpose",

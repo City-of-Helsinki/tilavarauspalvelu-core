@@ -1500,13 +1500,6 @@ type ReservationNode implements Node {
   reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeType: ReserveeType
-  billingFirstName: String
-  billingLastName: String
-  billingEmail: String
-  billingPhone: String
-  billingAddressStreet: String
-  billingAddressCity: String
-  billingAddressZip: String
   reservationUnit: ReservationUnitNode!
   user: UserNode
   reservationSeries: ReservationSeriesNode
@@ -1569,9 +1562,9 @@ enum MunicipalityChoice {
 
 """Reasons why user has cancelled their reservation"""
 enum ReservationCancelReasonChoice {
-  FOUND_ANOTHER_SPACE_VARAAMO
-  FOUND_ANOTHER_SPACE_ELSEWHERE
   CHANGE_OF_PLANS
+  FOUND_ANOTHER_SPACE_ELSEWHERE
+  FOUND_ANOTHER_SPACE_VARAAMO
   UNSUITABLE_SPACE
   PROCESSING_TIME_TOO_LONG
   OTHER
@@ -4254,13 +4247,6 @@ type ReservationStaffCreateMutationPayload {
   reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeType: ReserveeType
-  billingFirstName: String
-  billingLastName: String
-  billingPhone: String
-  billingEmail: String
-  billingAddressStreet: String
-  billingAddressCity: String
-  billingAddressZip: String
   ageGroup: Int
   purpose: Int
   state: ReservationStateChoice
@@ -4292,13 +4278,6 @@ input ReservationStaffCreateMutationInput {
   reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeType: ReserveeType
-  billingFirstName: String
-  billingLastName: String
-  billingPhone: String
-  billingEmail: String
-  billingAddressStreet: String
-  billingAddressCity: String
-  billingAddressZip: String
   reservationUnit: Int!
   ageGroup: Int
   purpose: Int
@@ -4322,13 +4301,6 @@ type ReservationUpdateMutationPayload {
   reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeType: ReserveeType
-  billingFirstName: String
-  billingLastName: String
-  billingEmail: String
-  billingPhone: String
-  billingAddressStreet: String
-  billingAddressCity: String
-  billingAddressZip: String
   ageGroup: Int
   purpose: Int
   state: ReservationStateChoice
@@ -4352,13 +4324,6 @@ input ReservationUpdateMutationInput {
   reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeType: ReserveeType
-  billingFirstName: String
-  billingLastName: String
-  billingEmail: String
-  billingPhone: String
-  billingAddressStreet: String
-  billingAddressCity: String
-  billingAddressZip: String
   ageGroup: Int
   purpose: Int
 }
@@ -4507,13 +4472,6 @@ type ReservationStaffModifyMutationPayload {
   reserveeEmail: String
   reserveeType: ReserveeType
   reserveeIdentifier: String
-  billingAddressCity: String
-  billingAddressStreet: String
-  billingAddressZip: String
-  billingEmail: String
-  billingFirstName: String
-  billingLastName: String
-  billingPhone: String
   ageGroup: Int
   purpose: Int
   confirmedAt: DateTime
@@ -4549,13 +4507,6 @@ input ReservationStaffModifyMutationInput {
   reserveeEmail: String
   reserveeType: ReserveeType
   reserveeIdentifier: String
-  billingAddressCity: String
-  billingAddressStreet: String
-  billingAddressZip: String
-  billingEmail: String
-  billingFirstName: String
-  billingLastName: String
-  billingPhone: String
   ageGroup: Int
   purpose: Int
 }
@@ -4634,13 +4585,6 @@ input ReservationSeriesReservationCreateSerializerInput {
   reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeType: ReserveeType
-  billingFirstName: String
-  billingLastName: String
-  billingEmail: String
-  billingPhone: String
-  billingAddressStreet: String
-  billingAddressCity: String
-  billingAddressZip: String
   user: Int!
   purpose: Int
   municipality: MunicipalityChoice
@@ -4692,13 +4636,6 @@ input UpdateReservationSeriesReservationUpdateSerializerInput {
   reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeType: ReserveeType
-  billingFirstName: String
-  billingLastName: String
-  billingEmail: String
-  billingPhone: String
-  billingAddressStreet: String
-  billingAddressCity: String
-  billingAddressZip: String
   purpose: Int
   municipality: MunicipalityChoice
   ageGroup: Int
