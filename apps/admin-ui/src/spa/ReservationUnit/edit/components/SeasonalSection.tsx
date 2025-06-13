@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import {
   Button,
   ButtonVariant,
@@ -185,9 +185,9 @@ function SeasonRow({
           return null;
         }
         return (
-          <>
+          <Fragment key={time.id}>
             {i > 0 && <AndSpan>{t("common.and")}</AndSpan>}
-            <SeasonalTimeWrapper key={time.id} style={{ gridArea: `a${i}` }}>
+            <SeasonalTimeWrapper style={{ gridArea: `a${i}` }}>
               <Controller
                 control={control}
                 name={`seasons.${index}.reservableTimes.${i}.begin`}
@@ -229,7 +229,7 @@ function SeasonRow({
                 )}
               />
             </SeasonalTimeWrapper>
-          </>
+          </Fragment>
         );
       })}
 
