@@ -52,7 +52,7 @@ i18n.addResourceBundle("fi", "common", {
   cancel: "Peruuta",
   remove: "Poista",
   scrollToTop: "Siirry ylös",
-  helsinkiCity: ["Helsingin kaupunki"],
+  helsinkiCity: "Helsingin kaupunki",
   "weekDayLong.0": "Sunnuntai",
   "weekDayLong.1": "Maanantai",
   "weekDayLong.2": "Tiistai",
