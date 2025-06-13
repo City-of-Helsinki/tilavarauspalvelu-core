@@ -179,14 +179,6 @@ class ReservationNode(DjangoNode):
     reservee_organisation_name = graphene.String()
     reservee_type = graphene.Field(graphene.Enum.from_enum(ReserveeType))
     #
-    billing_first_name = graphene.String()
-    billing_last_name = graphene.String()
-    billing_email = graphene.String()
-    billing_phone = graphene.String()
-    billing_address_street = graphene.String()
-    billing_address_city = graphene.String()
-    billing_address_zip = graphene.String()
-    #
     user = graphene.Field(UserNode)
 
     class Meta:
@@ -238,14 +230,6 @@ class ReservationNode(DjangoNode):
             "reservee_address_zip",
             "reservee_organisation_name",
             "reservee_type",
-            #
-            "billing_first_name",
-            "billing_last_name",
-            "billing_email",
-            "billing_phone",
-            "billing_address_street",
-            "billing_address_city",
-            "billing_address_zip",
             #
             "reservation_unit",
             "user",
