@@ -199,14 +199,6 @@ class ReservationUpdateData(TypedDict):
     reservee_address_zip: NotRequired[str]
     reservee_type: NotRequired[ReserveeType]
 
-    billing_first_name: NotRequired[str]
-    billing_last_name: NotRequired[str]
-    billing_email: NotRequired[str | None]
-    billing_phone: NotRequired[str]
-    billing_address_street: NotRequired[str]
-    billing_address_city: NotRequired[str]
-    billing_address_zip: NotRequired[str]
-
     purpose: NotRequired[ReservationPurpose | None]
     age_group: NotRequired[AgeGroup | None]
 
@@ -298,14 +290,6 @@ class StaffCreateReservationData(TypedDict):
     reservee_address_city: NotRequired[str]
     reservee_address_zip: NotRequired[str]
     reservee_type: NotRequired[ReserveeType]
-
-    billing_first_name: NotRequired[str]
-    billing_last_name: NotRequired[str]
-    billing_email: NotRequired[str | None]
-    billing_phone: NotRequired[str]
-    billing_address_street: NotRequired[str]
-    billing_address_city: NotRequired[str]
-    billing_address_zip: NotRequired[str]
 
     age_group: NotRequired[ReservationPurpose | None]
     purpose: NotRequired[AgeGroup | None]
@@ -449,14 +433,6 @@ class ReservationDetails(TypedDict, total=False):
     reservee_address_city: str
     reservee_address_zip: str
     reservee_type: ReserveeType
-
-    billing_first_name: str
-    billing_last_name: str
-    billing_email: str | None
-    billing_phone: str
-    billing_address_street: str
-    billing_address_city: str
-    billing_address_zip: str
 
     user: int | User | None
     purpose: int | ReservationPurpose | None

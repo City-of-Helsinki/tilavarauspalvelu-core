@@ -147,34 +147,6 @@ def test_query_user_data__full(api_client, settings):
                                 "value": reservation.reservee_address_street,
                             },
                             {
-                                "key": "BILLING_FIRST_NAME",
-                                "value": reservation.billing_first_name,
-                            },
-                            {
-                                "key": "BILLING_LAST_NAME",
-                                "value": reservation.billing_last_name,
-                            },
-                            {
-                                "key": "BILLING_EMAIL",
-                                "value": reservation.billing_email,
-                            },
-                            {
-                                "key": "BILLING_PHONE",
-                                "value": reservation.billing_phone,
-                            },
-                            {
-                                "key": "BILLING_ADDRESS_ZIP",
-                                "value": reservation.billing_address_zip,
-                            },
-                            {
-                                "key": "BILLING_ADDRESS_CITY",
-                                "value": reservation.billing_address_city,
-                            },
-                            {
-                                "key": "BILLING_ADDRESS_STREET",
-                                "value": reservation.billing_address_street,
-                            },
-                            {
                                 "key": "RESERVEE_IDENTIFIER",
                                 "value": reservation.reservee_identifier,
                             },

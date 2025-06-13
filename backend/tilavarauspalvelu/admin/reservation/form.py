@@ -75,14 +75,6 @@ class ReservationAdminForm(forms.ModelForm):
             "reservee_address_zip": _("Reservee address zip code"),
             "reservee_type": _("Type of reservee"),
             #
-            "billing_first_name": _("Billing first name"),
-            "billing_last_name": _("Billing last name"),
-            "billing_email": _("Billing email"),
-            "billing_phone": _("Billing phone"),
-            "billing_address_street": _("Billing address street"),
-            "billing_address_city": _("Billing address city"),
-            "billing_address_zip": _("Billing address zip code"),
-            #
             "user": _("User"),
             "reservation_series": _("Recurring reservation"),
             "deny_reason": _("Reason for deny"),
@@ -137,14 +129,6 @@ class ReservationAdminForm(forms.ModelForm):
             "reservee_address_city": _("Reservee's city"),
             "reservee_address_zip": _("Reservee's zip code"),
             "reservee_type": _("Type of reservee"),
-            #
-            "billing_first_name": _("Billing first name"),
-            "billing_last_name": _("Billing last name"),
-            "billing_email": _("Billing email"),
-            "billing_phone": _("Billing phone"),
-            "billing_address_street": _("Billing address street"),
-            "billing_address_city": _("Billing address city"),
-            "billing_address_zip": _("Billing address zip code"),
             #
             "user": _("User who made the reservation"),
             "reservation_series": _("Recurring reservation"),

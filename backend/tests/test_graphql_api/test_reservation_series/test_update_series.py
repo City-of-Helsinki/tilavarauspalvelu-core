@@ -58,13 +58,6 @@ def test_reservation_series__update_series(graphql):
             "reserveeAddressCity": "city",
             "reserveeAddressZip": "cip",
             "reserveeType": ReserveeType.COMPANY.value,
-            "billingFirstName": "Bill",
-            "billingLastName": "Admin",
-            "billingEmail": "bill@admin.com",
-            "billingPhone": "9876543210",
-            "billingAddressStreet": "lane",
-            "billingAddressCity": "town",
-            "billingAddressZip": "postal",
             "purpose": purpose_2.pk,
             "municipality": MunicipalityChoice.HELSINKI.value,
             "ageGroup": age_group_2.pk,
@@ -98,8 +91,6 @@ def test_reservation_series__update_series(graphql):
     assert reservation.reservee_address_city == "city"
     assert reservation.reservee_address_zip == "cip"
     assert reservation.reservee_type == ReserveeType.COMPANY.value
-    assert reservation.billing_first_name == "Bill"
-    assert reservation.billing_last_name == "Admin"
     assert reservation.age_group == age_group_2
     assert reservation.purpose == purpose_2
     assert reservation.municipality == MunicipalityChoice.HELSINKI
