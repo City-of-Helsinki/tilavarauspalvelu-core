@@ -120,15 +120,6 @@ class Reservation(SerializableMixin, models.Model):
     reservee_used_ad_login: bool = models.BooleanField(default=False, blank=True)
     reservee_type: str | None = StrChoiceField(enum=ReserveeType, null=True, blank=True)
 
-    # Billing information
-    billing_first_name: str = models.CharField(max_length=255, blank=True, default="")
-    billing_last_name: str = models.CharField(max_length=255, blank=True, default="")
-    billing_email: str | None = models.EmailField(null=True, blank=True)
-    billing_phone: str = models.CharField(max_length=255, blank=True, default="")
-    billing_address_street: str = models.CharField(max_length=255, blank=True, default="")
-    billing_address_city: str = models.CharField(max_length=255, blank=True, default="")
-    billing_address_zip: str = models.CharField(max_length=255, blank=True, default="")
-
     # Relations
     reservation_unit: ReservationUnit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
@@ -201,13 +192,6 @@ class Reservation(SerializableMixin, models.Model):
         {"name": "reservee_address_zip"},
         {"name": "reservee_address_city"},
         {"name": "reservee_address_street"},
-        {"name": "billing_first_name"},
-        {"name": "billing_last_name"},
-        {"name": "billing_email"},
-        {"name": "billing_phone"},
-        {"name": "billing_address_zip"},
-        {"name": "billing_address_city"},
-        {"name": "billing_address_street"},
         {"name": "reservee_identifier"},
         {"name": "reservee_organisation_name"},
         {"name": "free_of_charge_reason"},

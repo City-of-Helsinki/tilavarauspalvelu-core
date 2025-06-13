@@ -1062,10 +1062,6 @@ msgid "Reservee information"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/admin.py
-msgid "Billing information"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/admin.py
 msgid "None of the selected reservations can be denied."
 msgstr ""
 
@@ -1247,34 +1243,6 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Type of reservee"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Billing first name"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Billing last name"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Billing email"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Billing phone"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Billing address street"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Billing address city"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Billing address zip code"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
@@ -2473,8 +2441,8 @@ msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationCancelReason"
-msgid "I found another space through Varaamo"
-msgstr "Jag hittade en annan lokal på Varaamo"
+msgid "My plans have changed"
+msgstr "Mina planer har ändrats"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationCancelReason"
@@ -2483,8 +2451,8 @@ msgstr "Jag hittade en annan lokal någon annanstans"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationCancelReason"
-msgid "My plans have changed"
-msgstr "Mina planer har ändrats"
+msgid "I found another space through Varaamo"
+msgstr "Jag hittade en annan lokal på Varaamo"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationCancelReason"

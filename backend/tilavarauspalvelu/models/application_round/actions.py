@@ -213,19 +213,12 @@ class ApplicationRoundActions:
             reservee_last_name=application.contact_person_last_name,
             reservee_email=application.contact_person_email,
             reservee_phone=application.contact_person_phone_number,
-            billing_address_street=application.billing_street_address,
-            billing_address_city=application.billing_city,
-            billing_address_zip=application.billing_post_code,
             purpose=application_section.purpose,
             municipality=application.municipality,
         )
 
         if reservee_type == ReserveeType.INDIVIDUAL:
             reservation_details["description"] = application.additional_information
-            reservation_details["reservee_address_street"] = reservation_details["billing_address_street"]
-            reservation_details["reservee_address_city"] = reservation_details["billing_address_city"]
-            reservation_details["reservee_address_zip"] = reservation_details["billing_address_zip"]
-
         else:
             reservation_details["description"] = application.organisation_core_business
             reservation_details["reservee_organisation_name"] = application.organisation_name
