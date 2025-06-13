@@ -111,13 +111,6 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         reserveeOrganisationName
         reserveeName
         freeOfChargeReason
-        billingFirstName
-        billingLastName
-        billingAddressStreet
-        billingAddressCity
-        billingAddressZip
-        billingPhone
-        billingEmail
         description
         reserveeIdentifier
         cancelDetails
@@ -143,13 +136,6 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         "pk": reservation.pk,
         "ageGroup": None,
         "applyingForFreeOfCharge": None,
-        "billingAddressCity": None,
-        "billingAddressStreet": None,
-        "billingAddressZip": None,
-        "billingEmail": None,
-        "billingFirstName": None,
-        "billingLastName": None,
-        "billingPhone": None,
         "cancelDetails": None,
         "description": None,
         "freeOfChargeReason": None,
@@ -241,13 +227,6 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
     reservation = ReservationFactory.create(
         age_group=AgeGroupFactory.create(),
         applying_for_free_of_charge=True,
-        billing_address_city="billing city",
-        billing_address_street="billing street",
-        billing_address_zip="billing zip",
-        billing_email="billing email",
-        billing_first_name="billing first",
-        billing_last_name="billing last",
-        billing_phone="billing phone",
         cancel_details="cancel details",
         description="desc",
         free_of_charge_reason="reason",
@@ -281,13 +260,6 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
         pk
         ageGroup { minimum, maximum }
         applyingForFreeOfCharge
-        billingAddressCity
-        billingAddressStreet
-        billingAddressZip
-        billingEmail
-        billingFirstName
-        billingLastName
-        billingPhone
         cancelDetails
         description
         freeOfChargeReason
@@ -323,13 +295,6 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
     assert response.node(0)["pk"] == reservation.pk
     assert response.node(0)["ageGroup"] is not None, "field not found"
     assert response.node(0)["applyingForFreeOfCharge"] is not None, "field not found"
-    assert response.node(0)["billingAddressCity"] is not None, "field not found"
-    assert response.node(0)["billingAddressStreet"] is not None, "field not found"
-    assert response.node(0)["billingAddressZip"] is not None, "field not found"
-    assert response.node(0)["billingEmail"] is not None, "field not found"
-    assert response.node(0)["billingFirstName"] is not None, "field not found"
-    assert response.node(0)["billingLastName"] is not None, "field not found"
-    assert response.node(0)["billingPhone"] is not None, "field not found"
     assert response.node(0)["cancelDetails"] is not None, "field not found"
     assert response.node(0)["description"] is not None, "field not found"
     assert response.node(0)["freeOfChargeReason"] is not None, "field not found"
