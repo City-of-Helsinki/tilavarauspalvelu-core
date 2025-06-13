@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { fontMedium } from "common/styled";
 import { ReactNode } from "react";
 
 type SingleLabelRangeInputProps = {
@@ -21,8 +20,12 @@ const InputContainer = styled.div`
   }
 `;
 
-const Label = styled.div`
-  ${fontMedium}
+// Copy styles from HDS FieldLabel, which is an internal component of HDS
+const Label = styled.label`
+  color: var(--label-color-default, var(--color-black-90));
+  display: block;
+  font-size: var(--fontsize-body-m);
+  font-weight: 500;
 `;
 
 // A wrapper to supply a singular label to two related input fields:
