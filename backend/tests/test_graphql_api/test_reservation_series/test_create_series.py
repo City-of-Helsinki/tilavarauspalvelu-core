@@ -110,13 +110,6 @@ def test_reservation_series__create_series__reservation_details(graphql):
     data["reservationDetails"]["reserveeAddressCity"] = "city"
     data["reservationDetails"]["reserveeAddressZip"] = "cip"
     data["reservationDetails"]["reserveeType"] = ReserveeType.COMPANY.value
-    data["reservationDetails"]["billingFirstName"] = "Bill"
-    data["reservationDetails"]["billingLastName"] = "Admin"
-    data["reservationDetails"]["billingEmail"] = "bill@admin.com"
-    data["reservationDetails"]["billingPhone"] = "9876543210"
-    data["reservationDetails"]["billingAddressStreet"] = "lane"
-    data["reservationDetails"]["billingAddressCity"] = "town"
-    data["reservationDetails"]["billingAddressZip"] = "postal"
     data["reservationDetails"]["purpose"] = purpose.pk
     data["reservationDetails"]["municipality"] = MunicipalityChoice.HELSINKI.value
 
@@ -155,13 +148,6 @@ def test_reservation_series__create_series__reservation_details(graphql):
     assert reservations[0].reservee_address_city == "city"
     assert reservations[0].reservee_address_zip == "cip"
     assert reservations[0].reservee_type == ReserveeType.COMPANY
-    assert reservations[0].billing_first_name == "Bill"
-    assert reservations[0].billing_last_name == "Admin"
-    assert reservations[0].billing_email == "bill@admin.com"
-    assert reservations[0].billing_phone == "9876543210"
-    assert reservations[0].billing_address_street == "lane"
-    assert reservations[0].billing_address_city == "town"
-    assert reservations[0].billing_address_zip == "postal"
     assert reservations[0].purpose == purpose
     assert reservations[0].municipality == MunicipalityChoice.HELSINKI
     assert reservations[0].user == user
