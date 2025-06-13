@@ -94,10 +94,6 @@ class ReservationApproveSerializer(NestingModelSerializer):
             msg = "No pricing found for reservation's begin date."
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_NO_ACTIVE_PRICING)
 
-        if pricing.payment_type != PaymentType.ON_SITE:
-            reservation_unit.validators.validate_has_payment_product()
-
-        data["payment_type"] = PaymentType(pricing.payment_type)
         # Tax percentage needs to be updated in case it has changed since the reservation was created
         data["tax_percentage_value"] = pricing.tax_percentage.value
 
@@ -105,6 +101,16 @@ class ReservationApproveSerializer(NestingModelSerializer):
         one_hour_before_begin = begin - datetime.timedelta(hours=1)
         data["handled_payment_due_by"] = min(three_days_from_now, one_hour_before_begin)
 
+        # Use on-site payment if the reservation is going to begin soon,
+        # even if the current pricing payment type is not on-site.
+        if begin - local_datetime() < datetime.timedelta(hours=2):
+            data["payment_type"] = PaymentType.ON_SITE
+            return data
+
+        if pricing.payment_type != PaymentType.ON_SITE:
+            reservation_unit.validators.validate_has_payment_product()
+
+        data["payment_type"] = PaymentType(pricing.payment_type)
         return data
 
     def update(self, instance: Reservation, validated_data: ReservationApproveData) -> Reservation:
@@ -152,7 +158,7 @@ class ReservationApproveSerializer(NestingModelSerializer):
         self.instance.price = validated_data["price"]
         self.instance.tax_percentage_value = validated_data["tax_percentage_value"]
 
-        if self.instance.price_net > 0 and validated_data["state"].should_create_payment_order:
+        if validated_data["state"].should_create_payment_order:
             self.instance.actions.create_payment_order_paid_after_handling(
                 payment_type=validated_data["payment_type"],
                 handled_payment_due_by=validated_data["handled_payment_due_by"],
