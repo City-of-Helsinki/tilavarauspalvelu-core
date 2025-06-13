@@ -7,7 +7,7 @@ import freezegun
 import pytest
 from django.conf import settings
 
-from tilavarauspalvelu.enums import CustomerTypeChoice
+from tilavarauspalvelu.enums import ReserveeType
 from tilavarauspalvelu.integrations.verkkokauppa.helpers import get_verkkokauppa_order_params
 from utils.date_utils import local_datetime
 
@@ -35,7 +35,7 @@ def test_get_verkkokauppa_order_params__to_json():
         user=user,
         price=Decimal("12.55"),
         tax_percentage_value=Decimal(24),
-        reservee_type=CustomerTypeChoice.INDIVIDUAL,
+        reservee_type=ReserveeType.INDIVIDUAL,
         reservee_first_name="Firstname",
         reservee_last_name="Lastname",
         reservee_email="test@example.com",
@@ -100,7 +100,7 @@ def test_get_verkkokauppa_order_params__to_json__meta_label_language_support():
         user=user,
         price=Decimal("12.5488"),
         tax_percentage_value=Decimal(24),
-        reservee_type=CustomerTypeChoice.INDIVIDUAL,
+        reservee_type=ReserveeType.INDIVIDUAL,
         reservee_first_name="Firstname",
         reservee_last_name="Lastname",
         reservee_email="test@example.com",

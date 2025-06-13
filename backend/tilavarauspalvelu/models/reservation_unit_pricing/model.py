@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, ClassVar
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import PaymentType, PriceUnit
+from utils.auditlog_util import AuditLogger
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
@@ -23,12 +23,6 @@ if TYPE_CHECKING:
 __all__ = [
     "ReservationUnitPricing",
 ]
-
-
-def get_default_tax_percentage() -> int:
-    from tilavarauspalvelu.models import TaxPercentage
-
-    return TaxPercentage.objects.order_by("value").first().pk
 
 
 class ReservationUnitPricing(models.Model):
@@ -48,7 +42,6 @@ class ReservationUnitPricing(models.Model):
         "tilavarauspalvelu.TaxPercentage",
         related_name="reservation_unit_pricings",
         on_delete=models.PROTECT,
-        default=get_default_tax_percentage,
     )
 
     reservation_unit: ReservationUnit = models.ForeignKey(

@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING
 from django.db import models
 
 from tilavarauspalvelu.enums import (
-    CustomerTypeChoice,
     MunicipalityChoice,
     OrderStatus,
     PaymentType,
@@ -16,7 +15,8 @@ from tilavarauspalvelu.enums import (
     ReservationKind,
     ReservationStateChoice,
     ReservationTypeChoice,
-    WeekdayChoice,
+    ReserveeType,
+    Weekday,
 )
 from tilavarauspalvelu.models import (
     PaymentOrder,
@@ -129,10 +129,10 @@ def _create_normal_reservations(
         ReservationTypeChoice.STAFF,
     ]
 
-    customer_type_choices: list[CustomerTypeChoice] = [
-        CustomerTypeChoice.INDIVIDUAL,
-        CustomerTypeChoice.BUSINESS,
-        CustomerTypeChoice.NONPROFIT,
+    reservee_type_choice: list[ReserveeType] = [
+        ReserveeType.INDIVIDUAL,
+        ReserveeType.COMPANY,
+        ReserveeType.NONPROFIT,
     ]
 
     handling_state_choices: list[ReservationStateChoice] = [
@@ -186,7 +186,7 @@ def _create_normal_reservations(
             begin_datetime = combine(reservation_date, begin_time)
 
             while reservation_date == begin_datetime.date():
-                customer_type = weighted_choice(customer_type_choices, weights=[5, 1, 1])
+                customer_type = weighted_choice(reservee_type_choice, weights=[5, 1, 1])
                 reservation_type = weighted_choice(reservation_type_choices, weights=[5, 1, 1])
 
                 if pricing.highest_price != pricing.lowest_price:
@@ -205,7 +205,7 @@ def _create_normal_reservations(
                         ReservationBuilder()
                         .for_user(user)
                         .for_reservation_unit(reservation_unit)
-                        .for_customer_type(customer_type)
+                        .for_reservee_type(customer_type)
                         .starting_at(begin_datetime, reservation_unit, pricing=pricing)
                         .build(
                             reservation_unit=reservation_unit,
@@ -445,10 +445,10 @@ def _create_full_day_reservations(
 
     user = User.objects.get(username="tvp")
 
-    customer_type_choices: list[CustomerTypeChoice] = [
-        CustomerTypeChoice.INDIVIDUAL,
-        CustomerTypeChoice.BUSINESS,
-        CustomerTypeChoice.NONPROFIT,
+    reservee_type_choices: list[ReserveeType] = [
+        ReserveeType.INDIVIDUAL,
+        ReserveeType.COMPANY,
+        ReserveeType.NONPROFIT,
     ]
 
     reservation_type_choices: list[ReservationTypeChoice] = [
@@ -479,14 +479,14 @@ def _create_full_day_reservations(
             begin_time = datetime.time(hour=random.randint(6, 10), tzinfo=DEFAULT_TIMEZONE)
             begin_datetime = combine(reservation_date, begin_time)
 
-            customer_type = weighted_choice(customer_type_choices, weights=[5, 1, 1])
+            customer_type = weighted_choice(reservee_type_choices, weights=[5, 1, 1])
             reservation_type = weighted_choice(reservation_type_choices, weights=[5, 1, 1])
 
             reservation = (
                 ReservationBuilder()
                 .for_user(user)
                 .for_reservation_unit(reservation_unit)
-                .for_customer_type(customer_type)
+                .for_reservee_type(customer_type)
                 .starting_at(begin_datetime, reservation_unit, pricing=pricing)
                 .build(
                     reservation_unit=reservation_unit,
@@ -566,10 +566,10 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
 
     user = User.objects.get(username="tvp")
 
-    customer_type_choices: list[CustomerTypeChoice] = [
-        CustomerTypeChoice.INDIVIDUAL,
-        CustomerTypeChoice.BUSINESS,
-        CustomerTypeChoice.NONPROFIT,
+    reservee_type_choices: list[ReserveeType] = [
+        ReserveeType.INDIVIDUAL,
+        ReserveeType.COMPANY,
+        ReserveeType.NONPROFIT,
     ]
 
     reservations: list[Reservation] = []
@@ -585,13 +585,13 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
         begin_time = datetime.time(hour=random.randint(8, 12), tzinfo=DEFAULT_TIMEZONE)
         begin_datetime = combine(reservation_date, begin_time)
 
-        customer_type = weighted_choice(customer_type_choices, weights=[5, 1, 1])
+        customer_type = weighted_choice(reservee_type_choices, weights=[5, 1, 1])
 
         reservation = (
             ReservationBuilder()
             .for_user(user)
             .for_reservation_unit(reservation_unit)
-            .for_customer_type(customer_type)
+            .for_reservee_type(customer_type)
             .starting_at(begin_datetime, reservation_unit, pricing=pricing)
             .build(
                 reservation_unit=reservation_unit,
@@ -621,13 +621,13 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
         begin_time = datetime.time(hour=random.randint(8, 12), tzinfo=DEFAULT_TIMEZONE)
         begin_datetime = combine(reservation_date, begin_time)
 
-        customer_type = weighted_choice(customer_type_choices, weights=[5, 1, 1])
+        customer_type = weighted_choice(reservee_type_choices, weights=[5, 1, 1])
 
         reservation = (
             ReservationBuilder()
             .for_user(user)
             .for_reservation_unit(reservation_unit)
-            .for_customer_type(customer_type)
+            .for_reservee_type(customer_type)
             .starting_at(begin_datetime, reservation_unit, pricing=pricing)
             .build(
                 reservation_unit=reservation_unit,
@@ -675,7 +675,7 @@ def _create_reservation_series(
 
     _create_past_reservation_series(
         name="Viime kauden futistreenit",
-        weekdays=[WeekdayChoice.MONDAY],
+        weekdays=[Weekday.MONDAY],
         reservation_unit=reservation_unit,
         user=user,
         reservation_purposes=reservation_purposes,
@@ -684,7 +684,7 @@ def _create_reservation_series(
 
     _create_future_reservation_series(
         name="Tulevan kauden futistreenit",
-        weekdays=[WeekdayChoice.MONDAY],
+        weekdays=[Weekday.MONDAY],
         reservation_unit=reservation_unit,
         user=user,
         reservation_purposes=reservation_purposes,
@@ -693,7 +693,7 @@ def _create_reservation_series(
 
     _create_ongoing_reservation_series(
         name="Aikuisten treenit kaksi kertaa viikossa",
-        weekdays=[WeekdayChoice.WEDNESDAY, WeekdayChoice.FRIDAY],
+        weekdays=[Weekday.WEDNESDAY, Weekday.FRIDAY],
         reservation_unit=reservation_unit,
         user=user,
         reservation_purposes=reservation_purposes,
@@ -702,7 +702,7 @@ def _create_reservation_series(
 
     _create_ongoing_reservation_series(
         name="Ajoittaiset viikonloppupelit",
-        weekdays=[WeekdayChoice.SATURDAY],
+        weekdays=[Weekday.SATURDAY],
         reservation_unit=reservation_unit,
         user=user,
         reservation_purposes=reservation_purposes,
@@ -716,7 +716,7 @@ def _create_reservation_series(
 @with_logs
 def _create_past_reservation_series(
     name: str,
-    weekdays: list[WeekdayChoice],
+    weekdays: list[Weekday],
     reservation_unit: ReservationUnit,
     user: User,
     reservation_purposes: list[ReservationPurpose],
@@ -738,7 +738,7 @@ def _create_past_reservation_series(
         end_time=datetime.time(hour=11, minute=0),
         begin_time=datetime.time(hour=9, minute=0),
         #
-        weekdays=",".join(str(day.value) for day in weekdays),
+        weekdays=weekdays,
         reservation_unit=reservation_unit,
         user=user,
         age_group=age_group,
@@ -756,7 +756,7 @@ def _create_past_reservation_series(
 @with_logs
 def _create_future_reservation_series(
     name: str,
-    weekdays: list[WeekdayChoice],
+    weekdays: list[Weekday],
     reservation_unit: ReservationUnit,
     user: User,
     reservation_purposes: list[ReservationPurpose],
@@ -778,7 +778,7 @@ def _create_future_reservation_series(
         begin_time=datetime.time(hour=8, minute=0),
         end_time=datetime.time(hour=10, minute=0),
         #
-        weekdays=",".join(str(day.value) for day in weekdays),
+        weekdays=weekdays,
         reservation_unit=reservation_unit,
         user=user,
         age_group=age_group,
@@ -796,7 +796,7 @@ def _create_future_reservation_series(
 @with_logs
 def _create_ongoing_reservation_series(
     name: str,
-    weekdays: list[WeekdayChoice],
+    weekdays: list[Weekday],
     reservation_unit: ReservationUnit,
     user: User,
     reservation_purposes: list[ReservationPurpose],
@@ -818,7 +818,7 @@ def _create_ongoing_reservation_series(
         begin_time=datetime.time(hour=14, minute=0),
         end_time=datetime.time(hour=16, minute=0),
         #
-        weekdays=",".join(str(day.value) for day in weekdays),
+        weekdays=weekdays,
         reservation_unit=reservation_unit,
         user=user,
         age_group=age_group,
@@ -845,7 +845,7 @@ def _create_reservations_for_series(
     pricing: ReservationUnitPricing | None = series.reservation_unit.pricings.active().first()
     assert pricing is not None, "Reservation unit must have at least one pricing"
 
-    weekdays = series.actions.get_weekdays()
+    weekdays: list[Weekday] = [Weekday(weekday) for weekday in series.weekdays]
 
     reservations: list[Reservation] = []
     occurrences: list[RejectedOccurrence] = []

@@ -5,7 +5,7 @@ import datetime
 import pytest
 from freezegun import freeze_time
 
-from tilavarauspalvelu.enums import ApplicantTypeChoice, Priority, Weekday
+from tilavarauspalvelu.enums import Priority, ReserveeType, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
 from utils.date_utils import local_datetime, local_start_of_day, local_time
 
@@ -390,7 +390,7 @@ def test_send_application__billing_address_city_missing(graphql):
 @patch_method(EmailService.send_seasonal_booking_application_received_email)
 def test_send_application__community_applicant(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
-        applicant_type=ApplicantTypeChoice.COMMUNITY,
+        applicant_type=ReserveeType.NONPROFIT,
     )
 
     graphql.login_with_superuser()
@@ -406,7 +406,7 @@ def test_send_application__community_applicant(graphql):
 
 def test_send_application__community_applicant__org_name_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
-        applicant_type=ApplicantTypeChoice.COMMUNITY,
+        applicant_type=ReserveeType.NONPROFIT,
         organisation_name="",
     )
 
@@ -419,7 +419,7 @@ def test_send_application__community_applicant__org_name_missing(graphql):
 
 def test_send_application__community_applicant__org_core_business_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
-        applicant_type=ApplicantTypeChoice.COMMUNITY,
+        applicant_type=ReserveeType.NONPROFIT,
         organisation_core_business="",
     )
 
@@ -432,7 +432,7 @@ def test_send_application__community_applicant__org_core_business_missing(graphq
 
 def test_send_application__community_applicant__missing_municipality(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
-        applicant_type=ApplicantTypeChoice.COMMUNITY,
+        applicant_type=ReserveeType.NONPROFIT,
         municipality=None,
     )
 
@@ -445,7 +445,7 @@ def test_send_application__community_applicant__missing_municipality(graphql):
 
 def test_send_application__community_applicant__organisation_street_address_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
-        applicant_type=ApplicantTypeChoice.COMMUNITY,
+        applicant_type=ReserveeType.NONPROFIT,
         organisation_street_address="",
     )
 
@@ -458,7 +458,7 @@ def test_send_application__community_applicant__organisation_street_address_miss
 
 def test_send_application__community_applicant__organisation_post_code_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
-        applicant_type=ApplicantTypeChoice.COMMUNITY,
+        applicant_type=ReserveeType.NONPROFIT,
         organisation_post_code="",
     )
 
@@ -471,7 +471,7 @@ def test_send_application__community_applicant__organisation_post_code_missing(g
 
 def test_send_application__community_applicant__organisation_city_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
-        applicant_type=ApplicantTypeChoice.COMMUNITY,
+        applicant_type=ReserveeType.NONPROFIT,
         organisation_city="",
     )
 
@@ -484,7 +484,7 @@ def test_send_application__community_applicant__organisation_city_missing(graphq
 
 def test_send_application__community_applicant__billing_details_not_given(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
-        applicant_type=ApplicantTypeChoice.COMMUNITY,
+        applicant_type=ReserveeType.NONPROFIT,
         billing_street_address="",
         billing_post_code="",
         billing_city="",
@@ -498,7 +498,7 @@ def test_send_application__community_applicant__billing_details_not_given(graphq
 
 def test_send_application__community_applicant__billing_street_address_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
-        applicant_type=ApplicantTypeChoice.COMMUNITY,
+        applicant_type=ReserveeType.NONPROFIT,
         billing_street_address="",
         billing_post_code="54321",
         billing_city="City",
@@ -513,7 +513,7 @@ def test_send_application__community_applicant__billing_street_address_missing(g
 
 def test_send_application__community_applicant__billing_post_code_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
-        applicant_type=ApplicantTypeChoice.COMMUNITY,
+        applicant_type=ReserveeType.NONPROFIT,
         billing_street_address="Billing address",
         billing_post_code="",
         billing_city="City",
@@ -528,7 +528,7 @@ def test_send_application__community_applicant__billing_post_code_missing(graphq
 
 def test_send_application__community_applicant__billing_city_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
-        applicant_type=ApplicantTypeChoice.COMMUNITY,
+        applicant_type=ReserveeType.NONPROFIT,
         billing_street_address="Billing address",
         billing_post_code="54321",
         billing_city="",
@@ -544,7 +544,7 @@ def test_send_application__community_applicant__billing_city_missing(graphql):
 @patch_method(EmailService.send_seasonal_booking_application_received_email)
 def test_send_application__association_applicant(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
-        applicant_type=ApplicantTypeChoice.ASSOCIATION,
+        applicant_type=ReserveeType.NONPROFIT,
     )
 
     graphql.login_with_superuser()
@@ -561,7 +561,7 @@ def test_send_application__association_applicant(graphql):
 @patch_method(EmailService.send_seasonal_booking_application_received_email)
 def test_send_application__company_applicant(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
-        applicant_type=ApplicantTypeChoice.COMPANY,
+        applicant_type=ReserveeType.COMPANY,
     )
 
     graphql.login_with_superuser()
@@ -577,7 +577,7 @@ def test_send_application__company_applicant(graphql):
 
 def test_send_application__company_applicant__identifier_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
-        applicant_type=ApplicantTypeChoice.COMPANY,
+        applicant_type=ReserveeType.COMPANY,
         organisation_identifier="",
     )
 

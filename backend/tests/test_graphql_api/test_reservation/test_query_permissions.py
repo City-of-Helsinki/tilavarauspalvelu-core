@@ -4,12 +4,7 @@ import datetime
 
 import pytest
 
-from tilavarauspalvelu.enums import (
-    CustomerTypeChoice,
-    MunicipalityChoice,
-    ReservationStateChoice,
-    ReservationTypeChoice,
-)
+from tilavarauspalvelu.enums import MunicipalityChoice, ReservationStateChoice, ReservationTypeChoice, ReserveeType
 
 from tests.factories import (
     AgeGroupFactory,
@@ -124,11 +119,10 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         billingPhone
         billingEmail
         description
-        reserveeId
+        reserveeIdentifier
         cancelDetails
         municipality
         reserveeType
-        reserveeIsUnregisteredAssociation
         applyingForFreeOfCharge
         numPersons
         ageGroup { minimum, maximum }
@@ -171,8 +165,7 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         "reserveeAddressZip": None,
         "reserveeEmail": None,
         "reserveeFirstName": None,
-        "reserveeId": None,
-        "reserveeIsUnregisteredAssociation": None,
+        "reserveeIdentifier": None,
         "reserveeLastName": None,
         "reserveeName": None,
         "reserveeOrganisationName": None,
@@ -268,12 +261,11 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
         reservee_address_zip="123",
         reservee_email="foo@email.com",
         reservee_first_name="John",
-        reservee_id="reservee id",
-        reservee_is_unregistered_association=True,
+        reservee_identifier="reservee id",
         reservee_last_name="Doe",
         reservee_organisation_name="org",
         reservee_phone="123",
-        reservee_type=CustomerTypeChoice.BUSINESS,
+        reservee_type=ReserveeType.COMPANY,
         state=ReservationStateChoice.CREATED,
         tax_percentage_value=24,
         type=ReservationTypeChoice.STAFF,
@@ -312,8 +304,7 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
         reserveeAddressZip
         reserveeEmail
         reserveeFirstName
-        reserveeId
-        reserveeIsUnregisteredAssociation
+        reserveeIdentifier
         reserveeLastName
         reserveeName
         reserveeOrganisationName
@@ -355,8 +346,7 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
     assert response.node(0)["reserveeAddressZip"] is not None, "field not found"
     assert response.node(0)["reserveeEmail"] is not None, "field not found"
     assert response.node(0)["reserveeFirstName"] is not None, "field not found"
-    assert response.node(0)["reserveeId"] is not None, "field not found"
-    assert response.node(0)["reserveeIsUnregisteredAssociation"] is not None, "field not found"
+    assert response.node(0)["reserveeIdentifier"] is not None, "field not found"
     assert response.node(0)["reserveeLastName"] is not None, "field not found"
     assert response.node(0)["reserveeName"] is not None, "field not found"
     assert response.node(0)["reserveeOrganisationName"] is not None, "field not found"

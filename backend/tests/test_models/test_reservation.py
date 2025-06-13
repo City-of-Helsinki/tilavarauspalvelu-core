@@ -5,7 +5,7 @@ from typing import Any, NamedTuple
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice, ReserveeType
 
 from tests.factories import ReservationFactory
 
@@ -65,7 +65,7 @@ class Params(NamedTuple):
         ),
         "CustomerType: BUSINESS | reservee_organisation_name set": Params(
             fields={
-                "reservee_type": CustomerTypeChoice.BUSINESS,
+                "reservee_type": ReserveeType.COMPANY,
                 "reservee_organisation_name": "Organisation",
                 "reservee_first_name": "First",
                 "reservee_last_name": "Last",
@@ -74,7 +74,7 @@ class Params(NamedTuple):
         ),
         "CustomerType: NONPROFIT | reservee_organisation_name set": Params(
             fields={
-                "reservee_type": CustomerTypeChoice.BUSINESS,
+                "reservee_type": ReserveeType.COMPANY,
                 "reservee_organisation_name": "Organisation",
                 "reservee_first_name": "First",
                 "reservee_last_name": "Last",
@@ -83,7 +83,7 @@ class Params(NamedTuple):
         ),
         "CustomerType: BUSINESS | reservee_organisation_name not set, fallback to reservation name": Params(
             fields={
-                "reservee_type": CustomerTypeChoice.BUSINESS,
+                "reservee_type": ReserveeType.COMPANY,
                 "reservee_first_name": "First",
                 "reservee_last_name": "Last",
                 "name": "Fallback",
@@ -92,7 +92,7 @@ class Params(NamedTuple):
         ),
         "CustomerType: INDIVIDUAL | Use Reservee First and Last names": Params(
             fields={
-                "reservee_type": CustomerTypeChoice.INDIVIDUAL,
+                "reservee_type": ReserveeType.INDIVIDUAL,
                 "reservee_organisation_name": "Organisation",
                 "reservee_first_name": "First",
                 "reservee_last_name": "Last",
@@ -101,7 +101,7 @@ class Params(NamedTuple):
         ),
         "CustomerType: INDIVIDUAL | Only First name": Params(
             fields={
-                "reservee_type": CustomerTypeChoice.INDIVIDUAL,
+                "reservee_type": ReserveeType.INDIVIDUAL,
                 "reservee_first_name": "First",
                 "reservee_last_name": "",
             },
@@ -109,7 +109,7 @@ class Params(NamedTuple):
         ),
         "CustomerType: INDIVIDUAL | No names, fallback to Fallback to Reservation name": Params(
             fields={
-                "reservee_type": CustomerTypeChoice.INDIVIDUAL,
+                "reservee_type": ReserveeType.INDIVIDUAL,
                 "name": "Reservation Name",
             },
             result="Reservation Name",

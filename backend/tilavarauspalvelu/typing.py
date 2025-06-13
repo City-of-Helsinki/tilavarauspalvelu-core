@@ -17,12 +17,12 @@ if TYPE_CHECKING:
 
     from tilavarauspalvelu.enums import (
         AccessType,
-        CustomerTypeChoice,
         PaymentType,
         ReservationCancelReasonChoice,
         ReservationStateChoice,
         ReservationTypeChoice,
         ReservationTypeStaffChoice,
+        ReserveeType,
         Weekday,
     )
     from tilavarauspalvelu.models import AgeGroup, ReservationDenyReason, ReservationPurpose, ReservationUnit, User
@@ -197,8 +197,7 @@ class ReservationUpdateData(TypedDict):
     reservee_address_street: NotRequired[str]
     reservee_address_city: NotRequired[str]
     reservee_address_zip: NotRequired[str]
-    reservee_is_unregistered_association: NotRequired[bool]
-    reservee_type: NotRequired[CustomerTypeChoice]
+    reservee_type: NotRequired[ReserveeType]
 
     billing_first_name: NotRequired[str]
     billing_last_name: NotRequired[str]
@@ -298,8 +297,7 @@ class StaffCreateReservationData(TypedDict):
     reservee_address_street: NotRequired[str]
     reservee_address_city: NotRequired[str]
     reservee_address_zip: NotRequired[str]
-    reservee_is_unregistered_association: NotRequired[bool]
-    reservee_type: NotRequired[CustomerTypeChoice]
+    reservee_type: NotRequired[ReserveeType]
 
     billing_first_name: NotRequired[str]
     billing_last_name: NotRequired[str]
@@ -441,7 +439,7 @@ class ReservationDetails(TypedDict, total=False):
     applying_for_free_of_charge: bool
     free_of_charge_reason: bool
 
-    reservee_id: str
+    reservee_identifier: str
     reservee_first_name: str
     reservee_last_name: str
     reservee_email: str | None
@@ -450,8 +448,7 @@ class ReservationDetails(TypedDict, total=False):
     reservee_address_street: str
     reservee_address_city: str
     reservee_address_zip: str
-    reservee_is_unregistered_association: bool
-    reservee_type: CustomerTypeChoice
+    reservee_type: ReserveeType
 
     billing_first_name: str
     billing_last_name: str

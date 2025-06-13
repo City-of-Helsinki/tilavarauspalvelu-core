@@ -11,10 +11,10 @@ from rest_framework.fields import IntegerField
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import (
     AccessType,
-    CustomerTypeChoice,
     MunicipalityChoice,
     ReservationStateChoice,
     ReservationTypeChoice,
+    ReserveeType,
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -36,8 +36,8 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
     reservation_unit = IntegerPrimaryKeyField(queryset=ReservationUnit.objects, required=True, write_only=True)
 
     reservee_type = EnumFriendlyChoiceField(
-        choices=CustomerTypeChoice.choices,
-        enum=CustomerTypeChoice,
+        choices=ReserveeType.choices,
+        enum=ReserveeType,
         required=False,
     )
     type = EnumFriendlyChoiceField(
@@ -86,7 +86,7 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
             "free_of_charge_reason",
             #
             # Reservee information
-            "reservee_id",
+            "reservee_identifier",
             "reservee_first_name",
             "reservee_last_name",
             "reservee_email",
@@ -95,7 +95,6 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
             "reservee_address_street",
             "reservee_address_city",
             "reservee_address_zip",
-            "reservee_is_unregistered_association",
             "reservee_type",
             #
             # Billing information

@@ -6,10 +6,10 @@ from decimal import Decimal
 import pytest
 
 from tilavarauspalvelu.enums import (
-    CustomerTypeChoice,
     MunicipalityChoice,
     ReservationCancelReasonChoice,
     ReservationStateChoice,
+    ReserveeType,
     Weekday,
 )
 from tilavarauspalvelu.models import AgeGroup, ReservationStatistic
@@ -51,10 +51,9 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
         reservation_series=reservation_series,
         reservation_unit=reservation_unit,
         reservee_address_zip="12345",
-        reservee_id="123456789",
-        reservee_is_unregistered_association=False,
+        reservee_identifier="123456789",
         reservee_organisation_name="Test organisation",
-        reservee_type=CustomerTypeChoice.INDIVIDUAL,
+        reservee_type=ReserveeType.INDIVIDUAL,
         state=ReservationStateChoice.CREATED.value,
         tax_percentage_value=24,
         unit_price=10,
@@ -107,7 +106,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     assert stat.reservation_type == reservation.type
     assert stat.reservee_address_zip == ""
     assert stat.reservee_id == ""
-    assert stat.reservee_is_unregistered_association == reservation.reservee_is_unregistered_association
+    assert stat.reservee_is_unregistered_association is False
     assert stat.reservee_language == reservation.user.preferred_language
     assert stat.reservee_organisation_name == ""
     assert stat.reservee_type == reservation.reservee_type
@@ -140,44 +139,27 @@ def test_statistics__update__reservee_address_zip__no_profile_id(settings):
     assert stat.reservee_address_zip == ""
 
 
-def test_statistics__update__org_info_for_unregistered_organisation(settings):
+def test_statistics__update__org_info_for_company(settings):
     settings.SAVE_RESERVATION_STATISTICS = True
 
     reservation = ReservationFactory.create(
-        reservee_is_unregistered_association=True,
-        reservee_type=CustomerTypeChoice.BUSINESS,
+        reservee_type=ReserveeType.COMPANY,
         reservee_organisation_name="Test organisation",
-        reservee_id="123456789",
+        reservee_identifier="123456789",
     )
 
     stat = ReservationStatistic.objects.first()
     assert stat.reservee_organisation_name == reservation.reservee_organisation_name
-    assert stat.reservee_id == ""
-
-
-def test_statistics__update__org_info_for_registered_organisation(settings):
-    settings.SAVE_RESERVATION_STATISTICS = True
-
-    reservation = ReservationFactory.create(
-        reservee_is_unregistered_association=False,
-        reservee_type=CustomerTypeChoice.BUSINESS,
-        reservee_organisation_name="Test organisation",
-        reservee_id="123456789",
-    )
-
-    stat = ReservationStatistic.objects.first()
-    assert stat.reservee_organisation_name == reservation.reservee_organisation_name
-    assert stat.reservee_id == reservation.reservee_id
+    assert stat.reservee_id == reservation.reservee_identifier
 
 
 def test_statistics__update__no_org_info_for_individual(settings):
     settings.SAVE_RESERVATION_STATISTICS = True
 
     ReservationFactory.create(
-        reservee_is_unregistered_association=True,
-        reservee_type=CustomerTypeChoice.INDIVIDUAL,
+        reservee_type=ReserveeType.INDIVIDUAL,
         reservee_organisation_name="Test organisation",
-        reservee_id="123456789",
+        reservee_identifier="123456789",
     )
 
     stat = ReservationStatistic.objects.first()

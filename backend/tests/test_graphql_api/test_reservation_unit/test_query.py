@@ -10,7 +10,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
     ReservationUnitPublishingState,
     TermsOfUseTypeChoices,
-    WeekdayChoice,
+    Weekday,
 )
 from utils.date_utils import local_date, local_datetime, next_hour
 
@@ -572,8 +572,8 @@ def test_reservation_unit__query__timeslots(graphql):
     # - There is a reservation unit with timeslots
     # - A superuser is using the system
     reservation_unit = ReservationUnitFactory.create()
-    ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit, weekday=WeekdayChoice.MONDAY)
-    ApplicationRoundTimeSlotFactory.create_closed(reservation_unit=reservation_unit, weekday=WeekdayChoice.WEDNESDAY)
+    ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit, weekday=Weekday.MONDAY)
+    ApplicationRoundTimeSlotFactory.create_closed(reservation_unit=reservation_unit, weekday=Weekday.WEDNESDAY)
     graphql.login_with_superuser()
 
     # when:
@@ -589,7 +589,7 @@ def test_reservation_unit__query__timeslots(graphql):
     assert response.node(0) == {
         "applicationRoundTimeSlots": [
             {
-                "weekday": WeekdayChoice.MONDAY.value,
+                "weekday": Weekday.MONDAY.value,
                 "isClosed": False,
                 "reservableTimes": [
                     {
@@ -599,7 +599,7 @@ def test_reservation_unit__query__timeslots(graphql):
                 ],
             },
             {
-                "weekday": WeekdayChoice.WEDNESDAY.value,
+                "weekday": Weekday.WEDNESDAY.value,
                 "isClosed": True,
                 "reservableTimes": [],
             },

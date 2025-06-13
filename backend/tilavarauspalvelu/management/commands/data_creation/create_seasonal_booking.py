@@ -4,14 +4,7 @@ import datetime
 import random
 from typing import TYPE_CHECKING
 
-from tilavarauspalvelu.enums import (
-    ApplicantTypeChoice,
-    Priority,
-    ReservationKind,
-    TermsOfUseTypeChoices,
-    Weekday,
-    WeekdayChoice,
-)
+from tilavarauspalvelu.enums import Priority, ReservationKind, ReserveeType, TermsOfUseTypeChoices, Weekday
 from tilavarauspalvelu.models import (
     AllocatedTimeSlot,
     Application,
@@ -157,11 +150,11 @@ def _create_handled_application_rounds(
     applicant_type_choices: list[ApplicantTypeInfo] = [
         ApplicantTypeInfo(
             name="Individual",
-            applicant_type=ApplicantTypeChoice.INDIVIDUAL,
+            applicant_type=ReserveeType.INDIVIDUAL,
         ),
         ApplicantTypeInfo(
-            name="Community",
-            applicant_type=ApplicantTypeChoice.COMMUNITY,
+            name="Non-profit",
+            applicant_type=ReserveeType.NONPROFIT,
             different_billing_address=True,
         ),
     ]
@@ -286,25 +279,20 @@ def _create_application_round_in_allocations(
     applicant_type_choices: list[ApplicantTypeInfo] = [
         ApplicantTypeInfo(
             name="Individual",
-            applicant_type=ApplicantTypeChoice.INDIVIDUAL,
+            applicant_type=ReserveeType.INDIVIDUAL,
         ),
         ApplicantTypeInfo(
-            name="Association (unregistered)",
-            applicant_type=ApplicantTypeChoice.ASSOCIATION,
+            name="Non-profit (unregistered)",
+            applicant_type=ReserveeType.NONPROFIT,
             unregistered=True,
         ),
         ApplicantTypeInfo(
-            name="Association (registered)",
-            applicant_type=ApplicantTypeChoice.ASSOCIATION,
-        ),
-        ApplicantTypeInfo(
-            name="Community",
-            applicant_type=ApplicantTypeChoice.COMMUNITY,
-            different_billing_address=True,
+            name="Non-profit (registered)",
+            applicant_type=ReserveeType.NONPROFIT,
         ),
         ApplicantTypeInfo(
             name="Company",
-            applicant_type=ApplicantTypeChoice.COMPANY,
+            applicant_type=ReserveeType.COMPANY,
         ),
     ]
     applied_days_of_the_week_choices: list[SuitableTimeInfo] = [
@@ -380,8 +368,8 @@ def _create_application_round_in_allocations(
         reservation_units=reservation_units,
         users=users,
         applicant_type_info=ApplicantTypeInfo(
-            name="Association (registered)",
-            applicant_type=ApplicantTypeChoice.ASSOCIATION,
+            name="Non-profit (registered)",
+            applicant_type=ReserveeType.NONPROFIT,
         ),
         suitable_time_info=SuitableTimeInfo(
             name="Multiple weekdays",
@@ -458,25 +446,20 @@ def _create_open_application_rounds(
     applicant_type_choices: list[ApplicantTypeInfo] = [
         ApplicantTypeInfo(
             name="Individual",
-            applicant_type=ApplicantTypeChoice.INDIVIDUAL,
+            applicant_type=ReserveeType.INDIVIDUAL,
         ),
         ApplicantTypeInfo(
-            name="Association (unregistered)",
-            applicant_type=ApplicantTypeChoice.ASSOCIATION,
+            name="Non-profit (unregistered)",
+            applicant_type=ReserveeType.NONPROFIT,
             unregistered=True,
         ),
         ApplicantTypeInfo(
-            name="Association (registered)",
-            applicant_type=ApplicantTypeChoice.ASSOCIATION,
-        ),
-        ApplicantTypeInfo(
-            name="Community",
-            applicant_type=ApplicantTypeChoice.COMMUNITY,
-            different_billing_address=True,
+            name="Non-profit (registered)",
+            applicant_type=ReserveeType.NONPROFIT,
         ),
         ApplicantTypeInfo(
             name="Company",
-            applicant_type=ApplicantTypeChoice.COMPANY,
+            applicant_type=ReserveeType.COMPANY,
         ),
     ]
     applied_days_of_the_week_choices: list[SuitableTimeInfo] = [
@@ -589,7 +572,7 @@ def _create_upcoming_application_rounds(
 @with_logs
 def _create_application_round_time_slots(reservation_units: list[ReservationUnit]) -> list[ApplicationRoundTimeSlot]:
     time_slots: list[ApplicationRoundTimeSlot] = []
-    weekdays: list[int] = random_subset(WeekdayChoice.values)
+    weekdays: list[int] = random_subset(Weekday.values)
 
     for reservation_unit in reservation_units:
         for weekday in weekdays:

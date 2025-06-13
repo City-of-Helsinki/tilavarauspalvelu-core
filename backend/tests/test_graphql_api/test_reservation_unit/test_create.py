@@ -4,7 +4,7 @@ import datetime
 
 import pytest
 
-from tilavarauspalvelu.enums import ReservationKind, WeekdayChoice
+from tilavarauspalvelu.enums import ReservationKind, Weekday
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
@@ -374,13 +374,13 @@ def test_reservation_unit__create__with_timeslots(graphql):
         "unit": unit.pk,
         "applicationRoundTimeSlots": [
             {
-                "weekday": WeekdayChoice.MONDAY.value,
+                "weekday": Weekday.MONDAY.value,
                 "reservableTimes": [
                     {"begin": "10:00", "end": "12:00"},
                 ],
             },
             {
-                "weekday": WeekdayChoice.TUESDAY.value,
+                "weekday": Weekday.TUESDAY.value,
                 "isClosed": True,
             },
         ],
@@ -444,7 +444,7 @@ def test_reservation_unit__create__with_timeslots__begin_before_end(graphql):
         "unit": unit.pk,
         "applicationRoundTimeSlots": [
             {
-                "weekday": WeekdayChoice.MONDAY.value,
+                "weekday": Weekday.MONDAY.value,
                 "reservableTimes": [
                     {"begin": "12:00", "end": "10:00"},
                 ],
@@ -483,7 +483,7 @@ def test_reservation_unit__create__with_timeslots__overlapping_reservable_times(
         "unit": unit.pk,
         "applicationRoundTimeSlots": [
             {
-                "weekday": WeekdayChoice.MONDAY.value,
+                "weekday": Weekday.MONDAY.value,
                 "reservableTimes": [
                     {"begin": "10:00", "end": "12:00"},
                     {"begin": "11:00", "end": "15:00"},
@@ -523,13 +523,13 @@ def test_reservation_unit__create__with_timeslots__two_for_same_day(graphql):
         "unit": unit.pk,
         "applicationRoundTimeSlots": [
             {
-                "weekday": WeekdayChoice.MONDAY.value,
+                "weekday": Weekday.MONDAY.value,
                 "reservableTimes": [
                     {"begin": "10:00", "end": "12:00"},
                 ],
             },
             {
-                "weekday": WeekdayChoice.MONDAY.value,
+                "weekday": Weekday.MONDAY.value,
                 "isClosed": True,
             },
         ],
@@ -562,7 +562,7 @@ def test_reservation_unit__create__with_timeslots__open_has_no_reservable_times(
         "unit": unit.pk,
         "applicationRoundTimeSlots": [
             {
-                "weekday": WeekdayChoice.MONDAY.value,
+                "weekday": Weekday.MONDAY.value,
                 "reservableTimes": [],
             },
         ],
@@ -595,7 +595,7 @@ def test_reservation_unit__create__with_timeslots__closed_has_reservable_times(g
         "unit": unit.pk,
         "applicationRoundTimeSlots": [
             {
-                "weekday": WeekdayChoice.MONDAY.value,
+                "weekday": Weekday.MONDAY.value,
                 "isClosed": True,
                 "reservableTimes": [
                     {"begin": "10:00", "end": "12:00"},

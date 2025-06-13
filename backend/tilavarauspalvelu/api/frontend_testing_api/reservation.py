@@ -8,7 +8,7 @@ from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.frontend_testing_api.serializers import TestingBaseSerializer
 from tilavarauspalvelu.api.frontend_testing_api.viewsets import TestingBaseViewSet
-from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice
+from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice, Weekday
 from tilavarauspalvelu.models import ReservationMetadataField
 from utils.date_utils import local_datetime
 
@@ -97,12 +97,11 @@ class TestingReservationParamsSerializer(TestingBaseSerializer):
     def _create_metadata_set(self) -> ReservationMetadataSet:
         required_fields = {
             "description",
-            "home_city",
             "num_persons",
             "purpose",
             "reservee_email",
             "reservee_first_name",
-            "reservee_id",
+            "reservee_identifier",
             "reservee_last_name",
             "reservee_organisation_name",
             "reservee_phone",
@@ -110,7 +109,6 @@ class TestingReservationParamsSerializer(TestingBaseSerializer):
         }
         supported_fields = {
             "name",
-            "reservee_is_unregistered_association",
         } | required_fields
 
         ReservationMetadataField.objects.bulk_create(
@@ -139,7 +137,7 @@ class TestingReservationParamsSerializer(TestingBaseSerializer):
             end_date=(reservation.ends_at + datetime.timedelta(days=7)).date(),
             end_time=reservation.begins_at.time(),
             begin_time=reservation.ends_at.time(),
-            weekdays=f"{reservation.begins_at.weekday()}",
+            weekdays=[Weekday.from_week_day(reservation.begins_at.weekday())],
         )
         reservation.reservation_series = reservation_series
         reservation.save()

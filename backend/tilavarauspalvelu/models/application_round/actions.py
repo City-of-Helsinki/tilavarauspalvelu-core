@@ -11,13 +11,11 @@ from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 
 from tilavarauspalvelu.enums import (
-    ApplicantTypeChoice,
     ApplicationRoundStatusChoice,
-    CustomerTypeChoice,
     HaukiResourceState,
     ReservationStateChoice,
     ReservationTypeChoice,
-    Weekday,
+    ReserveeType,
 )
 from tilavarauspalvelu.exceptions import ApplicationRoundResetError
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
@@ -115,7 +113,7 @@ class ApplicationRoundActions:
                 end_date=allocation.reservation_unit_option.application_section.reservations_end_date,
                 end_time=allocation.end_time,
                 recurrence_in_days=7,
-                weekdays=str(Weekday(allocation.day_of_the_week).as_weekday_number),
+                weekdays=[allocation.day_of_the_week],
                 reservation_unit=allocation.reservation_unit_option.reservation_unit,
                 user=allocation.reservation_unit_option.application_section.application.user,
                 allocated_time_slot=allocation,
@@ -199,7 +197,7 @@ class ApplicationRoundActions:
         application_section = series.allocated_time_slot.reservation_unit_option.application_section
         application = application_section.application
 
-        reservee_type = ApplicantTypeChoice(application.applicant_type).customer_type_choice
+        reservee_type = ReserveeType(application.applicant_type)
 
         reservation_details = ReservationDetails(
             name=series.name,
@@ -222,19 +220,16 @@ class ApplicationRoundActions:
             municipality=application.municipality,
         )
 
-        if reservee_type == CustomerTypeChoice.INDIVIDUAL:
+        if reservee_type == ReserveeType.INDIVIDUAL:
             reservation_details["description"] = application.additional_information
             reservation_details["reservee_address_street"] = reservation_details["billing_address_street"]
             reservation_details["reservee_address_city"] = reservation_details["billing_address_city"]
             reservation_details["reservee_address_zip"] = reservation_details["billing_address_zip"]
 
         else:
-            organisation_identifier = application.organisation_identifier
-
             reservation_details["description"] = application.organisation_core_business
             reservation_details["reservee_organisation_name"] = application.organisation_name
-            reservation_details["reservee_id"] = organisation_identifier
-            reservation_details["reservee_is_unregistered_association"] = not organisation_identifier
+            reservation_details["reservee_identifier"] = application.organisation_identifier
             reservation_details["reservee_address_street"] = application.organisation_street_address
             reservation_details["reservee_address_city"] = application.organisation_city
             reservation_details["reservee_address_zip"] = application.organisation_post_code

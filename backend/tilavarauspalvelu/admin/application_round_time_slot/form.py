@@ -4,7 +4,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from subforms.fields import DynamicArrayField, NestedFormField
 
-from tilavarauspalvelu.enums import WeekdayChoice
+from tilavarauspalvelu.enums import Weekday
 from tilavarauspalvelu.models import ApplicationRoundTimeSlot
 from tilavarauspalvelu.validators import validate_string_time
 
@@ -23,7 +23,7 @@ class TimeslotForm(forms.Form):
 
 class ApplicationRoundTimeSlotForm(forms.ModelForm):
     weekday = forms.ChoiceField(
-        choices=WeekdayChoice.choices,
+        choices=Weekday.choices,
         help_text=_("Which weekday this timeslot concerns."),
     )
     reservable_times = DynamicArrayField(

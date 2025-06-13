@@ -7,7 +7,7 @@ from inspect import isfunction
 import pytest
 from graphql import OperationType
 
-from tilavarauspalvelu.enums import ApplicantTypeChoice, ReservationCancelReasonChoice
+from tilavarauspalvelu.enums import ReservationCancelReasonChoice, ReserveeType
 from utils.date_utils import next_hour
 
 from tests.factories import (
@@ -202,7 +202,7 @@ def test_frontend_queries__customer_ui__CreateApplication(graphql):
     variables = deepcopy(query_info.variables)
     variables["input"] = {
         "additionalInformation": "Additional information",
-        "applicantType": ApplicantTypeChoice.INDIVIDUAL.value,
+        "applicantType": ReserveeType.INDIVIDUAL.value,
         "applicationRound": application_round.pk,
         "applicationSections": [
             {
