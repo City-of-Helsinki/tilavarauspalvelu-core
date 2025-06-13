@@ -36,7 +36,7 @@
     "sanitize-html": "^2.17.0",
     "styled-components": "6.1.18",
     "tsconfig": "workspace:*",
-    "zod": "^3.25.63"
+    "zod": "^3.25.64"
   },
   "peerDependencies": {
     "@apollo/client": "^3.13.1",
