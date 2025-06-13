@@ -368,8 +368,8 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1
       react-big-calendar:
-        specifier: ^1.19.2
-        version: 1.19.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^1.19.3
+        version: 1.19.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
@@ -5487,8 +5487,8 @@ packages:
   randombytes@2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
 
-  react-big-calendar@1.19.2:
-    resolution: {integrity: sha512-2orH+TOXPJBlQGwSl9ZnTK2WZR9OfVf0r1s8mnbpjvtENZfmWHP6nXqxmten1vkvzOMqefVGjh5GurM27HHOZw==}
+  react-big-calendar@1.19.3:
+    resolution: {integrity: sha512-+P/9X54QxvBcbJhtyxSBoXEj3enSXSxJw76RWlP8IUhHUQQREpwdzld0dcJpfDTvp8c/aFzzKx7KZjZtiOusdA==}
     peerDependencies:
       react: ^16.14.0 || ^17 || ^18 || ^19
       react-dom: ^16.14.0 || ^17 || ^18 || ^19
@@ -12477,7 +12477,7 @@ snapshots:
     dependencies:
       safe-buffer: 5.2.1
 
-  react-big-calendar@1.19.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-big-calendar@1.19.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@babel/runtime': 7.27.6
       clsx: 1.2.1
