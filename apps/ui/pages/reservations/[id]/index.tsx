@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
@@ -29,18 +29,13 @@ import Link from "next/link";
 import { isBefore, sub } from "date-fns";
 import { createApolloClient } from "@/modules/apolloClient";
 import { formatDateTimeRange } from "@/modules/util";
-import { Sanitize } from "common/src/components/Sanitize";
-import { AccordionWithState as Accordion } from "@/components/Accordion";
 import {
   getCheckoutUrl,
   getNormalizedReservationOrderStatus,
   getWhyReservationCantBeChanged,
   isReservationCancellable,
 } from "@/modules/reservation";
-import {
-  getReservationUnitName,
-  isReservationUnitFreeOfCharge,
-} from "@/modules/reservationUnit";
+import { getReservationUnitName } from "@/modules/reservationUnit";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { AddressSection } from "@/components/reservation-unit";
 import {
@@ -67,25 +62,24 @@ import {
   reservationsPrefix,
 } from "@/modules/urls";
 import { useToastIfQueryParam } from "@/hooks";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
-import { Instructions } from "@/components/Instructions";
+import { convertLanguageCode } from "common/src/common/util";
 import { gql } from "@apollo/client";
 import StatusLabel from "common/src/components/StatusLabel";
 import IconButton from "common/src/components/IconButton";
 import {
   NotModifiableReason,
+  Instructions,
   LabelValuePair,
   ReservationStatus,
   ReservationInfoCard,
   ReservationOrderStatus,
+  TermsInfoSection,
   GeneralFields,
   ApplicationFields,
 } from "@/components/reservation";
 import { queryOptions } from "@/modules/queryOptions";
 
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 // TODO clean this up, way too much css
@@ -145,7 +139,9 @@ function Reservation({
   reservation,
   feedbackUrl,
   options,
-}: Readonly<PropsNarrowed>): JSX.Element | null {
+}: Readonly<
+  Pick<PropsNarrowed, "termsOfUse" | "reservation" | "feedbackUrl" | "options">
+>): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const shouldShowAccessCode =
     isBefore(sub(new Date(), { days: 1 }), new Date(reservation.end)) &&
@@ -274,6 +270,7 @@ function Reservation({
                 disabled={!reservation.calendarUrl}
                 data-testid="reservation__button--calendar-link"
                 href={reservation.calendarUrl ?? ""}
+                role="button"
               >
                 {t("reservations:saveToCalendar")}
                 <IconCalendar />
@@ -285,6 +282,7 @@ function Reservation({
                 data-testid="reservation__confirmation--button__receipt-link"
                 href={`${reservation.paymentOrder?.receiptUrl}&lang=${lang}`}
                 target="_blank"
+                role="button"
               >
                 {t("reservations:downloadReceipt")}
                 <IconLinkExternal />
@@ -300,6 +298,7 @@ function Reservation({
                 disabled={!hasCheckoutUrl}
                 href={checkoutUrl ?? ""}
                 data-testid="reservation-detail__button--checkout"
+                role="button"
               >
                 {t("reservations:payReservation")}
                 <IconArrowRight />
@@ -310,6 +309,7 @@ function Reservation({
                 size="large"
                 href={getReservationPath(reservation.pk, "edit")}
                 data-testid="reservation-detail__button--edit"
+                role="button"
               >
                 {t("reservations:modifyReservationTime")}
                 <IconCalendar />
@@ -320,6 +320,7 @@ function Reservation({
                 size="large"
                 href={getReservationPath(reservation.pk, "cancel")}
                 data-testid="reservation-detail__button--cancel"
+                role="button"
               >
                 {t(
                   `reservations:cancel.${
@@ -350,7 +351,7 @@ function Reservation({
               feedbackUrl={feedbackUrl}
             />
           )}
-          <TermsInfo reservation={reservation} termsOfUse={termsOfUse} />
+          <TermsInfoSection reservation={reservation} termsOfUse={termsOfUse} />
           <AddressSection
             title={getReservationUnitName(reservationUnit, lang) ?? "-"}
             unit={reservationUnit?.unit}
@@ -358,100 +359,6 @@ function Reservation({
         </Flex>
       </ReservationPageWrapper>
     </>
-  );
-}
-
-function TermsInfo({
-  reservation,
-  termsOfUse,
-}: Readonly<{
-  reservation: Pick<
-    NodeT,
-    "reservationUnits" | "begin" | "applyingForFreeOfCharge"
-  >;
-  termsOfUse: PropsNarrowed["termsOfUse"];
-}>) {
-  const { t, i18n } = useTranslation();
-  const reservationUnit = reservation.reservationUnits.find(() => true);
-
-  const shouldDisplayPricingTerms: boolean = useMemo(() => {
-    if (!reservationUnit) {
-      return false;
-    }
-
-    const isFreeOfCharge = isReservationUnitFreeOfCharge(
-      reservationUnit.pricings,
-      new Date(reservation.begin)
-    );
-
-    return (
-      reservation.applyingForFreeOfCharge ||
-      (reservationUnit.canApplyFreeOfCharge && !isFreeOfCharge)
-    );
-  }, [reservation, reservationUnit]);
-
-  const lang = convertLanguageCode(i18n.language);
-  const paymentTermsContent =
-    reservationUnit?.paymentTerms != null
-      ? getTranslationSafe(reservationUnit.paymentTerms, "text", lang)
-      : undefined;
-  const cancellationTermsContent =
-    reservationUnit?.cancellationTerms != null
-      ? getTranslationSafe(reservationUnit.cancellationTerms, "text", lang)
-      : undefined;
-  const pricingTermsContent =
-    reservationUnit?.pricingTerms != null
-      ? getTranslationSafe(reservationUnit?.pricingTerms, "text", lang)
-      : undefined;
-  const serviceSpecificTermsContent =
-    reservationUnit?.serviceSpecificTerms != null
-      ? getTranslationSafe(reservationUnit.serviceSpecificTerms, "text", lang)
-      : undefined;
-
-  return (
-    <div>
-      {(paymentTermsContent || cancellationTermsContent) && (
-        <Accordion
-          heading={t(
-            `reservationUnit:${
-              paymentTermsContent
-                ? "paymentAndCancellationTerms"
-                : "cancellationTerms"
-            }`
-          )}
-          theme="thin"
-          data-testid="reservation__payment-and-cancellation-terms"
-        >
-          {paymentTermsContent && <Sanitize html={paymentTermsContent} />}
-          {cancellationTermsContent && (
-            <Sanitize html={cancellationTermsContent} />
-          )}
-        </Accordion>
-      )}
-      {shouldDisplayPricingTerms && pricingTermsContent && (
-        <Accordion
-          heading={t("reservationUnit:pricingTerms")}
-          theme="thin"
-          data-testid="reservation__pricing-terms"
-        >
-          <Sanitize html={pricingTermsContent} />
-        </Accordion>
-      )}
-      <Accordion
-        heading={t("reservationUnit:termsOfUse")}
-        theme="thin"
-        data-testid="reservation__terms-of-use"
-      >
-        {serviceSpecificTermsContent && (
-          <Sanitize html={serviceSpecificTermsContent} />
-        )}
-        {termsOfUse?.genericTerms != null && (
-          <Sanitize
-            html={getTranslationSafe(termsOfUse.genericTerms, "text", lang)}
-          />
-        )}
-      </Accordion>
-    </div>
   );
 }
 
@@ -493,10 +400,6 @@ function AccessCodeInfo({
     </div>
   );
 }
-
-type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-
-type NodeT = NonNullable<ReservationPageQuery["reservation"]>;
 
 // TODO this should return 500 if the backend query fails (not 404), or 400 if the query is incorrect etc.
 // typically 500 would be MAX_COMPLEXITY issue (could also make it 400 but 400 should be invalid query, not too complex)
@@ -600,6 +503,7 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
   query ReservationPage($id: ID!) {
     reservation(id: $id) {
       id
+      type
       ...MetaFields
       ...ReservationInfoCard
       ...Instructions
