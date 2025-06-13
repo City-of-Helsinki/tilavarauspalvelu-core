@@ -22,13 +22,11 @@ from tilavarauspalvelu.enums import (
     UserRoleChoice,
 )
 from tilavarauspalvelu.models import (
-    Address,
     Application,
     ApplicationSection,
     GeneralRole,
-    Person,
-    RecurringReservation,
     Reservation,
+    ReservationSeries,
     Unit,
     UnitRole,
 )
@@ -86,7 +84,7 @@ class UserActions:
         reservations: Iterable[Reservation] = Reservation.objects.filter(user=self.user).exclude(
             type__in=ReservationTypeChoice.should_not_anonymize,
         )
-        recurring_reservations = RecurringReservation.objects.filter(reservations__in=reservations)
+        reservation_series = ReservationSeries.objects.filter(reservations__in=reservations)
 
         for reservation in reservations:
             reservation.name = ANONYMIZED
@@ -110,9 +108,9 @@ class UserActions:
             reservation.cancel_details = SENSITIVE_RESERVATION
             reservation.handling_details = SENSITIVE_RESERVATION
 
-        for recurring_reservation in recurring_reservations:
-            recurring_reservation.name = ANONYMIZED
-            recurring_reservation.description = ANONYMIZED
+        for series in reservation_series:
+            series.name = ANONYMIZED
+            series.description = ANONYMIZED
 
         Reservation.objects.bulk_update(
             reservations,
@@ -140,8 +138,8 @@ class UserActions:
             ],
         )
 
-        RecurringReservation.objects.bulk_update(
-            recurring_reservations,
+        ReservationSeries.objects.bulk_update(
+            reservation_series,
             [
                 "name",
                 "description",
@@ -154,33 +152,23 @@ class UserActions:
         ApplicationSection.objects.filter(application__user=self.user).update(
             name=SENSITIVE_APPLICATION,
         )
-        Person.objects.filter(applications__user=self.user).update(
-            first_name=self.user.first_name,
-            last_name=self.user.last_name,
-            email=self.user.email,
-            phone_number="",
-        )
-        Address.objects.filter(applications__user=self.user).update(
-            post_code="99999",
-            city=ANONYMIZED,
-            city_fi=ANONYMIZED,
-            city_en=ANONYMIZED,
-            city_sv=ANONYMIZED,
-            street_address=ANONYMIZED,
-            street_address_fi=ANONYMIZED,
-            street_address_en=ANONYMIZED,
-            street_address_sv=ANONYMIZED,
-        )
         Application.objects.filter(user=self.user).update(
             additional_information=SENSITIVE_APPLICATION,
             working_memo=SENSITIVE_APPLICATION,
+            contact_person_first_name=self.user.first_name,
+            contact_person_last_name=self.user.last_name,
+            contact_person_email=self.user.email,
+            contact_person_phone_number="",
+            billing_street_address=ANONYMIZED,
+            billing_post_code="99999",
+            billing_city=ANONYMIZED,
         )
 
     def can_anonymize(self) -> UserAnonymizationInfo:
         month_ago = local_datetime() - relativedelta(months=1)
 
         has_open_reservations = (
-            self.user.reservations.filter(end__gte=month_ago)
+            self.user.reservations.filter(ends_at__gte=month_ago)
             .exclude(state__in=ReservationStateChoice.doesnt_block_anonymization)
             .exists()
         )

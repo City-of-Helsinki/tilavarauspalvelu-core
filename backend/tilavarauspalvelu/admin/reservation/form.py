@@ -31,7 +31,6 @@ class ReservationAdminForm(forms.ModelForm):
         labels = {
             #
             "ext_uuid": _("External UUID"),
-            "sku": _("SKU"),
             "name": _("Name"),
             "description": _("Description"),
             "num_persons": _("Number of persons"),
@@ -40,9 +39,10 @@ class ReservationAdminForm(forms.ModelForm):
             "cancel_details": _("Cancel details"),
             "handling_details": _("Handling details"),
             "working_memo": _("Working memo"),
+            "reservation_unit": _("Reservation unit"),
             #
-            "begin": _("Begin time"),
-            "end": _("End time"),
+            "begins_at": _("Begin time"),
+            "ends_at": _("End time"),
             "buffer_time_before": _("Buffer time before"),
             "buffer_time_after": _("Buffer time after"),
             "handled_at": _("Handled at"),
@@ -85,17 +85,16 @@ class ReservationAdminForm(forms.ModelForm):
             "billing_address_zip": _("Billing address zip code"),
             #
             "user": _("User"),
-            "recurring_reservation": _("Recurring reservation"),
+            "reservation_series": _("Recurring reservation"),
             "deny_reason": _("Reason for deny"),
             "cancel_reason": _("Reason for cancellation"),
             "purpose": _("Reservation purpose"),
-            "home_city": _("Home city"),
+            "municipality": _("Municipality"),
             "age_group": _("Age group"),
         }
         help_texts = {
             #
             "ext_uuid": _("ID for external systems to use"),
-            "sku": _("SKU for this particular reservation"),
             "name": _("Name of the reservation"),
             "description": _("Description of the reservation"),
             "num_persons": _("Number of persons in the reservation"),
@@ -104,9 +103,10 @@ class ReservationAdminForm(forms.ModelForm):
             "cancel_details": _("Details for this reservation's cancellation"),
             "handling_details": _("Additional details for denying or approving the reservation"),
             "working_memo": _("Working memo for staff users"),
+            "reservation_unit": _("Reservation unit"),
             #
-            "begin": _("Reservation begin date and time"),
-            "end": _("Reservation end date and time"),
+            "begins_at": _("Reservation begin date and time"),
+            "ends_at": _("Reservation end date and time"),
             "buffer_time_before": _("Buffer time before reservation"),
             "buffer_time_after": _("Buffer time after reservation"),
             "handled_at": _("When this reservation was handled"),
@@ -149,11 +149,11 @@ class ReservationAdminForm(forms.ModelForm):
             "billing_address_zip": _("Billing address zip code"),
             #
             "user": _("User who made the reservation"),
-            "recurring_reservation": _("Recurring reservation"),
+            "reservation_series": _("Recurring reservation"),
             "deny_reason": _("Reason for denying the reservation"),
             "cancel_reason": _("Reason for cancelling the reservation"),
             "purpose": _("Purpose of the reservation"),
-            "home_city": _("Reservee's home city"),
+            "municipality": _("Reservee's municipality"),
             "age_group": _("Age group of the group or association"),
         }
 

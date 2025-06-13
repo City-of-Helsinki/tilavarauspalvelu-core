@@ -218,7 +218,7 @@ def test_reservation_requires_handling_staff_notification__send_email(outbox):
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_units__unit=unit,
+        reservation_unit__unit=unit,
     )
 
     EmailService.send_reservation_requires_handling_staff_notification_email(reservation)
@@ -237,7 +237,7 @@ def test_reservation_requires_handling_staff_notification__send_email__no_recipi
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_units__unit=unit,
+        reservation_unit__unit=unit,
     )
 
     EmailService.send_reservation_requires_handling_staff_notification_email(reservation)
@@ -264,7 +264,7 @@ def test_reservation_requires_handling_staff_notification__send_email__wrong_sta
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CANCELLED,
-        reservation_units__unit=unit,
+        reservation_unit__unit=unit,
     )
 
     EmailService.send_reservation_requires_handling_staff_notification_email(reservation)
@@ -293,7 +293,7 @@ def test_reservation_requires_handling_staff_notification__send_email__multiple_
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_units__unit=unit,
+        reservation_unit__unit=unit,
     )
 
     with TranslationsFromPOFiles():

@@ -154,32 +154,32 @@ class ReservationUnitFirstReservableTimeHelper:
         - reservation_unit.reservation_begins
         - reservation_unit.reservation_ends
         - reservation_unit.publish_ends
-        - reservation_unit.application_rounds.reservation_period_begin
-        - reservation_unit.application_rounds.reservation_period_end
+        - reservation_unit.application_rounds.reservation_period_begin_date
+        - reservation_unit.application_rounds.reservation_period_end_date
         """
         reservation_unit_closed_time_spans: list[TimeSpanElement] = []
 
-        if self.reservation_unit.reservation_begins:
+        if self.reservation_unit.reservation_begins_at:
             reservation_unit_closed_time_spans.append(
                 TimeSpanElement(
                     start_datetime=local_datetime_min(),
-                    end_datetime=self.reservation_unit.reservation_begins,
+                    end_datetime=self.reservation_unit.reservation_begins_at,
                     is_reservable=False,
                 )
             )
-        if self.reservation_unit.reservation_ends:
+        if self.reservation_unit.reservation_ends_at:
             reservation_unit_closed_time_spans.append(
                 TimeSpanElement(
-                    start_datetime=self.reservation_unit.reservation_ends,
+                    start_datetime=self.reservation_unit.reservation_ends_at,
                     end_datetime=local_datetime_max(),
                     is_reservable=False,
                 )
             )
 
-        if self.reservation_unit.publish_ends:
+        if self.reservation_unit.publish_ends_at:
             reservation_unit_closed_time_spans.append(
                 TimeSpanElement(
-                    start_datetime=self.reservation_unit.publish_ends,
+                    start_datetime=self.reservation_unit.publish_ends_at,
                     end_datetime=local_datetime_max(),
                     is_reservable=False,
                 )
@@ -189,8 +189,10 @@ class ReservationUnitFirstReservableTimeHelper:
         # so we don't need to filter those away here.
         reservation_unit_closed_time_spans.extend(
             TimeSpanElement(
-                start_datetime=local_start_of_day(application_round.reservation_period_begin),
-                end_datetime=local_start_of_day(application_round.reservation_period_end) + datetime.timedelta(days=1),
+                start_datetime=local_start_of_day(application_round.reservation_period_begin_date),
+                end_datetime=(
+                    local_start_of_day(application_round.reservation_period_end_date) + datetime.timedelta(days=1)
+                ),
                 is_reservable=False,
             )
             for application_round in self.reservation_unit.application_rounds.all()

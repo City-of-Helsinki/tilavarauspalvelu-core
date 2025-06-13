@@ -9,17 +9,11 @@ from modeltranslation.decorators import register
 from modeltranslation.translator import TranslationOptions
 
 from .models import (
-    AbilityGroup,
-    Address,
     ApplicationRound,
     BannerNotification,
-    City,
     Equipment,
     EquipmentCategory,
-    Location,
-    Organisation,
     Purpose,
-    Qualifier,
     ReservationDenyReason,
     ReservationPurpose,
     ReservationUnit,
@@ -72,17 +66,13 @@ class UnitGroupTranslationOptions(TranslationOptions):
 
 @register(Unit)
 class UnitTranslationOptions(TranslationOptions):
-    fields = ["name", "description", "short_description"]
-
-
-@register(Location)
-class LocationTranslationOptions(TranslationOptions):
-    fields = ["address_street", "address_city"]
-
-
-@register(AbilityGroup)
-class AbilityGroupTranslationOptions(TranslationOptions):
-    fields = ["name"]
+    fields = [
+        "name",
+        "description",
+        "short_description",
+        "address_street",
+        "address_city",
+    ]
 
 
 @register(ReservationPurpose)
@@ -100,7 +90,7 @@ class ReservationUnitTranslationOptions(TranslationOptions):
     fields = [
         "name",
         "description",
-        "terms_of_use",
+        "notes_when_applying",
         "reservation_pending_instructions",
         "reservation_confirmed_instructions",
         "reservation_cancelled_instructions",
@@ -114,11 +104,6 @@ class ReservationUnitTypeTranslationOptions(TranslationOptions):
 
 @register(Purpose)
 class PurposeTranslationOptions(TranslationOptions):
-    fields = ["name"]
-
-
-@register(Qualifier)
-class QualifierTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
@@ -137,24 +122,9 @@ class ReservationUnitCancellationRuleTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-@register(Address)
-class AddressTranslationOptions(TranslationOptions):
-    fields = ["street_address", "city"]
-
-
-@register(Organisation)
-class OrganisationTranslationOptions(TranslationOptions):
-    fields = ["name", "core_business"]
-
-
 @register(ApplicationRound)
 class ApplicationRoundTranslationOptions(TranslationOptions):
     fields = ["name", "criteria", "notes_when_applying"]
-
-
-@register(City)
-class CityTranslationOptions(TranslationOptions):
-    fields = ["name"]
 
 
 @register(BannerNotification)

@@ -21,8 +21,8 @@ class ReservationUnitOptionNode(DjangoNode):
         fields = [
             "pk",
             "preferred_order",
-            "locked",
-            "rejected",
+            "is_locked",
+            "is_rejected",
             "reservation_unit",
             "application_section",
             "allocated_time_slots",
@@ -30,8 +30,8 @@ class ReservationUnitOptionNode(DjangoNode):
         filterset_class = ReservationUnitOptionFilterSet
         permission_classes = [ReservationUnitOptionPermission]
         restricted_fields = {
-            "locked": lambda user: user.permissions.has_any_role(),
-            "rejected": lambda user: user.permissions.has_any_role(),
+            "is_locked": lambda user: user.permissions.has_any_role(),
+            "is_rejected": lambda user: user.permissions.has_any_role(),
         }
 
     @classmethod

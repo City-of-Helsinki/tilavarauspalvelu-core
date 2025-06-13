@@ -7,8 +7,6 @@ simply so that it's registered before any mutations.
 
 from __future__ import annotations
 
-from .types.ability_group.types import AbilityGroupNode
-from .types.address.types import AddressNode
 from .types.age_group.types import AgeGroupNode
 from .types.allocated_time_slot.types import AllocatedTimeSlotNode
 from .types.application.types import ApplicationNode
@@ -16,26 +14,21 @@ from .types.application_round.types import ApplicationRoundNode
 from .types.application_round_time_slot.types import ApplicationRoundTimeSlotNode
 from .types.application_section.types import ApplicationSectionNode
 from .types.banner_notification.types import BannerNotificationNode
-from .types.city.types import CityNode
 from .types.equipment.types import EquipmentAllNode, EquipmentNode
 from .types.equipment_category.types import EquipmentCategoryNode
 from .types.helsinki_profile.types import HelsinkiProfileDataNode
-from .types.location.types import LocationNode
-from .types.organisation.types import OrganisationNode
 from .types.payment_merchant.types import PaymentMerchantNode
 from .types.payment_order.types import PaymentOrderNode
 from .types.payment_product.types import PaymentProductNode
 from .types.permissions.types import GeneralRoleNode, PermissionCheckerType, UnitRoleNode
-from .types.person.types import PersonNode
 from .types.purpose.types import PurposeNode
-from .types.qualifier.types import QualifierNode
-from .types.recurring_reservation.types import RecurringReservationNode
 from .types.rejected_occurrence.types import RejectedOccurrenceNode
 from .types.reservation.types import ReservationNode
 from .types.reservation_cancel_reason.types import ReservationCancelReasonType
 from .types.reservation_deny_reason.types import ReservationDenyReasonNode
 from .types.reservation_metadata.types import ReservationMetadataFieldNode, ReservationMetadataSetNode
 from .types.reservation_purpose.types import ReservationPurposeNode
+from .types.reservation_series.types import ReservationSeriesNode
 from .types.reservation_unit.types import ReservationUnitAllNode, ReservationUnitNode
 from .types.reservation_unit_access_type.types import ReservationUnitAccessTypeNode
 from .types.reservation_unit_cancellation_rule.types import ReservationUnitCancellationRuleNode
@@ -53,8 +46,6 @@ from .types.unit_group.types import UnitGroupNode
 from .types.user.types import ApplicantNode, UserNode
 
 __all__ = [
-    "AbilityGroupNode",
-    "AddressNode",
     "AgeGroupNode",
     "AllocatedTimeSlotNode",
     "ApplicantNode",
@@ -63,22 +54,16 @@ __all__ = [
     "ApplicationRoundTimeSlotNode",
     "ApplicationSectionNode",
     "BannerNotificationNode",
-    "CityNode",
     "EquipmentAllNode",
     "EquipmentCategoryNode",
     "EquipmentNode",
     "GeneralRoleNode",
     "HelsinkiProfileDataNode",
-    "LocationNode",
-    "OrganisationNode",
     "PaymentMerchantNode",
     "PaymentOrderNode",
     "PaymentProductNode",
     "PermissionCheckerType",
-    "PersonNode",
     "PurposeNode",
-    "QualifierNode",
-    "RecurringReservationNode",
     "RejectedOccurrenceNode",
     "ReservationCancelReasonType",
     "ReservationDenyReasonNode",
@@ -86,6 +71,7 @@ __all__ = [
     "ReservationMetadataSetNode",
     "ReservationNode",
     "ReservationPurposeNode",
+    "ReservationSeriesNode",
     "ReservationUnitAccessTypeNode",
     "ReservationUnitAllNode",
     "ReservationUnitCancellationRuleNode",

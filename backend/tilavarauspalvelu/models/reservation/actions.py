@@ -5,7 +5,6 @@ import datetime
 from typing import TYPE_CHECKING, Literal
 
 from django.conf import settings
-from django.db.models import Prefetch
 from django.utils.translation import pgettext
 from icalendar import Calendar, Event, Timezone, TimezoneDaylight, TimezoneStandard
 from rest_framework.exceptions import ValidationError
@@ -29,7 +28,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.helpers import (
 )
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, Reservation, ReservationMetadataField, Space
+from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, Reservation, ReservationMetadataField
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
@@ -37,7 +36,7 @@ if TYPE_CHECKING:
     from decimal import Decimal
 
     from tilavarauspalvelu.integrations.verkkokauppa.order.types import Order
-    from tilavarauspalvelu.models import Location, ReservationUnit, Unit
+    from tilavarauspalvelu.models import ReservationUnit, Unit
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
     from tilavarauspalvelu.typing import Lang
 
@@ -53,19 +52,15 @@ class ReservationActions:
 
     def get_actual_before_buffer(self) -> datetime.timedelta:
         buffer_time_before: datetime.timedelta = self.reservation.buffer_time_before or datetime.timedelta()
-        reservation_unit: ReservationUnit
-        for reservation_unit in self.reservation.reservation_units.all():
-            before = reservation_unit.actions.get_actual_before_buffer(self.reservation.begin)
-            buffer_time_before = max(before, buffer_time_before)
-        return buffer_time_before
+        reservation_unit = self.reservation.reservation_unit
+        before = reservation_unit.actions.get_actual_before_buffer(self.reservation.begins_at)
+        return max(before, buffer_time_before)
 
     def get_actual_after_buffer(self) -> datetime.timedelta:
         buffer_time_after: datetime.timedelta = self.reservation.buffer_time_after or datetime.timedelta()
-        reservation_unit: ReservationUnit
-        for reservation_unit in self.reservation.reservation_units.all():
-            after = reservation_unit.actions.get_actual_after_buffer(self.reservation.end)
-            buffer_time_after = max(after, buffer_time_after)
-        return buffer_time_after
+        reservation_unit = self.reservation.reservation_unit
+        after = reservation_unit.actions.get_actual_after_buffer(self.reservation.ends_at)
+        return max(after, buffer_time_after)
 
     def to_ical(self) -> bytes:
         language = self.reservation.user.get_preferred_language()
@@ -117,48 +112,47 @@ class ReservationActions:
         """Adds the actual event information to the ical file."""
         ical_event = Event()
 
+        unit: Unit = self.reservation.reservation_unit.unit
+
         site_name = str(settings.EMAIL_VARAAMO_EXT_LINK).removesuffix("/")
         # This should be unique such that if another iCal file is created
         # for the same reservation, it will be the same as the previous one.
         uid = f"varaamo.reservation.{self.reservation.pk}@{site_name}"
         summary = self.get_ical_summary(language=language)
         description = self.get_ical_description(site_name=site_name, language=language)
-        location = self.get_location()
 
         ical_event.add(name=EventProperty.UID, value=uid)
         ical_event.add(name=EventProperty.DTSTAMP, value=local_datetime())
-        ical_event.add(name=EventProperty.DTSTART, value=self.reservation.begin.astimezone(DEFAULT_TIMEZONE))
-        ical_event.add(name=EventProperty.DTEND, value=self.reservation.end.astimezone(DEFAULT_TIMEZONE))
+        ical_event.add(name=EventProperty.DTSTART, value=self.reservation.begins_at.astimezone(DEFAULT_TIMEZONE))
+        ical_event.add(name=EventProperty.DTEND, value=self.reservation.ends_at.astimezone(DEFAULT_TIMEZONE))
 
         ical_event.add(name=EventProperty.SUMMARY, value=summary)
         ical_event.add(name=EventProperty.DESCRIPTION, value=description, parameters={"FMTTYPE": "text/html"})
         ical_event.add(name=EventProperty.X_ALT_DESC, value=description, parameters={"FMTTYPE": "text/html"})
 
-        if location is not None:
-            ical_event.add(name=EventProperty.LOCATION, value=location.address)
-            if location.coordinates is not None:
-                ical_event.add(name=EventProperty.GEO, value=(location.lat, location.lon))
+        ical_event.add(name=EventProperty.LOCATION, value=unit.address)
+        if unit.coordinates is not None:
+            ical_event.add(name=EventProperty.GEO, value=(unit.lat, unit.lon))
 
         return ical_event
 
     @get_translated
     def get_ical_summary(self, *, language: Lang = "fi") -> str:
-        unit: Unit = self.reservation.reservation_units.first().unit
+        unit: Unit = self.reservation.reservation_unit.unit
         unit_name = get_attr_by_language(unit, "name", language)
         return pgettext("ICAL", "Reservation for %(name)s") % {"name": unit_name}
 
     @get_translated
     def get_ical_description(self, *, site_name: str, language: Lang = "fi") -> str:
-        reservation_unit: ReservationUnit = self.reservation.reservation_units.first()
+        reservation_unit: ReservationUnit = self.reservation.reservation_unit
         unit: Unit = reservation_unit.unit
-        begin = self.reservation.begin.astimezone(DEFAULT_TIMEZONE)
-        end = self.reservation.end.astimezone(DEFAULT_TIMEZONE)
+        begin = self.reservation.begins_at.astimezone(DEFAULT_TIMEZONE)
+        end = self.reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
 
         title = pgettext("ICAL", "Booking details")
         reservation_unit_name = get_attr_by_language(reservation_unit, "name", language)
         unit_name = get_attr_by_language(unit, "name", language)
-        location = self.get_location()
-        address = location.address if location is not None else ""
+        address = unit.address
         start_date = begin.date().strftime("%d.%m.%Y")
         start_time = begin.time().strftime("%H:%M")
         end_date = end.date().strftime("%d.%m.%Y")
@@ -199,18 +193,6 @@ class ReservationActions:
             f"</html>"
         )
 
-    def get_location(self) -> Location | None:
-        reservation_unit: ReservationUnit = (
-            self.reservation.reservation_units.select_related("unit__location")
-            .prefetch_related(Prefetch("spaces", Space.objects.select_related("location")))
-            .first()
-        )
-        unit: Unit = reservation_unit.unit
-        location: Location | None = getattr(unit, "location", None)
-        if location is None:
-            return reservation_unit.actions.get_location()
-        return location
-
     def get_email_reservee_name(self) -> str:
         # Note: Different from 'reservation.reservee_name' (simpler, mainly)
         if self.reservation.reservee_type in {CustomerTypeChoice.INDIVIDUAL.value, None}:
@@ -218,10 +200,7 @@ class ReservationActions:
         return self.reservation.reservee_organisation_name
 
     def get_instructions(self, *, kind: Literal["confirmed", "pending", "cancelled"], language: Lang) -> str:
-        return "\n-\n".join(
-            get_attr_by_language(reservation_unit, f"reservation_{kind}_instructions", language)
-            for reservation_unit in self.reservation.reservation_units.all()
-        )
+        return get_attr_by_language(self.reservation.reservation_unit, f"reservation_{kind}_instructions", language)
 
     def calculate_full_price(
         self,
@@ -231,7 +210,7 @@ class ReservationActions:
         subsidised: bool = False,
     ) -> Decimal:
         # Currently, there is ever only one reservation unit per reservation
-        reservation_unit: ReservationUnit | None = self.reservation.reservation_units.first()
+        reservation_unit: ReservationUnit | None = self.reservation.reservation_unit
         if reservation_unit is None:
             msg = "Reservation has no reservation unit"
             raise ReservationPriceCalculationError(msg)
@@ -246,7 +225,7 @@ class ReservationActions:
 
     def get_application_section(self) -> ApplicationSection | None:
         return ApplicationSection.objects.filter(
-            reservation_unit_options__allocated_time_slots__recurring_reservation__reservations=self.reservation
+            reservation_unit_options__allocated_time_slots__reservation_series__reservations=self.reservation
         ).first()
 
     def get_state_on_reservation_confirmed(self, payment_type: PaymentType | None) -> ReservationStateChoice:
@@ -281,7 +260,13 @@ class ReservationActions:
         if reservee_is_unregistered_association:
             qs = qs.exclude(field_name__in=["reservee_id"])
 
-        return list(qs.distinct().order_by("field_name").values_list("field_name", flat=True))
+        required_fields = list(qs.distinct().order_by("field_name").values_list("field_name", flat=True))
+
+        # Home city removed and replaced with municipality
+        if "home_city" in required_fields:
+            required_fields.remove("home_city")
+
+        return required_fields
 
     def create_payment_order_paid_immediately(self, payment_type: PaymentType) -> PaymentOrder:
         if payment_type == PaymentType.ON_SITE:
@@ -359,7 +344,7 @@ class ReservationActions:
 
         invoicing_date: datetime.date | None = None
         if self.should_offer_invoicing():
-            invoicing_date = self.reservation.begin.date()
+            invoicing_date = self.reservation.begins_at.date()
 
         order_params = get_verkkokauppa_order_params(self.reservation, invoicing_date=invoicing_date)
 
@@ -373,11 +358,11 @@ class ReservationActions:
 
     def overlapping_reservations(self) -> ReservationQuerySet:
         """Find all reservations that overlap with this reservation."""
-        reservation_unit = self.reservation.reservation_units.first()
+        reservation_unit = self.reservation.reservation_unit
         return Reservation.objects.overlapping_reservations(
             reservation_unit=reservation_unit,
-            begin=self.reservation.begin,
-            end=self.reservation.end,
+            begin=self.reservation.begins_at,
+            end=self.reservation.ends_at,
             buffer_time_before=self.reservation.buffer_time_before,
             buffer_time_after=self.reservation.buffer_time_after,
         ).exclude(id=self.reservation.id)
@@ -393,9 +378,9 @@ class ReservationActions:
         if reservee_type == CustomerTypeChoice.NONPROFIT and self.reservation.reservee_is_unregistered_association:
             return False
 
-        reservation_unit: ReservationUnit = self.reservation.reservation_units.first()
+        reservation_unit: ReservationUnit = self.reservation.reservation_unit
 
-        pricing = reservation_unit.actions.get_active_pricing(by_date=self.reservation.begin.date())
+        pricing = reservation_unit.actions.get_active_pricing(by_date=self.reservation.begins_at.date())
         if pricing is None:
             return False
 

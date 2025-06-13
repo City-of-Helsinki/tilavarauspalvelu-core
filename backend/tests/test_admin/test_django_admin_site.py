@@ -10,14 +10,7 @@ from django.urls import reverse
 
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from tilavarauspalvelu.models import BugReport, RequestLog, Reservation, SQLLog
-from tilavarauspalvelu.models.bug_report.model import (
-    BugReportPhaseChoice,
-    BugReportPriorityChoice,
-    BugReportTargetChoice,
-    BugReportUserChoice,
-)
-from utils.date_utils import local_datetime
+from tilavarauspalvelu.models import Reservation
 
 from tests import factories
 from tests.helpers import ResponseMock, patch_method
@@ -47,23 +40,6 @@ def create_all_models():
             )
         else:
             model_factory.create()
-
-        request_log = RequestLog.objects.create(path="foo", body="bar", duration_ms=123)
-        SQLLog.objects.create(
-            request_log=request_log,
-            sql="SELECT * FROM foo",
-            succeeded=True,
-            duration_ns=123,
-            stack_info="stack_info",
-        )
-        BugReport.objects.create(
-            name="Example",
-            target=BugReportTargetChoice.BACKEND,
-            priority=BugReportPriorityChoice.THIS_SPRINT,
-            found_in_phase=BugReportPhaseChoice.PULL_REQUEST,
-            found_by=BugReportUserChoice.MATTI,
-            found_at=local_datetime(),
-        )
 
         Reservation.objects.all().upsert_statistics()
 

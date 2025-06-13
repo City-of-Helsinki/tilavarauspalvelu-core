@@ -23,10 +23,10 @@ __all__ = [
 
 class RejectedOccurrenceFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
-    recurring_reservation = IntChoiceFilter()
+    reservation_series = IntChoiceFilter()
     application_round = IntChoiceFilter(
         field_name=(
-            "recurring_reservation"
+            "reservation_series"
             "__allocated_time_slot"
             "__reservation_unit_option"
             "__application_section"
@@ -34,8 +34,8 @@ class RejectedOccurrenceFilterSet(ModelFilterSet):
             "__application_round"
         )
     )
-    reservation_unit = IntMultipleChoiceFilter(field_name="recurring_reservation__reservation_unit")
-    unit = IntMultipleChoiceFilter(field_name="recurring_reservation__reservation_unit__unit")
+    reservation_unit = IntMultipleChoiceFilter(field_name="reservation_series__reservation_unit")
+    unit = IntMultipleChoiceFilter(field_name="reservation_series__reservation_unit__unit")
     text_search = django_filters.CharFilter(method="filter_text_search")
 
     class Meta:
@@ -47,7 +47,7 @@ class RejectedOccurrenceFilterSet(ModelFilterSet):
             "rejection_reason",
             (
                 (
-                    "recurring_reservation"
+                    "reservation_series"
                     "__allocated_time_slot"
                     "__reservation_unit_option"
                     "__application_section"
@@ -58,7 +58,7 @@ class RejectedOccurrenceFilterSet(ModelFilterSet):
             ),
             (
                 (
-                    "recurring_reservation"  #
+                    "reservation_series"  #
                     "__allocated_time_slot"
                     "__reservation_unit_option"
                     "__application_section"
@@ -68,7 +68,7 @@ class RejectedOccurrenceFilterSet(ModelFilterSet):
             ),
             (
                 (
-                    "recurring_reservation"  #
+                    "reservation_series"  #
                     "__allocated_time_slot"
                     "__reservation_unit_option"
                     "__application_section"
@@ -77,10 +77,10 @@ class RejectedOccurrenceFilterSet(ModelFilterSet):
                 "application_section_name",
             ),
             "applicant",
-            ("recurring_reservation__reservation_unit__pk", "reservation_unit_pk"),
-            ("recurring_reservation__reservation_unit__name", "reservation_unit_name"),
-            ("recurring_reservation__reservation_unit__unit__pk", "unit_pk"),
-            ("recurring_reservation__reservation_unit__unit__name", "unit_name"),
+            ("reservation_series__reservation_unit__pk", "reservation_unit_pk"),
+            ("reservation_series__reservation_unit__name", "reservation_unit_name"),
+            ("reservation_series__reservation_unit__unit__pk", "unit_pk"),
+            ("reservation_series__reservation_unit__unit__name", "unit_name"),
         ]
 
     @staticmethod
@@ -88,13 +88,13 @@ class RejectedOccurrenceFilterSet(ModelFilterSet):
         # If this becomes slow, look into optimisation strategies here:
         # https://docs.djangoproject.com/en/4.2/ref/contrib/postgres/search/#performance
         fields = (
-            "recurring_reservation__allocated_time_slot__reservation_unit_option__application_section__id",
-            "recurring_reservation__allocated_time_slot__reservation_unit_option__application_section__name",
-            "recurring_reservation__allocated_time_slot__reservation_unit_option__application_section__application__id",
+            "reservation_series__allocated_time_slot__reservation_unit_option__application_section__id",
+            "reservation_series__allocated_time_slot__reservation_unit_option__application_section__name",
+            "reservation_series__allocated_time_slot__reservation_unit_option__application_section__application__id",
             "applicant",
         )
         applicant_ref = (
-            "recurring_reservation"
+            "reservation_series"
             "__allocated_time_slot"
             "__reservation_unit_option"
             "__application_section"

@@ -19,9 +19,9 @@ from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 
-from tests.factories import ApplicationFactory, RecurringReservationFactory, UserFactory
+from tests.factories import ApplicationFactory, ReservationSeriesFactory, UserFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
-from tests.test_graphql_api.test_recurring_reservation.helpers import create_reservation_series
+from tests.test_graphql_api.test_reservation_series.helpers import create_reservation_series
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
@@ -153,7 +153,7 @@ def test_seasonal_booking_rescheduled_series__get_context__access_code():
 @patch_method(PindoraClient.get_seasonal_booking)
 def test_seasonal_booking_rescheduled_series__get_context__instance(email_reservation):
     section = email_reservation.actions.get_application_section()
-    series = email_reservation.recurring_reservation
+    series = email_reservation.reservation_series
 
     expected = {
         **LANGUAGE_CONTEXT["en"],
@@ -171,7 +171,7 @@ def test_seasonal_booking_rescheduled_series__get_context__instance(email_reserv
 @patch_method(PindoraService.get_access_code)
 def test_seasonal_booking_rescheduled_series__get_context__instance__access_code(email_reservation):
     section = email_reservation.actions.get_application_section()
-    series = email_reservation.recurring_reservation
+    series = email_reservation.reservation_series
 
     series.reservations.update(access_type=AccessType.ACCESS_CODE)
 
@@ -201,7 +201,7 @@ def test_seasonal_booking_rescheduled_series__get_context__instance__access_code
 @patch_method(PindoraService.get_access_code)
 def test_seasonal_booking_rescheduled_series__get_context__instance__access_code__inactive(email_reservation):
     section = email_reservation.actions.get_application_section()
-    series = email_reservation.recurring_reservation
+    series = email_reservation.reservation_series
 
     series.reservations.update(access_type=AccessType.ACCESS_CODE)
 
@@ -366,11 +366,11 @@ def test_seasonal_booking_rescheduled_series__send_email(outbox):
     user = UserFactory.create(email="user@email.com")
     application = ApplicationFactory.create(
         user=user,
-        contact_person__email="contact@email.com",
+        contact_person_email="contact@email.com",
     )
     series = create_reservation_series(
         user=user,
-        reservation_unit__uuid=ext_uuid,
+        reservation_unit__ext_uuid=ext_uuid,
         reservations__type=ReservationTypeChoice.SEASONAL,
         allocated_time_slot__day_of_the_week=Weekday.MONDAY,
         allocated_time_slot__reservation_unit_option__application_section__application=application,
@@ -391,9 +391,9 @@ def test_seasonal_booking_rescheduled_series__send_email__no_reservations(outbox
     user = UserFactory.create(email="user@email.com")
     application = ApplicationFactory.create(
         user=user,
-        contact_person__email="contact@email.com",
+        contact_person_email="contact@email.com",
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         user=user,
         allocated_time_slot__day_of_the_week=Weekday.MONDAY,
         allocated_time_slot__reservation_unit_option__application_section__application=application,
@@ -411,7 +411,7 @@ def test_seasonal_booking_rescheduled_series__send_email__no_reservations(outbox
 def test_seasonal_booking_rescheduled_series__send_email__no_recipients(outbox):
     application = ApplicationFactory.create(
         user=None,
-        contact_person=None,
+        contact_person_email=None,
     )
     series = create_reservation_series(
         user=None,

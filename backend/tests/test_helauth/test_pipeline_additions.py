@@ -6,7 +6,7 @@ from typing import Any, NamedTuple
 
 import pytest
 
-from tilavarauspalvelu.enums import ReservationNotification
+from tilavarauspalvelu.enums import MunicipalityChoice, ReservationNotification
 from tilavarauspalvelu.integrations.helauth.pipeline import (
     migrate_from_tunnistamo_to_keycloak,
     update_user_from_profile,
@@ -20,8 +20,8 @@ from utils.external_service.errors import ExternalServiceError
 from tests.factories import (
     ApplicationFactory,
     GeneralRoleFactory,
-    RecurringReservationFactory,
     ReservationFactory,
+    ReservationSeriesFactory,
     UnitRoleFactory,
     UserFactory,
 )
@@ -77,7 +77,7 @@ def test_update_user_from_profile__prefill_info_not_available_in_response():
     session_call = request.session.mock_calls[0].args
     assert session_call[0] == "reservation_prefill_info"
     assert session_call[1] == {
-        "home_city": None,
+        "municipality": None,
         "reservee_address_city": None,
         "reservee_address_street": None,
         "reservee_address_zip": None,
@@ -116,7 +116,7 @@ def test_update_user_from_profile__store_prefill_info_in_session_storage():
     session_call = request.session.mock_calls[0].args
     assert session_call[0] == "reservation_prefill_info"
     assert session_call[1] == {
-        "home_city": None,
+        "municipality": MunicipalityChoice.HELSINKI.value,
         "reservee_address_city": "Helsinki",
         "reservee_address_street": "Example street 1",
         "reservee_address_zip": "00100",
@@ -208,7 +208,7 @@ def test_migrate_from_tunnistamo_to_keycloak():
 
     application = ApplicationFactory.create(user=old_user)
     reservation = ReservationFactory.create(user=old_user)
-    recurring_reservation = RecurringReservationFactory.create(user=old_user)
+    reservation_series = ReservationSeriesFactory.create(user=old_user)
     general_role = GeneralRoleFactory.create(user=old_user)
     unit_role = UnitRoleFactory.create(user=old_user)
 
@@ -227,7 +227,7 @@ def test_migrate_from_tunnistamo_to_keycloak():
 
     application.refresh_from_db()
     reservation.refresh_from_db()
-    recurring_reservation.refresh_from_db()
+    reservation_series.refresh_from_db()
     general_role.refresh_from_db()
     unit_role.refresh_from_db()
 
@@ -237,7 +237,7 @@ def test_migrate_from_tunnistamo_to_keycloak():
 
     assert application.user == new_user
     assert reservation.user == new_user
-    assert recurring_reservation.user == new_user
+    assert reservation_series.user == new_user
     assert general_role.user == new_user
     assert unit_role.user == new_user
 

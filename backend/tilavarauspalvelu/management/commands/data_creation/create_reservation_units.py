@@ -51,7 +51,6 @@ from .create_reservation_related_things import (
     _create_payment_accountings,
     _create_payment_merchants,
     _create_purposes,
-    _create_qualifiers,
     _fetch_and_build_reservation_unit_image,
 )
 from .create_seasonal_booking import _create_application_round_time_slots
@@ -188,13 +187,11 @@ def _create_reservation_units(
 
     equipments = _create_equipments()
     purposes = _create_purposes()
-    qualifiers = _create_qualifiers()
 
     reservation_units = list(ReservationUnit.objects.all())
     for reservation_unit in reservation_units:
         reservation_unit.equipments.add(*random_subset(equipments))
         reservation_unit.purposes.add(*random_subset(purposes))
-        reservation_unit.qualifiers.add(*random_subset(qualifiers))
 
     return reservation_units
 
@@ -339,7 +336,7 @@ def _create_free_reservation_units(
                 name_en=f"Drab office cubicle #{number}",
                 name_sv=f"Dyster kontorsbås #{number}",
                 unit=unit,
-                uuid=reservation_uuid,
+                ext_uuid=reservation_uuid,
                 origin_hauki_resource=random.choice(hauki_resources),
                 allow_reservations_without_opening_hours=True,
                 reservations_min_days_before=data.reservable_window_info.minimum,
@@ -357,7 +354,7 @@ def _create_free_reservation_units(
                 cancellation_rule=random.choice(data.cancellation_rule_info.value),
                 require_reservation_handling=data.handling_info.handling_required,
                 metadata_set=metadata_sets[set_name],
-                reservation_begins=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+                reservation_begins_at=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
                 cancellation_terms=terms_of_use[TermsOfUseTypeChoices.CANCELLATION],
                 payment_terms=terms_of_use[TermsOfUseTypeChoices.PAYMENT],
                 pricing_terms=terms_of_use[TermsOfUseTypeChoices.PRICING],
@@ -585,7 +582,7 @@ def _create_paid_reservation_units(
                 cancellation_rule=random.choice(data.cancellation_rule_info.value),
                 require_reservation_handling=data.handling_info.handling_required,
                 metadata_set=metadata_sets[set_name],
-                reservation_begins=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+                reservation_begins_at=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
                 cancellation_terms=terms_of_use[TermsOfUseTypeChoices.CANCELLATION],
                 payment_terms=terms_of_use[TermsOfUseTypeChoices.PAYMENT],
                 pricing_terms=terms_of_use[TermsOfUseTypeChoices.PRICING],
@@ -773,7 +770,7 @@ def _create_seasonal_bookable_reservation_units(
                 name_fi=f"Kausivarattava kerhohuone #{number}",
                 name_en=f"Seasonal club room #{number}",
                 name_sv=f"Säsongsöppet klubbrum #{number}",
-                uuid=reservation_uuid,
+                ext_uuid=reservation_uuid,
                 unit=unit,
                 origin_hauki_resource=random.choice(hauki_resources),
                 allow_reservations_without_opening_hours=True,
@@ -792,7 +789,7 @@ def _create_seasonal_bookable_reservation_units(
                 cancellation_rule=random.choice(data.cancellation_rule_info.value),
                 require_reservation_handling=False,
                 metadata_set=metadata_sets[set_name],
-                reservation_begins=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+                reservation_begins_at=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
                 cancellation_terms=terms_of_use[TermsOfUseTypeChoices.CANCELLATION],
                 payment_terms=terms_of_use[TermsOfUseTypeChoices.PAYMENT],
                 pricing_terms=terms_of_use[TermsOfUseTypeChoices.PRICING],
@@ -1740,7 +1737,7 @@ def _create_reservation_units_in_resource_hierarchies(
 
 
 @with_logs
-def _create_reservation_unit_for_recurring_reservations(
+def _create_reservation_unit_for_reservation_series(
     metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     cancellation_rules: list[ReservationUnitCancellationRule],
@@ -1835,7 +1832,7 @@ def _get_base_reservation_unit_builder(
         cancellation_rule=random.choice(cancellation_rules),
         require_reservation_handling=False,
         metadata_set=metadata_sets[SetName.set_1],
-        reservation_begins=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+        reservation_begins_at=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
         cancellation_terms=terms_of_use[TermsOfUseTypeChoices.CANCELLATION],
         payment_terms=terms_of_use[TermsOfUseTypeChoices.PAYMENT],
         pricing_terms=terms_of_use[TermsOfUseTypeChoices.PRICING],

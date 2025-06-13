@@ -37,8 +37,8 @@ def get_formatted_reservation_time(reservation: Reservation) -> str:
     Weekday is localized based on user's preferred language, but rest
     of the format is always the same: ww dd.mm.yyyy hh:mm-hh:mm
     """
-    begin = reservation.begin.astimezone(DEFAULT_TIMEZONE)
-    end = reservation.end.astimezone(DEFAULT_TIMEZONE)
+    begin = reservation.begins_at.astimezone(DEFAULT_TIMEZONE)
+    end = reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
 
     preferred_language = reservation.user.get_preferred_language()
     weekday = localized_short_weekday(begin.weekday(), preferred_language)
@@ -75,7 +75,7 @@ def get_verkkokauppa_order_params(
     *,
     invoicing_date: datetime.date | None = None,
 ) -> CreateOrderParams:
-    reservation_unit = reservation.reservation_units.first()
+    reservation_unit: ReservationUnit = reservation.reservation_unit
     preferred_language = reservation.user.get_preferred_language()
     items = [
         OrderItemParams(
@@ -94,7 +94,7 @@ def get_verkkokauppa_order_params(
             meta=[
                 OrderItemMetaParams(
                     key="namespaceProductId",
-                    value=reservation_unit.uuid,
+                    value=str(reservation_unit.ext_uuid),
                     label=None,
                     visible_in_checkout=False,
                     ordinal="0",
@@ -137,7 +137,7 @@ def get_verkkokauppa_order_params(
 
 
 def create_mock_verkkokauppa_order(reservation: Reservation) -> Order:
-    reservation_unit: ReservationUnit = reservation.reservation_units.first()
+    reservation_unit: ReservationUnit = reservation.reservation_unit
 
     if reservation_unit.payment_product is None:
         payment_merchant = reservation_unit.actions.get_merchant()

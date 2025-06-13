@@ -14,11 +14,11 @@ pytestmark = [
 
 def test_application__restore_all_options(graphql):
     application = ApplicationFactory.create_in_status_in_allocation(
-        application_sections__reservation_unit_options__rejected=True
+        application_sections__reservation_unit_options__is_rejected=True
     )
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
-    assert option.rejected is True
+    assert option.is_rejected is True
 
     graphql.login_with_superuser()
     response = graphql(RESTORE_MUTATION, input_data={"pk": application.pk})
@@ -26,7 +26,7 @@ def test_application__restore_all_options(graphql):
     assert response.has_errors is False, response
 
     option.refresh_from_db()
-    assert option.rejected is False
+    assert option.is_rejected is False
 
 
 def test_application__restore_all_options__general_admin(graphql):

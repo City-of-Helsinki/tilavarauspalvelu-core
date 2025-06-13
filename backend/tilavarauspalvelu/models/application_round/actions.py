@@ -28,8 +28,8 @@ from tilavarauspalvelu.models import (
     AllocatedTimeSlot,
     Application,
     ApplicationSection,
-    RecurringReservation,
     Reservation,
+    ReservationSeries,
     ReservationUnitOption,
 )
 from tilavarauspalvelu.tasks import create_statistics_for_reservations_task, update_affecting_time_spans_task
@@ -38,7 +38,7 @@ from tilavarauspalvelu.typing import ReservationDetails
 from utils.date_utils import local_end_of_day, local_start_of_day
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Address, ApplicationRound, Organisation, Person
+    from tilavarauspalvelu.models import ApplicationRound
 
 
 __all__ = [
@@ -58,7 +58,7 @@ class ApplicationRoundActions:
         match self.application_round.status:
             case ApplicationRoundStatusChoice.IN_ALLOCATION:
                 # Unlock all reservation unit options, and remove all allocated time slots
-                ReservationUnitOption.objects.for_application_round(self.application_round).update(locked=False)
+                ReservationUnitOption.objects.for_application_round(self.application_round).update(is_locked=False)
                 AllocatedTimeSlot.objects.for_application_round(self.application_round).delete()
 
             case ApplicationRoundStatusChoice.HANDLED:
@@ -72,21 +72,21 @@ class ApplicationRoundActions:
                     with suppress(PindoraNotFoundError):
                         PindoraService.delete_access_code(obj=section)
 
-                # Remove all recurring reservations, and set application round back to HANDLED
+                # Remove all reservation series, and set application round back to HANDLED
                 # NOTE: This triggers _a lot_ of `post_delete` signals fo reservations.
                 Reservation.objects.for_application_round(self.application_round).delete()
-                RecurringReservation.objects.for_application_round(self.application_round).delete()
+                ReservationSeries.objects.for_application_round(self.application_round).delete()
 
-                self.application_round.handled_date = None
+                self.application_round.handled_at = None
                 self.application_round.save()
 
             case ApplicationRoundStatusChoice.RESULTS_SENT:
                 # Reset handling email dates and round sent date
                 Application.objects.filter(application_round=self.application_round).update(
-                    results_ready_notification_sent_date=None,
+                    results_ready_notification_sent_at=None,
                 )
 
-                self.application_round.sent_date = None
+                self.application_round.sent_at = None
                 self.application_round.save()
 
             case _:
@@ -103,8 +103,8 @@ class ApplicationRoundActions:
 
         closed_time_spans: dict[int, list[TimeSpanElement]] = self._get_series_override_closed_time_spans(allocations)
 
-        recurring_reservations: list[RecurringReservation] = [
-            RecurringReservation(
+        reservation_series: list[ReservationSeries] = [
+            ReservationSeries(
                 name=allocation.reservation_unit_option.application_section.name,
                 description=translate_for_user(
                     _("Seasonal Booking"),
@@ -127,24 +127,24 @@ class ApplicationRoundActions:
         reservation_pks: set[int] = set()
 
         with transaction.atomic():
-            recurring_reservations = RecurringReservation.objects.bulk_create(recurring_reservations)
+            reservation_series = ReservationSeries.objects.bulk_create(reservation_series)
 
-            for recurring_reservation in recurring_reservations:
-                reservation_details = self._get_recurring_reservation_details(recurring_reservation)
+            for series in reservation_series:
+                reservation_details = self._get_reservation_series_details(series)
 
-                hauki_resource_id = getattr(recurring_reservation.reservation_unit.origin_hauki_resource, "id", None)
-                slots = recurring_reservation.actions.pre_calculate_slots(
+                hauki_resource_id = getattr(series.reservation_unit.origin_hauki_resource, "id", None)
+                slots = series.actions.pre_calculate_slots(
                     check_start_interval=True,
                     closed_hours=closed_time_spans.get(hauki_resource_id, []),
                 )
 
-                reservations = recurring_reservation.actions.bulk_create_reservation_for_periods(
+                reservations = series.actions.bulk_create_reservation_for_periods(
                     periods=slots.possible,
                     reservation_details=reservation_details,
                 )
                 reservation_pks.update(reservation.pk for reservation in reservations)
 
-                recurring_reservation.actions.bulk_create_rejected_occurrences_for_periods(
+                series.actions.bulk_create_rejected_occurrences_for_periods(
                     overlapping=slots.overlapping,
                     not_reservable=slots.not_reservable,
                     invalid_start_interval=slots.invalid_start_interval,
@@ -177,8 +177,8 @@ class ApplicationRoundActions:
             # Fetch periods from Hauki API
             date_periods = HaukiAPIClient.get_date_periods(
                 hauki_resource_id=resource.id,
-                start_date_lte=application_round.reservation_period_end.isoformat(),  # Starts before period ends
-                end_date_gte=application_round.reservation_period_begin.isoformat(),  # Ends after period begins
+                start_date_lte=application_round.reservation_period_end_date.isoformat(),  # Starts before period ends
+                end_date_gte=application_round.reservation_period_begin_date.isoformat(),  # Ends after period begins
             )
 
             # Convert periods to TimeSpanElements
@@ -195,33 +195,31 @@ class ApplicationRoundActions:
 
         return closed_time_spans
 
-    def _get_recurring_reservation_details(self, recurring_reservation: RecurringReservation) -> ReservationDetails:
-        application_section = recurring_reservation.allocated_time_slot.reservation_unit_option.application_section
+    def _get_reservation_series_details(self, series: ReservationSeries) -> ReservationDetails:
+        application_section = series.allocated_time_slot.reservation_unit_option.application_section
         application = application_section.application
 
         reservee_type = ApplicantTypeChoice(application.applicant_type).customer_type_choice
-        contact_person: Person | None = getattr(application, "contact_person", None)
-        billing_address: Address | None = getattr(application, "billing_address", None)
 
         reservation_details = ReservationDetails(
-            name=recurring_reservation.name,
+            name=series.name,
             type=ReservationTypeChoice.SEASONAL,
             reservee_type=reservee_type,
             state=ReservationStateChoice.CONFIRMED,
-            user=recurring_reservation.user,
-            handled_at=application.application_round.handled_date,
+            user=series.user,
+            handled_at=application.application_round.handled_at,
             num_persons=application_section.num_persons,
             buffer_time_before=datetime.timedelta(0),
             buffer_time_after=datetime.timedelta(0),
-            reservee_first_name=getattr(contact_person, "first_name", ""),
-            reservee_last_name=getattr(contact_person, "last_name", ""),
-            reservee_email=getattr(contact_person, "email", ""),
-            reservee_phone=getattr(contact_person, "phone_number", ""),
-            billing_address_street=getattr(billing_address, "street_address", ""),
-            billing_address_city=getattr(billing_address, "city", ""),
-            billing_address_zip=getattr(billing_address, "post_code", ""),
+            reservee_first_name=application.contact_person_first_name,
+            reservee_last_name=application.contact_person_last_name,
+            reservee_email=application.contact_person_email,
+            reservee_phone=application.contact_person_phone_number,
+            billing_address_street=application.billing_street_address,
+            billing_address_city=application.billing_city,
+            billing_address_zip=application.billing_post_code,
             purpose=application_section.purpose,
-            home_city=application.home_city,
+            municipality=application.municipality,
         )
 
         if reservee_type == CustomerTypeChoice.INDIVIDUAL:
@@ -231,16 +229,14 @@ class ApplicationRoundActions:
             reservation_details["reservee_address_zip"] = reservation_details["billing_address_zip"]
 
         else:
-            organisation: Organisation | None = getattr(application, "organisation", None)
-            organisation_identifier: str = getattr(organisation, "identifier", "") or ""
-            organisation_address: Address | None = getattr(organisation, "address", None)
+            organisation_identifier = application.organisation_identifier
 
-            reservation_details["description"] = getattr(organisation, "core_business", "")
-            reservation_details["reservee_organisation_name"] = getattr(organisation, "name", "")
+            reservation_details["description"] = application.organisation_core_business
+            reservation_details["reservee_organisation_name"] = application.organisation_name
             reservation_details["reservee_id"] = organisation_identifier
             reservation_details["reservee_is_unregistered_association"] = not organisation_identifier
-            reservation_details["reservee_address_street"] = getattr(organisation_address, "street_address", "")
-            reservation_details["reservee_address_city"] = getattr(organisation_address, "city", "")
-            reservation_details["reservee_address_zip"] = getattr(organisation_address, "post_code", "")
+            reservation_details["reservee_address_street"] = application.organisation_street_address
+            reservation_details["reservee_address_city"] = application.organisation_city
+            reservation_details["reservee_address_zip"] = application.organisation_post_code
 
         return reservation_details

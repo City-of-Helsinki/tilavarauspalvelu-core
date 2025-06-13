@@ -174,14 +174,14 @@ def test_seasonal_booking_application_round_in_allocation_email__render__html():
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 def test__seasonal_booking_application_round_in_allocation__send_email(outbox):
-    application = ApplicationFactory.create_in_status_in_allocation(in_allocation_notification_sent_date=None)
+    application = ApplicationFactory.create_in_status_in_allocation(in_allocation_notification_sent_at=None)
 
     EmailService.send_seasonal_booking_application_round_in_allocation_emails()
 
     assert len(outbox) == 1
 
     assert outbox[0].subject == "Your application is being processed"
-    assert sorted(outbox[0].bcc) == sorted([application.user.email, application.contact_person.email])
+    assert sorted(outbox[0].bcc) == sorted([application.user.email, application.contact_person_email])
 
 
 @pytest.mark.django_db
@@ -199,11 +199,11 @@ def test__seasonal_booking_application_round_in_allocation__send_email__already_
 def test__seasonal_booking_application_round_in_allocation__send_email__multiple_languages(outbox):
     application_1 = ApplicationFactory.create_in_status_in_allocation(
         user__preferred_language="fi",
-        in_allocation_notification_sent_date=None,
+        in_allocation_notification_sent_at=None,
     )
     application_2 = ApplicationFactory.create_in_status_in_allocation(
         user__preferred_language="en",
-        in_allocation_notification_sent_date=None,
+        in_allocation_notification_sent_at=None,
     )
 
     with TranslationsFromPOFiles():
@@ -212,10 +212,10 @@ def test__seasonal_booking_application_round_in_allocation__send_email__multiple
     assert len(outbox) == 2
 
     assert outbox[0].subject == "Hakemustasi käsitellään"
-    assert sorted(outbox[0].bcc) == sorted([application_1.user.email, application_1.contact_person.email])
+    assert sorted(outbox[0].bcc) == sorted([application_1.user.email, application_1.contact_person_email])
 
     assert outbox[1].subject == "Your application is being processed"
-    assert sorted(outbox[1].bcc) == sorted([application_2.user.email, application_2.contact_person.email])
+    assert sorted(outbox[1].bcc) == sorted([application_2.user.email, application_2.contact_person_email])
 
 
 @pytest.mark.django_db
@@ -234,8 +234,8 @@ def test__seasonal_booking_application_round_in_allocation__send_email__wrong_st
 def test__seasonal_booking_application_round_in_allocation__send_email__no_recipients(outbox):
     ApplicationFactory.create_in_status_in_allocation(
         user__email="",
-        contact_person__email="",
-        in_allocation_notification_sent_date=None,
+        contact_person_email="",
+        in_allocation_notification_sent_at=None,
     )
 
     EmailService.send_seasonal_booking_application_round_in_allocation_emails()

@@ -192,9 +192,9 @@ def test_seasonal_booking_rescheduled_single__send_email(outbox):
         type=ReservationTypeChoice.SEASONAL,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        reservation_unit__name="foo",
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_rescheduled_email(reservation)

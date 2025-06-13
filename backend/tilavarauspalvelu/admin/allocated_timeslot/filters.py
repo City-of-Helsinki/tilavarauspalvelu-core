@@ -27,7 +27,7 @@ class ApplicationRoundFilter(admin.SimpleListFilter):
 
     def lookups(self, *args: Any) -> list[tuple[str, str]]:
         return ApplicationRound.objects.filter(
-            Q(sent_date__isnull=True) | Q(handled_date__isnull=True),
+            Q(sent_at__isnull=True) | Q(handled_at__isnull=True),
         ).values_list("id", "name")
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:

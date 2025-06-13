@@ -131,7 +131,7 @@ class ReservationNode(DjangoNode):
 
     pindora_info = MultiField(
         PindoraReservationInfoType,
-        fields=["access_type", "ext_uuid", "state", "end"],
+        fields=["access_type", "ext_uuid", "state", "ends_at"],
         description=(
             "Info fetched from Pindora API. Cached per reservation for 30s. "
             "Please don't use this when filtering multiple reservations, queries to Pindora are not optimized."
@@ -198,12 +198,13 @@ class ReservationNode(DjangoNode):
             "num_persons",
             "state",
             "type",
+            "municipality",
             "cancel_details",
             "handling_details",
             "working_memo",
             #
-            "begin",
-            "end",
+            "begins_at",
+            "ends_at",
             "buffer_time_before",
             "buffer_time_after",
             "handled_at",
@@ -245,13 +246,12 @@ class ReservationNode(DjangoNode):
             "billing_address_city",
             "billing_address_zip",
             #
-            "reservation_units",
+            "reservation_unit",
             "user",
-            "recurring_reservation",
+            "reservation_series",
             "deny_reason",
             "cancel_reason",
             "purpose",
-            "home_city",
             "age_group",
             #
             "is_blocked",
@@ -281,11 +281,11 @@ class ReservationNode(DjangoNode):
                 # PUBLIC FIELDS
                 "pk",
                 "state",
-                "begin",
-                "end",
+                "begins_at",
+                "ends_at",
                 "buffer_time_before",
                 "buffer_time_after",
-                "reservation_units",
+                "reservation_unit",
                 "is_blocked",
             }
         }
@@ -324,7 +324,7 @@ class ReservationNode(DjangoNode):
 
         # No need to show Pindora info after 24 hours have passed since it ended
         now = local_datetime()
-        cutoff = root.end.astimezone(DEFAULT_TIMEZONE) + datetime.timedelta(hours=24)
+        cutoff = root.ends_at.astimezone(DEFAULT_TIMEZONE) + datetime.timedelta(hours=24)
         if now > cutoff:
             return None
 
@@ -334,12 +334,12 @@ class ReservationNode(DjangoNode):
         if not has_perms and root.state != ReservationStateChoice.CONFIRMED:
             return None
 
-        if root.recurring_reservation is not None and root.recurring_reservation.allocated_time_slot is not None:
-            section = root.recurring_reservation.allocated_time_slot.reservation_unit_option.application_section
+        if root.reservation_series is not None and root.reservation_series.allocated_time_slot is not None:
+            section = root.reservation_series.allocated_time_slot.reservation_unit_option.application_section
             application_round = section.application.application_round
 
             # Don't show Pindora info without permissions if the application round results haven't been sent yet
-            if not has_perms and application_round.sent_date is None:
+            if not has_perms and application_round.sent_at is None:
                 return None
 
         try:
@@ -358,9 +358,9 @@ class ReservationNode(DjangoNode):
         optimizer.annotations["applied_pricing"] = models.Subquery(
             queryset=(
                 ReservationUnitPricing.objects.filter(
-                    reservation_unit=models.OuterRef("reservation_units"),
+                    reservation_unit=models.OuterRef("reservation_unit"),
                 )
-                .active(from_date=models.OuterRef("begin__date"))
+                .active(from_date=models.OuterRef("begins_at__date"))
                 .annotate(
                     data=JSONObject(
                         begins=models.F("begins"),

@@ -381,7 +381,7 @@ def test_reservation_unit__create__with_timeslots(graphql):
             },
             {
                 "weekday": WeekdayChoice.TUESDAY.value,
-                "closed": True,
+                "isClosed": True,
             },
         ],
     }
@@ -530,7 +530,7 @@ def test_reservation_unit__create__with_timeslots__two_for_same_day(graphql):
             },
             {
                 "weekday": WeekdayChoice.MONDAY.value,
-                "closed": True,
+                "isClosed": True,
             },
         ],
     }
@@ -596,7 +596,7 @@ def test_reservation_unit__create__with_timeslots__closed_has_reservable_times(g
         "applicationRoundTimeSlots": [
             {
                 "weekday": WeekdayChoice.MONDAY.value,
-                "closed": True,
+                "isClosed": True,
                 "reservableTimes": [
                     {"begin": "10:00", "end": "12:00"},
                 ],

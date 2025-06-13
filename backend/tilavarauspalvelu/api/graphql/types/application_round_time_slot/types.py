@@ -26,7 +26,7 @@ class ApplicationRoundTimeSlotNode(DjangoNode):
         fields = [
             "pk",
             "weekday",
-            "closed",
+            "is_closed",
             "reservable_times",
         ]
         permission_classes = [ApplicationRoundTimeSlotPermission]

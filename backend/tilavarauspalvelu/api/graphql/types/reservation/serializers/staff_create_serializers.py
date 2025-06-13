@@ -3,17 +3,22 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 
-from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import (
+    AccessType,
+    CustomerTypeChoice,
+    MunicipalityChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose, ReservationUnit
+from tilavarauspalvelu.models import AgeGroup, Reservation, ReservationPurpose, ReservationUnit
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
@@ -40,9 +45,15 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
         enum=ReservationTypeChoice,
         required=True,
     )
+    municipality = EnumFriendlyChoiceField(
+        choices=MunicipalityChoice.choices,
+        enum=MunicipalityChoice,
+        allow_null=True,
+        default=None,
+        required=False,
+    )
 
     purpose = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects, allow_null=True, required=False)
-    home_city = IntegerPrimaryKeyField(queryset=City.objects, allow_null=True, required=False)
     age_group = IntegerPrimaryKeyField(queryset=AgeGroup.objects, allow_null=True, required=False)
 
     state = EnumFriendlyChoiceField(
@@ -62,10 +73,11 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
             "num_persons",
             "working_memo",
             "type",
+            "municipality",
             #
             # Time information
-            "begin",
-            "end",
+            "begins_at",
+            "ends_at",
             "buffer_time_before",
             "buffer_time_after",
             #
@@ -98,7 +110,6 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
             # Relations
             "reservation_unit",
             "age_group",
-            "home_city",
             "purpose",
             #
             # Read only
@@ -112,16 +123,16 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
         }
 
     def validate(self, data: StaffCreateReservationData) -> StaffCreateReservationData:
-        begin = data.get("begin").astimezone(DEFAULT_TIMEZONE)
-        end = data.get("end").astimezone(DEFAULT_TIMEZONE)
+        begins_at = data.get("begins_at").astimezone(DEFAULT_TIMEZONE)
+        ends_at = data.get("ends_at").astimezone(DEFAULT_TIMEZONE)
 
         # Endpoint requires user to be logged in
         user: User = self.context["request"].user
         reservation_unit: ReservationUnit = data["reservation_unit"]
 
         if reservation_unit.reservation_block_whole_day:
-            data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
-            data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)
+            data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begins_at)
+            data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(ends_at)
 
         reservation_type = data.get("type")
         reservation_unit.validators.validate_can_create_reservation_type(reservation_type=reservation_type)
@@ -134,11 +145,11 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
             buffer_time_before = data.get("buffer_time_before")
             buffer_time_after = data.get("buffer_time_after")
 
-        reservation_unit.validators.validate_begin_before_end(begin=begin, end=end)
-        reservation_unit.validators.validate_reservation_begin_time_staff(begin=begin)
+        reservation_unit.validators.validate_begin_before_end(begin=begins_at, end=ends_at)
+        reservation_unit.validators.validate_reservation_begin_time_staff(begin=begins_at)
         reservation_unit.validators.validate_no_overlapping_reservations(
-            begin=begin,
-            end=end,
+            begins_at=begins_at,
+            ends_at=ends_at,
             new_buffer_time_before=buffer_time_before,
             new_buffer_time_after=buffer_time_after,
         )
@@ -151,16 +162,12 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
         data["state"] = ReservationStateChoice.CONFIRMED
         data["user"] = user
         data["reservee_used_ad_login"] = False if id_token is None else id_token.is_ad_login
-        data["access_type"] = reservation_unit.actions.get_access_type_at(begin, default=AccessType.UNRESTRICTED)
+        data["access_type"] = reservation_unit.actions.get_access_type_at(begins_at, default=AccessType.UNRESTRICTED)
 
         return data
 
     def create(self, validated_data: StaffCreateReservationData) -> Reservation:
-        # Must be able to link reservation unit to the reservation
-        with transaction.atomic():
-            reservation_unit: ReservationUnit = validated_data.pop("reservation_unit")
-            reservation: Reservation = super().create(validated_data)
-            reservation.reservation_units.set([reservation_unit])
+        reservation: Reservation = super().create(validated_data)
 
         # After creating the reservation, check again if there are any overlapping reservations.
         # This can fail if two reservations are created for reservation units in the same

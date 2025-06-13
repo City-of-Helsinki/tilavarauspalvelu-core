@@ -34,7 +34,7 @@ if TYPE_CHECKING:
         SeasonalBookingRescheduledSeriesContext,
         SeasonalBookingRescheduledSingleContext,
     )
-    from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation
+    from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationSeries
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 __all__ = [
@@ -296,7 +296,7 @@ def get_context_for_seasonal_booking_cancelled_single(
 
 @get_translated
 def get_context_for_seasonal_booking_denied_series(
-    series: RecurringReservation | None = None,
+    series: ReservationSeries | None = None,
     *,
     language: Lang,
     **data: Unpack[SeasonalBookingDeniedSeriesContext],
@@ -323,7 +323,7 @@ def get_context_for_seasonal_booking_denied_series(
         data["time_value"] = f"{begin_time}-{end_time}"
         data["reservation_unit_name"] = get_attr_by_language(reservation_unit, "name", language)
         data["unit_name"] = get_attr_by_language(unit, "name", language)
-        data["unit_location"] = series.reservation_unit.actions.get_address()
+        data["unit_location"] = series.reservation_unit.unit.address
 
     return {
         "title": pgettext("Email", "Your seasonal booking has been cancelled"),
@@ -388,7 +388,7 @@ def get_context_for_seasonal_booking_denied_single(
 
 @get_translated
 def get_context_for_seasonal_booking_rescheduled_series(
-    series: RecurringReservation | None = None,
+    series: ReservationSeries | None = None,
     *,
     language: Lang,
     **data: Unpack[SeasonalBookingRescheduledSeriesContext],
@@ -412,7 +412,7 @@ def get_context_for_seasonal_booking_rescheduled_series(
         data["time_value"] = f"{begin_time}-{end_time}"
         data["reservation_unit_name"] = get_attr_by_language(reservation_unit, "name", language)
         data["unit_name"] = get_attr_by_language(unit, "name", language)
-        data["unit_location"] = series.reservation_unit.actions.get_address()
+        data["unit_location"] = series.reservation_unit.unit.address
 
         data |= params_for_access_code_series(series=series)
 

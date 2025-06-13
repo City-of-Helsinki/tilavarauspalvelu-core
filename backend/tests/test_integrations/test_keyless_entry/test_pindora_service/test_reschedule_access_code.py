@@ -9,7 +9,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraS
 from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraAccessCodeModifyResponse
 from utils.date_utils import local_datetime
 
-from tests.factories import ApplicationSectionFactory, RecurringReservationFactory, ReservationFactory, UserFactory
+from tests.factories import ApplicationSectionFactory, ReservationFactory, ReservationSeriesFactory, UserFactory
 from tests.helpers import ResponseMock, patch_method
 from tests.test_integrations.test_keyless_entry.helpers import default_access_code_modify_response
 
@@ -20,10 +20,10 @@ pytestmark = [
 
 def test_reschedule_access_code__reservation():
     reservation = ReservationFactory.create(
-        reservation_units__uuid=uuid.uuid4(),
-        recurring_reservation=None,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        reservation_unit__ext_uuid=uuid.uuid4(),
+        reservation_series=None,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -47,12 +47,12 @@ def test_reschedule_access_code__reservation():
 
 
 def test_reschedule_access_code__reservation__in_series():
-    series = RecurringReservationFactory.create()
+    series = ReservationSeriesFactory.create()
     reservation_1 = ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        reservation_unit=series.reservation_unit,
+        reservation_series=series,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -60,10 +60,10 @@ def test_reschedule_access_code__reservation__in_series():
         access_code_is_active=False,
     )
     reservation_2 = ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
-        begin=local_datetime(2024, 1, 1, 14),
-        end=local_datetime(2024, 1, 1, 15),
+        reservation_unit=series.reservation_unit,
+        reservation_series=series,
+        begins_at=local_datetime(2024, 1, 1, 14),
+        ends_at=local_datetime(2024, 1, 1, 15),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -95,15 +95,15 @@ def test_reschedule_access_code__reservation__in_series__in_seasonal_booking():
     section = ApplicationSectionFactory.create(
         application__user=user,
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     reservation_1 = ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        reservation_unit=series.reservation_unit,
+        reservation_series=series,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -112,10 +112,10 @@ def test_reschedule_access_code__reservation__in_series__in_seasonal_booking():
     )
     reservation_2 = ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
-        begin=local_datetime(2024, 1, 1, 14),
-        end=local_datetime(2024, 1, 1, 15),
+        reservation_unit=series.reservation_unit,
+        reservation_series=series,
+        begins_at=local_datetime(2024, 1, 1, 14),
+        ends_at=local_datetime(2024, 1, 1, 15),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -143,12 +143,12 @@ def test_reschedule_access_code__reservation__in_series__in_seasonal_booking():
 
 
 def test_reschedule_access_code__series():
-    series = RecurringReservationFactory.create()
+    series = ReservationSeriesFactory.create()
     reservation_1 = ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        reservation_unit=series.reservation_unit,
+        reservation_series=series,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -156,10 +156,10 @@ def test_reschedule_access_code__series():
         access_code_is_active=False,
     )
     reservation_2 = ReservationFactory.create(
-        reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
-        begin=local_datetime(2024, 1, 1, 14),
-        end=local_datetime(2024, 1, 1, 15),
+        reservation_unit=series.reservation_unit,
+        reservation_series=series,
+        begins_at=local_datetime(2024, 1, 1, 14),
+        ends_at=local_datetime(2024, 1, 1, 15),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -191,15 +191,15 @@ def test_reschedule_access_code__series__in_seasonal_booking():
     section = ApplicationSectionFactory.create(
         application__user=user,
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     reservation_1 = ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        reservation_unit=series.reservation_unit,
+        reservation_series=series,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -208,10 +208,10 @@ def test_reschedule_access_code__series__in_seasonal_booking():
     )
     reservation_2 = ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
-        begin=local_datetime(2024, 1, 1, 14),
-        end=local_datetime(2024, 1, 1, 15),
+        reservation_unit=series.reservation_unit,
+        reservation_series=series,
+        begins_at=local_datetime(2024, 1, 1, 14),
+        ends_at=local_datetime(2024, 1, 1, 15),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -243,15 +243,15 @@ def test_reschedule_access_code__seasonal_booking():
     section = ApplicationSectionFactory.create(
         application__user=user,
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     reservation_1 = ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
-        begin=local_datetime(2024, 1, 1, 12),
-        end=local_datetime(2024, 1, 1, 13),
+        reservation_unit=series.reservation_unit,
+        reservation_series=series,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -260,10 +260,10 @@ def test_reschedule_access_code__seasonal_booking():
     )
     reservation_2 = ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
-        begin=local_datetime(2024, 1, 1, 14),
-        end=local_datetime(2024, 1, 1, 15),
+        reservation_unit=series.reservation_unit,
+        reservation_series=series,
+        begins_at=local_datetime(2024, 1, 1, 14),
+        ends_at=local_datetime(2024, 1, 1, 15),
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,

@@ -29,7 +29,7 @@ def test_reservation_unit__query__anonymous_user(graphql):
     reservation_unit = ReservationUnitFactory.create()
     ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit)
 
-    fields = "applicationRoundTimeSlots { weekday closed reservableTimes { begin end } }"
+    fields = "applicationRoundTimeSlots { weekday isClosed reservableTimes { begin end } }"
     query = reservation_units_query(fields=fields)
     response = graphql(query)
 
@@ -42,7 +42,7 @@ def test_reservation_unit__query__regular_user(graphql):
     ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit)
     graphql.login_with_regular_user()
 
-    fields = "applicationRoundTimeSlots { weekday closed reservableTimes { begin end } }"
+    fields = "applicationRoundTimeSlots { weekday isClosed reservableTimes { begin end } }"
     query = reservation_units_query(fields=fields)
     response = graphql(query)
 
@@ -103,7 +103,7 @@ def test_reservation_unit__query__sensitive_information__regular_user(graphql):
         description="Description",
         free_of_charge_reason="Free of Charge Reason",
         handling_details="Handling Details",
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         reservee_address_city="City",
         reservee_address_street="Address",
         reservee_address_zip="Zip",
@@ -173,7 +173,7 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
         description="Description",
         free_of_charge_reason="Free of Charge Reason",
         handling_details="Handling Details",
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         reservee_address_city="City",
         reservee_address_street="Address",
         reservee_address_zip="Zip",

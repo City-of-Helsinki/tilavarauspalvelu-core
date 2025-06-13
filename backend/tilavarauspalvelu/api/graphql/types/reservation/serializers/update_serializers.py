@@ -6,8 +6,8 @@ from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework.fields import IntegerField
 
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice
-from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose
+from tilavarauspalvelu.enums import CustomerTypeChoice, MunicipalityChoice, ReservationStateChoice
+from tilavarauspalvelu.models import AgeGroup, Reservation, ReservationPurpose
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import ReservationUpdateData
@@ -25,9 +25,15 @@ class ReservationUpdateSerializer(NestingModelSerializer):
         enum=CustomerTypeChoice,
         required=False,
     )
+    municipality = EnumFriendlyChoiceField(
+        choices=MunicipalityChoice.choices,
+        enum=MunicipalityChoice,
+        allow_null=True,
+        default=None,
+        required=False,
+    )
 
     purpose = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects, allow_null=True, required=False)
-    home_city = IntegerPrimaryKeyField(queryset=City.objects, allow_null=True, required=False)
     age_group = IntegerPrimaryKeyField(queryset=AgeGroup.objects, allow_null=True, required=False)
 
     state = EnumFriendlyChoiceField(
@@ -45,6 +51,7 @@ class ReservationUpdateSerializer(NestingModelSerializer):
             "name",
             "description",
             "num_persons",
+            "municipality",
             #
             # Free of charge information
             "applying_for_free_of_charge",
@@ -74,7 +81,6 @@ class ReservationUpdateSerializer(NestingModelSerializer):
             #
             # Relations
             "age_group",
-            "home_city",
             "purpose",
             #
             # Read only

@@ -26,9 +26,9 @@ from tilavarauspalvelu.integrations.keyless_entry.typing import (
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_datetime
 
-from tests.factories import ApplicationFactory, ApplicationRoundFactory, RecurringReservationFactory, UserFactory
+from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationSeriesFactory, UserFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
-from tests.test_graphql_api.test_recurring_reservation.helpers import create_reservation_series
+from tests.test_graphql_api.test_reservation_series.helpers import create_reservation_series
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
@@ -207,8 +207,8 @@ def test_seasonal_booking_access_code_changed__get_context__instance(email_reser
     PindoraService.get_access_code.return_value = pindora_seasonal_booking_info(
         reservation_id__0=reservation_1.id,
         reservation_id__1=reservation_2.id,
-        reservation_series_id__0=reservation_1.recurring_reservation.id,
-        reservation_series_id__1=reservation_2.recurring_reservation.id,
+        reservation_series_id__0=reservation_1.reservation_series.id,
+        reservation_series_id__1=reservation_2.reservation_series.id,
     )
 
     expected: dict[str, Any] = {
@@ -242,8 +242,8 @@ def test_seasonal_booking_access_code_changed__get_context__instance__inactive(e
         access_code_is_active=False,
         reservation_id__0=reservation_1.id,
         reservation_id__1=reservation_2.id,
-        reservation_series_id__0=reservation_1.recurring_reservation.id,
-        reservation_series_id__1=reservation_2.recurring_reservation.id,
+        reservation_series_id__0=reservation_1.reservation_series.id,
+        reservation_series_id__1=reservation_2.reservation_series.id,
     )
 
     expected: dict[str, Any] = {
@@ -367,13 +367,13 @@ def test_seasonal_booking_access_code_changed__send_email(outbox):
     application_round = ApplicationRoundFactory.create_in_status_results_sent()
     application = ApplicationFactory.create(
         user=user,
-        contact_person__email="contact@email.com",
-        sent_date=local_datetime(),
+        contact_person_email="contact@email.com",
+        sent_at=local_datetime(),
         application_round=application_round,
     )
     reservation_series = create_reservation_series(
         user=user,
-        reservation_unit__uuid=ext_uuid,
+        reservation_unit__ext_uuid=ext_uuid,
         reservations__type=ReservationTypeChoice.SEASONAL,
         allocated_time_slot__day_of_the_week=Weekday.MONDAY,
         allocated_time_slot__reservation_unit_option__application_section__application=application,
@@ -397,11 +397,11 @@ def test_seasonal_booking_access_code_changed__send_email__no_reservations(outbo
     application_round = ApplicationRoundFactory.create_in_status_results_sent()
     application = ApplicationFactory.create(
         user=user,
-        contact_person__email="contact@email.com",
-        sent_date=local_datetime(),
+        contact_person_email="contact@email.com",
+        sent_at=local_datetime(),
         application_round=application_round,
     )
-    reservation_series = RecurringReservationFactory.create(
+    reservation_series = ReservationSeriesFactory.create(
         user=user,
         allocated_time_slot__day_of_the_week=Weekday.MONDAY,
         allocated_time_slot__reservation_unit_option__application_section__application=application,
@@ -422,8 +422,8 @@ def test_seasonal_booking_access_code_changed__send_email__no_recipients(outbox)
     application_round = ApplicationRoundFactory.create_in_status_results_sent()
     application = ApplicationFactory.create(
         user=None,
-        contact_person=None,
-        sent_date=local_datetime(),
+        contact_person_email=None,
+        sent_at=local_datetime(),
         application_round=application_round,
     )
     reservation_series = create_reservation_series(

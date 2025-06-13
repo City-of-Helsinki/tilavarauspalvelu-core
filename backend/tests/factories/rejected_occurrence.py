@@ -23,4 +23,4 @@ class RejectedOccurrenceFactory(GenericDjangoModelFactory[RejectedOccurrence]):
     end_datetime = LazyAttribute(lambda i: i.begin_datetime + datetime.timedelta(hours=1))
     rejection_reason = fuzzy.FuzzyChoice(choices=RejectionReadinessChoice.values)
 
-    recurring_reservation = ForeignKeyFactory("tests.factories.RecurringReservationFactory")
+    reservation_series = ForeignKeyFactory("tests.factories.ReservationSeriesFactory")

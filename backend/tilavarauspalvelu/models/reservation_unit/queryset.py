@@ -69,7 +69,7 @@ class ReservationUnitQuerySet(models.QuerySet):
         >>> sq = ReservationUnit.objects.filter(...)
         >>>
         >>> # 1
-        >>> qs.filter(reservation_units__in=Subquery(sq.affected_reservation_unit_ids))
+        >>> qs.filter(reservation_unit__in=Subquery(sq.affected_reservation_unit_ids))
         >>>
         >>> # 2
         >>> qs.annotate(affected=SubqueryArray(sq.affected_reservation_unit_ids, agg_field="ids", distinct=True))
@@ -150,12 +150,12 @@ class ReservationUnitQuerySet(models.QuerySet):
     @property
     def _is_visible(self) -> Q:
         return (
-            Q(publish_begins__lte=NowTT())  #
-            | Q(publish_begins__isnull=True)
+            Q(publish_begins_at__lte=NowTT())  #
+            | Q(publish_begins_at__isnull=True)
         ) & (
-            Q(publish_ends__gt=NowTT())  #
-            | Q(publish_ends__isnull=True)
-            | Q(publish_ends__lt=models.F("publish_begins"))
+            Q(publish_ends_at__gt=NowTT())  #
+            | Q(publish_ends_at__isnull=True)
+            | Q(publish_ends_at__lt=models.F("publish_begins_at"))
         )
 
     def visible(self) -> Self:

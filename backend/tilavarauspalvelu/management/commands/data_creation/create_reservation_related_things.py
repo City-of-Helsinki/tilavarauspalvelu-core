@@ -9,45 +9,35 @@ from typing import TYPE_CHECKING
 
 import requests
 from django.conf import settings
-from django.contrib.gis.geos import Point
 
-from tilavarauspalvelu.constants import COORDINATE_SYSTEM_ID
 from tilavarauspalvelu.enums import ReservationUnitImageType, TermsOfUseTypeChoices
 from tilavarauspalvelu.models import (
     AgeGroup,
-    City,
     Equipment,
     EquipmentCategory,
-    Location,
     OriginHaukiResource,
     PaymentAccounting,
     PaymentMerchant,
     Purpose,
-    Qualifier,
     ReservableTimeSpan,
     ReservationDenyReason,
     ReservationMetadataField,
     ReservationMetadataSet,
     ReservationPurpose,
     ReservationUnitCancellationRule,
-    Space,
     TaxPercentage,
     TermsOfUse,
-    Unit,
 )
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_start_of_day
 
 from tests.factories import (
     AgeGroupFactory,
-    CityFactory,
     EquipmentCategoryFactory,
     EquipmentFactory,
-    LocationFactory,
     OriginHaukiResourceFactory,
     PaymentAccountingFactory,
     PaymentMerchantFactory,
     PurposeFactory,
-    QualifierFactory,
     ReservableTimeSpanFactory,
     ReservationDenyReasonFactory,
     ReservationMetadataFieldFactory,
@@ -73,12 +63,6 @@ def _create_equipments() -> list[Equipment]:
     equipment_categories = EquipmentCategory.objects.bulk_create(equipment_categories)
     equipments = [EquipmentFactory.build(category=random.choice(equipment_categories)) for _ in range(30)]
     return Equipment.objects.bulk_create(equipments)
-
-
-@with_logs
-def _create_qualifiers() -> list[Qualifier]:
-    qualifiers = [QualifierFactory.build() for _ in range(3)]
-    return Qualifier.objects.bulk_create(qualifiers)
 
 
 @with_logs
@@ -622,42 +606,6 @@ def _create_age_groups() -> list[AgeGroup]:
     ]
 
     return AgeGroup.objects.bulk_create(age_groups)
-
-
-@with_logs
-def _create_cities() -> list[City]:
-    cities = [
-        CityFactory.build()  #
-        for _ in range(10)
-    ]
-    return City.objects.bulk_create(cities)
-
-
-@with_logs
-def _create_locations() -> list[Location]:
-    unit_locations = [
-        LocationFactory.build(
-            unit=unit,
-            coordinates=Point(
-                x=random.randint(-180, 180),  # latitude
-                y=random.randint(-90, 90),  # longitude
-                srid=COORDINATE_SYSTEM_ID,
-            ),
-        )
-        for unit in Unit.objects.all()
-    ]
-    space_locations = [
-        LocationFactory.build(
-            space=space,
-            coordinates=Point(
-                x=random.randint(-180, 180),  # latitude
-                y=random.randint(-90, 90),  # longitude
-                srid=COORDINATE_SYSTEM_ID,
-            ),
-        )
-        for space in Space.objects.all()
-    ]
-    return Location.objects.bulk_create(unit_locations + space_locations)
 
 
 @with_logs
