@@ -141,7 +141,7 @@ jobs:
           python-version: ${{ steps.setup-python.outputs.python-version }}
 
       - name: "Download test durations artifact"
-        uses: dawidd6/action-download-artifact@v10
+        uses: dawidd6/action-download-artifact@v11
         with:
           workflow: update_test_durations.yml
           name: test_durations
