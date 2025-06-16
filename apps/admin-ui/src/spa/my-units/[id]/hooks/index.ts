@@ -1,7 +1,4 @@
-import {
-  ReservationTypeChoice,
-  useReservationUnitsByUnitQuery,
-} from "@gql/gql-types";
+import { ReservationTypeChoice, useReservationUnitsByUnitQuery } from "@gql/gql-types";
 import { toApiDate } from "common/src/common/util";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
@@ -12,11 +9,7 @@ import { useTranslation } from "react-i18next";
 // TODO this should be split into two queries one for the reservation units and one for the daily reservations
 // since the reservation units only change on page load
 // reservations change when the date changes
-export function useUnitResources(
-  begin: Date,
-  unitPk: string,
-  reservationUnitTypes?: number[]
-) {
+export function useUnitResources(begin: Date, unitPk: string, reservationUnitTypes?: number[]) {
   const { t } = useTranslation();
   const id = base64encode(`UnitNode:${unitPk}`);
   const isValid = Number(unitPk) > 0;
@@ -51,26 +44,18 @@ export function useUnitResources(
     };
   }
 
-  function doesReservationAffectReservationUnit(
-    reservation: ReservationType,
-    reservationUnitPk: number
-  ) {
-    return reservation.affectedReservationUnits?.some(
-      (pk) => pk === reservationUnitPk
-    );
+  function doesReservationAffectReservationUnit(reservation: ReservationType, reservationUnitPk: number) {
+    return reservation.affectedReservationUnits?.some((pk) => pk === reservationUnitPk);
   }
 
   const resources = resUnits
     .filter(
       (x) =>
         !reservationUnitTypes?.length ||
-        (x.reservationUnitType?.pk != null &&
-          reservationUnitTypes.includes(x.reservationUnitType.pk))
+        (x.reservationUnitType?.pk != null && reservationUnitTypes.includes(x.reservationUnitType.pk))
     )
     .map((x) => {
-      const affecting = affectingReservations?.filter((y) =>
-        doesReservationAffectReservationUnit(y, x.pk ?? 0)
-      );
+      const affecting = affectingReservations?.filter((y) => doesReservationAffectReservationUnit(y, x.pk ?? 0));
       const events = filterNonNullable(affecting);
 
       return {
@@ -118,12 +103,7 @@ export const RESERVATION_UNITS_BY_UNIT_QUERY = gql`
         authentication
       }
     }
-    affectingReservations(
-      beginDate: $beginDate
-      endDate: $endDate
-      state: $state
-      forUnits: [$pk]
-    ) {
+    affectingReservations(beginDate: $beginDate, endDate: $endDate, state: $state, forUnits: [$pk]) {
       ...ReservationUnitReservations
     }
   }

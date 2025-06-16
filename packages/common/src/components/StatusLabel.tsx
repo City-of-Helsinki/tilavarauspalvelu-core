@@ -1,11 +1,7 @@
 import React from "react";
 import { StatusLabel as HDSStatusLabel } from "hds-react";
 import styled from "styled-components";
-import {
-  type StatusLabelType,
-  getStatusBorderColor,
-  getStatusBackgroundColor,
-} from "../tags";
+import { type StatusLabelType, getStatusBorderColor, getStatusBackgroundColor } from "../tags";
 
 type StatusLabelProps = {
   type: StatusLabelType;
@@ -21,8 +17,7 @@ const ColoredLabel = styled(HDSStatusLabel)<{
   $slim?: boolean;
 }>`
   && {
-    --status-label-background: ${(props) =>
-      getStatusBackgroundColor(props.$type)} !important;
+    --status-label-background: ${(props) => getStatusBackgroundColor(props.$type)} !important;
     --status-label-color: var(--color-black);
     border-width: 1px;
     border-style: solid;
@@ -44,13 +39,7 @@ const ColoredLabel = styled(HDSStatusLabel)<{
  * @param {React.ReactNode} children - Label text
  * @returns {JSX.Element} - Rendered StatusLabel component
  */
-function StatusLabel({
-  type,
-  icon,
-  slim = false,
-  children,
-  ...rest
-}: Readonly<StatusLabelProps>): JSX.Element {
+function StatusLabel({ type, icon, slim = false, children, ...rest }: Readonly<StatusLabelProps>): JSX.Element {
   return (
     <ColoredLabel
       {...rest}

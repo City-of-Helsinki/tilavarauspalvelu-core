@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Button,
-  ButtonVariant,
-  Dialog,
-  IconAlertCircleFill,
-  IconQuestionCircle,
-} from "hds-react";
+import { Button, ButtonVariant, Dialog, IconAlertCircleFill, IconQuestionCircle } from "hds-react";
 import { useTranslation } from "next-i18next";
 
 type Props = {
@@ -41,22 +35,12 @@ export function ConfirmationDialog(props: Props): JSX.Element | null {
       <Dialog.Header
         id={`${id}-header`}
         title={heading || t("confirm.heading")}
-        iconStart={
-          variant === "danger" ? (
-            <IconAlertCircleFill color="#b01038" />
-          ) : (
-            <IconQuestionCircle />
-          )
-        }
+        iconStart={variant === "danger" ? <IconAlertCircleFill color="#b01038" /> : <IconQuestionCircle />}
       />
-      <Dialog.Content id={`${id}-content`}>
-        {content || t("confirm.text")}
-      </Dialog.Content>
+      <Dialog.Content id={`${id}-content`}>{content || t("confirm.text")}</Dialog.Content>
       <Dialog.ActionButtons>
         <Button
-          variant={
-            variant === "danger" ? ButtonVariant.Danger : ButtonVariant.Primary
-          }
+          variant={variant === "danger" ? ButtonVariant.Danger : ButtonVariant.Primary}
           onClick={() => onAccept?.()}
           iconStart={acceptIcon}
         >

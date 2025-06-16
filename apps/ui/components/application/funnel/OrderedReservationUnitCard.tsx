@@ -1,12 +1,5 @@
 import React, { type HTMLAttributes } from "react";
-import {
-  IconArrowDown,
-  IconArrowUp,
-  ButtonSize,
-  ButtonVariant,
-  Button,
-  ButtonPresetTheme,
-} from "hds-react";
+import { IconArrowDown, IconArrowUp, ButtonSize, ButtonVariant, Button, ButtonPresetTheme } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Flex, H6, fontBold, fontMedium, fontRegular } from "common/styled";
@@ -16,10 +9,7 @@ import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getImageSource, getMainImage } from "common/src/helpers";
 import Card from "common/src/components/Card";
 import { ErrorText } from "common/src/components/ErrorText";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
 
 const NameCardContainer = styled(Flex).attrs({ $gap: "none" })`
@@ -228,11 +218,7 @@ export function OrderedReservationUnitCard({
         </PreCardLabel>
         <OverlayContainer>
           <CardContainer>
-            <Card
-              heading={getReservationUnitName(reservationUnit) ?? ""}
-              text={unitName}
-              imageSrc={imgSrc}
-            />
+            <Card heading={getReservationUnitName(reservationUnit) ?? ""} text={unitName} imageSrc={imgSrc} />
           </CardContainer>
           <OrderButtonContainer>
             <DeleteContainer>

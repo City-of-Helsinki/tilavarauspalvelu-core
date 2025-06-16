@@ -28,9 +28,7 @@ export function ApprovalButtonsRecurring({
   const { t } = useTranslation();
 
   // check if there are any reservations that can be deleted
-  const { loading, reservations, refetch } = useRecurringReservations(
-    recurringReservation.pk ?? undefined
-  );
+  const { loading, reservations, refetch } = useRecurringReservations(recurringReservation.pk ?? undefined);
 
   const handleReject = () => {
     refetch();
@@ -39,9 +37,7 @@ export function ApprovalButtonsRecurring({
 
   // TODO don't need to do this anymore we can just pass the first reservation here
   // need to do get all data here otherwise totalCount is incorrect (filter here instead of in the query)
-  const reservationsPossibleToDeny = reservations.filter((x) =>
-    isPossibleToDeny(x.state, new Date(x.begin))
-  );
+  const reservationsPossibleToDeny = reservations.filter((x) => isPossibleToDeny(x.state, new Date(x.begin)));
 
   const handleDenyClick = () => {
     const reservation = reservationsPossibleToDeny.find(() => true);
@@ -77,15 +73,10 @@ export function ApprovalButtonsRecurring({
       </Button>
       {!disableNonEssentialButtons && (
         <>
-          <ButtonLikeLink
-            to="edit"
-            data-testid="approval-buttons-recurring__edit-link"
-          >
+          <ButtonLikeLink to="edit" data-testid="approval-buttons-recurring__edit-link">
             {t("ApprovalButtons.edit")}
           </ButtonLikeLink>
-          <ButtonLikeLink to="series">
-            {t("ApprovalButtons.editSeriesTime")}
-          </ButtonLikeLink>
+          <ButtonLikeLink to="series">{t("ApprovalButtons.editSeriesTime")}</ButtonLikeLink>
         </>
       )}
     </>

@@ -13,10 +13,7 @@ import {
 import { Accordion } from "@/component/Accordion";
 import { AllocationCalendar } from "./AllocationCalendar";
 import { AllocationColumn } from "./AllocationColumn";
-import {
-  type AllocationApplicationSectionCardType,
-  ApplicationSectionCard,
-} from "./ApplicationEventCard";
+import { type AllocationApplicationSectionCardType, ApplicationSectionCard } from "./ApplicationEventCard";
 import { useFocusApplicationEvent } from "./hooks";
 import { type ApolloQueryResult } from "@apollo/client";
 import { filterNonNullable, toNumber } from "common/src/helpers";
@@ -46,8 +43,7 @@ const Content = styled.div`
 `;
 
 const StyledAccordion = styled(Accordion)<{ $fontLarge?: boolean }>`
-  --header-font-size: ${({ $fontLarge }) =>
-    $fontLarge ? "var(--fontsize-heading-m)" : "var(--fontsize-heading-xs)"};
+  --header-font-size: ${({ $fontLarge }) => ($fontLarge ? "var(--fontsize-heading-m)" : "var(--fontsize-heading-xs)")};
   > div {
     padding: 0 0 var(--spacing-s) 0;
     > h2,
@@ -98,14 +94,9 @@ function EventGroupList({
 type ApplicationEventsProps = {
   applicationSections: SectionNodeT[];
   reservationUnit: Pick<ReservationUnitNode, "pk">;
-  refetchApplicationEvents: () => Promise<
-    ApolloQueryResult<ApplicationSectionAllocationsQuery>
-  >;
+  refetchApplicationEvents: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
   applicationRoundStatus: ApplicationRoundStatusChoice;
-  relatedAllocations: Pick<
-    AllocatedTimeSlotNodeT,
-    "dayOfTheWeek" | "beginTime" | "endTime"
-  >[];
+  relatedAllocations: Pick<AllocatedTimeSlotNodeT, "dayOfTheWeek" | "beginTime" | "endTime">[];
 };
 
 /// TODO rename to something more descriptive
@@ -127,9 +118,7 @@ export function AllocationPageContent({
   useEffect(() => {
     const selectedAesPk = toNumber(params.get("aes"));
     if (selectedAesPk) {
-      const selectedAeas = applicationSections.find(
-        (ae) => ae.pk === selectedAesPk
-      );
+      const selectedAeas = applicationSections.find((ae) => ae.pk === selectedAesPk);
       setFocusedApplicationEvent(selectedAeas);
     } else {
       setFocusedApplicationEvent(undefined);
@@ -137,8 +126,7 @@ export function AllocationPageContent({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- We only care if reservationUnit changes, and adding the rest causes an infinite loop
   }, [reservationUnit, params]);
 
-  const relatedSpacesTimeSlotsByDayReduced =
-    getRelatedTimeSlots(relatedAllocations);
+  const relatedSpacesTimeSlotsByDayReduced = getRelatedTimeSlots(relatedAllocations);
 
   // NOTE left hand cards include other reservation units as well (if they are allocated)
   // remove those from the calendar and the right hand side
@@ -147,15 +135,11 @@ export function AllocationPageContent({
       if (ae.reservationUnitOptions.length === 0) {
         return false;
       }
-      return ae.reservationUnitOptions?.some(
-        (a) => a.reservationUnit.pk === reservationUnit.pk
-      );
+      return ae.reservationUnitOptions?.some((a) => a.reservationUnit.pk === reservationUnit.pk);
     })
     .map((ae) => ({
       ...ae,
-      reservationUnitOptions: ae.reservationUnitOptions?.filter(
-        (ruo) => ruo.reservationUnit.pk === reservationUnit.pk
-      ),
+      reservationUnitOptions: ae.reservationUnitOptions?.filter((ruo) => ruo.reservationUnit.pk === reservationUnit.pk),
     }));
 
   // TODO should use mobile menu layout if the screen is small (this page probably requires  >= 1200px)
@@ -186,17 +170,13 @@ function ApplicationSectionColumn({
   reservationUnit,
   refetchApplicationEvents,
   // TODO separate these types (use a union of two types or use Pick to define a new type)
-}: Pick<
-  ApplicationEventsProps,
-  "applicationSections" | "refetchApplicationEvents" | "reservationUnit"
->): JSX.Element {
+}: Pick<ApplicationEventsProps, "applicationSections" | "refetchApplicationEvents" | "reservationUnit">): JSX.Element {
   const { t } = useTranslation();
 
   const sections = filterNonNullable(applicationSections);
 
   // allocations are not specific to the reservation unit
-  const isAllocated = (as: (typeof sections)[0]) =>
-    as.allocations != null && as.allocations > 0;
+  const isAllocated = (as: (typeof sections)[0]) => as.allocations != null && as.allocations > 0;
 
   const isAllocatedToThisUnit = (as: (typeof sections)[0]) =>
     as.reservationUnitOptions
@@ -226,10 +206,7 @@ function ApplicationSectionColumn({
   );
 
   const isPartiallyAllocated = (as: (typeof sections)[0]) =>
-    as.status !== ApplicationSectionStatusChoice.Handled &&
-    isAllocated(as) &&
-    !isLocked(as) &&
-    !isRejected(as);
+    as.status !== ApplicationSectionStatusChoice.Handled && isAllocated(as) && !isLocked(as) && !isRejected(as);
 
   const partiallyAllocated = sections.filter(isPartiallyAllocated);
 
@@ -245,12 +222,7 @@ function ApplicationSectionColumn({
 
   return (
     <Flex $gap="s">
-      <StyledAccordion
-        initiallyOpen
-        $fontLarge
-        headingLevel="h3"
-        heading={t("Allocation.inAllocationHeader")}
-      >
+      <StyledAccordion initiallyOpen $fontLarge headingLevel="h3" heading={t("Allocation.inAllocationHeader")}>
         <p>{t("Allocation.selectApplicant")}</p>
         <EventGroupList
           applicationSections={unallocatedApplicationEvents}

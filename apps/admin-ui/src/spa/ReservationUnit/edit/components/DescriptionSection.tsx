@@ -12,12 +12,9 @@ import { ImageEditor } from "@/spa/ReservationUnit/edit/components/ImageEditor";
 import React from "react";
 import dynamic from "next/dynamic";
 
-const RichTextInput = dynamic(
-  () => import("../../../../component/RichTextInput"),
-  {
-    ssr: false,
-  }
-);
+const RichTextInput = dynamic(() => import("../../../../component/RichTextInput"), {
+  ssr: false,
+});
 
 export function DescriptionSection({
   form,
@@ -30,9 +27,7 @@ export function DescriptionSection({
   equipments: ReservationUnitEditorParametersQuery["equipmentsAll"] | undefined;
   purposes: ReservationUnitEditorParametersQuery["purposes"] | undefined;
   qualifiers: ReservationUnitEditorParametersQuery["qualifiers"] | undefined;
-  reservationUnitTypes:
-    | ReservationUnitEditorParametersQuery["reservationUnitTypes"]
-    | undefined;
+  reservationUnitTypes: ReservationUnitEditorParametersQuery["reservationUnitTypes"] | undefined;
 }>) {
   const { t } = useTranslation();
   const { control, formState } = form;
@@ -43,21 +38,15 @@ export function DescriptionSection({
     label: n.nameFi ?? "no-name",
   }));
 
-  const purposeOptions = filterNonNullable(
-    purposes?.edges.map((n) => n?.node)
-  ).map((n) => ({
+  const purposeOptions = filterNonNullable(purposes?.edges.map((n) => n?.node)).map((n) => ({
     value: n.pk ?? -1,
     label: n.nameFi ?? "no-name",
   }));
-  const qualifierOptions = filterNonNullable(
-    qualifiers?.edges.map((n) => n?.node)
-  ).map((n) => ({
+  const qualifierOptions = filterNonNullable(qualifiers?.edges.map((n) => n?.node)).map((n) => ({
     value: n.pk ?? -1,
     label: n.nameFi ?? "no-name",
   }));
-  const reservationUnitTypeOptions = filterNonNullable(
-    reservationUnitTypes?.edges.map((n) => n?.node)
-  ).map((n) => ({
+  const reservationUnitTypeOptions = filterNonNullable(reservationUnitTypes?.edges.map((n) => n?.node)).map((n) => ({
     value: n.pk ?? -1,
     label: n.nameFi ?? "no-name",
   }));
@@ -69,19 +58,14 @@ export function DescriptionSection({
     errors.descriptionSv != null;
 
   return (
-    <EditAccordion
-      open={hasErrors}
-      heading={t("ReservationUnitEditor.typesProperties")}
-    >
+    <EditAccordion open={hasErrors} heading={t("ReservationUnitEditor.typesProperties")}>
       <AutoGrid $minWidth="20rem">
         <ControlledSelect
           control={control}
           name="reservationUnitType"
           required
           label={t(`ReservationUnitEditor.label.reservationUnitType`)}
-          placeholder={t(
-            `ReservationUnitEditor.reservationUnitTypePlaceholder`
-          )}
+          placeholder={t(`ReservationUnitEditor.reservationUnitTypePlaceholder`)}
           options={reservationUnitTypeOptions}
           helper={t("ReservationUnitEditor.reservationUnitTypeHelperText")}
           error={getTranslatedError(t, errors.reservationUnitType?.message)}
@@ -114,35 +98,29 @@ export function DescriptionSection({
           options={qualifierOptions}
           tooltip={t("ReservationUnitEditor.tooltip.qualifiers")}
         />
-        {(["descriptionFi", "descriptionEn", "descriptionSv"] as const).map(
-          (fieldName) => (
-            <Controller
-              control={control}
-              name={fieldName}
-              key={fieldName}
-              render={({ field: { ...field } }) => (
-                <RichTextInput
-                  {...field}
-                  required
-                  style={{ gridColumn: "1 / -1" }}
-                  id={fieldName}
-                  label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                  errorText={getTranslatedError(t, errors[fieldName]?.message)}
-                  tooltipText={getTranslatedTooltipTex(t, fieldName)}
-                />
-              )}
-            />
-          )
-        )}
+        {(["descriptionFi", "descriptionEn", "descriptionSv"] as const).map((fieldName) => (
+          <Controller
+            control={control}
+            name={fieldName}
+            key={fieldName}
+            render={({ field: { ...field } }) => (
+              <RichTextInput
+                {...field}
+                required
+                style={{ gridColumn: "1 / -1" }}
+                id={fieldName}
+                label={t(`ReservationUnitEditor.label.${fieldName}`)}
+                errorText={getTranslatedError(t, errors[fieldName]?.message)}
+                tooltipText={getTranslatedTooltipTex(t, fieldName)}
+              />
+            )}
+          />
+        ))}
         <Controller
           control={control}
           name="images"
           render={({ field: { value, onChange } }) => (
-            <ImageEditor
-              images={value}
-              setImages={onChange}
-              style={{ gridColumn: "1 / -1" }}
-            />
+            <ImageEditor images={value} setImages={onChange} style={{ gridColumn: "1 / -1" }} />
           )}
         />
       </AutoGrid>

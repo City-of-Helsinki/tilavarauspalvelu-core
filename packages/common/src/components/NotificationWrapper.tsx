@@ -13,9 +13,7 @@ const StyledNotification = styled(Notification)`
   }
 `;
 
-function NotificationWrapper(
-  props: NotificationPropsWithCentering
-): JSX.Element | null {
+function NotificationWrapper(props: NotificationPropsWithCentering): JSX.Element | null {
   const [isVisible, setIsVisible] = useState(true);
 
   if (!isVisible) {

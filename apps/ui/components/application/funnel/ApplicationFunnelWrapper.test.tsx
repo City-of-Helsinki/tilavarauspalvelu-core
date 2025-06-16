@@ -31,35 +31,22 @@ describe("Stepper when starting application", () => {
     ["page4", "application:preview.subHeading"],
   ] as const)("application %s title", ([page, subtitle]) => {
     const application = createMockApplicationFragment({ page });
-    const view = render(
-      <ApplicationFunnelWrapper application={application} page={page} />
-    );
-    expect(
-      view.getByRole("heading", { name: "application:heading" })
-    ).toBeInTheDocument();
+    const view = render(<ApplicationFunnelWrapper application={application} page={page} />);
+    expect(view.getByRole("heading", { name: "application:heading" })).toBeInTheDocument();
     expect(view.getByText(subtitle)).toBeInTheDocument();
     expect(view.getByRole("heading", { name: subtitle })).toBeInTheDocument();
   });
 
-  test.for([["page1"], ["page2"], ["page3"], ["page4"]] as const)(
-    "application %s breadcrumb",
-    ([page]) => {
-      const application = createMockApplicationFragment({ page });
-      const view = render(
-        <ApplicationFunnelWrapper application={application} page={page} />
-      );
-      expect(
-        view.getByRole("link", { name: "breadcrumb:frontpage" })
-      ).toBeInTheDocument();
-      expect(
-        view.getByRole("link", { name: "breadcrumb:applications" })
-      ).toBeInTheDocument();
-      // current not a link
-      const current = view.getByText("breadcrumb:application");
-      expect(current).toBeInTheDocument();
-      expect(current).toHaveAttribute("aria-current", "true");
-    }
-  );
+  test.for([["page1"], ["page2"], ["page3"], ["page4"]] as const)("application %s breadcrumb", ([page]) => {
+    const application = createMockApplicationFragment({ page });
+    const view = render(<ApplicationFunnelWrapper application={application} page={page} />);
+    expect(view.getByRole("link", { name: "breadcrumb:frontpage" })).toBeInTheDocument();
+    expect(view.getByRole("link", { name: "breadcrumb:applications" })).toBeInTheDocument();
+    // current not a link
+    const current = view.getByText("breadcrumb:application");
+    expect(current).toBeInTheDocument();
+    expect(current).toHaveAttribute("aria-current", "true");
+  });
 
   test.for([
     ["page1", "DRAFT"],
@@ -68,42 +55,28 @@ describe("Stepper when starting application", () => {
     ["page4", "RECEIVED"],
   ] as const)("application %s status = %s", ([page, status]) => {
     const application = createMockApplicationFragment({ page });
-    const view = render(
-      <ApplicationFunnelWrapper application={application} page={page} />
-    );
+    const view = render(<ApplicationFunnelWrapper application={application} page={page} />);
     const statusLabel = `application:status.${status}`;
     expect(view.getByText(statusLabel)).toBeInTheDocument();
   });
 
-  test.for([["page1"], ["page2"], ["page3"], ["page4"]] as const)(
-    "application %s notes when applying",
-    ([page]) => {
-      const application = createMockApplicationFragment({ page });
-      const view = render(
-        <ApplicationFunnelWrapper application={application} page={page} />
-      );
-      expect(
-        view.getByRole("heading", {
-          name: "applicationRound:notesWhenApplying",
-        })
-      ).toBeInTheDocument();
-      expect(view.getByText("Notes when applying FI")).toBeInTheDocument();
-    }
-  );
+  test.for([["page1"], ["page2"], ["page3"], ["page4"]] as const)("application %s notes when applying", ([page]) => {
+    const application = createMockApplicationFragment({ page });
+    const view = render(<ApplicationFunnelWrapper application={application} page={page} />);
+    expect(
+      view.getByRole("heading", {
+        name: "applicationRound:notesWhenApplying",
+      })
+    ).toBeInTheDocument();
+    expect(view.getByText("Notes when applying FI")).toBeInTheDocument();
+  });
 
-  test.for([["page1"], ["page2"], ["page3"], ["page4"]] as const)(
-    "application %s NO notes when applying",
-    ([page]) => {
-      const application = createMockApplicationFragment({
-        page,
-        notesWhenApplying: null,
-      });
-      const view = render(
-        <ApplicationFunnelWrapper application={application} page={page} />
-      );
-      expect(
-        view.queryByText("applicationRound:notesWhenApplying")
-      ).not.toBeInTheDocument();
-    }
-  );
+  test.for([["page1"], ["page2"], ["page3"], ["page4"]] as const)("application %s NO notes when applying", ([page]) => {
+    const application = createMockApplicationFragment({
+      page,
+      notesWhenApplying: null,
+    });
+    const view = render(<ApplicationFunnelWrapper application={application} page={page} />);
+    expect(view.queryByText("applicationRound:notesWhenApplying")).not.toBeInTheDocument();
+  });
 });

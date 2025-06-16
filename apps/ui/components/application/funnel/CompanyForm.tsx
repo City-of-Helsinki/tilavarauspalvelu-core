@@ -18,9 +18,7 @@ export function CompanyForm(): JSX.Element {
       <ApplicationFormTextInput name="organisation.name" />
       <ApplicationFormTextInput name="organisation.coreBusiness" />
       <ApplicationFormTextInput name="organisation.identifier" />
-      <FormSubHeading>
-        {t("application:Page3.sectionHeadings.postalAddress")}
-      </FormSubHeading>
+      <FormSubHeading>{t("application:Page3.sectionHeadings.postalAddress")}</FormSubHeading>
       <ApplicationFormTextInput name="organisation.address.streetAddress" />
       <ApplicationFormTextInput name="organisation.address.postCode" />
       <ApplicationFormTextInput name="organisation.address.city" />
@@ -41,9 +39,7 @@ export function ContactPersonSection(): JSX.Element {
 
   return (
     <>
-      <FormSubHeading>
-        {t("application:Page3.sectionHeadings.contactInfo")}
-      </FormSubHeading>
+      <FormSubHeading>{t("application:Page3.sectionHeadings.contactInfo")}</FormSubHeading>
       <ApplicationFormTextInput name="contactPerson.firstName" />
       <ApplicationFormTextInput name="contactPerson.lastName" />
       <ApplicationFormTextInput name="contactPerson.phoneNumber" />

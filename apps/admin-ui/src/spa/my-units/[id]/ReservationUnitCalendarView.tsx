@@ -20,8 +20,7 @@ export function ReservationUnitCalendarView({
   unitPk: number;
 }): JSX.Element {
   const [params] = useSearchParams();
-  const reservationUnitPk =
-    toNumber(params.get("reservationUnit")) ?? reservationUnitOptions[0]?.value;
+  const reservationUnitPk = toNumber(params.get("reservationUnit")) ?? reservationUnitOptions[0]?.value;
   const today = formatISO(startOfDay(new Date()));
 
   const [begin, setBegin] = useState(today);
@@ -29,11 +28,7 @@ export function ReservationUnitCalendarView({
   return (
     <>
       <AutoGrid>
-        <SelectFilterStyled
-          name="reservationUnit"
-          clearable={false}
-          options={reservationUnitOptions}
-        />
+        <SelectFilterStyled name="reservationUnit" clearable={false} options={reservationUnitOptions} />
       </AutoGrid>
       <Flex $justifyContent="center" $direction="row">
         <WeekNavigation
@@ -47,11 +42,7 @@ export function ReservationUnitCalendarView({
         />
       </Flex>
       {reservationUnitPk && (
-        <ReservationUnitCalendar
-          begin={begin}
-          reservationUnitPk={reservationUnitPk}
-          unitPk={unitPk}
-        />
+        <ReservationUnitCalendar begin={begin} reservationUnitPk={reservationUnitPk} unitPk={unitPk} />
       )}
     </>
   );

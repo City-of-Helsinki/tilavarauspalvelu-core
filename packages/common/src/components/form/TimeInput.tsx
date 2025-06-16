@@ -77,15 +77,7 @@ type TimeInputProps = {
 /// this breaks all react-hook-forms because they rely on resetting the value (both controlled / uncontrolled)
 /// TODO if you use this on ui side check accessibility
 export const TimeInput = forwardRef(function TimeInput(
-  {
-    error,
-    label,
-    className,
-    style,
-    onChange,
-    onKeyDown,
-    ...props
-  }: TimeInputProps,
+  { error, label, className, style, onChange, onKeyDown, ...props }: TimeInputProps,
   ref: Ref<HTMLInputElement>
 ) {
   // block if the input is not a number or :
@@ -110,22 +102,13 @@ export const TimeInput = forwardRef(function TimeInput(
     } else if (e.key === "Backspace") {
       // automatically delete ':' - To simplify the logic we only care non selected variation here
       // there are issues when user selects ':' + other numbers around it (getting blocked by the validator)
-      if (
-        value.length === 3 &&
-        (selectionStart === 2 || selectionStart === 3) &&
-        selectionEnd === 3
-      ) {
+      if (value.length === 3 && (selectionStart === 2 || selectionStart === 3) && selectionEnd === 3) {
         e.currentTarget.value = value.slice(0, 2);
       }
     } else if (e.key === "Delete") {
       // TODO Same as backspace
     } else if (
-      ((e.key === "v" ||
-        e.key === "z" ||
-        e.key === "x" ||
-        e.key === "c" ||
-        e.key === "a") &&
-        e.ctrlKey) ||
+      ((e.key === "v" || e.key === "z" || e.key === "x" || e.key === "c" || e.key === "a") && e.ctrlKey) ||
       e.metaKey
     ) {
       // noop

@@ -18,10 +18,7 @@ const Button = styled.button<{ $checked: boolean }>`
   --button-height: ${BUTTON_HEIGHT};
 
   box-sizing: border-box;
-  border: ${({ $checked }) =>
-    $checked
-      ? "1px solid var(--color-checked)"
-      : "1px solid var(--color-border)"};
+  border: ${({ $checked }) => ($checked ? "1px solid var(--color-checked)" : "1px solid var(--color-border)")};
   border-radius: 2px;
   max-width: 163px;
   min-width: 163px;
@@ -63,13 +60,7 @@ const Label = styled.span`
   text-align: center;
 `;
 
-export function RadioButtonWithImage({
-  id,
-  icon,
-  label,
-  checked,
-  onClick,
-}: Props): JSX.Element {
+export function RadioButtonWithImage({ id, icon, label, checked, onClick }: Props): JSX.Element {
   const clickHandler = (e: React.MouseEvent) => {
     e.preventDefault();
     onClick();
@@ -81,14 +72,7 @@ export function RadioButtonWithImage({
     }
   };
   return (
-    <Button
-      id={id}
-      type="button"
-      onClick={clickHandler}
-      tabIndex={0}
-      onKeyDown={keyDownHandler}
-      $checked={checked}
-    >
+    <Button id={id} type="button" onClick={clickHandler} tabIndex={0} onKeyDown={keyDownHandler} $checked={checked}>
       <InnerWrapper $checked={checked}>
         {icon}
         <Label>{label}</Label>

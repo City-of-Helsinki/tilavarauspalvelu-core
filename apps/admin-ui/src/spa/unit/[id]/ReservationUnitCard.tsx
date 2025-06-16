@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  IconArrowRight,
-  IconLayers,
-  IconHome,
-  IconGroup,
-  IconPen,
-  IconCheck,
-} from "hds-react";
+import { IconArrowRight, IconLayers, IconHome, IconGroup, IconPen, IconCheck } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { type ReservationUnitCardFragment } from "@gql/gql-types";
 import { getImageSource, getMainImage } from "common/src/helpers";
@@ -22,10 +15,7 @@ interface IProps {
   unitId: number;
 }
 
-export function ReservationUnitCard({
-  reservationUnit,
-  unitId,
-}: Readonly<IProps>): JSX.Element {
+export function ReservationUnitCard({ reservationUnit, unitId }: Readonly<IProps>): JSX.Element {
   const { t } = useTranslation();
 
   const image = getMainImage(reservationUnit);

@@ -8,13 +8,7 @@ import {
 } from "@gql/gql-types";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import {
-  Button,
-  TextInput,
-  Notification,
-  ButtonVariant,
-  LoadingSpinner,
-} from "hds-react";
+import { Button, TextInput, Notification, ButtonVariant, LoadingSpinner } from "hds-react";
 import styled from "styled-components";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { fromUIDate } from "common/src/common/util";
@@ -25,11 +19,7 @@ import {
 } from "@/schemas";
 import { type NewReservationListItem } from "@/component/ReservationsList";
 import { WeekdaysSelector } from "./WeekdaysSelector";
-import {
-  useCreateRecurringReservation,
-  useFilteredReservationList,
-  useMultipleReservation,
-} from "./hooks";
+import { useCreateRecurringReservation, useFilteredReservationList, useMultipleReservation } from "./hooks";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
@@ -41,10 +31,7 @@ import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { useDisplayError } from "common/src/hooks";
 import { getSeriesOverlapErrors } from "common/src/apolloUtils";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import {
-  ReservationListEditor,
-  isReservationEq,
-} from "@/component/ReservationListEditor";
+import { ReservationListEditor, isReservationEq } from "@/component/ReservationListEditor";
 import { getBufferTime, getNormalizedInterval } from "@/helpers";
 import { SelectFilter } from "@/component/QueryParamFilters";
 
@@ -55,13 +42,8 @@ const InnerTextInput = styled(TextInput)`
 
 const TRANS_PREFIX = "MyUnits.RecurringReservationForm";
 
-function filterOutRemovedReservations(
-  items: NewReservationListItem[],
-  removedReservations: NewReservationListItem[]
-) {
-  return items.filter(
-    (x) => !removedReservations.find((y) => isReservationEq(x, y))
-  );
+function filterOutRemovedReservations(items: NewReservationListItem[], removedReservations: NewReservationListItem[]) {
+  return items.filter((x) => !removedReservations.find((y) => isReservationEq(x, y)));
 }
 
 type Props = {
@@ -98,11 +80,7 @@ function RecurringReservationFormWrapper({ reservationUnits }: Props) {
     <>
       <AutoGrid>
         <Element $start>
-          <SelectFilter
-            name="reservationUnit"
-            sort
-            options={reservationUnitOptions}
-          />
+          <SelectFilter name="reservationUnit" sort options={reservationUnitOptions} />
         </Element>
       </AutoGrid>
       <RecurringReservationForm reservationUnit={reservationUnit} />
@@ -113,16 +91,10 @@ function RecurringReservationFormWrapper({ reservationUnits }: Props) {
 export { RecurringReservationFormWrapper as RecurringReservationForm };
 
 type FormValues = RecurringReservationFormT & ReservationFormMeta;
-function RecurringReservationForm({
-  reservationUnit,
-}: {
-  reservationUnit: Maybe<CreateStaffReservationFragment>;
-}) {
+function RecurringReservationForm({ reservationUnit }: { reservationUnit: Maybe<CreateStaffReservationFragment> }) {
   const { t } = useTranslation();
 
-  const interval = getNormalizedInterval(
-    reservationUnit?.reservationStartInterval
-  );
+  const interval = getNormalizedInterval(reservationUnit?.reservationStartInterval);
 
   const form = useForm<FormValues>({
     // TODO onBlur doesn't work properly we have to submit the form to get validation errors
@@ -151,9 +123,7 @@ function RecurringReservationForm({
 
   const mutate = useCreateRecurringReservation();
 
-  const [removedReservations, setRemovedReservations] = useState<
-    NewReservationListItem[]
-  >([]);
+  const [removedReservations, setRemovedReservations] = useState<NewReservationListItem[]>([]);
   const [localError, setLocalError] = useState<string | null>(null);
 
   // Reset removed when time change (infi loop if array is unwrapped)
@@ -172,8 +142,7 @@ function RecurringReservationForm({
     setLocalError(null);
   }, [startDate, endDate, repeatOnDays, repeatPattern]);
 
-  const translateError = (errorMsg?: string) =>
-    errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "";
+  const translateError = (errorMsg?: string) => (errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "");
 
   const newReservations = useMultipleReservation({
     values: watch(),
@@ -194,11 +163,7 @@ function RecurringReservationForm({
   const navigate = useNavigate();
   const displayError = useDisplayError();
 
-  const onSubmit = async ({
-    enableBufferTimeBefore,
-    enableBufferTimeAfter,
-    ...data
-  }: FormValues) => {
+  const onSubmit = async ({ enableBufferTimeBefore, enableBufferTimeAfter, ...data }: FormValues) => {
     setLocalError(null);
 
     const skipDates = removedReservations
@@ -216,16 +181,8 @@ function RecurringReservationForm({
     }
 
     const buffers = {
-      before: getBufferTime(
-        reservationUnit.bufferTimeBefore,
-        data.type,
-        enableBufferTimeBefore
-      ),
-      after: getBufferTime(
-        reservationUnit.bufferTimeAfter,
-        data.type,
-        enableBufferTimeAfter
-      ),
+      before: getBufferTime(reservationUnit.bufferTimeBefore, data.type, enableBufferTimeBefore),
+      after: getBufferTime(reservationUnit.bufferTimeAfter, data.type, enableBufferTimeAfter),
     };
 
     try {
@@ -246,12 +203,8 @@ function RecurringReservationForm({
         // TODO show a temporary error message to the user but also refetch the collisions / remove the collisions
         // or maybe we can just retry the mutation without the collisions and show them on the next page?
         const count = overlaps.length;
-        setLocalError(
-          t("MyUnits.RecurringReservationForm.newOverlapError", { count })
-        );
-        document
-          .getElementById("create-recurring__reservations-list")
-          ?.scrollIntoView();
+        setLocalError(t("MyUnits.RecurringReservationForm.newOverlapError", { count }));
+        document.getElementById("create-recurring__reservations-list")?.scrollIntoView();
       } else {
         displayError(e);
         // on exception in RecurringReservation (because we are catching the individual errors)
@@ -358,9 +311,7 @@ function RecurringReservationForm({
                   count: newReservationsToMake.length,
                 })}
               </Strong>
-              {localError && (
-                <Notification type="alert">{localError}</Notification>
-              )}
+              {localError && <Notification type="alert">{localError}</Notification>}
               <ReservationListEditor
                 setRemovedReservations={setRemovedReservations}
                 removedReservations={removedReservations}
@@ -383,11 +334,7 @@ function RecurringReservationForm({
             </ReservationTypeForm>
           )}
 
-          <Flex
-            $direction="row"
-            $justifyContent="flex-end"
-            style={{ gridColumn: "1 / -1" }}
-          >
+          <Flex $direction="row" $justifyContent="flex-end" style={{ gridColumn: "1 / -1" }}>
             {/* cancel is disabled while sending because we have no rollback */}
             <ButtonLikeLink
               to=".."
@@ -400,9 +347,7 @@ function RecurringReservationForm({
             <Button
               type="submit"
               data-testid="recurring-reservation-form__submit-button"
-              variant={
-                isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary
-              }
+              variant={isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary}
               iconStart={isSubmitting ? <LoadingSpinner small /> : undefined}
               disabled={isDisabled || isSubmitting}
             >

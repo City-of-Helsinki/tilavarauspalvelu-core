@@ -1,36 +1,22 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import { useSearchParams } from "react-router-dom";
-import {
-  ApplicationSectionOrderingChoices,
-  useApplicationSectionsQuery,
-} from "@gql/gql-types";
+import { ApplicationSectionOrderingChoices, useApplicationSectionsQuery } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
-import {
-  LIST_PAGE_SIZE,
-  VALID_ALLOCATION_APPLICATION_STATUSES,
-} from "@/common/const";
+import { LIST_PAGE_SIZE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { errorToast } from "common/src/common/toast";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
-import {
-  ApplicationSectionsTable,
-  SORT_KEYS,
-} from "./ApplicationSectionsTable";
-import {
-  transformApplicantType,
-  transformApplicationSectionStatus,
-} from "./utils";
+import { ApplicationSectionsTable, SORT_KEYS } from "./ApplicationSectionsTable";
+import { transformApplicantType, transformApplicationSectionStatus } from "./utils";
 import { CenterSpinner } from "common/styled";
 
 type Props = {
   applicationRoundPk: number;
 };
 
-export function ApplicationSectionDataLoader({
-  applicationRoundPk,
-}: Props): JSX.Element {
+export function ApplicationSectionDataLoader({ applicationRoundPk }: Props): JSX.Element {
   const { t } = useTranslation();
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
   const [searchParams] = useSearchParams();
@@ -66,9 +52,7 @@ export function ApplicationSectionDataLoader({
     return <CenterSpinner />;
   }
 
-  const applicationSections = filterNonNullable(
-    dataToUse?.applicationSections?.edges.map((edge) => edge?.node)
-  );
+  const applicationSections = filterNonNullable(dataToUse?.applicationSections?.edges.map((edge) => edge?.node));
   const totalCount = dataToUse?.applicationSections?.totalCount ?? 0;
 
   return (
@@ -94,9 +78,7 @@ export function ApplicationSectionDataLoader({
   );
 }
 
-function transformOrderBy(
-  orderBy: string | null
-): ApplicationSectionOrderingChoices[] {
+function transformOrderBy(orderBy: string | null): ApplicationSectionOrderingChoices[] {
   if (orderBy == null) {
     return [];
   }
@@ -104,17 +86,13 @@ function transformOrderBy(
   const rest = desc ? orderBy.slice(1) : orderBy;
   switch (rest) {
     case "nameFi":
-      return desc
-        ? [ApplicationSectionOrderingChoices.NameDesc]
-        : [ApplicationSectionOrderingChoices.NameAsc];
+      return desc ? [ApplicationSectionOrderingChoices.NameDesc] : [ApplicationSectionOrderingChoices.NameAsc];
     case "preferredUnitNameFi":
       return desc
         ? [ApplicationSectionOrderingChoices.PreferredUnitNameFiDesc]
         : [ApplicationSectionOrderingChoices.PreferredUnitNameFiAsc];
     case "status":
-      return desc
-        ? [ApplicationSectionOrderingChoices.StatusDesc]
-        : [ApplicationSectionOrderingChoices.StatusAsc];
+      return desc ? [ApplicationSectionOrderingChoices.StatusDesc] : [ApplicationSectionOrderingChoices.StatusAsc];
     case "applicant":
       return desc
         ? [ApplicationSectionOrderingChoices.ApplicantDesc]
@@ -122,14 +100,8 @@ function transformOrderBy(
     case "application_id,pk":
     case "application_id,-pk":
       return desc
-        ? [
-            ApplicationSectionOrderingChoices.ApplicationPkDesc,
-            ApplicationSectionOrderingChoices.PkDesc,
-          ]
-        : [
-            ApplicationSectionOrderingChoices.ApplicationPkAsc,
-            ApplicationSectionOrderingChoices.PkAsc,
-          ];
+        ? [ApplicationSectionOrderingChoices.ApplicationPkDesc, ApplicationSectionOrderingChoices.PkDesc]
+        : [ApplicationSectionOrderingChoices.ApplicationPkAsc, ApplicationSectionOrderingChoices.PkAsc];
     default:
       return [];
   }

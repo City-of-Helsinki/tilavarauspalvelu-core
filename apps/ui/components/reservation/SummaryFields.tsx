@@ -14,10 +14,7 @@ type OptionType = {
   value: number;
 };
 
-export type OptionsRecord = Record<
-  "purpose" | "ageGroup" | "homeCity",
-  OptionType[]
->;
+export type OptionsRecord = Record<"purpose" | "ageGroup" | "homeCity", OptionType[]>;
 
 const Container = styled(AutoGrid)`
   margin-bottom: var(--spacing-2-xl);
@@ -29,12 +26,7 @@ function isNotEmpty(
   reservation: Record<string, unknown>
 ): boolean {
   const rawValue = reservation[key];
-  if (
-    rawValue == null ||
-    rawValue === "" ||
-    rawValue === false ||
-    rawValue === 0
-  ) {
+  if (rawValue == null || rawValue === "" || rawValue === false || rawValue === 0) {
     return false;
   }
   return true;
@@ -55,9 +47,7 @@ export function getApplicationFields({
     supportedFields,
     reserveeType,
   });
-  return applicationFields.filter(
-    (key): key is keyof ReservationNode => key in reservation
-  );
+  return applicationFields.filter((key): key is keyof ReservationNode => key in reservation);
 }
 
 /// Helper function to type safely pick the general fields from the reservation
@@ -74,9 +64,7 @@ export function getGeneralFields({
     reserveeType: "common",
   }).filter((n) => n !== "reserveeType");
 
-  const filteredGeneralFields = generalFields.filter(
-    (key): key is keyof ReservationNode => key in reservation
-  );
+  const filteredGeneralFields = generalFields.filter((key): key is keyof ReservationNode => key in reservation);
 
   return filteredGeneralFields;
 }
@@ -98,9 +86,7 @@ export function ApplicationFields({
 
   if (includesReserveeType && reservation.reserveeType == null) {
     // eslint-disable-next-line no-console
-    console.warn(
-      "getApplicationFields: reserveeType is null, but it is required"
-    );
+    console.warn("getApplicationFields: reserveeType is null, but it is required");
   }
   const reserveeType = includesReserveeType
     ? (reservation.reserveeType ?? CustomerTypeChoice.Individual)
@@ -112,8 +98,7 @@ export function ApplicationFields({
     reserveeType,
   }).filter((key) => isNotEmpty(key, reservation));
 
-  const hasReserveeType =
-    filteredApplicationFields.find((x) => x === "reserveeType") != null;
+  const hasReserveeType = filteredApplicationFields.find((x) => x === "reserveeType") != null;
 
   return (
     <>
@@ -122,33 +107,19 @@ export function ApplicationFields({
         <>
           {hasReserveeType && (
             <ParagraphAlt $isWide>
-              <PreviewLabel>
-                {t("reservationApplication:reserveeTypePrefix")}
-              </PreviewLabel>
+              <PreviewLabel>{t("reservationApplication:reserveeTypePrefix")}</PreviewLabel>
               <PreviewValue data-testid="reservation__reserveeType">
-                {capitalize(
-                  t(
-                    `reservationApplication:reserveeTypes.labels.${reserveeType.toLowerCase()}`
-                  )
-                )}
+                {capitalize(t(`reservationApplication:reserveeTypes.labels.${reserveeType.toLowerCase()}`))}
               </PreviewValue>
             </ParagraphAlt>
           )}
           {filteredApplicationFields.map((key) => {
             const value = convertMaybeOptionValue(key, reservation, options, t);
-            const typeNamespace =
-              reserveeType?.toLocaleLowerCase() || "individual";
+            const typeNamespace = reserveeType?.toLocaleLowerCase() || "individual";
             const labelKey = `reservationApplication:label.${typeNamespace}.${key}`;
             const label = t(labelKey);
             const testId = `reservation__${key}`;
-            return (
-              <LabelValuePair
-                key={key}
-                label={label}
-                value={value}
-                testId={testId}
-              />
-            );
+            return <LabelValuePair key={key} label={label} value={value} testId={testId} />;
           })}
         </>
       </Container>
@@ -183,21 +154,10 @@ export function GeneralFields({
         <>
           {filteredGeneralFields.map((key) => {
             const value = convertMaybeOptionValue(key, reservation, options, t);
-            const isWide =
-              ["name", "description", "freeOfChargeReason"].find(
-                (x) => x === key
-              ) != null;
+            const isWide = ["name", "description", "freeOfChargeReason"].find((x) => x === key) != null;
             const label = t(`reservationApplication:label.common.${key}`);
             const testId = `reservation__${key}`;
-            return (
-              <LabelValuePair
-                key={key}
-                label={label}
-                value={value}
-                testId={testId}
-                isWide={isWide}
-              />
-            );
+            return <LabelValuePair key={key} label={label} value={value} testId={testId} isWide={isWide} />;
           })}
         </>
       </Container>
@@ -219,27 +179,13 @@ function convertMaybeOptionValue(
     const optionsKey = key as keyof OptionsRecord;
     if (typeof rawValue !== "object" || rawValue == null) {
       // eslint-disable-next-line no-console
-      console.warn(
-        "convertMaybeOptionValue: rawValue is not object: ",
-        rawValue
-      );
+      console.warn("convertMaybeOptionValue: rawValue is not object: ", rawValue);
     }
-    if (
-      typeof rawValue === "object" &&
-      rawValue != null &&
-      "pk" in rawValue &&
-      typeof rawValue.pk === "number"
-    ) {
-      return (
-        options[optionsKey].find((option) => option.value === rawValue.pk)
-          ?.label ?? ""
-      );
+    if (typeof rawValue === "object" && rawValue != null && "pk" in rawValue && typeof rawValue.pk === "number") {
+      return options[optionsKey].find((option) => option.value === rawValue.pk)?.label ?? "";
     }
     // eslint-disable-next-line no-console
-    console.warn(
-      "convertMaybeOptionValue: rawValue is not pk, but object: ",
-      rawValue
-    );
+    console.warn("convertMaybeOptionValue: rawValue is not pk, but object: ", rawValue);
     return "unknown";
   }
   if (typeof rawValue === "boolean") {

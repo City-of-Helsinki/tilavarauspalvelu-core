@@ -6,9 +6,7 @@ import { useSearchParams } from "next/navigation";
 
 function Page() {
   const params = useSearchParams();
-  const statusCode = params.get("statusCode")
-    ? Number(params.get("statusCode"))
-    : 500;
+  const statusCode = params.get("statusCode") ? Number(params.get("statusCode")) : 500;
   return <CustomErrorComponent statusCode={statusCode} />;
 }
 

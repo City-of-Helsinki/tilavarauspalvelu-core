@@ -11,15 +11,7 @@ import { getReservationUnitUrl } from "@/common/urls";
 import { CustomTable } from "@/component/Table";
 import { MAX_NAME_LENGTH } from "@/common/const";
 import { TableLink } from "@/styled";
-import {
-  IconCheck,
-  IconClock,
-  IconEye,
-  IconEyeCrossed,
-  IconLock,
-  IconPen,
-  IconQuestionCircleFill,
-} from "hds-react";
+import { IconCheck, IconClock, IconEye, IconEyeCrossed, IconLock, IconPen, IconQuestionCircleFill } from "hds-react";
 import type { StatusLabelType } from "common/src/tags";
 import StatusLabel from "common/src/components/StatusLabel";
 import { gql } from "@apollo/client";
@@ -75,9 +67,7 @@ const getColConfig = (t: TFunction) => [
     headerName: t("ReservationUnits.headings.name"),
     key: "nameFi",
     transform: ({ nameFi, pk, unit }: ReservationUnitTableElementFragment) => (
-      <TableLink to={getReservationUnitUrl(pk, unit?.pk)}>
-        {truncate(nameFi ?? "-", MAX_NAME_LENGTH)}
-      </TableLink>
+      <TableLink to={getReservationUnitUrl(pk, unit?.pk)}>{truncate(nameFi ?? "-", MAX_NAME_LENGTH)}</TableLink>
     ),
     isSortable: true,
   },
@@ -85,16 +75,13 @@ const getColConfig = (t: TFunction) => [
     headerName: t("ReservationUnits.headings.unitName"),
     key: "unitNameFi",
     isSortable: true,
-    transform: (resUnit: ReservationUnitTableElementFragment) =>
-      resUnit.unit?.nameFi ?? "-",
+    transform: (resUnit: ReservationUnitTableElementFragment) => resUnit.unit?.nameFi ?? "-",
   },
   {
     headerName: t("ReservationUnits.headings.reservationUnitType"),
     key: "typeFi",
     isSortable: true,
-    transform: ({
-      reservationUnitType,
-    }: ReservationUnitTableElementFragment) => (
+    transform: ({ reservationUnitType }: ReservationUnitTableElementFragment) => (
       <span>{reservationUnitType?.nameFi ?? "-"}</span>
     ),
   },
@@ -102,9 +89,7 @@ const getColConfig = (t: TFunction) => [
     headerName: t("ReservationUnits.headings.maxPersons"),
     key: "maxPersons",
     isSortable: true,
-    transform: ({ maxPersons }: ReservationUnitTableElementFragment) => (
-      <span>{maxPersons || "-"}</span>
-    ),
+    transform: ({ maxPersons }: ReservationUnitTableElementFragment) => <span>{maxPersons || "-"}</span>,
   },
   {
     headerName: t("ReservationUnits.headings.surfaceArea"),

@@ -25,13 +25,7 @@ type Props = {
 function LinkPrevInner({ route, style, className }: Props): JSX.Element {
   const { t } = useTranslation();
   return (
-    <StyledLink
-      to={route || ".."}
-      relative="path"
-      style={style}
-      className={className}
-      data-testid="link__previous"
-    >
+    <StyledLink to={route || ".."} relative="path" style={style} className={className} data-testid="link__previous">
       <IconAngleLeft size={IconSize.Small} aria-hidden="true" />
       {t("common.prev")}
     </StyledLink>

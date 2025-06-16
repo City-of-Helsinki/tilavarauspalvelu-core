@@ -35,9 +35,10 @@ function getAdminApplicationStatusLabelProps(status: ApplicationStatusChoice): {
   }
 }
 
-function getCustomerApplicationStatusLabelProps(
-  status: ApplicationStatusChoice
-): { type: StatusLabelType; icon: JSX.Element } {
+function getCustomerApplicationStatusLabelProps(status: ApplicationStatusChoice): {
+  type: StatusLabelType;
+  icon: JSX.Element;
+} {
   switch (status) {
     case ApplicationStatusChoice.Draft:
       return { type: "draft", icon: <IconPen /> };
@@ -70,21 +71,14 @@ type Props = {
  *  @param slim - Optional boolean for table version.
  *  @param user - The type of user viewing the label.
  * */
-export function ApplicationStatusLabel({
-  status,
-  testId,
-  slim,
-  user,
-}: Props): JSX.Element | null {
+export function ApplicationStatusLabel({ status, testId, slim, user }: Props): JSX.Element | null {
   const { t } = useTranslation();
   if (!status) {
     return null;
   }
 
   const { type, icon } =
-    user === "admin"
-      ? getAdminApplicationStatusLabelProps(status)
-      : getCustomerApplicationStatusLabelProps(status);
+    user === "admin" ? getAdminApplicationStatusLabelProps(status) : getCustomerApplicationStatusLabelProps(status);
 
   return (
     <StatusLabel type={type} icon={icon} data-testid={testId} slim={slim}>

@@ -3,11 +3,7 @@ import { useTranslation } from "react-i18next";
 import { AutoGrid, HR } from "common/styled";
 import { SearchTags } from "@/component/SearchTags";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
-import {
-  AccessCodeState,
-  ApplicantTypeChoice,
-  ApplicationSectionStatusChoice,
-} from "@gql/gql-types";
+import { AccessCodeState, ApplicantTypeChoice, ApplicationSectionStatusChoice } from "@gql/gql-types";
 import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
 
 type UnitPkName = {
@@ -46,12 +42,10 @@ export function Filters({
     value: status,
   }));
 
-  const applicantOptions = Object.values(ApplicantTypeChoice).map(
-    (applicant) => ({
-      label: t(`Application.applicantTypes.${applicant}`),
-      value: applicant,
-    })
-  );
+  const applicantOptions = Object.values(ApplicantTypeChoice).map((applicant) => ({
+    label: t(`Application.applicantTypes.${applicant}`),
+    value: applicant,
+  }));
 
   const accessCodeOptions = Object.values(AccessCodeState).map((s) => ({
     value: s,
@@ -69,9 +63,7 @@ export function Filters({
       case "weekday":
         return t(`dayLong.${value}`);
       case "reservationUnit":
-        return (
-          reservationUnits.find((u) => u.pk === Number(value))?.nameFi ?? "-"
-        );
+        return reservationUnits.find((u) => u.pk === Number(value))?.nameFi ?? "-";
       case "eventStatus":
         return t(`ApplicationSectionStatusChoice.${value}`);
       case "accessCodeState":
@@ -104,9 +96,7 @@ export function Filters({
   // TODO these are "declined" / "approved" but the decline functionality is not implemented
   // so disabling the filter for now (there is no backend filter for it nor can it be tested)
 
-  const eventStatusOptions = (
-    statusOption === "eventShort" ? [] : eventStatusArrayLong
-  ).map((status) => ({
+  const eventStatusOptions = (statusOption === "eventShort" ? [] : eventStatusArrayLong).map((status) => ({
     label: t(`ApplicationSectionStatusChoice.${status}`),
     value: status,
   }));
@@ -117,32 +107,15 @@ export function Filters({
         <MultiSelectFilter name="unit" options={unitOptions} />
         {statusOption !== "application" ? (
           eventStatusOptions.length > 0 ? (
-            <MultiSelectFilter
-              name="eventStatus"
-              options={eventStatusOptions}
-            />
+            <MultiSelectFilter name="eventStatus" options={eventStatusOptions} />
           ) : null
         ) : (
           <MultiSelectFilter name="status" options={statusOptions} />
         )}
-        {enableApplicant && (
-          <MultiSelectFilter name="applicant" options={applicantOptions} />
-        )}
-        {enableWeekday && (
-          <MultiSelectFilter name="weekday" options={weekdayOptions} />
-        )}
-        {enableReservationUnit && (
-          <MultiSelectFilter
-            name="reservationUnit"
-            options={reservationUnitOptions}
-          />
-        )}
-        {enableAccessCodeState && (
-          <MultiSelectFilter
-            name="accessCodeState"
-            options={accessCodeOptions}
-          />
-        )}
+        {enableApplicant && <MultiSelectFilter name="applicant" options={applicantOptions} />}
+        {enableWeekday && <MultiSelectFilter name="weekday" options={weekdayOptions} />}
+        {enableReservationUnit && <MultiSelectFilter name="reservationUnit" options={reservationUnitOptions} />}
+        {enableAccessCodeState && <MultiSelectFilter name="accessCodeState" options={accessCodeOptions} />}
         <SearchFilter name="search" />
       </AutoGrid>
       <SearchTags hide={hideSearchTags} translateTag={translateTag} />

@@ -1,12 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import {
-  Button,
-  ButtonVariant,
-  Dialog,
-  IconArrowLeft,
-  LoadingSpinner,
-} from "hds-react";
+import { Button, ButtonVariant, Dialog, IconArrowLeft, LoadingSpinner } from "hds-react";
 import { StyledTag } from "./modules/newSpaceModal";
 import { SpaceForm, type SpaceUpdateForm } from "../SpaceForm";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
@@ -20,12 +14,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-export function Page2({
-  onPrevPage,
-  hasFixedParent,
-  form,
-  children,
-}: Props): JSX.Element {
+export function Page2({ onPrevPage, hasFixedParent, form, children }: Props): JSX.Element {
   const { t } = useTranslation();
   const { formState } = form;
   const { errors, isDirty, isSubmitting } = formState;
@@ -33,21 +22,13 @@ export function Page2({
   return (
     <>
       <Dialog.Header
-        title={t(
-          hasFixedParent
-            ? "SpaceModal.page2.subSpaceModalTitle"
-            : "SpaceModal.page2.modalTitle"
-        )}
+        title={t(hasFixedParent ? "SpaceModal.page2.subSpaceModalTitle" : "SpaceModal.page2.modalTitle")}
         id="modal-header"
       />
       <Dialog.Content>
         <StyledTag>{`${t("SpaceModal.phase")} 2/2`}</StyledTag>
         <p className="text-body" id="custom-dialog-content">
-          {t(
-            hasFixedParent
-              ? "SpaceModal.page2.subSpaceInfo"
-              : "SpaceModal.page2.info"
-          )}
+          {t(hasFixedParent ? "SpaceModal.page2.subSpaceInfo" : "SpaceModal.page2.info")}
         </p>
         {children}
         <div>

@@ -7,36 +7,19 @@ import {
   type ApplicationSectionCancelQuery,
   type ApplicationSectionCancelQueryVariables,
 } from "@gql/gql-types";
-import {
-  type CancelFormValues,
-  CancellationForm,
-} from "@/components/CancellationForm";
+import { type CancelFormValues, CancellationForm } from "@/components/CancellationForm";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import {
-  base64encode,
-  filterNonNullable,
-  formatApiTimeInterval,
-} from "common/src/helpers";
+import { base64encode, filterNonNullable, formatApiTimeInterval } from "common/src/helpers";
 import { getApplicationPath } from "@/modules/urls";
 import { useTranslation } from "next-i18next";
 import { ApolloError, gql } from "@apollo/client";
 import { H1 } from "common/styled";
 import { breakpoints } from "common/src/const";
-import {
-  convertLanguageCode,
-  fromApiDate,
-  getTranslationSafe,
-  toUIDate,
-} from "common/src/common/util";
+import { convertLanguageCode, fromApiDate, getTranslationSafe, toUIDate } from "common/src/common/util";
 import { useRouter } from "next/router";
-import {
-  IconCalendarEvent,
-  IconClock,
-  IconLocation,
-  IconTrash,
-} from "hds-react";
+import { IconCalendarEvent, IconClock, IconLocation, IconTrash } from "hds-react";
 import { Card } from "common/src/components";
 import styled from "styled-components";
 import { isReservationCancellable } from "@/modules/reservation";
@@ -66,9 +49,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
     },
   ];
 
-  const [onAcceptHandler, setOnAcceptHandler] = useState<(() => void) | null>(
-    null
-  );
+  const [onAcceptHandler, setOnAcceptHandler] = useState<(() => void) | null>(null);
 
   const [mutation, { loading }] = useCancelApplicationSectionMutation();
 
@@ -122,9 +103,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
   const lang = convertLanguageCode(i18n.language);
   const round = applicationSection?.application?.applicationRound;
   const { termsOfUse } = round ?? {};
-  const cancellationTerms = termsOfUse
-    ? getTranslationSafe(termsOfUse, "text", lang)
-    : null;
+  const cancellationTerms = termsOfUse ? getTranslationSafe(termsOfUse, "text", lang) : null;
 
   const modalTitle = t("reservations:cancelSection.modal.title");
   const modalContent = t("reservations:cancelSection.modal.body");
@@ -167,11 +146,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
   );
 }
 
-function getNReservations(
-  applicationSection: Readonly<
-    ApplicationSectionCancelQuery["applicationSection"]
-  >
-) {
+function getNReservations(applicationSection: Readonly<ApplicationSectionCancelQuery["applicationSection"]>) {
   const opts = applicationSection?.reservationUnitOptions;
   const allocatedSlots = opts?.flatMap((option) => option.allocatedTimeSlots);
   const reservations = allocatedSlots?.flatMap((slot) =>
@@ -195,9 +170,7 @@ function ApplicationSectionInfoCard({
   // NOTE assumes that the name of the recurringReservation is copied from applicationSection when it's created
   const name = applicationSection?.name;
   const opts = applicationSection?.reservationUnitOptions;
-  const reservationUnits = filterNonNullable(
-    opts?.flatMap((option) => option?.reservationUnit)
-  );
+  const reservationUnits = filterNonNullable(opts?.flatMap((option) => option?.reservationUnit));
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
   const firstReservationUnit = reservationUnits.find(() => true);
@@ -205,17 +178,13 @@ function ApplicationSectionInfoCard({
 
   const times = filterNonNullable(allocatedSlots).map((slot) => {
     const dayOfWeek = slot?.dayOfTheWeek;
-    const dayOfWeekString = dayOfWeek
-      ? t(`common:weekdayLongEnum.${dayOfWeek}`)
-      : "";
+    const dayOfWeekString = dayOfWeek ? t(`common:weekdayLongEnum.${dayOfWeek}`) : "";
     const { beginTime, endTime } = slot;
     return `${dayOfWeekString} ${formatApiTimeInterval({ beginTime, endTime })}`;
   });
 
   const reservationUnitName =
-    firstReservationUnit != null
-      ? getTranslationSafe(firstReservationUnit, "name", lang)
-      : "-";
+    firstReservationUnit != null ? getTranslationSafe(firstReservationUnit, "name", lang) : "-";
   const locationString = `${reservationUnitName}${reservationUnits.length > 1 ? ` +${reservationUnits.length - 1}` : ""}`;
 
   const icons = [
@@ -233,20 +202,12 @@ function ApplicationSectionInfoCard({
     },
   ];
 
-  const { reservationsBeginDate, reservationsEndDate } =
-    applicationSection ?? {};
+  const { reservationsBeginDate, reservationsEndDate } = applicationSection ?? {};
   const dateLabel = t("reservations:cancelSection.dateLabel");
   const begin = toUIDate(fromApiDate(reservationsBeginDate ?? ""));
   const end = toUIDate(fromApiDate(reservationsEndDate ?? ""));
   const text = `${dateLabel} ${begin} - ${end}`;
-  return (
-    <ApplicationInfo
-      heading={name ?? ""}
-      text={text}
-      variant="vertical"
-      infos={icons}
-    />
-  );
+  return <ApplicationInfo heading={name ?? ""} text={text} variant="vertical" infos={icons} />;
 }
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -260,10 +221,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   if (Number.isFinite(Number(pk))) {
     const id = base64encode(`ApplicationSectionNode:${pk}`);
-    const { data } = await client.query<
-      ApplicationSectionCancelQuery,
-      ApplicationSectionCancelQueryVariables
-    >({
+    const { data } = await client.query<ApplicationSectionCancelQuery, ApplicationSectionCancelQueryVariables>({
       query: ApplicationSectionCancelDocument,
       fetchPolicy: "no-cache",
       variables: { id },
@@ -368,9 +326,7 @@ export const APPLICATION_SECTION_CANCEL_QUERY = gql`
 `;
 
 export const CANCEL_APPLICATION_SECTION_MUTATION = gql`
-  mutation CancelApplicationSection(
-    $input: ApplicationSectionReservationCancellationMutationInput!
-  ) {
+  mutation CancelApplicationSection($input: ApplicationSectionReservationCancellationMutationInput!) {
     cancelAllApplicationSectionReservations(input: $input) {
       future
       cancelled

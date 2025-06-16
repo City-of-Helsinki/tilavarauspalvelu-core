@@ -12,12 +12,7 @@ import {
   isReservationUnitFreeOfCharge,
 } from "@/modules/reservationUnit";
 import Carousel from "../Carousel";
-import {
-  type Control,
-  type FieldValues,
-  type SubmitHandler,
-  type UseFormReturn,
-} from "react-hook-form";
+import { type Control, type FieldValues, type SubmitHandler, type UseFormReturn } from "react-hook-form";
 import { ControlledDateInput } from "common/src/components/form";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
@@ -105,8 +100,7 @@ const Slot = styled(Flex).attrs({
   height: 32px;
   border-width: 2px;
   border-style: solid;
-  border-color: ${({ $active }) =>
-    $active ? "var(--color-black-80)" : "var(--color-white)"};
+  border-color: ${({ $active }) => ($active ? "var(--color-black-80)" : "var(--color-white)")};
 `;
 
 const SlotButton = styled.button`
@@ -142,10 +136,7 @@ export function QuickReservation({
   const dateValue = useMemo(() => fromUIDate(formDate ?? ""), [formDate]);
   const duration = watch("duration");
 
-  const isFreeOfCharge = isReservationUnitFreeOfCharge(
-    reservationUnit?.pricings ?? [],
-    dateValue ?? new Date()
-  );
+  const isFreeOfCharge = isReservationUnitFreeOfCharge(reservationUnit?.pricings ?? [], dateValue ?? new Date());
 
   const price = getReservationUnitPrice({
     t,
@@ -188,17 +179,13 @@ export function QuickReservation({
         />
       </Selects>
 
-      <Subheading>
-        {t("reservationCalendar:quickReservation.subheading")}
-      </Subheading>
+      <Subheading>{t("reservationCalendar:quickReservation.subheading")}</Subheading>
       <div>
         <TimeChunkSection
           startingTimeOptions={startingTimeOptions}
           reservationForm={reservationForm}
           nextAvailableTime={nextAvailableTime}
-          durationString={
-            durationOptions.find((opt) => opt.value === duration)?.label ?? ""
-          }
+          durationString={durationOptions.find((opt) => opt.value === duration)?.label ?? ""}
         />
       </div>
       <Flex $direction="row" $justifyContent="space-between">
@@ -223,10 +210,7 @@ function TimeChunkSection({
   reservationForm: form,
   nextAvailableTime,
   durationString,
-}: Pick<
-  Props,
-  "startingTimeOptions" | "reservationForm" | "nextAvailableTime"
-> & {
+}: Pick<Props, "startingTimeOptions" | "reservationForm" | "nextAvailableTime"> & {
   durationString: string;
 }) {
   const { t } = useTranslation();

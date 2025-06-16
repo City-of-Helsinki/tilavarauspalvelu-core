@@ -27,14 +27,10 @@ export type CollisionInterval = {
 };
 
 /// @brief Check if two intervals collide
-export function doesIntervalCollide(
-  a: CollisionInterval,
-  b: CollisionInterval
-): boolean {
+export function doesIntervalCollide(a: CollisionInterval, b: CollisionInterval): boolean {
   const aEndBuffer = Math.max(a.buffers.after, b.buffers.before);
   const bEndBuffer = Math.max(a.buffers.before, b.buffers.after);
-  if (a.start < b.start && addSeconds(a.end, aEndBuffer) <= b.start)
-    return false;
+  if (a.start < b.start && addSeconds(a.end, aEndBuffer) <= b.start) return false;
   if (a.start >= addSeconds(b.end, bEndBuffer) && a.end > b.end) return false;
   return true;
 }
@@ -61,22 +57,14 @@ export function getBufferTime(
 export function reservationToInterval(
   x: Pick<
     CalendarReservationFragment,
-    | "begin"
-    | "end"
-    | "bufferTimeBefore"
-    | "bufferTimeAfter"
-    | "recurringReservation"
-    | "type"
+    "begin" | "end" | "bufferTimeBefore" | "bufferTimeAfter" | "recurringReservation" | "type"
   >,
   comparisonReservationType: ReservationTypeChoice
 ): CollisionInterval | null {
   if (!x || !x.begin || !x.end) {
     return null;
   }
-  const t =
-    x.type === ReservationTypeChoice.Blocked
-      ? ReservationTypeChoice.Blocked
-      : comparisonReservationType;
+  const t = x.type === ReservationTypeChoice.Blocked ? ReservationTypeChoice.Blocked : comparisonReservationType;
   return {
     start: new Date(x.begin),
     end: new Date(x.end),
@@ -108,10 +96,7 @@ export const COMBINE_AFFECTED_RESERVATIONS_FRAGMENT = gql`
 `;
 
 function isAffecting(
-  reservation: Pick<
-    CombineAffectedReservationsFragment,
-    "affectedReservationUnits"
-  >,
+  reservation: Pick<CombineAffectedReservationsFragment, "affectedReservationUnits">,
   resUnitPk: number
 ) {
   return reservation.affectedReservationUnits?.some((pk) => pk === resUnitPk);
@@ -125,12 +110,10 @@ export function combineAffectingReservations<T extends AffectedReservations>(
   }
 
   // NOTE we could use a recular concat here (we only have single reservationUnit here)
-  const affectingReservations = filterNonNullable(
-    data.affectingReservations
-  ).filter((y) => isAffecting(y, reservationUnitPk));
-  const reservationSet = filterNonNullable(
-    data.reservationUnit?.reservations
-  ).concat(affectingReservations);
+  const affectingReservations = filterNonNullable(data.affectingReservations).filter((y) =>
+    isAffecting(y, reservationUnitPk)
+  );
+  const reservationSet = filterNonNullable(data.reservationUnit?.reservations).concat(affectingReservations);
   return filterNonNullable(reservationSet);
 }
 
@@ -162,16 +145,13 @@ export function getApplicantName(app: ApplicantNameFieldsFragment): string {
 }
 
 export function isApplicationRoundInProgress(
-  round:
-    | Maybe<Pick<ApplicationRoundNode, "status" | "reservationCreationStatus">>
-    | undefined
+  round: Maybe<Pick<ApplicationRoundNode, "status" | "reservationCreationStatus">> | undefined
 ): boolean {
   if (!round) {
     return false;
   }
   return (
-    round.reservationCreationStatus ===
-      ApplicationRoundReservationCreationStatusChoice.NotCompleted &&
+    round.reservationCreationStatus === ApplicationRoundReservationCreationStatusChoice.NotCompleted &&
     round.status === ApplicationRoundStatusChoice.Handled
   );
 }
@@ -180,9 +160,7 @@ export function isApplicationRoundInProgress(
 /// @param interval
 /// @return Normalized interval
 /// @desc reservations made in the admin ui don't follow the customer interval rules
-export function getNormalizedInterval(
-  interval: Maybe<ReservationStartInterval> | undefined
-) {
+export function getNormalizedInterval(interval: Maybe<ReservationStartInterval> | undefined) {
   return interval === ReservationStartInterval.Interval_15Mins
     ? ReservationStartInterval.Interval_15Mins
     : ReservationStartInterval.Interval_30Mins;

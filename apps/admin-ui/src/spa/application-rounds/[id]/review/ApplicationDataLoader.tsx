@@ -2,10 +2,7 @@ import React from "react";
 import { gql } from "@apollo/client";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "next-i18next";
-import {
-  ApplicationOrderingChoices,
-  useApplicationsQuery,
-} from "@gql/gql-types";
+import { ApplicationOrderingChoices, useApplicationsQuery } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { errorToast } from "common/src/common/toast";
@@ -19,9 +16,7 @@ type Props = {
   applicationRoundPk: number;
 };
 
-export function ApplicationDataLoader({
-  applicationRoundPk,
-}: Props): JSX.Element {
+export function ApplicationDataLoader({ applicationRoundPk }: Props): JSX.Element {
   const { t } = useTranslation();
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
 
@@ -55,9 +50,7 @@ export function ApplicationDataLoader({
     return <CenterSpinner />;
   }
 
-  const applications = filterNonNullable(
-    dataToUse?.applications?.edges?.map((edge) => edge?.node)
-  );
+  const applications = filterNonNullable(dataToUse?.applications?.edges?.map((edge) => edge?.node));
   const totalCount = dataToUse?.applications?.totalCount ?? 0;
 
   return (
@@ -83,9 +76,7 @@ export function ApplicationDataLoader({
   );
 }
 
-function transformOrderBy(
-  orderBy: string | null
-): ApplicationOrderingChoices[] {
+function transformOrderBy(orderBy: string | null): ApplicationOrderingChoices[] {
   if (orderBy == null) {
     return [];
   }
@@ -93,25 +84,17 @@ function transformOrderBy(
   const rest = desc ? orderBy.slice(1) : orderBy;
   switch (rest) {
     case "applicantType":
-      return desc
-        ? [ApplicationOrderingChoices.ApplicantTypeDesc]
-        : [ApplicationOrderingChoices.ApplicantTypeAsc];
+      return desc ? [ApplicationOrderingChoices.ApplicantTypeDesc] : [ApplicationOrderingChoices.ApplicantTypeAsc];
     case "applicant":
-      return desc
-        ? [ApplicationOrderingChoices.ApplicantDesc]
-        : [ApplicationOrderingChoices.ApplicantAsc];
+      return desc ? [ApplicationOrderingChoices.ApplicantDesc] : [ApplicationOrderingChoices.ApplicantAsc];
     case "pk":
-      return desc
-        ? [ApplicationOrderingChoices.PkDesc]
-        : [ApplicationOrderingChoices.PkAsc];
+      return desc ? [ApplicationOrderingChoices.PkDesc] : [ApplicationOrderingChoices.PkAsc];
     case "preferredUnitNameFi":
       return desc
         ? [ApplicationOrderingChoices.PreferredUnitNameFiDesc]
         : [ApplicationOrderingChoices.PreferredUnitNameFiAsc];
     case "application_status":
-      return desc
-        ? [ApplicationOrderingChoices.StatusDesc]
-        : [ApplicationOrderingChoices.StatusAsc];
+      return desc ? [ApplicationOrderingChoices.StatusDesc] : [ApplicationOrderingChoices.StatusAsc];
     default:
       return [];
   }

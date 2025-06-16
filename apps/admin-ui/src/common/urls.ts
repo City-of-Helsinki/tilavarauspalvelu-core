@@ -12,9 +12,7 @@ export const reservationsUrl = "/reservations";
 export const allReservationsUrl = "/reservations/all";
 export const myUnitsUrl = "/my-units";
 
-export function getApplicationRoundUrl(
-  applicationRoundId: Maybe<number> | undefined
-): string {
+export function getApplicationRoundUrl(applicationRoundId: Maybe<number> | undefined): string {
   if (applicationRoundId == null || !(applicationRoundId > 0)) {
     return "";
   }
@@ -25,10 +23,7 @@ export function getApplicationRoundUrl(
 /// @param includePrefix is for anchor or vanilla js route manipulation
 /// @returns the url for the reservation
 /// Generally never enable includePrefix use react-router-dom link / router instead.
-export function getReservationUrl(
-  pk: Maybe<number> | undefined,
-  includePrefix = false
-): string {
+export function getReservationUrl(pk: Maybe<number> | undefined, includePrefix = false): string {
   if (pk == null || !(pk > 0)) {
     return "";
   }
@@ -36,10 +31,7 @@ export function getReservationUrl(
   return `${prefix}${reservationsUrl}/${pk}`;
 }
 
-export function getApplicationUrl(
-  pk: Maybe<number> | undefined,
-  sectionPk?: Maybe<number> | undefined
-): string {
+export function getApplicationUrl(pk: Maybe<number> | undefined, sectionPk?: Maybe<number> | undefined): string {
   if (pk == null || !(pk > 0)) {
     return "";
   }
@@ -60,29 +52,21 @@ export function getReservationUnitUrl(
   return `/unit/${unitPk}/reservationUnit/${reservationUnitPk ?? ""}`;
 }
 
-export function getSpacesResourcesUrl(
-  unitPk: Maybe<number> | undefined
-): string {
+export function getSpacesResourcesUrl(unitPk: Maybe<number> | undefined): string {
   if (unitPk == null) {
     return "";
   }
   return `/unit/${unitPk}/spacesResources`;
 }
 
-export function getSpaceUrl(
-  spacePk: Maybe<number> | undefined,
-  unitPk: Maybe<number> | undefined
-): string {
+export function getSpaceUrl(spacePk: Maybe<number> | undefined, unitPk: Maybe<number> | undefined): string {
   if (spacePk == null || unitPk == null) {
     return "";
   }
   return `/unit/${unitPk}/space/${spacePk}`;
 }
 
-export function getResourceUrl(
-  resourcePk: Maybe<number> | undefined,
-  unitPk: Maybe<number> | undefined
-): string {
+export function getResourceUrl(resourcePk: Maybe<number> | undefined, unitPk: Maybe<number> | undefined): string {
   if (resourcePk == null || unitPk == null) {
     return "";
   }
@@ -97,9 +81,7 @@ export function getMyUnitUrl(unitPk: Maybe<number> | undefined): string {
   return `/my-units/${unitPk}`;
 }
 
-export function getRecurringReservationUrl(
-  pk: Maybe<string | number> | undefined
-): string {
+export function getRecurringReservationUrl(pk: Maybe<string | number> | undefined): string {
   if (pk == null || !(Number(pk) > 0)) {
     return "";
   }

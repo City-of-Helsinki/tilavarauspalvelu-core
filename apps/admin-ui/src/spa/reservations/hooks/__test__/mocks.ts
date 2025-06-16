@@ -75,9 +75,7 @@ function createReservation({
   begin: string;
   end: string;
   state?: ReservationStateChoice;
-}): NonNullable<
-  RecurringReservationQuery["recurringReservation"]
->["reservations"][number] {
+}): NonNullable<RecurringReservationQuery["recurringReservation"]>["reservations"][number] {
   return {
     bufferTimeAfter: 0,
     bufferTimeBefore: 0,
@@ -105,9 +103,7 @@ function createReservationEdge({
   startingPk,
   recurringPk,
   state = ReservationStateChoice.Confirmed,
-}: ReservationEdgeProps): NonNullable<
-  RecurringReservationQuery["recurringReservation"]
->["reservations"] {
+}: ReservationEdgeProps): NonNullable<RecurringReservationQuery["recurringReservation"]>["reservations"] {
   const begin1 = getValidInterval(0)[0];
   const end1 = getValidInterval(0)[1];
   const begin2 = getValidInterval(7)[0];
@@ -153,9 +149,7 @@ function correctRecurringReservationQueryResult(
     startingPk,
     recurringPk,
   });
-  const recurringReservation: NonNullable<
-    RecurringReservationQuery["recurringReservation"]
-  > = {
+  const recurringReservation: NonNullable<RecurringReservationQuery["recurringReservation"]> = {
     id: base64encode(`RecurringReservationNode:${recurringPk}`),
     pk: recurringPk,
     // TODO this should not be empty

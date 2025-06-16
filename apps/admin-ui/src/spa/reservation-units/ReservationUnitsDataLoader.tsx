@@ -14,39 +14,24 @@ import { errorToast } from "common/src/common/toast";
 import { CenterSpinner } from "common/styled";
 import { useTranslation } from "react-i18next";
 
-function transformOrderBy(
-  orderBy: string,
-  desc: boolean
-): ReservationUnitOrderingChoices | null {
+function transformOrderBy(orderBy: string, desc: boolean): ReservationUnitOrderingChoices | null {
   switch (orderBy) {
     case "nameFi":
-      return desc
-        ? ReservationUnitOrderingChoices.NameFiDesc
-        : ReservationUnitOrderingChoices.NameFiAsc;
+      return desc ? ReservationUnitOrderingChoices.NameFiDesc : ReservationUnitOrderingChoices.NameFiAsc;
     case "unitNameFi":
-      return desc
-        ? ReservationUnitOrderingChoices.UnitNameFiDesc
-        : ReservationUnitOrderingChoices.UnitNameFiAsc;
+      return desc ? ReservationUnitOrderingChoices.UnitNameFiDesc : ReservationUnitOrderingChoices.UnitNameFiAsc;
     case "typeFi":
-      return desc
-        ? ReservationUnitOrderingChoices.TypeFiDesc
-        : ReservationUnitOrderingChoices.TypeFiAsc;
+      return desc ? ReservationUnitOrderingChoices.TypeFiDesc : ReservationUnitOrderingChoices.TypeFiAsc;
     case "maxPersons":
-      return desc
-        ? ReservationUnitOrderingChoices.MaxPersonsDesc
-        : ReservationUnitOrderingChoices.MaxPersonsAsc;
+      return desc ? ReservationUnitOrderingChoices.MaxPersonsDesc : ReservationUnitOrderingChoices.MaxPersonsAsc;
     case "surfaceArea":
-      return desc
-        ? ReservationUnitOrderingChoices.SurfaceAreaDesc
-        : ReservationUnitOrderingChoices.SurfaceAreaAsc;
+      return desc ? ReservationUnitOrderingChoices.SurfaceAreaDesc : ReservationUnitOrderingChoices.SurfaceAreaAsc;
     default:
       return null;
   }
 }
 
-function transformSortString(
-  orderBy: string | null
-): ReservationUnitOrderingChoices[] {
+function transformSortString(orderBy: string | null): ReservationUnitOrderingChoices[] {
   if (!orderBy) {
     return [];
   }
@@ -61,9 +46,7 @@ function transformSortString(
   return [];
 }
 
-function convertToReservationUnitState(
-  state: string
-): ReservationUnitPublishingState | null {
+function convertToReservationUnitState(state: string): ReservationUnitPublishingState | null {
   switch (state) {
     case ReservationUnitPublishingState.Archived:
       return ReservationUnitPublishingState.Archived;
@@ -97,10 +80,7 @@ export function ReservationUnitsDataReader(): JSX.Element {
   const orderBy = transformSortString(sort);
 
   const [searchParams] = useSearchParams();
-  const reservationUnitTypes = searchParams
-    .getAll("reservationUnitType")
-    .map(Number)
-    .filter(Number.isInteger);
+  const reservationUnitTypes = searchParams.getAll("reservationUnitType").map(Number).filter(Number.isInteger);
 
   const reservationUnitStates = searchParams.getAll("reservationUnitState");
 
@@ -125,9 +105,7 @@ export function ReservationUnitsDataReader(): JSX.Element {
       surfaceAreaGte: surfaceAreaGte,
       textSearch: searchFilter,
       unit,
-      publishingState: reservationUnitStates.map((state) =>
-        convertToReservationUnitState(state)
-      ),
+      publishingState: reservationUnitStates.map((state) => convertToReservationUnitState(state)),
       reservationUnitType: reservationUnitTypes,
     },
     onError: () => {
@@ -140,9 +118,7 @@ export function ReservationUnitsDataReader(): JSX.Element {
   const { fetchMore, loading, data, previousData } = query;
 
   const { reservationUnits } = data ?? previousData ?? {};
-  const resUnits = filterNonNullable(
-    reservationUnits?.edges.map((edge) => edge?.node)
-  );
+  const resUnits = filterNonNullable(reservationUnits?.edges.map((edge) => edge?.node));
 
   if (loading && resUnits.length === 0) {
     return <CenterSpinner />;
@@ -150,12 +126,7 @@ export function ReservationUnitsDataReader(): JSX.Element {
 
   return (
     <>
-      <ReservationUnitsTable
-        reservationUnits={resUnits}
-        sort={sort}
-        sortChanged={onSortChanged}
-        isLoading={loading}
-      />
+      <ReservationUnitsTable reservationUnits={resUnits} sort={sort} sortChanged={onSortChanged} isLoading={loading} />
       <More
         totalCount={data?.reservationUnits?.totalCount ?? 0}
         pageInfo={data?.reservationUnits?.pageInfo}

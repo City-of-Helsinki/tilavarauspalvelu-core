@@ -19,11 +19,7 @@ function createInput({
   repeatPattern?: "weekly" | "biweekly";
 }) {
   const today = new Date();
-  const dtoday = Date.UTC(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate()
-  );
+  const dtoday = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
 
   const start = startingDate ?? today;
   // two weeks is 13 days since the last day is inclusive

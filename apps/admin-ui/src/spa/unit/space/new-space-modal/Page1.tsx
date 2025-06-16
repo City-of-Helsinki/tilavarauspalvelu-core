@@ -17,25 +17,14 @@ type Props = {
   onNextPage: () => void;
   children: React.ReactNode;
 };
-export function Page1({
-  unit,
-  closeModal,
-  hasFixedParent,
-  form,
-  onNextPage,
-  children,
-}: Props): JSX.Element {
+export function Page1({ unit, closeModal, hasFixedParent, form, onNextPage, children }: Props): JSX.Element {
   const { t } = useTranslation();
   const { control } = form;
 
   return (
     <>
       <Dialog.Header
-        title={t(
-          hasFixedParent
-            ? "SpaceModal.page1.subSpaceModalTitle"
-            : "SpaceModal.page1.modalTitle"
-        )}
+        title={t(hasFixedParent ? "SpaceModal.page1.subSpaceModalTitle" : "SpaceModal.page1.modalTitle")}
         id="modal-header"
       />
       <Dialog.Content>
@@ -64,11 +53,7 @@ export function Page1({
         <Button onClick={closeModal} variant={ButtonVariant.Secondary}>
           {t("SpaceModal.page1.buttonCancel")}
         </Button>
-        <Button
-          variant={ButtonVariant.Supplementary}
-          iconEnd={<IconArrowRight />}
-          onClick={onNextPage}
-        >
+        <Button variant={ButtonVariant.Supplementary} iconEnd={<IconArrowRight />} onClick={onNextPage}>
           {t("SpaceModal.page1.buttonNext")}
         </Button>
       </DialogActionsButtons>

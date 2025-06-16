@@ -3,10 +3,7 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { CancelledLinkSet } from "@/components/reservation/CancelledLinkSet";
 import { H1 } from "common/styled";
-import {
-  getCommonServerSideProps,
-  getReservationByOrderUuid,
-} from "@/modules/serverUtils";
+import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
 import { useTranslation } from "next-i18next";
 import { createApolloClient } from "@/modules/apolloClient";
 import {
@@ -70,10 +67,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFoundValue;
   }
 
-  const { errors } = await apolloClient.mutate<
-    DeleteReservationMutation,
-    DeleteReservationMutationVariables
-  >({
+  const { errors } = await apolloClient.mutate<DeleteReservationMutation, DeleteReservationMutationVariables>({
     mutation: DeleteReservationDocument,
     variables: {
       input: {

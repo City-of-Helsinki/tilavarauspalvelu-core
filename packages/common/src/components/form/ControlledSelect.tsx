@@ -1,13 +1,7 @@
 import React from "react";
 import { defaultFilter, Option, Select, Tooltip } from "hds-react";
 import { useTranslation } from "next-i18next";
-import {
-  type Control,
-  type FieldValues,
-  type Path,
-  useController,
-  type UseControllerProps,
-} from "react-hook-form";
+import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
 import { convertOptionToHDS, filterNonNullable, toNumber } from "../../helpers";
 import { convertLanguageCode } from "../../common/util";
 
@@ -28,9 +22,7 @@ interface SelectProps<T extends FieldValues> extends UseControllerProps<T> {
   multiselect?: boolean;
   disabled?: boolean;
   enableSearch?: boolean;
-  afterChange?: (
-    value: string | number | Array<string | number> | undefined
-  ) => void;
+  afterChange?: (value: string | number | Array<string | number> | undefined) => void;
   id?: string;
 }
 
@@ -96,9 +88,7 @@ export function ControlledSelect<T extends FieldValues>({
       return [];
     }
     if (Array.isArray(val)) {
-      const keyVals = filterNonNullable(
-        val.map((v) => opts.find((o) => o.value === v))
-      );
+      const keyVals = filterNonNullable(val.map((v) => opts.find((o) => o.value === v)));
       return keyVals.map(convertOptionToHDS);
     }
     return opts.filter((o) => o.value === val).map(convertOptionToHDS);
@@ -121,11 +111,7 @@ export function ControlledSelect<T extends FieldValues>({
         assistive,
         language,
       }}
-      tooltip={
-        tooltip != null && tooltip !== "" ? (
-          <Tooltip>{tooltip}</Tooltip>
-        ) : undefined
-      }
+      tooltip={tooltip != null && tooltip !== "" ? <Tooltip>{tooltip}</Tooltip> : undefined}
       value={toHDSValue(options, value)}
       options={options.map(convertOptionToHDS)}
       onChange={handleChange}

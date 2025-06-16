@@ -92,9 +92,7 @@ test("Renders non required text field", async () => {
   const fieldName = "description";
   const view = render(<WrappedComponent field={fieldName} />);
 
-  const input = await view.findByLabelText(
-    `reservationApplication:label.individual.${fieldName}`
-  );
+  const input = await view.findByLabelText(`reservationApplication:label.individual.${fieldName}`);
   expect(input).toBeInTheDocument();
   expect(input).not.toBeRequired();
   expect(input).toHaveValue("");
@@ -120,9 +118,7 @@ test.todo("billingEmail only allows emails or it's an error");
 
 test("ReserveeType changes translation namespaces", async () => {
   const fieldName = "name";
-  const view = render(
-    <WrappedComponent field={fieldName} required translationKey="COMMON" />
-  );
+  const view = render(<WrappedComponent field={fieldName} required translationKey="COMMON" />);
   const label = RegExp(`reservationApplication:label.common.${fieldName}`);
   const input = await view.findByLabelText(label);
   expect(input).toBeInTheDocument();
@@ -180,9 +176,7 @@ test("Renders non-required Select field", async () => {
 test("Renders required version of Select", async () => {
   const fieldName = "purpose";
   const required = true;
-  const view = render(
-    <WrappedComponent field={fieldName} required={required} />
-  );
+  const view = render(<WrappedComponent field={fieldName} required={required} />);
   // Find and click the button so the listbox is visible
   const btn = view.getByRole("combobox");
   expect(btn).toBeInTheDocument();
@@ -195,13 +189,7 @@ test("Renders required version of Select", async () => {
 
 test.skip("Renders select with a default value", async () => {
   const fieldName = "homeCity";
-  const view = render(
-    <WrappedComponent
-      field={fieldName}
-      required={false}
-      defaultValues={{ homeCity: 2 }}
-    />
-  );
+  const view = render(<WrappedComponent field={fieldName} required={false} defaultValues={{ homeCity: 2 }} />);
   // Find and click the button so the listbox is visible
   const btn = view.getByRole("combobox");
   expect(btn).toBeInTheDocument();
@@ -214,11 +202,7 @@ test.skip("Renders select with a default value", async () => {
 
 // Required checkbox makes no sense at all so not testing it
 test("Renders a checkbox for reserveeIsUnregisteredAssociation", async () => {
-  const checkfields = [
-    "applyingForFreeOfCharge",
-    "reserveeIsUnregisteredAssociation",
-    "showBillingAddress",
-  ] as const;
+  const checkfields = ["applyingForFreeOfCharge", "reserveeIsUnregisteredAssociation", "showBillingAddress"] as const;
 
   for (const field of checkfields) {
     const view = render(<WrappedComponent field={field} />);

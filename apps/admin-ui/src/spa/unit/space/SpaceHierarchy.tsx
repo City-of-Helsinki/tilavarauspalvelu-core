@@ -16,11 +16,7 @@ const Tree = styled.div`
 
 type SpaceNode = Pick<NonNullable<Node>, "pk" | "nameFi" | "parent">;
 
-function getParents(
-  root: SpaceNode | null | undefined,
-  spaces?: SpaceNode[],
-  hierarchy: SpaceNode[] = []
-) {
+function getParents(root: SpaceNode | null | undefined, spaces?: SpaceNode[], hierarchy: SpaceNode[] = []) {
   if (root) {
     hierarchy.push(root);
     const nextParentId = root.parent?.pk;
@@ -38,9 +34,5 @@ export function SpaceHierarchy({ space }: Props): JSX.Element {
   // @ts-expect-error -- FIXME this wasn't working before either, the tree raversal is broken
   const tree = getParents(space, unitSpaces, []).reverse();
 
-  return (
-    <Tree>
-      {tree.map((parent, i) => `${i !== 0 ? " › " : ""} ${parent.nameFi}`)}
-    </Tree>
-  );
+  return <Tree>{tree.map((parent, i) => `${i !== 0 ? " › " : ""} ${parent.nameFi}`)}</Tree>;
 }

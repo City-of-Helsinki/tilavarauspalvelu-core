@@ -201,13 +201,9 @@ const translations: ITranslations = {
     // TODO describe what failed if you don't know why it failed
     functionFailedTitle: ["Toiminto epäonnistui"],
     unexpectedError: ["Odottamaton virhe"],
-    errorRecurringReservationsDoneDisplay: [
-      "Virhe. Varaus tehty, mutta sen näyttäminen epäonnistui.",
-    ],
+    errorRecurringReservationsDoneDisplay: ["Virhe. Varaus tehty, mutta sen näyttäminen epäonnistui."],
     noPermission: ["Sinulla ei ole käyttöoikeutta."],
-    timeCollision: [
-      "Valitsemasi aika ei ole enää vapaana. Ole hyvä ja valitse uusi aika.",
-    ],
+    timeCollision: ["Valitsemasi aika ei ole enää vapaana. Ole hyvä ja valitse uusi aika."],
   },
   breadcrumb: {
     frontpage: ["Etusivu"],
@@ -234,9 +230,7 @@ const translations: ITranslations = {
     priceTermsTitle: ["Alennusryhmä"],
     cancelTermsTitle: ["Peruutusehdot"],
     serviceTermsTitle: ["Täydentävät ehdot"],
-    generalTermsTitle: [
-      "Helsingin kaupungin tilojen ja laitteiden varaamisen sopimusehdot",
-    ],
+    generalTermsTitle: ["Helsingin kaupungin tilojen ja laitteiden varaamisen sopimusehdot"],
   },
   errorPages: {
     accessForbidden: {
@@ -247,9 +241,7 @@ const translations: ITranslations = {
     },
     generalError: {
       title: ["Jokin meni vikaan"],
-      description: [
-        "Pahoittelut, emme valitettavasti pysty näyttämään sivua juuri nyt. Yritä myöhemmin uudelleen!",
-      ],
+      description: ["Pahoittelut, emme valitettavasti pysty näyttämään sivua juuri nyt. Yritä myöhemmin uudelleen!"],
     },
     linkToVaraamo: ["Siirry Varaamon etusivulle"],
     giveFeedback: ["Ota yhteyttä"],
@@ -265,9 +257,7 @@ const translations: ITranslations = {
   },
   // TODO used inside the ReservationUnitEditor
   DiscardReservationUnitChangesDialog: {
-    title: [
-      "Oletko varma että haluat palata takaisin tallentamatta varausyksikön tietoja?",
-    ],
+    title: ["Oletko varma että haluat palata takaisin tallentamatta varausyksikön tietoja?"],
     description: ["Varausyksikön tiedot katoavat, eikä niitä voi palauttaa."],
     discard: ["Palaa tallentamatta"],
   },
@@ -340,9 +330,7 @@ const translations: ITranslations = {
     RecurringReservation: {
       error: {
         invalidUnitId: ["Virheellinen yksikön numero."],
-        notPossibleForThisUnit: [
-          "Tälle yksikölle ei ole mahdollista tehdä toistuvaa varausta.",
-        ],
+        notPossibleForThisUnit: ["Tälle yksikölle ei ole mahdollista tehdä toistuvaa varausta."],
       },
       pageTitle: ["Tee toistuva varaus"],
       addNewReservation: ["Lisää uusi varaus"],
@@ -355,15 +343,9 @@ const translations: ITranslations = {
         failedSubtitle: ["Epäonnistuneet varaukset"],
         successSubtitle: ["Varaukset"],
         successInfo: ["Kaikki varaukset tehtiin onnistuneesti."],
-        failureInfo: [
-          "{{conflicts}} / {{total}} epäonnistui päällekkäisyyksien takia.",
-        ],
-        holidayInfo: [
-          "{{holidays}} / {{total}} varaus osuu pyhäpäivälle, mutta varaus päivälle on silti tehty.",
-        ],
-        failureInfoSecondParagraph: [
-          "Voit halutessasi etsiä näille toistoille uuden ajan varauksen sivulta.",
-        ],
+        failureInfo: ["{{conflicts}} / {{total}} epäonnistui päällekkäisyyksien takia."],
+        holidayInfo: ["{{holidays}} / {{total}} varaus osuu pyhäpäivälle, mutta varaus päivälle on silti tehty."],
+        failureInfoSecondParagraph: ["Voit halutessasi etsiä näille toistoille uuden ajan varauksen sivulta."],
         // TODO these should be in the common translations (enum)
         RejectionReadinessChoice: {
           INTERVAL_NOT_ALLOWED: ["Aloitusaika ei sallittu"],
@@ -509,15 +491,9 @@ const translations: ITranslations = {
     },
     info: {
       loadingText: ["Varauksia luodaan..."],
-      allocatedBody: [
-        "Kausivaraukset on jaettu, mutta varauksia ei ole tehty eikä vahvistettu asiakkaille.",
-      ],
-      handledBody: [
-        "Kausivaraukset on tarkistettu ja varausvahvistukset lähetetään asiakkaille.",
-      ],
-      resultsSentBody: [
-        "Kausivaraukset on tarkistettu ja varausvahvistukset on lähetetty asiakkaille.",
-      ],
+      allocatedBody: ["Kausivaraukset on jaettu, mutta varauksia ei ole tehty eikä vahvistettu asiakkaille."],
+      handledBody: ["Kausivaraukset on tarkistettu ja varausvahvistukset lähetetään asiakkaille."],
+      resultsSentBody: ["Kausivaraukset on tarkistettu ja varausvahvistukset on lähetetty asiakkaille."],
       createBtn: ["Päätä käsittely"],
       sendResultsBtn: ["Lähetä varausvahvistukset"],
       failedBtn: ["Varausten luonti epäonnistui"],
@@ -559,25 +535,15 @@ const translations: ITranslations = {
     listHandlingIngress_other: [
       "Vastuullasi on tällä hetkellä {{count}} tulevaa tai käsittelyvaiheessa olevaa hakukierrosta.",
     ],
-    listHandlingPlaceholder: [
-      "Ei vielä tulevia tai käsittelyvaiheessa olevia hakukierroksia.",
-    ],
-    listApprovalIngress_one: [
-      "Hyväksyntääsi odottaa tällä hetkellä {{count}} päätöslauselma.",
-    ],
-    listApprovalIngress_other: [
-      "Hyväksyntääsi odottaa tällä hetkellä {{count}} päätöslauselmaa",
-    ],
+    listHandlingPlaceholder: ["Ei vielä tulevia tai käsittelyvaiheessa olevia hakukierroksia."],
+    listApprovalIngress_one: ["Hyväksyntääsi odottaa tällä hetkellä {{count}} päätöslauselma."],
+    listApprovalIngress_other: ["Hyväksyntääsi odottaa tällä hetkellä {{count}} päätöslauselmaa"],
     // TODO this is used in Criteria page
     searchAndUsageTimeRanges: ["Haku- ja käyttöajanjaksot"],
     // TODO this is used in Criteria page
-    applicationPeriodTitle: [
-      "Hakukauden alkamis- ja päätymisajankohta asiakkaille",
-    ],
+    applicationPeriodTitle: ["Hakukauden alkamis- ja päätymisajankohta asiakkaille"],
     // TODO this is used in Criteria page
-    reservationPeriodTitle: [
-      "Hakuun kuuluvien varausyksiköiden varsinainen käyttöajanjakso",
-    ],
+    reservationPeriodTitle: ["Hakuun kuuluvien varausyksiköiden varsinainen käyttöajanjakso"],
     // TODO this is used in Criteria page
     usedReservationUnits: ["Kierrokselle liitetyt varausyksiköt"],
     // TODO used in TimerFrameStatus.tsx instead
@@ -799,44 +765,20 @@ const translations: ITranslations = {
         "Date can't be in the past": ["Päivämäärä ei voi olla menneisyydessä"],
         "activeFromTime is not in time format.": ["Alkamisaika ei ole aika"],
         "activeUntilTime is not in time format.": ["Päättymisaika ei ole aika"],
-        "activeFromTime can't be more than 24 hours.": [
-          "Alkamisaika ei voi olla yli 24 tuntia",
-        ],
-        "activeUntilTime can't be more than 24 hours.": [
-          "Päättymisaika ei voi olla yli 24 tuntia",
-        ],
-        "End time needs to be after start time.": [
-          "Päättymisajan tulee olla alkamisajan jälkeen",
-        ],
-        "Date needs to be within three years.": [
-          "Päivämäärän tulee olla kolmen vuoden sisällä",
-        ],
-        "Message cannot be shorter than 1 characters": [
-          "Viesti ei saa olla tyhjä",
-        ],
-        "Message cannot be longer than 500 characters": [
-          "Viesti ei saa olla yli 500 merkkiä",
-        ],
-        "String must contain at most 1000 character(s)": [
-          "Viesti ei saa olla yli 1000 merkkiä",
-        ],
-        "String must contain at most 80 character(s)": [
-          "Nimi ei saa olla yli 80 merkkiä",
-        ],
-        "String must contain at most 2000 character(s)": [
-          "Viesti ei saa olla yli 2000 merkkiä",
-        ],
-        "String must contain at most 4000 character(s)": [
-          "Viesti ei saa olla yli 4000 merkkiä",
-        ],
+        "activeFromTime can't be more than 24 hours.": ["Alkamisaika ei voi olla yli 24 tuntia"],
+        "activeUntilTime can't be more than 24 hours.": ["Päättymisaika ei voi olla yli 24 tuntia"],
+        "End time needs to be after start time.": ["Päättymisajan tulee olla alkamisajan jälkeen"],
+        "Date needs to be within three years.": ["Päivämäärän tulee olla kolmen vuoden sisällä"],
+        "Message cannot be shorter than 1 characters": ["Viesti ei saa olla tyhjä"],
+        "Message cannot be longer than 500 characters": ["Viesti ei saa olla yli 500 merkkiä"],
+        "String must contain at most 1000 character(s)": ["Viesti ei saa olla yli 1000 merkkiä"],
+        "String must contain at most 80 character(s)": ["Nimi ei saa olla yli 80 merkkiä"],
+        "String must contain at most 2000 character(s)": ["Viesti ei saa olla yli 2000 merkkiä"],
+        "String must contain at most 4000 character(s)": ["Viesti ei saa olla yli 4000 merkkiä"],
         "must be a number": ["Pitää olla numero"],
-        "lowestPrice must be lower than highestPrice": [
-          "Alin hinta pitää olla pienempi kuin ylin hinta",
-        ],
+        "lowestPrice must be lower than highestPrice": ["Alin hinta pitää olla pienempi kuin ylin hinta"],
         "taxPercentage must be selected": ["Vero prosentti pitää valita"],
-        "Begin needs to be in the future": [
-          "Alkamisajan tulee olla tulevaisuudessa",
-        ],
+        "Begin needs to be in the future": ["Alkamisajan tulee olla tulevaisuudessa"],
         "Number must be greater than or equal to 1": ["Pitää olla vähintään 1"],
         "Expected number, received null": ["Pakollinen"],
         "Max persons must be greater than min persons": [
@@ -851,12 +793,8 @@ const translations: ITranslations = {
         "Previous end must be before next begin": [
           "Aikajakso ei voi alkaa ennen kuin edellinen aikajakso on päättynyt.",
         ],
-        "time must be at 30 minute intervals": [
-          "Aikajakson tulee alkaa tasalta tai puolelta.",
-        ],
-        "time can't be more than 24 hours.": [
-          "Aika on ilmoitettava muodossa tt:mm",
-        ],
+        "time must be at 30 minute intervals": ["Aikajakson tulee alkaa tasalta tai puolelta."],
+        "time can't be more than 24 hours.": ["Aika on ilmoitettava muodossa tt:mm"],
         "Previous end can't be the same as next begin": [
           "Aikajakson päättymisaika ei voi olla sama kuin toisen aikajakson alkamisaika.",
         ],
@@ -864,24 +802,16 @@ const translations: ITranslations = {
           "Aikajakso ei voi alkaa ennen kuin edellinen aikajakso on päättynyt.",
         ],
         "description cannot be shorter than 1 characters": ["Pakollinen"],
-        "publishBeginsDate must be before end": [
-          "Julkaisuajan tulee alkaa ennen kuin se päättyy.",
-        ],
-        "reservationBeginsDate must be before end": [
-          "Varausajan tulee alkaa ennen kuin se päättyy.",
-        ],
+        "publishBeginsDate must be before end": ["Julkaisuajan tulee alkaa ennen kuin se päättyy."],
+        "reservationBeginsDate must be before end": ["Varausajan tulee alkaa ennen kuin se päättyy."],
         "duration can't be less than reservation start interval": [
           "Kesto ei voi olla pienempi kuin varauksen alkamisväli.",
         ],
         "duration must be a multiple of the reservation start interval": [
           "Keston on oltava varauksen alkamisvälin kerrannainen",
         ],
-        "access type duplicate beginDate": [
-          "Tilaan pääsyillä on oltava eri alkamisajat",
-        ],
-        "access type invalid beginDate": [
-          "Tilaan pääsyillä on virheellinen alkamisaika",
-        ],
+        "access type duplicate beginDate": ["Tilaan pääsyillä on oltava eri alkamisajat"],
+        "access type invalid beginDate": ["Tilaan pääsyillä on virheellinen alkamisaika"],
         "access types are required for publish": [
           "Varausyksikölle täytyy määrittää vähintään yksi tilaan pääsy ennen julkaisua",
         ],
@@ -955,16 +885,10 @@ const translations: ITranslations = {
     showSpacesAndResources: ["Tilat ja resurssit"],
     spacesAndResources: ["Tilojen ja resurssien hallinta"],
     showConfiguration: ["Asetukset"],
-    noSpacesResourcesTitle: [
-      "Toimipisteelle ei ole määritetty tiloja eikä resursseja",
-    ],
-    noSpacesResources: [
-      "Toimipisteellä täytyy olla vähintään yksi tila, jotta voit luoda ensimmäisen varausyksikön.",
-    ],
+    noSpacesResourcesTitle: ["Toimipisteelle ei ole määritetty tiloja eikä resursseja"],
+    noSpacesResources: ["Toimipisteellä täytyy olla vähintään yksi tila, jotta voit luoda ensimmäisen varausyksikön."],
     createSpaces: ["Luo tiloja."],
-    maintainOpeningHours: [
-      "Siirry päivittämään toimipisteesi tiedot Toimipisterekisterin kautta.",
-    ],
+    maintainOpeningHours: ["Siirry päivittämään toimipisteesi tiedot Toimipisterekisterin kautta."],
     reservationUnitTitle: ["Varausyksiköt"],
     reservationUnitReadMore: ["Lue lisää varausyksiköistä"],
     reservationUnitCreate: ["Luo uusi varausyksikkö"],
@@ -978,13 +902,9 @@ const translations: ITranslations = {
     resources: ["Resurssit"],
     addResource: ["Uusi resurssi"],
     noResources: ["Ei vielä resursseja"],
-    noResourcesSpaces: [
-      "Lisää ensin tila ja sen jälkeen voit luoda resursseja",
-    ],
+    noResourcesSpaces: ["Lisää ensin tila ja sen jälkeen voit luoda resursseja"],
     newSpacesCreatedTitle: ["Uudet tilat luotu onnistuneesti"],
-    newSpacesCreatedNotification: [
-      "Voit luoda tiloille alitiloja niin pitkälle kuin on tarpeellista.",
-    ],
+    newSpacesCreatedNotification: ["Voit luoda tiloille alitiloja niin pitkälle kuin on tarpeellista."],
     spaceDeletedTitle: ["Tila poistettu"],
     spaceDeletedNotification: ["Tila poistettu onnistuneesti"],
     resourceDeletedTitle: ["Resurssi poistettu"],
@@ -1050,9 +970,7 @@ const translations: ITranslations = {
       info: [
         "Voit muokata tiloja milloin tahansa myöhemmin. Huomioi paloturvallisuusmääräykset maksimihenkilömäärissä.",
       ],
-      subSpaceInfo: [
-        "Voit luoda yhden tai kerralla useita alitiloja, joiden nimet ja tiedot voivat vaihdella.",
-      ],
+      subSpaceInfo: ["Voit luoda yhden tai kerralla useita alitiloja, joiden nimet ja tiedot voivat vaihdella."],
       newRootSpace: ["Uusi itsenäinen tila"],
       addRowButton: ["Lisää rivi"],
       prevButton: ["Edellinen"],
@@ -1074,9 +992,7 @@ const translations: ITranslations = {
     menuEditSpace: ["Muokkaa tilatietoja"],
     menuRemoveSpace: ["Poista tila"],
     removeConflictTitle: ["Tilaa ei voi poistaa"],
-    removeConflictMessage: [
-      "Et voi poistaa tilaa. Siirrä tai poista ensin resurssi",
-    ],
+    removeConflictMessage: ["Et voi poistaa tilaa. Siirrä tai poista ensin resurssi"],
     removeConfirmationTitle: ["Haluatko varmasti poistaa tilan {{name}}?"],
     removeConfirmationMessage: [
       "Tila poistetaan kaikista varausyksiköistä, joihin se on liitetty. Et voi perua toimintoa.",
@@ -1198,9 +1114,7 @@ const translations: ITranslations = {
       lowestPriceNet: ["Alin hinta (alviton)"],
       highestPrice: ["Ylin hinta (sis. alv)"],
       highestPriceNet: ["Ylin hinta (alviton)"],
-      canApplyFreeOfCharge: [
-        "Asiakas voi pyytää hinnan alennusta tai maksuttomuutta",
-      ],
+      canApplyFreeOfCharge: ["Asiakas voi pyytää hinnan alennusta tai maksuttomuutta"],
       pricings: ["Hinnoittelu"],
       metadataSet: ["Varauslomake"],
       termsOfUseFi: ["Varausyksikkökohtaiset lisätiedot fi"],
@@ -1212,34 +1126,16 @@ const translations: ITranslations = {
       paymentTypes: ["Maksutapa"],
       priceUnit: ["Hinnan yksikkö"],
       taxPercentage: ["Hinnan alv%"],
-      reservationPendingInstructionsEn: [
-        "Varausvahvistuksen lisäohjeteksti englanniksi",
-      ],
-      reservationPendingInstructionsFi: [
-        "Varausvahvistuksen lisäohjeteksti suomeksi",
-      ],
-      reservationPendingInstructionsSv: [
-        "Varausvahvistuksen lisäohjeteksti ruotsiksi",
-      ],
+      reservationPendingInstructionsEn: ["Varausvahvistuksen lisäohjeteksti englanniksi"],
+      reservationPendingInstructionsFi: ["Varausvahvistuksen lisäohjeteksti suomeksi"],
+      reservationPendingInstructionsSv: ["Varausvahvistuksen lisäohjeteksti ruotsiksi"],
       // TODO
-      reservationConfirmedInstructionsEn: [
-        "Varausvahvistuksen lisäohjeteksti englanniksi",
-      ],
-      reservationConfirmedInstructionsFi: [
-        "Varausvahvistuksen lisäohjeteksti suomeksi",
-      ],
-      reservationConfirmedInstructionsSv: [
-        "Varausvahvistuksen lisäohjeteksti ruotsiksi",
-      ],
-      reservationCancelledInstructionsEn: [
-        "Varausvahvistuksen lisäohjeteksti englanniksi",
-      ],
-      reservationCancelledInstructionsFi: [
-        "Varausvahvistuksen lisäohjeteksti suomeksi",
-      ],
-      reservationCancelledInstructionsSv: [
-        "Varausvahvistuksen lisäohjeteksti ruotsiksi",
-      ],
+      reservationConfirmedInstructionsEn: ["Varausvahvistuksen lisäohjeteksti englanniksi"],
+      reservationConfirmedInstructionsFi: ["Varausvahvistuksen lisäohjeteksti suomeksi"],
+      reservationConfirmedInstructionsSv: ["Varausvahvistuksen lisäohjeteksti ruotsiksi"],
+      reservationCancelledInstructionsEn: ["Varausvahvistuksen lisäohjeteksti englanniksi"],
+      reservationCancelledInstructionsFi: ["Varausvahvistuksen lisäohjeteksti suomeksi"],
+      reservationCancelledInstructionsSv: ["Varausvahvistuksen lisäohjeteksti ruotsiksi"],
       reservationKind: ["Varaustyyppi"],
       bufferType: ["Tauotus"],
       options: {
@@ -1539,16 +1435,12 @@ const translations: ITranslations = {
     requireAdultReserveeLabel: ["Varaajan on oltava täysi-ikäinen"],
     requireIntroductionLabel: ["Varausyksikkö vaatii pakollisen perehdytyksen"],
     surfaceAreaHelperText: ["Tilojen yhteenlaskettua alaa ei voi pienentää"],
-    maxPersonsHelperText: [
-      "Tilojen yhteenlaskettua enimmäishenkilömäärää ei voi ylittää",
-    ],
+    maxPersonsHelperText: ["Tilojen yhteenlaskettua enimmäishenkilömäärää ei voi ylittää"],
     minPersonsHelperText: [""],
     reservationsMinDaysBeforeHelperText: [""],
     errorNoSpaces: ["Toimipisteeseen ei ole liitetty yhtään tilaa"],
     errorDataHeading: ["Datavirhe"],
-    errorParamsNotAvailable: [
-      "Parametridataa puuttuu, osa lomakkeesta voi olla epäkunnossa",
-    ],
+    errorParamsNotAvailable: ["Parametridataa puuttuu, osa lomakkeesta voi olla epäkunnossa"],
     durationHours: ["{{hours}} tuntia"],
     tosPlaceholder: ["Ohjeteksti {{language}}"],
     termsPlaceholder: ["Valitse"],
@@ -1572,16 +1464,12 @@ const translations: ITranslations = {
     saved: ["Tiedot tallennettu."],
     saveAsDraft: ["Tallenna luonnos"],
     reservationUnitCreatedNotification: ["Varausyksikkö {{name}} luotu"],
-    reservationUnitUpdatedNotification: [
-      "Varausyksikön muutokset tallennettu.",
-    ],
+    reservationUnitUpdatedNotification: ["Varausyksikön muutokset tallennettu."],
     saveSuccess: ["Tiedot tallennettu."],
     saveFailed: [
       "Valitettavasti varausyksikön tallennus / julkaisu ei juuri nyt onnistu, kokeile myöhemmin uudelleen. ({{error}})",
     ],
-    imageSaveFailed: [
-      "Varausyksikön tallennus onnistui, mutta kuvien tallennus epäonnistui.",
-    ],
+    imageSaveFailed: ["Varausyksikön tallennus onnistui, mutta kuvien tallennus epäonnistui."],
     saveAndPublish: ["Julkaise"],
     settings: ["Varausasetukset"],
     cancellationIsPossible: ["Peruutus mahdollista"],
@@ -1589,9 +1477,7 @@ const translations: ITranslations = {
     communication: ["Viestintä"],
     additionalInstructionsPlaceholder: ["Lisäohjeteksti {{language}}"],
     contactInformationLabel: ["Vastuuhenkilön yhteystiedot"],
-    contactInformationHelperText: [
-      "Vain sisäiseen käyttöön, tiedot eivät näy varaajalle",
-    ],
+    contactInformationHelperText: ["Vain sisäiseen käyttöön, tiedot eivät näy varaajalle"],
     contactInformationPlaceholder: ["Vastuuhenkilön yhteystiedot"],
     noPreviewUnsavedChangesTooltip: ["Tallenna ensin muutokset"],
     previewTooltip: ["Varausyksikön esikatselu"],
@@ -1603,9 +1489,7 @@ const translations: ITranslations = {
     publishingSettings: ["Julkaisun ajastus"],
     publishBegins: ["Julkaise alkaen"],
     publishEnds: ["Piilota alkaen"],
-    scheduledReservation: [
-      "Ajasta varauskalenterin aukiolo tai sulkeminen asiakkaille",
-    ],
+    scheduledReservation: ["Ajasta varauskalenterin aukiolo tai sulkeminen asiakkaille"],
     reservationSettings: ["Varauskalenterin ajastus"],
     handlingSettings: ["Käsittely"],
     requireAdultReserveeSettings: ["Iän tarkistus"],
@@ -1673,9 +1557,7 @@ const translations: ITranslations = {
   },
   ResourceModal: {
     modalTitle: ["Luo uusi resurssi tilalle"],
-    info: [
-      "Voit luoda kerralla yhden tilan resurssin. Niitä voivat olla esim. laitteet tai tarvikkeet.",
-    ],
+    info: ["Voit luoda kerralla yhden tilan resurssin. Niitä voivat olla esim. laitteet tai tarvikkeet."],
     selectSpace: ["Valitse tila"],
     namePlaceholder: ["Resurssin nimi  {{language}}"],
     cancel: ["Palaa tallentamatta tietoja"],
@@ -1689,9 +1571,7 @@ const translations: ITranslations = {
     menuEditResource: ["Muokkaa resurssia"],
     menuRemoveResource: ["Poista resurssi"],
     removeConfirmationTitle: ["Haluatko varmasti poistaa resurssin {{name}}?"],
-    removeConfirmationMessage: [
-      "Resurssi poistetaan toimipisteestä. Et voi perua toimintoa.",
-    ],
+    removeConfirmationMessage: ["Resurssi poistetaan toimipisteestä. Et voi perua toimintoa."],
     removeConfirmationAccept: ["Poista"],
     removeConfirmationCancel: ["Kumoa"],
     removeSuccess: ["Resurssi poistettu."],
@@ -1902,9 +1782,7 @@ const translations: ITranslations = {
     reserveeType: ["Asiakastyyppi"],
     reserveeOrganisationName: ["Yhdistyksen nimi"],
     reserveeBusinessName: ["Yrityksen nimi"],
-    reserveeShowInfosNotification: [
-      "Tiedot haetaan Helsinki-profiilista ja sen kautta Väestötietovirastolta.",
-    ],
+    reserveeShowInfosNotification: ["Tiedot haetaan Helsinki-profiilista ja sen kautta Väestötietovirastolta."],
     reserveeUnableToShowData: ["Tietoja ei voida näyttää"],
     reserveeSSN: ["Henkilötunnus"],
     reserveeAuthenticationStrength: ["Tunnistautuminen"],
@@ -1946,9 +1824,7 @@ const translations: ITranslations = {
     DenyDialog: {
       reject: ["Hylkää varaus"],
       denyReason: ["Hylkäyksen syy"],
-      denyReasonHelper: [
-        "Ilmoitus hylkäyksestä ja syy lähetetään tiedoksi varaajalle",
-      ],
+      denyReasonHelper: ["Ilmoitus hylkäyksestä ja syy lähetetään tiedoksi varaajalle"],
       successNotify: ["Varaus hylätty"],
       title: ["Vahvista varauksen hylkäys"],
       handlingDetailsHelper: ["Näytetään vain henkilökunnalle"],
@@ -1959,9 +1835,7 @@ const translations: ITranslations = {
         returnChoice: ["Palauta maksu {{ price }} €"],
         noReturnChoice: ["Ei palautusta"],
         mutationSuccess: ["Varaus hylätty ja rahat palautetaan."],
-        mutationFailure: [
-          "Varaus hylätty, mutta rahojen palautus epäonnistui.",
-        ],
+        mutationFailure: ["Varaus hylätty, mutta rahojen palautus epäonnistui."],
       },
     },
     ApproveDialog: {
@@ -2004,9 +1878,7 @@ const translations: ITranslations = {
     allocationTitle: ["Vuorojen jako"],
     applicants: ["Hakijat"],
     // TODO this is deeper in the tree (ApplicationEvents)
-    selectApplicant: [
-      "Valitse hakija nähdäksesi hakijan toivomat ajat kalenterissa.",
-    ],
+    selectApplicant: ["Valitse hakija nähdäksesi hakijan toivomat ajat kalenterissa."],
     schedulesWithoutAllocation: ["Toiveita jakamatta"],
     otherApplicants: ["Muut hakijat"],
     inAllocationHeader: ["Käsittelyssä"],
@@ -2044,9 +1916,7 @@ const translations: ITranslations = {
     unlockOptions: ["Palauta käsittelyyn"],
     errors: {
       accepting: {
-        generic: [
-          "Varmista, että hakukierros on käsittelyssä ja että valittu ajankohta on vapaana.",
-        ],
+        generic: ["Varmista, että hakukierros on käsittelyssä ja että valittu ajankohta on vapaana."],
       },
       remove: {
         generic: ['Vuoron poistaminen varaukselta "{{name}}" epäonnistui.'],
@@ -2054,18 +1924,10 @@ const translations: ITranslations = {
       },
       noPermission: ["Sinulla ei ole riittäviä oikeuksia jakaa vuoroa."],
       // TODO these are not errors but warnings that are printed as notifications
-      allocatedDurationIsIncorrect: [
-        "Jaettu vuoro ei vastaa hakijan toiveita.",
-      ],
-      requestedDurationIsIncorrect: [
-        "Valittu kesto ei vastaa hakijan toiveita.",
-      ],
-      allocatedOutsideOfRequestedTimes: [
-        "Jaettu vuoro on toiveen ulkopuolella.",
-      ],
-      selectionOutsideOfRequestedTimes: [
-        "Valittu aika on toiveiden ulkopuolella.",
-      ],
+      allocatedDurationIsIncorrect: ["Jaettu vuoro ei vastaa hakijan toiveita."],
+      requestedDurationIsIncorrect: ["Valittu kesto ei vastaa hakijan toiveita."],
+      allocatedOutsideOfRequestedTimes: ["Jaettu vuoro on toiveen ulkopuolella."],
+      selectionOutsideOfRequestedTimes: ["Valittu aika on toiveiden ulkopuolella."],
     },
   },
   validation: {
@@ -2106,11 +1968,7 @@ const traverse = (
 ): Resource => {
   Object.keys(obj).forEach((k) => {
     if (obj[k] && !Array.isArray(obj[k])) {
-      traverse(
-        obj[k],
-        `${prefix.length === 0 ? prefix : `${prefix}.`}${k}`,
-        target
-      );
+      traverse(obj[k], `${prefix.length === 0 ? prefix : `${prefix}.`}${k}`, target);
     }
     if (Array.isArray(obj[k])) {
       const key = `${prefix}.${k}`;

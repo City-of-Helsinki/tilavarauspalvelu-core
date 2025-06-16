@@ -11,11 +11,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { isReservationCancellable } from "@/modules/reservation";
-import {
-  getApplicationPath,
-  getReservationPath,
-  reservationsPrefix,
-} from "@/modules/urls";
+import { getApplicationPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
@@ -23,13 +19,9 @@ import { type TFunction } from "i18next";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
-function getBreadcrumbs(
-  t: TFunction,
-  reservation: PropsNarrowed["reservation"]
-) {
+function getBreadcrumbs(t: TFunction, reservation: PropsNarrowed["reservation"]) {
   const applicationPk =
-    reservation?.recurringReservation?.allocatedTimeSlot?.reservationUnitOption
-      ?.applicationSection?.application?.pk;
+    reservation?.recurringReservation?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
   if (applicationPk) {
     return [
       {
@@ -83,10 +75,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   if (Number.isFinite(Number(pk))) {
     const id = base64encode(`ReservationNode:${pk}`);
-    const { data } = await client.query<
-      ReservationCancelPageQuery,
-      ReservationCancelPageQueryVariables
-    >({
+    const { data } = await client.query<ReservationCancelPageQuery, ReservationCancelPageQueryVariables>({
       query: ReservationCancelPageDocument,
       fetchPolicy: "no-cache",
       variables: { id },
@@ -94,8 +83,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const { reservation } = data || {};
 
     const reasons = filterNonNullable(data?.reservationCancelReasons);
-    const canCancel =
-      reservation != null && isReservationCancellable(reservation);
+    const canCancel = reservation != null && isReservationCancellable(reservation);
     if (canCancel) {
       return {
         props: {

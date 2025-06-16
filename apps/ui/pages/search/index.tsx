@@ -51,9 +51,7 @@ function SearchSingle({ options }: Readonly<Props>): JSX.Element {
   const { data, isLoading, error, fetchMore, previousData } = query;
 
   const currData = data ?? previousData;
-  const reservationUnits = filterNonNullable(
-    currData?.reservationUnits?.edges?.map((e) => e?.node)
-  );
+  const reservationUnits = filterNonNullable(currData?.reservationUnits?.edges?.map((e) => e?.node));
   const pageInfo = currData?.reservationUnits?.pageInfo;
 
   const content = useRef<HTMLElement>(null);

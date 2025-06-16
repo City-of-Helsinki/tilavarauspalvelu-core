@@ -36,36 +36,26 @@ type RejectedOccurrencesView = {
   link: string;
 };
 
-function timeSlotMapper(
-  t: TFunction,
-  slot: RejectedOccurancesTableElementFragment
-): RejectedOccurrencesView {
+function timeSlotMapper(t: TFunction, slot: RejectedOccurancesTableElementFragment): RejectedOccurrencesView {
   const allocatedSlot = slot.recurringReservation?.allocatedTimeSlot;
-  const allocatedReservationUnit =
-    allocatedSlot?.reservationUnitOption.reservationUnit;
+  const allocatedReservationUnit = allocatedSlot?.reservationUnitOption.reservationUnit;
   const allocatedReservationUnitName = allocatedReservationUnit?.nameFi ?? "-";
   const allocatedUnit = allocatedReservationUnit?.unit?.nameFi ?? "-";
 
-  const application =
-    allocatedSlot?.reservationUnitOption.applicationSection?.application;
-  const applicantName =
-    application != null ? getApplicantName(application) : "-";
+  const application = allocatedSlot?.reservationUnitOption.applicationSection?.application;
+  const applicantName = application != null ? getApplicantName(application) : "-";
 
   const date = toUIDate(new Date(slot?.beginDatetime));
   const begin = formatTime(slot?.beginDatetime);
   const end = formatTime(slot?.endDatetime);
   const timeString = `${date} ${begin}–${end}`;
-  const name =
-    allocatedSlot?.reservationUnitOption.applicationSection.name ?? "-";
+  const name = allocatedSlot?.reservationUnitOption.applicationSection.name ?? "-";
 
   const applicationPk = application?.pk ?? 0;
   const reservationPk = slot.recurringReservation?.reservations[0]?.pk ?? null;
   const link = getReservationUrl(reservationPk);
 
-  const reason =
-    t(
-      `MyUnits.RecurringReservation.Confirmation.RejectionReadinessChoice.${slot.rejectionReason}`
-    ) ?? "-";
+  const reason = t(`MyUnits.RecurringReservation.Confirmation.RejectionReadinessChoice.${slot.rejectionReason}`) ?? "-";
   return {
     key: `${applicationPk}-${slot.pk}`,
     applicationPk,
@@ -85,18 +75,13 @@ const COLS = [
     headerTKey: "ApplicationEvent.headings.id",
     isSortable: true,
     key: "application_id,application_event_id",
-    transform: ({ pk, applicationPk }: RejectedOccurrencesView) =>
-      `${applicationPk}-${pk}`,
+    transform: ({ pk, applicationPk }: RejectedOccurrencesView) => `${applicationPk}-${pk}`,
   },
   {
     headerTKey: "ApplicationEvent.headings.customer",
     isSortable: true,
     key: "applicant",
-    transform: ({
-      applicantName,
-      applicationPk,
-      pk,
-    }: RejectedOccurrencesView) => (
+    transform: ({ applicantName, applicationPk, pk }: RejectedOccurrencesView) => (
       <ExternalTableLink to={getApplicationUrl(applicationPk, pk)}>
         {truncate(applicantName ?? "-", applicantTruncateLen)}
         <IconLinkExternal size={IconSize.ExtraSmall} />
@@ -107,26 +92,20 @@ const COLS = [
     headerTKey: "ApplicationEventSchedules.headings.eventName",
     isSortable: true,
     key: "rejected_event_name_fi",
-    transform: ({ name }: RejectedOccurrencesView) => (
-      <span>{truncate(name ?? "-", unitsTruncateLen)}</span>
-    ),
+    transform: ({ name }: RejectedOccurrencesView) => <span>{truncate(name ?? "-", unitsTruncateLen)}</span>,
   },
   {
     headerTKey: "ApplicationEvent.headings.unit",
     isSortable: true,
     key: "rejected_unit_name_fi",
-    transform: ({ unitName }: RejectedOccurrencesView) => (
-      <span>{truncate(unitName ?? "-", unitsTruncateLen)}</span>
-    ),
+    transform: ({ unitName }: RejectedOccurrencesView) => <span>{truncate(unitName ?? "-", unitsTruncateLen)}</span>,
   },
   {
     headerTKey: "ApplicationEventSchedules.headings.reservationUnit",
     isSortable: true,
     key: "rejected_reservation_unit_name_fi",
     transform: ({ allocatedReservationUnitName }: RejectedOccurrencesView) => (
-      <span>
-        {truncate(allocatedReservationUnitName ?? "-", unitsTruncateLen)}
-      </span>
+      <span>{truncate(allocatedReservationUnitName ?? "-", unitsTruncateLen)}</span>
     ),
   },
   {

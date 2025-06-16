@@ -1,13 +1,5 @@
 import React, { forwardRef } from "react";
-import {
-  IconCheck,
-  IconCogwheel,
-  IconCross,
-  IconEuroSign,
-  IconPen,
-  IconQuestionCircle,
-  IconSize,
-} from "hds-react";
+import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen, IconQuestionCircle, IconSize } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { Flex, TitleSection, H1 } from "common/styled";
 import {
@@ -85,16 +77,11 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
     });
 
     const applicationPk =
-      data?.recurringReservation?.allocatedTimeSlot?.reservationUnitOption
-        ?.applicationSection?.application?.pk;
-    const sectionPk =
-      data?.recurringReservation?.allocatedTimeSlot?.reservationUnitOption
-        ?.applicationSection?.pk;
+      data?.recurringReservation?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
+    const sectionPk = data?.recurringReservation?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.pk;
     const applicationLink = getApplicationUrl(applicationPk, sectionPk);
 
-    const paymentStatusLabelType = getStatusLabelType(
-      reservation.paymentOrder?.status
-    );
+    const paymentStatusLabelType = getStatusLabelType(reservation.paymentOrder?.status);
     const reservationState = getReservationStateLabelProps(reservation.state);
 
     return (
@@ -124,8 +111,7 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
         </TitleSection>
         <p data-testid="reservation_title_section__tagline">{tagline}</p>
         <Flex $gap="xs" $direction="row">
-          {t("RequestedReservation.createdAt")}{" "}
-          {formatDateTime(reservation.createdAt ?? "")}
+          {t("RequestedReservation.createdAt")} {formatDateTime(reservation.createdAt ?? "")}
           {applicationLink !== "" && (
             <ExternalLink to={applicationLink} size={IconSize.Small} isBold>
               {`${t("RequestedReservation.applicationLink")}: ${applicationPk}-${sectionPk}`}

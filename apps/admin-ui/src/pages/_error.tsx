@@ -5,12 +5,7 @@ import ErrorContainer from "common/src/components/ErrorContainer";
 import { env } from "@/env.mjs";
 
 const CustomErrorComponent: NextPage<ErrorProps> = (props) => {
-  return (
-    <ErrorContainer
-      statusCode={props.statusCode}
-      feedbackUrl={env.EMAIL_VARAAMO_EXT_LINK}
-    />
-  );
+  return <ErrorContainer statusCode={props.statusCode} feedbackUrl={env.EMAIL_VARAAMO_EXT_LINK} />;
 };
 
 CustomErrorComponent.getInitialProps = async (contextData) => {

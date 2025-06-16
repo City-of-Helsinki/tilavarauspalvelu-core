@@ -29,10 +29,7 @@ function getPriceFractionMinutes(unit: PriceUnit): number {
   }
 }
 
-export function getUnRoundedReservationVolume(
-  minutes: number,
-  unit: PriceUnit
-): number {
+export function getUnRoundedReservationVolume(minutes: number, unit: PriceUnit): number {
   const wholeMinutes = getPriceUnitMinutes(unit);
 
   if (!minutes || wholeMinutes === 1) {

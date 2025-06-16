@@ -1,25 +1,9 @@
-import {
-  IconClock,
-  IconGroup,
-  IconEuroSign,
-  IconHome,
-  IconSize,
-  IconLock,
-  Tooltip,
-} from "hds-react";
+import { IconClock, IconGroup, IconEuroSign, IconHome, IconSize, IconLock, Tooltip } from "hds-react";
 import React from "react";
 import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
-import {
-  convertLanguageCode,
-  formatDuration,
-  getTranslationSafe,
-  toUIDate,
-} from "common/src/common/util";
-import {
-  ReservationKind,
-  type ReservationUnitHeadFragment,
-} from "@gql/gql-types";
+import { convertLanguageCode, formatDuration, getTranslationSafe, toUIDate } from "common/src/common/util";
+import { ReservationKind, type ReservationUnitHeadFragment } from "@gql/gql-types";
 import { Flex, H1, H3 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { formatDateRange, formatDateTime } from "@/modules/util";
@@ -48,37 +32,26 @@ const NotificationWrapper = styled.div`
 `;
 
 type NonReservableNotificationProps = {
-  reservationUnit: Pick<
-    ReservationUnitHeadFragment,
-    "reservationKind" | "reservationBegins"
-  >;
+  reservationUnit: Pick<ReservationUnitHeadFragment, "reservationKind" | "reservationBegins">;
 };
 
-function formatErrorMessages(
-  t: TFunction,
-  reservationUnit: NonReservableNotificationProps["reservationUnit"]
-): string {
+function formatErrorMessages(t: TFunction, reservationUnit: NonReservableNotificationProps["reservationUnit"]): string {
   let returnText = t("reservationUnit:notifications.notReservable");
   if (reservationUnit.reservationKind === ReservationKind.Season) {
     returnText = t("reservationUnit:notifications.onlyRecurring");
   } else if (reservationUnit.reservationBegins != null) {
     const begin = new Date(reservationUnit.reservationBegins);
     if (begin > new Date()) {
-      const futureOpeningText = t(
-        "reservationUnit:notifications.futureOpening",
-        {
-          date: formatDateTime(t, begin),
-        }
-      );
+      const futureOpeningText = t("reservationUnit:notifications.futureOpening", {
+        date: formatDateTime(t, begin),
+      });
       returnText = futureOpeningText;
     }
   }
   return returnText;
 }
 
-function NonReservableNotification({
-  reservationUnit,
-}: NonReservableNotificationProps) {
+function NonReservableNotification({ reservationUnit }: NonReservableNotificationProps) {
   const { t } = useTranslation();
   const returnText = formatErrorMessages(t, reservationUnit);
 
@@ -118,18 +91,10 @@ export function Head({
         <H3 as="h2" $noMargin>
           {unitName}
         </H3>
-        <IconList
-          reservationUnit={reservationUnit}
-          subventionSuffix={subventionSuffix}
-        />
-        {!reservationUnitIsReservable && (
-          <NonReservableNotification reservationUnit={reservationUnit} />
-        )}
+        <IconList reservationUnit={reservationUnit} subventionSuffix={subventionSuffix} />
+        {!reservationUnitIsReservable && <NonReservableNotification reservationUnit={reservationUnit} />}
       </Flex>
-      <Images
-        images={reservationUnit.images}
-        contextName={reservationUnitName}
-      />
+      <Images images={reservationUnit.images} contextName={reservationUnitName} />
     </Wrapper>
   );
 }
@@ -163,9 +128,7 @@ const AccessTypeTooltipWrapper = styled.div`
   }
 `;
 
-function AccessTypeTooltip({
-  accessTypes,
-}: Pick<ReservationUnitHeadFragment, "accessTypes">): JSX.Element {
+function AccessTypeTooltip({ accessTypes }: Pick<ReservationUnitHeadFragment, "accessTypes">): JSX.Element {
   const { t } = useTranslation();
 
   const accessTypeDurations = getReservationUnitAccessPeriods(accessTypes);
@@ -175,17 +138,12 @@ function AccessTypeTooltip({
         {accessTypeDurations.map((accessTypeDuration) => (
           <li key={toUIDate(accessTypeDuration.beginDate)}>
             <span>
-              {t(
-                `reservationUnit:accessTypes.${accessTypeDuration.accessType}`
-              )}
+              {t(`reservationUnit:accessTypes.${accessTypeDuration.accessType}`)}
               {": "}
             </span>
             <span>
               {accessTypeDuration.endDate != null
-                ? formatDateRange(
-                    accessTypeDuration.beginDate,
-                    accessTypeDuration.endDate
-                  )
+                ? formatDateRange(accessTypeDuration.beginDate, accessTypeDuration.endDate)
                 : `${t("common:dateGte", { value: toUIDate(accessTypeDuration.beginDate) })}`}
             </span>
           </li>
@@ -198,9 +156,7 @@ function AccessTypeTooltip({
 function IconList({
   reservationUnit,
   subventionSuffix,
-}: Readonly<
-  Pick<HeadProps, "reservationUnit" | "subventionSuffix">
->): JSX.Element {
+}: Readonly<Pick<HeadProps, "reservationUnit" | "subventionSuffix">>): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
   const minDur = reservationUnit.minReservationDuration ?? 0;
@@ -223,22 +179,13 @@ function IconList({
       ? {
           key: "reservationUnitType",
           icon: <IconHome size={IconSize.Small} />,
-          text: getTranslationSafe(
-            reservationUnit.reservationUnitType,
-            "name",
-            lang
-          ),
+          text: getTranslationSafe(reservationUnit.reservationUnitType, "name", lang),
         }
       : null,
     reservationUnit.maxPersons != null
       ? {
           key: "maxPersons",
-          icon: (
-            <IconGroup
-              aria-label={t("reservationUnit:maxPersons")}
-              aria-hidden="false"
-            />
-          ),
+          icon: <IconGroup aria-label={t("reservationUnit:maxPersons")} aria-hidden="false" />,
           text: t("reservationUnitCard:personRange", {
             count: reservationUnit.maxPersons,
             value:
@@ -250,16 +197,10 @@ function IconList({
           }),
         }
       : null,
-    reservationUnit.minReservationDuration ||
-    reservationUnit.maxReservationDuration
+    reservationUnit.minReservationDuration || reservationUnit.maxReservationDuration
       ? {
           key: "eventDuration",
-          icon: (
-            <IconClock
-              aria-label={t("reservationCalendar:eventDuration")}
-              aria-hidden="false"
-            />
-          ),
+          icon: <IconClock aria-label={t("reservationCalendar:eventDuration")} aria-hidden="false" />,
           text: t(`reservationCalendar:eventDurationLiteral`, {
             min: minReservationDuration,
             max: maxReservationDuration,
@@ -269,12 +210,7 @@ function IconList({
     unitPrice != null
       ? {
           key: "unitPrice",
-          icon: (
-            <IconEuroSign
-              aria-label={t("prices:reservationUnitPriceLabel")}
-              aria-hidden="false"
-            />
-          ),
+          icon: <IconEuroSign aria-label={t("prices:reservationUnitPriceLabel")} aria-hidden="false" />,
           text: (
             <>
               {unitPrice}
@@ -287,15 +223,8 @@ function IconList({
     reservationUnit.currentAccessType
       ? {
           key: "accessType",
-          icon: (
-            <IconLock
-              aria-hidden="false"
-              aria-label={t("reservationUnit:accessType")}
-            />
-          ),
-          text: t(
-            `reservationUnit:accessTypes.${reservationUnit.currentAccessType}`
-          ),
+          icon: <IconLock aria-hidden="false" aria-label={t("reservationUnit:accessType")} />,
+          text: t(`reservationUnit:accessTypes.${reservationUnit.currentAccessType}`),
         }
       : null,
   ] as const);
@@ -308,9 +237,7 @@ function IconList({
         ) : (
           <AccessTypeTooltipWrapper key={key}>
             <IconWithText icon={icon} text={text} />
-            {reservationUnit.accessTypes.length > 1 && (
-              <AccessTypeTooltip accessTypes={reservationUnit.accessTypes} />
-            )}
+            {reservationUnit.accessTypes.length > 1 && <AccessTypeTooltip accessTypes={reservationUnit.accessTypes} />}
           </AccessTypeTooltipWrapper>
         )
       )}

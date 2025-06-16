@@ -38,10 +38,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  const { data } = await apolloClient.query<
-    FrontPageQuery,
-    FrontPageQueryVariables
-  >({
+  const { data } = await apolloClient.query<FrontPageQuery, FrontPageQueryVariables>({
     query: FrontPageDocument,
     fetchPolicy: "no-cache",
     variables: {
@@ -49,9 +46,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       orderUnitsBy: [UnitOrderingChoices.RankAsc],
     },
   });
-  const purposes = filterNonNullable(
-    data?.purposes?.edges.map((edge) => edge?.node)
-  );
+  const purposes = filterNonNullable(data?.purposes?.edges.map((edge) => edge?.node));
   const units = filterNonNullable(data?.units?.edges.map((edge) => edge?.node));
 
   return {
@@ -68,10 +63,7 @@ export default Home;
 
 // TODO we can limit the number of purposes and units fetched
 export const FRONT_PAGE_QUERY = gql`
-  query FrontPage(
-    $orderBy: [PurposeOrderingChoices]
-    $orderUnitsBy: [UnitOrderingChoices]
-  ) {
+  query FrontPage($orderBy: [PurposeOrderingChoices], $orderUnitsBy: [UnitOrderingChoices]) {
     purposes(orderBy: $orderBy) {
       edges {
         node {

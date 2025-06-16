@@ -2,12 +2,7 @@ import React from "react";
 import { DateInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import {
-  useController,
-  type FieldValues,
-  type Path,
-  type UseControllerProps,
-} from "react-hook-form";
+import { useController, type FieldValues, type Path, type UseControllerProps } from "react-hook-form";
 import { TimeInput } from "./TimeInput";
 
 const DateTimeWrapper = styled.div`
@@ -16,8 +11,7 @@ const DateTimeWrapper = styled.div`
   gap: var(--spacing-m);
 `;
 
-interface DateTimeProps<T extends FieldValues>
-  extends Omit<UseControllerProps<T>, "name" | "disabled"> {
+interface DateTimeProps<T extends FieldValues> extends Omit<UseControllerProps<T>, "name" | "disabled"> {
   name: { date: Path<T>; time: Path<T> };
   minDate?: Date;
   required?: boolean;

@@ -4,12 +4,7 @@ import { useRouter } from "next/router";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  base64encode,
-  filterNonNullable,
-  ignoreMaybeArray,
-  toNumber,
-} from "common/src/helpers";
+import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { useDisplayError } from "common/src/hooks";
 import { Flex } from "common/styled";
 import { uniq } from "lodash-es";
@@ -24,10 +19,7 @@ import {
 import { getApplicationPath } from "@/modules/urls";
 import { useReservationUnitList } from "@/hooks";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import {
-  ApplicationFunnelWrapper,
-  Page1 as Page1Impl,
-} from "@/components/application/funnel";
+import { ApplicationFunnelWrapper, Page1 as Page1Impl } from "@/components/application/funnel";
 import {
   type ApplicationPage1FormValues,
   ApplicationPage1SchemaRefined,
@@ -36,10 +28,7 @@ import {
 } from "@/components/application/funnel/form";
 import { getSearchOptions } from "@/modules/search";
 
-function Page1({
-  application,
-  options: optionsOrig,
-}: Pick<PropsNarrowed, "application" | "options">): JSX.Element {
+function Page1({ application, options: optionsOrig }: Pick<PropsNarrowed, "application" | "options">): JSX.Element {
   const router = useRouter();
   const dislayError = useDisplayError();
   const [mutate] = useUpdateApplicationMutation();
@@ -59,16 +48,12 @@ function Page1({
   };
 
   const { applicationRound } = application;
-  const resUnitPks = applicationRound.reservationUnits?.map(
-    (resUnit) => resUnit.unit?.pk
-  );
+  const resUnitPks = applicationRound.reservationUnits?.map((resUnit) => resUnit.unit?.pk);
   const unitsInApplicationRound = filterNonNullable(uniq(resUnitPks));
 
   const options = {
     ...optionsOrig,
-    units: optionsOrig.units.filter((u) =>
-      unitsInApplicationRound.includes(u.value)
-    ),
+    units: optionsOrig.units.filter((u) => unitsInApplicationRound.includes(u.value)),
   };
   const { getReservationUnits } = useReservationUnitList(applicationRound);
 
@@ -118,10 +103,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   }
 
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
-  const { data } = await client.query<
-    ApplicationPage1Query,
-    ApplicationPage1QueryVariables
-  >({
+  const { data } = await client.query<ApplicationPage1Query, ApplicationPage1QueryVariables>({
     query: ApplicationPage1Document,
     variables: {
       id: base64encode(`ApplicationNode:${pk}`),

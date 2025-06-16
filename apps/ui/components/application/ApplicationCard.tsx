@@ -1,15 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
-import {
-  Button,
-  ButtonSize,
-  ButtonVariant,
-  IconArrowRight,
-  IconCross,
-  IconPen,
-  LoadingSpinner,
-} from "hds-react";
+import { Button, ButtonSize, ButtonVariant, IconArrowRight, IconCross, IconPen, LoadingSpinner } from "hds-react";
 import { breakpoints } from "common/src/const";
 import {
   ApplicantTypeChoice,
@@ -35,18 +27,13 @@ const StyledButton = styled(Button)`
   }
 `;
 
-function getApplicant(
-  application: ApplicationNameFragment,
-  t: TFunction
-): string {
+function getApplicant(application: ApplicationNameFragment, t: TFunction): string {
   if (application.applicantType === ApplicantTypeChoice.Individual) {
     return t("applicationCard:person");
   }
   if (application.organisation) {
     return t("applicationCard:organisation", {
-      type: t(
-        `applicationCard:applicantType.${application.applicantType?.toLocaleLowerCase()}`
-      ),
+      type: t(`applicationCard:applicantType.${application.applicantType?.toLocaleLowerCase()}`),
       name: application.organisation?.nameFi || t("applicationCard:noName"),
     });
   }
@@ -57,9 +44,7 @@ function getApplicant(
   return "";
 }
 
-function isEditable(
-  status: Maybe<ApplicationStatusChoice> | undefined
-): boolean {
+function isEditable(status: Maybe<ApplicationStatusChoice> | undefined): boolean {
   if (status === ApplicationStatusChoice.Draft) {
     return true;
   }
@@ -75,10 +60,7 @@ type Props = {
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 };
 
-export function ApplicationCard({
-  application,
-  actionCallback,
-}: Props): JSX.Element {
+export function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
@@ -104,13 +86,7 @@ export function ApplicationCard({
 
   const editable = isEditable(application.status);
 
-  const tags = [
-    <ApplicationStatusLabel
-      status={application.status}
-      user="customer"
-      key="status"
-    />,
-  ];
+  const tags = [<ApplicationStatusLabel status={application.status} user="customer" key="status" />];
 
   const buttons = [
     <StyledButton
@@ -152,8 +128,7 @@ export function ApplicationCard({
       buttons={buttons}
     >
       <br />
-      {t("applicationCard:saved")}{" "}
-      {formatDateTime(t, new Date(application.lastModifiedDate))}
+      {t("applicationCard:saved")} {formatDateTime(t, new Date(application.lastModifiedDate))}
       {isWaitingForDelete && (
         <ConfirmationDialog
           isOpen

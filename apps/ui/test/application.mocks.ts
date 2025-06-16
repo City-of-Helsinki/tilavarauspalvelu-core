@@ -22,11 +22,7 @@ import {
 } from "@/gql/gql-types";
 import { base64encode } from "common/src/helpers";
 import { addDays, addMonths, addYears } from "date-fns";
-import {
-  generateNameFragment,
-  generateTextFragment,
-  type CreateGraphQLMocksReturn,
-} from "./test.gql.utils";
+import { generateNameFragment, generateTextFragment, type CreateGraphQLMocksReturn } from "./test.gql.utils";
 import { createMockReservationUnit } from "./reservation-unit.mocks";
 
 export function createApplicationMutationMocks(): CreateGraphQLMocksReturn {
@@ -73,15 +69,11 @@ function createMockReservationUnits({
 }: {
   nReservationUnits?: number;
 }): Array<ReservationUnitNode> {
-  return Array.from({ length: nReservationUnits }, (_, i) =>
-    createMockReservationUnit({ pk: i + 1 })
-  );
+  return Array.from({ length: nReservationUnits }, (_, i) => createMockReservationUnit({ pk: i + 1 }));
 }
 
 type ApplicationMockType = NonNullable<ApplicationPage2Query["application"]>;
-type ApplicationSectionMockType = NonNullable<
-  ApplicationMockType["applicationSections"]
->[number];
+type ApplicationSectionMockType = NonNullable<ApplicationMockType["applicationSections"]>[number];
 
 /// @param page which page is valid (page0 => nothing is valid), preview => it's sent
 function createMockApplicationSection({
@@ -97,9 +89,7 @@ function createMockApplicationSection({
 
   const reservationUnitOptions: ApplicationSectionMockType["reservationUnitOptions"] =
     page !== "page0"
-      ? Array.from({ length: nReservationUnitOptions }).map((_, i) =>
-          createReservationUnitOption({ order: i + 1 })
-        )
+      ? Array.from({ length: nReservationUnitOptions }).map((_, i) => createReservationUnitOption({ order: i + 1 }))
       : [];
 
   const page2Data = {
@@ -144,9 +134,7 @@ function createMockApplicationSection({
   };
 }
 
-function createMockAgeGroupNode({
-  pk = 1,
-}: { pk?: number } = {}): AgeGroupNode {
+function createMockAgeGroupNode({ pk = 1 }: { pk?: number } = {}): AgeGroupNode {
   return {
     id: base64encode(`AgeGroupNode:1`),
     pk,
@@ -166,15 +154,9 @@ function createMockPurposeNode({ pk = 1 }: { pk?: number } = {}): PurposeNode {
   };
 }
 
-type CreateReservationUnitOption =
-  ApplicationSectionMockType["reservationUnitOptions"][0];
-function createReservationUnitOption({
-  order,
-}: {
-  order: number;
-}): CreateReservationUnitOption {
-  const reservationUnit: CreateReservationUnitOption["reservationUnit"] =
-    createMockReservationUnit({ pk: order });
+type CreateReservationUnitOption = ApplicationSectionMockType["reservationUnitOptions"][0];
+function createReservationUnitOption({ order }: { order: number }): CreateReservationUnitOption {
+  const reservationUnit: CreateReservationUnitOption["reservationUnit"] = createMockReservationUnit({ pk: order });
   return {
     id: base64encode(`ReservationUnitOptionNode:1`),
     pk: order,
@@ -292,9 +274,7 @@ export function createMockApplicationRound({
   // There is an implicit relation between reservationPeriodBegin and SearchQuery
   // so not mocking reservationPeriodBegin will break search query mock
   if (applicationPeriodBegin.getMilliseconds() !== 0) {
-    throw new Error(
-      "Application period millis should be 0. You most likely you forgot to set a mock date"
-    );
+    throw new Error("Application period millis should be 0. You most likely you forgot to set a mock date");
   }
   const reservationPeriodBegin = addMonths(applicationPeriodBegin, 1);
   const reservationUnits = createMockReservationUnits({
@@ -323,8 +303,7 @@ export function createMockApplicationRound({
     handledDate: null, // Maybe<Scalars["DateTime"]["output"]>;
     isSettingHandledAllowed: false, // Scalars["Boolean"]["output"];
     purposes: [] as const, // ReadonlyArray<ReservationPurposeNode>;
-    reservationCreationStatus:
-      ApplicationRoundReservationCreationStatusChoice.NotCompleted,
+    reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice.NotCompleted,
     reservationUnitCount: 10, // Scalars["Int"]["output"];
     sentDate: null, // Maybe<Scalars["DateTime"]["output"]>;
     statusTimestamp: null, // Maybe<Scalars["DateTime"]["output"]>;
@@ -333,9 +312,7 @@ export function createMockApplicationRound({
 }
 
 type ApplicationPage4 = ApplicationViewFragment;
-export function createMockApplicationViewFragment(
-  props: CreateMockApplicationFragmentProps = {}
-) {
+export function createMockApplicationViewFragment(props: CreateMockApplicationFragmentProps = {}) {
   const applicationRoundMock = {
     sentDate: new Date().toISOString(),
     status: ApplicationRoundStatusChoice.Open,

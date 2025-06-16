@@ -4,11 +4,7 @@ import styled from "styled-components";
 import ShowAllContainer from "common/src/components/ShowAllContainer";
 import { useReservationUnitTypes, useUnitOptions } from "@/hooks";
 import { ReservationUnitPublishingState } from "@gql/gql-types";
-import {
-  MultiSelectFilter,
-  SearchFilter,
-  RangeNumberFilter,
-} from "@/component/QueryParamFilters";
+import { MultiSelectFilter, SearchFilter, RangeNumberFilter } from "@/component/QueryParamFilters";
 import { SearchTags } from "@/component/SearchTags";
 
 const Wrapper = styled.div`
@@ -29,9 +25,7 @@ const MoreWrapper = styled(ShowAllContainer)`
 function Filters(): JSX.Element {
   const { t } = useTranslation();
 
-  const reservationUnitStateOptions = Object.values(
-    ReservationUnitPublishingState
-  )
+  const reservationUnitStateOptions = Object.values(ReservationUnitPublishingState)
     .filter((x) => x !== ReservationUnitPublishingState.Archived)
     .map((s) => ({
       value: s,
@@ -46,14 +40,9 @@ function Filters(): JSX.Element {
       case "unit":
         return unitOptions.find((u) => u.value === Number(val))?.label || val;
       case "reservationUnitType":
-        return (
-          reservationUnitTypeOptions.find((u) => u.value === Number(val))
-            ?.label || val
-        );
+        return reservationUnitTypeOptions.find((u) => u.value === Number(val))?.label || val;
       case "reservationUnitState":
-        return (
-          reservationUnitStateOptions.find((u) => u.value === val)?.label || val
-        );
+        return reservationUnitStateOptions.find((u) => u.value === val)?.label || val;
       case "maxPersonsGte":
         return t("ReservationUnitsSearch.filters.maxPersonsGteTag", {
           value: val,
@@ -84,14 +73,8 @@ function Filters(): JSX.Element {
       >
         <SearchFilter name="search" labelKey="reservationUnit" />
         <MultiSelectFilter options={unitOptions} name="unit" />
-        <MultiSelectFilter
-          options={reservationUnitTypeOptions}
-          name="reservationUnitType"
-        />
-        <MultiSelectFilter
-          options={reservationUnitStateOptions}
-          name="reservationUnitState"
-        />
+        <MultiSelectFilter options={reservationUnitTypeOptions} name="reservationUnitType" />
+        <MultiSelectFilter options={reservationUnitStateOptions} name="reservationUnitState" />
         <RangeNumberFilter
           label={t("ReservationUnitsSearch.maxPersonsLabel")}
           minName="maxPersonsGte"

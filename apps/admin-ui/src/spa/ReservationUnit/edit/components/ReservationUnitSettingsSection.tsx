@@ -1,23 +1,11 @@
-import {
-  type FieldValues,
-  useController,
-  type UseControllerProps,
-  UseFormReturn,
-} from "react-hook-form";
-import {
-  BUFFER_TIME_OPTIONS,
-  ReservationUnitEditFormValues,
-} from "@/spa/ReservationUnit/edit/form";
+import { type FieldValues, useController, type UseControllerProps, UseFormReturn } from "react-hook-form";
+import { BUFFER_TIME_OPTIONS, ReservationUnitEditFormValues } from "@/spa/ReservationUnit/edit/form";
 import { useTranslation } from "next-i18next";
 import { Authentication, ReservationStartInterval } from "@gql/gql-types";
 import { EditAccordion } from "@/spa/ReservationUnit/edit/components/styled";
 import { AutoGrid, Flex } from "common/styled";
 import { FieldGroup } from "@/spa/ReservationUnit/edit/components/FieldGroup";
-import {
-  ControlledSelect,
-  ControlledCheckbox,
-  DateTimeInput,
-} from "common/src/components/form";
+import { ControlledSelect, ControlledCheckbox, DateTimeInput } from "common/src/components/form";
 import { getTranslatedError } from "@/common/util";
 import { CustomNumberInput } from "@/spa/ReservationUnit/edit/components/CustomNumberInput";
 import { SpecializedRadioGroup } from "@/spa/ReservationUnit/edit/components/SpecializedRadioGroup";
@@ -98,9 +86,7 @@ export function ReservationUnitSettingsSection({
   const { control, watch, formState } = form;
   const { errors } = formState;
 
-  const reservationStartIntervalOptions = Object.values(
-    ReservationStartInterval
-  ).map((choice) => ({
+  const reservationStartIntervalOptions = Object.values(ReservationStartInterval).map((choice) => ({
     value: choice,
     label: t(`reservationStartInterval.${choice}`),
   }));
@@ -110,9 +96,7 @@ export function ReservationUnitSettingsSection({
     label: t(`authentication.${choice}`),
   }));
 
-  const isDirect =
-    watch("reservationKind") === "DIRECT" ||
-    watch("reservationKind") === "DIRECT_AND_SEASON";
+  const isDirect = watch("reservationKind") === "DIRECT" || watch("reservationKind") === "DIRECT_AND_SEASON";
 
   const hasErrors =
     errors.reservationBeginsDate != null ||
@@ -139,10 +123,7 @@ export function ReservationUnitSettingsSection({
   );
 
   return (
-    <EditAccordion
-      open={hasErrors}
-      heading={t("ReservationUnitEditor.settings")}
-    >
+    <EditAccordion open={hasErrors} heading={t("ReservationUnitEditor.settings")}>
       <AutoGrid $minWidth="24rem">
         {isDirect && (
           <FieldGroup
@@ -246,13 +227,8 @@ export function ReservationUnitSettingsSection({
               style={{ gridColumnStart: "1" }}
               required
               label={t("ReservationUnitEditor.label.minReservationDuration")}
-              error={getTranslatedError(
-                t,
-                errors.minReservationDuration?.message
-              )}
-              tooltip={t(
-                "ReservationUnitEditor.tooltip.minReservationDuration"
-              )}
+              error={getTranslatedError(t, errors.minReservationDuration?.message)}
+              tooltip={t("ReservationUnitEditor.tooltip.minReservationDuration")}
             />
             <ControlledSelect
               control={control}
@@ -260,13 +236,8 @@ export function ReservationUnitSettingsSection({
               required
               options={durationOptions}
               label={t("ReservationUnitEditor.label.maxReservationDuration")}
-              error={getTranslatedError(
-                t,
-                errors.maxReservationDuration?.message
-              )}
-              tooltip={t(
-                "ReservationUnitEditor.tooltip.maxReservationDuration"
-              )}
+              error={getTranslatedError(t, errors.maxReservationDuration?.message)}
+              tooltip={t("ReservationUnitEditor.tooltip.maxReservationDuration")}
             />
             <ControlledSelect
               control={control}
@@ -274,13 +245,8 @@ export function ReservationUnitSettingsSection({
               options={reservationsMaxDaysBeforeOptions}
               required
               label={t("ReservationUnitEditor.label.reservationsMaxDaysBefore")}
-              error={getTranslatedError(
-                t,
-                errors.reservationsMaxDaysBefore?.message
-              )}
-              tooltip={t(
-                "ReservationUnitEditor.tooltip.reservationsMaxDaysBefore"
-              )}
+              error={getTranslatedError(t, errors.reservationsMaxDaysBefore?.message)}
+              tooltip={t("ReservationUnitEditor.tooltip.reservationsMaxDaysBefore")}
             />
             <CustomNumberInput
               name="reservationsMinDaysBefore"
@@ -296,10 +262,7 @@ export function ReservationUnitSettingsSection({
           name="reservationStartInterval"
           options={reservationStartIntervalOptions}
           required
-          error={getTranslatedError(
-            t,
-            errors.reservationStartInterval?.message
-          )}
+          error={getTranslatedError(t, errors.reservationStartInterval?.message)}
           label={t("ReservationUnitEditor.label.reservationStartInterval")}
           tooltip={t("ReservationUnitEditor.tooltip.reservationStartInterval")}
         />
@@ -386,11 +349,7 @@ export function ReservationUnitSettingsSection({
               label={t("ReservationUnitEditor.authenticationLabel")}
               tooltip={t("ReservationUnitEditor.tooltip.authentication")}
             />
-            <CustomNumberInput
-              name="maxReservationsPerUser"
-              min={1}
-              form={form}
-            />
+            <CustomNumberInput name="maxReservationsPerUser" min={1} form={form} />
             <FieldGroup
               // FIXME replace the text fields
               heading={t("ReservationUnitEditor.requireAdultReserveeSettings")}

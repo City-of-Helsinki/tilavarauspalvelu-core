@@ -34,10 +34,7 @@ const LegendItem = styled.div<{
     content: "";
     display: block;
     background-color: ${({ $color }) => $color};
-    ${({ $border }) =>
-      $border
-        ? `border: 2px solid ${$border}`
-        : "border: 1px solid var(--color-black-20)"};
+    ${({ $border }) => ($border ? `border: 2px solid ${$border}` : "border: 1px solid var(--color-black-20)")};
     width: 30px;
     height: 40px;
     position: relative;
@@ -94,12 +91,7 @@ export function Legend({ items = defaultItems }: Props): JSX.Element {
   return (
     <Wrapper aria-hidden>
       {items.map(({ title, color, border, css: inlineCss }) => (
-        <LegendItem
-          key={title}
-          $color={color}
-          $border={border}
-          $inlineCss={inlineCss}
-        >
+        <LegendItem key={title} $color={color} $border={border} $inlineCss={inlineCss}>
           <LegendTitle>{t(`reservationCalendar:legend.${title}`)}</LegendTitle>
         </LegendItem>
       ))}

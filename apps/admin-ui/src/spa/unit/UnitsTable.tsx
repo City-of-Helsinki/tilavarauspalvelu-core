@@ -43,8 +43,7 @@ function getColConfig(t: TFunction, isMyUnits?: boolean): ColumnType[] {
       headerName: t("Units.headings.reservationUnitCount"),
       key: "reservationUnitCount",
       isSortable: true,
-      transform: (unit: UnitTableElementFragment) =>
-        (unit?.reservationUnits?.length ?? 0).toString(),
+      transform: (unit: UnitTableElementFragment) => (unit?.reservationUnits?.length ?? 0).toString(),
       width: "25%",
     },
     {
@@ -52,21 +51,13 @@ function getColConfig(t: TFunction, isMyUnits?: boolean): ColumnType[] {
       key: "unitGroup",
       isSortable: true,
       transform: (unit: UnitTableElementFragment) =>
-        (unit?.unitGroups ?? [])
-          .map((unitGroup) => unitGroup?.nameFi)
-          .join(", "),
+        (unit?.unitGroups ?? []).map((unitGroup) => unitGroup?.nameFi).join(", "),
       width: "25%",
     },
   ];
 }
 
-export function UnitsTable({
-  sort,
-  sortChanged: onSortChanged,
-  units,
-  isMyUnits,
-  isLoading,
-}: Props): JSX.Element {
+export function UnitsTable({ sort, sortChanged: onSortChanged, units, isMyUnits, isLoading }: Props): JSX.Element {
   const { t } = useTranslation();
 
   const cols = memoize(() => getColConfig(t, isMyUnits))();

@@ -17,10 +17,7 @@ import {
   type ApplicationPage2Query,
   type ApplicationPage2QueryVariables,
 } from "@/gql/gql-types";
-import {
-  ApplicationFunnelWrapper,
-  Page2 as Page2Impl,
-} from "@/components/application/funnel";
+import { ApplicationFunnelWrapper, Page2 as Page2Impl } from "@/components/application/funnel";
 import {
   type ApplicationPage2FormValues,
   transformApplicationPage2,
@@ -28,18 +25,14 @@ import {
   ApplicationPage2Schema,
 } from "@/components/application/funnel/form";
 
-function Page2({
-  application,
-}: Pick<PropsNarrowed, "application">): JSX.Element {
+function Page2({ application }: Pick<PropsNarrowed, "application">): JSX.Element {
   const router = useRouter();
   const [mutate] = useUpdateApplicationMutation();
   const dislayError = useDisplayError();
 
   const saveAndNavigate = async (values: ApplicationPage2FormValues) => {
     try {
-      const isInvalidPk = values.applicationSections.some(
-        (section) => typeof section.pk !== "number"
-      );
+      const isInvalidPk = values.applicationSections.some((section) => typeof section.pk !== "number");
       if (isInvalidPk) {
         const context = {
           level: "error" as const,
@@ -47,10 +40,7 @@ function Page2({
             formValues: values,
           },
         };
-        Sentry.captureMessage(
-          "Invalid type in section pk (not number) in application form",
-          context
-        );
+        Sentry.captureMessage("Invalid type in section pk (not number) in application form", context);
       }
       const input = transformApplicationPage2(values);
       const { data } = await mutate({ variables: { input } });
@@ -71,9 +61,7 @@ function Page2({
   });
 
   useEffect(() => {
-    const isInvalidPk = (application.applicationSections ?? []).some(
-      (section) => typeof section.pk !== "number"
-    );
+    const isInvalidPk = (application.applicationSections ?? []).some((section) => typeof section.pk !== "number");
     if (isInvalidPk) {
       const context = {
         level: "error" as const,
@@ -81,10 +69,7 @@ function Page2({
           application,
         },
       };
-      Sentry.captureMessage(
-        "Invalid type in section pk (not number) in application gql query",
-        context
-      );
+      Sentry.captureMessage("Invalid type in section pk (not number) in application gql query", context);
     }
   }, [application]);
 
@@ -118,10 +103,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   }
 
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
-  const { data } = await client.query<
-    ApplicationPage2Query,
-    ApplicationPage2QueryVariables
-  >({
+  const { data } = await client.query<ApplicationPage2Query, ApplicationPage2QueryVariables>({
     query: ApplicationPage2Document,
     variables: {
       id: base64encode(`ApplicationNode:${pk}`),

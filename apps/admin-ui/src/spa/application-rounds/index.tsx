@@ -68,12 +68,7 @@ function RoundsAccordion({
       <Flex $gap="l">
         {!rounds || rounds.length === 0
           ? emptyContent || <span>no data {name}</span>
-          : rounds?.map((round) => (
-              <ApplicationRoundCard
-                key={round?.pk ?? 0}
-                applicationRound={round}
-              />
-            ))}
+          : rounds?.map((round) => <ApplicationRoundCard key={round?.pk ?? 0} applicationRound={round} />)}
       </Flex>
     </AccordionWithoutTopPadding>
   );
@@ -85,9 +80,7 @@ function AllApplicationRounds(): JSX.Element | null {
   // TODO pagination
   const { data, loading, error } = useApplicationRoundListQuery();
 
-  const allApplicationRounds = filterNonNullable(
-    data?.applicationRounds?.edges?.map((ar) => ar?.node)
-  );
+  const allApplicationRounds = filterNonNullable(data?.applicationRounds?.edges?.map((ar) => ar?.node));
 
   if (loading && allApplicationRounds == null) {
     return <CenterSpinner />;
@@ -101,9 +94,7 @@ function AllApplicationRounds(): JSX.Element | null {
   const currentApplicationRounds = allApplicationRounds.filter(
     (ar) => ar.status === ApplicationRoundStatusChoice.InAllocation
   );
-  const openApplicationRounds = allApplicationRounds.filter(
-    (ar) => ar.status === ApplicationRoundStatusChoice.Open
-  );
+  const openApplicationRounds = allApplicationRounds.filter((ar) => ar.status === ApplicationRoundStatusChoice.Open);
   const sentApplicationRounds = allApplicationRounds.filter(
     (ar) => ar.status === ApplicationRoundStatusChoice.ResultsSent
   );
@@ -120,9 +111,7 @@ function AllApplicationRounds(): JSX.Element | null {
       headerName: t("ApplicationRound.headings.name"),
       transform: (applicationRound: ApplicationRoundNode) => (
         <TableLink to={getApplicationRoundUrl(applicationRound.pk)}>
-          <span title={applicationRound.nameFi ?? ""}>
-            {truncate(applicationRound.nameFi ?? "", 50)}
-          </span>
+          <span title={applicationRound.nameFi ?? ""}>{truncate(applicationRound.nameFi ?? "", 50)}</span>
         </TableLink>
       ),
       key: "nameFi",
@@ -130,15 +119,13 @@ function AllApplicationRounds(): JSX.Element | null {
     {
       isSortable: true,
       headerName: t("ApplicationRound.headings.reservationUnitCount"),
-      transform: (applicationRound: ApplicationRoundNode) =>
-        String(applicationRound.applicationsCount),
+      transform: (applicationRound: ApplicationRoundNode) => String(applicationRound.applicationsCount),
       key: "applicationsCount",
     },
     {
       isSortable: true,
       headerName: t("ApplicationRound.headings.applicationCount"),
-      transform: (applicationRound: ApplicationRoundNode) =>
-        String(applicationRound.reservationUnitCount),
+      transform: (applicationRound: ApplicationRoundNode) => String(applicationRound.reservationUnitCount),
       key: "reservationUnitCount",
     },
     {
@@ -150,11 +137,7 @@ function AllApplicationRounds(): JSX.Element | null {
     },
   ];
 
-  const rows = orderBy(
-    sentApplicationRounds,
-    ["statusTimestamp"],
-    ["desc"]
-  ).map((a) => ({
+  const rows = orderBy(sentApplicationRounds, ["statusTimestamp"], ["desc"]).map((a) => ({
     ...a,
     statusTimestampSort: new Date(a.statusTimestamp || "").getTime(),
   }));
@@ -169,11 +152,7 @@ function AllApplicationRounds(): JSX.Element | null {
         initiallyOpen
         hideIfEmpty
         name={t("ApplicationRound.groupLabel.handling")}
-        rounds={orderBy(
-          currentApplicationRounds,
-          ["status", "applicationPeriodEnd"],
-          ["asc", "asc"]
-        )}
+        rounds={orderBy(currentApplicationRounds, ["status", "applicationPeriodEnd"], ["asc", "asc"])}
       />
       <RoundsAccordion
         name={t("ApplicationRound.groupLabel.notSent")}
@@ -183,31 +162,20 @@ function AllApplicationRounds(): JSX.Element | null {
       />
       <RoundsAccordion
         name={t("ApplicationRound.groupLabel.open")}
-        rounds={orderBy(
-          openApplicationRounds,
-          ["applicationPeriodEnd", "asc"],
-          []
-        )}
+        rounds={orderBy(openApplicationRounds, ["applicationPeriodEnd", "asc"], [])}
         hideIfEmpty
         initiallyOpen
       />
       <RoundsAccordion
         name={t("ApplicationRound.groupLabel.opening")}
-        rounds={orderBy(
-          upcomingApplicationRounds,
-          ["applicationPeriodBegin"],
-          ["asc"]
-        )}
+        rounds={orderBy(upcomingApplicationRounds, ["applicationPeriodBegin"], ["asc"])}
         emptyContent={
           <div>
             <div>{t("ApplicationRound.noUpcoming")}</div>
           </div>
         }
       />
-      <StyledAccordion
-        heading={t("ApplicationRound.groupLabel.previousRounds")}
-        className="previous-rounds"
-      >
+      <StyledAccordion heading={t("ApplicationRound.groupLabel.previousRounds")} className="previous-rounds">
         <CustomTable
           enableFrontendSorting
           initialSortingColumnKey="applicantSort"

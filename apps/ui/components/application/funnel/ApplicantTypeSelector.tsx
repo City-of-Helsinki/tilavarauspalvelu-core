@@ -26,21 +26,14 @@ export function ApplicantTypeSelector(): JSX.Element {
     control,
   });
   // Community and association are the same except for corporate id
-  const choices = Object.values(ApplicantTypeChoice).filter(
-    (id) => id !== ApplicantTypeChoice.Community
-  );
+  const choices = Object.values(ApplicantTypeChoice).filter((id) => id !== ApplicantTypeChoice.Community);
 
   const selection = choices.find(
-    (id) =>
-      id === value ||
-      (id === ApplicantTypeChoice.Association &&
-        value === ApplicantTypeChoice.Community)
+    (id) => id === value || (id === ApplicantTypeChoice.Association && value === ApplicantTypeChoice.Community)
   );
   const error = errors.applicantType;
 
-  const errorText = error?.message
-    ? t(`application:validation.${error.message}`)
-    : undefined;
+  const errorText = error?.message ? t(`application:validation.${error.message}`) : undefined;
   return (
     <Flex $gap="xs">
       <Label>

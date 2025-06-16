@@ -56,12 +56,7 @@ const StyledKoros = styled(Koros)`
   height: 84px;
 `;
 
-export function KorosHeading({
-  heroImage,
-  className,
-  style,
-  children,
-}: IProps): JSX.Element {
+export function KorosHeading({ heroImage, className, style, children }: IProps): JSX.Element {
   return (
     <Wrapper $image={heroImage} className={className} style={style}>
       <Content>{children}</Content>

@@ -60,32 +60,18 @@ function transformStateSafe(t: string): ReservationStateChoice | null {
   }
 }
 
-function mapFilterParams(
-  searchParams: URLSearchParams
-): ReservationListQueryVariables {
-  const reservationUnitType = searchParams
-    .getAll("reservationUnitType")
-    .map(Number)
-    .filter(Number.isInteger);
+function mapFilterParams(searchParams: URLSearchParams): ReservationListQueryVariables {
+  const reservationUnitType = searchParams.getAll("reservationUnitType").map(Number).filter(Number.isInteger);
 
   const unit = searchParams.getAll("unit").map(Number).filter(Number.isInteger);
 
-  const orderStatus = filterNonNullable(
-    searchParams.getAll("orderStatus").map(transformPaymentStatusSafe)
-  );
+  const orderStatus = filterNonNullable(searchParams.getAll("orderStatus").map(transformPaymentStatusSafe));
 
-  const reservationUnits = searchParams
-    .getAll("reservationUnit")
-    .map(Number)
-    .filter(Number.isInteger);
+  const reservationUnits = searchParams.getAll("reservationUnit").map(Number).filter(Number.isInteger);
 
-  const state = filterNonNullable(
-    searchParams.getAll("state").map(transformStateSafe)
-  );
+  const state = filterNonNullable(searchParams.getAll("state").map(transformStateSafe));
 
-  const reservationType = filterNonNullable(
-    searchParams.getAll("reservationType").map(transformReservationTypeSafe)
-  );
+  const reservationType = filterNonNullable(searchParams.getAll("reservationType").map(transformReservationTypeSafe));
 
   const textSearch = searchParams.get("search");
 
@@ -118,9 +104,7 @@ function mapFilterParams(
   }
 
   const freeOfCharge = searchParams.get("freeOfCharge");
-  const applyingForFreeOfCharge = freeOfCharge
-    ? freeOfCharge === "true"
-    : undefined;
+  const applyingForFreeOfCharge = freeOfCharge ? freeOfCharge === "true" : undefined;
 
   return {
     unit,
@@ -171,9 +155,7 @@ export function ReservationsDataLoader(): JSX.Element {
 
   const currData = data ?? previousData;
 
-  const reservations = filterNonNullable(
-    currData?.reservations?.edges.map((edge) => edge?.node)
-  );
+  const reservations = filterNonNullable(currData?.reservations?.edges.map((edge) => edge?.node));
   const totalCount = currData?.reservations?.totalCount;
 
   if (loading && reservations.length === 0) {
@@ -182,12 +164,7 @@ export function ReservationsDataLoader(): JSX.Element {
 
   return (
     <>
-      <ReservationsTable
-        reservations={reservations}
-        sort={sort}
-        sortChanged={onSortChanged}
-        isLoading={loading}
-      />
+      <ReservationsTable reservations={reservations} sort={sort} sortChanged={onSortChanged} isLoading={loading} />
       <More
         totalCount={totalCount ?? 0}
         count={reservations.length}
@@ -198,56 +175,35 @@ export function ReservationsDataLoader(): JSX.Element {
   );
 }
 
-function transformOrderBy(
-  orderBy: string,
-  desc: boolean
-): ReservationOrderingChoices | null {
+function transformOrderBy(orderBy: string, desc: boolean): ReservationOrderingChoices | null {
   switch (orderBy) {
     case "pk":
-      return desc
-        ? ReservationOrderingChoices.PkDesc
-        : ReservationOrderingChoices.PkAsc;
+      return desc ? ReservationOrderingChoices.PkDesc : ReservationOrderingChoices.PkAsc;
     case "begin":
-      return desc
-        ? ReservationOrderingChoices.BeginDesc
-        : ReservationOrderingChoices.BeginAsc;
+      return desc ? ReservationOrderingChoices.BeginDesc : ReservationOrderingChoices.BeginAsc;
     case "end":
-      return desc
-        ? ReservationOrderingChoices.EndDesc
-        : ReservationOrderingChoices.EndAsc;
+      return desc ? ReservationOrderingChoices.EndDesc : ReservationOrderingChoices.EndAsc;
     case "created_at":
-      return desc
-        ? ReservationOrderingChoices.CreatedAtDesc
-        : ReservationOrderingChoices.CreatedAtAsc;
+      return desc ? ReservationOrderingChoices.CreatedAtDesc : ReservationOrderingChoices.CreatedAtAsc;
     case "reservee_name":
-      return desc
-        ? ReservationOrderingChoices.ReserveeNameDesc
-        : ReservationOrderingChoices.ReserveeNameAsc;
+      return desc ? ReservationOrderingChoices.ReserveeNameDesc : ReservationOrderingChoices.ReserveeNameAsc;
     case "reservation_unit_name_fi":
       return desc
         ? ReservationOrderingChoices.ReservationUnitNameFiDesc
         : ReservationOrderingChoices.ReservationUnitNameFiAsc;
     case "unit_name_fi":
-      return desc
-        ? ReservationOrderingChoices.UnitNameFiDesc
-        : ReservationOrderingChoices.UnitNameFiAsc;
+      return desc ? ReservationOrderingChoices.UnitNameFiDesc : ReservationOrderingChoices.UnitNameFiAsc;
     // NOTE inconsistent naming
     case "orderStatus":
-      return desc
-        ? ReservationOrderingChoices.OrderStatusDesc
-        : ReservationOrderingChoices.OrderStatusAsc;
+      return desc ? ReservationOrderingChoices.OrderStatusDesc : ReservationOrderingChoices.OrderStatusAsc;
     case "state":
-      return desc
-        ? ReservationOrderingChoices.StateDesc
-        : ReservationOrderingChoices.StateAsc;
+      return desc ? ReservationOrderingChoices.StateDesc : ReservationOrderingChoices.StateAsc;
     default:
       return null;
   }
 }
 
-function transformSortString(
-  orderBy: string | null
-): ReservationOrderingChoices[] {
+function transformSortString(orderBy: string | null): ReservationOrderingChoices[] {
   const defaultSort = [
     ReservationOrderingChoices.StateDesc,
     ReservationOrderingChoices.BeginAsc,
@@ -270,11 +226,7 @@ function transformSortString(
   if (transformed === ReservationOrderingChoices.BeginDesc) {
     return [transformed, ReservationOrderingChoices.EndDesc];
   }
-  return [
-    transformed,
-    ReservationOrderingChoices.BeginAsc,
-    ReservationOrderingChoices.EndAsc,
-  ];
+  return [transformed, ReservationOrderingChoices.BeginAsc, ReservationOrderingChoices.EndAsc];
 }
 
 export const RESERVATION_LIST_QUERY = gql`

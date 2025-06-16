@@ -10,19 +10,10 @@ import {
   Notification,
   NotificationSize,
 } from "hds-react";
-import {
-  Control,
-  FieldValues,
-  Path,
-  useController,
-  UseControllerProps,
-} from "react-hook-form";
+import { Control, FieldValues, Path, useController, UseControllerProps } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
-import type {
-  ApplicationReservationUnitListFragment,
-  OrderedReservationUnitCardFragment,
-} from "@gql/gql-types";
+import type { ApplicationReservationUnitListFragment, OrderedReservationUnitCardFragment } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { Flex } from "common/styled";
 import { ErrorText } from "common/src/components/ErrorText";
@@ -35,8 +26,7 @@ import { type OptionsT } from "@/modules/search";
 type ReservationUnitType = Pick<OrderedReservationUnitCardFragment, "pk">;
 export type OptionType = Readonly<{ value: number; label: string }>;
 
-export interface ReservationUnitListProps<T extends FieldValues>
-  extends UseControllerProps<T> {
+export interface ReservationUnitListProps<T extends FieldValues> extends UseControllerProps<T> {
   name: Path<T>;
   control: Control<T>;
   applicationRound: Readonly<ApplicationReservationUnitListFragment>;
@@ -119,29 +109,20 @@ export function ReservationUnitList<T extends FieldValues>({
 
   // Form only stores pks so turn those into Card Fragments
   const avail = filterNonNullable(applicationRound.reservationUnits);
-  const selected: typeof avail = filterNonNullable(
-    value.map((pk: T) => avail.find((ru) => ru.pk === Number(pk)))
-  );
+  const selected: typeof avail = filterNonNullable(value.map((pk: T) => avail.find((ru) => ru.pk === Number(pk))));
 
   return (
     <Flex>
-      <Notification
-        size={NotificationSize.Small}
-        label={t("reservationUnitList:infoReservationUnits")}
-      >
+      <Notification size={NotificationSize.Small} label={t("reservationUnitList:infoReservationUnits")}>
         {t("reservationUnitList:infoReservationUnits")}
       </Notification>
-      {error && (
-        <ErrorText data-testid="ReservationUnitList__error">{error}</ErrorText>
-      )}
+      {error && <ErrorText data-testid="ReservationUnitList__error">{error}</ErrorText>}
       <Flex $gap="m" $direction="column" aria-live="polite">
         {selected.map((ru, i, all) => (
           <OrderedReservationUnitCard
             key={`reservation-unit_${ru.pk}`}
             error={
-              minSize != null &&
-              ru.maxPersons != null &&
-              minSize > ru.maxPersons
+              minSize != null && ru.maxPersons != null && minSize > ru.maxPersons
                 ? t("application:validation.reservationUnitTooSmall")
                 : undefined
             }
@@ -177,10 +158,7 @@ export function ReservationUnitList<T extends FieldValues>({
         focusAfterCloseRef={ref}
         scrollable
       >
-        <Dialog.Header
-          id="modal-header"
-          title={t("reservationUnitModal:heading")}
-        />
+        <Dialog.Header id="modal-header" title={t("reservationUnitModal:heading")} />
         <Dialog.Content>
           <ReservationUnitModalContent
             currentReservationUnits={selected}

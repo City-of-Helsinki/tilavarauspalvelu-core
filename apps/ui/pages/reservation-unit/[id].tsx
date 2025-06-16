@@ -65,11 +65,7 @@ import {
   createDateTime,
   getDurationOptions,
 } from "@/modules/reservation";
-import {
-  clampDuration,
-  getMaxReservationDuration,
-  getMinReservationDuration,
-} from "@/modules/reservable";
+import { clampDuration, getMaxReservationDuration, getMinReservationDuration } from "@/modules/reservable";
 import { SubventionSuffix } from "@/components/reservation";
 import InfoDialog from "@/components/common/InfoDialog";
 import {
@@ -81,33 +77,19 @@ import {
   ReservationInfoSection,
   ReservationUnitCalendarSection,
 } from "@/components/reservation-unit";
-import {
-  getCommonServerSideProps,
-  getGenericTerms,
-} from "@/modules/serverUtils";
+import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
 import { useForm, type UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  PendingReservationFormSchema,
-  type PendingReservationFormType,
-} from "@/components/reservation-unit/schema";
+import { PendingReservationFormSchema, type PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { LoginFragment } from "@/components/LoginFragment";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
 import { SubmitButton } from "@/styled/util";
 import { ReservationUnitPageWrapper } from "@/styled/reservation";
-import {
-  getReservationInProgressPath,
-  getSingleSearchPath,
-} from "@/modules/urls";
+import { getReservationInProgressPath, getSingleSearchPath } from "@/modules/urls";
 import { Accordion, ButtonVariant, LoadingSpinner } from "hds-react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useDisplayError } from "common/src/hooks";
-import {
-  useRemoveStoredReservation,
-  useAvailableTimes,
-  useToastIfQueryParam,
-  useBlockingReservations,
-} from "@/hooks";
+import { useRemoveStoredReservation, useAvailableTimes, useToastIfQueryParam, useBlockingReservations } from "@/hooks";
 import { gql } from "@apollo/client";
 import { type ApiError, getApiErrors } from "common/src/apolloUtils";
 import { formatErrorMessage } from "common/src/hooks/useDisplayError";
@@ -146,9 +128,7 @@ export const APPLICATION_ROUND_TIME_SLOT_FRAGMENT = gql`
 `;
 
 // Returns an element for a weekday in the application round timetable, with up to two timespans
-function ApplicationRoundScheduleDay(
-  props: ApplicationRoundTimeSlotFieldsFragment
-) {
+function ApplicationRoundScheduleDay(props: ApplicationRoundTimeSlotFieldsFragment) {
   const { t } = useTranslation();
   const { weekday, closed } = props;
   const reservableTimes = filterNonNullable(props.reservableTimes);
@@ -257,10 +237,8 @@ function ReservationUnit({
 
   const durationOptions = getDurationOptions(reservationUnit, t);
 
-  const minReservationDurationMinutes =
-    getMinReservationDuration(reservationUnit);
-  const maxReservationDurationMinutes =
-    getMaxReservationDuration(reservationUnit);
+  const minReservationDurationMinutes = getMinReservationDuration(reservationUnit);
+  const maxReservationDurationMinutes = getMaxReservationDuration(reservationUnit);
 
   const searchUIDate = fromUIDate(searchDate ?? "");
   // TODO should be the first reservable day (the reservableTimeSpans logic is too complex and needs refactoring)
@@ -268,10 +246,7 @@ function ReservationUnit({
   const defaultDate = new Date();
   const defaultDateString = toUIDate(defaultDate);
   const defaultValues = {
-    date:
-      searchUIDate != null && isValidDate(searchUIDate)
-        ? (searchDate ?? "")
-        : defaultDateString,
+    date: searchUIDate != null && isValidDate(searchUIDate) ? (searchDate ?? "") : defaultDateString,
     duration: clampDuration(
       searchDuration ?? 0,
       minReservationDurationMinutes,
@@ -382,9 +357,7 @@ function ReservationUnit({
 
   const [createReservationMutation] = useCreateReservationMutation();
 
-  const createReservation = async (
-    input: ReservationCreateMutationInput
-  ): Promise<void> => {
+  const createReservation = async (input: ReservationCreateMutationInput): Promise<void> => {
     try {
       if (reservationUnit.pk == null) {
         throw new Error("Reservation unit pk is missing");
@@ -405,8 +378,7 @@ function ReservationUnit({
   };
 
   // store reservation unit overall reservability to use in JSX and pass to some child elements
-  const { isReservable: reservationUnitIsReservable, reason } =
-    isReservationUnitReservable(reservationUnit);
+  const { isReservable: reservationUnitIsReservable, reason } = isReservationUnitReservable(reservationUnit);
   if (!reservationUnitIsReservable) {
     // eslint-disable-next-line no-console
     console.warn("not reservable because: ", reason);
@@ -458,10 +430,7 @@ function ReservationUnit({
   });
 
   const subventionSuffix = useMemo(
-    () =>
-      reservationUnit.canApplyFreeOfCharge ? (
-        <SubventionSuffix setIsDialogOpen={setIsDialogOpen} />
-      ) : undefined,
+    () => (reservationUnit.canApplyFreeOfCharge ? <SubventionSuffix setIsDialogOpen={setIsDialogOpen} /> : undefined),
     [reservationUnit.canApplyFreeOfCharge]
   );
 
@@ -487,18 +456,13 @@ function ReservationUnit({
           />
         )}
         <JustForDesktop customBreakpoint={breakpoints.l}>
-          <AddressSection
-            unit={reservationUnit.unit}
-            title={getReservationUnitName(reservationUnit) ?? "-"}
-          />
+          <AddressSection unit={reservationUnit.unit} title={getReservationUnitName(reservationUnit) ?? "-"} />
         </JustForDesktop>
       </div>
       <PageContentWrapper>
         <div data-testid="reservation-unit__description">
           <H4 as="h2">{t("reservationUnit:description")}</H4>
-          <Sanitize
-            html={getTranslationSafe(reservationUnit, "description", lang)}
-          />
+          <Sanitize html={getTranslationSafe(reservationUnit, "description", lang)} />
         </div>
         {equipment.length > 0 && (
           <div data-testid="reservation-unit__equipment">
@@ -522,11 +486,7 @@ function ReservationUnit({
         />
         <NoticeWhenReservingSection reservationUnit={reservationUnit} />
         {showApplicationRoundTimeSlots && (
-          <Accordion
-            headingLevel={2}
-            heading={t("reservationUnit:recurringHeading")}
-            closeButton={false}
-          >
+          <Accordion headingLevel={2} heading={t("reservationUnit:recurringHeading")} closeButton={false}>
             <p>{t("reservationUnit:recurringBody")}</p>
             {applicationRoundTimeSlots.map((day) => (
               <ApplicationRoundScheduleDay key={day.weekday} {...day} />
@@ -534,29 +494,16 @@ function ReservationUnit({
           </Accordion>
         )}
         {reservationUnit.unit?.tprekId && (
-          <Accordion
-            closeButton={false}
-            heading={t("common:location")}
-            initiallyOpen
-          >
+          <Accordion closeButton={false} heading={t("common:location")} initiallyOpen>
             <JustForMobile customBreakpoint={breakpoints.l}>
-              <AddressSection
-                unit={reservationUnit.unit}
-                title={getReservationUnitName(reservationUnit) ?? "-"}
-              />
+              <AddressSection unit={reservationUnit.unit} title={getReservationUnitName(reservationUnit) ?? "-"} />
             </JustForMobile>
             <MapComponent tprekId={reservationUnit.unit?.tprekId ?? ""} />
           </Accordion>
         )}
         {(paymentTermsContent || cancellationTermsContent) && (
           <Accordion
-            heading={t(
-              `reservationUnit:${
-                paymentTermsContent
-                  ? "paymentAndCancellationTerms"
-                  : "cancellationTerms"
-              }`
-            )}
+            heading={t(`reservationUnit:${paymentTermsContent ? "paymentAndCancellationTerms" : "cancellationTerms"}`)}
             closeButton={false}
             data-testid="reservation-unit__payment-and-cancellation-terms"
           >
@@ -578,16 +525,8 @@ function ReservationUnit({
           closeButton={false}
           data-testid="reservation-unit__terms-of-use"
         >
-          {serviceSpecificTermsContent && (
-            <Sanitize html={serviceSpecificTermsContent} />
-          )}
-          <Sanitize
-            html={getTranslationSafe(
-              termsOfUse.genericTerms ?? {},
-              "text",
-              lang
-            )}
-          />
+          {serviceSpecificTermsContent && <Sanitize html={serviceSpecificTermsContent} />}
+          <Sanitize html={getTranslationSafe(termsOfUse.genericTerms ?? {}, "text", lang)} />
         </Accordion>
       </PageContentWrapper>
       <InfoDialog
@@ -598,9 +537,7 @@ function ReservationUnit({
         onClose={() => setIsDialogOpen(false)}
       />
       {/* TODO this breaks the layout when inside a grid (the RelatedUnits) */}
-      {shouldDisplayBottomWrapper && (
-        <StyledRelatedUnits units={relatedReservationUnits} />
-      )}
+      {shouldDisplayBottomWrapper && <StyledRelatedUnits units={relatedReservationUnits} />}
     </ReservationUnitPageWrapper>
   );
 }
@@ -630,11 +567,7 @@ function NoticeWhenReservingSection({
 }): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
-  const termsOfUseContent = getTranslationSafe(
-    reservationUnit,
-    "termsOfUse",
-    lang
-  );
+  const termsOfUseContent = getTranslationSafe(reservationUnit, "termsOfUse", lang);
 
   const appRounds = reservationUnit.applicationRounds;
   const futurePricing = getFuturePricing(reservationUnit, appRounds);
@@ -655,11 +588,7 @@ function NoticeWhenReservingSection({
   );
 }
 
-function PriceChangeNotice({
-  futurePricing,
-}: {
-  futurePricing: PricingFieldsFragment;
-}): JSX.Element {
+function PriceChangeNotice({ futurePricing }: { futurePricing: PricingFieldsFragment }): JSX.Element {
   const { t, i18n } = useTranslation();
 
   const isPaid = !isPriceFree(futurePricing);
@@ -733,10 +662,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       };
 
       try {
-        const res = await apolloClient.mutate<
-          CreateReservationMutation,
-          CreateReservationMutationVariables
-        >({
+        const res = await apolloClient.mutate<CreateReservationMutation, CreateReservationMutationVariables>({
           mutation: CreateReservationDocument,
           variables: {
             input,
@@ -805,17 +731,15 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
           unit: [reservationUnit.unit.pk],
         },
       });
-      relatedReservationUnits = filterNonNullable(
-        relatedData?.reservationUnits?.edges?.map((n) => n?.node)
-      ).filter((n) => n?.pk !== reservationUnitData.reservationUnit?.pk);
+      relatedReservationUnits = filterNonNullable(relatedData?.reservationUnits?.edges?.map((n) => n?.node)).filter(
+        (n) => n?.pk !== reservationUnitData.reservationUnit?.pk
+      );
     }
 
     const queryParams = new URLSearchParams(query as Record<string, string>);
     const searchDate = queryParams.get("date") ?? null;
     const searchTime = queryParams.get("time") ?? null;
-    const searchDuration = toNumber(
-      ignoreMaybeArray(queryParams.get("duration"))
-    );
+    const searchDuration = toNumber(ignoreMaybeArray(queryParams.get("duration")));
 
     return {
       props: {

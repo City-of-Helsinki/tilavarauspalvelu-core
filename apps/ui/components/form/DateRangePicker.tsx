@@ -41,33 +41,22 @@ export function DateRangePicker({
   limits,
   placeholder,
 }: DateRangePickerProps) {
-  const [internalStartDateString, setInternalStartDateString] =
-    useState<string>(() => toUIDate(startDate));
-  const [internalEndDateString, setInternalEndDateString] = useState<string>(
-    () => toUIDate(endDate)
-  );
+  const [internalStartDateString, setInternalStartDateString] = useState<string>(() => toUIDate(startDate));
+  const [internalEndDateString, setInternalEndDateString] = useState<string>(() => toUIDate(endDate));
   const [startDateError, setStartDateError] = useState<string | null>(null);
   const [endDateError, setEndDateError] = useState<string | null>(null);
   const { t, i18n } = useTranslation();
 
   // Pass params instead of state because React state updates are async
-  const validateAndUpdateUpstream = ({
-    start,
-    end,
-  }: {
-    start: string;
-    end: string;
-  }) => {
+  const validateAndUpdateUpstream = ({ start, end }: { start: string; end: string }) => {
     const sd = fromUIDate(start);
     const ed = fromUIDate(end);
 
     const isStartDateEmpty = start === "";
     if (!isStartDateEmpty) {
       const isStartDateInvalid = sd == null || !isValidDate(sd);
-      const isStartDateBeforeMin =
-        sd != null && limits?.startMinDate && sd < limits?.startMinDate;
-      const isStartDateAfterMax =
-        sd != null && limits?.startMaxDate && sd > limits?.startMaxDate;
+      const isStartDateBeforeMin = sd != null && limits?.startMinDate && sd < limits?.startMinDate;
+      const isStartDateAfterMax = sd != null && limits?.startMaxDate && sd > limits?.startMaxDate;
       if (isStartDateInvalid) {
         setStartDateError(t("dateSelector:errors.dateInvalid"));
         onChangeStartDate(null);
@@ -93,10 +82,8 @@ export function DateRangePicker({
     const isEndDateEmpty = end === "";
     if (!isEndDateEmpty) {
       const isEndDateInvalid = ed == null || !isValidDate(ed);
-      const isEndDateBeforeMin =
-        ed != null && limits?.endMinDate != null && ed < limits.endMinDate;
-      const isEndDateAfterMax =
-        ed != null && limits?.endMaxDate != null && ed > limits.endMaxDate;
+      const isEndDateBeforeMin = ed != null && limits?.endMinDate != null && ed < limits.endMinDate;
+      const isEndDateAfterMax = ed != null && limits?.endMaxDate != null && ed > limits.endMaxDate;
       if (isEndDateInvalid) {
         setEndDateError(t("dateSelector:errors.dateInvalid"));
         onChangeEndDate(null);
@@ -120,14 +107,7 @@ export function DateRangePicker({
     }
 
     // If both dates are valid, check that end date is not before start date
-    if (
-      !isStartDateEmpty &&
-      !isEndDateEmpty &&
-      ed != null &&
-      sd != null &&
-      isValidDate(ed) &&
-      isValidDate(sd)
-    ) {
+    if (!isStartDateEmpty && !isEndDateEmpty && ed != null && sd != null && isValidDate(ed) && isValidDate(sd)) {
       if (isBefore(ed, sd)) {
         setEndDateError(t("dateSelector:errors.endDateBeforeStartDate"));
         onChangeEndDate(null);
@@ -203,11 +183,7 @@ export function DateRangePicker({
         helperText={showHelperText ? helperText : undefined}
         minDate={limits?.endMinDate ?? new Date()}
         maxDate={limits?.endMaxDate}
-        initialMonth={
-          internalStartDate != null && isValidDate(internalStartDate)
-            ? internalStartDate
-            : new Date()
-        }
+        initialMonth={internalStartDate != null && isValidDate(internalStartDate) ? internalStartDate : new Date()}
         label={labels?.end ?? t("dateSelector:labelEndDate")}
         aria-label={labels?.ariaEnd ?? t("dateSelector:labelEndDate")}
         language={getLocalizationLang(i18n.language)}

@@ -1,11 +1,5 @@
 import React, { useEffect } from "react";
-import {
-  Button,
-  ButtonSize,
-  ButtonVariant,
-  IconArrowLeft,
-  IconArrowRight,
-} from "hds-react";
+import { Button, ButtonSize, ButtonVariant, IconArrowLeft, IconArrowRight } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
@@ -47,17 +41,14 @@ type Page3FormProps = {
 };
 
 function Page3Form({ cityOptions }: Page3FormProps): JSX.Element | null {
-  const { watch, unregister, register, setValue } =
-    useFormContext<ApplicationPage3FormValues>();
+  const { watch, unregister, register, setValue } = useFormContext<ApplicationPage3FormValues>();
   const type = watch("applicantType");
 
   useEffect(() => {
     if (type === ApplicantTypeChoice.Individual) {
       unregister("organisation");
     }
-    const hasRegistration =
-      type === ApplicantTypeChoice.Association ||
-      type === ApplicantTypeChoice.Company;
+    const hasRegistration = type === ApplicantTypeChoice.Association || type === ApplicantTypeChoice.Company;
     if (hasRegistration) {
       register("organisation.identifier", { required: true });
     } else {
@@ -90,10 +81,7 @@ function Page3Form({ cityOptions }: Page3FormProps): JSX.Element | null {
   }
 }
 
-function Page3({
-  application,
-  cityOptions,
-}: Pick<PropsNarrowed, "application" | "cityOptions">): JSX.Element {
+function Page3({ application, cityOptions }: Pick<PropsNarrowed, "application" | "cityOptions">): JSX.Element {
   const router = useRouter();
 
   const form = useForm<ApplicationPage3FormValues>({
@@ -134,17 +122,10 @@ function Page3({
   return (
     <FormProvider {...form}>
       <ApplicationFunnelWrapper page="page3" application={application}>
-        <Flex
-          as="form"
-          noValidate
-          onSubmit={handleSubmit(onSubmit)}
-          data-testid="application__page3--form"
-        >
+        <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)} data-testid="application__page3--form">
           <ApplicantTypeSelector />
           <AutoGrid>
-            <FormSubHeading as="h2">
-              {t("application:Page3.sectionHeadings.basicInfo")}
-            </FormSubHeading>
+            <FormSubHeading as="h2">{t("application:Page3.sectionHeadings.basicInfo")}</FormSubHeading>
             <Page3Form cityOptions={cityOptions} />
           </AutoGrid>
           <ButtonContainer>
@@ -156,12 +137,7 @@ function Page3({
             >
               {t("common:prev")}
             </Button>
-            <Button
-              id="button__application--next"
-              iconEnd={<IconArrowRight />}
-              size={ButtonSize.Small}
-              type="submit"
-            >
+            <Button id="button__application--next" iconEnd={<IconArrowRight />} size={ButtonSize.Small} type="submit">
               {t("common:next")}
             </Button>
           </ButtonContainer>
@@ -191,10 +167,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFound;
   }
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
-  const { data } = await apolloClient.query<
-    ApplicationPage3Query,
-    ApplicationPage3QueryVariables
-  >({
+  const { data } = await apolloClient.query<ApplicationPage3Query, ApplicationPage3QueryVariables>({
     query: ApplicationPage3Document,
     variables: { id: base64encode(`ApplicationNode:${pk}`) },
   });
@@ -203,11 +176,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFound;
   }
 
-  const options = await getSearchOptions(
-    apolloClient,
-    "seasonal",
-    locale ?? "fi"
-  );
+  const options = await getSearchOptions(apolloClient, "seasonal", locale ?? "fi");
 
   return {
     props: {

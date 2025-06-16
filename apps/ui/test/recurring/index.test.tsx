@@ -27,12 +27,8 @@ describe("RecurringLander", () => {
     });
     expect(activeRounds).toBeInTheDocument();
     expect(view.getByText("recurringLander:noRounds")).toBeInTheDocument();
-    expect(
-      view.queryByText("recurringLander:roundHeadings.pending")
-    ).not.toBeInTheDocument();
-    expect(
-      view.queryByText("recurringLander:roundHeadings.past")
-    ).not.toBeInTheDocument();
+    expect(view.queryByText("recurringLander:roundHeadings.pending")).not.toBeInTheDocument();
+    expect(view.queryByText("recurringLander:roundHeadings.past")).not.toBeInTheDocument();
   });
 
   // TODO test frontend splitting and sorting of application rounds
@@ -61,24 +57,16 @@ describe("RecurringLander", () => {
       }),
     ];
     const view = render(<RecurringLander applicationRounds={rounds} />);
-    expect(
-      view.getByRole("heading", { name: "recurringLander:heading" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("heading", { name: "recurringLander:heading" })).toBeInTheDocument();
     expect(view.getByText("recurringLander:subHeading")).toBeInTheDocument();
     expect(
       view.getByRole("heading", {
         name: "recurringLander:roundHeadings.active",
       })
     ).toBeInTheDocument();
-    expect(
-      view.queryByText("recurringLander:noRounds")
-    ).not.toBeInTheDocument();
-    expect(
-      view.queryByText("recurringLander:roundHeadings.pending")
-    ).not.toBeInTheDocument();
-    expect(
-      view.queryByText("recurringLander:roundHeadings.past")
-    ).not.toBeInTheDocument();
+    expect(view.queryByText("recurringLander:noRounds")).not.toBeInTheDocument();
+    expect(view.queryByText("recurringLander:roundHeadings.pending")).not.toBeInTheDocument();
+    expect(view.queryByText("recurringLander:roundHeadings.past")).not.toBeInTheDocument();
 
     const startLinks = view.queryAllByRole("link", {
       name: "applicationRound:startNewApplication",
@@ -113,24 +101,16 @@ describe("RecurringLander", () => {
       }),
     ];
     const view = render(<RecurringLander applicationRounds={rounds} />);
-    expect(
-      view.getByRole("heading", { name: "recurringLander:heading" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("heading", { name: "recurringLander:heading" })).toBeInTheDocument();
     expect(view.getByText("recurringLander:subHeading")).toBeInTheDocument();
     expect(
       view.getByRole("heading", {
         name: "recurringLander:roundHeadings.active",
       })
     ).toBeInTheDocument();
-    expect(
-      view.queryByText("recurringLander:noRounds")
-    ).not.toBeInTheDocument();
-    expect(
-      view.queryByText("recurringLander:roundHeadings.pending")
-    ).toBeInTheDocument();
-    expect(
-      view.queryByText("recurringLander:roundHeadings.past")
-    ).toBeInTheDocument();
+    expect(view.queryByText("recurringLander:noRounds")).not.toBeInTheDocument();
+    expect(view.queryByText("recurringLander:roundHeadings.pending")).toBeInTheDocument();
+    expect(view.queryByText("recurringLander:roundHeadings.past")).toBeInTheDocument();
 
     const startLinks = view.queryAllByRole("link", {
       name: "applicationRound:startNewApplication",

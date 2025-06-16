@@ -11,11 +11,7 @@ import {
 } from "@gql/gql-types";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { ReservationPageWrapper } from "@/styled/reservation";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-  toUIDate,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";
 import { useDisplayError } from "common/src/hooks";
 import { getApplicationPath, getReservationPath } from "@/modules/urls";
 import { getPrice } from "@/modules/reservationUnit";
@@ -56,9 +52,7 @@ export function ReservationCancellation(props: CancellationProps): JSX.Element {
   const backLink = getBackPath(reservation);
 
   const handleNext = () => {
-    const queryParam = isPartOfApplication(reservation)
-      ? `deletedReservationPk=${reservation.pk}`
-      : "deleted=true";
+    const queryParam = isPartOfApplication(reservation) ? `deletedReservationPk=${reservation.pk}` : "deleted=true";
     if (backLink) {
       router.push(`${backLink}?${queryParam}`);
     }
@@ -86,12 +80,8 @@ export function ReservationCancellation(props: CancellationProps): JSX.Element {
 
   const isApplication = isPartOfApplication(reservation);
   const title = t("reservations:cancel.reservation");
-  const ingress = isApplication
-    ? t("reservations:cancel.ingressApplication")
-    : t("reservations:cancel.ingress");
-  const infoBody = isApplication
-    ? t("reservations:cancel.infoBodyApplication")
-    : t("reservations:cancel.infoBody");
+  const ingress = isApplication ? t("reservations:cancel.ingressApplication") : t("reservations:cancel.ingress");
+  const infoBody = isApplication ? t("reservations:cancel.infoBodyApplication") : t("reservations:cancel.infoBody");
 
   const lang = convertLanguageCode(i18n.language);
   const cancellationTerms = getTranslatedTerms(reservation, lang);
@@ -123,28 +113,16 @@ const ApplicationInfo = styled(Card)`
   ${infoCss}
 `;
 
-function ApplicationInfoCard({
-  reservation,
-}: {
-  reservation: CancellationProps["reservation"];
-}) {
+function ApplicationInfoCard({ reservation }: { reservation: CancellationProps["reservation"] }) {
   // NOTE assumes that the name of the recurringReservation is copied from applicationSection when it's created
   const name = reservation.recurringReservation?.name;
   const reservationUnit = reservation.reservationUnits.find(() => true);
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
-  const reservationUnitName =
-    reservationUnit != null
-      ? getTranslationSafe(reservationUnit, "name", lang)
-      : "-";
+  const reservationUnitName = reservationUnit != null ? getTranslationSafe(reservationUnit, "name", lang) : "-";
   const price = getPrice(t, reservation, lang);
 
-  const { dayOfWeek, time, date } = formatDateTimeStrings(
-    t,
-    reservation,
-    undefined,
-    true
-  );
+  const { dayOfWeek, time, date } = formatDateTimeStrings(t, reservation, undefined, true);
 
   const icons = [
     {
@@ -162,32 +140,20 @@ function ApplicationInfoCard({
   ];
 
   const text = `${toUIDate(date)} - ${dayOfWeek}`;
-  return (
-    <ApplicationInfo
-      heading={name ?? ""}
-      text={text}
-      variant="vertical"
-      infos={icons}
-    />
-  );
+  return <ApplicationInfo heading={name ?? ""} text={text} variant="vertical" infos={icons} />;
 }
 
-function isPartOfApplication(
-  reservation: Pick<NonNullable<NodeT>, "recurringReservation">
-): boolean {
+function isPartOfApplication(reservation: Pick<NonNullable<NodeT>, "recurringReservation">): boolean {
   return reservation?.recurringReservation != null;
 }
 
-function getBackPath(
-  reservation: Pick<NonNullable<NodeT>, "recurringReservation" | "pk">
-): string {
+function getBackPath(reservation: Pick<NonNullable<NodeT>, "recurringReservation" | "pk">): string {
   if (reservation == null) {
     return "";
   }
   if (isPartOfApplication(reservation)) {
     const applicationPk =
-      reservation.recurringReservation?.allocatedTimeSlot?.reservationUnitOption
-        .applicationSection.application.pk;
+      reservation.recurringReservation?.allocatedTimeSlot?.reservationUnitOption.applicationSection.application.pk;
     return getApplicationPath(applicationPk, "view");
   }
   return getReservationPath(reservation.pk);
@@ -195,16 +161,13 @@ function getBackPath(
 
 /// For applications use application round terms of use
 function getTranslatedTerms(
-  reservation: Pick<
-    NonNullable<NodeT>,
-    "recurringReservation" | "reservationUnits" | "pk"
-  >,
+  reservation: Pick<NonNullable<NodeT>, "recurringReservation" | "reservationUnits" | "pk">,
   lang: LocalizationLanguages
 ) {
   if (reservation.recurringReservation) {
     const round =
-      reservation.recurringReservation?.allocatedTimeSlot?.reservationUnitOption
-        ?.applicationSection?.application?.applicationRound;
+      reservation.recurringReservation?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application
+        ?.applicationRound;
     const { termsOfUse } = round ?? {};
     if (termsOfUse) {
       return getTranslationSafe(termsOfUse, "text", lang);

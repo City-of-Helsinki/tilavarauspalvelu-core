@@ -18,10 +18,7 @@ import { errorToast, successToast } from "common/src/common/toast";
 import { useDisplayError } from "common/src/hooks";
 import { toNumber } from "common/src/helpers";
 
-export function useFocusApplicationEvent(): [
-  number | null,
-  (aes?: SectionNodeT) => void,
-] {
+export function useFocusApplicationEvent(): [number | null, (aes?: SectionNodeT) => void] {
   const [params, setParams] = useSearchParams();
 
   const selectedAeasPk = toNumber(params.get("aes"));
@@ -50,9 +47,7 @@ export function useFocusAllocatedSlot(): [
 ] {
   const [params, setParams] = useSearchParams();
 
-  const allocatedPk = params.get("allocated")
-    ? Number(params.get("allocated"))
-    : undefined;
+  const allocatedPk = params.get("allocated") ? Number(params.get("allocated")) : undefined;
 
   // { pk?: number | null | undefined }) => {
   const setAllocated = (allocated?: Pick<AllocatedTimeSlotNodeT, "pk">) => {
@@ -110,13 +105,7 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
     const [day, beginHour, beginMinute] = begin.split("-").map(toNumber);
     const [_, endHour, endMinute] = end.split("-").map(toNumber);
     const slots = [];
-    if (
-      day == null ||
-      beginHour == null ||
-      beginMinute == null ||
-      endHour == null ||
-      endMinute == null
-    ) {
+    if (day == null || beginHour == null || beginMinute == null || endHour == null || endMinute == null) {
       return [];
     }
     // NOTE: parseInt returns NaN for invalid => the loop checks will fail and return []
@@ -152,9 +141,7 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
 
 // side effects that should happen when a modification is made
 export function useRefreshApplications(
-  fetchCallback: () => Promise<
-    ApolloQueryResult<ApplicationSectionAllocationsQuery>
-  >
+  fetchCallback: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>
 ): [(clearSelection?: boolean) => Promise<void>, boolean] {
   const [, setSelection] = useSlotSelection();
   const [isRefetchLoading, setIsRefetchLoading] = useState(false);
@@ -202,8 +189,7 @@ export function useAcceptSlotMutation({
 }: AcceptSlotMutationProps): HookReturnValue {
   const { t } = useTranslation();
 
-  const [acceptApplicationEvent, { loading: isLoading }] =
-    useCreateAllocatedTimeSlotMutation();
+  const [acceptApplicationEvent, { loading: isLoading }] = useCreateAllocatedTimeSlotMutation();
   const displayError = useDisplayError();
 
   if (!reservationUnitOptionPk) {
@@ -225,10 +211,7 @@ export function useAcceptSlotMutation({
       return;
     }
     const allocatedBegin = timeSlotKeyToScheduleTime(selection[0]);
-    const allocatedEnd = timeSlotKeyToScheduleTime(
-      selection[selection.length - 1],
-      true
-    );
+    const allocatedEnd = timeSlotKeyToScheduleTime(selection[selection.length - 1], true);
     if (!reservationUnitOptionPk) {
       errorToast({ text: t("Allocation.errors.accepting.generic") });
       return;
@@ -280,8 +263,7 @@ export function useRemoveAllocation({
 }): HookReturnValue {
   const { t } = useTranslation();
 
-  const [resetApplicationEvent, { loading: isLoading }] =
-    useDeleteAllocatedTimeSlotMutation();
+  const [resetApplicationEvent, { loading: isLoading }] = useDeleteAllocatedTimeSlotMutation();
   const displayError = useDisplayError();
 
   const handleRemoveAllocation = async () => {
@@ -320,9 +302,7 @@ export function useRemoveAllocation({
 }
 
 export const CREATE_ALLOCATED_TIME_SLOT = gql`
-  mutation CreateAllocatedTimeSlot(
-    $input: AllocatedTimeSlotCreateMutationInput!
-  ) {
+  mutation CreateAllocatedTimeSlot($input: AllocatedTimeSlotCreateMutationInput!) {
     createAllocatedTimeslot(input: $input) {
       beginTime
       dayOfTheWeek
@@ -334,9 +314,7 @@ export const CREATE_ALLOCATED_TIME_SLOT = gql`
 `;
 
 export const DELETE_ALLOCATED_TIME_SLOT = gql`
-  mutation DeleteAllocatedTimeSlot(
-    $input: AllocatedTimeSlotDeleteMutationInput!
-  ) {
+  mutation DeleteAllocatedTimeSlot($input: AllocatedTimeSlotDeleteMutationInput!) {
     deleteAllocatedTimeslot(input: $input) {
       deleted
     }

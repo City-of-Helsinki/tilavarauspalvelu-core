@@ -31,10 +31,7 @@ export function getSingleSearchPath(params?: URLSearchParams): string {
 }
 
 type ApplicationPages = "page1" | "page2" | "page3" | "page4" | "view" | "sent";
-export function getApplicationPath(
-  pk: Maybe<number> | undefined,
-  page?: ApplicationPages | undefined
-): string {
+export function getApplicationPath(pk: Maybe<number> | undefined, page?: ApplicationPages | undefined): string {
   if (pk == null) {
     return "";
   }
@@ -66,10 +63,7 @@ export function getApplicationSectionPath(
 }
 
 type ReservationPages = "cancel" | "edit" | "confirmation";
-export function getReservationPath(
-  pk: Maybe<number> | undefined,
-  page?: ReservationPages | undefined
-): string {
+export function getReservationPath(pk: Maybe<number> | undefined, page?: ReservationPages | undefined): string {
   if (pk == null) {
     return "";
   }
@@ -86,20 +80,14 @@ export function getReservationInProgressPath(
   return `${reservationUnitPrefix}/${pk}/reservation/${reservationPk}`;
 }
 
-export function getReservationUnitPath(
-  pk: Maybe<number> | undefined,
-  params?: Readonly<URLSearchParams>
-): string {
+export function getReservationUnitPath(pk: Maybe<number> | undefined, params?: Readonly<URLSearchParams>): string {
   if (pk == null) {
     return "";
   }
   return `${reservationUnitPrefix}/${pk}?${params?.toString() ?? ""}`;
 }
 
-export function getFeedbackUrl(
-  feedbackUrl: string,
-  i18n: { language: string }
-) {
+export function getFeedbackUrl(feedbackUrl: string, i18n: { language: string }) {
   try {
     const url = new URL(feedbackUrl);
     url.searchParams.set("lang", i18n.language);

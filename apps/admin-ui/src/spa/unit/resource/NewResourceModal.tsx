@@ -7,11 +7,7 @@ import {
   type NewResourceUnitFieldsFragment,
   useCreateResourceMutation,
 } from "@gql/gql-types";
-import {
-  Editor,
-  ResourceUpdateForm,
-  ResourceUpdateSchema,
-} from "./modules/resourceEditor";
+import { Editor, ResourceUpdateForm, ResourceUpdateSchema } from "./modules/resourceEditor";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,20 +24,13 @@ interface IProps {
   refetch: () => Promise<unknown>;
 }
 
-export function NewResourceModal({
-  unit,
-  closeModal,
-  refetch,
-  spacePk,
-}: IProps): JSX.Element | null {
+export function NewResourceModal({ unit, closeModal, refetch, spacePk }: IProps): JSX.Element | null {
   const { t } = useTranslation();
   const displayError = useDisplayError();
 
-  const [createResourceMutation, { loading: isMutationLoading }] =
-    useCreateResourceMutation();
+  const [createResourceMutation, { loading: isMutationLoading }] = useCreateResourceMutation();
 
-  const createResource = (input: ResourceCreateMutationInput) =>
-    createResourceMutation({ variables: { input } });
+  const createResource = (input: ResourceCreateMutationInput) => createResourceMutation({ variables: { input } });
 
   const form = useForm<ResourceUpdateForm>({
     resolver: zodResolver(ResourceUpdateSchema),
@@ -71,8 +60,7 @@ export function NewResourceModal({
     }
   };
 
-  const parentName =
-    unit?.spaces.find((space) => space.pk === spacePk)?.nameFi ?? null;
+  const parentName = unit?.spaces.find((space) => space.pk === spacePk)?.nameFi ?? null;
 
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
@@ -88,11 +76,7 @@ export function NewResourceModal({
         </Editor>
       </Dialog.Content>
       <DialogActionsButtons>
-        <Button
-          onClick={closeModal}
-          variant={ButtonVariant.Secondary}
-          disabled={isMutationLoading}
-        >
+        <Button onClick={closeModal} variant={ButtonVariant.Secondary} disabled={isMutationLoading}>
           {t("ResourceModal.cancel")}
         </Button>
         <Button type="submit" disabled={!isDirty}>

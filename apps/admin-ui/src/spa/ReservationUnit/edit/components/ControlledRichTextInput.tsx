@@ -6,12 +6,9 @@ import React from "react";
 import dynamic from "next/dynamic";
 import { getTranslatedTooltipTex } from "@/spa/ReservationUnit/edit/utils";
 
-const RichTextInput = dynamic(
-  () => import("../../../../component/RichTextInput"),
-  {
-    ssr: false,
-  }
-);
+const RichTextInput = dynamic(() => import("../../../../component/RichTextInput"), {
+  ssr: false,
+});
 
 export function ControlledRichTextInput({
   control,

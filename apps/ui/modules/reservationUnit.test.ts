@@ -1,15 +1,5 @@
 import { get as mockGet } from "lodash-es";
-import {
-  addDays,
-  addHours,
-  addMonths,
-  endOfDay,
-  format,
-  getHours,
-  set,
-  startOfDay,
-  startOfToday,
-} from "date-fns";
+import { addDays, addHours, addMonths, endOfDay, format, getHours, set, startOfDay, startOfToday } from "date-fns";
 import { toApiDateUnsafe } from "common/src/common/util";
 import {
   PriceUnit,
@@ -49,16 +39,7 @@ import { generateNameFragment } from "@/test/test.gql.utils";
 import { TIMERS_TO_FAKE } from "@/test/test.utils";
 import { base64encode, ReadonlyDeep } from "common/src/helpers";
 import { type TFunction } from "i18next";
-import {
-  vi,
-  describe,
-  test,
-  expect,
-  beforeEach,
-  afterEach,
-  beforeAll,
-  afterAll,
-} from "vitest";
+import { vi, describe, test, expect, beforeEach, afterEach, beforeAll, afterAll } from "vitest";
 import { type DeepRequired } from "react-hook-form";
 import { createMockIsReservableFieldsFragment } from "@/test/reservation-unit.mocks";
 
@@ -175,9 +156,7 @@ describe("getPossibleTimesForDay", () => {
       { start: addHours(date, 16), end: addHours(date, 17) },
     ]);
     const input = createInput({ date, reservableTimes });
-    const output = ["12:00", "12:30", "13:00", "13:30", "16:00", "16:30"].map(
-      (label) => ({ label, value: label })
-    );
+    const output = ["12:00", "12:30", "13:00", "13:30", "16:00", "16:30"].map((label) => ({ label, value: label }));
     expect(getPossibleTimesForDay(input)).toStrictEqual(output);
   });
 
@@ -403,9 +382,7 @@ describe("isReservationUnitPublished", () => {
     [EnumT.ScheduledPeriod, false],
     [EnumT.ScheduledPublishing, false],
   ])("%s expect %s", (state, expected) => {
-    expect(isReservationUnitPublished({ publishingState: state })).toBe(
-      expected
-    );
+    expect(isReservationUnitPublished({ publishingState: state })).toBe(expected);
   });
 });
 
@@ -438,9 +415,7 @@ describe("getEquipmentCategories", () => {
   });
 
   test("with equipment out of predefined order", () => {
-    const equipment = ["Item A", "Item B", "Item C"].map((name) =>
-      createMockEquipment({ name })
-    );
+    const equipment = ["Item A", "Item B", "Item C"].map((name) => createMockEquipment({ name }));
     expect(getEquipmentCategories(equipment)).toStrictEqual(["Muu"]);
   });
 
@@ -472,12 +447,7 @@ describe("getEquipmentCategories", () => {
       },
     ].map(createMockEquipment);
 
-    expect(getEquipmentCategories(equipment)).toStrictEqual([
-      "Keittiö",
-      "Pelikonsoli",
-      "Liittimet",
-      "Muu",
-    ]);
+    expect(getEquipmentCategories(equipment)).toStrictEqual(["Keittiö", "Pelikonsoli", "Liittimet", "Muu"]);
   });
 });
 
@@ -487,14 +457,8 @@ describe("getEquipmentList", () => {
   });
 
   test("with equipment out of predefined order", () => {
-    const equipment = ["Item A", "Item B", "Item C"].map((name) =>
-      createMockEquipment({ name })
-    );
-    expect(getEquipmentList(equipment, "fi")).toStrictEqual([
-      "Item A FI",
-      "Item B FI",
-      "Item C FI",
-    ]);
+    const equipment = ["Item A", "Item B", "Item C"].map((name) => createMockEquipment({ name }));
+    expect(getEquipmentList(equipment, "fi")).toStrictEqual(["Item A FI", "Item B FI", "Item C FI"]);
   });
 
   test("with equipment in predefined order", () => {
@@ -530,13 +494,10 @@ describe("getReservationUnitName", () => {
     expect(getReservationUnitName(reservationUnit, lang)).toEqual(name);
   });
 
-  test.for(["", undefined, "fr", "de"])(
-    "should default to fi if language is not found",
-    () => {
-      const reservationUnit = generateNameFragment("Unit 1");
-      expect(getReservationUnitName(reservationUnit)).toEqual("Unit 1 FI");
-    }
-  );
+  test.for(["", undefined, "fr", "de"])("should default to fi if language is not found", () => {
+    const reservationUnit = generateNameFragment("Unit 1");
+    expect(getReservationUnitName(reservationUnit)).toEqual("Unit 1 FI");
+  });
 });
 
 describe("getFuturePricing", () => {
@@ -563,11 +524,7 @@ describe("getFuturePricing", () => {
     };
   }
 
-  const DAYS: readonly Date[] = [
-    addDays(new Date(), 10),
-    addDays(new Date(), 20),
-    addDays(new Date(), 5),
-  ];
+  const DAYS: readonly Date[] = [addDays(new Date(), 10), addDays(new Date(), 20), addDays(new Date(), 5)];
 
   test.for([
     { days: DAYS, expectedIndex: 2 },
@@ -700,9 +657,7 @@ describe("getReservationUnitPrice", () => {
     pricings,
   }: {
     date: Date;
-    pricings: Readonly<
-      NonNullable<PriceReservationUnitFieldsFragment>["pricings"]
-    >;
+    pricings: Readonly<NonNullable<PriceReservationUnitFieldsFragment>["pricings"]>;
   }): GetReservationUnitPriceProps {
     return {
       t: mockT as TFunction,
@@ -768,16 +723,13 @@ describe("getReservationUnitPrice", () => {
   test.for([
     { isFreeNow: false, expected: "20,00 € / tunti" },
     { isFreeNow: true, expected: "25,00 € / tunti" },
-  ])(
-    "change in tax is only active in the future",
-    ({ isFreeNow, expected }) => {
-      const input = connstructInput({
-        date: addDays(new Date(), 15),
-        pricings: constructTaxChangePricings(isFreeNow),
-      });
-      expect(getReservationUnitPrice(input)).toBe(expected);
-    }
-  );
+  ])("change in tax is only active in the future", ({ isFreeNow, expected }) => {
+    const input = connstructInput({
+      date: addDays(new Date(), 15),
+      pricings: constructTaxChangePricings(isFreeNow),
+    });
+    expect(getReservationUnitPrice(input)).toBe(expected);
+  });
 });
 
 describe("isReservationUnitReservable", () => {
@@ -823,17 +775,14 @@ describe("isReservationUnitReservable", () => {
     },
   ];
 
-  test.for([{ spans: undefined }, { spans: [] }])(
-    "not reservable with no time spans",
-    ({ spans }) => {
-      const input = constructReservationUnitNode({
-        reservableTimeSpans: spans,
-        reservationState: ReservationUnitReservationState.Reservable,
-      });
-      const { isReservable } = isReservationUnitReservable(input);
-      expect(isReservable).toBe(false);
-    }
-  );
+  test.for([{ spans: undefined }, { spans: [] }])("not reservable with no time spans", ({ spans }) => {
+    const input = constructReservationUnitNode({
+      reservableTimeSpans: spans,
+      reservationState: ReservationUnitReservationState.Reservable,
+    });
+    const { isReservable } = isReservationUnitReservable(input);
+    expect(isReservable).toBe(false);
+  });
 
   test.for([
     {
@@ -856,18 +805,15 @@ describe("isReservationUnitReservable", () => {
       reservationState: ReservationUnitReservationState.ScheduledPeriod,
       expected: false,
     },
-  ])(
-    "determines reservability correctly for state $reservationState",
-    ({ reservationState, expected }) => {
-      const input = constructReservationUnitNode({
-        reservableTimeSpans: defaultTimeSpans,
-        reservationState,
-        reservationBegins: addDays(new Date(), -1),
-      });
-      const { isReservable } = isReservationUnitReservable(input);
-      expect(isReservable).toBe(expected);
-    }
-  );
+  ])("determines reservability correctly for state $reservationState", ({ reservationState, expected }) => {
+    const input = constructReservationUnitNode({
+      reservableTimeSpans: defaultTimeSpans,
+      reservationState,
+      reservationBegins: addDays(new Date(), -1),
+    });
+    const { isReservable } = isReservationUnitReservable(input);
+    expect(isReservable).toBe(expected);
+  });
 
   test.for([
     {
@@ -1140,11 +1086,7 @@ describe("getNextAvailableTime", () => {
     ]);
   });
 
-  function mockOpenTimes(
-    start: Date,
-    days: number,
-    data?: Array<{ start: Date; end: Date }>
-  ) {
+  function mockOpenTimes(start: Date, days: number, data?: Array<{ start: Date; end: Date }>) {
     for (let i = 0; i < days; i++) {
       reservableTimes.set(
         dateToKey(addDays(start, i)),
@@ -1542,8 +1484,7 @@ describe("getNextAvailableTime", () => {
 
 describe("formatNDays", () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mockT = ((key: string, record: any) =>
-    `${record.count} ${key}`) as TFunction;
+  const mockT = ((key: string, record: any) => `${record.count} ${key}`) as TFunction;
 
   // Same list of options available in the admin-ui
   // this is the primary use case
@@ -1560,45 +1501,35 @@ describe("formatNDays", () => {
     expect(res).toBe(label);
   });
 
-  test.for([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13])(
-    "formats < 2 weeks as days",
-    (val) => {
-      const res = formatNDays(mockT, val);
-      expect(res).toBe(`${val} common:days`);
-    }
-  );
+  test.for([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13])("formats < 2 weeks as days", (val) => {
+    const res = formatNDays(mockT, val);
+    expect(res).toBe(`${val} common:days`);
+  });
 
   test("formats 0 days as a empty string", () => {
     const res = formatNDays(mockT, 0);
     expect(res).toBe("");
   });
 
-  test.for([14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29])(
-    "formats %s days as weeks",
-    (val) => {
-      const res = formatNDays(mockT, val);
-      expect(res).toBe(`${Math.floor(val / 7)} common:weeks`);
-    }
-  );
-
-  test.for(
-    Array.from({ length: 30 }, (_, i) => 30 + Math.random() * 10 * i).map(
-      Math.floor
-    )
-  )("formats %s days > as months", (days) => {
-    const res = formatNDays(mockT, days);
-    expect(res).toBe(`${Math.floor(days / 30)} common:months`);
+  test.for([14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29])("formats %s days as weeks", (val) => {
+    const res = formatNDays(mockT, val);
+    expect(res).toBe(`${Math.floor(val / 7)} common:weeks`);
   });
 
-  test.for(Array.from({ length: 30 }, () => Math.random() * 365))(
-    "removes decimals from %s",
+  test.for(Array.from({ length: 30 }, (_, i) => 30 + Math.random() * 10 * i).map(Math.floor))(
+    "formats %s days > as months",
     (days) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const t = ((_key: string, record: any) => `${record.count}`) as TFunction;
-      const res = formatNDays(t, days);
-      expect(res).toBe(Math.floor(Number(res)).toString());
+      const res = formatNDays(mockT, days);
+      expect(res).toBe(`${Math.floor(days / 30)} common:months`);
     }
   );
+
+  test.for(Array.from({ length: 30 }, () => Math.random() * 365))("removes decimals from %s", (days) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const t = ((_key: string, record: any) => `${record.count}`) as TFunction;
+    const res = formatNDays(t, days);
+    expect(res).toBe(Math.floor(Number(res)).toString());
+  });
 
   test("formats negative days as empty string", () => {
     const res = formatNDays(mockT, -5);

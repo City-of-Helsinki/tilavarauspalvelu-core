@@ -57,21 +57,16 @@ function EditReservation({
   const form = useForm<FormValueType>({
     // @ts-expect-error -- schema refinement breaks typing
     resolver: zodResolver(
-      ReservationChangeFormSchema.refine(
-        (x) => x.seriesName || !reservation.recurringReservation,
-        {
-          path: ["seriesName"],
-          message: "Required",
-        }
-      )
+      ReservationChangeFormSchema.refine((x) => x.seriesName || !reservation.recurringReservation, {
+        path: ["seriesName"],
+        message: "Required",
+      })
     ),
     mode: "onChange",
     defaultValues: {
       seriesName: reservation.recurringReservation?.name ?? "",
       comments: reservation.workingMemo ?? "",
-      type: ReservationTypeSchema.optional().parse(
-        reservation.type?.toUpperCase()
-      ),
+      type: ReservationTypeSchema.optional().parse(reservation.type?.toUpperCase()),
       name: reservation.name ?? "",
       description: reservation.description ?? "",
       ageGroup: reservation.ageGroup?.pk ?? undefined,
@@ -94,8 +89,7 @@ function EditReservation({
       reserveeEmail: reservation.reserveeEmail ?? "",
       reserveeFirstName: reservation.reserveeFirstName ?? "",
       reserveeId: reservation.reserveeId ?? "",
-      reserveeIsUnregisteredAssociation:
-        reservation.reserveeIsUnregisteredAssociation ?? undefined,
+      reserveeIsUnregisteredAssociation: reservation.reserveeIsUnregisteredAssociation ?? undefined,
       reserveeLastName: reservation.reserveeLastName ?? "",
       reserveeOrganisationName: reservation.reserveeOrganisationName ?? "",
       reserveePhone: reservation.reserveePhone ?? "",
@@ -135,8 +129,7 @@ function EditReservation({
     formState: { errors, isDirty, isSubmitting },
   } = form;
 
-  const translateError = (errorMsg?: string) =>
-    errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "";
+  const translateError = (errorMsg?: string) => (errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "");
 
   return (
     <FormProvider {...form}>
@@ -161,11 +154,7 @@ function EditReservation({
         </ReservationTypeForm>
         <HR />
         <ButtonContainer>
-          <Button
-            variant={ButtonVariant.Secondary}
-            onClick={onCancel}
-            disabled={isSubmitting}
-          >
+          <Button variant={ButtonVariant.Secondary} onClick={onCancel} disabled={isSubmitting}>
             {t("common.cancel")}
           </Button>
           <Button
@@ -210,11 +199,7 @@ export function EditPage() {
         t("Reservation failed to load", { pk: id })
       ) : (
         <ErrorBoundary fallback={<div>{t("pageThrewError")}</div>}>
-          <EditReservation
-            reservation={reservation}
-            onCancel={handleCancel}
-            onSuccess={handleSuccess}
-          />
+          <EditReservation reservation={reservation} onCancel={handleCancel} onSuccess={handleSuccess} />
         </ErrorBoundary>
       )}
     </EditPageWrapper>
@@ -237,12 +222,7 @@ function EditPageWrapper({
     <>
       <LinkPrev />
       {reservation && (
-        <ReservationTitleSection
-          reservation={reservation}
-          tagline={tagline}
-          overrideTitle={title}
-          noMargin
-        />
+        <ReservationTitleSection reservation={reservation} tagline={tagline} overrideTitle={title} noMargin />
       )}
       {children}
     </>

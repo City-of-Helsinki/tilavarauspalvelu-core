@@ -13,11 +13,9 @@ import { capitalize } from "../helpers";
 
 export const parseDate = (date: string): Date => parseISO(date);
 
-export const startOfWeek = (d: Date): Date =>
-  dateFnsStartOfWeek(d, { weekStartsOn: 1 });
+export const startOfWeek = (d: Date): Date => dateFnsStartOfWeek(d, { weekStartsOn: 1 });
 
-export const endOfWeek = (d: Date): Date =>
-  dateFnsEndOfWeek(d, { weekStartsOn: 1 });
+export const endOfWeek = (d: Date): Date => dateFnsEndOfWeek(d, { weekStartsOn: 1 });
 
 export function formatDuration(
   t: TFunction,
@@ -38,9 +36,7 @@ export function formatDuration(
   const min = Math.floor((secs / 60) % 60);
 
   const hourKey = abbreviated ? "common:abbreviations:hour" : "common:hour";
-  const minuteKey = abbreviated
-    ? "common:abbreviations:minute"
-    : "common:minute";
+  const minuteKey = abbreviated ? "common:abbreviations:minute" : "common:minute";
 
   const p = [];
 
@@ -58,11 +54,7 @@ function formatDurationSeconds(seconds: number, t: TFunction): string {
   return formatDuration(t, { seconds }, true);
 }
 
-export function formatDurationRange(
-  t: TFunction,
-  beginSecs: number,
-  endSecs: number
-): string {
+export function formatDurationRange(t: TFunction, beginSecs: number, endSecs: number): string {
   const beginHours = formatDurationSeconds(beginSecs, t);
   const endHours = formatDurationSeconds(endSecs, t);
   return beginSecs === endSecs ? beginHours : `${beginHours} – ${endHours}`;
@@ -80,13 +72,7 @@ type TimeStruct = {
 };
 
 export function toApiTime({ hours, minutes = 0 }: TimeStruct): string | null {
-  if (
-    (hours === 24 && minutes !== 0) ||
-    hours < 0 ||
-    hours > 24 ||
-    minutes < 0 ||
-    minutes > 59
-  ) {
+  if ((hours === 24 && minutes !== 0) || hours < 0 || hours > 24 || minutes < 0 || minutes > 59) {
     return null;
   }
   const hNormalized = hours === 24 ? 0 : hours;
@@ -156,8 +142,7 @@ export function fromUIDate(date: string): Date | null {
 // Returns true if the date is not NaN and after year 1000
 // this is used to check date after string conversion
 // another option: combine it to the date conversion functions (return null on invalid dates) => better with TS
-export const isValidDate = (date: Date): boolean =>
-  isValid(date) && isAfter(date, new Date("1000-01-01"));
+export const isValidDate = (date: Date): boolean => isValid(date) && isAfter(date, new Date("1000-01-01"));
 
 // Returns a string in "d.M.yyyy" format from a Date object
 // TODO returning undefined would be preferably (specificity) but breaks the users of this function
@@ -174,10 +159,7 @@ export function toUIDate(date: Date | null, formatStr = "d.M.yyyy"): string {
 
 // Returns a string in "d.M.yyyy klo hh:mm" format from a Date object
 // TODO returning undefined would be preferably (specificity) but breaks the users of this function
-export function toUIDateTime(
-  date: Date | null,
-  formatStr = "d.M.yyyy"
-): string {
+export function toUIDateTime(date: Date | null, formatStr = "d.M.yyyy"): string {
   if (!date || !isValidDate(date)) {
     return "";
   }
@@ -206,11 +188,7 @@ export const chunkArray = <T>(array: T[], size: number): T[][] => {
 // TODO Records are bad, use a query result type instead?
 // TODO key should not be a string (so we don't accidentially pass "nameFi" here)
 // gather all used keys and make a string literal for them (typically it's just name)
-export function getTranslationSafe(
-  parent: Record<string, unknown>,
-  key: string,
-  lang: "fi" | "sv" | "en"
-): string {
+export function getTranslationSafe(parent: Record<string, unknown>, key: string, lang: "fi" | "sv" | "en"): string {
   const keyString = `${key}${capitalize(lang)}`;
   if (parent && parent[keyString]) {
     if (typeof parent[keyString] === "string") {

@@ -58,9 +58,7 @@ const BannerNotificationText = styled.div`
   }
 `;
 
-function convertNotificationType(
-  level: BannerNotificationLevel
-): NotificationType {
+function convertNotificationType(level: BannerNotificationLevel): NotificationType {
   switch (level) {
     case BannerNotificationLevel.Exception:
       return "error";
@@ -71,11 +69,7 @@ function convertNotificationType(
   }
 }
 
-function NotificationsListItem({
-  notification,
-  closeFn,
-  closedArray,
-}: NotificationsListItemProps) {
+function NotificationsListItem({ notification, closeFn, closedArray }: NotificationsListItemProps) {
   const { t, i18n } = useTranslation();
   const notificationType = convertNotificationType(notification.level);
   const lang = convertLanguageCode(i18n.language);
@@ -88,12 +82,7 @@ function NotificationsListItem({
         dismissible
         closeButtonLabelText={t("common:close")}
         data-testid="BannerNotificationList__Notification"
-        onClose={() =>
-          closeFn([
-            ...closedArray,
-            notification.id + (notification.activeFrom ?? ""),
-          ])
-        }
+        onClose={() => closeFn([...closedArray, notification.id + (notification.activeFrom ?? "")])}
       >
         {notification && (
           <BannerNotificationText
@@ -114,10 +103,7 @@ function NotificationsListItem({
 /// @return A list of banner notifications targeted to the specified targets, ordered by level (EXCEPTION, WARNING, NORMAL)
 /// @desc A component which returns a list of styled banner notifications, clipped at the specified amount, targeted to the specified targets and ordered by level
 /// TODO under testing: can't do target checks to the query because backend doesn't allow querying target without can_manage_notifications permission
-const BannerNotificationsList = ({
-  target,
-  displayAmount = 2,
-}: BannerNotificationListProps) => {
+const BannerNotificationsList = ({ target, displayAmount = 2 }: BannerNotificationListProps) => {
   // no-cache is required because admin is caching bannerNotifications query and
   // there is no key setup for this so this query returns garbage from the admin cache.
   const { data } = useBannerNotificationsListQuery({
@@ -131,32 +117,20 @@ const BannerNotificationsList = ({
   });
   const notificationsTarget = data?.bannerNotifications;
   const notificationsAll = dataAll?.bannerNotifications;
-  const comb = [
-    ...(notificationsAll?.edges ?? []),
-    ...(notificationsTarget?.edges ?? []),
-  ];
+  const comb = [...(notificationsAll?.edges ?? []), ...(notificationsTarget?.edges ?? [])];
   const notificationsList = filterNonNullable(comb.map((edge) => edge?.node));
 
-  const [closedNotificationsList, setClosedNotificationsList] = useLocalStorage<
-    string[]
-  >("tilavarausHKIClosedNotificationsList", []);
+  const [closedNotificationsList, setClosedNotificationsList] = useLocalStorage<string[]>(
+    "tilavarausHKIClosedNotificationsList",
+    []
+  );
 
   // Separate notifications by level
-  const errorNotificationsList = notificationsList.filter(
-    (item) => item?.level === "EXCEPTION"
-  );
-  const alertNotificationsList = notificationsList.filter(
-    (item) => item?.level === "WARNING"
-  );
-  const infoNotificationsList = notificationsList.filter(
-    (item) => item?.level === "NORMAL"
-  );
+  const errorNotificationsList = notificationsList.filter((item) => item?.level === "EXCEPTION");
+  const alertNotificationsList = notificationsList.filter((item) => item?.level === "WARNING");
+  const infoNotificationsList = notificationsList.filter((item) => item?.level === "NORMAL");
   // Merge grouped notifications prioritised by level
-  const groupedNotificationsList = [
-    ...errorNotificationsList,
-    ...alertNotificationsList,
-    ...infoNotificationsList,
-  ];
+  const groupedNotificationsList = [...errorNotificationsList, ...alertNotificationsList, ...infoNotificationsList];
   // Filter out notifications that have been closed by the user
   const displayedNotificationsList = groupedNotificationsList.filter(
     (item) =>

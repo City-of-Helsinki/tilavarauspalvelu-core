@@ -2,27 +2,11 @@ import React, { useRef, type ReactNode } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import {
-  Button,
-  IconCross,
-  IconArrowRedo,
-  Tag,
-  ButtonSize,
-  ButtonVariant,
-  LoadingSpinner,
-} from "hds-react";
+import { Button, IconCross, IconArrowRedo, Tag, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { isEqual, trim } from "lodash-es";
 import { gql, type ApolloQueryResult } from "@apollo/client";
 import { type TFunction } from "i18next";
-import {
-  CenterSpinner,
-  Flex,
-  TitleSection,
-  H1,
-  H3,
-  H4,
-  fontMedium,
-} from "common/styled";
+import { CenterSpinner, Flex, TitleSection, H1, H3, H4, fontMedium } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { base64encode, filterNonNullable, toNumber } from "common/src/helpers";
 import {
@@ -43,12 +27,7 @@ import {
 } from "@gql/gql-types";
 import { formatDuration } from "common/src/common/util";
 import { ApplicationTimePreview } from "common/src/components/ApplicationTimePreview";
-import {
-  formatNumber,
-  formatDate,
-  formatAgeGroups,
-  formatDateRange,
-} from "@/common/util";
+import { formatNumber, formatDate, formatAgeGroups, formatDateRange } from "@/common/util";
 import ScrollIntoView from "@/common/ScrollIntoView";
 import { Accordion as AccordionBase } from "@/component/Accordion";
 import { ApplicationWorkingMemo } from "@/component/WorkingMemo";
@@ -91,15 +70,7 @@ const DeclinedTag = styled(Tag)`
   }
 `;
 
-const KV = ({
-  k,
-  v,
-  dataId,
-}: {
-  k: string;
-  v?: string;
-  dataId?: string;
-}): JSX.Element => (
+const KV = ({ k, v, dataId }: { k: string; v?: string; dataId?: string }): JSX.Element => (
   <div key={k}>
     <span id={k}>{k}</span>:{" "}
     <Value aria-labelledby={k} data-testid={dataId}>
@@ -108,11 +79,7 @@ const KV = ({
   </div>
 );
 
-function formatApplicationDuration(
-  durationSeconds: number | undefined,
-  t: TFunction,
-  type?: "min" | "max"
-): string {
+function formatApplicationDuration(durationSeconds: number | undefined, t: TFunction, type?: "min" | "max"): string {
   if (!durationSeconds) {
     return "";
   }
@@ -120,11 +87,7 @@ function formatApplicationDuration(
   return `${type ? t(translationKey) : ""} ${formatDuration(t, { seconds: durationSeconds })}`;
 }
 
-function appEventDuration(
-  min: number | undefined,
-  max: number | undefined,
-  t: TFunction
-): string {
+function appEventDuration(min: number | undefined, max: number | undefined, t: TFunction): string {
   let duration = "";
   if (isEqual(min, max)) {
     duration += formatApplicationDuration(min, t);
@@ -155,10 +118,7 @@ function RejectOptionButton({
   const { t } = useTranslation();
   const displayError = useDisplayError();
 
-  const updateOption = async (
-    pk: Maybe<number> | undefined,
-    rejected: boolean
-  ): Promise<void> => {
+  const updateOption = async (pk: Maybe<number> | undefined, rejected: boolean): Promise<void> => {
     try {
       if (pk == null) {
         throw new Error("no pk in option");
@@ -188,11 +148,9 @@ function RejectOptionButton({
   const isRejected = option.rejected;
 
   const isRejectionAllowed =
-    applicationStatus === ApplicationStatusChoice.InAllocation ||
-    applicationStatus === ApplicationStatusChoice.Handled;
+    applicationStatus === ApplicationStatusChoice.InAllocation || applicationStatus === ApplicationStatusChoice.Handled;
   const hasAllocations = option.allocatedTimeSlots?.length > 0;
-  const isDisabled =
-    !isRejectionAllowed || hasAllocations || !hasPermission || option.locked;
+  const isDisabled = !isRejectionAllowed || hasAllocations || !hasPermission || option.locked;
 
   if (!hasPermission) {
     return null;
@@ -201,22 +159,12 @@ function RejectOptionButton({
     <Button
       size={ButtonSize.Small}
       variant={loading ? ButtonVariant.Clear : ButtonVariant.Supplementary}
-      iconStart={
-        loading ? (
-          <LoadingSpinner small />
-        ) : isRejected ? (
-          <IconArrowRedo />
-        ) : (
-          <IconCross />
-        )
-      }
+      iconStart={loading ? <LoadingSpinner small /> : isRejected ? <IconArrowRedo /> : <IconCross />}
       onClick={isRejected ? handleRevert : handleReject}
       disabled={isDisabled || loading}
       data-testid={`reject-btn-${option.pk}`}
     >
-      {isRejected
-        ? t("Application.section.btnRestore")
-        : t("Application.section.btnReject")}
+      {isRejected ? t("Application.section.btnRestore") : t("Application.section.btnReject")}
     </Button>
   );
 }
@@ -231,29 +179,22 @@ function RejectAllOptionsButton({
   refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
 }) {
   const { t } = useTranslation();
-  const units = filterNonNullable(
-    section.reservationUnitOptions.map((x) => x.reservationUnit?.unit?.pk)
-  );
+  const units = filterNonNullable(section.reservationUnitOptions.map((x) => x.reservationUnit?.unit?.pk));
   const { hasPermission } = useCheckPermission({
     units,
     permission: UserPermissionChoice.CanManageApplications,
     requireAll: true,
   });
 
-  const [rejectMutation, { loading: rejectLoading }] =
-    useRejectAllSectionOptionsMutation();
+  const [rejectMutation, { loading: rejectLoading }] = useRejectAllSectionOptionsMutation();
 
-  const [restoreMutation, { loading: restoreLoading }] =
-    useRestoreAllSectionOptionsMutation();
+  const [restoreMutation, { loading: restoreLoading }] = useRestoreAllSectionOptionsMutation();
 
   const displayError = useDisplayError();
 
   const isLoading = rejectLoading || restoreLoading;
 
-  const mutate = async (
-    pk: Maybe<number> | undefined,
-    restore: boolean
-  ): Promise<void> => {
+  const mutate = async (pk: Maybe<number> | undefined, restore: boolean): Promise<void> => {
     try {
       if (pk == null) {
         throw new Error("no pk in section");
@@ -290,11 +231,8 @@ function RejectAllOptionsButton({
   }
 
   const inAllocation =
-    applicationStatus === ApplicationStatusChoice.InAllocation ||
-    applicationStatus === ApplicationStatusChoice.Handled;
-  const isRejected = section.reservationUnitOptions.every(
-    (x) => x.rejected || x.locked
-  );
+    applicationStatus === ApplicationStatusChoice.InAllocation || applicationStatus === ApplicationStatusChoice.Handled;
+  const isRejected = section.reservationUnitOptions.every((x) => x.rejected || x.locked);
   // edge case: only locked options -> rejection has no effect
   const isAllLocked = section.reservationUnitOptions.every((x) => x.locked);
   const hasAllocations = section.allocations != null && section.allocations > 0;
@@ -312,9 +250,7 @@ function RejectAllOptionsButton({
       disabled={isDisabled || isLoading}
       onClick={() => (isRejected ? handleRestoreAll() : handleRejectAll())}
     >
-      {isRejected
-        ? t("Application.section.btnRestoreAll")
-        : t("Application.section.btnRejectAll")}
+      {isRejected ? t("Application.section.btnRestoreAll") : t("Application.section.btnRejectAll")}
     </Button>
   );
 }
@@ -394,16 +330,9 @@ function ReservationUnitOptionsSection({
     },
     {
       key: "status",
-      transform: ({
-        rejected,
-        locked,
-      }: ReservationUnitOptionFieldsFragment) => {
+      transform: ({ rejected, locked }: ReservationUnitOptionFieldsFragment) => {
         if (rejected || locked) {
-          return (
-            <DeclinedTag iconStart={<IconCross />}>
-              {t("Application.rejected")}
-            </DeclinedTag>
-          );
+          return <DeclinedTag iconStart={<IconCross />}>{t("Application.rejected")}</DeclinedTag>;
         }
       },
     },
@@ -413,13 +342,7 @@ function ReservationUnitOptionsSection({
         if (applicationStatus == null) {
           return null;
         }
-        return (
-          <RejectOptionButton
-            option={option}
-            applicationStatus={applicationStatus}
-            refetch={refetch}
-          />
-        );
+        return <RejectOptionButton option={option} applicationStatus={applicationStatus} refetch={refetch} />;
       },
     },
   ];
@@ -435,10 +358,7 @@ function ReservationUnitOptionsSection({
         {rows.map((row) => (
           <ReservationUnitOptionRow key={row.pk}>
             {cols.map((col) => (
-              <ReservationUnitOptionElem
-                key={`${col.key}-${row.pk}`}
-                $hideOnMobile={col.key === "status"}
-              >
+              <ReservationUnitOptionElem key={`${col.key}-${row.pk}`} $hideOnMobile={col.key === "status"}>
                 {col.transform(row)}
               </ReservationUnitOptionElem>
             ))}
@@ -489,44 +409,22 @@ function ApplicationSectionDetails({
             )}
             <ValueBox
               label={t("ApplicationEvent.groupSize")}
-              value={formatNumber(
-                section.numPersons,
-                t("common.membersSuffix")
-              )}
+              value={formatNumber(section.numPersons, t("common.membersSuffix"))}
             />
-            <ValueBox
-              label={t("ApplicationEvent.purpose")}
-              value={section.purpose?.nameFi ?? undefined}
-            />
-            <ValueBox
-              label={t("ApplicationEvent.eventDuration")}
-              value={duration}
-            />
-            <ValueBox
-              label={t("ApplicationEvent.eventsPerWeek")}
-              value={`${section.appliedReservationsPerWeek}`}
-            />
+            <ValueBox label={t("ApplicationEvent.purpose")} value={section.purpose?.nameFi ?? undefined} />
+            <ValueBox label={t("ApplicationEvent.eventDuration")} value={duration} />
+            <ValueBox label={t("ApplicationEvent.eventsPerWeek")} value={`${section.appliedReservationsPerWeek}`} />
             <ValueBox label={t("ApplicationEvent.dates")} value={dates} />
           </ApplicationDatas>
-          <Flex
-            $justifyContent="space-between"
-            $direction="row"
-            $alignItems="center"
-          >
+          <Flex $justifyContent="space-between" $direction="row" $alignItems="center">
             <H4 as="h3">{t("ApplicationEvent.requestedReservationUnits")}</H4>
             <RejectAllOptionsButton
               section={section}
               refetch={refetch}
-              applicationStatus={
-                application?.status ?? ApplicationStatusChoice.Draft
-              }
+              applicationStatus={application?.status ?? ApplicationStatusChoice.Draft}
             />
           </Flex>
-          <ReservationUnitOptionsSection
-            section={section}
-            refetch={refetch}
-            applicationStatus={application?.status}
-          />
+          <ReservationUnitOptionsSection section={section} refetch={refetch} applicationStatus={application?.status} />
           <H4 as="h3">{t("ApplicationEvent.requestedTimes")}</H4>
           <TimeSection>
             <TimeSelector applicationSection={section} />
@@ -557,19 +455,14 @@ function RejectApplicationButton({
     requireAll: true,
   });
 
-  const [rejectionMutation, { loading: isRejectionLoading }] =
-    useRejectAllApplicationOptionsMutation();
+  const [rejectionMutation, { loading: isRejectionLoading }] = useRejectAllApplicationOptionsMutation();
 
-  const [restoreMutation, { loading: isRestoreLoading }] =
-    useRestoreAllApplicationOptionsMutation();
+  const [restoreMutation, { loading: isRestoreLoading }] = useRestoreAllApplicationOptionsMutation();
   const displayError = useDisplayError();
 
   const isLoading = isRejectionLoading || isRestoreLoading;
 
-  const updateApplication = async (
-    pk: Maybe<number> | undefined,
-    shouldReject: boolean
-  ): Promise<void> => {
+  const updateApplication = async (pk: Maybe<number> | undefined, shouldReject: boolean): Promise<void> => {
     try {
       if (pk == null) {
         throw new Error("no pk in application");
@@ -626,20 +519,14 @@ function RejectApplicationButton({
     application.status === ApplicationStatusChoice.Handled;
   const aes = application.applicationSections ?? [];
   const hasBeenAllocated = aes.some((section) =>
-    section.reservationUnitOptions.some(
-      (option) => option.allocatedTimeSlots?.length > 0
-    )
+    section.reservationUnitOptions.some((option) => option.allocatedTimeSlots?.length > 0)
   );
   const canReject = isInAllocation && !hasBeenAllocated;
   const isRejected = aes.every((section) =>
-    section.reservationUnitOptions.every(
-      (option) => option.rejected || option.locked
-    )
+    section.reservationUnitOptions.every((option) => option.rejected || option.locked)
   );
   // edge case: only locked options -> rejection has no effect
-  const isAllLocked = aes.every((section) =>
-    section.reservationUnitOptions.every((x) => x.locked)
-  );
+  const isAllLocked = aes.every((section) => section.reservationUnitOptions.every((x) => x.locked));
   const isDisabled = !canReject || !hasPermission || isAllLocked;
 
   if (!hasPermission) {
@@ -658,11 +545,7 @@ function RejectApplicationButton({
   );
 }
 
-function ApplicationDetails({
-  applicationPk,
-}: {
-  applicationPk: number;
-}): JSX.Element | null {
+function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.Element | null {
   const ref = useRef<HTMLHeadingElement>(null);
   const { t } = useTranslation();
 
@@ -704,8 +587,7 @@ function ApplicationDetails({
 
   // TODO replace this with an explicit check and warn on undefined fields
   const hasBillingAddress =
-    application?.billingAddress != null &&
-    !isEqual(application?.billingAddress, application.organisation?.address);
+    application?.billingAddress != null && !isEqual(application?.billingAddress, application.organisation?.address);
 
   const customerName = getApplicantName(application);
   // TODO where is this defined in the application form?
@@ -720,29 +602,20 @@ function ApplicationDetails({
   return (
     <>
       <ShowWhenTargetInvisible target={ref}>
-        <StickyHeader
-          name={customerName}
-          tagline={`${t("Application.id")}: ${application.pk}`}
-        />
+        <StickyHeader name={customerName} tagline={`${t("Application.id")}: ${application.pk}`} />
       </ShowWhenTargetInvisible>
       <>
         <TitleSection>
           <H1 ref={ref} $noMargin>
             {customerName}
           </H1>
-          {application.status != null && (
-            <ApplicationStatusLabel status={application.status} user="admin" />
-          )}
+          {application.status != null && <ApplicationStatusLabel status={application.status} user="admin" />}
         </TitleSection>
         <PreCard>
-          {t("Application.applicationReceivedTime")}{" "}
-          {formatDate(application.lastModifiedDate, "d.M.yyyy HH:mm")}
+          {t("Application.applicationReceivedTime")} {formatDate(application.lastModifiedDate, "d.M.yyyy HH:mm")}
         </PreCard>
         <div>
-          <RejectApplicationButton
-            application={application}
-            refetch={refetch}
-          />
+          <RejectApplicationButton application={application} refetch={refetch} />
         </div>
         <Summary>
           <KV
@@ -752,18 +625,12 @@ function ApplicationDetails({
           />
           <KV k={t("common.homeCity")} v={homeCity} />
           {isOrganisation && (
-            <KV
-              k={t("Application.coreActivity")}
-              v={application.organisation?.coreBusinessFi || "-"}
-            />
+            <KV k={t("Application.coreActivity")} v={application.organisation?.coreBusinessFi || "-"} />
           )}
           <KV k={t("Application.numHours")} v="-" />
           <KV k={t("Application.numTurns")} v="-" />
         </Summary>
-        <Accordion
-          heading={t("RequestedReservation.workingMemo")}
-          initiallyOpen={application.workingMemo.length > 0}
-        >
+        <Accordion heading={t("RequestedReservation.workingMemo")} initiallyOpen={application.workingMemo.length > 0}>
           <ApplicationWorkingMemo
             applicationPk={applicationPk}
             refetch={refetch}
@@ -771,48 +638,26 @@ function ApplicationDetails({
           />
         </Accordion>
         {applicationSections.map((section) => (
-          <ApplicationSectionDetails
-            section={section}
-            application={application}
-            key={section.pk}
-            refetch={refetch}
-          />
+          <ApplicationSectionDetails section={section} application={application} key={section.pk} refetch={refetch} />
         ))}
         <H3 as="h2" $noMargin>
           {t("Application.customerBasicInfo")}
         </H3>
         <ApplicationDatas>
-          <ValueBox
-            label={t("Application.authenticatedUser")}
-            value={application.user?.email}
-          />
+          <ValueBox label={t("Application.authenticatedUser")} value={application.user?.email} />
           <ValueBox
             label={t("Application.applicantType")}
-            value={t(
-              `Application.applicantTypes.${application?.applicantType}`
-            )}
+            value={t(`Application.applicantTypes.${application?.applicantType}`)}
           />
           {isOrganisation && (
             <>
-              <ValueBox
-                label={t("Application.organisationName")}
-                value={application.organisation?.nameFi}
-              />
-              <ValueBox
-                label={t("Application.coreActivity")}
-                value={application.organisation?.coreBusinessFi}
-              />
+              <ValueBox label={t("Application.organisationName")} value={application.organisation?.nameFi} />
+              <ValueBox label={t("Application.coreActivity")} value={application.organisation?.coreBusinessFi} />
               <ValueBox label={t("common.homeCity")} value={homeCity} />
-              <ValueBox
-                label={t("Application.identificationNumber")}
-                value={application.organisation?.identifier}
-              />
+              <ValueBox label={t("Application.identificationNumber")} value={application.organisation?.identifier} />
             </>
           )}
-          <ValueBox
-            label={t("Application.headings.additionalInformation")}
-            value={application.additionalInformation}
-          />
+          <ValueBox label={t("Application.headings.additionalInformation")} value={application.additionalInformation} />
           <ValueBox
             label={t("Application.headings.userBirthDate")}
             value={<BirthDate applicationPk={application.pk ?? 0} />}
@@ -822,22 +667,10 @@ function ApplicationDetails({
           {t("Application.contactPersonInformation")}
         </H3>
         <ApplicationDatas>
-          <ValueBox
-            label={t("Application.contactPersonFirstName")}
-            value={application.contactPerson?.firstName}
-          />
-          <ValueBox
-            label={t("Application.contactPersonLastName")}
-            value={application.contactPerson?.lastName}
-          />
-          <ValueBox
-            label={t("Application.contactPersonEmail")}
-            value={application.contactPerson?.email}
-          />
-          <ValueBox
-            label={t("Application.contactPersonPhoneNumber")}
-            value={application.contactPerson?.phoneNumber}
-          />
+          <ValueBox label={t("Application.contactPersonFirstName")} value={application.contactPerson?.firstName} />
+          <ValueBox label={t("Application.contactPersonLastName")} value={application.contactPerson?.lastName} />
+          <ValueBox label={t("Application.contactPersonEmail")} value={application.contactPerson?.email} />
+          <ValueBox label={t("Application.contactPersonPhoneNumber")} value={application.contactPerson?.phoneNumber} />
         </ApplicationDatas>
         {isOrganisation ? (
           <>
@@ -845,18 +678,9 @@ function ApplicationDetails({
               {t("Application.contactInformation")}
             </H3>
             <ApplicationDatas>
-              <ValueBox
-                label={t("common.streetAddress")}
-                value={application.organisation?.address?.streetAddressFi}
-              />
-              <ValueBox
-                label={t("common.postalNumber")}
-                value={application.organisation?.address?.postCode}
-              />
-              <ValueBox
-                label={t("common.postalDistrict")}
-                value={application.organisation?.address?.cityFi}
-              />
+              <ValueBox label={t("common.streetAddress")} value={application.organisation?.address?.streetAddressFi} />
+              <ValueBox label={t("common.postalNumber")} value={application.organisation?.address?.postCode} />
+              <ValueBox label={t("common.postalDistrict")} value={application.organisation?.address?.cityFi} />
             </ApplicationDatas>
           </>
         ) : null}
@@ -868,18 +692,9 @@ function ApplicationDetails({
                 : t("common.billingAddress")}
             </H3>
             <ApplicationDatas>
-              <ValueBox
-                label={t("common.streetAddress")}
-                value={application.billingAddress?.streetAddressFi}
-              />
-              <ValueBox
-                label={t("common.postalNumber")}
-                value={application.billingAddress?.postCode}
-              />
-              <ValueBox
-                label={t("common.postalDistrict")}
-                value={application.billingAddress?.cityFi}
-              />
+              <ValueBox label={t("common.streetAddress")} value={application.billingAddress?.streetAddressFi} />
+              <ValueBox label={t("common.postalNumber")} value={application.billingAddress?.postCode} />
+              <ValueBox label={t("common.postalDistrict")} value={application.billingAddress?.cityFi} />
             </ApplicationDatas>
           </>
         ) : null}
@@ -987,9 +802,7 @@ export const APPLICATION_ADMIN_QUERY = gql`
 `;
 
 export const REJECT_ALL_SECTION_OPTIONS = gql`
-  mutation RejectAllSectionOptions(
-    $input: RejectAllSectionOptionsMutationInput!
-  ) {
+  mutation RejectAllSectionOptions($input: RejectAllSectionOptionsMutationInput!) {
     rejectAllSectionOptions(input: $input) {
       pk
     }
@@ -997,9 +810,7 @@ export const REJECT_ALL_SECTION_OPTIONS = gql`
 `;
 
 export const RESTORE_ALL_SECTION_OPTIONS = gql`
-  mutation RestoreAllSectionOptions(
-    $input: RestoreAllSectionOptionsMutationInput!
-  ) {
+  mutation RestoreAllSectionOptions($input: RestoreAllSectionOptionsMutationInput!) {
     restoreAllSectionOptions(input: $input) {
       pk
     }
@@ -1007,9 +818,7 @@ export const RESTORE_ALL_SECTION_OPTIONS = gql`
 `;
 
 export const REJECT_APPLICATION = gql`
-  mutation RejectAllApplicationOptions(
-    $input: RejectAllApplicationOptionsMutationInput!
-  ) {
+  mutation RejectAllApplicationOptions($input: RejectAllApplicationOptionsMutationInput!) {
     rejectAllApplicationOptions(input: $input) {
       pk
     }
@@ -1017,9 +826,7 @@ export const REJECT_APPLICATION = gql`
 `;
 
 export const RESTORE_APPLICATION = gql`
-  mutation RestoreAllApplicationOptions(
-    $input: RestoreAllApplicationOptionsMutationInput!
-  ) {
+  mutation RestoreAllApplicationOptions($input: RestoreAllApplicationOptionsMutationInput!) {
     restoreAllApplicationOptions(input: $input) {
       pk
     }

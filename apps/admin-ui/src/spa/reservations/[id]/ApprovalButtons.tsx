@@ -36,13 +36,7 @@ type Props = {
   disableNonEssentialButtons?: boolean;
 };
 
-function ApprovalButtons({
-  isFree,
-  reservation,
-  handleClose,
-  handleAccept,
-  disableNonEssentialButtons,
-}: Props) {
+function ApprovalButtons({ isFree, reservation, handleClose, handleAccept, disableNonEssentialButtons }: Props) {
   const { setModalContent } = useModal();
   const approvalButtonRef = useRef<HTMLButtonElement>(null);
   const denyButtonRef = useRef<HTMLButtonElement>(null);
@@ -95,8 +89,7 @@ function ApprovalButtons({
   } as const;
 
   /* For now editing recurring is disabled (not implemented) */
-  const isAllowedToModify =
-    !reservation.recurringReservation && isPossibleToEdit(state, endTime);
+  const isAllowedToModify = !reservation.recurringReservation && isPossibleToEdit(state, endTime);
 
   return (
     <>

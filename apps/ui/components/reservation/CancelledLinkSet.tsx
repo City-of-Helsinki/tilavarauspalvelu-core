@@ -18,8 +18,7 @@ type Props =
 function BaseLinkSet(props: Props): JSX.Element {
   const { apiBaseUrl } = props;
   const { t } = useTranslation();
-  const resUnitUrl =
-    "reservationUnitHome" in props ? props.reservationUnitHome : null;
+  const resUnitUrl = "reservationUnitHome" in props ? props.reservationUnitHome : null;
 
   return (
     <Flex $gap="2-xs">
@@ -54,9 +53,6 @@ export function CancelledLinkSet({ apiBaseUrl }: Props) {
   return <BaseLinkSet apiBaseUrl={apiBaseUrl} />;
 }
 
-export function BackLinkList(props: {
-  reservationUnitHome: string;
-  apiBaseUrl: string;
-}): JSX.Element {
+export function BackLinkList(props: { reservationUnitHome: string; apiBaseUrl: string }): JSX.Element {
   return <BaseLinkSet {...props} />;
 }

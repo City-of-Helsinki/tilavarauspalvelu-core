@@ -1,14 +1,7 @@
 import React, { type RefObject, useEffect } from "react";
 import { gql } from "@apollo/client";
 import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
-import {
-  Button,
-  ButtonSize,
-  ButtonVariant,
-  Dialog,
-  Notification,
-  NotificationSize,
-} from "hds-react";
+import { Button, ButtonSize, ButtonVariant, Dialog, Notification, NotificationSize } from "hds-react";
 import { useTranslation } from "react-i18next";
 import {
   type CreateStaffReservationFragment,
@@ -20,20 +13,11 @@ import styled from "styled-components";
 import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorBoundary } from "react-error-boundary";
-import {
-  ReservationFormSchema,
-  type ReservationFormType,
-  type ReservationFormMeta,
-} from "@/schemas";
+import { ReservationFormSchema, type ReservationFormType, type ReservationFormMeta } from "@/schemas";
 import { CenterSpinner, Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useCheckCollisions } from "@/hooks";
-import {
-  constructDateTimeSafe,
-  dateTime,
-  getBufferTime,
-  getNormalizedInterval,
-} from "@/helpers";
+import { constructDateTimeSafe, dateTime, getBufferTime, getNormalizedInterval } from "@/helpers";
 import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
@@ -100,8 +84,7 @@ export function CreateReservationModal({
   const { t } = useTranslation();
   const { isOpen } = useModal();
   const [params] = useSearchParams();
-  const reservationUnitPk =
-    toNumber(params.get("reservationUnit")) ?? reservationUnitOptions[0]?.value;
+  const reservationUnitPk = toNumber(params.get("reservationUnit")) ?? reservationUnitOptions[0]?.value;
 
   const id = base64encode(`ReservationUnitNode:${reservationUnitPk}`);
   const { data, loading } = useReservationUnitQuery({
@@ -111,9 +94,7 @@ export function CreateReservationModal({
 
   const { reservationUnit } = data ?? {};
 
-  const interval = getNormalizedInterval(
-    reservationUnit?.reservationStartInterval
-  );
+  const interval = getNormalizedInterval(reservationUnit?.reservationStartInterval);
   const startDate = start ?? new Date();
   const form = useForm<FormValueType>({
     // @ts-expect-error -- schema refinement breaks typing
@@ -133,8 +114,7 @@ export function CreateReservationModal({
     },
   });
   const [create] = useCreateStaffReservationMutation();
-  const createStaffReservation = (input: ReservationStaffCreateMutationInput) =>
-    create({ variables: { input } });
+  const createStaffReservation = (input: ReservationStaffCreateMutationInput) => create({ variables: { input } });
   const displayError = useDisplayError();
   const onSubmit = async (values: FormValueType) => {
     try {
@@ -142,27 +122,11 @@ export function CreateReservationModal({
         throw new Error("Missing reservation unit");
       }
 
-      const {
-        comments,
-        date,
-        startTime,
-        endTime,
-        type,
-        enableBufferTimeBefore,
-        enableBufferTimeAfter,
-        ...rest
-      } = values;
+      const { comments, date, startTime, endTime, type, enableBufferTimeBefore, enableBufferTimeAfter, ...rest } =
+        values;
 
-      const bufferBefore = getBufferTime(
-        reservationUnit.bufferTimeBefore,
-        type,
-        enableBufferTimeBefore
-      );
-      const bufferAfter = getBufferTime(
-        reservationUnit.bufferTimeAfter,
-        type,
-        enableBufferTimeAfter
-      );
+      const bufferBefore = getBufferTime(reservationUnit.bufferTimeBefore, type, enableBufferTimeBefore);
+      const bufferAfter = getBufferTime(reservationUnit.bufferTimeAfter, type, enableBufferTimeAfter);
       const input: ReservationStaffCreateMutationInput = {
         ...rest,
         reservationUnit: reservationUnit.pk,
@@ -192,35 +156,15 @@ export function CreateReservationModal({
   }
 
   return (
-    <HDSModal
-      id="info-dialog"
-      isOpen={isOpen}
-      focusAfterCloseRef={focusAfterCloseRef}
-      scrollable
-      onClose={onClose}
-    >
+    <HDSModal id="info-dialog" isOpen={isOpen} focusAfterCloseRef={focusAfterCloseRef} scrollable onClose={onClose}>
       <Dialog.Header id="modal-header" title={t("ReservationDialog.title")} />
       <Dialog.Content style={{ paddingTop: "var(--spacing-m)" }}>
-        <SelectFilter
-          name="reservationUnit"
-          sort
-          options={reservationUnitOptions}
-        />
+        <SelectFilter name="reservationUnit" sort options={reservationUnitOptions} />
         {reservationUnit != null && (
           <ErrorBoundary fallback={<div>{t("errors.unexpectedError")}</div>}>
             <Flex>
-              <DialogContent
-                reservationUnit={reservationUnit}
-                startDate={startDate}
-                form={form}
-                onSubmit={onSubmit}
-              />
-              <ActionContainer
-                form={form}
-                reservationUnit={reservationUnit}
-                onCancel={onClose}
-                onSubmit={onSubmit}
-              />
+              <DialogContent reservationUnit={reservationUnit} startDate={startDate} form={form} onSubmit={onSubmit} />
+              <ActionContainer form={form} reservationUnit={reservationUnit} onCancel={onClose} onSubmit={onSubmit} />
             </Flex>
           </ErrorBoundary>
         )}
@@ -276,21 +220,13 @@ function DialogContent({
     }
   }, [formStartTime, trigger, getFieldState]);
 
-  const translateError = (errorMsg?: string) =>
-    errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "";
+  const translateError = (errorMsg?: string) => (errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "");
 
   return (
     <FormProvider {...form}>
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <MandatoryFieldsText>
-          {t("forms:mandatoryFieldsText")}
-        </MandatoryFieldsText>
-        <ControlledDateInput
-          name="date"
-          control={control}
-          error={translateError(errors.date?.message)}
-          required
-        />
+        <MandatoryFieldsText>{t("forms:mandatoryFieldsText")}</MandatoryFieldsText>
+        <ControlledDateInput name="date" control={control} error={translateError(errors.date?.message)} required />
         <ControlledTimeInput
           name="startTime"
           control={control}
@@ -325,16 +261,8 @@ function useCheckFormCollisions({
   const enableBufferTimeBefore = watch("enableBufferTimeBefore");
   const type = watch("type");
 
-  const bufferBeforeSeconds = getBufferTime(
-    reservationUnit.bufferTimeBefore,
-    type,
-    enableBufferTimeBefore
-  );
-  const bufferAfterSeconds = getBufferTime(
-    reservationUnit.bufferTimeAfter,
-    type,
-    enableBufferTimeAfter
-  );
+  const bufferBeforeSeconds = getBufferTime(reservationUnit.bufferTimeBefore, type, enableBufferTimeBefore);
+  const bufferAfterSeconds = getBufferTime(reservationUnit.bufferTimeAfter, type, enableBufferTimeAfter);
 
   const start = constructDateTimeSafe(formDate, formStartTime);
   const end = constructDateTimeSafe(formDate, formEndTime);
@@ -444,9 +372,7 @@ export const CREATE_STAFF_RESERVATION_FRAGMENT = gql`
 `;
 
 export const CREATE_STAFF_RESERVATION = gql`
-  mutation CreateStaffReservation(
-    $input: ReservationStaffCreateMutationInput!
-  ) {
+  mutation CreateStaffReservation($input: ReservationStaffCreateMutationInput!) {
     createStaffReservation(input: $input) {
       pk
     }

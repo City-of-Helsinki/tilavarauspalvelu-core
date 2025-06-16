@@ -23,10 +23,7 @@ function cleanUpFieldName(fieldName?: string): string | null {
   return fieldName;
 }
 
-export function FormErrorSummary<T extends FieldValues>({
-  errors,
-  fieldNamePrefix,
-}: Props<T>): JSX.Element | null {
+export function FormErrorSummary<T extends FieldValues>({ errors, fieldNamePrefix }: Props<T>): JSX.Element | null {
   const { t } = useTranslation();
 
   const keys: string[] = [];
@@ -41,8 +38,7 @@ export function FormErrorSummary<T extends FieldValues>({
   const cleanPrefix = cleanUpFieldName(fieldNamePrefix);
 
   // TODO use a common translation key for these
-  const prefix =
-    cleanPrefix != null ? `${cleanPrefix}.` : "Notifications.form.errors.";
+  const prefix = cleanPrefix != null ? `${cleanPrefix}.` : "Notifications.form.errors.";
 
   return (
     <Wrapper>

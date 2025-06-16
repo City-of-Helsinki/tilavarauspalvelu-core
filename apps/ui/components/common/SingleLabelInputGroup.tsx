@@ -31,10 +31,7 @@ const Label = styled.label`
 // A wrapper to supply a singular label to two related input fields:
 // Visually hides the original input labels from HDS-components while retaining their aria-attributes for a18y,
 // thus removing the need to try using hacks like empty label strings for the desired effect
-const SingleLabelInputGroup = ({
-  label,
-  children,
-}: SingleLabelRangeInputProps) => {
+const SingleLabelInputGroup = ({ label, children }: SingleLabelRangeInputProps) => {
   return (
     <div>
       <Label aria-hidden="true">{label}</Label>

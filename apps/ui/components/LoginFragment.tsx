@@ -44,9 +44,7 @@ export function LoginFragment({
       disabled={isActionDisabled}
       size={type === "application" ? ButtonSize.Small : ButtonSize.Medium}
     >
-      {type === "application"
-        ? t("shoppingCart:loginAndApply")
-        : t("shoppingCart:loginAndReserve")}
+      {type === "application" ? t("shoppingCart:loginAndApply") : t("shoppingCart:loginAndReserve")}
     </Button>
   );
 }

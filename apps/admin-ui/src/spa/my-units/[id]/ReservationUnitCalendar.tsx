@@ -35,12 +35,8 @@ const Container = styled.div`
   }
 `;
 
-type ReservationUnitType = NonNullable<
-  ReservationUnitCalendarQuery["reservationUnit"]
->;
-type ReservationType = NonNullable<
-  NonNullable<ReservationUnitType["reservations"]>[0]
->;
+type ReservationUnitType = NonNullable<ReservationUnitCalendarQuery["reservationUnit"]>;
+type ReservationType = NonNullable<NonNullable<ReservationUnitType["reservations"]>[0]>;
 
 function getEventTitle({
   reservationUnitPk,
@@ -64,11 +60,7 @@ function getEventTitle({
   return [reserveeName, ""];
 }
 
-function constructEventTitle(
-  res: ReservationType,
-  resUnitPk: number,
-  t: TFunction
-) {
+function constructEventTitle(res: ReservationType, resUnitPk: number, t: TFunction) {
   const [reservee, unit] = getEventTitle({
     reservationUnitPk: resUnitPk,
     reservation: res,
@@ -81,21 +73,14 @@ function constructEventTitle(
 }
 
 // TODO this is a copy of the RequestedReservationCalendar
-export function ReservationUnitCalendar({
-  begin,
-  reservationUnitPk,
-  unitPk,
-}: Props): JSX.Element {
+export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Props): JSX.Element {
   const { t } = useTranslation();
   const { hasPermission } = useCheckPermission({
     units: [unitPk],
     permission: UserPermissionChoice.CanViewReservations,
   });
 
-  const calendarEventExcludedLegends = [
-    "RESERVATION_UNIT_RELEASED",
-    "RESERVATION_UNIT_DRAFT",
-  ];
+  const calendarEventExcludedLegends = ["RESERVATION_UNIT_RELEASED", "RESERVATION_UNIT_DRAFT"];
 
   const typename = "ReservationUnitNode";
   const id = base64encode(`${typename}:${reservationUnitPk}`);
@@ -131,9 +116,7 @@ export function ReservationUnitCalendar({
     };
   });
 
-  const evts = filterNonNullable(events.map((e) => e.event)).filter(
-    (e) => e.type !== ReservationTypeChoice.Blocked
-  );
+  const evts = filterNonNullable(events.map((e) => e.event)).filter((e) => e.type !== ReservationTypeChoice.Blocked);
   const eventBuffers = getEventBuffers(evts);
 
   return (
@@ -177,12 +160,7 @@ export const RESERVATION_UNIT_CALENDAR_QUERY = gql`
         ...CombineAffectedReservations
       }
     }
-    affectingReservations(
-      forReservationUnits: [$pk]
-      state: $state
-      beginDate: $beginDate
-      endDate: $endDate
-    ) {
+    affectingReservations(forReservationUnits: [$pk], state: $state, beginDate: $beginDate, endDate: $endDate) {
       ...ReservationUnitReservations
       ...CombineAffectedReservations
     }

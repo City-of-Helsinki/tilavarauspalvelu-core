@@ -19,23 +19,13 @@ const NotesBox = styled.div`
 `;
 
 interface NotesWhenApplyingProps extends React.HTMLAttributes<HTMLDivElement> {
-  applicationRound: Pick<
-    ApplicationRoundNode,
-    "notesWhenApplyingFi" | "notesWhenApplyingSv" | "notesWhenApplyingEn"
-  >;
+  applicationRound: Pick<ApplicationRoundNode, "notesWhenApplyingFi" | "notesWhenApplyingSv" | "notesWhenApplyingEn">;
 }
 
-export function NotesWhenApplying({
-  applicationRound,
-  ...rest
-}: NotesWhenApplyingProps) {
+export function NotesWhenApplying({ applicationRound, ...rest }: NotesWhenApplyingProps) {
   const { t, i18n } = useTranslation();
 
-  const translatedNotes = getTranslationSafe(
-    applicationRound,
-    "notesWhenApplying",
-    getLocalizationLang(i18n.language)
-  );
+  const translatedNotes = getTranslationSafe(applicationRound, "notesWhenApplying", getLocalizationLang(i18n.language));
 
   if (translatedNotes === "") {
     return null;

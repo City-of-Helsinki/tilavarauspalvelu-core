@@ -1,11 +1,6 @@
 /// This file contains the search query for reservation units
 /// e.g. the common search pages (both seasonal and single)
-import {
-  filterNonNullable,
-  getLocalizationLang,
-  ignoreMaybeArray,
-  toNumber,
-} from "common/src/helpers";
+import { filterNonNullable, getLocalizationLang, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { type LocalizationLanguages } from "common/src/urlBuilder";
 import {
   EquipmentOrderingChoices,
@@ -20,11 +15,7 @@ import {
   ReservationUnitTypeOrderingChoices,
   UnitOrderingChoices,
 } from "@gql/gql-types";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-  toApiDate,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe, toApiDate } from "common/src/common/util";
 import { fromUIDate } from "./util";
 import { startOfDay } from "date-fns";
 import { SEARCH_PAGING_LIMIT } from "./const";
@@ -34,46 +25,26 @@ import { transformAccessTypeSafe } from "common/src/conversion";
 
 function transformOrderByName(desc: boolean, language: LocalizationLanguages) {
   if (language === "fi") {
-    return desc
-      ? ReservationUnitOrderingChoices.NameFiDesc
-      : ReservationUnitOrderingChoices.NameFiAsc;
+    return desc ? ReservationUnitOrderingChoices.NameFiDesc : ReservationUnitOrderingChoices.NameFiAsc;
   }
   if (language === "sv") {
-    return desc
-      ? ReservationUnitOrderingChoices.NameSvDesc
-      : ReservationUnitOrderingChoices.NameSvAsc;
+    return desc ? ReservationUnitOrderingChoices.NameSvDesc : ReservationUnitOrderingChoices.NameSvAsc;
   }
-  return desc
-    ? ReservationUnitOrderingChoices.NameEnDesc
-    : ReservationUnitOrderingChoices.NameEnAsc;
+  return desc ? ReservationUnitOrderingChoices.NameEnDesc : ReservationUnitOrderingChoices.NameEnAsc;
 }
 
-function transformOrderByUnitName(
-  desc: boolean,
-  language: LocalizationLanguages
-) {
+function transformOrderByUnitName(desc: boolean, language: LocalizationLanguages) {
   if (language === "fi") {
-    return desc
-      ? ReservationUnitOrderingChoices.UnitNameFiDesc
-      : ReservationUnitOrderingChoices.UnitNameFiAsc;
+    return desc ? ReservationUnitOrderingChoices.UnitNameFiDesc : ReservationUnitOrderingChoices.UnitNameFiAsc;
   }
   if (language === "sv") {
-    return desc
-      ? ReservationUnitOrderingChoices.UnitNameSvDesc
-      : ReservationUnitOrderingChoices.UnitNameSvAsc;
+    return desc ? ReservationUnitOrderingChoices.UnitNameSvDesc : ReservationUnitOrderingChoices.UnitNameSvAsc;
   }
-  return desc
-    ? ReservationUnitOrderingChoices.UnitNameEnDesc
-    : ReservationUnitOrderingChoices.UnitNameEnAsc;
+  return desc ? ReservationUnitOrderingChoices.UnitNameEnDesc : ReservationUnitOrderingChoices.UnitNameEnAsc;
 }
 
-function transformOrderByTypeRank(
-  desc: boolean,
-  _language: LocalizationLanguages
-) {
-  return desc
-    ? ReservationUnitOrderingChoices.TypeRankDesc
-    : ReservationUnitOrderingChoices.TypeRankAsc;
+function transformOrderByTypeRank(desc: boolean, _language: LocalizationLanguages) {
+  return desc ? ReservationUnitOrderingChoices.TypeRankDesc : ReservationUnitOrderingChoices.TypeRankAsc;
 }
 
 function transformOrderBy(
@@ -100,13 +71,9 @@ function transformSortString(
   desc: boolean
 ): ReservationUnitOrderingChoices[] {
   const lang = getLocalizationLang(language);
-  const transformed =
-    transformOrderBy(orderBy ?? "name", desc, lang) ??
-    transformOrderByName(false, lang);
+  const transformed = transformOrderBy(orderBy ?? "name", desc, lang) ?? transformOrderByName(false, lang);
   // NOTE a weird backend issue that requires two orderBy params (otherwise 2nd+ page is sometimes incorrect)
-  const sec = desc
-    ? ReservationUnitOrderingChoices.PkDesc
-    : ReservationUnitOrderingChoices.PkAsc;
+  const sec = desc ? ReservationUnitOrderingChoices.PkDesc : ReservationUnitOrderingChoices.PkAsc;
   return [transformed, sec];
 }
 
@@ -137,21 +104,13 @@ export function processVariables({
 }: ProcessVariablesParams): QueryReservationUnitsArgs {
   const sortCriteria = values.getAll("sort");
   const desc = values.getAll("order").includes("desc");
-  const orderBy = transformSortString(
-    ignoreMaybeArray(sortCriteria),
-    language,
-    desc
-  );
+  const orderBy = transformSortString(ignoreMaybeArray(sortCriteria), language, desc);
 
   const today = startOfDay(new Date());
-  const startDate = fromUIDate(
-    ignoreMaybeArray(values.getAll("startDate")) ?? ""
-  );
-  const reservableDateStart =
-    startDate && startDate >= today ? toApiDate(startDate) : null;
+  const startDate = fromUIDate(ignoreMaybeArray(values.getAll("startDate")) ?? "");
+  const reservableDateStart = startDate && startDate >= today ? toApiDate(startDate) : null;
   const endDate = fromUIDate(ignoreMaybeArray(values.getAll("endDate")) ?? "");
-  const reservableDateEnd =
-    endDate && endDate >= today ? toApiDate(endDate) : null;
+  const reservableDateEnd = endDate && endDate >= today ? toApiDate(endDate) : null;
 
   const dur = toNumber(ignoreMaybeArray(values.getAll("duration")));
   const duration = dur != null && dur > 0 ? dur : null;
@@ -160,23 +119,12 @@ export function processVariables({
   const personsAllowed = toNumber(values.get("personsAllowed"));
   const purposes = mapParamToNumber(values.getAll("purposes"), 1);
   const unit = mapParamToNumber(values.getAll("units"), 1);
-  const reservationUnitTypes = mapParamToNumber(
-    values.getAll("reservationUnitTypes"),
-    1
-  );
+  const reservationUnitTypes = mapParamToNumber(values.getAll("reservationUnitTypes"), 1);
   const equipments = mapParamToNumber(values.getAll("equipments"), 1);
-  const showOnlyReservable =
-    ignoreMaybeArray(values.getAll("showOnlyReservable")) !== "false";
-  const applicationRound =
-    "applicationRound" in rest && isSeasonal ? rest.applicationRound : null;
-  const reservationPeriodBegin =
-    "reservationPeriodBegin" in rest && isSeasonal
-      ? rest.reservationPeriodBegin
-      : null;
-  const reservationPeriodEnd =
-    "reservationPeriodEnd" in rest && isSeasonal
-      ? rest.reservationPeriodEnd
-      : null;
+  const showOnlyReservable = ignoreMaybeArray(values.getAll("showOnlyReservable")) !== "false";
+  const applicationRound = "applicationRound" in rest && isSeasonal ? rest.applicationRound : null;
+  const reservationPeriodBegin = "reservationPeriodBegin" in rest && isSeasonal ? rest.reservationPeriodBegin : null;
+  const reservationPeriodEnd = "reservationPeriodEnd" in rest && isSeasonal ? rest.reservationPeriodEnd : null;
   const timeEnd = ignoreMaybeArray(values.getAll("timeEnd"));
   const timeBegin = ignoreMaybeArray(values.getAll("timeBegin"));
   const accessType = values.getAll("accessTypes").map(transformAccessTypeSafe);
@@ -188,9 +136,7 @@ export function processVariables({
     reservationUnitType: reservationUnitTypes,
     equipments,
     accessType,
-    accessTypeBeginDate: isSeasonal
-      ? reservationPeriodBegin
-      : reservableDateStart,
+    accessTypeBeginDate: isSeasonal ? reservationPeriodBegin : reservableDateStart,
     accessTypeEndDate: isSeasonal ? reservationPeriodEnd : reservableDateEnd,
     ...(startDate != null || isSeasonal
       ? isSeasonal
@@ -208,9 +154,7 @@ export function processVariables({
           showOnlyReservable: true,
         }
       : {}),
-    ...(isSeasonal && applicationRound != null && applicationRound > 0
-      ? { applicationRound: [applicationRound] }
-      : {}),
+    ...(isSeasonal && applicationRound != null && applicationRound > 0 ? { applicationRound: [applicationRound] } : {}),
     personsAllowed,
     first: SEARCH_PAGING_LIMIT,
     orderBy,
@@ -256,10 +200,7 @@ export async function getSearchOptions(
   locale: string
 ): Promise<OptionsT> {
   const lang = convertLanguageCode(locale);
-  const { data: optionsData } = await apolloClient.query<
-    OptionsQuery,
-    OptionsQueryVariables
-  >({
+  const { data: optionsData } = await apolloClient.query<OptionsQuery, OptionsQueryVariables>({
     query: OptionsDocument,
     variables: {
       reservationUnitTypesOrderBy: ReservationUnitTypeOrderingChoices.RankAsc,
@@ -274,25 +215,19 @@ export async function getSearchOptions(
   const reservationUnitTypes = filterNonNullable(
     optionsData?.reservationUnitTypes?.edges?.map((edge) => edge?.node)
   ).map((n) => translateOption(n, lang));
-  const purposes = filterNonNullable(
-    optionsData?.purposes?.edges?.map((edge) => edge?.node)
-  ).map((n) => translateOption(n, lang));
+  const purposes = filterNonNullable(optionsData?.purposes?.edges?.map((edge) => edge?.node)).map((n) =>
+    translateOption(n, lang)
+  );
 
-  const equipments = filterNonNullable(optionsData?.equipmentsAll).map((n) =>
-    translateOption(n, lang)
-  );
-  const units = filterNonNullable(optionsData?.unitsAll).map((n) =>
-    translateOption(n, lang)
-  );
-  const ageGroups = sortAgeGroups(
-    optionsData?.ageGroups?.edges?.map((edge) => edge?.node ?? null) ?? []
-  ).map((n) => ({
+  const equipments = filterNonNullable(optionsData?.equipmentsAll).map((n) => translateOption(n, lang));
+  const units = filterNonNullable(optionsData?.unitsAll).map((n) => translateOption(n, lang));
+  const ageGroups = sortAgeGroups(optionsData?.ageGroups?.edges?.map((edge) => edge?.node ?? null) ?? []).map((n) => ({
     value: n.pk ?? 0,
     label: `${n.minimum || ""} - ${n.maximum || ""}`,
   }));
-  const cities = filterNonNullable(
-    optionsData?.cities?.edges?.map((edge) => edge?.node)
-  ).map((n) => translateOption(n, lang));
+  const cities = filterNonNullable(optionsData?.cities?.edges?.map((edge) => edge?.node)).map((n) =>
+    translateOption(n, lang)
+  );
 
   return {
     units,
@@ -304,9 +239,7 @@ export async function getSearchOptions(
   };
 }
 
-type AgeGroup = NonNullable<
-  NonNullable<OptionsQuery["ageGroups"]>["edges"][0]
->["node"];
+type AgeGroup = NonNullable<NonNullable<OptionsQuery["ageGroups"]>["edges"][0]>["node"];
 function sortAgeGroups(ageGroups: AgeGroup[]): NonNullable<AgeGroup>[] {
   return filterNonNullable(ageGroups).sort((a, b) => {
     const order = ["1-99"];

@@ -1,20 +1,9 @@
-import {
-  IconArrowRight,
-  IconEuroSign,
-  IconGroup,
-  IconHome,
-  IconLock,
-  IconSize,
-} from "hds-react";
+import { IconArrowRight, IconEuroSign, IconGroup, IconHome, IconLock, IconSize } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { type SingleSearchCardFragment } from "@gql/gql-types";
 import { format, isToday, isTomorrow, isValid } from "date-fns";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-  toUIDate,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import { isBrowser } from "@/modules/const";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
@@ -25,9 +14,7 @@ import { useSearchParams } from "next/navigation";
 import { getReservationUnitPath } from "@/modules/urls";
 import { gql } from "@apollo/client";
 
-function StatusTag(
-  props: Pick<SingleSearchCardFragment, "isClosed" | "firstReservableDatetime">
-): JSX.Element {
+function StatusTag(props: Pick<SingleSearchCardFragment, "isClosed" | "firstReservableDatetime">): JSX.Element {
   const { t } = useTranslation();
   const { isClosed, firstReservableDatetime } = props;
 
@@ -35,9 +22,7 @@ function StatusTag(
     return <Tag type="error">{t("reservationUnitCard:closed")}</Tag>;
   }
 
-  const availableAt = firstReservableDatetime
-    ? new Date(firstReservableDatetime)
-    : null;
+  const availableAt = firstReservableDatetime ? new Date(firstReservableDatetime) : null;
   if (!availableAt || !isValid(availableAt)) {
     return <Tag type="neutral">{t("reservationUnitCard:noTimes")}</Tag>;
   }
@@ -57,9 +42,7 @@ function StatusTag(
 }
 
 // TODO SSR version (and remove the use hook)
-function useConstructLink(
-  reservationUnit: Pick<SingleSearchCardFragment, "pk">
-): string {
+function useConstructLink(reservationUnit: Pick<SingleSearchCardFragment, "pk">): string {
   const params = useSearchParams();
   const date = params.get("startDate");
   const time = params.get("timeBegin");
@@ -72,10 +55,7 @@ function useConstructLink(
     return "";
   }
 
-  const linkURL = new URL(
-    getReservationUnitPath(reservationUnit.pk),
-    document.baseURI
-  );
+  const linkURL = new URL(getReservationUnitPath(reservationUnit.pk), document.baseURI);
   if (duration != null) linkURL.searchParams.set("duration", duration);
   if (date != null) linkURL.searchParams.set("date", date);
   if (time != null) linkURL.searchParams.set("time", time);
@@ -96,8 +76,7 @@ export function SingleSearchCard({ reservationUnit }: PropsT): JSX.Element {
   const unitName = getTranslationSafe(reservationUnit.unit ?? {}, "name", lang);
 
   const pricing = getActivePricing(reservationUnit);
-  const unitPrice =
-    pricing != null ? getPriceString({ t, pricing }) : undefined;
+  const unitPrice = pricing != null ? getPriceString({ t, pricing }) : undefined;
 
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null
@@ -107,9 +86,7 @@ export function SingleSearchCard({ reservationUnit }: PropsT): JSX.Element {
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "small");
 
-  const tags = [
-    <StatusTag {...reservationUnit} key={`status-tag-${reservationUnit.pk}`} />,
-  ];
+  const tags = [<StatusTag {...reservationUnit} key={`status-tag-${reservationUnit.pk}`} />];
 
   const infos = [];
   if (reservationUnitTypeName) {
@@ -120,12 +97,7 @@ export function SingleSearchCard({ reservationUnit }: PropsT): JSX.Element {
   }
   if (unitPrice) {
     infos.push({
-      icon: (
-        <IconEuroSign
-          aria-label={t("prices:reservationUnitPriceLabel")}
-          aria-hidden="false"
-        />
-      ),
+      icon: <IconEuroSign aria-label={t("prices:reservationUnitPriceLabel")} aria-hidden="false" />,
       value: unitPrice,
     });
   }
@@ -147,16 +119,8 @@ export function SingleSearchCard({ reservationUnit }: PropsT): JSX.Element {
   }
   if (reservationUnit.effectiveAccessType) {
     infos.push({
-      icon: (
-        <IconLock
-          aria-hidden="false"
-          aria-label={t("reservationUnit:accessType")}
-          size={IconSize.Small}
-        />
-      ),
-      value: t(
-        `reservationUnit:accessTypes.${reservationUnit.effectiveAccessType}`
-      ),
+      icon: <IconLock aria-hidden="false" aria-label={t("reservationUnit:accessType")} size={IconSize.Small} />,
+      value: t(`reservationUnit:accessTypes.${reservationUnit.effectiveAccessType}`),
     });
   }
 

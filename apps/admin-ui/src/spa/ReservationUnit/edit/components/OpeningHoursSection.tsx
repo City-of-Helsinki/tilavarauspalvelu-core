@@ -22,16 +22,13 @@ export function OpeningHoursSection({
   });
 
   const previewUrl = `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.uuid}#calendar`;
-  const previewDisabled =
-    previewUrlPrefix === "" || !reservationUnit?.pk || !reservationUnit?.uuid;
+  const previewDisabled = previewUrlPrefix === "" || !reservationUnit?.pk || !reservationUnit?.uuid;
 
   return (
     <EditAccordion heading={t("openingHours")}>
       {reservationUnit?.haukiUrl ? (
         <AutoGrid $alignCenter>
-          <p style={{ gridColumn: "1 / -1" }}>
-            {t("openingHoursHelperTextHasLink")}
-          </p>
+          <p style={{ gridColumn: "1 / -1" }}>{t("openingHoursHelperTextHasLink")}</p>
           <ButtonLikeLink
             disabled={!reservationUnit?.haukiUrl}
             to={reservationUnit?.haukiUrl ?? ""}

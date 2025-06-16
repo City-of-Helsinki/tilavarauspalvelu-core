@@ -1,10 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import {
-  UserPermissionChoice,
-  type ReservationUnitReservationsFragment,
-} from "@gql/gql-types";
+import { UserPermissionChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
 import { getReservationUrl } from "@/common/urls";
 import { formatTime, getReserveeName } from "@/common/util";
 import { truncate } from "@/helpers";
@@ -52,10 +49,7 @@ export function ReservationPopupContent({
           {formatTime(reservation.begin)} - {formatTime(reservation.end)} /{" "}
           {reservation.reservationUnits?.[0]?.nameFi ?? "-"}
         </Heading>
-        <VisibleIfPermission
-          reservation={reservation}
-          permission={UserPermissionChoice.CanViewReservations}
-        >
+        <VisibleIfPermission reservation={reservation} permission={UserPermissionChoice.CanViewReservations}>
           <Reservee>
             {reservation.pk ? (
               <Link target="_blank" to={getReservationUrl(reservation.pk)}>
@@ -66,9 +60,7 @@ export function ReservationPopupContent({
             )}
           </Reservee>
           {reservation.workingMemo && (
-            <WorkingMemo>
-              {truncate(reservation.workingMemo, MAX_POPOVER_COMMENT_LENGTH)}
-            </WorkingMemo>
+            <WorkingMemo>{truncate(reservation.workingMemo, MAX_POPOVER_COMMENT_LENGTH)}</WorkingMemo>
           )}
         </VisibleIfPermission>
       </Flex>

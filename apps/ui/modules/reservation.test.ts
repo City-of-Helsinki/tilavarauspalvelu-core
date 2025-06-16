@@ -157,9 +157,7 @@ describe("getDurationOptions", () => {
       maxReservationDuration: 5400,
       reservationStartInterval: ReservationStartInterval.Interval_15Mins,
     } as const;
-    expect(getDurationOptions(input, mockT).map((x) => x.value)).toEqual([
-      30, 45, 60, 75, 90,
-    ]);
+    expect(getDurationOptions(input, mockT).map((x) => x.value)).toEqual([30, 45, 60, 75, 90]);
   });
 
   test("values for 90 min intervals", () => {
@@ -168,9 +166,7 @@ describe("getDurationOptions", () => {
       maxReservationDuration: 30600,
       reservationStartInterval: ReservationStartInterval.Interval_90Mins,
     } as const;
-    expect(getDurationOptions(input, mockT).map((x) => x.value)).toEqual([
-      90, 180, 270, 360, 450,
-    ]);
+    expect(getDurationOptions(input, mockT).map((x) => x.value)).toEqual([90, 180, 270, 360, 450]);
   });
 });
 
@@ -300,16 +296,13 @@ describe("getNormalizedReservationOrderStatus", () => {
       orderStatus: value,
       expected: value,
     })),
-  ])(
-    "$state and $orderStatus -> $expected",
-    ({ state, orderStatus, expected }) => {
-      const input = createReservationOrderStatusFragment({
-        state,
-        orderStatus,
-      });
-      expect(getNormalizedReservationOrderStatus(input)).toBe(expected);
-    }
-  );
+  ])("$state and $orderStatus -> $expected", ({ state, orderStatus, expected }) => {
+    const input = createReservationOrderStatusFragment({
+      state,
+      orderStatus,
+    });
+    expect(getNormalizedReservationOrderStatus(input)).toBe(expected);
+  });
 });
 
 describe("isReservationEditable", () => {

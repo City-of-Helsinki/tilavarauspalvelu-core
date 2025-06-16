@@ -37,9 +37,5 @@ export const ModalContextProvider: React.FC<Props> = ({ children }: Props) => {
     [modalContent]
   );
 
-  return (
-    <ModalContext.Provider value={modalContextValues}>
-      {children}
-    </ModalContext.Provider>
-  );
+  return <ModalContext.Provider value={modalContextValues}>{children}</ModalContext.Provider>;
 };

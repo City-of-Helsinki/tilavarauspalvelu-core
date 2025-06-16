@@ -21,13 +21,7 @@ const Main = styled.main`
   ${mainStyles}
 `;
 
-function PageWrapper({
-  apiBaseUrl,
-  profileLink,
-  feedbackUrl,
-  children,
-  version,
-}: PageProps): JSX.Element {
+function PageWrapper({ apiBaseUrl, profileLink, feedbackUrl, children, version }: PageProps): JSX.Element {
   return (
     <>
       <Head>

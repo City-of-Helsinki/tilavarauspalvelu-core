@@ -1,11 +1,7 @@
 import React from "react";
 import { addYears } from "date-fns";
 import { DateInput } from "hds-react";
-import {
-  type FieldValues,
-  type UseControllerProps,
-  useController,
-} from "react-hook-form";
+import { type FieldValues, type UseControllerProps, useController } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 
 interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {

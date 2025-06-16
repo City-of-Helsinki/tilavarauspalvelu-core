@@ -11,9 +11,7 @@ import {
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { formatNumber } from "@/common/util";
 
-export function transformApplicationSectionStatus(
-  status: string[]
-): ApplicationSectionStatusChoice[] {
+export function transformApplicationSectionStatus(status: string[]): ApplicationSectionStatusChoice[] {
   return status
     .map((s) => {
       switch (s) {
@@ -32,9 +30,7 @@ export function transformApplicationSectionStatus(
     .filter((s): s is NonNullable<typeof s> => s != null);
 }
 
-export function transformApplicationStatuses(
-  filters: string[]
-): ApplicationStatusChoice[] {
+export function transformApplicationStatuses(filters: string[]): ApplicationStatusChoice[] {
   if (filters.length === 0) {
     return VALID_ALLOCATION_APPLICATION_STATUSES;
   }
@@ -56,9 +52,7 @@ export function transformApplicationStatuses(
     .filter((asc): asc is NonNullable<typeof asc> => asc != null);
 }
 
-export function transformApplicantType(
-  filters: string[]
-): ApplicantTypeChoice[] {
+export function transformApplicantType(filters: string[]): ApplicantTypeChoice[] {
   return filters
     .map((filter) => {
       switch (filter) {
@@ -99,21 +93,14 @@ const formatters = getFormatters("fi");
 export function calculateAppliedReservationTime(
   ae: Pick<
     ApplicationSectionNode,
-    | "reservationsBeginDate"
-    | "reservationsEndDate"
-    | "appliedReservationsPerWeek"
-    | "reservationMinDuration"
+    "reservationsBeginDate" | "reservationsEndDate" | "appliedReservationsPerWeek" | "reservationMinDuration"
   >
 ): {
   count: number;
   hours: number;
 } {
-  const begin = ae.reservationsBeginDate
-    ? fromApiDate(ae.reservationsBeginDate)
-    : undefined;
-  const end = ae.reservationsEndDate
-    ? fromApiDate(ae.reservationsEndDate)
-    : undefined;
+  const begin = ae.reservationsBeginDate ? fromApiDate(ae.reservationsBeginDate) : undefined;
+  const end = ae.reservationsEndDate ? fromApiDate(ae.reservationsEndDate) : undefined;
   const evtPerW = ae.appliedReservationsPerWeek ?? 0;
   const turns = begin && end ? differenceInWeeks(end, begin) * evtPerW : 0;
 
@@ -122,20 +109,14 @@ export function calculateAppliedReservationTime(
   return { count: turns, hours: totalHours };
 }
 
-export function formatAppliedReservationTime(time: {
-  count: number;
-  hours: number;
-}): string {
+export function formatAppliedReservationTime(time: { count: number; hours: number }): string {
   const { count, hours } = time;
   return `${formatNumber(count, "")} / ${formatters.oneDecimal?.format(hours) ?? hours} t`;
 }
 
 /// Clean query param selection and filter by possible units
 /// @return array of selected unit pks or all possible unit pks
-export function getFilteredUnits(
-  unitFilter: string[],
-  possibleUnits: { nameFi: string; pk: number }[]
-): number[] {
+export function getFilteredUnits(unitFilter: string[], possibleUnits: { nameFi: string; pk: number }[]): number[] {
   const units = unitFilter.map(Number).filter(Number.isFinite);
   return units.length > 0 ? units : possibleUnits.map((u) => u.pk);
 }

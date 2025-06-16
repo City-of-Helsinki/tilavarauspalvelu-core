@@ -6,16 +6,8 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { createApolloClient } from "@/modules/apolloClient";
 import { ViewApplication } from "@/components/application/ViewApplication";
 import { ApplicationHead } from "@/components/application/ApplicationHead";
-import {
-  getCommonServerSideProps,
-  getGenericTerms,
-} from "@/modules/serverUtils";
-import {
-  base64encode,
-  getLocalizationLang,
-  ignoreMaybeArray,
-  toNumber,
-} from "common/src/helpers";
+import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
+import { base64encode, getLocalizationLang, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import {
   ApplicationStatusChoice,
   ApplicationViewDocument,
@@ -24,10 +16,7 @@ import {
 } from "@gql/gql-types";
 import { Tabs } from "hds-react";
 import { formatDateTime } from "@/modules/util";
-import {
-  ApprovedReservations,
-  BREAKPOINT,
-} from "@/components/application/ApprovedReservations";
+import { ApprovedReservations, BREAKPOINT } from "@/components/application/ApprovedReservations";
 import { gql } from "@apollo/client";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import styled from "styled-components";
@@ -46,10 +35,7 @@ const TabPanel = styled(Tabs.TabPanel)`
   }
 `;
 
-function View({
-  application,
-  tos,
-}: Readonly<Pick<PropsNarrowed, "application" | "tos">>): JSX.Element {
+function View({ application, tos }: Readonly<Pick<PropsNarrowed, "application" | "tos">>): JSX.Element {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
@@ -103,16 +89,11 @@ function View({
     handleRouteChange(params);
   };
 
-  const tab =
-    searchParams.get("tab") === "application" ? "application" : "reservations";
+  const tab = searchParams.get("tab") === "application" ? "application" : "reservations";
 
   const { applicationRound } = application;
   const lang = getLocalizationLang(i18n.language);
-  const applicationRoundName = getTranslationSafe(
-    applicationRound,
-    "name",
-    lang
-  );
+  const applicationRoundName = getTranslationSafe(applicationRound, "name", lang);
   const { sentDate } = applicationRound;
   const handledDate = sentDate ? new Date(sentDate) : new Date();
   const showReservations =
@@ -135,26 +116,16 @@ function View({
   return (
     <>
       <Breadcrumb routes={routes} />
-      <ApplicationHead
-        title={applicationRoundName}
-        status={application.status}
-      />
+      <ApplicationHead title={applicationRoundName} status={application.status} />
       <p style={{ marginTop: 0 }}>{subTitle}</p>
       {showReservations ? (
         <Tabs initiallyActiveTab={tab === "application" ? 1 : 0}>
           <Tabs.TabList>
-            <Tabs.Tab onClick={() => handleTabChange("reservations")}>
-              {t("application:view.reservations")}
-            </Tabs.Tab>
-            <Tabs.Tab onClick={() => handleTabChange("application")}>
-              {t("application:view.application")}
-            </Tabs.Tab>
+            <Tabs.Tab onClick={() => handleTabChange("reservations")}>{t("application:view.reservations")}</Tabs.Tab>
+            <Tabs.Tab onClick={() => handleTabChange("application")}>{t("application:view.application")}</Tabs.Tab>
           </Tabs.TabList>
           <TabPanel>
-            <ApprovedReservations
-              application={application}
-              applicationRound={applicationRound}
-            />
+            <ApprovedReservations application={application} applicationRound={applicationRound} />
           </TabPanel>
           <TabPanel>
             <WrappedViewApplication application={application} tos={tos} />
@@ -167,16 +138,10 @@ function View({
   );
 }
 
-function WrappedViewApplication({
-  application,
-  tos,
-}: Readonly<Pick<PropsNarrowed, "application" | "tos">>) {
+function WrappedViewApplication({ application, tos }: Readonly<Pick<PropsNarrowed, "application" | "tos">>) {
   return (
     <ViewApplication application={application}>
-      <ApplicationTerms
-        generalTos={tos}
-        serviceTos={application.applicationRound?.termsOfUse}
-      />
+      <ApplicationTerms generalTos={tos} serviceTos={application.applicationRound?.termsOfUse} />
     </ViewApplication>
   );
 }
@@ -204,10 +169,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFound;
   }
 
-  const { data } = await apolloClient.query<
-    ApplicationViewQuery,
-    ApplicationViewQueryVariables
-  >({
+  const { data } = await apolloClient.query<ApplicationViewQuery, ApplicationViewQueryVariables>({
     query: ApplicationViewDocument,
     variables: { id: base64encode(`ApplicationNode:${pk}`) },
   });

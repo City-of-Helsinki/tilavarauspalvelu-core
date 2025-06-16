@@ -1,10 +1,4 @@
-import React, {
-  Children,
-  cloneElement,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { Children, cloneElement, useEffect, useMemo, useState } from "react";
 import {
   type BlockingReservationFieldsFragment,
   ReservationNode,
@@ -39,12 +33,7 @@ import {
   getSlotPropGetter,
   isRangeReservable,
 } from "@/modules/reservable";
-import {
-  formatDuration,
-  fromUIDate,
-  toApiDate,
-  toUIDate,
-} from "common/src/common/util";
+import { formatDuration, fromUIDate, toApiDate, toUIDate } from "common/src/common/util";
 import { useTranslation } from "next-i18next";
 import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";
 import { getTimeString } from "@/modules/reservationUnit";
@@ -96,20 +85,14 @@ export type ReservationTimePickerProps = Readonly<{
 function useSlotPropGetter({
   reservableTimes,
   reservationUnit,
-}: Pick<ReservationTimePickerProps, "reservableTimes" | "reservationUnit">): (
-  date: Date
-) => SlotProps {
+}: Pick<ReservationTimePickerProps, "reservableTimes" | "reservationUnit">): (date: Date) => SlotProps {
   const activeApplicationRounds = reservationUnit.applicationRounds;
   return useMemo(() => {
     return getSlotPropGetter({
       reservableTimes,
       activeApplicationRounds,
-      reservationBegins: reservationUnit.reservationBegins
-        ? new Date(reservationUnit.reservationBegins)
-        : undefined,
-      reservationEnds: reservationUnit.reservationEnds
-        ? new Date(reservationUnit.reservationEnds)
-        : undefined,
+      reservationBegins: reservationUnit.reservationBegins ? new Date(reservationUnit.reservationBegins) : undefined,
+      reservationEnds: reservationUnit.reservationEnds ? new Date(reservationUnit.reservationEnds) : undefined,
       reservationsMinDaysBefore: reservationUnit.reservationsMinDaysBefore ?? 0,
       reservationsMaxDaysBefore: reservationUnit.reservationsMaxDaysBefore ?? 0,
     });
@@ -134,9 +117,7 @@ function useCalendarEventChange({
   const { t } = useTranslation();
   // TODO this doesn't optimize anything
   // any change in the event will cause a full recalculation
-  const calendarEvents: Array<
-    CalendarEventBuffer | CalendarEvent<ReservationNode>
-  > = useMemo(() => {
+  const calendarEvents: Array<CalendarEventBuffer | CalendarEvent<ReservationNode>> = useMemo(() => {
     const shouldDisplayFocusSlot = focusSlot.isReservable;
 
     let focusEvent = null;
@@ -146,21 +127,14 @@ function useCalendarEventChange({
         begin: start,
         end,
         state: "INITIAL",
-        durationString:
-          diff >= 90 ? `(${formatDuration(t, { minutes: diff })})` : "",
+        durationString: diff >= 90 ? `(${formatDuration(t, { minutes: diff })})` : "",
       };
     }
 
-    const events = [
-      ...blockingReservations,
-      ...(focusEvent != null ? [focusEvent] : []),
-    ].map((n) => {
+    const events = [...blockingReservations, ...(focusEvent != null ? [focusEvent] : [])].map((n) => {
       const suffix = n.state === "INITIAL" ? n.durationString : "";
       const event: CalendarEvent<ReservationNode> = {
-        title:
-          n.state === "CANCELLED"
-            ? `${t("reservationCalendar:prefixForCancelled")}: `
-            : suffix,
+        title: n.state === "CANCELLED" ? `${t("reservationCalendar:prefixForCancelled")}: ` : suffix,
         start: new Date(n.begin ?? ""),
         end: new Date(n.end ?? ""),
         allDay: false,
@@ -246,10 +220,7 @@ export function ReservationTimePicker({
 
   const durationOptions = getDurationOptions(reservationUnit, t);
 
-  const handleCalendarEventChange = ({
-    start,
-    end,
-  }: CalendarEvent<ReservationNode>): boolean => {
+  const handleCalendarEventChange = ({ start, end }: CalendarEvent<ReservationNode>): boolean => {
     if (isReservationQuotaReached) {
       return false;
     }
@@ -369,9 +340,7 @@ export function ReservationTimePicker({
     },
   });
 
-  const userReservations = filterNonNullable(
-    data?.reservations?.edges?.map((e) => e?.node)
-  );
+  const userReservations = filterNonNullable(data?.reservations?.edges?.map((e) => e?.node));
 
   const controlProps =
     loginAndSubmitButton != null
@@ -394,11 +363,7 @@ export function ReservationTimePicker({
           begin={focusDate}
           onNavigate={(d: Date) => setValue("date", toUIDate(d))}
           eventStyleGetter={(event) =>
-            eventStyleGetter(
-              event,
-              filterNonNullable(userReservations?.map((n) => n?.pk)),
-              !isReservationQuotaReached
-            )
+            eventStyleGetter(event, filterNonNullable(userReservations?.map((n) => n?.pk)), !isReservationQuotaReached)
           }
           slotPropGetter={slotPropGetter}
           viewType={calendarViewType}
@@ -419,12 +384,8 @@ export function ReservationTimePicker({
           onEventDrop={handleCalendarEventChange}
           onEventResize={handleCalendarEventChange}
           onSelecting={handleCalendarEventChange}
-          draggableAccessor={({ event }) =>
-            event?.state?.toString() === "INITIAL"
-          }
-          resizableAccessor={({ event }) =>
-            event?.state?.toString() === "INITIAL"
-          }
+          draggableAccessor={({ event }) => event?.state?.toString() === "INITIAL"}
+          resizableAccessor={({ event }) => event?.state?.toString() === "INITIAL"}
           step={30}
           timeslots={SLOTS_EVERY_HOUR}
           culture={getLocalizationLang(i18n.language)}

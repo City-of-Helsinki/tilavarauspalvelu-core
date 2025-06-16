@@ -16,12 +16,7 @@ import { More } from "@/component/More";
 import { TableLink } from "@/styled";
 import type { StatusLabelType } from "common/src/tags";
 import StatusLabel from "common/src/components/StatusLabel";
-import {
-  IconCheck,
-  IconClock,
-  IconPen,
-  IconQuestionCircleFill,
-} from "hds-react";
+import { IconCheck, IconClock, IconPen, IconQuestionCircleFill } from "hds-react";
 import { getNotificationUrl } from "@/common/urls";
 import { CenterSpinner, TitleSection, H1 } from "common/styled";
 import { gql } from "@apollo/client";
@@ -65,9 +60,7 @@ const getColConfig = (t: TFunction) => [
     isSortable: true,
     transform: (notification: BannerNotificationTableElementFragment) =>
       notification.pk ? (
-        <TableLink to={getNotificationUrl(notification.pk)}>
-          {notification.name}
-        </TableLink>
+        <TableLink to={getNotificationUrl(notification.pk)}>{notification.name}</TableLink>
       ) : (
         notification.name
       ),
@@ -78,9 +71,7 @@ const getColConfig = (t: TFunction) => [
     isSortable: true,
     transform: (notification: BannerNotificationTableElementFragment) =>
       notification.activeFrom
-        ? `${valueForDateInput(notification.activeFrom)} ${valueForTimeInput(
-            notification.activeFrom
-          )}`
+        ? `${valueForDateInput(notification.activeFrom)} ${valueForTimeInput(notification.activeFrom)}`
         : "-",
   },
   {
@@ -89,9 +80,7 @@ const getColConfig = (t: TFunction) => [
     isSortable: true,
     transform: (notification: BannerNotificationTableElementFragment) =>
       notification.activeUntil
-        ? `${valueForDateInput(notification.activeUntil)} ${valueForTimeInput(
-            notification.activeUntil
-          )}`
+        ? `${valueForDateInput(notification.activeUntil)} ${valueForTimeInput(notification.activeUntil)}`
         : "-",
   },
   {
@@ -105,8 +94,7 @@ const getColConfig = (t: TFunction) => [
     headerName: t("Notifications.headings.level"),
     key: "level",
     isSortable: true,
-    transform: (notification: BannerNotificationTableElementFragment) =>
-      t(`Notifications.level.${notification.level}`),
+    transform: (notification: BannerNotificationTableElementFragment) => t(`Notifications.level.${notification.level}`),
   },
 ];
 
@@ -148,19 +136,16 @@ function Page() {
   const [sort, setSort] = useState<string>("state");
   const orderBy = transformSortString(sort);
 
-  const { data, loading, previousData, fetchMore } =
-    useBannerNotificationListQuery({
-      variables: {
-        first: GQL_MAX_RESULTS_PER_QUERY,
-        orderBy,
-      },
-      fetchPolicy: "cache-and-network",
-    });
+  const { data, loading, previousData, fetchMore } = useBannerNotificationListQuery({
+    variables: {
+      first: GQL_MAX_RESULTS_PER_QUERY,
+      orderBy,
+    },
+    fetchPolicy: "cache-and-network",
+  });
 
   const { bannerNotifications } = data ?? previousData ?? {};
-  const notifications = filterNonNullable(
-    bannerNotifications?.edges?.map((edge) => edge?.node)
-  );
+  const notifications = filterNonNullable(bannerNotifications?.edges?.map((edge) => edge?.node));
 
   const { t } = useTranslation();
 
@@ -177,15 +162,9 @@ function Page() {
       <TitleSection>
         <div>
           <H1 $noMargin>{t("Notifications.pageTitle")}</H1>
-          <p style={{ maxWidth: "var(--prose-width)" }}>
-            {t("Notifications.pageDescription")}
-          </p>
+          <p style={{ maxWidth: "var(--prose-width)" }}>{t("Notifications.pageDescription")}</p>
         </div>
-        <ButtonLikeLink
-          variant="primary"
-          size="large"
-          to="/messaging/notifications/new"
-        >
+        <ButtonLikeLink variant="primary" size="large" to="/messaging/notifications/new">
           {t("Notifications.newNotification")}
         </ButtonLikeLink>
       </TitleSection>
@@ -211,47 +190,28 @@ function Page() {
   );
 }
 
-function transformOrderBy(
-  orderBy: string,
-  desc: boolean
-): BannerNotificationOrderingChoices | null {
+function transformOrderBy(orderBy: string, desc: boolean): BannerNotificationOrderingChoices | null {
   switch (orderBy) {
     case "pk":
-      return desc
-        ? BannerNotificationOrderingChoices.PkDesc
-        : BannerNotificationOrderingChoices.PkAsc;
+      return desc ? BannerNotificationOrderingChoices.PkDesc : BannerNotificationOrderingChoices.PkAsc;
     case "state":
-      return desc
-        ? BannerNotificationOrderingChoices.StateDesc
-        : BannerNotificationOrderingChoices.StateAsc;
+      return desc ? BannerNotificationOrderingChoices.StateDesc : BannerNotificationOrderingChoices.StateAsc;
     case "name":
-      return desc
-        ? BannerNotificationOrderingChoices.NameDesc
-        : BannerNotificationOrderingChoices.NameAsc;
+      return desc ? BannerNotificationOrderingChoices.NameDesc : BannerNotificationOrderingChoices.NameAsc;
     case "starts":
-      return desc
-        ? BannerNotificationOrderingChoices.StartsDesc
-        : BannerNotificationOrderingChoices.StartsAsc;
+      return desc ? BannerNotificationOrderingChoices.StartsDesc : BannerNotificationOrderingChoices.StartsAsc;
     case "ends":
-      return desc
-        ? BannerNotificationOrderingChoices.EndsDesc
-        : BannerNotificationOrderingChoices.EndsAsc;
+      return desc ? BannerNotificationOrderingChoices.EndsDesc : BannerNotificationOrderingChoices.EndsAsc;
     case "target":
-      return desc
-        ? BannerNotificationOrderingChoices.TargetDesc
-        : BannerNotificationOrderingChoices.TargetAsc;
+      return desc ? BannerNotificationOrderingChoices.TargetDesc : BannerNotificationOrderingChoices.TargetAsc;
     case "level":
-      return desc
-        ? BannerNotificationOrderingChoices.LevelDesc
-        : BannerNotificationOrderingChoices.LevelAsc;
+      return desc ? BannerNotificationOrderingChoices.LevelDesc : BannerNotificationOrderingChoices.LevelAsc;
     default:
       return null;
   }
 }
 
-function transformSortString(
-  sort: string | null
-): BannerNotificationOrderingChoices[] {
+function transformSortString(sort: string | null): BannerNotificationOrderingChoices[] {
   if (!sort) {
     return [BannerNotificationOrderingChoices.StateDesc];
   }
@@ -278,11 +238,7 @@ export const BANNER_NOTIFICATIONS_TABLE_ELEMENT_FRAGMENT = gql`
 
 // TODO reduce the size of the query (use a different fragment or no fragment at all)
 export const BANNER_NOTIFICATION_LIST_QUERY = gql`
-  query BannerNotificationList(
-    $first: Int
-    $after: String
-    $orderBy: [BannerNotificationOrderingChoices]
-  ) {
+  query BannerNotificationList($first: Int, $after: String, $orderBy: [BannerNotificationOrderingChoices]) {
     bannerNotifications(first: $first, after: $after, orderBy: $orderBy) {
       edges {
         node {

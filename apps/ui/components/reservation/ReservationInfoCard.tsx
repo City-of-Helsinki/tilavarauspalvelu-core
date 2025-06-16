@@ -14,23 +14,12 @@ import {
 } from "@gql/gql-types";
 import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
 import { formatDateTimeRange, formatDuration } from "@/modules/util";
-import {
-  base64encode,
-  capitalize,
-  getImageSource,
-  getMainImage,
-} from "common/src/helpers";
+import { base64encode, capitalize, getImageSource, getMainImage } from "common/src/helpers";
 import { getReservationUnitPath } from "@/modules/urls";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 
 const Wrapper = styled.div<{ $color: "gold" | "silver" }>`
-  --bg-color: var(
-    ${({ $color }) =>
-      $color === "gold" ? "--color-gold-light" : "--color-silver-light"}
-  );
+  --bg-color: var(${({ $color }) => ($color === "gold" ? "--color-gold-light" : "--color-silver-light")});
   background-color: var(--bg-color);
 `;
 
@@ -86,20 +75,14 @@ export function ReservationInfoCard({
     },
   });
   const { accessCode } = accessCodeData?.reservation?.pindoraInfo ?? {};
-  const shouldDisplayAccessCode =
-    accessCodeData?.reservation?.pindoraInfo?.accessCodeIsActive;
+  const shouldDisplayAccessCode = accessCodeData?.reservation?.pindoraInfo?.accessCodeIsActive;
 
   const { begin, end } = reservation || {};
   // NOTE can be removed after this has been refactored not to be used for PendingReservation
 
-  const timeString = capitalize(
-    formatDateTimeRange(t, new Date(begin), new Date(end))
-  );
+  const timeString = capitalize(formatDateTimeRange(t, new Date(begin), new Date(end)));
 
-  const formatters = useMemo(
-    () => getFormatters(i18n.language),
-    [i18n.language]
-  );
+  const formatters = useMemo(() => getFormatters(i18n.language), [i18n.language]);
 
   if (!reservation || !reservationUnit) {
     return null;
@@ -107,17 +90,11 @@ export function ReservationInfoCard({
 
   const duration = differenceInMinutes(new Date(end), new Date(begin));
   const lang = convertLanguageCode(i18n.language);
-  const price: string | null = getPrice(
-    t,
-    reservation,
-    lang,
-    shouldDisplayReservationUnitPrice
-  );
+  const price: string | null = getPrice(t, reservation, lang, shouldDisplayReservationUnitPrice);
 
   const { taxPercentageValue, state } = reservation;
 
-  const showReservationNumber =
-    state != null && state !== ReservationStateChoice.Created;
+  const showReservationNumber = state != null && state !== ReservationStateChoice.Created;
 
   const shouldDisplayTaxPercentage: boolean =
     state === ReservationStateChoice.RequiresHandling
@@ -128,10 +105,7 @@ export function ReservationInfoCard({
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "medium");
 
-  const unitName =
-    reservationUnit.unit != null
-      ? getTranslationSafe(reservationUnit.unit, "name", lang)
-      : "-";
+  const unitName = reservationUnit.unit != null ? getTranslationSafe(reservationUnit.unit, "name", lang) : "-";
 
   // TODO why does this not use the Card component?
   return (
@@ -149,9 +123,7 @@ export function ReservationInfoCard({
         {showReservationNumber && (
           <Subheading>
             {t("reservations:reservationNumber")}:{" "}
-            <span data-testid="reservation__reservation-info-card__reservationNumber">
-              {reservation.pk ?? "-"}
-            </span>
+            <span data-testid="reservation__reservation-info-card__reservationNumber">{reservation.pk ?? "-"}</span>
           </Subheading>
         )}
         <Subheading>{unitName}</Subheading>
@@ -165,9 +137,7 @@ export function ReservationInfoCard({
           {taxPercentageValue &&
             shouldDisplayTaxPercentage &&
             `(${t("common:inclTax", {
-              taxPercentage: formatters.strippedDecimal?.format(
-                parseFloat(taxPercentageValue)
-              ),
+              taxPercentage: formatters.strippedDecimal?.format(parseFloat(taxPercentageValue)),
             })})`}
         </div>
         {reservation.accessType !== AccessType.Unrestricted && (

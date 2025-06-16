@@ -58,10 +58,7 @@ function Reservations(): JSX.Element | null {
               ReservationStateChoice.WaitingForPayment,
               ReservationStateChoice.Denied,
             ],
-      orderBy:
-        tab === "upcoming"
-          ? [ReservationOrderingChoices.BeginAsc]
-          : [ReservationOrderingChoices.BeginDesc],
+      orderBy: tab === "upcoming" ? [ReservationOrderingChoices.BeginAsc] : [ReservationOrderingChoices.BeginDesc],
       user: currentUser?.pk ?? 0,
       // NOTE today's reservations are always shown in upcoming (even when they are in the past)
       beginDate: tab === "upcoming" ? toApiDate(today) : undefined,
@@ -84,9 +81,7 @@ function Reservations(): JSX.Element | null {
     return <div>{t("common:error.notAuthenticated")}</div>;
   }
 
-  const reservations = filterNonNullable(
-    data?.reservations?.edges?.map((edge) => edge?.node)
-  );
+  const reservations = filterNonNullable(data?.reservations?.edges?.map((edge) => edge?.node));
 
   const routes = [
     {
@@ -102,30 +97,18 @@ function Reservations(): JSX.Element | null {
       <TabWrapper data-testid="Reservations--page__tab_container">
         <Tabs>
           <TabList>
-            <Tab onClick={() => setTab("upcoming")}>
-              {t("reservations:upcomingReservations")}
-            </Tab>
-            <Tab onClick={() => setTab("past")}>
-              {t("reservations:pastReservations")}
-            </Tab>
-            <Tab onClick={() => setTab("cancelled")}>
-              {t("reservations:cancelledReservations")}
-            </Tab>
+            <Tab onClick={() => setTab("upcoming")}>{t("reservations:upcomingReservations")}</Tab>
+            <Tab onClick={() => setTab("past")}>{t("reservations:pastReservations")}</Tab>
+            <Tab onClick={() => setTab("cancelled")}>{t("reservations:cancelledReservations")}</Tab>
           </TabList>
           <StyledTabPanel>
             {isLoading ? (
               <CenterSpinner />
             ) : reservations.length === 0 ? (
-              <EmptyMessage>
-                {t("reservations:noUpcomingReservations")}
-              </EmptyMessage>
+              <EmptyMessage>{t("reservations:noUpcomingReservations")}</EmptyMessage>
             ) : (
               reservations?.map((reservation) => (
-                <ReservationCard
-                  key={reservation.pk}
-                  reservation={reservation}
-                  type="upcoming"
-                />
+                <ReservationCard key={reservation.pk} reservation={reservation} type="upcoming" />
               ))
             )}
           </StyledTabPanel>
@@ -133,16 +116,10 @@ function Reservations(): JSX.Element | null {
             {isLoading ? (
               <CenterSpinner />
             ) : reservations.length === 0 ? (
-              <EmptyMessage>
-                {t("reservations:noPastReservations")}
-              </EmptyMessage>
+              <EmptyMessage>{t("reservations:noPastReservations")}</EmptyMessage>
             ) : (
               reservations?.map((reservation) => (
-                <ReservationCard
-                  key={reservation.pk}
-                  reservation={reservation}
-                  type="past"
-                />
+                <ReservationCard key={reservation.pk} reservation={reservation} type="past" />
               ))
             )}
           </StyledTabPanel>
@@ -150,16 +127,10 @@ function Reservations(): JSX.Element | null {
             {isLoading ? (
               <CenterSpinner />
             ) : reservations.length === 0 ? (
-              <EmptyMessage>
-                {t("reservations:noCancelledReservations")}
-              </EmptyMessage>
+              <EmptyMessage>{t("reservations:noCancelledReservations")}</EmptyMessage>
             ) : (
               reservations?.map((reservation) => (
-                <ReservationCard
-                  key={reservation.pk}
-                  reservation={reservation}
-                  type="cancelled"
-                />
+                <ReservationCard key={reservation.pk} reservation={reservation} type="cancelled" />
               ))
             )}
           </StyledTabPanel>

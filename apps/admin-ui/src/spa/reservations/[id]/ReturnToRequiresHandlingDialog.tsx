@@ -1,10 +1,7 @@
 import React, { type RefObject } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, ButtonVariant, Dialog, IconInfoCircle } from "hds-react";
-import {
-  type ReservationNode,
-  useRequireHandlingMutation,
-} from "@gql/gql-types";
+import { type ReservationNode, useRequireHandlingMutation } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { successToast } from "common/src/common/toast";
 import { gql } from "@apollo/client";
@@ -18,11 +15,7 @@ type Props = {
   focusAfterCloseRef: RefObject<HTMLButtonElement>;
 };
 
-function DialogContent({
-  reservation,
-  onClose,
-  onAccept,
-}: Omit<Props, "focusAfterCloseRef">): JSX.Element {
+function DialogContent({ reservation, onClose, onAccept }: Omit<Props, "focusAfterCloseRef">): JSX.Element {
   const { t } = useTranslation();
   const displayError = useDisplayError();
 
@@ -50,9 +43,7 @@ function DialogContent({
         <p id="modal-description" className="text-body" />
       </Dialog.Content>
       <Dialog.ActionButtons>
-        <Button onClick={handleClick}>
-          {t("RequestedReservation.ReturnToRequiresHandlingDialog.accept")}
-        </Button>
+        <Button onClick={handleClick}>{t("RequestedReservation.ReturnToRequiresHandlingDialog.accept")}</Button>
         <Button variant={ButtonVariant.Secondary} onClick={onClose}>
           {t("common.prev")}
         </Button>
@@ -84,11 +75,7 @@ function ReturnToRequiredHandlingDialog({
         title={t("RequestedReservation.ReturnToRequiresHandlingDialog.title")}
         iconStart={<IconInfoCircle />}
       />
-      <DialogContent
-        reservation={reservation}
-        onAccept={onAccept}
-        onClose={onClose}
-      />
+      <DialogContent reservation={reservation} onAccept={onAccept} onClose={onClose} />
     </Dialog>
   );
 }

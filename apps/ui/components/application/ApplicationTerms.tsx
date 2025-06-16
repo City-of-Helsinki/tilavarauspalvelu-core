@@ -1,10 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { type Maybe, type TermsOfUseTextFieldsFragment } from "@/gql/gql-types";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { Sanitize } from "common/src/components/Sanitize";
 import TermsBox from "common/src/termsbox/TermsBox";
 
@@ -29,34 +26,22 @@ export function ApplicationTerms({
         <TermsBox
           id="preview.acceptTermsOfUse"
           heading={t("reservationCalendar:heading.cancellationPaymentTerms")}
-          body={
-            <Sanitize html={getTranslationSafe(generalTos, "text", lang)} />
-          }
+          body={<Sanitize html={getTranslationSafe(generalTos, "text", lang)} />}
           acceptLabel={t("application:preview.userAcceptsGeneralTerms")}
           data-testid="terms-box__container--general-terms"
           accepted={isTermsAccepted?.general}
-          setAccepted={
-            setIsTermsAccepted
-              ? (val) => setIsTermsAccepted("general", val)
-              : undefined
-          }
+          setAccepted={setIsTermsAccepted ? (val) => setIsTermsAccepted("general", val) : undefined}
         />
       )}
       {serviceTos && (
         <TermsBox
           id="preview.acceptServiceSpecificTerms"
           heading={t("reservationCalendar:heading.termsOfUse")}
-          body={
-            <Sanitize html={getTranslationSafe(serviceTos, "text", lang)} />
-          }
+          body={<Sanitize html={getTranslationSafe(serviceTos, "text", lang)} />}
           acceptLabel={t("application:preview.userAcceptsSpecificTerms")}
           accepted={isTermsAccepted?.specific}
           data-testid="terms-box__container--service-specific-terms"
-          setAccepted={
-            setIsTermsAccepted
-              ? (val) => setIsTermsAccepted("specific", val)
-              : undefined
-          }
+          setAccepted={setIsTermsAccepted ? (val) => setIsTermsAccepted("specific", val) : undefined}
         />
       )}
     </>

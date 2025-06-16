@@ -20,11 +20,7 @@ interface IValueBoxProps {
   className?: string;
 }
 
-export function ValueBox({
-  label,
-  value,
-  ...rest
-}: IValueBoxProps): JSX.Element {
+export function ValueBox({ label, value, ...rest }: IValueBoxProps): JSX.Element {
   return (
     <div {...rest}>
       <Label>{label}</Label>

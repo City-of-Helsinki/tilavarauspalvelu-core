@@ -14,10 +14,7 @@ import { AllReservations } from "@/components/application/ApprovedReservations";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { applicationsPrefix, getApplicationPath } from "@/modules/urls";
 
 function ViewAll({ applicationSection }: PropsNarrowed): JSX.Element {
@@ -45,10 +42,7 @@ function ViewAll({ applicationSection }: PropsNarrowed): JSX.Element {
     <>
       <Breadcrumb routes={route} />
       <H1 $noMargin>{heading}</H1>
-      <AllReservations
-        applicationSection={applicationSection}
-        application={application}
-      />
+      <AllReservations applicationSection={applicationSection} application={application} />
     </>
   );
 }
@@ -103,10 +97,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFoundRetvalue;
   }
 
-  const { data } = await apolloClient.query<
-    ApplicationSectionViewQuery,
-    ApplicationSectionViewQueryVariables
-  >({
+  const { data } = await apolloClient.query<ApplicationSectionViewQuery, ApplicationSectionViewQueryVariables>({
     query: ApplicationSectionViewDocument,
     variables: { pk },
   });
@@ -116,8 +107,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFoundRetvalue;
   }
   const { application } = applicationSection;
-  const showReservations =
-    application.status === ApplicationStatusChoice.ResultsSent;
+  const showReservations = application.status === ApplicationStatusChoice.ResultsSent;
   if (!showReservations) {
     return notFoundRetvalue;
   }

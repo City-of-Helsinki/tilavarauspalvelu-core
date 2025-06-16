@@ -2,14 +2,7 @@ import { camelCase } from "lodash-es";
 import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import { ReservationStateChoice } from "@gql/gql-types";
-import {
-  IconCheck,
-  IconCogwheel,
-  IconCross,
-  IconEuroSign,
-  IconPen,
-  IconQuestionCircle,
-} from "hds-react";
+import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen, IconQuestionCircle } from "hds-react";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
 
@@ -67,11 +60,7 @@ export function ReservationStatus({ state, testId }: Props): JSX.Element {
   const statusText = t(`reservations:status.${camelCase(state)}`);
 
   return (
-    <StatusLabel
-      type={statusProps.type}
-      icon={statusProps.icon}
-      data-testid={testId}
-    >
+    <StatusLabel type={statusProps.type} icon={statusProps.icon} data-testid={testId}>
       {statusText}
     </StatusLabel>
   );

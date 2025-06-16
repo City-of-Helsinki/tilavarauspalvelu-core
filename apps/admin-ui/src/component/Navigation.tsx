@@ -1,14 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { signIn, signOut } from "common/src/browserHelpers";
 import { useSession } from "@/hooks/auth";
-import {
-  Header,
-  IconSignout,
-  IconStar,
-  IconUser,
-  LogoSize,
-  TitleStyleType,
-} from "hds-react";
+import { Header, IconSignout, IconStar, IconUser, LogoSize, TitleStyleType } from "hds-react";
 import React from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -37,9 +30,7 @@ type Props = {
 const BackgroundHeader = styled(Header)`
   --header-color: black;
   --actionbar-background-color: var(--color-bus-dark);
-  --notification-bubble-background-color: var(
-    --tilavaraus-admin-handling-count-color
-  );
+  --notification-bubble-background-color: var(--tilavaraus-admin-handling-count-color);
   [class^="HeaderActionBarItem-module_container"] {
     > button span {
       color: white !important;
@@ -196,18 +187,11 @@ function getFilteredMenu(
   return menuItems;
 }
 
-function checkActive(
-  pathname: string,
-  routes: string[],
-  exact: boolean,
-  exclude?: string[]
-) {
+function checkActive(pathname: string, routes: string[], exact: boolean, exclude?: string[]) {
   if (exclude?.includes(pathname)) {
     return false;
   }
-  return routes.some((route) =>
-    exact ? pathname === route : pathname.startsWith(route)
-  );
+  return routes.some((route) => (exact ? pathname === route : pathname.startsWith(route)));
 }
 
 function NavigationLink({
@@ -228,8 +212,7 @@ function NavigationLink({
   const navigate = useNavigate();
 
   if (!routes) return null;
-  const shouldDisplayCount =
-    title === "MainMenu.requestedReservations" && count && count > 0;
+  const shouldDisplayCount = title === "MainMenu.requestedReservations" && count && count > 0;
 
   const handleClick = (evt: React.MouseEvent<HTMLAnchorElement>) => {
     evt.preventDefault();
@@ -249,13 +232,9 @@ function NavigationLink({
       href={`/kasittely${routes[0]}`}
       label={t(title)}
       aria-label={t(title)}
-      className={
-        checkActive(pathname, routes, exact ?? false, exclude) ? "active" : ""
-      }
+      className={checkActive(pathname, routes, exact ?? false, exclude) ? "active" : ""}
       notificationBubbleAriaLabel={shouldDisplayCount ? "Määrä" : undefined}
-      notificationBubbleContent={
-        shouldDisplayCount ? count?.toString() : undefined
-      }
+      notificationBubbleContent={shouldDisplayCount ? count?.toString() : undefined}
       aria-current={checkActive(pathname, routes, exact ?? false, exclude)}
     />
   );
@@ -274,9 +253,7 @@ const Navigation = ({ apiBaseUrl }: Props) => {
   const hasPerms = (perm: UserPermissionChoice, onlyGeneral?: boolean) => {
     return hasSomePermission(user, perm, onlyGeneral);
   };
-  const menuItemList = getFilteredMenu(hasOwnUnits, hasPerms).filter(
-    (item) => item != null
-  );
+  const menuItemList = getFilteredMenu(hasOwnUnits, hasPerms).filter((item) => item != null);
 
   return (
     <BackgroundHeader>
@@ -292,12 +269,7 @@ const Navigation = ({ apiBaseUrl }: Props) => {
         logoHref={env.NEXT_PUBLIC_BASE_URL}
       >
         {user ? (
-          <Header.ActionBarItem
-            id="user-menu"
-            label={name}
-            icon={<IconUser />}
-            fixedRightPosition
-          >
+          <Header.ActionBarItem id="user-menu" label={name} icon={<IconUser />} fixedRightPosition>
             <Header.ActionBarButton
               label={
                 <>

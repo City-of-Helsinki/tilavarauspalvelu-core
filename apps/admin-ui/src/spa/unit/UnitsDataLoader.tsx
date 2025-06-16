@@ -91,19 +91,8 @@ function transformSortString(orderBy: string | null): UnitOrderingChoices[] {
 }
 
 export const UNIT_LIST_QUERY = gql`
-  query UnitList(
-    $first: Int
-    $after: String
-    $orderBy: [UnitOrderingChoices]
-    $nameFi: String
-  ) {
-    units(
-      first: $first
-      after: $after
-      orderBy: $orderBy
-      nameFi: $nameFi
-      onlyWithPermission: true
-    ) {
+  query UnitList($first: Int, $after: String, $orderBy: [UnitOrderingChoices], $nameFi: String) {
+    units(first: $first, after: $after, orderBy: $orderBy, nameFi: $nameFi, onlyWithPermission: true) {
       edges {
         node {
           ...UnitTableElement

@@ -1,7 +1,4 @@
-import {
-  type SearchReservationUnitsQueryVariables,
-  useSearchReservationUnitsQuery,
-} from "@/gql/gql-types";
+import { type SearchReservationUnitsQueryVariables, useSearchReservationUnitsQuery } from "@/gql/gql-types";
 import { SEARCH_PAGING_LIMIT } from "@/modules/const";
 import { hash, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { useRouter } from "next/router";
@@ -11,9 +8,7 @@ import { useEffect, useState } from "react";
  * because we can't trust the query.loading nor totalCount nor hasNextPage
  * we have to provide our own loading state and hasMoreData state
  */
-export function useSearchQuery(
-  variables: SearchReservationUnitsQueryVariables
-) {
+export function useSearchQuery(variables: SearchReservationUnitsQueryVariables) {
   const query = useSearchReservationUnitsQuery({
     variables,
     notifyOnNetworkStatusChange: true,

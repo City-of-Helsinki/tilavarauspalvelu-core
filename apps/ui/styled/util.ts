@@ -3,8 +3,7 @@ import { Button } from "hds-react";
 import Link from "next/link";
 import styled from "styled-components";
 
-export const pixel =
-  "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
+export const pixel = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
 
 /// @deprecated
 export const MediumButton = styled(Button)`

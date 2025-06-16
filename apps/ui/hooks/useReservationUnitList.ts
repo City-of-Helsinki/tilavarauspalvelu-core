@@ -24,9 +24,7 @@ export const SEASONAL_SELECTED_PARAM_KEY = "selectedReservationUnits";
 /// @param round filter the reservation units by the application round
 /// Problem with this is that the current system is not based on around requiring an application round
 /// but the actual use case is, so have to do filtering case by case.
-export function useReservationUnitList(
-  round: HookVars | undefined
-): ReservationUnitList {
+export function useReservationUnitList(round: HookVars | undefined): ReservationUnitList {
   const searchValues = useSearchParams();
   const { handleRouteChange } = useSearchModify();
 
@@ -62,14 +60,9 @@ export function useReservationUnitList(
   };
 
   const getReservationUnits = (): number[] => {
-    const pks = searchValues
-      .getAll(SEASONAL_SELECTED_PARAM_KEY)
-      .map(Number)
-      .filter(Number.isInteger);
+    const pks = searchValues.getAll(SEASONAL_SELECTED_PARAM_KEY).map(Number).filter(Number.isInteger);
     if (round) {
-      const roundRuPks = filterNonNullable(
-        round.reservationUnits?.map((ru) => ru.pk)
-      );
+      const roundRuPks = filterNonNullable(round.reservationUnits?.map((ru) => ru.pk));
       return pks.filter((pk) => roundRuPks.includes(pk));
     }
     return pks;

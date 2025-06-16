@@ -154,11 +154,7 @@ export function AccordionWithIcons({
             // we are hiding the text on mobile
             aria-label={isOpen ? t("common:close") : t("common:show")}
           >
-            {isOpen ? (
-              <IconAngleUp aria-hidden />
-            ) : (
-              <IconAngleDown aria-hidden />
-            )}
+            {isOpen ? <IconAngleUp aria-hidden /> : <IconAngleDown aria-hidden />}
             {isOpen ? t("common:close") : t("common:show")}
           </ToggleButton>
         </ButtonListWrapper>

@@ -20,16 +20,10 @@ type Props = {
   refetch: () => Promise<unknown>;
 };
 
-export function NewSpaceModal({
-  unit,
-  closeModal,
-  refetch,
-  parentSpacePk,
-}: Props): JSX.Element | null {
+export function NewSpaceModal({ unit, closeModal, refetch, parentSpacePk }: Props): JSX.Element | null {
   const [mutation] = useCreateSpaceMutation();
 
-  const createSpace = (input: SpaceCreateMutationInput) =>
-    mutation({ variables: { input } });
+  const createSpace = (input: SpaceCreateMutationInput) => mutation({ variables: { input } });
 
   const form = useForm<SpaceUpdateForm>({
     resolver: zodResolver(SpaceUpdateSchema),
@@ -66,8 +60,7 @@ export function NewSpaceModal({
   const { watch } = form;
 
   const parentPk = watch("parent");
-  const parentName =
-    unit?.spaces.find((space) => space.pk === parentPk)?.nameFi ?? null;
+  const parentName = unit?.spaces.find((space) => space.pk === parentPk)?.nameFi ?? null;
 
   return (
     <form noValidate onSubmit={form.handleSubmit(createSpaces)}>
@@ -82,11 +75,7 @@ export function NewSpaceModal({
           <UnitInfo parentName={parentName} unit={unit} />
         </Page1>
       ) : (
-        <Page2
-          form={form}
-          onPrevPage={() => setPage(0)}
-          hasFixedParent={hasFixedParent}
-        >
+        <Page2 form={form} onPrevPage={() => setPage(0)} hasFixedParent={hasFixedParent}>
           <UnitInfo parentName={parentName} unit={unit} />
         </Page2>
       )}

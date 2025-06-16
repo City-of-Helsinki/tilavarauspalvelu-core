@@ -26,12 +26,8 @@ export function SpecializedRadioGroup({
   const { fieldState } = useController({ name, control });
   const { error } = fieldState;
 
-  const groupLabel = !noLabel
-    ? t(`ReservationUnitEditor.label.${name}`)
-    : undefined;
-  const tooltip = !noTooltip
-    ? t(`ReservationUnitEditor.tooltip.${name}`)
-    : undefined;
+  const groupLabel = !noLabel ? t(`ReservationUnitEditor.label.${name}`) : undefined;
+  const tooltip = !noTooltip ? t(`ReservationUnitEditor.tooltip.${name}`) : undefined;
   const opts = options.map((opt) => {
     const prefix = `ReservationUnitEditor.label.options.${name}`;
     const label = typeof opt === "string" ? `${prefix}.${opt}` : opt.label;

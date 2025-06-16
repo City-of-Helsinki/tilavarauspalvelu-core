@@ -32,25 +32,16 @@ type InnerProps = {
   reservationUnitOptions: { label: string; value: number }[];
 };
 
-function UnitReservationsInner({
-  unitPk,
-  reservationUnitTypes,
-  reservationUnitOptions,
-}: InnerProps): JSX.Element {
+function UnitReservationsInner({ unitPk, reservationUnitTypes, reservationUnitOptions }: InnerProps): JSX.Element {
   const [searchParams] = useSearchParams();
   const { t } = useTranslation();
 
   const d = searchParams.get("date");
   const currentDate = d ? fromUIDate(d) : startOfDay(new Date());
 
-  const date =
-    currentDate && isValidDate(currentDate) ? currentDate : new Date();
+  const date = currentDate && isValidDate(currentDate) ? currentDate : new Date();
 
-  const { loading, resources, refetch } = useUnitResources(
-    date,
-    unitPk,
-    reservationUnitTypes
-  );
+  const { loading, resources, refetch } = useUnitResources(date, unitPk, reservationUnitTypes);
 
   return (
     <>
@@ -91,20 +82,14 @@ export function UnitReservations({
   const translateTag = (key: string, value: string) => {
     switch (key) {
       case "reservationUnitType":
-        return (
-          reservationUnitTypeOptions.find((u) => u.value === Number(value))
-            ?.label ?? ""
-        );
+        return reservationUnitTypeOptions.find((u) => u.value === Number(value))?.label ?? "";
       default:
         return "";
     }
   };
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const reservationUnitTypes = searchParams
-    .getAll("reservationUnitType")
-    .map(Number)
-    .filter(Number.isInteger);
+  const reservationUnitTypes = searchParams.getAll("reservationUnitType").map(Number).filter(Number.isInteger);
 
   useEffect(() => {
     if (searchParams.get("date") == null) {
@@ -126,17 +111,9 @@ export function UnitReservations({
           options={reservationUnitTypeOptions}
         />
       </AutoGrid>
-      <SearchTags
-        hide={["date", "tab", "reservationUnit"]}
-        translateTag={translateTag}
-      />
+      <SearchTags hide={["date", "tab", "reservationUnit"]} translateTag={translateTag} />
       <HR />
-      <Flex
-        $gap="none"
-        $direction="row"
-        $justifyContent="space-between"
-        $alignItems="center"
-      >
+      <Flex $gap="none" $direction="row" $justifyContent="space-between" $alignItems="center">
         <Button
           size={ButtonSize.Small}
           variant={ButtonVariant.Secondary}

@@ -15,10 +15,7 @@ import {
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import { type UseFormReturn } from "react-hook-form";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { ReservationTimePicker } from "./ReservationTimePicker";
@@ -101,9 +98,7 @@ function EditStep0Wrapped(props: EditStep0Props): JSX.Element {
   return <EditStep0 {...props} reservationUnit={reservationUnit} />;
 }
 
-type ReservationUnitT = NonNullable<
-  EditPageReservationFragment["reservationUnits"][number]
->;
+type ReservationUnitT = NonNullable<EditPageReservationFragment["reservationUnits"][number]>;
 
 function EditStep0({
   reservation,
@@ -118,10 +113,7 @@ function EditStep0({
   const originalBegin = new Date(reservation.begin);
   const originalEnd = new Date(reservation.end);
 
-  const { blockingReservations } = useBlockingReservations(
-    reservationUnit.pk,
-    reservation.pk
-  );
+  const { blockingReservations } = useBlockingReservations(reservationUnit.pk, reservation.pk);
 
   const { watch, handleSubmit, formState } = reservationForm;
   const { dirtyFields } = formState;
@@ -148,10 +140,7 @@ function EditStep0({
       return;
     }
     const { start, end } = slot;
-    const isFree = isReservationUnitFreeOfCharge(
-      reservationUnit.pricings,
-      start
-    );
+    const isFree = isReservationUnitFreeOfCharge(reservationUnit.pricings, start);
     if (!isFree) {
       throw new Error("Reservation unit is not free of charge");
     }
@@ -169,8 +158,7 @@ function EditStep0({
     }
   };
 
-  const durationValue =
-    watch("duration") ?? differenceInMinutes(originalBegin, originalEnd);
+  const durationValue = watch("duration") ?? differenceInMinutes(originalBegin, originalEnd);
   const dateValue = watch("date");
   const timeValue = watch("time");
   const { startingTimeOptions, nextAvailableTime } = useAvailableTimes({
@@ -196,11 +184,7 @@ function EditStep0({
 
   return (
     <>
-      <StyledReservationInfoCard
-        reservation={reservation}
-        bgColor="gold"
-        disableImage
-      />
+      <StyledReservationInfoCard reservation={reservation} bgColor="gold" disableImage />
       {/* TODO on mobile in the design this is after the calendar but before action buttons */}
       {termsOfUse !== "" && (
         <PinkBox>
@@ -237,10 +221,7 @@ function EditStep0({
       </StyledCalendarWrapper>
       <Form noValidate onSubmit={handleSubmit(submitReservation)}>
         <Actions>
-          <ButtonLikeLink
-            href={getReservationPath(reservation.pk)}
-            data-testid="reservation-edit__button--cancel"
-          >
+          <ButtonLikeLink href={getReservationPath(reservation.pk)} data-testid="reservation-edit__button--cancel">
             <IconCross />
             {t("common:stop")}
           </ButtonLikeLink>

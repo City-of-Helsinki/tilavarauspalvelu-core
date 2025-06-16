@@ -1,12 +1,6 @@
 import { addDays } from "date-fns";
-import {
-  ReservationStartInterval,
-  ReservationTypeChoice,
-} from "@gql/gql-types";
-import {
-  RecurringReservationForm,
-  RecurringReservationFormSchema,
-} from "./recurringReservation";
+import { ReservationStartInterval, ReservationTypeChoice } from "@gql/gql-types";
+import { RecurringReservationForm, RecurringReservationFormSchema } from "./recurringReservation";
 import { toUIDate } from "common/src/common/util";
 import { test, expect } from "vitest";
 
@@ -44,9 +38,7 @@ function createInput({
 // no metadata
 // type? BLOCKED or STAFF
 test("one week blocked reservation on a single day is valid", () => {
-  const res = RecurringReservationFormSchema(interval).safeParse(
-    createInput({})
-  );
+  const res = RecurringReservationFormSchema(interval).safeParse(createInput({}));
   expect(res.success).toBeTruthy();
 });
 

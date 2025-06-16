@@ -30,12 +30,7 @@ const createAddressSectionMock = (proper = true): AddressFieldsFragment => ({
 const fi = getLocalizationLang("fi");
 
 const customRender = (proper = true): ReturnType<typeof render> => {
-  return render(
-    <AddressSection
-      title={"Test unit 1"}
-      unit={createAddressSectionMock(proper)}
-    />
-  );
+  return render(<AddressSection title={"Test unit 1"} unit={createAddressSectionMock(proper)} />);
 };
 
 describe("Component: AddressSection | Test create url functions", () => {
@@ -47,16 +42,8 @@ describe("Component: AddressSection | Test create url functions", () => {
   });
   it("should return expected value/format with createGoogleUrl function", () => {
     const mock = createAddressSectionMock();
-    const addressStreet = getTranslationSafe(
-      mock.location ?? {},
-      "addressStreet",
-      fi
-    );
-    const addressCity = getTranslationSafe(
-      mock.location ?? {},
-      "addressCity",
-      fi
-    );
+    const addressStreet = getTranslationSafe(mock.location ?? {}, "addressStreet", fi);
+    const addressCity = getTranslationSafe(mock.location ?? {}, "addressCity", fi);
     const destination = encodeURI(`${addressStreet},${addressCity}`);
     expect(createGoogleUrl(fi, mock.location)).toEqual(
       `https://www.google.com/maps/dir/?api=1&hl=${fi}&destination=${destination}`
@@ -64,16 +51,8 @@ describe("Component: AddressSection | Test create url functions", () => {
   });
   it("should return expected value/format with createHslUrl function", () => {
     const mock = createAddressSectionMock();
-    const addressStreet = getTranslationSafe(
-      mock.location ?? {},
-      "addressStreet",
-      fi
-    );
-    const addressCity = getTranslationSafe(
-      mock.location ?? {},
-      "addressCity",
-      fi
-    );
+    const addressStreet = getTranslationSafe(mock.location ?? {}, "addressStreet", fi);
+    const addressCity = getTranslationSafe(mock.location ?? {}, "addressCity", fi);
     const destination = encodeURI(`${addressStreet},${addressCity}`);
     expect(createHslUrl(fi, createAddressSectionMock().location)).toEqual(
       `https://reittiopas.hsl.fi/reitti/-/${destination}/?locale=${fi}`
@@ -103,15 +82,12 @@ describe("Component: AddressSection | With proper content", () => {
     expect(view.getByText(streetText));
     expect(view.getByText(cityText));
   });
-  it.for(Object.entries(linkUrls))(
-    "should render %o link with correct href",
-    ([key, value]) => {
-      const view = customRender();
-      const linkName = `reservationUnit:link${key}`;
-      const linkElement = view.getByRole("link", { name: linkName });
-      expect(linkElement).toHaveAttribute("href", value);
-    }
-  );
+  it.for(Object.entries(linkUrls))("should render %o link with correct href", ([key, value]) => {
+    const view = customRender();
+    const linkName = `reservationUnit:link${key}`;
+    const linkElement = view.getByRole("link", { name: linkName });
+    expect(linkElement).toHaveAttribute("href", value);
+  });
   it("should render four links", () => {
     const view = customRender();
     expect(view.getAllByRole("link")).toHaveLength(4);
@@ -119,15 +95,12 @@ describe("Component: AddressSection | With proper content", () => {
 });
 
 describe("Component: AddressSection | Without content", () => {
-  it.for(Object.keys(linkUrls))(
-    "shouldn't render %o link without correct info",
-    (key) => {
-      const view = customRender(false);
-      const linkName = `reservationUnit:link${key}`;
-      const linkElement = view.queryByRole("link", { name: linkName });
-      expect(linkElement).not.toBeInTheDocument();
-    }
-  );
+  it.for(Object.keys(linkUrls))("shouldn't render %o link without correct info", (key) => {
+    const view = customRender(false);
+    const linkName = `reservationUnit:link${key}`;
+    const linkElement = view.queryByRole("link", { name: linkName });
+    expect(linkElement).not.toBeInTheDocument();
+  });
   it("shouldn't render any links at all, since no values are provided to the createURL functions", () => {
     const emptyView = customRender(false);
     expect(emptyView.queryAllByRole("link")).toHaveLength(0);

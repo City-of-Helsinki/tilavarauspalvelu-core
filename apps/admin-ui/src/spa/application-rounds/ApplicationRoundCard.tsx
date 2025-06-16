@@ -58,30 +58,19 @@ interface ApplicationCardProps {
   applicationRound: NonNullable<ApplicationRoundCardFragment>;
 }
 
-export function ApplicationRoundCard({
-  applicationRound,
-}: ApplicationCardProps): JSX.Element {
+export function ApplicationRoundCard({ applicationRound }: ApplicationCardProps): JSX.Element {
   const { t } = useTranslation();
 
   const name = applicationRound.nameFi;
 
   const buttons = [
-    <ButtonLikeLink
-      to={getApplicationRoundUrl(applicationRound.pk)}
-      width="full"
-      key="view"
-    >
+    <ButtonLikeLink to={getApplicationRoundUrl(applicationRound.pk)} width="full" key="view">
       <span>{t("common.view")}</span>
       <IconArrowRight size={IconSize.Medium} />
     </ButtonLikeLink>,
   ];
 
-  const tags = [
-    <ApplicationRoundStatusLabel
-      status={applicationRound.status}
-      key="status"
-    />,
-  ];
+  const tags = [<ApplicationRoundStatusLabel status={applicationRound.status} key="status" />];
 
   return (
     <Card heading={name ?? "-"} buttons={buttons} tags={tags}>

@@ -34,16 +34,8 @@ export function useMultipleReservation({
   return result.map((item) => ({
     ...item,
     buffers: {
-      before: getBufferTime(
-        reservationUnit?.bufferTimeBefore,
-        values.type,
-        values.bufferTimeBefore
-      ),
-      after: getBufferTime(
-        reservationUnit?.bufferTimeBefore,
-        values.type,
-        values.bufferTimeAfter
-      ),
+      before: getBufferTime(reservationUnit?.bufferTimeBefore, values.type, values.bufferTimeBefore),
+      after: getBufferTime(reservationUnit?.bufferTimeBefore, values.type, values.bufferTimeAfter),
     },
   }));
 }

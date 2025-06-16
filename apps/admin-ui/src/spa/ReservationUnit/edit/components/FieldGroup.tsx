@@ -37,9 +37,7 @@ export function FieldGroup({
         <FieldGroupHeading>
           {heading} {required ? "*" : ""}
         </FieldGroupHeading>
-        <div className="ReservationUnitEditor__FieldGroup-children">
-          {children}
-        </div>
+        <div className="ReservationUnitEditor__FieldGroup-children">{children}</div>
       </div>
       <Tooltip>{tooltip}</Tooltip>
     </FieldGroupWrapper>

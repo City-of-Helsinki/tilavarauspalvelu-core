@@ -7,10 +7,7 @@ import { type TFunction, useTranslation } from "next-i18next";
 /// reason: if the key is missing it's a bug
 export function formatErrorMessage(t: TFunction, err: ApiError): string {
   if (err.code === "MUTATION_VALIDATION_ERROR") {
-    const validation_code =
-      "validation_code" in err
-        ? err.validation_code
-        : "generic_validation_error";
+    const validation_code = "validation_code" in err ? err.validation_code : "generic_validation_error";
     return t(`errors:api.validation.${validation_code}`);
   }
   return t(`errors:api.${err.code}`);

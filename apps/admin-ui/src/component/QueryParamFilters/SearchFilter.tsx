@@ -6,13 +6,7 @@ import { useSearchParams } from "react-router-dom";
 // TODO should we check that name cant be empty?
 /* TODO allow overriding the placeholder / label without changing the key */
 // NOTE use TextInput because it has `id` prop unlike SearchInput
-export function SearchFilter({
-  name,
-  labelKey,
-}: {
-  name: string;
-  labelKey?: string;
-}) {
+export function SearchFilter({ name, labelKey }: { name: string; labelKey?: string }) {
   const { t } = useTranslation();
   const [searchParams, setParams] = useSearchParams();
 

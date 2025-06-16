@@ -1,10 +1,4 @@
-import React, {
-  forwardRef,
-  type Ref,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { forwardRef, type Ref, useEffect, useRef, useState } from "react";
 import CommonCalendar from "common/src/calendar/Calendar";
 import { Toolbar, ToolbarBtn } from "common/src/calendar/Toolbar";
 import styled from "styled-components";
@@ -16,12 +10,7 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import {
-  eventStyleGetter,
-  legend,
-  type CalendarEventType,
-  type EventType,
-} from "./eventStyleGetter";
+import { eventStyleGetter, legend, type CalendarEventType, type EventType } from "./eventStyleGetter";
 import { Legend, LegendsWrapper } from "@/component/Legend";
 import { EditTimeModal } from "@/component/EditTimeModal";
 import { isPossibleToEdit } from "@/modules/reservationModificationRules";
@@ -71,8 +60,7 @@ const Calendar = forwardRef(function Calendar(
   const selectedEvent = eventsAll.find((e) => e.event?.pk === selected);
 
   // Because the calendar is fixed to 6 - 24 interval anything outside it causes rendering artefacts.
-  const isInsideCalendarRange = (x: { start: Date; end: Date }) =>
-    x.end.getHours() > 6;
+  const isInsideCalendarRange = (x: { start: Date; end: Date }) => x.end.getHours() > 6;
   const events = eventsAll.filter(isInsideCalendarRange);
 
   const handleEditAccept = () => {
@@ -82,24 +70,15 @@ const Calendar = forwardRef(function Calendar(
 
   const handleEditTimeClick = () => {
     setModalContent(
-      <EditTimeModal
-        reservation={reservation}
-        onAccept={handleEditAccept}
-        onClose={() => setModalContent(null)}
-      />
+      <EditTimeModal reservation={reservation} onAccept={handleEditAccept} onClose={() => setModalContent(null)} />
     );
   };
 
   const isAllowedToModify =
-    !reservation.recurringReservation &&
-    isPossibleToEdit(reservation.state, new Date(reservation.end));
+    !reservation.recurringReservation && isPossibleToEdit(reservation.state, new Date(reservation.end));
 
   const eventBuffers = getEventBuffers(
-    filterNonNullable(
-      events
-        .map((e) => e.event)
-        .filter((e) => e?.type !== ReservationTypeChoice.Blocked)
-    )
+    filterNonNullable(events.map((e) => e.event).filter((e) => e?.type !== ReservationTypeChoice.Blocked))
   );
 
   return (
@@ -110,13 +89,8 @@ const Calendar = forwardRef(function Calendar(
           <Toolbar {...props}>
             {isAllowedToModify && (
               // NOTE don't use HDS buttons in the toolbar, breaks mobile layout
-              <VisibleIfPermission
-                reservation={reservation}
-                permission={UserPermissionChoice.CanManageReservations}
-              >
-                <ToolbarBtn onClick={handleEditTimeClick}>
-                  {t("Reservation.EditTimeModal.acceptBtn")}
-                </ToolbarBtn>
+              <VisibleIfPermission reservation={reservation} permission={UserPermissionChoice.CanManageReservations}>
+                <ToolbarBtn onClick={handleEditTimeClick}>{t("Reservation.EditTimeModal.acceptBtn")}</ToolbarBtn>
               </VisibleIfPermission>
             )}
           </Toolbar>
@@ -143,11 +117,9 @@ const Calendar = forwardRef(function Calendar(
   );
 });
 
-const maybeStringToDate: (s?: string) => Date | undefined = (str) =>
-  str ? new Date(str) : undefined;
+const maybeStringToDate: (s?: string) => Date | undefined = (str) => (str ? new Date(str) : undefined);
 
-const onlyFutureDates: (d?: Date) => Date | undefined = (d) =>
-  d && d > new Date() ? d : undefined;
+const onlyFutureDates: (d?: Date) => Date | undefined = (d) => (d && d > new Date() ? d : undefined);
 
 export function TimeBlockSection({
   reservation,
@@ -163,18 +135,13 @@ export function TimeBlockSection({
   // (2) else if reservation is in the future => show that
   // (3) else if reservation.recurrence has an event in the future => show that
   // (4) else show today
-  const { reservations } = useRecurringReservations(
-    reservation.recurringReservation?.pk ?? undefined
-  );
+  const { reservations } = useRecurringReservations(reservation.recurringReservation?.pk ?? undefined);
 
   const nextReservation = reservations.find(
-    (x) =>
-      x.state === ReservationStateChoice.Confirmed &&
-      new Date(x.begin) > new Date()
+    (x) => x.state === ReservationStateChoice.Confirmed && new Date(x.begin) > new Date()
   );
 
-  const shownReservation =
-    new Date(reservation.begin) > new Date() ? reservation : nextReservation;
+  const shownReservation = new Date(reservation.begin) > new Date() ? reservation : nextReservation;
 
   const [focusDate, setFocusDate] = useState<Date>(
     onlyFutureDates(maybeStringToDate(shownReservation?.begin)) ?? new Date()
@@ -202,13 +169,12 @@ export function TimeBlockSection({
   // No month view so always query the whole week even if a single day is selected
   // to avoid spamming queries and having to deal with start of day - end of day.
   // focus day can be in the middle of the week.
-  const { events: eventsAll, refetch: calendarRefetch } =
-    useReservationCalendarData({
-      begin: startOfISOWeek(focusDate),
-      end: add(startOfISOWeek(focusDate), { days: 7 }),
-      reservationUnitPk: reservation?.reservationUnits?.[0]?.pk,
-      reservationPk: reservation?.pk,
-    });
+  const { events: eventsAll, refetch: calendarRefetch } = useReservationCalendarData({
+    begin: startOfISOWeek(focusDate),
+    end: add(startOfISOWeek(focusDate), { days: 7 }),
+    reservationUnitPk: reservation?.reservationUnits?.[0]?.pk,
+    reservationPk: reservation?.pk,
+  });
 
   // Necessary because the reservation can be removed (denied) from the parent component
   // so update the calendar when that happens.
@@ -227,10 +193,7 @@ export function TimeBlockSection({
   return (
     <>
       {reservation.recurringReservation?.pk && (
-        <Accordion
-          id="reservation__recurring"
-          heading={t("RequestedReservation.recurring")}
-        >
+        <Accordion id="reservation__recurring" heading={t("RequestedReservation.recurring")}>
           <RecurringReservationsView
             recurringPk={reservation.recurringReservation.pk}
             onSelect={setSelected}

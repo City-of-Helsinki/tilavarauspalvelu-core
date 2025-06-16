@@ -45,11 +45,7 @@ export function RecurringReservation() {
   return (
     <>
       <LinkPrev />
-      {isInvalid ? (
-        <RecurringErrorPage />
-      ) : (
-        <RecurringReservationInner unitPk={unitPk} />
-      )}
+      {isInvalid ? <RecurringErrorPage /> : <RecurringReservationInner unitPk={unitPk} />}
     </>
   );
 }

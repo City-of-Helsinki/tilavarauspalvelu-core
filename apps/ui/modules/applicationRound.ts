@@ -4,16 +4,9 @@ import { getTranslationSafe } from "common/src/common/util";
 import type { ReadonlyDeep } from "common/src/helpers";
 import { type LocalizationLanguages } from "common/src/urlBuilder";
 
-type ApplicationRoundType =
-  | Maybe<
-      Pick<ReadonlyDeep<ApplicationRoundNode>, "nameFi" | "nameSv" | "nameEn">
-    >
-  | undefined;
+type ApplicationRoundType = Maybe<Pick<ReadonlyDeep<ApplicationRoundNode>, "nameFi" | "nameSv" | "nameEn">> | undefined;
 
-export function getApplicationRoundName(
-  applicationRound: ApplicationRoundType,
-  lang: LocalizationLanguages
-): string {
+export function getApplicationRoundName(applicationRound: ApplicationRoundType, lang: LocalizationLanguages): string {
   if (applicationRound == null) {
     return "-";
   }

@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  IconAngleDown,
-  IconAngleUp,
-  IconLinkExternal,
-  IconSize,
-  RadioButton,
-} from "hds-react";
+import { IconAngleDown, IconAngleUp, IconLinkExternal, IconSize, RadioButton } from "hds-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import styled, { css } from "styled-components";
@@ -33,11 +27,7 @@ import { MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH } from "@/common/const";
 import { formatAgeGroup } from "@/common/util";
 import { useDisplayError } from "common/src/hooks";
 
-export type AllocationApplicationSectionCardType =
-  | "unallocated"
-  | "allocated"
-  | "partial"
-  | "declined";
+export type AllocationApplicationSectionCardType = "unallocated" | "allocated" | "partial" | "declined";
 
 type ReservationUnitT = Pick<ReservationUnitNode, "pk">;
 
@@ -173,12 +163,10 @@ export function ApplicationSectionCard({
   const applicantName = getApplicantName(application);
   const durationString = createDurationString(applicationSection, t);
 
-  const nReservationUnits =
-    applicationSection?.reservationUnitOptions?.length ?? -1;
+  const nReservationUnits = applicationSection?.reservationUnitOptions?.length ?? -1;
   const n =
-    applicationSection?.reservationUnitOptions?.findIndex(
-      (ru) => ru?.reservationUnit?.pk === reservationUnit?.pk
-    ) ?? -1;
+    applicationSection?.reservationUnitOptions?.findIndex((ru) => ru?.reservationUnit?.pk === reservationUnit?.pk) ??
+    -1;
 
   const toggleSelection = () => {
     if (isActive) {
@@ -293,9 +281,7 @@ function SchedulesList({
         })),
       ];
     })
-  ).sort(
-    (a, b) => convertWeekday(a.dayOfTheWeek) - convertWeekday(b.dayOfTheWeek)
-  );
+  ).sort((a, b) => convertWeekday(a.dayOfTheWeek) - convertWeekday(b.dayOfTheWeek));
 
   const [mutation, { loading }] = useRejectRestMutation();
 
@@ -304,10 +290,7 @@ function SchedulesList({
   );
   const displayError = useDisplayError();
 
-  const updateOption = async (
-    pk: Maybe<number> | undefined,
-    locked: boolean
-  ): Promise<void> => {
+  const updateOption = async (pk: Maybe<number> | undefined, locked: boolean): Promise<void> => {
     if (loading) {
       return;
     }
@@ -352,8 +335,7 @@ function SchedulesList({
       {(nToAllocate > 0 || isLocked) && (
         <div style={{ display: "flex", gap: "1rem" }}>
           <SelectionListCount>
-            {t("Allocation.schedulesWithoutAllocation")} {nToAllocate}/
-            {eventsPerWeek}
+            {t("Allocation.schedulesWithoutAllocation")} {nToAllocate}/{eventsPerWeek}
           </SelectionListCount>
           <PopupMenu
             items={[
@@ -406,16 +388,12 @@ function AllocatedScheduleSection({
     }
   };
 
-  const allocatedReservationUnit =
-    allocatedTimeSlot.reservationUnitOption?.reservationUnit;
+  const allocatedReservationUnit = allocatedTimeSlot.reservationUnitOption?.reservationUnit;
 
   const isInDifferentUnit =
-    allocatedReservationUnit != null &&
-    allocatedReservationUnit.pk !== currentReservationUnit.pk;
+    allocatedReservationUnit != null && allocatedReservationUnit.pk !== currentReservationUnit.pk;
 
-  const combinedName = `${allocatedReservationUnit?.nameFi ?? "-"}, ${
-    allocatedReservationUnit.unit?.nameFi ?? "-"
-  }`;
+  const combinedName = `${allocatedReservationUnit?.nameFi ?? "-"}, ${allocatedReservationUnit.unit?.nameFi ?? "-"}`;
   return (
     <ScheduleCard key={allocatedTimeSlot.pk}>
       {/* TODO functionality for selecting the schedule vs. an applicationSection */}
@@ -427,9 +405,7 @@ function AllocatedScheduleSection({
       />
       <div>
         <SemiBold>{formatSuitableTimeRange(t, allocatedTimeSlot)}</SemiBold>
-        <div>
-          {truncate(combinedName, MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH)}
-        </div>
+        <div>{truncate(combinedName, MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH)}</div>
       </div>
     </ScheduleCard>
   );

@@ -95,11 +95,7 @@ describe("convertToDate", () => {
 
   test("sets time properly", () => {
     const d = new Date(2023, 9, 1, 23, 11);
-    expect(convertToDate(d, "10:00")).toStrictEqual(
-      new Date(2023, 9, 1, 10, 0)
-    );
-    expect(convertToDate(d, "10:15")).toStrictEqual(
-      new Date(2023, 9, 1, 10, 15)
-    );
+    expect(convertToDate(d, "10:00")).toStrictEqual(new Date(2023, 9, 1, 10, 0));
+    expect(convertToDate(d, "10:15")).toStrictEqual(new Date(2023, 9, 1, 10, 15));
   });
 });

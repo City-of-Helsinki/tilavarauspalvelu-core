@@ -1,15 +1,8 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import {
-  ApplicationStatusChoice,
-  type ApplicationViewFragment,
-} from "@gql/gql-types";
+import { ApplicationStatusChoice, type ApplicationViewFragment } from "@gql/gql-types";
 import { gql } from "@apollo/client";
-import {
-  ApplicationSection,
-  ApplicationSectionHeader,
-  StyledNotification,
-} from "./styled";
+import { ApplicationSection, ApplicationSectionHeader, StyledNotification } from "./styled";
 import { ApplicantInfoPreview, ApplicationSectionList } from ".";
 
 type ViewApplicationProps = {
@@ -17,20 +10,14 @@ type ViewApplicationProps = {
   children: JSX.Element;
 };
 
-export function ViewApplication({
-  application,
-  children,
-}: ViewApplicationProps): JSX.Element {
+export function ViewApplication({ application, children }: ViewApplicationProps): JSX.Element {
   const { t } = useTranslation();
-  const shouldShowNotification =
-    application.status !== ApplicationStatusChoice.ResultsSent;
+  const shouldShowNotification = application.status !== ApplicationStatusChoice.ResultsSent;
   return (
     <>
       <div>
         <ApplicationSection>
-          <ApplicationSectionHeader>
-            {t("application:preview.basicInfoSubHeading")}
-          </ApplicationSectionHeader>
+          <ApplicationSectionHeader>{t("application:preview.basicInfoSubHeading")}</ApplicationSectionHeader>
           <ApplicantInfoPreview application={application} />
         </ApplicationSection>
         <ApplicationSectionList application={application} />
@@ -39,9 +26,7 @@ export function ViewApplication({
       {shouldShowNotification && (
         <div>
           {/* Wrap the notification in a div, since HDS-notification has <section> as the root element and we need section:last-of-type to hit the last ApplicationSection */}
-          <StyledNotification
-            label={t("application:preview.notification.processing")}
-          >
+          <StyledNotification label={t("application:preview.notification.processing")}>
             {t("application:preview.notification.body")}
           </StyledNotification>
         </div>

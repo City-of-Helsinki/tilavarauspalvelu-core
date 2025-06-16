@@ -10,14 +10,12 @@ import { Flex } from "common/styled";
 const Container = styled.div<{ $disabled: boolean }>`
   .ql-toolbar {
     border: none !important;
-    ${({ $disabled }) =>
-      $disabled ? "background-color: var(--color-black-10);" : ""}
+    ${({ $disabled }) => ($disabled ? "background-color: var(--color-black-10);" : "")}
   }
   .ql-container {
     border: none !important;
     border-top: 1px solid var(--color-black-50) !important;
-    ${({ $disabled }) =>
-      $disabled ? "background-color: var(--color-black-10);" : ""}
+    ${({ $disabled }) => ($disabled ? "background-color: var(--color-black-10);" : "")}
   }
 `;
 
@@ -44,8 +42,7 @@ const ErrorText = styled.span`
 const StyledReactQuill = styled(ReactQuill)<{
   $error?: boolean;
 }>`
-  border: 2px solid
-    ${({ $error }) => ($error ? "var(--color-error)" : "var(--color-black-50)")};
+  border: 2px solid ${({ $error }) => ($error ? "var(--color-error)" : "var(--color-black-50)")};
   > div {
     font-size: var(--fontsize-body-l);
     font-family: var(--font-regular);

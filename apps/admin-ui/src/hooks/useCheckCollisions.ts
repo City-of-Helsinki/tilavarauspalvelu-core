@@ -1,13 +1,6 @@
-import {
-  ReservationTypeChoice,
-  useReservationsByReservationUnitQuery,
-} from "@gql/gql-types";
+import { ReservationTypeChoice, useReservationsByReservationUnitQuery } from "@gql/gql-types";
 import { errorToast } from "common/src/common/toast";
-import {
-  combineAffectingReservations,
-  doesIntervalCollide,
-  reservationToInterval,
-} from "@/helpers";
+import { combineAffectingReservations, doesIntervalCollide, reservationToInterval } from "@/helpers";
 import { base64encode } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
@@ -57,12 +50,7 @@ export function useCheckCollisions({
 
   const collisions = reservations
     .filter((x) => x?.pk !== reservationPk)
-    .map((x) =>
-      reservationToInterval(
-        { ...x, recurringReservation: null },
-        reservationType
-      )
-    )
+    .map((x) => reservationToInterval({ ...x, recurringReservation: null }, reservationType))
     .filter((x) => {
       if (x == null) {
         return false;
@@ -70,10 +58,7 @@ export function useCheckCollisions({
       if (start == null || end == null) {
         return false;
       }
-      const buff =
-        x.type === ReservationTypeChoice.Blocked
-          ? { before: 0, after: 0 }
-          : buffers;
+      const buff = x.type === ReservationTypeChoice.Blocked ? { before: 0, after: 0 } : buffers;
       return doesIntervalCollide({ start, end, buffers: buff }, x);
     });
 
@@ -96,12 +81,7 @@ export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
         ...CombineAffectedReservations
       }
     }
-    affectingReservations(
-      forReservationUnits: [$pk]
-      state: $state
-      beginDate: $beginDate
-      endDate: $endDate
-    ) {
+    affectingReservations(forReservationUnits: [$pk], state: $state, beginDate: $beginDate, endDate: $endDate) {
       ...CalendarReservation
       ...CombineAffectedReservations
     }

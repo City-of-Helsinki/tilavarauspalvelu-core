@@ -1,9 +1,6 @@
 import { UseFormReturn } from "react-hook-form";
 import type { ReservationUnitEditFormValues } from "@/spa/ReservationUnit/edit/form";
-import type {
-  ReservationUnitEditQuery,
-  ReservationUnitEditUnitFragment,
-} from "@gql/gql-types";
+import type { ReservationUnitEditQuery, ReservationUnitEditUnitFragment } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
 import { TextInput } from "hds-react";
@@ -20,15 +17,13 @@ type Node = NonNullable<QueryData>;
 
 // default is 20 if no spaces selected
 function getMaxPersons(spaceList: Pick<Node, "maxPersons">[]) {
-  const persons =
-    spaceList.map((s) => s.maxPersons ?? 0).reduce((a, x) => a + x, 0) || 20;
+  const persons = spaceList.map((s) => s.maxPersons ?? 0).reduce((a, x) => a + x, 0) || 20;
   return Math.floor(persons);
 }
 
 // default is 1 if no spaces selected
 function getMinSurfaceArea(spaceList: Pick<Node, "surfaceArea">[]) {
-  const area =
-    spaceList.map((s) => s.surfaceArea ?? 0).reduce((a, x) => a + x, 0) || 1;
+  const area = spaceList.map((s) => s.surfaceArea ?? 0).reduce((a, x) => a + x, 0) || 1;
   return Math.floor(area);
 }
 
@@ -47,14 +42,13 @@ export function BasicSection({
     label: s?.nameFi ?? "-",
     value: s?.pk ?? 0,
   }));
-  const resourceOptions = filterNonNullable(
-    spaces?.flatMap((s) => s?.resources)
-  ).map((r) => ({ label: r?.nameFi ?? "-", value: r?.pk ?? 0 }));
+  const resourceOptions = filterNonNullable(spaces?.flatMap((s) => s?.resources)).map((r) => ({
+    label: r?.nameFi ?? "-",
+    value: r?.pk ?? 0,
+  }));
 
   const spacePks = watch("spaces");
-  const selectedSpaces = filterNonNullable(
-    spacePks.map((pk) => spaces?.find((s) => s.pk === pk))
-  );
+  const selectedSpaces = filterNonNullable(spacePks.map((pk) => spaces?.find((s) => s.pk === pk)));
   const minSurfaceArea = getMinSurfaceArea(selectedSpaces);
   const maxPersons = getMaxPersons(selectedSpaces);
 
@@ -70,11 +64,7 @@ export function BasicSection({
     errors.nameSv != null;
 
   return (
-    <EditAccordion
-      initiallyOpen
-      open={hasErrors}
-      heading={t("ReservationUnitEditor.basicInformation")}
-    >
+    <EditAccordion initiallyOpen open={hasErrors} heading={t("ReservationUnitEditor.basicInformation")}>
       <AutoGrid>
         <FullRow>
           <SpecializedRadioGroup
@@ -109,9 +99,7 @@ export function BasicSection({
           afterChange={(vals) => {
             // recalculate the min surface area and max persons after update
             const sPks = Array.isArray(vals) ? vals.map((y) => y) : [];
-            const sspaces = filterNonNullable(
-              sPks.map((pk) => spaces?.find((s) => s.pk === pk))
-            );
+            const sspaces = filterNonNullable(sPks.map((pk) => spaces?.find((s) => s.pk === pk)));
             const minArea = getMinSurfaceArea(sspaces);
             const maxPer = getMaxPersons(sspaces);
             if (minArea > 0) {
@@ -135,24 +123,9 @@ export function BasicSection({
           error={getTranslatedError(t, errors.resources?.message)}
           tooltip={t("ReservationUnitEditor.tooltip.resources")}
         />
-        <CustomNumberInput
-          name="surfaceArea"
-          min={minSurfaceArea}
-          max={undefined}
-          form={form}
-        />
-        <CustomNumberInput
-          name="maxPersons"
-          min={0}
-          max={maxPersons}
-          form={form}
-        />
-        <CustomNumberInput
-          name="minPersons"
-          min={0}
-          max={watch("maxPersons") || 1}
-          form={form}
-        />
+        <CustomNumberInput name="surfaceArea" min={minSurfaceArea} max={undefined} form={form} />
+        <CustomNumberInput name="maxPersons" min={0} max={maxPersons} form={form} />
+        <CustomNumberInput name="minPersons" min={0} max={watch("maxPersons") || 1} form={form} />
       </AutoGrid>
     </EditAccordion>
   );

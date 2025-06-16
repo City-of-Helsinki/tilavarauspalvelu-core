@@ -85,13 +85,7 @@ const requiredFields = [
   "purpose",
 ];
 
-function createReservationUnitFragment({
-  pk,
-  nameFi,
-}: {
-  pk: number;
-  nameFi: string;
-}): CreateStaffReservationFragment {
+function createReservationUnitFragment({ pk, nameFi }: { pk: number; nameFi: string }): CreateStaffReservationFragment {
   return {
     authentication: Authentication.Weak,
     nameFi,
@@ -121,67 +115,61 @@ function createReservationUnitFragment({
 }
 
 // First monday off the month has reservation from 9:00 - 12:00
-export const mondayMorningReservations = Array.from(Array(12).keys()).map(
-  (x) => {
-    const firstMonday = nextMonday(new Date(YEAR, x, 1));
-    const begin = set(firstMonday, { hours: 9, minutes: 0, milliseconds: 0 });
-    const end = set(firstMonday, { hours: 12, minutes: 0, milliseconds: 0 });
-    return {
-      begin,
-      end,
-    };
-  }
-);
+export const mondayMorningReservations = Array.from(Array(12).keys()).map((x) => {
+  const firstMonday = nextMonday(new Date(YEAR, x, 1));
+  const begin = set(firstMonday, { hours: 9, minutes: 0, milliseconds: 0 });
+  const end = set(firstMonday, { hours: 12, minutes: 0, milliseconds: 0 });
+  return {
+    begin,
+    end,
+  };
+});
 
 // Every day has 5 x 1 hour reservations from 15 - 21
 const firstDay = new Date(YEAR, 1, 1);
-const everydayReservations = Array.from(Array(365).keys()).reduce(
-  (agv: { begin: Date; end: Date }[], i) => {
-    const begin = set(firstDay, {
-      date: i,
-      hours: 15,
-      minutes: 0,
-      milliseconds: 0,
-    });
-    const end = addHours(begin, 1);
-    return [
-      ...agv,
-      ...Array.from(Array(5).keys()).map((j) => ({
-        begin: set(begin, {
-          hours: 15 + j,
-        }),
-        end: set(end, {
-          hours: 16 + j,
-        }),
-      })),
-    ];
-  },
-  []
-);
+const everydayReservations = Array.from(Array(365).keys()).reduce((agv: { begin: Date; end: Date }[], i) => {
+  const begin = set(firstDay, {
+    date: i,
+    hours: 15,
+    minutes: 0,
+    milliseconds: 0,
+  });
+  const end = addHours(begin, 1);
+  return [
+    ...agv,
+    ...Array.from(Array(5).keys()).map((j) => ({
+      begin: set(begin, {
+        hours: 15 + j,
+      }),
+      end: set(end, {
+        hours: 16 + j,
+      }),
+    })),
+  ];
+}, []);
 
-const reservationsByUnitResponse: CalendarReservationFragment[] =
-  mondayMorningReservations
-    .concat(everydayReservations)
-    // backend returns days unsorted but our mondays are first
-    // we could also randomize the array so blocking times are neither at the start nor the end
-    .sort((x, y) => x.begin.getTime() - y.begin.getTime())
-    .map((x) => ({
-      __typename: "ReservationNode",
-      id: base64encode(`ReservationNode:1`),
-      begin: x.begin.toUTCString(),
-      end: x.end.toUTCString(),
-      bufferTimeBefore: 0,
-      bufferTimeAfter: 0,
-      accessType: AccessType.Unrestricted,
-      name: "Test reservation",
-      reserveeName: "Test reservee",
-      pk: 1,
-      state: ReservationStateChoice.Confirmed,
-      user: null,
-      type: ReservationTypeChoice.Normal,
-      affectedReservationUnits: [],
-      recurringReservation: null,
-    }));
+const reservationsByUnitResponse: CalendarReservationFragment[] = mondayMorningReservations
+  .concat(everydayReservations)
+  // backend returns days unsorted but our mondays are first
+  // we could also randomize the array so blocking times are neither at the start nor the end
+  .sort((x, y) => x.begin.getTime() - y.begin.getTime())
+  .map((x) => ({
+    __typename: "ReservationNode",
+    id: base64encode(`ReservationNode:1`),
+    begin: x.begin.toUTCString(),
+    end: x.end.toUTCString(),
+    bufferTimeBefore: 0,
+    bufferTimeAfter: 0,
+    accessType: AccessType.Unrestricted,
+    name: "Test reservation",
+    reserveeName: "Test reservee",
+    pk: 1,
+    state: ReservationStateChoice.Confirmed,
+    user: null,
+    type: ReservationTypeChoice.Normal,
+    affectedReservationUnits: [],
+    recurringReservation: null,
+  }));
 
 const AdminUserMock: CurrentUserQuery = {
   currentUser: {

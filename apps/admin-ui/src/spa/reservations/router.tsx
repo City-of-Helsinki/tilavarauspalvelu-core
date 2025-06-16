@@ -5,10 +5,7 @@ import { ListReservationsPage } from ".";
 import { EditPage } from "./[id]/edit";
 import { ReservationPage } from "./[id]";
 import { SeriesPage } from "./[id]/series";
-import {
-  useReservationPermissionsQuery,
-  UserPermissionChoice,
-} from "@gql/gql-types";
+import { useReservationPermissionsQuery, UserPermissionChoice } from "@gql/gql-types";
 import { gql } from "@apollo/client";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { useCheckPermission } from "@/hooks";
@@ -23,14 +20,8 @@ function ReservationsRouter(): JSX.Element {
       <Route path="requested" element={<RequestedPage />} />
       <Route path="all" element={<ListReservationsPage />} />
       <Route path=":id" element={<ReservationPage />} />
-      <Route
-        path=":id/edit"
-        element={<PermCheckedRoute element={<EditPage />} />}
-      />
-      <Route
-        path=":id/series"
-        element={<PermCheckedRoute element={<SeriesPage />} />}
-      />
+      <Route path=":id/edit" element={<PermCheckedRoute element={<EditPage />} />} />
+      <Route path=":id/series" element={<PermCheckedRoute element={<SeriesPage />} />} />
     </Routes>
   );
 }
@@ -56,9 +47,7 @@ function useCheckReservationPermissions(pk?: string) {
     variables: { id },
     skip: !pk,
   });
-  const units = filterNonNullable(
-    data?.reservation?.reservationUnits.map((ru) => ru.unit?.pk)
-  );
+  const units = filterNonNullable(data?.reservation?.reservationUnits.map((ru) => ru.unit?.pk));
   const { hasPermission, isLoading } = useCheckPermission({
     units,
     permission: UserPermissionChoice.CanManageReservations,

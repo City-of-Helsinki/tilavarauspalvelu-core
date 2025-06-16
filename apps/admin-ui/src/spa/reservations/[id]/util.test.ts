@@ -96,14 +96,8 @@ describe("getReservatinUnitPricing", () => {
       pricings: [constructFreePricing(), constructPaidPricing()],
     };
 
-    const first = getReservatinUnitPricing(
-      input,
-      new Date("2021-02-01T00:00:01Z")
-    );
-    const second = getReservatinUnitPricing(
-      input,
-      new Date("2022-04-01T00:00:01Z")
-    );
+    const first = getReservatinUnitPricing(input, new Date("2021-02-01T00:00:01Z"));
+    const second = getReservatinUnitPricing(input, new Date("2022-04-01T00:00:01Z"));
     expect(first?.lowestPrice).toBe("0");
     expect(second?.lowestPrice).toBe("120");
   });
@@ -116,9 +110,7 @@ describe("createTag", () => {
     const input = constructReservation({ begin, end, enableRecurrence: true });
 
     const tag = createTagString(input, mockT);
-    expect(tag).toContain(
-      "dayShort.0, dayShort.1, dayShort.3 12:00–14:00, common:abbreviations:hour"
-    );
+    expect(tag).toContain("dayShort.0, dayShort.1, dayShort.3 12:00–14:00, common:abbreviations:hour");
     expect(tag).toContain("1.4.2023–1.7.2023");
     expect(tag).toContain("Reservation unit 1");
   });

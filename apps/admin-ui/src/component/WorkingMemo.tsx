@@ -20,12 +20,7 @@ function WorkingMemo({
   initialValue: string;
   onMutate: (
     memo: string
-  ) => Promise<
-    FetchResult<
-      | UpdateReservationWorkingMemoMutation
-      | UpdateApplicationWorkingMemoMutation
-    >
-  >;
+  ) => Promise<FetchResult<UpdateReservationWorkingMemoMutation | UpdateApplicationWorkingMemoMutation>>;
   onSuccess: () => void;
 }) {
   const [workingMemo, setWorkingMemo] = useState<string>(initialValue);
@@ -101,13 +96,7 @@ export function ReservationWorkingMemo({
       variables: { pk: reservationPk, workingMemo: memo },
     });
 
-  return (
-    <WorkingMemo
-      onMutate={updateMemo}
-      initialValue={initialValue}
-      onSuccess={refetch}
-    />
-  );
+  return <WorkingMemo onMutate={updateMemo} initialValue={initialValue} onSuccess={refetch} />;
 }
 
 export function ApplicationWorkingMemo({
@@ -126,20 +115,12 @@ export function ApplicationWorkingMemo({
       variables: { pk: applicationPk, workingMemo: memo },
     });
 
-  return (
-    <WorkingMemo
-      onMutate={updateMemo}
-      initialValue={initialValue}
-      onSuccess={refetch}
-    />
-  );
+  return <WorkingMemo onMutate={updateMemo} initialValue={initialValue} onSuccess={refetch} />;
 }
 
 export const UPDATE_RESERVATION_WORKING_MEMO = gql`
   mutation UpdateReservationWorkingMemo($pk: Int!, $workingMemo: String!) {
-    updateReservationWorkingMemo(
-      input: { pk: $pk, workingMemo: $workingMemo }
-    ) {
+    updateReservationWorkingMemo(input: { pk: $pk, workingMemo: $workingMemo }) {
       pk
       workingMemo
     }
@@ -148,9 +129,7 @@ export const UPDATE_RESERVATION_WORKING_MEMO = gql`
 
 export const UPDATE_APPLICATION_WORKING_MEMO = gql`
   mutation UpdateApplicationWorkingMemo($pk: Int!, $workingMemo: String!) {
-    updateApplicationWorkingMemo(
-      input: { pk: $pk, workingMemo: $workingMemo }
-    ) {
+    updateApplicationWorkingMemo(input: { pk: $pk, workingMemo: $workingMemo }) {
       pk
       workingMemo
     }

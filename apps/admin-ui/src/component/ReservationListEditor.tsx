@@ -1,8 +1,5 @@
 import { useTranslation } from "next-i18next";
-import {
-  ReservationList,
-  type NewReservationListItem,
-} from "@/component/ReservationsList";
+import { ReservationList, type NewReservationListItem } from "@/component/ReservationsList";
 import { ReservationListButton } from "@/component/ReservationListButton";
 
 type ReservationListEditorProps = {
@@ -12,15 +9,8 @@ type ReservationListEditorProps = {
   isTall?: boolean;
 };
 
-export function isReservationEq(
-  a: NewReservationListItem,
-  b: NewReservationListItem
-) {
-  return (
-    a.date.getTime() === b.date.getTime() &&
-    a.endTime === b.endTime &&
-    a.startTime === b.startTime
-  );
+export function isReservationEq(a: NewReservationListItem, b: NewReservationListItem) {
+  return a.date.getTime() === b.date.getTime() && a.endTime === b.endTime && a.startTime === b.startTime;
 }
 
 /// @param items the checked list of all new reservations to make
@@ -47,10 +37,7 @@ export function ReservationListEditor({
     items.refetch();
     const fid = removedReservations.findIndex((x) => isReservationEq(item, x));
     if (fid !== -1) {
-      setRemovedReservations([
-        ...removedReservations.slice(0, fid),
-        ...removedReservations.slice(fid + 1),
-      ]);
+      setRemovedReservations([...removedReservations.slice(0, fid), ...removedReservations.slice(fid + 1)]);
     }
   };
 
@@ -74,7 +61,5 @@ export function ReservationListEditor({
     };
   });
 
-  return (
-    <ReservationList items={itemsWithButtons} hasPadding isTall={isTall} />
-  );
+  return <ReservationList items={itemsWithButtons} hasPadding isTall={isTall} />;
 }

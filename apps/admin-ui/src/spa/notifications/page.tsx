@@ -35,12 +35,7 @@ import {
   checkTimeStringFormat,
   checkLengthWithoutHtml,
 } from "common/src/schemas/schemaCommon";
-import {
-  valueForDateInput,
-  valueForTimeInput,
-  dateTime,
-  constructDateTimeSafe,
-} from "@/helpers";
+import { valueForDateInput, valueForTimeInput, dateTime, constructDateTimeSafe } from "@/helpers";
 import { base64encode } from "common/src/helpers";
 import { ControlledDateInput } from "common/src/components/form";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
@@ -57,9 +52,7 @@ const RichTextInput = dynamic(() => import("@/component/RichTextInput"), {
 
 // export for codegen (otherwise they might get removed)
 export const BANNER_NOTIFICATIONS_CREATE = gql`
-  mutation BannerNotificationCreate(
-    $input: BannerNotificationCreateMutationInput!
-  ) {
+  mutation BannerNotificationCreate($input: BannerNotificationCreateMutationInput!) {
     createBannerNotification(input: $input) {
       pk
     }
@@ -67,9 +60,7 @@ export const BANNER_NOTIFICATIONS_CREATE = gql`
 `;
 
 export const BANNER_NOTIFICATIONS_UPDATE = gql`
-  mutation BannerNotificationUpdate(
-    $input: BannerNotificationUpdateMutationInput!
-  ) {
+  mutation BannerNotificationUpdate($input: BannerNotificationUpdateMutationInput!) {
     updateBannerNotification(input: $input) {
       pk
     }
@@ -77,9 +68,7 @@ export const BANNER_NOTIFICATIONS_UPDATE = gql`
 `;
 
 export const BANNER_NOTIFICATIONS_DELETE = gql`
-  mutation BannerNotificationDelete(
-    $input: BannerNotificationDeleteMutationInput!
-  ) {
+  mutation BannerNotificationDelete($input: BannerNotificationDeleteMutationInput!) {
     deleteBannerNotification(input: $input) {
       deleted
     }
@@ -87,9 +76,7 @@ export const BANNER_NOTIFICATIONS_DELETE = gql`
 `;
 
 // helpers so we get typechecking without casting
-function convertLevel(
-  level: "EXCEPTION" | "NORMAL" | "WARNING"
-): BannerNotificationLevel {
+function convertLevel(level: "EXCEPTION" | "NORMAL" | "WARNING"): BannerNotificationLevel {
   switch (level) {
     case "EXCEPTION":
       return BannerNotificationLevel.Exception;
@@ -100,9 +87,7 @@ function convertLevel(
   }
 }
 
-function convertTarget(
-  target: "ALL" | "STAFF" | "USER"
-): BannerNotificationTarget {
+function convertTarget(target: "ALL" | "STAFF" | "USER"): BannerNotificationTarget {
   switch (target) {
     case "ALL":
       return BannerNotificationTarget.All;
@@ -123,14 +108,8 @@ type NotificationStatus = {
   icon: JSX.Element;
 };
 
-function BannerNotificationStatusLabel({
-  state,
-}: {
-  state: BannerNotificationState;
-}) {
-  const statusLabelProps = ((
-    s: BannerNotificationState
-  ): NotificationStatus => {
+function BannerNotificationStatusLabel({ state }: { state: BannerNotificationState }) {
+  const statusLabelProps = ((s: BannerNotificationState): NotificationStatus => {
     switch (s) {
       case BannerNotificationState.Draft:
         return {
@@ -153,10 +132,7 @@ function BannerNotificationStatusLabel({
   const { t } = useTranslation();
 
   return (
-    <StyledStatusLabel
-      type={statusLabelProps.type}
-      icon={statusLabelProps.icon}
-    >
+    <StyledStatusLabel type={statusLabelProps.type} icon={statusLabelProps.icon}>
       {t(`Notifications.state.${state}`)}
     </StyledStatusLabel>
   );
@@ -271,26 +247,14 @@ const GridForm = styled.form`
 `;
 
 /// @brief This is the create / edit page for a single notification.
-const NotificationForm = ({
-  notification,
-}: {
-  notification?: BannerNotificationPageQuery["bannerNotification"];
-}) => {
+const NotificationForm = ({ notification }: { notification?: BannerNotificationPageQuery["bannerNotification"] }) => {
   const { t } = useTranslation("translation", { keyPrefix: "Notifications" });
 
   const today = new Date();
-  const activeFrom = valueForDateInput(
-    notification?.activeFrom ?? today.toISOString()
-  );
-  const activeFromTime = notification?.activeFrom
-    ? valueForTimeInput(notification?.activeFrom)
-    : "06:00";
-  const activeUntil = notification?.activeUntil
-    ? valueForDateInput(notification?.activeUntil)
-    : "";
-  const activeUntilTime = notification?.activeUntil
-    ? valueForTimeInput(notification?.activeUntil)
-    : "23:59";
+  const activeFrom = valueForDateInput(notification?.activeFrom ?? today.toISOString());
+  const activeFromTime = notification?.activeFrom ? valueForTimeInput(notification?.activeFrom) : "06:00";
+  const activeUntil = notification?.activeUntil ? valueForDateInput(notification?.activeUntil) : "";
+  const activeUntilTime = notification?.activeUntil ? valueForTimeInput(notification?.activeUntil) : "23:59";
 
   const {
     handleSubmit,
@@ -304,9 +268,7 @@ const NotificationForm = ({
     resolver: zodResolver(NotificationFormSchema),
     defaultValues: {
       name: notification?.name ?? "",
-      inFuture: notification
-        ? notification?.state === BannerNotificationState.Scheduled
-        : false,
+      inFuture: notification ? notification?.state === BannerNotificationState.Scheduled : false,
       // draft mode is set separately on button press
       isDraft: false,
       activeFrom,
@@ -330,10 +292,7 @@ const NotificationForm = ({
 
   const onSubmit = async (data: NotificationFormType) => {
     const end = constructDateTimeSafe(data.activeUntil, data.activeUntilTime);
-    const start =
-      data.activeFrom !== ""
-        ? dateTime(data.activeFrom, data.activeFromTime)
-        : undefined;
+    const start = data.activeFrom !== "" ? dateTime(data.activeFrom, data.activeFromTime) : undefined;
 
     const input = {
       name: data.name,
@@ -368,8 +327,7 @@ const NotificationForm = ({
     }
   };
 
-  const translateError = (errorMsg?: string) =>
-    errorMsg ? t(`form.errors.${errorMsg}`) : "";
+  const translateError = (errorMsg?: string) => (errorMsg ? t(`form.errors.${errorMsg}`) : "");
 
   const levelOptions = [
     { value: "NORMAL", label: t("form.levelEnum.NORMAL") },
@@ -388,10 +346,7 @@ const NotificationForm = ({
         control={control}
         name="inFuture"
         render={({ field: { onChange, value } }) => (
-          <SelectionGroup
-            label={t("form.selectionWhen")}
-            style={{ gridColumn: "1 / -1" }}
-          >
+          <SelectionGroup label={t("form.selectionWhen")} style={{ gridColumn: "1 / -1" }}>
             <RadioButton
               id="v-radio1"
               name="v-radio"
@@ -485,11 +440,7 @@ const NotificationForm = ({
             style={{ gridColumn: "1 / -1" }}
             onChange={(val) => onChange(val)}
             value={value}
-            errorText={
-              errors.messageFi?.message
-                ? translateError(errors.messageFi?.message)
-                : undefined
-            }
+            errorText={errors.messageFi?.message ? translateError(errors.messageFi?.message) : undefined}
             required
             data-testid="Notification__Page--message-fi-input"
           />
@@ -546,10 +497,7 @@ const NotificationForm = ({
           </Button>
         </InnerButtons>
         <div>
-          <Button
-            type="submit"
-            data-testid="Notification__Page--publish-button"
-          >
+          <Button type="submit" data-testid="Notification__Page--publish-button">
             {t("form.save")}
           </Button>
         </div>
@@ -558,12 +506,7 @@ const NotificationForm = ({
   );
 };
 
-function getName(
-  isNew: boolean,
-  isLoading: boolean,
-  name: string | undefined,
-  t: TFunction
-) {
+function getName(isNew: boolean, isLoading: boolean, name: string | undefined, t: TFunction) {
   if (name) {
     return name;
   }
@@ -576,11 +519,7 @@ function getName(
   return t("Notifications.error.notFound");
 }
 
-function useRemoveNotification({
-  notification,
-}: {
-  notification?: BannerNotificationPageQuery["bannerNotification"];
-}) {
+function useRemoveNotification({ notification }: { notification?: BannerNotificationPageQuery["bannerNotification"] }) {
   const { t } = useTranslation();
 
   const [removeMutation] = useBannerNotificationDeleteMutation();
@@ -631,21 +570,12 @@ function LoadedContent({
     <>
       <TitleSection>
         <H1 $noMargin>{name}</H1>
-        {notification?.state && (
-          <BannerNotificationStatusLabel state={notification.state} />
-        )}
+        {notification?.state && <BannerNotificationStatusLabel state={notification.state} />}
       </TitleSection>
-      {(notification || isNew) && (
-        <NotificationForm notification={notification ?? undefined} />
-      )}
+      {(notification || isNew) && <NotificationForm notification={notification ?? undefined} />}
       {notification && (
-        <ButtonContainer
-          style={{ marginTop: "2rem", justifyContent: "flex-start" }}
-        >
-          <Button
-            onClick={removeNotification}
-            variant={ButtonVariant.Secondary}
-          >
+        <ButtonContainer style={{ marginTop: "2rem", justifyContent: "flex-start" }}>
+          <Button onClick={removeNotification} variant={ButtonVariant.Secondary}>
             {t("Notifications.deleteButton")}
           </Button>
         </ButtonContainer>
@@ -671,11 +601,7 @@ function PageWrapped({ pk }: { pk?: number }): JSX.Element {
 
   const isNew = pk === 0;
 
-  return isLoading ? (
-    <CenterSpinner />
-  ) : (
-    <LoadedContent isNew={isNew} notification={notification} />
-  );
+  return isLoading ? <CenterSpinner /> : <LoadedContent isNew={isNew} notification={notification} />;
 }
 
 // TODO this can be replaced with router match since we don't validate the pk here

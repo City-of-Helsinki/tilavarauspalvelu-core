@@ -1,14 +1,7 @@
-import {
-  type InstructionsFragment,
-  type Maybe,
-  ReservationStateChoice,
-} from "@/gql/gql-types";
+import { type InstructionsFragment, type Maybe, ReservationStateChoice } from "@/gql/gql-types";
 import { gql } from "@apollo/client";
 import { H4 } from "common/styled";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { Sanitize } from "common/src/components/Sanitize";
 import { useTranslation } from "next-i18next";
 
@@ -26,10 +19,7 @@ export function Instructions({ reservation }: Props): JSX.Element | null {
       ? getTranslationSafe(reservationUnit, instructionsKey, lang)
       : null;
   const showInstructions =
-    reservationUnit != null &&
-    instructionsKey != null &&
-    instructionsText != null &&
-    instructionsText !== "";
+    reservationUnit != null && instructionsKey != null && instructionsText != null && instructionsText !== "";
 
   if (!showInstructions) {
     return null;

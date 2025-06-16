@@ -1,16 +1,10 @@
 import { useFieldArray, UseFormReturn } from "react-hook-form";
-import {
-  AccessTypes,
-  ReservationUnitEditFormValues,
-} from "@/spa/ReservationUnit/edit/form";
+import { AccessTypes, ReservationUnitEditFormValues } from "@/spa/ReservationUnit/edit/form";
 import { useTranslation } from "next-i18next";
 import { EditAccordion } from "@/spa/ReservationUnit/edit/components/styled";
 import React from "react";
 import styled from "styled-components";
-import {
-  ControlledDateInput,
-  ControlledSelect,
-} from "common/src/components/form";
+import { ControlledDateInput, ControlledSelect } from "common/src/components/form";
 import { fromUIDate } from "common/src/common/util";
 import StatusLabel from "common/src/components/StatusLabel";
 import { AutoGrid, Flex, H6 } from "common/styled";
@@ -36,11 +30,7 @@ const WidthLimitedContainer = styled(Flex)`
   max-width: calc(var(--tilavaraus-page-max-width) * 0.6);
 `;
 
-function CurrentAccessType({
-  currentAccessType,
-}: {
-  currentAccessType?: Node["accessTypes"][0];
-}) {
+function CurrentAccessType({ currentAccessType }: { currentAccessType?: Node["accessTypes"][0] }) {
   const { t } = useTranslation();
 
   const accessType = currentAccessType?.accessType;
@@ -59,9 +49,7 @@ function CurrentAccessType({
           <Value>{beginDate ? formatDate(beginDate) : "-"}</Value>
         </KVWrapper>
         <StatusLabel type={beginDate ? "success" : "error"}>
-          {beginDate
-            ? t(`accessType:status.active`)
-            : t(`accessType:status.inactive`)}
+          {beginDate ? t(`accessType:status.active`) : t(`accessType:status.inactive`)}
         </StatusLabel>
       </CurrentAccessTypeContainer>
     </div>
@@ -123,20 +111,13 @@ function AccessTypePart({
         name={`accessTypes.${index}.beginDate`}
         label={t("accessType:validity.activeFrom")}
         minDate={new Date()}
-        error={getTranslatedError(
-          t,
-          errors.accessTypes?.[index]?.beginDate?.message
-        )}
+        error={getTranslatedError(t, errors.accessTypes?.[index]?.beginDate?.message)}
         disabled={isActiveAccessType}
         disableConfirmation
       />
       {!isActiveAccessType && (
         <div style={{ marginTop: "auto" }}>
-          <Button
-            variant={ButtonVariant.Secondary}
-            iconStart={<IconTrash />}
-            onClick={removeSelf}
-          >
+          <Button variant={ButtonVariant.Secondary} iconStart={<IconTrash />} onClick={removeSelf}>
             {t("common:remove")}
           </Button>
         </div>
@@ -170,37 +151,22 @@ export function AccessTypeSection({
   };
 
   return (
-    <EditAccordion
-      heading={t("accessType:accessTypeLabel")}
-      open={!!errors?.accessTypes}
-    >
+    <EditAccordion heading={t("accessType:accessTypeLabel")} open={!!errors?.accessTypes}>
       <WidthLimitedContainer>
         <CurrentAccessType currentAccessType={accessTypes[0]} />
 
         {errors?.accessTypes && fields.length === 0 && (
           <NotificationInline type="error">
-            {getTranslatedError(
-              t,
-              errors?.accessTypes?.message ?? errors?.accessTypes?.root?.message
-            )}
+            {getTranslatedError(t, errors?.accessTypes?.message ?? errors?.accessTypes?.root?.message)}
           </NotificationInline>
         )}
 
         {fields.map((accessType, index) => (
-          <AccessTypePart
-            key={`${accessType.id}`}
-            form={form}
-            index={index}
-            removeSelf={() => remove(index)}
-          />
+          <AccessTypePart key={`${accessType.id}`} form={form} index={index} removeSelf={() => remove(index)} />
         ))}
 
         <div style={{ marginTop: "var(--spacing-s)" }}>
-          <Button
-            onClick={handleAddNewAccessType}
-            variant={ButtonVariant.Secondary}
-            iconStart={<IconPlus />}
-          >
+          <Button onClick={handleAddNewAccessType} variant={ButtonVariant.Secondary} iconStart={<IconPlus />}>
             {t("accessType:actions.addNewAccessType")}
           </Button>
         </div>

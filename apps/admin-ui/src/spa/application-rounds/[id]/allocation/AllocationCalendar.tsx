@@ -3,10 +3,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled, { css } from "styled-components";
 import { filterNonNullable, timeToMinutes } from "common/src/helpers";
-import {
-  ApplicationSectionStatusChoice,
-  type SuitableTimeRangeNode,
-} from "@gql/gql-types";
+import { ApplicationSectionStatusChoice, type SuitableTimeRangeNode } from "@gql/gql-types";
 import { fontMedium } from "common/styled";
 import { breakpoints, type DayT, WEEKDAYS } from "common/src/const";
 import { transformWeekday } from "common/src/conversion";
@@ -23,11 +20,7 @@ import {
   type SectionNodeT,
   ReservationUnitOptionNodeT,
 } from "./modules/applicationRoundAllocation";
-import {
-  useFocusAllocatedSlot,
-  useFocusApplicationEvent,
-  useSlotSelection,
-} from "./hooks";
+import { useFocusAllocatedSlot, useFocusApplicationEvent, useSlotSelection } from "./hooks";
 import { useSearchParams } from "react-router-dom";
 
 type Props = {
@@ -79,27 +72,19 @@ const CalendarSlot = styled.div<{
   ${({ $eventCount, $isAccepted, $isDeclined, $isRelated }) => {
     if ($isAccepted) {
       return css`
-        background-color: var(
-          --tilavaraus-allocation-calendar-colour-bg-allocated
-        );
+        background-color: var(--tilavaraus-allocation-calendar-colour-bg-allocated);
         color: var(--tilavaraus-allocation-calendar-colour-text-allocated);
       `;
     }
     if ($isRelated) {
       return css`
-        background-color: var(
-          --tilavaraus-allocation-calendar-colour-bg-allocated-elsewhere
-        );
-        color: var(
-          --tilavaraus-allocation-calendar-colour-text-allocated-elsewhere
-        );
+        background-color: var(--tilavaraus-allocation-calendar-colour-bg-allocated-elsewhere);
+        color: var(--tilavaraus-allocation-calendar-colour-text-allocated-elsewhere);
       `;
     }
     if ($isDeclined) {
       return css`
-        background-color: var(
-          --tilavaraus-allocation-calendar-colour-bg-disabled
-        );
+        background-color: var(--tilavaraus-allocation-calendar-colour-bg-disabled);
         color: var(--tilavaraus-allocation-calendar-colour-text-disabled);
       `;
     }
@@ -158,10 +143,7 @@ const Active = styled.div<{
   position: absolute;
   width: calc(100%);
   height: calc(100% + 2px);
-  border: ${({ $isAllocated }) =>
-    $isAllocated
-      ? "2px solid var(--color-black)"
-      : "2px dashed var(--color-bus)"};
+  border: ${({ $isAllocated }) => ($isAllocated ? "2px solid var(--color-black)" : "2px dashed var(--color-bus)")};
   border-top-width: 0;
   border-bottom-width: 0;
   ${({ $isFirst }) =>
@@ -195,9 +177,7 @@ const isSlotFirst = (selection: string[], slot: string): boolean => {
   if (day == null || hour == null || minute == null) {
     return false;
   }
-  return minute === 0
-    ? !selection.includes(`${day}-${hour - 1}-30`)
-    : !selection.includes(`${day}-${hour}-00`);
+  return minute === 0 ? !selection.includes(`${day}-${hour - 1}-30`) : !selection.includes(`${day}-${hour}-00`);
 };
 
 const isSlotLast = (selection: string[], slot: string): boolean => {
@@ -205,9 +185,7 @@ const isSlotLast = (selection: string[], slot: string): boolean => {
   if (day == null || hour == null || minute == null) {
     return false;
   }
-  return minute === 0
-    ? !selection.includes(`${day}-${hour}-30`)
-    : !selection.includes(`${day}-${hour + 1}-00`);
+  return minute === 0 ? !selection.includes(`${day}-${hour}-30`) : !selection.includes(`${day}-${hour + 1}-00`);
 };
 
 // Assume that this is already filtered by the day
@@ -218,12 +196,7 @@ type Slot = {
   allocated: boolean;
   minutes: number;
 };
-function addTimeSlotToArray(
-  arr: Slot[],
-  slot: { beginTime: string; endTime: string },
-  day: DayT,
-  allocated: boolean
-) {
+function addTimeSlotToArray(arr: Slot[], slot: { beginTime: string; endTime: string }, day: DayT, allocated: boolean) {
   const { beginTime, endTime } = slot;
 
   const beginMinutes = timeToMinutes(beginTime);
@@ -236,10 +209,7 @@ function addTimeSlotToArray(
   }
 }
 
-function generateAllocatedSlots(
-  allocated: ReservationUnitOptionNodeT[],
-  day: DayT
-): Slot[] {
+function generateAllocatedSlots(allocated: ReservationUnitOptionNodeT[], day: DayT): Slot[] {
   const arr: Slot[] = [];
   for (const a of allocated) {
     if (!a.allocatedTimeSlots) {
@@ -258,10 +228,7 @@ function isDay(slot: Pick<SuitableTimeRangeNode, "dayOfTheWeek">, day: DayT) {
 
 /// We have to have all allocated slots for the event in the original data
 /// at some point (either here or in the draw function) those other days have to be removed
-function removeOtherAllocatedDays(
-  a: ReservationUnitOptionNodeT,
-  day: DayT
-): ReservationUnitOptionNodeT {
+function removeOtherAllocatedDays(a: ReservationUnitOptionNodeT, day: DayT): ReservationUnitOptionNodeT {
   return {
     ...a,
     allocatedTimeSlots: a.allocatedTimeSlots?.filter((ts) => isDay(ts, day)),
@@ -270,9 +237,7 @@ function removeOtherAllocatedDays(
 
 // Generate the focused slots for a selected application section
 function generateFocusedSlots(focusedAes: SectionNodeT, day: DayT): Slot[] {
-  const focusedTimeSlots = focusedAes.suitableTimeRanges.filter((ts) =>
-    isDay(ts, day)
-  );
+  const focusedTimeSlots = focusedAes.suitableTimeRanges.filter((ts) => isDay(ts, day));
   const focusedAllocatedTimeSlots = focusedAes.reservationUnitOptions
     .filter((a) => a.allocatedTimeSlots.some((ts) => isDay(ts, day)))
     .map((ts) => removeOtherAllocatedDays(ts, day));
@@ -291,25 +256,13 @@ function isInRange(ae: SectionNodeT, cell: Cell, day: DayT): boolean {
   return ae.suitableTimeRanges?.some((tr) => isInsideCell(day, cell, tr));
 }
 
-function isAllocated(
-  ae: ReservationUnitOptionNodeT,
-  cell: Cell,
-  day: DayT
-): boolean {
-  return ae.allocatedTimeSlots
-    .map((tr) => isInsideCell(day, cell, tr))
-    .some((x) => x);
+function isAllocated(ae: ReservationUnitOptionNodeT, cell: Cell, day: DayT): boolean {
+  return ae.allocatedTimeSlots.map((tr) => isInsideCell(day, cell, tr)).some((x) => x);
 }
 
-export function AllocationCalendar({
-  applicationSections,
-  relatedAllocations,
-}: Props): JSX.Element {
+export function AllocationCalendar({ applicationSections, relatedAllocations }: Props): JSX.Element {
   const [cells] = useState(
-    applicationEventSchedulesToCells(
-      ALLOCATION_CALENDAR_TIMES[0],
-      ALLOCATION_CALENDAR_TIMES[1]
-    )
+    applicationEventSchedulesToCells(ALLOCATION_CALENDAR_TIMES[0], ALLOCATION_CALENDAR_TIMES[1])
   );
 
   const [searchParams] = useSearchParams();
@@ -322,9 +275,7 @@ export function AllocationCalendar({
     if (priorityFilter.length > 0) {
       return {
         ...ae,
-        suitableTimeRanges: ae.suitableTimeRanges.filter((tr) =>
-          priorityFilter.find((p) => p === tr.priority)
-        ),
+        suitableTimeRanges: ae.suitableTimeRanges.filter((tr) => priorityFilter.find((p) => p === tr.priority)),
       };
     }
     return ae;
@@ -335,8 +286,7 @@ export function AllocationCalendar({
   const [focusedAllocated] = useFocusAllocatedSlot();
 
   const data = WEEKDAYS.map((day) => {
-    const isNotHandled = (ae: (typeof aes)[0]) =>
-      ae.status !== ApplicationSectionStatusChoice.Handled;
+    const isNotHandled = (ae: (typeof aes)[0]) => ae.status !== ApplicationSectionStatusChoice.Handled;
 
     // Only show allocated that match the unit and day
     const timeslots = filterNonNullable(aes)
@@ -382,19 +332,17 @@ export function AllocationCalendar({
           );
         })}
       </div>
-      {data.map(
-        ({ day, allocated, timeslots, focusedSlots, relatedTimeSpans }) => (
-          <CalendarDay
-            key={`day-${day}`}
-            allocated={allocated}
-            suitable={timeslots}
-            day={day}
-            cells={cells[day] ?? []}
-            relatedTimeSpans={relatedTimeSpans}
-            focusedSlots={focusedSlots}
-          />
-        )
-      )}
+      {data.map(({ day, allocated, timeslots, focusedSlots, relatedTimeSpans }) => (
+        <CalendarDay
+          key={`day-${day}`}
+          allocated={allocated}
+          suitable={timeslots}
+          day={day}
+          cells={cells[day] ?? []}
+          relatedTimeSpans={relatedTimeSpans}
+          focusedSlots={focusedSlots}
+        />
+      ))}
     </Wrapper>
   );
 }
@@ -442,13 +390,7 @@ function CalendarDay({
 }): JSX.Element {
   const { t } = useTranslation();
 
-  const {
-    selection,
-    setSelection,
-    isSelecting,
-    handleFinishSelection,
-    handleStartSelection,
-  } = useSelection();
+  const { selection, setSelection, isSelecting, handleFinishSelection, handleStartSelection } = useSelection();
 
   const handleMouseEnter = (cell: Cell) => {
     const sel = selection[0];
@@ -488,15 +430,10 @@ function CalendarDay({
         const focusedSlot = focused.find((x) => x.minutes === timeInMinutes);
         const isFocused = focusedSlot != null;
         // TODO these don't look nice and don't work if the array is not presorted
-        const isFocusedFirst =
-          focused.length > 0 && focused[0]?.minutes === timeInMinutes;
-        const isFocusedLast =
-          focused.length > 0 &&
-          focused[focused.length - 1]?.minutes === timeInMinutes;
+        const isFocusedFirst = focused.length > 0 && focused[0]?.minutes === timeInMinutes;
+        const isFocusedLast = focused.length > 0 && focused[focused.length - 1]?.minutes === timeInMinutes;
         const isInsideRelatedTimeSpan =
-          relatedTimeSpans?.some(
-            (ts) => ts.beginTime <= timeInMinutes && ts.endTime > timeInMinutes
-          ) ?? false;
+          relatedTimeSpans?.some((ts) => ts.beginTime <= timeInMinutes && ts.endTime > timeInMinutes) ?? false;
         return (
           <CalendarSlot
             key={cell.key}
@@ -517,17 +454,10 @@ function CalendarDay({
             ) : null}
             {/* Border styling done weirdly with absolute positioning */}
             {selection.includes(cell.key) && (
-              <Selection
-                $isFirst={isSlotFirst(selection, cell.key)}
-                $isLast={isSlotLast(selection, cell.key)}
-              />
+              <Selection $isFirst={isSlotFirst(selection, cell.key)} $isLast={isSlotLast(selection, cell.key)} />
             )}
             {isFocused && (
-              <Active
-                $isAllocated={focusedSlot.allocated}
-                $isFirst={isFocusedFirst}
-                $isLast={isFocusedLast}
-              />
+              <Active $isAllocated={focusedSlot.allocated} $isFirst={isFocusedFirst} $isLast={isFocusedLast} />
             )}
           </CalendarSlot>
         );

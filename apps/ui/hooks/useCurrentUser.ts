@@ -13,8 +13,7 @@ export function useCurrentUser(): {
     nextFetchPolicy: "cache-first",
   });
 
-  const currentUser =
-    data?.currentUser ?? previousData?.currentUser ?? undefined;
+  const currentUser = data?.currentUser ?? previousData?.currentUser ?? undefined;
   return {
     currentUser,
     error,

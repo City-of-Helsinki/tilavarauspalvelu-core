@@ -11,12 +11,7 @@ type SelectFilterProps = {
   clearable?: boolean;
 };
 
-export function SelectFilter({
-  name,
-  options,
-  sort,
-  clearable,
-}: SelectFilterProps) {
+export function SelectFilter({ name, options, sort, clearable }: SelectFilterProps) {
   const [searchParams, setParams] = useSearchParams();
   const { t } = useTranslation();
 
@@ -24,9 +19,7 @@ export function SelectFilter({
   const sortedOptions = useMemo(() => {
     const opts = [...options];
     if (sort) {
-      opts.sort((a, b) =>
-        a.label.toLowerCase().localeCompare(b.label.toLowerCase())
-      );
+      opts.sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
     }
     return opts;
   }, [options, sort]);
@@ -42,8 +35,7 @@ export function SelectFilter({
   };
 
   const value = new URLSearchParams(searchParams).get(name) ?? "";
-  const convertedValue =
-    typeof options[0]?.value === "number" ? Number(value) : value;
+  const convertedValue = typeof options[0]?.value === "number" ? Number(value) : value;
 
   const label = t(`filters.label.${name}`);
   const placeholder = t("common.select");

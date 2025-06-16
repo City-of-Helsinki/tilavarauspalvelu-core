@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  Button,
-  ButtonSize,
-  ButtonVariant,
-  Checkbox,
-  DateInput,
-  TextInput,
-} from "hds-react";
+import { Button, ButtonSize, ButtonVariant, Checkbox, DateInput, TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import { gql } from "@apollo/client";
@@ -14,10 +7,7 @@ import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { AutoGrid, Flex, H4 } from "common/styled";
 import { getLocalizationLang } from "common/src/helpers";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
-import {
-  ControlledNumberInput,
-  ControlledSelect,
-} from "common/src/components/form";
+import { ControlledNumberInput, ControlledSelect } from "common/src/components/form";
 import { toUIDate } from "common/src/common/util";
 import { Accordion } from "@/components/Accordion";
 import { getDurationOptions } from "@/modules/const";
@@ -32,12 +22,7 @@ type Props = Readonly<{
   onDeleteEvent: () => void;
 }>;
 
-function ApplicationSectionInner({
-  index,
-  applicationRound,
-  options,
-  onDeleteEvent,
-}: Props): JSX.Element {
+function ApplicationSectionInner({ index, applicationRound, options, onDeleteEvent }: Props): JSX.Element {
   const { t } = useTranslation();
   const form = useFormContext<ApplicationPage1FormValues>();
   const {
@@ -56,10 +41,7 @@ function ApplicationSectionInner({
   const periodEndDate = new Date(applicationRound.reservationPeriodEnd);
 
   const selectDefaultPeriod = (): void => {
-    clearErrors([
-      `applicationSections.${index}.begin`,
-      `applicationSections.${index}.end`,
-    ]);
+    clearErrors([`applicationSections.${index}.begin`, `applicationSections.${index}.end`]);
     const begin = toUIDate(periodStartDate);
     const end = toUIDate(periodEndDate);
     setValue(`applicationSections.${index}.begin`, begin);
@@ -108,11 +90,7 @@ function ApplicationSectionInner({
   }));
 
   return (
-    <Flex
-      $gap="s"
-      $marginTop="s"
-      data-testid={`application__applicationSection_${index}`}
-    >
+    <Flex $gap="s" $marginTop="s" data-testid={`application__applicationSection_${index}`}>
       <H4 as="h3">{t("application:Page1.basicInformationSubHeading")}</H4>
       <AutoGrid>
         <TextInput
@@ -167,11 +145,7 @@ function ApplicationSectionInner({
         disabled={selectionIsDefaultPeriod}
       />
       <AutoGrid>
-        <ApplicationDateRangePicker
-          index={index}
-          minDate={periodStartDate}
-          maxDate={periodEndDate}
-        />
+        <ApplicationDateRangePicker index={index} minDate={periodStartDate} maxDate={periodEndDate} />
         <ControlledSelect
           control={control}
           name={`applicationSections.${index}.minDuration`}
@@ -237,8 +211,7 @@ function ApplicationDateRangePicker({
 }): JSX.Element {
   const { t, i18n } = useTranslation();
   const form = useFormContext<ApplicationPage1FormValues>();
-  const { register, getValues, setValue, clearErrors, trigger, getFieldState } =
-    form;
+  const { register, getValues, setValue, clearErrors, trigger, getFieldState } = form;
 
   const lang = getLocalizationLang(i18n.language);
 
@@ -309,8 +282,7 @@ export function ApplicationSectionPage1(props: Props): JSX.Element {
   const eventName = watch(`applicationSections.${index}.name`);
   watch(`applicationSections.${index}.appliedReservationsPerWeek`);
   const openByDefault = watch(`applicationSections`)?.length === 1;
-  const isVisible =
-    openByDefault || watch(`applicationSections.${index}.isAccordionOpen`);
+  const isVisible = openByDefault || watch(`applicationSections.${index}.isAccordionOpen`);
 
   // TODO requires us to use the accordion from admin-ui instead (or add force open)
   const hasErrors = errors.applicationSections?.[index] != null;

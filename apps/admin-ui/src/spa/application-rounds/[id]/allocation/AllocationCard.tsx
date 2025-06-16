@@ -3,10 +3,7 @@ import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { type ApolloQueryResult } from "@apollo/client";
-import {
-  Priority,
-  type ApplicationSectionAllocationsQuery,
-} from "@gql/gql-types";
+import { Priority, type ApplicationSectionAllocationsQuery } from "@gql/gql-types";
 import { filterNonNullable, timeToMinutes } from "common/src/helpers";
 import { H5, Strong, Flex, SemiBold, fontMedium } from "common/styled";
 import { formatDuration } from "common/src/common/util";
@@ -20,11 +17,7 @@ import {
   type AllocatedTimeSlotNodeT,
   formatSuitableTimeRange,
 } from "./modules/applicationRoundAllocation";
-import {
-  useAcceptSlotMutation,
-  useRefreshApplications,
-  useRemoveAllocation,
-} from "./hooks";
+import { useAcceptSlotMutation, useRefreshApplications, useRemoveAllocation } from "./hooks";
 import { getApplicantName } from "@/helpers";
 import { NotificationInline } from "../../../../component/NotificationInline";
 
@@ -35,9 +28,7 @@ type Props = {
   isAllocationEnabled: boolean;
   // TODO better solution would be to have a query key (similar to tanstack/react-query) and invalidate the key
   // so we don't have to prop drill the refetch
-  refetchApplicationEvents: () => Promise<
-    ApolloQueryResult<ApplicationSectionAllocationsQuery>
-  >;
+  refetchApplicationEvents: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
   // TODO these should be mandatory (but requires refactoring the parent component a bit)
   timeSlot: SuitableTimeRangeNodeT;
   allocatedTimeSlot: AllocatedTimeSlotNodeT;
@@ -103,10 +94,7 @@ export function AllocatedCard({
   applicationSection,
   refetchApplicationEvents,
   allocatedTimeSlot,
-}: Omit<
-  Props,
-  "timeSlot" | "selection" | "isAllocationEnabled" | "reservationUnitOptionPk"
->): JSX.Element {
+}: Omit<Props, "timeSlot" | "selection" | "isAllocationEnabled" | "reservationUnitOptionPk">): JSX.Element {
   const { t } = useTranslation();
 
   // TODO refactor so it is mandatory
@@ -115,16 +103,13 @@ export function AllocatedCard({
     console.warn("MANDATORY: No allocated time slot");
   }
 
-  const [refresh, isRefreshLoading] = useRefreshApplications(
-    refetchApplicationEvents
-  );
+  const [refresh, isRefreshLoading] = useRefreshApplications(refetchApplicationEvents);
 
-  const [handleRemoveAllocation, { isLoading: isResetLoading }] =
-    useRemoveAllocation({
-      allocatedTimeSlot,
-      applicationSection,
-      refresh,
-    });
+  const [handleRemoveAllocation, { isLoading: isResetLoading }] = useRemoveAllocation({
+    allocatedTimeSlot,
+    applicationSection,
+    refresh,
+  });
 
   const allocationBeginMins = timeToMinutes(allocatedTimeSlot.beginTime) ?? 0;
   const allocationEndMins = timeToMinutes(allocatedTimeSlot.endTime) ?? 0;
@@ -132,8 +117,7 @@ export function AllocatedCard({
   const maxDurationSeconds = applicationSection.reservationMaxDuration ?? 0;
   const allocatedDurationMins = allocationEndMins - allocationBeginMins;
   const durationIsInvalid =
-    allocatedDurationMins < minDurationSeconds / 60 ||
-    allocatedDurationMins > maxDurationSeconds / 60;
+    allocatedDurationMins < minDurationSeconds / 60 || allocatedDurationMins > maxDurationSeconds / 60;
   // TODO should compare the allocated to the suitable time ranges, not to selection
   const isTimeMismatch = false;
 
@@ -147,23 +131,16 @@ export function AllocatedCard({
       </H5>
       <Applicant>{applicantName}</Applicant>
       <AllocatedDetails allocatedTimeSlot={allocatedTimeSlot} />
-      <StyledAccordion
-        heading={t("Allocation.showTimeRequests")}
-        headingLevel="h3"
-      >
+      <StyledAccordion heading={t("Allocation.showTimeRequests")} headingLevel="h3">
         <TimeRequested applicationSection={applicationSection} />
       </StyledAccordion>
       {/* TODO this could be abstracted into a common component (both cards use it, but use diferent error messages and durations
        * a common error component, since there is also a third different error message (with "error" type) */}
       {isTimeMismatch ? (
-        <NotificationInline type="alert">
-          {t("Allocation.errors.allocatedOutsideOfRequestedTimes")}
-        </NotificationInline>
+        <NotificationInline type="alert">{t("Allocation.errors.allocatedOutsideOfRequestedTimes")}</NotificationInline>
       ) : null}
       {durationIsInvalid ? (
-        <NotificationInline type="alert">
-          {t("Allocation.errors.allocatedDurationIsIncorrect")}
-        </NotificationInline>
+        <NotificationInline type="alert">{t("Allocation.errors.allocatedDurationIsIncorrect")}</NotificationInline>
       ) : null}
       <Flex $gap="s" $justifyContent="space-between">
         <Button
@@ -222,18 +199,15 @@ export function SuitableTimeCard({
     console.warn("Invalid reservation unit option: missing pk");
   }
 
-  const [refresh, isRefreshLoading] = useRefreshApplications(
-    refetchApplicationEvents
-  );
+  const [refresh, isRefreshLoading] = useRefreshApplications(refetchApplicationEvents);
 
-  const [handleAcceptSlot, { isLoading: isAcceptLoading }] =
-    useAcceptSlotMutation({
-      selection,
-      timeRange: timeSlot,
-      applicationSection,
-      reservationUnitOptionPk,
-      refresh,
-    });
+  const [handleAcceptSlot, { isLoading: isAcceptLoading }] = useAcceptSlotMutation({
+    selection,
+    timeRange: timeSlot,
+    applicationSection,
+    reservationUnitOptionPk,
+    refresh,
+  });
   const applicantName = getApplicantName(applicationSection.application);
 
   const isDisabled = !reservationUnitOptionPk || !isAllocationEnabled;
@@ -254,11 +228,7 @@ export function SuitableTimeCard({
   const isTooLong = selectionMins > maxDurationSeconds / 60;
   const durationIsInvalid = isTooShort || isTooLong;
 
-  const isTimeMismatch = isOutsideOfRequestedTimes(
-    timeSlot,
-    selectionBegin.hour,
-    selectionEnd.hour + 0.5
-  );
+  const isTimeMismatch = isOutsideOfRequestedTimes(timeSlot, selectionBegin.hour, selectionEnd.hour + 0.5);
 
   const isMutationLoading = isAcceptLoading;
   const isLoading = isMutationLoading || isRefreshLoading;
@@ -279,14 +249,10 @@ export function SuitableTimeCard({
         <NotificationInline type="error">{error}</NotificationInline>
       ) : null*/}
       {isTimeMismatch ? (
-        <NotificationInline type="alert">
-          {t("Allocation.errors.selectionOutsideOfRequestedTimes")}
-        </NotificationInline>
+        <NotificationInline type="alert">{t("Allocation.errors.selectionOutsideOfRequestedTimes")}</NotificationInline>
       ) : null}
       {durationIsInvalid ? (
-        <NotificationInline type="alert">
-          {t("Allocation.errors.requestedDurationIsIncorrect")}
-        </NotificationInline>
+        <NotificationInline type="alert">{t("Allocation.errors.requestedDurationIsIncorrect")}</NotificationInline>
       ) : null}
       <Flex $gap="s" $justifyContent="space-between">
         <Button
@@ -303,23 +269,13 @@ export function SuitableTimeCard({
   );
 }
 
-function getDurationFromApiTimeInHours({
-  beginTime,
-  endTime,
-}: {
-  beginTime: string;
-  endTime: string;
-}): number {
+function getDurationFromApiTimeInHours({ beginTime, endTime }: { beginTime: string; endTime: string }): number {
   const bh = timeToMinutes(beginTime) / 60;
   const eh = timeToMinutes(endTime) / 60;
   return (eh === 0 ? 24 : eh) - bh;
 }
 
-function AllocatedDetails({
-  allocatedTimeSlot,
-}: {
-  allocatedTimeSlot: AllocatedTimeSlotNodeT;
-}) {
+function AllocatedDetails({ allocatedTimeSlot }: { allocatedTimeSlot: AllocatedTimeSlotNodeT }) {
   const { t } = useTranslation();
   const allocationDuration = getDurationFromApiTimeInHours(allocatedTimeSlot);
   const timeString = formatSuitableTimeRange(t, allocatedTimeSlot);
@@ -336,11 +292,7 @@ function AllocatedDetails({
   );
 }
 
-function TimeRequested({
-  applicationSection,
-}: {
-  applicationSection: SectionNodeT;
-}) {
+function TimeRequested({ applicationSection }: { applicationSection: SectionNodeT }) {
   const { t } = useTranslation();
   const { appliedReservationsPerWeek } = applicationSection;
   const durationString = createDurationString(applicationSection, t);

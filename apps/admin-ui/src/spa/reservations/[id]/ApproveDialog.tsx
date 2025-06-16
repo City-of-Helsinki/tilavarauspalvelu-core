@@ -2,15 +2,7 @@ import React, { useState } from "react";
 import { trim } from "lodash-es";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import {
-  Button,
-  ButtonVariant,
-  Checkbox,
-  Dialog,
-  Notification,
-  NumberInput,
-  TextArea,
-} from "hds-react";
+import { Button, ButtonVariant, Checkbox, Dialog, Notification, NumberInput, TextArea } from "hds-react";
 import {
   type ApprovalDialogFieldsFragment,
   useApproveReservationMutation,
@@ -61,9 +53,7 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
   };
 
   const [price, setPrice] = useState(toNumber(reservation.price) ?? 0);
-  const [handlingDetails, setHandlingDetails] = useState<string>(
-    reservation.handlingDetails ?? ""
-  );
+  const [handlingDetails, setHandlingDetails] = useState<string>(reservation.handlingDetails ?? "");
   const hasPrice = reservation.price != null && Number(reservation.price) > 0;
   const priceIsValid = !hasPrice || !Number.isNaN(price);
 
@@ -85,16 +75,10 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
           {reservation.applyingForFreeOfCharge && (
             <>
               <div>
-                <Label>
-                  {t("RequestedReservation.ApproveDialog.subventionReason")}
-                </Label>
-                <Content>
-                  {trim(reservation.freeOfChargeReason ?? "") || "-"}
-                </Content>
+                <Label>{t("RequestedReservation.ApproveDialog.subventionReason")}</Label>
+                <Content>{trim(reservation.freeOfChargeReason ?? "") || "-"}</Content>
               </div>
-              <Notification>
-                {getReservationPriceDetails(reservation, t)}
-              </Notification>
+              <Notification>{getReservationPriceDetails(reservation, t)}</Notification>
               <Checkbox
                 label={t("RequestedReservation.ApproveDialog.clearPrice")}
                 id="clearPrice"
@@ -126,11 +110,7 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
                     }
                     setPrice(Number(e.target.value));
                   }}
-                  errorText={
-                    !priceIsValid
-                      ? t("RequestedReservation.ApproveDialog.missingPrice")
-                      : undefined
-                  }
+                  errorText={!priceIsValid ? t("RequestedReservation.ApproveDialog.missingPrice") : undefined}
                 />
               </div>
             </>
@@ -145,18 +125,10 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
         </Flex>
       </Dialog.Content>
       <ActionButtons>
-        <Button
-          disabled={!priceIsValid}
-          onClick={handleApprove}
-          data-testid="approval-dialog__accept-button"
-        >
+        <Button disabled={!priceIsValid} onClick={handleApprove} data-testid="approval-dialog__accept-button">
           {t("RequestedReservation.ApproveDialog.accept")}
         </Button>
-        <Button
-          variant={ButtonVariant.Secondary}
-          onClick={onClose}
-          data-testid="approval-dialog__cancel-button"
-        >
+        <Button variant={ButtonVariant.Secondary} onClick={onClose} data-testid="approval-dialog__cancel-button">
           {t("common.cancel")}
         </Button>
       </ActionButtons>
@@ -164,13 +136,7 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
   );
 };
 
-const ApproveDialog = ({
-  reservation,
-  isFree,
-  onClose,
-  onAccept,
-  focusAfterCloseRef,
-}: Props): JSX.Element => {
+const ApproveDialog = ({ reservation, isFree, onClose, onAccept, focusAfterCloseRef }: Props): JSX.Element => {
   const { isOpen } = useModal();
   const { t } = useTranslation();
 
@@ -191,11 +157,7 @@ const ApproveDialog = ({
               : t("RequestedReservation.ApproveDialog.title")
           }
         />
-        <DialogContent
-          reservation={reservation}
-          onAccept={onAccept}
-          onClose={onClose}
-        />
+        <DialogContent reservation={reservation} onAccept={onAccept} onClose={onClose} />
       </Flex>
     </Dialog>
   );

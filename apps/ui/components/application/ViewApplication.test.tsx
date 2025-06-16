@@ -1,8 +1,5 @@
 import { expect, test, describe } from "vitest";
-import {
-  CreateMockApplicationFragmentProps,
-  createMockApplicationViewFragment,
-} from "@test/application.mocks";
+import { CreateMockApplicationFragmentProps, createMockApplicationViewFragment } from "@test/application.mocks";
 import { render } from "@testing-library/react";
 import { ViewApplication } from "./ViewApplication";
 import { ApplicationStatusChoice } from "@/gql/gql-types";
@@ -10,18 +7,12 @@ import { ApplicationStatusChoice } from "@/gql/gql-types";
 interface RenderProps extends CreateMockApplicationFragmentProps {
   children?: JSX.Element;
 }
-function customRender({ children, ...props }: RenderProps = {}): ReturnType<
-  typeof render
-> {
+function customRender({ children, ...props }: RenderProps = {}): ReturnType<typeof render> {
   if (props.page == null) {
     props.page = "page3";
   }
   const application = createMockApplicationViewFragment(props);
-  return render(
-    <ViewApplication application={application}>
-      {children ?? <div></div>}
-    </ViewApplication>
-  );
+  return render(<ViewApplication application={application}>{children ?? <div></div>}</ViewApplication>);
 }
 
 describe("ViewApplication", () => {
@@ -76,9 +67,7 @@ describe("Processing Notification", () => {
   ] as const)("should show if %s is not Results sent", ([status, isShown]) => {
     const view = customRender({ status });
 
-    const title = view.queryByText(
-      "application:preview.notification.processing"
-    );
+    const title = view.queryByText("application:preview.notification.processing");
     const body = view.queryByText("application:preview.notification.body");
     if (isShown) {
       expect(title).toBeInTheDocument();

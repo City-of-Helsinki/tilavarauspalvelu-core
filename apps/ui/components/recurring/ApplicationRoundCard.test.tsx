@@ -1,7 +1,4 @@
-import {
-  ApplicationRoundStatusChoice,
-  type ApplicationRoundCardFragment,
-} from "@/gql/gql-types";
+import { ApplicationRoundStatusChoice, type ApplicationRoundCardFragment } from "@/gql/gql-types";
 import { render } from "@testing-library/react";
 import { ApplicationRoundCard } from "./ApplicationRoundCard";
 import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
@@ -47,18 +44,12 @@ describe("ApplicationRoundCard Open Round", () => {
       name: "applicationRound:startNewApplication",
     });
     expect(startLink).toBeInTheDocument();
-    expect(startLink).toHaveAttribute(
-      "href",
-      getApplicationRoundPath(1).replace(/\/+$/, "")
-    );
+    expect(startLink).toHaveAttribute("href", getApplicationRoundPath(1).replace(/\/+$/, ""));
     const criteriaLink = view.getByRole("link", {
       name: "applicationRound:card.criteria",
     });
     expect(criteriaLink).toBeInTheDocument();
-    expect(criteriaLink).toHaveAttribute(
-      "href",
-      getApplicationRoundPath(1, "criteria")
-    );
+    expect(criteriaLink).toHaveAttribute("href", getApplicationRoundPath(1, "criteria"));
   });
 });
 
@@ -79,9 +70,6 @@ describe.for([
       name: "applicationRound:card.criteria",
     });
     expect(criteriaLink).toBeInTheDocument();
-    expect(criteriaLink).toHaveAttribute(
-      "href",
-      getApplicationRoundPath(1, "criteria")
-    );
+    expect(criteriaLink).toHaveAttribute("href", getApplicationRoundPath(1, "criteria"));
   });
 });

@@ -78,10 +78,7 @@ export default function Page(_props: Props) {
 
         <p>
           Next, look for the error on the{" "}
-          <a href="https://sentry.io/organizations/city-of-helsinki/issues/?project=22">
-            Issues Page
-          </a>
-          .
+          <a href="https://sentry.io/organizations/city-of-helsinki/issues/?project=22">Issues Page</a>.
         </p>
         <p style={{ marginTop: "24px" }}>
           For more information, see{" "}

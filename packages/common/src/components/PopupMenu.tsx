@@ -71,11 +71,7 @@ interface PopupMenuProps {
 // - the popup is forced to open on the left side so using it on the left of a page would cause an overflow
 // - the popup will expand containers the buttons are inside of (like <table>, not the cell)
 // These seem to be ok for this use case, but for others would need some more work.
-export function PopupMenu({
-  items,
-  style,
-  className,
-}: PopupMenuProps): JSX.Element {
+export function PopupMenu({ items, style, className }: PopupMenuProps): JSX.Element {
   const buttonRef = useRef<HTMLDivElement>(null);
   const firstMenuItemRef = useRef<HTMLButtonElement>(null);
 
@@ -116,11 +112,7 @@ export function PopupMenu({
       </ToggleButton>
       {isOpen && buttonRef.current
         ? createPortal(
-            <PopupContent
-              items={items}
-              closePopup={closePopup}
-              firstMenuItemRef={firstMenuItemRef}
-            />,
+            <PopupContent items={items} closePopup={closePopup} firstMenuItemRef={firstMenuItemRef} />,
             buttonRef.current
           )
         : null}
@@ -150,10 +142,7 @@ function PopupContent({
         role="button"
         tabIndex={-1}
       />
-      <FocusTrap
-        focusTrapOptions={{ allowOutsideClick: true }}
-        active={canBeTrapped}
-      >
+      <FocusTrap focusTrapOptions={{ allowOutsideClick: true }} active={canBeTrapped}>
         <Popup>
           {items.map((i, index) => (
             <ListButton

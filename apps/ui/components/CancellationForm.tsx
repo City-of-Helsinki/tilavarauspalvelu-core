@@ -5,14 +5,8 @@ import { Button, ButtonVariant, IconCross, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { AutoGrid, ButtonContainer, Flex, fontMedium } from "common/styled";
 import { breakpoints } from "common/src/const";
-import {
-  type CancelReasonFieldsFragment,
-  ReservationCancelReasonChoice,
-} from "@gql/gql-types";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { type CancelReasonFieldsFragment, ReservationCancelReasonChoice } from "@gql/gql-types";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { ControlledSelect } from "common/src/components/form";
 import { ButtonLikeLink } from "./common/ButtonLikeLink";
 import TermsBox from "common/src/termsbox/TermsBox";
@@ -50,14 +44,7 @@ export function CancellationForm(props: {
   isLoading?: boolean;
   isDisabled?: boolean;
 }): JSX.Element {
-  const {
-    cancelReasons,
-    onNext,
-    isLoading,
-    isDisabled,
-    cancellationTerms,
-    backLink,
-  } = props;
+  const { cancelReasons, onNext, isLoading, isDisabled, cancellationTerms, backLink } = props;
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
@@ -78,10 +65,7 @@ export function CancellationForm(props: {
   return (
     <FormWrapper>
       {cancellationTerms != null && (
-        <AccordionWithState
-          heading={t("reservationUnit:cancellationTerms")}
-          disableBottomMargin
-        >
+        <AccordionWithState heading={t("reservationUnit:cancellationTerms")} disableBottomMargin>
           <TermsBox body={<Sanitize html={cancellationTerms} />} />
         </AccordionWithState>
       )}
@@ -97,11 +81,7 @@ export function CancellationForm(props: {
             disabled={isDisabled}
           />
           <Actions>
-            <ButtonLikeLink
-              data-testid="reservation-cancel__button--back"
-              href={backLink}
-              size="large"
-            >
+            <ButtonLikeLink data-testid="reservation-cancel__button--back" href={backLink} size="large">
               <IconCross aria-hidden="true" />
               {t("common:stop")}
             </ButtonLikeLink>

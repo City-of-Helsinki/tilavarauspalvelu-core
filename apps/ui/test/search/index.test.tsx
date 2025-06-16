@@ -80,22 +80,19 @@ describe("SearchSingle read query params", () => {
     const filterParams = {
       textSearch: {
         value: "TämäOnHakuArvo",
-        tagText:
-          'searchForm:filters.textSearch {"label":"textSearch","value":["TämäOnHakuArvo"],"count":null}',
+        tagText: 'searchForm:filters.textSearch {"label":"textSearch","value":["TämäOnHakuArvo"],"count":null}',
         formFieldText: undefined, // The text search field value can't be read
         initiallyOpen: false,
       },
       startDate: {
         value: "1.1.2025",
-        tagText:
-          'searchForm:filters.startDate {"label":"startDate","value":["1.1.2025"],"count":null}',
+        tagText: 'searchForm:filters.startDate {"label":"startDate","value":["1.1.2025"],"count":null}',
         formFieldText: "1.1.2025",
         initiallyOpen: false,
       },
       endDate: {
         value: "31.12.2025",
-        tagText:
-          'searchForm:filters.endDate {"label":"endDate","value":["31.12.2025"],"count":null}',
+        tagText: 'searchForm:filters.endDate {"label":"endDate","value":["31.12.2025"],"count":null}',
         formFieldText: "31.12.2025",
         initiallyOpen: false,
       },
@@ -125,29 +122,25 @@ describe("SearchSingle read query params", () => {
       },
       timeBegin: {
         value: "06:00",
-        tagText:
-          'searchForm:filters.timeBegin {"label":"timeBegin","value":["06:00"],"count":null}',
+        tagText: 'searchForm:filters.timeBegin {"label":"timeBegin","value":["06:00"],"count":null}',
         formFieldText: "06:00",
         initiallyOpen: true,
       },
       timeEnd: {
         value: "20:00",
-        tagText:
-          'searchForm:filters.timeEnd {"label":"timeEnd","value":["20:00"],"count":null}',
+        tagText: 'searchForm:filters.timeEnd {"label":"timeEnd","value":["20:00"],"count":null}',
         formFieldText: "20:00",
         initiallyOpen: true,
       },
       duration: {
         value: "30",
-        tagText:
-          'searchForm:filters.duration {"unit":"common:abbreviations.minute {\\"count\\":30}"}',
+        tagText: 'searchForm:filters.duration {"unit":"common:abbreviations.minute {\\"count\\":30}"}',
         formFieldText: 'common:minute_other {"count":30}',
         initiallyOpen: true,
       },
       personsAllowed: {
         value: "15",
-        tagText:
-          'searchForm:filters.personsAllowed {"label":"personsAllowed","value":["15"],"count":15}',
+        tagText: 'searchForm:filters.personsAllowed {"label":"personsAllowed","value":["15"],"count":15}',
         formFieldText: "15",
         initiallyOpen: true,
       },
@@ -179,9 +172,7 @@ describe("SearchSingle read query params", () => {
     });
     expect(title).toBeInTheDocument();
 
-    const listContainer = view.getByTestId(
-      "list-with-pagination__list--container"
-    );
+    const listContainer = view.getByTestId("list-with-pagination__list--container");
     expect(listContainer).toBeInTheDocument();
   });
 
@@ -200,33 +191,23 @@ describe("SearchSingle read query params", () => {
       "personsAllowed",
       "accessTypes",
     ])
-  )(
-    "Show filter tag for $key and accordian is correctly expanded",
-    ({ key, value, tagText, initiallyOpen }) => {
-      setUrlSearchParams(key, value);
-      const view = customRender();
+  )("Show filter tag for $key and accordian is correctly expanded", ({ key, value, tagText, initiallyOpen }) => {
+    setUrlSearchParams(key, value);
+    const view = customRender();
 
-      const tags = view.getByTestId("search-form__filter--tags");
-      expect(within(tags).getByText(tagText ?? "")).toBeInTheDocument();
+    const tags = view.getByTestId("search-form__filter--tags");
+    expect(within(tags).getByText(tagText ?? "")).toBeInTheDocument();
 
-      // Extra options accordion should be expanded, check by reading button text
-      if (initiallyOpen) {
-        view.getByRole("button", { name: "searchForm:showLessFilters" });
-      } else {
-        view.getByRole("button", { name: "searchForm:showMoreFilters" });
-      }
+    // Extra options accordion should be expanded, check by reading button text
+    if (initiallyOpen) {
+      view.getByRole("button", { name: "searchForm:showLessFilters" });
+    } else {
+      view.getByRole("button", { name: "searchForm:showMoreFilters" });
     }
-  );
+  });
 
   test.for(
-    selectFilterParamsForTest([
-      "purposes",
-      "units",
-      "equipments",
-      "reservationUnitTypes",
-      "duration",
-      "accessTypes",
-    ])
+    selectFilterParamsForTest(["purposes", "units", "equipments", "reservationUnitTypes", "duration", "accessTypes"])
   )("Use $key query param in form", ({ key, value, formFieldText }) => {
     setUrlSearchParams(key, value);
     const view = customRender();
@@ -242,9 +223,7 @@ describe("SearchSingle read query params", () => {
       const view = customRender();
 
       const fields = view.getByTestId("search-form__filters--optional");
-      const field = within(fields).getByTestId(
-        `search-form__filter--fields--${key}`
-      );
+      const field = within(fields).getByTestId(`search-form__filter--fields--${key}`);
 
       if (field instanceof HTMLInputElement) {
         expect(field.value).toBe(formFieldText ?? "");
@@ -261,9 +240,7 @@ describe("SearchSingle read query params", () => {
       const view = customRender();
 
       const fields = view.getByTestId("search-form__filters--optional");
-      const field = within(fields).getByTestId(
-        `search-form__filter--fields--${key}`
-      );
+      const field = within(fields).getByTestId(`search-form__filter--fields--${key}`);
       expect(within(field).getByText(formFieldText ?? "")).toBeInTheDocument();
     }
   );

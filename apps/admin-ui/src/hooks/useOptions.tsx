@@ -1,8 +1,5 @@
 import { sortBy } from "lodash-es";
-import {
-  ReservationPurposeOrderingChoices,
-  useOptionsQuery,
-} from "@gql/gql-types";
+import { ReservationPurposeOrderingChoices, useOptionsQuery } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
@@ -13,35 +10,26 @@ export function useOptions() {
     },
   });
 
-  const purpose = filterNonNullable(
-    optionsData?.reservationPurposes?.edges
-  ).map((purposeType) => ({
+  const purpose = filterNonNullable(optionsData?.reservationPurposes?.edges).map((purposeType) => ({
     label: purposeType?.node?.nameFi ?? "",
     value: Number(purposeType?.node?.pk),
   }));
 
-  const ageGroup = sortBy(
-    optionsData?.ageGroups?.edges || [],
-    "node.minimum"
-  ).map((group) => ({
+  const ageGroup = sortBy(optionsData?.ageGroups?.edges || [], "node.minimum").map((group) => ({
     label: `${group?.node?.minimum}-${group?.node?.maximum || ""}`,
     value: Number(group?.node?.pk),
   }));
 
-  const homeCity = sortBy(optionsData?.cities?.edges || [], "node.nameFi").map(
-    (cityType) => ({
-      label: cityType?.node?.nameFi ?? "",
-      value: Number(cityType?.node?.pk),
-    })
-  );
+  const homeCity = sortBy(optionsData?.cities?.edges || [], "node.nameFi").map((cityType) => ({
+    label: cityType?.node?.nameFi ?? "",
+    value: Number(cityType?.node?.pk),
+  }));
 
   return { ageGroup, purpose, homeCity };
 }
 
 export const OPTIONS_QUERY = gql`
-  query Options(
-    $reservationPurposesOrderBy: [ReservationPurposeOrderingChoices]
-  ) {
+  query Options($reservationPurposesOrderBy: [ReservationPurposeOrderingChoices]) {
     reservationPurposes(orderBy: $reservationPurposesOrderBy) {
       edges {
         node {

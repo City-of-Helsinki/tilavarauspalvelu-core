@@ -82,13 +82,7 @@ type ToolbarProps = {
   children?: React.ReactNode;
 };
 
-export function Toolbar({
-  onNavigate,
-  onView,
-  view,
-  date,
-  children,
-}: Readonly<ToolbarProps>) {
+export function Toolbar({ onNavigate, onView, view, date, children }: Readonly<ToolbarProps>) {
   const culture = { locale: fi };
   const { t } = useTranslation();
 
@@ -115,9 +109,7 @@ export function Toolbar({
       const currentYear = format(new Date(), "yyyy", culture);
       title = `${startDay}.${startMonth !== endMonth ? `${startMonth}.` : ""}${
         startYear !== endYear ? startYear : ""
-      } – ${endDay}.${endMonth}.${
-        startYear !== endYear || endYear !== currentYear ? endYear : ""
-      }`;
+      } – ${endDay}.${endMonth}.${startYear !== endYear || endYear !== currentYear ? endYear : ""}`;
     }
   }
 
@@ -132,9 +124,7 @@ export function Toolbar({
       aria-hidden="true"
     >
       <Flex $direction="row">
-        <ToolbarBtn onClick={() => onNavigate("TODAY")}>
-          {t("common:today")}
-        </ToolbarBtn>
+        <ToolbarBtn onClick={() => onNavigate("TODAY")}>{t("common:today")}</ToolbarBtn>
         {children}
       </Flex>
       <DateNavigationWrapper>

@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Button,
-  ButtonSize,
-  ButtonVariant,
-  IconArrowRight,
-  IconPlus,
-} from "hds-react";
+import { Button, ButtonSize, ButtonVariant, IconArrowRight, IconPlus } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { filterNonNullable } from "common/src/helpers";
@@ -13,10 +7,7 @@ import { ButtonContainer } from "common/styled";
 import { type ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { useReservationUnitList } from "@/hooks";
 import { ApplicationSectionPage1 } from ".";
-import {
-  type ApplicationPage1FormValues,
-  createDefaultPage1Section,
-} from "./form";
+import { type ApplicationPage1FormValues, createDefaultPage1Section } from "./form";
 import { type OptionsT } from "@/modules/search";
 
 type Page1Props = Readonly<{
@@ -24,10 +15,7 @@ type Page1Props = Readonly<{
   options: Readonly<OptionsT>;
 }>;
 
-export function Page1({
-  applicationRound,
-  options,
-}: Page1Props): JSX.Element | null {
+export function Page1({ applicationRound, options }: Page1Props): JSX.Element | null {
   const { t } = useTranslation();
 
   // get the user selected defaults for reservationUnits field

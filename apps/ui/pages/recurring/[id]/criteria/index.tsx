@@ -11,16 +11,8 @@ import {
 import { Flex, H1 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { Sanitize } from "common/src/components/Sanitize";
-import {
-  base64encode,
-  capitalize,
-  ignoreMaybeArray,
-  toNumber,
-} from "common/src/helpers";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { base64encode, capitalize, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -57,9 +49,7 @@ const ContentWrapper = styled.div`
   }
 `;
 
-function Criteria({
-  applicationRound,
-}: Readonly<PropsNarrowed>): JSX.Element | null {
+function Criteria({ applicationRound }: Readonly<PropsNarrowed>): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
   const name = getTranslationSafe(applicationRound, "name", lang);
@@ -115,10 +105,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   if (pk == null || !(pk > 0)) {
     return notFound;
   }
-  const { data } = await apolloClient.query<
-    ApplicationRoundCriteriaQuery,
-    ApplicationRoundCriteriaQueryVariables
-  >({
+  const { data } = await apolloClient.query<ApplicationRoundCriteriaQuery, ApplicationRoundCriteriaQueryVariables>({
     query: ApplicationRoundCriteriaDocument,
     variables: {
       id: base64encode(`ApplicationRoundNode:${pk}`),

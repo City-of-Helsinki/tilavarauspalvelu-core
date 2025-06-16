@@ -19,31 +19,20 @@ type TextFields =
   | "billingAddress.postCode"
   | "billingAddress.city"
   | "additionalInformation";
-export function ApplicationFormTextInput({
-  name,
-  disabled,
-}: {
-  name: TextFields;
-  disabled?: boolean;
-}): JSX.Element {
+export function ApplicationFormTextInput({ name, disabled }: { name: TextFields; disabled?: boolean }): JSX.Element {
   const { t } = useTranslation();
-  const { control, getFieldState, formState } =
-    useFormContext<ApplicationPage3FormValues>();
+  const { control, getFieldState, formState } = useFormContext<ApplicationPage3FormValues>();
   // NOTE getFieldState does not update unless we extract formState also
   // but using errors is too difficult for nested fields
   const { errors: _ } = formState;
 
   const { register } = control;
 
-  const translateError = (errorMsg?: string) =>
-    errorMsg ? t(`application:validation.${errorMsg}`) : "";
+  const translateError = (errorMsg?: string) => (errorMsg ? t(`application:validation.${errorMsg}`) : "");
   const state = getFieldState(name);
 
   // avoid duplicating the translation key without polluting the props for a single case
-  const transformedLabel = name.replace(
-    "organisation.address.",
-    "billingAddress."
-  );
+  const transformedLabel = name.replace("organisation.address.", "billingAddress.");
 
   return (
     <TextInput

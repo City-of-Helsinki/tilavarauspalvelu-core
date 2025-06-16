@@ -7,15 +7,7 @@ import { parseAddress } from "@/common/util";
 import React from "react";
 import styled from "styled-components";
 import { Flex, fontBold, H1, NoWrap, TitleSection } from "common/styled";
-import {
-  IconCheck,
-  IconClock,
-  IconEye,
-  IconEyeCrossed,
-  IconLock,
-  IconPen,
-  IconQuestionCircle,
-} from "hds-react";
+import { IconCheck, IconClock, IconEye, IconEyeCrossed, IconLock, IconPen, IconQuestionCircle } from "hds-react";
 import { useTranslation } from "react-i18next";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
@@ -33,9 +25,7 @@ type StatePropsType = {
   icon: JSX.Element;
 };
 
-const getReservationStateProps = (
-  state?: ReservationUnitReservationState
-): StatePropsType => {
+const getReservationStateProps = (state?: ReservationUnitReservationState): StatePropsType => {
   switch (state) {
     case ReservationUnitReservationState.ScheduledReservation:
     case ReservationUnitReservationState.ScheduledPeriod:
@@ -62,11 +52,7 @@ const getReservationStateProps = (
   }
 };
 
-function ReservationStateTag({
-  state,
-}: {
-  state?: ReservationUnitReservationState;
-}) {
+function ReservationStateTag({ state }: { state?: ReservationUnitReservationState }) {
   const { t } = useTranslation();
 
   if (!state || state === ReservationUnitReservationState.Reservable) {
@@ -81,9 +67,7 @@ function ReservationStateTag({
   );
 }
 
-const getPublishingStateProps = (
-  state?: ReservationUnitPublishingState
-): StatePropsType => {
+const getPublishingStateProps = (state?: ReservationUnitPublishingState): StatePropsType => {
   switch (state) {
     case ReservationUnitPublishingState.Draft:
       return {
@@ -115,11 +99,7 @@ const getPublishingStateProps = (
   }
 };
 
-function PublishingStateTag({
-  state,
-}: {
-  state?: ReservationUnitPublishingState;
-}): JSX.Element | null {
+function PublishingStateTag({ state }: { state?: ReservationUnitPublishingState }): JSX.Element | null {
   const { t } = useTranslation();
 
   if (!state) return null;

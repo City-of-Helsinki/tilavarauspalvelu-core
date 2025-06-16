@@ -9,11 +9,7 @@ import { getReservationUrl } from "@/common/urls";
 import { Flex, H1 } from "common/styled";
 import { useRecurringReservations } from "@/hooks";
 
-function RecurringReservationDoneInner({
-  recurringPk,
-}: {
-  recurringPk: number;
-}) {
+function RecurringReservationDoneInner({ recurringPk }: { recurringPk: number }) {
   const { t } = useTranslation("translation", {
     keyPrefix: "MyUnits.RecurringReservation.Confirmation",
   });
@@ -23,9 +19,7 @@ function RecurringReservationDoneInner({
 
   return (
     <>
-      <H1 $marginBottom="none">
-        {reservations.length > 0 ? t(`title`) : t("allFailedTitle")}
-      </H1>
+      <H1 $marginBottom="none">{reservations.length > 0 ? t(`title`) : t("allFailedTitle")}</H1>
       <p>{t(`successInfo`)}</p>
       <RecurringReservationsView recurringPk={recurringPk} />
       <Flex $direction="row" $justifyContent="flex-end" $wrap="wrap">

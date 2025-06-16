@@ -124,15 +124,8 @@ const Carousel = forwardRef(function Carousel(
         <CustomBottomControls>
           <ul>
             {[...Array(slideCount)].map((key, idx) => (
-              <li
-                key={key}
-                className={currentSlide === idx ? "active" : undefined}
-              >
-                <button
-                  type="button"
-                  aria-label={`${controlAriaLabel} #${idx + 1}`}
-                  onClick={() => goToSlide(idx)}
-                >
+              <li key={key} className={currentSlide === idx ? "active" : undefined}>
+                <button type="button" aria-label={`${controlAriaLabel} #${idx + 1}`} onClick={() => goToSlide(idx)}>
                   <svg width="12" height="12">
                     <circle cx="5" cy="5" r="5" />
                   </svg>

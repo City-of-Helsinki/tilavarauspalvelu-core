@@ -60,8 +60,7 @@ const StyledTextArea = styled(TextArea)<TextAreaProps>`
   ${({ $hidden }) => $hidden && "display: none"};
 
   && {
-    ${({ $height }) =>
-      $height != null ? `--textarea-height: ${$height}` : ""};
+    ${({ $height }) => ($height != null ? `--textarea-height: ${$height}` : "")};
   }
 
   label {
@@ -85,8 +84,7 @@ const ReservationFormField = ({
 }: Props) => {
   const { t } = useTranslation();
 
-  const lowerCaseTranslationKey =
-    translationKey?.toLocaleLowerCase() || "individual";
+  const lowerCaseTranslationKey = translationKey?.toLocaleLowerCase() || "individual";
 
   const isWideRow = useMemo(
     (): boolean =>
@@ -110,40 +108,25 @@ const ReservationFormField = ({
     trigger,
   } = useFormContext();
 
-  const isTextArea = useMemo(
-    (): boolean => ["description"].includes(field),
-    [field]
-  );
+  const isTextArea = useMemo((): boolean => ["description"].includes(field), [field]);
 
-  const isNumField = useMemo(
-    (): boolean => ["numPersons"].includes(field),
-    [field]
-  );
+  const isNumField = useMemo((): boolean => ["numPersons"].includes(field), [field]);
 
-  const isEmailField = useMemo(
-    (): boolean => ["reserveeEmail", "billingEmail"].includes(field),
-    [field]
-  );
+  const isEmailField = useMemo((): boolean => ["reserveeEmail", "billingEmail"].includes(field), [field]);
 
   const isSelectField = Object.keys(options).includes(field);
 
   const isReserveeIdRequired =
-    field === "reserveeId" &&
-    watch("reserveeIsUnregisteredAssociation") !== undefined
+    field === "reserveeId" && watch("reserveeIsUnregisteredAssociation") !== undefined
       ? watch("reserveeIsUnregisteredAssociation") !== true
       : required;
 
-  const isFreeOfChargeReasonRequired =
-    field === "freeOfChargeReason" && watch("applyingForFreeOfCharge") === true;
+  const isFreeOfChargeReasonRequired = field === "freeOfChargeReason" && watch("applyingForFreeOfCharge") === true;
 
-  const label = t(
-    `reservationApplication:label.${lowerCaseTranslationKey}.${field}`
-  );
+  const label = t(`reservationApplication:label.${lowerCaseTranslationKey}.${field}`);
 
   const minValue =
-    get(params, field)?.min != null && !Number.isNaN(get(params, field).min)
-      ? Number(get(params, field)?.min)
-      : 1;
+    get(params, field)?.min != null && !Number.isNaN(get(params, field).min) ? Number(get(params, field)?.min) : 1;
   const maxValue =
     get(params, field)?.max != null && !Number.isNaN(get(params, field).max)
       ? Number(get(params, field)?.max) < 200
@@ -164,12 +147,10 @@ const ReservationFormField = ({
 
     switch (error.type) {
       case "min":
-        if (field === "numPersons")
-          return t("forms:minNumPersons", { minValue });
+        if (field === "numPersons") return t("forms:minNumPersons", { minValue });
         break;
       case "max":
-        if (field === "numPersons")
-          return t("forms:maxNumPersons", { maxValue });
+        if (field === "numPersons") return t("forms:maxNumPersons", { maxValue });
         break;
       case "minLength":
         if (field === "reserveeId") return t("forms:invalidReserveeId");
@@ -268,9 +249,7 @@ const ReservationFormField = ({
         required={required}
         maxLength={MAX_TEXT_LENGTH - (isEmailField ? 1 : 0)}
         $isWide={isWideRow}
-        $hidden={
-          field.includes("billing") && watch("showBillingAddress") !== true
-        }
+        $hidden={field.includes("billing") && watch("showBillingAddress") !== true}
         $height="119px"
       />
     );
@@ -290,22 +269,15 @@ const ReservationFormField = ({
     case "applyingForFreeOfCharge":
       return (
         <StyledCheckboxWrapper key={field} $isWide={isWideRow}>
-          <Subheading>
-            {t("reservationApplication:label.subHeadings.subvention")}
-          </Subheading>{" "}
+          <Subheading>{t("reservationApplication:label.subHeadings.subvention")}</Subheading>{" "}
           <ControlledCheckbox {...checkParams} />
-          {data.termsForDiscount && (
-            <div style={{ marginTop: "0.5rem" }}>{data.termsForDiscount}</div>
-          )}
+          {data.termsForDiscount && <div style={{ marginTop: "0.5rem" }}>{data.termsForDiscount}</div>}
         </StyledCheckboxWrapper>
       );
     case "reserveeIsUnregisteredAssociation":
       return (
         <StyledCheckboxWrapper key={field}>
-          <ControlledCheckbox
-            {...checkParams}
-            defaultValue={watch("reserveeIsUnregisteredAssociation")}
-          />
+          <ControlledCheckbox {...checkParams} defaultValue={watch("reserveeIsUnregisteredAssociation")} />
         </StyledCheckboxWrapper>
       );
     case "showBillingAddress":
@@ -375,9 +347,7 @@ const ReservationFormField = ({
           // email field is special and has one less character than the rest
           maxLength={MAX_TEXT_LENGTH - (isEmailField ? 1 : 0)}
           $isWide={isWideRow}
-          $hidden={
-            field.includes("billing") && watch("showBillingAddress") !== true
-          }
+          $hidden={field.includes("billing") && watch("showBillingAddress") !== true}
         />
       );
   }

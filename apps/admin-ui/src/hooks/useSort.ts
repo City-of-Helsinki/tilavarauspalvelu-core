@@ -15,9 +15,7 @@ function validSort(keys: string[], sort: string | null): boolean {
 /// matching keys are updated to be reversed (e.g. pk -> -pk)
 /// new keys replace existing keys (e.g. pk -> application_id)
 /// all state is stored in the URL only
-export function useSort(
-  validSortKeys: string[]
-): [string | null, (field: string) => void] {
+export function useSort(validSortKeys: string[]): [string | null, (field: string) => void] {
   const [searchParams, setParams] = useSearchParams();
   const sort = searchParams.get("orderBy");
   const orderBy = validSort(validSortKeys, sort) ? sort : null;

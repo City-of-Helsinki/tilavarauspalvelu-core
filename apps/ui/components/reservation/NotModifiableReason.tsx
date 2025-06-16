@@ -1,9 +1,6 @@
 import React from "react";
 import { type CanReservationBeChangedFragment } from "@/gql/gql-types";
-import {
-  getWhyReservationCantBeChanged,
-  isReservationCancellable,
-} from "@/modules/reservation";
+import { getWhyReservationCantBeChanged, isReservationCancellable } from "@/modules/reservation";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 
@@ -15,9 +12,7 @@ const Reasons = styled.p`
   color: var(--color-black-70);
 `;
 
-export function NotModifiableReason(
-  reservation: CanReservationBeChangedFragment
-): JSX.Element | null {
+export function NotModifiableReason(reservation: CanReservationBeChangedFragment): JSX.Element | null {
   const { t } = useTranslation();
   const modifyTimeReason = getWhyReservationCantBeChanged(reservation);
   const isCancellationAllowed = isReservationCancellable(reservation);
@@ -30,9 +25,7 @@ export function NotModifiableReason(
       {t(`reservations:modifyTimeReasons:${modifyTimeReason}`)}
       {modifyTimeReason === "RESERVATION_MODIFICATION_NOT_ALLOWED" &&
         isCancellationAllowed &&
-        ` ${t(
-          "reservations:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED_SUFFIX"
-        )}`}
+        ` ${t("reservations:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED_SUFFIX")}`}
     </Reasons>
   );
 }

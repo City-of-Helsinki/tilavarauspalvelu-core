@@ -2,10 +2,7 @@ import React, { useState } from "react";
 import { gql } from "@apollo/client";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import {
-  useReservationDateOfBirthQuery,
-  useApplicationDateOfBirthQuery,
-} from "@gql/gql-types";
+import { useReservationDateOfBirthQuery, useApplicationDateOfBirthQuery } from "@gql/gql-types";
 import { formatDate } from "@/common/util";
 import { Flex } from "common/styled";
 import { base64encode } from "common/src/helpers";
@@ -80,8 +77,7 @@ export function BirthDate(props: Props): JSX.Element {
   const { t } = useTranslation();
 
   const data = "reservationPk" in props ? dataReservation : dataApplication;
-  const isLoading =
-    "reservationPk" in props ? isReservationLoading : isApplicationLoading;
+  const isLoading = "reservationPk" in props ? isReservationLoading : isApplicationLoading;
   const error = "reservationPk" in props ? errorReservation : errorApplication;
 
   function getUser(d: typeof data) {
@@ -111,11 +107,7 @@ export function BirthDate(props: Props): JSX.Element {
         <span>{t("common.error")}</span>
       ) : (
         <>
-          {visible ? (
-            <span>{dateOfBirth ? formatDate(dateOfBirth) : "-"}</span>
-          ) : (
-            <span>XX.XX.XXXX</span>
-          )}
+          {visible ? <span>{dateOfBirth ? formatDate(dateOfBirth) : "-"}</span> : <span>XX.XX.XXXX</span>}
           <Button type="button" onClick={() => setVisible(!visible)}>
             {visible ? hideLabel : showLabel}
           </Button>

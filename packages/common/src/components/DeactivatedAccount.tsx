@@ -12,22 +12,14 @@ const Email = styled.a`
   ${fontBold}
 `;
 
-const DeactivatedAccount = ({
-  feedbackUrl,
-  imgSrc,
-}: {
-  feedbackUrl: string;
-  imgSrc: string;
-}) => {
+const DeactivatedAccount = ({ feedbackUrl, imgSrc }: { feedbackUrl: string; imgSrc: string }) => {
   const { t } = useTranslation();
   return (
     <ErrorContainer feedbackUrl={feedbackUrl} imgSrc={imgSrc}>
       <H1>{t("errors:deactivatedAccount.heading")}</H1>
       <Body>
         {`${t("errors:deactivatedAccount.subHeadingA")} `}
-        <Email href={`mailto:${t("errors:deactivatedAccount.email")}`}>
-          {t("errors:deactivatedAccount.email")}
-        </Email>
+        <Email href={`mailto:${t("errors:deactivatedAccount.email")}`}>{t("errors:deactivatedAccount.email")}</Email>
         {` ${t("errors:deactivatedAccount.subHeadingB")}`}
       </Body>
     </ErrorContainer>

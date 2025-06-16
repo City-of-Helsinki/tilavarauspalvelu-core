@@ -19,11 +19,7 @@ i18n.use(initReactI18next).init({
   },
 });
 
-i18n.addResourceBundle(
-  "fi",
-  "reservationApplication",
-  reservationApplicationFi
-);
+i18n.addResourceBundle("fi", "reservationApplication", reservationApplicationFi);
 i18n.addResourceBundle("fi", "reservationForm", reservationFormFi);
 i18n.addResourceBundle("fi", "accessType", accessTypeFi);
 

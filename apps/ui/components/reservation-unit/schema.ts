@@ -7,6 +7,4 @@ export const PendingReservationFormSchema = z.object({
   isControlsVisible: z.boolean(),
 });
 
-export type PendingReservationFormType = z.infer<
-  typeof PendingReservationFormSchema
->;
+export type PendingReservationFormType = z.infer<typeof PendingReservationFormSchema>;

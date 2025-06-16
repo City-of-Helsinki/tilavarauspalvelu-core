@@ -21,10 +21,7 @@ function getStep(slug: string) {
   return index;
 }
 
-function calculateAvailableStep(
-  application: ReadonlyDeep<ApplicationFormFragment>,
-  step: number
-) {
+function calculateAvailableStep(application: ReadonlyDeep<ApplicationFormFragment>, step: number) {
   if (isSent(application?.status)) {
     return StepState.completed;
   }
@@ -57,9 +54,7 @@ const StyledStepper = styled(HDSStepper)`
 type StepperProps = {
   application: ReadonlyDeep<ApplicationFormFragment>;
 };
-export function ApplicationStepper({
-  application,
-}: Readonly<StepperProps>): JSX.Element {
+export function ApplicationStepper({ application }: Readonly<StepperProps>): JSX.Element {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 

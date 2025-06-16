@@ -1,10 +1,6 @@
 import { isSameDay } from "date-fns";
 import { type TFunction } from "next-i18next";
-import {
-  toUIDate,
-  fromApiDate as fromAPIDate,
-  fromUIDate,
-} from "common/src/common/util";
+import { toUIDate, fromApiDate as fromAPIDate, fromUIDate } from "common/src/common/util";
 import { isBrowser } from "./const";
 import { formatMinutes, timeToMinutes } from "common/src/helpers";
 import { ReadonlyURLSearchParams } from "next/navigation";
@@ -13,9 +9,7 @@ import { type Maybe, ApplicationStatusChoice } from "@/gql/gql-types";
 export { formatDuration } from "common/src/common/util";
 export { fromAPIDate, fromUIDate };
 
-export function getPostLoginUrl(
-  params: Readonly<URLSearchParams> = new ReadonlyURLSearchParams()
-): string | undefined {
+export function getPostLoginUrl(params: Readonly<URLSearchParams> = new ReadonlyURLSearchParams()): string | undefined {
   if (!isBrowser) {
     return undefined;
   }
@@ -57,11 +51,7 @@ function dayTimeSeparator(t: TFunction): string {
   return t("common:dayTimeSeparator");
 }
 
-export function formatDateTimeRange(
-  t: TFunction,
-  begin: Date,
-  end: Date
-): string {
+export function formatDateTimeRange(t: TFunction, begin: Date, end: Date): string {
   // TODO change the key names
   const beginDate = t("common:dateWithWeekday", {
     date: begin,
@@ -103,11 +93,7 @@ function formatDay(t: TFunction, date: Date): string {
   });
 }
 
-export function formatDateTime(
-  t: TFunction,
-  date: Date,
-  includeWeekday = true
-): string {
+export function formatDateTime(t: TFunction, date: Date, includeWeekday = true): string {
   const dateStr = t("common:dateWithWeekday", {
     date,
     formatParams: dateFormatParams,
@@ -145,9 +131,7 @@ export function formatDateTimeStrings(
 
   const beginMins = toMinutes(start);
   const endMins = toMinutes(end);
-  const isModified =
-    orig != null &&
-    (originalBeginMins !== beginMins || originalEndMins !== endMins);
+  const isModified = orig != null && (originalBeginMins !== beginMins || originalEndMins !== endMins);
   const btime = formatMinutes(beginMins, trailingMinutes);
   const etime = formatMinutes(endMins, trailingMinutes);
   const time = `${btime} - ${etime}`;
@@ -164,9 +148,7 @@ function toMinutes(d: Date): number {
   return d.getHours() * 60 + d.getMinutes();
 }
 
-export function isSent(
-  status: Maybe<ApplicationStatusChoice> | undefined
-): boolean {
+export function isSent(status: Maybe<ApplicationStatusChoice> | undefined): boolean {
   if (status == null) {
     return false;
   }

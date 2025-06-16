@@ -1,8 +1,4 @@
-import {
-  formatters as getFormatters,
-  getReservationPrice,
-  getUnRoundedReservationVolume,
-} from "common";
+import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "common";
 import { trim, uniq } from "lodash-es";
 import {
   addMinutes,
@@ -18,11 +14,7 @@ import {
   startOfDay,
 } from "date-fns";
 import { i18n } from "next-i18next";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-  toUIDate,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";
 import {
   type AvailableTimesReservationUnitFieldsFragment,
   ReservationUnitPublishingState,
@@ -75,9 +67,7 @@ function formatTime(date: Date): string {
 
 export { formatTime as getTimeString };
 
-export function isReservationUnitPublished(
-  reservationUnit: Pick<ReservationUnitNode, "publishingState">
-): boolean {
+export function isReservationUnitPublished(reservationUnit: Pick<ReservationUnitNode, "publishingState">): boolean {
   const { publishingState } = reservationUnit;
 
   switch (publishingState) {
@@ -99,24 +89,19 @@ const equipmentCategoryOrder = [
   "Muu",
 ] as const;
 
-export function getEquipmentCategories(
-  equipment: Readonly<Pick<EquipmentFieldsFragment, "category">[]>
-): string[] {
+export function getEquipmentCategories(equipment: Readonly<Pick<EquipmentFieldsFragment, "category">[]>): string[] {
   if (!equipment || equipment.length === 0) {
     return [];
   }
-  const categories: Array<(typeof equipmentCategoryOrder)[number]> =
-    filterNonNullable(
-      equipment.map((n) => {
-        const index = equipmentCategoryOrder.findIndex(
-          (order) => order === n.category?.nameFi
-        );
-        if (index === -1) {
-          return "Muu";
-        }
-        return equipmentCategoryOrder[index];
-      })
-    );
+  const categories: Array<(typeof equipmentCategoryOrder)[number]> = filterNonNullable(
+    equipment.map((n) => {
+      const index = equipmentCategoryOrder.findIndex((order) => order === n.category?.nameFi);
+      if (index === -1) {
+        return "Muu";
+      }
+      return equipmentCategoryOrder[index];
+    })
+  );
 
   categories.sort((a, b) => {
     const left = equipmentCategoryOrder.indexOf(a);
@@ -145,22 +130,16 @@ export function getEquipmentList(
           n.category?.nameFi === category ||
           (category === "Muu" &&
             n.category?.nameFi &&
-            !equipmentCategoryOrder.find(
-              (order) => order === n.category.nameFi
-            ))
+            !equipmentCategoryOrder.find((order) => order === n.category.nameFi))
       )
-      .sort((a, b) =>
-        a.nameFi && b.nameFi ? a.nameFi.localeCompare(b.nameFi) : 0
-      )
+      .sort((a, b) => (a.nameFi && b.nameFi ? a.nameFi.localeCompare(b.nameFi) : 0))
   );
 
   return sortedEquipment.map((n) => getTranslationSafe(n, "name", lang));
 }
 
 export function getReservationUnitName(
-  reservationUnit:
-    | Pick<ReservationUnitNode, "nameFi" | "nameSv" | "nameEn">
-    | undefined,
+  reservationUnit: Pick<ReservationUnitNode, "nameFi" | "nameSv" | "nameEn"> | undefined,
   language: string = i18n?.language ?? "fi"
 ): string | undefined {
   if (!reservationUnit) {
@@ -242,8 +221,7 @@ export function getFuturePricing(
     )
     .filter((futurePricing) => {
       return !applicationRounds.some((applicationRound) => {
-        const { reservationPeriodBegin, reservationPeriodEnd } =
-          applicationRound;
+        const { reservationPeriodBegin, reservationPeriodEnd } = applicationRound;
         if (!reservationPeriodBegin || !reservationPeriodEnd) {
           return false;
         }
@@ -268,9 +246,7 @@ export function getFuturePricing(
 
 function formatPrice(price: number, toCurrency?: boolean): string {
   const enableDecimals = price !== 0;
-  const currencyFormatter = enableDecimals
-    ? "currencyWithDecimals"
-    : "currency";
+  const currencyFormatter = enableDecimals ? "currencyWithDecimals" : "currency";
   const floatFormatter = enableDecimals ? "twoDecimal" : "strippedDecimal";
   const formatters = getFormatters("fi");
   const formatter = formatters[toCurrency ? currencyFormatter : floatFormatter];
@@ -308,9 +284,7 @@ export function getPriceString(props: GetPriceType): string {
       ? formatPrice(lowestPrice, true)
       : `${formatPrice(lowestPrice)} - ${formatPrice(highestPrice, true)}`;
   const unitString =
-    pricing.priceUnit === PriceUnit.Fixed || minutes
-      ? ""
-      : t(`prices:priceUnits.${pricing.priceUnit}`);
+    pricing.priceUnit === PriceUnit.Fixed || minutes ? "" : t(`prices:priceUnits.${pricing.priceUnit}`);
   return trim(`${priceString} / ${unitString}`, " / ");
 }
 
@@ -321,9 +295,7 @@ export type GetReservationUnitPriceProps = {
   minutes?: number;
 };
 
-export function getReservationUnitPrice(
-  props: GetReservationUnitPriceProps
-): string | null {
+export function getReservationUnitPrice(props: GetReservationUnitPriceProps): string | null {
   const { t, reservationUnit: ru, pricingDate, minutes } = props;
   if (Number.isNaN(pricingDate.getTime())) {
     // eslint-disable-next-line no-console
@@ -381,8 +353,7 @@ export function getPrice(
   const minutes = differenceInMinutes(end, begin);
 
   const subventionState = getSubventionState(reservation);
-  const showReservationUnitPrice =
-    reservationUnitPriceOnly || subventionState === "pending";
+  const showReservationUnitPrice = reservationUnitPriceOnly || subventionState === "pending";
 
   if (showReservationUnitPrice && reservationUnit) {
     return getReservationUnitPrice({
@@ -392,24 +363,13 @@ export function getPrice(
       minutes,
     });
   }
-  return getReservationPrice(
-    reservation.price ?? undefined,
-    t("prices:priceFree"),
-    true,
-    lang
-  );
+  return getReservationPrice(reservation.price ?? undefined, t("prices:priceFree"), true, lang);
 }
 
 function getSubventionState(
-  reservation: Pick<
-    ReservationPriceFieldsFragment,
-    "applyingForFreeOfCharge" | "state"
-  >
+  reservation: Pick<ReservationPriceFieldsFragment, "applyingForFreeOfCharge" | "state">
 ): "pending" | "none" | "done" {
-  if (
-    reservation.applyingForFreeOfCharge &&
-    reservation.state === ReservationStateChoice.RequiresHandling
-  ) {
+  if (reservation.applyingForFreeOfCharge && reservation.state === ReservationStateChoice.RequiresHandling) {
     return "pending";
   }
   if (!reservation.applyingForFreeOfCharge) {
@@ -418,17 +378,11 @@ function getSubventionState(
   return "done";
 }
 
-export function isReservationUnitFreeOfCharge(
-  pricings: Readonly<PricingFieldsFragment[]>,
-  date?: Date
-): boolean {
+export function isReservationUnitFreeOfCharge(pricings: Readonly<PricingFieldsFragment[]>, date?: Date): boolean {
   return !isReservationUnitPaid(pricings, date);
 }
 
-export function isReservationUnitPaid(
-  pricings: Readonly<PricingFieldsFragment[]>,
-  date?: Date
-): boolean {
+export function isReservationUnitPaid(pricings: Readonly<PricingFieldsFragment[]>, date?: Date): boolean {
   const active = pricings.filter((p) => isActivePricing(p));
   const future = pricings.filter((p) => isFuturePricing(p));
   const d =
@@ -444,10 +398,7 @@ export function isReservationUnitPaid(
 /// Returns true if the given time is 'inside' the time span
 /// inside in this case means it's either the same day or the time span is multiple days
 /// TODO should rewrite this to work on dates since we want to do that conversion first anyway
-export function isInTimeSpan(
-  date: Date,
-  timeSpan: NonNullable<ReservationUnitNode["reservableTimeSpans"]>[0]
-) {
+export function isInTimeSpan(date: Date, timeSpan: NonNullable<ReservationUnitNode["reservableTimeSpans"]>[0]) {
   const { startDatetime, endDatetime } = timeSpan ?? {};
 
   if (!startDatetime || !endDatetime) return false;
@@ -518,12 +469,8 @@ export function getPossibleTimesForDay({
   for (const slot of slotsForDay) {
     const startDate = slot.start;
     const endDate = slot.end;
-    const begin = isSameDay(startDate, date)
-      ? startDate
-      : set(date, { hours: 0, minutes: 0 });
-    const end = isSameDay(endDate, date)
-      ? endDate
-      : set(date, { hours: 23, minutes: 59 });
+    const begin = isSameDay(startDate, date) ? startDate : set(date, { hours: 0, minutes: 0 });
+    const end = isSameDay(endDate, date) ? endDate : set(date, { hours: 23, minutes: 59 });
 
     const s: { h: number; m: number } = {
       h: getHours(begin),
@@ -537,10 +484,7 @@ export function getPossibleTimesForDay({
     allTimes.push(...intervals);
   }
 
-  const realDuration =
-    duration >= getIntervalMinutes(interval)
-      ? duration
-      : getIntervalMinutes(interval);
+  const realDuration = duration >= getIntervalMinutes(interval) ? duration : getIntervalMinutes(interval);
   const times = allTimes
     .filter((span) => {
       const { h: slotH, m: slotM } = span;
@@ -573,14 +517,11 @@ export type LastPossibleReservationDateProps = Pick<
 >;
 
 // Returns the last possible reservation date for the given reservation unit
-export function getLastPossibleReservationDate(
-  reservationUnit: LastPossibleReservationDateProps
-): Date | null {
+export function getLastPossibleReservationDate(reservationUnit: LastPossibleReservationDateProps): Date | null {
   if (!reservationUnit) {
     return null;
   }
-  const { reservationsMaxDaysBefore, reservableTimeSpans, reservationEnds } =
-    reservationUnit;
+  const { reservationsMaxDaysBefore, reservableTimeSpans, reservationEnds } = reservationUnit;
   if (!reservableTimeSpans?.length) {
     return null;
   }
@@ -589,19 +530,11 @@ export function getLastPossibleReservationDate(
     reservationsMaxDaysBefore != null && reservationsMaxDaysBefore > 0
       ? addDays(new Date(), reservationsMaxDaysBefore)
       : undefined;
-  const reservationUnitNotReservable = reservationEnds
-    ? new Date(reservationEnds)
-    : undefined;
+  const reservationUnitNotReservable = reservationEnds ? new Date(reservationEnds) : undefined;
   // Why does this return now instead of null if there are no reservableTimeSpans?
   const endDateTime = reservableTimeSpans.at(-1)?.endDatetime ?? undefined;
   const lastOpeningDate = endDateTime ? new Date(endDateTime) : new Date();
-  return (
-    dayMin([
-      reservationUnitNotReservable,
-      lastPossibleReservationDate,
-      lastOpeningDate,
-    ]) ?? null
-  );
+  return dayMin([reservationUnitNotReservable, lastPossibleReservationDate, lastOpeningDate]) ?? null;
 }
 
 export const AVILABLE_TIMES_RESERVATION_UNIT_FRAGMENT = gql`
@@ -675,20 +608,14 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
   if (reservationUnit == null) {
     return null;
   }
-  const { reservationsMinDaysBefore, reservationsMaxDaysBefore } =
-    reservationUnit;
+  const { reservationsMinDaysBefore, reservationsMaxDaysBefore } = reservationUnit;
 
-  const minReservationDate = addDays(
-    new Date(),
-    reservationsMinDaysBefore ?? 0
-  );
+  const minReservationDate = addDays(new Date(), reservationsMinDaysBefore ?? 0);
   const possibleEndDay = getLastPossibleReservationDate(reservationUnit);
   const endDay = possibleEndDay ? addDays(possibleEndDay, 1) : undefined;
   // NOTE there is still a case where application rounds have a hole but there are no reservable times
   // this is not a real use case but technically possible
-  const openAfterRound: Date | undefined = props.activeApplicationRounds.reduce<
-    Date | undefined
-  >((acc, round) => {
+  const openAfterRound: Date | undefined = props.activeApplicationRounds.reduce<Date | undefined>((acc, round) => {
     if (round.reservationPeriodEnd == null) {
       return acc;
     }
@@ -707,9 +634,7 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
     return dayMax([acc, new Date(round.reservationPeriodEnd)]);
   }, undefined);
 
-  let minDay = new Date(
-    dayMax([minReservationDate, start, openAfterRound]) ?? minReservationDate
-  );
+  let minDay = new Date(dayMax([minReservationDate, start, openAfterRound]) ?? minReservationDate);
 
   // Find the first possible day
   let openTimes = reservableTimes.get(dateToKey(minDay)) ?? [];
@@ -768,9 +693,7 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
   return null;
 }
 
-export function isReservationUnitReservable(
-  reservationUnit: NotReservableFieldsFragmentNarrow
-):
+export function isReservationUnitReservable(reservationUnit: NotReservableFieldsFragmentNarrow):
   | {
       isReservable: false;
       reason: string;
@@ -820,9 +743,7 @@ export type NotReservableFieldsFragmentNarrow = Omit<
 >;
 
 // Why doesn't this check reservationEnds?
-function getNotReservableReason(
-  reservationUnit: NotReservableFieldsFragmentNarrow
-): string | null {
+function getNotReservableReason(reservationUnit: NotReservableFieldsFragmentNarrow): string | null {
   const {
     minReservationDuration,
     maxReservationDuration,
@@ -861,10 +782,7 @@ function getNotReservableReason(
   return null;
 }
 
-type AccessTypeDurations = Pick<
-  ReservationUnitAccessTypeNode,
-  "beginDate" | "accessType" | "pk"
->;
+type AccessTypeDurations = Pick<ReservationUnitAccessTypeNode, "beginDate" | "accessType" | "pk">;
 type AccessTypeDurationsExtended = {
   accessType: string;
   pk: number | null;
@@ -889,9 +807,7 @@ export function getReservationUnitAccessPeriods(
 
   return accessTypeDurationDates.reduceRight<nextEndDateIterator>(
     (acc, aT) => {
-      const endDate = acc.nextEndDate
-        ? sub(acc.nextEndDate, { days: 1 })
-        : null;
+      const endDate = acc.nextEndDate ? sub(acc.nextEndDate, { days: 1 }) : null;
       const beginDate = aT.begin;
       const accessTypeWithEndDate = {
         ...aT,

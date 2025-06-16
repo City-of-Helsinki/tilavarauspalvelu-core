@@ -10,43 +10,28 @@ import { addHours, isToday } from "date-fns";
  * Allowed to change state (except deny unconfirmed) only till it's ended.
  * Allowed to modify the reservation after ending as long as it's the same date or within one hour.
  */
-export function isPossibleToApprove(
-  state: Maybe<ReservationStateChoice>,
-  end: Date
-): boolean {
+export function isPossibleToApprove(state: Maybe<ReservationStateChoice>, end: Date): boolean {
   return state === ReservationStateChoice.RequiresHandling && end > new Date();
 }
 
 /// for regular reservations they can be denied until the end
 /// a full series of reservations can only be denied till the start of the last one
-export function isPossibleToDeny(
-  state: Maybe<ReservationStateChoice>,
-  end: Date
-): boolean {
+export function isPossibleToDeny(state: Maybe<ReservationStateChoice>, end: Date): boolean {
   if (state === ReservationStateChoice.RequiresHandling) {
     return true;
   }
   return state === ReservationStateChoice.Confirmed && end > new Date();
 }
 
-export function isPossibleToReturn(
-  state: Maybe<ReservationStateChoice>,
-  end: Date
-): boolean {
-  if (
-    state !== ReservationStateChoice.Denied &&
-    state !== ReservationStateChoice.Confirmed
-  ) {
+export function isPossibleToReturn(state: Maybe<ReservationStateChoice>, end: Date): boolean {
+  if (state !== ReservationStateChoice.Denied && state !== ReservationStateChoice.Confirmed) {
     return false;
   }
 
   return end > new Date();
 }
 
-export function isPossibleToEdit(
-  state: Maybe<ReservationStateChoice>,
-  end: Date
-): boolean {
+export function isPossibleToEdit(state: Maybe<ReservationStateChoice>, end: Date): boolean {
   if (state !== ReservationStateChoice.Confirmed) {
     return false;
   }

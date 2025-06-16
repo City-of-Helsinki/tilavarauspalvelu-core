@@ -62,10 +62,7 @@ const WarningIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <g fill="none" fillRule="evenodd">
       <path d="M0 0h24v24H0z" />
-      <path
-        fill="currentColor"
-        d="M12 3a9 9 0 110 18 9 9 0 010-18zm1 13v2h-2v-2h2zm0-10v8h-2V6h2z"
-      />
+      <path fill="currentColor" d="M12 3a9 9 0 110 18 9 9 0 010-18zm1 13v2h-2v-2h2zm0-10v8h-2V6h2z" />
     </g>
   </svg>
 );
@@ -78,13 +75,7 @@ type Props = {
   errorText?: string;
 };
 
-export function WeekdaysSelector({
-  label,
-  value = [],
-  disabled = false,
-  onChange,
-  errorText,
-}: Props) {
+export function WeekdaysSelector({ label, value = [], disabled = false, onChange, errorText }: Props) {
   const { t } = useTranslation();
 
   const handleDayToggle = (day: number) => {

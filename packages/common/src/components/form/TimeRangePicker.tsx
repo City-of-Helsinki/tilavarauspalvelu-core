@@ -2,17 +2,11 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { IconAlertCircleFill } from "hds-react";
-import {
-  type FieldValues,
-  Path,
-  useController,
-  UseControllerProps,
-} from "react-hook-form";
+import { type FieldValues, Path, useController, UseControllerProps } from "react-hook-form";
 import { ControlledSelect } from "./ControlledSelect";
 import { timeToMinutes } from "../../helpers";
 
-interface TimeRangePickerProps<T extends FieldValues>
-  extends Omit<UseControllerProps<T>, "name" | "disabled"> {
+interface TimeRangePickerProps<T extends FieldValues> extends Omit<UseControllerProps<T>, "name" | "disabled"> {
   names: { begin: Path<T>; end: Path<T> };
   error?: string;
   required?: { begin?: boolean; end?: boolean };
@@ -49,13 +43,9 @@ function populateTimes(populateTimesProps?: PopulateTimesProps): Option[] {
   let minute = beginHour % 1 ? (beginHour % 1) * 60 : 0;
 
   while (hour < endHour) {
-    const label = `${hour.toString().padStart(2, "0")}:${minute
-      .toString()
-      .padStart(2, "0")}`;
+    const label = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
     times.push({
-      label: `${hour.toString().padStart(2, "0")}:${minute
-        .toString()
-        .padStart(2, "0")}`,
+      label: `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`,
       value: label,
     });
     minute += interval;
@@ -104,9 +94,7 @@ export function TimeRangePicker<T extends FieldValues>({
 
   const populatedTimeOptions = populateTimes();
   const endTimeIsBeforeStartTime =
-    beginField.value &&
-    endField.value &&
-    timeToMinutes(beginField.value) >= timeToMinutes(endField.value);
+    beginField.value && endField.value && timeToMinutes(beginField.value) >= timeToMinutes(endField.value);
 
   if (control == null) {
     return null;

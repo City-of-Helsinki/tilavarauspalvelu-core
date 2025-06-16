@@ -3,10 +3,7 @@ import Page3 from "@/pages/applications/[id]/page3";
 import { render, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
 import { createGraphQLMocks } from "@test/gql.mocks";
-import {
-  createMockApplicationFragment,
-  type CreateMockApplicationFragmentProps,
-} from "@test/application.mocks";
+import { createMockApplicationFragment, type CreateMockApplicationFragmentProps } from "@test/application.mocks";
 import userEvent from "@testing-library/user-event";
 import { getApplicationPath } from "@/modules/urls";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
@@ -52,9 +49,7 @@ vi.mock("next/router", () => ({
 }));
 
 type ApplicationPage3 = NonNullable<ApplicationPage3Query["application"]>;
-function customRender(
-  props: CreateMockApplicationFragmentProps = {}
-): ReturnType<typeof render> {
+function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnType<typeof render> {
   // TODO need a graphql mutation mock (but have to have separate error / success cases)
   if (props.page == null) {
     props.page = "page2";
@@ -72,24 +67,16 @@ describe("Application Page3", () => {
   test("smoke: should render page with initial data", () => {
     // TODO all of this is common to all application funnel pages
     const view = customRender();
-    expect(
-      view.getByRole("heading", { name: "application:Page3.subHeading" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("heading", { name: "application:Page3.subHeading" })).toBeInTheDocument();
     expect(view.getByRole("button", { name: "common:next" }));
-    expect(
-      view.getByRole("link", { name: "breadcrumb:applications" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("link", { name: "breadcrumb:applications" })).toBeInTheDocument();
     expect(view.getByText("breadcrumb:application")).toBeInTheDocument();
-    expect(
-      view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })).toBeInTheDocument();
 
     const form = view.getByTestId("application__page3--form");
     expect(form).toBeInTheDocument();
     // TODO this doesn't match getByRole("heading")
-    expect(
-      within(form).getByText("application:Page3.sectionHeadings.basicInfo")
-    );
+    expect(within(form).getByText("application:Page3.sectionHeadings.basicInfo"));
     // TODO check that we have a single application section with the pick times calendar
   });
 
@@ -109,9 +96,7 @@ describe("Application Page3", () => {
       name: "common:next",
     });
     await userEvent.click(nextButton);
-    expect(mockedRouterPush).toHaveBeenCalledWith(
-      getApplicationPath(1, "page4")
-    );
+    expect(mockedRouterPush).toHaveBeenCalledWith(getApplicationPath(1, "page4"));
   });
   test.todo("should fail to send if form is invalid");
 });

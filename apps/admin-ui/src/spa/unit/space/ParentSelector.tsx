@@ -3,27 +3,14 @@ import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 import { Select } from "hds-react";
 import { UnitSpacesQuery, useUnitSpacesQuery } from "@gql/gql-types";
-import {
-  base64encode,
-  convertOptionToHDS,
-  filterNonNullable,
-  toNumber,
-} from "common/src/helpers";
+import { base64encode, convertOptionToHDS, filterNonNullable, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
-function spacesAsHierarchy(
-  unit: UnitSpacesQuery["unit"] | undefined,
-  paddingChar: string
-) {
+function spacesAsHierarchy(unit: UnitSpacesQuery["unit"] | undefined, paddingChar: string) {
   const allSpaces = filterNonNullable(unit?.spaces);
   type SpaceNode = (typeof allSpaces)[0];
 
-  function recurse(
-    parent: SpaceNode,
-    spaces: SpaceNode[],
-    depth: number,
-    pad: string
-  ): SpaceNode[] {
+  function recurse(parent: SpaceNode, spaces: SpaceNode[], depth: number, pad: string): SpaceNode[] {
     const newParent = {
       ...parent,
       nameFi: "".padStart(depth, pad) + (parent.nameFi ?? "-"),
@@ -34,16 +21,12 @@ function spacesAsHierarchy(
     if (children.length === 0) {
       return [newParent];
     }
-    const c = children.flatMap((space) =>
-      recurse(space, spaces, depth + 1, pad)
-    );
+    const c = children.flatMap((space) => recurse(space, spaces, depth + 1, pad));
     return [newParent, ...c];
   }
 
   const roots = allSpaces.filter((e) => e.parent == null);
-  return roots.flatMap((rootSpace) =>
-    recurse(rootSpace, allSpaces, 0, paddingChar)
-  );
+  return roots.flatMap((rootSpace) => recurse(rootSpace, allSpaces, 0, paddingChar));
 }
 
 type Props = {
@@ -90,13 +73,9 @@ export function ParentSelector({
   // NOTE there used to be children filtering, but it filtered out all possible options
   // this handles the first level of children, but if it's a deeper hierarchy, it's not handled
   const opts = unitSpaces
-    .filter(
-      (space) =>
-        selfPk == null || (space.pk !== selfPk && space.parent?.pk !== selfPk)
-    )
+    .filter((space) => selfPk == null || (space.pk !== selfPk && space.parent?.pk !== selfPk))
     .map((space) => ({
-      label:
-        space.nameFi != null && space.nameFi.length > 0 ? space.nameFi : "-",
+      label: space.nameFi != null && space.nameFi.length > 0 ? space.nameFi : "-",
       value: space.pk ?? 0,
     }));
 

@@ -7,18 +7,11 @@ interface IProps {
   unitId: number;
 }
 
-export function ReservationUnitList({
-  reservationUnits,
-  unitId,
-}: IProps): JSX.Element {
+export function ReservationUnitList({ reservationUnits, unitId }: IProps): JSX.Element {
   return (
     <>
       {reservationUnits.map((resUnit) => (
-        <ReservationUnitCard
-          reservationUnit={resUnit}
-          unitId={unitId}
-          key={resUnit.pk}
-        />
+        <ReservationUnitCard reservationUnit={resUnit} unitId={unitId} key={resUnit.pk} />
       ))}
     </>
   );

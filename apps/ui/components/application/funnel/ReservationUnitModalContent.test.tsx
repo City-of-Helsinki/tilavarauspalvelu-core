@@ -4,10 +4,7 @@ import { createGraphQLMocks } from "@test/gql.mocks";
 import { createMockApplicationRound } from "@test/application.mocks";
 import { type CreateGraphQLMockProps } from "@test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
-import {
-  ReservationUnitModalContent,
-  type ReservationUnitModalProps,
-} from "./ReservationUnitModalContent";
+import { ReservationUnitModalContent, type ReservationUnitModalProps } from "./ReservationUnitModalContent";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
@@ -44,12 +41,7 @@ interface CustomRenderProps extends CreateGraphQLMockProps {
 }
 
 function customRender(
-  {
-    handleAdd = vi.fn(),
-    handleRemove = vi.fn(),
-    currentReservationUnits = [],
-    ...mockProps
-  }: CustomRenderProps = {
+  { handleAdd = vi.fn(), handleRemove = vi.fn(), currentReservationUnits = [], ...mockProps }: CustomRenderProps = {
     handleAdd: vi.fn(),
     handleRemove: vi.fn(),
     currentReservationUnits: [],
@@ -96,9 +88,7 @@ describe("Modal render", () => {
     const cards = view.getAllByTestId("ModalContent__reservationUnitCard");
     expect(cards).toHaveLength(10);
     for (let i = 0; i < 10; i++) {
-      expect(
-        view.getByRole("heading", { name: `ReservationUnit ${i + 1} FI` })
-      ).toBeInTheDocument();
+      expect(view.getByRole("heading", { name: `ReservationUnit ${i + 1} FI` })).toBeInTheDocument();
     }
   });
 
@@ -131,10 +121,7 @@ describe("Modal render", () => {
   });
 
   test("should render remove button for all", async () => {
-    const currentReservationUnits = Array.from(
-      { length: 10 },
-      (_, i) => i + 1
-    ).map((i) => ({ pk: i }));
+    const currentReservationUnits = Array.from({ length: 10 }, (_, i) => i + 1).map((i) => ({ pk: i }));
     const view = customRender({ currentReservationUnits });
     await isReady(view);
     const cards = view.getAllByTestId("ModalContent__reservationUnitCard");
@@ -169,86 +156,80 @@ describe("Modal search", () => {
 });
 
 describe("modal card actions", () => {
-  test.for(Array.from({ length: 10 }).map((_, i) => i))(
-    "should add correct %s reservation units",
-    async (index) => {
-      const addCb = vi.fn();
-      const view = customRender({ handleAdd: addCb });
-      await isReady(view);
-      const user = userEvent.setup();
+  test.for(Array.from({ length: 10 }).map((_, i) => i))("should add correct %s reservation units", async (index) => {
+    const addCb = vi.fn();
+    const view = customRender({ handleAdd: addCb });
+    await isReady(view);
+    const user = userEvent.setup();
 
-      const cards = view.getAllByTestId("ModalContent__reservationUnitCard");
-      expect(cards).toHaveLength(10);
-      const card = cards[index];
-      if (!card) {
-        throw new Error("No card found");
-      }
-      const select = within(card).getByRole("button", {
+    const cards = view.getAllByTestId("ModalContent__reservationUnitCard");
+    expect(cards).toHaveLength(10);
+    const card = cards[index];
+    if (!card) {
+      throw new Error("No card found");
+    }
+    const select = within(card).getByRole("button", {
+      name: "reservationUnitModal:selectReservationUnit",
+    });
+    if (!select) {
+      throw new Error("No select found");
+    }
+    await user.click(select);
+    expect(addCb).toHaveBeenCalledTimes(1);
+    expect(addCb).toHaveBeenLastCalledWith({
+      pk: index + 1,
+    });
+    // button value is not changed since it is not a controlled component
+    expect(
+      within(card).getByRole("button", {
         name: "reservationUnitModal:selectReservationUnit",
-      });
-      if (!select) {
-        throw new Error("No select found");
-      }
-      await user.click(select);
-      expect(addCb).toHaveBeenCalledTimes(1);
-      expect(addCb).toHaveBeenLastCalledWith({
-        pk: index + 1,
-      });
-      // button value is not changed since it is not a controlled component
-      expect(
-        within(card).getByRole("button", {
-          name: "reservationUnitModal:selectReservationUnit",
-        })
-      ).toBeInTheDocument();
-      expect(
-        within(card).queryByRole("button", {
-          name: "reservationUnitModal:deselectReservationUnit",
-        })
-      ).not.toBeInTheDocument();
-    }
-  );
-
-  test.for(Array.from({ length: 10 }).map((_, i) => i))(
-    "should remove selected %s reservation unit",
-    async (index) => {
-      const addCb = vi.fn();
-      const removeCb = vi.fn();
-      const view = customRender({
-        handleAdd: addCb,
-        handleRemove: removeCb,
-        // select all we expect the correct one to be deselected
-        currentReservationUnits: Array.from({ length: 10 })
-          .map((_, i) => i + 1)
-          .map((pk) => ({ pk })),
-      });
-      await isReady(view);
-      const user = userEvent.setup();
-
-      const cards = view.getAllByTestId("ModalContent__reservationUnitCard");
-      expect(cards).toHaveLength(10);
-      const card = cards[index];
-      if (!card) {
-        throw new Error("No card found");
-      }
-      const select = within(card).queryByRole("button", {
+      })
+    ).toBeInTheDocument();
+    expect(
+      within(card).queryByRole("button", {
         name: "reservationUnitModal:deselectReservationUnit",
-      });
-      expect(
-        within(card).queryByRole("button", {
-          name: "reservationUnitModal:selectReservationUnit",
-        })
-      ).not.toBeInTheDocument();
-      if (!select) {
-        throw new Error("No select found");
-      }
-      await user.click(select);
-      expect(removeCb).toHaveBeenCalledTimes(1);
-      expect(removeCb).toHaveBeenLastCalledWith({
-        pk: index + 1,
-      });
-      expect(addCb).toHaveBeenCalledTimes(0);
+      })
+    ).not.toBeInTheDocument();
+  });
+
+  test.for(Array.from({ length: 10 }).map((_, i) => i))("should remove selected %s reservation unit", async (index) => {
+    const addCb = vi.fn();
+    const removeCb = vi.fn();
+    const view = customRender({
+      handleAdd: addCb,
+      handleRemove: removeCb,
+      // select all we expect the correct one to be deselected
+      currentReservationUnits: Array.from({ length: 10 })
+        .map((_, i) => i + 1)
+        .map((pk) => ({ pk })),
+    });
+    await isReady(view);
+    const user = userEvent.setup();
+
+    const cards = view.getAllByTestId("ModalContent__reservationUnitCard");
+    expect(cards).toHaveLength(10);
+    const card = cards[index];
+    if (!card) {
+      throw new Error("No card found");
     }
-  );
+    const select = within(card).queryByRole("button", {
+      name: "reservationUnitModal:deselectReservationUnit",
+    });
+    expect(
+      within(card).queryByRole("button", {
+        name: "reservationUnitModal:selectReservationUnit",
+      })
+    ).not.toBeInTheDocument();
+    if (!select) {
+      throw new Error("No select found");
+    }
+    await user.click(select);
+    expect(removeCb).toHaveBeenCalledTimes(1);
+    expect(removeCb).toHaveBeenLastCalledWith({
+      pk: index + 1,
+    });
+    expect(addCb).toHaveBeenCalledTimes(0);
+  });
 });
 
 describe("modal actions", () => {
@@ -261,9 +242,7 @@ describe("modal actions", () => {
 // TODO should create a utility that waits for loading-spinner to be hidden instead
 // this is too specific for search forms and is brittle in case we disable
 // submit for other reasons (like errors)
-async function isReady(
-  view: ReturnType<typeof customRender>
-): Promise<HTMLElement> {
+async function isReady(view: ReturnType<typeof customRender>): Promise<HTMLElement> {
   const submitBtn = view.getByRole("button", {
     name: "searchForm:searchButton",
   });

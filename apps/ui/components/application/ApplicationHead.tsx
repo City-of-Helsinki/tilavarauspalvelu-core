@@ -10,12 +10,7 @@ export function ApplicationHead({
   title: string;
 }): JSX.Element {
   return (
-    <Flex
-      $direction="row"
-      $alignItems="flex-start"
-      $justifyContent="space-between"
-      $wrap="wrap"
-    >
+    <Flex $direction="row" $alignItems="flex-start" $justifyContent="space-between" $wrap="wrap">
       <H1 $noMargin>{title}</H1>
       <ApplicationStatusLabel status={status} user="customer" />
     </Flex>

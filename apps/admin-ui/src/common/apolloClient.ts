@@ -1,10 +1,4 @@
-import {
-  ApolloClient,
-  ApolloLink,
-  HttpLink,
-  InMemoryCache,
-  from,
-} from "@apollo/client";
+import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, from } from "@apollo/client";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore -- types require nodenext which breaks bundler option that breaks the build
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
@@ -72,9 +66,7 @@ export function createClient(apiBaseUrl: string) {
         },
       },
     }),
-    link: isBrowser
-      ? from([authLink, errorLink, uploadLink])
-      : from([authLink, errorLink, httpLink]),
+    link: isBrowser ? from([authLink, errorLink, uploadLink]) : from([authLink, errorLink, httpLink]),
     ssrMode: !isBrowser,
   });
 }

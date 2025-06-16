@@ -11,9 +11,7 @@ function eachDayOfInterval(start: number, end: number, stepDays = 1) {
   }
   const daysWithoutCeil = (end - start) / (MS_IN_DAY * stepDays);
   const days = Math.ceil(daysWithoutCeil);
-  return Array.from(Array(days)).map(
-    (_, i) => i * (MS_IN_DAY * stepDays) + start
-  );
+  return Array.from(Array(days)).map((_, i) => i * (MS_IN_DAY * stepDays) + start);
 }
 
 // epoch is Thue (4)
@@ -37,21 +35,13 @@ export function generateReservations(props: TimeSelectionForm) {
     return [];
   }
 
-  const {
-    startingDate,
-    startTime,
-    endingDate,
-    endTime,
-    repeatPattern,
-    repeatOnDays,
-  } = vals;
+  const { startingDate, startTime, endingDate, endTime, repeatPattern, repeatOnDays } = vals;
 
   if (repeatOnDays.length === 0) {
     return [];
   }
 
-  const utcDate = (d: Date) =>
-    Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+  const utcDate = (d: Date) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
   const min = (a: number, b: number) => (a < b ? a : b);
   const max = (a: number, b: number) => (a > b ? a : b);
 
@@ -70,10 +60,7 @@ export function generateReservations(props: TimeSelectionForm) {
       return [];
     }
 
-    const sDay = max(
-      utcDate(new Date()),
-      utcDate(fromUIDateUnsafe(startingDate))
-    );
+    const sDay = max(utcDate(new Date()), utcDate(fromUIDateUnsafe(startingDate)));
 
     // end date with time 23:59:59
     const eDay = utcDate(fromUIDateUnsafe(endingDate)) + (MS_IN_DAY - 1);
@@ -81,9 +68,7 @@ export function generateReservations(props: TimeSelectionForm) {
 
     return firstWeek
       .filter((time) => repeatOnDays.includes(toMondayFirst(dayOfWeek(time))))
-      .map((x) =>
-        eachDayOfInterval(x, eDay, repeatPattern === "weekly" ? 7 : 14)
-      )
+      .map((x) => eachDayOfInterval(x, eDay, repeatPattern === "weekly" ? 7 : 14))
       .reduce((acc, x) => [...acc, ...x], [])
       .map((day) => ({
         date: new Date(day),

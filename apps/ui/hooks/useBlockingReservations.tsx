@@ -35,9 +35,9 @@ export function useBlockingReservations(
     },
   });
 
-  const blockingReservations = filterNonNullable(
-    data?.affectingReservations
-  ).filter((r) => r.pk !== currentReservationPk);
+  const blockingReservations = filterNonNullable(data?.affectingReservations).filter(
+    (r) => r.pk !== currentReservationPk
+  );
 
   return {
     blockingReservations,
@@ -46,18 +46,8 @@ export function useBlockingReservations(
 }
 
 export const AFFECTING_RESERVATIONS_QUERY = gql`
-  query AffectingReservations(
-    $pk: Int!
-    $beginDate: Date!
-    $endDate: Date!
-    $state: [ReservationStateChoice]
-  ) {
-    affectingReservations(
-      forReservationUnits: [$pk]
-      beginDate: $beginDate
-      endDate: $endDate
-      state: $state
-    ) {
+  query AffectingReservations($pk: Int!, $beginDate: Date!, $endDate: Date!, $state: [ReservationStateChoice]) {
+    affectingReservations(forReservationUnits: [$pk], beginDate: $beginDate, endDate: $endDate, state: $state) {
       ...BlockingReservationFields
     }
   }

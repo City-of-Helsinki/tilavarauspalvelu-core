@@ -70,10 +70,7 @@ const StyledContainerMedium = styled(Flex)`
 `;
 
 // Terms PK is not a number but any valid string
-const makeTermsOptions = (
-  parameters: ReservationUnitEditorParametersQuery | undefined,
-  termsType: TermsType
-) => {
+const makeTermsOptions = (parameters: ReservationUnitEditorParametersQuery | undefined, termsType: TermsType) => {
   return filterNonNullable(parameters?.termsOfUse?.edges.map((e) => e?.node))
     .filter((tou) => termsType === tou?.termsType)
     .map((tou) => {
@@ -89,17 +86,12 @@ const useImageMutations = () => {
   const [delImage] = useDeleteImageMutation();
   const [updateImagetype] = useUpdateImageMutation();
 
-  const reconcileImageChanges = async (
-    resUnitPk: number,
-    images: ImageFormType[]
-  ): Promise<boolean> => {
+  const reconcileImageChanges = async (resUnitPk: number, images: ImageFormType[]): Promise<boolean> => {
     // delete deleted images
     try {
       const deletePromises = images
         .filter((image) => image.deleted)
-        .map((image) =>
-          delImage({ variables: { pk: image.pk?.toString() ?? "" } })
-        );
+        .map((image) => delImage({ variables: { pk: image.pk?.toString() ?? "" } }));
       await Promise.all(deletePromises);
     } catch (_) {
       return false;
@@ -191,34 +183,20 @@ function ReservationUnitEditor({
 
   // ----------------------------- Constants ---------------------------------
 
-  const taxPercentageOptions = filterNonNullable(
-    parametersData?.taxPercentages?.edges.map((e) => e?.node)
-  ).map((n) => ({
-    value: Number(n.value),
-    pk: n.pk ?? -1,
-    label: n.value,
-  }));
-  const pricingTermsOptions = makeTermsOptions(
-    parametersData,
-    TermsType.PricingTerms
+  const taxPercentageOptions = filterNonNullable(parametersData?.taxPercentages?.edges.map((e) => e?.node)).map(
+    (n) => ({
+      value: Number(n.value),
+      pk: n.pk ?? -1,
+      label: n.value,
+    })
   );
+  const pricingTermsOptions = makeTermsOptions(parametersData, TermsType.PricingTerms);
 
-  const serviceSpecificTermsOptions = makeTermsOptions(
-    parametersData,
-    TermsType.ServiceTerms
-  );
-  const paymentTermsOptions = makeTermsOptions(
-    parametersData,
-    TermsType.PaymentTerms
-  );
-  const cancellationTermsOptions = makeTermsOptions(
-    parametersData,
-    TermsType.CancellationTerms
-  );
+  const serviceSpecificTermsOptions = makeTermsOptions(parametersData, TermsType.ServiceTerms);
+  const paymentTermsOptions = makeTermsOptions(parametersData, TermsType.PaymentTerms);
+  const cancellationTermsOptions = makeTermsOptions(parametersData, TermsType.CancellationTerms);
 
-  const metadataOptions = filterNonNullable(
-    parametersData?.metadataSets?.edges.map((e) => e?.node)
-  ).map((n) => ({
+  const metadataOptions = filterNonNullable(parametersData?.metadataSets?.edges.map((e) => e?.node)).map((n) => ({
     value: n?.pk ?? -1,
     label: n?.name ?? "no-name",
   }));
@@ -233,10 +211,8 @@ function ReservationUnitEditor({
   const { getValues, watch, handleSubmit } = form;
 
   const kind = watch("reservationKind");
-  const isDirect =
-    kind === ReservationKind.Direct || kind === ReservationKind.DirectAndSeason;
-  const isSeasonal =
-    kind === ReservationKind.Season || kind === ReservationKind.DirectAndSeason;
+  const isDirect = kind === ReservationKind.Direct || kind === ReservationKind.DirectAndSeason;
+  const isSeasonal = kind === ReservationKind.Season || kind === ReservationKind.DirectAndSeason;
 
   // unsafe because the handleSubmit doesn't pass return value (so throw is the only way to manipulate control flow)
   const onSubmit = async (formValues: ReservationUnitEditFormValues) => {
@@ -300,9 +276,7 @@ function ReservationUnitEditor({
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <StyledContainerMedium>
         <DisplayUnit
-          heading={
-            reservationUnit?.nameFi ?? t("ReservationUnitEditor.defaultHeading")
-          }
+          heading={reservationUnit?.nameFi ?? t("ReservationUnitEditor.defaultHeading")}
           unit={unit}
           reservationState={reservationUnit?.reservationState ?? undefined}
           unitState={reservationUnit?.publishingState ?? undefined}
@@ -337,15 +311,9 @@ function ReservationUnitEditor({
           />
         )}
         <CommunicationSection form={form} />
-        <OpeningHoursSection
-          reservationUnit={reservationUnit}
-          previewUrlPrefix={previewUrlPrefix}
-        />
+        <OpeningHoursSection reservationUnit={reservationUnit} previewUrlPrefix={previewUrlPrefix} />
         {isSeasonal && <SeasonalSection form={form} />}
-        <AccessTypeSection
-          form={form}
-          accessTypes={reservationUnit?.accessTypes || []}
-        />
+        <AccessTypeSection form={form} accessTypes={reservationUnit?.accessTypes || []} />
       </StyledContainerMedium>
 
       <BottomButtonsStripe
@@ -377,10 +345,7 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
     refetch,
   } = useReservationUnitEditQuery({
     variables: { id },
-    skip:
-      !reservationUnitPk ||
-      Number(reservationUnitPk) === 0 ||
-      Number.isNaN(Number(reservationUnitPk)),
+    skip: !reservationUnitPk || Number(reservationUnitPk) === 0 || Number.isNaN(Number(reservationUnitPk)),
   });
 
   const reservationUnit = data?.reservationUnit ?? undefined;
@@ -611,18 +576,8 @@ export const CREATE_RESERVATION_UNIT = gql`
 
 // TODO this allows for a pk input (is it for a change? i.e. not needing to delete and create a new one)
 export const CREATE_IMAGE = gql`
-  mutation CreateImage(
-    $image: Upload!
-    $reservationUnit: Int!
-    $imageType: ImageType!
-  ) {
-    createReservationUnitImage(
-      input: {
-        image: $image
-        reservationUnit: $reservationUnit
-        imageType: $imageType
-      }
-    ) {
+  mutation CreateImage($image: Upload!, $reservationUnit: Int!, $imageType: ImageType!) {
+    createReservationUnitImage(input: { image: $image, reservationUnit: $reservationUnit, imageType: $imageType }) {
       pk
     }
   }
@@ -645,9 +600,7 @@ export const UPDATE_IMAGE_TYPE = gql`
 `;
 
 export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
-  query ReservationUnitEditorParameters(
-    $equipmentsOrderBy: EquipmentOrderingChoices
-  ) {
+  query ReservationUnitEditorParameters($equipmentsOrderBy: EquipmentOrderingChoices) {
     equipmentsAll(orderBy: [$equipmentsOrderBy]) {
       id
       nameFi

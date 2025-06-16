@@ -10,10 +10,7 @@ import {
   type ReservationInfoCardFragment,
   ReservationStateChoice,
 } from "@gql/gql-types";
-import {
-  type CreateGraphQLMockProps,
-  generateNameFragment,
-} from "@/test/test.gql.utils";
+import { type CreateGraphQLMockProps, generateNameFragment } from "@/test/test.gql.utils";
 import { base64encode } from "common/src/helpers";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
@@ -39,26 +36,20 @@ const customRender = (
 describe("Component: ReservationInfoCard", () => {
   it("should render the component", () => {
     customRender();
-    expect(
-      screen.getByTestId("reservation__reservation-info-card__content")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("reservation__reservation-info-card__content")).toBeInTheDocument();
   });
 
   it("should show reservation unit name according to the reservation unit for the reservation", () => {
     customRender();
     const mockReservationData = createMockReservationInfoCard();
     const reservationUnit = mockReservationData.reservationUnits[0];
-    expect(
-      screen.getByText(reservationUnit?.nameFi ?? "Test Reservation Unit FI")
-    ).toBeInTheDocument();
+    expect(screen.getByText(reservationUnit?.nameFi ?? "Test Reservation Unit FI")).toBeInTheDocument();
   });
 
   it("should show the reservation id", () => {
     customRender();
     const mockReservationData = createMockReservationInfoCard();
-    expect(
-      screen.getByText(`${mockReservationData.pk ?? "1"}`)
-    ).toBeInTheDocument();
+    expect(screen.getByText(`${mockReservationData.pk ?? "1"}`)).toBeInTheDocument();
   });
 
   it("should show the reservation duration", () => {
@@ -74,9 +65,7 @@ describe("Component: ReservationInfoCard", () => {
     });
     expect(
       screen.getByText((_, element) => {
-        return (
-          element?.textContent?.trim() === "common:price: prices:priceFree"
-        );
+        return element?.textContent?.trim() === "common:price: prices:priceFree";
       })
     ).toBeInTheDocument();
   });
@@ -87,25 +76,17 @@ describe("Component: ReservationInfoCard", () => {
     });
     expect(
       screen.getByText((_, element) => {
-        return (
-          element?.textContent?.trim() ===
-          'common:price: 10,00 € (common:inclTax {"taxPercentage":"25,5"})'
-        );
+        return element?.textContent?.trim() === 'common:price: 10,00 € (common:inclTax {"taxPercentage":"25,5"})';
       })
     ).toBeInTheDocument();
   });
 });
 
 describe("Access code", () => {
-  it.todo(
-    "should show the access code if the reservationType is ACCESS_CODE and it exists",
-    () => {}
-  );
+  it.todo("should show the access code if the reservationType is ACCESS_CODE and it exists", () => {});
 });
 
-function createMockReservationInfoCard(
-  price?: string
-): ReservationInfoCardFragment {
+function createMockReservationInfoCard(price?: string): ReservationInfoCardFragment {
   return {
     accessType: AccessType.Unrestricted,
     applyingForFreeOfCharge: false,
@@ -159,8 +140,6 @@ function createMockReservationInfoCard(
   };
 }
 
-function createInfoCardReservationMock(): Readonly<
-  NonNullable<ReservationInfoCardFragment>
-> {
+function createInfoCardReservationMock(): Readonly<NonNullable<ReservationInfoCardFragment>> {
   return createMockReservationInfoCard();
 }

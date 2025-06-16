@@ -1,11 +1,5 @@
 import React from "react";
-import Document, {
-  DocumentContext,
-  Html,
-  Head,
-  Main,
-  NextScript,
-} from "next/document";
+import Document, { DocumentContext, Html, Head, Main, NextScript } from "next/document";
 import { ServerStyleSheet } from "styled-components";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: this works in ui/pages/_document.js for some reason
@@ -20,15 +14,11 @@ export default class MyDocument extends Document {
     try {
       ctx.renderPage = () =>
         originalRenderPage({
-          enhanceApp: (App) => (props) =>
-            sheet.collectStyles(<App {...props} />),
+          enhanceApp: (App) => (props) => sheet.collectStyles(<App {...props} />),
         });
 
       const initialProps = await Document.getInitialProps(ctx);
-      const hdsCriticalRules = await getCriticalHdsRules(
-        initialProps.html,
-        hdsStyles
-      );
+      const hdsCriticalRules = await getCriticalHdsRules(initialProps.html, hdsStyles);
 
       return {
         ...initialProps,
@@ -57,15 +47,8 @@ export default class MyDocument extends Document {
           <meta name="color-scheme" content="light only" />
           <meta name="theme-color" content="#0000bf" />
           <link rel="icon" href={`${basePath}/favicon-32x32.ico`} sizes="any" />
-          <link
-            rel="icon"
-            href={`${basePath}/favicon.svg`}
-            type="image/svg+xml"
-          />
-          <link
-            rel="apple-touch-icon"
-            href={`${basePath}/apple-touch-icon.png`}
-          />
+          <link rel="icon" href={`${basePath}/favicon.svg`} type="image/svg+xml" />
+          <link rel="apple-touch-icon" href={`${basePath}/apple-touch-icon.png`} />
           <link rel="manifest" href={`${basePath}/manifest.webmanifest`} />
         </Head>
         <body>

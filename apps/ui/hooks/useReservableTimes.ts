@@ -1,18 +1,11 @@
 import { ReservationUnitNode } from "@/gql/gql-types";
-import {
-  generateReservableMap,
-  type ReservableMap,
-} from "@/modules/reservable";
+import { generateReservableMap, type ReservableMap } from "@/modules/reservable";
 import { filterNonNullable } from "common/src/helpers";
 import { useMemo } from "react";
 
-export function useReservableTimes(
-  reservationUnit: Pick<ReservationUnitNode, "reservableTimeSpans">
-): ReservableMap {
+export function useReservableTimes(reservationUnit: Pick<ReservationUnitNode, "reservableTimeSpans">): ReservableMap {
   const timespans: ReservableMap = useMemo(() => {
-    const reservableTimeSpans = filterNonNullable(
-      reservationUnit.reservableTimeSpans
-    );
+    const reservableTimeSpans = filterNonNullable(reservationUnit.reservableTimeSpans);
     return generateReservableMap(reservableTimeSpans);
   }, [reservationUnit.reservableTimeSpans]);
 

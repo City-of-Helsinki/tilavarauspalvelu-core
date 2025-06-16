@@ -68,13 +68,10 @@ export function ReviewEndAllocation({
   };
 
   const hasFailed =
-    applicationRound.reservationCreationStatus ===
-    ApplicationRoundReservationCreationStatusChoice.Failed;
+    applicationRound.reservationCreationStatus === ApplicationRoundReservationCreationStatusChoice.Failed;
 
-  const isHandled =
-    applicationRound.status === ApplicationRoundStatusChoice.Handled;
-  const isResultsSent =
-    applicationRound.status === ApplicationRoundStatusChoice.ResultsSent;
+  const isHandled = applicationRound.status === ApplicationRoundStatusChoice.Handled;
+  const isResultsSent = applicationRound.status === ApplicationRoundStatusChoice.ResultsSent;
 
   const showSendResults = isHandled && !isInProgress;
   // TODO futher work: (separate spec)
@@ -88,24 +85,18 @@ export function ReviewEndAllocation({
   const modalAcceptLabel = showSendResults
     ? t("ApplicationRound.confirmation.sendResultsAccept")
     : t("ApplicationRound.confirmation.endAllocationAccept");
-  const moddalCancelLabel = t(
-    "ApplicationRound.confirmation.endAllocationCancel"
-  );
+  const moddalCancelLabel = t("ApplicationRound.confirmation.endAllocationCancel");
 
   // TODO add resultsSentBody
   // requires refoctoring this a bit so we don't do multiple ternaries
-  const infoBody = showSendResults
-    ? t("ApplicationRound.info.handledBody")
-    : t("ApplicationRound.info.allocatedBody");
+  const infoBody = showSendResults ? t("ApplicationRound.info.handledBody") : t("ApplicationRound.info.allocatedBody");
   const infoButton = hasFailed
     ? t("ApplicationRound.info.failedBtn")
     : showSendResults
       ? t("ApplicationRound.info.sendResultsBtn")
       : t("ApplicationRound.info.createBtn");
 
-  const units = filterNonNullable(
-    applicationRound.reservationUnits.flatMap((ru) => ru.unit?.pk)
-  );
+  const units = filterNonNullable(applicationRound.reservationUnits.flatMap((ru) => ru.unit?.pk));
   const { hasPermission: canEndAllocation } = useCheckPermission({
     units,
     permission: UserPermissionChoice.CanManageApplications,
@@ -118,9 +109,7 @@ export function ReviewEndAllocation({
         variant={isInProgress ? ButtonVariant.Clear : ButtonVariant.Primary}
         iconStart={isInProgress ? <LoadingSpinner small /> : undefined}
         onClick={() => setWaitingForHandle(true)}
-        disabled={
-          hasFailed || isResultsSent || !canEndAllocation || isInProgress
-        }
+        disabled={hasFailed || isResultsSent || !canEndAllocation || isInProgress}
       >
         {infoButton}
       </Button>

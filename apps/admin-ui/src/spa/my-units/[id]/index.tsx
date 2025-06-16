@@ -79,12 +79,10 @@ export function MyUnitView() {
 
   const recurringReservationUrl = getRecurringReservationUrl(pk);
 
-  const reservationUnitOptions = (unit?.reservationUnits ?? []).map(
-    ({ pk, nameFi }) => ({
-      label: nameFi ?? "-",
-      value: pk ?? 0,
-    })
-  );
+  const reservationUnitOptions = (unit?.reservationUnits ?? []).map(({ pk, nameFi }) => ({
+    label: nameFi ?? "-",
+    value: pk ?? 0,
+  }));
 
   const handleOpenModal = () => {
     setModalContent(
@@ -103,8 +101,7 @@ export function MyUnitView() {
 
   const title = loading ? t("common.loading") : (unit?.nameFi ?? "-");
   const location = unit?.location ? parseAddress(unit.location) : "-";
-  const canCreateReservations =
-    hasPermission && unit != null && reservationUnitOptions.length > 0;
+  const canCreateReservations = hasPermission && unit != null && reservationUnitOptions.length > 0;
   return (
     <>
       <TitleSection>
@@ -121,31 +118,21 @@ export function MyUnitView() {
         >
           {t("MyUnits.Calendar.header.createReservation")}
         </Button>
-        <ButtonLikeLink
-          to={canCreateReservations ? recurringReservationUrl : ""}
-          disabled={!canCreateReservations}
-        >
+        <ButtonLikeLink to={canCreateReservations ? recurringReservationUrl : ""} disabled={!canCreateReservations}>
           {t("MyUnits.Calendar.header.recurringReservation")}
         </ButtonLikeLink>
       </Flex>
       <TabWrapper>
         <Tabs initiallyActiveTab={activeTab}>
           <Tabs.TabList>
-            <Tabs.Tab onClick={() => handleTabChange("unit")}>
-              {t("MyUnits.Calendar.Tabs.byReservationUnit")}
-            </Tabs.Tab>
-            <Tabs.Tab onClick={() => handleTabChange("reservation-unit")}>
-              {t("MyUnits.Calendar.Tabs.byUnit")}
-            </Tabs.Tab>
+            <Tabs.Tab onClick={() => handleTabChange("unit")}>{t("MyUnits.Calendar.Tabs.byReservationUnit")}</Tabs.Tab>
+            <Tabs.Tab onClick={() => handleTabChange("reservation-unit")}>{t("MyUnits.Calendar.Tabs.byUnit")}</Tabs.Tab>
           </Tabs.TabList>
           <TabPanel>
             <UnitReservations reservationUnitOptions={reservationUnitOptions} />
           </TabPanel>
           <TabPanel>
-            <ReservationUnitCalendarView
-              reservationUnitOptions={reservationUnitOptions}
-              unitPk={Number(pk)}
-            />
+            <ReservationUnitCalendarView reservationUnitOptions={reservationUnitOptions} unitPk={Number(pk)} />
           </TabPanel>
         </Tabs>
       </TabWrapper>

@@ -10,9 +10,9 @@ export function useGenericTerms() {
     },
   });
 
-  const genericTerms = filterNonNullable(
-    data?.termsOfUse?.edges?.map((n) => n?.node)
-  ).find((n) => n.pk === genericTermsVariant.BOOKING);
+  const genericTerms = filterNonNullable(data?.termsOfUse?.edges?.map((n) => n?.node)).find(
+    (n) => n.pk === genericTermsVariant.BOOKING
+  );
 
   return genericTerms;
 }
