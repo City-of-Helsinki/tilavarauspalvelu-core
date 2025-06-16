@@ -894,14 +894,14 @@ Django = ">=4.2"
 
 [[package]]
 name = "django-health-check"
-version = "3.19.2"
+version = "3.20.0"
 description = "Monitor the health of your Django app and its connected services."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "django_health_check-3.19.2-py3-none-any.whl", hash = "sha256:44533d0d18958fc4a3544df880086dcaba824a0ac11c707d3cb286013af7e5d1"},
-    {file = "django_health_check-3.19.2.tar.gz", hash = "sha256:126560fee249b1e6f976b19af170dceb7abef6d023a9d02387a11eeb15bb4f77"},
+    {file = "django_health_check-3.20.0-py3-none-any.whl", hash = "sha256:bcb2b8f36f463cead0564a028345c5b17e2a2d18e9cc88ecd611b13a26521926"},
+    {file = "django_health_check-3.20.0.tar.gz", hash = "sha256:cd69ac5facf73fe7241d9492d939b57bd20e24f46c4edea91e6a900bf22c2d8e"},
 ]
 
 [package.dependencies]
@@ -3447,4 +3447,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "c2f508098be7862de8e32232aa8d3d9db45dc779cc93b918b371a5a3f8b8de0a"
+content-hash = "e57ec4a34faf9a68dfdee33fcb96ca23890ad7ced2d00915cf72730ad75da14a"
