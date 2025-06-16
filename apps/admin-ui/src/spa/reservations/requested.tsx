@@ -47,10 +47,7 @@ export function RequestedPage(): JSX.Element {
         <H1 $marginTop="l">{t("Reservations.reservationListHeading")}</H1>
         <p>{t("Reservations.reservationListDescription")}</p>
       </div>
-      <Filters
-        defaultFilters={defaultFilters}
-        clearButtonLabel={t("common.returnDefaults")}
-      />
+      <Filters defaultFilters={defaultFilters} clearButtonLabel={t("common.returnDefaults")} />
       <HR />
       <ReservationsDataLoader />
     </>

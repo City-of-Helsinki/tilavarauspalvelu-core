@@ -18,10 +18,7 @@ import { getImageSource, getMainImage } from "common/src/helpers";
 import Card, { CardInfoItem } from "common/src/components/Card";
 import { getReservationUnitPath } from "@/modules/urls";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
 
 interface CardProps {
@@ -43,9 +40,7 @@ export function RecurringCard({
 
   const name = getReservationUnitName(reservationUnit);
 
-  const unitName = reservationUnit.unit
-    ? getTranslationSafe(reservationUnit.unit, "name", lang)
-    : "-";
+  const unitName = reservationUnit.unit ? getTranslationSafe(reservationUnit.unit, "name", lang) : "-";
 
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null
@@ -58,12 +53,7 @@ export function RecurringCard({
   const infos: CardInfoItem[] = [];
   if (reservationUnitTypeName) {
     infos.push({
-      icon: (
-        <IconHome
-          size={IconSize.Small}
-          data-testid="reservation-unit-card__icon--home"
-        />
-      ),
+      icon: <IconHome size={IconSize.Small} data-testid="reservation-unit-card__icon--home" />,
       value: reservationUnitTypeName,
     });
   }
@@ -77,16 +67,8 @@ export function RecurringCard({
   }
   if (reservationUnit.effectiveAccessType) {
     infos.push({
-      icon: (
-        <IconLock
-          aria-hidden="false"
-          aria-label={t("reservationUnit:accessType")}
-          size={IconSize.Small}
-        />
-      ),
-      value: t(
-        `reservationUnit:accessTypes.${reservationUnit.effectiveAccessType}`
-      ),
+      icon: <IconLock aria-hidden="false" aria-label={t("reservationUnit:accessType")} size={IconSize.Small} />,
+      value: t(`reservationUnit:accessTypes.${reservationUnit.effectiveAccessType}`),
     });
   }
 
@@ -109,9 +91,7 @@ export function RecurringCard({
       data-testid="recurring-card__button--toggle"
       key={"common:selectReservationUnit"}
     >
-      {isSelected
-        ? t("common:removeReservationUnit")
-        : t("common:selectReservationUnit")}
+      {isSelected ? t("common:removeReservationUnit") : t("common:selectReservationUnit")}
     </Button>
   );
   buttons.push(
@@ -127,15 +107,7 @@ export function RecurringCard({
     </ButtonLikeLink>
   );
 
-  return (
-    <Card
-      imageSrc={imgSrc}
-      heading={name ?? ""}
-      text={unitName ?? ""}
-      infos={infos}
-      buttons={buttons}
-    />
-  );
+  return <Card imageSrc={imgSrc} heading={name ?? ""} text={unitName ?? ""} infos={infos} buttons={buttons} />;
 }
 
 export const RECURRING_CARD_FRAGMENT = gql`

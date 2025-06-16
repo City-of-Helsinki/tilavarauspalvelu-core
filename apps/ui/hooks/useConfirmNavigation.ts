@@ -69,10 +69,7 @@ export function useConfirmNavigation(props: {
 /// Use case: form reset, unsaved changes
 /// handles refresh and <a> links (there should be no <a> links in the app)
 /// doesn't support callback because there is no easy way to hook it (page load event is the closest)
-export function useConfirmBrowserRefresh(
-  confirm: boolean,
-  confirmMessage: string
-) {
+export function useConfirmBrowserRefresh(confirm: boolean, confirmMessage: string) {
   useEffect(() => {
     const beforeUnloadHandler = (event: Event) => {
       if (confirm) {

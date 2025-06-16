@@ -25,9 +25,7 @@ function hasUserAcceptedStatistics(): boolean {
     return false;
   }
   const cookies = document.cookie.split(";").map((cookie) => cookie.trim());
-  const consentCookie = cookies.find((cookie) =>
-    cookie.startsWith("varaamo-cookie-consents=")
-  );
+  const consentCookie = cookies.find((cookie) => cookie.startsWith("varaamo-cookie-consents="));
   if (consentCookie) {
     const val = consentCookie.split("=")[1];
     if (val == null) {
@@ -55,13 +53,7 @@ function useHasUserAcceptedStatistics() {
 }
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const {
-    hotjarEnabled,
-    matomoEnabled,
-    apiBaseUrl,
-    sentryDsn,
-    sentryEnvironment,
-  } = pageProps;
+  const { hotjarEnabled, matomoEnabled, apiBaseUrl, sentryDsn, sentryEnvironment } = pageProps;
   useEffect(() => {
     if (sentryDsn) {
       updateSentryConfig(sentryDsn, sentryEnvironment);
@@ -69,8 +61,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   }, [sentryDsn, sentryEnvironment]);
 
   const { i18n } = useTranslation();
-  const { hasUserAcceptedStatistics: statisticsAccepted, recheck } =
-    useHasUserAcceptedStatistics();
+  const { hasUserAcceptedStatistics: statisticsAccepted, recheck } = useHasUserAcceptedStatistics();
 
   const client = createApolloClient(apiBaseUrl ?? "", undefined);
   const language = convertLanguageCode(i18n.language);
@@ -98,10 +89,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           </ThemeProvider>
         </ApolloProvider>
       </TrackingWrapper>
-      <ExternalScripts
-        enableMatomo={enableMatomo}
-        enableHotjar={enableHotjar}
-      />
+      <ExternalScripts enableMatomo={enableMatomo} enableHotjar={enableHotjar} />
     </CookieConsentContextProvider>
   );
 }

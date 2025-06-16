@@ -15,10 +15,7 @@ type TrackingWrapperProps = {
   matomoEnabled: boolean;
 };
 
-export function TrackingWrapper({
-  children,
-  matomoEnabled,
-}: TrackingWrapperProps): JSX.Element {
+export function TrackingWrapper({ children, matomoEnabled }: TrackingWrapperProps): JSX.Element {
   const router = useRouter();
 
   useEffect(() => {

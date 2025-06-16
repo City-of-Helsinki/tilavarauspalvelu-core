@@ -11,18 +11,12 @@ import {
   IconQuestionCircle,
   IconSize,
 } from "hds-react";
-import {
-  type ApplicationSectionTableElementFragment,
-  ApplicationSectionStatusChoice,
-} from "@gql/gql-types";
+import { type ApplicationSectionTableElementFragment, ApplicationSectionStatusChoice } from "@gql/gql-types";
 import { MAX_APPLICATION_ROUND_NAME_LENGTH } from "@/common/const";
 import { getApplicantName, truncate } from "@/helpers";
 import { getApplicationUrl } from "@/common/urls";
 import { CustomTable } from "@/component/Table";
-import {
-  calculateAppliedReservationTime,
-  formatAppliedReservationTime,
-} from "./utils";
+import { calculateAppliedReservationTime, formatAppliedReservationTime } from "./utils";
 import { ExternalTableLink } from "@/styled";
 import type { StatusLabelType } from "common/src/tags";
 import StatusLabel from "common/src/components/StatusLabel";
@@ -52,9 +46,7 @@ type ApplicationSectionView = {
   applicationCount: string;
 };
 
-function sectionMapper(
-  aes: ApplicationSectionTableElementFragment
-): ApplicationSectionView {
+function sectionMapper(aes: ApplicationSectionTableElementFragment): ApplicationSectionView {
   const resUnits = aes.reservationUnitOptions?.flatMap((eru) => ({
     ...eru.reservationUnit?.unit,
     priority: eru.preferredOrder,
@@ -83,9 +75,7 @@ function sectionMapper(
   };
 }
 
-const getStatusProps = (
-  status?: ApplicationSectionStatusChoice
-): { type: StatusLabelType; icon: JSX.Element } => {
+const getStatusProps = (status?: ApplicationSectionStatusChoice): { type: StatusLabelType; icon: JSX.Element } => {
   switch (status) {
     case ApplicationSectionStatusChoice.Unallocated:
       return {
@@ -106,30 +96,19 @@ const getStatusProps = (
   }
 };
 
-export const SORT_KEYS = [
-  "application_id,pk",
-  "applicant",
-  "nameFi",
-  "preferredUnitNameFi",
-  "status",
-];
+export const SORT_KEYS = ["application_id,pk", "applicant", "nameFi", "preferredUnitNameFi", "status"];
 
 const getColConfig = (t: TFunction) =>
   [
     {
       headerTKey: "ApplicationEvent.headings.id",
       key: "application_id,pk",
-      transform: ({ pk, applicationPk }: ApplicationSectionView) =>
-        `${applicationPk}-${pk}`,
+      transform: ({ pk, applicationPk }: ApplicationSectionView) => `${applicationPk}-${pk}`,
     },
     {
       headerTKey: "ApplicationEvent.headings.customer",
       key: "applicant",
-      transform: ({
-        applicantName,
-        applicationPk,
-        pk,
-      }: ApplicationSectionView) => (
+      transform: ({ applicantName, applicationPk, pk }: ApplicationSectionView) => (
         <ExternalTableLink to={getApplicationUrl(applicationPk, pk)}>
           {truncate(applicantName ?? "-", applicantTruncateLen)}
           <IconLinkExternal size={IconSize.ExtraSmall} aria-hidden="true" />
@@ -139,8 +118,7 @@ const getColConfig = (t: TFunction) =>
     {
       headerTKey: "ApplicationEvent.headings.name",
       key: "nameFi",
-      transform: ({ nameFi }: ApplicationSectionView) =>
-        truncate(nameFi, MAX_APPLICATION_ROUND_NAME_LENGTH),
+      transform: ({ nameFi }: ApplicationSectionView) => truncate(nameFi, MAX_APPLICATION_ROUND_NAME_LENGTH),
     },
     {
       headerTKey: "ApplicationEvent.headings.unit",
@@ -164,8 +142,7 @@ const getColConfig = (t: TFunction) =>
     {
       headerTKey: "ApplicationEvent.headings.stats",
       key: "applicationCount",
-      transform: ({ applicationCount }: ApplicationSectionView) =>
-        applicationCount,
+      transform: ({ applicationCount }: ApplicationSectionView) => applicationCount,
     },
     {
       headerTKey: "ApplicationEvent.headings.phase",

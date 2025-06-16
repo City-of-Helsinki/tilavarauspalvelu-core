@@ -1,11 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import {
-  TextInput,
-  IconSearch,
-  LoadingSpinner,
-  ButtonVariant,
-} from "hds-react";
+import { TextInput, IconSearch, LoadingSpinner, ButtonVariant } from "hds-react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { FilterTagList } from "../FilterTagList";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
@@ -36,16 +31,11 @@ export type SearchFormValues = {
 };
 
 // TODO combine as much as possible with the one in single-search (move them to a common place)
-function mapSeasonalQueryToForm(
-  params: ReadonlyURLSearchParams
-): SearchFormValues {
+function mapSeasonalQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
   return {
     purposes: mapParamToNumber(params.getAll("purposes"), 1),
     units: mapParamToNumber(params.getAll("units"), 1),
-    reservationUnitTypes: mapParamToNumber(
-      params.getAll("reservationUnitTypes"),
-      1
-    ),
+    reservationUnitTypes: mapParamToNumber(params.getAll("reservationUnitTypes"), 1),
     personsAllowed: toNumber(params.get("personsAllowed")),
     textSearch: params.get("textSearch") ?? "",
     accessTypes: params.getAll("accessTypes"),
@@ -69,9 +59,7 @@ export function SeasonalSearchForm({
     values: mapSeasonalQueryToForm(searchValues),
   });
 
-  const onSubmit: SubmitHandler<SearchFormValues> = (
-    data: SearchFormValues
-  ) => {
+  const onSubmit: SubmitHandler<SearchFormValues> = (data: SearchFormValues) => {
     handleSearch(data);
   };
 
@@ -85,9 +73,7 @@ export function SeasonalSearchForm({
       case "units":
         return options.units.find((n) => String(n.value) === value)?.label;
       case "reservationUnitTypes":
-        return options.reservationUnitTypes.find(
-          (n) => String(n.value) === value
-        )?.label;
+        return options.reservationUnitTypes.find((n) => String(n.value) === value)?.label;
       case "purposes":
         return options.purposes.find((n) => String(n.value) === value)?.label;
       case "accessTypes":
@@ -97,20 +83,8 @@ export function SeasonalSearchForm({
     }
   };
 
-  const multiSelectFilters = [
-    "units",
-    "reservationUnitTypes",
-    "purposes",
-    "accessTypes",
-  ] as const;
-  const hideList = [
-    "id",
-    "order",
-    "sort",
-    "ref",
-    "selectedReservationUnits",
-    "modalShown",
-  ] as const;
+  const multiSelectFilters = ["units", "reservationUnitTypes", "purposes", "accessTypes"] as const;
+  const hideList = ["id", "order", "sort", "ref", "selectedReservationUnits", "modalShown"] as const;
 
   return (
     <Flex

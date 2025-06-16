@@ -1,10 +1,7 @@
 import { useTranslation } from "next-i18next";
 import React, { useMemo } from "react";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { Sanitize } from "common/src/components/Sanitize";
 import type { ReservationPageQuery } from "@gql/gql-types";
@@ -18,10 +15,7 @@ export function TermsInfoSection({
   reservation,
   termsOfUse,
 }: Readonly<{
-  reservation: Pick<
-    NodeT,
-    "reservationUnits" | "begin" | "applyingForFreeOfCharge"
-  >;
+  reservation: Pick<NodeT, "reservationUnits" | "begin" | "applyingForFreeOfCharge">;
   termsOfUse: PropsNarrowed["termsOfUse"];
 }>) {
   const { t, i18n } = useTranslation();
@@ -32,30 +26,20 @@ export function TermsInfoSection({
       return false;
     }
 
-    const isFreeOfCharge = isReservationUnitFreeOfCharge(
-      reservationUnit.pricings,
-      new Date(reservation.begin)
-    );
+    const isFreeOfCharge = isReservationUnitFreeOfCharge(reservationUnit.pricings, new Date(reservation.begin));
 
-    return (
-      reservation.applyingForFreeOfCharge ||
-      (reservationUnit.canApplyFreeOfCharge && !isFreeOfCharge)
-    );
+    return reservation.applyingForFreeOfCharge || (reservationUnit.canApplyFreeOfCharge && !isFreeOfCharge);
   }, [reservation, reservationUnit]);
 
   const lang = convertLanguageCode(i18n.language);
   const paymentTermsContent =
-    reservationUnit?.paymentTerms != null
-      ? getTranslationSafe(reservationUnit.paymentTerms, "text", lang)
-      : undefined;
+    reservationUnit?.paymentTerms != null ? getTranslationSafe(reservationUnit.paymentTerms, "text", lang) : undefined;
   const cancellationTermsContent =
     reservationUnit?.cancellationTerms != null
       ? getTranslationSafe(reservationUnit.cancellationTerms, "text", lang)
       : undefined;
   const pricingTermsContent =
-    reservationUnit?.pricingTerms != null
-      ? getTranslationSafe(reservationUnit?.pricingTerms, "text", lang)
-      : undefined;
+    reservationUnit?.pricingTerms != null ? getTranslationSafe(reservationUnit?.pricingTerms, "text", lang) : undefined;
   const serviceSpecificTermsContent =
     reservationUnit?.serviceSpecificTerms != null
       ? getTranslationSafe(reservationUnit.serviceSpecificTerms, "text", lang)
@@ -65,43 +49,23 @@ export function TermsInfoSection({
     <div>
       {(paymentTermsContent || cancellationTermsContent) && (
         <Accordion
-          heading={t(
-            `reservationUnit:${
-              paymentTermsContent
-                ? "paymentAndCancellationTerms"
-                : "cancellationTerms"
-            }`
-          )}
+          heading={t(`reservationUnit:${paymentTermsContent ? "paymentAndCancellationTerms" : "cancellationTerms"}`)}
           theme="thin"
           data-testid="reservation__payment-and-cancellation-terms"
         >
           {paymentTermsContent && <Sanitize html={paymentTermsContent} />}
-          {cancellationTermsContent && (
-            <Sanitize html={cancellationTermsContent} />
-          )}
+          {cancellationTermsContent && <Sanitize html={cancellationTermsContent} />}
         </Accordion>
       )}
       {shouldDisplayPricingTerms && pricingTermsContent && (
-        <Accordion
-          heading={t("reservationUnit:pricingTerms")}
-          theme="thin"
-          data-testid="reservation__pricing-terms"
-        >
+        <Accordion heading={t("reservationUnit:pricingTerms")} theme="thin" data-testid="reservation__pricing-terms">
           <Sanitize html={pricingTermsContent} />
         </Accordion>
       )}
-      <Accordion
-        heading={t("reservationUnit:termsOfUse")}
-        theme="thin"
-        data-testid="reservation__terms-of-use"
-      >
-        {serviceSpecificTermsContent && (
-          <Sanitize html={serviceSpecificTermsContent} />
-        )}
+      <Accordion heading={t("reservationUnit:termsOfUse")} theme="thin" data-testid="reservation__terms-of-use">
+        {serviceSpecificTermsContent && <Sanitize html={serviceSpecificTermsContent} />}
         {termsOfUse?.genericTerms != null && (
-          <Sanitize
-            html={getTranslationSafe(termsOfUse.genericTerms, "text", lang)}
-          />
+          <Sanitize html={getTranslationSafe(termsOfUse.genericTerms, "text", lang)} />
         )}
       </Accordion>
     </div>

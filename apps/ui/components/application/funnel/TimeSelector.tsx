@@ -1,12 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import {
-  Button,
-  ButtonSize,
-  ButtonVariant,
-  Notification,
-  NotificationSize,
-} from "hds-react";
+import { Button, ButtonSize, ButtonVariant, Notification, NotificationSize } from "hds-react";
 import { useFormContext } from "react-hook-form";
 import { AutoGrid, Flex } from "common/styled";
 import { filterNonNullable } from "common/src/helpers";
@@ -39,10 +33,7 @@ export function TimeSelectorForm({
   const { t } = useTranslation();
   const { setValue, watch } = useFormContext<ApplicationPage2FormValues>();
 
-  const setSelectorData = (
-    index: number,
-    selected: Readonly<Readonly<Cell[]>[]>
-  ) => {
+  const setSelectorData = (index: number, selected: Readonly<Readonly<Cell[]>[]>) => {
     const formVals = covertCellsToTimeRange(selected);
     setValue(`applicationSections.${index}.suitableTimeRanges`, formVals, {
       shouldDirty: true,
@@ -63,9 +54,7 @@ export function TimeSelectorForm({
     // and we rely on the conversion function here
     // problem: we don't known opening hours at this point
     // - would have to refactor the cell type to include the open state e.g. separate selection and open state
-    const cellIndex = tmp[day].findIndex((cell) =>
-      isCellEqual(cell, selection)
-    );
+    const cellIndex = tmp[day].findIndex((cell) => isCellEqual(cell, selection));
     if (cellIndex === -1) {
       throw new Error("cell not found");
     }
@@ -89,29 +78,18 @@ export function TimeSelectorForm({
     });
   };
 
-  const cells = aesToCells(
-    watch("applicationSections")[index]?.suitableTimeRanges ?? [],
-    reservationUnitOpeningHours
-  );
+  const cells = aesToCells(watch("applicationSections")[index]?.suitableTimeRanges ?? [], reservationUnitOpeningHours);
   const priority = watch(`applicationSections.${index}.priority`);
 
-  const enableCopyCells =
-    filterNonNullable(watch("applicationSections")).length > 1;
+  const enableCopyCells = filterNonNullable(watch("applicationSections")).length > 1;
 
   return (
     // NOTE flex inside a grid container breaks overflow-x
     <Flex style={{ display: "grid" }} $marginTop="m">
-      <Notification
-        label={t("application:Page2.info")}
-        size={NotificationSize.Small}
-        type="info"
-      >
+      <Notification label={t("application:Page2.info")} size={NotificationSize.Small} type="info">
         {t("application:Page2.info")}
       </Notification>
-      <OptionSelector
-        reservationUnitOptions={reservationUnitOptions}
-        index={index}
-      />
+      <OptionSelector reservationUnitOptions={reservationUnitOptions} index={index} />
       <ApplicationTimeSelector
         cells={cells}
         onCellUpdate={handleCellUpdate}
@@ -177,9 +155,7 @@ function ErrorMessage({ index }: { index: number }): JSX.Element | null {
     return null;
   }
   const errorMsg = state.error?.message;
-  const msg = errorMsg
-    ? t(`application:validation.calendar.${errorMsg}`)
-    : t("errors:general_error");
+  const msg = errorMsg ? t(`application:validation.calendar.${errorMsg}`) : t("errors:general_error");
 
   return (
     <ErrorText

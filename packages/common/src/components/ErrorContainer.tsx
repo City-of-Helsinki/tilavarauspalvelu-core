@@ -66,10 +66,7 @@ const Body = styled.p`
   margin: 0;
 `;
 
-const constructFeedbackUrl = (
-  i18n: { language: string },
-  feedbackUrl?: string | null
-) => {
+const constructFeedbackUrl = (i18n: { language: string }, feedbackUrl?: string | null) => {
   if (!feedbackUrl) {
     return null;
   }
@@ -93,9 +90,7 @@ function statusCodeText({
   body?: string;
   t: TFunction;
 }>) {
-  const statusCodeString = STATUS_CODES_WITH_NONGENERIC_CONTENT.includes(
-    statusCode ?? 0
-  )
+  const statusCodeString = STATUS_CODES_WITH_NONGENERIC_CONTENT.includes(statusCode ?? 0)
     ? statusCode?.toString()
     : "generic";
   return (
@@ -104,13 +99,9 @@ function statusCodeText({
         {statusCode !== 500 ? `${statusCode}: ` : ""}
         {title ?? t(`${statusCodeString}.heading`)}
       </H1>
-      <Body data-testid={`error__${statusCode}--body`}>
-        {body ?? t(`${statusCodeString}.body`)}
-      </Body>
+      <Body data-testid={`error__${statusCode}--body`}>{body ?? t(`${statusCodeString}.body`)}</Body>
       {STATUS_CODES_WITH_SECOND_PARAGRAPH.includes(statusCode ?? 0) && (
-        <Body data-testid={`error__${statusCode}--body2`}>
-          {t(`${statusCodeString}.body2`)}
-        </Body>
+        <Body data-testid={`error__${statusCode}--body2`}>{t(`${statusCodeString}.body2`)}</Body>
       )}
     </>
   );
@@ -136,11 +127,7 @@ const ErrorContainer = ({
             ? `/images/${statusCode}-error.png`
             : "/images/generic-error.png")
         }
-        alt={
-          (imgAlt ?? statusCode)
-            ? t(`${statusCode}.heading`)
-            : t("generic.heading")
-        }
+        alt={(imgAlt ?? statusCode) ? t(`${statusCode}.heading`) : t("generic.heading")}
         width={IMAGE_WIDTH}
         height={IMAGE_HEIGHT}
         aria-hidden="true"

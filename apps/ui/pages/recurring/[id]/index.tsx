@@ -17,17 +17,8 @@ import {
   type CurrentUserQuery,
   ReservationKind,
 } from "@gql/gql-types";
-import {
-  base64encode,
-  filterNonNullable,
-  ignoreMaybeArray,
-  type ReadonlyDeep,
-  toNumber,
-} from "common/src/helpers";
-import {
-  type SearchFormValues,
-  SeasonalSearchForm,
-} from "@/components/recurring/SeasonalSearchForm";
+import { base64encode, filterNonNullable, ignoreMaybeArray, type ReadonlyDeep, toNumber } from "common/src/helpers";
+import { type SearchFormValues, SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
 import { createApolloClient } from "@/modules/apolloClient";
 import { RecurringCard } from "@/components/recurring/RecurringCard";
 import { useReservationUnitList } from "@/hooks";
@@ -46,15 +37,9 @@ import { convertLanguageCode } from "common/src/common/util";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { createPortal } from "react-dom";
 
-type SeasonalSearchProps = ReadonlyDeep<
-  Pick<NarrowedProps, "applicationRound" | "options" | "apiBaseUrl">
->;
+type SeasonalSearchProps = ReadonlyDeep<Pick<NarrowedProps, "applicationRound" | "options" | "apiBaseUrl">>;
 
-function SeasonalSearch({
-  apiBaseUrl,
-  applicationRound,
-  options,
-}: Readonly<SeasonalSearchProps>): JSX.Element {
+function SeasonalSearch({ apiBaseUrl, applicationRound, options }: Readonly<SeasonalSearchProps>): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
   const searchValues = useSearchParams();
@@ -84,9 +69,7 @@ function SeasonalSearch({
   const { data, isLoading, error, fetchMore, previousData } = query;
 
   const currData = data ?? previousData;
-  const reservationUnits = filterNonNullable(
-    currData?.reservationUnits?.edges?.map((e) => e?.node)
-  );
+  const reservationUnits = filterNonNullable(currData?.reservationUnits?.edges?.map((e) => e?.node));
   const pageInfo = currData?.reservationUnits?.pageInfo;
 
   const routes = [
@@ -111,11 +94,7 @@ function SeasonalSearch({
           {t("errors:search")}
         </Notification>
       ) : null}
-      <SeasonalSearchForm
-        options={options}
-        isLoading={isLoading}
-        handleSearch={onSearch}
-      />
+      <SeasonalSearchForm options={options} isLoading={isLoading} handleSearch={onSearch} />
       <ListWithPagination
         items={reservationUnits?.map((ru) => (
           <RecurringCard
@@ -132,13 +111,7 @@ function SeasonalSearch({
         fetchMore={(cursor) => fetchMore(cursor)}
         sortingComponent={<SortingComponent />}
       />
-      {createPortal(
-        <StartApplicationBar
-          applicationRound={applicationRound}
-          apiBaseUrl={apiBaseUrl}
-        />,
-        document.body
-      )}
+      {createPortal(<StartApplicationBar applicationRound={applicationRound} apiBaseUrl={apiBaseUrl} />, document.body)}
     </>
   );
 }
@@ -164,10 +137,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   if (pk == null || pk <= 0) {
     return notFound;
   }
-  const { data } = await apolloClient.query<
-    ApplicationRoundQuery,
-    ApplicationRoundQueryVariables
-  >({
+  const { data } = await apolloClient.query<ApplicationRoundQuery, ApplicationRoundQueryVariables>({
     query: ApplicationRoundDocument,
     variables: {
       id: base64encode(`ApplicationRoundNode:${pk}`),
@@ -201,10 +171,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     // don't catch errors here -> results in 500 page
     // we can't display proper error message to user (no page for it)
     // and we can't handle them
-    const mutRes = await apolloClient.mutate<
-      CreateApplicationMutation,
-      CreateApplicationMutationVariables
-    >({
+    const mutRes = await apolloClient.mutate<CreateApplicationMutation, CreateApplicationMutationVariables>({
       mutation: CreateApplicationDocument,
       variables: {
         input,

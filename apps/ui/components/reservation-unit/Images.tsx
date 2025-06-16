@@ -76,9 +76,7 @@ export function Images({ images, contextName }: Props): JSX.Element {
           <CarouselImage
             tabIndex={0}
             key={image.imageUrl}
-            alt={`${t("common:imgAltForSpace", { name: contextName })} #${
-              index + 1
-            }`}
+            alt={`${t("common:imgAltForSpace", { name: contextName })} #${index + 1}`}
             src={getImageSource(image, "large")}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -101,10 +99,7 @@ export function Images({ images, contextName }: Props): JSX.Element {
         <Dialog.Header id="modal-header" title={label} />
         <Dialog.Content>
           {currentImage ? (
-            <LargeImage
-              alt={t("common:imgAltForSpace")}
-              src={getImageSource(currentImage, "large")}
-            />
+            <LargeImage alt={t("common:imgAltForSpace")} src={getImageSource(currentImage, "large")} />
           ) : null}
           <ModalImages>
             {images?.map((image) => (
@@ -115,10 +110,7 @@ export function Images({ images, contextName }: Props): JSX.Element {
                   setCurrentImage(image);
                 }}
               >
-                <ThumbnailImage
-                  alt={t("common:imgAltForSpace")}
-                  src={getImageSource(image, "small")}
-                />
+                <ThumbnailImage alt={t("common:imgAltForSpace")} src={getImageSource(image, "small")} />
               </ThumbnailButton>
             ))}
           </ModalImages>

@@ -3,15 +3,7 @@ import { gql } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import {
-  H1,
-  H3,
-  SemiBold,
-  Strong,
-  CenterSpinner,
-  Flex,
-  TitleSection,
-} from "common/styled";
+import { H1, H3, SemiBold, Strong, CenterSpinner, Flex, TitleSection } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useApplicationRoundCriteriaQuery } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
@@ -79,11 +71,7 @@ export const APPLICATION_ROUND_QUERY = gql`
   }
 `;
 
-function Criteria({
-  applicationRoundPk,
-}: {
-  applicationRoundPk: number;
-}): JSX.Element {
+function Criteria({ applicationRoundPk }: { applicationRoundPk: number }): JSX.Element {
   const { t } = useTranslation();
 
   const id = base64encode(`ApplicationRoundNode:${applicationRoundPk}`);
@@ -95,9 +83,7 @@ function Criteria({
     },
   });
   const { applicationRound } = data ?? {};
-  const reservationUnits = filterNonNullable(
-    applicationRound?.reservationUnits
-  );
+  const reservationUnits = filterNonNullable(applicationRound?.reservationUnits);
 
   if (loading) {
     return <CenterSpinner />;
@@ -121,37 +107,27 @@ function Criteria({
           </span>
         </Flex>
       </TitleSection>
-      <Accordion
-        heading={t("ApplicationRound.searchAndUsageTimeRanges")}
-        initiallyOpen
-      >
+      <Accordion heading={t("ApplicationRound.searchAndUsageTimeRanges")} initiallyOpen>
         <div>
           <H3>{t("ApplicationRound.applicationPeriodTitle")}</H3>
           <div>
-            {t("common.begins")}{" "}
-            {formatDate(applicationRound.applicationPeriodBegin)}
+            {t("common.begins")} {formatDate(applicationRound.applicationPeriodBegin)}
           </div>
           <div>
-            {t("common.ends")}{" "}
-            {formatDate(applicationRound.applicationPeriodEnd)}
+            {t("common.ends")} {formatDate(applicationRound.applicationPeriodEnd)}
           </div>
         </div>
         <div>
           <H3>{t("ApplicationRound.reservationPeriodTitle")}</H3>
           <div>
-            {t("common.begins")}{" "}
-            {formatDate(applicationRound.reservationPeriodBegin)}
+            {t("common.begins")} {formatDate(applicationRound.reservationPeriodBegin)}
           </div>
           <div>
-            {t("common.ends")}{" "}
-            {formatDate(applicationRound.reservationPeriodEnd)}
+            {t("common.ends")} {formatDate(applicationRound.reservationPeriodEnd)}
           </div>
         </div>
       </Accordion>
-      <Accordion
-        heading={t("ApplicationRound.usedReservationUnits")}
-        initiallyOpen
-      >
+      <Accordion heading={t("ApplicationRound.usedReservationUnits")} initiallyOpen>
         <ReservationUnits>
           {/* TODO this should be a reduce where the unique key is the unit pk and under that is all the reservationUnits that belong to it */}
           {reservationUnits?.map((reservationUnit) => (

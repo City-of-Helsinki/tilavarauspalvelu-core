@@ -21,11 +21,7 @@ import {
 import { type Inputs } from "common/src/reservation-form/types";
 import { createApolloClient } from "@/modules/apolloClient";
 import { default as NextError } from "next/error";
-import {
-  getReservationPath,
-  getReservationUnitPath,
-  getSingleSearchPath,
-} from "@/modules/urls";
+import { getReservationPath, getReservationUnitPath, getSingleSearchPath } from "@/modules/urls";
 import { Sanitize } from "common/src/components/Sanitize";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import { getCheckoutUrl } from "@/modules/reservation";
@@ -39,10 +35,7 @@ import { containsField } from "common/src/metaFieldsHelpers";
 import { errorToast } from "common/src/common/toast";
 import { getGeneralFields } from "@/components/reservation/SummaryFields";
 import { queryOptions } from "@/modules/queryOptions";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
 import { PinkBox as PinkBoxBase } from "@/components/reservation/styles";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
@@ -135,18 +128,13 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
   const reserveeType = watch("reserveeType");
 
-  const requireHandling =
-    reservationUnit?.requireReservationHandling ||
-    reservation?.applyingForFreeOfCharge;
+  const requireHandling = reservationUnit?.requireReservationHandling || reservation?.applyingForFreeOfCharge;
 
   const steps = useMemo(() => {
     if (reservationUnit == null) {
       return [];
     }
-    const isUnitFreeOfCharge = isReservationUnitFreeOfCharge(
-      reservationUnit.pricings,
-      new Date(reservation.begin)
-    );
+    const isUnitFreeOfCharge = isReservationUnitFreeOfCharge(reservationUnit.pricings, new Date(reservation.begin));
 
     const stepLength = isUnitFreeOfCharge || requireHandling ? 2 : 5;
 
@@ -183,9 +171,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   // whitelist to allow language change and confirmation
   const whitelist = [
     RegExp(`.*/reservations/${reservation?.pk}/confirmation`),
-    RegExp(
-      `.*/reservation-unit/${reservationUnit?.pk}/reservation/${reservation?.pk}`
-    ),
+    RegExp(`.*/reservation-unit/${reservationUnit?.pk}/reservation/${reservation?.pk}`),
   ];
   // only block nextjs navigation (we should not have any <a> links and we don't want to block refresh)
   useConfirmNavigation({
@@ -201,14 +187,10 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   const { pk: reservationPk } = reservation || {};
 
   const pageTitle =
-    step === 0
-      ? t("reservationCalendar:heading.newReservation")
-      : t("reservationCalendar:heading.pendingReservation");
+    step === 0 ? t("reservationCalendar:heading.newReservation") : t("reservationCalendar:heading.pendingReservation");
 
   // TODO all this is copy pasta from EditStep1
-  const supportedFields = filterNonNullable(
-    reservationUnit?.metadataSet?.supportedFields
-  );
+  const supportedFields = filterNonNullable(reservationUnit?.metadataSet?.supportedFields);
 
   const displayError = useDisplayError();
 
@@ -225,9 +207,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
       if (key === "showBillingAddress") {
         return acc;
       }
-      acc[key] = {}.propertyIsEnumerable.call(payload[key] || {}, "value")
-        ? payload[key].value
-        : payload[key];
+      acc[key] = {}.propertyIsEnumerable.call(payload[key] || {}, "value") ? payload[key].value : payload[key];
       return acc;
     }, {});
 
@@ -269,10 +249,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
         return;
       }
 
-      if (
-        state === ReservationStateChoice.Confirmed ||
-        state === ReservationStateChoice.RequiresHandling
-      ) {
+      if (state === ReservationStateChoice.Confirmed || state === ReservationStateChoice.RequiresHandling) {
         router.push(getReservationPath(pk, "confirmation"));
       } else if (state === ReservationStateChoice.WaitingForPayment) {
         const { order } = data?.confirmReservation ?? {};
@@ -300,24 +277,15 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   const shouldDisplayReservationUnitPrice = useMemo(() => {
     switch (step) {
       case 0:
-        return (
-          reservationUnit?.canApplyFreeOfCharge &&
-          generalFields?.includes("applyingForFreeOfCharge")
-        );
+        return reservationUnit?.canApplyFreeOfCharge && generalFields?.includes("applyingForFreeOfCharge");
       case 1:
       default:
-        return (
-          reservationUnit?.canApplyFreeOfCharge &&
-          reservation?.applyingForFreeOfCharge === true
-        );
+        return reservationUnit?.canApplyFreeOfCharge && reservation?.applyingForFreeOfCharge === true;
     }
   }, [step, generalFields, reservation, reservationUnit]);
 
   const lang = convertLanguageCode(i18n.language);
-  const termsOfUse =
-    reservationUnit != null
-      ? getTranslationSafe(reservationUnit, "termsOfUse", lang)
-      : "";
+  const termsOfUse = reservationUnit != null ? getTranslationSafe(reservationUnit, "termsOfUse", lang) : "";
 
   // TODO rework so we submit the form values here
   const onSubmit = (values: unknown) => {
@@ -368,13 +336,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
           )}
         </TitleSection>
         <StyledForm onSubmit={handleSubmit(onSubmit)} noValidate>
-          {step === 0 && (
-            <Step0
-              reservation={reservation}
-              cancelReservation={cancelReservation}
-              options={options}
-            />
-          )}
+          {step === 0 && <Step0 reservation={reservation} cancelReservation={cancelReservation} options={options} />}
           {step === 1 && (
             <Step1
               reservation={reservation}
@@ -395,9 +357,7 @@ function NewReservationWrapper(props: PropsNarrowed): JSX.Element | null {
   const lang = convertLanguageCode(i18n.language);
   const { reservation } = props;
   const reservationUnit = reservation?.reservationUnits?.find(() => true);
-  const reservationUnitName = reservationUnit
-    ? getTranslationSafe(reservationUnit, "name", lang)
-    : "";
+  const reservationUnitName = reservationUnit ? getTranslationSafe(reservationUnit, "name", lang) : "";
   const routes = [
     {
       slug: getSingleSearchPath(),
@@ -433,13 +393,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const reservationPk = toNumber(reservationPkStr);
   const reservationUnitPk = toNumber(reservationUnitPkStr);
-  const isInvalidReservationUnitPk =
-    reservationUnitPk == null || reservationUnitPk <= 0;
+  const isInvalidReservationUnitPk = reservationUnitPk == null || reservationUnitPk <= 0;
   const isInvalidReservationPk = reservationPk == null || reservationPk <= 0;
-  const isInvalidPath =
-    isInvalidReservationUnitPk ||
-    isInvalidReservationPk ||
-    path !== "reservation";
+  const isInvalidPath = isInvalidReservationUnitPk || isInvalidReservationPk || path !== "reservation";
 
   if (isInvalidPath) {
     return {
@@ -453,10 +409,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     };
   }
 
-  const { data: resData } = await apolloClient.query<
-    ReservationQuery,
-    ReservationQueryVariables
-  >({
+  const { data: resData } = await apolloClient.query<ReservationQuery, ReservationQueryVariables>({
     query: ReservationDocument,
     variables: { id: base64encode(`ReservationNode:${reservationPk}`) },
   });

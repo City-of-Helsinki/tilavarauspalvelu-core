@@ -12,8 +12,7 @@ type FilterTagProps = {
   translateTag: (key: string, value: string) => string | undefined;
 };
 
-const inHours = (minutes: number): number =>
-  Math.round((minutes / 60) * 100) / 100; // two decimal places
+const inHours = (minutes: number): number => Math.round((minutes / 60) * 100) / 100; // two decimal places
 
 function translateDuration(t: TFunction, duration: number): string {
   let unit = t("common:abbreviations.hour", { count: inHours(duration) });
@@ -40,12 +39,7 @@ function translateDuration(t: TFunction, duration: number): string {
 /// An invalid manually modified value (or mangled copy / link) would be ignore. Now it's printed out as a tag.
 /// Another thing about that is the translation function is generic enough to allow dynamic changes to the tags
 /// (so we can hide / show based on some other condition) of course such would require forcing a rerender with an url change or remounting this.
-export function FilterTagList({
-  filters,
-  multiSelectFilters,
-  hideList,
-  translateTag,
-}: Readonly<FilterTagProps>) {
+export function FilterTagList({ filters, multiSelectFilters, hideList, translateTag }: Readonly<FilterTagProps>) {
   const { t } = useTranslation();
 
   const { handleRemoveTag, handleResetTags } = useSearchModify();
@@ -60,9 +54,7 @@ export function FilterTagList({
     }
   }
 
-  const keys = [...formValueKeys].sort(
-    (a, b) => filters.indexOf(a) - filters.indexOf(b)
-  );
+  const keys = [...formValueKeys].sort((a, b) => filters.indexOf(a) - filters.indexOf(b));
 
   const filteredTags = keys
     .filter((key) => !hideList.includes(key))
@@ -120,9 +112,7 @@ export function FilterTagList({
               value: label,
             })}
           >
-            {key === "duration" && !Number.isNaN(Number(value))
-              ? translateDuration(t, Number(value))
-              : label}
+            {key === "duration" && !Number.isNaN(Number(value)) ? translateDuration(t, Number(value)) : label}
           </StyledTag>
         );
       })}

@@ -1,20 +1,11 @@
 import React from "react";
-import {
-  Button,
-  ButtonSize,
-  ButtonVariant,
-  IconArrowLeft,
-  IconArrowRight,
-} from "hds-react";
+import { Button, ButtonSize, ButtonVariant, IconArrowLeft, IconArrowRight } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { useFormContext } from "react-hook-form";
 import { type ApplicationPage2Query } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { ButtonContainer } from "common/styled";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { getApplicationPath } from "@/modules/urls";
@@ -30,8 +21,7 @@ type Props = {
 export function Page2({ application, onNext }: Props): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
-  const { watch, handleSubmit, formState } =
-    useFormContext<ApplicationPage2FormValues>();
+  const { watch, handleSubmit, formState } = useFormContext<ApplicationPage2FormValues>();
 
   const applicationSections = filterNonNullable(watch("applicationSections"));
 
@@ -91,16 +81,11 @@ function ApplicationSectionTimePicker({
     openingHours: ruo.reservationUnit.applicationRoundTimeSlots,
   }));
 
-  const selectedReservationUnitPk = watch(
-    `applicationSections.${sectionIndex}.reservationUnitPk`
-  );
+  const selectedReservationUnitPk = watch(`applicationSections.${sectionIndex}.reservationUnitPk`);
   const reservationUnitOpeningHours =
-    allOpeningHours?.find((n) => n.pk === selectedReservationUnitPk)
-      ?.openingHours ?? [];
+    allOpeningHours?.find((n) => n.pk === selectedReservationUnitPk)?.openingHours ?? [];
 
-  const reservationUnitOptions = filterNonNullable(
-    section?.reservationUnitOptions
-  )
+  const reservationUnitOptions = filterNonNullable(section?.reservationUnitOptions)
     .map((n) => n.reservationUnit)
     .map((n) => ({
       value: n?.pk ?? 0,

@@ -21,14 +21,7 @@ type Props = {
   body?: string;
 };
 function Page503({ title, body, feedbackUrl }: Readonly<Props>): JSX.Element {
-  return (
-    <ErrorContainer
-      statusCode={503}
-      title={title}
-      body={body}
-      feedbackUrl={feedbackUrl}
-    />
-  );
+  return <ErrorContainer statusCode={503} title={title} body={body} feedbackUrl={feedbackUrl} />;
 }
 
 export default Page503;

@@ -15,18 +15,8 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { InlineStyledLink } from "@/styled/util";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import {
-  getReservationPath,
-  getReservationUnitPath,
-  reservationsPath,
-  reservationsPrefix,
-} from "@/modules/urls";
-import {
-  Button,
-  ButtonVariant,
-  IconCalendar,
-  IconLinkExternal,
-} from "hds-react";
+import { getReservationPath, getReservationUnitPath, reservationsPath, reservationsPrefix } from "@/modules/urls";
+import { Button, ButtonVariant, IconCalendar, IconLinkExternal } from "hds-react";
 import styled from "styled-components";
 import { Flex, H1 } from "common/styled";
 import { breakpoints } from "common/src/const";
@@ -57,10 +47,7 @@ function Confirmation({ apiBaseUrl, reservation }: PropsNarrowed) {
       <Breadcrumb routes={routes} />
       <ReservationPageWrapper $nRows={4}>
         <ReservationInfoCard reservation={reservation} bgColor="gold" />
-        <ReservationConfirmation
-          apiBaseUrl={apiBaseUrl}
-          reservation={reservation}
-        />
+        <ReservationConfirmation apiBaseUrl={apiBaseUrl} reservation={reservation} />
       </ReservationPageWrapper>
     </>
   );
@@ -79,18 +66,13 @@ function ReservationConfirmation({
   const { t } = useTranslation();
   // NOTE typescript can't type array off index
   const reservationUnit = reservation.reservationUnits.find(() => true);
-  const requiresHandling =
-    reservation.state === ReservationStateChoice.RequiresHandling;
+  const requiresHandling = reservation.state === ReservationStateChoice.RequiresHandling;
 
-  const titleKey = requiresHandling
-    ? "reservationInHandling"
-    : "reservationSuccessful";
+  const titleKey = requiresHandling ? "reservationInHandling" : "reservationSuccessful";
   const title = t(`reservationUnit:${titleKey}`);
 
   const confirmPostfix = requiresHandling ? "Handling" : "";
-  const confirmationText = t(
-    `reservationUnit:reservationReminderText${confirmPostfix}`
-  );
+  const confirmationText = t(`reservationUnit:reservationReminderText${confirmPostfix}`);
   return (
     <Wrapper>
       <div>
@@ -98,17 +80,12 @@ function ReservationConfirmation({
         <p>{confirmationText}</p>
         <p>
           {t("reservationUnit:findYourReservations")}{" "}
-          <InlineStyledLink href={reservationsPath}>
-            {t("reservationUnit:myReservationsLink")}
-          </InlineStyledLink>
+          <InlineStyledLink href={reservationsPath}>{t("reservationUnit:myReservationsLink")}</InlineStyledLink>
         </p>
       </div>
       <Actions reservation={reservation} />
       <Instructions reservation={reservation} />
-      <BackLinkList
-        reservationUnitHome={getReservationUnitPath(reservationUnit?.pk)}
-        apiBaseUrl={apiBaseUrl}
-      />
+      <BackLinkList reservationUnitHome={getReservationUnitPath(reservationUnit?.pk)} apiBaseUrl={apiBaseUrl} />
     </Wrapper>
   );
 }
@@ -116,10 +93,7 @@ function ReservationConfirmation({
 function Actions({
   reservation,
 }: {
-  reservation: Pick<
-    PropsNarrowed["reservation"],
-    "calendarUrl" | "paymentOrder" | "state"
-  >;
+  reservation: Pick<PropsNarrowed["reservation"], "calendarUrl" | "paymentOrder" | "state">;
 }) {
   const { t, i18n } = useTranslation();
 
@@ -143,12 +117,7 @@ function Actions({
       {reservation.paymentOrder?.receiptUrl && (
         <Button
           data-testid="reservation__confirmation--button__receipt-link"
-          onClick={() =>
-            window.open(
-              `${reservation.paymentOrder?.receiptUrl}&lang=${i18n.language}`,
-              "_blank"
-            )
-          }
+          onClick={() => window.open(`${reservation.paymentOrder?.receiptUrl}&lang=${i18n.language}`, "_blank")}
           variant={ButtonVariant.Secondary}
           iconEnd={<IconLinkExternal />}
         >

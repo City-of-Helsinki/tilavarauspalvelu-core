@@ -1,11 +1,4 @@
-import {
-  addMinutes,
-  addSeconds,
-  isAfter,
-  roundToNearestMinutes,
-  differenceInMinutes,
-  set,
-} from "date-fns";
+import { addMinutes, addSeconds, isAfter, roundToNearestMinutes, differenceInMinutes, set } from "date-fns";
 import {
   type ReservationNode,
   ReservationStartInterval,
@@ -25,11 +18,7 @@ import {
 import { getIntervalMinutes } from "common/src/conversion";
 import { fromUIDate } from "./util";
 import { type TFunction } from "i18next";
-import {
-  type ReservableMap,
-  type RoundPeriod,
-  isRangeReservable,
-} from "./reservable";
+import { type ReservableMap, type RoundPeriod, isRangeReservable } from "./reservable";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { isValidDate, toUIDate } from "common/src/common/util";
 import { getTimeString } from "./reservationUnit";
@@ -44,18 +33,10 @@ export const SLOTS_EVERY_HOUR = 2;
 /// @param t translation function
 /// opts should never include undefined values but our codegen doesn't properly type it
 export function getDurationOptions(
-  opts: Pick<
-    ReservationUnitNode,
-    | "minReservationDuration"
-    | "maxReservationDuration"
-    | "reservationStartInterval"
-  >,
+  opts: Pick<ReservationUnitNode, "minReservationDuration" | "maxReservationDuration" | "reservationStartInterval">,
   t: TFunction
 ): { label: string; value: number }[] {
-  if (
-    opts.minReservationDuration == null ||
-    opts.maxReservationDuration == null
-  ) {
+  if (opts.minReservationDuration == null || opts.maxReservationDuration == null) {
     return [];
   }
   const intervalMinutes = getIntervalMinutes(opts.reservationStartInterval);
@@ -64,8 +45,7 @@ export function getDurationOptions(
   }
 
   const minuteString = (mins: number, hours: number) => {
-    if (mins > 90)
-      return t("common:abbreviations.minute", { count: mins % 60 });
+    if (mins > 90) return t("common:abbreviations.minute", { count: mins % 60 });
     if (mins <= 90) return t("common:abbreviations.minute", { count: mins });
     if (mins !== 0)
       return t("common:abbreviations.minute", {
@@ -77,19 +57,11 @@ export function getDurationOptions(
   const durationOptions: { label: string; value: number }[] = [];
   const minReservationDurationMinutes = opts.minReservationDuration / 60;
   const maxReservationDurationMinutes = opts.maxReservationDuration / 60;
-  const start =
-    minReservationDurationMinutes > intervalMinutes
-      ? minReservationDurationMinutes
-      : intervalMinutes;
+  const start = minReservationDurationMinutes > intervalMinutes ? minReservationDurationMinutes : intervalMinutes;
 
-  for (
-    let i = start;
-    i <= maxReservationDurationMinutes;
-    i += intervalMinutes
-  ) {
+  for (let i = start; i <= maxReservationDurationMinutes; i += intervalMinutes) {
     const hours: number = Math.floor(i / 60);
-    const hourString =
-      i > 90 ? t("common:abbreviations.hour", { count: hours }) : "";
+    const hourString = i > 90 ? t("common:abbreviations.hour", { count: hours }) : "";
 
     const optionString = `${hourString} ${minuteString(i, hours)}`;
     durationOptions.push({
@@ -101,9 +73,7 @@ export function getDurationOptions(
   return durationOptions;
 }
 
-function isReservationInThePast(
-  reservation: Pick<ReservationNode, "begin">
-): boolean {
+function isReservationInThePast(reservation: Pick<ReservationNode, "begin">): boolean {
   if (!reservation?.begin) {
     return false;
   }
@@ -116,18 +86,11 @@ type ReservationQueryT = NonNullable<ListReservationsQuery["reservations"]>;
 type ReservationEdgeT = NonNullable<ReservationQueryT["edges"]>[0];
 type ReservationNodeT = NonNullable<NonNullable<ReservationEdgeT>["node"]>;
 
-type IsWithinCancellationPeriodReservationT = Pick<
-  ReservationNodeT,
-  "begin"
-> & {
-  reservationUnits?: Readonly<
-    Maybe<Array<CancellationRuleFieldsFragment>> | undefined
-  >;
+type IsWithinCancellationPeriodReservationT = Pick<ReservationNodeT, "begin"> & {
+  reservationUnits?: Readonly<Maybe<Array<CancellationRuleFieldsFragment>> | undefined>;
 };
 
-function isTooCloseToCancel(
-  reservation: Readonly<IsWithinCancellationPeriodReservationT>
-): boolean {
+function isTooCloseToCancel(reservation: Readonly<IsWithinCancellationPeriodReservationT>): boolean {
   const reservationUnit = reservation.reservationUnits?.[0];
   const begin = new Date(reservation.begin);
 
@@ -150,9 +113,7 @@ export const CAN_USER_CANCEL_RESERVATION_FRAGMENT = gql`
   }
 `;
 
-export function isReservationCancellable(
-  reservation: CanUserCancelReservationFragment
-): boolean {
+export function isReservationCancellable(reservation: CanUserCancelReservationFragment): boolean {
   return isReservationCancellableReason(reservation) === "";
 }
 
@@ -167,8 +128,7 @@ export function isReservationCancellableReason(
   reservation: CanUserCancelReservationFragment
 ): ReservationCancellableReason {
   const reservationUnit = reservation.reservationUnits.find(() => true);
-  const isReservationCancelled =
-    reservation.state === ReservationStateChoice.Cancelled;
+  const isReservationCancelled = reservation.state === ReservationStateChoice.Cancelled;
   if (isReservationCancelled) {
     return "ALREADY_CANCELLED";
   }
@@ -190,9 +150,7 @@ export function isReservationCancellableReason(
   return "";
 }
 
-function shouldShowOrderStatus(
-  state: Maybe<ReservationStateChoice> | undefined
-) {
+function shouldShowOrderStatus(state: Maybe<ReservationStateChoice> | undefined) {
   if (
     state == null ||
     state === ReservationStateChoice.Created ||
@@ -215,9 +173,7 @@ export const RESERVATION_ORDER_STATUS_FRAGMENT = gql`
   }
 `;
 
-export function getNormalizedReservationOrderStatus(
-  reservation: ReservationOrderStatusFragment
-): OrderStatus | null {
+export function getNormalizedReservationOrderStatus(reservation: ReservationOrderStatusFragment): OrderStatus | null {
   if (!reservation) {
     return null;
   }
@@ -229,15 +185,11 @@ export function getNormalizedReservationOrderStatus(
   return null;
 }
 
-function isReservationConfirmed(reservation: {
-  state?: Maybe<ReservationStateChoice> | undefined;
-}): boolean {
+function isReservationConfirmed(reservation: { state?: Maybe<ReservationStateChoice> | undefined }): boolean {
   return reservation.state === ReservationStateChoice.Confirmed;
 }
 
-function isReservationFreeOfCharge(
-  reservation: Pick<ReservationNode, "price">
-): boolean {
+function isReservationFreeOfCharge(reservation: Pick<ReservationNode, "price">): boolean {
   return !(Number(reservation.price) > 0);
 }
 
@@ -258,9 +210,7 @@ export type CanReservationBeChangedProps = {
   blockingReservations: readonly BlockingReservationFieldsFragment[];
 };
 
-export function getWhyReservationCantBeChanged(
-  reservation: CanReservationBeChangedFragment
-): string | null {
+export function getWhyReservationCantBeChanged(reservation: CanReservationBeChangedFragment): string | null {
   // existing reservation state is not CONFIRMED
   if (!isReservationConfirmed(reservation)) {
     return "RESERVATION_MODIFICATION_NOT_ALLOWED";
@@ -294,9 +244,7 @@ export function getWhyReservationCantBeChanged(
   return null;
 }
 
-export function isReservationEditable(
-  reservation: CanReservationBeChangedFragment
-): boolean {
+export function isReservationEditable(reservation: CanReservationBeChangedFragment): boolean {
   if (getWhyReservationCantBeChanged(reservation) != null) {
     return false;
   }
@@ -330,10 +278,7 @@ export function getNewReservation({
   end,
   reservationUnit,
 }: {
-  reservationUnit: Pick<
-    ReservationUnitNode,
-    "minReservationDuration" | "reservationStartInterval"
-  >;
+  reservationUnit: Pick<ReservationUnitNode, "minReservationDuration" | "reservationStartInterval">;
   start: Date;
   end: Date;
 }) {
@@ -370,8 +315,7 @@ function getMinReservation({
   const minDurationMinutes = minReservationDuration / 60;
   const intervalMinutes = getIntervalMinutes(reservationStartInterval);
 
-  const minutes =
-    minDurationMinutes < intervalMinutes ? intervalMinutes : minDurationMinutes;
+  const minutes = minDurationMinutes < intervalMinutes ? intervalMinutes : minDurationMinutes;
   return { begin, end: addMinutes(begin, minutes) };
 }
 
@@ -390,9 +334,7 @@ function getValidEndingTime({
   const remainder = durationMinutes % intervalMinutes;
 
   if (remainder !== 0) {
-    const wholeIntervals = Math.abs(
-      Math.floor(durationMinutes / intervalMinutes)
-    );
+    const wholeIntervals = Math.abs(Math.floor(durationMinutes / intervalMinutes));
 
     return addMinutes(start, wholeIntervals * intervalMinutes);
   }

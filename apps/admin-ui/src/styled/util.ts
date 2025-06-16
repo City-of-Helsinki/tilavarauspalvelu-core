@@ -44,10 +44,8 @@ export const Element = styled.div<{
   $start?: boolean;
   $unlimitedMaxWidth?: boolean;
 }>`
-  grid-column: ${({ $wide, $start }) =>
-    $wide ? "1 / -1" : $start ? "1 / span 1" : "auto / span 1"};
-  max-width: ${({ $unlimitedMaxWidth }) =>
-    $unlimitedMaxWidth ? "inherit" : "var(--prose-width)"};
+  grid-column: ${({ $wide, $start }) => ($wide ? "1 / -1" : $start ? "1 / span 1" : "auto / span 1")};
+  max-width: ${({ $unlimitedMaxWidth }) => ($unlimitedMaxWidth ? "inherit" : "var(--prose-width)")};
 `;
 
 export const ApplicationDatas = styled.div`

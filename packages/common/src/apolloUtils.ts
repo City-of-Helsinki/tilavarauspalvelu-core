@@ -22,16 +22,10 @@ export interface OverlappingError extends ApiError {
   overlapping: { begin: string; end: string }[];
 }
 
-function mapValidationError(
-  gqlError: GraphQLFormattedError
-): ValidationError[] {
+function mapValidationError(gqlError: GraphQLFormattedError): ValidationError[] {
   const { extensions } = gqlError;
   const code = getExtensionCode(gqlError);
-  if (
-    extensions != null &&
-    "errors" in extensions &&
-    Array.isArray(extensions.errors)
-  ) {
+  if (extensions != null && "errors" in extensions && Array.isArray(extensions.errors)) {
     // field errors
     const { errors } = extensions;
     const errs = errors.map((err: unknown) => {
@@ -126,11 +120,7 @@ function mapOverlapError(gqlError: GraphQLFormattedError) {
   const code = getExtensionCode(gqlError);
   if (extensions != null && "overlapping" in extensions) {
     const { overlapping } = extensions ?? {};
-    if (
-      code == null ||
-      !Array.isArray(overlapping) ||
-      overlapping.length === 0
-    ) {
+    if (code == null || !Array.isArray(overlapping) || overlapping.length === 0) {
       return [];
     }
     const ov = overlapping.map((o: unknown) => {
@@ -146,9 +136,7 @@ function mapOverlapError(gqlError: GraphQLFormattedError) {
       }
       return null;
     });
-    const fov = ov.filter(
-      (e): e is { begin: string; end: string } => e != null
-    );
+    const fov = ov.filter((e): e is { begin: string; end: string } => e != null);
     return { overlapping: fov, code };
   }
   return [];
@@ -175,9 +163,7 @@ export function getSeriesOverlapErrors(error: unknown): OverlappingError[] {
   return [];
 }
 
-function mapGraphQLErrors(
-  graphQLErrors: readonly Readonly<GraphQLFormattedError>[]
-): ApiError[] {
+function mapGraphQLErrors(graphQLErrors: readonly Readonly<GraphQLFormattedError>[]): ApiError[] {
   if (graphQLErrors.length > 0) {
     return graphQLErrors.flatMap((err) => {
       const code = getExtensionCode(err);
@@ -213,10 +199,7 @@ function getExtensionCode(e: GraphQLFormattedError): string | null {
   if (e.extensions == null) {
     return null;
   }
-  if (
-    e.extensions.error_code != null &&
-    typeof e.extensions.error_code === "string"
-  ) {
+  if (e.extensions.error_code != null && typeof e.extensions.error_code === "string") {
     return e.extensions.error_code;
   }
   // old extension name
@@ -227,11 +210,7 @@ function getExtensionCode(e: GraphQLFormattedError): string | null {
 }
 
 function extractErrorCode(error: ApiError): string | string[] {
-  if (
-    "validation_code" in error &&
-    error.validation_code != null &&
-    typeof error.validation_code === "string"
-  ) {
+  if ("validation_code" in error && error.validation_code != null && typeof error.validation_code === "string") {
     return [error.code, error.validation_code];
   }
   if (error.code != null) {
@@ -251,12 +230,8 @@ export const errorLink = onError(({ graphQLErrors, networkError }) => {
     level: "warning" as const,
     // have to encode the errors [Object Object] otherwise
     extra: {
-      ...(graphQLErrors != null
-        ? { graphQLErrors: JSON.stringify(graphQLErrors) }
-        : {}),
-      ...(networkError != null
-        ? { networkError: JSON.stringify(networkError) }
-        : {}),
+      ...(graphQLErrors != null ? { graphQLErrors: JSON.stringify(graphQLErrors) } : {}),
+      ...(networkError != null ? { networkError: JSON.stringify(networkError) } : {}),
     },
     fingerprint: ["graphql_error", ...apiErrorCodes],
   };

@@ -1,8 +1,5 @@
 import { camelCase, get, uniq } from "lodash-es";
-import {
-  CustomerTypeChoice,
-  type ReservationMetadataFieldNode,
-} from "../../gql/gql-types";
+import { CustomerTypeChoice, type ReservationMetadataFieldNode } from "../../gql/gql-types";
 import { reservationApplicationFields } from "./types";
 import { containsField } from "../metaFieldsHelpers";
 
@@ -20,8 +17,8 @@ export function getReservationApplicationFields({
   // TODO not good, refactor (remove get especially)
   const fields = uniq<string>(
     // TODO don't use get or string comparison, use a switch statement
-    get(reservationApplicationFields, reserveeType.toLocaleLowerCase()).filter(
-      (field: string) => containsField(supportedFields, camelCase(field))
+    get(reservationApplicationFields, reserveeType.toLocaleLowerCase()).filter((field: string) =>
+      containsField(supportedFields, camelCase(field))
     )
   );
 
@@ -38,9 +35,7 @@ export function getReservationApplicationFields({
   return fields.map(camelCase);
 }
 
-export function removeRefParam<Type>(
-  params: Type & { ref: unknown }
-): Omit<Type, "ref"> {
+export function removeRefParam<Type>(params: Type & { ref: unknown }): Omit<Type, "ref"> {
   const { ref, ...rest } = params;
   return rest;
 }

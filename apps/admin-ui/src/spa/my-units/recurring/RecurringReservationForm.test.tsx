@@ -6,12 +6,7 @@ import { MockedProvider } from "@apollo/client/testing";
 import { MemoryRouter } from "react-router-dom";
 import { RecurringReservationForm } from "./RecurringReservationForm";
 import { vi, test, expect, afterEach, beforeEach } from "vitest";
-import {
-  YEAR,
-  createGraphQLMocks,
-  mondayMorningReservations,
-  createReservationUnits,
-} from "./__test__/mocks";
+import { YEAR, createGraphQLMocks, mondayMorningReservations, createReservationUnits } from "./__test__/mocks";
 import { toUIDate } from "common/src/common/util";
 
 const DEFAULT_DATES = {
@@ -89,9 +84,7 @@ test("Render recurring reservation form with all but unit field disabled", async
     advanceTimers: vi.advanceTimersByTime.bind(vi),
   });
 
-  const resUnitSelectLabel = await screen.findByText(
-    "filters.label.reservationUnit"
-  );
+  const resUnitSelectLabel = await screen.findByText("filters.label.reservationUnit");
   expect(resUnitSelectLabel).toBeDefined();
 
   const btn = getReservationUnitBtn();
@@ -403,9 +396,7 @@ test("Form submission with a lot of blocking reservations", async () => {
   expect(elems).toHaveLength(nMondays);
 
   // Can't check the count printed before the list because it's using i18n (would need to modify the TFunction mock)
-  const listCountLabel = view.getByText(
-    /RecurringReservationForm.reservationsList/
-  );
+  const listCountLabel = view.getByText(/RecurringReservationForm.reservationsList/);
   expect(listCountLabel).toBeInTheDocument();
 
   const overlaps = within(list).queryAllByText(/overlapping/);
@@ -454,17 +445,13 @@ test("Reservations can be removed and restored", async () => {
   expect(within(list).queryAllByText(/common.remove/)).toHaveLength(3);
 
   await user.click(restore);
-  await waitFor(
-    async () => (await within(list).findAllByText(/common.remove/)).length === 4
-  );
+  await waitFor(async () => (await within(list).findAllByText(/common.remove/)).length === 4);
 });
 
 // NOTE this requires us to fix submission checking
 test.todo("Removed reservations are not included in the mutation");
 
-test.todo(
-  "Submit without any valid dates is disabled even though form is fully filled"
-);
+test.todo("Submit without any valid dates is disabled even though form is fully filled");
 
 test.todo("Form has reservation type selection.");
 test.todo("Form submission can bypass required meta field");

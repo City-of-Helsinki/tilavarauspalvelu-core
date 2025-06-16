@@ -32,10 +32,7 @@ const FallbackComponent = (err: unknown) => {
 };
 
 // NOTE client only because Navigation requires react-router-dom
-export default function PageWrapper({
-  apiBaseUrl,
-  children,
-}: Props): JSX.Element {
+export default function PageWrapper({ apiBaseUrl, children }: Props): JSX.Element {
   const { user } = useSession();
   const hasAccess = hasAnyPermission(user);
   const { modalContent } = useModal();
@@ -46,11 +43,7 @@ export default function PageWrapper({
         <Navigation apiBaseUrl={apiBaseUrl} />
         <Suspense fallback={<CenterSpinner />}>
           <Content>
-            {hasAccess && (
-              <BannerNotificationsList
-                target={BannerNotificationTarget.Staff}
-              />
-            )}
+            {hasAccess && <BannerNotificationsList target={BannerNotificationTarget.Staff} />}
             {user ? children : <MainLander apiBaseUrl={apiBaseUrl} />}
             <ToastContainer />
           </Content>

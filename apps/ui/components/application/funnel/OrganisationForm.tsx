@@ -3,15 +3,8 @@ import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import { ApplicantTypeChoice } from "@gql/gql-types";
-import {
-  ControlledSelect,
-  ControlledCheckbox,
-} from "common/src/components/form";
-import {
-  ApplicationFormTextInput,
-  BillingAddress,
-  ContactPersonSection,
-} from ".";
+import { ControlledSelect, ControlledCheckbox } from "common/src/components/form";
+import { ApplicationFormTextInput, BillingAddress, ContactPersonSection } from ".";
 import { type ApplicationPage3FormValues } from "./form";
 import { FormSubHeading } from "./styled";
 import { type OptionsT } from "@/modules/search";
@@ -34,8 +27,7 @@ export function OrganisationForm({ homeCityOptions }: Props): JSX.Element {
   const hasRegistration = applicantType === ApplicantTypeChoice.Association;
   const hasBillingAddress = watch("hasBillingAddress");
 
-  const translateError = (errorMsg?: string) =>
-    errorMsg ? t(`application:validation.${errorMsg}`) : "";
+  const translateError = (errorMsg?: string) => (errorMsg ? t(`application:validation.${errorMsg}`) : "");
 
   const toggleRegistration = () => {
     if (!hasRegistration) {
@@ -64,13 +56,8 @@ export function OrganisationForm({ homeCityOptions }: Props): JSX.Element {
         checked={!hasRegistration}
         onClick={toggleRegistration}
       />
-      <ApplicationFormTextInput
-        name="organisation.identifier"
-        disabled={!hasRegistration}
-      />
-      <FormSubHeading>
-        {t("application:Page3.sectionHeadings.postalAddress")}
-      </FormSubHeading>
+      <ApplicationFormTextInput name="organisation.identifier" disabled={!hasRegistration} />
+      <FormSubHeading>{t("application:Page3.sectionHeadings.postalAddress")}</FormSubHeading>
       <ApplicationFormTextInput name="organisation.address.streetAddress" />
       <ApplicationFormTextInput name="organisation.address.postCode" />
       <ApplicationFormTextInput name="organisation.address.city" />

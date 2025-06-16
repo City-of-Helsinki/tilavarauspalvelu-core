@@ -67,10 +67,7 @@ export function useReservationCalendarData({
 
 // TODO This would be better if we combined two GQL queries, one for the reservation itself
 // and other that includes the states (now we are fetching a lot of things we don't need)
-function shouldBeShownInTheCalendar(
-  r: CalendarReservationFragment,
-  ownPk: Maybe<number> | undefined
-) {
+function shouldBeShownInTheCalendar(r: CalendarReservationFragment, ownPk: Maybe<number> | undefined) {
   return (
     r.state === ReservationStateChoice.Confirmed ||
     r.state === ReservationStateChoice.RequiresHandling ||
@@ -116,8 +113,6 @@ function getEventName({
   return type === ReservationTypeChoice.Blocked ? blockedName : title.trim();
 }
 
-function getReservationTitle(
-  r: Pick<CalendarReservationFragment, "reserveeName">
-): string {
+function getReservationTitle(r: Pick<CalendarReservationFragment, "reserveeName">): string {
   return r.reserveeName ?? "";
 }

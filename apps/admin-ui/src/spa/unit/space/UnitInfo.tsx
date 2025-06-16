@@ -41,9 +41,7 @@ export function UnitInfo({
         <Name>{unit?.nameFi}</Name>
         <Parent>{parentName}</Parent>
       </div>
-      {unit?.location != null && (
-        <Address>{parseAddress(unit?.location)}</Address>
-      )}
+      {unit?.location != null && <Address>{parseAddress(unit?.location)}</Address>}
     </UnitInfoWrapper>
   );
 }

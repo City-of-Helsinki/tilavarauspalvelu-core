@@ -12,24 +12,10 @@ import {
 } from "@/gql/gql-types";
 import { ReservableMap, type RoundPeriod } from "@/modules/reservable";
 import { base64encode } from "common/src/helpers";
-import {
-  addDays,
-  addYears,
-  endOfDay,
-  format,
-  startOfDay,
-  startOfToday,
-} from "date-fns";
-import {
-  createMockReservationUnitType,
-  generateDescriptionFragment,
-  generateNameFragment,
-} from "./test.gql.utils";
+import { addDays, addYears, endOfDay, format, startOfDay, startOfToday } from "date-fns";
+import { createMockReservationUnitType, generateDescriptionFragment, generateNameFragment } from "./test.gql.utils";
 
-type ReservationUnitType = Omit<
-  IsReservableFieldsFragment,
-  "reservableTimeSpans"
->;
+type ReservationUnitType = Omit<IsReservableFieldsFragment, "reservableTimeSpans">;
 type MockReservationUnitProps = {
   bufferTimeBefore?: number;
   bufferTimeAfter?: number;
@@ -79,11 +65,7 @@ export function createMockIsReservableFieldsFragment({
   return reservationUnit;
 }
 
-export function createMockReservationUnit({
-  pk,
-}: {
-  pk: number;
-}): ReservationUnitNode {
+export function createMockReservationUnit({ pk }: { pk: number }): ReservationUnitNode {
   const timeSelector: ApplicationRoundTimeSlotNode = {
     id: base64encode(`ApplicationRoundTimeSlotNode:1`),
     pk,
@@ -169,8 +151,7 @@ export function createMockReservationUnit({
     requireReservationHandling: false, // Scalars["Boolean"]["output"];
     reservableTimeSpans: [] as const, // Maybe<ReadonlyArray<ReservableTimeSpanType>>;
     reservationBlockWholeDay: false, // Scalars["Boolean"]["output"];
-    reservationCancelledInstructionsEn:
-      null /* Maybe< Scalars["String"]["output"] >;*/,
+    reservationCancelledInstructionsEn: null /* Maybe< Scalars["String"]["output"] >;*/,
     reservationCancelledInstructionsFi: null, // Maybe< Scalars["String"]["output"] >;
     reservationCancelledInstructionsSv: null, // Maybe< Scalars["String"]["output"] >;
     reservationConfirmedInstructionsEn: null, // Maybe< Scalars["String"]["output"] >;

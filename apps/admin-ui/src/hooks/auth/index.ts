@@ -1,7 +1,4 @@
-import {
-  useCurrentUserQuery,
-  useCurrentUserSuspenseQuery,
-} from "@gql/gql-types";
+import { useCurrentUserQuery, useCurrentUserSuspenseQuery } from "@gql/gql-types";
 
 export function useSession() {
   const { data, error } = useCurrentUserQuery();

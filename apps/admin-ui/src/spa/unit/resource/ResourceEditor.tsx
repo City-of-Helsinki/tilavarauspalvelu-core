@@ -15,11 +15,7 @@ import { ButtonContainer, CenterSpinner } from "common/styled";
 import { SubPageHead } from "../SubPageHead";
 import { errorToast, successToast } from "common/src/common/toast";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
-import {
-  Editor,
-  ResourceUpdateSchema,
-  type ResourceUpdateForm,
-} from "./modules/resourceEditor";
+import { Editor, ResourceUpdateSchema, type ResourceUpdateForm } from "./modules/resourceEditor";
 import { ResourceEditorFields } from "./EditForm";
 import { LinkPrev } from "@/component/LinkPrev";
 import { gql } from "@apollo/client";
@@ -110,19 +106,13 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
   return (
     <>
       <LinkPrev route="../.." />
-      <SubPageHead
-        unit={unit}
-        title={resource.nameFi || t("ResourceEditor.defaultHeading")}
-      />
+      <SubPageHead unit={unit} title={resource.nameFi || t("ResourceEditor.defaultHeading")} />
       <FormErrorSummary errors={errors} />
       <form noValidate onSubmit={handleSubmit(onSubmit)}>
         <Editor>
           <ResourceEditorFields form={form} unitPk={unitPk} />
           <ButtonContainer>
-            <Button
-              onClick={() => history(-1)}
-              variant={ButtonVariant.Secondary}
-            >
+            <Button onClick={() => history(-1)} variant={ButtonVariant.Secondary}>
               {t("ResourceModal.cancel")}
             </Button>
             <Button type="submit" disabled={!isDirty}>

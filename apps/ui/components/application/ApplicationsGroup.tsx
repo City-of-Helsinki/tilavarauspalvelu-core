@@ -10,18 +10,12 @@ type Props = {
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 };
 
-export function ApplicationsGroup({
-  name,
-  applications,
-  actionCallback,
-}: Props): JSX.Element | null {
+export function ApplicationsGroup({ name, applications, actionCallback }: Props): JSX.Element | null {
   if (applications.length === 0) {
     return null;
   }
   applications.sort((a, b) => {
-    return (
-      new Date(a.sentDate ?? 0).getTime() - new Date(b.sentDate ?? 0).getTime()
-    );
+    return new Date(a.sentDate ?? 0).getTime() - new Date(b.sentDate ?? 0).getTime();
   });
 
   return (
@@ -30,11 +24,7 @@ export function ApplicationsGroup({
         {name}
       </H2>
       {applications.map((application) => (
-        <ApplicationCard
-          key={application.pk}
-          application={application}
-          actionCallback={actionCallback}
-        />
+        <ApplicationCard key={application.pk} application={application} actionCallback={actionCallback} />
       ))}
     </Flex>
   );

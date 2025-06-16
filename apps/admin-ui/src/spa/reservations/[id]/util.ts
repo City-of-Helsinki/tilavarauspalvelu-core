@@ -1,10 +1,6 @@
 import { differenceInMinutes, format } from "date-fns";
 import type { TFunction } from "i18next";
-import {
-  formatters as getFormatters,
-  getReservationPrice,
-  getUnRoundedReservationVolume,
-} from "common";
+import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "common";
 import {
   type Maybe,
   CustomerTypeChoice,
@@ -18,34 +14,19 @@ import {
   ReservationPriceDetailsFieldsFragment,
 } from "@gql/gql-types";
 import { formatDuration, fromApiDate } from "common/src/common/util";
-import {
-  formatDateTimeRange,
-  formatDate,
-  getReserveeName,
-} from "@/common/util";
+import { formatDateTimeRange, formatDate, getReserveeName } from "@/common/util";
 import { fromAPIDateTime } from "@/helpers";
 import { filterNonNullable, sort, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
 type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
-function reservationUnitName(
-  reservationUnit: Maybe<CreateTagStringFragment["reservationUnits"][0]>
-): string {
-  return reservationUnit
-    ? `${reservationUnit.nameFi}, ${reservationUnit.unit?.nameFi || ""}`
-    : "-";
+function reservationUnitName(reservationUnit: Maybe<CreateTagStringFragment["reservationUnits"][0]>): string {
+  return reservationUnit ? `${reservationUnit.nameFi}, ${reservationUnit.unit?.nameFi || ""}` : "-";
 }
 
-export function reservationPrice(
-  reservation: ReservationType,
-  t: TFunction
-): string {
-  return getReservationPrice(
-    reservation.price,
-    t("RequestedReservation.noPrice"),
-    true
-  );
+export function reservationPrice(reservation: ReservationType, t: TFunction): string {
+  return getReservationPrice(reservation.price, t("RequestedReservation.noPrice"), true);
 }
 
 function getBeginTime(p: PricingFieldsFragment): number {
@@ -61,10 +42,7 @@ export function getReservatinUnitPricing(
     return null;
   }
 
-  const pricings = sort(
-    reservationUnit.pricings,
-    (a, b) => getBeginTime(a) - getBeginTime(b)
-  );
+  const pricings = sort(reservationUnit.pricings, (a, b) => getBeginTime(a) - getBeginTime(b));
 
   // Find the first pricing that is valid at the given date
   // requires using reduce because we have no end dates => the last begin should be used
@@ -99,10 +77,7 @@ export const RESERVATION_PRICE_DETAILS_FRAGMENT = gql`
 `;
 
 /// TODO refactor this to use reasonable formatting (modern i18next)
-export function getReservationPriceDetails(
-  reservation: ReservationPriceDetailsFieldsFragment,
-  t: TFunction
-): string {
+export function getReservationPriceDetails(reservation: ReservationPriceDetailsFieldsFragment, t: TFunction): string {
   const begin = new Date(reservation.begin);
   const end = new Date(reservation.end);
   const resUnit = reservation.reservationUnits?.[0] ?? null;
@@ -136,18 +111,13 @@ export function getReservationPriceDetails(
       });
 }
 
-function reserveeTypeToTranslationKey(
-  reserveeType: CustomerTypeChoice,
-  isUnregisteredAssociation: boolean
-) {
+function reserveeTypeToTranslationKey(reserveeType: CustomerTypeChoice, isUnregisteredAssociation: boolean) {
   switch (reserveeType) {
     case CustomerTypeChoice.Business:
     case CustomerTypeChoice.Individual:
       return `CustomerTypeChoice.${reserveeType}`;
     case CustomerTypeChoice.Nonprofit:
-      return `CustomerTypeChoice.${reserveeType}.${
-        isUnregisteredAssociation ? "UNREGISTERED" : "REGISTERED"
-      }`;
+      return `CustomerTypeChoice.${reserveeType}.${isUnregisteredAssociation ? "UNREGISTERED" : "REGISTERED"}`;
     default:
       return "";
   }
@@ -166,19 +136,13 @@ export function getTranslationKeyForCustomerTypeChoice(
   }
 
   const reserveeTypeTranslationKey = reserveeType
-    ? reserveeTypeToTranslationKey(
-        reserveeType,
-        isUnregisteredAssociation ?? false
-      )
+    ? reserveeTypeToTranslationKey(reserveeType, isUnregisteredAssociation ?? false)
     : "";
   return [`ReservationType.${reservationType}`, reserveeTypeTranslationKey];
 }
 
 export function translateReservationCustomerType(
-  res: Pick<
-    ReservationType,
-    "type" | "reserveeType" | "reserveeIsUnregisteredAssociation"
-  >,
+  res: Pick<ReservationType, "type" | "reserveeType" | "reserveeIsUnregisteredAssociation">,
   t: TFunction
 ): string {
   const [part1, part2] = getTranslationKeyForCustomerTypeChoice(
@@ -198,18 +162,13 @@ export function getName(
     return `${reservation.pk}, ${reservation.name}`.trim();
   }
 
-  return `${reservation.pk}, ${
-    getReserveeName(reservation, t) || t("RequestedReservation.noName")
-  }`.trim();
+  return `${reservation.pk}, ${getReserveeName(reservation, t) || t("RequestedReservation.noName")}`.trim();
 }
 
 // TODO rename: it's the time + duration
 // recurring format: {weekday(s)} {time}, {duration} | {startDate}-{endDate} | {unit}
 // single format   : {weekday} {date} {time}, {duration} | {unit}
-export function createTagString(
-  reservation: CreateTagStringFragment,
-  t: TFunction
-): string {
+export function createTagString(reservation: CreateTagStringFragment, t: TFunction): string {
   try {
     if (reservation.recurringReservation != null) {
       return createRecurringTagString(reservation, t);
@@ -220,17 +179,12 @@ export function createTagString(
   }
 }
 
-function createSingleTagString(
-  reservation: CreateTagStringFragment,
-  t: TFunction
-): string {
+function createSingleTagString(reservation: CreateTagStringFragment, t: TFunction): string {
   const begin = new Date(reservation.begin);
   const end = new Date(reservation.end);
   const singleDateTimeTag = formatDateTimeRange(t, begin, end);
 
-  const unitTag = reservation?.reservationUnits
-    ?.map(reservationUnitName)
-    .join(", ");
+  const unitTag = reservation?.reservationUnits?.map(reservationUnitName).join(", ");
 
   const durMinutes = differenceInMinutes(end, begin);
   const durationTag = formatDuration(t, { minutes: durMinutes });
@@ -238,13 +192,9 @@ function createSingleTagString(
   return `${singleDateTimeTag}, ${durationTag} | ${unitTag}`;
 }
 
-function createRecurringTagString(
-  reservation: CreateTagStringFragment,
-  t: TFunction
-): string {
+function createRecurringTagString(reservation: CreateTagStringFragment, t: TFunction): string {
   const { recurringReservation } = reservation;
-  const { beginDate, beginTime, endDate, endTime, weekdays } =
-    recurringReservation ?? {};
+  const { beginDate, beginTime, endDate, endTime, weekdays } = recurringReservation ?? {};
   if (
     endDate == null ||
     beginDate == null ||
@@ -256,9 +206,7 @@ function createRecurringTagString(
   }
 
   const recurringTag = `${formatDate(beginDate)}–${formatDate(endDate)}`;
-  const unitTag = reservation?.reservationUnits
-    ?.map(reservationUnitName)
-    .join(", ");
+  const unitTag = reservation?.reservationUnits?.map(reservationUnitName).join(", ");
 
   const weekDayTag = sort(filterNonNullable(weekdays), (a, b) => a - b)
     .map((x) => t(`dayShort.${x}`))
@@ -270,17 +218,12 @@ function createRecurringTagString(
     return "";
   }
 
-  const durMinutes = differenceInMinutes(
-    new Date(reservation.end),
-    new Date(reservation.begin)
-  );
+  const durMinutes = differenceInMinutes(new Date(reservation.end), new Date(reservation.begin));
   const durationTag = formatDuration(t, { minutes: durMinutes });
 
   const recurringDateTag = `${weekDayTag} ${format(begin, "HH:mm")}–${format(end, "HH:mm")}`;
 
-  return `${recurringDateTag}, ${durationTag} ${
-    recurringTag.length > 0 ? " | " : ""
-  } ${recurringTag} | ${unitTag}`;
+  return `${recurringDateTag}, ${durationTag} ${recurringTag.length > 0 ? " | " : ""} ${recurringTag} | ${unitTag}`;
 }
 
 export const CREATE_TAG_STRING_FRAGMENT = gql`

@@ -1,15 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import {
-  Button,
-  ButtonVariant,
-  Dialog,
-  RadioButton,
-  Select,
-  SelectionGroup,
-  TextArea,
-} from "hds-react";
+import { Button, ButtonVariant, Dialog, RadioButton, Select, SelectionGroup, TextArea } from "hds-react";
 import {
   type ReservationDenyMutationInput,
   type ReservationRefundMutationInput,
@@ -54,18 +46,14 @@ function isPriceReturnable(x: {
   return (
     x.price > 0 &&
     (x.orderStatus === OrderStatus.Paid ||
-      (x.orderStatus === OrderStatus.PaidByInvoice &&
-        isBefore(new Date(), new Date(x.begin)))) &&
+      (x.orderStatus === OrderStatus.PaidByInvoice && isBefore(new Date(), new Date(x.begin)))) &&
     x.orderUuid != null &&
     x.refundUuid == null
   );
 }
 
 function convertToReturnState(
-  reservation: Pick<
-    DenyDialogFieldsFragment,
-    "price" | "paymentOrder" | "begin"
-  >
+  reservation: Pick<DenyDialogFieldsFragment, "price" | "paymentOrder" | "begin">
 ): ReturnAllowedState {
   const { price, paymentOrder, begin } = reservation;
 
@@ -157,9 +145,7 @@ function DialogContent({
 }: Readonly<DialogContentProps>): JSX.Element {
   const { t } = useTranslation();
 
-  const [handlingDetails, setHandlingDetails] = useState<string>(
-    initialHandlingDetails
-  );
+  const [handlingDetails, setHandlingDetails] = useState<string>(initialHandlingDetails);
 
   const [denyReasonPk, setDenyReason] = useState<number | null>(null);
 
@@ -202,26 +188,16 @@ function DialogContent({
             onChange={(e) => setHandlingDetails(e.target.value)}
             label={t("RequestedReservation.handlingDetails")}
             id="handlingDetails"
-            helperText={t(
-              "RequestedReservation.DenyDialog.handlingDetailsHelper"
-            )}
+            helperText={t("RequestedReservation.DenyDialog.handlingDetailsHelper")}
           />
           {children}
         </Flex>
       </Dialog.Content>
       <ActionButtons>
-        <Button
-          disabled={!denyReasonPk || disabled}
-          onClick={handleDeny}
-          data-testid="deny-dialog__deny-button"
-        >
+        <Button disabled={!denyReasonPk || disabled} onClick={handleDeny} data-testid="deny-dialog__deny-button">
           {t("RequestedReservation.DenyDialog.reject")}
         </Button>
-        <Button
-          variant={ButtonVariant.Secondary}
-          onClick={onClose}
-          data-testid="deny-dialog__cancel-button"
-        >
+        <Button variant={ButtonVariant.Secondary} onClick={onClose} data-testid="deny-dialog__cancel-button">
           {t("common.prev")}
         </Button>
       </ActionButtons>
@@ -255,10 +231,7 @@ function DenyDialogWrapper({
       focusAfterCloseRef={focusAfterCloseRef}
     >
       <Flex>
-        <Dialog.Header
-          id="deny-dialog__header"
-          title={title ?? t("RequestedReservation.DenyDialog.title")}
-        />
+        <Dialog.Header id="deny-dialog__header" title={title ?? t("RequestedReservation.DenyDialog.title")} />
         {children}
       </Flex>
     </Dialog>
@@ -282,12 +255,9 @@ export function DenyDialog({
   const [denyReservationMutation] = useDenyReservationMutation();
   const [refundReservationMutation] = useRefundReservationMutation();
 
-  const denyReservation = (input: ReservationDenyMutationInput) =>
-    denyReservationMutation({ variables: { input } });
+  const denyReservation = (input: ReservationDenyMutationInput) => denyReservationMutation({ variables: { input } });
 
-  const [returnState, setReturnState] = useState<ReturnAllowedState>(
-    convertToReturnState(reservation)
-  );
+  const [returnState, setReturnState] = useState<ReturnAllowedState>(convertToReturnState(reservation));
 
   const displayError = useDisplayError();
 
@@ -339,22 +309,14 @@ export function DenyDialog({
   };
 
   return (
-    <DenyDialogWrapper
-      title={title}
-      onClose={onClose}
-      focusAfterCloseRef={focusAfterCloseRef}
-    >
+    <DenyDialogWrapper title={title} onClose={onClose} focusAfterCloseRef={focusAfterCloseRef}>
       <DialogContent
         initialHandlingDetails={reservation.handlingDetails ?? ""}
         onReject={handleDeny}
         onClose={onClose}
         disabled={returnState === "not-decided"}
       >
-        <ReturnMoney
-          state={returnState}
-          onChange={setReturnState}
-          price={toNumber(reservation.price) ?? 0}
-        />
+        <ReturnMoney state={returnState} onChange={setReturnState} price={toNumber(reservation.price) ?? 0} />
       </DialogContent>
     </DenyDialogWrapper>
   );
@@ -412,16 +374,8 @@ export function DenyDialogSeries({
   };
 
   return (
-    <DenyDialogWrapper
-      title={title}
-      onClose={onClose}
-      focusAfterCloseRef={focusAfterCloseRef}
-    >
-      <DialogContent
-        initialHandlingDetails={initialHandlingDetails}
-        onReject={handleDeny}
-        onClose={onClose}
-      />
+    <DenyDialogWrapper title={title} onClose={onClose} focusAfterCloseRef={focusAfterCloseRef}>
+      <DialogContent initialHandlingDetails={initialHandlingDetails} onReject={handleDeny} onClose={onClose} />
     </DenyDialogWrapper>
   );
 }

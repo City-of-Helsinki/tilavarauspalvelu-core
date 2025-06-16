@@ -148,9 +148,7 @@ type LinkProps = {
   tabIndex?: number;
   to: To;
 };
-type LinkComponent = React.ForwardRefExoticComponent<
-  LinkProps & React.RefAttributes<HTMLAnchorElement>
->;
+type LinkComponent = React.ForwardRefExoticComponent<LinkProps & React.RefAttributes<HTMLAnchorElement>>;
 type To = string | Partial<Path>;
 interface Path {
   pathname: string;
@@ -411,11 +409,7 @@ function Texts({
     <TextContainer>
       <WrapWithLink
         content={
-          <Header
-            className="card__header"
-            as={headingElement}
-            data-testid={headingTestId ?? "card__heading"}
-          >
+          <Header className="card__header" as={headingElement} data-testid={headingTestId ?? "card__heading"}>
             {heading}
           </Header>
         }
@@ -454,22 +448,13 @@ function Infos({
   return (
     <InfoContainer>
       {infos.map((info) => (
-        <Info
-          key={info.value}
-          value={info.value}
-          icon={info.icon}
-          data-testid={info.testId}
-        />
+        <Info key={info.value} value={info.value} icon={info.icon} data-testid={info.testId} />
       ))}
     </InfoContainer>
   );
 }
 
-function Info({
-  value,
-  icon,
-  ...rest
-}: Readonly<{ value: string; icon?: JSX.Element }>) {
+function Info({ value, icon, ...rest }: Readonly<{ value: string; icon?: JSX.Element }>) {
   return (
     <InfoItem {...rest}>
       {icon}

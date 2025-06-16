@@ -12,9 +12,7 @@ import { addYears } from "date-fns";
 interface SearchQueryProps extends ICreateGraphQLMock {
   isSearchError: boolean;
 }
-export function createSearchQueryMocks({
-  isSearchError,
-}: SearchQueryProps): CreateGraphQLMocksReturn {
+export function createSearchQueryMocks({ isSearchError }: SearchQueryProps): CreateGraphQLMocksReturn {
   // TODO this should enforce non nullable for the query
   // it can be null when the query is loading, but when we mock it it should be non nullable
   // Q: what about failed queries? (though they should have different type)
@@ -31,22 +29,21 @@ export function createSearchQueryMocks({
       },
     },
   };
-  const SearchReservationUnitsQueryMockWithParams: SearchReservationUnitsQuery =
-    {
-      reservationUnits: {
-        totalCount: 1,
-        edges: [
-          {
-            node: createMockReservationUnit({ pk: 1 }),
-          },
-        ],
-        pageInfo: {
-          // TOOD how to mock this?
-          endCursor: null,
-          hasNextPage: false,
+  const SearchReservationUnitsQueryMockWithParams: SearchReservationUnitsQuery = {
+    reservationUnits: {
+      totalCount: 1,
+      edges: [
+        {
+          node: createMockReservationUnit({ pk: 1 }),
         },
+      ],
+      pageInfo: {
+        // TOOD how to mock this?
+        endCursor: null,
+        hasNextPage: false,
       },
-    };
+    },
+  };
 
   return [
     {
@@ -112,10 +109,7 @@ function createSearchVariablesMock({
     applicationRound: [1],
     personsAllowed: null,
     first: 36,
-    orderBy: [
-      ReservationUnitOrderingChoices.NameFiAsc,
-      ReservationUnitOrderingChoices.PkAsc,
-    ],
+    orderBy: [ReservationUnitOrderingChoices.NameFiAsc, ReservationUnitOrderingChoices.PkAsc],
     isDraft: false,
     isVisible: true,
     reservationKind: ReservationKind.Season,

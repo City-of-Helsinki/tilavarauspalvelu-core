@@ -76,9 +76,7 @@ export function Purposes({ purposes }: Props): JSX.Element {
     return item.smallUrl || item.imageUrl || pixel;
   };
   const lang = getLocalizationLang(i18n.language);
-  const getName = (
-    item: Pick<PurposeCardFragment, "nameFi" | "nameEn" | "nameSv">
-  ) => {
+  const getName = (item: Pick<PurposeCardFragment, "nameFi" | "nameEn" | "nameSv">) => {
     return getTranslationSafe(item, "name", lang);
   };
 

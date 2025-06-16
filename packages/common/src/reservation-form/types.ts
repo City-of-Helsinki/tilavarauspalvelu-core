@@ -89,12 +89,7 @@ export const reservationApplicationFields = {
     "reservee_id",
     ...fieldsCommon,
   ],
-  business: [
-    "reservee_organisation_name",
-    "home_city",
-    "reservee_id",
-    ...fieldsCommon,
-  ],
+  business: ["reservee_organisation_name", "home_city", "reservee_id", ...fieldsCommon],
   common: [
     "reservee_type",
     "name",

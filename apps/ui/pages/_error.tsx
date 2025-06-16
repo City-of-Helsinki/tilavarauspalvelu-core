@@ -6,13 +6,7 @@ import { env } from "@/env.mjs";
 import { getApiErrors } from "common/src/apolloUtils";
 
 const CustomErrorComponent: NextPage<ErrorProps> = (props) => {
-  return (
-    <ErrorContainer
-      title={props.title}
-      statusCode={props.statusCode}
-      feedbackUrl={env.EMAIL_VARAAMO_EXT_LINK}
-    />
-  );
+  return <ErrorContainer title={props.title} statusCode={props.statusCode} feedbackUrl={env.EMAIL_VARAAMO_EXT_LINK} />;
 };
 
 CustomErrorComponent.getInitialProps = async (contextData) => {
@@ -22,10 +16,7 @@ CustomErrorComponent.getInitialProps = async (contextData) => {
   if (gqlErrors.length > 0) {
     // TODO there might be a nicer way of doing this with normal SentryCaptureMessage not Underscore
     const first = gqlErrors[0];
-    const err =
-      first != null && "validation_code" in first
-        ? first.validation_code
-        : (first?.code ?? "UNKNOWN");
+    const err = first != null && "validation_code" in first ? first.validation_code : (first?.code ?? "UNKNOWN");
     await Sentry.captureUnderscoreErrorException({
       ...contextData,
       err: `GraphQL error: ${err}`,

@@ -1,35 +1,16 @@
 import React, { useMemo } from "react";
 import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
-import {
-  Button,
-  ButtonVariant,
-  IconAngleDown,
-  IconAngleUp,
-  IconCross,
-  IconSize,
-} from "hds-react";
+import { Button, ButtonVariant, IconAngleDown, IconAngleUp, IconCross, IconSize } from "hds-react";
 import { maxBy } from "lodash-es";
 import { fromUIDate } from "common/src/common/util";
 import { Transition } from "react-transition-group";
-import {
-  SemiBold,
-  Flex,
-  fontBold,
-  fontMedium,
-  fontRegular,
-} from "common/styled";
+import { SemiBold, Flex, fontBold, fontMedium, fontRegular } from "common/styled";
 import { breakpoints } from "common/src/const";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import { formatDateTimeRange } from "@/modules/util";
-import {
-  useController,
-  type Control,
-  type FieldValues,
-  type SubmitHandler,
-  type UseFormReturn,
-} from "react-hook-form";
+import { useController, type Control, type FieldValues, type SubmitHandler, type UseFormReturn } from "react-hook-form";
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { useMedia } from "react-use";
@@ -155,9 +136,7 @@ export function ReservationCalendarControls({
   const formDuration = watch("duration");
   const dateValue = useMemo(() => fromUIDate(formDate ?? ""), [formDate]);
 
-  const duration = !Number.isNaN(Number(formDuration))
-    ? formDuration
-    : (reservationUnit.minReservationDuration ?? 0);
+  const duration = !Number.isNaN(Number(formDuration)) ? formDuration : (reservationUnit.minReservationDuration ?? 0);
 
   const price =
     dateValue != null
@@ -169,10 +148,7 @@ export function ReservationCalendarControls({
         })
       : null;
 
-  const lastOpeningDate = maxBy(
-    reservationUnit.reservableTimeSpans,
-    (n) => n?.endDatetime
-  );
+  const lastOpeningDate = maxBy(reservationUnit.reservableTimeSpans, (n) => n?.endDatetime);
 
   const areControlsVisible = watch("isControlsVisible");
 
@@ -184,23 +160,11 @@ export function ReservationCalendarControls({
       onSubmit={handleSubmit(submitReservation)}
       data-testid="reservation-unit__reservation-controls--wrapper"
     >
-      <ControlledToggler
-        form={reservationForm}
-        focusSlot={focusSlot}
-        price={price}
-        durationOptions={durationOptions}
-      />
+      <ControlledToggler form={reservationForm} focusSlot={focusSlot} price={price} durationOptions={durationOptions} />
       {/* TODO the submit button part should be refactored so that we hide the other buttons instead of
        * adding a second submit button */}
-      {focusSlot.isReservable && !areControlsVisible && (
-        <Flex $alignItems="flex-end">{submitButton}</Flex>
-      )}
-      <Transition
-        mountOnEnter
-        unmountOnExit
-        timeout={isMobile ? 500 : 0}
-        in={areControlsVisible}
-      >
+      {focusSlot.isReservable && !areControlsVisible && <Flex $alignItems="flex-end">{submitButton}</Flex>}
+      <Transition mountOnEnter unmountOnExit timeout={isMobile ? 500 : 0} in={areControlsVisible}>
         {(state) => (
           <Content className={state} $isAnimated={isMobile}>
             <ControlledDateInput
@@ -209,11 +173,7 @@ export function ReservationCalendarControls({
               label={t("reservationCalendar:startDate")}
               initialMonth={dateValue ?? new Date()}
               minDate={new Date()}
-              maxDate={
-                lastOpeningDate?.endDatetime
-                  ? new Date(lastOpeningDate.endDatetime)
-                  : new Date()
-              }
+              maxDate={lastOpeningDate?.endDatetime ? new Date(lastOpeningDate.endDatetime) : new Date()}
             />
             <div data-testid="calendar-controls__duration">
               <ControlledSelect
@@ -287,9 +247,7 @@ function ControlledToggler({
     if (!focusSlot.isReservable) {
       return t("reservationCalendar:selectTime");
     }
-    const dateStr = capitalize(
-      formatDateTimeRange(t, focusSlot.start, focusSlot.end)
-    );
+    const dateStr = capitalize(formatDateTimeRange(t, focusSlot.start, focusSlot.end));
     const selected = durationOptions.find((opt) => opt.value === duration);
     const durationStr = selected?.label ?? "";
 
@@ -304,19 +262,10 @@ function ControlledToggler({
   });
 
   return (
-    <Flex
-      $alignItems="flex-start"
-      $justifyContent="space-between"
-      $direction="row"
-    >
+    <Flex $alignItems="flex-start" $justifyContent="space-between" $direction="row">
       <TogglerLabel>
         {focusSlot.isReservable ? (
-          <TogglerLabelContent
-            areControlsVisible={value}
-            togglerLabel={togglerLabel}
-            t={t}
-            price={price}
-          />
+          <TogglerLabelContent areControlsVisible={value} togglerLabel={togglerLabel} t={t} price={price} />
         ) : (
           t("reservationCalendar:selectTime")
         )}
@@ -327,11 +276,7 @@ function ControlledToggler({
         type="button"
         aria-label={value ? t("common:showLess") : t("common:showMore")}
       >
-        {value ? (
-          <IconAngleDown size={IconSize.Medium} />
-        ) : (
-          <IconAngleUp size={IconSize.Medium} />
-        )}
+        {value ? <IconAngleDown size={IconSize.Medium} /> : <IconAngleUp size={IconSize.Medium} />}
       </ToggleButton>
     </Flex>
   );

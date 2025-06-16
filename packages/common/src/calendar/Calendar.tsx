@@ -1,21 +1,10 @@
 import React from "react";
 import styled from "styled-components";
-import {
-  addHours,
-  endOfMonth,
-  format,
-  startOfWeek,
-  getDay,
-  startOfDay,
-} from "date-fns";
+import { addHours, endOfMonth, format, startOfWeek, getDay, startOfDay } from "date-fns";
 import { fi } from "date-fns/locale/fi";
 import { enGB } from "date-fns/locale/en-GB";
 import { sv } from "date-fns/locale/sv";
-import {
-  Calendar as BigCalendar,
-  dateFnsLocalizer,
-  ToolbarProps,
-} from "react-big-calendar";
+import { Calendar as BigCalendar, dateFnsLocalizer, ToolbarProps } from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
@@ -66,11 +55,7 @@ type Props<T> = {
   onEventDrop?: (event: CalendarEvent<T>) => void;
   onEventResize?: (event: CalendarEvent<T>) => void;
   onSelectSlot?: (
-    {
-      start,
-      end,
-      action,
-    }: { start: Date; end: Date; action: "select" | "click" | "doubleClick" },
+    { start, end, action }: { start: Date; end: Date; action: "select" | "click" | "doubleClick" },
     skipLengthCheck: boolean
   ) => void;
   min?: Date;
@@ -443,8 +428,7 @@ const StyledCalendar = styled(BigCalendar)<{
   .rbc-event-content {
     font-size: 80%;
     margin-top: var(--spacing-3-xs);
-    text-decoration: ${({ $underlineEvents }) =>
-      $underlineEvents ? "underline" : "none"};
+    text-decoration: ${({ $underlineEvents }) => ($underlineEvents ? "underline" : "none")};
   }
 
   .isSmall .rbc-event-label {
@@ -515,9 +499,7 @@ function Calendar<T extends Record<string, unknown>>({
   isLoading,
 }: Props<T>): JSX.Element {
   // FIXME this breaks TS type ckecking => replace with prop spreading
-  const Component: React.ElementType = draggable
-    ? StyledCalendarDND
-    : StyledCalendar;
+  const Component: React.ElementType = draggable ? StyledCalendarDND : StyledCalendar;
 
   return (
     <Component

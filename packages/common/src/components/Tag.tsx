@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  getStatusBackgroundColor,
-  getStatusBorderColor,
-  StatusLabelType,
-  StyledTag,
-} from "../tags";
+import { getStatusBackgroundColor, getStatusBorderColor, StatusLabelType, StyledTag } from "../tags";
 import styled from "styled-components";
 
 type TagPropsType = {
@@ -25,12 +20,7 @@ const ColoredTag = styled(StyledTag)<{ $type: StatusLabelType }>`
   }
 `;
 
-function Tag({
-  ariaLabel,
-  type = "neutral",
-  children,
-  onClick,
-}: TagPropsType): JSX.Element {
+function Tag({ ariaLabel, type = "neutral", children, onClick }: TagPropsType): JSX.Element {
   return (
     <ColoredTag $type={type} aria-label={ariaLabel} onClick={onClick}>
       {children}

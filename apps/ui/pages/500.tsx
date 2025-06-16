@@ -23,14 +23,7 @@ type Props = {
 };
 
 function Page500({ title, body, feedbackUrl }: Readonly<Props>): JSX.Element {
-  return (
-    <ErrorContainer
-      statusCode={500}
-      title={title}
-      body={body}
-      feedbackUrl={feedbackUrl}
-    />
-  );
+  return <ErrorContainer statusCode={500} title={title} body={body} feedbackUrl={feedbackUrl} />;
 }
 
 export default Page500;

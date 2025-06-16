@@ -3,22 +3,14 @@ import { Button, ButtonVariant, LoadingSpinner, Notification } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import {
-  useUpdateSpaceMutation,
-  type SpaceUpdateMutationInput,
-  useSpaceQuery,
-} from "@gql/gql-types";
+import { useUpdateSpaceMutation, type SpaceUpdateMutationInput, useSpaceQuery } from "@gql/gql-types";
 import { errorToast, successToast } from "common/src/common/toast";
 import { ButtonContainer, CenterSpinner, H2, H3 } from "common/styled";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
 import { Head } from "./Head";
 import { SpaceHierarchy } from "./SpaceHierarchy";
 import { ParentSelector } from "./ParentSelector";
-import {
-  type SpaceUpdateForm,
-  SpaceForm,
-  SpaceUpdateSchema,
-} from "./SpaceForm";
+import { type SpaceUpdateForm, SpaceForm, SpaceUpdateSchema } from "./SpaceForm";
 import { base64encode } from "common/src/helpers";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -45,8 +37,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
 
   const [mutation, { loading: isMutationLoading }] = useUpdateSpaceMutation();
 
-  const updateSpace = (input: SpaceUpdateMutationInput) =>
-    mutation({ variables: { input } });
+  const updateSpace = (input: SpaceUpdateMutationInput) => mutation({ variables: { input } });
 
   const displayError = useDisplayError();
   const {
@@ -176,9 +167,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
             {t("SpaceEditor.cancel")}
           </Button>
           <Button
-            variant={
-              isMutationLoading ? ButtonVariant.Clear : ButtonVariant.Primary
-            }
+            variant={isMutationLoading ? ButtonVariant.Clear : ButtonVariant.Primary}
             iconStart={isMutationLoading ? <LoadingSpinner small /> : undefined}
             disabled={!isDirty || isMutationLoading}
             type="submit"

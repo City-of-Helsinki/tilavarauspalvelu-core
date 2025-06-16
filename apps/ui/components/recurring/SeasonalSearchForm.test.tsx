@@ -45,10 +45,7 @@ function constructOptions({
   nUnitOptions = 8,
 } = {}): SearchFormProps["options"] {
   return {
-    reservationUnitTypes: constructOption(
-      "reservationUnitTypes",
-      nReservationUnitTypeOptions
-    ),
+    reservationUnitTypes: constructOption("reservationUnitTypes", nReservationUnitTypeOptions),
     purposes: constructOption("purposes", nPurposeOptions),
     units: constructOption("units", nUnitOptions),
   } as const;
@@ -96,12 +93,7 @@ describe("SeasonalSearchForm", () => {
   test("should search (update query params) on submit", async () => {
     const handleSearch = vi.fn();
     const options = constructOptions();
-    const view = render(
-      <SeasonalSearchForm
-        {...constructProps({ options })}
-        handleSearch={handleSearch}
-      />
-    );
+    const view = render(<SeasonalSearchForm {...constructProps({ options })} handleSearch={handleSearch} />);
     const user = userEvent.setup();
     const selected = options.purposes[0] ?? { label: "", value: 0 };
     await selectOption(view, "searchForm:labels.purposes", selected.label);
@@ -114,18 +106,12 @@ describe("SeasonalSearchForm", () => {
     expect(handleSearch).toHaveBeenCalledTimes(1);
   });
 
-  test.for([
-    { key: "purposes" },
-    { key: "reservationUnitTypes" },
-    { key: "units" },
-  ] as const)(
+  test.for([{ key: "purposes" }, { key: "reservationUnitTypes" }, { key: "units" }] as const)(
     "should disable %key select if no options are available",
     ({ key }) => {
       const options = { ...constructOptions() };
       options[key] = [];
-      const view = render(
-        <SeasonalSearchForm {...constructProps({ options })} />
-      );
+      const view = render(<SeasonalSearchForm {...constructProps({ options })} />);
       // const view = render(<SeasonalSearchForm {...props} options={options} />);
       const btn = view.getByLabelText(`searchForm:labels.${key}`, {
         selector: "button",
@@ -142,9 +128,7 @@ describe("SeasonalSearchForm", () => {
     const params = new URLSearchParams();
     params.set("purposes", selected.value.toString());
     mockedSearchParams.mockReturnValue(params);
-    const view = render(
-      <SeasonalSearchForm {...constructProps({ options })} />
-    );
+    const view = render(<SeasonalSearchForm {...constructProps({ options })} />);
     const label = "searchForm:labels.purposes";
     const btn = view.getByLabelText(label, {
       selector: "button",
@@ -155,9 +139,7 @@ describe("SeasonalSearchForm", () => {
   test("allow input text search but dont search automatically", async () => {
     const user = userEvent.setup();
     const handleSearch = vi.fn();
-    const view = render(
-      <SeasonalSearchForm {...constructProps()} handleSearch={handleSearch} />
-    );
+    const view = render(<SeasonalSearchForm {...constructProps()} handleSearch={handleSearch} />);
     const searchLabel = "searchForm:labels.textSearch";
     const searchValue = "foobar";
     expect(view.getByLabelText(searchLabel)).toBeInTheDocument();
@@ -174,9 +156,7 @@ describe("SeasonalSearchForm", () => {
   test("allow select reservation unit type but dont search automatically", async () => {
     const user = userEvent.setup();
     const handleSearch = vi.fn();
-    const view = render(
-      <SeasonalSearchForm {...constructProps()} handleSearch={handleSearch} />
-    );
+    const view = render(<SeasonalSearchForm {...constructProps()} handleSearch={handleSearch} />);
     const listboxLabel = "searchForm:labels.reservationUnitTypes";
     const optionLabel = "reservationUnitTypes 1";
     await selectOption(view, listboxLabel, optionLabel);
@@ -197,9 +177,7 @@ describe("Tags should modify search params", () => {
   test("no tags should be visible by default", () => {
     const handleSearch = vi.fn();
     const props = constructProps();
-    const view = render(
-      <SeasonalSearchForm {...props} handleSearch={handleSearch} />
-    );
+    const view = render(<SeasonalSearchForm {...props} handleSearch={handleSearch} />);
     const tags = view.getByTestId("search-form__filter--tags");
     expect(tags).toBeInTheDocument();
     expect(tags.children).toHaveLength(0);
@@ -212,27 +190,16 @@ describe("Tags should modify search params", () => {
     const selected = options.purposes[0] ?? { label: "", value: 0 };
     params.set("purposes", selected.value.toString());
     mockedSearchParams.mockReturnValue(params);
-    const view = render(
-      <SeasonalSearchForm
-        {...constructProps({ options })}
-        handleSearch={handleSearch}
-      />
-    );
+    const view = render(<SeasonalSearchForm {...constructProps({ options })} handleSearch={handleSearch} />);
     const tags = view.getByTestId("search-form__filter--tags");
     expect(tags).toBeInTheDocument();
     // check that we have one tag + the clear all button
     expect(tags.children).toHaveLength(2);
     expect(within(tags).getByText("searchForm:resetForm")).toBeInTheDocument();
-    expect(
-      within(tags).getByText(`purposes ${selected.value}`)
-    ).toBeInTheDocument();
+    expect(within(tags).getByText(`purposes ${selected.value}`)).toBeInTheDocument();
   });
 
-  test.for([
-    { key: "purposes" },
-    { key: "reservationUnitTypes" },
-    { key: "units" },
-  ] as const)(
+  test.for([{ key: "purposes" }, { key: "reservationUnitTypes" }, { key: "units" }] as const)(
     "multiple tags for same option should be visible $key",
     ({ key }) => {
       const handleSearch = vi.fn();
@@ -247,24 +214,13 @@ describe("Tags should modify search params", () => {
       params.append(key, selected1.value.toString());
       params.append(key, selected2.value.toString());
       mockedSearchParams.mockReturnValue(params);
-      const view = render(
-        <SeasonalSearchForm
-          {...constructProps({ options })}
-          handleSearch={handleSearch}
-        />
-      );
+      const view = render(<SeasonalSearchForm {...constructProps({ options })} handleSearch={handleSearch} />);
       const tags = view.getByTestId("search-form__filter--tags");
       expect(tags).toBeInTheDocument();
       // check that we have one tag + the clear all button
-      expect(
-        within(tags).getByText("searchForm:resetForm")
-      ).toBeInTheDocument();
-      expect(
-        within(tags).getByText(`${key} ${selected1.value}`)
-      ).toBeInTheDocument();
-      expect(
-        within(tags).getByText(`${key} ${selected2.value}`)
-      ).toBeInTheDocument();
+      expect(within(tags).getByText("searchForm:resetForm")).toBeInTheDocument();
+      expect(within(tags).getByText(`${key} ${selected1.value}`)).toBeInTheDocument();
+      expect(within(tags).getByText(`${key} ${selected2.value}`)).toBeInTheDocument();
     }
   );
 
@@ -280,23 +236,14 @@ describe("Tags should modify search params", () => {
     params.append("purposes", selected1.value.toString());
     params.append("reservationUnitTypes", selected2.value.toString());
     mockedSearchParams.mockReturnValue(params);
-    const view = render(
-      <SeasonalSearchForm
-        {...constructProps({ options })}
-        handleSearch={handleSearch}
-      />
-    );
+    const view = render(<SeasonalSearchForm {...constructProps({ options })} handleSearch={handleSearch} />);
     const tags = view.getByTestId("search-form__filter--tags");
     expect(tags).toBeInTheDocument();
     // check that we have one tag + the clear all button
     expect(tags.children).toHaveLength(3);
     expect(within(tags).getByText("searchForm:resetForm")).toBeInTheDocument();
-    expect(
-      within(tags).getByText(`purposes ${selected1.value}`)
-    ).toBeInTheDocument();
-    expect(
-      within(tags).getByText(`reservationUnitTypes ${selected2.value}`)
-    ).toBeInTheDocument();
+    expect(within(tags).getByText(`purposes ${selected1.value}`)).toBeInTheDocument();
+    expect(within(tags).getByText(`reservationUnitTypes ${selected2.value}`)).toBeInTheDocument();
   });
 
   // TODO should test all multi select options in single for loop
@@ -313,12 +260,7 @@ describe("Tags should modify search params", () => {
     params.append("purposes", selected.value.toString());
     params.append("purposes", selected2.value.toString());
     mockedSearchParams.mockReturnValue(params);
-    const view = render(
-      <SeasonalSearchForm
-        {...constructProps({ options })}
-        handleSearch={handleSearch}
-      />
-    );
+    const view = render(<SeasonalSearchForm {...constructProps({ options })} handleSearch={handleSearch} />);
     const tags = view.getByTestId("search-form__filter--tags");
     expect(tags).toBeInTheDocument();
     // check that we have one tag + the clear all button
@@ -336,11 +278,10 @@ describe("Tags should modify search params", () => {
     await user.click(removeBtn);
     expect(mockedRouterReplace).toHaveBeenCalledTimes(1);
     // check we only removed the first tag
-    expect(mockedRouterReplace).toHaveBeenCalledWith(
-      { query: "purposes=2" },
-      undefined,
-      { scroll: false, shallow: true }
-    );
+    expect(mockedRouterReplace).toHaveBeenCalledWith({ query: "purposes=2" }, undefined, {
+      scroll: false,
+      shallow: true,
+    });
   });
 
   test("all tags should be clearable at once", async () => {
@@ -354,12 +295,7 @@ describe("Tags should modify search params", () => {
     params.append("purposes", selected.value.toString());
     params.append("purposes", selected2.value.toString());
     mockedSearchParams.mockReturnValue(params);
-    const view = render(
-      <SeasonalSearchForm
-        {...constructProps({ options })}
-        handleSearch={handleSearch}
-      />
-    );
+    const view = render(<SeasonalSearchForm {...constructProps({ options })} handleSearch={handleSearch} />);
     const tags = view.getByTestId("search-form__filter--tags");
     expect(tags).toBeInTheDocument();
     const resetBtn = within(tags).getByRole("button", {

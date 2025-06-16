@@ -10,9 +10,7 @@ function ReservationUnits(): JSX.Element {
   return (
     <>
       <div>
-        <H1 $marginTop="l">
-          {t("ReservationUnits.reservationUnitListHeading")}
-        </H1>
+        <H1 $marginTop="l">{t("ReservationUnits.reservationUnitListHeading")}</H1>
         <p>{t("ReservationUnits.reservationUnitListDescription")}</p>
       </div>
       <Filters />

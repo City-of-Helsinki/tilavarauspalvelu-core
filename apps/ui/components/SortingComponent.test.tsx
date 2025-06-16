@@ -78,41 +78,32 @@ describe("SortingComponent", () => {
     expect(orderBtn).toBeInTheDocument();
   });
 
-  test.for(SORTING_OPTIONS)(
-    "should select sort by query param $value",
-    ({ value, label }) => {
-      const params = new URLSearchParams();
-      params.set("sort", value);
-      mockedSearchParams.mockReturnValue(params);
-      const view = render(<SortingComponent />);
-      expect(view.getByText(label)).toBeInTheDocument();
-    }
-  );
+  test.for(SORTING_OPTIONS)("should select sort by query param $value", ({ value, label }) => {
+    const params = new URLSearchParams();
+    params.set("sort", value);
+    mockedSearchParams.mockReturnValue(params);
+    const view = render(<SortingComponent />);
+    expect(view.getByText(label)).toBeInTheDocument();
+  });
 
   test.for(
     SORTING_OPTIONS.map((option, i) => ({
       ...option,
-      next:
-        i < SORTING_OPTIONS.length - 1
-          ? SORTING_OPTIONS[i + 1]
-          : SORTING_OPTIONS[0],
+      next: i < SORTING_OPTIONS.length - 1 ? SORTING_OPTIONS[i + 1] : SORTING_OPTIONS[0],
     }))
-  )(
-    "should change sort value on select from $value to $next.value",
-    async ({ value, label, next }) => {
-      if (next == null) {
-        throw new Error("select is null");
-      }
-      const params = new URLSearchParams();
-      params.set("sort", value);
-      mockedSearchParams.mockReturnValue(params);
-      const view = render(<SortingComponent />);
-      expect(view.getByText(label)).toBeInTheDocument();
-      const optionLabel = next.label;
-      const listLabel = /searchResultList:sortButtonLabel/;
-      expect(mockedRouterReplace).toHaveBeenCalledTimes(0);
-      await selectOption(view, listLabel, optionLabel);
-      expect(mockedRouterReplace).toHaveBeenCalledTimes(1);
+  )("should change sort value on select from $value to $next.value", async ({ value, label, next }) => {
+    if (next == null) {
+      throw new Error("select is null");
     }
-  );
+    const params = new URLSearchParams();
+    params.set("sort", value);
+    mockedSearchParams.mockReturnValue(params);
+    const view = render(<SortingComponent />);
+    expect(view.getByText(label)).toBeInTheDocument();
+    const optionLabel = next.label;
+    const listLabel = /searchResultList:sortButtonLabel/;
+    expect(mockedRouterReplace).toHaveBeenCalledTimes(0);
+    await selectOption(view, listLabel, optionLabel);
+    expect(mockedRouterReplace).toHaveBeenCalledTimes(1);
+  });
 });

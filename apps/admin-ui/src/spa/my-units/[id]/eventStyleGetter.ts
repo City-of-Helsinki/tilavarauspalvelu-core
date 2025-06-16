@@ -73,13 +73,10 @@ const eventStyleGetter =
     style: React.CSSProperties;
     className?: string;
   } => {
-    const isCurrentReservationUnit = !!event?.reservationUnits?.find(
-      (ru) => ru?.pk === currentReservationUnitPk
-    );
+    const isCurrentReservationUnit = !!event?.reservationUnits?.find((ru) => ru?.pk === currentReservationUnitPk);
 
     const isConfirmed = event?.state === ReservationStateChoice.Confirmed;
-    const isWaitingForPayment =
-      event?.state === ReservationStateChoice.WaitingForPayment;
+    const isWaitingForPayment = event?.state === ReservationStateChoice.WaitingForPayment;
 
     const isClosed = event?.type === ReservationTypeChoice.Blocked;
     const isStaff = event?.type === ReservationTypeChoice.Staff;

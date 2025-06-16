@@ -21,16 +21,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { EditStep0 } from "@/components/reservation/EditStep0";
 import { EditStep1 } from "@/components/reservation/EditStep1";
-import {
-  PendingReservationFormSchema,
-  type PendingReservationFormType,
-} from "@/components/reservation-unit/schema";
+import { PendingReservationFormSchema, type PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { queryOptions } from "@/modules/queryOptions";
-import {
-  isReservationEditable,
-  transformReservation,
-} from "@/modules/reservation";
+import { isReservationEditable, transformReservation } from "@/modules/reservation";
 import { getReservationPath, reservationsPrefix } from "@/modules/urls";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 
@@ -63,15 +57,9 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
     reset(transformReservation(reservation));
   }, [reservation, reset]);
 
-  const title =
-    step === 0
-      ? "reservations:editReservationTime"
-      : "reservationCalendar:heading.pendingReservation";
+  const title = step === 0 ? "reservations:editReservationTime" : "reservationCalendar:heading.pendingReservation";
 
-  const handleStepClick = (
-    _: React.MouseEvent<HTMLButtonElement>,
-    index: number
-  ) => {
+  const handleStepClick = (_: React.MouseEvent<HTMLButtonElement>, index: number) => {
     if (index === 0 || index === 1) {
       setStep(index);
     }
@@ -89,12 +77,7 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
     },
     {
       label: `2. ${t("reservations:steps.2")}`,
-      state:
-        step === 1
-          ? StepState.available
-          : isValid && isDirty
-            ? StepState.available
-            : StepState.disabled,
+      state: step === 1 ? StepState.available : isValid && isDirty ? StepState.available : StepState.disabled,
     },
   ];
 
@@ -102,26 +85,12 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
     <ReservationPageWrapper $nRows={5}>
       <StepperWrapper>
         <H1 $marginTop="none">{t(title)}</H1>
-        <Stepper
-          language={i18n.language}
-          selectedStep={step}
-          onStepClick={handleStepClick}
-          steps={steps}
-        />
+        <Stepper language={i18n.language} selectedStep={step} onStepClick={handleStepClick} steps={steps} />
       </StepperWrapper>
       {step === 0 ? (
-        <EditStep0
-          reservation={reservation}
-          reservationForm={form}
-          nextStep={() => setStep(1)}
-        />
+        <EditStep0 reservation={reservation} reservationForm={form} nextStep={() => setStep(1)} />
       ) : (
-        <EditStep1
-          reservation={reservation}
-          options={options}
-          onBack={() => setStep(0)}
-          form={form}
-        />
+        <EditStep1 reservation={reservation} options={options} onBack={() => setStep(0)} form={form} />
       )}
     </ReservationPageWrapper>
   );
@@ -172,10 +141,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 
   if (pk != null && pk > 0) {
-    const { data } = await client.query<
-      ReservationEditPageQuery,
-      ReservationEditPageQueryVariables
-    >({
+    const { data } = await client.query<ReservationEditPageQuery, ReservationEditPageQueryVariables>({
       query: ReservationEditPageDocument,
       variables: {
         id: base64encode(`ReservationNode:${pk}`),

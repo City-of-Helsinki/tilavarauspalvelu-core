@@ -1,9 +1,5 @@
 import { useMemo } from "react";
-import {
-  ReservationTypeChoice,
-  type Maybe,
-  useReservationsByReservationUnitQuery,
-} from "@gql/gql-types";
+import { ReservationTypeChoice, type Maybe, useReservationsByReservationUnitQuery } from "@gql/gql-types";
 import { isValidDate, toApiDate } from "common/src/common/util";
 import { addDays, addMinutes, startOfDay } from "date-fns";
 import {
@@ -35,11 +31,7 @@ function useReservationsInInterval({
   const apiEnd = toApiDate(addDays(end, 1));
   const isIntervalValid = begin < end;
   const isValidQuery =
-    isIntervalValid &&
-    reservationUnitPk != null &&
-    reservationUnitPk > 0 &&
-    apiStart != null &&
-    apiEnd != null;
+    isIntervalValid && reservationUnitPk != null && reservationUnitPk > 0 && apiStart != null && apiEnd != null;
 
   const typename = "ReservationUnitNode";
   const id = base64encode(`${typename}:${reservationUnitPk}`);
@@ -106,18 +98,9 @@ export function useFilteredReservationList({
 
     const startMin = timeToMinutes(startTime);
     const endMin = timeToMinutes(endTime);
-    const isReservationInsideRange = (
-      reservationToMake: NewReservationListItem,
-      interval: CollisionInterval
-    ) => {
+    const isReservationInsideRange = (reservationToMake: NewReservationListItem, interval: CollisionInterval) => {
       const type = interval.type ?? ReservationTypeChoice.Blocked;
-      const interval2 = listItemToInterval(
-        reservationToMake.date,
-        startMin,
-        endMin,
-        type,
-        reservationToMake.buffers
-      );
+      const interval2 = listItemToInterval(reservationToMake.date, startMin, endMin, type, reservationToMake.buffers);
       if (interval2 && interval) {
         return doesIntervalCollide(interval2, interval);
       }
@@ -126,10 +109,7 @@ export function useFilteredReservationList({
 
     return items.map((x) =>
       reservations.find((y) => {
-        if (
-          existingRecurringPk != null &&
-          y.recurringReservationPk === existingRecurringPk
-        ) {
+        if (existingRecurringPk != null && y.recurringReservationPk === existingRecurringPk) {
           return false;
         }
         return isReservationInsideRange(x, y);
@@ -155,10 +135,8 @@ function listItemToInterval(
   if (!isValidDate(start) && !isValidDate(end)) {
     throw new Error("Invalid date");
   }
-  const before =
-    type !== ReservationTypeChoice.Blocked ? (buffers?.before ?? 0) : 0;
-  const after =
-    type !== ReservationTypeChoice.Blocked ? (buffers?.after ?? 0) : 0;
+  const before = type !== ReservationTypeChoice.Blocked ? (buffers?.before ?? 0) : 0;
+  const after = type !== ReservationTypeChoice.Blocked ? (buffers?.after ?? 0) : 0;
   return {
     start,
     end,

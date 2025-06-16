@@ -1,20 +1,13 @@
 import React from "react";
 import { IconArrowRight, IconLinkExternal } from "hds-react";
 import { type TFunction, useTranslation } from "next-i18next";
-import {
-  type ApplicationRoundCardFragment,
-  ApplicationRoundStatusChoice,
-} from "@gql/gql-types";
+import { type ApplicationRoundCardFragment, ApplicationRoundStatusChoice } from "@gql/gql-types";
 import { formatDateTime } from "@/modules/util";
 import { isValid } from "date-fns";
 import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { getApplicationRoundPath } from "@/modules/urls";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-  toUIDate,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";
 import { gql } from "@apollo/client";
 
 interface CardProps {
@@ -23,10 +16,7 @@ interface CardProps {
 
 function translateRoundDate(
   t: TFunction,
-  round: Pick<
-    ApplicationRoundCardFragment,
-    "applicationPeriodBegin" | "applicationPeriodEnd" | "status"
-  >
+  round: Pick<ApplicationRoundCardFragment, "applicationPeriodBegin" | "applicationPeriodEnd" | "status">
 ) {
   const begin = new Date(round.applicationPeriodBegin);
   const end = new Date(round.applicationPeriodEnd);
@@ -48,9 +38,7 @@ function translateRoundDate(
   }
 }
 
-export function ApplicationRoundCard({
-  applicationRound,
-}: Readonly<CardProps>): JSX.Element {
+export function ApplicationRoundCard({ applicationRound }: Readonly<CardProps>): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
@@ -80,11 +68,7 @@ export function ApplicationRoundCard({
 
   if (applicationRound.status === ApplicationRoundStatusChoice.Open) {
     buttons.push(
-      <ButtonLikeLink
-        key="button"
-        href={getApplicationRoundPath(applicationRound.pk)}
-        width="full"
-      >
+      <ButtonLikeLink key="button" href={getApplicationRoundPath(applicationRound.pk)} width="full">
         {t("applicationRound:startNewApplication")}
         <IconArrowRight />
       </ButtonLikeLink>

@@ -19,8 +19,7 @@ type Props = {
 // TODO should we remove the padding all together? having both seems really silly
 const AccordionElement = styled.div<{ $noBottomMargin?: boolean }>`
   padding-bottom: var(--spacing-xs);
-  margin-bottom: ${({ $noBottomMargin }) =>
-    $noBottomMargin ? "0" : "var(--spacing-layout-xs)"};
+  margin-bottom: ${({ $noBottomMargin }) => ($noBottomMargin ? "0" : "var(--spacing-layout-xs)")};
   margin-left: 0;
   padding-left: 0;
   --accordion-border-color: var(--color-black-50);
@@ -105,11 +104,7 @@ export function Accordion({
     }
   }, [closeAccordion, isOpen, open, openAccordion]);
 
-  const icon = isOpen ? (
-    <IconAngleUp aria-hidden="true" />
-  ) : (
-    <IconAngleDown aria-hidden="true" />
-  );
+  const icon = isOpen ? <IconAngleUp aria-hidden="true" /> : <IconAngleDown aria-hidden="true" />;
 
   return (
     <AccordionElement id={id} {...rest} $noBottomMargin={disableBottomMargin}>
@@ -122,10 +117,7 @@ export function Accordion({
   );
 }
 
-export function AccordionWithState({
-  open: initiallyOpen,
-  ...rest
-}: Props): JSX.Element {
+export function AccordionWithState({ open: initiallyOpen, ...rest }: Props): JSX.Element {
   const [open, setOpen] = useState(initiallyOpen);
 
   return <Accordion onToggle={() => setOpen(!open)} {...rest} open={open} />;

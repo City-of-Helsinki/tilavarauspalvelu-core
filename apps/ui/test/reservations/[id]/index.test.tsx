@@ -2,11 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { type CreateGraphQLMockProps } from "@/test/test.gql.utils";
 import { render, screen, within } from "@testing-library/react";
 import Reservation from "@/pages/reservations/[id]";
-import {
-  OrderStatus,
-  ReservationStateChoice,
-  ReservationTypeChoice,
-} from "@gql/gql-types";
+import { OrderStatus, ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
 import { camelCase } from "lodash-es";
 import {
   createOptionsMock,
@@ -49,18 +45,7 @@ interface CustomRenderProps extends CreateGraphQLMockProps {
 }
 
 function customRender(
-  {
-    state,
-    pk,
-    begin,
-    end,
-    isHandled,
-    type,
-    price,
-    paymentOrder,
-    cancellable,
-    ...mockProps
-  }: CustomRenderProps = {
+  { state, pk, begin, end, isHandled, type, price, paymentOrder, cancellable, ...mockProps }: CustomRenderProps = {
     ...reservationRenderProps(),
   }
 ): ReturnType<typeof render> {
@@ -78,12 +63,7 @@ function customRender(
   const termsOfUse = createTermsOfUseMock();
   return render(
     <MockedGraphQLProvider mocks={createGraphQLMocks(mockProps)}>
-      <Reservation
-        termsOfUse={termsOfUse}
-        reservation={reservation}
-        feedbackUrl=""
-        options={createOptionsMock()}
-      />
+      <Reservation termsOfUse={termsOfUse} reservation={reservation} feedbackUrl="" options={createOptionsMock()} />
     </MockedGraphQLProvider>
   );
 }
@@ -109,20 +89,14 @@ describe("Page: View reservation", () => {
   });
 
   describe("Status labels", () => {
-    it.for(Object.values(ReservationStateChoice))(
-      "renders %s status label correctly",
-      async (state) => {
-        const view = customRender({ state: state });
-        await waitForAddressSection(view);
+    it.for(Object.values(ReservationStateChoice))("renders %s status label correctly", async (state) => {
+      const view = customRender({ state: state });
+      await waitForAddressSection(view);
 
-        const headingSection = view.getByTestId("reservation__content")
-          .children[0] as HTMLElement;
-        const statusText = "reservations:status." + camelCase(state);
-        expect(
-          within(headingSection).getByText(statusText)
-        ).toBeInTheDocument();
-      }
-    );
+      const headingSection = view.getByTestId("reservation__content").children[0] as HTMLElement;
+      const statusText = "reservations:status." + camelCase(state);
+      expect(within(headingSection).getByText(statusText)).toBeInTheDocument();
+    });
   });
 
   describe("Action buttons", () => {
@@ -130,48 +104,33 @@ describe("Page: View reservation", () => {
       const view = customRender(reservationRenderProps("inThePast"));
       await waitForAddressSection(view);
 
-      const buttonSection = view.getByTestId("reservation__content")
-        .childNodes[2] as HTMLElement;
-      const modificationText =
-        "reservations:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED";
-      expect(
-        within(buttonSection).getByText(modificationText)
-      ).toBeInTheDocument();
+      const buttonSection = view.getByTestId("reservation__content").childNodes[2] as HTMLElement;
+      const modificationText = "reservations:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED";
+      expect(within(buttonSection).getByText(modificationText)).toBeInTheDocument();
     });
 
     it("shows cancel button if the reservation can be cancelled", async () => {
       const view = customRender(reservationRenderProps("canBeCancelled"));
       await waitForAddressSection(view);
 
-      const buttonSection = view.getByTestId("reservation__content")
-        .childNodes[2] as HTMLElement;
-      expect(
-        within(buttonSection).getByText("reservations:cancel.reservation")
-      ).toBeInTheDocument();
+      const buttonSection = view.getByTestId("reservation__content").childNodes[2] as HTMLElement;
+      expect(within(buttonSection).getByText("reservations:cancel.reservation")).toBeInTheDocument();
     });
 
     it("shows action buttons if the reservation can be modified", async () => {
       const view = customRender(reservationRenderProps("canBeMoved"));
       await waitForAddressSection(view);
 
-      const buttonSection = view.getByTestId("reservation__content")
-        .childNodes[2] as HTMLElement;
-      expect.poll(() =>
-        within(buttonSection).getByText("reservations:modifyReservationTime")
-      );
-      expect.poll(() =>
-        within(buttonSection).getByTestId("reservation-detail__button--edit")
-      );
+      const buttonSection = view.getByTestId("reservation__content").childNodes[2] as HTMLElement;
+      expect.poll(() => within(buttonSection).getByText("reservations:modifyReservationTime"));
+      expect.poll(() => within(buttonSection).getByTestId("reservation-detail__button--edit"));
     });
     it("Should show the pay button if the reservation is waiting for payment", async () => {
       const view = customRender(reservationRenderProps("waitingForPayment"));
       await waitForAddressSection(view);
 
-      const buttonSection = view.getByTestId("reservation__content")
-        .childNodes[2] as HTMLElement;
-      expect(
-        within(buttonSection).getByText("reservations:payReservation")
-      ).toBeInTheDocument();
+      const buttonSection = view.getByTestId("reservation__content").childNodes[2] as HTMLElement;
+      expect(within(buttonSection).getByText("reservations:payReservation")).toBeInTheDocument();
       expect(within(buttonSection).getAllByRole("button")).toHaveLength(1);
     });
   });
@@ -181,68 +140,41 @@ describe("Page: View reservation", () => {
       const view = customRender(reservationRenderProps("inThePast"));
       await waitForAddressSection(view);
 
-      const buttonSection = view.getByTestId("reservation__content")
-        .childNodes[2] as HTMLElement;
-      const modificationText =
-        "reservations:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED";
-      expect(
-        within(buttonSection).getByText(modificationText)
-      ).toBeInTheDocument();
-      expect(
-        within(buttonSection).queryByText("reservations:modifyReservationTime")
-      ).not.toBeInTheDocument();
-      expect(
-        within(buttonSection).queryByText("reservations:cancel.reservation")
-      ).not.toBeInTheDocument();
+      const buttonSection = view.getByTestId("reservation__content").childNodes[2] as HTMLElement;
+      const modificationText = "reservations:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED";
+      expect(within(buttonSection).getByText(modificationText)).toBeInTheDocument();
+      expect(within(buttonSection).queryByText("reservations:modifyReservationTime")).not.toBeInTheDocument();
+      expect(within(buttonSection).queryByText("reservations:cancel.reservation")).not.toBeInTheDocument();
     });
   });
 
-  const shouldHaveReceiptButton = [
-    OrderStatus.Paid,
-    OrderStatus.PaidByInvoice,
-    OrderStatus.Refunded,
-  ];
+  const shouldHaveReceiptButton = [OrderStatus.Paid, OrderStatus.PaidByInvoice, OrderStatus.Refunded];
 
   describe("Sidebar", () => {
     it("should render a 'Save to calendar'-button when the reservation state is CONFIRMED", () => {
       const view = customRender(reservationRenderProps());
-      expect(
-        view.getByTestId("reservation__button--calendar-link")
-      ).toBeInTheDocument();
+      expect(view.getByTestId("reservation__button--calendar-link")).toBeInTheDocument();
     });
 
-    it.for(
-      Object.entries(OrderStatus).filter((status, _idx) =>
-        shouldHaveReceiptButton.includes(status[1])
-      )
-    )("should show a receipt button for a %s payment order", ([_, status]) => {
-      customRender(reservationRenderProps("default", status));
-      expect(
-        screen.getByTestId("reservation__confirmation--button__receipt-link")
-      ).toBeInTheDocument();
-    });
+    it.for(Object.entries(OrderStatus).filter((status, _idx) => shouldHaveReceiptButton.includes(status[1])))(
+      "should show a receipt button for a %s payment order",
+      ([_, status]) => {
+        customRender(reservationRenderProps("default", status));
+        expect(screen.getByTestId("reservation__confirmation--button__receipt-link")).toBeInTheDocument();
+      }
+    );
 
-    it.for(
-      Object.entries(OrderStatus).filter(
-        (status) => !shouldHaveReceiptButton.includes(status[1])
-      )
-    )(
+    it.for(Object.entries(OrderStatus).filter((status) => !shouldHaveReceiptButton.includes(status[1])))(
       "should not show a receipt button for a %s payment order",
       ([_, status]) => {
         customRender(reservationRenderProps("default", status));
-        expect(
-          screen.queryByTestId(
-            "reservation__confirmation--button__receipt-link"
-          )
-        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("reservation__confirmation--button__receipt-link")).not.toBeInTheDocument();
       }
     );
 
     it("should not show a receipt button if there is no receiptUrl", () => {
       customRender(reservationRenderProps("default", OrderStatus.Paid, null));
-      expect(
-        screen.queryByTestId("reservation__confirmation--button__receipt-link")
-      ).not.toBeInTheDocument();
+      expect(screen.queryByTestId("reservation__confirmation--button__receipt-link")).not.toBeInTheDocument();
     });
   });
 });
@@ -250,12 +182,8 @@ describe("Page: View reservation", () => {
 // If you don't wait for something the mock query is still loading
 // even if you don't need the statusLabel
 // waiting for this is a proxy that the query has finished
-async function waitForAddressSection(
-  view: ReturnType<typeof customRender>
-): Promise<HTMLElement> {
-  const addressSection = view.getByTestId(
-    "reservation-unit__address--container"
-  );
+async function waitForAddressSection(view: ReturnType<typeof customRender>): Promise<HTMLElement> {
+  const addressSection = view.getByTestId("reservation-unit__address--container");
   await expect.poll(() => addressSection).toBeInTheDocument();
   return addressSection;
 }

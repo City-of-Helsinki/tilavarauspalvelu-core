@@ -1,19 +1,12 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import type {
-  Maybe,
-  LocationFieldsI18nFragment,
-  AddressFieldsFragment,
-} from "@gql/gql-types";
+import type { Maybe, LocationFieldsI18nFragment, AddressFieldsFragment } from "@gql/gql-types";
 import { IconLinkExternal } from "hds-react";
 import { IconButton } from "common/src/components";
 import { mapUrlPrefix } from "@/modules/const";
 import { Flex, H4, fontMedium } from "common/styled";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { type LocalizationLanguages } from "common/src/urlBuilder";
 import { gql } from "@apollo/client";
 
@@ -51,9 +44,7 @@ export function createHslUrl(
     return "";
   }
 
-  const destination = addressStreet
-    ? encodeURI(`${addressStreet},${addressCity}`)
-    : "-";
+  const destination = addressStreet ? encodeURI(`${addressStreet},${addressCity}`) : "-";
 
   return `https://reittiopas.hsl.fi/reitti/-/${destination}/?locale=${locale}`;
 }
@@ -72,9 +63,7 @@ export function createGoogleUrl(
     return "";
   }
 
-  const destination = addressStreet
-    ? encodeURI(`${addressStreet},${addressCity}`)
-    : "";
+  const destination = addressStreet ? encodeURI(`${addressStreet},${addressCity}`) : "";
 
   return `https://www.google.com/maps/dir/?api=1&hl=${locale}&destination=${destination}`;
 }
@@ -112,12 +101,8 @@ export function AddressSection({ title, unit }: Props): JSX.Element {
   const { location } = unit ?? {};
   const lang = convertLanguageCode(i18n.language);
 
-  const addressStreet = location
-    ? getTranslationSafe(location, "addressStreet", lang)
-    : undefined;
-  const addressCity = location
-    ? getTranslationSafe(location, "addressCity", lang)
-    : undefined;
+  const addressStreet = location ? getTranslationSafe(location, "addressStreet", lang) : undefined;
+  const addressCity = location ? getTranslationSafe(location, "addressCity", lang) : undefined;
 
   const unitMapUrl = createMapUrl(lang, unit);
   const googleUrl = createGoogleUrl(lang, location);
@@ -128,9 +113,7 @@ export function AddressSection({ title, unit }: Props): JSX.Element {
     <div data-testid="reservation-unit__address--container">
       <H4 as="h2">{title}</H4>
       {addressStreet && <AddressSpan>{addressStreet}</AddressSpan>}
-      {location?.addressZip && addressCity && (
-        <AddressSpan>{`, ${location?.addressZip} ${addressCity}`}</AddressSpan>
-      )}
+      {location?.addressZip && addressCity && <AddressSpan>{`, ${location?.addressZip} ${addressCity}`}</AddressSpan>}
       <Links>
         {unitMapUrl !== "" && (
           <IconButton

@@ -1,13 +1,7 @@
 import React, { type HTMLAttributes } from "react";
 import Link from "next/link";
 import styled, { css } from "styled-components";
-import {
-  anchorStyles,
-  focusStyles,
-  fontMedium,
-  visitedStyles,
-  Flex,
-} from "../../styled";
+import { anchorStyles, focusStyles, fontMedium, visitedStyles, Flex } from "../../styled";
 
 interface IconButtonProps extends HTMLAttributes<HTMLButtonElement> {
   // the button label text
@@ -34,8 +28,7 @@ const linkStyles = css`
 
 // Allow disabling the visited color so internal links look like buttons without borders
 const StyledLink = styled(Link)<{ $disableVisitedStyles?: boolean }>`
-  ${({ $disableVisitedStyles }) =>
-    $disableVisitedStyles && "--link-visited-color: var(--color-link)"};
+  ${({ $disableVisitedStyles }) => $disableVisitedStyles && "--link-visited-color: var(--color-link)"};
   ${linkStyles}
   ${focusStyles}
   ${anchorStyles}
@@ -98,15 +91,7 @@ const Label = styled.span`
   ${fontMedium}
 `;
 
-const LinkElement = ({
-  label,
-  icon,
-  disabled,
-}: {
-  label: string;
-  icon: React.ReactNode;
-  disabled?: boolean;
-}) => (
+const LinkElement = ({ label, icon, disabled }: { label: string; icon: React.ReactNode; disabled?: boolean }) => (
   <Container $disabled={disabled}>
     <Label>{label}</Label>
     {icon}
@@ -166,15 +151,7 @@ function IconButtonImpl({
     ...rest,
   };
 
-  return (
-    <LinkWrapper
-      {...rest}
-      {...linkOptions}
-      href={href}
-      label={label}
-      icon={icon}
-    />
-  );
+  return <LinkWrapper {...rest} {...linkOptions} href={href} label={label} icon={icon} />;
 }
 
 /**

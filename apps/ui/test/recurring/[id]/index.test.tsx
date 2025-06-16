@@ -2,10 +2,7 @@ import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { createMockApplicationRound } from "@test/application.mocks";
-import {
-  type CreateGraphQLMockProps,
-  createOptionMock,
-} from "@/test/test.gql.utils";
+import { type CreateGraphQLMockProps, createOptionMock } from "@/test/test.gql.utils";
 import SeasonalSearch from "@/pages/recurring/[id]";
 import { addYears } from "date-fns";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
@@ -47,9 +44,7 @@ vi.mock("next/router", () => ({
   useRouter,
 }));
 
-function customRender(
-  props: CreateGraphQLMockProps = {}
-): ReturnType<typeof render> {
+function customRender(props: CreateGraphQLMockProps = {}): ReturnType<typeof render> {
   const mocks = createGraphQLMocks(props);
   const round = createMockApplicationRound({
     applicationPeriodBegin: new Date(2024, 0, 1, 0, 0, 0),
@@ -58,11 +53,7 @@ function customRender(
   const options: OptionsT = createOptionMock();
   return render(
     <MockedGraphQLProvider mocks={mocks}>
-      <SeasonalSearch
-        applicationRound={round}
-        apiBaseUrl="http://localhost:8000"
-        options={options}
-      />
+      <SeasonalSearch applicationRound={round} apiBaseUrl="http://localhost:8000" options={options} />
     </MockedGraphQLProvider>
   );
 }
@@ -87,12 +78,8 @@ describe("Page: SeasonalSearch", () => {
     expect(title).toBeInTheDocument();
     const subtitle = view.getByText("applicationRound:search.subtitle");
     expect(subtitle).toBeInTheDocument();
-    expect(
-      view.getByRole("link", { name: "breadcrumb:frontpage" })
-    ).toBeInTheDocument();
-    expect(
-      view.getByRole("link", { name: "breadcrumb:recurring" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("link", { name: "breadcrumb:frontpage" })).toBeInTheDocument();
+    expect(view.getByRole("link", { name: "breadcrumb:recurring" })).toBeInTheDocument();
     expect(view.getByText("ApplicationRound 1 FI")).toBeInTheDocument();
 
     await isReady(view);
@@ -102,13 +89,9 @@ describe("Page: SeasonalSearch", () => {
     expect(cardsSelects).toHaveLength(10);
     // sanity check that the cards have some data
     for (let i = 0; i < 10; i++) {
-      expect(
-        view.getByRole("heading", { name: `ReservationUnit ${i + 1} FI` })
-      ).toBeInTheDocument();
+      expect(view.getByRole("heading", { name: `ReservationUnit ${i + 1} FI` })).toBeInTheDocument();
     }
-    expect(
-      view.queryByRole("button", { name: "shoppingCart:nextShort" })
-    ).not.toBeInTheDocument();
+    expect(view.queryByRole("button", { name: "shoppingCart:nextShort" })).not.toBeInTheDocument();
   });
 
   test("selecting card should set query params", async () => {
@@ -184,9 +167,7 @@ describe("Page: SeasonalSearch", () => {
     const cardsSelects = view.getAllByTestId("recurring-card__button--toggle");
     expect(cardsSelects).toHaveLength(10);
     expect(view.getByText(/shoppingCart:count/)).toBeInTheDocument();
-    expect(
-      view.getByRole("button", { name: "shoppingCart:nextShort" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("button", { name: "shoppingCart:nextShort" })).toBeInTheDocument();
   });
 
   test("no start application bar if not selected", async () => {
@@ -196,9 +177,7 @@ describe("Page: SeasonalSearch", () => {
     const cardsSelects = view.getAllByTestId("recurring-card__button--toggle");
     expect(cardsSelects).toHaveLength(10);
     expect(view.queryByText(/shoppingCart:count/)).not.toBeInTheDocument();
-    expect(
-      view.queryByRole("button", { name: "shoppingCart:nextShort" })
-    ).not.toBeInTheDocument();
+    expect(view.queryByRole("button", { name: "shoppingCart:nextShort" })).not.toBeInTheDocument();
   });
 
   test("should show login button instead of start if user is not logged in", async () => {
@@ -211,9 +190,7 @@ describe("Page: SeasonalSearch", () => {
     const cardsSelects = view.getAllByTestId("recurring-card__button--toggle");
     expect(cardsSelects).toHaveLength(10);
     expect(view.getByText(/shoppingCart:count/)).toBeInTheDocument();
-    expect(
-      view.getByRole("button", { name: "shoppingCart:loginAndApply" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("button", { name: "shoppingCart:loginAndApply" })).toBeInTheDocument();
   });
 
   test("should filter based on query params", async () => {
@@ -239,20 +216,14 @@ describe("Page: SeasonalSearch", () => {
     });
     await user.click(startBtn);
     expect(mockedRouterReplace).toHaveBeenCalledTimes(1);
-    expect(mockedRouterReplace).toHaveBeenLastCalledWith(
-      `${getApplicationPath(1, "page1")}?${params.toString()}`
-    );
+    expect(mockedRouterReplace).toHaveBeenLastCalledWith(`${getApplicationPath(1, "page1")}?${params.toString()}`);
   });
 
   test("should show an error if query fails", async () => {
     const view = customRender({ isSearchError: true });
     await isReady(view);
-    expect(
-      view.getByRole("heading", { name: "applicationRound:search.title" })
-    ).toBeInTheDocument();
-    expect(
-      view.getByText("applicationRound:search.subtitle")
-    ).toBeInTheDocument();
+    expect(view.getByRole("heading", { name: "applicationRound:search.title" })).toBeInTheDocument();
+    expect(view.getByText("applicationRound:search.subtitle")).toBeInTheDocument();
     expect(view.getByText("errors:search")).toBeInTheDocument();
   });
 
@@ -273,9 +244,7 @@ describe("SeasonalSearch Page SSR", () => {
 
 // Client side query will return loading on first render
 // submit button in this case works as a proxy for the query loading state
-async function isReady(
-  view: ReturnType<typeof customRender>
-): Promise<HTMLElement> {
+async function isReady(view: ReturnType<typeof customRender>): Promise<HTMLElement> {
   const submitBtn = view.getByRole("button", {
     name: "searchForm:searchButton",
   });

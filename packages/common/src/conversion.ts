@@ -46,9 +46,7 @@ export function convertWeekday(d: Weekday): DayT {
   }
 }
 
-export function transformReservationTypeSafe(
-  d: string
-): ReservationTypeChoice | null {
+export function transformReservationTypeSafe(d: string): ReservationTypeChoice | null {
   switch (d) {
     case ReservationTypeChoice.Staff:
       return ReservationTypeChoice.Staff;
@@ -73,9 +71,7 @@ export function convertReservationType(type: string): ReservationTypeChoice {
   return t;
 }
 
-export function transformReserveeType(
-  reserveeType: Maybe<string> | undefined
-): ReserveeType | undefined {
+export function transformReserveeType(reserveeType: Maybe<string> | undefined): ReserveeType | undefined {
   switch (reserveeType) {
     case ReserveeType.Business:
       return ReserveeType.Business;
@@ -88,9 +84,7 @@ export function transformReserveeType(
   }
 }
 
-export function getIntervalMinutes(
-  reservationStartInterval: ReservationStartInterval
-): number {
+export function getIntervalMinutes(reservationStartInterval: ReservationStartInterval): number {
   switch (reservationStartInterval) {
     case ReservationStartInterval.Interval_15Mins:
       return 15;

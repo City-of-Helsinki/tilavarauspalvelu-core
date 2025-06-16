@@ -4,11 +4,7 @@ import { useTranslation } from "react-i18next";
 import { gql } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
-import {
-  useDeleteResourceMutation,
-  type Maybe,
-  type ResourceTableFragment,
-} from "@gql/gql-types";
+import { useDeleteResourceMutation, type Maybe, type ResourceTableFragment } from "@gql/gql-types";
 import { PopupMenu } from "common/src/components/PopupMenu";
 import { getResourceUrl } from "@/common/urls";
 import { CustomTable } from "@/component/Table";
@@ -52,11 +48,7 @@ function getColConfig({
       transform: ({ pk, nameFi }: ResourceT) => {
         const link = getResourceUrl(pk, unit?.pk);
         const name = nameFi != null && nameFi.length > 0 ? nameFi : "-";
-        return (
-          <TableLink to={link}>
-            {truncate(trim(name), MAX_NAME_LENGTH)}
-          </TableLink>
-        );
+        return <TableLink to={link}>{truncate(trim(name), MAX_NAME_LENGTH)}</TableLink>;
       },
       isSortable: false,
     },
@@ -80,17 +72,15 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
 
   const [deleteResourceMutation] = useDeleteResourceMutation();
 
-  const deleteResource = (pk: number) =>
-    deleteResourceMutation({ variables: { input: { pk: String(pk) } } });
+  const deleteResource = (pk: number) => deleteResourceMutation({ variables: { input: { pk: String(pk) } } });
 
   const { t } = useTranslation();
 
   const history = useNavigate();
 
-  const [resourceWaitingForDelete, setResourceWaitingForDelete] = useState<Pick<
-    ResourceT,
-    "pk" | "nameFi"
-  > | null>(null);
+  const [resourceWaitingForDelete, setResourceWaitingForDelete] = useState<Pick<ResourceT, "pk" | "nameFi"> | null>(
+    null
+  );
 
   function handleEditResource(pk: Maybe<number> | undefined) {
     if (pk == null || unit?.pk == null) {
@@ -162,23 +152,13 @@ export const DELETE_RESOURCE = gql`
   }
 `;
 
-function ResourceMenu({
-  locationType,
-  onEdit,
-  onDelete,
-}: ResourceT & { onDelete: () => void; onEdit: () => void }) {
+function ResourceMenu({ locationType, onEdit, onDelete }: ResourceT & { onDelete: () => void; onEdit: () => void }) {
   const { t } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
 
   const type = locationType ? t(`locationType.${locationType}`) : "-";
   return (
-    <Flex
-      $gap="none"
-      $direction="row"
-      $alignItems="center"
-      $justifyContent="space-between"
-      ref={ref}
-    >
+    <Flex $gap="none" $direction="row" $alignItems="center" $justifyContent="space-between" ref={ref}>
       <span>{type}</span>
       <PopupMenu
         items={[

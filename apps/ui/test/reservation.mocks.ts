@@ -41,11 +41,7 @@ export function generatePurposeFragment(name: string) {
   };
 }
 
-export function generateAgeGroupFragment(props: {
-  id: number;
-  min: number;
-  max: number;
-}) {
+export function generateAgeGroupFragment(props: { id: number; min: number; max: number }) {
   const { id, min, max } = props;
   return {
     id: base64encode(`AgeGroupNode:${id}`),
@@ -98,12 +94,7 @@ export type MockReservationProps = {
 
 export type ReservationPaymentOrderFragment = Pick<
   PaymentOrderNode,
-  | "id"
-  | "reservationPk"
-  | "status"
-  | "paymentType"
-  | "receiptUrl"
-  | "checkoutUrl"
+  "id" | "reservationPk" | "status" | "paymentType" | "receiptUrl" | "checkoutUrl"
 >;
 
 export function createMockReservation(
@@ -160,8 +151,7 @@ export function createMockReservation(
     billingFirstName: "Laura",
     billingLastName: "Laskuttaja",
     billingPhone: "0501234567",
-    calendarUrl:
-      "https:type: ReservationTypeChoice.Normal,//example.com/calendar.ics",
+    calendarUrl: "https:type: ReservationTypeChoice.Normal,//example.com/calendar.ics",
     description: "Test reservation description",
     end: end,
     freeOfChargeReason: "Test free of charge reason",
@@ -492,9 +482,7 @@ export function createOptionsMock(): OptionsRecord {
   };
 }
 
-export function createMetaFieldsFragment(
-  type: CustomerTypeChoice = CustomerTypeChoice.Business
-): MetaFieldsFragment {
+export function createMetaFieldsFragment(type: CustomerTypeChoice = CustomerTypeChoice.Business): MetaFieldsFragment {
   return {
     id: "1",
     description: "Test description",
@@ -529,9 +517,7 @@ export function createMetaFieldsFragment(
   };
 }
 
-export function createSupportedFieldsMock(
-  type: CustomerTypeChoice | "reservation" = "reservation"
-): FieldName[] {
+export function createSupportedFieldsMock(type: CustomerTypeChoice | "reservation" = "reservation"): FieldName[] {
   // We need to include the reserveeType field in the supported fields
   // so that the application fields can be rendered correctly.
   if (type === "reservation") {

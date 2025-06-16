@@ -40,9 +40,7 @@ describe("DateRangePicker", () => {
     await user.type(endDateInput, "24.6.2021");
     await user.tab();
 
-    expect(
-      view.queryByText(/errors.endDateBeforeStartDate/)
-    ).not.toBeInTheDocument();
+    expect(view.queryByText(/errors.endDateBeforeStartDate/)).not.toBeInTheDocument();
   });
 
   test("should show formatting error", async () => {

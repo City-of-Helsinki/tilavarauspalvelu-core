@@ -37,13 +37,7 @@ function BufferController({ name, seconds, control }: BufferControllerProps) {
   );
 }
 
-export function BufferToggles({
-  before,
-  after,
-}: {
-  before: number;
-  after: number;
-}) {
+export function BufferToggles({ before, after }: { before: number; after: number }) {
   const { t } = useTranslation();
   const { control } = useFormContext();
 
@@ -57,20 +51,8 @@ export function BufferToggles({
         {t("reservationApplication:buffers.label")}
         <Tooltip>{t("reservationApplication:buffers.tooltip")}</Tooltip>
       </Flex>
-      {before !== 0 && (
-        <BufferController
-          name="enableBufferTimeBefore"
-          control={control}
-          seconds={before}
-        />
-      )}
-      {after !== 0 && (
-        <BufferController
-          name="enableBufferTimeAfter"
-          control={control}
-          seconds={after}
-        />
-      )}
+      {before !== 0 && <BufferController name="enableBufferTimeBefore" control={control} seconds={before} />}
+      {after !== 0 && <BufferController name="enableBufferTimeAfter" control={control} seconds={after} />}
     </Flex>
   );
 }

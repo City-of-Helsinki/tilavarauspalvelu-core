@@ -5,11 +5,7 @@ import { useTranslation } from "react-i18next";
 import { ApolloError, gql } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
-import {
-  type Maybe,
-  type SpacesTableFragment,
-  useDeleteSpaceMutation,
-} from "@gql/gql-types";
+import { type Maybe, type SpacesTableFragment, useDeleteSpaceMutation } from "@gql/gql-types";
 import { PopupMenu } from "common/src/components/PopupMenu";
 import { HDSModal, useModal } from "common/src/components/HDSModal";
 import { NewSpaceModal } from "./space/new-space-modal/NewSpaceModal";
@@ -46,12 +42,7 @@ interface IProps {
 
 export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
   const { t } = useTranslation();
-  const {
-    open: isOpen,
-    openWithContent,
-    closeModal,
-    modalContent,
-  } = useModal();
+  const { open: isOpen, openWithContent, closeModal, modalContent } = useModal();
 
   const [deleteSpaceMutation] = useDeleteSpaceMutation();
   const displayError = useDisplayError();
@@ -82,14 +73,9 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
 
   const history = useNavigate();
 
-  const [spaceWaitingForDelete, setSpaceWaitingForDelete] = useState<Pick<
-    SpaceT,
-    "pk" | "nameFi"
-  > | null>(null);
+  const [spaceWaitingForDelete, setSpaceWaitingForDelete] = useState<Pick<SpaceT, "pk" | "nameFi"> | null>(null);
 
-  function handleRemoveSpace(
-    space: Pick<SpaceT, "resources" | "pk" | "nameFi">
-  ) {
+  function handleRemoveSpace(space: Pick<SpaceT, "resources" | "pk" | "nameFi">) {
     if (space && space.resources && space?.resources.length > 0) {
       errorToast({
         text: t("SpaceTable.removeConflictMessage"),
@@ -104,14 +90,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     if (unit == null) {
       return;
     }
-    openWithContent(
-      <NewSpaceModal
-        parentSpacePk={space.pk}
-        unit={unit}
-        closeModal={closeModal}
-        refetch={refetch}
-      />
-    );
+    openWithContent(<NewSpaceModal parentSpacePk={space.pk} unit={unit} closeModal={closeModal} refetch={refetch} />);
   }
 
   function handleEditSpace(space: SpaceT) {
@@ -131,11 +110,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
         const { pk, nameFi } = space;
         const link = getSpaceUrl(pk, unit?.pk);
         const name = nameFi != null && nameFi.length > 0 ? nameFi : "-";
-        return (
-          <TableLink to={link}>
-            {truncate(trim(name), MAX_NAME_LENGTH)}
-          </TableLink>
-        );
+        return <TableLink to={link}>{truncate(trim(name), MAX_NAME_LENGTH)}</TableLink>;
       },
       isSortable: false,
     },
@@ -157,8 +132,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     {
       headerName: t("Unit.headings.surfaceArea"),
       key: "surfaceArea",
-      transform: ({ surfaceArea }: SpaceT) =>
-        surfaceArea ? `${surfaceArea}m²` : "",
+      transform: ({ surfaceArea }: SpaceT) => (surfaceArea ? `${surfaceArea}m²` : ""),
       isSortable: false,
     },
     {
@@ -166,13 +140,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
       key: "maxPersons",
       // TODO this is weird it creates both the max Persons and the buttons to the same cell
       transform: (space: SpaceT) => (
-        <Flex
-          $gap="none"
-          $direction="row"
-          $justifyContent={
-            space.maxPersons != null ? "space-between" : "flex-end"
-          }
-        >
+        <Flex $gap="none" $direction="row" $justifyContent={space.maxPersons != null ? "space-between" : "flex-end"}>
           {space.maxPersons != null && (
             <Flex $gap="2-xs" $alignItems="center" $direction="row">
               <IconGroup />
@@ -215,12 +183,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
         cols={cols}
         // no sort on purpose
       />
-      <HDSModal
-        id="modal-id"
-        isOpen={isOpen}
-        onClose={closeModal}
-        focusAfterCloseRef={ref}
-      >
+      <HDSModal id="modal-id" isOpen={isOpen} onClose={closeModal} focusAfterCloseRef={ref}>
         {modalContent}
       </HDSModal>
       {spaceWaitingForDelete && (

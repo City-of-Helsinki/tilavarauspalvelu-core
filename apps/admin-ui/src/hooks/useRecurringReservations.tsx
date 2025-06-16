@@ -7,9 +7,7 @@ import { gql } from "@apollo/client";
 /// @param recurringPk fetch reservations related to this pk
 /// @param state optionally only fetch some reservation states
 /// @param limit allows to over fetch: 100 is the limit per query, larger amounts are done with multiple fetches
-export function useRecurringReservations(
-  recurringPk: Maybe<number> | undefined
-) {
+export function useRecurringReservations(recurringPk: Maybe<number> | undefined) {
   const { t } = useTranslation();
 
   const id = base64encode(`RecurringReservationNode:${recurringPk}`);

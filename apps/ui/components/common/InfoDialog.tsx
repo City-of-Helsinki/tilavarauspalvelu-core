@@ -11,13 +11,7 @@ type Props = {
   onClose: () => void;
 };
 
-function InfoDialog({
-  id,
-  heading,
-  text,
-  isOpen,
-  onClose,
-}: Props): JSX.Element {
+function InfoDialog({ id, heading, text, isOpen, onClose }: Props): JSX.Element {
   const { t } = useTranslation();
 
   return (
@@ -31,12 +25,7 @@ function InfoDialog({
       <Dialog.Header
         id={`dialog__${id}--header`}
         title={heading}
-        iconStart={
-          <IconInfoCircleFill
-            aria-hidden="true"
-            style={{ color: "var(--color-bus)" }}
-          />
-        }
+        iconStart={<IconInfoCircleFill aria-hidden="true" style={{ color: "var(--color-bus)" }} />}
       />
       <Dialog.Content id={`dialog__${id}--body`}>
         <Sanitize html={text} />

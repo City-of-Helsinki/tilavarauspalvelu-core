@@ -28,10 +28,7 @@ function Content({
   });
 
   return (
-    <Flex
-      data-testid="list-with-pagination__list--container"
-      $alignItems="center"
-    >
+    <Flex data-testid="list-with-pagination__list--container" $alignItems="center">
       {items}
       {loadingMore ? (
         <div>
@@ -39,9 +36,7 @@ function Content({
         </div>
       ) : items.length > 0 ? (
         <Flex $justifyContent="center">
-          <HitCountSummary data-testid="list-with-pagination__pagination--summary">
-            {hitCountSummary}
-          </HitCountSummary>
+          <HitCountSummary data-testid="list-with-pagination__pagination--summary">{hitCountSummary}</HitCountSummary>
           {showMore && (
             <Button
               onClick={fetchMore}
@@ -63,9 +58,7 @@ const NoResults = styled.div`
 
 type Props = {
   items: JSX.Element[];
-  fetchMore: (
-    cursor: string
-  ) => Promise<ApolloQueryResult<SearchReservationUnitsQuery>>;
+  fetchMore: (cursor: string) => Promise<ApolloQueryResult<SearchReservationUnitsQuery>>;
   pageInfo?: Pick<PageInfo, "endCursor">;
   hasMoreData: boolean;
   isLoading: boolean;
@@ -95,19 +88,10 @@ export function ListWithPagination({
   return (
     <>
       <div data-testid="list-with-pagination__hit-count">
-        {items.length === 0 ? (
-          <NoResults>{t("searchResultList:noResults")}</NoResults>
-        ) : (
-          <div />
-        )}
+        {items.length === 0 ? <NoResults>{t("searchResultList:noResults")}</NoResults> : <div />}
       </div>
       {showSorting && sortingComponent}
-      <Content
-        items={items}
-        fetchMore={handleFetchMore}
-        loadingMore={isInProcess}
-        showMore={hasMoreData}
-      />
+      <Content items={items} fetchMore={handleFetchMore} loadingMore={isInProcess} showMore={hasMoreData} />
     </>
   );
 }

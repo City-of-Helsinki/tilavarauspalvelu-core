@@ -3,10 +3,7 @@ import Page2 from "@/pages/applications/[id]/page2";
 import { render } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
 import { createGraphQLMocks } from "@test/gql.mocks";
-import {
-  createMockApplicationFragment,
-  type CreateMockApplicationFragmentProps,
-} from "@test/application.mocks";
+import { createMockApplicationFragment, type CreateMockApplicationFragmentProps } from "@test/application.mocks";
 import userEvent from "@testing-library/user-event";
 import { getApplicationPath } from "@/modules/urls";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
@@ -52,9 +49,7 @@ vi.mock("next/router", () => ({
 }));
 
 type ApplicationPage2 = NonNullable<ApplicationPage2Query["application"]>;
-function customRender(
-  props: CreateMockApplicationFragmentProps = {}
-): ReturnType<typeof render> {
+function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnType<typeof render> {
   // TODO need a graphql mutation mock (but have to have separate error / success cases)
   if (props.page == null) {
     props.page = "page2";
@@ -73,17 +68,11 @@ describe("Application Page2", () => {
   test("should render page properly", () => {
     // TODO all of this is common to all application funnel pages
     const view = customRender();
-    expect(
-      view.getByRole("heading", { name: "application:Page2.subHeading" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("heading", { name: "application:Page2.subHeading" })).toBeInTheDocument();
     expect(view.getByRole("button", { name: "common:next" }));
-    expect(
-      view.getByRole("link", { name: "breadcrumb:applications" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("link", { name: "breadcrumb:applications" })).toBeInTheDocument();
     expect(view.getByText("breadcrumb:application")).toBeInTheDocument();
-    expect(
-      view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })).toBeInTheDocument();
 
     expect(
       view.getByLabelText("application:Page2.prioritySelectLabel", {
@@ -104,9 +93,7 @@ describe("Application Page2", () => {
       name: "common:prev",
     });
     await userEvent.click(prevBtn);
-    expect(mockedRouterPush).toHaveBeenCalledWith(
-      getApplicationPath(1, "page1")
-    );
+    expect(mockedRouterPush).toHaveBeenCalledWith(getApplicationPath(1, "page1"));
   });
 
   test("should send the form when clicking next", async () => {
@@ -115,9 +102,7 @@ describe("Application Page2", () => {
       name: "common:next",
     });
     await userEvent.click(nextButton);
-    expect(mockedRouterPush).toHaveBeenCalledWith(
-      getApplicationPath(1, "page3")
-    );
+    expect(mockedRouterPush).toHaveBeenCalledWith(getApplicationPath(1, "page3"));
   });
 
   test("submit button is disabled without selection", async () => {
@@ -145,9 +130,7 @@ describe("Application page2 validation errors", () => {
   });
 
   // TODO requires changing the mocks (allow override to add more weekly reservations)
-  test.todo(
-    "At least as many suitable time ranges as applied reservations per week"
-  );
+  test.todo("At least as many suitable time ranges as applied reservations per week");
 
   test("error message should be shown if times are not long enough", async () => {
     const user = userEvent.setup();
@@ -196,9 +179,7 @@ describe("Application page2 validation errors", () => {
     const select2 = view.getByTestId("time-selector__button--1-15");
     await user.click(select2);
     expect(view.queryAllByText(/application:validation/)).toHaveLength(0);
-    expect(
-      view.getByRole("button", { name: "common:next" })
-    ).not.toBeDisabled();
+    expect(view.getByRole("button", { name: "common:next" })).not.toBeDisabled();
   });
 });
 

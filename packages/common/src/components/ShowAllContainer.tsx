@@ -4,8 +4,7 @@ import styled from "styled-components";
 import { AutoGrid, Flex } from "../../styled";
 import IconButton from "./IconButton";
 
-export interface ShowAllContainerProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+export interface ShowAllContainerProps extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   // Label-text for the "show all" toggle-button
   showAllLabel: string;
   // Label-text for the "show less" toggle-button (optional, defaults to showAllLabel)
@@ -47,11 +46,7 @@ function ShowAllContainer({
   }, [initiallyOpen]);
 
   const count = Array.isArray(children) ? children.length : 1;
-  const content = showAll
-    ? children
-    : Array.isArray(children)
-      ? children.slice(0, maximumNumber)
-      : null;
+  const content = showAll ? children : Array.isArray(children) ? children.slice(0, maximumNumber) : null;
 
   return (
     <Flex {...rest}>

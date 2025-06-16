@@ -51,19 +51,13 @@ function ReservationNotification({
   isLoading?: boolean;
 }) {
   const startRemainingMinutes = reservation.paymentOrder?.expiresInMinutes;
-  const [remainingMinutes, setRemainingMinutes] = useState(
-    startRemainingMinutes
-  );
+  const [remainingMinutes, setRemainingMinutes] = useState(startRemainingMinutes);
   const { t } = useTranslation(["notification, common"]);
   const isCreated = reservation.state === ReservationStateChoice.Created;
 
-  const translateKey = isCreated
-    ? "notification:createdReservation"
-    : "notification:waitingForPayment";
+  const translateKey = isCreated ? "notification:createdReservation" : "notification:waitingForPayment";
   const title = t(`${translateKey}.title`);
-  const submitButtonText = t(
-    `${translateKey}${isCreated ? ".continueReservation" : ".payReservation"}`
-  );
+  const submitButtonText = t(`${translateKey}${isCreated ? ".continueReservation" : ".payReservation"}`);
   const text = t(`${translateKey}.body`, {
     time: remainingMinutes,
   });
@@ -132,10 +126,7 @@ export function InProgressReservationNotification() {
   const { data, refetch } = useListInProgressReservationsQuery({
     skip: !currentUser?.pk,
     variables: {
-      state: [
-        ReservationStateChoice.WaitingForPayment,
-        ReservationStateChoice.Created,
-      ],
+      state: [ReservationStateChoice.WaitingForPayment, ReservationStateChoice.Created],
       orderBy: ReservationOrderingChoices.PkDesc,
       user: currentUser?.pk ?? 0,
       beginDate: toApiDate(new Date()) ?? "",
@@ -144,9 +135,7 @@ export function InProgressReservationNotification() {
     fetchPolicy: "no-cache",
   });
 
-  const reservations = filterNonNullable(
-    data?.reservations?.edges.map((e) => e?.node)
-  );
+  const reservations = filterNonNullable(data?.reservations?.edges.map((e) => e?.node));
 
   // Hide on some routes
   // We want to filter these two routes for
@@ -157,11 +146,11 @@ export function InProgressReservationNotification() {
 
   const router = useRouter();
 
-  const shouldHidePaymentNotification = hidePaymentNotificationRoutes.some(
-    (route) => router.pathname.startsWith(route)
+  const shouldHidePaymentNotification = hidePaymentNotificationRoutes.some((route) =>
+    router.pathname.startsWith(route)
   );
-  const shouldHideCreatedNotification = hideCreatedNotificationRoutes.some(
-    (route) => router.pathname.startsWith(route)
+  const shouldHideCreatedNotification = hideCreatedNotificationRoutes.some((route) =>
+    router.pathname.startsWith(route)
   );
 
   const unpaidReservation = reservations
@@ -171,13 +160,9 @@ export function InProgressReservationNotification() {
     .filter(() => !shouldHideCreatedNotification)
     .find((r) => r.state === ReservationStateChoice.Created);
 
-  const [deleteReservation, { loading: isDeleteLoading }] =
-    useDeleteReservationMutation();
+  const [deleteReservation, { loading: isDeleteLoading }] = useDeleteReservationMutation();
 
-  const checkoutUrl = getCheckoutUrl(
-    unpaidReservation?.paymentOrder,
-    i18n.language
-  );
+  const checkoutUrl = getCheckoutUrl(unpaidReservation?.paymentOrder, i18n.language);
 
   // Lazy minimal query to check if the reservation is still valid
   const [reservationQ] = useReservationStateLazyQuery({
@@ -220,9 +205,7 @@ export function InProgressReservationNotification() {
           throw e;
         }
       }
-      if (
-        shouldRedirectAfterDelete(reservation.pk, router.pathname, router.query)
-      ) {
+      if (shouldRedirectAfterDelete(reservation.pk, router.pathname, router.query)) {
         router.push("/");
       } else {
         await refreshQueryCache();
@@ -237,9 +220,7 @@ export function InProgressReservationNotification() {
     }
   };
 
-  const handleContinue = async (
-    reservation: ReservationNotificationFragment
-  ) => {
+  const handleContinue = async (reservation: ReservationNotificationFragment) => {
     const reservationUnit = reservation.reservationUnits.find(() => true);
     if (reservationUnit?.pk == null) {
       throw new Error("No reservation unit pk");
@@ -256,10 +237,7 @@ export function InProgressReservationNotification() {
       await refreshQueryCache();
       return;
     }
-    const url = getReservationInProgressPath(
-      reservationUnit.pk,
-      reservation.pk
-    );
+    const url = getReservationInProgressPath(reservationUnit.pk, reservation.pk);
     router.push(url);
   };
 
@@ -295,11 +273,7 @@ export function InProgressReservationNotification() {
 
 // we match both the base name (reservations) and the specific reservation pk
 // NOTE we could remove this if the Created reservation would always redirect to the funnel page instead of reservation/:pk page
-function shouldRedirectAfterDelete(
-  reservationPk: number,
-  pathname: string,
-  query: ParsedUrlQuery
-): boolean {
+function shouldRedirectAfterDelete(reservationPk: number, pathname: string, query: ParsedUrlQuery): boolean {
   const isReservationPage = pathname.includes("/reservations/");
   if (isReservationPage) {
     const { id } = query;

@@ -16,10 +16,7 @@ export default function Layout({ children, version }: Props) {
         <meta name="description" content="Tilavarauskäsittely" />
         <meta name="keywords" content="" />
         <meta name="version" content={version} />
-        <meta
-          property="og:image"
-          content="https://www.hel.fi/static/public/helsinki_tunnus_musta.png"
-        />
+        <meta property="og:image" content="https://www.hel.fi/static/public/helsinki_tunnus_musta.png" />
       </Head>
       {children}
     </>

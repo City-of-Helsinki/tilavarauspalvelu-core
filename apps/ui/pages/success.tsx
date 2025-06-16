@@ -1,14 +1,7 @@
 import type { GetServerSidePropsContext } from "next";
-import {
-  ReservationStateChoice,
-  ReservationStateQuery,
-  useReservationStateQuery,
-} from "@gql/gql-types";
+import { ReservationStateChoice, ReservationStateQuery, useReservationStateQuery } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import {
-  getCommonServerSideProps,
-  getReservationByOrderUuid,
-} from "@/modules/serverUtils";
+import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath } from "@/modules/urls";
 import { createApolloClient } from "@/modules/apolloClient";
 import { useEffect } from "react";

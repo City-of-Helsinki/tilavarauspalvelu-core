@@ -26,11 +26,7 @@ export function NumberFilter({ name }: { name: string }) {
       onChange={handleOnChange}
       value={value || ""}
       placeholder={t(`filters.placeholder.${name}`)}
-      errorText={
-        value !== "" && Number.isNaN(Number(value))
-          ? t("ReservationUnitsSearch.notANumber")
-          : undefined
-      }
+      errorText={value !== "" && Number.isNaN(Number(value)) ? t("ReservationUnitsSearch.notANumber") : undefined}
     />
   );
 }

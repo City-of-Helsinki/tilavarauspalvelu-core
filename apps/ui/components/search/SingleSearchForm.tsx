@@ -4,10 +4,7 @@ import { Checkbox, IconSearch, LoadingSpinner, TextInput } from "hds-react";
 import { type SubmitHandler, useForm, Controller } from "react-hook-form";
 import styled from "styled-components";
 import { addYears, startOfDay } from "date-fns";
-import {
-  ControlledNumberInput,
-  TimeRangePicker,
-} from "common/src/components/form";
+import { ControlledNumberInput, TimeRangePicker } from "common/src/components/form";
 import { toUIDate } from "common/src/common/util";
 import { fromUIDate } from "@/modules/util";
 import { getDurationOptions } from "@/modules/const";
@@ -50,16 +47,12 @@ type SearchFormValues = {
 function mapQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
   const dur = toNumber(params.get("duration"));
   const duration = dur != null && dur > 0 ? dur : null;
-  const showOnlyReservable =
-    ignoreMaybeArray(params.getAll("showOnlyReservable")) !== "false";
+  const showOnlyReservable = ignoreMaybeArray(params.getAll("showOnlyReservable")) !== "false";
   return {
     purposes: mapParamToNumber(params.getAll("purposes"), 1),
     units: mapParamToNumber(params.getAll("units"), 1),
     equipments: mapParamToNumber(params.getAll("equipments"), 1),
-    reservationUnitTypes: mapParamToNumber(
-      params.getAll("reservationUnitTypes"),
-      1
-    ),
+    reservationUnitTypes: mapParamToNumber(params.getAll("reservationUnitTypes"), 1),
     accessTypes: params.getAll("accessTypes"),
     timeBegin: params.get("timeBegin"),
     timeEnd: params.get("timeEnd"),
@@ -87,13 +80,7 @@ const filterOrder = [
   "equipments",
   "accessTypes",
 ] as const;
-const multiSelectFilters = [
-  "units",
-  "reservationUnitTypes",
-  "purposes",
-  "equipments",
-  "accessTypes",
-] as const;
+const multiSelectFilters = ["units", "reservationUnitTypes", "purposes", "equipments", "accessTypes"] as const;
 // we don't want to show "showOnlyReservable" as a FilterTag, as it has its own checkbox in the form
 const hideTagList = ["showOnlyReservable", "order", "sort", "ref"];
 
@@ -125,8 +112,7 @@ export function SingleSearchForm({
 
   const translateTag = (key: string, value: string): string | undefined => {
     // Handle possible number / string comparison
-    const compFn = (a: { value: unknown }, b: string) =>
-      a != null && String(a.value) === b;
+    const compFn = (a: { value: unknown }, b: string) => a != null && String(a.value) === b;
 
     // TODO should rework the find matcher (typing issues) (it works but it's confusing)
     switch (key) {
@@ -153,9 +139,7 @@ export function SingleSearchForm({
     }
   };
 
-  const onSearch: SubmitHandler<SearchFormValues> = (
-    criteria: SearchFormValues
-  ) => {
+  const onSearch: SubmitHandler<SearchFormValues> = (criteria: SearchFormValues) => {
     // We need to pass all form values, even empty ones, to the search handler
     // to ensure that all search params are updated/cleared correctly
     handleSearch(criteria, true);
@@ -212,12 +196,8 @@ export function SingleSearchForm({
           <DateRangePicker
             startDate={fromUIDate(getValues("startDate") ?? "")}
             endDate={fromUIDate(getValues("endDate") ?? "")}
-            onChangeStartDate={(date: Date | null) =>
-              setValue("startDate", date != null ? toUIDate(date) : null)
-            }
-            onChangeEndDate={(date: Date | null) =>
-              setValue("endDate", date != null ? toUIDate(date) : null)
-            }
+            onChangeStartDate={(date: Date | null) => setValue("startDate", date != null ? toUIDate(date) : null)}
+            onChangeEndDate={(date: Date | null) => setValue("endDate", date != null ? toUIDate(date) : null)}
             labels={{
               begin: t("dateSelector:labelStartDate"),
               end: t("dateSelector:labelEndDate"),

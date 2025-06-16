@@ -11,11 +11,7 @@ import { LIST_PAGE_SIZE } from "@/common/const";
 import { errorToast } from "common/src/common/toast";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
-import {
-  getFilteredUnits,
-  transformAccessCodeState,
-  transformApplicantType,
-} from "./utils";
+import { getFilteredUnits, transformAccessCodeState, transformApplicantType } from "./utils";
 import { useSearchParams } from "react-router-dom";
 import { AllocatedSectionsTable, SORT_KEYS } from "./AllocatedSectionsTable";
 import { transformWeekday } from "common/src/conversion";
@@ -28,10 +24,7 @@ type Props = {
   unitOptions: { nameFi: string; pk: number }[];
 };
 
-export function TimeSlotDataLoader({
-  unitOptions,
-  applicationRoundPk,
-}: Props): JSX.Element {
+export function TimeSlotDataLoader({ unitOptions, applicationRoundPk }: Props): JSX.Element {
   const { t } = useTranslation();
 
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
@@ -49,18 +42,13 @@ export function TimeSlotDataLoader({
       allocatedUnit: getFilteredUnits(unitFilter, unitOptions),
       applicationRound: applicationRoundPk,
       applicantType: transformApplicantType(applicantFilter),
-      applicationSectionStatus: [
-        ApplicationSectionStatusChoice.Handled,
-        ApplicationSectionStatusChoice.InAllocation,
-      ],
+      applicationSectionStatus: [ApplicationSectionStatusChoice.Handled, ApplicationSectionStatusChoice.InAllocation],
       dayOfTheWeek: weekDayFilter
         .map(Number)
         .filter(Number.isFinite)
         .filter((n): n is DayT => n >= 0 && n <= 6)
         .map(transformWeekday),
-      allocatedReservationUnit: reservationUnitFilter
-        .map(Number)
-        .filter(Number.isFinite),
+      allocatedReservationUnit: reservationUnitFilter.map(Number).filter(Number.isFinite),
       accessCodeState: transformAccessCodeState(accessCodeState),
       textSearch: nameFilter,
       first: LIST_PAGE_SIZE,
@@ -86,9 +74,7 @@ export function TimeSlotDataLoader({
   }
 
   const totalCount = dataToUse?.allocatedTimeSlots?.totalCount ?? 0;
-  const aes = filterNonNullable(
-    dataToUse?.allocatedTimeSlots?.edges.map((edge) => edge?.node)
-  );
+  const aes = filterNonNullable(dataToUse?.allocatedTimeSlots?.edges.map((edge) => edge?.node));
 
   return (
     <>
@@ -97,12 +83,7 @@ export function TimeSlotDataLoader({
           {totalCount} {t("ApplicationRound.applicationEventCount")}
         </b>
       </span>
-      <AllocatedSectionsTable
-        schedules={aes}
-        sort={orderBy}
-        sortChanged={handleSortChanged}
-        isLoading={loading}
-      />
+      <AllocatedSectionsTable schedules={aes} sort={orderBy} sortChanged={handleSortChanged} isLoading={loading} />
       <More
         totalCount={totalCount}
         count={aes.length}
@@ -113,9 +94,7 @@ export function TimeSlotDataLoader({
   );
 }
 
-function transformOrderBy(
-  orderBy: string | null
-): AllocatedTimeSlotOrderingChoices[] {
+function transformOrderBy(orderBy: string | null): AllocatedTimeSlotOrderingChoices[] {
   if (orderBy == null) {
     return [];
   }
@@ -135,9 +114,7 @@ function transformOrderBy(
         ? [AllocatedTimeSlotOrderingChoices.ApplicationSectionNameDesc]
         : [AllocatedTimeSlotOrderingChoices.ApplicationSectionNameAsc];
     case "applicant":
-      return desc
-        ? [AllocatedTimeSlotOrderingChoices.ApplicantDesc]
-        : [AllocatedTimeSlotOrderingChoices.ApplicantAsc];
+      return desc ? [AllocatedTimeSlotOrderingChoices.ApplicantDesc] : [AllocatedTimeSlotOrderingChoices.ApplicantAsc];
     case "application_id,application_event_id":
     case "application_id,-application_event_id":
       return desc
@@ -145,10 +122,7 @@ function transformOrderBy(
             AllocatedTimeSlotOrderingChoices.ApplicationPkDesc,
             AllocatedTimeSlotOrderingChoices.ApplicationSectionPkDesc,
           ]
-        : [
-            AllocatedTimeSlotOrderingChoices.ApplicationPkAsc,
-            AllocatedTimeSlotOrderingChoices.ApplicationSectionPkAsc,
-          ];
+        : [AllocatedTimeSlotOrderingChoices.ApplicationPkAsc, AllocatedTimeSlotOrderingChoices.ApplicationSectionPkAsc];
     case "allocated_time_of_week":
       return desc
         ? [AllocatedTimeSlotOrderingChoices.AllocatedTimeOfWeekDesc]

@@ -38,11 +38,7 @@ const SubAccordion = styled(EditAccordion)`
   }
 `;
 
-export function CommunicationSection({
-  form,
-}: {
-  form: UseFormReturn<ReservationUnitEditFormValues>;
-}) {
+export function CommunicationSection({ form }: { form: UseFormReturn<ReservationUnitEditFormValues> }) {
   const { t } = useTranslation();
   const { control, register } = form;
 

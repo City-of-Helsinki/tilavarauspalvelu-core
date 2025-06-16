@@ -33,9 +33,7 @@ type ReservationInfoSectionProps = {
 };
 
 type RervationStatus = "willOpen" | "isOpen" | "hasClosed";
-function getStatus(
-  reservationUnit: Pick<NodeT, "reservationBegins" | "reservationEnds">
-): RervationStatus | null {
+function getStatus(reservationUnit: Pick<NodeT, "reservationBegins" | "reservationEnds">): RervationStatus | null {
   const now = new Date();
   const { reservationBegins, reservationEnds } = reservationUnit;
 
@@ -65,8 +63,7 @@ export function ReservationInfoSection({
   }
 
   const isReservable =
-    reservationUnit.reservationsMaxDaysBefore != null ||
-    reservationUnit.reservationsMinDaysBefore != null;
+    reservationUnit.reservationsMaxDaysBefore != null || reservationUnit.reservationsMinDaysBefore != null;
 
   // TODO this should be a list
   return (
@@ -80,9 +77,7 @@ export function ReservationInfoSection({
   );
 }
 
-function ReservationMinMaxDaysBefore(
-  props: Pick<NodeT, "reservationsMaxDaysBefore" | "reservationsMinDaysBefore">
-) {
+function ReservationMinMaxDaysBefore(props: Pick<NodeT, "reservationsMaxDaysBefore" | "reservationsMinDaysBefore">) {
   const { t } = useTranslation();
   const maxDaysBefore = props.reservationsMaxDaysBefore ?? 0;
   const minDaysBefore = props.reservationsMinDaysBefore ?? 0;
@@ -113,10 +108,7 @@ function ReservationMinMaxDaysBefore(
 function ReservationDuration({
   minReservationDuration,
   maxReservationDuration,
-}: Pick<
-  NodeT,
-  "minReservationDuration" | "maxReservationDuration"
->): JSX.Element | null {
+}: Pick<NodeT, "minReservationDuration" | "maxReservationDuration">): JSX.Element | null {
   const { t } = useTranslation();
 
   // TODO why does this require both min and max?
@@ -163,46 +155,28 @@ function ReservationStatus({
   const { t } = useTranslation();
   const reservationStatus = getStatus(reservationUnit);
   if (reservationStatus === "willOpen") {
-    const dateTime = formatDateTime(
-      t,
-      new Date(reservationUnit.reservationBegins ?? ""),
-      false
-    );
+    const dateTime = formatDateTime(t, new Date(reservationUnit.reservationBegins ?? ""), false);
     return (
       <p>
-        <Strong>
-          {t("reservationUnit:reservationInfoSection.willOpen", { dateTime })}
-        </Strong>
+        <Strong>{t("reservationUnit:reservationInfoSection.willOpen", { dateTime })}</Strong>
       </p>
     );
   }
 
   if (reservationStatus === "isOpen") {
-    const dateTime = formatDateTime(
-      t,
-      new Date(reservationUnit.reservationEnds ?? ""),
-      false
-    );
+    const dateTime = formatDateTime(t, new Date(reservationUnit.reservationEnds ?? ""), false);
     return (
       <p>
-        <Strong>
-          {t("reservationUnit:reservationInfoSection.isOpen", { dateTime })}
-        </Strong>
+        <Strong>{t("reservationUnit:reservationInfoSection.isOpen", { dateTime })}</Strong>
       </p>
     );
   }
 
   if (reservationStatus === "hasClosed") {
-    const dateTime = formatDateTime(
-      t,
-      new Date(reservationUnit.reservationEnds ?? ""),
-      false
-    );
+    const dateTime = formatDateTime(t, new Date(reservationUnit.reservationEnds ?? ""), false);
     return (
       <p>
-        <Strong>
-          {t("reservationUnit:reservationInfoSection.hasClosed", { dateTime })}
-        </Strong>
+        <Strong>{t("reservationUnit:reservationInfoSection.hasClosed", { dateTime })}</Strong>
       </p>
     );
   }

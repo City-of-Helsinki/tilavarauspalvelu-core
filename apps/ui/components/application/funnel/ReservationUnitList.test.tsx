@@ -1,7 +1,4 @@
-import {
-  type CreateGraphQLMockProps,
-  generateNameFragment,
-} from "@test/test.gql.utils";
+import { type CreateGraphQLMockProps, generateNameFragment } from "@test/test.gql.utils";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { createMockReservationUnit } from "@test/reservation-unit.mocks";
 import { render, within } from "@testing-library/react";
@@ -124,12 +121,7 @@ function WrappedRender({
   };
   return (
     <form noValidate onSubmit={handleSubmit(onSubmitWrapper)}>
-      <ReservationUnitList
-        {...props}
-        options={options}
-        control={control}
-        name="reservationUnits"
-      />
+      <ReservationUnitList {...props} options={options} control={control} name="reservationUnits" />
       <button type="submit">Submit</button>
     </form>
   );
@@ -231,9 +223,7 @@ describe("up / down buttons", () => {
 
   test("should be enabled for the middle unit", () => {
     const view = customRender({ nReservationUnits: 3 });
-    const card = view.getByTestId(
-      "ReservationUnitList__ordered-reservation-unit-card-2"
-    );
+    const card = view.getByTestId("ReservationUnitList__ordered-reservation-unit-card-2");
 
     const upBtn = within(card).getByRole("button", {
       name: "reservationUnitList:buttonUp",
@@ -263,9 +253,7 @@ describe("up / down buttons", () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     const view = customRender({ nReservationUnits: 3, onSubmit });
-    const card = view.getByTestId(
-      "ReservationUnitList__ordered-reservation-unit-card-2"
-    );
+    const card = view.getByTestId("ReservationUnitList__ordered-reservation-unit-card-2");
 
     const upBtn = within(card).getByRole("button", {
       name: "reservationUnitList:buttonUp",

@@ -34,10 +34,7 @@ export function constructDateTimeSafe(date: string, time: string): Date | null {
   }
 }
 
-export function fromAPIDateTime(
-  d: Maybe<string> | undefined,
-  time: Maybe<string> | undefined
-): Date | null {
+export function fromAPIDateTime(d: Maybe<string> | undefined, time: Maybe<string> | undefined): Date | null {
   if (!d || !time) {
     return null;
   }

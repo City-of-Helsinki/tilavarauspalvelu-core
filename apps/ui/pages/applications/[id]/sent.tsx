@@ -5,20 +5,13 @@ import styled from "styled-components";
 import { H1 } from "common/styled";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { GetServerSidePropsContext } from "next";
-import {
-  applicationsPath,
-  applicationsPrefix,
-  getApplicationPath,
-} from "@/modules/urls";
+import { applicationsPath, applicationsPrefix, getApplicationPath } from "@/modules/urls";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
-import {
-  ApplicationSentPageDocument,
-  type ApplicationSentPageQuery,
-} from "@/gql/gql-types";
+import { ApplicationSentPageDocument, type ApplicationSentPageQuery } from "@/gql/gql-types";
 import { createApolloClient } from "@/modules/apolloClient";
 import { isSent } from "@/modules/util";
 

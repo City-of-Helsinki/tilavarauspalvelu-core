@@ -11,38 +11,22 @@ import type { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { createApolloClient } from "@/modules/apolloClient";
-import {
-  getCommonServerSideProps,
-  getGenericTerms,
-} from "@/modules/serverUtils";
+import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
 import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { getApplicationPath } from "@/modules/urls";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { ButtonContainer, Flex } from "common/styled";
-import {
-  Button,
-  ButtonSize,
-  ButtonVariant,
-  IconArrowLeft,
-  LoadingSpinner,
-} from "hds-react";
+import { Button, ButtonSize, ButtonVariant, IconArrowLeft, LoadingSpinner } from "hds-react";
 import { useDisplayError } from "common/src/hooks";
 import { ErrorText } from "common/src/components/ErrorText";
-import {
-  validateApplication,
-  PAGES_WITH_STEPPER,
-  ApplicationFunnelWrapper,
-} from "@/components/application/funnel";
+import { validateApplication, PAGES_WITH_STEPPER, ApplicationFunnelWrapper } from "@/components/application/funnel";
 import { ApplicationTerms, ViewApplication } from "@/components/application";
 import { gql } from "@apollo/client";
 
 // User has to accept the terms of service then on submit we change the application status
 // This uses separate Send mutation (not update) so no onNext like the other pages
 // we could also remove the FormContext here
-function Page4({
-  application,
-  tos,
-}: Pick<PropsNarrowed, "application" | "tos">): JSX.Element {
+function Page4({ application, tos }: Pick<PropsNarrowed, "application" | "tos">): JSX.Element {
   const router = useRouter();
   const dislayError = useDisplayError();
   const { t } = useTranslation();
@@ -52,10 +36,7 @@ function Page4({
     specific: false,
   });
 
-  const handleTermsAcceptedChange = (
-    key: "general" | "specific",
-    val: boolean
-  ) => {
+  const handleTermsAcceptedChange = (key: "general" | "specific", val: boolean) => {
     setIsTermsAccepted({ ...isTermsAccepted, [key]: val });
   };
 
@@ -108,13 +89,9 @@ function Page4({
         {!isValid.valid && (
           <ErrorText>
             {t("application:validation.previewError", {
-              page: t(
-                `application:navigation.${PAGES_WITH_STEPPER[isValid.page]}`
-              ),
+              page: t(`application:navigation.${PAGES_WITH_STEPPER[isValid.page]}`),
             })}{" "}
-            <Link
-              href={getApplicationPath(application.pk, `page${isValid.page}`)}
-            >
+            <Link href={getApplicationPath(application.pk, `page${isValid.page}`)}>
               {t("application:validation.fix")}
             </Link>
           </ErrorText>
@@ -127,9 +104,7 @@ function Page4({
           <Button
             id="button__application--submit"
             type="submit"
-            variant={
-              isMutationLoading ? ButtonVariant.Clear : ButtonVariant.Primary
-            }
+            variant={isMutationLoading ? ButtonVariant.Clear : ButtonVariant.Primary}
             iconStart={isMutationLoading ? <LoadingSpinner small /> : undefined}
             size={ButtonSize.Small}
             disabled={!hasTermsAccepted || isMutationLoading}
@@ -166,10 +141,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFound;
   }
 
-  const { data } = await apolloClient.query<
-    ApplicationPage4Query,
-    ApplicationPage4QueryVariables
-  >({
+  const { data } = await apolloClient.query<ApplicationPage4Query, ApplicationPage4QueryVariables>({
     query: ApplicationPage4Document,
     variables: { id: base64encode(`ApplicationNode:${pk}`) },
   });

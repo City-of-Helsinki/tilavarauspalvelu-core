@@ -90,8 +90,7 @@ const Wrapper = styled.div`
       [class*="HeaderActionBarItemButton-module_actionBarItemButton__"] {
         padding: var(--spacing-s);
       }
-      &.visible
-        [class*="HeaderActionBarItemButton-module_actionBarItemButton__"] {
+      &.visible [class*="HeaderActionBarItemButton-module_actionBarItemButton__"] {
         border-bottom: 1px solid var(--color-black-20) !important;
       }
       [class*="HeaderActionBarItemButton-module_actionBarItemButtonLabel__"] {
@@ -189,9 +188,7 @@ function constructInitials(firstName?: string, lastName?: string) {
 }
 
 function checkActive(pathname: string, routes: string[], exact: boolean) {
-  return routes.some((route) =>
-    exact ? pathname === route : pathname.startsWith(route)
-  );
+  return routes.some((route) => (exact ? pathname === route : pathname.startsWith(route)));
 }
 
 function NavigationMenu({ user }: { user: CurrentUserQuery["currentUser"] }) {
@@ -213,29 +210,18 @@ function NavigationMenu({ user }: { user: CurrentUserQuery["currentUser"] }) {
         if (!pathname) {
           return;
         }
-        const localisationString =
-          i18n.language === "fi" ? "" : getLocalizationLang(i18n.language);
+        const localisationString = i18n.language === "fi" ? "" : getLocalizationLang(i18n.language);
 
         return (
           <Header.Link
             key={item.label}
             label={t(item.label)}
             href={
-              getLocalizationLang(i18n.language) === "fi"
-                ? item.routes[0]
-                : `/${localisationString}${item.routes[0]}`
+              getLocalizationLang(i18n.language) === "fi" ? item.routes[0] : `/${localisationString}${item.routes[0]}`
             }
             onClick={handleClick}
-            className={
-              checkActive(pathname, item.routes, item.exact ?? false)
-                ? "active"
-                : ""
-            }
-            aria-current={checkActive(
-              pathname,
-              item.routes,
-              item.exact ?? false
-            )}
+            className={checkActive(pathname, item.routes, item.exact ?? false) ? "active" : ""}
+            aria-current={checkActive(pathname, item.routes, item.exact ?? false)}
           />
         );
       })}
@@ -243,11 +229,7 @@ function NavigationMenu({ user }: { user: CurrentUserQuery["currentUser"] }) {
   );
 }
 
-function ActionBar({
-  apiBaseUrl,
-  profileLink,
-  languageOptions,
-}: Readonly<HeaderProps>) {
+function ActionBar({ apiBaseUrl, profileLink, languageOptions }: Readonly<HeaderProps>) {
   const { t, i18n } = useTranslation();
   const { isAuthenticated, user } = useSession();
   const { firstName, lastName } = user ?? {};
@@ -267,28 +249,16 @@ function ActionBar({
       logoAriaLabel={t("common:helsinkiCity")}
       menuButtonLabel={t("navigation:navigation")}
     >
-      <Header.LanguageSelector
-        languages={languageOptions}
-        ariaLabel={t("navigation:languageSelection")}
-      />
+      <Header.LanguageSelector languages={languageOptions} ariaLabel={t("navigation:languageSelection")} />
       {isAuthenticated ? (
-        <Header.ActionBarItem
-          fixedRightPosition
-          id="user-menu"
-          label={userName}
-          avatar={userInitials ?? <IconUser />}
-        >
+        <Header.ActionBarItem fixedRightPosition id="user-menu" label={userName} avatar={userInitials ?? <IconUser />}>
           {!user?.isAdAuthenticated && (
             <a href={profileLink} target="_blank" rel="noopener noreferrer">
               {t("navigation:profileLinkLabel")}
               <IconLinkExternal />
             </a>
           )}
-          <button
-            type="button"
-            aria-label={t("common:logout")}
-            onClick={() => signOut(apiBaseUrl)}
-          >
+          <button type="button" aria-label={t("common:logout")} onClick={() => signOut(apiBaseUrl)}>
             {t("common:logout")}
             <IconSignout />
           </button>
@@ -332,16 +302,8 @@ function Navigation({ apiBaseUrl, profileLink }: HeaderProps) {
 
   return (
     <Wrapper>
-      <Header
-        onDidChangeLanguage={languageChangeHandler}
-        defaultLanguage={router.locale}
-        languages={languageOptions}
-      >
-        <ActionBar
-          apiBaseUrl={apiBaseUrl}
-          profileLink={profileLink}
-          languageOptions={languageOptions}
-        />
+      <Header onDidChangeLanguage={languageChangeHandler} defaultLanguage={router.locale} languages={languageOptions}>
+        <ActionBar apiBaseUrl={apiBaseUrl} profileLink={profileLink} languageOptions={languageOptions} />
         <NavigationMenu user={user ?? null} />
       </Header>
     </Wrapper>

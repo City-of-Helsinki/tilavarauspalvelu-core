@@ -2,14 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { addDays, subDays } from "date-fns";
 import { useTranslation } from "next-i18next";
-import {
-  Button,
-  IconAngleLeft,
-  IconAngleRight,
-  DateInput,
-  ButtonSize,
-  ButtonVariant,
-} from "hds-react";
+import { Button, IconAngleLeft, IconAngleRight, DateInput, ButtonSize, ButtonVariant } from "hds-react";
 import { fromUIDate, toUIDate } from "common/src/common/util";
 import { Flex } from "common/styled";
 import { breakpoints } from "common/src/const";

@@ -21,10 +21,7 @@ const FixedDialog = styled(Dialog)<{
   /* Hack to deal with modal trying to fit content. So an error message -> layout shift */
   && {
     /* stylelint-disable custom-property-pattern */
-    width: min(
-      calc(100vw - 2rem),
-      var(--container-width-${(props) => props.$maxWidth ?? "l"})
-    );
+    width: min(calc(100vw - 2rem), var(--container-width-${(props) => props.$maxWidth ?? "l"}));
     /* stylelint-enable custom-property-pattern */
   }
   & > div:nth-child(2) {

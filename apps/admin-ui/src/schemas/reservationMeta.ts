@@ -35,11 +35,7 @@ const ReservationFormMetaSchema = z.object({
   // radio buttons should have a default value and form inputs don't like null (uncontrolled input)
   // TODO test what happens if the user submits a form with a null value?
   reserveeType: z
-    .enum([
-      CustomerTypeChoice.Individual,
-      CustomerTypeChoice.Nonprofit,
-      CustomerTypeChoice.Business,
-    ])
+    .enum([CustomerTypeChoice.Individual, CustomerTypeChoice.Nonprofit, CustomerTypeChoice.Business])
     .nullable(),
 });
 

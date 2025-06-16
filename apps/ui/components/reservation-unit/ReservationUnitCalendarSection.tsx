@@ -10,18 +10,13 @@ import { Notification } from "hds-react";
 import { type ReservationTimePickerProps } from "@/components/reservation/ReservationTimePicker";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { useReservableTimes } from "@/hooks";
 import { PendingReservationFormType } from "./schema";
 import { UseFormReturn } from "react-hook-form";
 import { Flex, H4 } from "common/styled";
 
-type ReservationUnitT = NonNullable<
-  ReservationUnitPageQuery["reservationUnit"]
->;
+type ReservationUnitT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 
 export function ReservationUnitCalendarSection({
   reservationUnit,
@@ -32,10 +27,7 @@ export function ReservationUnitCalendarSection({
   reservationForm: UseFormReturn<PendingReservationFormType>;
 } & Pick<
   ReservationTimePickerProps,
-  | "startingTimeOptions"
-  | "blockingReservations"
-  | "loginAndSubmitButton"
-  | "submitReservation"
+  "startingTimeOptions" | "blockingReservations" | "loginAndSubmitButton" | "submitReservation"
 >): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
@@ -85,17 +77,14 @@ export const RESERVATION_QUOTA_REACHED_QUERY = gql`
   }
 `;
 
-function ReservationQuotaReached(
-  props: ReservationQuotaReachedFragment
-): JSX.Element | null {
+function ReservationQuotaReached(props: ReservationQuotaReachedFragment): JSX.Element | null {
   const { t } = useTranslation("reservationCalendar", {
     keyPrefix: "reservationQuota",
   });
 
   const quotaReached = isReservationQuotaReached(props);
   const { maxReservationsPerUser, numActiveUserReservations } = props;
-  const shouldHide =
-    maxReservationsPerUser == null || numActiveUserReservations === 0;
+  const shouldHide = maxReservationsPerUser == null || numActiveUserReservations === 0;
   if (shouldHide) {
     return null;
   }
@@ -109,22 +98,16 @@ function ReservationQuotaReached(
 
   return (
     <Notification type={quotaReached ? "alert" : "info"} label={label}>
-      <span data-testid="reservation-unit--notification__reservation-quota">
-        {text}
-      </span>
+      <span data-testid="reservation-unit--notification__reservation-quota">{text}</span>
     </Notification>
   );
 }
 
 export function isReservationQuotaReached(
-  reservationUnit: Pick<
-    ReservationUnitNode,
-    "maxReservationsPerUser" | "numActiveUserReservations"
-  >
+  reservationUnit: Pick<ReservationUnitNode, "maxReservationsPerUser" | "numActiveUserReservations">
 ): boolean {
   return (
     reservationUnit.maxReservationsPerUser != null &&
-    reservationUnit.numActiveUserReservations >=
-      reservationUnit.maxReservationsPerUser
+    reservationUnit.numActiveUserReservations >= reservationUnit.maxReservationsPerUser
   );
 }

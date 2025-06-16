@@ -24,19 +24,9 @@ const StyledLink = styled(Link)<{ $isBold?: boolean }>`
   }
 `;
 
-export function ExternalLink({
-  children,
-  to,
-  size,
-  isBold = false,
-}: Props): JSX.Element | null {
+export function ExternalLink({ children, to, size, isBold = false }: Props): JSX.Element | null {
   return (
-    <StyledLink
-      to={to}
-      target="_blank"
-      rel="noopener noreferrer"
-      $isBold={isBold}
-    >
+    <StyledLink to={to} target="_blank" rel="noopener noreferrer" $isBold={isBold}>
       <span>{children}</span>
       <IconLinkExternal size={size} aria-hidden />
     </StyledLink>

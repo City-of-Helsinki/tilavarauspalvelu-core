@@ -1,15 +1,9 @@
 import { gql } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
-import {
-  ReservationUnitTypeOrderingChoices,
-  useReservationUnitTypesFilterQuery,
-} from "@gql/gql-types";
+import { ReservationUnitTypeOrderingChoices, useReservationUnitTypesFilterQuery } from "@gql/gql-types";
 
 export const RESERVATION_UNIT_TYPES_QUERY = gql`
-  query ReservationUnitTypesFilter(
-    $after: String
-    $orderBy: [ReservationUnitTypeOrderingChoices]
-  ) {
+  query ReservationUnitTypesFilter($after: String, $orderBy: [ReservationUnitTypeOrderingChoices]) {
     reservationUnitTypes(after: $after, orderBy: $orderBy) {
       edges {
         node {

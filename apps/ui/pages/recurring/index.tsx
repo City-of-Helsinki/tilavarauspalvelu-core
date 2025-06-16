@@ -26,23 +26,17 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  const { data } = await apolloClient.query<
-    ApplicationRoundsUiQuery,
-    ApplicationRoundsUiQueryVariables
-  >({
+  const { data } = await apolloClient.query<ApplicationRoundsUiQuery, ApplicationRoundsUiQueryVariables>({
     query: ApplicationRoundsUiDocument,
     variables: {
       orderBy: [ApplicationRoundOrderingChoices.PkAsc],
     },
   });
-  const applicationRounds = filterNonNullable(
-    data?.applicationRounds?.edges.map((n) => n?.node)
-  );
+  const applicationRounds = filterNonNullable(data?.applicationRounds?.edges.map((n) => n?.node));
 
   const filteredApplicationRounds = applicationRounds.filter(
     (applicationRound) =>
-      new Date(applicationRound.publicDisplayBegin) <= now &&
-      new Date(applicationRound.publicDisplayEnd) >= now
+      new Date(applicationRound.publicDisplayBegin) <= now && new Date(applicationRound.publicDisplayEnd) >= now
   );
 
   return {
@@ -54,28 +48,20 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-function RecurringLander({
-  applicationRounds,
-}: Readonly<Pick<Props, "applicationRounds">>): JSX.Element {
+function RecurringLander({ applicationRounds }: Readonly<Pick<Props, "applicationRounds">>): JSX.Element {
   const { t } = useTranslation();
 
   const active = applicationRounds
     .filter(isActiveRound)
-    .sort((a, b) =>
-      compTimeStrings(a.applicationPeriodEnd, b.applicationPeriodEnd)
-    );
+    .sort((a, b) => compTimeStrings(a.applicationPeriodEnd, b.applicationPeriodEnd));
 
   const upcoming = applicationRounds
     .filter(isFutureRound)
-    .sort((a, b) =>
-      compTimeStrings(a.applicationPeriodBegin, b.applicationPeriodBegin)
-    );
+    .sort((a, b) => compTimeStrings(a.applicationPeriodBegin, b.applicationPeriodBegin));
 
   const past = applicationRounds
     .filter(isPastRound)
-    .sort((a, b) =>
-      compTimeStrings(a.applicationPeriodEnd, b.applicationPeriodEnd)
-    );
+    .sort((a, b) => compTimeStrings(a.applicationPeriodEnd, b.applicationPeriodEnd));
 
   const routes = [
     {
@@ -94,9 +80,7 @@ function RecurringLander({
         <Flex data-testid="recurring-lander__application-round-container--active">
           <H2 $noMargin>{t("recurringLander:roundHeadings.active")}</H2>
           {active.length > 0 ? (
-            active.map((round) => (
-              <ApplicationRoundCard key={round.pk} applicationRound={round} />
-            ))
+            active.map((round) => <ApplicationRoundCard key={round.pk} applicationRound={round} />)
           ) : (
             <p>{t("recurringLander:noRounds")}</p>
           )}
@@ -122,24 +106,15 @@ function RecurringLander({
   );
 }
 
-function isPastRound(
-  round: Pick<ApplicationRoundFieldsFragment, "status">
-): boolean {
-  return (
-    round.status !== ApplicationRoundStatusChoice.Open &&
-    round.status !== ApplicationRoundStatusChoice.Upcoming
-  );
+function isPastRound(round: Pick<ApplicationRoundFieldsFragment, "status">): boolean {
+  return round.status !== ApplicationRoundStatusChoice.Open && round.status !== ApplicationRoundStatusChoice.Upcoming;
 }
 
-function isFutureRound(
-  round: Pick<ApplicationRoundFieldsFragment, "status">
-): boolean {
+function isFutureRound(round: Pick<ApplicationRoundFieldsFragment, "status">): boolean {
   return round.status === ApplicationRoundStatusChoice.Upcoming;
 }
 
-function isActiveRound(
-  round: Pick<ApplicationRoundFieldsFragment, "status">
-): boolean {
+function isActiveRound(round: Pick<ApplicationRoundFieldsFragment, "status">): boolean {
   return round.status === ApplicationRoundStatusChoice.Open;
 }
 

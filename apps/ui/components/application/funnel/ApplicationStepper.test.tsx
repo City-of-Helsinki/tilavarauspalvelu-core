@@ -23,16 +23,9 @@ vi.mock("next/router", () => ({
   useRouter,
 }));
 
-function checkStepperStep(
-  view: ReturnType<typeof render>,
-  label: string,
-  isDisabled: boolean,
-  isCompleted?: boolean
-) {
+function checkStepperStep(view: ReturnType<typeof render>, label: string, isDisabled: boolean, isCompleted?: boolean) {
   const btn = view.getByRole("button", {
-    name: RegExp(
-      `application:navigation.${label}.+${isCompleted ? "Valmis\\.$" : ""}`
-    ),
+    name: RegExp(`application:navigation.${label}.+${isCompleted ? "Valmis\\.$" : ""}`),
   });
   expect(btn).toBeInTheDocument();
   if (isDisabled) {
@@ -43,9 +36,7 @@ function checkStepperStep(
 }
 
 describe("Stepper when starting application", () => {
-  test.for(
-    PAGES_WITH_STEPPER.map((x) => ({ label: x, isDisabled: x !== "page1" }))
-  )(
+  test.for(PAGES_WITH_STEPPER.map((x) => ({ label: x, isDisabled: x !== "page1" })))(
     "stepper step $label should render and be disabled = $isDisabled",
     ({ label, isDisabled }) => {
       const application = createMockApplicationFragment({ page: "page0" });
@@ -61,14 +52,11 @@ describe("Stepper when page 1 is valid", () => {
       label: x,
       isDisabled: x !== "page1" && x !== "page2",
     }))
-  )(
-    "stepper step $label should render and be disabled = $isDisabled",
-    ({ label, isDisabled }) => {
-      const application = createMockApplicationFragment({ page: "page1" });
-      const view = render(<ApplicationStepper application={application} />);
-      checkStepperStep(view, label, isDisabled);
-    }
-  );
+  )("stepper step $label should render and be disabled = $isDisabled", ({ label, isDisabled }) => {
+    const application = createMockApplicationFragment({ page: "page1" });
+    const view = render(<ApplicationStepper application={application} />);
+    checkStepperStep(view, label, isDisabled);
+  });
 });
 
 describe("Stepper when page 2 is valid", () => {
@@ -77,14 +65,11 @@ describe("Stepper when page 2 is valid", () => {
       label: x,
       isDisabled: x === "page4",
     }))
-  )(
-    "stepper step $label should render and be disabled = $isDisabled",
-    ({ label, isDisabled }) => {
-      const application = createMockApplicationFragment({ page: "page2" });
-      const view = render(<ApplicationStepper application={application} />);
-      checkStepperStep(view, label, isDisabled);
-    }
-  );
+  )("stepper step $label should render and be disabled = $isDisabled", ({ label, isDisabled }) => {
+    const application = createMockApplicationFragment({ page: "page2" });
+    const view = render(<ApplicationStepper application={application} />);
+    checkStepperStep(view, label, isDisabled);
+  });
 });
 
 describe("Stepper when page 3 is valid", () => {

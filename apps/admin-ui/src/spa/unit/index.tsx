@@ -14,12 +14,7 @@ function Units(): JSX.Element {
         <H1 $marginTop="l">{t("MainMenu.units")}</H1>
         <p>
           {t("Units.description")}
-          <Link
-            size={LinkSize.Medium}
-            href={t("Units.descriptionLinkHref")}
-            openInNewTab
-            external
-          >
+          <Link size={LinkSize.Medium} href={t("Units.descriptionLinkHref")} openInNewTab external>
             {t("Units.descriptionLinkLabel")}
           </Link>
         </p>

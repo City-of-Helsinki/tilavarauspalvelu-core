@@ -15,17 +15,11 @@ export const DATE_FORMAT_SHORT = "d.M.";
 
 /// @deprecated use format directly
 /// why convert date -> string -> date?
-export function formatDate(
-  date: string | null | undefined,
-  outputFormat = DATE_FORMAT
-): string | null {
+export function formatDate(date: string | null | undefined, outputFormat = DATE_FORMAT): string | null {
   return date ? format(parseISO(date), outputFormat) : null;
 }
 
-export function formatTime(
-  date: string | null | undefined,
-  outputFormat = "HH:mm"
-): string | null {
+export function formatTime(date: string | null | undefined, outputFormat = "HH:mm"): string | null {
   return date ? format(parseISO(date), outputFormat) : null;
 }
 
@@ -35,24 +29,14 @@ export function formatDateTime(date: string): string {
 }
 
 // TODO move to common and combine with ui (requires i18n changes: replace messages.ts with json)
-export function formatDateTimeRange(
-  t: TFunction,
-  start: Date,
-  end: Date
-): string {
+export function formatDateTimeRange(t: TFunction, start: Date, end: Date): string {
   const startDay = t(`dayShort.${toMondayFirstUnsafe(getDay(start))}`);
 
   if (isSameDay(start, end)) {
-    return `${startDay} ${format(start, DATE_FORMAT)} ${format(
-      start,
-      "HH:mm"
-    )}–${format(end, "HH:mm")}`;
+    return `${startDay} ${format(start, DATE_FORMAT)} ${format(start, "HH:mm")}–${format(end, "HH:mm")}`;
   }
 
-  return `${format(start, DATE_FORMAT)} ${format(start, "HH:mm")}–${format(
-    end,
-    "HH:mm"
-  )} ${format(end, "HH:mm")}`;
+  return `${format(start, DATE_FORMAT)} ${format(start, "HH:mm")}–${format(end, "HH:mm")} ${format(end, "HH:mm")}`;
 }
 
 export function formatDateRange(t: TFunction, start: Date, end: Date): string {
@@ -63,10 +47,7 @@ export function formatDateRange(t: TFunction, start: Date, end: Date): string {
   return `${startDay} ${format(start, DATE_FORMAT)}–${format(end, DATE_FORMAT)}`;
 }
 
-export const formatNumber = (
-  input?: number | null,
-  suffix?: string
-): string => {
+export const formatNumber = (input?: number | null, suffix?: string): string => {
   if (input == null) return "";
 
   const number = new Intl.NumberFormat("fi").format(input);
@@ -87,27 +68,16 @@ export function formatAgeGroups(ageGroups: IAgeGroups, t: TFunction): string {
 
 // TODO why have the two separate versions of this? (s)
 export function formatAgeGroup(
-  group:
-    | Maybe<
-        Pick<NonNullable<ReservationNode["ageGroup"]>, "minimum" | "maximum">
-      >
-    | undefined
+  group: Maybe<Pick<NonNullable<ReservationNode["ageGroup"]>, "minimum" | "maximum">> | undefined
 ): string | null {
   return group ? `${group.minimum}-${group.maximum || ""}` : null;
 }
 
-export function formatAddress(
-  location: LocationFieldsFragment | null | undefined
-): string {
+export function formatAddress(location: LocationFieldsFragment | null | undefined): string {
   if (!location) {
     return "-";
   }
-  const res = trim(
-    `${location.addressStreetFi ?? ""}, ${location.addressZip} ${
-      location.addressCityFi ?? ""
-    }`,
-    ", "
-  );
+  const res = trim(`${location.addressStreetFi ?? ""}, ${location.addressZip} ${location.addressCityFi ?? ""}`, ", ");
   if (res === "") {
     return "-";
   }
@@ -120,10 +90,7 @@ export { formatAddress as parseAddress };
 export const sortByName = (a?: string, b?: string): number =>
   a && b ? a.toLowerCase().localeCompare(b.toLowerCase()) : !a ? 1 : -1;
 
-export function getTranslatedError(
-  t: TFunction,
-  error: string | undefined
-): string | undefined {
+export function getTranslatedError(t: TFunction, error: string | undefined): string | undefined {
   if (error == null) {
     return undefined;
   }

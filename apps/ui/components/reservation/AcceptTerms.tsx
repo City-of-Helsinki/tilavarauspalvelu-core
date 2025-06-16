@@ -2,33 +2,22 @@ import React from "react";
 import TermsBox from "common/src/termsbox/TermsBox";
 import { useTranslation } from "next-i18next";
 import { Sanitize } from "common/src/components/Sanitize";
-import {
-  type TermsOfUseTextFieldsFragment,
-  type Maybe,
-  type TermsOfUseFragment,
-} from "@/gql/gql-types";
+import { type TermsOfUseTextFieldsFragment, type Maybe, type TermsOfUseFragment } from "@/gql/gql-types";
 import { Flex } from "common/styled";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 
 export function AcceptTerms({
   reservationUnit,
   isTermsAccepted,
   setIsTermsAccepted,
 }: {
-  reservationUnit: Pick<
-    TermsOfUseFragment,
-    "cancellationTerms" | "paymentTerms" | "serviceSpecificTerms"
-  >;
+  reservationUnit: Pick<TermsOfUseFragment, "cancellationTerms" | "paymentTerms" | "serviceSpecificTerms">;
   isTermsAccepted: { space: boolean; service: boolean };
   setIsTermsAccepted: (key: "space" | "service", val: boolean) => void;
 }): JSX.Element {
   const { t } = useTranslation();
 
-  const { cancellationTerms, paymentTerms, serviceSpecificTerms } =
-    reservationUnit;
+  const { cancellationTerms, paymentTerms, serviceSpecificTerms } = reservationUnit;
 
   const paymentTermsHeading = t(
     `reservationCalendar:heading.${
@@ -49,9 +38,7 @@ export function AcceptTerms({
     }`
   );
   const serviceSpecificAcceptLabel = t(
-    `reservationCalendar:label.${
-      serviceSpecificTerms ? "termsGeneralSpecific" : "termsGeneral"
-    }`
+    `reservationCalendar:label.${serviceSpecificTerms ? "termsGeneralSpecific" : "termsGeneral"}`
   );
 
   return (

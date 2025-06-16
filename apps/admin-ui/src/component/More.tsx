@@ -13,12 +13,7 @@ type Props = {
 };
 
 // TODO refactor count and totalCount to use pageInfo
-export function More({
-  count,
-  totalCount,
-  pageInfo,
-  fetchMore,
-}: Props): JSX.Element {
+export function More({ count, totalCount, pageInfo, fetchMore }: Props): JSX.Element {
   const { t } = useTranslation();
   const [isFetching, setIsFetching] = useState(false);
 

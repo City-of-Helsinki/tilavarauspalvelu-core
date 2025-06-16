@@ -8,10 +8,7 @@ import { Flex, H3, anchorStyles, focusStyles } from "common/styled";
 import type { UnitListFieldsFragment } from "@gql/gql-types";
 import { IconButton } from "common/src/components";
 import { singleSearchPrefix } from "@/modules/urls";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
 
 const ITEM_LIMIT = 8;

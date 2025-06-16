@@ -3,13 +3,7 @@ import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import styled from "styled-components";
-import {
-  IconSize,
-  IconSortAscending,
-  IconSortDescending,
-  Option,
-  Select,
-} from "hds-react";
+import { IconSize, IconSortAscending, IconSortDescending, Option, Select } from "hds-react";
 import { Flex, fontMedium, focusStyles } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { convertOptionToHDS } from "common/src/helpers";
@@ -30,9 +24,7 @@ export const SORTING_OPTIONS = [
   },
 ] as const;
 
-function validateSorting(
-  value: string | null
-): (typeof SORTING_OPTIONS)[number]["value"] {
+function validateSorting(value: string | null): (typeof SORTING_OPTIONS)[number]["value"] {
   if (SORTING_OPTIONS?.some((option) => option.value === value)) {
     return value as (typeof SORTING_OPTIONS)[number]["value"];
   }
@@ -128,18 +120,14 @@ export function SortingComponent() {
       handleOrderChange("asc");
     }
   };
-  const sortValue = sortingOptions.find(
-    (option) => option.value === value
-  )?.value;
+  const sortValue = sortingOptions.find((option) => option.value === value)?.value;
 
   return (
     <Wrapper>
       <OrderBtn
         type="button"
         onClick={toggleOrder}
-        aria-label={t(
-          `search:sorting.action.${isOrderingAsc ? "descending" : "ascending"}`
-        )}
+        aria-label={t(`search:sorting.action.${isOrderingAsc ? "descending" : "ascending"}`)}
         data-testid="sorting-button"
       >
         {isOrderingAsc ? (

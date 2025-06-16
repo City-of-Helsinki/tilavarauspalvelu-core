@@ -33,10 +33,7 @@ const EquipmentItem = styled.li`
   font-size: var(--fontsize-body-l);
 `;
 
-export function EquipmentList({
-  equipment,
-  itemsToShow = 6,
-}: Props): JSX.Element {
+export function EquipmentList({ equipment, itemsToShow = 6 }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
   const equipmentList = getEquipmentList(equipment, lang);

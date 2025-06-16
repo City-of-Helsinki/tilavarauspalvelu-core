@@ -37,11 +37,7 @@ function ApplicationGroups({
   applications,
   actionCallback,
 }: {
-  applications: NonNullable<
-    NonNullable<
-      NonNullable<ApplicationsQuery["applications"]>["edges"][0]
-    >["node"]
-  >[];
+  applications: NonNullable<NonNullable<NonNullable<ApplicationsQuery["applications"]>["edges"][0]>["node"]>[];
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 }) {
   const { t } = useTranslation();
@@ -49,16 +45,10 @@ function ApplicationGroups({
     return <span>{t("applications:noApplications")}</span>;
   }
 
-  const sent = applications.filter(
-    (a) => a.status === ApplicationStatusChoice.ResultsSent
-  );
-  const received = applications.filter(
-    (a) => a.status === ApplicationStatusChoice.Received
-  );
+  const sent = applications.filter((a) => a.status === ApplicationStatusChoice.ResultsSent);
+  const received = applications.filter((a) => a.status === ApplicationStatusChoice.Received);
   const processing = applications.filter(
-    (a) =>
-      a.status === ApplicationStatusChoice.InAllocation ||
-      a.status === ApplicationStatusChoice.Handled
+    (a) => a.status === ApplicationStatusChoice.InAllocation || a.status === ApplicationStatusChoice.Handled
   );
   const draft = applications.filter(
     (a) =>
@@ -69,11 +59,7 @@ function ApplicationGroups({
 
   return (
     <>
-      <ApplicationsGroup
-        name={t(`applications:group.sent`)}
-        applications={sent}
-        actionCallback={actionCallback}
-      />
+      <ApplicationsGroup name={t(`applications:group.sent`)} applications={sent} actionCallback={actionCallback} />
       <ApplicationsGroup
         name={t(`applications:group.received`)}
         applications={received}
@@ -84,18 +70,12 @@ function ApplicationGroups({
         applications={processing}
         actionCallback={actionCallback}
       />
-      <ApplicationsGroup
-        name={t(`applications:group.draft`)}
-        applications={draft}
-        actionCallback={actionCallback}
-      />
+      <ApplicationsGroup name={t(`applications:group.draft`)} applications={draft} actionCallback={actionCallback} />
     </>
   );
 }
 
-function ApplicationsPage({
-  data: initialData,
-}: PropsNarrowed): JSX.Element | null {
+function ApplicationsPage({ data: initialData }: PropsNarrowed): JSX.Element | null {
   const { t } = useTranslation();
 
   const { currentUser } = useCurrentUser();
@@ -111,9 +91,7 @@ function ApplicationsPage({
   });
 
   const data = appData ?? initialData;
-  const applications = filterNonNullable(
-    data.applications?.edges?.map((n) => n?.node)
-  );
+  const applications = filterNonNullable(data.applications?.edges?.map((n) => n?.node));
 
   const actionCallback = async (type: "cancel" | "error") => {
     switch (type) {
@@ -141,10 +119,7 @@ function ApplicationsPage({
         <H1 $noMargin>{t("applications:heading")}</H1>
         <p>{t("applications:subHeading")}</p>
       </div>
-      <ApplicationGroups
-        applications={applications}
-        actionCallback={actionCallback}
-      />
+      <ApplicationGroups applications={applications} actionCallback={actionCallback} />
     </>
   );
 }
@@ -175,10 +150,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     };
   }
 
-  const { data: appData } = await client.query<
-    ApplicationsQuery,
-    ApplicationsQueryVariables
-  >({
+  const { data: appData } = await client.query<ApplicationsQuery, ApplicationsQueryVariables>({
     query: ApplicationsDocument,
     variables: {
       user: user.pk,
@@ -199,11 +171,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 // NOTE because this doesn't have pagination we use orderBy for development purposes only
 // if you create new application it's the first one in the list
 export const APPLICATIONS = gql`
-  query Applications(
-    $user: Int!
-    $status: [ApplicationStatusChoice]!
-    $orderBy: [ApplicationOrderingChoices]!
-  ) {
+  query Applications($user: Int!, $status: [ApplicationStatusChoice]!, $orderBy: [ApplicationOrderingChoices]!) {
     applications(user: $user, status: $status, orderBy: $orderBy) {
       edges {
         node {

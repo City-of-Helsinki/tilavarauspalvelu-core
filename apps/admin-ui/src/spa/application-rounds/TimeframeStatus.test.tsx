@@ -9,36 +9,20 @@ const today = new Date().toISOString();
 const futureDate = endOfTomorrow().toISOString();
 
 test("Past times ok", () => {
-  const view = render(
-    <TimeframeStatus
-      applicationPeriodBegin={pastDate}
-      applicationPeriodEnd={pastDate}
-    />
-  );
+  const view = render(<TimeframeStatus applicationPeriodBegin={pastDate} applicationPeriodEnd={pastDate} />);
 
   expect(view.getByText("Application.timeframePast")).toBeInTheDocument();
 });
 
 test("Today ending time ok", () => {
-  const view = render(
-    <TimeframeStatus
-      applicationPeriodBegin={pastDate}
-      applicationPeriodEnd={today}
-    />
-  );
+  const view = render(<TimeframeStatus applicationPeriodBegin={pastDate} applicationPeriodEnd={today} />);
 
-  expect(
-    view.getByText("Application.timeframePast (common.today)")
-  ).toBeInTheDocument();
+  expect(view.getByText("Application.timeframePast (common.today)")).toBeInTheDocument();
 });
 
 test("Future times ok", () => {
   const view = render(
-    <TimeframeStatus
-      applicationPeriodBegin={futureDate}
-      applicationPeriodEnd={futureDate}
-      isResolved={false}
-    />
+    <TimeframeStatus applicationPeriodBegin={futureDate} applicationPeriodEnd={futureDate} isResolved={false} />
   );
 
   expect(view.getByText("Application.timeframeFuture")).toBeInTheDocument();

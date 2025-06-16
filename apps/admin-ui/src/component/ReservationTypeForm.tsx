@@ -11,10 +11,7 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { type ReservationFormType, ReservationTypes } from "@/schemas";
 import { ShowAllContainer } from "common/src/components/";
-import {
-  ReservationMetadataSetForm,
-  ReserverMetadataSetForm,
-} from "./MetadataSetForm";
+import { ReservationMetadataSetForm, ReserverMetadataSetForm } from "./MetadataSetForm";
 import { BufferToggles } from "./BufferToggles";
 import ShowTOS from "./ShowTOS";
 import { Element } from "@/styled";
@@ -47,8 +44,7 @@ function TypeSelect({ isDisabled }: { isDisabled?: boolean }) {
   }
 
   const allowedTypesChoices = ReservationTypes.filter(
-    (x) =>
-      x !== ReservationTypeChoice.Normal && x !== ReservationTypeChoice.Seasonal
+    (x) => x !== ReservationTypeChoice.Normal && x !== ReservationTypeChoice.Seasonal
   );
 
   return (
@@ -60,11 +56,7 @@ function TypeSelect({ isDisabled }: { isDisabled?: boolean }) {
           required
           disabled={isDisabled}
           label={t("reservationApplication:type")}
-          errorText={
-            errors.type?.message != null
-              ? t(`reservationForm:errors.${errors.type?.message}`)
-              : ""
-          }
+          errorText={errors.type?.message != null ? t(`reservationForm:errors.${errors.type?.message}`) : ""}
           tooltipText={t("reservationApplication:typeSelection.tooltip")}
         >
           {allowedTypesChoices.map((v) => (
@@ -104,8 +96,7 @@ function ReservationTypeForm({
   }
 
   const showAuthWarning =
-    type === ReservationTypeChoice.Behalf &&
-    reservationUnit.authentication === Authentication.Strong;
+    type === ReservationTypeChoice.Behalf && reservationUnit.authentication === Authentication.Strong;
 
   return (
     <>
@@ -123,10 +114,7 @@ function ReservationTypeForm({
         <>
           {showAuthWarning && (
             <Element $wide>
-              <Notification
-                label={t("reservationApplication:strongAuthentication.label")}
-                type="info"
-              >
+              <Notification label={t("reservationApplication:strongAuthentication.label")} type="info">
                 {t("reservationApplication:strongAuthentication.info")}
               </Notification>
             </Element>
@@ -149,10 +137,7 @@ function ReservationTypeForm({
               <ReservationMetadataSetForm reservationUnit={reservationUnit} />
             </div>
             {type === ReservationTypeChoice.Staff ? (
-              <StyledShowAllContainer
-                showAllLabel={t("MyUnits.ReservationForm.showReserver")}
-                maximumNumber={0}
-              >
+              <StyledShowAllContainer showAllLabel={t("MyUnits.ReservationForm.showReserver")} maximumNumber={0}>
                 <>
                   <ReserverMetadataSetForm reservationUnit={reservationUnit} />
                   <HR style={{ gridColumn: "1 / -1" }} />

@@ -3,11 +3,7 @@ import { toUIDate } from "common/src/common/util";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { startOfDay } from "date-fns";
-import {
-  RejectionReadinessChoice,
-  type ReservationToCopyFragment,
-  UserPermissionChoice,
-} from "@gql/gql-types";
+import { RejectionReadinessChoice, type ReservationToCopyFragment, UserPermissionChoice } from "@gql/gql-types";
 import { Button, ButtonSize, ButtonVariant, IconCross } from "hds-react";
 import { useCheckPermission } from "@/hooks";
 import { NewReservationModal } from "@/component/EditTimeModal";
@@ -76,8 +72,7 @@ const ErrorLabel = styled(StatusLabel)`
   margin-inline: -8px;
 `;
 
-const stripTimeZeros = (time: string) =>
-  time.startsWith("0") ? time.substring(1) : time;
+const stripTimeZeros = (time: string) => (time.startsWith("0") ? time.substring(1) : time);
 
 // TODO this function should be refactored
 // all the messages and label types should be enum -> object mapping (or similar)
@@ -114,11 +109,9 @@ function getStatus(x: NewReservationListItem) {
   if (x.error) {
     // TODO the error handling is really messy and it's impossible to get codes rather than the error message string
     // also the i18n map is built stupidly so we can't use strings with spaces as keys
-    const intervalErrorMsg =
-      /ApolloError: Reservation start time does not match the allowed interval/;
+    const intervalErrorMsg = /ApolloError: Reservation start time does not match the allowed interval/;
     const overlapErrorMsg = /Overlapping reservations are not allowed/;
-    const reservationInPastErrorMsg =
-      /ApolloError: Reservation new begin cannot be in the past/;
+    const reservationInPastErrorMsg = /ApolloError: Reservation new begin cannot be in the past/;
     let errorCode = "default";
     if (x.error.match(intervalErrorMsg)) {
       errorCode = "interval";
@@ -161,10 +154,7 @@ type AddNewReservationButtonProps = {
   refetch: () => void;
 };
 
-function AddNewReservationButton({
-  reservationToCopy,
-  refetch,
-}: AddNewReservationButtonProps) {
+function AddNewReservationButton({ reservationToCopy, refetch }: AddNewReservationButtonProps) {
   const unitPk = reservationToCopy?.reservationUnits?.[0]?.unit?.pk;
   const { hasPermission } = useCheckPermission({
     units: unitPk ? [unitPk] : [],
@@ -188,21 +178,12 @@ function AddNewReservationButton({
       return;
     }
     setModalContent(
-      <NewReservationModal
-        onAccept={handleAccept}
-        onClose={handleClose}
-        reservationToCopy={reservationToCopy}
-      />
+      <NewReservationModal onAccept={handleAccept} onClose={handleClose} reservationToCopy={reservationToCopy} />
     );
   };
 
   return (
-    <Button
-      size={ButtonSize.Small}
-      variant={ButtonVariant.Secondary}
-      disabled={!hasPermission}
-      onClick={handleClick}
-    >
+    <Button size={ButtonSize.Small} variant={ButtonVariant.Secondary} disabled={!hasPermission} onClick={handleClick}>
       {t("MyUnits.RecurringReservation.addNewReservation")}
     </Button>
   );
@@ -230,14 +211,11 @@ export function ReservationList(props: Props | ExtendedProps) {
     return null;
   }
 
-  const hasReservation =
-    "reservationToCopy" in props && !!props.reservationToCopy;
+  const hasReservation = "reservationToCopy" in props && !!props.reservationToCopy;
 
   // NOTE this doesn't properly handle other reservation states than removed
   // should drill the actual state in the props (not just the removed flag)
-  const hasReservationsInFuture = items.some(
-    (item) => !item.isRemoved && item.date >= startOfDay(new Date())
-  );
+  const hasReservationsInFuture = items.some((item) => !item.isRemoved && item.date >= startOfDay(new Date()));
   const showNewReservationButton = hasReservation && hasReservationsInFuture;
 
   const removed = items.filter((x) => x.isRemoved).length;
@@ -252,25 +230,15 @@ export function ReservationList(props: Props | ExtendedProps) {
         )}
         {showNewReservationButton && (
           <div>
-            <AddNewReservationButton
-              reservationToCopy={props.reservationToCopy}
-              refetch={props.refetch}
-            />
+            <AddNewReservationButton reservationToCopy={props.reservationToCopy} refetch={props.refetch} />
           </div>
         )}
       </TitleWrapper>
       <StyledList $hasPadding={hasPadding ?? false}>
         {items.map((item) => (
-          <StyledListItem
-            key={`${item.date}-${item.startTime}-${item.endTime}`}
-          >
+          <StyledListItem key={`${item.date}-${item.startTime}-${item.endTime}`}>
             <TextWrapper $failed={!!item.error}>
-              <DateElement
-                $isRemoved={
-                  (item.isRemoved || item.isOverlapping || item.isCancelled) ??
-                  false
-                }
-              >
+              <DateElement $isRemoved={(item.isRemoved || item.isOverlapping || item.isCancelled) ?? false}>
                 {`${toUIDate(item.date, "cccccc d.M.yyyy")}, ${stripTimeZeros(
                   item.startTime
                 )}-${stripTimeZeros(item.endTime)}`}

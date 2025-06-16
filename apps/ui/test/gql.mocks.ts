@@ -32,9 +32,7 @@ interface CurrentUserQueryMocksProps extends ICreateGraphQLMock {
   noUser: boolean;
 }
 
-function createCurrentUserQueryMocks({
-  noUser,
-}: CurrentUserQueryMocksProps): CreateGraphQLMocksReturn {
+function createCurrentUserQueryMocks({ noUser }: CurrentUserQueryMocksProps): CreateGraphQLMocksReturn {
   const CurrentUserMock: CurrentUserQuery = {
     currentUser: !noUser
       ? {
@@ -67,8 +65,7 @@ function createOptionsQueryMocks(): CreateGraphQLMocksReturn {
       request: {
         query: OptionsDocument,
         variables: {
-          reservationUnitTypesOrderBy:
-            ReservationUnitTypeOrderingChoices.RankAsc,
+          reservationUnitTypesOrderBy: ReservationUnitTypeOrderingChoices.RankAsc,
           reservationPurposesOrderBy: ReservationPurposeOrderingChoices.RankAsc,
           unitsOrderBy: [],
           equipmentsOrderBy: [],

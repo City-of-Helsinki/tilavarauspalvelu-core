@@ -27,21 +27,13 @@ import {
 } from "./modules/applicationRoundAllocation";
 import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import { useSlotSelection } from "./hooks";
-import {
-  convertOptionToHDS,
-  filterNonNullable,
-  formatTimeRange,
-  timeToMinutes,
-  toNumber,
-} from "common/src/helpers";
+import { convertOptionToHDS, filterNonNullable, formatTimeRange, timeToMinutes, toNumber } from "common/src/helpers";
 import { addMinutes, startOfDay } from "date-fns";
 
 type Props = {
   applicationSections: SectionNodeT[] | null;
   reservationUnit: Pick<ReservationUnitNode, "pk">;
-  refetchApplicationEvents: () => Promise<
-    ApolloQueryResult<ApplicationSectionAllocationsQuery>
-  >;
+  refetchApplicationEvents: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
   applicationRoundStatus: ApplicationRoundStatusChoice;
   relatedAllocations: RelatedSlot[][];
 };
@@ -108,13 +100,7 @@ function getTimeLabel(selection: string[], t: TFunction): string {
   }
   const [day, startHour, startMinute] = selectionStart.split("-").map(toNumber);
   const [, endHour, endMinute] = selectionEnd.split("-").map(toNumber);
-  if (
-    day == null ||
-    startHour == null ||
-    startMinute == null ||
-    endHour == null ||
-    endMinute == null
-  ) {
+  if (day == null || startHour == null || startMinute == null || endHour == null || endMinute == null) {
     return "";
   }
 
@@ -127,9 +113,7 @@ function getTimeLabel(selection: string[], t: TFunction): string {
   return `${dayString} ${timeString}`;
 }
 
-function deserializeSlot(
-  slot: string
-): { day: DayT; hour: number; mins: number } | null {
+function deserializeSlot(slot: string): { day: DayT; hour: number; mins: number } | null {
   const res = slot.split("-").map(toNumber);
   if (res.length !== 3) {
     return null;
@@ -160,13 +144,7 @@ function TimeSelection(): JSX.Element {
       const start = ALLOCATION_CALENDAR_TIMES[0];
       const end = ALLOCATION_CALENDAR_TIMES[1];
       // TODO unsafe
-      return getTimeSlotOptions(
-        Number(day) as DayT,
-        start,
-        0,
-        end,
-        type === "end"
-      );
+      return getTimeSlotOptions(Number(day) as DayT, start, 0, end, type === "end");
     },
     [selection]
   );
@@ -194,12 +172,7 @@ function TimeSelection(): JSX.Element {
     if (day !== dayEnd) {
       return;
     }
-    const timeSlots = getTimeSlotOptions(
-      day,
-      startHours,
-      startMinutes,
-      endHours
-    ).map((n) => n.value);
+    const timeSlots = getTimeSlotOptions(day, startHours, startMinutes, endHours).map((n) => n.value);
 
     if (endValue && endMinutes === 0) timeSlots.pop();
     setSelection(timeSlots);
@@ -212,9 +185,7 @@ function TimeSelection(): JSX.Element {
     }
     const minsStart = timeToMinutes(val.label);
     const startTime = addMinutes(startOfDay(new Date()), minsStart);
-    const endOption = timeSlotEndOptions.find(
-      (n) => n.value === selection?.[selection.length - 1]
-    );
+    const endOption = timeSlotEndOptions.find((n) => n.value === selection?.[selection.length - 1]);
     if (!endOption) {
       return;
     }
@@ -231,9 +202,7 @@ function TimeSelection(): JSX.Element {
     const endValue =
       startTime >= endTime
         ? timeSlotEndOptions[startIndex + 1]?.value
-        : timeSlotEndOptions.find(
-            (n) => n.value === selection?.[selection.length - 1]
-          )?.value;
+        : timeSlotEndOptions.find((n) => n.value === selection?.[selection.length - 1])?.value;
     if (endValue != null && val.value != null) {
       setSelectedTime(val.value, endValue);
     }
@@ -247,9 +216,7 @@ function TimeSelection(): JSX.Element {
     const minsEnd = timeToMinutes(val.label);
     // Disabling options shows them disabled but does NOT prevent them from being selected
     // the select component breaks if the end time is before the start time
-    const startOption = timeSlotStartOptions.find(
-      (n) => n.value === selection?.[0]
-    );
+    const startOption = timeSlotStartOptions.find((n) => n.value === selection?.[0]);
     if (!startOption) {
       return;
     }
@@ -261,9 +228,7 @@ function TimeSelection(): JSX.Element {
   };
 
   const isOptionDisabled = (option: Partial<Option>) => {
-    const firstOption = timeSlotStartOptions.find(
-      (n) => n.value === selection?.[0]
-    );
+    const firstOption = timeSlotStartOptions.find((n) => n.value === selection?.[0]);
     if (!firstOption) {
       return false;
     }
@@ -279,12 +244,10 @@ function TimeSelection(): JSX.Element {
   };
 
   const startTimeOptions = timeSlotStartOptions.map(convertOptionToHDS);
-  const endTimeOptions = timeSlotEndOptions
-    .map(convertOptionToHDS)
-    .map((n) => ({
-      ...n,
-      disabled: isOptionDisabled(n),
-    }));
+  const endTimeOptions = timeSlotEndOptions.map(convertOptionToHDS).map((n) => ({
+    ...n,
+    disabled: isOptionDisabled(n),
+  }));
 
   return (
     <TimeSelectWrapper>
@@ -294,9 +257,7 @@ function TimeSelection(): JSX.Element {
         }}
         clearable={false}
         options={startTimeOptions}
-        value={
-          timeSlotStartOptions.find((n) => n.value === selection?.[0])?.value
-        }
+        value={timeSlotStartOptions.find((n) => n.value === selection?.[0])?.value}
         onChange={onStartTimeChange}
       />
       <Select
@@ -305,11 +266,7 @@ function TimeSelection(): JSX.Element {
         }}
         clearable={false}
         options={endTimeOptions}
-        value={
-          timeSlotEndOptions.find(
-            (n) => n.value === selection?.[selection.length - 1]
-          )?.value
-        }
+        value={timeSlotEndOptions.find((n) => n.value === selection?.[selection.length - 1])?.value}
         onChange={onEndTimeChange}
       />
     </TimeSelectWrapper>
@@ -368,48 +325,31 @@ export function AllocationColumn({
   // - the selected time slot / allocation (this is used for the mutation pk)
   // NOTE we show Handled for already allocated, but not for suitable that have already been allocated.
   const selected = { day, start: startHour, end: endHour };
-  const isDay = (ts: { dayOfTheWeek: Weekday }) =>
-    ts.dayOfTheWeek === transformWeekday(day);
+  const isDay = (ts: { dayOfTheWeek: Weekday }) => ts.dayOfTheWeek === transformWeekday(day);
 
   const timeslots = aes
     .filter((ae) => ae.status !== ApplicationSectionStatusChoice.Handled)
     .filter((ae) => ae.suitableTimeRanges?.some(isDay))
-    .filter((ae) =>
-      ae.suitableTimeRanges?.some((tr) => isInsideSelection(selected, tr))
-    );
+    .filter((ae) => ae.suitableTimeRanges?.some((tr) => isInsideSelection(selected, tr)));
   const resUnits = aes?.flatMap((ae) => ae.reservationUnitOptions);
   const allocated = resUnits
     .filter((a) => a.allocatedTimeSlots?.some(isDay))
-    .filter((ae) =>
-      ae.allocatedTimeSlots?.some((tr) => isInsideSelection(selected, tr))
-    );
+    .filter((ae) => ae.allocatedTimeSlots?.some((tr) => isInsideSelection(selected, tr)));
 
   // check if something is already allocated and push it down to the Card components
   const hasSelection = selection != null && selection.length > 0;
-  const isRoundAllocable =
-    applicationRoundStatus === ApplicationRoundStatusChoice.InAllocation;
+  const isRoundAllocable = applicationRoundStatus === ApplicationRoundStatusChoice.InAllocation;
 
   // NOTE have to reverse search for the pk, as the reservationUnitOption doesn't include any other fields than pk
   const allocatedPks = allocated.flatMap((ruo) =>
-    ruo.allocatedTimeSlots?.map(
-      (ts) => ts.reservationUnitOption.applicationSection.pk
-    )
+    ruo.allocatedTimeSlots?.map((ts) => ts.reservationUnitOption.applicationSection.pk)
   );
-  const allocatedSections = aes.filter(
-    (as) => as.pk != null && allocatedPks.find((x) => x === as.pk)
-  );
+  const allocatedSections = aes.filter((as) => as.pk != null && allocatedPks.find((x) => x === as.pk));
 
-  const doesCollideToOtherAllocations = relatedAllocations[day]?.some(
-    (slot) => {
-      return (
-        slot.day === day &&
-        slot.beginTime < endHour * 60 &&
-        slot.endTime > startHour * 60
-      );
-    }
-  );
-  const canAllocateSelection =
-    allocatedSections.length === 0 && !doesCollideToOtherAllocations;
+  const doesCollideToOtherAllocations = relatedAllocations[day]?.some((slot) => {
+    return slot.day === day && slot.beginTime < endHour * 60 && slot.endTime > startHour * 60;
+  });
+  const canAllocateSelection = allocatedSections.length === 0 && !doesCollideToOtherAllocations;
   const canAllocate = hasSelection && canAllocateSelection && isRoundAllocable;
 
   const allocatedData = filterNonNullable(
@@ -435,9 +375,7 @@ export function AllocationColumn({
       const timeSlot = getSuitableTimeSlot(as, { day, startHour, endHour });
       if (timeSlot != null) {
         const reservationUnitOptionPk =
-          as.reservationUnitOptions?.find(
-            (ruo) => ruo.reservationUnit?.pk === reservationUnit?.pk
-          )?.pk ?? 0;
+          as.reservationUnitOptions?.find((ruo) => ruo.reservationUnit?.pk === reservationUnit?.pk)?.pk ?? 0;
         return {
           key: as.pk,
           applicationSection: as,
@@ -460,11 +398,7 @@ export function AllocationColumn({
         <TimeSelection />
       </StyledShowAllContainer>
       {allocatedData.map((props) => (
-        <AllocatedCard
-          {...props}
-          key={props.key}
-          refetchApplicationEvents={refetchApplicationEvents}
-        />
+        <AllocatedCard {...props} key={props.key} refetchApplicationEvents={refetchApplicationEvents} />
       ))}
       {suitableData.map((props) => (
         <SuitableTimeCard
@@ -475,9 +409,7 @@ export function AllocationColumn({
           refetchApplicationEvents={refetchApplicationEvents}
         />
       ))}
-      {timeslots.length + allocated.length === 0 && (
-        <EmptyState>{t("Allocation.noRequestedTimes")}</EmptyState>
-      )}
+      {timeslots.length + allocated.length === 0 && <EmptyState>{t("Allocation.noRequestedTimes")}</EmptyState>}
     </Wrapper>
   );
 }

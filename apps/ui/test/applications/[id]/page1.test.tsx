@@ -2,10 +2,7 @@ import Page1 from "@/pages/applications/[id]/page1";
 import { render, screen, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
 import { createGraphQLMocks } from "@test/gql.mocks";
-import {
-  createMockApplicationFragment,
-  type CreateMockApplicationFragmentProps,
-} from "@test/application.mocks";
+import { createMockApplicationFragment, type CreateMockApplicationFragmentProps } from "@test/application.mocks";
 import { createOptionMock } from "@test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
 import { selectFirstOption } from "@test/test.utils";
@@ -53,9 +50,7 @@ vi.mock("next/router", () => ({
   useRouter,
 }));
 
-function customRender(
-  props: CreateMockApplicationFragmentProps = {}
-): ReturnType<typeof render> {
+function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnType<typeof render> {
   const mocks = createGraphQLMocks();
   const application = createMockApplicationFragment(props);
   const options: OptionsT = createOptionMock();
@@ -70,22 +65,16 @@ describe("Page1 common to all funnel pages", () => {
   test("should render empty application page", () => {
     // TODO all of this is common to all application funnel pages
     const view = customRender();
-    expect(
-      view.getByRole("heading", { name: "application:Page1.subHeading" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("heading", { name: "application:Page1.subHeading" })).toBeInTheDocument();
     expect(view.getByRole("button", { name: "application:Page1.createNew" }));
     expect(view.getByRole("button", { name: "common:next" }));
-    expect(
-      view.getByRole("link", { name: "breadcrumb:applications" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("link", { name: "breadcrumb:applications" })).toBeInTheDocument();
     expect(view.getByText("breadcrumb:application")).toBeInTheDocument();
   });
 
   test("should render notes when applying", () => {
     const view = customRender();
-    expect(
-      view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })).toBeInTheDocument();
     expect(view.getByText("Notes when applying FI")).toBeInTheDocument();
   });
   test.todo("should not render notes if they are empty or null");
@@ -117,13 +106,9 @@ describe("Page1", () => {
     const user = userEvent.setup();
     const submitBtn = view.getByRole("button", { name: "common:next" });
     expect(submitBtn).not.toBeDisabled();
-    expect(view.queryAllByText("application:validation.Required")).toHaveLength(
-      0
-    );
+    expect(view.queryAllByText("application:validation.Required")).toHaveLength(0);
     await user.click(submitBtn);
-    expect(
-      view.queryAllByText("application:validation.Required")
-    ).not.toHaveLength(0);
+    expect(view.queryAllByText("application:validation.Required")).not.toHaveLength(0);
   });
 
   test("should preselect reservation units based on query params", async () => {
@@ -136,9 +121,7 @@ describe("Page1", () => {
 
     const submitBtn = view.getByRole("button", { name: "common:next" });
     await user.click(submitBtn);
-    expect(
-      view.queryAllByText("application:validation.noReservationUnits")
-    ).toHaveLength(0);
+    expect(view.queryAllByText("application:validation.noReservationUnits")).toHaveLength(0);
   });
 
   // clicking should fill the
@@ -162,10 +145,7 @@ describe("Page1", () => {
     await user.type(name, "Test section name");
     await selectFirstOption(within(section), /application:Page1.ageGroup/);
     await selectFirstOption(within(section), /application:Page1.purpose/);
-    const groupSize = within(section).getByLabelText(
-      /application:Page1.groupSize/,
-      { selector: "input" }
-    );
+    const groupSize = within(section).getByLabelText(/application:Page1.groupSize/, { selector: "input" });
     expect(groupSize).toBeInTheDocument();
     await user.type(groupSize, "1");
 
@@ -179,10 +159,7 @@ describe("Page1", () => {
     await selectFirstOption(within(section), /application:Page1.maxDuration/);
 
     // don't expect a default value for eventsPerWeek
-    const eventsPerWeek = within(section).getByLabelText(
-      /application:Page1.eventsPerWeek/,
-      { selector: "input" }
-    );
+    const eventsPerWeek = within(section).getByLabelText(/application:Page1.eventsPerWeek/, { selector: "input" });
     expect(eventsPerWeek).toBeInTheDocument();
     await user.clear(eventsPerWeek);
     await user.type(eventsPerWeek, "1");
@@ -199,20 +176,13 @@ describe("Page1", () => {
 
     const section = view.getByTestId("application__applicationSection_0");
     expect(section).toBeInTheDocument();
-    const eventsPerWeek = within(section).getByLabelText(
-      /application:Page1.eventsPerWeek/,
-      { selector: "input" }
-    );
+    const eventsPerWeek = within(section).getByLabelText(/application:Page1.eventsPerWeek/, { selector: "input" });
     expect(eventsPerWeek).toBeInTheDocument();
     await user.clear(eventsPerWeek);
     await user.type(eventsPerWeek, "11");
     const submitBtn = view.getByRole("button", { name: "common:next" });
     await user.click(submitBtn);
-    expect(
-      view.queryAllByText(
-        "application:validation.Number must be less than or equal to 7"
-      )
-    ).toHaveLength(1);
+    expect(view.queryAllByText("application:validation.Number must be less than or equal to 7")).toHaveLength(1);
   });
 
   // TODO should these be schema tests
@@ -228,9 +198,7 @@ describe("Page1", () => {
     expect(submitBtn).not.toBeDisabled();
     await user.click(submitBtn);
     const section = view.getByTestId("application__applicationSection_0");
-    expect(
-      within(section).getAllByText("application:validation.noReservationUnits")
-    ).toHaveLength(2);
+    expect(within(section).getAllByText("application:validation.noReservationUnits")).toHaveLength(2);
   });
 
   // it's an error not to select all fields, but what if we have no options?

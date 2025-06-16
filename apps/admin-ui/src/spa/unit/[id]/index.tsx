@@ -1,10 +1,4 @@
-import {
-  Button,
-  ButtonVariant,
-  IconPlusCircleFill,
-  Notification,
-  NotificationSize,
-} from "hds-react";
+import { Button, ButtonVariant, IconPlusCircleFill, Notification, NotificationSize } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate, Link } from "react-router-dom";
@@ -16,15 +10,7 @@ import { base64encode, filterNonNullable } from "common/src/helpers";
 import Error404 from "@/common/Error404";
 import { ReservationUnitList } from "./ReservationUnitList";
 import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/common/urls";
-import {
-  CenterSpinner,
-  Flex,
-  fontBold,
-  fontMedium,
-  H1,
-  H2,
-  H3,
-} from "common/styled";
+import { CenterSpinner, Flex, fontBold, fontMedium, H1, H2, H3 } from "common/styled";
 import { gql } from "@apollo/client";
 
 interface IProps {
@@ -109,25 +95,14 @@ function Unit(): JSX.Element {
             <Address $disabled>{t("Unit.noAddress")}</Address>
           )}
         </Heading>
-        <Link to={getSpacesResourcesUrl(unitPk)}>
-          {t("Unit.showSpacesAndResources")}
-        </Link>
+        <Link to={getSpacesResourcesUrl(unitPk)}>{t("Unit.showSpacesAndResources")}</Link>
       </Flex>
       {!hasSpacesResources ? (
-        <Notification
-          type="alert"
-          label={t("Unit.noSpacesResourcesTitle")}
-          size={NotificationSize.Large}
-        >
-          {t("Unit.noSpacesResources")}{" "}
-          <Link to={getSpacesResourcesUrl(unitPk)}>
-            {t("Unit.createSpaces")}
-          </Link>
+        <Notification type="alert" label={t("Unit.noSpacesResourcesTitle")} size={NotificationSize.Large}>
+          {t("Unit.noSpacesResources")} <Link to={getSpacesResourcesUrl(unitPk)}>{t("Unit.createSpaces")}</Link>
         </Notification>
       ) : null}
-      <ExternalLink to={`${UNIT_REGISTRY_LINK}${unit.tprekId}`}>
-        {t("Unit.maintainOpeningHours")}
-      </ExternalLink>
+      <ExternalLink to={`${UNIT_REGISTRY_LINK}${unit.tprekId}`}>{t("Unit.maintainOpeningHours")}</ExternalLink>
       <H2 $noMargin>{t("Unit.reservationUnitTitle")}</H2>
       <Flex $direction="row" $justifyContent="space-between">
         {reservationUnits.length > 0 ? (
@@ -151,10 +126,7 @@ function Unit(): JSX.Element {
         </StyledBoldButton>
       </Flex>
       {reservationUnits.length > 0 ? (
-        <ReservationUnitList
-          reservationUnits={reservationUnits}
-          unitId={unitPk}
-        />
+        <ReservationUnitList reservationUnits={reservationUnits} unitId={unitPk} />
       ) : (
         <EmptyContainer>
           <H3 as="p">{t("Unit.noReservationUnitsTitle")}</H3>

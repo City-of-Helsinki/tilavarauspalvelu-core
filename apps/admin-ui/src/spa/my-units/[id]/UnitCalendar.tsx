@@ -1,24 +1,8 @@
-import React, {
-  type CSSProperties,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import {
-  addMinutes,
-  differenceInMinutes,
-  isToday,
-  setHours,
-  startOfDay,
-} from "date-fns";
+import React, { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
+import { addMinutes, differenceInMinutes, isToday, setHours, startOfDay } from "date-fns";
 import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
-import {
-  ReservationTypeChoice,
-  UserPermissionChoice,
-  type ReservationUnitReservationsFragment,
-} from "@gql/gql-types";
+import { ReservationTypeChoice, UserPermissionChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { CalendarEvent } from "common/src/calendar/Calendar";
@@ -80,8 +64,7 @@ const ResourceNameContainer = styled.div<{ $isDraft: boolean }>`
   padding: var(--spacing-2-xs) var(--spacing-4-xs);
   border-top: ${CELL_BORDER};
   border-right: ${CELL_BORDER};
-  border-left: ${({ $isDraft }) =>
-    $isDraft ? CELL_BORDER_LEFT_ALERT : CELL_BORDER_LEFT};
+  border-left: ${({ $isDraft }) => ($isDraft ? CELL_BORDER_LEFT_ALERT : CELL_BORDER_LEFT)};
   font-size: var(--fontsize-body-s);
   line-height: var(--lineheight-m);
   position: sticky;
@@ -187,8 +170,7 @@ const Container = styled.div<{ $height: number | "auto" }>`
   scroll-behavior: smooth;
   overscroll-behavior: contain;
 
-  height: ${({ $height }) =>
-    typeof $height === "number" ? `${$height}px` : "auto"};
+  height: ${({ $height }) => (typeof $height === "number" ? `${$height}px` : "auto")};
 `;
 
 function RowCells({ hasPermission, cols, ...rest }: CellProps): JSX.Element {
@@ -197,12 +179,7 @@ function RowCells({ hasPermission, cols, ...rest }: CellProps): JSX.Element {
   return (
     <CellContent $numCols={cols} data-testid={testId}>
       {Array.from(Array(cols).keys()).map((i) => (
-        <Cell
-          {...rest}
-          key={i}
-          offset={i}
-          hasPermission={hasPermission ?? false}
-        />
+        <Cell {...rest} key={i} offset={i} hasPermission={hasPermission ?? false} />
       ))}
     </CellContent>
   );
@@ -219,8 +196,7 @@ type CellProps = {
 };
 
 const CellStyled = styled.div<{ $isPast?: boolean }>`
-  ${({ $isPast }) =>
-    $isPast ? "background: var(--tilavaraus-event-booking-past-date);" : ""}
+  ${({ $isPast }) => ($isPast ? "background: var(--tilavaraus-event-booking-past-date);" : "")}
   height: 100%;
   width: 100%;
   border-left: ${CELL_BORDER};
@@ -361,20 +337,12 @@ function PostBuffer({
   );
 }
 
-function getEventTitle({
-  reservation: { title, event },
-  t,
-}: {
-  reservation: CalendarEventType;
-  t: TFunction;
-}) {
+function getEventTitle({ reservation: { title, event }, t }: { reservation: CalendarEventType; t: TFunction }) {
   if (event?.type === ReservationTypeChoice.Blocked) {
     return t("MyUnits.Calendar.legend.closed");
   }
 
-  return event && event?.pk !== event?.reservationUnits?.[0]?.pk
-    ? getReserveeName(event, t)
-    : title;
+  return event && event?.pk !== event?.reservationUnits?.[0]?.pk ? getReserveeName(event, t) : title;
 }
 
 const EventTriggerButton = () => (
@@ -418,20 +386,13 @@ function Event({ event, styleGetter }: EventProps): JSX.Element {
 
   const durationMinutes = differenceInMinutes(endDate, start);
 
-  const right = `calc(${left} + ${durationMinutes / 60} * ${
-    100 / N_HOURS
-  }% + 1px)`;
+  const right = `calc(${left} + ${durationMinutes / 60} * ${100 / N_HOURS}% + 1px)`;
 
   const reservation = event.event;
   const testId = `UnitCalendar__RowCalendar--event-${reservation?.pk}`;
   return (
     <>
-      <PreBuffer
-        event={event}
-        hourPercent={hourPercent}
-        left={left}
-        style={TemplateProps}
-      />
+      <PreBuffer event={event} hourPercent={hourPercent} left={left} style={TemplateProps} />
       <div
         style={{
           left,
@@ -440,36 +401,20 @@ function Event({ event, styleGetter }: EventProps): JSX.Element {
           zIndex: 5,
         }}
       >
-        <EventContent
-          style={{ ...styleGetter(event).style }}
-          data-testid={testId}
-        >
+        <EventContent style={{ ...styleGetter(event).style }} data-testid={testId}>
           <p>{title}</p>
           {/* NOTE don't set position on Popup it breaks responsiveness */}
           <Popup trigger={EventTriggerButton}>
-            {reservation && (
-              <ReservationPopupContent reservation={reservation} />
-            )}
+            {reservation && <ReservationPopupContent reservation={reservation} />}
           </Popup>
         </EventContent>
       </div>
-      <PostBuffer
-        event={event}
-        hourPercent={hourPercent}
-        right={right}
-        style={TemplateProps}
-      />
+      <PostBuffer event={event} hourPercent={hourPercent} right={right} style={TemplateProps} />
     </>
   );
 }
 
-function Events({
-  events,
-  styleGetter,
-}: {
-  events: CalendarEventType[];
-  styleGetter: EventStyleGetter;
-}) {
+function Events({ events, styleGetter }: { events: CalendarEventType[]; styleGetter: EventStyleGetter }) {
   return (
     <EventContainer data-testid="UnitCalendar__RowCalendar--events">
       {events.map((e) => (
@@ -520,12 +465,8 @@ export function UnitCalendar({
 
     const FIRST_HOUR = 7;
     const now = new Date();
-    const cellToScroll = isToday(date)
-      ? Math.min(now.getHours(), 24)
-      : Math.min(FIRST_HOUR, 24);
-    const firstElementOfHeader = ref.querySelector(
-      `.calendar-header > div:nth-of-type(${cellToScroll})`
-    );
+    const cellToScroll = isToday(date) ? Math.min(now.getHours(), 24) : Math.min(FIRST_HOUR, 24);
+    const firstElementOfHeader = ref.querySelector(`.calendar-header > div:nth-of-type(${cellToScroll})`);
     // horizontal scroll the calendar element
     // NOTE Don't use scrollIntoView because it changes focus on Chrome
     if (firstElementOfHeader && ref.parentElement) {
@@ -559,8 +500,7 @@ export function UnitCalendar({
   const margins = windowHeight < MOBILE_CUTOFF ? MOBILE_MARGIN : DESKTOP_MARGIN;
   const containerHeight = windowHeight - margins;
 
-  const height =
-    resources.length > MAX_RESOURCES_WITHOUT_SCROLL ? containerHeight : "auto";
+  const height = resources.length > MAX_RESOURCES_WITHOUT_SCROLL ? containerHeight : "auto";
   if (isLoading) {
     return <CenterSpinner />;
   }
@@ -571,11 +511,7 @@ export function UnitCalendar({
       <FlexContainer $numCols={N_COLS} ref={calendarRef}>
         <HeadingRow>
           <div />
-          <CellContent
-            $numCols={N_HOURS}
-            key="header"
-            className="calendar-header"
-          >
+          <CellContent $numCols={N_HOURS} key="header" className="calendar-header">
             {Array.from(Array(N_HOURS).keys()).map((i, index) => (
               <Time key={i}>{index}</Time>
             ))}
@@ -597,10 +533,7 @@ export function UnitCalendar({
                 onComplete={refetch}
               />
               {/* TODO events should be over the cells (tabindex is not correct now) */}
-              <Events
-                events={row.events}
-                styleGetter={eventStyleGetter(row.pk)}
-              />
+              <Events events={row.events} styleGetter={eventStyleGetter(row.pk)} />
             </RowCalendarArea>
           </Row>
         ))}

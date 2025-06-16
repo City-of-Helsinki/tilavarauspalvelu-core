@@ -8,9 +8,7 @@ export type ReservationEventType = {
   bufferTimeAfter: number;
 };
 
-export function getEventBuffers(
-  events: ReservationEventType[]
-): CalendarEventBuffer[] {
+export function getEventBuffers(events: ReservationEventType[]): CalendarEventBuffer[] {
   const buffers: CalendarEventBuffer[] = [];
   for (const event of events) {
     if (!event.begin || !event.end) {

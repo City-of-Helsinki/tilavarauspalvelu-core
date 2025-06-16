@@ -10,10 +10,7 @@ import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { getImageSource, getMainImage } from "common/src/helpers";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { getReservationUnitPath } from "@/modules/urls";
 import { gql } from "@apollo/client";
 
@@ -23,11 +20,7 @@ type RelatedUnitsProps = {
   style?: React.CSSProperties;
 };
 
-export function RelatedUnits({
-  units,
-  style,
-  className,
-}: RelatedUnitsProps): JSX.Element | null {
+export function RelatedUnits({ units, style, className }: RelatedUnitsProps): JSX.Element | null {
   const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
   const isWideMobile = useMedia(`(max-width: ${breakpoints.l})`, false);
@@ -56,19 +49,14 @@ export function RelatedUnits({
   );
 }
 
-function RelatedUnitCard({
-  reservationUnit,
-}: {
-  reservationUnit: RelatedUnitCardFieldsFragment;
-}): JSX.Element {
+function RelatedUnitCard({ reservationUnit }: { reservationUnit: RelatedUnitCardFieldsFragment }): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
   const name = getTranslationSafe(reservationUnit, "name", lang);
   const unitName = getTranslationSafe(reservationUnit.unit ?? {}, "name", lang);
   const pricing = getActivePricing(reservationUnit);
-  const unitPrice =
-    pricing != null ? getPriceString({ t, pricing }) : undefined;
+  const unitPrice = pricing != null ? getPriceString({ t, pricing }) : undefined;
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null
       ? getTranslationSafe(reservationUnit.reservationUnitType, "name", lang)
@@ -93,20 +81,12 @@ function RelatedUnitCard({
   }
   if (unitPrice) {
     infos.push({
-      icon: (
-        <IconEuroSign
-          aria-label={t("prices:reservationUnitPriceLabel")}
-          aria-hidden="false"
-        />
-      ),
+      icon: <IconEuroSign aria-label={t("prices:reservationUnitPriceLabel")} aria-hidden="false" />,
       value: unitPrice,
     });
   }
   const buttons = [
-    <ButtonLikeLink
-      href={getReservationUnitPath(reservationUnit.pk)}
-      key={reservationUnit.pk ?? 0}
-    >
+    <ButtonLikeLink href={getReservationUnitPath(reservationUnit.pk)} key={reservationUnit.pk ?? 0}>
       {t("common:show")}
       <IconArrowRight />
     </ButtonLikeLink>,

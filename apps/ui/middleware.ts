@@ -8,11 +8,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { env } from "@/env.mjs";
-import {
-  getSignInUrl,
-  buildGraphQLUrl,
-  type LocalizationLanguages,
-} from "common/src/urlBuilder";
+import { getSignInUrl, buildGraphQLUrl, type LocalizationLanguages } from "common/src/urlBuilder";
 import { base64encode, getLocalizationLang } from "common/src/helpers";
 import { ReservationStateChoice, ReservationTypeChoice } from "./gql/gql-types";
 import { getReservationInProgressPath } from "./modules/urls";
@@ -135,14 +131,8 @@ async function fetchUserData(
     return null;
   }
 
-  const applicationId =
-    opts?.applicationPk != null
-      ? base64encode(`ApplicationNode:${opts.applicationPk}`)
-      : null;
-  const reservationId =
-    opts?.reservationPk != null
-      ? base64encode(`ReservationNode:${opts.reservationPk}`)
-      : null;
+  const applicationId = opts?.applicationPk != null ? base64encode(`ApplicationNode:${opts.applicationPk}`) : null;
+  const reservationId = opts?.reservationPk != null ? base64encode(`ReservationNode:${opts.reservationPk}`) : null;
 
   // NOTE: need to build queries dynamically because of the optional parameters
   const params =
@@ -172,9 +162,7 @@ ${applicationId ? "$applicationId: ID!" : ""}
   if (!res.ok) {
     const text = await res.text();
     // eslint-disable-next-line no-console
-    console.warn(
-      `Middleware request failed: ${res.status} with message: ${text}`
-    );
+    console.warn(`Middleware request failed: ${res.status} with message: ${text}`);
     // prefer throw here because we want all query failures -> end in same fail state
     throw new Error(res.statusText);
   }
@@ -205,19 +193,11 @@ function parseReservationGQLquery(data: unknown): Data["reservation"] | null {
       let state: ReservationStateChoice | null = null;
       let type: ReservationTypeChoice | null = null;
       let resUnitPk: number | null = null;
-      if (
-        "type" in reservation &&
-        reservation.type != null &&
-        typeof reservation.type === "string"
-      ) {
+      if ("type" in reservation && reservation.type != null && typeof reservation.type === "string") {
         type = reservation.type as ReservationTypeChoice;
       }
 
-      if (
-        "state" in reservation &&
-        reservation.state != null &&
-        typeof reservation.state === "string"
-      ) {
+      if ("state" in reservation && reservation.state != null && typeof reservation.state === "string") {
         state = reservation.state as ReservationStateChoice;
       }
 
@@ -243,11 +223,7 @@ function parseReservationGQLquery(data: unknown): Data["reservation"] | null {
   return null;
 }
 
-function parseUserGQLquery(
-  data: unknown,
-  reservationId: string | null,
-  applicationId: string | null
-): User | null {
+function parseUserGQLquery(data: unknown, reservationId: string | null, applicationId: string | null): User | null {
   let userPk = null;
   let hasAccess = reservationId == null && applicationId == null;
   if (typeof data !== "object" || data == null) {
@@ -256,11 +232,7 @@ function parseUserGQLquery(
 
   if ("currentUser" in data) {
     const { currentUser } = data;
-    if (
-      typeof currentUser === "object" &&
-      currentUser != null &&
-      "pk" in currentUser
-    ) {
+    if (typeof currentUser === "object" && currentUser != null && "pk" in currentUser) {
       userPk = typeof currentUser.pk === "number" ? currentUser.pk : null;
     }
   }
@@ -330,10 +302,7 @@ function getLocalizationFromUrl(url: URL): LocalizationLanguages {
 /// uses the following cookies: sessionid, csrftoken, (language)
 /// only saves the language if the user is logged in
 /// NOTE The responsibility to update the cookie is on the caller (who creates the next request).
-async function maybeSaveUserLanguage(
-  req: NextRequest,
-  user: User | null
-): Promise<string | undefined> {
+async function maybeSaveUserLanguage(req: NextRequest, user: User | null): Promise<string | undefined> {
   const { cookies } = req;
   const url = new URL(req.url);
   if (user == null) {
@@ -379,10 +348,7 @@ async function maybeSaveUserLanguage(
 /// @param req - NextRequest
 /// @param user - user id or null if not logged in
 /// @returns Promise<string | undefined> - the redirect url or null if no redirect is needed
-function getRedirectProtectedRoute(
-  req: NextRequest,
-  user: User | null
-): string | null {
+function getRedirectProtectedRoute(req: NextRequest, user: User | null): string | null {
   const { headers } = req;
 
   if (user == null) {
@@ -412,9 +378,7 @@ function isPageRequest(url: URL): boolean {
     // ignore healthcheck because it's for automated test suite that can't do redirects
     url.pathname.startsWith("/healthcheck") ||
     url.pathname.startsWith("/_next") ||
-    url.pathname.match(
-      /\.(webmanifest|js|css|png|jpg|jpeg|svg|gif|ico|json|woff|woff2|ttf|eot|otf|pdf)$/
-    ) ||
+    url.pathname.match(/\.(webmanifest|js|css|png|jpg|jpeg|svg|gif|ico|json|woff|woff2|ttf|eot|otf|pdf)$/) ||
     url.pathname.startsWith("/503") ||
     url.pathname.startsWith("/en/503") ||
     url.pathname.startsWith("/sv/503")
@@ -467,11 +431,7 @@ const APPLICATION_ROUTES = [
   "applications", //:path*',
   "application", //:path*',
 ];
-const AUTHENTICATED_ROUTES = [
-  ...RESERVATION_ROUTES,
-  ...APPLICATION_ROUTES,
-  "success",
-];
+const AUTHENTICATED_ROUTES = [...RESERVATION_ROUTES, ...APPLICATION_ROUTES, "success"];
 // url matcher that is very specific to our case
 function doesUrlMatch(url: string, route: string) {
   const ref: string[] = url.split("/");
@@ -563,10 +523,7 @@ export async function middleware(req: NextRequest) {
 
       if (data.reservation.state === ReservationStateChoice.Created) {
         const { resUnitPk } = data.reservation;
-        const redirectUrl = new URL(
-          `${langPrefix}${getReservationInProgressPath(resUnitPk, reservationPk)}`,
-          req.url
-        );
+        const redirectUrl = new URL(`${langPrefix}${getReservationInProgressPath(resUnitPk, reservationPk)}`, req.url);
         return NextResponse.redirect(redirectUrl);
       }
       // Because we use url rewrite for Seasonal we have to allow both here (and do per page SSR checks instead)

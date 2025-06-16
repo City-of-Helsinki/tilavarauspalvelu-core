@@ -18,27 +18,17 @@ import {
   type RecurringCardFragment,
   ReservationKind,
 } from "@gql/gql-types";
-import {
-  filterNonNullable,
-  getImageSource,
-  getMainImage,
-} from "common/src/helpers";
+import { filterNonNullable, getImageSource, getMainImage } from "common/src/helpers";
 import { CenterSpinner, Flex, H3 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import Card from "common/src/components/Card";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 // TODO this is weird import path
-import {
-  SearchFormValues,
-  SeasonalSearchForm,
-} from "@/components/recurring/SeasonalSearchForm";
+import { SearchFormValues, SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { type OptionsT, processVariables } from "@/modules/search";
 import { useSearchParams } from "next/navigation";
@@ -53,21 +43,13 @@ const ImageSizeWrapper = styled.div`
 `;
 
 type ReservationUnitCardProps = Readonly<{
-  reservationUnit: Omit<
-    RecurringCardFragment,
-    "currentAccessType" | "effectiveAccessType"
-  >;
+  reservationUnit: Omit<RecurringCardFragment, "currentAccessType" | "effectiveAccessType">;
   isSelected: boolean;
   handleAdd: (pk: Maybe<number>) => void;
   handleRemove: (pk: Maybe<number>) => void;
 }>;
 
-function ReservationUnitCard({
-  reservationUnit,
-  handleAdd,
-  handleRemove,
-  isSelected,
-}: ReservationUnitCardProps) {
+function ReservationUnitCard({ reservationUnit, handleAdd, handleRemove, isSelected }: ReservationUnitCardProps) {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
@@ -86,9 +68,7 @@ function ReservationUnitCard({
   const reservationUnitTypeName = reservationUnit.reservationUnitType
     ? getTranslationSafe(reservationUnit.reservationUnitType, "name", lang)
     : undefined;
-  const unitName = reservationUnit.unit
-    ? getUnitName(reservationUnit.unit, lang)
-    : undefined;
+  const unitName = reservationUnit.unit ? getUnitName(reservationUnit.unit, lang) : undefined;
 
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "small");
@@ -136,10 +116,7 @@ function ReservationUnitCard({
   );
 }
 
-type AppRoundNode = Omit<
-  ApplicationReservationUnitListFragment,
-  "reservationUnits"
->;
+type AppRoundNode = Omit<ApplicationReservationUnitListFragment, "reservationUnits">;
 
 export type ReservationUnitModalProps = Readonly<{
   applicationRound: AppRoundNode;
@@ -176,18 +153,12 @@ export function ReservationUnitModalContent({
     handleSearch(criteria, true);
   };
 
-  const reservationUnits = filterNonNullable(
-    data?.reservationUnits?.edges.map((n) => n?.node)
-  );
+  const reservationUnits = filterNonNullable(data?.reservationUnits?.edges.map((n) => n?.node));
 
   return (
     <Flex>
       <H3 as="p">{getApplicationRoundName(applicationRound, lang)}</H3>
-      <SeasonalSearchForm
-        isLoading={isLoading}
-        options={options}
-        handleSearch={onSearch}
-      />
+      <SeasonalSearchForm isLoading={isLoading} options={options} handleSearch={onSearch} />
       {isLoading ? (
         <CenterSpinner />
       ) : error ? (
@@ -199,9 +170,7 @@ export function ReservationUnitModalContent({
           <ReservationUnitCard
             handleAdd={(pk) => handleAdd({ pk })}
             handleRemove={(pk) => handleRemove({ pk })}
-            isSelected={
-              currentReservationUnits.find((i) => i.pk === ru.pk) !== undefined
-            }
+            isSelected={currentReservationUnits.find((i) => i.pk === ru.pk) !== undefined}
             reservationUnit={ru}
             key={ru.pk}
           />

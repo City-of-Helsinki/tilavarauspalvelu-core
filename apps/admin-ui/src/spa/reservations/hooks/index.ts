@@ -17,9 +17,7 @@ type InputT = UpdateStaffReservationMutationVariables["input"];
 type MemoT = UpdateStaffReservationMutationVariables["workingMemo"];
 type ExtraParamsT = { seriesName?: string };
 
-export type MutationInputParams = Omit<InputT, "pk"> &
-  Omit<MemoT, "pk"> &
-  ExtraParamsT;
+export type MutationInputParams = Omit<InputT, "pk"> & Omit<MemoT, "pk"> & ExtraParamsT;
 
 type Props = {
   reservation: UseStaffReservationFragment;
@@ -34,9 +32,7 @@ export function useStaffReservationMutation({ reservation, onSuccess }: Props) {
   const [recurringMutation] = useUpdateRecurringReservationMutation();
 
   const handleSuccess = (isRecurring: boolean) => {
-    const trKey = `Reservation.EditPage.${
-      isRecurring ? "saveSuccessRecurring" : "saveSuccess"
-    }`;
+    const trKey = `Reservation.EditPage.${isRecurring ? "saveSuccessRecurring" : "saveSuccess"}`;
     successToast({ text: t(trKey) });
     onSuccess();
   };
@@ -95,9 +91,7 @@ export function useStaffReservationMutation({ reservation, onSuccess }: Props) {
   return editStaffReservation;
 }
 
-function convertReserveeType(
-  type?: Maybe<CustomerTypeChoice>
-): ReserveeType | undefined {
+function convertReserveeType(type?: Maybe<CustomerTypeChoice>): ReserveeType | undefined {
   if (type == null) {
     return undefined;
   }
@@ -139,9 +133,7 @@ export const UPDATE_STAFF_RESERVATION_MUTATION = gql`
 `;
 
 export const UPDATE_STAFF_RECURRING_RESERVATION_MUTATION = gql`
-  mutation UpdateRecurringReservation(
-    $input: ReservationSeriesUpdateMutationInput!
-  ) {
+  mutation UpdateRecurringReservation($input: ReservationSeriesUpdateMutationInput!) {
     updateReservationSeries(input: $input) {
       pk
     }

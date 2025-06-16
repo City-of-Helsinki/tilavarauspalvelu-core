@@ -5,11 +5,7 @@ import { fromUIDate } from "../common/util";
 const THREE_YEARS_MS = 3 * 365 * 24 * 60 * 60 * 1000;
 const TIME_PATTERN = /^[0-2][0-9]:[0-5][0-9]$/;
 
-export function checkDateNotInPast(
-  date: Date | null,
-  ctx: z.RefinementCtx,
-  path: string
-): void {
+export function checkDateNotInPast(date: Date | null, ctx: z.RefinementCtx, path: string): void {
   if (date && date < subDays(new Date(), 1)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -19,15 +15,8 @@ export function checkDateNotInPast(
   }
 }
 
-export function checkDateWithinThreeYears(
-  date: Date | null,
-  ctx: z.RefinementCtx,
-  path: string
-): void {
-  if (
-    date &&
-    Math.abs(new Date().getTime() - date.getTime()) > THREE_YEARS_MS
-  ) {
+export function checkDateWithinThreeYears(date: Date | null, ctx: z.RefinementCtx, path: string): void {
+  if (date && Math.abs(new Date().getTime() - date.getTime()) > THREE_YEARS_MS) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: [path],
@@ -36,11 +25,7 @@ export function checkDateWithinThreeYears(
   }
 }
 
-export function checkValidDateOnly(
-  date: Date | null,
-  ctx: z.RefinementCtx,
-  path: string
-) {
+export function checkValidDateOnly(date: Date | null, ctx: z.RefinementCtx, path: string) {
   if (!date) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -58,30 +43,17 @@ export function checkValidDateOnly(
 
 // TODO doesn't check for valid days or months i.e. 2024-02-31 and 2024-13-41 are valid (?) it seems to work
 // TODO this should not do two things, it should only check if the date is valid, but requires refactoring the users
-export function checkValidDate(
-  date: Date | null,
-  ctx: z.RefinementCtx,
-  path: string
-): void {
+export function checkValidDate(date: Date | null, ctx: z.RefinementCtx, path: string): void {
   checkValidDateOnly(date, ctx, path);
   checkDateWithinThreeYears(date, ctx, path);
 }
 
-export function checkValidFutureDate(
-  date: Date | null,
-  ctx: z.RefinementCtx,
-  path: string
-): void {
+export function checkValidFutureDate(date: Date | null, ctx: z.RefinementCtx, path: string): void {
   checkValidDate(date, ctx, path);
   checkDateNotInPast(date, ctx, path);
 }
 
-export function checkTimeStringFormat(
-  data: string | undefined,
-  ctx: z.RefinementCtx,
-  path: string,
-  errorKey?: string
-) {
+export function checkTimeStringFormat(data: string | undefined, ctx: z.RefinementCtx, path: string, errorKey?: string) {
   if (!data) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -129,10 +101,7 @@ export function checkLengthWithoutHtml(
   }
 }
 
-export function lessThanMaybeDate(
-  a?: string | null,
-  b?: string | null
-): boolean {
+export function lessThanMaybeDate(a?: string | null, b?: string | null): boolean {
   if (a == null || b == null) {
     return false;
   }

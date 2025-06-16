@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  useController,
-  UseControllerProps,
-  FieldValues,
-} from "react-hook-form";
+import { useController, UseControllerProps, FieldValues } from "react-hook-form";
 import { TimeInput } from "hds-react";
 import { useTranslation } from "react-i18next";
 

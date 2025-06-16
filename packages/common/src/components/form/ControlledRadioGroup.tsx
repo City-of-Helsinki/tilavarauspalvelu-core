@@ -1,12 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import {
-  type Control,
-  type FieldValues,
-  type Path,
-  useController,
-  type UseControllerProps,
-} from "react-hook-form";
+import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
 import { RadioButton, SelectionGroup } from "hds-react";
 
 interface RadioGroupProps<T extends FieldValues> extends UseControllerProps<T> {
@@ -34,13 +28,7 @@ export function ControlledRadioGroup<T extends FieldValues>({
   const { field } = useController({ name, control });
 
   return (
-    <SelectionGroup
-      label={label}
-      tooltipText={tooltip}
-      required={required}
-      direction={direction}
-      errorText={error}
-    >
+    <SelectionGroup label={label} tooltipText={tooltip} required={required} direction={direction} errorText={error}>
       {options.map((opt) => (
         <RadioButton
           id={`${name}.${opt.label}`}

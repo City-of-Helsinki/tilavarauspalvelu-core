@@ -18,9 +18,7 @@ export type ReadonlyDeep<T> = {
   readonly [P in keyof T]: ReadonlyDeep<T[P]>;
 };
 
-export function filterNonNullable<T>(
-  arr: Maybe<Readonly<Array<Maybe<T | undefined>>>> | undefined
-): NonNullable<T>[] {
+export function filterNonNullable<T>(arr: Maybe<Readonly<Array<Maybe<T | undefined>>>> | undefined): NonNullable<T>[] {
   return arr?.filter((n): n is NonNullable<T> => n != null) ?? [];
 }
 
@@ -51,10 +49,7 @@ export function toNumber(filter: Maybe<string> | undefined): number | null {
   return n;
 }
 
-export function pick<T, K extends keyof T>(
-  reservation: T,
-  keys: ReadonlyArray<K>
-): Pick<T, K> {
+export function pick<T, K extends keyof T>(reservation: T, keys: ReadonlyArray<K>): Pick<T, K> {
   return keys.reduce<Pick<T, K>>(
     (acc, key) => {
       if (reservation[key] != null) {
@@ -115,14 +110,10 @@ export async function hash(val: string): Promise<string> {
   if (!isBrowser) {
     throw new Error("hash is only available in the browser");
   }
-  const h = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(val)
-  );
+  const h = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(val));
   const hexes = [],
     view = new DataView(h);
-  for (let i = 0; i < view.byteLength; i += 4)
-    hexes.push(`00000000${view.getUint32(i).toString(16)}`.slice(-8));
+  for (let i = 0; i < view.byteLength; i += 4) hexes.push(`00000000${view.getUint32(i).toString(16)}`.slice(-8));
   return hexes.join("");
 }
 
@@ -162,17 +153,13 @@ function getImageSourceWithoutDefault(
   }
 }
 
-export function getMainImage(ru?: {
-  images: Readonly<ImageFragment[]>;
-}): ImageFragment | null {
+export function getMainImage(ru?: { images: Readonly<ImageFragment[]> }): ImageFragment | null {
   return ru?.images.find((img) => img.imageType === ImageType.Main) ?? null;
 }
 
 /// Returns if price is free
 /// NOTE Only check highestPrice because lowestPrice < highestPrice
-export function isPriceFree(
-  pricing: Pick<PricingFieldsFragment, "highestPrice">
-): boolean {
+export function isPriceFree(pricing: Pick<PricingFieldsFragment, "highestPrice">): boolean {
   const price = toNumber(pricing.highestPrice);
   if (price == null || price === 0) {
     return true;
@@ -195,9 +182,7 @@ function pickMaybeDay(
 }
 
 // Returns a Date object with the first day of the given array of Dates
-export function dayMin(
-  days: Readonly<Array<Readonly<Date | undefined>>>
-): Date | undefined {
+export function dayMin(days: Readonly<Array<Readonly<Date | undefined>>>): Date | undefined {
   return filterNonNullable(days).reduce<Date | undefined>((acc, day) => {
     return pickMaybeDay(acc, day, isBefore);
   }, undefined);
@@ -215,21 +200,13 @@ export function dayMax(days: Array<Date | undefined>): Date | undefined {
 /// @return 0 if time is invalid otherwise the time in minutes
 export function timeToMinutes(time: string): number {
   const [hours, minutes] = time.split(":").map(Number);
-  if (
-    hours != null &&
-    minutes != null &&
-    isFinite(hours) &&
-    isFinite(minutes)
-  ) {
+  if (hours != null && minutes != null && isFinite(hours) && isFinite(minutes)) {
     return hours * 60 + minutes;
   }
   return 0;
 }
 
-export function formatMinutes(
-  minutes: number,
-  trailingMinutes = false
-): string {
+export function formatMinutes(minutes: number, trailingMinutes = false): string {
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
   const showMins = trailingMinutes || mins > 0;
@@ -239,11 +216,7 @@ export function formatMinutes(
   return `${hours}`;
 }
 
-export function formatTimeRange(
-  beginMins: number,
-  endMins: number,
-  trailingMinutes = false
-): string {
+export function formatTimeRange(beginMins: number, endMins: number, trailingMinutes = false): string {
   return `${formatMinutes(beginMins, trailingMinutes)}–${formatMinutes(endMins, trailingMinutes)}`;
 }
 
@@ -262,17 +235,11 @@ export function formatApiTimeInterval({
   // NOTE this uses extra cycles because of double conversions but it's safer than stripping from raw data
   const btime = formatMinutes(timeToMinutes(beginTime), trailingMinutes);
   const endTimeMins = timeToMinutes(endTime);
-  const etime = formatMinutes(
-    endTimeMins === 0 ? 24 * 60 : endTimeMins,
-    trailingMinutes
-  );
+  const etime = formatMinutes(endTimeMins === 0 ? 24 * 60 : endTimeMins, trailingMinutes);
   return `${btime}–${etime}`;
 }
 
-export function formatDayTimes(
-  schedule: Omit<SuitableTimeFragment, "pk" | "id" | "priority">[],
-  day: number
-): string {
+export function formatDayTimes(schedule: Omit<SuitableTimeFragment, "pk" | "id" | "priority">[], day: number): string {
   return schedule
     .filter((s) => convertWeekday(s.dayOfTheWeek) === day)
     .map((s) => formatApiTimeInterval(s))
@@ -318,10 +285,7 @@ export function ignoreMaybeArray<T>(value: T | T[]): T | null {
   return Array.isArray(value) ? (value[0] ?? null) : value;
 }
 
-export function convertOptionToHDS(option: {
-  label: string;
-  value: string | number;
-}): OptionInProps {
+export function convertOptionToHDS(option: { label: string; value: string | number }): OptionInProps {
   return {
     label: option.label,
     value: option.value.toString(),
@@ -329,10 +293,7 @@ export function convertOptionToHDS(option: {
 }
 
 /// @description Convert a list of strings to a comma separated string
-export function formatListToCSV(
-  t: TFunction,
-  list: Readonly<Array<Readonly<string>>>
-): string {
+export function formatListToCSV(t: TFunction, list: Readonly<Array<Readonly<string>>>): string {
   if (list.length === 0) {
     return "";
   }
@@ -340,22 +301,13 @@ export function formatListToCSV(
     return list[0];
   }
   const lastItem = list[list.length - 1];
-  return (
-    list.slice(0, list.length - 1).join(", ") +
-    ` ${t("common:and")} ${lastItem}`
-  );
+  return list.slice(0, list.length - 1).join(", ") + ` ${t("common:and")} ${lastItem}`;
 }
 
 /// @description Converts time struct to string
 /// @param hour - hour in 24h format
 /// @param minute - minute in 24h format
 /// @return string in format HH:MM
-export function formatTimeStruct({
-  hour,
-  minute,
-}: {
-  hour: number;
-  minute: number;
-}): string {
+export function formatTimeStruct({ hour, minute }: { hour: number; minute: number }): string {
   return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
 }

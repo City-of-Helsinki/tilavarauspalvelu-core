@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  IconAlertCircleFill,
-  IconErrorFill,
-  IconSize,
-  Notification,
-  NotificationProps,
-} from "hds-react";
+import { IconAlertCircleFill, IconErrorFill, IconSize, Notification, NotificationProps } from "hds-react";
 import styled from "styled-components";
 
 type Props = {
@@ -28,14 +22,10 @@ const StyledNotification = styled(Notification)`
 `;
 
 /// TODO see if we can use vars for the colours (they are svg fill colours so css vars might not work)
-const WarningIcon = (
-  <IconAlertCircleFill size={IconSize.Small} color="#D18200" />
-);
+const WarningIcon = <IconAlertCircleFill size={IconSize.Small} color="#D18200" />;
 const ErrorIcon = <IconErrorFill size={IconSize.Small} color="#B01038" />;
 // TODO check the colours and icons for success and info
-const SuccessIcon = (
-  <IconAlertCircleFill size={IconSize.Small} color="#006442" />
-);
+const SuccessIcon = <IconAlertCircleFill size={IconSize.Small} color="#006442" />;
 const InfoIcon = <IconAlertCircleFill size={IconSize.Small} color="#006442" />;
 
 function getIcon(type: NotificationProps["type"]): React.ReactNode {

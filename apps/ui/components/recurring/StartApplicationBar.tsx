@@ -1,9 +1,4 @@
-import {
-  ButtonSize,
-  ButtonVariant,
-  IconArrowRight,
-  IconCross,
-} from "hds-react";
+import { ButtonSize, ButtonVariant, IconArrowRight, IconCross } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -65,23 +60,17 @@ type Props = {
   apiBaseUrl: string;
 };
 
-export function StartApplicationBar({
-  apiBaseUrl,
-  applicationRound,
-}: Readonly<Props>): JSX.Element {
+export function StartApplicationBar({ apiBaseUrl, applicationRound }: Readonly<Props>): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
   let bottomOffset = 0;
   if (isBrowser) {
     bottomOffset =
-      (document
-        ?.querySelector(".hds-cc__target")
-        ?.shadowRoot?.querySelector(".hds-cc__container")?.clientHeight ?? -8) +
-      8; // CC-border width is 8px, which isn't included in clientHeight. If it's undefined, use -8 to nullify the result
+      (document?.querySelector(".hds-cc__target")?.shadowRoot?.querySelector(".hds-cc__container")?.clientHeight ??
+        -8) + 8; // CC-border width is 8px, which isn't included in clientHeight. If it's undefined, use -8 to nullify the result
   }
-  const { getReservationUnits, clearSelections, PARAM_NAME } =
-    useReservationUnitList(applicationRound);
+  const { getReservationUnits, clearSelections, PARAM_NAME } = useReservationUnitList(applicationRound);
   const searchValues = useSearchParams();
 
   const [create, { loading: isSaving }] = useCreateApplicationMutation();
@@ -129,9 +118,7 @@ export function StartApplicationBar({
       {count > 0 && (
         <InnerContainer style={{ bottom: bottomOffset + "px" }}>
           <NoWrap id="reservationUnitCount">
-            {isMobile
-              ? t("shoppingCart:countShort", { count })
-              : t("shoppingCart:count", { count })}
+            {isMobile ? t("shoppingCart:countShort", { count }) : t("shoppingCart:count", { count })}
           </NoWrap>
           <WhiteButton
             onClick={clearSelections}
@@ -141,9 +128,7 @@ export function StartApplicationBar({
             iconStart={<IconCross />}
             $colorVariant="light"
           >
-            {isMobile
-              ? t("shoppingCart:deleteSelectionsShort")
-              : t("shoppingCart:deleteSelections")}
+            {isMobile ? t("shoppingCart:deleteSelectionsShort") : t("shoppingCart:deleteSelections")}
           </WhiteButton>
           <LoginFragment
             returnUrl={getPostLoginUrl()}

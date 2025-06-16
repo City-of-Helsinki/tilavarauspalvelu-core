@@ -1,11 +1,5 @@
 import React from "react";
-import Document, {
-  DocumentContext,
-  Html,
-  Head,
-  Main,
-  NextScript,
-} from "next/document";
+import Document, { DocumentContext, Html, Head, Main, NextScript } from "next/document";
 import { ServerStyleSheet } from "styled-components";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: this works in ui/pages/_document.js for some reason
@@ -19,15 +13,11 @@ export default class MyDocument extends Document {
     try {
       ctx.renderPage = () =>
         originalRenderPage({
-          enhanceApp: (App) => (props) =>
-            sheet.collectStyles(<App {...props} />),
+          enhanceApp: (App) => (props) => sheet.collectStyles(<App {...props} />),
         });
 
       const initialProps = await Document.getInitialProps(ctx);
-      const hdsCriticalRules = await getCriticalHdsRules(
-        initialProps.html,
-        hdsStyles
-      );
+      const hdsCriticalRules = await getCriticalHdsRules(initialProps.html, hdsStyles);
 
       return {
         ...initialProps,

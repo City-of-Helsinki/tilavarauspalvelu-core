@@ -1,10 +1,4 @@
-import {
-  addDays,
-  addHours,
-  endOfDay,
-  startOfDay,
-  startOfToday,
-} from "date-fns";
+import { addDays, addHours, endOfDay, startOfDay, startOfToday } from "date-fns";
 import {
   type ReservableMap,
   type RoundPeriod,
@@ -20,10 +14,7 @@ import {
 } from "@/gql/gql-types";
 import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 import { base64encode, toNumber } from "common/src/helpers";
-import {
-  createMockIsReservableFieldsFragment,
-  createMockReservableTimes,
-} from "@/test/reservation-unit.mocks";
+import { createMockIsReservableFieldsFragment, createMockReservableTimes } from "@/test/reservation-unit.mocks";
 
 describe("generateReservableMap", () => {
   beforeEach(() => {
@@ -122,12 +113,8 @@ describe("generateReservableMap", () => {
       expect(value.length).toBe(1);
       const { y, m, d } = splitDateKey(key);
       const date = new Date(y, m - 1, d, 9, 0, 0);
-      const s =
-        value[0]?.start?.getDate() === start.getDate()
-          ? date
-          : startOfDay(date);
-      const e =
-        value[0]?.end?.getDate() === start.getDate() ? endOfDay(start) : end;
+      const s = value[0]?.start?.getDate() === start.getDate() ? date : startOfDay(date);
+      const e = value[0]?.end?.getDate() === start.getDate() ? endOfDay(start) : end;
       expect(value[0]?.start).toStrictEqual(s);
       expect(value[0]?.end).toStrictEqual(e);
     }
@@ -144,12 +131,8 @@ describe("generateReservableMap", () => {
       expect(value.length).toBe(1);
       const { y, m, d } = splitDateKey(key);
       const date = new Date(y, m - 1, d, 9, 0, 0);
-      const s =
-        value[0]?.start?.getDate() === start.getDate()
-          ? date
-          : startOfDay(date);
-      const e =
-        value[0]?.end?.getDate() === start.getDate() ? endOfDay(start) : end;
+      const s = value[0]?.start?.getDate() === start.getDate() ? date : startOfDay(date);
+      const e = value[0]?.end?.getDate() === start.getDate() ? endOfDay(start) : end;
       expect(value[0]?.start).toStrictEqual(s);
       expect(value[0]?.end).toStrictEqual(e);
     }

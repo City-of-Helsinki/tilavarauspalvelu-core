@@ -68,10 +68,7 @@ const Slug = styled.span<{ $current?: boolean }>`
   max-width: ${LIMIT_DEFAULT_CH}ch;
 `;
 
-function BreadcrumbImpl({
-  routes,
-  isMobile,
-}: Pick<Props, "routes"> & { isMobile: boolean }): JSX.Element | null {
+function BreadcrumbImpl({ routes, isMobile }: Pick<Props, "routes"> & { isMobile: boolean }): JSX.Element | null {
   const routesWithSlug = routes?.filter((n) => n.slug != null && n.slug !== "");
   const lastRoute = routes[routes.length - 1];
   const lastRouteWithSlug = routesWithSlug[routesWithSlug.length - 1];
@@ -79,10 +76,7 @@ function BreadcrumbImpl({
   // or would it just be better to pass hideMobileBreadcrumb prop to the component
   // instead of having hidden logic here?
   const isMobileEnabled =
-    isMobile &&
-    routesWithSlug.length > 0 &&
-    lastRoute != null &&
-    lastRoute.slug !== lastRouteWithSlug?.slug;
+    isMobile && routesWithSlug.length > 0 && lastRoute != null && lastRoute.slug !== lastRouteWithSlug?.slug;
 
   if (!isMobileEnabled && isMobile) {
     return null;
@@ -103,22 +97,13 @@ function BreadcrumbImpl({
     <>
       {routes.map((item, index) => (
         <Item key={`${item.title}${item.slug}`}>
-          {index > 0 && (
-            <IconAngleRight size={IconSize.Small} aria-hidden="true" />
-          )}
+          {index > 0 && <IconAngleRight size={IconSize.Small} aria-hidden="true" />}
           {item.slug ? (
-            <Anchor
-              href={item.slug}
-              $current={index === routes.length - 1}
-              aria-current={index === routes.length - 1}
-            >
+            <Anchor href={item.slug} $current={index === routes.length - 1} aria-current={index === routes.length - 1}>
               {item.title}
             </Anchor>
           ) : (
-            <Slug
-              $current={index === routes.length - 1}
-              aria-current={index === routes.length - 1}
-            >
+            <Slug $current={index === routes.length - 1} aria-current={index === routes.length - 1}>
               {item.title}
             </Slug>
           )}
@@ -132,16 +117,9 @@ export function Breadcrumb({ routes }: Readonly<Props>): JSX.Element {
   const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
 
-  const routesWithFrontPage = [
-    { title: t("breadcrumb:frontpage"), slug: "/" },
-    ...routes,
-  ];
+  const routesWithFrontPage = [{ title: t("breadcrumb:frontpage"), slug: "/" }, ...routes];
   return (
-    <Nav
-      data-testid="breadcrumb__wrapper"
-      $isMobile={isMobile}
-      aria-label={t("breadcrumb:breadcrumb")}
-    >
+    <Nav data-testid="breadcrumb__wrapper" $isMobile={isMobile} aria-label={t("breadcrumb:breadcrumb")}>
       <BreadcrumbImpl routes={routesWithFrontPage} isMobile={isMobile} />
     </Nav>
   );

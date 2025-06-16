@@ -3,10 +3,7 @@ import { RecurringCard } from "./RecurringCard";
 import { AccessType, type RecurringCardFragment } from "@/gql/gql-types";
 import { vi, describe, test, expect } from "vitest";
 import { getReservationUnitPath } from "@/modules/urls";
-import {
-  createMockReservationUnitType,
-  generateNameFragment,
-} from "@/test/test.gql.utils";
+import { createMockReservationUnitType, generateNameFragment } from "@/test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
 import { base64encode } from "common/src/helpers";
 
@@ -20,27 +17,16 @@ describe("RecurringCard", () => {
     // For these cards neither the title nor image are links
     const showLink = view.getByRole("link", { name: "common:show" });
     expect(showLink).toBeInTheDocument();
-    expect(showLink).toHaveAttribute(
-      "href",
-      getReservationUnitPath(input.reservationUnit.pk)
-    );
-    expect(
-      view.getByRole("button", { name: "common:selectReservationUnit" })
-    ).toBeInTheDocument();
+    expect(showLink).toHaveAttribute("href", getReservationUnitPath(input.reservationUnit.pk));
+    expect(view.getByRole("button", { name: "common:selectReservationUnit" })).toBeInTheDocument();
     expect(view.getAllByRole("link")).toHaveLength(1);
     expect(view.getAllByRole("button")).toHaveLength(1);
     expect(view.getByText("foobar FI")).toBeInTheDocument();
     expect(view.getByText("Unit FI")).toBeInTheDocument();
-    expect(
-      view.getByText(`reservationUnit:accessTypes.${AccessType.AccessCode}`)
-    ).toBeInTheDocument();
-    expect(
-      view.getByText(/reservationUnitCard:maxPersons/)
-    ).toBeInTheDocument();
+    expect(view.getByText(`reservationUnit:accessTypes.${AccessType.AccessCode}`)).toBeInTheDocument();
+    expect(view.getByText(/reservationUnitCard:maxPersons/)).toBeInTheDocument();
     // unit type icon is present, can't query by aria-label since it's hidden
-    expect(
-      view.queryByTestId("reservation-unit-card__icon--home")
-    ).toBeInTheDocument();
+    expect(view.queryByTestId("reservation-unit-card__icon--home")).toBeInTheDocument();
   });
 
   test("should render remove button if already selected", async () => {
@@ -54,9 +40,7 @@ describe("RecurringCard", () => {
       name: "common:removeReservationUnit",
     });
     expect(removeBtn).toBeInTheDocument();
-    expect(
-      view.queryByRole("button", { name: "common:selectReservationUnit" })
-    ).not.toBeInTheDocument();
+    expect(view.queryByRole("button", { name: "common:selectReservationUnit" })).not.toBeInTheDocument();
     const user = userEvent.setup();
     await user.click(removeBtn);
     expect(input.removeReservationUnit).toHaveBeenCalledTimes(1);
@@ -84,9 +68,7 @@ describe("RecurringCard", () => {
       maxPersons: null,
     });
     const view = render(<RecurringCard {...input} />);
-    expect(
-      view.queryByText(/reservationUnitCard:maxPersons/)
-    ).not.toBeInTheDocument();
+    expect(view.queryByText(/reservationUnitCard:maxPersons/)).not.toBeInTheDocument();
   });
 
   test("should not have typename if not defined", () => {
@@ -96,9 +78,7 @@ describe("RecurringCard", () => {
       reservationUnitType: null,
     });
     const view = render(<RecurringCard {...input} />);
-    expect(
-      view.queryByTestId("reservation-unit-card__icon--home")
-    ).not.toBeInTheDocument();
+    expect(view.queryByTestId("reservation-unit-card__icon--home")).not.toBeInTheDocument();
   });
 
   test("should not have access type if not defined", () => {
@@ -108,9 +88,7 @@ describe("RecurringCard", () => {
       currentAccessType: null,
     });
     const view = render(<RecurringCard {...input} />);
-    expect(
-      view.queryByText(/reservationUnit:accessTypes/)
-    ).not.toBeInTheDocument();
+    expect(view.queryByText(/reservationUnit:accessTypes/)).not.toBeInTheDocument();
   });
 });
 
@@ -134,10 +112,7 @@ function createReservationUnit({
     id: "ReservationUnitNode:1",
     pk: 1,
     maxPersons: maxPersons !== undefined ? maxPersons : 10,
-    currentAccessType:
-      currentAccessType !== undefined
-        ? currentAccessType
-        : AccessType.AccessCode,
+    currentAccessType: currentAccessType !== undefined ? currentAccessType : AccessType.AccessCode,
     effectiveAccessType:
       currentAccessType !== undefined
         ? currentAccessType // Just use the same value for effectiveAccessType
@@ -154,11 +129,7 @@ function createReservationUnit({
   };
 }
 
-function createUnitMock({
-  name,
-}: {
-  name?: string;
-}): RecurringCardFragment["unit"] {
+function createUnitMock({ name }: { name?: string }): RecurringCardFragment["unit"] {
   if (!name) {
     return null;
   }

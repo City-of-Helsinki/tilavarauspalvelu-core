@@ -8,8 +8,7 @@ const bodyText = `Excepteur ut veniam minim id. Veniam laboris laborum cupidatat
 
 const defaultProps = {
   id: "testing",
-  heading:
-    "A heading with somewhat long text that might wrap to multiple lines",
+  heading: "A heading with somewhat long text that might wrap to multiple lines",
   body: <span>{bodyText}</span>,
   links: [
     { href: "https://www.google.com", text: "Google" },
@@ -21,8 +20,7 @@ const defaultProps = {
   setAccepted: vi.fn(),
 };
 
-const renderComponent = (props: TermBoxProps) =>
-  render(<TermsBox {...props} />);
+const renderComponent = (props: TermBoxProps) => render(<TermsBox {...props} />);
 
 describe("TermsBox", () => {
   test("should render with all props", () => {
@@ -83,18 +81,15 @@ describe("TermsBox", () => {
     expect(checkbox).not.toBeInTheDocument();
   });
 
-  test.for([[true], [false]] as const)(
-    "should toggle acceptance callback ",
-    async ([accepted]) => {
-      const user = userEvent.setup();
-      const setAccepted = vi.fn();
-      const view = renderComponent({ ...defaultProps, setAccepted, accepted });
-      const checkbox = view.getByRole("checkbox", {
-        name: defaultProps.acceptLabel,
-      });
-      expect(checkbox).toBeInTheDocument();
-      await user.click(checkbox);
-      expect(setAccepted).toHaveBeenCalledExactlyOnceWith(!accepted);
-    }
-  );
+  test.for([[true], [false]] as const)("should toggle acceptance callback ", async ([accepted]) => {
+    const user = userEvent.setup();
+    const setAccepted = vi.fn();
+    const view = renderComponent({ ...defaultProps, setAccepted, accepted });
+    const checkbox = view.getByRole("checkbox", {
+      name: defaultProps.acceptLabel,
+    });
+    expect(checkbox).toBeInTheDocument();
+    await user.click(checkbox);
+    expect(setAccepted).toHaveBeenCalledExactlyOnceWith(!accepted);
+  });
 });

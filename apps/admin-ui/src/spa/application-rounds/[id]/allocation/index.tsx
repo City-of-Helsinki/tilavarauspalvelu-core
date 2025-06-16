@@ -4,13 +4,7 @@ import { useTranslation } from "react-i18next";
 import { uniqBy } from "lodash-es";
 import { useParams, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
-import {
-  CenterSpinner,
-  TabWrapper,
-  H1,
-  fontBold,
-  fontMedium,
-} from "common/styled";
+import { CenterSpinner, TabWrapper, H1, fontBold, fontMedium } from "common/styled";
 import { ShowAllContainer } from "common/src/components";
 import { hasPermission as hasUnitPermission } from "@/modules/permissionHelper";
 import {
@@ -22,20 +16,11 @@ import {
   useAllApplicationEventsQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import {
-  base64encode,
-  convertOptionToHDS,
-  filterNonNullable,
-  sort,
-  toNumber,
-} from "common/src/helpers";
+import { base64encode, convertOptionToHDS, filterNonNullable, sort, toNumber } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
 import { useOptions } from "@/hooks";
 import { errorToast } from "common/src/common/toast";
-import {
-  ALLOCATION_POLL_INTERVAL,
-  VALID_ALLOCATION_APPLICATION_STATUSES,
-} from "@/common/const";
+import { ALLOCATION_POLL_INTERVAL, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { truncate } from "@/helpers";
 import { AllocationPageContent } from "./ApplicationEvents";
 import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
@@ -104,10 +89,8 @@ const transformApplicantType = (value: string | null) => {
   return null;
 };
 
-type ApplicationRoundFilterQueryType =
-  NonNullable<ApplicationRoundFilterQuery>["applicationRound"];
-type ReservationUnitFilterQueryType =
-  NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0];
+type ApplicationRoundFilterQueryType = NonNullable<ApplicationRoundFilterQuery>["applicationRound"];
+type ReservationUnitFilterQueryType = NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0];
 type UnitFilterQueryType = NonNullable<ReservationUnitFilterQueryType>["unit"];
 
 function ApplicationRoundAllocation({
@@ -147,14 +130,10 @@ function ApplicationRoundAllocation({
     setParams(vals, { replace: true });
   };
 
-  const unitReservationUnits = reservationUnits.filter(
-    (ru) => ru.unit?.pk != null && ru.unit.pk === unitFilter
-  );
+  const unitReservationUnits = reservationUnits.filter((ru) => ru.unit?.pk != null && ru.unit.pk === unitFilter);
 
   const selectedReservationUnit =
-    searchParams.get("reservation-unit") ??
-    unitReservationUnits?.[0]?.pk?.toString() ??
-    null;
+    searchParams.get("reservation-unit") ?? unitReservationUnits?.[0]?.pk?.toString() ?? null;
 
   const setSelectedReservationUnit = (value: number | null) => {
     setSingleValueSearchParam("reservation-unit", value?.toString() ?? null);
@@ -171,24 +150,15 @@ function ApplicationRoundAllocation({
   // NOTE sanitize all other query filters similar to this
   // backend returns an error on invalid filter values, but user can cause them by manipulating the url
   const priorityFilterSanitized = convertPriorityFilter(priorityFilter);
-  const priorityFilterQuery =
-    priorityFilterSanitized.length > 0 ? priorityFilterSanitized : null;
-  const ageGroupFilterQuery = ageGroupFilter
-    .map(Number)
-    .filter(Number.isFinite);
+  const priorityFilterQuery = priorityFilterSanitized.length > 0 ? priorityFilterSanitized : null;
+  const ageGroupFilterQuery = ageGroupFilter.map(Number).filter(Number.isFinite);
   const cityFilterQuery = cityFilter.map(Number).filter(Number.isFinite);
   const purposeFilterQuery = purposeFilter.map(Number).filter(Number.isFinite);
-  const applicantTypeFilterQuery = filterNonNullable(
-    applicantTypeFilter.map((x) => transformApplicantType(x))
-  );
+  const applicantTypeFilterQuery = filterNonNullable(applicantTypeFilter.map((x) => transformApplicantType(x)));
   const reservationUnitFilterQuery = toNumber(selectedReservationUnit);
-  const preferredOrderFilterQuery = orderFilter
-    .map(Number)
-    .filter((x) => x >= 0 && x <= 10);
+  const preferredOrderFilterQuery = orderFilter.map(Number).filter((x) => x >= 0 && x <= 10);
   const includePreferredOrder10OrHigher =
-    orderFilter.length > 0
-      ? orderFilter.filter((x) => Number(x) > 10).length > 0
-      : null;
+    orderFilter.length > 0 ? orderFilter.filter((x) => Number(x) > 10).length > 0 : null;
 
   const query = useApplicationSectionAllocationsQuery({
     // On purpose skip if the reservation unit is not selected (it is required)
@@ -237,22 +207,15 @@ function ApplicationRoundAllocation({
     console.warn("Skipping allocation query because reservation unit");
   } else if (applicationRound == null) {
     // eslint-disable-next-line no-console -- TODO use logger
-    console.warn(
-      "Skipping allocation query because application round is not set"
-    );
+    console.warn("Skipping allocation query because application round is not set");
   }
 
-  const affectingAllocations = filterNonNullable(
-    data?.affectingAllocatedTimeSlots
-  );
+  const affectingAllocations = filterNonNullable(data?.affectingAllocatedTimeSlots);
 
   // NOTE get the count of all application sections for the selected reservation unit
   // TODO this can be combined with the above query (but requires casting the alias)
   const { data: allEventsData } = useAllApplicationEventsQuery({
-    skip:
-      applicationRoundPk === 0 ||
-      reservationUnitFilterQuery == null ||
-      unitFilter == null,
+    skip: applicationRoundPk === 0 || reservationUnitFilterQuery == null || unitFilter == null,
     variables: {
       applicationRound: applicationRoundPk,
       reservationUnit: [reservationUnitFilterQuery],
@@ -266,9 +229,7 @@ function ApplicationRoundAllocation({
   // NOTE totalCount is fine, but we need to query the things we want to count otherwise it's off by a mile.
   // default to zero because filter returns empty array if no data
   const totalCount = allEventsData?.applicationSections?.totalCount ?? 0;
-  const allEvents = filterNonNullable(
-    allEventsData?.applicationSections?.edges.map((e) => e?.node)
-  );
+  const allEvents = filterNonNullable(allEventsData?.applicationSections?.edges.map((e) => e?.node));
   if (allEvents.length !== totalCount && totalCount < 100) {
     // eslint-disable-next-line no-console -- TODO use logger
     console.warn(
@@ -283,25 +244,17 @@ function ApplicationRoundAllocation({
   // NOTE we can't filter the query because we need to show allocated in different units
   // so for all data we remove non allocated that don't match the preferredOrder
   // for calendar / right hand side we do more extensive filtering later.
-  const applicationSections = filterNonNullable(
-    appEventsData?.applicationSections?.edges.map((e) => e?.node)
-  )
+  const applicationSections = filterNonNullable(appEventsData?.applicationSections?.edges.map((e) => e?.node))
     .filter((section) => {
       const opts = section.reservationUnitOptions.filter((r) => {
-        if (
-          r.allocatedTimeSlots.filter(
-            (ats) => ats.reservationUnitOption.pk === r.pk
-          ).length > 0
-        ) {
+        if (r.allocatedTimeSlots.filter((ats) => ats.reservationUnitOption.pk === r.pk).length > 0) {
           return true;
         }
         if (preferredOrderFilterQuery.length > 0) {
           const includedInPreferredOrder =
             preferredOrderFilterQuery.includes(r.preferredOrder) ||
             (includePreferredOrder10OrHigher && r.preferredOrder >= 10);
-          const orderFiltered =
-            includedInPreferredOrder &&
-            r.reservationUnit.pk === reservationUnitFilterQuery;
+          const orderFiltered = includedInPreferredOrder && r.reservationUnit.pk === reservationUnitFilterQuery;
           return orderFiltered;
         }
         return r.reservationUnit.pk === reservationUnitFilterQuery;
@@ -357,17 +310,11 @@ function ApplicationRoundAllocation({
       case "applicantType":
         return t(`Application.applicantTypes.${value.toUpperCase()}`);
       case "purpose":
-        return (
-          purposeOptions.find((o) => String(o.value) === value)?.label ?? ""
-        );
+        return purposeOptions.find((o) => String(o.value) === value)?.label ?? "";
       case "ageGroup":
-        return (
-          ageGroupOptions.find((o) => String(o.value) === value)?.label ?? ""
-        );
+        return ageGroupOptions.find((o) => String(o.value) === value)?.label ?? "";
       case "priority":
-        return (
-          priorityOptions.find((o) => String(o.value) === value)?.label ?? ""
-        );
+        return priorityOptions.find((o) => String(o.value) === value)?.label ?? "";
       case "order":
         return orderOptions.find((o) => String(o.value) === value)?.label ?? "";
       case "search":
@@ -377,19 +324,11 @@ function ApplicationRoundAllocation({
     }
   };
 
-  const hideSearchTags = [
-    "unit",
-    "reservation-unit",
-    "aes",
-    "selectionBegin",
-    "selectionEnd",
-    "allocated",
-  ];
+  const hideSearchTags = ["unit", "reservation-unit", "aes", "selectionBegin", "selectionEnd", "allocated"];
 
   const handleResetFilters = () => {
     const newParams = hideSearchTags.reduce<typeof searchParams>(
-      (acc, s) =>
-        searchParams.get(s) ? { ...acc, [s]: searchParams.get(s) } : acc,
+      (acc, s) => (searchParams.get(s) ? { ...acc, [s]: searchParams.get(s) } : acc),
       new URLSearchParams()
     );
     setParams(newParams, { replace: true });
@@ -404,21 +343,15 @@ function ApplicationRoundAllocation({
   };
 
   // NOTE findIndex returns -1 if not found
-  const initiallyActiveTab = unitReservationUnits.findIndex(
-    (x) => x.pk != null && x.pk === reservationUnitFilterQuery
-  );
+  const initiallyActiveTab = unitReservationUnits.findIndex((x) => x.pk != null && x.pk === reservationUnitFilterQuery);
 
   const reservationUnit =
-    unitReservationUnits.find(
-      (x) => x.pk != null && x.pk === reservationUnitFilterQuery
-    ) ?? reservationUnits[0];
+    unitReservationUnits.find((x) => x.pk != null && x.pk === reservationUnitFilterQuery) ?? reservationUnits[0];
 
-  const customerFilterOptions = Object.keys(ApplicantTypeChoice).map(
-    (value) => ({
-      label: t(`Application.applicantTypes.${value.toUpperCase()}`),
-      value: value as ApplicantTypeChoice,
-    })
-  );
+  const customerFilterOptions = Object.keys(ApplicantTypeChoice).map((value) => ({
+    label: t(`Application.applicantTypes.${value.toUpperCase()}`),
+    value: value as ApplicantTypeChoice,
+  }));
   const unitOptions = units.map((unit) => ({
     value: unit?.pk ?? 0,
     label: unit?.nameFi ?? "",
@@ -460,9 +393,7 @@ function ApplicationRoundAllocation({
           clearable={false}
           options={unitOptions.map(convertOptionToHDS)}
           disabled={unitOptions.length === 0}
-          value={unitOptions
-            .find((v) => v.value === unitFilter)
-            ?.value?.toString()}
+          value={unitOptions.find((v) => v.value === unitFilter)?.value?.toString()}
           onChange={(selection) => {
             const val = selection.find(() => true)?.value;
             const v = toNumber(val);
@@ -475,10 +406,7 @@ function ApplicationRoundAllocation({
         <MultiSelectFilter name="order" options={orderOptions} />
         <SearchFilter name="search" />
         <MultiSelectFilter name="homeCity" options={cityOptions} />
-        <MultiSelectFilter
-          name="applicantType"
-          options={customerFilterOptions}
-        />
+        <MultiSelectFilter name="applicantType" options={customerFilterOptions} />
         <MultiSelectFilter name="ageGroup" options={ageGroupOptions} />
         <MultiSelectFilter name="purpose" options={purposeOptions} />
       </ShowAllContainer>
@@ -487,16 +415,10 @@ function ApplicationRoundAllocation({
        * remount causes flickering but HDS doesn't allow programmatically changing the active tab
        */}
       <TabWrapper>
-        <Tabs
-          initiallyActiveTab={initiallyActiveTab >= 0 ? initiallyActiveTab : 0}
-          key={unitFilter ?? "unit-none"}
-        >
+        <Tabs initiallyActiveTab={initiallyActiveTab >= 0 ? initiallyActiveTab : 0} key={unitFilter ?? "unit-none"}>
           <TabList>
             {unitReservationUnits.map((ru) => (
-              <Tab
-                onClick={() => setSelectedReservationUnit(ru.pk ?? null)}
-                key={ru?.pk}
-              >
+              <Tab onClick={() => setSelectedReservationUnit(ru.pk ?? null)} key={ru?.pk}>
                 {truncate(ru?.nameFi ?? "-", MAX_RES_UNIT_NAME_LENGTH)}
               </Tab>
             ))}
@@ -538,11 +460,7 @@ function ApplicationRoundAllocation({
 }
 
 // Do a single full query to get filter / page data
-function AllocationWrapper({
-  applicationRoundPk,
-}: {
-  applicationRoundPk: number;
-}): JSX.Element {
+function AllocationWrapper({ applicationRoundPk }: { applicationRoundPk: number }): JSX.Element {
   const typename = "ApplicationRoundNode";
   const id = base64encode(`${typename}:${applicationRoundPk}`);
   const { loading, error, data } = useApplicationRoundFilterQuery({
@@ -554,19 +472,12 @@ function AllocationWrapper({
   const { user } = useSession();
 
   const { applicationRound } = data ?? {};
-  const reservationUnits = filterNonNullable(
-    applicationRound?.reservationUnits
-  );
+  const reservationUnits = filterNonNullable(applicationRound?.reservationUnits);
   const unitData = reservationUnits.map((ru) => ru?.unit);
   const units = uniqBy(filterNonNullable(unitData), "pk");
 
   const hasAccess = (unit: (typeof units)[0]) =>
-    unit.pk != null &&
-    hasUnitPermission(
-      user,
-      UserPermissionChoice.CanManageApplications,
-      unit?.pk
-    );
+    unit.pk != null && hasUnitPermission(user, UserPermissionChoice.CanManageApplications, unit?.pk);
 
   // filter the list of individual units so user can select only the ones they have permission to
   const filteredUnits = sort(
@@ -605,10 +516,7 @@ function AllocationWrapper({
 
   const roundName = applicationRound?.nameFi ?? "-";
 
-  const resUnits = sort(
-    uniqBy(reservationUnits, "pk"),
-    (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0
-  );
+  const resUnits = sort(uniqBy(reservationUnits, "pk"), (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0);
 
   return (
     <ApplicationRoundAllocation
@@ -617,9 +525,7 @@ function AllocationWrapper({
       units={filteredUnits}
       reservationUnits={resUnits}
       roundName={roundName}
-      applicationRoundStatus={
-        applicationRound?.status ?? ApplicationRoundStatusChoice.Upcoming
-      }
+      applicationRoundStatus={applicationRound?.status ?? ApplicationRoundStatusChoice.Upcoming}
     />
   );
 }
@@ -712,11 +618,7 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
       }
       totalCount
     }
-    affectingAllocatedTimeSlots(
-      reservationUnit: $reservationUnit
-      beginDate: $beginDate
-      endDate: $endDate
-    ) {
+    affectingAllocatedTimeSlots(reservationUnit: $reservationUnit, beginDate: $beginDate, endDate: $endDate) {
       ...AllocatedTimeSlot
     }
   }

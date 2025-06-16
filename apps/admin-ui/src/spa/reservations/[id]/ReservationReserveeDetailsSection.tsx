@@ -24,10 +24,7 @@ import { useSession } from "@/hooks/auth";
 import { trim } from "lodash-es";
 import { gql } from "@apollo/client";
 import { formatDate } from "@/common/util";
-import {
-  getName as getCountryName,
-  registerLocale as registerCountryLocale,
-} from "i18n-iso-countries";
+import { getName as getCountryName, registerLocale as registerCountryLocale } from "i18n-iso-countries";
 import countriesJson from "i18n-iso-countries/langs/fi.json";
 import { getApiErrors } from "common/src/apolloUtils";
 import { formatErrorMessage } from "common/src/hooks/useDisplayError";
@@ -119,52 +116,30 @@ export function ReservationReserveeDetailsSection({
   }
 
   return (
-    <ReserveeDetailsAccordion
-      id="reservation__reservee-details"
-      heading={t("RequestedReservation.reserveeDetails")}
-    >
+    <ReserveeDetailsAccordion id="reservation__reservee-details" heading={t("RequestedReservation.reserveeDetails")}>
       {gqlError && (
         <Notification
           type={"alert"}
           size={NotificationSize.Large}
-          label={
-            <H5 $noMargin>
-              {t("RequestedReservation.reserveeUnableToShowData")}
-            </H5>
-          }
+          label={<H5 $noMargin>{t("RequestedReservation.reserveeUnableToShowData")}</H5>}
         >
           {errorMessage}
         </Notification>
       )}
       <ApplicationDatas>
-        <DataWrapper
-          label={t("RequestedReservation.reserveeFirstName")}
-          isLoading={isContactInfoLoading}
-        >
-          {(isContactInfoVisible && !contactInfoError
-            ? profileContactInfo?.firstName
-            : reservation.user?.firstName) || "-"}
+        <DataWrapper label={t("RequestedReservation.reserveeFirstName")} isLoading={isContactInfoLoading}>
+          {(isContactInfoVisible && !contactInfoError ? profileContactInfo?.firstName : reservation.user?.firstName) ||
+            "-"}
         </DataWrapper>
-        <DataWrapper
-          label={t("RequestedReservation.reserveeLastName")}
-          isLoading={isContactInfoLoading}
-        >
-          {(isContactInfoVisible && !contactInfoError
-            ? profileContactInfo?.lastName
-            : reservation.user?.lastName) || "-"}
+        <DataWrapper label={t("RequestedReservation.reserveeLastName")} isLoading={isContactInfoLoading}>
+          {(isContactInfoVisible && !contactInfoError ? profileContactInfo?.lastName : reservation.user?.lastName) ||
+            "-"}
         </DataWrapper>
 
-        <DataWrapper
-          label={t("RequestedReservation.reserveeEmail")}
-          isLoading={isContactInfoLoading}
-        >
-          {(isContactInfoVisible && !contactInfoError
-            ? profileContactInfo?.email
-            : reservation.user?.email) || "-"}
+        <DataWrapper label={t("RequestedReservation.reserveeEmail")} isLoading={isContactInfoLoading}>
+          {(isContactInfoVisible && !contactInfoError ? profileContactInfo?.email : reservation.user?.email) || "-"}
         </DataWrapper>
-        <DataWrapper
-          label={t("RequestedReservation.reserveeAuthenticationStrength")}
-        >
+        <DataWrapper label={t("RequestedReservation.reserveeAuthenticationStrength")}>
           {t(
             reservation.user?.isStronglyAuthenticated
               ? "RequestedReservation.reserveeAuthenticationStrong"
@@ -173,53 +148,35 @@ export function ReservationReserveeDetailsSection({
         </DataWrapper>
 
         {isBirthDateVisible && (
-          <DataWrapper
-            label={t("RequestedReservation.birthDate")}
-            isLoading={isDateOfBirthLoading}
-          >
+          <DataWrapper label={t("RequestedReservation.birthDate")} isLoading={isDateOfBirthLoading}>
             {formatDate(dateOfBirthData?.reservation?.user?.dateOfBirth) || "-"}
           </DataWrapper>
         )}
 
         {isSSNVisible && (
-          <DataWrapper
-            label={t("RequestedReservation.reserveeSSN")}
-            isLoading={isSSNLoading}
-          >
+          <DataWrapper label={t("RequestedReservation.reserveeSSN")} isLoading={isSSNLoading}>
             {ssnData?.profileData?.ssn || "-"}
           </DataWrapper>
         )}
 
         {isContactInfoVisible && (
           <>
-            <DataWrapper
-              label={t("RequestedReservation.reserveePhone")}
-              isLoading={isContactInfoLoading}
-            >
+            <DataWrapper label={t("RequestedReservation.reserveePhone")} isLoading={isContactInfoLoading}>
               {profileContactInfo?.phone || "-"}
             </DataWrapper>
 
-            {!profileContactInfo?.countryCode ||
-            profileContactInfo?.countryCode === "246" ? (
+            {!profileContactInfo?.countryCode || profileContactInfo?.countryCode === "246" ? (
               <>
                 {/* Local address */}
-                <DataWrapper
-                  label={t("RequestedReservation.addressCity")}
-                  isLoading={isContactInfoLoading}
-                >
+                <DataWrapper label={t("RequestedReservation.addressCity")} isLoading={isContactInfoLoading}>
                   {profileContactInfo?.municipalityName || "-"}
                 </DataWrapper>
-                <DataWrapper
-                  label={t("RequestedReservation.addressStreet")}
-                  isLoading={isContactInfoLoading}
-                >
+                <DataWrapper label={t("RequestedReservation.addressStreet")} isLoading={isContactInfoLoading}>
                   <span>{profileContactInfo?.streetAddress || "-"}</span>
                   <br />
                   <span>
                     {profileContactInfo?.postalCode || profileContactInfo?.city
-                      ? trim(
-                          `${profileContactInfo?.postalCode} ${profileContactInfo?.city}`
-                        )
+                      ? trim(`${profileContactInfo?.postalCode} ${profileContactInfo?.city}`)
                       : ""}
                   </span>
                 </DataWrapper>
@@ -227,22 +184,13 @@ export function ReservationReserveeDetailsSection({
             ) : (
               <>
                 {/* Foreign address */}
-                <DataWrapper
-                  label={t("RequestedReservation.addressCountry")}
-                  isLoading={isContactInfoLoading}
-                >
+                <DataWrapper label={t("RequestedReservation.addressCountry")} isLoading={isContactInfoLoading}>
                   {getCountryName(profileContactInfo?.countryCode, "fi") || "-"}
                 </DataWrapper>
-                <DataWrapper
-                  label={t("RequestedReservation.addressForeign")}
-                  isLoading={isContactInfoLoading}
-                >
+                <DataWrapper label={t("RequestedReservation.addressForeign")} isLoading={isContactInfoLoading}>
                   {profileContactInfo?.streetAddress || "-"}
                 </DataWrapper>
-                <DataWrapper
-                  label={t("RequestedReservation.addressAdditional")}
-                  isLoading={isContactInfoLoading}
-                >
+                <DataWrapper label={t("RequestedReservation.addressAdditional")} isLoading={isContactInfoLoading}>
                   {profileContactInfo?.additionalAddress || "-"}
                 </DataWrapper>
               </>
@@ -253,9 +201,7 @@ export function ReservationReserveeDetailsSection({
 
       {!reservation.user?.isAdAuthenticated ? (
         <>
-          <Notification>
-            {t("RequestedReservation.reserveeShowInfosNotification")}
-          </Notification>
+          <Notification>{t("RequestedReservation.reserveeShowInfosNotification")}</Notification>
 
           <Flex $direction={"row"}>
             <ReserveeDetailsButton
@@ -263,11 +209,7 @@ export function ReservationReserveeDetailsSection({
               onClick={() => {
                 setIsContactInfoVisible(true);
               }}
-              disabled={
-                !!contactInfoData ||
-                !currentUser?.isAdAuthenticated ||
-                !!contactInfoError
-              }
+              disabled={!!contactInfoData || !currentUser?.isAdAuthenticated || !!contactInfoError}
               icon={<IconEnvelope />}
               text={t("RequestedReservation.reserveeShowContactInfo")}
             />
@@ -285,9 +227,7 @@ export function ReservationReserveeDetailsSection({
               onClick={() => {
                 setIsSSNVisible(true);
               }}
-              disabled={
-                !!ssnData || !currentUser?.isAdAuthenticated || !!ssnError
-              }
+              disabled={!!ssnData || !currentUser?.isAdAuthenticated || !!ssnError}
               icon={<IconPersonGenderless />}
               text={t("RequestedReservation.reserveeShowSSN")}
             />

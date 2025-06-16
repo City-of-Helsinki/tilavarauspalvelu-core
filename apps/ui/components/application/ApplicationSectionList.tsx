@@ -1,11 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import {
-  IconCheck,
-  IconCross,
-  IconQuestionCircleFill,
-  Tooltip,
-} from "hds-react";
+import { IconCheck, IconCross, IconQuestionCircleFill, Tooltip } from "hds-react";
 import {
   type AgeGroupNode,
   type Maybe,
@@ -15,20 +10,11 @@ import {
   type SuitableTimeFragment,
 } from "@gql/gql-types";
 import { WEEKDAYS } from "common/src/const";
-import {
-  filterNonNullable,
-  formatDayTimes,
-  fromMondayFirstUnsafe,
-} from "common/src/helpers";
+import { filterNonNullable, formatDayTimes, fromMondayFirstUnsafe } from "common/src/helpers";
 import StatusLabel from "common/src/components/StatusLabel";
 import type { StatusLabelType } from "common/src/tags";
 import { NoWrap } from "common/styled";
-import {
-  convertLanguageCode,
-  formatDurationRange,
-  getTranslationSafe,
-  toUIDate,
-} from "common/src/common/util";
+import { convertLanguageCode, formatDurationRange, getTranslationSafe, toUIDate } from "common/src/common/util";
 import {
   ApplicationInfoContainer,
   ApplicationSection,
@@ -47,9 +33,10 @@ function ageGroupToString(ag: Maybe<AgeGroupNode> | undefined): string {
   return `${ag.minimum} - ${ag.maximum}`;
 }
 
-function getLabelProps(
-  status: ApplicationSectionStatusChoice | undefined | null
-): { type: StatusLabelType; icon: JSX.Element } {
+function getLabelProps(status: ApplicationSectionStatusChoice | undefined | null): {
+  type: StatusLabelType;
+  icon: JSX.Element;
+} {
   switch (status) {
     case ApplicationSectionStatusChoice.Handled:
       return { type: "success", icon: <IconCheck /> };
@@ -60,13 +47,7 @@ function getLabelProps(
   }
 }
 
-function InfoListItem({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | JSX.Element;
-}) {
+function InfoListItem({ label, value }: { label: string; value: string | JSX.Element }) {
   return (
     <li>
       <h4>{`${label}: `}</h4>
@@ -76,9 +57,7 @@ function InfoListItem({
 }
 
 type ApplicationT = Pick<ApplicationViewFragment, "applicationSections">;
-type SingleApplicationSectionT = NonNullable<
-  NonNullable<ApplicationT["applicationSections"]>[number]
->;
+type SingleApplicationSectionT = NonNullable<NonNullable<ApplicationT["applicationSections"]>[number]>;
 
 function SingleApplicationSection({
   aes,
@@ -103,33 +82,22 @@ function SingleApplicationSection({
       name: getTranslationSafe(ru, "name", lang).trim(),
     }));
   const shouldShowStatusLabel =
-    aes.status === ApplicationSectionStatusChoice.Rejected ||
-    aes.status === ApplicationSectionStatusChoice.Handled;
+    aes.status === ApplicationSectionStatusChoice.Rejected || aes.status === ApplicationSectionStatusChoice.Handled;
   const statusProps = getLabelProps(aes.status);
 
   const reservationsBegin = toUIDate(new Date(aes.reservationsBeginDate));
   const reservationsEnd = toUIDate(new Date(aes.reservationsEndDate));
-  const duration = formatDurationRange(
-    t,
-    aes.reservationMinDuration,
-    aes.reservationMaxDuration
-  );
+  const duration = formatDurationRange(t, aes.reservationMinDuration, aes.reservationMaxDuration);
   const infos = [
     {
       key: "numPersons",
       label: t("application:preview.applicationEvent.numPersons"),
-      value: (
-        <NoWrap>{`${aes.numPersons} ${t("common:peopleSuffixShort")}`}</NoWrap>
-      ),
+      value: <NoWrap>{`${aes.numPersons} ${t("common:peopleSuffixShort")}`}</NoWrap>,
     },
     {
       key: "ageGroup",
       label: t("application:preview.applicationEvent.ageGroup"),
-      value: (
-        <NoWrap>
-          {`${ageGroupToString(aes.ageGroup)} ${t("common:yearSuffixShort")}`}
-        </NoWrap>
-      ),
+      value: <NoWrap>{`${ageGroupToString(aes.ageGroup)} ${t("common:yearSuffixShort")}`}</NoWrap>,
     },
     {
       key: "duration",
@@ -139,11 +107,7 @@ function SingleApplicationSection({
     {
       key: "eventsPerWeek",
       label: t("application:preview.applicationEvent.eventsPerWeek"),
-      value: (
-        <NoWrap>
-          {`${aes.appliedReservationsPerWeek} ${t("common:amountSuffixShort")}`}
-        </NoWrap>
-      ),
+      value: <NoWrap>{`${aes.appliedReservationsPerWeek} ${t("common:amountSuffixShort")}`}</NoWrap>,
     },
     {
       key: "period",
@@ -162,11 +126,7 @@ function SingleApplicationSection({
       <ApplicationSectionHeader>
         {aes.name}
         {shouldShowStatusLabel && (
-          <StatusLabel
-            type={statusProps.type}
-            icon={statusProps.icon}
-            data-testid="application-section__status"
-          >
+          <StatusLabel type={statusProps.type} icon={statusProps.icon} data-testid="application-section__status">
             {t(`application:applicationSectionStatus.${aes.status}`)}
           </StatusLabel>
         )}
@@ -174,9 +134,7 @@ function SingleApplicationSection({
       <ApplicationInfoContainer>
         <InfoItemContainer>
           <InfoItem>
-            <h3 className="info-label">
-              {t("application:preview.applicationEvent.applicationInfo")}
-            </h3>
+            <h3 className="info-label">{t("application:preview.applicationEvent.applicationInfo")}</h3>
             <ul>
               {infos.map(({ key, ...rest }) => (
                 <InfoListItem key={key} {...rest} />
@@ -186,9 +144,7 @@ function SingleApplicationSection({
         </InfoItemContainer>
         <InfoItemContainer>
           <InfoItem>
-            <h3 className="info-label">
-              {t("application:preview.applicationEvent.appliedSpaces")}
-            </h3>
+            <h3 className="info-label">{t("application:preview.applicationEvent.appliedSpaces")}</h3>
             <ol>
               {reservationUnits.map(({ pk, name }) => (
                 <li key={pk}>
@@ -202,9 +158,7 @@ function SingleApplicationSection({
           <InfoItem data-testid={`time-selector__preview-${aes.pk}`}>
             <h3 className="info-label">
               <span>{t("application:preview.applicationEvent.schedules")}</span>
-              <Tooltip placement="top">
-                {t("application:preview.applicationEvent.scheduleTooltip")}
-              </Tooltip>
+              <Tooltip placement="top">{t("application:preview.applicationEvent.scheduleTooltip")}</Tooltip>
             </h3>
             <div>
               <Weekdays primary={primaryTimes} secondary={secondaryTimes} />
@@ -216,16 +170,10 @@ function SingleApplicationSection({
   );
 }
 
-const filterPrimary = (n: { priority: Priority }) =>
-  n.priority === Priority.Primary;
-const filterSecondary = (n: { priority: Priority }) =>
-  n.priority === Priority.Secondary;
+const filterPrimary = (n: { priority: Priority }) => n.priority === Priority.Primary;
+const filterSecondary = (n: { priority: Priority }) => n.priority === Priority.Secondary;
 
-export function ApplicationSectionList({
-  application,
-}: {
-  application: ApplicationT;
-}): JSX.Element {
+export function ApplicationSectionList({ application }: { application: ApplicationT }): JSX.Element {
   const sections = filterNonNullable(application.applicationSections);
   return (
     <>
@@ -242,13 +190,7 @@ export function ApplicationSectionList({
 }
 
 type SchedulesT = Omit<SuitableTimeFragment, "pk" | "id" | "priority">;
-function Weekdays({
-  primary,
-  secondary,
-}: {
-  primary: SchedulesT[];
-  secondary: SchedulesT[];
-}) {
+function Weekdays({ primary, secondary }: { primary: SchedulesT[]; secondary: SchedulesT[] }) {
   const { t } = useTranslation();
 
   return (
@@ -257,11 +199,7 @@ function Weekdays({
         <ScheduleDay key={day}>
           <span>{t(`common:weekDay.${fromMondayFirstUnsafe(day)}`)}</span>
           <span>{formatDayTimes(primary, day) || "-"}</span>
-          <span>
-            {formatDayTimes(secondary, day)
-              ? `(${formatDayTimes(secondary, day)})`
-              : "-"}
-          </span>
+          <span>{formatDayTimes(secondary, day) ? `(${formatDayTimes(secondary, day)})` : "-"}</span>
         </ScheduleDay>
       ))}
     </>

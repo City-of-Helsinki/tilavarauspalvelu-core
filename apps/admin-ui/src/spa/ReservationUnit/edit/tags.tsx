@@ -1,17 +1,6 @@
 import React from "react";
-import {
-  ReservationUnitPublishingState,
-  ReservationUnitReservationState,
-} from "@gql/gql-types";
-import {
-  IconCheck,
-  IconClock,
-  IconEye,
-  IconEyeCrossed,
-  IconLock,
-  IconPen,
-  IconQuestionCircle,
-} from "hds-react";
+import { ReservationUnitPublishingState, ReservationUnitReservationState } from "@gql/gql-types";
+import { IconCheck, IconClock, IconEye, IconEyeCrossed, IconLock, IconPen, IconQuestionCircle } from "hds-react";
 import { useTranslation } from "react-i18next";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
@@ -22,14 +11,8 @@ type StatusPropsType = {
   icon: JSX.Element;
 };
 
-export function ReservationStateTag({
-  state,
-}: {
-  state?: ReservationUnitReservationState;
-}) {
-  const statusProps = ((
-    s?: ReservationUnitReservationState
-  ): StatusPropsType => {
+export function ReservationStateTag({ state }: { state?: ReservationUnitReservationState }) {
+  const statusProps = ((s?: ReservationUnitReservationState): StatusPropsType => {
     switch (s) {
       case ReservationUnitReservationState.ScheduledReservation:
       case ReservationUnitReservationState.ScheduledPeriod:
@@ -72,9 +55,7 @@ export function ReservationStateTag({
   );
 }
 
-const statusProps = (
-  state?: ReservationUnitPublishingState
-): StatusPropsType => {
+const statusProps = (state?: ReservationUnitPublishingState): StatusPropsType => {
   switch (state) {
     case ReservationUnitPublishingState.Draft:
       return {
@@ -106,11 +87,7 @@ const statusProps = (
   }
 };
 
-export function ReservationUnitStateTag({
-  state,
-}: {
-  state?: ReservationUnitPublishingState;
-}): JSX.Element | null {
+export function ReservationUnitStateTag({ state }: { state?: ReservationUnitPublishingState }): JSX.Element | null {
   const { t } = useTranslation();
   if (!state) {
     return null;

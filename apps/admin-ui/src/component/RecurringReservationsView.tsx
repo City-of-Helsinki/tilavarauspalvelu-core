@@ -1,24 +1,14 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
-import {
-  ReservationStateChoice,
-  type ReservationToCopyFragment,
-  UserPermissionChoice,
-} from "@gql/gql-types";
-import {
-  NewReservationListItem,
-  ReservationList,
-} from "@/component/ReservationsList";
+import { ReservationStateChoice, type ReservationToCopyFragment, UserPermissionChoice } from "@gql/gql-types";
+import { NewReservationListItem, ReservationList } from "@/component/ReservationsList";
 import { ReservationListButton } from "@/component/ReservationListButton";
 import { DenyDialog } from "@/component/DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import { EditTimeModal } from "@/component/EditTimeModal";
 import { useCheckPermission, useRecurringReservations } from "@/hooks";
-import {
-  isPossibleToDeny,
-  isPossibleToEdit,
-} from "@/modules/reservationModificationRules";
+import { isPossibleToDeny, isPossibleToEdit } from "@/modules/reservationModificationRules";
 import { CenterSpinner } from "common/styled";
 
 type Props = {
@@ -41,8 +31,7 @@ export function RecurringReservationsView({
   const { t } = useTranslation();
   const { setModalContent } = useModal();
 
-  const { reservations, loading, refetch, recurringReservation } =
-    useRecurringReservations(recurringPk);
+  const { reservations, loading, refetch, recurringReservation } = useRecurringReservations(recurringPk);
 
   const unitPk = reservationToCopy?.reservationUnits?.[0]?.unit?.pk;
   const { hasPermission } = useCheckPermission({
@@ -113,40 +102,15 @@ export function RecurringReservationsView({
     const endDate = new Date(x.end);
 
     if (hasPermission && onChange && isPossibleToEdit(x.state, endDate)) {
-      buttons.push(
-        <ReservationListButton
-          key="change"
-          callback={() => handleChange(x)}
-          type="change"
-          t={t}
-        />
-      );
+      buttons.push(<ReservationListButton key="change" callback={() => handleChange(x)} type="change" t={t} />);
     }
 
     const { pk } = x;
-    if (
-      onSelect &&
-      x.state === ReservationStateChoice.Confirmed &&
-      pk != null
-    ) {
-      buttons.push(
-        <ReservationListButton
-          key="show"
-          callback={() => onSelect(pk)}
-          type="show"
-          t={t}
-        />
-      );
+    if (onSelect && x.state === ReservationStateChoice.Confirmed && pk != null) {
+      buttons.push(<ReservationListButton key="show" callback={() => onSelect(pk)} type="show" t={t} />);
     }
     if (hasPermission && isPossibleToDeny(x.state, endDate)) {
-      buttons.push(
-        <ReservationListButton
-          key="deny"
-          callback={() => handleRemove(x)}
-          type="deny"
-          t={t}
-        />
-      );
+      buttons.push(<ReservationListButton key="deny" callback={() => handleRemove(x)} type="deny" t={t} />);
     }
 
     return {
@@ -159,9 +123,7 @@ export function RecurringReservationsView({
     };
   });
 
-  const items = forDisplay
-    .concat(rejected)
-    .sort((a, b) => a.date.getTime() - b.date.getTime());
+  const items = forDisplay.concat(rejected).sort((a, b) => a.date.getTime() - b.date.getTime());
 
   return (
     <ReservationList

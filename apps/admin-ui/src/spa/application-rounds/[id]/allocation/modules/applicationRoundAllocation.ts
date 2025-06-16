@@ -7,27 +7,18 @@ import {
   type ApplicationSectionAllocationsQuery,
 } from "@gql/gql-types";
 import { type TFunction } from "next-i18next";
-import {
-  filterNonNullable,
-  formatTimeRange,
-  timeToMinutes,
-  toNumber,
-} from "common/src/helpers";
+import { filterNonNullable, formatTimeRange, timeToMinutes, toNumber } from "common/src/helpers";
 import { formatDuration } from "common/src/common/util";
 import { convertWeekday, transformWeekday } from "common/src/conversion";
 import { type DayT } from "common/src/const";
 import { set } from "date-fns";
 
 // TODO use a fragment
-type QueryT = NonNullable<
-  ApplicationSectionAllocationsQuery["applicationSections"]
->;
+type QueryT = NonNullable<ApplicationSectionAllocationsQuery["applicationSections"]>;
 type EdgeT = NonNullable<QueryT["edges"][0]>;
 export type SectionNodeT = NonNullable<EdgeT["node"]>;
 export type SuitableTimeRangeNodeT = SectionNodeT["suitableTimeRanges"][0];
-export type ReservationUnitOptionNodeT = NonNullable<
-  SectionNodeT["reservationUnitOptions"]
->[0];
+export type ReservationUnitOptionNodeT = NonNullable<SectionNodeT["reservationUnitOptions"]>[0];
 
 export type RelatedSlot = {
   day: number;
@@ -137,11 +128,7 @@ function constructTimeSlot(day: number, begin: string): TimeSlot | null {
   return { day, hour: time };
 }
 
-export function getTimeSeries(
-  day: string,
-  begin: string,
-  end: string
-): string[] {
+export function getTimeSeries(day: string, begin: string, end: string): string[] {
   const [, startHours, startMinutes] = begin.split("-").map(toNumber);
   const [, endHours, endMinutes] = end.split("-").map(toNumber);
   const timeSlots: string[] = [];
@@ -173,10 +160,7 @@ export function formatSuitableTimeRange(
 
 export function formatTimeRangeList(
   t: TFunction,
-  aes: Pick<
-    SuitableTimeRangeNode,
-    "dayOfTheWeek" | "beginTime" | "endTime" | "priority"
-  >[],
+  aes: Pick<SuitableTimeRangeNode, "dayOfTheWeek" | "beginTime" | "endTime" | "priority">[],
   priority: Priority
 ): string {
   const schedules = sortBy(
@@ -189,10 +173,7 @@ export function formatTimeRangeList(
     .join(", ");
 }
 
-export function timeSlotKeyToScheduleTime(
-  slot: string | undefined,
-  padEnd = false
-): string {
+export function timeSlotKeyToScheduleTime(slot: string | undefined, padEnd = false): string {
   let [, hours, minutes] = slot?.split("-").map(toNumber) ?? [];
   if (hours == null || minutes == null) {
     return "";
@@ -210,10 +191,7 @@ export function timeSlotKeyToScheduleTime(
 }
 
 export function createDurationString(
-  section: Pick<
-    ApplicationSectionNode,
-    "reservationMinDuration" | "reservationMaxDuration"
-  >,
+  section: Pick<ApplicationSectionNode, "reservationMinDuration" | "reservationMaxDuration">,
   t: TFunction
 ) {
   const minDuration = section.reservationMinDuration;
@@ -221,21 +199,14 @@ export function createDurationString(
 
   const minDurString = formatDuration(t, { seconds: minDuration });
   const maxDurString = formatDuration(t, { seconds: maxDuration });
-  const durationString =
-    minDuration === maxDuration
-      ? minDurString
-      : `${minDurString ?? ""} - ${maxDurString ?? ""}`;
+  const durationString = minDuration === maxDuration ? minDurString : `${minDurString ?? ""} - ${maxDurString ?? ""}`;
   return durationString;
 }
 
-export type AllocatedTimeSlotNodeT =
-  SectionNodeT["reservationUnitOptions"][0]["allocatedTimeSlots"][0];
+export type AllocatedTimeSlotNodeT = SectionNodeT["reservationUnitOptions"][0]["allocatedTimeSlots"][0];
 
 export function getRelatedTimeSlots(
-  allocations: Pick<
-    AllocatedTimeSlotNodeT,
-    "endTime" | "beginTime" | "dayOfTheWeek"
-  >[]
+  allocations: Pick<AllocatedTimeSlotNodeT, "endTime" | "beginTime" | "dayOfTheWeek">[]
 ): RelatedSlot[][] {
   const relatedSpacesTimeSlots = allocations;
 
@@ -245,9 +216,7 @@ export function getRelatedTimeSlots(
   // we should end up with 7 arrays (one for each day), each having a list of time slots (beginTime, endTime)
   // then we can use that data to draw the calendar
   const dayArray = Array.from(Array(7)).map(() => []);
-  const relatedSpacesTimeSlotsByDay = relatedSpacesTimeSlots.reduce<
-    RelatedSlot[][]
-  >((acc, ts) => {
+  const relatedSpacesTimeSlotsByDay = relatedSpacesTimeSlots.reduce<RelatedSlot[][]>((acc, ts) => {
     const day = convertWeekday(ts.dayOfTheWeek);
     const arr = acc[day];
     if (arr == null) {

@@ -41,11 +41,7 @@ export const CURRENT_USER = gql`
 
 type UserNode = CurrentUserQuery["currentUser"];
 
-function hasUnitPermission(
-  permission: UserPermissionChoice,
-  unitPk: number,
-  user: UserNode
-): boolean {
+function hasUnitPermission(permission: UserPermissionChoice, unitPk: number, user: UserNode): boolean {
   const unitRoles = filterNonNullable(user?.unitRoles);
 
   for (const role of unitRoles) {
@@ -53,9 +49,7 @@ function hasUnitPermission(
     if (perms.find((x) => x === permission) == null) {
       continue;
     }
-    const unitsInGroups = filterNonNullable(
-      role.unitGroups?.flatMap((x) => x.units.map((y) => y.pk))
-    );
+    const unitsInGroups = filterNonNullable(role.unitGroups?.flatMap((x) => x.units.map((y) => y.pk)));
     if (unitsInGroups.find((x) => x === unitPk)) {
       return true;
     }
@@ -69,14 +63,9 @@ function hasUnitPermission(
   return false;
 }
 
-function hasGeneralPermission(
-  permission: UserPermissionChoice,
-  user: UserNode
-) {
+function hasGeneralPermission(permission: UserPermissionChoice, user: UserNode) {
   const roles = filterNonNullable(user?.generalRoles);
-  return roles.find(
-    (x) => x.permissions?.find((y) => y === permission) != null
-  );
+  return roles.find((x) => x.permissions?.find((y) => y === permission) != null);
 }
 
 /// Returns true if the user is allowed to perform operation for a specific unit or service sector
@@ -116,16 +105,12 @@ export function hasSomePermission(
     return true;
   }
 
-  const someGeneralRoles = user?.generalRoles?.some((r) =>
-    r.permissions?.some((x) => x === permission)
-  );
+  const someGeneralRoles = user?.generalRoles?.some((r) => r.permissions?.some((x) => x === permission));
   if (someGeneralRoles) {
     return true;
   }
 
-  const someUnitRoles = user?.unitRoles?.some((role) =>
-    role.permissions?.some((p) => p === permission)
-  );
+  const someUnitRoles = user?.unitRoles?.some((role) => role.permissions?.some((p) => p === permission));
 
   return someUnitRoles && !onlyGeneral;
 }

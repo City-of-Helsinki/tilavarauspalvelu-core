@@ -1,15 +1,9 @@
 import { errorToast } from "common/src/common/toast";
 import { useSort } from "@/hooks/useSort";
-import {
-  RejectedOccurrencesTable,
-  SORT_KEYS,
-} from "./RejectedOccurrencesTable";
+import { RejectedOccurrencesTable, SORT_KEYS } from "./RejectedOccurrencesTable";
 import { useSearchParams } from "react-router-dom";
 import { type ApolloError, gql } from "@apollo/client";
-import {
-  RejectedOccurrenceOrderingChoices,
-  useRejectedOccurrencesQuery,
-} from "@gql/gql-types";
+import { RejectedOccurrenceOrderingChoices, useRejectedOccurrencesQuery } from "@gql/gql-types";
 import { More } from "@/component/More";
 import React from "react";
 import { filterNonNullable } from "common/src/helpers";
@@ -24,10 +18,7 @@ type Props = {
   unitOptions: { nameFi: string; pk: number }[];
 };
 
-export function RejectedOccurrencesDataLoader({
-  applicationRoundPk,
-  unitOptions,
-}: Props): JSX.Element {
+export function RejectedOccurrencesDataLoader({ applicationRoundPk, unitOptions }: Props): JSX.Element {
   const { t } = useTranslation();
 
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
@@ -36,29 +27,26 @@ export function RejectedOccurrencesDataLoader({
   const reservationUnitFilter = searchParams.getAll("reservationUnit");
   const nameFilter = searchParams.get("search");
 
-  const { data, previousData, loading, fetchMore } =
-    useRejectedOccurrencesQuery({
-      variables: {
-        first: LIST_PAGE_SIZE,
-        applicationRound: applicationRoundPk,
-        unit: getFilteredUnits(unitFilter, unitOptions),
-        reservationUnit: reservationUnitFilter
-          .map(Number)
-          .filter(Number.isFinite),
-        orderBy: transformOrderBy(orderBy),
-        textSearch: nameFilter,
-      },
-      onError: (err: ApolloError) => {
-        const permErrors = getPermissionErrors(err);
-        if (permErrors.length > 0) {
-          errorToast({ text: t("errors.noPermission") });
-        } else {
-          errorToast({ text: t("errors.errorFetchingData") });
-        }
-      },
-      fetchPolicy: "cache-and-network",
-      nextFetchPolicy: "cache-first",
-    });
+  const { data, previousData, loading, fetchMore } = useRejectedOccurrencesQuery({
+    variables: {
+      first: LIST_PAGE_SIZE,
+      applicationRound: applicationRoundPk,
+      unit: getFilteredUnits(unitFilter, unitOptions),
+      reservationUnit: reservationUnitFilter.map(Number).filter(Number.isFinite),
+      orderBy: transformOrderBy(orderBy),
+      textSearch: nameFilter,
+    },
+    onError: (err: ApolloError) => {
+      const permErrors = getPermissionErrors(err);
+      if (permErrors.length > 0) {
+        errorToast({ text: t("errors.noPermission") });
+      } else {
+        errorToast({ text: t("errors.errorFetchingData") });
+      }
+    },
+    fetchPolicy: "cache-and-network",
+    nextFetchPolicy: "cache-first",
+  });
 
   const dataToUse = data ?? previousData;
 
@@ -67,9 +55,7 @@ export function RejectedOccurrencesDataLoader({
   }
 
   const totalCount = dataToUse?.rejectedOccurrences?.totalCount ?? 0;
-  const rejectedOccurrences = filterNonNullable(
-    dataToUse?.rejectedOccurrences?.edges.map((edge) => edge?.node)
-  );
+  const rejectedOccurrences = filterNonNullable(dataToUse?.rejectedOccurrences?.edges.map((edge) => edge?.node));
 
   return (
     <>
@@ -94,9 +80,7 @@ export function RejectedOccurrencesDataLoader({
   );
 }
 
-function transformOrderBy(
-  orderBy: string | null
-): RejectedOccurrenceOrderingChoices[] {
+function transformOrderBy(orderBy: string | null): RejectedOccurrenceOrderingChoices[] {
   if (orderBy == null) {
     return [];
   }
@@ -106,14 +90,8 @@ function transformOrderBy(
     case "application_id,application_event_id":
     case "application_id,-application_event_id":
       return desc
-        ? [
-            RejectedOccurrenceOrderingChoices.ApplicationPkDesc,
-            RejectedOccurrenceOrderingChoices.PkDesc,
-          ]
-        : [
-            RejectedOccurrenceOrderingChoices.ApplicationPkAsc,
-            RejectedOccurrenceOrderingChoices.PkAsc,
-          ];
+        ? [RejectedOccurrenceOrderingChoices.ApplicationPkDesc, RejectedOccurrenceOrderingChoices.PkDesc]
+        : [RejectedOccurrenceOrderingChoices.ApplicationPkAsc, RejectedOccurrenceOrderingChoices.PkAsc];
     case "applicant":
       return desc
         ? [RejectedOccurrenceOrderingChoices.ApplicantDesc]
@@ -123,9 +101,7 @@ function transformOrderBy(
         ? [RejectedOccurrenceOrderingChoices.ApplicationSectionNameDesc]
         : [RejectedOccurrenceOrderingChoices.ApplicationSectionNameAsc];
     case "rejected_unit_name_fi":
-      return desc
-        ? [RejectedOccurrenceOrderingChoices.UnitNameDesc]
-        : [RejectedOccurrenceOrderingChoices.UnitNameAsc];
+      return desc ? [RejectedOccurrenceOrderingChoices.UnitNameDesc] : [RejectedOccurrenceOrderingChoices.UnitNameAsc];
     case "rejected_reservation_unit_name_fi":
       return desc
         ? [RejectedOccurrenceOrderingChoices.ReservationUnitNameDesc]

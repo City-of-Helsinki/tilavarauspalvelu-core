@@ -3,10 +3,7 @@ import Page4 from "@/pages/applications/[id]/page4";
 import { render, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
 import { createGraphQLMocks } from "@test/gql.mocks";
-import {
-  type CreateMockApplicationFragmentProps,
-  createMockApplicationViewFragment,
-} from "@test/application.mocks";
+import { type CreateMockApplicationFragmentProps, createMockApplicationViewFragment } from "@test/application.mocks";
 import { base64encode } from "common/src/helpers";
 import userEvent from "@testing-library/user-event";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
@@ -51,9 +48,7 @@ vi.mock("next/router", () => ({
   useRouter,
 }));
 
-function customRender(
-  props: CreateMockApplicationFragmentProps = {}
-): ReturnType<typeof render> {
+function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnType<typeof render> {
   // TODO need a graphql mutation mock (but have to have separate error / success cases)
   if (props.page == null) {
     props.page = "page3";
@@ -83,16 +78,10 @@ describe("Application Page4", () => {
     // TODO some of this is common to all application funnel pages
     // we could just remove it (it's tested by the ApplicationFunnel tests)
     const view = customRender();
-    expect(
-      view.getByRole("heading", { name: "application:preview.subHeading" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("heading", { name: "application:preview.subHeading" })).toBeInTheDocument();
     expect(view.getByRole("button", { name: "common:submit" }));
-    expect(
-      view.getByRole("link", { name: "breadcrumb:applications" })
-    ).toBeInTheDocument();
-    expect(
-      view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("link", { name: "breadcrumb:applications" })).toBeInTheDocument();
+    expect(view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })).toBeInTheDocument();
     expect(view.getByText("Notes when applying FI")).toBeInTheDocument();
   });
 
@@ -141,15 +130,9 @@ describe("Terms of Use", () => {
     const checkTerms = vi.fn();
     const view = customRender({});
     // Check that we have the terms of use checkboxes
-    expect(
-      view.getByText("reservationCalendar:heading.cancellationPaymentTerms")
-    ).toBeInTheDocument();
-    expect(
-      view.getByText("reservationCalendar:heading.termsOfUse")
-    ).toBeInTheDocument();
-    const genericTermsContainer = view.getByTestId(
-      "terms-box__container--general-terms"
-    );
+    expect(view.getByText("reservationCalendar:heading.cancellationPaymentTerms")).toBeInTheDocument();
+    expect(view.getByText("reservationCalendar:heading.termsOfUse")).toBeInTheDocument();
+    const genericTermsContainer = view.getByTestId("terms-box__container--general-terms");
     expect(genericTermsContainer).toBeInTheDocument();
     const checkbox1 = within(genericTermsContainer).getByRole("checkbox", {
       name: "application:preview.userAcceptsGeneralTerms",
@@ -157,9 +140,7 @@ describe("Terms of Use", () => {
     expect(checkbox1).toBeInTheDocument();
     expect(checkbox1).not.toBeChecked();
 
-    const specificTermsContainer = view.getByTestId(
-      "terms-box__container--service-specific-terms"
-    );
+    const specificTermsContainer = view.getByTestId("terms-box__container--service-specific-terms");
     expect(specificTermsContainer).toBeInTheDocument();
     const checkbox2 = within(specificTermsContainer).getByRole("checkbox", {
       name: "application:preview.userAcceptsSpecificTerms",

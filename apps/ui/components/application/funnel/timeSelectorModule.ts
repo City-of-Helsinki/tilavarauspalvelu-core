@@ -1,20 +1,9 @@
 import { type SuitableTimeRangeFormValues } from "./form";
-import {
-  type ApplicationRoundTimeSlotNode,
-  Priority,
-  SuitableTimeFragment,
-} from "@/gql/gql-types";
-import {
-  type Cell,
-  type CellState,
-} from "common/src/components/ApplicationTimeSelector";
+import { type ApplicationRoundTimeSlotNode, Priority, SuitableTimeFragment } from "@/gql/gql-types";
+import { type Cell, type CellState } from "common/src/components/ApplicationTimeSelector";
 import { WEEKDAYS, DayT } from "common/src/const";
 import { convertWeekday, transformWeekday } from "common/src/conversion";
-import {
-  filterNonNullable,
-  formatTimeStruct,
-  timeToMinutes,
-} from "common/src/helpers";
+import { filterNonNullable, formatTimeStruct, timeToMinutes } from "common/src/helpers";
 
 export type DailyOpeningHours = Readonly<
   Pick<ApplicationRoundTimeSlotNode, "weekday" | "closed" | "reservableTimes">[]
@@ -43,9 +32,7 @@ export function createCells(openingHours: DailyOpeningHours): WeekCells {
 
     const cell: Cell[] = [];
     for (let i = FIRST_SLOT_START; i <= LAST_SLOT_START; i += 1) {
-      const isAvailable = dayOpeningHours.some(
-        (t) => t.begin != null && t.end != null && t?.begin <= i && t?.end > i
-      );
+      const isAvailable = dayOpeningHours.some((t) => t.begin != null && t.end != null && t?.begin <= i && t?.end > i);
       cell.push({
         day,
         hour: i,
@@ -59,10 +46,7 @@ export function createCells(openingHours: DailyOpeningHours): WeekCells {
   return cells;
 }
 
-export function aesToCells(
-  schedule: Readonly<SchedulesT[]>,
-  openingHours: DailyOpeningHours
-): WeekCells {
+export function aesToCells(schedule: Readonly<SchedulesT[]>, openingHours: DailyOpeningHours): WeekCells {
   const cells = createCells(openingHours);
   for (const aes of schedule) {
     const { dayOfTheWeek, priority } = aes;
@@ -85,10 +69,7 @@ type OpeningHourPeriod = {
   end: string;
 };
 
-function getOpeningHours(
-  day: number,
-  openingHours?: DailyOpeningHours
-): Readonly<OpeningHourPeriod[]> {
+function getOpeningHours(day: number, openingHours?: DailyOpeningHours): Readonly<OpeningHourPeriod[]> {
   if (!openingHours) {
     return [];
   }
@@ -102,9 +83,7 @@ function getOpeningHours(
   return filterNonNullable(dayOpeningHours.reservableTimes);
 }
 
-export function covertCellsToTimeRange(
-  cells: WeekCells
-): SuitableTimeRangeFormValues[] {
+export function covertCellsToTimeRange(cells: WeekCells): SuitableTimeRangeFormValues[] {
   return cellsToSections(cells).map((aes) => {
     const { day, begin, end, priority } = aes;
     return {
@@ -144,10 +123,7 @@ function combineTimespans(prev: TimeSpan[], current: TimeSpan): TimeSpan[] {
   if (prevCell == null) {
     throw new Error("prevCell is null");
   }
-  if (
-    prevCell.end === current.begin &&
-    prevCell.priority === current.priority
-  ) {
+  if (prevCell.end === current.begin && prevCell.priority === current.priority) {
     return [
       ...prev.slice(0, prev.length - 1),
       {

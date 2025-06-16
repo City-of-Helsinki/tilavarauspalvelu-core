@@ -1,10 +1,7 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import {
-  type ApprovalButtonsFragment,
-  ReservationStateChoice,
-} from "@gql/gql-types";
+import { type ApprovalButtonsFragment, ReservationStateChoice } from "@gql/gql-types";
 import { addDays, addMinutes } from "date-fns";
 import ApprovalButtons from "./ApprovalButtons";
 import { vi, describe, test, expect } from "vitest";
@@ -13,12 +10,7 @@ import { base64encode } from "common/src/helpers";
 const wrappedRender = (reservation: ApprovalButtonsFragment) => {
   return render(
     <BrowserRouter>
-      <ApprovalButtons
-        isFree
-        reservation={reservation}
-        handleClose={vi.fn()}
-        handleAccept={vi.fn()}
-      />
+      <ApprovalButtons isFree reservation={reservation} handleClose={vi.fn()} handleAccept={vi.fn()} />
     </BrowserRouter>
   );
 };
@@ -51,9 +43,7 @@ describe("State change rules", () => {
     const input = createInput({ state: ReservationStateChoice.Confirmed });
     const view = wrappedRender(input);
 
-    expect(
-      view.getByRole("button", { name: "RequestedReservation.reject" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("button", { name: "RequestedReservation.reject" })).toBeInTheDocument();
     expect(
       view.getByRole("button", {
         name: "RequestedReservation.returnToHandling",
@@ -67,12 +57,8 @@ describe("State change rules", () => {
     });
     const view = wrappedRender(input);
 
-    expect(
-      view.getByRole("button", { name: "RequestedReservation.reject" })
-    ).toBeInTheDocument();
-    expect(
-      view.getByRole("button", { name: "RequestedReservation.approve" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("button", { name: "RequestedReservation.reject" })).toBeInTheDocument();
+    expect(view.getByRole("button", { name: "RequestedReservation.approve" })).toBeInTheDocument();
   });
 
   test("Only Return to Handling is enabled if Denied", () => {
@@ -113,9 +99,7 @@ describe("State change rules", () => {
     const view = wrappedRender(input);
 
     expect(view.queryAllByRole("button")).toHaveLength(1);
-    expect(
-      view.getByRole("button", { name: "RequestedReservation.reject" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("button", { name: "RequestedReservation.reject" })).toBeInTheDocument();
   });
 });
 
@@ -124,9 +108,7 @@ describe("Editing allowed", () => {
     const input = createInput({ state: ReservationStateChoice.Confirmed });
     const view = wrappedRender(input);
 
-    expect(
-      view.getByRole("link", { name: "ApprovalButtons.edit" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("link", { name: "ApprovalButtons.edit" })).toBeInTheDocument();
   });
 
   test("No editing if the event isn't Confirmed", () => {
@@ -167,8 +149,6 @@ describe("Editing allowed", () => {
       end: addMinutes(new Date(), -45),
     });
     const view = wrappedRender(input);
-    expect(
-      view.getByRole("link", { name: "ApprovalButtons.edit" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("link", { name: "ApprovalButtons.edit" })).toBeInTheDocument();
   });
 });

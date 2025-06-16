@@ -105,11 +105,7 @@ function TermsBox({
           <LinkList>
             {links.map((link) => (
               <li key={link.href}>
-                <Anchor
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <Anchor href={link.href} target="_blank" rel="noopener noreferrer">
                   {link.text}
                   <IconLinkExternal />
                 </Anchor>

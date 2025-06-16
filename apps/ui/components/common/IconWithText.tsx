@@ -6,11 +6,7 @@ type IconWithTextProps = {
   text: string | JSX.Element;
 };
 
-export function IconWithText({
-  icon,
-  text,
-  ...rest
-}: IconWithTextProps): JSX.Element {
+export function IconWithText({ icon, text, ...rest }: IconWithTextProps): JSX.Element {
   return (
     <Flex
       $gap="xs"

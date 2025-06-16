@@ -1,18 +1,8 @@
 import { z } from "zod";
-import {
-  ReservationStartInterval,
-  ReservationTypeChoice,
-} from "@gql/gql-types";
+import { ReservationStartInterval, ReservationTypeChoice } from "@gql/gql-types";
 import { fromUIDate } from "common/src/common/util";
-import {
-  ReservationTypeSchema,
-  checkReservationInterval,
-  checkStartEndTime,
-} from "./reservation";
-import {
-  checkDateNotInPast,
-  checkTimeStringFormat,
-} from "common/src/schemas/schemaCommon";
+import { ReservationTypeSchema, checkReservationInterval, checkStartEndTime } from "./reservation";
+import { checkDateNotInPast, checkTimeStringFormat } from "common/src/schemas/schemaCommon";
 import { intervalToNumber } from "./utils";
 
 // TODO handle metadata (variable form fields) instead of using .passthrough
@@ -47,69 +37,37 @@ const RecurringReservationFormSchema = z
   })
   .merge(timeSelectionSchemaBase);
 
-const convertToDate = (date?: string): Date | null =>
-  date ? fromUIDate(date) : null;
+const convertToDate = (date?: string): Date | null => (date ? fromUIDate(date) : null);
 
-const dateIsBefore = (date: Date | null, other: Date | null) =>
-  date && other && date.getTime() < other.getTime();
+const dateIsBefore = (date: Date | null, other: Date | null) => date && other && date.getTime() < other.getTime();
 
-const RecurringReservationFormSchemaRefined = (
-  interval: ReservationStartInterval
-) =>
+const RecurringReservationFormSchemaRefined = (interval: ReservationStartInterval) =>
   RecurringReservationFormSchema
     // need passthrough otherwise zod will strip the metafields
     .passthrough()
     // this refine works without partial since it's the last required value
     .refine(
-      (s) =>
-        s.type === ReservationTypeChoice.Blocked ||
-        (s.seriesName !== undefined && s.seriesName.length > 0),
+      (s) => s.type === ReservationTypeChoice.Blocked || (s.seriesName !== undefined && s.seriesName.length > 0),
       {
         path: ["seriesName"],
         message: "Required",
       }
     )
-    .superRefine((val, ctx) =>
-      checkDateNotInPast(convertToDate(val.startingDate), ctx, "startingDate")
-    )
-    .superRefine((val, ctx) =>
-      checkDateNotInPast(convertToDate(val.endingDate), ctx, "endingDate")
-    )
-    .refine(
-      (s) =>
-        dateIsBefore(
-          convertToDate(s.startingDate),
-          convertToDate(s.endingDate)
-        ),
-      {
-        path: ["endingDate"],
-        message: "Start date can't be after end date.",
-      }
-    )
-    .superRefine((val, ctx) =>
-      checkTimeStringFormat(val.startTime, ctx, "startTime")
-    )
-    .superRefine((val, ctx) =>
-      checkTimeStringFormat(val.endTime, ctx, "endTime")
-    )
-    .superRefine((val, ctx) =>
-      checkReservationInterval(
-        val.startTime,
-        ctx,
-        "startTime",
-        intervalToNumber(interval)
-      )
-    )
-    .superRefine((val, ctx) =>
-      checkReservationInterval(val.endTime, ctx, "endTime", 15)
-    )
+    .superRefine((val, ctx) => checkDateNotInPast(convertToDate(val.startingDate), ctx, "startingDate"))
+    .superRefine((val, ctx) => checkDateNotInPast(convertToDate(val.endingDate), ctx, "endingDate"))
+    .refine((s) => dateIsBefore(convertToDate(s.startingDate), convertToDate(s.endingDate)), {
+      path: ["endingDate"],
+      message: "Start date can't be after end date.",
+    })
+    .superRefine((val, ctx) => checkTimeStringFormat(val.startTime, ctx, "startTime"))
+    .superRefine((val, ctx) => checkTimeStringFormat(val.endTime, ctx, "endTime"))
+    .superRefine((val, ctx) => checkReservationInterval(val.startTime, ctx, "startTime", intervalToNumber(interval)))
+    .superRefine((val, ctx) => checkReservationInterval(val.endTime, ctx, "endTime", 15))
     .superRefine((val, ctx) => checkStartEndTime(val, ctx));
 
 export { RecurringReservationFormSchemaRefined as RecurringReservationFormSchema };
 
-export type RecurringReservationForm = z.infer<
-  typeof RecurringReservationFormSchema
->;
+export type RecurringReservationForm = z.infer<typeof RecurringReservationFormSchema>;
 
 const RescheduleReservationSeriesFormSchema = z
   .object({
@@ -120,53 +78,27 @@ const RescheduleReservationSeriesFormSchema = z
   })
   .merge(timeSelectionSchemaBase);
 
-export type RescheduleReservationSeriesForm = z.infer<
-  typeof RescheduleReservationSeriesFormSchema
->;
+export type RescheduleReservationSeriesForm = z.infer<typeof RescheduleReservationSeriesFormSchema>;
 
 // Copy paste from RecurringReservationFormSchemaRefined
 // TODO schema refinements should be looked over and refactored so they can be reused easily
 // TODO neither of them validates the end date =< 2 years from now (causes a backend error, that is toasted to the user)
-const RescheduleReservationSeriesFormSchemaRefined = (
-  interval: ReservationStartInterval
-) =>
+const RescheduleReservationSeriesFormSchemaRefined = (interval: ReservationStartInterval) =>
   RescheduleReservationSeriesFormSchema
     // need passthrough otherwise zod will strip the metafields
     // TODO do we need it here? reschedule might not have metadata
     .passthrough()
     // this refine works without partial since it's the last required value
     /* Don't validate start time since it's not editable */
-    .superRefine((val, ctx) =>
-      checkDateNotInPast(convertToDate(val.endingDate), ctx, "endingDate")
-    )
-    .refine(
-      (s) =>
-        dateIsBefore(
-          convertToDate(s.startingDate),
-          convertToDate(s.endingDate)
-        ),
-      {
-        path: ["endingDate"],
-        message: "Start date can't be after end date.",
-      }
-    )
-    .superRefine((val, ctx) =>
-      checkTimeStringFormat(val.startTime, ctx, "startTime")
-    )
-    .superRefine((val, ctx) =>
-      checkTimeStringFormat(val.endTime, ctx, "endTime")
-    )
-    .superRefine((val, ctx) =>
-      checkReservationInterval(
-        val.startTime,
-        ctx,
-        "startTime",
-        intervalToNumber(interval)
-      )
-    )
-    .superRefine((val, ctx) =>
-      checkReservationInterval(val.endTime, ctx, "endTime", 15)
-    )
+    .superRefine((val, ctx) => checkDateNotInPast(convertToDate(val.endingDate), ctx, "endingDate"))
+    .refine((s) => dateIsBefore(convertToDate(s.startingDate), convertToDate(s.endingDate)), {
+      path: ["endingDate"],
+      message: "Start date can't be after end date.",
+    })
+    .superRefine((val, ctx) => checkTimeStringFormat(val.startTime, ctx, "startTime"))
+    .superRefine((val, ctx) => checkTimeStringFormat(val.endTime, ctx, "endTime"))
+    .superRefine((val, ctx) => checkReservationInterval(val.startTime, ctx, "startTime", intervalToNumber(interval)))
+    .superRefine((val, ctx) => checkReservationInterval(val.endTime, ctx, "endTime", 15))
     .superRefine((val, ctx) => checkStartEndTime(val, ctx));
 
 export { RescheduleReservationSeriesFormSchemaRefined as RescheduleReservationSeriesFormSchema };

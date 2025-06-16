@@ -23,8 +23,7 @@ vi.mock("next-i18next", async (importOriginal) => {
     ...(await importOriginal()),
     useTranslation: () => {
       return {
-        t: (str: string, args: unknown) =>
-          `${str}${args ? " " + JSON.stringify(args) : ""}`,
+        t: (str: string, args: unknown) => `${str}${args ? " " + JSON.stringify(args) : ""}`,
         // t: (str: string) => str,
         i18n: {
           changeLanguage: () => new Promise(() => {}),
@@ -47,8 +46,7 @@ expect.extend({
     if (received.mock.calls.length < nth + 1) {
       return {
         pass: false,
-        message: () =>
-          `Expected at least ${nth + 1} calls, but received ${received.mock.calls.length}`,
+        message: () => `Expected at least ${nth + 1} calls, but received ${received.mock.calls.length}`,
       };
     }
     const [one, two, three] = received.mock.calls[nth] ?? [];
@@ -66,8 +64,7 @@ expect.extend({
         two === undefined &&
         three?.scroll === false &&
         three?.shallow === true,
-      message: () =>
-        `Expected ${prefix}mock call ${params.toString()} to ${isNot ? " not" : ""}be ${one.query}`,
+      message: () => `Expected ${prefix}mock call ${params.toString()} to ${isNot ? " not" : ""}be ${one.query}`,
     };
   },
 });

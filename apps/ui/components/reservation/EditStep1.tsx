@@ -1,25 +1,12 @@
-import {
-  type EditPageReservationFragment,
-  useAdjustReservationTimeMutation,
-} from "@gql/gql-types";
-import {
-  Button,
-  ButtonVariant,
-  IconArrowLeft,
-  IconCross,
-  LoadingSpinner,
-} from "hds-react";
+import { type EditPageReservationFragment, useAdjustReservationTimeMutation } from "@gql/gql-types";
+import { Button, ButtonVariant, IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
 import { breakpoints } from "common/src/const";
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { filterNonNullable } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
-import {
-  ApplicationFields,
-  GeneralFields,
-  OptionsRecord,
-} from "./SummaryFields";
+import { ApplicationFields, GeneralFields, OptionsRecord } from "./SummaryFields";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { PendingReservationFormType } from "../reservation-unit/schema";
@@ -89,12 +76,7 @@ const StyledForm = styled.form`
   }
 `;
 
-export function EditStep1({
-  reservation,
-  options,
-  onBack,
-  form,
-}: Props): JSX.Element {
+export function EditStep1({ reservation, options, onBack, form }: Props): JSX.Element {
   const { t } = useTranslation();
 
   const reservationUnit = reservation.reservationUnits[0];
@@ -104,16 +86,11 @@ export function EditStep1({
     service: false,
   });
 
-  const handleTermsAcceptedChange = (
-    key: "service" | "space",
-    val: boolean
-  ) => {
+  const handleTermsAcceptedChange = (key: "service" | "space", val: boolean) => {
     setIsTermsAccepted({ ...isTermsAccepted, [key]: val });
   };
 
-  const supportedFields = filterNonNullable(
-    reservationUnit?.metadataSet?.supportedFields
-  );
+  const supportedFields = filterNonNullable(reservationUnit?.metadataSet?.supportedFields);
 
   const {
     handleSubmit,
@@ -167,21 +144,10 @@ export function EditStep1({
 
   return (
     <>
-      <StyledReservationInfoCard
-        reservation={modifiedReservation}
-        bgColor="gold"
-      />
+      <StyledReservationInfoCard reservation={modifiedReservation} bgColor="gold" />
       <StyledForm onSubmit={handleSubmit(onSubmit)}>
-        <GeneralFields
-          supportedFields={supportedFields}
-          reservation={reservation}
-          options={options}
-        />
-        <ApplicationFields
-          supportedFields={supportedFields}
-          reservation={reservation}
-          options={options}
-        />
+        <GeneralFields supportedFields={supportedFields} reservation={reservation} options={options} />
+        <ApplicationFields supportedFields={supportedFields} reservation={reservation} options={options} />
         <AcceptTerms
           reservationUnit={reservationUnit}
           isTermsAccepted={isTermsAccepted}

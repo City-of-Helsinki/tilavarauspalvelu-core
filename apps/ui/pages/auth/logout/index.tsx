@@ -19,9 +19,7 @@ function LogoutPage({ redirectUrl }: Props) {
   return null;
 }
 
-export async function getServerSideProps({
-  locale,
-}: GetServerSidePropsContext) {
+export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
   return {
     props: {
       ...getCommonServerSideProps(),

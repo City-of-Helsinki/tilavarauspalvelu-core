@@ -13,9 +13,7 @@ import { useSession } from "@/hooks/auth";
 import { transformReserveeType } from "common/src/conversion";
 
 // Not all choices are valid for recurring reservations (the ui should not allow these)
-function transformReservationTypeStaffChoice(
-  t: ReservationTypeChoice
-): ReservationTypeStaffChoice {
+function transformReservationTypeStaffChoice(t: ReservationTypeChoice): ReservationTypeStaffChoice {
   switch (t) {
     case ReservationTypeChoice.Staff:
       return ReservationTypeStaffChoice.Staff;
@@ -29,9 +27,7 @@ function transformReservationTypeStaffChoice(
 }
 
 export const CREATE_RESERVATION_SERIES = gql`
-  mutation CreateReservationSeries(
-    $input: ReservationSeriesCreateMutationInput!
-  ) {
+  mutation CreateReservationSeries($input: ReservationSeriesCreateMutationInput!) {
     createReservationSeries(input: $input) {
       pk
     }
@@ -41,9 +37,7 @@ export const CREATE_RESERVATION_SERIES = gql`
 export function useCreateRecurringReservation() {
   const [create] = useCreateReservationSeriesMutation();
 
-  const createReservationSeries = (
-    input: ReservationSeriesCreateMutationInput
-  ) => create({ variables: { input } });
+  const createReservationSeries = (input: ReservationSeriesCreateMutationInput) => create({ variables: { input } });
 
   const { user } = useSession();
 
@@ -78,18 +72,17 @@ export function useCreateRecurringReservation() {
       throw new Error("Current user pk missing");
     }
 
-    const reservationDetails: ReservationSeriesReservationCreateSerializerInput =
-      {
-        ...rest,
-        type: transformReservationTypeStaffChoice(type),
-        reserveeType: transformReserveeType(reserveeType),
-        bufferTimeBefore: buffers.before,
-        bufferTimeAfter: buffers.after,
-        workingMemo: comments,
-        state: ReservationStateChoice.Confirmed,
-        // TODO why is this needed in the mutation?
-        user: user.pk,
-      };
+    const reservationDetails: ReservationSeriesReservationCreateSerializerInput = {
+      ...rest,
+      type: transformReservationTypeStaffChoice(type),
+      reserveeType: transformReserveeType(reserveeType),
+      bufferTimeBefore: buffers.before,
+      bufferTimeAfter: buffers.after,
+      workingMemo: comments,
+      state: ReservationStateChoice.Confirmed,
+      // TODO why is this needed in the mutation?
+      user: user.pk,
+    };
 
     const skipDates: string[] = props.skipDates.map((d) => toApiDateUnsafe(d));
     const input: ReservationSeriesCreateMutationInput = {

@@ -19,12 +19,7 @@ const Box = styled(Flex).attrs({
   padding: var(--spacing-l) var(--spacing-m);
 `;
 
-function getHours(
-  start: Date | null,
-  end: Date | null,
-  eventsPerWeek: number,
-  minDurationMinutes: number
-) {
+function getHours(start: Date | null, end: Date | null, eventsPerWeek: number, minDurationMinutes: number) {
   if (!start || !end) {
     return 0;
   }
@@ -40,43 +35,23 @@ type Props = {
 };
 type SectionFormValues = Pick<
   ApplicationSectionPage1FormValues,
-  | "begin"
-  | "end"
-  | "appliedReservationsPerWeek"
-  | "minDuration"
-  | "maxDuration"
-  | "numPersons"
+  "begin" | "end" | "appliedReservationsPerWeek" | "minDuration" | "maxDuration" | "numPersons"
 >;
 
-export function ApplicationSectionSummary({
-  applicationSection,
-  name,
-}: Props): JSX.Element | null {
+export function ApplicationSectionSummary({ applicationSection, name }: Props): JSX.Element | null {
   const { t } = useTranslation();
 
   if (!applicationSection) {
     return null;
   }
 
-  const {
-    begin,
-    end,
-    appliedReservationsPerWeek,
-    minDuration,
-    maxDuration,
-    numPersons,
-  } = applicationSection;
+  const { begin, end, appliedReservationsPerWeek, minDuration, maxDuration, numPersons } = applicationSection;
 
   if (!begin || !end || !minDuration || !maxDuration) {
     return null;
   }
 
-  const hours = getHours(
-    fromUIDate(begin),
-    fromUIDate(end),
-    appliedReservationsPerWeek ?? 1,
-    minDuration / 60
-  );
+  const hours = getHours(fromUIDate(begin), fromUIDate(end), appliedReservationsPerWeek ?? 1, minDuration / 60);
 
   const icons = [
     {
@@ -87,15 +62,10 @@ export function ApplicationSectionSummary({
     },
     {
       icon: <IconClock style={{ flexShrink: 0 }} />,
-      text: t(
-        `applicationSectionSummary:${
-          minDuration === maxDuration ? "minDuration" : "durations"
-        }`,
-        {
-          minDuration: formatDuration(t, { seconds: minDuration }, false),
-          maxDuration: formatDuration(t, { seconds: maxDuration }, false),
-        }
-      ),
+      text: t(`applicationSectionSummary:${minDuration === maxDuration ? "minDuration" : "durations"}`, {
+        minDuration: formatDuration(t, { seconds: minDuration }, false),
+        maxDuration: formatDuration(t, { seconds: maxDuration }, false),
+      }),
     },
     {
       icon: <IconCalendar style={{ flexShrink: 0 }} />,

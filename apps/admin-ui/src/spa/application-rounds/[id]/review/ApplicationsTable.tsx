@@ -3,17 +3,11 @@ import { useTranslation } from "react-i18next";
 import { memoize, orderBy, uniqBy } from "lodash-es";
 import type { TFunction } from "i18next";
 import { IconLinkExternal, IconSize } from "hds-react";
-import {
-  type ApplicationsTableElementFragment,
-  ApplicationStatusChoice,
-} from "@gql/gql-types";
+import { type ApplicationsTableElementFragment, ApplicationStatusChoice } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { getApplicantName, truncate } from "@/helpers";
 import { CustomTable } from "@/component/Table";
-import {
-  calculateAppliedReservationTime,
-  formatAppliedReservationTime,
-} from "./utils";
+import { calculateAppliedReservationTime, formatAppliedReservationTime } from "./utils";
 import { getApplicationUrl } from "@/common/urls";
 import { ExternalTableLink } from "@/styled";
 import { ApplicationStatusLabel } from "common/src/components/statuses";
@@ -38,13 +32,7 @@ type ApplicationView = {
   status: ApplicationStatusChoice | null;
 };
 
-export const SORT_KEYS = [
-  "pk",
-  "applicant",
-  "applicantType",
-  "preferredUnitNameFi",
-  "application_status",
-];
+export const SORT_KEYS = ["pk", "applicant", "applicantType", "preferredUnitNameFi", "application_status"];
 
 const getColConfig = (t: TFunction) =>
   [
@@ -105,10 +93,7 @@ const getColConfig = (t: TFunction) =>
     isSortable: SORT_KEYS.includes(key) ?? undefined,
   }));
 
-function appMapper(
-  app: ApplicationsTableElementFragment,
-  t: TFunction
-): ApplicationView {
+function appMapper(app: ApplicationsTableElementFragment, t: TFunction): ApplicationView {
   const applicationEvents = (app.applicationSections ?? [])
     .flatMap((ae) => ae?.reservationUnitOptions)
     .flatMap((eru) => ({
@@ -124,14 +109,12 @@ function appMapper(
   const eventPk = firstEvent?.pk ?? 0;
   const status = app.status;
   const applicantName = getApplicantName(app);
-  const applicantType =
-    app.applicantType != null
-      ? t(`Application.applicantTypes.${app.applicantType}`)
-      : "-";
+  const applicantType = app.applicantType != null ? t(`Application.applicantTypes.${app.applicantType}`) : "-";
 
-  const time = filterNonNullable(
-    app.applicationSections?.map((ae) => calculateAppliedReservationTime(ae))
-  ).reduce<{ count: number; hours: number }>(
+  const time = filterNonNullable(app.applicationSections?.map((ae) => calculateAppliedReservationTime(ae))).reduce<{
+    count: number;
+    hours: number;
+  }>(
     (acc, { count, hours }) => ({
       count: acc.count + count,
       hours: acc.hours + hours,

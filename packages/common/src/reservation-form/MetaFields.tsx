@@ -74,8 +74,7 @@ const CustomerTypeChoiceContainer = styled.div`
 `;
 
 const InfoHeading = styled(Subheading)<{ $zeroMargin?: boolean }>`
-  margin: ${({ $zeroMargin }) =>
-    $zeroMargin ? 0 : "var(--spacing-layout-m) 0 var(--spacing-xs)"};
+  margin: ${({ $zeroMargin }) => ($zeroMargin ? 0 : "var(--spacing-layout-m) 0 var(--spacing-xs)")};
 `;
 
 const MandatoryFieldsInfoText = styled.p`
@@ -116,36 +115,22 @@ function SubheadingByType({
 }) {
   const { t } = useTranslation();
 
-  const headingForNonProfit =
-    reserveeType === CustomerTypeChoice.Nonprofit && index === 0;
+  const headingForNonProfit = reserveeType === CustomerTypeChoice.Nonprofit && index === 0;
 
-  const headingForNonProfitContactInfo =
-    reserveeType === CustomerTypeChoice.Nonprofit &&
-    field === "reserveeFirstName";
+  const headingForNonProfitContactInfo = reserveeType === CustomerTypeChoice.Nonprofit && field === "reserveeFirstName";
 
-  const headingForCompanyInfo =
-    reserveeType === CustomerTypeChoice.Business && index === 0;
+  const headingForCompanyInfo = reserveeType === CustomerTypeChoice.Business && index === 0;
 
-  const headingForContactInfo =
-    reserveeType === CustomerTypeChoice.Business &&
-    field === "reserveeFirstName";
+  const headingForContactInfo = reserveeType === CustomerTypeChoice.Business && field === "reserveeFirstName";
 
   return headingForNonProfit ? (
-    <GroupHeading style={{ marginTop: 0 }}>
-      {t("reservationApplication:label.headings.nonprofitInfo")}
-    </GroupHeading>
+    <GroupHeading style={{ marginTop: 0 }}>{t("reservationApplication:label.headings.nonprofitInfo")}</GroupHeading>
   ) : headingForNonProfitContactInfo ? (
-    <GroupHeading>
-      {t("reservationApplication:label.headings.contactInfo")}
-    </GroupHeading>
+    <GroupHeading>{t("reservationApplication:label.headings.contactInfo")}</GroupHeading>
   ) : headingForCompanyInfo ? (
-    <GroupHeading style={{ marginTop: 0 }}>
-      {t("reservationApplication:label.headings.companyInfo")}
-    </GroupHeading>
+    <GroupHeading style={{ marginTop: 0 }}>{t("reservationApplication:label.headings.companyInfo")}</GroupHeading>
   ) : headingForContactInfo ? (
-    <GroupHeading>
-      {t("reservationApplication:label.headings.contactInfo")}
-    </GroupHeading>
+    <GroupHeading>{t("reservationApplication:label.headings.contactInfo")}</GroupHeading>
   ) : null;
 }
 
@@ -183,12 +168,7 @@ function ReservationFormFields({
       {fieldsExtended.map(({ field, required }, index) => (
         <Fragment key={`key-${field}-container`}>
           {hasSubheading && headingKey != null && headingKey !== "COMMON" && (
-            <SubheadingByType
-              reserveeType={headingKey}
-              index={index}
-              field={field}
-              key={`key-${field}-subheading`}
-            />
+            <SubheadingByType reserveeType={headingKey} index={index} field={field} key={`key-${field}-subheading`} />
           )}
           <ReservationFormField
             key={`key-${field}`}
@@ -233,12 +213,8 @@ export function ReservationMetaFields({
 
   return (
     <>
-      <InfoHeading $zeroMargin={noHeadingMarginal}>
-        {t("reservationCalendar:reservationInfo")}
-      </InfoHeading>
-      <MandatoryFieldsInfoText>
-        {t("forms:mandatoryFieldsText")}
-      </MandatoryFieldsInfoText>
+      <InfoHeading $zeroMargin={noHeadingMarginal}>{t("reservationCalendar:reservationInfo")}</InfoHeading>
+      <MandatoryFieldsInfoText>{t("forms:mandatoryFieldsText")}</MandatoryFieldsInfoText>
       <AutoGrid>
         <ReservationFormFields
           options={options}
@@ -247,10 +223,7 @@ export function ReservationMetaFields({
           headingKey="COMMON"
           params={{
             numPersons: {
-              min:
-                !reservationUnit.minPersons || reservationUnit.minPersons === 0
-                  ? 1
-                  : reservationUnit.minPersons,
+              min: !reservationUnit.minPersons || reservationUnit.minPersons === 0 ? 1 : reservationUnit.minPersons,
               max:
                 reservationUnit.maxPersons != null &&
                 !Number.isNaN(reservationUnit.maxPersons) &&
@@ -286,9 +259,7 @@ function CustomerTypeChoiceSelector() {
                   key={choice}
                   id={`reserveeType__${name}`}
                   // TODO use the enum translation key
-                  label={capitalize(
-                    t(`reservationApplication:reserveeTypes.labels.${name}`)
-                  )}
+                  label={capitalize(t(`reservationApplication:reserveeTypes.labels.${name}`))}
                   onClick={() => onChange(choice)}
                   icon={icon}
                   checked={value === choice}
@@ -319,9 +290,7 @@ export function ReserverMetaFields({
   const { watch } = useFormContext<Reservation & Partial<Inputs>>();
   const { t } = useTranslation();
 
-  const supportedFields = filterNonNullable(
-    reservationUnit?.metadataSet?.supportedFields
-  );
+  const supportedFields = filterNonNullable(reservationUnit?.metadataSet?.supportedFields);
   const isTypeSelectable = containsField(supportedFields, "reserveeType");
 
   const reserveeType = watch("reserveeType");
@@ -331,14 +300,10 @@ export function ReserverMetaFields({
   }
   return (
     <>
-      <ReserverInfoHeading>
-        {t("reservationCalendar:reserverInfo")}
-      </ReserverInfoHeading>
+      <ReserverInfoHeading>{t("reservationCalendar:reserverInfo")}</ReserverInfoHeading>
       {isTypeSelectable && (
         <>
-          <p id="reserveeType-label">
-            {t("reservationApplication:reserveeTypePrefix")}
-          </p>
+          <p id="reserveeType-label">{t("reservationApplication:reserveeTypePrefix")}</p>
           <CustomerTypeChoiceSelector />
         </>
       )}
@@ -360,25 +325,14 @@ export function ReserverMetaFields({
 // because we need the individual components for admin-ui (placement in dom changes)
 // and this component has more props than dom nodes.
 // Not removed yet since requires ui/ refactoring.
-function MetaFields({
-  reservationUnit,
-  generalFields,
-  reservationApplicationFields,
-  options,
-  data,
-}: Props) {
+function MetaFields({ reservationUnit, generalFields, reservationApplicationFields, options, data }: Props) {
   if (!reservationUnit.metadataSet) {
     return null;
   }
 
   return (
     <Container>
-      <ReservationMetaFields
-        fields={generalFields}
-        options={options}
-        reservationUnit={reservationUnit}
-        data={data}
-      />
+      <ReservationMetaFields fields={generalFields} options={options} reservationUnit={reservationUnit} data={data} />
       <ReserverMetaFields
         fields={reservationApplicationFields}
         options={options}

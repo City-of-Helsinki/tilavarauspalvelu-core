@@ -24,8 +24,7 @@ const StyledImageWithCard = styled(ImageWithCard)<{ cardAlignment: string }>`
 
     > div:nth-of-type(2) {
       > div {
-        ${({ cardAlignment }) =>
-          cardAlignment === "right" ? `right: 8%;` : `left: 8%;`}
+        ${({ cardAlignment }) => (cardAlignment === "right" ? `right: 8%;` : `left: 8%;`)}
         position: relative;
         min-height: unset;
       }
@@ -82,12 +81,7 @@ export function SearchGuides(): JSX.Element {
   const router = useRouter();
 
   return (
-    <StyledImageWithCard
-      cardAlignment="left"
-      cardLayout="hover"
-      color="primary"
-      src="images/guide-recurring.png"
-    >
+    <StyledImageWithCard cardAlignment="left" cardLayout="hover" color="primary" src="images/guide-recurring.png">
       <InfoContainer data-testid="search-guide__recurring">
         <H3 as="h2" $noMargin>
           {t("infoRecurring.heading")}

@@ -18,23 +18,15 @@ import DeactivatedAccount from "common/src/components/DeactivatedAccount";
 
 const Units = dynamic(() => import("./spa/unit"));
 
-const ApplicationDetails = dynamic(
-  () => import("./spa/applications/[id]/index")
-);
+const ApplicationDetails = dynamic(() => import("./spa/applications/[id]/index"));
 
 const ReservationUnits = dynamic(() => import("./spa/reservation-units/index"));
 
 const HomePage = dynamic(() => import("./spa/HomePage"));
 
-const AllApplicationRounds = dynamic(
-  () => import(`./spa/application-rounds/index`)
-);
-const Criteria = dynamic(
-  () => import(`./spa/application-rounds/[id]/criteria`)
-);
-const ApplicationRoundAllocation = dynamic(
-  () => import(`./spa/application-rounds/[id]/allocation`)
-);
+const AllApplicationRounds = dynamic(() => import(`./spa/application-rounds/index`));
+const Criteria = dynamic(() => import(`./spa/application-rounds/[id]/criteria`));
+const ApplicationRoundAllocation = dynamic(() => import(`./spa/application-rounds/[id]/allocation`));
 
 type Props = {
   reservationUnitPreviewUrl: string;
@@ -53,35 +45,21 @@ const ApplicationRoundsRouter = () => (
   <Routes>
     <Route index element={<AllApplicationRounds />} />
     <Route path=":applicationRoundId/criteria" element={<Criteria />} />
-    <Route
-      path=":applicationRoundPk/allocation"
-      element={<ApplicationRoundAllocation />}
-    />
+    <Route path=":applicationRoundPk/allocation" element={<ApplicationRoundAllocation />} />
     <Route path=":applicationRoundId" element={<ApplicationRound />} />
   </Routes>
 );
 
-function ClientApp({
-  reservationUnitPreviewUrl,
-  apiBaseUrl,
-  feedbackUrl,
-}: Props) {
+function ClientApp({ reservationUnitPreviewUrl, apiBaseUrl, feedbackUrl }: Props) {
   return (
     <BrowserRouter basename={PUBLIC_URL}>
       <PageWrapper apiBaseUrl={apiBaseUrl}>
         <Routes>
           <Route path="*" element={<Error404 />} />
-          <Route
-            path="/"
-            element={withAuthorization(<HomePage />, apiBaseUrl)}
-          />
+          <Route path="/" element={withAuthorization(<HomePage />, apiBaseUrl)} />
           <Route
             path={`${applicationsUrl}/*`}
-            element={withAuthorization(
-              <ApplicationRouter />,
-              apiBaseUrl,
-              UserPermissionChoice.CanManageApplications
-            )}
+            element={withAuthorization(<ApplicationRouter />, apiBaseUrl, UserPermissionChoice.CanManageApplications)}
           />
           <Route
             path="/application-rounds/*"
@@ -101,32 +79,20 @@ function ClientApp({
           />
           <Route
             path="units"
-            element={withAuthorization(
-              <Units />,
-              apiBaseUrl,
-              UserPermissionChoice.CanManageReservationUnits
-            )}
+            element={withAuthorization(<Units />, apiBaseUrl, UserPermissionChoice.CanManageReservationUnits)}
           />
           <Route
             path="/unit/*"
             element={withAuthorization(
-              <UnitsRouter
-                reservationUnitPreviewUrl={reservationUnitPreviewUrl}
-              />,
+              <UnitsRouter reservationUnitPreviewUrl={reservationUnitPreviewUrl} />,
               apiBaseUrl,
               UserPermissionChoice.CanManageReservationUnits
             )}
           />
-          <Route
-            path="/reservations/*"
-            element={withAuthorization(<ReservationsRouter />, apiBaseUrl)}
-          />
+          <Route path="/reservations/*" element={withAuthorization(<ReservationsRouter />, apiBaseUrl)} />
           <Route
             path="/my-units/*"
-            element={withAuthorization(
-              <MyUnitsRouter apiBaseUrl={apiBaseUrl} />,
-              apiBaseUrl
-            )}
+            element={withAuthorization(<MyUnitsRouter apiBaseUrl={apiBaseUrl} />, apiBaseUrl)}
           />
           <Route
             path="/messaging/notifications/*"
@@ -139,10 +105,7 @@ function ClientApp({
           <Route
             path="/deactivated-account"
             element={
-              <DeactivatedAccount
-                feedbackUrl={feedbackUrl}
-                imgSrc={`${PUBLIC_URL}/images/deactivated-account.png`}
-              />
+              <DeactivatedAccount feedbackUrl={feedbackUrl} imgSrc={`${PUBLIC_URL}/images/deactivated-account.png`} />
             }
           />
         </Routes>

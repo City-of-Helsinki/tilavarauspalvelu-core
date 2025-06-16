@@ -1,17 +1,7 @@
 import React from "react";
-import {
-  ToastContainer as TC,
-  toast as toastFn,
-  ToastOptions,
-  type Id,
-} from "react-toastify";
+import { ToastContainer as TC, toast as toastFn, ToastOptions, type Id } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {
-  IconCheckCircleFill,
-  IconErrorFill,
-  IconInfoCircleFill,
-  Notification,
-} from "hds-react";
+import { IconCheckCircleFill, IconErrorFill, IconInfoCircleFill, Notification } from "hds-react";
 import styled from "styled-components";
 
 type ToastProps<T = unknown> = {
@@ -161,14 +151,7 @@ export default function toast({
 }
 
 // This component is used to render the toast content, in our case it's a HDS Notification
-function ToastNotification({
-  type,
-  text,
-  label,
-  duration,
-  ariaLabel,
-  dataTestId,
-}: Readonly<ToastProps>): JSX.Element {
+function ToastNotification({ type, text, label, duration, ariaLabel, dataTestId }: Readonly<ToastProps>): JSX.Element {
   return (
     <HDSNotification
       type={type}

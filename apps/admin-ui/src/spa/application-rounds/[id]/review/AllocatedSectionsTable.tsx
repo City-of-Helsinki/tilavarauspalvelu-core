@@ -36,26 +36,19 @@ type ApplicationScheduleView = {
   accessCodeActiveAlert?: string;
 };
 
-function timeSlotMapper(
-  t: TFunction,
-  slot: AllocatedSectionsTableElementFragment
-): ApplicationScheduleView {
+function timeSlotMapper(t: TFunction, slot: AllocatedSectionsTableElementFragment): ApplicationScheduleView {
   const allocatedReservationUnit = slot.reservationUnitOption.reservationUnit;
   const allocatedReservationUnitName = allocatedReservationUnit.nameFi ?? "-";
   const allocatedUnit = allocatedReservationUnit.unit?.nameFi ?? "-";
 
-  const application =
-    slot.reservationUnitOption.applicationSection?.application;
+  const application = slot.reservationUnitOption.applicationSection?.application;
   const applicantName = getApplicantName(application);
 
   // TODO should this check the state directly?
   const isAllocated = !slot.reservationUnitOption.rejected;
 
   const day = convertWeekday(slot.dayOfTheWeek);
-  const timeRange = formatTimeRange(
-    timeToMinutes(slot.beginTime),
-    timeToMinutes(slot.endTime)
-  );
+  const timeRange = formatTimeRange(timeToMinutes(slot.beginTime), timeToMinutes(slot.endTime));
   const timeString = isAllocated ? `${t("dayShort." + day)} ${timeRange}` : "-";
   const name = slot.reservationUnitOption.applicationSection.name;
 
@@ -63,8 +56,7 @@ function timeSlotMapper(
   const reservationPk = slot.recurringReservation?.reservations[0]?.pk ?? null;
   const link = getReservationUrl(reservationPk);
   const accessCodeActiveAlert =
-    slot.recurringReservation?.shouldHaveActiveAccessCode &&
-    !slot.recurringReservation?.isAccessCodeIsActiveCorrect
+    slot.recurringReservation?.shouldHaveActiveAccessCode && !slot.recurringReservation?.isAccessCodeIsActiveCorrect
       ? t("accessType.accessCodeState.ACCESS_CODE_PENDING")
       : "";
   return {
@@ -92,18 +84,13 @@ const COLS = [
     headerTKey: "ApplicationEvent.headings.id",
     isSortable: true,
     key: "application_id,application_event_id",
-    transform: ({ pk, applicationPk }: ApplicationScheduleView) =>
-      `${applicationPk}-${pk}`,
+    transform: ({ pk, applicationPk }: ApplicationScheduleView) => `${applicationPk}-${pk}`,
   },
   {
     headerTKey: "ApplicationEvent.headings.customer",
     isSortable: true,
     key: "applicant",
-    transform: ({
-      applicantName,
-      applicationPk,
-      pk,
-    }: ApplicationScheduleView) => (
+    transform: ({ applicantName, applicationPk, pk }: ApplicationScheduleView) => (
       <ExternalTableLink to={getApplicationUrl(applicationPk, pk)}>
         {truncate(applicantName ?? "-", applicantTruncateLen)}
         <IconLinkExternal size={IconSize.ExtraSmall} aria-hidden="true" />
@@ -130,16 +117,11 @@ const COLS = [
     headerTKey: "ApplicationEventSchedules.headings.reservationUnit",
     isSortable: true,
     key: "allocated_reservation_unit_name_fi",
-    transform: ({
-      allocatedReservationUnitName,
-      accessCodeActiveAlert,
-    }: ApplicationScheduleView) => {
+    transform: ({ allocatedReservationUnitName, accessCodeActiveAlert }: ApplicationScheduleView) => {
       return (
         <span style={{ position: "relative" }}>
           {truncate(allocatedReservationUnitName ?? "-", unitsTruncateLen)}
-          {accessCodeActiveAlert !== "" && (
-            <StyledTooltip>{accessCodeActiveAlert}</StyledTooltip>
-          )}
+          {accessCodeActiveAlert !== "" && <StyledTooltip>{accessCodeActiveAlert}</StyledTooltip>}
         </span>
       );
     },

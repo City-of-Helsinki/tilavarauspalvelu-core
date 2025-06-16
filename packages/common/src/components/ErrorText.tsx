@@ -27,12 +27,7 @@ type Props = {
 export function ErrorText({ children, size, noTitle, title, ...rest }: Props) {
   const label = noTitle ? undefined : (title ?? children);
   return (
-    <StyledNotification
-      {...rest}
-      size={size ?? NotificationSize.Small}
-      type="error"
-      label={label}
-    >
+    <StyledNotification {...rest} size={size ?? NotificationSize.Small} type="error" label={label}>
       {children}
     </StyledNotification>
   );

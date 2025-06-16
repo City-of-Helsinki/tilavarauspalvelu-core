@@ -2,40 +2,23 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { memoize } from "lodash-es";
-import {
-  OrderStatus,
-  ReservationStateChoice,
-  type ReservationTableElementFragment,
-} from "@gql/gql-types";
+import { OrderStatus, ReservationStateChoice, type ReservationTableElementFragment } from "@gql/gql-types";
 import { truncate } from "@/helpers";
 import { getReservationUrl } from "@/common/urls";
-import {
-  formatDateTime,
-  formatDateTimeRange,
-  getReserveeName,
-} from "@/common/util";
+import { formatDateTime, formatDateTimeRange, getReserveeName } from "@/common/util";
 import { CustomTable } from "@/component/Table";
 import { MAX_NAME_LENGTH } from "@/common/const";
 import { TableLink } from "@/styled";
 import type { StatusLabelType } from "common/src/tags";
 import StatusLabel from "common/src/components/StatusLabel";
-import {
-  IconCheck,
-  IconCogwheel,
-  IconCross,
-  IconEuroSign,
-  IconPen,
-  IconQuestionCircleFill,
-} from "hds-react";
+import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen, IconQuestionCircleFill } from "hds-react";
 import { gql } from "@apollo/client";
 
 type ReservationTableColumn = {
   headerName: string;
   key: string;
   isSortable: boolean;
-  transform?: (
-    reservationtype: ReservationTableElementFragment
-  ) => JSX.Element | string;
+  transform?: (reservationtype: ReservationTableElementFragment) => JSX.Element | string;
 };
 
 type Props = {
@@ -69,9 +52,7 @@ const getStatusLabelProps = (
   }
 };
 
-const getPaymentStatusLabelType = (
-  status: OrderStatus | null | undefined
-): StatusLabelType => {
+const getPaymentStatusLabelType = (status: OrderStatus | null | undefined): StatusLabelType => {
   switch (status) {
     case OrderStatus.Refunded:
     case OrderStatus.Paid:
@@ -99,11 +80,7 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     key: "reservee_name",
     isSortable: true,
     transform: (reservation: ReservationTableElementFragment) => {
-      const reservationDisplayName = getReserveeName(
-        reservation,
-        t,
-        MAX_NAME_LENGTH
-      );
+      const reservationDisplayName = getReserveeName(reservation, t, MAX_NAME_LENGTH);
       return (
         <TableLink to={getReservationUrl(reservation.pk)}>
           {reservationDisplayName || t("RequestedReservation.noName")}
@@ -136,8 +113,7 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     headerName: t("Reservations.headings.createdAt"),
     key: "created_at",
     isSortable: true,
-    transform: ({ createdAt }: ReservationTableElementFragment) =>
-      createdAt ? formatDateTime(createdAt) : "-",
+    transform: ({ createdAt }: ReservationTableElementFragment) => (createdAt ? formatDateTime(createdAt) : "-"),
   },
   {
     headerName: t("Reservations.headings.paymentStatus"),

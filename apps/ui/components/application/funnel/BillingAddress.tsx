@@ -8,9 +8,7 @@ export function BillingAddress() {
 
   return (
     <>
-      <FormSubHeading as="h2">
-        {t("application:Page3.sectionHeadings.billingAddress")}
-      </FormSubHeading>
+      <FormSubHeading as="h2">{t("application:Page3.sectionHeadings.billingAddress")}</FormSubHeading>
       <ApplicationFormTextInput name="billingAddress.streetAddress" />
       <ApplicationFormTextInput name="billingAddress.postCode" />
       <ApplicationFormTextInput name="billingAddress.city" />

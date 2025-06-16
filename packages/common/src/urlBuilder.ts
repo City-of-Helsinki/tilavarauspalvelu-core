@@ -10,11 +10,8 @@ export type LocalizationLanguages = "fi" | "sv" | "en";
 /// only needed on server side, only needed on localhost
 /// this will not work with authentication so remove if adding session cookies to SSR requests
 export function buildGraphQLUrl(apiUrl: string, enableFetchHack?: boolean) {
-  const shouldModifyLocalhost =
-    enableFetchHack && !isBrowser && apiUrl.includes("localhost");
-  const url = shouldModifyLocalhost
-    ? apiUrl.replace("localhost", "127.0.0.1")
-    : apiUrl;
+  const shouldModifyLocalhost = enableFetchHack && !isBrowser && apiUrl.includes("localhost");
+  const url = shouldModifyLocalhost ? apiUrl.replace("localhost", "127.0.0.1") : apiUrl;
   return `${url}${url.endsWith("/") ? "" : "/"}graphql/`;
 }
 
@@ -44,20 +41,14 @@ export function getSignInUrl({
 
   if (callBackUrl.includes(`/logout`)) {
     // TODO this is unsound if the callback url is not a full url but this at least redirects to an error page
-    loginUrl.searchParams.set(
-      "next",
-      originOverride ?? new URL(callBackUrl).origin
-    );
+    loginUrl.searchParams.set("next", originOverride ?? new URL(callBackUrl).origin);
     return loginUrl.toString();
   }
   loginUrl.searchParams.set("ui", client);
   if (client === "customer") {
     loginUrl.searchParams.set("lang", language);
   }
-  loginUrl.searchParams.set(
-    "next",
-    originOverride != null ? `${originOverride}/${callBackUrl}` : callBackUrl
-  );
+  loginUrl.searchParams.set("next", originOverride != null ? `${originOverride}/${callBackUrl}` : callBackUrl);
   return loginUrl.toString();
 }
 

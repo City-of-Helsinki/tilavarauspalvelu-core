@@ -11,9 +11,7 @@ export function IndividualForm(): JSX.Element {
       <ApplicationFormTextInput name="contactPerson.firstName" />
       <ApplicationFormTextInput name="contactPerson.lastName" />
       <BillingAddress />
-      <FormSubHeading as="h2">
-        {t("application:Page3.sectionHeadings.contactInfo")}
-      </FormSubHeading>
+      <FormSubHeading as="h2">{t("application:Page3.sectionHeadings.contactInfo")}</FormSubHeading>
       <ApplicationFormTextInput name="contactPerson.phoneNumber" />
       <ApplicationFormTextInput name="contactPerson.email" />
       <SpanFullRow>

@@ -2,14 +2,7 @@ import React from "react";
 import { Checkbox } from "hds-react";
 import styled from "styled-components";
 import { fontRegular } from "../../../styled";
-import {
-  Control,
-  FieldValues,
-  Path,
-  PathValue,
-  useController,
-  UseControllerProps,
-} from "react-hook-form";
+import { Control, FieldValues, Path, PathValue, useController, UseControllerProps } from "react-hook-form";
 
 const StyledCheckbox = styled(Checkbox)`
   && {
@@ -60,9 +53,7 @@ export function ControlledCheckbox<T extends FieldValues>({
       id={id ?? name}
       onChange={(e) => onChange(e.target.checked)}
       checked={value}
-      defaultChecked={
-        typeof defaultValue === "boolean" ? defaultValue : undefined
-      }
+      defaultChecked={typeof defaultValue === "boolean" ? defaultValue : undefined}
       label={label}
       errorText={error}
       tooltipText={tooltip}

@@ -50,18 +50,9 @@ function SpacesResources(): JSX.Element {
     },
   });
 
-  const {
-    open: newSpaceDialogIsOpen,
-    openModal: openNewSpaceModal,
-    closeModal: closeNewSpaceModal,
-  } = useModal();
+  const { open: newSpaceDialogIsOpen, openModal: openNewSpaceModal, closeModal: closeNewSpaceModal } = useModal();
 
-  const {
-    openWithContent,
-    modalContent,
-    open: isNewResourceModalOpen,
-    closeModal: closeNewResourceModal,
-  } = useModal();
+  const { openWithContent, modalContent, open: isNewResourceModalOpen, closeModal: closeNewResourceModal } = useModal();
 
   if (isLoading) {
     return <CenterSpinner />;
@@ -80,19 +71,11 @@ function SpacesResources(): JSX.Element {
         onClose={closeNewSpaceModal}
         focusAfterCloseRef={newSpacesButtonRef}
       >
-        <NewSpaceModal
-          unit={unit}
-          closeModal={() => closeNewSpaceModal()}
-          refetch={refetch}
-        />
+        <NewSpaceModal unit={unit} closeModal={() => closeNewSpaceModal()} refetch={refetch} />
       </HDSModal>
       <LinkPrev />
       <SubPageHead title={t("Unit.spacesAndResources")} unit={unit} />
-      <Flex
-        $direction="row"
-        $justifyContent="space-between"
-        $alignItems="center"
-      >
+      <Flex $direction="row" $justifyContent="space-between" $alignItems="center">
         <H2 $noMargin>{t("Unit.spaces")}</H2>
         <ActionButton
           ref={newSpacesButtonRef}
@@ -104,11 +87,7 @@ function SpacesResources(): JSX.Element {
         </ActionButton>
       </Flex>
       <SpacesTable unit={unit} refetch={refetch} />
-      <Flex
-        $direction="row"
-        $justifyContent="space-between"
-        $alignItems="center"
-      >
+      <Flex $direction="row" $justifyContent="space-between" $alignItems="center">
         <H2 $noMargin>{t("Unit.resources")}</H2>
         <ActionButton
           variant={ButtonVariant.Supplementary}
@@ -116,12 +95,7 @@ function SpacesResources(): JSX.Element {
           disabled={unit.spaces.length === 0}
           onClick={() => {
             openWithContent(
-              <NewResourceModal
-                spacePk={0}
-                unit={unit}
-                closeModal={closeNewResourceModal}
-                refetch={refetch}
-              />
+              <NewResourceModal spacePk={0} unit={unit} closeModal={closeNewResourceModal} refetch={refetch} />
             );
           }}
         >

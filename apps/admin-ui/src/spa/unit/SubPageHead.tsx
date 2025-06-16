@@ -27,8 +27,7 @@ export function SubPageHead({ title, unit }: IProps): JSX.Element {
         <IconLocation />
         <div>
           <Name>{unit?.nameFi}</Name>
-          <span>{t("Unit.address")}</span>:{" "}
-          <span>{formatAddress(unit.location)}</span>
+          <span>{t("Unit.address")}</span>: <span>{formatAddress(unit.location)}</span>
         </div>
       </Flex>
     </>

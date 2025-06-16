@@ -5,11 +5,7 @@ import { getTranslatedError } from "@/common/util";
 import { Notification } from "hds-react";
 import React from "react";
 
-export function ErrorInfo({
-  form,
-}: {
-  form: UseFormReturn<ReservationUnitEditFormValues>;
-}): JSX.Element | null {
+export function ErrorInfo({ form }: { form: UseFormReturn<ReservationUnitEditFormValues> }): JSX.Element | null {
   const { t } = useTranslation();
 
   const {
@@ -23,8 +19,7 @@ export function ErrorInfo({
   }
 
   // NOTE the type information for access type errors is too complex to handle (hence runtime checks)
-  const nonNullAccessTypes =
-    accessTypes != null && Array.isArray(accessTypes) ? accessTypes : [];
+  const nonNullAccessTypes = accessTypes != null && Array.isArray(accessTypes) ? accessTypes : [];
   const accessTypeErrors = nonNullAccessTypes.flatMap((pricing) =>
     Object.entries(pricing ?? {})
       .map(([key, value]) => {
@@ -54,8 +49,7 @@ export function ErrorInfo({
   }
 
   // NOTE the type information for pricings errors is too complex to handle (hence runtime checks)
-  const nonNullPricings =
-    pricings != null && Array.isArray(pricings) ? pricings : [];
+  const nonNullPricings = pricings != null && Array.isArray(pricings) ? pricings : [];
   const pricingErrors = nonNullPricings.flatMap((pricing) =>
     Object.entries(pricing ?? {})
       .map(([key, value]) => {
@@ -78,8 +72,7 @@ export function ErrorInfo({
       <ol>
         {Object.entries(otherErrors).map(([key, value]) => (
           <li key={key}>
-            {t(`ReservationUnitEditor.label.${key}`)}:{" "}
-            {getTranslatedError(t, value?.message)}
+            {t(`ReservationUnitEditor.label.${key}`)}: {getTranslatedError(t, value?.message)}
           </li>
         ))}
         {pricingErrors.map((error) => (

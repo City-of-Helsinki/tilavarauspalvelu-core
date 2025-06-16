@@ -11,10 +11,7 @@ export type Props = {
   testId?: string;
 };
 
-export function ReservationOrderStatus({
-  orderStatus,
-  testId,
-}: Props): JSX.Element {
+export function ReservationOrderStatus({ orderStatus, testId }: Props): JSX.Element {
   const { t } = useTranslation();
 
   const labelType = useMemo((): StatusLabelType => {

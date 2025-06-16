@@ -14,9 +14,7 @@ const StyledImage = styled.img`
 
 function RUImage({ image }: { image: ImageFormType }): JSX.Element {
   // medium url seems to work when deployed but locally it's not available
-  const [imageUrl, setImageUrl] = useState<string>(
-    image.mediumUrl || image.imageUrl || ""
-  );
+  const [imageUrl, setImageUrl] = useState<string>(image.mediumUrl || image.imageUrl || "");
 
   if (image.bytes) {
     const reader = new FileReader();
@@ -103,17 +101,11 @@ function ReservationUnitImage({
         {isMain ? (
           <span>{t("ImageEditor.mainImage")}</span>
         ) : (
-          <SmallButton
-            disabled={isMain || image.pk == null}
-            onClick={() => makeIntoMainImage(image.pk ?? 0)}
-          >
+          <SmallButton disabled={isMain || image.pk == null} onClick={() => makeIntoMainImage(image.pk ?? 0)}>
             {t("ImageEditor.useAsMainImage")}
           </SmallButton>
         )}
-        <SmallButton
-          disabled={image.pk == null}
-          onClick={() => deleteImage(image.pk ?? 0)}
-        >
+        <SmallButton disabled={image.pk == null} onClick={() => deleteImage(image.pk ?? 0)}>
           {t("ImageEditor.deleteImage")}
         </SmallButton>
       </Flex>
@@ -129,12 +121,7 @@ type Props = {
   className?: string;
 };
 
-export function ImageEditor({
-  images,
-  setImages,
-  style,
-  className,
-}: Props): JSX.Element {
+export function ImageEditor({ images, setImages, style, className }: Props): JSX.Element {
   const { t } = useTranslation();
 
   const addImage = (files: File[]) => {

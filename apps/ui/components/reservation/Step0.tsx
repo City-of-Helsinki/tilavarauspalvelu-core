@@ -3,14 +3,7 @@
  *  This component needs to be wrapped inside a Form context
  */
 import type { OptionType } from "common/types/common";
-import {
-  Notification,
-  IconArrowRight,
-  Button,
-  ButtonVariant,
-  LoadingSpinner,
-  IconCross,
-} from "hds-react";
+import { Notification, IconArrowRight, Button, ButtonVariant, LoadingSpinner, IconCross } from "hds-react";
 import { useFormContext, UseFormReturn } from "react-hook-form";
 import React, { useState } from "react";
 import { Trans, useTranslation } from "next-i18next";
@@ -24,10 +17,7 @@ import { containsField, FieldName } from "common/src/metaFieldsHelpers";
 import { getApplicationFields, getGeneralFields } from "./SummaryFields";
 import { type Inputs } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/styled";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 
 type ReservationT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
@@ -36,11 +26,7 @@ type Props = {
   options: Record<string, OptionType[]>;
 };
 
-export function Step0({
-  reservation,
-  cancelReservation,
-  options,
-}: Props): JSX.Element {
+export function Step0({ reservation, cancelReservation, options }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
   const reservationUnit = reservation?.reservationUnits?.find(() => true);
 
@@ -52,9 +38,7 @@ export function Step0({
     formState: { isSubmitting, isValid },
   } = form;
 
-  const supportedFields = filterNonNullable(
-    reservationUnit?.metadataSet?.supportedFields
-  );
+  const supportedFields = filterNonNullable(reservationUnit?.metadataSet?.supportedFields);
   const reserveeType = watch("reserveeType");
   const homeCity = watch("homeCity");
   const includesHomeCity = containsField(supportedFields, "homeCity");
@@ -77,9 +61,7 @@ export function Step0({
     : "";
 
   if (reservationUnit == null) {
-    return (
-      <Notification type="error">{t("common:errors.dataError")}</Notification>
-    );
+    return <Notification type="error">{t("common:errors.dataError")}</Notification>;
   }
   return (
     <>
@@ -94,12 +76,7 @@ export function Step0({
               i18nKey="reservationApplication:label.common.applyingForFreeOfChargeButton"
               defaults="Lue lisää <button>alennusperiaatteista</button>"
               components={{
-                button: (
-                  <LinkLikeButton
-                    type="button"
-                    onClick={() => setIsDialogOpen(true)}
-                  />
-                ),
+                button: <LinkLikeButton type="button" onClick={() => setIsDialogOpen(true)} />,
               }}
             />
           ),
@@ -112,11 +89,7 @@ export function Step0({
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
       />
-      <Errors
-        form={form}
-        supportedFields={supportedFields}
-        generalFields={generalFields}
-      />
+      <Errors form={form} supportedFields={supportedFields} generalFields={generalFields} />
       <ActionContainer>
         <Button
           type="submit"
@@ -193,17 +166,12 @@ function Errors({
   }
 
   return (
-    <ErrorBox
-      label={t("forms:heading.errorsTitle")}
-      type="error"
-      position="inline"
-    >
+    <ErrorBox label={t("forms:heading.errorsTitle")} type="error" position="inline">
       <div>{t("forms:heading.errorsSubtitle")}</div>
       <ErrorList>
         {errorKeys.map((key: string) => {
           const fieldType =
-            generalFields.find((x) => x === key) != null ||
-            key === "reserveeType"
+            generalFields.find((x) => x === key) != null || key === "reserveeType"
               ? "common"
               : reserveeType?.toLocaleLowerCase() || "individual";
           return (
@@ -212,9 +180,7 @@ function Errors({
                 href="#!"
                 onClick={(e) => {
                   e.preventDefault();
-                  const element =
-                    document.getElementById(key) ||
-                    document.getElementById(`${key}-label`);
+                  const element = document.getElementById(key) || document.getElementById(`${key}-label`);
                   const top = element?.getBoundingClientRect()?.y || 0;
                   window.scroll({
                     top: window.scrollY + top - 28,

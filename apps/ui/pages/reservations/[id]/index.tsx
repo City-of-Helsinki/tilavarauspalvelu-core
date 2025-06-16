@@ -2,13 +2,7 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
-import {
-  IconArrowRight,
-  IconCalendar,
-  IconCross,
-  IconLinkExternal,
-  IconLock,
-} from "hds-react";
+import { IconArrowRight, IconCalendar, IconCross, IconLinkExternal, IconLock } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { Flex, NoWrap, H1, H4, fontRegular } from "common/styled";
 import { breakpoints } from "common/src/const";
@@ -38,21 +32,9 @@ import {
 import { getReservationUnitName } from "@/modules/reservationUnit";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { AddressSection } from "@/components/reservation-unit";
-import {
-  getCommonServerSideProps,
-  getGenericTerms,
-} from "@/modules/serverUtils";
-import {
-  base64encode,
-  capitalize,
-  filterNonNullable,
-  ignoreMaybeArray,
-  toNumber,
-} from "common/src/helpers";
-import {
-  ButtonLikeLink,
-  ButtonLikeExternalLink,
-} from "@/components/common/ButtonLikeLink";
+import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
+import { base64encode, capitalize, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { ButtonLikeLink, ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import {
   getApplicationPath,
@@ -139,9 +121,7 @@ function Reservation({
   reservation,
   feedbackUrl,
   options,
-}: Readonly<
-  Pick<PropsNarrowed, "termsOfUse" | "reservation" | "feedbackUrl" | "options">
->): JSX.Element | null {
+}: Readonly<Pick<PropsNarrowed, "termsOfUse" | "reservation" | "feedbackUrl" | "options">>): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const shouldShowAccessCode =
     isBefore(sub(new Date(), { days: 1 }), new Date(reservation.end)) &&
@@ -161,8 +141,7 @@ function Reservation({
   const modifyTimeReason = getWhyReservationCantBeChanged(reservation);
   const canTimeBeModified = modifyTimeReason == null;
 
-  const normalizedOrderStatus =
-    getNormalizedReservationOrderStatus(reservation);
+  const normalizedOrderStatus = getNormalizedReservationOrderStatus(reservation);
 
   useToastIfQueryParam({
     key: "timeUpdated",
@@ -175,24 +154,18 @@ function Reservation({
   });
 
   const { begin, end } = reservation;
-  const timeString = capitalize(
-    formatDateTimeRange(t, new Date(begin), new Date(end))
-  );
+  const timeString = capitalize(formatDateTimeRange(t, new Date(begin), new Date(end)));
 
-  const supportedFields = filterNonNullable(
-    reservationUnit?.metadataSet?.supportedFields
-  );
+  const supportedFields = filterNonNullable(reservationUnit?.metadataSet?.supportedFields);
 
-  const isBeingHandled =
-    reservation.state === ReservationStateChoice.RequiresHandling;
+  const isBeingHandled = reservation.state === ReservationStateChoice.RequiresHandling;
   const isCancellable = isReservationCancellable(reservation);
 
   const lang = convertLanguageCode(i18n.language);
   const checkoutUrl = getCheckoutUrl(reservation.paymentOrder, lang);
 
   const hasCheckoutUrl = !!checkoutUrl;
-  const isWaitingForPayment =
-    reservation.state === ReservationStateChoice.WaitingForPayment;
+  const isWaitingForPayment = reservation.state === ReservationStateChoice.WaitingForPayment;
 
   const routes = [
     {
@@ -215,12 +188,7 @@ function Reservation({
       <Breadcrumb routes={routes} />
       <ReservationPageWrapper data-testid="reservation__content" $nRows={3}>
         <Flex style={{ gridColumn: "1 / span 1", gridRow: "1 / span 1" }}>
-          <Flex
-            $direction="row"
-            $alignItems="center"
-            $justifyContent="space-between"
-            $wrap="wrap"
-          >
+          <Flex $direction="row" $alignItems="center" $justifyContent="space-between" $wrap="wrap">
             <H1 $noMargin data-testid="reservation__name">
               {t("reservations:reservationName", { id: reservation.pk })}
             </H1>
@@ -230,20 +198,12 @@ function Reservation({
                 state={reservation.state ?? ReservationStateChoice.Confirmed}
               />
               {normalizedOrderStatus && (
-                <ReservationOrderStatus
-                  orderStatus={normalizedOrderStatus}
-                  testId="reservation__payment-status"
-                />
+                <ReservationOrderStatus orderStatus={normalizedOrderStatus} testId="reservation__payment-status" />
               )}
               {shouldShowAccessCode && (
                 <StatusLabel
                   type="info"
-                  icon={
-                    <IconLock
-                      aria-hidden="false"
-                      aria-label={t(`reservationUnit:accessType`)}
-                    />
-                  }
+                  icon={<IconLock aria-hidden="false" aria-label={t(`reservationUnit:accessType`)} />}
                   data-testid="reservation__access-code"
                 >
                   {t("reservationUnit:accessTypes.ACCESS_CODE")}
@@ -252,10 +212,7 @@ function Reservation({
             </Flex>
           </Flex>
           <SubHeading>
-            <Link
-              data-testid="reservation__reservation-unit"
-              href={getReservationUnitPath(reservationUnit?.pk)}
-            >
+            <Link data-testid="reservation__reservation-unit" href={getReservationUnitPath(reservationUnit?.pk)}>
               {getReservationUnitName(reservationUnit, lang) ?? "-"}
             </Link>
             <NoWrap data-testid="reservation__time">{timeString}</NoWrap>
@@ -322,11 +279,7 @@ function Reservation({
                 data-testid="reservation-detail__button--cancel"
                 role="button"
               >
-                {t(
-                  `reservations:cancel.${
-                    isBeingHandled ? "application" : "reservation"
-                  }`
-                )}
+                {t(`reservations:cancel.${isBeingHandled ? "application" : "reservation"}`)}
                 <IconCross />
               </ButtonLikeLink>
             )}
@@ -335,27 +288,11 @@ function Reservation({
         </div>
         <Flex>
           <Instructions reservation={reservation} />
-          <GeneralFields
-            supportedFields={supportedFields}
-            reservation={reservation}
-            options={options}
-          />
-          <ApplicationFields
-            reservation={reservation}
-            options={options}
-            supportedFields={supportedFields}
-          />
-          {shouldShowAccessCode && (
-            <AccessCodeInfo
-              pindoraInfo={pindoraInfo}
-              feedbackUrl={feedbackUrl}
-            />
-          )}
+          <GeneralFields supportedFields={supportedFields} reservation={reservation} options={options} />
+          <ApplicationFields reservation={reservation} options={options} supportedFields={supportedFields} />
+          {shouldShowAccessCode && <AccessCodeInfo pindoraInfo={pindoraInfo} feedbackUrl={feedbackUrl} />}
           <TermsInfoSection reservation={reservation} termsOfUse={termsOfUse} />
-          <AddressSection
-            title={getReservationUnitName(reservationUnit, lang) ?? "-"}
-            unit={reservationUnit?.unit}
-          />
+          <AddressSection title={getReservationUnitName(reservationUnit, lang) ?? "-"} unit={reservationUnit?.unit} />
         </Flex>
       </ReservationPageWrapper>
     </>
@@ -366,8 +303,7 @@ function AccessCodeInfo({
   pindoraInfo,
   feedbackUrl,
 }: Readonly<
-  Pick<NonNullable<AccessCodeQuery["reservation"]>, "pindoraInfo"> &
-    Pick<PropsNarrowed, "feedbackUrl">
+  Pick<NonNullable<AccessCodeQuery["reservation"]>, "pindoraInfo"> & Pick<PropsNarrowed, "feedbackUrl">
 >): JSX.Element {
   const { t, i18n } = useTranslation();
   return (
@@ -425,10 +361,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
     // NOTE errors will fallback to 404
     const id = base64encode(`ReservationNode:${pk}`);
-    const { data } = await apolloClient.query<
-      ReservationPageQuery,
-      ReservationPageQueryVariables
-    >({
+    const { data } = await apolloClient.query<ReservationPageQuery, ReservationPageQueryVariables>({
       query: ReservationPageDocument,
       fetchPolicy: "no-cache",
       variables: { id },
@@ -446,8 +379,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         variables: { id: recurringId },
       });
       const applicationPk =
-        recurringData?.recurringReservation?.allocatedTimeSlot
-          ?.reservationUnitOption?.applicationSection?.application?.pk;
+        recurringData?.recurringReservation?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application
+          ?.pk;
       return {
         redirect: {
           permanent: true,

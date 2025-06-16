@@ -19,12 +19,7 @@ export type Cell = {
 };
 
 // for formatting strings and css styles
-const COMBINED_CELL_STATES = [
-  "primary",
-  "secondary",
-  "open",
-  "unavailable",
-] as const;
+const COMBINED_CELL_STATES = ["primary", "secondary", "open", "unavailable"] as const;
 type CombinedCellState = (typeof COMBINED_CELL_STATES)[number];
 
 export function isCellEqual(a: Cell, b: Cell): boolean {
@@ -77,10 +72,7 @@ function DayColumn({
     if (evt.key !== "Enter" && evt.key !== " ") {
       return;
     }
-    setCellValue(
-      cell,
-      selectedPriority === cell.state ? false : selectedPriority
-    );
+    setCellValue(cell, selectedPriority === cell.state ? false : selectedPriority);
   };
 
   const head = t(`common:weekDayLong.${fromMondayFirstUnsafe(day)}`);
@@ -157,11 +149,7 @@ function formatCell(cell: Cell): string {
   return `${cell.hour} - ${cell.hour + 1}`;
 }
 
-function formatButtonAriaLabel(
-  t: TFunction,
-  cell: Cell,
-  weekday: string
-): string {
+function formatButtonAriaLabel(t: TFunction, cell: Cell, weekday: string): string {
   const s = cell.state !== "none" ? cell.state : cell.openState;
   const base = translateCellType(t, s);
   return `${base}: ${weekday} ${formatCell(cell)}`;
@@ -209,12 +197,7 @@ function Legend() {
   return (
     <AutoGrid $minWidth="9rem" $gap="xs" data-testid="time-selector__legend">
       {cellTypes.map((cell) => (
-        <Flex
-          key={cell.label}
-          $gap="2-xs"
-          $alignItems="center"
-          $direction="row"
-        >
+        <Flex key={cell.label} $gap="2-xs" $alignItems="center" $direction="row">
           <LegendBox type={cell.type} />
           <NoWrap>{cell.label}</NoWrap>
         </Flex>

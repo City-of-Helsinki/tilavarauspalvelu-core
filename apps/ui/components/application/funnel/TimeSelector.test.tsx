@@ -1,27 +1,13 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { test, describe, expect, vi } from "vitest";
-import {
-  type ApplicationPage2FormValues,
-  convertApplicationPage2,
-} from "./form";
+import { type ApplicationPage2FormValues, convertApplicationPage2 } from "./form";
 import { TimeSelectorForm, type TimeSelectorProps } from "./TimeSelector";
-import {
-  createMockApplicationFragment,
-  type CreateMockApplicationFragmentProps,
-} from "@test/application.mocks";
-import {
-  type ApplicationPage2Query,
-  Priority,
-  type TimeSelectorFragment,
-} from "@/gql/gql-types";
+import { createMockApplicationFragment, type CreateMockApplicationFragmentProps } from "@test/application.mocks";
+import { type ApplicationPage2Query, Priority, type TimeSelectorFragment } from "@/gql/gql-types";
 import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { transformWeekday } from "common/src/conversion";
-import {
-  base64encode,
-  formatTimeStruct,
-  fromMondayFirstUnsafe,
-} from "common/src/helpers";
+import { base64encode, formatTimeStruct, fromMondayFirstUnsafe } from "common/src/helpers";
 import { type OpenHoursState } from "common/src/components/ApplicationTimeSelector";
 import { selectOption } from "@/test/test.utils";
 import { toApiTime } from "common/src/common/util";
@@ -34,9 +20,7 @@ interface TimeSelectorMockProps extends CreateMockApplicationFragmentProps {
   reservationUnitOpeningHours?: TimeSelectorProps["reservationUnitOpeningHours"];
 }
 
-function customRender(
-  props: TimeSelectorMockProps = {}
-): ReturnType<typeof render> {
+function customRender(props: TimeSelectorMockProps = {}): ReturnType<typeof render> {
   if (props.page == null) {
     props.page = "page1";
   }
@@ -44,11 +28,7 @@ function customRender(
 }
 
 // To use hooks have to use component wrap
-function WrapTimeSelector({
-  onSubmit = vi.fn(),
-  reservationUnitOpeningHours = [],
-  ...props
-}: TimeSelectorMockProps) {
+function WrapTimeSelector({ onSubmit = vi.fn(), reservationUnitOpeningHours = [], ...props }: TimeSelectorMockProps) {
   const application: ApplicationPage2 = createMockApplicationFragment(props);
   const form = useForm<ApplicationPage2FormValues>({
     mode: "onChange",
@@ -130,27 +110,20 @@ describe("TimeSelector render single section", () => {
     const view = customRender();
     const options = view.getByTestId("time-selector__options-0");
     expect(
-      within(options).getByLabelText(
-        "application:Page2.reservationUnitSelectLabel",
-        {
-          selector: "button",
-        }
-      )
+      within(options).getByLabelText("application:Page2.reservationUnitSelectLabel", {
+        selector: "button",
+      })
     ).toBeInTheDocument();
   });
 
   test("should have time selector", () => {
     const view = customRender();
-    const calendar = view.getByLabelText(
-      "application:TimeSelector.calendarLabel"
-    );
+    const calendar = view.getByLabelText("application:TimeSelector.calendarLabel");
     expect(calendar).toBeInTheDocument();
 
     for (let day = 0; day < 7; day += 1) {
       for (let hour = 7; hour <= 23; hour += 1) {
-        expect(
-          within(calendar).getByTestId(`time-selector__button--${day}-${hour}`)
-        ).toBeInTheDocument();
+        expect(within(calendar).getByTestId(`time-selector__button--${day}-${hour}`)).toBeInTheDocument();
         const btn = within(calendar).getByRole("option", {
           name: `application:TimeSelector.legend.unavailable: common:weekDay.${day} ${hour} - ${hour + 1}`,
         });
@@ -167,21 +140,13 @@ describe("TimeSelector render single section", () => {
     const view = customRender();
     const legend = view.getByTestId("time-selector__legend");
     expect(legend).toBeInTheDocument();
-    const open = within(legend).getByText(
-      "application:TimeSelector.legend.open"
-    );
+    const open = within(legend).getByText("application:TimeSelector.legend.open");
     expect(open).toBeInTheDocument();
-    const unavailable = within(legend).getByText(
-      "application:TimeSelector.legend.unavailable"
-    );
+    const unavailable = within(legend).getByText("application:TimeSelector.legend.unavailable");
     expect(unavailable).toBeInTheDocument();
-    const secondary = within(legend).getByText(
-      "application:TimeSelector.legend.secondary"
-    );
+    const secondary = within(legend).getByText("application:TimeSelector.legend.secondary");
     expect(secondary).toBeInTheDocument();
-    const primary = within(legend).getByText(
-      "application:TimeSelector.legend.primary"
-    );
+    const primary = within(legend).getByText("application:TimeSelector.legend.primary");
     expect(primary).toBeInTheDocument();
   });
 
@@ -271,9 +236,7 @@ describe("TimeSelector render single section", () => {
         })),
       }));
       const view = customRender({ reservationUnitOpeningHours: openTimes });
-      const calendar = view.getByLabelText(
-        "application:TimeSelector.calendarLabel"
-      );
+      const calendar = view.getByLabelText("application:TimeSelector.calendarLabel");
 
       // smoke
       const open = within(calendar).getAllByRole("option", {
@@ -291,18 +254,14 @@ describe("TimeSelector render single section", () => {
       function isAvailable(day: DayT, hour: number): boolean {
         // sunday first
         const time = days.find(
-          (t) =>
-            fromMondayFirstUnsafe(t.day) === day &&
-            t.times.some((x) => hour >= x.start && hour < x.end)
+          (t) => fromMondayFirstUnsafe(t.day) === day && t.times.some((x) => hour >= x.start && hour < x.end)
         );
         return !!time;
       }
 
       for (const day of [0, 1, 2, 3, 4, 5, 6] as const) {
         for (let hour = 7; hour <= 23; hour += 1) {
-          const state: OpenHoursState = isAvailable(day, hour)
-            ? "open"
-            : "unavailable";
+          const state: OpenHoursState = isAvailable(day, hour) ? "open" : "unavailable";
           const btn = within(calendar).getByRole("option", {
             name: `application:TimeSelector.legend.${state}: common:weekDay.${day} ${hour} - ${hour + 1}`,
           });
@@ -314,16 +273,12 @@ describe("TimeSelector render single section", () => {
 
   test("single application section should not have copy button", () => {
     const view = customRender();
-    expect(
-      view.queryByText("application:Page2.copyTimes")
-    ).not.toBeInTheDocument();
+    expect(view.queryByText("application:Page2.copyTimes")).not.toBeInTheDocument();
   });
 
   test("should have a copy buttons if more than one section", () => {
     const view = customRender({ nSections: 2 });
-    expect(
-      view.getByRole("button", { name: "application:Page2.copyTimes" })
-    ).toBeInTheDocument();
+    expect(view.getByRole("button", { name: "application:Page2.copyTimes" })).toBeInTheDocument();
   });
 });
 
@@ -413,33 +368,19 @@ describe("TimeSelector calendar select", () => {
 describe("TimeSelector priority select", () => {
   test("should preselect primary time", () => {
     const view = customRender({ page: "page2" });
-    const selectBtn = view.getByLabelText(
-      "application:Page2.prioritySelectLabel",
-      {
-        selector: "button",
-      }
-    );
+    const selectBtn = view.getByLabelText("application:Page2.prioritySelectLabel", {
+      selector: "button",
+    });
     expect(selectBtn).toBeInTheDocument();
-    expect(selectBtn).toHaveTextContent(
-      "application:Page2.priorityLabels.primary"
-    );
+    expect(selectBtn).toHaveTextContent("application:Page2.priorityLabels.primary");
   });
   test("priority select can be changed", async () => {
     const view = customRender({ page: "page2" });
-    await selectOption(
-      view,
-      "application:Page2.prioritySelectLabel",
-      /Page2.priorityLabels.secondary/
-    );
-    const selectBtn = view.getByLabelText(
-      "application:Page2.prioritySelectLabel",
-      {
-        selector: "button",
-      }
-    );
-    expect(selectBtn).toHaveTextContent(
-      "application:Page2.priorityLabels.secondary"
-    );
+    await selectOption(view, "application:Page2.prioritySelectLabel", /Page2.priorityLabels.secondary/);
+    const selectBtn = view.getByLabelText("application:Page2.prioritySelectLabel", {
+      selector: "button",
+    });
+    expect(selectBtn).toHaveTextContent("application:Page2.priorityLabels.secondary");
   });
   // requires setting predata
   test.todo("priority select doesn't change existing selection");

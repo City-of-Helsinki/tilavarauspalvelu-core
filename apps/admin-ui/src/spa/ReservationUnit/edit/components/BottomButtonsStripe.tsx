@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Button,
-  ButtonSize,
-  ButtonVariant,
-  Dialog,
-  IconArrowLeft,
-  LoadingSpinner,
-} from "hds-react";
+import { Button, ButtonSize, ButtonVariant, Dialog, IconArrowLeft, LoadingSpinner } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { UseFormReturn } from "react-hook-form";
@@ -14,10 +7,7 @@ import type { ReservationUnitEditFormValues } from "@/spa/ReservationUnit/edit/f
 import { useNavigate } from "react-router-dom";
 import { getUnitUrl } from "@/common/urls";
 import { successToast } from "common/src/common/toast";
-import type {
-  ReservationUnitEditQuery,
-  UnitSubpageHeadFragment,
-} from "@gql/gql-types";
+import type { ReservationUnitEditQuery, UnitSubpageHeadFragment } from "@gql/gql-types";
 import { breakpoints } from "common/src/const";
 import { pageSideMargins, WhiteButton } from "common/styled";
 import { useDisplayError } from "common/src/hooks";
@@ -145,12 +135,7 @@ function GenericDialog({
       isOpen={isOpen}
     >
       <Dialog.Header id="modal-header" title={title} />
-      <DialogContent
-        description={description}
-        acceptLabel={acceptLabel}
-        onAccept={onAccept}
-        onClose={onClose}
-      />
+      <DialogContent description={description} acceptLabel={acceptLabel} onAccept={onAccept} onClose={onClose} />
     </Dialog>
   );
 }
@@ -179,13 +164,7 @@ function ArchiveDialog({
   );
 }
 
-function DiscardChangesDialog({
-  onClose,
-  onAccept,
-}: {
-  onClose: () => void;
-  onAccept: () => void;
-}): JSX.Element {
+function DiscardChangesDialog({ onClose, onAccept }: { onClose: () => void; onAccept: () => void }): JSX.Element {
   const { t } = useTranslation();
 
   return (
@@ -225,11 +204,7 @@ export function BottomButtonsStripe({
   const draftEnabled = hasChanges || !watch("isDraft");
   const publishEnabled = hasChanges || watch("isDraft");
 
-  const isPreviewDisabled =
-    isSaving ||
-    !reservationUnit?.pk ||
-    !reservationUnit?.uuid ||
-    previewUrlPrefix === "";
+  const isPreviewDisabled = isSaving || !reservationUnit?.pk || !reservationUnit?.uuid || previewUrlPrefix === "";
 
   // Have to define these like this because otherwise the state changes don't work
   const handlePublish = async () => {
@@ -319,16 +294,10 @@ export function BottomButtonsStripe({
       <PreviewLink
         target="_blank"
         rel="noopener noreferrer"
-        href={
-          !isPreviewDisabled
-            ? `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.uuid}`
-            : undefined
-        }
+        href={!isPreviewDisabled ? `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.uuid}` : undefined}
         onClick={(e) => isPreviewDisabled && e.preventDefault()}
         title={t(
-          hasChanges
-            ? "ReservationUnitEditor.noPreviewUnsavedChangesTooltip"
-            : "ReservationUnitEditor.previewTooltip"
+          hasChanges ? "ReservationUnitEditor.noPreviewUnsavedChangesTooltip" : "ReservationUnitEditor.previewTooltip"
         )}
       >
         <span>{t("ReservationUnitEditor.preview")}</span>

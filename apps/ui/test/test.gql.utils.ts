@@ -1,7 +1,4 @@
-import {
-  type OptionsQuery,
-  type ReservationUnitTypeNode,
-} from "@/gql/gql-types";
+import { type OptionsQuery, type ReservationUnitTypeNode } from "@/gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { type DocumentNode } from "graphql";
 import { translateOption, type OptionsT } from "@/modules/search";
@@ -35,27 +32,17 @@ export function createOptionMock(
   const opts = createOptionQueryMock(props);
   const lang = "fi" as const;
   return {
-    units: filterNonNullable(opts.unitsAll).map((n) =>
+    units: filterNonNullable(opts.unitsAll).map((n) => translateOption(n, lang)),
+    equipments: filterNonNullable(opts.equipmentsAll).map((n) => translateOption(n, lang)),
+    purposes: filterNonNullable(opts.purposes?.edges.map((edge) => edge?.node)).map((n) => translateOption(n, lang)),
+    reservationUnitTypes: filterNonNullable(opts.reservationUnitTypes?.edges.map((edge) => edge?.node)).map((n) =>
       translateOption(n, lang)
     ),
-    equipments: filterNonNullable(opts.equipmentsAll).map((n) =>
-      translateOption(n, lang)
-    ),
-    purposes: filterNonNullable(
-      opts.purposes?.edges.map((edge) => edge?.node)
-    ).map((n) => translateOption(n, lang)),
-    reservationUnitTypes: filterNonNullable(
-      opts.reservationUnitTypes?.edges.map((edge) => edge?.node)
-    ).map((n) => translateOption(n, lang)),
-    ageGroups: filterNonNullable(
-      opts.ageGroups?.edges.map((edge) => edge?.node)
-    ).map((op) => ({
+    ageGroups: filterNonNullable(opts.ageGroups?.edges.map((edge) => edge?.node)).map((op) => ({
       value: op.pk ?? 0,
       label: `${op.minimum ?? ""}-${op.maximum ?? ""}`,
     })),
-    cities: filterNonNullable(opts.cities?.edges.map((edge) => edge?.node)).map(
-      (n) => translateOption(n, lang)
-    ),
+    cities: filterNonNullable(opts.cities?.edges.map((edge) => edge?.node)).map((n) => translateOption(n, lang)),
   };
 }
 
@@ -86,15 +73,13 @@ export function createOptionQueryMock({
     id: base64encode(`ReservationPurposeNode:${val.pk}`),
   }));
 
-  const reservationPurposes = reservationPurposeOptions.map(
-    ({ value, label }) => ({
-      id: base64encode(`ReservationPurposeNode:${value}`),
-      pk: value,
-      nameFi: label,
-      nameSv: label,
-      nameEn: label,
-    })
-  );
+  const reservationPurposes = reservationPurposeOptions.map(({ value, label }) => ({
+    id: base64encode(`ReservationPurposeNode:${value}`),
+    pk: value,
+    nameFi: label,
+    nameSv: label,
+    nameEn: label,
+  }));
   const units = Array.from({ length: nCount }, (_, i) => ({
     id: base64encode(`UnitNode:${i + 1}`),
     pk: i + 1,

@@ -114,12 +114,7 @@ export function Accordion({
     : `${t("common.open")} ${t("common.accordion")} "${heading}"`;
 
   return (
-    <Wrapper
-      style={style}
-      className={className}
-      $open={isAccordionOpen}
-      {...rest}
-    >
+    <Wrapper style={style} className={className} $open={isAccordionOpen} {...rest}>
       <Heading
         onClick={() => !disabled && toggleOpenState(!isAccordionOpen)}
         data-testid="accordion__header"
@@ -134,11 +129,7 @@ export function Accordion({
           disabled={disabled}
           onClick={() => !disabled && toggleOpenState(!isAccordionOpen)}
         >
-          {isAccordionOpen ? (
-            <ToggleIconOpen aria-hidden />
-          ) : (
-            <ToggleIconClosed aria-hidden />
-          )}
+          {isAccordionOpen ? <ToggleIconOpen aria-hidden /> : <ToggleIconClosed aria-hidden />}
         </ToggleButton>
       </Heading>
       <Content aria-hidden={!isAccordionOpen}>{children}</Content>

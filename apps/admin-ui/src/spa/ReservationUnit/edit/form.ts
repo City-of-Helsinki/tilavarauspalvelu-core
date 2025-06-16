@@ -1,15 +1,5 @@
-import {
-  convertTime,
-  filterNonNullable,
-  timeToMinutes,
-  toNumber,
-} from "common/src/helpers";
-import {
-  fromApiDate,
-  fromUIDate,
-  toUIDate,
-  toApiDate,
-} from "common/src/common/util";
+import { convertTime, filterNonNullable, timeToMinutes, toNumber } from "common/src/helpers";
+import { fromApiDate, fromUIDate, toUIDate, toApiDate } from "common/src/common/util";
 import {
   ReservationStartInterval,
   Authentication,
@@ -23,19 +13,11 @@ import {
 } from "@gql/gql-types";
 import { addDays, endOfDay, format } from "date-fns";
 import { z } from "zod";
-import {
-  checkLengthWithoutHtml,
-  checkTimeStringFormat,
-} from "common/src/schemas/schemaCommon";
+import { checkLengthWithoutHtml, checkTimeStringFormat } from "common/src/schemas/schemaCommon";
 import { fromUIDateTime } from "@/helpers";
 import { intervalToNumber } from "@/schemas/utils";
 
-export const AccessTypes = [
-  "ACCESS_CODE",
-  "OPENED_BY_STAFF",
-  "PHYSICAL_KEY",
-  "UNRESTRICTED",
-] as const;
+export const AccessTypes = ["ACCESS_CODE", "OPENED_BY_STAFF", "PHYSICAL_KEY", "UNRESTRICTED"] as const;
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
@@ -73,11 +55,7 @@ const PricingFormSchema = z.object({
 
 type PricingFormValues = z.infer<typeof PricingFormSchema>;
 
-function refinePricing(
-  data: PricingFormValues | undefined,
-  ctx: z.RefinementCtx,
-  path: string
-) {
+function refinePricing(data: PricingFormValues | undefined, ctx: z.RefinementCtx, path: string) {
   if (data == null) {
     return;
   }
@@ -197,10 +175,7 @@ const AccessTypesFormSchema = z.object({
 });
 export type AccessTypesFormType = z.infer<typeof AccessTypesFormSchema>;
 
-function validateAccessTypes(
-  accessTypes: AccessTypesFormType[],
-  ctx: z.RefinementCtx
-): void {
+function validateAccessTypes(accessTypes: AccessTypesFormType[], ctx: z.RefinementCtx): void {
   const seenDates: string[] = [];
 
   accessTypes.forEach((at, index) => {
@@ -223,10 +198,7 @@ function validateAccessTypes(
   });
 }
 
-function validateSeasonalTimes(
-  data: SeasonalFormType[],
-  ctx: z.RefinementCtx
-): void {
+function validateSeasonalTimes(data: SeasonalFormType[], ctx: z.RefinementCtx): void {
   data.forEach((season, index) => {
     // closed don't need validation (time is not saved)
     if (season.closed) {
@@ -246,12 +218,7 @@ function validateSeasonalTimes(
         return;
       }
       const path = `seasons[${index}].reservableTimes[${i}]`;
-      checkTimeStringFormat(
-        reservableTime?.begin,
-        ctx,
-        `${path}.begin`,
-        "time"
-      );
+      checkTimeStringFormat(reservableTime?.begin, ctx, `${path}.begin`, "time");
       checkTimeStringFormat(reservableTime?.end, ctx, `${path}.end`, "time");
 
       const beginTimeMinutes = timeToMinutes(reservableTime.begin);
@@ -392,10 +359,7 @@ function validateDateTimeInterval({
   }
 }
 
-const bufferTimeSchema = z
-  .literal("noBuffer")
-  .or(z.literal("blocksWholeDay"))
-  .or(z.literal("bufferTimesSet"));
+const bufferTimeSchema = z.literal("noBuffer").or(z.literal("blocksWholeDay")).or(z.literal("bufferTimesSet"));
 
 // Don't enable blocksWholeDay as selectable option for users
 // because it doesn't work in customer ui (backend supports it though)
@@ -500,10 +464,7 @@ export const ReservationUnitEditSchema = z
 
     // Drafts require this validation, but only if it's directly bookable
     if (v.reservationKind !== ReservationKind.Season) {
-      if (
-        v.minReservationDuration != null &&
-        v.maxReservationDuration != null
-      ) {
+      if (v.minReservationDuration != null && v.maxReservationDuration != null) {
         if (v.minReservationDuration > v.maxReservationDuration) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
@@ -522,14 +483,10 @@ export const ReservationUnitEditSchema = z
             path: ["minReservationDuration"],
           });
         }
-        if (
-          minDurationMinutes % intervalToNumber(v.reservationStartInterval) !==
-          0
-        ) {
+        if (minDurationMinutes % intervalToNumber(v.reservationStartInterval) !== 0) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message:
-              "duration must be a multiple of the reservation start interval",
+            message: "duration must be a multiple of the reservation start interval",
             path: ["minReservationDuration"],
           });
         }
@@ -537,14 +494,10 @@ export const ReservationUnitEditSchema = z
 
       if (v.maxReservationDuration != null) {
         const maxDurationMinutes = Math.floor(v.maxReservationDuration / 60);
-        if (
-          maxDurationMinutes % intervalToNumber(v.reservationStartInterval) !==
-          0
-        ) {
+        if (maxDurationMinutes % intervalToNumber(v.reservationStartInterval) !== 0) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message:
-              "duration must be a multiple of the reservation start interval",
+            message: "duration must be a multiple of the reservation start interval",
             path: ["maxReservationDuration"],
           });
         }
@@ -688,30 +641,9 @@ export const ReservationUnitEditSchema = z
         path: ["nameSv"],
       });
     }
-    checkLengthWithoutHtml(
-      v.descriptionEn,
-      ctx,
-      "descriptionEn",
-      1,
-      undefined,
-      "description"
-    );
-    checkLengthWithoutHtml(
-      v.descriptionFi,
-      ctx,
-      "descriptionFi",
-      1,
-      undefined,
-      "description"
-    );
-    checkLengthWithoutHtml(
-      v.descriptionSv,
-      ctx,
-      "descriptionSv",
-      1,
-      undefined,
-      "description"
-    );
+    checkLengthWithoutHtml(v.descriptionEn, ctx, "descriptionEn", 1, undefined, "description");
+    checkLengthWithoutHtml(v.descriptionFi, ctx, "descriptionFi", 1, undefined, "description");
+    checkLengthWithoutHtml(v.descriptionSv, ctx, "descriptionSv", 1, undefined, "description");
 
     if (v.maxPersons && v.minPersons) {
       if (v.maxPersons < v.minPersons) {
@@ -734,9 +666,7 @@ export const ReservationUnitEditSchema = z
     }
   });
 
-export type ReservationUnitEditFormValues = z.infer<
-  typeof ReservationUnitEditSchema
->;
+export type ReservationUnitEditFormValues = z.infer<typeof ReservationUnitEditSchema>;
 
 function convertBegins(begins?: string) {
   const d = begins != null && begins !== "" ? fromApiDate(begins) : undefined;
@@ -749,10 +679,8 @@ function convertBegins(begins?: string) {
 
 type PricingNode = NonNullable<Node["pricings"]>[0];
 function convertPricing(p?: PricingNode): PricingFormValues {
-  const lowestPriceNet =
-    Math.floor(100 * (toNumber(p?.lowestPriceNet) ?? 0)) / 100;
-  const highestPriceNet =
-    Math.floor(100 * (toNumber(p?.highestPriceNet) ?? 0)) / 100;
+  const lowestPriceNet = Math.floor(100 * (toNumber(p?.lowestPriceNet) ?? 0)) / 100;
+  const highestPriceNet = Math.floor(100 * (toNumber(p?.highestPriceNet) ?? 0)) / 100;
   return {
     pk: p?.pk ?? 0,
     taxPercentage: p?.taxPercentage?.pk ?? 0,
@@ -776,8 +704,7 @@ function convertPricingList(pricings: PricingNode[]): PricingFormValues[] {
 
   const activePrice = activePrices[activePrices.length - 1];
   // query data includes all past pricings also, remove them
-  const prices =
-    activePrice != null ? [activePrice, ...futurePrices] : convertedPrices;
+  const prices = activePrice != null ? [activePrice, ...futurePrices] : convertedPrices;
 
   // Always include at least two pricings in the form data (the frontend doesn't support dynamic adding)
   // negative pk for new pricings
@@ -785,10 +712,7 @@ function convertPricingList(pricings: PricingNode[]): PricingFormValues[] {
   while (prices.length < 2 || !prices.some((p) => p?.isFuture)) {
     // if we need to add first price, it's always current
     const isFuture = prices.length > 0;
-    const begins =
-      prices.length === 0
-        ? toUIDate(new Date())
-        : toUIDate(addDays(new Date(), 1));
+    const begins = prices.length === 0 ? toUIDate(new Date()) : toUIDate(addDays(new Date(), 1));
 
     prices.push({
       pk: rollingIndex--,
@@ -840,9 +764,7 @@ function convertSeasonalList(
   });
 }
 
-function convertAccessTypes(
-  accessTypes: NonNullable<Node["accessTypes"]>
-): AccessTypesFormType[] {
+function convertAccessTypes(accessTypes: NonNullable<Node["accessTypes"]>): AccessTypesFormType[] {
   return accessTypes.map((at) => ({
     pk: at?.pk ?? undefined,
     accessType: at.accessType,
@@ -850,9 +772,7 @@ function convertAccessTypes(
   }));
 }
 
-export function convertReservationUnit(
-  data?: Node
-): ReservationUnitEditFormValues {
+export function convertReservationUnit(data?: Node): ReservationUnitEditFormValues {
   // Convert from API data to form values
   return {
     bufferType:
@@ -870,58 +790,31 @@ export function convertReservationUnit(
     minReservationDuration: data?.minReservationDuration ?? null,
     pk: data?.pk ?? 0,
     // Date split for ui components
-    publishBeginsDate: data?.publishBegins
-      ? format(new Date(data.publishBegins), "d.M.yyyy")
-      : "",
-    publishBeginsTime: data?.publishBegins
-      ? format(new Date(data.publishBegins), "H:mm")
-      : "",
-    publishEndsDate: data?.publishEnds
-      ? format(new Date(data.publishEnds), "d.M.yyyy")
-      : "",
-    publishEndsTime: data?.publishEnds
-      ? format(new Date(data.publishEnds), "H:mm")
-      : "",
-    reservationBeginsDate: data?.reservationBegins
-      ? format(new Date(data.reservationBegins), "d.M.yyyy")
-      : "",
-    reservationBeginsTime: data?.reservationBegins
-      ? format(new Date(data.reservationBegins), "H:mm")
-      : "",
-    reservationEndsDate: data?.reservationEnds
-      ? format(new Date(data.reservationEnds), "d.M.yyyy")
-      : "",
-    reservationEndsTime: data?.reservationEnds
-      ? format(new Date(data.reservationEnds), "H:mm")
-      : "",
+    publishBeginsDate: data?.publishBegins ? format(new Date(data.publishBegins), "d.M.yyyy") : "",
+    publishBeginsTime: data?.publishBegins ? format(new Date(data.publishBegins), "H:mm") : "",
+    publishEndsDate: data?.publishEnds ? format(new Date(data.publishEnds), "d.M.yyyy") : "",
+    publishEndsTime: data?.publishEnds ? format(new Date(data.publishEnds), "H:mm") : "",
+    reservationBeginsDate: data?.reservationBegins ? format(new Date(data.reservationBegins), "d.M.yyyy") : "",
+    reservationBeginsTime: data?.reservationBegins ? format(new Date(data.reservationBegins), "H:mm") : "",
+    reservationEndsDate: data?.reservationEnds ? format(new Date(data.reservationEnds), "d.M.yyyy") : "",
+    reservationEndsTime: data?.reservationEnds ? format(new Date(data.reservationEnds), "H:mm") : "",
     requireAdultReservee: data?.requireAdultReservee ?? false,
     requireReservationHandling: data?.requireReservationHandling ?? false,
-    reservationStartInterval:
-      data?.reservationStartInterval ??
-      ReservationStartInterval.Interval_15Mins,
+    reservationStartInterval: data?.reservationStartInterval ?? ReservationStartInterval.Interval_15Mins,
     canApplyFreeOfCharge: data?.canApplyFreeOfCharge ?? false,
     reservationsMinDaysBefore: data?.reservationsMinDaysBefore ?? 0,
     reservationsMaxDaysBefore: data?.reservationsMaxDaysBefore ?? 0,
     reservationKind: data?.reservationKind ?? ReservationKind.DirectAndSeason,
     contactInformation: data?.contactInformation ?? "",
-    reservationPendingInstructionsFi:
-      data?.reservationPendingInstructionsFi ?? "",
-    reservationPendingInstructionsEn:
-      data?.reservationPendingInstructionsEn ?? "",
-    reservationPendingInstructionsSv:
-      data?.reservationPendingInstructionsSv ?? "",
-    reservationConfirmedInstructionsFi:
-      data?.reservationConfirmedInstructionsFi ?? "",
-    reservationConfirmedInstructionsEn:
-      data?.reservationConfirmedInstructionsEn ?? "",
-    reservationConfirmedInstructionsSv:
-      data?.reservationConfirmedInstructionsSv ?? "",
-    reservationCancelledInstructionsFi:
-      data?.reservationCancelledInstructionsFi ?? "",
-    reservationCancelledInstructionsEn:
-      data?.reservationCancelledInstructionsEn ?? "",
-    reservationCancelledInstructionsSv:
-      data?.reservationCancelledInstructionsSv ?? "",
+    reservationPendingInstructionsFi: data?.reservationPendingInstructionsFi ?? "",
+    reservationPendingInstructionsEn: data?.reservationPendingInstructionsEn ?? "",
+    reservationPendingInstructionsSv: data?.reservationPendingInstructionsSv ?? "",
+    reservationConfirmedInstructionsFi: data?.reservationConfirmedInstructionsFi ?? "",
+    reservationConfirmedInstructionsEn: data?.reservationConfirmedInstructionsEn ?? "",
+    reservationConfirmedInstructionsSv: data?.reservationConfirmedInstructionsSv ?? "",
+    reservationCancelledInstructionsFi: data?.reservationCancelledInstructionsFi ?? "",
+    reservationCancelledInstructionsEn: data?.reservationCancelledInstructionsEn ?? "",
+    reservationCancelledInstructionsSv: data?.reservationCancelledInstructionsSv ?? "",
     descriptionFi: data?.descriptionFi ?? "",
     descriptionEn: data?.descriptionEn ?? "",
     descriptionSv: data?.descriptionSv ?? "",
@@ -949,15 +842,10 @@ export function convertReservationUnit(
     images: filterNonNullable(data?.images).map((i) => convertImage(i)),
     isDraft: data?.isDraft ?? false,
     isArchived: false,
-    seasons: convertSeasonalList(
-      filterNonNullable(data?.applicationRoundTimeSlots)
-    ),
-    hasFuturePricing:
-      data?.pricings?.some((p) => new Date(p.begins) > new Date()) ?? false,
-    hasScheduledPublish:
-      data?.publishBegins != null || data?.publishEnds != null,
-    hasScheduledReservation:
-      data?.reservationBegins != null || data?.reservationEnds != null,
+    seasons: convertSeasonalList(filterNonNullable(data?.applicationRoundTimeSlots)),
+    hasFuturePricing: data?.pricings?.some((p) => new Date(p.begins) > new Date()) ?? false,
+    hasScheduledPublish: data?.publishBegins != null || data?.publishEnds != null,
+    hasScheduledReservation: data?.reservationBegins != null || data?.reservationEnds != null,
     hasPublishBegins: data?.publishBegins != null,
     hasPublishEnds: data?.publishEnds != null,
     hasReservationBegins: data?.reservationBegins != null,
@@ -970,9 +858,7 @@ export function convertReservationUnit(
 }
 
 // Too hard to type this because of two separate mutations that have optional fields in them
-export function transformReservationUnit(
-  values: ReservationUnitEditFormValues
-) {
+export function transformReservationUnit(values: ReservationUnitEditFormValues) {
   // Convert from form values to API data
   const {
     pk,
@@ -1014,19 +900,14 @@ export function transformReservationUnit(
     ...vals
   } = values;
 
-  const isReservableTime = (t?: SeasonalFormType["reservableTimes"][0]) =>
-    t && t.begin && t.end;
+  const isReservableTime = (t?: SeasonalFormType["reservableTimes"][0]) => t && t.begin && t.end;
   // NOTE mutation doesn't support pks (even if changing not adding) unlike other mutations
   const applicationRoundTimeSlots = seasons
-    .filter(
-      (s) => s.reservableTimes.filter(isReservableTime).length > 0 || s.closed
-    )
+    .filter((s) => s.reservableTimes.filter(isReservableTime).length > 0 || s.closed)
     .map((s) => ({
       weekday: s.weekday,
       closed: s.closed,
-      reservableTimes: !s.closed
-        ? filterNonNullable(s.reservableTimes.filter(isReservableTime))
-        : [],
+      reservableTimes: !s.closed ? filterNonNullable(s.reservableTimes.filter(isReservableTime)) : [],
     }));
 
   function maybeToApiDateTime(date: string, time: string): string | null {
@@ -1038,8 +919,7 @@ export function transformReservationUnit(
     ...vals,
     ...(pk > 0 ? { pk } : {}),
     name: vals.nameFi.trim(),
-    surfaceArea:
-      surfaceArea != null && surfaceArea > 0 ? Math.floor(surfaceArea) : null,
+    surfaceArea: surfaceArea != null && surfaceArea > 0 ? Math.floor(surfaceArea) : null,
     reservationBegins:
       hasScheduledReservation && hasReservationBegins
         ? maybeToApiDateTime(reservationBeginsDate, reservationBeginsTime)
@@ -1049,32 +929,15 @@ export function transformReservationUnit(
         ? maybeToApiDateTime(reservationEndsDate, reservationEndsTime)
         : null,
     publishBegins:
-      hasScheduledPublish && hasPublishBegins
-        ? maybeToApiDateTime(publishBeginsDate, publishBeginsTime)
-        : null,
-    publishEnds:
-      hasScheduledPublish && hasPublishEnds
-        ? maybeToApiDateTime(publishEndsDate, publishEndsTime)
-        : null,
+      hasScheduledPublish && hasPublishBegins ? maybeToApiDateTime(publishBeginsDate, publishBeginsTime) : null,
+    publishEnds: hasScheduledPublish && hasPublishEnds ? maybeToApiDateTime(publishEndsDate, publishEndsTime) : null,
     // Set min/max reservation duration to null if ReservationKind is Season
     // (They are not used and can cause errors if reservation interval is changed)
-    minReservationDuration:
-      reservationKind !== ReservationKind.Season
-        ? minReservationDuration
-        : null,
-    maxReservationDuration:
-      reservationKind !== ReservationKind.Season
-        ? maxReservationDuration
-        : null,
+    minReservationDuration: reservationKind !== ReservationKind.Season ? minReservationDuration : null,
+    maxReservationDuration: reservationKind !== ReservationKind.Season ? maxReservationDuration : null,
     reservationBlockWholeDay: bufferType === "blocksWholeDay",
-    bufferTimeAfter:
-      hasBufferTimeAfter && bufferType === "bufferTimesSet"
-        ? bufferTimeAfter
-        : 0,
-    bufferTimeBefore:
-      hasBufferTimeBefore && bufferType === "bufferTimesSet"
-        ? bufferTimeBefore
-        : 0,
+    bufferTimeAfter: hasBufferTimeAfter && bufferType === "bufferTimesSet" ? bufferTimeAfter : 0,
+    bufferTimeBefore: hasBufferTimeBefore && bufferType === "bufferTimesSet" ? bufferTimeBefore : 0,
     reservationKind,
     isDraft,
     isArchived,
@@ -1082,9 +945,7 @@ export function transformReservationUnit(
     termsOfUseFi: termsOfUseFi !== "" ? termsOfUseFi : null,
     termsOfUseSv: termsOfUseSv !== "" ? termsOfUseSv : null,
     cancellationRule: hasCancellationRule ? cancellationRule : null,
-    pricings: filterNonNullable(
-      pricings.map((p) => transformPricing(p, hasFuturePricing))
-    ),
+    pricings: filterNonNullable(pricings.map((p) => transformPricing(p, hasFuturePricing))),
     accessTypes: filterNonNullable(
       accessTypes.map((at) => ({
         pk: at.pk,

@@ -1,20 +1,10 @@
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { type ReservationQuery } from "@gql/gql-types";
-import {
-  Button,
-  ButtonVariant,
-  IconArrowLeft,
-  LoadingSpinner,
-  Notification,
-} from "hds-react";
+import { Button, ButtonVariant, IconArrowLeft, LoadingSpinner, Notification } from "hds-react";
 import { ActionContainer } from "./styles";
 import { useFormContext } from "react-hook-form";
-import {
-  ApplicationFields,
-  GeneralFields,
-  type OptionsRecord,
-} from "./SummaryFields";
+import { ApplicationFields, GeneralFields, type OptionsRecord } from "./SummaryFields";
 import { type FieldName } from "common/src/metaFieldsHelpers";
 import { AcceptTerms } from "./AcceptTerms";
 
@@ -27,13 +17,7 @@ type Props = {
   setStep: React.Dispatch<React.SetStateAction<number>>;
 };
 
-export function Step1({
-  reservation,
-  supportedFields,
-  options,
-  requiresPayment,
-  setStep,
-}: Props): JSX.Element {
+export function Step1({ reservation, supportedFields, options, requiresPayment, setStep }: Props): JSX.Element {
   const { t } = useTranslation();
   const {
     formState: { isSubmitting },
@@ -44,10 +28,7 @@ export function Step1({
     service: false,
   });
 
-  const handleTermsAcceptedChange = (
-    key: "space" | "service",
-    val: boolean
-  ) => {
+  const handleTermsAcceptedChange = (key: "space" | "service", val: boolean) => {
     setIsTermsAccepted({ ...isTermsAccepted, [key]: val });
   };
 
@@ -56,22 +37,12 @@ export function Step1({
   const areTermsAccepted = isTermsAccepted.space && isTermsAccepted.service;
 
   if (!reservationUnit) {
-    return (
-      <Notification type="error">{t("common:errors.dataError")}</Notification>
-    );
+    return <Notification type="error">{t("common:errors.dataError")}</Notification>;
   }
   return (
     <>
-      <GeneralFields
-        supportedFields={supportedFields}
-        reservation={reservation}
-        options={options}
-      />
-      <ApplicationFields
-        reservation={reservation}
-        options={options}
-        supportedFields={supportedFields}
-      />
+      <GeneralFields supportedFields={supportedFields} reservation={reservation} options={options} />
+      <ApplicationFields reservation={reservation} options={options} supportedFields={supportedFields} />
       <AcceptTerms
         reservationUnit={reservationUnit}
         isTermsAccepted={isTermsAccepted}

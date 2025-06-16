@@ -1,14 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import {
-  Button,
-  ButtonSize,
-  ButtonVariant,
-  Dialog,
-  Notification,
-  NotificationSize,
-} from "hds-react";
+import { Button, ButtonSize, ButtonVariant, Dialog, Notification, NotificationSize } from "hds-react";
 import { z } from "zod";
 import { type TFunction } from "i18next";
 import {
@@ -29,12 +22,7 @@ import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { BufferToggles } from "@/component/BufferToggles";
 import { useCheckCollisions } from "@/hooks";
-import {
-  getBufferTime,
-  getNormalizedInterval,
-  constructDateTimeSafe,
-  constructDateTimeUnsafe,
-} from "@/helpers";
+import { getBufferTime, getNormalizedInterval, constructDateTimeSafe, constructDateTimeUnsafe } from "@/helpers";
 import { formatDateTimeRange } from "@/common/util";
 import { gql } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
@@ -190,25 +178,17 @@ function DialogContent({
     }
   };
 
-  const translateError = (errorMsg?: string) =>
-    errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "";
+  const translateError = (errorMsg?: string) => (errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "");
 
   const newTimeString = start && end ? formatDateInterval(t, start, end) : "";
-  const translateKey =
-    type === "move"
-      ? "Reservation.EditTimeModal"
-      : "Reservation.NewReservationModal";
+  const translateKey = type === "move" ? "Reservation.EditTimeModal" : "Reservation.NewReservationModal";
   const commonTrKey = "Reservation.CommonModal";
   const isDisabled = (!isDirty && !isValid) || isLoading || hasCollisions;
   return (
     <Dialog.Content>
       <StyledForm onSubmit={handleSubmit(onSubmit)} noValidate>
         {topContent}
-        <ControlledDateInput
-          name="date"
-          control={control}
-          error={translateError(errors.date?.message)}
-        />
+        <ControlledDateInput name="date" control={control} error={translateError(errors.date?.message)} />
         <ControlledTimeInput
           name="startTime"
           control={control}
@@ -241,11 +221,7 @@ function DialogContent({
           <Button disabled={isDisabled} type="submit">
             {t(`${translateKey}.acceptBtn`)}
           </Button>
-          <Button
-            size={ButtonSize.Small}
-            variant={ButtonVariant.Secondary}
-            onClick={onClose}
-          >
+          <Button size={ButtonSize.Small} variant={ButtonVariant.Secondary} onClick={onClose}>
             {t("common.cancel")}
           </Button>
         </ActionButtons>
@@ -259,11 +235,7 @@ export type NewReservationModalProps = CommonProps & {
   onAccept: () => void;
 };
 
-export function NewReservationModal({
-  reservationToCopy,
-  onAccept,
-  onClose,
-}: NewReservationModalProps) {
+export function NewReservationModal({ reservationToCopy, onAccept, onClose }: NewReservationModalProps) {
   const { t } = useTranslation();
   const { isOpen } = useModal();
 
@@ -273,9 +245,7 @@ export function NewReservationModal({
   const bufferTimeBefore = reservationUnit?.bufferTimeBefore ?? 0;
   const bufferTimeAfter = reservationUnit?.bufferTimeAfter ?? 0;
 
-  const interval = getNormalizedInterval(
-    reservationUnit?.reservationStartInterval
-  );
+  const interval = getNormalizedInterval(reservationUnit?.reservationStartInterval);
 
   const form = useForm<EditFormValueType>({
     // @ts-expect-error -- schema refinement breaks typing
@@ -291,11 +261,7 @@ export function NewReservationModal({
 
   const [create] = useAddReservationToSeriesMutation();
 
-  function createInput({
-    begin,
-    end,
-    buffers,
-  }: MutationValues): ReservationSeriesAddMutationInput {
+  function createInput({ begin, end, buffers }: MutationValues): ReservationSeriesAddMutationInput {
     if (reservationToCopy?.recurringReservation?.pk == null) {
       throw new Error("recurring reservation pk missing");
     }
@@ -325,10 +291,7 @@ export function NewReservationModal({
       isOpen={isOpen}
       focusAfterCloseRef={undefined}
     >
-      <Dialog.Header
-        id="modal-header"
-        title={t("Reservation.NewReservationModal.title")}
-      />
+      <Dialog.Header id="modal-header" title={t("Reservation.NewReservationModal.title")} />
       <ErrorBoundary fallback={<div>{t("errors.unexpectedError")}</div>}>
         <DialogContent
           form={form}
@@ -364,14 +327,10 @@ export function EditTimeModal({
   const reservationUnit = reservation.reservationUnits?.find(() => true);
 
   // NOTE 0 => buffer disabled for this reservation, undefined => no buffers selected
-  const bufferTimeBefore =
-    (reservation.bufferTimeBefore || reservationUnit?.bufferTimeBefore) ?? 0;
-  const bufferTimeAfter =
-    (reservation.bufferTimeAfter || reservationUnit?.bufferTimeAfter) ?? 0;
+  const bufferTimeBefore = (reservation.bufferTimeBefore || reservationUnit?.bufferTimeBefore) ?? 0;
+  const bufferTimeAfter = (reservation.bufferTimeAfter || reservationUnit?.bufferTimeAfter) ?? 0;
 
-  const interval = getNormalizedInterval(
-    reservationUnit?.reservationStartInterval
-  );
+  const interval = getNormalizedInterval(reservationUnit?.reservationStartInterval);
 
   if (reservation.pk == null) {
     // eslint-disable-next-line no-console
@@ -423,10 +382,7 @@ export function EditTimeModal({
       isOpen={isOpen}
       focusAfterCloseRef={undefined}
     >
-      <Dialog.Header
-        id="modal-header"
-        title={t("Reservation.EditTimeModal.title")}
-      />
+      <Dialog.Header id="modal-header" title={t("Reservation.EditTimeModal.title")} />
       <ErrorBoundary fallback={<div>{t("errors.unexpectedError")}</div>}>
         <DialogContent
           form={form}
@@ -442,22 +398,15 @@ export function EditTimeModal({
                 {t("Reservation.EditTimeModal.recurringInfoLabel")}:{" "}
                 <Bold>
                   {recurringReservationInfoText({
-                    weekdays: filterNonNullable(
-                      reservation.recurringReservation?.weekdays
-                    ),
-                    begin: ((x) => (x != null ? new Date(x) : undefined))(
-                      reservation.recurringReservation?.beginDate
-                    ),
-                    end: ((x) => (x != null ? new Date(x) : undefined))(
-                      reservation.recurringReservation?.endDate
-                    ),
+                    weekdays: filterNonNullable(reservation.recurringReservation?.weekdays),
+                    begin: ((x) => (x != null ? new Date(x) : undefined))(reservation.recurringReservation?.beginDate),
+                    end: ((x) => (x != null ? new Date(x) : undefined))(reservation.recurringReservation?.endDate),
                     t,
                   })}
                 </Bold>
               </TimeInfoBox>
               <TimeInfoBox>
-                {t("Reservation.EditTimeModal.originalTime")}:{" "}
-                <Bold>{originalTime}</Bold>
+                {t("Reservation.EditTimeModal.originalTime")}: <Bold>{originalTime}</Bold>
               </TimeInfoBox>
             </>
           }
@@ -468,9 +417,7 @@ export function EditTimeModal({
 }
 
 export const CHANGE_RESERVATION_TIME = gql`
-  mutation StaffAdjustReservationTime(
-    $input: ReservationStaffAdjustTimeMutationInput!
-  ) {
+  mutation StaffAdjustReservationTime($input: ReservationStaffAdjustTimeMutationInput!) {
     staffAdjustReservationTime(input: $input) {
       pk
       begin

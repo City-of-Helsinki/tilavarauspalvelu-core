@@ -24,15 +24,10 @@ export const AutoGrid = styled.div<AutoGridProps>`
   display: grid;
   grid-template-columns: repeat(
     auto-fill,
-    minmax(
-      ${({ $minWidth }) =>
-        $minWidth && $minWidth?.length > 0 ? $minWidth : "16rem"},
-      1fr
-    )
+    minmax(${({ $minWidth }) => ($minWidth && $minWidth?.length > 0 ? $minWidth : "16rem")}, 1fr)
   );
   align-items: ${({ $alignCenter }) => ($alignCenter ? "center" : "baseline")};
-  gap: ${({ $gap }) => ($gap ? `var(--spacing-${$gap})` : "var(--spacing-m)")}
-    var(--spacing-m);
+  gap: ${({ $gap }) => ($gap ? `var(--spacing-${$gap})` : "var(--spacing-m)")} var(--spacing-m);
 
   & > :not(img):not(hr):empty {
     display: none;
@@ -43,15 +38,7 @@ export const FullRow = styled.div`
   grid-column: 1 / -1;
 `;
 
-export type SpacingSize =
-  | "none"
-  | "2-xs"
-  | "xs"
-  | "s"
-  | "m"
-  | "l"
-  | "xl"
-  | "2-xl";
+export type SpacingSize = "none" | "2-xs" | "xs" | "s" | "m" | "l" | "xl" | "2-xl";
 
 // TODO should allow for switching to smaller gap on mobile (scale down)
 export const Flex = styled.div<{
@@ -59,28 +46,19 @@ export const Flex = styled.div<{
   $gap?: SpacingSize;
   $marginTop?: SpacingSize;
   $marginBottom?: SpacingSize;
-  $justifyContent?:
-    | "center"
-    | "flex-start"
-    | "flex-end"
-    | "space-between"
-    | "space-around"
-    | "space-evenly";
+  $justifyContent?: "center" | "flex-start" | "flex-end" | "space-between" | "space-around" | "space-evenly";
   $alignItems?: "center" | "flex-start" | "flex-end" | "baseline" | "stretch";
   $wrap?: "wrap" | "nowrap";
   $width?: "full" | "auto";
 }>`
   display: flex;
   flex-wrap: ${({ $wrap }) => $wrap ?? "nowrap"};
-  gap: ${({ $gap }) =>
-    $gap != null ? `var(--spacing-${$gap})` : "var(--spacing-m)"};
+  gap: ${({ $gap }) => ($gap != null ? `var(--spacing-${$gap})` : "var(--spacing-m)")};
   flex-direction: ${({ $direction }) => $direction ?? "column"};
   justify-content: ${({ $justifyContent }) => $justifyContent ?? "initial"};
   align-items: ${({ $alignItems }) => $alignItems ?? "initial"};
-  margin-top: ${({ $marginTop }) =>
-    $marginTop ? `var(--spacing-${$marginTop})` : "0"};
-  margin-bottom: ${({ $marginBottom }) =>
-    $marginBottom ? `var(--spacing-${$marginBottom})` : "0"};
+  margin-top: ${({ $marginTop }) => ($marginTop ? `var(--spacing-${$marginTop})` : "0")};
+  margin-bottom: ${({ $marginBottom }) => ($marginBottom ? `var(--spacing-${$marginBottom})` : "0")};
   width: ${({ $width }) => ($width === "full" ? "100%" : "auto")};
 `;
 
@@ -90,13 +68,7 @@ export const Flex = styled.div<{
 // three buttons need a 1, 1/2, 1/2 layout on mobile (100% width total, two rows)
 // four buttons need 1/2, 1/2, 1/2, 1/2 layout on mobile (100% width total, two rows)
 export const ButtonContainer = styled.div<{
-  $justifyContent?:
-    | "center"
-    | "flex-start"
-    | "flex-end"
-    | "space-between"
-    | "space-around"
-    | "space-evenly";
+  $justifyContent?: "center" | "flex-start" | "flex-end" | "space-between" | "space-around" | "space-evenly";
   $marginTop?: SpacingSize;
   $marginBottom?: SpacingSize;
 }>`
@@ -104,8 +76,7 @@ export const ButtonContainer = styled.div<{
   flex-wrap: wrap;
   gap: var(--spacing-2-xs);
   width: 100%;
-  margin-bottom: ${({ $marginBottom }) =>
-    `var(--spacing-${$marginBottom ?? "none"})`};
+  margin-bottom: ${({ $marginBottom }) => `var(--spacing-${$marginBottom ?? "none"})`};
   margin-top: ${({ $marginTop }) => `var(--spacing-${$marginTop ?? "none"})`};
   justify-content: ${({ $justifyContent }) => $justifyContent ?? "flex-end"};
 

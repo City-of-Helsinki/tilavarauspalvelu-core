@@ -60,17 +60,11 @@ export const EVENT_STYLE_RESERVATION_FRAGMENT = gql`
   }
 `;
 
-type CurrentReservationType = Pick<
-  EventStyleReservationFieldsFragment,
-  "pk" | "recurringReservation"
->;
+type CurrentReservationType = Pick<EventStyleReservationFieldsFragment, "pk" | "recurringReservation">;
 
 // TODO combine with the eventStyleGetter in my-units/eventStyleGetter.ts
 const eventStyleGetter =
-  (
-    currentReservation: CurrentReservationType,
-    selectedReservation: EventType | undefined
-  ) =>
+  (currentReservation: CurrentReservationType, selectedReservation: EventType | undefined) =>
   ({
     event,
   }: CalendarEventType): {
@@ -79,12 +73,10 @@ const eventStyleGetter =
   } => {
     const isPartOfRecurrance =
       currentReservation?.recurringReservation?.pk != null &&
-      currentReservation?.recurringReservation.pk ===
-        event?.recurringReservation?.pk;
+      currentReservation?.recurringReservation.pk === event?.recurringReservation?.pk;
 
     const isConfirmed = event?.state === ReservationStateChoice.Confirmed;
-    const isWaitingForPayment =
-      event?.state === ReservationStateChoice.WaitingForPayment;
+    const isWaitingForPayment = event?.state === ReservationStateChoice.WaitingForPayment;
 
     const isClosed = event?.type === ReservationTypeChoice.Blocked;
     const isStaff = event?.type === ReservationTypeChoice.Staff;

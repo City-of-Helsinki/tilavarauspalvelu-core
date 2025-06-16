@@ -12,12 +12,7 @@ export function CustomNumberInput({
   min,
   required,
 }: {
-  name:
-    | "maxPersons"
-    | "minPersons"
-    | "surfaceArea"
-    | "reservationsMinDaysBefore"
-    | "maxReservationsPerUser";
+  name: "maxPersons" | "minPersons" | "surfaceArea" | "reservationsMinDaysBefore" | "maxReservationsPerUser";
   form: UseFormReturn<ReservationUnitEditFormValues>;
   max?: number;
   min?: number;

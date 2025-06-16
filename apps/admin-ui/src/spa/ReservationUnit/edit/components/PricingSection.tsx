@@ -77,8 +77,7 @@ function PaidPricingPart({
 
   const pricing = watch(`pricings.${index}`);
   const taxPercentagePk = watch(`pricings.${index}.taxPercentage`);
-  const taxPercentage =
-    taxPercentageOptions.find((x) => x.pk === taxPercentagePk)?.value ?? 0;
+  const taxPercentage = taxPercentageOptions.find((x) => x.pk === taxPercentagePk)?.value ?? 0;
 
   // TODO mobile number keyboard?
   return (
@@ -91,10 +90,7 @@ function PaidPricingPart({
         required
         options={unitPriceOptions}
         tooltip={t("ReservationUnitEditor.tooltip.priceUnit")}
-        error={getTranslatedError(
-          t,
-          errors.pricings?.[index]?.priceUnit?.message
-        )}
+        error={getTranslatedError(t, errors.pricings?.[index]?.priceUnit?.message)}
       />
       <ControlledSelect
         name={`pricings.${index}.taxPercentage`}
@@ -108,8 +104,7 @@ function PaidPricingPart({
         afterChange={(val) => {
           const low = pricing.lowestPrice;
           const high = pricing.highestPrice;
-          const tax =
-            taxPercentageOptions.find((x) => x.pk === val)?.value ?? 0;
+          const tax = taxPercentageOptions.find((x) => x.pk === val)?.value ?? 0;
           if (!Number.isNaN(low)) {
             const lowNet = removeTax(low, tax);
             setValue(`pricings.${index}.lowestPriceNet`, lowNet);
@@ -119,10 +114,7 @@ function PaidPricingPart({
             setValue(`pricings.${index}.highestPriceNet`, highNet);
           }
         }}
-        error={getTranslatedError(
-          t,
-          errors.pricings?.[index]?.taxPercentage?.message
-        )}
+        error={getTranslatedError(t, errors.pricings?.[index]?.taxPercentage?.message)}
       />
       <ControlledNumberInput
         name={`pricings.${index}.lowestPriceNet`}
@@ -130,18 +122,12 @@ function PaidPricingPart({
         control={control}
         afterChange={(value) => {
           if (value != null) {
-            setValue(
-              `pricings.${index}.lowestPrice`,
-              addTax(value, taxPercentage)
-            );
+            setValue(`pricings.${index}.lowestPrice`, addTax(value, taxPercentage));
           }
         }}
         label={t("ReservationUnitEditor.label.lowestPriceNet")}
         min={0}
-        errorText={getTranslatedError(
-          t,
-          errors.pricings?.[index]?.lowestPriceNet?.message
-        )}
+        errorText={getTranslatedError(t, errors.pricings?.[index]?.lowestPriceNet?.message)}
       />
       <ControlledNumberInput
         required
@@ -149,19 +135,13 @@ function PaidPricingPart({
         control={control}
         afterChange={(value) => {
           if (value != null) {
-            setValue(
-              `pricings.${index}.lowestPriceNet`,
-              removeTax(value, taxPercentage)
-            );
+            setValue(`pricings.${index}.lowestPriceNet`, removeTax(value, taxPercentage));
           }
         }}
         label={t("ReservationUnitEditor.label.lowestPrice")}
         tooltipText={t("ReservationUnitEditor.tooltip.lowestPrice")}
         min={0}
-        errorText={getTranslatedError(
-          t,
-          errors.pricings?.[index]?.lowestPrice?.message
-        )}
+        errorText={getTranslatedError(t, errors.pricings?.[index]?.lowestPrice?.message)}
       />
       <ControlledNumberInput
         name={`pricings.${index}.highestPriceNet`}
@@ -169,18 +149,12 @@ function PaidPricingPart({
         control={control}
         afterChange={(value) => {
           if (value != null) {
-            setValue(
-              `pricings.${index}.highestPrice`,
-              addTax(value, taxPercentage)
-            );
+            setValue(`pricings.${index}.highestPrice`, addTax(value, taxPercentage));
           }
         }}
         label={t("ReservationUnitEditor.label.highestPriceNet")}
         min={0}
-        errorText={getTranslatedError(
-          t,
-          errors.pricings?.[index]?.highestPriceNet?.message
-        )}
+        errorText={getTranslatedError(t, errors.pricings?.[index]?.highestPriceNet?.message)}
       />
       <ControlledNumberInput
         name={`pricings.${index}.highestPrice`}
@@ -188,19 +162,13 @@ function PaidPricingPart({
         control={control}
         afterChange={(value) => {
           if (value != null) {
-            setValue(
-              `pricings.${index}.highestPriceNet`,
-              removeTax(value, taxPercentage)
-            );
+            setValue(`pricings.${index}.highestPriceNet`, removeTax(value, taxPercentage));
           }
         }}
         label={t("ReservationUnitEditor.label.highestPrice")}
         tooltipText={t("ReservationUnitEditor.tooltip.highestPrice")}
         min={0}
-        errorText={getTranslatedError(
-          t,
-          errors.pricings?.[index]?.highestPrice?.message
-        )}
+        errorText={getTranslatedError(t, errors.pricings?.[index]?.highestPrice?.message)}
       />
       <ControlledSelect
         // This is not pricing type specific
@@ -210,20 +178,13 @@ function PaidPricingPart({
         options={paymentTypeOptions}
         label={t("ReservationUnitEditor.label.paymentTypes")}
         tooltip={t("ReservationUnitEditor.tooltip.paymentTypes")}
-        error={getTranslatedError(
-          t,
-          errors.pricings?.[index]?.paymentType?.message
-        )}
+        error={getTranslatedError(t, errors.pricings?.[index]?.paymentType?.message)}
       />
     </>
   );
 }
 
-export function PricingTypeView({
-  pk,
-  form,
-  taxPercentageOptions,
-}: Props): JSX.Element | null {
+export function PricingTypeView({ pk, form, taxPercentageOptions }: Props): JSX.Element | null {
   const { t } = useTranslation();
 
   const { control, formState, watch } = form;
@@ -248,10 +209,7 @@ export function PricingTypeView({
           label={t("ReservationUnitEditor.label.begins")}
           minDate={addDays(new Date(), 1)}
           disableConfirmation
-          error={getTranslatedError(
-            t,
-            errors.pricings?.[index]?.begins?.message
-          )}
+          error={getTranslatedError(t, errors.pricings?.[index]?.begins?.message)}
         />
       )}
       <Controller
@@ -285,13 +243,7 @@ export function PricingTypeView({
           <span>{getTranslatedError(t, errors.pricings.message)}</span>
         </Error>
       )}
-      {isPaid && (
-        <PaidPricingPart
-          form={form}
-          index={index}
-          taxPercentageOptions={taxPercentageOptions}
-        />
-      )}
+      {isPaid && <PaidPricingPart form={form} index={index} taxPercentageOptions={taxPercentageOptions} />}
     </AutoGrid>
   );
 }
@@ -314,11 +266,7 @@ function PricingControl({
       tooltip={t("ReservationUnitEditor.tooltip.pricingType")}
       style={{ gridColumn: "1 / -1" }}
     >
-      <PricingTypeView
-        pk={pricing.pk}
-        form={form}
-        taxPercentageOptions={taxPercentageOptions}
-      />
+      <PricingTypeView pk={pricing.pk} form={form} taxPercentageOptions={taxPercentageOptions} />
     </FieldGroup>
   );
 }
@@ -341,10 +289,7 @@ export function PricingSection({
   const hasErrors = errors.pricings != null;
 
   return (
-    <EditAccordion
-      open={hasErrors}
-      heading={t("ReservationUnitEditor.label.pricings")}
-    >
+    <EditAccordion open={hasErrors} heading={t("ReservationUnitEditor.label.pricings")}>
       <AutoGrid>
         {watch("pricings")
           .filter((p) => !p.isFuture)

@@ -1,11 +1,5 @@
 import React, { Fragment } from "react";
-import {
-  Button,
-  ButtonVariant,
-  Checkbox,
-  IconMinus,
-  IconPlus,
-} from "hds-react";
+import { Button, ButtonVariant, Checkbox, IconMinus, IconPlus } from "hds-react";
 import styled, { css } from "styled-components";
 import { Controller, useFieldArray, UseFormReturn } from "react-hook-form";
 import { TimeInput } from "common/src/components/form/TimeInput";
@@ -200,11 +194,7 @@ function SeasonRow({
                     }}
                     disabled={isClosed}
                     label={t("ReservationUnitEditor.label.openingTime")}
-                    error={getTranslatedError(
-                      t,
-                      errors.seasons?.[index]?.reservableTimes?.[i]?.begin
-                        ?.message
-                    )}
+                    error={getTranslatedError(t, errors.seasons?.[index]?.reservableTimes?.[i]?.begin?.message)}
                   />
                 )}
               />
@@ -220,11 +210,7 @@ function SeasonRow({
                     }}
                     disabled={isClosed}
                     label={t("ReservationUnitEditor.label.closingTime")}
-                    error={getTranslatedError(
-                      t,
-                      errors.seasons?.[index]?.reservableTimes?.[i]?.end
-                        ?.message
-                    )}
+                    error={getTranslatedError(t, errors.seasons?.[index]?.reservableTimes?.[i]?.end?.message)}
                   />
                 )}
               />
@@ -280,11 +266,7 @@ const SeasonalInnerWrapper = styled.div`
   }
 `;
 
-export function SeasonalSection({
-  form,
-}: {
-  form: UseFormReturn<ReservationUnitEditFormValues>;
-}): JSX.Element {
+export function SeasonalSection({ form }: { form: UseFormReturn<ReservationUnitEditFormValues> }): JSX.Element {
   const { t } = useTranslation();
   const {
     control,
@@ -310,10 +292,7 @@ export function SeasonalSection({
   };
 
   return (
-    <Accordion
-      open={errors.seasons != null}
-      heading={t("ReservationUnitEditor.seasonalTimesTitle")}
-    >
+    <Accordion open={errors.seasons != null} heading={t("ReservationUnitEditor.seasonalTimesTitle")}>
       <SeasonalInnerWrapper>
         <p>{t("ReservationUnitEditor.seasonalTimesDescription")}</p>
 

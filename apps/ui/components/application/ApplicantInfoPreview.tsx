@@ -1,14 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import {
-  type ApplicantFieldsFragment,
-  ApplicantTypeChoice,
-} from "@gql/gql-types";
-import {
-  ApplicationInfoContainer,
-  InfoItemContainer,
-  InfoItem,
-} from "./styled";
+import { type ApplicantFieldsFragment, ApplicantTypeChoice } from "@gql/gql-types";
+import { ApplicationInfoContainer, InfoItemContainer, InfoItem } from "./styled";
 
 const LabelValue = ({
   label,
@@ -29,16 +22,9 @@ const LabelValue = ({
   );
 };
 
-type ApplicantT = Omit<
-  ApplicantFieldsFragment,
-  "homeCity" | "additionalInformation"
->;
+type ApplicantT = Omit<ApplicantFieldsFragment, "homeCity" | "additionalInformation">;
 
-export function ApplicantInfoPreview({
-  application,
-}: {
-  application: ApplicantT;
-}): JSX.Element {
+export function ApplicantInfoPreview({ application }: { application: ApplicantT }): JSX.Element {
   const { t } = useTranslation();
   const applicant = {
     name: `${application.contactPerson?.firstName} ${application.contactPerson?.lastName}`,
@@ -58,10 +44,7 @@ export function ApplicantInfoPreview({
         <div style={{ gridColumn: "1 / -1" }}>ERROR: applicantType is null</div>
       ) : application.applicantType !== ApplicantTypeChoice.Individual ? (
         <>
-          <LabelValue
-            label={t("application:preview.organisation.name")}
-            value={application.organisation?.nameFi}
-          />
+          <LabelValue label={t("application:preview.organisation.name")} value={application.organisation?.nameFi} />
           <LabelValue
             label={t("application:preview.organisation.coreBusiness")}
             value={application.organisation?.coreBusinessFi}
@@ -72,20 +55,9 @@ export function ApplicantInfoPreview({
           />
         </>
       ) : null}
-      <LabelValue
-        label={t("application:preview.contactPerson")}
-        value={applicant.name}
-      />
-      <LabelValue
-        label={t("application:preview.contactInfo")}
-        value={applicant.contact}
-      />
-      {applicant.address && (
-        <LabelValue
-          label={t("application:preview.address")}
-          value={applicant.address}
-        />
-      )}
+      <LabelValue label={t("application:preview.contactPerson")} value={applicant.name} />
+      <LabelValue label={t("application:preview.contactInfo")} value={applicant.contact} />
+      {applicant.address && <LabelValue label={t("application:preview.address")} value={applicant.address} />}
       {applicant.billingAddress && (
         <LabelValue
           label={t("application:preview.organisation.billingAddress")}

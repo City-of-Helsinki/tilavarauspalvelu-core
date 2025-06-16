@@ -7,15 +7,7 @@ const RangeContrainer = styled.div`
   text-align: center;
 `;
 
-export function RangeNumberFilter({
-  label,
-  minName,
-  maxName,
-}: {
-  label: string;
-  minName: string;
-  maxName: string;
-}) {
+export function RangeNumberFilter({ label, minName, maxName }: { label: string; minName: string; maxName: string }) {
   // TODO add a proper label to it (don't use div, and hide it for screen readers)
   // TODO hide the actual input label (using sr-only or height 0)
   return (
