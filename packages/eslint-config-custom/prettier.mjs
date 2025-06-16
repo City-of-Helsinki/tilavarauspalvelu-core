@@ -2,4 +2,5 @@
 export default {
   singleQuote: false,
   trailingComma: "es5",
+  printWidth: 120,
 };
