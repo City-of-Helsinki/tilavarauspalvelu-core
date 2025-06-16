@@ -50,7 +50,7 @@
     "react-hook-form": "7.54.2",
     "react-i18next": "^15.5.3",
     "react-quill": "2.0.0",
-    "react-router-dom": "^6.23.1",
+    "react-router-dom": "^7.6.2",
     "react-use": "^17.6.0",
     "reactjs-popup": "^2.0.6",
     "styled-components": "6.1.18",
