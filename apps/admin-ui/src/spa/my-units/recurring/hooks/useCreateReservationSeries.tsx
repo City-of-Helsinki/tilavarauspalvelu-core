@@ -6,13 +6,13 @@ import {
   useCreateReservationSeriesMutation,
   type ReservationSeriesReservationCreateSerializerInput,
 } from "@gql/gql-types";
-import type { RecurringReservationForm, ReservationFormMeta } from "@/schemas";
+import type { ReservationSeriesForm, ReservationFormMeta } from "@/schemas";
 import { fromUIDateUnsafe, toApiDateUnsafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
 import { useSession } from "@/hooks/auth";
 import { transformReserveeType } from "common/src/conversion";
 
-// Not all choices are valid for recurring reservations (the ui should not allow these)
+// Not all choices are valid for reservation series (the ui should not allow these)
 function transformReservationTypeStaffChoice(t: ReservationTypeChoice): ReservationTypeStaffChoice {
   switch (t) {
     case ReservationTypeChoice.Staff:
@@ -34,7 +34,7 @@ export const CREATE_RESERVATION_SERIES = gql`
   }
 `;
 
-export function useCreateRecurringReservation() {
+export function useCreateReservationSeries() {
   const [create] = useCreateReservationSeriesMutation();
 
   const createReservationSeries = (input: ReservationSeriesCreateMutationInput) => create({ variables: { input } });
@@ -44,7 +44,7 @@ export function useCreateRecurringReservation() {
   // NOTE unsafe
   const mutate = async (props: {
     // FIXME this type is incorrect, it should include the reservation meta fields
-    data: RecurringReservationForm & ReservationFormMeta;
+    data: ReservationSeriesForm & ReservationFormMeta;
     skipDates: Date[];
     reservationUnitPk: number;
     // metaFields: ReservationMetadataFieldNode[];

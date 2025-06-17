@@ -151,7 +151,7 @@ export const RESERVATION_META_FRAGMENT = gql`
 `;
 
 export const RECURRING_RESERVATION_FRAGMENT = gql`
-  fragment RecurringReservationFields on RecurringReservationNode {
+  fragment ReservationSeriesFields on ReservationSeriesNode {
     id
     pk
     weekdays

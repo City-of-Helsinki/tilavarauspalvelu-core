@@ -132,7 +132,7 @@ function getStatus(x: NewReservationListItem) {
 
 function StatusElement({ item }: { item: NewReservationListItem }) {
   const { t } = useTranslation("translation", {
-    keyPrefix: "MyUnits.RecurringReservation.Confirmation",
+    keyPrefix: "MyUnits.ReservationSeries.Confirmation",
   });
 
   const status = getStatus(item);
@@ -184,7 +184,7 @@ function AddNewReservationButton({ reservationToCopy, refetch }: AddNewReservati
 
   return (
     <Button size={ButtonSize.Small} variant={ButtonVariant.Secondary} disabled={!hasPermission} onClick={handleClick}>
-      {t("MyUnits.RecurringReservation.addNewReservation")}
+      {t("MyUnits.ReservationSeries.addNewReservation")}
     </Button>
   );
 }
@@ -203,7 +203,7 @@ type Props = {
 };
 type ExtendedProps = AddNewReservationButtonProps & Props;
 
-/// Used by the RecurringReservation pages to show a list of reservations
+/// Used by the ReservationSeries pages to show a list of reservations
 // TODO should be renamed / moved to signify that this is only for recurring reservations
 export function ReservationList(props: Props | ExtendedProps) {
   const { header, items, hasPadding, isTall } = props;

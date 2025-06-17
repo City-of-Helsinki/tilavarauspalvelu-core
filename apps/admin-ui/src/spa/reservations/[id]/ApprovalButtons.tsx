@@ -21,7 +21,7 @@ export const APPROVAL_BUTTONS_FRAGMENT = gql`
     state
     ...DenyDialogFields
     ...ApprovalDialogFields
-    recurringReservation {
+    reservationSeries {
       id
       pk
     }
@@ -89,7 +89,7 @@ function ApprovalButtons({ isFree, reservation, handleClose, handleAccept, disab
   } as const;
 
   /* For now editing recurring is disabled (not implemented) */
-  const isAllowedToModify = !reservation.recurringReservation && isPossibleToEdit(state, endTime);
+  const isAllowedToModify = !reservation.reservationSeries && isPossibleToEdit(state, endTime);
 
   return (
     <>

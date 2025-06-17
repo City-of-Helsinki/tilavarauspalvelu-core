@@ -201,7 +201,7 @@ const translations: ITranslations = {
     // TODO describe what failed if you don't know why it failed
     functionFailedTitle: ["Toiminto epäonnistui"],
     unexpectedError: ["Odottamaton virhe"],
-    errorRecurringReservationsDoneDisplay: ["Virhe. Varaus tehty, mutta sen näyttäminen epäonnistui."],
+    errorReservationSeriesDoneDisplay: ["Virhe. Varaus tehty, mutta sen näyttäminen epäonnistui."],
     noPermission: ["Sinulla ei ole käyttöoikeutta."],
     timeCollision: ["Valitsemasi aika ei ole enää vapaana. Ole hyvä ja valitse uusi aika."],
   },
@@ -275,8 +275,6 @@ const translations: ITranslations = {
     reservations: ["Varaukset"],
     requestedReservations: ["Varaustoiveet"],
     allReservations: ["Kaikki varaukset"],
-    recurringReservations: ["Kausivaraaminen"],
-    applicatioNROunds: ["Hakukierrokset"],
     clients: ["Asiakkaat"],
     archive: ["Arkisto"],
     premisesAndSettings: ["Tilat ja asetukset"],
@@ -313,7 +311,7 @@ const translations: ITranslations = {
       },
       header: {
         createReservation: ["Tee varaus"],
-        recurringReservation: ["Tee toistuva varaus"],
+        reservationSeries: ["Tee toistuva varaus"],
       },
       legend: {
         confirmed: ["Hyväksytty varaus"],
@@ -327,7 +325,7 @@ const translations: ITranslations = {
         reservationUnitDraft: ["Varausyksikkö luonnostilassa"],
       },
     },
-    RecurringReservation: {
+    ReservationSeries: {
       error: {
         invalidUnitId: ["Virheellinen yksikön numero."],
         notPossibleForThisUnit: ["Tälle yksikölle ei ole mahdollista tehdä toistuvaa varausta."],
@@ -365,7 +363,7 @@ const translations: ITranslations = {
     ReservationForm: {
       showReserver: ["Näytä varaajan tiedot ja ehdot"],
     },
-    RecurringReservationForm: {
+    ReservationSeriesForm: {
       // these are unique form elements only for this form
       reservationUnit: ["Varausyksikkö"],
       repeatPattern: ["Varauksen toisto"],
@@ -1568,7 +1566,7 @@ const translations: ITranslations = {
     removeConfirmationCancel: ["Kumoa"],
     removeSuccess: ["Resurssi poistettu."],
   },
-  RecurringReservationsView: {
+  ReservationSeriesView: {
     Heading: ["Ajankohta"],
   },
   Payment: {

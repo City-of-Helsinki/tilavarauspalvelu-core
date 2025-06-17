@@ -70,7 +70,7 @@ export function useFilteredReservationList({
   startTime,
   endTime,
   reservationType,
-  existingRecurringPk,
+  existingReservationSeriesPk,
 }: {
   items: NewReservationListItem[];
   reservationUnitPk?: number;
@@ -79,7 +79,7 @@ export function useFilteredReservationList({
   startTime: string;
   endTime: string;
   reservationType: ReservationTypeChoice;
-  existingRecurringPk?: Maybe<number>;
+  existingReservationSeriesPk?: Maybe<number>;
 }) {
   const { reservations, refetch } = useReservationsInInterval({
     reservationUnitPk,
@@ -109,7 +109,7 @@ export function useFilteredReservationList({
 
     return items.map((x) =>
       reservations.find((y) => {
-        if (existingRecurringPk != null && y.recurringReservationPk === existingRecurringPk) {
+        if (existingReservationSeriesPk != null && y.reservationSeriesPk === existingReservationSeriesPk) {
           return false;
         }
         return isReservationInsideRange(x, y);
@@ -117,7 +117,7 @@ export function useFilteredReservationList({
         ? { ...x, isOverlapping: true }
         : x
     );
-  }, [items, reservations, startTime, endTime, existingRecurringPk]);
+  }, [items, reservations, startTime, endTime, existingReservationSeriesPk]);
 
   return { reservations: data, refetch };
 }

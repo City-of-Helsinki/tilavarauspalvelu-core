@@ -53,10 +53,10 @@ function timeSlotMapper(t: TFunction, slot: AllocatedSectionsTableElementFragmen
   const name = slot.reservationUnitOption.applicationSection.name;
 
   const applicationPk = application.pk ?? 0;
-  const reservationPk = slot.recurringReservation?.reservations[0]?.pk ?? null;
+  const reservationPk = slot.reservationSeries?.reservations[0]?.pk ?? null;
   const link = getReservationUrl(reservationPk);
   const accessCodeActiveAlert =
-    slot.recurringReservation?.shouldHaveActiveAccessCode && !slot.recurringReservation?.isAccessCodeIsActiveCorrect
+    slot.reservationSeries?.shouldHaveActiveAccessCode && !slot.reservationSeries?.isAccessCodeIsActiveCorrect
       ? t("accessType.accessCodeState.ACCESS_CODE_PENDING")
       : "";
   return {
@@ -185,7 +185,7 @@ export const ALLOCATED_SECTIONS_TABLE_ELEMENT_FRAGMENT = gql`
     dayOfTheWeek
     endTime
     beginTime
-    recurringReservation {
+    reservationSeries {
       id
       pk
       shouldHaveActiveAccessCode

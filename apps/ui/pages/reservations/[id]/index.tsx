@@ -11,9 +11,9 @@ import {
   type ReservationPageQuery,
   type ReservationPageQueryVariables,
   ReservationPageDocument,
-  type ApplicationRecurringReservationQuery,
-  type ApplicationRecurringReservationQueryVariables,
-  ApplicationRecurringReservationDocument,
+  type ApplicationReservationSeriesQuery,
+  type ApplicationReservationSeriesQueryVariables,
+  ApplicationReservationSeriesDocument,
   OrderStatus,
   useAccessCodeQuery,
   AccessType,
@@ -376,18 +376,17 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
     const { reservation } = data ?? {};
 
-    if (reservation?.recurringReservation != null) {
-      const recurringId = reservation.recurringReservation.id;
+    if (reservation?.reservationSeries != null) {
+      const recurringId = reservation.reservationSeries.id;
       const { data: recurringData } = await apolloClient.query<
-        ApplicationRecurringReservationQuery,
-        ApplicationRecurringReservationQueryVariables
+        ApplicationReservationSeriesQuery,
+        ApplicationReservationSeriesQueryVariables
       >({
-        query: ApplicationRecurringReservationDocument,
+        query: ApplicationReservationSeriesDocument,
         variables: { id: recurringId },
       });
       const applicationPk =
-        recurringData?.recurringReservation?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application
-          ?.pk;
+        recurringData?.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
       return {
         redirect: {
           permanent: true,
@@ -418,9 +417,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 export default Reservation;
 
-export const GET_APPLICATION_RECURRING_RESERVATION_QUERY = gql`
-  query ApplicationRecurringReservation($id: ID!) {
-    recurringReservation(id: $id) {
+export const GET_APPLICATION_RESERVATION_SERIES_QUERY = gql`
+  query ApplicationReservationSeries($id: ID!) {
+    reservationSeries(id: $id) {
       id
       allocatedTimeSlot {
         id
@@ -456,7 +455,7 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
         receiptUrl
         handledPaymentDueBy
       }
-      recurringReservation {
+      reservationSeries {
         id
       }
       reservationUnits {

@@ -7,6 +7,7 @@
     "Expected number, received null": "Pakollinen",
     "noReservationUnits": "Lisää hakemukselle yksi tai useampi tila",
     "End date must be after begin date": "Päättymispäivän pitää olla aloituspäivän jälkeen",
+    "Begin date must be before end date": "Aloituspäivän pitää olla ennen päättymispäivää",
     "Expected number, received nan": "Pitää olla numero",
     "Number must be greater than or equal to 1": "Pitää olla vähintään 1",
     "Number must be less than or equal to 7": "Pitää olla enintään 7",

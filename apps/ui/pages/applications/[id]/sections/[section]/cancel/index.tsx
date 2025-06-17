@@ -150,7 +150,7 @@ function getNReservations(applicationSection: Readonly<ApplicationSectionCancelQ
   const opts = applicationSection?.reservationUnitOptions;
   const allocatedSlots = opts?.flatMap((option) => option.allocatedTimeSlots);
   const reservations = allocatedSlots?.flatMap((slot) =>
-    slot?.recurringReservation?.reservations.filter(isReservationCancellable)
+    slot?.reservationSeries?.reservations.filter(isReservationCancellable)
   );
   return reservations?.length ?? 0;
 }
@@ -167,7 +167,7 @@ function ApplicationSectionInfoCard({
 }: {
   applicationSection: ApplicationSectionCancelQuery["applicationSection"];
 }) {
-  // NOTE assumes that the name of the recurringReservation is copied from applicationSection when it's created
+  // NOTE assumes that the name of the reservationSeries is copied from applicationSection when it's created
   const name = applicationSection?.name;
   const opts = applicationSection?.reservationUnitOptions;
   const reservationUnits = filterNonNullable(opts?.flatMap((option) => option?.reservationUnit));
@@ -297,7 +297,7 @@ export const APPLICATION_SECTION_CANCEL_QUERY = gql`
           dayOfTheWeek
           beginTime
           endTime
-          recurringReservation {
+          reservationSeries {
             id
             reservations {
               id

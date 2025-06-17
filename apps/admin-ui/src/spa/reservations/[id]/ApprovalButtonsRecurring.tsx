@@ -1,15 +1,15 @@
 import React, { useRef } from "react";
-import { type RecurringReservationNode } from "@gql/gql-types";
+import { type ReservationSeriesNode } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { DenyDialogSeries } from "@/component/DenyDialog";
 import { useModal } from "@/context/ModalContext";
-import { useRecurringReservations } from "@/hooks";
+import { useReservationSeries } from "@/hooks";
 import { isPossibleToDeny } from "@/modules/reservationModificationRules";
 
 type Props = {
-  recurringReservation: Pick<RecurringReservationNode, "pk">;
+  reservationSeries: Pick<ReservationSeriesNode, "pk">;
   handleClose: () => void;
   // TODO weird name for the after deny callback
   handleAccept: () => void;
@@ -18,7 +18,7 @@ type Props = {
 
 // NOTE some copy paste from ApprovalButtons
 export function ApprovalButtonsRecurring({
-  recurringReservation,
+  reservationSeries,
   handleClose,
   handleAccept,
   disableNonEssentialButtons,
@@ -28,7 +28,7 @@ export function ApprovalButtonsRecurring({
   const { t } = useTranslation();
 
   // check if there are any reservations that can be deleted
-  const { loading, reservations, refetch } = useRecurringReservations(recurringReservation.pk ?? undefined);
+  const { loading, reservations, refetch } = useReservationSeries(reservationSeries.pk ?? undefined);
 
   const handleReject = () => {
     refetch();
@@ -47,7 +47,7 @@ export function ApprovalButtonsRecurring({
     setModalContent(
       <DenyDialogSeries
         initialHandlingDetails={reservation.handlingDetails ?? ""}
-        recurringReservation={recurringReservation}
+        reservationSeries={reservationSeries}
         onReject={handleReject}
         onClose={handleClose}
         title={t("ApprovalButtons.recurring.DenyDialog.title")}

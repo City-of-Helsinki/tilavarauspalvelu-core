@@ -27,7 +27,7 @@ const timeSelectionSchemaBase = z.object({
 });
 
 export type TimeSelectionForm = z.infer<typeof timeSelectionSchemaBase>;
-const RecurringReservationFormSchema = z
+const ReservationSeriesFormSchema = z
   .object({
     type: ReservationTypeSchema,
     seriesName: z.string().optional(),
@@ -41,8 +41,8 @@ const convertToDate = (date?: string): Date | null => (date ? fromUIDate(date) :
 
 const dateIsBefore = (date: Date | null, other: Date | null) => date && other && date.getTime() < other.getTime();
 
-const RecurringReservationFormSchemaRefined = (interval: ReservationStartInterval) =>
-  RecurringReservationFormSchema
+const ReservationSeriesFormSchemaRefined = (interval: ReservationStartInterval) =>
+  ReservationSeriesFormSchema
     // need passthrough otherwise zod will strip the metafields
     .passthrough()
     // this refine works without partial since it's the last required value
@@ -65,9 +65,9 @@ const RecurringReservationFormSchemaRefined = (interval: ReservationStartInterva
     .superRefine((val, ctx) => checkReservationInterval(val.endTime, ctx, "endTime", 15))
     .superRefine((val, ctx) => checkStartEndTime(val, ctx));
 
-export { RecurringReservationFormSchemaRefined as RecurringReservationFormSchema };
+export { ReservationSeriesFormSchemaRefined as ReservationSeriesFormSchema };
 
-export type RecurringReservationForm = z.infer<typeof RecurringReservationFormSchema>;
+export type ReservationSeriesForm = z.infer<typeof ReservationSeriesFormSchema>;
 
 const RescheduleReservationSeriesFormSchema = z
   .object({
@@ -80,7 +80,7 @@ const RescheduleReservationSeriesFormSchema = z
 
 export type RescheduleReservationSeriesForm = z.infer<typeof RescheduleReservationSeriesFormSchema>;
 
-// Copy paste from RecurringReservationFormSchemaRefined
+// Copy paste from ReservationSeriesFormSchemaRefined
 // TODO schema refinements should be looked over and refactored so they can be reused easily
 // TODO neither of them validates the end date =< 2 years from now (causes a backend error, that is toasted to the user)
 const RescheduleReservationSeriesFormSchemaRefined = (interval: ReservationStartInterval) =>

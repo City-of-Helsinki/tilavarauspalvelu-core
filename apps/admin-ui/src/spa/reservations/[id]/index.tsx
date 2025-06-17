@@ -57,9 +57,9 @@ function ApprovalButtonsWithPermChecks({
 
   return (
     <VisibleIfPermission reservation={reservation} permission={UserPermissionChoice.CanManageReservations}>
-      {reservation.recurringReservation ? (
+      {reservation.reservationSeries ? (
         <ApprovalButtonsRecurring
-          recurringReservation={reservation.recurringReservation}
+          reservationSeries={reservation.reservationSeries}
           handleClose={closeDialog}
           handleAccept={() => {
             onReservationUpdated();
@@ -379,7 +379,7 @@ export const RESERVATION_PAGE_QUERY = gql`
       ...TimeBlockSection
       ...ReservationTitleSectionFields
       ...ReservationKeylessEntry
-      recurringReservation {
+      reservationSeries {
         id
         pk
         beginDate

@@ -21,7 +21,7 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 function getBreadcrumbs(t: TFunction, reservation: PropsNarrowed["reservation"]) {
   const applicationPk =
-    reservation?.recurringReservation?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
+    reservation?.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
   if (applicationPk) {
     return [
       {
@@ -129,7 +129,7 @@ export const RESERVATION_CANCEL_PAGE_QUERY = gql`
           ...TermsOfUseTextFields
         }
       }
-      recurringReservation {
+      reservationSeries {
         id
         name
         allocatedTimeSlot {

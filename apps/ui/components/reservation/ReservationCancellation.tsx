@@ -93,7 +93,7 @@ export function ReservationCancellation(props: CancellationProps): JSX.Element {
         <p>{ingress}</p>
         <p>{infoBody}</p>
       </div>
-      {reservation.recurringReservation ? (
+      {reservation.reservationSeries ? (
         <ApplicationInfoCard reservation={reservation} />
       ) : (
         <StyledReservationInfoCard reservation={reservation} />
@@ -114,8 +114,8 @@ const ApplicationInfo = styled(Card)`
 `;
 
 function ApplicationInfoCard({ reservation }: { reservation: CancellationProps["reservation"] }) {
-  // NOTE assumes that the name of the recurringReservation is copied from applicationSection when it's created
-  const name = reservation.recurringReservation?.name;
+  // NOTE assumes that the name of the reservationSeries is copied from applicationSection when it's created
+  const name = reservation.reservationSeries?.name;
   const reservationUnit = reservation.reservationUnits.find(() => true);
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
@@ -143,17 +143,17 @@ function ApplicationInfoCard({ reservation }: { reservation: CancellationProps["
   return <ApplicationInfo heading={name ?? ""} text={text} variant="vertical" infos={icons} />;
 }
 
-function isPartOfApplication(reservation: Pick<NonNullable<NodeT>, "recurringReservation">): boolean {
-  return reservation?.recurringReservation != null;
+function isPartOfApplication(reservation: Pick<NonNullable<NodeT>, "reservationSeries">): boolean {
+  return reservation?.reservationSeries != null;
 }
 
-function getBackPath(reservation: Pick<NonNullable<NodeT>, "recurringReservation" | "pk">): string {
+function getBackPath(reservation: Pick<NonNullable<NodeT>, "reservationSeries" | "pk">): string {
   if (reservation == null) {
     return "";
   }
   if (isPartOfApplication(reservation)) {
     const applicationPk =
-      reservation.recurringReservation?.allocatedTimeSlot?.reservationUnitOption.applicationSection.application.pk;
+      reservation.reservationSeries?.allocatedTimeSlot?.reservationUnitOption.applicationSection.application.pk;
     return getApplicationPath(applicationPk, "view");
   }
   return getReservationPath(reservation.pk);
@@ -161,12 +161,12 @@ function getBackPath(reservation: Pick<NonNullable<NodeT>, "recurringReservation
 
 /// For applications use application round terms of use
 function getTranslatedTerms(
-  reservation: Pick<NonNullable<NodeT>, "recurringReservation" | "reservationUnits" | "pk">,
+  reservation: Pick<NonNullable<NodeT>, "reservationSeries" | "reservationUnits" | "pk">,
   lang: LocalizationLanguages
 ) {
-  if (reservation.recurringReservation) {
+  if (reservation.reservationSeries) {
     const round =
-      reservation.recurringReservation?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application
+      reservation.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application
         ?.applicationRound;
     const { termsOfUse } = round ?? {};
     if (termsOfUse) {

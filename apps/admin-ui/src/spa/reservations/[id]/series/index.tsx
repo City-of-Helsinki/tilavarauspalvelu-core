@@ -38,7 +38,7 @@ import { useDisplayError } from "common/src/hooks";
 import { generateReservations } from "@/spa/my-units/recurring/generateReservations";
 import Error404 from "@/common/Error404";
 
-type NodeT = NonNullable<SeriesPageQuery["reservation"]>["recurringReservation"];
+type NodeT = NonNullable<SeriesPageQuery["reservation"]>["reservationSeries"];
 
 function convertToForm(value: NodeT): RescheduleReservationSeriesForm {
   // buffer times can be changed individually but the base value is not saved to the recurring series
@@ -79,7 +79,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
     variables: { id: base64encode(`ReservationNode:${pk}`) },
   });
   const { reservation } = data ?? {};
-  const recurringReservation = reservation?.recurringReservation ?? null;
+  const reservationSeries = reservation?.reservationSeries ?? null;
 
   const [mutate] = useRescheduleReservationSeriesMutation();
 
@@ -91,16 +91,16 @@ function SeriesPageInner({ pk }: { pk: number }) {
   const form = useForm<RescheduleReservationSeriesForm>({
     // FIXME there is no validation here (schema is incomplete, need to run the same refinements as in the create form)
     resolver: zodResolver(RescheduleReservationSeriesFormSchema(interval)),
-    values: convertToForm(recurringReservation),
+    values: convertToForm(reservationSeries),
   });
 
   const { control, formState, reset, handleSubmit, watch } = form;
   const { errors } = formState;
   useEffect(() => {
-    if (recurringReservation) {
-      reset(convertToForm(recurringReservation));
+    if (reservationSeries) {
+      reset(convertToForm(reservationSeries));
     }
-  }, [recurringReservation, reset]);
+  }, [reservationSeries, reset]);
   const reservationUnit = reservation?.reservationUnits?.[0] ?? null;
 
   const [removedReservations, setRemovedReservations] = useState<NewReservationListItem[]>([]);
@@ -113,8 +113,8 @@ function SeriesPageInner({ pk }: { pk: number }) {
   // needs to only be run when the query data changes (first fetch is null)
   // can't change when the form values change -> otherwise we overwrite user selection
   useEffect(() => {
-    const compareList = recurringReservation?.reservations.map((x) => new Date(x.begin));
-    const values = convertToForm(recurringReservation);
+    const compareList = reservationSeries?.reservations.map((x) => new Date(x.begin));
+    const values = convertToForm(reservationSeries);
     const vals = {
       startingDate: values.startingDate,
       endingDate: values.endingDate,
@@ -126,7 +126,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
     const result = generateReservations(vals);
     const removed = result.filter((x) => compareList?.find((y) => isSameDay(y, x.date)) == null);
     setRemovedReservations(removed);
-  }, [recurringReservation]);
+  }, [reservationSeries]);
 
   const checkedReservations = useFilteredReservationList({
     items: newReservations,
@@ -136,7 +136,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
     startTime: watch("startTime"),
     endTime: watch("endTime"),
     reservationType: reservation?.type ?? ReservationTypeChoice.Staff,
-    existingRecurringPk: recurringReservation?.pk,
+    existingReservationSeriesPk: reservationSeries?.pk,
   });
 
   const client = useApolloClient();
@@ -164,7 +164,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
       errorToast({ text: t("reservationForm:errors.formNotValid") });
       return;
     }
-    if (recurringReservation?.pk == null) {
+    if (reservationSeries?.pk == null) {
       errorToast({ text: t("reservationForm:errors.formNotValid") });
       return;
     }
@@ -174,7 +174,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
 
     try {
       const input: ReservationSeriesRescheduleMutationInput = {
-        pk: recurringReservation.pk,
+        pk: reservationSeries.pk,
         beginDate: toApiDateUnsafe(fromUIDateUnsafe(values.startingDate)),
         beginTime: values.startTime,
         endDate: toApiDateUnsafe(fromUIDateUnsafe(values.endingDate)),
@@ -195,11 +195,11 @@ function SeriesPageInner({ pk }: { pk: number }) {
       const seriesPk = mutRes.data.rescheduleReservationSeries.pk;
       const res = await client.query<ReservationSeriesQuery, ReservationSeriesQueryVariables>({
         query: ReservationSeriesDocument,
-        variables: { id: base64encode(`RecurringReservationNode:${seriesPk}`) },
+        variables: { id: base64encode(`ReservationSeriesNode:${seriesPk}`) },
         // NOTE disable cache is mandatory, all the old data is invalid here
         fetchPolicy: "no-cache",
       });
-      const d = res.data?.recurringReservation;
+      const d = res.data?.reservationSeries;
       const createdReservations = filterNonNullable(d?.reservations);
       // find the first reservation that is in the future and redirect to it
       const first = createdReservations.find((x) => new Date(x.begin) >= new Date()) ?? createdReservations[0];
@@ -220,7 +220,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
         const count = overlaps.length;
         if (count > 0) {
           checkedReservations.refetch();
-          setLocalError(t("MyUnits.RecurringReservationForm.newOverlapError", { count }));
+          setLocalError(t("MyUnits.ReservationSeriesForm.newOverlapError", { count }));
           document.getElementById("edit-recurring__reservations-list")?.scrollIntoView();
         } else {
           displayError(err);
@@ -236,10 +236,10 @@ function SeriesPageInner({ pk }: { pk: number }) {
   const reservationsCount =
     checkedReservations.reservations.filter((x) => !x.isRemoved).length - removedReservations.length;
 
-  if (loading && !recurringReservation) {
+  if (loading && !reservationSeries) {
     return <CenterSpinner />;
   }
-  if (error || !recurringReservation) {
+  if (error || !reservationSeries) {
     return <Error404 />;
   }
 
@@ -298,7 +298,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
                 control={control}
                 render={({ field: { value, onChange } }) => (
                   <WeekdaysSelector
-                    label={t("MyUnits.RecurringReservationForm.repeatOnDays")}
+                    label={t("MyUnits.ReservationSeriesForm.repeatOnDays")}
                     value={value}
                     onChange={onChange}
                     errorText={translateError(errors.repeatOnDays?.message)}
@@ -310,7 +310,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
             <Element $wide id="edit-recurring__reservations-list" $unlimitedMaxWidth>
               {/* TODO can we refactor this part (the name + count) into the ReservationListEditor */}
               <Strong>
-                {t(`MyUnits.RecurringReservationForm.reservationsList`, {
+                {t(`MyUnits.ReservationSeriesForm.reservationsList`, {
                   count: reservationsCount,
                 })}
               </Strong>
@@ -340,7 +340,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
   );
 }
 
-// TODO can we make RecurringReservation fragment smaller?
+// TODO can we make ReservationSeries fragment smaller?
 // it has paymentOrder and reservationUnit for each reservation (not necessary)
 export const SERIES_PAGE_QUERY = gql`
   query SeriesPage($id: ID!) {
@@ -348,8 +348,8 @@ export const SERIES_PAGE_QUERY = gql`
       id
       pk
       type
-      recurringReservation {
-        ...RecurringReservationFields
+      reservationSeries {
+        ...ReservationSeriesFields
         recurrenceInDays
         endTime
         beginTime
@@ -362,14 +362,6 @@ export const SERIES_PAGE_QUERY = gql`
         bufferTimeAfter
         reservationStartInterval
       }
-    }
-  }
-`;
-
-export const SERIES_QUERY = gql`
-  query ReservationSeries($id: ID!) {
-    recurringReservation(id: $id) {
-      ...RecurringReservationFields
     }
   }
 `;

@@ -89,11 +89,11 @@ export function SearchGuides(): JSX.Element {
         <p>{t("infoRecurring.text")}</p>
         <Flex $marginTop="s">
           <Button
-            id="browseRecurringReservationUnits"
+            id="browseSeriesReservationUnits"
             onClick={() => router.push(seasonalPrefix)}
             iconEnd={<IconArrowRight />}
           >
-            {t("browseRecurringReservationsButton")}
+            {t("browseReservationSeriesButton")}
           </Button>
         </Flex>
       </InfoContainer>
