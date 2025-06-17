@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.exceptions import ValidationError
@@ -15,9 +13,6 @@ from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.typing import StaffReservationAdjustTimeData
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.errors import ExternalServiceError
-
-if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationUnit
 
 
 class StaffReservationAdjustTimeSerializer(NestingModelSerializer):
@@ -35,45 +30,44 @@ class StaffReservationAdjustTimeSerializer(NestingModelSerializer):
         model = Reservation
         fields = [
             "pk",
-            "begin",
-            "end",
+            "begins_at",
+            "ends_at",
             "buffer_time_before",
             "buffer_time_after",
             "state",
         ]
 
     def validate(self, data: StaffReservationAdjustTimeData) -> StaffReservationAdjustTimeData:
-        begin = data["begin"].astimezone(DEFAULT_TIMEZONE)
-        end = data["end"].astimezone(DEFAULT_TIMEZONE)
+        begins_at = data["begins_at"].astimezone(DEFAULT_TIMEZONE)
+        ends_at = data["ends_at"].astimezone(DEFAULT_TIMEZONE)
 
         self.instance.validators.validate_reservation_state_allows_rescheduling()
-        self.instance.validators.validate_single_reservation_unit()
         self.instance.validators.validate_reservation_can_be_modified_by_staff()
 
-        reservation_unit: ReservationUnit = self.instance.reservation_units.first()
+        reservation_unit = self.instance.reservation_unit
 
         if reservation_unit.reservation_block_whole_day:
-            data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
-            data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)
+            data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begins_at)
+            data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(ends_at)
 
-        reservation_unit.validators.validate_begin_before_end(begin=begin, end=end)
-        reservation_unit.validators.validate_reservation_begin_time_staff(begin=begin)
+        reservation_unit.validators.validate_begin_before_end(begin=begins_at, end=ends_at)
+        reservation_unit.validators.validate_reservation_begin_time_staff(begin=begins_at)
         reservation_unit.validators.validate_no_overlapping_reservations(
-            begin=begin,
-            end=end,
+            begins_at=begins_at,
+            ends_at=ends_at,
             new_buffer_time_before=data.get("buffer_time_before"),
             new_buffer_time_after=data.get("buffer_time_after"),
             ignore_ids=[self.instance.pk],
         )
 
-        data["access_type"] = reservation_unit.actions.get_access_type_at(begin, default=AccessType.UNRESTRICTED)
+        data["access_type"] = reservation_unit.actions.get_access_type_at(begins_at, default=AccessType.UNRESTRICTED)
 
         return data
 
     def update(self, instance: Reservation, validated_data: StaffReservationAdjustTimeData) -> Reservation:
         previous_data = StaffReservationAdjustTimeData(
-            begin=instance.begin,
-            end=instance.end,
+            begins_at=instance.begins_at,
+            ends_at=instance.ends_at,
             buffer_time_before=instance.buffer_time_before,
             buffer_time_after=instance.buffer_time_after,
             access_type=AccessType(instance.access_type),

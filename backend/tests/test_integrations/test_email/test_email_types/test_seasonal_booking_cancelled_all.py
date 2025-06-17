@@ -18,7 +18,7 @@ from tilavarauspalvelu.integrations.email.typing import EmailType
 
 from tests.factories import ApplicationFactory, ApplicationSectionFactory
 from tests.helpers import TranslationsFromPOFiles
-from tests.test_graphql_api.test_recurring_reservation.helpers import create_reservation_series
+from tests.test_graphql_api.test_reservation_series.helpers import create_reservation_series
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
@@ -181,7 +181,7 @@ def test_seasonal_booking_cancelled_all_email__render__html():
 def test_seasonal_booking_cancelled_all__send_email(outbox):
     application = ApplicationFactory.create_in_status_results_sent(
         user__email="user@email.com",
-        contact_person__email="contact@email.com",
+        contact_person_email="contact@email.com",
     )
     application_section = application.application_sections.first()
 

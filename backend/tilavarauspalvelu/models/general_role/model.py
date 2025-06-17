@@ -37,10 +37,10 @@ class GeneralRole(models.Model):
         blank=True,
     )
 
-    created: datetime.datetime = models.DateTimeField(auto_now_add=True)
-    modified: datetime.datetime = models.DateTimeField(auto_now=True)
+    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
+    updated_at: datetime.datetime = models.DateTimeField(auto_now=True)
 
-    role_active: bool = models.BooleanField(default=True)
+    is_role_active: bool = models.BooleanField(default=True)
 
     objects: ClassVar[GeneralRoleManager] = LazyModelManager.new()
     actions: GeneralRoleActions = LazyModelAttribute.new()

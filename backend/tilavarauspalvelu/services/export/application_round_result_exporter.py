@@ -76,8 +76,6 @@ class ApplicationRoundResultCSVExporter(BaseCSVExporter):
             )
             .select_related(
                 "application",
-                "application__organisation",
-                "application__contact_person",
                 "application__application_round",
             )
             .prefetch_related(
@@ -133,6 +131,8 @@ class ApplicationRoundResultCSVExporter(BaseCSVExporter):
         ]
 
     def get_data_rows(self, instance: ApplicationSection) -> Iterable[ApplicationSectionExportRow]:
+        application = instance.application
+
         section_row = ApplicationSectionExportRow(
             application_id=str(instance.application.id),
             application_status=instance.application_status,  # type: ignore[attr-defined]
@@ -144,13 +144,8 @@ class ApplicationRoundResultCSVExporter(BaseCSVExporter):
             applied_reservations_per_week=str(instance.applied_reservations_per_week),
             reservation_min_duration=local_timedelta_string(instance.reservation_min_duration),
             reservation_max_duration=local_timedelta_string(instance.reservation_max_duration),
+            applicant=application.applicant,
         )
-
-        # Applicant
-        if instance.application.organisation is not None:
-            section_row.applicant = instance.application.organisation.name
-        elif (contact_person := instance.application.contact_person) is not None:
-            section_row.applicant = f"{contact_person.first_name} {contact_person.last_name}"
 
         rows: list[ApplicationSectionExportRow] = []
         # Reservation Unit Options

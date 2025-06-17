@@ -23,11 +23,11 @@ class GeneralRoleInlineAdmin(admin.TabularInline):
     fk_name = "user"
     fields = [
         "role",
-        "role_active",
+        "is_role_active",
     ]
     readonly_fields = [
         "role",
-        "role_active",
+        "is_role_active",
     ]
 
     def has_add_permission(self, request, obj=None) -> bool:
@@ -46,13 +46,13 @@ class UnitRoleInlineAdmin(admin.TabularInline):
         "role",
         "units",
         "unit_groups",
-        "role_active",
+        "is_role_active",
     ]
     readonly_fields = [
         "role",
         "units",
         "unit_groups",
-        "role_active",
+        "is_role_active",
     ]
 
     def has_add_permission(self, request, obj=None) -> bool:

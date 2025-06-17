@@ -93,7 +93,9 @@ def test_reservation__deny__state_confirmed_and_reservation_ended(graphql):
     end = last_hour - datetime.timedelta(hours=1)
     begin = end - datetime.timedelta(hours=1)
 
-    reservation = ReservationFactory.create_for_deny(state=ReservationStateChoice.CONFIRMED, begin=begin, end=end)
+    reservation = ReservationFactory.create_for_deny(
+        state=ReservationStateChoice.CONFIRMED, begins_at=begin, ends_at=end
+    )
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
@@ -114,7 +116,7 @@ def test_reservation__deny__state_requires_handling_and_reservation_ended(graphq
     end = last_hour - datetime.timedelta(hours=1)
     begin = end - datetime.timedelta(hours=1)
 
-    reservation = ReservationFactory.create_for_deny(begin=begin, end=end)
+    reservation = ReservationFactory.create_for_deny(begins_at=begin, ends_at=end)
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
@@ -176,7 +178,7 @@ def test_reservation__deny__send_email_if_reservation_started_but_not_ended(grap
     begin = last_hour - datetime.timedelta(hours=1)
     end = last_hour + datetime.timedelta(hours=1)
 
-    reservation = ReservationFactory.create_for_deny(begin=begin, end=end)
+    reservation = ReservationFactory.create_for_deny(begins_at=begin, ends_at=end)
 
     graphql.login_with_superuser()
     data = get_deny_data(reservation)
@@ -198,7 +200,7 @@ def test_reservation__deny__dont_send_notification_if_reservation_already_ended(
     end = last_hour - datetime.timedelta(hours=1)
     begin = end - datetime.timedelta(hours=1)
 
-    reservation = ReservationFactory.create_for_deny(begin=begin, end=end)
+    reservation = ReservationFactory.create_for_deny(begins_at=begin, ends_at=end)
 
     graphql.login_with_superuser()
     data = get_deny_data(reservation)

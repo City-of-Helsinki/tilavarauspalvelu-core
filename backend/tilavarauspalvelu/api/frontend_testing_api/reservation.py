@@ -13,9 +13,9 @@ from tilavarauspalvelu.models import ReservationMetadataField
 from utils.date_utils import local_datetime
 
 from tests.factories import (
-    RecurringReservationFactory,
     ReservationMetadataFieldFactory,
     ReservationMetadataSetFactory,
+    ReservationSeriesFactory,
     ReservationUnitFactory,
     ReservationUnitPricingFactory,
 )
@@ -55,9 +55,9 @@ class TestingReservationParamsSerializer(TestingBaseSerializer):
         reservation = (
             ReservationBuilder()
             .set(
-                reservation_units=[reservation_unit],
-                begin=begin_datetime,
-                end=begin_datetime + datetime.timedelta(hours=2),
+                reservation_unit=reservation_unit,
+                begins_at=begin_datetime,
+                ends_at=begin_datetime + datetime.timedelta(hours=2),
             )
             .for_state(validated_data["state"])
             .for_user(self.context["user"])
@@ -71,7 +71,7 @@ class TestingReservationParamsSerializer(TestingBaseSerializer):
             self._create_payment_order(validated_data, reservation)
 
         if validated_data["is_part_of_series"]:
-            self._create_recurring_reservation(reservation)
+            self._create_reservation_series(reservation)
 
         return reservation
 
@@ -131,17 +131,17 @@ class TestingReservationParamsSerializer(TestingBaseSerializer):
                 order_builder.set(status=OrderStatus.PAID_MANUALLY)
         order_builder.create()
 
-    def _create_recurring_reservation(self, reservation: Reservation) -> None:
-        recurring_reservation = RecurringReservationFactory.create(
-            reservation_unit=reservation.reservation_units.first(),
+    def _create_reservation_series(self, reservation: Reservation) -> None:
+        reservation_series = ReservationSeriesFactory.create(
+            reservation_unit=reservation.reservation_unit,
             user=self.context["user"],
-            begin_date=(reservation.begin - datetime.timedelta(days=7)).date(),
-            end_date=(reservation.end + datetime.timedelta(days=7)).date(),
-            end_time=reservation.begin.time(),
-            begin_time=reservation.end.time(),
-            weekdays=f"{reservation.begin.weekday()}",
+            begin_date=(reservation.begins_at - datetime.timedelta(days=7)).date(),
+            end_date=(reservation.ends_at + datetime.timedelta(days=7)).date(),
+            end_time=reservation.begins_at.time(),
+            begin_time=reservation.ends_at.time(),
+            weekdays=f"{reservation.begins_at.weekday()}",
         )
-        reservation.recurring_reservation = recurring_reservation
+        reservation.reservation_series = reservation_series
         reservation.save()
 
 

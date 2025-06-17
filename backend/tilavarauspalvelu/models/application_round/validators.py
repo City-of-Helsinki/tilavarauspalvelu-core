@@ -21,8 +21,8 @@ class ApplicationRoundValidator:
     application_round: ApplicationRound
 
     def validate_open_for_applications(self) -> None:
-        begin = self.application_round.application_period_begin.astimezone(DEFAULT_TIMEZONE)
-        end = self.application_round.application_period_end.astimezone(DEFAULT_TIMEZONE)
+        begin = self.application_round.application_period_begins_at.astimezone(DEFAULT_TIMEZONE)
+        end = self.application_round.application_period_ends_at.astimezone(DEFAULT_TIMEZONE)
         now = local_datetime()
 
         if begin < now <= end:

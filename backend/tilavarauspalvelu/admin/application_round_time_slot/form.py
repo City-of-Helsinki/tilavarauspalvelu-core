@@ -37,8 +37,8 @@ class ApplicationRoundTimeSlotForm(forms.ModelForm):
         fields = [
             "weekday",
             "reservable_times",
-            "closed",
+            "is_closed",
         ]
         help_texts = {
-            "closed": _("Is the reservation unit closed on this weekday?"),
+            "is_closed": _("Is the reservation unit closed on this weekday?"),
         }

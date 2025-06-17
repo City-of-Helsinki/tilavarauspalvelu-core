@@ -66,7 +66,7 @@ class ReservationUnitFilter(admin.SimpleListFilter):
         value: str | None = self.value()
         if value is None:
             return queryset
-        return queryset.filter(reservation__reservation_units__pk=value).distinct()
+        return queryset.filter(reservation__reservation_unit__pk=value).distinct()
 
 
 @admin.register(PaymentOrder)
@@ -77,7 +77,7 @@ class PaymentOrderAdmin(admin.ModelAdmin):
         # 'reservation_id' handled separately in `get_search_results()`
         # 'remote_id' handled separately in `get_search_results()`
         "reservation__name",
-        "reservation__reservation_units__name",
+        "reservation__reservation_unit__name",
     ]
     search_help_text = _(
         "Search by Payment Order ID, Reservation ID, Remote Order ID, Reservation name, or Reservation Unit name"
@@ -130,7 +130,7 @@ class PaymentOrderAdmin(admin.ModelAdmin):
         return super().get_queryset(request).select_related("reservation")
 
     def reservation_unit(self, obj: PaymentOrder) -> str:
-        return obj.reservation.reservation_units.first() if obj.reservation else ""
+        return obj.reservation.reservation_unit if obj.reservation else ""
 
     def get_search_results(
         self,

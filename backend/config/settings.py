@@ -91,7 +91,6 @@ class Common(Environment):
     ]
 
     MIDDLEWARE = [
-        "config.middleware.QueryLoggingMiddleware",
         "config.middleware.MultipleProxyMiddleware",
         "corsheaders.middleware.CorsMiddleware",
         "django.middleware.security.SecurityMiddleware",
@@ -302,11 +301,6 @@ class Common(Environment):
     OPEN_CITY_PROFILE_SCOPE = values.StringValue()
     OPEN_CITY_PROFILE_GRAPHQL_API = values.StringValue()
     PREFILL_RESERVATION_WITH_PROFILE_DATA = values.BooleanValue(default=False)
-
-    # Defaults when fetching profile data
-    PRIMARY_MUNICIPALITY_NUMBER = values.StringValue(default="091")
-    PRIMARY_MUNICIPALITY_NAME = values.StringValue(default="Helsinki")
-    SECONDARY_MUNICIPALITY_NAME = values.StringValue(default="Other")
 
     # --- Tunnistamo / Social Auth settings --------------------------------------------------------------------------
 

@@ -220,7 +220,7 @@ class PaymentOrderActions:
             self.payment_order.reservation is not None
             and self.payment_order.reservation.price_net > 0
             # Reservation start date is not in the past
-            and local_date() <= self.payment_order.reservation.begin.astimezone(DEFAULT_TIMEZONE).date()
+            and local_date() <= self.payment_order.reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
             # Has been paid in webshop using invoice
             and self.payment_order.status == OrderStatus.PAID_BY_INVOICE
         )

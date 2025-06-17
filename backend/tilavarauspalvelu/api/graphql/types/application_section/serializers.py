@@ -144,7 +144,7 @@ class ApplicationSectionSerializer(NestingModelSerializer):
 
             reservation_period = (
                 ApplicationRound.objects.filter(pk=application_round)
-                .values("reservation_period_begin", "reservation_period_end")
+                .values("reservation_period_begin_date", "reservation_period_end_date")
                 .first()
             )
 
@@ -153,18 +153,18 @@ class ApplicationSectionSerializer(NestingModelSerializer):
                 Application.objects.select_related("application_round")
                 .filter(pk=application.pk)
                 .annotate(
-                    reservation_period_begin=models.F("application_round__reservation_period_begin"),
-                    reservation_period_end=models.F("application_round__reservation_period_end"),
+                    reservation_period_begin_date=models.F("application_round__reservation_period_begin_date"),
+                    reservation_period_end_date=models.F("application_round__reservation_period_end_date"),
                 )
-                .values("reservation_period_begin", "reservation_period_end")
+                .values("reservation_period_begin_date", "reservation_period_end_date")
                 .first()
             )
 
-        if reservation_period["reservation_period_begin"] > reservations_begin_date:
+        if reservation_period["reservation_period_begin_date"] > reservations_begin_date:
             msg = "Reservations begin date cannot be before the application round's reservation period begin date."
             errors.append(msg)
 
-        if reservation_period["reservation_period_end"] < reservations_end_date:
+        if reservation_period["reservation_period_end_date"] < reservations_end_date:
             msg = "Reservations end date cannot be after the application round's reservation period end date."
             errors.append(msg)
 
@@ -196,7 +196,7 @@ class RejectAllSectionOptionsSerializer(NestingModelSerializer):
         return data
 
     def save(self, **kwargs: Any) -> ApplicationSection:
-        self.instance.reservation_unit_options.all().update(rejected=True)
+        self.instance.reservation_unit_options.all().update(is_rejected=True)
         return self.instance
 
 
@@ -210,7 +210,7 @@ class RestoreAllSectionOptionsSerializer(NestingModelSerializer):
         ]
 
     def save(self, **kwargs: Any) -> ApplicationSection:
-        self.instance.reservation_unit_options.all().update(rejected=False)
+        self.instance.reservation_unit_options.all().update(is_rejected=False)
         return self.instance
 
 
@@ -251,7 +251,7 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
     def save(self, **kwargs: Any) -> CancellationOutput:
         future_reservations = Reservation.objects.for_application_section(self.instance).filter(
             user=self.instance.application.user,
-            begin__gt=local_datetime(),
+            begins_at__gt=local_datetime(),
         )
 
         cancellable_reservations: ReservationQuerySet = (
@@ -259,14 +259,14 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
                 type=ReservationTypeChoice.SEASONAL,
                 state=ReservationStateChoice.CONFIRMED,
                 price=0,
-                reservation_units__cancellation_rule__isnull=False,
+                reservation_unit__cancellation_rule__isnull=False,
             )
             .alias(
-                cancellation_time=models.F("reservation_units__cancellation_rule__can_be_cancelled_time_before"),
+                cancellation_time=models.F("reservation_unit__cancellation_rule__can_be_cancelled_time_before"),
                 cancellation_cutoff=NowTT() + models.F("cancellation_time"),
             )
             .filter(
-                begin__gt=models.F("cancellation_cutoff"),
+                begins_at__gt=models.F("cancellation_cutoff"),
             )
             .distinct()
         )

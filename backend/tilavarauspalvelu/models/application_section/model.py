@@ -128,7 +128,7 @@ class ApplicationSection(SerializableMixin, models.Model):
         return models.Case(  # type: ignore[return-value]
             models.When(
                 # The application round has not yet moved to the allocation stage
-                models.Q(application__application_round__application_period_end__gte=NowTT()),
+                models.Q(application__application_round__application_period_ends_at__gte=NowTT()),
                 then=models.Value(ApplicationSectionStatusChoice.UNALLOCATED.value),
             ),
             models.When(
@@ -139,7 +139,7 @@ class ApplicationSection(SerializableMixin, models.Model):
                     models.Q(
                         L(allocations=0)
                         & (
-                            models.Q(application__application_round__handled_date__isnull=False)
+                            models.Q(application__application_round__handled_at__isnull=False)
                             | L(usable_reservation_unit_options=0)
                         )
                     )
@@ -156,7 +156,7 @@ class ApplicationSection(SerializableMixin, models.Model):
                     | (
                         L(allocations__gt=0)
                         & (
-                            models.Q(application__application_round__handled_date__isnull=False)
+                            models.Q(application__application_round__handled_at__isnull=False)
                             | L(usable_reservation_unit_options=0)
                         )
                     )
@@ -170,7 +170,7 @@ class ApplicationSection(SerializableMixin, models.Model):
 
     @status.override
     def _(self) -> ApplicationSectionStatusChoice:
-        if self.application.application_round.application_period_end > local_datetime():
+        if self.application.application_round.application_period_ends_at > local_datetime():
             return ApplicationSectionStatusChoice.UNALLOCATED
 
         reservation_unit_options = list(
@@ -182,12 +182,12 @@ class ApplicationSection(SerializableMixin, models.Model):
             ).all()
         )
         total_allocations = sum(option.num_of_allocations for option in reservation_unit_options)
-        all_locked_or_rejected = all(option.locked or option.rejected for option in reservation_unit_options)
+        all_locked_or_rejected = all(option.is_locked or option.is_rejected for option in reservation_unit_options)
 
         if total_allocations >= self.applied_reservations_per_week:
             return ApplicationSectionStatusChoice.HANDLED
 
-        is_application_round_handled = self.application.application_round.handled_date is not None
+        is_application_round_handled = self.application.application_round.handled_at is not None
         if is_application_round_handled or all_locked_or_rejected:
             if total_allocations > 0:
                 return ApplicationSectionStatusChoice.HANDLED
@@ -229,7 +229,7 @@ class ApplicationSection(SerializableMixin, models.Model):
             SubqueryCount(
                 queryset=(
                     ReservationUnitOption.objects.filter(application_section=models.OuterRef("pk"))
-                    .filter(rejected=False, locked=False)
+                    .filter(is_rejected=False, is_locked=False)
                     .values("id")
                 )
             ),
@@ -238,7 +238,7 @@ class ApplicationSection(SerializableMixin, models.Model):
 
     @usable_reservation_unit_options.override
     def _(self) -> int:
-        return self.reservation_unit_options.filter(rejected=False, locked=False).count()
+        return self.reservation_unit_options.filter(is_rejected=False, is_locked=False).count()
 
     @lookup_property
     def status_sort_order() -> int:

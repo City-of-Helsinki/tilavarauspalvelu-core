@@ -25,7 +25,7 @@ from .sending import send_emails_in_batches_task, send_multiple_emails_in_batche
 from .typing import EmailData, EmailType
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation
+    from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationSeries
     from tilavarauspalvelu.typing import Lang
 
 __all__ = [
@@ -55,7 +55,7 @@ class EmailService:
         if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
             return
 
-        if reservation.end.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -91,7 +91,7 @@ class EmailService:
         if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
             return
 
-        if reservation.end.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -117,7 +117,7 @@ class EmailService:
         if reservation.state != ReservationStateChoice.CONFIRMED:
             return
 
-        if reservation.end.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -229,7 +229,7 @@ class EmailService:
         if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
             return
 
-        if reservation.end.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -257,7 +257,7 @@ class EmailService:
         if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
             return
 
-        if reservation.end.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -335,7 +335,7 @@ class EmailService:
         if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
             return
 
-        if reservation.end.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -447,7 +447,7 @@ class EmailService:
     @staticmethod
     def send_seasonal_booking_application_round_in_allocation_emails() -> None:
         """Sends an email to all applicants when an application round has entered the allocation phase."""
-        applications = Application.objects.should_send_in_allocation_email().order_by("created_date")
+        applications = Application.objects.should_send_in_allocation_email().order_by("created_at")
         if not applications:
             msg = "Zero applications require the 'seasonal booking application round in allocation email' to be sent"
             SentryLogger.log_message(msg)
@@ -470,12 +470,12 @@ class EmailService:
             emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
-        applications.update(in_allocation_notification_sent_date=local_datetime())
+        applications.update(in_allocation_notification_sent_at=local_datetime())
 
     @staticmethod
     def send_seasonal_booking_application_round_handled_emails() -> None:
         """Sends an email to all applicants when an application round has its allocation results available."""
-        applications = Application.objects.should_send_handled_email().order_by("created_date")
+        applications = Application.objects.should_send_handled_email().order_by("created_at")
         if not applications:
             msg = "Zero applications require the 'seasonal booking application round handled email' to be sent"
             SentryLogger.log_message(msg)
@@ -498,7 +498,7 @@ class EmailService:
             emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
-        applications.update(results_ready_notification_sent_date=local_datetime())
+        applications.update(results_ready_notification_sent_at=local_datetime())
 
     @staticmethod
     def send_seasonal_booking_cancelled_all_email(
@@ -600,7 +600,7 @@ class EmailService:
 
     @staticmethod
     def send_seasonal_booking_denied_series_email(
-        series: RecurringReservation,
+        series: ReservationSeries,
         *,
         language: Lang | None = None,
     ) -> None:
@@ -642,7 +642,7 @@ class EmailService:
         if reservation.type != ReservationTypeChoice.SEASONAL:
             return
 
-        if reservation.end.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -663,7 +663,7 @@ class EmailService:
 
     @staticmethod
     def send_seasonal_booking_rescheduled_series_email(
-        series: RecurringReservation,
+        series: ReservationSeries,
         *,
         language: Lang | None = None,
     ) -> None:
@@ -702,7 +702,7 @@ class EmailService:
         if reservation.type != ReservationTypeChoice.SEASONAL:
             return
 
-        if reservation.end.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)

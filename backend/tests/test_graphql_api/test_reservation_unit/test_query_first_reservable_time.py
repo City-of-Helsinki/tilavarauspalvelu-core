@@ -118,8 +118,8 @@ def reservation_unit() -> ReservationUnit:
     return ReservationUnitFactory.create(
         origin_hauki_resource=origin_hauki_resource,
         reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES.value,
-        reservation_begins=None,
-        reservation_ends=None,
+        reservation_begins_at=None,
+        reservation_ends_at=None,
         reservations_min_days_before=None,
         reservations_max_days_before=None,
         min_reservation_duration=None,
@@ -142,8 +142,8 @@ def create_child_for_reservation_unit(reservation_unit: ReservationUnit) -> Rese
     child_space = SpaceFactory.create(parent=parent_space)
 
     return ReservationUnitFactory.create(
-        reservation_begins=None,
-        reservation_ends=None,
+        reservation_begins_at=None,
+        reservation_ends_at=None,
         reservations_min_days_before=None,
         reservations_max_days_before=None,
         min_reservation_duration=None,
@@ -186,9 +186,9 @@ class ReservableFilters:
 @dataclass
 class ReservationUnitOverrides:
     reservation_start_interval: str | None = None
-    reservation_begins: datetime.datetime | None = None
-    reservation_ends: datetime.datetime | None = None
-    publish_ends: datetime.datetime | None = None
+    reservation_begins_at: datetime.datetime | None = None
+    reservation_ends_at: datetime.datetime | None = None
+    publish_ends_at: datetime.datetime | None = None
     reservations_min_days_before: int | None = None
     reservations_max_days_before: int | None = None
     min_reservation_duration: datetime.timedelta | None = None
@@ -200,10 +200,10 @@ class ReservationUnitOverrides:
 @dataclass
 class ApplicationStatusParams:
     status: ApplicationRoundStatusChoice
-    sent_date: datetime.datetime | None = None
-    handled_date: datetime.datetime | None = None
-    reservation_period_begin: datetime.date | None = None
-    reservation_period_end: datetime.date | None = None
+    sent_at: datetime.datetime | None = None
+    handled_at: datetime.datetime | None = None
+    reservation_period_begin_date: datetime.date | None = None
+    reservation_period_end_date: datetime.date | None = None
     reservation_units: list[ReservationUnit] | None = None
 
 
@@ -820,9 +820,9 @@ def test__reservation_unit__first_reservable_time__filters__multiple_days_long_t
 
 @pytest.mark.parametrize(
     **parametrize_helper({
-        "ReservationUnit Settings | reservation_begins": RU_ReservableParams(
+        "ReservationUnit Settings | reservation_begins_at": RU_ReservableParams(
             reservation_unit_settings=ReservationUnitOverrides(
-                reservation_begins=_datetime(day=20, hour=17),
+                reservation_begins_at=_datetime(day=20, hour=17),
             ),
             result=ReservableNode(
                 is_closed=False,
@@ -831,7 +831,7 @@ def test__reservation_unit__first_reservable_time__filters__multiple_days_long_t
         ),
         "ReservationUnit Settings | reservation_begins in the middle of time span": RU_ReservableParams(
             reservation_unit_settings=ReservationUnitOverrides(
-                reservation_begins=_datetime(day=20, hour=18, minute=1),
+                reservation_begins_at=_datetime(day=20, hour=18, minute=1),
             ),
             result=ReservableNode(
                 is_closed=False,
@@ -840,7 +840,7 @@ def test__reservation_unit__first_reservable_time__filters__multiple_days_long_t
         ),
         "ReservationUnit Settings | reservation_ends causes no results": RU_ReservableParams(
             reservation_unit_settings=ReservationUnitOverrides(
-                reservation_ends=_datetime(day=11),
+                reservation_ends_at=_datetime(day=11),
             ),
             result=ReservableNode(
                 is_closed=True,
@@ -849,7 +849,7 @@ def test__reservation_unit__first_reservable_time__filters__multiple_days_long_t
         ),
         "ReservationUnit Settings | publish_ends causes no results": RU_ReservableParams(
             reservation_unit_settings=ReservationUnitOverrides(
-                publish_ends=_datetime(day=11, hour=13),
+                publish_ends_at=_datetime(day=11, hour=13),
             ),
             result=ReservableNode(
                 is_closed=True,
@@ -1092,8 +1092,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period overlaps, Status=OPEN, ReservationUnit not part of round": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.OPEN,
-                reservation_period_begin=_date(day=6),
-                reservation_period_end=_date(day=20),
+                reservation_period_begin_date=_date(day=6),
+                reservation_period_end_date=_date(day=20),
                 reservation_units=[],
             ),
             filters=ReservableFilters(),
@@ -1105,8 +1105,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period overlaps, STATUS=UPCOMING": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.UPCOMING,
-                reservation_period_begin=_date(day=6),
-                reservation_period_end=_date(day=20),
+                reservation_period_begin_date=_date(day=6),
+                reservation_period_end_date=_date(day=20),
             ),
             filters=ReservableFilters(),
             result=ReservableNode(
@@ -1117,8 +1117,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period overlaps, Status=OPEN": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.OPEN,
-                reservation_period_begin=_date(day=6),
-                reservation_period_end=_date(day=20),
+                reservation_period_begin_date=_date(day=6),
+                reservation_period_end_date=_date(day=20),
             ),
             filters=ReservableFilters(),
             result=ReservableNode(
@@ -1129,8 +1129,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period overlaps, Status=IN_ALLOCATION": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.IN_ALLOCATION,
-                reservation_period_begin=_date(day=1),
-                reservation_period_end=_date(day=20),
+                reservation_period_begin_date=_date(day=1),
+                reservation_period_end_date=_date(day=20),
             ),
             filters=ReservableFilters(),
             result=ReservableNode(
@@ -1141,8 +1141,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period overlaps, Status=HANDLED": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.HANDLED,
-                reservation_period_begin=_date(day=1),
-                reservation_period_end=_date(day=20),
+                reservation_period_begin_date=_date(day=1),
+                reservation_period_end_date=_date(day=20),
             ),
             filters=ReservableFilters(),
             result=ReservableNode(
@@ -1153,8 +1153,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period overlaps, Status=RESULTS_SENT": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.RESULTS_SENT,
-                reservation_period_begin=_date(day=1),
-                reservation_period_end=_date(day=20),
+                reservation_period_begin_date=_date(day=1),
+                reservation_period_end_date=_date(day=20),
             ),
             filters=ReservableFilters(),
             result=ReservableNode(
@@ -1165,8 +1165,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Not overlapping, Period in the past, Status=UPCOMING": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.UPCOMING,
-                reservation_period_begin=_date(day=6),
-                reservation_period_end=_date(day=10),
+                reservation_period_begin_date=_date(day=6),
+                reservation_period_end_date=_date(day=10),
             ),
             filters=ReservableFilters(),
             result=ReservableNode(
@@ -1177,8 +1177,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Not overlapping, Period in the future, Status=OPEN": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.OPEN,
-                reservation_period_begin=_date(day=20),
-                reservation_period_end=_date(day=30),
+                reservation_period_begin_date=_date(day=20),
+                reservation_period_end_date=_date(day=30),
             ),
             filters=ReservableFilters(),
             result=ReservableNode(
@@ -1189,8 +1189,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period partially overlaps, Status=OPEN": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.OPEN,
-                reservation_period_begin=_date(day=14),
-                reservation_period_end=_date(day=15),
+                reservation_period_begin_date=_date(day=14),
+                reservation_period_end_date=_date(day=15),
             ),
             filters=ReservableFilters(),
             result=ReservableNode(
@@ -1201,8 +1201,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period partially overlaps, Status=OPEN, Min duration too long": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.OPEN,
-                reservation_period_begin=_date(day=14),
-                reservation_period_end=_date(day=15),
+                reservation_period_begin_date=_date(day=14),
+                reservation_period_end_date=_date(day=15),
             ),
             filters=ReservableFilters(
                 minimum_duration_minutes=61,
@@ -1215,8 +1215,8 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period ends on the day of time span, STATUS=OPEN": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.OPEN,
-                reservation_period_begin=_date(day=14),
-                reservation_period_end=_date(day=16),
+                reservation_period_begin_date=_date(day=14),
+                reservation_period_end_date=_date(day=16),
             ),
             filters=ReservableFilters(),
             result=ReservableNode(
@@ -1287,8 +1287,8 @@ def test__reservation_unit__first_reservable_time__filters__application_rounds__
     """
     ApplicationRoundFactory.create_in_status_open(
         reservation_units=[reservation_unit],
-        reservation_period_begin=_date(day=29),
-        reservation_period_end=_date(day=30),
+        reservation_period_begin_date=_date(day=29),
+        reservation_period_end_date=_date(day=30),
     )
 
     # 29th Jan 11:00 - 12:00 (1h)
@@ -1351,8 +1351,8 @@ def test__reservation_unit__first_reservable_time__reservations__own_reservation
     # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=12),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=12),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -1401,8 +1401,8 @@ def test__reservation_unit__first_reservable_time__reservations__unrelated_reser
     # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_2,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=12),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=12),
     )
 
     response = graphql(reservation_units_reservable_query())
@@ -1445,15 +1445,15 @@ def test__reservation_unit__first_reservable_time__reservations__dont_include_ca
     # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=12),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=12),
         state=ReservationStateChoice.CANCELLED,
     )
     # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=12),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=12),
         state=ReservationStateChoice.DENIED,
     )
 
@@ -1501,8 +1501,8 @@ def test__reservation_unit__first_reservable_time__reservations__date_filters_on
     # 1st Jan 12:00 - 17:00 (5h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=_datetime(hour=12),
-        end=_datetime(hour=17),
+        begins_at=_datetime(hour=12),
+        ends_at=_datetime(hour=17),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -1557,8 +1557,8 @@ def test__reservation_unit__first_reservable_time__reservations__filter_start_ti
     # 1st Jan 14:00 - 15:30 (1h 30min)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=_datetime(hour=14),
-        end=_datetime(hour=15, minute=30),
+        begins_at=_datetime(hour=14),
+        ends_at=_datetime(hour=15, minute=30),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -1620,8 +1620,8 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_2,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=12),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=12),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -1683,8 +1683,8 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_2,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=12),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=12),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -1752,8 +1752,8 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_2,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=12),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=12),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -1888,14 +1888,14 @@ def test__reservation_unit__first_reservable_time__buffers__different_length_buf
     # 1st Jan 10:00 - 11:30 (1h 30min) | Buffer: 9:30-10:00 + 11:30-12:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=11, minute=30),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=11, minute=30),
     )
     # 1st Jan 13:00 - 15:30 (1h 30min) | Buffer: (?) + 15:30-16:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=_datetime(hour=13),
-        end=_datetime(hour=15, minute=30),
+        begins_at=_datetime(hour=13),
+        ends_at=_datetime(hour=15, minute=30),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -1971,14 +1971,14 @@ def test__reservation_unit__first_reservable_time__buffers__start_and_end_same_t
     # 1st Jan 10:00 - 11:30 (1h 30min) | Buffer: 11:30-12:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_30,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=11, minute=30),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=11, minute=30),
     )
     # 1st Jan 10:00 - 11:30 (1h 30min) | Buffer: 11:30-12:30
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_60,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=11, minute=30),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=11, minute=30),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -2058,20 +2058,20 @@ def test__reservation_unit__first_reservable_time__buffers__different_before_buf
     # 1st Jan 10:00 - 10:30 (30min)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=_datetime(hour=10),
-        end=_datetime(hour=10, minute=30),
+        begins_at=_datetime(hour=10),
+        ends_at=_datetime(hour=10, minute=30),
     )
     # 1st Jan 12:00 - 13:00 (1h) | Buffer: 11:30-12:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_30,
-        begin=_datetime(hour=12),
-        end=_datetime(hour=13),
+        begins_at=_datetime(hour=12),
+        ends_at=_datetime(hour=13),
     )
     # 1st Jan 12:00 - 13:00 (1h) | Buffer: 11:00-12:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_60,
-        begin=_datetime(hour=12),
-        end=_datetime(hour=13),
+        begins_at=_datetime(hour=12),
+        ends_at=_datetime(hour=13),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -2151,15 +2151,15 @@ def test__reservation_unit__first_reservable_time__buffers__different_before_buf
     # 1st Jan 12:00-13:00 (1h) | Buffer: 11:30-12:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_30,
-        begin=_datetime(hour=12),
-        end=_datetime(hour=13),
+        begins_at=_datetime(hour=12),
+        ends_at=_datetime(hour=13),
     )
 
     # 1st Jan 12:00-13:00 (1h) | Buffer: 11:00-12:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_60,
-        begin=_datetime(hour=12),
-        end=_datetime(hour=13),
+        begins_at=_datetime(hour=12),
+        ends_at=_datetime(hour=13),
     )
 
     response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
@@ -2248,8 +2248,8 @@ def test__reservation_unit__first_reservable_time__extra_long_interval(graphql, 
     # 1st Jan 13:00 - 16:00 (3h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=_datetime(hour=13),
-        end=_datetime(hour=16),
+        begins_at=_datetime(hour=13),
+        ends_at=_datetime(hour=16),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -2319,9 +2319,9 @@ def test__reservation_unit__first_reservable_time__blocked_type_reservation_can_
 
     # 1st Jan 12:00 - 14:00 (2h)
     ReservationFactory.create(
-        reservation_units=[reservation_unit],
-        begin=_datetime(hour=12),
-        end=_datetime(hour=14),
+        reservation_unit=reservation_unit,
+        begins_at=_datetime(hour=12),
+        ends_at=_datetime(hour=14),
         buffer_time_before=datetime.timedelta(minutes=300),  # This buffer should be completely ignored
         buffer_time_after=datetime.timedelta(minutes=300),  # This buffer should be completely ignored
         type=ReservationTypeChoice.BLOCKED,
@@ -2396,31 +2396,31 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
 
     # 1st Jan 17:00-18:00 (1h) | Buffer: none
     ReservationFactory.create(
-        begin=_datetime(hour=17),
-        end=_datetime(hour=18),
+        begins_at=_datetime(hour=17),
+        ends_at=_datetime(hour=18),
         buffer_time_before=datetime.timedelta(),
         buffer_time_after=datetime.timedelta(),
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         state=ReservationStateChoice.CREATED,
     )
 
     # 1st Jan 18:30-19:30 (1h) | Buffer: none
     ReservationFactory.create(
-        begin=_datetime(hour=18, minute=30),
-        end=_datetime(hour=19, minute=30),
+        begins_at=_datetime(hour=18, minute=30),
+        ends_at=_datetime(hour=19, minute=30),
         buffer_time_before=datetime.timedelta(),
         buffer_time_after=datetime.timedelta(),
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         state=ReservationStateChoice.CREATED,
     )
 
     # 1st Jan 20:00-21:00 (1h) | Buffer: 19:45-21:30
     ReservationFactory.create(
-        begin=_datetime(hour=20),
-        end=_datetime(hour=21),
+        begins_at=_datetime(hour=20),
+        ends_at=_datetime(hour=21),
         buffer_time_before=datetime.timedelta(minutes=15),
         buffer_time_after=datetime.timedelta(minutes=30),
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         state=ReservationStateChoice.CREATED,
     )
 

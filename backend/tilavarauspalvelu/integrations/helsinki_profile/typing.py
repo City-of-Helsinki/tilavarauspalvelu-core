@@ -6,7 +6,6 @@ if TYPE_CHECKING:
     import datetime
 
     from tilavarauspalvelu.enums import LoginMethod
-    from tilavarauspalvelu.models import City
 
 # Profile raw response
 
@@ -97,7 +96,7 @@ class ReservationPrefillInfo(TypedDict):
     reservee_address_street: str | None
     reservee_address_zip: str | None
     reservee_address_city: str | None
-    home_city: City | None
+    municipality: str | None  # MunicipalityChoice
 
 
 class AfterLoginAdditionalInfo(ReservationPrefillInfo):

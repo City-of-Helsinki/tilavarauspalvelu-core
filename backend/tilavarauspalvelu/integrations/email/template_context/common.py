@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     import datetime
     from decimal import Decimal
 
-    from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation, ReservationUnit
+    from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationSeries, Unit
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 
@@ -224,15 +224,15 @@ def get_contex_for_seasonal_reservation_check_details_url(
 
 
 def params_for_base_info(*, reservation: Reservation, language: Lang) -> dict[str, Any]:
-    # Currently, there is ever only one reservation unit per reservation.
-    primary: ReservationUnit = reservation.reservation_units.select_related("unit__location").first()
+    reservation_unit = reservation.reservation_unit
+    unit: Unit = reservation_unit.unit
 
     return {
-        "reservation_unit_name": get_attr_by_language(primary, "name", language),
-        "unit_name": get_attr_by_language(primary.unit, "name", language),
-        "unit_location": primary.actions.get_address(),
-        "begin_datetime": reservation.begin.astimezone(DEFAULT_TIMEZONE),
-        "end_datetime": reservation.end.astimezone(DEFAULT_TIMEZONE),
+        "reservation_unit_name": get_attr_by_language(reservation_unit, "name", language),
+        "unit_name": get_attr_by_language(unit, "name", language),
+        "unit_location": unit.address,
+        "begin_datetime": reservation.begins_at.astimezone(DEFAULT_TIMEZONE),
+        "end_datetime": reservation.ends_at.astimezone(DEFAULT_TIMEZONE),
     }
 
 
@@ -245,8 +245,8 @@ def params_for_price_info(*, reservation: Reservation) -> dict[str, Any]:
 
 
 def params_for_price_range_info(*, reservation: Reservation) -> dict[str, Any]:
-    begin_datetime = reservation.begin.astimezone(DEFAULT_TIMEZONE)
-    end_datetime = reservation.end.astimezone(DEFAULT_TIMEZONE)
+    begin_datetime = reservation.begins_at.astimezone(DEFAULT_TIMEZONE)
+    end_datetime = reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
 
     subsidised_price = reservation.actions.calculate_full_price(begin_datetime, end_datetime, subsidised=True)
 
@@ -292,7 +292,7 @@ def params_for_access_code_reservation(*, reservation: Reservation) -> dict[str,
     return params
 
 
-def params_for_access_code_series(*, series: RecurringReservation) -> dict[str, Any]:
+def params_for_access_code_series(*, series: ReservationSeries) -> dict[str, Any]:
     from tilavarauspalvelu.integrations.keyless_entry import PindoraService
     from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 
@@ -454,7 +454,7 @@ def _initialize_allocations_map(section: ApplicationSection) -> defaultdict[int,
     """
     allocations_map: defaultdict[int, dict[Weekday, dict[str, str]]] = defaultdict(dict)
 
-    series: RecurringReservation
+    series: ReservationSeries
     for series in section.actions.get_reservation_series():
         begin_time = local_time_string(series.begin_time)  # type: ignore[arg-type]
         end_time = local_time_string(series.end_time)  # type: ignore[arg-type]
@@ -468,7 +468,7 @@ def _initialize_allocations_map(section: ApplicationSection) -> defaultdict[int,
                 "access_code_validity_period": "",  # Can be filled in later if access codes are used
                 "series_url": get_staff_reservations_ext_link(reservation_id=reservation.pk),
                 "unit_name": reservation_unit.unit.name,  # type: ignore[union-attr]
-                "unit_location": reservation_unit.actions.get_address(),
+                "unit_location": reservation_unit.unit.address,
                 "reservation_unit_name": reservation_unit.name,
             }
 

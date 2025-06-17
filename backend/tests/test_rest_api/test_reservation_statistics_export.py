@@ -32,8 +32,8 @@ def test_reservation_statistics_export(api_client, settings):
     # Assume that the data per reservation statistic is correct from the exporter
     # -> Simply check the keys are what we expect
     assert list(data[0]) == [
-        "ability_group",
-        "ability_group_name",
+        "ability_group",  # Removed from series model
+        "ability_group_name",  # Removed from series model
         "access_code_generated_at",
         "access_type",
         "age_group",
@@ -155,8 +155,8 @@ def test_reservation_statistics_export__only_two(api_client, settings):
 def test_reservation_statistics_export__tprek_id(api_client, settings):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    reservation = ReservationFactory.create(reservation_units__unit__tprek_id="1")
-    ReservationFactory.create(reservation_units__unit__tprek_id="2")
+    reservation = ReservationFactory.create(reservation_unit__unit__tprek_id="1")
+    ReservationFactory.create(reservation_unit__unit__tprek_id="2")
 
     url = reverse("reservation_statistics_export") + "?tprek_id=1"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
@@ -174,8 +174,8 @@ def test_reservation_statistics_export__begins_after(api_client, settings):
     begin_1 = local_datetime(2022, 1, 2, 12)
     begin_2 = begin_1 - datetime.timedelta(days=1)
 
-    reservation = ReservationFactory.create(begin=begin_1)
-    ReservationFactory.create(begin=begin_2)
+    reservation = ReservationFactory.create(begins_at=begin_1)
+    ReservationFactory.create(begins_at=begin_2)
 
     url = reverse("reservation_statistics_export") + f"?begins_after={begin_1.isoformat()}"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
@@ -193,8 +193,8 @@ def test_reservation_statistics_export__begins_before(api_client, settings):
     begin_1 = local_datetime(2022, 1, 2, 12)
     begin_2 = begin_1 - datetime.timedelta(days=1)
 
-    ReservationFactory.create(begin=begin_1)
-    reservation = ReservationFactory.create(begin=begin_2)
+    ReservationFactory.create(begins_at=begin_1)
+    reservation = ReservationFactory.create(begins_at=begin_2)
 
     url = reverse("reservation_statistics_export") + f"?begins_before={begin_1.isoformat()}"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})

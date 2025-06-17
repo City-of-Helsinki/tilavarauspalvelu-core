@@ -39,20 +39,43 @@ class ApplicationNode(DjangoNode):
         fields = [
             "pk",
             "applicant_type",
-            "created_date",
-            "last_modified_date",
-            "cancelled_date",
-            "sent_date",
             "additional_information",
             "working_memo",
-            "application_round",
-            "organisation",
-            "contact_person",
-            "user",
-            "billing_address",
-            "home_city",
-            "application_sections",
+            #
+            "billing_street_address",
+            "billing_post_code",
+            "billing_city",
+            #
+            "organisation_name",
+            "organisation_email",
+            "organisation_identifier",
+            "organisation_year_established",
+            "organisation_active_members",
+            "organisation_core_business",
+            "organisation_street_address",
+            "organisation_post_code",
+            "organisation_city",
+            #
+            # Contact person
+            "contact_person_first_name",
+            "contact_person_last_name",
+            "contact_person_email",
+            "contact_person_phone_number",
+            #
+            # Datetimes
+            "cancelled_at",
+            "sent_at",
+            "created_at",
+            "updated_at",
+            #
+            # Lookup properties
             "status",
+            #
+            # Relations
+            "application_round",
+            "application_sections",
+            "user",
+            "municipality",
         ]
         restricted_fields = {
             "working_memo": lambda user, application: user.permissions.can_view_application(
@@ -89,7 +112,7 @@ class ApplicationNode(DjangoNode):
                 parent=optimizer,
             ),
         )
-        application_round_optimizer.only_fields.append("application_period_end")
+        application_round_optimizer.only_fields.append("application_period_ends_at")
 
         return queryset
 

@@ -24,7 +24,7 @@ class ApplicationRoundTimeSlotFactory(GenericDjangoModelFactory[ApplicationRound
     reservation_unit = ForeignKeyFactory("tests.factories.ReservationUnitFactory")
 
     weekday = fuzzy.FuzzyChoice(choices=WeekdayChoice.values)
-    closed = False
+    is_closed = False
     reservable_times = factory.LazyAttribute(
         lambda _: [
             TimeSlotDB(
@@ -36,6 +36,6 @@ class ApplicationRoundTimeSlotFactory(GenericDjangoModelFactory[ApplicationRound
 
     @classmethod
     def create_closed(cls, **kwargs: Any) -> ApplicationRoundTimeSlot:
-        kwargs["closed"] = True
+        kwargs["is_closed"] = True
         kwargs["reservable_times"] = []
         return cls.create(**kwargs)

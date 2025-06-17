@@ -3,12 +3,12 @@ from __future__ import annotations
 import dataclasses
 from typing import TYPE_CHECKING
 
-from tilavarauspalvelu.models import RecurringReservation, Reservation
+from tilavarauspalvelu.models import Reservation, ReservationSeries
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationSection
-    from tilavarauspalvelu.models.recurring_reservation.queryset import RecurringReservationQuerySet
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
+    from tilavarauspalvelu.models.reservation_series.queryset import ReservationSeriesQuerySet
 
 
 __all__ = [
@@ -20,9 +20,9 @@ __all__ = [
 class ApplicationSectionActions:
     application_section: ApplicationSection
 
-    def get_reservation_series(self) -> RecurringReservationQuerySet:
+    def get_reservation_series(self) -> ReservationSeriesQuerySet:
         return (
-            RecurringReservation.objects.filter(
+            ReservationSeries.objects.filter(
                 allocated_time_slot__reservation_unit_option__application_section=self.application_section
             )
             .prefetch_related("reservations")

@@ -12,19 +12,10 @@ from query_optimizer import AnnotatedField, DjangoListField, ManuallyOptimizedFi
 from query_optimizer.optimizer import QueryOptimizer
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.api.graphql.types.location.types import LocationNode
 from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
 from tilavarauspalvelu.enums import AccessType, ReservationUnitPublishingState, ReservationUnitReservationState
 from tilavarauspalvelu.integrations.opening_hours.hauki_link_generator import generate_hauki_link
-from tilavarauspalvelu.models import (
-    Location,
-    OriginHaukiResource,
-    PaymentMerchant,
-    Reservation,
-    ReservationUnit,
-    Space,
-    Unit,
-)
+from tilavarauspalvelu.models import OriginHaukiResource, PaymentMerchant, Reservation, ReservationUnit, Unit
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.db import SubqueryCount
 
@@ -64,8 +55,6 @@ class ReservationUnitNode(DjangoNode):
         required=True,
     )
 
-    location = ManuallyOptimizedField(LocationNode)
-
     is_closed = graphene.Boolean(required=True)
     first_reservable_datetime = graphene.DateTime()
     effective_access_type = graphene.Field(graphene.Enum.from_enum(AccessType))
@@ -92,13 +81,13 @@ class ReservationUnitNode(DjangoNode):
             #
             # IDs
             "pk",
-            "uuid",
+            "ext_uuid",
             "rank",
             #
             # Strings
             "name",
             "description",
-            "terms_of_use",
+            "notes_when_applying",
             "contact_information",
             "reservation_pending_instructions",
             "reservation_confirmed_instructions",
@@ -114,10 +103,10 @@ class ReservationUnitNode(DjangoNode):
             "reservations_max_days_before",
             #
             # Datetime
-            "reservation_begins",
-            "reservation_ends",
-            "publish_begins",
-            "publish_ends",
+            "reservation_begins_at",
+            "reservation_ends_at",
+            "publish_begins_at",
+            "publish_ends_at",
             "min_reservation_duration",
             "max_reservation_duration",
             "buffer_time_before",
@@ -154,14 +143,12 @@ class ReservationUnitNode(DjangoNode):
             "payment_terms",
             "payment_product",
             "payment_merchant",
-            "location",
             #
             # Forward many-to-many related
             "spaces",
             "resources",
             "purposes",
             "equipments",
-            "qualifiers",
             #
             # Reverse many-to-many related
             "application_rounds",
@@ -233,34 +220,6 @@ class ReservationUnitNode(DjangoNode):
         raise GQLCodeError(msg, code=error_codes.RESERVATION_UNIT_FIRST_RESERVABLE_DATETIME_NOT_CALCULATED)
 
     @staticmethod
-    def optimize_location(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
-        # Fetch `space` and space's `location` if not fetched yet.
-        space_optimizer = optimizer.get_or_set_child_optimizer(
-            name="spaces",
-            optimizer=QueryOptimizer(
-                Space,
-                optimizer.info,
-                name="spaces",
-                parent=optimizer,
-            ),
-            set_as="prefetch_related",
-        )
-        space_optimizer.get_or_set_child_optimizer(
-            name="location",
-            optimizer=QueryOptimizer(
-                Location,
-                optimizer.info,
-                name="location",
-                parent=space_optimizer,
-            ),
-        )
-
-        return queryset
-
-    def resolve_location(root: ReservationUnit, info: GQLInfo) -> Location:
-        return root.actions.get_location()
-
-    @staticmethod
     def optimize_payment_merchant(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
         # Fetch `payment_merchant` if not fetched yet.
         optimizer.get_or_set_child_optimizer(
@@ -305,7 +264,7 @@ class ReservationUnitNode(DjangoNode):
     @staticmethod
     def optimize_hauki_url(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
         # Fetch `uuid` if not fetched yet.
-        optimizer.only_fields.append("uuid")
+        optimizer.only_fields.append("ext_uuid")
 
         # Fetch `origin_hauki_resource` if not fetched yet.
         optimizer.get_or_set_child_optimizer(
@@ -338,7 +297,7 @@ class ReservationUnitNode(DjangoNode):
         if root.origin_hauki_resource is None:
             return None
 
-        return generate_hauki_link(root.uuid, info.context.user.email, root.unit.hauki_department_id)
+        return generate_hauki_link(root.ext_uuid, info.context.user.email, root.unit.hauki_department_id)
 
     def resolve_reservable_time_spans(
         root: ReservationUnit,

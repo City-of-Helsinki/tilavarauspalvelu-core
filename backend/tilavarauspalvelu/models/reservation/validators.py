@@ -23,11 +23,6 @@ __all__ = [
 class ReservationValidator:
     reservation: Reservation
 
-    def validate_single_reservation_unit(self) -> None:
-        if self.reservation.reservation_units.count() > 1:
-            msg = "Reservations with multiple reservation units are not supported yet."
-            raise ValidationError(msg, code=error_codes.MULTIPLE_RESERVATION_UNITS)
-
     def validate_no_payment_order(self) -> None:
         if hasattr(self.reservation, "payment_order"):
             msg = "Reservation cannot be changed anymore because it is attached to a payment order"
@@ -80,7 +75,7 @@ class ReservationValidator:
             raise ValidationError(msg, code=error_codes.ORDER_REFUND_NOT_ALLOWED)
 
     def validate_reservation_not_past_or_ongoing(self) -> None:
-        if self.reservation.begin.astimezone(DEFAULT_TIMEZONE) < local_datetime():
+        if self.reservation.begins_at.astimezone(DEFAULT_TIMEZONE) < local_datetime():
             msg = "Past or ongoing reservations cannot be modified"
             raise ValidationError(msg, code=error_codes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
@@ -93,7 +88,7 @@ class ReservationValidator:
         if now.hour == 0:
             min_allowed_datetime -= datetime.timedelta(days=1)
 
-        end = self.reservation.end.astimezone(DEFAULT_TIMEZONE)
+        end = self.reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
         if end < min_allowed_datetime:
             msg = "Reservation cannot be changed anymore."
             raise ValidationError(msg, code=error_codes.RESERVATION_MODIFICATION_NOT_ALLOWED)
@@ -133,7 +128,7 @@ class ReservationValidator:
             raise ValidationError(msg, code=error_codes.RESERVATION_DENYING_NOT_ALLOWED)
 
         now = local_datetime()
-        end = self.reservation.end.astimezone(DEFAULT_TIMEZONE)
+        end = self.reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
 
         if self.reservation.state == ReservationStateChoice.CONFIRMED.value and end < now:
             msg = "Reservation cannot be denied after it has ended."
@@ -195,7 +190,7 @@ class ReservationValidator:
             raise ValidationError(msg, code=error_codes.RESERVATION_ACCESS_CODE_NOT_GENERATED)
 
     def validate_not_in_reservation_series(self) -> None:
-        if self.reservation.recurring_reservation is not None:
+        if self.reservation.reservation_series is not None:
             msg = "Reservation cannot be in a reservation series."
             raise ValidationError(msg, code=error_codes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
@@ -211,7 +206,7 @@ class ReservationValidator:
 
     def validate_reservation_has_not_ended(self) -> None:
         now = local_datetime()
-        end = self.reservation.end.astimezone(DEFAULT_TIMEZONE)
+        end = self.reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
 
         if end <= now:
             msg = "Reservation has already ended."

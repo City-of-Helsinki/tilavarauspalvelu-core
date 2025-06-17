@@ -11,8 +11,8 @@ from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import (
     PaymentOrderFactory,
-    RecurringReservationFactory,
     ReservationFactory,
+    ReservationSeriesFactory,
     ReservationUnitFactory,
     UnitFactory,
     UnitGroupFactory,
@@ -32,7 +32,7 @@ def test_reservation__filter__by_reservation_type(graphql):
     # - There is a reservation in a certain state
     # - A superuser is using the system
     reservation_unit = ReservationUnitFactory.create()
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit], type=ReservationTypeChoice.NORMAL)
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit, type=ReservationTypeChoice.NORMAL)
     graphql.login_with_superuser()
 
     # when:
@@ -52,9 +52,9 @@ def test_reservation__filter__by_reservation_type__multiple(graphql):
     # - There are reservations in a different states
     # - A superuser is using the system
     reservation_unit = ReservationUnitFactory.create()
-    reservation_1 = ReservationFactory.create(reservation_units=[reservation_unit], type=ReservationTypeChoice.NORMAL)
-    reservation_2 = ReservationFactory.create(reservation_units=[reservation_unit], type=ReservationTypeChoice.STAFF)
-    ReservationFactory.create(reservation_units=[reservation_unit], type=ReservationTypeChoice.BEHALF)
+    reservation_1 = ReservationFactory.create(reservation_unit=reservation_unit, type=ReservationTypeChoice.NORMAL)
+    reservation_2 = ReservationFactory.create(reservation_unit=reservation_unit, type=ReservationTypeChoice.STAFF)
+    ReservationFactory.create(reservation_unit=reservation_unit, type=ReservationTypeChoice.BEHALF)
     graphql.login_with_superuser()
 
     # when:
@@ -178,7 +178,7 @@ def test_reservation__filter__by_only_with_permission__unit_admin(graphql):
     admin = UserFactory.create_with_unit_role(units=[unit])
 
     ReservationFactory.create(user=admin)  # Own reservation, different unit
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
     ReservationFactory.create()  # Other user's reservation, different unit
 
     graphql.force_login(admin)
@@ -198,11 +198,11 @@ def test_reservation__filter__by_only_with_permission__unit_admin__reserver(grap
     admin = UserFactory.create_with_unit_role(role=UserRoleChoice.RESERVER, units=[unit])
 
     # Own reservation, own unit
-    reservation = ReservationFactory.create(user=admin, reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(user=admin, reservation_unit=reservation_unit)
     # Own reservation, different unit
     ReservationFactory.create(user=admin)
     # Other user's reservation, own unit
-    ReservationFactory.create(reservation_units=[reservation_unit])
+    ReservationFactory.create(reservation_unit=reservation_unit)
     # Other user's reservation, different unit
     ReservationFactory.create()
 
@@ -222,7 +222,7 @@ def test_reservation__filter__by_only_with_permission__unit_group_admin(graphql)
     admin = UserFactory.create_with_unit_role(unit_groups=[unit_group])
 
     ReservationFactory.create(user=admin)  # Own reservation, different unit
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
     ReservationFactory.create()  # Other user's reservation, different unit
 
     graphql.force_login(admin)
@@ -259,9 +259,9 @@ def test_reservation__filter__by_only_with_handling_permission__unit_admin(graph
     # Reservation for the admin
     ReservationFactory.create(user=admin)
     # Reservation for the unit the admin has manage permissions for
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit_2])
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit_2)
     # Reservation for the unit the admin has view permissions for
-    ReservationFactory.create(reservation_units=[reservation_unit_1])
+    ReservationFactory.create(reservation_unit=reservation_unit_1)
     # Reservation for another unit
     ReservationFactory.create()
 
@@ -288,9 +288,9 @@ def test_reservation__filter__by_only_with_handling_permission__unit_group_admin
     # Reservation for the admin
     ReservationFactory.create(user=admin)
     # Reservation for the unit group the admin has manage permissions for
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit_2])
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit_2)
     # Reservation for the unit group the admin has view permissions for
-    ReservationFactory.create(reservation_units=[reservation_unit_1])
+    ReservationFactory.create(reservation_unit=reservation_unit_1)
     # Reservation for another unit
     ReservationFactory.create()
 
@@ -326,9 +326,9 @@ def test_reservation__filter__by_user(graphql):
 )
 def test_reservation__filter__by_reservation_unit_name(graphql, field, search):
     reservation = ReservationFactory.create(
-        reservation_units__name_fi="koirankoppi",
-        reservation_units__name_en="doghouse",
-        reservation_units__name_sv="hundkoja",
+        reservation_unit__name_fi="koirankoppi",
+        reservation_unit__name_en="doghouse",
+        reservation_unit__name_sv="hundkoja",
     )
 
     graphql.login_with_superuser()
@@ -350,14 +350,14 @@ def test_reservation__filter__by_reservation_unit_name(graphql, field, search):
 )
 def test_reservation__filter__by_reservation_unit_name__multiple_values(graphql, field, search):
     reservation_1 = ReservationFactory.create(
-        reservation_units__name_fi="koirankoppi",
-        reservation_units__name_en="doghouse",
-        reservation_units__name_sv="hundkoja",
+        reservation_unit__name_fi="koirankoppi",
+        reservation_unit__name_en="doghouse",
+        reservation_unit__name_sv="hundkoja",
     )
     reservation_2 = ReservationFactory.create(
-        reservation_units__name_fi="norsutarha",
-        reservation_units__name_en="elephant park",
-        reservation_units__name_sv="elefantparken",
+        reservation_unit__name_fi="norsutarha",
+        reservation_unit__name_en="elephant park",
+        reservation_unit__name_sv="elefantparken",
     )
 
     graphql.login_with_superuser()
@@ -372,7 +372,7 @@ def test_reservation__filter__by_reservation_unit_name__multiple_values(graphql,
 
 def test_reservation__filter__by_unit(graphql):
     reservation_unit = ReservationUnitFactory.create()
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
     ReservationFactory.create()
 
     graphql.login_with_superuser()
@@ -387,8 +387,8 @@ def test_reservation__filter__by_unit(graphql):
 def test_reservation__filter__by_unit__multiple(graphql):
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
-    reservation_1 = ReservationFactory.create(reservation_units=[reservation_unit_1])
-    reservation_2 = ReservationFactory.create(reservation_units=[reservation_unit_2])
+    reservation_1 = ReservationFactory.create(reservation_unit=reservation_unit_1)
+    reservation_2 = ReservationFactory.create(reservation_unit=reservation_unit_2)
 
     graphql.login_with_superuser()
     query = reservations_query(unit=[reservation_unit_1.unit.pk, reservation_unit_2.unit.pk])
@@ -426,15 +426,15 @@ def test_reservation__filter__by_price_gte(graphql):
     assert response.node(0) == {"pk": reservation.pk}
 
 
-def test_reservation__filter__by_recurring_reservation(graphql):
-    recurring_reservation = RecurringReservationFactory.create()
+def test_reservation__filter__by_reservation_series(graphql):
+    series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
-        recurring_reservation=recurring_reservation,
-        reservation_units=[recurring_reservation.reservation_unit],
+        reservation_series=series,
+        reservation_unit=series.reservation_unit,
     )
 
     graphql.login_with_superuser()
-    query = reservations_query(recurring_reservation=recurring_reservation.pk)
+    query = reservations_query(reservation_series=series.pk)
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -443,12 +443,12 @@ def test_reservation__filter__by_recurring_reservation(graphql):
 
 
 def test_reservation__filter__by_is_recurring(graphql):
-    recurring_reservation = RecurringReservationFactory.create()
+    series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
-        recurring_reservation=recurring_reservation,
-        reservation_units=[recurring_reservation.reservation_unit],
+        reservation_series=series,
+        reservation_unit=series.reservation_unit,
     )
-    ReservationFactory.create(recurring_reservation=None)
+    ReservationFactory.create(reservation_series=None)
 
     graphql.login_with_superuser()
     query = reservations_query(is_recurring=True)
@@ -461,7 +461,7 @@ def test_reservation__filter__by_is_recurring(graphql):
 
 def test_reservation__filter__by_reservation_unit(graphql):
     reservation_unit = ReservationUnitFactory.create()
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
 
     graphql.login_with_superuser()
     query = reservations_query(reservation_units=reservation_unit.pk)
@@ -472,11 +472,11 @@ def test_reservation__filter__by_reservation_unit(graphql):
     assert response.node(0) == {"pk": reservation.pk}
 
 
-def test_reservation__filter__by_reservation_units__multiple(graphql):
+def test_reservation__filter__by_reservation_unit__multiple(graphql):
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
-    reservation_1 = ReservationFactory.create(reservation_units=[reservation_unit_1])
-    reservation_2 = ReservationFactory.create(reservation_units=[reservation_unit_2])
+    reservation_1 = ReservationFactory.create(reservation_unit=reservation_unit_1)
+    reservation_2 = ReservationFactory.create(reservation_unit=reservation_unit_2)
 
     graphql.login_with_superuser()
     query = reservations_query(reservation_units=[reservation_unit_1.pk, reservation_unit_2.pk])
@@ -490,7 +490,7 @@ def test_reservation__filter__by_reservation_units__multiple(graphql):
 
 def test_reservation__filter__by_reservation_unit_type(graphql):
     reservation_unit = ReservationUnitFactory.create()
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
 
     graphql.login_with_superuser()
     query = reservations_query(reservation_unit_type=reservation_unit.reservation_unit_type.pk)
@@ -504,8 +504,8 @@ def test_reservation__filter__by_reservation_unit_type(graphql):
 def test_reservation__filter__by_reservation_unit_type__multiple(graphql):
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
-    reservation_1 = ReservationFactory.create(reservation_units=[reservation_unit_1])
-    reservation_2 = ReservationFactory.create(reservation_units=[reservation_unit_2])
+    reservation_1 = ReservationFactory.create(reservation_unit=reservation_unit_1)
+    reservation_2 = ReservationFactory.create(reservation_unit=reservation_unit_2)
 
     graphql.login_with_superuser()
     query = reservations_query(
@@ -524,7 +524,7 @@ def test_reservation__filter__by_reservation_unit_type__multiple(graphql):
 
 def test_reservation__filter__by_text_search__pk(graphql):
     reservation_unit = ReservationUnitFactory.create()
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
 
     graphql.login_with_superuser()
     query = reservations_query(text_search=str(reservation.pk))
@@ -643,12 +643,12 @@ def test_reservation__filter__by_text_search__user_last_name(graphql):
     assert response.node(0) == {"pk": reservation.pk}
 
 
-def test_reservation__filter__by_text_search__recurring_reservation_name(graphql):
-    reservation = ReservationFactory.create(recurring_reservation__name="foo")
-    recurring_reservation = reservation.recurring_reservation
+def test_reservation__filter__by_text_search__reservation_series_name(graphql):
+    reservation = ReservationFactory.create(reservation_series__name="foo")
+    reservation_series = reservation.reservation_series
 
     graphql.login_with_superuser()
-    query = reservations_query(text_search=recurring_reservation.name)
+    query = reservations_query(text_search=reservation_series.name)
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -676,18 +676,18 @@ def test_reservation__filter__by_begin_and_end_dates_is_timezone_aware(graphql):
 
     # 2021-01-01
     reservation_1 = ReservationFactory.create(
-        begin=datetime.datetime(2021, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE),
-        end=datetime.datetime(2021, 1, 1, 13, tzinfo=DEFAULT_TIMEZONE),
+        begins_at=datetime.datetime(2021, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE),
+        ends_at=datetime.datetime(2021, 1, 1, 13, tzinfo=DEFAULT_TIMEZONE),
     )
     # 2021-01-02 - 2021-01-03
     reservation_2 = ReservationFactory.create(
-        begin=datetime.datetime(2021, 1, 2, 12, tzinfo=DEFAULT_TIMEZONE),
-        end=datetime.datetime(2021, 1, 3, 0, tzinfo=DEFAULT_TIMEZONE),
+        begins_at=datetime.datetime(2021, 1, 2, 12, tzinfo=DEFAULT_TIMEZONE),
+        ends_at=datetime.datetime(2021, 1, 3, 0, tzinfo=DEFAULT_TIMEZONE),
     )
     # 2021-01-03 - 2021-01-04
     reservation_3 = ReservationFactory.create(
-        begin=datetime.datetime(2021, 1, 3, 12, tzinfo=datetime.UTC),  # 2021-01-03 14:00 local time
-        end=datetime.datetime(2021, 1, 3, 22, tzinfo=datetime.UTC),  # 2021-01-04 00:00 local time
+        begins_at=datetime.datetime(2021, 1, 3, 12, tzinfo=datetime.UTC),  # 2021-01-03 14:00 local time
+        ends_at=datetime.datetime(2021, 1, 3, 22, tzinfo=datetime.UTC),  # 2021-01-04 00:00 local time
     )
 
     graphql.login_with_superuser()

@@ -234,10 +234,10 @@ def test_handle_unfinished_reservations__handled__overdue():
     reservation_unit = ReservationUnitFactory.create()
 
     reservation = ReservationFactory.create(
-        begin=local_datetime(2024, 1, 2, 12),
+        begins_at=local_datetime(2024, 1, 2, 12),
         type=ReservationTypeChoice.NORMAL,
         state=ReservationStateChoice.CONFIRMED,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
 
     PaymentOrderFactory.create(
@@ -261,10 +261,10 @@ def test_handle_unfinished_reservations__handled__overdue__dont_delete_too_early
     reservation_unit = ReservationUnitFactory.create()
 
     reservation = ReservationFactory.create(
-        begin=local_datetime(2024, 1, 2, 12),
+        begins_at=local_datetime(2024, 1, 2, 12),
         type=ReservationTypeChoice.NORMAL,
         state=ReservationStateChoice.CONFIRMED,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
 
     PaymentOrderFactory.create(
@@ -288,12 +288,12 @@ def test_handle_unfinished_reservations__handled__overdue__delete_from_pindora()
     reservation_unit = ReservationUnitFactory.create()
 
     reservation = ReservationFactory.create(
-        begin=local_datetime(2024, 1, 2, 12),
+        begins_at=local_datetime(2024, 1, 2, 12),
         type=ReservationTypeChoice.NORMAL,
         state=ReservationStateChoice.CONFIRMED,
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=local_datetime(),
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
 
     PaymentOrderFactory.create(
@@ -317,12 +317,12 @@ def test_handle_unfinished_reservations__handled__overdue__delete_from_pindora__
     reservation_unit = ReservationUnitFactory.create()
 
     reservation = ReservationFactory.create(
-        begin=local_datetime(2024, 1, 2, 12),
+        begins_at=local_datetime(2024, 1, 2, 12),
         type=ReservationTypeChoice.NORMAL,
         state=ReservationStateChoice.CONFIRMED,
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=local_datetime(),
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
 
     PaymentOrderFactory.create(

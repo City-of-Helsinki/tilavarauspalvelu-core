@@ -7,30 +7,24 @@ import pytest
 
 from tilavarauspalvelu.management.commands.create_test_data import create_test_data
 from tilavarauspalvelu.models import (
-    AbilityGroup,
     PaymentOrder,
     PersonalInfoViewLog,
-    RecurringReservation,
     RejectedOccurrence,
+    ReservationSeries,
     ReservationStatistic,
     ReservationUnitImage,
 )
-from tilavarauspalvelu.models.request_log.model import RequestLog
-from tilavarauspalvelu.models.sql_log.model import SQLLog
 
 if TYPE_CHECKING:
     from django.db import models
 
 models_that_should_be_empty: list[type[models.Model]] = [
-    AbilityGroup,
     PaymentOrder,
     PersonalInfoViewLog,
-    RecurringReservation,
+    ReservationSeries,
     RejectedOccurrence,
-    RequestLog,
     ReservationStatistic,
     ReservationUnitImage,
-    SQLLog,
 ]
 
 
