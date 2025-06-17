@@ -6,7 +6,7 @@ import { Button, ButtonSize, ButtonVariant, Tabs } from "hds-react";
 import { Flex, H1, TabWrapper, TitleSection } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { parseAddress } from "@/common/util";
-import { getRecurringReservationUrl } from "@/common/urls";
+import { getReservationSeriesUrl } from "@/common/urls";
 import { ReservationUnitCalendarView } from "./ReservationUnitCalendarView";
 import { UnitReservations } from "./UnitReservations";
 import { base64encode, toNumber } from "common/src/helpers";
@@ -77,7 +77,7 @@ export function MyUnitView() {
     );
   }
 
-  const recurringReservationUrl = getRecurringReservationUrl(pk);
+  const recurringReservationUrl = getReservationSeriesUrl(pk);
 
   const reservationUnitOptions = (unit?.reservationUnits ?? []).map(({ pk, nameFi }) => ({
     label: nameFi ?? "-",
@@ -119,7 +119,7 @@ export function MyUnitView() {
           {t("MyUnits.Calendar.header.createReservation")}
         </Button>
         <ButtonLikeLink to={canCreateReservations ? recurringReservationUrl : ""} disabled={!canCreateReservations}>
-          {t("MyUnits.Calendar.header.recurringReservation")}
+          {t("MyUnits.Calendar.header.reservationSeries")}
         </ButtonLikeLink>
       </Flex>
       <TabWrapper>

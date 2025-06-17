@@ -72,13 +72,13 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
 
     // ignore error on purpose because this is going to fail with permission error
     const { data, error: _err } = useReservationApplicationLinkQuery({
-      variables: { id: reservation.recurringReservation?.id ?? "" },
-      skip: !reservation.recurringReservation?.id,
+      variables: { id: reservation.reservationSeries?.id ?? "" },
+      skip: !reservation.reservationSeries?.id,
     });
 
     const applicationPk =
-      data?.recurringReservation?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
-    const sectionPk = data?.recurringReservation?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.pk;
+      data?.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
+    const sectionPk = data?.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.pk;
     const applicationLink = getApplicationUrl(applicationPk, sectionPk);
 
     const paymentStatusLabelType = getStatusLabelType(reservation.paymentOrder?.status);
@@ -127,7 +127,7 @@ export default ReservationTitleSection;
 
 export const APPLICATION_LINK_QUERY = gql`
   query ReservationApplicationLink($id: ID!) {
-    recurringReservation(id: $id) {
+    reservationSeries(id: $id) {
       id
       allocatedTimeSlot {
         id
@@ -158,7 +158,7 @@ export const RESERVATION_TITLE_SECTION_FRAGMENT = gql`
     name
     pk
     reserveeName
-    recurringReservation {
+    reservationSeries {
       id
     }
     paymentOrder {

@@ -57,14 +57,14 @@ function EditReservation({
   const form = useForm<FormValueType>({
     // @ts-expect-error -- schema refinement breaks typing
     resolver: zodResolver(
-      ReservationChangeFormSchema.refine((x) => x.seriesName || !reservation.recurringReservation, {
+      ReservationChangeFormSchema.refine((x) => x.seriesName || !reservation.reservationSeries, {
         path: ["seriesName"],
         message: "Required",
       })
     ),
     mode: "onChange",
     defaultValues: {
-      seriesName: reservation.recurringReservation?.name ?? "",
+      seriesName: reservation.reservationSeries?.name ?? "",
       comments: reservation.workingMemo ?? "",
       type: ReservationTypeSchema.optional().parse(reservation.type?.toUpperCase()),
       name: reservation.name ?? "",
@@ -138,13 +138,13 @@ function EditReservation({
           reservationUnit={reservationUnit}
           disableBufferToggle
           // backend doesn't allow changing type for series but does allow it for single reservations
-          disableTypeSelect={reservation.recurringReservation?.pk != null}
+          disableTypeSelect={reservation.reservationSeries?.pk != null}
         >
-          {reservation.recurringReservation?.pk && (
+          {reservation.reservationSeries?.pk && (
             <InnerTextInput
               id="seriesName"
               disabled={reservationUnit == null}
-              label={t(`MyUnits.RecurringReservationForm.name`)}
+              label={t(`MyUnits.ReservationSeriesForm.name`)}
               required
               {...register("seriesName")}
               invalid={errors.seriesName != null}
@@ -239,7 +239,7 @@ export const RESERVATION_EDIT_PAGE_QUERY = gql`
       ...ReservationMetaFields
       ...ReservationTitleSectionFields
       ...UseStaffReservation
-      recurringReservation {
+      reservationSeries {
         id
         pk
         name

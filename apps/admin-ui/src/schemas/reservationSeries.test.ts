@@ -1,6 +1,6 @@
 import { addDays } from "date-fns";
 import { ReservationStartInterval, ReservationTypeChoice } from "@gql/gql-types";
-import { RecurringReservationForm, RecurringReservationFormSchema } from "./recurringReservation";
+import { ReservationSeriesForm, ReservationSeriesFormSchema } from "./reservationSeries";
 import { toUIDate } from "common/src/common/util";
 import { test, expect } from "vitest";
 
@@ -16,7 +16,7 @@ function createInput({
   startTime = "09:00",
   endTime = "10:15",
   seriesName = "name",
-}: Partial<RecurringReservationForm>) {
+}: Partial<ReservationSeriesForm>) {
   return {
     type,
     startingDate,
@@ -38,12 +38,12 @@ function createInput({
 // no metadata
 // type? BLOCKED or STAFF
 test("one week blocked reservation on a single day is valid", () => {
-  const res = RecurringReservationFormSchema(interval).safeParse(createInput({}));
+  const res = ReservationSeriesFormSchema(interval).safeParse(createInput({}));
   expect(res.success).toBeTruthy();
 });
 
 test("over 24h time should fail", () => {
-  const res = RecurringReservationFormSchema(interval).safeParse(
+  const res = ReservationSeriesFormSchema(interval).safeParse(
     createInput({
       startTime: "32:00",
       endTime: "33:15",
@@ -54,7 +54,7 @@ test("over 24h time should fail", () => {
 });
 
 test(`invalid time string should fail`, () => {
-  const res = RecurringReservationFormSchema(interval).safeParse(
+  const res = ReservationSeriesFormSchema(interval).safeParse(
     createInput({
       startTime: "fo:ba",
     })
@@ -64,7 +64,7 @@ test(`invalid time string should fail`, () => {
 });
 
 test(`time start after time end should fail`, () => {
-  const res = RecurringReservationFormSchema(interval).safeParse(
+  const res = ReservationSeriesFormSchema(interval).safeParse(
     createInput({
       startTime: "10:30",
       endTime: "10:00",
@@ -79,7 +79,7 @@ test.todo(`STAFF reservation should be a success`);
 test.todo(`start date cannot be in the past`);
 test.todo(`end date cannot be after start date`);
 test.todo(`start time can't be after end time`);
-test.todo("RecurringReservationFormSchema checks for empty fields");
-test.todo("RecurringReservationFormSchema passthrough unknown fields");
+test.todo("ReservationSeriesFormSchema checks for empty fields");
+test.todo("ReservationSeriesFormSchema passthrough unknown fields");
 // TODO should check the error types from failures also but need to think through those cases
 // for example missing type should still give a refinement error for dates

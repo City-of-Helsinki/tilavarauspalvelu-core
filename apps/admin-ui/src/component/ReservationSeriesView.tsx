@@ -7,22 +7,22 @@ import { ReservationListButton } from "@/component/ReservationListButton";
 import { DenyDialog } from "@/component/DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import { EditTimeModal } from "@/component/EditTimeModal";
-import { useCheckPermission, useRecurringReservations } from "@/hooks";
+import { useCheckPermission, useReservationSeries } from "@/hooks";
 import { isPossibleToDeny, isPossibleToEdit } from "@/modules/reservationModificationRules";
 import { CenterSpinner } from "common/styled";
 
 type Props = {
-  recurringPk: number;
+  reservationSeriesPk: number;
   onSelect?: (selected: number) => void;
   onChange?: () => Promise<unknown>;
   onReservationUpdated?: () => void;
   // optional reservation to copy when creating a new reservation
-  // contains a lot more information than the RecurringReservationQuery
+  // contains a lot more information than the ReservationSeriesQuery
   reservationToCopy?: ReservationToCopyFragment;
 };
 
-export function RecurringReservationsView({
-  recurringPk,
+export function ReservationSeriesView({
+  reservationSeriesPk,
   onSelect,
   onChange,
   onReservationUpdated,
@@ -31,7 +31,7 @@ export function RecurringReservationsView({
   const { t } = useTranslation();
   const { setModalContent } = useModal();
 
-  const { reservations, loading, refetch, recurringReservation } = useRecurringReservations(recurringPk);
+  const { reservations, loading, refetch, reservationSeries } = useReservationSeries(reservationSeriesPk);
 
   const unitPk = reservationToCopy?.reservationUnits?.[0]?.unit?.pk;
   const { hasPermission } = useCheckPermission({
@@ -69,7 +69,7 @@ export function RecurringReservationsView({
   const handleRemove = (res: (typeof reservations)[0]) => {
     setModalContent(
       <DenyDialog
-        // @ts-expect-error -- FIXME make a separate version of DenyDialog for recurring reservations
+        // @ts-expect-error -- FIXME make a separate version of DenyDialog for reservations series
         reservation={res}
         onReject={() => {
           refetch();
@@ -81,7 +81,7 @@ export function RecurringReservationsView({
     );
   };
 
-  const { rejectedOccurrences } = recurringReservation ?? {};
+  const { rejectedOccurrences } = reservationSeries ?? {};
   const rejected: NewReservationListItem[] =
     rejectedOccurrences?.map((x) => {
       const startDate = new Date(x.beginDatetime);
@@ -127,7 +127,7 @@ export function RecurringReservationsView({
 
   return (
     <ReservationList
-      header={t("RecurringReservationsView.Heading")}
+      header={t("ReservationSeriesView.Heading")}
       items={items}
       reservationToCopy={reservationToCopy}
       refetch={handleChangeSuccess}

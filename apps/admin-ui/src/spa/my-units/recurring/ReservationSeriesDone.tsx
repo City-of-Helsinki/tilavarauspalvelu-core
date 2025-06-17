@@ -2,26 +2,26 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { ErrorBoundary } from "react-error-boundary";
-import { RecurringReservationsView } from "@/component/RecurringReservationsView";
+import { ReservationSeriesView } from "@/component/ReservationSeriesView";
 import Error404 from "@/common/Error404";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { getReservationUrl } from "@/common/urls";
 import { Flex, H1 } from "common/styled";
-import { useRecurringReservations } from "@/hooks";
+import { useReservationSeries } from "@/hooks";
 
-function RecurringReservationDoneInner({ recurringPk }: { recurringPk: number }) {
+function ReservationSeriesDoneInner({ recurringPk }: { recurringPk: number }) {
   const { t } = useTranslation("translation", {
-    keyPrefix: "MyUnits.RecurringReservation.Confirmation",
+    keyPrefix: "MyUnits.ReservationSeries.Confirmation",
   });
 
-  const { reservations } = useRecurringReservations(recurringPk);
+  const { reservations } = useReservationSeries(recurringPk);
   const reservationUrl = getReservationUrl(reservations[0]?.pk);
 
   return (
     <>
       <H1 $marginBottom="none">{reservations.length > 0 ? t(`title`) : t("allFailedTitle")}</H1>
       <p>{t(`successInfo`)}</p>
-      <RecurringReservationsView recurringPk={recurringPk} />
+      <ReservationSeriesView reservationSeriesPk={recurringPk} />
       <Flex $direction="row" $justifyContent="flex-end" $wrap="wrap">
         <ButtonLikeLink to="../../.." relative="path">
           {t(`buttonToUnit`)}
@@ -36,10 +36,10 @@ function RecurringReservationDoneInner({ recurringPk }: { recurringPk: number })
 
 function ErrorComponent() {
   const { t } = useTranslation();
-  return <div>{t("errors.errorRecurringReservationsDoneDisplay")}</div>;
+  return <div>{t("errors.errorReservationSeriesDoneDisplay")}</div>;
 }
 
-export function RecurringReservationDone() {
+export function ReservationSeriesDone() {
   const { pk } = useParams() as { pk: string };
   const recurringPk = Number(pk);
   const isValid = recurringPk > 0;
@@ -50,7 +50,7 @@ export function RecurringReservationDone() {
 
   return (
     <ErrorBoundary FallbackComponent={ErrorComponent}>
-      <RecurringReservationDoneInner recurringPk={recurringPk} />
+      <ReservationSeriesDoneInner recurringPk={recurringPk} />
     </ErrorBoundary>
   );
 }
