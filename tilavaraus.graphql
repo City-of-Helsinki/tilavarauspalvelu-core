@@ -1734,7 +1734,6 @@ type RecurringReservationNode implements Node {
   user: UserNode
   allocatedTimeSlot: AllocatedTimeSlotNode
   ageGroup: AgeGroupNode
-  abilityGroup: AbilityGroupNode
   rejectedOccurrences(
     pk: [Int]
     recurringReservation: Int
@@ -2191,16 +2190,6 @@ enum AllocatedTimeSlotOrderingChoices {
   applicationStatusDesc
   applicationSectionStatusAsc
   applicationSectionStatusDesc
-}
-
-type AbilityGroupNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
-
-  """The ID of the object"""
-  id: ID!
-  pk: Int
 }
 
 type RejectedOccurrenceNode implements Node {
@@ -4747,7 +4736,6 @@ type ReservationSeriesCreateMutationPayload {
   description: String
   reservationUnit: Int
   ageGroup: Int
-  abilityGroup: Int
   recurrenceInDays: Int
   weekdays: [Int]
   beginTime: Time
@@ -4762,7 +4750,6 @@ input ReservationSeriesCreateMutationInput {
   description: String
   reservationUnit: Int!
   ageGroup: Int
-  abilityGroup: Int
   recurrenceInDays: Int!
   weekdays: [Int]!
   beginTime: Time!
