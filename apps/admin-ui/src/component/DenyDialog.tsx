@@ -327,14 +327,14 @@ export function DenyDialogSeries({
   onClose,
   onReject,
   initialHandlingDetails,
-  recurringReservation,
+  reservationSeries,
   focusAfterCloseRef,
 }: Readonly<{
   title?: string;
   onClose: () => void;
   onReject: () => void;
   initialHandlingDetails: string;
-  recurringReservation: { pk: number | null };
+  reservationSeries: { pk: number | null };
   focusAfterCloseRef?: React.RefObject<HTMLButtonElement>;
 }>): JSX.Element {
   const { t } = useTranslation();
@@ -343,7 +343,7 @@ export function DenyDialogSeries({
 
   const handleDeny = async (vars: DenyVariables) => {
     const { handlingDetails, denyReasonPk } = vars;
-    const inputPk = recurringReservation.pk;
+    const inputPk = reservationSeries.pk;
     try {
       if (denyReasonPk == null) {
         throw new Error("Deny PK undefined");

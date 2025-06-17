@@ -2,11 +2,11 @@ import { GraphQLError } from "graphql";
 import { addDays, addHours, startOfDay } from "date-fns";
 import {
   CustomerTypeChoice,
-  RecurringReservationDocument,
-  type RecurringReservationQuery,
+  ReservationSeriesDocument,
+  type ReservationSeriesQuery,
   ReservationStateChoice,
   ReservationTypeChoice,
-  UpdateRecurringReservationDocument,
+  UpdateReservationSeriesDocument,
   UpdateStaffReservationDocument,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
@@ -75,7 +75,7 @@ function createReservation({
   begin: string;
   end: string;
   state?: ReservationStateChoice;
-}): NonNullable<RecurringReservationQuery["recurringReservation"]>["reservations"][number] {
+}): NonNullable<ReservationSeriesQuery["reservationSeries"]>["reservations"][number] {
   return {
     bufferTimeAfter: 0,
     bufferTimeBefore: 0,
@@ -83,8 +83,8 @@ function createReservation({
     reservationUnits: [],
     type: ReservationTypeChoice.Behalf,
     handlingDetails: null,
-    recurringReservation: {
-      id: base64encode(`RecurringReservationNode:${recurringPk}`),
+    reservationSeries: {
+      id: base64encode(`ReservationSeriesNode:${recurringPk}`),
       pk: recurringPk,
       // TODO these should not be empty
       weekdays: [],
@@ -103,7 +103,7 @@ function createReservationEdge({
   startingPk,
   recurringPk,
   state = ReservationStateChoice.Confirmed,
-}: ReservationEdgeProps): NonNullable<RecurringReservationQuery["recurringReservation"]>["reservations"] {
+}: ReservationEdgeProps): NonNullable<ReservationSeriesQuery["reservationSeries"]>["reservations"] {
   const begin1 = getValidInterval(0)[0];
   const end1 = getValidInterval(0)[1];
   const begin2 = getValidInterval(7)[0];
@@ -136,7 +136,7 @@ function convertDate(str: string) {
   return toApiDateUnsafe(date);
 }
 
-function correctRecurringReservationQueryResult(
+function correctReservationSeriesQueryResult(
   startingPk: number,
   recurringPk: number,
   options?: {
@@ -149,8 +149,8 @@ function correctRecurringReservationQueryResult(
     startingPk,
     recurringPk,
   });
-  const recurringReservation: NonNullable<RecurringReservationQuery["recurringReservation"]> = {
-    id: base64encode(`RecurringReservationNode:${recurringPk}`),
+  const reservationSeries: NonNullable<ReservationSeriesQuery["reservationSeries"]> = {
+    id: base64encode(`ReservationSeriesNode:${recurringPk}`),
     pk: recurringPk,
     // TODO this should not be empty
     weekdays: [],
@@ -164,20 +164,20 @@ function correctRecurringReservationQueryResult(
   return [
     {
       request: {
-        query: RecurringReservationDocument,
+        query: ReservationSeriesDocument,
         variables: {
-          id: base64encode(`RecurringReservationNode:${recurringPk}`),
+          id: base64encode(`ReservationSeriesNode:${recurringPk}`),
         },
       },
       result: {
         data: {
-          recurringReservation,
+          reservationSeries,
         },
       },
     },
     {
       request: {
-        query: UpdateRecurringReservationDocument,
+        query: UpdateReservationSeriesDocument,
         variables: {
           input: {
             name: "Modify recurring name",
@@ -188,7 +188,7 @@ function correctRecurringReservationQueryResult(
       },
       result: {
         data: {
-          updateRecurringReservation: {
+          updateReservationSeries: {
             pk: recurringPk,
             errors: null,
           },
@@ -306,9 +306,9 @@ export function createMocks() {
         errors: [new GraphQLError("Error")],
       },
     },
-    ...correctRecurringReservationQueryResult(21, 1),
-    ...correctRecurringReservationQueryResult(31, 2, { shouldFailOnce: true }),
-    ...correctRecurringReservationQueryResult(41, 3, { allDenied: true }),
-    ...correctRecurringReservationQueryResult(51, 4, { shouldFailAll: true }),
+    ...correctReservationSeriesQueryResult(21, 1),
+    ...correctReservationSeriesQueryResult(31, 2, { shouldFailOnce: true }),
+    ...correctReservationSeriesQueryResult(41, 3, { allDenied: true }),
+    ...correctReservationSeriesQueryResult(51, 4, { shouldFailAll: true }),
   ];
 }

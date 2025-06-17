@@ -66,9 +66,9 @@ function constructReservation({
     id: base64encode("ReservationNode:1"),
     begin: begin.toISOString(),
     end: end.toISOString(),
-    recurringReservation: enableRecurrence
+    reservationSeries: enableRecurrence
       ? {
-          id: base64encode("RecurringReservationNode:1"),
+          id: base64encode("ReservationSeriesNode:1"),
           beginTime: "12:00",
           endTime: "14:00",
           beginDate: toApiDate(begin),

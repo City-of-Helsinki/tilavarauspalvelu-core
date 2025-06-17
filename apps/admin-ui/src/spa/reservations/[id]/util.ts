@@ -170,7 +170,7 @@ export function getName(
 // single format   : {weekday} {date} {time}, {duration} | {unit}
 export function createTagString(reservation: CreateTagStringFragment, t: TFunction): string {
   try {
-    if (reservation.recurringReservation != null) {
+    if (reservation.reservationSeries != null) {
       return createRecurringTagString(reservation, t);
     }
     return createSingleTagString(reservation, t);
@@ -193,8 +193,8 @@ function createSingleTagString(reservation: CreateTagStringFragment, t: TFunctio
 }
 
 function createRecurringTagString(reservation: CreateTagStringFragment, t: TFunction): string {
-  const { recurringReservation } = reservation;
-  const { beginDate, beginTime, endDate, endTime, weekdays } = recurringReservation ?? {};
+  const { reservationSeries } = reservation;
+  const { beginDate, beginTime, endDate, endTime, weekdays } = reservationSeries ?? {};
   if (
     endDate == null ||
     beginDate == null ||
@@ -239,7 +239,7 @@ export const CREATE_TAG_STRING_FRAGMENT = gql`
         nameFi
       }
     }
-    recurringReservation {
+    reservationSeries {
       id
       beginDate
       beginTime

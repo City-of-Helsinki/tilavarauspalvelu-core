@@ -37,7 +37,7 @@ type RejectedOccurrencesView = {
 };
 
 function timeSlotMapper(t: TFunction, slot: RejectedOccurancesTableElementFragment): RejectedOccurrencesView {
-  const allocatedSlot = slot.recurringReservation?.allocatedTimeSlot;
+  const allocatedSlot = slot.reservationSeries?.allocatedTimeSlot;
   const allocatedReservationUnit = allocatedSlot?.reservationUnitOption.reservationUnit;
   const allocatedReservationUnitName = allocatedReservationUnit?.nameFi ?? "-";
   const allocatedUnit = allocatedReservationUnit?.unit?.nameFi ?? "-";
@@ -52,10 +52,10 @@ function timeSlotMapper(t: TFunction, slot: RejectedOccurancesTableElementFragme
   const name = allocatedSlot?.reservationUnitOption.applicationSection.name ?? "-";
 
   const applicationPk = application?.pk ?? 0;
-  const reservationPk = slot.recurringReservation?.reservations[0]?.pk ?? null;
+  const reservationPk = slot.reservationSeries?.reservations[0]?.pk ?? null;
   const link = getReservationUrl(reservationPk);
 
-  const reason = t(`MyUnits.RecurringReservation.Confirmation.RejectionReadinessChoice.${slot.rejectionReason}`) ?? "-";
+  const reason = t(`MyUnits.ReservationSeries.Confirmation.RejectionReadinessChoice.${slot.rejectionReason}`) ?? "-";
   return {
     key: `${applicationPk}-${slot.pk}`,
     applicationPk,
@@ -173,7 +173,7 @@ export const REJECTED_OCCURANCES_TABLE_ELEMENT_FRAGMENT = gql`
     beginDatetime
     endDatetime
     rejectionReason
-    recurringReservation {
+    reservationSeries {
       id
       allocatedTimeSlot {
         id

@@ -23,7 +23,7 @@ export type CollisionInterval = {
   end: Date;
   buffers: { before: number; after: number };
   type?: ReservationTypeChoice;
-  recurringReservationPk?: number;
+  reservationSeriesPk?: number;
 };
 
 /// @brief Check if two intervals collide
@@ -57,7 +57,7 @@ export function getBufferTime(
 export function reservationToInterval(
   x: Pick<
     CalendarReservationFragment,
-    "begin" | "end" | "bufferTimeBefore" | "bufferTimeAfter" | "recurringReservation" | "type"
+    "begin" | "end" | "bufferTimeBefore" | "bufferTimeAfter" | "reservationSeries" | "type"
   >,
   comparisonReservationType: ReservationTypeChoice
 ): CollisionInterval | null {
@@ -72,7 +72,7 @@ export function reservationToInterval(
       before: getBufferTime(x.bufferTimeBefore, t),
       after: getBufferTime(x.bufferTimeAfter, t),
     },
-    recurringReservationPk: x.recurringReservation?.pk ?? undefined,
+    reservationSeriesPk: x.reservationSeries?.pk ?? undefined,
     type: x.type ?? undefined,
   };
 }

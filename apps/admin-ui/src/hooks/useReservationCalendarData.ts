@@ -94,7 +94,7 @@ function convertReservationToCalendarEvent(
     event: {
       ...r,
       name: r.name?.trim() !== "" ? r.name : "No name",
-      recurringReservation: null,
+      reservationSeries: null,
     },
     start: new Date(r.begin),
     end: new Date(r.end),

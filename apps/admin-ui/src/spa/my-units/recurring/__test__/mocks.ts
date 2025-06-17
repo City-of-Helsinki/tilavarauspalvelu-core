@@ -168,7 +168,7 @@ const reservationsByUnitResponse: CalendarReservationFragment[] = mondayMorningR
     user: null,
     type: ReservationTypeChoice.Normal,
     affectedReservationUnits: [],
-    recurringReservation: null,
+    reservationSeries: null,
   }));
 
 const AdminUserMock: CurrentUserQuery = {

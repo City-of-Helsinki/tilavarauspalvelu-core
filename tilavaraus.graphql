@@ -400,7 +400,7 @@ type Query {
     unit: [Int]
     user: [Int]
     reservationUnitType: [Int]
-    recurringReservation: [Int]
+    reservationSeries: [Int]
     reservationUnitNameFi: String
     reservationUnitNameEn: String
     reservationUnitNameSv: String
@@ -441,7 +441,7 @@ type Query {
     unit: [Int]
     user: [Int]
     reservationUnitType: [Int]
-    recurringReservation: [Int]
+    reservationSeries: [Int]
     reservationUnitNameFi: String
     reservationUnitNameEn: String
     reservationUnitNameSv: String
@@ -464,11 +464,11 @@ type Query {
     """Ordering"""
     orderBy: [ReservationOrderingChoices]
   ): [ReservationNode!]
-  recurringReservation(
+  reservationSeries(
     """The ID of the object"""
     id: ID!
-  ): RecurringReservationNode
-  recurringReservations(
+  ): ReservationSeriesNode
+  pagedReservationSeries(
     first: Int
     last: Int
     offset: Int
@@ -490,8 +490,8 @@ type Query {
     reservationUnitType: [ID]
 
     """Ordering"""
-    orderBy: [RecurringReservationOrderingChoices]
-  ): RecurringReservationNodeConnection
+    orderBy: [ReservationSeriesOrderingChoices]
+  ): ReservationSeriesNodeConnection
   rejectedOccurrence(
     """The ID of the object"""
     id: ID!
@@ -503,7 +503,7 @@ type Query {
     after: String
     before: String
     pk: [Int]
-    recurringReservation: Int
+    reservationSeries: Int
     applicationRound: Int
     reservationUnit: [Int]
     unit: [Int]
@@ -845,7 +845,7 @@ type ReservationUnitNode implements Node {
     unit: [Int]
     user: [Int]
     reservationUnitType: [Int]
-    recurringReservation: [Int]
+    reservationSeries: [Int]
     reservationUnitNameFi: String
     reservationUnitNameEn: String
     reservationUnitNameSv: String
@@ -1336,7 +1336,7 @@ enum TermsType {
   """Cancellation terms"""
   CANCELLATION_TERMS
 
-  """Recurring reservation terms"""
+  """Reservation series terms"""
   RECURRING_TERMS
 
   """Service-specific terms"""
@@ -1536,7 +1536,7 @@ type ReservationNode implements Node {
     orderBy: [ReservationUnitOrderingChoices]
   ): [ReservationUnitNode!]!
   user: UserNode
-  recurringReservation: RecurringReservationNode
+  reservationSeries: ReservationSeriesNode
   denyReason: ReservationDenyReasonNode
   purpose: ReservationPurposeNode
   homeCity: CityNode
@@ -1719,7 +1719,7 @@ type UnitRoleNode implements Node {
   permissions: [UserPermissionChoice!]!
 }
 
-type RecurringReservationNode implements Node {
+type ReservationSeriesNode implements Node {
   extUuid: UUID!
   name: String!
   description: String!
@@ -1736,7 +1736,7 @@ type RecurringReservationNode implements Node {
   ageGroup: AgeGroupNode
   rejectedOccurrences(
     pk: [Int]
-    recurringReservation: Int
+    reservationSeries: Int
     applicationRound: Int
     reservationUnit: [Int]
     unit: [Int]
@@ -1752,7 +1752,7 @@ type RecurringReservationNode implements Node {
     unit: [Int]
     user: [Int]
     reservationUnitType: [Int]
-    recurringReservation: [Int]
+    reservationSeries: [Int]
     reservationUnitNameFi: String
     reservationUnitNameEn: String
     reservationUnitNameSv: String
@@ -1795,7 +1795,7 @@ type AllocatedTimeSlotNode implements Node {
   beginTime: Time!
   endTime: Time!
   reservationUnitOption: ReservationUnitOptionNode!
-  recurringReservation: RecurringReservationNode
+  reservationSeries: ReservationSeriesNode
 
   """The ID of the object"""
   id: ID!
@@ -2197,7 +2197,7 @@ type RejectedOccurrenceNode implements Node {
   endDatetime: DateTime!
   rejectionReason: RejectionReadinessChoice!
   createdAt: DateTime!
-  recurringReservation: RecurringReservationNode!
+  reservationSeries: ReservationSeriesNode!
 
   """The ID of the object"""
   id: ID!
@@ -2903,26 +2903,26 @@ type ReservationNodeEdge {
   cursor: String!
 }
 
-type RecurringReservationNodeConnection {
+type ReservationSeriesNodeConnection {
   """Pagination data for this connection."""
   pageInfo: PageInfo!
 
   """Contains the nodes in this connection."""
-  edges: [RecurringReservationNodeEdge]!
+  edges: [ReservationSeriesNodeEdge]!
   totalCount: Int
 }
 
-"""A Relay edge containing a `RecurringReservationNode` and its cursor."""
-type RecurringReservationNodeEdge {
+"""A Relay edge containing a `ReservationSeriesNode` and its cursor."""
+type ReservationSeriesNodeEdge {
   """The item at the end of the edge"""
-  node: RecurringReservationNode
+  node: ReservationSeriesNode
 
   """A cursor for use in pagination"""
   cursor: String!
 }
 
-"""Ordering fields for the 'RecurringReservation' model."""
-enum RecurringReservationOrderingChoices {
+"""Ordering fields for the 'ReservationSeries' model."""
+enum ReservationSeriesOrderingChoices {
   pkAsc
   pkDesc
   nameAsc

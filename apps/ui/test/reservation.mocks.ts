@@ -172,7 +172,7 @@ export function createMockReservation(
     purpose: {
       ...generatePurposeFragment("Test Purpose"),
     },
-    recurringReservation: null,
+    reservationSeries: null,
     reservationUnits: [
       {
         id: base64encode(`ReservationUnitNode:1`),

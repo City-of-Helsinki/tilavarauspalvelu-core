@@ -18,9 +18,9 @@ import { getEventBuffers } from "common/src/calendar/util";
 import { filterNonNullable, toNumber } from "common/src/helpers";
 import VisibleIfPermission from "@/component/VisibleIfPermission";
 import { useSearchParams } from "react-router-dom";
-import { useRecurringReservations, useReservationCalendarData } from "@/hooks";
+import { useReservationSeries, useReservationCalendarData } from "@/hooks";
 import { add, startOfISOWeek } from "date-fns";
-import { RecurringReservationsView } from "@/component/RecurringReservationsView";
+import { ReservationSeriesView } from "@/component/ReservationSeriesView";
 import { Accordion } from "./components";
 import { gql } from "@apollo/client";
 
@@ -75,7 +75,7 @@ const Calendar = forwardRef(function Calendar(
   };
 
   const isAllowedToModify =
-    !reservation.recurringReservation && isPossibleToEdit(reservation.state, new Date(reservation.end));
+    !reservation.reservationSeries && isPossibleToEdit(reservation.state, new Date(reservation.end));
 
   const eventBuffers = getEventBuffers(
     filterNonNullable(events.map((e) => e.event).filter((e) => e?.type !== ReservationTypeChoice.Blocked))
@@ -135,7 +135,7 @@ export function TimeBlockSection({
   // (2) else if reservation is in the future => show that
   // (3) else if reservation.recurrence has an event in the future => show that
   // (4) else show today
-  const { reservations } = useRecurringReservations(reservation.recurringReservation?.pk ?? undefined);
+  const { reservations } = useReservationSeries(reservation.reservationSeries?.pk ?? undefined);
 
   const nextReservation = reservations.find(
     (x) => x.state === ReservationStateChoice.Confirmed && new Date(x.begin) > new Date()
@@ -192,10 +192,10 @@ export function TimeBlockSection({
 
   return (
     <>
-      {reservation.recurringReservation?.pk && (
+      {reservation.reservationSeries?.pk && (
         <Accordion id="reservation__recurring" heading={t("RequestedReservation.recurring")}>
-          <RecurringReservationsView
-            recurringPk={reservation.recurringReservation.pk}
+          <ReservationSeriesView
+            reservationSeriesPk={reservation.reservationSeries.pk}
             onSelect={setSelected}
             onReservationUpdated={handleChanged}
             onChange={handleChanged}
@@ -206,7 +206,7 @@ export function TimeBlockSection({
 
       <Accordion
         heading={t("RequestedReservation.calendar")}
-        initiallyOpen={reservation.recurringReservation != null}
+        initiallyOpen={reservation.reservationSeries != null}
         id="reservation__calendar"
       >
         <Calendar
@@ -240,7 +240,7 @@ export const TIME_BLOCK_FRAGMENT = gql`
       id
       pk
     }
-    recurringReservation {
+    reservationSeries {
       id
       pk
     }

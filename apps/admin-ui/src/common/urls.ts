@@ -81,7 +81,7 @@ export function getMyUnitUrl(unitPk: Maybe<number> | undefined): string {
   return `/my-units/${unitPk}`;
 }
 
-export function getRecurringReservationUrl(pk: Maybe<string | number> | undefined): string {
+export function getReservationSeriesUrl(pk: Maybe<string | number> | undefined): string {
   if (pk == null || !(Number(pk) > 0)) {
     return "";
   }

@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { RecurringReservationForm } from "./RecurringReservationForm";
-import { useRecurringReservationsUnits } from "./hooks";
+import { ReservationSeriesForm } from "./ReservationSeriesForm";
+import { useSeriesReservationsUnits } from "./hooks";
 import { LinkPrev } from "@/component/LinkPrev";
 import { CenterSpinner, H1 } from "common/styled";
 import { toNumber } from "common/src/helpers";
@@ -12,32 +12,32 @@ type Params = {
   reservationUnitId: string;
 };
 
-function RecurringReservationInner({ unitPk }: { unitPk: number }) {
+function ReservationSeriesInner({ unitPk }: { unitPk: number }) {
   const { t } = useTranslation();
 
-  const { loading, reservationUnits } = useRecurringReservationsUnits(unitPk);
+  const { loading, reservationUnits } = useSeriesReservationsUnits(unitPk);
 
   return (
     <>
-      <H1 $noMargin>{t("MyUnits.RecurringReservation.pageTitle")}</H1>
+      <H1 $noMargin>{t("MyUnits.ReservationSeries.pageTitle")}</H1>
       {loading ? (
         <CenterSpinner />
       ) : reservationUnits.length > 0 ? (
-        <RecurringReservationForm reservationUnits={reservationUnits} />
+        <ReservationSeriesForm reservationUnits={reservationUnits} />
       ) : (
-        <p>{t("MyUnits.RecurringReservation.error.notPossibleForThisUnit")}</p>
+        <p>{t("MyUnits.ReservationSeries.error.notPossibleForThisUnit")}</p>
       )}
     </>
   );
 }
 
-function RecurringErrorPage() {
+function ReservationSeriesErrorPage() {
   const { t } = useTranslation();
-  return <div>{t("MyUnits.RecurringReservation.error.invalidUnitId")}</div>;
+  return <div>{t("MyUnits.ReservationSeries.error.invalidUnitId")}</div>;
 }
 
 // Handle invalid route params
-export function RecurringReservation() {
+export function ReservationSeries() {
   const { unitId } = useParams<Params>();
 
   const unitPk = toNumber(unitId);
@@ -45,7 +45,7 @@ export function RecurringReservation() {
   return (
     <>
       <LinkPrev />
-      {isInvalid ? <RecurringErrorPage /> : <RecurringReservationInner unitPk={unitPk} />}
+      {isInvalid ? <ReservationSeriesErrorPage /> : <ReservationSeriesInner unitPk={unitPk} />}
     </>
   );
 }

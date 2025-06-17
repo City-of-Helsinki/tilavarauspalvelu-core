@@ -29,7 +29,7 @@ function createInput({
     begin: end.toISOString(),
     end: end.toISOString(),
     paymentOrder: null,
-    recurringReservation: null,
+    reservationSeries: null,
     reservationUnits: [],
     price: null,
     handlingDetails: null,

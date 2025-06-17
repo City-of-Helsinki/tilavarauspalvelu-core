@@ -4,7 +4,7 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MockedProvider } from "@apollo/client/testing";
 import { MemoryRouter } from "react-router-dom";
-import { RecurringReservationForm } from "./RecurringReservationForm";
+import { ReservationSeriesForm } from "./ReservationSeriesForm";
 import { vi, test, expect, afterEach, beforeEach } from "vitest";
 import { YEAR, createGraphQLMocks, mondayMorningReservations, createReservationUnits } from "./__test__/mocks";
 import { toUIDate } from "common/src/common/util";
@@ -35,7 +35,7 @@ function customRender(
           mutate: { fetchPolicy: "no-cache" },
         }}
       >
-        <RecurringReservationForm reservationUnits={createReservationUnits()} />
+        <ReservationSeriesForm reservationUnits={createReservationUnits()} />
       </MockedProvider>
     </MemoryRouter>
   );
@@ -177,7 +177,7 @@ test("Form has meta when reservation unit is selected.", async () => {
   await selectUnit();
 
   // visible after unit is selected
-  const seriesNameInput = view.getByLabelText(/RecurringReservationForm.name/);
+  const seriesNameInput = view.getByLabelText(/ReservationSeriesForm.name/);
   expect(seriesNameInput).toBeInTheDocument();
 
   // TODO check that the radio buttons are not selected by default
@@ -396,7 +396,7 @@ test("Form submission with a lot of blocking reservations", async () => {
   expect(elems).toHaveLength(nMondays);
 
   // Can't check the count printed before the list because it's using i18n (would need to modify the TFunction mock)
-  const listCountLabel = view.getByText(/RecurringReservationForm.reservationsList/);
+  const listCountLabel = view.getByText(/ReservationSeriesForm.reservationsList/);
   expect(listCountLabel).toBeInTheDocument();
 
   const overlaps = within(list).queryAllByText(/overlapping/);
