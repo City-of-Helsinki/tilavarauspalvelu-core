@@ -13,13 +13,13 @@ import styled from "styled-components";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { fromUIDate } from "common/src/common/util";
 import {
-  RecurringReservationFormSchema,
+  ReservationSeriesFormSchema,
   type ReservationFormMeta,
-  type RecurringReservationForm as RecurringReservationFormT,
+  type ReservationSeriesForm as ReservationSeriesFormT,
 } from "@/schemas";
 import { type NewReservationListItem } from "@/component/ReservationsList";
 import { WeekdaysSelector } from "./WeekdaysSelector";
-import { useCreateRecurringReservation, useFilteredReservationList, useMultipleReservation } from "./hooks";
+import { useCreateReservationSeries, useFilteredReservationList, useMultipleReservation } from "./hooks";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
@@ -40,7 +40,7 @@ const InnerTextInput = styled(TextInput)`
   max-width: var(--prose-width);
 `;
 
-const TRANS_PREFIX = "MyUnits.RecurringReservationForm";
+const TRANS_PREFIX = "MyUnits.ReservationSeriesForm";
 
 function filterOutRemovedReservations(items: NewReservationListItem[], removedReservations: NewReservationListItem[]) {
   return items.filter((x) => !removedReservations.find((y) => isReservationEq(x, y)));
@@ -55,7 +55,7 @@ type Props = {
 
 /// Wrap the form with a separate reservationUnit selector
 /// the schema validator requires us to know the start interval from reservationUnit
-function RecurringReservationFormWrapper({ reservationUnits }: Props) {
+function ReservationSeriesFormWrapper({ reservationUnits }: Props) {
   const reservationUnitOptions = reservationUnits.map((unit) => ({
     label: unit?.nameFi ?? "",
     value: unit?.pk ?? 0,
@@ -83,15 +83,15 @@ function RecurringReservationFormWrapper({ reservationUnits }: Props) {
           <SelectFilter name="reservationUnit" sort options={reservationUnitOptions} />
         </Element>
       </AutoGrid>
-      <RecurringReservationForm reservationUnit={reservationUnit} />
+      <ReservationSeriesForm reservationUnit={reservationUnit} />
     </>
   );
 }
 
-export { RecurringReservationFormWrapper as RecurringReservationForm };
+export { ReservationSeriesFormWrapper as ReservationSeriesForm };
 
-type FormValues = RecurringReservationFormT & ReservationFormMeta;
-function RecurringReservationForm({ reservationUnit }: { reservationUnit: Maybe<CreateStaffReservationFragment> }) {
+type FormValues = ReservationSeriesFormT & ReservationFormMeta;
+function ReservationSeriesForm({ reservationUnit }: { reservationUnit: Maybe<CreateStaffReservationFragment> }) {
   const { t } = useTranslation();
 
   const interval = getNormalizedInterval(reservationUnit?.reservationStartInterval);
@@ -105,7 +105,7 @@ function RecurringReservationForm({ reservationUnit }: { reservationUnit: Maybe<
       repeatPattern: "weekly",
     },
     // @ts-expect-error -- schema refinement breaks typing
-    resolver: zodResolver(RecurringReservationFormSchema(interval)),
+    resolver: zodResolver(ReservationSeriesFormSchema(interval)),
   });
 
   const {
@@ -121,7 +121,7 @@ function RecurringReservationForm({ reservationUnit }: { reservationUnit: Maybe<
     { value: "biweekly", label: t("common.biweekly") },
   ] as const;
 
-  const mutate = useCreateRecurringReservation();
+  const mutate = useCreateReservationSeries();
 
   const [removedReservations, setRemovedReservations] = useState<NewReservationListItem[]>([]);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -203,12 +203,12 @@ function RecurringReservationForm({ reservationUnit }: { reservationUnit: Maybe<
         // TODO show a temporary error message to the user but also refetch the collisions / remove the collisions
         // or maybe we can just retry the mutation without the collisions and show them on the next page?
         const count = overlaps.length;
-        setLocalError(t("MyUnits.RecurringReservationForm.newOverlapError", { count }));
+        setLocalError(t("MyUnits.ReservationSeriesForm.newOverlapError", { count }));
         document.getElementById("create-recurring__reservations-list")?.scrollIntoView();
       } else {
         displayError(e);
-        // on exception in RecurringReservation (because we are catching the individual errors)
-        // We don't need to cleanup the RecurringReservation that has zero connections.
+        // on exception in ReservationSeries (because we are catching the individual errors)
+        // We don't need to cleanup the ReservationSeries that has zero connections.
         // Based on documentation backend will do this for us.
       }
       checkedReservations.refetch();

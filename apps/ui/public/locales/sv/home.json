@@ -8,7 +8,7 @@
     "heading": "Säsongsbokning",
     "text": "Ansök om utrymmen från Helsingfors stad för regelbunden, veckovis användning inför den kommande säsongen. Bekanta dig med ansökningstiderna och fyll i ansökan."
   },
-  "browseRecurringReservationsButton": "Se ansökningstider",
+  "browseReservationSeriesButton": "Se ansökningstider",
   "footer": {
     "heading": "Om Varaamo",
     "body": "Varaamo är en nättjänst som upprätthålls av Helsingfors stad, genom vilken du kan boka stadens offentliga lokaler samt arbetspunkter för ditt bruk. \n\nDen förnyade lokalbokningstjänsten befinner sig i testskedet. De nya egenskaperna och funktionerna tas i användning så småningom."

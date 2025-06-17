@@ -5,7 +5,7 @@ export { useOptions } from "./useOptions";
 export { useCheckPermission } from "./useCheckPermission";
 export { useCheckCollisions } from "./useCheckCollisions";
 export { useDenyReasonOptions } from "./useDenyReasonOptions";
-export { useRecurringReservations } from "./useRecurringReservations";
+export { useReservationSeries } from "./useReservationSeries";
 export { useHandling } from "./useHandling";
 export { useReservationCalendarData } from "./useReservationCalendarData";
 export { useReservationEditData } from "./useReservationEditData";

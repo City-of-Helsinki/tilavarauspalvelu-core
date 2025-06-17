@@ -61,7 +61,7 @@ const StyledDialog = styled(Dialog)`
   max-width: 944px;
 `;
 
-function recurringReservationInfoText({
+function reservationSeriesInfoText({
   weekdays,
   begin,
   end,
@@ -262,11 +262,11 @@ export function NewReservationModal({ reservationToCopy, onAccept, onClose }: Ne
   const [create] = useAddReservationToSeriesMutation();
 
   function createInput({ begin, end, buffers }: MutationValues): ReservationSeriesAddMutationInput {
-    if (reservationToCopy?.recurringReservation?.pk == null) {
+    if (reservationToCopy?.reservationSeries?.pk == null) {
       throw new Error("recurring reservation pk missing");
     }
     return {
-      pk: reservationToCopy?.recurringReservation?.pk,
+      pk: reservationToCopy?.reservationSeries?.pk,
       ...convertToApiFormat(begin, end),
       bufferTimeAfter: buffers.after?.toString(),
       bufferTimeBefore: buffers.before?.toString(),
@@ -397,10 +397,10 @@ export function EditTimeModal({
               <TimeInfoBox>
                 {t("Reservation.EditTimeModal.recurringInfoLabel")}:{" "}
                 <Bold>
-                  {recurringReservationInfoText({
-                    weekdays: filterNonNullable(reservation.recurringReservation?.weekdays),
-                    begin: ((x) => (x != null ? new Date(x) : undefined))(reservation.recurringReservation?.beginDate),
-                    end: ((x) => (x != null ? new Date(x) : undefined))(reservation.recurringReservation?.endDate),
+                  {reservationSeriesInfoText({
+                    weekdays: filterNonNullable(reservation.reservationSeries?.weekdays),
+                    begin: ((x) => (x != null ? new Date(x) : undefined))(reservation.reservationSeries?.beginDate),
+                    end: ((x) => (x != null ? new Date(x) : undefined))(reservation.reservationSeries?.endDate),
                     t,
                   })}
                 </Bold>
@@ -444,7 +444,7 @@ export const CHANGE_RESERVATION_TIME_QUERY_FRAGMENT = gql`
     type
     bufferTimeAfter
     bufferTimeBefore
-    recurringReservation {
+    reservationSeries {
       pk
       id
       weekdays

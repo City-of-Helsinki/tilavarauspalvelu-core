@@ -1,5 +1,5 @@
 import { useTranslation } from "next-i18next";
-import { type Maybe, useRecurringReservationQuery } from "@gql/gql-types";
+import { type Maybe, useReservationSeriesQuery } from "@gql/gql-types";
 import { errorToast } from "common/src/common/toast";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { gql } from "@apollo/client";
@@ -7,11 +7,11 @@ import { gql } from "@apollo/client";
 /// @param recurringPk fetch reservations related to this pk
 /// @param state optionally only fetch some reservation states
 /// @param limit allows to over fetch: 100 is the limit per query, larger amounts are done with multiple fetches
-export function useRecurringReservations(recurringPk: Maybe<number> | undefined) {
+export function useReservationSeries(recurringPk: Maybe<number> | undefined) {
   const { t } = useTranslation();
 
-  const id = base64encode(`RecurringReservationNode:${recurringPk}`);
-  const { data, loading, refetch } = useRecurringReservationQuery({
+  const id = base64encode(`ReservationSeriesNode:${recurringPk}`);
+  const { data, loading, refetch } = useReservationSeriesQuery({
     skip: !recurringPk,
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
@@ -21,21 +21,21 @@ export function useRecurringReservations(recurringPk: Maybe<number> | undefined)
     },
   });
 
-  const { recurringReservation } = data ?? {};
-  const reservations = filterNonNullable(recurringReservation?.reservations);
+  const { reservationSeries } = data ?? {};
+  const reservations = filterNonNullable(reservationSeries?.reservations);
 
   return {
     loading,
     reservations,
-    recurringReservation,
+    reservationSeries,
     refetch,
   };
 }
 
-export const RECURRING_RESERVATION_QUERY = gql`
-  query RecurringReservation($id: ID!) {
-    recurringReservation(id: $id) {
-      ...RecurringReservationFields
+export const RESERVATION_SERIES_QUERY = gql`
+  query ReservationSeries($id: ID!) {
+    reservationSeries(id: $id) {
+      ...ReservationSeriesFields
       reservations {
         id
         handlingDetails

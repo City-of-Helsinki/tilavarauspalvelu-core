@@ -28,7 +28,7 @@ import {
 function Page2({ application }: Pick<PropsNarrowed, "application">): JSX.Element {
   const router = useRouter();
   const [mutate] = useUpdateApplicationMutation();
-  const dislayError = useDisplayError();
+  const displayError = useDisplayError();
 
   const saveAndNavigate = async (values: ApplicationPage2FormValues) => {
     try {
@@ -50,7 +50,7 @@ function Page2({ application }: Pick<PropsNarrowed, "application">): JSX.Element
       }
       router.push(getApplicationPath(pk, "page3"));
     } catch (err) {
-      dislayError(err);
+      displayError(err);
     }
   };
 

@@ -50,7 +50,7 @@ export function useCheckCollisions({
 
   const collisions = reservations
     .filter((x) => x?.pk !== reservationPk)
-    .map((x) => reservationToInterval({ ...x, recurringReservation: null }, reservationType))
+    .map((x) => reservationToInterval({ ...x, reservationSeries: null }, reservationType))
     .filter((x) => {
       if (x == null) {
         return false;
@@ -106,7 +106,7 @@ export const CALENDAR_RESERVATION_FRAGMENT = gql`
     bufferTimeAfter
     affectedReservationUnits
     accessType
-    recurringReservation {
+    reservationSeries {
       id
       pk
     }

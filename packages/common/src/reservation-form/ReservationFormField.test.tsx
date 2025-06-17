@@ -108,7 +108,7 @@ test("Renders non required text field", async () => {
 /* email fields: reserveeEmail, billingEmail
 TODO This requires rework because errors are only checked on submit (not on blur),
 they also are shown to the user using notifyError not in the form itself unlike both
-ReservationForm and RecurringReservationForm erros.
+ReservationForm and ReservationSeriesForm errors.
 Testing before rework is silly.
 Also passing the validator here would be better than coupling it with the
 field name so we can decouple the testing of the validator vs. the display component.
