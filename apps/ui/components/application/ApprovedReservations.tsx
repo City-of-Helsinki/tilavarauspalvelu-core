@@ -188,7 +188,7 @@ function getAesReservationUnits(aes: ApplicationSectionT) {
   return filterNonNullable(
     aes.reservationUnitOptions
       .map((x) => x.allocatedTimeSlots)
-      .map((x) => x.map((y) => y.recurringReservation?.reservationUnit))
+      .map((x) => x.map((y) => y.reservationSeries?.reservationUnit))
       .flat()
   );
 }
@@ -211,7 +211,7 @@ function getAesReservationUnitCount(aes: ApplicationSectionReservationFragment):
 
 function formatNumberOfReservations(t: TFunction, aes: ApplicationSectionReservationFragment): string {
   const reservations = aes.reservationUnitOptions.flatMap((ruo) =>
-    ruo.allocatedTimeSlots.flatMap((ats) => ats.recurringReservation?.reservations ?? [])
+    ruo.allocatedTimeSlots.flatMap((ats) => ats.reservationSeries?.reservations ?? [])
   );
   const count = reservations.length;
   return `${count} ${t("application:view.reservationsTab.reservationCountPostfix")}`;
@@ -224,12 +224,12 @@ function formatReservationTimes(t: TFunction, aes: ApplicationSectionReservation
     label: string;
   };
   const times: TimeLabel[] = atsList.reduce<TimeLabel[]>((acc, ats) => {
-    if (ats.recurringReservation == null) {
+    if (ats.reservationSeries == null) {
       return acc;
     }
     const { dayOfTheWeek } = ats;
     const day = convertWeekday(dayOfTheWeek);
-    const time = formatApiTimeInterval(ats.recurringReservation);
+    const time = formatApiTimeInterval(ats.reservationSeries);
     // NOTE our translations are sunday first
     // using enum translations is bad because we need to sort by day of the week
     const tday = t(`weekDay.${fromMondayFirst(day)}`);
@@ -847,12 +847,12 @@ function getReservationStatusChoice(
 }
 
 function sectionToreservations(t: TFunction, section: ApplicationSectionReservationFragment): ReservationsTableElem[] {
-  const recurringReservations = filterNonNullable(
+  const reservationSeries = filterNonNullable(
     section.reservationUnitOptions.flatMap((ruo) =>
       ruo.allocatedTimeSlots.map((ats) =>
-        ats.recurringReservation != null
+        ats.reservationSeries != null
           ? {
-              ...ats.recurringReservation,
+              ...ats.reservationSeries,
               allocatedTimeSlot: {
                 dayOfTheWeek: ats.dayOfTheWeek,
                 beginTime: ats.beginTime,
@@ -864,7 +864,7 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
     )
   );
 
-  function getRejected(r: (typeof recurringReservations)[0]): ReservationsTableElem[] {
+  function getRejected(r: (typeof reservationSeries)[0]): ReservationsTableElem[] {
     return r.rejectedOccurrences.map((res) => {
       const reservation = { begin: res.beginDatetime, end: res.endDatetime };
       const rest = formatDateTimeStrings(t, reservation);
@@ -888,7 +888,7 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
     };
   }
 
-  function getReservations(r: (typeof recurringReservations)[0]): ReservationsTableElem[] {
+  function getReservations(r: (typeof reservationSeries)[0]): ReservationsTableElem[] {
     return r.reservations.reduce<ReservationsTableElem[]>((acc, res, idx, ar) => {
       const { isModified, ...rest } = formatDateTimeStrings(t, res, r.allocatedTimeSlot);
       const status = getReservationStatusChoice(res.state, isModified);
@@ -910,7 +910,7 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
   }
 
   return (
-    recurringReservations
+    reservationSeries
       .reduce<ReservationsTableElem[]>((acc, r) => {
         const rejected = getRejected(r);
         const expanded: ReservationsTableElem[] = getReservations(r);
@@ -927,7 +927,7 @@ function sectionToReservationUnits(t: TFunction, section: ApplicationSectionT): 
       .map((ruo) => ruo.allocatedTimeSlots.map((ats) => ats))
       .flat()
       .map((ats) => {
-        const { recurringReservation: r, dayOfTheWeek } = ats;
+        const { reservationSeries: r, dayOfTheWeek } = ats;
         if (r == null) {
           return null;
         }
@@ -937,21 +937,21 @@ function sectionToReservationUnits(t: TFunction, section: ApplicationSectionT): 
           reservationUnit,
           // NOTE monday first for sorting
           day,
-          recurringReservation: r,
+          reservationSeries: r,
           time: formatApiTimeInterval(r),
         };
       })
   );
   return sort(reservationUnitsByDay, (a, b) => a.day - b.day).map((x) => {
-    const { reservationUnit, day, time, recurringReservation } = x;
+    const { reservationUnit, day, time, reservationSeries } = x;
     return {
       reservationUnit,
       // NOTE our translations are sunday first
       dateOfWeek: t(`weekDayLong.${fromMondayFirst(day)}`),
       time,
-      accessType: recurringReservation.accessType,
-      usedAccessTypes: filterNonNullable(recurringReservation.usedAccessTypes),
-      pindoraInfo: recurringReservation.pindoraInfo,
+      accessType: reservationSeries.accessType,
+      usedAccessTypes: filterNonNullable(reservationSeries.usedAccessTypes),
+      pindoraInfo: reservationSeries.pindoraInfo,
     };
   });
 }
@@ -1031,7 +1031,7 @@ export const APPLICATION_SECTION_RESERVATION_FRAGMENT = gql`
         dayOfTheWeek
         beginTime
         endTime
-        recurringReservation {
+        reservationSeries {
           id
           pk
           beginTime

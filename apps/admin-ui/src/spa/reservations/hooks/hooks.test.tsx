@@ -12,7 +12,7 @@ export function createMockReservation({ pk }: { pk: number }): UseStaffReservati
   return {
     id: base64encode("ReservationNode:" + pk),
     pk,
-    recurringReservation: null,
+    reservationSeries: null,
   };
 }
 

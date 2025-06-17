@@ -53,14 +53,14 @@ export const EVENT_STYLE_RESERVATION_FRAGMENT = gql`
     name
     state
     type
-    recurringReservation {
+    reservationSeries {
       id
       pk
     }
   }
 `;
 
-type CurrentReservationType = Pick<EventStyleReservationFieldsFragment, "pk" | "recurringReservation">;
+type CurrentReservationType = Pick<EventStyleReservationFieldsFragment, "pk" | "reservationSeries">;
 
 // TODO combine with the eventStyleGetter in my-units/eventStyleGetter.ts
 const eventStyleGetter =
@@ -71,9 +71,9 @@ const eventStyleGetter =
     style: React.CSSProperties;
     className?: string;
   } => {
-    const isPartOfRecurrance =
-      currentReservation?.recurringReservation?.pk != null &&
-      currentReservation?.recurringReservation.pk === event?.recurringReservation?.pk;
+    const isPartOfRecurrence =
+      currentReservation?.reservationSeries?.pk != null &&
+      currentReservation?.reservationSeries.pk === event?.reservationSeries?.pk;
 
     const isConfirmed = event?.state === ReservationStateChoice.Confirmed;
     const isWaitingForPayment = event?.state === ReservationStateChoice.WaitingForPayment;
@@ -101,7 +101,7 @@ const eventStyleGetter =
       Object.assign(style, REST.style);
     }
 
-    if (currentReservation?.pk === event?.pk || isPartOfRecurrance) {
+    if (currentReservation?.pk === event?.pk || isPartOfRecurrence) {
       style.cursor = "default";
     }
 
