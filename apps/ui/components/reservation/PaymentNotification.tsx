@@ -47,14 +47,14 @@ export const PaymentNotification = ({ appliedPricing, paymentOrder }: PaymentNot
         {t("reservations:paymentBanner.description")}
         <PriceDetails>
           {
-            <div>
+            <div data-testid="reservation__payment-notification__price">
               {t("common:price")}: {price}
               {` (${t("common:inclTax", {
                 taxPercentage: formatters.strippedDecimal?.format(parseFloat(appliedPricing?.taxPercentage ?? "")),
               })})`}
             </div>
           }
-          <div>
+          <div data-testid="reservation__payment-notification__deadline">
             {t("common:deadline")}: {toUIDateTime(new Date(paymentOrder?.handledPaymentDueBy ?? ""))}
           </div>
           <ButtonLikeLink
