@@ -70,6 +70,10 @@
     "created": "Utkast",
     "waitingForPayment": "Inväntar betalning"
   },
+  "paymentBanner": {
+    "title": "Din bokning väntar på betalning",
+    "description": "Din bokning har bekräftats. Vänligen betala online eller välj faktura som betalningsmetod inom tidsfristen, annars kommer bokningen automatiskt att avbokas."
+  },
   "purpose": "Användningsändamål",
   "ageGroup": "Åldersgrupp",
   "numPersons": "Antal deltagare",
@@ -109,8 +113,7 @@
     "pending": "Inväntar betalning",
     "cancelled": "Betalning avbokad",
     "expired": "Obetald",
-    "refunded": "Återbetald",
-    "paidByInvoice": "Betalning mot faktura"
+    "refunded": "Återbetald"
   },
   "reservationEditFailed": "Det gick inte att redigera bokningen",
   "backToReservationUnit": "Tillbaka till objektets sida",

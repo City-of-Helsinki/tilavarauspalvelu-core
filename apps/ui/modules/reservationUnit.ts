@@ -337,6 +337,10 @@ export const RESERVATION_PRICE_FRAGMENT = gql`
     state
     end
     applyingForFreeOfCharge
+    appliedPricing {
+      highestPrice
+      taxPercentage
+    }
   }
 `;
 
