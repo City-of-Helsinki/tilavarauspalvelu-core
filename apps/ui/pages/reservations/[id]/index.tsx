@@ -58,6 +58,7 @@ import {
   TermsInfoSection,
   GeneralFields,
   ApplicationFields,
+  PaymentNotification,
 } from "@/components/reservation";
 import { queryOptions } from "@/modules/queryOptions";
 
@@ -183,6 +184,9 @@ function Reservation({
       reservation.paymentOrder?.status === OrderStatus.Refunded ||
       reservation.paymentOrder?.status === OrderStatus.PaidByInvoice);
 
+  const shouldShowPaymentNotification =
+    reservation.paymentOrder?.status === OrderStatus.Pending && reservation.state === ReservationStateChoice.Confirmed;
+
   return (
     <>
       <Breadcrumb routes={routes} />
@@ -287,6 +291,9 @@ function Reservation({
           <NotModifiableReason {...reservation} />
         </div>
         <Flex>
+          {shouldShowPaymentNotification && (
+            <PaymentNotification paymentOrder={reservation.paymentOrder} appliedPricing={reservation.appliedPricing} />
+          )}
           <Instructions reservation={reservation} />
           <GeneralFields supportedFields={supportedFields} reservation={reservation} options={options} />
           <ApplicationFields reservation={reservation} options={options} supportedFields={supportedFields} />
@@ -447,6 +454,7 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
         status
         checkoutUrl
         receiptUrl
+        handledPaymentDueBy
       }
       recurringReservation {
         id

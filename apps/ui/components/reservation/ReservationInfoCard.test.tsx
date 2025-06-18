@@ -97,6 +97,10 @@ function createMockReservationInfoCard(price?: string): ReservationInfoCardFragm
     },
     pk: 1,
     price: price ?? "10",
+    appliedPricing: {
+      highestPrice: price ?? "10.0",
+      taxPercentage: "25.5",
+    },
     reservationUnits: [
       {
         id: base64encode("ReservationUnitNode:2"),

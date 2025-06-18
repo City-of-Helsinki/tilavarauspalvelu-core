@@ -265,6 +265,7 @@ function createReservationOrderStatusFragment({
     paymentOrder: {
       id: base64encode("PaymentOrderNode:1"),
       status: orderStatus,
+      checkoutUrl: "https://checkout.url/path?user=1111-2222-3333-4444",
     },
   };
 }

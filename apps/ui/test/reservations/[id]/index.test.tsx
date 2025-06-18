@@ -40,7 +40,7 @@ interface CustomRenderProps extends CreateGraphQLMockProps {
   isHandled?: boolean;
   type?: ReservationTypeChoice;
   price?: string;
-  paymentOrder?: ReservationPaymentOrderFragment;
+  paymentOrder?: ReservationPaymentOrderFragment & { handledPaymentDueBy: string };
   cancellable?: boolean;
 }
 

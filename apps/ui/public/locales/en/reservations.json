@@ -70,6 +70,10 @@
     "created": "Draft",
     "waitingForPayment": "Awaiting payment"
   },
+  "paymentBanner": {
+    "title": "Your booking is waiting for payment",
+    "description": "Your booking is confirmed. Pay online or select invoice as the payment method before the deadline, otherwise the booking will be automatically cancelled."
+  },
   "purpose": "Purpose of use",
   "ageGroup": "Age group",
   "numPersons": "Number of participants",

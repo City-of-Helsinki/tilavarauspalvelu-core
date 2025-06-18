@@ -70,6 +70,10 @@
     "created": "Luonnos",
     "waitingForPayment": "Odottaa maksua"
   },
+  "paymentBanner": {
+    "title": "Varauksesi odottaa maksua",
+    "description": "Varauksesi on vahvistettu. Maksa varaus verkossa tai valitse maksutavaksi lasku määräaikaan mennessä, muuten varaus peruuntuu automaattisesti."
+  },
   "purpose": "Käyttötarkoitus",
   "ageGroup": "Ikäryhmä",
   "numPersons": "Osallistujamäärä",

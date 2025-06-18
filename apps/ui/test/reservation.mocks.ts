@@ -59,7 +59,8 @@ export type MockReservationProps = {
   isHandled?: boolean;
   type?: ReservationTypeChoice;
   price?: string;
-  paymentOrder?: ReservationPaymentOrderFragment;
+  paymentOrder?: ReservationPaymentOrderFragment & { handledPaymentDueBy: string };
+  appliedPricing?: { highestPrice: string; taxPercentage: string };
   cancellable?: boolean;
   canApplyFreeOfCharge?: boolean;
   applyingForFreeOfCharge?: boolean;
@@ -118,10 +119,20 @@ export function createMockReservation(
       paymentType: PaymentType.OnSite,
       receiptUrl: "https://example.com/receipt",
       checkoutUrl: "https://example.com/checkout",
+      handledPaymentDueBy: new Date(2024, 0, 1, 12, 0, 0, 0).toISOString(),
     },
     paymentTerms = {
       id: base64encode(`PaymentTermsNode:1`),
       ...generateTextFragment("Test payment terms"),
+    },
+    appliedPricing = {
+      id: base64encode(`AppliedPricingNode:1`),
+      begins: new Date(2000, 0, 1, 0, 0, 0, 0).toISOString(),
+      priceUnit: PriceUnit.PerHour,
+      paymentType: PaymentType.Online,
+      highestPrice: "10.0",
+      lowestPrice: "0.0",
+      taxPercentage: "24.5",
     },
     pk = 1,
     price = "10.0",
@@ -165,6 +176,7 @@ export function createMockReservation(
     id: base64encode(`ReservationNode:${pk}`),
     isHandled: cancellable ? false : isHandled,
     numPersons: 5,
+    appliedPricing: appliedPricing,
     paymentOrder: paymentOrder,
     pindoraInfo: null,
     pk: pk,
@@ -371,6 +383,7 @@ export const reservationRenderProps = (
           paymentType: PaymentType.OnlineOrInvoice,
           receiptUrl: receiptUrl,
           checkoutUrl: "https://example.com/checkout",
+          handledPaymentDueBy: new Date(2024, 0, 1, 12, 0, 0).toISOString(),
         },
       };
     case "default":
@@ -392,6 +405,7 @@ export const reservationRenderProps = (
           paymentType: PaymentType.OnlineOrInvoice,
           receiptUrl: receiptUrl,
           checkoutUrl: "https://example.com/checkout",
+          handledPaymentDueBy: new Date(2024, 0, 1, 12, 0, 0).toISOString(),
         },
       };
   }
@@ -415,7 +429,7 @@ export function createReservationPageMock({
   isHandled?: boolean;
   type?: ReservationTypeChoice;
   price?: string;
-  paymentOrder?: ReservationPaymentOrderFragment;
+  paymentOrder?: ReservationPaymentOrderFragment & { handledPaymentDueBy: string };
   cancellable?: boolean;
 }): Readonly<NonNullable<ReservationPageQuery["reservation"]>> {
   return createMockReservation({
