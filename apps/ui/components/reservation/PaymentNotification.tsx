@@ -2,13 +2,15 @@ import { Notification, NotificationType } from "hds-react";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { toUIDateTime } from "common/src/common/util";
+import { convertLanguageCode, toUIDateTime } from "common/src/common/util";
 import { Flex, fontMedium } from "common/styled";
 import { formatters as getFormatters } from "common";
 import { useMemo } from "react";
 import { breakpoints } from "common/src/const";
+import { getCheckoutRedirectUrl } from "@/modules/urls";
 
 type PaymentNotificationProps = {
+  pk: number;
   appliedPricing: {
     highestPrice: string;
     taxPercentage: string;
@@ -17,6 +19,7 @@ type PaymentNotificationProps = {
     handledPaymentDueBy: string | null;
     checkoutUrl: string | null;
   };
+  apiBaseUrl: string;
 };
 
 const PriceDetails = styled.div`
@@ -32,13 +35,15 @@ const PriceDetails = styled.div`
   }
 `;
 
-export const PaymentNotification = ({ appliedPricing, paymentOrder }: PaymentNotificationProps) => {
+export const PaymentNotification = ({ pk, appliedPricing, paymentOrder, apiBaseUrl }: PaymentNotificationProps) => {
   const { t, i18n } = useTranslation();
   const formatters = useMemo(() => getFormatters(i18n.language), [i18n.language]);
   const formatter = formatters["currencyWithDecimals"];
   const price = formatter?.format(parseFloat(appliedPricing?.highestPrice ?? "") ?? 0);
   const taxPercentage = formatters.strippedDecimal?.format(parseFloat(appliedPricing?.taxPercentage ?? "")) ?? "0";
   const deadline = toUIDateTime(new Date(paymentOrder?.handledPaymentDueBy ?? ""));
+  const lang = convertLanguageCode(i18n.language);
+
   return (
     <Notification
       data-testid="reservation__payment-notification"
@@ -55,12 +60,7 @@ export const PaymentNotification = ({ appliedPricing, paymentOrder }: PaymentNot
           <div data-testid="reservation__payment-notification__deadline">
             {t("common:deadline")}: {deadline}
           </div>
-          <ButtonLikeLink
-            href={paymentOrder?.checkoutUrl ?? ""}
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="primary"
-          >
+          <ButtonLikeLink href={getCheckoutRedirectUrl(pk ?? 0, lang, apiBaseUrl)} variant="primary">
             {t("reservations:payReservation")}
           </ButtonLikeLink>
         </PriceDetails>

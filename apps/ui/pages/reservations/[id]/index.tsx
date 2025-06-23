@@ -25,7 +25,6 @@ import { isBefore, sub } from "date-fns";
 import { createApolloClient } from "@/modules/apolloClient";
 import { formatDateTimeRange } from "@/modules/util";
 import {
-  getCheckoutUrl,
   getNormalizedReservationOrderStatus,
   getWhyReservationCantBeChanged,
   isReservationCancellable,
@@ -39,6 +38,7 @@ import { ButtonLikeLink, ButtonLikeExternalLink } from "@/components/common/Butt
 import { ReservationPageWrapper } from "@/styled/reservation";
 import {
   getApplicationPath,
+  getCheckoutRedirectUrl,
   getFeedbackUrl,
   getReservationPath,
   getReservationUnitPath,
@@ -122,13 +122,18 @@ function Reservation({
   termsOfUse,
   reservation,
   feedbackUrl,
+  apiBaseUrl,
   options,
-}: Readonly<Pick<PropsNarrowed, "termsOfUse" | "reservation" | "feedbackUrl" | "options">>): JSX.Element | null {
+}: Readonly<
+  Pick<PropsNarrowed, "termsOfUse" | "reservation" | "feedbackUrl" | "options" | "apiBaseUrl">
+>): JSX.Element | null {
   const { t, i18n } = useTranslation();
+
   const shouldShowAccessCode =
     isBefore(sub(new Date(), { days: 1 }), new Date(reservation.endsAt)) &&
     reservation.state === ReservationStateChoice.Confirmed &&
     reservation.accessType === AccessType.AccessCode;
+
   const { data: accessCodeData } = useAccessCodeQuery({
     skip: !reservation || !shouldShowAccessCode,
     variables: {
@@ -161,9 +166,8 @@ function Reservation({
   const isCancellable = isReservationCancellable(reservation);
 
   const lang = convertLanguageCode(i18n.language);
-  const checkoutUrl = getCheckoutUrl(reservation.paymentOrder, lang);
 
-  const hasCheckoutUrl = !!checkoutUrl;
+  const hasCheckoutUrl = !!reservation.paymentOrder?.checkoutUrl;
   const isWaitingForPayment = reservation.state === ReservationStateChoice.WaitingForPayment;
 
   const routes = [
@@ -258,7 +262,7 @@ function Reservation({
               <ButtonLikeLink
                 size="large"
                 disabled={!hasCheckoutUrl}
-                href={checkoutUrl ?? ""}
+                href={getCheckoutRedirectUrl(reservation.pk ?? 0, lang, apiBaseUrl)}
                 data-testid="reservation-detail__button--checkout"
                 role="button"
               >
@@ -293,7 +297,12 @@ function Reservation({
         </div>
         <Flex>
           {shouldShowPaymentNotification && (
-            <PaymentNotification paymentOrder={reservation.paymentOrder} appliedPricing={reservation.appliedPricing} />
+            <PaymentNotification
+              pk={reservation.pk ?? 0}
+              paymentOrder={reservation.paymentOrder}
+              appliedPricing={reservation.appliedPricing}
+              apiBaseUrl={apiBaseUrl}
+            />
           )}
           <Instructions reservation={reservation} />
           <GeneralFields supportedFields={supportedFields} reservation={reservation} options={options} />
