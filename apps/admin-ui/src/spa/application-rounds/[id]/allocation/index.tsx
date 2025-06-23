@@ -179,8 +179,8 @@ function ApplicationRoundAllocation({
       ageGroup: ageGroupFilterQuery,
       reservationUnit: reservationUnitFilterQuery ?? 0,
       applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
-      beginDate: applicationRound?.reservationPeriodBegin ?? "",
-      endDate: applicationRound?.reservationPeriodEnd ?? "",
+      beginDate: applicationRound?.reservationPeriodBeginDate ?? "",
+      endDate: applicationRound?.reservationPeriodEndDate ?? "",
     },
     onError: () => {
       errorToast({ text: t("errors.errorFetchingData") });
@@ -666,8 +666,8 @@ export const APPLICATION_ROUND_FILTER_OPTIONS = gql`
       id
       nameFi
       status
-      reservationPeriodBegin
-      reservationPeriodEnd
+      reservationPeriodBeginDate
+      reservationPeriodEndDate
       reservationUnits {
         id
         pk
