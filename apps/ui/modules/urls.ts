@@ -96,3 +96,18 @@ export function getFeedbackUrl(feedbackUrl: string, i18n: { language: string }) 
     return null;
   }
 }
+
+export function getCheckoutRedirectUrl(pk: number, lang = "fi", apiBaseUrl: string): string {
+  const errorUrl = new URL(`/reservations/${pk}`, window.location.origin);
+  try {
+    const url = new URL(`/v1/pay_pending_reservation/${pk}/`, apiBaseUrl);
+    const { searchParams } = url;
+    searchParams.set("lang", lang);
+    searchParams.set("redirect_on_error", errorUrl.toString());
+    return url.toString();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+  }
+  return "";
+}

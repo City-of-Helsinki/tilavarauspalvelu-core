@@ -2,16 +2,16 @@ import React from "react";
 import { ButtonVariant, IconArrowRight, IconCross, IconEuroSign, IconLock } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { trim } from "lodash-es";
-import { AccessType, OrderStatus, type ReservationCardFragment, ReservationStateChoice } from "@gql/gql-types";
+import { OrderStatus, type ReservationCardFragment, ReservationStateChoice } from "@gql/gql-types";
 import { formatDateTimeRange } from "@/modules/util";
 import { getNormalizedReservationOrderStatus, isReservationCancellable } from "@/modules/reservation";
 import { getPrice } from "@/modules/reservationUnit";
+import { getCheckoutRedirectUrl, getReservationPath } from "@/modules/urls";
 import { ReservationOrderStatus } from "./ReservationOrderStatus";
 import { ReservationStatus } from "./ReservationStatus";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { capitalize, getImageSource, getMainImage } from "common/src/helpers";
 import Card from "common/src/components/Card";
-import { getReservationPath } from "@/modules/urls";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
 
@@ -20,9 +20,10 @@ type CardType = "upcoming" | "past" | "cancelled";
 interface PropsT {
   reservation: ReservationCardFragment;
   type?: CardType;
+  apiBaseUrl: string;
 }
 
-export function ReservationCard({ reservation, type }: Readonly<PropsT>): JSX.Element | null {
+export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<PropsT>): JSX.Element | null {
   const { t, i18n } = useTranslation();
 
   const reservationUnit = reservation.reservationUnit;
@@ -68,15 +69,11 @@ export function ReservationCard({ reservation, type }: Readonly<PropsT>): JSX.El
       icon: <IconEuroSign aria-label={t("common:price")} aria-hidden="false" />,
       value: price ?? "",
     },
-  ];
-
-  // TODO: Remove this check when all reservations have an accessType
-  if (reservation.accessType !== AccessType.Unrestricted) {
-    infos.push({
+    {
       icon: <IconLock aria-label={t("reservationUnit:accessType")} aria-hidden="false" />,
       value: t(`reservationUnit:accessTypes.${reservation.accessType}`),
-    });
-  }
+    },
+  ];
 
   const buttons = [];
   if (type === "upcoming" && isReservationCancellable(reservation)) {
@@ -102,7 +99,7 @@ export function ReservationCard({ reservation, type }: Readonly<PropsT>): JSX.El
     buttons.push(
       <ButtonLikeLink
         variant={ButtonVariant.Primary}
-        href={reservation.paymentOrder?.checkoutUrl ?? ""}
+        href={getCheckoutRedirectUrl(reservation.pk ?? 0, lang, apiBaseUrl)}
         data-testid="reservation-card__button--goto-payment"
         key="payment"
         width="full"
