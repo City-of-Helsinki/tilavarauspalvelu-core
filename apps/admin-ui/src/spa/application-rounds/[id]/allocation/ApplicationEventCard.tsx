@@ -290,7 +290,7 @@ function SchedulesList({
   );
   const displayError = useDisplayError();
 
-  const updateOption = async (pk: Maybe<number> | undefined, locked: boolean): Promise<void> => {
+  const updateOption = async (pk: Maybe<number> | undefined, isLocked: boolean): Promise<void> => {
     if (loading) {
       return;
     }
@@ -302,7 +302,7 @@ function SchedulesList({
         variables: {
           input: {
             pk,
-            locked,
+            isLocked,
           },
         },
       });
@@ -321,8 +321,8 @@ function SchedulesList({
   };
 
   const nToAllocate = eventsPerWeek - allocatedSchedules.length;
-  const isLocked = thisOption?.locked ?? false;
-  const isRejected = thisOption?.rejected ?? false;
+  const isLocked = thisOption?.isLocked ?? false;
+  const isRejected = thisOption?.isRejected ?? false;
   return (
     <SelectionListContainer>
       {allocatedSchedules.map((ats) => (
@@ -415,8 +415,8 @@ export const REJECT_REST_MUTATION = gql`
   mutation RejectRest($input: ReservationUnitOptionUpdateMutationInput!) {
     updateReservationUnitOption(input: $input) {
       pk
-      rejected
-      locked
+      isRejected
+      isLocked
     }
   }
 `;
