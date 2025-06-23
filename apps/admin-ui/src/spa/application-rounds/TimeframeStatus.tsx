@@ -6,8 +6,8 @@ import { useTranslation } from "react-i18next";
 import { formatDate } from "@/common/util";
 
 interface IProps {
-  applicationPeriodBegin?: string;
-  applicationPeriodEnd?: string;
+  applicationPeriodBeginsAt?: string;
+  applicationPeriodEndsAt?: string;
   isResolved?: boolean;
   resolutionDate?: string;
 }
@@ -19,15 +19,15 @@ const Wrapper = styled.span`
 `;
 
 function TimeframeStatus({
-  applicationPeriodBegin = "",
-  applicationPeriodEnd = "",
+  applicationPeriodBeginsAt = "",
+  applicationPeriodEndsAt = "",
   isResolved,
   resolutionDate,
 }: IProps): JSX.Element {
   const { t } = useTranslation();
 
-  const dateBegin = new Date(applicationPeriodBegin);
-  const dateEnd = new Date(applicationPeriodEnd);
+  const dateBegin = new Date(applicationPeriodBeginsAt);
+  const dateEnd = new Date(applicationPeriodEndsAt);
 
   let message = "";
   if (isResolved) {
@@ -36,19 +36,19 @@ function TimeframeStatus({
     });
   } else if (isPast(dateBegin) && isFuture(dateEnd)) {
     message = t("Application.timeframeCurrent", {
-      date: formatDate(applicationPeriodEnd),
+      date: formatDate(applicationPeriodEndsAt),
     });
   } else if (isToday(dateEnd)) {
     message = `${t("Application.timeframePast", {
-      date: formatDate(applicationPeriodEnd),
+      date: formatDate(applicationPeriodEndsAt),
     })} (${t("common.today")})`;
   } else if (isPast(dateEnd)) {
     message = t("Application.timeframePast", {
-      date: formatDate(applicationPeriodEnd),
+      date: formatDate(applicationPeriodEndsAt),
     });
   } else if (isFuture(dateBegin)) {
     message = t("Application.timeframeFuture", {
-      date: formatDate(applicationPeriodBegin),
+      date: formatDate(applicationPeriodBeginsAt),
     });
   }
 

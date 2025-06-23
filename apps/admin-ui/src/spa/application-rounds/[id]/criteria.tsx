@@ -50,10 +50,10 @@ export const APPLICATION_ROUND_QUERY = gql`
       pk
       nameFi
       reservationUnitCount
-      applicationPeriodBegin
-      applicationPeriodEnd
-      reservationPeriodBegin
-      reservationPeriodEnd
+      applicationPeriodBeginsAt
+      applicationPeriodEndsAt
+      reservationPeriodBeginDate
+      reservationPeriodEndDate
       reservationUnits {
         id
         pk
@@ -98,8 +98,8 @@ function Criteria({ applicationRoundPk }: { applicationRoundPk: number }): JSX.E
         <H1 $noMargin>{applicationRound.nameFi}</H1>
         <Flex $direction="row" $justifyContent="space-between" $wrap="wrap">
           <TimeframeStatus
-            applicationPeriodBegin={applicationRound.applicationPeriodBegin}
-            applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+            applicationPeriodBeginsAt={applicationRound.applicationPeriodBeginsAt}
+            applicationPeriodEndsAt={applicationRound.applicationPeriodEndsAt}
           />
           <span>
             <SemiBold>{applicationRound.reservationUnitCount}</SemiBold>{" "}
@@ -111,19 +111,19 @@ function Criteria({ applicationRoundPk }: { applicationRoundPk: number }): JSX.E
         <div>
           <H3>{t("ApplicationRound.applicationPeriodTitle")}</H3>
           <div>
-            {t("common.begins")} {formatDate(applicationRound.applicationPeriodBegin)}
+            {t("common.begins")} {formatDate(applicationRound.applicationPeriodBeginsAt)}
           </div>
           <div>
-            {t("common.ends")} {formatDate(applicationRound.applicationPeriodEnd)}
+            {t("common.ends")} {formatDate(applicationRound.applicationPeriodEndsAt)}
           </div>
         </div>
         <div>
           <H3>{t("ApplicationRound.reservationPeriodTitle")}</H3>
           <div>
-            {t("common.begins")} {formatDate(applicationRound.reservationPeriodBegin)}
+            {t("common.begins")} {formatDate(applicationRound.reservationPeriodBeginDate)}
           </div>
           <div>
-            {t("common.ends")} {formatDate(applicationRound.reservationPeriodEnd)}
+            {t("common.ends")} {formatDate(applicationRound.reservationPeriodEndDate)}
           </div>
         </div>
       </Accordion>

@@ -18,10 +18,10 @@ function createApplicationRoundCard({
     nameSv: `${name} SV`,
     nameEn: `${name} EN`,
     status,
-    reservationPeriodBegin: "2024-02-01T00:00:00Z",
-    reservationPeriodEnd: "2025-01-01T00:00:00Z",
-    applicationPeriodBegin: "2023-01-01T00:00:00Z",
-    applicationPeriodEnd: "2024-02-01T00:00:00Z",
+    reservationPeriodBeginDate: "2024-02-01T00:00:00Z",
+    reservationPeriodEndDate: "2025-01-01T00:00:00Z",
+    applicationPeriodBeginsAt: "2023-01-01T00:00:00Z",
+    applicationPeriodEndsAt: "2024-02-01T00:00:00Z",
   };
 }
 

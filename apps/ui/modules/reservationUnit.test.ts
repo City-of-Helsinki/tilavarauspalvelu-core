@@ -594,8 +594,8 @@ describe("getFuturePricing", () => {
     const data = constructInput({ days: DAYS });
     const applicationRounds: RoundPeriod[] = [
       {
-        reservationPeriodBegin: begin.toISOString(),
-        reservationPeriodEnd: end?.toISOString() ?? "",
+        reservationPeriodBeginDate: begin.toISOString(),
+        reservationPeriodEndDate: end?.toISOString() ?? "",
       },
     ];
     const expected = data.pricings[index] ?? null;
@@ -1375,8 +1375,8 @@ describe("getNextAvailableTime", () => {
       const end = addDays(today, 7);
       const activeApplicationRounds: RoundPeriod[] = [
         {
-          reservationPeriodBegin: addDays(today, -7).toISOString(),
-          reservationPeriodEnd: end.toISOString(),
+          reservationPeriodBeginDate: addDays(today, -7).toISOString(),
+          reservationPeriodEndDate: end.toISOString(),
         },
       ];
       const input = createInput({
@@ -1395,12 +1395,12 @@ describe("getNextAvailableTime", () => {
       const end = addDays(today, 7);
       const activeApplicationRounds: RoundPeriod[] = [
         {
-          reservationPeriodBegin: addDays(today, -7).toISOString(),
-          reservationPeriodEnd: end.toISOString(),
+          reservationPeriodBeginDate: addDays(today, -7).toISOString(),
+          reservationPeriodEndDate: end.toISOString(),
         },
         {
-          reservationPeriodBegin: addDays(today, -5).toISOString(),
-          reservationPeriodEnd: addDays(end, 2).toISOString(),
+          reservationPeriodBeginDate: addDays(today, -5).toISOString(),
+          reservationPeriodEndDate: addDays(end, 2).toISOString(),
         },
       ];
       const input = createInput({
@@ -1419,12 +1419,12 @@ describe("getNextAvailableTime", () => {
       const middle = addDays(today, 7);
       const activeApplicationRounds: RoundPeriod[] = [
         {
-          reservationPeriodBegin: addDays(today, -7).toISOString(),
-          reservationPeriodEnd: middle.toISOString(),
+          reservationPeriodBeginDate: addDays(today, -7).toISOString(),
+          reservationPeriodEndDate: middle.toISOString(),
         },
         {
-          reservationPeriodBegin: addDays(middle, 2).toISOString(),
-          reservationPeriodEnd: addDays(middle, 10).toISOString(),
+          reservationPeriodBeginDate: addDays(middle, 2).toISOString(),
+          reservationPeriodEndDate: addDays(middle, 10).toISOString(),
         },
       ];
       const input = createInput({
@@ -1443,8 +1443,8 @@ describe("getNextAvailableTime", () => {
       const end = addDays(today, 31);
       const activeApplicationRounds: RoundPeriod[] = [
         {
-          reservationPeriodBegin: addDays(today, -7).toISOString(),
-          reservationPeriodEnd: end.toISOString(),
+          reservationPeriodBeginDate: addDays(today, -7).toISOString(),
+          reservationPeriodEndDate: end.toISOString(),
         },
       ];
       const input = createInput({
@@ -1462,8 +1462,8 @@ describe("getNextAvailableTime", () => {
       mockOpenTimes(new Date(), 2 * 365);
       const activeApplicationRounds: RoundPeriod[] = [
         {
-          reservationPeriodBegin: new Date().toISOString(),
-          reservationPeriodEnd: addDays(new Date(), 365).toISOString(),
+          reservationPeriodBeginDate: new Date().toISOString(),
+          reservationPeriodEndDate: addDays(new Date(), 365).toISOString(),
         },
       ];
       const today = new Date();
