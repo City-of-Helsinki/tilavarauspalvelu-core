@@ -188,12 +188,12 @@ function ApplicationSectionColumn({
   const isLocked = (as: (typeof sections)[0]) =>
     as.reservationUnitOptions
       .filter((ruo) => ruo.reservationUnit.pk === reservationUnit.pk)
-      ?.map((ruo) => ruo.locked)
+      ?.map((ruo) => ruo.isLocked)
       .some(Boolean);
   const isRejected = (as: (typeof sections)[0]) =>
     as.reservationUnitOptions
       .filter((ruo) => ruo.reservationUnit.pk === reservationUnit.pk)
-      ?.map((ruo) => ruo.rejected)
+      ?.map((ruo) => ruo.isRejected)
       .some(Boolean);
 
   // one of:

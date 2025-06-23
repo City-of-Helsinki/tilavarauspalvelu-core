@@ -45,7 +45,7 @@ function timeSlotMapper(t: TFunction, slot: AllocatedSectionsTableElementFragmen
   const applicantName = getApplicantName(application);
 
   // TODO should this check the state directly?
-  const isAllocated = !slot.reservationUnitOption.rejected;
+  const isAllocated = !slot.reservationUnitOption.isRejected;
 
   const day = convertWeekday(slot.dayOfTheWeek);
   const timeRange = formatTimeRange(timeToMinutes(slot.beginTime), timeToMinutes(slot.endTime));
@@ -197,8 +197,8 @@ export const ALLOCATED_SECTIONS_TABLE_ELEMENT_FRAGMENT = gql`
     }
     reservationUnitOption {
       id
-      rejected
-      locked
+      isRejected
+      isLocked
       preferredOrder
       applicationSection {
         id
