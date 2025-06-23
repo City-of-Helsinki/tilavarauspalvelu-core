@@ -34,7 +34,7 @@ function getBeginTime(p: PricingFieldsFragment): number {
 }
 
 /** returns reservation unit pricing at given date */
-export function getReservatinUnitPricing(
+export function getReservationUnitPricing(
   reservationUnit: ReservationUnitPricingFieldsFragment,
   from: Date
 ): PricingFieldsFragment | null {
@@ -85,7 +85,7 @@ export function getReservationPriceDetails(reservation: ReservationPriceDetailsF
   const end = new Date(reservation.end);
   const resUnit = reservation.reservationUnits?.[0] ?? null;
   const durationMinutes = differenceInMinutes(end, begin);
-  const pricing = resUnit ? getReservatinUnitPricing(resUnit, begin) : null;
+  const pricing = resUnit ? getReservationUnitPricing(resUnit, begin) : null;
 
   if (pricing == null) {
     return "???";

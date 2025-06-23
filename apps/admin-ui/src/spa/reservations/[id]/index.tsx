@@ -18,7 +18,7 @@ import { ReservationWorkingMemo } from "@/component/WorkingMemo";
 import {
   createTagString,
   getName,
-  getReservatinUnitPricing,
+  getReservationUnitPricing,
   reservationPrice,
   translateReservationCustomerType,
 } from "./util";
@@ -281,7 +281,7 @@ function RequestedReservation({
   const ref = useRef<HTMLHeadingElement>(null);
 
   const resUnit = reservation?.reservationUnits?.[0];
-  const pricing = resUnit != null ? getReservatinUnitPricing(resUnit, new Date(reservation.begin)) : null;
+  const pricing = resUnit != null ? getReservationUnitPricing(resUnit, new Date(reservation.begin)) : null;
 
   const isNonFree = pricing != null ? !isPriceFree(pricing) : false;
 
