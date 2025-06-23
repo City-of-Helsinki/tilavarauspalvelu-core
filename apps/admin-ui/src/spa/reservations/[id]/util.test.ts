@@ -6,7 +6,7 @@ import {
   type PricingFieldsFragment,
   type ReservationUnitPricingFieldsFragment,
 } from "@gql/gql-types";
-import { createTagString, getReservatinUnitPricing } from "./util";
+import { createTagString, getReservationUnitPricing } from "./util";
 import { addHours, addMonths } from "date-fns";
 import { toApiDate } from "common/src/common/util";
 import { describe, expect, test } from "vitest";
@@ -96,8 +96,8 @@ describe("getReservatinUnitPricing", () => {
       pricings: [constructFreePricing(), constructPaidPricing()],
     };
 
-    const first = getReservatinUnitPricing(input, new Date("2021-02-01T00:00:01Z"));
-    const second = getReservatinUnitPricing(input, new Date("2022-04-01T00:00:01Z"));
+    const first = getReservationUnitPricing(input, new Date("2021-02-01T00:00:01Z"));
+    const second = getReservationUnitPricing(input, new Date("2022-04-01T00:00:01Z"));
     expect(first?.lowestPrice).toBe("0");
     expect(second?.lowestPrice).toBe("120");
   });
