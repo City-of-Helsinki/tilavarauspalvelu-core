@@ -33,7 +33,7 @@ const EmptyMessage = styled.div`
   margin-left: var(--spacing-xl);
 `;
 
-function Reservations(): JSX.Element | null {
+function Reservations(props: { apiBaseUrl: string }): JSX.Element | null {
   const router = useRouter();
   const { t } = useTranslation();
   const { isAuthenticated, user: currentUser } = useSession();
@@ -109,7 +109,12 @@ function Reservations(): JSX.Element | null {
               <EmptyMessage>{t("reservations:noUpcomingReservations")}</EmptyMessage>
             ) : (
               reservations?.map((reservation) => (
-                <ReservationCard key={reservation.pk} reservation={reservation} type="upcoming" />
+                <ReservationCard
+                  key={reservation.pk}
+                  reservation={reservation}
+                  type="upcoming"
+                  apiBaseUrl={props.apiBaseUrl}
+                />
               ))
             )}
           </StyledTabPanel>
@@ -120,7 +125,12 @@ function Reservations(): JSX.Element | null {
               <EmptyMessage>{t("reservations:noPastReservations")}</EmptyMessage>
             ) : (
               reservations?.map((reservation) => (
-                <ReservationCard key={reservation.pk} reservation={reservation} type="past" />
+                <ReservationCard
+                  key={reservation.pk}
+                  reservation={reservation}
+                  type="past"
+                  apiBaseUrl={props.apiBaseUrl}
+                />
               ))
             )}
           </StyledTabPanel>
@@ -131,7 +141,12 @@ function Reservations(): JSX.Element | null {
               <EmptyMessage>{t("reservations:noCancelledReservations")}</EmptyMessage>
             ) : (
               reservations?.map((reservation) => (
-                <ReservationCard key={reservation.pk} reservation={reservation} type="cancelled" />
+                <ReservationCard
+                  key={reservation.pk}
+                  reservation={reservation}
+                  type="cancelled"
+                  apiBaseUrl={props.apiBaseUrl}
+                />
               ))
             )}
           </StyledTabPanel>
