@@ -757,7 +757,7 @@ function convertSeasonalList(
     return {
       pk: season?.pk ?? 0,
       weekday: d,
-      closed: season?.closed ?? false,
+      closed: season?.isClosed ?? false,
       reservableTimes: times.length > 0 ? times : [{ begin: "", end: "" }],
     };
   });

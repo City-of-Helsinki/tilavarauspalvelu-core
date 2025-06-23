@@ -187,7 +187,7 @@ export const APPLICATION_ROUND_TIME_SLOTS_FRAGMENT = gql`
     id
     pk
     weekday
-    closed
+    isClosed
     reservableTimes {
       begin
       end

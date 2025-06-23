@@ -172,7 +172,7 @@ export const TIME_SELECTOR_FRAGMENT = gql`
   fragment TimeSelector on ApplicationRoundTimeSlotNode {
     id
     weekday
-    closed
+    isClosed
     reservableTimes {
       begin
       end

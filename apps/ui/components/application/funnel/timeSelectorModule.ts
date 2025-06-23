@@ -6,7 +6,7 @@ import { convertWeekday, transformWeekday } from "common/src/conversion";
 import { filterNonNullable, formatTimeStruct, timeToMinutes } from "common/src/helpers";
 
 export type DailyOpeningHours = Readonly<
-  Pick<ApplicationRoundTimeSlotNode, "weekday" | "closed" | "reservableTimes">[]
+  Pick<ApplicationRoundTimeSlotNode, "weekday" | "isClosed" | "reservableTimes">[]
 >;
 
 type SchedulesT = Omit<SuitableTimeFragment, "pk" | "id">;
@@ -77,7 +77,7 @@ function getOpeningHours(day: number, openingHours?: DailyOpeningHours): Readonl
   if (!dayOpeningHours) {
     return [];
   }
-  if (dayOpeningHours.closed) {
+  if (dayOpeningHours.isClosed) {
     return [];
   }
   return filterNonNullable(dayOpeningHours.reservableTimes);

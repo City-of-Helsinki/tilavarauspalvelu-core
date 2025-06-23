@@ -119,7 +119,7 @@ export const APPLICATION_ROUND_TIME_SLOT_FRAGMENT = gql`
   fragment ApplicationRoundTimeSlotFields on ApplicationRoundTimeSlotNode {
     id
     weekday
-    closed
+    isClosed
     reservableTimes {
       begin
       end
@@ -130,14 +130,14 @@ export const APPLICATION_ROUND_TIME_SLOT_FRAGMENT = gql`
 // Returns an element for a weekday in the application round timetable, with up to two timespans
 function ApplicationRoundScheduleDay(props: ApplicationRoundTimeSlotFieldsFragment) {
   const { t } = useTranslation();
-  const { weekday, closed } = props;
+  const { weekday, isClosed } = props;
   const reservableTimes = filterNonNullable(props.reservableTimes);
   return (
     <StyledApplicationRoundScheduleDay>
       <span data-testid="application-round-time-slot__weekday">
         {t(`common:weekDayLong.${fromMondayFirstUnsafe(weekday)}`)}
       </span>{" "}
-      {closed ? (
+      {isClosed ? (
         <span data-testid="application-round-time-slot__value">-</span>
       ) : (
         reservableTimes.length > 0 && (
