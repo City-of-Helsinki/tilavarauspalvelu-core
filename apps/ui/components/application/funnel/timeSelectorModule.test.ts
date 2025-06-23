@@ -58,7 +58,7 @@ describe("createCells", () => {
     const openingHours: DailyOpeningHours = [
       {
         weekday: 0,
-        closed: false,
+        isClosed: false,
         reservableTimes: [{ begin, end }],
       },
     ];
@@ -153,7 +153,7 @@ describe("createCells", () => {
       {
         // TODO fuzzy the weekday
         weekday: 0,
-        closed: false,
+        isClosed: false,
         reservableTimes: times,
       },
     ];
@@ -168,10 +168,10 @@ describe("createCells", () => {
 });
 
 describe("aesToCells", () => {
-  function createInputDay({ weekday, closed = false }: { weekday: number; closed?: boolean }) {
+  function createInputDay({ weekday, isClosed = false }: { weekday: number; isClosed?: boolean }) {
     return {
       weekday,
-      closed,
+      isClosed,
       reservableTimes: [
         { begin: "08:00", end: "12:00" },
         { begin: "13:00", end: "17:00" },

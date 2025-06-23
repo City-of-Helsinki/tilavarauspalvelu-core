@@ -70,7 +70,7 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     id: base64encode(`ApplicationRoundTimeSlotNode:1`),
     pk,
     weekday: 1,
-    closed: false,
+    isClosed: false,
     reservableTimes: [
       {
         begin: "08:00",

@@ -229,7 +229,7 @@ describe("TimeSelector render single section", () => {
       const openTimes: TimeSelectorFragment[] = days.map((day, index) => ({
         id: base64encode(`TimeSelector:${index}`),
         weekday: day.day,
-        closed: false,
+        isClosed: false,
         reservableTimes: day.times.map((time) => ({
           begin: toApiTime({ hours: time.start }) ?? "",
           end: toApiTime({ hours: time.end }) ?? "",
