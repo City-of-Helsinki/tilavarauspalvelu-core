@@ -70,6 +70,9 @@ export const RESERVATION_PRICE_DETAILS_FRAGMENT = gql`
     id
     begin
     end
+    appliedPricing {
+      taxPercentage
+    }
     reservationUnits {
       ...ReservationUnitPricingFields
     }
@@ -94,7 +97,7 @@ export function getReservationPriceDetails(reservation: ReservationPriceDetailsF
   const maxPrice = pricing.highestPrice;
   const formatters = getFormatters("fi");
 
-  const taxPercentage = toNumber(pricing.taxPercentage.value) ?? 0;
+  const taxPercentage = toNumber(reservation.appliedPricing?.taxPercentage) ?? 0;
   return priceUnit === PriceUnit.Fixed
     ? getReservationPrice(maxPrice, t("RequestedReservation.noPrice"), false)
     : t("RequestedReservation.ApproveDialog.priceBreakdown", {
