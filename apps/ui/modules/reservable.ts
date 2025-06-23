@@ -35,8 +35,8 @@ import { getIntervalMinutes } from "common/src/conversion";
 import { gql } from "@apollo/client";
 
 export type RoundPeriod = {
-  reservationPeriodBegin: string;
-  reservationPeriodEnd: string;
+  reservationPeriodBeginDate: string;
+  reservationPeriodEndDate: string;
 };
 
 type BufferCollideCheckReservation = Pick<
@@ -444,8 +444,8 @@ function doesSlotCollideWithApplicationRounds(slot: Date, rounds: readonly Round
 
   return rounds.some((round) =>
     isWithinInterval(slot, {
-      start: new Date(round.reservationPeriodBegin),
-      end: new Date(round.reservationPeriodEnd).setHours(23, 59, 59),
+      start: new Date(round.reservationPeriodBeginDate),
+      end: new Date(round.reservationPeriodEndDate).setHours(23, 59, 59),
     })
   );
 }

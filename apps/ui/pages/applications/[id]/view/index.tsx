@@ -94,8 +94,8 @@ function View({ application, tos }: Readonly<Pick<PropsNarrowed, "application" |
   const { applicationRound } = application;
   const lang = getLocalizationLang(i18n.language);
   const applicationRoundName = getTranslationSafe(applicationRound, "name", lang);
-  const { sentDate } = applicationRound;
-  const handledDate = sentDate ? new Date(sentDate) : new Date();
+  const { sentAt } = applicationRound;
+  const handledAt = sentAt ? new Date(sentAt) : new Date();
   const showReservations =
     application.status === ApplicationStatusChoice.ResultsSent &&
     application.applicationSections?.some((section) => section.hasReservations);
@@ -111,7 +111,7 @@ function View({ application, tos }: Readonly<Pick<PropsNarrowed, "application" |
   ] as const;
 
   const subTitle = showReservations
-    ? `${t("application:view.handledDate")} ${formatDateTime(t, handledDate, false)}`
+    ? `${t("application:view.handledAt")} ${formatDateTime(t, handledAt, false)}`
     : undefined;
   return (
     <>

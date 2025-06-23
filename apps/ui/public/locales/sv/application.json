@@ -193,7 +193,7 @@
     "heading": "Säsongbokningsansökan",
     "reservations": "Godkända bokningar",
     "application": "Ansökan",
-    "handledDate": "Behandlad",
+    "handledAt": "Behandlad",
     "allReservations": "Alla bokningar",
     "reservationsTab": {
       "reservationUnit": "Utrymme",

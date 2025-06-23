@@ -92,8 +92,8 @@ type ProcessVariablesParams =
       language: string;
       kind: ReservationKind.Season;
       applicationRound: number;
-      reservationPeriodBegin?: string;
-      reservationPeriodEnd?: string;
+      reservationPeriodBeginDate?: string;
+      reservationPeriodEndDate?: string;
     };
 
 export function processVariables({
@@ -123,8 +123,10 @@ export function processVariables({
   const equipments = mapParamToNumber(values.getAll("equipments"), 1);
   const showOnlyReservable = ignoreMaybeArray(values.getAll("showOnlyReservable")) !== "false";
   const applicationRound = "applicationRound" in rest && isSeasonal ? rest.applicationRound : null;
-  const reservationPeriodBegin = "reservationPeriodBegin" in rest && isSeasonal ? rest.reservationPeriodBegin : null;
-  const reservationPeriodEnd = "reservationPeriodEnd" in rest && isSeasonal ? rest.reservationPeriodEnd : null;
+  const reservationPeriodBeginDate =
+    "reservationPeriodBeginDate" in rest && isSeasonal ? rest.reservationPeriodBeginDate : null;
+  const reservationPeriodEndDate =
+    "reservationPeriodEndDate" in rest && isSeasonal ? rest.reservationPeriodEndDate : null;
   const timeEnd = ignoreMaybeArray(values.getAll("timeEnd"));
   const timeBegin = ignoreMaybeArray(values.getAll("timeBegin"));
   const accessType = values.getAll("accessTypes").map(transformAccessTypeSafe);
@@ -136,11 +138,11 @@ export function processVariables({
     reservationUnitType: reservationUnitTypes,
     equipments,
     accessType,
-    accessTypeBeginDate: isSeasonal ? reservationPeriodBegin : reservableDateStart,
-    accessTypeEndDate: isSeasonal ? reservationPeriodEnd : reservableDateEnd,
+    accessTypeBeginDate: isSeasonal ? reservationPeriodBeginDate : reservableDateStart,
+    accessTypeEndDate: isSeasonal ? reservationPeriodEndDate : reservableDateEnd,
     ...(startDate != null || isSeasonal
       ? isSeasonal
-        ? { reservableDateStart: reservationPeriodBegin } // Used to find effectiveAccessType in /recurring/[id] page
+        ? { reservableDateStart: reservationPeriodBeginDate } // Used to find effectiveAccessType in /recurring/[id] page
         : {
             reservableDateStart,
           }

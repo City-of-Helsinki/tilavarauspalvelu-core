@@ -254,8 +254,8 @@ export const EDIT_PAGE_RESERVATION_UNIT_FRAGMENT = gql`
     ...MetadataSets
     applicationRounds(ongoing: true) {
       id
-      reservationPeriodBegin
-      reservationPeriodEnd
+      reservationPeriodBeginDate
+      reservationPeriodEndDate
     }
   }
 `;

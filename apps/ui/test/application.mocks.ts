@@ -262,21 +262,21 @@ export function createMockApplicationRound({
   pk = 1,
   notesWhenApplying,
   status = ApplicationRoundStatusChoice.Open,
-  applicationPeriodEnd = new Date(2024, 0, 1, 0, 0, 0),
-  applicationPeriodBegin = addYears(new Date(2024, 0, 1, 0, 0, 0), 1),
+  applicationPeriodEndsAt = new Date(2024, 0, 1, 0, 0, 0),
+  applicationPeriodBeginsAt = addYears(new Date(2024, 0, 1, 0, 0, 0), 1),
 }: {
   pk?: number;
   status?: ApplicationRoundStatusChoice;
   notesWhenApplying?: string | null;
-  applicationPeriodEnd?: Date;
-  applicationPeriodBegin?: Date;
+  applicationPeriodEndsAt?: Date;
+  applicationPeriodBeginsAt?: Date;
 } = {}): ApplicationRoundNode {
-  // There is an implicit relation between reservationPeriodBegin and SearchQuery
-  // so not mocking reservationPeriodBegin will break search query mock
-  if (applicationPeriodBegin.getMilliseconds() !== 0) {
+  // There is an implicit relation between reservationPeriodBeginDate and SearchQuery
+  // so not mocking reservationPeriodBeginDate will break search query mock
+  if (applicationPeriodBeginsAt.getMilliseconds() !== 0) {
     throw new Error("Application period millis should be 0. You most likely you forgot to set a mock date");
   }
-  const reservationPeriodBegin = addMonths(applicationPeriodBegin, 1);
+  const reservationPeriodBeginDate = addMonths(applicationPeriodBeginsAt, 1);
   const reservationUnits = createMockReservationUnits({
     nReservationUnits: 10,
   });
@@ -288,24 +288,24 @@ export function createMockApplicationRound({
     notesWhenApplyingFi: notesWhenApplying ? `${notesWhenApplying} FI` : null,
     notesWhenApplyingEn: notesWhenApplying ? `${notesWhenApplying} EN` : null,
     notesWhenApplyingSv: notesWhenApplying ? `${notesWhenApplying} SV` : null,
-    reservationPeriodBegin: reservationPeriodBegin.toISOString(),
-    reservationPeriodEnd: addYears(reservationPeriodBegin, 1).toISOString(),
-    publicDisplayBegin: applicationPeriodBegin.toISOString(),
-    publicDisplayEnd: applicationPeriodEnd.toISOString(),
-    applicationPeriodBegin: applicationPeriodBegin.toISOString(),
-    applicationPeriodEnd: applicationPeriodEnd.toISOString(),
+    reservationPeriodBeginDate: reservationPeriodBeginDate.toISOString(),
+    reservationPeriodEndDate: addYears(reservationPeriodBeginDate, 1).toISOString(),
+    publicDisplayBeginsAt: applicationPeriodBeginsAt.toISOString(),
+    publicDisplayEndsAt: applicationPeriodEndsAt.toISOString(),
+    applicationPeriodBeginsAt: applicationPeriodBeginsAt.toISOString(),
+    applicationPeriodEndsAt: applicationPeriodEndsAt.toISOString(),
     status,
     reservationUnits,
     applicationsCount: 0, // Scalars["Int"]["output"];
     criteriaEn: null, // Maybe<Scalars["String"]["output"]>;
     criteriaFi: null, // Maybe<Scalars["String"]["output"]>;
     criteriaSv: null, // Maybe<Scalars["String"]["output"]>;
-    handledDate: null, // Maybe<Scalars["DateTime"]["output"]>;
+    handledAt: null, // Maybe<Scalars["DateTime"]["output"]>;
     isSettingHandledAllowed: false, // Scalars["Boolean"]["output"];
     purposes: [] as const, // ReadonlyArray<ReservationPurposeNode>;
     reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice.NotCompleted,
     reservationUnitCount: 10, // Scalars["Int"]["output"];
-    sentDate: null, // Maybe<Scalars["DateTime"]["output"]>;
+    sentAt: null, // Maybe<Scalars["DateTime"]["output"]>;
     statusTimestamp: null, // Maybe<Scalars["DateTime"]["output"]>;
     termsOfUse: null, // Maybe<TermsOfUseNode>;
   };
@@ -314,7 +314,7 @@ export function createMockApplicationRound({
 type ApplicationPage4 = ApplicationViewFragment;
 export function createMockApplicationViewFragment(props: CreateMockApplicationFragmentProps = {}) {
   const applicationRoundMock = {
-    sentDate: new Date().toISOString(),
+    sentAt: new Date().toISOString(),
     status: ApplicationRoundStatusChoice.Open,
     ...generateNameFragment("ApplicationRound"),
     termsOfUse: {

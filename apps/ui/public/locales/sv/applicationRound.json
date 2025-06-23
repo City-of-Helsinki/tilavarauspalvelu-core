@@ -10,7 +10,7 @@
     "pending": "Ansökningsperioden öppnas {{opening}}",
     "open": "Ansökningsperioden öppen till {{until}}",
     "past": "Ansökningsperioden stängdes {{closing}}",
-    "reservationPeriod": "Lokaler kan bokas för perioden {{reservationPeriodBegin}} - {{reservationPeriodEnd}}"
+    "reservationPeriod": "Lokaler kan bokas för perioden {{reservationPeriodBeginDate}} - {{reservationPeriodEndDate}}"
   },
   "startNewApplication": "Fyll i ansökan",
   "criteria": "ansökningsvillkor",

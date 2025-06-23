@@ -47,8 +47,8 @@ vi.mock("next/router", () => ({
 function customRender(props: CreateGraphQLMockProps = {}): ReturnType<typeof render> {
   const mocks = createGraphQLMocks(props);
   const round = createMockApplicationRound({
-    applicationPeriodBegin: new Date(2024, 0, 1, 0, 0, 0),
-    applicationPeriodEnd: addYears(new Date(), 1),
+    applicationPeriodBeginsAt: new Date(2024, 0, 1, 0, 0, 0),
+    applicationPeriodEndsAt: addYears(new Date(), 1),
   });
   const options: OptionsT = createOptionMock();
   return render(

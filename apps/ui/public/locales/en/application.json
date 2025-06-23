@@ -195,7 +195,7 @@
     "heading": "Seasonal booking application",
     "reservations": "Confirmed bookings",
     "application": "Application",
-    "handledDate": "Handled",
+    "handledAt": "Handled",
     "allReservations": "All bookings",
     "reservationsTab": {
       "reservationUnit": "Space",

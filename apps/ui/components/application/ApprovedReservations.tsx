@@ -72,7 +72,7 @@ import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 const N_RESERVATIONS_TO_SHOW = 20;
 
 type ApplicationT = Pick<ApplicationNode, "id" | "pk">;
-type ApplicationRoundT = Pick<ApplicationRoundNode, "reservationPeriodBegin" | "reservationPeriodEnd">;
+type ApplicationRoundT = Pick<ApplicationRoundNode, "reservationPeriodBeginDate" | "reservationPeriodEndDate">;
 type Props = {
   application: ApplicationT;
   applicationRound: ApplicationRoundT;
@@ -470,8 +470,8 @@ function ReservationSeriesTable({
               accessTypes={modal.accessTypes}
               reservationUnits={reservationUnits}
               pk={modal?.pk}
-              roundReservationBegin={new Date(applicationRound.reservationPeriodBegin)}
-              roundReservationEnd={new Date(applicationRound.reservationPeriodEnd)}
+              roundReservationBegin={new Date(applicationRound.reservationPeriodBeginDate)}
+              roundReservationEnd={new Date(applicationRound.reservationPeriodEndDate)}
             />
           )}
         </Dialog.Content>
