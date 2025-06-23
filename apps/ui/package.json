@@ -57,7 +57,7 @@
     "@vitejs/plugin-react": "^4.5.2",
     "happy-dom": "^18.0.1",
     "postcss-styled-syntax": "^0.7.1",
-    "prettier": "^3.5.3",
+    "prettier": "^3.6.0",
     "stylelint": "^16.20.0",
     "stylelint-config-standard": "^38.0.0",
     "stylelint-config-styled-components": "^0.1.1",
