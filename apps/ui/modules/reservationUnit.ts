@@ -221,13 +221,13 @@ export function getFuturePricing(
     )
     .filter((futurePricing) => {
       return !applicationRounds.some((applicationRound) => {
-        const { reservationPeriodBegin, reservationPeriodEnd } = applicationRound;
-        if (!reservationPeriodBegin || !reservationPeriodEnd) {
+        const { reservationPeriodBeginDate, reservationPeriodEndDate } = applicationRound;
+        if (!reservationPeriodBeginDate || !reservationPeriodEndDate) {
           return false;
         }
         const begins = new Date(futurePricing.begins);
-        const periodStart = new Date(reservationPeriodBegin);
-        const periodEnd = new Date(reservationPeriodEnd);
+        const periodStart = new Date(reservationPeriodBeginDate);
+        const periodEnd = new Date(reservationPeriodEndDate);
         return begins >= periodStart && begins <= periodEnd;
       });
     })
@@ -620,11 +620,11 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
   // NOTE there is still a case where application rounds have a hole but there are no reservable times
   // this is not a real use case but technically possible
   const openAfterRound: Date | undefined = props.activeApplicationRounds.reduce<Date | undefined>((acc, round) => {
-    if (round.reservationPeriodEnd == null) {
+    if (round.reservationPeriodEndDate == null) {
       return acc;
     }
-    const end = new Date(round.reservationPeriodEnd);
-    const begin = new Date(round.reservationPeriodBegin);
+    const end = new Date(round.reservationPeriodEndDate);
+    const begin = new Date(round.reservationPeriodBeginDate);
     if (isBefore(end, minReservationDate)) {
       return acc;
     }
@@ -635,7 +635,7 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
     if (startOfDay(begin) > startOfDay(acc)) {
       return acc;
     }
-    return dayMax([acc, new Date(round.reservationPeriodEnd)]);
+    return dayMax([acc, new Date(round.reservationPeriodEndDate)]);
   }, undefined);
 
   let minDay = new Date(dayMax([minReservationDate, start, openAfterRound]) ?? minReservationDate);

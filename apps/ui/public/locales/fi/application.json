@@ -194,7 +194,7 @@
     "heading": "Kausivaraushakemus",
     "reservations": "Hyväksytyt varaukset",
     "application": "Hakemus",
-    "handledDate": "Käsitelty",
+    "handledAt": "Käsitelty",
     "allReservations": "Kaikki varaukset",
     "reservationsTab": {
       "reservationUnit": "Tila",

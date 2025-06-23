@@ -57,8 +57,8 @@ function Page1({ application, options: optionsOrig }: Pick<PropsNarrowed, "appli
   };
   const { getReservationUnits } = useReservationUnitList(applicationRound);
 
-  const begin = new Date(applicationRound.reservationPeriodBegin);
-  const end = new Date(applicationRound.reservationPeriodEnd);
+  const begin = new Date(applicationRound.reservationPeriodBeginDate);
+  const end = new Date(applicationRound.reservationPeriodEndDate);
   const form = useForm<ApplicationPage1FormValues>({
     mode: "onChange",
     defaultValues: convertApplicationPage1(application, getReservationUnits()),

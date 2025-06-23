@@ -31,16 +31,16 @@ const Label = styled.span`
 `;
 
 function ReservationPeriod({
-  reservationPeriodBegin,
-  reservationPeriodEnd,
+  reservationPeriodBeginDate,
+  reservationPeriodEndDate,
 }: {
-  reservationPeriodBegin: string;
-  reservationPeriodEnd: string;
+  reservationPeriodBeginDate: string;
+  reservationPeriodEndDate: string;
 }): JSX.Element {
   return (
     <Flex $gap="xs" $direction="row" $alignItems="center">
       <IconCalendar size={IconSize.ExtraSmall} />
-      {formatDate(reservationPeriodBegin)}-{formatDate(reservationPeriodEnd)}
+      {formatDate(reservationPeriodBeginDate)}-{formatDate(reservationPeriodEndDate)}
     </Flex>
   );
 }
@@ -76,12 +76,12 @@ export function ApplicationRoundCard({ applicationRound }: ApplicationCardProps)
     <Card heading={name ?? "-"} buttons={buttons} tags={tags}>
       <Times>
         <TimeframeStatus
-          applicationPeriodBegin={applicationRound.applicationPeriodBegin}
-          applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+          applicationPeriodBeginsAt={applicationRound.applicationPeriodBeginsAt}
+          applicationPeriodEndsAt={applicationRound.applicationPeriodEndsAt}
         />
         <ReservationPeriod
-          reservationPeriodBegin={applicationRound.reservationPeriodBegin}
-          reservationPeriodEnd={applicationRound.reservationPeriodEnd}
+          reservationPeriodBeginDate={applicationRound.reservationPeriodBeginDate}
+          reservationPeriodEndDate={applicationRound.reservationPeriodEndDate}
         />
       </Times>
       <Flex $gap="m" $direction="row" $justifyContent="space-between">
@@ -108,10 +108,10 @@ export const APPLICATION_ROUND_CARD_FRAGMENT = gql`
     pk
     nameFi
     status
-    applicationPeriodBegin
-    applicationPeriodEnd
-    reservationPeriodBegin
-    reservationPeriodEnd
+    applicationPeriodBeginsAt
+    applicationPeriodEndsAt
+    reservationPeriodBeginDate
+    reservationPeriodEndDate
     reservationUnitCount
     applicationsCount
   }

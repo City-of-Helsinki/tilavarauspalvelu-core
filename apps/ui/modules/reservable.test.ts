@@ -695,8 +695,8 @@ describe("isRangeReservable", () => {
       end: addHours(date, 11),
       activeApplicationRounds: [
         {
-          reservationPeriodBegin: addDays(date, -10).toISOString(),
-          reservationPeriodEnd: addDays(date, 10).toISOString(),
+          reservationPeriodBeginDate: addDays(date, -10).toISOString(),
+          reservationPeriodEndDate: addDays(date, 10).toISOString(),
         },
       ],
     });
@@ -709,8 +709,8 @@ describe("isRangeReservable", () => {
       end: addHours(date, 11),
       activeApplicationRounds: [
         {
-          reservationPeriodBegin: addDays(date, 2).toISOString(),
-          reservationPeriodEnd: addDays(date, 20).toISOString(),
+          reservationPeriodBeginDate: addDays(date, 2).toISOString(),
+          reservationPeriodEndDate: addDays(date, 20).toISOString(),
         },
       ],
     });

@@ -10,7 +10,7 @@
     "pending": "Haku avautuu {{opening}}",
     "open": "Haku auki {{until}} saakka",
     "past": "Haku sulkeutui {{closing}}",
-    "reservationPeriod": "Tilat varattavissa ajalle {{reservationPeriodBegin}} - {{reservationPeriodEnd}}"
+    "reservationPeriod": "Tilat varattavissa ajalle {{reservationPeriodBeginDate}} - {{reservationPeriodEndDate}}"
   },
   "startNewApplication": "Täytä hakemus",
   "criteria": "hakuehdot",

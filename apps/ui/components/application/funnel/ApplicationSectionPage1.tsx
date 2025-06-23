@@ -37,8 +37,8 @@ function ApplicationSectionInner({ index, applicationRound, options, onDeleteEve
 
   const [isWaitingForDelete, setIsWaitingForDelete] = useState(false);
 
-  const periodStartDate = new Date(applicationRound.reservationPeriodBegin);
-  const periodEndDate = new Date(applicationRound.reservationPeriodEnd);
+  const periodStartDate = new Date(applicationRound.reservationPeriodBeginDate);
+  const periodEndDate = new Date(applicationRound.reservationPeriodEndDate);
 
   const selectDefaultPeriod = (): void => {
     clearErrors([`applicationSections.${index}.begin`, `applicationSections.${index}.end`]);
@@ -48,15 +48,15 @@ function ApplicationSectionInner({ index, applicationRound, options, onDeleteEve
     setValue(`applicationSections.${index}.end`, end);
   };
 
-  const applicationPeriodBegin = watch(`applicationSections.${index}.begin`);
-  const applicationPeriodEnd = watch(`applicationSections.${index}.end`);
+  const applicationPeriodBeginsAt = watch(`applicationSections.${index}.begin`);
+  const applicationPeriodEndsAt = watch(`applicationSections.${index}.end`);
   const numPersons = watch(`applicationSections.${index}.numPersons`);
 
   const selectionIsDefaultPeriod =
-    applicationPeriodEnd != null &&
-    applicationPeriodBegin != null &&
-    applicationPeriodBegin === toUIDate(periodStartDate) &&
-    applicationPeriodEnd === toUIDate(periodEndDate);
+    applicationPeriodEndsAt != null &&
+    applicationPeriodBeginsAt != null &&
+    applicationPeriodBeginsAt === toUIDate(periodStartDate) &&
+    applicationPeriodEndsAt === toUIDate(periodEndDate);
 
   type FieldName =
     | "begin"
@@ -312,7 +312,7 @@ export function ApplicationSectionPage1(props: Props): JSX.Element {
 export const APPLICATION_ROUND_FRAGMENT = gql`
   fragment ApplicationRoundForApplication on ApplicationRoundNode {
     ...ApplicationReservationUnitList
-    reservationPeriodBegin
-    reservationPeriodEnd
+    reservationPeriodBeginDate
+    reservationPeriodEndDate
   }
 `;

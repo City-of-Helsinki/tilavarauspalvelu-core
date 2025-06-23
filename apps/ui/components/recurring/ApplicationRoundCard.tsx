@@ -16,10 +16,10 @@ interface CardProps {
 
 function translateRoundDate(
   t: TFunction,
-  round: Pick<ApplicationRoundCardFragment, "applicationPeriodBegin" | "applicationPeriodEnd" | "status">
+  round: Pick<ApplicationRoundCardFragment, "applicationPeriodBeginsAt" | "applicationPeriodEndsAt" | "status">
 ) {
-  const begin = new Date(round.applicationPeriodBegin);
-  const end = new Date(round.applicationPeriodEnd);
+  const begin = new Date(round.applicationPeriodBeginsAt);
+  const end = new Date(round.applicationPeriodEndsAt);
   if (!isValid(begin) || !isValid(end)) {
     return "";
   }
@@ -44,14 +44,14 @@ export function ApplicationRoundCard({ applicationRound }: Readonly<CardProps>):
 
   const name = getTranslationSafe(applicationRound, "name", lang);
   const timeString = translateRoundDate(t, applicationRound);
-  const begin = new Date(applicationRound.reservationPeriodBegin);
-  const end = new Date(applicationRound.reservationPeriodEnd);
-  const reservationPeriodBegin = toUIDate(begin);
-  const reservationPeriodEnd = toUIDate(end);
+  const begin = new Date(applicationRound.reservationPeriodBeginDate);
+  const end = new Date(applicationRound.reservationPeriodEndDate);
+  const reservationPeriodBeginDate = toUIDate(begin);
+  const reservationPeriodEndDate = toUIDate(end);
 
   const reservationPeriod = t(`applicationRound:card.reservationPeriod`, {
-    reservationPeriodBegin,
-    reservationPeriodEnd,
+    reservationPeriodBeginDate,
+    reservationPeriodEndDate,
   });
 
   const buttons = [
@@ -89,10 +89,10 @@ export const APPLICATION_ROUND_CARD_FRAGMENT = gql`
     nameFi
     nameEn
     nameSv
-    reservationPeriodBegin
-    reservationPeriodEnd
-    applicationPeriodBegin
-    applicationPeriodEnd
+    reservationPeriodBeginDate
+    reservationPeriodEndDate
+    applicationPeriodBeginsAt
+    applicationPeriodEndsAt
     status
   }
 `;

@@ -62,8 +62,8 @@ function SeasonalSearch({ apiBaseUrl, applicationRound, options }: Readonly<Seas
     language: i18n.language,
     kind: ReservationKind.Season,
     applicationRound: applicationRound.pk ?? 0,
-    reservationPeriodBegin: applicationRound?.reservationPeriodBegin,
-    reservationPeriodEnd: applicationRound?.reservationPeriodEnd,
+    reservationPeriodBeginDate: applicationRound?.reservationPeriodBeginDate,
+    reservationPeriodEndDate: applicationRound?.reservationPeriodEndDate,
   });
   const query = useSearchQuery(variables);
   const { data, isLoading, error, fetchMore, previousData } = query;
@@ -220,8 +220,8 @@ export const APPLICATION_ROUND_QUERY = gql`
       nameEn
       nameSv
       status
-      reservationPeriodBegin
-      reservationPeriodEnd
+      reservationPeriodBeginDate
+      reservationPeriodEndDate
       reservationUnits {
         id
         pk

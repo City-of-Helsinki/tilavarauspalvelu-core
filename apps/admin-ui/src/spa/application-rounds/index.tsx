@@ -152,7 +152,7 @@ function AllApplicationRounds(): JSX.Element | null {
         initiallyOpen
         hideIfEmpty
         name={t("ApplicationRound.groupLabel.handling")}
-        rounds={orderBy(currentApplicationRounds, ["status", "applicationPeriodEnd"], ["asc", "asc"])}
+        rounds={orderBy(currentApplicationRounds, ["status", "applicationPeriodEndsAt"], ["asc", "asc"])}
       />
       <RoundsAccordion
         name={t("ApplicationRound.groupLabel.notSent")}
@@ -162,13 +162,13 @@ function AllApplicationRounds(): JSX.Element | null {
       />
       <RoundsAccordion
         name={t("ApplicationRound.groupLabel.open")}
-        rounds={orderBy(openApplicationRounds, ["applicationPeriodEnd", "asc"], [])}
+        rounds={orderBy(openApplicationRounds, ["applicationPeriodEndsAt", "asc"], [])}
         hideIfEmpty
         initiallyOpen
       />
       <RoundsAccordion
         name={t("ApplicationRound.groupLabel.opening")}
-        rounds={orderBy(upcomingApplicationRounds, ["applicationPeriodBegin"], ["asc"])}
+        rounds={orderBy(upcomingApplicationRounds, ["applicationPeriodBeginsAt"], ["asc"])}
         emptyContent={
           <div>
             <div>{t("ApplicationRound.noUpcoming")}</div>

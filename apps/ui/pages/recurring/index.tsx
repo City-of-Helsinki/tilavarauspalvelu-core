@@ -36,7 +36,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const filteredApplicationRounds = applicationRounds.filter(
     (applicationRound) =>
-      new Date(applicationRound.publicDisplayBegin) <= now && new Date(applicationRound.publicDisplayEnd) >= now
+      new Date(applicationRound.publicDisplayBeginsAt) <= now && new Date(applicationRound.publicDisplayEndsAt) >= now
   );
 
   return {
@@ -53,15 +53,15 @@ function RecurringLander({ applicationRounds }: Readonly<Pick<Props, "applicatio
 
   const active = applicationRounds
     .filter(isActiveRound)
-    .sort((a, b) => compTimeStrings(a.applicationPeriodEnd, b.applicationPeriodEnd));
+    .sort((a, b) => compTimeStrings(a.applicationPeriodEndsAt, b.applicationPeriodEndsAt));
 
   const upcoming = applicationRounds
     .filter(isFutureRound)
-    .sort((a, b) => compTimeStrings(a.applicationPeriodBegin, b.applicationPeriodBegin));
+    .sort((a, b) => compTimeStrings(a.applicationPeriodBeginsAt, b.applicationPeriodBeginsAt));
 
   const past = applicationRounds
     .filter(isPastRound)
-    .sort((a, b) => compTimeStrings(a.applicationPeriodEnd, b.applicationPeriodEnd));
+    .sort((a, b) => compTimeStrings(a.applicationPeriodEndsAt, b.applicationPeriodEndsAt));
 
   const routes = [
     {
@@ -131,8 +131,8 @@ export default RecurringLander;
 export const APPLICATION_ROUND_FRAGMENT = gql`
   fragment ApplicationRoundFields on ApplicationRoundNode {
     ...ApplicationRoundCard
-    publicDisplayBegin
-    publicDisplayEnd
+    publicDisplayBeginsAt
+    publicDisplayEndsAt
     criteriaFi
     criteriaEn
     criteriaSv

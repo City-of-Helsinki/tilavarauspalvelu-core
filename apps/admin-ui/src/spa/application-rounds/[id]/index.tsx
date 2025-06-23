@@ -131,8 +131,8 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
           <H1 $noMargin>{applicationRound.nameFi}</H1>
           <Flex $justifyContent="flex-start" $direction="row" $marginTop="xs">
             <TimeframeStatus
-              applicationPeriodBegin={applicationRound.applicationPeriodBegin}
-              applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+              applicationPeriodBeginsAt={applicationRound.applicationPeriodBeginsAt}
+              applicationPeriodEndsAt={applicationRound.applicationPeriodEndsAt}
             />
             <Link to="criteria">{t("ApplicationRound.roundCriteria")}</Link>
           </Flex>
@@ -304,8 +304,8 @@ export const APPLICATION_ROUND_ADMIN_FRAGMENT = gql`
     pk
     nameFi
     status
-    applicationPeriodBegin
-    applicationPeriodEnd
+    applicationPeriodBeginsAt
+    applicationPeriodEndsAt
     applicationsCount
     isSettingHandledAllowed
     reservationCreationStatus

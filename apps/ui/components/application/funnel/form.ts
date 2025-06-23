@@ -621,8 +621,8 @@ export function validateApplication(
   application: ApplicationFormFragment
 ): { valid: true } | { valid: false; page: 1 | 2 | 3 } {
   const { applicationRound } = application;
-  const begin = new Date(applicationRound.reservationPeriodBegin);
-  const end = new Date(applicationRound.reservationPeriodEnd);
+  const begin = new Date(applicationRound.reservationPeriodBeginDate);
+  const end = new Date(applicationRound.reservationPeriodEndDate);
   const schema = ApplicationPage1SchemaRefined({ begin, end });
   const page1 = schema.safeParse(convertApplicationPage1(application, []));
   if (!page1.success) {

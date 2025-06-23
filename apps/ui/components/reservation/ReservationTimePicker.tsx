@@ -419,8 +419,8 @@ export const RESERVATION_TIME_PICKER_FRAGMENT = gql`
     ...PriceReservationUnitFields
     applicationRounds(ongoing: true) {
       id
-      reservationPeriodBegin
-      reservationPeriodEnd
+      reservationPeriodBeginDate
+      reservationPeriodEndDate
     }
   }
 `;

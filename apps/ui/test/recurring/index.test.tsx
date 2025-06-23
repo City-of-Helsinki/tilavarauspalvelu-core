@@ -40,20 +40,20 @@ describe("RecurringLander", () => {
       createMockApplicationRound({
         pk: 1,
         status: ApplicationRoundStatusChoice.Open,
-        applicationPeriodBegin: new Date("2024-04-01"),
-        applicationPeriodEnd: new Date("2024-05-01"),
+        applicationPeriodBeginsAt: new Date("2024-04-01"),
+        applicationPeriodEndsAt: new Date("2024-05-01"),
       }),
       createMockApplicationRound({
         pk: 2,
         status: ApplicationRoundStatusChoice.Open,
-        applicationPeriodBegin: new Date("2024-01-01"),
-        applicationPeriodEnd: new Date("2024-02-01"),
+        applicationPeriodBeginsAt: new Date("2024-01-01"),
+        applicationPeriodEndsAt: new Date("2024-02-01"),
       }),
       createMockApplicationRound({
         pk: 3,
         status: ApplicationRoundStatusChoice.Open,
-        applicationPeriodBegin: new Date("2024-02-01"),
-        applicationPeriodEnd: new Date("2024-03-01"),
+        applicationPeriodBeginsAt: new Date("2024-02-01"),
+        applicationPeriodEndsAt: new Date("2024-03-01"),
       }),
     ];
     const view = render(<RecurringLander applicationRounds={rounds} />);
@@ -76,7 +76,7 @@ describe("RecurringLander", () => {
       name: "applicationRound:card.criteria",
     });
     expect(criteriaLinks).toHaveLength(3);
-    // TODO check the sort order (based on applicationPeriodBegin)
+    // TODO check the sort order (based on applicationPeriodBeginsAt)
   });
 
   test("should render recurring lander with one of each status", () => {
@@ -84,20 +84,20 @@ describe("RecurringLander", () => {
       createMockApplicationRound({
         pk: 1,
         status: ApplicationRoundStatusChoice.Upcoming,
-        applicationPeriodBegin: new Date("2024-04-01"),
-        applicationPeriodEnd: new Date("2024-05-01"),
+        applicationPeriodBeginsAt: new Date("2024-04-01"),
+        applicationPeriodEndsAt: new Date("2024-05-01"),
       }),
       createMockApplicationRound({
         pk: 2,
         status: ApplicationRoundStatusChoice.Handled,
-        applicationPeriodBegin: new Date("2024-01-01"),
-        applicationPeriodEnd: new Date("2024-02-01"),
+        applicationPeriodBeginsAt: new Date("2024-01-01"),
+        applicationPeriodEndsAt: new Date("2024-02-01"),
       }),
       createMockApplicationRound({
         pk: 3,
         status: ApplicationRoundStatusChoice.Open,
-        applicationPeriodBegin: new Date("2024-02-01"),
-        applicationPeriodEnd: new Date("2024-03-01"),
+        applicationPeriodBeginsAt: new Date("2024-02-01"),
+        applicationPeriodEndsAt: new Date("2024-03-01"),
       }),
     ];
     const view = render(<RecurringLander applicationRounds={rounds} />);

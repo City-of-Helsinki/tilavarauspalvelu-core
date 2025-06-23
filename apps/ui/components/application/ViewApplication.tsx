@@ -53,7 +53,7 @@ export const APPLICATION_VIEW_FRAGMENT = gql`
     }
     applicationRound {
       id
-      sentDate
+      sentAt
       status
       termsOfUse {
         id
