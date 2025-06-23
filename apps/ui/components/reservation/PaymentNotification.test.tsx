@@ -7,7 +7,14 @@ import { toUIDateTime } from "common/src/common/util";
 function customRender() {
   const paymentOrder = createPaymentOrderMock();
   const appliedPricing = createAppliedPricingMock();
-  return render(<PaymentNotification paymentOrder={paymentOrder} appliedPricing={appliedPricing} />);
+  return render(
+    <PaymentNotification
+      pk={1}
+      paymentOrder={paymentOrder}
+      appliedPricing={appliedPricing}
+      apiBaseUrl={"http://localhost:8000"}
+    />
+  );
 }
 
 describe("Component: Payment Notification", () => {
