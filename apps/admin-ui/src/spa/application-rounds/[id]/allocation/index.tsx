@@ -269,10 +269,7 @@ function ApplicationRoundAllocation({
         if (r.reservationUnit.pk !== reservationUnitFilterQuery) {
           return false;
         }
-        if (r.locked || r.rejected) {
-          return false;
-        }
-        return true;
+        return !(r.isLocked || r.isRejected);
       });
 
       if (opts.length === 0) {
@@ -595,8 +592,8 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
           reservationUnitOptions {
             id
             pk
-            locked
-            rejected
+            isRejected
+            isLocked
             allocatedTimeSlots {
               pk
               ...AllocatedTimeSlot
