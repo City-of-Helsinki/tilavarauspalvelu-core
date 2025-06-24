@@ -35,22 +35,22 @@ function createMockCancellationRule({
 
 function createMockReservationUnit({
   reservationsMinDaysBefore = 0,
-  reservationEnds,
+  reservationEndsAt,
 }: {
   reservationsMinDaysBefore?: number;
-  reservationEnds?: Date;
+  reservationEndsAt?: Date;
 }): CanReservationBeChangedProps["reservationUnit"] {
   return {
     bufferTimeBefore: 0,
     bufferTimeAfter: 0,
     id: "123f4w90",
     reservationStartInterval: ReservationStartInterval.Interval_15Mins,
-    reservationBegins: addDays(new Date(), -1).toISOString(),
+    reservationBeginsAt: addDays(new Date(), -1).toISOString(),
     reservationsMinDaysBefore,
     reservationsMaxDaysBefore: null,
     minReservationDuration: null,
     maxReservationDuration: null,
-    reservationEnds: reservationEnds?.toISOString() ?? null,
+    reservationEndsAt: reservationEndsAt?.toISOString() ?? null,
     reservableTimeSpans: Array.from(Array(100)).map((_val, index) => {
       return {
         startDatetime: `${toApiDate(addDays(new Date(), index))}T07:00:00+00:00`,
@@ -68,7 +68,7 @@ function createMockReservation({
   isHandled = null,
   canBeCancelledTimeBefore,
   reservationsMinDaysBefore,
-  reservationEnds,
+  reservationEndsAt,
 }: {
   beginsAt?: Date;
   price?: string;
@@ -78,14 +78,14 @@ function createMockReservation({
   isHandled?: boolean | null;
   canBeCancelledTimeBefore?: number;
   reservationsMinDaysBefore?: number;
-  reservationEnds?: Date;
+  reservationEndsAt?: Date;
 }): CanReservationBeChangedProps["reservation"] {
   const start = beginsAt ?? addHours(startOfToday(), 34);
   const end = addHours(start, 1);
   const resUnit = reservationUnit ?? {
     ...createMockReservationUnit({
       reservationsMinDaysBefore,
-      reservationEnds,
+      reservationEndsAt,
     }),
     cancellationRule: createMockCancellationRule({ canBeCancelledTimeBefore }),
   };
@@ -440,8 +440,8 @@ describe("isSlotWithinReservationTime", () => {
     const baseDate = new Date("2019-09-22T12:00:00+00:00");
     const input = {
       start: baseDate,
-      reservationBegins: begin != null ? addDays(baseDate, -begin) : undefined,
-      reservationEnds: end != null ? addDays(baseDate, end) : undefined,
+      reservationBeginsAt: begin != null ? addDays(baseDate, -begin) : undefined,
+      reservationEndsAt: end != null ? addDays(baseDate, end) : undefined,
     };
     expect(isSlotWithinReservationTime(input)).toBe(expected);
   });
