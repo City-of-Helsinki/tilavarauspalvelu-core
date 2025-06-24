@@ -139,7 +139,7 @@ export function ReservationUnitSettingsSection({
               <Flex $gap="xs">
                 {/* TODO the Two DateInputs need to touch each other to rerun common validation code */}
                 <ActivationGroup
-                  label={t("ReservationUnitEditor.publishBegins")}
+                  label={t("ReservationUnitEditor.publishBeginsAt")}
                   control={control}
                   name="hasPublishBegins"
                   noIndent
@@ -155,7 +155,7 @@ export function ReservationUnitSettingsSection({
                   />
                 </ActivationGroup>
                 <ActivationGroup
-                  label={t("ReservationUnitEditor.publishEnds")}
+                  label={t("ReservationUnitEditor.publishEndsAt")}
                   control={control}
                   name="hasPublishEnds"
                   noIndent
@@ -184,7 +184,7 @@ export function ReservationUnitSettingsSection({
             >
               {/* TODO the Two DateInputs need to touch each other to rerun common validation code */}
               <ActivationGroup
-                label={t("ReservationUnitEditor.reservationBegins")}
+                label={t("ReservationUnitEditor.reservationBeginsAt")}
                 control={control}
                 name="hasReservationBegins"
                 noIndent
@@ -200,7 +200,7 @@ export function ReservationUnitSettingsSection({
                 />
               </ActivationGroup>
               <ActivationGroup
-                label={t("ReservationUnitEditor.reservationEnds")}
+                label={t("ReservationUnitEditor.reservationEndsAt")}
                 control={control}
                 name="hasReservationEnds"
                 noIndent

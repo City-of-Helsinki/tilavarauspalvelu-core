@@ -413,9 +413,9 @@ export const ReservationUnitEditSchema = z
     nameEn: z.string().max(80),
     nameSv: z.string().max(80),
     // backend allows nulls but not empty strings, these are not required though
-    termsOfUseFi: z.string().max(2000),
-    termsOfUseEn: z.string().max(2000),
-    termsOfUseSv: z.string().max(2000),
+    notesWhenApplyingFi: z.string().max(2000),
+    notesWhenApplyingEn: z.string().max(2000),
+    notesWhenApplyingSv: z.string().max(2000),
     spaces: z.array(z.number()),
     resources: z.array(z.number()),
     equipments: z.array(z.number()),
@@ -789,14 +789,14 @@ export function convertReservationUnit(data?: Node): ReservationUnitEditFormValu
     minReservationDuration: data?.minReservationDuration ?? null,
     pk: data?.pk ?? 0,
     // Date split for ui components
-    publishBeginsDate: data?.publishBegins ? format(new Date(data.publishBegins), "d.M.yyyy") : "",
-    publishBeginsTime: data?.publishBegins ? format(new Date(data.publishBegins), "H:mm") : "",
-    publishEndsDate: data?.publishEnds ? format(new Date(data.publishEnds), "d.M.yyyy") : "",
-    publishEndsTime: data?.publishEnds ? format(new Date(data.publishEnds), "H:mm") : "",
-    reservationBeginsDate: data?.reservationBegins ? format(new Date(data.reservationBegins), "d.M.yyyy") : "",
-    reservationBeginsTime: data?.reservationBegins ? format(new Date(data.reservationBegins), "H:mm") : "",
-    reservationEndsDate: data?.reservationEnds ? format(new Date(data.reservationEnds), "d.M.yyyy") : "",
-    reservationEndsTime: data?.reservationEnds ? format(new Date(data.reservationEnds), "H:mm") : "",
+    publishBeginsDate: data?.publishBeginsAt ? format(new Date(data.publishBeginsAt), "d.M.yyyy") : "",
+    publishBeginsTime: data?.publishBeginsAt ? format(new Date(data.publishBeginsAt), "H:mm") : "",
+    publishEndsDate: data?.publishEndsAt ? format(new Date(data.publishEndsAt), "d.M.yyyy") : "",
+    publishEndsTime: data?.publishEndsAt ? format(new Date(data.publishEndsAt), "H:mm") : "",
+    reservationBeginsDate: data?.reservationBeginsAt ? format(new Date(data.reservationBeginsAt), "d.M.yyyy") : "",
+    reservationBeginsTime: data?.reservationBeginsAt ? format(new Date(data.reservationBeginsAt), "H:mm") : "",
+    reservationEndsDate: data?.reservationEndsAt ? format(new Date(data.reservationEndsAt), "d.M.yyyy") : "",
+    reservationEndsTime: data?.reservationEndsAt ? format(new Date(data.reservationEndsAt), "H:mm") : "",
     requireAdultReservee: data?.requireAdultReservee ?? false,
     requireReservationHandling: data?.requireReservationHandling ?? false,
     reservationStartInterval: data?.reservationStartInterval ?? ReservationStartInterval.Interval_15Mins,
@@ -820,9 +820,9 @@ export function convertReservationUnit(data?: Node): ReservationUnitEditFormValu
     nameFi: data?.nameFi ?? "",
     nameEn: data?.nameEn ?? "",
     nameSv: data?.nameSv ?? "",
-    termsOfUseFi: data?.termsOfUseFi ?? "",
-    termsOfUseEn: data?.termsOfUseEn ?? "",
-    termsOfUseSv: data?.termsOfUseSv ?? "",
+    notesWhenApplyingFi: data?.notesWhenApplyingFi ?? "",
+    notesWhenApplyingEn: data?.notesWhenApplyingEn ?? "",
+    notesWhenApplyingSv: data?.notesWhenApplyingSv ?? "",
     spaces: filterNonNullable(data?.spaces?.map((s) => s?.pk)),
     resources: filterNonNullable(data?.resources?.map((r) => r?.pk)),
     equipments: filterNonNullable(data?.equipments?.map((e) => e?.pk)),
@@ -842,12 +842,12 @@ export function convertReservationUnit(data?: Node): ReservationUnitEditFormValu
     isArchived: false,
     seasons: convertSeasonalList(filterNonNullable(data?.applicationRoundTimeSlots)),
     hasFuturePricing: data?.pricings?.some((p) => new Date(p.begins) > new Date()) ?? false,
-    hasScheduledPublish: data?.publishBegins != null || data?.publishEnds != null,
-    hasScheduledReservation: data?.reservationBegins != null || data?.reservationEnds != null,
-    hasPublishBegins: data?.publishBegins != null,
-    hasPublishEnds: data?.publishEnds != null,
-    hasReservationBegins: data?.reservationBegins != null,
-    hasReservationEnds: data?.reservationEnds != null,
+    hasScheduledPublish: data?.publishBeginsAt != null || data?.publishEndsAt != null,
+    hasScheduledReservation: data?.reservationBeginsAt != null || data?.reservationEndsAt != null,
+    hasPublishBegins: data?.publishBeginsAt != null,
+    hasPublishEnds: data?.publishEndsAt != null,
+    hasReservationBegins: data?.reservationBeginsAt != null,
+    hasReservationEnds: data?.reservationEndsAt != null,
     hasBufferTimeBefore: !!data?.bufferTimeBefore,
     hasBufferTimeAfter: !!data?.bufferTimeAfter,
     hasCancellationRule: data?.cancellationRule != null,
@@ -889,9 +889,9 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues) 
     bufferTimeAfter,
     bufferTimeBefore,
     cancellationRule,
-    termsOfUseEn,
-    termsOfUseFi,
-    termsOfUseSv,
+    notesWhenApplyingEn,
+    notesWhenApplyingFi,
+    notesWhenApplyingSv,
     seasons,
     accessTypes,
     images, // images are updated with a separate mutation
@@ -918,17 +918,17 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues) 
     ...(pk > 0 ? { pk } : {}),
     name: vals.nameFi.trim(),
     surfaceArea: surfaceArea != null && surfaceArea > 0 ? Math.floor(surfaceArea) : null,
-    reservationBegins:
+    reservationBeginsAt:
       hasScheduledReservation && hasReservationBegins
         ? maybeToApiDateTime(reservationBeginsDate, reservationBeginsTime)
         : null,
-    reservationEnds:
+    reservationEndsAt:
       hasScheduledReservation && hasReservationEnds
         ? maybeToApiDateTime(reservationEndsDate, reservationEndsTime)
         : null,
-    publishBegins:
+    publishBeginsAt:
       hasScheduledPublish && hasPublishBegins ? maybeToApiDateTime(publishBeginsDate, publishBeginsTime) : null,
-    publishEnds: hasScheduledPublish && hasPublishEnds ? maybeToApiDateTime(publishEndsDate, publishEndsTime) : null,
+    publishEndsAt: hasScheduledPublish && hasPublishEnds ? maybeToApiDateTime(publishEndsDate, publishEndsTime) : null,
     // Set min/max reservation duration to null if ReservationKind is Season
     // (They are not used and can cause errors if reservation interval is changed)
     minReservationDuration: reservationKind !== ReservationKind.Season ? minReservationDuration : null,
@@ -939,9 +939,9 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues) 
     reservationKind,
     isDraft,
     isArchived,
-    termsOfUseEn: termsOfUseEn !== "" ? termsOfUseEn : null,
-    termsOfUseFi: termsOfUseFi !== "" ? termsOfUseFi : null,
-    termsOfUseSv: termsOfUseSv !== "" ? termsOfUseSv : null,
+    notesWhenApplyingEn: notesWhenApplyingEn !== "" ? notesWhenApplyingEn : null,
+    notesWhenApplyingFi: notesWhenApplyingFi !== "" ? notesWhenApplyingFi : null,
+    notesWhenApplyingSv: notesWhenApplyingSv !== "" ? notesWhenApplyingSv : null,
     cancellationRule: hasCancellationRule ? cancellationRule : null,
     pricings: filterNonNullable(pricings.map((p) => transformPricing(p, hasFuturePricing))),
     accessTypes: filterNonNullable(

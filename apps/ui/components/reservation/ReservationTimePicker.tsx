@@ -91,16 +91,18 @@ function useSlotPropGetter({
     return getSlotPropGetter({
       reservableTimes,
       activeApplicationRounds,
-      reservationBegins: reservationUnit.reservationBegins ? new Date(reservationUnit.reservationBegins) : undefined,
-      reservationEnds: reservationUnit.reservationEnds ? new Date(reservationUnit.reservationEnds) : undefined,
+      reservationBeginsAt: reservationUnit.reservationBeginsAt
+        ? new Date(reservationUnit.reservationBeginsAt)
+        : undefined,
+      reservationEndsAt: reservationUnit.reservationEndsAt ? new Date(reservationUnit.reservationEndsAt) : undefined,
       reservationsMinDaysBefore: reservationUnit.reservationsMinDaysBefore ?? 0,
       reservationsMaxDaysBefore: reservationUnit.reservationsMaxDaysBefore ?? 0,
     });
   }, [
     reservableTimes,
     activeApplicationRounds,
-    reservationUnit.reservationBegins,
-    reservationUnit.reservationEnds,
+    reservationUnit.reservationBeginsAt,
+    reservationUnit.reservationEndsAt,
     reservationUnit.reservationsMinDaysBefore,
     reservationUnit.reservationsMaxDaysBefore,
   ]);

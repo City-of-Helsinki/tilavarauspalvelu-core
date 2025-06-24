@@ -16,8 +16,8 @@ const Subheading = styled(H4).attrs({ as: "h2", $noMargin: true })`
 export const RESERVATION_INFO_CONTAINER_FRAGMENT = gql`
   fragment ReservationInfoSection on ReservationUnitNode {
     id
-    reservationBegins
-    reservationEnds
+    reservationBeginsAt
+    reservationEndsAt
     reservationsMaxDaysBefore
     reservationsMinDaysBefore
     minReservationDuration
@@ -33,19 +33,19 @@ type ReservationInfoSectionProps = {
 };
 
 type RervationStatus = "willOpen" | "isOpen" | "hasClosed";
-function getStatus(reservationUnit: Pick<NodeT, "reservationBegins" | "reservationEnds">): RervationStatus | null {
+function getStatus(reservationUnit: Pick<NodeT, "reservationBeginsAt" | "reservationEndsAt">): RervationStatus | null {
   const now = new Date();
-  const { reservationBegins, reservationEnds } = reservationUnit;
+  const { reservationBeginsAt, reservationEndsAt } = reservationUnit;
 
-  if (reservationEnds && new Date(reservationEnds) < now) {
+  if (reservationEndsAt && new Date(reservationEndsAt) < now) {
     return "hasClosed";
   }
 
-  if (reservationBegins && new Date(reservationBegins) > now) {
+  if (reservationBeginsAt && new Date(reservationBeginsAt) > now) {
     return "willOpen";
   }
 
-  if (reservationEnds) {
+  if (reservationEndsAt) {
     return "isOpen";
   }
 
@@ -150,12 +150,12 @@ function ReservationMaxReservationsPerUser({
 function ReservationStatus({
   reservationUnit,
 }: {
-  reservationUnit: Pick<NodeT, "reservationEnds" | "reservationBegins">;
+  reservationUnit: Pick<NodeT, "reservationEndsAt" | "reservationBeginsAt">;
 }): JSX.Element | null {
   const { t } = useTranslation();
   const reservationStatus = getStatus(reservationUnit);
   if (reservationStatus === "willOpen") {
-    const dateTime = formatDateTime(t, new Date(reservationUnit.reservationBegins ?? ""), false);
+    const dateTime = formatDateTime(t, new Date(reservationUnit.reservationBeginsAt ?? ""), false);
     return (
       <p>
         <Strong>{t("reservationUnit:reservationInfoSection.willOpen", { dateTime })}</Strong>
@@ -164,7 +164,7 @@ function ReservationStatus({
   }
 
   if (reservationStatus === "isOpen") {
-    const dateTime = formatDateTime(t, new Date(reservationUnit.reservationEnds ?? ""), false);
+    const dateTime = formatDateTime(t, new Date(reservationUnit.reservationEndsAt ?? ""), false);
     return (
       <p>
         <Strong>{t("reservationUnit:reservationInfoSection.isOpen", { dateTime })}</Strong>
@@ -173,7 +173,7 @@ function ReservationStatus({
   }
 
   if (reservationStatus === "hasClosed") {
-    const dateTime = formatDateTime(t, new Date(reservationUnit.reservationEnds ?? ""), false);
+    const dateTime = formatDateTime(t, new Date(reservationUnit.reservationEndsAt ?? ""), false);
     return (
       <p>
         <Strong>{t("reservationUnit:reservationInfoSection.hasClosed", { dateTime })}</Strong>

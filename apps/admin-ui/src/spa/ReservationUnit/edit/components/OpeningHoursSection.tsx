@@ -21,8 +21,8 @@ export function OpeningHoursSection({
     keyPrefix: "ReservationUnitEditor",
   });
 
-  const previewUrl = `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.uuid}#calendar`;
-  const previewDisabled = previewUrlPrefix === "" || !reservationUnit?.pk || !reservationUnit?.uuid;
+  const previewUrl = `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.extUuid}#calendar`;
+  const previewDisabled = previewUrlPrefix === "" || !reservationUnit?.pk || !reservationUnit?.extUuid;
 
   return (
     <EditAccordion heading={t("openingHours")}>
