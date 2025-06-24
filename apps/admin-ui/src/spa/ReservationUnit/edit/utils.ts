@@ -14,8 +14,8 @@ export const getTranslatedTooltipTex = (t: TFunction, fieldName: string) => {
   if (fieldName === "contactInformation") {
     return t("ReservationUnitEditor.tooltip.contactInformation");
   }
-  if (fieldName === "termsOfUseFi") {
-    return t("ReservationUnitEditor.tooltip.termsOfUseFi");
+  if (fieldName === "notesWhenApplyingFi") {
+    return t("ReservationUnitEditor.tooltip.notesWhenApplyingFi");
   }
   if (fieldName === "descriptionFi") {
     return t("ReservationUnitEditor.tooltip.description");

@@ -3,9 +3,9 @@ import { gql } from "@apollo/client";
 export const TERMS_OF_USE_FRAGMENT = gql`
   fragment TermsOfUse on ReservationUnitNode {
     id
-    termsOfUseFi
-    termsOfUseEn
-    termsOfUseSv
+    notesWhenApplyingFi
+    notesWhenApplyingEn
+    notesWhenApplyingSv
     serviceSpecificTerms {
       ...TermsOfUseTextFields
     }

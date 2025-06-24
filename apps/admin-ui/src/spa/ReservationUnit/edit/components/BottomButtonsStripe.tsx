@@ -204,7 +204,7 @@ export function BottomButtonsStripe({
   const draftEnabled = hasChanges || !watch("isDraft");
   const publishEnabled = hasChanges || watch("isDraft");
 
-  const isPreviewDisabled = isSaving || !reservationUnit?.pk || !reservationUnit?.uuid || previewUrlPrefix === "";
+  const isPreviewDisabled = isSaving || !reservationUnit?.pk || !reservationUnit?.extUuid || previewUrlPrefix === "";
 
   // Have to define these like this because otherwise the state changes don't work
   const handlePublish = async () => {
@@ -294,7 +294,9 @@ export function BottomButtonsStripe({
       <PreviewLink
         target="_blank"
         rel="noopener noreferrer"
-        href={!isPreviewDisabled ? `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.uuid}` : undefined}
+        href={
+          !isPreviewDisabled ? `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.extUuid}` : undefined
+        }
         onClick={(e) => isPreviewDisabled && e.preventDefault()}
         title={t(
           hasChanges ? "ReservationUnitEditor.noPreviewUnsavedChangesTooltip" : "ReservationUnitEditor.previewTooltip"

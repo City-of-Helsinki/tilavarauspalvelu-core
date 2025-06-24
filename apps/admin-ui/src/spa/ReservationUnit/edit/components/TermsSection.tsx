@@ -24,7 +24,8 @@ export function TermsSection({
   const { control, formState } = form;
   const { errors } = formState;
 
-  const hasErrors = errors.termsOfUseFi != null || errors.termsOfUseEn != null || errors.termsOfUseSv != null;
+  const hasErrors =
+    errors.notesWhenApplyingFi != null || errors.notesWhenApplyingEn != null || errors.notesWhenApplyingSv != null;
 
   const termsOptions = [
     {
@@ -60,7 +61,7 @@ export function TermsSection({
           );
         })}
       </AutoGrid>
-      {(["termsOfUseFi", "termsOfUseEn", "termsOfUseSv"] as const).map((n) => (
+      {(["notesWhenApplyingFi", "notesWhenApplyingEn", "notesWhenApplyingSv"] as const).map((n) => (
         <ControlledRichTextInput control={control} fieldName={n} key={n} />
       ))}
     </EditAccordion>

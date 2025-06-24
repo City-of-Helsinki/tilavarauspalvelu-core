@@ -25,9 +25,9 @@ export function ControlledRichTextInput({
     | "reservationPendingInstructionsFi"
     | "reservationPendingInstructionsEn"
     | "reservationPendingInstructionsSv"
-    | "termsOfUseFi"
-    | "termsOfUseEn"
-    | "termsOfUseSv";
+    | "notesWhenApplyingFi"
+    | "notesWhenApplyingEn"
+    | "notesWhenApplyingSv";
 }) {
   const { t } = useTranslation();
   const { field, fieldState } = useController({
