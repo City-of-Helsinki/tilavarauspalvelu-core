@@ -1,43 +1,30 @@
+import { getReservationServerProps } from "@/modules/paymentRedirect";
 import type { GetServerSidePropsContext } from "next";
 import { ReservationStateChoice, ReservationStateQuery, useReservationStateQuery } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath } from "@/modules/urls";
-import { createApolloClient } from "@/modules/apolloClient";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { CenterSpinner } from "common/styled";
-import { ignoreMaybeArray } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
 // TODO should be moved to /reservations/success
 // but because this is webstore callback page we need to leave the url (use an url rewrite)
 // we can't tie this to a reservationPk because it's used as a return page from webstore
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { locale, query } = ctx;
-  const commonProps = getCommonServerSideProps();
+  const { commonProps, reservation, orderId, locale } = await getReservationServerProps(ctx);
 
-  const orderId = ignoreMaybeArray(query.orderId);
-  const notFoundValue = {
-    notFound: true,
-    props: {
-      ...commonProps,
-      ...(await serverSideTranslations(locale ?? "fi")),
+  if (!orderId || !reservation) {
+    return {
       notFound: true,
-    },
-  };
-
-  if (!orderId) {
-    return notFoundValue;
+      props: {
+        ...commonProps,
+        ...(await serverSideTranslations(locale ?? "fi")),
+        notFound: true,
+      },
+    };
   }
 
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
-  // The reservation exists already if the orderUuid is valid
-  const reservation = await getReservationByOrderUuid(apolloClient, orderId);
-
-  if (reservation == null) {
-    return notFoundValue;
-  }
   const destination = getRedirectUrl(reservation);
   if (destination != null) {
     return {
@@ -121,6 +108,10 @@ export const GET_RESERVATION_STATE = gql`
       id
       pk
       state
+      paymentOrder {
+        id
+        status
+      }
     }
   }
 `;
