@@ -1,11 +1,11 @@
+import { getReservationServerProps } from "@/modules/paymentRedirect";
 import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { CancelledLinkSet } from "@/components/reservation/CancelledLinkSet";
 import { H1 } from "common/styled";
-import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useTranslation } from "next-i18next";
-import { createApolloClient } from "@/modules/apolloClient";
 import {
   DeleteReservationDocument,
   type DeleteReservationMutation,
@@ -13,7 +13,6 @@ import {
 } from "@/gql/gql-types";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { reservationsPrefix } from "@/modules/urls";
-import { ignoreMaybeArray } from "common/src/helpers";
 
 // This is the callback page from webstore if user cancels the order
 // TODO this would be nicer if we could use a reservation/[id]/cancelled page (or reservation/[id])
@@ -44,27 +43,17 @@ function Cancel({ apiBaseUrl }: NarrowedProps): JSX.Element {
 }
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { locale, query } = ctx;
-  const commonProps = getCommonServerSideProps();
-  const orderId = ignoreMaybeArray(query.orderId);
+  const { apolloClient, commonProps, reservation, orderId, locale } = await getReservationServerProps(ctx);
 
-  const notFoundValue = {
-    notFound: true,
-    props: {
-      ...commonProps,
-      ...(await serverSideTranslations(locale ?? "fi")),
+  if (!orderId || !reservation || reservation?.pk == null) {
+    return {
       notFound: true,
-    },
-  };
-
-  if (!orderId) {
-    return notFoundValue;
-  }
-
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
-  const reservation = await getReservationByOrderUuid(apolloClient, orderId);
-  if (reservation?.pk == null) {
-    return notFoundValue;
+      props: {
+        ...commonProps,
+        ...(await serverSideTranslations(locale ?? "fi")),
+        notFound: true,
+      },
+    };
   }
 
   const { errors } = await apolloClient.mutate<DeleteReservationMutation, DeleteReservationMutationVariables>({
