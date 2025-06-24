@@ -59,8 +59,8 @@ export function createMockIsReservableFieldsFragment({
     reservationStartInterval: interval,
     reservationsMaxDaysBefore,
     reservationsMinDaysBefore,
-    reservationBegins: addDays(new Date(), -1).toISOString(),
-    reservationEnds: addDays(new Date(), 180).toISOString(),
+    reservationBeginsAt: addDays(new Date(), -1).toISOString(),
+    reservationEndsAt: addDays(new Date(), 180).toISOString(),
   };
   return reservationUnit;
 }
@@ -83,8 +83,8 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     pk,
     ...generateNameFragment(`ReservationUnit ${pk}`),
     // TODO this is weird
-    reservationBegins: addYears(new Date(), -1 * pk).toISOString(),
-    reservationEnds: addYears(new Date(), 1 * pk).toISOString(),
+    reservationBeginsAt: addYears(new Date(), -1 * pk).toISOString(),
+    reservationEndsAt: addYears(new Date(), 1 * pk).toISOString(),
     isClosed: false,
     // TODO implement though for Seasonal this doesn't matter
     firstReservableDatetime: null,
@@ -141,8 +141,8 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     paymentProduct: null, //Maybe<PaymentProductNode>;
     paymentTerms: null, // Maybe<TermsOfUseNode>;
     pricingTerms: null, //Maybe<TermsOfUseNode>;
-    publishBegins: null, // Maybe<Scalars["DateTime"]["output"]>;
-    publishEnds: null, // Maybe<Scalars["DateTime"]["output"]>;
+    publishBeginsAt: null, // Maybe<Scalars["DateTime"]["output"]>;
+    publishEndsAt: null, // Maybe<Scalars["DateTime"]["output"]>;
     publishingState: ReservationUnitPublishingState.Published,
     purposes: [] as const, // ReadonlyArray<PurposeNode>;
     rank: pk, // Scalars["Int"]["output"];
@@ -170,10 +170,10 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     serviceSpecificTerms: null, // Maybe<TermsOfUseNode>;
     spaces: [] as const, // ReadonlyArray<SpaceNode>;
     surfaceArea: null, // Maybe<Scalars["Int"]["output"]>;
-    termsOfUseEn: null, // Maybe<Scalars["String"]["output"]>;
-    termsOfUseFi: null, // Maybe<Scalars["String"]["output"]>;
-    termsOfUseSv: null, // Maybe<Scalars["String"]["output"]>;
-    uuid: "dummy-uuid", // Scalars["UUID"]["output"];
+    notesWhenApplyingEn: null, // Maybe<Scalars["String"]["output"]>;
+    notesWhenApplyingFi: null, // Maybe<Scalars["String"]["output"]>;
+    notesWhenApplyingSv: null, // Maybe<Scalars["String"]["output"]>;
+    extUuid: "dummy-uuid", // Scalars["UUID"]["output"];
   };
 }
 

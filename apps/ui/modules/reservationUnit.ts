@@ -188,8 +188,8 @@ export const RESERVATION_UNIT_PRICE_FRAGMENT = gql`
     pricings {
       ...PricingFields
     }
-    reservationBegins
-    reservationEnds
+    reservationBeginsAt
+    reservationEndsAt
   }
 `;
 
@@ -201,22 +201,22 @@ export function getFuturePricing(
   if (!reservationUnit) {
     return null;
   }
-  const { pricings, reservationBegins, reservationEnds } = reservationUnit;
+  const { pricings, reservationBeginsAt, reservationEndsAt } = reservationUnit;
 
   if (!pricings || pricings.length === 0) {
     return null;
   }
 
-  const begin = reservationBegins ? new Date(reservationBegins) : undefined;
-  const end = reservationEnds ? new Date(reservationEnds) : undefined;
+  const begin = reservationBeginsAt ? new Date(reservationBeginsAt) : undefined;
+  const end = reservationEndsAt ? new Date(reservationEndsAt) : undefined;
 
   const futurePricings = pricings
     .filter((p) => isFuturePricing(p))
     .filter((fp) =>
       isSlotWithinReservationTime({
         start: new Date(fp.begins),
-        reservationBegins: begin,
-        reservationEnds: end,
+        reservationBeginsAt: begin,
+        reservationEndsAt: end,
       })
     )
     .filter((futurePricing) => {
@@ -517,7 +517,7 @@ export function getPossibleTimesForDay({
 
 export type LastPossibleReservationDateProps = Pick<
   IsReservableFieldsFragment,
-  "reservationsMaxDaysBefore" | "reservableTimeSpans" | "reservationEnds"
+  "reservationsMaxDaysBefore" | "reservableTimeSpans" | "reservationEndsAt"
 >;
 
 // Returns the last possible reservation date for the given reservation unit
@@ -525,7 +525,7 @@ export function getLastPossibleReservationDate(reservationUnit: LastPossibleRese
   if (!reservationUnit) {
     return null;
   }
-  const { reservationsMaxDaysBefore, reservableTimeSpans, reservationEnds } = reservationUnit;
+  const { reservationsMaxDaysBefore, reservableTimeSpans, reservationEndsAt } = reservationUnit;
   if (!reservableTimeSpans?.length) {
     return null;
   }
@@ -534,7 +534,7 @@ export function getLastPossibleReservationDate(reservationUnit: LastPossibleRese
     reservationsMaxDaysBefore != null && reservationsMaxDaysBefore > 0
       ? addDays(new Date(), reservationsMaxDaysBefore)
       : undefined;
-  const reservationUnitNotReservable = reservationEnds ? new Date(reservationEnds) : undefined;
+  const reservationUnitNotReservable = reservationEndsAt ? new Date(reservationEndsAt) : undefined;
   // Why does this return now instead of null if there are no reservableTimeSpans?
   const endDateTime = reservableTimeSpans.at(-1)?.endDatetime ?? undefined;
   const lastOpeningDate = endDateTime ? new Date(endDateTime) : new Date();
@@ -739,14 +739,14 @@ export type NotReservableFieldsFragmentNarrow = Omit<
   | "bufferTimeBefore"
   | "bufferTimeAfter"
   | "reservationStartInterval"
-  | "reservationEnds"
+  | "reservationEndsAt"
   | "reservationsMaxDaysBefore"
   | "reservationsMinDaysBefore"
   | "maxPersons"
   | "minPersons"
 >;
 
-// Why doesn't this check reservationEnds?
+// Why doesn't this check reservationEndsAt?
 function getNotReservableReason(reservationUnit: NotReservableFieldsFragmentNarrow): string | null {
   const {
     minReservationDuration,
@@ -755,7 +755,7 @@ function getNotReservableReason(reservationUnit: NotReservableFieldsFragmentNarr
     reservationState,
     metadataSet,
     reservableTimeSpans,
-    reservationBegins,
+    reservationBeginsAt,
   } = reservationUnit;
 
   if (
@@ -764,7 +764,7 @@ function getNotReservableReason(reservationUnit: NotReservableFieldsFragmentNarr
   ) {
     return "reservationUnit is not reservable";
   }
-  const resBegins = reservationBegins ? new Date(reservationBegins) : null;
+  const resBegins = reservationBeginsAt ? new Date(reservationBeginsAt) : null;
   const hasSupportedFields = (metadataSet?.supportedFields?.length ?? 0) > 0;
   const hasReservableTimes = (reservableTimeSpans?.length ?? 0) > 0;
   if (!hasSupportedFields) {

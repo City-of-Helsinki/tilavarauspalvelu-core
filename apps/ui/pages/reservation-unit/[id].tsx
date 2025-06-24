@@ -708,7 +708,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       return notFound;
     }
 
-    const previewPass = uuid === reservationUnitData.reservationUnit?.uuid;
+    const previewPass = uuid === reservationUnitData.reservationUnit?.extUuid;
     if (!isReservationUnitPublished(reservationUnit) && !previewPass) {
       return notFound;
     }
@@ -777,7 +777,7 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
       unit {
         ...AddressFields
       }
-      uuid
+      extUuid
       ...TermsOfUse
       isDraft
       applicationRoundTimeSlots {

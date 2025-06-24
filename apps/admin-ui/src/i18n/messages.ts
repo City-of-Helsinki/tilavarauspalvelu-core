@@ -1115,9 +1115,9 @@ const translations: ITranslations = {
       canApplyFreeOfCharge: ["Asiakas voi pyytää hinnan alennusta tai maksuttomuutta"],
       pricings: ["Hinnoittelu"],
       metadataSet: ["Varauslomake"],
-      termsOfUseFi: ["Varausyksikkökohtaiset lisätiedot fi"],
-      termsOfUseSv: ["Varausyksikkökohtaiset lisätiedot sv"],
-      termsOfUseEn: ["Varausyksikkökohtaiset lisätiedot en"],
+      notesWhenApplyingFi: ["Varausyksikkökohtaiset lisätiedot fi"],
+      notesWhenApplyingSv: ["Varausyksikkökohtaiset lisätiedot sv"],
+      notesWhenApplyingEn: ["Varausyksikkökohtaiset lisätiedot en"],
       serviceSpecificTerms: ["Palvelukohtaiset täydentävät ehdot"],
       cancellationTerms: ["Peruutusehdot"],
       paymentTerms: ["Maksuehdot"],
@@ -1365,7 +1365,7 @@ const translations: ITranslations = {
         `Valitse kirjallinen peruutusehto.
       Varmista, että peruutusasetukset kohdassa “Varauksen peruutus > Peruutus mahdollista” vastaa tässä valittua ehtoa.`,
       ],
-      termsOfUseFi: [
+      notesWhenApplyingFi: [
         `Voit antaa asiakkaalle varuksen teon kannalta oleellisia lisätietoja. Tiedot näkyvät Huomioi varattaessa -otsikon alla varauslomaketta täytettäessä.
       Suositus:
       käytä vain tarvittaessa.
@@ -1477,16 +1477,16 @@ const translations: ITranslations = {
     bufferTimeAfterDuration: ["Tauon kesto"],
     scheduledPublishing: ["Ajasta varausyksikön julkaisu tai piilotus"],
     publishingSettings: ["Julkaisun ajastus"],
-    publishBegins: ["Julkaise alkaen"],
-    publishEnds: ["Piilota alkaen"],
+    publishBeginsAt: ["Julkaise alkaen"],
+    publishEndsAt: ["Piilota alkaen"],
     scheduledReservation: ["Ajasta varauskalenterin aukiolo tai sulkeminen asiakkaille"],
     reservationSettings: ["Varauskalenterin ajastus"],
     handlingSettings: ["Käsittely"],
     requireAdultReserveeSettings: ["Iän tarkistus"],
     bufferSettings: ["Varauksen tauko"],
     cancellationSettings: ["Varauksen peruutus"],
-    reservationBegins: ["Avaa varauskalenteri alkaen"],
-    reservationEnds: ["Sulje varauskalenteri alkaen"],
+    reservationBeginsAt: ["Avaa varauskalenteri alkaen"],
+    reservationEndsAt: ["Sulje varauskalenteri alkaen"],
   },
   ImageEditor: {
     imageType: ["Kuvan tyyppi"],

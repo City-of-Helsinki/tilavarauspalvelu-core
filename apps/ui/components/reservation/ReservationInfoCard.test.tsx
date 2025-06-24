@@ -130,8 +130,8 @@ function createMockReservationInfoCard(price?: string): ReservationInfoCardFragm
             },
           },
         ],
-        reservationBegins: new Date(2024, 0, 0, 0, 0).toISOString(),
-        reservationEnds: new Date(2025, 0, 0, 0, 0).toISOString(),
+        reservationBeginsAt: new Date(2024, 0, 0, 0, 0).toISOString(),
+        reservationEndsAt: new Date(2025, 0, 0, 0, 0).toISOString(),
         ...generateNameFragment("Test reservation unit"),
         unit: {
           id: "3",

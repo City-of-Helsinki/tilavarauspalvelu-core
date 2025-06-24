@@ -353,7 +353,7 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
     mode: "onBlur",
     // NOTE disabling because it throws an error when submitting because it can't focus the field
     // this happens for field errors in the zod schema where the field is created using an array
-    // for example termsOfUseEn, termsOfUseFi, termsOfUseSv
+    // for example notesWhenApplyingEn, notesWhenApplyingFi, notesWhenApplyingSv
     shouldFocusError: false,
     defaultValues: {
       ...convertReservationUnit(reservationUnit),
@@ -473,11 +473,11 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
         pk
         nameFi
       }
-      uuid
+      extUuid
       requireAdultReservee
-      termsOfUseFi
-      termsOfUseSv
-      termsOfUseEn
+      notesWhenApplyingFi
+      notesWhenApplyingSv
+      notesWhenApplyingEn
       reservationKind
       reservationPendingInstructionsFi
       reservationPendingInstructionsSv
@@ -523,11 +523,11 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
       reservationBlockWholeDay
       bufferTimeBefore
       bufferTimeAfter
-      reservationBegins
       contactInformation
-      reservationEnds
-      publishBegins
-      publishEnds
+      reservationBeginsAt
+      reservationEndsAt
+      publishBeginsAt
+      publishEndsAt
       maxReservationsPerUser
       metadataSet {
         id

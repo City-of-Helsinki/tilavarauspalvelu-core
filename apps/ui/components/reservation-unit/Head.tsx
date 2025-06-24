@@ -32,15 +32,15 @@ const NotificationWrapper = styled.div`
 `;
 
 type NonReservableNotificationProps = {
-  reservationUnit: Pick<ReservationUnitHeadFragment, "reservationKind" | "reservationBegins">;
+  reservationUnit: Pick<ReservationUnitHeadFragment, "reservationKind" | "reservationBeginsAt">;
 };
 
 function formatErrorMessages(t: TFunction, reservationUnit: NonReservableNotificationProps["reservationUnit"]): string {
   let returnText = t("reservationUnit:notifications.notReservable");
   if (reservationUnit.reservationKind === ReservationKind.Season) {
     returnText = t("reservationUnit:notifications.onlyRecurring");
-  } else if (reservationUnit.reservationBegins != null) {
-    const begin = new Date(reservationUnit.reservationBegins);
+  } else if (reservationUnit.reservationBeginsAt != null) {
+    const begin = new Date(reservationUnit.reservationBeginsAt);
     if (begin > new Date()) {
       const futureOpeningText = t("reservationUnit:notifications.futureOpening", {
         date: formatDateTime(t, begin),
@@ -249,7 +249,7 @@ export const RESERVATION_UNIT_HEAD_FRAGMENT = gql`
   fragment ReservationUnitHead on ReservationUnitNode {
     id
     reservationKind
-    reservationBegins
+    reservationBeginsAt
     nameFi
     nameSv
     nameEn

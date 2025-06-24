@@ -502,18 +502,18 @@ describe("getReservationUnitName", () => {
 
 describe("getFuturePricing", () => {
   function constructInput({
-    reservationBegins,
-    reservationEnds,
+    reservationBeginsAt,
+    reservationEndsAt,
     days,
   }: {
-    reservationBegins?: Date;
-    reservationEnds?: Date;
+    reservationBeginsAt?: Date;
+    reservationEndsAt?: Date;
     days: readonly Date[];
   }) {
     return {
       id: "1",
-      reservationBegins: reservationBegins?.toISOString() ?? null,
-      reservationEnds: reservationEnds?.toISOString() ?? null,
+      reservationBeginsAt: reservationBeginsAt?.toISOString() ?? null,
+      reservationEndsAt: reservationEndsAt?.toISOString() ?? null,
       pricings: days.map((date) =>
         constructPricing({
           begins: date,
@@ -550,7 +550,7 @@ describe("getFuturePricing", () => {
     { begin: addDays(new Date(), 19), index: 1 },
     { begin: addDays(new Date(), 20), index: null },
   ])("with reservation begin time", ({ begin, index }) => {
-    const data = constructInput({ days: DAYS, reservationBegins: begin });
+    const data = constructInput({ days: DAYS, reservationBeginsAt: begin });
     const val = index != null ? data.pricings[index] : null;
     expect(getFuturePricing(data)).toEqual(val);
   });
@@ -561,7 +561,7 @@ describe("getFuturePricing", () => {
     { endDays: 5, index: 2 },
   ])("with reservation end time", ({ endDays, index }) => {
     const data = constructInput({
-      reservationEnds: endDays ? addDays(new Date(), endDays + 1) : undefined,
+      reservationEndsAt: endDays ? addDays(new Date(), endDays + 1) : undefined,
       days: DAYS,
     });
     const val = index != null ? data.pricings[index] : null;
@@ -575,8 +575,8 @@ describe("getFuturePricing", () => {
   ])("with both reservation times", ({ begin, end, index }) => {
     const data = constructInput({
       days: DAYS,
-      reservationBegins: begin ? addDays(new Date(), begin) : undefined,
-      reservationEnds: end ? addDays(new Date(), end) : undefined,
+      reservationBeginsAt: begin ? addDays(new Date(), begin) : undefined,
+      reservationEndsAt: end ? addDays(new Date(), end) : undefined,
     });
     const val = index != null ? data.pricings[index] : null;
     expect(getFuturePricing(data)).toEqual(val);
@@ -664,8 +664,8 @@ describe("getReservationUnitPrice", () => {
       pricingDate: date,
       reservationUnit: {
         id: "1",
-        reservationBegins: null,
-        reservationEnds: null,
+        reservationBeginsAt: null,
+        reservationEndsAt: null,
         pricings,
       },
     };
@@ -737,13 +737,13 @@ describe("isReservationUnitReservable", () => {
     minReservationDuration = 3600,
     maxReservationDuration = 3600,
     reservationState = ReservationUnitReservationState.Reservable,
-    reservationBegins,
+    reservationBeginsAt,
     reservableTimeSpans = [],
   }: {
     minReservationDuration?: number;
     maxReservationDuration?: number;
     reservationState?: ReservationUnitReservationState;
-    reservationBegins?: Date;
+    reservationBeginsAt?: Date;
     reservableTimeSpans?: ReservationUnitNode["reservableTimeSpans"];
   }): NotReservableFieldsFragmentNarrow {
     return {
@@ -751,7 +751,7 @@ describe("isReservationUnitReservable", () => {
       reservationKind: ReservationKind.Direct,
       minReservationDuration,
       maxReservationDuration,
-      reservationBegins: reservationBegins?.toISOString() ?? null,
+      reservationBeginsAt: reservationBeginsAt?.toISOString() ?? null,
       metadataSet: {
         id: "1234",
         supportedFields: [
@@ -809,7 +809,7 @@ describe("isReservationUnitReservable", () => {
     const input = constructReservationUnitNode({
       reservableTimeSpans: defaultTimeSpans,
       reservationState,
-      reservationBegins: addDays(new Date(), -1),
+      reservationBeginsAt: addDays(new Date(), -1),
     });
     const { isReservable } = isReservationUnitReservable(input);
     expect(isReservable).toBe(expected);
@@ -818,13 +818,13 @@ describe("isReservationUnitReservable", () => {
   test.for([
     {
       reservableTimeSpans: defaultTimeSpans,
-      reservationBegins: addDays(new Date(), 5),
+      reservationBeginsAt: addDays(new Date(), 5),
       reservationsMaxDaysBefore: 5,
       expected: false,
     },
     {
       reservableTimeSpans: undefined,
-      reservationBegins: addDays(new Date(), 5),
+      reservationBeginsAt: addDays(new Date(), 5),
       reservationsMaxDaysBefore: 4,
       expected: false,
     },
@@ -957,14 +957,14 @@ describe("getLastPossibleReservationDate", () => {
   function createInput({
     reservationsMaxDaysBefore = null,
     reservableTimeSpans = [],
-    reservationEnds,
+    reservationEndsAt,
   }: {
     reservationsMaxDaysBefore?: number | null;
     reservableTimeSpans?: {
       begin: Date;
       end: Date;
     }[];
-    reservationEnds?: Date;
+    reservationEndsAt?: Date;
   }): LastPossibleReservationDateProps {
     return {
       reservationsMaxDaysBefore,
@@ -972,14 +972,14 @@ describe("getLastPossibleReservationDate", () => {
         startDatetime: begin.toISOString(),
         endDatetime: end.toISOString(),
       })),
-      reservationEnds: reservationEnds?.toISOString() ?? null,
+      reservationEndsAt: reservationEndsAt?.toISOString() ?? null,
     };
   }
 
   test("returns null without reservableTimeSpans", () => {
     const input = createInput({
       reservationsMaxDaysBefore: 1,
-      reservationEnds: addDays(new Date(), 10),
+      reservationEndsAt: addDays(new Date(), 10),
     });
     expect(getLastPossibleReservationDate(input)).toBeNull();
   });
@@ -994,13 +994,13 @@ describe("getLastPossibleReservationDate", () => {
           end: addDays(today, 10),
         },
       ],
-      reservationEnds: addDays(today, 10),
+      reservationEndsAt: addDays(today, 10),
     });
     const tommorow = addDays(today, 1);
     expect(getLastPossibleReservationDate(input)).toEqual(tommorow);
   });
 
-  test("if 'reservationEnds' is set for tomorrow returns tomorrow", () => {
+  test("if 'reservationEndsAt' is set for tomorrow returns tomorrow", () => {
     const tomorrow = addDays(new Date(), 1);
     const input = createInput({
       reservationsMaxDaysBefore: 1,
@@ -1010,7 +1010,7 @@ describe("getLastPossibleReservationDate", () => {
           end: addDays(new Date(), 10),
         },
       ],
-      reservationEnds: tomorrow,
+      reservationEndsAt: tomorrow,
     });
     expect(getLastPossibleReservationDate(input)).toEqual(tomorrow);
   });
@@ -1037,7 +1037,7 @@ describe("getLastPossibleReservationDate", () => {
           end: addDays(new Date(), 10),
         },
       ],
-      reservationEnds: addDays(new Date(), 3),
+      reservationEndsAt: addDays(new Date(), 3),
     });
     const expected = addDays(new Date(), 3);
     expect(getLastPossibleReservationDate(input)).toEqual(expected);
@@ -1125,8 +1125,8 @@ describe("getNextAvailableTime", () => {
         reservationStartInterval: ReservationStartInterval.Interval_30Mins,
         maxReservationDuration: null,
         minReservationDuration: null,
-        reservationBegins: null,
-        reservationEnds: null,
+        reservationBeginsAt: null,
+        reservationEndsAt: null,
         reservableTimeSpans: [],
       },
       activeApplicationRounds,

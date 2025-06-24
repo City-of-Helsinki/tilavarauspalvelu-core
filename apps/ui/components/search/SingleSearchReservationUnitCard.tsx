@@ -151,8 +151,8 @@ export const SINGLE_SEARCH_CARD_FRAGMENT = gql`
     pricings {
       ...PricingFields
     }
-    reservationBegins
-    reservationEnds
+    reservationBeginsAt
+    reservationEndsAt
     isClosed
     firstReservableDatetime
     currentAccessType

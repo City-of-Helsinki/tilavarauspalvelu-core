@@ -137,16 +137,16 @@ export function generateReservableMap(reservableTimeSpans: readonly ReservableTi
 
 export function isSlotWithinReservationTime({
   start,
-  reservationBegins,
-  reservationEnds,
+  reservationBeginsAt,
+  reservationEndsAt,
 }: {
   start: Date;
-  reservationBegins?: Date;
-  reservationEnds?: Date;
+  reservationBeginsAt?: Date;
+  reservationEndsAt?: Date;
 }): boolean {
   return (
-    (!reservationBegins || isAfter(start, new Date(reservationBegins))) &&
-    (!reservationEnds || isBefore(start, new Date(reservationEnds)))
+    (!reservationBeginsAt || isAfter(start, new Date(reservationBeginsAt))) &&
+    (!reservationEndsAt || isBefore(start, new Date(reservationEndsAt)))
   );
 }
 
@@ -175,8 +175,8 @@ export const IS_RESERVABLE_FRAGMENT = gql`
     reservationStartInterval
     reservationsMaxDaysBefore
     reservationsMinDaysBefore
-    reservationBegins
-    reservationEnds
+    reservationBeginsAt
+    reservationEndsAt
   }
 `;
 
@@ -197,8 +197,8 @@ export function isRangeReservable({
     reservationStartInterval,
     reservationsMaxDaysBefore,
     reservationsMinDaysBefore,
-    reservationBegins,
-    reservationEnds,
+    reservationBeginsAt,
+    reservationEndsAt,
   } = reservationUnit;
   const { start, end } = range;
 
@@ -240,8 +240,8 @@ export function isRangeReservable({
     !isRangeReservable_({
       range: [start, end],
       reservableTimes,
-      reservationBegins: reservationBegins ? new Date(reservationBegins) : undefined,
-      reservationEnds: reservationEnds ? new Date(reservationEnds) : undefined,
+      reservationBeginsAt: reservationBeginsAt ? new Date(reservationBeginsAt) : undefined,
+      reservationEndsAt: reservationEndsAt ? new Date(reservationEndsAt) : undefined,
       reservationsMaxDaysBefore: reservationsMaxDaysBefore ?? 0,
       reservationsMinDaysBefore: reservationsMinDaysBefore ?? 0,
       activeApplicationRounds,
@@ -302,8 +302,8 @@ export function isStartTimeValid(date: Date, timeSlots: ReservableMap, interval:
 function isRangeReservable_({
   range,
   reservableTimes,
-  reservationBegins,
-  reservationEnds,
+  reservationBeginsAt,
+  reservationEndsAt,
   reservationsMinDaysBefore = 0,
   reservationsMaxDaysBefore = 0,
   activeApplicationRounds = [],
@@ -312,8 +312,8 @@ function isRangeReservable_({
   reservableTimes: ReservableMap;
   reservationsMinDaysBefore: number;
   reservationsMaxDaysBefore: number;
-  reservationBegins?: Date;
-  reservationEnds?: Date;
+  reservationBeginsAt?: Date;
+  reservationEndsAt?: Date;
   activeApplicationRounds: readonly RoundPeriod[];
 }): boolean {
   const start = range[0];
@@ -334,8 +334,8 @@ function isRangeReservable_({
       slot,
       reservationsMinDaysBefore,
       reservationsMaxDaysBefore,
-      reservationBegins,
-      reservationEnds
+      reservationBeginsAt,
+      reservationEndsAt
     );
     const collides = doesSlotCollideWithApplicationRounds(slot, activeApplicationRounds);
     return isInFrame && !collides;
@@ -426,11 +426,11 @@ function isSlotWithinTimeframe(
   start: Date,
   minDaysBefore: number,
   maxDaysBefore: number,
-  reservationBegins?: Date,
-  reservationEnds?: Date
+  reservationBeginsAt?: Date,
+  reservationEndsAt?: Date
 ) {
   const isLegalTimeframe =
-    isAfter(start, new Date()) && isSlotWithinReservationTime({ start, reservationBegins, reservationEnds });
+    isAfter(start, new Date()) && isSlotWithinReservationTime({ start, reservationBeginsAt, reservationEndsAt });
   const maxDay = addDays(new Date(), maxDaysBefore);
   // if max days === 0 => latest = today
   const isBeforeMaxDaysBefore = maxDaysBefore === 0 || !isAfter(start, maxDay);
@@ -455,8 +455,8 @@ function areSlotsReservable(
   reservableTimes: ReservableMap,
   reservationsMinDaysBefore: number,
   reservationsMaxDaysBefore: number,
-  reservationBegins?: Date,
-  reservationEnds?: Date,
+  reservationBeginsAt?: Date,
+  reservationEndsAt?: Date,
   activeApplicationRounds: readonly RoundPeriod[] = []
 ): boolean {
   return slots.every(
@@ -466,8 +466,8 @@ function areSlotsReservable(
         slotDate,
         reservationsMinDaysBefore,
         reservationsMaxDaysBefore,
-        reservationBegins,
-        reservationEnds
+        reservationBeginsAt,
+        reservationEndsAt
       ) &&
       areReservableTimesAvailable(reservableTimes, slotDate) &&
       !doesSlotCollideWithApplicationRounds(slotDate, activeApplicationRounds)
@@ -480,16 +480,16 @@ type PropGetterProps = {
   reservationsMinDaysBefore: number;
   reservationsMaxDaysBefore: number;
   customValidation?: (arg: Date) => boolean;
-  reservationBegins?: Date;
-  reservationEnds?: Date;
+  reservationBeginsAt?: Date;
+  reservationEndsAt?: Date;
 };
 // TODO refactor this (it's way too complicated and passes all it's parameters to another function)
 export const getSlotPropGetter =
   ({
     reservableTimes,
     activeApplicationRounds,
-    reservationBegins,
-    reservationEnds,
+    reservationBeginsAt,
+    reservationEndsAt,
     reservationsMinDaysBefore,
     reservationsMaxDaysBefore,
     customValidation,
@@ -501,8 +501,8 @@ export const getSlotPropGetter =
         reservableTimes,
         reservationsMinDaysBefore,
         reservationsMaxDaysBefore,
-        reservationBegins,
-        reservationEnds,
+        reservationBeginsAt,
+        reservationEndsAt,
         activeApplicationRounds
       ) &&
       (customValidation ? customValidation(date) : true)
