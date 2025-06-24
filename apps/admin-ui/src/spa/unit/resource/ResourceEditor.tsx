@@ -142,9 +142,7 @@ export const RESOURCE_QUERY = gql`
       id
       pk
       nameFi
-      location {
-        ...LocationFields
-      }
+      ...LocationFields
     }
   }
 `;

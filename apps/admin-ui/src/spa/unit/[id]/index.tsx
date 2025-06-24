@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import styled from "styled-components";
 import { useUnitPageQuery } from "@gql/gql-types";
-import { parseAddress } from "@/common/util";
+import { formatAddress } from "@/common/util";
 import { ExternalLink } from "@/component/ExternalLink";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import Error404 from "@/common/Error404";
@@ -30,19 +30,19 @@ const Heading = styled.div`
 const Address = styled.div<{ $disabled?: boolean }>`
   font-size: var(--fontsize-body-s);
   line-height: 26px;
-  ${fontMedium}
+  ${fontMedium};
 
   ${({ $disabled }) => $disabled && "opacity: 0.4;"}
 `;
 
 const ResourceUnitCount = styled.div`
-  ${fontBold}
+  ${fontBold};
   padding: var(--spacing-s) 0;
   font-size: var(--fontsize-heading-xs);
 `;
 
 const StyledBoldButton = styled(Button)`
-  ${fontBold}
+  ${fontBold};
   span {
     color: var(--color-black);
   }
@@ -83,17 +83,15 @@ function Unit(): JSX.Element {
   const reservationUnits = filterNonNullable(unit.reservationUnits);
 
   const UNIT_REGISTRY_LINK = `https://asiointi.hel.fi/tprperhe/TPR/UI/ServicePoint/ServicePointEdit/`;
+  const address = formatAddress(unit);
+
   return (
     <>
       <Flex $direction="row" $alignItems="center">
         <Image src="https://tilavaraus.hel.fi/v1/media/reservation_unit_images/liikumistila2.jfif.250x250_q85_crop.jpg" />
         <Heading>
           <H1 $noMargin>{unit?.nameFi}</H1>
-          {unit?.location ? (
-            <Address>{parseAddress(unit?.location)}</Address>
-          ) : (
-            <Address $disabled>{t("Unit.noAddress")}</Address>
-          )}
+          {address !== "-" ? <Address>{address}</Address> : <Address $disabled>{t("Unit.noAddress")}</Address>}
         </Heading>
         <Link to={getSpacesResourcesUrl(unitPk)}>{t("Unit.showSpacesAndResources")}</Link>
       </Flex>
