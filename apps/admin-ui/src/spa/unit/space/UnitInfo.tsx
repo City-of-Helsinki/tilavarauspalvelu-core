@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { fontMedium, Flex } from "common/styled";
-import { parseAddress } from "@/common/util";
+import { formatAddress } from "@/common/util";
 import { IconCheck } from "hds-react";
 import { gql } from "@apollo/client";
 import { type UnitResourceInfoFieldsFragment } from "@gql/gql-types";
@@ -15,7 +15,7 @@ const UnitInfoWrapper = styled(Flex).attrs({
 `;
 
 export const Parent = styled.div`
-  ${fontMedium}
+  ${fontMedium};
   margin-bottom: var(--spacing-m);
 `;
 
@@ -41,7 +41,7 @@ export function UnitInfo({
         <Name>{unit?.nameFi}</Name>
         <Parent>{parentName}</Parent>
       </div>
-      {unit?.location != null && <Address>{parseAddress(unit?.location)}</Address>}
+      {unit != null && <Address>{formatAddress(unit)}</Address>}
     </UnitInfoWrapper>
   );
 }
@@ -51,8 +51,6 @@ export const UNIT_RESOURCE_INFO_FRAGMENT = gql`
     id
     pk
     nameFi
-    location {
-      ...LocationFields
-    }
+    ...LocationFields
   }
 `;

@@ -5,7 +5,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { Button, ButtonSize, ButtonVariant, Tabs } from "hds-react";
 import { Flex, H1, TabWrapper, TitleSection } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { parseAddress } from "@/common/util";
+import { formatAddress } from "@/common/util";
 import { getReservationSeriesUrl } from "@/common/urls";
 import { ReservationUnitCalendarView } from "./ReservationUnitCalendarView";
 import { UnitReservations } from "./UnitReservations";
@@ -100,13 +100,12 @@ export function MyUnitView() {
   const activeTab = selectedTab === "reservation-unit" ? 1 : 0;
 
   const title = loading ? t("common.loading") : (unit?.nameFi ?? "-");
-  const location = unit?.location ? parseAddress(unit.location) : "-";
   const canCreateReservations = hasPermission && unit != null && reservationUnitOptions.length > 0;
   return (
     <>
       <TitleSection>
         <H1 $noMargin>{title}</H1>
-        <LocationOnlyOnDesktop>{location}</LocationOnlyOnDesktop>
+        <LocationOnlyOnDesktop>{formatAddress(unit)}</LocationOnlyOnDesktop>
       </TitleSection>
       <Flex $direction="row" $gap="m">
         <Button
@@ -146,9 +145,7 @@ export const UNIT_VIEW_QUERY = gql`
       id
       pk
       nameFi
-      location {
-        ...LocationFields
-      }
+      ...LocationFields
       reservationUnits {
         id
         pk

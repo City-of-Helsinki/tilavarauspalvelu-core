@@ -15,16 +15,13 @@ const createAddressSectionMock = (proper = true): AddressFieldsFragment => ({
   id: "1",
   pk: proper ? 1 : null,
   tprekId: proper ? "12345" : null,
-  location: {
-    id: proper ? "1" : "",
-    addressStreetFi: proper ? "Test street 1 FI" : null,
-    addressZip: proper ? "00100" : "",
-    addressCityFi: proper ? "Helsinki" : null,
-    addressStreetEn: proper ? "Test street 1 EN" : null,
-    addressStreetSv: proper ? "Test street 1 SV" : null,
-    addressCityEn: proper ? "Helsinki EN" : null,
-    addressCitySv: proper ? "Helsingfors" : null,
-  },
+  addressStreetEn: proper ? "Test street 1 EN" : null,
+  addressStreetFi: proper ? "Test street 1 FI" : null,
+  addressStreetSv: proper ? "Test street 1 SV" : null,
+  addressCityEn: proper ? "Helsinki EN" : null,
+  addressCityFi: proper ? "Helsinki" : null,
+  addressCitySv: proper ? "Helsingfors" : null,
+  addressZip: proper ? "00100" : "",
 });
 
 const fi = getLocalizationLang("fi");
@@ -42,19 +39,19 @@ describe("Component: AddressSection | Test create url functions", () => {
   });
   it("should return expected value/format with createGoogleUrl function", () => {
     const mock = createAddressSectionMock();
-    const addressStreet = getTranslationSafe(mock.location ?? {}, "addressStreet", fi);
-    const addressCity = getTranslationSafe(mock.location ?? {}, "addressCity", fi);
+    const addressStreet = getTranslationSafe(mock ?? {}, "addressStreet", fi);
+    const addressCity = getTranslationSafe(mock ?? {}, "addressCity", fi);
     const destination = encodeURI(`${addressStreet},${addressCity}`);
-    expect(createGoogleUrl(fi, mock.location)).toEqual(
+    expect(createGoogleUrl(fi, mock)).toEqual(
       `https://www.google.com/maps/dir/?api=1&hl=${fi}&destination=${destination}`
     );
   });
   it("should return expected value/format with createHslUrl function", () => {
     const mock = createAddressSectionMock();
-    const addressStreet = getTranslationSafe(mock.location ?? {}, "addressStreet", fi);
-    const addressCity = getTranslationSafe(mock.location ?? {}, "addressCity", fi);
+    const addressStreet = getTranslationSafe(mock ?? {}, "addressStreet", fi);
+    const addressCity = getTranslationSafe(mock ?? {}, "addressCity", fi);
     const destination = encodeURI(`${addressStreet},${addressCity}`);
-    expect(createHslUrl(fi, createAddressSectionMock().location)).toEqual(
+    expect(createHslUrl(fi, createAddressSectionMock())).toEqual(
       `https://reittiopas.hsl.fi/reitti/-/${destination}/?locale=${fi}`
     );
   });
@@ -68,16 +65,16 @@ describe("Component: AddressSection | Test create url functions", () => {
 
 const linkUrls = {
   Map: createMapUrl(fi, createAddressSectionMock()),
-  Google: createGoogleUrl(fi, createAddressSectionMock().location),
-  HSL: createHslUrl(fi, createAddressSectionMock().location),
+  Google: createGoogleUrl(fi, createAddressSectionMock()),
+  HSL: createHslUrl(fi, createAddressSectionMock()),
   Accessibility: createAccessibilityUrl(fi, createAddressSectionMock()),
 };
 
 describe("Component: AddressSection | With proper content", () => {
   it("should show the unit name and address formatted correctly", () => {
     const view = customRender();
-    const streetText = `${createAddressSectionMock().location?.addressStreetFi}`;
-    const cityText = `, ${createAddressSectionMock().location?.addressZip} ${createAddressSectionMock().location?.addressCityFi}`;
+    const streetText = `${createAddressSectionMock()?.addressStreetFi}`;
+    const cityText = `, ${createAddressSectionMock()?.addressZip} ${createAddressSectionMock()?.addressCityFi}`;
     // expect(view.getByRole("heading", { name: "Test unit 1" }));
     expect(view.getByText(streetText));
     expect(view.getByText(cityText));
