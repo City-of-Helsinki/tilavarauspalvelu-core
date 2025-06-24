@@ -49,10 +49,12 @@ export function Head({ title, space, surfaceArea, maxPersons }: IProps): JSX.Ele
 
   const unitUrl = getUnitUrl(unit?.pk);
 
+  const address = formatAddress(unit) !== "-" ? formatAddress(unit) : t("SpaceEditor.noAddress");
+
   return (
     <div>
       <H1 $noMargin>{title}</H1>
-      <Address>{unit?.location ? formatAddress(unit?.location) : t("SpaceEditor.noAddress")}</Address>
+      <Address>{address}</Address>
       <Props>
         <Prop $disabled={!unit}>
           <IconLocation /> {unit ? <Link to={unitUrl}>{unit?.nameFi}</Link> : t("SpaceEditor.noUnit")}

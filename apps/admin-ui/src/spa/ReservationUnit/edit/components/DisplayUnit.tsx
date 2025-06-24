@@ -3,7 +3,7 @@ import {
   ReservationUnitReservationState,
   UnitSubpageHeadFragment,
 } from "@gql/gql-types";
-import { parseAddress } from "@/common/util";
+import { formatAddress } from "@/common/util";
 import React from "react";
 import styled from "styled-components";
 import { Flex, fontBold, H1, NoWrap, TitleSection } from "common/styled";
@@ -123,7 +123,6 @@ export function DisplayUnit({
   unitState?: ReservationUnitPublishingState;
   reservationState?: ReservationUnitReservationState;
 }): JSX.Element {
-  const location = unit?.location;
   return (
     <>
       <TitleSection>
@@ -135,7 +134,7 @@ export function DisplayUnit({
       </TitleSection>
       <UnitInformationWrapper>
         <div>{unit?.nameFi ?? "-"}</div>
-        <div>{location != null ? parseAddress(location) : "-"}</div>
+        <div>{formatAddress(unit)}</div>
       </UnitInformationWrapper>
     </>
   );

@@ -98,22 +98,21 @@ type Props = {
 export function AddressSection({ title, unit }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
 
-  const { location } = unit ?? {};
   const lang = convertLanguageCode(i18n.language);
 
-  const addressStreet = location ? getTranslationSafe(location, "addressStreet", lang) : undefined;
-  const addressCity = location ? getTranslationSafe(location, "addressCity", lang) : undefined;
+  const addressStreet = location ? getTranslationSafe(unit ?? {}, "addressStreet", lang) : undefined;
+  const addressCity = location ? getTranslationSafe(unit ?? {}, "addressCity", lang) : undefined;
 
   const unitMapUrl = createMapUrl(lang, unit);
-  const googleUrl = createGoogleUrl(lang, location);
-  const hslUrl = createHslUrl(lang, location);
+  const googleUrl = createGoogleUrl(lang, unit);
+  const hslUrl = createHslUrl(lang, unit);
   const accessibilityUrl = createAccessibilityUrl(lang, unit);
 
   return (
     <div data-testid="reservation-unit__address--container">
       <H4 as="h2">{title}</H4>
       {addressStreet && <AddressSpan>{addressStreet}</AddressSpan>}
-      {location?.addressZip && addressCity && <AddressSpan>{`, ${location?.addressZip} ${addressCity}`}</AddressSpan>}
+      {unit?.addressZip && addressCity && <AddressSpan>{`, ${unit?.addressZip} ${addressCity}`}</AddressSpan>}
       <Links>
         {unitMapUrl !== "" && (
           <IconButton
@@ -153,8 +152,6 @@ export const ADDRESS_FIELDS = gql`
     id
     pk
     tprekId
-    location {
-      ...LocationFieldsI18n
-    }
+    ...LocationFieldsI18n
   }
 `;

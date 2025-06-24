@@ -130,7 +130,6 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     haukiUrl: null, // Maybe<Scalars["String"]["output"]>;
     isArchived: false,
     isDraft: false,
-    location: null,
     maxReservationDuration: null, // Maybe<Scalars["Duration"]["output"]>;
     maxReservationsPerUser: null, //Maybe<Scalars["Int"]["output"]>;
     metadataSet: null, //Maybe<ReservationMetadataSetNode>;
@@ -184,7 +183,13 @@ function createMockUnit({ pk }: { pk: number }): UnitNode {
     ...generateNameFragment(`Unit ${pk}`),
     ...generateDescriptionFragment(`Unit Description ${pk}`),
     email: "", // Scalars["String"]["output"];
-    location: null, // Maybe<LocationNode>;
+    addressCityEn: null,
+    addressCityFi: null,
+    addressCitySv: null,
+    addressStreetEn: null,
+    addressStreetFi: null,
+    addressStreetSv: null,
+    addressZip: "",
     paymentMerchant: null, // Maybe<PaymentMerchantNode>;
     phone: "", // Scalars["String"]["output"];
     reservationUnits: [] as const, // ReadonlyArray<ReservationUnitNode>;

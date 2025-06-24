@@ -13,7 +13,7 @@ interface IProps {
 }
 
 const Name = styled.p`
-  ${fontMedium}
+  ${fontMedium};
   margin: 0;
 `;
 
@@ -27,7 +27,7 @@ export function SubPageHead({ title, unit }: IProps): JSX.Element {
         <IconLocation />
         <div>
           <Name>{unit?.nameFi}</Name>
-          <span>{t("Unit.address")}</span>: <span>{formatAddress(unit.location)}</span>
+          <span>{t("Unit.address")}</span>: <span>{formatAddress(unit)}</span>
         </div>
       </Flex>
     </>
@@ -39,8 +39,6 @@ export const UNIT_SUBPAGE_HEAD_FRAGMENT = gql`
     id
     pk
     nameFi
-    location {
-      ...LocationFields
-    }
+    ...LocationFields
   }
 `;

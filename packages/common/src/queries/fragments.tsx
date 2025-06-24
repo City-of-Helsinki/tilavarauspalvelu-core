@@ -110,16 +110,16 @@ export const IMAGE_FRAGMENT = gql`
 `;
 
 export const LOCATION_FRAGMENT = gql`
-  fragment LocationFields on LocationNode {
+  fragment LocationFields on UnitNode {
     id
     addressStreetFi
-    addressZip
     addressCityFi
+    addressZip
   }
 `;
 
 export const LOCATION_FRAGMENT_I18N = gql`
-  fragment LocationFieldsI18n on LocationNode {
+  fragment LocationFieldsI18n on UnitNode {
     ...LocationFields
     addressStreetEn
     addressStreetSv
