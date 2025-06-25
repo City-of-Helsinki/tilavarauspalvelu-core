@@ -186,7 +186,7 @@ export function createMockApplicationFragment({
 }: CreateMockApplicationFragmentProps = {}): ApplicationMockType {
   const page3Data = {
     applicantType: ApplicantTypeChoice.Association,
-    additionalInformation: null,
+    additionalInformation: "",
     contactPerson: {
       id: base64encode("ContactPersonNode:1"),
       pk: 1,
@@ -246,7 +246,7 @@ export function createMockApplicationFragment({
       : {
           applicantType: null,
           billingAddress: null,
-          additionalInformation: null,
+          additionalInformation: "",
           contactPerson: null,
           organisation: null,
           homeCity: null,

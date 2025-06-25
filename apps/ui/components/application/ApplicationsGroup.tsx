@@ -15,7 +15,7 @@ export function ApplicationsGroup({ name, applications, actionCallback }: Props)
     return null;
   }
   applications.sort((a, b) => {
-    return new Date(a.sentDate ?? 0).getTime() - new Date(b.sentDate ?? 0).getTime();
+    return new Date(a.sentAt ?? 0).getTime() - new Date(b.sentAt ?? 0).getTime();
   });
 
   return (
@@ -33,6 +33,6 @@ export function ApplicationsGroup({ name, applications, actionCallback }: Props)
 export const APPLICATIONS_GROUP_FRAGMENT = gql`
   fragment ApplicationsGroup on ApplicationNode {
     ...ApplicationCard
-    sentDate
+    sentAt
   }
 `;

@@ -86,7 +86,7 @@ function ApplicationsPage({ data: initialData }: PropsNarrowed): JSX.Element | n
     variables: {
       user: currentUser?.pk ?? 0,
       status: VALID_STATUSES,
-      orderBy: [ApplicationOrderingChoices.SentDateDesc],
+      orderBy: [ApplicationOrderingChoices.SentAtDesc],
     },
   });
 
@@ -155,7 +155,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     variables: {
       user: user.pk,
       status: VALID_STATUSES,
-      orderBy: [ApplicationOrderingChoices.SentDateDesc],
+      orderBy: [ApplicationOrderingChoices.SentAtDesc],
     },
   });
 
