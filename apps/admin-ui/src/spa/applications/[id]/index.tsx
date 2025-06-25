@@ -612,7 +612,7 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
           {application.status != null && <ApplicationStatusLabel status={application.status} user="admin" />}
         </TitleSection>
         <PreCard>
-          {t("Application.applicationReceivedTime")} {formatDate(application.lastModifiedDate, "d.M.yyyy HH:mm")}
+          {t("Application.applicationReceivedTime")} {formatDate(application.updatedAt, "d.M.yyyy HH:mm")}
         </PreCard>
         <div>
           <RejectApplicationButton application={application} refetch={refetch} />
@@ -747,7 +747,7 @@ export const APPLICATION_PAGE_FRAGMENT = gql`
     id
     pk
     status
-    lastModifiedDate
+    updatedAt
     ...ApplicantFields
     ...ApplicantNameFields
     applicationRound {
