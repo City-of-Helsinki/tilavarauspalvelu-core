@@ -121,15 +121,9 @@ export const APPLICANT_NAME_FRAGMENT = gql`
   fragment ApplicantNameFields on ApplicationNode {
     id
     applicantType
-    contactPerson {
-      id
-      firstName
-      lastName
-    }
-    organisation {
-      id
-      nameFi
-    }
+    contactPersonFirstName
+    contactPersonLastName
+    organisationName
   }
 `;
 
@@ -138,10 +132,9 @@ export function getApplicantName(app: ApplicantNameFieldsFragment): string {
     return "-";
   }
   if (app.applicantType === ApplicantTypeChoice.Individual) {
-    const { firstName, lastName } = app.contactPerson || {};
-    return `${firstName || "-"} ${lastName || "-"}`;
+    return `${app.contactPersonFirstName || "-"} ${app.contactPersonLastName || "-"}`;
   }
-  return app.organisation?.nameFi || "-";
+  return app.organisationName || "-";
 }
 
 export function isApplicationRoundInProgress(
