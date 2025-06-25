@@ -46,24 +46,30 @@ function Page3Form({ cityOptions }: Page3FormProps): JSX.Element | null {
 
   useEffect(() => {
     if (type === ApplicantTypeChoice.Individual) {
-      unregister("organisation");
+      unregister("organisationName");
+      unregister("organisationIdentifier");
+      unregister("organisationCoreBusiness");
+      unregister("organisationStreetAddress");
+      unregister("organisationCity");
+      unregister("organisationPostCode");
     }
+
     const hasRegistration = type === ApplicantTypeChoice.Association || type === ApplicantTypeChoice.Company;
     if (hasRegistration) {
-      register("organisation.identifier", { required: true });
+      register("organisationIdentifier", { required: true });
     } else {
       // Unregister does not remove the form value (neither from DOM nor from the form state)
-      setValue("organisation.identifier", undefined);
-      unregister("organisation.identifier");
+      setValue("organisationIdentifier", undefined);
+      unregister("organisationIdentifier");
     }
   }, [type, register, unregister, setValue]);
 
   const hasBillingAddress = watch("hasBillingAddress");
   useEffect(() => {
     if (!hasBillingAddress) {
-      unregister("billingAddress");
-      unregister("billingAddress.postCode");
-      unregister("billingAddress.city");
+      unregister("billingStreetAddress");
+      unregister("billingPostCode");
+      unregister("billingCity");
     }
   }, [hasBillingAddress, unregister]);
 
