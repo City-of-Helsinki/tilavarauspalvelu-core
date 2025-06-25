@@ -582,13 +582,16 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
     return <Error404 />;
   }
 
-  const isOrganisation = application?.organisation != null;
+  const isOrganisation = !!application?.organisationName;
 
-  // TODO replace this with an explicit check and warn on undefined fields
   const hasBillingAddress =
-    application?.billingAddress != null && !isEqual(application?.billingAddress, application.organisation?.address);
+    !!application.billingStreetAddress &&
+    application.billingStreetAddress === application.organisationStreetAddress &&
+    application.billingPostCode === application.organisationPostCode &&
+    application.billingCity === application.organisationCity;
 
   const customerName = getApplicantName(application);
+
   // TODO where is this defined in the application form?
   const homeCity = application.homeCity?.nameFi ?? "-";
 
@@ -623,9 +626,7 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
             dataId="application-details__data--applicant-type"
           />
           <KV k={t("common.homeCity")} v={homeCity} />
-          {isOrganisation && (
-            <KV k={t("Application.coreActivity")} v={application.organisation?.coreBusinessFi || "-"} />
-          )}
+          {isOrganisation && <KV k={t("Application.coreActivity")} v={application.organisationCoreBusiness || "-"} />}
           <KV k={t("Application.numHours")} v="-" />
           <KV k={t("Application.numTurns")} v="-" />
         </Summary>
@@ -650,10 +651,10 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
           />
           {isOrganisation && (
             <>
-              <ValueBox label={t("Application.organisationName")} value={application.organisation?.nameFi} />
-              <ValueBox label={t("Application.coreActivity")} value={application.organisation?.coreBusinessFi} />
+              <ValueBox label={t("Application.organisationName")} value={application.organisationName} />
+              <ValueBox label={t("Application.coreActivity")} value={application.organisationCoreBusiness} />
               <ValueBox label={t("common.homeCity")} value={homeCity} />
-              <ValueBox label={t("Application.identificationNumber")} value={application.organisation?.identifier} />
+              <ValueBox label={t("Application.identificationNumber")} value={application.organisationIdentifier} />
             </>
           )}
           <ValueBox label={t("Application.headings.additionalInformation")} value={application.additionalInformation} />
@@ -666,10 +667,10 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
           {t("Application.contactPersonInformation")}
         </H3>
         <ApplicationDatas>
-          <ValueBox label={t("Application.contactPersonFirstName")} value={application.contactPerson?.firstName} />
-          <ValueBox label={t("Application.contactPersonLastName")} value={application.contactPerson?.lastName} />
-          <ValueBox label={t("Application.contactPersonEmail")} value={application.contactPerson?.email} />
-          <ValueBox label={t("Application.contactPersonPhoneNumber")} value={application.contactPerson?.phoneNumber} />
+          <ValueBox label={t("Application.contactPersonFirstName")} value={application.contactPersonFirstName} />
+          <ValueBox label={t("Application.contactPersonLastName")} value={application.contactPersonLastName} />
+          <ValueBox label={t("Application.contactPersonEmail")} value={application.contactPersonEmail} />
+          <ValueBox label={t("Application.contactPersonPhoneNumber")} value={application.contactPersonPhoneNumber} />
         </ApplicationDatas>
         {isOrganisation ? (
           <>
@@ -677,9 +678,9 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
               {t("Application.contactInformation")}
             </H3>
             <ApplicationDatas>
-              <ValueBox label={t("common.streetAddress")} value={application.organisation?.address?.streetAddressFi} />
-              <ValueBox label={t("common.postalNumber")} value={application.organisation?.address?.postCode} />
-              <ValueBox label={t("common.postalDistrict")} value={application.organisation?.address?.cityFi} />
+              <ValueBox label={t("common.streetAddress")} value={application.organisationStreetAddress} />
+              <ValueBox label={t("common.postalNumber")} value={application.organisationPostCode} />
+              <ValueBox label={t("common.postalDistrict")} value={application.organisationCity} />
             </ApplicationDatas>
           </>
         ) : null}
@@ -691,9 +692,9 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
                 : t("common.billingAddress")}
             </H3>
             <ApplicationDatas>
-              <ValueBox label={t("common.streetAddress")} value={application.billingAddress?.streetAddressFi} />
-              <ValueBox label={t("common.postalNumber")} value={application.billingAddress?.postCode} />
-              <ValueBox label={t("common.postalDistrict")} value={application.billingAddress?.cityFi} />
+              <ValueBox label={t("common.streetAddress")} value={application.billingStreetAddress} />
+              <ValueBox label={t("common.postalNumber")} value={application.billingPostCode} />
+              <ValueBox label={t("common.postalDistrict")} value={application.billingCity} />
             </ApplicationDatas>
           </>
         ) : null}

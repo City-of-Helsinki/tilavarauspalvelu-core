@@ -66,7 +66,7 @@
       "unavailable": "Kan inte bokas",
       "primary": "Prioriterat önskemål",
       "secondary": "Alternativt önskemål",
-      "open":"Kan reserveras"
+      "open": "Kan reserveras"
     }
   },
   "Page2": {
@@ -106,28 +106,25 @@
         "INDIVIDUAL": "som privatkund"
       }
     },
-    "contactPerson": {
-      "firstName": "Kontaktpersonens förnamn",
-      "lastName": "Kontaktpersonens efternamn",
-      "phoneNumber": "Kontaktpersonens telefonnummer",
-      "email": "E-postadress som skall bifogas till ansökan"
-    },
-    "billingAddress": {
-      "streetAddress": "Adress",
-      "postCode": "Postnummer",
-      "city": "Postanstalt"
-    },
+    "contactPersonFirstName": "Kontaktpersonens förnamn",
+    "contactPersonLastName": "Kontaktpersonens efternamn",
+    "contactPersonPhoneNumber": "Kontaktpersonens telefonnummer",
+    "contactPersonEmail": "E-postadress som skall bifogas till ansökan",
+    "billingStreetAddress": "Adress",
+    "billingPostCode": "Postnummer",
+    "billingCity": "Postanstalt",
     "company": {
       "name": "Företagets officiella namn",
       "coreBusiness": "Företagets kärnverksamhet"
     },
-    "organisation": {
-      "name": "Officiella namnet",
-      "identifier": "FO-nummer",
-      "coreBusiness": "Kärnverksamhet",
-      "notRegistered": "Inget FO-nummer",
-      "separateInvoicingAddress": "Faktureringsadressen avviker från postadressen"
-    },
+    "organisationName": "Officiella namnet",
+    "organisationIdentifier": "FO-nummer",
+    "organisationCoreBusiness": "Kärnverksamhet",
+    "organisationNotRegistered": "Inget FO-nummer",
+    "organisationSeparateInvoicingAddress": "Faktureringsadressen avviker från postadressen",
+    "organisationStreetAddress": "Adress",
+    "organisationPostCode": "Postnummer",
+    "organisationCity": "Postanstalt",
     "additionalInformation": "Tilläggsinformation om bokningens ändamål"
   },
   "preview": {
@@ -182,8 +179,8 @@
     "IN_ALLOCATION": "I behandling",
     "RECEIVED": "Skickat",
     "RESULTS_SENT": "Behandlad"
-   },
-  "applicationSectionStatus":{
+  },
+  "applicationSectionStatus": {
     "UNALLOCATED": "Mottagen",
     "IN_ALLOCATION": "I behandling",
     "HANDLED": "Behandlad",

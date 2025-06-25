@@ -8,12 +8,12 @@ export function IndividualForm(): JSX.Element {
 
   return (
     <>
-      <ApplicationFormTextInput name="contactPerson.firstName" />
-      <ApplicationFormTextInput name="contactPerson.lastName" />
+      <ApplicationFormTextInput name="contactPersonFirstName" />
+      <ApplicationFormTextInput name="contactPersonLastName" />
       <BillingAddress />
       <FormSubHeading as="h2">{t("application:Page3.sectionHeadings.contactInfo")}</FormSubHeading>
-      <ApplicationFormTextInput name="contactPerson.phoneNumber" />
-      <ApplicationFormTextInput name="contactPerson.email" />
+      <ApplicationFormTextInput name="contactPersonPhoneNumber" />
+      <ApplicationFormTextInput name="contactPersonEmail" />
       <SpanFullRow>
         <ApplicationFormTextInput name="additionalInformation" />
       </SpanFullRow>

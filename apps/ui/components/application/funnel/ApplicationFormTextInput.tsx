@@ -5,19 +5,19 @@ import { useFormContext } from "react-hook-form";
 import { type ApplicationPage3FormValues } from "./form";
 
 type TextFields =
-  | "organisation.name"
-  | "organisation.coreBusiness"
-  | "organisation.identifier"
-  | "organisation.address.streetAddress"
-  | "organisation.address.postCode"
-  | "organisation.address.city"
-  | "contactPerson.firstName"
-  | "contactPerson.lastName"
-  | "contactPerson.phoneNumber"
-  | "contactPerson.email"
-  | "billingAddress.streetAddress"
-  | "billingAddress.postCode"
-  | "billingAddress.city"
+  | "organisationName"
+  | "organisationCoreBusiness"
+  | "organisationIdentifier"
+  | "organisationStreetAddress"
+  | "organisationPostCode"
+  | "organisationCity"
+  | "contactPersonFirstName"
+  | "contactPersonLastName"
+  | "contactPersonPhoneNumber"
+  | "contactPersonEmail"
+  | "billingStreetAddress"
+  | "billingPostCode"
+  | "billingCity"
   | "additionalInformation";
 export function ApplicationFormTextInput({ name, disabled }: { name: TextFields; disabled?: boolean }): JSX.Element {
   const { t } = useTranslation();
@@ -31,13 +31,10 @@ export function ApplicationFormTextInput({ name, disabled }: { name: TextFields;
   const translateError = (errorMsg?: string) => (errorMsg ? t(`application:validation.${errorMsg}`) : "");
   const state = getFieldState(name);
 
-  // avoid duplicating the translation key without polluting the props for a single case
-  const transformedLabel = name.replace("organisation.address.", "billingAddress.");
-
   return (
     <TextInput
       {...register(name)}
-      label={t(`application:Page3.${transformedLabel}`)}
+      label={t(`application:Page3.${name}`)}
       id={name}
       required={!disabled}
       disabled={disabled}

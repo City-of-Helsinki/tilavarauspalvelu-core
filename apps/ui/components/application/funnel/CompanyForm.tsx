@@ -15,13 +15,13 @@ export function CompanyForm(): JSX.Element {
 
   return (
     <>
-      <ApplicationFormTextInput name="organisation.name" />
-      <ApplicationFormTextInput name="organisation.coreBusiness" />
-      <ApplicationFormTextInput name="organisation.identifier" />
+      <ApplicationFormTextInput name="organisationName" />
+      <ApplicationFormTextInput name="organisationCoreBusiness" />
+      <ApplicationFormTextInput name="organisationIdentifier" />
       <FormSubHeading>{t("application:Page3.sectionHeadings.postalAddress")}</FormSubHeading>
-      <ApplicationFormTextInput name="organisation.address.streetAddress" />
-      <ApplicationFormTextInput name="organisation.address.postCode" />
-      <ApplicationFormTextInput name="organisation.address.city" />
+      <ApplicationFormTextInput name="organisationStreetAddress" />
+      <ApplicationFormTextInput name="organisationPostCode" />
+      <ApplicationFormTextInput name="organisationCity" />
       <ControlledCheckbox
         control={control}
         label={t("application:Page3.organisation.separateInvoicingAddress")}
@@ -40,10 +40,10 @@ export function ContactPersonSection(): JSX.Element {
   return (
     <>
       <FormSubHeading>{t("application:Page3.sectionHeadings.contactInfo")}</FormSubHeading>
-      <ApplicationFormTextInput name="contactPerson.firstName" />
-      <ApplicationFormTextInput name="contactPerson.lastName" />
-      <ApplicationFormTextInput name="contactPerson.phoneNumber" />
-      <ApplicationFormTextInput name="contactPerson.email" />
+      <ApplicationFormTextInput name="contactPersonFirstName" />
+      <ApplicationFormTextInput name="contactPersonLastName" />
+      <ApplicationFormTextInput name="contactPersonPhoneNumber" />
+      <ApplicationFormTextInput name="contactPersonEmail" />
     </>
   );
 }

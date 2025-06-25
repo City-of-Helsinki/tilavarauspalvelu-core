@@ -55,7 +55,7 @@
     "biweekly": "Varaus vain joka toinen viikko",
     "defaultDurationLabel": "1 tunti 30 min",
     "createNew": "Lisää uusi kausivaraus",
-    "defaultSectionName": "Nimetön kausivaraus" ,
+    "defaultSectionName": "Nimetön kausivaraus",
     "deleteDialog": {
       "heading": "Oletko varma, että haluat poistaa varauksen?",
       "content": "Kun varaus on peruttu, sen tietoja ei ole mahdollista palauttaa."
@@ -107,28 +107,25 @@
         "INDIVIDUAL": "yksityishenkilönä"
       }
     },
-    "contactPerson": {
-      "firstName": "Yhteyshenkilön etunimi",
-      "lastName": "Yhteyshenkilön sukunimi",
-      "phoneNumber": "Yhteyshenkilön puhelinnumero",
-      "email": "Hakemukselle liitettävä sähköpostiosoite"
-    },
-    "billingAddress": {
-      "streetAddress": "Katuosoite",
-      "postCode": "Postinumero",
-      "city": "Postitoimipaikka"
-    },
+    "contactPersonFirstName": "Yhteyshenkilön etunimi",
+    "contactPersonLastName": "Yhteyshenkilön sukunimi",
+    "contactPersonPhoneNumber": "Yhteyshenkilön puhelinnumero",
+    "contactPersonEmail": "Hakemukselle liitettävä sähköpostiosoite",
+    "billingStreetAddress": "Katuosoite",
+    "billingPostCode": "Postinumero",
+    "billingCity": "Postitoimipaikka",
     "company": {
       "name": "Yrityksen virallinen nimi",
       "coreBusiness": "Yrityksen ydintoiminta"
     },
-    "organisation": {
-      "name": "Virallinen nimi",
-      "identifier": "Y-tunnus",
-      "coreBusiness": "Ydintoiminta",
-      "notRegistered": "Ei Y-tunnusta",
-      "separateInvoicingAddress": "Laskutusosoite eri kuin postiosoite"
-    },
+    "organisationName": "Virallinen nimi",
+    "organisationIdentifier": "Y-tunnus",
+    "organisationCoreBusiness": "Ydintoiminta",
+    "organisationNotRegistered": "Ei Y-tunnusta",
+    "organisationSeparateInvoicingAddress": "Laskutusosoite eri kuin postiosoite",
+    "organisationStreetAddress": "Katuosoite",
+    "organisationPostCode": "Postinumero",
+    "organisationCity": "Postitoimipaikka",
     "additionalInformation": "Lisätietoja varauksen käyttötarkoituksesta"
   },
   "preview": {
@@ -184,7 +181,7 @@
     "RECEIVED": "Lähetetty",
     "RESULTS_SENT": "Käsitelty"
   },
-  "applicationSectionStatus":{
+  "applicationSectionStatus": {
     "UNALLOCATED": "Vastaanotettu",
     "IN_ALLOCATION": "Käsittelyssä",
     "HANDLED": "Hyväksytty",

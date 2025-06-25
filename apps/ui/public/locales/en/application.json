@@ -106,28 +106,26 @@
         "INDIVIDUAL": "as a private person"
       }
     },
-    "contactPerson": {
-      "firstName": "Contact person's first name ",
-      "lastName": "Contact person's surname ",
-      "phoneNumber": "Contact person's phone number",
-      "email": "Email address to be attached to the application"
-    },
-    "billingAddress": {
-      "streetAddress": "Address",
-      "postCode": "Postal code",
-      "city": "City"
-    },
+    "contactPersonFirstName": "Contact person's first name ",
+    "contactPersonLastName": "Contact person's surname ",
+    "contactPersonPhoneNumber": "Contact person's phone number",
+    "contactPersonEmail": "Email address to be attached to the application",
+    "billingStreetAddress": "Address",
+    "billingPostCode": "Postal code",
+    "billingCity": "City",
     "company": {
       "name": "Company’s official name",
       "coreBusiness": "Company’s core business"
     },
-    "organisation": {
-      "name": "Official name",
-      "identifier": "Business ID",
-      "coreBusiness": "Core business",
-      "notRegistered": "No business ID",
-      "separateInvoicingAddress": "Billing address different to postal address"
-    },
+    "organisationName": "Official name",
+    "organisationIdentifier": "Business ID",
+    "organisationCoreBusiness": "Core business",
+    "organisationNotRegistered": "No business ID",
+    "organisationSeparateInvoicingAddress": "Billing address different to postal address",
+    "organisationStreetAddress": "Address",
+    "organisationPostCode": "Postal code",
+    "organisationCity": "City",
+
     "additionalInformation": "Additional details about the purpose of the booking"
   },
   "preview": {
@@ -184,8 +182,8 @@
     "IN_ALLOCATION": "In process",
     "RECEIVED": "Sent",
     "RESULTS_SENT": "Processed"
-   },
-  "applicationSectionStatus":{
+  },
+  "applicationSectionStatus": {
     "UNALLOCATED": "Unallocated",
     "IN_ALLOCATION": "In allocation",
     "HANDLED": "Handled",

@@ -27,13 +27,13 @@ type ApplicantT = Omit<ApplicantFieldsFragment, "homeCity" | "additionalInformat
 export function ApplicantInfoPreview({ application }: { application: ApplicantT }): JSX.Element {
   const { t } = useTranslation();
   const applicant = {
-    name: `${application.contactPerson?.firstName} ${application.contactPerson?.lastName}`,
-    contact: `${application.contactPerson?.phoneNumber} / ${application.contactPerson?.email}`,
-    address: application.organisation?.address?.streetAddressFi
-      ? `${application.organisation?.address?.streetAddressFi}, ${application.organisation?.address?.postCode} ${application.organisation?.address?.cityFi}`
+    name: `${application.contactPersonFirstName} ${application.contactPersonLastName}`,
+    contact: `${application.contactPersonPhoneNumber} / ${application.contactPersonEmail}`,
+    address: application.organisationStreetAddress
+      ? `${application.organisationStreetAddress}, ${application.organisationPostCode} ${application.organisationCity}`
       : null,
-    billingAddress: application.billingAddress?.streetAddressFi
-      ? `${application.billingAddress?.streetAddressFi}, ${application.billingAddress?.postCode} ${application.billingAddress?.cityFi}`
+    billingAddress: application.billingStreetAddress
+      ? `${application.billingStreetAddress}, ${application.billingPostCode} ${application.billingCity}`
       : null,
   };
 
@@ -44,14 +44,14 @@ export function ApplicantInfoPreview({ application }: { application: ApplicantT 
         <div style={{ gridColumn: "1 / -1" }}>ERROR: applicantType is null</div>
       ) : application.applicantType !== ApplicantTypeChoice.Individual ? (
         <>
-          <LabelValue label={t("application:preview.organisation.name")} value={application.organisation?.nameFi} />
+          <LabelValue label={t("application:preview.organisation.name")} value={application.organisationName} />
           <LabelValue
             label={t("application:preview.organisation.coreBusiness")}
-            value={application.organisation?.coreBusinessFi}
+            value={application.organisationCoreBusiness}
           />
           <LabelValue
             label={t("application:preview.organisation.registrationNumber")}
-            value={application.organisation?.identifier}
+            value={application.organisationIdentifier}
           />
         </>
       ) : null}
@@ -62,7 +62,7 @@ export function ApplicantInfoPreview({ application }: { application: ApplicantT 
         <LabelValue
           label={t("application:preview.organisation.billingAddress")}
           value={applicant.billingAddress}
-          fullWidth={!!application.organisation?.address?.streetAddressFi}
+          fullWidth={!!application.organisationStreetAddress}
         />
       )}
     </ApplicationInfoContainer>

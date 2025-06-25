@@ -31,13 +31,13 @@ function getApplicant(application: ApplicationNameFragment, t: TFunction): strin
   if (application.applicantType === ApplicantTypeChoice.Individual) {
     return t("applicationCard:person");
   }
-  if (application.organisation) {
+  if (application.organisationName) {
     return t("applicationCard:organisation", {
       type: t(`applicationCard:applicantType.${application.applicantType?.toLocaleLowerCase()}`),
-      name: application.organisation?.nameFi || t("applicationCard:noName"),
+      name: application.organisationName || t("applicationCard:noName"),
     });
   }
-  if (application.contactPerson) {
+  if (application.contactPersonFirstName) {
     return t("applicationCard:person");
   }
 
@@ -48,10 +48,7 @@ function isEditable(status: Maybe<ApplicationStatusChoice> | undefined): boolean
   if (status === ApplicationStatusChoice.Draft) {
     return true;
   }
-  if (status === ApplicationStatusChoice.Received) {
-    return true;
-  }
-  return false;
+  return status === ApplicationStatusChoice.Received;
 }
 
 type Props = {

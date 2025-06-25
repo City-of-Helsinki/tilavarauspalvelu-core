@@ -4,16 +4,9 @@ export const APPLICANT_NAME_FRAGMENT = gql`
   fragment ApplicationName on ApplicationNode {
     id
     applicantType
-    organisation {
-      id
-      nameFi
-      organisationType
-    }
-    contactPerson {
-      id
-      lastName
-      firstName
-    }
+    organisationName
+    contactPersonFirstName
+    contactPersonLastName
   }
 `;
 
@@ -33,44 +26,27 @@ export const APPLICANT_FIELDS_FRAGMENT = gql`
     id
     pk
     applicantType
-    contactPerson {
-      id
-      pk
-      firstName
-      lastName
-      email
-      phoneNumber
-    }
+    contactPersonFirstName
+    contactPersonLastName
+    contactPersonEmail
+    contactPersonPhoneNumber
     additionalInformation
-    organisation {
-      id
-      pk
-      nameFi
-      identifier
-      organisationType
-      coreBusinessFi
-      yearEstablished
-      address {
-        id
-        pk
-        postCode
-        streetAddressFi
-        cityFi
-      }
-    }
+    organisationName
+    organisationIdentifier
+    organisationCoreBusiness
+    organisationYearEstablished
+    organisationPostCode
+    organisationStreetAddress
+    organisationCity
+    billingPostCode
+    billingStreetAddress
+    billingCity
     homeCity {
       id
       pk
       nameFi
       nameEn
       nameSv
-    }
-    billingAddress {
-      id
-      pk
-      postCode
-      streetAddressFi
-      cityFi
     }
   }
 `;

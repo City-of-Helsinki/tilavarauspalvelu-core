@@ -39,8 +39,8 @@ export function OrganisationForm({ homeCityOptions }: Props): JSX.Element {
 
   return (
     <>
-      <ApplicationFormTextInput name="organisation.name" />
-      <ApplicationFormTextInput name="organisation.coreBusiness" />
+      <ApplicationFormTextInput name="organisationName" />
+      <ApplicationFormTextInput name="organisationCoreBusiness" />
       <ControlledSelect
         control={control}
         required
@@ -56,11 +56,11 @@ export function OrganisationForm({ homeCityOptions }: Props): JSX.Element {
         checked={!hasRegistration}
         onClick={toggleRegistration}
       />
-      <ApplicationFormTextInput name="organisation.identifier" disabled={!hasRegistration} />
+      <ApplicationFormTextInput name="organisationIdentifier" disabled={!hasRegistration} />
       <FormSubHeading>{t("application:Page3.sectionHeadings.postalAddress")}</FormSubHeading>
-      <ApplicationFormTextInput name="organisation.address.streetAddress" />
-      <ApplicationFormTextInput name="organisation.address.postCode" />
-      <ApplicationFormTextInput name="organisation.address.city" />
+      <ApplicationFormTextInput name="organisationStreetAddress" />
+      <ApplicationFormTextInput name="organisationPostCode" />
+      <ApplicationFormTextInput name="organisationCity" />
       <ControlledCheckbox
         control={control}
         label={t("application:Page3.organisation.separateInvoicingAddress")}
