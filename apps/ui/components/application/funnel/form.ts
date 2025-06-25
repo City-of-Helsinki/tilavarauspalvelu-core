@@ -2,7 +2,6 @@ import { startOfDay } from "date-fns";
 import { filterNonNullable, type ReadonlyDeep, timeToMinutes } from "common/src/helpers";
 import {
   ApplicantTypeChoice,
-  type PersonNode,
   type ApplicationUpdateMutationInput,
   Weekday,
   Priority,
@@ -19,8 +18,6 @@ import { fromUIDate } from "@/modules/util";
 import { checkValidDateOnly, lessThanMaybeDate } from "common/src/schemas/schemaCommon";
 import { CELL_STATES } from "common/src/components/ApplicationTimeSelector";
 
-type Organisation = ApplicationFormFragment["organisation"];
-type Address = NonNullable<Organisation>["address"];
 type SectionType = NonNullable<ApplicationFormFragment["applicationSections"]>[0];
 
 type NodePage2 = NonNullable<ApplicationPage2Query["application"]>;
@@ -227,57 +224,6 @@ function convertDate(date: string | null | undefined): string | undefined {
   return toUIDate(new Date(date)) || undefined;
 }
 
-const AddressSchema = z.object({
-  pk: z.number().optional(),
-  streetAddress: z.string().min(1).max(80),
-  city: z.string().min(1).max(80),
-  postCode: z.string().min(1).max(32),
-});
-type AddressFormValues = z.infer<typeof AddressSchema>;
-
-// TODO identifier is only optional for Associations (not for Companies / Communities)
-const OrganisationsSchema = z.object({
-  pk: z.number().optional(),
-  name: z.string().min(1).max(255),
-  identifier: z.string().max(255).optional(),
-  coreBusiness: z.string().min(1).max(255),
-  address: AddressSchema,
-});
-type OrganisationFormValues = z.infer<typeof OrganisationsSchema>;
-
-const PersonsSchema = z.object({
-  pk: z.number().optional(),
-  firstName: z.string().min(1).max(255),
-  lastName: z.string().min(1).max(255),
-  email: z.string().min(1).max(254).email(),
-  phoneNumber: z.string().min(1).max(255),
-});
-type PersonFormValues = z.infer<typeof PersonsSchema>;
-
-const convertPerson = (p: Maybe<PersonNode> | undefined): PersonFormValues => ({
-  pk: p?.pk ?? undefined,
-  firstName: p?.firstName ?? "",
-  lastName: p?.lastName ?? "",
-  email: p?.email ?? "",
-  phoneNumber: p?.phoneNumber ?? "",
-});
-
-// TODO are these converters the wrong way around? (not input, but output)
-const convertAddress = (a: Address): AddressFormValues => ({
-  pk: a?.pk ?? undefined,
-  streetAddress: a?.streetAddressFi ?? "",
-  city: a?.cityFi ?? "",
-  postCode: a?.postCode ?? "",
-});
-
-const convertOrganisation = (o: Organisation): OrganisationFormValues => ({
-  pk: o?.pk ?? undefined,
-  name: o?.nameFi ?? "",
-  identifier: o?.identifier ?? "",
-  coreBusiness: o?.coreBusinessFi ?? "",
-  address: convertAddress(o?.address ?? null),
-});
-
 const ApplicantTypeSchema = z.enum([
   ApplicantTypeChoice.Individual,
   ApplicantTypeChoice.Company,
@@ -387,9 +333,23 @@ export const ApplicationPage3Schema = z
   .object({
     pk: z.number(),
     applicantType: ApplicantTypeSchema.optional(),
-    organisation: OrganisationsSchema.optional(),
-    contactPerson: PersonsSchema,
-    billingAddress: AddressSchema.optional(),
+
+    // TODO identifier is only optional for Associations (not for Companies / Communities)
+    organisationName: z.string().min(1).max(255).optional(),
+    organisationIdentifier: z.string().max(255).optional(),
+    organisationCoreBusiness: z.string().min(1).max(255).optional(),
+    organisationStreetAddress: z.string().min(1).max(80).optional(),
+    organisationCity: z.string().min(1).max(80).optional(),
+    organisationPostCode: z.string().min(1).max(32).optional(),
+
+    contactPersonFirstName: z.string().min(1).max(255),
+    contactPersonLastName: z.string().min(1).max(255),
+    contactPersonEmail: z.string().min(1).max(254).email(),
+    contactPersonPhoneNumber: z.string().min(1).max(255),
+
+    billingStreetAddress: z.string().min(1).max(80).optional(),
+    billingCity: z.string().min(1).max(80).optional(),
+    billingPostCode: z.string().min(1).max(32).optional(),
     // this is not submitted, we can use it to remove the billing address from submit without losing the frontend state
     hasBillingAddress: z.boolean(),
     additionalInformation: z.string().max(255).optional(),
@@ -405,7 +365,7 @@ export const ApplicationPage3Schema = z
     switch (val.applicantType) {
       case ApplicantTypeChoice.Association:
       case ApplicantTypeChoice.Company:
-        if (!val.organisation?.identifier) {
+        if (!val.organisationIdentifier) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["organisation", "identifier"],
@@ -547,71 +507,82 @@ export function createDefaultPage1Section(
   };
 }
 
-// Filter out any empty strings from the object (otherwise the mutation fails)
-function transformPerson(person?: PersonFormValues) {
-  return {
-    firstName: person?.firstName || undefined,
-    lastName: person?.lastName || undefined,
-    email: person?.email || undefined,
-    phoneNumber: person?.phoneNumber || undefined,
-  };
-}
-
-function isAddressValid(address?: AddressFormValues) {
-  const { streetAddress, postCode, city } = address || {};
-  return (
-    streetAddress != null && streetAddress !== "" && postCode != null && postCode !== "" && city != null && city !== ""
-  );
-}
-
-function transformAddress(address?: AddressFormValues) {
-  return {
-    pk: address?.pk || undefined,
-    streetAddress: address?.streetAddress || undefined,
-    postCode: address?.postCode || undefined,
-    city: address?.city || undefined,
-  };
-}
-
-// Filter out any empty strings from the object (otherwise the mutation fails)
-// remove the identifier if it's empty (otherwise the mutation fails)
-function transformOrganisation(org: OrganisationFormValues) {
-  return {
-    name: org.name || undefined,
-    identifier: org.identifier || undefined,
-    address: isAddressValid(org.address) ? transformAddress(org.address) : undefined,
-    coreBusiness: org.coreBusiness || undefined,
-  };
-}
-
 export function convertApplicationPage3(app?: Maybe<ApplicantFieldsFragment>): ApplicationPage3FormValues {
   const hasBillingAddress =
     app?.applicantType === ApplicantTypeChoice.Individual ||
-    (app?.billingAddress?.streetAddressFi != null && app?.billingAddress?.streetAddressFi !== "");
+    (app?.billingStreetAddress != null && app?.billingStreetAddress !== "");
   return {
     pk: app?.pk ?? 0,
     applicantType: app?.applicantType ?? undefined,
-    organisation: app?.organisation ? convertOrganisation(app.organisation) : undefined,
-    contactPerson: convertPerson(app?.contactPerson),
-    billingAddress: hasBillingAddress ? convertAddress(app.billingAddress) : undefined,
+
+    organisationName: app?.organisationName ?? "",
+    organisationIdentifier: app?.organisationIdentifier ?? "",
+    organisationCoreBusiness: app?.organisationCoreBusiness ?? "",
+    organisationStreetAddress: app?.organisationStreetAddress ?? "",
+    organisationCity: app?.organisationCity ?? "",
+    organisationPostCode: app?.organisationPostCode ?? "",
+
+    contactPersonFirstName: app?.contactPersonFirstName ?? "",
+    contactPersonLastName: app?.contactPersonLastName ?? "",
+    contactPersonEmail: app?.contactPersonEmail ?? "",
+    contactPersonPhoneNumber: app?.contactPersonPhoneNumber ?? "",
+
+    billingStreetAddress: hasBillingAddress ? app?.billingStreetAddress : "",
+    billingCity: hasBillingAddress ? app?.billingCity : "",
+    billingPostCode: hasBillingAddress ? app?.billingPostCode : "",
+
     hasBillingAddress,
     additionalInformation: app?.additionalInformation ?? "",
     homeCity: app?.homeCity?.pk ?? undefined,
   };
 }
 
+function isAddressValid(streetAddress?: string, postCode?: string, city?: string): boolean {
+  return (
+    streetAddress != null && streetAddress !== "" && postCode != null && postCode !== "" && city != null && city !== ""
+  );
+}
+
 export function transformPage3Application(values: ApplicationPage3FormValues): ApplicationUpdateMutationInput {
   const shouldSaveBillingAddress = values.applicantType === ApplicantTypeChoice.Individual || values.hasBillingAddress;
+
+  const isOrganisation = values.organisationName != null && values.applicantType !== ApplicantTypeChoice.Individual;
+  const isOrganisationAddressValid = isAddressValid(
+    values.organisationStreetAddress,
+    values.organisationPostCode,
+    values.organisationCity
+  );
+
+  const isBillingAddressValid = isAddressValid(values.billingStreetAddress, values.billingPostCode, values.billingCity);
+
   return {
     pk: values.pk,
     applicantType: values.applicantType,
-    ...(values.billingAddress != null && shouldSaveBillingAddress
-      ? { billingAddress: transformAddress(values.billingAddress) }
+
+    contactPersonFirstName: values?.contactPersonFirstName || undefined,
+    contactPersonLastName: values?.contactPersonLastName || undefined,
+    contactPersonEmail: values?.contactPersonEmail || undefined,
+    contactPersonPhoneNumber: values?.contactPersonPhoneNumber || undefined,
+
+    ...(isOrganisation
+      ? {
+          organisationName: values.organisationName || undefined,
+          organisationIdentifier: values.organisationIdentifier || undefined,
+          organisationCoreBusiness: values.organisationCoreBusiness || undefined,
+          organisationAddress: isOrganisationAddressValid ? values.organisationStreetAddress : undefined,
+          organisationPostCode: isOrganisationAddressValid ? values.organisationPostCode : undefined,
+          organisationCity: isOrganisationAddressValid ? values.organisationCity : undefined,
+        }
       : {}),
-    ...(values.contactPerson != null ? { contactPerson: transformPerson(values.contactPerson) } : {}),
-    ...(values.organisation != null && values.applicantType !== ApplicantTypeChoice.Individual
-      ? { organisation: transformOrganisation(values.organisation) }
+
+    ...(shouldSaveBillingAddress
+      ? {
+          billingStreetAddress: isBillingAddressValid ? values.billingStreetAddress : undefined,
+          billingPostCode: isBillingAddressValid ? values.billingPostCode : undefined,
+          billingCity: isBillingAddressValid ? values.billingCity : undefined,
+        }
       : {}),
+
     ...(values.additionalInformation != null ? { additionalInformation: values.additionalInformation } : {}),
     ...(values.homeCity != null && values.homeCity !== 0 ? { homeCity: values.homeCity } : {}),
   };
