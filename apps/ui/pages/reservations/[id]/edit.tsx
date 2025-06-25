@@ -9,6 +9,7 @@ import {
   type ReservationEditPageQuery,
   type ReservationEditPageQueryVariables,
   ReservationEditPageDocument,
+  MunicipalityChoice,
 } from "@gql/gql-types";
 import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
@@ -41,8 +42,15 @@ const StepperWrapper = styled.div`
 `;
 
 function ReservationEditPage(props: PropsNarrowed): JSX.Element {
-  const { reservation, options } = props;
   const { t, i18n } = useTranslation();
+  const { reservation } = props;
+  const options = {
+    ...props.options,
+    municipality: Object.values(MunicipalityChoice).map((value) => ({
+      label: t(`Application.municipalities.${value.toUpperCase()}`),
+      value: value,
+    })),
+  };
 
   const [step, setStep] = useState<0 | 1>(0);
 

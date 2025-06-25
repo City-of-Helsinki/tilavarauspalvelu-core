@@ -1,4 +1,4 @@
-import { type OptionsQuery, type ReservationUnitTypeNode } from "@/gql/gql-types";
+import { MunicipalityChoice, type OptionsQuery, type ReservationUnitTypeNode } from "@/gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { type DocumentNode } from "graphql";
 import { translateOption, type OptionsT } from "@/modules/search";
@@ -42,7 +42,10 @@ export function createOptionMock(
       value: op.pk ?? 0,
       label: `${op.minimum ?? ""}-${op.maximum ?? ""}`,
     })),
-    cities: filterNonNullable(opts.cities?.edges.map((edge) => edge?.node)).map((n) => translateOption(n, lang)),
+    municipalities: Object.values(MunicipalityChoice).map((value) => ({
+      label: value as string,
+      value: value,
+    })),
   };
 }
 
@@ -101,13 +104,6 @@ export function createOptionQueryMock({
     nameSv: `Purpose ${i + 1} SV`,
     nameEn: `Purpose ${i + 1} EN`,
   }));
-  const cities = Array.from({ length: nCount }, (_, i) => ({
-    id: base64encode(`CityNode:${i + 1}`),
-    pk: i + 1,
-    nameFi: `City ${i + 1} FI`,
-    nameSv: `City ${i + 1} SV`,
-    nameEn: `City ${i + 1} EN`,
-  }));
 
   return {
     reservationPurposes: {
@@ -121,9 +117,6 @@ export function createOptionQueryMock({
     },
     purposes: {
       edges: purposes.map((node) => ({ node })),
-    },
-    cities: {
-      edges: cities.map((node) => ({ node })),
     },
     equipmentsAll: equipments,
     unitsAll: units,

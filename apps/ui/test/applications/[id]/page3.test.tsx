@@ -58,7 +58,7 @@ function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnTyp
   const mocks = createGraphQLMocks();
   return render(
     <MockedGraphQLProvider mocks={mocks}>
-      <Page3 application={application} cityOptions={[]} />
+      <Page3 application={application} />
     </MockedGraphQLProvider>
   );
 }

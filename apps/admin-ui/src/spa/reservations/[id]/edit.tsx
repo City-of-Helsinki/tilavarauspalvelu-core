@@ -80,7 +80,7 @@ function EditReservation({
       billingLastName: reservation.billingLastName ?? "",
       billingPhone: reservation.billingPhone ?? "",
       freeOfChargeReason: reservation.freeOfChargeReason ?? undefined,
-      homeCity: reservation.homeCity?.pk ?? undefined,
+      municipality: reservation.municipality ?? undefined,
       numPersons: reservation.numPersons ?? undefined,
       purpose: reservation.purpose?.pk ?? undefined,
       reserveeAddressCity: reservation.reserveeAddressCity ?? "",

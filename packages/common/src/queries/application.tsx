@@ -41,12 +41,6 @@ export const APPLICANT_FIELDS_FRAGMENT = gql`
     billingPostCode
     billingStreetAddress
     billingCity
-    homeCity {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-    }
+    municipality
   }
 `;

@@ -121,7 +121,7 @@ export const APPLICATION_SECTIONS_QUERY = gql`
     $purpose: [Int]
     $reservationUnit: [Int]
     $ageGroup: [Int]
-    $homeCity: [Int]
+    $municipality: [MunicipalityChoice]
     $includePreferredOrder10OrHigher: Boolean
     $orderBy: [ApplicationSectionOrderingChoices]
     $first: Int
@@ -139,7 +139,7 @@ export const APPLICATION_SECTIONS_QUERY = gql`
       purpose: $purpose
       reservationUnit: $reservationUnit
       ageGroup: $ageGroup
-      homeCity: $homeCity
+      municipality: $municipality
       includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
       orderBy: $orderBy
       first: $first

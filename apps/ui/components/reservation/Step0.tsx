@@ -40,8 +40,8 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
 
   const supportedFields = filterNonNullable(reservationUnit?.metadataSet?.supportedFields);
   const reserveeType = watch("reserveeType");
-  const homeCity = watch("homeCity");
-  const includesHomeCity = containsField(supportedFields, "homeCity");
+  const municipality = watch("municipality");
+  const includesHomeCity = containsField(supportedFields, "municipality");
   const includesReserveeType = containsField(supportedFields, "reserveeType");
 
   const generalFields = getGeneralFields({ supportedFields, reservation });
@@ -51,7 +51,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
     reserveeType: reserveeType ?? CustomerTypeChoice.Individual,
   });
 
-  const isHomeCityValid = !includesHomeCity || Boolean(homeCity);
+  const isHomeCityValid = !includesHomeCity || Boolean(municipality);
   const isReserveeTypeValid = !includesReserveeType || Boolean(reserveeType);
   const submitDisabled = !isValid || !isReserveeTypeValid || !isHomeCityValid;
 

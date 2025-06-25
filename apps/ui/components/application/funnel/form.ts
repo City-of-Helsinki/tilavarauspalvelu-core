@@ -11,6 +11,7 @@ import {
   type ApplicationFormFragment,
   type Maybe,
   type SuitableTimeRangeSerializerInput,
+  MunicipalityChoice,
 } from "@gql/gql-types";
 import { z } from "zod";
 import { toApiDate, toUIDate } from "common/src/common/util";
@@ -353,8 +354,8 @@ export const ApplicationPage3Schema = z
     // this is not submitted, we can use it to remove the billing address from submit without losing the frontend state
     hasBillingAddress: z.boolean(),
     additionalInformation: z.string().max(255).optional(),
-    // homeCity is only for Organisations
-    homeCity: z.number().min(1, { message: "Required" }).optional(),
+    // municipality is only for Organisations
+    municipality: z.enum([MunicipalityChoice.Helsinki, MunicipalityChoice.Other]).optional(),
   })
   // have to check at form level otherwise it forbids undefined initialization
   .refine((val) => val.applicantType != null, {
@@ -377,7 +378,7 @@ export const ApplicationPage3Schema = z
         break;
     }
     if (val.applicantType === ApplicantTypeChoice.Community || val.applicantType === ApplicantTypeChoice.Association) {
-      if (!val.homeCity) {
+      if (!val.municipality) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["homeCity"],
@@ -533,7 +534,7 @@ export function convertApplicationPage3(app?: Maybe<ApplicantFieldsFragment>): A
 
     hasBillingAddress,
     additionalInformation: app?.additionalInformation ?? "",
-    homeCity: app?.homeCity?.pk ?? undefined,
+    municipality: app?.municipality ?? undefined,
   };
 }
 
@@ -584,7 +585,7 @@ export function transformPage3Application(values: ApplicationPage3FormValues): A
       : {}),
 
     ...(values.additionalInformation != null ? { additionalInformation: values.additionalInformation } : {}),
-    ...(values.homeCity != null && values.homeCity !== 0 ? { homeCity: values.homeCity } : {}),
+    ...(values.municipality != null ? { municipality: values.municipality } : {}),
   };
 }
 

@@ -5,6 +5,7 @@ import { type LocalizationLanguages } from "common/src/urlBuilder";
 import {
   EquipmentOrderingChoices,
   type Maybe,
+  MunicipalityChoice,
   OptionsDocument,
   type OptionsQuery,
   type OptionsQueryVariables,
@@ -193,7 +194,7 @@ export type OptionsT = Readonly<{
   purposes: Readonly<OptionT[]>;
   reservationUnitTypes: Readonly<OptionT[]>;
   ageGroups: Readonly<OptionT[]>;
-  cities: Readonly<OptionT[]>;
+  municipalities: Readonly<{ value: MunicipalityChoice; label: string }[]>;
 }>;
 
 export async function getSearchOptions(
@@ -227,9 +228,11 @@ export async function getSearchOptions(
     value: n.pk ?? 0,
     label: `${n.minimum || ""} - ${n.maximum || ""}`,
   }));
-  const cities = filterNonNullable(optionsData?.cities?.edges?.map((edge) => edge?.node)).map((n) =>
-    translateOption(n, lang)
-  );
+
+  const municipalities = Object.values(MunicipalityChoice).map((value) => ({
+    label: value as string, // TODO: Translate this
+    value: value,
+  }));
 
   return {
     units,
@@ -237,7 +240,7 @@ export async function getSearchOptions(
     purposes,
     reservationUnitTypes,
     ageGroups,
-    cities,
+    municipalities,
   };
 }
 
@@ -305,17 +308,6 @@ export const OPTIONS_QUERY = gql`
           pk
           minimum
           maximum
-        }
-      }
-    }
-    cities {
-      edges {
-        node {
-          id
-          pk
-          nameFi
-          nameEn
-          nameSv
         }
       }
     }

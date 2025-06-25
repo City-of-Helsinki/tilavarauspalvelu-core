@@ -590,10 +590,10 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
     application.billingPostCode === application.organisationPostCode &&
     application.billingCity === application.organisationCity;
 
+  const municipality = application?.municipality
+    ? t(`application.municipality.${application.municipality.toUpperCase()}`)
+    : "-";
   const customerName = getApplicantName(application);
-
-  // TODO where is this defined in the application form?
-  const homeCity = application.homeCity?.nameFi ?? "-";
 
   // TODO (test these and either change the query to do the sorting or sort on the client)
   // sort reservationUnitOptions by priority
@@ -625,7 +625,7 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
             v={t(`Application.applicantTypes.${application.applicantType}`)}
             dataId="application-details__data--applicant-type"
           />
-          <KV k={t("common.homeCity")} v={homeCity} />
+          <KV k={t("common.municipality")} v={municipality} />
           {isOrganisation && <KV k={t("Application.coreActivity")} v={application.organisationCoreBusiness || "-"} />}
           <KV k={t("Application.numHours")} v="-" />
           <KV k={t("Application.numTurns")} v="-" />
@@ -653,7 +653,7 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
             <>
               <ValueBox label={t("Application.organisationName")} value={application.organisationName} />
               <ValueBox label={t("Application.coreActivity")} value={application.organisationCoreBusiness} />
-              <ValueBox label={t("common.homeCity")} value={homeCity} />
+              <ValueBox label={t("common.municipality")} value={municipality} />
               <ValueBox label={t("Application.identificationNumber")} value={application.organisationIdentifier} />
             </>
           )}

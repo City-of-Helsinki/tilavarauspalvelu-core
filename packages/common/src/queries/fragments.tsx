@@ -44,13 +44,7 @@ export const METAFIELDS_FRAGMENT = gql`
       nameEn
       nameSv
     }
-    homeCity {
-      id
-      pk
-      nameFi
-      nameSv
-      nameEn
-    }
+    municipality
   }
 `;
 

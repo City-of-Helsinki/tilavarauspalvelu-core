@@ -18,6 +18,7 @@ import {
   useAccessCodeQuery,
   AccessType,
   type AccessCodeQuery,
+  MunicipalityChoice,
 } from "@gql/gql-types";
 import Link from "next/link";
 import { isBefore, sub } from "date-fns";
@@ -402,7 +403,13 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         props: {
           ...commonProps,
           ...(await serverSideTranslations(locale ?? "fi")),
-          options,
+          options: {
+            ...options,
+            municipality: Object.values(MunicipalityChoice).map((value) => ({
+              label: value as string,
+              value: value,
+            })),
+          },
           reservation,
           termsOfUse: {
             genericTerms: bookingTerms ?? null,

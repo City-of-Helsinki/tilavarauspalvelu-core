@@ -1,4 +1,4 @@
-import { type CustomerTypeChoice } from "../../gql/gql-types";
+import { type CustomerTypeChoice, MunicipalityChoice } from "../../gql/gql-types";
 
 type Billing = {
   billingFirstName: string;
@@ -26,7 +26,7 @@ type CommonInputs = {
   // reservations name
   name: string;
   description: string;
-  homeCity: number;
+  municipality: MunicipalityChoice;
   spaceTerms: boolean;
   resourceTerms: boolean;
   purpose: number;
@@ -70,7 +70,7 @@ const fieldsCommon = [
   "reservee_address_city",
   "reservee_email",
   "reservee_phone",
-  "home_city",
+  "municipality",
   "billing_first_name",
   "billing_last_name",
   "billing_phone",
@@ -84,12 +84,12 @@ export const reservationApplicationFields = {
   individual: fieldsCommon,
   nonprofit: [
     "reservee_organisation_name",
-    "home_city",
+    "municipality",
     "reservee_is_unregistered_association",
     "reservee_id",
     ...fieldsCommon,
   ],
-  business: ["reservee_organisation_name", "home_city", "reservee_id", ...fieldsCommon],
+  business: ["reservee_organisation_name", "municipality", "reservee_id", ...fieldsCommon],
   common: [
     "reservee_type",
     "name",

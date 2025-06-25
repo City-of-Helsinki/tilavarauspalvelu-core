@@ -231,7 +231,7 @@ function ReservationUserAccordion({
         >
           {reservation.reserveeOrganisationName}
         </DataWrapper>
-        <DataWrapper label={t("filters.homeCity")}>{reservation.homeCity?.nameFi}</DataWrapper>
+        <DataWrapper label={t("filters.municipality")}>{reservation.municipality}</DataWrapper>
         <DataWrapper label={t("RequestedReservation.reserveeId")}>
           {reservation.reserveeId || t("RequestedReservation.noReserveeId")}
         </DataWrapper>

@@ -64,7 +64,7 @@ const supportedFields = [
   "billing_address_street",
   "billing_address_city",
   "billing_address_zip",
-  "home_city",
+  "municipality",
   "age_group",
   "applying_for_free_of_charge",
   "free_of_charge_reason",
@@ -191,9 +191,6 @@ const OptionsMock: OptionsQuery = {
     edges: [],
   },
   ageGroups: {
-    edges: [],
-  },
-  cities: {
     edges: [],
   },
 };

@@ -147,7 +147,7 @@ const translations: ITranslations = {
     postalDistrict: ["Postitoimipaikka"],
     emailAddress: ["Sähköpostiosoite"],
     billingAddress: ["Laskutusosoite"],
-    homeCity: ["Kotipaikka"],
+    municipality: ["Kotipaikka"],
     // TODO this is silly use count (with zero, one, other)
     membersSuffix: [" jäsentä"],
     minAmount: ["Vähintään"],
@@ -453,6 +453,10 @@ const translations: ITranslations = {
       COMPANY: ["Yritys"],
       COMMUNITY: ["Yhdistys, rekisteröimätön"],
       ASSOCIATION: ["Yhdistys, rekisteröity"],
+    },
+    municipalities: {
+      HELSINKI: ["Helsinki"],
+      OTHER: ["Muu"],
     },
     contactPerson: ["Yhteyshenkilö"],
     identificationNumber: ["Y-tunnus"],
@@ -1634,7 +1638,7 @@ const translations: ITranslations = {
   // TODO key prefix is questionable (it's not only filters)
   filters: {
     // TODO move to label
-    homeCity: ["Kotipaikka"],
+    municipality: ["Kotipaikka"],
     purpose: ["Käyttötarkoitus"],
     ageGroup: ["Ikäryhmä"],
     label: {
@@ -1650,7 +1654,7 @@ const translations: ITranslations = {
       searchReservation: ["Hae varausta"],
       ageGroup: ["Ikäryhmä"],
       purpose: ["Käyttötarkoitus"],
-      homeCity: ["Kotikunta"],
+      municipality: ["Kotikunta"],
       applicantType: ["Asiakastyyppi"],
       order: ["Varausyksiköiden toivejärjestys"],
       state: ["Käsittelyn tilanne"],
@@ -1686,7 +1690,7 @@ const translations: ITranslations = {
       applicantType: ["Valitse asiakastyyppi"],
       ageGroup: ["Valitse ikäryhmä"],
       purpose: ["Valitse käyttötarkoitus"],
-      homeCity: ["Valitse kotikunta"],
+      municipality: ["Valitse kotikunta"],
       reservationUnitType: ["Valitse"],
       reservationUnitState: ["Valitse varausyksikön tila"],
       paymentStatus: ["Valitse"],

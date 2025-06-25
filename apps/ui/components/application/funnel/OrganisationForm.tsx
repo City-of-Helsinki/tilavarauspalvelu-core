@@ -2,18 +2,13 @@ import React from "react";
 import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
-import { ApplicantTypeChoice } from "@gql/gql-types";
+import { ApplicantTypeChoice, MunicipalityChoice } from "@gql/gql-types";
 import { ControlledSelect, ControlledCheckbox } from "common/src/components/form";
 import { ApplicationFormTextInput, BillingAddress, ContactPersonSection } from ".";
 import { type ApplicationPage3FormValues } from "./form";
 import { FormSubHeading } from "./styled";
-import { type OptionsT } from "@/modules/search";
 
-type Props = {
-  homeCityOptions: OptionsT["cities"];
-};
-
-export function OrganisationForm({ homeCityOptions }: Props): JSX.Element {
+export function OrganisationForm(): JSX.Element {
   const { t } = useTranslation();
 
   const {
@@ -37,6 +32,11 @@ export function OrganisationForm({ homeCityOptions }: Props): JSX.Element {
     }
   };
 
+  const municipalityOptions = Object.values(MunicipalityChoice).map((value) => ({
+    label: t(`Application.municipalities.${value.toUpperCase()}`),
+    value: value,
+  }));
+
   return (
     <>
       <ApplicationFormTextInput name="organisationName" />
@@ -44,10 +44,10 @@ export function OrganisationForm({ homeCityOptions }: Props): JSX.Element {
       <ControlledSelect
         control={control}
         required
-        name="homeCity"
-        label={t("application:Page3.homeCity")}
-        options={homeCityOptions}
-        error={translateError(errors.homeCity?.message)}
+        name="municipality"
+        label={t("application:Page3.municipality")}
+        options={municipalityOptions}
+        error={translateError(errors.municipality?.message)}
       />
       <Checkbox
         label={t("application:Page3.organisation.notRegistered")}
