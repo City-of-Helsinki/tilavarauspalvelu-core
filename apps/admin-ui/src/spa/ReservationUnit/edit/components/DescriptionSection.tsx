@@ -20,13 +20,11 @@ export function DescriptionSection({
   form,
   equipments,
   purposes,
-  qualifiers,
   reservationUnitTypes,
 }: Readonly<{
   form: UseFormReturn<ReservationUnitEditFormValues>;
   equipments: ReservationUnitEditorParametersQuery["equipmentsAll"] | undefined;
   purposes: ReservationUnitEditorParametersQuery["purposes"] | undefined;
-  qualifiers: ReservationUnitEditorParametersQuery["qualifiers"] | undefined;
   reservationUnitTypes: ReservationUnitEditorParametersQuery["reservationUnitTypes"] | undefined;
 }>) {
   const { t } = useTranslation();
@@ -39,10 +37,6 @@ export function DescriptionSection({
   }));
 
   const purposeOptions = filterNonNullable(purposes?.edges.map((n) => n?.node)).map((n) => ({
-    value: n.pk ?? -1,
-    label: n.nameFi ?? "no-name",
-  }));
-  const qualifierOptions = filterNonNullable(qualifiers?.edges.map((n) => n?.node)).map((n) => ({
     value: n.pk ?? -1,
     label: n.nameFi ?? "no-name",
   }));
@@ -88,15 +82,6 @@ export function DescriptionSection({
           placeholder={t("ReservationUnitEditor.equipmentsPlaceholder")}
           options={equipmentOptions}
           tooltip={t("ReservationUnitEditor.tooltip.equipments")}
-        />
-        <ControlledSelect
-          control={control}
-          name="qualifiers"
-          multiselect
-          label={t("ReservationUnitEditor.qualifiersLabel")}
-          placeholder={t("ReservationUnitEditor.qualifiersPlaceholder")}
-          options={qualifierOptions}
-          tooltip={t("ReservationUnitEditor.tooltip.qualifiers")}
         />
         {(["descriptionFi", "descriptionEn", "descriptionSv"] as const).map((fieldName) => (
           <Controller

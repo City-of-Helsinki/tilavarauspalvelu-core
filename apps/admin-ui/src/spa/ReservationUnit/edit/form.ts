@@ -420,7 +420,6 @@ export const ReservationUnitEditSchema = z
     resources: z.array(z.number()),
     equipments: z.array(z.number()),
     purposes: z.array(z.number()),
-    qualifiers: z.array(z.number()),
     pricings: z.array(PricingFormSchema),
     seasons: z.array(SeasonalFormSchema),
     // "Not draft reservation unit must have a reservation unit type."
@@ -828,7 +827,6 @@ export function convertReservationUnit(data?: Node): ReservationUnitEditFormValu
     resources: filterNonNullable(data?.resources?.map((r) => r?.pk)),
     equipments: filterNonNullable(data?.equipments?.map((e) => e?.pk)),
     purposes: filterNonNullable(data?.purposes?.map((p) => p?.pk)),
-    qualifiers: filterNonNullable(data?.qualifiers?.map((q) => q?.pk)),
     surfaceArea: data?.surfaceArea ?? 0,
     authentication: data?.authentication ?? Authentication.Weak,
     reservationUnitType: data?.reservationUnitType?.pk ?? null,

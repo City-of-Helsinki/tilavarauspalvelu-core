@@ -145,7 +145,6 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     publishEnds: null, // Maybe<Scalars["DateTime"]["output"]>;
     publishingState: ReservationUnitPublishingState.Published,
     purposes: [] as const, // ReadonlyArray<PurposeNode>;
-    qualifiers: [] as const, // ReadonlyArray<QualifierNode>;
     rank: pk, // Scalars["Int"]["output"];
     requireAdultReservee: true, // Scalars["Boolean"]["output"];
     requireReservationHandling: false, // Scalars["Boolean"]["output"];
