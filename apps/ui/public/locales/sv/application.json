@@ -88,7 +88,7 @@
   "Page3": {
     "subHeading": "Kontaktuppgifter",
     "firstName": "Förnamn",
-    "homeCity": "Hemort",
+    "municipality": "Hemort",
     "lastName": "Efternamn",
     "phoneNumber": "Telefonnummer",
     "emailNotification": "Alla meddelanden som har att göra med ansökningen skickas till nedanstående e-postadress",
@@ -135,7 +135,7 @@
       "individual": "Privatkund",
       "association": "Registrerad förening"
     },
-    "homeCity": "Hemort",
+    "municipality": "Hemort",
     "text": "Sammandrag av din ansökan",
     "basicInfoSubHeading": "Ansökningsinformation",
     "contactPerson": "Kontaktperson",

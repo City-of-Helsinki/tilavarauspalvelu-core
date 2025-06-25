@@ -20,12 +20,7 @@ export function useOptions() {
     value: Number(group?.node?.pk),
   }));
 
-  const homeCity = sortBy(optionsData?.cities?.edges || [], "node.nameFi").map((cityType) => ({
-    label: cityType?.node?.nameFi ?? "",
-    value: Number(cityType?.node?.pk),
-  }));
-
-  return { ageGroup, purpose, homeCity };
+  return { ageGroup, purpose };
 }
 
 export const OPTIONS_QUERY = gql`
@@ -46,15 +41,6 @@ export const OPTIONS_QUERY = gql`
           pk
           minimum
           maximum
-        }
-      }
-    }
-    cities {
-      edges {
-        node {
-          id
-          nameFi
-          pk
         }
       }
     }

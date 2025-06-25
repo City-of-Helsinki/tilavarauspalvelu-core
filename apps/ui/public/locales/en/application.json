@@ -88,7 +88,7 @@
   "Page3": {
     "subHeading": "Customer information",
     "firstName": "First name",
-    "homeCity": "City",
+    "municipality": "City",
     "lastName": "Surname",
     "phoneNumber": "Phone number",
     "emailNotification": "All messages concerning the application will be sent to the email address below",
@@ -136,7 +136,7 @@
       "individual": "Private customer",
       "association": "Registered association"
     },
-    "homeCity": "City",
+    "municipality": "City",
     "basicInfoSubHeading": "Applicant details",
     "contactPerson": "Contact person",
     "contactInfo": "Contact information",

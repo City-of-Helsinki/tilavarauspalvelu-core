@@ -26,9 +26,9 @@ const options: Record<string, OptionType[]> = {
     { value: 1, label: "1-9" },
     { value: 2, label: "10-" },
   ],
-  homeCity: [
-    { value: 1, label: "Helsinki" },
-    { value: 2, label: "Muu" },
+  municipality: [
+    { value: "Helsinki", label: "Helsinki" },
+    { value: "Muu", label: "Muu" },
   ],
 };
 
@@ -188,7 +188,7 @@ test("Renders required version of Select", async () => {
 });
 
 test.skip("Renders select with a default value", async () => {
-  const fieldName = "homeCity";
+  const fieldName = "municipality";
   const view = render(<WrappedComponent field={fieldName} required={false} defaultValues={{ homeCity: 2 }} />);
   // Find and click the button so the listbox is visible
   const btn = view.getByRole("combobox");

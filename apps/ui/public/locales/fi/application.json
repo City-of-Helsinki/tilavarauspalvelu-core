@@ -89,7 +89,7 @@
   "Page3": {
     "subHeading": "Täytä hakijan tiedot",
     "firstName": "Etunimi",
-    "homeCity": "Kotipaikka",
+    "municipality": "Kotipaikka",
     "lastName": "Sukunimi",
     "phoneNumber": "Puhelinnumero",
     "emailNotification": "Kaikki hakemukseen liittyvät viestit lähetetään alla olevaan sähköpostiin",
@@ -136,7 +136,7 @@
       "INDIVIDUAL": "Yksityishenkilö",
       "ASSOCIATION": "Rekisteröity yhdistys"
     },
-    "homeCity": "Kotipaikka",
+    "municipality": "Kotipaikka",
     "basicInfoSubHeading": "Hakijan tiedot",
     "contactPerson": "Yhteyshenkilö",
     "contactInfo": "Yhteystiedot",
