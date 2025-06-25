@@ -136,11 +136,7 @@ export const RESERVATION_META_FRAGMENT = gql`
       nameFi
       pk
     }
-    homeCity {
-      id
-      nameFi
-      pk
-    }
+    municipality
     numPersons
     name
     description

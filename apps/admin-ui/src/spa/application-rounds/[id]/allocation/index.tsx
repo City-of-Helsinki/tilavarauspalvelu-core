@@ -15,6 +15,7 @@ import {
   useApplicationSectionAllocationsQuery,
   useAllApplicationEventsQuery,
   UserPermissionChoice,
+  MunicipalityChoice,
 } from "@gql/gql-types";
 import { base64encode, convertOptionToHDS, filterNonNullable, sort, toNumber } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
@@ -89,6 +90,19 @@ const transformApplicantType = (value: string | null) => {
   return null;
 };
 
+const transformMunicipality = (value: string | null) => {
+  if (value == null) {
+    return null;
+  }
+  switch (value) {
+    case "Helsinki":
+      return MunicipalityChoice.Helsinki;
+    case "Other":
+      return MunicipalityChoice.Other;
+  }
+  return null;
+};
+
 type ApplicationRoundFilterQueryType = NonNullable<ApplicationRoundFilterQuery>["applicationRound"];
 type ReservationUnitFilterQueryType = NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0];
 type UnitFilterQueryType = NonNullable<ReservationUnitFilterQueryType>["unit"];
@@ -114,7 +128,6 @@ function ApplicationRoundAllocation({
 
   const options = useOptions();
   const purposeOptions = options.purpose;
-  const cityOptions = options.homeCity;
   const ageGroupOptions = options.ageGroup;
 
   const [searchParams, setParams] = useSearchParams();
@@ -144,7 +157,7 @@ function ApplicationRoundAllocation({
   const priorityFilter = searchParams.getAll("priority");
   const orderFilter = searchParams.getAll("order");
   const ageGroupFilter = searchParams.getAll("ageGroup");
-  const cityFilter = searchParams.getAll("homeCity");
+  const municipalityFilter = searchParams.getAll("municipality");
   const purposeFilter = searchParams.getAll("purpose");
 
   // NOTE sanitize all other query filters similar to this
@@ -152,7 +165,7 @@ function ApplicationRoundAllocation({
   const priorityFilterSanitized = convertPriorityFilter(priorityFilter);
   const priorityFilterQuery = priorityFilterSanitized.length > 0 ? priorityFilterSanitized : null;
   const ageGroupFilterQuery = ageGroupFilter.map(Number).filter(Number.isFinite);
-  const cityFilterQuery = cityFilter.map(Number).filter(Number.isFinite);
+  const municipalityFilterQuery = filterNonNullable(municipalityFilter.map((x) => transformMunicipality(x)));
   const purposeFilterQuery = purposeFilter.map(Number).filter(Number.isFinite);
   const applicantTypeFilterQuery = filterNonNullable(applicantTypeFilter.map((x) => transformApplicantType(x)));
   const reservationUnitFilterQuery = toNumber(selectedReservationUnit);
@@ -173,7 +186,7 @@ function ApplicationRoundAllocation({
       preferredOrder: preferredOrderFilterQuery,
       includePreferredOrder10OrHigher,
       textSearch: nameFilter,
-      homeCity: cityFilterQuery,
+      municipality: municipalityFilterQuery,
       applicantType: applicantTypeFilterQuery,
       purpose: purposeFilterQuery,
       ageGroup: ageGroupFilterQuery,
@@ -300,8 +313,8 @@ function ApplicationRoundAllocation({
 
   const translateTag = (key: string, value: string) => {
     switch (key) {
-      case "homeCity":
-        return cityOptions.find((o) => String(o.value) === value)?.label ?? "";
+      case "municipality":
+        return t(`Application.municipalities.${value.toUpperCase()}`);
       case "textSearch":
         return value;
       case "applicantType":
@@ -345,6 +358,10 @@ function ApplicationRoundAllocation({
   const reservationUnit =
     unitReservationUnits.find((x) => x.pk != null && x.pk === reservationUnitFilterQuery) ?? reservationUnits[0];
 
+  const municipalityOptions = Object.values(MunicipalityChoice).map((value) => ({
+    label: t(`Application.municipalities.${value.toUpperCase()}`),
+    value: value as MunicipalityChoice,
+  }));
   const customerFilterOptions = Object.keys(ApplicantTypeChoice).map((value) => ({
     label: t(`Application.applicantTypes.${value.toUpperCase()}`),
     value: value as ApplicantTypeChoice,
@@ -402,7 +419,7 @@ function ApplicationRoundAllocation({
         <MultiSelectFilter name="priority" options={priorityOptions} />
         <MultiSelectFilter name="order" options={orderOptions} />
         <SearchFilter name="search" />
-        <MultiSelectFilter name="homeCity" options={cityOptions} />
+        <MultiSelectFilter name="municipality" options={municipalityOptions} />
         <MultiSelectFilter name="applicantType" options={customerFilterOptions} />
         <MultiSelectFilter name="ageGroup" options={ageGroupOptions} />
         <MultiSelectFilter name="purpose" options={purposeOptions} />
@@ -558,7 +575,7 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
     $beginDate: Date!
     $endDate: Date!
     $ageGroup: [Int]
-    $homeCity: [Int]
+    $municipality: [MunicipalityChoice]
     $includePreferredOrder10OrHigher: Boolean
     $after: String
   ) {
@@ -573,7 +590,7 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
       purpose: $purpose
       reservationUnit: [$reservationUnit]
       ageGroup: $ageGroup
-      homeCity: $homeCity
+      municipality: $municipality
       includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
       after: $after
     ) {

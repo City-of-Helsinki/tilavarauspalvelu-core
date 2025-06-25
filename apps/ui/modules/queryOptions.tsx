@@ -11,7 +11,6 @@ export async function queryOptions(apolloClient: ApolloClient<unknown>, locale: 
 
   const reservationPurposes = filterNonNullable(paramsData.reservationPurposes?.edges?.map((e) => e?.node));
   const ageGroups = filterNonNullable(paramsData.ageGroups?.edges?.map((e) => e?.node));
-  const cities = filterNonNullable(paramsData.cities?.edges?.map((e) => e?.node));
   if (!ageGroups || ageGroups.length < 1) {
     // eslint-disable-next-line no-console
     console.warn("No ageGroups received!");
@@ -32,14 +31,9 @@ export async function queryOptions(apolloClient: ApolloClient<unknown>, locale: 
     label: `${ageGroup.minimum} - ${ageGroup.maximum ?? ""}`,
     value: ageGroup.pk ?? 0,
   }));
-  const homeCityOptions = cities.map((city) => ({
-    label: getTranslationSafe(city, "name", lang),
-    value: city.pk ?? 0,
-  }));
 
   return {
     purpose: purposeOptions,
     ageGroup: ageGroupOptions,
-    homeCity: homeCityOptions,
   };
 }

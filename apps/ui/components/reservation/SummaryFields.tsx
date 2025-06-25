@@ -1,8 +1,8 @@
 import styled from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
-import { CustomerTypeChoice, type ReservationNode } from "@/gql/gql-types";
-import { type FieldName, containsField } from "common/src/metaFieldsHelpers";
+import { CustomerTypeChoice, MunicipalityChoice, type ReservationNode } from "@/gql/gql-types";
+import { containsField, type FieldName } from "common/src/metaFieldsHelpers";
 import { AutoGrid, H4 } from "common/styled";
 import { type MetaFieldsFragment } from "common/gql/gql-types";
 import { capitalize } from "common/src/helpers";
@@ -11,10 +11,10 @@ import { LabelValuePair } from "./LabelValuePair";
 
 type OptionType = {
   label: string;
-  value: number;
+  value: number | MunicipalityChoice;
 };
 
-export type OptionsRecord = Record<"purpose" | "ageGroup" | "homeCity", OptionType[]>;
+export type OptionsRecord = Record<"purpose" | "ageGroup" | "municipality", OptionType[]>;
 
 const Container = styled(AutoGrid)`
   margin-bottom: var(--spacing-2-xl);
@@ -26,10 +26,7 @@ function isNotEmpty(
   reservation: Record<string, unknown>
 ): boolean {
   const rawValue = reservation[key];
-  if (rawValue == null || rawValue === "" || rawValue === false || rawValue === 0) {
-    return false;
-  }
-  return true;
+  return !(rawValue == null || rawValue === "" || rawValue === false || rawValue === 0);
 }
 
 /// Helper function to type safely pick the application fields from the reservation
@@ -64,9 +61,7 @@ export function getGeneralFields({
     reserveeType: "common",
   }).filter((n) => n !== "reserveeType");
 
-  const filteredGeneralFields = generalFields.filter((key): key is keyof ReservationNode => key in reservation);
-
-  return filteredGeneralFields;
+  return generalFields.filter((key): key is keyof ReservationNode => key in reservation);
 }
 
 /// Component to show the application fields in the reservation confirmation
