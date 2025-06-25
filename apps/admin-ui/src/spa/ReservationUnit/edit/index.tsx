@@ -287,7 +287,6 @@ function ReservationUnitEditor({
           form={form}
           equipments={parametersData?.equipmentsAll}
           purposes={parametersData?.purposes}
-          qualifiers={parametersData?.qualifiers}
           reservationUnitTypes={parametersData?.reservationUnitTypes}
         />
         <ReservationUnitSettingsSection
@@ -500,11 +499,6 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
         pk
         nameFi
       }
-      qualifiers {
-        id
-        pk
-        nameFi
-      }
       unit {
         ...ReservationUnitEditUnit
       }
@@ -657,15 +651,6 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
         node {
           id
           name
-          pk
-        }
-      }
-    }
-    qualifiers {
-      edges {
-        node {
-          id
-          nameFi
           pk
         }
       }
