@@ -128,7 +128,7 @@ export function ApplicationCard({ application, actionCallback }: Props): JSX.Ele
       buttons={buttons}
     >
       <br />
-      {t("applicationCard:saved")} {formatDateTime(t, new Date(application.lastModifiedDate))}
+      {t("applicationCard:saved")} {formatDateTime(t, new Date(application.updatedAt))}
       {isWaitingForDelete && (
         <ConfirmationDialog
           isOpen
@@ -152,7 +152,7 @@ export const APPLICATION_CARD_FRAGMENT = gql`
     pk
     ...ApplicationName
     status
-    lastModifiedDate
+    updatedAt
     applicationRound {
       id
       nameFi
