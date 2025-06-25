@@ -105,7 +105,7 @@ function WrappedRender({
     purposes: [],
     reservationUnitTypes: [],
     ageGroups: [],
-    cities: [],
+    municipalities: [],
   } as const;
 
   const form = useForm<FormValues>({

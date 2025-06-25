@@ -11,6 +11,7 @@ import {
   CreateApplicationDocument,
   type CreateApplicationMutation,
   type CreateApplicationMutationVariables,
+  MunicipalityChoice,
   Priority,
   type PurposeNode,
   type ReservationUnitNode,
@@ -197,11 +198,7 @@ export function createMockApplicationFragment({
     organisationPostCode: "00000",
     organisationStreetAddress: "Street address FI",
     organisationCity: "City FI",
-    homeCity: {
-      id: base64encode("CityNode:1"),
-      pk: 1,
-      ...generateNameFragment("CityNode"),
-    },
+    municipality: MunicipalityChoice.Helsinki,
     billingPostCode: "00000",
     billingStreetAddress: "Street address FI",
     billingCity: "City FI",
@@ -242,7 +239,7 @@ export function createMockApplicationFragment({
           organisationCity: "",
           organisationPostCode: "",
           organisationYearEstablished: null,
-          homeCity: null,
+          municipality: null,
         }),
   };
   return {

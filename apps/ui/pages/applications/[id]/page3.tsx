@@ -7,9 +7,9 @@ import { useRouter } from "next/router";
 import {
   ApplicantTypeChoice,
   ApplicationPage3Document,
-  useUpdateApplicationMutation,
   type ApplicationPage3Query,
   type ApplicationPage3QueryVariables,
+  useUpdateApplicationMutation,
 } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,8 +24,8 @@ import {
   transformPage3Application,
 } from "@/components/application/funnel/form";
 import {
-  ApplicationFunnelWrapper,
   ApplicantTypeSelector,
+  ApplicationFunnelWrapper,
   CompanyForm,
   IndividualForm,
   OrganisationForm,
@@ -34,13 +34,8 @@ import { FormSubHeading } from "@/components/application/funnel/styled";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
-import { getSearchOptions, type OptionsT } from "@/modules/search";
 
-type Page3FormProps = {
-  cityOptions: OptionsT["cities"];
-};
-
-function Page3Form({ cityOptions }: Page3FormProps): JSX.Element | null {
+function Page3Form(): JSX.Element | null {
   const { watch, unregister, register, setValue } = useFormContext<ApplicationPage3FormValues>();
   const type = watch("applicantType");
 
@@ -78,7 +73,7 @@ function Page3Form({ cityOptions }: Page3FormProps): JSX.Element | null {
       return <IndividualForm />;
     case ApplicantTypeChoice.Community:
     case ApplicantTypeChoice.Association:
-      return <OrganisationForm homeCityOptions={cityOptions} />;
+      return <OrganisationForm />;
     case ApplicantTypeChoice.Company:
       return <CompanyForm />;
     default:
@@ -87,7 +82,7 @@ function Page3Form({ cityOptions }: Page3FormProps): JSX.Element | null {
   }
 }
 
-function Page3({ application, cityOptions }: Pick<PropsNarrowed, "application" | "cityOptions">): JSX.Element {
+function Page3({ application }: Pick<PropsNarrowed, "application">): JSX.Element {
   const router = useRouter();
 
   const form = useForm<ApplicationPage3FormValues>({
@@ -132,7 +127,7 @@ function Page3({ application, cityOptions }: Pick<PropsNarrowed, "application" |
           <ApplicantTypeSelector />
           <AutoGrid>
             <FormSubHeading as="h2">{t("application:Page3.sectionHeadings.basicInfo")}</FormSubHeading>
-            <Page3Form cityOptions={cityOptions} />
+            <Page3Form />
           </AutoGrid>
           <ButtonContainer>
             <Button
@@ -182,12 +177,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFound;
   }
 
-  const options = await getSearchOptions(apolloClient, "seasonal", locale ?? "fi");
-
   return {
     props: {
       application,
-      cityOptions: options.cities,
       ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
     },

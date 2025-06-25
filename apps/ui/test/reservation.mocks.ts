@@ -3,6 +3,7 @@ import {
   CustomerTypeChoice,
   ImageType,
   MetaFieldsFragment,
+  MunicipalityChoice,
   OrderStatus,
   type PaymentOrderNode,
   PaymentType,
@@ -13,7 +14,6 @@ import {
   TermsType,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
-import { OptionsRecord } from "@/components/reservation/SummaryFields";
 import type { FieldName } from "common/src/metaFieldsHelpers";
 import { generateNameFragment } from "@/test/test.gql.utils";
 
@@ -166,13 +166,7 @@ export function createMockReservation(
     description: "Test reservation description",
     endsAt: endsAt,
     freeOfChargeReason: "Test free of charge reason",
-    homeCity: {
-      id: base64encode("HomeCityNode:1"),
-      pk: 1,
-      nameFi: "Helsinki",
-      nameSv: "Helsingfors",
-      nameEn: "Helsinki",
-    },
+    municipality: MunicipalityChoice.Helsinki,
     id: base64encode(`ReservationNode:${pk}`),
     isHandled: cancellable ? false : isHandled,
     numPersons: 5,
@@ -442,7 +436,7 @@ export function createReservationPageMock({
   });
 }
 
-export function createOptionsMock(): OptionsRecord {
+export function createOptionsMock() {
   return {
     purpose: [
       {
@@ -476,18 +470,14 @@ export function createOptionsMock(): OptionsRecord {
         value: 4,
       },
     ],
-    homeCity: [
+    municipality: [
       {
         label: "Helsinki",
-        value: 1,
+        value: MunicipalityChoice.Helsinki,
       },
       {
-        label: "Espoo",
-        value: 2,
-      },
-      {
-        label: "Vantaa",
-        value: 3,
+        label: "Muu",
+        value: MunicipalityChoice.Other,
       },
     ],
   };
@@ -520,11 +510,7 @@ export function createMetaFieldsFragment(type: CustomerTypeChoice = CustomerType
     billingAddressStreet: "Laskunmaksukatu 1",
     billingAddressZip: "00200",
     billingAddressCity: "Helsinki",
-    homeCity: {
-      id: "1",
-      pk: 1,
-      ...generateNameFragment("Helsinki"),
-    },
+    municipality: MunicipalityChoice.Helsinki,
   };
 }
 

@@ -22,7 +22,7 @@ const LabelValue = ({
   );
 };
 
-type ApplicantT = Omit<ApplicantFieldsFragment, "homeCity" | "additionalInformation">;
+type ApplicantT = Omit<ApplicantFieldsFragment, "municipality" | "additionalInformation">;
 
 export function ApplicantInfoPreview({ application }: { application: ApplicantT }): JSX.Element {
   const { t } = useTranslation();

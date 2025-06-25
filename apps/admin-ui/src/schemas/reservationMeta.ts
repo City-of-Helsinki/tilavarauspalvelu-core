@@ -1,7 +1,7 @@
 // Rewriting the metafields using zod validators
 // TODO move to common after they are tested in use with
 // CreateReservationModal / ReservationSeries / EditReservation
-import { CustomerTypeChoice } from "@gql/gql-types";
+import { CustomerTypeChoice, MunicipalityChoice } from "@gql/gql-types";
 import { z } from "zod";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -18,7 +18,7 @@ const ReservationFormMetaSchema = z.object({
   billingLastName: z.string().optional(),
   billingPhone: z.string().optional(),
   freeOfChargeReason: z.string().optional(),
-  homeCity: z.number().optional(),
+  municipality: z.enum([MunicipalityChoice.Helsinki, MunicipalityChoice.Other]).optional(),
   numPersons: z.number().optional(),
   purpose: z.number().optional(),
   reserveeAddressCity: z.string().optional(),

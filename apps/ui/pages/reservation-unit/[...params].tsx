@@ -17,6 +17,7 @@ import {
   type ReservationQueryVariables,
   useReservationLazyQuery,
   ReservationStateChoice,
+  MunicipalityChoice,
 } from "@gql/gql-types";
 import { type Inputs } from "common/src/reservation-form/types";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -91,7 +92,13 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  const { options } = props;
+  const options = {
+    ...props.options,
+    municipality: Object.values(MunicipalityChoice).map((value) => ({
+      label: t(`Application.municipalities.${value.toUpperCase()}`),
+      value: value,
+    })),
+  };
 
   const [refetch, { data: resData }] = useReservationLazyQuery({
     variables: { id: props.reservation.id },
@@ -115,10 +122,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     reserveeAddressStreet: reservation?.reserveeAddressStreet ?? "",
     reserveeAddressCity: reservation?.reserveeAddressCity ?? "",
     reserveeAddressZip: reservation?.reserveeAddressZip ?? "",
-    // TODO is this correct? it used to just pick the homeCity (but that makes no sense since it's typed as a number)
-    // no it's not correct, the types and MetaFields are based on a number but the front sets it as { label: string, value: number }
-    // requires typing the useFormContext properly and refactoring all setters.
-    homeCity: reservation?.homeCity?.pk ?? undefined,
+    municipality: reservation?.municipality ?? undefined,
   };
   // TODO is defaultValues correct? it's prefilled from the profile data and we are not refetching at any point.
   // If we would refetch values would be more correct with reset hook.
