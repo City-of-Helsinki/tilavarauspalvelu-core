@@ -1225,12 +1225,6 @@ const translations: ITranslations = {
         `Valitse varusteet, jotka ovat kaikkien käyttäjien saatavilla. Jos tiettyä varustusta voi käyttää vain erikseen kysymällä, sitä ei tule listata.
         Täydennyksiä varustelistaan voi pyytää ylläpidolta. `,
       ],
-      qualifiers: [
-        `Lisää tarvittaessa tilan ikärajoja tai sisäänpääsyä kuvaavat tarkenteet.
-      Sopimusehtojen mukaisesti alle 15-vuotiaat eivät voi varta tiloja ellei sitä ole erikseen sallittu.
-      Lasten ja nuorten (peli)tilat:
-      valitse “varattavissa alle 15-vuotiaille”`,
-      ],
       description: [
         `Kuvaus kirjoitetaan standardointipohjan mukaisesti.
       Lisää linkkejä ulkoisille verkkosivuille kuten käyttöohjeisiin vain tarvittaessa. Tarkista linkkien toimivuus ja saavutettavuus säännöllisesti. Käytäthän muotoiluja harkiten. `,
@@ -1426,8 +1420,6 @@ const translations: ITranslations = {
     maxReservationsPerUserHelperText: [""],
     purposesLabel: ["Käyttötarkoitus"],
     purposesPlaceholder: ["Valitse mitä tarkoitusta tuetaan"],
-    qualifiersLabel: ["Tarkenne"],
-    qualifiersPlaceholder: ["Valitse"],
     resourcesPlaceholder: ["Liitä tarvittavat resurssit"],
     requireReservationHandling: [
       "Haluan käsitellä kaikki varaukset. Varaukset tulee aina käsitellä - hyväksyä tai hylätä -luvatussa ajassa, usein kolmen arkipäivän kuluessa.",
