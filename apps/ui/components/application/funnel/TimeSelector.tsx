@@ -7,8 +7,8 @@ import { filterNonNullable } from "common/src/helpers";
 import { ControlledSelect } from "common/src/components/form";
 import {
   ApplicationTimeSelector,
-  type CellState,
   type Cell,
+  type CellState,
   isCellEqual,
 } from "common/src/components/ApplicationTimeSelector";
 import { successToast } from "common/src/common/toast";
@@ -18,6 +18,7 @@ import { gql } from "@apollo/client";
 import { aesToCells, covertCellsToTimeRange } from "./timeSelectorModule";
 import { type ApplicationPage2FormValues } from "./form";
 import { TimePreview } from ".";
+import { convertWeekday } from "common/src/conversion";
 
 export type TimeSelectorProps = {
   index: number;
@@ -43,22 +44,23 @@ export function TimeSelectorForm({
   };
 
   const handleCellUpdate = (selection: Cell, value: CellState) => {
-    const { day } = selection;
+    const { weekday } = selection;
+    const dayNumber = convertWeekday(weekday);
     const times = watch(`applicationSections.${index}.suitableTimeRanges`);
     const tmp = aesToCells(times, reservationUnitOpeningHours);
-    if (tmp[day] == null) {
+    if (tmp[dayNumber] == null) {
       throw new Error("day not found");
     }
     // TODO this is confusing
-    // the final conversion changes "open" to "unavailable" if needed but it's sitll confusing
-    // and we rely on the conversion function here
-    // problem: we don't known opening hours at this point
-    // - would have to refactor the cell type to include the open state e.g. separate selection and open state
-    const cellIndex = tmp[day].findIndex((cell) => isCellEqual(cell, selection));
+    //  the final conversion changes "open" to "unavailable" if needed but it's still confusing
+    //  and we rely on the conversion function here
+    //  problem: we don't known opening hours at this point
+    //  - would have to refactor the cell type to include the open state e.g. separate selection and open state
+    const cellIndex = tmp[dayNumber].findIndex((cell) => isCellEqual(cell, selection));
     if (cellIndex === -1) {
       throw new Error("cell not found");
     }
-    const cell = tmp[day][cellIndex];
+    const cell = tmp[dayNumber][cellIndex];
     if (cell != null) {
       cell.state = value;
       setSelectorData(index, tmp);

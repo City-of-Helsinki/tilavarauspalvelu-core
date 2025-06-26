@@ -1,19 +1,20 @@
-import { expect, describe, test } from "vitest";
+import { describe, expect, test } from "vitest";
 import {
   aesToCells,
   covertCellsToTimeRange,
-  type TimeSpan,
-  type DailyOpeningHours,
   createCells,
+  type DailyOpeningHours,
+  type TimeSpan,
 } from "./timeSelectorModule";
 import { type SuitableTimeRangeFormValues } from "./form";
 import { Priority, Weekday } from "@/gql/gql-types";
 import { type Cell } from "common/src/components/ApplicationTimeSelector";
-import { type DayT } from "common/src/const";
+import { type DayT, WEEKDAYS_SORTED } from "common/src/const";
 import { toApiTimeUnsafe } from "common/src/common/util";
+import { transformWeekday } from "common/src/conversion";
 
 function createDayCells(
-  day: DayT,
+  day: Weekday,
   openRanges: { begin: number; end: number }[] = [] as const,
   selectedRange: TimeSpan[] = [] as const
 ): Cell[] {
@@ -24,7 +25,7 @@ function createDayCells(
     const state = selectedRangeType[0]?.priority ?? "none";
     const openState = openRanges?.some((r) => h >= r.begin && h < r.end);
     return {
-      day,
+      weekday: day,
       hour: h,
       state,
       openState: openState ? "open" : "unavailable",
@@ -57,7 +58,7 @@ describe("createCells", () => {
   ])("open without gaps from $begin to $end is $expectedCount", ({ begin, end, expectedCount }) => {
     const openingHours: DailyOpeningHours = [
       {
-        weekday: 0,
+        weekday: Weekday.Monday,
         isClosed: false,
         reservableTimes: [{ begin, end }],
       },
@@ -152,7 +153,7 @@ describe("createCells", () => {
     const openTimes: DailyOpeningHours = [
       {
         // TODO fuzzy the weekday
-        weekday: 0,
+        weekday: Weekday.Monday,
         isClosed: false,
         reservableTimes: times,
       },
@@ -168,7 +169,7 @@ describe("createCells", () => {
 });
 
 describe("aesToCells", () => {
-  function createInputDay({ weekday, isClosed = false }: { weekday: number; isClosed?: boolean }) {
+  function createInputDay({ weekday, isClosed = false }: { weekday: Weekday; isClosed?: boolean }) {
     return {
       weekday,
       isClosed,
@@ -178,7 +179,8 @@ describe("aesToCells", () => {
       ],
     };
   }
-  function createInput({ openDays = [0, 1, 2, 3, 4, 5, 6] }: { openDays?: number[] }): DailyOpeningHours {
+
+  function createInput({ openDays = WEEKDAYS_SORTED }: { openDays?: Weekday[] }): DailyOpeningHours {
     return openDays.map((day) => createInputDay({ weekday: day }));
   }
 
@@ -189,22 +191,22 @@ describe("aesToCells", () => {
     expect(res).toHaveLength(7);
     for (const [i, cell] of res.entries()) {
       expect(cell).toHaveLength(17);
-      const expected = createDayCells(i as DayT);
+      const expected = createDayCells(transformWeekday(i as DayT));
       expect(cell).toEqual(expected);
     }
   });
 
   test("with opening hours on monday", () => {
     const schedule = [] as const;
-    const openingHours = createInput({ openDays: [0] });
+    const openingHours = createInput({ openDays: [Weekday.Monday] });
     const res = aesToCells(schedule, openingHours);
     expect(res).toHaveLength(7);
     const expected = [
-      createDayCells(0, [
+      createDayCells(Weekday.Monday, [
         { begin: 8, end: 12 },
         { begin: 13, end: 17 },
       ]),
-      ...Array.from({ length: 6 }, (_, i) => createDayCells((i + 1) as DayT)),
+      ...Array.from({ length: 6 }, (_, i) => createDayCells(transformWeekday((1 + i) as DayT))),
     ];
     for (const [i, day] of res.entries()) {
       expect(day).toHaveLength(17);
@@ -218,7 +220,7 @@ describe("aesToCells", () => {
     const res = aesToCells(schedule, openingHours);
     expect(res).toHaveLength(7);
     const expected = Array.from({ length: 7 }, (_, i) =>
-      createDayCells(i as DayT, [
+      createDayCells(transformWeekday(i as DayT), [
         { begin: 8, end: 12 },
         { begin: 13, end: 17 },
       ])
@@ -231,16 +233,20 @@ describe("aesToCells", () => {
 
   test("opening hours only on friday", () => {
     const schedule = [] as const;
-    const openingHours = createInput({ openDays: [4] });
+    const openingHours = createInput({ openDays: [Weekday.Friday] });
     const res = aesToCells(schedule, openingHours);
     expect(res).toHaveLength(7);
     const expected = [
-      ...Array.from({ length: 4 }, (_, i) => createDayCells(i as DayT)),
-      createDayCells(4, [
+      createDayCells(Weekday.Monday),
+      createDayCells(Weekday.Tuesday),
+      createDayCells(Weekday.Wednesday),
+      createDayCells(Weekday.Thursday),
+      createDayCells(Weekday.Friday, [
         { begin: 8, end: 12 },
         { begin: 13, end: 17 },
       ]),
-      ...Array.from({ length: 2 }, (_, i) => createDayCells((i + 5) as DayT)),
+      createDayCells(Weekday.Saturday),
+      createDayCells(Weekday.Sunday),
     ];
     for (const [i, day] of res.entries()) {
       expect(day).toHaveLength(17);
@@ -262,7 +268,7 @@ describe("aesToCells", () => {
     expect(res).toHaveLength(7);
     const expected = Array.from({ length: 7 }, (_, i) =>
       createDayCells(
-        i as DayT,
+        transformWeekday(i as DayT),
         [
           { begin: 8, end: 12 },
           { begin: 13, end: 17 },
@@ -290,7 +296,7 @@ describe("aesToCells", () => {
     expect(res).toHaveLength(7);
     const expected = Array.from({ length: 7 }, (_, i) =>
       createDayCells(
-        i as DayT,
+        transformWeekday(i as DayT),
         [
           { begin: 8, end: 12 },
           { begin: 13, end: 17 },
@@ -315,18 +321,18 @@ describe("covertCellsToTimeRange", () => {
 
   test("openining hours are ignored", () => {
     const cells: Cell[][] = [
-      createDayCells(0, [
+      createDayCells(Weekday.Monday, [
         { begin: 8, end: 12 },
         { begin: 13, end: 17 },
       ]),
-      createDayCells(1),
+      createDayCells(Weekday.Tuesday),
     ];
     const res = covertCellsToTimeRange(cells);
     expect(res).toEqual([]);
   });
 
   test("primary contiguous selection", () => {
-    const cells: Cell[][] = [createDayCells(0, [], [{ begin: 8, end: 12, priority: "primary" }])];
+    const cells: Cell[][] = [createDayCells(Weekday.Monday, [], [{ begin: 8, end: 12, priority: "primary" }])];
     const res = covertCellsToTimeRange(cells);
     const expected: SuitableTimeRangeFormValues[] = [
       {
@@ -342,7 +348,7 @@ describe("covertCellsToTimeRange", () => {
   test("non contiguous primary selection is not merged", () => {
     const cells: Cell[][] = [
       createDayCells(
-        0,
+        Weekday.Monday,
         [],
         [
           { begin: 8, end: 9, priority: "primary" },
@@ -371,7 +377,7 @@ describe("covertCellsToTimeRange", () => {
   test.todo("merging primary contiguous selection");
 
   test("secondary selection", () => {
-    const cells: Cell[][] = [createDayCells(0, [], [{ begin: 8, end: 12, priority: "secondary" }])];
+    const cells: Cell[][] = [createDayCells(Weekday.Monday, [], [{ begin: 8, end: 12, priority: "secondary" }])];
     const res = covertCellsToTimeRange(cells);
     const expected: SuitableTimeRangeFormValues[] = [
       {
@@ -387,7 +393,7 @@ describe("covertCellsToTimeRange", () => {
   test("mixed selection", () => {
     const cells: Cell[][] = [
       createDayCells(
-        0,
+        Weekday.Monday,
         [],
         [
           { begin: 8, end: 10, priority: "primary" },
@@ -414,7 +420,7 @@ describe("covertCellsToTimeRange", () => {
   });
 
   test("24:00 should be converted to 0:00", () => {
-    const cells: Cell[][] = [createDayCells(0, [], [{ begin: 23, end: 24, priority: "secondary" }])];
+    const cells: Cell[][] = [createDayCells(Weekday.Monday, [], [{ begin: 23, end: 24, priority: "secondary" }])];
     const res = covertCellsToTimeRange(cells);
     const expected: SuitableTimeRangeFormValues[] = [
       {
@@ -430,7 +436,7 @@ describe("covertCellsToTimeRange", () => {
   // NOTE implicit expectation that the first selectable slot is 7:00
   // the UI calendar only shows 7 - 24 so it's limitation has bled into logic
   test("full day range -> 07:00 - 0:00", () => {
-    const cells: Cell[][] = [createDayCells(0, [], [{ begin: 0, end: 24, priority: "primary" }])];
+    const cells: Cell[][] = [createDayCells(Weekday.Monday, [], [{ begin: 0, end: 24, priority: "primary" }])];
     const res = covertCellsToTimeRange(cells);
     const expected: SuitableTimeRangeFormValues[] = [
       {

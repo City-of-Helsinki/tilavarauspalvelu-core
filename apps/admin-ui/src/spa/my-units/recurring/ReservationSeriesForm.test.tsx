@@ -5,9 +5,10 @@ import userEvent from "@testing-library/user-event";
 import { MockedProvider } from "@apollo/client/testing";
 import { MemoryRouter } from "react-router-dom";
 import { ReservationSeriesForm } from "./ReservationSeriesForm";
-import { vi, test, expect, afterEach, beforeEach } from "vitest";
-import { YEAR, createGraphQLMocks, mondayMorningReservations, createReservationUnits } from "./__test__/mocks";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
+import { createGraphQLMocks, createReservationUnits, mondayMorningReservations, YEAR } from "./__test__/mocks";
 import { toUIDate } from "common/src/common/util";
+import { Weekday } from "@gql/gql-types";
 
 const DEFAULT_DATES = {
   begin: new Date(YEAR, 0, 1),
@@ -215,12 +216,12 @@ test("Form doesn't have meta without a reservation unit.", () => {
 async function fillForm({
   begin,
   end,
-  dayNumber,
+  weekday,
 }: {
   // FI time format for keyboard input
   begin: string;
   end: string;
-  dayNumber: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  weekday: Weekday;
 }) {
   // Duplicated code from selectUnit because user type is questionable to recreate / pass
   const container = screen.getByText(/filters.label.reservationUnit/);
@@ -284,7 +285,7 @@ async function fillForm({
   expect(endTime).toHaveValue("11:00");
 
   const button = screen.getByRole("button", {
-    name: `dayShort.${dayNumber}`,
+    name: `dayShort.${weekday}`,
   });
   expect(button).toBeInTheDocument();
   await user.click(button);
@@ -308,7 +309,7 @@ test("Form can't be submitted without reservation type selection", async () => {
   await fillForm({
     begin: toUIDate(begin),
     end: toUIDate(end),
-    dayNumber: 1,
+    weekday: Weekday.Tuesday,
   });
   const user = userEvent.setup({
     advanceTimers: vi.advanceTimersByTime.bind(vi),
@@ -331,7 +332,7 @@ test("Form submission without any blocking reservations", async () => {
   await fillForm({
     begin: toUIDate(begin),
     end: toUIDate(end),
-    dayNumber: 1,
+    weekday: Weekday.Tuesday,
   });
 
   const typeStaff = screen.getByLabelText(/STAFF/);
@@ -371,7 +372,7 @@ test("Form submission with a lot of blocking reservations", async () => {
   await fillForm({
     begin: toUIDate(begin),
     end: toUIDate(end),
-    dayNumber: 0,
+    weekday: Weekday.Monday,
   });
 
   const typeStaff = screen.getByLabelText(/STAFF/);
@@ -415,7 +416,7 @@ test("Reservations can be removed and restored", async () => {
   await fillForm({
     begin: toUIDate(begin),
     end: toUIDate(end),
-    dayNumber: 1,
+    weekday: Weekday.Tuesday,
   });
 
   const typeStaff = screen.getByLabelText(/STAFF/);

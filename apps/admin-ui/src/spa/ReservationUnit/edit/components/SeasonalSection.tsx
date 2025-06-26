@@ -5,7 +5,7 @@ import { Controller, useFieldArray, UseFormReturn } from "react-hook-form";
 import { TimeInput } from "common/src/components/form/TimeInput";
 import { IconButton } from "common/src/components";
 import { fontBold } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints, WEEKDAYS_SORTED } from "common/src/const";
 import { useTranslation } from "react-i18next";
 import { ReservationUnitEditFormValues } from "../form";
 import { Accordion } from "@/component/Accordion";
@@ -87,6 +87,7 @@ const StyledTimeInput = styled(TimeInput)`
     grid-row-end: span 3;
 
     /* increase min-width for error message */
+
     & > input {
       min-width: 11ch;
     }
@@ -127,9 +128,11 @@ const Controls = styled.div`
   justify-content: space-between;
 
   /* hack to get the IconButton to bottom align */
+
   & > button > div {
     margin: 0;
     padding: 0;
+
     > div {
       margin: 0;
       padding: 0;
@@ -281,9 +284,9 @@ export function SeasonalSection({ form }: { form: UseFormReturn<ReservationUnitE
 
   const handleClear = () => {
     // Generate 7 empty days and replace the current seasons
-    const val = Array.from(Array(7)).map((_, i) => ({
+    const val = WEEKDAYS_SORTED.map((weekday) => ({
       pk: 0,
-      weekday: i,
+      weekday: weekday,
       closed: false,
       reservableTimes: [{ begin: "", end: "" }],
     }));

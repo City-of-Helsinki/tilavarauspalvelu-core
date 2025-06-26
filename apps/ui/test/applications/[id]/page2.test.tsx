@@ -135,7 +135,7 @@ describe("Application page2 validation errors", () => {
   test("error message should be shown if times are not long enough", async () => {
     const user = userEvent.setup();
     const view = customRender({ page: "page1" });
-    const select = view.getByTestId("time-selector__button--1-14");
+    const select = view.getByTestId("time-selector__button--TUESDAY-14");
     await user.click(select);
     expect(view.getByText("application:validation.calendar.title"));
     expect(
@@ -151,10 +151,10 @@ describe("Application page2 validation errors", () => {
   test("error message should disappear if times are long enough", async () => {
     const user = userEvent.setup();
     const view = customRender({ page: "page1" });
-    const select = view.getByTestId("time-selector__button--1-14");
+    const select = view.getByTestId("time-selector__button--TUESDAY-14");
     await user.click(select);
     expect(view.queryAllByText(/application:validation/)).toHaveLength(2);
-    const select2 = view.getByTestId("time-selector__button--1-15");
+    const select2 = view.getByTestId("time-selector__button--TUESDAY-15");
     await user.click(select2);
     expect(view.queryAllByText(/application:validation/)).toHaveLength(0);
   });
@@ -162,9 +162,9 @@ describe("Application page2 validation errors", () => {
   test("two disjointed time ranges are too short", async () => {
     const user = userEvent.setup();
     const view = customRender({ page: "page1" });
-    const select = view.getByTestId("time-selector__button--1-14");
+    const select = view.getByTestId("time-selector__button--TUESDAY-14");
     await user.click(select);
-    const select2 = view.getByTestId("time-selector__button--1-16");
+    const select2 = view.getByTestId("time-selector__button--TUESDAY-16");
     await user.click(select2);
     expect(view.queryAllByText(/application:validation/)).toHaveLength(2);
   });
@@ -172,11 +172,11 @@ describe("Application page2 validation errors", () => {
   test("submit button should be disabled if there are errors", async () => {
     const user = userEvent.setup();
     const view = customRender({ page: "page1" });
-    const select = view.getByTestId("time-selector__button--1-14");
+    const select = view.getByTestId("time-selector__button--TUESDAY-14");
     await user.click(select);
     expect(view.queryAllByText(/application:validation/)).toHaveLength(2);
     expect(view.getByRole("button", { name: "common:next" })).toBeDisabled();
-    const select2 = view.getByTestId("time-selector__button--1-15");
+    const select2 = view.getByTestId("time-selector__button--TUESDAY-15");
     await user.click(select2);
     expect(view.queryAllByText(/application:validation/)).toHaveLength(0);
     expect(view.getByRole("button", { name: "common:next" })).not.toBeDisabled();
