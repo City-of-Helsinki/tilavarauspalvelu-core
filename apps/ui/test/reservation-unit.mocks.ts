@@ -3,6 +3,7 @@ import {
   Authentication,
   ImageType,
   type IsReservableFieldsFragment,
+  ReservationForm,
   ReservationKind,
   ReservationStartInterval,
   type ReservationUnitNode,
@@ -173,6 +174,7 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     notesWhenApplyingFi: null, // Maybe<Scalars["String"]["output"]>;
     notesWhenApplyingSv: null, // Maybe<Scalars["String"]["output"]>;
     extUuid: "dummy-uuid", // Scalars["UUID"]["output"];
+    reservationForm: ReservationForm.ReserveeInfoForm,
   };
 }
 
