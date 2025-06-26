@@ -3,7 +3,7 @@ import { type ApolloQueryResult, gql } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import {
-  CustomerTypeChoice,
+  ReserveeType,
   type ReservationPageQuery,
   ReservationStateChoice,
   useReservationCancelReasonsQuery,
@@ -224,7 +224,7 @@ function ReservationUserAccordion({
         </DataWrapper>
         <DataWrapper
           label={t(
-            reservation.reserveeType === CustomerTypeChoice.Business
+            reservation.reserveeType === ReserveeType.Company
               ? "RequestedReservation.reserveeBusinessName"
               : "RequestedReservation.reserveeOrganisationName"
           )}
@@ -232,8 +232,8 @@ function ReservationUserAccordion({
           {reservation.reserveeOrganisationName}
         </DataWrapper>
         <DataWrapper label={t("filters.municipality")}>{reservation.municipality}</DataWrapper>
-        <DataWrapper label={t("RequestedReservation.reserveeId")}>
-          {reservation.reserveeId || t("RequestedReservation.noReserveeId")}
+        <DataWrapper label={t("RequestedReservation.reserveeIdentifier")}>
+          {reservation.reserveeIdentifier || t("RequestedReservation.noReserveeId")}
         </DataWrapper>
         <DataWrapper label={t("RequestedReservation.reserveeFirstName")}>{reservation.reserveeFirstName}</DataWrapper>
         <DataWrapper label={t("RequestedReservation.reserveeLastName")}>{reservation.reserveeLastName}</DataWrapper>

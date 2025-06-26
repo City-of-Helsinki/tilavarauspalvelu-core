@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { type ApplicantFieldsFragment, ApplicantTypeChoice } from "@gql/gql-types";
-import { ApplicationInfoContainer, InfoItemContainer, InfoItem } from "./styled";
+import { type ApplicantFieldsFragment, ReserveeType } from "@gql/gql-types";
+import { ApplicationInfoContainer, InfoItem, InfoItemContainer } from "./styled";
 
 const LabelValue = ({
   label,
@@ -42,7 +42,7 @@ export function ApplicantInfoPreview({ application }: { application: ApplicantT 
       {application.applicantType == null ? (
         // TODO translate (though this is more a system error than a user error)
         <div style={{ gridColumn: "1 / -1" }}>ERROR: applicantType is null</div>
-      ) : application.applicantType !== ApplicantTypeChoice.Individual ? (
+      ) : application.applicantType !== ReserveeType.Individual ? (
         <>
           <LabelValue label={t("application:preview.organisation.name")} value={application.organisationName} />
           <LabelValue

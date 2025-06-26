@@ -2,11 +2,11 @@ import { differenceInWeeks } from "date-fns";
 import { fromApiDate } from "common/src/common/util";
 import { formatters as getFormatters } from "common";
 import {
-  ApplicantTypeChoice,
-  ApplicationStatusChoice,
-  ApplicationSectionStatusChoice,
-  ApplicationSectionNode,
   AccessCodeState,
+  ApplicationSectionNode,
+  ApplicationSectionStatusChoice,
+  ApplicationStatusChoice,
+  ReserveeType,
 } from "@gql/gql-types";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { formatNumber } from "@/common/util";
@@ -52,18 +52,16 @@ export function transformApplicationStatuses(filters: string[]): ApplicationStat
     .filter((asc): asc is NonNullable<typeof asc> => asc != null);
 }
 
-export function transformApplicantType(filters: string[]): ApplicantTypeChoice[] {
+export function transformApplicantType(filters: string[]): ReserveeType[] {
   return filters
     .map((filter) => {
       switch (filter) {
-        case ApplicantTypeChoice.Individual:
-          return ApplicantTypeChoice.Individual;
-        case ApplicantTypeChoice.Company:
-          return ApplicantTypeChoice.Company;
-        case ApplicantTypeChoice.Community:
-          return ApplicantTypeChoice.Community;
-        case ApplicantTypeChoice.Association:
-          return ApplicantTypeChoice.Association;
+        case ReserveeType.Individual:
+          return ReserveeType.Individual;
+        case ReserveeType.Company:
+          return ReserveeType.Company;
+        case ReserveeType.Nonprofit:
+          return ReserveeType.Nonprofit;
         default:
           return undefined;
       }

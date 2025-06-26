@@ -14,7 +14,7 @@ import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { camelCase } from "lodash-es";
-import { CustomerTypeChoice, MetadataSetsFragment } from "../../gql/gql-types";
+import { MetadataSetsFragment, ReserveeType } from "../../gql/gql-types";
 import ReservationFormField from "./ReservationFormField";
 import { Inputs, Reservation } from "./types";
 import { RadioButtonWithImage } from "./RadioButtonWithImage";
@@ -91,15 +91,15 @@ const ReservationApplicationFieldsContainer = styled(AutoGrid)`
 
 const reserveeOptions = [
   {
-    id: CustomerTypeChoice.Individual,
+    id: ReserveeType.Individual,
     icon: <IconUser />,
   },
   {
-    id: CustomerTypeChoice.Nonprofit,
+    id: ReserveeType.Nonprofit,
     icon: <IconGroup />,
   },
   {
-    id: CustomerTypeChoice.Business,
+    id: ReserveeType.Company,
     icon: <IconPremises width="24" height="24" aria-hidden />,
   },
 ];
@@ -109,19 +109,19 @@ function SubheadingByType({
   index,
   field,
 }: {
-  reserveeType: CustomerTypeChoice;
+  reserveeType: ReserveeType;
   index: number;
   field: string;
 }) {
   const { t } = useTranslation();
 
-  const headingForNonProfit = reserveeType === CustomerTypeChoice.Nonprofit && index === 0;
+  const headingForNonProfit = reserveeType === ReserveeType.Nonprofit && index === 0;
 
-  const headingForNonProfitContactInfo = reserveeType === CustomerTypeChoice.Nonprofit && field === "reserveeFirstName";
+  const headingForNonProfitContactInfo = reserveeType === ReserveeType.Nonprofit && field === "reserveeFirstName";
 
-  const headingForCompanyInfo = reserveeType === CustomerTypeChoice.Business && index === 0;
+  const headingForCompanyInfo = reserveeType === ReserveeType.Company && index === 0;
 
-  const headingForContactInfo = reserveeType === CustomerTypeChoice.Business && field === "reserveeFirstName";
+  const headingForContactInfo = reserveeType === ReserveeType.Company && field === "reserveeFirstName";
 
   return headingForNonProfit ? (
     <GroupHeading style={{ marginTop: 0 }}>{t("reservationApplication:label.headings.nonprofitInfo")}</GroupHeading>
@@ -145,7 +145,7 @@ function ReservationFormFields({
   data,
 }: CommonProps & {
   fields: Field[];
-  headingKey?: CustomerTypeChoice | "COMMON";
+  headingKey?: ReserveeType | "COMMON";
   hasSubheading?: boolean;
   metadata: MetadataSetsFragment["metadataSet"];
   params?: { numPersons: { min?: number; max?: number } };

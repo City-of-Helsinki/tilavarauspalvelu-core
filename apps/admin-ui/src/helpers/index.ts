@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   type ApplicantNameFieldsFragment,
-  ApplicantTypeChoice,
   type ApplicationRoundNode,
   ApplicationRoundReservationCreationStatusChoice,
   ApplicationRoundStatusChoice,
@@ -10,6 +9,7 @@ import {
   type Maybe,
   ReservationStartInterval,
   ReservationTypeChoice,
+  ReserveeType,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { addSeconds } from "date-fns";
@@ -131,7 +131,7 @@ export function getApplicantName(app: ApplicantNameFieldsFragment): string {
   if (!app) {
     return "-";
   }
-  if (app.applicantType === ApplicantTypeChoice.Individual) {
+  if (app.applicantType === ReserveeType.Individual) {
     return `${app.contactPersonFirstName || "-"} ${app.contactPersonLastName || "-"}`;
   }
   return app.organisationName || "-";

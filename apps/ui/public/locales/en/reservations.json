@@ -78,7 +78,7 @@
   "ageGroup": "Age group",
   "numPersons": "Number of participants",
   "organisationName": "Company name",
-  "reserveeId": "Business ID",
+  "reserveeIdentifier": "Business ID",
   "contactName": "Name of contact person",
   "contactPhone": "Contact person’s telephone number",
   "contactEmail": "Contact person’s e-mail address",

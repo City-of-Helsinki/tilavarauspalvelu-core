@@ -78,7 +78,7 @@
   "ageGroup": "Ikäryhmä",
   "numPersons": "Osallistujamäärä",
   "organisationName": "Yrityksen nimi",
-  "reserveeId": "Y-tunnus",
+  "reserveeIdentifier": "Y-tunnus",
   "contactName": "Yhteyshenkilön nimi",
   "contactPhone": "Yhteyshenkilön puhelinnumero",
   "contactEmail": "Yhteyshenkilön sähköposti",

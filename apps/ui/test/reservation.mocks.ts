@@ -1,6 +1,5 @@
 import {
   AccessType,
-  CustomerTypeChoice,
   ImageType,
   MetaFieldsFragment,
   MunicipalityChoice,
@@ -11,6 +10,7 @@ import {
   type ReservationPageQuery,
   ReservationStateChoice,
   ReservationTypeChoice,
+  ReserveeType,
   TermsType,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
@@ -272,11 +272,10 @@ export function createMockReservation(
     reserveeEmail: "teppo.testaaja@hel.fi",
     reserveeFirstName: "Teppo",
     reserveeLastName: "Testaaja",
-    reserveeId: "1",
-    reserveeIsUnregisteredAssociation: false,
+    reserveeIdentifier: "1",
     reserveeOrganisationName: "Test Organisation",
     reserveePhone: "0401234567",
-    reserveeType: CustomerTypeChoice.Individual,
+    reserveeType: ReserveeType.Individual,
     state: state,
     taxPercentageValue: "24.5",
     type: type,
@@ -481,7 +480,7 @@ export function createOptionsMock() {
   };
 }
 
-export function createMetaFieldsFragment(type: CustomerTypeChoice = CustomerTypeChoice.Business): MetaFieldsFragment {
+export function createMetaFieldsFragment(type: ReserveeType = ReserveeType.Company): MetaFieldsFragment {
   return {
     id: "1",
     description: "Test description",
@@ -495,9 +494,8 @@ export function createMetaFieldsFragment(type: CustomerTypeChoice = CustomerType
     reserveeLastName: "Testicle",
     reserveePhone: "123456789",
     reserveeEmail: "teppo.testicle@hel.fi",
-    reserveeId: type === CustomerTypeChoice.Business ? "1234567-8" : null,
+    reserveeIdentifier: type === ReserveeType.Company ? "1234567-8" : null,
     reserveeOrganisationName: "Test Organisation",
-    reserveeIsUnregisteredAssociation: false,
     reserveeAddressStreet: "Testikuja 1",
     reserveeAddressZip: "00100",
     reserveeAddressCity: "Helsinki",
@@ -512,7 +510,7 @@ export function createMetaFieldsFragment(type: CustomerTypeChoice = CustomerType
   };
 }
 
-export function createSupportedFieldsMock(type: CustomerTypeChoice | "reservation" = "reservation"): FieldName[] {
+export function createSupportedFieldsMock(type: ReserveeType | "reservation" = "reservation"): FieldName[] {
   // We need to include the reserveeType field in the supported fields
   // so that the application fields can be rendered correctly.
   if (type === "reservation") {
@@ -548,18 +546,18 @@ export function createSupportedFieldsMock(type: CustomerTypeChoice | "reservatio
       fieldName: "reserveeEmail",
     },
   ];
-  if (type === CustomerTypeChoice.Nonprofit) {
+  if (type === ReserveeType.Nonprofit) {
     fieldNames.push({
       fieldName: "reserveeOrganisationName",
     });
   }
-  if (type === CustomerTypeChoice.Business) {
+  if (type === ReserveeType.Company) {
     fieldNames.push(
       {
         fieldName: "reserveeOrganisationName",
       },
       {
-        fieldName: "reserveeId",
+        fieldName: "reserveeIdentifier",
       }
     );
   }

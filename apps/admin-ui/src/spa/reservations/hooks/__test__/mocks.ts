@@ -1,12 +1,12 @@
 import { GraphQLError } from "graphql";
 import { addDays, addHours, startOfDay } from "date-fns";
 import {
-  CustomerTypeChoice,
   ReservationSeriesDocument,
   type ReservationSeriesQuery,
   ReservationStartInterval,
   ReservationStateChoice,
   ReservationTypeChoice,
+  ReserveeType,
   UpdateReservationSeriesDocument,
   UpdateStaffReservationDocument,
 } from "@gql/gql-types";
@@ -23,13 +23,13 @@ export const MUTATION_DATA = {
     reservationBlockWholeDay: false,
     bufferTimeBefore: 0,
     bufferTimeAfter: 0,
-    reserveeType: CustomerTypeChoice.Business,
+    reserveeType: ReserveeType.Company,
     reserveeFirstName: "Etunimi",
     reserveeLastName: "Sukunimi",
     reserveeOrganisationName: "Yhdistys007",
     reserveePhone: "43434343",
     reserveeEmail: "",
-    reserveeId: "44444444",
+    reserveeIdentifier: "44444444",
     reserveeIsUnregisteredAssociation: true,
     reserveeAddressStreet: "Katuosoite",
     reserveeAddressCity: "TRE",

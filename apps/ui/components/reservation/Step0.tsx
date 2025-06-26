@@ -3,7 +3,7 @@
  *  This component needs to be wrapped inside a Form context
  */
 import type { OptionType } from "common/types/common";
-import { Notification, IconArrowRight, Button, ButtonVariant, LoadingSpinner, IconCross } from "hds-react";
+import { Button, ButtonVariant, IconArrowRight, IconCross, LoadingSpinner, Notification } from "hds-react";
 import { useFormContext, UseFormReturn } from "react-hook-form";
 import React, { useState } from "react";
 import { Trans, useTranslation } from "next-i18next";
@@ -11,7 +11,7 @@ import styled from "styled-components";
 import MetaFields from "common/src/reservation-form/MetaFields";
 import { ActionContainer } from "./styles";
 import InfoDialog from "../common/InfoDialog";
-import { CustomerTypeChoice, type ReservationQuery } from "@gql/gql-types";
+import { type ReservationQuery, ReserveeType } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { containsField, FieldName } from "common/src/metaFieldsHelpers";
 import { getApplicationFields, getGeneralFields } from "./SummaryFields";
@@ -46,7 +46,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
   const reservationApplicationFields = getApplicationFields({
     supportedFields,
     reservation,
-    reserveeType: reserveeType ?? CustomerTypeChoice.Individual,
+    reserveeType: reserveeType ?? ReserveeType.Individual,
   });
 
   const isHomeCityValid = !includesHomeCity || Boolean(municipality);

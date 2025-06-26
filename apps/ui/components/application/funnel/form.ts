@@ -2,13 +2,13 @@ import { startOfDay } from "date-fns";
 import { filterNonNullable, type ReadonlyDeep, timeToMinutes } from "common/src/helpers";
 import {
   type ApplicantFieldsFragment,
-  ApplicantTypeChoice,
   type ApplicationFormFragment,
   type ApplicationPage2Query,
   type ApplicationUpdateMutationInput,
   type Maybe,
   MunicipalityChoice,
   Priority,
+  ReserveeType,
   type SuitableTimeRangeSerializerInput,
   type UpdateApplicationSectionForApplicationSerializerInput,
   Weekday,
@@ -226,12 +226,7 @@ function convertDate(date: string | null | undefined): string | undefined {
   return toUIDate(new Date(date)) || undefined;
 }
 
-const ApplicantTypeSchema = z.enum([
-  ApplicantTypeChoice.Individual,
-  ApplicantTypeChoice.Company,
-  ApplicantTypeChoice.Association,
-  ApplicantTypeChoice.Community,
-]);
+const ApplicantTypeSchema = z.enum([ReserveeType.Individual, ReserveeType.Company, ReserveeType.Nonprofit]);
 const ApplicationPage1Schema = z.object({
   pk: z.number(),
   applicantType: ApplicantTypeSchema.optional(),
@@ -365,8 +360,8 @@ export const ApplicationPage3Schema = z
   })
   .superRefine((val, ctx) => {
     switch (val.applicantType) {
-      case ApplicantTypeChoice.Association:
-      case ApplicantTypeChoice.Company:
+      case ReserveeType.Nonprofit:
+      case ReserveeType.Company:
         if (!val.organisationIdentifier) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
@@ -378,7 +373,7 @@ export const ApplicationPage3Schema = z
       default:
         break;
     }
-    if (val.applicantType === ApplicantTypeChoice.Community || val.applicantType === ApplicantTypeChoice.Association) {
+    if (val.applicantType === ReserveeType.Nonprofit) {
       if (!val.municipality) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -514,7 +509,7 @@ export function createDefaultPage1Section(
 
 export function convertApplicationPage3(app?: Maybe<ApplicantFieldsFragment>): ApplicationPage3FormValues {
   const hasBillingAddress =
-    app?.applicantType === ApplicantTypeChoice.Individual ||
+    app?.applicantType === ReserveeType.Individual ||
     (app?.billingStreetAddress != null && app?.billingStreetAddress !== "");
   return {
     pk: app?.pk ?? 0,
@@ -549,9 +544,9 @@ function isAddressValid(streetAddress?: string, postCode?: string, city?: string
 }
 
 export function transformPage3Application(values: ApplicationPage3FormValues): ApplicationUpdateMutationInput {
-  const shouldSaveBillingAddress = values.applicantType === ApplicantTypeChoice.Individual || values.hasBillingAddress;
+  const shouldSaveBillingAddress = values.applicantType === ReserveeType.Individual || values.hasBillingAddress;
 
-  const isOrganisation = values.organisationName != null && values.applicantType !== ApplicantTypeChoice.Individual;
+  const isOrganisation = values.organisationName != null && values.applicantType !== ReserveeType.Individual;
   const isOrganisationAddressValid = isAddressValid(
     values.organisationStreetAddress,
     values.organisationPostCode,

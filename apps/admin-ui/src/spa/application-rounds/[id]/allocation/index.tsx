@@ -4,18 +4,18 @@ import { useTranslation } from "react-i18next";
 import { uniqBy } from "lodash-es";
 import { useParams, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
-import { CenterSpinner, TabWrapper, H1, fontBold, fontMedium } from "common/styled";
+import { CenterSpinner, fontBold, fontMedium, H1, TabWrapper } from "common/styled";
 import { ShowAllContainer } from "common/src/components";
 import { hasPermission as hasUnitPermission } from "@/modules/permissionHelper";
 import {
-  ApplicantTypeChoice,
-  ApplicationRoundStatusChoice,
   type ApplicationRoundFilterQuery,
+  ApplicationRoundStatusChoice,
+  MunicipalityChoice,
+  ReserveeType,
+  useAllApplicationEventsQuery,
   useApplicationRoundFilterQuery,
   useApplicationSectionAllocationsQuery,
-  useAllApplicationEventsQuery,
   UserPermissionChoice,
-  MunicipalityChoice,
 } from "@gql/gql-types";
 import { base64encode, convertOptionToHDS, filterNonNullable, sort, toNumber } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
@@ -55,13 +55,16 @@ const NumberOfResultsContainer = styled.div`
   --color-focus-outline: #0072c6;
   display: flex;
   gap: var(--spacing-s);
+
   & button {
     border: none;
     text-decoration: underline;
     background-color: transparent;
+
     &:hover {
       cursor: pointer;
     }
+
     &:focus {
       outline: none;
       box-shadow: 0 0 0 3px var(--color-focus-outline);
@@ -79,13 +82,13 @@ const transformApplicantType = (value: string | null) => {
   }
   switch (value) {
     case "Individual":
-      return ApplicantTypeChoice.Individual;
+      return ReserveeType.Individual;
     case "Community":
-      return ApplicantTypeChoice.Community;
+      return ReserveeType.Nonprofit;
     case "Association":
-      return ApplicantTypeChoice.Association;
+      return ReserveeType.Nonprofit;
     case "Company":
-      return ApplicantTypeChoice.Company;
+      return ReserveeType.Company;
   }
   return null;
 };
@@ -362,9 +365,9 @@ function ApplicationRoundAllocation({
     label: t(`Application.municipalities.${value.toUpperCase()}`),
     value: value as MunicipalityChoice,
   }));
-  const customerFilterOptions = Object.keys(ApplicantTypeChoice).map((value) => ({
+  const customerFilterOptions = Object.keys(ReserveeType).map((value) => ({
     label: t(`Application.applicantTypes.${value.toUpperCase()}`),
-    value: value as ApplicantTypeChoice,
+    value: value as ReserveeType,
   }));
   const unitOptions = units.map((unit) => ({
     value: unit?.pk ?? 0,
@@ -566,7 +569,7 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
     $applicationRound: Int!
     $applicationStatus: [ApplicationStatusChoice]!
     $status: [ApplicationSectionStatusChoice]
-    $applicantType: [ApplicantTypeChoice]
+    $applicantType: [ReserveeType]
     $preferredOrder: [Int]
     $textSearch: String
     $priority: [Priority]

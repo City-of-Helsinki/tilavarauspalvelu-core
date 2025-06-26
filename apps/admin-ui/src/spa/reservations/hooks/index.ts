@@ -1,13 +1,12 @@
 import { useTranslation } from "react-i18next";
 import {
-  useUpdateReservationSeriesMutation,
-  useUpdateStaffReservationMutation,
+  type Maybe,
   type ReservationSeriesUpdateMutationInput,
   ReserveeType,
-  CustomerTypeChoice,
-  type Maybe,
   type UpdateStaffReservationMutationVariables,
   type UseStaffReservationFragment,
+  useUpdateReservationSeriesMutation,
+  useUpdateStaffReservationMutation,
 } from "@gql/gql-types";
 import { successToast } from "common/src/common/toast";
 import { ApolloError, gql } from "@apollo/client";
@@ -91,16 +90,16 @@ export function useStaffReservationMutation({ reservation, onSuccess }: Props) {
   return editStaffReservation;
 }
 
-function convertReserveeType(type?: Maybe<CustomerTypeChoice>): ReserveeType | undefined {
+function convertReserveeType(type?: Maybe<ReserveeType>): ReserveeType | undefined {
   if (type == null) {
     return undefined;
   }
   switch (type) {
-    case CustomerTypeChoice.Business:
-      return ReserveeType.Business;
-    case CustomerTypeChoice.Individual:
+    case ReserveeType.Company:
+      return ReserveeType.Company;
+    case ReserveeType.Individual:
       return ReserveeType.Individual;
-    case CustomerTypeChoice.Nonprofit:
+    case ReserveeType.Nonprofit:
       return ReserveeType.Nonprofit;
     default:
       return undefined;
