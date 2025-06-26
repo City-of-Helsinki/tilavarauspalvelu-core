@@ -114,7 +114,7 @@ export const APPLICATION_SECTIONS_QUERY = gql`
     $applicationStatus: [ApplicationStatusChoice]!
     $status: [ApplicationSectionStatusChoice]
     $unit: [Int]
-    $applicantType: [ApplicantTypeChoice]
+    $applicantType: [ReserveeType]
     $preferredOrder: [Int]
     $textSearch: String
     $priority: [Priority]

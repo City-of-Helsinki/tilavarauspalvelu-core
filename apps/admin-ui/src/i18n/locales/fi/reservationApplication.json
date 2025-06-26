@@ -25,7 +25,7 @@
   "reserveeTypes": {
     "labels": {
       "nonprofit": "järjestön, ryhmän tai yhteisön puolesta",
-      "business": "yrityksen puolesta",
+      "company": "yrityksen puolesta",
       "individual": "yksityishenkilönä"
     }
   },
@@ -57,7 +57,7 @@
       "reserveeEmail": "Yhteyshenkilön sähköpostiosoite",
       "reserveePhone": "Yhteyshenkilön puhelinnumero",
       "reserveeOrganisationName": "Virallinen nimi",
-      "reserveeId": "Y-tunnus",
+      "reserveeIdentifier": "Y-tunnus",
       "reserveeIsUnregisteredAssociation": "Yhdistystä ei ole rekisteröity",
       "municipality": "Kotipaikka",
       "showBillingAddress": "Erillinen laskutusosoite",
@@ -87,7 +87,7 @@
       "billingAddressZip": "Postinumero",
       "billingAddressCity": "Postitoimipaikka"
     },
-    "business": {
+    "company": {
       "reserveeFirstName": "Yhteyshenkilön etunimi",
       "reserveeLastName": "Yhteyshenkilön sukunimi",
       "reserveeAddressStreet": "Katuosoite",
@@ -96,7 +96,7 @@
       "reserveeEmail": "Yhteyshenkilön sähköpostiosoite",
       "reserveePhone": "Yhteyshenkilön puhelinnumero",
       "reserveeOrganisationName": "Virallinen nimi",
-      "reserveeId": "Y-tunnus",
+      "reserveeIdentifier": "Y-tunnus",
       "municipality": "Kotipaikka",
       "showBillingAddress": "Erillinen laskutusosoite",
       "billingFirstName": "Varaajan etunimi",

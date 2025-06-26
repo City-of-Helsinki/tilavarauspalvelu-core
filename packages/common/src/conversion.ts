@@ -73,8 +73,8 @@ export function convertReservationType(type: string): ReservationTypeChoice {
 
 export function transformReserveeType(reserveeType: Maybe<string> | undefined): ReserveeType | undefined {
   switch (reserveeType) {
-    case ReserveeType.Business:
-      return ReserveeType.Business;
+    case ReserveeType.Company:
+      return ReserveeType.Company;
     case ReserveeType.Nonprofit:
       return ReserveeType.Nonprofit;
     case ReserveeType.Individual:

@@ -2,8 +2,8 @@ import React from "react";
 import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
-import { ApplicantTypeChoice, MunicipalityChoice } from "@gql/gql-types";
-import { ControlledSelect, ControlledCheckbox } from "common/src/components/form";
+import { MunicipalityChoice, ReserveeType } from "@gql/gql-types";
+import { ControlledCheckbox, ControlledSelect } from "common/src/components/form";
 import { ApplicationFormTextInput, BillingAddress, ContactPersonSection } from ".";
 import { type ApplicationPage3FormValues } from "./form";
 import { FormSubHeading } from "./styled";
@@ -19,16 +19,16 @@ export function OrganisationForm(): JSX.Element {
   } = useFormContext<ApplicationPage3FormValues>();
 
   const applicantType = watch("applicantType");
-  const hasRegistration = applicantType === ApplicantTypeChoice.Association;
+  const hasRegistration = applicantType === ReserveeType.Nonprofit;
   const hasBillingAddress = watch("hasBillingAddress");
 
   const translateError = (errorMsg?: string) => (errorMsg ? t(`application:validation.${errorMsg}`) : "");
 
   const toggleRegistration = () => {
     if (!hasRegistration) {
-      setValue("applicantType", ApplicantTypeChoice.Association);
+      setValue("applicantType", ReserveeType.Nonprofit);
     } else {
-      setValue("applicantType", ApplicantTypeChoice.Community);
+      setValue("applicantType", ReserveeType.Nonprofit);
     }
   };
 

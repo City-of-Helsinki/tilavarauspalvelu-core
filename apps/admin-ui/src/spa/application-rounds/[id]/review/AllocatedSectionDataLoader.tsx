@@ -136,7 +136,7 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
   query AllocatedTimeSlots(
     $applicationRound: Int!
     $allocatedUnit: [Int]
-    $applicantType: [ApplicantTypeChoice]
+    $applicantType: [ReserveeType]
     $applicationSectionStatus: [ApplicationSectionStatusChoice]
     $allocatedReservationUnit: [Int]
     $dayOfTheWeek: [Weekday]
