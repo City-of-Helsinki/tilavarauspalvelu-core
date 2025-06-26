@@ -1713,7 +1713,7 @@ type ReservationSeriesNode implements Node {
   endDate: Date!
   endTime: Time!
   recurrenceInDays: Int
-  weekdays: [String!]!
+  weekdays: [Weekday]!
   reservationUnit: ReservationUnitNode!
   user: UserNode!
   allocatedTimeSlot: AllocatedTimeSlotNode
