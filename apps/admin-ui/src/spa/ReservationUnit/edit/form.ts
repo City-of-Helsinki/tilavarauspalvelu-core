@@ -1,21 +1,23 @@
 import { convertTime, filterNonNullable, timeToMinutes, toNumber } from "common/src/helpers";
-import { fromApiDate, fromUIDate, toUIDate, toApiDate } from "common/src/common/util";
+import { fromApiDate, fromUIDate, toApiDate, toUIDate } from "common/src/common/util";
 import {
-  ReservationStartInterval,
+  AccessType,
   Authentication,
-  ReservationKind,
-  PriceUnit,
   ImageType,
+  PaymentType,
+  PriceUnit,
+  ReservationKind,
+  ReservationStartInterval,
   type ReservationUnitEditQuery,
   type ReservationUnitPricingSerializerInput,
-  AccessType,
-  PaymentType,
+  Weekday,
 } from "@gql/gql-types";
 import { addDays, endOfDay, format } from "date-fns";
 import { z } from "zod";
 import { checkLengthWithoutHtml, checkTimeStringFormat } from "common/src/schemas/schemaCommon";
 import { fromUIDateTime } from "@/helpers";
 import { intervalToNumber } from "@/schemas/utils";
+import { WEEKDAYS_SORTED } from "common/src/const";
 
 export const AccessTypes = ["ACCESS_CODE", "OPENED_BY_STAFF", "PHYSICAL_KEY", "UNRESTRICTED"] as const;
 
@@ -159,7 +161,7 @@ const ReservableTimeSchema = z.object({
 const SeasonalFormSchema = z.object({
   pk: z.number(),
   closed: z.boolean(),
-  weekday: z.number().min(0).max(6),
+  weekday: z.nativeEnum(Weekday),
   // unregister leaves undefined in the array
   // undefined => not rendered, not saved
   // empty => rendered as empty, not saved
@@ -239,7 +241,7 @@ function validateSeasonalTimes(data: SeasonalFormType[], ctx: z.RefinementCtx): 
         });
       }
 
-      // check that the begin is before the end
+      // check that the beginning is before the end
       const t1 = beginTimeMinutes;
       const t2 = endTimeMinutes;
       if (t1 >= t2 && t2 !== 0) {
@@ -677,6 +679,7 @@ function convertBegins(begins?: string) {
 }
 
 type PricingNode = NonNullable<Node["pricings"]>[0];
+
 function convertPricing(p?: PricingNode): PricingFormValues {
   const lowestPriceNet = Math.floor(100 * (toNumber(p?.lowestPriceNet) ?? 0)) / 100;
   const highestPriceNet = Math.floor(100 * (toNumber(p?.highestPriceNet) ?? 0)) / 100;
@@ -746,17 +749,16 @@ function convertImage(image?: Node["images"][0]): ImageFormType {
 function convertSeasonalList(
   data: NonNullable<Node["applicationRoundTimeSlots"]>
 ): ReservationUnitEditFormValues["seasons"] {
-  const days = [0, 1, 2, 3, 4, 5, 6];
-  return days.map((d) => {
-    const season = data.find((s) => s.weekday === d);
-
-    const times = filterNonNullable(season?.reservableTimes).map((rt) => ({
-      begin: convertTime(rt.begin),
-      end: convertTime(rt.end),
+  return WEEKDAYS_SORTED.map((weekday) => {
+    const season = data.find((s) => s.weekday === weekday);
+    const times = filterNonNullable(season?.reservableTimes).map((reservableTimes) => ({
+      begin: convertTime(reservableTimes.begin),
+      end: convertTime(reservableTimes.end),
     }));
+
     return {
       pk: season?.pk ?? 0,
-      weekday: d,
+      weekday: weekday,
       closed: season?.isClosed ?? false,
       reservableTimes: times.length > 0 ? times : [{ begin: "", end: "" }],
     };
@@ -956,20 +958,21 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues) 
 }
 
 function transformPricing(
-  p: PricingFormValues,
+  values: PricingFormValues,
   hasFuturePricing: boolean
 ): ReservationUnitPricingSerializerInput | null {
-  if (!hasFuturePricing && isAfterToday(p.begins)) {
+  if (!hasFuturePricing && isAfterToday(values.begins)) {
     return null;
   }
-  const begins = fromUIDate(p.begins) ?? new Date();
+
+  const begins = fromUIDate(values.begins) ?? new Date();
   return {
-    ...(p.taxPercentage > 0 ? { taxPercentage: p.taxPercentage } : {}),
+    taxPercentage: values.taxPercentage,
     begins: toApiDate(begins) ?? "",
-    highestPrice: p.isPaid ? p.highestPrice.toString() : "0",
-    lowestPrice: p.isPaid ? p.lowestPrice.toString() : "0",
-    ...(p.pk > 0 ? { pk: p.pk } : {}),
-    ...(p.priceUnit != null ? { priceUnit: p.priceUnit } : {}),
-    ...(p.paymentType != null ? { paymentType: p.paymentType } : {}),
+    highestPrice: values.isPaid ? values.highestPrice.toString() : "0",
+    lowestPrice: values.isPaid ? values.lowestPrice.toString() : "0",
+    ...(values.pk > 0 ? { pk: values.pk } : {}),
+    ...(values.priceUnit != null ? { priceUnit: values.priceUnit } : {}),
+    ...(values.paymentType != null ? { paymentType: values.paymentType } : {}),
   };
 }

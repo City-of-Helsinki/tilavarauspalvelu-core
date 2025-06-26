@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { ReservationStartInterval, ReservationTypeChoice } from "@gql/gql-types";
+import { ReservationStartInterval, ReservationTypeChoice, Weekday } from "@gql/gql-types";
 import { fromUIDate } from "common/src/common/util";
-import { ReservationTypeSchema, checkReservationInterval, checkStartEndTime } from "./reservation";
+import { checkReservationInterval, checkStartEndTime, ReservationTypeSchema } from "./reservation";
 import { checkDateNotInPast, checkTimeStringFormat } from "common/src/schemas/schemaCommon";
 import { intervalToNumber } from "./utils";
 
@@ -11,7 +11,7 @@ import { intervalToNumber } from "./utils";
 
 // NOTE schema refinement is quirky since zod objects can't be merged after it
 // always use the exact refined scheme for validation and displaying errors to the user
-// the merged schemes are for type inferance.
+// the merged schemes are for type inference.
 
 // NOTE zod doesn't run refinements if part of the required data is missing
 // i.e. the core zod schema is run first if it passes then refinements are run
@@ -22,7 +22,7 @@ const timeSelectionSchemaBase = z.object({
   endingDate: z.string(),
   startTime: z.string(),
   endTime: z.string(),
-  repeatOnDays: z.array(z.number()).min(1).max(7),
+  repeatOnDays: z.array(z.nativeEnum(Weekday)).min(1).max(7),
   repeatPattern: z.literal("weekly").or(z.literal("biweekly")),
 });
 

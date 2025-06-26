@@ -18,6 +18,7 @@ import { formatDate, formatDateTimeRange, getReserveeName } from "@/common/util"
 import { fromAPIDateTime } from "@/helpers";
 import { filterNonNullable, sort, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
+import { convertWeekday } from "common/src/conversion";
 
 type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
@@ -211,15 +212,15 @@ function createRecurringTagString(reservation: CreateTagStringFragment, t: TFunc
   const recurringTag = `${formatDate(beginDate)}–${formatDate(endDate)}`;
   const unitTag = reservationUnitName(reservation.reservationUnit);
 
-  const weekDayTag = sort(filterNonNullable(weekdays), (a, b) => a - b)
-    .map((x) => t(`dayShort.${x}`))
-    .reduce((agv, x) => `${agv}${agv.length > 0 ? "," : ""} ${x}`, "");
-
   const begin = fromAPIDateTime(beginDate, beginTime);
   const end = fromAPIDateTime(endDate, endTime);
   if (begin == null || end == null) {
     return "";
   }
+
+  const weekDayTag = sort(filterNonNullable(weekdays), (a, b) => convertWeekday(a) - convertWeekday(b))
+    .map((x) => t(`dayShort.${x}`))
+    .reduce((agv, x) => `${agv}${agv.length > 0 ? "," : ""} ${x}`, ""); // Why not just use ARRAY.join(", ")
 
   const durMinutes = differenceInMinutes(new Date(reservation.endsAt), new Date(reservation.beginsAt));
   const durationTag = formatDuration(t, { minutes: durMinutes });

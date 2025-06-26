@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  type CreateStaffReservationFragment,
+  type Maybe,
   ReservationTypeChoice,
   useReservationUnitQuery,
-  type Maybe,
-  type CreateStaffReservationFragment,
 } from "@gql/gql-types";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { Button, TextInput, Notification, ButtonVariant, LoadingSpinner } from "hds-react";
+import { Button, ButtonVariant, LoadingSpinner, Notification, TextInput } from "hds-react";
 import styled from "styled-components";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { fromUIDate } from "common/src/common/util";
 import {
-  ReservationSeriesFormSchema,
   type ReservationFormMeta,
   type ReservationSeriesForm as ReservationSeriesFormT,
+  ReservationSeriesFormSchema,
 } from "@/schemas";
 import { type NewReservationListItem } from "@/component/ReservationsList";
 import { WeekdaysSelector } from "./WeekdaysSelector";
@@ -31,7 +31,7 @@ import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { useDisplayError } from "common/src/hooks";
 import { getSeriesOverlapErrors } from "common/src/apolloUtils";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { ReservationListEditor, isReservationEq } from "@/component/ReservationListEditor";
+import { isReservationEq, ReservationListEditor } from "@/component/ReservationListEditor";
 import { getBufferTime, getNormalizedInterval } from "@/helpers";
 import { SelectFilter } from "@/component/QueryParamFilters";
 
@@ -91,6 +91,7 @@ function ReservationSeriesFormWrapper({ reservationUnits }: Props) {
 export { ReservationSeriesFormWrapper as ReservationSeriesForm };
 
 type FormValues = ReservationSeriesFormT & ReservationFormMeta;
+
 function ReservationSeriesForm({ reservationUnit }: { reservationUnit: Maybe<CreateStaffReservationFragment> }) {
   const { t } = useTranslation();
 
@@ -324,7 +325,6 @@ function ReservationSeriesForm({ reservationUnit }: { reservationUnit: Maybe<Cre
             <ReservationTypeForm reservationUnit={reservationUnit}>
               <InnerTextInput
                 id="seriesName"
-                disabled={reservationUnit == null}
                 label={t(`${TRANS_PREFIX}.name`)}
                 required
                 {...register("seriesName")}

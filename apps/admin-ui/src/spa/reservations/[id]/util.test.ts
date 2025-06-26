@@ -5,6 +5,7 @@ import {
   PriceUnit,
   type PricingFieldsFragment,
   type ReservationUnitPricingFieldsFragment,
+  Weekday,
 } from "@gql/gql-types";
 import { createTagString, getReservationUnitPricing } from "./util";
 import { addHours, addMonths } from "date-fns";
@@ -74,7 +75,7 @@ function constructReservation({
           endTime: "14:00",
           beginDate: toApiDateUnsafe(beginsAt),
           endDate: toApiDateUnsafe(addMonths(endsAt, 3)),
-          weekdays: [0, 1, 3],
+          weekdays: [Weekday.Monday, Weekday.Tuesday, Weekday.Thursday],
         }
       : null,
     reservationUnit: {
@@ -109,7 +110,9 @@ describe("createTag", () => {
     const input = constructReservation({ beginsAt, endsAt, enableRecurrence: true });
 
     const tag = createTagString(input, mockT);
-    expect(tag).toContain("dayShort.0, dayShort.1, dayShort.3 12:00–14:00, common:abbreviations:hour");
+    expect(tag).toContain(
+      "dayShort.MONDAY, dayShort.TUESDAY, dayShort.THURSDAY 12:00–14:00, common:abbreviations:hour"
+    );
     expect(tag).toContain("1.4.2023–1.7.2023");
     expect(tag).toContain("Reservation unit 1");
   });
@@ -121,7 +124,7 @@ describe("createTag", () => {
     });
 
     const tag = createTagString(input, mockT);
-    expect(tag).not.toContain("dayShort.0, dayShort.1, dayShort.3");
+    expect(tag).not.toContain("dayShort.MONDAY, dayShort.TUESDAY, dayShort.THURSDAY");
     expect(tag).toContain("1.4.2023");
     expect(tag).toContain("12:00–14:00, common:abbreviations:hour");
     expect(tag).toContain("dayShort.5");
