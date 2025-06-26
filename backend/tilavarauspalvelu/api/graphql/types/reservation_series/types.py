@@ -8,7 +8,7 @@ from graphene_django_extensions import DjangoNode
 from lookup_property import L
 from query_optimizer import AnnotatedField, MultiField
 
-from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued
+from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, Weekday
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import ReservationSeries
 from utils.date_utils import local_date
@@ -65,6 +65,10 @@ class ReservationSeriesNode(DjangoNode):
     is_access_code_is_active_correct = AnnotatedField(
         graphene.Boolean,
         expression=L("is_access_code_is_active_correct"),
+        required=True,
+    )
+    weekdays = graphene.Field(
+        graphene.List(graphene.Enum.from_enum(Weekday)),
         required=True,
     )
 
