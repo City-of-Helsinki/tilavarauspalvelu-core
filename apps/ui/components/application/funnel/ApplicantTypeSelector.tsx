@@ -1,7 +1,7 @@
 import React from "react";
 import { RadioButton } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { ApplicantTypeChoice } from "@gql/gql-types";
+import { ReserveeType } from "@gql/gql-types";
 import { useController, useFormContext } from "react-hook-form";
 import type { ApplicationPage3FormValues } from "./form";
 import { Flex } from "common/styled";
@@ -26,11 +26,8 @@ export function ApplicantTypeSelector(): JSX.Element {
     control,
   });
   // Community and association are the same except for corporate id
-  const choices = Object.values(ApplicantTypeChoice).filter((id) => id !== ApplicantTypeChoice.Community);
+  const choices = Object.values(ReserveeType).filter((id) => id !== ReserveeType.Nonprofit);
 
-  const selection = choices.find(
-    (id) => id === value || (id === ApplicantTypeChoice.Association && value === ApplicantTypeChoice.Community)
-  );
   const error = errors.applicantType;
 
   const errorText = error?.message ? t(`application:validation.${error.message}`) : undefined;
@@ -48,7 +45,7 @@ export function ApplicantTypeSelector(): JSX.Element {
             id={id}
             label={t(`application:Page3.as.type.${id}`)}
             onClick={() => onChange(id)}
-            checked={selection === id}
+            checked={value === id}
           />
         ))}
       </div>

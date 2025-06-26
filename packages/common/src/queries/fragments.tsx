@@ -9,8 +9,7 @@ export const RESERVEE_BILLING_FRAGMENT = gql`
     reserveePhone
     reserveeType
     reserveeOrganisationName
-    reserveeId
-    reserveeIsUnregisteredAssociation
+    reserveeIdentifier
     reserveeAddressStreet
     reserveeAddressCity
     reserveeAddressZip

@@ -1,5 +1,5 @@
 import { camelCase, get, uniq } from "lodash-es";
-import { CustomerTypeChoice, type ReservationMetadataFieldNode } from "../../gql/gql-types";
+import { type ReservationMetadataFieldNode, ReserveeType } from "../../gql/gql-types";
 import { reservationApplicationFields } from "./types";
 import { containsField } from "../metaFieldsHelpers";
 
@@ -8,7 +8,7 @@ export function getReservationApplicationFields({
   reserveeType,
 }: {
   supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
-  reserveeType: CustomerTypeChoice | "common";
+  reserveeType: ReserveeType | "common";
 }): string[] {
   if (!supportedFields || supportedFields?.length === 0) {
     return [];

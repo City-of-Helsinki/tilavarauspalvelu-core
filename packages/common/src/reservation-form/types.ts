@@ -1,4 +1,4 @@
-import { type CustomerTypeChoice, MunicipalityChoice } from "../../gql/gql-types";
+import { MunicipalityChoice, type ReserveeType } from "../../gql/gql-types";
 
 type Billing = {
   billingFirstName: string;
@@ -32,7 +32,7 @@ type CommonInputs = {
   purpose: number;
   numPersons: number;
   ageGroup: number;
-  reserveeType?: CustomerTypeChoice;
+  reserveeType?: ReserveeType;
   freeOfChargeReason: string;
   applyingForFreeOfCharge: boolean;
 };
@@ -42,7 +42,7 @@ export type Inputs = {
   // TODO why is this optional unlike other fields?
   showBillingAddress?: boolean;
   reserveeIsUnregisteredAssociation?: boolean;
-  reserveeId?: number;
+  reserveeIdentifier?: number;
 } & Billing &
   Reservee &
   CommonInputs;
@@ -86,10 +86,10 @@ export const reservationApplicationFields = {
     "reservee_organisation_name",
     "municipality",
     "reservee_is_unregistered_association",
-    "reservee_id",
+    "reservee_identifier",
     ...fieldsCommon,
   ],
-  business: ["reservee_organisation_name", "municipality", "reservee_id", ...fieldsCommon],
+  company: ["reservee_organisation_name", "municipality", "reservee_identifier", ...fieldsCommon],
   common: [
     "reservee_type",
     "name",

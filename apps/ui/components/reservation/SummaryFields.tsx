@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
-import { CustomerTypeChoice, MunicipalityChoice, type ReservationNode } from "@/gql/gql-types";
+import { MunicipalityChoice, type ReservationNode, ReserveeType } from "@/gql/gql-types";
 import { containsField, type FieldName } from "common/src/metaFieldsHelpers";
 import { AutoGrid, H4 } from "common/styled";
 import { type MetaFieldsFragment } from "common/gql/gql-types";
@@ -38,7 +38,7 @@ export function getApplicationFields({
 }: {
   supportedFields: FieldName[];
   reservation: MetaFieldsFragment;
-  reserveeType: CustomerTypeChoice;
+  reserveeType: ReserveeType;
 }) {
   const applicationFields = getReservationApplicationFields({
     supportedFields,
@@ -84,8 +84,8 @@ export function ApplicationFields({
     console.warn("getApplicationFields: reserveeType is null, but it is required");
   }
   const reserveeType = includesReserveeType
-    ? (reservation.reserveeType ?? CustomerTypeChoice.Individual)
-    : CustomerTypeChoice.Individual;
+    ? (reservation.reserveeType ?? ReserveeType.Individual)
+    : ReserveeType.Individual;
 
   const filteredApplicationFields = getApplicationFields({
     supportedFields,

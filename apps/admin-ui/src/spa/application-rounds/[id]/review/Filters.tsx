@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { AutoGrid, HR } from "common/styled";
 import { SearchTags } from "@/component/SearchTags";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
-import { AccessCodeState, ApplicantTypeChoice, ApplicationSectionStatusChoice } from "@gql/gql-types";
+import { AccessCodeState, ApplicationSectionStatusChoice, ReserveeType } from "@gql/gql-types";
 import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
 
 type UnitPkName = {
@@ -42,7 +42,7 @@ export function Filters({
     value: status,
   }));
 
-  const applicantOptions = Object.values(ApplicantTypeChoice).map((applicant) => ({
+  const applicantOptions = Object.values(ReserveeType).map((applicant) => ({
     label: t(`Application.applicantTypes.${applicant}`),
     value: applicant,
   }));

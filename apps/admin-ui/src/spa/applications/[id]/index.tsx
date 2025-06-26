@@ -1,33 +1,33 @@
-import React, { useRef, type ReactNode } from "react";
+import React, { type ReactNode, useRef } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { Button, IconCross, IconArrowRedo, Tag, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
+import { Button, ButtonSize, ButtonVariant, IconArrowRedo, IconCross, LoadingSpinner, Tag } from "hds-react";
 import { isEqual, trim } from "lodash-es";
-import { gql, type ApolloQueryResult } from "@apollo/client";
+import { type ApolloQueryResult, gql } from "@apollo/client";
 import { type TFunction } from "i18next";
-import { CenterSpinner, Flex, TitleSection, H1, H3, H4, fontMedium } from "common/styled";
+import { CenterSpinner, Flex, fontMedium, H1, H3, H4, TitleSection } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { base64encode, filterNonNullable, toNumber } from "common/src/helpers";
 import {
-  ApplicationStatusChoice,
-  ApplicantTypeChoice,
-  type Maybe,
-  useRestoreAllApplicationOptionsMutation,
-  useRejectAllApplicationOptionsMutation,
-  useRestoreAllSectionOptionsMutation,
-  useRejectAllSectionOptionsMutation,
-  useApplicationAdminQuery,
   type ApplicationAdminQuery,
-  useRejectRestMutation,
-  UserPermissionChoice,
-  type ReservationUnitOptionFieldsFragment,
-  type ApplicationPageSectionFragment,
   type ApplicationPageFieldsFragment,
+  type ApplicationPageSectionFragment,
+  ApplicationStatusChoice,
+  type Maybe,
+  type ReservationUnitOptionFieldsFragment,
+  ReserveeType,
+  useApplicationAdminQuery,
+  useRejectAllApplicationOptionsMutation,
+  useRejectAllSectionOptionsMutation,
+  useRejectRestMutation,
+  useRestoreAllApplicationOptionsMutation,
+  useRestoreAllSectionOptionsMutation,
+  UserPermissionChoice,
 } from "@gql/gql-types";
 import { formatDuration } from "common/src/common/util";
 import { ApplicationTimePreview } from "common/src/components/ApplicationTimePreview";
-import { formatNumber, formatDate, formatAgeGroups, formatDateRange } from "@/common/util";
+import { formatAgeGroups, formatDate, formatDateRange, formatNumber } from "@/common/util";
 import ScrollIntoView from "@/common/ScrollIntoView";
 import { Accordion as AccordionBase } from "@/component/Accordion";
 import { ApplicationWorkingMemo } from "@/component/WorkingMemo";
@@ -50,6 +50,7 @@ const Value = styled.span`
 
 const Accordion = styled(AccordionBase)`
   --spacing-unit: 0;
+
   & h2 {
     --header-padding: var(--spacing-xs);
     margin: 0;
@@ -64,6 +65,7 @@ const PreCard = styled.div`
 // TODO reusable Tags that allow setting both the background and optional Icon
 const DeclinedTag = styled(Tag)`
   background-color: var(--color-metro-medium-light);
+
   > span > span {
     display: flex;
     align-items: center;
@@ -264,6 +266,7 @@ const TimeSection = styled.div`
   }
 
   /* force legend to next row after calendar */
+
   > :nth-child(2) {
     grid-row: 2;
   }
@@ -272,6 +275,7 @@ const TimeSection = styled.div`
 interface DataType extends ReservationUnitOptionFieldsFragment {
   index: number;
 }
+
 type ColumnType = {
   key: string;
   transform: (data: DataType) => ReactNode;
@@ -687,7 +691,7 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
         {hasBillingAddress ? (
           <>
             <H3 as="h2" $noMargin>
-              {application.applicantType === ApplicantTypeChoice.Individual
+              {application.applicantType === ReserveeType.Individual
                 ? t("Application.contactInformation")
                 : t("common.billingAddress")}
             </H3>
@@ -704,8 +708,9 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
 }
 
 interface IRouteParams {
-  [key: string]: string;
   applicationId: string;
+
+  [key: string]: string;
 }
 
 function ApplicationDetailsRouted(): JSX.Element {

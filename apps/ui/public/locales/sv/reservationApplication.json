@@ -7,7 +7,7 @@
   "reserveeTypes": {
     "labels": {
       "nonprofit": "för en organisation, grupp eller samfund",
-      "business": "för ett företag",
+      "company": "för ett företag",
       "individual": "som privatkund"
     }
   },
@@ -32,7 +32,7 @@
       "reserveeEmail": "Kontaktpersonens e-postadress",
       "reserveePhone": "Kontaktpersonens telefonnummer",
       "reserveeOrganisationName": "Officiellt namn",
-      "reserveeId": "FO-nummer",
+      "reserveeIdentifier": "FO-nummer",
       "reserveeIsUnregisteredAssociation": "Sammanslutningen är inte registrerad",
       "municipality": "Hemort",
       "showBillingAddress": "Faktureringsadress",
@@ -62,7 +62,7 @@
       "billingAddressZip": "Postnummer",
       "billingAddressCity": "Postanstalt"
     },
-    "business": {
+    "company": {
       "reserveeFirstName": "Kontaktpersonens förnamn",
       "reserveeLastName": "Kontaktpersonens efternamn",
       "reserveeAddressStreet": "Gatuadress",
@@ -71,7 +71,7 @@
       "reserveeEmail": "Kontaktpersonens e-postadress",
       "reserveePhone": "Kontaktpersonens telefonnummer",
       "reserveeOrganisationName": "Officiellt namn",
-      "reserveeId": "FO-nummer",
+      "reserveeIdentifier": "FO-nummer",
       "municipality": "Hemort",
       "showBillingAddress": "Faktureringsadress",
       "billingFirstName": "Bokarens förnamn",
