@@ -1,8 +1,8 @@
 import { addDays } from "date-fns";
-import { ReservationStartInterval, ReservationTypeChoice } from "@gql/gql-types";
+import { ReservationStartInterval, ReservationTypeChoice, Weekday } from "@gql/gql-types";
 import { ReservationSeriesForm, ReservationSeriesFormSchema } from "./reservationSeries";
 import { toUIDate } from "common/src/common/util";
-import { test, expect } from "vitest";
+import { expect, test } from "vitest";
 
 const tomorrow = addDays(new Date(), 1);
 const interval = ReservationStartInterval.Interval_15Mins;
@@ -11,7 +11,7 @@ function createInput({
   type = ReservationTypeChoice.Blocked,
   startingDate = toUIDate(tomorrow),
   endingDate = toUIDate(addDays(tomorrow, 6)),
-  repeatOnDays = [1],
+  repeatOnDays = [Weekday.Tuesday],
   repeatPattern = "weekly",
   startTime = "09:00",
   endTime = "10:15",

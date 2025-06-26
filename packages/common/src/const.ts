@@ -1,7 +1,17 @@
-import { ReservationStateChoice } from "../gql/gql-types";
+import { ReservationStateChoice, Weekday } from "../gql/gql-types";
 
 export const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6] as const;
 export type DayT = (typeof WEEKDAYS)[number];
+
+export const WEEKDAYS_SORTED: Weekday[] = [
+  Weekday.Monday,
+  Weekday.Tuesday,
+  Weekday.Wednesday,
+  Weekday.Thursday,
+  Weekday.Friday,
+  Weekday.Saturday,
+  Weekday.Sunday,
+];
 
 export const genericTermsVariant = {
   BOOKING: "booking",

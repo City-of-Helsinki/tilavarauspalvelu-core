@@ -18,29 +18,28 @@ import { Flex, H4 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import {
   type ApplicationRoundTimeSlotFieldsFragment,
-  type ReservationCreateMutationInput,
-  useCreateReservationMutation,
-  type ReservationUnitPageQuery,
-  type ReservationUnitPageQueryVariables,
-  ReservationUnitPageDocument,
-  RelatedReservationUnitsDocument,
-  type RelatedReservationUnitsQuery,
-  type RelatedReservationUnitsQueryVariables,
   CreateReservationDocument,
   type CreateReservationMutation,
   type CreateReservationMutationVariables,
   CurrentUserDocument,
   type CurrentUserQuery,
-  type TimeSlotType,
-  type RelatedUnitCardFieldsFragment,
   type PricingFieldsFragment,
+  RelatedReservationUnitsDocument,
+  type RelatedReservationUnitsQuery,
+  type RelatedReservationUnitsQueryVariables,
+  type RelatedUnitCardFieldsFragment,
+  type ReservationCreateMutationInput,
+  ReservationUnitPageDocument,
+  type ReservationUnitPageQuery,
+  type ReservationUnitPageQueryVariables,
+  type TimeSlotType,
+  useCreateReservationMutation,
 } from "@gql/gql-types";
 import {
   base64encode,
   filterNonNullable,
   formatListToCSV,
   formatTimeRange,
-  fromMondayFirstUnsafe,
   ignoreMaybeArray,
   isPriceFree,
   timeToMinutes,
@@ -60,9 +59,9 @@ import {
 } from "@/modules/reservationUnit";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import {
-  type FocusTimeSlot,
   convertFormToFocustimeSlot,
   createDateTime,
+  type FocusTimeSlot,
   getDurationOptions,
 } from "@/modules/reservation";
 import { clampDuration, getMaxReservationDuration, getMinReservationDuration } from "@/modules/reservable";
@@ -70,8 +69,8 @@ import { SubventionSuffix } from "@/components/reservation";
 import InfoDialog from "@/components/common/InfoDialog";
 import {
   AddressSection,
-  Head,
   EquipmentList,
+  Head,
   QuickReservation,
   RelatedUnits,
   ReservationInfoSection,
@@ -89,7 +88,7 @@ import { getReservationInProgressPath, getSingleSearchPath } from "@/modules/url
 import { Accordion, ButtonVariant, LoadingSpinner } from "hds-react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useDisplayError } from "common/src/hooks";
-import { useRemoveStoredReservation, useAvailableTimes, useToastIfQueryParam, useBlockingReservations } from "@/hooks";
+import { useAvailableTimes, useBlockingReservations, useRemoveStoredReservation, useToastIfQueryParam } from "@/hooks";
 import { gql } from "@apollo/client";
 import { type ApiError, getApiErrors } from "common/src/apolloUtils";
 import { formatErrorMessage } from "common/src/hooks/useDisplayError";
@@ -134,9 +133,7 @@ function ApplicationRoundScheduleDay(props: ApplicationRoundTimeSlotFieldsFragme
   const reservableTimes = filterNonNullable(props.reservableTimes);
   return (
     <StyledApplicationRoundScheduleDay>
-      <span data-testid="application-round-time-slot__weekday">
-        {t(`common:weekDayLong.${fromMondayFirstUnsafe(weekday)}`)}
-      </span>{" "}
+      <span data-testid="application-round-time-slot__weekday">{t(`common:weekdayLongEnum.${weekday}`)}</span>{" "}
       {isClosed ? (
         <span data-testid="application-round-time-slot__value">-</span>
       ) : (

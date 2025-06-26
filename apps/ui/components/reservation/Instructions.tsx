@@ -13,6 +13,7 @@ export function Instructions({ reservation }: Props): JSX.Element | null {
 
   const lang = convertLanguageCode(i18n.language);
   const instructionsKey = getReservationUnitInstructionsKey(reservation.state);
+
   const instructionsText =
     instructionsKey != null ? getTranslationSafe(reservation.reservationUnit, instructionsKey, lang) : null;
   const showInstructions = instructionsKey != null && instructionsText != null && instructionsText !== "";
