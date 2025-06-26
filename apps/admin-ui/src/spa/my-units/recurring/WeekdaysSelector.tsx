@@ -5,8 +5,9 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { WEEKDAYS } from "common/src/const";
+import { WEEKDAYS_SORTED } from "common/src/const";
 import { Flex } from "common/styled";
+import { Weekday } from "@gql/gql-types";
 
 const Day = styled.button`
   background-color: var(--color-black-5);
@@ -69,16 +70,16 @@ const WarningIcon = () => (
 
 type Props = {
   label: string;
-  value: number[];
+  value: Weekday[];
   disabled?: boolean;
-  onChange: (value: number[]) => void;
+  onChange: (value: Weekday[]) => void;
   errorText?: string;
 };
 
 export function WeekdaysSelector({ label, value = [], disabled = false, onChange, errorText }: Props) {
   const { t } = useTranslation();
 
-  const handleDayToggle = (day: number) => {
+  const handleDayToggle = (day: Weekday) => {
     if (value.includes(day)) {
       const vals = value.filter((d) => d !== day);
       onChange(vals);
@@ -93,7 +94,7 @@ export function WeekdaysSelector({ label, value = [], disabled = false, onChange
     <div>
       <Label>{label}</Label>
       <Flex $gap="s" $direction="row">
-        {WEEKDAYS.map((weekday) => (
+        {WEEKDAYS_SORTED.map((weekday) => (
           <Day
             key={`weekday-${weekday}`}
             disabled={disabled}

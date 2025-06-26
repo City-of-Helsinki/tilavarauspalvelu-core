@@ -1,6 +1,6 @@
 import React from "react";
-import { Priority, type ApplicationAdminQuery } from "@gql/gql-types";
-import { convertWeekday } from "common/src/conversion";
+import { type ApplicationAdminQuery, Priority } from "@gql/gql-types";
+import { convertWeekday, transformWeekday } from "common/src/conversion";
 import { filterNonNullable } from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
 import { ApplicationTimeSelector, type Cell } from "common/src/components/ApplicationTimeSelector";
@@ -21,12 +21,12 @@ function timeRangeToCell(timeRanges: SuitableTimeRangeType[]): Cell[][] {
 
   const cells: Cell[][] = [];
 
-  for (const j of WEEKDAYS) {
+  for (const weekdayNumber of WEEKDAYS) {
     const day: Cell[] = [];
     for (let i = firstSlotStart; i <= lastSlotStart; i += 1) {
       day.push({
         hour: i,
-        day: j,
+        weekday: transformWeekday(weekdayNumber),
         state: "none",
         // TODO need open and close times for the reservation unit
         openState: "open",
@@ -45,8 +45,7 @@ function timeRangeToCell(timeRanges: SuitableTimeRangeType[]): Cell[][] {
     for (let h = hourBegin; h < hourEnd; h += 1) {
       const cell = cells[day]?.[h];
       if (cell) {
-        const p = priority === Priority.Primary ? "primary" : "secondary";
-        cell.state = p;
+        cell.state = priority === Priority.Primary ? "primary" : "secondary";
       }
     }
   }

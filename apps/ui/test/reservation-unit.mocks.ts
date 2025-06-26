@@ -10,6 +10,7 @@ import {
   ReservationUnitPublishingState,
   ReservationUnitReservationState,
   type UnitNode,
+  Weekday,
 } from "@/gql/gql-types";
 import { ReservableMap, type RoundPeriod } from "@/modules/reservable";
 import { base64encode } from "common/src/helpers";
@@ -51,7 +52,7 @@ export function createMockIsReservableFieldsFragment({
   reservationsMinDaysBefore = 0,
   reservationsMaxDaysBefore = null,
 }: MockReservationUnitProps): ReservationUnitType {
-  const reservationUnit: ReservationUnitType = {
+  return {
     id: "1",
     bufferTimeBefore: 60 * 60 * bufferTimeBefore,
     bufferTimeAfter: 60 * 60 * bufferTimeAfter,
@@ -63,14 +64,13 @@ export function createMockIsReservableFieldsFragment({
     reservationBeginsAt: addDays(new Date(), -1).toISOString(),
     reservationEndsAt: addDays(new Date(), 180).toISOString(),
   };
-  return reservationUnit;
 }
 
 export function createMockReservationUnit({ pk }: { pk: number }): ReservationUnitNode {
   const timeSelector: ApplicationRoundTimeSlotNode = {
     id: base64encode(`ApplicationRoundTimeSlotNode:1`),
     pk,
-    weekday: 1,
+    weekday: Weekday.Tuesday,
     isClosed: false,
     reservableTimes: [
       {

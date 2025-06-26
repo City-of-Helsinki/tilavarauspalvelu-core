@@ -1,7 +1,7 @@
 import { type SuitableTimeRangeFormValues } from "./form";
-import { type ApplicationRoundTimeSlotNode, Priority, SuitableTimeFragment } from "@/gql/gql-types";
+import { type ApplicationRoundTimeSlotNode, Priority, SuitableTimeFragment, Weekday } from "@/gql/gql-types";
 import { type Cell, type CellState } from "common/src/components/ApplicationTimeSelector";
-import { WEEKDAYS, DayT } from "common/src/const";
+import { DayT, WEEKDAYS, WEEKDAYS_SORTED } from "common/src/const";
 import { convertWeekday, transformWeekday } from "common/src/conversion";
 import { filterNonNullable, formatTimeStruct, timeToMinutes } from "common/src/helpers";
 
@@ -20,8 +20,8 @@ const LAST_SLOT_START = 23;
 export function createCells(openingHours: DailyOpeningHours): WeekCells {
   const cells: Cell[][] = [];
 
-  for (const day of WEEKDAYS) {
-    const dayOpeningHours = getOpeningHours(day, openingHours).map((t) => {
+  for (const weekday of WEEKDAYS_SORTED) {
+    const dayOpeningHours = getOpeningHours(weekday, openingHours).map((t) => {
       const beginMins = timeToMinutes(t.begin);
       const endMins = timeToMinutes(t.end);
       return {
@@ -34,7 +34,7 @@ export function createCells(openingHours: DailyOpeningHours): WeekCells {
     for (let i = FIRST_SLOT_START; i <= LAST_SLOT_START; i += 1) {
       const isAvailable = dayOpeningHours.some((t) => t.begin != null && t.end != null && t?.begin <= i && t?.end > i);
       cell.push({
-        day,
+        weekday: weekday,
         hour: i,
         state: "none",
         openState: isAvailable ? "open" : "unavailable",
@@ -48,14 +48,16 @@ export function createCells(openingHours: DailyOpeningHours): WeekCells {
 
 export function aesToCells(schedule: Readonly<SchedulesT[]>, openingHours: DailyOpeningHours): WeekCells {
   const cells = createCells(openingHours);
+
   for (const aes of schedule) {
     const { dayOfTheWeek, priority } = aes;
     const hourBegin = timeToMinutes(aes.beginTime) / 60 - FIRST_SLOT_START;
     const hourEnd = (timeToMinutes(aes.endTime) / 60 || 24) - FIRST_SLOT_START;
     const p = priority === Priority.Primary ? "primary" : "secondary";
-    const day = convertWeekday(dayOfTheWeek);
+    const weekdayNumber = convertWeekday(dayOfTheWeek);
+
     for (let h = hourBegin; h < hourEnd; h += 1) {
-      const cell = cells[day]?.[h];
+      const cell = cells[weekdayNumber]?.[h];
       if (cell) {
         cell.state = p;
       }
@@ -69,7 +71,7 @@ type OpeningHourPeriod = {
   end: string;
 };
 
-function getOpeningHours(day: number, openingHours?: DailyOpeningHours): Readonly<OpeningHourPeriod[]> {
+function getOpeningHours(day: Weekday, openingHours?: DailyOpeningHours): Readonly<OpeningHourPeriod[]> {
   if (!openingHours) {
     return [];
   }
@@ -111,6 +113,7 @@ export type TimeSpan = {
   end: number;
   priority: CellState;
 };
+
 interface AesType extends TimeSpan {
   day: DayT;
 }
@@ -141,8 +144,7 @@ function cellsToSections(cells: WeekCells): AesType[] {
   if (cells.length > 7) {
     throw new Error("Too many days");
   }
-  const range = [0, 1, 2, 3, 4, 5, 6] as const;
-  for (const day of range) {
+  for (const day of WEEKDAYS) {
     const dayCells = cells[day] ?? [];
     const transformedDayCells = dayCells
       .filter((cell) => cell.state !== "none")

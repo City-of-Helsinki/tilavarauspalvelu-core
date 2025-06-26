@@ -1,21 +1,23 @@
 import { addDays, nextMonday } from "date-fns";
 import { generateReservations } from "./generateReservations";
 import { toUIDate } from "common/src/common/util";
-import { describe, test, expect } from "vitest";
+import { describe, expect, test } from "vitest";
+import { Weekday } from "@gql/gql-types";
+import { WEEKDAYS_SORTED } from "common/src/const";
 
 function createInput({
   startingDate,
   endingDate,
   startTime = "00:00",
   endTime = "01:00",
-  repeatOnDays = [1],
+  repeatOnDays = [Weekday.Tuesday],
   repeatPattern = "weekly" as const,
 }: {
   startingDate?: Date;
   endingDate?: Date;
   startTime?: string;
   endTime?: string;
-  repeatOnDays?: number[];
+  repeatOnDays?: Weekday[];
   repeatPattern?: "weekly" | "biweekly";
 }) {
   const today = new Date();
@@ -43,7 +45,7 @@ describe("generate reservations", () => {
   test("two weeks twice a week", () => {
     const res = generateReservations(
       createInput({
-        repeatOnDays: [1, 3],
+        repeatOnDays: [Weekday.Tuesday, Weekday.Thursday],
       })
     );
     expect(res).toHaveLength(4);
@@ -52,7 +54,7 @@ describe("generate reservations", () => {
   test("two weeks every day a week => 15 elements", () => {
     const res = generateReservations(
       createInput({
-        repeatOnDays: [0, 1, 2, 3, 4, 5, 6],
+        repeatOnDays: WEEKDAYS_SORTED,
       })
     );
     expect(res).toHaveLength(14);
@@ -65,7 +67,7 @@ describe("generate reservations", () => {
       createInput({
         startingDate: start,
         endingDate: addDays(start, 7),
-        repeatOnDays: [0],
+        repeatOnDays: [Weekday.Monday],
       })
     );
     expect(res).toHaveLength(2);
@@ -77,19 +79,19 @@ describe("generate reservations", () => {
       createInput({
         startingDate: start,
         endingDate: addDays(start, 1),
-        repeatOnDays: [0, 1],
+        repeatOnDays: [Weekday.Monday, Weekday.Tuesday],
       })
     );
     expect(res).toHaveLength(2);
   });
 
-  test("repeat on moday with no monday on range => empty result", () => {
+  test("repeat on monday with no monday on range => empty result", () => {
     const start = nextMonday(new Date());
     const res = generateReservations(
       createInput({
         startingDate: addDays(start, 1),
         endingDate: addDays(start, 6),
-        repeatOnDays: [0],
+        repeatOnDays: [Weekday.Monday],
       })
     );
     expect(res).toHaveLength(0);
@@ -101,7 +103,7 @@ describe("generate reservations", () => {
     const res = generateReservations(
       createInput({
         endingDate: addDays(today, 27),
-        repeatOnDays: [0],
+        repeatOnDays: [Weekday.Monday],
       })
     );
     expect(res).toHaveLength(4);
@@ -112,7 +114,7 @@ describe("generate reservations", () => {
     const res = generateReservations(
       createInput({
         endingDate: addDays(today, 27),
-        repeatOnDays: [0],
+        repeatOnDays: [Weekday.Monday],
         repeatPattern: "biweekly",
       })
     );
@@ -125,20 +127,20 @@ describe("generate reservations", () => {
       createInput({
         startingDate: addDays(today, 28),
         endingDate: addDays(today, 20),
-        repeatOnDays: [0],
+        repeatOnDays: [Weekday.Monday],
       })
     );
     expect(res).toHaveLength(0);
   });
 
-  // start date === end date doesn't pass validators so it's gonna be empty
+  // start date === end date doesn't pass validators so it's going to be empty
   test("start date === end date => one", () => {
     const today = new Date();
     const res = generateReservations(
       createInput({
         endingDate: addDays(today, 28),
         startingDate: addDays(today, 28),
-        repeatOnDays: [0, 1, 2, 3, 4, 5, 6],
+        repeatOnDays: WEEKDAYS_SORTED,
       })
     );
     expect(res).toHaveLength(1);

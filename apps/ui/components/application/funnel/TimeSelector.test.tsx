@@ -1,17 +1,17 @@
 import { FormProvider, useForm } from "react-hook-form";
-import { test, describe, expect, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { type ApplicationPage2FormValues, convertApplicationPage2 } from "./form";
 import { TimeSelectorForm, type TimeSelectorProps } from "./TimeSelector";
 import { createMockApplicationFragment, type CreateMockApplicationFragmentProps } from "@test/application.mocks";
-import { type ApplicationPage2Query, Priority, type TimeSelectorFragment } from "@/gql/gql-types";
+import { type ApplicationPage2Query, Priority, type TimeSelectorFragment, Weekday } from "@/gql/gql-types";
 import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { transformWeekday } from "common/src/conversion";
-import { base64encode, formatTimeStruct, fromMondayFirstUnsafe } from "common/src/helpers";
+import { base64encode, formatTimeStruct } from "common/src/helpers";
 import { type OpenHoursState } from "common/src/components/ApplicationTimeSelector";
 import { selectOption } from "@/test/test.utils";
 import { toApiTime } from "common/src/common/util";
-import { type DayT } from "common/src/const";
+import { type DayT, WEEKDAYS_SORTED } from "common/src/const";
 
 type ApplicationPage2 = NonNullable<ApplicationPage2Query["application"]>;
 
@@ -121,11 +121,11 @@ describe("TimeSelector render single section", () => {
     const calendar = view.getByLabelText("application:TimeSelector.calendarLabel");
     expect(calendar).toBeInTheDocument();
 
-    for (let day = 0; day < 7; day += 1) {
+    for (const day of WEEKDAYS_SORTED) {
       for (let hour = 7; hour <= 23; hour += 1) {
         expect(within(calendar).getByTestId(`time-selector__button--${day}-${hour}`)).toBeInTheDocument();
         const btn = within(calendar).getByRole("option", {
-          name: `application:TimeSelector.legend.unavailable: common:weekDay.${day} ${hour} - ${hour + 1}`,
+          name: `application:TimeSelector.legend.unavailable: common:weekdayShortEnum.${day} ${hour} - ${hour + 1}`,
         });
         expect(btn).toBeInTheDocument();
         expect(btn).toHaveAttribute("aria-selected", "false");
@@ -157,7 +157,7 @@ describe("TimeSelector render single section", () => {
       label: "one on wednesday",
       days: [
         {
-          day: 2,
+          day: Weekday.Wednesday,
           times: [
             {
               start: 8,
@@ -171,7 +171,7 @@ describe("TimeSelector render single section", () => {
       label: "one on friday",
       days: [
         {
-          day: 5,
+          day: Weekday.Friday,
           times: [
             {
               start: 11,
@@ -185,7 +185,7 @@ describe("TimeSelector render single section", () => {
       label: "on monday and friday",
       days: [
         {
-          day: 0,
+          day: Weekday.Monday,
           times: [
             {
               start: 11,
@@ -194,7 +194,7 @@ describe("TimeSelector render single section", () => {
           ],
         },
         {
-          day: 4,
+          day: Weekday.Thursday,
           times: [
             {
               start: 11,
@@ -208,7 +208,7 @@ describe("TimeSelector render single section", () => {
       label: "thursday with a gap",
       days: [
         {
-          day: 3,
+          day: Weekday.Thursday,
           times: [
             {
               start: 8,
@@ -251,19 +251,17 @@ describe("TimeSelector render single section", () => {
       });
       expect(unavailable).toHaveLength(7 * 17 - totalHours); // 7 days, 17 hours (7-23)
 
-      function isAvailable(day: DayT, hour: number): boolean {
+      function isAvailable(day: Weekday, hour: number): boolean {
         // sunday first
-        const time = days.find(
-          (t) => fromMondayFirstUnsafe(t.day) === day && t.times.some((x) => hour >= x.start && hour < x.end)
-        );
+        const time = days.find((t) => t.day === day && t.times.some((x) => hour >= x.start && hour < x.end));
         return !!time;
       }
 
-      for (const day of [0, 1, 2, 3, 4, 5, 6] as const) {
+      for (const day of WEEKDAYS_SORTED) {
         for (let hour = 7; hour <= 23; hour += 1) {
           const state: OpenHoursState = isAvailable(day, hour) ? "open" : "unavailable";
           const btn = within(calendar).getByRole("option", {
-            name: `application:TimeSelector.legend.${state}: common:weekDay.${day} ${hour} - ${hour + 1}`,
+            name: `application:TimeSelector.legend.${state}: common:weekdayShortEnum.${day} ${hour} - ${hour + 1}`,
           });
           expect(btn).toBeInTheDocument();
         }
@@ -288,7 +286,7 @@ describe("TimeSelector time slot selecting", () => {
     const onSubmit = vi.fn();
     const view = customRender({ onSubmit });
     // tuesday 14 - 15
-    const select = view.getByTestId("time-selector__button--1-14");
+    const select = view.getByTestId("time-selector__button--TUESDAY-14");
     await user.click(select);
     const btn = view.getByRole("button", { name: "submit" });
     await user.click(btn);
@@ -313,7 +311,7 @@ describe("TimeSelector time slot selecting", () => {
     const onSubmit = vi.fn();
     const view = customRender({ onSubmit });
     // tuesday 14 - 15
-    const select = view.getByTestId("time-selector__button--1-14");
+    const select = view.getByTestId("time-selector__button--TUESDAY-14");
     await user.click(select);
     const btn = view.getByRole("button", { name: "submit" });
     await user.click(btn);
@@ -348,7 +346,7 @@ describe("TimeSelector calendar select", () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     const view = customRender({ page: "page1", onSubmit });
-    const select = view.getByTestId("time-selector__button--1-23");
+    const select = view.getByTestId("time-selector__button--TUESDAY-23");
     await user.click(select);
     const btn = view.getByRole("button", { name: "submit" });
     await user.click(btn);

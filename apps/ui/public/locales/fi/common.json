@@ -36,6 +36,15 @@
   "weekDay.5": "Pe",
   "weekDay.6": "La",
   "weekdayLongEnum": {
+    "MONDAY": "Ma",
+    "TUESDAY": "Ti",
+    "WEDNESDAY": "Ke",
+    "THURSDAY": "To",
+    "FRIDAY": "Pe",
+    "SATURDAY": "La",
+    "SUNDAY": "Su"
+  },
+  "weekdayShortEnum": {
     "FRIDAY": "Perjantai",
     "MONDAY": "Maanantai",
     "SATURDAY": "Lauantai",

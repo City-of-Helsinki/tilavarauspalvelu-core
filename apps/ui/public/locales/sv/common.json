@@ -36,13 +36,22 @@
   "weekDay.5": "Fre",
   "weekDay.6": "Lör",
   "weekdayLongEnum": {
-    "FRIDAY": "Fredag",
     "MONDAY": "Måndag",
-    "SATURDAY": "Lördag",
-    "SUNDAY": "Söndag",
-    "THURSDAY": "Torsdag",
     "TUESDAY": "Tisdag",
-    "WEDNESDAY": "Onsdag"
+    "WEDNESDAY": "Onsdag",
+    "THURSDAY": "Torsdag",
+    "FRIDAY": "Fredag",
+    "SATURDAY": "Lördag",
+    "SUNDAY": "Söndag"
+  },
+  "weekdayShortEnum": {
+    "MONDAY": "Mån",
+    "TUESDAY": "Tis",
+    "WEDNESDAY": "Ons",
+    "THURSDAY": "Tors",
+    "FRIDAY": "Fre",
+    "SATURDAY": "Lör",
+    "SUNDAY": "Sön"
   },
   "month.0": "Januari",
   "month.1": "Februari",

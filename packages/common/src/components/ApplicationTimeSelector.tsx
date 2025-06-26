@@ -2,9 +2,10 @@ import React, { type HTMLAttributes, useState } from "react";
 import styled, { css, type RuleSet } from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
 import { AutoGrid, Flex, fontMedium, NoWrap } from "../../styled";
-import { type DayT, WEEKDAYS } from "../const";
-import { fromMondayFirstUnsafe } from "../helpers";
+import { WEEKDAYS_SORTED } from "../const";
 import { isTouchDevice } from "../browserHelpers";
+import { Weekday } from "../../gql/gql-types";
+import { convertWeekday } from "../conversion";
 
 export const CELL_STATES = ["none", "secondary", "primary"] as const;
 export const OPEN_HOURS_STATES = ["open", "unavailable"] as const;
@@ -15,7 +16,7 @@ export type Cell = {
   hour: number;
   state: CellState;
   openState: OpenHoursState;
-  day: DayT;
+  weekday: Weekday;
 };
 
 // for formatting strings and css styles
@@ -23,7 +24,7 @@ const COMBINED_CELL_STATES = ["primary", "secondary", "open", "unavailable"] as 
 type CombinedCellState = (typeof COMBINED_CELL_STATES)[number];
 
 export function isCellEqual(a: Cell, b: Cell): boolean {
-  return a.hour === b.hour && a.day === b.day;
+  return a.hour === b.hour && a.weekday === b.weekday;
 }
 
 function DayColumn({
@@ -32,7 +33,7 @@ function DayColumn({
   updateCell,
   selectedPriority,
 }: Readonly<{
-  day: DayT;
+  day: Weekday;
   cells: Readonly<Cell[]>;
   // use undefined to disable painting
   updateCell?: (cell: Cell, value: CellState) => void;
@@ -75,8 +76,8 @@ function DayColumn({
     setCellValue(cell, selectedPriority === cell.state ? false : selectedPriority);
   };
 
-  const head = t(`common:weekDayLong.${fromMondayFirstUnsafe(day)}`);
-  const weekdayStr = t(`common:weekDay.${fromMondayFirstUnsafe(day)}`);
+  const head = t(`common:weekdayLongEnum.${day}`);
+  const weekdayStr = t(`common:weekdayShortEnum.${day}`);
 
   const getHandlers = (cell: Cell) => {
     if (updateCell == null) {
@@ -100,7 +101,7 @@ function DayColumn({
       {cells.map((cell) => (
         <TimeSelectionButton
           as={updateCell != null ? "button" : "div"}
-          key={`${cell.day}-${cell.hour}`}
+          key={`${cell.weekday}-${cell.hour}`}
           $type={cell.state !== "none" ? cell.state : cell.openState}
           disabled={updateCell == null}
           type="button"
@@ -108,7 +109,7 @@ function DayColumn({
           role="option"
           aria-label={formatButtonAriaLabel(t, cell, weekdayStr)}
           aria-selected={isSelected(cell.state)}
-          data-testid={`time-selector__button--${cell.day}-${cell.hour}`}
+          data-testid={`time-selector__button--${cell.weekday}-${cell.hour}`}
         >
           {formatCell(cell)}
         </TimeSelectionButton>
@@ -172,11 +173,11 @@ export function ApplicationTimeSelector({
   return (
     <>
       <CalendarContainer {...rest} aria-multiselectable role="table">
-        {WEEKDAYS.map((day) => (
+        {WEEKDAYS_SORTED.map((day) => (
           <DayColumn
             key={`day-${day}`}
             day={day}
-            cells={cells[day] ?? []}
+            cells={cells[convertWeekday(day)] ?? []}
             updateCell={onCellUpdate}
             selectedPriority={selectedPriority}
           />

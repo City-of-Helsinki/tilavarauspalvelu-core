@@ -10,6 +10,7 @@ import {
   ReservationTypeChoice,
   useAddReservationToSeriesMutation,
   useStaffAdjustReservationTimeMutation,
+  Weekday,
 } from "@gql/gql-types";
 import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
 import { differenceInMinutes, format } from "date-fns";
@@ -28,6 +29,7 @@ import { gql } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
 import { successToast } from "common/src/common/toast";
 import { useDisplayError } from "common/src/hooks";
+import { convertWeekday } from "common/src/conversion";
 
 const StyledForm = styled.form`
   margin-top: var(--spacing-m);
@@ -69,14 +71,14 @@ function reservationSeriesInfoText({
   end,
   t,
 }: {
-  weekdays: number[];
+  weekdays: Weekday[];
   begin?: Date;
   end?: Date;
   t: TFunction;
 }) {
   return t("Reservation.EditTimeModal.recurringInfoTimes", {
     weekdays: weekdays
-      .sort((a, b) => a - b)
+      .sort((a, b) => convertWeekday(a) - convertWeekday(b))
       .map((weekday) => t(`dayShort.${weekday}`))
       .join(", "),
     begin: begin && toUIDate(begin),
