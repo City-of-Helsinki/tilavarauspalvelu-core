@@ -3,7 +3,7 @@ import type { TFunction } from "i18next";
 import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "common";
 import {
   type CreateTagStringFragment,
-  CustomerTypeChoice,
+  ReserveeType,
   type Maybe,
   PriceUnit,
   type PricingFieldsFragment,
@@ -115,13 +115,13 @@ export function getReservationPriceDetails(reservation: ReservationPriceDetailsF
       });
 }
 
-function reserveeTypeToTranslationKey(reserveeType: CustomerTypeChoice, isUnregisteredAssociation: boolean) {
+function reserveeTypeToTranslationKey(reserveeType: ReserveeType, isRegisteredAssociation: boolean) {
   switch (reserveeType) {
-    case CustomerTypeChoice.Business:
-    case CustomerTypeChoice.Individual:
-      return `CustomerTypeChoice.${reserveeType}`;
-    case CustomerTypeChoice.Nonprofit:
-      return `CustomerTypeChoice.${reserveeType}.${isUnregisteredAssociation ? "UNREGISTERED" : "REGISTERED"}`;
+    case ReserveeType.Company:
+    case ReserveeType.Individual:
+      return `ReserveeType.${reserveeType}`;
+    case ReserveeType.Nonprofit:
+      return `ReserveeType.${reserveeType}.${isRegisteredAssociation ? "REGISTERED" : "UNREGISTERED"}`;
     default:
       return "";
   }
@@ -129,8 +129,8 @@ function reserveeTypeToTranslationKey(reserveeType: CustomerTypeChoice, isUnregi
 
 export function getTranslationKeyForCustomerTypeChoice(
   reservationType: Maybe<ReservationTypeChoice> | undefined,
-  reserveeType: Maybe<CustomerTypeChoice> | undefined,
-  isUnregisteredAssociation: Maybe<boolean> | undefined
+  reserveeType: Maybe<ReserveeType> | undefined,
+  reserveeIdentifier: Maybe<string> | undefined
 ): string[] {
   if (!reservationType) {
     return ["errors.missingReservationNode"];
@@ -140,20 +140,16 @@ export function getTranslationKeyForCustomerTypeChoice(
   }
 
   const reserveeTypeTranslationKey = reserveeType
-    ? reserveeTypeToTranslationKey(reserveeType, isUnregisteredAssociation ?? false)
+    ? reserveeTypeToTranslationKey(reserveeType, !!reserveeIdentifier)
     : "";
   return [`ReservationType.${reservationType}`, reserveeTypeTranslationKey];
 }
 
 export function translateReservationCustomerType(
-  res: Pick<ReservationType, "type" | "reserveeType" | "reserveeIsUnregisteredAssociation">,
+  res: Pick<ReservationType, "type" | "reserveeType" | "reserveeIdentifier">,
   t: TFunction
 ): string {
-  const [part1, part2] = getTranslationKeyForCustomerTypeChoice(
-    res.type,
-    res.reserveeType,
-    res.reserveeIsUnregisteredAssociation
-  );
+  const [part1, part2] = getTranslationKeyForCustomerTypeChoice(res.type, res.reserveeType, res.reserveeIdentifier);
   const part2WithSpace = part2 ? ` ${t(part2)}` : "";
   return `${t(part1 ?? "")}${part2WithSpace}`;
 }

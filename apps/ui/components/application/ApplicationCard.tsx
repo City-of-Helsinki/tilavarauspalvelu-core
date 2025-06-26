@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import { useTranslation, type TFunction } from "next-i18next";
+import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Button, ButtonSize, ButtonVariant, IconArrowRight, IconCross, IconPen, LoadingSpinner } from "hds-react";
 import { breakpoints } from "common/src/const";
 import {
-  ApplicantTypeChoice,
+  type ApplicationCardFragment,
+  type ApplicationNameFragment,
   ApplicationStatusChoice,
   type Maybe,
+  ReserveeType,
   useCancelApplicationMutation,
-  type ApplicationNameFragment,
-  type ApplicationCardFragment,
 } from "@gql/gql-types";
 import { formatDateTime } from "@/modules/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
@@ -28,7 +28,7 @@ const StyledButton = styled(Button)`
 `;
 
 function getApplicant(application: ApplicationNameFragment, t: TFunction): string {
-  if (application.applicantType === ApplicantTypeChoice.Individual) {
+  if (application.applicantType === ReserveeType.Individual) {
     return t("applicationCard:person");
   }
   if (application.organisationName) {

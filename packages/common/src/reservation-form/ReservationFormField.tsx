@@ -5,15 +5,15 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontMedium, Strongish } from "../../styled";
-import { CustomerTypeChoice } from "../../gql/gql-types";
+import { ReserveeType } from "../../gql/gql-types";
 import { Inputs, Reservation } from "./types";
 import { OptionType } from "../../types/common";
-import { ControlledSelect, ControlledCheckbox } from "../components/form";
+import { ControlledCheckbox, ControlledSelect } from "../components/form";
 
 type Props = {
   field: keyof Inputs;
   options: Record<string, OptionType[]>;
-  translationKey?: CustomerTypeChoice | "COMMON";
+  translationKey?: ReserveeType | "COMMON";
   reservation: Reservation;
   required: boolean;
   params?: Record<string, Record<string, string | number>>;
@@ -117,7 +117,7 @@ const ReservationFormField = ({
   const isSelectField = Object.keys(options).includes(field);
 
   const isReserveeIdRequired =
-    field === "reserveeId" && watch("reserveeIsUnregisteredAssociation") !== undefined
+    field === "reserveeIdentifier" && watch("reserveeIsUnregisteredAssociation") !== undefined
       ? watch("reserveeIsUnregisteredAssociation") !== true
       : required;
 
@@ -153,7 +153,7 @@ const ReservationFormField = ({
         if (field === "numPersons") return t("forms:maxNumPersons", { maxValue });
         break;
       case "minLength":
-        if (field === "reserveeId") return t("forms:invalidReserveeId");
+        if (field === "reserveeIdentifier") return t("forms:invalidReserveeId");
         return t("forms:minLength");
       case "maxLength":
         return t("forms:maxLength");
@@ -303,7 +303,7 @@ const ReservationFormField = ({
           $height="92px"
         />
       );
-    case "reserveeId":
+    case "reserveeIdentifier":
       return (
         <StyledTextInput
           label={label}

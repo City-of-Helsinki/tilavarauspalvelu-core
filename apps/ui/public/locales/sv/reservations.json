@@ -78,7 +78,7 @@
   "ageGroup": "Åldersgrupp",
   "numPersons": "Antal deltagare",
   "organisationName": "Företagets namn",
-  "reserveeId": "FO-nummer",
+  "reserveeIdentifier": "FO-nummer",
   "contactName": "Kontaktpersonens namn",
   "contactPhone": "Kontaktpersonens telefonnummer",
   "contactEmail": "Kontaktpersonens e-post",

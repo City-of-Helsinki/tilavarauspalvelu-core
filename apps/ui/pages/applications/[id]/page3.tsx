@@ -5,10 +5,10 @@ import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import {
-  ApplicantTypeChoice,
   ApplicationPage3Document,
   type ApplicationPage3Query,
   type ApplicationPage3QueryVariables,
+  ReserveeType,
   useUpdateApplicationMutation,
 } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -40,7 +40,7 @@ function Page3Form(): JSX.Element | null {
   const type = watch("applicantType");
 
   useEffect(() => {
-    if (type === ApplicantTypeChoice.Individual) {
+    if (type === ReserveeType.Individual) {
       unregister("organisationName");
       unregister("organisationIdentifier");
       unregister("organisationCoreBusiness");
@@ -49,7 +49,7 @@ function Page3Form(): JSX.Element | null {
       unregister("organisationPostCode");
     }
 
-    const hasRegistration = type === ApplicantTypeChoice.Association || type === ApplicantTypeChoice.Company;
+    const hasRegistration = type === ReserveeType.Nonprofit || type === ReserveeType.Company;
     if (hasRegistration) {
       register("organisationIdentifier", { required: true });
     } else {
@@ -69,12 +69,11 @@ function Page3Form(): JSX.Element | null {
   }, [hasBillingAddress, unregister]);
 
   switch (type) {
-    case ApplicantTypeChoice.Individual:
+    case ReserveeType.Individual:
       return <IndividualForm />;
-    case ApplicantTypeChoice.Community:
-    case ApplicantTypeChoice.Association:
+    case ReserveeType.Nonprofit:
       return <OrganisationForm />;
-    case ApplicantTypeChoice.Company:
+    case ReserveeType.Company:
       return <CompanyForm />;
     default:
       // TODO should we return disabled form here?

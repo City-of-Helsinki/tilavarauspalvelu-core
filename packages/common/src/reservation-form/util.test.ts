@@ -1,18 +1,18 @@
 import { getReservationApplicationFields } from "./util";
-import { CustomerTypeChoice } from "./../../gql/gql-types";
-import { describe, test, expect } from "vitest";
+import { ReserveeType } from "./../../gql/gql-types";
+import { describe, expect, test } from "vitest";
 
 describe("getReservationApplicationFields", () => {
   test("with empty input", () => {
     expect(
       getReservationApplicationFields({
         supportedFields: [],
-        reserveeType: CustomerTypeChoice.Individual,
+        reserveeType: ReserveeType.Individual,
       })
     ).toEqual([]);
   });
 
-  const fields = ["reservee_id", "reservee_organisation_name", "name"].map((field) => ({
+  const fields = ["reservee_identifier", "reservee_organisation_name", "name"].map((field) => ({
     fieldName: field,
   }));
 
@@ -20,7 +20,7 @@ describe("getReservationApplicationFields", () => {
     expect(
       getReservationApplicationFields({
         supportedFields: fields,
-        reserveeType: CustomerTypeChoice.Individual,
+        reserveeType: ReserveeType.Individual,
       })
     ).toEqual([]);
   });
@@ -38,17 +38,17 @@ describe("getReservationApplicationFields", () => {
     expect(
       getReservationApplicationFields({
         supportedFields: fields,
-        reserveeType: CustomerTypeChoice.Business,
+        reserveeType: ReserveeType.Company,
       })
-    ).toEqual(["reserveeOrganisationName", "reserveeId"]);
+    ).toEqual(["reserveeOrganisationName", "reserveeIdentifier"]);
   });
 
   test("with nonprofit input", () => {
     expect(
       getReservationApplicationFields({
         supportedFields: fields,
-        reserveeType: CustomerTypeChoice.Nonprofit,
+        reserveeType: ReserveeType.Nonprofit,
       })
-    ).toEqual(["reserveeOrganisationName", "reserveeId"]);
+    ).toEqual(["reserveeOrganisationName", "reserveeIdentifier"]);
   });
 });

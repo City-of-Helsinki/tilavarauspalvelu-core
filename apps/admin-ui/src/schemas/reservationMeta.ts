@@ -1,7 +1,7 @@
 // Rewriting the metafields using zod validators
 // TODO move to common after they are tested in use with
 // CreateReservationModal / ReservationSeries / EditReservation
-import { CustomerTypeChoice, MunicipalityChoice } from "@gql/gql-types";
+import { MunicipalityChoice, ReserveeType } from "@gql/gql-types";
 import { z } from "zod";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -26,7 +26,7 @@ const ReservationFormMetaSchema = z.object({
   reserveeAddressZip: z.string().optional(),
   reserveeEmail: z.string().optional(),
   reserveeFirstName: z.string().optional(),
-  reserveeId: z.string().optional(),
+  reserveeIdentifier: z.string().optional(),
   reserveeIsUnregisteredAssociation: z.boolean().optional(),
   reserveeLastName: z.string().optional(),
   reserveeOrganisationName: z.string().optional(),
@@ -34,9 +34,7 @@ const ReservationFormMetaSchema = z.object({
   // TODO the reserveeType is problematic
   // radio buttons should have a default value and form inputs don't like null (uncontrolled input)
   // TODO test what happens if the user submits a form with a null value?
-  reserveeType: z
-    .enum([CustomerTypeChoice.Individual, CustomerTypeChoice.Nonprofit, CustomerTypeChoice.Business])
-    .nullable(),
+  reserveeType: z.enum([ReserveeType.Individual, ReserveeType.Nonprofit, ReserveeType.Company]).nullable(),
 });
 
 export type ReservationFormMeta = z.infer<typeof ReservationFormMetaSchema>;

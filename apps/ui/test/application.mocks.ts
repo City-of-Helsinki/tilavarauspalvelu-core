@@ -1,6 +1,5 @@
 import {
   type AgeGroupNode,
-  ApplicantTypeChoice,
   type ApplicationPage2Query,
   type ApplicationRoundNode,
   ApplicationRoundReservationCreationStatusChoice,
@@ -15,6 +14,7 @@ import {
   Priority,
   type PurposeNode,
   type ReservationUnitNode,
+  ReserveeType,
   TermsType,
   UpdateApplicationDocument,
   type UpdateApplicationMutation,
@@ -22,7 +22,7 @@ import {
 } from "@/gql/gql-types";
 import { base64encode } from "common/src/helpers";
 import { addDays, addMonths, addYears } from "date-fns";
-import { generateNameFragment, generateTextFragment, type CreateGraphQLMocksReturn } from "./test.gql.utils";
+import { type CreateGraphQLMocksReturn, generateNameFragment, generateTextFragment } from "./test.gql.utils";
 import { createMockReservationUnit } from "./reservation-unit.mocks";
 
 export function createApplicationMutationMocks(): CreateGraphQLMocksReturn {
@@ -155,6 +155,7 @@ function createMockPurposeNode({ pk = 1 }: { pk?: number } = {}): PurposeNode {
 }
 
 type CreateReservationUnitOption = ApplicationSectionMockType["reservationUnitOptions"][0];
+
 function createReservationUnitOption({ order }: { order: number }): CreateReservationUnitOption {
   const reservationUnit: CreateReservationUnitOption["reservationUnit"] = createMockReservationUnit({ pk: order });
   return {
@@ -185,7 +186,7 @@ export function createMockApplicationFragment({
   nSections = 1,
 }: CreateMockApplicationFragmentProps = {}): ApplicationMockType {
   const page3Data = {
-    applicantType: ApplicantTypeChoice.Association,
+    applicantType: ReserveeType.Nonprofit,
     additionalInformation: "",
     contactPersonFirstName: "Test",
     contactPersonLastName: "User",
@@ -302,6 +303,7 @@ export function createMockApplicationRound({
 }
 
 type ApplicationPage4 = ApplicationViewFragment;
+
 export function createMockApplicationViewFragment(props: CreateMockApplicationFragmentProps = {}) {
   const applicationRoundMock = {
     sentAt: new Date().toISOString(),

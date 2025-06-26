@@ -65,7 +65,7 @@ const translations: ITranslations = {
     WEAK: ["Heikko tunnistautuminen"],
     STRONG: ["Vahva tunnistautuminen"],
   },
-  CustomerTypeChoice: {
+  ReserveeType: {
     INDIVIDUAL: ["yksityishenkilö"],
     BUSINESS: ["yritys"],
     NONPROFIT: {
@@ -1807,7 +1807,7 @@ const translations: ITranslations = {
     billingEmail: ["Sähköpostiosoite (Laskutus)"],
     billingPhone: ["Puhelin (Laskutus)"],
     reservationUser: ["Tilan käyttäjän tiedot"],
-    reserveeId: ["Y-tunnus"],
+    reserveeIdentifier: ["Y-tunnus"],
     noReserveeId: ["Ei y-tunnusta"],
     save: ["Tallenna"],
     appliesSubvention: ["hakee subventiota"],

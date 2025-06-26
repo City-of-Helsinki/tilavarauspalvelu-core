@@ -104,7 +104,7 @@ export const APPLICATIONS_QUERY = gql`
   query Applications(
     $applicationRound: Int!
     $unit: [Int]
-    $applicantType: [ApplicantTypeChoice]
+    $applicantType: [ReserveeType]
     $status: [ApplicationStatusChoice]!
     $textSearch: String
     $orderBy: [ApplicationOrderingChoices]
