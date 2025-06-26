@@ -8,7 +8,7 @@ import {
 } from "@gql/gql-types";
 import { createTagString, getReservationUnitPricing } from "./util";
 import { addHours, addMonths } from "date-fns";
-import { toApiDate } from "common/src/common/util";
+import { toApiDate, toApiDateUnsafe } from "common/src/common/util";
 import { describe, expect, test } from "vitest";
 import { base64encode } from "common/src/helpers";
 
@@ -72,8 +72,8 @@ function constructReservation({
           id: base64encode("ReservationSeriesNode:1"),
           beginTime: "12:00",
           endTime: "14:00",
-          beginDate: toApiDate(beginsAt),
-          endDate: toApiDate(addMonths(endsAt, 3)),
+          beginDate: toApiDateUnsafe(beginsAt),
+          endDate: toApiDateUnsafe(addMonths(endsAt, 3)),
           weekdays: [0, 1, 3],
         }
       : null,

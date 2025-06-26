@@ -87,7 +87,10 @@ function createReservation({
       bufferTimeBefore: 0,
       bufferTimeAfter: 0,
       reservationStartInterval: ReservationStartInterval.Interval_15Mins,
-      unit: null,
+      unit: {
+        id: base64encode("UnitNode:1"),
+        pk: 0,
+      },
     },
     type: ReservationTypeChoice.Behalf,
     handlingDetails: null,

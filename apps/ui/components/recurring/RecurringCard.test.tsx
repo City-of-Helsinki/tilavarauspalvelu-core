@@ -129,10 +129,7 @@ function createReservationUnit({
   };
 }
 
-function createUnitMock({ name }: { name?: string }): RecurringCardFragment["unit"] {
-  if (!name) {
-    return null;
-  }
+function createUnitMock({ name }: { name: string }): RecurringCardFragment["unit"] {
   return {
     id: base64encode("UnitNode:1"),
     ...generateNameFragment(name),
