@@ -3,12 +3,12 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import {
+  type ReservationNotificationFragment,
   ReservationOrderingChoices,
-  ReservationTypeChoice,
   ReservationStateChoice,
+  ReservationTypeChoice,
   useDeleteReservationMutation,
   useListInProgressReservationsQuery,
-  type ReservationNotificationFragment,
   useReservationStateLazyQuery,
 } from "@gql/gql-types";
 import NotificationWrapper from "common/src/components/NotificationWrapper";
@@ -221,8 +221,7 @@ export function InProgressReservationNotification() {
   };
 
   const handleContinue = async (reservation: ReservationNotificationFragment) => {
-    const reservationUnit = reservation.reservationUnits.find(() => true);
-    if (reservationUnit?.pk == null) {
+    if (reservation.reservationUnit.pk == null) {
       throw new Error("No reservation unit pk");
     }
     const res = await reservationQ({
@@ -237,7 +236,7 @@ export function InProgressReservationNotification() {
       await refreshQueryCache();
       return;
     }
-    const url = getReservationInProgressPath(reservationUnit.pk, reservation.pk);
+    const url = getReservationInProgressPath(reservation.reservationUnit.pk, reservation.pk);
     router.push(url);
   };
 
@@ -294,7 +293,7 @@ export const RESERVATION_NOTIFICATION_FRAGMENT = gql`
       expiresInMinutes
       checkoutUrl
     }
-    reservationUnits {
+    reservationUnit {
       id
       pk
     }

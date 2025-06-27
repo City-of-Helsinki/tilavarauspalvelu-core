@@ -280,8 +280,7 @@ function RequestedReservation({
 
   const ref = useRef<HTMLHeadingElement>(null);
 
-  const resUnit = reservation?.reservationUnits?.[0];
-  const pricing = resUnit != null ? getReservationUnitPricing(resUnit, new Date(reservation.beginsAt)) : null;
+  const pricing = getReservationUnitPricing(reservation.reservationUnit, new Date(reservation.beginsAt));
 
   const isNonFree = pricing != null ? !isPriceFree(pricing) : false;
 
@@ -396,7 +395,7 @@ export const RESERVATION_PAGE_QUERY = gql`
         id
         reasonFi
       }
-      reservationUnits {
+      reservationUnit {
         id
         pk
         reservationStartInterval

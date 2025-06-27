@@ -4,23 +4,23 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import styled, { css } from "styled-components";
 import {
-  useRejectRestMutation,
-  type Maybe,
   type ApplicationSectionAllocationsQuery,
+  type Maybe,
   type ReservationUnitNode,
+  useRejectRestMutation,
 } from "@gql/gql-types";
-import { SemiBold, fontMedium } from "common/styled";
+import { fontMedium, SemiBold } from "common/styled";
 import { filterNonNullable, truncate } from "common/src/helpers";
 import { convertWeekday } from "common/src/conversion";
 import {
-  type SectionNodeT,
-  createDurationString,
   type AllocatedTimeSlotNodeT,
+  createDurationString,
   formatSuitableTimeRange,
+  type SectionNodeT,
 } from "./modules/applicationRoundAllocation";
 import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
 import { PopupMenu } from "common/src/components/PopupMenu";
-import { gql, type ApolloQueryResult } from "@apollo/client";
+import { type ApolloQueryResult, gql } from "@apollo/client";
 import { getApplicationUrl } from "@/common/urls";
 import { getApplicantName } from "@/helpers";
 import { MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH } from "@/common/const";
@@ -62,7 +62,7 @@ const Card = styled.div<{ $type: AllocationApplicationSectionCardType }>`
   padding: var(--spacing-2-xs) var(--spacing-xs) var(--spacing-xs);
   line-height: var(--lineheight-xl);
   font-size: var(--fontsize-body-s);
-  ${borderCss}
+  ${borderCss};
   background-color: transparent;
   text-align: left;
 `;
@@ -70,17 +70,20 @@ const Card = styled.div<{ $type: AllocationApplicationSectionCardType }>`
 const StyledRadioButton = styled(RadioButton)<{ $topPadding?: boolean }>`
   display: flex;
   align-self: center;
+
   > label {
     &:before,
     &:after {
       ${({ $topPadding }) => ($topPadding ? "top: 10px !important;" : "")}
     }
+
     text-align: left;
 
     font-family: var(--font-medium);
     font-weight: 500;
     padding-left: var(--spacing-xl) !important;
   }
+
   cursor: pointer;
 `;
 
@@ -124,6 +127,7 @@ const StyledLink = styled(Link)`
   &:hover {
     text-decoration: underline;
   }
+
   svg {
     width: 1rem;
     height: 1rem;
@@ -369,6 +373,7 @@ const ScheduleCard = styled.div`
 type AllocatedT = Omit<AllocatedTimeSlotNodeT, "reservationUnitOption"> & {
   reservationUnitOption: NonNullable<SectionNodeT["reservationUnitOptions"]>[0];
 };
+
 function AllocatedScheduleSection({
   allocatedTimeSlot,
   currentReservationUnit,

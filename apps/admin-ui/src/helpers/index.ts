@@ -1,15 +1,15 @@
 import { gql } from "@apollo/client";
 import {
-  ReservationTypeChoice,
-  ApplicantTypeChoice,
-  type CalendarReservationFragment,
   type ApplicantNameFieldsFragment,
+  ApplicantTypeChoice,
+  type ApplicationRoundNode,
   ApplicationRoundReservationCreationStatusChoice,
   ApplicationRoundStatusChoice,
-  type ApplicationRoundNode,
+  type CalendarReservationFragment,
+  type CombineAffectedReservationsFragment,
   type Maybe,
   ReservationStartInterval,
-  type CombineAffectedReservationsFragment,
+  ReservationTypeChoice,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { addSeconds } from "date-fns";
@@ -31,8 +31,7 @@ export function doesIntervalCollide(a: CollisionInterval, b: CollisionInterval):
   const aEndBuffer = Math.max(a.buffers.after, b.buffers.before);
   const bEndBuffer = Math.max(a.buffers.before, b.buffers.after);
   if (a.start < b.start && addSeconds(a.end, aEndBuffer) <= b.start) return false;
-  if (a.start >= addSeconds(b.end, bEndBuffer) && a.end > b.end) return false;
-  return true;
+  return !(a.start >= addSeconds(b.end, bEndBuffer) && a.end > b.end);
 }
 
 export function getBufferTime(
@@ -101,6 +100,7 @@ function isAffecting(
 ) {
   return reservation.affectedReservationUnits?.some((pk) => pk === resUnitPk);
 }
+
 export function combineAffectingReservations<T extends AffectedReservations>(
   data: Maybe<T> | undefined,
   reservationUnitPk: Maybe<number> | undefined
@@ -113,7 +113,7 @@ export function combineAffectingReservations<T extends AffectedReservations>(
   const affectingReservations = filterNonNullable(data.affectingReservations).filter((y) =>
     isAffecting(y, reservationUnitPk)
   );
-  const reservationSet = filterNonNullable(data.reservationUnit?.reservations).concat(affectingReservations);
+  const reservationSet = filterNonNullable(data?.reservationUnit?.reservations).concat(affectingReservations);
   return filterNonNullable(reservationSet);
 }
 

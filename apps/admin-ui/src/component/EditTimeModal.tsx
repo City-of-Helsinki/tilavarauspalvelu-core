@@ -6,12 +6,12 @@ import { z } from "zod";
 import { type TFunction } from "i18next";
 import {
   type ChangeReservationTimeFragment,
-  ReservationTypeChoice,
-  useStaffAdjustReservationTimeMutation,
   type ReservationSeriesAddMutationInput,
+  ReservationTypeChoice,
   useAddReservationToSeriesMutation,
+  useStaffAdjustReservationTimeMutation,
 } from "@gql/gql-types";
-import { FormProvider, UseFormReturn, useForm } from "react-hook-form";
+import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
 import { differenceInMinutes, format } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,7 +22,7 @@ import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { BufferToggles } from "@/component/BufferToggles";
 import { useCheckCollisions } from "@/hooks";
-import { getBufferTime, getNormalizedInterval, constructDateTimeSafe, constructDateTimeUnsafe } from "@/helpers";
+import { constructDateTimeSafe, constructDateTimeUnsafe, getBufferTime, getNormalizedInterval } from "@/helpers";
 import { formatDateTimeRange } from "@/common/util";
 import { gql } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
@@ -55,9 +55,11 @@ const Bold = styled.b`
 
 const StyledDialog = styled(Dialog)`
   /* larger than normal HDS modal */
+
   && {
     width: 100%;
   }
+
   max-width: 944px;
 `;
 
@@ -239,13 +241,13 @@ export function NewReservationModal({ reservationToCopy, onAccept, onClose }: Ne
   const { t } = useTranslation();
   const { isOpen } = useModal();
 
-  const reservationUnit = reservationToCopy?.reservationUnits?.[0];
+  const reservationUnit = reservationToCopy.reservationUnit;
 
   // NOTE 0 => buffer disabled for this reservation, undefined => no buffers selected
-  const bufferTimeBefore = reservationUnit?.bufferTimeBefore ?? 0;
-  const bufferTimeAfter = reservationUnit?.bufferTimeAfter ?? 0;
+  const bufferTimeBefore = reservationUnit.bufferTimeBefore ?? 0;
+  const bufferTimeAfter = reservationUnit.bufferTimeAfter ?? 0;
 
-  const interval = getNormalizedInterval(reservationUnit?.reservationStartInterval);
+  const interval = getNormalizedInterval(reservationUnit.reservationStartInterval);
 
   const form = useForm<EditFormValueType>({
     // @ts-expect-error -- schema refinement breaks typing
@@ -295,7 +297,7 @@ export function NewReservationModal({ reservationToCopy, onAccept, onClose }: Ne
       <ErrorBoundary fallback={<div>{t("errors.unexpectedError")}</div>}>
         <DialogContent
           form={form}
-          reservationUnitPk={reservationUnit?.pk ?? 0}
+          reservationUnitPk={reservationUnit.pk ?? 0}
           bufferTimeAfter={bufferTimeAfter}
           bufferTimeBefore={bufferTimeBefore}
           mutate={mutate}
@@ -324,13 +326,13 @@ export function EditTimeModal({
   const startDateTime = new Date(reservation.beginsAt);
   const endDateTime = new Date(reservation.endsAt);
 
-  const reservationUnit = reservation.reservationUnits?.find(() => true);
+  const reservationUnit = reservation.reservationUnit;
 
   // NOTE 0 => buffer disabled for this reservation, undefined => no buffers selected
-  const bufferTimeBefore = (reservation.bufferTimeBefore || reservationUnit?.bufferTimeBefore) ?? 0;
-  const bufferTimeAfter = (reservation.bufferTimeAfter || reservationUnit?.bufferTimeAfter) ?? 0;
+  const bufferTimeBefore = (reservation.bufferTimeBefore || reservationUnit.bufferTimeBefore) ?? 0;
+  const bufferTimeAfter = (reservation.bufferTimeAfter || reservationUnit.bufferTimeAfter) ?? 0;
 
-  const interval = getNormalizedInterval(reservationUnit?.reservationStartInterval);
+  const interval = getNormalizedInterval(reservationUnit.reservationStartInterval);
 
   if (reservation.pk == null) {
     // eslint-disable-next-line no-console
@@ -386,7 +388,7 @@ export function EditTimeModal({
       <ErrorBoundary fallback={<div>{t("errors.unexpectedError")}</div>}>
         <DialogContent
           form={form}
-          reservationUnitPk={reservation.reservationUnits?.[0]?.pk ?? 0}
+          reservationUnitPk={reservation.reservationUnit.pk ?? 0}
           bufferTimeAfter={bufferTimeAfter}
           bufferTimeBefore={bufferTimeBefore}
           mutate={changeTime}
@@ -451,7 +453,7 @@ export const CHANGE_RESERVATION_TIME_QUERY_FRAGMENT = gql`
       beginDate
       endDate
     }
-    reservationUnits {
+    reservationUnit {
       id
       pk
       bufferTimeBefore

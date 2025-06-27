@@ -17,6 +17,7 @@ export const visitedStyles = css`
 export const anchorStyles = css`
   color: var(--color-black-30);
   cursor: default;
+
   &:link {
     color: var(--color-black);
     cursor: pointer;
@@ -26,12 +27,12 @@ export const anchorStyles = css`
 // should be default to all components but for legacy reasons have to be per component
 export const borderBoxSizing = css`
   -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
 `;
 
 export const removeButtonStyles = css`
-  ${borderBoxSizing}
+  ${borderBoxSizing};
   /* without flex we have extra padding */
   display: flex;
   background-color: transparent;

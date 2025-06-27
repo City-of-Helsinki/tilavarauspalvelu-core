@@ -18,7 +18,7 @@ function VisibleIfPermission({
   const { user } = useSession();
   const isOwner = reservation.user?.pk === user?.pk;
   const { hasPermission } = useCheckPermission({
-    units: [reservation?.reservationUnits?.[0]?.unit?.pk ?? 0],
+    units: [reservation.reservationUnit.unit?.pk ?? 0],
     permission,
   });
 
@@ -39,7 +39,7 @@ export const VISIBLE_IF_PERMISSION_FRAGMENT = gql`
       id
       pk
     }
-    reservationUnits {
+    reservationUnit {
       id
       unit {
         id

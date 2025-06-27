@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import { NewReservationListItem } from "@/component/ReservationsList";
 import { ApolloError, gql, useApolloClient } from "@apollo/client";
 import {
+  ReservationSeriesDocument,
+  ReservationSeriesQuery,
+  ReservationSeriesQueryVariables,
+  ReservationSeriesRescheduleMutationInput,
+  ReservationStartInterval,
+  ReservationTypeChoice,
   type SeriesPageQuery,
   useRescheduleReservationSeriesMutation,
   useSeriesPageQuery,
-  ReservationTypeChoice,
-  ReservationSeriesRescheduleMutationInput,
-  ReservationSeriesQuery,
-  ReservationSeriesQueryVariables,
-  ReservationSeriesDocument,
-  ReservationStartInterval,
 } from "@gql/gql-types";
 import { base64encode, calculateMedian, filterNonNullable } from "common/src/helpers";
 import { useNavigate, useParams } from "react-router-dom";
@@ -85,8 +85,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
 
   const [localError, setLocalError] = useState<string | null>(null);
 
-  const interval =
-    reservation?.reservationUnits[0]?.reservationStartInterval ?? ReservationStartInterval.Interval_15Mins;
+  const interval = reservation?.reservationUnit.reservationStartInterval ?? ReservationStartInterval.Interval_15Mins;
 
   const form = useForm<RescheduleReservationSeriesForm>({
     // FIXME there is no validation here (schema is incomplete, need to run the same refinements as in the create form)
@@ -101,7 +100,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
       reset(convertToForm(reservationSeries));
     }
   }, [reservationSeries, reset]);
-  const reservationUnit = reservation?.reservationUnits?.[0] ?? null;
+  const reservationUnit = reservation?.reservationUnit ?? null;
 
   const [removedReservations, setRemovedReservations] = useState<NewReservationListItem[]>([]);
   const newReservations = useMultipleReservation({
@@ -354,7 +353,7 @@ export const SERIES_PAGE_QUERY = gql`
         endTime
         beginTime
       }
-      reservationUnits {
+      reservationUnit {
         id
         pk
         nameFi

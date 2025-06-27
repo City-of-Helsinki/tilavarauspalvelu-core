@@ -4,6 +4,7 @@ import {
   CustomerTypeChoice,
   ReservationSeriesDocument,
   type ReservationSeriesQuery,
+  ReservationStartInterval,
   ReservationStateChoice,
   ReservationTypeChoice,
   UpdateReservationSeriesDocument,
@@ -80,7 +81,14 @@ function createReservation({
     bufferTimeAfter: 0,
     bufferTimeBefore: 0,
     paymentOrder: null,
-    reservationUnits: [],
+    reservationUnit: {
+      id: base64encode("ReservationUnitNode:1"),
+      pk: null,
+      bufferTimeBefore: 0,
+      bufferTimeAfter: 0,
+      reservationStartInterval: ReservationStartInterval.Interval_15Mins,
+      unit: null,
+    },
     type: ReservationTypeChoice.Behalf,
     handlingDetails: null,
     reservationSeries: {

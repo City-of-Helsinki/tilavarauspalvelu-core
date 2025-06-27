@@ -137,9 +137,6 @@ function Reservation({
   });
   const pindoraInfo = accessCodeData?.reservation?.pindoraInfo ?? null;
 
-  // NOTE typescript can't type array off index
-  const reservationUnit = reservation.reservationUnits.find(() => true);
-
   const modifyTimeReason = getWhyReservationCantBeChanged(reservation);
   const canTimeBeModified = modifyTimeReason == null;
 
@@ -158,7 +155,7 @@ function Reservation({
   const { beginsAt, endsAt } = reservation;
   const timeString = capitalize(formatDateTimeRange(t, new Date(beginsAt), new Date(endsAt)));
 
-  const supportedFields = filterNonNullable(reservationUnit?.metadataSet?.supportedFields);
+  const supportedFields = filterNonNullable(reservation.reservationUnit.metadataSet?.supportedFields);
 
   const isBeingHandled = reservation.state === ReservationStateChoice.RequiresHandling;
   const isCancellable = isReservationCancellable(reservation);
@@ -217,8 +214,11 @@ function Reservation({
             </Flex>
           </Flex>
           <SubHeading>
-            <Link data-testid="reservation__reservation-unit" href={getReservationUnitPath(reservationUnit?.pk)}>
-              {getReservationUnitName(reservationUnit, lang) ?? "-"}
+            <Link
+              data-testid="reservation__reservation-unit"
+              href={getReservationUnitPath(reservation.reservationUnit.pk)}
+            >
+              {getReservationUnitName(reservation.reservationUnit, lang) ?? "-"}
             </Link>
             <NoWrap data-testid="reservation__time">{timeString}</NoWrap>
           </SubHeading>
@@ -300,7 +300,10 @@ function Reservation({
           <ApplicationFields reservation={reservation} options={options} supportedFields={supportedFields} />
           {shouldShowAccessCode && <AccessCodeInfo pindoraInfo={pindoraInfo} feedbackUrl={feedbackUrl} />}
           <TermsInfoSection reservation={reservation} termsOfUse={termsOfUse} />
-          <AddressSection title={getReservationUnitName(reservationUnit, lang) ?? "-"} unit={reservationUnit?.unit} />
+          <AddressSection
+            title={getReservationUnitName(reservation.reservationUnit, lang) ?? "-"}
+            unit={reservation.reservationUnit.unit}
+          />
         </Flex>
       </ReservationPageWrapper>
     </>
@@ -465,7 +468,7 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
       reservationSeries {
         id
       }
-      reservationUnits {
+      reservationUnit {
         id
         unit {
           ...AddressFields

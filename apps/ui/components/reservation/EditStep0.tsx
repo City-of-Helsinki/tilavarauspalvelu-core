@@ -19,7 +19,7 @@ import { convertLanguageCode, getTranslationSafe } from "common/src/common/util"
 import { useReservableTimes } from "@/hooks/useReservableTimes";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { ReservationTimePicker } from "./ReservationTimePicker";
-import { QuickReservation } from "../reservation-unit/QuickReservation";
+import { QuickReservation } from "@/components/reservation-unit";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { Sanitize } from "common/src/components/Sanitize";
 import { PinkBox as PinkBoxBase } from "./styles";
@@ -91,14 +91,14 @@ type EditStep0Props = {
 
 // Non null assertion to simplify types
 function EditStep0Wrapped(props: EditStep0Props): JSX.Element {
-  const reservationUnit = props.reservation.reservationUnits[0];
+  const reservationUnit = props.reservation.reservationUnit;
   if (reservationUnit == null) {
     return <ErrorComponent statusCode={404} />;
   }
   return <EditStep0 {...props} reservationUnit={reservationUnit} />;
 }
 
-type ReservationUnitT = NonNullable<EditPageReservationFragment["reservationUnits"][number]>;
+type ReservationUnitT = NonNullable<EditPageReservationFragment["reservationUnit"]>;
 
 function EditStep0({
   reservation,
@@ -269,7 +269,7 @@ export const EDIT_PAGE_RESERVATION_FRAGMENT = gql`
     ...CanReservationBeChanged
     ...ReservationInfoCard
     ...MetaFields
-    reservationUnits {
+    reservationUnit {
       ...EditPageReservationUnit
     }
   }

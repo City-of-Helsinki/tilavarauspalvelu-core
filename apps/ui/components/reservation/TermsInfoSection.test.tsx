@@ -21,10 +21,10 @@ describe("Component: Reservation page terms info section", () => {
     it("should contain both terms, when both exist", () => {
       const paymentAndCancellationTerms = createMockReservation({});
       customRender(paymentAndCancellationTerms);
-      const reservationUnit = paymentAndCancellationTerms.reservationUnits.find(() => true);
+      const reservationUnit = paymentAndCancellationTerms.reservationUnit;
 
-      expect(screen.getByText(reservationUnit?.paymentTerms?.textFi ?? "Maksuehdot")).toBeInTheDocument();
-      expect(screen.getByText(reservationUnit?.paymentTerms?.textFi ?? "Peruutusehdot")).toBeInTheDocument();
+      expect(screen.getByText(reservationUnit.paymentTerms?.textFi ?? "Maksuehdot")).toBeInTheDocument();
+      expect(screen.getByText(reservationUnit.paymentTerms?.textFi ?? "Peruutusehdot")).toBeInTheDocument();
     });
 
     it("should contain only payment terms if only it exists (no cancellation terms)", () => {
@@ -32,9 +32,9 @@ describe("Component: Reservation page terms info section", () => {
         cancellationTerms: null,
       });
       customRender(onlyPaymentTerms);
-      const reservationUnit = onlyPaymentTerms.reservationUnits.find(() => true);
+      const reservationUnit = onlyPaymentTerms.reservationUnit;
       const termsContent = screen.getByTestId("reservation__payment-and-cancellation-terms").children[1];
-      expect(termsContent?.textContent).toBe(reservationUnit?.paymentTerms?.textFi ?? "");
+      expect(termsContent?.textContent).toBe(reservationUnit.paymentTerms?.textFi ?? "");
     });
 
     it("should contain only cancellation terms if only it exists (no payment terms)", () => {
@@ -42,10 +42,10 @@ describe("Component: Reservation page terms info section", () => {
         paymentTerms: null,
       });
       customRender(onlyCancellationTerms);
-      const reservationUnit = onlyCancellationTerms.reservationUnits.find(() => true);
+      const reservationUnit = onlyCancellationTerms.reservationUnit;
       const termsContent = screen.getByTestId("reservation__payment-and-cancellation-terms").children[1];
 
-      expect(termsContent?.textContent).toBe(reservationUnit?.cancellationTerms?.textFi ?? "");
+      expect(termsContent?.textContent).toBe(reservationUnit.cancellationTerms?.textFi ?? "");
     });
 
     it("should not render at all if neither of the terms exist", () => {
@@ -71,9 +71,9 @@ describe("Component: Reservation page terms info section", () => {
         canApplyFreeOfCharge: true,
       });
       customRender(applyingFreePricingTerms);
-      const reservationUnit = applyingFreePricingTerms.reservationUnits.find(() => true);
+      const reservationUnit = applyingFreePricingTerms.reservationUnit;
       expect(screen.getByText("reservationUnit:pricingTerms")).toBeInTheDocument();
-      expect(screen.getByText(reservationUnit?.pricingTerms?.textFi ?? "Pricing terms text FI")).toBeInTheDocument();
+      expect(screen.getByText(reservationUnit.pricingTerms?.textFi ?? "Pricing terms text FI")).toBeInTheDocument();
     });
 
     it.for(
@@ -100,9 +100,7 @@ describe("Component: Reservation page terms info section", () => {
       customRender(reservation);
       expect(screen.queryByText("reservationUnit:pricingTerms")).not.toBeInTheDocument();
       expect(
-        screen.queryByText(
-          reservation.reservationUnits.find(() => true)?.pricingTerms?.textFi ?? "Pricing terms text FI"
-        )
+        screen.queryByText(reservation.reservationUnit.pricingTerms?.textFi ?? "Pricing terms text FI")
       ).not.toBeInTheDocument();
     });
   });
@@ -113,10 +111,7 @@ describe("Component: Reservation page terms info section", () => {
       const normalTOS = createTermsOfUseMock();
       customRender(reservation, normalTOS);
       expect(
-        screen.getByText(
-          reservation?.reservationUnits.find(() => true)?.serviceSpecificTerms?.textFi ??
-            "Test service specific terms FI"
-        )
+        screen.getByText(reservation.reservationUnit.serviceSpecificTerms?.textFi ?? "Test service specific terms FI")
       ).toBeInTheDocument();
       expect(screen.getByText(normalTOS.genericTerms?.textFi ?? "Test terms of use FI")).toBeInTheDocument();
     });
@@ -126,11 +121,9 @@ describe("Component: Reservation page terms info section", () => {
       const emptyTOS = createTermsOfUseMock(true);
       customRender(reservation, emptyTOS);
       expect(
-        screen.getByText(
-          reservation.reservationUnits.find(() => true)?.serviceSpecificTerms?.textFi ??
-            "Test service specific terms FI"
-        ).textContent
-      ).toBe(reservation.reservationUnits.find(() => true)?.serviceSpecificTerms?.textFi);
+        screen.getByText(reservation.reservationUnit.serviceSpecificTerms?.textFi ?? "Test service specific terms FI")
+          .textContent
+      ).toBe(reservation.reservationUnit.serviceSpecificTerms?.textFi);
     });
 
     it("should contain only terms of use if only it exists (no service specific terms)", () => {

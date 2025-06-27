@@ -7,9 +7,9 @@ import styled from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
 import {
   ReservationTypeChoice,
-  UserPermissionChoice,
-  useReservationUnitCalendarQuery,
   type ReservationUnitCalendarQuery,
+  useReservationUnitCalendarQuery,
+  UserPermissionChoice,
 } from "@gql/gql-types";
 import { getEventBuffers } from "common/src/calendar/util";
 import { getReservationUrl } from "@/common/urls";
@@ -47,12 +47,10 @@ function getEventTitle({
   reservation: ReservationType;
   t: TFunction;
 }) {
-  const reservationUnit = reservation.reservationUnits?.[0];
-  const isOtherReservationUnit = reservationUnitPk !== reservationUnit?.pk;
-
   const reserveeName = getReserveeName(reservation, t);
-  if (isOtherReservationUnit) {
-    const reservationUnitName = reservationUnit?.nameFi ?? "";
+
+  if (reservationUnitPk !== reservation.reservationUnit.pk) {
+    const reservationUnitName = reservation.reservationUnit.nameFi ?? "";
 
     return [reserveeName, reservationUnitName];
   }

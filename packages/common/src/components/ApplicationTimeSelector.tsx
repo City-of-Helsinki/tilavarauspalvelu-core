@@ -1,8 +1,8 @@
-import React, { useState, type HTMLAttributes } from "react";
+import React, { type HTMLAttributes, useState } from "react";
 import styled, { css, type RuleSet } from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
 import { AutoGrid, Flex, fontMedium, NoWrap } from "../../styled";
-import { WEEKDAYS, type DayT } from "../const";
+import { type DayT, WEEKDAYS } from "../const";
 import { fromMondayFirstUnsafe } from "../helpers";
 import { isTouchDevice } from "../browserHelpers";
 
@@ -207,7 +207,7 @@ function Legend() {
 }
 
 const CalendarHead = styled.div`
-  ${fontMedium}
+  ${fontMedium};
   font-size: var(--fontsize-body-m);
   text-align: center;
   padding: var(--spacing-2-xs) 0;
@@ -218,7 +218,7 @@ const CalendarHead = styled.div`
 const TimeSelectionButton = styled.button<{
   $type: CombinedCellState;
 }>`
-  ${fontMedium}
+  ${fontMedium};
   width: 100%;
   font-size: var(--fontsize-body-m);
   white-space: nowrap;
@@ -272,11 +272,12 @@ const arrowDown = css`
 
 const primaryCssFragment = css`
   &:before {
-    ${arrowUp}
+    ${arrowUp};
     left: 4px;
     top: 6px;
     border-bottom-color: var(--color-white);
   }
+
   background: var(--color-bus);
   color: var(--color-white);
   border-bottom-color: var(--color-black-60);
@@ -284,11 +285,12 @@ const primaryCssFragment = css`
 
 const secondaryCssFragment = css`
   &:before {
-    ${arrowDown}
+    ${arrowDown};
     left: 4px;
     top: 6px;
     border-top-color: var(--color-black);
   }
+
   background: var(--color-engel);
   color: var(--color-black);
 `;

@@ -11,15 +11,11 @@ type Props = {
 export function Instructions({ reservation }: Props): JSX.Element | null {
   const { t, i18n } = useTranslation();
 
-  const reservationUnit = reservation.reservationUnits.find(() => true);
   const lang = convertLanguageCode(i18n.language);
   const instructionsKey = getReservationUnitInstructionsKey(reservation.state);
   const instructionsText =
-    instructionsKey != null && reservationUnit != null
-      ? getTranslationSafe(reservationUnit, instructionsKey, lang)
-      : null;
-  const showInstructions =
-    reservationUnit != null && instructionsKey != null && instructionsText != null && instructionsText !== "";
+    instructionsKey != null ? getTranslationSafe(reservation.reservationUnit, instructionsKey, lang) : null;
+  const showInstructions = instructionsKey != null && instructionsText != null && instructionsText !== "";
 
   if (!showInstructions) {
     return null;
@@ -59,7 +55,7 @@ export const INSTRUCTIONS_FRAGMENT = gql`
   fragment Instructions on ReservationNode {
     id
     state
-    reservationUnits {
+    reservationUnit {
       id
       reservationPendingInstructionsFi
       reservationPendingInstructionsEn

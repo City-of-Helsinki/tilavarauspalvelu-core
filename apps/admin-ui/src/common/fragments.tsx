@@ -108,7 +108,7 @@ export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
     name
     numPersons
     calendarUrl
-    reservationUnits {
+    reservationUnit {
       id
       pk
       nameFi
@@ -166,7 +166,7 @@ export const RECURRING_RESERVATION_FRAGMENT = gql`
         id
         status
       }
-      reservationUnits {
+      reservationUnit {
         id
         unit {
           id

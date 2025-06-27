@@ -42,8 +42,8 @@ describe("Component: ReservationInfoCard", () => {
   it("should show reservation unit name according to the reservation unit for the reservation", () => {
     customRender();
     const mockReservationData = createMockReservationInfoCard();
-    const reservationUnit = mockReservationData.reservationUnits[0];
-    expect(screen.getByText(reservationUnit?.nameFi ?? "Test Reservation Unit FI")).toBeInTheDocument();
+    const reservationUnit = mockReservationData.reservationUnit;
+    expect(screen.getByText(reservationUnit.nameFi ?? "Test Reservation Unit FI")).toBeInTheDocument();
   });
 
   it("should show the reservation id", () => {
@@ -101,44 +101,42 @@ function createMockReservationInfoCard(price?: string): ReservationInfoCardFragm
       highestPrice: price ?? "10.0",
       taxPercentage: "25.5",
     },
-    reservationUnits: [
-      {
-        id: base64encode("ReservationUnitNode:2"),
-        images: [
-          {
-            id: base64encode(`ReservationUnitImageNode:1`),
-            imageUrl: "https://example.com/image-image.jpg",
-            imageType: ImageType.Main,
-            largeUrl: "https://example.com/image-large.jpg",
-            mediumUrl: "https://example.com/image-medium.jpg",
-            smallUrl: "https://example.com/image-small.jpg",
-          },
-        ],
-        pk: 2,
-        pricings: [
-          {
-            id: "3",
-            begins: new Date(2024, 0, 0, 0, 0).toISOString(),
-            highestPrice: "10.0",
-            lowestPrice: "0.0",
-            priceUnit: PriceUnit.PerHour,
-            paymentType: PaymentType.OnlineOrInvoice,
-            taxPercentage: {
-              id: "123",
-              pk: 123,
-              value: "25.5",
-            },
-          },
-        ],
-        reservationBeginsAt: new Date(2024, 0, 0, 0, 0).toISOString(),
-        reservationEndsAt: new Date(2025, 0, 0, 0, 0).toISOString(),
-        ...generateNameFragment("Test reservation unit"),
-        unit: {
-          id: "3",
-          ...generateNameFragment("Test unit"),
+    reservationUnit: {
+      id: base64encode("ReservationUnitNode:2"),
+      images: [
+        {
+          id: base64encode(`ReservationUnitImageNode:1`),
+          imageUrl: "https://example.com/image-image.jpg",
+          imageType: ImageType.Main,
+          largeUrl: "https://example.com/image-large.jpg",
+          mediumUrl: "https://example.com/image-medium.jpg",
+          smallUrl: "https://example.com/image-small.jpg",
         },
+      ],
+      pk: 2,
+      pricings: [
+        {
+          id: "3",
+          begins: new Date(2024, 0, 0, 0, 0).toISOString(),
+          highestPrice: "10.0",
+          lowestPrice: "0.0",
+          priceUnit: PriceUnit.PerHour,
+          paymentType: PaymentType.OnlineOrInvoice,
+          taxPercentage: {
+            id: "123",
+            pk: 123,
+            value: "25.5",
+          },
+        },
+      ],
+      reservationBeginsAt: new Date(2024, 0, 0, 0, 0).toISOString(),
+      reservationEndsAt: new Date(2025, 0, 0, 0, 0).toISOString(),
+      ...generateNameFragment("Test reservation unit"),
+      unit: {
+        id: "3",
+        ...generateNameFragment("Test unit"),
       },
-    ],
+    },
     state: ReservationStateChoice.Confirmed,
     taxPercentageValue: "25.5",
   };

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { UserPermissionChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
+import { type ReservationUnitReservationsFragment, UserPermissionChoice } from "@gql/gql-types";
 import { getReservationUrl } from "@/common/urls";
 import { formatTime, getReserveeName } from "@/common/util";
 import { truncate } from "@/helpers";
@@ -47,7 +47,7 @@ export function ReservationPopupContent({
       <Flex $gap="xs">
         <Heading>
           {formatTime(reservation.beginsAt)} - {formatTime(reservation.endsAt)} /{" "}
-          {reservation.reservationUnits?.[0]?.nameFi ?? "-"}
+          {reservation.reservationUnit?.nameFi ?? "-"}
         </Heading>
         <VisibleIfPermission reservation={reservation} permission={UserPermissionChoice.CanViewReservations}>
           <Reservee>

@@ -2,26 +2,26 @@ import { differenceInMinutes, format } from "date-fns";
 import type { TFunction } from "i18next";
 import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "common";
 import {
-  type Maybe,
-  CustomerTypeChoice,
-  PriceUnit,
-  ReservationTypeChoice,
-  type PricingFieldsFragment,
-  type ReservationPageQuery,
   type CreateTagStringFragment,
+  CustomerTypeChoice,
+  type Maybe,
+  PriceUnit,
+  type PricingFieldsFragment,
   type ReservationNode,
-  ReservationUnitPricingFieldsFragment,
+  type ReservationPageQuery,
   ReservationPriceDetailsFieldsFragment,
+  ReservationTypeChoice,
+  ReservationUnitPricingFieldsFragment,
 } from "@gql/gql-types";
 import { formatDuration, fromApiDate } from "common/src/common/util";
-import { formatDateTimeRange, formatDate, getReserveeName } from "@/common/util";
+import { formatDate, formatDateTimeRange, getReserveeName } from "@/common/util";
 import { fromAPIDateTime } from "@/helpers";
 import { filterNonNullable, sort, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
 type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
-function reservationUnitName(reservationUnit: Maybe<CreateTagStringFragment["reservationUnits"][0]>): string {
+function reservationUnitName(reservationUnit: Maybe<CreateTagStringFragment["reservationUnit"]>): string {
   return reservationUnit ? `${reservationUnit.nameFi}, ${reservationUnit.unit?.nameFi || ""}` : "-";
 }
 
@@ -73,7 +73,7 @@ export const RESERVATION_PRICE_DETAILS_FRAGMENT = gql`
     appliedPricing {
       taxPercentage
     }
-    reservationUnits {
+    reservationUnit {
       ...ReservationUnitPricingFields
     }
   }
@@ -83,7 +83,7 @@ export const RESERVATION_PRICE_DETAILS_FRAGMENT = gql`
 export function getReservationPriceDetails(reservation: ReservationPriceDetailsFieldsFragment, t: TFunction): string {
   const begin = new Date(reservation.beginsAt);
   const end = new Date(reservation.endsAt);
-  const resUnit = reservation.reservationUnits?.[0] ?? null;
+  const resUnit = reservation.reservationUnit ?? null;
   const durationMinutes = differenceInMinutes(end, begin);
   const pricing = resUnit ? getReservationUnitPricing(resUnit, begin) : null;
 
@@ -187,7 +187,7 @@ function createSingleTagString(reservation: CreateTagStringFragment, t: TFunctio
   const end = new Date(reservation.endsAt);
   const singleDateTimeTag = formatDateTimeRange(t, begin, end);
 
-  const unitTag = reservation?.reservationUnits?.map(reservationUnitName).join(", ");
+  const unitTag = reservationUnitName(reservation.reservationUnit);
 
   const durMinutes = differenceInMinutes(end, begin);
   const durationTag = formatDuration(t, { minutes: durMinutes });
@@ -209,7 +209,7 @@ function createRecurringTagString(reservation: CreateTagStringFragment, t: TFunc
   }
 
   const recurringTag = `${formatDate(beginDate)}–${formatDate(endDate)}`;
-  const unitTag = reservation?.reservationUnits?.map(reservationUnitName).join(", ");
+  const unitTag = reservationUnitName(reservation.reservationUnit);
 
   const weekDayTag = sort(filterNonNullable(weekdays), (a, b) => a - b)
     .map((x) => t(`dayShort.${x}`))
@@ -234,7 +234,7 @@ export const CREATE_TAG_STRING_FRAGMENT = gql`
     id
     beginsAt
     endsAt
-    reservationUnits {
+    reservationUnit {
       id
       nameFi
       unit {

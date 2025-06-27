@@ -8,10 +8,10 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { ErrorBoundary } from "react-error-boundary";
 import {
+  ReservationChangeFormSchema,
+  type ReservationChangeFormType,
   type ReservationFormMeta,
   ReservationTypeSchema,
-  type ReservationChangeFormType,
-  ReservationChangeFormSchema,
 } from "@/schemas";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { useStaffReservationMutation } from "../hooks";
@@ -51,7 +51,7 @@ function EditReservation({
 }) {
   const { t } = useTranslation();
 
-  const reservationUnit = reservation.reservationUnits?.[0];
+  const reservationUnit = reservation.reservationUnit;
 
   // TODO recurring requires a description and a name box
   const form = useForm<FormValueType>({
@@ -103,7 +103,7 @@ function EditReservation({
   });
 
   const onSubmit = (values: FormValueType) => {
-    if (!reservationUnit?.pk) {
+    if (!reservationUnit.pk) {
       errorToast({ text: "ERROR: Can't update without reservation unit" });
       return;
     }
@@ -244,7 +244,7 @@ export const RESERVATION_EDIT_PAGE_QUERY = gql`
         pk
         name
       }
-      reservationUnits {
+      reservationUnit {
         id
         pk
         ...ReservationTypeFormFields

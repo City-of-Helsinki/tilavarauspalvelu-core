@@ -33,7 +33,7 @@ export function ReservationSeriesView({
 
   const { reservations, loading, refetch, reservationSeries } = useReservationSeries(reservationSeriesPk);
 
-  const unitPk = reservationToCopy?.reservationUnits?.[0]?.unit?.pk;
+  const unitPk = reservationToCopy?.reservationUnit?.unit?.pk;
   const { hasPermission } = useCheckPermission({
     units: unitPk ? [unitPk] : [],
     permission: UserPermissionChoice.CanManageReservations,

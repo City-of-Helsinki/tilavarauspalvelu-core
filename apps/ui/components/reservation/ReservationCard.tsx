@@ -25,7 +25,7 @@ interface PropsT {
 export function ReservationCard({ reservation, type }: Readonly<PropsT>): JSX.Element | null {
   const { t, i18n } = useTranslation();
 
-  const reservationUnit = reservation.reservationUnits[0];
+  const reservationUnit = reservation.reservationUnit;
   const link = reservation.pk ? `/reservations/${reservation.pk}` : "";
 
   const { beginsAt, endsAt } = reservation;
@@ -136,7 +136,7 @@ export const RESERVATION_CARD_FRAGMENT = gql`
     endsAt
     state
     accessType
-    reservationUnits {
+    reservationUnit {
       id
       nameFi
       nameSv

@@ -6,7 +6,7 @@ import styled from "styled-components";
 import type { SpaceQuery } from "@gql/gql-types";
 import { formatAddress } from "@/common/util";
 import { getUnitUrl } from "@/common/urls";
-import { fontMedium, H1, Flex } from "common/styled";
+import { Flex, fontMedium, H1 } from "common/styled";
 import { breakpoints } from "common/src/const";
 
 interface IProps {
@@ -37,7 +37,7 @@ const Prop = styled(Flex).attrs({
   $alignItems: "center",
   $gap: "2-xs",
 })<{ $disabled: boolean }>`
-  ${fontMedium}
+  ${fontMedium};
   margin-bottom: var(--spacing-xs);
 
   ${({ $disabled }) => $disabled && "opacity: 0.4;"}

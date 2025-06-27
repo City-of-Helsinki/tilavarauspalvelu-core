@@ -2,10 +2,10 @@ import { useTranslation } from "react-i18next";
 import {
   AccessType,
   type ReservationKeylessEntryFragment,
-  useChangeReservationAccessCodeSingleMutation,
-  useRepairReservationAccessCodeSingleMutation,
   useChangeReservationAccessCodeSeriesMutation,
+  useChangeReservationAccessCodeSingleMutation,
   useRepairReservationAccessCodeSeriesMutation,
+  useRepairReservationAccessCodeSingleMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { successToast } from "common/src/common/toast";
@@ -248,7 +248,7 @@ function AccessCodeChangeRepairButton({
   const [repairAccessCodeMutationSeries] = useRepairReservationAccessCodeSeriesMutation();
 
   const { hasPermission } = useCheckPermission({
-    units: [reservation.reservationUnits?.[0]?.unit?.pk ?? 0],
+    units: [reservation.reservationUnit?.unit?.pk ?? 0],
     permission: UserPermissionChoice.CanManageReservations,
   });
 
@@ -374,7 +374,7 @@ export const RESERVATION_KEYLESS_ENTRY_FRAGMENT = gql`
     id
     pk
     endsAt
-    reservationUnits {
+    reservationUnit {
       id
       unit {
         id

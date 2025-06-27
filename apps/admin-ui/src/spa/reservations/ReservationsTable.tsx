@@ -92,15 +92,15 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     headerName: t("Reservations.headings.reservationUnit"),
     key: "reservation_unit_name_fi",
     isSortable: true,
-    transform: ({ reservationUnits }: ReservationTableElementFragment) =>
-      truncate(reservationUnits?.[0]?.nameFi || "-", MAX_NAME_LENGTH),
+    transform: ({ reservationUnit }: ReservationTableElementFragment) =>
+      truncate(reservationUnit?.nameFi || "-", MAX_NAME_LENGTH),
   },
   {
     headerName: t("Reservations.headings.unit"),
     key: "unit_name_fi",
     isSortable: true,
-    transform: ({ reservationUnits }: ReservationTableElementFragment) =>
-      truncate(reservationUnits?.[0]?.unit?.nameFi || "-", MAX_NAME_LENGTH),
+    transform: ({ reservationUnit }: ReservationTableElementFragment) =>
+      truncate(reservationUnit?.unit?.nameFi || "-", MAX_NAME_LENGTH),
   },
   {
     headerName: t("Reservations.headings.datetime"),
@@ -178,7 +178,7 @@ export const RESERVATION_TABLE_ELEMENT_FRAGMENT = gql`
   fragment ReservationTableElement on ReservationNode {
     ...ReservationCommonFields
     name
-    reservationUnits {
+    reservationUnit {
       id
       nameFi
       unit {

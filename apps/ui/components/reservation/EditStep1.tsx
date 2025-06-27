@@ -32,13 +32,16 @@ const Actions = styled.div`
   display: flex;
   flex-flow: row wrap;
   gap: var(--spacing-m);
+
   & > * {
     flex-grow: 1;
   }
+
   & > :last-child {
     width: 100%;
     order: 1;
   }
+
   & > :not(:last-child) {
     order: 2;
   }
@@ -48,9 +51,11 @@ const Actions = styled.div`
       flex-grow: unset;
       order: unset;
     }
+
     & > :not(:last-child) {
       order: unset;
     }
+
     & > :last-child {
       margin-left: auto;
       width: auto;
@@ -79,7 +84,7 @@ const StyledForm = styled.form`
 export function EditStep1({ reservation, options, onBack, form }: Props): JSX.Element {
   const { t } = useTranslation();
 
-  const reservationUnit = reservation.reservationUnits[0];
+  const reservationUnit = reservation.reservationUnit;
 
   const [isTermsAccepted, setIsTermsAccepted] = useState({
     space: false,

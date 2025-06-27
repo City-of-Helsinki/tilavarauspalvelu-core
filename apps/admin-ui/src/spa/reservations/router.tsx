@@ -30,7 +30,7 @@ export const GET_RESERVATION_PERMISSION_QUERY = gql`
   query ReservationPermissions($id: ID!) {
     reservation(id: $id) {
       id
-      reservationUnits {
+      reservationUnit {
         id
         unit {
           id
@@ -47,7 +47,7 @@ function useCheckReservationPermissions(pk?: string) {
     variables: { id },
     skip: !pk,
   });
-  const units = filterNonNullable(data?.reservation?.reservationUnits.map((ru) => ru.unit?.pk));
+  const units = filterNonNullable([data?.reservation?.reservationUnit?.unit?.pk]);
   const { hasPermission, isLoading } = useCheckPermission({
     units,
     permission: UserPermissionChoice.CanManageReservations,

@@ -87,11 +87,11 @@ type ReservationEdgeT = NonNullable<ReservationQueryT["edges"]>[0];
 type ReservationNodeT = NonNullable<NonNullable<ReservationEdgeT>["node"]>;
 
 type IsWithinCancellationPeriodReservationT = Pick<ReservationNodeT, "beginsAt"> & {
-  reservationUnits?: Readonly<Maybe<Array<CancellationRuleFieldsFragment>> | undefined>;
+  reservationUnit?: Readonly<CancellationRuleFieldsFragment>;
 };
 
 function isTooCloseToCancel(reservation: Readonly<IsWithinCancellationPeriodReservationT>): boolean {
-  const reservationUnit = reservation.reservationUnits?.[0];
+  const reservationUnit = reservation.reservationUnit;
   const begin = new Date(reservation.beginsAt);
 
   const { canBeCancelledTimeBefore } = reservationUnit?.cancellationRule ?? {};
@@ -106,7 +106,7 @@ export const CAN_USER_CANCEL_RESERVATION_FRAGMENT = gql`
     id
     state
     beginsAt
-    reservationUnits {
+    reservationUnit {
       id
       ...CancellationRuleFields
     }
@@ -127,7 +127,7 @@ export type ReservationCancellableReason =
 export function isReservationCancellableReason(
   reservation: CanUserCancelReservationFragment
 ): ReservationCancellableReason {
-  const reservationUnit = reservation.reservationUnits.find(() => true);
+  const reservationUnit = reservation.reservationUnit;
   const isReservationCancelled = reservation.state === ReservationStateChoice.Cancelled;
   if (isReservationCancelled) {
     return "ALREADY_CANCELLED";
@@ -227,7 +227,7 @@ export function getWhyReservationCantBeChanged(reservation: CanReservationBeChan
     return "RESERVATION_BEGIN_IN_PAST";
   }
 
-  const reservationUnit = reservation.reservationUnits?.[0];
+  const reservationUnit = reservation.reservationUnit;
   if (reservationUnit?.cancellationRule == null) {
     return "CANCELLATION_NOT_ALLOWED";
   }

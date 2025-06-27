@@ -3,19 +3,19 @@ import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { type ApolloQueryResult } from "@apollo/client";
-import { Priority, type ApplicationSectionAllocationsQuery } from "@gql/gql-types";
+import { type ApplicationSectionAllocationsQuery, Priority } from "@gql/gql-types";
 import { filterNonNullable, timeToMinutes } from "common/src/helpers";
-import { H5, Strong, Flex, SemiBold, fontMedium } from "common/styled";
+import { Flex, fontMedium, H5, SemiBold, Strong } from "common/styled";
 import { formatDuration } from "common/src/common/util";
 import { Accordion } from "@/component/Accordion";
 import {
-  formatTimeRangeList,
+  type AllocatedTimeSlotNodeT,
   createDurationString,
   decodeTimeSlot,
+  formatSuitableTimeRange,
+  formatTimeRangeList,
   type SectionNodeT,
   type SuitableTimeRangeNodeT,
-  type AllocatedTimeSlotNodeT,
-  formatSuitableTimeRange,
 } from "./modules/applicationRoundAllocation";
 import { useAcceptSlotMutation, useRefreshApplications, useRemoveAllocation } from "./hooks";
 import { getApplicantName } from "@/helpers";
@@ -70,15 +70,17 @@ const StyledAccordion = styled(Accordion)`
   --header-font-size: 1rem;
 
   padding-top: var(--spacing-xs);
+
   & > * {
     padding: 0;
   }
+
   & > div:nth-of-type(2) {
     padding-top: var(--spacing-2-xs);
   }
 
   & h3 {
-    ${fontMedium}
+    ${fontMedium};
     padding: 0;
   }
 `;

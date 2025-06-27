@@ -10,7 +10,7 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { eventStyleGetter, legend, type CalendarEventType, type EventType } from "./eventStyleGetter";
+import { type CalendarEventType, eventStyleGetter, type EventType, legend } from "./eventStyleGetter";
 import { Legend, LegendsWrapper } from "@/component/Legend";
 import { EditTimeModal } from "@/component/EditTimeModal";
 import { isPossibleToEdit } from "@/modules/reservationModificationRules";
@@ -18,7 +18,7 @@ import { getEventBuffers } from "common/src/calendar/util";
 import { filterNonNullable, toNumber } from "common/src/helpers";
 import VisibleIfPermission from "@/component/VisibleIfPermission";
 import { useSearchParams } from "react-router-dom";
-import { useReservationSeries, useReservationCalendarData } from "@/hooks";
+import { useReservationCalendarData, useReservationSeries } from "@/hooks";
 import { add, startOfISOWeek } from "date-fns";
 import { ReservationSeriesView } from "@/component/ReservationSeriesView";
 import { Accordion } from "./components";
@@ -172,8 +172,8 @@ export function TimeBlockSection({
   const { events: eventsAll, refetch: calendarRefetch } = useReservationCalendarData({
     begin: startOfISOWeek(focusDate),
     end: add(startOfISOWeek(focusDate), { days: 7 }),
-    reservationUnitPk: reservation?.reservationUnits?.[0]?.pk,
-    reservationPk: reservation?.pk,
+    reservationUnitPk: reservation.reservationUnit.pk,
+    reservationPk: reservation.pk,
   });
 
   // Necessary because the reservation can be removed (denied) from the parent component
@@ -236,7 +236,7 @@ export const TIME_BLOCK_FRAGMENT = gql`
     ...EventStyleReservationFields
     ...ReservationToCopy
     ...VisibleIfPermissionFields
-    reservationUnits {
+    reservationUnit {
       id
       pk
     }

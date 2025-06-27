@@ -4,7 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { type ApprovalButtonsFragment, ReservationStateChoice } from "@gql/gql-types";
 import { addDays, addMinutes } from "date-fns";
 import ApprovalButtons from "./ApprovalButtons";
-import { vi, describe, test, expect } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { base64encode } from "common/src/helpers";
 
 const wrappedRender = (reservation: ApprovalButtonsFragment) => {
@@ -30,7 +30,10 @@ function createInput({
     endsAt: endsAt.toISOString(),
     paymentOrder: null,
     reservationSeries: null,
-    reservationUnits: [],
+    reservationUnit: {
+      id: base64encode("ReservationUnitNode:1"),
+      pricings: [],
+    },
     price: null,
     handlingDetails: null,
     applyingForFreeOfCharge: false,

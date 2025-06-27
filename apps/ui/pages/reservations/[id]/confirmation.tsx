@@ -65,7 +65,6 @@ function ReservationConfirmation({
 }: Pick<PropsNarrowed, "reservation" | "apiBaseUrl">): JSX.Element {
   const { t } = useTranslation();
   // NOTE typescript can't type array off index
-  const reservationUnit = reservation.reservationUnits.find(() => true);
   const requiresHandling = reservation.state === ReservationStateChoice.RequiresHandling;
 
   const titleKey = requiresHandling ? "reservationInHandling" : "reservationSuccessful";
@@ -85,7 +84,10 @@ function ReservationConfirmation({
       </div>
       <Actions reservation={reservation} />
       <Instructions reservation={reservation} />
-      <BackLinkList reservationUnitHome={getReservationUnitPath(reservationUnit?.pk)} apiBaseUrl={apiBaseUrl} />
+      <BackLinkList
+        reservationUnitHome={getReservationUnitPath(reservation.reservationUnit.pk)}
+        apiBaseUrl={apiBaseUrl}
+      />
     </Wrapper>
   );
 }
@@ -186,7 +188,7 @@ export const CONFIRMATION_QUERY = gql`
         id
         receiptUrl
       }
-      reservationUnits {
+      reservationUnit {
         id
         canApplyFreeOfCharge
         ...CancellationRuleFields
