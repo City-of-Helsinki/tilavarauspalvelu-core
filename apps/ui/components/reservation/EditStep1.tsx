@@ -134,8 +134,8 @@ export function EditStep1({ reservation, options, onBack, form }: Props): JSX.El
   const apiValues = convertReservationFormToApi(watch());
   const modifiedReservation = {
     ...reservation,
-    begin: apiValues?.begin ?? reservation.begin,
-    end: apiValues?.end ?? reservation.end,
+    begin: apiValues?.beginsAt ?? reservation.beginsAt,
+    end: apiValues?.endsAt ?? reservation.endsAt,
   };
 
   if (reservationUnit == null) {
@@ -190,8 +190,8 @@ export const ADJUST_RESERVATION_TIME = gql`
     adjustReservationTime(input: $input) {
       pk
       state
-      begin
-      end
+      beginsAt
+      endsAt
     }
   }
 `;

@@ -281,7 +281,7 @@ function RequestedReservation({
   const ref = useRef<HTMLHeadingElement>(null);
 
   const resUnit = reservation?.reservationUnits?.[0];
-  const pricing = resUnit != null ? getReservationUnitPricing(resUnit, new Date(reservation.begin)) : null;
+  const pricing = resUnit != null ? getReservationUnitPricing(resUnit, new Date(reservation.beginsAt)) : null;
 
   const isNonFree = pricing != null ? !isPriceFree(pricing) : false;
 

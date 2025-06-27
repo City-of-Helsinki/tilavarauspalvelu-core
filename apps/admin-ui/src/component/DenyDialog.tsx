@@ -41,28 +41,28 @@ function isPriceReturnable(x: {
   orderStatus: OrderStatus | null;
   orderUuid: string | null;
   refundUuid: string | null;
-  begin: string;
+  beginsAt: string;
 }): boolean {
   return (
     x.price > 0 &&
     (x.orderStatus === OrderStatus.Paid ||
-      (x.orderStatus === OrderStatus.PaidByInvoice && isBefore(new Date(), new Date(x.begin)))) &&
+      (x.orderStatus === OrderStatus.PaidByInvoice && isBefore(new Date(), new Date(x.beginsAt)))) &&
     x.orderUuid != null &&
     x.refundUuid == null
   );
 }
 
 function convertToReturnState(
-  reservation: Pick<DenyDialogFieldsFragment, "price" | "paymentOrder" | "begin">
+  reservation: Pick<DenyDialogFieldsFragment, "price" | "paymentOrder" | "beginsAt">
 ): ReturnAllowedState {
-  const { price, paymentOrder, begin } = reservation;
+  const { price, paymentOrder, beginsAt } = reservation;
 
   const paid = {
     price: toNumber(price) ?? 0,
     orderStatus: paymentOrder?.status ?? null,
     orderUuid: paymentOrder?.orderUuid ?? null,
     refundUuid: paymentOrder?.refundUuid ?? null,
-    begin,
+    beginsAt,
   };
 
   if (paid.refundUuid != null) {
@@ -384,7 +384,7 @@ export const DENY_DIALOG_FRAGMENT = gql`
   fragment DenyDialogFields on ReservationNode {
     id
     pk
-    begin
+    beginsAt
     handlingDetails
     price
     paymentOrder {

@@ -114,8 +114,8 @@ type DialogContentProps = {
 
 function convertToApiFormat(begin: Date, end: Date) {
   return {
-    begin: begin.toISOString(),
-    end: end.toISOString(),
+    beginsAt: begin.toISOString(),
+    endsAt: end.toISOString(),
   };
 }
 
@@ -321,8 +321,8 @@ export function EditTimeModal({
   const { isOpen } = useModal();
   const { t } = useTranslation();
 
-  const startDateTime = new Date(reservation.begin);
-  const endDateTime = new Date(reservation.end);
+  const startDateTime = new Date(reservation.beginsAt);
+  const endDateTime = new Date(reservation.endsAt);
 
   const reservationUnit = reservation.reservationUnits?.find(() => true);
 
@@ -420,8 +420,8 @@ export const CHANGE_RESERVATION_TIME = gql`
   mutation StaffAdjustReservationTime($input: ReservationStaffAdjustTimeMutationInput!) {
     staffAdjustReservationTime(input: $input) {
       pk
-      begin
-      end
+      beginsAt
+      endsAt
       state
     }
   }
@@ -439,8 +439,8 @@ export const CHANGE_RESERVATION_TIME_QUERY_FRAGMENT = gql`
   fragment ChangeReservationTime on ReservationNode {
     id
     pk
-    begin
-    end
+    beginsAt
+    endsAt
     type
     bufferTimeAfter
     bufferTimeBefore

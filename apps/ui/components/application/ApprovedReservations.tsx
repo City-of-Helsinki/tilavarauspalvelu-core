@@ -866,7 +866,7 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
 
   function getRejected(r: (typeof reservationSeries)[0]): ReservationsTableElem[] {
     return r.rejectedOccurrences.map((res) => {
-      const reservation = { begin: res.beginDatetime, end: res.endDatetime };
+      const reservation = { beginsAt: res.beginDatetime, endsAt: res.endDatetime };
       const rest = formatDateTimeStrings(t, reservation);
       return {
         ...rest,
@@ -883,8 +883,8 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
       return null;
     }
     return {
-      begin: pindoraInfo.accessCodeBeginsAt,
-      end: pindoraInfo.accessCodeEndsAt,
+      beginsAt: pindoraInfo.accessCodeBeginsAt,
+      endsAt: pindoraInfo.accessCodeEndsAt,
     };
   }
 
@@ -1059,10 +1059,10 @@ export const APPLICATION_SECTION_RESERVATION_FRAGMENT = gql`
             beginDatetime
             endDatetime
           }
-          reservations(orderBy: [beginAsc], beginDate: $beginDate) {
+          reservations(orderBy: [beginsAtAsc], beginDate: $beginDate) {
             id
             pk
-            end
+            endsAt
             state
             ...CanUserCancelReservation
             accessType

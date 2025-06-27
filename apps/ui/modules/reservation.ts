@@ -73,26 +73,26 @@ export function getDurationOptions(
   return durationOptions;
 }
 
-function isReservationInThePast(reservation: Pick<ReservationNode, "begin">): boolean {
-  if (!reservation?.begin) {
+function isReservationInThePast(reservation: Pick<ReservationNode, "beginsAt">): boolean {
+  if (!reservation?.beginsAt) {
     return false;
   }
 
   const now = new Date().setSeconds(0, 0);
-  return !isAfter(new Date(reservation.begin).setSeconds(0, 0), now);
+  return !isAfter(new Date(reservation.beginsAt).setSeconds(0, 0), now);
 }
 
 type ReservationQueryT = NonNullable<ListReservationsQuery["reservations"]>;
 type ReservationEdgeT = NonNullable<ReservationQueryT["edges"]>[0];
 type ReservationNodeT = NonNullable<NonNullable<ReservationEdgeT>["node"]>;
 
-type IsWithinCancellationPeriodReservationT = Pick<ReservationNodeT, "begin"> & {
+type IsWithinCancellationPeriodReservationT = Pick<ReservationNodeT, "beginsAt"> & {
   reservationUnits?: Readonly<Maybe<Array<CancellationRuleFieldsFragment>> | undefined>;
 };
 
 function isTooCloseToCancel(reservation: Readonly<IsWithinCancellationPeriodReservationT>): boolean {
   const reservationUnit = reservation.reservationUnits?.[0];
-  const begin = new Date(reservation.begin);
+  const begin = new Date(reservation.beginsAt);
 
   const { canBeCancelledTimeBefore } = reservationUnit?.cancellationRule ?? {};
   const cancelLatest = addSeconds(begin, -(canBeCancelledTimeBefore ?? 0));
@@ -105,7 +105,7 @@ export const CAN_USER_CANCEL_RESERVATION_FRAGMENT = gql`
   fragment CanUserCancelReservation on ReservationNode {
     id
     state
-    begin
+    beginsAt
     reservationUnits {
       id
       ...CancellationRuleFields
@@ -196,7 +196,7 @@ function isReservationFreeOfCharge(reservation: Pick<ReservationNode, "price">):
 
 export const CAN_RESERVATION_BE_CHANGED_FRAGMENT = gql`
   fragment CanReservationBeChanged on ReservationNode {
-    end
+    endsAt
     isHandled
     price
     ...CanUserCancelReservation
@@ -414,7 +414,7 @@ export function createDateTime(date: string, time: string): Date {
 // NOTE backend throws errors in some cases if we accidentally send seconds or milliseconds that are not 0
 export function convertReservationFormToApi(
   formValues: PendingReservationFormType
-): { begin: string; end: string } | null {
+): { beginsAt: string; endsAt: string } | null {
   const time = formValues.time;
   const date = fromUIDate(formValues.date);
   const duration = formValues.duration;
@@ -424,14 +424,14 @@ export function convertReservationFormToApi(
   const minutes = timeToMinutes(time);
   const begin: Date = set(date, { minutes, seconds: 0, milliseconds: 0 });
   const end: Date = addMinutes(begin, duration);
-  return { begin: begin.toISOString(), end: end.toISOString() };
+  return { beginsAt: begin.toISOString(), endsAt: end.toISOString() };
 }
 
 export function transformReservation(
-  reservation?: Pick<ReservationNodeT, "begin" | "end">
+  reservation?: Pick<ReservationNodeT, "beginsAt" | "endsAt">
 ): PendingReservationFormType {
-  const originalBegin = new Date(reservation?.begin ?? "");
-  const originalEnd = new Date(reservation?.end ?? "");
+  const originalBegin = new Date(reservation?.beginsAt ?? "");
+  const originalEnd = new Date(reservation?.endsAt ?? "");
   return {
     date: toUIDate(originalBegin),
     duration: differenceInMinutes(originalEnd, originalBegin),

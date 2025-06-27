@@ -124,8 +124,8 @@ function useCalendarEventChange({
     if (shouldDisplayFocusSlot) {
       const { durationMinutes: diff, start, end } = focusSlot;
       focusEvent = {
-        begin: start,
-        end,
+        beginsAt: start,
+        endsAt: end,
         state: "INITIAL",
         durationString: diff >= 90 ? `(${formatDuration(t, { minutes: diff })})` : "",
       };
@@ -135,8 +135,8 @@ function useCalendarEventChange({
       const suffix = n.state === "INITIAL" ? n.durationString : "";
       const event: CalendarEvent<ReservationNode> = {
         title: n.state === "CANCELLED" ? `${t("reservationCalendar:prefixForCancelled")}: ` : suffix,
-        start: new Date(n.begin ?? ""),
-        end: new Date(n.end ?? ""),
+        start: new Date(n.beginsAt ?? ""),
+        end: new Date(n.endsAt ?? ""),
         allDay: false,
         // TODO refactor and remove modifying the state
         event: n as ReservationNode,
@@ -149,8 +149,8 @@ function useCalendarEventChange({
     const evts = filterNonNullable(events.map((e) => e.event));
     const pendingReservation = focusSlot.isReservable
       ? {
-          begin: focusSlot.start.toISOString(),
-          end: focusSlot.end.toISOString(),
+          beginsAt: focusSlot.start.toISOString(),
+          endsAt: focusSlot.end.toISOString(),
           state: "INITIAL",
           bufferTimeBefore,
           bufferTimeAfter,

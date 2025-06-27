@@ -66,8 +66,8 @@ export function useUnitResources(begin: Date, unitPk: string, reservationUnitTyp
         events: events.map((y) => ({
           event: convertToEvent(y, x),
           title: y.name ?? "",
-          start: new Date(y.begin),
-          end: new Date(y.end),
+          start: new Date(y.beginsAt),
+          end: new Date(y.endsAt),
         })),
       };
     });

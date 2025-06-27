@@ -305,8 +305,8 @@ function ReservationUnit({
     }
     const { start, end } = slot;
     const input: ReservationCreateMutationInput = {
-      begin: start.toISOString(),
-      end: end.toISOString(),
+      beginsAt: start.toISOString(),
+      endsAt: end.toISOString(),
       reservationUnit: reservationUnit.pk,
     };
     return await createReservation(input);
@@ -651,13 +651,13 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   });
   let mutationErrors: ApiError[] | null = null;
   if (pk != null && pk > 0 && isPostLogin && userData?.currentUser != null) {
-    const begin = ignoreMaybeArray(query.begin);
-    const end = ignoreMaybeArray(query.end);
+    const beginsAt = ignoreMaybeArray(query.begin);
+    const endsAt = ignoreMaybeArray(query.end);
 
-    if (begin != null && end != null) {
+    if (beginsAt != null && endsAt != null) {
       const input: ReservationCreateMutationInput = {
-        begin,
-        end,
+        beginsAt,
+        endsAt,
         reservationUnit: pk,
       };
 

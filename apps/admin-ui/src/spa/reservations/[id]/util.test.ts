@@ -54,25 +54,25 @@ function constructPaidPricing(): PricingFieldsFragment {
 }
 
 function constructReservation({
-  begin,
-  end,
+  beginsAt,
+  endsAt,
   enableRecurrence,
 }: {
-  begin: Date;
-  end: Date;
+  beginsAt: Date;
+  endsAt: Date;
   enableRecurrence?: boolean;
 }): CreateTagStringFragment {
   return {
     id: base64encode("ReservationNode:1"),
-    begin: begin.toISOString(),
-    end: end.toISOString(),
+    beginsAt: beginsAt.toISOString(),
+    endsAt: endsAt.toISOString(),
     reservationSeries: enableRecurrence
       ? {
           id: base64encode("ReservationSeriesNode:1"),
           beginTime: "12:00",
           endTime: "14:00",
-          beginDate: toApiDate(begin),
-          endDate: toApiDate(addMonths(end, 3)),
+          beginDate: toApiDate(beginsAt),
+          endDate: toApiDate(addMonths(endsAt, 3)),
           weekdays: [0, 1, 3],
         }
       : null,
@@ -105,9 +105,9 @@ describe("getReservatinUnitPricing", () => {
 
 describe("createTag", () => {
   test("recurring has a tag with a date range and multiple weekdays days", () => {
-    const begin = new Date("2023-04-01T09:00:00Z");
-    const end = addHours(begin, 2);
-    const input = constructReservation({ begin, end, enableRecurrence: true });
+    const beginsAt = new Date("2023-04-01T09:00:00Z");
+    const endsAt = addHours(beginsAt, 2);
+    const input = constructReservation({ beginsAt, endsAt, enableRecurrence: true });
 
     const tag = createTagString(input, mockT);
     expect(tag).toContain("dayShort.0, dayShort.1, dayShort.3 12:00–14:00, common:abbreviations:hour");
@@ -117,8 +117,8 @@ describe("createTag", () => {
 
   test("no recurring defaults to reservation tag", () => {
     const input = constructReservation({
-      begin: new Date("2023-04-01T09:00:00Z"),
-      end: new Date("2023-04-01T11:00:00Z"),
+      beginsAt: new Date("2023-04-01T09:00:00Z"),
+      endsAt: new Date("2023-04-01T11:00:00Z"),
     });
 
     const tag = createTagString(input, mockT);

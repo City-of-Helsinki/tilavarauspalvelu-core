@@ -111,8 +111,8 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
     return {
       title,
       event: reservation,
-      start: new Date(get(reservation, "begin")),
-      end: new Date(get(reservation, "end")),
+      start: new Date(get(reservation, "beginsAt")),
+      end: new Date(get(reservation, "endsAt")),
     };
   });
 
