@@ -46,7 +46,7 @@ export function ReservationPopupContent({
     <PopupContent>
       <Flex $gap="xs">
         <Heading>
-          {formatTime(reservation.begin)} - {formatTime(reservation.end)} /{" "}
+          {formatTime(reservation.beginsAt)} - {formatTime(reservation.endsAt)} /{" "}
           {reservation.reservationUnits?.[0]?.nameFi ?? "-"}
         </Heading>
         <VisibleIfPermission reservation={reservation} permission={UserPermissionChoice.CanViewReservations}>

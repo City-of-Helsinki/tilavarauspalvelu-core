@@ -294,7 +294,7 @@ function AccessCodeChangeRepairButton({
     displayError(e);
   };
 
-  const endDate = reservation.reservationSeries?.endDate || reservation.end;
+  const endDate = reservation.reservationSeries?.endDate || reservation.endsAt;
   const isReservationEnded = new Date() > new Date(endDate);
 
   return (
@@ -373,7 +373,7 @@ export const RESERVATION_KEYLESS_ENTRY_FRAGMENT = gql`
   fragment ReservationKeylessEntry on ReservationNode {
     id
     pk
-    end
+    endsAt
     reservationUnits {
       id
       unit {

@@ -46,8 +46,8 @@ export const EVENT_STYLE_RESERVATION_FRAGMENT = gql`
   fragment EventStyleReservationFields on ReservationNode {
     id
     pk
-    begin
-    end
+    beginsAt
+    endsAt
     bufferTimeAfter
     bufferTimeBefore
     name

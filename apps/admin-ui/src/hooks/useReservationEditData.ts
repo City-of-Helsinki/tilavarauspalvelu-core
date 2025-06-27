@@ -33,7 +33,7 @@ export function useReservationEditData(pk?: string): {
   // real solution is to fix the cache, but without fixing passing query params
   // into it will break the reservation queries elsewhere.
   const possibleReservations = reservationSeries
-    .filter((x) => new Date(x.begin) > new Date())
+    .filter((x) => new Date(x.beginsAt) > new Date())
     .filter((x) => x.state === ReservationStateChoice.Confirmed);
 
   const nextPk = possibleReservations?.at(0)?.pk ?? 0;

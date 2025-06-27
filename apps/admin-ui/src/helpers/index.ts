@@ -57,17 +57,17 @@ export function getBufferTime(
 export function reservationToInterval(
   x: Pick<
     CalendarReservationFragment,
-    "begin" | "end" | "bufferTimeBefore" | "bufferTimeAfter" | "reservationSeries" | "type"
+    "beginsAt" | "endsAt" | "bufferTimeBefore" | "bufferTimeAfter" | "reservationSeries" | "type"
   >,
   comparisonReservationType: ReservationTypeChoice
 ): CollisionInterval | null {
-  if (!x || !x.begin || !x.end) {
+  if (!x || !x.beginsAt || !x.endsAt) {
     return null;
   }
   const t = x.type === ReservationTypeChoice.Blocked ? ReservationTypeChoice.Blocked : comparisonReservationType;
   return {
-    start: new Date(x.begin),
-    end: new Date(x.end),
+    start: new Date(x.beginsAt),
+    end: new Date(x.endsAt),
     buffers: {
       before: getBufferTime(x.bufferTimeBefore, t),
       after: getBufferTime(x.bufferTimeAfter, t),

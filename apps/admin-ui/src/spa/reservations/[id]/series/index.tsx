@@ -43,7 +43,7 @@ type NodeT = NonNullable<SeriesPageQuery["reservation"]>["reservationSeries"];
 function convertToForm(value: NodeT): RescheduleReservationSeriesForm {
   // buffer times can be changed individually but the base value is not saved to the recurring series
   // so we take the most common value from all future reservations
-  const reservations = filterNonNullable(value?.reservations).filter((x) => new Date(x.begin) >= new Date());
+  const reservations = filterNonNullable(value?.reservations).filter((x) => new Date(x.beginsAt) >= new Date());
   const bufferTimeBefore = calculateMedian(reservations.map((x) => x.bufferTimeBefore));
   const bufferTimeAfter = calculateMedian(reservations.map((x) => x.bufferTimeAfter));
   const begin = fromAPIDateTime(value?.beginDate, value?.beginTime);
@@ -113,7 +113,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
   // needs to only be run when the query data changes (first fetch is null)
   // can't change when the form values change -> otherwise we overwrite user selection
   useEffect(() => {
-    const compareList = reservationSeries?.reservations.map((x) => new Date(x.begin));
+    const compareList = reservationSeries?.reservations.map((x) => new Date(x.beginsAt));
     const values = convertToForm(reservationSeries);
     const vals = {
       startingDate: values.startingDate,
@@ -202,7 +202,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
       const d = res.data?.reservationSeries;
       const createdReservations = filterNonNullable(d?.reservations);
       // find the first reservation that is in the future and redirect to it
-      const first = createdReservations.find((x) => new Date(x.begin) >= new Date()) ?? createdReservations[0];
+      const first = createdReservations.find((x) => new Date(x.beginsAt) >= new Date()) ?? createdReservations[0];
       if (first == null) {
         throw new Error("No reservations found");
       }

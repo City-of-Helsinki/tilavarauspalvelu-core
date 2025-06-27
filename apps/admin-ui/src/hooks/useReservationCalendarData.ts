@@ -96,8 +96,8 @@ function convertReservationToCalendarEvent(
       name: r.name?.trim() !== "" ? r.name : "No name",
       reservationSeries: null,
     },
-    start: new Date(r.begin),
-    end: new Date(r.end),
+    start: new Date(r.beginsAt),
+    end: new Date(r.beginsAt),
   };
 }
 

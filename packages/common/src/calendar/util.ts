@@ -2,8 +2,8 @@ import { addSeconds } from "date-fns";
 import { type CalendarEventBuffer } from "./Calendar";
 
 export type ReservationEventType = {
-  begin: string;
-  end: string;
+  beginsAt: string;
+  endsAt: string;
   bufferTimeBefore: number;
   bufferTimeAfter: number;
 };
@@ -11,12 +11,12 @@ export type ReservationEventType = {
 export function getEventBuffers(events: ReservationEventType[]): CalendarEventBuffer[] {
   const buffers: CalendarEventBuffer[] = [];
   for (const event of events) {
-    if (!event.begin || !event.end) {
+    if (!event.beginsAt || !event.endsAt) {
       continue;
     }
     const { bufferTimeBefore, bufferTimeAfter } = event;
-    const begin = new Date(event.begin);
-    const end = new Date(event.end);
+    const begin = new Date(event.beginsAt);
+    const end = new Date(event.endsAt);
 
     if (bufferTimeBefore) {
       buffers.push({

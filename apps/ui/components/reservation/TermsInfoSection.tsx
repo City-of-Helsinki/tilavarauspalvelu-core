@@ -15,7 +15,7 @@ export function TermsInfoSection({
   reservation,
   termsOfUse,
 }: Readonly<{
-  reservation: Pick<NodeT, "reservationUnits" | "begin" | "applyingForFreeOfCharge">;
+  reservation: Pick<NodeT, "reservationUnits" | "beginsAt" | "applyingForFreeOfCharge">;
   termsOfUse: PropsNarrowed["termsOfUse"];
 }>) {
   const { t, i18n } = useTranslation();
@@ -26,7 +26,7 @@ export function TermsInfoSection({
       return false;
     }
 
-    const isFreeOfCharge = isReservationUnitFreeOfCharge(reservationUnit.pricings, new Date(reservation.begin));
+    const isFreeOfCharge = isReservationUnitFreeOfCharge(reservationUnit.pricings, new Date(reservation.beginsAt));
 
     return reservation.applyingForFreeOfCharge || (reservationUnit.canApplyFreeOfCharge && !isFreeOfCharge);
   }, [reservation, reservationUnit]);

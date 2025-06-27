@@ -66,14 +66,14 @@ type ReservationEdgeProps = {
 function createReservation({
   pk,
   recurringPk,
-  begin,
-  end,
+  beginsAt,
+  endsAt,
   state = ReservationStateChoice.Confirmed,
 }: {
   pk: number;
   recurringPk: number;
-  begin: string;
-  end: string;
+  beginsAt: string;
+  endsAt: string;
   state?: ReservationStateChoice;
 }): NonNullable<ReservationSeriesQuery["reservationSeries"]>["reservations"][number] {
   return {
@@ -94,8 +94,8 @@ function createReservation({
     state,
     id: base64encode(`ReservationNode:${pk}`),
     pk,
-    begin,
-    end,
+    beginsAt,
+    endsAt,
   };
 }
 
@@ -116,15 +116,15 @@ function createReservationEdge({
       pk: startingPk,
       recurringPk,
       state,
-      begin: begin1,
-      end: end1,
+      beginsAt: begin1,
+      endsAt: end1,
     }),
     createReservation({
       pk: startingPk + 1,
       recurringPk,
       state,
-      begin: begin1,
-      end: end1,
+      beginsAt: begin1,
+      endsAt: end1,
     }),
   ];
 }

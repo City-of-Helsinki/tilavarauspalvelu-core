@@ -180,9 +180,9 @@ function transformOrderBy(orderBy: string, desc: boolean): ReservationOrderingCh
     case "pk":
       return desc ? ReservationOrderingChoices.PkDesc : ReservationOrderingChoices.PkAsc;
     case "begin":
-      return desc ? ReservationOrderingChoices.BeginDesc : ReservationOrderingChoices.BeginAsc;
+      return desc ? ReservationOrderingChoices.BeginsAtDesc : ReservationOrderingChoices.BeginsAtAsc;
     case "end":
-      return desc ? ReservationOrderingChoices.EndDesc : ReservationOrderingChoices.EndAsc;
+      return desc ? ReservationOrderingChoices.EndsAtDesc : ReservationOrderingChoices.EndsAtAsc;
     case "created_at":
       return desc ? ReservationOrderingChoices.CreatedAtDesc : ReservationOrderingChoices.CreatedAtAsc;
     case "reservee_name":
@@ -206,8 +206,8 @@ function transformOrderBy(orderBy: string, desc: boolean): ReservationOrderingCh
 function transformSortString(orderBy: string | null): ReservationOrderingChoices[] {
   const defaultSort = [
     ReservationOrderingChoices.StateDesc,
-    ReservationOrderingChoices.BeginAsc,
-    ReservationOrderingChoices.EndAsc,
+    ReservationOrderingChoices.BeginsAtAsc,
+    ReservationOrderingChoices.EndsAtAsc,
   ];
   if (!orderBy) {
     return defaultSort;
@@ -220,13 +220,13 @@ function transformSortString(orderBy: string | null): ReservationOrderingChoices
     return defaultSort;
   }
 
-  if (transformed === ReservationOrderingChoices.BeginAsc) {
-    return [transformed, ReservationOrderingChoices.EndAsc];
+  if (transformed === ReservationOrderingChoices.BeginsAtAsc) {
+    return [transformed, ReservationOrderingChoices.EndsAtAsc];
   }
-  if (transformed === ReservationOrderingChoices.BeginDesc) {
-    return [transformed, ReservationOrderingChoices.EndDesc];
+  if (transformed === ReservationOrderingChoices.BeginsAtDesc) {
+    return [transformed, ReservationOrderingChoices.EndsAtDesc];
   }
-  return [transformed, ReservationOrderingChoices.BeginAsc, ReservationOrderingChoices.EndAsc];
+  return [transformed, ReservationOrderingChoices.BeginsAtAsc, ReservationOrderingChoices.EndsAtAsc];
 }
 
 export const RESERVATION_LIST_QUERY = gql`

@@ -106,8 +106,8 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     headerName: t("Reservations.headings.datetime"),
     key: "begin",
     isSortable: true,
-    transform: ({ begin, end }: ReservationTableElementFragment) =>
-      formatDateTimeRange(t, new Date(begin), new Date(end)),
+    transform: ({ beginsAt, endsAt }: ReservationTableElementFragment) =>
+      formatDateTimeRange(t, new Date(beginsAt), new Date(endsAt)),
   },
   {
     headerName: t("Reservations.headings.createdAt"),

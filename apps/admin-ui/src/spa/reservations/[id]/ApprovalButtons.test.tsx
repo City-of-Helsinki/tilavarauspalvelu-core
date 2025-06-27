@@ -17,17 +17,17 @@ const wrappedRender = (reservation: ApprovalButtonsFragment) => {
 
 function createInput({
   state,
-  end = addDays(new Date(), 2),
+  endsAt = addDays(new Date(), 2),
 }: {
   state: ReservationStateChoice;
-  end?: Date;
+  endsAt?: Date;
 }): ApprovalButtonsFragment {
   return {
     id: base64encode("ReservationNode:1"),
     pk: 1,
     state,
-    begin: end.toISOString(),
-    end: end.toISOString(),
+    beginsAt: endsAt.toISOString(),
+    endsAt: endsAt.toISOString(),
     paymentOrder: null,
     reservationSeries: null,
     reservationUnits: [],
@@ -77,7 +77,7 @@ describe("State change rules", () => {
   test("Past Confirmed all buttons are disabled", () => {
     const input = createInput({
       state: ReservationStateChoice.Confirmed,
-      end: addDays(new Date(), -2),
+      endsAt: addDays(new Date(), -2),
     });
     const view = wrappedRender(input);
     expect(view.queryAllByRole("button")).toHaveLength(0);
@@ -86,7 +86,7 @@ describe("State change rules", () => {
   test("Past Denied all buttons are disabled", () => {
     const input = createInput({
       state: ReservationStateChoice.Denied,
-      end: addDays(new Date(), -2),
+      endsAt: addDays(new Date(), -2),
     });
     const view = wrappedRender(input);
     expect(view.queryAllByRole("button")).toHaveLength(0);
@@ -95,7 +95,7 @@ describe("State change rules", () => {
   test("Past RequiresHandling can be Denied", () => {
     const input = createInput({
       state: ReservationStateChoice.RequiresHandling,
-      end: addDays(new Date(), -2),
+      endsAt: addDays(new Date(), -2),
     });
     const view = wrappedRender(input);
 
@@ -147,7 +147,7 @@ describe("Editing allowed", () => {
   test("Past Confirmed has a one hour edit window", () => {
     const input = createInput({
       state: ReservationStateChoice.Confirmed,
-      end: addMinutes(new Date(), -45),
+      endsAt: addMinutes(new Date(), -45),
     });
     const view = wrappedRender(input);
     expect(view.getByRole("link", { name: "ApprovalButtons.edit" })).toBeInTheDocument();

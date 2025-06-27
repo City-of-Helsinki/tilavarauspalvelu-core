@@ -125,7 +125,7 @@ function Reservation({
 }: Readonly<Pick<PropsNarrowed, "termsOfUse" | "reservation" | "feedbackUrl" | "options">>): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const shouldShowAccessCode =
-    isBefore(sub(new Date(), { days: 1 }), new Date(reservation.end)) &&
+    isBefore(sub(new Date(), { days: 1 }), new Date(reservation.endsAt)) &&
     reservation.state === ReservationStateChoice.Confirmed &&
     reservation.accessType === AccessType.AccessCode;
   const { data: accessCodeData } = useAccessCodeQuery({
@@ -154,8 +154,8 @@ function Reservation({
     message: t("reservations:reservationCancelledTitle"),
   });
 
-  const { begin, end } = reservation;
-  const timeString = capitalize(formatDateTimeRange(t, new Date(begin), new Date(end)));
+  const { beginsAt, endsAt } = reservation;
+  const timeString = capitalize(formatDateTimeRange(t, new Date(beginsAt), new Date(endsAt)));
 
   const supportedFields = filterNonNullable(reservationUnit?.metadataSet?.supportedFields);
 

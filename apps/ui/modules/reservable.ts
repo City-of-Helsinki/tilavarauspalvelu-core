@@ -41,7 +41,7 @@ export type RoundPeriod = {
 
 type BufferCollideCheckReservation = Pick<
   ReservationNode,
-  "begin" | "end" | "isBlocked" | "bufferTimeBefore" | "bufferTimeAfter"
+  "beginsAt" | "endsAt" | "isBlocked" | "bufferTimeBefore" | "bufferTimeAfter"
 >;
 
 // TODO sub classing Map and overriding get would be a lot cleaner
@@ -257,8 +257,8 @@ export function isRangeReservable({
   // This is the slowest part of the function => run it last
   // because the reservationSet includes every reservation not just for the selected day
   const others = blockingReservations.filter(shouldReservationBlock).filter((r) => {
-    const rStart = new Date(r.begin);
-    const rEnd = new Date(r.end);
+    const rStart = new Date(r.beginsAt);
+    const rEnd = new Date(r.endsAt);
     // Performance optimization:
     // (should be filtered outside of this function and cached per week, not calculated every time reservation time is selected)
     // buffer is never greater than 24 hours (using real buffer time could work, but we'd have more complex rules)
@@ -372,8 +372,8 @@ function hasCollisions(
   }
 ): boolean {
   const unbuf = {
-    start: new Date(reservation.begin),
-    end: new Date(reservation.end),
+    start: new Date(reservation.beginsAt),
+    end: new Date(reservation.endsAt),
   };
   const bufferedNewReservation = getBufferedEventTimes(
     newReservation.start,
@@ -385,8 +385,8 @@ function hasCollisions(
     return true;
   }
   const bufferedReservation = getBufferedEventTimes(
-    new Date(reservation.begin),
-    new Date(reservation.end),
+    new Date(reservation.beginsAt),
+    new Date(reservation.endsAt),
     reservation.bufferTimeBefore,
     reservation.bufferTimeAfter,
     reservation.isBlocked

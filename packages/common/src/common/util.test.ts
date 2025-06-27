@@ -26,15 +26,15 @@ describe("getEventBuffers", () => {
     const events = [
       {
         id: "1234",
-        begin: new Date("2019-09-22T12:00:00+00:00").toString(),
-        end: new Date("2019-09-22T13:00:00+00:00").toString(),
+        beginsAt: new Date("2019-09-22T12:00:00+00:00").toString(),
+        endsAt: new Date("2019-09-22T13:00:00+00:00").toString(),
         bufferTimeBefore: 3600,
         bufferTimeAfter: 5400,
       },
       {
         id: "3456",
-        begin: new Date("2019-09-22T15:00:00+00:00").toString(),
-        end: new Date("2019-09-22T16:00:00+00:00").toString(),
+        beginsAt: new Date("2019-09-22T15:00:00+00:00").toString(),
+        endsAt: new Date("2019-09-22T16:00:00+00:00").toString(),
         bufferTimeBefore: null,
         bufferTimeAfter: 9000,
       },

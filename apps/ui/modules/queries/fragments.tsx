@@ -47,8 +47,8 @@ export const BLOCKING_RESERVATION_FRAGMENT = gql`
     id
     state
     isBlocked
-    begin
-    end
+    beginsAt
+    endsAt
     numPersons
     bufferTimeBefore
     bufferTimeAfter

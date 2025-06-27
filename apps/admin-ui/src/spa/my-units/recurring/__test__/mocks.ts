@@ -156,8 +156,8 @@ const reservationsByUnitResponse: CalendarReservationFragment[] = mondayMorningR
   .map((x) => ({
     __typename: "ReservationNode",
     id: base64encode(`ReservationNode:1`),
-    begin: x.begin.toUTCString(),
-    end: x.end.toUTCString(),
+    beginsAt: x.begin.toUTCString(),
+    endsAt: x.end.toUTCString(),
     bufferTimeBefore: 0,
     bufferTimeAfter: 0,
     accessType: AccessType.Unrestricted,

@@ -75,7 +75,7 @@ const Calendar = forwardRef(function Calendar(
   };
 
   const isAllowedToModify =
-    !reservation.reservationSeries && isPossibleToEdit(reservation.state, new Date(reservation.end));
+    !reservation.reservationSeries && isPossibleToEdit(reservation.state, new Date(reservation.endsAt));
 
   const eventBuffers = getEventBuffers(
     filterNonNullable(events.map((e) => e.event).filter((e) => e?.type !== ReservationTypeChoice.Blocked))
@@ -138,13 +138,13 @@ export function TimeBlockSection({
   const { reservations } = useReservationSeries(reservation.reservationSeries?.pk ?? undefined);
 
   const nextReservation = reservations.find(
-    (x) => x.state === ReservationStateChoice.Confirmed && new Date(x.begin) > new Date()
+    (x) => x.state === ReservationStateChoice.Confirmed && new Date(x.beginsAt) > new Date()
   );
 
-  const shownReservation = new Date(reservation.begin) > new Date() ? reservation : nextReservation;
+  const shownReservation = new Date(reservation.beginsAt) > new Date() ? reservation : nextReservation;
 
   const [focusDate, setFocusDate] = useState<Date>(
-    onlyFutureDates(maybeStringToDate(shownReservation?.begin)) ?? new Date()
+    onlyFutureDates(maybeStringToDate(shownReservation?.beginsAt)) ?? new Date()
   );
 
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -157,7 +157,7 @@ export function TimeBlockSection({
       setSearchParams(params, { replace: true });
       const selectedReservation = reservations.find((x) => x.pk === pk);
       if (selectedReservation) {
-        setFocusDate(new Date(selectedReservation.begin));
+        setFocusDate(new Date(selectedReservation.beginsAt));
         calendarRef.current?.scrollIntoView({ behavior: "smooth" });
       }
     } else {

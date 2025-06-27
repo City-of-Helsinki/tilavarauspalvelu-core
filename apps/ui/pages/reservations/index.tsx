@@ -58,7 +58,8 @@ function Reservations(): JSX.Element | null {
               ReservationStateChoice.WaitingForPayment,
               ReservationStateChoice.Denied,
             ],
-      orderBy: tab === "upcoming" ? [ReservationOrderingChoices.BeginAsc] : [ReservationOrderingChoices.BeginDesc],
+      orderBy:
+        tab === "upcoming" ? [ReservationOrderingChoices.BeginsAtAsc] : [ReservationOrderingChoices.BeginsAtDesc],
       user: currentUser?.pk ?? 0,
       // NOTE today's reservations are always shown in upcoming (even when they are in the past)
       beginDate: tab === "upcoming" ? toApiDate(today) : undefined,
