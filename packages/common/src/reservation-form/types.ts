@@ -1,16 +1,5 @@
 import { MunicipalityChoice, type ReserveeType } from "../../gql/gql-types";
 
-type Billing = {
-  billingFirstName: string;
-  billingLastName: string;
-  billingPhone: string;
-  billingEmail: string;
-  billingAddressStreet: string;
-  billingAddressCity: string;
-  billingAddressZip: string;
-  showBillingAddress?: boolean;
-};
-
 type Reservee = {
   reserveeFirstName: string;
   reserveeLastName: string;
@@ -39,12 +28,9 @@ type CommonInputs = {
 
 export type Inputs = {
   pk: number;
-  // TODO why is this optional unlike other fields?
-  showBillingAddress?: boolean;
   reserveeIsUnregisteredAssociation?: boolean;
   reserveeIdentifier?: number;
-} & Billing &
-  Reservee &
+} & Reservee &
   CommonInputs;
 
 export type Reservation = {
@@ -57,9 +43,7 @@ export type Reservation = {
   state?: string;
   price?: number;
   taxPercentageValue?: number;
-  showBillingAddress?: boolean;
-} & Partial<Billing> &
-  Partial<Reservee> &
+} & Partial<Reservee> &
   Partial<CommonInputs>;
 
 const fieldsCommon = [
