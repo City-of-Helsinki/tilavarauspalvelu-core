@@ -13,13 +13,14 @@ from query_optimizer import AnnotatedField, ManuallyOptimizedField, MultiField
 from query_optimizer.optimizer import QueryOptimizer
 from rest_framework.reverse import reverse
 
+from tilavarauspalvelu.api.graphql.types.user.types import UserNode
 from tilavarauspalvelu.enums import (
     AccessType,
-    CustomerTypeChoice,
     PriceUnit,
     ReservationCancelReasonChoice,
     ReservationStateChoice,
     ReservationTypeChoice,
+    ReserveeType,
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Reservation, ReservationUnit, ReservationUnitPricing, User
@@ -131,7 +132,7 @@ class ReservationNode(DjangoNode):
 
     pindora_info = MultiField(
         PindoraReservationInfoType,
-        fields=["access_type", "ext_uuid", "state", "end"],
+        fields=["access_type", "ext_uuid", "state", "ends_at"],
         description=(
             "Info fetched from Pindora API. Cached per reservation for 30s. "
             "Please don't use this when filtering multiple reservations, queries to Pindora are not optimized."
@@ -167,7 +168,7 @@ class ReservationNode(DjangoNode):
     applying_for_free_of_charge = graphene.Boolean()
     free_of_charge_reason = graphene.String()
     #
-    reservee_id = graphene.String()
+    reservee_identifier = graphene.String()
     reservee_first_name = graphene.String()
     reservee_last_name = graphene.String()
     reservee_email = graphene.String()
@@ -175,17 +176,10 @@ class ReservationNode(DjangoNode):
     reservee_address_street = graphene.String()
     reservee_address_city = graphene.String()
     reservee_address_zip = graphene.String()
-    reservee_is_unregistered_association = graphene.Boolean()
     reservee_organisation_name = graphene.String()
-    reservee_type = graphene.Field(graphene.Enum.from_enum(CustomerTypeChoice))
+    reservee_type = graphene.Field(graphene.Enum.from_enum(ReserveeType))
     #
-    billing_first_name = graphene.String()
-    billing_last_name = graphene.String()
-    billing_email = graphene.String()
-    billing_phone = graphene.String()
-    billing_address_street = graphene.String()
-    billing_address_city = graphene.String()
-    billing_address_zip = graphene.String()
+    user = graphene.Field(UserNode)
 
     class Meta:
         model = Reservation
@@ -198,12 +192,13 @@ class ReservationNode(DjangoNode):
             "num_persons",
             "state",
             "type",
+            "municipality",
             "cancel_details",
             "handling_details",
             "working_memo",
             #
-            "begin",
-            "end",
+            "begins_at",
+            "ends_at",
             "buffer_time_before",
             "buffer_time_after",
             "handled_at",
@@ -224,7 +219,7 @@ class ReservationNode(DjangoNode):
             "applying_for_free_of_charge",
             "free_of_charge_reason",
             #
-            "reservee_id",
+            "reservee_identifier",
             "reservee_name",
             "reservee_first_name",
             "reservee_last_name",
@@ -233,25 +228,15 @@ class ReservationNode(DjangoNode):
             "reservee_address_street",
             "reservee_address_city",
             "reservee_address_zip",
-            "reservee_is_unregistered_association",
             "reservee_organisation_name",
             "reservee_type",
             #
-            "billing_first_name",
-            "billing_last_name",
-            "billing_email",
-            "billing_phone",
-            "billing_address_street",
-            "billing_address_city",
-            "billing_address_zip",
-            #
-            "reservation_units",
+            "reservation_unit",
             "user",
-            "recurring_reservation",
+            "reservation_series",
             "deny_reason",
             "cancel_reason",
             "purpose",
-            "home_city",
             "age_group",
             #
             "is_blocked",
@@ -281,11 +266,11 @@ class ReservationNode(DjangoNode):
                 # PUBLIC FIELDS
                 "pk",
                 "state",
-                "begin",
-                "end",
+                "begins_at",
+                "ends_at",
                 "buffer_time_before",
                 "buffer_time_after",
-                "reservation_units",
+                "reservation_unit",
                 "is_blocked",
             }
         }
@@ -324,7 +309,7 @@ class ReservationNode(DjangoNode):
 
         # No need to show Pindora info after 24 hours have passed since it ended
         now = local_datetime()
-        cutoff = root.end.astimezone(DEFAULT_TIMEZONE) + datetime.timedelta(hours=24)
+        cutoff = root.ends_at.astimezone(DEFAULT_TIMEZONE) + datetime.timedelta(hours=24)
         if now > cutoff:
             return None
 
@@ -334,12 +319,12 @@ class ReservationNode(DjangoNode):
         if not has_perms and root.state != ReservationStateChoice.CONFIRMED:
             return None
 
-        if root.recurring_reservation is not None and root.recurring_reservation.allocated_time_slot is not None:
-            section = root.recurring_reservation.allocated_time_slot.reservation_unit_option.application_section
+        if root.reservation_series is not None and root.reservation_series.allocated_time_slot is not None:
+            section = root.reservation_series.allocated_time_slot.reservation_unit_option.application_section
             application_round = section.application.application_round
 
             # Don't show Pindora info without permissions if the application round results haven't been sent yet
-            if not has_perms and application_round.sent_date is None:
+            if not has_perms and application_round.sent_at is None:
                 return None
 
         try:
@@ -358,9 +343,9 @@ class ReservationNode(DjangoNode):
         optimizer.annotations["applied_pricing"] = models.Subquery(
             queryset=(
                 ReservationUnitPricing.objects.filter(
-                    reservation_unit=models.OuterRef("reservation_units"),
+                    reservation_unit=models.OuterRef("reservation_unit"),
                 )
-                .active(from_date=models.OuterRef("begin__date"))
+                .active(from_date=models.OuterRef("begins_at__date"))
                 .annotate(
                     data=JSONObject(
                         begins=models.F("begins"),

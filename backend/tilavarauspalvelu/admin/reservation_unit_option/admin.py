@@ -49,8 +49,8 @@ class ReservationUnitOptionAdmin(admin.ModelAdmin):
         "application_section",
         "reservation_unit",
         "preferred_order",
-        "rejected",
-        "locked",
+        "is_rejected",
+        "is_locked",
     ]
     readonly_fields = [
         "application_section",

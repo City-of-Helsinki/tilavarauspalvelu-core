@@ -186,7 +186,8 @@ def test_reservation_approved__get_context__instance(email_reservation):
     instructions_html = '<p>[HYVÄKSYTYN VARAUKSEN OHJEET] <a href="https://foo.bar">LINK</a></p>'
     instructions_text = "[HYVÄKSYTYN VARAUKSEN OHJEET] LINK <https://foo.bar>"
 
-    email_reservation.reservation_units.update(reservation_confirmed_instructions_en=instructions_html)
+    email_reservation.reservation_unit.reservation_confirmed_instructions_en = instructions_html
+    email_reservation.reservation_unit.save()
 
     expected = {
         **LANGUAGE_CONTEXT["en"],
@@ -577,9 +578,9 @@ def test_reservation_approved__send_email(outbox):
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        reservation_unit__name="foo",
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_approved_email(reservation)
@@ -601,9 +602,9 @@ def test_reservation_approved__send_email__wrong_state(outbox):
         state=ReservationStateChoice.CANCELLED,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        reservation_unit__name="foo",
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_approved_email(reservation)
@@ -620,9 +621,9 @@ def test_reservation_approved__send_email__no_recipients(outbox):
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="",
         user__email="",
-        reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        reservation_unit__name="foo",
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_approved_email(reservation)
@@ -641,9 +642,9 @@ def test_reservation_approved__send_email__reservation_in_the_past(outbox):
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        reservation_unit__name="foo",
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_approved_email(reservation)

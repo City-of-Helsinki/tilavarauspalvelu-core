@@ -33,9 +33,9 @@ from tests.factories import (
     ApplicationRoundFactory,
     ApplicationSectionFactory,
     BannerNotificationFactory,
-    RecurringReservationFactory,
     ReservationDenyReasonFactory,
     ReservationFactory,
+    ReservationSeriesFactory,
     ReservationUnitFactory,
     ReservationUnitImageFactory,
     ReservationUnitOptionFactory,
@@ -87,7 +87,7 @@ def test_frontend_queries__customer_ui__AddReservationToSeries(graphql):
 
     factory_args = deepcopy(query_info.factory_args)
     factory_args["begin"] = now
-    series = RecurringReservationFactory.create_with_matching_reservations(**factory_args)
+    series = ReservationSeriesFactory.create_with_matching_reservations(**factory_args)
 
     last_reservation = series.reservations.last()
 
@@ -97,8 +97,8 @@ def test_frontend_queries__customer_ui__AddReservationToSeries(graphql):
     variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": series.pk,
-        "begin": new_begin.isoformat(),
-        "end": new_end.isoformat(),
+        "beginsAt": new_begin.isoformat(),
+        "endsAt": new_end.isoformat(),
     }
     assert_no_undefined_variables(variables)
 
@@ -228,7 +228,7 @@ def test_frontend_queries__customer_ui__ChangeReservationAccessCodeSeries(graphq
     factory_args = deepcopy(query_info.factory_args)
     factory_args["begin"] = now
     factory_args["reservations__access_type"] = AccessType.ACCESS_CODE
-    series = RecurringReservationFactory.create_with_matching_reservations(**factory_args)
+    series = ReservationSeriesFactory.create_with_matching_reservations(**factory_args)
 
     variables = deepcopy(query_info.variables)
     variables["input"] = {
@@ -260,7 +260,7 @@ def test_frontend_queries__customer_ui__ChangeReservationAccessCodeSingle(graphq
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
-    factory_args["begin"] = next_hour()
+    factory_args["begins_at"] = next_hour()
     factory_args["access_type"] = AccessType.ACCESS_CODE
     reservation = ReservationFactory.create_for_staff_update(**factory_args)
 
@@ -449,8 +449,8 @@ def test_frontend_queries__customer_ui__CreateStaffReservation(graphql):
 
     variables = deepcopy(query_info.variables)
     variables["input"] = {
-        "begin": begin.isoformat(),
-        "end": end.isoformat(),
+        "beginsAt": begin.isoformat(),
+        "endsAt": end.isoformat(),
         "reservationUnit": reservation_unit.pk,
         "type": ReservationTypeChoice.STAFF.value,
     }
@@ -593,7 +593,7 @@ def test_frontend_queries__customer_ui__DenyReservationSeries(graphql):
 
     factory_args: dict[str, Any] = {}
     factory_args["reservations__state"] = ReservationStateChoice.REQUIRES_HANDLING
-    series = RecurringReservationFactory.create_with_matching_reservations(**factory_args)
+    series = ReservationSeriesFactory.create_with_matching_reservations(**factory_args)
 
     deny_reason = ReservationDenyReasonFactory.create()
 
@@ -716,7 +716,7 @@ def test_frontend_queries__customer_ui__RejectRest(graphql):
     variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": option.pk,
-        "locked": True,
+        "isLocked": True,
     }
     assert_no_undefined_variables(variables)
 
@@ -740,7 +740,7 @@ def test_frontend_queries__customer_ui__RepairReservationAccessCodeSeries(graphq
     factory_args["reservations__access_type"] = AccessType.ACCESS_CODE
     factory_args["begin"] = next_hour()
 
-    series = RecurringReservationFactory.create_with_matching_reservations(**factory_args)
+    series = ReservationSeriesFactory.create_with_matching_reservations(**factory_args)
 
     variables = deepcopy(query_info.variables)
     variables["input"] = {
@@ -766,7 +766,7 @@ def test_frontend_queries__customer_ui__RepairReservationAccessCodeSingle(graphq
 
     factory_args: dict[str, Any] = {}
     factory_args["access_type"] = AccessType.ACCESS_CODE
-    factory_args["begin"] = next_hour()
+    factory_args["begins_at"] = next_hour()
 
     reservation = ReservationFactory.create(**factory_args)
 
@@ -818,7 +818,7 @@ def test_frontend_queries__customer_ui__RescheduleReservationSeries(graphql):
     factory_args["begin"] = next_hour()
     factory_args["weekdays"] = f"{Weekday.MONDAY.as_weekday_number}"
 
-    series = RecurringReservationFactory.create_with_matching_reservations(**factory_args)
+    series = ReservationSeriesFactory.create_with_matching_reservations(**factory_args)
 
     variables = deepcopy(query_info.variables)
     variables["input"] = {
@@ -843,7 +843,7 @@ def test_frontend_queries__customer_ui__RestoreAllApplicationOptions(graphql):
     query_info = factories[0]
 
     factory_args: dict[str, Any] = {}
-    factory_args["application_sections__reservation_unit_options__rejected"] = True
+    factory_args["application_sections__reservation_unit_options__is_rejected"] = True
 
     application = ApplicationFactory.create_in_status_in_allocation(**factory_args)
 
@@ -869,7 +869,7 @@ def test_frontend_queries__customer_ui__RestoreAllSectionOptions(graphql):
     query_info = factories[0]
 
     factory_args: dict[str, Any] = {}
-    factory_args["reservation_unit_options__rejected"] = True
+    factory_args["reservation_unit_options__is_rejected"] = True
 
     section = ApplicationSectionFactory.create_in_status_in_allocation(**factory_args)
 
@@ -920,8 +920,8 @@ def test_frontend_queries__customer_ui__StaffAdjustReservationTime(graphql):
     variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation.pk,
-        "begin": (reservation.begin + datetime.timedelta(hours=1)).isoformat(),
-        "end": (reservation.end + datetime.timedelta(hours=1)).isoformat(),
+        "beginsAt": (reservation.begins_at + datetime.timedelta(hours=1)).isoformat(),
+        "endsAt": (reservation.ends_at + datetime.timedelta(hours=1)).isoformat(),
     }
     assert_no_undefined_variables(variables)
 
@@ -984,7 +984,7 @@ def test_frontend_queries__customer_ui__UpdateRecurringReservation(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    series = RecurringReservationFactory.create()
+    series = ReservationSeriesFactory.create()
 
     variables = deepcopy(query_info.variables)
     variables["input"] = {

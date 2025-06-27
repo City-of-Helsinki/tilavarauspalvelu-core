@@ -40,7 +40,6 @@ if TYPE_CHECKING:
 
     from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIResource
     from tilavarauspalvelu.models import (
-        Location,
         PaymentAccounting,
         PaymentMerchant,
         ReservationUnitAccessType,
@@ -101,7 +100,7 @@ class ReservationUnitHaukiExporter:
                         "id": "tvp",
                         "name": "Tilavarauspalvelu",
                     },
-                    "origin_id": str(self.reservation_unit.uuid),
+                    "origin_id": str(self.reservation_unit.ext_uuid),
                 }
             ],
             "parents": [parent_unit_resource_id],
@@ -116,10 +115,6 @@ class ReservationUnitHaukiExporter:
     def _get_parent_resource_id(self) -> int | None:
         """Get the parent units hauki resource id, so that the reservation unit can be added as a child in Hauki API."""
         parent_unit = self.reservation_unit.unit
-
-        # No parent, no way to get the id
-        if parent_unit is None:
-            return None
 
         # If the parent has an origin_hauki_resource_id, use that
         if parent_unit.origin_hauki_resource is not None:
@@ -204,17 +199,6 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             return override
         return self.reservation_unit.buffer_time_after
 
-    def get_location(self) -> Location:
-        # For now, we assume that if reservation has multiple spaces they all have same location
-        spaces = self.reservation_unit.spaces.all()
-        return next((space.location for space in spaces if hasattr(space, "location")), None)
-
-    def get_address(self) -> str:
-        location = getattr(self.reservation_unit.unit, "location", None)
-        if location is None:
-            return ""
-        return location.address
-
     def get_max_persons(self) -> int | None:
         # Sum of max persons for all spaces because group can be divided to different spaces
         return sum(space.max_persons or 0 for space in self.reservation_unit.spaces.all()) or None
@@ -230,7 +214,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
     ) -> bool:
         from tilavarauspalvelu.models import Reservation
 
-        qs = Reservation.objects.overlapping_reservations(
+        qs = Reservation.objects.all().overlapping_reservations(
             reservation_unit=self.reservation_unit,
             begin=start_datetime,
             end=end_datetime,
@@ -254,8 +238,8 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         from tilavarauspalvelu.models import Reservation
 
         qs = Reservation.objects.filter(
-            reservation_units__in=self.reservation_units_with_common_hierarchy,
-            begin__gte=end_time,
+            reservation_unit__in=self.reservation_units_with_common_hierarchy,
+            begins_at__gte=end_time,
         ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
 
         if reservation:
@@ -264,7 +248,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         if exclude_blocked:
             qs = qs.exclude(type=ReservationTypeChoice.BLOCKED)
 
-        return qs.order_by("begin").first()
+        return qs.order_by("begins_at").first()
 
     def get_previous_reservation(
         self,
@@ -277,8 +261,8 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         from tilavarauspalvelu.models import Reservation
 
         qs = Reservation.objects.filter(
-            reservation_units__in=self.reservation_units_with_common_hierarchy,
-            end__lte=start_time,
+            reservation_unit__in=self.reservation_units_with_common_hierarchy,
+            ends_at__lte=start_time,
         ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
 
         if reservation:
@@ -287,7 +271,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         if exclude_blocked:
             qs = qs.exclude(type=ReservationTypeChoice.BLOCKED)
 
-        return qs.order_by("-end").first()
+        return qs.order_by("-ends_at").first()
 
     @property
     def reservation_units_with_common_hierarchy(self) -> models.QuerySet:
@@ -379,8 +363,8 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         return (
             ApplicationRound.objects.filter(
                 reservation_units=self.reservation_unit,
-                reservation_period_end__gte=start_date,
-                reservation_period_begin__lte=end_date,
+                reservation_period_end_date__gte=start_date,
+                reservation_period_begin_date__lte=end_date,
             )
             .exclude(
                 L(status=ApplicationRoundStatusChoice.RESULTS_SENT),
@@ -485,10 +469,10 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
     def is_reservable_at(self, moment: datetime.datetime) -> bool:
         moment = moment.astimezone(DEFAULT_TIMEZONE)
 
-        reservation_begins = self.reservation_unit.reservation_begins or local_datetime_min()
+        reservation_begins = self.reservation_unit.reservation_begins_at or local_datetime_min()
         reservation_begins = reservation_begins.astimezone(DEFAULT_TIMEZONE)
 
-        reservation_ends = self.reservation_unit.reservation_ends or local_datetime_max()
+        reservation_ends = self.reservation_unit.reservation_ends_at or local_datetime_max()
         reservation_ends = reservation_ends.astimezone(DEFAULT_TIMEZONE)
 
         if reservation_begins == reservation_ends:
@@ -518,14 +502,14 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         # This way reservations will get the correct access type given the currently defined ones.
         whens: list[models.When] = [
             models.When(
-                models.Q(begin__date__gte=access_type.begin_date),
+                models.Q(begins_at__date__gte=access_type.begin_date),
                 then=models.Value(access_type.access_type),
             )
             for access_type in access_types
         ]
 
         # Update all future or ongoing reservations in the reservation unit to their current access types
-        Reservation.objects.filter(reservation_units=self.reservation_unit, end__gt=now).update(
+        Reservation.objects.filter(reservation_unit=self.reservation_unit, ends_at__gt=now).update(
             access_type=models.Case(
                 *whens,
                 # Use the active access type as the default (even though we should never reach this)

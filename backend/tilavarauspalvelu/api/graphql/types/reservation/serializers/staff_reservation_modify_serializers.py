@@ -6,10 +6,16 @@ from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework.fields import IntegerField
 
-from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import (
+    AccessType,
+    MunicipalityChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+    ReserveeType,
+)
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose
+from tilavarauspalvelu.models import AgeGroup, Reservation, ReservationPurpose
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -22,8 +28,8 @@ class StaffReservationModifySerializer(NestingModelSerializer):
     pk = IntegerField(required=True)
 
     reservee_type = EnumFriendlyChoiceField(
-        choices=CustomerTypeChoice.choices,
-        enum=CustomerTypeChoice,
+        choices=ReserveeType.choices,
+        enum=ReserveeType,
         required=False,
     )
     type = EnumFriendlyChoiceField(
@@ -31,9 +37,15 @@ class StaffReservationModifySerializer(NestingModelSerializer):
         enum=ReservationTypeChoice,
         required=False,
     )
+    municipality = EnumFriendlyChoiceField(
+        choices=MunicipalityChoice.choices,
+        enum=MunicipalityChoice,
+        allow_null=True,
+        default=None,
+        required=False,
+    )
 
     age_group = IntegerPrimaryKeyField(queryset=AgeGroup.objects, required=False, allow_null=True)
-    home_city = IntegerPrimaryKeyField(queryset=City.objects, required=False, allow_null=True)
     purpose = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects, required=False, allow_null=True)
 
     state = EnumFriendlyChoiceField(
@@ -52,6 +64,7 @@ class StaffReservationModifySerializer(NestingModelSerializer):
             "description",
             "num_persons",
             "type",
+            "municipality",
             #
             # Free of charge information
             "applying_for_free_of_charge",
@@ -69,29 +82,18 @@ class StaffReservationModifySerializer(NestingModelSerializer):
             "reservee_address_zip",
             "reservee_email",
             "reservee_type",
-            "reservee_id",
-            "reservee_is_unregistered_association",
-            #
-            # Billing information
-            "billing_address_city",
-            "billing_address_street",
-            "billing_address_zip",
-            "billing_email",
-            "billing_first_name",
-            "billing_last_name",
-            "billing_phone",
+            "reservee_identifier",
             #
             # Relations
             "age_group",
-            "home_city",
             "purpose",
             #
             # Read only
             "confirmed_at",
             "state",
             # Time info
-            "begin",
-            "end",
+            "begins_at",
+            "ends_at",
             "buffer_time_after",
             "buffer_time_before",
             # Price info
@@ -105,8 +107,8 @@ class StaffReservationModifySerializer(NestingModelSerializer):
         extra_kwargs = {
             "confirmed_at": {"read_only": True},
             # Time info
-            "begin": {"read_only": True},
-            "end": {"read_only": True},
+            "begins_at": {"read_only": True},
+            "ends_at": {"read_only": True},
             "buffer_time_after": {"read_only": True},
             "buffer_time_before": {"read_only": True},
             # Price info

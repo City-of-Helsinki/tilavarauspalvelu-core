@@ -34,11 +34,13 @@ class UnitNode(DjangoNode):
             "web_page",
             "email",
             "phone",
-            "payment_merchant",
+            "address_street",
+            "address_zip",
+            "address_city",
             "reservation_units",
             "spaces",
-            "location",
             "unit_groups",
+            "payment_merchant",
         ]
         restricted_fields = {
             "payment_merchant": private_field_check,

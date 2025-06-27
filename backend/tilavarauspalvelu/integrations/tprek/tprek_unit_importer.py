@@ -10,7 +10,7 @@ from tilavarauspalvelu.exceptions import TPRekImportError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.tprek.tprek_api_client import TprekAPIClient
-from tilavarauspalvelu.models import Location, OriginHaukiResource
+from tilavarauspalvelu.models import OriginHaukiResource
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -67,9 +67,11 @@ class TprekUnitImporter:
         """Updates a Unit and its location from the given TPREK data."""
         for field, value in asdict(tprek_unit_data).items():
             setattr(unit, field, value)
-        unit.save()
 
-        Location.objects.update_or_create(unit=unit, defaults=asdict(tprek_location_data))
+        for field, value in asdict(tprek_location_data).items():
+            setattr(unit, field, value)
+
+        unit.save()
 
         self.updated_units_count += 1
         if unit.origin_hauki_resource is None:

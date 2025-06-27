@@ -17,7 +17,6 @@ from tilavarauspalvelu.typing import permission
 
 __all__ = [
     "AccessType",
-    "ApplicantTypeChoice",
     "ApplicationRoundReservationCreationStatusChoice",
     "ApplicationRoundStatusChoice",
     "ApplicationSectionStatusChoice",
@@ -27,13 +26,12 @@ __all__ = [
     "BannerNotificationState",
     "BannerNotificationTarget",
     "CalendarProperty",
-    "CustomerTypeChoice",
     "EventProperty",
     "HaukiResourceState",
     "Language",
+    "MunicipalityChoice",
     "OrderStatus",
     "OrderStatusWithFree",
-    "OrganizationTypeChoice",
     "PaymentType",
     "PriceUnit",
     "PricingStatus",
@@ -57,7 +55,6 @@ __all__ = [
     "UserPermissionChoice",
     "UserRoleChoice",
     "Weekday",
-    "WeekdayChoice",
 ]
 
 
@@ -73,7 +70,7 @@ class TermsOfUseTypeChoices(models.TextChoices):
     GENERIC = "generic_terms", _("Generic terms")
     PAYMENT = "payment_terms", _("Payment terms")
     CANCELLATION = "cancellation_terms", _("Cancellation terms")
-    RECURRING = "recurring_terms", _("Recurring reservation terms")
+    RECURRING = "recurring_terms", _("Reservation series terms")
     SERVICE = "service_terms", _("Service-specific terms")
     PRICING = "pricing_terms", _("Pricing terms")
 
@@ -212,7 +209,7 @@ class UserRoleChoice(models.TextChoices):
     def can_view_reservations(cls) -> list[UserRoleChoice]:
         """
         Permission required to view reservation data, and comment on them,
-        as well as to view some restricted information on recurring reservations.
+        as well as to view some restricted information on reservation series.
         """
         return [UserRoleChoice.VIEWER, UserRoleChoice.HANDLER, UserRoleChoice.ADMIN]
 
@@ -221,7 +218,7 @@ class UserRoleChoice(models.TextChoices):
         """
         Permission required to create different types of reservations,
         like those on behalf of another user, or once that block reservable time.,
-        or to create or modify recurring reservations.
+        or to create or modify reservation series.
         """
         return [UserRoleChoice.RESERVER, UserRoleChoice.HANDLER, UserRoleChoice.ADMIN]
 
@@ -373,21 +370,17 @@ class HaukiResourceState(models.TextChoices):
             return HaukiResourceState.UNDEFINED
 
 
-class CustomerTypeChoice(models.TextChoices):
-    BUSINESS = "BUSINESS", pgettext_lazy("CustomerType", "Business")
-    NONPROFIT = "NONPROFIT", pgettext_lazy("CustomerType", "Nonprofit")
-    INDIVIDUAL = "INDIVIDUAL", pgettext_lazy("CustomerType", "Individual")
+class ReserveeType(models.TextChoices):
+    INDIVIDUAL = "INDIVIDUAL", pgettext_lazy("ReserveeType", "Individual")
+    COMPANY = "COMPANY", pgettext_lazy("ReserveeType", "Company")
+    NONPROFIT = "NONPROFIT", pgettext_lazy("ReserveeType", "Nonprofit")
 
     @classproperty
-    def organisation(cls) -> list[str]:
-        return [  # type: ignore[return-value]
-            CustomerTypeChoice.BUSINESS.value,
-            CustomerTypeChoice.NONPROFIT.value,
+    def organisation_types(cls) -> list[str]:
+        return [  # type: ignore
+            ReserveeType.COMPANY.value,  # type: ignore
+            ReserveeType.NONPROFIT.value,  # type: ignore
         ]
-
-    @enum.property
-    def is_organisation(self) -> bool:
-        return self in CustomerTypeChoice.organisation
 
 
 class ReservationStateChoice(models.TextChoices):
@@ -714,17 +707,18 @@ class ReservationStartInterval(models.TextChoices):
 class ReservationCancelReasonChoice(models.TextChoices):
     """Reasons why user has cancelled their reservation"""
 
-    FOUND_ANOTHER_SPACE_VARAAMO = (
-        "FOUND_ANOTHER_SPACE_VARAAMO",
-        pgettext_lazy("ReservationCancelReason", "I found another space through Varaamo"),
+    # Reasons refined in the order they should appear in the the frontend.
+    CHANGE_OF_PLANS = (
+        "CHANGE_OF_PLANS",
+        pgettext_lazy("ReservationCancelReason", "My plans have changed"),
     )
     FOUND_ANOTHER_SPACE_ELSEWHERE = (
         "FOUND_ANOTHER_SPACE_ELSEWHERE",
         pgettext_lazy("ReservationCancelReason", "I found another space somewhere else"),
     )
-    CHANGE_OF_PLANS = (
-        "CHANGE_OF_PLANS",
-        pgettext_lazy("ReservationCancelReason", "My plans have changed"),
+    FOUND_ANOTHER_SPACE_VARAAMO = (
+        "FOUND_ANOTHER_SPACE_VARAAMO",
+        pgettext_lazy("ReservationCancelReason", "I found another space through Varaamo"),
     )
     UNSUITABLE_SPACE = (
         "UNSUITABLE_SPACE",
@@ -752,13 +746,15 @@ class ReservationCancelReasonChoice(models.TextChoices):
     @classproperty
     def user_selectable(cls) -> list[ReservationCancelReasonChoice]:
         """These reasons are selectable by the user"""
-        return sorted(set(cls) - {cls.NOT_PAID})  # type: ignore[return-type]
+        values = list(cls)
+        values.remove(cls.NOT_PAID)
+        return values  # type: ignore[return-type]
 
 
 class ReservationKind(models.TextChoices):
-    DIRECT = "direct", pgettext_lazy("ReservationKind", "Direct")
-    SEASON = "season", pgettext_lazy("ReservationKind", "Season")
-    DIRECT_AND_SEASON = "direct_and_season", pgettext_lazy("ReservationKind", "Direct and season")
+    DIRECT = "DIRECT", pgettext_lazy("ReservationKind", "Direct")
+    SEASON = "SEASON", pgettext_lazy("ReservationKind", "Season")
+    DIRECT_AND_SEASON = "DIRECT_AND_SEASON", pgettext_lazy("ReservationKind", "Direct and season")
 
     @classproperty
     def allows_direct(cls) -> list[str]:
@@ -773,6 +769,28 @@ class ReservationKind(models.TextChoices):
             cls.SEASON.value,
             cls.DIRECT_AND_SEASON.value,
         ]
+
+
+class ReservationFormType(models.TextChoices):
+    """Reservation forms for that are supported by the system."""
+
+    CONTACT_INFO_FORM = "CONTACT_INFO_FORM", _("Contact info form")
+    """Asks for user's contact information."""
+
+    RESERVEE_INFO_FORM = "RESERVEE_INFO_FORM", _("Reservee info form")
+    """Asks for reservee information depending on the user's reservee type, in addition to contact information."""
+
+    PURPOSE_FORM = "PURPOSE_FORM", _("Purpose form")
+    """Asks for user's purpose of use, in addition to contact and reservee information."""
+
+    AGE_GROUP_FORM = "AGE_GROUP_FORM", _("Age group form")
+    """Asks for user's age group, in addition to contact and reservee information, and purpose of use."""
+
+    PURPOSE_SUBVENTION_FORM = "PURPOSE_SUBVENTION_FORM", _("Purpose subvention form")
+    """Adds option to apply for subvention to the purpose form."""
+
+    AGE_GROUP_SUBVENTION_FORM = "AGE_GROUP_SUBVENTION_FORM", _("Age group subvention form")
+    """Adds option to apply for subvention to the age group form."""
 
 
 class PricingType(models.TextChoices):
@@ -852,16 +870,6 @@ class AuthenticationType(models.TextChoices):
 class ReservationUnitImageType(models.TextChoices):
     MAIN = "main", pgettext_lazy("ReservationUnitImageType", "Main image")
     OTHER = "other", pgettext_lazy("ReservationUnitImageType", "Other")
-
-
-class WeekdayChoice(models.IntegerChoices):
-    MONDAY = 0, _("Monday")
-    TUESDAY = 1, _("Tuesday")
-    WEDNESDAY = 2, _("Wednesday")
-    THURSDAY = 3, _("Thursday")
-    FRIDAY = 4, _("Friday")
-    SATURDAY = 5, _("Saturday")
-    SUNDAY = 6, _("Sunday")
 
 
 class Weekday(models.TextChoices):
@@ -965,38 +973,22 @@ class Priority(models.TextChoices):
     SECONDARY = "SECONDARY", pgettext_lazy("Priority", "Secondary")
 
 
-class ApplicantTypeChoice(models.TextChoices):
-    INDIVIDUAL = "INDIVIDUAL", pgettext_lazy("ApplicantType", "Individual")
-    ASSOCIATION = "ASSOCIATION", pgettext_lazy("ApplicantType", "Association")
-    COMMUNITY = "COMMUNITY", pgettext_lazy("ApplicantType", "Community")
-    COMPANY = "COMPANY", pgettext_lazy("ApplicantType", "Company")
+class MunicipalityChoice(models.TextChoices):
+    """Municipality choices"""
+
+    HELSINKI = "HELSINKI", _("Helsinki")
+    OTHER = "OTHER", _("Other")
 
     @enum.property
-    def customer_type_choice(self) -> CustomerTypeChoice:
+    def code(self) -> str:
         match self:
-            case ApplicantTypeChoice.INDIVIDUAL:
-                return CustomerTypeChoice.INDIVIDUAL
-            case ApplicantTypeChoice.ASSOCIATION:
-                return CustomerTypeChoice.NONPROFIT
-            case ApplicantTypeChoice.COMMUNITY:
-                return CustomerTypeChoice.NONPROFIT
-            case ApplicantTypeChoice.COMPANY:
-                return CustomerTypeChoice.BUSINESS
-
-    @enum.property
-    def should_have_organisation(self) -> bool:
-        return self in {
-            ApplicantTypeChoice.ASSOCIATION,
-            ApplicantTypeChoice.COMMUNITY,
-            ApplicantTypeChoice.COMPANY,
-        }
-
-    @enum.property
-    def should_have_home_city(self) -> bool:
-        return self in {
-            ApplicantTypeChoice.ASSOCIATION,
-            ApplicantTypeChoice.COMMUNITY,
-        }
+            case MunicipalityChoice.HELSINKI:
+                return "091"
+            case MunicipalityChoice.OTHER:
+                return "199"
+            case _:
+                msg = f"Unknown municipality code for {self}"
+                raise ValueError(msg)
 
 
 class ApplicationRoundStatusChoice(models.TextChoices):
@@ -1156,31 +1148,6 @@ class ApplicationSectionStatusChoice(models.TextChoices):
             ApplicationSectionStatusChoice.IN_ALLOCATION,
             ApplicationSectionStatusChoice.HANDLED,
         }
-
-
-class OrganizationTypeChoice(models.TextChoices):
-    COMPANY = "COMPANY", pgettext_lazy("OrganizationType", "Company")
-    REGISTERED_ASSOCIATION = "REGISTERED_ASSOCIATION", pgettext_lazy("OrganizationType", "Registered association")
-    PUBLIC_ASSOCIATION = "PUBLIC_ASSOCIATION", pgettext_lazy("OrganizationType", "Public association")
-    UNREGISTERED_ASSOCIATION = "UNREGISTERED_ASSOCIATION", pgettext_lazy("OrganizationType", "Unregistered association")
-    MUNICIPALITY_CONSORTIUM = "MUNICIPALITY_CONSORTIUM", pgettext_lazy("OrganizationType", "Municipality consortium")
-    RELIGIOUS_COMMUNITY = "RELIGIOUS_COMMUNITY", pgettext_lazy("OrganizationType", "Religious community")
-
-    @enum.property
-    def applicant_type(self) -> ApplicantTypeChoice:
-        match self:
-            case OrganizationTypeChoice.COMPANY:
-                return ApplicantTypeChoice.COMPANY
-            case OrganizationTypeChoice.REGISTERED_ASSOCIATION:
-                return ApplicantTypeChoice.ASSOCIATION
-            case OrganizationTypeChoice.PUBLIC_ASSOCIATION:
-                return ApplicantTypeChoice.ASSOCIATION
-            case OrganizationTypeChoice.UNREGISTERED_ASSOCIATION:
-                return ApplicantTypeChoice.ASSOCIATION
-            case OrganizationTypeChoice.RELIGIOUS_COMMUNITY:
-                return ApplicantTypeChoice.COMMUNITY
-            case OrganizationTypeChoice.MUNICIPALITY_CONSORTIUM:
-                return ApplicantTypeChoice.ASSOCIATION
 
 
 class BannerNotificationLevel(models.TextChoices):

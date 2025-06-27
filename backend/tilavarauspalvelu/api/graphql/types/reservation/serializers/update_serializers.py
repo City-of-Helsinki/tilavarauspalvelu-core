@@ -6,8 +6,8 @@ from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework.fields import IntegerField
 
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice
-from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose
+from tilavarauspalvelu.enums import MunicipalityChoice, ReservationStateChoice, ReserveeType
+from tilavarauspalvelu.models import AgeGroup, Reservation, ReservationPurpose
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import ReservationUpdateData
@@ -21,13 +21,19 @@ class ReservationUpdateSerializer(NestingModelSerializer):
     pk = IntegerField(required=True)
 
     reservee_type = EnumFriendlyChoiceField(
-        choices=CustomerTypeChoice.choices,
-        enum=CustomerTypeChoice,
+        choices=ReserveeType.choices,
+        enum=ReserveeType,
+        required=False,
+    )
+    municipality = EnumFriendlyChoiceField(
+        choices=MunicipalityChoice.choices,
+        enum=MunicipalityChoice,
+        allow_null=True,
+        default=None,
         required=False,
     )
 
     purpose = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects, allow_null=True, required=False)
-    home_city = IntegerPrimaryKeyField(queryset=City.objects, allow_null=True, required=False)
     age_group = IntegerPrimaryKeyField(queryset=AgeGroup.objects, allow_null=True, required=False)
 
     state = EnumFriendlyChoiceField(
@@ -45,13 +51,14 @@ class ReservationUpdateSerializer(NestingModelSerializer):
             "name",
             "description",
             "num_persons",
+            "municipality",
             #
             # Free of charge information
             "applying_for_free_of_charge",
             "free_of_charge_reason",
             #
             # Reservee information
-            "reservee_id",
+            "reservee_identifier",
             "reservee_first_name",
             "reservee_last_name",
             "reservee_email",
@@ -60,21 +67,10 @@ class ReservationUpdateSerializer(NestingModelSerializer):
             "reservee_address_street",
             "reservee_address_city",
             "reservee_address_zip",
-            "reservee_is_unregistered_association",
             "reservee_type",
-            #
-            # Billing information
-            "billing_first_name",
-            "billing_last_name",
-            "billing_email",
-            "billing_phone",
-            "billing_address_street",
-            "billing_address_city",
-            "billing_address_zip",
             #
             # Relations
             "age_group",
-            "home_city",
             "purpose",
             #
             # Read only

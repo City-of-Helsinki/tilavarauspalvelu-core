@@ -29,7 +29,7 @@ def test_reservation__approve__free(graphql):
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
 
     graphql.login_with_superuser()
@@ -52,7 +52,7 @@ def test_reservation__approve__paid__on_site(graphql):
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
 
     graphql.login_with_superuser()
@@ -77,9 +77,9 @@ def test_reservation__approve__paid__in_webshop(graphql):
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_units=[reservation_unit],
-        begin=local_datetime(2024, 1, 10, 12),
-        end=local_datetime(2024, 1, 10, 13),
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 10, 12),
+        ends_at=local_datetime(2024, 1, 10, 13),
         tax_percentage_value=Decimal("24.0"),
     )
 
@@ -129,9 +129,9 @@ def test_reservation__approve__paid__in_webshop__close_to_begin_date(graphql):
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_units=[reservation_unit],
-        begin=local_datetime(2024, 1, 2, 12),
-        end=local_datetime(2024, 1, 2, 13),
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 2, 12),
+        ends_at=local_datetime(2024, 1, 2, 13),
     )
 
     graphql.login_with_superuser()
@@ -152,15 +152,48 @@ def test_reservation__approve__paid__in_webshop__close_to_begin_date(graphql):
     assert handled_payment_due_by == local_datetime(2024, 1, 2, 11)
 
 
+@patch_method(EmailService.send_reservation_approved_email)
+@patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
+@freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation__approve__paid__in_webshop__paid_on_site_since_begin_too_close(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 1, 13),
+        ends_at=local_datetime(2024, 1, 1, 14),
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation, price="10.59")
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert EmailService.send_reservation_approved_email.called is True
+    assert EmailService.send_reservation_confirmed_staff_notification_email.called is True
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+
+    assert hasattr(reservation, "payment_order")
+
+    payment_order = reservation.payment_order
+
+    assert payment_order.payment_type == PaymentType.ON_SITE
+    assert payment_order.status == OrderStatus.PAID_MANUALLY
+
+
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_reservation__approve__paid__in_webshop__has_payment__paid_online__with_same_price(graphql):
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_units=[reservation_unit],
-        begin=local_datetime(2024, 1, 2, 12),
-        end=local_datetime(2024, 1, 2, 13),
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 2, 12),
+        ends_at=local_datetime(2024, 1, 2, 13),
         tax_percentage_value=Decimal("24.0"),
     )
 
@@ -195,9 +228,9 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__diffe
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_units=[reservation_unit],
-        begin=local_datetime(2024, 1, 2, 12),
-        end=local_datetime(2024, 1, 2, 13),
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 2, 12),
+        ends_at=local_datetime(2024, 1, 2, 13),
     )
 
     PaymentOrderFactory.create(
@@ -224,9 +257,9 @@ def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online(gr
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_units=[reservation_unit],
-        begin=local_datetime(2024, 1, 2, 12),
-        end=local_datetime(2024, 1, 2, 13),
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 2, 12),
+        ends_at=local_datetime(2024, 1, 2, 13),
     )
 
     old_payment_order = PaymentOrderFactory.create(
@@ -270,7 +303,7 @@ def test_reservation__approve__pindora_api__call_succeeds(graphql):
     )
 
     reservation = ReservationFactory.create(
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         state=ReservationStateChoice.REQUIRES_HANDLING,
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=False,
@@ -299,7 +332,7 @@ def test_reservation__approve__pindora_api__call_fails(graphql):
     )
 
     reservation = ReservationFactory.create(
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         state=ReservationStateChoice.REQUIRES_HANDLING,
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=False,
@@ -329,9 +362,9 @@ def test_reservation__approve__no_pricing(graphql):
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_units=[reservation_unit],
-        begin=local_datetime(2024, 1, 10, 12),
-        end=local_datetime(2024, 1, 10, 13),
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 10, 12),
+        ends_at=local_datetime(2024, 1, 10, 13),
     )
 
     graphql.login_with_superuser()
@@ -353,9 +386,9 @@ def test_reservation__approve__no_payment_product_if_paid_online(graphql):
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_units=[reservation_unit],
-        begin=local_datetime(2024, 1, 10, 12),
-        end=local_datetime(2024, 1, 10, 13),
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 10, 12),
+        ends_at=local_datetime(2024, 1, 10, 13),
     )
 
     graphql.login_with_superuser()
@@ -371,7 +404,7 @@ def test_reservation__approve__status_not_requires_handling(graphql):
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CREATED,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
 
     graphql.login_with_superuser()
@@ -390,7 +423,7 @@ def test_reservation__approve__price_missing(graphql):
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
 
     graphql.login_with_superuser()
@@ -409,7 +442,7 @@ def test_reservation__approve__handling_details_missing(graphql):
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
 
     graphql.login_with_superuser()
@@ -428,7 +461,7 @@ def test_reservation__approve__empty_handling_details(graphql):
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
     )
 
     graphql.login_with_superuser()

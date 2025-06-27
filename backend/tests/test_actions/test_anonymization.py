@@ -21,12 +21,9 @@ from tilavarauspalvelu.models.user.actions import (
 from utils.date_utils import local_datetime
 
 from tests.factories import (
-    AddressFactory,
     ApplicationFactory,
     ApplicationSectionFactory,
-    OrganisationFactory,
     PaymentOrderFactory,
-    PersonFactory,
     ReservationFactory,
     UnitFactory,
     UserFactory,
@@ -88,16 +85,7 @@ def test_anonymization__application():
         email="anony.mous@foo.com",
         reservation_notification=ReservationNotification.ALL,
     )
-    billing_address = AddressFactory()
-    organisation_address = AddressFactory.create()
-    contact_person = PersonFactory.create()
-    organisation = OrganisationFactory.create(address=organisation_address)
-    application = ApplicationFactory.create(
-        user=mr_anonymous,
-        billing_address=billing_address,
-        contact_person=contact_person,
-        organisation=organisation,
-    )
+    application = ApplicationFactory.create(user=mr_anonymous)
     app_section = ApplicationSectionFactory.create(application=application)
 
     mr_anonymous.actions.anonymize_user_applications()
@@ -112,41 +100,26 @@ def test_anonymization__application():
     assert application.working_memo == SENSITIVE_APPLICATION
 
     # Application billing address
-    assert application.billing_address.post_code == "99999"
-    assert application.billing_address.street_address == ANONYMIZED
-    assert application.billing_address.street_address_fi == ANONYMIZED
-    assert application.billing_address.street_address_en == ANONYMIZED
-    assert application.billing_address.street_address_sv == ANONYMIZED
-    assert application.billing_address.city == ANONYMIZED
-    assert application.billing_address.city_fi == ANONYMIZED
-    assert application.billing_address.city_en == ANONYMIZED
-    assert application.billing_address.city_sv == ANONYMIZED
+    assert application.billing_post_code == "99999"
+    assert application.billing_street_address == ANONYMIZED
+    assert application.billing_city == ANONYMIZED
 
     # Contact person
-    assert application.contact_person.first_name == mr_anonymous.first_name
-    assert application.contact_person.last_name == mr_anonymous.last_name
-    assert application.contact_person.email == mr_anonymous.email
-    assert application.contact_person.phone_number == ""
+    assert application.contact_person_first_name == mr_anonymous.first_name
+    assert application.contact_person_last_name == mr_anonymous.last_name
+    assert application.contact_person_email == mr_anonymous.email
+    assert application.contact_person_phone_number == ""
 
     # Organisation data should not be anonymized
-    assert application.organisation.name != ANONYMIZED
-    assert application.organisation.identifier != "1234567-2"
-    assert application.organisation.email != mr_anonymous.email
-    assert application.organisation.core_business != ANONYMIZED
-    assert application.organisation.core_business_fi != ANONYMIZED
-    assert application.organisation.core_business_en != ANONYMIZED
-    assert application.organisation.core_business_sv != ANONYMIZED
+    assert application.organisation_name != ANONYMIZED
+    assert application.organisation_identifier != "1234567-2"
+    assert application.organisation_email != mr_anonymous.email
+    assert application.organisation_core_business != ANONYMIZED
 
     # Organisation address should not be anonymized
-    assert application.organisation.address.post_code != "99999"
-    assert application.organisation.address.street_address != ANONYMIZED
-    assert application.organisation.address.street_address_fi != ANONYMIZED
-    assert application.organisation.address.street_address_en != ANONYMIZED
-    assert application.organisation.address.street_address_sv != ANONYMIZED
-    assert application.organisation.address.city != ANONYMIZED
-    assert application.organisation.address.city_fi != ANONYMIZED
-    assert application.organisation.address.city_en != ANONYMIZED
-    assert application.organisation.address.city_sv != ANONYMIZED
+    assert application.organisation_post_code != "99999"
+    assert application.organisation_street_address != ANONYMIZED
+    assert application.organisation_city != ANONYMIZED
 
 
 def test_anonymization__reservation():
@@ -162,14 +135,11 @@ def test_anonymization__reservation():
         reservee_address_zip="0100",
         reservee_address_city="Helsinki",
         reservee_address_street="Test Address 1",
-        billing_address_zip="01000",
-        billing_address_city="Helsinki",
-        billing_address_street="Test Address 1",
         free_of_charge_reason="Test reason",
         cancel_details="Test cancel details",
         handling_details="Test handling details",
-        recurring_reservation__name="foo",
-        recurring_reservation__description="bar",
+        reservation_series__name="foo",
+        reservation_series__description="bar",
     )
 
     mr_anonymous.actions.anonymize_user_reservations()
@@ -184,16 +154,9 @@ def test_anonymization__reservation():
     assert reservation.reservee_address_zip == "99999"
     assert reservation.reservee_address_city == ANONYMIZED
     assert reservation.reservee_address_street == ANONYMIZED
-    assert reservation.billing_first_name == mr_anonymous.first_name
-    assert reservation.billing_last_name == mr_anonymous.last_name
-    assert reservation.billing_email == mr_anonymous.email
-    assert reservation.billing_phone == ""
-    assert reservation.billing_address_zip == "99999"
-    assert reservation.billing_address_city == ANONYMIZED
-    assert reservation.billing_address_street == ANONYMIZED
 
     # Reservee_id and organisation name should not be anonymized
-    assert reservation.reservee_id != "1234567-2"
+    assert reservation.reservee_identifier != "1234567-2"
     assert reservation.reservee_organisation_name != ANONYMIZED
 
     assert reservation.working_memo == ""
@@ -201,8 +164,8 @@ def test_anonymization__reservation():
     assert reservation.cancel_details == SENSITIVE_RESERVATION
     assert reservation.handling_details == SENSITIVE_RESERVATION
 
-    assert reservation.recurring_reservation.name == ANONYMIZED
-    assert reservation.recurring_reservation.description == ANONYMIZED
+    assert reservation.reservation_series.name == ANONYMIZED
+    assert reservation.reservation_series.description == ANONYMIZED
 
     # Check that auditlog entries are removed also
     assert LogEntry.objects.get_for_object(reservation).count() == 0
@@ -213,7 +176,7 @@ def test_anonymization__can_anonymize__open_reservations():
     user = UserFactory.create(first_name="foo")
 
     now = local_datetime()
-    ReservationFactory.create(user=user, begin=now, end=now + datetime.timedelta(days=1))
+    ReservationFactory.create(user=user, begins_at=now, ends_at=now + datetime.timedelta(days=1))
 
     can_anonymize = user.actions.can_anonymize()
 
@@ -240,8 +203,8 @@ def test_anonymization__can_anonymize__open_payments():
 
     PaymentOrderFactory.create(
         reservation__user=user,
-        reservation__begin=datetime.datetime(2022, 1, 1),
-        reservation__end=datetime.datetime(2022, 1, 2),
+        reservation__begins_at=datetime.datetime(2022, 1, 1),
+        reservation__ends_at=datetime.datetime(2022, 1, 2),
         remote_id=uuid.uuid4(),
         status=OrderStatus.DRAFT,
     )
@@ -264,7 +227,7 @@ def test_anonymization__anonymize_inactive_users():
     user_4 = UserFactory.create(first_name="bax", last_login=None, date_joined=now - datetime.timedelta(days=11))
 
     # User 2 cannot be anonymized, since it has open reservations
-    ReservationFactory.create(user=user_2, begin=now, end=now + datetime.timedelta(days=1))
+    ReservationFactory.create(user=user_2, begins_at=now, ends_at=now + datetime.timedelta(days=1))
 
     User.objects.anonymize_inactive_users()
 

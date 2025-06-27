@@ -34,13 +34,13 @@ def test_application__send__regular_user__own_application(graphql):
     assert response.has_errors is False, response
 
     application.refresh_from_db()
-    assert application.sent_date is not None
+    assert application.sent_at is not None
 
 
 def test_application__send__regular_user__own_application__application_period_over(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
-        application_round__application_period_begin=local_start_of_day() - datetime.timedelta(days=4),
-        application_round__application_period_end=local_start_of_day() - datetime.timedelta(days=2),
+        application_round__application_period_begins_at=local_start_of_day() - datetime.timedelta(days=4),
+        application_round__application_period_ends_at=local_start_of_day() - datetime.timedelta(days=2),
     )
 
     graphql.force_login(application.user)

@@ -11,8 +11,8 @@ from tilavarauspalvelu.models import (
     AllocatedTimeSlot,
     ApplicationRound,
     ApplicationSection,
-    RecurringReservation,
     Reservation,
+    ReservationSeries,
     ReservationUnitOption,
 )
 from utils.date_utils import get_periods_between, local_datetime, local_start_of_day, next_date_matching_weekday
@@ -62,21 +62,25 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
 
     timestamp = factory.LazyFunction(local_start_of_day)  # private helper (see Meta.exclude)
 
-    application_period_begin = factory.LazyAttribute(lambda i: i.timestamp)
-    application_period_end = factory.LazyAttribute(lambda i: i.application_period_begin + datetime.timedelta(weeks=4))
-
-    reservation_period_begin = factory.LazyAttribute(
-        lambda i: coerce_date(i.application_period_end) + datetime.timedelta(days=1),
-    )
-    reservation_period_end = factory.LazyAttribute(
-        lambda i: coerce_date(i.reservation_period_begin) + datetime.timedelta(weeks=4),
+    application_period_begins_at = factory.LazyAttribute(lambda i: i.timestamp)
+    application_period_ends_at = factory.LazyAttribute(
+        lambda i: i.application_period_begins_at + datetime.timedelta(weeks=4)
     )
 
-    public_display_begin = factory.LazyAttribute(lambda i: i.application_period_begin - datetime.timedelta(days=7))
-    public_display_end = factory.LazyAttribute(lambda i: i.application_period_end + datetime.timedelta(days=4))
+    reservation_period_begin_date = factory.LazyAttribute(
+        lambda i: coerce_date(i.application_period_ends_at) + datetime.timedelta(days=1),
+    )
+    reservation_period_end_date = factory.LazyAttribute(
+        lambda i: coerce_date(i.reservation_period_begin_date) + datetime.timedelta(weeks=4),
+    )
 
-    handled_date = None
-    sent_date = None
+    public_display_begins_at = factory.LazyAttribute(
+        lambda i: i.application_period_begins_at - datetime.timedelta(days=7)
+    )
+    public_display_ends_at = factory.LazyAttribute(lambda i: i.application_period_ends_at + datetime.timedelta(days=4))
+
+    handled_at = None
+    sent_at = None
 
     reservation_units = ManyToManyFactory("tests.factories.ReservationUnitFactory")
     purposes = ManyToManyFactory("tests.factories.ReservationPurposeFactory")
@@ -134,9 +138,9 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         from .allocated_time_slot import AllocatedTimeSlotFactory
         from .application import ApplicationFactory
         from .application_section import ApplicationSectionFactory
-        from .recurring_reservation import RecurringReservationFactory
         from .reservation import ReservationFactory
         from .reservation_purpose import ReservationPurposeFactory
+        from .reservation_series import ReservationSeriesFactory
         from .reservation_unit_option import ReservationUnitOptionFactory
 
         purpose = ReservationPurposeFactory.create()
@@ -146,30 +150,28 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
             ApplicationRoundBuilder()
             .handled()
             .create(
-                reservation_period_begin=reservation_period_begin_date,
-                reservation_period_end=reservation_period_end_date,
+                reservation_period_begin_date=reservation_period_begin_date,
+                reservation_period_end_date=reservation_period_end_date,
                 purposes=[purpose],
             )
         )
 
-        ReservationReservationUnit: type[models.Model] = Reservation.reservation_units.through
         ApplicationRoundReservationUnit: type[models.Model] = ApplicationRound.reservation_units.through
 
         sections: list[ApplicationSection] = []
         options: list[ReservationUnitOption] = []
         allocated_time_slots: list[AllocatedTimeSlot] = []
-        allocation_series: list[RecurringReservation] = []
+        allocation_series: list[ReservationSeries] = []
         reservations: list[Reservation] = []
-        reservation_reservation_units: list[models.Model] = []
         application_round_reservation_units: list[models.Model] = []
         reservation_units: list[ReservationUnit] = []
 
         application = ApplicationFactory.create(
             application_round=application_round,
             user=user,
-            cancelled_date=None,
-            sent_date=local_datetime(),
-            in_allocation_notification_sent_date=local_datetime(),
+            cancelled_at=None,
+            sent_at=local_datetime(),
+            in_allocation_notification_sent_at=local_datetime(),
         )
 
         for allocation in allocations:
@@ -204,7 +206,7 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
             allocated_time_slots.append(allocated_time_slot)
 
             if with_reservations:
-                series = RecurringReservationFactory.build(
+                series = ReservationSeriesFactory.build(
                     weekdays=str(allocation["day_of_the_week"]),
                     begin_date=reservation_period_begin_date,
                     begin_time=allocation["begin_time"],
@@ -229,27 +231,21 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
 
                 for begin, end in reservation_times:
                     reservation = ReservationFactory.build(
-                        begin=begin,
-                        end=end,
+                        begins_at=begin,
+                        ends_at=end,
                         user=user,
                         purpose=purpose,
                         age_group=age_group,
-                        recurring_reservation=series,
+                        reservation_series=series,
+                        reservation_unit=allocation["reservation_unit"],
                     )
                     reservations.append(reservation)
-
-                    reservation_reservation_unit = ReservationReservationUnit(
-                        reservation=reservation,
-                        reservationunit=allocation["reservation_unit"],
-                    )
-                    reservation_reservation_units.append(reservation_reservation_unit)
 
         ApplicationSection.objects.bulk_create(sections)
         ReservationUnitOption.objects.bulk_create(options)
         AllocatedTimeSlot.objects.bulk_create(allocated_time_slots)
-        RecurringReservation.objects.bulk_create(allocation_series)
+        ReservationSeries.objects.bulk_create(allocation_series)
         Reservation.objects.bulk_create(reservations)
-        ReservationReservationUnit.objects.bulk_create(reservation_reservation_units)
         ApplicationRoundReservationUnit.objects.bulk_create(application_round_reservation_units)
 
         return application_round
@@ -274,44 +270,44 @@ class ApplicationRoundBuilder(ModelFactoryBuilder[ApplicationRound]):
     def upcoming(self) -> Self:
         now = local_start_of_day()
         return self.set(
-            sent_date=None,
-            handled_date=None,
-            application_period_begin=now + datetime.timedelta(days=2),
-            application_period_end=now + datetime.timedelta(days=4),
+            sent_at=None,
+            handled_at=None,
+            application_period_begins_at=now + datetime.timedelta(days=2),
+            application_period_ends_at=now + datetime.timedelta(days=4),
         )
 
     def open(self) -> Self:
         now = local_start_of_day()
         return self.set(
-            sent_date=None,
-            handled_date=None,
-            application_period_begin=now - datetime.timedelta(days=2),
-            application_period_end=now + datetime.timedelta(days=2),
+            sent_at=None,
+            handled_at=None,
+            application_period_begins_at=now - datetime.timedelta(days=2),
+            application_period_ends_at=now + datetime.timedelta(days=2),
         )
 
     def in_allocation(self) -> Self:
         now = local_start_of_day()
         return self.set(
-            sent_date=None,
-            handled_date=None,
-            application_period_begin=now - datetime.timedelta(days=4),
-            application_period_end=now - datetime.timedelta(days=2),
+            sent_at=None,
+            handled_at=None,
+            application_period_begins_at=now - datetime.timedelta(days=4),
+            application_period_ends_at=now - datetime.timedelta(days=2),
         )
 
     def handled(self) -> Self:
         now = local_start_of_day()
         return self.set(
-            sent_date=None,
-            handled_date=now,
-            application_period_begin=now - datetime.timedelta(days=4),
-            application_period_end=now - datetime.timedelta(days=2),
+            sent_at=None,
+            handled_at=now,
+            application_period_begins_at=now - datetime.timedelta(days=4),
+            application_period_ends_at=now - datetime.timedelta(days=2),
         )
 
     def results_sent(self) -> Self:
         now = local_start_of_day()
         return self.set(
-            sent_date=now,
-            handled_date=now,
-            application_period_begin=now - datetime.timedelta(days=4),
-            application_period_end=now - datetime.timedelta(days=2),
+            sent_at=now,
+            handled_at=now,
+            application_period_begins_at=now - datetime.timedelta(days=4),
+            application_period_ends_at=now - datetime.timedelta(days=2),
         )

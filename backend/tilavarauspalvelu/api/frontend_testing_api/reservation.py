@@ -8,14 +8,14 @@ from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.frontend_testing_api.serializers import TestingBaseSerializer
 from tilavarauspalvelu.api.frontend_testing_api.viewsets import TestingBaseViewSet
-from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice
+from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice, Weekday
 from tilavarauspalvelu.models import ReservationMetadataField
 from utils.date_utils import local_datetime
 
 from tests.factories import (
-    RecurringReservationFactory,
     ReservationMetadataFieldFactory,
     ReservationMetadataSetFactory,
+    ReservationSeriesFactory,
     ReservationUnitFactory,
     ReservationUnitPricingFactory,
 )
@@ -55,9 +55,9 @@ class TestingReservationParamsSerializer(TestingBaseSerializer):
         reservation = (
             ReservationBuilder()
             .set(
-                reservation_units=[reservation_unit],
-                begin=begin_datetime,
-                end=begin_datetime + datetime.timedelta(hours=2),
+                reservation_unit=reservation_unit,
+                begins_at=begin_datetime,
+                ends_at=begin_datetime + datetime.timedelta(hours=2),
             )
             .for_state(validated_data["state"])
             .for_user(self.context["user"])
@@ -71,7 +71,7 @@ class TestingReservationParamsSerializer(TestingBaseSerializer):
             self._create_payment_order(validated_data, reservation)
 
         if validated_data["is_part_of_series"]:
-            self._create_recurring_reservation(reservation)
+            self._create_reservation_series(reservation)
 
         return reservation
 
@@ -97,12 +97,11 @@ class TestingReservationParamsSerializer(TestingBaseSerializer):
     def _create_metadata_set(self) -> ReservationMetadataSet:
         required_fields = {
             "description",
-            "home_city",
             "num_persons",
             "purpose",
             "reservee_email",
             "reservee_first_name",
-            "reservee_id",
+            "reservee_identifier",
             "reservee_last_name",
             "reservee_organisation_name",
             "reservee_phone",
@@ -110,7 +109,6 @@ class TestingReservationParamsSerializer(TestingBaseSerializer):
         }
         supported_fields = {
             "name",
-            "reservee_is_unregistered_association",
         } | required_fields
 
         ReservationMetadataField.objects.bulk_create(
@@ -131,17 +129,17 @@ class TestingReservationParamsSerializer(TestingBaseSerializer):
                 order_builder.set(status=OrderStatus.PAID_MANUALLY)
         order_builder.create()
 
-    def _create_recurring_reservation(self, reservation: Reservation) -> None:
-        recurring_reservation = RecurringReservationFactory.create(
-            reservation_unit=reservation.reservation_units.first(),
+    def _create_reservation_series(self, reservation: Reservation) -> None:
+        reservation_series = ReservationSeriesFactory.create(
+            reservation_unit=reservation.reservation_unit,
             user=self.context["user"],
-            begin_date=(reservation.begin - datetime.timedelta(days=7)).date(),
-            end_date=(reservation.end + datetime.timedelta(days=7)).date(),
-            end_time=reservation.begin.time(),
-            begin_time=reservation.end.time(),
-            weekdays=f"{reservation.begin.weekday()}",
+            begin_date=(reservation.begins_at - datetime.timedelta(days=7)).date(),
+            end_date=(reservation.ends_at + datetime.timedelta(days=7)).date(),
+            end_time=reservation.begins_at.time(),
+            begin_time=reservation.ends_at.time(),
+            weekdays=[Weekday.from_week_day(reservation.begins_at.weekday())],
         )
-        reservation.recurring_reservation = recurring_reservation
+        reservation.reservation_series = reservation_series
         reservation.save()
 
 

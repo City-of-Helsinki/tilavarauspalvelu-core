@@ -40,7 +40,7 @@ class ApplicationExportRow(BaseExportRow):
     section_name: str = ""
     reservations_begin_date: str = ""
     reservations_end_date: str = ""
-    home_city_name: str = ""
+    municipality: str = ""
     purpose_name: str = ""
     age_group_str: str = ""
     num_persons: str = ""
@@ -111,8 +111,6 @@ class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter):
             )
             .select_related(
                 "application",
-                "application__organisation",
-                "application__contact_person",
                 "application__application_round",
                 "purpose",
                 "age_group",
@@ -132,7 +130,7 @@ class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter):
                     ).order_by("preferred_order"),
                 ),
             )
-            .order_by("application__organisation__name")
+            .order_by("application__organisation_name")
         )
 
     @property
@@ -164,7 +162,7 @@ class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter):
                 section_name="varauksen nimi",
                 reservations_begin_date="hakijan ilmoittaman kauden alkupäivä",
                 reservations_end_date="hakijan ilmoittaman kauden loppupäivä",
-                home_city_name="kotikunta",
+                municipality="kotikunta",
                 purpose_name="vuoronkäyttötarkoitus",
                 age_group_str="ikäryhmä",
                 num_persons="osallistujamäärä",
@@ -192,39 +190,29 @@ class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter):
         ]
 
     def get_data_rows(self, instance: ApplicationSection) -> Iterable[ApplicationExportRow]:
+        application = instance.application
+
         row = ApplicationExportRow(
             application_id=str(instance.application.id),
             application_status=instance.application_status,  # type: ignore[attr-defined]
             section_id=str(instance.id),
             section_status=instance.status,  # type: ignore[attr-defined]
             section_name=instance.name,
-            home_city_name="muu",
+            municipality=application.municipality or "",
             num_persons=str(instance.num_persons),
-            applicant_type=instance.application.applicant_type,
+            applicant_type=application.applicant_type or "",
+            applicant=application.applicant,
             applied_reservations_per_week=str(instance.applied_reservations_per_week),
+            contact_person_first_name=application.contact_person_first_name,
+            contact_person_last_name=application.contact_person_last_name,
+            contact_person_email=application.contact_person_email or "",
+            contact_person_phone=application.contact_person_phone_number,
+            reservation_min_duration=local_timedelta_string(instance.reservation_min_duration),
+            reservation_max_duration=local_timedelta_string(instance.reservation_max_duration),
+            reservations_begin_date=local_date_string(instance.reservations_begin_date),
+            reservations_end_date=local_date_string(instance.reservations_end_date),
+            organisation_id=application.organisation_identifier,
         )
-
-        row.reservation_min_duration = local_timedelta_string(instance.reservation_min_duration)
-        row.reservation_max_duration = local_timedelta_string(instance.reservation_max_duration)
-        row.reservations_begin_date = local_date_string(instance.reservations_begin_date)
-        row.reservations_end_date = local_date_string(instance.reservations_end_date)
-
-        if instance.application.organisation is not None:
-            row.applicant = instance.application.organisation.name
-            row.organisation_id = instance.application.organisation.identifier
-
-        if instance.application.contact_person is not None:
-            row.contact_person_first_name = instance.application.contact_person.first_name
-            row.contact_person_last_name = instance.application.contact_person.last_name
-            row.contact_person_email = instance.application.contact_person.email
-            row.contact_person_phone = instance.application.contact_person.phone_number
-
-            if not row.applicant:
-                contact = instance.application.contact_person
-                row.applicant = f"{contact.first_name} {contact.last_name}"
-
-        if instance.application.home_city is not None:
-            row.home_city_name = instance.application.home_city.name
 
         if instance.purpose is not None:
             row.purpose_name = instance.purpose.name

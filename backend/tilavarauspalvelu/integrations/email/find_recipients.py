@@ -10,7 +10,7 @@ from tilavarauspalvelu.models import Unit, User
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from tilavarauspalvelu.models import Application, ApplicationSection, RecurringReservation, Reservation
+    from tilavarauspalvelu.models import Application, ApplicationSection, Reservation, ReservationSeries
     from tilavarauspalvelu.typing import Lang
 
 __all__ = [
@@ -26,22 +26,20 @@ def get_application_email_recipients(application: Application) -> list[str]:
     """Get email notification recipients for the given application."""
     recipients: set[str] = set()
 
-    contact_person_email = getattr(application.contact_person, "email", None)
-    if contact_person_email:
-        recipients.add(contact_person_email.lower())
+    if application.contact_person_email:
+        recipients.add(application.contact_person_email.lower())
 
-    applicant_email = getattr(application.user, "email", None)
-    if applicant_email:
-        recipients.add(applicant_email.lower())
+    if application.user.email:
+        recipients.add(application.user.email.lower())
 
     return list(recipients)
 
 
-def get_series_email_recipients(series: RecurringReservation) -> list[str]:
+def get_series_email_recipients(series: ReservationSeries) -> list[str]:
     """Get email notification recipients for the given series."""
     recipients: set[str] = set()
 
-    if series.user is not None and series.user.email:
+    if series.user.email:
         recipients.add(series.user.email.lower())
 
     if series.allocated_time_slot is not None:
@@ -58,8 +56,7 @@ def get_reservation_email_recipients(reservation: Reservation) -> list[str]:
     if reservation.reservee_email:
         recipients.add(reservation.reservee_email.lower())
 
-    reservation_user_email = getattr(reservation.user, "email", None)
-    if reservation_user_email:
+    if reservation.user.email:
         recipients.add(reservation.user.email.lower())
 
     return list(recipients)
@@ -109,18 +106,15 @@ def get_reservation_staff_notification_recipients_by_language(
     # Only fetch users with active unit roles and appropriate notification settings.
     users = User.objects.filter(
         unit_roles__isnull=False,
-        unit_roles__role_active=True,
+        unit_roles__is_role_active=True,
         reservation_notification__in=notification_settings,
     ).exclude(email="")
 
     # Skip the reservation creator
-    if reservation.user:
-        users = users.exclude(pk=reservation.user.pk)
+    users = users.exclude(pk=reservation.user.pk)
 
     units = (
-        Unit.objects.filter(
-            reservation_units__in=reservation.reservation_units.all(),
-        )
+        Unit.objects.filter(reservation_units__in=[reservation.reservation_unit])
         .prefetch_related("unit_groups")
         .distinct()
     )
@@ -148,20 +142,19 @@ def get_application_section_staff_notification_recipients_by_language(
     # Only fetch users with active unit roles and appropriate notification settings.
     users = User.objects.filter(
         unit_roles__isnull=False,
-        unit_roles__role_active=True,
+        unit_roles__is_role_active=True,
         reservation_notification__in=notification_settings,
     ).exclude(email="")
 
     # Skip the application creator
-    if application_section.application.user:
-        users = users.exclude(pk=application_section.application.user.pk)
+    users = users.exclude(pk=application_section.application.user.pk)
 
     units = (
         Unit.objects.prefetch_related("unit_groups")
         .filter(
             # The ReservationUnits must be fetched through AllocatedTimeSlot, since ReservationUnitOptions may contain
             # ReservationUnits which has not been allocated any slots in application handling
-            reservation_units__recurring_reservations__allocated_time_slot__reservation_unit_option__application_section=application_section
+            reservation_units__reservation_series__allocated_time_slot__reservation_unit_option__application_section=application_section
         )
         .distinct()
     )

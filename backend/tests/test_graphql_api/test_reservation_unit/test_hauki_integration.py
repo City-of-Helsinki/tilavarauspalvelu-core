@@ -89,7 +89,7 @@ def test_reservation_unit__query__hauki_url__regular_user(graphql):
 
     reservation_unit = ReservationUnitFactory.create(
         unit__tprek_department_id="ORGANISATION",
-        uuid="3774af34-9916-40f2-acc7-68db5a627710",
+        ext_uuid="3774af34-9916-40f2-acc7-68db5a627710",
     )
 
     global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
@@ -106,7 +106,7 @@ def test_reservation_unit__query__hauki_url__superuser(graphql, settings):
     origin_hauki_resource = OriginHaukiResourceFactory.create()
     reservation_unit = ReservationUnitFactory.create(
         unit__tprek_department_id="ORGANISATION",
-        uuid="3774af34-9916-40f2-acc7-68db5a627710",
+        ext_uuid="3774af34-9916-40f2-acc7-68db5a627710",
         origin_hauki_resource=origin_hauki_resource,
     )
 
@@ -118,13 +118,13 @@ def test_reservation_unit__query__hauki_url__superuser(graphql, settings):
 
     url = settings.HAUKI_ADMIN_UI_URL + urllib.parse.quote(
         string=(
-            f"/resource/{settings.HAUKI_ORIGIN_ID}:{reservation_unit.uuid}/"
+            f"/resource/{settings.HAUKI_ORIGIN_ID}:{reservation_unit.ext_uuid}/"
             f"?hsa_source={settings.HAUKI_ORIGIN_ID}"
             f"&hsa_username={user.email}"
             f"&hsa_organization={reservation_unit.unit.hauki_department_id}"
             f"&hsa_created_at=2023-01-01T12:00:00+02:00"
             f"&hsa_valid_until=2023-01-01T12:30:00+02:00"
-            f"&hsa_resource={settings.HAUKI_ORIGIN_ID}:{reservation_unit.uuid}"
+            f"&hsa_resource={settings.HAUKI_ORIGIN_ID}:{reservation_unit.ext_uuid}"
             f"&hsa_has_organization_rights=true"
             # See: `opening_hours.utils.hauki_link_generator.generate_hauki_link`
             f"&hsa_signature=1dc8823af4b4dfe050de12893adcb11e9ea457e53905181006a9e2345f65ee1f"
@@ -138,7 +138,7 @@ def test_reservation_unit__query__hauki_url__superuser(graphql, settings):
 def test_reservation_unit__query__hauki_url__superuser__no_hauki_resource(graphql):
     reservation_unit = ReservationUnitFactory.create(
         unit__tprek_department_id="ORGANISATION",
-        uuid="3774af34-9916-40f2-acc7-68db5a627710",
+        ext_uuid="3774af34-9916-40f2-acc7-68db5a627710",
         origin_hauki_resource=None,
     )
 

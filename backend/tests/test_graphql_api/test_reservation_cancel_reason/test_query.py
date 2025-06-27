@@ -33,10 +33,10 @@ DATA = [
         "reasonSv": "Jag hittade en annan lokal på Varaamo",
     },
     {
-        "value": "OTHER",
-        "reasonFi": "Muu syy",
-        "reasonEn": "Other reason",
-        "reasonSv": "Annan orsak",
+        "value": "UNSUITABLE_SPACE",
+        "reasonFi": "Tila ei sovellu käyttötarkoitukseeni",
+        "reasonEn": "The space is not suitable for my purpose",
+        "reasonSv": "Lokalen är inte lämplig för ändamålet",
     },
     {
         "value": "PROCESSING_TIME_TOO_LONG",
@@ -45,10 +45,10 @@ DATA = [
         "reasonSv": "Bokningens handläggningstid är för lång",
     },
     {
-        "value": "UNSUITABLE_SPACE",
-        "reasonFi": "Tila ei sovellu käyttötarkoitukseeni",
-        "reasonEn": "The space is not suitable for my purpose",
-        "reasonSv": "Lokalen är inte lämplig för ändamålet",
+        "value": "OTHER",
+        "reasonFi": "Muu syy",
+        "reasonEn": "Other reason",
+        "reasonSv": "Annan orsak",
     },
 ]
 

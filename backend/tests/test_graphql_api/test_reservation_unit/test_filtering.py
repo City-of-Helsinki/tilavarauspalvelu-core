@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import datetime
+from typing import NamedTuple
 
 import pytest
+from graphene_django_extensions.testing import parametrize_helper
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -250,37 +252,6 @@ def test_reservation_unit__filter__by_multiple_purposes(graphql):
     assert response.node(1) == {"pk": reservation_unit_2.pk}
 
 
-def test_reservation_unit__filter__by_qualifier(graphql):
-    reservation_unit = ReservationUnitFactory.create(qualifiers__name="foo")
-    ReservationUnitFactory.create(qualifiers__name="bar")
-
-    query = reservation_units_query(qualifiers=reservation_unit.qualifiers.first().pk)
-    response = graphql(query)
-
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 1
-    assert response.node(0) == {"pk": reservation_unit.pk}
-
-
-def test_reservation_unit__filter__by_qualifiers__multiple(graphql):
-    reservation_unit_1 = ReservationUnitFactory.create(qualifiers__name="foo")
-    reservation_unit_2 = ReservationUnitFactory.create(qualifiers__name="bar")
-    ReservationUnitFactory.create(qualifiers__name="baz")
-
-    query = reservation_units_query(
-        qualifiers=[
-            reservation_unit_1.qualifiers.first().pk,
-            reservation_unit_2.qualifiers.first().pk,
-        ]
-    )
-    response = graphql(query)
-
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": reservation_unit_1.pk}
-    assert response.node(1) == {"pk": reservation_unit_2.pk}
-
-
 def test_reservation_unit__filter__by_max_persons_gte(graphql):
     reservation_unit_1 = ReservationUnitFactory.create(max_persons=None)
     reservation_unit_2 = ReservationUnitFactory.create(max_persons=201)
@@ -471,44 +442,44 @@ def test_reservation_unit__filter__by_is_visible(graphql):
 
     # No publish times -> VISIBLE
     reservation_unit_1 = ReservationUnitFactory.create(
-        publish_begins=None,
-        publish_ends=None,
+        publish_begins_at=None,
+        publish_ends_at=None,
     )
 
     # Publish begins before today -> VISIBLE
     reservation_unit_2 = ReservationUnitFactory.create(
-        publish_begins=now - datetime.timedelta(days=5),
-        publish_ends=now + datetime.timedelta(days=10),
+        publish_begins_at=now - datetime.timedelta(days=5),
+        publish_ends_at=now + datetime.timedelta(days=10),
     )
 
     # Publish begins after today -> NOT VISIBLE
     reservation_unit_3 = ReservationUnitFactory.create(
-        publish_begins=now + datetime.timedelta(days=5),
-        publish_ends=now + datetime.timedelta(days=10),
+        publish_begins_at=now + datetime.timedelta(days=5),
+        publish_ends_at=now + datetime.timedelta(days=10),
     )
 
     # Publish begins before today, ends null -> VISIBLE
     reservation_unit_4 = ReservationUnitFactory.create(
-        publish_begins=now - datetime.timedelta(days=5),
-        publish_ends=None,
+        publish_begins_at=now - datetime.timedelta(days=5),
+        publish_ends_at=None,
     )
 
     # Publish begins null, ends after today -> VISIBLE
     reservation_unit_5 = ReservationUnitFactory.create(
-        publish_begins=None,
-        publish_ends=now + datetime.timedelta(days=5),
+        publish_begins_at=None,
+        publish_ends_at=now + datetime.timedelta(days=5),
     )
 
     # Publish begins null, ends before today -> NOT VISIBLE
     reservation_unit_6 = ReservationUnitFactory.create(
-        publish_begins=None,
-        publish_ends=now - datetime.timedelta(days=1),
+        publish_begins_at=None,
+        publish_ends_at=now - datetime.timedelta(days=1),
     )
 
     # Archived -> NEVER SHOWN
     ReservationUnitFactory.create(
-        publish_begins=now - datetime.timedelta(days=5),
-        publish_ends=now + datetime.timedelta(days=10),
+        publish_begins_at=now - datetime.timedelta(days=5),
+        publish_ends_at=now + datetime.timedelta(days=10),
         is_archived=True,
     )
 
@@ -529,18 +500,26 @@ def test_reservation_unit__filter__by_is_visible(graphql):
     assert response.node(1) == {"pk": reservation_unit_6.pk}
 
 
+class Params(NamedTuple):
+    kind: ReservationKind
+    units: list[int]
+
+
 @pytest.mark.parametrize(
-    ("kind", "units"),
-    [
-        (ReservationKind.DIRECT.value, [1, 3]),
-        (ReservationKind.SEASON.value, [2, 3]),
-        (ReservationKind.DIRECT_AND_SEASON.value, [3]),
-    ],
-    ids=[
-        ReservationKind.DIRECT.value,
-        ReservationKind.SEASON.value,
-        ReservationKind.DIRECT_AND_SEASON.value,
-    ],
+    **parametrize_helper({
+        "DIRECT": Params(
+            kind=ReservationKind.DIRECT,
+            units=[1, 3],
+        ),
+        "SEASON": Params(
+            kind=ReservationKind.SEASON,
+            units=[2, 3],
+        ),
+        "DIRECT_AND_SEASON": Params(
+            kind=ReservationKind.DIRECT_AND_SEASON,
+            units=[3],
+        ),
+    })
 )
 def test_reservation_unit__filter__by_reservation_kind(graphql, kind, units):
     reservation_units = {

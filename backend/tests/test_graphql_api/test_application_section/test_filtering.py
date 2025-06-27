@@ -5,10 +5,11 @@ from typing import TYPE_CHECKING
 import pytest
 
 from tilavarauspalvelu.enums import (
-    ApplicantTypeChoice,
     ApplicationSectionStatusChoice,
     ApplicationStatusChoice,
+    MunicipalityChoice,
     Priority,
+    ReserveeType,
     Weekday,
 )
 
@@ -16,7 +17,6 @@ from tests.factories import (
     AgeGroupFactory,
     ApplicationFactory,
     ApplicationSectionFactory,
-    CityFactory,
     ReservationPurposeFactory,
     SuitableTimeRangeFactory,
 )
@@ -289,15 +289,15 @@ def test_application_section__filter__by_applicant_type(graphql):
     # given:
     # - There is a draft application in an application round with three application sections
     # - A superuser is using the system
-    application_1 = ApplicationFactory.create_in_status_draft_no_sections(applicant_type=ApplicantTypeChoice.COMPANY)
-    application_2 = ApplicationFactory.create_in_status_draft_no_sections(applicant_type=ApplicantTypeChoice.INDIVIDUAL)
+    application_1 = ApplicationFactory.create_in_status_draft_no_sections(applicant_type=ReserveeType.COMPANY)
+    application_2 = ApplicationFactory.create_in_status_draft_no_sections(applicant_type=ReserveeType.INDIVIDUAL)
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application_1)
     ApplicationSectionFactory.create_in_status_unallocated(application=application_2)
     graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections of a specific applicant type
-    query = sections_query(applicant_type=ApplicantTypeChoice.COMPANY)
+    query = sections_query(applicant_type=ReserveeType.COMPANY)
     response = graphql(query)
 
     # then:
@@ -310,15 +310,15 @@ def test_application_section__filter__by_applicant_type__multiple(graphql):
     # given:
     # - There is a draft application in an application round with three application sections
     # - A superuser is using the system
-    application_1 = ApplicationFactory.create_in_status_draft_no_sections(applicant_type=ApplicantTypeChoice.COMPANY)
-    application_2 = ApplicationFactory.create_in_status_draft_no_sections(applicant_type=ApplicantTypeChoice.INDIVIDUAL)
+    application_1 = ApplicationFactory.create_in_status_draft_no_sections(applicant_type=ReserveeType.COMPANY)
+    application_2 = ApplicationFactory.create_in_status_draft_no_sections(applicant_type=ReserveeType.INDIVIDUAL)
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application_1)
     section_2 = ApplicationSectionFactory.create_in_status_unallocated(application=application_2)
     graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with any of the given applicant types
-    query = sections_query(applicant_type=[ApplicantTypeChoice.COMPANY, ApplicantTypeChoice.INDIVIDUAL])
+    query = sections_query(applicant_type=[ReserveeType.COMPANY, ReserveeType.INDIVIDUAL])
     response = graphql(query)
 
     # then:
@@ -666,21 +666,19 @@ def test_application_section__filter__by_include_preferred_order_10_or_higher__w
     assert response.node(2) == {"pk": section_4.pk}
 
 
-def test_application_section__filter__by_home_city(graphql):
+def test_application_section__filter__by_municipality(graphql):
     # given:
     # - There are two application with different home cities, each with one application section
     # - A superuser is using the system
-    city_1 = CityFactory.create(name="Helsinki")
-    city_2 = CityFactory.create(name="Other")
-    application_1 = ApplicationFactory.create_in_status_draft_no_sections(home_city=city_1)
-    application_2 = ApplicationFactory.create_in_status_draft_no_sections(home_city=city_2)
+    application_1 = ApplicationFactory.create_in_status_draft_no_sections(municipality=MunicipalityChoice.HELSINKI)
+    application_2 = ApplicationFactory.create_in_status_draft_no_sections(municipality=MunicipalityChoice.OTHER)
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application_1)
     ApplicationSectionFactory.create_in_status_unallocated(application=application_2)
     graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a specific preferred order
-    query = sections_query(home_city=city_1.pk)
+    query = sections_query(municipality=MunicipalityChoice.HELSINKI)
     response = graphql(query)
 
     # then:
@@ -691,21 +689,19 @@ def test_application_section__filter__by_home_city(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_home_city__multiple(graphql):
+def test_application_section__filter__by_municipality__multiple(graphql):
     # given:
     # - There are two application with different home cities, each with one application section
     # - A superuser is using the system
-    city_1 = CityFactory.create(name="Helsinki")
-    city_2 = CityFactory.create(name="Other")
-    application_1 = ApplicationFactory.create_in_status_draft_no_sections(home_city=city_1)
-    application_2 = ApplicationFactory.create_in_status_draft_no_sections(home_city=city_2)
+    application_1 = ApplicationFactory.create_in_status_draft_no_sections(municipality=MunicipalityChoice.HELSINKI)
+    application_2 = ApplicationFactory.create_in_status_draft_no_sections(municipality=MunicipalityChoice.OTHER)
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application_1)
     section_2 = ApplicationSectionFactory.create_in_status_unallocated(application=application_2)
     graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a specific preferred order
-    query = sections_query(home_city=[city_1.pk, city_2.pk])
+    query = sections_query(municipality=[MunicipalityChoice.HELSINKI, MunicipalityChoice.OTHER])
     response = graphql(query)
 
     # then:
@@ -820,9 +816,11 @@ def test_application_section__filter__by_text_search__section_name(graphql):
     # - There is an application with two application sections
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft_no_sections(
-        organisation=None,
-        contact_person=None,
-        user=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
     )
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
     ApplicationSectionFactory.create_in_status_unallocated(application=application, name="bar")
@@ -846,7 +844,11 @@ def test_application_section__filter__by_text_search__section_name__prefix(graph
     # - There is an application with two application sections
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft_no_sections(
-        organisation=None, contact_person=None, user=None
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
     )
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
     ApplicationSectionFactory.create_in_status_unallocated(application=application, name="bar")
@@ -870,7 +872,11 @@ def test_application_section__filter__by_text_search__section_name__has_quotes(g
     # - There is an application with two application sections
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft_no_sections(
-        organisation=None, contact_person=None, user=None
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
     )
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="Moe's Bar")
     ApplicationSectionFactory.create_in_status_unallocated(application=application, name="Bar")
@@ -894,9 +900,11 @@ def test_application_section__filter__by_text_search__applicant__organisation_na
     # - There is an application with two application sections
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft_no_sections(
-        organisation__name="fizz",
-        contact_person=None,
-        user=None,
+        organisation_name="fizz",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
     )
     section = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
     graphql.login_with_superuser()
@@ -919,10 +927,11 @@ def test_application_section__filter__by_text_search__applicant__contact_person_
     # - There is an application with two application sections
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft_no_sections(
-        organisation=None,
-        contact_person__first_name="fizz",
-        contact_person__last_name="none",
-        user=None,
+        organisation_name="",
+        contact_person_first_name="fizz",
+        contact_person_last_name="none",
+        user__first_name="",
+        user__last_name="",
     )
     section = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
     graphql.login_with_superuser()
@@ -945,10 +954,11 @@ def test_application_section__filter__by_text_search__applicant__contact_person_
     # - There is an application with two application sections
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft_no_sections(
-        organisation=None,
-        contact_person__first_name="none",
-        contact_person__last_name="fizz",
-        user=None,
+        organisation_name="",
+        contact_person_first_name="none",
+        contact_person_last_name="fizz",
+        user__first_name="",
+        user__last_name="",
     )
     section = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
     graphql.login_with_superuser()
@@ -971,8 +981,9 @@ def test_application_section__filter__by_text_search__applicant__user_first_name
     # - There is an application with two application sections
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft_no_sections(
-        organisation=None,
-        contact_person=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
         user__first_name="fizz",
         user__last_name="none",
     )
@@ -997,8 +1008,9 @@ def test_application_section__filter__by_text_search__applicant__user_last_name(
     # - There is an application with two application sections
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft_no_sections(
-        organisation=None,
-        contact_person=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
         user__first_name="none",
         user__last_name="fizz",
     )
@@ -1024,9 +1036,11 @@ def test_application_section__filter__by_text_search__section_id(graphql):
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft_no_sections(
         id=1,
-        organisation=None,
-        contact_person=None,
-        user=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
     )
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(id=2, application=application, name="foo")
     ApplicationSectionFactory.create_in_status_unallocated(id=3, application=application, name="bar")
@@ -1051,15 +1065,19 @@ def test_application_section__filter__by_text_search__application_id(graphql):
     # - A superuser is using the system
     application_1 = ApplicationFactory.create_in_status_draft_no_sections(
         id=1,
-        organisation=None,
-        contact_person=None,
-        user=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
     )
     application_2 = ApplicationFactory.create_in_status_draft_no_sections(
         id=2,
-        organisation=None,
-        contact_person=None,
-        user=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
     )
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(id=3, application=application_1, name="foo")
     ApplicationSectionFactory.create_in_status_unallocated(id=4, application=application_2, name="bar")
@@ -1083,9 +1101,9 @@ def test_application_section__filter__by_text_search__not_found(graphql):
     # - There is an application with two application sections
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft_no_sections(
-        organisation__name="org",
-        contact_person__first_name="fizz",
-        contact_person__last_name="buzz",
+        organisation_name="org",
+        contact_person_first_name="fizz",
+        contact_person_last_name="buzz",
         user__first_name="person",
         user__last_name="one",
     )

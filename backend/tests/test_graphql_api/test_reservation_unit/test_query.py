@@ -10,7 +10,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
     ReservationUnitPublishingState,
     TermsOfUseTypeChoices,
-    WeekdayChoice,
+    Weekday,
 )
 from utils.date_utils import local_date, local_datetime, next_hour
 
@@ -21,7 +21,6 @@ from tests.factories import (
     PaymentMerchantFactory,
     PaymentProductFactory,
     PurposeFactory,
-    QualifierFactory,
     ReservationFactory,
     ReservationMetadataSetFactory,
     ReservationUnitCancellationRuleFactory,
@@ -95,7 +94,7 @@ def test_reservation_unit__query__all_fields(graphql):
 
     fields = """
         pk
-        uuid
+        extUuid
         rank
 
         nameFi
@@ -105,9 +104,9 @@ def test_reservation_unit__query__all_fields(graphql):
         descriptionEn
         descriptionSv
         contactInformation
-        termsOfUseFi
-        termsOfUseEn
-        termsOfUseSv
+        notesWhenApplyingFi
+        notesWhenApplyingEn
+        notesWhenApplyingSv
         reservationPendingInstructionsFi
         reservationPendingInstructionsSv
         reservationPendingInstructionsEn
@@ -125,10 +124,10 @@ def test_reservation_unit__query__all_fields(graphql):
         reservationsMinDaysBefore
         reservationsMaxDaysBefore
 
-        reservationBegins
-        reservationEnds
-        publishBegins
-        publishEnds
+        reservationBeginsAt
+        reservationEndsAt
+        publishBeginsAt
+        publishEndsAt
         minReservationDuration
         maxReservationDuration
         bufferTimeBefore
@@ -158,10 +157,10 @@ def test_reservation_unit__query__all_fields(graphql):
         reservations_max_days_before=10,
         buffer_time_before=datetime.timedelta(minutes=15),
         buffer_time_after=datetime.timedelta(minutes=15),
-        reservation_begins=datetime.datetime(2021, 5, 3, tzinfo=datetime.UTC),
-        reservation_ends=datetime.datetime(2021, 5, 3, tzinfo=datetime.UTC),
-        publish_begins=datetime.datetime(2021, 5, 3, tzinfo=datetime.UTC),
-        publish_ends=datetime.datetime(2021, 5, 3, tzinfo=datetime.UTC),
+        reservation_begins_at=datetime.datetime(2021, 5, 3, tzinfo=datetime.UTC),
+        reservation_ends_at=datetime.datetime(2021, 5, 3, tzinfo=datetime.UTC),
+        publish_begins_at=datetime.datetime(2021, 5, 3, tzinfo=datetime.UTC),
+        publish_ends_at=datetime.datetime(2021, 5, 3, tzinfo=datetime.UTC),
         min_reservation_duration=datetime.timedelta(minutes=15),
         max_reservation_duration=datetime.timedelta(hours=2),
     )
@@ -172,7 +171,7 @@ def test_reservation_unit__query__all_fields(graphql):
     assert len(response.edges) == 1
     assert response.node(0) == {
         "pk": reservation_unit.pk,
-        "uuid": str(reservation_unit.uuid),
+        "extUuid": str(reservation_unit.ext_uuid),
         "rank": reservation_unit.rank,
         #
         "nameFi": reservation_unit.name_fi,
@@ -181,9 +180,9 @@ def test_reservation_unit__query__all_fields(graphql):
         "descriptionFi": reservation_unit.description_fi,
         "descriptionEn": reservation_unit.description_en,
         "descriptionSv": reservation_unit.description_sv,
-        "termsOfUseFi": reservation_unit.terms_of_use_fi,
-        "termsOfUseEn": reservation_unit.terms_of_use_en,
-        "termsOfUseSv": reservation_unit.terms_of_use_sv,
+        "notesWhenApplyingFi": reservation_unit.notes_when_applying_fi,
+        "notesWhenApplyingEn": reservation_unit.notes_when_applying_en,
+        "notesWhenApplyingSv": reservation_unit.notes_when_applying_sv,
         "contactInformation": reservation_unit.contact_information,
         "reservationPendingInstructionsEn": reservation_unit.reservation_pending_instructions_en,
         "reservationPendingInstructionsFi": reservation_unit.reservation_pending_instructions_fi,
@@ -202,10 +201,10 @@ def test_reservation_unit__query__all_fields(graphql):
         "reservationsMinDaysBefore": reservation_unit.reservations_min_days_before,
         "reservationsMaxDaysBefore": reservation_unit.reservations_max_days_before,
         #
-        "reservationBegins": reservation_unit.reservation_begins.isoformat(),
-        "reservationEnds": reservation_unit.reservation_ends.isoformat(),
-        "publishBegins": reservation_unit.publish_begins.isoformat(),
-        "publishEnds": reservation_unit.publish_ends.isoformat(),
+        "reservationBeginsAt": reservation_unit.reservation_begins_at.isoformat(),
+        "reservationEndsAt": reservation_unit.reservation_ends_at.isoformat(),
+        "publishBeginsAt": reservation_unit.publish_begins_at.isoformat(),
+        "publishEndsAt": reservation_unit.publish_ends_at.isoformat(),
         "minReservationDuration": int(reservation_unit.min_reservation_duration.total_seconds()),
         "maxReservationDuration": int(reservation_unit.max_reservation_duration.total_seconds()),
         "bufferTimeBefore": int(reservation_unit.buffer_time_before.total_seconds()),
@@ -327,20 +326,25 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
             largeUrl
         }
         applicationRoundTimeSlots {
-            closed
+            isClosed
         }
         accessTypes {
             accessType
             beginDate
+        }
+        reservations {
+            beginsAt
         }
     """
 
     reservation_unit = ReservationUnitFactory.create(
         pricings__highest_price=20,
         images__large_url="https://example.com",
-        application_round_time_slots__closed=False,
+        application_round_time_slots__is_closed=False,
         access_types__begin_date=local_date(),
     )
+    ReservationFactory.create(reservation_unit=reservation_unit)
+
     graphql.login_with_superuser()
     query = reservation_units_query(fields=fields)
     response = graphql(query)
@@ -364,13 +368,18 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
         ],
         "applicationRoundTimeSlots": [
             {
-                "closed": reservation_unit.application_round_time_slots.first().closed,
+                "isClosed": reservation_unit.application_round_time_slots.first().is_closed,
             },
         ],
         "accessTypes": [
             {
                 "accessType": reservation_unit.access_types.first().access_type,
                 "beginDate": reservation_unit.access_types.first().begin_date.isoformat(),
+            },
+        ],
+        "reservations": [
+            {
+                "beginsAt": reservation_unit.reservations.first().begins_at.isoformat(),
             },
         ],
     }
@@ -393,14 +402,8 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
         equipments {
             nameFi
         }
-        qualifiers {
-            nameFi
-        }
         applicationRounds {
             nameFi
-        }
-        reservations {
-            begin
         }
     """
 
@@ -409,10 +412,9 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
         resources=[ResourceFactory.create()],
         purposes=[PurposeFactory.create()],
         equipments=[EquipmentFactory.create()],
-        qualifiers=[QualifierFactory.create()],
         application_rounds=[ApplicationRoundFactory.create()],
-        reservations=[ReservationFactory.create()],
     )
+
     query = reservation_units_query(fields=fields)
     response = graphql(query)
 
@@ -442,21 +444,11 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
                 "nameFi": reservation_unit.equipments.first().name_fi,
             },
         ],
-        "qualifiers": [
-            {
-                "nameFi": reservation_unit.qualifiers.first().name_fi,
-            },
-        ],
         #
         # Reverse
         "applicationRounds": [
             {
                 "nameFi": reservation_unit.application_rounds.first().name_fi,
-            },
-        ],
-        "reservations": [
-            {
-                "begin": reservation_unit.reservations.first().begin.isoformat(),
             },
         ],
     }
@@ -487,8 +479,8 @@ def test_reservation_unit__query__state__draft(graphql):
 def test_reservation_unit__query__state__scheduled_publishing(graphql):
     now = local_datetime()
     reservation_unit = ReservationUnitFactory.create(
-        publish_begins=now + datetime.timedelta(hours=1),
-        publish_ends=None,
+        publish_begins_at=now + datetime.timedelta(hours=1),
+        publish_ends_at=None,
     )
 
     query = reservation_units_query(fields="publishingState", pk=reservation_unit.pk)
@@ -502,8 +494,8 @@ def test_reservation_unit__query__state__scheduled_publishing(graphql):
 def test_reservation_unit__query__state__scheduled_hiding(graphql):
     now = local_datetime()
     reservation_unit = ReservationUnitFactory.create(
-        publish_begins=now - datetime.timedelta(days=1),
-        publish_ends=now + datetime.timedelta(days=2),
+        publish_begins_at=now - datetime.timedelta(days=1),
+        publish_ends_at=now + datetime.timedelta(days=2),
     )
 
     query = reservation_units_query(fields="publishingState", pk=reservation_unit.pk)
@@ -517,8 +509,8 @@ def test_reservation_unit__query__state__scheduled_hiding(graphql):
 def test_reservation_unit__query__state__hidden(graphql):
     now = local_datetime()
     reservation_unit = ReservationUnitFactory.create(
-        publish_begins=now - datetime.timedelta(days=2),
-        publish_ends=now - datetime.timedelta(days=1),
+        publish_begins_at=now - datetime.timedelta(days=2),
+        publish_ends_at=now - datetime.timedelta(days=1),
     )
 
     query = reservation_units_query(fields="publishingState", pk=reservation_unit.pk)
@@ -532,8 +524,8 @@ def test_reservation_unit__query__state__hidden(graphql):
 def test_reservation_unit__query__state__scheduled_period(graphql):
     now = local_datetime()
     reservation_unit = ReservationUnitFactory.create(
-        publish_begins=now + datetime.timedelta(days=2),
-        publish_ends=now + datetime.timedelta(days=3),
+        publish_begins_at=now + datetime.timedelta(days=2),
+        publish_ends_at=now + datetime.timedelta(days=3),
     )
 
     query = reservation_units_query(fields="publishingState", pk=reservation_unit.pk)
@@ -546,10 +538,10 @@ def test_reservation_unit__query__state__scheduled_period(graphql):
 
 def test_reservation_unit__query__state__published(graphql):
     reservation_unit = ReservationUnitFactory.create(
-        publish_begins=None,
-        publish_ends=None,
-        reservation_begins=None,
-        reservation_ends=None,
+        publish_begins_at=None,
+        publish_ends_at=None,
+        reservation_begins_at=None,
+        reservation_ends_at=None,
     )
 
     query = reservation_units_query(fields="publishingState", pk=reservation_unit.pk)
@@ -580,13 +572,13 @@ def test_reservation_unit__query__timeslots(graphql):
     # - There is a reservation unit with timeslots
     # - A superuser is using the system
     reservation_unit = ReservationUnitFactory.create()
-    ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit, weekday=WeekdayChoice.MONDAY)
-    ApplicationRoundTimeSlotFactory.create_closed(reservation_unit=reservation_unit, weekday=WeekdayChoice.WEDNESDAY)
+    ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit, weekday=Weekday.MONDAY)
+    ApplicationRoundTimeSlotFactory.create_closed(reservation_unit=reservation_unit, weekday=Weekday.WEDNESDAY)
     graphql.login_with_superuser()
 
     # when:
     # - The reservation unit timeslots are queried
-    fields = "applicationRoundTimeSlots { weekday closed reservableTimes { begin end } }"
+    fields = "applicationRoundTimeSlots { weekday isClosed reservableTimes { begin end } }"
     query = reservation_units_query(fields=fields)
     response = graphql(query)
 
@@ -597,8 +589,8 @@ def test_reservation_unit__query__timeslots(graphql):
     assert response.node(0) == {
         "applicationRoundTimeSlots": [
             {
-                "weekday": WeekdayChoice.MONDAY.value,
-                "closed": False,
+                "weekday": Weekday.MONDAY.value,
+                "isClosed": False,
                 "reservableTimes": [
                     {
                         "begin": "10:00:00",
@@ -607,8 +599,8 @@ def test_reservation_unit__query__timeslots(graphql):
                 ],
             },
             {
-                "weekday": WeekdayChoice.WEDNESDAY.value,
-                "closed": True,
+                "weekday": Weekday.WEDNESDAY.value,
+                "isClosed": True,
                 "reservableTimes": [],
             },
         ]
@@ -624,7 +616,7 @@ def test_reservation_unit__query__timeslots__not_found(graphql):
 
     # when:
     # - The reservation unit timeslots are queried
-    fields = "applicationRoundTimeSlots { weekday closed reservableTimes { begin end } }"
+    fields = "applicationRoundTimeSlots { weekday isClosed reservableTimes { begin end } }"
     query = reservation_units_query(fields=fields)
     response = graphql(query)
 
@@ -693,39 +685,39 @@ def test_reservation_unit__query__num_active_user_reservations(graphql):
 
     # Correct user
     ReservationFactory.create_for_reservation_unit(
-        begin=begin,
-        end=end,
+        begins_at=begin,
+        ends_at=end,
         reservation_unit=reservation_unit,
         user=user,
     )
     # Another user
     ReservationFactory.create_for_reservation_unit(
-        begin=begin,
-        end=end,
+        begins_at=begin,
+        ends_at=end,
         reservation_unit=reservation_unit,
         user=other_user,
     )
     # Unauthenticated user
     ReservationFactory.create_for_reservation_unit(
-        begin=begin,
-        end=end,
+        begins_at=begin,
+        ends_at=end,
         reservation_unit=reservation_unit,
     )
     # Another reservation unit
-    ReservationFactory.create(begin=begin, end=end)
+    ReservationFactory.create(begins_at=begin, ends_at=end)
     # Another reservation unit with correct user
-    ReservationFactory.create(begin=begin, end=end, user=user)
+    ReservationFactory.create(begins_at=begin, ends_at=end, user=user)
     # Past reservation
     ReservationFactory.create_for_reservation_unit(
-        begin=begin - datetime.timedelta(days=1),
-        end=end - datetime.timedelta(days=1),
+        begins_at=begin - datetime.timedelta(days=1),
+        ends_at=end - datetime.timedelta(days=1),
         reservation_unit=reservation_unit,
         user=user,
     )
     # Denied reservation
     ReservationFactory.create_for_reservation_unit(
-        begin=begin,
-        end=end,
+        begins_at=begin,
+        ends_at=end,
         reservation_unit=reservation_unit,
         user=user,
         state=ReservationStateChoice.DENIED,
@@ -738,8 +730,8 @@ def test_reservation_unit__query__num_active_user_reservations(graphql):
         ReservationTypeChoice.SEASONAL,
     ]:
         ReservationFactory.create_for_reservation_unit(
-            begin=begin,
-            end=end,
+            begins_at=begin,
+            ends_at=end,
             reservation_unit=reservation_unit,
             user=user,
             type=type_choice,
@@ -761,9 +753,11 @@ def test_reservation_unit__query__num_active_user_reservations__user_unauthentic
 
     # Reservation with a user
     user = UserFactory.create()
-    ReservationFactory.create_for_reservation_unit(begin=begin, end=end, reservation_unit=reservation_unit, user=user)
+    ReservationFactory.create_for_reservation_unit(
+        begins_at=begin, ends_at=end, reservation_unit=reservation_unit, user=user
+    )
     # Reservation without a user
-    ReservationFactory.create_for_reservation_unit(begin=begin, end=end, reservation_unit=reservation_unit)
+    ReservationFactory.create_for_reservation_unit(begins_at=begin, ends_at=end, reservation_unit=reservation_unit)
 
     query = reservation_units_query(fields="numActiveUserReservations", pk=reservation_unit.pk)
     response = graphql(query)

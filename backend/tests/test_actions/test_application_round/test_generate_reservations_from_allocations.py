@@ -8,21 +8,20 @@ import pytest
 
 from tilavarauspalvelu.enums import (
     AccessType,
-    ApplicantTypeChoice,
-    CustomerTypeChoice,
     HaukiResourceState,
     RejectionReadinessChoice,
     ReservationStateChoice,
     ReservationTypeChoice,
+    ReserveeType,
     Weekday,
 )
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIDatePeriod
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
-    RecurringReservation,
     RejectedOccurrence,
     Reservation,
+    ReservationSeries,
     ReservationUnitHierarchy,
 )
 from tilavarauspalvelu.typing import Allocation
@@ -68,7 +67,7 @@ def test_generate_reservation_series_from_allocations():
 
     assert HaukiAPIClient.get_date_periods.call_count == 1
 
-    all_series: list[RecurringReservation] = list(RecurringReservation.objects.all())
+    all_series: list[ReservationSeries] = list(ReservationSeries.objects.all())
     assert len(all_series) == 1
 
     series = all_series[0]
@@ -81,12 +80,12 @@ def test_generate_reservation_series_from_allocations():
     assert series.end_date == section.reservations_end_date
     assert series.end_time == local_time(14, 0).replace(tzinfo=DEFAULT_TIMEZONE)
     assert series.recurrence_in_days == 7
-    assert series.weekdays == str(Weekday.MONDAY.as_weekday_number)
+    assert series.weekdays == [Weekday.MONDAY]
     assert series.reservation_unit == reservation_unit
     assert series.user == user
     assert series.age_group == section.age_group
 
-    reservations: list[Reservation] = list(series.reservations.order_by("begin").all())
+    reservations: list[Reservation] = list(series.reservations.order_by("begins_at").all())
 
     assert len(reservations) == 3
 
@@ -94,26 +93,23 @@ def test_generate_reservation_series_from_allocations():
     assert reservations[0].type == ReservationTypeChoice.SEASONAL.value
     assert reservations[0].state == ReservationStateChoice.CONFIRMED.value
     assert reservations[0].user == section.application.user
-    assert reservations[0].handled_at == application_round.handled_date
+    assert reservations[0].handled_at == application_round.handled_at
     assert reservations[0].num_persons == section.num_persons
     assert reservations[0].buffer_time_before == datetime.timedelta(0)
     assert reservations[0].buffer_time_after == datetime.timedelta(0)
-    assert reservations[0].reservee_first_name == section.application.contact_person.first_name
-    assert reservations[0].reservee_last_name == section.application.contact_person.last_name
-    assert reservations[0].reservee_email == section.application.contact_person.email
-    assert reservations[0].reservee_phone == section.application.contact_person.phone_number
-    assert reservations[0].billing_address_street == section.application.billing_address.street_address
-    assert reservations[0].billing_address_city == section.application.billing_address.city
-    assert reservations[0].billing_address_zip == section.application.billing_address.post_code
+    assert reservations[0].reservee_first_name == section.application.contact_person_first_name
+    assert reservations[0].reservee_last_name == section.application.contact_person_last_name
+    assert reservations[0].reservee_email == section.application.contact_person_email
+    assert reservations[0].reservee_phone == section.application.contact_person_phone_number
 
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 12)
-    assert reservations[0].end.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 14)
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 12)
+    assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 14)
 
-    assert reservations[1].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 8, 12)
-    assert reservations[1].end.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 8, 14)
+    assert reservations[1].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 8, 12)
+    assert reservations[1].ends_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 8, 14)
 
-    assert reservations[2].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 15, 12)
-    assert reservations[2].end.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 15, 14)
+    assert reservations[2].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 15, 12)
+    assert reservations[2].ends_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 15, 14)
 
     assert RejectedOccurrence.objects.count() == 0
 
@@ -141,7 +137,7 @@ def test_generate_reservation_series_from_allocations__individual():
     )
 
     application: Application = application_round.applications.first()
-    application.applicant_type = ApplicantTypeChoice.INDIVIDUAL
+    application.applicant_type = ReserveeType.INDIVIDUAL
     application.save()
 
     application_round.actions.generate_reservations_from_allocations()
@@ -151,10 +147,7 @@ def test_generate_reservation_series_from_allocations__individual():
     assert len(reservations) == 1
 
     assert reservations[0].description == application.additional_information
-    assert reservations[0].reservee_type == CustomerTypeChoice.INDIVIDUAL
-    assert reservations[0].reservee_address_street == application.billing_address.street_address
-    assert reservations[0].reservee_address_city == application.billing_address.city
-    assert reservations[0].reservee_address_zip == application.billing_address.post_code
+    assert reservations[0].reservee_type == ReserveeType.INDIVIDUAL
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
@@ -180,7 +173,7 @@ def test_generate_reservation_series_from_allocations__company():
     )
 
     application: Application = application_round.applications.first()
-    application.applicant_type = ApplicantTypeChoice.COMPANY
+    application.applicant_type = ReserveeType.COMPANY
     application.save()
 
     application_round.actions.generate_reservations_from_allocations()
@@ -188,14 +181,13 @@ def test_generate_reservation_series_from_allocations__company():
     reservations: list[Reservation] = list(Reservation.objects.all())
     assert len(reservations) == 1
 
-    assert reservations[0].description == application.organisation.core_business
-    assert reservations[0].reservee_type == CustomerTypeChoice.BUSINESS
-    assert reservations[0].reservee_organisation_name == application.organisation.name
-    assert reservations[0].reservee_id == application.organisation.identifier
-    assert reservations[0].reservee_is_unregistered_association is False
-    assert reservations[0].reservee_address_street == application.organisation.address.street_address
-    assert reservations[0].reservee_address_city == application.organisation.address.city
-    assert reservations[0].reservee_address_zip == application.organisation.address.post_code
+    assert reservations[0].description == application.organisation_core_business
+    assert reservations[0].reservee_type == ReserveeType.COMPANY
+    assert reservations[0].reservee_organisation_name == application.organisation_name
+    assert reservations[0].reservee_identifier == application.organisation_identifier
+    assert reservations[0].reservee_address_street == application.organisation_street_address
+    assert reservations[0].reservee_address_city == application.organisation_city
+    assert reservations[0].reservee_address_zip == application.organisation_post_code
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
@@ -221,7 +213,7 @@ def test_generate_reservation_series_from_allocations__association():
     )
 
     application: Application = application_round.applications.first()
-    application.applicant_type = ApplicantTypeChoice.ASSOCIATION
+    application.applicant_type = ReserveeType.NONPROFIT
     application.save()
 
     application_round.actions.generate_reservations_from_allocations()
@@ -229,14 +221,13 @@ def test_generate_reservation_series_from_allocations__association():
     reservations: list[Reservation] = list(Reservation.objects.all())
     assert len(reservations) == 1
 
-    assert reservations[0].description == application.organisation.core_business
-    assert reservations[0].reservee_type == CustomerTypeChoice.NONPROFIT
-    assert reservations[0].reservee_organisation_name == application.organisation.name
-    assert reservations[0].reservee_id == application.organisation.identifier
-    assert reservations[0].reservee_is_unregistered_association is False
-    assert reservations[0].reservee_address_street == application.organisation.address.street_address
-    assert reservations[0].reservee_address_city == application.organisation.address.city
-    assert reservations[0].reservee_address_zip == application.organisation.address.post_code
+    assert reservations[0].description == application.organisation_core_business
+    assert reservations[0].reservee_type == ReserveeType.NONPROFIT
+    assert reservations[0].reservee_organisation_name == application.organisation_name
+    assert reservations[0].reservee_identifier == application.organisation_identifier
+    assert reservations[0].reservee_address_street == application.organisation_street_address
+    assert reservations[0].reservee_address_city == application.organisation_city
+    assert reservations[0].reservee_address_zip == application.organisation_post_code
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
@@ -262,7 +253,7 @@ def test_generate_reservation_series_from_allocations__community():
     )
 
     application: Application = application_round.applications.first()
-    application.applicant_type = ApplicantTypeChoice.COMMUNITY
+    application.applicant_type = ReserveeType.NONPROFIT
     application.save()
 
     application_round.actions.generate_reservations_from_allocations()
@@ -270,13 +261,12 @@ def test_generate_reservation_series_from_allocations__community():
     reservations: list[Reservation] = list(Reservation.objects.all())
     assert len(reservations) == 1
 
-    assert reservations[0].reservee_type == CustomerTypeChoice.NONPROFIT
-    assert reservations[0].reservee_organisation_name == application.organisation.name
-    assert reservations[0].reservee_id == application.organisation.identifier
-    assert reservations[0].reservee_is_unregistered_association is False
-    assert reservations[0].reservee_address_street == application.organisation.address.street_address
-    assert reservations[0].reservee_address_city == application.organisation.address.city
-    assert reservations[0].reservee_address_zip == application.organisation.address.post_code
+    assert reservations[0].reservee_type == ReserveeType.NONPROFIT
+    assert reservations[0].reservee_organisation_name == application.organisation_name
+    assert reservations[0].reservee_identifier == application.organisation_identifier
+    assert reservations[0].reservee_address_street == application.organisation_street_address
+    assert reservations[0].reservee_address_city == application.organisation_city
+    assert reservations[0].reservee_address_zip == application.organisation_post_code
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
@@ -313,11 +303,11 @@ def test_generate_reservation_series_from_allocations__multiple_allocations():
 
     assert len(reservations) == 2
 
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 12)
-    assert reservations[0].end.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 14)
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 12)
+    assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 14)
 
-    assert reservations[1].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 2, 12)
-    assert reservations[1].end.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 2, 14)
+    assert reservations[1].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 2, 12)
+    assert reservations[1].ends_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 2, 14)
 
     assert HaukiAPIClient.get_date_periods.call_count == 1
 
@@ -380,9 +370,9 @@ def test_generate_reservation_series_from_allocations__overlapping_reservation()
     )
 
     existing_reservation = ReservationFactory.create(
-        reservation_units=[reservation_unit],
-        begin=local_datetime(2024, 1, 1, 12, 0),
-        end=local_datetime(2024, 1, 1, 14, 0),
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 1, 12, 0),
+        ends_at=local_datetime(2024, 1, 1, 14, 0),
     )
 
     ReservationUnitHierarchy.refresh()
@@ -394,7 +384,7 @@ def test_generate_reservation_series_from_allocations__overlapping_reservation()
     assert len(reservations) == 1
 
     assert reservations[0] == existing_reservation
-    assert reservations[0].recurring_reservation is None
+    assert reservations[0].reservation_series is None
 
     rejected: list[RejectedOccurrence] = list(RejectedOccurrence.objects.all())
     assert len(rejected) == 1
@@ -501,8 +491,8 @@ def test_generate_reservation_series_from_allocations__explicitly_closed_opening
     reservations: list[Reservation] = list(Reservation.objects.all())
     assert len(reservations) == 1
 
-    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 12)
-    assert reservations[0].end.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 14)
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 12)
+    assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 14)
 
     assert HaukiAPIClient.get_date_periods.call_count == 1
 
@@ -611,16 +601,16 @@ def test_generate_reservation_series_from_allocations__two_reservation_units_wit
 
     application_round.actions.generate_reservations_from_allocations()
 
-    qs = Reservation.objects.order_by("begin")
+    qs = Reservation.objects.order_by("begins_at")
 
-    reservations: list[Reservation] = list(qs.filter(reservation_units=reservation_unit_1))
+    reservations: list[Reservation] = list(qs.filter(reservation_unit=reservation_unit_1))
     assert len(reservations) == 3
 
     assert reservations[0].access_type == AccessType.UNRESTRICTED
     assert reservations[1].access_type == AccessType.UNRESTRICTED
     assert reservations[2].access_type == AccessType.UNRESTRICTED
 
-    reservations: list[Reservation] = list(qs.filter(reservation_units=reservation_unit_2))
+    reservations: list[Reservation] = list(qs.filter(reservation_unit=reservation_unit_2))
     assert len(reservations) == 3
 
     assert reservations[0].access_type == AccessType.ACCESS_CODE

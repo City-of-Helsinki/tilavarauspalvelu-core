@@ -10,9 +10,50 @@ from django.conf import settings
 from django.db import migrations, models
 
 import tilavarauspalvelu.enums
-import tilavarauspalvelu.models.organisation.model
 import tilavarauspalvelu.validators
 import utils.fields.model
+
+
+class WeekdayChoice(models.IntegerChoices):
+    MONDAY = 0, "Monday"
+    TUESDAY = 1, "Tuesday"
+    WEDNESDAY = 2, "Wednesday"
+    THURSDAY = 3, "Thursday"
+    FRIDAY = 4, "Friday"
+    SATURDAY = 5, "Saturday"
+    SUNDAY = 6, "Sunday"
+
+
+class OrganizationTypeChoice(models.TextChoices):
+    COMPANY = "COMPANY", "Company"
+    REGISTERED_ASSOCIATION = "REGISTERED_ASSOCIATION", "Registered association"
+    PUBLIC_ASSOCIATION = "PUBLIC_ASSOCIATION", "Public association"
+    UNREGISTERED_ASSOCIATION = "UNREGISTERED_ASSOCIATION", "Unregistered association"
+    MUNICIPALITY_CONSORTIUM = "MUNICIPALITY_CONSORTIUM", "Municipality consortium"
+    RELIGIOUS_COMMUNITY = "RELIGIOUS_COMMUNITY", "Religious community"
+
+
+class ApplicantTypeChoice(models.TextChoices):
+    INDIVIDUAL = "INDIVIDUAL", "Individual"
+    COMPANY = "COMPANY", "Company"
+    ASSOCIATION = "ASSOCIATION", "Association"
+    COMMUNITY = "COMMUNITY", "Community"
+
+
+def year_not_in_future(year: int | None) -> None:
+    from django.core.exceptions import ValidationError
+    from django.utils.text import format_lazy
+
+    from utils.date_utils import local_datetime
+
+    if year is None:
+        return
+
+    current_date = local_datetime()
+
+    if current_date.year < year:
+        msg = "is after current year"
+        raise ValidationError(format_lazy("{year} {msg}", year=year, msg=msg))
 
 
 class Migration(migrations.Migration):
@@ -194,7 +235,7 @@ class Migration(migrations.Migration):
                             ("COMPANY", "Company"),
                         ],
                         db_index=True,
-                        enum=tilavarauspalvelu.enums.ApplicantTypeChoice,
+                        enum=ApplicantTypeChoice,
                         max_length=11,
                         null=True,
                     ),
@@ -326,7 +367,7 @@ class Migration(migrations.Migration):
                     models.PositiveIntegerField(
                         blank=True,
                         null=True,
-                        validators=[tilavarauspalvelu.models.organisation.model.year_not_in_future],
+                        validators=[year_not_in_future],
                     ),
                 ),
                 ("active_members", models.PositiveIntegerField(null=True)),
@@ -346,7 +387,7 @@ class Migration(migrations.Migration):
                             ("RELIGIOUS_COMMUNITY", "Religious community"),
                         ],
                         default="COMPANY",
-                        enum=tilavarauspalvelu.enums.OrganizationTypeChoice,
+                        enum=OrganizationTypeChoice,
                         max_length=24,
                     ),
                 ),
@@ -463,7 +504,7 @@ class Migration(migrations.Migration):
                 (
                     "weekday",
                     utils.fields.model.IntChoiceField(
-                        enum=tilavarauspalvelu.enums.WeekdayChoice,
+                        enum=WeekdayChoice,
                         validators=[
                             django.core.validators.MinValueValidator(
                                 limit_value=0, message="Value must be between 0 and 6."

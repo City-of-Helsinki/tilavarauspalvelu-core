@@ -33,18 +33,18 @@ class ReservationFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
     ext_uuid = django_filters.UUIDFilter()
 
-    reservation_units = IntMultipleChoiceFilter(field_name="reservation_units")
-    unit = IntMultipleChoiceFilter(field_name="reservation_units__unit")
+    reservation_units = IntMultipleChoiceFilter(field_name="reservation_unit")
+    unit = IntMultipleChoiceFilter(field_name="reservation_unit__unit")
     user = IntMultipleChoiceFilter(field_name="user")
-    reservation_unit_type = IntMultipleChoiceFilter(field_name="reservation_units__reservation_unit_type")
-    recurring_reservation = IntMultipleChoiceFilter(field_name="recurring_reservation")
+    reservation_unit_type = IntMultipleChoiceFilter(field_name="reservation_unit__reservation_unit_type")
+    reservation_series = IntMultipleChoiceFilter(field_name="reservation_series")
 
     reservation_unit_name_fi = django_filters.CharFilter(method="filter_by_reservation_unit_name")
     reservation_unit_name_en = django_filters.CharFilter(method="filter_by_reservation_unit_name")
     reservation_unit_name_sv = django_filters.CharFilter(method="filter_by_reservation_unit_name")
 
-    begin_date = TimezoneAwareDateFilter(field_name="end", lookup_expr="gte", use_end_of_day=False)
-    end_date = TimezoneAwareDateFilter(field_name="begin", lookup_expr="lte", use_end_of_day=True)
+    begin_date = TimezoneAwareDateFilter(field_name="ends_at", lookup_expr="gte", use_end_of_day=False)
+    end_date = TimezoneAwareDateFilter(field_name="begins_at", lookup_expr="lte", use_end_of_day=True)
 
     created_at_gte = TimezoneAwareDateFilter(field_name="created_at", lookup_expr="gte", use_end_of_day=False)
     created_at_lte = TimezoneAwareDateFilter(field_name="created_at", lookup_expr="lte", use_end_of_day=True)
@@ -53,7 +53,7 @@ class ReservationFilterSet(ModelFilterSet):
     price_lte = django_filters.NumberFilter(field_name="price", lookup_expr="lte")
 
     applying_for_free_of_charge = django_filters.BooleanFilter(field_name="applying_for_free_of_charge")
-    is_recurring = django_filters.BooleanFilter(field_name="recurring_reservation", lookup_expr="isnull", exclude=True)
+    is_recurring = django_filters.BooleanFilter(field_name="reservation_series", lookup_expr="isnull", exclude=True)
     requested = django_filters.BooleanFilter(method="filter_by_requested")
     only_with_permission = django_filters.BooleanFilter(method="filter_by_only_with_permission")
     only_with_handling_permission = django_filters.BooleanFilter(method="filter_by_only_with_handling_permission")
@@ -69,17 +69,17 @@ class ReservationFilterSet(ModelFilterSet):
         order_by = [
             "pk",
             "name",
-            "begin",
-            "end",
+            "begins_at",
+            "ends_at",
             "created_at",
             "state",
             "price",
-            ("reservation_units__name_fi", "reservation_unit_name_fi"),
-            ("reservation_units__name_en", "reservation_unit_name_en"),
-            ("reservation_units__name_sv", "reservation_unit_name_sv"),
-            ("reservation_units__unit__name_fi", "unit_name_fi"),
-            ("reservation_units__unit__name_en", "unit_name_en"),
-            ("reservation_units__unit__name_sv", "unit_name_sv"),
+            ("reservation_unit__name_fi", "reservation_unit_name_fi"),
+            ("reservation_unit__name_en", "reservation_unit_name_en"),
+            ("reservation_unit__name_sv", "reservation_unit_name_sv"),
+            ("reservation_unit__unit__name_fi", "unit_name_fi"),
+            ("reservation_unit__unit__name_en", "unit_name_en"),
+            ("reservation_unit__unit__name_sv", "unit_name_sv"),
             "reservee_name",
             ("payment_order__status", "order_status"),
         ]
@@ -108,14 +108,14 @@ class ReservationFilterSet(ModelFilterSet):
 
         return qs.filter(
             # Either has "can_view_reservations" permissions
-            Q(reservation_units__unit__in=u_ids)  #
-            | Q(reservation_units__unit__unit_groups__in=g_ids)
+            Q(reservation_unit__unit__in=u_ids)  #
+            | Q(reservation_unit__unit__unit_groups__in=g_ids)
             # ...or is the owner of the reservation, and has "can_create_staff_reservations" permissions to it
             | (
                 Q(user=user)
                 & (
-                    Q(reservation_units__unit__in=reserver_u_ids)  #
-                    | Q(reservation_units__unit__unit_groups__in=reserver_g_ids)
+                    Q(reservation_unit__unit__in=reserver_u_ids)  #
+                    | Q(reservation_unit__unit__unit_groups__in=reserver_g_ids)
                 )
             )
         )
@@ -139,8 +139,8 @@ class ReservationFilterSet(ModelFilterSet):
         g_ids = user.permissions.unit_group_ids_where_has_role(role_choices=roles)
 
         return qs.filter(
-            Q(reservation_units__unit__in=u_ids)  #
-            | Q(reservation_units__unit__unit_groups__in=g_ids)
+            Q(reservation_unit__unit__in=u_ids)  #
+            | Q(reservation_unit__unit__unit_groups__in=g_ids)
         )
 
     @staticmethod
@@ -159,11 +159,11 @@ class ReservationFilterSet(ModelFilterSet):
         for word in words:
             word = word.strip()
             if language == "en":
-                q |= Q(reservation_units__name_en__istartswith=word)
+                q |= Q(reservation_unit__name_en__istartswith=word)
             elif language == "sv":
-                q |= Q(reservation_units__name_sv__istartswith=word)
+                q |= Q(reservation_unit__name_sv__istartswith=word)
             else:
-                q |= Q(reservation_units__name_fi__istartswith=word)
+                q |= Q(reservation_unit__name_fi__istartswith=word)
 
         return qs.filter(q).distinct()
 
@@ -183,7 +183,7 @@ class ReservationFilterSet(ModelFilterSet):
             fields = (
                 "pk",
                 "name",
-                "reservee_id",
+                "reservee_identifier",
                 "reservee_email",
                 "reservee_first_name",
                 "reservee_last_name",
@@ -191,7 +191,7 @@ class ReservationFilterSet(ModelFilterSet):
                 "user__email",
                 "user__first_name",
                 "user__last_name",
-                "recurring_reservation__name",
+                "reservation_series__name",
             )
             return text_search(qs=qs, fields=fields, text=value)
 

@@ -15,6 +15,7 @@ from tilavarauspalvelu.enums import (
     AuthenticationType,
     PaymentType,
     PriceUnit,
+    ReservationFormType,
     ReservationKind,
     ReservationStartInterval,
 )
@@ -47,8 +48,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
         model = ReservationUnit
 
     # IDs
-    sku = FakerFI("word")
-    uuid = factory.LazyFunction(uuid.uuid4)  # For Verkkokauppa and Hauki APIs
+    ext_uuid = factory.LazyFunction(uuid.uuid4)
     rank = factory.Sequence(lambda n: n)
 
     # Strings
@@ -64,10 +64,10 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
 
     contact_information = FakerFI("sentence")
 
-    terms_of_use = FakerFI("p_tags")
-    terms_of_use_fi = LazyAttribute(lambda i: i.terms_of_use)
-    terms_of_use_en = FakerEN("p_tags")
-    terms_of_use_sv = FakerSV("p_tags")
+    notes_when_applying = FakerFI("p_tags")
+    notes_when_applying_fi = LazyAttribute(lambda i: i.notes_when_applying)
+    notes_when_applying_en = FakerEN("p_tags")
+    notes_when_applying_sv = FakerSV("p_tags")
 
     reservation_pending_instructions = FakerFI("p_tags")
     reservation_pending_instructions_fi = LazyAttribute(lambda i: i.reservation_pending_instructions)
@@ -93,10 +93,10 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     reservations_max_days_before = None
 
     # Datetime
-    reservation_begins = None
-    reservation_ends = None
-    publish_begins = None
-    publish_ends = None
+    reservation_begins_at = None
+    reservation_ends_at = None
+    publish_begins_at = None
+    publish_ends_at = None
     max_reservation_duration = None
     min_reservation_duration = None
     buffer_time_before = factory.LazyFunction(datetime.timedelta)
@@ -115,6 +115,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     authentication = AuthenticationType.WEAK.value
     reservation_start_interval = ReservationStartInterval.INTERVAL_15_MINUTES.value
     reservation_kind = ReservationKind.DIRECT_AND_SEASON.value
+    reservation_form = ReservationFormType.CONTACT_INFO_FORM.value
 
     # Lists
     search_terms = LazyAttribute(lambda i: [])
@@ -138,7 +139,6 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     resources = ManyToManyFactory("tests.factories.ResourceFactory")
     purposes = ManyToManyFactory("tests.factories.PurposeFactory")
     equipments = ManyToManyFactory("tests.factories.EquipmentFactory")
-    qualifiers = ManyToManyFactory("tests.factories.QualifierFactory")
 
     # Reverse many-to-many
     application_rounds = ManyToManyFactory("tests.factories.ApplicationRoundFactory")
@@ -147,7 +147,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     # Reverse one-to-many
     images = ReverseForeignKeyFactory("tests.factories.ReservationUnitImageFactory")
     pricings = ReverseForeignKeyFactory("tests.factories.ReservationUnitPricingFactory")
-    recurring_reservations = ReverseForeignKeyFactory("tests.factories.RecurringReservationFactory")
+    reservation_series = ReverseForeignKeyFactory("tests.factories.ReservationSeriesFactory")
     application_round_time_slots = ReverseForeignKeyFactory("tests.factories.ApplicationRoundTimeSlotFactory")
     reservation_unit_options = ReverseForeignKeyFactory("tests.factories.ReservationUnitOptionFactory")
     access_types = ReverseForeignKeyFactory("tests.factories.ReservationUnitAccessTypeFactory")
@@ -264,11 +264,8 @@ class ReservationUnitBuilder(ModelFactoryBuilder[ReservationUnit]):
         self.set(
             unit=space.unit,
             spaces=[space],
+            origin_hauki_resource=space.unit.origin_hauki_resource,
         )
-        if space.unit and space.unit.origin_hauki_resource:
-            self.set(
-                origin_hauki_resource=space.unit.origin_hauki_resource,
-            )
         if use_name:
             self.set(
                 name=space.name,

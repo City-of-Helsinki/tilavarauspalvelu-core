@@ -12,10 +12,11 @@ from graphql_relay import to_global_id
 
 from tilavarauspalvelu.enums import (
     AccessType,
-    CustomerTypeChoice,
+    MunicipalityChoice,
     PriceUnit,
     ReservationStateChoice,
     ReservationTypeChoice,
+    ReserveeType,
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
@@ -33,8 +34,8 @@ from tests.factories import (
     ApplicationRoundFactory,
     ApplicationSectionFactory,
     PaymentOrderFactory,
-    RecurringReservationFactory,
     ReservationFactory,
+    ReservationSeriesFactory,
     ReservationUnitFactory,
     ReservationUnitPricingFactory,
     UnitFactory,
@@ -70,26 +71,19 @@ def test_reservation__query__all_fields(graphql):
         accessType
         ageGroup { minimum maximum }
         applyingForFreeOfCharge
-        begin
-        billingAddressCity
-        billingAddressStreet
-        billingAddressZip
-        billingEmail
-        billingFirstName
-        billingLastName
-        billingPhone
+        beginsAt
         bufferTimeAfter
         bufferTimeBefore
         cancelDetails
         cancelReason
         denyReason { reasonFi }
         description
-        end
+        endsAt
         extUuid
         freeOfChargeReason
         handledAt
         handlingDetails
-        homeCity { nameFi }
+        municipality
         isBlocked
         isHandled
         name
@@ -98,15 +92,14 @@ def test_reservation__query__all_fields(graphql):
         price
         priceNet
         purpose { nameFi }
-        recurringReservation { user { email } }
-        reservationUnits { nameFi }
+        reservationSeries { user { email } }
+        reservationUnit { nameFi }
         reserveeAddressCity
         reserveeAddressStreet
         reserveeAddressZip
         reserveeEmail
         reserveeFirstName
-        reserveeId
-        reserveeIsUnregisteredAssociation
+        reserveeIdentifier
         reserveeLastName
         reserveeName
         reserveeOrganisationName
@@ -134,26 +127,19 @@ def test_reservation__query__all_fields(graphql):
         "accessType": AccessType.UNRESTRICTED.value,
         "ageGroup": None,
         "applyingForFreeOfCharge": reservation.applying_for_free_of_charge,
-        "begin": reservation.begin.isoformat(),
-        "billingAddressCity": reservation.billing_address_city,
-        "billingAddressStreet": reservation.billing_address_street,
-        "billingAddressZip": reservation.billing_address_zip,
-        "billingEmail": reservation.billing_email,
-        "billingFirstName": reservation.billing_first_name,
-        "billingLastName": reservation.billing_last_name,
-        "billingPhone": reservation.billing_phone,
+        "beginsAt": reservation.begins_at.isoformat(),
         "bufferTimeAfter": int(reservation.buffer_time_after.total_seconds()),
         "bufferTimeBefore": int(reservation.buffer_time_before.total_seconds()),
         "cancelDetails": reservation.cancel_details,
         "cancelReason": None,
         "denyReason": None,
         "description": reservation.description,
-        "end": reservation.end.isoformat(),
+        "endsAt": reservation.ends_at.isoformat(),
         "extUuid": str(reservation.ext_uuid),
         "freeOfChargeReason": reservation.free_of_charge_reason,
         "handledAt": reservation.handled_at,
         "handlingDetails": reservation.handling_details,
-        "homeCity": None,
+        "municipality": MunicipalityChoice.HELSINKI.value,
         "isBlocked": False,
         "isHandled": False,
         "name": reservation.name,
@@ -162,15 +148,14 @@ def test_reservation__query__all_fields(graphql):
         "price": f"{reservation.price:.2f}",
         "priceNet": f"{reservation.price_net:.2f}",
         "purpose": None,
-        "recurringReservation": None,
-        "reservationUnits": [],
+        "reservationSeries": None,
+        "reservationUnit": {"nameFi": reservation.reservation_unit.name_fi},
         "reserveeAddressCity": reservation.reservee_address_city,
         "reserveeAddressStreet": reservation.reservee_address_street,
         "reserveeAddressZip": reservation.reservee_address_zip,
         "reserveeEmail": reservation.reservee_email,
         "reserveeFirstName": reservation.reservee_first_name,
-        "reserveeId": reservation.reservee_id,
-        "reserveeIsUnregisteredAssociation": reservation.reservee_is_unregistered_association,
+        "reserveeIdentifier": reservation.reservee_identifier,
         "reserveeLastName": reservation.reservee_last_name,
         "reserveeName": f"{reservation.reservee_first_name} {reservation.reservee_last_name}",
         "reserveeOrganisationName": reservation.reservee_organisation_name,
@@ -200,7 +185,7 @@ def test_reservation__query__single(graphql):
 
 def test_reservation__query__reservee_name_for_individual_reservee(graphql):
     reservation = ReservationFactory.create(
-        reservee_type=CustomerTypeChoice.INDIVIDUAL,
+        reservee_type=ReserveeType.INDIVIDUAL,
         reservee_first_name="First",
         reservee_last_name="Last",
     )
@@ -218,7 +203,7 @@ def test_reservation__query__reservee_name_for_individual_reservee(graphql):
 
 def test_reservation__query__reservee_name_for_business_reservee(graphql):
     reservation = ReservationFactory.create(
-        reservee_type=CustomerTypeChoice.BUSINESS,
+        reservee_type=ReserveeType.COMPANY,
         reservee_organisation_name="Business Oy",
     )
 
@@ -235,7 +220,7 @@ def test_reservation__query__reservee_name_for_business_reservee(graphql):
 
 def test_reservation__query__reservee_name_for_nonprofit_reservee(graphql):
     reservation = ReservationFactory(
-        reservee_type=CustomerTypeChoice.NONPROFIT,
+        reservee_type=ReserveeType.NONPROFIT,
         reservee_organisation_name="Nonprofit Ry",
     )
 
@@ -292,7 +277,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__general_
 def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_admin(graphql):
     unit = UnitFactory.create()
     reservation_unit = ReservationUnitFactory.create(unit=unit)
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
     admin = UserFactory.create_with_unit_role(units=[unit])
 
     graphql.force_login(admin)
@@ -320,7 +305,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_gro
     unit_group = UnitGroupFactory.create()
     unit = UnitFactory.create(unit_groups=[unit_group])
     reservation_unit = ReservationUnitFactory.create(unit=unit)
-    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
     admin = UserFactory.create_with_unit_role(unit_groups=[unit_group])
 
     graphql.force_login(admin)
@@ -418,16 +403,16 @@ def test_reservation__query__order__all_fields(graphql):
 
 
 def test_reservation__query__reservation_unit_is_archived_but_data_is_still_returned_through_relation(graphql):
-    reservation = ReservationFactory.create(reservation_units__is_archived=True)
-    reservation_unit = reservation.reservation_units.first()
+    reservation = ReservationFactory.create(reservation_unit__is_archived=True)
+    reservation_unit = reservation.reservation_unit
 
     graphql.login_with_superuser()
     global_id = to_global_id("ReservationNode", reservation.pk)
 
-    fields = "pk reservationUnits { pk isArchived }"
+    fields = "pk reservationUnit { pk isArchived }"
     expected_response = {
         "pk": reservation.pk,
-        "reservationUnits": [{"pk": reservation_unit.pk, "isArchived": True}],
+        "reservationUnit": {"pk": reservation_unit.pk, "isArchived": True},
     }
 
     # Single
@@ -467,8 +452,8 @@ def test_reservation__query__applied_pricing(graphql):
 
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
-        begin=local_datetime(2024, 1, 2, 12),
-        end=local_datetime(2024, 1, 2, 13),
+        begins_at=local_datetime(2024, 1, 2, 12),
+        ends_at=local_datetime(2024, 1, 2, 13),
     )
 
     fields = """
@@ -540,8 +525,8 @@ def test_reservation__query__pindora_info(graphql):
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
-        begin=local_datetime(2022, 1, 1, 12),
-        end=local_datetime(2022, 1, 1, 13),
+        begins_at=local_datetime(2022, 1, 1, 12),
+        ends_at=local_datetime(2022, 1, 1, 13),
     )
 
     query = pindora_query(reservation)
@@ -572,8 +557,8 @@ def test_reservation__query__pindora_info__access_code_not_active(graphql, as_re
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
-        begin=local_datetime(2022, 1, 1, 12),
-        end=local_datetime(2022, 1, 1, 13),
+        begins_at=local_datetime(2022, 1, 1, 12),
+        ends_at=local_datetime(2022, 1, 1, 13),
     )
 
     query = pindora_query(reservation)
@@ -603,8 +588,8 @@ def test_reservation__query__pindora_info__not_confirmed(graphql, as_reservee):
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.WAITING_FOR_PAYMENT,
-        begin=local_datetime(2022, 1, 1, 12),
-        end=local_datetime(2022, 1, 1, 13),
+        begins_at=local_datetime(2022, 1, 1, 12),
+        ends_at=local_datetime(2022, 1, 1, 13),
     )
 
     query = pindora_query(reservation)
@@ -630,8 +615,8 @@ def test_reservation__query__pindora_info__access_type_not_access_code(graphql):
     reservation = ReservationFactory.create(
         access_type=AccessType.UNRESTRICTED,
         state=ReservationStateChoice.CONFIRMED,
-        begin=local_datetime(2022, 1, 1, 12),
-        end=local_datetime(2022, 1, 1, 13),
+        begins_at=local_datetime(2022, 1, 1, 12),
+        ends_at=local_datetime(2022, 1, 1, 13),
     )
 
     query = pindora_query(reservation)
@@ -651,8 +636,8 @@ def test_reservation__query__pindora_info__pindora_call_fails(graphql):
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
-        begin=local_datetime(2022, 1, 1, 12),
-        end=local_datetime(2022, 1, 1, 13),
+        begins_at=local_datetime(2022, 1, 1, 12),
+        ends_at=local_datetime(2022, 1, 1, 13),
     )
 
     query = pindora_query(reservation)
@@ -672,8 +657,8 @@ def test_reservation__query__pindora_info__pindora_data_cached(graphql):
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
-        begin=local_datetime(2022, 1, 1, 12),
-        end=local_datetime(2022, 1, 1, 13),
+        begins_at=local_datetime(2022, 1, 1, 12),
+        ends_at=local_datetime(2022, 1, 1, 13),
     )
 
     query = pindora_query(reservation)
@@ -709,8 +694,8 @@ def test_reservation__query__pindora_info__reservation_past(graphql):
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
-        begin=local_datetime(2022, 1, 1, 12),
-        end=local_datetime(2022, 1, 1, 13),
+        begins_at=local_datetime(2022, 1, 1, 12),
+        ends_at=local_datetime(2022, 1, 1, 13),
     )
 
     query = pindora_query(reservation)
@@ -726,14 +711,14 @@ def test_reservation__query__pindora_info__reservation_past(graphql):
 
 
 @freeze_time(local_datetime(2022, 1, 1))
-def test_reservation__query__pindora_info__in_recurring_reservation(graphql):
-    series = RecurringReservationFactory.create()
+def test_reservation__query__pindora_info__in_reservation_series(graphql):
+    series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
-        begin=local_datetime(2022, 1, 1, 12),
-        end=local_datetime(2022, 1, 1, 13),
-        recurring_reservation=series,
+        begins_at=local_datetime(2022, 1, 1, 12),
+        ends_at=local_datetime(2022, 1, 1, 13),
+        reservation_series=series,
     )
 
     query = pindora_query(reservation)
@@ -785,17 +770,17 @@ def test_reservation__query__pindora_info__in_application_section(graphql):
         application__user=user,
         application__application_round=application_round,
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     reservation = ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_unit=series.reservation_unit,
+        reservation_series=series,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
-        begin=local_datetime(2022, 1, 1, 12),
-        end=local_datetime(2022, 1, 1, 13),
+        begins_at=local_datetime(2022, 1, 1, 12),
+        ends_at=local_datetime(2022, 1, 1, 13),
     )
 
     query = pindora_query(reservation)
@@ -812,11 +797,11 @@ def test_reservation__query__pindora_info__in_application_section(graphql):
         access_code_is_active=True,
         reservation_unit_code_validity=[
             PindoraSeasonalBookingAccessCodeValidity(
-                reservation_unit_id=series.reservation_unit.uuid,
+                reservation_unit_id=series.reservation_unit.ext_uuid,
                 access_code_valid_minutes_before=10,
                 access_code_valid_minutes_after=5,
-                begin=reservation.begin,
-                end=reservation.end,
+                begin=reservation.begins_at,
+                end=reservation.ends_at,
             ),
         ],
     )
@@ -844,19 +829,19 @@ def test_reservation__query__pindora_info__in_application_section__not_sent(grap
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
-        application__application_round__sent_date=None,
+        application__application_round__sent_at=None,
     )
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
     )
     reservation = ReservationFactory.create(
         user=user,
-        reservation_units=[series.reservation_unit],
-        recurring_reservation=series,
+        reservation_unit=series.reservation_unit,
+        reservation_series=series,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
-        begin=local_datetime(2022, 1, 1, 12),
-        end=local_datetime(2022, 1, 1, 13),
+        begins_at=local_datetime(2022, 1, 1, 12),
+        ends_at=local_datetime(2022, 1, 1, 13),
     )
 
     query = pindora_query(reservation)

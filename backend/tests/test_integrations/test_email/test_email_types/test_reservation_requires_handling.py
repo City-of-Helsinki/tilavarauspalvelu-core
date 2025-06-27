@@ -404,11 +404,11 @@ def test_reservation_requires_handling__send_email(outbox):
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_units__name="foo",
-        reservation_units__pricings__lowest_price=0,
-        reservation_units__pricings__highest_price=0,
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        reservation_unit__name="foo",
+        reservation_unit__pricings__lowest_price=0,
+        reservation_unit__pricings__highest_price=0,
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_requires_handling_email(reservation)
@@ -427,11 +427,11 @@ def test_reservation_requires_handling__send_email__wrong_state(outbox):
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_units__name="foo",
-        reservation_units__pricings__lowest_price=0,
-        reservation_units__pricings__highest_price=0,
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        reservation_unit__name="foo",
+        reservation_unit__pricings__lowest_price=0,
+        reservation_unit__pricings__highest_price=0,
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_requires_handling_email(reservation)
@@ -448,11 +448,11 @@ def test_reservation_requires_handling__send_email__no_recipients(outbox):
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservee_email="",
         user__email="",
-        reservation_units__name="foo",
-        reservation_units__pricings__lowest_price=0,
-        reservation_units__pricings__highest_price=0,
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        reservation_unit__name="foo",
+        reservation_unit__pricings__lowest_price=0,
+        reservation_unit__pricings__highest_price=0,
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_requires_handling_email(reservation)
@@ -471,11 +471,11 @@ def test_reservation_requires_handling__send_email__reservation_in_the_past(outb
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_units__name="foo",
-        reservation_units__pricings__lowest_price=0,
-        reservation_units__pricings__highest_price=0,
-        begin=datetime.datetime(2024, 1, 1, 20, 0),
-        end=datetime.datetime(2024, 1, 1, 22, 0),
+        reservation_unit__name="foo",
+        reservation_unit__pricings__lowest_price=0,
+        reservation_unit__pricings__highest_price=0,
+        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
+        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_requires_handling_email(reservation)

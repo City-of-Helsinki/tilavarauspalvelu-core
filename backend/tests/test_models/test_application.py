@@ -13,10 +13,7 @@ from tests.factories import (
     ApplicationFactory,
     ApplicationRoundFactory,
     ApplicationSectionFactory,
-    OrganisationFactory,
-    PersonFactory,
     ReservationUnitOptionFactory,
-    UserFactory,
 )
 
 # Applied to all tests
@@ -28,8 +25,8 @@ pytestmark = [
 def test_application__status():
     now = datetime.datetime.now(tz=datetime.UTC)
     application_round = ApplicationRoundFactory.create(
-        application_period_begin=now - datetime.timedelta(days=7),
-        application_period_end=now + datetime.timedelta(days=1),
+        application_period_begins_at=now - datetime.timedelta(days=7),
+        application_period_ends_at=now + datetime.timedelta(days=1),
     )
     application = ApplicationFactory.create(application_round=application_round)
 
@@ -38,13 +35,13 @@ def test_application__status():
     assert Application.objects.filter(L(status=ApplicationStatusChoice.DRAFT)).exists()
 
     # Application round has moved to allocation, but application was not sent -> application is EXPIRED
-    application_round.application_period_end = now - datetime.timedelta(days=1)
+    application_round.application_period_ends_at = now - datetime.timedelta(days=1)
     application_round.save()
     assert application.status == ApplicationStatusChoice.EXPIRED
     assert Application.objects.filter(L(status=ApplicationStatusChoice.EXPIRED)).exists()
 
     # Application was sent, but without any sections -> application is HANDLED
-    application.sent_date = now
+    application.sent_at = now
     application.save()
     assert application.status == ApplicationStatusChoice.HANDLED
     assert Application.objects.filter(L(status=ApplicationStatusChoice.HANDLED)).exists()
@@ -56,27 +53,27 @@ def test_application__status():
     assert Application.objects.filter(L(status=ApplicationStatusChoice.IN_ALLOCATION)).exists()
 
     # Application is not yet allocated, but round marked handled -> application is HANDLED
-    application_round.handled_date = now
+    application_round.handled_at = now
     application_round.save()
     assert application.status == ApplicationStatusChoice.HANDLED
     assert Application.objects.filter(L(status=ApplicationStatusChoice.HANDLED)).exists()
-    application_round.handled_date = None
+    application_round.handled_at = None
     application_round.save()
 
     # All reservation unit options have been locked -> application is HANDLED
-    option.locked = True
+    option.is_locked = True
     option.save()
     assert application.status == ApplicationStatusChoice.HANDLED
     assert Application.objects.filter(L(status=ApplicationStatusChoice.HANDLED)).exists()
-    option.locked = False
+    option.is_locked = False
     option.save()
 
     # All reservation unit options have been rejected -> application is HANDLED
-    option.rejected = True
+    option.is_rejected = True
     option.save()
     assert application.status == ApplicationStatusChoice.HANDLED
     assert Application.objects.filter(L(status=ApplicationStatusChoice.HANDLED)).exists()
-    option.rejected = False
+    option.is_rejected = False
     option.save()
 
     # All application sections' applied reservations per week equals
@@ -86,14 +83,14 @@ def test_application__status():
     assert Application.objects.filter(L(status=ApplicationStatusChoice.HANDLED)).exists()
 
     # Application round has been marked as sent -> application is RESULTS_SENT
-    application_round.handled_date = now
-    application_round.sent_date = now
+    application_round.handled_at = now
+    application_round.sent_at = now
     application_round.save()
     assert application.status == ApplicationStatusChoice.RESULTS_SENT
     assert Application.objects.filter(L(status=ApplicationStatusChoice.RESULTS_SENT)).exists()
 
     # Application has been cancelled -> application is CANCELLED
-    application.cancelled_date = now
+    application.cancelled_at = now
     application.save()
     assert application.status == ApplicationStatusChoice.CANCELLED
     assert Application.objects.filter(L(status=ApplicationStatusChoice.CANCELLED)).exists()
@@ -102,8 +99,8 @@ def test_application__status():
 def test_application__all_sections_allocated():
     now = datetime.datetime.now(tz=datetime.UTC)
     application_round = ApplicationRoundFactory.create(
-        application_period_begin=now - datetime.timedelta(days=7),
-        application_period_end=now + datetime.timedelta(days=1),
+        application_period_begins_at=now - datetime.timedelta(days=7),
+        application_period_ends_at=now + datetime.timedelta(days=1),
     )
     application = ApplicationFactory.create(application_round=application_round)
     section = ApplicationSectionFactory.create(application=application, applied_reservations_per_week=1)
@@ -115,25 +112,25 @@ def test_application__all_sections_allocated():
 
     # Application round has entered allocation, but there are no
     # allocations for the application yet -> all_sections_allocated is False
-    application_round.application_period_end = now - datetime.timedelta(days=1)
+    application_round.application_period_ends_at = now - datetime.timedelta(days=1)
     application_round.save()
     assert application.all_sections_allocated is False
     assert Application.objects.filter(L(all_sections_allocated=False)).exists()
 
     # All reservation unit options have been locked -> all_sections_allocated is True
-    option.locked = True
+    option.is_locked = True
     option.save()
     assert application.all_sections_allocated is True
     assert Application.objects.filter(L(all_sections_allocated=True)).exists()
-    option.locked = False
+    option.is_locked = False
     option.save()
 
     # All reservation unit options have been rejected -> all_sections_allocated is True
-    option.rejected = True
+    option.is_rejected = True
     option.save()
     assert application.all_sections_allocated is True
     assert Application.objects.filter(L(all_sections_allocated=True)).exists()
-    option.rejected = False
+    option.is_rejected = False
     option.save()
 
     # All application sections' applied reservations per week equals
@@ -144,26 +141,34 @@ def test_application__all_sections_allocated():
 
 
 def test_application__applicant():
-    application = ApplicationFactory.create(organisation=None, contact_person=None, user=None)
+    application = ApplicationFactory.create(
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
+    )
 
-    # Application has no user, organisation or contact person -> applicant is empty
+    # Application has no user, organisation name or contact person name -> applicant is empty
     assert application.applicant == ""
     assert Application.objects.filter(L(applicant="")).exists()
 
-    # Application has a user, but no organisation or contact person -> applicant is user's name
-    application.user = UserFactory.create(first_name="John", last_name="Doe")
-    application.save()
+    # Application has a user, but no organisation name or contact person name -> applicant is user's name
+    application.user.first_name = "John"
+    application.user.last_name = "Doe"
+    application.user.save()
     assert application.applicant == "John Doe"
     assert Application.objects.filter(L(applicant="John Doe")).exists()
 
-    # Application has a user and a contact person, but no organisation -> applicant is contact person's name
-    application.contact_person = PersonFactory.create(first_name="Jane", last_name="Doe")
+    # Application has a user and a contact person name, but no organisation name -> applicant is contact person name
+    application.contact_person_first_name = "Jane"
+    application.contact_person_last_name = "Doe"
     application.save()
     assert application.applicant == "Jane Doe"
     assert Application.objects.filter(L(applicant="Jane Doe")).exists()
 
-    # Application an organisation -> applicant is organisation's name
-    application.organisation = OrganisationFactory.create(name="Test Organisation")
+    # Application an organisation name -> applicant is organisation name
+    application.organisation_name = "Test Organisation"
     application.save()
     assert application.applicant == "Test Organisation"
     assert Application.objects.filter(L(applicant="Test Organisation")).exists()

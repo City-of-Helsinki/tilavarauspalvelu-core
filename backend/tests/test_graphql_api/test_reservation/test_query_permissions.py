@@ -4,11 +4,10 @@ import datetime
 
 import pytest
 
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import MunicipalityChoice, ReservationStateChoice, ReservationTypeChoice, ReserveeType
 
 from tests.factories import (
     AgeGroupFactory,
-    CityFactory,
     PaymentOrderFactory,
     ReservationFactory,
     ReservationPurposeFactory,
@@ -68,7 +67,7 @@ def test_reservation__query__unit_admin_can_see_working_memo_for_reservations_in
     unit = UnitFactory.create()
     reservation_unit = ReservationUnitFactory.create(unit=unit)
     admin = UserFactory.create_with_unit_role(units=[unit])
-    reservation = ReservationFactory.create(working_memo="foo", reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(working_memo="foo", reservation_unit=reservation_unit)
 
     graphql.force_login(admin)
     query = reservations_query(fields="pk workingMemo")
@@ -83,7 +82,7 @@ def test_reservation__query__unit_admin_cannot_see_working_memo_for_reservations
     unit = UnitFactory.create()
     reservation_unit = ReservationUnitFactory.create()
     admin = UserFactory.create_with_unit_role(units=[unit])
-    reservation = ReservationFactory.create(working_memo="foo", reservation_units=[reservation_unit])
+    reservation = ReservationFactory.create(working_memo="foo", reservation_unit=reservation_unit)
 
     graphql.force_login(admin)
     query = reservations_query(fields="pk workingMemo")
@@ -112,19 +111,11 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         reserveeOrganisationName
         reserveeName
         freeOfChargeReason
-        billingFirstName
-        billingLastName
-        billingAddressStreet
-        billingAddressCity
-        billingAddressZip
-        billingPhone
-        billingEmail
         description
-        reserveeId
+        reserveeIdentifier
         cancelDetails
-        homeCity { nameFi }
+        municipality
         reserveeType
-        reserveeIsUnregisteredAssociation
         applyingForFreeOfCharge
         numPersons
         ageGroup { minimum, maximum }
@@ -145,17 +136,10 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         "pk": reservation.pk,
         "ageGroup": None,
         "applyingForFreeOfCharge": None,
-        "billingAddressCity": None,
-        "billingAddressStreet": None,
-        "billingAddressZip": None,
-        "billingEmail": None,
-        "billingFirstName": None,
-        "billingLastName": None,
-        "billingPhone": None,
         "cancelDetails": None,
         "description": None,
         "freeOfChargeReason": None,
-        "homeCity": None,
+        "municipality": None,
         "isHandled": None,
         "name": None,
         "numPersons": None,
@@ -167,8 +151,7 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         "reserveeAddressZip": None,
         "reserveeEmail": None,
         "reserveeFirstName": None,
-        "reserveeId": None,
-        "reserveeIsUnregisteredAssociation": None,
+        "reserveeIdentifier": None,
         "reserveeLastName": None,
         "reserveeName": None,
         "reserveeOrganisationName": None,
@@ -244,17 +227,10 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
     reservation = ReservationFactory.create(
         age_group=AgeGroupFactory.create(),
         applying_for_free_of_charge=True,
-        billing_address_city="billing city",
-        billing_address_street="billing street",
-        billing_address_zip="billing zip",
-        billing_email="billing email",
-        billing_first_name="billing first",
-        billing_last_name="billing last",
-        billing_phone="billing phone",
         cancel_details="cancel details",
         description="desc",
         free_of_charge_reason="reason",
-        home_city=CityFactory.create(),
+        municipality=MunicipalityChoice.HELSINKI,
         name="foo",
         num_persons=1,
         price=123,
@@ -264,12 +240,11 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
         reservee_address_zip="123",
         reservee_email="foo@email.com",
         reservee_first_name="John",
-        reservee_id="reservee id",
-        reservee_is_unregistered_association=True,
+        reservee_identifier="reservee id",
         reservee_last_name="Doe",
         reservee_organisation_name="org",
         reservee_phone="123",
-        reservee_type=CustomerTypeChoice.BUSINESS,
+        reservee_type=ReserveeType.COMPANY,
         state=ReservationStateChoice.CREATED,
         tax_percentage_value=24,
         type=ReservationTypeChoice.STAFF,
@@ -285,17 +260,10 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
         pk
         ageGroup { minimum, maximum }
         applyingForFreeOfCharge
-        billingAddressCity
-        billingAddressStreet
-        billingAddressZip
-        billingEmail
-        billingFirstName
-        billingLastName
-        billingPhone
         cancelDetails
         description
         freeOfChargeReason
-        homeCity { nameFi }
+        municipality
         isHandled
         name
         numPersons
@@ -308,8 +276,7 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
         reserveeAddressZip
         reserveeEmail
         reserveeFirstName
-        reserveeId
-        reserveeIsUnregisteredAssociation
+        reserveeIdentifier
         reserveeLastName
         reserveeName
         reserveeOrganisationName
@@ -328,17 +295,10 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
     assert response.node(0)["pk"] == reservation.pk
     assert response.node(0)["ageGroup"] is not None, "field not found"
     assert response.node(0)["applyingForFreeOfCharge"] is not None, "field not found"
-    assert response.node(0)["billingAddressCity"] is not None, "field not found"
-    assert response.node(0)["billingAddressStreet"] is not None, "field not found"
-    assert response.node(0)["billingAddressZip"] is not None, "field not found"
-    assert response.node(0)["billingEmail"] is not None, "field not found"
-    assert response.node(0)["billingFirstName"] is not None, "field not found"
-    assert response.node(0)["billingLastName"] is not None, "field not found"
-    assert response.node(0)["billingPhone"] is not None, "field not found"
     assert response.node(0)["cancelDetails"] is not None, "field not found"
     assert response.node(0)["description"] is not None, "field not found"
     assert response.node(0)["freeOfChargeReason"] is not None, "field not found"
-    assert response.node(0)["homeCity"] is not None, "field not found"
+    assert response.node(0)["municipality"] is not None, "field not found"
     assert response.node(0)["isHandled"] is not None, "field not found"
     assert response.node(0)["name"] is not None, "field not found"
     assert response.node(0)["numPersons"] is not None, "field not found"
@@ -351,8 +311,7 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
     assert response.node(0)["reserveeAddressZip"] is not None, "field not found"
     assert response.node(0)["reserveeEmail"] is not None, "field not found"
     assert response.node(0)["reserveeFirstName"] is not None, "field not found"
-    assert response.node(0)["reserveeId"] is not None, "field not found"
-    assert response.node(0)["reserveeIsUnregisteredAssociation"] is not None, "field not found"
+    assert response.node(0)["reserveeIdentifier"] is not None, "field not found"
     assert response.node(0)["reserveeLastName"] is not None, "field not found"
     assert response.node(0)["reserveeName"] is not None, "field not found"
     assert response.node(0)["reserveeOrganisationName"] is not None, "field not found"

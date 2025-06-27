@@ -22,7 +22,6 @@ from tests.factories import (
     PaymentAccountingFactory,
     PaymentMerchantFactory,
     PaymentProductFactory,
-    QualifierFactory,
     ReservableTimeSpanFactory,
     ReservationUnitAccessTypeFactory,
     ReservationUnitCancellationRuleFactory,
@@ -320,17 +319,6 @@ def _create_caisa() -> None:
         name_fi="Työpiste",
         name_en="Workstation",
         name_sv="Arbetsstation",
-    )
-
-    ###########################################################################################################
-    # Create qualifiers
-    ###########################################################################################################
-
-    qualifier_under_15 = QualifierFactory.create(
-        name="varattavissa alle 15-vuotiaille",
-        name_fi="varattavissa alle 15-vuotiaille",
-        name_en="Available for below 15 years of age",
-        name_sv="kan bokas för under 15 år",
     )
 
     ###########################################################################################################
@@ -663,7 +651,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     aina_kasiteltava_kellarikerros = ReservationUnitFactory.create(
-        uuid="293d595f-738d-4e21-91fd-9c68d5a83dc5",
+        ext_uuid="293d595f-738d-4e21-91fd-9c68d5a83dc5",
         name="Aina käsiteltävä kellarikerros",
         name_fi="Aina käsiteltävä kellarikerros FI",
         name_en="Aina käsiteltävä kellarikerros EN",
@@ -691,12 +679,12 @@ def _create_caisa() -> None:
         ),
         description_en="English description goes here.",
         description_sv="Svensk beskrivning går här.",
-        terms_of_use=(
+        notes_when_applying=(
             "<p>Tässä varausyksikössä kaikki varaukset siirtyvät käsittelyyn. "
             "Varaus tulee hyväksyä tai hylätä käsittelijän puolelta.</p>"
         ),
-        terms_of_use_en="English terms of use goes here.",
-        terms_of_use_sv="Svenska användarvillkor finns här.",
+        notes_when_applying_en="English terms of use goes here.",
+        notes_when_applying_sv="Svenska användarvillkor finns här.",
         min_reservation_duration=datetime.timedelta(hours=1),
         max_reservation_duration=datetime.timedelta(hours=6),
         min_persons=1,
@@ -717,6 +705,7 @@ def _create_caisa() -> None:
         pricing_terms=pricing_terms_youth,
         cancellation_rule=cancel_rule_14_days,
         metadata_set=metadata_sets[SetName.set_4],
+        reservation_form=SetName.set_4.reservation_form,
         payment_merchant=payment_merchant_library_pih,
         payment_accounting=payment_accounting_library_pih,
         origin_hauki_resource=aina_kasiteltava_kellarikerros_hauki,
@@ -777,7 +766,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     maksuton_mankeli = ReservationUnitFactory.create(
-        uuid="2160b0cf-518a-482f-bd6c-2676e5682045",
+        ext_uuid="2160b0cf-518a-482f-bd6c-2676e5682045",
         name="Maksuton mankeli",
         name_fi="Maksuton mankeli FI",
         name_en="Maksuton mankeli EN",
@@ -808,7 +797,7 @@ def _create_caisa() -> None:
         ),
         description_en="English description goes here.",
         description_sv="Svensk beskrivning går här.",
-        terms_of_use="",
+        notes_when_applying="",
         min_reservation_duration=datetime.timedelta(minutes=30),
         max_reservation_duration=datetime.timedelta(hours=3),
         min_persons=None,
@@ -828,6 +817,7 @@ def _create_caisa() -> None:
         service_specific_terms=service_terms_gadgets,
         cancellation_rule=cancel_rule_until_begin,
         metadata_set=metadata_sets[SetName.set_1],
+        reservation_form=SetName.set_1.reservation_form,
         origin_hauki_resource=maksuton_mankeli_hauki,
     )
     maksuton_mankeli.spaces.add(
@@ -842,7 +832,6 @@ def _create_caisa() -> None:
         ),
     )
     maksuton_mankeli.equipments.add(equipment_click_share)
-    maksuton_mankeli.qualifiers.add(qualifier_under_15)
     ReservationUnitPricingFactory.create(
         reservation_unit=maksuton_mankeli,
         begins=datetime.date(2023, 1, 1),
@@ -891,7 +880,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     aina_maksullinen_aitio = ReservationUnitFactory.create(
-        uuid="349b8fb8-105d-40ee-a1a1-a515cd1a7c12",
+        ext_uuid="349b8fb8-105d-40ee-a1a1-a515cd1a7c12",
         name="Aina maksullinen Aitio",
         name_fi="Aina maksullinen Aitio FI",
         name_en="Aina maksullinen Aitio EN",
@@ -924,9 +913,9 @@ def _create_caisa() -> None:
         ),
         description_en="English description goes here.",
         description_sv="Svensk beskrivning går här.",
-        terms_of_use='<p><span style="color: rgb(0, 0, 0);">Varaus tulee maksaa verkkokaupassa.</span></p>',
-        terms_of_use_en="English terms of use goes here.",
-        terms_of_use_sv="Svenska användarvillkor finns här.",
+        notes_when_applying='<p><span style="color: rgb(0, 0, 0);">Varaus tulee maksaa verkkokaupassa.</span></p>',
+        notes_when_applying_en="English terms of use goes here.",
+        notes_when_applying_sv="Svenska användarvillkor finns här.",
         min_reservation_duration=datetime.timedelta(hours=1),
         max_reservation_duration=datetime.timedelta(hours=6),
         min_persons=4,
@@ -946,6 +935,7 @@ def _create_caisa() -> None:
         service_specific_terms=service_terms_oodi,
         cancellation_rule=cancel_rule_until_begin,
         metadata_set=metadata_sets[SetName.set_3],
+        reservation_form=SetName.set_3.reservation_form,
         payment_merchant=payment_merchant_library_ita,
         payment_accounting=payment_accounting_library_ita,
         origin_hauki_resource=aina_maksullinen_aitio_hauki,
@@ -1000,7 +990,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     alennuskelpoinen_aula = ReservationUnitFactory.create(
-        uuid="0f022f59-4b21-44d7-83fb-5bb9a9e1759a",
+        ext_uuid="0f022f59-4b21-44d7-83fb-5bb9a9e1759a",
         name="Alennuskelpoinen aula",
         name_fi="Alennuskelpoinen aula FI",
         name_en="Alennuskelpoinen aula EN",
@@ -1036,7 +1026,7 @@ def _create_caisa() -> None:
         ),
         description_en="English description goes here.",
         description_sv="Svensk beskrivning går här.",
-        terms_of_use="",
+        notes_when_applying="",
         min_reservation_duration=datetime.timedelta(minutes=30),
         max_reservation_duration=datetime.timedelta(hours=5),
         min_persons=None,
@@ -1057,6 +1047,7 @@ def _create_caisa() -> None:
         pricing_terms=pricing_terms_youth,
         cancellation_rule=cancel_rule_14_days,
         metadata_set=metadata_sets[SetName.set_6],
+        reservation_form=SetName.set_6.reservation_form,
         payment_merchant=payment_merchant_library_pih,
         payment_accounting=payment_accounting_library_pih,
         origin_hauki_resource=alennuskelpoinen_aula_hauki,
@@ -1112,7 +1103,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     perumiskelvoton_parveke = ReservationUnitFactory.create(
-        uuid="67dd01ea-1115-442e-86ed-79c144cd281c",
+        ext_uuid="67dd01ea-1115-442e-86ed-79c144cd281c",
         name="Perumiskelvoton parveke, maksuton",
         name_fi="Perumiskelvoton parveke, maksuton FI",
         name_en="Perumiskelvoton parveke, maksuton EN",
@@ -1139,7 +1130,7 @@ def _create_caisa() -> None:
         ),
         description_en="English description goes here.",
         description_sv="Svensk beskrivning går här.",
-        terms_of_use="",
+        notes_when_applying="",
         min_reservation_duration=datetime.timedelta(minutes=30),
         max_reservation_duration=datetime.timedelta(hours=5),
         min_persons=5,
@@ -1158,6 +1149,7 @@ def _create_caisa() -> None:
         cancellation_terms=cancel_terms_cannot_cancel,
         service_specific_terms=service_terms_library,
         metadata_set=metadata_sets[SetName.set_2],
+        reservation_form=SetName.set_2.reservation_form,
         origin_hauki_resource=perumiskelvoton_parveke_hauki,
     )
     perumiskelvoton_parveke.spaces.add(
@@ -1200,7 +1192,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     perumiskelvoton_patio = ReservationUnitFactory.create(
-        uuid="9a09d859-62eb-4d8d-ae2b-1823d1e7644b",
+        ext_uuid="9a09d859-62eb-4d8d-ae2b-1823d1e7644b",
         name="Perumiskelvoton patio, maksullinen",
         name_fi="Perumiskelvoton patio, maksullinen FI",
         name_en="Perumiskelvoton patio, maksullinen EN",
@@ -1222,7 +1214,7 @@ def _create_caisa() -> None:
         ),
         description_en="English description goes here.",
         description_sv="Svensk beskrivning går här.",
-        terms_of_use="",
+        notes_when_applying="",
         min_reservation_duration=datetime.timedelta(minutes=30),
         max_reservation_duration=datetime.timedelta(hours=1),
         min_persons=None,
@@ -1241,6 +1233,7 @@ def _create_caisa() -> None:
         cancellation_terms=cancel_terms_cannot_cancel,
         service_specific_terms=service_terms_library,
         metadata_set=metadata_sets[SetName.set_3],
+        reservation_form=SetName.set_3.reservation_form,
         payment_merchant=payment_merchant_library_pih,
         origin_hauki_resource=perumiskelvoton_patio_hauki,
         payment_product=PaymentProductFactory.create(
@@ -1301,7 +1294,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     toistuvien_varausten_toimisto = ReservationUnitFactory.create(
-        uuid="4310564b-2c03-48d2-9d31-ea4d244471ef",
+        ext_uuid="4310564b-2c03-48d2-9d31-ea4d244471ef",
         name="Toistuvien varausten Toimisto",
         name_fi="Toistuvien varausten Toimisto FI",
         name_en="Toistuvien varausten Toimisto EN",
@@ -1329,7 +1322,7 @@ def _create_caisa() -> None:
         ),
         description_en="English description goes here.",
         description_sv="Svensk beskrivning går här.",
-        terms_of_use="",
+        notes_when_applying="",
         min_reservation_duration=datetime.timedelta(minutes=30),
         max_reservation_duration=datetime.timedelta(hours=11),
         min_persons=None,
@@ -1349,6 +1342,7 @@ def _create_caisa() -> None:
         service_specific_terms=service_terms_library,
         cancellation_rule=cancel_rule_14_days,
         metadata_set=metadata_sets[SetName.set_2],
+        reservation_form=SetName.set_2.reservation_form,
         origin_hauki_resource=toistuvien_varausten_toimisto_hauki,
     )
     toistuvien_varausten_toimisto.spaces.add(
@@ -1406,7 +1400,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     tauotettu_takkahuone = ReservationUnitFactory.create(
-        uuid="e8611183-86e0-4730-aae6-eeaa75b9211f",
+        ext_uuid="e8611183-86e0-4730-aae6-eeaa75b9211f",
         name="Tauotettu Takkahuone",
         name_fi="Tauotettu Takkahuone FI",
         name_en="Tauotettu Takkahuone EN",
@@ -1428,7 +1422,7 @@ def _create_caisa() -> None:
         ),
         description_en="English description goes here.",
         description_sv="Svensk beskrivning går här.",
-        terms_of_use="",
+        notes_when_applying="",
         min_reservation_duration=datetime.timedelta(minutes=30),
         max_reservation_duration=datetime.timedelta(hours=3),
         min_persons=None,
@@ -1450,6 +1444,7 @@ def _create_caisa() -> None:
         service_specific_terms=service_terms_library,
         cancellation_rule=cancel_rule_until_begin,
         metadata_set=metadata_sets[SetName.set_2],
+        reservation_form=SetName.set_2.reservation_form,
         origin_hauki_resource=tauotettu_takkahuone_hauki,
     )
     tauotettu_takkahuone.spaces.add(
@@ -1498,7 +1493,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     aina_kasiteltava_kammio = ReservationUnitFactory.create(
-        uuid="8488f2a7-8476-43ad-a51d-a0995dd21b18",
+        ext_uuid="8488f2a7-8476-43ad-a51d-a0995dd21b18",
         name="Aina käsiteltävä Kammio, maksuton",
         name_fi="Aina käsiteltävä Kammio, maksuton FI",
         name_en="Aina käsiteltävä Kammio, maksuton EN",
@@ -1525,12 +1520,12 @@ def _create_caisa() -> None:
         ),
         description_en="English description goes here.",
         description_sv="Svensk beskrivning går här.",
-        terms_of_use=(
+        notes_when_applying=(
             "Tilan voi varata vain yleisölle avoimiin ja maksuttomiin tilaisuuksiin, "
             "joiden sisältö on kaikenikäisille sopivaa."
         ),
-        terms_of_use_en="English terms of use goes here.",
-        terms_of_use_sv="Svenska användarvillkor finns här.",
+        notes_when_applying_en="English terms of use goes here.",
+        notes_when_applying_sv="Svenska användarvillkor finns här.",
         min_reservation_duration=datetime.timedelta(hours=1),
         max_reservation_duration=datetime.timedelta(hours=4),
         min_persons=0,
@@ -1552,6 +1547,7 @@ def _create_caisa() -> None:
         service_specific_terms=service_terms_library,
         cancellation_rule=cancel_rule_until_begin,
         metadata_set=metadata_sets[SetName.set_3],
+        reservation_form=SetName.set_3.reservation_form,
         origin_hauki_resource=aina_kasiteltava_kammio_hauki,
     )
     aina_kasiteltava_kammio.spaces.add(

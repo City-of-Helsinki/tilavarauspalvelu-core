@@ -17,22 +17,15 @@ if TYPE_CHECKING:
 
     from tilavarauspalvelu.enums import (
         AccessType,
-        CustomerTypeChoice,
         PaymentType,
         ReservationCancelReasonChoice,
         ReservationStateChoice,
         ReservationTypeChoice,
         ReservationTypeStaffChoice,
+        ReserveeType,
         Weekday,
     )
-    from tilavarauspalvelu.models import (
-        AgeGroup,
-        City,
-        ReservationDenyReason,
-        ReservationPurpose,
-        ReservationUnit,
-        User,
-    )
+    from tilavarauspalvelu.models import AgeGroup, ReservationDenyReason, ReservationPurpose, ReservationUnit, User
 
 __all__ = [
     "AffectedTimeSpan",
@@ -159,11 +152,10 @@ class ExtraData(TypedDict):
 class ReservationCreateData(TypedDict):
     reservation_unit: NotRequired[ReservationUnit]  # Required but removed before mutation
 
-    begin: datetime.datetime
-    end: datetime.datetime
+    begins_at: datetime.datetime
+    ends_at: datetime.datetime
 
     # Added automatically
-    sku: NotRequired[str]
     buffer_time_before: NotRequired[datetime.timedelta]
     buffer_time_after: NotRequired[datetime.timedelta]
     user: NotRequired[User]
@@ -182,7 +174,7 @@ class ReservationCreateData(TypedDict):
     reservee_address_street: NotRequired[str | None]
     reservee_address_zip: NotRequired[str | None]
     reservee_address_city: NotRequired[str | None]
-    home_city: NotRequired[City | None]
+    municipality: NotRequired[str | None]
 
 
 class ReservationUpdateData(TypedDict):
@@ -191,6 +183,7 @@ class ReservationUpdateData(TypedDict):
     name: NotRequired[str]
     num_persons: NotRequired[int]
     description: NotRequired[str]
+    municipality: NotRequired[str | None]
 
     applying_for_free_of_charge: NotRequired[bool]
     free_of_charge_reason: NotRequired[str | None]
@@ -204,19 +197,9 @@ class ReservationUpdateData(TypedDict):
     reservee_address_street: NotRequired[str]
     reservee_address_city: NotRequired[str]
     reservee_address_zip: NotRequired[str]
-    reservee_is_unregistered_association: NotRequired[bool]
-    reservee_type: NotRequired[CustomerTypeChoice]
-
-    billing_first_name: NotRequired[str]
-    billing_last_name: NotRequired[str]
-    billing_email: NotRequired[str | None]
-    billing_phone: NotRequired[str]
-    billing_address_street: NotRequired[str]
-    billing_address_city: NotRequired[str]
-    billing_address_zip: NotRequired[str]
+    reservee_type: NotRequired[ReserveeType]
 
     purpose: NotRequired[ReservationPurpose | None]
-    home_city: NotRequired[City | None]
     age_group: NotRequired[AgeGroup | None]
 
     state: NotRequired[ReservationStateChoice]
@@ -232,8 +215,8 @@ class ReservationConfirmData(TypedDict):
 
 class ReservationAdjustTimeData(TypedDict):
     pk: NotRequired[int]
-    begin: datetime.datetime
-    end: datetime.datetime
+    begins_at: datetime.datetime
+    ends_at: datetime.datetime
 
     state: NotRequired[ReservationStateChoice]
     buffer_time_before: NotRequired[datetime.timedelta]
@@ -287,9 +270,10 @@ class StaffCreateReservationData(TypedDict):
     num_persons: NotRequired[int]
     working_memo: NotRequired[str]
     type: NotRequired[ReservationTypeChoice]
+    municipality: NotRequired[str | None]
 
-    begin: NotRequired[datetime.datetime]
-    end: NotRequired[datetime.datetime]
+    begins_at: NotRequired[datetime.datetime]
+    ends_at: NotRequired[datetime.datetime]
     buffer_time_before: NotRequired[datetime.timedelta]
     buffer_time_after: NotRequired[datetime.timedelta]
 
@@ -305,19 +289,9 @@ class StaffCreateReservationData(TypedDict):
     reservee_address_street: NotRequired[str]
     reservee_address_city: NotRequired[str]
     reservee_address_zip: NotRequired[str]
-    reservee_is_unregistered_association: NotRequired[bool]
-    reservee_type: NotRequired[CustomerTypeChoice]
-
-    billing_first_name: NotRequired[str]
-    billing_last_name: NotRequired[str]
-    billing_email: NotRequired[str | None]
-    billing_phone: NotRequired[str]
-    billing_address_street: NotRequired[str]
-    billing_address_city: NotRequired[str]
-    billing_address_zip: NotRequired[str]
+    reservee_type: NotRequired[ReserveeType]
 
     age_group: NotRequired[ReservationPurpose | None]
-    home_city: NotRequired[City | None]
     purpose: NotRequired[AgeGroup | None]
 
     state: NotRequired[ReservationStateChoice]
@@ -335,8 +309,8 @@ class StaffReservationData(StaffCreateReservationData):
 
 class StaffReservationAdjustTimeData(TypedDict):
     pk: NotRequired[int]
-    begin: datetime.datetime
-    end: datetime.datetime
+    begins_at: datetime.datetime
+    ends_at: datetime.datetime
 
     buffer_time_before: NotRequired[datetime.timedelta]
     buffer_time_after: NotRequired[datetime.timedelta]
@@ -350,7 +324,6 @@ class ReservationSeriesCreateData(TypedDict):
     description: str
     reservation_unit: int
     age_group: int
-    ability_group: int
     recurrence_in_days: int
     weekdays: list[int]
     begin_time: datetime.time
@@ -361,8 +334,8 @@ class ReservationSeriesCreateData(TypedDict):
 
 class ReservationSeriesAddData(TypedDict):
     pk: int
-    begin: datetime.datetime
-    end: datetime.datetime
+    begins_at: datetime.datetime
+    ends_at: datetime.datetime
     buffer_time_before: datetime.timedelta
     buffer_time_after: datetime.timedelta
     access_type: AccessType
@@ -439,6 +412,7 @@ class ReservationDetails(TypedDict, total=False):
     num_persons: int
     state: ReservationStateChoice
     type: ReservationTypeChoice | ReservationTypeStaffChoice
+    municipality: str | None  # MunicipalityChoice
     working_memo: str
 
     buffer_time_before: datetime.timedelta
@@ -449,30 +423,20 @@ class ReservationDetails(TypedDict, total=False):
     applying_for_free_of_charge: bool
     free_of_charge_reason: bool
 
-    reservee_id: str
+    reservee_identifier: str
     reservee_first_name: str
     reservee_last_name: str
-    reservee_email: str
+    reservee_email: str | None
     reservee_phone: str
     reservee_organisation_name: str
     reservee_address_street: str
     reservee_address_city: str
     reservee_address_zip: str
-    reservee_is_unregistered_association: bool
-    reservee_type: CustomerTypeChoice
+    reservee_type: ReserveeType
 
-    billing_first_name: str
-    billing_last_name: str
-    billing_email: str
-    billing_phone: str
-    billing_address_street: str
-    billing_address_city: str
-    billing_address_zip: str
-
-    user: int | User
-    purpose: int | ReservationPurpose
-    home_city: int | City
-    age_group: int | AgeGroup
+    user: int | User | None
+    purpose: int | ReservationPurpose | None
+    age_group: int | AgeGroup | None
 
 
 class PreSaveKwargs[TModel: models.Model](TypedDict):

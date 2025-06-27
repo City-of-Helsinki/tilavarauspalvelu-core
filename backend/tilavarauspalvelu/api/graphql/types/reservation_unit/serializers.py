@@ -19,7 +19,7 @@ from tilavarauspalvelu.api.graphql.types.reservation_unit_access_type.serializer
 )
 from tilavarauspalvelu.api.graphql.types.reservation_unit_image.serializers import ReservationUnitImageFieldSerializer
 from tilavarauspalvelu.api.graphql.types.reservation_unit_pricing.serializers import ReservationUnitPricingSerializer
-from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, ReservationUnitPublishingState, WeekdayChoice
+from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, ReservationUnitPublishingState, Weekday
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, ReservationUnitPricing
@@ -48,12 +48,12 @@ class ReservationUnitSerializer(NestingModelSerializer):
             #
             # IDs
             "pk",
-            "uuid",
+            "ext_uuid",
             #
             # Strings
             "name",
             "description",
-            "terms_of_use",
+            "notes_when_applying",
             "contact_information",
             "reservation_pending_instructions",
             "reservation_confirmed_instructions",
@@ -68,10 +68,10 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "reservations_max_days_before",
             #
             # Datetime
-            "reservation_begins",
-            "reservation_ends",
-            "publish_begins",
-            "publish_ends",
+            "reservation_begins_at",
+            "reservation_ends_at",
+            "publish_begins_at",
+            "publish_ends_at",
             "min_reservation_duration",
             "max_reservation_duration",
             "buffer_time_before",
@@ -90,6 +90,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "authentication",
             "reservation_start_interval",
             "reservation_kind",
+            "reservation_form",
             "publishing_state",
             #
             # List fields
@@ -110,7 +111,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "resources",
             "purposes",
             "equipments",
-            "qualifiers",
             #
             # Reverse one-to-many related
             "images",
@@ -331,7 +331,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
 
         for timeslot in timeslots:
             weekday = timeslot["weekday"]
-            closed = timeslot.get("closed", False)
+            closed = timeslot.get("is_closed", False)
             reservable_times = timeslot.get("reservable_times", [])
 
             if closed and len(reservable_times) > 0:
@@ -340,7 +340,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
                 errors.append("Open timeslots must have reservable times.")
 
             if weekday in weekdays_seen:
-                day = WeekdayChoice(weekday).name.capitalize()
+                day = Weekday(weekday).name.capitalize()
                 errors.append(f"Got multiple timeslots for {day}.")
 
             weekdays_seen.add(weekday)
@@ -369,7 +369,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
     def update(self, instance: ReservationUnit, validated_data: dict[str, Any]) -> ReservationUnit:
         # The ReservationUnit can't be archived if it has active reservations in the future
         if instance.publishing_state != ReservationUnitPublishingState.ARCHIVED and validated_data.get("is_archived"):
-            future_reservations = instance.reservations.going_to_occur().filter(end__gt=local_datetime())
+            future_reservations = instance.reservations.going_to_occur().filter(ends_at__gt=local_datetime())
             if future_reservations.exists():
                 msg = "Reservation unit can't be archived if it has any reservations in the future"
                 raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS)

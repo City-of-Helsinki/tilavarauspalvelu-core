@@ -6,8 +6,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from graphene_django_extensions.fields.model import StrChoiceField
 
-from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import UserRoleChoice
+from utils.auditlog_util import AuditLogger
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
@@ -38,10 +38,10 @@ class UnitRole(models.Model):
         null=True,
         blank=True,
     )
-    created: datetime.datetime = models.DateTimeField(auto_now_add=True)
-    modified: datetime.datetime = models.DateTimeField(auto_now=True)
+    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
+    updated_at: datetime.datetime = models.DateTimeField(auto_now=True)
 
-    role_active: bool = models.BooleanField(default=True)
+    is_role_active: bool = models.BooleanField(default=True)
     is_from_ad_group: bool = models.BooleanField(default=False)
 
     objects: ClassVar[UnitRoleManager] = LazyModelManager.new()

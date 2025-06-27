@@ -112,7 +112,7 @@ class ApplicationQuerySet(models.QuerySet):
         return self.filter(
             L(application_round__status=ApplicationRoundStatusChoice.IN_ALLOCATION.value),
             L(status=ApplicationStatusChoice.IN_ALLOCATION.value),
-            in_allocation_notification_sent_date__isnull=True,
+            in_allocation_notification_sent_at__isnull=True,
             application_sections__isnull=False,
         )
 
@@ -121,7 +121,7 @@ class ApplicationQuerySet(models.QuerySet):
         return self.filter(
             L(application_round__status=ApplicationRoundStatusChoice.RESULTS_SENT.value),
             L(status=ApplicationStatusChoice.RESULTS_SENT.value),
-            results_ready_notification_sent_date__isnull=True,
+            results_ready_notification_sent_at__isnull=True,
             application_sections__isnull=False,
         )
 
@@ -130,7 +130,7 @@ class ApplicationQuerySet(models.QuerySet):
         self.filter(
             L(status__in=[ApplicationStatusChoice.EXPIRED, ApplicationStatusChoice.CANCELLED])
             & L(application_round__status=ApplicationRoundStatusChoice.RESULTS_SENT)
-            & models.Q(application_round__application_period_end__date__lte=cutoff_date)
+            & models.Q(application_round__application_period_ends_at__date__lte=cutoff_date)
         ).delete()
 
 

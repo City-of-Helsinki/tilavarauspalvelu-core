@@ -30,8 +30,8 @@ class ApplicationRoundFilterSet(ModelFilterSet):
         now = local_datetime()
         return queryset.filter(
             models.Q(
-                application_period_begin__lte=now,
-                application_period_end__gte=now,
+                application_period_begins_at__lte=now,
+                application_period_ends_at__gte=now,
                 _negated=not value,
             )
         )

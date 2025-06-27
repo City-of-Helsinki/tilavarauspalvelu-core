@@ -35,8 +35,8 @@ class GeneralRoleNode(DjangoNode):
             "user",
             "role",
             "assigner",
-            "created",
-            "modified",
+            "created_at",
+            "updated_at",
             "permissions",
         ]
 
@@ -61,8 +61,8 @@ class UnitRoleNode(DjangoNode):
             "units",
             "unit_groups",
             "assigner",
-            "created",
-            "modified",
+            "created_at",
+            "updated_at",
             "permissions",
         ]
 

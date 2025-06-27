@@ -132,7 +132,7 @@ def test_frontend_queries__admin_ui__ApplicationAdmin(graphql):
     arts_key = "application_sections__reservation_unit_options__reservation_unit__application_round_time_slots"
 
     factory_args = deepcopy(query_info.factory_args)
-    factory_args[f"{arts_key}__closed"] = False
+    factory_args[f"{arts_key}__is_closed"] = False
     factory_args["application_sections__applied_reservations_per_week"] = 1
     factory_args["application_sections__reservation_min_duration"] = datetime.timedelta(minutes=30)
     factory_args["application_sections__reservation_max_duration"] = datetime.timedelta(minutes=60)
@@ -182,12 +182,12 @@ def test_frontend_queries__admin_ui__ApplicationRoundList(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
-    factory_args["application_period_begin"] = local_datetime(2024, 1, 1)
-    factory_args["application_period_end"] = local_datetime(2024, 2, 1)
-    factory_args["reservation_period_begin"] = local_date(2024, 2, 2)
-    factory_args["reservation_period_end"] = local_date(2024, 3, 1)
-    factory_args["public_display_begin"] = local_datetime(2024, 1, 1)
-    factory_args["public_display_end"] = local_datetime(2024, 2, 2)
+    factory_args["application_period_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["application_period_ends_at"] = local_datetime(2024, 2, 1)
+    factory_args["reservation_period_begin_date"] = local_date(2024, 2, 2)
+    factory_args["reservation_period_end_date"] = local_date(2024, 3, 1)
+    factory_args["public_display_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["public_display_ends_at"] = local_datetime(2024, 2, 2)
     query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -209,12 +209,12 @@ def test_frontend_queries__admin_ui__ApplicationRoundCriteria(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
-    factory_args["application_period_begin"] = local_datetime(2024, 1, 1)
-    factory_args["application_period_end"] = local_datetime(2024, 2, 1)
-    factory_args["reservation_period_begin"] = local_date(2024, 2, 2)
-    factory_args["reservation_period_end"] = local_date(2024, 3, 1)
-    factory_args["public_display_begin"] = local_datetime(2024, 1, 1)
-    factory_args["public_display_end"] = local_datetime(2024, 2, 2)
+    factory_args["application_period_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["application_period_ends_at"] = local_datetime(2024, 2, 1)
+    factory_args["reservation_period_begin_date"] = local_date(2024, 2, 2)
+    factory_args["reservation_period_end_date"] = local_date(2024, 3, 1)
+    factory_args["public_display_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["public_display_ends_at"] = local_datetime(2024, 2, 2)
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -237,12 +237,12 @@ def test_frontend_queries__admin_ui__ApplicationRound(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
-    factory_args["application_period_begin"] = local_datetime(2024, 1, 1)
-    factory_args["application_period_end"] = local_datetime(2024, 2, 1)
-    factory_args["reservation_period_begin"] = local_date(2024, 2, 2)
-    factory_args["reservation_period_end"] = local_date(2024, 3, 1)
-    factory_args["public_display_begin"] = local_datetime(2024, 1, 1)
-    factory_args["public_display_end"] = local_datetime(2024, 2, 2)
+    factory_args["application_period_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["application_period_ends_at"] = local_datetime(2024, 2, 1)
+    factory_args["reservation_period_begin_date"] = local_date(2024, 2, 2)
+    factory_args["reservation_period_end_date"] = local_date(2024, 3, 1)
+    factory_args["public_display_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["public_display_ends_at"] = local_datetime(2024, 2, 2)
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -265,12 +265,12 @@ def test_frontend_queries__admin_ui__ApplicationRoundFilter(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
-    factory_args["application_period_begin"] = local_datetime(2024, 1, 1)
-    factory_args["application_period_end"] = local_datetime(2024, 2, 1)
-    factory_args["reservation_period_begin"] = local_date(2024, 2, 2)
-    factory_args["reservation_period_end"] = local_date(2024, 3, 1)
-    factory_args["public_display_begin"] = local_datetime(2024, 1, 1)
-    factory_args["public_display_end"] = local_datetime(2024, 2, 2)
+    factory_args["application_period_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["application_period_ends_at"] = local_datetime(2024, 2, 1)
+    factory_args["reservation_period_begin_date"] = local_date(2024, 2, 2)
+    factory_args["reservation_period_end_date"] = local_date(2024, 3, 1)
+    factory_args["public_display_begins_at"] = local_datetime(2024, 1, 1)
+    factory_args["public_display_ends_at"] = local_datetime(2024, 2, 2)
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -309,8 +309,8 @@ def test_frontend_queries__admin_ui__ApplicationSectionAllocations(graphql):
     variables["applicationRound"] = application_round.pk
     variables["applicationStatus"] = [obj.application.status.value]
     variables["reservationUnit"] = reservation_unit.pk
-    variables["beginDate"] = application_round.application_period_begin.date().isoformat()
-    variables["endDate"] = application_round.application_period_end.date().isoformat()
+    variables["beginDate"] = application_round.application_period_begins_at.date().isoformat()
+    variables["endDate"] = application_round.application_period_ends_at.date().isoformat()
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -544,8 +544,8 @@ def test_frontend_queries__admin_ui__HandlingData(graphql):
     end = begin + datetime.timedelta(hours=1)
 
     factory_args_1 = deepcopy(query_info_1.factory_args)
-    factory_args_1["begin"] = begin
-    factory_args_1["end"] = end
+    factory_args_1["begins_at"] = begin
+    factory_args_1["ends_at"] = end
     obj: Reservation = query_info_1.factory.create(**factory_args_1)
 
     factory_args_2 = deepcopy(query_info_2.factory_args)
@@ -941,7 +941,7 @@ def test_frontend_queries__admin_ui__ReservationUnitsByUnit(graphql):
     obj: Unit = query_info_1.factory.create(**factory_args_1)
 
     factory_args_2 = deepcopy(query_info_2.factory_args)
-    factory_args_2["reservation_units__unit"] = obj
+    factory_args_2["reservation_unit__unit"] = obj
     query_info_2.factory.create(**factory_args_2)
 
     variables = query_info_1.variables

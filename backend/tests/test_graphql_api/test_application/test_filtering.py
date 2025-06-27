@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from tilavarauspalvelu.enums import ApplicantTypeChoice
+from tilavarauspalvelu.enums import ReserveeType
 
 from tests.factories import ApplicationFactory
 
@@ -72,8 +72,8 @@ def test_application__filter__by_applicant_type__single(graphql):
     # given:
     # - There are two applications in the system with different applicant types
     # - A superuser is using the system
-    application = ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.COMPANY)
-    ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.INDIVIDUAL)
+    application = ApplicationFactory.create_in_status_draft(applicant_type=ReserveeType.COMPANY)
+    ApplicationFactory.create_in_status_draft(applicant_type=ReserveeType.INDIVIDUAL)
     graphql.login_with_superuser()
 
     # when:
@@ -90,8 +90,8 @@ def test_application__filter__by_applicant_type__multiple(graphql):
     # given:
     # - There are two applications in the system with different applicant types
     # - A superuser is using the system
-    application_1 = ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.COMPANY)
-    application_2 = ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.INDIVIDUAL)
+    application_1 = ApplicationFactory.create_in_status_draft(applicant_type=ReserveeType.COMPANY)
+    application_2 = ApplicationFactory.create_in_status_draft(applicant_type=ReserveeType.INDIVIDUAL)
     graphql.login_with_superuser()
 
     # when:
@@ -229,15 +229,19 @@ def test_application__filter__by_text_search__section_name(graphql):
     # - There are two applications with one application events each
     # - A superuser is using the system
     application_1 = ApplicationFactory.create_in_status_draft(
-        organisation=None,
-        contact_person=None,
-        user=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
         application_sections__name="foo",
     )
     ApplicationFactory.create_in_status_draft(
-        organisation=None,
-        contact_person=None,
-        user=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
         application_sections__name="bar",
     )
     graphql.login_with_superuser()
@@ -260,15 +264,19 @@ def test_application__filter__by_text_search__section_name__prefix(graphql):
     # - There are two applications with one application events each
     # - A superuser is using the system
     application_1 = ApplicationFactory.create_in_status_draft(
-        organisation=None,
-        contact_person=None,
-        user=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
         application_sections__name="kirjastoryhmä",
     )
     ApplicationFactory.create_in_status_draft(
-        organisation=None,
-        contact_person=None,
-        user=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
         application_sections__name="suunnistusryhmä",
     )
     graphql.login_with_superuser()
@@ -291,15 +299,19 @@ def test_application__filter__by_text_search__section_name__has_quotes(graphql):
     # - There are two applications with one application events each
     # - A superuser is using the system
     application_1 = ApplicationFactory.create_in_status_draft(
-        organisation=None,
-        contact_person=None,
-        user=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
         application_sections__name="Moe's Bar",
     )
     ApplicationFactory.create_in_status_draft(
-        organisation=None,
-        contact_person=None,
-        user=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
         application_sections__name="Bar",
     )
     graphql.login_with_superuser()
@@ -322,15 +334,19 @@ def test_application__filter__by_text_search__applicant__organisation_name(graph
     # - There are two applications
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft(
-        organisation__name="foo",
-        contact_person=None,
-        user=None,
+        organisation_name="foo",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
         application_sections__name="aaaa",
     )
     ApplicationFactory.create_in_status_draft(
-        organisation__name="bar",
-        contact_person=None,
-        user=None,
+        organisation_name="bar",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
         application_sections__name="bbbb",
     )
     graphql.login_with_superuser()
@@ -353,17 +369,19 @@ def test_application__filter__by_text_search__applicant__contact_person_first_na
     # - There are two applications
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft(
-        organisation=None,
-        contact_person__first_name="foo",
-        contact_person__last_name="none",
-        user=None,
+        organisation_name="",
+        contact_person_first_name="foo",
+        contact_person_last_name="none",
+        user__first_name="",
+        user__last_name="",
         application_sections__name="aaaa",
     )
     ApplicationFactory.create_in_status_draft(
-        organisation=None,
-        contact_person__first_name="bar",
-        contact_person__last_name="none",
-        user=None,
+        organisation_name="",
+        contact_person_first_name="bar",
+        contact_person_last_name="none",
+        user__first_name="",
+        user__last_name="",
         application_sections__name="bbbb",
     )
     graphql.login_with_superuser()
@@ -386,17 +404,19 @@ def test_application__filter__by_text_search__applicant__contact_person_last_nam
     # - There are two applications
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft(
-        organisation=None,
-        contact_person__first_name="none",
-        contact_person__last_name="foo",
-        user=None,
+        organisation_name="",
+        contact_person_first_name="none",
+        contact_person_last_name="foo",
+        user__first_name="",
+        user__last_name="",
         application_sections__name="aaaa",
     )
     ApplicationFactory.create_in_status_draft(
-        organisation=None,
-        contact_person__first_name="none",
-        contact_person__last_name="bar",
-        user=None,
+        organisation_name="",
+        contact_person_first_name="none",
+        contact_person_last_name="bar",
+        user__first_name="",
+        user__last_name="",
         application_sections__name="bbbb",
     )
     graphql.login_with_superuser()
@@ -419,15 +439,17 @@ def test_application__filter__by_text_search__applicant__user_first_name(graphql
     # - There are two applications
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft(
-        organisation=None,
-        contact_person=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
         user__first_name="foo",
         user__last_name="none",
         application_sections__name="aaaa",
     )
     ApplicationFactory.create_in_status_draft(
-        organisation=None,
-        contact_person=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
         user__first_name="bar",
         user__last_name="none",
         application_sections__name="bbbb",
@@ -452,15 +474,17 @@ def test_application__filter__by_text_search__applicant__user_last_name(graphql)
     # - There are two applications
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft(
-        organisation=None,
-        contact_person=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
         user__first_name="none",
         user__last_name="foo",
         application_sections__name="aaaa",
     )
     ApplicationFactory.create_in_status_draft(
-        organisation=None,
-        contact_person=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
         user__first_name="none",
         user__last_name="bar",
         application_sections__name="bbbb",
@@ -486,17 +510,21 @@ def test_application__filter__by_text_search__section_id(graphql):
     # - A superuser is using the system
     application_1 = ApplicationFactory.create_in_status_draft(
         id=1,
-        organisation=None,
-        contact_person=None,
-        user=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
         application_sections__id=3,
         application_sections__name="foo",
     )
     ApplicationFactory.create_in_status_draft(
         id=2,
-        organisation=None,
-        contact_person=None,
-        user=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
         application_sections__id=4,
         application_sections__name="bar",
     )
@@ -521,17 +549,21 @@ def test_application__filter__by_text_search__application_id(graphql):
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft(
         id=1,
-        organisation=None,
-        contact_person=None,
-        user=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
         application_sections__id=3,
         application_sections__name="aaaa",
     )
     ApplicationFactory.create_in_status_draft(
         id=2,
-        organisation=None,
-        contact_person=None,
-        user=None,
+        organisation_name="",
+        contact_person_first_name="",
+        contact_person_last_name="",
+        user__first_name="",
+        user__last_name="",
         application_sections__id=4,
         application_sections__name="bbbb",
     )
@@ -555,9 +587,9 @@ def test_application__filter__by_text_search__not_found(graphql):
     # - There is an application with an application event
     # - A superuser is using the system
     ApplicationFactory.create_in_status_draft(
-        organisation__name="org",
-        contact_person__first_name="fizz",
-        contact_person__last_name="buzz",
+        organisation_name="org",
+        contact_person_first_name="fizz",
+        contact_person_last_name="buzz",
         user__first_name="person",
         user__last_name="one",
         application_sections__name="foo",

@@ -91,7 +91,6 @@ from .queries import (
     ApplicationRoundNode,
     ApplicationSectionNode,
     BannerNotificationNode,
-    CityNode,
     EquipmentAllNode,
     EquipmentCategoryNode,
     EquipmentNode,
@@ -99,14 +98,13 @@ from .queries import (
     PaymentOrderNode,
     PermissionCheckerType,
     PurposeNode,
-    QualifierNode,
-    RecurringReservationNode,
     RejectedOccurrenceNode,
     ReservationCancelReasonType,
     ReservationDenyReasonNode,
     ReservationMetadataSetNode,
     ReservationNode,
     ReservationPurposeNode,
+    ReservationSeriesNode,
     ReservationUnitAllNode,
     ReservationUnitCancellationRuleNode,
     ReservationUnitNode,
@@ -178,7 +176,6 @@ class Query(graphene.ObjectType):
     tax_percentages = TaxPercentageNode.Connection()
     metadata_sets = ReservationMetadataSetNode.Connection()
     purposes = PurposeNode.Connection()
-    qualifiers = QualifierNode.Connection()
     #
     # Reservations
     reservation = ReservationNode.Node()
@@ -199,15 +196,14 @@ class Query(graphene.ObjectType):
             description="Reservations should contain at least one these reservation units.",
         ),
     )
-    recurring_reservation = RecurringReservationNode.Node()
-    recurring_reservations = RecurringReservationNode.Connection()
+    reservation_series = ReservationSeriesNode.Node()
+    paged_reservation_series = ReservationSeriesNode.Connection()
     rejected_occurrence = RejectedOccurrenceNode.Node()
     rejected_occurrences = RejectedOccurrenceNode.Connection()
     reservation_cancel_reasons = Field(graphene.List(graphene.NonNull(ReservationCancelReasonType)), required=True)
     reservation_deny_reasons = ReservationDenyReasonNode.Connection()
     reservation_purposes = ReservationPurposeNode.Connection()
     age_groups = AgeGroupNode.Connection()
-    cities = CityNode.Connection()
     order = Field(PaymentOrderNode, order_uuid=graphene.String(required=True))
     #
     # User

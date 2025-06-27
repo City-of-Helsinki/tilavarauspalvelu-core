@@ -177,7 +177,7 @@ class ApplicationSectionNode(DjangoNode):
         has_perms = info.context.user.permissions.can_manage_application(root.application, reserver_needs_role=True)
 
         # Don't show Pindora info without permissions if the application round results haven't been sent yet
-        if not has_perms and root.application.application_round.sent_date is None:
+        if not has_perms and root.application.application_round.sent_at is None:
             return None
 
         try:

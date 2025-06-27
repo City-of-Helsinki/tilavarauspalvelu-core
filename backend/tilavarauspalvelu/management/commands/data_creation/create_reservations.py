@@ -8,14 +8,15 @@ from typing import TYPE_CHECKING
 from django.db import models
 
 from tilavarauspalvelu.enums import (
-    CustomerTypeChoice,
+    MunicipalityChoice,
     OrderStatus,
     PaymentType,
     ReservationCancelReasonChoice,
     ReservationKind,
     ReservationStateChoice,
     ReservationTypeChoice,
-    WeekdayChoice,
+    ReserveeType,
+    Weekday,
 )
 from tilavarauspalvelu.models import (
     PaymentOrder,
@@ -36,23 +37,22 @@ from utils.date_utils import (
     next_date_matching_weekday,
 )
 
-from tests.factories import RecurringReservationFactory, RejectedOccurrenceFactory
+from tests.factories import RejectedOccurrenceFactory, ReservationSeriesFactory
 from tests.factories.payment_order import PaymentOrderBuilder
 from tests.factories.reservation import NextDateError, ReservationBuilder
 
 from .create_reservation_related_things import _create_deny_reasons
-from .create_reservation_units import _create_reservation_unit_for_recurring_reservations
+from .create_reservation_units import _create_reservation_unit_for_reservation_series
 from .utils import sample_qs, weighted_choice, with_logs
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.enums import TermsOfUseTypeChoices
     from tilavarauspalvelu.models import (
         AgeGroup,
-        City,
         OriginHaukiResource,
-        RecurringReservation,
         ReservationMetadataSet,
         ReservationPurpose,
+        ReservationSeries,
         ReservationUnitCancellationRule,
         TaxPercentage,
         TermsOfUse,
@@ -66,24 +66,20 @@ if TYPE_CHECKING:
 def _create_reservations(
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
 ) -> None:
     _create_normal_reservations(
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
-        cities=cities,
     )
 
     _create_full_day_reservations(
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
-        cities=cities,
     )
 
     _create_reservations_for_reservation_units_affecting_other_reservation_units(
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
-        cities=cities,
     )
 
 
@@ -91,7 +87,6 @@ def _create_reservations(
 def _create_normal_reservations(
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
 ) -> None:
     """
     Create reservations for all reservation units that:
@@ -134,10 +129,10 @@ def _create_normal_reservations(
         ReservationTypeChoice.STAFF,
     ]
 
-    customer_type_choices: list[CustomerTypeChoice] = [
-        CustomerTypeChoice.INDIVIDUAL,
-        CustomerTypeChoice.BUSINESS,
-        CustomerTypeChoice.NONPROFIT,
+    reservee_type_choice: list[ReserveeType] = [
+        ReserveeType.INDIVIDUAL,
+        ReserveeType.COMPANY,
+        ReserveeType.NONPROFIT,
     ]
 
     handling_state_choices: list[ReservationStateChoice] = [
@@ -145,10 +140,7 @@ def _create_normal_reservations(
         ReservationStateChoice.CONFIRMED,
     ]
 
-    ReservationUnitThroughModel: type[models.Model] = Reservation.reservation_units.through  # noqa: N806
-
     reservations: list[Reservation] = []
-    reservation_reservation_units: list[models.Model] = []
     payment_orders: list[PaymentOrder] = []
 
     # --- Create reservations -------------------------------------------------------------------------------------
@@ -194,7 +186,7 @@ def _create_normal_reservations(
             begin_datetime = combine(reservation_date, begin_time)
 
             while reservation_date == begin_datetime.date():
-                customer_type = weighted_choice(customer_type_choices, weights=[5, 1, 1])
+                customer_type = weighted_choice(reservee_type_choice, weights=[5, 1, 1])
                 reservation_type = weighted_choice(reservation_type_choices, weights=[5, 1, 1])
 
                 if pricing.highest_price != pricing.lowest_price:
@@ -213,9 +205,10 @@ def _create_normal_reservations(
                         ReservationBuilder()
                         .for_user(user)
                         .for_reservation_unit(reservation_unit)
-                        .for_customer_type(customer_type)
+                        .for_reservee_type(customer_type)
                         .starting_at(begin_datetime, reservation_unit, pricing=pricing)
                         .build(
+                            reservation_unit=reservation_unit,
                             type=reservation_type,
                             state=reservation_state,
                             #
@@ -228,7 +221,7 @@ def _create_normal_reservations(
                             #
                             purpose=random.choice(reservation_purposes),
                             age_group=random.choice(age_groups),
-                            home_city=random.choice(cities),
+                            municipality=MunicipalityChoice.HELSINKI,
                             #
                             deny_reason=deny_reason,
                             cancel_reason=None,
@@ -241,13 +234,6 @@ def _create_normal_reservations(
 
                 reservations.append(reservation)
 
-                reservation_reservation_units.append(
-                    ReservationUnitThroughModel(
-                        reservation=reservation,
-                        reservationunit=reservation_unit,
-                    )
-                )
-
                 if pricing.highest_price > 0:
                     payment_order = _build_payment_order(reservation, payment_type, handled_payment_due_by)
                     payment_orders.append(payment_order)
@@ -256,7 +242,6 @@ def _create_normal_reservations(
 
     ReservationUnit.objects.bulk_update(reservation_units, fields=["name", "name_fi", "name_en", "name_sv"])
     Reservation.objects.bulk_create(reservations)
-    ReservationUnitThroughModel.objects.bulk_create(reservation_reservation_units)
     PaymentOrder.objects.bulk_create(payment_orders)
 
     _deny_and_cancel_normal_reservations()
@@ -348,6 +333,7 @@ def _cancel_reservations(qs: ReservationQuerySet) -> None:
 
     now = local_datetime()
 
+    reservation: Reservation
     for reservation in qs:
         reservation.state = ReservationStateChoice.CANCELLED
         reservation.cancel_details = "Cancelled by reservee"
@@ -366,18 +352,18 @@ def _cancel_reservations(qs: ReservationQuerySet) -> None:
 
                 case OrderStatus.PAID_BY_INVOICE:
                     payment_order.status = OrderStatus.CANCELLED
-                    payment_order.processed_at = reservation.begin - datetime.timedelta(days=3)
+                    payment_order.processed_at = reservation.begins_at - datetime.timedelta(days=3)
 
                 case OrderStatus.PENDING if overdue:
                     reservation.cancel_reason = ReservationCancelReasonChoice.NOT_PAID
                     reservation.cancel_details = "Cancelled due to no payment"
                     payment_order.status = OrderStatus.EXPIRED
-                    payment_order.processed_at = reservation.begin - datetime.timedelta(days=3)
+                    payment_order.processed_at = reservation.begins_at - datetime.timedelta(days=3)
 
                 case OrderStatus.PENDING:
                     reservation.cancel_details = "Cancelled by the reservee"
                     payment_order.status = OrderStatus.CANCELLED
-                    payment_order.processed_at = reservation.begin - datetime.timedelta(days=3)
+                    payment_order.processed_at = reservation.begins_at - datetime.timedelta(days=3)
 
                 case _:
                     msg = f"Cannot cancel payment order in status '{payment_order.status}'"
@@ -393,6 +379,7 @@ def _deny_reservations(qs: ReservationQuerySet, deny_reasons: list[ReservationDe
     reservations: list[Reservation] = []
     payment_orders: list[PaymentOrder] = []
 
+    reservation: Reservation
     for reservation in qs:
         reservation.state = ReservationStateChoice.DENIED
         reservation.handling_details = "Denied by handler"
@@ -414,7 +401,7 @@ def _deny_reservations(qs: ReservationQuerySet, deny_reasons: list[ReservationDe
                 # Invoices are always cancelled, since no payment has been made
                 case OrderStatus.PAID | OrderStatus.PAID_BY_INVOICE | OrderStatus.PENDING:
                     payment_order.status = OrderStatus.CANCELLED
-                    payment_order.processed_at = reservation.begin - datetime.timedelta(days=3)
+                    payment_order.processed_at = reservation.begins_at - datetime.timedelta(days=3)
 
                 case _:
                     msg = f"Cannot deny payment order in status '{payment_order.status}'"
@@ -430,7 +417,6 @@ def _deny_reservations(qs: ReservationQuerySet, deny_reasons: list[ReservationDe
 def _create_full_day_reservations(
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
 ) -> None:
     """
     Create reservations for all reservation units that require full day booking.
@@ -459,10 +445,10 @@ def _create_full_day_reservations(
 
     user = User.objects.get(username="tvp")
 
-    customer_type_choices: list[CustomerTypeChoice] = [
-        CustomerTypeChoice.INDIVIDUAL,
-        CustomerTypeChoice.BUSINESS,
-        CustomerTypeChoice.NONPROFIT,
+    reservee_type_choices: list[ReserveeType] = [
+        ReserveeType.INDIVIDUAL,
+        ReserveeType.COMPANY,
+        ReserveeType.NONPROFIT,
     ]
 
     reservation_type_choices: list[ReservationTypeChoice] = [
@@ -471,10 +457,7 @@ def _create_full_day_reservations(
         ReservationTypeChoice.STAFF,
     ]
 
-    ReservationUnitThroughModel: type[models.Model] = Reservation.reservation_units.through  # noqa: N806
-
     reservations: list[Reservation] = []
-    reservation_reservation_units: list[models.Model] = []
 
     # --- Create reservations -------------------------------------------------------------------------------------
 
@@ -496,16 +479,17 @@ def _create_full_day_reservations(
             begin_time = datetime.time(hour=random.randint(6, 10), tzinfo=DEFAULT_TIMEZONE)
             begin_datetime = combine(reservation_date, begin_time)
 
-            customer_type = weighted_choice(customer_type_choices, weights=[5, 1, 1])
+            customer_type = weighted_choice(reservee_type_choices, weights=[5, 1, 1])
             reservation_type = weighted_choice(reservation_type_choices, weights=[5, 1, 1])
 
             reservation = (
                 ReservationBuilder()
                 .for_user(user)
                 .for_reservation_unit(reservation_unit)
-                .for_customer_type(customer_type)
+                .for_reservee_type(customer_type)
                 .starting_at(begin_datetime, reservation_unit, pricing=pricing)
                 .build(
+                    reservation_unit=reservation_unit,
                     type=reservation_type,
                     state=ReservationStateChoice.CONFIRMED,
                     #
@@ -517,27 +501,18 @@ def _create_full_day_reservations(
                     #
                     purpose=random.choice(reservation_purposes),
                     age_group=random.choice(age_groups),
-                    home_city=random.choice(cities),
+                    municipality=MunicipalityChoice.HELSINKI,
                 )
             )
             reservations.append(reservation)
 
-            reservation_reservation_units.append(
-                ReservationUnitThroughModel(
-                    reservation=reservation,
-                    reservationunit=reservation_unit,
-                )
-            )
-
     Reservation.objects.bulk_create(reservations)
-    ReservationUnitThroughModel.objects.bulk_create(reservation_reservation_units)
 
 
 @with_logs
 def _create_reservations_for_reservation_units_affecting_other_reservation_units(
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
 ) -> None:
     """
     Create reservations for all reservation units that are in a space or resource hierarchy.
@@ -591,16 +566,13 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
 
     user = User.objects.get(username="tvp")
 
-    customer_type_choices: list[CustomerTypeChoice] = [
-        CustomerTypeChoice.INDIVIDUAL,
-        CustomerTypeChoice.BUSINESS,
-        CustomerTypeChoice.NONPROFIT,
+    reservee_type_choices: list[ReserveeType] = [
+        ReserveeType.INDIVIDUAL,
+        ReserveeType.COMPANY,
+        ReserveeType.NONPROFIT,
     ]
 
-    ReservationUnitThroughModel: type[models.Model] = Reservation.reservation_units.through  # noqa: N806
-
     reservations: list[Reservation] = []
-    reservation_reservation_units: list[models.Model] = []
 
     # --- Create reservations -------------------------------------------------------------------------------------
 
@@ -613,15 +585,16 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
         begin_time = datetime.time(hour=random.randint(8, 12), tzinfo=DEFAULT_TIMEZONE)
         begin_datetime = combine(reservation_date, begin_time)
 
-        customer_type = weighted_choice(customer_type_choices, weights=[5, 1, 1])
+        customer_type = weighted_choice(reservee_type_choices, weights=[5, 1, 1])
 
         reservation = (
             ReservationBuilder()
             .for_user(user)
             .for_reservation_unit(reservation_unit)
-            .for_customer_type(customer_type)
+            .for_reservee_type(customer_type)
             .starting_at(begin_datetime, reservation_unit, pricing=pricing)
             .build(
+                reservation_unit=reservation_unit,
                 type=ReservationTypeChoice.NORMAL,
                 state=ReservationStateChoice.CONFIRMED,
                 #
@@ -633,17 +606,10 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
                 #
                 purpose=random.choice(reservation_purposes),
                 age_group=random.choice(age_groups),
-                home_city=random.choice(cities),
+                municipality=MunicipalityChoice.HELSINKI,
             )
         )
         reservations.append(reservation)
-
-        reservation_reservation_units.append(
-            ReservationUnitThroughModel(
-                reservation=reservation,
-                reservationunit=reservation_unit,
-            )
-        )
 
         # Only one reservation per day, so that we don't accidentally create overlapping reservations
         reservation_date += datetime.timedelta(days=1)
@@ -655,15 +621,16 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
         begin_time = datetime.time(hour=random.randint(8, 12), tzinfo=DEFAULT_TIMEZONE)
         begin_datetime = combine(reservation_date, begin_time)
 
-        customer_type = weighted_choice(customer_type_choices, weights=[5, 1, 1])
+        customer_type = weighted_choice(reservee_type_choices, weights=[5, 1, 1])
 
         reservation = (
             ReservationBuilder()
             .for_user(user)
             .for_reservation_unit(reservation_unit)
-            .for_customer_type(customer_type)
+            .for_reservee_type(customer_type)
             .starting_at(begin_datetime, reservation_unit, pricing=pricing)
             .build(
+                reservation_unit=reservation_unit,
                 type=ReservationTypeChoice.NORMAL,
                 state=ReservationStateChoice.CONFIRMED,
                 #
@@ -675,27 +642,19 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
                 #
                 purpose=random.choice(reservation_purposes),
                 age_group=random.choice(age_groups),
-                home_city=random.choice(cities),
+                municipality=MunicipalityChoice.HELSINKI,
             )
         )
         reservations.append(reservation)
-
-        reservation_reservation_units.append(
-            ReservationUnitThroughModel(
-                reservation=reservation,
-                reservationunit=reservation_unit,
-            )
-        )
 
         # Only one reservation per day, so that we don't accidentally create overlapping reservations
         reservation_date += datetime.timedelta(days=1)
 
     Reservation.objects.bulk_create(reservations)
-    ReservationUnitThroughModel.objects.bulk_create(reservation_reservation_units)
 
 
 @with_logs
-def _create_recurring_reservations(
+def _create_reservation_series(
     metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     cancellation_rules: list[ReservationUnitCancellationRule],
@@ -703,11 +662,10 @@ def _create_recurring_reservations(
     tax_percentage: TaxPercentage,
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
 ) -> None:
     user = User.objects.get(username="tvp")
 
-    reservation_unit = _create_reservation_unit_for_recurring_reservations(
+    reservation_unit = _create_reservation_unit_for_reservation_series(
         metadata_sets=metadata_sets,
         terms_of_use=terms_of_use,
         cancellation_rules=cancellation_rules,
@@ -715,44 +673,40 @@ def _create_recurring_reservations(
         tax_percentage=tax_percentage,
     )
 
-    _create_past_recurring_reservation(
+    _create_past_reservation_series(
         name="Viime kauden futistreenit",
-        weekdays=[WeekdayChoice.MONDAY],
+        weekdays=[Weekday.MONDAY],
         reservation_unit=reservation_unit,
         user=user,
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
-        cities=cities,
     )
 
-    _create_future_recurring_reservation(
+    _create_future_reservation_series(
         name="Tulevan kauden futistreenit",
-        weekdays=[WeekdayChoice.MONDAY],
+        weekdays=[Weekday.MONDAY],
         reservation_unit=reservation_unit,
         user=user,
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
-        cities=cities,
     )
 
-    _create_ongoing_recurring_reservation(
+    _create_ongoing_reservation_series(
         name="Aikuisten treenit kaksi kertaa viikossa",
-        weekdays=[WeekdayChoice.WEDNESDAY, WeekdayChoice.FRIDAY],
+        weekdays=[Weekday.WEDNESDAY, Weekday.FRIDAY],
         reservation_unit=reservation_unit,
         user=user,
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
-        cities=cities,
     )
 
-    _create_ongoing_recurring_reservation(
+    _create_ongoing_reservation_series(
         name="Ajoittaiset viikonloppupelit",
-        weekdays=[WeekdayChoice.SATURDAY],
+        weekdays=[Weekday.SATURDAY],
         reservation_unit=reservation_unit,
         user=user,
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
-        cities=cities,
         cancel_random=3,
         deny_random=3,
         reject_random=3,
@@ -760,14 +714,13 @@ def _create_recurring_reservations(
 
 
 @with_logs
-def _create_past_recurring_reservation(
+def _create_past_reservation_series(
     name: str,
-    weekdays: list[WeekdayChoice],
+    weekdays: list[Weekday],
     reservation_unit: ReservationUnit,
     user: User,
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
     *,
     cancel_random: int = 0,
     deny_random: int = 0,
@@ -776,7 +729,7 @@ def _create_past_recurring_reservation(
     today = local_date()
 
     age_group = random.choice(age_groups)
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         name=name,
         #
         begin_date=today - datetime.timedelta(days=90),
@@ -785,7 +738,7 @@ def _create_past_recurring_reservation(
         end_time=datetime.time(hour=11, minute=0),
         begin_time=datetime.time(hour=9, minute=0),
         #
-        weekdays=",".join(str(day.value) for day in weekdays),
+        weekdays=weekdays,
         reservation_unit=reservation_unit,
         user=user,
         age_group=age_group,
@@ -794,7 +747,6 @@ def _create_past_recurring_reservation(
         series=series,
         reservation_purposes=reservation_purposes,
         age_group=age_group,
-        cities=cities,
         cancel_random=cancel_random,
         deny_random=deny_random,
         reject_random=reject_random,
@@ -802,14 +754,13 @@ def _create_past_recurring_reservation(
 
 
 @with_logs
-def _create_future_recurring_reservation(
+def _create_future_reservation_series(
     name: str,
-    weekdays: list[WeekdayChoice],
+    weekdays: list[Weekday],
     reservation_unit: ReservationUnit,
     user: User,
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
     *,
     cancel_random: int = 0,
     deny_random: int = 0,
@@ -818,7 +769,7 @@ def _create_future_recurring_reservation(
     today = local_date()
 
     age_group = random.choice(age_groups)
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         name=name,
         #
         begin_date=today + datetime.timedelta(days=1),
@@ -827,7 +778,7 @@ def _create_future_recurring_reservation(
         begin_time=datetime.time(hour=8, minute=0),
         end_time=datetime.time(hour=10, minute=0),
         #
-        weekdays=",".join(str(day.value) for day in weekdays),
+        weekdays=weekdays,
         reservation_unit=reservation_unit,
         user=user,
         age_group=age_group,
@@ -836,7 +787,6 @@ def _create_future_recurring_reservation(
         series=series,
         reservation_purposes=reservation_purposes,
         age_group=age_group,
-        cities=cities,
         cancel_random=cancel_random,
         deny_random=deny_random,
         reject_random=reject_random,
@@ -844,14 +794,13 @@ def _create_future_recurring_reservation(
 
 
 @with_logs
-def _create_ongoing_recurring_reservation(
+def _create_ongoing_reservation_series(
     name: str,
-    weekdays: list[WeekdayChoice],
+    weekdays: list[Weekday],
     reservation_unit: ReservationUnit,
     user: User,
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
-    cities: list[City],
     *,
     cancel_random: int = 0,
     deny_random: int = 0,
@@ -860,7 +809,7 @@ def _create_ongoing_recurring_reservation(
     today = local_date()
 
     age_group = random.choice(age_groups)
-    series = RecurringReservationFactory.create(
+    series = ReservationSeriesFactory.create(
         name=name,
         #
         begin_date=today - datetime.timedelta(days=30),
@@ -869,7 +818,7 @@ def _create_ongoing_recurring_reservation(
         begin_time=datetime.time(hour=14, minute=0),
         end_time=datetime.time(hour=16, minute=0),
         #
-        weekdays=",".join(str(day.value) for day in weekdays),
+        weekdays=weekdays,
         reservation_unit=reservation_unit,
         user=user,
         age_group=age_group,
@@ -878,7 +827,6 @@ def _create_ongoing_recurring_reservation(
         series=series,
         reservation_purposes=reservation_purposes,
         age_group=age_group,
-        cities=cities,
         cancel_random=cancel_random,
         deny_random=deny_random,
         reject_random=reject_random,
@@ -886,24 +834,20 @@ def _create_ongoing_recurring_reservation(
 
 
 def _create_reservations_for_series(
-    series: RecurringReservation,
+    series: ReservationSeries,
     reservation_purposes: list[ReservationPurpose],
-    cities: list[City],
     age_group: AgeGroup,
     *,
     cancel_random: int = 0,
     deny_random: int = 0,
     reject_random: int = 0,
 ) -> None:
-    ReservationUnitThroughModel: type[models.Model] = Reservation.reservation_units.through  # noqa: N806
-
     pricing: ReservationUnitPricing | None = series.reservation_unit.pricings.active().first()
     assert pricing is not None, "Reservation unit must have at least one pricing"
 
-    weekdays = series.actions.get_weekdays()
+    weekdays: list[Weekday] = [Weekday(weekday) for weekday in series.weekdays]
 
     reservations: list[Reservation] = []
-    reservation_reservation_units: list[models.Model] = []
     occurrences: list[RejectedOccurrence] = []
 
     for weekday in weekdays:
@@ -928,10 +872,11 @@ def _create_reservations_for_series(
                 .for_reservation_unit(series.reservation_unit)
                 .for_nonprofit()
                 .build(
-                    recurring_reservation=series,
+                    reservation_unit=series.reservation_unit,
+                    reservation_series=series,
                     #
-                    begin=begin,
-                    end=end,
+                    begins_at=begin,
+                    ends_at=end,
                     buffer_time_before=buffer_time_before,
                     buffer_time_after=buffer_time_after,
                     #
@@ -952,7 +897,7 @@ def _create_reservations_for_series(
                     #
                     purpose=random.choice(reservation_purposes),
                     age_group=age_group,
-                    home_city=random.choice(cities),
+                    municipality=MunicipalityChoice.HELSINKI,
                     #
                     deny_reason=None,
                     cancel_reason=None,
@@ -960,13 +905,6 @@ def _create_reservations_for_series(
             )
 
             reservations.append(reservation)
-
-            reservation_reservation_units.append(
-                ReservationUnitThroughModel(
-                    reservation=reservation,
-                    reservationunit=series.reservation_unit,
-                )
-            )
 
     if cancel_random > 0:
         cancel_reasons = ReservationCancelReasonChoice.user_selectable
@@ -996,16 +934,14 @@ def _create_reservations_for_series(
             # Replace the reservation with a rejected occurrence.
             index = random.randint(0, len(reservations) - 1)
             reservation = reservations.pop(index)
-            reservation_reservation_units.pop(index)
             occurrence = RejectedOccurrenceFactory.build(
-                begin_datetime=reservation.begin,
-                end_datetime=reservation.end,
-                recurring_reservation=reservation.recurring_reservation,
+                begin_datetime=reservation.begins_at,
+                end_datetime=reservation.ends_at,
+                reservation_series=reservation.reservation_series,
                 created_at=local_datetime(),
             )
             occurrences.append(occurrence)
             rejected_count += 1
 
     Reservation.objects.bulk_create(reservations)
-    ReservationUnitThroughModel.objects.bulk_create(reservation_reservation_units)
     RejectedOccurrence.objects.bulk_create(occurrences)

@@ -209,7 +209,7 @@ def test_reservation_confirmed_staff_notification__send_email(outbox):
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
-        reservation_units__unit=unit,
+        reservation_unit__unit=unit,
     )
 
     EmailService.send_reservation_confirmed_staff_notification_email(reservation)
@@ -228,7 +228,7 @@ def test_reservation_confirmed_staff_notification__send_email__no_recipients(out
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
-        reservation_units__unit=unit,
+        reservation_unit__unit=unit,
     )
 
     EmailService.send_reservation_confirmed_staff_notification_email(reservation)
@@ -254,7 +254,7 @@ def test_reservation_confirmed_staff_notification__send_email__wrong_state(outbo
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CANCELLED,
-        reservation_units__unit=unit,
+        reservation_unit__unit=unit,
     )
 
     EmailService.send_reservation_confirmed_staff_notification_email(reservation)
@@ -283,7 +283,7 @@ def test_reservation_confirmed_staff_notification__send_email__multiple_recipien
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
-        reservation_units__unit=unit,
+        reservation_unit__unit=unit,
     )
 
     with TranslationsFromPOFiles():

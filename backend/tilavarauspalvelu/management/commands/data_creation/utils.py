@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import datetime
+import enum
 import functools
 import itertools
 import operator
@@ -13,6 +14,7 @@ from typing import TYPE_CHECKING, Annotated, Any, Literal, NamedTuple, TypeVar
 from django.db import models
 from django.test import override_settings
 
+from tilavarauspalvelu.enums import ReservationFormType
 from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnit, ReservationUnitHierarchy
 
 if TYPE_CHECKING:
@@ -21,20 +23,17 @@ if TYPE_CHECKING:
 
     from tilavarauspalvelu.enums import (
         AccessType,
-        ApplicantTypeChoice,
         PaymentType,
         PriceUnit,
         ReservationKind,
         ReservationStartInterval,
+        ReserveeType,
         Weekday,
     )
     from tilavarauspalvelu.models import (
-        Address,
         AllocatedTimeSlot,
         Application,
         ApplicationSection,
-        Organisation,
-        Person,
         ReservationUnitCancellationRule,
         ReservationUnitOption,
         SuitableTimeRange,
@@ -121,7 +120,6 @@ class SetName(StrEnum):
     set_4 = "Lomake 4"
     set_5 = "Lomake 5"
     set_6 = "Lomake 6"
-    set_all = "All Fields"
 
     value: str  # Override typing, since current inferred type is somehow wrong...
 
@@ -131,7 +129,26 @@ class SetName(StrEnum):
 
     @classmethod
     def non_free_of_charge_applying(cls) -> list[SetName]:
-        return list(set(cls.__members__.values()) - set(cls.applying_free_of_charge()))
+        return [cls.set_1, cls.set_2, cls.set_3, cls.set_4]
+
+    @enum.property
+    def reservation_form(self) -> ReservationFormType:
+        match self:
+            case SetName.set_1:
+                return ReservationFormType.CONTACT_INFO_FORM
+            case SetName.set_2:
+                return ReservationFormType.RESERVEE_INFO_FORM
+            case SetName.set_3:
+                return ReservationFormType.PURPOSE_FORM
+            case SetName.set_4:
+                return ReservationFormType.AGE_GROUP_FORM
+            case SetName.set_5:
+                return ReservationFormType.PURPOSE_SUBVENTION_FORM
+            case SetName.set_6:
+                return ReservationFormType.AGE_GROUP_SUBVENTION_FORM
+            case _:
+                msg = f"Unknown reservation form for {self}"
+                raise ValueError(msg)
 
 
 class FieldCombination(NamedTuple):
@@ -269,7 +286,7 @@ class SeasonalReservationUnitData:
 @dataclasses.dataclass(frozen=True, slots=True)
 class ApplicantTypeInfo:
     name: str
-    applicant_type: ApplicantTypeChoice
+    applicant_type: ReserveeType
     unregistered: bool = False
     different_billing_address: bool = False
 
@@ -314,9 +331,6 @@ class ApplicationRoundData:
 @dataclasses.dataclass(frozen=True, slots=True)
 class CreatedApplicationInfo:
     application: Application
-    addresses: list[Address]
-    contact_persons: list[Person]
-    organisations: list[Organisation]
     application_sections: list[ApplicationSection]
     suitable_time_ranges: list[SuitableTimeRange]
     reservation_unit_options: list[ReservationUnitOption]

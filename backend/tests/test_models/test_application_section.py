@@ -32,8 +32,8 @@ pytestmark = [
 def test_application_section__status():
     now = datetime.datetime.now(tz=datetime.UTC)
     application_round = ApplicationRoundFactory.create(
-        application_period_begin=now - datetime.timedelta(days=7),
-        application_period_end=now + datetime.timedelta(days=1),
+        application_period_begins_at=now - datetime.timedelta(days=7),
+        application_period_ends_at=now + datetime.timedelta(days=1),
     )
     section = ApplicationSectionFactory.create(
         application__application_round=application_round,
@@ -48,7 +48,7 @@ def test_application_section__status():
     assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.UNALLOCATED)).exists()
 
     # Application round has entered allocation -> status is IN_ALLOCATION
-    application_round.application_period_end = now - datetime.timedelta(days=1)
+    application_round.application_period_ends_at = now - datetime.timedelta(days=1)
     application_round.save()
     assert section.status == ApplicationSectionStatusChoice.IN_ALLOCATION
     assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.IN_ALLOCATION)).exists()
@@ -59,27 +59,27 @@ def test_application_section__status():
     assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.IN_ALLOCATION)).exists()
 
     # 1/2 allocations have been made, but application round has been handled -> status is HANDLED
-    application_round.handled_date = now
+    application_round.handled_at = now
     application_round.save()
     assert section.status == ApplicationSectionStatusChoice.HANDLED
     assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.HANDLED)).exists()
-    application_round.handled_date = None
+    application_round.handled_at = None
     application_round.save()
 
     # All reservation unit options have been locked -> status is HANDLED
-    option.locked = True
+    option.is_locked = True
     option.save()
     assert section.status == ApplicationSectionStatusChoice.HANDLED
     assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.HANDLED)).exists()
-    option.locked = False
+    option.is_locked = False
     option.save()
 
     # All reservation unit options have been rejected -> status is HANDLED
-    option.rejected = True
+    option.is_rejected = True
     option.save()
     assert section.status == ApplicationSectionStatusChoice.HANDLED
     assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.HANDLED)).exists()
-    option.rejected = False
+    option.is_rejected = False
     option.save()
 
     # 2/2 allocations have been made -> status is HANDLED
@@ -94,13 +94,13 @@ def test_application_section__status__partially_allocated__option_unusable():
         application__application_round=application_round,
         applied_reservations_per_week=2,
     )
-    option = ReservationUnitOptionFactory.create(application_section=section, locked=True)
+    option = ReservationUnitOptionFactory.create(application_section=section, is_locked=True)
 
     assert section.status == ApplicationSectionStatusChoice.REJECTED
     assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.REJECTED)).exists()
 
-    option.locked = False
-    option.rejected = True
+    option.is_locked = False
+    option.is_rejected = True
     option.save()
 
     assert section.status == ApplicationSectionStatusChoice.REJECTED
@@ -162,15 +162,15 @@ def test_application_section__usable_reservation_unit_options():
     assert ApplicationSection.objects.filter(L(usable_reservation_unit_options=1)).exists()
 
     # Reservation unit locked -> Application section has 0 usable reservation unit options
-    option.locked = True
+    option.is_locked = True
     option.save()
     assert section.usable_reservation_unit_options == 0
     assert ApplicationSection.objects.filter(L(usable_reservation_unit_options=0)).exists()
-    option.locked = False
+    option.is_locked = False
     option.save()
 
     # Reservation unit rejected -> Application section has 0 usable reservation unit options
-    option.rejected = True
+    option.is_rejected = True
     option.save()
     assert section.usable_reservation_unit_options == 0
     assert ApplicationSection.objects.filter(L(usable_reservation_unit_options=0)).exists()
@@ -184,7 +184,7 @@ def test_application_section__usable_reservation_unit_options():
 def test_application_section__should_have_active_access_code__active():
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -196,7 +196,7 @@ def test_application_section__should_have_active_access_code__active():
 def test_application_section__should_have_active_access_code__blocked():
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.BLOCKED,
@@ -208,7 +208,7 @@ def test_application_section__should_have_active_access_code__blocked():
 def test_application_section__should_have_active_access_code__not_confirmed():
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CREATED,
         type=ReservationTypeChoice.NORMAL,
@@ -220,7 +220,7 @@ def test_application_section__should_have_active_access_code__not_confirmed():
 def test_application_section__is_access_code_is_active_correct__active_when_should_be():
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -234,7 +234,7 @@ def test_application_section__is_access_code_is_active_correct__active_when_shou
 def test_application_section__is_access_code_is_active_correct__active_when_should_not_be():
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.BLOCKED,
@@ -248,7 +248,7 @@ def test_application_section__is_access_code_is_active_correct__active_when_shou
 def test_application_section__is_access_code_is_active_correct__inactive_when_should_not_be():
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -261,7 +261,7 @@ def test_application_section__is_access_code_is_active_correct__inactive_when_sh
 def test_application_section__is_access_code_is_active_correct__inactive_when_should_be():
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.BLOCKED,

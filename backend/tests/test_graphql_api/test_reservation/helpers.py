@@ -62,8 +62,8 @@ def mock_profile_reader(**kwargs: Any):
 def get_adjust_data(reservation: Reservation, **overrides: Any) -> dict[str, Any]:
     return {
         "pk": reservation.pk,
-        "begin": (reservation.begin + datetime.timedelta(hours=2)).isoformat(),
-        "end": (reservation.end + datetime.timedelta(hours=2)).isoformat(),
+        "beginsAt": (reservation.begins_at + datetime.timedelta(hours=2)).isoformat(),
+        "endsAt": (reservation.ends_at + datetime.timedelta(hours=2)).isoformat(),
         **overrides,
     }
 
@@ -91,19 +91,19 @@ def get_confirm_data(reservation: Reservation, **overrides: Any) -> dict[str, An
 
 def get_staff_create_data(
     reservation_unit: ReservationUnit,
-    begin: datetime.datetime | None = None,
-    end: datetime.datetime | None = None,
+    begins_at: datetime.datetime | None = None,
+    ends_at: datetime.datetime | None = None,
     **overrides: Any,
 ) -> dict[str, Any]:
-    if begin is None:
-        begin = next_hour(plus_hours=1)
-    if end is None:
-        end = begin + datetime.timedelta(hours=1)
+    if begins_at is None:
+        begins_at = next_hour(plus_hours=1)
+    if ends_at is None:
+        ends_at = begins_at + datetime.timedelta(hours=1)
 
     return {
         "type": ReservationTypeChoice.STAFF,
-        "begin": begin.isoformat(),
-        "end": end.isoformat(),
+        "beginsAt": begins_at.isoformat(),
+        "endsAt": ends_at.isoformat(),
         "reservationUnit": reservation_unit.pk,
         **overrides,
     }
@@ -111,19 +111,19 @@ def get_staff_create_data(
 
 def get_create_data(
     reservation_unit: ReservationUnit,
-    begin: datetime.datetime | None = None,
-    end: datetime.datetime | None = None,
+    begins_at: datetime.datetime | None = None,
+    ends_at: datetime.datetime | None = None,
     **overrides: Any,
 ) -> dict[str, Any]:
-    if begin is None:
-        begin = next_hour(plus_hours=1)
-    if end is None:
-        end = begin + datetime.timedelta(hours=1)
+    if begins_at is None:
+        begins_at = next_hour(plus_hours=1)
+    if ends_at is None:
+        ends_at = begins_at + datetime.timedelta(hours=1)
 
     return {
         "reservationUnit": reservation_unit.pk,
-        "begin": begin.isoformat(),
-        "end": end.isoformat(),
+        "beginsAt": begins_at.isoformat(),
+        "endsAt": ends_at.isoformat(),
         **overrides,
     }
 
@@ -166,19 +166,19 @@ def get_require_handling_data(reservation: Reservation, **overrides: Any) -> dic
 
 def get_staff_adjust_data(
     reservation: Reservation,
-    begin: datetime.datetime | None = None,
-    end: datetime.datetime | None = None,
+    begins_at: datetime.datetime | None = None,
+    ends_at: datetime.datetime | None = None,
     **overrides: Any,
 ) -> dict[str, Any]:
-    if begin is None:
-        begin = next_hour(plus_hours=1)
-    if end is None:
-        end = begin + datetime.timedelta(hours=1)
+    if begins_at is None:
+        begins_at = next_hour(plus_hours=1)
+    if ends_at is None:
+        ends_at = begins_at + datetime.timedelta(hours=1)
 
     return {
         "pk": reservation.pk,
-        "begin": begin.isoformat(),
-        "end": end.isoformat(),
+        "beginsAt": begins_at.isoformat(),
+        "endsAt": ends_at.isoformat(),
         **overrides,
     }
 

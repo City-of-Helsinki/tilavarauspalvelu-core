@@ -9,45 +9,35 @@ from typing import TYPE_CHECKING
 
 import requests
 from django.conf import settings
-from django.contrib.gis.geos import Point
 
-from tilavarauspalvelu.constants import COORDINATE_SYSTEM_ID
 from tilavarauspalvelu.enums import ReservationUnitImageType, TermsOfUseTypeChoices
 from tilavarauspalvelu.models import (
     AgeGroup,
-    City,
     Equipment,
     EquipmentCategory,
-    Location,
     OriginHaukiResource,
     PaymentAccounting,
     PaymentMerchant,
     Purpose,
-    Qualifier,
     ReservableTimeSpan,
     ReservationDenyReason,
     ReservationMetadataField,
     ReservationMetadataSet,
     ReservationPurpose,
     ReservationUnitCancellationRule,
-    Space,
     TaxPercentage,
     TermsOfUse,
-    Unit,
 )
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_start_of_day
 
 from tests.factories import (
     AgeGroupFactory,
-    CityFactory,
     EquipmentCategoryFactory,
     EquipmentFactory,
-    LocationFactory,
     OriginHaukiResourceFactory,
     PaymentAccountingFactory,
     PaymentMerchantFactory,
     PurposeFactory,
-    QualifierFactory,
     ReservableTimeSpanFactory,
     ReservationDenyReasonFactory,
     ReservationMetadataFieldFactory,
@@ -73,12 +63,6 @@ def _create_equipments() -> list[Equipment]:
     equipment_categories = EquipmentCategory.objects.bulk_create(equipment_categories)
     equipments = [EquipmentFactory.build(category=random.choice(equipment_categories)) for _ in range(30)]
     return Equipment.objects.bulk_create(equipments)
-
-
-@with_logs
-def _create_qualifiers() -> list[Qualifier]:
-    qualifiers = [QualifierFactory.build() for _ in range(3)]
-    return Qualifier.objects.bulk_create(qualifiers)
 
 
 @with_logs
@@ -353,8 +337,7 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
                 "num_persons",
                 "reservee_email",
                 "reservee_first_name",
-                "reservee_id",
-                "reservee_is_unregistered_association",
+                "reservee_identifier",
                 "reservee_last_name",
                 "reservee_organisation_name",
                 "reservee_phone",
@@ -364,7 +347,7 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
                 "description",
                 "reservee_email",
                 "reservee_first_name",
-                "reservee_id",
+                "reservee_identifier",
                 "reservee_last_name",
                 "reservee_organisation_name",
                 "reservee_phone",
@@ -374,14 +357,12 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
         SetName.set_3: FieldCombination(
             supported=[
                 "description",
-                "home_city",
                 "name",
                 "num_persons",
                 "purpose",
                 "reservee_email",
                 "reservee_first_name",
-                "reservee_id",
-                "reservee_is_unregistered_association",
+                "reservee_identifier",
                 "reservee_last_name",
                 "reservee_organisation_name",
                 "reservee_phone",
@@ -389,12 +370,11 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
             ],
             required=[
                 "description",
-                "home_city",
                 "num_persons",
                 "purpose",
                 "reservee_email",
                 "reservee_first_name",
-                "reservee_id",
+                "reservee_identifier",
                 "reservee_last_name",
                 "reservee_organisation_name",
                 "reservee_phone",
@@ -405,14 +385,12 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
             supported=[
                 "age_group",
                 "description",
-                "home_city",
                 "name",
                 "num_persons",
                 "purpose",
                 "reservee_email",
                 "reservee_first_name",
-                "reservee_id",
-                "reservee_is_unregistered_association",
+                "reservee_identifier",
                 "reservee_last_name",
                 "reservee_organisation_name",
                 "reservee_phone",
@@ -421,12 +399,11 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
             required=[
                 "age_group",
                 "description",
-                "home_city",
                 "num_persons",
                 "purpose",
                 "reservee_email",
                 "reservee_first_name",
-                "reservee_id",
+                "reservee_identifier",
                 "reservee_last_name",
                 "reservee_organisation_name",
                 "reservee_phone",
@@ -437,14 +414,12 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
             supported=[
                 "applying_for_free_of_charge",
                 "description",
-                "home_city",
                 "name",
                 "num_persons",
                 "purpose",
                 "reservee_email",
                 "reservee_first_name",
-                "reservee_id",
-                "reservee_is_unregistered_association",
+                "reservee_identifier",
                 "reservee_last_name",
                 "reservee_organisation_name",
                 "reservee_phone",
@@ -452,12 +427,11 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
             ],
             required=[
                 "description",
-                "home_city",
                 "num_persons",
                 "purpose",
                 "reservee_email",
                 "reservee_first_name",
-                "reservee_id",
+                "reservee_identifier",
                 "reservee_last_name",
                 "reservee_organisation_name",
                 "reservee_phone",
@@ -469,14 +443,12 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
                 "age_group",
                 "applying_for_free_of_charge",
                 "description",
-                "home_city",
                 "name",
                 "num_persons",
                 "purpose",
                 "reservee_email",
                 "reservee_first_name",
-                "reservee_id",
-                "reservee_is_unregistered_association",
+                "reservee_identifier",
                 "reservee_last_name",
                 "reservee_organisation_name",
                 "reservee_phone",
@@ -485,48 +457,16 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
             required=[
                 "age_group",
                 "description",
-                "home_city",
                 "num_persons",
                 "purpose",
                 "reservee_email",
                 "reservee_first_name",
-                "reservee_id",
+                "reservee_identifier",
                 "reservee_last_name",
                 "reservee_organisation_name",
                 "reservee_phone",
                 "reservee_type",
             ],
-        ),
-        SetName.set_all: FieldCombination(
-            supported=[
-                "age_group",
-                "applying_for_free_of_charge",
-                "billing_address_city",
-                "billing_address_street",
-                "billing_address_zip",
-                "billing_email",
-                "billing_first_name",
-                "billing_last_name",
-                "billing_phone",
-                "description",
-                "free_of_charge_reason",
-                "home_city",
-                "name",
-                "num_persons",
-                "purpose",
-                "reservee_address_city",
-                "reservee_address_street",
-                "reservee_address_zip",
-                "reservee_email",
-                "reservee_first_name",
-                "reservee_id",
-                "reservee_is_unregistered_association",
-                "reservee_last_name",
-                "reservee_organisation_name",
-                "reservee_phone",
-                "reservee_type",
-            ],
-            required=[],
         ),
     }
 
@@ -555,19 +495,10 @@ def _create_metadata_fields() -> list[ReservationMetadataField]:
         "reservee_organisation_name",
         "reservee_phone",
         "reservee_email",
-        "reservee_id",
-        "reservee_is_unregistered_association",
+        "reservee_identifier",
         "reservee_address_street",
         "reservee_address_city",
         "reservee_address_zip",
-        "billing_first_name",
-        "billing_last_name",
-        "billing_phone",
-        "billing_email",
-        "billing_address_street",
-        "billing_address_city",
-        "billing_address_zip",
-        "home_city",
         "age_group",
         "applying_for_free_of_charge",
         "free_of_charge_reason",
@@ -622,42 +553,6 @@ def _create_age_groups() -> list[AgeGroup]:
     ]
 
     return AgeGroup.objects.bulk_create(age_groups)
-
-
-@with_logs
-def _create_cities() -> list[City]:
-    cities = [
-        CityFactory.build()  #
-        for _ in range(10)
-    ]
-    return City.objects.bulk_create(cities)
-
-
-@with_logs
-def _create_locations() -> list[Location]:
-    unit_locations = [
-        LocationFactory.build(
-            unit=unit,
-            coordinates=Point(
-                x=random.randint(-180, 180),  # latitude
-                y=random.randint(-90, 90),  # longitude
-                srid=COORDINATE_SYSTEM_ID,
-            ),
-        )
-        for unit in Unit.objects.all()
-    ]
-    space_locations = [
-        LocationFactory.build(
-            space=space,
-            coordinates=Point(
-                x=random.randint(-180, 180),  # latitude
-                y=random.randint(-90, 90),  # longitude
-                srid=COORDINATE_SYSTEM_ID,
-            ),
-        )
-        for space in Space.objects.all()
-    ]
-    return Location.objects.bulk_create(unit_locations + space_locations)
 
 
 @with_logs

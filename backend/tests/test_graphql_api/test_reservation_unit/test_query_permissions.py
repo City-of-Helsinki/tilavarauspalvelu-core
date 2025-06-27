@@ -29,7 +29,7 @@ def test_reservation_unit__query__anonymous_user(graphql):
     reservation_unit = ReservationUnitFactory.create()
     ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit)
 
-    fields = "applicationRoundTimeSlots { weekday closed reservableTimes { begin end } }"
+    fields = "applicationRoundTimeSlots { weekday isClosed reservableTimes { begin end } }"
     query = reservation_units_query(fields=fields)
     response = graphql(query)
 
@@ -42,7 +42,7 @@ def test_reservation_unit__query__regular_user(graphql):
     ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit)
     graphql.login_with_regular_user()
 
-    fields = "applicationRoundTimeSlots { weekday closed reservableTimes { begin end } }"
+    fields = "applicationRoundTimeSlots { weekday isClosed reservableTimes { begin end } }"
     query = reservation_units_query(fields=fields)
     response = graphql(query)
 
@@ -67,15 +67,8 @@ SENSITIVE_FIELDS = """
         reserveeAddressZip
         reserveeOrganisationName
         freeOfChargeReason
-        billingFirstName
-        billingLastName
-        billingAddressStreet
-        billingAddressCity
-        billingAddressZip
-        billingPhone
-        billingEmail
         description
-        reserveeId
+        reserveeIdentifier
         cancelDetails
         cancelReason
         denyReason {
@@ -90,26 +83,19 @@ def test_reservation_unit__query__sensitive_information__regular_user(graphql):
     user = UserFactory.create(date_of_birth=datetime.date(2020, 1, 1))
 
     ReservationFactory.create(
-        billing_address_city="Billing City",
-        billing_address_street="Billing Street",
-        billing_address_zip="Billing Zip",
-        billing_email="billing@localhost",
-        billing_first_name="Billing General",
-        billing_last_name="Billing Admin",
-        billing_phone="67890",
         cancel_details="Cancel Details",
         cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS,
         deny_reason=ReservationDenyReasonFactory(reason="Deny Reason"),
         description="Description",
         free_of_charge_reason="Free of Charge Reason",
         handling_details="Handling Details",
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         reservee_address_city="City",
         reservee_address_street="Address",
         reservee_address_zip="Zip",
         reservee_email="admin@localhost",
         reservee_first_name="General",
-        reservee_id="Reservee ID",
+        reservee_identifier="Reservee ID",
         reservee_last_name="Admin",
         reservee_organisation_name="Organisation",
         reservee_phone="123435",
@@ -126,13 +112,6 @@ def test_reservation_unit__query__sensitive_information__regular_user(graphql):
     assert response.node(0) == {
         "reservations": [
             {
-                "billingAddressCity": None,
-                "billingAddressStreet": None,
-                "billingAddressZip": None,
-                "billingEmail": None,
-                "billingFirstName": None,
-                "billingLastName": None,
-                "billingPhone": None,
                 "cancelDetails": None,
                 "cancelReason": None,
                 "denyReason": None,
@@ -144,7 +123,7 @@ def test_reservation_unit__query__sensitive_information__regular_user(graphql):
                 "reserveeAddressZip": None,
                 "reserveeEmail": None,
                 "reserveeFirstName": None,
-                "reserveeId": None,
+                "reserveeIdentifier": None,
                 "reserveeLastName": None,
                 "reserveeOrganisationName": None,
                 "reserveePhone": None,
@@ -160,26 +139,19 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
     user = UserFactory.create(date_of_birth=datetime.date(2020, 1, 1))
 
     ReservationFactory.create(
-        billing_address_city="Billing City",
-        billing_address_street="Billing Street",
-        billing_address_zip="Billing Zip",
-        billing_email="billing@localhost",
-        billing_first_name="Billing General",
-        billing_last_name="Billing Admin",
-        billing_phone="67890",
         cancel_details="Cancel Details",
         cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS,
         deny_reason=ReservationDenyReasonFactory(reason="Deny Reason"),
         description="Description",
         free_of_charge_reason="Free of Charge Reason",
         handling_details="Handling Details",
-        reservation_units=[reservation_unit],
+        reservation_unit=reservation_unit,
         reservee_address_city="City",
         reservee_address_street="Address",
         reservee_address_zip="Zip",
         reservee_email="admin@localhost",
         reservee_first_name="General",
-        reservee_id="Reservee ID",
+        reservee_identifier="Reservee ID",
         reservee_last_name="Admin",
         reservee_organisation_name="Organisation",
         reservee_phone="123435",
@@ -198,13 +170,6 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
     assert response.node(0) == {
         "reservations": [
             {
-                "billingAddressCity": "Billing City",
-                "billingAddressStreet": "Billing Street",
-                "billingAddressZip": "Billing Zip",
-                "billingEmail": "billing@localhost",
-                "billingFirstName": "Billing General",
-                "billingLastName": "Billing Admin",
-                "billingPhone": "67890",
                 "cancelDetails": "Cancel Details",
                 "cancelReason": ReservationCancelReasonChoice.CHANGE_OF_PLANS.value,
                 "denyReason": {"reasonFi": "Deny Reason"},
@@ -216,7 +181,7 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
                 "reserveeAddressZip": "Zip",
                 "reserveeEmail": "admin@localhost",
                 "reserveeFirstName": "General",
-                "reserveeId": "Reservee ID",
+                "reserveeIdentifier": "Reservee ID",
                 "reserveeLastName": "Admin",
                 "reserveeOrganisationName": "Organisation",
                 "reserveePhone": "123435",

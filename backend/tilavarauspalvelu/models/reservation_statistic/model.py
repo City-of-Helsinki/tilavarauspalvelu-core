@@ -7,7 +7,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationCancelReasonChoice
+from tilavarauspalvelu.enums import MunicipalityChoice, ReservationCancelReasonChoice, ReserveeType
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
@@ -88,6 +88,7 @@ class ReservationStatistic(models.Model):
     age_group: int | None = models.BigIntegerField(null=True, blank=True)
     age_group_name: str = models.CharField(max_length=255, default="", blank=True)
 
+    # Removed from series model
     ability_group: int | None = models.BigIntegerField(null=True, blank=True)
     ability_group_name: str = models.CharField(max_length=255, default="", blank=True)
 
@@ -126,24 +127,21 @@ class ReservationStatistic(models.Model):
     def for_reservation(cls, reservation: Reservation, *, save: bool = False) -> ReservationStatistic:  # noqa: PLR0915
         from tilavarauspalvelu.translation import translated
 
-        recurring_reservation = getattr(reservation, "recurring_reservation", None)
-        ability_group = getattr(recurring_reservation, "ability_group", None)
-        allocated_time_slot = getattr(recurring_reservation, "allocated_time_slot", None)
+        reservation_series = getattr(reservation, "reservation_series", None)
+        allocated_time_slot = getattr(reservation_series, "allocated_time_slot", None)
         age_group = getattr(reservation, "age_group", None)
         deny_reason = getattr(reservation, "deny_reason", None)
         user = getattr(reservation, "user", None)
-        home_city = getattr(reservation, "home_city", None)
         purpose = getattr(reservation, "purpose", None)
 
         cancel_reason: ReservationCancelReasonChoice | None = None
         if reservation.cancel_reason is not None:
             cancel_reason = ReservationCancelReasonChoice(reservation.cancel_reason)
 
-        requires_org_name = reservation.reservee_type != CustomerTypeChoice.INDIVIDUAL
-        requires_org_id = not reservation.reservee_is_unregistered_association and requires_org_name
-        by_profile_user = bool(getattr(reservation.user, "profile_id", ""))
-        begin = reservation.begin.astimezone(DEFAULT_TIMEZONE)
-        end = reservation.end.astimezone(DEFAULT_TIMEZONE)
+        requires_org_data = reservation.reservee_type != ReserveeType.INDIVIDUAL
+        by_profile_user = bool(reservation.user.profile_id)
+        begin = reservation.begins_at.astimezone(DEFAULT_TIMEZONE)
+        end = reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
         duration = end - begin
 
         # Don't care about existing statistics, we can use `bulk_create` with `update_conflicts=True`
@@ -163,11 +161,8 @@ class ReservationStatistic(models.Model):
         statistic.deny_reason_text = getattr(deny_reason, "reason", "")
         statistic.duration_minutes = int(duration.total_seconds() / 60)
         statistic.end = end
-        statistic.home_city = getattr(home_city, "id", None)
-        statistic.home_city_municipality_code = getattr(home_city, "municipality_code", "")
-        statistic.home_city_name = getattr(home_city, "name", "")
         statistic.is_applied = allocated_time_slot is not None
-        statistic.is_recurring = recurring_reservation is not None
+        statistic.is_recurring = reservation_series is not None
         statistic.is_subsidised = reservation.price < reservation.non_subsidised_price
         statistic.non_subsidised_price = reservation.non_subsidised_price
         statistic.non_subsidised_price_net = reservation.non_subsidised_price_net
@@ -176,9 +171,9 @@ class ReservationStatistic(models.Model):
         statistic.price_net = reservation.price_net
         statistic.purpose = getattr(purpose, "id", None)
         statistic.purpose_name = getattr(purpose, "name", "")
-        statistic.recurrence_begin_date = getattr(recurring_reservation, "begin_date", None)
-        statistic.recurrence_end_date = getattr(recurring_reservation, "end_date", None)
-        statistic.recurrence_uuid = str(getattr(recurring_reservation, "ext_uuid", ""))
+        statistic.recurrence_begin_date = getattr(reservation_series, "begin_date", None)
+        statistic.recurrence_end_date = getattr(reservation_series, "end_date", None)
+        statistic.recurrence_uuid = str(getattr(reservation_series, "ext_uuid", ""))
         statistic.reservation = reservation
         statistic.reservation_confirmed_at = reservation.confirmed_at
         statistic.reservation_created_at = reservation.created_at
@@ -186,26 +181,25 @@ class ReservationStatistic(models.Model):
         statistic.reservation_type = reservation.type
         statistic.reservation_uuid = str(reservation.ext_uuid)
         statistic.reservee_address_zip = reservation.reservee_address_zip if by_profile_user else ""
-        statistic.reservee_id = reservation.reservee_id if requires_org_id else ""
-        statistic.reservee_is_unregistered_association = reservation.reservee_is_unregistered_association
+        statistic.reservee_id = reservation.reservee_identifier if requires_org_data else ""
+        statistic.reservee_is_unregistered_association = not reservation.reservee_identifier
         statistic.reservee_language = user.get_preferred_language() if user else ""
-        statistic.reservee_organisation_name = reservation.reservee_organisation_name if requires_org_name else ""
-        statistic.reservee_type = reservation.reservee_type
+        statistic.reservee_organisation_name = reservation.reservee_organisation_name if requires_org_data else ""
+        statistic.reservee_type = str(reservation.reservee_type)
         statistic.reservee_used_ad_login = reservation.reservee_used_ad_login
         statistic.reservee_uuid = str(getattr(user, "tvp_uuid", ""))
         statistic.state = reservation.state
         statistic.tax_percentage_value = reservation.tax_percentage_value
 
-        for res_unit in reservation.reservation_units.all():
-            statistic.primary_reservation_unit = res_unit.id
-            statistic.primary_reservation_unit_name = res_unit.name
-            statistic.primary_unit_name = getattr(res_unit.unit, "name", "")
-            statistic.primary_unit_tprek_id = getattr(res_unit.unit, "tprek_id", "")
-            break
+        if reservation.municipality is not None:
+            municipality = MunicipalityChoice(reservation.municipality)
+            statistic.home_city_municipality_code = municipality.code
+            statistic.home_city_name = str(municipality.value)
 
-        if statistic.is_applied:
-            statistic.ability_group = getattr(ability_group, "id", None)
-            statistic.ability_group_name = getattr(ability_group, "name", "")
+        statistic.primary_reservation_unit = reservation.reservation_unit.id
+        statistic.primary_reservation_unit_name = reservation.reservation_unit.name
+        statistic.primary_unit_name = getattr(reservation.reservation_unit.unit, "name", "")
+        statistic.primary_unit_tprek_id = getattr(reservation.reservation_unit.unit, "tprek_id", "")
 
         if save:
             statistic.save()
