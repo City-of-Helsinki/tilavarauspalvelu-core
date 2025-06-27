@@ -13,13 +13,6 @@ export const RESERVEE_BILLING_FRAGMENT = gql`
     reserveeAddressStreet
     reserveeAddressCity
     reserveeAddressZip
-    billingFirstName
-    billingLastName
-    billingPhone
-    billingEmail
-    billingAddressStreet
-    billingAddressCity
-    billingAddressZip
   }
 `;
 

@@ -202,7 +202,7 @@ test.skip("Renders select with a default value", async () => {
 
 // Required checkbox makes no sense at all so not testing it
 test("Renders a checkbox for reserveeIsUnregisteredAssociation", async () => {
-  const checkfields = ["applyingForFreeOfCharge", "reserveeIsUnregisteredAssociation", "showBillingAddress"] as const;
+  const checkfields = ["applyingForFreeOfCharge", "reserveeIsUnregisteredAssociation"] as const;
 
   for (const field of checkfields) {
     const view = render(<WrappedComponent field={field} />);
