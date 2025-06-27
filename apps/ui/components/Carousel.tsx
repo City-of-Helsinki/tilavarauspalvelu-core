@@ -120,11 +120,14 @@ const Carousel = forwardRef(function Carousel(
           <IconAngleRight size={IconSize.Medium} aria-hidden="true" />
         </SmallArrowButton>
       )}
-      renderBottomCenterControls={({ slideCount, currentSlide, goToSlide }) => (
+      renderBottomCenterControls={({ currentSlide, goToSlide }) => (
         <CustomBottomControls>
           <ul>
-            {[...Array(slideCount)].map((key, idx) => (
-              <li key={key} className={currentSlide === idx ? "active" : undefined}>
+            {children.map((child, idx) => (
+              <li
+                key={`carousel-control-${(child as React.ReactElement)?.key}`}
+                className={currentSlide === idx ? "active" : undefined}
+              >
                 <button type="button" aria-label={`${controlAriaLabel} #${idx + 1}`} onClick={() => goToSlide(idx)}>
                   <svg width="12" height="12">
                     <circle cx="5" cy="5" r="5" />
