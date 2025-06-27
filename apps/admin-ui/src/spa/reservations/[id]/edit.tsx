@@ -26,15 +26,6 @@ import { gql } from "@apollo/client";
 type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;
 type FormValueType = ReservationChangeFormType & ReservationFormMeta;
 
-const noSeparateBillingDefined = (reservation: ReservationType): boolean =>
-  !reservation.billingAddressCity &&
-  !reservation.billingAddressStreet &&
-  !reservation.billingAddressZip &&
-  !reservation.billingEmail &&
-  !reservation.billingFirstName &&
-  !reservation.billingLastName &&
-  !reservation.billingPhone;
-
 const InnerTextInput = styled(TextInput)`
   grid-column: 1 / -1;
   max-width: var(--prose-width);
@@ -71,14 +62,6 @@ function EditReservation({
       description: reservation.description ?? "",
       ageGroup: reservation.ageGroup?.pk ?? undefined,
       applyingForFreeOfCharge: reservation.applyingForFreeOfCharge ?? undefined,
-      showBillingAddress: !noSeparateBillingDefined(reservation),
-      billingAddressCity: reservation.billingAddressCity ?? "",
-      billingAddressStreet: reservation.billingAddressStreet ?? "",
-      billingAddressZip: reservation.billingAddressZip ?? "",
-      billingEmail: reservation.billingEmail ?? "",
-      billingFirstName: reservation.billingFirstName ?? "",
-      billingLastName: reservation.billingLastName ?? "",
-      billingPhone: reservation.billingPhone ?? "",
       freeOfChargeReason: reservation.freeOfChargeReason ?? undefined,
       municipality: reservation.municipality ?? undefined,
       numPersons: reservation.numPersons ?? undefined,
@@ -112,7 +95,7 @@ function EditReservation({
       return;
     }
 
-    const { seriesName, comments, showBillingAddress: _, ...rest } = values;
+    const { seriesName, comments, ...rest } = values;
 
     const toSubmit = {
       ...rest,

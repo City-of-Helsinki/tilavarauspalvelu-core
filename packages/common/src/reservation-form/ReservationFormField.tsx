@@ -94,7 +94,6 @@ const ReservationFormField = ({
         "reserveeAddressStreet",
         "applyingForFreeOfCharge",
         // "reserveeOrganisationName",
-        "billingAddressStreet",
         "purpose",
       ].includes(field),
     [field]
@@ -112,7 +111,7 @@ const ReservationFormField = ({
 
   const isNumField = useMemo((): boolean => ["numPersons"].includes(field), [field]);
 
-  const isEmailField = useMemo((): boolean => ["reserveeEmail", "billingEmail"].includes(field), [field]);
+  const isEmailField = useMemo((): boolean => ["reserveeEmail"].includes(field), [field]);
 
   const isSelectField = Object.keys(options).includes(field);
 
@@ -249,7 +248,6 @@ const ReservationFormField = ({
         required={required}
         maxLength={MAX_TEXT_LENGTH - (isEmailField ? 1 : 0)}
         $isWide={isWideRow}
-        $hidden={field.includes("billing") && watch("showBillingAddress") !== true}
         $height="119px"
       />
     );
@@ -278,12 +276,6 @@ const ReservationFormField = ({
       return (
         <StyledCheckboxWrapper key={field}>
           <ControlledCheckbox {...checkParams} defaultValue={watch("reserveeIsUnregisteredAssociation")} />
-        </StyledCheckboxWrapper>
-      );
-    case "showBillingAddress":
-      return (
-        <StyledCheckboxWrapper key={field}>
-          <ControlledCheckbox {...checkParams} />
         </StyledCheckboxWrapper>
       );
     case "freeOfChargeReason":
@@ -347,7 +339,6 @@ const ReservationFormField = ({
           // email field is special and has one less character than the rest
           maxLength={MAX_TEXT_LENGTH - (isEmailField ? 1 : 0)}
           $isWide={isWideRow}
-          $hidden={field.includes("billing") && watch("showBillingAddress") !== true}
         />
       );
   }
