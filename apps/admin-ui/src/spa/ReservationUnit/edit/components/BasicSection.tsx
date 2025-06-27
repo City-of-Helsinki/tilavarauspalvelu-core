@@ -1,6 +1,6 @@
 import { UseFormReturn } from "react-hook-form";
 import type { ReservationUnitEditFormValues } from "@/spa/ReservationUnit/edit/form";
-import type { ReservationUnitEditQuery, ReservationUnitEditUnitFragment } from "@gql/gql-types";
+import { ReservationKind, ReservationUnitEditQuery, ReservationUnitEditUnitFragment } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
 import { TextInput } from "hds-react";
@@ -51,6 +51,7 @@ export function BasicSection({
   const selectedSpaces = filterNonNullable(spacePks.map((pk) => spaces?.find((s) => s.pk === pk)));
   const minSurfaceArea = getMinSurfaceArea(selectedSpaces);
   const maxPersons = getMaxPersons(selectedSpaces);
+  const reservationKindOptions = Object.values(ReservationKind);
 
   const hasErrors =
     errors.reservationKind != null ||
@@ -69,7 +70,7 @@ export function BasicSection({
         <FullRow>
           <SpecializedRadioGroup
             name="reservationKind"
-            options={["DIRECT_AND_SEASON", "DIRECT", "SEASON"] as const}
+            options={reservationKindOptions}
             control={control}
             direction="horizontal"
             required
