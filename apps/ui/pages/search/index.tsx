@@ -134,7 +134,7 @@ export const SEARCH_RESERVATION_UNITS = gql`
     $orderBy: [ReservationUnitOrderingChoices]
     $isDraft: Boolean
     $isVisible: Boolean
-    $reservationKind: String
+    $reservationKind: ReservationKind
   ) {
     reservationUnits(
       textSearch: $textSearch
