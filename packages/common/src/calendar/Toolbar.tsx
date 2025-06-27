@@ -30,7 +30,7 @@ const Label = styled(NoWrap)`
   display: inline-flex;
   justify-content: center;
   text-transform: capitalize;
-  ${fontMedium}
+  ${fontMedium};
   font-size: var(--fontsize-body-l);
 `;
 

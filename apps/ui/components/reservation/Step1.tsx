@@ -32,11 +32,9 @@ export function Step1({ reservation, supportedFields, options, requiresPayment, 
     setIsTermsAccepted({ ...isTermsAccepted, [key]: val });
   };
 
-  const reservationUnit = reservation?.reservationUnits?.find(() => true);
-
   const areTermsAccepted = isTermsAccepted.space && isTermsAccepted.service;
 
-  if (!reservationUnit) {
+  if (!reservation.reservationUnit) {
     return <Notification type="error">{t("common:errors.dataError")}</Notification>;
   }
   return (
@@ -44,7 +42,7 @@ export function Step1({ reservation, supportedFields, options, requiresPayment, 
       <GeneralFields supportedFields={supportedFields} reservation={reservation} options={options} />
       <ApplicationFields reservation={reservation} options={options} supportedFields={supportedFields} />
       <AcceptTerms
-        reservationUnit={reservationUnit}
+        reservationUnit={reservation.reservationUnit}
         isTermsAccepted={isTermsAccepted}
         setIsTermsAccepted={handleTermsAcceptedChange}
       />

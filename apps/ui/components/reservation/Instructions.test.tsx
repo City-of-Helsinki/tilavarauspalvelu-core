@@ -22,12 +22,10 @@ describe("Component: Instructions", () => {
     const testInstructions = {
       id: "1",
       state: ReservationStateChoice.Confirmed,
-      reservationUnits: [
-        {
-          id: "1",
-          reservationConfirmedInstructionsFi: "regular text <script>text inside script</script>",
-        },
-      ],
+      reservationUnit: {
+        id: "1",
+        reservationConfirmedInstructionsFi: "regular text <script>text inside script</script>",
+      },
     };
     // @ts-expect-error: doesn't match the type by design, since we're only providing reservationConfirmedInstructionsFi
     const view = customRender(testInstructions);
@@ -43,7 +41,7 @@ describe("Component: Instructions", () => {
     const view = customRender(mockReservation);
 
     const instructionsKey = getReservationUnitInstructionsKey(state) ?? "";
-    const mockReservationUnit = mockReservation.reservationUnits[0] ?? {};
+    const mockReservationUnit = mockReservation.reservationUnit ?? {};
     const instructionsText = getTranslationSafe(mockReservationUnit, instructionsKey, "fi");
     // check that the heading is present...
     expect(view.queryByText("reservations:reservationInfo")).toBeInTheDocument();

@@ -9,7 +9,7 @@ type Props = {
 };
 
 const Tree = styled.div`
-  ${fontMedium}
+  ${fontMedium};
   font-size: var(--fontsize-heading-m);
   margin-bottom: var(--spacing-xs);
 `;

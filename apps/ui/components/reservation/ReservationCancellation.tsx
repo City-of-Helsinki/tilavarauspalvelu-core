@@ -6,8 +6,8 @@ import { H1 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import {
   type CancelReasonFieldsFragment,
-  useCancelReservationMutation,
   type ReservationCancelPageQuery,
+  useCancelReservationMutation,
 } from "@gql/gql-types";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { ReservationPageWrapper } from "@/styled/reservation";
@@ -116,10 +116,9 @@ const ApplicationInfo = styled(Card)`
 function ApplicationInfoCard({ reservation }: { reservation: CancellationProps["reservation"] }) {
   // NOTE assumes that the name of the reservationSeries is copied from applicationSection when it's created
   const name = reservation.reservationSeries?.name;
-  const reservationUnit = reservation.reservationUnits.find(() => true);
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
-  const reservationUnitName = reservationUnit != null ? getTranslationSafe(reservationUnit, "name", lang) : "-";
+  const reservationUnitName = getTranslationSafe(reservation.reservationUnit, "name", lang);
   const price = getPrice(t, reservation, lang);
 
   const { dayOfWeek, time, date } = formatDateTimeStrings(t, reservation, undefined, true);
@@ -161,7 +160,7 @@ function getBackPath(reservation: Pick<NonNullable<NodeT>, "reservationSeries" |
 
 /// For applications use application round terms of use
 function getTranslatedTerms(
-  reservation: Pick<NonNullable<NodeT>, "reservationSeries" | "reservationUnits" | "pk">,
+  reservation: Pick<NonNullable<NodeT>, "reservationSeries" | "reservationUnit" | "pk">,
   lang: LocalizationLanguages
 ) {
   if (reservation.reservationSeries) {
@@ -174,9 +173,9 @@ function getTranslatedTerms(
     }
     return null;
   }
-  const reservationUnit = reservation.reservationUnits.find(() => true);
-  if (reservationUnit?.cancellationTerms != null) {
-    return getTranslationSafe(reservationUnit?.cancellationTerms, "text", lang);
+  const reservationUnit = reservation.reservationUnit;
+  if (reservationUnit.cancellationTerms != null) {
+    return getTranslationSafe(reservationUnit.cancellationTerms, "text", lang);
   }
   return null;
 }

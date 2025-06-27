@@ -175,8 +175,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       };
     }
 
-    const reservationUnit = reservation.reservationUnits.find(() => true);
-    if (reservationUnit?.pk == null) {
+    if (reservation.reservationUnit.pk == null) {
       return notFound;
     }
 

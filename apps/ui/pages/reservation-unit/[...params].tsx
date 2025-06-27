@@ -9,15 +9,15 @@ import { useTranslation } from "next-i18next";
 import { Flex, H1, H4 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import {
-  useConfirmReservationMutation,
-  useUpdateReservationMutation,
-  useDeleteReservationMutation,
-  type ReservationQuery,
-  ReservationDocument,
-  type ReservationQueryVariables,
-  useReservationLazyQuery,
-  ReservationStateChoice,
   MunicipalityChoice,
+  ReservationDocument,
+  type ReservationQuery,
+  type ReservationQueryVariables,
+  ReservationStateChoice,
+  useConfirmReservationMutation,
+  useDeleteReservationMutation,
+  useReservationLazyQuery,
+  useUpdateReservationMutation,
 } from "@gql/gql-types";
 import { type Inputs } from "common/src/reservation-form/types";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -106,7 +106,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   });
 
   const reservation = resData?.reservation ?? props.reservation;
-  const reservationUnit = reservation?.reservationUnits?.find(() => true);
+  const reservationUnit = reservation.reservationUnit;
 
   useRemoveStoredReservation();
 
@@ -132,7 +132,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
   const reserveeType = watch("reserveeType");
 
-  const requireHandling = reservationUnit?.requireReservationHandling || reservation?.applyingForFreeOfCharge;
+  const requireHandling = reservationUnit.requireReservationHandling || reservation?.applyingForFreeOfCharge;
 
   const steps = useMemo(() => {
     if (reservationUnit == null) {
@@ -150,7 +150,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
         state,
       };
     });
-  }, [step, requireHandling, reservationUnit, reservation, t]);
+  }, [reservationUnit, reservation.beginsAt, requireHandling, step, t]);
 
   const [deleteReservation] = useDeleteReservationMutation({
     errorPolicy: "all",
@@ -275,7 +275,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   // NOTE: only navigate away from the page if the reservation is cancelled the confirmation hook handles delete
   const cancelReservation = useCallback(() => {
     router.push(getReservationUnitPath(reservationUnit?.pk));
-  }, [router, reservationUnit?.pk]);
+  }, [router, reservationUnit]);
 
   const generalFields = getGeneralFields({ supportedFields, reservation });
   const shouldDisplayReservationUnitPrice = useMemo(() => {
@@ -289,7 +289,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   }, [step, generalFields, reservation, reservationUnit]);
 
   const lang = convertLanguageCode(i18n.language);
-  const termsOfUse = reservationUnit != null ? getTranslationSafe(reservationUnit, "termsOfUse", lang) : "";
+  const termsOfUse = getTranslationSafe(reservationUnit, "termsOfUse", lang);
 
   // TODO rework so we submit the form values here
   const onSubmit = (values: unknown) => {
@@ -360,15 +360,14 @@ function NewReservationWrapper(props: PropsNarrowed): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
   const { reservation } = props;
-  const reservationUnit = reservation?.reservationUnits?.find(() => true);
-  const reservationUnitName = reservationUnit ? getTranslationSafe(reservationUnit, "name", lang) : "";
+  const reservationUnitName = getTranslationSafe(reservation.reservationUnit, "name", lang);
   const routes = [
     {
       slug: getSingleSearchPath(),
       title: t("breadcrumb:searchSingle"),
     },
     {
-      slug: getReservationUnitPath(reservationUnit?.pk),
+      slug: getReservationUnitPath(reservation.reservationUnit.pk),
       title: reservationUnitName,
     },
     {
@@ -470,7 +469,7 @@ export const RESERVATION_IN_PROGRESS_QUERY = gql`
       bufferTimeBefore
       bufferTimeAfter
       calendarUrl
-      reservationUnits {
+      reservationUnit {
         id
         canApplyFreeOfCharge
         ...CancellationRuleFields

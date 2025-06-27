@@ -155,7 +155,7 @@ type AddNewReservationButtonProps = {
 };
 
 function AddNewReservationButton({ reservationToCopy, refetch }: AddNewReservationButtonProps) {
-  const unitPk = reservationToCopy?.reservationUnits?.[0]?.unit?.pk;
+  const unitPk = reservationToCopy?.reservationUnit?.unit?.pk;
   const { hasPermission } = useCheckPermission({
     units: unitPk ? [unitPk] : [],
     permission: UserPermissionChoice.CanManageReservations,
@@ -256,7 +256,7 @@ export function ReservationList(props: Props | ExtendedProps) {
 export const RESERVATION_TO_COPY_FRAGMENT = gql`
   fragment ReservationToCopy on ReservationNode {
     ...ChangeReservationTime
-    reservationUnits {
+    reservationUnit {
       id
       unit {
         id
