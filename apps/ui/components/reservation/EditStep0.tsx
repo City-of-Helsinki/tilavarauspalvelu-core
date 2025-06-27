@@ -110,8 +110,8 @@ function EditStep0({
 }): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const activeApplicationRounds = reservationUnit.applicationRounds;
-  const originalBegin = new Date(reservation.begin);
-  const originalEnd = new Date(reservation.end);
+  const originalBegin = new Date(reservation.beginsAt);
+  const originalEnd = new Date(reservation.endsAt);
 
   const { blockingReservations } = useBlockingReservations(reservationUnit.pk, reservation.pk);
 
@@ -264,8 +264,8 @@ export const EDIT_PAGE_RESERVATION_FRAGMENT = gql`
   fragment EditPageReservation on ReservationNode {
     id
     pk
-    begin
-    end
+    beginsAt
+    endsAt
     ...CanReservationBeChanged
     ...ReservationInfoCard
     ...MetaFields

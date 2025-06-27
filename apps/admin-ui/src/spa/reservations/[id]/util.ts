@@ -68,8 +68,8 @@ export const RESERVATION_UNIT_PRICING_FRAGMENT = gql`
 export const RESERVATION_PRICE_DETAILS_FRAGMENT = gql`
   fragment ReservationPriceDetailsFields on ReservationNode {
     id
-    begin
-    end
+    beginsAt
+    endsAt
     appliedPricing {
       taxPercentage
     }
@@ -81,8 +81,8 @@ export const RESERVATION_PRICE_DETAILS_FRAGMENT = gql`
 
 /// TODO refactor this to use reasonable formatting (modern i18next)
 export function getReservationPriceDetails(reservation: ReservationPriceDetailsFieldsFragment, t: TFunction): string {
-  const begin = new Date(reservation.begin);
-  const end = new Date(reservation.end);
+  const begin = new Date(reservation.beginsAt);
+  const end = new Date(reservation.endsAt);
   const resUnit = reservation.reservationUnits?.[0] ?? null;
   const durationMinutes = differenceInMinutes(end, begin);
   const pricing = resUnit ? getReservationUnitPricing(resUnit, begin) : null;
@@ -183,8 +183,8 @@ export function createTagString(reservation: CreateTagStringFragment, t: TFuncti
 }
 
 function createSingleTagString(reservation: CreateTagStringFragment, t: TFunction): string {
-  const begin = new Date(reservation.begin);
-  const end = new Date(reservation.end);
+  const begin = new Date(reservation.beginsAt);
+  const end = new Date(reservation.endsAt);
   const singleDateTimeTag = formatDateTimeRange(t, begin, end);
 
   const unitTag = reservation?.reservationUnits?.map(reservationUnitName).join(", ");
@@ -221,7 +221,7 @@ function createRecurringTagString(reservation: CreateTagStringFragment, t: TFunc
     return "";
   }
 
-  const durMinutes = differenceInMinutes(new Date(reservation.end), new Date(reservation.begin));
+  const durMinutes = differenceInMinutes(new Date(reservation.endsAt), new Date(reservation.beginsAt));
   const durationTag = formatDuration(t, { minutes: durMinutes });
 
   const recurringDateTag = `${weekDayTag} ${format(begin, "HH:mm")}–${format(end, "HH:mm")}`;
@@ -232,8 +232,8 @@ function createRecurringTagString(reservation: CreateTagStringFragment, t: TFunc
 export const CREATE_TAG_STRING_FRAGMENT = gql`
   fragment CreateTagString on ReservationNode {
     id
-    begin
-    end
+    beginsAt
+    endsAt
     reservationUnits {
       id
       nameFi

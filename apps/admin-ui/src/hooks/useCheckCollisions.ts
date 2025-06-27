@@ -98,8 +98,8 @@ export const CALENDAR_RESERVATION_FRAGMENT = gql`
     name
     reserveeName
     pk
-    begin
-    end
+    beginsAt
+    endsAt
     state
     type
     bufferTimeBefore

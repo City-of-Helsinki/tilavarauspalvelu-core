@@ -77,10 +77,10 @@ export function ReservationInfoCard({
   const { accessCode } = accessCodeData?.reservation?.pindoraInfo ?? {};
   const shouldDisplayAccessCode = accessCodeData?.reservation?.pindoraInfo?.accessCodeIsActive;
 
-  const { begin, end } = reservation || {};
+  const { beginsAt, endsAt } = reservation || {};
   // NOTE can be removed after this has been refactored not to be used for PendingReservation
 
-  const timeString = capitalize(formatDateTimeRange(t, new Date(begin), new Date(end)));
+  const timeString = capitalize(formatDateTimeRange(t, new Date(beginsAt), new Date(endsAt)));
 
   const formatters = useMemo(() => getFormatters(i18n.language), [i18n.language]);
 
@@ -88,7 +88,7 @@ export function ReservationInfoCard({
     return null;
   }
 
-  const duration = differenceInMinutes(new Date(end), new Date(begin));
+  const duration = differenceInMinutes(new Date(endsAt), new Date(beginsAt));
   const lang = convertLanguageCode(i18n.language);
   const price: string | null = getPrice(t, reservation, lang, shouldDisplayReservationUnitPrice);
 
@@ -98,7 +98,7 @@ export function ReservationInfoCard({
 
   const shouldDisplayTaxPercentage: boolean =
     state === ReservationStateChoice.RequiresHandling
-      ? isReservationUnitPaid(reservationUnit.pricings, new Date(begin))
+      ? isReservationUnitPaid(reservationUnit.pricings, new Date(beginsAt))
       : Number(reservation?.price) > 0;
 
   const name = getTranslationSafe(reservationUnit, "name", lang);

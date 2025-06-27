@@ -28,8 +28,8 @@ export function ReservationCard({ reservation, type }: Readonly<PropsT>): JSX.El
   const reservationUnit = reservation.reservationUnits[0];
   const link = reservation.pk ? `/reservations/${reservation.pk}` : "";
 
-  const { begin, end } = reservation;
-  const timeString = capitalize(formatDateTimeRange(t, new Date(begin), new Date(end)));
+  const { beginsAt, endsAt } = reservation;
+  const timeString = capitalize(formatDateTimeRange(t, new Date(beginsAt), new Date(endsAt)));
 
   const lang = convertLanguageCode(i18n.language);
   const price = getPrice(t, reservation, lang);
@@ -132,8 +132,8 @@ export function ReservationCard({ reservation, type }: Readonly<PropsT>): JSX.El
 export const RESERVATION_CARD_FRAGMENT = gql`
   fragment ReservationCard on ReservationNode {
     pk
-    begin
-    end
+    beginsAt
+    endsAt
     state
     accessType
     reservationUnits {

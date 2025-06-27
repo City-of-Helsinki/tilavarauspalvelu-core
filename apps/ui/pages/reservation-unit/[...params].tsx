@@ -134,7 +134,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     if (reservationUnit == null) {
       return [];
     }
-    const isUnitFreeOfCharge = isReservationUnitFreeOfCharge(reservationUnit.pricings, new Date(reservation.begin));
+    const isUnitFreeOfCharge = isReservationUnitFreeOfCharge(reservationUnit.pricings, new Date(reservation.beginsAt));
 
     const stepLength = isUnitFreeOfCharge || requireHandling ? 2 : 5;
 

@@ -333,9 +333,9 @@ export const RESERVATION_PRICE_FRAGMENT = gql`
       ...PriceReservationUnitFields
     }
     price
-    begin
     state
-    end
+    beginsAt
+    endsAt
     applyingForFreeOfCharge
     appliedPricing {
       highestPrice
@@ -352,8 +352,8 @@ export function getPrice(
   reservationUnitPriceOnly = false
 ): string | null {
   const reservationUnit = reservation.reservationUnits.find(() => true);
-  const begin = new Date(reservation.begin);
-  const end = new Date(reservation.end);
+  const begin = new Date(reservation.beginsAt);
+  const end = new Date(reservation.endsAt);
   const minutes = differenceInMinutes(end, begin);
 
   const subventionState = getSubventionState(reservation);

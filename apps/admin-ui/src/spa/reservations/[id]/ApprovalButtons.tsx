@@ -80,7 +80,7 @@ function ApprovalButtons({ isFree, reservation, handleClose, handleAccept, disab
     );
   };
 
-  const endTime = new Date(reservation.end);
+  const endTime = new Date(reservation.endsAt);
 
   const btnCommon = {
     size: ButtonSize.Small,

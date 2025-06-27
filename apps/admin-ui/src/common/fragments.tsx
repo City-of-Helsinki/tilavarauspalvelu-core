@@ -72,8 +72,8 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
   fragment ReservationCommonFields on ReservationNode {
     id
     pk
-    begin
-    end
+    beginsAt
+    endsAt
     createdAt
     state
     type

@@ -37,7 +37,7 @@ export function ApprovalButtonsRecurring({
 
   // TODO don't need to do this anymore we can just pass the first reservation here
   // need to do get all data here otherwise totalCount is incorrect (filter here instead of in the query)
-  const reservationsPossibleToDeny = reservations.filter((x) => isPossibleToDeny(x.state, new Date(x.begin)));
+  const reservationsPossibleToDeny = reservations.filter((x) => isPossibleToDeny(x.state, new Date(x.beginsAt)));
 
   const handleDenyClick = () => {
     const reservation = reservationsPossibleToDeny.find(() => true);
