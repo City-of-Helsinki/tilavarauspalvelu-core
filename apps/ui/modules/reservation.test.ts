@@ -26,7 +26,7 @@ function createMockCancellationRule({
   canBeCancelledTimeBefore = 0,
 }: {
   canBeCancelledTimeBefore?: number;
-} = {}): CanUserCancelReservationFragment["reservationUnits"][0]["cancellationRule"] {
+} = {}): CanUserCancelReservationFragment["reservationUnit"]["cancellationRule"] {
   return {
     canBeCancelledTimeBefore,
     id: "fr8ejifod",
@@ -74,7 +74,7 @@ function createMockReservation({
   price?: string;
   state?: ReservationStateChoice;
   reservationUnit?: CanReservationBeChangedProps["reservationUnit"] &
-    CanUserCancelReservationFragment["reservationUnits"][0];
+    CanUserCancelReservationFragment["reservationUnit"];
   isHandled?: boolean | null;
   canBeCancelledTimeBefore?: number;
   reservationsMinDaysBefore?: number;
@@ -95,7 +95,7 @@ function createMockReservation({
     price: price ?? "0",
     beginsAt: start.toISOString(),
     endsAt: end.toISOString(),
-    reservationUnits: [resUnit],
+    reservationUnit: resUnit,
     isHandled,
   };
 }
@@ -113,15 +113,13 @@ function createMockCanUserCancelReservation({
     id: base64encode("ReservationNode:1"),
     state,
     beginsAt: beginsAt.toISOString(),
-    reservationUnits: [
-      {
-        id: base64encode("ReservationUnitNode:1"),
-        cancellationRule: {
-          id: base64encode("CancellationRuleNode:1"),
-          canBeCancelledTimeBefore,
-        },
+    reservationUnit: {
+      id: base64encode("ReservationUnitNode:1"),
+      cancellationRule: {
+        id: base64encode("CancellationRuleNode:1"),
+        canBeCancelledTimeBefore,
       },
-    ],
+    },
   };
 }
 
@@ -362,12 +360,10 @@ describe("isReservationEditable", () => {
       ...constructInput({
         beginsAt: addHours(new Date(), 24),
       }),
-      reservationUnits: [
-        {
-          ...baseUnit,
-          cancellationRule: null,
-        },
-      ],
+      reservationUnit: {
+        ...baseUnit,
+        cancellationRule: null,
+      },
     };
     expect(isReservationEditable(input)).toBe(false);
   });
