@@ -113,8 +113,8 @@ export function formatDateTime(t: TFunction, date: Date, includeWeekday = true):
 export function formatDateTimeStrings(
   t: TFunction,
   reservation: {
-    begin: string;
-    end: string;
+    beginsAt: string;
+    endsAt: string;
   },
   orig?: {
     beginTime: string;
@@ -122,8 +122,8 @@ export function formatDateTimeStrings(
   },
   trailingMinutes = false
 ): { date: Date; time: string; dayOfWeek: string; isModified: boolean } {
-  const start = new Date(reservation.begin);
-  const end = new Date(reservation.end);
+  const start = new Date(reservation.beginsAt);
+  const end = new Date(reservation.endsAt);
   const dayOfWeek = t(`weekDayLong.${start.getDay()}`);
 
   const originalBeginMins = orig != null ? timeToMinutes(orig.beginTime) : -1;

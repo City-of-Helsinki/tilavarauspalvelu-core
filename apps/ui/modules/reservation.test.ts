@@ -61,7 +61,7 @@ function createMockReservationUnit({
 }
 
 function createMockReservation({
-  begin,
+  beginsAt,
   price,
   state,
   reservationUnit,
@@ -70,7 +70,7 @@ function createMockReservation({
   reservationsMinDaysBefore,
   reservationEnds,
 }: {
-  begin?: Date;
+  beginsAt?: Date;
   price?: string;
   state?: ReservationStateChoice;
   reservationUnit?: CanReservationBeChangedProps["reservationUnit"] &
@@ -80,7 +80,7 @@ function createMockReservation({
   reservationsMinDaysBefore?: number;
   reservationEnds?: Date;
 }): CanReservationBeChangedProps["reservation"] {
-  const start = begin ?? addHours(startOfToday(), 34);
+  const start = beginsAt ?? addHours(startOfToday(), 34);
   const end = addHours(start, 1);
   const resUnit = reservationUnit ?? {
     ...createMockReservationUnit({
@@ -93,26 +93,26 @@ function createMockReservation({
     id: "123f4w90",
     state: state ?? ReservationStateChoice.Confirmed,
     price: price ?? "0",
-    begin: start.toISOString(),
-    end: end.toISOString(),
+    beginsAt: start.toISOString(),
+    endsAt: end.toISOString(),
     reservationUnits: [resUnit],
     isHandled,
   };
 }
 
 function createMockCanUserCancelReservation({
-  begin,
+  beginsAt,
   state = ReservationStateChoice.Confirmed,
   canBeCancelledTimeBefore = 0,
 }: {
-  begin: Date; // reservation begin time
+  beginsAt: Date; // reservation begin time
   state?: ReservationStateChoice; // reservation state
   canBeCancelledTimeBefore?: number; // in seconds
 }): CanUserCancelReservationFragment {
   return {
     id: base64encode("ReservationNode:1"),
     state,
-    begin: begin.toISOString(),
+    beginsAt: beginsAt.toISOString(),
     reservationUnits: [
       {
         id: base64encode("ReservationUnitNode:1"),
@@ -184,7 +184,7 @@ describe("isReservationCancellable", () => {
 
   test("NO for reservation that requires handling", () => {
     const input = constructInput({
-      begin: addDays(new Date(), 1),
+      beginsAt: addDays(new Date(), 1),
       state: ReservationStateChoice.RequiresHandling,
     });
     expect(isReservationCancellable(input)).toBe(false);
@@ -192,7 +192,7 @@ describe("isReservationCancellable", () => {
 
   test("NO for reservation that is cancelled", () => {
     const input = constructInput({
-      begin: addDays(new Date(), 1),
+      beginsAt: addDays(new Date(), 1),
       state: ReservationStateChoice.Cancelled,
     });
     expect(isReservationCancellable(input)).toBe(false);
@@ -200,7 +200,7 @@ describe("isReservationCancellable", () => {
 
   test("YES for reservation that is confirmed", () => {
     const input = constructInput({
-      begin: addDays(new Date(), 1),
+      beginsAt: addDays(new Date(), 1),
       state: ReservationStateChoice.Confirmed,
     });
     expect(isReservationCancellable(input)).toBe(true);
@@ -208,7 +208,7 @@ describe("isReservationCancellable", () => {
 
   test("NO for reservation that is waiting for payment", () => {
     const input = constructInput({
-      begin: addDays(new Date(), 1),
+      beginsAt: addDays(new Date(), 1),
       state: ReservationStateChoice.WaitingForPayment,
     });
     expect(isReservationCancellable(input)).toBe(false);
@@ -216,21 +216,21 @@ describe("isReservationCancellable", () => {
 
   test("YES for reservation that does not need handling", () => {
     const input = constructInput({
-      begin: addDays(new Date(), 1),
+      beginsAt: addDays(new Date(), 1),
     });
     expect(isReservationCancellable(input)).toBe(true);
   });
 
   test("YES for a reservation that can be cancelled till it's start", () => {
     const input = constructInput({
-      begin: addMinutes(new Date(), 10),
+      beginsAt: addMinutes(new Date(), 10),
     });
     expect(isReservationCancellable(input)).toBe(true);
   });
 
   test("YES for a reservation in the future with 24h cancel buffer", () => {
     const input = constructInput({
-      begin: addDays(new Date(), 2),
+      beginsAt: addDays(new Date(), 2),
       canBeCancelledTimeBefore: 24 * 60 * 60, // 24 hours
     });
     expect(isReservationCancellable(input)).toBe(true);
@@ -238,14 +238,14 @@ describe("isReservationCancellable", () => {
 
   test("NO for a reservation that is in the past", () => {
     const input = constructInput({
-      begin: addDays(new Date(), -1),
+      beginsAt: addDays(new Date(), -1),
     });
     expect(isReservationCancellable(input)).toBe(false);
   });
 
   test("NO for a reservation that is too close to the start time", () => {
     const input = constructInput({
-      begin: addMinutes(new Date(), 10),
+      beginsAt: addMinutes(new Date(), 10),
       canBeCancelledTimeBefore: 30 * 60,
     });
     expect(isReservationCancellable(input)).toBe(false);
@@ -309,18 +309,18 @@ describe("getNormalizedReservationOrderStatus", () => {
 describe("isReservationEditable", () => {
   function constructInput({
     state = ReservationStateChoice.Confirmed,
-    begin,
+    beginsAt,
     isHandled = false,
     cancellationBuffer = 0,
   }: {
     state?: ReservationStateChoice;
-    begin: Date;
+    beginsAt: Date;
     isHandled?: boolean;
     cancellationBuffer?: number;
   }) {
     return createMockReservation({
       state,
-      begin,
+      beginsAt,
       isHandled,
       canBeCancelledTimeBefore: cancellationBuffer,
     });
@@ -328,7 +328,7 @@ describe("isReservationEditable", () => {
 
   test("YES for confirmed reservation in the future", () => {
     const input = constructInput({
-      begin: addHours(new Date(), 24),
+      beginsAt: addHours(new Date(), 24),
     });
     expect(isReservationEditable(input)).toBe(true);
   });
@@ -336,21 +336,21 @@ describe("isReservationEditable", () => {
   test("NO for non-confirmed reservation", () => {
     const input = constructInput({
       state: ReservationStateChoice.Created,
-      begin: addHours(new Date(), 24),
+      beginsAt: addHours(new Date(), 24),
     });
     expect(isReservationEditable(input)).toBe(false);
   });
 
   test("NO for past reservation", () => {
     const input = constructInput({
-      begin: addHours(new Date(), -1),
+      beginsAt: addHours(new Date(), -1),
     });
     expect(isReservationEditable(input)).toBe(false);
   });
 
   test("NO for handled reservation", () => {
     const input: CanReservationBeChangedFragment = constructInput({
-      begin: addHours(new Date(), 24),
+      beginsAt: addHours(new Date(), 24),
       isHandled: true,
     });
     expect(isReservationEditable(input)).toBe(false);
@@ -360,7 +360,7 @@ describe("isReservationEditable", () => {
     const baseUnit = createMockReservationUnit({});
     const input: CanReservationBeChangedFragment = {
       ...constructInput({
-        begin: addHours(new Date(), 24),
+        beginsAt: addHours(new Date(), 24),
       }),
       reservationUnits: [
         {
@@ -374,7 +374,7 @@ describe("isReservationEditable", () => {
 
   test("YES if outside cancellation buffer", () => {
     const input = constructInput({
-      begin: addHours(new Date(), 24),
+      beginsAt: addHours(new Date(), 24),
       cancellationBuffer: 60 * 60,
     });
     expect(isReservationEditable(input)).toBe(true);
@@ -382,7 +382,7 @@ describe("isReservationEditable", () => {
 
   test("NO if inside cancellation buffer", () => {
     const input = constructInput({
-      begin: addHours(new Date(), 24),
+      beginsAt: addHours(new Date(), 24),
       cancellationBuffer: 24 * 60 * 60 + 1,
     });
     expect(isReservationEditable(input)).toBe(false);

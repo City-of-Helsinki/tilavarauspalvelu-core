@@ -54,8 +54,8 @@ export function generateAgeGroupFragment(props: { id: number; min: number; max: 
 export type MockReservationProps = {
   pk?: number;
   state?: ReservationStateChoice;
-  begin?: string;
-  end?: string;
+  beginsAt?: string;
+  endsAt?: string;
   isHandled?: boolean;
   type?: ReservationTypeChoice;
   price?: string;
@@ -103,14 +103,14 @@ export function createMockReservation(
 ): Readonly<NonNullable<ReservationPageQuery["reservation"]>> {
   const {
     applyingForFreeOfCharge = false,
-    begin = new Date(2024, 0, 1, 10, 0, 0, 0).toISOString(),
+    beginsAt = new Date(2024, 0, 1, 10, 0, 0, 0).toISOString(),
     canApplyFreeOfCharge = true,
     cancellable = false,
     cancellationTerms = {
       id: base64encode(`CancellationTermsNode:1`),
       ...generateTextFragment("Test cancellation terms"),
     },
-    end = new Date(2024, 0, 1, 12, 0, 0, 0).toISOString(),
+    endsAt = new Date(2024, 0, 1, 12, 0, 0, 0).toISOString(),
     isHandled = true,
     paymentOrder = {
       id: "1",
@@ -154,7 +154,7 @@ export function createMockReservation(
       ...generateAgeGroupFragment({ id: 1, min: 0, max: 100 }),
     },
     applyingForFreeOfCharge: applyingForFreeOfCharge,
-    begin: begin,
+    beginsAt: beginsAt,
     billingAddressCity: "Helsinki",
     billingAddressStreet: "Laskutuskuja 2",
     billingAddressZip: "00200",
@@ -164,7 +164,7 @@ export function createMockReservation(
     billingPhone: "0501234567",
     calendarUrl: "https:type: ReservationTypeChoice.Normal,//example.com/calendar.ics",
     description: "Test reservation description",
-    end: end,
+    endsAt: endsAt,
     freeOfChargeReason: "Test free of charge reason",
     homeCity: {
       id: base64encode("HomeCityNode:1"),
@@ -309,8 +309,8 @@ export function createTermsOfUseMock(empty: boolean = false) {
 }
 
 export const future1hReservation = () => ({
-  begin: new Date(2024, 0, 7, 9, 0, 0).toISOString(),
-  end: new Date(2024, 0, 7, 10, 0, 0).toISOString(),
+  beginsAt: new Date(2024, 0, 7, 9, 0, 0).toISOString(),
+  endsAt: new Date(2024, 0, 7, 10, 0, 0).toISOString(),
 });
 
 export const reservationRenderProps = (
@@ -435,8 +435,8 @@ export function createReservationPageMock({
   return createMockReservation({
     pk,
     state: state,
-    begin: begin,
-    end: end,
+    beginsAt: begin,
+    endsAt: end,
     isHandled: isHandled,
     type: type,
     price: price,
