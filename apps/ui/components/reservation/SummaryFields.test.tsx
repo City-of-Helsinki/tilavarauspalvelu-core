@@ -101,13 +101,13 @@ describe("Component: Reservee Details", () => {
     );
   });
 
-  describe("Type: Business", () => {
+  describe("Type: Company", () => {
     it.for(getFilteredSupportedFields(ReserveeType.Company))(
       "should render the $fieldName label and the correct value from the reservation",
       ({ fieldName }) => {
         renderApplicationFields(ReserveeType.Company);
         expect(screen.getByTestId(`reservation__${fieldName}`)).toBeInTheDocument();
-        expect(screen.getByText(`reservationApplication:label.business.${fieldName}`)).toBeInTheDocument();
+        expect(screen.getByText(`reservationApplication:label.company.${fieldName}`)).toBeInTheDocument();
       }
     );
   });

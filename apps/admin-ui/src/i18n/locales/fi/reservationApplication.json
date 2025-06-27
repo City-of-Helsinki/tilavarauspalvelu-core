@@ -25,7 +25,7 @@
   "reserveeTypes": {
     "labels": {
       "nonprofit": "järjestön, ryhmän tai yhteisön puolesta",
-      "business": "yrityksen puolesta",
+      "company": "yrityksen puolesta",
       "individual": "yksityishenkilönä"
     }
   },
@@ -87,7 +87,7 @@
       "billingAddressZip": "Postinumero",
       "billingAddressCity": "Postitoimipaikka"
     },
-    "business": {
+    "company": {
       "reserveeFirstName": "Yhteyshenkilön etunimi",
       "reserveeLastName": "Yhteyshenkilön sukunimi",
       "reserveeAddressStreet": "Katuosoite",

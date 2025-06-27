@@ -70,10 +70,10 @@ export const reservationApplicationFields = {
     "reservee_organisation_name",
     "municipality",
     "reservee_is_unregistered_association",
-    "reservee_id",
+    "reservee_identifier",
     ...fieldsCommon,
   ],
-  business: ["reservee_organisation_name", "municipality", "reservee_id", ...fieldsCommon],
+  company: ["reservee_organisation_name", "municipality", "reservee_identifier", ...fieldsCommon],
   common: [
     "reservee_type",
     "name",

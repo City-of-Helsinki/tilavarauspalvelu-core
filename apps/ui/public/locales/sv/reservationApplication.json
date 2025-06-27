@@ -7,7 +7,7 @@
   "reserveeTypes": {
     "labels": {
       "nonprofit": "för en organisation, grupp eller samfund",
-      "business": "för ett företag",
+      "company": "för ett företag",
       "individual": "som privatkund"
     }
   },
@@ -62,7 +62,7 @@
       "billingAddressZip": "Postnummer",
       "billingAddressCity": "Postanstalt"
     },
-    "business": {
+    "company": {
       "reserveeFirstName": "Kontaktpersonens förnamn",
       "reserveeLastName": "Kontaktpersonens efternamn",
       "reserveeAddressStreet": "Gatuadress",
