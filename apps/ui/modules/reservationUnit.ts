@@ -1,6 +1,7 @@
 import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "common";
 import { trim, uniq } from "lodash-es";
 import {
+  addDays,
   addMinutes,
   differenceInMinutes,
   getHours,
@@ -9,37 +10,36 @@ import {
   isBefore,
   isSameDay,
   set,
-  sub,
-  addDays,
   startOfDay,
+  sub,
 } from "date-fns";
 import { i18n } from "next-i18next";
 import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";
 import {
   type AvailableTimesReservationUnitFieldsFragment,
-  ReservationUnitPublishingState,
-  type ReservationUnitNode,
-  PriceUnit,
-  type EquipmentFieldsFragment,
-  type UnitNode,
-  ReservationUnitReservationState,
-  ReservationKind,
-  type IsReservableFieldsFragment,
-  ReservationStartInterval,
-  type ReservationUnitAccessTypeNode,
   type BlockingReservationFieldsFragment,
-  ReservationStateChoice,
+  type EquipmentFieldsFragment,
+  type IsReservableFieldsFragment,
   type NotReservableFieldsFragment,
-  type PricingFieldsFragment,
-  type ReservationPriceFieldsFragment,
   type PriceReservationUnitFieldsFragment,
+  PriceUnit,
+  type PricingFieldsFragment,
+  ReservationKind,
+  type ReservationPriceFieldsFragment,
+  ReservationStartInterval,
+  ReservationStateChoice,
+  type ReservationUnitAccessTypeNode,
+  type ReservationUnitNode,
+  ReservationUnitPublishingState,
+  ReservationUnitReservationState,
+  type UnitNode,
 } from "@gql/gql-types";
 import {
-  type ReservableMap,
-  type RoundPeriod,
-  isSlotWithinReservationTime,
   dateToKey,
   isRangeReservable,
+  isSlotWithinReservationTime,
+  type ReservableMap,
+  type RoundPeriod,
 } from "@/modules/reservable";
 import { gql } from "@apollo/client";
 import { getIntervalMinutes } from "common/src/conversion";
@@ -47,10 +47,10 @@ import {
   capitalize,
   dayMax,
   dayMin,
-  timeToMinutes,
   filterNonNullable,
   isPriceFree,
   type ReadonlyDeep,
+  timeToMinutes,
 } from "common/src/helpers";
 import { type LocalizationLanguages } from "common/src/urlBuilder";
 import { type TFunction } from "i18next";
@@ -58,6 +58,7 @@ import { type TFunction } from "i18next";
 function formatTimeObject(time: { h: number; m: number }): string {
   return `${time.h.toString().padStart(2, "0")}:${time.m.toString().padStart(2, "0")}`;
 }
+
 function formatTime(date: Date): string {
   if (Number.isNaN(date.getTime())) {
     return "";
@@ -169,6 +170,7 @@ export function getUnitName(
 function isActivePricing(pricing: PricingFieldsFragment): boolean {
   return new Date(pricing.begins) <= new Date();
 }
+
 function isFuturePricing(pricing: PricingFieldsFragment): boolean {
   return new Date(pricing.begins) > new Date();
 }
@@ -329,7 +331,7 @@ export function getReservationUnitPrice(props: GetReservationUnitPriceProps): st
 export const RESERVATION_PRICE_FRAGMENT = gql`
   fragment ReservationPriceFields on ReservationNode {
     id
-    reservationUnits {
+    reservationUnit {
       ...PriceReservationUnitFields
     }
     price
@@ -351,7 +353,7 @@ export function getPrice(
   lang: LocalizationLanguages,
   reservationUnitPriceOnly = false
 ): string | null {
-  const reservationUnit = reservation.reservationUnits.find(() => true);
+  const reservationUnit = reservation.reservationUnit;
   const begin = new Date(reservation.beginsAt);
   const end = new Date(reservation.endsAt);
   const minutes = differenceInMinutes(end, begin);

@@ -15,33 +15,31 @@ export function TermsInfoSection({
   reservation,
   termsOfUse,
 }: Readonly<{
-  reservation: Pick<NodeT, "reservationUnits" | "beginsAt" | "applyingForFreeOfCharge">;
+  reservation: Pick<NodeT, "reservationUnit" | "beginsAt" | "applyingForFreeOfCharge">;
   termsOfUse: PropsNarrowed["termsOfUse"];
 }>) {
   const { t, i18n } = useTranslation();
-  const reservationUnit = reservation.reservationUnits.find(() => true);
+  const reservationUnit = reservation.reservationUnit;
 
   const shouldDisplayPricingTerms: boolean = useMemo(() => {
     if (!reservationUnit) {
       return false;
     }
-
     const isFreeOfCharge = isReservationUnitFreeOfCharge(reservationUnit.pricings, new Date(reservation.beginsAt));
-
     return reservation.applyingForFreeOfCharge || (reservationUnit.canApplyFreeOfCharge && !isFreeOfCharge);
   }, [reservation, reservationUnit]);
 
   const lang = convertLanguageCode(i18n.language);
   const paymentTermsContent =
-    reservationUnit?.paymentTerms != null ? getTranslationSafe(reservationUnit.paymentTerms, "text", lang) : undefined;
+    reservationUnit.paymentTerms != null ? getTranslationSafe(reservationUnit.paymentTerms, "text", lang) : undefined;
   const cancellationTermsContent =
-    reservationUnit?.cancellationTerms != null
+    reservationUnit.cancellationTerms != null
       ? getTranslationSafe(reservationUnit.cancellationTerms, "text", lang)
       : undefined;
   const pricingTermsContent =
-    reservationUnit?.pricingTerms != null ? getTranslationSafe(reservationUnit?.pricingTerms, "text", lang) : undefined;
+    reservationUnit.pricingTerms != null ? getTranslationSafe(reservationUnit.pricingTerms, "text", lang) : undefined;
   const serviceSpecificTermsContent =
-    reservationUnit?.serviceSpecificTerms != null
+    reservationUnit.serviceSpecificTerms != null
       ? getTranslationSafe(reservationUnit.serviceSpecificTerms, "text", lang)
       : undefined;
 

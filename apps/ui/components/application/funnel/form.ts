@@ -1,17 +1,17 @@
 import { startOfDay } from "date-fns";
 import { filterNonNullable, type ReadonlyDeep, timeToMinutes } from "common/src/helpers";
 import {
-  ApplicantTypeChoice,
-  type ApplicationUpdateMutationInput,
-  Weekday,
-  Priority,
-  type UpdateApplicationSectionForApplicationSerializerInput,
   type ApplicantFieldsFragment,
-  type ApplicationPage2Query,
+  ApplicantTypeChoice,
   type ApplicationFormFragment,
+  type ApplicationPage2Query,
+  type ApplicationUpdateMutationInput,
   type Maybe,
-  type SuitableTimeRangeSerializerInput,
   MunicipalityChoice,
+  Priority,
+  type SuitableTimeRangeSerializerInput,
+  type UpdateApplicationSectionForApplicationSerializerInput,
+  Weekday,
 } from "@gql/gql-types";
 import { z } from "zod";
 import { toApiDate, toUIDate } from "common/src/common/util";
@@ -171,6 +171,7 @@ function convertApplicationSectionPage2(section: ReadonlyDeep<SectionTypePage2>)
     priority: "primary",
   };
 }
+
 export const ApplicationPage2Schema = z.object({
   pk: z.number(),
   applicationSections: z.array(ApplicationSectionPage2Schema),
@@ -181,7 +182,7 @@ export type ApplicationPage2FormValues = z.infer<typeof ApplicationPage2Schema>;
 function convertApplicationSectionPage1(section: SectionType): ApplicationSectionPage1FormValues {
   const reservationUnits = filterNonNullable(
     section.reservationUnitOptions?.map(({ reservationUnit, preferredOrder }) => ({
-      pk: reservationUnit?.pk,
+      pk: reservationUnit.pk,
       preferredOrder,
     }))
   )
@@ -452,6 +453,7 @@ export function transformApplicationPage2(values: ApplicationPage2FormValues): A
     applicationSections: appEvents.map((ae) => transformApplicationSectionPage2(ae)),
   };
 }
+
 // For page 1
 export function transformApplicationPage1(values: ApplicationPage1FormValues): ApplicationUpdateMutationInput {
   const { pk, applicantType } = values;
@@ -471,6 +473,7 @@ export function convertApplicationPage2(
     applicationSections: app.applicationSections?.map(convertApplicationSectionPage2) ?? [],
   };
 }
+
 export function convertApplicationPage1(
   app: ReadonlyDeep<ApplicationFormFragment>,
   // We pass reservationUnits here so we have a default selection for a new application section
@@ -484,6 +487,7 @@ export function convertApplicationPage1(
     applicationSections: formAes.length > 0 ? formAes : [defaultAes],
   };
 }
+
 export function createDefaultPage1Section(
   reservationUnits: number[]
 ): NonNullable<ApplicationPage1FormValues["applicationSections"]>[0] {

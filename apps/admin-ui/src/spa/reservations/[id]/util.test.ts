@@ -45,6 +45,7 @@ function constructFreePricing(): PricingFieldsFragment {
     begin: new Date("2021-01-01"),
   });
 }
+
 function constructPaidPricing(): PricingFieldsFragment {
   return constructPricing({
     lowestPrice: 120,
@@ -76,20 +77,18 @@ function constructReservation({
           weekdays: [0, 1, 3],
         }
       : null,
-    reservationUnits: [
-      {
-        id: base64encode("ReservationUnitNode:1"),
-        nameFi: "Reservation unit 1",
-        unit: {
-          id: base64encode("UnitNode:1"),
-          nameFi: "Unit 1",
-        },
+    reservationUnit: {
+      id: base64encode("ReservationUnitNode:1"),
+      nameFi: "Reservation unit 1",
+      unit: {
+        id: base64encode("UnitNode:1"),
+        nameFi: "Unit 1",
       },
-    ],
+    },
   };
 }
 
-describe("getReservatinUnitPricing", () => {
+describe("getReservationUnitPricing", () => {
   test("returns correct pricing based on reservation date", () => {
     const input: ReservationUnitPricingFieldsFragment = {
       id: "1",

@@ -122,7 +122,7 @@ export const RESERVATION_CANCEL_PAGE_QUERY = gql`
       id
       ...ReservationInfoCard
       name
-      reservationUnits {
+      reservationUnit {
         id
         ...CancellationRuleFields
         cancellationTerms {

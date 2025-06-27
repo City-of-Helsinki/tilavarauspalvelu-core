@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { Button, IconArrowRight, ImageWithCard } from "hds-react";
-import { Flex, H3, fontMedium } from "common/styled";
+import { Flex, fontMedium, H3 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { seasonalPrefix } from "@/modules/urls";
 
@@ -71,7 +71,7 @@ const InfoContainer = styled(Flex).attrs({
   }
 
   a {
-    ${fontMedium}
+    ${fontMedium};
     text-decoration: underline;
   }
 `;

@@ -2,7 +2,7 @@ import React, { type CSSProperties, useCallback, useEffect, useRef, useState } f
 import { addMinutes, differenceInMinutes, isToday, setHours, startOfDay } from "date-fns";
 import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
-import { ReservationTypeChoice, UserPermissionChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
+import { ReservationTypeChoice, type ReservationUnitReservationsFragment, UserPermissionChoice } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { CalendarEvent } from "common/src/calendar/Calendar";
@@ -201,8 +201,9 @@ const CellStyled = styled.div<{ $isPast?: boolean }>`
   width: 100%;
   border-left: ${CELL_BORDER};
   border-top: ${CELL_BORDER};
+
   &:focus {
-    ${focusStyles}
+    ${focusStyles};
     z-index: var(--tilavaraus-admin-stack-calendar-pick-time-focus);
   }
 `;
@@ -342,7 +343,7 @@ function getEventTitle({ reservation: { title, event }, t }: { reservation: Cale
     return t("MyUnits.Calendar.legend.closed");
   }
 
-  return event && event?.pk !== event?.reservationUnits?.[0]?.pk ? getReserveeName(event, t) : title;
+  return event && event?.pk !== event?.reservationUnit?.pk ? getReserveeName(event, t) : title;
 }
 
 const EventTriggerButton = () => (
@@ -488,6 +489,7 @@ export function UnitCalendar({
     function updateSize() {
       setWindowHeight(window.innerHeight);
     }
+
     window.addEventListener("resize", updateSize);
     return () => window.removeEventListener("resize", updateSize);
   }, []);

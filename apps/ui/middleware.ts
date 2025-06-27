@@ -1,4 +1,5 @@
 // NOTE middleware can't import lodash or any other library that has
+import type { NextRequest } from "next/server";
 // Dynamic Code Evaluation
 // This is because Vercel doesn't support NodeJs as a runtime environment
 // and edge doesn't allow Dynamic Code Evaluation
@@ -6,11 +7,10 @@
 // Workaround as long as the function isn't needed is to split imports in such a way
 // that libraries are not imported in the middleware.
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 import { env } from "@/env.mjs";
-import { getSignInUrl, buildGraphQLUrl, type LocalizationLanguages } from "common/src/urlBuilder";
+import { buildGraphQLUrl, getSignInUrl, type LocalizationLanguages } from "common/src/urlBuilder";
 import { base64encode, getLocalizationLang } from "common/src/helpers";
-import { ReservationStateChoice, ReservationTypeChoice } from "./gql/gql-types";
+import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
 import { getReservationInProgressPath } from "./modules/urls";
 
 const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
@@ -88,7 +88,7 @@ const RESERVATION_QUERY = `
     id
     type
     state
-    reservationUnits {
+    reservationUnit {
       id
       pk
     }
@@ -189,32 +189,27 @@ ${applicationId ? "$applicationId: ID!" : ""}
 function parseReservationGQLquery(data: unknown): Data["reservation"] | null {
   if (data != null && typeof data === "object" && "reservation" in data) {
     const { reservation } = data;
+
     if (reservation != null && typeof reservation === "object") {
-      let state: ReservationStateChoice | null = null;
       let type: ReservationTypeChoice | null = null;
-      let resUnitPk: number | null = null;
       if ("type" in reservation && reservation.type != null && typeof reservation.type === "string") {
         type = reservation.type as ReservationTypeChoice;
       }
 
+      let state: ReservationStateChoice | null = null;
       if ("state" in reservation && reservation.state != null && typeof reservation.state === "string") {
         state = reservation.state as ReservationStateChoice;
       }
 
+      let resUnitPk: number | null = null;
       if (
-        "reservationUnits" in reservation &&
-        reservation.reservationUnits != null &&
-        Array.isArray(reservation.reservationUnits)
+        "reservationUnit" in reservation &&
+        reservation.reservationUnit != null &&
+        typeof reservation.reservationUnit === "object" &&
+        "pk" in reservation.reservationUnit &&
+        typeof reservation.reservationUnit.pk === "number"
       ) {
-        const resUnitPks: Array<number | null> = reservation.reservationUnits
-          .map((unit) => {
-            if (unit != null && typeof unit === "object" && "pk" in unit) {
-              return typeof unit.pk === "number" ? unit.pk : null;
-            }
-            return null;
-          })
-          .filter((pk): pk is number => pk != null);
-        resUnitPk = resUnitPks.find(() => true) ?? null;
+        resUnitPk = reservation.reservationUnit.pk;
       }
       return { state, type, resUnitPk };
     }
@@ -432,6 +427,7 @@ const APPLICATION_ROUTES = [
   "application", //:path*',
 ];
 const AUTHENTICATED_ROUTES = [...RESERVATION_ROUTES, ...APPLICATION_ROUTES, "success"];
+
 // url matcher that is very specific to our case
 function doesUrlMatch(url: string, route: string) {
   const ref: string[] = url.split("/");

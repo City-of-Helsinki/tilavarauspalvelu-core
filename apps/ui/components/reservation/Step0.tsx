@@ -28,8 +28,6 @@ type Props = {
 
 export function Step0({ reservation, cancelReservation, options }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
-  const reservationUnit = reservation?.reservationUnits?.find(() => true);
-
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useFormContext<Inputs>();
@@ -38,7 +36,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
     formState: { isSubmitting, isValid },
   } = form;
 
-  const supportedFields = filterNonNullable(reservationUnit?.metadataSet?.supportedFields);
+  const supportedFields = filterNonNullable(reservation.reservationUnit.metadataSet?.supportedFields);
   const reserveeType = watch("reserveeType");
   const municipality = watch("municipality");
   const includesHomeCity = containsField(supportedFields, "municipality");
@@ -56,17 +54,14 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
   const submitDisabled = !isValid || !isReserveeTypeValid || !isHomeCityValid;
 
   const lang = convertLanguageCode(i18n.language);
-  const pricingTerms = reservationUnit?.pricingTerms
-    ? getTranslationSafe(reservationUnit.pricingTerms, "text", lang)
+  const pricingTerms = reservation.reservationUnit.pricingTerms
+    ? getTranslationSafe(reservation.reservationUnit.pricingTerms, "text", lang)
     : "";
 
-  if (reservationUnit == null) {
-    return <Notification type="error">{t("common:errors.dataError")}</Notification>;
-  }
   return (
     <>
       <MetaFields
-        reservationUnit={reservationUnit}
+        reservationUnit={reservation.reservationUnit}
         options={options}
         generalFields={generalFields}
         reservationApplicationFields={reservationApplicationFields}

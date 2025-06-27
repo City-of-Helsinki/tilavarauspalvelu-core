@@ -73,7 +73,7 @@ const eventStyleGetter =
     style: React.CSSProperties;
     className?: string;
   } => {
-    const isCurrentReservationUnit = !!event?.reservationUnits?.find((ru) => ru?.pk === currentReservationUnitPk);
+    const isCurrentReservationUnit = event?.reservationUnit?.pk === currentReservationUnitPk;
 
     const isConfirmed = event?.state === ReservationStateChoice.Confirmed;
     const isWaitingForPayment = event?.state === ReservationStateChoice.WaitingForPayment;

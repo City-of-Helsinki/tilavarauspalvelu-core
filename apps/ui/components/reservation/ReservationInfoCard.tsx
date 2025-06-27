@@ -67,7 +67,7 @@ export function ReservationInfoCard({
   style,
 }: Readonly<Props>): JSX.Element | null {
   const { t, i18n } = useTranslation();
-  const reservationUnit = reservation.reservationUnits?.[0];
+  const reservationUnit = reservation.reservationUnit;
   const { data: accessCodeData } = useAccessCodeQuery({
     skip: !reservation || reservation.accessType !== AccessType.AccessCode,
     variables: {
@@ -163,7 +163,7 @@ export const RESERVATION_INFO_CARD_FRAGMENT = gql`
     pindoraInfo {
       accessCode
     }
-    reservationUnits {
+    reservationUnit {
       id
       pk
       nameFi
