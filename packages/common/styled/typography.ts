@@ -44,7 +44,7 @@ export const H1 = styled.h1<{
   $marginBottom?: SpacingSize;
 }>`
   font-size: ${({ $large }) => (!$large ? "var(--fontsize-heading-l)" : " var(--fontsize-heading-xl-mobile)")};
-  ${fontRegular}
+  ${fontRegular};
   line-height: var(--lineheight-s);
   margin: ${({ $noMargin, $marginTop, $marginBottom }) =>
     $noMargin ? "0" : `var(--spacing-${$marginTop ?? "s"}) 0 var(--spacing-${$marginBottom ?? "m"})`};
@@ -62,7 +62,7 @@ export const H2 = styled.h2<{
   $marginBottom?: SpacingSize;
 }>`
   font-size: var(--fontsize-heading-m);
-  ${fontRegular}
+  ${fontRegular};
   line-height: var(--lineheight-s);
   margin-bottom: ${({ $noMargin, $marginBottom }) => ($noMargin ? `0` : `var(--spacing-${$marginBottom ?? "m"})`)};
   margin-top: ${({ $noMargin, $marginTop }) => ($noMargin ? `0` : `var(--spacing-${$marginTop ?? "s"})`)};
@@ -75,7 +75,7 @@ export const H2 = styled.h2<{
 
 export const H3 = styled.h3<{ $noMargin?: boolean }>`
   font-size: var(--fontsize-heading-s);
-  ${fontRegular}
+  ${fontRegular};
   line-height: 2rem;
   margin-bottom: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-m)`)};
   margin-top: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-s)`)};
@@ -91,7 +91,7 @@ export const H4 = styled.h4<{
   $marginBottom?: SpacingSize;
 }>`
   font-size: var(--fontsize-heading-s);
-  ${fontMedium}
+  ${fontMedium};
   line-height: var(--lineheight-m);
   margin-bottom: ${({ $noMargin, $marginBottom }) => ($noMargin ? `0` : `var(--spacing-${$marginBottom ?? "s"})`)};
   margin-top: ${({ $noMargin, $marginTop }) => ($noMargin ? `0` : `var(--spacing-${$marginTop ?? "s"})`)};
@@ -107,7 +107,7 @@ export const H5 = styled.h5<{
   $marginBottom?: SpacingSize;
 }>`
   font-size: var(--fontsize-heading-xs);
-  ${fontBold}
+  ${fontBold};
   line-height: 1.625;
   margin-bottom: ${({ $noMargin, $marginBottom }) => ($noMargin ? `0` : `var(--spacing-${$marginBottom ?? "s"})`)};
   margin-top: ${({ $noMargin, $marginTop }) => ($noMargin ? `0` : `var(--spacing-${$marginTop ?? "s"})`)};
@@ -123,7 +123,7 @@ export const H6 = styled.h6<{
   $marginBottom?: SpacingSize;
 }>`
   font-size: var(--fontsize-heading-xs);
-  ${fontBold}
+  ${fontBold};
   line-height: 1.4;
   margin-bottom: ${({ $marginBottom }) => `var(--spacing-${$marginBottom ?? "m"})`};
   margin-top: ${({ $marginTop }) => `var(--spacing-${$marginTop ?? "s"})`};

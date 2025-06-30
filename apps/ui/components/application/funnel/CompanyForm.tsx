@@ -24,7 +24,7 @@ export function CompanyForm(): JSX.Element {
       <ApplicationFormTextInput name="organisationCity" />
       <ControlledCheckbox
         control={control}
-        label={t("application:Page3.organisation.separateInvoicingAddress")}
+        label={t("application:Page3.organisationSeparateInvoicingAddress")}
         id="organisation.hasInvoicingAddress"
         name="hasBillingAddress"
       />

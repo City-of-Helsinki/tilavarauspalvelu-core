@@ -1,0 +1,24 @@
+{
+  "municipalities": {
+    "HELSINKI": "Helsinki",
+    "OTHER": "Muu"
+  },
+  "weekdayShortEnum": {
+    "MONDAY": "Ma",
+    "TUESDAY": "Ti",
+    "WEDNESDAY": "Ke",
+    "THURSDAY": "To",
+    "FRIDAY": "Pe",
+    "SATURDAY": "La",
+    "SUNDAY": "Su"
+  },
+  "weekdayLongEnum": {
+    "FRIDAY": "Perjantai",
+    "MONDAY": "Maanantai",
+    "SATURDAY": "Lauantai",
+    "SUNDAY": "Sunnuntai",
+    "THURSDAY": "Torstai",
+    "TUESDAY": "Tiistai",
+    "WEDNESDAY": "Keskiviikko"
+  }
+}

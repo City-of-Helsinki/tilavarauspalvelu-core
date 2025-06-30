@@ -424,10 +424,10 @@ function ApplicationSectionDetails({
             <RejectAllOptionsButton
               section={section}
               refetch={refetch}
-              applicationStatus={application?.status ?? ApplicationStatusChoice.Draft}
+              applicationStatus={application.status ?? ApplicationStatusChoice.Draft}
             />
           </Flex>
-          <ReservationUnitOptionsSection section={section} refetch={refetch} applicationStatus={application?.status} />
+          <ReservationUnitOptionsSection section={section} refetch={refetch} applicationStatus={application.status} />
           <H4 as="h3">{t("ApplicationEvent.requestedTimes")}</H4>
           <TimeSection>
             <TimeSelector applicationSection={section} />
@@ -488,12 +488,12 @@ function RejectApplicationButton({
     }
   };
 
-  if (application?.applicationSections == null) {
+  if (application.applicationSections == null) {
     // eslint-disable-next-line no-console
     console.warn("application.applicationSections is null", application);
   }
 
-  if (application?.pk == null) {
+  if (application.pk == null) {
     // eslint-disable-next-line no-console
     console.warn("application.pk is null", application);
     return null;
@@ -586,7 +586,7 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
     return <Error404 />;
   }
 
-  const isOrganisation = !!application?.organisationName;
+  const isOrganisation = !!application.organisationName;
 
   const hasBillingAddress =
     !!application.billingStreetAddress &&
@@ -594,8 +594,11 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
     application.billingPostCode === application.organisationPostCode &&
     application.billingCity === application.organisationCity;
 
-  const municipality = application?.municipality
-    ? t(`application.municipality.${application.municipality.toUpperCase()}`)
+  const applicantType = t(
+    `Application.applicantTypes.${application.applicantType}${application.applicantType === ReserveeType.Nonprofit && application.organisationIdentifier ? "_REGISTERED" : ""}`
+  );
+  const municipality = application.municipality
+    ? t(`common:municipalities.${application.municipality.toUpperCase()}`)
     : "-";
   const customerName = getApplicantName(application);
 
@@ -623,17 +626,15 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
         <div>
           <RejectApplicationButton application={application} refetch={refetch} />
         </div>
+
         <Summary>
-          <KV
-            k={t("Application.applicantType")}
-            v={t(`Application.applicantTypes.${application.applicantType}`)}
-            dataId="application-details__data--applicant-type"
-          />
+          <KV k={t("Application.applicantType")} v={applicantType} dataId="application-details__data--applicant-type" />
           <KV k={t("common.municipality")} v={municipality} />
           {isOrganisation && <KV k={t("Application.coreActivity")} v={application.organisationCoreBusiness || "-"} />}
           <KV k={t("Application.numHours")} v="-" />
           <KV k={t("Application.numTurns")} v="-" />
         </Summary>
+
         <Accordion heading={t("RequestedReservation.workingMemo")} initiallyOpen={application.workingMemo.length > 0}>
           <ApplicationWorkingMemo
             applicationPk={applicationPk}
@@ -644,15 +645,13 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
         {applicationSections.map((section) => (
           <ApplicationSectionDetails section={section} application={application} key={section.pk} refetch={refetch} />
         ))}
-        <H3 as="h2" $noMargin>
+
+        <H3 as="h2" $noMargin style={{ marginTop: "var(--spacing-xl)" }}>
           {t("Application.customerBasicInfo")}
         </H3>
         <ApplicationDatas>
           <ValueBox label={t("Application.authenticatedUser")} value={application.user?.email} />
-          <ValueBox
-            label={t("Application.applicantType")}
-            value={t(`Application.applicantTypes.${application?.applicantType}`)}
-          />
+          <ValueBox label={t("Application.applicantType")} value={applicantType} />
           {isOrganisation && (
             <>
               <ValueBox label={t("Application.organisationName")} value={application.organisationName} />
@@ -676,6 +675,7 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
           <ValueBox label={t("Application.contactPersonEmail")} value={application.contactPersonEmail} />
           <ValueBox label={t("Application.contactPersonPhoneNumber")} value={application.contactPersonPhoneNumber} />
         </ApplicationDatas>
+
         {isOrganisation ? (
           <>
             <H3 as="h2" $noMargin>
@@ -688,6 +688,7 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
             </ApplicationDatas>
           </>
         ) : null}
+
         {hasBillingAddress ? (
           <>
             <H3 as="h2" $noMargin>

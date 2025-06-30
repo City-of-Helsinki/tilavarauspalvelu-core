@@ -312,6 +312,7 @@ const translations: ITranslations = {
     expandMenu: ['Laajenna valikko "{{title}}"'],
     shrinkMenu: ['Pienennä valikko "{{title}}"'],
     noName: ["Ei nimeä"],
+    navigation: ["Päävalikko"],
   },
   MyUnits: {
     heading: ["Omat toimipisteet"],
@@ -465,12 +466,9 @@ const translations: ITranslations = {
     applicantTypes: {
       INDIVIDUAL: ["Yksityishenkilö"],
       COMPANY: ["Yritys"],
-      COMMUNITY: ["Yhdistys, rekisteröimätön"],
-      ASSOCIATION: ["Yhdistys, rekisteröity"],
-    },
-    municipalities: {
-      HELSINKI: ["Helsinki"],
-      OTHER: ["Muu"],
+      NONPROFIT: ["Yhdistys"],
+      NONPROFIT_REGISTERED: ["Yhdistys, rekisteröity"],
+      NONPROFIT_UNREGISTERED: ["Yhdistys, rekisteröimätön"],
     },
     contactPerson: ["Yhteyshenkilö"],
     identificationNumber: ["Y-tunnus"],

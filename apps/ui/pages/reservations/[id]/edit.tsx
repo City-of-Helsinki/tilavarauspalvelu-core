@@ -47,7 +47,7 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
   const options = {
     ...props.options,
     municipality: Object.values(MunicipalityChoice).map((value) => ({
-      label: t(`Application.municipalities.${value.toUpperCase()}`),
+      label: t(`common:municipalities.${value.toUpperCase()}`),
       value: value,
     })),
   };

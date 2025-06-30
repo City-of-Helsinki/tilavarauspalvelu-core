@@ -142,5 +142,9 @@
   "amountSuffixShort": "pcs",
   "validity": "Period of validity",
   "deadline": "Deadline",
-  "helsinkiCity": "City of Helsinki"
+  "helsinkiCity": "City of Helsinki",
+  "municipalities": {
+    "HELSINKI": "Helsinki",
+    "OTHER": "Other"
+  }
 }

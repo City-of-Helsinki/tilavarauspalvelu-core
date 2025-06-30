@@ -101,7 +101,7 @@
     "as": {
       "prefix": "Skapa ansökan",
       "type": {
-        "ASSOCIATION": "för en organisation, grupp eller samfund",
+        "NONPROFIT": "för en organisation, grupp eller samfund",
         "COMPANY": "för ett företag",
         "INDIVIDUAL": "som privatkund"
       }
