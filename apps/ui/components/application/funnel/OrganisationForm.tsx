@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
-import { MunicipalityChoice, ReserveeType } from "@gql/gql-types";
+import { MunicipalityChoice } from "@gql/gql-types";
 import { ControlledCheckbox, ControlledSelect } from "common/src/components/form";
 import { ApplicationFormTextInput, BillingAddress, ContactPersonSection } from ".";
 import { type ApplicationPage3FormValues } from "./form";
@@ -10,30 +10,19 @@ import { FormSubHeading } from "./styled";
 
 export function OrganisationForm(): JSX.Element {
   const { t } = useTranslation();
-
   const {
     control,
     formState: { errors },
     watch,
-    setValue,
   } = useFormContext<ApplicationPage3FormValues>();
 
-  const applicantType = watch("applicantType");
-  const hasRegistration = applicantType === ReserveeType.Nonprofit;
+  const [isRegisteredNonProfit, setIsRegisteredNonProfit] = useState(true);
   const hasBillingAddress = watch("hasBillingAddress");
 
   const translateError = (errorMsg?: string) => (errorMsg ? t(`application:validation.${errorMsg}`) : "");
 
-  const toggleRegistration = () => {
-    if (!hasRegistration) {
-      setValue("applicantType", ReserveeType.Nonprofit);
-    } else {
-      setValue("applicantType", ReserveeType.Nonprofit);
-    }
-  };
-
   const municipalityOptions = Object.values(MunicipalityChoice).map((value) => ({
-    label: t(`Application.municipalities.${value.toUpperCase()}`),
+    label: t(`common:municipalities.${value.toUpperCase()}`),
     value: value,
   }));
 
@@ -50,21 +39,21 @@ export function OrganisationForm(): JSX.Element {
         error={translateError(errors.municipality?.message)}
       />
       <Checkbox
-        label={t("application:Page3.organisation.notRegistered")}
-        id="organisation.notRegistered"
-        name="organisation.notRegistered"
-        checked={!hasRegistration}
-        onClick={toggleRegistration}
+        label={t("application:Page3.organisationNotRegistered")}
+        id="organisationNotRegistered"
+        name="organisationNotRegistered"
+        checked={!isRegisteredNonProfit}
+        onClick={() => setIsRegisteredNonProfit(!isRegisteredNonProfit)}
       />
-      <ApplicationFormTextInput name="organisationIdentifier" disabled={!hasRegistration} />
+      <ApplicationFormTextInput name="organisationIdentifier" disabled={!isRegisteredNonProfit} />
       <FormSubHeading>{t("application:Page3.sectionHeadings.postalAddress")}</FormSubHeading>
       <ApplicationFormTextInput name="organisationStreetAddress" />
       <ApplicationFormTextInput name="organisationPostCode" />
       <ApplicationFormTextInput name="organisationCity" />
       <ControlledCheckbox
         control={control}
-        label={t("application:Page3.organisation.separateInvoicingAddress")}
-        id="organisation.hasInvoicingAddress"
+        label={t("application:Page3.organisationSeparateInvoicingAddress")}
+        id="organisationHasInvoicingAddress"
         name="hasBillingAddress"
       />
       {hasBillingAddress ? <BillingAddress /> : null}
