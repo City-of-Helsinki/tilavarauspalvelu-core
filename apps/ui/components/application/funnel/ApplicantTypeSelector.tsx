@@ -19,18 +19,15 @@ export function ApplicantTypeSelector(): JSX.Element {
     control,
     formState: { errors },
   } = useFormContext<ApplicationPage3FormValues>();
+
   const {
     field: { value, onChange },
-  } = useController({
-    name: "applicantType",
-    control,
-  });
-  // Community and association are the same except for corporate id
-  const choices = Object.values(ReserveeType).filter((id) => id !== ReserveeType.Nonprofit);
+  } = useController({ name: "applicantType", control });
 
   const error = errors.applicantType;
-
   const errorText = error?.message ? t(`application:validation.${error.message}`) : undefined;
+
+  const reserveeTypeChoices = [ReserveeType.Nonprofit, ReserveeType.Company, ReserveeType.Individual];
   return (
     <Flex $gap="xs">
       <Label>
@@ -38,14 +35,14 @@ export function ApplicantTypeSelector(): JSX.Element {
         {" *"}
       </Label>
       <div>
-        {choices.map((id) => (
+        {reserveeTypeChoices.map((reserveeType) => (
           <RadioButton
-            name={id}
-            key={id}
-            id={id}
-            label={t(`application:Page3.as.type.${id}`)}
-            onClick={() => onChange(id)}
-            checked={value === id}
+            name={reserveeType}
+            key={reserveeType}
+            id={reserveeType}
+            label={t(`application:Page3.as.type.${reserveeType}`)}
+            onClick={() => onChange(reserveeType)}
+            checked={value === reserveeType}
           />
         ))}
       </div>
