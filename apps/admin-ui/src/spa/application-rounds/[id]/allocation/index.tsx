@@ -317,7 +317,7 @@ function ApplicationRoundAllocation({
   const translateTag = (key: string, value: string) => {
     switch (key) {
       case "municipality":
-        return t(`Application.municipalities.${value.toUpperCase()}`);
+        return t(`common:municipalities.${value.toUpperCase()}`);
       case "textSearch":
         return value;
       case "applicantType":
@@ -362,7 +362,7 @@ function ApplicationRoundAllocation({
     unitReservationUnits.find((x) => x.pk != null && x.pk === reservationUnitFilterQuery) ?? reservationUnits[0];
 
   const municipalityOptions = Object.values(MunicipalityChoice).map((value) => ({
-    label: t(`Application.municipalities.${value.toUpperCase()}`),
+    label: t(`common:municipalities.${value.toUpperCase()}`),
     value: value as MunicipalityChoice,
   }));
   const customerFilterOptions = Object.keys(ReserveeType).map((value) => ({

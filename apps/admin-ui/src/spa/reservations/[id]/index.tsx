@@ -231,7 +231,9 @@ function ReservationUserAccordion({
         >
           {reservation.reserveeOrganisationName}
         </DataWrapper>
-        <DataWrapper label={t("filters.municipality")}>{reservation.municipality}</DataWrapper>
+        <DataWrapper label={t("filters.municipality")}>
+          {reservation?.municipality ? t(`common:municipalities.${reservation.municipality.toUpperCase()}`) : "-"}
+        </DataWrapper>
         <DataWrapper label={t("RequestedReservation.reserveeIdentifier")}>
           {reservation.reserveeIdentifier || t("RequestedReservation.noReserveeId")}
         </DataWrapper>

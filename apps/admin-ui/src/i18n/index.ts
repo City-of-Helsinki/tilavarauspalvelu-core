@@ -6,6 +6,7 @@ import * as reservationApplicationFi from "./locales/fi/reservationApplication.j
 import * as reservationFormFi from "./locales/fi/reservationForm.json";
 import * as errors from "./locales/fi/errors.json";
 import * as accessTypeFi from "./locales/fi/accessType.json";
+import * as commonFi from "./locales/fi/common.json";
 
 i18n.use(initReactI18next).init({
   resources: messages,
@@ -22,6 +23,7 @@ i18n.use(initReactI18next).init({
 i18n.addResourceBundle("fi", "reservationApplication", reservationApplicationFi);
 i18n.addResourceBundle("fi", "reservationForm", reservationFormFi);
 i18n.addResourceBundle("fi", "accessType", accessTypeFi);
+i18n.addResourceBundle("fi", "common", commonFi);
 
 // manually add namespaces here so we can share components with the Next frontend
 i18n.addResourceBundle("fi", "common", {

@@ -36,15 +36,6 @@
   "weekDay.5": "Pe",
   "weekDay.6": "La",
   "weekdayLongEnum": {
-    "MONDAY": "Ma",
-    "TUESDAY": "Ti",
-    "WEDNESDAY": "Ke",
-    "THURSDAY": "To",
-    "FRIDAY": "Pe",
-    "SATURDAY": "La",
-    "SUNDAY": "Su"
-  },
-  "weekdayShortEnum": {
     "FRIDAY": "Perjantai",
     "MONDAY": "Maanantai",
     "SATURDAY": "Lauantai",
@@ -52,6 +43,15 @@
     "THURSDAY": "Torstai",
     "TUESDAY": "Tiistai",
     "WEDNESDAY": "Keskiviikko"
+  },
+  "weekdayShortEnum": {
+    "MONDAY": "Ma",
+    "TUESDAY": "Ti",
+    "WEDNESDAY": "Ke",
+    "THURSDAY": "To",
+    "FRIDAY": "Pe",
+    "SATURDAY": "La",
+    "SUNDAY": "Su"
   },
   "month.0": "Tammikuu",
   "month.1": "Helmikuu",
@@ -142,5 +142,9 @@
   "amountSuffixShort": "kpl",
   "validity": "Voimassaoloaika",
   "deadline": "Määräaika",
-  "helsinkiCity": "Helsingin kaupunki"
+  "helsinkiCity": "Helsingin kaupunki",
+  "municipalities": {
+    "HELSINKI": "Helsinki",
+    "OTHER": "Muu"
+  }
 }
