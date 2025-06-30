@@ -488,7 +488,6 @@ export function createDefaultPage1Section(
 ): NonNullable<ApplicationPage1FormValues["applicationSections"]>[0] {
   // TODO do we need to set default values?
   return {
-    pk: 0,
     name: "",
     // TODO this is not unique if the user adds multiple new sections
     // it doesn't matter as long as any newly added sections have different keys
