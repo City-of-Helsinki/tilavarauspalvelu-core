@@ -88,14 +88,7 @@ const ReservationFormField = ({
 
   const isWideRow = useMemo(
     (): boolean =>
-      [
-        "name",
-        "description",
-        "reserveeAddressStreet",
-        "applyingForFreeOfCharge",
-        // "reserveeOrganisationName",
-        "purpose",
-      ].includes(field),
+      ["name", "description", "reserveeAddressStreet", "applyingForFreeOfCharge", "purpose"].includes(field),
     [field]
   );
 
