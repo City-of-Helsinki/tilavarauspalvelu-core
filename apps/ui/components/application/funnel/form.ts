@@ -507,30 +507,33 @@ export function createDefaultPage1Section(
 }
 
 export function convertApplicationPage3(app?: Maybe<ApplicantFieldsFragment>): ApplicationPage3FormValues {
+  const isOrganisation = app?.applicantType !== ReserveeType.Individual;
+
   const hasBillingAddress =
     app?.applicantType === ReserveeType.Individual ||
     (app?.billingStreetAddress != null && app?.billingStreetAddress !== "");
+
   return {
     pk: app?.pk ?? 0,
     applicantType: app?.applicantType ?? undefined,
 
-    organisationName: app?.organisationName ?? "",
-    organisationIdentifier: app?.organisationIdentifier ?? "",
-    organisationCoreBusiness: app?.organisationCoreBusiness ?? "",
-    organisationStreetAddress: app?.organisationStreetAddress ?? "",
-    organisationCity: app?.organisationCity ?? "",
-    organisationPostCode: app?.organisationPostCode ?? "",
+    organisationName: isOrganisation ? app?.organisationName : undefined,
+    organisationIdentifier: isOrganisation ? app?.organisationIdentifier : undefined,
+    organisationCoreBusiness: isOrganisation ? app?.organisationCoreBusiness : undefined,
+    organisationStreetAddress: isOrganisation ? app?.organisationStreetAddress : undefined,
+    organisationCity: isOrganisation ? app?.organisationCity : undefined,
+    organisationPostCode: isOrganisation ? app?.organisationPostCode : undefined,
 
     contactPersonFirstName: app?.contactPersonFirstName ?? "",
     contactPersonLastName: app?.contactPersonLastName ?? "",
     contactPersonEmail: app?.contactPersonEmail ?? "",
     contactPersonPhoneNumber: app?.contactPersonPhoneNumber ?? "",
 
-    billingStreetAddress: hasBillingAddress ? app?.billingStreetAddress : "",
-    billingCity: hasBillingAddress ? app?.billingCity : "",
-    billingPostCode: hasBillingAddress ? app?.billingPostCode : "",
-
     hasBillingAddress,
+    billingStreetAddress: hasBillingAddress ? app?.billingStreetAddress : undefined,
+    billingCity: hasBillingAddress ? app?.billingCity : undefined,
+    billingPostCode: hasBillingAddress ? app?.billingPostCode : undefined,
+
     additionalInformation: app?.additionalInformation ?? "",
     municipality: app?.municipality ?? undefined,
   };
@@ -568,11 +571,18 @@ export function transformPage3Application(values: ApplicationPage3FormValues): A
           organisationName: values.organisationName || undefined,
           organisationIdentifier: values.organisationIdentifier || undefined,
           organisationCoreBusiness: values.organisationCoreBusiness || undefined,
-          organisationAddress: isOrganisationAddressValid ? values.organisationStreetAddress : undefined,
+          organisationStreetAddress: isOrganisationAddressValid ? values.organisationStreetAddress : undefined,
           organisationPostCode: isOrganisationAddressValid ? values.organisationPostCode : undefined,
           organisationCity: isOrganisationAddressValid ? values.organisationCity : undefined,
         }
-      : {}),
+      : {
+          organisationName: "",
+          organisationIdentifier: "",
+          organisationCoreBusiness: "",
+          organisationStreetAddress: "",
+          organisationPostCode: "",
+          organisationCity: "",
+        }),
 
     ...(shouldSaveBillingAddress
       ? {
@@ -580,7 +590,11 @@ export function transformPage3Application(values: ApplicationPage3FormValues): A
           billingPostCode: isBillingAddressValid ? values.billingPostCode : undefined,
           billingCity: isBillingAddressValid ? values.billingCity : undefined,
         }
-      : {}),
+      : {
+          billingStreetAddress: "",
+          billingPostCode: "",
+          billingCity: "",
+        }),
 
     ...(values.additionalInformation != null ? { additionalInformation: values.additionalInformation } : {}),
     ...(values.municipality != null ? { municipality: values.municipality } : {}),
