@@ -101,7 +101,7 @@ function Page3({ application }: Pick<PropsNarrowed, "application">): JSX.Element
 
   const { t } = useTranslation();
   const [mutate] = useUpdateApplicationMutation();
-  const dislayError = useDisplayError();
+  const displayError = useDisplayError();
 
   const onSubmit = async (values: ApplicationPage3FormValues) => {
     try {
@@ -113,7 +113,7 @@ function Page3({ application }: Pick<PropsNarrowed, "application">): JSX.Element
       }
       router.push(getApplicationPath(pk, "page4"));
     } catch (err) {
-      dislayError(err);
+      displayError(err);
     }
   };
 

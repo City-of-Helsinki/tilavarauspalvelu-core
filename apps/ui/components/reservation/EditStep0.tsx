@@ -19,8 +19,8 @@ import { convertLanguageCode, getTranslationSafe } from "common/src/common/util"
 import { useReservableTimes } from "@/hooks/useReservableTimes";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { ReservationTimePicker } from "./ReservationTimePicker";
-import { QuickReservation } from "@/components/reservation-unit";
 import { ReservationInfoCard } from "./ReservationInfoCard";
+import { QuickReservation } from "@/components/reservation-unit";
 import { Sanitize } from "common/src/components/Sanitize";
 import { PinkBox as PinkBoxBase } from "./styles";
 import { getReservationPath } from "@/modules/urls";
@@ -66,6 +66,7 @@ const StyledReservationInfoCard = styled(ReservationInfoCard)`
 
 const StyledQuickReservation = styled(QuickReservation)`
   grid-column: 1 / -1;
+
   grid-row: 3;
   @media (min-width: ${breakpoints.m}) {
     grid-column-start: unset;

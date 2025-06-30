@@ -101,7 +101,7 @@
     "as": {
       "prefix": "I create the application...",
       "type": {
-        "ASSOCIATION": "on behalf of an organisation, group or community",
+        "NONPROFIT": "on behalf of an organisation, group or community",
         "COMPANY": "on behalf of the company",
         "INDIVIDUAL": "as a private person"
       }

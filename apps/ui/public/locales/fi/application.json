@@ -102,7 +102,7 @@
     "as": {
       "prefix": "Luon hakemuksen",
       "type": {
-        "ASSOCIATION": "järjestön, ryhmän tai yhteisön puolesta",
+        "NONPROFIT": "järjestön, ryhmän tai yhteisön puolesta",
         "COMPANY": "yrityksen puolesta",
         "INDIVIDUAL": "yksityishenkilönä"
       }

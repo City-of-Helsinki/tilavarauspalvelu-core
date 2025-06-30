@@ -57,7 +57,7 @@ function timeSlotMapper(t: TFunction, slot: AllocatedSectionsTableElementFragmen
   const link = getReservationUrl(reservationPk);
   const accessCodeActiveAlert =
     slot.reservationSeries?.shouldHaveActiveAccessCode && !slot.reservationSeries?.isAccessCodeIsActiveCorrect
-      ? t("accessType.accessCodeState.ACCESS_CODE_PENDING")
+      ? t("accessType:accessCodeState.ACCESS_CODE_PENDING")
       : "";
   return {
     key: `${applicationPk}-${slot.pk}`,

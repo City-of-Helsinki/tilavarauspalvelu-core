@@ -142,5 +142,9 @@
   "amountSuffixShort": "st",
   "validity": "Giltlighetstid",
   "deadline": "Tidsfrist",
-  "helsinkiCity": "Helsingfors stad"
+  "helsinkiCity": "Helsingfors stad",
+  "municipalities": {
+    "HELSINKI": "Helsinki",
+    "OTHER": "Andra"
+  }
 }
