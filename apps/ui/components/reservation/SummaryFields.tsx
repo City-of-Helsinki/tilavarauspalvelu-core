@@ -44,7 +44,12 @@ export function getApplicationFields({
     supportedFields,
     reserveeType,
   });
-  return applicationFields.filter((key): key is keyof ReservationNode => key in reservation);
+
+  // Special case for reserveeIsUnregisteredAssociation due to it not being included in the schema,
+  // but we use it in the form to decide if reserveeIdentifier is required or not
+  return applicationFields.filter(
+    (key): key is keyof ReservationNode => key in reservation || key === "reserveeIsUnregisteredAssociation"
+  );
 }
 
 /// Helper function to type safely pick the general fields from the reservation
