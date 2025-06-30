@@ -208,9 +208,11 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     // TODO what is the purpose of this?
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: type the form
     const input = Object.keys(payload).reduce<any>((acc, key) => {
-      if (key === "showBillingAddress") {
+      // Exclude fields from being sent to the backend
+      if (key === "showBillingAddress" || key === "reserveeIsUnregisteredAssociation") {
         return acc;
       }
+
       acc[key] = {}.propertyIsEnumerable.call(payload[key] || {}, "value") ? payload[key].value : payload[key];
       return acc;
     }, {});
