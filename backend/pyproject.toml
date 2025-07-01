@@ -228,6 +228,9 @@ ignore = [
     # Any-typing allowed
     "ANN401",   # any-type
 
+    # Allow importing inside functions, this is useful for avoiding circular imports.
+    "PLC0415",  # import-outside-top-level
+
     # Allow empty comments. We use emtpy comments for forcing better code formatting.
     "PLR2044",  # empty-comment
 
