@@ -8,8 +8,7 @@ def migrate_metadata_fields(apps, schema_editor):
     ReservationMetadataField = apps.get_model("tilavarauspalvelu", "ReservationMetadataField")
 
     ReservationMetadataField.objects.filter(field_name="reservee_id").update(field_name="reservee_identifier")
-    ReservationMetadataField.objects.filter(field_name="reservee_is_unregistered_association").delete()
-    ReservationMetadataField.objects.filter(field_name="home_city").delete()
+    ReservationMetadataField.objects.filter(field_name="home_city").update(field_name="municipality")
 
 
 class Migration(migrations.Migration):
