@@ -129,6 +129,7 @@
   "accessCodeDuration": "Door code valid",
   "accessTypeChanged": "Changes in access to the space. See instructions.",
   "contactSupport": "Please contact support.",
+  "reservationNoLongerPayable": "The booking can no longer be paid",
   "notifications": {
     "requires_handling": {
       "title": "Your booking is being processed",
