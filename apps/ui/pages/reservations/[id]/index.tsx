@@ -180,6 +180,17 @@ function Reservation({
     message: t("reservations:reservationCancelledTitle"),
   });
 
+  useToastIfQueryParam({
+    key: "error_code",
+    message:
+      params.get("error_code") === "RESERVATION_NOT_CONFIRMED" ||
+      params.get("error_code") === "RESERVATION_NOT_FOUND" ||
+      params.get("error_code") === "RESERVATION_CANCELLED"
+        ? t("reservations:reservationNotPayable")
+        : params.get("error_message") || t("error:genericError"),
+    type: "error",
+  });
+
   const { beginsAt, endsAt } = reservation;
   const timeString = capitalize(formatDateTimeRange(t, new Date(beginsAt), new Date(endsAt)));
 
