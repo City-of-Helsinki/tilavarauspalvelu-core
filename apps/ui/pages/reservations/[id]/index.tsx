@@ -1,8 +1,9 @@
+import { useSearchParams } from "next/navigation";
 import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
-import { IconArrowRight, IconCalendar, IconCross, IconLinkExternal, IconLock } from "hds-react";
+import { IconArrowRight, IconCalendar, IconCross, IconLinkExternal, IconLock, Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { Flex, NoWrap, H1, H4, fontRegular } from "common/styled";
 import { breakpoints } from "common/src/const";
@@ -126,8 +127,11 @@ function Reservation({
   options,
 }: Readonly<
   Pick<PropsNarrowed, "termsOfUse" | "reservation" | "feedbackUrl" | "options" | "apiBaseUrl">
->): JSX.Element | null {
+>): React.ReactElement | null {
   const { t, i18n } = useTranslation();
+
+  const params = useSearchParams();
+  const reservationStatus = params.get("status")?.toLowerCase();
 
   const shouldShowAccessCode =
     isBefore(sub(new Date(), { days: 1 }), new Date(reservation.endsAt)) &&
@@ -186,12 +190,25 @@ function Reservation({
       reservation.paymentOrder?.status === OrderStatus.Refunded ||
       reservation.paymentOrder?.status === OrderStatus.PaidByInvoice);
 
+  console.log(reservation.state?.toLowerCase(), reservationStatus, "reservation state and status");
+  const shouldShowStatusNotification =
+    (reservationStatus === "paid" || reservationStatus === "confirmed" || reservationStatus === "requires_handling") &&
+    reservation.state?.toLowerCase() === reservationStatus;
   const shouldShowPaymentNotification =
     reservation.paymentOrder?.status === OrderStatus.Pending && reservation.state === ReservationStateChoice.Confirmed;
 
   return (
     <>
       <Breadcrumb routes={routes} />
+      {shouldShowStatusNotification && (
+        <Notification
+          type={reservationStatus === "requires_handling" ? "info" : "success"}
+          data-testid="reservation__status-notification"
+          label={t(`reservations:notifications.${reservationStatus}.title`)}
+        >
+          {t(`reservations:notifications.${reservationStatus}.body`)}
+        </Notification>
+      )}
       <ReservationPageWrapper data-testid="reservation__content" $nRows={3}>
         <Flex style={{ gridColumn: "1 / span 1", gridRow: "1 / span 1" }}>
           <Flex $direction="row" $alignItems="center" $justifyContent="space-between" $wrap="wrap">
@@ -324,7 +341,7 @@ function AccessCodeInfo({
   feedbackUrl,
 }: Readonly<
   Pick<NonNullable<AccessCodeQuery["reservation"]>, "pindoraInfo"> & Pick<PropsNarrowed, "feedbackUrl">
->): JSX.Element {
+>): React.ReactElement {
   const { t, i18n } = useTranslation();
   return (
     <div>

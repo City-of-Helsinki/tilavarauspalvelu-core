@@ -124,5 +124,19 @@
   "confirmNavigation": "Jos haluat poistua tältä sivulta, niin varauksesi peruuntuu automaattisesti",
   "accessCodeDuration": "Ovikoodi voimassa",
   "accessTypeChanged": "Pääsy tilaan muuttuu. Katso ohjeet.",
-  "contactSupport": "Ota yhteyttä asiakaspalveluun"
+  "contactSupport": "Ota yhteyttä asiakaspalveluun",
+  "notifications": {
+    "requires_handling": {
+      "title": "Varauksesi on käsittelyssä",
+      "body": "Saat varausvahvistuksen sähköpostiisi hetken kuluttua."
+    },
+    "confirmed": {
+      "title": "Varauksesi on vahvistettu",
+      "body": "Saat varausvahvistuksen sähköpostiisi hetken kuluttua."
+    },
+    "paid": {
+      "title": "Varauksesi on maksettu.",
+      "body": ""
+    }
+  }
 }
