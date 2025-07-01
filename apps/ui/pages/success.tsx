@@ -1,6 +1,6 @@
 import { getReservationServerProps } from "@/modules/paymentRedirect";
 import type { GetServerSidePropsContext } from "next";
-import { ReservationStateChoice, ReservationStateQuery, useReservationStateQuery } from "@gql/gql-types";
+import { OrderStatus, ReservationStateChoice, ReservationStateQuery, useReservationStateQuery } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { getReservationPath } from "@/modules/urls";
 import { useEffect } from "react";
@@ -48,16 +48,21 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 }
 
 type QueryT = NonNullable<ReservationStateQuery["reservation"]>;
-type RedirectProps = Pick<QueryT, "state" | "pk">;
+type RedirectProps = Pick<QueryT, "state" | "pk" | "paymentOrder">;
 
 /// @returns the url of the reservation or null if the reservation is still waiting for payment
 /// because payments are done with webhooks, we might need to wait for it
 /// the reservation is valid (and should be payed) but wait for the backend to confirm it
 function getRedirectUrl(reservation: RedirectProps): string | null {
+  const redirectUrl = getReservationPath(reservation.pk);
   switch (reservation.state) {
-    case ReservationStateChoice.Confirmed:
     case ReservationStateChoice.RequiresHandling:
-      return getReservationPath(reservation.pk, "confirmation");
+      return redirectUrl + "?status=requires_handling";
+    case ReservationStateChoice.Confirmed:
+      if (reservation.paymentOrder?.handledPaymentDueBy) {
+        return redirectUrl + "?status=confirmed";
+      }
+      return redirectUrl + "?status=paid";
     case ReservationStateChoice.WaitingForPayment:
       return null;
     case ReservationStateChoice.Created:
@@ -74,8 +79,8 @@ type NarrowedProps = Exclude<Props, { notFound: boolean }>;
 /// Show loading page if the reservation is still waiting for payment
 /// assuming the user landed here correctly from the webstore callback
 /// the reservation is paid and confirmed but our backend hasn't updated the state yet
-function Page(pros: NarrowedProps): JSX.Element {
-  const id = pros.reservation.id;
+function Page(props: NarrowedProps): JSX.Element {
+  const id = props.reservation.id;
   // is there a point where we stop polling and return an error to the user?
   const { data } = useReservationStateQuery({
     variables: {
@@ -88,7 +93,11 @@ function Page(pros: NarrowedProps): JSX.Element {
 
   useEffect(() => {
     const reservation = data?.reservation;
-    if (reservation == null) {
+    if (
+      reservation == null ||
+      (reservation.paymentOrder?.status !== OrderStatus.Paid &&
+        reservation.paymentOrder?.status !== OrderStatus.PaidByInvoice)
+    ) {
       return;
     }
     const redirectUrl = getRedirectUrl(reservation);
@@ -111,6 +120,7 @@ export const GET_RESERVATION_STATE = gql`
       paymentOrder {
         id
         status
+        handledPaymentDueBy
       }
     }
   }
