@@ -14,6 +14,7 @@ import {
   type ReservationQuery,
   type ReservationQueryVariables,
   ReservationStateChoice,
+  ReserveeType,
   useConfirmReservationMutation,
   useDeleteReservationMutation,
   useReservationLazyQuery,
@@ -123,6 +124,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     reserveeAddressCity: reservation?.reserveeAddressCity ?? "",
     reserveeAddressZip: reservation?.reserveeAddressZip ?? "",
     municipality: reservation?.municipality ?? undefined,
+    reserveeType: reservation?.reserveeType ?? ReserveeType.Individual,
   };
   // TODO is defaultValues correct? it's prefilled from the profile data and we are not refetching at any point.
   // If we would refetch values would be more correct with reset hook.
