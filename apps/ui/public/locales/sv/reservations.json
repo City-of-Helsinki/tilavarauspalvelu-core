@@ -128,5 +128,19 @@
   "confirmNavigation": "Om du vill lämna sidan, kommer din bokning att avbokas automatiskt.",
   "accessCodeDuration": "Dörrkoden är giltig",
   "accessTypeChanged": "Ändringar i tillträde till utrymmet. Se instruktioner.",
-  "contactSupport": "Vänligen kontakta kundtjänsten."
+  "contactSupport": "Vänligen kontakta kundtjänsten.",
+  "notifications": {
+    "requires_handling": {
+      "title": "Din bokning behandlas",
+      "body": "Du kommer att få en bokningsbekräftelse via e-post inom kort."
+    },
+    "confirmed": {
+      "title": "Din bokning är bekräftad",
+      "body": "Du kommer att få en bokningsbekräftelse via e-post inom kort."
+    },
+    "paid": {
+      "title": "Din bokning är betald",
+      "body": ""
+    }
+  }
 }

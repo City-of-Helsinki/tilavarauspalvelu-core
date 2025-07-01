@@ -5,7 +5,6 @@ import {
   TermsOfUseDocument,
   type TermsOfUseQuery,
   type TermsOfUseQueryVariables,
-  type ReservationStateQuery,
   type OrderQuery,
   type OrderQueryVariables,
   OrderDocument,
@@ -68,7 +67,7 @@ export async function getGenericTerms(apolloClient: ApolloClient<unknown>): Prom
 export async function getReservationByOrderUuid(
   apolloClient: ApolloClient<NormalizedCacheObject>,
   uuid: string
-): Promise<NonNullable<ReservationStateQuery["reservation"]> | null> {
+): Promise<NonNullable<NonNullable<OrderQuery["order"]>["reservation"]> | null> {
   // TODO retry once if not found (or increase the timeout so the webhook from store has fired)
   const { data } = await apolloClient.query<OrderQuery, OrderQueryVariables>({
     query: OrderDocument,
@@ -84,6 +83,7 @@ export async function getReservationByOrderUuid(
   return order.reservation ?? null;
 }
 
+// NOTE: Needs to match ReservationStateQuery
 export const GET_ORDER = gql`
   query Order($orderUuid: String!) {
     order(orderUuid: $orderUuid) {
@@ -92,6 +92,11 @@ export const GET_ORDER = gql`
         id
         pk
         state
+        paymentOrder {
+          id
+          status
+          handledPaymentDueBy
+        }
       }
       status
       paymentType
