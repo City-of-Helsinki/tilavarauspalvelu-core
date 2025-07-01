@@ -2,7 +2,7 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
-import { IconArrowRight, IconCalendar, IconCross, IconLinkExternal, IconLock } from "hds-react";
+import { IconArrowRight, IconCalendar, IconCross, IconLinkExternal, IconLock, Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { Flex, NoWrap, H1, H4, fontRegular } from "common/styled";
 import { breakpoints } from "common/src/const";
@@ -42,6 +42,7 @@ import {
   getFeedbackUrl,
   getReservationPath,
   getReservationUnitPath,
+  type ReservationNotifications,
   reservationsPrefix,
 } from "@/modules/urls";
 import { useToastIfQueryParam } from "@/hooks";
@@ -61,6 +62,7 @@ import {
   ApplicationFields,
   PaymentNotification,
 } from "@/components/reservation";
+import { useSearchParams } from "next/navigation";
 import { queryOptions } from "@/modules/queryOptions";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -116,6 +118,25 @@ const SecondaryActions = styled(Flex)`
   margin-top: var(--spacing-l);
 `;
 
+function shouldShowStatusNotification(
+  reservation: Pick<PropsNarrowed, "reservation">["reservation"],
+  param: ReservationNotifications | null
+): boolean {
+  switch (param) {
+    case "confirmed":
+    case "requires_handling":
+      return reservation.state === param.toUpperCase();
+    case "paid":
+      return (
+        reservation.state === ReservationStateChoice.Confirmed &&
+        (reservation.paymentOrder?.status === OrderStatus.Paid ||
+          reservation.paymentOrder?.status === OrderStatus.PaidByInvoice)
+      );
+    default:
+      return false;
+  }
+}
+
 // TODO add a state check => if state is Created redirect to the reservation funnel
 // if state is Cancelled, Denied, WaitingForPayment what then?
 function Reservation({
@@ -126,8 +147,10 @@ function Reservation({
   options,
 }: Readonly<
   Pick<PropsNarrowed, "termsOfUse" | "reservation" | "feedbackUrl" | "options" | "apiBaseUrl">
->): JSX.Element | null {
+>): React.ReactElement | null {
   const { t, i18n } = useTranslation();
+  const params = useSearchParams();
+  const statusNotification = params.get("notify") as ReservationNotifications;
 
   const shouldShowAccessCode =
     isBefore(sub(new Date(), { days: 1 }), new Date(reservation.endsAt)) &&
@@ -192,6 +215,15 @@ function Reservation({
   return (
     <>
       <Breadcrumb routes={routes} />
+      {shouldShowStatusNotification(reservation, statusNotification) && (
+        <Notification
+          type={statusNotification === "requires_handling" ? "info" : "success"}
+          data-testid="reservation__status-notification"
+          label={t(`reservations:notifications.${statusNotification}.title`)}
+        >
+          {t(`reservations:notifications.${statusNotification}.body`)}
+        </Notification>
+      )}
       <ReservationPageWrapper data-testid="reservation__content" $nRows={3}>
         <Flex style={{ gridColumn: "1 / span 1", gridRow: "1 / span 1" }}>
           <Flex $direction="row" $alignItems="center" $justifyContent="space-between" $wrap="wrap">
@@ -324,7 +356,7 @@ function AccessCodeInfo({
   feedbackUrl,
 }: Readonly<
   Pick<NonNullable<AccessCodeQuery["reservation"]>, "pindoraInfo"> & Pick<PropsNarrowed, "feedbackUrl">
->): JSX.Element {
+>): React.ReactElement {
   const { t, i18n } = useTranslation();
   return (
     <div>

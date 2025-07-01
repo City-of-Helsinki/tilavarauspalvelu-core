@@ -62,12 +62,17 @@ export function getApplicationSectionPath(
   return `${getApplicationPath(applicationPk)}sections/${sectionPk}/${page}`;
 }
 
-type ReservationPages = "cancel" | "edit" | "confirmation";
-export function getReservationPath(pk: Maybe<number> | undefined, page?: ReservationPages | undefined): string {
+type ReservationPages = "cancel" | "edit";
+export type ReservationNotifications = "requires_handling" | "confirmed" | "paid";
+export function getReservationPath(
+  pk: Maybe<number> | undefined,
+  page?: ReservationPages | undefined,
+  notify?: ReservationNotifications | undefined
+): string {
   if (pk == null) {
     return "";
   }
-  return `${reservationsPrefix}/${pk}/${page ?? ""}`;
+  return `${reservationsPrefix}/${pk}/${page ?? ""}${notify ? `?notify=${notify}` : ""}`;
 }
 
 export function getReservationInProgressPath(
