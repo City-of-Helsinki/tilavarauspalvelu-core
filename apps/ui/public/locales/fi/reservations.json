@@ -125,6 +125,7 @@
   "accessCodeDuration": "Ovikoodi voimassa",
   "accessTypeChanged": "Pääsy tilaan muuttuu. Katso ohjeet.",
   "contactSupport": "Ota yhteyttä asiakaspalveluun",
+  "reservationNoLongerPayable": "Varausta ei voi enää maksaa",
   "notifications": {
     "requires_handling": {
       "title": "Varauksesi on käsittelyssä",

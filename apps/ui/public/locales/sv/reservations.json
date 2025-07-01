@@ -129,6 +129,7 @@
   "accessCodeDuration": "Dörrkoden är giltig",
   "accessTypeChanged": "Ändringar i tillträde till utrymmet. Se instruktioner.",
   "contactSupport": "Vänligen kontakta kundtjänsten.",
+  "reservationNoLongerPayable": "Bokningen kan inte längre betalas",
   "notifications": {
     "requires_handling": {
       "title": "Din bokning behandlas",
