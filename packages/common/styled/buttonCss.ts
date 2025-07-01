@@ -20,13 +20,14 @@ export const ButtonCss = css<ButtonStyleProps>`
   --outline-gutter: 2px;
   --outline-width: 3px;
   --font-size: ${({ fontSize }) => (fontSize === "small" ? "var(--fontsize-body-s)" : "var(--fontsize-body-m)")};
+  --color: ${({ variant }) => (variant === "primary" ? "var(--color-white)" : "var(--color-black)")};
 
   font-size: var(--font-size);
 
   opacity: ${({ disabled }) => (disabled ? "0.5" : "1")};
   text-decoration: none;
+  color: var(--color);
   background-color: ${({ variant }) => (variant === "primary" ? "var(--color-bus)" : "var(--color-white)")};
-  color: ${({ variant }) => (variant === "primary" ? "var(--color-white)" : "var(--color-black)")};
   padding: ${({ size }) => (size === "large" ? "12px 20px" : "0 20px")};
   border: 2px solid ${({ variant }) => (variant === "primary" ? "var(--color-bus)" : "var(--color-black)")};
   display: inline-flex;
@@ -38,8 +39,8 @@ export const ButtonCss = css<ButtonStyleProps>`
   line-height: 1;
   text-align: center;
   min-height: 44px;
-  &:visited[variant="primary"] {
-    color: var(--color-white);
+  &:visited {
+    color: var(--color);
   }
   &:hover,
   &:focus-visible {
