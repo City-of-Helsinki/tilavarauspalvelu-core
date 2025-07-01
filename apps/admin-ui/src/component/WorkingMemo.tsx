@@ -55,6 +55,8 @@ function WorkingMemo({
     }
   };
 
+  const isButtonsDisabled = workingMemo === initialValue;
+
   return (
     <>
       <TextArea
@@ -69,10 +71,11 @@ function WorkingMemo({
           size={ButtonSize.Small}
           variant={ButtonVariant.Secondary}
           onClick={() => setWorkingMemo(initialValue || "")}
+          disabled={isButtonsDisabled}
         >
           {t("common.cancel")}
         </Button>
-        <Button size={ButtonSize.Small} onClick={handleSave}>
+        <Button size={ButtonSize.Small} onClick={handleSave} disabled={isButtonsDisabled}>
           {t("RequestedReservation.save")}
         </Button>
       </ButtonContainer>
