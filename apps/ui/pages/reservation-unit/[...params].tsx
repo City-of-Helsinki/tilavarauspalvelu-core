@@ -176,7 +176,8 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
   // whitelist to allow language change and confirmation
   const whitelist = [
-    RegExp(`.*/reservations/${reservation?.pk}/confirmation`),
+    RegExp(`.*/reservations/${reservation?.pk}\\?status=confirmed`),
+    RegExp(`.*/reservations/${reservation?.pk}\\?status=requires_handling`),
     RegExp(`.*/reservation-unit/${reservationUnit?.pk}/reservation/${reservation?.pk}`),
   ];
   // only block nextjs navigation (we should not have any <a> links and we don't want to block refresh)
@@ -257,8 +258,10 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
         return;
       }
 
-      if (state === ReservationStateChoice.Confirmed || state === ReservationStateChoice.RequiresHandling) {
-        router.push(getReservationPath(pk, "confirmation"));
+      if (state === ReservationStateChoice.Confirmed) {
+        router.push(getReservationPath(pk) + `?status=confirmed`);
+      } else if (state === ReservationStateChoice.RequiresHandling) {
+        router.push(getReservationPath(pk) + `?status=requires_handling`);
       } else if (state === ReservationStateChoice.WaitingForPayment) {
         const { order } = data?.confirmReservation ?? {};
         const checkoutUrl = getCheckoutUrl(order, i18n.language);
