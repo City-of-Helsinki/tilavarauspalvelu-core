@@ -255,7 +255,6 @@ class ReservationNode(DjangoNode):
                     "handling_details",
                     "working_memo",
                     "handled_at",
-                    "applied_pricing",
                 }
                 # FIELDS ARE PRIVATE BY DEFAULT
                 else private_field_check
