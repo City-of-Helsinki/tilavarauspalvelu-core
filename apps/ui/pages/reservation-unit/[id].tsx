@@ -71,7 +71,6 @@ import {
   AddressSection,
   EquipmentList,
   Head,
-  QuickReservation,
   RelatedUnits,
   ReservationInfoSection,
   ReservationUnitCalendarSection,
@@ -93,6 +92,7 @@ import { gql } from "@apollo/client";
 import { type ApiError, getApiErrors } from "common/src/apolloUtils";
 import { formatErrorMessage } from "common/src/hooks/useDisplayError";
 import { errorToast } from "common/src/common/toast";
+import { QuickReservation } from "@/components/reservation-unit/QuickReservation";
 
 const StyledApplicationRoundScheduleDay = styled.p`
   span:first-child {

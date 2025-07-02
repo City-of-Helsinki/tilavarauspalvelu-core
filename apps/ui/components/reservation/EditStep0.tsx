@@ -20,7 +20,6 @@ import { useReservableTimes } from "@/hooks/useReservableTimes";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { ReservationTimePicker } from "./ReservationTimePicker";
 import { ReservationInfoCard } from "./ReservationInfoCard";
-import { QuickReservation } from "@/components/reservation-unit";
 import { Sanitize } from "common/src/components/Sanitize";
 import { PinkBox as PinkBoxBase } from "./styles";
 import { getReservationPath } from "@/modules/urls";
@@ -29,6 +28,7 @@ import ErrorComponent from "next/error";
 import { useAvailableTimes } from "@/hooks";
 import { useBlockingReservations } from "@/hooks/useBlockingReservations";
 import { isRangeReservable } from "@/modules/reservable";
+import { QuickReservation } from "@/components/reservation-unit/QuickReservation";
 
 const StyledCalendarWrapper = styled.div`
   grid-column: 1 / -1;
@@ -57,6 +57,7 @@ const Actions = styled.div`
 const StyledReservationInfoCard = styled(ReservationInfoCard)`
   grid-column: 1 / -1;
   grid-row: 2;
+
   @media (min-width: ${breakpoints.m}) {
     grid-column-start: unset;
     grid-column-end: -1;
@@ -66,8 +67,8 @@ const StyledReservationInfoCard = styled(ReservationInfoCard)`
 
 const StyledQuickReservation = styled(QuickReservation)`
   grid-column: 1 / -1;
-
   grid-row: 3;
+
   @media (min-width: ${breakpoints.m}) {
     grid-column-start: unset;
     grid-column-end: -1;
@@ -78,6 +79,7 @@ const StyledQuickReservation = styled(QuickReservation)`
 const PinkBox = styled(PinkBoxBase)`
   grid-column: 1 / -1;
   grid-row: -1;
+
   @media (min-width: ${breakpoints.l}) {
     grid-column: span 1 / -1;
     grid-row: 3 / -1;
