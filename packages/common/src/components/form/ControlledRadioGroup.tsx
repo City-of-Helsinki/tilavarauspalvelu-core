@@ -11,6 +11,7 @@ interface RadioGroupProps<T extends FieldValues> extends UseControllerProps<T> {
   required?: boolean;
   tooltip?: string;
   label?: string;
+  noTranslation?: boolean; // Prevent translation of labels
   error?: string;
 }
 
@@ -22,6 +23,7 @@ export function ControlledRadioGroup<T extends FieldValues>({
   required,
   label,
   tooltip,
+  noTranslation,
   error,
 }: RadioGroupProps<T>): JSX.Element {
   const { t } = useTranslation();
@@ -34,7 +36,7 @@ export function ControlledRadioGroup<T extends FieldValues>({
           id={`${name}.${opt.label}`}
           key={opt.label}
           style={{ margin: 0 }}
-          label={t(opt.label)}
+          label={noTranslation ? opt.label : t(opt.label)}
           onChange={() => field.onChange(opt.value)}
           checked={field.value === opt.value}
         />
