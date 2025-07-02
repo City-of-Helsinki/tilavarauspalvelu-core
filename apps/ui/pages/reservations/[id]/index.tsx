@@ -1,4 +1,4 @@
-import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/router";
 import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -129,8 +129,9 @@ function Reservation({
   Pick<PropsNarrowed, "termsOfUse" | "reservation" | "feedbackUrl" | "options" | "apiBaseUrl">
 >): React.ReactElement | null {
   const { t, i18n } = useTranslation();
-
-  const params = useSearchParams();
+  const router = useRouter();
+  const { query } = router;
+  const params = new URLSearchParams(query as Record<string, string>);
   const reservationStatus = params.get("status")?.toLowerCase();
 
   const shouldShowAccessCode =
@@ -168,7 +169,7 @@ function Reservation({
       params.get("error_code") === "RESERVATION_NOT_FOUND" ||
       params.get("error_code") === "RESERVATION_CANCELLED"
         ? t("reservations:reservationNotPayable")
-        : (params.get("error_message") ?? ""),
+        : (params.get("error_message") ?? t("error:genericError")),
     type: "error",
   });
 
@@ -201,7 +202,6 @@ function Reservation({
       reservation.paymentOrder?.status === OrderStatus.Refunded ||
       reservation.paymentOrder?.status === OrderStatus.PaidByInvoice);
 
-  console.log(reservation.state?.toLowerCase(), reservationStatus, "reservation state and status");
   const shouldShowStatusNotification =
     (reservationStatus === "paid" || reservationStatus === "confirmed" || reservationStatus === "requires_handling") &&
     reservation.state?.toLowerCase() === reservationStatus;
