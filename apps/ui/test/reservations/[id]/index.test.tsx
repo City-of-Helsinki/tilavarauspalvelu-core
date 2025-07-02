@@ -14,6 +14,14 @@ import {
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 
+const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
+  const params = vi.fn();
+  return {
+    useSearchParams: params,
+    mockedSearchParams: params,
+  };
+});
+
 const { useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
   const query = {
@@ -28,9 +36,28 @@ const { useRouter } = vi.hoisted(() => {
   };
 });
 
+vi.mock("next/navigation", () => ({
+  useSearchParams,
+}));
+
 vi.mock("next/router", () => ({
   useRouter,
 }));
+
+beforeEach(() => {
+  vi.useFakeTimers({
+    now: new Date(2024, 0, 1, 0, 0, 0),
+  });
+  const params = new URLSearchParams();
+  params.set("modalShown", false.toString());
+  mockedSearchParams.mockReturnValue(params);
+});
+
+afterEach(() => {
+  vi.runOnlyPendingTimers();
+  vi.useRealTimers();
+  vi.clearAllMocks();
+});
 
 interface CustomRenderProps extends CreateGraphQLMockProps {
   pk?: number;
@@ -74,16 +101,6 @@ function customRender(
   );
 }
 
-beforeEach(() => {
-  vi.useFakeTimers({
-    now: new Date(2024, 0, 1, 0, 0, 0),
-  });
-});
-afterEach(() => {
-  vi.runOnlyPendingTimers();
-  vi.useRealTimers();
-});
-
 describe("Page: View reservation", () => {
   it("renders reservation title correctly", async () => {
     const view = customRender();
@@ -99,7 +116,7 @@ describe("Page: View reservation", () => {
       const view = customRender({ state: state });
       await waitForAddressSection(view);
 
-      const headingSection = view.getByTestId("reservation__content").children[0] as HTMLElement;
+      const headingSection = view.getByTestId("reservation__content").childNodes[0] as HTMLElement;
       const statusText = "reservations:status." + camelCase(state);
       expect(within(headingSection).getByText(statusText)).toBeInTheDocument();
     });
