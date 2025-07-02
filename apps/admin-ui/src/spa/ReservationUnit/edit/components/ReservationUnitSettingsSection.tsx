@@ -327,6 +327,7 @@ export function ReservationUnitSettingsSection({
               control={control}
               noLabel
               noTooltip
+              noTranslation
             />
           </ActivationGroup>
         </FieldGroup>

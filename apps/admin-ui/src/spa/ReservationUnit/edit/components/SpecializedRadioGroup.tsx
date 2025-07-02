@@ -9,18 +9,20 @@ export function SpecializedRadioGroup({
   name,
   options,
   control,
-  noLabel,
-  noTooltip,
   direction,
   required,
+  noLabel,
+  noTooltip,
+  noTranslation,
 }: {
   name: "reservationKind" | "bufferType" | "cancellationRule";
   options: readonly string[] | readonly { label: string; value: number }[];
   control: Control<ReservationUnitEditFormValues>;
-  noLabel?: boolean;
-  noTooltip?: boolean;
   direction?: "horizontal" | "vertical";
   required?: boolean;
+  noLabel?: boolean;
+  noTooltip?: boolean;
+  noTranslation?: boolean;
 }): JSX.Element {
   const { t } = useTranslation();
   const { fieldState } = useController({ name, control });
@@ -48,6 +50,7 @@ export function SpecializedRadioGroup({
       direction={direction}
       error={getTranslatedError(t, error?.message)}
       options={opts}
+      noTranslation={noTranslation}
     />
   );
 }
