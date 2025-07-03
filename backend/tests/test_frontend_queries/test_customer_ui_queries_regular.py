@@ -65,7 +65,7 @@ def test_frontend_queries__customer_ui__AffectingReservations__regular(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
     factory_args = query_info.factory_args
-    factory_args["reservation_units"] = [reservation_unit]
+    factory_args["reservation_unit"] = reservation_unit
     factory_args["begins_at"] = local_datetime(2024, 1, 1, 12, 0)
     factory_args["ends_at"] = local_datetime(2024, 1, 1, 15, 0)
     query_info.factory.create(**factory_args)
@@ -305,7 +305,7 @@ def test_frontend_queries__customer_ui__Options__regular(graphql):
     customer_factories = get_customer_query_info()
     factories = customer_factories["Options"]
 
-    assert len(factories) == 7
+    assert len(factories) == 6
 
     for query_info in factories:
         factory_args = deepcopy(query_info.factory_args)
@@ -687,9 +687,9 @@ def test_frontend_queries__customer_ui__ApplicationPage4__regular(graphql):
     assert isinstance(response.first_query_object, dict)
 
 
-def test_frontend_queries__customer_ui__ApplicationRecurringReservation__regular(graphql):
+def test_frontend_queries__customer_ui__ApplicationReservationSeries__regular(graphql):
     customer_factories = get_customer_query_info()
-    factories = customer_factories["ApplicationRecurringReservation"]
+    factories = customer_factories["ApplicationReservationSeries"]
 
     assert len(factories) == 1
     query_info = factories[0]
@@ -722,7 +722,7 @@ def test_frontend_queries__customer_ui__ApplicationReservations__regular(graphql
 
     user = graphql.login_with_regular_user()
 
-    series_key = "application_sections__reservation_unit_options__allocated_time_slots__recurring_reservation"
+    series_key = "application_sections__reservation_unit_options__allocated_time_slots__reservation_series"
 
     factory_args = deepcopy(query_info.factory_args)
     factory_args["user"] = user
@@ -753,7 +753,7 @@ def test_frontend_queries__customer_ui__ApplicationSectionCancel__regular(graphq
 
     user = graphql.login_with_regular_user()
 
-    series_key = "reservation_unit_options__allocated_time_slots__recurring_reservation"
+    series_key = "reservation_unit_options__allocated_time_slots__reservation_series"
 
     # Make sure the application has been handled and results sent to users
     factory_args_1 = deepcopy(query_info_1.factory_args)
@@ -787,7 +787,7 @@ def test_frontend_queries__customer_ui__ApplicationSectionView__regular(graphql)
 
     user = graphql.login_with_regular_user()
 
-    series_key = "reservation_unit_options__allocated_time_slots__recurring_reservation"
+    series_key = "reservation_unit_options__allocated_time_slots__reservation_series"
 
     # Make sure the application has been handled and results sent to users
     factory_args = deepcopy(query_info.factory_args)
@@ -989,11 +989,11 @@ def test_frontend_queries__customer_ui__ReservationCancelPage__regular(graphql):
 
     user = graphql.login_with_regular_user()
 
-    apl_key = "recurring_reservation__allocated_time_slot__reservation_unit_option__application_section__application"
+    apl_key = "reservation_series__allocated_time_slot__reservation_unit_option__application_section__application"
 
     factory_args_1 = deepcopy(query_info_1.factory_args)
     factory_args_1["user"] = user
-    factory_args_1["recurring_reservation__user"] = user
+    factory_args_1["reservation_series__user"] = user
     factory_args_1[f"{apl_key}__user"] = user
     obj = query_info_1.factory.create(**factory_args_1)
 
@@ -1083,7 +1083,7 @@ def test_frontend_queries__customer_ui__ReservationPage__regular(graphql):
 
     factory_args = deepcopy(query_info.factory_args)
     factory_args["user"] = user
-    factory_args["recurring_reservation__user"] = user
+    factory_args["reservation_series__user"] = user
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)

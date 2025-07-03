@@ -80,7 +80,7 @@ def test_frontend_queries__customer_ui__AffectingReservations(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
     factory_args = query_info.factory_args
-    factory_args["reservation_units"] = [reservation_unit]
+    factory_args["reservation_unit"] = reservation_unit
     factory_args["begins_at"] = local_datetime(2024, 1, 1, 12, 0)
     factory_args["ends_at"] = local_datetime(2024, 1, 1, 15, 0)
     query_info.factory.create(**factory_args)
@@ -248,9 +248,9 @@ def test_frontend_queries__customer_ui__ApplicationPage4(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__ApplicationRecurringReservation(graphql):
+def test_frontend_queries__customer_ui__ApplicationReservationSeries(graphql):
     customer_factories = get_customer_query_info()
-    factories = customer_factories["ApplicationRecurringReservation"]
+    factories = customer_factories["ApplicationReservationSeries"]
 
     assert len(factories) == 1
     query_info = factories[0]
@@ -656,7 +656,7 @@ def test_frontend_queries__customer_ui__Options(graphql):
     customer_factories = get_customer_query_info()
     factories = customer_factories["Options"]
 
-    assert len(factories) == 7
+    assert len(factories) == 6
 
     for query_info in factories:
         factory_args = deepcopy(query_info.factory_args)

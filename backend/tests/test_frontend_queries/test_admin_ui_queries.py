@@ -569,19 +569,15 @@ def test_frontend_queries__admin_ui__Options(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["Options"]
 
-    assert len(factories) == 3
+    assert len(factories) == 2
     query_info_1 = factories[0]
     query_info_2 = factories[1]
-    query_info_3 = factories[2]
 
     factory_args_1 = deepcopy(query_info_1.factory_args)
     query_info_1.factory.create(**factory_args_1)
 
     factory_args_2 = deepcopy(query_info_2.factory_args)
     query_info_2.factory.create(**factory_args_2)
-
-    factory_args_3 = deepcopy(query_info_3.factory_args)
-    query_info_3.factory.create(**factory_args_3)
 
     variables = query_info_1.variables
     assert_no_undefined_variables(variables)
@@ -594,9 +590,9 @@ def test_frontend_queries__admin_ui__Options(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__admin_ui__RecurringReservation(graphql):
+def test_frontend_queries__admin_ui__ReservationSeries(graphql):
     admin_factories = get_admin_query_info()
-    factories = admin_factories["RecurringReservation"]
+    factories = admin_factories["ReservationSeries"]
 
     assert len(factories) == 1
     query_info = factories[0]
@@ -616,9 +612,9 @@ def test_frontend_queries__admin_ui__RecurringReservation(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__admin_ui__RecurringReservationUnit(graphql):
+def test_frontend_queries__admin_ui__SeriesReservationUnit(graphql):
     admin_factories = get_admin_query_info()
-    factories = admin_factories["RecurringReservationUnit"]
+    factories = admin_factories["SeriesReservationUnit"]
 
     assert len(factories) == 1
     query_info = factories[0]
@@ -792,28 +788,6 @@ def test_frontend_queries__admin_ui__ReservationPermissions(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__admin_ui__ReservationSeries(graphql):
-    admin_factories = get_admin_query_info()
-    factories = admin_factories["ReservationSeries"]
-
-    assert len(factories) == 1
-    query_info = factories[0]
-
-    factory_args = deepcopy(query_info.factory_args)
-    obj = query_info.factory.create(**factory_args)
-
-    variables = deepcopy(query_info.variables)
-    variables["id"] = to_global_id(query_info.typename, obj.id)
-    assert_no_undefined_variables(variables)
-
-    query = query_info.query
-    graphql.login_with_superuser()
-
-    response = graphql(query, variables=variables)
-
-    assert response.has_errors is False, response.errors
-
-
 def test_frontend_queries__admin_ui__ReservationUnit(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["ReservationUnit"]
@@ -848,7 +822,7 @@ def test_frontend_queries__admin_ui__ReservationUnitCalendar(graphql):
     obj: ReservationUnit = query_info_1.factory.create(**factory_args_1)
 
     factory_args_2 = deepcopy(query_info_2.factory_args)
-    factory_args_2["reservation_units"] = [obj]
+    factory_args_2["reservation_unit"] = obj
     query_info_2.factory.create(**factory_args_2)
 
     variables = query_info_1.variables
@@ -890,7 +864,7 @@ def test_frontend_queries__admin_ui__ReservationUnitEditorParameters(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["ReservationUnitEditorParameters"]
 
-    assert len(factories) == 8
+    assert len(factories) == 7
 
     for query_info in factories:
         factory_args = deepcopy(query_info.factory_args)
@@ -1011,7 +985,7 @@ def test_frontend_queries__admin_ui__ReservationsByReservationUnit(graphql):
     obj: ReservationUnit = query_info_1.factory.create(**factory_args_1)
 
     factory_args_2 = deepcopy(query_info_2.factory_args)
-    factory_args_2["reservation_units"] = [obj]
+    factory_args_2["reservation_unit"] = obj
     query_info_2.factory.create(**factory_args_2)
 
     variables = query_info_1.variables

@@ -4,7 +4,7 @@ import datetime
 import uuid
 from copy import deepcopy
 from inspect import isfunction
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from unittest.mock import MagicMock
 
 import pytest
@@ -49,6 +49,9 @@ from tests.helpers import patch_method
 
 from .helpers import assert_no_undefined_variables, get_admin_query_info
 
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import Reservation
+
 pytestmark = [
     pytest.mark.django_db,
     pytest.mark.frontend_query,
@@ -89,10 +92,10 @@ def test_frontend_queries__customer_ui__AddReservationToSeries(graphql):
     factory_args["begin"] = now
     series = ReservationSeriesFactory.create_with_matching_reservations(**factory_args)
 
-    last_reservation = series.reservations.last()
+    last_reservation: Reservation = series.reservations.last()
 
-    new_begin = last_reservation.begin + datetime.timedelta(days=1)
-    new_end = last_reservation.end + datetime.timedelta(days=1)
+    new_begin = last_reservation.begins_at + datetime.timedelta(days=1)
+    new_end = last_reservation.ends_at + datetime.timedelta(days=1)
 
     variables = deepcopy(query_info.variables)
     variables["input"] = {
@@ -351,7 +354,7 @@ def test_frontend_queries__customer_ui__CreateReservationSeries(graphql):
         "endTime": end.time().isoformat(),
         "recurrenceInDays": 7,
         "reservationUnit": reservation_unit.pk,
-        "weekdays": [Weekday.MONDAY.as_weekday_number],
+        "weekdays": [Weekday.MONDAY],
         "reservationDetails": {
             "type": ReservationTypeStaffChoice.STAFF.value,
             "user": user.pk,
@@ -418,12 +421,15 @@ def test_frontend_queries__customer_ui__CreateSpace(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["CreateSpace"]
 
+    unit = UnitFactory.create()
+
     assert len(factories) == 1
     query_info = factories[0]
 
     variables = deepcopy(query_info.variables)
     variables["input"] = {
         "name": "Resource",
+        "unit": unit.pk,
     }
     assert_no_undefined_variables(variables)
 
@@ -816,14 +822,14 @@ def test_frontend_queries__customer_ui__RescheduleReservationSeries(graphql):
 
     factory_args: dict[str, Any] = {}
     factory_args["begin"] = next_hour()
-    factory_args["weekdays"] = f"{Weekday.MONDAY.as_weekday_number}"
+    factory_args["weekdays"] = [f"{Weekday.MONDAY}"]
 
     series = ReservationSeriesFactory.create_with_matching_reservations(**factory_args)
 
     variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": series.pk,
-        "weekdays": [Weekday.TUESDAY.as_weekday_number],
+        "weekdays": [Weekday.TUESDAY],
     }
     assert_no_undefined_variables(variables)
 
@@ -977,9 +983,9 @@ def test_frontend_queries__customer_ui__UpdateImage(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__UpdateRecurringReservation(graphql):
+def test_frontend_queries__customer_ui__UpdateReservationSeries(graphql):
     admin_factories = get_admin_query_info()
-    factories = admin_factories["UpdateRecurringReservation"]
+    factories = admin_factories["UpdateReservationSeries"]
 
     assert len(factories) == 1
     query_info = factories[0]
