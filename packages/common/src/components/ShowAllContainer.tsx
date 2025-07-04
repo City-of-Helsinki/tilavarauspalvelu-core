@@ -1,4 +1,4 @@
-import React, { type HTMLAttributes, useEffect, useState } from "react";
+import React, { type HTMLAttributes, useState } from "react";
 import { IconAngleDown, IconAngleUp } from "hds-react";
 import styled from "styled-components";
 import { AutoGrid, Flex } from "../../styled";
@@ -12,8 +12,6 @@ export interface ShowAllContainerProps extends Omit<HTMLAttributes<HTMLDivElemen
   // Maximum number of child elements shown unless "Show all" is toggled
   maximumNumber?: number;
   minWidth?: string;
-  // All the elements to show, when "show all" is toggled
-  children: JSX.Element[] | JSX.Element;
   // "Show all"-button alignment <"left" | "right> (optional, defaults to "right")
   alignButton?: "left" | "right";
   // Should the component return an <ul> element (optional, defaults to false)
@@ -22,6 +20,8 @@ export interface ShowAllContainerProps extends Omit<HTMLAttributes<HTMLDivElemen
   initiallyOpen?: boolean;
   // Extra content to show next to the "Show all" button, e.g. checkbox filter
   extraShowMoreContent?: JSX.Element;
+  // All the elements to show, when "show all" is toggled
+  children: JSX.Element[] | JSX.Element;
 }
 
 // styled component so we can use "as" to cast the html element
@@ -31,19 +31,16 @@ function ShowAllContainer({
   showAllLabel,
   showLessLabel = showAllLabel,
   maximumNumber = 0,
-  initiallyOpen = false,
-  alignButton = "left",
   minWidth = "18rem",
-  renderAsUl,
+  alignButton = "left",
+  renderAsUl = false,
+  initiallyOpen = false,
   extraShowMoreContent,
   children,
   ...rest
 }: ShowAllContainerProps) {
-  const [showAll, setShowAll] = useState<boolean>(false);
-  // update the showAll state if the initiallyOpen prop changes
-  useEffect(() => {
-    setShowAll(initiallyOpen);
-  }, [initiallyOpen]);
+  // Use initiallyOpen only when the component is rendered for the first time
+  const [showAll, setShowAll] = useState<boolean>(initiallyOpen);
 
   const count = Array.isArray(children) ? children.length : 1;
   const content = showAll ? children : Array.isArray(children) ? children.slice(0, maximumNumber) : null;
