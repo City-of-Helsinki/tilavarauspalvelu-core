@@ -100,7 +100,7 @@ describe("SearchSingle read query params", () => {
         value: "1",
         tagText: options.purposes[0]?.label,
         formFieldText: options.purposes[0]?.label,
-        initiallyOpen: false,
+        initiallyOpen: true,
       },
       units: {
         value: "1",
@@ -118,7 +118,7 @@ describe("SearchSingle read query params", () => {
         value: "1",
         tagText: options.reservationUnitTypes[0]?.label,
         formFieldText: options.reservationUnitTypes[0]?.label,
-        initiallyOpen: true,
+        initiallyOpen: false,
       },
       timeBegin: {
         value: "06:00",
