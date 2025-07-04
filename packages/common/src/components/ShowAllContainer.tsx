@@ -1,4 +1,4 @@
-import React, { type HTMLAttributes, useEffect, useState } from "react";
+import React, { type HTMLAttributes, useState } from "react";
 import { IconAngleDown, IconAngleUp } from "hds-react";
 import styled from "styled-components";
 import { AutoGrid, Flex } from "../../styled";
@@ -39,11 +39,8 @@ function ShowAllContainer({
   children,
   ...rest
 }: ShowAllContainerProps) {
-  const [showAll, setShowAll] = useState<boolean>(false);
-  // update the showAll state if the initiallyOpen prop changes
-  useEffect(() => {
-    setShowAll(initiallyOpen);
-  }, [initiallyOpen]);
+  // Use initiallyOpen only when the component is rendered for the first time
+  const [showAll, setShowAll] = useState<boolean>(initiallyOpen);
 
   const count = Array.isArray(children) ? children.length : 1;
   const content = showAll ? children : Array.isArray(children) ? children.slice(0, maximumNumber) : null;
