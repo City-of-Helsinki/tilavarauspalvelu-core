@@ -147,13 +147,13 @@ export function SingleSearchForm({
 
   // All fields that are normally initially hidden
   const showOptionalFilters = !!(
-    formValues.units.length ||
-    formValues.equipments.length ||
-    formValues.reservationUnitTypes.length ||
     formValues.timeBegin ||
     formValues.timeEnd ||
     formValues.duration ||
+    formValues.units.length ||
     formValues.personsAllowed ||
+    formValues.purposes.length ||
+    formValues.equipments.length ||
     formValues.accessTypes.length
   );
 
@@ -192,6 +192,15 @@ export function SingleSearchForm({
             }
           }}
         />
+        <ControlledSelect
+          name="reservationUnitTypes"
+          multiselect
+          control={control}
+          options={reservationUnitTypes}
+          enableSearch
+          clearable
+          label={t("searchForm:labels.reservationUnitTypes")}
+        />
         <SingleLabelInputGroup label={t("common:dateLabel")}>
           <DateRangePicker
             startDate={fromUIDate(getValues("startDate") ?? "")}
@@ -214,42 +223,7 @@ export function SingleSearchForm({
             }}
           />
         </SingleLabelInputGroup>
-        <ControlledSelect
-          multiselect
-          clearable
-          enableSearch
-          name="purposes"
-          control={control}
-          options={purposes}
-          label={t("searchForm:labels.purposes")}
-        />
-        <ControlledSelect
-          multiselect
-          clearable
-          enableSearch
-          name="units"
-          control={control}
-          options={units}
-          label={t("searchForm:labels.units")}
-        />
-        <ControlledSelect
-          multiselect
-          clearable
-          enableSearch
-          name="equipments"
-          control={control}
-          options={equipments}
-          label={t("searchForm:labels.equipments")}
-        />
-        <ControlledSelect
-          name="reservationUnitTypes"
-          multiselect
-          control={control}
-          options={reservationUnitTypes}
-          enableSearch
-          clearable
-          label={t("searchForm:labels.reservationUnitTypes")}
-        />
+
         <SingleLabelInputGroup label={t("common:timeLabel")}>
           <TimeRangePicker
             control={control}
@@ -272,12 +246,41 @@ export function SingleSearchForm({
           options={durationOptions}
           label={t("searchForm:labels.duration", { duration: "" })}
         />
+        <ControlledSelect
+          multiselect
+          clearable
+          enableSearch
+          name="units"
+          control={control}
+          options={units}
+          label={t("searchForm:labels.units")}
+        />
+
         <ControlledNumberInput
           label={t("searchForm:labels.personsAllowed")}
           name="personsAllowed"
           control={control}
           min={1}
         />
+        <ControlledSelect
+          multiselect
+          clearable
+          enableSearch
+          name="purposes"
+          control={control}
+          options={purposes}
+          label={t("searchForm:labels.purposes")}
+        />
+        <ControlledSelect
+          multiselect
+          clearable
+          enableSearch
+          name="equipments"
+          control={control}
+          options={equipments}
+          label={t("searchForm:labels.equipments")}
+        />
+
         <ControlledSelect
           multiselect
           clearable
