@@ -1,8 +1,9 @@
+import { useRouter } from "next/router";
 import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
-import { IconArrowRight, IconCalendar, IconCross, IconLinkExternal, IconLock } from "hds-react";
+import { IconArrowRight, IconCalendar, IconCross, IconLinkExternal, IconLock, Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { Flex, NoWrap, H1, H4, fontRegular } from "common/styled";
 import { breakpoints } from "common/src/const";
@@ -25,7 +26,6 @@ import { isBefore, sub } from "date-fns";
 import { createApolloClient } from "@/modules/apolloClient";
 import { formatDateTimeRange } from "@/modules/util";
 import {
-  getCheckoutUrl,
   getNormalizedReservationOrderStatus,
   getWhyReservationCantBeChanged,
   isReservationCancellable,
@@ -39,6 +39,7 @@ import { ButtonLikeLink, ButtonLikeExternalLink } from "@/components/common/Butt
 import { ReservationPageWrapper } from "@/styled/reservation";
 import {
   getApplicationPath,
+  getCheckoutRedirectUrl,
   getFeedbackUrl,
   getReservationPath,
   getReservationUnitPath,
@@ -122,13 +123,22 @@ function Reservation({
   termsOfUse,
   reservation,
   feedbackUrl,
+  apiBaseUrl,
   options,
-}: Readonly<Pick<PropsNarrowed, "termsOfUse" | "reservation" | "feedbackUrl" | "options">>): JSX.Element | null {
+}: Readonly<
+  Pick<PropsNarrowed, "termsOfUse" | "reservation" | "feedbackUrl" | "options" | "apiBaseUrl">
+>): React.ReactElement | null {
   const { t, i18n } = useTranslation();
+  const router = useRouter();
+  const { query } = router;
+  const params = new URLSearchParams(query as Record<string, string>);
+  const reservationStatus = params.get("status")?.toLowerCase();
+
   const shouldShowAccessCode =
     isBefore(sub(new Date(), { days: 1 }), new Date(reservation.endsAt)) &&
     reservation.state === ReservationStateChoice.Confirmed &&
     reservation.accessType === AccessType.AccessCode;
+
   const { data: accessCodeData } = useAccessCodeQuery({
     skip: !reservation || !shouldShowAccessCode,
     variables: {
@@ -152,6 +162,17 @@ function Reservation({
     message: t("reservations:reservationCancelledTitle"),
   });
 
+  useToastIfQueryParam({
+    key: "error_code",
+    message:
+      params.get("error_code") === "RESERVATION_NOT_CONFIRMED" ||
+      params.get("error_code") === "RESERVATION_NOT_FOUND" ||
+      params.get("error_code") === "RESERVATION_CANCELLED"
+        ? t("reservations:reservationNotPayable")
+        : (params.get("error_message") ?? t("error:genericError")),
+    type: "error",
+  });
+
   const { beginsAt, endsAt } = reservation;
   const timeString = capitalize(formatDateTimeRange(t, new Date(beginsAt), new Date(endsAt)));
 
@@ -161,9 +182,8 @@ function Reservation({
   const isCancellable = isReservationCancellable(reservation);
 
   const lang = convertLanguageCode(i18n.language);
-  const checkoutUrl = getCheckoutUrl(reservation.paymentOrder, lang);
 
-  const hasCheckoutUrl = !!checkoutUrl;
+  const hasCheckoutUrl = !!reservation.paymentOrder?.checkoutUrl;
   const isWaitingForPayment = reservation.state === ReservationStateChoice.WaitingForPayment;
 
   const routes = [
@@ -182,12 +202,24 @@ function Reservation({
       reservation.paymentOrder?.status === OrderStatus.Refunded ||
       reservation.paymentOrder?.status === OrderStatus.PaidByInvoice);
 
+  const shouldShowStatusNotification =
+    (reservationStatus === "paid" || reservationStatus === "confirmed" || reservationStatus === "requires_handling") &&
+    reservation.state?.toLowerCase() === reservationStatus;
   const shouldShowPaymentNotification =
     reservation.paymentOrder?.status === OrderStatus.Pending && reservation.state === ReservationStateChoice.Confirmed;
 
   return (
     <>
       <Breadcrumb routes={routes} />
+      {shouldShowStatusNotification && (
+        <Notification
+          type={reservationStatus === "requires_handling" ? "info" : "success"}
+          data-testid="reservation__status-notification"
+          label={t(`reservations:notifications.${reservationStatus}.title`)}
+        >
+          {t(`reservations:notifications.${reservationStatus}.body`)}
+        </Notification>
+      )}
       <ReservationPageWrapper data-testid="reservation__content" $nRows={3}>
         <Flex style={{ gridColumn: "1 / span 1", gridRow: "1 / span 1" }}>
           <Flex $direction="row" $alignItems="center" $justifyContent="space-between" $wrap="wrap">
@@ -258,7 +290,7 @@ function Reservation({
               <ButtonLikeLink
                 size="large"
                 disabled={!hasCheckoutUrl}
-                href={checkoutUrl ?? ""}
+                href={getCheckoutRedirectUrl(reservation.pk ?? 0, lang, apiBaseUrl)}
                 data-testid="reservation-detail__button--checkout"
                 role="button"
               >
@@ -293,7 +325,12 @@ function Reservation({
         </div>
         <Flex>
           {shouldShowPaymentNotification && (
-            <PaymentNotification paymentOrder={reservation.paymentOrder} appliedPricing={reservation.appliedPricing} />
+            <PaymentNotification
+              pk={reservation.pk ?? 0}
+              paymentOrder={reservation.paymentOrder}
+              appliedPricing={reservation.appliedPricing}
+              apiBaseUrl={apiBaseUrl}
+            />
           )}
           <Instructions reservation={reservation} />
           <GeneralFields supportedFields={supportedFields} reservation={reservation} options={options} />
@@ -315,7 +352,7 @@ function AccessCodeInfo({
   feedbackUrl,
 }: Readonly<
   Pick<NonNullable<AccessCodeQuery["reservation"]>, "pindoraInfo"> & Pick<PropsNarrowed, "feedbackUrl">
->): JSX.Element {
+>): React.ReactElement {
   const { t, i18n } = useTranslation();
   return (
     <div>

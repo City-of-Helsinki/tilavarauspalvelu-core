@@ -63,7 +63,13 @@ function customRender(
   const termsOfUse = createTermsOfUseMock();
   return render(
     <MockedGraphQLProvider mocks={createGraphQLMocks(mockProps)}>
-      <Reservation termsOfUse={termsOfUse} reservation={reservation} feedbackUrl="" options={createOptionsMock()} />
+      <Reservation
+        termsOfUse={termsOfUse}
+        reservation={reservation}
+        feedbackUrl=""
+        options={createOptionsMock()}
+        apiBaseUrl={"http://localhost:8000"}
+      />
     </MockedGraphQLProvider>
   );
 }
@@ -93,7 +99,7 @@ describe("Page: View reservation", () => {
       const view = customRender({ state: state });
       await waitForAddressSection(view);
 
-      const headingSection = view.getByTestId("reservation__content").children[0] as HTMLElement;
+      const headingSection = view.getByTestId("reservation__content").childNodes[0] as HTMLElement;
       const statusText = "reservations:status." + camelCase(state);
       expect(within(headingSection).getByText(statusText)).toBeInTheDocument();
     });

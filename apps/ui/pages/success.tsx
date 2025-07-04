@@ -1,43 +1,30 @@
+import { getReservationServerProps } from "@/modules/paymentRedirect";
 import type { GetServerSidePropsContext } from "next";
-import { ReservationStateChoice, ReservationStateQuery, useReservationStateQuery } from "@gql/gql-types";
+import { OrderStatus, ReservationStateChoice, ReservationStateQuery, useReservationStateQuery } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath } from "@/modules/urls";
-import { createApolloClient } from "@/modules/apolloClient";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { CenterSpinner } from "common/styled";
-import { ignoreMaybeArray } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
 // TODO should be moved to /reservations/success
 // but because this is webstore callback page we need to leave the url (use an url rewrite)
 // we can't tie this to a reservationPk because it's used as a return page from webstore
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { locale, query } = ctx;
-  const commonProps = getCommonServerSideProps();
+  const { commonProps, reservation, orderId, locale } = await getReservationServerProps(ctx);
 
-  const orderId = ignoreMaybeArray(query.orderId);
-  const notFoundValue = {
-    notFound: true,
-    props: {
-      ...commonProps,
-      ...(await serverSideTranslations(locale ?? "fi")),
+  if (!orderId || !reservation) {
+    return {
       notFound: true,
-    },
-  };
-
-  if (!orderId) {
-    return notFoundValue;
+      props: {
+        ...commonProps,
+        ...(await serverSideTranslations(locale ?? "fi")),
+        notFound: true,
+      },
+    };
   }
 
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
-  // The reservation exists already if the orderUuid is valid
-  const reservation = await getReservationByOrderUuid(apolloClient, orderId);
-
-  if (reservation == null) {
-    return notFoundValue;
-  }
   const destination = getRedirectUrl(reservation);
   if (destination != null) {
     return {
@@ -61,16 +48,21 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 }
 
 type QueryT = NonNullable<ReservationStateQuery["reservation"]>;
-type RedirectProps = Pick<QueryT, "state" | "pk">;
+type RedirectProps = Pick<QueryT, "state" | "pk" | "paymentOrder">;
 
 /// @returns the url of the reservation or null if the reservation is still waiting for payment
 /// because payments are done with webhooks, we might need to wait for it
 /// the reservation is valid (and should be payed) but wait for the backend to confirm it
 function getRedirectUrl(reservation: RedirectProps): string | null {
+  const redirectUrl = getReservationPath(reservation.pk);
   switch (reservation.state) {
-    case ReservationStateChoice.Confirmed:
     case ReservationStateChoice.RequiresHandling:
-      return getReservationPath(reservation.pk, "confirmation");
+      return redirectUrl + "?status=requires_handling";
+    case ReservationStateChoice.Confirmed:
+      if (reservation.paymentOrder?.handledPaymentDueBy) {
+        return redirectUrl + "?status=confirmed";
+      }
+      return redirectUrl + "?status=paid";
     case ReservationStateChoice.WaitingForPayment:
       return null;
     case ReservationStateChoice.Created:
@@ -87,8 +79,8 @@ type NarrowedProps = Exclude<Props, { notFound: boolean }>;
 /// Show loading page if the reservation is still waiting for payment
 /// assuming the user landed here correctly from the webstore callback
 /// the reservation is paid and confirmed but our backend hasn't updated the state yet
-function Page(pros: NarrowedProps): JSX.Element {
-  const id = pros.reservation.id;
+function Page(props: NarrowedProps): JSX.Element {
+  const id = props.reservation.id;
   // is there a point where we stop polling and return an error to the user?
   const { data } = useReservationStateQuery({
     variables: {
@@ -101,7 +93,11 @@ function Page(pros: NarrowedProps): JSX.Element {
 
   useEffect(() => {
     const reservation = data?.reservation;
-    if (reservation == null) {
+    if (
+      reservation == null ||
+      (reservation.paymentOrder?.status !== OrderStatus.Paid &&
+        reservation.paymentOrder?.status !== OrderStatus.PaidByInvoice)
+    ) {
       return;
     }
     const redirectUrl = getRedirectUrl(reservation);
@@ -121,6 +117,11 @@ export const GET_RESERVATION_STATE = gql`
       id
       pk
       state
+      paymentOrder {
+        id
+        status
+        handledPaymentDueBy
+      }
     }
   }
 `;

@@ -6,6 +6,7 @@ import uuid
 from functools import cache, wraps
 from typing import TYPE_CHECKING, Any
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.http import HttpRequest, HttpResponseRedirect, JsonResponse
@@ -44,7 +45,7 @@ def validation_error_as_response[R, **P](func: Callable[P, R]) -> Callable[P, R]
     return wrapper
 
 
-validate_url = URLValidator(schemes=["https"])
+validate_url = URLValidator(schemes=(["https"] if not settings.DEBUG else ["https", "http"]))
 
 
 def is_valid_url(url: str) -> bool:

@@ -92,6 +92,11 @@ export const GET_ORDER = gql`
         id
         pk
         state
+        paymentOrder {
+          id
+          status
+          handledPaymentDueBy
+        }
       }
       status
       paymentType
