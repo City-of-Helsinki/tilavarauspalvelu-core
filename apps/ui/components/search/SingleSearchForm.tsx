@@ -184,8 +184,8 @@ export function SingleSearchForm({
         <TextInput
           id="search"
           label={t("searchForm:labels.textSearch")}
-          {...register("textSearch")}
           placeholder={t("searchForm:placeholders.textSearch")}
+          {...register("textSearch")}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               handleSubmit(onSearch)();
@@ -194,19 +194,15 @@ export function SingleSearchForm({
         />
         <ControlledSelect
           name="reservationUnitTypes"
-          multiselect
+          label={t("searchForm:labels.reservationUnitTypes")}
           control={control}
           options={reservationUnitTypes}
-          enableSearch
+          multiselect
           clearable
-          label={t("searchForm:labels.reservationUnitTypes")}
+          enableSearch
         />
         <SingleLabelInputGroup label={t("common:dateLabel")}>
           <DateRangePicker
-            startDate={fromUIDate(getValues("startDate") ?? "")}
-            endDate={fromUIDate(getValues("endDate") ?? "")}
-            onChangeStartDate={(date: Date | null) => setValue("startDate", date != null ? toUIDate(date) : null)}
-            onChangeEndDate={(date: Date | null) => setValue("endDate", date != null ? toUIDate(date) : null)}
             labels={{
               begin: t("dateSelector:labelStartDate"),
               end: t("dateSelector:labelEndDate"),
@@ -215,6 +211,10 @@ export function SingleSearchForm({
               begin: t("common:beginLabel"),
               end: t("common:endLabel"),
             }}
+            startDate={fromUIDate(getValues("startDate") ?? "")}
+            endDate={fromUIDate(getValues("endDate") ?? "")}
+            onChangeStartDate={(date: Date | null) => setValue("startDate", date != null ? toUIDate(date) : null)}
+            onChangeEndDate={(date: Date | null) => setValue("endDate", date != null ? toUIDate(date) : null)}
             limits={{
               startMinDate: startOfDay(new Date()),
               startMaxDate: addYears(new Date(), 2),
@@ -226,7 +226,6 @@ export function SingleSearchForm({
 
         <SingleLabelInputGroup label={t("common:timeLabel")}>
           <TimeRangePicker
-            control={control}
             names={{ begin: "timeBegin", end: "timeEnd" }}
             labels={{
               begin: `${t("common:timeLabelBegin")}`,
@@ -236,58 +235,59 @@ export function SingleSearchForm({
               begin: t("common:beginLabel"),
               end: t("common:endLabel"),
             }}
+            control={control}
             clearable={{ begin: true, end: true }}
           />
         </SingleLabelInputGroup>
         <ControlledSelect
           name="duration"
-          control={control}
-          clearable
-          options={durationOptions}
           label={t("searchForm:labels.duration", { duration: "" })}
+          control={control}
+          options={durationOptions}
+          clearable
         />
         <ControlledSelect
+          name="units"
+          label={t("searchForm:labels.units")}
+          control={control}
+          options={units}
           multiselect
           clearable
           enableSearch
-          name="units"
-          control={control}
-          options={units}
-          label={t("searchForm:labels.units")}
         />
 
         <ControlledNumberInput
-          label={t("searchForm:labels.personsAllowed")}
           name="personsAllowed"
+          label={t("searchForm:labels.personsAllowed")}
           control={control}
           min={1}
         />
         <ControlledSelect
+          name="purposes"
+          label={t("searchForm:labels.purposes")}
+          options={purposes}
+          control={control}
           multiselect
           clearable
           enableSearch
-          name="purposes"
-          control={control}
-          options={purposes}
-          label={t("searchForm:labels.purposes")}
         />
         <ControlledSelect
+          name="equipments"
+          label={t("searchForm:labels.equipments")}
+          control={control}
+          options={equipments}
           multiselect
           clearable
           enableSearch
-          name="equipments"
-          control={control}
-          options={equipments}
-          label={t("searchForm:labels.equipments")}
         />
 
         <ControlledSelect
-          multiselect
-          clearable
           name="accessTypes"
+          label={t("searchForm:labels.accessTypes")}
           control={control}
           options={accessTypeOptions}
-          label={t("searchForm:labels.accessTypes")}
+          multiselect
+          clearable
         />
       </ShowAllContainer>
       <SearchButtonContainer>

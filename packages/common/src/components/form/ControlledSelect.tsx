@@ -4,6 +4,14 @@ import { useTranslation } from "next-i18next";
 import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
 import { convertOptionToHDS, filterNonNullable, toNumber } from "../../helpers";
 import { convertLanguageCode } from "../../common/util";
+import styled from "styled-components";
+
+// Used to override the default max-width of HDS Select component, which causes different width fields in the form
+const StyledControlledSelect = styled(Select)`
+  && {
+    max-width: none;
+  }
+`;
 
 interface SelectProps<T extends FieldValues> extends UseControllerProps<T> {
   name: Path<T>;
@@ -95,7 +103,7 @@ export function ControlledSelect<T extends FieldValues>({
   }
 
   return (
-    <Select
+    <StyledControlledSelect
       {...rest}
       style={style}
       className={className}
