@@ -34,7 +34,7 @@ function mapValidationError(gqlError: GraphQLFormattedError): ValidationError[] 
       }
       if (code != null && "message" in err && "field" in err) {
         const { message, field } = err ?? {};
-        const validation_code = "code" in err ? err.code : null;
+        const validation_code = "code" in err && err.code !== "" ? err.code : null;
         return {
           code,
           message: typeof message !== "string" ? null : message,

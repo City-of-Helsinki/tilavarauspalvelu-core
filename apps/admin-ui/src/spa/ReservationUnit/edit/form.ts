@@ -964,6 +964,10 @@ function transformPricing(
   if (!hasFuturePricing && isAfterToday(values.begins)) {
     return null;
   }
+  // backend error if not valid making it impossible to save free new reservation units
+  if (values.taxPercentage === 0) {
+    return null;
+  }
 
   const begins = fromUIDate(values.begins) ?? new Date();
   return {
