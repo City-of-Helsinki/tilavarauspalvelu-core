@@ -1,7 +1,7 @@
-import styled from "styled-components";
 import React from "react";
+import styled from "styled-components";
 import { Tooltip } from "hds-react";
-import { fontBold } from "common/styled";
+import { fontMedium } from "common/styled";
 
 const FieldGroupWrapper = styled.div`
   display: grid;
@@ -13,7 +13,7 @@ const FieldGroupWrapper = styled.div`
 const FieldGroupHeading = styled.span`
   padding-bottom: var(--spacing-xs);
   display: block;
-  ${fontBold};
+  ${fontMedium};
 `;
 
 export function FieldGroup({
@@ -32,14 +32,14 @@ export function FieldGroup({
   required?: boolean;
 }): JSX.Element {
   return (
-    <FieldGroupWrapper className={className} style={style}>
-      <div>
+    <div className={className} style={style}>
+      <FieldGroupWrapper>
         <FieldGroupHeading>
           {heading} {required ? "*" : ""}
         </FieldGroupHeading>
-        <div className="ReservationUnitEditor__FieldGroup-children">{children}</div>
-      </div>
-      <Tooltip>{tooltip}</Tooltip>
-    </FieldGroupWrapper>
+        <Tooltip>{tooltip}</Tooltip>
+      </FieldGroupWrapper>
+      <div className="ReservationUnitEditor__FieldGroup-children">{children}</div>
+    </div>
   );
 }
