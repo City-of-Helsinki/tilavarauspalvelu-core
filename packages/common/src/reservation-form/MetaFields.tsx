@@ -14,18 +14,19 @@ import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { camelCase } from "lodash-es";
-import { MetadataSetsFragment, ReserveeType } from "../../gql/gql-types";
-import ReservationFormField from "./ReservationFormField";
-import { Inputs, Reservation } from "./types";
+import { MetadataSetsFragment, MunicipalityChoice, ReserveeType } from "../../gql/gql-types";
+import { ReservationFormField } from "./ReservationFormField";
+import { Inputs, type Reservation } from "./types";
 import { RadioButtonWithImage } from "./RadioButtonWithImage";
 import { AutoGrid, fontMedium, fontRegular, H4, H5 } from "../../styled";
-import type { OptionType } from "../../types/common";
+import type { OptionsRecord } from "../../types/common";
 import IconPremises from "../icons/IconPremises";
 import { containsField } from "../metaFieldsHelpers";
 import { capitalize, filterNonNullable } from "../helpers";
+import { TFunction } from "i18next";
 
 type CommonProps = {
-  options: Record<string, OptionType[]>;
+  options: Omit<OptionsRecord, "municipality">;
   data?: {
     termsForDiscount?: JSX.Element | string;
   };
@@ -150,6 +151,7 @@ function ReservationFormFields({
   metadata: MetadataSetsFragment["metadataSet"];
   params?: { numPersons: { min?: number; max?: number } };
 }) {
+  const { t } = useTranslation();
   const { getValues } = useFormContext<Reservation>();
 
   const requiredFields = filterNonNullable(metadata?.requiredFields)
@@ -173,7 +175,7 @@ function ReservationFormFields({
           <ReservationFormField
             key={`key-${field}`}
             field={field as unknown as keyof Inputs}
-            options={options}
+            options={extendMetaFieldOptions(options, t)}
             required={required}
             translationKey={headingKey}
             reservation={getValues()}
@@ -196,12 +198,8 @@ export function ReservationMetaFields({
 }: {
   fields: string[];
   reservationUnit: MetadataSetsFragment;
-  options: Record<string, OptionType[]>;
-  data?: {
-    termsForDiscount?: JSX.Element | string;
-  };
   noHeadingMarginal?: boolean;
-}) {
+} & CommonProps) {
   const { t } = useTranslation();
 
   if (fields.length === 0) {
@@ -217,7 +215,7 @@ export function ReservationMetaFields({
       <MandatoryFieldsInfoText>{t("forms:mandatoryFieldsText")}</MandatoryFieldsInfoText>
       <AutoGrid>
         <ReservationFormFields
-          options={options}
+          options={extendMetaFieldOptions(options, t)}
           fields={fields}
           metadata={reservationUnit.metadataSet}
           headingKey="COMMON"
@@ -282,11 +280,7 @@ export function ReserverMetaFields({
   // TODO should not be arbitary strings
   fields: string[];
   reservationUnit: MetadataSetsFragment;
-  options: Record<string, OptionType[]>;
-  data?: {
-    termsForDiscount?: JSX.Element | string;
-  };
-}) {
+} & CommonProps) {
   const { watch } = useFormContext<Reservation & Partial<Inputs>>();
   const { t } = useTranslation();
 
@@ -311,7 +305,7 @@ export function ReserverMetaFields({
         <ReservationFormFields
           fields={fields}
           metadata={reservationUnit.metadataSet}
-          options={options}
+          options={extendMetaFieldOptions(options, t)}
           hasSubheading
           headingKey={reserveeType}
           data={data}
@@ -319,6 +313,19 @@ export function ReserverMetaFields({
       </ReservationApplicationFieldsContainer>
     </>
   );
+}
+
+// Modify options to include static enums
+// the options Record (and down stream components don't narrow types properly)
+// so missing keys are not type errors but instead turn Select components -> TextFields
+export function extendMetaFieldOptions(options: Omit<OptionsRecord, "municipality">, t: TFunction): OptionsRecord {
+  return {
+    ...options,
+    municipality: Object.values(MunicipalityChoice).map((value) => ({
+      label: t(`common:municipalities.${value.toUpperCase()}`),
+      value: value,
+    })),
+  };
 }
 
 // TODO this should be deprecated (use the individual components instead)

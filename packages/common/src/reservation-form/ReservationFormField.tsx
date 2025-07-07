@@ -5,14 +5,14 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontMedium, Strongish } from "../../styled";
-import { ReserveeType } from "../../gql/gql-types";
+import { type ReserveeType } from "../../gql/gql-types";
 import { Inputs, Reservation } from "./types";
-import { OptionType } from "../../types/common";
+import { type OptionsRecord } from "../../types/common";
 import { ControlledCheckbox, ControlledSelect } from "../components/form";
 
 type Props = {
   field: keyof Inputs;
-  options: Record<string, OptionType[]>;
+  options: OptionsRecord;
   translationKey?: ReserveeType | "COMMON";
   reservation: Reservation;
   required: boolean;
@@ -73,7 +73,7 @@ const StyledTextArea = styled(TextArea)<TextAreaProps>`
  */
 const MAX_TEXT_LENGTH = 255;
 
-const ReservationFormField = ({
+export function ReservationFormField({
   field,
   options,
   translationKey,
@@ -81,7 +81,7 @@ const ReservationFormField = ({
   reservation,
   params = {},
   data = {},
-}: Props) => {
+}: Props) {
   const { t } = useTranslation();
 
   const lowerCaseTranslationKey = translationKey?.toLocaleLowerCase() || "individual";
@@ -180,6 +180,7 @@ const ReservationFormField = ({
 
   const id = `reservation-form-field__${field}`;
   if (isSelectField) {
+    const optionsNarrowed = Object.keys(options).includes(field) ? options[field as keyof OptionsRecord] : [];
     return (
       <StyledControlledSelect
         id={id}
@@ -187,7 +188,7 @@ const ReservationFormField = ({
         label={label}
         control={control}
         required={required}
-        options={options[field] ?? []}
+        options={optionsNarrowed}
         error={errorText}
         placeholder={t("common:select")}
         afterChange={() => trigger(field)}
@@ -335,6 +336,4 @@ const ReservationFormField = ({
         />
       );
   }
-};
-
-export default ReservationFormField;
+}

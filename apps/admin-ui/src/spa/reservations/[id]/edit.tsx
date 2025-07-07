@@ -95,11 +95,13 @@ function EditReservation({
       return;
     }
 
-    const { seriesName, comments, ...rest } = values;
+    const { seriesName, comments, reserveeIsUnregisteredAssociation, reserveeIdentifier, ...rest } = values;
 
     const toSubmit = {
       ...rest,
       seriesName: seriesName !== "" ? seriesName : undefined,
+      // force update to empty -> NA
+      reserveeIdentifier: !reserveeIsUnregisteredAssociation ? reserveeIdentifier : "",
       workingMemo: comments,
     };
 

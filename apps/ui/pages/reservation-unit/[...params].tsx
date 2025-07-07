@@ -9,7 +9,6 @@ import { useTranslation } from "next-i18next";
 import { Flex, H1, H4 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import {
-  MunicipalityChoice,
   ReservationDocument,
   type ReservationQuery,
   type ReservationQueryVariables,
@@ -92,14 +91,6 @@ const TitleSection = styled(Flex)`
 function NewReservation(props: PropsNarrowed): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const router = useRouter();
-
-  const options = {
-    ...props.options,
-    municipality: Object.values(MunicipalityChoice).map((value) => ({
-      label: t(`common:municipalities.${value.toUpperCase()}`),
-      value: value,
-    })),
-  };
 
   const [refetch, { data: resData }] = useReservationLazyQuery({
     variables: { id: props.reservation.id },
@@ -344,12 +335,14 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
           )}
         </TitleSection>
         <StyledForm onSubmit={handleSubmit(onSubmit)} noValidate>
-          {step === 0 && <Step0 reservation={reservation} cancelReservation={cancelReservation} options={options} />}
+          {step === 0 && (
+            <Step0 reservation={reservation} cancelReservation={cancelReservation} options={props.options} />
+          )}
           {step === 1 && (
             <Step1
               reservation={reservation}
               supportedFields={supportedFields}
-              options={options}
+              options={props.options}
               setStep={setStep}
               requiresPayment={steps.length > 2}
             />

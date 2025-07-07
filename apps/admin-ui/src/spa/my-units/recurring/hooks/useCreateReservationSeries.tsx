@@ -26,14 +26,6 @@ function transformReservationTypeStaffChoice(t: ReservationTypeChoice): Reservat
   }
 }
 
-export const CREATE_RESERVATION_SERIES = gql`
-  mutation CreateReservationSeries($input: ReservationSeriesCreateMutationInput!) {
-    createReservationSeries(input: $input) {
-      pk
-    }
-  }
-`;
-
 export function useCreateReservationSeries() {
   const [create] = useCreateReservationSeriesMutation();
 
@@ -47,7 +39,6 @@ export function useCreateReservationSeries() {
     data: ReservationSeriesForm & ReservationFormMeta;
     skipDates: Date[];
     reservationUnitPk: number;
-    // metaFields: ReservationMetadataFieldNode[];
     buffers: { before?: number; after?: number };
   }): Promise<number | null> => {
     const { data, reservationUnitPk, buffers } = props;
@@ -63,10 +54,14 @@ export function useCreateReservationSeries() {
       repeatOnDays,
       repeatPattern,
       reserveeType,
+      reserveeIsUnregisteredAssociation,
+      enableBufferTimeAfter,
+      enableBufferTimeBefore,
+      reserveeIdentifier,
       ...rest
     } = data;
 
-    const name = data.type === "BLOCKED" ? "BLOCKED" : (data.seriesName ?? "");
+    const name = data.type === "BLOCKED" ? "BLOCKED" : (seriesName ?? "");
 
     if (user?.pk == null) {
       throw new Error("Current user pk missing");
@@ -75,6 +70,7 @@ export function useCreateReservationSeries() {
     const reservationDetails: ReservationSeriesReservationCreateSerializerInput = {
       ...rest,
       type: transformReservationTypeStaffChoice(type),
+      reserveeIdentifier: !reserveeIsUnregisteredAssociation ? reserveeIdentifier : undefined,
       reserveeType: transformReserveeType(reserveeType),
       bufferTimeBefore: buffers.before,
       bufferTimeAfter: buffers.after,
@@ -91,9 +87,9 @@ export function useCreateReservationSeries() {
       // checkOpeningHours: true,
       ageGroup: !Number.isNaN(ageGroup) ? ageGroup : undefined,
       reservationUnit: reservationUnitPk,
-      beginDate: toApiDateUnsafe(fromUIDateUnsafe(data.startingDate)),
+      beginDate: toApiDateUnsafe(fromUIDateUnsafe(startingDate)),
       beginTime: startTime,
-      endDate: toApiDateUnsafe(fromUIDateUnsafe(data.endingDate)),
+      endDate: toApiDateUnsafe(fromUIDateUnsafe(endingDate)),
       endTime,
       weekdays: repeatOnDays,
       recurrenceInDays: repeatPattern === "weekly" ? 7 : 14,
@@ -108,3 +104,11 @@ export function useCreateReservationSeries() {
 
   return mutate;
 }
+
+export const CREATE_RESERVATION_SERIES = gql`
+  mutation CreateReservationSeries($input: ReservationSeriesCreateMutationInput!) {
+    createReservationSeries(input: $input) {
+      pk
+    }
+  }
+`;
