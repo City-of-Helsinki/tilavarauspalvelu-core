@@ -13,6 +13,7 @@ import {
   type ReservationQuery,
   type ReservationQueryVariables,
   ReservationStateChoice,
+  type ReservationUpdateMutationInput,
   ReserveeType,
   useConfirmReservationMutation,
   useDeleteReservationMutation,
@@ -105,8 +106,12 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   const [step, setStep] = useState(0);
 
   // Get prefilled profile user fields from the reservation (backend fills them when created).
-  // NOTE Using pick makes the types way too complex; easier to just define the fields here.
-  const defaultValues = {
+  // NOTE this is only updated on load (not after mutation or refetch)
+  const defaultValues: Inputs = {
+    // NOTE never undefined (this page is not accessible without reservation)
+    pk: reservation?.pk ?? 0,
+    name: reservation?.name ?? "",
+    description: reservation?.description ?? "",
     reserveeFirstName: reservation?.reserveeFirstName ?? "",
     reserveeLastName: reservation?.reserveeLastName ?? "",
     reserveePhone: reservation?.reserveePhone ?? "",
@@ -114,8 +119,19 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     reserveeAddressStreet: reservation?.reserveeAddressStreet ?? "",
     reserveeAddressCity: reservation?.reserveeAddressCity ?? "",
     reserveeAddressZip: reservation?.reserveeAddressZip ?? "",
+    reserveeIdentifier: reservation?.reserveeIdentifier ?? "",
+    reserveeOrganisationName: reservation?.reserveeOrganisationName ?? "",
     municipality: reservation?.municipality ?? undefined,
     reserveeType: reservation?.reserveeType ?? ReserveeType.Individual,
+    applyingForFreeOfCharge: reservation?.applyingForFreeOfCharge ?? false,
+    freeOfChargeReason: reservation?.freeOfChargeReason ?? "",
+    purpose: reservation?.purpose?.pk ?? undefined,
+    numPersons: reservation?.numPersons ?? undefined,
+    ageGroup: reservation?.ageGroup?.pk ?? undefined,
+    showBillingAddress: false,
+    reserveeIsUnregisteredAssociation: false,
+    spaceTerms: false,
+    resourceTerms: false,
   };
   // TODO is defaultValues correct? it's prefilled from the profile data and we are not refetching at any point.
   // If we would refetch values would be more correct with reset hook.
@@ -191,32 +207,41 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
   const displayError = useDisplayError();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: type the form
-  const onSubmitStep0 = async (payload: any): Promise<void> => {
+  const onSubmitStep0 = async (payload: Inputs): Promise<void> => {
+    const {
+      // boolean toggles
+      applyingForFreeOfCharge,
+      freeOfChargeReason,
+      showBillingAddress,
+      reserveeIsUnregisteredAssociation,
+      reserveeIdentifier,
+      // ignore on step 0
+      spaceTerms,
+      resourceTerms,
+      ...rest
+    } = payload;
     const hasReserveeTypeField = containsField(supportedFields, "reserveeType");
     if (hasReserveeTypeField && !reserveeType) {
       throw new Error("Reservee type is required");
     }
+    if (reservationPk == null) {
+      throw new Error("Reservation pk is required");
+    }
 
-    // TODO what is the purpose of this?
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: type the form
-    const input = Object.keys(payload).reduce<any>((acc, key) => {
-      // Exclude fields from being sent to the backend
-      if (key === "showBillingAddress" || key === "reserveeIsUnregisteredAssociation") {
-        return acc;
-      }
-
-      acc[key] = {}.propertyIsEnumerable.call(payload[key] || {}, "value") ? payload[key].value : payload[key];
-      return acc;
-    }, {});
+    const input: ReservationUpdateMutationInput = {
+      ...rest,
+      // force update to empty -> NA
+      reserveeIdentifier:
+        !reserveeIsUnregisteredAssociation && reserveeType !== ReserveeType.Individual ? reserveeIdentifier : "",
+      applyingForFreeOfCharge,
+      freeOfChargeReason: applyingForFreeOfCharge ? freeOfChargeReason : "",
+      pk: reservationPk,
+    };
 
     try {
       const { data } = await updateReservation({
         variables: {
-          input: {
-            pk: reservationPk ?? 0,
-            ...input,
-          },
+          input,
         },
       });
       if (data?.updateReservation?.state === "CANCELLED") {
@@ -286,8 +311,8 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   const lang = convertLanguageCode(i18n.language);
   const termsOfUse = getTranslationSafe(reservationUnit, "termsOfUse", lang);
 
-  // TODO rework so we submit the form values here
-  const onSubmit = (values: unknown) => {
+  // TODO hacky should separate the submit handlers and form types
+  const onSubmit = (values: Inputs) => {
     if (step === 0) {
       onSubmitStep0(values);
     }
