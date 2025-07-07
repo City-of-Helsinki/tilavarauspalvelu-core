@@ -70,7 +70,7 @@ const StyledContainerMedium = styled(Flex)`
 `;
 
 // Terms PK is not a number but any valid string
-const makeTermsOptions = (parameters: ReservationUnitEditorParametersQuery | undefined, termsType: TermsType) => {
+function makeTermsOptions(parameters: ReservationUnitEditorParametersQuery | undefined, termsType: TermsType) {
   return filterNonNullable(parameters?.termsOfUse?.edges.map((e) => e?.node))
     .filter((tou) => termsType === tou?.termsType)
     .map((tou) => {
@@ -79,9 +79,9 @@ const makeTermsOptions = (parameters: ReservationUnitEditorParametersQuery | und
         label: tou?.nameFi ?? "no-name",
       };
     });
-};
+}
 
-const useImageMutations = () => {
+function useImageMutations() {
   const [createImage] = useCreateImageMutation();
   const [delImage] = useDeleteImageMutation();
   const [updateImagetype] = useUpdateImageMutation();
@@ -140,7 +140,7 @@ const useImageMutations = () => {
   };
 
   return [reconcileImageChanges];
-};
+}
 
 function ReservationUnitEditor({
   reservationUnit,

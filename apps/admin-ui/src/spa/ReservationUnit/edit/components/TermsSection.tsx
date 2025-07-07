@@ -1,13 +1,18 @@
+import React from "react";
+import styled from "styled-components";
 import { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { EditAccordion } from "@/spa/ReservationUnit/edit/components/styled";
 import { ControlledSelect } from "common/src/components/form";
-import React from "react";
 import { type ReservationUnitEditFormValues } from "../form";
 import { ControlledRichTextInput } from "./ControlledRichTextInput";
 import { AutoGrid } from "common/styled";
 
 type OptionType = { value: string; label: string };
+
+const StyledRichTextInput = styled(ControlledRichTextInput)`
+  grid-column: 1 / -1;
+`;
 
 export function TermsSection({
   form,
@@ -45,25 +50,22 @@ export function TermsSection({
   return (
     <EditAccordion open={hasErrors} heading={t("ReservationUnitEditor.termsInstructions")}>
       <AutoGrid $minWidth="20rem">
-        {(["serviceSpecificTerms", "paymentTerms", "cancellationTerms"] as const).map((name) => {
-          const opts = termsOptions.find((o) => o.key === name)?.options ?? [];
-          return (
-            <ControlledSelect
-              control={control}
-              name={name}
-              key={name}
-              clearable
-              label={t(`ReservationUnitEditor.label.${name}`)}
-              placeholder={t(`ReservationUnitEditor.termsPlaceholder`)}
-              options={opts}
-              tooltip={t(`ReservationUnitEditor.tooltip.${name}`)}
-            />
-          );
-        })}
+        {(["serviceSpecificTerms", "paymentTerms", "cancellationTerms"] as const).map((name) => (
+          <ControlledSelect
+            control={control}
+            name={name}
+            key={name}
+            clearable
+            label={t(`ReservationUnitEditor.label.${name}`)}
+            placeholder={t(`ReservationUnitEditor.termsPlaceholder`)}
+            options={termsOptions.find((o) => o.key === name)?.options ?? []}
+            tooltip={t(`ReservationUnitEditor.tooltip.${name}`)}
+          />
+        ))}
+        {(["notesWhenApplyingFi", "notesWhenApplyingEn", "notesWhenApplyingSv"] as const).map((n) => (
+          <StyledRichTextInput control={control} fieldName={n} key={n} />
+        ))}
       </AutoGrid>
-      {(["notesWhenApplyingFi", "notesWhenApplyingEn", "notesWhenApplyingSv"] as const).map((n) => (
-        <ControlledRichTextInput control={control} fieldName={n} key={n} />
-      ))}
     </EditAccordion>
   );
 }

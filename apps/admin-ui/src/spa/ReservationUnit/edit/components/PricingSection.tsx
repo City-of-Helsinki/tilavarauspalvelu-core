@@ -201,7 +201,7 @@ export function PricingTypeView({ pk, form, taxPercentageOptions }: Props): JSX.
   const priceOptions = ["free", "paid"];
 
   return (
-    <AutoGrid $alignCenter>
+    <AutoGrid $alignCenter $gap="xs">
       {isFuture && (
         <ControlledDateInput
           name={`pricings.${index}.begins`}
