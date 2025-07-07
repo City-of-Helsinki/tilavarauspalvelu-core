@@ -141,16 +141,14 @@ const BannerNotificationsList = ({ target, displayAmount = 2 }: BannerNotificati
 
   return (
     <PositionWrapper>
-      {displayedNotificationsList
-        ?.slice(0, displayAmount)
-        .map((notification) => (
-          <NotificationsListItem
-            key={notification?.id}
-            notification={notification}
-            closedArray={closedNotificationsList ?? []}
-            closeFn={setClosedNotificationsList}
-          />
-        ))}
+      {displayedNotificationsList?.slice(0, displayAmount).map((notification) => (
+        <NotificationsListItem
+          key={notification?.id}
+          notification={notification}
+          closedArray={closedNotificationsList ?? []}
+          closeFn={setClosedNotificationsList}
+        />
+      ))}
     </PositionWrapper>
   );
 };
