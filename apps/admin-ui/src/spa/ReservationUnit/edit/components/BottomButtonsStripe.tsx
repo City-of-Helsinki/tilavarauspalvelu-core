@@ -9,7 +9,7 @@ import { getUnitUrl } from "@/common/urls";
 import { successToast } from "common/src/common/toast";
 import type { ReservationUnitEditQuery, UnitSubpageHeadFragment } from "@gql/gql-types";
 import { breakpoints } from "common/src/const";
-import { pageSideMargins, WhiteButton } from "common/styled";
+import { Flex, pageSideMargins, WhiteButton } from "common/styled";
 import { useDisplayError } from "common/src/hooks";
 import { useModal } from "@/context/ModalContext";
 
@@ -44,34 +44,38 @@ const PreviewLink = styled.a`
   }
 `;
 
-const ButtonsStripe = styled.div`
+const ButtonsStripe = styled(Flex).attrs({
+  $direction: "row",
+  $justifyContent: "space-between",
+})`
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
-  display: flex;
-  justify-content: space-between;
   background-color: var(--color-bus-dark);
   z-index: var(--tilavaraus-admin-stack-button-stripe);
 
   padding: var(--spacing-s) 0;
   ${pageSideMargins};
 
-  /* back button should be left aligned */
-  gap: var(--spacing-m);
+  gap: var(--spacing-xs);
 
+  /* back button should be left aligned */
   & > *:first-child {
     margin-right: auto;
   }
 
   /* four buttons is too much on mobile */
 
-  & > *:nth-child(2) {
+  & > .preview-link,
+  & > .archive-button {
     display: none;
   }
 
   @media (min-width: ${breakpoints.s}) {
-    & > *:nth-child(2) {
+    gap: var(--spacing-m);
+    & > .preview-link,
+    & > .archive-button {
       display: flex;
     }
   }
@@ -287,6 +291,7 @@ export function BottomButtonsStripe({
         onClick={handleArchiveButtonClick}
         type="button"
         disabled={isSaving || !archiveEnabled}
+        className="archive-button"
       >
         {t("ReservationUnitEditor.archive")}
       </WhiteButton>
@@ -294,6 +299,7 @@ export function BottomButtonsStripe({
       <PreviewLink
         target="_blank"
         rel="noopener noreferrer"
+        className="preview-link"
         href={
           !isPreviewDisabled ? `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.extUuid}` : undefined
         }

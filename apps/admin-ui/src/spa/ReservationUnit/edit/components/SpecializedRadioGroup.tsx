@@ -1,9 +1,11 @@
+import React from "react";
 import { Control, useController } from "react-hook-form";
 import type { ReservationUnitEditFormValues } from "@/spa/ReservationUnit/edit/form";
 import { useTranslation } from "next-i18next";
+import { useMedia } from "react-use";
 import { ControlledRadioGroup } from "common/src/components/form";
+import { breakpoints } from "common/src/const";
 import { getTranslatedError } from "@/common/util";
-import React from "react";
 
 export function SpecializedRadioGroup({
   name,
@@ -28,6 +30,8 @@ export function SpecializedRadioGroup({
   const { fieldState } = useController({ name, control });
   const { error } = fieldState;
 
+  const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
+
   const groupLabel = !noLabel ? t(`ReservationUnitEditor.label.${name}`) : undefined;
   const tooltip = !noTooltip ? t(`ReservationUnitEditor.tooltip.${name}`) : undefined;
   const opts = options.map((opt) => {
@@ -40,6 +44,9 @@ export function SpecializedRadioGroup({
     };
   });
 
+  // HDS has no auto scaling for selection group and since it's a prop and not CSS we can't use styled-components
+  const correctDirection = isMobile ? "vertical" : direction;
+
   return (
     <ControlledRadioGroup
       name={name}
@@ -47,7 +54,7 @@ export function SpecializedRadioGroup({
       label={groupLabel}
       tooltip={tooltip}
       required={required}
-      direction={direction}
+      direction={correctDirection}
       error={getTranslatedError(t, error?.message)}
       options={opts}
       noTranslation={noTranslation}

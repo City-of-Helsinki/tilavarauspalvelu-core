@@ -63,9 +63,9 @@ const StyledContainerMedium = styled(Flex)`
   }
 
   /* NOTE some magic values so the sticky buttons don't hide the bottom of the page */
-  padding-bottom: 16rem;
+  padding-bottom: 6rem;
   @media (min-width: ${breakpoints.m}) {
-    padding-bottom: 8rem;
+    padding-bottom: 5rem;
   }
 `;
 
@@ -278,8 +278,8 @@ function ReservationUnitEditor({
         <DisplayUnit
           heading={reservationUnit?.nameFi ?? t("ReservationUnitEditor.defaultHeading")}
           unit={unit}
-          reservationState={reservationUnit?.reservationState ?? undefined}
-          unitState={reservationUnit?.publishingState ?? undefined}
+          reservationState={reservationUnit?.reservationState}
+          unitState={reservationUnit?.publishingState}
         />
         <ErrorInfo form={form} />
         <BasicSection form={form} spaces={unit?.spaces ?? []} />
