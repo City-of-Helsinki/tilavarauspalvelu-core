@@ -12,15 +12,14 @@ type Reservee = {
 };
 
 type CommonInputs = {
-  // reservations name
   name: string;
   description: string;
-  municipality: MunicipalityChoice;
+  municipality?: MunicipalityChoice;
   spaceTerms: boolean;
   resourceTerms: boolean;
-  purpose: number;
-  numPersons: number;
-  ageGroup: number;
+  purpose?: number;
+  numPersons?: number;
+  ageGroup?: number;
   reserveeType?: ReserveeType;
   freeOfChargeReason: string;
   applyingForFreeOfCharge: boolean;
@@ -29,7 +28,8 @@ type CommonInputs = {
 export type Inputs = {
   pk: number;
   reserveeIsUnregisteredAssociation?: boolean;
-  reserveeIdentifier?: number;
+  reserveeIdentifier?: string;
+  showBillingAddress?: boolean;
 } & Reservee &
   CommonInputs;
 
