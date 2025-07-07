@@ -114,8 +114,8 @@ importers:
         specifier: 2.0.0
         version: 2.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-router-dom:
-        specifier: ^6.23.1
-        version: 6.26.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^7.6.3
+        version: 7.6.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-use:
         specifier: ^17.6.0
         version: 17.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2185,10 +2185,6 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
-  '@remix-run/router@1.19.2':
-    resolution: {integrity: sha512-baiMx18+IMuD1yyvOGaHM9QrVUPGGG0jC+z+IPHnRJWUAUvaKuWKyE8gjDj2rzv3sz9zOGoRSPgeBVHRhZnBlA==}
-    engines: {node: '>=14.0.0'}
-
   '@repeaterjs/repeater@3.0.6':
     resolution: {integrity: sha512-Javneu5lsuhwNCryN+pXH93VPQ8g0dBX7wItHFgYiwQmzE1sVdg5tWHiOgHywzL2W21XQopa7IwIEnNbmeUJYA==}
 
@@ -3506,6 +3502,10 @@ packages:
   cookie@0.4.2:
     resolution: {integrity: sha512-aSWTXFzaKWkvHO1Ny/s+ePFpvKsPnjc551iI41v3ny/ow6tBG5Vd+FuqGNhh1LxOmVzOlGUriIlOaokOvhaStA==}
     engines: {node: '>= 0.6'}
+
+  cookie@1.0.2:
+    resolution: {integrity: sha512-9Kr/j4O16ISv8zBBhJoi4bXOYNTkFLOqSL3UDB0njXxCXNezjeyVrJyGOWtgfs/q2km1gwBcfH8q1yEGoMYunA==}
+    engines: {node: '>=18'}
 
   copy-to-clipboard@3.3.3:
     resolution: {integrity: sha512-2KV8NhB5JqC3ky0r9PMCAZKbUHSwtEo4CwCs0KXgruG43gX5PMqDEBbVU4OUzw2MuAWUfsuFmWvEKG5QRfSnJA==}
@@ -5581,18 +5581,22 @@ packages:
     resolution: {integrity: sha512-z6F7K9bV85EfseRCp2bzrpyQ0Gkw1uLoCel9XBVWPg/TjRj94SkJzUTGfOa4bs7iJvBWtQG0Wq7wnI0syw3EBQ==}
     engines: {node: '>=0.10.0'}
 
-  react-router-dom@6.26.2:
-    resolution: {integrity: sha512-z7YkaEW0Dy35T3/QKPYB1LjMK2R1fxnHO8kWpUMTBdfVzZrWOiY9a7CtN8HqdWtDUWd5FY6Dl8HFsqVwH4uOtQ==}
-    engines: {node: '>=14.0.0'}
+  react-router-dom@7.6.3:
+    resolution: {integrity: sha512-DiWJm9qdUAmiJrVWaeJdu4TKu13+iB/8IEi0EW/XgaHCjW/vWGrwzup0GVvaMteuZjKnh5bEvJP/K0MDnzawHw==}
+    engines: {node: '>=20.0.0'}
     peerDependencies:
-      react: '>=16.8'
-      react-dom: '>=16.8'
+      react: '>=18'
+      react-dom: '>=18'
 
-  react-router@6.26.2:
-    resolution: {integrity: sha512-tvN1iuT03kHgOFnLPfLJ8V95eijteveqdOSk+srqfePtQvqCExB8eHOYnlilbOcyJyKnYkr1vJvf7YqotAJu1A==}
-    engines: {node: '>=14.0.0'}
+  react-router@7.6.3:
+    resolution: {integrity: sha512-zf45LZp5skDC6I3jDLXQUu0u26jtuP4lEGbc7BbdyxenBN1vJSTA18czM2D+h5qyMBuMrD+9uB+mU37HIoKGRA==}
+    engines: {node: '>=20.0.0'}
     peerDependencies:
-      react: '>=16.8'
+      react: '>=18'
+      react-dom: '>=18'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
 
   react-toastify@10.0.5:
     resolution: {integrity: sha512-mNKt2jBXJg4O7pSdbNUfDdTsK9FIdikfsIE/yUCxbAEXl4HMyJaivrVFcn3Elvt5xvCQYhUZm+hqTIu1UXM3Pw==}
@@ -5860,6 +5864,9 @@ packages:
 
   set-blocking@2.0.0:
     resolution: {integrity: sha512-KiKBS8AnWGEyLzofFfmvKwpdPzqiy16LvQfK3yv/fVH7Bj13/wl3JSR1J+rfgRE9q7xUJK4qvgS8raSOeLUehw==}
+
+  set-cookie-parser@2.7.1:
+    resolution: {integrity: sha512-IOc8uWeOZgnb3ptbCURJWNjWUPcO3ZnTTdzsurqERrP6nPyv+paC55vJM0LpOlT2ne+Ix+9+CRG1MNLlyZ4GjQ==}
 
   set-function-length@1.2.2:
     resolution: {integrity: sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==}
@@ -8813,8 +8820,6 @@ snapshots:
     dependencies:
       react: 18.3.1
 
-  '@remix-run/router@1.19.2': {}
-
   '@repeaterjs/repeater@3.0.6': {}
 
   '@restart/hooks@0.4.16(react@18.3.1)':
@@ -10280,6 +10285,8 @@ snapshots:
   convert-source-map@2.0.0: {}
 
   cookie@0.4.2: {}
+
+  cookie@1.0.2: {}
 
   copy-to-clipboard@3.3.3:
     dependencies:
@@ -12621,17 +12628,19 @@ snapshots:
 
   react-refresh@0.17.0: {}
 
-  react-router-dom@6.26.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-router-dom@7.6.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      '@remix-run/router': 1.19.2
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      react-router: 6.26.2(react@18.3.1)
+      react-router: 7.6.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
-  react-router@6.26.2(react@18.3.1):
+  react-router@7.6.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      '@remix-run/router': 1.19.2
+      cookie: 1.0.2
       react: 18.3.1
+      set-cookie-parser: 2.7.1
+    optionalDependencies:
+      react-dom: 18.3.1(react@18.3.1)
 
   react-toastify@10.0.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
@@ -12952,6 +12961,8 @@ snapshots:
       randombytes: 2.1.0
 
   set-blocking@2.0.0: {}
+
+  set-cookie-parser@2.7.1: {}
 
   set-function-length@1.2.2:
     dependencies:
