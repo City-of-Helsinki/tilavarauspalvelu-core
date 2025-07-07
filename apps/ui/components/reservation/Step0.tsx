@@ -2,7 +2,6 @@
  *  First part of the Reservation process form
  *  This component needs to be wrapped inside a Form context
  */
-import type { OptionType } from "common/types/common";
 import { Button, ButtonVariant, IconArrowRight, IconCross, LoadingSpinner, Notification } from "hds-react";
 import { useFormContext, UseFormReturn } from "react-hook-form";
 import React, { useState } from "react";
@@ -18,12 +17,13 @@ import { getApplicationFields, getGeneralFields } from "./SummaryFields";
 import { type Inputs } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { type OptionsRecord } from "common";
 
 type ReservationT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
   cancelReservation: () => void;
   reservation: ReservationT;
-  options: Record<string, OptionType[]>;
+  options: Omit<OptionsRecord, "municipality">;
 };
 
 export function Step0({ reservation, cancelReservation, options }: Props): JSX.Element {

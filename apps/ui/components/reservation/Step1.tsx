@@ -2,17 +2,18 @@ import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { type ReservationQuery } from "@gql/gql-types";
 import { Button, ButtonVariant, IconArrowLeft, LoadingSpinner, Notification } from "hds-react";
-import { ActionContainer } from "./styles";
 import { useFormContext } from "react-hook-form";
-import { ApplicationFields, GeneralFields, type OptionsRecord } from "./SummaryFields";
+import { type OptionsRecord } from "common";
 import { type FieldName } from "common/src/metaFieldsHelpers";
+import { ActionContainer } from "./styles";
+import { ApplicationFields, GeneralFields } from "./SummaryFields";
 import { AcceptTerms } from "./AcceptTerms";
 
 type NodeT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
   reservation: NodeT;
   supportedFields: FieldName[];
-  options: OptionsRecord;
+  options: Omit<OptionsRecord, "municipality">;
   requiresPayment: boolean;
   setStep: React.Dispatch<React.SetStateAction<number>>;
 };

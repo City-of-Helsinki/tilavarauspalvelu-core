@@ -1,20 +1,15 @@
 import styled from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
-import { MunicipalityChoice, type ReservationNode, ReserveeType } from "@/gql/gql-types";
+import { type ReservationNode, ReserveeType } from "@/gql/gql-types";
 import { containsField, type FieldName } from "common/src/metaFieldsHelpers";
 import { AutoGrid, H4 } from "common/styled";
 import { type MetaFieldsFragment } from "common/gql/gql-types";
 import { capitalize } from "common/src/helpers";
 import { ParagraphAlt, PreviewLabel, PreviewValue } from "./styles";
 import { LabelValuePair } from "./LabelValuePair";
-
-type OptionType = {
-  label: string;
-  value: number | MunicipalityChoice;
-};
-
-export type OptionsRecord = Record<"purpose" | "ageGroup" | "municipality", OptionType[]>;
+import { extendMetaFieldOptions } from "common/src/reservation-form/MetaFields";
+import { type OptionsRecord } from "common";
 
 const Container = styled(AutoGrid)`
   margin-bottom: var(--spacing-2-xl);
@@ -77,7 +72,7 @@ export function ApplicationFields({
   supportedFields,
 }: {
   reservation: MetaFieldsFragment;
-  options: OptionsRecord;
+  options: Omit<OptionsRecord, "municipality">;
   supportedFields: FieldName[];
 }): JSX.Element {
   const { t } = useTranslation();
@@ -114,7 +109,7 @@ export function ApplicationFields({
             </ParagraphAlt>
           )}
           {filteredApplicationFields.map((key) => {
-            const value = convertMaybeOptionValue(key, reservation, options, t);
+            const value = convertMaybeOptionValue(key, reservation, extendMetaFieldOptions(options, t), t);
             const typeNamespace = reserveeType?.toLocaleLowerCase() || "individual";
             const labelKey = `reservationApplication:label.${typeNamespace}.${key}`;
             const label = t(labelKey);
@@ -134,7 +129,7 @@ export function GeneralFields({
 }: {
   supportedFields: FieldName[];
   reservation: MetaFieldsFragment;
-  options: OptionsRecord;
+  options: Omit<OptionsRecord, "municipality">;
 }): JSX.Element | null {
   const { t } = useTranslation();
 
@@ -153,7 +148,7 @@ export function GeneralFields({
       <Container>
         <>
           {filteredGeneralFields.map((key) => {
-            const value = convertMaybeOptionValue(key, reservation, options, t);
+            const value = convertMaybeOptionValue(key, reservation, extendMetaFieldOptions(options, t), t);
             const isWide = ["name", "description", "freeOfChargeReason"].find((x) => x === key) != null;
             const label = t(`reservationApplication:label.common.${key}`);
             const testId = `reservation__${key}`;
@@ -177,12 +172,13 @@ function convertMaybeOptionValue(
   const rawValue = reservation[key];
   if (key in options) {
     const optionsKey = key as keyof OptionsRecord;
-    if (typeof rawValue !== "object" || rawValue == null) {
+    if (rawValue == null) {
       // eslint-disable-next-line no-console
       console.warn("convertMaybeOptionValue: rawValue is not object: ", rawValue);
-    }
-    if (typeof rawValue === "object" && rawValue != null && "pk" in rawValue && typeof rawValue.pk === "number") {
+    } else if (typeof rawValue === "object" && "pk" in rawValue && typeof rawValue.pk === "number") {
       return options[optionsKey].find((option) => option.value === rawValue.pk)?.label ?? "";
+    } else if (typeof rawValue === "string" && rawValue !== "") {
+      return options[optionsKey].find((option) => option.value === rawValue)?.label ?? "";
     }
     // eslint-disable-next-line no-console
     console.warn("convertMaybeOptionValue: rawValue is not pk, but object: ", rawValue);

@@ -4,8 +4,7 @@
 import { MunicipalityChoice, ReserveeType } from "@gql/gql-types";
 import { z } from "zod";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ReservationFormMetaSchema = z.object({
+export const ReservationFormMetaSchema = z.object({
   name: z.string().optional(),
   description: z.string().optional(),
   ageGroup: z.number().optional(),

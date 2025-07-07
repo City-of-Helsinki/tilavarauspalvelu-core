@@ -6,7 +6,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { filterNonNullable } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
-import { ApplicationFields, GeneralFields, OptionsRecord } from "./SummaryFields";
+import { ApplicationFields, GeneralFields } from "./SummaryFields";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { PendingReservationFormType } from "../reservation-unit/schema";
@@ -18,6 +18,7 @@ import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";
 import ErrorComponent from "next/error";
 import { gql } from "@apollo/client";
+import { type OptionsRecord } from "common";
 
 type Props = {
   reservation: EditPageReservationFragment;

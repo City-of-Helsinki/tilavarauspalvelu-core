@@ -2,10 +2,11 @@ import React from "react";
 import { render, within } from "@testing-library/react";
 import user from "@testing-library/user-event";
 import { FormProvider, useForm } from "react-hook-form";
-import ReservationFormField from "./ReservationFormField";
-import { Inputs, Reservation } from "./types";
-import { OptionType } from "../../types/common";
+import { ReservationFormField } from "./ReservationFormField";
+import type { Inputs, Reservation } from "./types";
 import { test, expect } from "vitest";
+import { MunicipalityChoice } from "../../gql/gql-types";
+import { type OptionsRecord } from "../../types/common";
 
 function Wrapper({ children }: { children: React.ReactNode }): JSX.Element {
   const formMethods = useForm<Reservation>();
@@ -17,18 +18,18 @@ function Wrapper({ children }: { children: React.ReactNode }): JSX.Element {
 }
 
 /* options are gotten from GraphQL so some mock data */
-const options: Record<string, OptionType[]> = {
+const options: OptionsRecord = {
   purpose: [
-    { value: "purple", label: "Purpose" },
-    { value: "not", label: "Not a thing" },
+    { value: 1, label: "Purpose" },
+    { value: 2, label: "Not a thing" },
   ],
   ageGroup: [
     { value: 1, label: "1-9" },
     { value: 2, label: "10-" },
   ],
   municipality: [
-    { value: "Helsinki", label: "Helsinki" },
-    { value: "Muu", label: "Muu" },
+    { value: MunicipalityChoice.Helsinki, label: "Helsinki" },
+    { value: MunicipalityChoice.Other, label: "Muu" },
   ],
 };
 
