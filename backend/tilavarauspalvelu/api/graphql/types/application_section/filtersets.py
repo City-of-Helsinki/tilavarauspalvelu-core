@@ -43,6 +43,7 @@ class ApplicationSectionFilterSet(ModelFilterSet):
     application_round = IntChoiceFilter(field_name="application__application_round")
     reservation_unit = IntMultipleChoiceFilter(field_name="reservation_unit_options__reservation_unit")
     unit = IntMultipleChoiceFilter(field_name="reservation_unit_options__reservation_unit__unit")
+    unit_group = IntMultipleChoiceFilter(field_name="reservation_unit_options__reservation_unit__unit__unit_groups")
 
     applicant_type = EnumMultipleChoiceFilter(field_name="application__applicant_type", enum=ReserveeType)
     status = EnumMultipleChoiceFilter(method="filter_by_status", enum=ApplicationSectionStatusChoice)

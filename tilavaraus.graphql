@@ -34,6 +34,7 @@ type Query {
     applicantType: [ReserveeType]
     status: [ApplicationStatusChoice]
     unit: [Int]
+    unitGroup: [Int]
     textSearch: String
 
     """Ordering"""
@@ -57,6 +58,7 @@ type Query {
     applicationRound: Int
     reservationUnit: [Int]
     unit: [Int]
+    unitGroup: [Int]
     applicantType: [ReserveeType]
     status: [ApplicationSectionStatusChoice]
     applicationStatus: [ApplicationStatusChoice]
@@ -1947,6 +1949,7 @@ type ApplicationNode implements Node {
     applicationRound: Int
     reservationUnit: [Int]
     unit: [Int]
+    unitGroup: [Int]
     applicantType: [ReserveeType]
     status: [ApplicationSectionStatusChoice]
     applicationStatus: [ApplicationStatusChoice]
