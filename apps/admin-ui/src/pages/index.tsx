@@ -1,30 +1,65 @@
 import React from "react";
-import { App } from "@/App";
-import Layout from "./layout";
-import { getVersion } from "@/modules/baseUtils.mjs";
+import { type GetServerSidePropsContext } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import styled from "styled-components";
+import { useTranslation } from "next-i18next";
+import { H2 } from "common/styled";
+import { HERO_IMAGE_URL } from "@/common/const";
+import { KorosHeading, Heading } from "@/component/KorosHeading";
+import { useSession } from "@/hooks/auth";
+import { AuthorizationChecker } from "@/common/AuthorizationChecker";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
-export type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+const Ingress = styled(H2)`
+  max-width: 44rem;
+  margin: var(--spacing-3-xl) auto var(--spacing-2-xl);
+  padding: 0 var(--spacing-xl);
+  text-align: center;
+  line-height: 1.8125rem;
+`;
 
-export default function Index(props: PageProps) {
+function HomePage(): JSX.Element {
+  const { t } = useTranslation();
+
+  const { user } = useSession();
+
+  let headingStr = t("translation:MainLander.welcome");
+  if (
+    user?.username === "u-gptwmnqqnjahlfj2uas2glyx5a" &&
+    Math.random() < 0.1 // 10% chance
+  ) {
+    headingStr = t("translation:MainLander.welcomeCustom");
+  }
+
+  const name = user?.firstName;
+  if (name) {
+    headingStr += `, ${name}`;
+  }
+
   return (
-    <Layout version={props.version}>
-      <App {...props} />
-    </Layout>
+    <div>
+      <KorosHeading heroImage={HERO_IMAGE_URL}>
+        <Heading>{headingStr}!</Heading>
+      </KorosHeading>
+      <Ingress as="p">{t("translation:MainLander.ingress")}</Ingress>
+    </div>
   );
 }
 
-export async function getServerSideProps() {
-  const { env } = await import("@/env.mjs");
+export type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+export default function Index(props: PageProps) {
+  return (
+    <AuthorizationChecker apiUrl={props.apiBaseUrl}>
+      <HomePage />
+    </AuthorizationChecker>
+  );
+}
+
+export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
   return {
     props: {
-      reservationUnitPreviewUrl: env.RESERVATION_UNIT_PREVIEW_URL_PREFIX ?? "",
-      apiBaseUrl: env.TILAVARAUS_API_URL ?? "",
-      feedbackUrl: env.EMAIL_VARAAMO_EXT_LINK ?? "",
-      sentryDsn: env.SENTRY_DSN ?? "",
-      sentryEnvironment: env.SENTRY_ENVIRONMENT ?? "",
-      version: getVersion(),
-      // TODO can't use SSR translations because our translations aren't in public folder
-      // ...(await serverSideTranslations(locale ?? "fi")),
+      ...(await getCommonServerSideProps()),
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 }

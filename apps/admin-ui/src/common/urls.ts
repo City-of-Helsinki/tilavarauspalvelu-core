@@ -1,22 +1,20 @@
 import { type Maybe } from "@gql/gql-types";
 import { PUBLIC_URL } from "./const";
 
-export const applicationsUrl = "/applications";
-export const reservationUnitsUrl = "/reservation-units";
-export const singleUnitUrl = "/unit";
-export const applicationRoundsUrl = "/application-rounds";
-export const unitsUrl = "/units";
-export const bannerNotificationsUrl = "/messaging/notifications";
-export const requestedReservationsUrl = "/reservations/requested";
-export const reservationsUrl = "/reservations";
-export const allReservationsUrl = "/reservations/all";
-export const myUnitsUrl = "/my-units";
+export const APPLICATIONS_URL_PREFIX = "/applications";
+export const RESERVATION_UNIT_URL_PREFIX = "/reservation-units";
+export const APPLICATION_ROUNDS_URL_PREFIX = "/application-rounds";
+export const RESERVATIONS_URL_PREFIX = "/reservations";
+export const MY_UNITS_URL_PREFIX = "/my-units";
+export const UNITS_URL_PREFIX = "/units";
+export const BANNER_NOTIFICATIONS_URL_PREFIX = "/notifications";
+export const REQUESTED_RESERVATIONS_URL_PREFIX = "/reservations/requested";
 
 export function getApplicationRoundUrl(applicationRoundId: Maybe<number> | undefined): string {
   if (applicationRoundId == null || !(applicationRoundId > 0)) {
     return "";
   }
-  return `${applicationRoundsUrl}/${applicationRoundId}`;
+  return `${APPLICATION_ROUNDS_URL_PREFIX}/${applicationRoundId}`;
 }
 
 /// @param pk is the primary key of the reservation
@@ -28,14 +26,14 @@ export function getReservationUrl(pk: Maybe<number> | undefined, includePrefix =
     return "";
   }
   const prefix = includePrefix ? PUBLIC_URL : "";
-  return `${prefix}${reservationsUrl}/${pk}`;
+  return `${prefix}${RESERVATIONS_URL_PREFIX}/${pk}`;
 }
 
 export function getApplicationUrl(pk: Maybe<number> | undefined, sectionPk?: Maybe<number> | undefined): string {
   if (pk == null || !(pk > 0)) {
     return "";
   }
-  const baseUrl = `${applicationsUrl}/${pk}`;
+  const baseUrl = `${APPLICATIONS_URL_PREFIX}/${pk}`;
   if (sectionPk == null || !(sectionPk > 0)) {
     return baseUrl;
   }
@@ -49,32 +47,32 @@ export function getReservationUnitUrl(
   if (unitPk == null) {
     return "";
   }
-  return `/unit/${unitPk}/reservationUnit/${reservationUnitPk ?? ""}`;
+  return `${UNITS_URL_PREFIX}/${unitPk}/reservation-unit/${reservationUnitPk ?? ""}`;
 }
 
 export function getSpacesResourcesUrl(unitPk: Maybe<number> | undefined): string {
   if (unitPk == null) {
     return "";
   }
-  return `/unit/${unitPk}/spacesResources`;
+  return `${UNITS_URL_PREFIX}/${unitPk}/spaces-resources`;
 }
 
 export function getSpaceUrl(spacePk: Maybe<number> | undefined, unitPk: Maybe<number> | undefined): string {
   if (spacePk == null || unitPk == null) {
     return "";
   }
-  return `/unit/${unitPk}/space/${spacePk}`;
+  return `${UNITS_URL_PREFIX}/${unitPk}/space/${spacePk}`;
 }
 
 export function getResourceUrl(resourcePk: Maybe<number> | undefined, unitPk: Maybe<number> | undefined): string {
   if (resourcePk == null || unitPk == null) {
     return "";
   }
-  return `/unit/${unitPk}/resource/${resourcePk}`;
+  return `${UNITS_URL_PREFIX}/${unitPk}/resource/${resourcePk}`;
 }
 
 export function getUnitUrl(unitPk: Maybe<number> | undefined): string {
-  return `/unit/${unitPk}`;
+  return `${UNITS_URL_PREFIX}/${unitPk}`;
 }
 
 export function getMyUnitUrl(unitPk: Maybe<number> | undefined): string {
@@ -88,9 +86,13 @@ export function getReservationSeriesUrl(pk: Maybe<string | number> | undefined):
   return `/my-units/${pk}/recurring`;
 }
 
+export function getNotificationListUrl(): string {
+  return `${BANNER_NOTIFICATIONS_URL_PREFIX}`;
+}
+
 export function getNotificationUrl(pk: Maybe<number> | undefined): string {
   if (pk == null || !(pk > 0)) {
     return "";
   }
-  return `${bannerNotificationsUrl}/${pk}`;
+  return `${BANNER_NOTIFICATIONS_URL_PREFIX}/${pk}`;
 }

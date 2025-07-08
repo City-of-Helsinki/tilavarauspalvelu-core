@@ -9,3 +9,8 @@ export { useReservationSeries } from "./useReservationSeries";
 export { useHandling } from "./useHandling";
 export { useReservationCalendarData } from "./useReservationCalendarData";
 export { useReservationEditData } from "./useReservationEditData";
+export { useSeriesReservationsUnits } from "./useSeriesReservationsUnits";
+export { useMultipleReservation } from "./useMultipleReservation";
+export { useCreateReservationSeries } from "./useCreateReservationSeries";
+export { useFilteredReservationList } from "./useFilteredReservationList";
+export { useStaffReservationMutation } from "./useStaffReservationMutation";

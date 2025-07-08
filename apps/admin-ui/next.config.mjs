@@ -5,6 +5,10 @@ import { withSentryConfig } from "@sentry/nextjs";
 import { env } from "./src/env.mjs";
 import { getVersion } from "./src/modules/baseUtils.mjs";
 
+// NOTE required for next-i18next to find the config file (when not .js)
+// required to be cjs because they don't support esm
+process.env.I18NEXT_DEFAULT_CONFIG_PATH = "./next-i18next.config.cjs";
+
 const ROOT_PATH = url.fileURLToPath(new URL(".", import.meta.url));
 
 /** @type {import('next').NextConfig} */
@@ -30,31 +34,21 @@ const config = {
     locales: ["fi"],
     defaultLocale: "fi",
   },
-  basePath: env.NEXT_PUBLIC_BASE_URL,
   // eslint-disable-next-line require-await
   async rewrites() {
     return [
-      // Do not rewrite API routes
       {
-        source: "/api/:any*",
-        destination: "/api/:any*",
+        source: "/units/:id/reservation-unit/:any*",
+        destination: "/reservation-units/:any*",
       },
       {
-        source: "/auth/logout/:any*",
-        destination: "/auth/logout/:any*",
-      },
-      // Do not rewrite sentry tunnel
-      {
-        source: "/monitoring/:any*",
-        destination: "/monitoring/:any*",
-      },
-      // Rewrite everything else to use `pages/index`
-      {
-        source: "/:any*",
-        destination: "/",
+        source: "/messaging/notifications/:any*",
+        destination: "/notifications/:any*",
       },
     ];
   },
+
+  basePath: env.NEXT_PUBLIC_BASE_URL,
   compiler: {
     styledComponents: {
       ssr: true,

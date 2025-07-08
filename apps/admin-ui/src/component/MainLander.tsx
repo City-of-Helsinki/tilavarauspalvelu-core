@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { signIn } from "common/src/browserHelpers";
 import { Button, IconArrowRight, IconGroup } from "hds-react";
 import { fontBold, H2 } from "common/styled";
@@ -48,7 +48,7 @@ export function MainLander({ apiBaseUrl }: Readonly<{ apiBaseUrl: string }>) {
   return (
     <>
       <KorosHeading heroImage={HERO_IMAGE_URL}>
-        <Heading>{t("common.applicationName")}</Heading>
+        <Heading>{t("common:applicationName")}</Heading>
         <LoginBtn
           iconStart={<IconGroup />}
           iconEnd={<IconArrowRight />}
@@ -60,11 +60,11 @@ export function MainLander({ apiBaseUrl }: Readonly<{ apiBaseUrl: string }>) {
             })
           }
         >
-          {t("Navigation.login")}
+          {t("navigation:login")}
         </LoginBtn>
       </KorosHeading>
       <Content>
-        <Ingress as="p">{t("MainLander.ingress")}</Ingress>
+        <Ingress as="p">{t("translation:MainLander.ingress")}</Ingress>
       </Content>
     </>
   );

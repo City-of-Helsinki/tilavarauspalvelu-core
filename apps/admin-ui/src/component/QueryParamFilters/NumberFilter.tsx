@@ -1,21 +1,22 @@
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { TextInput } from "hds-react";
-import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "next/navigation";
+import { useTranslation } from "next-i18next";
 
 export function NumberFilter({ name }: { name: string }) {
   const { t } = useTranslation();
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const searchParams = useSearchParams();
+  const setSearchParams = useSetSearchParams();
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const params = new URLSearchParams(searchParams);
     if (e.target.value.length > 0) {
       params.set(name, e.target.value);
-      setSearchParams(params, { replace: true });
     } else {
       params.delete(name);
-      setSearchParams(params, { replace: true });
     }
+    setSearchParams(params);
   };
 
   const value = searchParams.get(name);
@@ -25,8 +26,8 @@ export function NumberFilter({ name }: { name: string }) {
       label=" "
       onChange={handleOnChange}
       value={value || ""}
-      placeholder={t(`filters.placeholder.${name}`)}
-      errorText={value !== "" && Number.isNaN(Number(value)) ? t("ReservationUnitsSearch.notANumber") : undefined}
+      placeholder={t(`filters:placeholder.${name}`)}
+      errorText={value !== "" && Number.isNaN(Number(value)) ? t("common:notANumber") : undefined}
     />
   );
 }
