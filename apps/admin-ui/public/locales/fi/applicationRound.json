@@ -1,0 +1,70 @@
+{
+  "noUpcoming": "Ei tulossa olevia hakukierroksia.",
+  "statuses": {
+    "UPCOMING": "Tulossa",
+    "OPEN": "Haku avoinna",
+    "IN_ALLOCATION": "Käsittelyssä",
+    "RESULTS_SENT": "Lähetetty",
+    "HANDLED": "Käsitelty"
+  },
+  "groupLabel": {
+    "handling": "Odottaa jakoa",
+    "notSent": "Päätökset lähettämättä",
+    "open": "Haku avoinna",
+    "opening": "Tulossa",
+    "previousRounds": "Edelliset hakukierrokset"
+  },
+  "headings": {
+    "name": "Nimi",
+    "service": "Palvelu",
+    "reservationUnitCount": "Varausyksiköt",
+    "applicationCount": "Hakemukset",
+    "sent": "Lähetetty"
+  },
+  "errors": {
+    "noApplicationRound": "Hakukierrosta ei löytynyt"
+  },
+  "info": {
+    "loadingText": "Varauksia luodaan...",
+    "allocatedBody": "Kausivaraukset on jaettu, mutta varauksia ei ole tehty eikä vahvistettu asiakkaille.",
+    "handledBody": "Kausivaraukset on tarkistettu ja varausvahvistukset lähetetään asiakkaille.",
+    "resultsSentBody": "Kausivaraukset on tarkistettu ja varausvahvistukset on lähetetty asiakkaille.",
+    "createBtn": "Päätä käsittely",
+    "sendResultsBtn": "Lähetä varausvahvistukset",
+    "failedBtn": "Varausten luonti epäonnistui"
+  },
+  "confirmation": {
+    "endAllocationTitle": "Oletko varma, että haluat päättää käsittelyn",
+    "endAllocationMessage": "Kun kierros on päätetty, jattuihin vuoroihin ei voida tehdä muutoksia. Huomaathan, että jaetuista vuoroista tehdään samalla toistuvat varaukset.",
+    "endAllocationAccept": "Päätä käsittely ja luo varaukset",
+    "endAllocationCancel": "Peruuta",
+    "sendResultsTitle": "Lähetä varausvahvistukset",
+    "sendResultsMessage": "Sähköpostiviesti käsittelyn valmistumisesta lähtee heti tiedoksi asiakkaalle, kun painat Lähetä varausvahvistukset -painiketta. Varausvahvistukset näkyvät asiakkaalle Omat hakemukset -sivulla ja tehdyt varaukset Omat kausivaraukset- sivulla.",
+    "sendResultsAccept": "Lähetä varausvahvistukset"
+  },
+  "description": "Alla näet kaikki hakukierrokset, joihin sinulla on käsittelyoikeus. Noudata kausivarausten käsittelyssä palvelukohtaisia käsittelyperiaatteita ja -aikatauluja.",
+  "allocate": "Jaa vuoroja",
+  "applicationCount": "hakemusta",
+  "applicationEventCount": "vuoroa",
+  "reservationUnitCount": "varausyksikköä",
+  "applicants": "Hakukierroksen hakijat",
+  "listHandlingTitle": "Käsittely",
+  "appliedReservations": "Haetut vuorot",
+  "madeReservations": "Varatut vuorot",
+  "allocatedReservations": "Jaetut vuorot",
+  "rejectedOccurrences": "Hylätyt ajankohdat",
+  "rejectedOccurrencesCount": "hylättyä ajankohtaa",
+  "applications": "Hakemukset",
+  "roundCriteria": "Kierroksen kriteerit",
+  "attachedReservationUnits": "Liitettyä varausyksikköä",
+  "listHandlingIngress_one": "Vastuullasi on tällä hetkellä {{count}} tuleva tai käsittelyvaiheessa oleva hakukierros.",
+  "listHandlingIngress_other": "Vastuullasi on tällä hetkellä {{count}} tulevaa tai käsittelyvaiheessa olevaa hakukierrosta.",
+  "listHandlingPlaceholder": "Ei vielä tulevia tai käsittelyvaiheessa olevia hakukierroksia.",
+  "listApprovalIngress_one": "Hyväksyntääsi odottaa tällä hetkellä {{count}} päätöslauselma.",
+  "listApprovalIngress_other": "Hyväksyntääsi odottaa tällä hetkellä {{count}} päätöslauselmaa",
+  "searchAndUsageTimeRanges": "Haku- ja käyttöajanjaksot",
+  "applicationPeriodTitle": "Hakukauden alkamis- ja päätymisajankohta asiakkaille",
+  "reservationPeriodTitle": "Hakuun kuuluvien varausyksiköiden varsinainen käyttöajanjakso",
+  "usedReservationUnits": "Kierrokselle liitetyt varausyksiköt",
+  "resolutionDate": "Päätös tehty {{date}}"
+}

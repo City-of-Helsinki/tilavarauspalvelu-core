@@ -1,8 +1,9 @@
 import React, { useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
 import { Select } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { convertOptionToHDS } from "common/src/helpers";
+import { useSearchParams } from "next/navigation";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
 type SelectFilterProps = {
   name: string;
@@ -12,7 +13,8 @@ type SelectFilterProps = {
 };
 
 export function SelectFilter({ name, options, sort, clearable }: SelectFilterProps) {
-  const [searchParams, setParams] = useSearchParams();
+  const searchParams = useSearchParams();
+  const setParams = useSetSearchParams();
   const { t } = useTranslation();
 
   // TODO not a fan of frontend sorting (especially when it's prop toggled)
@@ -31,14 +33,14 @@ export function SelectFilter({ name, options, sort, clearable }: SelectFilterPro
     } else {
       params.delete(name);
     }
-    setParams(params, { replace: true });
+    setParams(params);
   };
 
-  const value = new URLSearchParams(searchParams).get(name) ?? "";
+  const value = searchParams.get(name) ?? "";
   const convertedValue = typeof options[0]?.value === "number" ? Number(value) : value;
 
-  const label = t(`filters.label.${name}`);
-  const placeholder = t("common.select");
+  const label = t(`filters:label.${name}`);
+  const placeholder = t("common:select");
   return (
     <Select
       texts={{

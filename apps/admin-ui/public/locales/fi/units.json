@@ -1,0 +1,15 @@
+{
+  "description": "Alla näet kaikki toimipisteet, joihin sinulla on käyttöoikeus. Voit luoda ja hallita tiloja, resursseja sekä varausyksiköitä toimipisteen sivulta. Toimipisteen tietoja hallitaan",
+  "descriptionLinkLabel": "toimipisterekisterin kautta",
+  "descriptionLinkHref": "https://asiointi.hel.fi/tprperhe/etusivu/",
+  "filters": {
+    "nameLabel": "Toimipisteen nimi",
+    "unitGroup": "Toimipisteryhmä",
+    "unitGroupTag": "Toimipisteryhmä: {{value}}"
+  },
+  "headings": {
+    "name": "Toimipisteen nimi",
+    "unitGroup": "Toimipisteryhmä",
+    "reservationUnitCount": "Varausyksiköitä"
+  }
+}

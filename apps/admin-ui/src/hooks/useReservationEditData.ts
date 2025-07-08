@@ -14,7 +14,7 @@ type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;
 /// but the UI makes no distinction between past and present instances of a recurrence.
 /// If we don't get the next valid reservation for edits: the mutations work,
 /// but the UI is not updated to show the changes (since it's looking at a past instance).
-export function useReservationEditData(pk?: string): {
+export function useReservationEditData(pk: number): {
   reservation: Maybe<ReservationType> | undefined;
   loading: boolean;
   refetch: () => Promise<unknown>;

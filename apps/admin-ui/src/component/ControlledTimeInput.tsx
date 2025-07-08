@@ -1,7 +1,7 @@
 import React from "react";
 import { useController, UseControllerProps, FieldValues } from "react-hook-form";
 import { TimeInput } from "hds-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 
 interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
   error?: string;
@@ -27,10 +27,10 @@ export function ControlledTimeInput<T extends FieldValues>({
 
   return (
     <TimeInput
-      id={id ?? `ReservationDialog.${field.name}`}
-      label={label ?? t(`common.${field.name}`)}
-      hoursLabel={t("common.hoursLabel")}
-      minutesLabel={t("common.minutesLabel")}
+      id={id ?? `TimeInput.${field.name}`}
+      label={label ?? t(`common:${field.name}`)}
+      hoursLabel={t("common:hoursLabel")}
+      minutesLabel={t("common:minutesLabel")}
       required={required}
       disabled={disabled}
       errorText={error}

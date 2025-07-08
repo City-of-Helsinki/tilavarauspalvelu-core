@@ -1,8 +1,8 @@
 import React from "react";
 import styled from "styled-components";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { IconAngleLeft, IconSize } from "hds-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 const StyledLink = styled(Link)`
   display: inline-flex;
@@ -25,9 +25,9 @@ type Props = {
 function LinkPrevInner({ route, style, className }: Props): JSX.Element {
   const { t } = useTranslation();
   return (
-    <StyledLink to={route || ".."} relative="path" style={style} className={className} data-testid="link__previous">
-      <IconAngleLeft size={IconSize.Small} aria-hidden="true" />
-      {t("common.prev")}
+    <StyledLink href={route || ".."} style={style} className={className} data-testid="link__previous">
+      <IconAngleLeft size={IconSize.Small} />
+      {t("common:prev")}
     </StyledLink>
   );
 }

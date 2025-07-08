@@ -7,7 +7,7 @@ import {
   ReservationTypeChoice,
   type ReservationTypeFormFieldsFragment,
 } from "@gql/gql-types";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { type ReservationFormType, ReservationTypes } from "@/schemas";
 import { ShowAllContainer } from "common/src/components/";
@@ -137,7 +137,7 @@ function ReservationTypeForm({
               <ReservationMetadataSetForm reservationUnit={reservationUnit} />
             </div>
             {type === ReservationTypeChoice.Staff ? (
-              <StyledShowAllContainer showAllLabel={t("MyUnits.ReservationForm.showReserver")} maximumNumber={0}>
+              <StyledShowAllContainer showAllLabel={t("myUnits:ReservationForm.showReserver")} maximumNumber={0}>
                 <>
                   <ReserverMetadataSetForm reservationUnit={reservationUnit} />
                   <HR style={{ gridColumn: "1 / -1" }} />

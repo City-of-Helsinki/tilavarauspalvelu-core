@@ -1,0 +1,77 @@
+{
+  "heading": "Omat toimipisteet",
+  "description": "Alla näet kaikki toimipisteet, joihin sinulla on käyttöoikeus. Voit tarkastella varauskalentereita ja tehdä varauksia toimipisteen sivulla.",
+  "Calendar": {
+    "Tabs": {
+      "byUnit": "Varausyksiköittäin",
+      "byReservationUnit": "Kaikki varaukset"
+    },
+    "header": {
+      "createReservation": "Tee varaus",
+      "reservationSeries": "Tee toistuva varaus"
+    },
+    "legend": {
+      "confirmed": "Hyväksytty varaus",
+      "unconfirmed": "Varaustoive",
+      "intersecting": "Toisen varausyksikön varaus",
+      "pause": "Tauko",
+      "closed": "Suljettu",
+      "waitingPayment": "Hyväksytty varaus, Odottaa maksua",
+      "staffReservation": "Sisäinen varaus",
+      "reservationUnitReleased": "Varausyksikkö julkaistu",
+      "reservationUnitDraft": "Varausyksikkö luonnostilassa"
+    }
+  },
+  "ReservationDialog": {
+    "title": "Tee varaus",
+    "accept": "Varaa",
+    "saveSuccess": "Varaus tehty kohteeseen {{reservationUnit}}"
+  },
+  "ReservationSeries": {
+    "error": {
+      "invalidUnitId": "Virheellinen yksikön numero.",
+      "notPossibleForThisUnit": "Tälle yksikölle ei ole mahdollista tehdä toistuvaa varausta."
+    },
+    "pageTitle": "Tee toistuva varaus",
+    "addNewReservation": "Lisää uusi varaus",
+    "Confirmation": {
+      "removed": "Hylätty",
+      "overlapping": "Ei saatavilla",
+      "cancelled": "Peruttu",
+      "title": "Toistuva varaus tehty",
+      "allFailedTitle": "Toistuvaa varausta ei voitu tehdä",
+      "failedSubtitle": "Epäonnistuneet varaukset",
+      "successSubtitle": "Varaukset",
+      "successInfo": "Kaikki varaukset tehtiin onnistuneesti.",
+      "failureInfo": "{{conflicts}} / {{total}} epäonnistui päällekkäisyyksien takia.",
+      "holidayInfo": "{{holidays}} / {{total}} varaus osuu pyhäpäivälle, mutta varaus päivälle on silti tehty.",
+      "failureInfoSecondParagraph": "Voit halutessasi etsiä näille toistoille uuden ajan varauksen sivulta.",
+      "RejectionReadinessChoice": {
+        "INTERVAL_NOT_ALLOWED": "Aloitusaika ei sallittu",
+        "OVERLAPPING_RESERVATIONS": "Ei saatavilla",
+        "RESERVATION_UNIT_CLOSED": "Suljettu"
+      },
+      "failureMessages": {
+        "reservationInPast": "Aika menneisyydessä",
+        "overlap": "Päällekkäinen varaus",
+        "interval": "Ei sallittu varauksen aloitus aika",
+        "default": "Aika ei saatavilla"
+      },
+      "buttonToUnit": "Palaa toimipisteen sivulle",
+      "buttonToReservation": "Siirry varauksen sivulle"
+    }
+  },
+  "ReservationForm": {
+    "showReserver": "Näytä varaajan tiedot ja ehdot"
+  },
+  "ReservationSeriesForm": {
+    "reservationUnit": "Varausyksikkö",
+    "repeatPattern": "Varauksen toisto",
+    "repeatOnDays": "Toistoviikonpäivät",
+    "reservationsList_zero": "Ei yhtään varausta aikavälille",
+    "reservationsList_one": "Olet tekemässä yhden varauksen",
+    "reservationsList_other": "Olet tekemässä {{count}} varausta",
+    "name": "Varaussarjan nimi",
+    "newOverlapError": "Varausta ei pystytty tekemään, koska siinä on uusia päällekkäistä varauksia ({{ count }}). Tarkista lista ja yritä uudelleen."
+  }
+}

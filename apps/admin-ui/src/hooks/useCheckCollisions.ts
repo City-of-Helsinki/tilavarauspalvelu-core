@@ -5,7 +5,7 @@ import { base64encode } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { gql } from "@apollo/client";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 
 export function useCheckCollisions({
   reservationPk,
@@ -42,7 +42,7 @@ export function useCheckCollisions({
       state: RELATED_RESERVATION_STATES,
     },
     onError: () => {
-      errorToast({ text: t("errors.errorFetchingData") });
+      errorToast({ text: t("errors:errorFetchingData") });
     },
   });
 

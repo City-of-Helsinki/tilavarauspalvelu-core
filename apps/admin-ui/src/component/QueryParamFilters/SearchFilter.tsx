@@ -1,14 +1,16 @@
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { TextInput } from "hds-react";
 import { debounce } from "lodash-es";
-import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "next/navigation";
+import { useTranslation } from "next-i18next";
 
 // TODO should we check that name cant be empty?
 /* TODO allow overriding the placeholder / label without changing the key */
 // NOTE use TextInput because it has `id` prop unlike SearchInput
 export function SearchFilter({ name, labelKey }: { name: string; labelKey?: string }) {
   const { t } = useTranslation();
-  const [searchParams, setParams] = useSearchParams();
+  const searchParams = useSearchParams();
+  const setParams = useSetSearchParams();
 
   const filter = searchParams.get(name);
   const setFilter = (value: string) => {
@@ -18,15 +20,15 @@ export function SearchFilter({ name, labelKey }: { name: string; labelKey?: stri
     } else {
       vals.set(name, value);
     }
-    setParams(vals, { replace: true });
+    setParams(vals);
   };
 
   const onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     setFilter(evt.target.value);
   };
 
-  const label = t(`filters.label.${labelKey ?? name}`);
-  const placeholder = t(`filters.placeholder.${name}`);
+  const label = t(`filters:label.${labelKey ?? name}`);
+  const placeholder = t(`filters:placeholder.${name}`);
   return (
     <TextInput
       label={label}

@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import { IconAngleDown, IconAngleUp } from "hds-react";
 import styled from "styled-components";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { Flex, H2 } from "common/styled";
 
 const ToggleButton = styled.button`
@@ -110,8 +110,8 @@ export function Accordion({
 
   const isAccordionOpen = open || accordionOpenState;
   const buttonAriaLabel = isAccordionOpen
-    ? `${t("common.close")} ${t("common.accordion")} "${heading}"`
-    : `${t("common.open")} ${t("common.accordion")} "${heading}"`;
+    ? `${t("common:close")} ${t("common:accordion")} "${heading}"`
+    : `${t("common:open")} ${t("common:accordion")} "${heading}"`;
 
   return (
     <Wrapper style={style} className={className} $open={isAccordionOpen} {...rest}>
