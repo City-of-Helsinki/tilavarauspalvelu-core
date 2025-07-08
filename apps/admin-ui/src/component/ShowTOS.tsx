@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { useGenericTerms } from "common/src/hooks/useGenericTerms";
 import { type Maybe, type TermsOfUseTextFieldsFragment } from "@gql/gql-types";
 import { Sanitize } from "common/src/components/Sanitize";

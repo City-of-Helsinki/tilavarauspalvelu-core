@@ -7,7 +7,8 @@ import { fromUIDate, toUIDate } from "common/src/common/util";
 import { Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { toMondayFirstUnsafe } from "common/src/helpers";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "next/navigation";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
 const Wrapper = styled(Flex).attrs({
   $gap: "none",
@@ -53,17 +54,17 @@ export function DayNavigation({ name }: Props): JSX.Element {
   }
 
   const { t } = useTranslation();
-
-  const [searchParams, setSearchParams] = useSearchParams();
+  const searchParams = useSearchParams();
+  const setSearchParams = useSetSearchParams();
 
   const handleChange = (value: string) => {
     const params = new URLSearchParams(searchParams);
     if (value.length > 0) {
       params.set(name, value);
-      setSearchParams(params, { replace: true });
+      setSearchParams(params);
     } else {
       params.delete(name);
-      setSearchParams(params, { replace: true });
+      setSearchParams(params);
     }
   };
 
@@ -84,15 +85,15 @@ export function DayNavigation({ name }: Props): JSX.Element {
   return (
     <Wrapper>
       <Btn
-        aria-label={t("common.prev")}
+        aria-label={t("common:prev")}
         size={ButtonSize.Small}
         variant={ButtonVariant.Supplementary}
         onClick={onPreviousDay}
-        iconStart={<IconAngleLeft aria-hidden="true" />}
+        iconStart={<IconAngleLeft />}
       >
         {" "}
       </Btn>
-      <WeekDay>{`${t(`dayShort.${day}`)} `}</WeekDay>
+      <WeekDay>{`${t(`translation:dayShort.${day}`)} `}</WeekDay>
       <BorderlessDatePicker
         disableConfirmation
         id="date-input"
@@ -103,11 +104,11 @@ export function DayNavigation({ name }: Props): JSX.Element {
         value={uiDate}
       />
       <Btn
-        aria-label={t("common.next")}
+        aria-label={t("common:next")}
         size={ButtonSize.Small}
         variant={ButtonVariant.Supplementary}
         onClick={onNextDay}
-        iconStart={<IconAngleRight aria-hidden="true" />}
+        iconStart={<IconAngleRight />}
       >
         {" "}
       </Btn>

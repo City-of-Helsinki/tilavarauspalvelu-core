@@ -40,3 +40,10 @@ export const VALID_ALLOCATION_APPLICATION_STATUSES = [
   ApplicationStatusChoice.Handled,
   ApplicationStatusChoice.ResultsSent,
 ];
+
+export const NOT_FOUND_SSR_VALUE = {
+  notFound: true,
+  props: {
+    notFound: true,
+  },
+};

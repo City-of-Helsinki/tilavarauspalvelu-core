@@ -42,13 +42,13 @@ export function ReservationListButton({
     case "remove":
       return (
         <Button key={type} {...btnCommon} iconStart={<IconCross />}>
-          {type === "deny" ? t("common.deny") : t("common.remove")}
+          {type === "deny" ? t("common:deny") : t("common:remove")}
         </Button>
       );
     case "restore":
       return (
         <Button key={type} {...btnCommon} iconStart={<IconArrowUndo />}>
-          {t("common.restore")}
+          {t("common:restore")}
         </Button>
       );
     case "change":

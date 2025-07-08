@@ -1,0 +1,435 @@
+{
+  "calendar": {
+    "monday": "Maanantai",
+    "tuesday": "Tiistai",
+    "wednesday": "Keskiviikko",
+    "thursday": "Torstai",
+    "friday": "Perjantai",
+    "saturday": "Lauantai",
+    "sunday": "Sunnuntai"
+  },
+  "dayShort": {
+    "0": "Ma",
+    "1": "Ti",
+    "2": "Ke",
+    "3": "To",
+    "4": "Pe",
+    "5": "La",
+    "6": "Su",
+    "MONDAY": "Ma",
+    "TUESDAY": "Ti",
+    "WEDNESDAY": "Ke",
+    "THURSDAY": "To",
+    "FRIDAY": "Pe",
+    "SATURDAY": "La",
+    "SUNDAY": "Su"
+  },
+  "dayLong": {
+    "0": "Maanantai",
+    "1": "Tiistai",
+    "2": "Keskiviikko",
+    "3": "Torstai",
+    "4": "Perjantai",
+    "5": "Lauantai",
+    "6": "Sunnuntai",
+    "MONDAY": "Maanantai",
+    "TUESDAY": "Tiistai",
+    "WEDNESDAY": "Keskiviikko",
+    "THURSDAY": "Torstai",
+    "FRIDAY": "Perjantai",
+    "SATURDAY": "Lauantai",
+    "SUNDAY": "Sunnuntai"
+  },
+  "authentication": {
+    "WEAK": "Heikko tunnistautuminen",
+    "STRONG": "Vahva tunnistautuminen"
+  },
+  "ReserveeType": {
+    "INDIVIDUAL": "yksityishenkilö",
+    "BUSINESS": "yritys",
+    "NONPROFIT": {
+      "REGISTERED": "yhdistys, rekisteröity",
+      "UNREGISTERED": "yhdistys, rekisteröimätön"
+    }
+  },
+  "ReservationType": {
+    "NORMAL": "",
+    "BLOCKED": "Suljettu",
+    "BEHALF": "Asiakkaan puolesta",
+    "STAFF": "Sisäinen varaus",
+    "SEASONAL": "Kausivaraus"
+  },
+  "paymentType": {
+    "ONLINE_OR_INVOICE": "Verkkomaksu tai laskutus",
+    "ONLINE": "Verkkomaksu",
+    "ON_SITE": "Maksu paikan päällä"
+  },
+  "language": {
+    "fi": "suomeksi",
+    "sv": "ruotsiksi",
+    "en": "englanniksi"
+  },
+  "paging": {
+    "numResults": "{{count}} tulosta {{totalCount}} tuloksesta näytetty",
+    "allResults": "Kaikki {{totalCount}} tulosta näytetty"
+  },
+  "tos": {
+    "paymentTermsTitle": "Maksuehdot",
+    "priceTermsTitle": "Alennusryhmä",
+    "cancelTermsTitle": "Peruutusehdot",
+    "serviceTermsTitle": "Täydentävät ehdot",
+    "generalTermsTitle": "Helsingin kaupungin tilojen ja laitteiden varaamisen sopimusehdot"
+  },
+  "errorPages": {
+    "accessForbidden": {
+      "title": "Sinulla ei ole käyttöoikeuksia tälle sivulle",
+      "description": "Sivu on nähtävillä vain kirjautuneille käyttäjille. Voit nähdä sivun sisällön, jos kirjaudut sisään ja sinulla on riittävän laajat käyttöoikeudet."
+    },
+    "generalError": {
+      "title": "Jokin meni vikaan",
+      "description": "Pahoittelut, emme valitettavasti pysty näyttämään sivua juuri nyt. Yritä myöhemmin uudelleen!"
+    },
+    "linkToVaraamo": "Siirry Varaamon etusivulle",
+    "giveFeedback": "Ota yhteyttä"
+  },
+  "ArchiveReservationUnitDialog": {
+    "title": "Oletko varma että haluat arkistoida varausyksikön {{name}}?",
+    "description": "Arkistoimisen jälkeen varausyksikkö ei ole enää näkyvissä Varaamon käsittelypuolella. Mikäli haluat palauttaa varausyksikön, ota yhteyttä järjestelmän pääkäyttäjään.",
+    "archive": "Arkistoi",
+    "success": "Varausyksikkö arkistoitu."
+  },
+  "DiscardReservationUnitChangesDialog": {
+    "title": "Oletko varma että haluat palata takaisin tallentamatta varausyksikön tietoja?",
+    "description": "Varausyksikön tiedot katoavat, eikä niitä voi palauttaa.",
+    "discard": "Palaa tallentamatta"
+  },
+  "MainLander": {
+    "ingress": "Tässä palvelussa voit käsitellä Helsingin kaupungin tilavaraushakemuksia sekä asettaa tiloja ja laitteita varattaviksi.",
+    "welcome": "Tervetuloa"
+  },
+  "ReservationEditSeries": {
+    "heading": "Muokkaa varaussarjaa",
+    "submit": "Luo varaukset"
+  },
+  "ApplicationSectionStatusChoice": {
+    "HANDLED": "Hyväksytty",
+    "IN_ALLOCATION": "Käsittelyssä",
+    "UNALLOCATED": "Vastaanotettu",
+    "REJECTED": "Hylätty"
+  },
+  "TimeSlotStatusCell": {
+    "declined": "Hylätty",
+    "approved": "Hyväksytty"
+  },
+  "Recommendation": {
+    "actionMassActionSubmit": "Massakäsittele valitut"
+  },
+  "Reservation": {
+    "headings": {
+      "applicant": "Hakija",
+      "schedule": "Vuoro"
+    },
+    "noReservations": "Ei varauksia",
+    "NewReservationModal": {
+      "acceptBtn": "Lisää varaus",
+      "title": "Luo uusi varaus",
+      "successToast": "Uusi aika tallennettu"
+    },
+    "CommonModal": {
+      "form": {
+        "startTime": "Aloitusaika",
+        "length": "Kesto"
+      },
+      "newTime": "Uusi aika",
+      "error": {
+        "reservationCollides": "Toivomasi aika ei ole saatavilla"
+      }
+    },
+    "EditTimeModal": {
+      "title": "Muuta varauksen aikaa",
+      "originalTime": "Muutettava aika",
+      "recurringInfoLabel": "Toistuva varaus aikavälillä",
+      "recurringInfoTimes": "{{ weekdays }} {{begin}} - {{end}}",
+      "acceptBtn": "Muuta aikaa",
+      "successToast": "Uusi aika tallennettu",
+      "error": {
+        "mutation": "Ajan muutos epäonnistui."
+      }
+    },
+    "EditPage": {
+      "title": "Muokkaa varauksen tietoja",
+      "Reservation failed to load": "Varausta {{ pk }} ei pystytty latamaan",
+      "Reservation unit failed to load": "Varausyksikköä ei löytynyt",
+      "save": "Tallenna",
+      "saveSuccess": "Varauksen muutokset tallennettu",
+      "saveSuccessRecurring": "Muutokset tallennettu tuleviin varauksiin!",
+      "pageThrewError": "Virhe: varausta ei voi muokata"
+    }
+  },
+  "ReservationUnit": {
+    "isDraft": {
+      "true": "Luonnos",
+      "false": "Julkaistu"
+    }
+  },
+  "Spaces": {
+    "spaceListHeading": "Kaikki tilat",
+    "spaceListDescription": "Täällä näet koosteen kaikista tiloista, joita on liitetty järjestelmään ja jotka sinulla on oikeus nähdä.",
+    "searchPlaceholder": "Hae tiloja",
+    "headings": {
+      "name": "Nimi",
+      "unit": "Toimipiste",
+      "district": "Kaupunginosa",
+      "volume": "Vetoisuus",
+      "size": "Koko"
+    }
+  },
+  "Resources": {
+    "resourceListHeading": "Kaikki resurssit",
+    "resourceListDescription": "Täällä näet koosteen kaikista resursseista, joita on liitetty järjestelmään ja jotka sinulla on oikeus nähdä.",
+    "searchPlaceholder": "Hae resursseja",
+    "headings": {
+      "name": "Nimi",
+      "unit": "Toimipiste",
+      "district": "Kaupunginosa",
+      "resourceType": "Resurssityyppi"
+    }
+  },
+  "ResourceEditor": {
+    "defaultHeading": "(nimetön resurssi)",
+    "resourceUpdated": "Tiedot tallennettu.",
+    "resourceUpdatedNotification": "Resurssin tiedot tallennettu.",
+    "label": {
+      "spacePk": "Tila",
+      "nameFi": "Resurssin nimi suomeksi",
+      "nameSv": "Resurssin nimi ruotsiksi",
+      "nameEn": "Resurssin nimi englanniksi"
+    }
+  },
+  "ResourceEditorView": {
+    "illegalResource": "Virheellinen resurssin tunniste",
+    "illegalUnit": "Virheellinen toimipisteen tunniste"
+  },
+  "SpaceEditorView": {
+    "illegalSpace": "Virheellinen tilan tunniste",
+    "illegalUnit": "Virheellinen toimipisteen tunniste"
+  },
+  "SpaceEditor": {
+    "noParent": "Päätason tila",
+    "noUnit": "Tilaa ei ole liitetty toimipisteeseen",
+    "noAddress": "Toimipisteellä ei ole osoitetta",
+    "noSurfaceArea": "Pinta-alaa ei ole asetettu",
+    "details": "Tilan tiedot",
+    "hierarchy": "Tilapuurakenne",
+    "parent": "Ylitila",
+    "other": "Muut tiedot",
+    "cancel": "Palaa tallentamatta tietoja",
+    "save": "Tallenna tiedot",
+    "label": {
+      "nameFi": "Tilan nimi suomeksi",
+      "nameEn": "Tilan nimi englanniksi",
+      "nameSv": "Tilan nimi ruotsiksi",
+      "surfaceArea": "Pinta-ala",
+      "maxPersons": "Henkilömäärä enintään"
+    },
+    "touLabel": "Tilan ohjeet {{lang}}",
+    "noMaxPersons": "Henkilömäärää ei asetettu",
+    "spaceUpdated": "Tiedot tallennettu",
+    "spaceUpdatedNotification": "Tilan tiedot tallennettu",
+    "area": "{{surfaceArea}} m²"
+  },
+  "SpaceModal": {
+    "phase": "Vaihe",
+    "namePlaceholder": "Tilan nimi {{language}}",
+    "nameLabel": "Tilan nimi {{lang}}",
+    "page1": {
+      "modalTitle": "Luo uusi tila toimipisteelle",
+      "subSpaceModalTitle": "Luo alitila tilalle",
+      "info": "Voit luoda yhden tai kerralla useita samaan tasoon liittyviä tiloja, joiden nimet ja tiedot voivat vaihdella.",
+      "title": "Valitse tilojen määrä ja ylitila",
+      "numSpacesLabel": "Uusien tilojen määrä",
+      "numSpacesHelperText": "Valitse alustava määrä.",
+      "parentLabel": "Ylitila",
+      "parentPlaceholder": "Valitse ylitila tai uusi itsenäinen tila.",
+      "parentHelperText": "Ylitila tarkoittaa tilaa, jonka osaksi nyt luomasi tila kuuluu. Jos tila on uusi itsenäinen tila, valitse itsenäinen tila. Voit vaihtaa ylitilan myöhemminkin.",
+      "buttonCancel": "Palaa tallentamatta tiloja",
+      "buttonNext": "Seuraava"
+    },
+    "page2": {
+      "modalTitle": "Määritä tilojen pohjatiedot",
+      "subSpaceModalTitle": "Määritä alitilatiedot",
+      "info": "Voit muokata tiloja milloin tahansa myöhemmin. Huomioi paloturvallisuusmääräykset maksimihenkilömäärissä.",
+      "subSpaceInfo": "Voit luoda yhden tai kerralla useita alitiloja, joiden nimet ja tiedot voivat vaihdella.",
+      "newRootSpace": "Uusi itsenäinen tila",
+      "addRowButton": "Lisää rivi",
+      "prevButton": "Edellinen",
+      "createButton": "Luo tilatieto",
+      "nameLabel": "Tilan nimi",
+      "surfaceAreaLabel": "Pinta-ala",
+      "surfaceAreaHelperText": "m²",
+      "maxPersonsLabel": "Henkilömäärä enintään",
+      "maxPersonsHelperText": "henkilöä",
+      "codeLabel": "Tilan numero",
+      "codePlaceholder": "Numero tai koodi",
+      "saving": "Luodaan tilatietoja..."
+    }
+  },
+  "SpaceTable": {
+    "subSpaceCount_one": "alitila",
+    "subSpaceCount_other": "alitilaa",
+    "menuAddSubSpace": "Lisää alitiloja",
+    "menuEditSpace": "Muokkaa tilatietoja",
+    "menuRemoveSpace": "Poista tila",
+    "removeConflictTitle": "Tilaa ei voi poistaa",
+    "removeConflictMessage": "Et voi poistaa tilaa. Siirrä tai poista ensin resurssi",
+    "removeConfirmationTitle": "Haluatko varmasti poistaa tilan {{name}}?",
+    "removeConfirmationMessage": "Tila poistetaan kaikista varausyksiköistä, joihin se on liitetty. Et voi perua toimintoa.",
+    "removeConfirmationAccept": "Poista",
+    "removeConfirmationCancel": "Kumoa",
+    "removeFailed": "Tilan poistaminen ei onnistunut."
+  },
+  "ReservationDialog": {
+    "title": "Tee varaus",
+    "accept": "Varaa",
+    "saveSuccess": "Varaus tehty kohteeseen {{reservationUnit}}"
+  },
+  "ReservationUnitList": {
+    "typeFilter": "Tyyppi",
+    "statusFilter": "Tila"
+  },
+  "locationType": {
+    "FIXED": "Kiinteä",
+    "MOVABLE": "Siirrettävä"
+  },
+  "priceUnit": {
+    "FIXED": "Per kerta",
+    "PER_15_MINS": "Per 15 min",
+    "PER_30_MINS": "Per 30 min",
+    "PER_DAY": "Per päivä",
+    "PER_HALF_DAY": "Per puoli päivää",
+    "PER_HOUR": "Per tunti",
+    "PER_WEEK": "Per viikko"
+  },
+  "orderStatus": {
+    "ALL": "Maksuton",
+    "PAID": "Maksettu",
+    "PAID_MANUALLY": "Maksetaan paikan päällä",
+    "PAID_BY_INVOICE": "Maksu laskulla",
+    "PENDING": "Odottaa maksua",
+    "DRAFT": "Maksu kesken",
+    "EXPIRED": "Ei maksettu",
+    "REFUNDED": "Maksu palautettu",
+    "CANCELLED": "Peruutettu",
+    "FREE": "Maksuton"
+  },
+  "reservationStartInterval": {
+    "INTERVAL_15_MINS": "15 min välein",
+    "INTERVAL_30_MINS": "30 min välein",
+    "INTERVAL_60_MINS": "1 tunnin välein",
+    "INTERVAL_90_MINS": "1,5 tunnin välein",
+    "INTERVAL_120_MINS": "2 tunnin välein",
+    "INTERVAL_180_MINS": "3 tunnin välein",
+    "INTERVAL_240_MINS": "4 tunnin välein",
+    "INTERVAL_300_MINS": "5 tunnin välein",
+    "INTERVAL_360_MINS": "6 tunnin välein",
+    "INTERVAL_420_MINS": "7 tunnin välein"
+  },
+  "ReservationStateFilter": {
+    "label": "Käsittelytila",
+    "state": {
+      "CANCELLED": ""
+    }
+  },
+  "ResourceModal": {
+    "modalTitle": "Luo uusi resurssi tilalle",
+    "info": "Voit luoda kerralla yhden tilan resurssin. Niitä voivat olla esim. laitteet tai tarvikkeet.",
+    "selectSpace": "Valitse tila",
+    "namePlaceholder": "Resurssin nimi  {{language}}",
+    "cancel": "Palaa tallentamatta tietoja",
+    "save": "Tallenna"
+  },
+  "ResourceTable": {
+    "headings": {
+      "name": "Nimi",
+      "unitName": "Toimipiste"
+    },
+    "menuEditResource": "Muokkaa resurssia",
+    "menuRemoveResource": "Poista resurssi",
+    "removeConfirmationTitle": "Haluatko varmasti poistaa resurssin {{name}}?",
+    "removeConfirmationMessage": "Resurssi poistetaan toimipisteestä. Et voi perua toimintoa.",
+    "removeConfirmationAccept": "Poista",
+    "removeConfirmationCancel": "Kumoa",
+    "removeSuccess": "Resurssi poistettu."
+  },
+  "ReservationSeriesView": {
+    "Heading": "Ajankohta"
+  },
+  "Payment": {
+    "status": {
+      "DRAFT": "Maksu kesken",
+      "EXPIRED": "Ei maksettu",
+      "CANCELLED": "Peruutettu",
+      "PAID": "Maksettu",
+      "PAID_MANUALLY": "Paikan päällä",
+      "PAID_BY_INVOICE": "Maksu laskulla",
+      "PENDING": "Odottaa maksua",
+      "REFUNDED": "Maksu palautettu"
+    }
+  },
+  "Calendar": {
+    "legend": {
+      "confirmed": "Hyväksytty varaus",
+      "unconfirmed": "Varaustoive",
+      "otherRequiedHandling": "Muun varaajan toive",
+      "rest": "Varattu"
+    }
+  },
+  "Reservations": {
+    "reservationListHeading": "Varaustoiveet",
+    "emptyFilterPageName": "varausta",
+    "reservationListDescription": "Alla näet kaikki käsittelemättömät varaustoiveet. Klikkaamalla varaajan nimeä pääset käsittelemään varauksen.",
+    "allReservationListHeading": "Kaikki varaukset",
+    "allReservationListDescription": "Alla näet kaikki tulevat varaukset ja käsittelemättömät varaustoiveet. Voit tarkastella varauksia tarkemmin klikkaamalla varaajan nimeä.",
+    "headings": {
+      "id": "id",
+      "reserveeName": "Varaajan nimi",
+      "reservationUnit": "Varausyksikkö",
+      "unit": "Toimipiste",
+      "datetime": "Aika",
+      "createdAt": "Tehty",
+      "paymentStatus": "Maksutila",
+      "state": "Käsittelytila"
+    },
+    "prefixes": {
+      "behalf": "Puolesta| ",
+      "staff": "Sis.| "
+    }
+  },
+  "ReservationsListButton": {
+    "changeTime": "Muuta aikaa",
+    "showInCalendar": "Näytä kalenterissa"
+  },
+  "validation": {
+    "string": {
+      "max": "Kenttään {{fieldName}} voi lisätä korkeintaan {{limit}} merkkiä.",
+      "empty": "{{fieldName}} on pakollinen tieto",
+      "base": "{{fieldName}} on pakollinen tieto"
+    },
+    "object": {
+      "unknown": "{{fieldName}} tuntematon"
+    },
+    "number": {
+      "empty": "{{fieldName}} on pakollinen tieto",
+      "base": "{{fieldName}} on pakollinen tieto",
+      "min": "{{fieldName}} pitää olla vähintään {{limit}}",
+      "max": "{{fieldName}} pitää olla pienempi kuin {{limit}}",
+      "precision": "{{fieldName}} {{limit}} desimaalia sallitaan"
+    },
+    "array": {
+      "min": "{{fieldName}} on pakollinen tieto"
+    },
+    "any": {
+      "required": "{{fieldName}} on pakollinen tieto"
+    }
+  }
+}

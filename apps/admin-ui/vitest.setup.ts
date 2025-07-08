@@ -19,7 +19,7 @@ afterEach(() => {
   cleanup();
 });
 
-vi.mock("react-i18next", () => ({
+vi.mock("next-i18next", () => ({
   useTranslation: () => {
     return {
       t: (str: string) => str,

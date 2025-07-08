@@ -1,0 +1,31 @@
+{
+  "reservationUnitListHeading": "Varausyksiköt",
+  "reservationUnitListDescription": "Alla näet kaikki luodut varausyksiköt, joihin sinulla on käyttöoikeus. Voit luoda uuden varausyksikön toimipisteen sivulta.",
+  "emptyFilterPageName": "varausyksikköä",
+  "state": {
+    "ARCHIVED": "Arkistoitu",
+    "DRAFT": "Luonnos",
+    "HIDDEN": "Piilotettu",
+    "PUBLISHED": "Julkaistu",
+    "SCHEDULED_HIDING": "Piilotus ajastettu",
+    "SCHEDULED_PERIOD": "Julkaisuväli ajastettu",
+    "SCHEDULED_PUBLISHING": "Julkaisu ajastettu"
+  },
+  "reservationState": {
+    "RESERVABLE": "Varattavissa",
+    "SCHEDULED_RESERVATION": "Varaus ajastettu",
+    "SCHEDULED_PERIOD": "Varausväli ajastettu",
+    "SCHEDULED_CLOSING": "Sulku ajastettu",
+    "RESERVATION_CLOSED": "Suljettu"
+  },
+  "headings": {
+    "name": "Nimi",
+    "unitName": "Toimipiste",
+    "district": "Kaupunginosa",
+    "reservationUnitType": "Tilatyyppi",
+    "maxPersons": "Hlömäärä (max)",
+    "surfaceArea": "Pinta-ala",
+    "state": "Tila",
+    "reservationState": "Varauskalenteri"
+  }
+}
