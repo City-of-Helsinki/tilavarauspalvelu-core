@@ -9,6 +9,7 @@ import { UnitsTable } from "./UnitsTable";
 import { useSearchParams } from "react-router-dom";
 import { CenterSpinner } from "common/styled";
 import { useTranslation } from "react-i18next";
+import { mapParamToNumber } from "@/helpers";
 
 type Props = {
   isMyUnits?: boolean;
@@ -28,13 +29,15 @@ export function UnitsDataLoader({ isMyUnits }: Props): JSX.Element {
 
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
-  const searchFilter = searchParams.get("search");
+  const nameFilter = searchParams.get("search");
+  const unitGroupFilter = mapParamToNumber(searchParams.getAll("unitGroup"), 1);
 
   const { fetchMore, loading, data, previousData } = useUnitListQuery({
     variables: {
       orderBy,
       first: LARGE_LIST_PAGE_SIZE,
-      nameFi: searchFilter,
+      nameFi: nameFilter,
+      unitGroup: unitGroupFilter,
     },
     onError: () => {
       errorToast({ text: t("errors.errorFetchingData") });
@@ -91,8 +94,15 @@ function transformSortString(orderBy: string | null): UnitOrderingChoices[] {
 }
 
 export const UNIT_LIST_QUERY = gql`
-  query UnitList($first: Int, $after: String, $orderBy: [UnitOrderingChoices], $nameFi: String) {
-    units(first: $first, after: $after, orderBy: $orderBy, nameFi: $nameFi, onlyWithPermission: true) {
+  query UnitList($first: Int, $after: String, $orderBy: [UnitOrderingChoices], $nameFi: String, $unitGroup: [Int]) {
+    units(
+      first: $first
+      after: $after
+      orderBy: $orderBy
+      nameFi: $nameFi
+      onlyWithPermission: true
+      unitGroup: $unitGroup
+    ) {
       edges {
         node {
           ...UnitTableElement
