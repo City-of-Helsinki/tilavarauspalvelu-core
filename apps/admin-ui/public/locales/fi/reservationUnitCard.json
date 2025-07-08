@@ -1,0 +1,13 @@
+{
+  "spaceOnly": "Tila",
+  "spaceAndResource": "Tila ja resurssi",
+  "noArea": "pinta-ala puuttuu",
+  "noMaxPersons": "Maksimihenkilömäärä puuttuu",
+  "noReservationUnitType": "Varausyksikön tyyppi puuttuu",
+  "noPurpose": "Käyttötarkoitus puuttuu",
+  "purpose_one": "{{count}} käyttötarkoitus",
+  "purpose_other": "{{count}} käyttötarkoitusta",
+  "statePublished": "Julkaistu",
+  "stateDraft": "Luonnos",
+  "stateArchived": "Arkistoitu"
+}

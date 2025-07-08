@@ -4,6 +4,9 @@ import * as Sentry from "@sentry/nextjs";
 import { onError } from "@apollo/client/link/error";
 import toast from "./common/toast";
 import { isBrowser } from "./helpers";
+import { type IncomingMessage, type IncomingHttpHeaders } from "node:http";
+import qs from "querystring";
+import { getCookie } from "typescript-cookie";
 
 // TODO narrow down the error codes and transform unknowns to catch all
 type ErrorCode = string;
@@ -302,4 +305,71 @@ function toastNetworkError(error: Error | ServerParseError | ServerError) {
       options: { toastId: errorToastId },
     });
   }
+}
+
+export function getServerCookie(headers: IncomingHttpHeaders | undefined, name: string) {
+  const cookie = headers?.cookie;
+  if (cookie == null) {
+    return null;
+  }
+  const decoded = qs.decode(cookie, "; ");
+  const token = decoded[name];
+  if (token == null) {
+    return null;
+  }
+  if (Array.isArray(token)) {
+    // eslint-disable-next-line no-console
+    console.warn(`multiple ${name} in cookies`, token);
+    return token[0];
+  }
+  return token;
+}
+
+export function enchancedFetch(req?: IncomingMessage) {
+  return (url: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    const isServer = typeof window === "undefined";
+    const csrfToken = isServer ? getServerCookie(req?.headers, "csrftoken") : getCookie("csrftoken");
+    const headers = new Headers({
+      ...(init?.headers != null ? init.headers : {}),
+      // TODO missing csrf token is a non recoverable error
+      ...(csrfToken != null ? { "X-Csrftoken": csrfToken } : {}),
+    });
+
+    // NOTE server requests don't include cookies by default
+    // TODO do we want to copy request headers from client or no?
+    if (isServer) {
+      if (req == null) {
+        throw new Error("request is required for server-side fetch");
+      }
+      if (req?.headers == null) {
+        throw new Error("request headers must be defined for server-side fetch");
+      }
+      if (csrfToken == null) {
+        throw new Error("csrftoken not found in cookies");
+      }
+      headers.append("Set-Cookie", `csrftoken=${csrfToken}`);
+      headers.append("Cookie", `csrftoken=${csrfToken}`);
+      // Django fails with 403 if there is no referer (only on Kubernetes)
+      const requestUrl = req.url ?? "";
+      const hostname = req.headers["x-forwarded-host"] ?? req.headers.host ?? "";
+      // NOTE not exactly correct
+      // For our case this is sufficent because we are always behind a proxy,
+      // but technically there is a case where we are not behind a gateway and not localhost
+      // so the proto would be https and no x-forwarded-proto set
+      // TODO we have .json blobs in the referer (translations), does it matter?
+      const proto = req.headers["x-forwarded-proto"] ?? "http";
+      headers.append("Referer", `${proto}://${hostname}${requestUrl}`);
+
+      const sessionCookie = getServerCookie(req?.headers, "sessionid");
+      if (sessionCookie != null) {
+        headers.append("Cookie", `sessionid=${sessionCookie}`);
+        headers.append("Set-Cookie", `sessionid=${sessionCookie}`);
+      }
+    }
+
+    return fetch(url, {
+      ...init,
+      headers,
+    });
+  };
 }

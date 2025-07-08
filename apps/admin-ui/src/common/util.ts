@@ -30,7 +30,7 @@ export function formatDateTime(date: string): string {
 
 // TODO move to common and combine with ui (requires i18n changes: replace messages.ts with json)
 export function formatDateTimeRange(t: TFunction, start: Date, end: Date): string {
-  const startDay = t(`dayShort.${toMondayFirstUnsafe(getDay(start))}`);
+  const startDay = t(`translation:dayShort.${toMondayFirstUnsafe(getDay(start))}`);
 
   if (isSameDay(start, end)) {
     return `${startDay} ${format(start, DATE_FORMAT)} ${format(start, "HH:mm")}–${format(end, "HH:mm")}`;
@@ -40,7 +40,7 @@ export function formatDateTimeRange(t: TFunction, start: Date, end: Date): strin
 }
 
 export function formatDateRange(t: TFunction, start: Date, end: Date): string {
-  const startDay = t(`dayShort.${toMondayFirstUnsafe(getDay(start))}`);
+  const startDay = t(`translation:dayShort.${toMondayFirstUnsafe(getDay(start))}`);
   if (isSameDay(start, end)) {
     return `${startDay} ${format(start, DATE_FORMAT)}`;
   }
@@ -61,7 +61,7 @@ interface IAgeGroups {
 }
 
 export function formatAgeGroups(ageGroups: IAgeGroups, t: TFunction): string {
-  return t("common.agesSuffix", {
+  return t("common:agesSuffix", {
     range: trim(`${ageGroups.minimum || ""}-${ageGroups.maximum || ""}`, "-"),
   });
 }
@@ -73,13 +73,13 @@ export function formatAgeGroup(
   return group ? `${group.minimum}-${group.maximum || ""}` : null;
 }
 
-export function formatAddress(location: LocationFieldsFragment | null | undefined): string {
+export function formatAddress(location: LocationFieldsFragment | null | undefined, defaultValue = "-"): string {
   if (!location) {
-    return "-";
+    return defaultValue;
   }
   const res = trim(`${location.addressStreetFi ?? ""}, ${location.addressZip} ${location.addressCityFi ?? ""}`, ", ");
   if (res === "") {
-    return "-";
+    return defaultValue;
   }
   return res;
 }
@@ -91,8 +91,7 @@ export function getTranslatedError(t: TFunction, error: string | undefined): str
   if (error == null) {
     return undefined;
   }
-  // TODO use a common translation key for these
-  return t(`Notifications.form.errors.${error}`);
+  return t(`form:errors.${error}`);
 }
 
 export function getReserveeName(
@@ -102,7 +101,7 @@ export function getReserveeName(
 ): string {
   let prefix = "";
   if (reservation.type === ReservationTypeChoice.Behalf) {
-    prefix = t ? t("Reservations.prefixes.behalf") : "";
+    prefix = t ? t("reservation:prefixes.behalf") : "";
   }
   if (
     // commented extra condition out for now, as the staff prefix was requested to be used for all staff reservations
@@ -110,7 +109,7 @@ export function getReserveeName(
     reservation.reserveeName ===
       `${reservation.user?.firstName} ${reservation.user?.lastName}` */
   ) {
-    prefix = t ? t("Reservations.prefixes.staff") : "";
+    prefix = t ? t("reservation:prefixes.staff") : "";
   }
   return truncate(prefix + (reservation.reserveeName ?? "-"), length);
 }

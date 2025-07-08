@@ -1,4 +1,5 @@
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "next/navigation";
+import { useSetSearchParams } from "./useSetSearchParams";
 
 function validSort(keys: string[], sort: string | null): boolean {
   if (!sort) {
@@ -16,7 +17,9 @@ function validSort(keys: string[], sort: string | null): boolean {
 /// new keys replace existing keys (e.g. pk -> application_id)
 /// all state is stored in the URL only
 export function useSort(validSortKeys: string[]): [string | null, (field: string) => void] {
-  const [searchParams, setParams] = useSearchParams();
+  const searchParams = useSearchParams();
+  const setParams = useSetSearchParams();
+
   const sort = searchParams.get("orderBy");
   const orderBy = validSort(validSortKeys, sort) ? sort : null;
 
@@ -31,7 +34,7 @@ export function useSort(validSortKeys: string[]): [string | null, (field: string
     } else {
       params.set("orderBy", field);
     }
-    setParams(params, { replace: true });
+    setParams(params);
   };
 
   return [orderBy, handleSortChanged];

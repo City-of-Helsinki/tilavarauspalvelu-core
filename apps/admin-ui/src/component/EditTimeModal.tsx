@@ -1,9 +1,8 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
 import { Button, ButtonSize, ButtonVariant, Dialog, Notification, NotificationSize } from "hds-react";
 import { z } from "zod";
-import { type TFunction } from "i18next";
 import {
   type ChangeReservationTimeFragment,
   type ReservationSeriesAddMutationInput,
@@ -79,7 +78,7 @@ function reservationSeriesInfoText({
   return t("Reservation.EditTimeModal.recurringInfoTimes", {
     weekdays: weekdays
       .sort((a, b) => convertWeekday(a) - convertWeekday(b))
-      .map((weekday) => t(`dayShort.${weekday}`))
+      .map((weekday) => t(`translation:dayShort.${weekday}`))
       .join(", "),
     begin: begin && toUIDate(begin),
     end: end && toUIDate(end),
@@ -226,7 +225,7 @@ function DialogContent({
             {t(`${translateKey}.acceptBtn`)}
           </Button>
           <Button size={ButtonSize.Small} variant={ButtonVariant.Secondary} onClick={onClose}>
-            {t("common.cancel")}
+            {t("common:cancel")}
           </Button>
         </ActionButtons>
       </StyledForm>
