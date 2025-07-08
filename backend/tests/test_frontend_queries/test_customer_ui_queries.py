@@ -683,6 +683,9 @@ def test_frontend_queries__customer_ui__Order(graphql):
     factory_args = deepcopy(query_info.factory_args)
     factory_args["remote_id"] = uuid.uuid4()
     factory_args["reservation__pk"] = 1
+    del factory_args["reservation__payment_order__id"]
+    del factory_args["reservation__payment_order__status"]
+    del factory_args["reservation__payment_order__handled_payment_due_by"]
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -759,28 +762,6 @@ def test_frontend_queries__customer_ui__ReservationCancelPage(graphql):
     obj = query_info.factory.create(**factory_args_1)
 
     variables = query_info.variables
-    variables["id"] = to_global_id(query_info.typename, obj.id)
-    assert_no_undefined_variables(variables)
-
-    query = query_info.query
-    graphql.login_with_superuser()
-
-    response = graphql(query, variables=variables)
-
-    assert response.has_errors is False, response.errors
-
-
-def test_frontend_queries__customer_ui__ReservationConfirmationPage(graphql):
-    customer_factories = get_customer_query_info()
-    factories = customer_factories["ReservationConfirmationPage"]
-
-    assert len(factories) == 1
-    query_info = factories[0]
-
-    factory_args = deepcopy(query_info.factory_args)
-    obj = query_info.factory.create(**factory_args)
-
-    variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
     assert_no_undefined_variables(variables)
 
