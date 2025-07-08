@@ -1,6 +1,6 @@
 import React from "react";
 import { ErrorSummary } from "hds-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import type { FieldErrors, FieldValues } from "react-hook-form";
 
@@ -38,14 +38,14 @@ export function FormErrorSummary<T extends FieldValues>({ errors, fieldNamePrefi
   const cleanPrefix = cleanUpFieldName(fieldNamePrefix);
 
   // TODO use a common translation key for these
-  const prefix = cleanPrefix != null ? `${cleanPrefix}.` : "Notifications.form.errors.";
+  const prefix = cleanPrefix != null ? `${cleanPrefix}.` : "form:errors.";
 
   return (
     <Wrapper>
-      <ErrorSummary label={t("FormErrorSummary.label")} autofocus>
+      <ErrorSummary label={t("form:ErrorSummary.label")} autofocus>
         <ul>
           {Object.values(errors).map((err, index: number) => {
-            const label = t(`FormErrorSummary.errorLabel`, {
+            const label = t(`form:ErrorSummary.errorLabel`, {
               index: index + 1,
             });
             // TODO undefined should be filtered out

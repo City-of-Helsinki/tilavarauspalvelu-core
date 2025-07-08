@@ -47,7 +47,7 @@ function WorkingMemo({
         throw new Error("No data returned");
       }
       successToast({
-        text: t("RequestedReservation.savedWorkingMemo"),
+        text: t("reservation:savedWorkingMemo"),
       });
       onSuccess();
     } catch (err) {
@@ -60,9 +60,9 @@ function WorkingMemo({
   return (
     <>
       <TextArea
-        label={t("RequestedReservation.workingMemoLabel")}
+        label={t("reservation:workingMemoLabel")}
         id="workingMemo"
-        helperText={t("RequestedReservation.workingMemoHelperText")}
+        helperText={t("reservation:workingMemoHelperText")}
         value={workingMemo}
         onChange={(e) => setWorkingMemo(e.target.value)}
       />
@@ -73,10 +73,10 @@ function WorkingMemo({
           onClick={() => setWorkingMemo(initialValue || "")}
           disabled={isButtonsDisabled}
         >
-          {t("common.cancel")}
+          {t("common:cancel")}
         </Button>
         <Button size={ButtonSize.Small} onClick={handleSave} disabled={isButtonsDisabled}>
-          {t("RequestedReservation.save")}
+          {t("reservation:save")}
         </Button>
       </ButtonContainer>
     </>

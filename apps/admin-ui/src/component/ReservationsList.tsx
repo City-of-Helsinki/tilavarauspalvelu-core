@@ -1,7 +1,7 @@
 import React from "react";
 import { toUIDate } from "common/src/common/util";
 import styled from "styled-components";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { startOfDay } from "date-fns";
 import { RejectionReadinessChoice, type ReservationToCopyFragment, UserPermissionChoice } from "@gql/gql-types";
 import { Button, ButtonSize, ButtonVariant, IconCross } from "hds-react";
@@ -132,7 +132,7 @@ function getStatus(x: NewReservationListItem) {
 
 function StatusElement({ item }: { item: NewReservationListItem }) {
   const { t } = useTranslation("translation", {
-    keyPrefix: "MyUnits.ReservationSeries.Confirmation",
+    keyPrefix: "myUnits:ReservationSeries.Confirmation",
   });
 
   const status = getStatus(item);
@@ -184,7 +184,7 @@ function AddNewReservationButton({ reservationToCopy, refetch }: AddNewReservati
 
   return (
     <Button size={ButtonSize.Small} variant={ButtonVariant.Secondary} disabled={!hasPermission} onClick={handleClick}>
-      {t("MyUnits.ReservationSeries.addNewReservation")}
+      {t("myUnits:ReservationSeries.addNewReservation")}
     </Button>
   );
 }

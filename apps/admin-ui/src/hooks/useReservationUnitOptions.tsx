@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
 import { ReservationUnitOrderingChoices, useReservationUnitsFilterParamsQuery } from "@gql/gql-types";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "next/navigation";
 
 export const RESERVATION_UNITS_FILTER_PARAMS_QUERY = gql`
   query ReservationUnitsFilterParams($unit: [Int], $orderBy: [ReservationUnitOrderingChoices]) {
@@ -14,7 +14,7 @@ export const RESERVATION_UNITS_FILTER_PARAMS_QUERY = gql`
 `;
 
 export function useReservationUnitOptions() {
-  const [params] = useSearchParams();
+  const params = useSearchParams();
   const { data, loading } = useReservationUnitsFilterParamsQuery({
     variables: {
       unit: params.getAll("unit").map(Number).filter(Number.isFinite),

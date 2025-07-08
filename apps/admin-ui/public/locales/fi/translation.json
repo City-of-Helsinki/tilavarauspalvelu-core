@@ -1,0 +1,212 @@
+{
+  "calendar": {
+    "monday": "Maanantai",
+    "tuesday": "Tiistai",
+    "wednesday": "Keskiviikko",
+    "thursday": "Torstai",
+    "friday": "Perjantai",
+    "saturday": "Lauantai",
+    "sunday": "Sunnuntai"
+  },
+  "dayShort": {
+    "0": "Ma",
+    "1": "Ti",
+    "2": "Ke",
+    "3": "To",
+    "4": "Pe",
+    "5": "La",
+    "6": "Su",
+    "MONDAY": "Ma",
+    "TUESDAY": "Ti",
+    "WEDNESDAY": "Ke",
+    "THURSDAY": "To",
+    "FRIDAY": "Pe",
+    "SATURDAY": "La",
+    "SUNDAY": "Su"
+  },
+  "dayLong": {
+    "0": "Maanantai",
+    "1": "Tiistai",
+    "2": "Keskiviikko",
+    "3": "Torstai",
+    "4": "Perjantai",
+    "5": "Lauantai",
+    "6": "Sunnuntai",
+    "MONDAY": "Maanantai",
+    "TUESDAY": "Tiistai",
+    "WEDNESDAY": "Keskiviikko",
+    "THURSDAY": "Torstai",
+    "FRIDAY": "Perjantai",
+    "SATURDAY": "Lauantai",
+    "SUNDAY": "Sunnuntai"
+  },
+  "authentication": {
+    "WEAK": "Heikko tunnistautuminen",
+    "STRONG": "Vahva tunnistautuminen"
+  },
+  "reserveeType": {
+    "INDIVIDUAL": "Yksityishenkilö",
+    "COMPANY": "Yritys",
+    "NONPROFIT": "Yhdistys",
+    "NONPROFIT_REGISTERED": "Yhdistys, rekisteröity",
+    "NONPROFIT_UNREGISTERED": "Yhdistys, rekisteröimätön"
+  },
+  "reservationType": {
+    "NORMAL": "",
+    "BLOCKED": "Suljettu",
+    "BEHALF": "Asiakkaan puolesta",
+    "STAFF": "Sisäinen varaus",
+    "SEASONAL": "Kausivaraus"
+  },
+  "paymentType": {
+    "ONLINE_OR_INVOICE": "Verkkomaksu tai laskutus",
+    "ONLINE": "Verkkomaksu",
+    "ON_SITE": "Maksu paikan päällä"
+  },
+  "language": {
+    "fi": "suomeksi",
+    "sv": "ruotsiksi",
+    "en": "englanniksi"
+  },
+  "paging": {
+    "numResults": "{{count}} tulosta {{totalCount}} tuloksesta näytetty",
+    "allResults": "Kaikki {{totalCount}} tulosta näytetty"
+  },
+  "MainLander": {
+    "ingress": "Tässä palvelussa voit käsitellä Helsingin kaupungin tilavaraushakemuksia sekä asettaa tiloja ja laitteita varattaviksi.",
+    "welcome": "Tervetuloa",
+    "welcomeCustom": "Moro nääs"
+  },
+  "ReservationEditSeries": {
+    "heading": "Muokkaa varaussarjaa",
+    "submit": "Luo varaukset"
+  },
+  "ApplicationSectionStatusChoice": {
+    "HANDLED": "Hyväksytty",
+    "IN_ALLOCATION": "Käsittelyssä",
+    "UNALLOCATED": "Vastaanotettu",
+    "REJECTED": "Hylätty"
+  },
+  "TimeSlotStatusCell": {
+    "declined": "Hylätty",
+    "approved": "Hyväksytty"
+  },
+  "Recommendation": {
+    "actionMassActionSubmit": "Massakäsittele valitut"
+  },
+  "Reservation": {
+    "headings": {
+      "applicant": "Hakija",
+      "schedule": "Vuoro"
+    },
+    "noReservations": "Ei varauksia",
+    "NewReservationModal": {
+      "acceptBtn": "Lisää varaus",
+      "title": "Luo uusi varaus",
+      "successToast": "Uusi aika tallennettu"
+    },
+    "CommonModal": {
+      "form": {
+        "startTime": "Aloitusaika",
+        "length": "Kesto"
+      },
+      "newTime": "Uusi aika",
+      "error": {
+        "reservationCollides": "Toivomasi aika ei ole saatavilla"
+      }
+    },
+    "EditTimeModal": {
+      "title": "Muuta varauksen aikaa",
+      "originalTime": "Muutettava aika",
+      "recurringInfoLabel": "Toistuva varaus aikavälillä",
+      "recurringInfoTimes": "{{ weekdays }} {{begin}} - {{end}}",
+      "acceptBtn": "Muuta aikaa",
+      "successToast": "Uusi aika tallennettu",
+      "error": {
+        "mutation": "Ajan muutos epäonnistui."
+      }
+    },
+    "EditPage": {
+      "title": "Muokkaa varauksen tietoja",
+      "Reservation failed to load": "Varausta {{ pk }} ei pystytty latamaan",
+      "Reservation unit failed to load": "Varausyksikköä ei löytynyt",
+      "save": "Tallenna",
+      "saveSuccess": "Varauksen muutokset tallennettu",
+      "saveSuccessRecurring": "Muutokset tallennettu tuleviin varauksiin!",
+      "pageThrewError": "Virhe: varausta ei voi muokata"
+    }
+  },
+  "ReservationUnit": {
+    "isDraft": {
+      "true": "Luonnos",
+      "false": "Julkaistu"
+    }
+  },
+  "ReservationUnitList": {
+    "typeFilter": "Tyyppi",
+    "statusFilter": "Tila"
+  },
+  "locationType": {
+    "FIXED": "Kiinteä",
+    "MOVABLE": "Siirrettävä"
+  },
+  "priceUnit": {
+    "FIXED": "Per kerta",
+    "PER_15_MINS": "Per 15 min",
+    "PER_30_MINS": "Per 30 min",
+    "PER_DAY": "Per päivä",
+    "PER_HALF_DAY": "Per puoli päivää",
+    "PER_HOUR": "Per tunti",
+    "PER_WEEK": "Per viikko"
+  },
+  "orderStatus": {
+    "ALL": "Maksuton",
+    "PAID": "Maksettu",
+    "PAID_MANUALLY": "Maksetaan paikan päällä",
+    "PAID_BY_INVOICE": "Maksu laskulla",
+    "PENDING": "Odottaa maksua",
+    "DRAFT": "Maksu kesken",
+    "EXPIRED": "Ei maksettu",
+    "REFUNDED": "Maksu palautettu",
+    "CANCELLED": "Peruutettu",
+    "FREE": "Maksuton"
+  },
+  "reservationStartInterval": {
+    "INTERVAL_15_MINS": "15 min välein",
+    "INTERVAL_30_MINS": "30 min välein",
+    "INTERVAL_60_MINS": "1 tunnin välein",
+    "INTERVAL_90_MINS": "1,5 tunnin välein",
+    "INTERVAL_120_MINS": "2 tunnin välein",
+    "INTERVAL_180_MINS": "3 tunnin välein",
+    "INTERVAL_240_MINS": "4 tunnin välein",
+    "INTERVAL_300_MINS": "5 tunnin välein",
+    "INTERVAL_360_MINS": "6 tunnin välein",
+    "INTERVAL_420_MINS": "7 tunnin välein"
+  },
+  "ReservationStateFilter": {
+    "label": "Käsittelytila",
+    "state": {
+      "CANCELLED": ""
+    }
+  },
+  "Payment": {
+    "status": {
+      "DRAFT": "Maksu kesken",
+      "EXPIRED": "Ei maksettu",
+      "CANCELLED": "Peruutettu",
+      "PAID": "Maksettu",
+      "PAID_MANUALLY": "Paikan päällä",
+      "PAID_BY_INVOICE": "Maksu laskulla",
+      "PENDING": "Odottaa maksua",
+      "REFUNDED": "Maksu palautettu"
+    }
+  },
+  "Calendar": {
+    "legend": {
+      "confirmed": "Hyväksytty varaus",
+      "unconfirmed": "Varaustoive",
+      "otherRequiedHandling": "Muun varaajan toive",
+      "rest": "Varattu"
+    }
+  }
+}

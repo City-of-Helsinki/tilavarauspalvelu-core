@@ -35,26 +35,26 @@ export function ReservationListButton({
     case "show":
       return (
         <Button key={type} {...btnCommon} iconStart={<IconClock />}>
-          {t("ReservationsListButton.showInCalendar")}
+          {t("reservation:SeriesView.showInCalendar")}
         </Button>
       );
     case "deny":
     case "remove":
       return (
         <Button key={type} {...btnCommon} iconStart={<IconCross />}>
-          {type === "deny" ? t("common.deny") : t("common.remove")}
+          {type === "deny" ? t("common:deny") : t("common:remove")}
         </Button>
       );
     case "restore":
       return (
         <Button key={type} {...btnCommon} iconStart={<IconArrowUndo />}>
-          {t("common.restore")}
+          {t("common:restore")}
         </Button>
       );
     case "change":
       return (
         <Button key={type} {...btnCommon} iconStart={<IconPen />}>
-          {t("ReservationsListButton.changeTime")}
+          {t("reservation:SeriesView.changeTime")}
         </Button>
       );
     default:

@@ -1,10 +1,9 @@
-import React, { Suspense } from "react";
-import { useSessionSuspense } from "@/hooks/auth";
+import React from "react";
+import { useSession } from "@/hooks/auth";
 import { MainLander } from "@/component/MainLander";
 import Error403 from "./Error403";
 import { UserPermissionChoice } from "@gql/gql-types";
 import { hasAnyPermission, hasSomePermission } from "@/modules/permissionHelper";
-import { CenterSpinner } from "common/styled";
 
 export function AuthorizationChecker({
   apiUrl,
@@ -12,22 +11,16 @@ export function AuthorizationChecker({
   permission,
 }: {
   apiUrl: string;
-  children: React.ReactNode;
+  children: React.ReactElement | React.ReactElement[];
   permission?: UserPermissionChoice;
-}) {
-  const { isAuthenticated, user } = useSessionSuspense();
+}): React.ReactElement {
+  const { user: currentUser, isAuthenticated } = useSession();
   if (!isAuthenticated) {
     return <MainLander apiBaseUrl={apiUrl} />;
   }
 
-  const hasAccess = permission ? hasSomePermission(user, permission) : hasAnyPermission(user);
+  const hasAccess = permission ? hasSomePermission(currentUser, permission) : hasAnyPermission(currentUser);
 
-  // Use suspense to avoid flash of unauthorised content
-  return <Suspense fallback={<CenterSpinner />}>{hasAccess ? children : <Error403 />}</Suspense>;
+  // eslint-disable-next-line react/jsx-no-useless-fragment
+  return hasAccess ? <>{children}</> : <Error403 />;
 }
-
-export const withAuthorization = (component: JSX.Element, apiBaseUrl: string, permission?: UserPermissionChoice) => (
-  <AuthorizationChecker permission={permission} apiUrl={apiBaseUrl}>
-    {component}
-  </AuthorizationChecker>
-);

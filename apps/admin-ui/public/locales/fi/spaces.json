@@ -1,0 +1,150 @@
+{
+  "headings": {
+    "name": "Nimi",
+    "code": "Tilan numero",
+    "service": "Palvelut",
+    "numSubSpaces": "Alitilojen määrä",
+    "surfaceArea": "Koko",
+    "maxPersons": "Henkilömäärä",
+    "area": "Alue"
+  },
+  "spacesAndResources": "Tilojen ja resurssien hallinta",
+  "spaces": "Tilat",
+  "addSpace": "Uusi tila",
+  "noSpaces": "Ei vielä tiloja",
+  "resources": "Resurssit",
+  "addResource": "Uusi resurssi",
+  "noResources": "Ei vielä resursseja",
+  "noResourcesSpaces": "Lisää ensin tila ja sen jälkeen voit luoda resursseja",
+  "newSpacesCreatedTitle": "Uudet tilat luotu onnistuneesti",
+  "newSpacesCreatedNotification": "Voit luoda tiloille alitiloja niin pitkälle kuin on tarpeellista.",
+  "spaceDeletedTitle": "Tila poistettu",
+  "spaceDeletedNotification": "Tila poistettu onnistuneesti",
+  "resourceDeletedTitle": "Resurssi poistettu",
+  "resourceDeletedNotification": "Resurssi poistettu onnistuneesti",
+  "ResourceModal": {
+    "modalTitle": "Luo uusi resurssi tilalle",
+    "info": "Voit luoda kerralla yhden tilan resurssin. Niitä voivat olla esim. laitteet tai tarvikkeet.",
+    "selectSpace": "Valitse tila",
+    "namePlaceholder": "Resurssin nimi  {{language}}",
+    "cancel": "Palaa tallentamatta tietoja",
+    "save": "Tallenna"
+  },
+  "ResourceTable": {
+    "headings": {
+      "name": "Nimi",
+      "unitName": "Toimipiste"
+    },
+    "menuEditResource": "Muokkaa resurssia",
+    "menuRemoveResource": "Poista resurssi",
+    "removeConfirmationTitle": "Haluatko varmasti poistaa resurssin {{name}}?",
+    "removeConfirmationMessage": "Resurssi poistetaan toimipisteestä. Et voi perua toimintoa.",
+    "removeConfirmationAccept": "Poista",
+    "removeConfirmationCancel": "Kumoa",
+    "removeSuccess": "Resurssi poistettu."
+  },
+  "SpaceTable": {
+    "subSpaceCount_one": "alitila",
+    "subSpaceCount_other": "alitilaa",
+    "menuAddSubSpace": "Lisää alitiloja",
+    "menuEditSpace": "Muokkaa tilatietoja",
+    "menuRemoveSpace": "Poista tila",
+    "removeConflictTitle": "Tilaa ei voi poistaa",
+    "removeConflictMessage": "Et voi poistaa tilaa. Siirrä tai poista ensin resurssi",
+    "removeConfirmationTitle": "Haluatko varmasti poistaa tilan {{name}}?",
+    "removeConfirmationMessage": "Tila poistetaan kaikista varausyksiköistä, joihin se on liitetty. Et voi perua toimintoa.",
+    "removeConfirmationAccept": "Poista",
+    "removeConfirmationCancel": "Kumoa",
+    "removeFailed": "Tilan poistaminen ei onnistunut."
+  },
+  "Spaces": {
+    "headings": {
+      "name": "Nimi",
+      "unit": "Toimipiste",
+      "district": "Kaupunginosa",
+      "volume": "Vetoisuus",
+      "size": "Koko"
+    }
+  },
+  "Resources": {
+    "resourceListHeading": "Kaikki resurssit",
+    "resourceListDescription": "Täällä näet koosteen kaikista resursseista, joita on liitetty järjestelmään ja jotka sinulla on oikeus nähdä.",
+    "searchPlaceholder": "Hae resursseja",
+    "headings": {
+      "name": "Nimi",
+      "unit": "Toimipiste",
+      "district": "Kaupunginosa",
+      "resourceType": "Resurssityyppi"
+    }
+  },
+  "resourceUpdatedNotification": "Resurssin tiedot tallennettu.",
+  "ResourceEditor": {
+    "defaultHeading": "(nimetön resurssi)",
+    "resourceUpdated": "Tiedot tallennettu.",
+    "label": {
+      "spacePk": "Tila",
+      "nameFi": "Resurssin nimi suomeksi",
+      "nameSv": "Resurssin nimi ruotsiksi",
+      "nameEn": "Resurssin nimi englanniksi"
+    }
+  },
+  "noParent": "Päätason tila",
+  "noUnit": "Tilaa ei ole liitetty toimipisteeseen",
+  "noAddress": "Toimipisteellä ei ole osoitetta",
+  "noMaxPersons": "Henkilömäärää ei asetettu",
+  "noSurfaceArea": "Pinta-alaa ei ole asetettu",
+  "unitAddress": "Osoite",
+  "SpaceEditor": {
+    "details": "Tilan tiedot",
+    "hierarchy": "Tilapuurakenne",
+    "parent": "Ylitila",
+    "other": "Muut tiedot",
+    "cancel": "Palaa tallentamatta tietoja",
+    "save": "Tallenna tiedot",
+    "label": {
+      "nameFi": "Tilan nimi suomeksi",
+      "nameEn": "Tilan nimi englanniksi",
+      "nameSv": "Tilan nimi ruotsiksi",
+      "surfaceArea": "Pinta-ala",
+      "maxPersons": "Henkilömäärä enintään"
+    },
+    "touLabel": "Tilan ohjeet {{lang}}",
+    "spaceUpdated": "Tiedot tallennettu",
+    "spaceUpdatedNotification": "Tilan tiedot tallennettu",
+    "area": "{{surfaceArea}} m²"
+  },
+  "SpaceModal": {
+    "phase": "Vaihe",
+    "namePlaceholder": "Tilan nimi {{language}}",
+    "nameLabel": "Tilan nimi {{lang}}",
+    "page1": {
+      "modalTitle": "Luo uusi tila toimipisteelle",
+      "subSpaceModalTitle": "Luo alitila tilalle",
+      "info": "Voit luoda yhden tai kerralla useita samaan tasoon liittyviä tiloja, joiden nimet ja tiedot voivat vaihdella.",
+      "title": "Valitse tilojen määrä ja ylitila",
+      "numSpacesLabel": "Uusien tilojen määrä",
+      "numSpacesHelperText": "Valitse alustava määrä.",
+      "parentLabel": "Ylitila",
+      "parentPlaceholder": "Valitse ylitila tai uusi itsenäinen tila.",
+      "parentHelperText": "Ylitila tarkoittaa tilaa, jonka osaksi nyt luomasi tila kuuluu. Jos tila on uusi itsenäinen tila, valitse itsenäinen tila. Voit vaihtaa ylitilan myöhemminkin."
+    },
+    "page2": {
+      "modalTitle": "Määritä tilojen pohjatiedot",
+      "subSpaceModalTitle": "Määritä alitilatiedot",
+      "info": "Voit muokata tiloja milloin tahansa myöhemmin. Huomioi paloturvallisuusmääräykset maksimihenkilömäärissä.",
+      "subSpaceInfo": "Voit luoda yhden tai kerralla useita alitiloja, joiden nimet ja tiedot voivat vaihdella.",
+      "newRootSpace": "Uusi itsenäinen tila",
+      "addRowButton": "Lisää rivi",
+      "prevButton": "Edellinen",
+      "createButton": "Luo tilatieto",
+      "nameLabel": "Tilan nimi",
+      "surfaceAreaLabel": "Pinta-ala",
+      "surfaceAreaHelperText": "m²",
+      "maxPersonsLabel": "Henkilömäärä enintään",
+      "maxPersonsHelperText": "henkilöä",
+      "codeLabel": "Tilan numero",
+      "codePlaceholder": "Numero tai koodi",
+      "saving": "Luodaan tilatietoja..."
+    }
+  }
+}

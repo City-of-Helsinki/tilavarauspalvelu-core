@@ -5,7 +5,7 @@ type Props = {
   children: ReactNode;
 };
 
-const ShowWhenTargetInvisible = ({ target, children }: Props): JSX.Element => {
+export function ShowWhenTargetInvisible({ target, children }: Props): JSX.Element {
   const [visible, setVisible] = useState(false);
 
   const onScroll = () => {
@@ -25,6 +25,4 @@ const ShowWhenTargetInvisible = ({ target, children }: Props): JSX.Element => {
   if (!visible) return <> </>;
 
   return <> {children} </>;
-};
-
-export default ShowWhenTargetInvisible;
+}
