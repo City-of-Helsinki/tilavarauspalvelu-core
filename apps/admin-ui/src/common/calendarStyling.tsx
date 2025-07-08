@@ -105,22 +105,22 @@ export const EVENT_STYLE: React.CSSProperties = {
 export const COMMON_LEGEND = [
   {
     key: "CONFIRMED",
-    label: "MyUnits.Calendar.legend.confirmed",
+    label: "myUnits:Calendar.legend.confirmed",
     style: CONFIRMED.style,
   },
   {
     key: "WAITING_PAYMENT",
-    label: "MyUnits.Calendar.legend.waitingPayment",
+    label: "myUnits:Calendar.legend.waitingPayment",
     style: WAITING_PAYMENT.style,
   },
   {
     key: "UNCONFIRMED",
-    label: "MyUnits.Calendar.legend.unconfirmed",
+    label: "myUnits:Calendar.legend.unconfirmed",
     style: UNCONFIRMED.style,
   },
   {
     key: "STAFF_RESERVATION",
-    label: "MyUnits.Calendar.legend.staffReservation",
+    label: "myUnits:Calendar.legend.staffReservation",
     style: STAFF_RESERVATION.style,
   },
 ] as const;

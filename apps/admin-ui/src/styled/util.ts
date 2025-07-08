@@ -1,8 +1,8 @@
 import { Dialog } from "hds-react";
 import styled, { css } from "styled-components";
-import { Link } from "react-router-dom";
 import { fontMedium } from "common/styled";
 import { breakpoints } from "common/src/const";
+import Link from "next/link";
 
 export const TableLink = styled(Link)`
   --focus-ring-color: var(--color-coat-of-arms);

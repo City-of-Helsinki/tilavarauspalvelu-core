@@ -1,15 +1,15 @@
 import { useEffect } from "react";
-// NOTE not using App.tsx so need to import i18n here also
-import "@/i18n";
 import { getVersion } from "@/modules/baseUtils.mjs";
 import { useRouter } from "next/router";
+import { GetServerSidePropsContext } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
 /* Page to redirect to the front page after a succesful logout
  * TODO might be able to replace this with middleware
  * */
-function LogoutPage({ redirectUrl }: Props) {
+export default function LogoutPage({ redirectUrl }: Props) {
   const router = useRouter();
 
   useEffect(() => {
@@ -19,15 +19,12 @@ function LogoutPage({ redirectUrl }: Props) {
   return null;
 }
 
-export function getServerSideProps() {
+export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
   return {
     props: {
       redirectUrl: "/",
       version: getVersion(),
-      // TODO can't use SSR translations because our translations aren't in public folder
-      // ...(await serverSideTranslations(locale ?? "fi")),
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 }
-
-export default LogoutPage;
