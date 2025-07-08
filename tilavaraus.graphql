@@ -589,7 +589,27 @@ type Query {
     """Ordering"""
     orderBy: [BannerNotificationOrderingChoices]
   ): BannerNotificationNodeConnection
-  unitGroups(first: Int, last: Int, offset: Int, after: String, before: String): UnitGroupNodeConnection
+  unitGroups(
+    first: Int
+    last: Int
+    offset: Int
+    after: String
+    before: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    pk: [Int]
+    onlyWithPermission: Boolean
+
+    """Ordering"""
+    orderBy: [UnitGroupOrderingChoices]
+  ): UnitGroupNodeConnection
 }
 
 type ApplicationRoundNode implements Node {
@@ -1070,7 +1090,22 @@ type UnitNode implements Node {
     """Ordering"""
     orderBy: [SpaceOrderingChoices]
   ): [SpaceNode!]!
-  unitGroups: [UnitGroupNode!]!
+  unitGroups(
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    pk: [Int]
+    onlyWithPermission: Boolean
+
+    """Ordering"""
+    orderBy: [UnitGroupOrderingChoices]
+  ): [UnitGroupNode!]!
 
   """The ID of the object"""
   id: ID!
@@ -1287,6 +1322,18 @@ enum UnitOrderingChoices {
   unitGroupNameEnDesc
   unitGroupNameSvAsc
   unitGroupNameSvDesc
+}
+
+"""Ordering fields for the 'UnitGroup' model."""
+enum UnitGroupOrderingChoices {
+  pkAsc
+  pkDesc
+  nameFiAsc
+  nameFiDesc
+  nameEnAsc
+  nameEnDesc
+  nameSvAsc
+  nameSvDesc
 }
 
 type ReservationUnitTypeNode implements Node {
@@ -1680,7 +1727,22 @@ type UnitRoleNode implements Node {
     """Ordering"""
     orderBy: [UnitOrderingChoices]
   ): [UnitNode!]!
-  unitGroups: [UnitGroupNode!]!
+  unitGroups(
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    pk: [Int]
+    onlyWithPermission: Boolean
+
+    """Ordering"""
+    orderBy: [UnitGroupOrderingChoices]
+  ): [UnitGroupNode!]!
   assigner: UserNode
   createdAt: DateTime!
   updatedAt: DateTime!

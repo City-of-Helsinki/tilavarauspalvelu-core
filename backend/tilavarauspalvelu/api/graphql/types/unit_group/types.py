@@ -4,6 +4,7 @@ from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import UnitGroup
 
+from .filtersets import UnitGroupFilterSet
 from .permissions import UnitGroupPermission
 
 __all__ = [
@@ -20,3 +21,4 @@ class UnitGroupNode(DjangoNode):
             "units",
         ]
         permission_classes = [UnitGroupPermission]
+        filterset_class = UnitGroupFilterSet
