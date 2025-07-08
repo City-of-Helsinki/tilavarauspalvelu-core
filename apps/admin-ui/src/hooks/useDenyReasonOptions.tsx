@@ -12,7 +12,7 @@ export function useDenyReasonOptions() {
       orderBy: [ReservationDenyReasonOrderingChoices.RankAsc],
     },
     onError: () => {
-      errorToast({ text: t("errors.errorFetchingData") });
+      errorToast({ text: t("errors:errorFetchingData") });
     },
   });
   const { reservationDenyReasons } = data ?? {};

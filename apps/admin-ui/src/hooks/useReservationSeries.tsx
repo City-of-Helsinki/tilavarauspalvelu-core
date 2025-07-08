@@ -17,7 +17,7 @@ export function useReservationSeries(recurringPk: Maybe<number> | undefined) {
     nextFetchPolicy: "cache-first",
     variables: { id },
     onError: () => {
-      errorToast({ text: t("errors.errorFetchingData") });
+      errorToast({ text: t("errors:errorFetchingData") });
     },
   });
 

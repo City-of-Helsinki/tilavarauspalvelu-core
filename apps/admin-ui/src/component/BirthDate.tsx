@@ -96,15 +96,15 @@ export function BirthDate(props: Props): JSX.Element {
   const user = getUser(data);
   const dateOfBirth = user?.dateOfBirth;
 
-  const hideLabel = t("RequestedReservation.hideBirthDate");
-  const showLabel = t("RequestedReservation.showBirthDate");
+  const hideLabel = t("reservation:hideBirthDate");
+  const showLabel = t("reservation:showBirthDate");
 
   return (
     <Flex $gap="2-xs" $direction="row">
       {isLoading ? (
-        <span>{t("common.loading")}</span>
+        <span>{t("common:loading")}</span>
       ) : error != null ? (
-        <span>{t("common.error")}</span>
+        <span>{t("common:error")}</span>
       ) : (
         <>
           {visible ? <span>{dateOfBirth ? formatDate(dateOfBirth) : "-"}</span> : <span>XX.XX.XXXX</span>}

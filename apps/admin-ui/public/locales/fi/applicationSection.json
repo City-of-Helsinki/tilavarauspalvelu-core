@@ -1,0 +1,48 @@
+{
+  "name": "Vakiovuoron nimi",
+  "emptyFilterPageName": "haettua vuoroa",
+  "allocated": {
+    "emptyFilterPageName": "jaettua vuoroa"
+  },
+  "groupSize": "Ryhmän koko",
+  "ageGroup": "Ikäryhmä",
+  "eventDuration": "Vuoron kesto",
+  "purpose": "Vuoron käyttötarkoitus",
+  "dates": "Kausi",
+  "eventsPerWeek": "Vuorojen määrä / viikko",
+  "biweekly": "Vakiovuorot vain joka toinen viikko",
+  "requestedTimes": "Toivotut ajat",
+  "requestedReservationUnits": "Toivotut varausyksiköt",
+  "gotoLink": "Tarkastele vuoroehdotusta",
+  "noSchedule": "ei aikatoiveita",
+  "statuses": {
+    "APPROVED": "Hyväksytty",
+    "DECLINED": "Hylätty",
+    "UNALLOCATED": "Käsittelyssä",
+    "FAILED": "Epäonnistunut",
+    "RESERVED": "Varattu"
+  },
+  "priority": {
+    "300": "Ensisijaiset aikatoiveet",
+    "200": "Muut aikatoiveet",
+    "all": "Kaikki"
+  },
+  "headings": {
+    "id": "Id",
+    "customer": "Hakija",
+    "name": "Varauksen nimi",
+    "unit": "Toimipiste",
+    "reason": "Syy",
+    "stats": "Haettu",
+    "phase": "Vaihe"
+  },
+  "schedule": {
+    "headings": {
+      "reservationUnit": "Varausyksikkö",
+      "eventName": "Varauksen nimi",
+      "time": "Vuoro",
+      "occurrenceTime": "Aika",
+      "reason": "Syy"
+    }
+  }
+}
