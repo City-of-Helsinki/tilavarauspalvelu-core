@@ -275,6 +275,7 @@ type Query {
     tprekId: String
     tprekDepartmentId: String
     unit: [Int]
+    unitGroup: [Int]
     reservationUnitType: [Int]
     minPersonsGte: Int
     minPersonsLte: Int
@@ -653,6 +654,7 @@ type ApplicationRoundNode implements Node {
     tprekId: String
     tprekDepartmentId: String
     unit: [Int]
+    unitGroup: [Int]
     reservationUnitType: [Int]
     minPersonsGte: Int
     minPersonsLte: Int
@@ -1039,6 +1041,7 @@ type UnitNode implements Node {
     tprekId: String
     tprekDepartmentId: String
     unit: [Int]
+    unitGroup: [Int]
     reservationUnitType: [Int]
     minPersonsGte: Int
     minPersonsLte: Int
