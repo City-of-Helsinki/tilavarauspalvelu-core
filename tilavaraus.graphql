@@ -116,6 +116,7 @@ type Query {
     nameEn_Icontains: String
     nameEn_Istartswith: String
     pk: [Int]
+    unitGroup: [Int]
     onlyWithPermission: Boolean
     publishedReservationUnits: Boolean
     ownReservations: Boolean
@@ -136,6 +137,7 @@ type Query {
     nameEn_Icontains: String
     nameEn_Istartswith: String
     unit: [Int]
+    unitGroup: [Int]
     onlyWithPermission: Boolean
     publishedReservationUnits: Boolean
     ownReservations: Boolean
@@ -1285,6 +1287,7 @@ type UnitGroupNode implements Node {
     nameEn_Icontains: String
     nameEn_Istartswith: String
     pk: [Int]
+    unitGroup: [Int]
     onlyWithPermission: Boolean
     publishedReservationUnits: Boolean
     ownReservations: Boolean
@@ -1718,6 +1721,7 @@ type UnitRoleNode implements Node {
     nameEn_Icontains: String
     nameEn_Istartswith: String
     pk: [Int]
+    unitGroup: [Int]
     onlyWithPermission: Boolean
     publishedReservationUnits: Boolean
     ownReservations: Boolean
