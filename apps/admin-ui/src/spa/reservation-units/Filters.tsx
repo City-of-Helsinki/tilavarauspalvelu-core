@@ -6,6 +6,7 @@ import { useReservationUnitTypes, useUnitOptions } from "@/hooks";
 import { ReservationUnitPublishingState } from "@gql/gql-types";
 import { MultiSelectFilter, SearchFilter, RangeNumberFilter } from "@/component/QueryParamFilters";
 import { SearchTags } from "@/component/SearchTags";
+import { useUnitGroupOptions } from "@/hooks/useUnitGroupOptions";
 
 const Wrapper = styled.div`
   display: flex;
@@ -34,11 +35,14 @@ function Filters(): JSX.Element {
 
   const { options: unitOptions } = useUnitOptions();
   const { options: reservationUnitTypeOptions } = useReservationUnitTypes();
+  const { options: unitGroupOptions } = useUnitGroupOptions();
 
   function translateTag(tag: string, val: string): string {
     switch (tag) {
       case "unit":
         return unitOptions.find((u) => u.value === Number(val))?.label || val;
+      case "unitGroup":
+        return unitGroupOptions.find((u) => u.value === Number(val))?.label || val;
       case "reservationUnitType":
         return reservationUnitTypeOptions.find((u) => u.value === Number(val))?.label || val;
       case "reservationUnitState":
@@ -72,9 +76,10 @@ function Filters(): JSX.Element {
         maximumNumber={4}
       >
         <SearchFilter name="search" labelKey="reservationUnit" />
-        <MultiSelectFilter options={unitOptions} name="unit" />
-        <MultiSelectFilter options={reservationUnitTypeOptions} name="reservationUnitType" />
-        <MultiSelectFilter options={reservationUnitStateOptions} name="reservationUnitState" />
+        <MultiSelectFilter name="unit" options={unitOptions} />
+        <MultiSelectFilter name="unitGroup" options={unitGroupOptions} />
+        <MultiSelectFilter name="reservationUnitType" options={reservationUnitTypeOptions} />
+        <MultiSelectFilter name="reservationUnitState" options={reservationUnitStateOptions} />
         <RangeNumberFilter
           label={t("ReservationUnitsSearch.maxPersonsLabel")}
           minName="maxPersonsGte"

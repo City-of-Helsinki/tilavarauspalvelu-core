@@ -13,6 +13,7 @@ import { useSearchParams } from "react-router-dom";
 import { errorToast } from "common/src/common/toast";
 import { CenterSpinner } from "common/styled";
 import { useTranslation } from "react-i18next";
+import { mapParamToNumber } from "@/helpers";
 
 function transformOrderBy(orderBy: string, desc: boolean): ReservationUnitOrderingChoices | null {
   switch (orderBy) {
@@ -84,7 +85,8 @@ export function ReservationUnitsDataReader(): JSX.Element {
 
   const reservationUnitStates = searchParams.getAll("reservationUnitState");
 
-  const unit = searchParams.getAll("unit").map(Number).filter(Number.isInteger);
+  const unit = mapParamToNumber(searchParams.getAll("unit"), 1);
+  const unitGroupFilter = mapParamToNumber(searchParams.getAll("unitGroup"), 1);
 
   const searchFilter = searchParams.get("search");
   // it's typed string but it's actually a number (python Decimal)
@@ -105,6 +107,7 @@ export function ReservationUnitsDataReader(): JSX.Element {
       surfaceAreaGte: surfaceAreaGte,
       textSearch: searchFilter,
       unit,
+      unitGroup: unitGroupFilter,
       publishingState: reservationUnitStates.map((state) => convertToReservationUnitState(state)),
       reservationUnitType: reservationUnitTypes,
     },
@@ -147,6 +150,7 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
     $surfaceAreaGte: Int
     $surfaceAreaLte: Int
     $unit: [Int]
+    $unitGroup: [Int]
     $reservationUnitType: [Int]
     $orderBy: [ReservationUnitOrderingChoices]
     $publishingState: [ReservationUnitPublishingState]
@@ -163,6 +167,7 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
       surfaceAreaGte: $surfaceAreaGte
       surfaceAreaLte: $surfaceAreaLte
       unit: $unit
+      unitGroup: $unitGroup
       reservationUnitType: $reservationUnitType
       publishingState: $publishingState
       onlyWithPermission: true
