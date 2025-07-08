@@ -126,8 +126,8 @@ importers:
         specifier: ^1.89.2
         version: 1.89.2
       styled-components:
-        specifier: 6.1.18
-        version: 6.1.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 6.1.19
+        version: 6.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tsconfig:
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -212,7 +212,7 @@ importers:
         version: 4.1.3(react-hook-form@7.54.2(react@18.3.1))
       '@sentry/nextjs':
         specifier: ^8.29.0
-        version: 8.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.26.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.53.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.26.0(@opentelemetry/api@1.9.0))(next@15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2))(react@18.3.1)(webpack@5.94.0)
+        version: 8.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.26.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.53.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.26.0(@opentelemetry/api@1.9.0))(next@15.3.3(@babel/core@7.27.4)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2))(react@18.3.1)(webpack@5.94.0)
       common:
         specifier: workspace:*
         version: link:../../packages/common
@@ -233,7 +233,7 @@ importers:
         version: 4.6.0
       hds-react:
         specifier: ^4.6.0
-        version: 4.6.0(@types/react@18.2.7)(eslint@9.30.1(jiti@2.4.2))(graphql-ws@6.0.5(graphql@16.11.0)(ws@8.18.3))(postcss@8.5.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+        version: 4.6.0(@types/react@18.2.7)(eslint@9.30.1(jiti@2.4.2))(graphql-ws@6.0.5(graphql@16.11.0)(ws@8.18.3))(postcss@8.5.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
       i18next:
         specifier: ^25.2.1
         version: 25.2.1(typescript@5.8.3)
@@ -242,13 +242,13 @@ importers:
         version: 4.17.21
       next:
         specifier: 15.3.3
-        version: 15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2)
+        version: 15.3.3(@babel/core@7.27.4)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2)
       next-compose-plugins:
         specifier: ^2.2.1
         version: 2.2.1
       next-i18next:
         specifier: ^15.4.2
-        version: 15.4.2(i18next@25.2.1(typescript@5.8.3))(next@15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2))(react-i18next@15.5.3(i18next@25.2.1(typescript@5.8.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3))(react@18.3.1)
+        version: 15.4.2(i18next@25.2.1(typescript@5.8.3))(next@15.3.3(@babel/core@7.27.4)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2))(react-i18next@15.5.3(i18next@25.2.1(typescript@5.8.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3))(react@18.3.1)
       nuka-carousel:
         specifier: ^7.0.0
         version: 7.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -268,8 +268,8 @@ importers:
         specifier: ^17.6.0
         version: 17.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       styled-components:
-        specifier: 6.1.18
-        version: 6.1.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 6.1.19
+        version: 6.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tsconfig:
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -318,7 +318,7 @@ importers:
         version: 18.0.1
       postcss-styled-syntax:
         specifier: ^0.7.1
-        version: 0.7.1(postcss@8.5.5)
+        version: 0.7.1(postcss@8.5.6)
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -357,7 +357,7 @@ importers:
         version: 16.11.0
       hds-react:
         specifier: ^4.6.0
-        version: 4.6.0(@types/react@18.2.7)(eslint@9.30.1(jiti@2.4.2))(graphql-ws@6.0.5(graphql@16.11.0)(ws@8.18.3))(postcss@8.5.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+        version: 4.6.0(@types/react@18.2.7)(eslint@9.30.1(jiti@2.4.2))(graphql-ws@6.0.5(graphql@16.11.0)(ws@8.18.3))(postcss@8.5.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
       i18next:
         specifier: ^25.2.1
         version: 25.2.1(typescript@5.8.3)
@@ -366,7 +366,7 @@ importers:
         version: 4.17.21
       next-i18next:
         specifier: ^15.4.2
-        version: 15.4.2(i18next@25.2.1(typescript@5.8.3))(next@15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2))(react-i18next@15.5.3(i18next@25.2.1(typescript@5.8.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3))(react@18.3.1)
+        version: 15.4.2(i18next@25.2.1(typescript@5.8.3))(next@15.3.3(@babel/core@7.27.4)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2))(react-i18next@15.5.3(i18next@25.2.1(typescript@5.8.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3))(react@18.3.1)
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -389,8 +389,8 @@ importers:
         specifier: ^2.17.0
         version: 2.17.0
       styled-components:
-        specifier: 6.1.18
-        version: 6.1.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 6.1.19
+        version: 6.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
@@ -406,7 +406,7 @@ importers:
         version: 18.0.1
       '@sentry/nextjs':
         specifier: ^8.29.0
-        version: 8.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.26.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.53.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.26.0(@opentelemetry/api@1.9.0))(next@15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2))(react@18.3.1)(webpack@5.94.0)
+        version: 8.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.26.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.53.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.26.0(@opentelemetry/api@1.9.0))(next@15.3.3(@babel/core@7.27.4)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2))(react@18.3.1)(webpack@5.94.0)
       '@testing-library/dom':
         specifier: ^10.4.0
         version: 10.4.0
@@ -442,10 +442,10 @@ importers:
         version: 18.0.1
       next:
         specifier: 15.3.3
-        version: 15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2)
+        version: 15.3.3(@babel/core@7.27.4)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2)
       postcss-styled-syntax:
         specifier: ^0.7.1
-        version: 0.7.1(postcss@8.5.5)
+        version: 0.7.1(postcss@8.5.6)
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -5334,6 +5334,10 @@ packages:
     resolution: {integrity: sha512-d/jtm+rdNT8tpXuHY5MMtcbJFBkhXE6593XVR9UoGCH8jSFGci7jGvMGH5RYd5PBJW+00NZQt6gf7CbagJCrhg==}
     engines: {node: ^10 || ^12 || >=14}
 
+  postcss@8.5.6:
+    resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
+    engines: {node: ^10 || ^12 || >=14}
+
   postgres-array@2.0.0:
     resolution: {integrity: sha512-VpZrUqU5A69eQyW2c5CA1jtLecCsN2U/bD6VilrFDWq5+5UIEVO7nazS3TEcHf1zuPYO/sqGvUvW62g86RXZuA==}
     engines: {node: '>=4'}
@@ -5979,8 +5983,8 @@ packages:
   strip-literal@3.0.0:
     resolution: {integrity: sha512-TcccoMhJOM3OebGhSBEmp3UZ2SfDMZUEBdRA/9ynfLi8yYajyWX3JiXArcJt4Umh4vISpspkQIY8ZZoCqjbviA==}
 
-  styled-components@6.1.18:
-    resolution: {integrity: sha512-Mvf3gJFzZCkhjY2Y/Fx9z1m3dxbza0uI9H1CbNZm/jSHCojzJhQ0R7bByrlFJINnMzz/gPulpoFFGymNwrsMcw==}
+  styled-components@6.1.19:
+    resolution: {integrity: sha512-1v/e3Dl1BknC37cXMhwGomhO8AkYmN41CqyX9xhUDxry1ns3BFQy2lLDRQXJRdVVWB9OHemv/53xaStimvWyuA==}
     engines: {node: '>= 16'}
     peerDependencies:
       react: '>= 16.8.0'
@@ -7931,7 +7935,7 @@ snapshots:
   '@graphql-tools/optimize@2.0.0(graphql@16.11.0)':
     dependencies:
       graphql: 16.11.0
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@graphql-tools/prisma-loader@8.0.17(@types/node@24.0.10)(graphql@16.11.0)':
     dependencies:
@@ -7977,7 +7981,7 @@ snapshots:
       '@ardatan/relay-compiler': 12.0.3(graphql@16.11.0)
       '@graphql-tools/utils': 10.8.6(graphql@16.11.0)
       graphql: 16.11.0
-      tslib: 2.6.3
+      tslib: 2.8.1
     transitivePeerDependencies:
       - encoding
 
@@ -8017,7 +8021,7 @@ snapshots:
       cross-inspect: 1.0.1
       dset: 3.1.4
       graphql: 16.11.0
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@graphql-tools/utils@10.8.1(graphql@16.11.0)':
     dependencies:
@@ -8025,7 +8029,7 @@ snapshots:
       cross-inspect: 1.0.1
       dset: 3.1.4
       graphql: 16.11.0
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@graphql-tools/utils@10.8.2(graphql@16.11.0)':
     dependencies:
@@ -8033,7 +8037,7 @@ snapshots:
       cross-inspect: 1.0.1
       dset: 3.1.4
       graphql: 16.11.0
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@graphql-tools/utils@10.8.3(graphql@16.11.0)':
     dependencies:
@@ -8920,35 +8924,6 @@ snapshots:
     dependencies:
       '@sentry/types': 8.29.0
       '@sentry/utils': 8.29.0
-
-  '@sentry/nextjs@8.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.26.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.53.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.26.0(@opentelemetry/api@1.9.0))(next@15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2))(react@18.3.1)(webpack@5.94.0)':
-    dependencies:
-      '@opentelemetry/instrumentation-http': 0.53.0(@opentelemetry/api@1.9.0)
-      '@opentelemetry/semantic-conventions': 1.27.0
-      '@rollup/plugin-commonjs': 26.0.1(rollup@3.29.4)
-      '@sentry/core': 8.29.0
-      '@sentry/node': 8.29.0
-      '@sentry/opentelemetry': 8.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.26.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.53.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.26.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.27.0)
-      '@sentry/react': 8.29.0(react@18.3.1)
-      '@sentry/types': 8.29.0
-      '@sentry/utils': 8.29.0
-      '@sentry/vercel-edge': 8.29.0
-      '@sentry/webpack-plugin': 2.22.3(webpack@5.94.0)
-      chalk: 3.0.0
-      next: 15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2)
-      resolve: 1.22.8
-      rollup: 3.29.4
-      stacktrace-parser: 0.1.10
-    optionalDependencies:
-      webpack: 5.94.0
-    transitivePeerDependencies:
-      - '@opentelemetry/api'
-      - '@opentelemetry/core'
-      - '@opentelemetry/instrumentation'
-      - '@opentelemetry/sdk-trace-base'
-      - encoding
-      - react
-      - supports-color
 
   '@sentry/nextjs@8.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.26.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.53.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.26.0(@opentelemetry/api@1.9.0))(next@15.3.3(@babel/core@7.27.4)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2))(react@18.3.1)(webpack@5.94.0)':
     dependencies:
@@ -10210,7 +10185,7 @@ snapshots:
 
   cross-inspect@1.0.1:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   cross-spawn@7.0.6:
     dependencies:
@@ -11289,6 +11264,48 @@ snapshots:
       - supports-color
       - typescript
 
+  hds-react@4.6.0(@types/react@18.2.7)(eslint@9.30.1(jiti@2.4.2))(graphql-ws@6.0.5(graphql@16.11.0)(ws@8.18.3))(postcss@8.5.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3):
+    dependencies:
+      '@apollo/client': 3.13.8(@types/react@18.2.7)(graphql-ws@6.0.5(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@babel/runtime': 7.17.9
+      '@emotion/styled-base': 11.0.0
+      '@hookform/resolvers': 2.9.11(react-hook-form@7.54.2(react@18.3.1))
+      '@juggle/resize-observer': 3.2.0
+      '@popperjs/core': 2.11.5
+      '@react-aria/visually-hidden': 3.8.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-spring/web': 9.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@types/cookie': 0.4.1
+      '@typescript-eslint/parser': 6.21.0(eslint@9.30.1(jiti@2.4.2))(typescript@5.8.3)
+      await-to-js: 3.0.0
+      cookie: 0.4.2
+      crc-32: 1.2.0
+      date-fns: 2.16.1
+      downshift: 6.0.6(react@18.3.1)
+      graphql: 16.11.0
+      hds-core: 4.6.0
+      jwt-decode: 3.1.2
+      kashe: 1.0.4
+      lodash: 4.17.21
+      memoize-one: 5.2.1
+      oidc-client-ts: 2.4.1
+      postcss: 8.5.6
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-hook-form: 7.54.2(react@18.3.1)
+      react-merge-refs: 1.1.0
+      react-popper: 2.2.5(@popperjs/core@2.11.5)(react@18.3.1)
+      react-use-measure: 2.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-virtual: 2.10.4(react@18.3.1)
+      uuid: 9.0.1
+      yup: 1.6.1
+    transitivePeerDependencies:
+      - '@types/react'
+      - eslint
+      - graphql-ws
+      - subscriptions-transport-ws
+      - supports-color
+      - typescript
+
   header-case@2.0.4:
     dependencies:
       capital-case: 1.0.4
@@ -11978,18 +11995,6 @@ snapshots:
 
   next-compose-plugins@2.2.1: {}
 
-  next-i18next@15.4.2(i18next@25.2.1(typescript@5.8.3))(next@15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2))(react-i18next@15.5.3(i18next@25.2.1(typescript@5.8.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3))(react@18.3.1):
-    dependencies:
-      '@babel/runtime': 7.26.9
-      '@types/hoist-non-react-statics': 3.3.6
-      core-js: 3.40.0
-      hoist-non-react-statics: 3.3.2
-      i18next: 25.2.1(typescript@5.8.3)
-      i18next-fs-backend: 2.6.0
-      next: 15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2)
-      react: 18.3.1
-      react-i18next: 15.5.3(i18next@25.2.1(typescript@5.8.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
-
   next-i18next@15.4.2(i18next@25.2.1(typescript@5.8.3))(next@15.3.3(@babel/core@7.27.4)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2))(react-i18next@15.5.3(i18next@25.2.1(typescript@5.8.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3))(react@18.3.1):
     dependencies:
       '@babel/runtime': 7.26.9
@@ -12001,33 +12006,6 @@ snapshots:
       next: 15.3.3(@babel/core@7.27.4)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2)
       react: 18.3.1
       react-i18next: 15.5.3(i18next@25.2.1(typescript@5.8.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
-
-  next@15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2):
-    dependencies:
-      '@next/env': 15.3.3
-      '@swc/counter': 0.1.3
-      '@swc/helpers': 0.5.15
-      busboy: 1.6.0
-      caniuse-lite: 1.0.30001718
-      postcss: 8.4.31
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      styled-jsx: 5.1.6(@babel/core@7.26.10)(react@18.3.1)
-    optionalDependencies:
-      '@next/swc-darwin-arm64': 15.3.3
-      '@next/swc-darwin-x64': 15.3.3
-      '@next/swc-linux-arm64-gnu': 15.3.3
-      '@next/swc-linux-arm64-musl': 15.3.3
-      '@next/swc-linux-x64-gnu': 15.3.3
-      '@next/swc-linux-x64-musl': 15.3.3
-      '@next/swc-win32-arm64-msvc': 15.3.3
-      '@next/swc-win32-x64-msvc': 15.3.3
-      '@opentelemetry/api': 1.9.0
-      sass: 1.89.2
-      sharp: 0.34.2
-    transitivePeerDependencies:
-      - '@babel/core'
-      - babel-plugin-macros
 
   next@15.3.3(@babel/core@7.27.4)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2):
     dependencies:
@@ -12343,6 +12321,11 @@ snapshots:
       postcss: 8.5.5
       typescript: 5.8.3
 
+  postcss-styled-syntax@0.7.1(postcss@8.5.6):
+    dependencies:
+      postcss: 8.5.6
+      typescript: 5.8.3
+
   postcss-value-parser@4.2.0: {}
 
   postcss@8.4.31:
@@ -12358,6 +12341,12 @@ snapshots:
       source-map-js: 1.2.1
 
   postcss@8.5.5:
+    dependencies:
+      nanoid: 3.3.11
+      picocolors: 1.1.1
+      source-map-js: 1.2.1
+
+  postcss@8.5.6:
     dependencies:
       nanoid: 3.3.11
       picocolors: 1.1.1
@@ -13133,7 +13122,7 @@ snapshots:
     dependencies:
       js-tokens: 9.0.1
 
-  styled-components@6.1.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  styled-components@6.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@emotion/is-prop-valid': 1.2.2
       '@emotion/unitless': 0.8.1
@@ -13146,13 +13135,6 @@ snapshots:
       shallowequal: 1.1.0
       stylis: 4.3.2
       tslib: 2.6.2
-
-  styled-jsx@5.1.6(@babel/core@7.26.10)(react@18.3.1):
-    dependencies:
-      client-only: 0.0.1
-      react: 18.3.1
-    optionalDependencies:
-      '@babel/core': 7.26.10
 
   styled-jsx@5.1.6(@babel/core@7.27.4)(react@18.3.1):
     dependencies:
@@ -13598,7 +13580,7 @@ snapshots:
       esbuild: 0.25.5
       fdir: 6.4.6(picomatch@4.0.2)
       picomatch: 4.0.2
-      postcss: 8.5.5
+      postcss: 8.5.6
       rollup: 4.43.0
       tinyglobby: 0.2.14
     optionalDependencies:
