@@ -159,11 +159,11 @@ function ArchiveDialog({
     <GenericDialog
       onAccept={onAccept}
       onClose={onClose}
-      description={t("ArchiveReservationUnitDialog.description")}
-      title={t("ArchiveReservationUnitDialog.title", {
+      description={t("reservationUnitEditor:ArchiveDialog.description")}
+      title={t("reservationUnitEditor:ArchiveDialog.title", {
         name: reservationUnit.nameFi ?? "-",
       })}
-      acceptLabel={t("ArchiveReservationUnitDialog.archive")}
+      acceptLabel={t("reservationUnitEditor:ArchiveDialog.acceptBtn")}
     />
   );
 }
@@ -175,9 +175,9 @@ function DiscardChangesDialog({ onClose, onAccept }: { onClose: () => void; onAc
     <GenericDialog
       onAccept={onAccept}
       onClose={onClose}
-      description={t("DiscardReservationUnitChangesDialog.description")}
-      title={t("DiscardReservationUnitChangesDialog.title")}
-      acceptLabel={t("DiscardReservationUnitChangesDialog.discard")}
+      description={t("reservationUnitEditor:DiscardChangesDialog.description")}
+      title={t("reservationUnitEditor:DiscardChangesDialog.title")}
+      acceptLabel={t("reservationUnitEditor:DiscardChangesDialog.discard")}
     />
   );
 }
@@ -237,7 +237,7 @@ export function BottomButtonsStripe({
     setModalContent(null);
     try {
       await handleSubmit(onSubmit)();
-      successToast({ text: t("ArchiveReservationUnitDialog.success") });
+      successToast({ text: t("reservationUnitEditor:ArchiveDialog.success") });
       router.push(getUnitUrl(unit?.pk));
     } catch (e) {
       displayError(e);

@@ -326,12 +326,9 @@ export function getServerCookie(headers: IncomingHttpHeaders | undefined, name: 
 }
 
 export function enchancedFetch(req?: IncomingMessage) {
-  return (
-    url: RequestInfo | URL,
-    init?: RequestInit,
-    ): Promise<Response> => {
+  return (url: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const isServer = typeof window === "undefined";
-    const csrfToken  =isServer ? getServerCookie(req?.headers, "csrftoken") : getCookie("csrftoken");
+    const csrfToken = isServer ? getServerCookie(req?.headers, "csrftoken") : getCookie("csrftoken");
     const headers = new Headers({
       ...(init?.headers != null ? init.headers : {}),
       // TODO missing csrf token is a non recoverable error
@@ -341,16 +338,10 @@ export function enchancedFetch(req?: IncomingMessage) {
     // NOTE server requests don't include cookies by default
     // TODO do we want to copy request headers from client or no?
     if (isServer) {
-
       if (req == null) {
         throw new Error("request is required for server-side fetch");
       }
       if (req?.headers == null) {
-        console.error("no headers found", {
-          req,
-          headers: req.headers,
-          url: req.url,
-        });
         throw new Error("request headers must be defined for server-side fetch");
       }
       if (csrfToken == null) {

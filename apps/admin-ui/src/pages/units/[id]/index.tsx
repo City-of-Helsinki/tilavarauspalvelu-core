@@ -83,7 +83,7 @@ function Unit({ unitPk }: { unitPk: number }): JSX.Element {
   const reservationUnits = filterNonNullable(unit.reservationUnits);
 
   const UNIT_REGISTRY_LINK = `https://asiointi.hel.fi/tprperhe/TPR/UI/ServicePoint/ServicePointEdit/`;
-  const address = formatAddress(unit);
+  const address = formatAddress(unit, "");
 
   return (
     <>
@@ -91,7 +91,7 @@ function Unit({ unitPk }: { unitPk: number }): JSX.Element {
         <Image src="https://tilavaraus.hel.fi/v1/media/reservation_unit_images/liikumistila2.jfif.250x250_q85_crop.jpg" />
         <Heading>
           <H1 $noMargin>{unit?.nameFi}</H1>
-          {address !== "-" ? <Address>{address}</Address> : <Address $disabled>{t("unit:noAddress")}</Address>}
+          {address !== "" ? <Address>{address}</Address> : <Address $disabled>{t("unit:noAddress")}</Address>}
         </Heading>
         <Link href={getSpacesResourcesUrl(unitPk)}>{t("unit:showSpacesAndResources")}</Link>
       </Flex>

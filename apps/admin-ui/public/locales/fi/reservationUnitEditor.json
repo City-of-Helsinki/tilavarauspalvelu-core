@@ -214,5 +214,17 @@
     "mainImage": "Pääkuva",
     "useAsMainImage": "Käytä pääkuvana",
     "tooltip": "Liitä vähintään kolme kuvaa. Kuvien tulisi olla todenmukaisia ja hyvälaatuisia.\nSuositus:\nlisää ensisijaisesti vaakatasossa kuvattuja kuvia, ei kuitenkaan panoramoja. jpeg/jpg ja png, max 1 M\nKuvissa näkyviltä ihmisiltä tulee olla kuvauslupa. Kuvissa ei saa näkyä turvakameroita."
-  }
+  },
+  "ArchiveDialog": {
+    "title": "Oletko varma että haluat arkistoida varausyksikön {{name}}?",
+    "description": "Arkistoimisen jälkeen varausyksikkö ei ole enää näkyvissä Varaamon käsittelypuolella. Mikäli haluat palauttaa varausyksikön, ota yhteyttä järjestelmän pääkäyttäjään.",
+    "acceptBtn": "Arkistoi",
+    "success": "Varausyksikkö arkistoitu."
+  },
+  "DiscardChangesDialog": {
+    "title": "Oletko varma että haluat palata takaisin tallentamatta varausyksikön tietoja?",
+    "description": "Varausyksikön tiedot katoavat, eikä niitä voi palauttaa.",
+    "discard": "Palaa tallentamatta"
+  },
+
 }

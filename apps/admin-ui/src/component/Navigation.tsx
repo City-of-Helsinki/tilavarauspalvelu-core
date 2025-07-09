@@ -310,7 +310,6 @@ export function Navigation({ apiBaseUrl }: Props) {
               exact={item.exact}
               exclude={item.excludeRoutes}
               count={handlingCount}
-              aria-label={t("navigation:navigation")}
             />
           ))}
         </Header.NavigationMenu>

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Button, ButtonVariant, LoadingSpinner, Notification } from "hds-react";
+import { Button, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { useUpdateSpaceMutation, type SpaceUpdateMutationInput, useSpaceQuery } from "@gql/gql-types";
@@ -32,19 +32,14 @@ type Props = {
 
 function SpaceEditor({ space, unit }: Props): JSX.Element {
   const router = useRouter();
-
   const { t } = useTranslation();
-
   const [mutation, { loading: isMutationLoading }] = useUpdateSpaceMutation();
-
-  const updateSpace = (input: SpaceUpdateMutationInput) => mutation({ variables: { input } });
-
   const displayError = useDisplayError();
+
   const {
     data,
     refetch,
     loading: isQueryLoading,
-    error,
   } = useSpaceQuery({
     variables: { id: base64encode(`SpaceNode:${space}`) },
     onError: () => {
@@ -82,24 +77,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
     return <CenterSpinner />;
   }
 
-  if (error != null) {
-    return (
-      <div>
-        <Notification
-          type="error"
-          label={t("errors:functionFailedTitle")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common:close")}
-          displayAutoCloseProgress={false}
-        >
-          {t(error.message)}
-        </Notification>
-      </div>
-    );
-  }
-
+  const updateSpace = (input: SpaceUpdateMutationInput) => mutation({ variables: { input } });
   const onSubmit = async (values: SpaceUpdateForm) => {
     try {
       const { parent, surfaceArea, pk, ...rest } = values;
@@ -113,7 +91,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
         surfaceArea: Math.ceil(surfaceArea ?? 0),
       });
       successToast({
-        text: t("SpaceEditor.spaceUpdatedNotification"),
+        text: t("spaces:SpaceEditor.spaceUpdatedNotification"),
       });
       refetch();
       router.back();
@@ -126,27 +104,27 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
     <>
       <LinkPrev route="../.." />
       <SpaceHead
-        title={data?.space?.parent?.nameFi || t("SpaceEditor.noParent")}
+        title={data?.space?.parent?.nameFi || t("spaces:noParent")}
         space={data?.space}
         maxPersons={watch("maxPersons") || undefined}
         surfaceArea={watch("surfaceArea") || undefined}
       />
-      <H2 $noMargin>{t("SpaceEditor.details")}</H2>
+      <H2 $noMargin>{t("spaces:SpaceEditor.details")}</H2>
       <Form noValidate onSubmit={handleSubmit(onSubmit)}>
         <FormErrorSummary errors={errors} />
         <section>
-          <H3>{t("SpaceEditor.hierarchy")}</H3>
+          <H3>{t("spaces:SpaceEditor.hierarchy")}</H3>
           <SpaceHierarchy space={data?.space} />
           <Controller
             control={control}
             name="parent"
             render={({ field: { onChange, value } }) => (
               <ParentSelector
-                helperText={t("SpaceModal.page1.parentHelperText")}
-                label={t("SpaceModal.page1.parentLabel")}
+                helperText={t("spaces:SpaceModal.page1.parentHelperText")}
+                label={t("spaces:SpaceModal.page1.parentLabel")}
                 onChange={(parentPk) => onChange(parentPk)}
                 value={value}
-                placeholder={t("SpaceModal.page1.parentPlaceholder")}
+                placeholder={t("spaces:SpaceModal.page1.parentPlaceholder")}
                 unitPk={unit}
                 selfPk={space}
               />
@@ -154,7 +132,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
           />
         </section>
         <section>
-          <H3>{t("SpaceEditor.other")}</H3>
+          <H3>{t("spaces:SpaceEditor.other")}</H3>
           <SpaceForm form={form} />
         </section>
         <ButtonContainer>
@@ -164,7 +142,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
             onClick={() => router.back()}
             disabled={isMutationLoading}
           >
-            {t("SpaceEditor.cancel")}
+            {t("common:cancel")}
           </Button>
           <Button
             variant={isMutationLoading ? ButtonVariant.Clear : ButtonVariant.Primary}
@@ -172,7 +150,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
             disabled={!isDirty || isMutationLoading}
             type="submit"
           >
-            {t("SpaceEditor.save")}
+            {t("common:save")}
           </Button>
         </ButtonContainer>
       </Form>

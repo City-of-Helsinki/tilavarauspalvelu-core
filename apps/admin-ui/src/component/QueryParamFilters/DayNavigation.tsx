@@ -29,7 +29,9 @@ const WeekDay = styled.span`
 `;
 
 const BorderlessDatePicker = styled(DateInput)`
-  --input-border-color-default: transparent;
+  && {
+    --input-border-color-default: transparent;
+  }
   max-width: 180px;
   @media (min-width: ${breakpoints.m}) {
     margin-right: var(--spacing-s);

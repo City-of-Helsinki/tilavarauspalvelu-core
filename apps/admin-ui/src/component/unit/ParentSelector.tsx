@@ -43,7 +43,7 @@ type Props = {
 
 function parentLessOption(t: TFunction) {
   return {
-    label: t("SpaceEditor.noParent"),
+    label: t("spaces:noParent"),
     value: 0,
   };
 }

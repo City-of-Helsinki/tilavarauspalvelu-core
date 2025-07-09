@@ -13,7 +13,7 @@ export function useUnitResources(begin: Date, unitPk: number, reservationUnitTyp
   const { t } = useTranslation();
   const id = base64encode(`UnitNode:${unitPk}`);
   const isValid = Number(unitPk) > 0;
-  const { data, ...rest } = useReservationUnitsByUnitQuery({
+  const { data, previousData, ...rest } = useReservationUnitsByUnitQuery({
     skip: !isValid,
     variables: {
       id,
@@ -27,8 +27,8 @@ export function useUnitResources(begin: Date, unitPk: number, reservationUnitTyp
     },
   });
 
-  const { affectingReservations } = data ?? {};
-  const resUnits = filterNonNullable(data?.unit?.reservationUnits);
+  const { affectingReservations, unit } = data ?? previousData ?? {};
+  const resUnits = filterNonNullable(unit?.reservationUnits);
 
   type ReservationType = NonNullable<typeof affectingReservations>[0];
   type ReservationUnitType = NonNullable<typeof resUnits>[0];

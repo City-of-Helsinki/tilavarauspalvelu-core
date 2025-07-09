@@ -21,26 +21,27 @@ export function Page1({ unit, closeModal, hasFixedParent, form, onNextPage, chil
   const { t } = useTranslation();
   const { control } = form;
 
+  const modalTitle = t(
+    hasFixedParent ? "spaces:SpaceModal.page1.subSpaceModalTitle" : "spaces:SpaceModal.page1.modalTitle"
+  );
+  const modalContent = t("spaces:SpaceModal.page1.info");
   return (
     <>
-      <Dialog.Header
-        title={t(hasFixedParent ? "SpaceModal.page1.subSpaceModalTitle" : "SpaceModal.page1.modalTitle")}
-        id="modal-header"
-      />
+      <Dialog.Header title={modalTitle} id="modal-header" />
       <Dialog.Content>
-        <StyledTag>{`${t("SpaceModal.phase")} 1/2`}</StyledTag>
+        <StyledTag>{`${t("spaces:SpaceModal.phase")} 1/2`}</StyledTag>
         <p className="text-body" id="custom-dialog-content">
-          {t("SpaceModal.page1.info")}
+          {modalContent}
         </p>
         {children}
-        {!hasFixedParent ? <H4>{t("SpaceModal.page1.title")}</H4> : null}
+        {!hasFixedParent ? <H4>{t("spaces:SpaceModal.page1.title")}</H4> : null}
         {!hasFixedParent ? (
           <Controller
             control={control}
             name="parent"
             render={({ field: { onChange, value } }) => (
               <ParentSelector
-                label={t("SpaceModal.page1.parentLabel")}
+                label={t("spaces:SpaceModal.page1.parentLabel")}
                 unitPk={unit?.pk ?? 0}
                 value={value}
                 onChange={(parent) => onChange(parent)}
@@ -51,10 +52,10 @@ export function Page1({ unit, closeModal, hasFixedParent, form, onNextPage, chil
       </Dialog.Content>
       <DialogActionsButtons>
         <Button onClick={closeModal} variant={ButtonVariant.Secondary}>
-          {t("SpaceModal.page1.buttonCancel")}
+          {t("common:cancel")}
         </Button>
         <Button variant={ButtonVariant.Supplementary} iconEnd={<IconArrowRight />} onClick={onNextPage}>
-          {t("SpaceModal.page1.buttonNext")}
+          {t("common:next")}
         </Button>
       </DialogActionsButtons>
     </>

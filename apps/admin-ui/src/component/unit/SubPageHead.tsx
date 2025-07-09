@@ -9,7 +9,7 @@ import { gql } from "@apollo/client";
 
 interface IProps {
   title: string;
-  unit: UnitSubpageHeadFragment;
+  unit: UnitSubpageHeadFragment | null | undefined;
 }
 
 const Name = styled.p`
@@ -27,7 +27,7 @@ export function SubPageHead({ title, unit }: IProps): JSX.Element {
         <IconLocation />
         <div>
           <Name>{unit?.nameFi}</Name>
-          <span>{t("Unit.address")}</span>: <span>{formatAddress(unit)}</span>
+          <span>{t("spaces:unitAddress")}</span>: <span>{formatAddress(unit)}</span>
         </div>
       </Flex>
     </>

@@ -30,7 +30,7 @@ function WeekNavigation({ date, onNext, onPrev }: Props): JSX.Element {
         size={ButtonSize.Small}
         variant={ButtonVariant.Supplementary}
         onClick={onPrev}
-        iconStart={<IconAngleLeft aria-hidden="true" />}
+        iconStart={<IconAngleLeft />}
       >
         {" "}
       </Btn>
@@ -43,7 +43,7 @@ function WeekNavigation({ date, onNext, onPrev }: Props): JSX.Element {
         size={ButtonSize.Small}
         variant={ButtonVariant.Supplementary}
         onClick={onNext}
-        iconStart={<IconAngleRight aria-hidden="true" />}
+        iconStart={<IconAngleRight />}
       >
         {" "}
       </Btn>

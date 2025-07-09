@@ -64,7 +64,7 @@ export function SpaceForm({ form }: Props): JSX.Element {
             key={fieldName}
             required={fieldName === "nameFi"}
             id={fieldName}
-            label={t(`SpaceEditor.label.${fieldName}`)}
+            label={t(`spaces:SpaceEditor.label.${fieldName}`)}
             maxLength={80}
             errorText={getTranslatedError(t, errors[fieldName]?.message)}
             invalid={errors[fieldName]?.message != null}
@@ -75,24 +75,24 @@ export function SpaceForm({ form }: Props): JSX.Element {
         <ControlledNumberInput
           name="surfaceArea"
           control={control}
-          label={t("SpaceEditor.label.surfaceArea")}
-          helperText={t("SpaceModal.page2.surfaceAreaHelperText")}
+          label={t("spaces:SpaceEditor.label.surfaceArea")}
+          helperText={t("spaces:SpaceModal.page2.surfaceAreaHelperText")}
           min={1}
           errorText={getTranslatedError(t, errors.surfaceArea?.message)}
         />
         <ControlledNumberInput
           name="maxPersons"
           control={control}
-          label={t("SpaceEditor.label.maxPersons")}
+          label={t("spaces:SpaceEditor.label.maxPersons")}
           min={1}
-          helperText={t("SpaceModal.page2.maxPersonsHelperText")}
+          helperText={t("spaces:SpaceModal.page2.maxPersonsHelperText")}
           errorText={getTranslatedError(t, errors.maxPersons?.message)}
         />
         <TextInput
           {...register("code")}
           id="code"
-          label={t("SpaceModal.page2.codeLabel")}
-          placeholder={t("SpaceModal.page2.codePlaceholder")}
+          label={t("spaces:SpaceModal.page2.codeLabel")}
+          placeholder={t("spaces:SpaceModal.page2.codePlaceholder")}
         />
       </EditorColumns>
     </div>

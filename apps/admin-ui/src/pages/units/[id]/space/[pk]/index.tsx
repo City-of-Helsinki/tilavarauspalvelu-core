@@ -1,24 +1,36 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import SpaceEditor from "@/component/unit/SpaceEditor";
-import { useRouter } from "next/router";
 import { ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { NOT_FOUND_SSR_VALUE } from "@/common/const";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { type GetServerSidePropsContext } from "next";
+import { AuthorizationChecker } from "@/common/AuthorizationChecker";
+import { UserPermissionChoice } from "@gql/gql-types";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
-function SpaceEditorView(): JSX.Element {
-  const { t } = useTranslation();
-  const router = useRouter();
-  const unitPk = toNumber(ignoreMaybeArray(router.query.id));
-  const spacePk = toNumber(ignoreMaybeArray(router.query.pk));
-
-  if (!spacePk) {
-    return <>{t("SpaceEditorView.illegalSpace")}</>;
-  }
-
-  if (!unitPk) {
-    return <>{t("SpaceEditorView.illegalUnit")}</>;
-  }
-
-  return <SpaceEditor space={spacePk} unit={unitPk} />;
+type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
+export default function Page({ apiBaseUrl, spacePk, unitPk }: PropsNarrowed): JSX.Element {
+  return (
+    <AuthorizationChecker apiUrl={apiBaseUrl} permission={UserPermissionChoice.CanManageReservationUnits}>
+      <SpaceEditor space={spacePk} unit={unitPk} />
+    </AuthorizationChecker>
+  );
 }
 
-export default SpaceEditorView;
+export async function getServerSideProps({ locale, query }: GetServerSidePropsContext) {
+  const unitPk = toNumber(ignoreMaybeArray(query.id));
+  const spacePk = toNumber(ignoreMaybeArray(query.pk));
+
+  if (unitPk == null || unitPk <= 0 || spacePk == null || spacePk <= 0) {
+    return NOT_FOUND_SSR_VALUE;
+  }
+  return {
+    props: {
+      unitPk,
+      spacePk,
+      ...(await getCommonServerSideProps()),
+      ...(await serverSideTranslations(locale ?? "fi")),
+    },
+  };
+}

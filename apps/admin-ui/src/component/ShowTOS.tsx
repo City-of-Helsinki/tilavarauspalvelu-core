@@ -52,13 +52,13 @@ function ShowTOS({ reservationUnit }: { reservationUnit: Node }) {
 
   return (
     <div>
-      {payTerms?.textFi && <TOSElement title={t("tos.paymentTermsTitle")} text={payTerms?.textFi ?? ""} isHtml />}
-      {priceTerms?.textFi && <TOSElement title={t("tos.priceTermsTitle")} text={priceTerms?.textFi ?? ""} isHtml />}
-      {cancelTerms?.textFi && <TOSElement title={t("tos.cancelTermsTitle")} text={cancelTerms?.textFi ?? ""} isHtml />}
+      {payTerms?.textFi && <TOSElement title={t("tos:paymentTermsTitle")} text={payTerms?.textFi ?? ""} isHtml />}
+      {priceTerms?.textFi && <TOSElement title={t("tos:priceTermsTitle")} text={priceTerms?.textFi ?? ""} isHtml />}
+      {cancelTerms?.textFi && <TOSElement title={t("tos:cancelTermsTitle")} text={cancelTerms?.textFi ?? ""} isHtml />}
       {serviceTerms?.textFi && (
-        <TOSElement title={t("tos.serviceTermsTitle")} text={serviceTerms?.textFi ?? ""} isHtml />
+        <TOSElement title={t("tos:serviceTermsTitle")} text={serviceTerms?.textFi ?? ""} isHtml />
       )}
-      <TOSElement title={t("tos.generalTermsTitle")} text={genericTerms?.textFi ?? ""} isHtml />
+      <TOSElement title={t("tos:generalTermsTitle")} text={genericTerms?.textFi ?? ""} isHtml />
     </div>
   );
 }

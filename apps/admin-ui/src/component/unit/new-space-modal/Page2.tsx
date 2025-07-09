@@ -19,16 +19,17 @@ export function Page2({ onPrevPage, hasFixedParent, form, children }: Props): JS
   const { formState } = form;
   const { errors, isDirty, isSubmitting } = formState;
 
+  const modalTitle = t(
+    hasFixedParent ? "spaces:SpaceModal.page2.subSpaceModalTitle" : "spaces:SpaceModal.page2.modalTitle"
+  );
+  const modalContent = t(hasFixedParent ? "spaces:SpaceModal.page2.subSpaceInfo" : "spaces:SpaceModal.page2.info");
   return (
     <>
-      <Dialog.Header
-        title={t(hasFixedParent ? "SpaceModal.page2.subSpaceModalTitle" : "SpaceModal.page2.modalTitle")}
-        id="modal-header"
-      />
+      <Dialog.Header title={modalTitle} id="modal-header" />
       <Dialog.Content>
-        <StyledTag>{`${t("SpaceModal.phase")} 2/2`}</StyledTag>
+        <StyledTag>{`${t("spaces:SpaceModal.phase")} 2/2`}</StyledTag>
         <p className="text-body" id="custom-dialog-content">
-          {t(hasFixedParent ? "SpaceModal.page2.subSpaceInfo" : "SpaceModal.page2.info")}
+          {modalContent}
         </p>
         {children}
         <div>
@@ -40,10 +41,10 @@ export function Page2({ onPrevPage, hasFixedParent, form, children }: Props): JS
         <Button
           onClick={onPrevPage}
           variant={ButtonVariant.Supplementary}
-          iconStart={<IconArrowLeft aria-hidden="true" />}
+          iconStart={<IconArrowLeft />}
           disabled={isSubmitting}
         >
-          {t("SpaceModal.page2.prevButton")}
+          {t("spaces:SpaceModal.page2.prevButton")}
         </Button>
         <Button
           type="submit"
@@ -51,7 +52,7 @@ export function Page2({ onPrevPage, hasFixedParent, form, children }: Props): JS
           iconStart={isSubmitting ? <LoadingSpinner small /> : undefined}
           disabled={!isDirty || isSubmitting}
         >
-          {t("SpaceModal.page2.createButton")}
+          {t("spaces:SpaceModal.page2.createButton")}
         </Button>
       </DialogActionsButtons>
     </>

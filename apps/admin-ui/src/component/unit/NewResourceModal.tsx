@@ -64,10 +64,10 @@ export function NewResourceModal({ unit, closeModal, refetch, spacePk }: ModalPr
 
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
-      <Dialog.Header title={t("ResourceModal.modalTitle")} id="modal-header" />
+      <Dialog.Header title={t("spaces:ResourceModal.modalTitle")} id="modal-header" />
       <Dialog.Content>
         <p className="text-body" id="custom-dialog-content">
-          {t("ResourceModal.info")}
+          {t("spaces:ResourceModal.info")}
         </p>
         <UnitInfo unit={unit} parentName={parentName} />
         <FormErrorSummary errors={errors} />
@@ -77,10 +77,10 @@ export function NewResourceModal({ unit, closeModal, refetch, spacePk }: ModalPr
       </Dialog.Content>
       <DialogActionsButtons>
         <Button onClick={closeModal} variant={ButtonVariant.Secondary} disabled={isMutationLoading}>
-          {t("ResourceModal.cancel")}
+          {t("common:cancel")}
         </Button>
         <Button type="submit" disabled={!isDirty}>
-          {t("ResourceModal.save")}
+          {t("common:save")}
         </Button>
       </DialogActionsButtons>
     </form>

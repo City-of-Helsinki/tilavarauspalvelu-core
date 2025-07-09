@@ -1,13 +1,5 @@
 {
-  "headings": {
-    "name": "Nimi",
-    "code": "Tilan numero",
-    "service": "Palvelut",
-    "numSubSpaces": "Alitilojen määrä",
-    "surfaceArea": "Koko",
-    "maxPersons": "Henkilömäärä",
-    "area": "Alue"
-  },
+
   "emptyFilterPageName": "toimipistettä",
   "reservationUnits_one": "{{count}} varausyksikkö",
   "reservationUnits_other": "{{count}} varausyksikköä",
@@ -16,11 +8,7 @@
   "noService": "Palvelu puuttuu",
   "unitCount_one": "{{count}} toimipiste",
   "unitCount_other": "{{count}} toimipistettä",
-  "noUnits": "Ei toimipisteitä",
-  "showOnMap": "Näytä kartalla",
-  "showOpeningHours": "Aukioloajat",
   "showSpacesAndResources": "Tilat ja resurssit",
-  "spacesAndResources": "Tilojen ja resurssien hallinta",
   "showConfiguration": "Asetukset",
   "noSpacesResourcesTitle": "Toimipisteelle ei ole määritetty tiloja eikä resursseja",
   "noSpacesResources": "Toimipisteellä täytyy olla vähintään yksi tila, jotta voit luoda ensimmäisen varausyksikön.",
@@ -30,20 +18,6 @@
   "reservationUnitReadMore": "Lue lisää varausyksiköistä",
   "reservationUnitCreate": "Luo uusi varausyksikkö",
   "noReservationUnitsTitle": "Ei luotuja varausyksiköitä.",
-  "address": "Osoite",
   "noAddress": "Osoite puuttuu",
-  "location": "Toimipisteen sijainti",
-  "spaces": "Tilat",
-  "addSpace": "Uusi tila",
-  "noSpaces": "Ei vielä tiloja",
-  "resources": "Resurssit",
-  "addResource": "Uusi resurssi",
-  "noResources": "Ei vielä resursseja",
-  "noResourcesSpaces": "Lisää ensin tila ja sen jälkeen voit luoda resursseja",
-  "newSpacesCreatedTitle": "Uudet tilat luotu onnistuneesti",
-  "newSpacesCreatedNotification": "Voit luoda tiloille alitiloja niin pitkälle kuin on tarpeellista.",
-  "spaceDeletedTitle": "Tila poistettu",
-  "spaceDeletedNotification": "Tila poistettu onnistuneesti",
-  "resourceDeletedTitle": "Resurssi poistettu",
-  "resourceDeletedNotification": "Resurssi poistettu onnistuneesti"
+  "location": "Toimipisteen sijainti"
 }

@@ -41,14 +41,14 @@ function MyUnitView({ unitPk: pk }: { unitPk: number }): JSX.Element {
   const { setModalContent } = useModal();
 
   const id = base64encode(`UnitNode:${pk}`);
-  const { loading, data } = useUnitViewQuery({
+  const { loading, data, previousData } = useUnitViewQuery({
     variables: { id },
     onError: () => {
       errorToast({ text: t("errors:errorFetchingData") });
     },
   });
 
-  const { unit } = data ?? {};
+  const { unit } = data ?? previousData ?? {};
 
   const createReservationBtnRef = useRef<HTMLButtonElement>(null);
   const { hasPermission } = useCheckPermission({
@@ -85,7 +85,7 @@ function MyUnitView({ unitPk: pk }: { unitPk: number }): JSX.Element {
 
   const activeTab = selectedTab === "reservation-unit" ? 1 : 0;
 
-  const title = loading ? t("common:loading") : (unit?.nameFi ?? "-");
+  const title = (unit?.nameFi ?? loading) ? t("common:loading") : "-";
   const canCreateReservations = hasPermission && unit != null && reservationUnitOptions.length > 0;
   const address = formatAddress(unit, "");
   return (

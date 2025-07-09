@@ -43,7 +43,7 @@ function getColConfig({
 }) {
   return [
     {
-      headerName: t("ResourceTable.headings.name"),
+      headerName: t("spaces:ResourceTable.headings.name"),
       key: `nameFi`,
       transform: ({ pk, nameFi }: ResourceT) => {
         const link = getResourceUrl(pk, unit?.pk);
@@ -107,7 +107,7 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
     }
     try {
       await deleteResource(resourceWaitingForDelete.pk);
-      successToast({ text: t("ResourceTable.removeSuccess") });
+      successToast({ text: t("spaces:ResourceTable.removeSuccess") });
       setResourceWaitingForDelete(null);
       refetch();
     } catch (err) {
@@ -127,12 +127,12 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
         <ConfirmationDialog
           isOpen
           variant="danger"
-          heading={t("ResourceTable.removeConfirmationTitle", {
+          heading={t("spaces:ResourceTable.removeConfirmationTitle", {
             name: resourceWaitingForDelete.nameFi,
           })}
-          content={t("ResourceTable.removeConfirmationMessage")}
-          acceptLabel={t("ResourceTable.removeConfirmationAccept")}
-          cancelLabel={t("ResourceTable.removeConfirmationCancel")}
+          content={t("spaces:ResourceTable.removeConfirmationMessage")}
+          acceptLabel={t("spaces:ResourceTable.removeConfirmationAccept")}
+          cancelLabel={t("spaces:ResourceTable.removeConfirmationCancel")}
           onCancel={() => setResourceWaitingForDelete(null)}
           onAccept={handleConfirmDelete}
         />
@@ -153,18 +153,18 @@ function ResourceMenu({ locationType, onEdit, onDelete }: ResourceT & { onDelete
   const { t } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
 
-  const type = locationType ? t(`locationType.${locationType}`) : "-";
+  const type = t(`translation:locationType.${locationType}`);
   return (
     <Flex $gap="none" $direction="row" $alignItems="center" $justifyContent="space-between" ref={ref}>
       <span>{type}</span>
       <PopupMenu
         items={[
           {
-            name: t("ResourceTable.menuEditResource"),
+            name: t("spaces:ResourceTable.menuEditResource"),
             onClick: onEdit,
           },
           {
-            name: t("ResourceTable.menuRemoveResource"),
+            name: t("spaces:ResourceTable.menuRemoveResource"),
             onClick: onDelete,
           },
         ]}

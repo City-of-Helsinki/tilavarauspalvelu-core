@@ -72,21 +72,21 @@ function SpacesResources({ unitPk }: { unitPk: number }): JSX.Element {
         <NewSpaceModal unit={unit} closeModal={() => closeNewSpaceModal()} refetch={refetch} />
       </HDSModal>
       <LinkPrev />
-      <SubPageHead title={t("Unit.spacesAndResources")} unit={unit} />
+      <SubPageHead title={t("spaces:spacesAndResources")} unit={unit} />
       <Flex $direction="row" $justifyContent="space-between" $alignItems="center">
-        <H2 $noMargin>{t("Unit.spaces")}</H2>
+        <H2 $noMargin>{t("spaces:spaces")}</H2>
         <ActionButton
           ref={newSpacesButtonRef}
           variant={ButtonVariant.Supplementary}
           iconStart={<IconPlusCircleFill />}
           onClick={() => openNewSpaceModal()}
         >
-          {t("Unit.addSpace")}
+          {t("spaces:addSpace")}
         </ActionButton>
       </Flex>
       <SpacesTable unit={unit} refetch={refetch} />
       <Flex $direction="row" $justifyContent="space-between" $alignItems="center">
-        <H2 $noMargin>{t("Unit.resources")}</H2>
+        <H2 $noMargin>{t("spaces:resources")}</H2>
         <ActionButton
           variant={ButtonVariant.Supplementary}
           iconStart={<IconPlusCircleFill />}
@@ -97,7 +97,7 @@ function SpacesResources({ unitPk }: { unitPk: number }): JSX.Element {
             );
           }}
         >
-          {t("Unit.addResource")}
+          {t("spaces:addResource")}
         </ActionButton>
       </Flex>
       <ResourcesTable unit={unit} refetch={refetch} />

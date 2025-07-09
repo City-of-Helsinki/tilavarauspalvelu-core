@@ -49,7 +49,7 @@ export function SpaceHead({ title, space, surfaceArea, maxPersons }: IProps): JS
 
   const unitUrl = getUnitUrl(unit?.pk);
 
-  const address = formatAddress(unit) !== "-" ? formatAddress(unit) : t("SpaceEditor.noAddress");
+  const address = formatAddress(unit) !== "-" ? formatAddress(unit) : t("spaces:noAddress");
 
   return (
     <div>
@@ -57,13 +57,13 @@ export function SpaceHead({ title, space, surfaceArea, maxPersons }: IProps): JS
       <Address>{address}</Address>
       <Props>
         <Prop $disabled={!unit}>
-          <IconLocation /> {unit ? <Link href={unitUrl}>{unit?.nameFi}</Link> : t("SpaceEditor.noUnit")}
+          <IconLocation /> {unit ? <Link href={unitUrl}>{unit?.nameFi}</Link> : t("spaces:noUnit")}
         </Prop>
         <Prop $disabled={!maxPersons}>
-          <IconGroup /> {maxPersons || t("SpaceEditor.noMaxPersons")}
+          <IconGroup /> {maxPersons || t("spaces:noMaxPersons")}
         </Prop>
         <Prop $disabled={!surfaceArea}>
-          {surfaceArea ? t("SpaceEditor.area", { surfaceArea }) : t("SpaceEditor.noSurfaceArea")}
+          {surfaceArea ? t("spaces:SpaceEditor.area", { surfaceArea }) : t("spaces:noSurfaceArea")}
         </Prop>
       </Props>
     </div>

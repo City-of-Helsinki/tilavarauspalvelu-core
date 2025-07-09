@@ -32,7 +32,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
   const { t } = useTranslation();
   const displayError = useDisplayError();
 
-  const { data, loading, refetch } = useResourceQuery({
+  const { data, loading, previousData, refetch } = useResourceQuery({
     variables: {
       id: base64encode(`ResourceNode:${resourcePk}`),
       unitId: base64encode(`UnitNode:${unitPk}`),
@@ -75,7 +75,9 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
     return <CenterSpinner />;
   }
 
-  if (data?.resource == null || data?.unit == null) {
+  const { unit, resource } = data ?? previousData ?? {};
+
+  if (resource == null || unit == null) {
     return <Error404 />;
   }
 
@@ -91,7 +93,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
       });
 
       successToast({
-        text: t("ResourceEditor.resourceUpdatedNotification"),
+        text: t("spaces:resourceUpdatedNotification"),
       });
       refetch();
       router.back();
@@ -100,23 +102,20 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
     }
   };
 
-  const unit = data.unit;
-  const resource = data.resource;
-
   return (
     <>
       <LinkPrev route="../.." />
-      <SubPageHead unit={unit} title={resource.nameFi || t("ResourceEditor.defaultHeading")} />
+      <SubPageHead unit={unit} title={resource.nameFi || t("spaces:ResourceEditor.defaultHeading")} />
       <FormErrorSummary errors={errors} />
       <form noValidate onSubmit={handleSubmit(onSubmit)}>
         <Editor>
           <ResourceEditorFields form={form} unitPk={unitPk} />
           <ButtonContainer>
             <Button onClick={() => router.back()} variant={ButtonVariant.Secondary}>
-              {t("ResourceModal.cancel")}
+              {t("common:cancel")}
             </Button>
             <Button type="submit" disabled={!isDirty}>
-              {t("ResourceModal.save")}
+              {t("common:save")}
             </Button>
           </ButtonContainer>
         </Editor>

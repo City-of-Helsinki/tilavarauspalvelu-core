@@ -23,7 +23,7 @@ export function ResourceEditorFields({
         name="space"
         render={({ field: { onChange, value } }) => (
           <ParentSelector
-            label={t("ResourceModal.selectSpace")}
+            label={t("spaces:ResourceModal.selectSpace")}
             onChange={onChange}
             unitPk={unitPk}
             value={value}
@@ -40,7 +40,7 @@ export function ResourceEditorFields({
           required={fieldName === "nameFi"}
           id={fieldName}
           maxLength={80}
-          label={t(`ResourceEditor.label.${fieldName}`)}
+          label={t(`spaces:ResourceEditor.label.${fieldName}`)}
           errorText={getTranslatedError(t, errors[fieldName]?.message)}
           invalid={form.formState.errors[fieldName]?.message != null}
         />

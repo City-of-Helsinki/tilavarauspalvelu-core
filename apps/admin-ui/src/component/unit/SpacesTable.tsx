@@ -65,7 +65,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
         setSpaceWaitingForDelete(null);
         refetch();
       } else {
-        errorToast({ text: t("SpaceTable.removeFailed") });
+        errorToast({ text: t("spaces:SpaceTable.removeFailed") });
       }
     } catch (err) {
       displayError(err);
@@ -75,8 +75,8 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
   function handleRemoveSpace(space: Pick<SpaceT, "resources" | "pk" | "nameFi">) {
     if (space && space.resources && space?.resources.length > 0) {
       errorToast({
-        text: t("SpaceTable.removeConflictMessage"),
-        label: t("SpaceTable.removeConflictTitle"),
+        text: t("spaces:SpaceTable.removeConflictMessage"),
+        label: t("spaces:SpaceTable.removeConflictTitle"),
       });
       return;
     }
@@ -101,7 +101,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
   // TODO translation keys are wonky, yeah it's under a unit page but the table should be reusable
   const cols: SpacesTableColumn[] = [
     {
-      headerName: t("Unit.headings.name"),
+      headerName: t("spaces:headings.name"),
       key: "nameFi",
       transform: (space: SpaceT) => {
         const { pk, nameFi } = space;
@@ -112,28 +112,28 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
       isSortable: false,
     },
     {
-      headerName: t("Unit.headings.code"),
+      headerName: t("spaces:headings.code"),
       key: "code",
       transform: ({ code }: SpaceT) => trim(code),
       isSortable: false,
     },
     {
-      headerName: t("Unit.headings.numSubSpaces"),
+      headerName: t("spaces:headings.numSubSpaces"),
       key: "numSubSpaces",
       transform: (space) => {
         const count = countSubSpaces(space);
-        return `${count} ${t("SpaceTable.subSpaceCount", { count })}`;
+        return `${count} ${t("spaces:SpaceTable.subSpaceCount", { count })}`;
       },
       isSortable: false,
     },
     {
-      headerName: t("Unit.headings.surfaceArea"),
+      headerName: t("spaces:headings.surfaceArea"),
       key: "surfaceArea",
       transform: ({ surfaceArea }: SpaceT) => (surfaceArea ? `${surfaceArea}m²` : ""),
       isSortable: false,
     },
     {
-      headerName: t("Unit.headings.maxPersons"),
+      headerName: t("spaces:headings.maxPersons"),
       key: "maxPersons",
       // TODO this is weird it creates both the max Persons and the buttons to the same cell
       transform: (space: SpaceT) => (
@@ -147,15 +147,15 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
           <PopupMenu
             items={[
               {
-                name: t("SpaceTable.menuAddSubSpace"),
+                name: t("spaces:SpaceTable.menuAddSubSpace"),
                 onClick: () => handeAddSubSpace(space),
               },
               {
-                name: t("SpaceTable.menuEditSpace"),
+                name: t("spaces:SpaceTable.menuEditSpace"),
                 onClick: () => handleEditSpace(space),
               },
               {
-                name: t("SpaceTable.menuRemoveSpace"),
+                name: t("spaces:SpaceTable.menuRemoveSpace"),
                 onClick: () => handleRemoveSpace(space),
               },
             ]}
@@ -187,12 +187,12 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
         <ConfirmationDialog
           isOpen
           variant="danger"
-          heading={t("SpaceTable.removeConfirmationTitle", {
+          heading={t("spaces:SpaceTable.removeConfirmationTitle", {
             name: spaceWaitingForDelete.nameFi,
           })}
-          content={t("SpaceTable.removeConfirmationMessage")}
-          acceptLabel={t("SpaceTable.removeConfirmationAccept")}
-          cancelLabel={t("SpaceTable.removeConfirmationCancel")}
+          content={t("spaces:SpaceTable.removeConfirmationMessage")}
+          acceptLabel={t("spaces:SpaceTable.removeConfirmationAccept")}
+          cancelLabel={t("spaces:SpaceTable.removeConfirmationCancel")}
           onCancel={() => setSpaceWaitingForDelete(null)}
           onAccept={() => {
             deleteSpace(spaceWaitingForDelete.pk);

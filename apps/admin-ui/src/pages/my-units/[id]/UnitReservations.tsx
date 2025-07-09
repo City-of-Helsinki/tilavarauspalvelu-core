@@ -50,7 +50,7 @@ function UnitReservationsInner({ unitPk, reservationUnitTypes, reservationUnitOp
         date={date}
         resources={resources}
         refetch={refetch}
-        unitPk={Number(unitPk)}
+        unitPk={unitPk}
         isLoading={loading}
         reservationUnitOptions={reservationUnitOptions}
       />

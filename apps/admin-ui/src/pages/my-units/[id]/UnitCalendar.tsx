@@ -5,7 +5,7 @@ import styled, { css } from "styled-components";
 import { ReservationTypeChoice, type ReservationUnitReservationsFragment, UserPermissionChoice } from "@gql/gql-types";
 import { useTranslation, type TFunction } from "next-i18next";
 import { CalendarEvent } from "common/src/calendar/Calendar";
-import { CenterSpinner, focusStyles } from "common/styled";
+import { focusStyles } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { POST_PAUSE, PRE_PAUSE } from "@/common/calendarStyling";
 import { getReserveeName, sortByName } from "@/common/util";
@@ -179,7 +179,7 @@ function RowCells({ hasPermission, cols, ...rest }: CellProps): JSX.Element {
   return (
     <CellContent $numCols={cols} data-testid={testId}>
       {Array.from(Array(cols).keys()).map((i) => (
-        <Cell {...rest} key={i} offset={i} hasPermission={hasPermission ?? false} />
+        <Cell {...rest} key={i} offset={i} hasPermission={hasPermission} />
       ))}
     </CellContent>
   );
@@ -189,7 +189,7 @@ type CellProps = {
   cols: number;
   reservationUnitPk: number;
   date: Date;
-  setModalContent: (content: JSX.Element | null, isHds?: boolean) => void;
+  setModalContent: (content: JSX.Element | null) => void;
   onComplete: () => void;
   reservationUnitOptions: { label: string; value: number }[];
   hasPermission: boolean;
@@ -243,8 +243,7 @@ function Cell({
           setModalContent(null);
           onComplete();
         }}
-      />,
-      true
+      />
     );
   };
 
@@ -444,14 +443,7 @@ type Props = {
   reservationUnitOptions: { label: string; value: number }[];
 };
 
-export function UnitCalendar({
-  unitPk,
-  date,
-  resources,
-  refetch,
-  isLoading,
-  reservationUnitOptions,
-}: Props): JSX.Element {
+export function UnitCalendar({ unitPk, date, resources, refetch, reservationUnitOptions }: Props): JSX.Element {
   const calendarRef = useRef<HTMLDivElement>(null);
   const orderedResources = sortByDraftStatusAndTitle([...resources]);
   const { setModalContent } = useModal();
@@ -506,9 +498,11 @@ export function UnitCalendar({
   const containerHeight = windowHeight - margins;
 
   const height = resources.length > MAX_RESOURCES_WITHOUT_SCROLL ? containerHeight : "auto";
+  /* TODO use a darker background if loading
   if (isLoading) {
     return <CenterSpinner />;
   }
+  */
 
   return (
     <Container $height={height}>
