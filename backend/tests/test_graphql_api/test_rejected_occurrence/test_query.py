@@ -6,7 +6,7 @@ import pytest
 
 from tilavarauspalvelu.enums import RejectionReadinessChoice, Weekday
 
-from tests.factories import RejectedOccurrenceFactory
+from tests.factories import RejectedOccurrenceFactory, UnitGroupFactory
 
 from .helpers import rejected_occurrence_query
 
@@ -127,6 +127,23 @@ def test_rejected_recurrence__filter__by_unit(graphql):
 
     graphql.login_with_superuser()
     query = rejected_occurrence_query(unit=unit.pk)
+    response = graphql(query)
+
+    assert response.has_errors is False
+
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": occurrence.pk}
+
+
+def test_rejected_recurrence__filter__by_unit_group(graphql):
+    unit_group = UnitGroupFactory.create()
+
+    RejectedOccurrenceFactory.create()
+    occurrence = RejectedOccurrenceFactory.create(reservation_series__reservation_unit__unit__unit_groups=[unit_group])
+    RejectedOccurrenceFactory.create()
+
+    graphql.login_with_superuser()
+    query = rejected_occurrence_query(unit_group=[unit_group.pk])
     response = graphql(query)
 
     assert response.has_errors is False

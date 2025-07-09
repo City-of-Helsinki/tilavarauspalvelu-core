@@ -36,6 +36,7 @@ class RejectedOccurrenceFilterSet(ModelFilterSet):
     )
     reservation_unit = IntMultipleChoiceFilter(field_name="reservation_series__reservation_unit")
     unit = IntMultipleChoiceFilter(field_name="reservation_series__reservation_unit__unit")
+    unit_group = IntMultipleChoiceFilter(field_name="reservation_series__reservation_unit__unit__unit_groups")
     text_search = django_filters.CharFilter(method="filter_text_search")
 
     class Meta:
