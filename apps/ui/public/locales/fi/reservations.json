@@ -112,7 +112,7 @@
     "paidByInvoice": "Maksu laskulla",
     "pending": "Odottaa maksua",
     "cancelled": "Maksu Peruttu",
-    "expired": "Maksamatta",
+    "expired": "Ei maksettu",
     "refunded": "Maksu palautettu"
   },
   "reservationEditFailed": "Varauksen muokkaaminen epäonnistui",

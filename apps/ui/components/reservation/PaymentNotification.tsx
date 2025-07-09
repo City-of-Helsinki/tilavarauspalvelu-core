@@ -1,4 +1,3 @@
-import { getServerSideProps } from "@/pages/reservations/[id]";
 import { ReservationCancelReasonChoice, ReservationStateChoice } from "@gql/gql-types";
 import { Notification, NotificationType } from "hds-react";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
@@ -11,11 +10,12 @@ import { useMemo } from "react";
 import { breakpoints } from "common/src/const";
 import { getCheckoutRedirectUrl } from "@/modules/urls";
 
-type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
-
 type PaymentNotificationProps = {
-  reservation: Pick<PropsNarrowed, "reservation">["reservation"];
+  reservation: {
+    pk: number | null;
+    state: ReservationStateChoice | null;
+    cancelReason: ReservationCancelReasonChoice | null;
+  };
   appliedPricing: {
     highestPrice: string;
     taxPercentage: string;
