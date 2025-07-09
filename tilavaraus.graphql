@@ -86,6 +86,7 @@ type Query {
     applicationSectionStatus: [ApplicationSectionStatusChoice]
     applicantType: [ReserveeType]
     allocatedUnit: [Int]
+    unitGroup: [Int]
     allocatedReservationUnit: [Int]
     accessCodeState: [AccessCodeState]
     textSearch: String
@@ -1859,6 +1860,7 @@ type ReservationUnitOptionNode implements Node {
     applicationSectionStatus: [ApplicationSectionStatusChoice]
     applicantType: [ReserveeType]
     allocatedUnit: [Int]
+    unitGroup: [Int]
     allocatedReservationUnit: [Int]
     accessCodeState: [AccessCodeState]
     textSearch: String

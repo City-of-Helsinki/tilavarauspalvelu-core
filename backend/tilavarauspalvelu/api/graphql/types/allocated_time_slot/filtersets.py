@@ -37,6 +37,7 @@ class AllocatedTimeSlotFilterSet(ModelFilterSet):
         enum=ReserveeType,
     )
     allocated_unit = IntMultipleChoiceFilter(field_name="reservation_unit_option__reservation_unit__unit")
+    unit_group = IntMultipleChoiceFilter(field_name="reservation_unit_option__reservation_unit__unit__unit_groups")
     allocated_reservation_unit = IntMultipleChoiceFilter(field_name="reservation_unit_option__reservation_unit")
 
     access_code_state = EnumMultipleChoiceFilter(
