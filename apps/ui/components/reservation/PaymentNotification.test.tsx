@@ -1,3 +1,4 @@
+import { createReservationPageMock } from "@test/reservation.mocks";
 import { render, screen } from "@testing-library/react";
 import PaymentNotification from "@/components/reservation/PaymentNotification";
 import { describe, it, expect } from "vitest";
@@ -7,9 +8,10 @@ import { toUIDateTime } from "common/src/common/util";
 function customRender() {
   const paymentOrder = createPaymentOrderMock();
   const appliedPricing = createAppliedPricingMock();
+  const reservation = createReservationPageMock({});
   return render(
     <PaymentNotification
-      pk={1}
+      reservation={reservation}
       paymentOrder={paymentOrder}
       appliedPricing={appliedPricing}
       apiBaseUrl={"http://localhost:8000"}
