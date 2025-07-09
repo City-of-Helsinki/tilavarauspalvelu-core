@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { gql } from "@apollo/client";
 import { errorToast } from "common/src/common/toast";
 import { useCheckPermission } from "@/hooks";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { isApplicationRoundInProgress } from "@/helpers";
-import { CenterSpinner, Flex, TabWrapper, TitleSection, H1 } from "common/styled";
+import { CenterSpinner, Flex, H1, TabWrapper, TitleSection } from "common/styled";
 import { Button, Tabs } from "hds-react";
 import { uniqBy } from "lodash-es";
 import styled from "styled-components";
 import {
-  type Maybe,
-  ApplicationRoundStatusChoice,
   type ApplicationRoundAdminFragment,
-  UserPermissionChoice,
-  useApplicationRoundQuery,
+  ApplicationRoundStatusChoice,
   CurrentUserQuery,
+  type Maybe,
+  useApplicationRoundQuery,
+  UserPermissionChoice,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { ApplicationRoundStatusLabel } from "./../ApplicationRoundStatusLabel";
@@ -30,12 +30,11 @@ import { hasPermission } from "@/modules/permissionHelper";
 import { useSession } from "@/hooks/auth";
 import { ReviewEndAllocation } from "./review/ReviewEndAllocation";
 
-const TabContent = styled.div`
-  display: grid;
-  gap: var(--spacing-m);
-  margin-top: var(--spacing-s);
-  line-height: 1;
-`;
+const TabContent = styled(Flex).attrs({
+  $direction: "column",
+  $gap: "m",
+  $marginTop: "s",
+})``;
 
 function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   const { t } = useTranslation();
@@ -139,6 +138,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
         </div>
         <ApplicationRoundStatusLabel status={applicationRound.status} />
       </TitleSection>
+
       <Flex $justifyContent="space-between" $direction="row-reverse" $alignItems="center">
         {!hideAllocation &&
           (isAllocationEnabled(applicationRound) ? (
@@ -152,6 +152,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
           <ReviewEndAllocation applicationRound={applicationRound} refetch={refetch} />
         ) : null}
       </Flex>
+
       <TabWrapper>
         <Tabs initiallyActiveTab={activeTabIndex}>
           <Tabs.TabList>

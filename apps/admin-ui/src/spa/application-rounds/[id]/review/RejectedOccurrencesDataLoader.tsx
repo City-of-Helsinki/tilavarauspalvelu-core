@@ -12,6 +12,7 @@ import { useTranslation } from "next-i18next";
 import { getFilteredUnits } from "./utils";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { CenterSpinner } from "common/styled";
+import { mapParamToNumber } from "@/helpers";
 
 type Props = {
   applicationRoundPk: number;
@@ -24,6 +25,7 @@ export function RejectedOccurrencesDataLoader({ applicationRoundPk, unitOptions 
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
   const [searchParams] = useSearchParams();
   const unitFilter = searchParams.getAll("unit");
+  const unitGroupFilter = mapParamToNumber(searchParams.getAll("unitGroup"), 1);
   const reservationUnitFilter = searchParams.getAll("reservationUnit");
   const nameFilter = searchParams.get("search");
 
@@ -32,6 +34,7 @@ export function RejectedOccurrencesDataLoader({ applicationRoundPk, unitOptions 
       first: LIST_PAGE_SIZE,
       applicationRound: applicationRoundPk,
       unit: getFilteredUnits(unitFilter, unitOptions),
+      unitGroup: unitGroupFilter,
       reservationUnit: reservationUnitFilter.map(Number).filter(Number.isFinite),
       orderBy: transformOrderBy(orderBy),
       textSearch: nameFilter,
@@ -123,6 +126,7 @@ export const REJECTED_OCCURRENCES_QUERY = gql`
   query RejectedOccurrences(
     $applicationRound: Int
     $unit: [Int]
+    $unitGroup: [Int]
     $reservationUnit: [Int]
     $orderBy: [RejectedOccurrenceOrderingChoices]
     $textSearch: String
@@ -132,6 +136,7 @@ export const REJECTED_OCCURRENCES_QUERY = gql`
     rejectedOccurrences(
       applicationRound: $applicationRound
       unit: $unit
+      unitGroup: $unitGroup
       reservationUnit: $reservationUnit
       orderBy: $orderBy
       textSearch: $textSearch

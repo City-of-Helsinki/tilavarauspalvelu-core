@@ -5,6 +5,7 @@ import { SearchTags } from "@/component/SearchTags";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { AccessCodeState, ApplicationSectionStatusChoice, ReserveeType } from "@gql/gql-types";
 import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
+import { useUnitGroupOptions } from "@/hooks/useUnitGroupOptions";
 
 type UnitPkName = {
   pk: number;
@@ -32,6 +33,8 @@ export function Filters({
 }: Props): JSX.Element {
   const { t } = useTranslation();
 
+  const { options: unitGroupOptions } = useUnitGroupOptions();
+
   const unitOptions = units.map((unit) => ({
     label: unit?.nameFi ?? "",
     value: unit?.pk ?? "",
@@ -54,6 +57,8 @@ export function Filters({
 
   const translateTag = (key: string, value: string) => {
     switch (key) {
+      case "unitGroup":
+        return unitGroupOptions.find((u) => u.value === Number(value))?.label ?? "-";
       case "unit":
         return unitOptions.find((u) => u.value === Number(value))?.label ?? "-";
       case "status":
@@ -104,6 +109,7 @@ export function Filters({
   return (
     <>
       <AutoGrid>
+        <MultiSelectFilter name="unitGroup" options={unitGroupOptions} />
         <MultiSelectFilter name="unit" options={unitOptions} />
         {statusOption !== "application" ? (
           eventStatusOptions.length > 0 ? (
@@ -112,9 +118,9 @@ export function Filters({
         ) : (
           <MultiSelectFilter name="status" options={statusOptions} />
         )}
+        {enableReservationUnit && <MultiSelectFilter name="reservationUnit" options={reservationUnitOptions} />}
         {enableApplicant && <MultiSelectFilter name="applicant" options={applicantOptions} />}
         {enableWeekday && <MultiSelectFilter name="weekday" options={weekdayOptions} />}
-        {enableReservationUnit && <MultiSelectFilter name="reservationUnit" options={reservationUnitOptions} />}
         {enableAccessCodeState && <MultiSelectFilter name="accessCodeState" options={accessCodeOptions} />}
         <SearchFilter name="search" />
       </AutoGrid>

@@ -18,6 +18,7 @@ import { transformWeekday } from "common/src/conversion";
 import { type DayT } from "common/src/const";
 import { getPermissionErrors } from "common/src/apolloUtils";
 import { CenterSpinner } from "common/styled";
+import { mapParamToNumber } from "@/helpers";
 
 type Props = {
   applicationRoundPk: number;
@@ -28,8 +29,10 @@ export function TimeSlotDataLoader({ unitOptions, applicationRoundPk }: Props): 
   const { t } = useTranslation();
 
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
+
   const [searchParams] = useSearchParams();
   const unitFilter = searchParams.getAll("unit");
+  const unitGroupFilter = mapParamToNumber(searchParams.getAll("unitGroup"), 1);
   const applicantFilter = searchParams.getAll("applicant");
   const nameFilter = searchParams.get("search");
   const weekDayFilter = searchParams.getAll("weekday");
@@ -40,6 +43,7 @@ export function TimeSlotDataLoader({ unitOptions, applicationRoundPk }: Props): 
     skip: !applicationRoundPk,
     variables: {
       allocatedUnit: getFilteredUnits(unitFilter, unitOptions),
+      unitGroup: unitGroupFilter,
       applicationRound: applicationRoundPk,
       applicantType: transformApplicantType(applicantFilter),
       applicationSectionStatus: [ApplicationSectionStatusChoice.Handled, ApplicationSectionStatusChoice.InAllocation],
@@ -136,6 +140,7 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
   query AllocatedTimeSlots(
     $applicationRound: Int!
     $allocatedUnit: [Int]
+    $unitGroup: [Int]
     $applicantType: [ReserveeType]
     $applicationSectionStatus: [ApplicationSectionStatusChoice]
     $allocatedReservationUnit: [Int]
@@ -151,6 +156,7 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
       first: $first
       applicationRound: $applicationRound
       allocatedUnit: $allocatedUnit
+      unitGroup: $unitGroup
       applicantType: $applicantType
       applicationSectionStatus: $applicationSectionStatus
       allocatedReservationUnit: $allocatedReservationUnit

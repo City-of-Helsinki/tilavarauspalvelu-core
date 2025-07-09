@@ -11,6 +11,7 @@ import { useSort } from "@/hooks/useSort";
 import { ApplicationSectionsTable, SORT_KEYS } from "./ApplicationSectionsTable";
 import { transformApplicantType, transformApplicationSectionStatus } from "./utils";
 import { CenterSpinner } from "common/styled";
+import { mapParamToNumber } from "@/helpers";
 
 type Props = {
   applicationRoundPk: number;
@@ -20,7 +21,8 @@ export function ApplicationSectionDataLoader({ applicationRoundPk }: Props): JSX
   const { t } = useTranslation();
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
   const [searchParams] = useSearchParams();
-  const unitFilter = searchParams.getAll("unit");
+  const unitFilter = mapParamToNumber(searchParams.getAll("unit"), 1);
+  const unitGroupFilter = mapParamToNumber(searchParams.getAll("unitGroup"), 1);
   const applicantFilter = searchParams.getAll("applicant");
   const nameFilter = searchParams.get("search");
   const eventStatusFilter = searchParams.getAll("eventStatus");
@@ -29,7 +31,8 @@ export function ApplicationSectionDataLoader({ applicationRoundPk }: Props): JSX
     skip: !applicationRoundPk,
     variables: {
       first: LIST_PAGE_SIZE,
-      unit: unitFilter.map(Number).filter(Number.isFinite),
+      unit: unitFilter,
+      unitGroup: unitGroupFilter,
       applicationRound: applicationRoundPk,
       applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
       status: transformApplicationSectionStatus(eventStatusFilter),
@@ -114,6 +117,7 @@ export const APPLICATION_SECTIONS_QUERY = gql`
     $applicationStatus: [ApplicationStatusChoice]!
     $status: [ApplicationSectionStatusChoice]
     $unit: [Int]
+    $unitGroup: [Int]
     $applicantType: [ReserveeType]
     $preferredOrder: [Int]
     $textSearch: String
@@ -132,6 +136,7 @@ export const APPLICATION_SECTIONS_QUERY = gql`
       applicationStatus: $applicationStatus
       status: $status
       unit: $unit
+      unitGroup: $unitGroup
       applicantType: $applicantType
       preferredOrder: $preferredOrder
       textSearch: $textSearch

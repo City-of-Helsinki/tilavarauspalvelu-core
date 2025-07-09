@@ -11,6 +11,7 @@ import { useSort } from "@/hooks/useSort";
 import { ApplicationsTable, SORT_KEYS } from "./ApplicationsTable";
 import { transformApplicantType, transformApplicationStatuses } from "./utils";
 import { CenterSpinner } from "common/styled";
+import { mapParamToNumber } from "@/helpers";
 
 type Props = {
   applicationRoundPk: number;
@@ -21,7 +22,8 @@ export function ApplicationDataLoader({ applicationRoundPk }: Props): JSX.Elemen
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
 
   const [searchParams] = useSearchParams();
-  const unitFilter = searchParams.getAll("unit");
+  const unitFilter = mapParamToNumber(searchParams.getAll("unit"), 1);
+  const unitGroupFilter = mapParamToNumber(searchParams.getAll("unitGroup"), 1);
   const statusFilter = searchParams.getAll("status");
   const applicantFilter = searchParams.getAll("applicant");
   const nameFilter = searchParams.get("search");
@@ -31,7 +33,8 @@ export function ApplicationDataLoader({ applicationRoundPk }: Props): JSX.Elemen
     variables: {
       first: LIST_PAGE_SIZE,
       applicationRound: applicationRoundPk,
-      unit: unitFilter.map(Number).filter(Number.isFinite),
+      unit: unitFilter,
+      unitGroup: unitGroupFilter,
       status: transformApplicationStatuses(statusFilter),
       applicantType: transformApplicantType(applicantFilter),
       textSearch: nameFilter,
@@ -104,6 +107,7 @@ export const APPLICATIONS_QUERY = gql`
   query Applications(
     $applicationRound: Int!
     $unit: [Int]
+    $unitGroup: [Int]
     $applicantType: [ReserveeType]
     $status: [ApplicationStatusChoice]!
     $textSearch: String
@@ -114,6 +118,7 @@ export const APPLICATIONS_QUERY = gql`
     applications(
       applicationRound: $applicationRound
       unit: $unit
+      unitGroup: $unitGroup
       applicantType: $applicantType
       status: $status
       textSearch: $textSearch
