@@ -72,7 +72,11 @@
   },
   "paymentBanner": {
     "title": "Din bokning väntar på betalning",
-    "description": "Din bokning har bekräftats. Vänligen betala online eller välj faktura som betalningsmetod inom tidsfristen, annars kommer bokningen automatiskt att avbokas."
+    "description": "Din bokning har bekräftats. Vänligen betala online eller välj faktura som betalningsmetod inom tidsfristen, annars kommer bokningen automatiskt att avbokas.",
+    "expired": {
+      "title": "Din bokning har avbokats",
+      "description": "Bokningen har avbokats eftersom den inte betalades eller en faktura inte valdes som betalningsmetod före tidsfristen."
+    }
   },
   "purpose": "Användningsändamål",
   "ageGroup": "Åldersgrupp",

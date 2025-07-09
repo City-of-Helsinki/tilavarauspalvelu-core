@@ -1,3 +1,5 @@
+import { getServerSideProps } from "@/pages/reservations/[id]";
+import { ReservationCancelReasonChoice, ReservationStateChoice } from "@gql/gql-types";
 import { Notification, NotificationType } from "hds-react";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { useTranslation } from "next-i18next";
@@ -9,8 +11,11 @@ import { useMemo } from "react";
 import { breakpoints } from "common/src/const";
 import { getCheckoutRedirectUrl } from "@/modules/urls";
 
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
+
 type PaymentNotificationProps = {
-  pk: number;
+  reservation: Pick<PropsNarrowed, "reservation">["reservation"];
   appliedPricing: {
     highestPrice: string;
     taxPercentage: string;
@@ -18,7 +23,7 @@ type PaymentNotificationProps = {
   paymentOrder: {
     handledPaymentDueBy: string | null;
     checkoutUrl: string | null;
-  };
+  } | null;
   apiBaseUrl: string;
 };
 
@@ -35,7 +40,12 @@ const PriceDetails = styled.div`
   }
 `;
 
-export const PaymentNotification = ({ pk, appliedPricing, paymentOrder, apiBaseUrl }: PaymentNotificationProps) => {
+export const PaymentNotification = ({
+  reservation,
+  appliedPricing,
+  paymentOrder,
+  apiBaseUrl,
+}: PaymentNotificationProps) => {
   const { t, i18n } = useTranslation();
   const formatters = useMemo(() => getFormatters(i18n.language), [i18n.language]);
   const formatter = formatters["currencyWithDecimals"];
@@ -43,15 +53,18 @@ export const PaymentNotification = ({ pk, appliedPricing, paymentOrder, apiBaseU
   const taxPercentage = formatters.strippedDecimal?.format(parseFloat(appliedPricing?.taxPercentage ?? "")) ?? "0";
   const deadline = toUIDateTime(new Date(paymentOrder?.handledPaymentDueBy ?? ""));
   const lang = convertLanguageCode(i18n.language);
-
+  const isExpired =
+    reservation.state === ReservationStateChoice.Cancelled &&
+    reservation.cancelReason === ReservationCancelReasonChoice.NotPaid;
+  const translationPath = isExpired ? "reservation:paymentBanner.expired" : "reservations:paymentBanner";
   return (
     <Notification
       data-testid="reservation__payment-notification"
       type={"alert" as NotificationType}
-      label={t("reservations:paymentBanner.title")}
+      label={t(`${translationPath}.title`)}
     >
       <Flex $direction={"column"} $gap={"2-xs"}>
-        {t("reservations:paymentBanner.description")}
+        {t(`${translationPath}.description`)}
         <PriceDetails>
           <div data-testid="reservation__payment-notification__price">
             {t("common:price")}: {price}
@@ -60,9 +73,11 @@ export const PaymentNotification = ({ pk, appliedPricing, paymentOrder, apiBaseU
           <div data-testid="reservation__payment-notification__deadline">
             {t("common:deadline")}: {deadline}
           </div>
-          <ButtonLikeLink href={getCheckoutRedirectUrl(pk ?? 0, lang, apiBaseUrl)} variant="primary">
-            {t("reservations:payReservation")}
-          </ButtonLikeLink>
+          {!isExpired && (
+            <ButtonLikeLink href={getCheckoutRedirectUrl(reservation.pk ?? 0, lang, apiBaseUrl)} variant="primary">
+              {t("reservations:payReservation")}
+            </ButtonLikeLink>
+          )}
         </PriceDetails>
       </Flex>
     </Notification>
