@@ -72,7 +72,11 @@
   },
   "paymentBanner": {
     "title": "Varauksesi odottaa maksua",
-    "description": "Varauksesi on vahvistettu. Maksa varaus verkossa tai valitse maksutavaksi lasku määräaikaan mennessä, muuten varaus peruuntuu automaattisesti."
+    "description": "Varauksesi on vahvistettu. Maksa varaus verkossa tai valitse maksutavaksi lasku määräaikaan mennessä, muuten varaus peruuntuu automaattisesti.",
+    "expired": {
+      "title": "Varauksesi on peruttu",
+      "description": "Varaus on peruttu, koska varausta ei maksettu tai laskua valittu maksutavaksi määräaikaan mennessä."
+    }
   },
   "purpose": "Käyttötarkoitus",
   "ageGroup": "Ikäryhmä",

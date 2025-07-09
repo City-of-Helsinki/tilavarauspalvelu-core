@@ -72,7 +72,11 @@
   },
   "paymentBanner": {
     "title": "Your booking is waiting for payment",
-    "description": "Your booking is confirmed. Pay online or select invoice as the payment method before the deadline, otherwise the booking will be automatically cancelled."
+    "description": "Your booking is confirmed. Pay online or select invoice as the payment method before the deadline, otherwise the booking will be automatically cancelled.",
+    "expired": {
+      "title": "Your booking has been cancelled",
+      "description": "The booking has been cancelled because it was not paid or an invoice was not selected as the payment method before the deadline."
+    }
   },
   "purpose": "Purpose of use",
   "ageGroup": "Age group",
