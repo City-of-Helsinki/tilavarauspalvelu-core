@@ -150,7 +150,7 @@ export const REJECTED_OCCURRENCES_QUERY = gql`
       }
       edges {
         node {
-          ...RejectedOccurancesTableElement
+          ...RejectedOccurrencesTableElement
         }
       }
     }

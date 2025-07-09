@@ -1,7 +1,7 @@
 import React from "react";
 import { CustomTable } from "@/component/Table";
 import { getApplicationUrl, getReservationUrl } from "@/common/urls";
-import type { RejectedOccurancesTableElementFragment } from "@gql/gql-types";
+import type { RejectedOccurrencesTableElementFragment } from "@gql/gql-types";
 import { truncate } from "common/src/helpers";
 import { IconLinkExternal, IconSize } from "hds-react";
 import { memoize } from "lodash-es";
@@ -19,7 +19,7 @@ const applicantTruncateLen = 20;
 type Props = {
   sort: string | null;
   sortChanged: (field: string) => void;
-  rejectedOccurrences: RejectedOccurancesTableElementFragment[];
+  rejectedOccurrences: RejectedOccurrencesTableElementFragment[];
   isLoading?: boolean;
 };
 
@@ -36,7 +36,7 @@ type RejectedOccurrencesView = {
   link: string;
 };
 
-function timeSlotMapper(t: TFunction, slot: RejectedOccurancesTableElementFragment): RejectedOccurrencesView {
+function timeSlotMapper(t: TFunction, slot: RejectedOccurrencesTableElementFragment): RejectedOccurrencesView {
   const allocatedSlot = slot.reservationSeries?.allocatedTimeSlot;
   const allocatedReservationUnit = allocatedSlot?.reservationUnitOption.reservationUnit;
   const allocatedReservationUnitName = allocatedReservationUnit?.nameFi ?? "-";
@@ -166,8 +166,8 @@ export function RejectedOccurrencesTable({
   );
 }
 
-export const REJECTED_OCCURANCES_TABLE_ELEMENT_FRAGMENT = gql`
-  fragment RejectedOccurancesTableElement on RejectedOccurrenceNode {
+export const REJECTED_OCCURRENCES_TABLE_ELEMENT_FRAGMENT = gql`
+  fragment RejectedOccurrencesTableElement on RejectedOccurrenceNode {
     id
     pk
     beginDatetime
