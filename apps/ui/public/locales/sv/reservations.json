@@ -116,7 +116,7 @@
     "paidByInvoice": "Betalas med faktura",
     "pending": "Inväntar betalning",
     "cancelled": "Betalning avbokad",
-    "expired": "Obetald",
+    "expired": "Ej betald",
     "refunded": "Återbetald"
   },
   "reservationEditFailed": "Det gick inte att redigera bokningen",
