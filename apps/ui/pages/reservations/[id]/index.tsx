@@ -19,6 +19,7 @@ import {
   AccessType,
   type AccessCodeQuery,
   MunicipalityChoice,
+  ReservationCancelReasonChoice,
 } from "@gql/gql-types";
 import Link from "next/link";
 import { isBefore, sub } from "date-fns";
@@ -137,6 +138,15 @@ function shouldShowStatusNotification(
   }
 }
 
+function shouldShowPaymentNotification(reservation: Pick<PropsNarrowed, "reservation">["reservation"]): boolean {
+  return (
+    (reservation.state === ReservationStateChoice.Confirmed &&
+      reservation.paymentOrder?.status === OrderStatus.Pending) ||
+    (reservation.state === ReservationStateChoice.Cancelled &&
+      reservation.cancelReason === ReservationCancelReasonChoice.NotPaid)
+  );
+}
+
 // TODO add a state check => if state is Created redirect to the reservation funnel
 // if state is Cancelled, Denied, WaitingForPayment what then?
 function Reservation({
@@ -219,9 +229,6 @@ function Reservation({
     (reservation.paymentOrder?.status === OrderStatus.Paid ||
       reservation.paymentOrder?.status === OrderStatus.Refunded ||
       reservation.paymentOrder?.status === OrderStatus.PaidByInvoice);
-
-  const shouldShowPaymentNotification =
-    reservation.paymentOrder?.status === OrderStatus.Pending && reservation.state === ReservationStateChoice.Confirmed;
 
   return (
     <>
@@ -339,9 +346,9 @@ function Reservation({
           <NotModifiableReason {...reservation} />
         </div>
         <Flex>
-          {shouldShowPaymentNotification && (
+          {shouldShowPaymentNotification(reservation) && (
             <PaymentNotification
-              pk={reservation.pk ?? 0}
+              reservation={reservation}
               paymentOrder={reservation.paymentOrder}
               appliedPricing={reservation.appliedPricing}
               apiBaseUrl={apiBaseUrl}
@@ -510,6 +517,7 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
       ...Instructions
       ...CanReservationBeChanged
       calendarUrl
+      cancelReason
       paymentOrder {
         id
         status
