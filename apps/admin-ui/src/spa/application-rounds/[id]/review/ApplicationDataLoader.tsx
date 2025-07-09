@@ -1,6 +1,5 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "next-i18next";
 import { ApplicationOrderingChoices, useApplicationsQuery } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
@@ -9,9 +8,8 @@ import { errorToast } from "common/src/common/toast";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
 import { ApplicationsTable, SORT_KEYS } from "./ApplicationsTable";
-import { transformApplicantType, transformApplicationStatuses } from "./utils";
+import { useGetFilterSearchParams } from "./utils";
 import { CenterSpinner } from "common/styled";
-import { mapParamToNumber } from "@/helpers";
 
 type Props = {
   applicationRoundPk: number;
@@ -21,24 +19,19 @@ export function ApplicationDataLoader({ applicationRoundPk }: Props): JSX.Elemen
   const { t } = useTranslation();
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
 
-  const [searchParams] = useSearchParams();
-  const unitFilter = mapParamToNumber(searchParams.getAll("unit"), 1);
-  const unitGroupFilter = mapParamToNumber(searchParams.getAll("unitGroup"), 1);
-  const statusFilter = searchParams.getAll("status");
-  const applicantFilter = searchParams.getAll("applicant");
-  const nameFilter = searchParams.get("search");
+  const { textFilter, unitFilter, unitGroupFilter, statusFilter, applicantTypeFilter } = useGetFilterSearchParams();
 
   const { fetchMore, previousData, loading, data } = useApplicationsQuery({
     skip: !applicationRoundPk,
     variables: {
       first: LIST_PAGE_SIZE,
       applicationRound: applicationRoundPk,
+      orderBy: transformOrderBy(orderBy),
+      textSearch: textFilter,
       unit: unitFilter,
       unitGroup: unitGroupFilter,
-      status: transformApplicationStatuses(statusFilter),
-      applicantType: transformApplicantType(applicantFilter),
-      textSearch: nameFilter,
-      orderBy: transformOrderBy(orderBy),
+      status: statusFilter,
+      applicantType: applicantTypeFilter,
     },
     onError: () => {
       errorToast({ text: t("errors.errorFetchingData") });

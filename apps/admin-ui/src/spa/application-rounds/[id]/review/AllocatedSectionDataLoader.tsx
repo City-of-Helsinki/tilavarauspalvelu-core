@@ -1,8 +1,8 @@
 import React from "react";
-import { gql, type ApolloError } from "@apollo/client";
+import { type ApolloError, gql } from "@apollo/client";
 import {
-  ApplicationSectionStatusChoice,
   AllocatedTimeSlotOrderingChoices,
+  ApplicationSectionStatusChoice,
   useAllocatedTimeSlotsQuery,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
@@ -11,14 +11,10 @@ import { LIST_PAGE_SIZE } from "@/common/const";
 import { errorToast } from "common/src/common/toast";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
-import { getFilteredUnits, transformAccessCodeState, transformApplicantType } from "./utils";
-import { useSearchParams } from "react-router-dom";
+import { getFilteredUnits, useGetFilterSearchParams } from "./utils";
 import { AllocatedSectionsTable, SORT_KEYS } from "./AllocatedSectionsTable";
-import { transformWeekday } from "common/src/conversion";
-import { type DayT } from "common/src/const";
 import { getPermissionErrors } from "common/src/apolloUtils";
 import { CenterSpinner } from "common/styled";
-import { mapParamToNumber } from "@/helpers";
 
 type Props = {
   applicationRoundPk: number;
@@ -30,33 +26,30 @@ export function TimeSlotDataLoader({ unitOptions, applicationRoundPk }: Props): 
 
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
 
-  const [searchParams] = useSearchParams();
-  const unitFilter = searchParams.getAll("unit");
-  const unitGroupFilter = mapParamToNumber(searchParams.getAll("unitGroup"), 1);
-  const applicantFilter = searchParams.getAll("applicant");
-  const nameFilter = searchParams.get("search");
-  const weekDayFilter = searchParams.getAll("weekday");
-  const reservationUnitFilter = searchParams.getAll("reservationUnit");
-  const accessCodeState = searchParams.getAll("accessCodeState");
+  const {
+    textFilter,
+    unitFilter,
+    unitGroupFilter,
+    reservationUnitFilter,
+    applicantTypeFilter,
+    accessCodeStateFilter,
+    weekDayFilter,
+  } = useGetFilterSearchParams();
 
   const query = useAllocatedTimeSlotsQuery({
     skip: !applicationRoundPk,
     variables: {
+      first: LIST_PAGE_SIZE,
+      applicationRound: applicationRoundPk,
+      orderBy: transformOrderBy(orderBy),
+      textSearch: textFilter,
       allocatedUnit: getFilteredUnits(unitFilter, unitOptions),
       unitGroup: unitGroupFilter,
-      applicationRound: applicationRoundPk,
-      applicantType: transformApplicantType(applicantFilter),
+      allocatedReservationUnit: reservationUnitFilter,
+      applicantType: applicantTypeFilter,
       applicationSectionStatus: [ApplicationSectionStatusChoice.Handled, ApplicationSectionStatusChoice.InAllocation],
-      dayOfTheWeek: weekDayFilter
-        .map(Number)
-        .filter(Number.isFinite)
-        .filter((n): n is DayT => n >= 0 && n <= 6)
-        .map(transformWeekday),
-      allocatedReservationUnit: reservationUnitFilter.map(Number).filter(Number.isFinite),
-      accessCodeState: transformAccessCodeState(accessCodeState),
-      textSearch: nameFilter,
-      first: LIST_PAGE_SIZE,
-      orderBy: transformOrderBy(orderBy),
+      accessCodeState: accessCodeStateFilter,
+      dayOfTheWeek: weekDayFilter,
     },
     onError: (err: ApolloError) => {
       const permErrors = getPermissionErrors(err);

@@ -1,7 +1,6 @@
 import { errorToast } from "common/src/common/toast";
 import { useSort } from "@/hooks/useSort";
 import { RejectedOccurrencesTable, SORT_KEYS } from "./RejectedOccurrencesTable";
-import { useSearchParams } from "react-router-dom";
 import { type ApolloError, gql } from "@apollo/client";
 import { RejectedOccurrenceOrderingChoices, useRejectedOccurrencesQuery } from "@gql/gql-types";
 import { More } from "@/component/More";
@@ -9,10 +8,9 @@ import React from "react";
 import { filterNonNullable } from "common/src/helpers";
 import { getPermissionErrors } from "common/src/apolloUtils";
 import { useTranslation } from "next-i18next";
-import { getFilteredUnits } from "./utils";
+import { getFilteredUnits, useGetFilterSearchParams } from "./utils";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { CenterSpinner } from "common/styled";
-import { mapParamToNumber } from "@/helpers";
 
 type Props = {
   applicationRoundPk: number;
@@ -23,21 +21,18 @@ export function RejectedOccurrencesDataLoader({ applicationRoundPk, unitOptions 
   const { t } = useTranslation();
 
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
-  const [searchParams] = useSearchParams();
-  const unitFilter = searchParams.getAll("unit");
-  const unitGroupFilter = mapParamToNumber(searchParams.getAll("unitGroup"), 1);
-  const reservationUnitFilter = searchParams.getAll("reservationUnit");
-  const nameFilter = searchParams.get("search");
+
+  const { textFilter, unitFilter, unitGroupFilter, reservationUnitFilter } = useGetFilterSearchParams();
 
   const { data, previousData, loading, fetchMore } = useRejectedOccurrencesQuery({
     variables: {
       first: LIST_PAGE_SIZE,
       applicationRound: applicationRoundPk,
+      orderBy: transformOrderBy(orderBy),
+      textSearch: textFilter,
       unit: getFilteredUnits(unitFilter, unitOptions),
       unitGroup: unitGroupFilter,
-      reservationUnit: reservationUnitFilter.map(Number).filter(Number.isFinite),
-      orderBy: transformOrderBy(orderBy),
-      textSearch: nameFilter,
+      reservationUnit: reservationUnitFilter,
     },
     onError: (err: ApolloError) => {
       const permErrors = getPermissionErrors(err);
@@ -52,7 +47,6 @@ export function RejectedOccurrencesDataLoader({ applicationRoundPk, unitOptions 
   });
 
   const dataToUse = data ?? previousData;
-
   if (loading && !dataToUse) {
     return <CenterSpinner />;
   }

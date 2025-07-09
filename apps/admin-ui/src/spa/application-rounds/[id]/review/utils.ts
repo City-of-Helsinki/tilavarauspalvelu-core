@@ -10,8 +10,12 @@ import {
 } from "@gql/gql-types";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { formatNumber } from "@/common/util";
+import { useSearchParams } from "react-router-dom";
+import { mapParamToNumber } from "@/helpers";
+import type { DayT } from "common/src/const";
+import { transformWeekday } from "common/src/conversion";
 
-export function transformApplicationSectionStatus(status: string[]): ApplicationSectionStatusChoice[] {
+function transformApplicationSectionStatus(status: string[]): ApplicationSectionStatusChoice[] {
   return status
     .map((s) => {
       switch (s) {
@@ -30,7 +34,7 @@ export function transformApplicationSectionStatus(status: string[]): Application
     .filter((s): s is NonNullable<typeof s> => s != null);
 }
 
-export function transformApplicationStatuses(filters: string[]): ApplicationStatusChoice[] {
+function transformApplicationStatuses(filters: string[]): ApplicationStatusChoice[] {
   if (filters.length === 0) {
     return VALID_ALLOCATION_APPLICATION_STATUSES;
   }
@@ -52,7 +56,7 @@ export function transformApplicationStatuses(filters: string[]): ApplicationStat
     .filter((asc): asc is NonNullable<typeof asc> => asc != null);
 }
 
-export function transformApplicantType(filters: string[]): ReserveeType[] {
+function transformApplicantType(filters: string[]): ReserveeType[] {
   return filters
     .map((filter) => {
       switch (filter) {
@@ -69,7 +73,7 @@ export function transformApplicantType(filters: string[]): ReserveeType[] {
     .filter((at): at is NonNullable<typeof at> => at != null);
 }
 
-export function transformAccessCodeState(filters: string[]): AccessCodeState[] {
+function transformAccessCodeState(filters: string[]): AccessCodeState[] {
   return filters
     .map((f) => {
       switch (f) {
@@ -86,7 +90,24 @@ export function transformAccessCodeState(filters: string[]): AccessCodeState[] {
     .filter((act): act is NonNullable<typeof act> => act != null);
 }
 
-const formatters = getFormatters("fi");
+export function useGetFilterSearchParams() {
+  // Process search params from the URL to get filter values used in the application review data loaders
+  const [searchParams] = useSearchParams();
+
+  return {
+    textFilter: searchParams.get("search"),
+    unitFilter: mapParamToNumber(searchParams.getAll("unit"), 1),
+    unitGroupFilter: mapParamToNumber(searchParams.getAll("unitGroup"), 1),
+    reservationUnitFilter: mapParamToNumber(searchParams.getAll("reservationUnit"), 1),
+    statusFilter: transformApplicationStatuses(searchParams.getAll("status")),
+    sectionStatusFilter: transformApplicationSectionStatus(searchParams.getAll("sectionStatus")),
+    applicantTypeFilter: transformApplicantType(searchParams.getAll("applicant")),
+    accessCodeStateFilter: transformAccessCodeState(searchParams.getAll("accessCodeState")),
+    weekDayFilter: mapParamToNumber(searchParams.getAll("weekday"))
+      .filter((n): n is DayT => n >= 0 && n <= 6)
+      .map(transformWeekday),
+  };
+}
 
 export function calculateAppliedReservationTime(
   ae: Pick<
@@ -107,6 +128,7 @@ export function calculateAppliedReservationTime(
   return { count: turns, hours: totalHours };
 }
 
+const formatters = getFormatters("fi");
 export function formatAppliedReservationTime(time: { count: number; hours: number }): string {
   const { count, hours } = time;
   return `${formatNumber(count, "")} / ${formatters.oneDecimal?.format(hours) ?? hours} t`;
@@ -114,7 +136,6 @@ export function formatAppliedReservationTime(time: { count: number; hours: numbe
 
 /// Clean query param selection and filter by possible units
 /// @return array of selected unit pks or all possible unit pks
-export function getFilteredUnits(unitFilter: string[], possibleUnits: { nameFi: string; pk: number }[]): number[] {
-  const units = unitFilter.map(Number).filter(Number.isFinite);
-  return units.length > 0 ? units : possibleUnits.map((u) => u.pk);
+export function getFilteredUnits(unitFilter: number[], possibleUnits: { nameFi: string; pk: number }[]): number[] {
+  return unitFilter.length > 0 ? unitFilter : possibleUnits.map((u) => u.pk);
 }

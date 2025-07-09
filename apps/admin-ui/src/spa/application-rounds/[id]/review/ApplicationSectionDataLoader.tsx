@@ -1,6 +1,5 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import { useSearchParams } from "react-router-dom";
 import { ApplicationSectionOrderingChoices, useApplicationSectionsQuery } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
@@ -9,9 +8,8 @@ import { errorToast } from "common/src/common/toast";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
 import { ApplicationSectionsTable, SORT_KEYS } from "./ApplicationSectionsTable";
-import { transformApplicantType, transformApplicationSectionStatus } from "./utils";
+import { useGetFilterSearchParams } from "./utils";
 import { CenterSpinner } from "common/styled";
-import { mapParamToNumber } from "@/helpers";
 
 type Props = {
   applicationRoundPk: number;
@@ -19,26 +17,25 @@ type Props = {
 
 export function ApplicationSectionDataLoader({ applicationRoundPk }: Props): JSX.Element {
   const { t } = useTranslation();
+
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
-  const [searchParams] = useSearchParams();
-  const unitFilter = mapParamToNumber(searchParams.getAll("unit"), 1);
-  const unitGroupFilter = mapParamToNumber(searchParams.getAll("unitGroup"), 1);
-  const applicantFilter = searchParams.getAll("applicant");
-  const nameFilter = searchParams.get("search");
-  const sectionStatusFilter = searchParams.getAll("sectionStatus");
+
+  const { textFilter, unitFilter, unitGroupFilter, reservationUnitFilter, applicantTypeFilter, sectionStatusFilter } =
+    useGetFilterSearchParams();
 
   const query = useApplicationSectionsQuery({
     skip: !applicationRoundPk,
     variables: {
       first: LIST_PAGE_SIZE,
+      applicationRound: applicationRoundPk,
+      orderBy: transformOrderBy(orderBy),
+      textSearch: textFilter,
       unit: unitFilter,
       unitGroup: unitGroupFilter,
-      applicationRound: applicationRoundPk,
+      reservationUnit: reservationUnitFilter,
       applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
-      status: transformApplicationSectionStatus(sectionStatusFilter),
-      applicantType: transformApplicantType(applicantFilter),
-      textSearch: nameFilter,
-      orderBy: transformOrderBy(orderBy),
+      status: sectionStatusFilter,
+      applicantType: applicantTypeFilter,
     },
     onError: () => {
       errorToast({ text: t("errors.errorFetchingData") });
