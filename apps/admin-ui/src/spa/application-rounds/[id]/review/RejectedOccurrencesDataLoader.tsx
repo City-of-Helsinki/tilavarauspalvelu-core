@@ -90,8 +90,8 @@ function transformOrderBy(orderBy: string | null): RejectedOccurrenceOrderingCho
   const desc = orderBy.startsWith("-");
   const rest = desc ? orderBy.slice(1) : orderBy;
   switch (rest) {
-    case "application_id,application_event_id":
-    case "application_id,-application_event_id":
+    case "application_id,application_section_id":
+    case "application_id,-application_section_id":
       return desc
         ? [RejectedOccurrenceOrderingChoices.ApplicationPkDesc, RejectedOccurrenceOrderingChoices.PkDesc]
         : [RejectedOccurrenceOrderingChoices.ApplicationPkAsc, RejectedOccurrenceOrderingChoices.PkAsc];

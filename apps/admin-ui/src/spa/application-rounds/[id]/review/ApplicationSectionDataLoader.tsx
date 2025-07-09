@@ -25,7 +25,7 @@ export function ApplicationSectionDataLoader({ applicationRoundPk }: Props): JSX
   const unitGroupFilter = mapParamToNumber(searchParams.getAll("unitGroup"), 1);
   const applicantFilter = searchParams.getAll("applicant");
   const nameFilter = searchParams.get("search");
-  const eventStatusFilter = searchParams.getAll("eventStatus");
+  const sectionStatusFilter = searchParams.getAll("sectionStatus");
 
   const query = useApplicationSectionsQuery({
     skip: !applicationRoundPk,
@@ -35,7 +35,7 @@ export function ApplicationSectionDataLoader({ applicationRoundPk }: Props): JSX
       unitGroup: unitGroupFilter,
       applicationRound: applicationRoundPk,
       applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
-      status: transformApplicationSectionStatus(eventStatusFilter),
+      status: transformApplicationSectionStatus(sectionStatusFilter),
       applicantType: transformApplicantType(applicantFilter),
       textSearch: nameFilter,
       orderBy: transformOrderBy(orderBy),

@@ -74,7 +74,7 @@ const COLS = [
   {
     headerTKey: "ApplicationEvent.headings.id",
     isSortable: true,
-    key: "application_id,application_event_id",
+    key: "application_id,application_section_id",
     transform: ({ pk, applicationPk }: RejectedOccurrencesView) => `${applicationPk}-${pk}`,
   },
   {

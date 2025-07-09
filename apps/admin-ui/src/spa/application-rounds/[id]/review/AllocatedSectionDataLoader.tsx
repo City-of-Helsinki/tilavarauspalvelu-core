@@ -119,8 +119,8 @@ function transformOrderBy(orderBy: string | null): AllocatedTimeSlotOrderingChoi
         : [AllocatedTimeSlotOrderingChoices.ApplicationSectionNameAsc];
     case "applicant":
       return desc ? [AllocatedTimeSlotOrderingChoices.ApplicantDesc] : [AllocatedTimeSlotOrderingChoices.ApplicantAsc];
-    case "application_id,application_event_id":
-    case "application_id,-application_event_id":
+    case "application_id,application_section_id":
+    case "application_id,-application_section_id":
       return desc
         ? [
             AllocatedTimeSlotOrderingChoices.ApplicationPkDesc,

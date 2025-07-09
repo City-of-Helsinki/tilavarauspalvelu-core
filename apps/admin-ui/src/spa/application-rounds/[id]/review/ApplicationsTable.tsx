@@ -22,7 +22,7 @@ type UnitType = {
 };
 type ApplicationView = {
   pk: number;
-  eventPk: number;
+  sectionPk: number;
   key: string;
   applicantName?: string;
   name: string;
@@ -94,19 +94,19 @@ const getColConfig = (t: TFunction) =>
   }));
 
 function appMapper(app: ApplicationsTableElementFragment, t: TFunction): ApplicationView {
-  const applicationEvents = (app.applicationSections ?? [])
+  const applicationSections = (app.applicationSections ?? [])
     .flatMap((ae) => ae?.reservationUnitOptions)
     .flatMap((eru) => ({
       ...eru?.reservationUnit?.unit,
       priority: eru?.preferredOrder ?? 0,
     }));
-  const units = orderBy(uniqBy(applicationEvents, "pk"), "priority", "asc")
+  const units = orderBy(uniqBy(applicationSections, "pk"), "priority", "asc")
     .map(({ pk, nameFi }) => ({ pk, name: nameFi }))
     .filter((u): u is UnitType => u.pk != null && u.name != null);
 
   const name = app.applicationSections?.find(() => true)?.name || "-";
-  const firstEvent = app.applicationSections?.find(() => true);
-  const eventPk = firstEvent?.pk ?? 0;
+  const firstSection = app.applicationSections?.find(() => true);
+  const sectionPk = firstSection?.pk ?? 0;
   const status = app.status;
   const applicantName = getApplicantName(app);
   const applicantType = app.applicantType != null ? t(`Application.applicantTypes.${app.applicantType}`) : "-";
@@ -124,9 +124,9 @@ function appMapper(app: ApplicationsTableElementFragment, t: TFunction): Applica
   const applicationCount = formatAppliedReservationTime(time);
 
   return {
-    key: `${app.pk}-${eventPk || "-"} `,
+    key: `${app.pk}-${sectionPk || "-"} `,
     pk: app.pk ?? 0,
-    eventPk,
+    sectionPk,
     applicantName,
     applicantType,
     units,

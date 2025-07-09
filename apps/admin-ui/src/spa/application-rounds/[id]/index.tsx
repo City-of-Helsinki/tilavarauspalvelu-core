@@ -73,7 +73,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
 
   const unitOptions = getFilteredUnits(applicationRound, user);
 
-  // user has no accesss to specific unit through URL with search params -> remove it from URL
+  // user has no access to specific unit through URL with search params -> remove it from URL
   useEffect(() => {
     const unitParam = searchParams.getAll("unit");
     if (unitParam.length > 0) {
@@ -117,7 +117,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
 
   const isEndingAllowed = applicationRound.isSettingHandledAllowed ?? false;
 
-  const activeTabIndex = selectedTab === "events" ? 1 : selectedTab === "allocated" ? 2 : 0;
+  const activeTabIndex = selectedTab === "sections" ? 1 : selectedTab === "allocated" ? 2 : 0;
 
   const reservationUnitOptions = filterNonNullable(
     applicationRound.reservationUnits.flatMap((x) => x).map((x) => toOption(x))
@@ -157,7 +157,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
         <Tabs initiallyActiveTab={activeTabIndex}>
           <Tabs.TabList>
             <Tabs.Tab onClick={() => handleTabChange("applications")}>{t("ApplicationRound.applications")}</Tabs.Tab>
-            <Tabs.Tab onClick={() => handleTabChange("events")}>{t("ApplicationRound.appliedReservations")}</Tabs.Tab>
+            <Tabs.Tab onClick={() => handleTabChange("sections")}>{t("ApplicationRound.appliedReservations")}</Tabs.Tab>
             <Tabs.Tab onClick={() => handleTabChange("allocated")}>
               {isApplicationRoundEnded
                 ? t("ApplicationRound.madeReservations")
@@ -169,18 +169,21 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
               </Tabs.Tab>
             )}
           </Tabs.TabList>
+
           <Tabs.TabPanel>
             <TabContent>
               <Filters units={unitOptions} enableApplicant />
               <ApplicationDataLoader applicationRoundPk={applicationRound.pk ?? 0} />
             </TabContent>
           </Tabs.TabPanel>
+
           <Tabs.TabPanel>
             <TabContent>
-              <Filters units={unitOptions} statusOption="event" enableApplicant />
+              <Filters units={unitOptions} statusOption="section" enableApplicant />
               <ApplicationSectionDataLoader applicationRoundPk={applicationRound.pk ?? 0} />
             </TabContent>
           </Tabs.TabPanel>
+
           <Tabs.TabPanel>
             <TabContent>
               <Filters
@@ -190,11 +193,12 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
                 enableWeekday
                 enableReservationUnit
                 enableAccessCodeState
-                statusOption="eventShort"
+                statusOption="sectionShort"
               />
               <TimeSlotDataLoader applicationRoundPk={applicationRound.pk ?? 0} unitOptions={unitOptions} />
             </TabContent>
           </Tabs.TabPanel>
+
           {isApplicationRoundEnded && (
             <Tabs.TabPanel>
               <TabContent>
@@ -202,7 +206,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
                   units={unitOptions}
                   reservationUnits={reservationUnitOptions}
                   enableReservationUnit
-                  statusOption="eventShort"
+                  statusOption="sectionShort"
                 />
                 <RejectedOccurrencesDataLoader
                   applicationRoundPk={applicationRound.pk ?? 0}
@@ -258,8 +262,7 @@ function getFilteredUnits(
       hasPermission(user, UserPermissionChoice.CanViewApplications, unit.pk) ||
       hasPermission(user, UserPermissionChoice.CanManageApplications, unit.pk)
   );
-  const unitOptions = uniqBy(ds, (unit) => unit.pk).sort((a, b) => a.nameFi.localeCompare(b.nameFi));
-  return unitOptions;
+  return uniqBy(ds, (unit) => unit.pk).sort((a, b) => a.nameFi.localeCompare(b.nameFi));
 }
 
 function isAllocationEnabled(

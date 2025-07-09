@@ -14,7 +14,7 @@ type UnitPkName = {
 
 type Props = {
   units: UnitPkName[];
-  statusOption?: "application" | "event" | "eventShort";
+  statusOption?: "application" | "section" | "sectionShort";
   enableApplicant?: boolean;
   enableWeekday?: boolean;
   enableReservationUnit?: boolean;
@@ -69,7 +69,7 @@ export function Filters({
         return t(`dayLong.${value}`);
       case "reservationUnit":
         return reservationUnits.find((u) => u.pk === Number(value))?.nameFi ?? "-";
-      case "eventStatus":
+      case "sectionStatus":
         return t(`ApplicationSectionStatusChoice.${value}`);
       case "accessCodeState":
         return t(`accessType:accessCodeState.${value}`);
@@ -81,7 +81,7 @@ export function Filters({
   const hideSearchTags: string[] = [
     "tab",
     "orderBy",
-    ...(statusOption !== "application" ? ["status"] : ["eventStatus"]),
+    ...(statusOption !== "application" ? ["status"] : ["sectionStatus"]),
     ...(!enableWeekday ? ["weekday"] : []),
     ...(!enableReservationUnit ? ["reservationUnit"] : []),
   ];
@@ -96,12 +96,12 @@ export function Filters({
     value: unit?.pk ?? "",
   }));
 
-  // event status is shared on two tabs, but allocated only has two options
-  const eventStatusArrayLong = Object.values(ApplicationSectionStatusChoice);
+  // section status is shared on two tabs, but allocated only has two options
+  const sectionStatusArrayLong = Object.values(ApplicationSectionStatusChoice);
   // TODO these are "declined" / "approved" but the decline functionality is not implemented
   // so disabling the filter for now (there is no backend filter for it nor can it be tested)
 
-  const eventStatusOptions = (statusOption === "eventShort" ? [] : eventStatusArrayLong).map((status) => ({
+  const sectionStatusOptions = (statusOption === "sectionShort" ? [] : sectionStatusArrayLong).map((status) => ({
     label: t(`ApplicationSectionStatusChoice.${status}`),
     value: status,
   }));
@@ -112,8 +112,8 @@ export function Filters({
         <MultiSelectFilter name="unitGroup" options={unitGroupOptions} />
         <MultiSelectFilter name="unit" options={unitOptions} />
         {statusOption !== "application" ? (
-          eventStatusOptions.length > 0 ? (
-            <MultiSelectFilter name="eventStatus" options={eventStatusOptions} />
+          sectionStatusOptions.length > 0 ? (
+            <MultiSelectFilter name="sectionStatus" options={sectionStatusOptions} />
           ) : null
         ) : (
           <MultiSelectFilter name="status" options={statusOptions} />
