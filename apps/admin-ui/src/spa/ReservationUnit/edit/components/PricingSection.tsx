@@ -16,6 +16,7 @@ import { PaymentType, PriceUnit } from "@gql/gql-types";
 import { addDays } from "date-fns";
 import { IconAlertCircleFill, RadioButton } from "hds-react";
 import { useTranslation } from "react-i18next";
+import { startOfDay } from "date-fns/startOfDay";
 
 const Error = styled.div`
   margin-top: var(--spacing-3-xs);
@@ -207,7 +208,7 @@ export function PricingTypeView({ pk, form, taxPercentageOptions }: Props): JSX.
           name={`pricings.${index}.begins`}
           control={control}
           label={t("ReservationUnitEditor.label.begins")}
-          minDate={addDays(new Date(), 1)}
+          minDate={startOfDay(addDays(new Date(), 1))}
           disableConfirmation
           error={getTranslatedError(t, errors.pricings?.[index]?.begins?.message)}
         />

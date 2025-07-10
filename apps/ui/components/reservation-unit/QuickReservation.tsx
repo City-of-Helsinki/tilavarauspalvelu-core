@@ -3,7 +3,7 @@ import { Button } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { chunkArray, fromUIDate, toUIDate } from "common/src/common/util";
-import { Flex, NoWrap, H4, fontMedium } from "common/styled";
+import { Flex, fontMedium, H4, NoWrap } from "common/styled";
 import { breakpoints } from "common/src/const";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import {
@@ -51,6 +51,7 @@ const Price = styled.div`
   display: inline-grid;
   padding-bottom: var(--spacing-m);
   height: var(--spacing-m);
+
   &:empty {
     display: none;
   }
@@ -165,7 +166,6 @@ export function QuickReservation({
           control={control}
           label={t("reservationCalendar:startDate")}
           initialMonth={dateValue ?? new Date()}
-          minDate={new Date()}
           maxDate={lastPossibleDate ?? undefined}
           disableConfirmation={false}
         />

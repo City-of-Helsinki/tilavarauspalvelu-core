@@ -2,8 +2,9 @@ import React from "react";
 import { DateInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { useController, type FieldValues, type Path, type UseControllerProps } from "react-hook-form";
+import { type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
 import { TimeInput } from "./TimeInput";
+import { startOfDay } from "date-fns/startOfDay";
 
 const DateTimeWrapper = styled.div`
   display: grid;
@@ -61,7 +62,7 @@ export function DateTimeInput<T extends FieldValues>({
         ref={dateField.ref}
         required={required}
         disabled={disabled}
-        minDate={minDate}
+        minDate={minDate && startOfDay(minDate)}
         disableConfirmation
         label={t("common.date")}
         id={name.date}

@@ -14,6 +14,7 @@ import { getDurationOptions } from "@/modules/const";
 import { type ApplicationPage1FormValues } from "./form";
 import { ApplicationSectionSummary, ReservationUnitList } from ".";
 import { type OptionsT } from "@/modules/search";
+import { startOfDay } from "date-fns/startOfDay";
 
 type Props = Readonly<{
   index: number;
@@ -241,7 +242,7 @@ function ApplicationDateRangePicker({
         }}
         value={getValues(beginField)}
         required
-        minDate={minDate}
+        minDate={startOfDay(minDate)}
         maxDate={maxDate}
         invalid={beginState.error?.message != null}
         errorText={getTranslatedError(beginState.error?.message)}
@@ -258,7 +259,7 @@ function ApplicationDateRangePicker({
         }}
         value={getValues(endField)}
         required
-        minDate={minDate}
+        minDate={startOfDay(minDate)}
         maxDate={maxDate}
         invalid={endState.error?.message != null}
         errorText={getTranslatedError(endState.error?.message)}
