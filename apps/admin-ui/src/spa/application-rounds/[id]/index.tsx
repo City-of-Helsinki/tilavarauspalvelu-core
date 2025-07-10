@@ -28,6 +28,7 @@ import { RejectedOccurrencesDataLoader } from "./review/RejectedOccurrencesDataL
 import { hasPermission } from "@/modules/permissionHelper";
 import { useSession } from "@/hooks/auth";
 import { ReviewEndAllocation } from "./review/ReviewEndAllocation";
+import { useUnitGroupOptions } from "@/hooks/useUnitGroupOptions";
 
 const TabContent = styled(Flex).attrs({
   $direction: "column",
@@ -59,6 +60,8 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
 
   const { user } = useSession();
   const unitOptions = getUserPermissionFilteredUnits(applicationRound, user);
+  const { options: unitGroupOptions } = useUnitGroupOptions({ applicationRoundPk: pk });
+
   const canUserSeePage = unitOptions.length > 0;
 
   const [searchParams, setParams] = useSearchParams();
@@ -150,7 +153,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
 
           <Tabs.TabPanel>
             <TabContent>
-              <Filters unitOptions={unitOptions} enableApplicant />
+              <Filters unitGroupOptions={unitGroupOptions} unitOptions={unitOptions} enableApplicant />
               <ApplicationDataLoader applicationRoundPk={applicationRound.pk ?? 0} />
             </TabContent>
           </Tabs.TabPanel>
@@ -158,6 +161,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
           <Tabs.TabPanel>
             <TabContent>
               <Filters
+                unitGroupOptions={unitGroupOptions}
                 unitOptions={unitOptions}
                 statusOption="section"
                 enableApplicant
@@ -169,6 +173,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
           <Tabs.TabPanel>
             <TabContent>
               <Filters
+                unitGroupOptions={unitGroupOptions}
                 unitOptions={unitOptions}
                 reservationUnitOptions={reservationUnitOptions}
                 enableApplicant
@@ -185,6 +190,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
             <Tabs.TabPanel>
               <TabContent>
                 <Filters
+                  unitGroupOptions={unitGroupOptions}
                   unitOptions={unitOptions}
                   reservationUnitOptions={reservationUnitOptions}
                   enableReservationUnit

@@ -5,7 +5,6 @@ import { SearchTags } from "@/component/SearchTags";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { AccessCodeState, ApplicationSectionStatusChoice, ReserveeType } from "@gql/gql-types";
 import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
-import { useUnitGroupOptions } from "@/hooks/useUnitGroupOptions";
 
 type OptionType = {
   value: number;
@@ -13,6 +12,7 @@ type OptionType = {
 };
 
 type Props = {
+  unitGroupOptions: OptionType[];
   unitOptions: OptionType[];
   reservationUnitOptions?: OptionType[];
   statusOption?: "application" | "section" | "sectionShort";
@@ -23,6 +23,7 @@ type Props = {
 };
 
 export function Filters({
+  unitGroupOptions,
   unitOptions,
   reservationUnitOptions = [],
   statusOption = "application",
@@ -32,8 +33,6 @@ export function Filters({
   enableAccessCodeState = false,
 }: Props): JSX.Element {
   const { t } = useTranslation();
-
-  const { options: unitGroupOptions } = useUnitGroupOptions();
 
   const statusOptions = VALID_ALLOCATION_APPLICATION_STATUSES.map((status) => ({
     label: t(`Application.statuses.${status}`),
