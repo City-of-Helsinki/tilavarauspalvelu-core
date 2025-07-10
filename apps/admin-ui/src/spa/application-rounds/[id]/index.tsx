@@ -39,12 +39,10 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   const { t } = useTranslation();
   const [isInProgress, setIsInProgress] = useState(false);
 
-  const id = base64encode(`ApplicationRoundNode:${pk}`);
-  const isValid = pk > 0;
-
+  const isPkValid = pk > 0;
   const { data, loading, refetch } = useApplicationRoundQuery({
-    skip: !isValid,
-    variables: { id },
+    skip: !isPkValid,
+    variables: { id: base64encode(`ApplicationRoundNode:${pk}`) },
     pollInterval: isInProgress ? 10000 : 0,
     onError: () => {
       errorToast({ text: t("errors.errorFetchingData") });
@@ -52,16 +50,10 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   });
   const { applicationRound } = data ?? {};
 
-  const [searchParams, setParams] = useSearchParams();
-
   // NOTE: useEffect works, onCompleted does not work with refetch
   useEffect(() => {
     if (data) {
-      if (isApplicationRoundInProgress(data.applicationRound)) {
-        setIsInProgress(true);
-      } else {
-        setIsInProgress(false);
-      }
+      setIsInProgress(isApplicationRoundInProgress(data.applicationRound));
     }
   }, [data]);
 
@@ -69,6 +61,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   const unitOptions = getUserPermissionFilteredUnits(applicationRound, user);
   const canUserSeePage = unitOptions.length > 0;
 
+  const [searchParams, setParams] = useSearchParams();
   // user has no access to specific unit through URL with search params -> remove it from URL
   useEffect(() => {
     const unitParam = searchParams.getAll("unit");
@@ -94,26 +87,21 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   }
 
   const selectedTab = searchParams.get("tab") ?? "applications";
+  const activeTabIndex = selectedTab === "sections" ? 1 : selectedTab === "allocated" ? 2 : 0;
   const handleTabChange = (tab: string) => {
-    const vals = new URLSearchParams(searchParams);
-    vals.set("tab", tab);
-    setParams(vals, { replace: true });
+    const params = new URLSearchParams(searchParams);
+    params.set("tab", tab);
+    setParams(params, { replace: true });
   };
 
+  const reservationUnitOptions = getRoundReservationUnitOptions(applicationRound);
   const isApplicationRoundEnded = hasApplicationRoundEnded(applicationRound);
 
-  // isHandled means that the reservations are created
-  // isSettingHandledAllowed means that we are allowed to create the reservations
-  // i.e. state.InAllocation -> isSettingHandledAllowed -> state.Handled -> state.ResultsSent
-  const isHandled = applicationRound.status === ApplicationRoundStatusChoice.Handled;
-  const isResultsSent = applicationRound.status === ApplicationRoundStatusChoice.ResultsSent;
-  const hideAllocation = isHandled || isResultsSent;
-
-  const isEndingAllowed = applicationRound.isSettingHandledAllowed ?? false;
-
-  const activeTabIndex = selectedTab === "sections" ? 1 : selectedTab === "allocated" ? 2 : 0;
-
-  const reservationUnitOptions = getRoundReservationUnitOptions(applicationRound);
+  // isSettingHandledAllowed = Reservations can be created
+  // status.Handled = Reservations are created, but not sent to the applicants
+  // i.e. status.InAllocation -> isSettingHandledAllowed -> status.Handled -> status.ResultsSent
+  const canSetHandledOrSendResults =
+    applicationRound.isSettingHandledAllowed || applicationRound.status === ApplicationRoundStatusChoice.Handled;
 
   return (
     <>
@@ -132,7 +120,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
       </TitleSection>
 
       <Flex $justifyContent="space-between" $direction="row-reverse" $alignItems="center">
-        {!hideAllocation &&
+        {!isApplicationRoundEnded &&
           (isAllocationEnabled(applicationRound) ? (
             <ButtonLikeLink to="allocation" variant="primary" size="large">
               {t("ApplicationRound.allocate")}
@@ -140,9 +128,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
           ) : (
             <Button disabled>{t("ApplicationRound.allocate")}</Button>
           ))}
-        {isEndingAllowed || isHandled ? (
-          <ReviewEndAllocation applicationRound={applicationRound} refetch={refetch} />
-        ) : null}
+        {canSetHandledOrSendResults && <ReviewEndAllocation applicationRound={applicationRound} refetch={refetch} />}
       </Flex>
 
       <TabWrapper>
@@ -276,13 +262,10 @@ function isAllocationEnabled(
   );
 }
 
-function hasApplicationRoundEnded(
-  applicationRound: Maybe<Pick<ApplicationRoundAdminFragment, "status">> | undefined
-): boolean {
+function hasApplicationRoundEnded(applicationRound: Pick<ApplicationRoundAdminFragment, "status">): boolean {
   return (
-    applicationRound != null &&
-    (applicationRound.status === ApplicationRoundStatusChoice.Handled ||
-      applicationRound.status === ApplicationRoundStatusChoice.ResultsSent)
+    applicationRound.status === ApplicationRoundStatusChoice.Handled ||
+    applicationRound.status === ApplicationRoundStatusChoice.ResultsSent
   );
 }
 
