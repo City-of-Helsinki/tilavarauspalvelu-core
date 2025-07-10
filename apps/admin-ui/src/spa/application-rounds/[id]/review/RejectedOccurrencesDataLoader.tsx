@@ -8,7 +8,7 @@ import React from "react";
 import { filterNonNullable } from "common/src/helpers";
 import { getPermissionErrors } from "common/src/apolloUtils";
 import { useTranslation } from "next-i18next";
-import { getFilteredUnits, useGetFilterSearchParams } from "./utils";
+import { useGetFilterSearchParams } from "./utils";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { CenterSpinner } from "common/styled";
 
@@ -22,7 +22,9 @@ export function RejectedOccurrencesDataLoader({ applicationRoundPk, unitOptions 
 
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
 
-  const { textFilter, unitFilter, unitGroupFilter, reservationUnitFilter } = useGetFilterSearchParams();
+  const { textFilter, unitFilter, unitGroupFilter, reservationUnitFilter } = useGetFilterSearchParams({
+    unitOptions: unitOptions,
+  });
 
   const { data, previousData, loading, fetchMore } = useRejectedOccurrencesQuery({
     variables: {
@@ -30,7 +32,7 @@ export function RejectedOccurrencesDataLoader({ applicationRoundPk, unitOptions 
       applicationRound: applicationRoundPk,
       orderBy: transformOrderBy(orderBy),
       textSearch: textFilter,
-      unit: getFilteredUnits(unitFilter, unitOptions),
+      unit: unitFilter,
       unitGroup: unitGroupFilter,
       reservationUnit: reservationUnitFilter,
     },

@@ -90,13 +90,18 @@ function transformAccessCodeState(filters: string[]): AccessCodeState[] {
     .filter((act): act is NonNullable<typeof act> => act != null);
 }
 
-export function useGetFilterSearchParams() {
+export function useGetFilterSearchParams({ unitOptions }: { unitOptions?: { nameFi: string; pk: number }[] } = {}) {
   // Process search params from the URL to get filter values used in the application review data loaders
   const [searchParams] = useSearchParams();
 
+  // If unitParam is empty, use all units the user has permission to as the filter
+  // This is required on some endpoints, in case the user is missing permissions for some units
+  const unitParam = mapParamToNumber(searchParams.getAll("unit"), 1);
+  const unitFilter = unitParam.length > 0 ? unitParam : (unitOptions ?? []).map((u) => u.pk);
+
   return {
     textFilter: searchParams.get("search"),
-    unitFilter: mapParamToNumber(searchParams.getAll("unit"), 1),
+    unitFilter: unitFilter,
     unitGroupFilter: mapParamToNumber(searchParams.getAll("unitGroup"), 1),
     reservationUnitFilter: mapParamToNumber(searchParams.getAll("reservationUnit"), 1),
     statusFilter: transformApplicationStatuses(searchParams.getAll("status")),
@@ -132,10 +137,4 @@ const formatters = getFormatters("fi");
 export function formatAppliedReservationTime(time: { count: number; hours: number }): string {
   const { count, hours } = time;
   return `${formatNumber(count, "")} / ${formatters.oneDecimal?.format(hours) ?? hours} t`;
-}
-
-/// Clean query param selection and filter by possible units
-/// @return array of selected unit pks or all possible unit pks
-export function getFilteredUnits(unitFilter: number[], possibleUnits: { nameFi: string; pk: number }[]): number[] {
-  return unitFilter.length > 0 ? unitFilter : possibleUnits.map((u) => u.pk);
 }

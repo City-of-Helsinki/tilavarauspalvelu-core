@@ -11,7 +11,7 @@ import { LIST_PAGE_SIZE } from "@/common/const";
 import { errorToast } from "common/src/common/toast";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
-import { getFilteredUnits, useGetFilterSearchParams } from "./utils";
+import { useGetFilterSearchParams } from "./utils";
 import { AllocatedSectionsTable, SORT_KEYS } from "./AllocatedSectionsTable";
 import { getPermissionErrors } from "common/src/apolloUtils";
 import { CenterSpinner } from "common/styled";
@@ -34,7 +34,7 @@ export function TimeSlotDataLoader({ unitOptions, applicationRoundPk }: Props): 
     applicantTypeFilter,
     accessCodeStateFilter,
     weekDayFilter,
-  } = useGetFilterSearchParams();
+  } = useGetFilterSearchParams({ unitOptions: unitOptions });
 
   const query = useAllocatedTimeSlotsQuery({
     skip: !applicationRoundPk,
@@ -43,7 +43,7 @@ export function TimeSlotDataLoader({ unitOptions, applicationRoundPk }: Props): 
       applicationRound: applicationRoundPk,
       orderBy: transformOrderBy(orderBy),
       textSearch: textFilter,
-      allocatedUnit: getFilteredUnits(unitFilter, unitOptions),
+      allocatedUnit: unitFilter,
       unitGroup: unitGroupFilter,
       allocatedReservationUnit: reservationUnitFilter,
       applicantType: applicantTypeFilter,
