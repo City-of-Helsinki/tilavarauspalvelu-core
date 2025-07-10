@@ -21,7 +21,7 @@ export function createApolloClient(hostUrl: string, ctx?: GetServerSidePropsCont
     uri,
     // TODO this might be useless
     credentials: "include",
-    fetch: enchancedFetch(ctx),
+    fetch: enchancedFetch(ctx?.req),
   });
 
   return new ApolloClient({
