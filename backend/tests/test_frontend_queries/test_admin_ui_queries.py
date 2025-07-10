@@ -1058,6 +1058,7 @@ def test_frontend_queries__admin_ui__OwnUnitGroups(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
+    factory_args["units__name"] = "Create a unit for the group so it's not hidden in the GQL endpoint"
     query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)

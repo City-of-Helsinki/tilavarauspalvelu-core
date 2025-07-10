@@ -12,7 +12,9 @@ pytestmark = [
 
 
 def test_units__filter__only_with_permission__regular_user(graphql):
-    UnitGroupFactory.create()
+    unit_group = UnitGroupFactory.create()
+    UnitFactory.create(unit_groups=[unit_group])
+
     graphql.login_with_regular_user()
 
     query = unit_groups_query(only_with_permission=True)
@@ -23,7 +25,7 @@ def test_units__filter__only_with_permission__regular_user(graphql):
 
 
 def test_units__filter__only_with_permission__general_admin(graphql):
-    UnitGroupFactory.create()
+    UnitFactory.create(unit_groups__name="Included")
 
     user = UserFactory.create_with_general_role()
     graphql.force_login(user)
@@ -36,8 +38,9 @@ def test_units__filter__only_with_permission__general_admin(graphql):
 
 
 def test_units__filter__only_with_permission__unit_group_admin(graphql):
+    UnitFactory.create(unit_groups__name="Excluded")
     unit_group = UnitGroupFactory.create()
-    UnitGroupFactory.create()
+    UnitFactory.create(unit_groups=[unit_group])
 
     user = UserFactory.create_with_unit_role(unit_groups=[unit_group])
     graphql.force_login(user)
@@ -51,7 +54,7 @@ def test_units__filter__only_with_permission__unit_group_admin(graphql):
 
 
 def test_units__filter__only_with_permission__unit_admin(graphql):
-    UnitGroupFactory.create()
+    UnitFactory.create(unit_groups__name="Excluded")
     unit_group = UnitGroupFactory.create()
     unit = UnitFactory.create(unit_groups=[unit_group])
 

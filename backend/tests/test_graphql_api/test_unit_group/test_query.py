@@ -53,3 +53,15 @@ def test_unit_groups__query__only_with_permission(graphql):
 
     assert response.has_errors is True, response
     assert response.error_message() == "No permission to access node."
+
+
+def test_unit_groups__query__unit_groups_with_no_units_are_excluded(graphql):
+    UnitGroupFactory.create()
+
+    graphql.login_user_with_role(role=UserRoleChoice.ADMIN)
+
+    query = build_query("unitGroups", connection=True)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 0
