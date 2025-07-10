@@ -138,10 +138,11 @@ export function EditStep1({ reservation, options, onBack, form }: Props): JSX.El
 
   // We need to modify reservation because we want to show the new time
   const apiValues = convertReservationFormToApi(watch());
-  const modifiedReservation = {
+  // NOTE enforce no unknown keys to avoid mistakes in the key names
+  const modifiedReservation: typeof reservation = {
     ...reservation,
-    begin: apiValues?.beginsAt ?? reservation.beginsAt,
-    end: apiValues?.endsAt ?? reservation.endsAt,
+    beginsAt: apiValues?.beginsAt ?? reservation.beginsAt,
+    endsAt: apiValues?.endsAt ?? reservation.endsAt,
   };
 
   if (reservationUnit == null) {
