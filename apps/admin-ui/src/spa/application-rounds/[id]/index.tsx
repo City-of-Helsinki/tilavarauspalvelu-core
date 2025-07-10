@@ -66,7 +66,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   useEffect(() => {
     const unitParam = searchParams.getAll("unit");
     if (unitParam.length > 0) {
-      const filteredUnits = unitParam.filter((u) => unitOptions.some((unit) => unit.pk === Number(u)));
+      const filteredUnits = unitParam.filter((u) => unitOptions.some((unit) => unit.value === Number(u)));
       if (filteredUnits.length !== unitParam.length) {
         const p = new URLSearchParams(searchParams);
         p.delete("unit");
@@ -150,14 +150,18 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
 
           <Tabs.TabPanel>
             <TabContent>
-              <Filters units={unitOptions} enableApplicant />
+              <Filters unitOptions={unitOptions} enableApplicant />
               <ApplicationDataLoader applicationRoundPk={applicationRound.pk ?? 0} />
             </TabContent>
           </Tabs.TabPanel>
 
           <Tabs.TabPanel>
             <TabContent>
-              <Filters units={unitOptions} statusOption="section" enableApplicant />
+              <Filters
+                unitOptions={unitOptions}
+                statusOption="section"
+                enableApplicant
+              />
               <ApplicationSectionDataLoader applicationRoundPk={applicationRound.pk ?? 0} />
             </TabContent>
           </Tabs.TabPanel>
@@ -165,8 +169,8 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
           <Tabs.TabPanel>
             <TabContent>
               <Filters
-                units={unitOptions}
-                reservationUnits={reservationUnitOptions}
+                unitOptions={unitOptions}
+                reservationUnitOptions={reservationUnitOptions}
                 enableApplicant
                 enableWeekday
                 enableReservationUnit
@@ -181,8 +185,8 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
             <Tabs.TabPanel>
               <TabContent>
                 <Filters
-                  units={unitOptions}
-                  reservationUnits={reservationUnitOptions}
+                  unitOptions={unitOptions}
+                  reservationUnitOptions={reservationUnitOptions}
                   enableReservationUnit
                   statusOption="sectionShort"
                 />
@@ -226,7 +230,7 @@ function toOption(
     return null;
   }
   const { nameFi, pk } = instance;
-  return { nameFi, pk };
+  return { label: nameFi, value: pk };
 }
 
 function getRoundReservationUnitOptions(applicationRound: Pick<ApplicationRoundAdminFragment, "reservationUnits">) {
@@ -240,15 +244,15 @@ function getRoundUnitOptions(reservationUnits: ApplicationRoundAdminFragment["re
 function getUserPermissionFilteredUnits(
   applicationRound: Maybe<ApplicationRoundAdminFragment> | undefined,
   user: CurrentUserQuery["currentUser"]
-) {
+): { label: string; value: number }[] {
   // Return all units that the user has permission to view or manage in the application round
   const reservationUnits = filterNonNullable(applicationRound?.reservationUnits);
-  const units = getRoundUnitOptions(reservationUnits).filter(
+  const unitOptions = getRoundUnitOptions(reservationUnits).filter(
     (unit) =>
-      hasPermission(user, UserPermissionChoice.CanViewApplications, unit.pk) ||
-      hasPermission(user, UserPermissionChoice.CanManageApplications, unit.pk)
+      hasPermission(user, UserPermissionChoice.CanViewApplications, unit.value) ||
+      hasPermission(user, UserPermissionChoice.CanManageApplications, unit.value)
   );
-  return uniqBy(units, (unit) => unit.pk).sort((a, b) => a.nameFi.localeCompare(b.nameFi));
+  return uniqBy(unitOptions, (unit) => unit.value).sort((a, b) => a.label.localeCompare(b.label));
 }
 
 function isAllocationEnabled(

@@ -7,38 +7,33 @@ import { AccessCodeState, ApplicationSectionStatusChoice, ReserveeType } from "@
 import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
 import { useUnitGroupOptions } from "@/hooks/useUnitGroupOptions";
 
-type UnitPkName = {
-  pk: number;
-  nameFi: string;
+type OptionType = {
+  value: number;
+  label: string;
 };
 
 type Props = {
-  units: UnitPkName[];
+  unitOptions: OptionType[];
+  reservationUnitOptions?: OptionType[];
   statusOption?: "application" | "section" | "sectionShort";
   enableApplicant?: boolean;
   enableWeekday?: boolean;
   enableReservationUnit?: boolean;
-  reservationUnits?: UnitPkName[];
   enableAccessCodeState?: boolean;
 };
 
 export function Filters({
-  units,
+  unitOptions,
+  reservationUnitOptions = [],
   statusOption = "application",
   enableApplicant = false,
   enableWeekday = false,
   enableReservationUnit = false,
-  reservationUnits = [],
   enableAccessCodeState = false,
 }: Props): JSX.Element {
   const { t } = useTranslation();
 
   const { options: unitGroupOptions } = useUnitGroupOptions();
-
-  const unitOptions = units.map((unit) => ({
-    label: unit?.nameFi ?? "",
-    value: unit?.pk ?? "",
-  }));
 
   const statusOptions = VALID_ALLOCATION_APPLICATION_STATUSES.map((status) => ({
     label: t(`Application.statuses.${status}`),
@@ -68,7 +63,7 @@ export function Filters({
       case "weekday":
         return t(`dayLong.${value}`);
       case "reservationUnit":
-        return reservationUnits.find((u) => u.pk === Number(value))?.nameFi ?? "-";
+        return reservationUnitOptions.find((u) => u.value === Number(value))?.label ?? "-";
       case "sectionStatus":
         return t(`ApplicationSectionStatusChoice.${value}`);
       case "accessCodeState":
@@ -89,11 +84,6 @@ export function Filters({
   const weekdayOptions = Array.from(Array(7)).map((_, i) => ({
     label: t(`dayLong.${i}`),
     value: i,
-  }));
-
-  const reservationUnitOptions = reservationUnits.map((unit) => ({
-    label: unit?.nameFi ?? "",
-    value: unit?.pk ?? "",
   }));
 
   // section status is shared on two tabs, but allocated only has two options

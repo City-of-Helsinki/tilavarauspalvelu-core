@@ -90,14 +90,14 @@ function transformAccessCodeState(filters: string[]): AccessCodeState[] {
     .filter((act): act is NonNullable<typeof act> => act != null);
 }
 
-export function useGetFilterSearchParams({ unitOptions }: { unitOptions?: { nameFi: string; pk: number }[] } = {}) {
+export function useGetFilterSearchParams({ unitOptions }: { unitOptions?: { label: string; value: number }[] } = {}) {
   // Process search params from the URL to get filter values used in the application review data loaders
   const [searchParams] = useSearchParams();
 
   // If unitParam is empty, use all units the user has permission to as the filter
   // This is required on some endpoints, in case the user is missing permissions for some units
   const unitParam = mapParamToNumber(searchParams.getAll("unit"), 1);
-  const unitFilter = unitParam.length > 0 ? unitParam : (unitOptions ?? []).map((u) => u.pk);
+  const unitFilter = unitParam.length > 0 ? unitParam : (unitOptions ?? []).map((u) => u.value);
 
   return {
     textFilter: searchParams.get("search"),
