@@ -3,7 +3,6 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { gql } from "@apollo/client";
 import { errorToast } from "common/src/common/toast";
-import { useCheckPermission } from "@/hooks";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { isApplicationRoundInProgress } from "@/helpers";
 import { CenterSpinner, Flex, H1, TabWrapper, TitleSection } from "common/styled";
@@ -52,13 +51,8 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
     },
   });
   const { applicationRound } = data ?? {};
-  const units = filterNonNullable(applicationRound?.reservationUnits.map((x) => x.unit?.pk));
-  const { canSeePage, isLoadingPermissions } = useReviewCheckPermissions({
-    units,
-  });
 
   const [searchParams, setParams] = useSearchParams();
-  const { user } = useSession();
 
   // NOTE: useEffect works, onCompleted does not work with refetch
   useEffect(() => {
@@ -71,7 +65,9 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
     }
   }, [data]);
 
-  const unitOptions = getFilteredUnits(applicationRound, user);
+  const { user } = useSession();
+  const unitOptions = getUserPermissionFilteredUnits(applicationRound, user);
+  const canUserSeePage = unitOptions.length > 0;
 
   // user has no access to specific unit through URL with search params -> remove it from URL
   useEffect(() => {
@@ -89,12 +85,10 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
     }
   }, [unitOptions, searchParams, setParams]);
 
-  if (!canSeePage && !isLoadingPermissions) {
+  if (loading) {
+    return <CenterSpinner />;
+  } else if (!canUserSeePage) {
     return <div>{t("errors.noPermission")}</div>;
-  } else if (isLoadingPermissions) {
-    return <CenterSpinner />;
-  } else if (loading) {
-    return <CenterSpinner />;
   } else if (!applicationRound) {
     return <div>{t("errors.applicationRoundNotFound")}</div>;
   }
@@ -119,9 +113,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
 
   const activeTabIndex = selectedTab === "sections" ? 1 : selectedTab === "allocated" ? 2 : 0;
 
-  const reservationUnitOptions = filterNonNullable(
-    applicationRound.reservationUnits.flatMap((x) => x).map((x) => toOption(x))
-  );
+  const reservationUnitOptions = getRoundReservationUnitOptions(applicationRound);
 
   return (
     <>
@@ -237,32 +229,40 @@ function ApplicationRoundRouted(): JSX.Element | null {
   return <div>{t("errors.router.invalidApplicationRoundNumber")}</div>;
 }
 
-function getUnitOptions(resUnits: ApplicationRoundAdminFragment["reservationUnits"]) {
-  const opts = resUnits.map((x) => x?.unit).map((x) => toOption(x));
-  return filterNonNullable(opts);
-}
-
-function toOption(resUnit: Maybe<{ nameFi?: string | null; pk?: number | null }>) {
-  if (resUnit?.pk == null || resUnit.nameFi == null) {
+function toOption(
+  instance: Pick<
+    | ApplicationRoundAdminFragment["reservationUnits"][number]
+    | ApplicationRoundAdminFragment["reservationUnits"][number]["unit"],
+    "nameFi" | "pk"
+  >
+) {
+  if (instance?.pk == null || instance.nameFi == null) {
     return null;
   }
-  const { nameFi, pk } = resUnit;
+  const { nameFi, pk } = instance;
   return { nameFi, pk };
 }
 
-function getFilteredUnits(
+function getRoundReservationUnitOptions(applicationRound: Pick<ApplicationRoundAdminFragment, "reservationUnits">) {
+  return filterNonNullable(applicationRound.reservationUnits.map(toOption));
+}
+
+function getRoundUnitOptions(reservationUnits: ApplicationRoundAdminFragment["reservationUnits"]) {
+  return filterNonNullable(reservationUnits.map((x) => toOption(x?.unit)));
+}
+
+function getUserPermissionFilteredUnits(
   applicationRound: Maybe<ApplicationRoundAdminFragment> | undefined,
   user: CurrentUserQuery["currentUser"]
 ) {
-  const resUnits = filterNonNullable(applicationRound?.reservationUnits?.flatMap((x) => x));
-
-  // need filtered list of units that the user has permission to view
-  const ds = getUnitOptions(resUnits).filter(
+  // Return all units that the user has permission to view or manage in the application round
+  const reservationUnits = filterNonNullable(applicationRound?.reservationUnits);
+  const units = getRoundUnitOptions(reservationUnits).filter(
     (unit) =>
       hasPermission(user, UserPermissionChoice.CanViewApplications, unit.pk) ||
       hasPermission(user, UserPermissionChoice.CanManageApplications, unit.pk)
   );
-  return uniqBy(ds, (unit) => unit.pk).sort((a, b) => a.nameFi.localeCompare(b.nameFi));
+  return uniqBy(units, (unit) => unit.pk).sort((a, b) => a.nameFi.localeCompare(b.nameFi));
 }
 
 function isAllocationEnabled(
@@ -284,20 +284,6 @@ function hasApplicationRoundEnded(
     (applicationRound.status === ApplicationRoundStatusChoice.Handled ||
       applicationRound.status === ApplicationRoundStatusChoice.ResultsSent)
   );
-}
-
-function useReviewCheckPermissions({ units }: { units: number[] }) {
-  const { hasPermission: canView, isLoading } = useCheckPermission({
-    units,
-    permission: UserPermissionChoice.CanViewApplications,
-  });
-  const { hasPermission: canManage, isLoading: isLoading2 } = useCheckPermission({
-    units,
-    permission: UserPermissionChoice.CanManageApplications,
-  });
-  const canSeePage = canView || canManage;
-  const isLoadingPermissions = isLoading || isLoading2;
-  return { canSeePage, isLoadingPermissions };
 }
 
 export default ApplicationRoundRouted;
