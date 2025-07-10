@@ -51,7 +51,7 @@ export function createClient(hostUrl: string, req?: IncomingMessage): ApolloClie
           fields: {
             reservationUnits: relayStylePagination(),
             units: relayStylePagination(),
-            reservations: relayStylePagination(),
+            reservations: relayStylePagination(["onlyWithHandlingPermission"]),
             applications: relayStylePagination(),
             applicationSections: relayStylePagination(),
             allocatedTimeSlots: relayStylePagination(),

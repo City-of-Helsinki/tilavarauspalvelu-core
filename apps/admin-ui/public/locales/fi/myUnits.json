@@ -22,6 +22,11 @@
       "reservationUnitDraft": "Varausyksikkö luonnostilassa"
     }
   },
+  "ReservationDialog": {
+    "title": "Tee varaus",
+    "accept": "Varaa",
+    "saveSuccess": "Varaus tehty kohteeseen {{reservationUnit}}"
+  },
   "ReservationSeries": {
     "error": {
       "invalidUnitId": "Virheellinen yksikön numero.",

@@ -225,6 +225,5 @@
     "title": "Oletko varma että haluat palata takaisin tallentamatta varausyksikön tietoja?",
     "description": "Varausyksikön tiedot katoavat, eikä niitä voi palauttaa.",
     "discard": "Palaa tallentamatta"
-  },
-
+  }
 }

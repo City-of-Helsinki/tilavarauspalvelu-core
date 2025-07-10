@@ -142,11 +142,6 @@
       "false": "Julkaistu"
     }
   },
-  "ReservationDialog": {
-    "title": "Tee varaus",
-    "accept": "Varaa",
-    "saveSuccess": "Varaus tehty kohteeseen {{reservationUnit}}"
-  },
   "ReservationUnitList": {
     "typeFilter": "Tyyppi",
     "statusFilter": "Tila"

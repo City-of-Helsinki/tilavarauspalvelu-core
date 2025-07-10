@@ -21,7 +21,7 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { CenterSpinner, Flex } from "common/styled";
+import { Flex } from "common/styled";
 
 import { errorToast, successToast } from "common/src/common/toast";
 import { useModal } from "@/context/ModalContext";
@@ -372,17 +372,13 @@ export default function EditorPage(props: PageProps): JSX.Element {
     }
   }, [data, reset]);
 
-  if (isLoading) {
-    return <CenterSpinner />;
-  }
-
   // we use null for "new" units (could also be "new" slug)
   const isNew = ignoreMaybeArray(router.query.pk) == null;
   if (!isNew && reservationUnitPk === 0) {
     return <Error404 />;
   }
   // the pk is valid but not found in the backend
-  if (!isNew && reservationUnit == null) {
+  if (!isNew && !isLoading && reservationUnit == null) {
     return <Error404 />;
   }
 

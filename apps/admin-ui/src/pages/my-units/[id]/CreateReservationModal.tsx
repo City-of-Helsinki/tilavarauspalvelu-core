@@ -141,7 +141,7 @@ export function CreateReservationModal({
       await createStaffReservation(input);
 
       successToast({
-        text: t("ReservationDialog.saveSuccess", {
+        text: t("myUnits:ReservationDialog.saveSuccess", {
           reservationUnit: reservationUnit.nameFi,
         }),
       });
@@ -157,11 +157,11 @@ export function CreateReservationModal({
 
   return (
     <HDSModal id="info-dialog" isOpen={isOpen} focusAfterCloseRef={focusAfterCloseRef} scrollable onClose={onClose}>
-      <Dialog.Header id="modal-header" title={t("ReservationDialog.title")} />
+      <Dialog.Header id="modal-header" title={t("myUnits:ReservationDialog.title")} />
       <Dialog.Content style={{ paddingTop: "var(--spacing-m)" }}>
         <SelectFilter name="reservationUnit" sort options={reservationUnitOptions} />
         {reservationUnit != null && (
-          <ErrorBoundary fallback={<div>{t("errors.unexpectedError")}</div>}>
+          <ErrorBoundary fallback={<div>{t("errors:unexpectedError")}</div>}>
             <Flex>
               <DialogContent reservationUnit={reservationUnit} startDate={startDate} form={form} onSubmit={onSubmit} />
               <ActionContainer form={form} reservationUnit={reservationUnit} onCancel={onClose} onSubmit={onSubmit} />
@@ -339,7 +339,7 @@ function ActionContainer({
         }}
         data-testid="CreateReservationModal__accept-reservation"
       >
-        {t("ReservationDialog.accept")}
+        {t("myUnits:ReservationDialog.accept")}
       </Button>
       <Button
         size={ButtonSize.Small}

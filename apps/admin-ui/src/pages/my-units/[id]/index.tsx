@@ -85,7 +85,7 @@ function MyUnitView({ unitPk: pk }: { unitPk: number }): JSX.Element {
 
   const activeTab = selectedTab === "reservation-unit" ? 1 : 0;
 
-  const title = (unit?.nameFi ?? loading) ? t("common:loading") : "-";
+  const title = unit?.nameFi ?? (loading ? t("common:loading") : "-");
   const canCreateReservations = hasPermission && unit != null && reservationUnitOptions.length > 0;
   const address = formatAddress(unit, "");
   return (
