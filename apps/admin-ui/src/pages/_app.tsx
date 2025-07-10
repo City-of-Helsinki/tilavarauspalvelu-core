@@ -10,11 +10,20 @@ import { appWithTranslation } from "next-i18next";
 import Layout from "./layout";
 import PageWrapper from "@/component/PageWrapper";
 import { ModalContextProvider } from "@/context/ModalContext";
-import { CurrentUserDocument, CurrentUserQuery, CurrentUserQueryVariables } from "@gql/gql-types";
+import {
+  CurrentUserDocument,
+  CurrentUserQuery,
+  CurrentUserQueryVariables,
+  HandlingDataDocument,
+  HandlingDataQuery,
+  HandlingDataQueryVariables,
+  ReservationStateChoice,
+} from "@gql/gql-types";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { toApiDate } from "common/src/common/util";
 
 function MyApp(props: AppProps<PageProps> & AppOwnProps): JSX.Element {
-  const { Component, pageProps, currentUser } = props;
+  const { Component, pageProps, currentUser, handlingData } = props;
   const { apiBaseUrl, sentryDsn, sentryEnvironment, version } = pageProps;
   useEffect(() => {
     if (sentryDsn) {
@@ -38,6 +47,12 @@ function MyApp(props: AppProps<PageProps> & AppOwnProps): JSX.Element {
       },
     });
   }
+  if (handlingData) {
+    apolloClient.writeQuery({
+      query: HandlingDataDocument,
+      data: handlingData,
+    });
+  }
 
   return (
     <ApolloProvider client={apolloClient}>
@@ -54,6 +69,7 @@ function MyApp(props: AppProps<PageProps> & AppOwnProps): JSX.Element {
 
 type AppOwnProps = {
   currentUser: CurrentUserQuery["currentUser"];
+  handlingData: HandlingDataQuery | null;
 };
 
 // Override the data fetching for the whole app
@@ -71,14 +87,23 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
       query: CurrentUserDocument,
       fetchPolicy: "no-cache",
     });
+    // Need to fetch all data required by the Navigation component otherwise it flashes
+    const { data: handlingData } = await client.query<HandlingDataQuery, HandlingDataQueryVariables>({
+      query: HandlingDataDocument,
+      fetchPolicy: "no-cache",
+      variables: {
+        beginDate: toApiDate(new Date()) ?? "",
+        state: ReservationStateChoice.RequiresHandling,
+      },
+    });
 
-    return { ...ctx, currentUser: data.currentUser };
+    return { ...ctx, currentUser: data.currentUser, handlingData };
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Error fetching current user:", error);
   }
 
-  return { ...ctx, currentUser: null };
+  return { ...ctx, currentUser: null, handlingData: null };
 };
 
 // NOTE infered type problem so casting to FC
