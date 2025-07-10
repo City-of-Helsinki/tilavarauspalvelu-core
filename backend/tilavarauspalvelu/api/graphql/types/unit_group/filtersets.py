@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import django_filters
 from django.db.models import Q
 from graphene_django_extensions import ModelFilterSet
-from graphene_django_extensions.filters import IntMultipleChoiceFilter
+from graphene_django_extensions.filters import IntChoiceFilter, IntMultipleChoiceFilter
 
 from tilavarauspalvelu.enums import UserRoleChoice
 from tilavarauspalvelu.models import UnitGroup
@@ -24,6 +24,9 @@ class UnitGroupFilterSet(ModelFilterSet):
     name_sv = django_filters.CharFilter(field_name="name_sv", lookup_expr="istartswith")
 
     only_with_permission = django_filters.BooleanFilter(method="filter_by_only_with_permission")
+    application_round = IntChoiceFilter(
+        field_name="units__reservation_units__application_rounds",
+    )
 
     class Meta:
         model = UnitGroup

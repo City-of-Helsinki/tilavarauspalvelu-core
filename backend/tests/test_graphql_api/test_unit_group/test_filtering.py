@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from tests.factories import UnitFactory, UnitGroupFactory, UserFactory
+from tests.factories import ApplicationRoundFactory, UnitFactory, UnitGroupFactory, UserFactory
 from tests.test_graphql_api.test_unit_group.helpers import unit_groups_query
 
 # Applied to all tests
@@ -62,6 +62,24 @@ def test_units__filter__only_with_permission__unit_admin(graphql):
     graphql.force_login(user)
 
     query = unit_groups_query(only_with_permission=True)
+    response = graphql(query)
+
+    assert response.has_errors is False
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": unit_group.pk}
+
+
+def test_units__filter__application_round(graphql):
+    UnitFactory.create(unit_groups__name="Excluded")
+    unit_group = UnitGroupFactory.create()
+    application_round = ApplicationRoundFactory.create_in_status_in_allocation(
+        reservation_units__unit__unit_groups=[unit_group]
+    )
+
+    user = UserFactory.create_with_general_role()
+    graphql.force_login(user)
+
+    query = unit_groups_query(application_round=application_round.pk)
     response = graphql(query)
 
     assert response.has_errors is False

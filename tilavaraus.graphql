@@ -613,6 +613,7 @@ type Query {
     nameEn_Istartswith: String
     pk: [Int]
     onlyWithPermission: Boolean
+    applicationRound: Int
 
     """Ordering"""
     orderBy: [UnitGroupOrderingChoices]
@@ -1111,6 +1112,7 @@ type UnitNode implements Node {
     nameEn_Istartswith: String
     pk: [Int]
     onlyWithPermission: Boolean
+    applicationRound: Int
 
     """Ordering"""
     orderBy: [UnitGroupOrderingChoices]
@@ -1750,6 +1752,7 @@ type UnitRoleNode implements Node {
     nameEn_Istartswith: String
     pk: [Int]
     onlyWithPermission: Boolean
+    applicationRound: Int
 
     """Ordering"""
     orderBy: [UnitGroupOrderingChoices]

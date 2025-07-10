@@ -34,4 +34,4 @@ class UnitGroupNode(DjangoNode):
     def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
         # Always hide UnitGroups that don't have any units.
         # They are not useful for the frontend, as UnitGroups are set to units outside of the GraphQL API.
-        return queryset.exclude(units__isnull=True)
+        return queryset.exclude(units__isnull=True).distinct()
