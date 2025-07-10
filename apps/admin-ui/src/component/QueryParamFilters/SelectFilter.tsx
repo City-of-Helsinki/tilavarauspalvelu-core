@@ -1,8 +1,10 @@
 import React, { useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
 import { Select } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { convertOptionToHDS } from "common/src/helpers";
+import { useSearchParams } from "next/navigation";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
+import styled from "styled-components";
 
 type SelectFilterProps = {
   name: string;
@@ -11,8 +13,16 @@ type SelectFilterProps = {
   clearable?: boolean;
 };
 
+const StyledSelect = styled(Select)`
+  /* HDS Tabs have z-index issues so as a hacky solution move the dropdowns above the tabs */
+  && > div > div {
+    z-index: 101;
+  }
+`;
+
 export function SelectFilter({ name, options, sort, clearable }: SelectFilterProps) {
-  const [searchParams, setParams] = useSearchParams();
+  const searchParams = useSearchParams();
+  const setParams = useSetSearchParams();
   const { t } = useTranslation();
 
   // TODO not a fan of frontend sorting (especially when it's prop toggled)
@@ -31,16 +41,16 @@ export function SelectFilter({ name, options, sort, clearable }: SelectFilterPro
     } else {
       params.delete(name);
     }
-    setParams(params, { replace: true });
+    setParams(params);
   };
 
   const value = new URLSearchParams(searchParams).get(name) ?? "";
   const convertedValue = typeof options[0]?.value === "number" ? Number(value) : value;
 
-  const label = t(`filters.label.${name}`);
-  const placeholder = t("common.select");
+  const label = t(`filters:label.${name}`);
+  const placeholder = t("common:select");
   return (
-    <Select
+    <StyledSelect
       texts={{
         label,
         placeholder,

@@ -1,8 +1,7 @@
 import React from "react";
 import Document, { DocumentContext, Html, Head, Main, NextScript } from "next/document";
 import { ServerStyleSheet } from "styled-components";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore: this works in ui/pages/_document.js for some reason
+// @ts-expect-error: this works in ui/pages/_document.js for some reason
 import { getCriticalHdsRules, hdsStyles } from "hds-react";
 import { env } from "@/env.mjs";
 

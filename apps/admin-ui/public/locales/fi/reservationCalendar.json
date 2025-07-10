@@ -1,0 +1,8 @@
+{
+  "showCurrentDay": "Näytä tämä päivä",
+  "showPrevious": "Naytä edellinen {{view}}",
+  "showNext": "Naytä seuraava {{view}}",
+  "showView": "Näytä {{view}}näkymä",
+  "reserverInfo": "Varaajan tiedot",
+  "reservationInfo": "Varauksen tiedot"
+}

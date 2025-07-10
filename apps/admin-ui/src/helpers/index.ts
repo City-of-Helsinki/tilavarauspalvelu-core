@@ -13,6 +13,7 @@ import {
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { addSeconds } from "date-fns";
+import { type TFunction } from "next-i18next";
 
 export { truncate } from "common/src/helpers";
 
@@ -135,6 +136,34 @@ export function getApplicantName(app: ApplicantNameFieldsFragment): string {
     return `${app.contactPersonFirstName || "-"} ${app.contactPersonLastName || "-"}`;
   }
   return app.organisationName || "-";
+}
+
+export function getReserveeTypeTranslationKey(
+  type: Maybe<ReserveeType> | undefined,
+  orgId: Maybe<string> | undefined
+): string | null {
+  switch (type) {
+    case ReserveeType.Individual:
+      return "translation:reserveeType.INDIVIDUAL";
+    case ReserveeType.Company:
+      return "translation:reserveeType.COMPANY";
+    case ReserveeType.Nonprofit:
+      if (orgId) {
+        return "translation:reserveeType.NONPROFIT_REGISTERED";
+      }
+      return "translation:reserveeType.NONPROFIT_UNREGISTERED";
+    default:
+      return null;
+  }
+}
+
+export function translateReserveeType(
+  t: TFunction,
+  type: Maybe<ReserveeType> | undefined,
+  orgId: Maybe<string> | undefined
+): string {
+  const translationKey = getReserveeTypeTranslationKey(type, orgId);
+  return translationKey ? t(translationKey) : "-";
 }
 
 export function isApplicationRoundInProgress(

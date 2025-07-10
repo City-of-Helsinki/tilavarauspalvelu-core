@@ -1,8 +1,9 @@
-import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
-import { DateInput } from "hds-react";
 import React from "react";
+import { useTranslation } from "next-i18next";
+import { DateInput } from "hds-react";
 import styled from "styled-components";
+import { useSearchParams } from "next/navigation";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
 const DateRangeFilterWrapper = styled.div`
   display: grid;
@@ -25,7 +26,8 @@ export function DateRangeFilter({ name }: { name: string }) {
     end: `${name}Lte`,
   };
   const { t } = useTranslation();
-  const [searchParams, setParams] = useSearchParams();
+  const searchParams = useSearchParams();
+  const setParams = useSetSearchParams();
   const beginFilter = searchParams.get(names.begin);
   const endFilter = searchParams.get(names.end);
 
@@ -33,10 +35,8 @@ export function DateRangeFilter({ name }: { name: string }) {
     const params = new URLSearchParams(searchParams);
     if (val.length > 0) {
       params.set(paramName, val);
-      setParams(params, { replace: true });
-    } else {
-      setParams(params, { replace: true });
     }
+    setParams(params);
   };
 
   return (
@@ -44,16 +44,16 @@ export function DateRangeFilter({ name }: { name: string }) {
       <DateInput
         language="fi"
         id={names.begin}
-        label={t(`filters.label.${names.begin}`)}
-        placeholder={t(`filters.placeholder.${names.begin}`)}
+        label={t(`filters:label.${names.begin}`)}
+        placeholder={t(`filters:placeholder.${names.begin}`)}
         onChange={(val: string) => handleChange(val, names.begin)}
         value={beginFilter ?? ""}
       />
       <DateInput
         language="fi"
         id={names.end}
-        label={t(`filters.label.${names.end}`)}
-        placeholder={t(`filters.placeholder.${names.end}`)}
+        label={t(`filters:label.${names.end}`)}
+        placeholder={t(`filters:placeholder.${names.end}`)}
         onChange={(val: string) => handleChange(val, names.end)}
         value={endFilter ?? ""}
       />

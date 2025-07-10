@@ -1,7 +1,17 @@
+import React from "react";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { convertOptionToHDS } from "common/src/helpers";
 import { Select } from "hds-react";
-import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "next/navigation";
+import { useTranslation } from "next-i18next";
+import styled from "styled-components";
+
+const StyledSelect = styled(Select)`
+  /* HDS Tabs have z-index issues so as a hacky solution move the dropdowns above the tabs */
+  && > div > div {
+    z-index: 101;
+  }
+`;
 
 // TODO is the T param good enough for type safety?
 // arrays of unions can be broken (ex. pushing a number to string[])
@@ -20,7 +30,8 @@ export function MultiSelectFilter({
   className?: string;
 }): JSX.Element {
   const { t } = useTranslation();
-  const [params, setParams] = useSearchParams();
+  const params = useSearchParams();
+  const setParams = useSetSearchParams();
 
   const filter = params.getAll(name);
 
@@ -37,13 +48,13 @@ export function MultiSelectFilter({
         }
       });
     }
-    setParams(vals, { replace: true });
+    setParams(vals);
   };
 
-  const label = t(`filters.label.${name}`);
-  const placeholder = t(`filters.placeholder.${name}`);
+  const label = t(`filters:label.${name}`);
+  const placeholder = t(`filters:placeholder.${name}`);
   return (
-    <Select
+    <StyledSelect
       style={style}
       className={className}
       clearable

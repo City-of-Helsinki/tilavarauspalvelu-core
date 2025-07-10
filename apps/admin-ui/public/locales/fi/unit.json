@@ -1,0 +1,23 @@
+{
+
+  "emptyFilterPageName": "toimipistettä",
+  "reservationUnits_one": "{{count}} varausyksikkö",
+  "reservationUnits_other": "{{count}} varausyksikköä",
+  "noReservationUnits": "Ei varausyksiköitä",
+  "noArea": "Alue puuttuu",
+  "noService": "Palvelu puuttuu",
+  "unitCount_one": "{{count}} toimipiste",
+  "unitCount_other": "{{count}} toimipistettä",
+  "showSpacesAndResources": "Tilat ja resurssit",
+  "showConfiguration": "Asetukset",
+  "noSpacesResourcesTitle": "Toimipisteelle ei ole määritetty tiloja eikä resursseja",
+  "noSpacesResources": "Toimipisteellä täytyy olla vähintään yksi tila, jotta voit luoda ensimmäisen varausyksikön.",
+  "createSpaces": "Luo tiloja.",
+  "maintainOpeningHours": "Siirry päivittämään toimipisteesi tiedot Toimipisterekisterin kautta.",
+  "reservationUnitTitle": "Varausyksiköt",
+  "reservationUnitReadMore": "Lue lisää varausyksiköistä",
+  "reservationUnitCreate": "Luo uusi varausyksikkö",
+  "noReservationUnitsTitle": "Ei luotuja varausyksiköitä.",
+  "noAddress": "Osoite puuttuu",
+  "location": "Toimipisteen sijainti"
+}

@@ -63,7 +63,7 @@ export function DateTimeInput<T extends FieldValues>({
         disabled={disabled}
         minDate={minDate}
         disableConfirmation
-        label={t("common.date")}
+        label={t("common:date")}
         id={name.date}
         value={dateField.value}
         onChange={(v) => dateField.onChange(v)}
@@ -79,7 +79,7 @@ export function DateTimeInput<T extends FieldValues>({
         // hoursLabel="hours"
         // minutesLabel="minutes"
         value={timeField.value}
-        label={t("common.time")}
+        label={t("common:time")}
         onChange={handleTimeChange}
         error={translateError?.(timeError?.message) ?? timeError?.message}
       />
