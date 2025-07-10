@@ -1,6 +1,5 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import { useSearchParams } from "react-router-dom";
 import { ApplicationSectionOrderingChoices, useApplicationSectionsQuery } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
@@ -9,7 +8,7 @@ import { errorToast } from "common/src/common/toast";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
 import { ApplicationSectionsTable, SORT_KEYS } from "./ApplicationSectionsTable";
-import { transformApplicantType, transformApplicationSectionStatus } from "./utils";
+import { useGetFilterSearchParams } from "./utils";
 import { CenterSpinner } from "common/styled";
 
 type Props = {
@@ -18,24 +17,25 @@ type Props = {
 
 export function ApplicationSectionDataLoader({ applicationRoundPk }: Props): JSX.Element {
   const { t } = useTranslation();
+
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
-  const [searchParams] = useSearchParams();
-  const unitFilter = searchParams.getAll("unit");
-  const applicantFilter = searchParams.getAll("applicant");
-  const nameFilter = searchParams.get("search");
-  const eventStatusFilter = searchParams.getAll("eventStatus");
+
+  const { textFilter, unitFilter, unitGroupFilter, reservationUnitFilter, applicantTypeFilter, sectionStatusFilter } =
+    useGetFilterSearchParams();
 
   const query = useApplicationSectionsQuery({
     skip: !applicationRoundPk,
     variables: {
       first: LIST_PAGE_SIZE,
-      unit: unitFilter.map(Number).filter(Number.isFinite),
       applicationRound: applicationRoundPk,
-      applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
-      status: transformApplicationSectionStatus(eventStatusFilter),
-      applicantType: transformApplicantType(applicantFilter),
-      textSearch: nameFilter,
       orderBy: transformOrderBy(orderBy),
+      textSearch: textFilter,
+      unit: unitFilter,
+      unitGroup: unitGroupFilter,
+      reservationUnit: reservationUnitFilter,
+      applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
+      status: sectionStatusFilter,
+      applicantType: applicantTypeFilter,
     },
     onError: () => {
       errorToast({ text: t("errors.errorFetchingData") });
@@ -114,6 +114,7 @@ export const APPLICATION_SECTIONS_QUERY = gql`
     $applicationStatus: [ApplicationStatusChoice]!
     $status: [ApplicationSectionStatusChoice]
     $unit: [Int]
+    $unitGroup: [Int]
     $applicantType: [ReserveeType]
     $preferredOrder: [Int]
     $textSearch: String
@@ -132,6 +133,7 @@ export const APPLICATION_SECTIONS_QUERY = gql`
       applicationStatus: $applicationStatus
       status: $status
       unit: $unit
+      unitGroup: $unitGroup
       applicantType: $applicantType
       preferredOrder: $preferredOrder
       textSearch: $textSearch

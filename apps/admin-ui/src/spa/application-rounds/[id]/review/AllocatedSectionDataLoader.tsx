@@ -1,8 +1,8 @@
 import React from "react";
-import { gql, type ApolloError } from "@apollo/client";
+import { type ApolloError, gql } from "@apollo/client";
 import {
-  ApplicationSectionStatusChoice,
   AllocatedTimeSlotOrderingChoices,
+  ApplicationSectionStatusChoice,
   useAllocatedTimeSlotsQuery,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
@@ -11,48 +11,45 @@ import { LIST_PAGE_SIZE } from "@/common/const";
 import { errorToast } from "common/src/common/toast";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
-import { getFilteredUnits, transformAccessCodeState, transformApplicantType } from "./utils";
-import { useSearchParams } from "react-router-dom";
+import { useGetFilterSearchParams } from "./utils";
 import { AllocatedSectionsTable, SORT_KEYS } from "./AllocatedSectionsTable";
-import { transformWeekday } from "common/src/conversion";
-import { type DayT } from "common/src/const";
 import { getPermissionErrors } from "common/src/apolloUtils";
 import { CenterSpinner } from "common/styled";
 
 type Props = {
   applicationRoundPk: number;
-  unitOptions: { nameFi: string; pk: number }[];
+  unitOptions: { label: string; value: number }[];
 };
 
 export function TimeSlotDataLoader({ unitOptions, applicationRoundPk }: Props): JSX.Element {
   const { t } = useTranslation();
 
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
-  const [searchParams] = useSearchParams();
-  const unitFilter = searchParams.getAll("unit");
-  const applicantFilter = searchParams.getAll("applicant");
-  const nameFilter = searchParams.get("search");
-  const weekDayFilter = searchParams.getAll("weekday");
-  const reservationUnitFilter = searchParams.getAll("reservationUnit");
-  const accessCodeState = searchParams.getAll("accessCodeState");
+
+  const {
+    textFilter,
+    unitFilter,
+    unitGroupFilter,
+    reservationUnitFilter,
+    applicantTypeFilter,
+    accessCodeStateFilter,
+    weekDayFilter,
+  } = useGetFilterSearchParams({ unitOptions: unitOptions });
 
   const query = useAllocatedTimeSlotsQuery({
     skip: !applicationRoundPk,
     variables: {
-      allocatedUnit: getFilteredUnits(unitFilter, unitOptions),
-      applicationRound: applicationRoundPk,
-      applicantType: transformApplicantType(applicantFilter),
-      applicationSectionStatus: [ApplicationSectionStatusChoice.Handled, ApplicationSectionStatusChoice.InAllocation],
-      dayOfTheWeek: weekDayFilter
-        .map(Number)
-        .filter(Number.isFinite)
-        .filter((n): n is DayT => n >= 0 && n <= 6)
-        .map(transformWeekday),
-      allocatedReservationUnit: reservationUnitFilter.map(Number).filter(Number.isFinite),
-      accessCodeState: transformAccessCodeState(accessCodeState),
-      textSearch: nameFilter,
       first: LIST_PAGE_SIZE,
+      applicationRound: applicationRoundPk,
       orderBy: transformOrderBy(orderBy),
+      textSearch: textFilter,
+      allocatedUnit: unitFilter,
+      unitGroup: unitGroupFilter,
+      allocatedReservationUnit: reservationUnitFilter,
+      applicantType: applicantTypeFilter,
+      applicationSectionStatus: [ApplicationSectionStatusChoice.Handled, ApplicationSectionStatusChoice.InAllocation],
+      accessCodeState: accessCodeStateFilter,
+      dayOfTheWeek: weekDayFilter,
     },
     onError: (err: ApolloError) => {
       const permErrors = getPermissionErrors(err);
@@ -115,8 +112,8 @@ function transformOrderBy(orderBy: string | null): AllocatedTimeSlotOrderingChoi
         : [AllocatedTimeSlotOrderingChoices.ApplicationSectionNameAsc];
     case "applicant":
       return desc ? [AllocatedTimeSlotOrderingChoices.ApplicantDesc] : [AllocatedTimeSlotOrderingChoices.ApplicantAsc];
-    case "application_id,application_event_id":
-    case "application_id,-application_event_id":
+    case "application_id,application_section_id":
+    case "application_id,-application_section_id":
       return desc
         ? [
             AllocatedTimeSlotOrderingChoices.ApplicationPkDesc,
@@ -136,6 +133,7 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
   query AllocatedTimeSlots(
     $applicationRound: Int!
     $allocatedUnit: [Int]
+    $unitGroup: [Int]
     $applicantType: [ReserveeType]
     $applicationSectionStatus: [ApplicationSectionStatusChoice]
     $allocatedReservationUnit: [Int]
@@ -151,6 +149,7 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
       first: $first
       applicationRound: $applicationRound
       allocatedUnit: $allocatedUnit
+      unitGroup: $unitGroup
       applicantType: $applicantType
       applicationSectionStatus: $applicationSectionStatus
       allocatedReservationUnit: $allocatedReservationUnit

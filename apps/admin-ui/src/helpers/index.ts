@@ -158,3 +158,9 @@ export function getNormalizedInterval(interval: Maybe<ReservationStartInterval> 
     ? ReservationStartInterval.Interval_15Mins
     : ReservationStartInterval.Interval_30Mins;
 }
+
+export function mapParamToNumber(param: string[], min?: number): number[] {
+  // Copypaste from UI search.ts
+  const numbers = param.map(Number).filter(Number.isInteger);
+  return min != null ? numbers.filter((n) => n >= min) : numbers;
+}

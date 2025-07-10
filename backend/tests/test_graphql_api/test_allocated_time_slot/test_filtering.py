@@ -19,6 +19,7 @@ from tests.factories import (
     ReservationFactory,
     ReservationSeriesFactory,
     ReservationUnitFactory,
+    UnitGroupFactory,
 )
 
 from .helpers import allocations_query
@@ -235,6 +236,27 @@ def test_allocated_time_slot__filter__by_allocated_unit__multiple(graphql):
     assert len(response.edges) == 2
     assert response.node(0) == {"pk": allocation_1.pk}
     assert response.node(1) == {"pk": allocation_2.pk}
+
+
+def test_allocated_time_slot__filter__by_unit_group(graphql):
+    # given:
+    # - There are two allocated time slots with different allocated unit groups
+    # - A superuser is using the system
+    group_1 = UnitGroupFactory.create()
+    group_2 = UnitGroupFactory.create()
+    allocation = AllocatedTimeSlotFactory.create(reservation_unit_option__reservation_unit__unit__unit_groups=[group_1])
+    AllocatedTimeSlotFactory.create(reservation_unit_option__reservation_unit__unit__unit_groups=[group_2])
+    graphql.login_with_superuser()
+
+    # when:
+    # - User tries to search allocations with the given allocated unit group
+    query = allocations_query(unit_group=[group_1.pk])
+    response = graphql(query)
+
+    # then:
+    # - The response contains the selected allocations
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": allocation.pk}
 
 
 def test_allocated_time_slot__filter__by_allocated_reservation_unit(graphql):

@@ -69,6 +69,7 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
     tprek_id = django_filters.CharFilter(field_name="unit__tprek_id")
     tprek_department_id = django_filters.CharFilter(field_name="unit__tprek_department_id")
     unit = IntMultipleChoiceFilter()
+    unit_group = IntMultipleChoiceFilter(field_name="unit__unit_groups")
     reservation_unit_type = IntMultipleChoiceFilter()
 
     min_persons_gte = IntChoiceFilter(field_name="min_persons", method="get_min_persons_gte")

@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { gql } from "@apollo/client";
 import { errorToast } from "common/src/common/toast";
-import { useCheckPermission } from "@/hooks";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { isApplicationRoundInProgress } from "@/helpers";
-import { CenterSpinner, Flex, TabWrapper, TitleSection, H1 } from "common/styled";
+import { CenterSpinner, Flex, H1, TabWrapper, TitleSection } from "common/styled";
 import { Button, Tabs } from "hds-react";
 import { uniqBy } from "lodash-es";
 import styled from "styled-components";
 import {
-  type Maybe,
-  ApplicationRoundStatusChoice,
   type ApplicationRoundAdminFragment,
-  UserPermissionChoice,
-  useApplicationRoundQuery,
+  ApplicationRoundStatusChoice,
   CurrentUserQuery,
+  type Maybe,
+  useApplicationRoundQuery,
+  UserPermissionChoice,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { ApplicationRoundStatusLabel } from "./../ApplicationRoundStatusLabel";
@@ -29,56 +28,48 @@ import { RejectedOccurrencesDataLoader } from "./review/RejectedOccurrencesDataL
 import { hasPermission } from "@/modules/permissionHelper";
 import { useSession } from "@/hooks/auth";
 import { ReviewEndAllocation } from "./review/ReviewEndAllocation";
+import { useUnitGroupOptions } from "@/hooks/useUnitGroupOptions";
 
-const TabContent = styled.div`
-  display: grid;
-  gap: var(--spacing-m);
-  margin-top: var(--spacing-s);
-  line-height: 1;
-`;
+const TabContent = styled(Flex).attrs({
+  $direction: "column",
+  $gap: "m",
+  $marginTop: "s",
+})``;
 
 function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   const { t } = useTranslation();
   const [isInProgress, setIsInProgress] = useState(false);
 
-  const id = base64encode(`ApplicationRoundNode:${pk}`);
-  const isValid = pk > 0;
-
+  const isPkValid = pk > 0;
   const { data, loading, refetch } = useApplicationRoundQuery({
-    skip: !isValid,
-    variables: { id },
+    skip: !isPkValid,
+    variables: { id: base64encode(`ApplicationRoundNode:${pk}`) },
     pollInterval: isInProgress ? 10000 : 0,
     onError: () => {
       errorToast({ text: t("errors.errorFetchingData") });
     },
   });
   const { applicationRound } = data ?? {};
-  const units = filterNonNullable(applicationRound?.reservationUnits.map((x) => x.unit?.pk));
-  const { canSeePage, isLoadingPermissions } = useReviewCheckPermissions({
-    units,
-  });
-
-  const [searchParams, setParams] = useSearchParams();
-  const { user } = useSession();
 
   // NOTE: useEffect works, onCompleted does not work with refetch
   useEffect(() => {
     if (data) {
-      if (isApplicationRoundInProgress(data.applicationRound)) {
-        setIsInProgress(true);
-      } else {
-        setIsInProgress(false);
-      }
+      setIsInProgress(isApplicationRoundInProgress(data.applicationRound));
     }
   }, [data]);
 
-  const unitOptions = getFilteredUnits(applicationRound, user);
+  const { user } = useSession();
+  const unitOptions = getUserPermissionFilteredUnits(applicationRound, user);
+  const { options: unitGroupOptions } = useUnitGroupOptions({ applicationRoundPk: pk });
 
-  // user has no accesss to specific unit through URL with search params -> remove it from URL
+  const canUserSeePage = unitOptions.length > 0;
+
+  const [searchParams, setParams] = useSearchParams();
+  // user has no access to specific unit through URL with search params -> remove it from URL
   useEffect(() => {
     const unitParam = searchParams.getAll("unit");
     if (unitParam.length > 0) {
-      const filteredUnits = unitParam.filter((u) => unitOptions.some((unit) => unit.pk === Number(u)));
+      const filteredUnits = unitParam.filter((u) => unitOptions.some((unit) => unit.value === Number(u)));
       if (filteredUnits.length !== unitParam.length) {
         const p = new URLSearchParams(searchParams);
         p.delete("unit");
@@ -90,39 +81,30 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
     }
   }, [unitOptions, searchParams, setParams]);
 
-  if (!canSeePage && !isLoadingPermissions) {
+  if (loading) {
+    return <CenterSpinner />;
+  } else if (!canUserSeePage) {
     return <div>{t("errors.noPermission")}</div>;
-  } else if (isLoadingPermissions) {
-    return <CenterSpinner />;
-  } else if (loading) {
-    return <CenterSpinner />;
   } else if (!applicationRound) {
     return <div>{t("errors.applicationRoundNotFound")}</div>;
   }
 
   const selectedTab = searchParams.get("tab") ?? "applications";
+  const activeTabIndex = selectedTab === "sections" ? 1 : selectedTab === "allocated" ? 2 : 0;
   const handleTabChange = (tab: string) => {
-    const vals = new URLSearchParams(searchParams);
-    vals.set("tab", tab);
-    setParams(vals, { replace: true });
+    const params = new URLSearchParams(searchParams);
+    params.set("tab", tab);
+    setParams(params, { replace: true });
   };
 
+  const reservationUnitOptions = getRoundReservationUnitOptions(applicationRound);
   const isApplicationRoundEnded = hasApplicationRoundEnded(applicationRound);
 
-  // isHandled means that the reservations are created
-  // isSettingHandledAllowed means that we are allowed to create the reservations
-  // i.e. state.InAllocation -> isSettingHandledAllowed -> state.Handled -> state.ResultsSent
-  const isHandled = applicationRound.status === ApplicationRoundStatusChoice.Handled;
-  const isResultsSent = applicationRound.status === ApplicationRoundStatusChoice.ResultsSent;
-  const hideAllocation = isHandled || isResultsSent;
-
-  const isEndingAllowed = applicationRound.isSettingHandledAllowed ?? false;
-
-  const activeTabIndex = selectedTab === "events" ? 1 : selectedTab === "allocated" ? 2 : 0;
-
-  const reservationUnitOptions = filterNonNullable(
-    applicationRound.reservationUnits.flatMap((x) => x).map((x) => toOption(x))
-  );
+  // isSettingHandledAllowed = Reservations can be created
+  // status.Handled = Reservations are created, but not sent to the applicants
+  // i.e. status.InAllocation -> isSettingHandledAllowed -> status.Handled -> status.ResultsSent
+  const canSetHandledOrSendResults =
+    applicationRound.isSettingHandledAllowed || applicationRound.status === ApplicationRoundStatusChoice.Handled;
 
   return (
     <>
@@ -139,8 +121,9 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
         </div>
         <ApplicationRoundStatusLabel status={applicationRound.status} />
       </TitleSection>
+
       <Flex $justifyContent="space-between" $direction="row-reverse" $alignItems="center">
-        {!hideAllocation &&
+        {!isApplicationRoundEnded &&
           (isAllocationEnabled(applicationRound) ? (
             <ButtonLikeLink to="allocation" variant="primary" size="large">
               {t("ApplicationRound.allocate")}
@@ -148,15 +131,14 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
           ) : (
             <Button disabled>{t("ApplicationRound.allocate")}</Button>
           ))}
-        {isEndingAllowed || isHandled ? (
-          <ReviewEndAllocation applicationRound={applicationRound} refetch={refetch} />
-        ) : null}
+        {canSetHandledOrSendResults && <ReviewEndAllocation applicationRound={applicationRound} refetch={refetch} />}
       </Flex>
+
       <TabWrapper>
         <Tabs initiallyActiveTab={activeTabIndex}>
           <Tabs.TabList>
             <Tabs.Tab onClick={() => handleTabChange("applications")}>{t("ApplicationRound.applications")}</Tabs.Tab>
-            <Tabs.Tab onClick={() => handleTabChange("events")}>{t("ApplicationRound.appliedReservations")}</Tabs.Tab>
+            <Tabs.Tab onClick={() => handleTabChange("sections")}>{t("ApplicationRound.appliedReservations")}</Tabs.Tab>
             <Tabs.Tab onClick={() => handleTabChange("allocated")}>
               {isApplicationRoundEnded
                 ? t("ApplicationRound.madeReservations")
@@ -168,40 +150,51 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
               </Tabs.Tab>
             )}
           </Tabs.TabList>
+
           <Tabs.TabPanel>
             <TabContent>
-              <Filters units={unitOptions} enableApplicant />
+              <Filters unitGroupOptions={unitGroupOptions} unitOptions={unitOptions} enableApplicant />
               <ApplicationDataLoader applicationRoundPk={applicationRound.pk ?? 0} />
             </TabContent>
           </Tabs.TabPanel>
-          <Tabs.TabPanel>
-            <TabContent>
-              <Filters units={unitOptions} statusOption="event" enableApplicant />
-              <ApplicationSectionDataLoader applicationRoundPk={applicationRound.pk ?? 0} />
-            </TabContent>
-          </Tabs.TabPanel>
+
           <Tabs.TabPanel>
             <TabContent>
               <Filters
-                units={unitOptions}
-                reservationUnits={reservationUnitOptions}
+                unitGroupOptions={unitGroupOptions}
+                unitOptions={unitOptions}
+                statusOption="section"
+                enableApplicant
+              />
+              <ApplicationSectionDataLoader applicationRoundPk={applicationRound.pk ?? 0} />
+            </TabContent>
+          </Tabs.TabPanel>
+
+          <Tabs.TabPanel>
+            <TabContent>
+              <Filters
+                unitGroupOptions={unitGroupOptions}
+                unitOptions={unitOptions}
+                reservationUnitOptions={reservationUnitOptions}
                 enableApplicant
                 enableWeekday
                 enableReservationUnit
                 enableAccessCodeState
-                statusOption="eventShort"
+                statusOption="sectionShort"
               />
               <TimeSlotDataLoader applicationRoundPk={applicationRound.pk ?? 0} unitOptions={unitOptions} />
             </TabContent>
           </Tabs.TabPanel>
+
           {isApplicationRoundEnded && (
             <Tabs.TabPanel>
               <TabContent>
                 <Filters
-                  units={unitOptions}
-                  reservationUnits={reservationUnitOptions}
+                  unitGroupOptions={unitGroupOptions}
+                  unitOptions={unitOptions}
+                  reservationUnitOptions={reservationUnitOptions}
                   enableReservationUnit
-                  statusOption="eventShort"
+                  statusOption="sectionShort"
                 />
                 <RejectedOccurrencesDataLoader
                   applicationRoundPk={applicationRound.pk ?? 0}
@@ -232,33 +225,40 @@ function ApplicationRoundRouted(): JSX.Element | null {
   return <div>{t("errors.router.invalidApplicationRoundNumber")}</div>;
 }
 
-function getUnitOptions(resUnits: ApplicationRoundAdminFragment["reservationUnits"]) {
-  const opts = resUnits.map((x) => x?.unit).map((x) => toOption(x));
-  return filterNonNullable(opts);
-}
-
-function toOption(resUnit: Maybe<{ nameFi?: string | null; pk?: number | null }>) {
-  if (resUnit?.pk == null || resUnit.nameFi == null) {
+function toOption(
+  instance: Pick<
+    | ApplicationRoundAdminFragment["reservationUnits"][number]
+    | ApplicationRoundAdminFragment["reservationUnits"][number]["unit"],
+    "nameFi" | "pk"
+  >
+) {
+  if (instance?.pk == null || instance.nameFi == null) {
     return null;
   }
-  const { nameFi, pk } = resUnit;
-  return { nameFi, pk };
+  const { nameFi, pk } = instance;
+  return { label: nameFi, value: pk };
 }
 
-function getFilteredUnits(
+function getRoundReservationUnitOptions(applicationRound: Pick<ApplicationRoundAdminFragment, "reservationUnits">) {
+  return filterNonNullable(applicationRound.reservationUnits.map(toOption));
+}
+
+function getRoundUnitOptions(reservationUnits: ApplicationRoundAdminFragment["reservationUnits"]) {
+  return filterNonNullable(reservationUnits.map((x) => toOption(x?.unit)));
+}
+
+function getUserPermissionFilteredUnits(
   applicationRound: Maybe<ApplicationRoundAdminFragment> | undefined,
   user: CurrentUserQuery["currentUser"]
-) {
-  const resUnits = filterNonNullable(applicationRound?.reservationUnits?.flatMap((x) => x));
-
-  // need filtered list of units that the user has permission to view
-  const ds = getUnitOptions(resUnits).filter(
+): { label: string; value: number }[] {
+  // Return all units that the user has permission to view or manage in the application round
+  const reservationUnits = filterNonNullable(applicationRound?.reservationUnits);
+  const unitOptions = getRoundUnitOptions(reservationUnits).filter(
     (unit) =>
-      hasPermission(user, UserPermissionChoice.CanViewApplications, unit.pk) ||
-      hasPermission(user, UserPermissionChoice.CanManageApplications, unit.pk)
+      hasPermission(user, UserPermissionChoice.CanViewApplications, unit.value) ||
+      hasPermission(user, UserPermissionChoice.CanManageApplications, unit.value)
   );
-  const unitOptions = uniqBy(ds, (unit) => unit.pk).sort((a, b) => a.nameFi.localeCompare(b.nameFi));
-  return unitOptions;
+  return uniqBy(unitOptions, (unit) => unit.value).sort((a, b) => a.label.localeCompare(b.label));
 }
 
 function isAllocationEnabled(
@@ -272,28 +272,11 @@ function isAllocationEnabled(
   );
 }
 
-function hasApplicationRoundEnded(
-  applicationRound: Maybe<Pick<ApplicationRoundAdminFragment, "status">> | undefined
-): boolean {
+function hasApplicationRoundEnded(applicationRound: Pick<ApplicationRoundAdminFragment, "status">): boolean {
   return (
-    applicationRound != null &&
-    (applicationRound.status === ApplicationRoundStatusChoice.Handled ||
-      applicationRound.status === ApplicationRoundStatusChoice.ResultsSent)
+    applicationRound.status === ApplicationRoundStatusChoice.Handled ||
+    applicationRound.status === ApplicationRoundStatusChoice.ResultsSent
   );
-}
-
-function useReviewCheckPermissions({ units }: { units: number[] }) {
-  const { hasPermission: canView, isLoading } = useCheckPermission({
-    units,
-    permission: UserPermissionChoice.CanViewApplications,
-  });
-  const { hasPermission: canManage, isLoading: isLoading2 } = useCheckPermission({
-    units,
-    permission: UserPermissionChoice.CanManageApplications,
-  });
-  const canSeePage = canView || canManage;
-  const isLoadingPermissions = isLoading || isLoading2;
-  return { canSeePage, isLoadingPermissions };
 }
 
 export default ApplicationRoundRouted;

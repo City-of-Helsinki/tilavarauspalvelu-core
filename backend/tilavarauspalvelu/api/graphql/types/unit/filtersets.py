@@ -134,6 +134,7 @@ class UnitFilterSetMixin:
 
 class UnitFilterSet(ModelFilterSet, UnitFilterSetMixin):
     pk = IntMultipleChoiceFilter()
+    unit_group = IntMultipleChoiceFilter(field_name="unit_groups")
 
     name_fi = django_filters.CharFilter(field_name="name_fi", lookup_expr="istartswith")
     name_en = django_filters.CharFilter(field_name="name_en", lookup_expr="istartswith")
@@ -190,6 +191,7 @@ class UnitFilterSet(ModelFilterSet, UnitFilterSetMixin):
 
 class UnitAllFilterSet(ModelFilterSet, UnitFilterSetMixin):
     unit = IntMultipleChoiceFilter()
+    unit_group = IntMultipleChoiceFilter(field_name="unit_groups")
 
     name_fi = django_filters.CharFilter(field_name="name_fi", lookup_expr="istartswith")
     name_en = django_filters.CharFilter(field_name="name_en", lookup_expr="istartswith")

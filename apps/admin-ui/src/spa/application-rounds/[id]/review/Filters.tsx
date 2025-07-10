@@ -6,36 +6,33 @@ import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { AccessCodeState, ApplicationSectionStatusChoice, ReserveeType } from "@gql/gql-types";
 import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
 
-type UnitPkName = {
-  pk: number;
-  nameFi: string;
+type OptionType = {
+  value: number;
+  label: string;
 };
 
 type Props = {
-  units: UnitPkName[];
-  statusOption?: "application" | "event" | "eventShort";
+  unitGroupOptions: OptionType[];
+  unitOptions: OptionType[];
+  reservationUnitOptions?: OptionType[];
+  statusOption?: "application" | "section" | "sectionShort";
   enableApplicant?: boolean;
   enableWeekday?: boolean;
   enableReservationUnit?: boolean;
-  reservationUnits?: UnitPkName[];
   enableAccessCodeState?: boolean;
 };
 
 export function Filters({
-  units,
+  unitGroupOptions,
+  unitOptions,
+  reservationUnitOptions = [],
   statusOption = "application",
   enableApplicant = false,
   enableWeekday = false,
   enableReservationUnit = false,
-  reservationUnits = [],
   enableAccessCodeState = false,
 }: Props): JSX.Element {
   const { t } = useTranslation();
-
-  const unitOptions = units.map((unit) => ({
-    label: unit?.nameFi ?? "",
-    value: unit?.pk ?? "",
-  }));
 
   const statusOptions = VALID_ALLOCATION_APPLICATION_STATUSES.map((status) => ({
     label: t(`Application.statuses.${status}`),
@@ -54,6 +51,8 @@ export function Filters({
 
   const translateTag = (key: string, value: string) => {
     switch (key) {
+      case "unitGroup":
+        return unitGroupOptions.find((u) => u.value === Number(value))?.label ?? "-";
       case "unit":
         return unitOptions.find((u) => u.value === Number(value))?.label ?? "-";
       case "status":
@@ -63,8 +62,8 @@ export function Filters({
       case "weekday":
         return t(`dayLong.${value}`);
       case "reservationUnit":
-        return reservationUnits.find((u) => u.pk === Number(value))?.nameFi ?? "-";
-      case "eventStatus":
+        return reservationUnitOptions.find((u) => u.value === Number(value))?.label ?? "-";
+      case "sectionStatus":
         return t(`ApplicationSectionStatusChoice.${value}`);
       case "accessCodeState":
         return t(`accessType:accessCodeState.${value}`);
@@ -76,7 +75,7 @@ export function Filters({
   const hideSearchTags: string[] = [
     "tab",
     "orderBy",
-    ...(statusOption !== "application" ? ["status"] : ["eventStatus"]),
+    ...(statusOption !== "application" ? ["status"] : ["sectionStatus"]),
     ...(!enableWeekday ? ["weekday"] : []),
     ...(!enableReservationUnit ? ["reservationUnit"] : []),
   ];
@@ -86,17 +85,12 @@ export function Filters({
     value: i,
   }));
 
-  const reservationUnitOptions = reservationUnits.map((unit) => ({
-    label: unit?.nameFi ?? "",
-    value: unit?.pk ?? "",
-  }));
-
-  // event status is shared on two tabs, but allocated only has two options
-  const eventStatusArrayLong = Object.values(ApplicationSectionStatusChoice);
+  // section status is shared on two tabs, but allocated only has two options
+  const sectionStatusArrayLong = Object.values(ApplicationSectionStatusChoice);
   // TODO these are "declined" / "approved" but the decline functionality is not implemented
   // so disabling the filter for now (there is no backend filter for it nor can it be tested)
 
-  const eventStatusOptions = (statusOption === "eventShort" ? [] : eventStatusArrayLong).map((status) => ({
+  const sectionStatusOptions = (statusOption === "sectionShort" ? [] : sectionStatusArrayLong).map((status) => ({
     label: t(`ApplicationSectionStatusChoice.${status}`),
     value: status,
   }));
@@ -104,17 +98,18 @@ export function Filters({
   return (
     <>
       <AutoGrid>
+        <MultiSelectFilter name="unitGroup" options={unitGroupOptions} />
         <MultiSelectFilter name="unit" options={unitOptions} />
         {statusOption !== "application" ? (
-          eventStatusOptions.length > 0 ? (
-            <MultiSelectFilter name="eventStatus" options={eventStatusOptions} />
+          sectionStatusOptions.length > 0 ? (
+            <MultiSelectFilter name="sectionStatus" options={sectionStatusOptions} />
           ) : null
         ) : (
           <MultiSelectFilter name="status" options={statusOptions} />
         )}
+        {enableReservationUnit && <MultiSelectFilter name="reservationUnit" options={reservationUnitOptions} />}
         {enableApplicant && <MultiSelectFilter name="applicant" options={applicantOptions} />}
         {enableWeekday && <MultiSelectFilter name="weekday" options={weekdayOptions} />}
-        {enableReservationUnit && <MultiSelectFilter name="reservationUnit" options={reservationUnitOptions} />}
         {enableAccessCodeState && <MultiSelectFilter name="accessCodeState" options={accessCodeOptions} />}
         <SearchFilter name="search" />
       </AutoGrid>

@@ -21,6 +21,7 @@ from tests.factories import (
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
     UnitFactory,
+    UnitGroupFactory,
     UserFactory,
 )
 
@@ -170,6 +171,19 @@ def test_reservation_unit__filter__by_unit__multiple(graphql):
     assert len(response.edges) == 2
     assert response.node(0) == {"pk": reservation_unit_1.pk}
     assert response.node(1) == {"pk": reservation_unit_2.pk}
+
+
+def test_reservation_unit__filtering__by_unit_group(graphql):
+    unit_group = UnitGroupFactory.create()
+    reservation_unit = ReservationUnitFactory.create(unit__unit_groups=[unit_group])
+    ReservationUnitFactory.create()
+
+    query = reservation_units_query(unitGroup=unit_group.pk)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_unit.pk}
 
 
 def test_reservation_unit__filter__by_application_round__multiple(graphql):

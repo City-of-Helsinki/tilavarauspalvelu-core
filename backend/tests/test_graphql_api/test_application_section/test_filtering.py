@@ -19,6 +19,7 @@ from tests.factories import (
     ApplicationSectionFactory,
     ReservationPurposeFactory,
     SuitableTimeRangeFactory,
+    UnitGroupFactory,
 )
 from tests.test_graphql_api.test_application_section.helpers import sections_query
 
@@ -199,6 +200,27 @@ def test_application_section__filter__by_unit__multiple(graphql):
     assert len(response.edges) == 2, response
     assert response.node(0) == {"pk": section_1.pk}
     assert response.node(1) == {"pk": section_2.pk}
+
+
+def test_application_section__filter__by_unit_groups(graphql):
+    # given:
+    # - There are two application sections in the system to different units groups
+    # - A superuser is using the system
+    unit_group = UnitGroupFactory.create()
+    section = ApplicationSectionFactory.create_in_status_unallocated(
+        reservation_unit_options__reservation_unit__unit__unit_groups=[unit_group],
+    )
+    ApplicationSectionFactory.create_in_status_unallocated()
+    graphql.login_with_superuser()
+
+    # when:
+    # - User tries to search for applications with a specific unit
+    response = graphql(sections_query(unitGroup=[unit_group.pk]))
+
+    # then:
+    # - The response contains the application with the given unit
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": section.pk}
 
 
 def test_application_section__filter__by_reservation_unit(graphql):

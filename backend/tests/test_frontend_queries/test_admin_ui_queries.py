@@ -1050,6 +1050,29 @@ def test_frontend_queries__admin_ui__SearchReservationUnits(graphql):
     assert len(response.edges) == 1
 
 
+def test_frontend_queries__admin_ui__OwnUnitGroups(graphql):
+    admin_factories = get_admin_query_info()
+    factories = admin_factories["OwnUnitGroups"]
+
+    assert len(factories) == 1
+    query_info = factories[0]
+
+    factory_args = deepcopy(query_info.factory_args)
+    factory_args["units__name"] = "Create a unit for the group so it's not hidden in the GQL endpoint"
+    query_info.factory.create(**factory_args)
+
+    variables = deepcopy(query_info.variables)
+    assert_no_undefined_variables(variables)
+
+    query = query_info.query
+    graphql.login_with_superuser()
+
+    response = graphql(query, variables=variables)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+
+
 def test_frontend_queries__admin_ui__SeriesPage(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["SeriesPage"]

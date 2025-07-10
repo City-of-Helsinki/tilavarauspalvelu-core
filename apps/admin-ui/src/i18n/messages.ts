@@ -424,7 +424,7 @@ const translations: ITranslations = {
       btnRestoreAll: ["Palauta kaikki"],
     },
     headings: {
-      id: ["id"],
+      id: ["Id"],
       customer: ["Hakija"],
       unit: ["Toimipiste"],
       phase: ["Vaihe"],
@@ -1618,7 +1618,7 @@ const translations: ITranslations = {
       "Alla näet kaikki tulevat varaukset ja käsittelemättömät varaustoiveet. Voit tarkastella varauksia tarkemmin klikkaamalla varaajan nimeä.",
     ],
     headings: {
-      id: ["id"],
+      id: ["Id"],
       reserveeName: ["Varaajan nimi"],
       reservationUnit: ["Varausyksikkö"],
       unit: ["Toimipiste"],
@@ -1656,10 +1656,11 @@ const translations: ITranslations = {
     ageGroup: ["Ikäryhmä"],
     label: {
       unit: ["Toimipiste"],
+      unitGroup: ["Toimipisteryhmä"],
       reservationUnit: ["Varausyksikkö"],
       applicant: ["Asiakastyyppi"],
       status: ["Käsittelyn vaihe"],
-      eventStatus: ["Käsittelyn vaihe"],
+      sectionStatus: ["Käsittelyn vaihe"],
       weekday: ["Viikonpäivä"],
       selectUnits: ["Valitse toimipisteet"],
       priority: ["Aikatoive"],
@@ -1691,11 +1692,12 @@ const translations: ITranslations = {
     },
     placeholder: {
       unit: ["Valitse toimipiste"],
+      unitGroup: ["Valitse toimipisteryhmä"],
       reservationUnit: ["Valitse varausyksikkö"],
       applicant: ["Valitse asiakastyyppi"],
       // NOTE on purpose duplicating the translation, the filter is separate but we want same labels
       status: ["Valitse käsittelyn vaihe"],
-      eventStatus: ["Valitse käsittelyn vaihe"],
+      sectionStatus: ["Valitse käsittelyn vaihe"],
       weekday: ["Valitse viikonpäivä"],
       priority: ["Valitse aikatoive"],
       order: ["Valitse toivejärjestys"],

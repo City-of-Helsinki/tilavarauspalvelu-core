@@ -9,7 +9,7 @@ from graphene_django.settings import graphene_settings
 from tilavarauspalvelu.enums import ReservationKind
 from utils.date_utils import DEFAULT_TIMEZONE
 
-from tests.factories import ReservationFactory, ReservationUnitFactory, UnitFactory, UserFactory
+from tests.factories import ReservationFactory, ReservationUnitFactory, UnitFactory, UnitGroupFactory, UserFactory
 
 from .helpers import units_all_query, units_query
 
@@ -27,6 +27,26 @@ def test_units__filter__by_name(graphql, gql_query):
 
     graphql.login_with_superuser()
     response = graphql(gql_query(nameFi="111"))
+
+    assert response.has_errors is False, response.errors
+
+    if gql_query == units_query:
+        assert len(response.edges) == 1
+        assert response.node(0) == {"pk": unit.pk}
+    else:
+        assert len(response.first_query_object) == 1
+        assert response.first_query_object[0] == {"pk": unit.pk}
+
+
+@pytest.mark.parametrize("gql_query", [units_query, units_all_query])
+def test_units__filter__by_unit_group(graphql, gql_query):
+    unit_group = UnitGroupFactory.create()
+    unit = UnitFactory.create(unit_groups=[unit_group])
+    UnitFactory.create()
+    UnitFactory.create()
+
+    graphql.login_with_superuser()
+    response = graphql(gql_query(unitGroup=[unit_group.pk]))
 
     assert response.has_errors is False, response.errors
 

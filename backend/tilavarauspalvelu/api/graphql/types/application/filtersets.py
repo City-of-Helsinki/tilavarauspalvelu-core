@@ -31,6 +31,9 @@ class ApplicationFilterSet(ModelFilterSet):
     applicant_type = EnumMultipleChoiceFilter(enum=ReserveeType)
     status = EnumMultipleChoiceFilter(method="filter_by_status", enum=ApplicationStatusChoice)
     unit = IntMultipleChoiceFilter(field_name="application_sections__reservation_unit_options__reservation_unit__unit")
+    unit_group = IntMultipleChoiceFilter(
+        field_name="application_sections__reservation_unit_options__reservation_unit__unit__unit_groups"
+    )
     text_search = django_filters.CharFilter(method="filter_by_text_search")
 
     class Meta:

@@ -34,6 +34,7 @@ type Query {
     applicantType: [ReserveeType]
     status: [ApplicationStatusChoice]
     unit: [Int]
+    unitGroup: [Int]
     textSearch: String
 
     """Ordering"""
@@ -57,6 +58,7 @@ type Query {
     applicationRound: Int
     reservationUnit: [Int]
     unit: [Int]
+    unitGroup: [Int]
     applicantType: [ReserveeType]
     status: [ApplicationSectionStatusChoice]
     applicationStatus: [ApplicationStatusChoice]
@@ -84,6 +86,7 @@ type Query {
     applicationSectionStatus: [ApplicationSectionStatusChoice]
     applicantType: [ReserveeType]
     allocatedUnit: [Int]
+    unitGroup: [Int]
     allocatedReservationUnit: [Int]
     accessCodeState: [AccessCodeState]
     textSearch: String
@@ -116,6 +119,7 @@ type Query {
     nameEn_Icontains: String
     nameEn_Istartswith: String
     pk: [Int]
+    unitGroup: [Int]
     onlyWithPermission: Boolean
     publishedReservationUnits: Boolean
     ownReservations: Boolean
@@ -136,6 +140,7 @@ type Query {
     nameEn_Icontains: String
     nameEn_Istartswith: String
     unit: [Int]
+    unitGroup: [Int]
     onlyWithPermission: Boolean
     publishedReservationUnits: Boolean
     ownReservations: Boolean
@@ -273,6 +278,7 @@ type Query {
     tprekId: String
     tprekDepartmentId: String
     unit: [Int]
+    unitGroup: [Int]
     reservationUnitType: [Int]
     minPersonsGte: Int
     minPersonsLte: Int
@@ -508,6 +514,7 @@ type Query {
     applicationRound: Int
     reservationUnit: [Int]
     unit: [Int]
+    unitGroup: [Int]
     textSearch: String
 
     """Ordering"""
@@ -589,7 +596,28 @@ type Query {
     """Ordering"""
     orderBy: [BannerNotificationOrderingChoices]
   ): BannerNotificationNodeConnection
-  unitGroups(first: Int, last: Int, offset: Int, after: String, before: String): UnitGroupNodeConnection
+  unitGroups(
+    first: Int
+    last: Int
+    offset: Int
+    after: String
+    before: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    pk: [Int]
+    onlyWithPermission: Boolean
+    applicationRound: Int
+
+    """Ordering"""
+    orderBy: [UnitGroupOrderingChoices]
+  ): UnitGroupNodeConnection
 }
 
 type ApplicationRoundNode implements Node {
@@ -631,6 +659,7 @@ type ApplicationRoundNode implements Node {
     tprekId: String
     tprekDepartmentId: String
     unit: [Int]
+    unitGroup: [Int]
     reservationUnitType: [Int]
     minPersonsGte: Int
     minPersonsLte: Int
@@ -1017,6 +1046,7 @@ type UnitNode implements Node {
     tprekId: String
     tprekDepartmentId: String
     unit: [Int]
+    unitGroup: [Int]
     reservationUnitType: [Int]
     minPersonsGte: Int
     minPersonsLte: Int
@@ -1070,7 +1100,23 @@ type UnitNode implements Node {
     """Ordering"""
     orderBy: [SpaceOrderingChoices]
   ): [SpaceNode!]!
-  unitGroups: [UnitGroupNode!]!
+  unitGroups(
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    pk: [Int]
+    onlyWithPermission: Boolean
+    applicationRound: Int
+
+    """Ordering"""
+    orderBy: [UnitGroupOrderingChoices]
+  ): [UnitGroupNode!]!
 
   """The ID of the object"""
   id: ID!
@@ -1250,6 +1296,7 @@ type UnitGroupNode implements Node {
     nameEn_Icontains: String
     nameEn_Istartswith: String
     pk: [Int]
+    unitGroup: [Int]
     onlyWithPermission: Boolean
     publishedReservationUnits: Boolean
     ownReservations: Boolean
@@ -1287,6 +1334,18 @@ enum UnitOrderingChoices {
   unitGroupNameEnDesc
   unitGroupNameSvAsc
   unitGroupNameSvDesc
+}
+
+"""Ordering fields for the 'UnitGroup' model."""
+enum UnitGroupOrderingChoices {
+  pkAsc
+  pkDesc
+  nameFiAsc
+  nameFiDesc
+  nameEnAsc
+  nameEnDesc
+  nameSvAsc
+  nameSvDesc
 }
 
 type ReservationUnitTypeNode implements Node {
@@ -1671,6 +1730,7 @@ type UnitRoleNode implements Node {
     nameEn_Icontains: String
     nameEn_Istartswith: String
     pk: [Int]
+    unitGroup: [Int]
     onlyWithPermission: Boolean
     publishedReservationUnits: Boolean
     ownReservations: Boolean
@@ -1680,7 +1740,23 @@ type UnitRoleNode implements Node {
     """Ordering"""
     orderBy: [UnitOrderingChoices]
   ): [UnitNode!]!
-  unitGroups: [UnitGroupNode!]!
+  unitGroups(
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    pk: [Int]
+    onlyWithPermission: Boolean
+    applicationRound: Int
+
+    """Ordering"""
+    orderBy: [UnitGroupOrderingChoices]
+  ): [UnitGroupNode!]!
   assigner: UserNode
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -1711,6 +1787,7 @@ type ReservationSeriesNode implements Node {
     applicationRound: Int
     reservationUnit: [Int]
     unit: [Int]
+    unitGroup: [Int]
     textSearch: String
 
     """Ordering"""
@@ -1786,6 +1863,7 @@ type ReservationUnitOptionNode implements Node {
     applicationSectionStatus: [ApplicationSectionStatusChoice]
     applicantType: [ReserveeType]
     allocatedUnit: [Int]
+    unitGroup: [Int]
     allocatedReservationUnit: [Int]
     accessCodeState: [AccessCodeState]
     textSearch: String
@@ -1878,6 +1956,7 @@ type ApplicationNode implements Node {
     applicationRound: Int
     reservationUnit: [Int]
     unit: [Int]
+    unitGroup: [Int]
     applicantType: [ReserveeType]
     status: [ApplicationSectionStatusChoice]
     applicationStatus: [ApplicationStatusChoice]
