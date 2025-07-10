@@ -1,8 +1,9 @@
 import React from "react";
 import { addYears } from "date-fns";
 import { DateInput } from "hds-react";
-import { type FieldValues, type UseControllerProps, useController } from "react-hook-form";
+import { type FieldValues, useController, type UseControllerProps } from "react-hook-form";
 import { useTranslation } from "next-i18next";
+import { startOfDay } from "date-fns/startOfDay";
 
 interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
   error?: string;
@@ -41,7 +42,7 @@ export function ControlledDateInput<T extends FieldValues>({
       {...rest}
       id={id ?? `controlled-date-input__${name}`}
       label={label ?? t(`common.${name}`)}
-      minDate={minDate ?? new Date()}
+      minDate={startOfDay(minDate ?? new Date())}
       maxDate={maxDate ?? addYears(new Date(), 2)}
       initialMonth={initialMonth}
       disableConfirmation={disableConfirmation ?? false}

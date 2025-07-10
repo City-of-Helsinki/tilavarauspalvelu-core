@@ -110,7 +110,6 @@ function AccessTypePart({
         control={control}
         name={`accessTypes.${index}.beginDate`}
         label={t("accessType:validity.activeFrom")}
-        minDate={new Date()}
         error={getTranslatedError(t, errors.accessTypes?.[index]?.beginDate?.message)}
         disabled={isActiveAccessType}
         disableConfirmation

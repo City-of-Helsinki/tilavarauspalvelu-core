@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { isBefore } from "date-fns";
 import { DateInput } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { fromUIDate, toUIDate, isValidDate } from "common/src/common/util";
+import { fromUIDate, isValidDate, toUIDate } from "common/src/common/util";
 import { getLocalizationLang } from "common/src/helpers";
+import { startOfDay } from "date-fns/startOfDay";
 
 export interface DateRangePickerProps {
   endDate: Date | null;
@@ -162,7 +163,7 @@ export function DateRangePicker({
         onChange={handleStartDateChange}
         // disableConfirmation: is not accessible
         helperText={showHelperText ? helperText : undefined}
-        minDate={limits?.startMinDate ?? new Date()}
+        minDate={startOfDay(limits?.startMinDate ?? new Date())}
         maxDate={limits?.startMaxDate}
         initialMonth={new Date()}
         label={labels?.begin ?? t("dateSelector:labelStartDate")}
@@ -181,7 +182,7 @@ export function DateRangePicker({
         onChange={handleEndDateChange}
         // disableConfirmation: is not accessible
         helperText={showHelperText ? helperText : undefined}
-        minDate={limits?.endMinDate ?? new Date()}
+        minDate={startOfDay(limits?.endMinDate ?? new Date())}
         maxDate={limits?.endMaxDate}
         initialMonth={internalStartDate != null && isValidDate(internalStartDate) ? internalStartDate : new Date()}
         label={labels?.end ?? t("dateSelector:labelEndDate")}

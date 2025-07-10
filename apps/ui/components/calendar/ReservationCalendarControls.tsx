@@ -1,16 +1,16 @@
 import React, { useMemo } from "react";
-import { useTranslation, type TFunction } from "next-i18next";
+import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Button, ButtonVariant, IconAngleDown, IconAngleUp, IconCross, IconSize } from "hds-react";
 import { maxBy } from "lodash-es";
 import { fromUIDate } from "common/src/common/util";
 import { Transition } from "react-transition-group";
-import { SemiBold, Flex, fontBold, fontMedium, fontRegular } from "common/styled";
+import { Flex, fontBold, fontMedium, fontRegular, SemiBold } from "common/styled";
 import { breakpoints } from "common/src/const";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import { formatDateTimeRange } from "@/modules/util";
-import { useController, type Control, type FieldValues, type SubmitHandler, type UseFormReturn } from "react-hook-form";
+import { type Control, type FieldValues, type SubmitHandler, useController, type UseFormReturn } from "react-hook-form";
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { useMedia } from "react-use";
@@ -59,6 +59,7 @@ const Content = styled.div<{ $isAnimated: boolean }>`
    * cleaner would be to use visibility transition or custom transform-y to bring the new elements
    * from the top while pushing the submit button down.
    */
+
   ${({ $isAnimated }) =>
     $isAnimated &&
     `
@@ -76,7 +77,6 @@ const Content = styled.div<{ $isAnimated: boolean }>`
       overflow-y: hidden;
     }
   `}
-
   /* necessary but not a fan of doing it like this, make a separate component or use html defaults */
   label {
     ${fontMedium};
@@ -172,7 +172,6 @@ export function ReservationCalendarControls({
               control={control}
               label={t("reservationCalendar:startDate")}
               initialMonth={dateValue ?? new Date()}
-              minDate={new Date()}
               maxDate={lastOpeningDate?.endDatetime ? new Date(lastOpeningDate.endDatetime) : new Date()}
             />
             <div data-testid="calendar-controls__duration">
