@@ -34,7 +34,7 @@ import { StickyHeader } from "@/component/StickyHeader";
 import { BirthDate } from "@/component/BirthDate";
 import { ValueBox } from "@/component/ValueBox";
 import { TimeSelector } from "@/component/TimeSelector";
-import { getApplicantName } from "@/helpers";
+import { getApplicantName, translateReserveeType } from "@/helpers";
 import Error404 from "@/common/Error404";
 import { useCheckPermission } from "@/hooks";
 import { ApplicationDatas, Summary } from "@/styled";
@@ -555,8 +555,7 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
   const ref = useRef<HTMLHeadingElement>(null);
   const { t } = useTranslation();
 
-  const typename = "ApplicationNode";
-  const id = base64encode(`${typename}:${applicationPk}`);
+  const id = base64encode(`ApplicationNode:${applicationPk}`);
   const {
     data,
     loading: isLoading,
@@ -575,7 +574,7 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
   }
 
   if (error) {
-    return <div>{t("errors.errorFetchingApplication")}</div>;
+    return <div>{t("errors:errorFetchingApplication")}</div>;
   }
 
   // NOTE id query will return null if the application is not found or the user does not have permission
@@ -597,10 +596,7 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
     application.billingPostCode === application.organisationPostCode &&
     application.billingCity === application.organisationCity;
 
-  // FIXME this translation key is crazy just switch case it
-  const applicantType = t(
-    `application.applicantTypes.${application.applicantType}${application.applicantType === ReserveeType.Nonprofit && application.organisationIdentifier ? "_REGISTERED" : ""}`
-  );
+  const applicantType = translateReserveeType(t, application?.applicantType, application?.organisationIdentifier);
   const municipality = application.municipality
     ? t(`common:municipalities.${application.municipality.toUpperCase()}`)
     : "-";

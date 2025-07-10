@@ -4,6 +4,7 @@ import { useTranslation } from "next-i18next";
 import { convertOptionToHDS } from "common/src/helpers";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
+import styled from "styled-components";
 
 type SelectFilterProps = {
   name: string;
@@ -11,6 +12,13 @@ type SelectFilterProps = {
   sort?: boolean;
   clearable?: boolean;
 };
+
+const StyledSelect = styled(Select)`
+  /* HDS Tabs have z-index issues so as a hacky solution move the dropdowns above the tabs */
+  && > div > div {
+    z-index: 101;
+  }
+`;
 
 export function SelectFilter({ name, options, sort, clearable }: SelectFilterProps) {
   const searchParams = useSearchParams();
@@ -42,7 +50,7 @@ export function SelectFilter({ name, options, sort, clearable }: SelectFilterPro
   const label = t(`filters:label.${name}`);
   const placeholder = t("common:select");
   return (
-    <Select
+    <StyledSelect
       texts={{
         label,
         placeholder,

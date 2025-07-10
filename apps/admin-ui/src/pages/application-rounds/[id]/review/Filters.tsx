@@ -43,7 +43,7 @@ export function Filters({
   }));
 
   const applicantOptions = Object.values(ReserveeType).map((applicant) => ({
-    label: t(`application:applicantTypes.${applicant}`),
+    label: t(`translation:reserveeType.${applicant}`),
     value: applicant,
   }));
 
@@ -59,7 +59,7 @@ export function Filters({
       case "status":
         return t(`application:statuses.${value}`);
       case "applicant":
-        return t(`application:applicantTypes.${value}`);
+        return t(`translation:reserveeType.${value}`);
       case "weekday":
         return t(`translation:dayLong.${value}`);
       case "reservationUnit":

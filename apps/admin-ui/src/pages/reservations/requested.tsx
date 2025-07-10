@@ -49,8 +49,8 @@ function RequestedListing(): JSX.Element {
   return (
     <>
       <div>
-        <H1 $marginTop="l">{t("Reservations.reservationListHeading")}</H1>
-        <p>{t("Reservations.reservationListDescription")}</p>
+        <H1 $marginTop="l">{t("reservation:listHeading")}</H1>
+        <p>{t("reservations:listDescription")}</p>
       </div>
       <Filters defaultFilters={defaultFilters} clearButtonLabel={t("common:returnDefaults")} />
       <HR />

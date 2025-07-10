@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Flex, H4, fontMedium } from "common/styled";
@@ -13,15 +13,13 @@ import { Accordion } from "@/component/Accordion";
 import { AllocationCalendar } from "./AllocationCalendar";
 import { AllocationColumn } from "./AllocationColumn";
 import { type AllocationApplicationSectionCardType, ApplicationSectionCard } from "./ApplicationEventCard";
-import { useFocusApplicationEvent } from "./hooks";
 import { type ApolloQueryResult } from "@apollo/client";
-import { filterNonNullable, toNumber } from "common/src/helpers";
+import { filterNonNullable } from "common/src/helpers";
 import {
   type AllocatedTimeSlotNodeT,
   getRelatedTimeSlots,
   type SectionNodeT,
 } from "./modules/applicationRoundAllocation";
-import { useSearchParams } from "next/navigation";
 
 // TODO max-width for the grid columns (315px, 480px, 332px)
 // TODO not perfect (aligment issues with the last columns and grid end),
@@ -107,6 +105,8 @@ export function AllocationPageContent({
   applicationRoundStatus,
   relatedAllocations,
 }: ApplicationEventsProps): JSX.Element {
+  /* FIXME this is dangerous and causes infinite loops
+   * change the architecture in such a way that we don't need to do this
   const params = useSearchParams();
   // TODO could also pass the applicationSections to the hook and let it handle the filtering
   // and validating that the focused application event is in the list of application events
@@ -125,6 +125,7 @@ export function AllocationPageContent({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- We only care if reservationUnit changes, and adding the rest causes an infinite loop
   }, [reservationUnit, params]);
+  */
 
   const relatedSpacesTimeSlotsByDayReduced = getRelatedTimeSlots(relatedAllocations);
 

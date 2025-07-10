@@ -15,7 +15,7 @@ import {
 } from "@gql/gql-types";
 import { formatDuration, fromApiDate } from "common/src/common/util";
 import { formatDate, formatDateTimeRange, getReserveeName } from "@/common/util";
-import { fromAPIDateTime } from "@/helpers";
+import { fromAPIDateTime, getReserveeTypeTranslationKey } from "@/helpers";
 import { filterNonNullable, sort, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 import { convertWeekday } from "common/src/conversion";
@@ -111,34 +111,22 @@ export function getReservationPriceDetails(reservation: ReservationPriceDetailsF
       });
 }
 
-function reserveeTypeToTranslationKey(reserveeType: ReserveeType, isRegisteredAssociation: boolean) {
-  switch (reserveeType) {
-    case ReserveeType.Company:
-    case ReserveeType.Individual:
-      return `ReserveeType.${reserveeType}`;
-    case ReserveeType.Nonprofit:
-      return `ReserveeType.${reserveeType}.${isRegisteredAssociation ? "REGISTERED" : "UNREGISTERED"}`;
-    default:
-      return "";
-  }
-}
-
 export function getTranslationKeyForCustomerTypeChoice(
   reservationType: Maybe<ReservationTypeChoice> | undefined,
   reserveeType: Maybe<ReserveeType> | undefined,
   reserveeIdentifier: Maybe<string> | undefined
 ): string[] {
   if (!reservationType) {
-    return ["errors.missingReservationNode"];
+    return ["errors:missingReservationNode"];
   }
   if (reservationType === ReservationTypeChoice.Blocked) {
-    return ["ReservationType.BLOCKED"];
+    return ["translation:reservationType.BLOCKED"];
   }
 
   const reserveeTypeTranslationKey = reserveeType
-    ? reserveeTypeToTranslationKey(reserveeType, !!reserveeIdentifier)
+    ? (getReserveeTypeTranslationKey(reserveeType, reserveeIdentifier) ?? "")
     : "";
-  return [`ReservationType.${reservationType}`, reserveeTypeTranslationKey];
+  return [`translation:reservationType.${reservationType}`, reserveeTypeTranslationKey];
 }
 
 export function translateReservationCustomerType(

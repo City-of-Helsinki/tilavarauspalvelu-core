@@ -138,5 +138,31 @@
         "title": "Hylkää kaikki"
       }
     }
+  },
+  "listHeading": "Varaustoiveet",
+  "listDescription": "Alla näet kaikki käsittelemättömät varaustoiveet. Klikkaamalla varaajan nimeä pääset käsittelemään varauksen.",
+  "allListHeading": "Kaikki varaukset",
+  "allListDescription": "Alla näet kaikki tulevat varaukset ja käsittelemättömät varaustoiveet. Voit tarkastella varauksia tarkemmin klikkaamalla varaajan nimeä.",
+  "emptyFilterPageName": "varausta",
+  "Table": {
+    "headings": {
+      "id": "id",
+      "reserveeName": "Varaajan nimi",
+      "reservationUnit": "Varausyksikkö",
+      "unit": "Toimipiste",
+      "datetime": "Aika",
+      "createdAt": "Tehty",
+      "paymentStatus": "Maksutila",
+      "state": "Käsittelytila"
+    }
+  },
+    "prefixes": {
+      "behalf": "Puolesta| ",
+      "staff": "Sis.| "
+    },
+  "SeriesView": {
+    "Heading": "Ajankohta",
+    "changeTime": "Muuta aikaa",
+    "showInCalendar": "Näytä kalenterissa"
   }
 }

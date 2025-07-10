@@ -71,12 +71,12 @@ const getPaymentStatusLabelType = (status: OrderStatus | null | undefined): Stat
 
 const getColConfig = (t: TFunction): ReservationTableColumn[] => [
   {
-    headerName: t("Reservations.headings.id"),
+    headerName: t("reservation:Table.headings.id"),
     key: "pk",
     isSortable: true,
   },
   {
-    headerName: t("translation:Reservations.headings.reserveeName"),
+    headerName: t("reservation:Table.headings.reserveeName"),
     key: "reservee_name",
     isSortable: true,
     transform: (reservation: ReservationTableElementFragment) => {
@@ -89,34 +89,34 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     },
   },
   {
-    headerName: t("translation:Reservations.headings.reservationUnit"),
+    headerName: t("reservation:Table.headings.reservationUnit"),
     key: "reservation_unit_name_fi",
     isSortable: true,
     transform: ({ reservationUnit }: ReservationTableElementFragment) =>
       truncate(reservationUnit?.nameFi || "-", MAX_NAME_LENGTH),
   },
   {
-    headerName: t("translation:Reservations.headings.unit"),
+    headerName: t("reservation:Table.headings.unit"),
     key: "unit_name_fi",
     isSortable: true,
     transform: ({ reservationUnit }: ReservationTableElementFragment) =>
       truncate(reservationUnit?.unit?.nameFi || "-", MAX_NAME_LENGTH),
   },
   {
-    headerName: t("translation:Reservations.headings.datetime"),
+    headerName: t("reservation:Table.headings.datetime"),
     key: "begin",
     isSortable: true,
     transform: ({ beginsAt, endsAt }: ReservationTableElementFragment) =>
       formatDateTimeRange(t, new Date(beginsAt), new Date(endsAt)),
   },
   {
-    headerName: t("translation:Reservations.headings.createdAt"),
+    headerName: t("reservation:Table.headings.createdAt"),
     key: "created_at",
     isSortable: true,
     transform: ({ createdAt }: ReservationTableElementFragment) => (createdAt ? formatDateTime(createdAt) : "-"),
   },
   {
-    headerName: t("translation:Reservations.headings.paymentStatus"),
+    headerName: t("reservation:Table.headings.paymentStatus"),
     key: "orderStatus",
     isSortable: true,
     transform: ({ paymentOrder }: ReservationTableElementFragment) => {
@@ -126,13 +126,13 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
       const labelType = getPaymentStatusLabelType(paymentOrder.status);
       return (
         <StatusLabel type={labelType} icon={<IconEuroSign />} slim>
-          {t(`Payment.status.${paymentOrder.status}`)}
+          {t(`translation:Payment.status.${paymentOrder.status}`)}
         </StatusLabel>
       );
     },
   },
   {
-    headerName: t("translation:Reservations.headings.state"),
+    headerName: t("reservation:Table.headings.state"),
     key: "state",
     isSortable: true,
     transform: ({ state }: ReservationTableElementFragment) => {
@@ -157,7 +157,7 @@ export function ReservationsTable({
   const cols = memoize(() => getColConfig(t))();
 
   if (reservations.length === 0) {
-    const name = t("translation:Reservations.emptyFilterPageName");
+    const name = t("reservation:emptyFilterPageName");
     return <div>{t("common:noFilteredResults", { name })}</div>;
   }
 

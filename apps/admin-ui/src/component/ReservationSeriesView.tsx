@@ -127,7 +127,7 @@ export function ReservationSeriesView({
 
   return (
     <ReservationList
-      header={t("ReservationSeriesView.Heading")}
+      header={t("reservation:SeriesView.Heading")}
       items={items}
       reservationToCopy={reservationToCopy}
       refetch={handleChangeSuccess}

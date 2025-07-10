@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { errorToast } from "common/src/common/toast";
-import { useCheckPermission } from "@/hooks";
 import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { isApplicationRoundInProgress } from "@/helpers";
 import { CenterSpinner, Flex, TabWrapper, TitleSection, H1 } from "common/styled";
@@ -16,6 +15,12 @@ import {
   UserPermissionChoice,
   useApplicationRoundQuery,
   CurrentUserQuery,
+  ApplicationRoundQuery,
+  ApplicationRoundQueryVariables,
+  ApplicationRoundDocument,
+  CheckPermissionsQuery,
+  CheckPermissionsQueryVariables,
+  CheckPermissionsDocument,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { ApplicationRoundStatusLabel } from "./../ApplicationRoundStatusLabel";
@@ -31,11 +36,12 @@ import { ReviewEndAllocation } from "./review/ReviewEndAllocation";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import Link from "next/link";
-import { AuthorizationChecker } from "@/common/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
+import Error404 from "@/common/Error404";
+import { createClient } from "@/common/apolloClient";
 
 const TabContent = styled.div`
   display: grid;
@@ -44,26 +50,21 @@ const TabContent = styled.div`
   line-height: 1;
 `;
 
-function ApplicationRound({ pk }: { pk: number }): JSX.Element {
+type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
+
+export default function ApplicationRound({ pk }: PropsNarrowed): JSX.Element {
   const { t } = useTranslation();
   const [isInProgress, setIsInProgress] = useState(false);
 
-  const id = base64encode(`ApplicationRoundNode:${pk}`);
-  const isValid = pk > 0;
-
-  const { data, loading, refetch } = useApplicationRoundQuery({
-    skip: !isValid,
-    variables: { id },
+  const { data, previousData, loading, refetch } = useApplicationRoundQuery({
+    variables: { id: base64encode(`ApplicationRoundNode:${pk}`) },
     pollInterval: isInProgress ? 10000 : 0,
     onError: () => {
       errorToast({ text: t("errors:errorFetchingData") });
     },
   });
-  const { applicationRound } = data ?? {};
-  const units = filterNonNullable(applicationRound?.reservationUnits.map((x) => x.unit?.pk));
-  const { canSeePage, isLoadingPermissions } = useReviewCheckPermissions({
-    units,
-  });
+  const { applicationRound } = data ?? previousData ?? {};
 
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
@@ -98,14 +99,10 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
     }
   }, [unitOptions, searchParams, setParams]);
 
-  if (!canSeePage && !isLoadingPermissions) {
-    return <div>{t("errors.noPermission")}</div>;
-  } else if (isLoadingPermissions) {
-    return <CenterSpinner />;
-  } else if (loading) {
+  if (applicationRound == null && loading) {
     return <CenterSpinner />;
   } else if (!applicationRound) {
-    return <div>{t("errors.applicationRoundNotFound")}</div>;
+    return <Error404 />;
   }
 
   const selectedTab = searchParams.get("tab") ?? "applications";
@@ -224,20 +221,46 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   );
 }
 
-type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function ApplicationRoundRouted(props: PropsNarrowed): JSX.Element {
-  return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl} permission={UserPermissionChoice.CanManageApplications}>
-      <ApplicationRound pk={props.pk} />
-    </AuthorizationChecker>
-  );
-}
-
-export async function getServerSideProps({ locale, query }: GetServerSidePropsContext) {
+/// Do permission checks in SSR since they don't change and the extra query refreshes cause loading spinners
+export async function getServerSideProps({ locale, query, req }: GetServerSidePropsContext) {
   const pk = toNumber(ignoreMaybeArray(query.id));
 
   if (pk == null || pk <= 0) {
+    return NOT_FOUND_SSR_VALUE;
+  }
+
+  const commonProps = await getCommonServerSideProps();
+  const client = createClient(commonProps.apiBaseUrl, req);
+  const { data } = await client.query<ApplicationRoundQuery, ApplicationRoundQueryVariables>({
+    query: ApplicationRoundDocument,
+    variables: { id: base64encode(`ApplicationRoundNode:${pk}`) },
+  });
+  const { applicationRound } = data;
+  const units = filterNonNullable(applicationRound?.reservationUnits.map((x) => x.unit?.pk));
+
+  if (!applicationRound) {
+    return NOT_FOUND_SSR_VALUE;
+  }
+
+  const { data: viewPermissionData } = await client.query<CheckPermissionsQuery, CheckPermissionsQueryVariables>({
+    query: CheckPermissionsDocument,
+    variables: {
+      units,
+      permission: UserPermissionChoice.CanViewApplications,
+    },
+  });
+
+  const { data: managePermissionData } = await client.query<CheckPermissionsQuery, CheckPermissionsQueryVariables>({
+    query: CheckPermissionsDocument,
+    variables: {
+      units,
+      permission: UserPermissionChoice.CanManageApplications,
+    },
+  });
+  const canSeePage =
+    viewPermissionData.checkPermissions?.hasPermission || managePermissionData.checkPermissions?.hasPermission;
+
+  if (!canSeePage) {
     return NOT_FOUND_SSR_VALUE;
   }
 
@@ -298,20 +321,6 @@ function hasApplicationRoundEnded(
     (applicationRound.status === ApplicationRoundStatusChoice.Handled ||
       applicationRound.status === ApplicationRoundStatusChoice.ResultsSent)
   );
-}
-
-function useReviewCheckPermissions({ units }: { units: number[] }) {
-  const { hasPermission: canView, isLoading } = useCheckPermission({
-    units,
-    permission: UserPermissionChoice.CanViewApplications,
-  });
-  const { hasPermission: canManage, isLoading: isLoading2 } = useCheckPermission({
-    units,
-    permission: UserPermissionChoice.CanManageApplications,
-  });
-  const canSeePage = canView || canManage;
-  const isLoadingPermissions = isLoading || isLoading2;
-  return { canSeePage, isLoadingPermissions };
 }
 
 export const APPLICATION_ROUND_ADMIN_FRAGMENT = gql`

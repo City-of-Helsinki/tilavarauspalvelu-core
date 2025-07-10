@@ -7,12 +7,13 @@ import { CenterSpinner, fontBold, fontMedium, H1, TabWrapper } from "common/styl
 import { ShowAllContainer } from "common/src/components";
 import { hasPermission as hasUnitPermission } from "@/modules/permissionHelper";
 import {
+  ApplicationRoundFilterDocument,
   type ApplicationRoundFilterQuery,
+  ApplicationRoundFilterQueryVariables,
   ApplicationRoundStatusChoice,
   MunicipalityChoice,
   ReserveeType,
   useAllApplicationEventsQuery,
-  useApplicationRoundFilterQuery,
   useApplicationSectionAllocationsQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
@@ -37,10 +38,11 @@ import { useSession } from "@/hooks/auth";
 import { gql } from "@apollo/client";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useSearchParams } from "next/navigation";
-import { AuthorizationChecker } from "@/common/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
+import Error403 from "@/common/Error403";
+import { createClient } from "@/common/apolloClient";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;
 
@@ -114,13 +116,12 @@ const transformMunicipality = (value: string | null) => {
   return null;
 };
 
-type ApplicationRoundFilterQueryType = NonNullable<ApplicationRoundFilterQuery>["applicationRound"];
+type ApplicationRoundFilterQueryType = NonNullable<ApplicationRoundFilterQuery["applicationRound"]>;
 type ReservationUnitFilterQueryType = NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0];
 type UnitFilterQueryType = NonNullable<ReservationUnitFilterQueryType>["unit"];
 
 function ApplicationRoundAllocation({
   applicationRound,
-  applicationRoundPk,
   units,
   reservationUnits,
   roundName,
@@ -128,7 +129,6 @@ function ApplicationRoundAllocation({
 }: {
   applicationRound: ApplicationRoundFilterQueryType;
   // TODO refactor the others to use the RoundNode
-  applicationRoundPk: number;
   units: UnitFilterQueryType[];
   reservationUnits: ReservationUnitFilterQueryType[];
   // TODO do we want to prop drill these? or include it in every application event?
@@ -187,13 +187,13 @@ function ApplicationRoundAllocation({
 
   const query = useApplicationSectionAllocationsQuery({
     // On purpose skip if the reservation unit is not selected (it is required)
-    skip: !applicationRoundPk || reservationUnitFilterQuery == null,
+    skip: reservationUnitFilterQuery == null,
     pollInterval: ALLOCATION_POLL_INTERVAL,
     // NOTE required otherwise this returns stale data when filters change
     // there is an issue with the caches (sometimes returns incorrect data, not stale but incorrect)
     fetchPolicy: "network-only",
     variables: {
-      applicationRound: applicationRoundPk,
+      applicationRound: applicationRound.pk ?? 0,
       priority: priorityFilterQuery,
       preferredOrder: preferredOrderFilterQuery,
       includePreferredOrder10OrHigher,
@@ -240,9 +240,9 @@ function ApplicationRoundAllocation({
   // NOTE get the count of all application sections for the selected reservation unit
   // TODO this can be combined with the above query (but requires casting the alias)
   const { data: allEventsData } = useAllApplicationEventsQuery({
-    skip: applicationRoundPk === 0 || reservationUnitFilterQuery == null || unitFilter == null,
+    skip: reservationUnitFilterQuery == null || unitFilter == null,
     variables: {
-      applicationRound: applicationRoundPk,
+      applicationRound: applicationRound.pk ?? 0,
       reservationUnit: [reservationUnitFilterQuery],
       unit: [unitFilter],
       applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
@@ -308,7 +308,7 @@ function ApplicationRoundAllocation({
 
   const priorityOptions = ([300, 200] as const).map((n) => ({
     value: n,
-    label: t(`applicationSchedule:priority.${n}`),
+    label: t(`applicationSection:priority.${n}`),
   }));
 
   const orderOptions = Array.from(Array(10).keys())
@@ -330,7 +330,7 @@ function ApplicationRoundAllocation({
       case "textSearch":
         return value;
       case "applicantType":
-        return t(`application:applicantTypes.${value.toUpperCase()}`);
+        return t(`translation:reserveeType.${value.toUpperCase()}`);
       case "purpose":
         return purposeOptions.find((o) => String(o.value) === value)?.label ?? "";
       case "ageGroup":
@@ -357,7 +357,7 @@ function ApplicationRoundAllocation({
   };
 
   const handleRefetchApplicationEvents = async () => {
-    const id = base64encode(`ApplicationRoundNode:${applicationRoundPk}`);
+    const id = base64encode(`ApplicationRoundNode:${applicationRound.pk}`);
     await query.client.refetchQueries({
       include: ["ApplicationRound", id],
     });
@@ -375,7 +375,7 @@ function ApplicationRoundAllocation({
     value: value as MunicipalityChoice,
   }));
   const customerFilterOptions = Object.keys(ReserveeType).map((value) => ({
-    label: t(`application:applicantTypes.${value.toUpperCase()}`),
+    label: t(`translation:reserveeType.${value.toUpperCase()}`),
     value: value as ReserveeType,
   }));
   const unitOptions = units.map((unit) => ({
@@ -469,7 +469,7 @@ function ApplicationRoundAllocation({
         )}
       </NumberOfResultsContainer>
       {/* NOTE there is an effect inside this component that removes "aes" query param if we don't have data */}
-      {reservationUnit && !loading ? (
+      {reservationUnit ? (
         <AllocationPageContent
           applicationSections={applicationSections}
           reservationUnit={reservationUnit}
@@ -486,18 +486,47 @@ function ApplicationRoundAllocation({
 }
 
 // Do a single full query to get filter / page data
-function AllocationWrapper({ applicationRoundPk }: { applicationRoundPk: number }): JSX.Element {
-  const typename = "ApplicationRoundNode";
-  const id = base64encode(`${typename}:${applicationRoundPk}`);
-  const { loading, error, data } = useApplicationRoundFilterQuery({
-    skip: !applicationRoundPk,
-    variables: { id },
-  });
+function AllocationWrapper({
+  applicationRound,
+  filteredUnits,
+}: {
+  applicationRound: NonNullable<ApplicationRoundFilterQuery["applicationRound"]>;
+  filteredUnits: NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0]["unit"][];
+}): JSX.Element {
+  // user has no accesss to specific unit through URL with search params -> reset the filter
+  const searchParams = useSearchParams();
+  const setParams = useSetSearchParams();
+  useEffect(() => {
+    const unit = toNumber(searchParams.get("unit"));
+    if (unit != null && !filteredUnits.some((u) => u.pk === unit)) {
+      const p = new URLSearchParams(searchParams);
+      p.delete("unit");
+      setParams(p);
+    }
+  }, [filteredUnits, searchParams, setParams]);
 
-  const { t } = useTranslation();
+  const roundName = applicationRound?.nameFi ?? "-";
+
+  const reservationUnits = filterNonNullable(applicationRound?.reservationUnits);
+  const resUnits = sort(uniqBy(reservationUnits, "pk"), (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0);
+
+  return (
+    <ApplicationRoundAllocation
+      applicationRound={applicationRound}
+      units={filteredUnits}
+      reservationUnits={resUnits}
+      roundName={roundName}
+      applicationRoundStatus={applicationRound.status}
+    />
+  );
+}
+
+type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
+export default function ApplicationRoundRouted(props: PropsNarrowed): JSX.Element {
+  const { applicationRound } = props;
   const { user } = useSession();
 
-  const { applicationRound } = data ?? {};
   const reservationUnits = filterNonNullable(applicationRound?.reservationUnits);
   const unitData = reservationUnits.map((ru) => ru?.unit);
   const units = uniqBy(filterNonNullable(unitData), "pk");
@@ -512,77 +541,42 @@ function AllocationWrapper({ applicationRoundPk }: { applicationRoundPk: number 
     (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0
   );
 
-  // user has no accesss to specific unit through URL with search params -> reset the filter
-  const searchParams = useSearchParams();
-  const setParams = useSetSearchParams();
-  useEffect(() => {
-    const unit = toNumber(searchParams.get("unit"));
-    if (unit != null && !loading && !filteredUnits.some((u) => u.pk === unit)) {
-      const p = new URLSearchParams(searchParams);
-      p.delete("unit");
-      setParams(p);
-    }
-  }, [filteredUnits, searchParams, setParams, loading]);
-
-  // TODO don't use spinners, skeletons are better
-  // also this blocks the sub component query (the initial with zero filters) which slows down the page load
-  if (loading) {
-    return <CenterSpinner />;
-  }
-
-  // TODO improve this (disabled filters if error, notify the user, but don't block the whole page)
-  if (error) {
-    // eslint-disable-next-line no-console
-    console.error("Error: ", error);
-    return <p>{t("errors:errorFetchingData")}</p>;
-  }
-
   if (filteredUnits.length === 0) {
-    return <div>{t("errors.noPermission")}</div>;
+    return <Error403 />;
   }
 
-  const roundName = applicationRound?.nameFi ?? "-";
-
-  const resUnits = sort(uniqBy(reservationUnits, "pk"), (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0);
-
   return (
-    <ApplicationRoundAllocation
-      applicationRound={applicationRound ?? null}
-      applicationRoundPk={applicationRoundPk}
-      units={filteredUnits}
-      reservationUnits={resUnits}
-      roundName={roundName}
-      applicationRoundStatus={applicationRound?.status ?? ApplicationRoundStatusChoice.Upcoming}
-    />
-  );
-}
-
-type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function ApplicationRoundRouted(props: PropsNarrowed): JSX.Element {
-  const { pk, apiBaseUrl } = props;
-  // FIXME this goes to an infinite refresh loop due to the way we set default values for search params
-  // fix it by adding them in the SSR props
-
-  return (
-    <AuthorizationChecker apiUrl={apiBaseUrl} permission={UserPermissionChoice.CanManageApplications}>
+    <>
       <LinkPrev />
-      <AllocationWrapper applicationRoundPk={pk} />
-    </AuthorizationChecker>
+      <AllocationWrapper applicationRound={applicationRound} filteredUnits={filteredUnits} />
+    </>
   );
 }
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { locale, query } = ctx;
+  const { locale, query, req } = ctx;
   const pk = toNumber(ignoreMaybeArray(query.id));
 
   if (pk == null || pk <= 0) {
     return NOT_FOUND_SSR_VALUE;
   }
 
+  const commonProps = await getCommonServerSideProps();
+  const client = createClient(commonProps.apiBaseUrl, req);
+  const { data } = await client.query<ApplicationRoundFilterQuery, ApplicationRoundFilterQueryVariables>({
+    query: ApplicationRoundFilterDocument,
+    variables: { id: base64encode(`ApplicationRoundNode:${pk}`) },
+  });
+
+  const { applicationRound } = data;
+
+  if (applicationRound == null) {
+    return NOT_FOUND_SSR_VALUE;
+  }
+
   return {
     props: {
-      pk,
+      applicationRound,
       ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
@@ -706,6 +700,7 @@ export const APPLICATION_ROUND_FILTER_OPTIONS = gql`
   query ApplicationRoundFilter($id: ID!) {
     applicationRound(id: $id) {
       id
+      pk
       nameFi
       status
       reservationPeriodBeginDate

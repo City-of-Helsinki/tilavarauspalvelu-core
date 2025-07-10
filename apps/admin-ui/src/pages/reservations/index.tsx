@@ -35,8 +35,8 @@ export function ListReservations(): JSX.Element {
   return (
     <>
       <div>
-        <H1 $marginTop="l">{t("Reservations.allReservationListHeading")}</H1>
-        <p>{t("Reservations.allReservationListDescription")}</p>
+        <H1 $marginTop="l">{t("reservation:allListHeading")}</H1>
+        <p>{t("reservation:allListDescription")}</p>
       </div>
       <Filters
         defaultFilters={defaultFilters}

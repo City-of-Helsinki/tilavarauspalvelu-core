@@ -4,7 +4,7 @@ import { memoize, orderBy, uniqBy } from "lodash-es";
 import { IconLinkExternal, IconSize } from "hds-react";
 import { type ApplicationsTableElementFragment, ApplicationStatusChoice } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { getApplicantName, truncate } from "@/helpers";
+import { getApplicantName, translateReserveeType, truncate } from "@/helpers";
 import { CustomTable } from "@/component/Table";
 import { calculateAppliedReservationTime, formatAppliedReservationTime } from "./utils";
 import { getApplicationUrl } from "@/common/urls";
@@ -108,7 +108,7 @@ function appMapper(app: ApplicationsTableElementFragment, t: TFunction): Applica
   const eventPk = firstEvent?.pk ?? 0;
   const status = app.status;
   const applicantName = getApplicantName(app);
-  const applicantType = app.applicantType != null ? t(`application:applicantTypes.${app.applicantType}`) : "-";
+  const applicantType = translateReserveeType(t, app.applicantType, app.organisationId) || "-";
 
   const time = filterNonNullable(app.applicationSections?.map((ae) => calculateAppliedReservationTime(ae))).reduce<{
     count: number;
@@ -180,6 +180,7 @@ export const APPLICATIONS_TABLE_ELEMENT_FRAGMENT = gql`
     pk
     status
     ...ApplicationName
+    organisationIdentifier
     applicationSections {
       id
       pk

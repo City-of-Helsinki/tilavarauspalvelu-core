@@ -15,8 +15,8 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 
 function ReservationSeriesDoneInner({ recurringPk }: { recurringPk: number }) {
-  const { t } = useTranslation("translation", {
-    keyPrefix: "myUnits:ReservationSeries.Confirmation",
+  const { t } = useTranslation("myUnits", {
+    keyPrefix: "ReservationSeries.Confirmation",
   });
 
   const { reservations } = useReservationSeries(recurringPk);
@@ -39,7 +39,7 @@ function ReservationSeriesDoneInner({ recurringPk }: { recurringPk: number }) {
 
 function ErrorComponent() {
   const { t } = useTranslation();
-  return <div>{t("errors.errorReservationSeriesDoneDisplay")}</div>;
+  return <div>{t("errors:errorReservationSeriesDoneDisplay")}</div>;
 }
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];

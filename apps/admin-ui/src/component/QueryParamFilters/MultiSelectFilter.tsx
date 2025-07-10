@@ -4,6 +4,14 @@ import { convertOptionToHDS } from "common/src/helpers";
 import { Select } from "hds-react";
 import { useSearchParams } from "next/navigation";
 import { useTranslation } from "next-i18next";
+import styled from "styled-components";
+
+const StyledSelect = styled(Select)`
+  /* HDS Tabs have z-index issues so as a hacky solution move the dropdowns above the tabs */
+  && > div > div {
+    z-index: 101;
+  }
+`;
 
 // TODO is the T param good enough for type safety?
 // arrays of unions can be broken (ex. pushing a number to string[])
@@ -46,7 +54,7 @@ export function MultiSelectFilter({
   const label = t(`filters:label.${name}`);
   const placeholder = t(`filters:placeholder.${name}`);
   return (
-    <Select
+    <StyledSelect
       style={style}
       className={className}
       clearable

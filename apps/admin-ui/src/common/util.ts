@@ -101,7 +101,7 @@ export function getReserveeName(
 ): string {
   let prefix = "";
   if (reservation.type === ReservationTypeChoice.Behalf) {
-    prefix = t ? t("translation:Reservations.prefixes.behalf") : "";
+    prefix = t ? t("reservation:prefixes.behalf") : "";
   }
   if (
     // commented extra condition out for now, as the staff prefix was requested to be used for all staff reservations
@@ -109,7 +109,7 @@ export function getReserveeName(
     reservation.reserveeName ===
       `${reservation.user?.firstName} ${reservation.user?.lastName}` */
   ) {
-    prefix = t ? t("translation:Reservations.prefixes.staff") : "";
+    prefix = t ? t("reservation:prefixes.staff") : "";
   }
   return truncate(prefix + (reservation.reserveeName ?? "-"), length);
 }

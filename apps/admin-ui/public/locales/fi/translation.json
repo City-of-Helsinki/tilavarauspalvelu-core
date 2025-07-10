@@ -44,15 +44,14 @@
     "WEAK": "Heikko tunnistautuminen",
     "STRONG": "Vahva tunnistautuminen"
   },
-  "ReserveeType": {
-    "INDIVIDUAL": "yksityishenkilö",
-    "BUSINESS": "yritys",
-    "NONPROFIT": {
-      "REGISTERED": "yhdistys, rekisteröity",
-      "UNREGISTERED": "yhdistys, rekisteröimätön"
-    }
+  "reserveeType": {
+    "INDIVIDUAL": "Yksityishenkilö",
+    "COMPANY": "Yritys",
+    "NONPROFIT": "Yhdistys",
+    "NONPROFIT_REGISTERED": "Yhdistys, rekisteröity",
+    "NONPROFIT_UNREGISTERED": "Yhdistys, rekisteröimätön"
   },
-  "ReservationType": {
+  "reservationType": {
     "NORMAL": "",
     "BLOCKED": "Suljettu",
     "BEHALF": "Asiakkaan puolesta",
@@ -195,9 +194,6 @@
       "CANCELLED": ""
     }
   },
-  "ReservationSeriesView": {
-    "Heading": "Ajankohta"
-  },
   "Payment": {
     "status": {
       "DRAFT": "Maksu kesken",
@@ -216,54 +212,6 @@
       "unconfirmed": "Varaustoive",
       "otherRequiedHandling": "Muun varaajan toive",
       "rest": "Varattu"
-    }
-  },
-  "Reservations": {
-    "reservationListHeading": "Varaustoiveet",
-    "emptyFilterPageName": "varausta",
-    "reservationListDescription": "Alla näet kaikki käsittelemättömät varaustoiveet. Klikkaamalla varaajan nimeä pääset käsittelemään varauksen.",
-    "allReservationListHeading": "Kaikki varaukset",
-    "allReservationListDescription": "Alla näet kaikki tulevat varaukset ja käsittelemättömät varaustoiveet. Voit tarkastella varauksia tarkemmin klikkaamalla varaajan nimeä.",
-    "headings": {
-      "id": "id",
-      "reserveeName": "Varaajan nimi",
-      "reservationUnit": "Varausyksikkö",
-      "unit": "Toimipiste",
-      "datetime": "Aika",
-      "createdAt": "Tehty",
-      "paymentStatus": "Maksutila",
-      "state": "Käsittelytila"
-    },
-    "prefixes": {
-      "behalf": "Puolesta| ",
-      "staff": "Sis.| "
-    }
-  },
-  "ReservationsListButton": {
-    "changeTime": "Muuta aikaa",
-    "showInCalendar": "Näytä kalenterissa"
-  },
-  "validation": {
-    "string": {
-      "max": "Kenttään {{fieldName}} voi lisätä korkeintaan {{limit}} merkkiä.",
-      "empty": "{{fieldName}} on pakollinen tieto",
-      "base": "{{fieldName}} on pakollinen tieto"
-    },
-    "object": {
-      "unknown": "{{fieldName}} tuntematon"
-    },
-    "number": {
-      "empty": "{{fieldName}} on pakollinen tieto",
-      "base": "{{fieldName}} on pakollinen tieto",
-      "min": "{{fieldName}} pitää olla vähintään {{limit}}",
-      "max": "{{fieldName}} pitää olla pienempi kuin {{limit}}",
-      "precision": "{{fieldName}} {{limit}} desimaalia sallitaan"
-    },
-    "array": {
-      "min": "{{fieldName}} on pakollinen tieto"
-    },
-    "any": {
-      "required": "{{fieldName}} on pakollinen tieto"
     }
   }
 }

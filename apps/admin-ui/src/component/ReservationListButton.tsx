@@ -35,7 +35,7 @@ export function ReservationListButton({
     case "show":
       return (
         <Button key={type} {...btnCommon} iconStart={<IconClock />}>
-          {t("ReservationsListButton.showInCalendar")}
+          {t("reservation:SeriesView.showInCalendar")}
         </Button>
       );
     case "deny":
@@ -54,7 +54,7 @@ export function ReservationListButton({
     case "change":
       return (
         <Button key={type} {...btnCommon} iconStart={<IconPen />}>
-          {t("ReservationsListButton.changeTime")}
+          {t("reservation:SeriesView.changeTime")}
         </Button>
       );
     default:
