@@ -9,6 +9,7 @@ import {
 import { useState } from "react";
 import {
   type AllocatedTimeSlotNodeT,
+  decodeTimeSlot,
   type SectionNodeT,
   type SuitableTimeRangeNodeT,
   timeSlotKeyToScheduleTime,
@@ -18,6 +19,8 @@ import { useDisplayError } from "common/src/hooks";
 import { toNumber } from "common/src/helpers";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useSearchParams } from "next/navigation";
+import { type TimeSlotRange, useSelectedSlots } from "./SelectedSlotsContext";
+import { type DayT } from "common/src/const";
 
 export function useFocusApplicationEvent(): [number | null, (aes?: SectionNodeT) => void] {
   const params = useSearchParams();
@@ -69,41 +72,35 @@ export function useFocusAllocatedSlot(): [
 /// state is saved in the URL as selectionBegin and selectionEnd parameters
 /// TODO rework the interface, accepts string[] for compatibility, not because it's desired
 export function useSlotSelection(): [string[], (slots: string[]) => void] {
-  const params = useSearchParams();
-  const setParams = useSetSearchParams();
+  const { selection, setSelection } = useSelectedSlots();
 
   const setSelectedSlots = (slots: string[]) => {
     if (slots.length < 1) {
-      const qp = new URLSearchParams(params);
-      qp.delete("selectionBegin");
-      qp.delete("selectionEnd");
-      setParams(qp);
+      setSelection(null);
     } else {
-      // TODO change the save format
-      // current format is: {day}-{hour}-{minute}
-      // what's the format we'd like to use?
-      // we also don't allow using different days for begin and end so it should not be possible
-      // => maybe selectionDay, selectionBegin, selectionEnd
-      // with integers for each, time is in minutes from midnight?
       const selectionBegin = slots[0];
       const selectionEnd = slots[slots.length - 1];
       if (selectionBegin == null || selectionEnd == null) {
         return;
       }
-      const qp = new URLSearchParams(params);
-      qp.set("selectionBegin", selectionBegin);
-      qp.set("selectionEnd", selectionEnd);
-      setParams(qp);
+      const begins = decodeTimeSlot(selectionBegin);
+      const ends = decodeTimeSlot(selectionEnd);
+      setSelection({
+        begins: begins.hour,
+        ends: ends.hour,
+        day: begins.day as DayT,
+      });
     }
   };
 
   // generate a list of strings for each slot based on the interval
-  // we can assume the same day for begin and end (so end day is ignored)
-  const generateSelection = (begin: string, end: string): string[] => {
-    // current format: {day}-{hour}-{minute}
-    // with minute always 00 or 30
-    const [day, beginHour, beginMinute] = begin.split("-").map(toNumber);
-    const [_, endHour, endMinute] = end.split("-").map(toNumber);
+  const generateSelection = (selectionRange: TimeSlotRange): string[] => {
+    const { day, ends, begins } = selectionRange;
+    const beginHour = Math.floor(begins);
+    const beginMinute = Math.round((begins - beginHour) * 60);
+    const endHour = Math.floor(ends);
+    const endMinute = Math.round((ends - endHour) * 60);
+
     const slots = [];
     if (day == null || beginHour == null || beginMinute == null || endHour == null || endMinute == null) {
       return [];
@@ -126,17 +123,13 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
   };
 
   const getSelection = (): string[] => {
-    const selectionBegin = params.get("selectionBegin");
-    const selectionEnd = params.get("selectionEnd");
-    if (selectionBegin == null || selectionEnd == null) {
+    if (selection == null) {
       return [];
     }
-    return generateSelection(selectionBegin, selectionEnd);
+    return generateSelection(selection);
   };
 
-  const selection = getSelection();
-
-  return [selection, setSelectedSlots];
+  return [getSelection(), setSelectedSlots];
 }
 
 // side effects that should happen when a modification is made
