@@ -151,7 +151,20 @@ cp frontend/apps/customer/.env.example frontend/apps/customer/.env.local
 cp frontend/apps/staff/.env.example frontend/apps/staff/.env.local
 ```
 
-6. Start the frontend.
+6. Run codegen
+
+For non Windows users using GNU parallel
+```sh
+cd frontend
+pnpm codegen
+```
+
+For Windows
+```sh
+make codegen
+```
+
+7. Start the frontend.
 
 ```sh
 cd frontend
