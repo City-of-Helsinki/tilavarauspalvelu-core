@@ -260,16 +260,11 @@ function isAllocated(ae: ReservationUnitOptionNodeT, cell: Cell, day: DayT): boo
   return ae.allocatedTimeSlots.map((tr) => isInsideCell(day, cell, tr)).some((x) => x);
 }
 
-export function AllocationCalendar({ applicationSections, relatedAllocations }: Props): JSX.Element {
-  const [cells] = useState(
-    applicationEventSchedulesToCells(ALLOCATION_CALENDAR_TIMES[0], ALLOCATION_CALENDAR_TIMES[1])
-  );
-
+function usePriorityFilteredApplicationSections(aes: Props["applicationSections"]): SectionNodeT[] {
   const searchParams = useSearchParams();
   const priorityFilter = convertPriorityFilter(searchParams.getAll("priority"));
 
-  const [focused] = useFocusApplicationEvent();
-  const aes = applicationSections.map((ae) => {
+  return aes.map((ae) => {
     // if priority filter is set, we need to filter what is shown in calendar based on that
     // these are included in the backend request because we want to show them elsewhere, but not in the calendar
     if (priorityFilter.length > 0) {
@@ -280,9 +275,15 @@ export function AllocationCalendar({ applicationSections, relatedAllocations }: 
     }
     return ae;
   });
+}
 
-  const focusedApplicationEvent = aes.find((ae) => ae.pk === focused);
+export function AllocationCalendar({ applicationSections, relatedAllocations }: Props): JSX.Element {
+  const [cells] = useState(
+    applicationEventSchedulesToCells(ALLOCATION_CALENDAR_TIMES[0], ALLOCATION_CALENDAR_TIMES[1])
+  );
 
+  const [focused] = useFocusApplicationEvent();
+  const aes = usePriorityFilteredApplicationSections(applicationSections);
   const [focusedAllocated] = useFocusAllocatedSlot();
 
   const data = WEEKDAYS.map((day) => {
@@ -303,9 +304,10 @@ export function AllocationCalendar({ applicationSections, relatedAllocations }: 
       a.allocatedTimeSlots.some((ts) => ts.pk === focusedAllocated)
     );
 
+    const focusedApplicationSection = aes.find((ae) => ae.pk === focused);
     const focusedSlots =
-      focusedAllocated == null && focusedApplicationEvent != null
-        ? generateFocusedSlots(focusedApplicationEvent, day)
+      focusedAllocated == null && focusedApplicationSection != null
+        ? generateFocusedSlots(focusedApplicationSection, day)
         : generateAllocatedSlots(focusedAllocatedTimes, day);
 
     return {
