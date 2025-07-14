@@ -20,6 +20,7 @@ import {
   getRelatedTimeSlots,
   type SectionNodeT,
 } from "./modules/applicationRoundAllocation";
+import { SelectedSlotsContextProvider } from "./SelectedSlotsContext";
 
 // TODO max-width for the grid columns (315px, 480px, 332px)
 // TODO not perfect (aligment issues with the last columns and grid end),
@@ -145,24 +146,26 @@ export function AllocationPageContent({
 
   // TODO should use mobile menu layout if the screen is small (this page probably requires  >= 1200px)
   return (
-    <Content>
-      <ApplicationSectionColumn
-        applicationSections={applicationSections}
-        reservationUnit={reservationUnit}
-        refetchApplicationEvents={refetchApplicationEvents}
-      />
-      <AllocationCalendar
-        applicationSections={aesForThisUnit}
-        relatedAllocations={relatedSpacesTimeSlotsByDayReduced}
-      />
-      <AllocationColumn
-        applicationSections={aesForThisUnit}
-        reservationUnit={reservationUnit}
-        refetchApplicationEvents={refetchApplicationEvents}
-        applicationRoundStatus={applicationRoundStatus}
-        relatedAllocations={relatedSpacesTimeSlotsByDayReduced}
-      />
-    </Content>
+    <SelectedSlotsContextProvider>
+      <Content>
+        <ApplicationSectionColumn
+          applicationSections={applicationSections}
+          reservationUnit={reservationUnit}
+          refetchApplicationEvents={refetchApplicationEvents}
+        />
+        <AllocationCalendar
+          applicationSections={aesForThisUnit}
+          relatedAllocations={relatedSpacesTimeSlotsByDayReduced}
+        />
+        <AllocationColumn
+          applicationSections={aesForThisUnit}
+          reservationUnit={reservationUnit}
+          refetchApplicationEvents={refetchApplicationEvents}
+          applicationRoundStatus={applicationRoundStatus}
+          relatedAllocations={relatedSpacesTimeSlotsByDayReduced}
+        />
+      </Content>
+    </SelectedSlotsContextProvider>
   );
 }
 
