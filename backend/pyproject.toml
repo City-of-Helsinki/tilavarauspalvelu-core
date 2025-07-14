@@ -23,7 +23,7 @@ django-health-check = "3.20.0"
 django-helusers = "0.13.3"
 django-jinja = "2.11.0"
 django-lookup-property = "0.1.8"
-django-modeltranslation = "0.19.15"
+django-modeltranslation = "0.19.16"
 django-mptt = "0.17.0"
 django-redis = "6.0.0"
 djangorestframework = "3.16.0"
@@ -67,7 +67,7 @@ django-celery-results = "2.6.0"
 # Dependencies only required for running tests.
 factory-boy = "3.3.3"
 faker = "37.4.0"
-freezegun = "1.5.2"
+freezegun = "1.5.3"
 polib = "1.2.0"
 pyinstrument = "5.0.3"
 pypdf2 = "3.0.1"
@@ -80,7 +80,7 @@ pytest-xdist = "3.8.0"
 [tool.poetry.group.lint.dependencies]
 # Dependencies only required for linting.
 pre-commit = "4.2.0"
-ruff = "0.12.2"
+ruff = "0.12.3"
 
 [project.entry-points.pytest11]
 tilavarauspalvelu = "tests.plugins"
