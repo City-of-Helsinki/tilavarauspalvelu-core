@@ -154,7 +154,20 @@ cp frontend/apps/customer/.env.example frontend/apps/customer/.env.local
 cp frontend/apps/staff/.env.example frontend/apps/staff/.env.local
 ```
 
-6. Start the frontend.
+6. Run codegen
+
+For non Windows users using GNU parallel
+```sh
+cd frontend
+pnpm codegen
+```
+
+Without GNU parallel (e.g. Windows users)
+```sh
+make codegen
+```
+
+7. Start the frontend.
 
 ```sh
 cd frontend
@@ -465,7 +478,7 @@ Codegen needs to be run if either the backend schema or any frontend GQL query c
 
 Uses the schema file `tilavaraus.graphql` in the repo root and crawls the frontend code for `gql` tagged strings. Then generates Typescript types for them.
 
-Update GraphQL schema and types. Uses GNU Parallel to update all apps.
+Update GraphQL schema and types. Uses GNU parallel to update all apps.
 ```sh
 cd frontend
 pnpm codegen
@@ -482,7 +495,7 @@ cd frontend
 pnpm codegen:watch
 ```
 
-Watch mode has some issues with changes in packages/ui not propagated to the other packages.
+Watch mode has some issues with changes in `packages/ui` not propagated to the `apps`.
 Also when switching branches it might hit an unrecoverable error.
 In those cases running `pnpm codegen` first fixes the issue.
 
