@@ -126,8 +126,8 @@ importers:
         specifier: ^1.89.2
         version: 1.89.2
       styled-components:
-        specifier: 6.1.18
-        version: 6.1.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 6.1.19
+        version: 6.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tsconfig:
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -233,7 +233,7 @@ importers:
         version: 4.6.0
       hds-react:
         specifier: ^4.6.0
-        version: 4.6.0(@types/react@18.2.7)(eslint@9.30.1(jiti@2.4.2))(graphql-ws@6.0.5(graphql@16.11.0)(ws@8.18.3))(postcss@8.5.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+        version: 4.6.0(@types/react@18.2.7)(eslint@9.30.1(jiti@2.4.2))(graphql-ws@6.0.5(graphql@16.11.0)(ws@8.18.3))(postcss@8.5.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
       i18next:
         specifier: ^25.2.1
         version: 25.2.1(typescript@5.8.3)
@@ -268,8 +268,8 @@ importers:
         specifier: ^17.6.0
         version: 17.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       styled-components:
-        specifier: 6.1.18
-        version: 6.1.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 6.1.19
+        version: 6.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tsconfig:
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -318,7 +318,7 @@ importers:
         version: 18.0.1
       postcss-styled-syntax:
         specifier: ^0.7.1
-        version: 0.7.1(postcss@8.5.5)
+        version: 0.7.1(postcss@8.5.6)
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -357,7 +357,7 @@ importers:
         version: 16.11.0
       hds-react:
         specifier: ^4.6.0
-        version: 4.6.0(@types/react@18.2.7)(eslint@9.30.1(jiti@2.4.2))(graphql-ws@6.0.5(graphql@16.11.0)(ws@8.18.3))(postcss@8.5.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+        version: 4.6.0(@types/react@18.2.7)(eslint@9.30.1(jiti@2.4.2))(graphql-ws@6.0.5(graphql@16.11.0)(ws@8.18.3))(postcss@8.5.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
       i18next:
         specifier: ^25.2.1
         version: 25.2.1(typescript@5.8.3)
@@ -389,8 +389,8 @@ importers:
         specifier: ^2.17.0
         version: 2.17.0
       styled-components:
-        specifier: 6.1.18
-        version: 6.1.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 6.1.19
+        version: 6.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
@@ -445,7 +445,7 @@ importers:
         version: 15.3.3(@babel/core@7.27.4)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2)
       postcss-styled-syntax:
         specifier: ^0.7.1
-        version: 0.7.1(postcss@8.5.5)
+        version: 0.7.1(postcss@8.5.6)
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -5337,6 +5337,10 @@ packages:
     resolution: {integrity: sha512-d/jtm+rdNT8tpXuHY5MMtcbJFBkhXE6593XVR9UoGCH8jSFGci7jGvMGH5RYd5PBJW+00NZQt6gf7CbagJCrhg==}
     engines: {node: ^10 || ^12 || >=14}
 
+  postcss@8.5.6:
+    resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
+    engines: {node: ^10 || ^12 || >=14}
+
   postgres-array@2.0.0:
     resolution: {integrity: sha512-VpZrUqU5A69eQyW2c5CA1jtLecCsN2U/bD6VilrFDWq5+5UIEVO7nazS3TEcHf1zuPYO/sqGvUvW62g86RXZuA==}
     engines: {node: '>=4'}
@@ -5982,8 +5986,8 @@ packages:
   strip-literal@3.0.0:
     resolution: {integrity: sha512-TcccoMhJOM3OebGhSBEmp3UZ2SfDMZUEBdRA/9ynfLi8yYajyWX3JiXArcJt4Umh4vISpspkQIY8ZZoCqjbviA==}
 
-  styled-components@6.1.18:
-    resolution: {integrity: sha512-Mvf3gJFzZCkhjY2Y/Fx9z1m3dxbza0uI9H1CbNZm/jSHCojzJhQ0R7bByrlFJINnMzz/gPulpoFFGymNwrsMcw==}
+  styled-components@6.1.19:
+    resolution: {integrity: sha512-1v/e3Dl1BknC37cXMhwGomhO8AkYmN41CqyX9xhUDxry1ns3BFQy2lLDRQXJRdVVWB9OHemv/53xaStimvWyuA==}
     engines: {node: '>= 16'}
     peerDependencies:
       react: '>= 16.8.0'
@@ -7934,7 +7938,7 @@ snapshots:
   '@graphql-tools/optimize@2.0.0(graphql@16.11.0)':
     dependencies:
       graphql: 16.11.0
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@graphql-tools/prisma-loader@8.0.17(@types/node@24.0.14)(graphql@16.11.0)':
     dependencies:
@@ -7980,7 +7984,7 @@ snapshots:
       '@ardatan/relay-compiler': 12.0.3(graphql@16.11.0)
       '@graphql-tools/utils': 10.8.6(graphql@16.11.0)
       graphql: 16.11.0
-      tslib: 2.6.3
+      tslib: 2.8.1
     transitivePeerDependencies:
       - encoding
 
@@ -8020,7 +8024,7 @@ snapshots:
       cross-inspect: 1.0.1
       dset: 3.1.4
       graphql: 16.11.0
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@graphql-tools/utils@10.8.1(graphql@16.11.0)':
     dependencies:
@@ -8028,7 +8032,7 @@ snapshots:
       cross-inspect: 1.0.1
       dset: 3.1.4
       graphql: 16.11.0
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@graphql-tools/utils@10.8.2(graphql@16.11.0)':
     dependencies:
@@ -8036,7 +8040,7 @@ snapshots:
       cross-inspect: 1.0.1
       dset: 3.1.4
       graphql: 16.11.0
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@graphql-tools/utils@10.8.3(graphql@16.11.0)':
     dependencies:
@@ -10208,7 +10212,7 @@ snapshots:
 
   cross-inspect@1.0.1:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   cross-spawn@7.0.6:
     dependencies:
@@ -11287,6 +11291,48 @@ snapshots:
       - supports-color
       - typescript
 
+  hds-react@4.6.0(@types/react@18.2.7)(eslint@9.30.1(jiti@2.4.2))(graphql-ws@6.0.5(graphql@16.11.0)(ws@8.18.3))(postcss@8.5.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3):
+    dependencies:
+      '@apollo/client': 3.13.8(@types/react@18.2.7)(graphql-ws@6.0.5(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@babel/runtime': 7.17.9
+      '@emotion/styled-base': 11.0.0
+      '@hookform/resolvers': 2.9.11(react-hook-form@7.54.2(react@18.3.1))
+      '@juggle/resize-observer': 3.2.0
+      '@popperjs/core': 2.11.5
+      '@react-aria/visually-hidden': 3.8.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-spring/web': 9.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@types/cookie': 0.4.1
+      '@typescript-eslint/parser': 6.21.0(eslint@9.30.1(jiti@2.4.2))(typescript@5.8.3)
+      await-to-js: 3.0.0
+      cookie: 0.4.2
+      crc-32: 1.2.0
+      date-fns: 2.16.1
+      downshift: 6.0.6(react@18.3.1)
+      graphql: 16.11.0
+      hds-core: 4.6.0
+      jwt-decode: 3.1.2
+      kashe: 1.0.4
+      lodash: 4.17.21
+      memoize-one: 5.2.1
+      oidc-client-ts: 2.4.1
+      postcss: 8.5.6
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-hook-form: 7.54.2(react@18.3.1)
+      react-merge-refs: 1.1.0
+      react-popper: 2.2.5(@popperjs/core@2.11.5)(react@18.3.1)
+      react-use-measure: 2.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-virtual: 2.10.4(react@18.3.1)
+      uuid: 9.0.1
+      yup: 1.6.1
+    transitivePeerDependencies:
+      - '@types/react'
+      - eslint
+      - graphql-ws
+      - subscriptions-transport-ws
+      - supports-color
+      - typescript
+
   header-case@2.0.4:
     dependencies:
       capital-case: 1.0.4
@@ -12302,6 +12348,11 @@ snapshots:
       postcss: 8.5.5
       typescript: 5.8.3
 
+  postcss-styled-syntax@0.7.1(postcss@8.5.6):
+    dependencies:
+      postcss: 8.5.6
+      typescript: 5.8.3
+
   postcss-value-parser@4.2.0: {}
 
   postcss@8.4.31:
@@ -12317,6 +12368,12 @@ snapshots:
       source-map-js: 1.2.1
 
   postcss@8.5.5:
+    dependencies:
+      nanoid: 3.3.11
+      picocolors: 1.1.1
+      source-map-js: 1.2.1
+
+  postcss@8.5.6:
     dependencies:
       nanoid: 3.3.11
       picocolors: 1.1.1
@@ -13092,7 +13149,7 @@ snapshots:
     dependencies:
       js-tokens: 9.0.1
 
-  styled-components@6.1.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  styled-components@6.1.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@emotion/is-prop-valid': 1.2.2
       '@emotion/unitless': 0.8.1
@@ -13582,7 +13639,7 @@ snapshots:
       esbuild: 0.25.5
       fdir: 6.4.6(picomatch@4.0.2)
       picomatch: 4.0.2
-      postcss: 8.5.5
+      postcss: 8.5.6
       rollup: 4.43.0
       tinyglobby: 0.2.14
     optionalDependencies:
@@ -13598,7 +13655,7 @@ snapshots:
       esbuild: 0.25.5
       fdir: 6.4.6(picomatch@4.0.2)
       picomatch: 4.0.2
-      postcss: 8.5.5
+      postcss: 8.5.6
       rollup: 4.43.0
       tinyglobby: 0.2.14
     optionalDependencies:
