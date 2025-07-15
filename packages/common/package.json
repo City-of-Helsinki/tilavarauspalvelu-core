@@ -14,7 +14,6 @@
     "lint:fix": "eslint . --fix",
     "lint:css": "stylelint './src/**/*.tsx'",
     "test": "SKIP_ENV_VALIDATION=true TZ=Europe/Helsinki vitest",
-    "format": "prettier --ignore-path \"../.prettierignore\" --write \"**/*.{js,jsx,ts,tsx,json}\"",
     "tsc:check": "tsc --noEmit --project tsconfig.json",
     "tsc:clean": "tsc --build --clean"
   },
