@@ -61,14 +61,14 @@ export function getSpaceUrl(spacePk: Maybe<number> | undefined, unitPk: Maybe<nu
   if (spacePk == null || unitPk == null) {
     return "";
   }
-  return `${UNITS_URL_PREFIX}/${unitPk}/space/${spacePk}`;
+  return `${UNITS_URL_PREFIX}/${unitPk}/spaces/${spacePk}`;
 }
 
 export function getResourceUrl(resourcePk: Maybe<number> | undefined, unitPk: Maybe<number> | undefined): string {
   if (resourcePk == null || unitPk == null) {
     return "";
   }
-  return `${UNITS_URL_PREFIX}/${unitPk}/resource/${resourcePk}`;
+  return `${UNITS_URL_PREFIX}/${unitPk}/resources/${resourcePk}`;
 }
 
 export function getUnitUrl(unitPk: Maybe<number> | undefined): string {
