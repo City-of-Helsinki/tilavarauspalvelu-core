@@ -45,6 +45,15 @@ const config = {
         source: "/messaging/notifications/:any*",
         destination: "/notifications/:any*",
       },
+      // Fix missing 's' in resources and spaces
+      {
+        source: "/units/:id/resource/:any*",
+        destination: "/units/:id/resources/:any*",
+      },
+      {
+        source: "/units/:id/space/:any*",
+        destination: "/units/:id/spaces/:any*",
+      },
     ];
   },
 
