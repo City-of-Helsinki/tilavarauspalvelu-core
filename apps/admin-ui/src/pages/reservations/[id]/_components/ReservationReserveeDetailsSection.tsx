@@ -1,6 +1,6 @@
 import { useTranslation } from "next-i18next";
-import { Accordion, DataWrapper } from "./components";
-import { ApplicationDatas } from "@/styled";
+import { Accordion, ApplicationDatas } from "@/styled";
+import { DataWrapper } from "./DataWrapper";
 import React, { useState } from "react";
 import {
   ReservationPageQuery,

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { toUIDate } from "common/src/common/util";
 import { useTranslation } from "next-i18next";
 import { H1 } from "common/styled";
-import { Filters, ReservationsDataLoader } from "@/component/reservations";
+import { Filters, ReservationsDataLoader } from "./_components";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useSearchParams } from "next/navigation";
 import { AuthorizationChecker } from "@/common/AuthorizationChecker";
