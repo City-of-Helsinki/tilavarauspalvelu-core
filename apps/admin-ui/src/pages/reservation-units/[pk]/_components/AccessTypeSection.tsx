@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
-import { AccessTypes, ReservationUnitEditFormValues } from "../form";
+import { AccessTypes, type ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 import { ControlledDateInput, ControlledSelect } from "common/src/components/form";
 import { fromUIDate } from "common/src/common/util";
