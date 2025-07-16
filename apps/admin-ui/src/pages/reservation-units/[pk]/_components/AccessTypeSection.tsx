@@ -17,13 +17,14 @@ import { NotificationInline } from "@/component/NotificationInline";
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
 
-const CurrentAccessTypeContainer = styled(Flex)`
+const CurrentAccessTypeContainer = styled(Flex).attrs({
+  $gap: "s",
+  $alignItems: "center",
+  $justifyContent: "space-between",
+  $direction: "row",
+})`
   background-color: var(--color-black-5);
   padding: var(--spacing-m);
-  gap: var(--spacing-s);
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
 `;
 
 const WidthLimitedContainer = styled(Flex)`
