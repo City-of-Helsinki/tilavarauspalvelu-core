@@ -96,6 +96,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
         text: t("spaces:resourceUpdatedNotification"),
       });
       refetch();
+      // FIXME this should go up, not back
       router.back();
     } catch (err) {
       displayError(err);
@@ -111,6 +112,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
         <Editor>
           <ResourceEditorFields form={form} unitPk={unitPk} />
           <ButtonContainer>
+            {/* FIXME this should go up, not back */}
             <Button onClick={() => router.back()} variant={ButtonVariant.Secondary}>
               {t("common:cancel")}
             </Button>
