@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from graphene_django_extensions import NestingModelSerializer
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.models import ReservationUnitOption

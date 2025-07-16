@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, NamedTuple
 
 import freezegun
 import pytest
-from graphene_django_extensions.testing import parametrize_helper
 
 from utils.date_utils import (
     DEFAULT_TIMEZONE,

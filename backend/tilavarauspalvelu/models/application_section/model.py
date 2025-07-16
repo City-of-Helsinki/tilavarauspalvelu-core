@@ -269,8 +269,10 @@ class ApplicationSection(SerializableMixin, models.Model):
         from tilavarauspalvelu.models import Reservation
 
         exists = Exists(
-            queryset=Reservation.objects.for_application_section(models.OuterRef("pk")).filter(
-                L(access_code_should_be_active=True),
+            queryset=(
+                Reservation.objects.all()
+                .for_application_section(models.OuterRef("pk"))
+                .filter(L(access_code_should_be_active=True))
             ),
         )
         return exists  # type: ignore[return-value]  # noqa: RET504

@@ -4,6 +4,7 @@ from __future__ import annotations
 import os
 import zoneinfo
 from pathlib import Path
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 from env_config import Environment, values
@@ -71,9 +72,8 @@ class Common(Environment):
         "django_celery_beat",
         "django_celery_results",
         "django_extensions",
-        "django_filters",
         "easy_thumbnails",
-        "graphene_django",
+        "undine",
         "import_export",
         "mptt",
         "rangefilter",
@@ -384,14 +384,21 @@ class Common(Environment):
     PINDORA_API_URL = values.StringValue()
     PINDORA_API_KEY = values.StringValue()
 
-    # --- Graphene settings ------------------------------------------------------------------------------------------
+    # --- Undine settings --------------------------------------------------------------------------------------------
 
-    GRAPHENE = {
-        "SCHEMA": "tilavarauspalvelu.api.graphql.schema.schema",
-        "MIDDLEWARE": [
-            "config.middleware.GraphQLSentryMiddleware",
-        ],
-    }
+    @classproperty
+    def UNDINE(cls) -> dict[str, Any]:
+        return {
+            "SCHEMA": "tilavarauspalvelu.api.graphql.schema.schema",
+            "MAX_QUERY_COMPLEXITY": 50,
+            "GRAPHIQL_ENABLED": cls.DEBUG,
+            "ALLOW_DID_YOU_MEAN_SUGGESTIONS": cls.DEBUG,
+            "ALLOW_INTROSPECTION_QUERIES": cls.DEBUG,
+            "FILE_UPLOAD_ENABLED": True,
+            "MIDDLEWARE": [
+                "config.middleware.GraphQLSentryMiddleware",
+            ],
+        }
 
     # --- Django REST Framework settings -----------------------------------------------------------------------------
 
@@ -514,10 +521,6 @@ class Common(Environment):
     ICAL_HASH_SECRET = values.StringValue()
     EXPORT_AUTHORIZATION_TOKEN = values.StringValue()
 
-    GRAPHENE_DJANGO_EXTENSIONS = {
-        "EXPERIMENTAL_REMOVE_TRANSLATION_BASE_FIELDS": True,
-    }
-
     # Allows faking membership to certain AD groups for testing automatic role assignment
     FAKE_SUPERUSER_AD_GROUPS = values.ListValue(default=[])
 
@@ -630,16 +633,6 @@ class Local(Common, overrides_from=LocalMixin):
     MOCK_VERKKOKAUPPA_API_ENABLED = values.BooleanValue(default=True)
     MOCK_VERKKOKAUPPA_FRONTEND_URL = values.StringValue(default="http://localhost:3000")
     MOCK_VERKKOKAUPPA_BACKEND_URL = values.StringValue(default="http://localhost:8000")
-
-    # --- Graphene settings ------------------------------------------------------------------------------------------
-
-    GRAPHENE = {
-        "SCHEMA": Common.GRAPHENE["SCHEMA"],
-        "MIDDLEWARE": [
-            "graphene_django.debug.DjangoDebugMiddleware",
-            "config.middleware.GraphQLErrorLoggingMiddleware",
-        ],
-    }
 
     # --- Celery settings --------------------------------------------------------------------------------------------
 
@@ -762,16 +755,6 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     # --- Celery settings --------------------------------------------------------------------------------------------
 
     CELERY_TASK_ALWAYS_EAGER = True
-
-    # --- Graphene settings ------------------------------------------------------------------------------------------
-
-    GRAPHENE = {
-        "SCHEMA": Common.GRAPHENE["SCHEMA"],
-        "TESTING_ENDPOINT": "/graphql/",
-        "MIDDLEWARE": [
-            "config.middleware.GraphQLErrorLoggingMiddleware",
-        ],
-    }
 
     # --- Static file settings ---------------------------------------------------------------------------------------
 

@@ -3,10 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 
-import graphene
-from graphene_django_extensions import DjangoNode
 from lookup_property import L
-from query_optimizer import AnnotatedField, MultiField
 
 from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, Weekday
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService

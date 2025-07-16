@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from graphene_django_extensions import DjangoNode
-
 from tilavarauspalvelu.models import EquipmentCategory
 
 from .filtersets import EquipmentCategoryFilterSet

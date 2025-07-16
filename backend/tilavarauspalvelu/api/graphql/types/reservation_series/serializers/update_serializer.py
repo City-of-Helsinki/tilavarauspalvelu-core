@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.db import transaction
-from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 
 from tilavarauspalvelu.models import Reservation, ReservationSeries

@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Any, NamedTuple
 import freezegun
 import pytest
 from freezegun import freeze_time
-from graphene_django_extensions.testing import parametrize_helper
 
 from tilavarauspalvelu.enums import (
     AccessType,

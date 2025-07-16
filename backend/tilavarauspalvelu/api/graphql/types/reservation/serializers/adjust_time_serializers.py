@@ -1,16 +1,13 @@
 from __future__ import annotations
 
-from graphene_django_extensions import NestingModelSerializer
-from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Reservation
-from tilavarauspalvelu.typing import ReservationAdjustTimeData
+from tilavarauspalvelu.typing import ReservationAdjustTimeData, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.errors import ExternalServiceError
 

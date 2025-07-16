@@ -7,9 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 from django.core.cache import cache
 from django.db import models
-from graphene_django.settings import graphene_settings
 from lookup_property import L
-from query_optimizer.utils import calculate_queryset_slice
 
 from tilavarauspalvelu.enums import AccessType, ApplicationRoundStatusChoice
 from tilavarauspalvelu.exceptions import FirstReservableTimeError
@@ -25,7 +23,6 @@ if TYPE_CHECKING:
     from decimal import Decimal
 
     from django.db.models import QuerySet, When
-    from query_optimizer.validators import PaginationArgs
 
     from tilavarauspalvelu.models import ReservationUnit
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet

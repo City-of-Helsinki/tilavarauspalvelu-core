@@ -4,7 +4,6 @@ import datetime
 import uuid
 from typing import TYPE_CHECKING
 
-from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice

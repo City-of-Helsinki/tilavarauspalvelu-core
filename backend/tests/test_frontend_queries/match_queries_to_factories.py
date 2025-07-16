@@ -15,11 +15,6 @@ from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.db.models import NOT_PROVIDED, ForeignObjectRel
 from django.db.models.fields.related import RelatedField
-from graphene.types.utils import get_underlying_type
-from graphene.utils.str_converters import to_snake_case
-from graphene_django import DjangoObjectType
-from graphene_django.rest_framework.mutation import SerializerMutationOptions
-from graphene_django.types import DjangoObjectTypeOptions
 from graphql import (
     FieldNode,
     GraphQLInputObjectType,
@@ -42,8 +37,6 @@ from tests.factories._base import GenericDjangoModelFactory
 
 if TYPE_CHECKING:
     from pathlib import Path
-
-    from graphene.types.objecttype import ObjectTypeOptions
 
 
 type ModelField = models.Field | models.ForeignObjectRel

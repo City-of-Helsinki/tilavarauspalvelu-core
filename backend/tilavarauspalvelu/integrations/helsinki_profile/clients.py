@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.utils.functional import classproperty
-from graphene_django_extensions.utils import get_nested
 from requests import HTTPError
 from rest_framework.status import HTTP_200_OK
 from social_django.models import DjangoStorage

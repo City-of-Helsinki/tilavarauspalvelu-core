@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pytest
-from graphene_django_extensions.testing import build_query
 
 from tilavarauspalvelu.enums import UserRoleChoice
 

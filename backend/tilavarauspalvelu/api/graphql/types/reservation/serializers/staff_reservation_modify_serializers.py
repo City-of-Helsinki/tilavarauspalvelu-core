@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from graphene_django_extensions import NestingModelSerializer
-from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.enums import (

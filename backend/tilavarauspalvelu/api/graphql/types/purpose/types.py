@@ -2,11 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import graphene
 from django.db import models
 from easy_thumbnails.files import get_thumbnailer
-from graphene_django_extensions import DjangoNode
-from query_optimizer import AnnotatedField
 
 from tilavarauspalvelu.models import Purpose
 

@@ -4,7 +4,6 @@ import datetime
 from typing import Any, NamedTuple
 
 import pytest
-from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import HaukiResourceState
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIOpeningHoursResponseTime

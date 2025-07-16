@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any, NamedTuple
 
 import pytest
-from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice, ReserveeType
 

@@ -6,7 +6,6 @@ from types import SimpleNamespace
 from typing import NamedTuple, cast
 
 import pytest
-from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import ReservationStartInterval
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement

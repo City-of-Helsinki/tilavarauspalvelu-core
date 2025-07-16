@@ -2,9 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import django_filters
-from graphene_django_extensions import ModelFilterSet
-from graphene_django_extensions.filters import IntChoiceFilter, IntMultipleChoiceFilter
 from lookup_property import L
 
 from tilavarauspalvelu.models import RejectedOccurrence

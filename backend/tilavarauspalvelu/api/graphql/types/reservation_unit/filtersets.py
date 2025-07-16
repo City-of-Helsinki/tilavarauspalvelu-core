@@ -3,17 +3,9 @@ from __future__ import annotations
 import base64
 from typing import TYPE_CHECKING, Any
 
-import django_filters
 from django.contrib.postgres.search import SearchQuery
 from django.db import models
 from django.db.models import Q
-from graphene_django_extensions import ModelFilterSet
-from graphene_django_extensions.filters import (
-    EnumChoiceFilter,
-    EnumMultipleChoiceFilter,
-    IntChoiceFilter,
-    IntMultipleChoiceFilter,
-)
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -31,7 +23,6 @@ if TYPE_CHECKING:
     from decimal import Decimal
 
     from django.db.models import QuerySet
-    from query_optimizer.validators import PaginationArgs
 
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
     from tilavarauspalvelu.typing import AnyUser

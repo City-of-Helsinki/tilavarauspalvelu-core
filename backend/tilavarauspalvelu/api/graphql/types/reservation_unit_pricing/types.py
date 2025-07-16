@@ -2,9 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import graphene
-from graphene_django_extensions import DjangoNode
-
 from tilavarauspalvelu.enums import PaymentType
 from tilavarauspalvelu.models import ReservationUnitPricing
 

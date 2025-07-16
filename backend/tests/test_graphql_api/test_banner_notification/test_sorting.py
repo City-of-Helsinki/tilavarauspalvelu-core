@@ -5,7 +5,6 @@ from typing import NamedTuple
 
 import pytest
 from freezegun import freeze_time
-from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget
 from utils.date_utils import local_datetime

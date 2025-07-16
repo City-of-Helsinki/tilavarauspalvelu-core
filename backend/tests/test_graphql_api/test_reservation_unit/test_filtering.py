@@ -4,7 +4,6 @@ import datetime
 from typing import NamedTuple
 
 import pytest
-from graphene_django_extensions.testing import parametrize_helper
 
 from tilavarauspalvelu.enums import (
     AccessType,

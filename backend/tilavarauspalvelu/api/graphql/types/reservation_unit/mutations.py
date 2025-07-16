@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from graphene_django_extensions import CreateMutation, UpdateMutation
-
 from .permissions import ReservationUnitPermission
 from .serializers import ReservationUnitSerializer
 

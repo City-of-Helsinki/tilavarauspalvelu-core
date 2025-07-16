@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import ReservationKind, ReservationTypeChoice, ReservationUnitPublishingState
 from tilavarauspalvelu.models import Reservation
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_datetime, local_start_of_day
 
 if TYPE_CHECKING:

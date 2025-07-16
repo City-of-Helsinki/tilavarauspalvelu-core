@@ -4,8 +4,6 @@ import uuid
 from functools import partial
 from typing import TYPE_CHECKING
 
-from graphene_django_extensions.testing import build_mutation, build_query
-
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
 
 if TYPE_CHECKING:

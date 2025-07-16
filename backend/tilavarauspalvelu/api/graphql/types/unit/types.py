@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from graphene_django_extensions import DjangoNode
-
 from tilavarauspalvelu.models import Unit
 
 from .filtersets import UnitAllFilterSet, UnitFilterSet

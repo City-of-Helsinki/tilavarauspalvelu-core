@@ -5,7 +5,6 @@ from collections import defaultdict
 from types import NoneType
 from typing import Any
 
-from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification

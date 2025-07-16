@@ -3,14 +3,10 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 
-import graphene
 from django.db import models
 from django.db.models import OuterRef
 from django.db.models.functions import JSONObject
-from graphene_django_extensions import DjangoNode
 from lookup_property import L
-from query_optimizer import AnnotatedField, ManuallyOptimizedField, MultiField
-from query_optimizer.optimizer import QueryOptimizer
 from rest_framework.reverse import reverse
 
 from tilavarauspalvelu.api.graphql.types.user.types import UserNode

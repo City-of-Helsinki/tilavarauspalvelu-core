@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Any
 from rest_framework.fields import SkipField
 
 if TYPE_CHECKING:
-    from graphene_django_extensions.typing import AnyUser
     from rest_framework import serializers
     from rest_framework.fields import Field
 

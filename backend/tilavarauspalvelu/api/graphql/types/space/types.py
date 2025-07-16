@@ -2,10 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from graphene_django_extensions import DjangoNode
-from graphene_django_extensions.fields import RelatedField
-from query_optimizer import DjangoListField
-
 from tilavarauspalvelu.models import Space
 
 from .filtersets import SpaceFilterSet

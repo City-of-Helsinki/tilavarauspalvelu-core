@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from graphene_django_extensions import NestingModelSerializer
 from rest_framework.fields import CharField, IntegerField
 
 from tilavarauspalvelu.models import Reservation

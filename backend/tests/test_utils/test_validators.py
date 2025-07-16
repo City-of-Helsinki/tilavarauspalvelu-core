@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, NamedTuple
 
 import pytest
 from django.core.exceptions import ValidationError
-from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.typing import TimeSlot
 from tilavarauspalvelu.validators import validate_reservable_times_begin_end, validate_reservable_times_overlap

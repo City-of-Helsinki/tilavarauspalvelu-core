@@ -2,16 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import graphene
-from graphene_django_extensions.errors import GQLCodeError, GQLNodePermissionDeniedError
-from query_optimizer.selections import get_field_selections
-
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import LoginMethod
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.helsinki_profile.typing import UserProfileInfo
 from tilavarauspalvelu.models import Application, Reservation
 from tilavarauspalvelu.tasks import save_personal_info_view_log_task
+from tilavarauspalvelu.typing import error_codes
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -25,24 +21,7 @@ __all__ = [
 ]
 
 
-class HelsinkiProfileDataNode(graphene.ObjectType):
-    pk = graphene.Int(required=True)
-    first_name = graphene.String()
-    last_name = graphene.String()
-    email = graphene.String()
-    phone = graphene.String()
-    birthday = graphene.Date()
-    ssn = graphene.String()
-    street_address = graphene.String()
-    postal_code = graphene.String()
-    city = graphene.String()
-    country_code = graphene.String()
-    additional_address = graphene.String()
-    municipality_code = graphene.String()
-    municipality_name = graphene.String()
-    login_method = graphene.Field(graphene.Enum.from_enum(LoginMethod), required=True)
-    is_strong_login = graphene.Boolean(required=True)
-
+class HelsinkiProfileDataNode:
     @classmethod
     def get_data(
         cls,

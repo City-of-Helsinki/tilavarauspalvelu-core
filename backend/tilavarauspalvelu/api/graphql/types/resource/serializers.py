@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from graphene_django_extensions import NestingModelSerializer
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.enums import ResourceLocationType

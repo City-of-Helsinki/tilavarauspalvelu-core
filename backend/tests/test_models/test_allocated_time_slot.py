@@ -116,7 +116,7 @@ def test_allocated_time_slot__affecting_allocations(query_counter):
     ReservationUnitHierarchy.refresh()
 
     with query_counter() as counter:
-        allocations = AllocatedTimeSlot.objects.affecting_allocations(
+        allocations = AllocatedTimeSlot.objects.all().affecting_allocations(
             reservation_unit=common_unit.pk,
             begin_date=period_begin,
             end_date=period_end,

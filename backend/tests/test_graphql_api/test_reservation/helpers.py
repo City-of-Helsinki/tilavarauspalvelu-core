@@ -5,8 +5,6 @@ from contextlib import contextmanager
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
-from graphene_django_extensions.testing import build_mutation, build_query
-
 from tilavarauspalvelu.enums import ReservationCancelReasonChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from utils.date_utils import next_hour

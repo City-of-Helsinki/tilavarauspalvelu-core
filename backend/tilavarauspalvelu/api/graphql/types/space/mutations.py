@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from django.core.exceptions import ValidationError
-from graphene_django_extensions.bases import CreateMutation, DeleteMutation, UpdateMutation
 
 from tilavarauspalvelu.models import ApplicationRound, Space
 

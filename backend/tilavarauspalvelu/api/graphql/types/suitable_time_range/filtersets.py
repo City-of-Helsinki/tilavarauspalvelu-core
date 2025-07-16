@@ -2,10 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import django_filters
-from graphene_django_extensions import ModelFilterSet
-from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
-
 from tilavarauspalvelu.enums import Priority
 from tilavarauspalvelu.models import SuitableTimeRange
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import re
 import uuid
@@ -6,11 +8,11 @@ import django.contrib.postgres.fields
 import django.core.validators
 import django.db.models.deletion
 import django.utils.timezone
-import graphene_django_extensions.fields.model
 from django.conf import settings
 from django.db import migrations, models
 
 import tilavarauspalvelu.enums
+from utils.fields.model import StrChoiceField
 
 
 class Migration(migrations.Migration):
@@ -504,7 +506,7 @@ class Migration(migrations.Migration):
                 ("end_datetime", models.DateTimeField()),
                 (
                     "rejection_reason",
-                    graphene_django_extensions.fields.model.StrChoiceField(
+                    StrChoiceField(
                         choices=[
                             ("INTERVAL_NOT_ALLOWED", "Interval not allowed"),
                             ("OVERLAPPING_RESERVATIONS", "Overlapping reservations"),

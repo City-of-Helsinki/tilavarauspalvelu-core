@@ -2,15 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from graphene_django_extensions.errors import GQLCodeError
-from graphene_django_extensions.permissions import BasePermission
-
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.models import ReservationUnit
+from tilavarauspalvelu.typing import error_codes
 
 if TYPE_CHECKING:
-    from query_optimizer.typing import GraphQLFilterInfo
-
     from tilavarauspalvelu.models import ReservationSeries
     from tilavarauspalvelu.typing import AnyUser
 

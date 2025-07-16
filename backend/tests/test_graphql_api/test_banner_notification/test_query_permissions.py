@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
-from graphene_django_extensions.testing import parametrize_helper
 
 from tilavarauspalvelu.enums import BannerNotificationTarget, UserRoleChoice
 

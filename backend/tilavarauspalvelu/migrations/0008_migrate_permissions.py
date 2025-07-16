@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import django.db.models.deletion
-import graphene_django_extensions.fields.model
 from django.conf import settings
 from django.db import migrations, models
 
 import tilavarauspalvelu.enums
+from utils.fields.model import StrChoiceField
 
 
 class Migration(migrations.Migration):
@@ -22,7 +24,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "role",
-                    graphene_django_extensions.fields.model.StrChoiceField(
+                    StrChoiceField(
                         choices=[
                             ("ADMIN", "Admin"),
                             ("HANDLER", "Handler"),

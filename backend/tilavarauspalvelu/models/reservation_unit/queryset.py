@@ -18,8 +18,6 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Generator
     from decimal import Decimal
 
-    from query_optimizer.validators import PaginationArgs
-
     from tilavarauspalvelu.enums import AccessType
 
 

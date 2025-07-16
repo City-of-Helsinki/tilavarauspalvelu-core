@@ -4,7 +4,6 @@ import datetime
 from typing import TYPE_CHECKING
 
 import pytest
-from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import MunicipalityChoice, Priority, ReserveeType, Weekday
 from tilavarauspalvelu.services.export import ApplicationRoundApplicationsCSVExporter

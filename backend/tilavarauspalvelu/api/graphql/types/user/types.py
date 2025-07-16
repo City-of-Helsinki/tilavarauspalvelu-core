@@ -2,11 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import graphene
 from django.db.models import Value
 from django.db.models.functions import Concat, Trim
-from graphene_django_extensions import DjangoNode
-from query_optimizer import AnnotatedField, MultiField
 
 from tilavarauspalvelu.enums import ReservationNotification
 from tilavarauspalvelu.models import User

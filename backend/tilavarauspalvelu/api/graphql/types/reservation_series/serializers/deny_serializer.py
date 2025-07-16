@@ -5,17 +5,16 @@ from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.db import transaction
-from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import ReservationDenyReason, ReservationSeries
 from tilavarauspalvelu.tasks import create_statistics_for_reservations_task, update_affecting_time_spans_task
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_datetime
 from utils.external_service.errors import external_service_errors_as_validation_errors
 

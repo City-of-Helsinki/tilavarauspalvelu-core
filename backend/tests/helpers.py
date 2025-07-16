@@ -15,7 +15,6 @@ from django.conf import settings
 from django.utils import translation
 from django.utils.functional import lazy
 from django.utils.translation import trans_real
-from graphene_django_extensions.testing import GraphQLClient as BaseGraphQLClient
 
 if TYPE_CHECKING:
     from collections.abc import Callable

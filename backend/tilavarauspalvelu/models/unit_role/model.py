@@ -4,10 +4,10 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from graphene_django_extensions.fields.model import StrChoiceField
 
 from tilavarauspalvelu.enums import UserRoleChoice
 from utils.auditlog_util import AuditLogger
+from utils.fields.model import StrChoiceField
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:

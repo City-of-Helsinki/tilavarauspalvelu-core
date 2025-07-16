@@ -121,3 +121,7 @@ class UserProfileInfo(TypedDict):
     municipality_name: str | None
     login_method: LoginMethod
     is_strong_login: bool
+
+
+class PermissionCheckResult(TypedDict):
+    has_permission: bool

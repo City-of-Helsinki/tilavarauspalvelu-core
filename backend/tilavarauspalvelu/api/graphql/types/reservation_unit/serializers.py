@@ -5,12 +5,8 @@ from typing import TYPE_CHECKING, Any
 from auditlog.models import LogEntry
 from django.conf import settings
 from django.db import transaction
-from graphene.utils.str_converters import to_camel_case
-from graphene_django_extensions import NestingModelSerializer
-from graphene_django_extensions.errors import GQLCodeError
 from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.api.graphql.types.application_round_time_slot.serializers import (
     ApplicationRoundTimeSlotSerializer,
 )
@@ -22,7 +18,18 @@ from tilavarauspalvelu.api.graphql.types.reservation_unit_pricing.serializers im
 from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, ReservationUnitPublishingState, Weekday
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, ReservationUnitPricing
+from tilavarauspalvelu.models import (
+    ApplicationRoundTimeSlot,
+    ReservationUnit,
+    ReservationUnitAccessType,
+    ReservationUnitPricing,
+)
+from tilavarauspalvelu.typing import error_codes
+from tilavarauspalvelu.validators import (
+    TimeSlotSerializer,
+    validate_reservable_times_begin_end,
+    validate_reservable_times_overlap,
+)
 from utils.date_utils import local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
@@ -32,6 +39,32 @@ if TYPE_CHECKING:
 __all__ = [
     "ReservationUnitSerializer",
 ]
+
+
+
+
+class ApplicationRoundTimeSlotSerializer(NestingModelSerializer):
+    reservable_times = TimeSlotSerializer(many=True, required=False)
+
+    class Meta:
+        model = ApplicationRoundTimeSlot
+        fields = [
+            "weekday",
+            "is_closed",
+            "reservable_times",
+        ]
+        extra_kwargs = {
+            "weekday": {
+                "required": True,
+            },
+        }
+
+    @staticmethod
+    def validate_reservable_times(timeslots: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        validate_reservable_times_begin_end(timeslots)
+        validate_reservable_times_overlap(timeslots)
+        return timeslots
+
 
 
 class ReservationUnitSerializer(NestingModelSerializer):

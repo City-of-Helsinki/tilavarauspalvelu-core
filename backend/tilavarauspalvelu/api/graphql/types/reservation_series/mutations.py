@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from graphene_django_extensions import CreateMutation, UpdateMutation
-
 from tilavarauspalvelu.enums import ReservationStateChoice
 from utils.date_utils import local_datetime
 

@@ -5,19 +5,16 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.db import transaction
-from graphene_django_extensions import NestingModelSerializer
-from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from graphql import GraphQLError
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import ReservationSeries, ReservationStatistic
 from tilavarauspalvelu.tasks import create_statistics_for_reservations_task, update_affecting_time_spans_task
-from tilavarauspalvelu.typing import ReservationDetails
+from tilavarauspalvelu.typing import ReservationDetails, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_datetime
 from utils.external_service.errors import external_service_errors_as_validation_errors
 from utils.fields.serializer import input_only_field

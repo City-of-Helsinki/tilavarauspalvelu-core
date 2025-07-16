@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pytest
 import requests
-from graphene_django_extensions.testing import parametrize_helper
 from rest_framework.status import (
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
