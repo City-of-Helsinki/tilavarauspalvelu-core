@@ -18,7 +18,7 @@ const MoreWrapper = styled(ShowAllContainer)`
   }
 `;
 
-function Filters(): JSX.Element {
+export function Filters(): JSX.Element {
   const { t } = useTranslation();
 
   const reservationUnitStateOptions = Object.values(ReservationUnitPublishingState)
@@ -77,5 +77,3 @@ function Filters(): JSX.Element {
     </Flex>
   );
 }
-
-export default Filters;

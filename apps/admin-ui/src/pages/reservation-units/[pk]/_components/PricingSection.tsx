@@ -14,7 +14,7 @@ import {
 import { PaymentType, PriceUnit } from "@gql/gql-types";
 import { getTranslatedError } from "@/common/util";
 import { FieldGroup } from "./FieldGroup";
-import { ReservationUnitEditFormValues } from "../form";
+import { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 
 const Error = styled.div`

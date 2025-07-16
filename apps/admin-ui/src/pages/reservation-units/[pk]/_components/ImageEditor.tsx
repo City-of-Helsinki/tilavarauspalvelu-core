@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant, FileInput } from "hds-react";
 import { ImageType } from "@gql/gql-types";
-import { type ImageFormType } from "../form";
+import { type ImageFormType } from "./form";
 import { AutoGrid, Flex, fontRegular } from "common/styled";
 
 const StyledImage = styled.img`

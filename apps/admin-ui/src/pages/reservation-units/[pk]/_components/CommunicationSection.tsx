@@ -3,10 +3,10 @@ import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { type UseFormReturn } from "react-hook-form";
 import { TextInput } from "hds-react";
-import type { ReservationUnitEditFormValues } from "../form";
+import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 import { ControlledRichTextInput } from "./ControlledRichTextInput";
-import { getTranslatedTooltipTex } from "../utils";
+import { getTranslatedTooltipTex } from "./utils";
 import { Flex, fontMedium, H4 } from "common/styled";
 
 const SubAccordion = styled(EditAccordion)`
