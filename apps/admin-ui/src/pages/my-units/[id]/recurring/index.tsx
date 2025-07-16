@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { ReservationSeriesForm } from "./ReservationSeriesForm";
+import { ReservationSeriesForm } from "./_components/ReservationSeriesForm";
 import { useSeriesReservationsUnits } from "@/hooks";
 import { LinkPrev } from "@/component/LinkPrev";
 import { CenterSpinner, H1 } from "common/styled";
