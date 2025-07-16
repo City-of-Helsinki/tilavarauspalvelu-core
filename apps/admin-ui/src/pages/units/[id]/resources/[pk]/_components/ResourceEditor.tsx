@@ -11,16 +11,20 @@ import {
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
 import { ButtonContainer, CenterSpinner } from "common/styled";
-import { SubPageHead } from "./SubPageHead";
 import { errorToast, successToast } from "common/src/common/toast";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
-import { Editor, ResourceUpdateSchema, type ResourceUpdateForm } from "./modules/resourceEditor";
-import { ResourceEditorFields } from "./ResourceEditForm";
 import { LinkPrev } from "@/component/LinkPrev";
 import { gql } from "@apollo/client";
 import Error404 from "@/common/Error404";
 import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";
+import {
+  SubPageHead,
+  ResourceEditorFields,
+  Editor,
+  ResourceUpdateSchema,
+  type ResourceUpdateForm,
+} from "../../../_components";
 
 type Props = {
   resourcePk?: number;

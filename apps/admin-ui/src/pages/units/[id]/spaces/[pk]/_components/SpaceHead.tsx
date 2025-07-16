@@ -32,7 +32,7 @@ const Props = styled.div`
   }
 `;
 
-const Prop = styled(Flex).attrs({
+const Value = styled(Flex).attrs({
   $direction: "row",
   $alignItems: "center",
   $gap: "2-xs",
@@ -56,15 +56,15 @@ export function SpaceHead({ title, space, surfaceArea, maxPersons }: IProps): JS
       <H1 $noMargin>{title}</H1>
       <Address>{address}</Address>
       <Props>
-        <Prop $disabled={!unit}>
+        <Value $disabled={!unit}>
           <IconLocation /> {unit ? <Link href={unitUrl}>{unit?.nameFi}</Link> : t("spaces:noUnit")}
-        </Prop>
-        <Prop $disabled={!maxPersons}>
+        </Value>
+        <Value $disabled={!maxPersons}>
           <IconGroup /> {maxPersons || t("spaces:noMaxPersons")}
-        </Prop>
-        <Prop $disabled={!surfaceArea}>
+        </Value>
+        <Value $disabled={!surfaceArea}>
           {surfaceArea ? t("spaces:SpaceEditor.area", { surfaceArea }) : t("spaces:noSurfaceArea")}
-        </Prop>
+        </Value>
       </Props>
     </div>
   );

@@ -1,8 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { H1 } from "common/styled";
-import { Filters } from "@/component/unit/Filters";
-import { UnitsDataLoader } from "@/component/unit/UnitsDataLoader";
+import { Filters, UnitsDataLoader } from "@/component/units";
 import { AuthorizationChecker } from "@/common/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
