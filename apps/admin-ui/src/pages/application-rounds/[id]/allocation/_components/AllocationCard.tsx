@@ -19,7 +19,7 @@ import {
 } from "./modules/applicationRoundAllocation";
 import { useAcceptSlotMutation, useRefreshApplications, useRemoveAllocation } from "./hooks";
 import { getApplicantName } from "@/helpers";
-import { NotificationInline } from "../../../../component/NotificationInline";
+import { NotificationInline } from "@/component/NotificationInline";
 
 type Props = {
   applicationSection: SectionNodeT;
