@@ -6,8 +6,6 @@ import { Flex, H1, TabWrapper, TitleSection } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { formatAddress } from "@/common/util";
 import { getReservationSeriesUrl } from "@/common/urls";
-import { ReservationUnitCalendarView } from "./ReservationUnitCalendarView";
-import { UnitReservations } from "./UnitReservations";
 import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
 import { UserPermissionChoice, useUnitViewQuery } from "@gql/gql-types";
@@ -15,7 +13,6 @@ import { useCheckPermission } from "@/hooks";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { gql } from "@apollo/client";
 import { useModal } from "@/context/ModalContext";
-import { CreateReservationModal } from "./CreateReservationModal";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { AuthorizationChecker } from "@/common/AuthorizationChecker";
@@ -23,6 +20,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { type GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
+import { CreateReservationModal, ReservationUnitCalendarView, UnitReservations } from "./_components";
 
 const LocationOnlyOnDesktop = styled.p`
   display: none;
