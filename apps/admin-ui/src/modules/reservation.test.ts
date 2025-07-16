@@ -7,7 +7,7 @@ import {
   type ReservationUnitPricingFieldsFragment,
   Weekday,
 } from "@gql/gql-types";
-import { createTagString, getReservationUnitPricing } from "./util";
+import { createTagString, getReservationUnitPricing } from "./reservation";
 import { addHours, addMonths } from "date-fns";
 import { toApiDate, toApiDateUnsafe } from "common/src/common/util";
 import { describe, expect, test } from "vitest";
