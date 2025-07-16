@@ -23,16 +23,8 @@ import {
   CheckPermissionsDocument,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
-import { ApplicationRoundStatusLabel } from "./../ApplicationRoundStatusLabel";
-import TimeframeStatus from "./../TimeframeStatus";
-import { ApplicationDataLoader } from "./review/ApplicationDataLoader";
-import { Filters } from "./review/Filters";
-import { ApplicationSectionDataLoader } from "./review/ApplicationSectionDataLoader";
-import { TimeSlotDataLoader } from "./review/AllocatedSectionDataLoader";
-import { RejectedOccurrencesDataLoader } from "./review/RejectedOccurrencesDataLoader";
 import { hasPermission } from "@/modules/permissionHelper";
 import { useSession } from "@/hooks/auth";
-import { ReviewEndAllocation } from "./review/ReviewEndAllocation";
 import { useUnitGroupOptions } from "@/hooks/useUnitGroupOptions";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
@@ -43,6 +35,15 @@ import { GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import Error404 from "@/common/Error404";
 import { createClient } from "@/common/apolloClient";
+import { TimeframeStatus, ApplicationRoundStatusLabel } from "./../_components";
+import {
+  ReviewEndAllocation,
+  ApplicationDataLoader,
+  Filters,
+  ApplicationSectionDataLoader,
+  TimeSlotDataLoader,
+  RejectedOccurrencesDataLoader,
+} from "./_components";
 
 const TabContent = styled(Flex).attrs({
   $direction: "column",

@@ -6,7 +6,7 @@ import { type ApplicationRoundCardFragment } from "@gql/gql-types";
 import { formatDate } from "@/common/util";
 import { ApplicationRoundStatusLabel } from "./ApplicationRoundStatusLabel";
 import { getApplicationRoundUrl } from "@/common/urls";
-import TimeframeStatus from "./TimeframeStatus";
+import { TimeframeStatus } from "./TimeframeStatus";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { Flex, fontMedium } from "common/styled";
 import { Card } from "common/src/components";
