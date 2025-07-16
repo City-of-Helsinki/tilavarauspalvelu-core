@@ -1,5 +1,5 @@
 import { UseFormReturn } from "react-hook-form";
-import type { ReservationUnitEditFormValues } from "../form";
+import type { ReservationUnitEditFormValues } from "./form";
 import { ReservationKind, ReservationUnitEditQuery, ReservationUnitEditUnitFragment } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
