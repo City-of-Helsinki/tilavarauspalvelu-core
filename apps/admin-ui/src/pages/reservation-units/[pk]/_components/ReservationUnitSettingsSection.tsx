@@ -7,7 +7,7 @@ import { Authentication, ReservationStartInterval } from "@gql/gql-types";
 import { AutoGrid, Flex } from "common/styled";
 import { ControlledSelect, ControlledCheckbox, DateTimeInput } from "common/src/components/form";
 import { getTranslatedError } from "@/common/util";
-import { BUFFER_TIME_OPTIONS, ReservationUnitEditFormValues } from "../form";
+import { BUFFER_TIME_OPTIONS, ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 import { FieldGroup } from "./FieldGroup";
 import { CustomNumberInput } from "./CustomNumberInput";
