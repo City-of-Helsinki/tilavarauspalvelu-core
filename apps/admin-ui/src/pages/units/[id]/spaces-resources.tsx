@@ -3,11 +3,6 @@ import React, { createRef } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { UserPermissionChoice, useSpacesResourcesQuery } from "@gql/gql-types";
-import { ResourcesTable } from "@/component/unit/ResourcesTable";
-import { SpacesTable } from "@/component/unit/SpacesTable";
-import { SubPageHead } from "@/component/unit/SubPageHead";
-import { NewSpaceModal } from "@/component/unit/new-space-modal/NewSpaceModal";
-import { NewResourceModal } from "@/component/unit/NewResourceModal";
 import { base64encode, toNumber, ignoreMaybeArray } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
 import Error404 from "@/common/Error404";
@@ -21,6 +16,7 @@ import { AuthorizationChecker } from "@/common/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
+import { ResourcesTable, SubPageHead, SpacesTable, NewSpaceModal, NewResourceModal } from "./_components";
 
 const ActionButton = styled(Button)`
   span {

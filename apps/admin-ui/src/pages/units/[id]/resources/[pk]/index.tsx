@@ -1,5 +1,5 @@
 import React from "react";
-import { ResourceEditor } from "@/component/unit/ResourceEditor";
+import { ResourceEditor } from "./_components/ResourceEditor";
 import { ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { AuthorizationChecker } from "@/common/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";

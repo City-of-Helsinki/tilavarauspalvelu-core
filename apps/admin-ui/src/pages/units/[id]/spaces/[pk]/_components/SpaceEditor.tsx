@@ -6,10 +6,6 @@ import { useUpdateSpaceMutation, type SpaceUpdateMutationInput, useSpaceQuery } 
 import { errorToast, successToast } from "common/src/common/toast";
 import { ButtonContainer, CenterSpinner, H2, H3 } from "common/styled";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
-import { SpaceHead } from "./SpaceHead";
-import { SpaceHierarchy } from "./SpaceHierarchy";
-import { ParentSelector } from "./ParentSelector";
-import { type SpaceUpdateForm, SpaceForm, SpaceUpdateSchema } from "./SpaceForm";
 import { base64encode } from "common/src/helpers";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +13,9 @@ import { LinkPrev } from "@/component/LinkPrev";
 import { gql } from "@apollo/client";
 import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";
+import { ParentSelector, type SpaceUpdateForm, SpaceForm, SpaceUpdateSchema } from "../../../_components";
+import { SpaceHead } from "./SpaceHead";
+import { SpaceHierarchy } from "./SpaceHierarchy";
 
 const Form = styled.form`
   display: flex;
