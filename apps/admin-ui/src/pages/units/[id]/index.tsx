@@ -7,7 +7,7 @@ import { formatAddress } from "@/common/util";
 import { ExternalLink } from "@/component/ExternalLink";
 import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import Error404 from "@/common/Error404";
-import { ReservationUnitList } from "@/component/unit/ReservationUnitList";
+import { ReservationUnitList } from "./_components/ReservationUnitList";
 import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/common/urls";
 import { CenterSpinner, Flex, fontBold, fontMedium, H1, H2, H3 } from "common/styled";
 import { gql } from "@apollo/client";
