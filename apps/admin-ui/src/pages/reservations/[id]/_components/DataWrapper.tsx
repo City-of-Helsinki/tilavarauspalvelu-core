@@ -1,23 +1,6 @@
 import React from "react";
 import { KVWrapper, Label, Value } from "@/styled";
-import styled from "styled-components";
-import { Accordion as AccordionBase, LoadingSpinner } from "hds-react";
-
-export const Accordion = styled(AccordionBase).attrs({
-  closeButton: false,
-})`
-  > div > div:not([class^="LoadingSpinner-module_loadingSpinner"]) {
-    width: 100%;
-  }
-
-  && {
-    --icon-size: 24px;
-
-    [class^="Accordion-module_accordionHeader__"] {
-      --icon-size: 32px;
-    }
-  }
-`;
+import { LoadingSpinner } from "hds-react";
 
 export function DataWrapper({
   label,

@@ -12,6 +12,7 @@ import {
   ReservationPriceDetailsFieldsFragment,
   ReservationTypeChoice,
   ReservationUnitPricingFieldsFragment,
+  EventStyleReservationFieldsFragment,
 } from "@gql/gql-types";
 import { formatDuration, fromApiDate } from "common/src/common/util";
 import { formatDate, formatDateTimeRange, getReserveeName } from "@/common/util";
@@ -19,6 +20,10 @@ import { fromAPIDateTime, getReserveeTypeTranslationKey } from "@/helpers";
 import { filterNonNullable, sort, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 import { convertWeekday } from "common/src/conversion";
+import { type CalendarEvent } from "common/src/calendar/Calendar";
+
+export type EventType = EventStyleReservationFieldsFragment;
+export type CalendarEventType = CalendarEvent<EventType>;
 
 type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 

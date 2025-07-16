@@ -20,7 +20,7 @@ import {
   getReservationUnitPricing,
   reservationPrice,
   translateReservationCustomerType,
-} from "@/component/reservations/util";
+} from "@/modules/reservation";
 import VisibleIfPermission from "@/component/VisibleIfPermission";
 import {
   ApprovalButtons,
@@ -29,12 +29,12 @@ import {
   ReservationKeylessEntry,
   TimeBlockSection,
   ReservationReserveeDetailsSection,
-} from "@/component/reservations";
-import { Accordion, DataWrapper } from "@/component/reservations/components";
+  DataWrapper,
+} from "./_components";
+import { Accordion, ApplicationDatas, Summary } from "@/styled";
 import { base64encode, ignoreMaybeArray, isPriceFree, toNumber } from "common/src/helpers";
 import { formatAgeGroup } from "@/common/util";
 import Error404 from "@/common/Error404";
-import { ApplicationDatas, Summary } from "@/styled";
 import { toUIDateTime } from "common/src/common/util";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { AuthorizationChecker } from "@/common/AuthorizationChecker";
