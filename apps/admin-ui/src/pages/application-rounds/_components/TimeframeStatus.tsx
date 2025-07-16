@@ -18,7 +18,7 @@ const Wrapper = styled.span`
   gap: var(--spacing-3-xs);
 `;
 
-function TimeframeStatus({
+export function TimeframeStatus({
   applicationPeriodBeginsAt = "",
   applicationPeriodEndsAt = "",
   isResolved,
@@ -59,5 +59,3 @@ function TimeframeStatus({
     </Wrapper>
   );
 }
-
-export default TimeframeStatus;
