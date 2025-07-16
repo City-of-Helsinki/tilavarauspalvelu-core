@@ -30,7 +30,7 @@ type Props = {
   unit: number;
 };
 
-function SpaceEditor({ space, unit }: Props): JSX.Element {
+export function SpaceEditor({ space, unit }: Props): JSX.Element {
   const router = useRouter();
   const { t } = useTranslation();
   const [mutation, { loading: isMutationLoading }] = useUpdateSpaceMutation();
@@ -94,6 +94,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
         text: t("spaces:SpaceEditor.spaceUpdatedNotification"),
       });
       refetch();
+      // FIXME this should go up, not back
       router.back();
     } catch (err) {
       displayError(err);
@@ -139,6 +140,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
           <Button
             variant={ButtonVariant.Secondary}
             type="button"
+            /* FIXME this should go up, not back */
             onClick={() => router.back()}
             disabled={isMutationLoading}
           >
@@ -157,8 +159,6 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
     </>
   );
 }
-
-export default SpaceEditor;
 
 export const UPDATE_SPACE = gql`
   mutation UpdateSpace($input: SpaceUpdateMutationInput!) {
