@@ -1,9 +1,9 @@
-import type { CalendarEvent } from "common/src/calendar/Calendar";
 import {
   type EventStyleReservationFieldsFragment,
   ReservationStateChoice,
   ReservationTypeChoice,
 } from "@gql/gql-types";
+import { type CalendarEventType, type EventType } from "@/modules/reservation";
 import {
   COMMON_LEGEND,
   CONFIRMED,
@@ -38,9 +38,6 @@ export const legend = [
     style: REST.style,
   },
 ];
-
-export type EventType = EventStyleReservationFieldsFragment;
-export type CalendarEventType = CalendarEvent<EventType>;
 
 export const EVENT_STYLE_RESERVATION_FRAGMENT = gql`
   fragment EventStyleReservationFields on ReservationNode {

@@ -10,7 +10,7 @@ import {
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { Flex } from "common/styled";
-import { getReservationPriceDetails } from "./util";
+import { getReservationPriceDetails } from "@/modules/reservation";
 import { successToast } from "common/src/common/toast";
 import { toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";

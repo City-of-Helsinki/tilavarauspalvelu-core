@@ -9,7 +9,7 @@ import {
   type ReservationTitleSectionFieldsFragment,
   useReservationApplicationLinkQuery,
 } from "@gql/gql-types";
-import { getName } from "./util";
+import { getName } from "@/modules/reservation";
 import { formatDateTime } from "@/common/util";
 import { getApplicationUrl } from "@/common/urls";
 import { gql } from "@apollo/client";
