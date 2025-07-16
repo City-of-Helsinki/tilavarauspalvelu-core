@@ -10,7 +10,8 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { type CalendarEventType, eventStyleGetter, type EventType, legend } from "./eventStyleGetter";
+import { type CalendarEventType, type EventType } from "@/modules/reservation";
+import { eventStyleGetter, legend } from "./eventStyleGetter";
 import { Legend, LegendsWrapper } from "@/component/Legend";
 import { EditTimeModal } from "@/component/EditTimeModal";
 import { isPossibleToEdit } from "@/modules/reservationModificationRules";
@@ -20,7 +21,7 @@ import VisibleIfPermission from "@/component/VisibleIfPermission";
 import { useReservationCalendarData, useReservationSeries } from "@/hooks";
 import { add, startOfISOWeek } from "date-fns";
 import { ReservationSeriesView } from "@/component/ReservationSeriesView";
-import { Accordion } from "./components";
+import { Accordion } from "@/styled";
 import { gql } from "@apollo/client";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
