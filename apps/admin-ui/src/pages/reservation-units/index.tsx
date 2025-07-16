@@ -1,13 +1,12 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { H1, HR } from "common/styled";
-import Filters from "./Filters";
-import { ReservationUnitsDataReader } from "./ReservationUnitsDataLoader";
 import { AuthorizationChecker } from "@/common/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { UserPermissionChoice } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
+import { ReservationUnitsDataReader, Filters } from "./_components";
 
 function ReservationUnits(): JSX.Element {
   const { t } = useTranslation();

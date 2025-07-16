@@ -7,7 +7,7 @@ import { IconButton } from "common/src/components";
 import { fontBold } from "common/styled";
 import { breakpoints, WEEKDAYS_SORTED } from "common/src/const";
 import { useTranslation } from "next-i18next";
-import { ReservationUnitEditFormValues } from "../form";
+import { ReservationUnitEditFormValues } from "./form";
 import { Accordion } from "@/component/Accordion";
 import { getTranslatedError } from "@/common/util";
 

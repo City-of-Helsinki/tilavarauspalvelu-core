@@ -1,6 +1,6 @@
 import React from "react";
 import { Control, useController } from "react-hook-form";
-import type { ReservationUnitEditFormValues } from "../form";
+import type { ReservationUnitEditFormValues } from "./form";
 import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import { ControlledRadioGroup } from "common/src/components/form";
