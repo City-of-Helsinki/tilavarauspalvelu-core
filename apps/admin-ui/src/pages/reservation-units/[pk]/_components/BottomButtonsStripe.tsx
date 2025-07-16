@@ -3,7 +3,7 @@ import { Button, ButtonSize, ButtonVariant, Dialog, IconArrowLeft, LoadingSpinne
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { UseFormReturn } from "react-hook-form";
-import type { ReservationUnitEditFormValues } from "../form";
+import type { ReservationUnitEditFormValues } from "./form";
 import { getUnitUrl } from "@/common/urls";
 import { successToast } from "common/src/common/toast";
 import type { ReservationUnitEditQuery, UnitSubpageHeadFragment } from "@gql/gql-types";

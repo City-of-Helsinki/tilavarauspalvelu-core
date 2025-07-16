@@ -7,9 +7,9 @@ import { filterNonNullable } from "common/src/helpers";
 import { AutoGrid } from "common/styled";
 import { ControlledSelect } from "common/src/components/form";
 import { getTranslatedError } from "@/common/util";
-import type { ReservationUnitEditFormValues } from "../form";
+import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
-import { getTranslatedTooltipTex } from "../utils";
+import { getTranslatedTooltipTex } from "./utils";
 import { ImageEditor } from "./ImageEditor";
 
 const RichTextInput = dynamic(() => import("../../../../component/RichTextInput"), {

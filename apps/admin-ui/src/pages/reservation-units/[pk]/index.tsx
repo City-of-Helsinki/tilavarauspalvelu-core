@@ -27,33 +27,33 @@ import { errorToast, successToast } from "common/src/common/toast";
 import { useModal } from "@/context/ModalContext";
 import Error404 from "@/common/Error404";
 
+import { getReservationUnitUrl } from "@/common/urls";
+import { ApolloError, gql } from "@apollo/client";
+import { breakpoints } from "common/src/const";
+import { useRouter } from "next/router";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { AuthorizationChecker } from "@/common/AuthorizationChecker";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { type GetServerSidePropsContext } from "next";
 import {
   convertReservationUnit,
   type ImageFormType,
   type ReservationUnitEditFormValues,
   ReservationUnitEditSchema,
   transformReservationUnit,
-} from "./form";
-import { SeasonalSection } from "./components/SeasonalSection";
-import { getReservationUnitUrl } from "@/common/urls";
-import { ApolloError, gql } from "@apollo/client";
-import { DisplayUnit } from "./components/DisplayUnit";
-import { breakpoints } from "common/src/const";
-import { BottomButtonsStripe } from "./components/BottomButtonsStripe";
-import { BasicSection } from "./components/BasicSection";
-import { TermsSection } from "./components/TermsSection";
-import { DescriptionSection } from "./components/DescriptionSection";
-import { OpeningHoursSection } from "./components/OpeningHoursSection";
-import { CommunicationSection } from "./components/CommunicationSection";
-import { AccessTypeSection } from "./components/AccessTypeSection";
-import { ReservationUnitSettingsSection } from "./components/ReservationUnitSettingsSection";
-import { PricingSection } from "./components/PricingSection";
-import { ErrorInfo } from "./components/ErrorInfo";
-import { useRouter } from "next/router";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { AuthorizationChecker } from "@/common/AuthorizationChecker";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
+  SeasonalSection,
+  DisplayUnit,
+  BottomButtonsStripe,
+  BasicSection,
+  TermsSection,
+  DescriptionSection,
+  OpeningHoursSection,
+  CommunicationSection,
+  AccessTypeSection,
+  ReservationUnitSettingsSection,
+  PricingSection,
+  ErrorInfo,
+} from "./_components";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
