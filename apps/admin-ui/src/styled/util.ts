@@ -1,4 +1,4 @@
-import { Dialog } from "hds-react";
+import { Accordion as AccordionBase, Dialog } from "hds-react";
 import styled, { css } from "styled-components";
 import { fontMedium } from "common/styled";
 import { breakpoints } from "common/src/const";
@@ -99,4 +99,20 @@ export const KVWrapper = styled.div<{
       display: flex;
       gap: var(--spacing-2-xs);
     `};
+`;
+
+export const Accordion = styled(AccordionBase).attrs({
+  closeButton: false,
+})`
+  > div > div:not([class^="LoadingSpinner-module_loadingSpinner"]) {
+    width: 100%;
+  }
+
+  && {
+    --icon-size: 24px;
+
+    [class^="Accordion-module_accordionHeader__"] {
+      --icon-size: 32px;
+    }
+  }
 `;

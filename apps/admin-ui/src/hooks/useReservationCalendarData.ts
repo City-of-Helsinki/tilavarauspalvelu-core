@@ -9,8 +9,7 @@ import { useTranslation } from "next-i18next";
 import { toApiDate } from "common/src/common/util";
 import { errorToast } from "common/src/common/toast";
 import { base64encode } from "common/src/helpers";
-// TODO move the import
-import { type CalendarEventType } from "@/component/reservations/eventStyleGetter";
+import { type CalendarEventType } from "@/modules/reservation";
 import { combineAffectingReservations } from "@/helpers";
 
 // TODO there is an issue here with denied "Blocked" reservations shown in the Calendar as regular "Blocked" reservations
