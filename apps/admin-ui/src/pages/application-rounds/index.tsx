@@ -14,7 +14,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { getApplicationRoundUrl } from "@/common/urls";
 import { formatDate } from "@/common/util";
 import { truncate } from "@/helpers";
-import { ApplicationRoundCard } from "./ApplicationRoundCard";
+import { ApplicationRoundCard } from "./_components";
 import { TableLink } from "@/styled";
 import { CustomTable } from "@/component/Table";
 import Error404 from "@/common/Error404";
