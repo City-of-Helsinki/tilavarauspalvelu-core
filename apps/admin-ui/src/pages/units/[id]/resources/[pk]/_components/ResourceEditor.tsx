@@ -25,6 +25,7 @@ import {
   ResourceUpdateSchema,
   type ResourceUpdateForm,
 } from "../../../_components";
+import { getUnitUrl } from "@/common/urls";
 
 type Props = {
   resourcePk?: number;
@@ -47,7 +48,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
     },
   });
 
-  const [mutation] = useUpdateResourceMutation();
+  const [mutation, { loading: isMutationLoading }] = useUpdateResourceMutation();
 
   const updateResource = async (input: ResourceUpdateMutationInput) => {
     const res = await mutation({ variables: { input } });
@@ -100,8 +101,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
         text: t("spaces:resourceUpdatedNotification"),
       });
       refetch();
-      // FIXME this should go up, not back
-      router.back();
+      router.replace(getUnitUrl(unit.pk, "spaces-resources"));
     } catch (err) {
       displayError(err);
     }
@@ -109,15 +109,18 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
 
   return (
     <>
-      <LinkPrev route="../.." />
+      <LinkPrev route={getUnitUrl(unit.pk, "spaces-resources")} />
       <SubPageHead unit={unit} title={resource.nameFi || t("spaces:ResourceEditor.defaultHeading")} />
       <FormErrorSummary errors={errors} />
       <form noValidate onSubmit={handleSubmit(onSubmit)}>
         <Editor>
           <ResourceEditorFields form={form} unitPk={unitPk} />
           <ButtonContainer>
-            {/* FIXME this should go up, not back */}
-            <Button onClick={() => router.back()} variant={ButtonVariant.Secondary}>
+            <Button
+              variant={ButtonVariant.Secondary}
+              onClick={() => router.replace(getUnitUrl(unit.pk, "spaces-resources"))}
+              disabled={isMutationLoading}
+            >
               {t("common:cancel")}
             </Button>
             <Button type="submit" disabled={!isDirty}>
