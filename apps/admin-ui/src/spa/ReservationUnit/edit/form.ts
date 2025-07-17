@@ -18,6 +18,7 @@ import { checkLengthWithoutHtml, checkTimeStringFormat } from "common/src/schema
 import { fromUIDateTime } from "@/helpers";
 import { intervalToNumber } from "@/schemas/utils";
 import { WEEKDAYS_SORTED } from "common/src/const";
+import { type TaxOption } from "./components/PricingSection";
 
 export const AccessTypes = ["ACCESS_CODE", "OPENED_BY_STAFF", "PHYSICAL_KEY", "UNRESTRICTED"] as const;
 
@@ -858,7 +859,7 @@ export function convertReservationUnit(data?: Node): ReservationUnitEditFormValu
 }
 
 // Too hard to type this because of two separate mutations that have optional fields in them
-export function transformReservationUnit(values: ReservationUnitEditFormValues) {
+export function transformReservationUnit(values: ReservationUnitEditFormValues, taxPercentageOptions: TaxOption[]) {
   // Convert from form values to API data
   const {
     pk,
@@ -945,7 +946,7 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues) 
     notesWhenApplyingFi: notesWhenApplyingFi !== "" ? notesWhenApplyingFi : null,
     notesWhenApplyingSv: notesWhenApplyingSv !== "" ? notesWhenApplyingSv : null,
     cancellationRule: hasCancellationRule ? cancellationRule : null,
-    pricings: filterNonNullable(pricings.map((p) => transformPricing(p, hasFuturePricing))),
+    pricings: filterNonNullable(pricings.map((p) => transformPricing(p, hasFuturePricing, taxPercentageOptions))),
     accessTypes: filterNonNullable(
       accessTypes.map((at) => ({
         pk: at.pk,
@@ -959,19 +960,22 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues) 
 
 function transformPricing(
   values: PricingFormValues,
-  hasFuturePricing: boolean
+  hasFuturePricing: boolean,
+  taxPercentageOptions: TaxOption[]
 ): ReservationUnitPricingSerializerInput | null {
   if (!hasFuturePricing && isAfterToday(values.begins)) {
     return null;
   }
-  // backend error if not valid making it impossible to save free new reservation units
-  if (values.taxPercentage === 0) {
-    return null;
+  // without a valid taxPrecentage mutation fails even if it's free pricing
+  // but we don't have a valid taxPercentage for free pricings (user has made no selection)
+  const taxPercentage = values.taxPercentage > 0 ? values.taxPercentage : (taxPercentageOptions[0]?.pk ?? 0);
+  if (taxPercentage === 0) {
+    throw new Error("Tax percentage is required for pricing");
   }
 
   const begins = fromUIDate(values.begins) ?? new Date();
   return {
-    taxPercentage: values.taxPercentage,
+    taxPercentage,
     begins: toApiDate(begins) ?? "",
     highestPrice: values.isPaid ? values.highestPrice.toString() : "0",
     lowestPrice: values.isPaid ? values.lowestPrice.toString() : "0",

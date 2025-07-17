@@ -216,7 +216,7 @@ function ReservationUnitEditor({
 
   // unsafe because the handleSubmit doesn't pass return value (so throw is the only way to manipulate control flow)
   const onSubmit = async (formValues: ReservationUnitEditFormValues) => {
-    const { pk, ...input } = transformReservationUnit(formValues);
+    const { pk, ...input } = transformReservationUnit(formValues, taxPercentageOptions);
     const promise =
       pk != null
         ? updateMutation({ variables: { input: { ...input, pk } } })
