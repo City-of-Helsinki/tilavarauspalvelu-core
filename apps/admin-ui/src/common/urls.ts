@@ -71,8 +71,9 @@ export function getResourceUrl(resourcePk: Maybe<number> | undefined, unitPk: Ma
   return `${UNITS_URL_PREFIX}/${unitPk}/resources/${resourcePk}`;
 }
 
-export function getUnitUrl(unitPk: Maybe<number> | undefined): string {
-  return `${UNITS_URL_PREFIX}/${unitPk}`;
+type UnitPage = "spaces-resources" | "";
+export function getUnitUrl(unitPk: Maybe<number> | undefined, page?: UnitPage): string {
+  return `${UNITS_URL_PREFIX}/${unitPk}/${page ?? ""}`;
 }
 
 export function getMyUnitUrl(unitPk: Maybe<number> | undefined): string {
