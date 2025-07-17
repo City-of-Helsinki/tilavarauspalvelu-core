@@ -16,6 +16,7 @@ import { useRouter } from "next/router";
 import { ParentSelector, type SpaceUpdateForm, SpaceForm, SpaceUpdateSchema } from "../../../_components";
 import { SpaceHead } from "./SpaceHead";
 import { SpaceHierarchy } from "./SpaceHierarchy";
+import { getUnitUrl } from "@/common/urls";
 
 const Form = styled.form`
   display: flex;
@@ -93,8 +94,7 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
         text: t("spaces:SpaceEditor.spaceUpdatedNotification"),
       });
       refetch();
-      // FIXME this should go up, not back
-      router.back();
+      router.replace(getUnitUrl(unit, "spaces-resources"));
     } catch (err) {
       displayError(err);
     }
@@ -102,12 +102,12 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
 
   return (
     <>
-      <LinkPrev route="../.." />
+      <LinkPrev route={getUnitUrl(unit, "spaces-resources")} />
       <SpaceHead
         title={data?.space?.parent?.nameFi || t("spaces:noParent")}
         space={data?.space}
-        maxPersons={watch("maxPersons") || undefined}
-        surfaceArea={watch("surfaceArea") || undefined}
+        maxPersons={watch("maxPersons")}
+        surfaceArea={watch("surfaceArea")}
       />
       <H2 $noMargin>{t("spaces:SpaceEditor.details")}</H2>
       <Form noValidate onSubmit={handleSubmit(onSubmit)}>
@@ -138,9 +138,7 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
         <ButtonContainer>
           <Button
             variant={ButtonVariant.Secondary}
-            type="button"
-            /* FIXME this should go up, not back */
-            onClick={() => router.back()}
+            onClick={() => router.replace(getUnitUrl(unit, "spaces-resources"))}
             disabled={isMutationLoading}
           >
             {t("common:cancel")}
