@@ -1,10 +1,12 @@
 import React from "react";
 import styled from "styled-components";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { IconAngleLeft, IconSize } from "hds-react";
-import { Link } from "react-router-dom";
+import { useRouter } from "next/router";
+import { focusStyles, removeButtonStyles } from "common/styled";
 
-const StyledLink = styled(Link)`
+const StyledLink = styled.button`
+  ${removeButtonStyles}
   display: inline-flex;
   font-size: var(--fontsize-body-m);
   color: var(--color-black-90);
@@ -14,6 +16,12 @@ const StyledLink = styled(Link)`
   gap: var(--spacing-2-xs);
   align-content: center;
   align-items: center;
+
+  ${focusStyles}
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
 `;
 
 type Props = {
@@ -24,10 +32,19 @@ type Props = {
 
 function LinkPrevInner({ route, style, className }: Props): JSX.Element {
   const { t } = useTranslation();
+  const router = useRouter();
+  const handleClick = () => {
+    if (route) {
+      router.replace(route);
+    } else {
+      router.back();
+    }
+  };
+
   return (
-    <StyledLink to={route || ".."} relative="path" style={style} className={className} data-testid="link__previous">
-      <IconAngleLeft size={IconSize.Small} aria-hidden="true" />
-      {t("common.prev")}
+    <StyledLink onClick={handleClick} style={style} className={className} data-testid="link__previous">
+      <IconAngleLeft size={IconSize.Small} />
+      {t("common:prev")}
     </StyledLink>
   );
 }

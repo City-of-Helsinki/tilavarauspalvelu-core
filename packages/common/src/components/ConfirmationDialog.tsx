@@ -44,10 +44,10 @@ export function ConfirmationDialog(props: Props): JSX.Element | null {
           onClick={() => onAccept?.()}
           iconStart={acceptIcon}
         >
-          {acceptLabel || t("common.approve")}
+          {acceptLabel || t("common:approve")}
         </Button>
         <Button variant={ButtonVariant.Secondary} onClick={() => onCancel?.()}>
-          {cancelLabel || t("common.cancel")}
+          {cancelLabel || t("common:cancel")}
         </Button>
       </Dialog.ActionButtons>
     </Dialog>
