@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING, ClassVar
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.enums import MunicipalityChoice, ReservationCancelReasonChoice, ReserveeType
 from utils.date_utils import DEFAULT_TIMEZONE
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -28,6 +28,7 @@ class ReservationStatistic(models.Model):
         "tilavarauspalvelu.Reservation",
         related_name="reservation_statistic",
         on_delete=models.SET_NULL,
+        blank=True,
         null=True,
     )
 
@@ -35,15 +36,15 @@ class ReservationStatistic(models.Model):
 
     num_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
     state: str = models.CharField(max_length=255)
-    reservation_type: str | None = models.CharField(max_length=255, null=True)
+    reservation_type: str | None = models.CharField(max_length=255, null=True, blank=True)
 
     begin: datetime.datetime = models.DateTimeField()
     end: datetime.datetime = models.DateTimeField()
     buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
     buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
     reservation_handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
-    reservation_confirmed_at: datetime.datetime | None = models.DateTimeField(null=True)
-    reservation_created_at: datetime.datetime | None = models.DateTimeField(null=True, default=timezone.now)  # noqa: TID251
+    reservation_confirmed_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+    reservation_created_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=timezone.now)  # noqa: TID251
 
     price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     price_net: Decimal = models.DecimalField(max_digits=20, decimal_places=6, default=0)
@@ -69,7 +70,7 @@ class ReservationStatistic(models.Model):
 
     primary_reservation_unit: int | None = models.BigIntegerField(null=True, blank=True)
     primary_reservation_unit_name: str = models.CharField(max_length=255)
-    primary_unit_tprek_id: str | None = models.CharField(max_length=255, null=True)
+    primary_unit_tprek_id: str | None = models.CharField(max_length=255, null=True, blank=True)
     primary_unit_name: str = models.CharField(max_length=255)
 
     deny_reason: int | None = models.BigIntegerField(null=True, blank=True)
@@ -100,8 +101,8 @@ class ReservationStatistic(models.Model):
     duration_minutes: int = models.IntegerField()
     is_subsidised: bool = models.BooleanField(default=False)
     is_recurring: bool = models.BooleanField(default=False)
-    recurrence_begin_date: datetime.date | None = models.DateField(null=True)
-    recurrence_end_date: datetime.date | None = models.DateField(null=True)
+    recurrence_begin_date: datetime.date | None = models.DateField(null=True, blank=True)
+    recurrence_end_date: datetime.date | None = models.DateField(null=True, blank=True)
     recurrence_uuid: str = models.CharField(max_length=255, default="", blank=True)
     reservation_uuid: str = models.CharField(max_length=255, default="", blank=True)
     reservee_uuid: str = models.CharField(max_length=255, default="", blank=True)

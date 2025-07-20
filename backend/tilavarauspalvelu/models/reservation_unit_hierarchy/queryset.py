@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from django.db import models
+from tilavarauspalvelu.models import ReservationUnitHierarchy
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 
 __all__ = [
     "ReservationUnitHierarchyManager",
@@ -8,7 +9,7 @@ __all__ = [
 ]
 
 
-class ReservationUnitHierarchyQuerySet(models.QuerySet): ...
+class ReservationUnitHierarchyQuerySet(ModelQuerySet[ReservationUnitHierarchy]): ...
 
 
-class ReservationUnitHierarchyManager(models.Manager.from_queryset(ReservationUnitHierarchyQuerySet)): ...
+class ReservationUnitHierarchyManager(ModelManager[ReservationUnitHierarchy, ReservationUnitHierarchyQuerySet]): ...

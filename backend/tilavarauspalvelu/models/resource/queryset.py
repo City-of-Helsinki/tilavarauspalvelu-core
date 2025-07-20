@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from django.db import models
+from tilavarauspalvelu.models import Resource
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 
 __all__ = [
     "ResourceManager",
@@ -8,7 +9,7 @@ __all__ = [
 ]
 
 
-class ResourceQuerySet(models.QuerySet): ...
+class ResourceQuerySet(ModelQuerySet[Resource]): ...
 
 
-class ResourceManager(models.Manager.from_queryset(ResourceQuerySet)): ...
+class ResourceManager(ModelManager[Resource, ResourceQuerySet]): ...

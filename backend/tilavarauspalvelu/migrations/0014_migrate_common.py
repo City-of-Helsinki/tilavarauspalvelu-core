@@ -2,14 +2,29 @@ from __future__ import annotations
 
 import uuid
 from inspect import cleandoc
+from typing import Any
 
 import django.db.models.deletion
 from django.contrib.postgres.fields import ArrayField
 from django.db import migrations, models
 
 import tilavarauspalvelu.enums
-import utils.fields.model
 from utils.db import NowTT  # noqa: TID251
+
+
+class StrChoiceField(models.CharField):
+    """CharField for TextChoices that automatically sets 'max_length' to the length of the longest choice."""
+
+    def __init__(self, enum: type[models.Choices], **kwargs: Any) -> None:
+        self.enum = enum
+        kwargs["max_length"] = max(len(val) for val, _ in enum.choices)
+        kwargs["choices"] = enum.choices
+        super().__init__(**kwargs)
+
+    def deconstruct(self) -> tuple[str, str, list[Any], dict[str, Any]]:
+        name, path, args, kwargs = super().deconstruct()
+        kwargs["enum"] = self.enum
+        return name, path, args, kwargs
 
 
 def create_reservation_unit_hierarchy():
@@ -207,7 +222,7 @@ class Migration(migrations.Migration):
                 ("draft", models.BooleanField(default=True)),
                 (
                     "level",
-                    utils.fields.model.StrChoiceField(
+                    StrChoiceField(
                         choices=[("EXCEPTION", "Exception"), ("WARNING", "Warning"), ("NORMAL", "Normal")],
                         enum=tilavarauspalvelu.enums.BannerNotificationLevel,
                         max_length=9,
@@ -215,7 +230,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "target",
-                    utils.fields.model.StrChoiceField(
+                    StrChoiceField(
                         choices=[("ALL", "All"), ("STAFF", "Staff"), ("USER", "User")],
                         enum=tilavarauspalvelu.enums.BannerNotificationTarget,
                         max_length=5,

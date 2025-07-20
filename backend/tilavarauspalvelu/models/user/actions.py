@@ -11,6 +11,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db import models
 from django.db.models.functions import Upper
+from lookup_property import L
 from social_django.models import UserSocialAuth
 
 from tilavarauspalvelu.enums import (
@@ -160,7 +161,7 @@ class UserActions:
         )
 
         has_open_applications = (  #
-            self.user.applications.has_status_in(statuses=ApplicationStatusChoice.blocks_anonymization).exists()
+            self.user.applications.filter(L(status__in=ApplicationStatusChoice.blocks_anonymization)).exists()
         )
 
         has_open_payments = self.user.reservations.filter(

@@ -1179,6 +1179,20 @@ class BannerNotificationTarget(models.TextChoices):
     STAFF = "STAFF", pgettext_lazy("BannerNotificationTarget", "Staff")
     USER = "USER", pgettext_lazy("BannerNotificationTarget", "User")
 
+    @classproperty
+    def for_staff(cls) -> list[str]:
+        return [  # type: ignore[return-type]
+            cls.STAFF.value,
+            cls.ALL.value,
+        ]
+
+    @classproperty
+    def for_customers(cls) -> list[str]:
+        return [  # type: ignore[return-type]
+            cls.USER.value,
+            cls.ALL.value,
+        ]
+
 
 class BannerNotificationState(models.TextChoices):
     DRAFT = "DRAFT", pgettext_lazy("BannerNotificationState", "Draft")

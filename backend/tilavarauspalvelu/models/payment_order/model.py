@@ -8,10 +8,11 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
+from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import uuid
@@ -40,8 +41,8 @@ class PaymentOrder(models.Model):
     remote_id: uuid.UUID | None = models.UUIDField(blank=True, null=True)
     payment_id: str = models.CharField(blank=True, default="", max_length=128)
     refund_id: uuid.UUID | None = models.UUIDField(blank=True, null=True)
-    payment_type: str = models.CharField(max_length=128, choices=PaymentType.choices)
-    status: str = models.CharField(max_length=128, choices=OrderStatus.choices, db_index=True)
+    payment_type: PaymentType = TextChoicesField(choices_enum=PaymentType)
+    status: OrderStatus = TextChoicesField(choices_enum=OrderStatus, db_index=True)
 
     price_net: Decimal = models.DecimalField(max_digits=10, decimal_places=2)
     price_vat: Decimal = models.DecimalField(max_digits=10, decimal_places=2)
@@ -52,7 +53,7 @@ class PaymentOrder(models.Model):
     # Only set when reservation also requires handling, meaning user cannot pay directly during checkout.
     handled_payment_due_by: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
 
-    language: str = models.CharField(max_length=8, choices=Language.choices)
+    language: Language = TextChoicesField(choices_enum=Language)
     reservation_user_uuid: uuid.UUID | None = models.UUIDField(blank=True, null=True)
     checkout_url: str = models.CharField(blank=True, default="", max_length=512)
     receipt_url: str = models.CharField(blank=True, default="", max_length=512)

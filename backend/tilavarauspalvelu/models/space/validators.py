@@ -8,10 +8,10 @@ if TYPE_CHECKING:
 
 
 __all__ = [
-    "ResourceValidator",
+    "SpaceValidator",
 ]
 
 
 @dataclasses.dataclass(slots=True, frozen=True)
-class ResourceValidator:
+class SpaceValidator:
     resource: Resource
