@@ -6,7 +6,9 @@ from typing import TYPE_CHECKING, ClassVar
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
+from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import (
     ApplicationRoundReservationCreationStatusChoice,
@@ -16,10 +18,13 @@ from tilavarauspalvelu.enums import (
 )
 from utils.date_utils import local_datetime
 from utils.db import Now
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import TermsOfUse, Unit
+    from tilavarauspalvelu.models import Application, ReservationPurpose, ReservationUnit, TermsOfUse, Unit
+    from tilavarauspalvelu.models._base import ManyToManyRelatedManager, OneToManyRelatedManager
+    from tilavarauspalvelu.models.application.queryset import ApplicationQuerySet
+    from tilavarauspalvelu.models.reservation_purpose.queryset import ReservationPurposeQuerySet
+    from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
 
     from .actions import ApplicationRoundActions
     from .queryset import ApplicationRoundManager
@@ -57,12 +62,12 @@ class ApplicationRound(models.Model):
     handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
     sent_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
 
-    reservation_units = models.ManyToManyField(
+    reservation_units: ManyToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet] = models.ManyToManyField(
         "tilavarauspalvelu.ReservationUnit",
         related_name="application_rounds",
         limit_choices_to=models.Q(reservation_kind__in=ReservationKind.allows_season),
     )
-    purposes = models.ManyToManyField(
+    purposes: ManyToManyRelatedManager[ReservationPurpose, ReservationPurposeQuerySet] = models.ManyToManyField(
         "tilavarauspalvelu.ReservationPurpose",
         related_name="application_rounds",
     )
@@ -70,12 +75,15 @@ class ApplicationRound(models.Model):
         "tilavarauspalvelu.TermsOfUse",
         related_name="application_rounds",
         on_delete=models.SET_NULL,
+        blank=True,
         null=True,
     )
 
     objects: ClassVar[ApplicationRoundManager] = LazyModelManager.new()
     actions: ApplicationRoundActions = LazyModelAttribute.new()
     validators: ApplicationRoundValidator = LazyModelAttribute.new()
+
+    applications: OneToManyRelatedManager[Application, ApplicationQuerySet]
 
     # Translated field hints
     name_fi: str | None
@@ -156,7 +164,7 @@ class ApplicationRound(models.Model):
                 then=models.Value(ApplicationRoundStatusChoice.OPEN.value),
             ),
             default=models.Value(ApplicationRoundStatusChoice.IN_ALLOCATION.value),
-            output_field=models.CharField(),
+            output_field=TextChoicesField(choices_enum=ApplicationRoundStatusChoice),
         )
 
     @status.override
@@ -192,7 +200,7 @@ class ApplicationRound(models.Model):
                 then=models.F("application_period_begins_at"),
             ),
             default=models.F("application_period_ends_at"),  # IN_ALLOCATION
-            output_field=models.DateTimeField(),
+            output_field=models.DateTimeField(null=True),
         )
 
     @status_timestamp.override
@@ -255,12 +263,7 @@ class ApplicationRound(models.Model):
         from tilavarauspalvelu.models import ReservationSeries
 
         timeout = datetime.timedelta(minutes=settings.APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES)
-
-        reservation_series_filters = {
-            "allocated_time_slot__reservation_unit_option__application_section__application__application_round": (
-                models.OuterRef("id")
-            )
-        }
+        lookup = "allocated_time_slot__reservation_unit_option__application_section__application__application_round"
 
         return models.Case(  # type: ignore[return-value]
             models.When(
@@ -268,7 +271,7 @@ class ApplicationRound(models.Model):
                 then=models.Value(ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED.value),
             ),
             models.When(
-                models.Exists(ReservationSeries.objects.filter(**reservation_series_filters)),
+                models.Exists(ReservationSeries.objects.filter(**{lookup: models.OuterRef("id")})),
                 then=models.Value(ApplicationRoundReservationCreationStatusChoice.COMPLETED.value),
             ),
             models.When(
@@ -276,7 +279,7 @@ class ApplicationRound(models.Model):
                 then=models.Value(ApplicationRoundReservationCreationStatusChoice.FAILED.value),
             ),
             default=models.Value(ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED.value),
-            output_field=models.CharField(),
+            output_field=TextChoicesField(choices_enum=ApplicationRoundReservationCreationStatusChoice),
         )
 
     @reservation_creation_status.override

@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING, Self
 from django.db import models
 from django.db.models.functions import RowNumber
 
+from tilavarauspalvelu.models import ReservationUnitPricing
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from utils.date_utils import local_date
 
 if TYPE_CHECKING:
@@ -18,7 +20,7 @@ __all__ = [
 ]
 
 
-class ReservationUnitPricingQuerySet(models.QuerySet):
+class ReservationUnitPricingQuerySet(ModelQuerySet[ReservationUnitPricing]):
     def exclude_past(self) -> Self:
         """Return all currently active and future pricings."""
         today = local_date()
@@ -85,4 +87,4 @@ class ReservationUnitPricingQuerySet(models.QuerySet):
         )
 
 
-class ReservationUnitPricingManager(models.Manager.from_queryset(ReservationUnitPricingQuerySet)): ...
+class ReservationUnitPricingManager(ModelManager[ReservationUnitPricing, ReservationUnitPricingQuerySet]): ...

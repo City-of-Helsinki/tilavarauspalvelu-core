@@ -10,9 +10,12 @@ from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 from django.db.models import Subquery
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
+from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import (
+    AccessType,
     AuthenticationType,
     ReservationFormType,
     ReservationKind,
@@ -22,24 +25,47 @@ from tilavarauspalvelu.enums import (
 )
 from utils.auditlog_util import AuditLogger
 from utils.db import Now
-from utils.fields.model import StrChoiceField
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from decimal import Decimal
 
-    from tilavarauspalvelu.enums import AccessType
     from tilavarauspalvelu.models import (
+        ApplicationRound,
+        ApplicationRoundTimeSlot,
+        Equipment,
         OriginHaukiResource,
         PaymentAccounting,
         PaymentMerchant,
         PaymentProduct,
+        Purpose,
+        Reservation,
         ReservationMetadataSet,
+        ReservationSeries,
+        ReservationUnitAccessType,
         ReservationUnitCancellationRule,
+        ReservationUnitHierarchy,
+        ReservationUnitImage,
+        ReservationUnitOption,
+        ReservationUnitPricing,
         ReservationUnitType,
+        Resource,
+        Space,
         TermsOfUse,
         Unit,
     )
+    from tilavarauspalvelu.models._base import ManyToManyRelatedManager, OneToManyRelatedManager
+    from tilavarauspalvelu.models.application_round.queryset import ApplicationRoundQuerySet
+    from tilavarauspalvelu.models.application_round_time_slot.queryset import ApplicationRoundTimeSlotQuerySet
+    from tilavarauspalvelu.models.equipment.queryset import EquipmentQuerySet
+    from tilavarauspalvelu.models.purpose.queryset import PurposeQuerySet
+    from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
+    from tilavarauspalvelu.models.reservation_series.queryset import ReservationSeriesQuerySet
+    from tilavarauspalvelu.models.reservation_unit_access_type.queryset import ReservationUnitAccessTypeQuerySet
+    from tilavarauspalvelu.models.reservation_unit_image.queryset import ReservationUnitImageQuerySet
+    from tilavarauspalvelu.models.reservation_unit_option.queryset import ReservationUnitOptionQuerySet
+    from tilavarauspalvelu.models.reservation_unit_pricing.queryset import ReservationUnitPricingQuerySet
+    from tilavarauspalvelu.models.resource.queryset import ResourceQuerySet
+    from tilavarauspalvelu.models.space.queryset import SpaceQuerySet
 
     from .actions import ReservationUnitActions
     from .queryset import ReservationUnitManager
@@ -105,25 +131,22 @@ class ReservationUnit(models.Model):
 
     # Enums
 
-    authentication: str = models.CharField(
-        max_length=20,
-        choices=AuthenticationType.choices,
-        default=AuthenticationType.WEAK.value,
+    authentication: AuthenticationType = TextChoicesField(
+        choices_enum=AuthenticationType,
+        default=AuthenticationType.WEAK,
     )
-    reservation_start_interval: str = models.CharField(
-        max_length=20,
-        choices=ReservationStartInterval.choices,
-        default=ReservationStartInterval.INTERVAL_15_MINUTES.value,
+    reservation_start_interval: ReservationStartInterval = TextChoicesField(
+        choices_enum=ReservationStartInterval,
+        default=ReservationStartInterval.INTERVAL_15_MINUTES,
     )
-    reservation_kind: str = StrChoiceField(
-        enum=ReservationKind,
-        default=ReservationKind.DIRECT_AND_SEASON.value,
+    reservation_kind: ReservationKind = TextChoicesField(
+        choices_enum=ReservationKind,
+        default=ReservationKind.DIRECT_AND_SEASON,
         db_index=True,
     )
-    reservation_form: str = models.CharField(
-        max_length=255,
-        choices=ReservationFormType.choices,
-        default=ReservationFormType.CONTACT_INFO_FORM.value,
+    reservation_form: ReservationFormType = TextChoicesField(
+        choices_enum=ReservationFormType,
+        default=ReservationFormType.CONTACT_INFO_FORM,
         db_index=True,
     )
 
@@ -163,8 +186,8 @@ class ReservationUnit(models.Model):
         "tilavarauspalvelu.ReservationMetadataSet",
         related_name="reservation_units",
         on_delete=models.SET_NULL,
-        null=True,
         blank=True,
+        null=True,
     )
     cancellation_terms: TermsOfUse | None = models.ForeignKey(
         "tilavarauspalvelu.TermsOfUse",
@@ -198,8 +221,8 @@ class ReservationUnit(models.Model):
         "tilavarauspalvelu.PaymentProduct",
         related_name="reservation_units",
         on_delete=models.PROTECT,
-        null=True,
         blank=True,
+        null=True,
     )
     payment_merchant: PaymentMerchant | None = models.ForeignKey(
         "tilavarauspalvelu.PaymentMerchant",
@@ -212,28 +235,28 @@ class ReservationUnit(models.Model):
         "tilavarauspalvelu.PaymentAccounting",
         related_name="reservation_units",
         on_delete=models.PROTECT,
-        null=True,
         blank=True,
+        null=True,
     )
 
     # Many-to-Many related
 
-    spaces = models.ManyToManyField(
+    spaces: ManyToManyRelatedManager[Space, SpaceQuerySet] = models.ManyToManyField(
         "tilavarauspalvelu.Space",
         related_name="reservation_units",
         blank=True,
     )
-    resources = models.ManyToManyField(
+    resources: ManyToManyRelatedManager[Resource, ResourceQuerySet] = models.ManyToManyField(
         "tilavarauspalvelu.Resource",
         related_name="reservation_units",
         blank=True,
     )
-    purposes = models.ManyToManyField(
+    purposes: ManyToManyRelatedManager[Purpose, PurposeQuerySet] = models.ManyToManyField(
         "tilavarauspalvelu.Purpose",
         related_name="reservation_units",
         blank=True,
     )
-    equipments = models.ManyToManyField(
+    equipments: ManyToManyRelatedManager[Equipment, EquipmentQuerySet] = models.ManyToManyField(
         "tilavarauspalvelu.Equipment",
         related_name="reservation_units",
         blank=True,
@@ -241,9 +264,9 @@ class ReservationUnit(models.Model):
 
     # Pre-calculated search vectors.
 
-    search_vector_fi = SearchVectorField()
-    search_vector_en = SearchVectorField()
-    search_vector_sv = SearchVectorField()
+    search_vector_fi = SearchVectorField(blank=True, default="")
+    search_vector_en = SearchVectorField(blank=True, default="")
+    search_vector_sv = SearchVectorField(blank=True, default="")
 
     # Translated field hints
     name_fi: str | None
@@ -268,6 +291,16 @@ class ReservationUnit(models.Model):
     objects: ClassVar[ReservationUnitManager] = LazyModelManager.new()
     actions: ReservationUnitActions = LazyModelAttribute.new()
     validators: ReservationUnitValidator = LazyModelAttribute.new()
+
+    reservation_unit_hierarchy: ReservationUnitHierarchy | None  # Can be missing
+    pricings: OneToManyRelatedManager[ReservationUnitPricing, ReservationUnitPricingQuerySet]
+    reservation_unit_options: OneToManyRelatedManager[ReservationUnitOption, ReservationUnitOptionQuerySet]
+    images: OneToManyRelatedManager[ReservationUnitImage, ReservationUnitImageQuerySet]
+    access_types: OneToManyRelatedManager[ReservationUnitAccessType, ReservationUnitAccessTypeQuerySet]
+    reservation_series: OneToManyRelatedManager[ReservationSeries, ReservationSeriesQuerySet]
+    reservations: OneToManyRelatedManager[Reservation, ReservationQuerySet]
+    application_round_time_slots: OneToManyRelatedManager[ApplicationRoundTimeSlot, ApplicationRoundTimeSlotQuerySet]
+    application_rounds: ManyToManyRelatedManager[ApplicationRound, ApplicationRoundQuerySet]
 
     class Meta:
         db_table = "reservation_unit"
@@ -387,7 +420,7 @@ class ReservationUnit(models.Model):
             ),
             # Otherwise, Reservation Unit is published.
             default=models.Value(ReservationUnitPublishingState.PUBLISHED.value),
-            output_field=models.CharField(),
+            output_field=TextChoicesField(choices_enum=ReservationUnitPublishingState),
         )
         return case  # type: ignore[return-value]  # noqa: RET504
 
@@ -481,7 +514,7 @@ class ReservationUnit(models.Model):
             ),
             # Otherwise, Reservation Unit is reservable
             default=models.Value(ReservationUnitReservationState.RESERVABLE.value),
-            output_field=models.CharField(),
+            output_field=TextChoicesField(choices_enum=ReservationUnitReservationState),
         )
 
         return case  # type: ignore[return-value]  # noqa: RET504
@@ -497,7 +530,7 @@ class ReservationUnit(models.Model):
                 .active()
                 .values("access_type")[:1]
             ),
-            output_field=models.CharField(null=True),
+            output_field=TextChoicesField(choices_enum=AccessType, null=True),
         )
         return sq  # type: ignore[return-value]  # noqa: RET504
 
@@ -505,14 +538,60 @@ class ReservationUnit(models.Model):
     def _(self) -> AccessType | None:
         return self.access_types.active().values_list("access_type", flat=True).first()
 
+    @lookup_property
+    def is_visible() -> bool:
+        return (  # type: ignore[return-value]
+            (
+                # Always visible
+                models.Q(publish_begins_at__isnull=True)  #
+                & models.Q(publish_ends_at__isnull=True)
+            )
+            | (
+                # Visible until publish ends
+                models.Q(publish_begins_at__isnull=True)  #
+                & models.Q(publish_ends_at__isnull=False)
+                & models.Q(publish_ends_at__gt=Now())
+            )
+            | (
+                # Visible since publish begun
+                models.Q(publish_begins_at__isnull=False)  #
+                & models.Q(publish_ends_at__isnull=True)
+                & models.Q(publish_begins_at__lte=Now())
+            )
+            | (
+                models.Q(publish_begins_at__isnull=False)  #
+                & models.Q(publish_ends_at__isnull=False)
+                & (
+                    (
+                        # Visible since publish begins, until publish ends
+                        models.Q(publish_begins_at__lte=Now())  #
+                        & models.Q(publish_ends_at__gt=Now())
+                    )
+                    | (
+                        # Visible until publish ends, and then again after publish begins
+                        models.Q(publish_begins_at__gt=Now())
+                        & models.Q(publish_ends_at__gt=Now())
+                        & models.Q(publish_ends_at__lt=models.F("publish_begins_at"))
+                    )
+                    | (
+                        # Was visible until publish ended, and now again since publish begun
+                        models.Q(publish_begins_at__lte=Now())
+                        & models.Q(publish_ends_at__lte=Now())
+                        & models.Q(publish_ends_at__lt=models.F("publish_begins_at"))
+                    )
+                )
+            )
+        )
+
 
 AuditLogger.register(
     ReservationUnit,
     # Exclude lookup properties, since they are calculated values.
     exclude_fields=[
+        "_active_pricing_price",
         "_publishing_state",
         "_reservation_state",
-        "_active_pricing_price",
         "_current_access_type",
+        "_is_visible",
     ],
 )

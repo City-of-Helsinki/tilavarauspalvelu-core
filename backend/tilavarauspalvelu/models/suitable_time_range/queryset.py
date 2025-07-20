@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING, Self
 from django.db import models
 from lookup_property import L
 
+from tilavarauspalvelu.models import SuitableTimeRange
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from utils.date_utils import merge_time_slots
 
 if TYPE_CHECKING:
@@ -21,7 +23,7 @@ __all__ = [
 ]
 
 
-class SuitableTimeRangeQuerySet(models.QuerySet):
+class SuitableTimeRangeQuerySet(ModelQuerySet[SuitableTimeRange]):
     def order_by_day_of_the_week(self, *, desc: bool = False) -> Self:
         return self.alias(day_of_the_week_number=L("day_of_the_week_number")).order_by(
             models.OrderBy(models.F("day_of_the_week_number"), descending=desc)
@@ -52,4 +54,4 @@ class SuitableTimeRangeQuerySet(models.QuerySet):
         return self.filter(L(fulfilled=value))
 
 
-class SuitableTimeRangeManager(models.Manager.from_queryset(SuitableTimeRangeQuerySet)): ...
+class SuitableTimeRangeManager(ModelManager[SuitableTimeRange, SuitableTimeRangeQuerySet]): ...

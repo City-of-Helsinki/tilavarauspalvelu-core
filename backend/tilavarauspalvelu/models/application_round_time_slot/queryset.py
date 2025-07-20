@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from django.db import models
+from tilavarauspalvelu.models import ApplicationRoundTimeSlot
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 
 __all__ = [
     "ApplicationRoundTimeSlotManager",
@@ -8,7 +9,7 @@ __all__ = [
 ]
 
 
-class ApplicationRoundTimeSlotQuerySet(models.QuerySet): ...
+class ApplicationRoundTimeSlotQuerySet(ModelQuerySet[ApplicationRoundTimeSlot]): ...
 
 
-class ApplicationRoundTimeSlotManager(models.Manager.from_queryset(ApplicationRoundTimeSlotQuerySet)): ...
+class ApplicationRoundTimeSlotManager(ModelManager[ApplicationRoundTimeSlot, ApplicationRoundTimeSlotQuerySet]): ...

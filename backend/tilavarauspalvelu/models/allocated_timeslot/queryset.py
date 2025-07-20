@@ -3,10 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 
 from django.db import models
-from lookup_property import L
 
-from tilavarauspalvelu.enums import AccessCodeState, AccessType
-from tilavarauspalvelu.models import ReservationUnit
+from tilavarauspalvelu.models import AllocatedTimeSlot, ReservationUnit
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from utils.date_utils import merge_time_slots
 
 if TYPE_CHECKING:
@@ -23,42 +22,7 @@ __all__ = [
 ]
 
 
-class AllocatedTimeSlotQuerySet(models.QuerySet):
-    def has_section_status_in(self, statuses: list[str]) -> Self:
-        order = L("reservation_unit_option__application_section__status")
-        return self.alias(application_section_status=order).filter(application_section_status__in=statuses)
-
-    def order_by_allocated_time_of_week(self, *, desc: bool = False) -> Self:
-        order = L("allocated_time_of_week")
-        return self.alias(allocated_time_of_week=order).order_by(
-            models.OrderBy(models.F("allocated_time_of_week"), descending=desc),
-        )
-
-    def order_by_application_status(self, *, desc: bool = False) -> Self:
-        order = L("reservation_unit_option__application_section__application__status_sort_order")
-        return self.alias(
-            application_status_sort_order=order,
-        ).order_by(
-            models.OrderBy(models.F("application_status_sort_order"), descending=desc),
-        )
-
-    def order_by_application_section_status(self, *, desc: bool = False) -> Self:
-        order = L("reservation_unit_option__application_section__status_sort_order")
-        return self.alias(
-            application_section_status_sort_order=order,
-        ).order_by(
-            models.OrderBy(models.F("application_section_status_sort_order"), descending=desc),
-        )
-
-    def order_by_applicant(self, *, desc: bool = False) -> Self:
-        order = L("reservation_unit_option__application_section__application__applicant")
-        return self.alias(applicant=order).order_by(models.OrderBy(models.F("applicant"), descending=desc))
-
-    def order_by_day_of_the_week(self, *, desc: bool = False) -> Self:
-        return self.alias(day_of_the_week_number=L("day_of_the_week_number")).order_by(
-            models.OrderBy(models.F("day_of_the_week_number"), descending=desc)
-        )
-
+class AllocatedTimeSlotQuerySet(ModelQuerySet[AllocatedTimeSlot]):
     def has_overlapping_allocations(
         self,
         *,
@@ -108,21 +72,5 @@ class AllocatedTimeSlotQuerySet(models.QuerySet):
     def for_application_round(self, ref: ApplicationRound | models.OuterRef) -> Self:
         return self.filter(reservation_unit_option__application_section__application__application_round=ref)
 
-    def has_access_code_state_in(self, states: list[str]) -> Self:
-        return self.alias(
-            access_code_state=models.Case(
-                models.When(
-                    ~L(reservation_series__used_access_types__contains=[AccessType.ACCESS_CODE]),
-                    then=models.Value(AccessCodeState.ACCESS_CODE_NOT_REQUIRED.value),
-                ),
-                models.When(
-                    L(reservation_series__is_access_code_is_active_correct=True),
-                    then=models.Value(AccessCodeState.ACCESS_CODE_CREATED.value),
-                ),
-                default=models.Value(AccessCodeState.ACCESS_CODE_PENDING.value),
-                output_field=models.CharField(),
-            ),
-        ).filter(access_code_state__in=states)
 
-
-class AllocatedTimeSlotManager(models.Manager.from_queryset(AllocatedTimeSlotQuerySet)): ...
+class AllocatedTimeSlotManager(ModelManager[AllocatedTimeSlot, AllocatedTimeSlotQuerySet]): ...

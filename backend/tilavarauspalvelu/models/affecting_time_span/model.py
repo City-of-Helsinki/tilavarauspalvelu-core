@@ -7,10 +7,10 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.transaction import get_connection
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, timedelta_to_json
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime

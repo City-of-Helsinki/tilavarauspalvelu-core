@@ -10,15 +10,12 @@ from django.db.models import Q, prefetch_related_objects
 from lookup_property import L
 
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType
-from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from utils.date_utils import local_date
 from utils.db import ArrayUnnest, Now, SubqueryArray
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
-    from decimal import Decimal
-
-    from query_optimizer.validators import PaginationArgs
 
     from tilavarauspalvelu.enums import AccessType
 
@@ -32,34 +29,7 @@ __all__ = [
 type ReservationUnitPK = int
 
 
-class ReservationUnitQuerySet(models.QuerySet):
-    def with_first_reservable_time(
-        self,
-        *,
-        filter_date_start: datetime.date | None,
-        filter_date_end: datetime.date | None,
-        filter_time_start: datetime.time | None,
-        filter_time_end: datetime.time | None,
-        minimum_duration_minutes: float | Decimal | None,
-        show_only_reservable: bool = False,
-        pagination_args: PaginationArgs | None = None,
-        cache_key: str = "",
-    ) -> Self:
-        """Annotate the queryset with `first_reservable_time` and `is_closed` for each reservation unit."""
-        helper = FirstReservableTimeHelper(
-            reservation_unit_queryset=self,
-            filter_date_start=filter_date_start,
-            filter_date_end=filter_date_end,
-            filter_time_start=filter_time_start,
-            filter_time_end=filter_time_end,
-            minimum_duration_minutes=minimum_duration_minutes,
-            show_only_reservable=show_only_reservable,
-            pagination_args=pagination_args,
-            cache_key=cache_key,
-        )
-        helper.calculate_all_first_reservable_times()
-        return helper.get_annotated_queryset()
-
+class ReservationUnitQuerySet(ModelQuerySet[ReservationUnit]):
     @property
     def affected_reservation_unit_ids(self) -> models.QuerySet[dict[str, int]]:
         """
@@ -251,7 +221,7 @@ class ReservationUnitQuerySet(models.QuerySet):
         )
 
 
-class ReservationUnitManager(models.Manager.from_queryset(ReservationUnitQuerySet)):
+class ReservationUnitManager(ModelManager[ReservationUnit, ReservationUnitQuerySet]):
     use_in_migrations = True
 
     # We need to redefine '__eq__' here because `use_in_migrations=True` and this manager is lazy loaded

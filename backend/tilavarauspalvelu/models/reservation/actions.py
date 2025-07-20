@@ -7,9 +7,8 @@ from typing import TYPE_CHECKING, Literal
 from django.conf import settings
 from django.utils.translation import pgettext
 from icalendar import Calendar, Event, Timezone, TimezoneDaylight, TimezoneStandard
-from rest_framework.exceptions import ValidationError
+from undine.exceptions import GraphQLValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import (
     CalendarProperty,
     EventProperty,
@@ -30,6 +29,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateO
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, Reservation, ReservationMetadataField
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 if TYPE_CHECKING:
@@ -39,7 +39,6 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit, Unit
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
     from tilavarauspalvelu.typing import Lang
-
 
 __all__ = [
     "ReservationActions",
@@ -261,8 +260,8 @@ class ReservationActions:
 
     def create_payment_order_paid_immediately(self, payment_type: PaymentType) -> PaymentOrder:
         if payment_type == PaymentType.ON_SITE:
-            return self.reservation.actions.create_payment_order_paid_on_site()
-        return self.reservation.actions.create_payment_order_paid_online(payment_type)
+            return self.create_payment_order_paid_on_site()
+        return self.create_payment_order_paid_online(payment_type)
 
     def create_payment_order_paid_after_handling(
         self,
@@ -270,9 +269,9 @@ class ReservationActions:
         handled_payment_due_by: datetime.datetime,
     ) -> PaymentOrder:
         if payment_type == PaymentType.ON_SITE:
-            return self.reservation.actions.create_payment_order_paid_on_site()
+            return self.create_payment_order_paid_on_site()
 
-        return self.reservation.actions.create_payment_order_pending_after_handling(
+        return self.create_payment_order_pending_after_handling(
             payment_type=payment_type,
             handled_payment_due_by=handled_payment_due_by,
         )
@@ -280,7 +279,7 @@ class ReservationActions:
     def create_payment_order_paid_online(self, payment_type: PaymentType) -> PaymentOrder:
         if payment_type not in PaymentType.requires_verkkokauppa:
             msg = f"Payment type {payment_type!r} cannot be paid online"
-            raise ValidationError(msg)
+            raise GraphQLValidationError(msg)
 
         verkkokauppa_order = self.create_order_in_verkkokauppa()
 
@@ -316,7 +315,7 @@ class ReservationActions:
     ) -> PaymentOrder:
         if payment_type not in PaymentType.types_that_can_be_pending:
             msg = f"Payment type {payment_type!r} cannot have a pending payment order"
-            raise ValidationError(msg)
+            raise GraphQLValidationError(msg)
 
         return PaymentOrder.objects.create(
             payment_type=payment_type,
@@ -346,18 +345,22 @@ class ReservationActions:
             sentry_msg = "Creating order in Verkkokauppa failed"
             SentryLogger.log_exception(err, details=sentry_msg, reservation_id=self.reservation.pk)
             msg = "Upstream service call failed. Unable to confirm the reservation."
-            raise ValidationError(msg, code=error_codes.UPSTREAM_CALL_FAILED) from err
+            raise GraphQLValidationError(msg, code=error_codes.UPSTREAM_CALL_FAILED) from err
 
     def overlapping_reservations(self) -> ReservationQuerySet:
         """Find all reservations that overlap with this reservation."""
         reservation_unit = self.reservation.reservation_unit
-        return Reservation.objects.overlapping_reservations(
-            reservation_unit=reservation_unit,
-            begin=self.reservation.begins_at,
-            end=self.reservation.ends_at,
-            buffer_time_before=self.reservation.buffer_time_before,
-            buffer_time_after=self.reservation.buffer_time_after,
-        ).exclude(id=self.reservation.id)
+        return (
+            Reservation.objects.all()
+            .overlapping_reservations(
+                reservation_unit=reservation_unit,
+                begin=self.reservation.begins_at,
+                end=self.reservation.ends_at,
+                buffer_time_before=self.reservation.buffer_time_before,
+                buffer_time_after=self.reservation.buffer_time_after,
+            )
+            .exclude(id=self.reservation.id)
+        )
 
     def should_offer_invoicing(self) -> bool:
         if self.reservation.reservee_type is None:
