@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from django.db import models
+from tilavarauspalvelu.models import ReservationMetadataField
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 
 __all__ = [
     "ReservationMetadataFieldManager",
@@ -8,7 +9,7 @@ __all__ = [
 ]
 
 
-class ReservationMetadataFieldQuerySet(models.QuerySet): ...
+class ReservationMetadataFieldQuerySet(ModelQuerySet[ReservationMetadataField]): ...
 
 
-class ReservationMetadataFieldManager(models.Manager.from_queryset(ReservationMetadataFieldQuerySet)): ...
+class ReservationMetadataFieldManager(ModelManager[ReservationMetadataField, ReservationMetadataFieldQuerySet]): ...

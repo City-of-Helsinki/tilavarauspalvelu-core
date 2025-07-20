@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from django.db import models
+from tilavarauspalvelu.models import ReservationUnitCancellationRule
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 
 __all__ = [
     "ReservationUnitCancellationRuleManager",
@@ -8,7 +9,9 @@ __all__ = [
 ]
 
 
-class ReservationUnitCancellationRuleQuerySet(models.QuerySet): ...
+class ReservationUnitCancellationRuleQuerySet(ModelQuerySet[ReservationUnitCancellationRule]): ...
 
 
-class ReservationUnitCancellationRuleManager(models.Manager.from_queryset(ReservationUnitCancellationRuleQuerySet)): ...
+class ReservationUnitCancellationRuleManager(
+    ModelManager[ReservationUnitCancellationRule, ReservationUnitCancellationRuleQuerySet],
+): ...

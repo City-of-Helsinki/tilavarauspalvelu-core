@@ -1,14 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-from django.db import models
 from easy_thumbnails.exceptions import InvalidImageFormatError
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-
-if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationUnitImage
+from tilavarauspalvelu.models import ReservationUnitImage
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 
 __all__ = [
     "ReservationUnitImageManager",
@@ -16,7 +12,7 @@ __all__ = [
 ]
 
 
-class ReservationUnitImageQuerySet(models.QuerySet):
+class ReservationUnitImageQuerySet(ModelQuerySet[ReservationUnitImage]):
     def update_thumbnail_urls(self) -> None:
         reservation_unit_images = self.filter(image__isnull=False)
 
@@ -39,4 +35,4 @@ class ReservationUnitImageQuerySet(models.QuerySet):
         self.bulk_update(images, ["large_url", "medium_url", "small_url"])
 
 
-class ReservationUnitImageManager(models.Manager.from_queryset(ReservationUnitImageQuerySet)): ...
+class ReservationUnitImageManager(ModelManager[ReservationUnitImage, ReservationUnitImageQuerySet]): ...

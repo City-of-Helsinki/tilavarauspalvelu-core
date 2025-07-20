@@ -4,11 +4,16 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-from utils.lazy import LazyModelAttribute, LazyModelManager
+from lazy_managers import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import uuid
+
+    from tilavarauspalvelu.models import PaymentProduct, ReservationUnit, Unit
+    from tilavarauspalvelu.models._base import OneToManyRelatedManager
+    from tilavarauspalvelu.models.payment_product.queryset import PaymentProductQuerySet
+    from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
+    from tilavarauspalvelu.models.unit.queryset import UnitQuerySet
 
     from .actions import PaymentMerchantActions
     from .queryset import PaymentMerchantManager
@@ -32,6 +37,10 @@ class PaymentMerchant(models.Model):
     objects: ClassVar[PaymentMerchantManager] = LazyModelManager.new()
     actions: PaymentMerchantActions = LazyModelAttribute.new()
     validators: PaymentMerchantValidator = LazyModelAttribute.new()
+
+    products: OneToManyRelatedManager[PaymentProduct, PaymentProductQuerySet]
+    units: OneToManyRelatedManager[Unit, UnitQuerySet]
+    reservation_units: OneToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]
 
     class Meta:
         db_table = "payment_merchant"

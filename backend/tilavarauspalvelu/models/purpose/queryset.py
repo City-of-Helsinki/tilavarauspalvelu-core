@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from django.db import models
+from tilavarauspalvelu.models import Purpose
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 
 __all__ = [
     "PurposeManager",
@@ -8,7 +9,7 @@ __all__ = [
 ]
 
 
-class PurposeQuerySet(models.QuerySet): ...
+class PurposeQuerySet(ModelQuerySet[Purpose]): ...
 
 
-class PurposeManager(models.Manager.from_queryset(PurposeQuerySet)): ...
+class PurposeManager(ModelManager[Purpose, PurposeQuerySet]): ...

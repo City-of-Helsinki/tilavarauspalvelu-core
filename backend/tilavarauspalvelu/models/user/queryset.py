@@ -4,12 +4,14 @@ import datetime
 from typing import Self
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.auth.models import UserManager as DjangoUserManager
 from django.db import models
-from helsinki_gdpr.models import SerializableMixin
 
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from tilavarauspalvelu.models.user.actions import ANONYMIZED_FIRST_NAME, ANONYMIZED_LAST_NAME
 from utils.date_utils import local_date
+from utils.mixins import SerializableModelManagerMixin
 
 __all__ = [
     "UserManager",
@@ -17,7 +19,7 @@ __all__ = [
 ]
 
 
-class UserQuerySet(models.QuerySet):
+class UserQuerySet(ModelQuerySet[User]):
     def remove_old_superuser_and_staff_permissions(self) -> None:
         """Remove superuser and staff permissions from inactive users."""
         self.should_deactivate_permissions().update(is_staff=False, is_superuser=False)
@@ -90,23 +92,8 @@ class UserQuerySet(models.QuerySet):
         )
 
 
-class UserManager(DjangoUserManager.from_queryset(UserQuerySet)):
+class UserManager(DjangoUserManager, ModelManager[User, UserQuerySet]):
     use_in_migrations = True
 
-    # We need to redefine '__eq__' here because `use_in_migrations=True` and this manager is lazy loaded
-    # in the model class. Django's migration system thinks that the lazy loaded manager is a different
-    # class than the one in the migration history, and will therefore always try to update the manager.
-    #
-    # This implementation defers to the 'LazyModelManager.__eq__' implementation when the manager is not
-    # yet loaded, which then loads the manager and compares the actual managers there.
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, type(self)):
-            return NotImplemented
-        return self._constructor_args == other._constructor_args  # type: ignore[attr-defined]
 
-    # Copied from 'BaseManager.__hash__'
-    def __hash__(self) -> int:
-        return id(self)
-
-
-class ProfileUserManager(SerializableMixin.SerializableManager.from_queryset(UserQuerySet)): ...
+class ProfileUserManager(SerializableModelManagerMixin, ModelManager[User, UserQuerySet]): ...

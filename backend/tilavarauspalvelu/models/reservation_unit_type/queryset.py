@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from django.db import models
+from tilavarauspalvelu.models import ReservationUnitType
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 
 __all__ = [
     "ReservationUnitTypeManager",
@@ -8,7 +9,7 @@ __all__ = [
 ]
 
 
-class ReservationUnitTypeQuerySet(models.QuerySet): ...
+class ReservationUnitTypeQuerySet(ModelQuerySet[ReservationUnitType]): ...
 
 
-class ReservationUnitTypeManager(models.Manager.from_queryset(ReservationUnitTypeQuerySet)): ...
+class ReservationUnitTypeManager(ModelManager[ReservationUnitType, ReservationUnitTypeQuerySet]): ...

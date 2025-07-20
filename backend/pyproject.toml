@@ -191,7 +191,6 @@ extend-select = [
     "PLW0108",  # unnecessary-lambda
     "PLW1514",  # unspecified-encoding
     "PLW1641",  # eq-without-hash (NOTE: Does not check for __hash__ implementations in superclasses.)
-    "PLW3201",  # bad-dunder-method-name
     "PT028",    # pytest-parameter-with-default-argument
     "RUF027",   # missing-f-string-syntax
     "RUF028",   # invalid-formatter-suppression-comment

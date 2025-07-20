@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from django.db import models
+from tilavarauspalvelu.models import AgeGroup
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 
 __all__ = [
     "AgeGroupManager",
@@ -8,7 +9,7 @@ __all__ = [
 ]
 
 
-class AgeGroupQuerySet(models.QuerySet): ...
+class AgeGroupQuerySet(ModelQuerySet[AgeGroup]): ...
 
 
-class AgeGroupManager(models.Manager.from_queryset(AgeGroupQuerySet)): ...
+class AgeGroupManager(ModelManager[AgeGroup, AgeGroupQuerySet]): ...
