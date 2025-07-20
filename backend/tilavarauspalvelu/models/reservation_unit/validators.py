@@ -123,6 +123,7 @@ class ReservationUnitValidator:
         new_buffer_time_after: datetime.timedelta | None = None,
         ignore_ids: Collection[int] = (),
     ) -> None:
+        # TODO: Using this might fail unrelated mutations if there is an overlapping reservation in one mutation.
         if self.reservation_unit.actions.has_overlapping_reservations(
             start_datetime=begins_at,
             end_datetime=ends_at,

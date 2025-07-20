@@ -40,7 +40,6 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
     from tilavarauspalvelu.typing import Lang
 
-
 __all__ = [
     "ReservationActions",
 ]
@@ -261,8 +260,8 @@ class ReservationActions:
 
     def create_payment_order_paid_immediately(self, payment_type: PaymentType) -> PaymentOrder:
         if payment_type == PaymentType.ON_SITE:
-            return self.reservation.actions.create_payment_order_paid_on_site()
-        return self.reservation.actions.create_payment_order_paid_online(payment_type)
+            return self.create_payment_order_paid_on_site()
+        return self.create_payment_order_paid_online(payment_type)
 
     def create_payment_order_paid_after_handling(
         self,
@@ -270,9 +269,9 @@ class ReservationActions:
         handled_payment_due_by: datetime.datetime,
     ) -> PaymentOrder:
         if payment_type == PaymentType.ON_SITE:
-            return self.reservation.actions.create_payment_order_paid_on_site()
+            return self.create_payment_order_paid_on_site()
 
-        return self.reservation.actions.create_payment_order_pending_after_handling(
+        return self.create_payment_order_pending_after_handling(
             payment_type=payment_type,
             handled_payment_due_by=handled_payment_due_by,
         )
@@ -351,13 +350,17 @@ class ReservationActions:
     def overlapping_reservations(self) -> ReservationQuerySet:
         """Find all reservations that overlap with this reservation."""
         reservation_unit = self.reservation.reservation_unit
-        return Reservation.objects.overlapping_reservations(
-            reservation_unit=reservation_unit,
-            begin=self.reservation.begins_at,
-            end=self.reservation.ends_at,
-            buffer_time_before=self.reservation.buffer_time_before,
-            buffer_time_after=self.reservation.buffer_time_after,
-        ).exclude(id=self.reservation.id)
+        return (
+            Reservation.objects.all()
+            .overlapping_reservations(
+                reservation_unit=reservation_unit,
+                begin=self.reservation.begins_at,
+                end=self.reservation.ends_at,
+                buffer_time_before=self.reservation.buffer_time_before,
+                buffer_time_after=self.reservation.buffer_time_after,
+            )
+            .exclude(id=self.reservation.id)
+        )
 
     def should_offer_invoicing(self) -> bool:
         if self.reservation.reservee_type is None:

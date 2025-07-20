@@ -6,16 +6,16 @@ from django.db import models
 from django.db.models import Value
 from django.db.models.functions import Cast, Concat
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import Weekday
-from utils.fields.model import StrChoiceField
-from utils.lazy import LazyModelAttribute, LazyModelManager
+from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
     import datetime
 
-    from tilavarauspalvelu.models import ReservationUnitOption
+    from tilavarauspalvelu.models import ReservationSeries, ReservationUnitOption
 
     from .actions import AllocatedTimeSlotActions
     from .queryset import AllocatedTimeSlotManager
@@ -34,7 +34,7 @@ class AllocatedTimeSlot(models.Model):
     Will be converted to reservations when the application round has been allocated.
     """
 
-    day_of_the_week: str = StrChoiceField(enum=Weekday)
+    day_of_the_week: Weekday = TextChoicesField(choices_enum=Weekday)
     begin_time: datetime.time = models.TimeField()
     end_time: datetime.time = models.TimeField()
 
@@ -47,6 +47,8 @@ class AllocatedTimeSlot(models.Model):
     objects: ClassVar[AllocatedTimeSlotManager] = LazyModelManager.new()
     actions: AllocatedTimeSlotActions = LazyModelAttribute.new()
     validators: AllocatedTimeSlotValidator = LazyModelAttribute.new()
+
+    reservation_series: ReservationSeries | None  # Can be missing
 
     class Meta:
         db_table = "allocated_time_slot"

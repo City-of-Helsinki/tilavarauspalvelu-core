@@ -1,23 +1,20 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Literal, Self
+from typing import Literal, Self
 
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models
 from django.db.models import Subquery
 from django.db.models.functions import Coalesce
-from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
-from tilavarauspalvelu.models import ApplicationSection, Unit
+from tilavarauspalvelu.models import Application, ApplicationSection, Unit
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from utils.date_utils import local_date
-
-if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Application
-
+from utils.mixins import SerializableModelManagerMixin
 
 __all__ = [
     "ApplicationManager",
@@ -25,7 +22,7 @@ __all__ = [
 ]
 
 
-class ApplicationQuerySet(models.QuerySet):
+class ApplicationQuerySet(ModelQuerySet[Application]):
     def has_status(self, status: ApplicationStatusChoice) -> Self:
         return self.filter(L(status=status.value))
 
@@ -40,7 +37,8 @@ class ApplicationQuerySet(models.QuerySet):
             **{
                 f"preferred_unit_name_{lang}": Subquery(
                     queryset=(
-                        ApplicationSection.objects.preferred_unit_name_alias(lang=lang)
+                        ApplicationSection.objects.all()
+                        .preferred_unit_name_alias(lang=lang)
                         .annotate(preferred_unit_name=models.F(f"preferred_unit_name_{lang}"))
                         .filter(application=models.OuterRef("pk"))
                         .order_by("pk")
@@ -81,7 +79,7 @@ class ApplicationQuerySet(models.QuerySet):
         # to fetch units and unit groups for the permission checks when the queryset is evaluated,
         # and 'joins' them to the correct model instances in python.
 
-        items: list[Application] = list(self)
+        items = list(self._result_cache)
         if not items:
             return
 
@@ -134,5 +132,4 @@ class ApplicationQuerySet(models.QuerySet):
         ).delete()
 
 
-class ApplicationManager(SerializableMixin.SerializableManager.from_queryset(ApplicationQuerySet)):
-    """Contains custom queryset methods and GDPR serialization."""
+class ApplicationManager(SerializableModelManagerMixin, ModelManager[Application, ApplicationQuerySet]): ...

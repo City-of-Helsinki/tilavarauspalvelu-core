@@ -37,12 +37,12 @@ class ReservationUnitAccessTypeValidator:
             raise ValidationError(msg, code=error_codes.ACCESS_TYPE_ACCESS_CODE_ON_CREATE)
 
     def validate_not_past(self, begin_date: datetime.date) -> None:
-        if self.access_type.begin_date <= local_date() and self.access_type.begin_date != begin_date:
+        if self.access_type.begin_date != begin_date and self.access_type.begin_date <= local_date():
             msg = "Past of active access type begin date cannot be changed."
             raise ValidationError(msg, code=error_codes.ACCESS_TYPE_CANNOT_BE_MOVED)
 
     def validate_not_moved_to_past(self, begin_date: datetime.date) -> None:
-        if begin_date < local_date() and self.access_type.begin_date != begin_date:
+        if self.access_type.begin_date != begin_date and begin_date < local_date():
             msg = "Access type cannot be moved to the past."
             raise ValidationError(msg, code=error_codes.ACCESS_TYPE_BEGIN_DATE_IN_PAST)
 

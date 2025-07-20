@@ -22,6 +22,7 @@ django-filter = "25.1"
 django-health-check = "3.20.0"
 django-helusers = "0.13.3"
 django-jinja = "2.11.0"
+django-lazy-managers = "0.0.1"
 django-lookup-property = "0.2.2"
 django-modeltranslation = "0.19.17"
 django-mptt = "0.18.0"
@@ -192,7 +193,6 @@ extend-select = [
     "PLW0108",  # unnecessary-lambda
     "PLW1514",  # unspecified-encoding
     "PLW1641",  # eq-without-hash (NOTE: Does not check for __hash__ implementations in superclasses.)
-    "PLW3201",  # bad-dunder-method-name
     "PT028",    # pytest-parameter-with-default-argument
     "RUF027",   # missing-f-string-syntax
     "RUF028",   # invalid-formatter-suppression-comment

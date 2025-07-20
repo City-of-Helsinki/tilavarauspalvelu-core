@@ -6,7 +6,8 @@ from django.db import models
 from lookup_property import L
 
 from tilavarauspalvelu.enums import AccessCodeState, AccessType
-from tilavarauspalvelu.models import ReservationUnit
+from tilavarauspalvelu.models import AllocatedTimeSlot, ReservationUnit
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from utils.date_utils import merge_time_slots
 
 if TYPE_CHECKING:
@@ -23,7 +24,7 @@ __all__ = [
 ]
 
 
-class AllocatedTimeSlotQuerySet(models.QuerySet):
+class AllocatedTimeSlotQuerySet(ModelQuerySet[AllocatedTimeSlot]):
     def has_section_status_in(self, statuses: list[str]) -> Self:
         order = L("reservation_unit_option__application_section__status")
         return self.alias(application_section_status=order).filter(application_section_status__in=statuses)
@@ -125,4 +126,4 @@ class AllocatedTimeSlotQuerySet(models.QuerySet):
         ).filter(access_code_state__in=states)
 
 
-class AllocatedTimeSlotManager(models.Manager.from_queryset(AllocatedTimeSlotQuerySet)): ...
+class AllocatedTimeSlotManager(ModelManager[AllocatedTimeSlot, AllocatedTimeSlotQuerySet]): ...

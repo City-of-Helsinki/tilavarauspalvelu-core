@@ -1049,6 +1049,21 @@ django = ">=4.2"
 tests = ["coverage"]
 
 [[package]]
+name = "django-lazy-managers"
+version = "0.0.1"
+description = "Lazy model managers for Django"
+optional = false
+python-versions = "<4,>=3.11"
+groups = ["main"]
+files = [
+    {file = "django_lazy_managers-0.0.1-py3-none-any.whl", hash = "sha256:43faccaf72b7eabc96687e3f07d4c26b992048728e3643969b8cdda78f3ea31e"},
+    {file = "django_lazy_managers-0.0.1.tar.gz", hash = "sha256:984a88fbe9cb66b5f491f4d8101c0247fc1b1e4ba8451be352f78412afc55211"},
+]
+
+[package.dependencies]
+Django = ">=4.2"
+
+[[package]]
 name = "django-lookup-property"
 version = "0.2.2"
 description = "Django model properties that are also lookup expressions."
@@ -3576,4 +3591,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "559571a765cb59c4605f7c69eb79d22a567466dbf75f560c50565c07dbe0ea47"
+content-hash = "47af1f7dac68d762cb97f142bdbd5d4070ad0ebb7f822685e43a6a6335c5a96e"

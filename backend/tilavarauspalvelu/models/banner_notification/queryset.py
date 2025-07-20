@@ -3,40 +3,27 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 
 from django.db import models
+from lookup_property import L
 
-from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget
-from utils.db import Now
+from tilavarauspalvelu.enums import BannerNotificationTarget
+from tilavarauspalvelu.models import BannerNotification
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
-    "BANNER_LEVEL_SORT_ORDER",
-    "BANNER_STATE_SORT_ORDER",
-    "BANNER_TARGET_SORT_ORDER",
     "BannerNotificationManager",
     "BannerNotificationQuerySet",
 ]
 
 
-class BannerNotificationQuerySet(models.QuerySet):
-    def order_by_expression(self, alias: str, expression: models.Expression, *, desc: bool = False) -> Self:
-        order_by = models.OrderBy(models.F(alias), descending=desc)
-        return self.alias(**{alias: expression}).order_by(order_by)
-
+class BannerNotificationQuerySet(ModelQuerySet[BannerNotification]):
     def active(self) -> Self:
-        return self.filter(
-            draft=False,
-            active_from__lte=Now(),
-            active_until__gte=Now(),
-        )
+        return self.filter(L(is_active=True))
 
     def inactive(self) -> Self:
-        return self.filter(
-            draft=True,
-            active_from__isnull=True,
-            active_until__isnull=True,
-        )
+        return self.filter(L(is_active=False))
 
     def visible(self, user: AnyUser) -> Self:
         if user.is_anonymous:
@@ -66,67 +53,13 @@ class BannerNotificationQuerySet(models.QuerySet):
         return self.none()
 
     def order_by_level(self, *, desc: bool = False) -> Self:
-        return self.order_by_expression(alias="__level", expression=BANNER_LEVEL_SORT_ORDER, desc=desc)
+        return self.order_by(L("banner_level_sort_order").order_by(descending=desc))
 
     def order_by_state(self, *, desc: bool = False) -> Self:
-        return self.order_by_expression(alias="__state", expression=BANNER_STATE_SORT_ORDER, desc=desc)
+        return self.order_by(L("banner_state_sort_order").order_by(descending=desc))
 
     def order_by_target(self, *, desc: bool = False) -> Self:
-        return self.order_by_expression(alias="__target", expression=BANNER_TARGET_SORT_ORDER, desc=desc)
+        return self.order_by(L("banner_target_sort_order").order_by(descending=desc))
 
 
-class BannerNotificationManager(models.Manager.from_queryset(BannerNotificationQuerySet)): ...
-
-
-BANNER_LEVEL_SORT_ORDER = models.Case(
-    models.When(
-        level=BannerNotificationLevel.EXCEPTION,
-        then=models.Value(1),
-    ),
-    models.When(
-        level=BannerNotificationLevel.WARNING,
-        then=models.Value(2),
-    ),
-    models.When(
-        level=BannerNotificationLevel.NORMAL,
-        then=models.Value(3),
-    ),
-    default=models.Value(4),
-)
-
-# Can't use this for indexing because it uses the Now() function
-BANNER_STATE_SORT_ORDER = models.Case(
-    # Draft
-    models.When(
-        draft=True,
-        then=models.Value(3),
-    ),
-    # Scheduled
-    models.When(
-        condition=(models.Q(active_from__gt=Now())),
-        then=models.Value(2),
-    ),
-    # Active
-    models.When(
-        condition=(models.Q(active_from__lte=Now()) & models.Q(active_until__gte=Now())),
-        then=models.Value(1),
-    ),
-    # "Past" / "draft"
-    default=models.Value(4),
-)
-
-BANNER_TARGET_SORT_ORDER = models.Case(
-    models.When(
-        target=BannerNotificationTarget.ALL,
-        then=models.Value(1),
-    ),
-    models.When(
-        target=BannerNotificationTarget.USER,
-        then=models.Value(2),
-    ),
-    models.When(
-        target=BannerNotificationTarget.STAFF,
-        then=models.Value(3),
-    ),
-    default=models.Value(4),
-)
+class BannerNotificationManager(ModelManager[BannerNotification, BannerNotificationQuerySet]): ...

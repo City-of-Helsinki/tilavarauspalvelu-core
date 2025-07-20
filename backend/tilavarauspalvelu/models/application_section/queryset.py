@@ -4,22 +4,22 @@ from typing import Literal, Self
 
 from django.db import models
 from django.db.models import Subquery
-from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
-from tilavarauspalvelu.models import Reservation, ReservationUnitOption
+from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationUnitOption
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from utils.date_utils import local_datetime
+from utils.db import Now
+from utils.mixins import SerializableModelManagerMixin
 
 __all__ = [
     "ApplicationSectionManager",
     "ApplicationSectionQuerySet",
 ]
 
-from utils.date_utils import local_datetime
-from utils.db import Now
 
-
-class ApplicationSectionQuerySet(models.QuerySet):
+class ApplicationSectionQuerySet(ModelQuerySet[ApplicationSection]):
     def has_status_in(self, statuses: list[str]) -> Self:
         return self.filter(L(status__in=statuses))
 
@@ -59,11 +59,15 @@ class ApplicationSectionQuerySet(models.QuerySet):
         """Return all application sections that should have an access code but don't."""
         return self.alias(
             has_missing_access_codes=models.Exists(
-                queryset=Reservation.objects.for_application_section(models.OuterRef("pk")).filter(
-                    state=ReservationStateChoice.CONFIRMED,
-                    access_type=AccessType.ACCESS_CODE,
-                    access_code_generated_at=None,
-                    ends_at__gt=Now(),
+                queryset=(
+                    Reservation.objects.all()
+                    .for_application_section(models.OuterRef("pk"))
+                    .filter(
+                        state=ReservationStateChoice.CONFIRMED,
+                        access_type=AccessType.ACCESS_CODE,
+                        access_code_generated_at=None,
+                        ends_at__gt=Now(),
+                    )
                 ),
             )
         ).filter(has_missing_access_codes=True)
@@ -75,17 +79,23 @@ class ApplicationSectionQuerySet(models.QuerySet):
         """
         return self.alias(
             has_incorrect_access_codes=models.Exists(
-                queryset=Reservation.objects.for_application_section(models.OuterRef("pk")).filter(
-                    (
-                        (models.Q(access_code_is_active=True) & L(access_code_should_be_active=False))
-                        | (models.Q(access_code_is_active=False) & L(access_code_should_be_active=True))
-                    ),
-                    access_code_generated_at__isnull=False,
-                    ends_at__gt=local_datetime(),
+                queryset=(
+                    Reservation.objects.all()
+                    .for_application_section(models.OuterRef("pk"))
+                    .filter(
+                        (
+                            (models.Q(access_code_is_active=True) & L(access_code_should_be_active=False))
+                            | (models.Q(access_code_is_active=False) & L(access_code_should_be_active=True))
+                        ),
+                        access_code_generated_at__isnull=False,
+                        ends_at__gt=local_datetime(),
+                    )
                 ),
             )
         ).filter(has_incorrect_access_codes=True)
 
 
-class ApplicationSectionManager(SerializableMixin.SerializableManager.from_queryset(ApplicationSectionQuerySet)):
-    """Contains custom queryset methods and GDPR serialization."""
+class ApplicationSectionManager(
+    SerializableModelManagerMixin,
+    ModelManager[ApplicationSection, ApplicationSectionQuerySet],
+): ...

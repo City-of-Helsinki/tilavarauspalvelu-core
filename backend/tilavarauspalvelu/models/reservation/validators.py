@@ -209,8 +209,8 @@ class ReservationValidator:
             msg = "Reservation has already ended."
             raise ValidationError(msg, code=error_codes.RESERVATION_HAS_ENDED)
 
-    def validate_can_be_deleted(self, reservation: Reservation) -> None:
-        if reservation.state not in ReservationStateChoice.states_that_can_be_deleted:
+    def validate_can_be_deleted(self) -> None:
+        if self.reservation.state not in ReservationStateChoice.states_that_can_be_deleted:
             states_str = comma_sep_str(ReservationStateChoice.states_that_can_be_deleted, last_sep="or", quote=True)
             msg = f"Reservation which is not in {states_str} state cannot be deleted."
             raise ValidationError(msg)

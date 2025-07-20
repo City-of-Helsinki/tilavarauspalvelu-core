@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING, ClassVar
 from django.contrib.postgres.fields import ArrayField, HStoreField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.enums import Weekday
 from tilavarauspalvelu.validators import validate_reservable_times
-from utils.fields.model import StrChoiceField
-from utils.lazy import LazyModelAttribute, LazyModelManager
+from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
@@ -27,7 +27,7 @@ class ApplicationRoundTimeSlot(models.Model):
         on_delete=models.CASCADE,
     )
 
-    weekday: str = StrChoiceField(enum=Weekday)
+    weekday: Weekday = TextChoicesField(choices_enum=Weekday)
     is_closed: bool = models.BooleanField(default=False)
     reservable_times: list[TimeSlotDB] = ArrayField(
         base_field=HStoreField(),

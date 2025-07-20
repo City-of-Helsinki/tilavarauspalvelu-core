@@ -9,16 +9,26 @@ from django.db import models
 from django.db.models import Exists
 from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, Weekday
 from utils.db import SubqueryArray
-from utils.lazy import LazyModelAttribute, LazyModelManager
+from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
     import datetime
 
-    from tilavarauspalvelu.models import AgeGroup, AllocatedTimeSlot, ReservationUnit, User
+    from tilavarauspalvelu.models import (
+        AgeGroup,
+        AllocatedTimeSlot,
+        RejectedOccurrence,
+        Reservation,
+        ReservationUnit,
+        User,
+    )
+    from tilavarauspalvelu.models._base import OneToManyRelatedManager
+    from tilavarauspalvelu.models.rejected_occurrence.queryset import RejectedOccurrenceQuerySet
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
 
     from .actions import ReservationSeriesActions
@@ -45,13 +55,9 @@ class ReservationSeries(models.Model):
     end_date: datetime.date = models.DateField()
     end_time: datetime.time = models.TimeField()
 
-    recurrence_in_days: int | None = models.PositiveIntegerField(null=True, blank=True)
+    recurrence_in_days: int | None = models.PositiveIntegerField(null=True, blank=True)  # TODO: Nullable?
 
-    weekdays: list[str] = ArrayField(
-        models.CharField(choices=Weekday.choices, max_length=255),
-        size=7,
-        default=list,
-    )
+    weekdays: list[Weekday] = ArrayField(TextChoicesField(choices_enum=Weekday), size=7, default=list)
 
     # Relations
 
@@ -77,16 +83,16 @@ class ReservationSeries(models.Model):
         "tilavarauspalvelu.AgeGroup",
         related_name="reservation_series",
         on_delete=models.SET_NULL,
-        null=True,
         blank=True,
+        null=True,
     )
-
-    # Reverse relation typing helpers.
-    reservations: ReservationQuerySet
 
     objects: ClassVar[ReservationSeriesManager] = LazyModelManager.new()
     actions: ReservationSeriesActions = LazyModelAttribute.new()
     validators: ReservationSeriesValidator = LazyModelAttribute.new()
+
+    rejected_occurrences: OneToManyRelatedManager[RejectedOccurrence, RejectedOccurrenceQuerySet]
+    reservations: OneToManyRelatedManager[Reservation, ReservationQuerySet]
 
     class Meta:
         db_table = "reservation_series"
@@ -150,7 +156,7 @@ class ReservationSeries(models.Model):
             agg_field="access_type",
             distinct=True,
             coalesce_output_type="varchar",
-            output_field=models.CharField(),
+            output_field=TextChoicesField(choices_enum=AccessType),
         )
         return sq  # type: ignore[return-value]  # noqa: RET504
 
@@ -178,7 +184,7 @@ class ReservationSeries(models.Model):
                 IndexTransform(1, models.CharField(), L("used_access_types")),
                 models.Value(AccessTypeWithMultivalued.UNRESTRICTED.value),  # If no reservations in series
             ),
-            output_field=models.CharField(),
+            output_field=TextChoicesField(choices_enum=AccessTypeWithMultivalued),
         )
         return case  # type: ignore[return-value]  # noqa: RET504
 

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, ClassVar
 from django.db import models
 from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
-from helsinki_gdpr.models import SerializableMixin
+from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import (
@@ -16,13 +16,15 @@ from tilavarauspalvelu.enums import (
     ReserveeType,
 )
 from utils.db import Now
-from utils.fields.model import StrChoiceField
-from utils.lazy import LazyModelAttribute, LazyModelManager
+from utils.fields.model import TextChoicesField
+from utils.mixins import SerializableModelMixin
 
 if TYPE_CHECKING:
     import datetime
 
-    from tilavarauspalvelu.models import ApplicationRound, Unit, User
+    from tilavarauspalvelu.models import ApplicationRound, ApplicationSection, Unit, User
+    from tilavarauspalvelu.models._base import OneToManyRelatedManager
+    from tilavarauspalvelu.models.application_section.queryset import ApplicationSectionQuerySet
 
     from .actions import ApplicationActions
     from .queryset import ApplicationManager
@@ -34,14 +36,14 @@ __all__ = [
 ]
 
 
-class Application(SerializableMixin, models.Model):
+class Application(SerializableModelMixin, models.Model):
     """
     An application for an application round. Contains multiple application sections,
     as well as information about the applicant.
     """
 
     # Basic information
-    applicant_type: str | None = StrChoiceField(enum=ReserveeType, null=True, blank=True)
+    applicant_type: ReserveeType | None = TextChoicesField(choices_enum=ReserveeType, null=True, blank=True)
     additional_information: str = models.TextField(blank=True, default="")
 
     # Handling data
@@ -74,7 +76,7 @@ class Application(SerializableMixin, models.Model):
     organisation_street_address: str = models.TextField(max_length=255, blank=True, default="")
     organisation_post_code: str = models.CharField(max_length=255, blank=True, default="")
     organisation_city: str = models.TextField(max_length=255, blank=True, default="")
-    municipality: str | None = StrChoiceField(enum=MunicipalityChoice, null=True, blank=True)
+    municipality: MunicipalityChoice | None = TextChoicesField(choices_enum=MunicipalityChoice, null=True, blank=True)
 
     # Auto-filled fields
     created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
@@ -94,6 +96,8 @@ class Application(SerializableMixin, models.Model):
     objects: ClassVar[ApplicationManager] = LazyModelManager.new()
     actions: ApplicationActions = LazyModelAttribute.new()
     validators: ApplicationValidator = LazyModelAttribute.new()
+
+    application_sections: OneToManyRelatedManager[ApplicationSection, ApplicationSectionQuerySet]
 
     class Meta:
         db_table = "application"
@@ -151,7 +155,7 @@ class Application(SerializableMixin, models.Model):
                 models.Q(sent_at__isnull=True),
                 then=models.Value(ApplicationStatusChoice.EXPIRED.value),
             ),
-            # NOTE: Some copy-pasta from Application Round status for efficiency
+            # NOTE: Some copy-pasta from `ApplicationRound.status` for efficiency
             models.When(
                 # If the application round has been marked as sent
                 models.Q(application_round__sent_at__isnull=False),
@@ -173,7 +177,7 @@ class Application(SerializableMixin, models.Model):
                 then=models.Value(ApplicationStatusChoice.IN_ALLOCATION.value),
             ),
             default=models.Value(ApplicationStatusChoice.HANDLED.value),
-            output_field=models.CharField(),
+            output_field=TextChoicesField(choices_enum=ApplicationStatusChoice),
         )
 
     @status.override
@@ -200,6 +204,10 @@ class Application(SerializableMixin, models.Model):
 
             case ApplicationRoundStatusChoice.RESULTS_SENT:
                 return ApplicationStatusChoice.RESULTS_SENT
+
+            case _:
+                msg = f"Unknown application round status: {self.status}"
+                raise ValueError(msg)
 
     @lookup_property(skip_codegen=True)
     def all_sections_allocated() -> bool:

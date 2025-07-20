@@ -4,7 +4,7 @@ import dataclasses
 from typing import TYPE_CHECKING
 
 from django.conf import settings
-from rest_framework.exceptions import ValidationError
+from django.core.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 

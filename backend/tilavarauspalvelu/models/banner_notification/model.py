@@ -4,13 +4,12 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
+from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationState, BannerNotificationTarget
-from utils.date_utils import local_datetime
-from utils.fields.model import StrChoiceField
-from utils.lazy import LazyModelAttribute, LazyModelManager
-
-from .queryset import BANNER_LEVEL_SORT_ORDER, BANNER_TARGET_SORT_ORDER
+from utils.db import Now
+from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
     import datetime
@@ -29,8 +28,8 @@ class BannerNotification(models.Model):
     name: str = models.CharField(max_length=100, unique=True)
     message: str = models.TextField(max_length=1_000, blank=True, default="")
     draft: bool = models.BooleanField(default=True)
-    level: str = StrChoiceField(enum=BannerNotificationLevel)
-    target: str = StrChoiceField(enum=BannerNotificationTarget)
+    level: BannerNotificationLevel = TextChoicesField(choices_enum=BannerNotificationLevel)
+    target: BannerNotificationTarget = TextChoicesField(choices_enum=BannerNotificationTarget)
     active_from: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=None)
     active_until: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=None)
 
@@ -49,16 +48,6 @@ class BannerNotification(models.Model):
         verbose_name = _("banner notification")
         verbose_name_plural = _("banner notifications")
         ordering = ["pk"]
-        indexes = [
-            models.Index(
-                BANNER_LEVEL_SORT_ORDER,
-                name="level_priority_index",
-            ),
-            models.Index(
-                BANNER_TARGET_SORT_ORDER,
-                name="target_priority_index",
-            ),
-        ]
         constraints = [
             models.CheckConstraint(
                 name="non_draft_notifications_must_have_active_period_and_message",
@@ -93,26 +82,97 @@ class BannerNotification(models.Model):
     def __str__(self) -> str:
         return self.name
 
-    @property
-    def is_active(self) -> bool:
-        if self.draft or self.active_from is None or self.active_until is None:
-            return False
+    @lookup_property
+    def is_active() -> bool:
+        return models.Q(  # type: ignore[return-value]
+            draft=False,
+            active_from__isnull=False,
+            active_until__isnull=False,
+            active_from__lte=Now(),
+            active_until__gte=Now(),
+        )
 
-        return self.active_from <= local_datetime() <= self.active_until
+    @lookup_property
+    def is_scheduled() -> bool:
+        return models.Q(  # type: ignore[return-value]
+            draft=False,
+            active_from__isnull=False,
+            active_from__gt=Now(),
+        )
 
-    @property
-    def is_scheduled(self) -> bool:
-        if self.draft or self.active_from is None or self.active_until is None:
-            return False
+    @lookup_property
+    def state() -> BannerNotificationState:
+        return models.Case(  # type: ignore[return-value]
+            models.When(
+                draft=True,
+                then=models.Value(BannerNotificationState.DRAFT.value),
+            ),
+            models.When(
+                L(is_active=True),
+                then=models.Value(BannerNotificationState.ACTIVE.value),
+            ),
+            models.When(
+                L(is_scheduled=True),
+                then=models.Value(BannerNotificationState.SCHEDULED.value),
+            ),
+            default=models.Value(BannerNotificationState.DRAFT.value),  # past notifications are considered drafts
+            output_field=TextChoicesField(choices_enum=BannerNotificationState),
+        )
 
-        return self.active_from > local_datetime()
+    @lookup_property
+    def banner_level_sort_order() -> int:
+        return models.Case(  # type: ignore[return-value]
+            models.When(
+                level=BannerNotificationLevel.EXCEPTION.value,
+                then=models.Value(1),
+            ),
+            models.When(
+                level=BannerNotificationLevel.WARNING.value,
+                then=models.Value(2),
+            ),
+            models.When(
+                level=BannerNotificationLevel.NORMAL.value,
+                then=models.Value(3),
+            ),
+            default=models.Value(4),
+        )
 
-    @property
-    def state(self) -> BannerNotificationState:
-        if self.draft:
-            return BannerNotificationState.DRAFT
-        if self.is_active:
-            return BannerNotificationState.ACTIVE
-        if self.is_scheduled:
-            return BannerNotificationState.SCHEDULED
-        return BannerNotificationState.DRAFT  # past notifications are considered drafts
+    @lookup_property
+    def banner_state_sort_order() -> int:
+        return models.Case(  # type: ignore[return-value]
+            # Draft
+            models.When(
+                draft=True,
+                then=models.Value(3),
+            ),
+            # Scheduled
+            models.When(
+                condition=(models.Q(active_from__gt=Now())),
+                then=models.Value(2),
+            ),
+            # Active
+            models.When(
+                condition=(models.Q(active_from__lte=Now()) & models.Q(active_until__gte=Now())),
+                then=models.Value(1),
+            ),
+            # "Past" / "draft"
+            default=models.Value(4),
+        )
+
+    @lookup_property
+    def banner_target_sort_order() -> int:
+        return models.Case(  # type: ignore[return-value]
+            models.When(
+                target=BannerNotificationTarget.ALL.value,
+                then=models.Value(1),
+            ),
+            models.When(
+                target=BannerNotificationTarget.USER.value,
+                then=models.Value(2),
+            ),
+            models.When(
+                target=BannerNotificationTarget.STAFF.value,
+                then=models.Value(3),
+            ),
+            default=models.Value(4),
+        )

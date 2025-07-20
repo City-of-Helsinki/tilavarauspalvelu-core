@@ -144,7 +144,7 @@ class ReservationDeleteTentativeMutation(DeleteMutation):
 
     @classmethod
     def validate_deletion(cls, reservation: Reservation, user: AnyUser) -> None:
-        reservation.validators.validate_can_be_deleted(reservation)
+        reservation.validators.validate_can_be_deleted()
 
         if hasattr(reservation, "payment_order"):
             payment_order: PaymentOrder = reservation.payment_order

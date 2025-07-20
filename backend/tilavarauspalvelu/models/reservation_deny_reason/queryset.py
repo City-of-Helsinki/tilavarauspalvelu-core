@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from django.db import models
+from tilavarauspalvelu.models import ReservationDenyReason
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 
 __all__ = [
     "ReservationDenyReasonManager",
@@ -8,7 +9,7 @@ __all__ = [
 ]
 
 
-class ReservationDenyReasonQuerySet(models.QuerySet): ...
+class ReservationDenyReasonQuerySet(ModelQuerySet[ReservationDenyReason]): ...
 
 
-class ReservationDenyReasonManager(models.Manager.from_queryset(ReservationDenyReasonQuerySet)): ...
+class ReservationDenyReasonManager(ModelManager[ReservationDenyReason, ReservationDenyReasonQuerySet]): ...

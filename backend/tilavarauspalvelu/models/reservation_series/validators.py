@@ -84,3 +84,9 @@ class ReservationSeriesValidator:
         if reservation.ends_at < local_datetime():
             msg = "Last reservation in the series has already ended."
             raise ValidationError(msg, code=error_codes.RESERVATION_SERIES_HAS_ENDED)
+
+    @classmethod
+    def validate_recurrence_in_days(cls, recurrence_in_days: int) -> None:
+        if recurrence_in_days == 0 or recurrence_in_days % 7 != 0:
+            msg = "Reoccurrence interval must be a multiple of 7 days."
+            raise ValidationError(msg, code=error_codes.RESERVATION_SERIES_INVALID_RECURRENCE_IN_DAYS)

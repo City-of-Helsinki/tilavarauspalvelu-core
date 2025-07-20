@@ -4,12 +4,18 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import pgettext_lazy
+from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.enums import TermsOfUseTypeChoices
 from utils.auditlog_util import AuditLogger
-from utils.lazy import LazyModelAttribute, LazyModelManager
+from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ApplicationRound, ReservationUnit
+    from tilavarauspalvelu.models._base import OneToManyRelatedManager
+    from tilavarauspalvelu.models.application_round.queryset import ApplicationRoundQuerySet
+    from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
+
     from .actions import TermsOfUseActions
     from .queryset import TermsOfUseManager
     from .validators import TermsOfUseValidator
@@ -24,11 +30,10 @@ class TermsOfUse(models.Model):
     name: str | None = models.CharField(max_length=255, null=True, blank=True)
     text: str = models.TextField()
 
-    terms_type: str = models.CharField(
-        blank=False,
-        max_length=40,
-        choices=TermsOfUseTypeChoices.choices,
+    terms_type: TermsOfUseTypeChoices = TextChoicesField(
+        choices_enum=TermsOfUseTypeChoices,
         default=TermsOfUseTypeChoices.GENERIC,
+        blank=False,
     )
 
     # Translated field hints
@@ -42,6 +47,12 @@ class TermsOfUse(models.Model):
     objects: ClassVar[TermsOfUseManager] = LazyModelManager.new()
     actions: TermsOfUseActions = LazyModelAttribute.new()
     validators: TermsOfUseValidator = LazyModelAttribute.new()
+
+    application_rounds: OneToManyRelatedManager[ApplicationRound, ApplicationRoundQuerySet]
+    cancellation_terms_reservation_units: OneToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]
+    service_specific_terms_reservation_units: OneToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]
+    pricing_terms_reservation_units: OneToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]
+    payment_terms_reservation_units: OneToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]
 
     class Meta:
         db_table = "terms_of_use"
