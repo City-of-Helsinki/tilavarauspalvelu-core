@@ -17,7 +17,7 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.12.11
     hooks:
-      - id: ruff
+      - id: ruff-check
         entry: bash -c 'cd backend && ruff check --force-exclude'
       - id: ruff-format
         entry: bash -c 'cd backend && ruff format --force-exclude'
