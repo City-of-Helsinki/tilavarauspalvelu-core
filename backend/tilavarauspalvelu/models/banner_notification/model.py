@@ -11,8 +11,6 @@ from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationS
 from utils.db import NowTT
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
-from .queryset import BANNER_LEVEL_SORT_ORDER, BANNER_TARGET_SORT_ORDER
-
 if TYPE_CHECKING:
     import datetime
 
@@ -50,16 +48,6 @@ class BannerNotification(models.Model):
         verbose_name = _("banner notification")
         verbose_name_plural = _("banner notifications")
         ordering = ["pk"]
-        indexes = [
-            models.Index(
-                BANNER_LEVEL_SORT_ORDER,
-                name="level_priority_index",
-            ),
-            models.Index(
-                BANNER_TARGET_SORT_ORDER,
-                name="target_priority_index",
-            ),
-        ]
         constraints = [
             models.CheckConstraint(
                 name="non_draft_notifications_must_have_active_period_and_message",
@@ -129,4 +117,62 @@ class BannerNotification(models.Model):
             ),
             default=models.Value(BannerNotificationState.DRAFT.value),  # past notifications are considered drafts
             output_field=models.CharField(),
+        )
+
+    @lookup_property
+    def banner_level_sort_order() -> int:
+        return models.Case(  # type: ignore[return-value]
+            models.When(
+                level=BannerNotificationLevel.EXCEPTION.value,
+                then=models.Value(1),
+            ),
+            models.When(
+                level=BannerNotificationLevel.WARNING.value,
+                then=models.Value(2),
+            ),
+            models.When(
+                level=BannerNotificationLevel.NORMAL.value,
+                then=models.Value(3),
+            ),
+            default=models.Value(4),
+        )
+
+    @lookup_property
+    def banner_state_sort_order() -> int:
+        return models.Case(  # type: ignore[return-value]
+            # Draft
+            models.When(
+                draft=True,
+                then=models.Value(3),
+            ),
+            # Scheduled
+            models.When(
+                condition=(models.Q(active_from__gt=NowTT())),
+                then=models.Value(2),
+            ),
+            # Active
+            models.When(
+                condition=(models.Q(active_from__lte=NowTT()) & models.Q(active_until__gte=NowTT())),
+                then=models.Value(1),
+            ),
+            # "Past" / "draft"
+            default=models.Value(4),
+        )
+
+    @lookup_property
+    def banner_target_sort_order() -> int:
+        return models.Case(  # type: ignore[return-value]
+            models.When(
+                target=BannerNotificationTarget.ALL.value,
+                then=models.Value(1),
+            ),
+            models.When(
+                target=BannerNotificationTarget.USER.value,
+                then=models.Value(2),
+            ),
+            models.When(
+                target=BannerNotificationTarget.STAFF.value,
+                then=models.Value(3),
+            ),
+            default=models.Value(4),
         )

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from itertools import islice
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Any, Self
 
 from django.contrib.postgres.search import SearchVector
 from django.db import connections, models
@@ -10,6 +10,7 @@ from django.db.models import Q, prefetch_related_objects
 from lookup_property import L
 
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
 from utils.date_utils import local_date
 from utils.db import ArrayUnnest, NowTT, SubqueryArray
@@ -17,8 +18,6 @@ from utils.db import ArrayUnnest, NowTT, SubqueryArray
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
     from decimal import Decimal
-
-    from query_optimizer.validators import PaginationArgs
 
     from tilavarauspalvelu.enums import AccessType
 
@@ -32,7 +31,7 @@ __all__ = [
 type ReservationUnitPK = int
 
 
-class ReservationUnitQuerySet(models.QuerySet):
+class ReservationUnitQuerySet(ModelQuerySet[ReservationUnit]):
     def with_first_reservable_time(
         self,
         *,
@@ -42,7 +41,7 @@ class ReservationUnitQuerySet(models.QuerySet):
         filter_time_end: datetime.time | None,
         minimum_duration_minutes: float | Decimal | None,
         show_only_reservable: bool = False,
-        pagination_args: PaginationArgs | None = None,
+        pagination_args: dict[str, Any] | None = None,
         cache_key: str = "",
     ) -> Self:
         """Annotate the queryset with `first_reservable_time` and `is_closed` for each reservation unit."""
@@ -251,7 +250,7 @@ class ReservationUnitQuerySet(models.QuerySet):
         )
 
 
-class ReservationUnitManager(models.Manager.from_queryset(ReservationUnitQuerySet)):
+class ReservationUnitManager(ModelManager[ReservationUnit, ReservationUnitQuerySet]):
     use_in_migrations = True
 
     # We need to redefine '__eq__' here because `use_in_migrations=True` and this manager is lazy loaded

@@ -7,7 +7,6 @@ from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import IntegrityError, models, transaction
 from django.db.models.functions import Coalesce
-from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L
 
 from tilavarauspalvelu.enums import (
@@ -19,12 +18,14 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.models import ReservationStatistic, ReservationUnit, Unit
+from tilavarauspalvelu.models import Reservation, ReservationStatistic, ReservationUnit, Unit
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet, SerializableModelManagerMixin
 from tilavarauspalvelu.tasks import delete_pindora_reservation_task
 from utils.date_utils import local_datetime
+from utils.db import NowTT
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ApplicationRound, ApplicationSection, Reservation
+    from tilavarauspalvelu.models import ApplicationRound, ApplicationSection
     from tilavarauspalvelu.typing import AnyUser
 
 
@@ -34,7 +35,7 @@ __all__ = [
 ]
 
 
-class ReservationQuerySet(models.QuerySet):
+class ReservationQuerySet(ModelQuerySet[Reservation]):
     def with_buffered_begin_and_end(self) -> Self:
         """Annotate the queryset with buffered begin and end times."""
         return self.annotate(
@@ -337,6 +338,28 @@ class ReservationQuerySet(models.QuerySet):
             ends_at__gt=local_datetime(),
         )
 
+    def future_reservations_in_section(self, ref: ApplicationSection | models.OuterRef) -> Self:
+        return self.for_application_section(ref).filter(begins_at__gt=local_datetime())
+
+    def cancellable_reservations_in_section(self, ref: ApplicationSection | models.OuterRef) -> Self:
+        return (
+            self.future_reservations_in_section(ref)
+            .filter(
+                type=ReservationTypeChoice.SEASONAL,
+                state=ReservationStateChoice.CONFIRMED,
+                price=0,
+                reservation_unit__cancellation_rule__isnull=False,
+            )
+            .alias(
+                cancellation_time=models.F("reservation_unit__cancellation_rule__can_be_cancelled_time_before"),
+                cancellation_cutoff=NowTT() + models.F("cancellation_time"),
+            )
+            .filter(
+                begins_at__gt=models.F("cancellation_cutoff"),
+            )
+            .distinct()
+        )
+
     def for_application_section(self, ref: ApplicationSection | models.OuterRef) -> Self:
         """Return all reservations for the given application section."""
         return self.filter(reservation_series__allocated_time_slot__reservation_unit_option__application_section=ref)
@@ -390,17 +413,7 @@ class ReservationQuerySet(models.QuerySet):
         )
 
 
-# Need to do this to get proper type hints in the manager methods, since
-# 'from_queryset' returns a subclass of Manager, but is not typed correctly...
-# 'SerializableMixin.SerializableManager' contains custom queryset methods and GDPR serialization
-_BaseManager: type[models.Manager] = SerializableMixin.SerializableManager.from_queryset(ReservationQuerySet)  # type: ignore[assignment]
-
-
-class ReservationManager(_BaseManager):
-    # Define to get type hints for queryset methods.
-    def all(self) -> ReservationQuerySet:
-        return super().all()  # type: ignore[return-value]
-
+class ReservationManager(SerializableModelManagerMixin, ModelManager[Reservation, ReservationQuerySet]):
     def delete_unfinished(self) -> None:
         """Delete any reservations that have not completed checkout in time. Handle required integrations."""
         qs = self.all().unfinished()

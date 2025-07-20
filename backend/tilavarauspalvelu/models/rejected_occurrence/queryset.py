@@ -6,6 +6,8 @@ from django.db import models
 from lookup_property import L
 
 from tilavarauspalvelu.enums import RejectionReadinessChoice
+from tilavarauspalvelu.models import RejectedOccurrence
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 
 __all__ = [
     "RejectedOccurrenceManager",
@@ -13,7 +15,7 @@ __all__ = [
 ]
 
 
-class RejectedOccurrenceQuerySet(models.QuerySet):
+class RejectedOccurrenceQuerySet(ModelQuerySet[RejectedOccurrence]):
     def order_by_applicant(self, *, desc: bool = False) -> Self:
         applicant_ref = (
             "reservation_series"
@@ -46,4 +48,4 @@ class RejectedOccurrenceQuerySet(models.QuerySet):
         ).order_by(models.OrderBy(models.F("rejection_reason_order"), descending=desc))
 
 
-class RejectedOccurrenceManager(models.Manager.from_queryset(RejectedOccurrenceQuerySet)): ...
+class RejectedOccurrenceManager(ModelManager[RejectedOccurrence, RejectedOccurrenceQuerySet]): ...
