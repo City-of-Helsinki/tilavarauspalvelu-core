@@ -4,10 +4,13 @@ from typing import TYPE_CHECKING, Self
 
 from django.db import models
 
+from tilavarauspalvelu.models import ReservableTimeSpan
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from utils.date_utils import normalize_as_datetime
 
 if TYPE_CHECKING:
     import datetime
+
 
 __all__ = [
     "ReservableTimeSpanManager",
@@ -15,7 +18,7 @@ __all__ = [
 ]
 
 
-class ReservableTimeSpanQuerySet(models.QuerySet):
+class ReservableTimeSpanQuerySet(ModelQuerySet[ReservableTimeSpan]):
     def overlapping_with_period(
         self,
         start: datetime.datetime | datetime.date,
@@ -104,4 +107,4 @@ class ReservableTimeSpanQuerySet(models.QuerySet):
         )
 
 
-class ReservableTimeSpanManager(models.Manager.from_queryset(ReservableTimeSpanQuerySet)): ...
+class ReservableTimeSpanManager(ModelManager[ReservableTimeSpan, ReservableTimeSpanQuerySet]): ...

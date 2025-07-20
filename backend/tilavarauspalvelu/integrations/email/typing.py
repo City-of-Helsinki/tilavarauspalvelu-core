@@ -96,7 +96,7 @@ class EmailData:
             attachments=[attachment] if attachment else [],
         )
 
-    def __json__(self) -> dict[str, Any]:  # noqa: PLW3201
+    def __json__(self) -> dict[str, Any]:
         """Make the object JSON serializable to be used in Celery tasks."""
         return dataclasses.asdict(self)
 

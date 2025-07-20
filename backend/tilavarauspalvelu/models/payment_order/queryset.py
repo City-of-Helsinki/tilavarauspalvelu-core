@@ -10,6 +10,8 @@ from django.db import models, transaction
 from tilavarauspalvelu.enums import OrderStatus
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
+from tilavarauspalvelu.models import PaymentOrder
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from utils.date_utils import local_datetime
 
 __all__ = [
@@ -18,7 +20,7 @@ __all__ = [
 ]
 
 
-class PaymentOrderQuerySet(models.QuerySet):
+class PaymentOrderQuerySet(ModelQuerySet[PaymentOrder]):
     def expired_direct_payments(self) -> Self:
         now = local_datetime()
         expiration = datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
@@ -44,16 +46,7 @@ class PaymentOrderQuerySet(models.QuerySet):
         )
 
 
-# Need to do this to get proper type hints in the manager methods, since
-# 'from_queryset' returns a subclass of Manager, but is not typed correctly...
-_BaseManager: type[models.Manager] = models.Manager.from_queryset(PaymentOrderQuerySet)  # type: ignore[assignment]
-
-
-class PaymentOrderManager(_BaseManager):
-    # Define to get type hints for queryset methods.
-    def all(self) -> PaymentOrderQuerySet:
-        return super().all()  # type: ignore[return-value]
-
+class PaymentOrderManager(ModelManager[PaymentOrder, PaymentOrderQuerySet]):
     def refresh_expired_payments_from_verkkokauppa(self) -> None:
         for payment_order in self.all().expired_direct_payments():
             # Do not update PaymentOrder status if an error occurs

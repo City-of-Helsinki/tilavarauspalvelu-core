@@ -5,10 +5,13 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-from utils.lazy import LazyModelAttribute, LazyModelManager
+from lazy_managers import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ReservationUnitPricing
+    from tilavarauspalvelu.models._base import OneToManyRelatedManager
+    from tilavarauspalvelu.models.reservation_unit_pricing.queryset import ReservationUnitPricingQuerySet
+
     from .actions import TaxPercentageActions
     from .queryset import TaxPercentageManager
     from .validators import TaxPercentageValidator
@@ -24,6 +27,8 @@ class TaxPercentage(models.Model):
     objects: ClassVar[TaxPercentageManager] = LazyModelManager.new()
     actions: TaxPercentageActions = LazyModelAttribute.new()
     validators: TaxPercentageValidator = LazyModelAttribute.new()
+
+    reservation_unit_pricings: OneToManyRelatedManager[ReservationUnitPricing, ReservationUnitPricingQuerySet]
 
     class Meta:
         db_table = "tax_percentage"

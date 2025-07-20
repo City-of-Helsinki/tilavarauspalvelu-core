@@ -4,11 +4,16 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.validators import is_numeric, validate_accounting_project
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ReservationUnit, Unit
+    from tilavarauspalvelu.models._base import OneToManyRelatedManager
+    from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
+    from tilavarauspalvelu.models.unit.queryset import UnitQuerySet
+
     from .actions import PaymentAccountingActions
     from .queryset import PaymentAccountingManager
     from .validators import PaymentAccountingValidator
@@ -46,6 +51,9 @@ class PaymentAccounting(models.Model):
     objects: ClassVar[PaymentAccountingManager] = LazyModelManager.new()
     actions: PaymentAccountingActions = LazyModelAttribute.new()
     validators: PaymentAccountingValidator = LazyModelAttribute.new()
+
+    units: OneToManyRelatedManager[Unit, UnitQuerySet]
+    reservation_units: OneToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]
 
     class Meta:
         db_table = "payment_accounting"
