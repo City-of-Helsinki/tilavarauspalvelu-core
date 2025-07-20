@@ -4,10 +4,10 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from utils.date_utils import DEFAULT_TIMEZONE
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime

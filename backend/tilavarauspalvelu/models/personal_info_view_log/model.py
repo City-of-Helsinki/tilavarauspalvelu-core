@@ -4,8 +4,7 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-from utils.lazy import LazyModelAttribute, LazyModelManager
+from lazy_managers import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
@@ -34,6 +33,7 @@ class PersonalInfoViewLog(models.Model):
         "tilavarauspalvelu.User",
         related_name="personal_info_view_logs",
         on_delete=models.SET_NULL,
+        blank=True,
         null=True,
         editable=False,
     )
@@ -41,6 +41,7 @@ class PersonalInfoViewLog(models.Model):
         "tilavarauspalvelu.User",
         related_name="as_viewer_personal_info_view_logs",
         on_delete=models.SET_NULL,
+        blank=True,
         null=True,
         editable=False,
     )

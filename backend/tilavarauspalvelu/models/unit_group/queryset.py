@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from django.db import models
+from tilavarauspalvelu.models import UnitGroup
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 
 __all__ = [
     "UnitGroupManager",
@@ -8,7 +9,7 @@ __all__ = [
 ]
 
 
-class UnitGroupQuerySet(models.QuerySet): ...
+class UnitGroupQuerySet(ModelQuerySet[UnitGroup]): ...
 
 
-class UnitGroupManager(models.Manager.from_queryset(UnitGroupQuerySet)): ...
+class UnitGroupManager(ModelManager[UnitGroup, UnitGroupQuerySet]): ...

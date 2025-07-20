@@ -25,7 +25,6 @@ if TYPE_CHECKING:
     from decimal import Decimal
 
     from django.db.models import QuerySet, When
-    from query_optimizer.validators import PaginationArgs
 
     from tilavarauspalvelu.models import ReservationUnit
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
@@ -154,7 +153,7 @@ class FirstReservableTimeHelper:
         filter_time_end: datetime.time | None = None,
         minimum_duration_minutes: float | Decimal | None = None,
         show_only_reservable: bool = False,
-        pagination_args: PaginationArgs | None = None,
+        pagination_args: dict[str, Any] | None = None,
         cache_key: str = "",
     ) -> None:
         self.now = local_datetime()

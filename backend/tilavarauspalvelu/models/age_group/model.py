@@ -4,10 +4,15 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-from utils.lazy import LazyModelAttribute, LazyModelManager
+from lazy_managers import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationSeries
+    from tilavarauspalvelu.models._base import OneToManyRelatedManager
+    from tilavarauspalvelu.models.application_section.queryset import ApplicationSectionQuerySet
+    from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
+    from tilavarauspalvelu.models.reservation_series.queryset import ReservationSeriesQuerySet
+
     from .actions import AgeGroupActions
     from .queryset import AgeGroupManager
     from .validators import AgeGroupValidator
@@ -24,6 +29,10 @@ class AgeGroup(models.Model):
     objects: ClassVar[AgeGroupManager] = LazyModelManager.new()
     actions: AgeGroupActions = LazyModelAttribute.new()
     validators: AgeGroupValidator = LazyModelAttribute.new()
+
+    application_sections: OneToManyRelatedManager[ApplicationSection, ApplicationSectionQuerySet]
+    reservations: OneToManyRelatedManager[Reservation, ReservationQuerySet]
+    reservation_series: OneToManyRelatedManager[ReservationSeries, ReservationSeriesQuerySet]
 
     class Meta:
         db_table = "age_group"

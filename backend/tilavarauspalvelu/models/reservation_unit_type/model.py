@@ -4,10 +4,13 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-from utils.lazy import LazyModelAttribute, LazyModelManager
+from lazy_managers import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ReservationUnit
+    from tilavarauspalvelu.models._base import OneToManyRelatedManager
+    from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
+
     from .actions import ReservationUnitTypeActions
     from .queryset import ReservationUnitTypeManager
     from .validators import ReservationUnitTypeValidator
@@ -31,6 +34,8 @@ class ReservationUnitType(models.Model):
     objects: ClassVar[ReservationUnitTypeManager] = LazyModelManager.new()
     actions: ReservationUnitTypeActions = LazyModelAttribute.new()
     validators: ReservationUnitTypeValidator = LazyModelAttribute.new()
+
+    reservation_units: OneToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]
 
     class Meta:
         db_table = "reservation_unit_type"

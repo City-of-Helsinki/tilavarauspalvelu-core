@@ -3,9 +3,9 @@ from __future__ import annotations
 import dataclasses
 from typing import TYPE_CHECKING
 
-from rest_framework.exceptions import ValidationError
+from undine.exceptions import GraphQLValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
+from tilavarauspalvelu.typing import error_codes
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import User
@@ -33,12 +33,12 @@ class UserValidator:
                     return
 
                 msg = "AD user is not an internal user. Cannot verify age."
-                raise ValidationError(msg, code=code)
+                raise GraphQLValidationError(msg, code=code)
 
             return
 
         msg = "User is not of age"
-        raise ValidationError(msg, code=code)
+        raise GraphQLValidationError(msg, code=code)
 
     def validate_is_internal_user_if_ad_user(self) -> None:
         # Superusers can be external/guest users (e.g. developers)
@@ -47,4 +47,4 @@ class UserValidator:
 
         if self.user.actions.is_ad_user and not self.user.actions.is_internal_user:
             msg = "AD user is not an internal user."
-            raise ValidationError(msg, code=error_codes.USER_NOT_INTERNAL_USER)
+            raise GraphQLValidationError(msg, code=error_codes.USER_NOT_INTERNAL_USER)
