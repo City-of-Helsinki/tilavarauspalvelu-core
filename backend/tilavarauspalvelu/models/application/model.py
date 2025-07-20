@@ -7,6 +7,7 @@ from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L, lookup_property
+from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import (
     ApplicationRoundStatusChoice,
@@ -16,7 +17,6 @@ from tilavarauspalvelu.enums import (
     ReserveeType,
 )
 from utils.db import NowTT
-from utils.fields.model import StrChoiceField
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
@@ -41,7 +41,7 @@ class Application(SerializableMixin, models.Model):
     """
 
     # Basic information
-    applicant_type: str | None = StrChoiceField(enum=ReserveeType, null=True, blank=True)
+    applicant_type: ReserveeType | None = TextChoicesField(choices_enum=ReserveeType, null=True, blank=True)
     additional_information: str = models.TextField(blank=True, default="")
 
     # Handling data
@@ -74,7 +74,7 @@ class Application(SerializableMixin, models.Model):
     organisation_street_address: str = models.TextField(max_length=255, blank=True, default="")
     organisation_post_code: str = models.CharField(max_length=255, blank=True, default="")
     organisation_city: str = models.TextField(max_length=255, blank=True, default="")
-    municipality: str | None = StrChoiceField(enum=MunicipalityChoice, null=True, blank=True)
+    municipality: MunicipalityChoice | None = TextChoicesField(choices_enum=MunicipalityChoice, null=True, blank=True)
 
     # Auto-filled fields
     created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)

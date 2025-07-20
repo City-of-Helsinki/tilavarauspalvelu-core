@@ -11,6 +11,7 @@ from django.db import models
 from django.db.models import Subquery
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L, lookup_property
+from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import (
     AuthenticationType,
@@ -22,7 +23,6 @@ from tilavarauspalvelu.enums import (
 )
 from utils.auditlog_util import AuditLogger
 from utils.db import NowTT
-from utils.fields.model import StrChoiceField
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
@@ -105,25 +105,22 @@ class ReservationUnit(models.Model):
 
     # Enums
 
-    authentication: str = models.CharField(
-        max_length=20,
-        choices=AuthenticationType.choices,
-        default=AuthenticationType.WEAK.value,
+    authentication: AuthenticationType = TextChoicesField(
+        choices_enum=AuthenticationType,
+        default=AuthenticationType.WEAK,
     )
-    reservation_start_interval: str = models.CharField(
-        max_length=20,
-        choices=ReservationStartInterval.choices,
-        default=ReservationStartInterval.INTERVAL_15_MINUTES.value,
+    reservation_start_interval: ReservationStartInterval = TextChoicesField(
+        choices_enum=ReservationStartInterval,
+        default=ReservationStartInterval.INTERVAL_15_MINUTES,
     )
-    reservation_kind: str = StrChoiceField(
-        enum=ReservationKind,
-        default=ReservationKind.DIRECT_AND_SEASON.value,
+    reservation_kind: ReservationKind = TextChoicesField(
+        choices_enum=ReservationKind,
+        default=ReservationKind.DIRECT_AND_SEASON,
         db_index=True,
     )
-    reservation_form: str = models.CharField(
-        max_length=255,
-        choices=ReservationFormType.choices,
-        default=ReservationFormType.CONTACT_INFO_FORM.value,
+    reservation_form: ReservationFormType = TextChoicesField(
+        choices_enum=ReservationFormType,
+        default=ReservationFormType.CONTACT_INFO_FORM,
         db_index=True,
     )
 

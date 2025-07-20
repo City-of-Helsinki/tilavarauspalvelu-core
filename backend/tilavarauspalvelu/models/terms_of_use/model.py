@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import pgettext_lazy
+from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import TermsOfUseTypeChoices
 from utils.auditlog_util import AuditLogger
@@ -24,11 +25,10 @@ class TermsOfUse(models.Model):
     name: str | None = models.CharField(max_length=255, null=True, blank=True)
     text: str = models.TextField()
 
-    terms_type: str = models.CharField(
-        blank=False,
-        max_length=40,
-        choices=TermsOfUseTypeChoices.choices,
+    terms_type: TermsOfUseTypeChoices = TextChoicesField(
+        choices_enum=TermsOfUseTypeChoices,
         default=TermsOfUseTypeChoices.GENERIC,
+        blank=False,
     )
 
     # Translated field hints

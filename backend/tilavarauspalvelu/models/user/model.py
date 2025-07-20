@@ -10,9 +10,10 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from helusers.models import AbstractUser
+from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.dataclasses import IDToken
-from tilavarauspalvelu.enums import ReservationNotification, UserRoleChoice
+from tilavarauspalvelu.enums import Language, ReservationNotification, UserRoleChoice
 from tilavarauspalvelu.services.permission_resolver import PermissionResolver
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.lazy import LazyModelAttribute, LazyModelManager
@@ -40,18 +41,12 @@ __all__ = [
 
 class User(AbstractUser):
     tvp_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    preferred_language: str = models.CharField(
-        max_length=8,
-        blank=True,
-        choices=settings.LANGUAGES,
-        default=settings.LANGUAGE_CODE,
-    )
+    preferred_language: Language = TextChoicesField(choices_enum=Language, default=Language.FI, blank=True)
     date_of_birth: datetime.date | None = models.DateField(null=True, blank=True)
     profile_id: str = models.CharField(max_length=255, blank=True, default="")
 
-    reservation_notification: str = models.CharField(
-        max_length=32,
-        choices=ReservationNotification.choices,
+    reservation_notification: ReservationNotification = TextChoicesField(
+        choices_enum=ReservationNotification,
         default=ReservationNotification.ONLY_HANDLING_REQUIRED,
     )
 

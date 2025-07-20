@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from graphene_django_extensions.fields.model import StrChoiceField
+from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import UserRoleChoice
 from utils.auditlog_util import AuditLogger
@@ -26,7 +26,7 @@ __all__ = [
 
 class UnitRole(models.Model):
     user: User = models.ForeignKey("tilavarauspalvelu.User", related_name="unit_roles", on_delete=models.CASCADE)
-    role: str = StrChoiceField(enum=UserRoleChoice)
+    role: UserRoleChoice = TextChoicesField(choices_enum=UserRoleChoice)
 
     units = models.ManyToManyField("tilavarauspalvelu.Unit", related_name="unit_roles", blank=True)
     unit_groups = models.ManyToManyField("tilavarauspalvelu.UnitGroup", related_name="unit_roles", blank=True)

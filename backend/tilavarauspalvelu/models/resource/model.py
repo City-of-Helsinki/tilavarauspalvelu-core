@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import ResourceLocationType
 from utils.lazy import LazyModelAttribute, LazyModelManager
@@ -24,10 +25,9 @@ __all__ = [
 class Resource(models.Model):
     name: str = models.CharField(max_length=255)
 
-    location_type: str = models.CharField(
-        max_length=20,
-        choices=ResourceLocationType.choices,
-        default=ResourceLocationType.FIXED.value,
+    location_type: ResourceLocationType = TextChoicesField(
+        choices_enum=ResourceLocationType,
+        default=ResourceLocationType.FIXED,
     )
 
     space: Space | None = models.ForeignKey(

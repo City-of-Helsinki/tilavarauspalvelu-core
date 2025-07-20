@@ -10,6 +10,7 @@ from django.db.models import Exists
 from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L, lookup_property
+from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, Weekday
 from utils.db import SubqueryArray
@@ -47,11 +48,7 @@ class ReservationSeries(models.Model):
 
     recurrence_in_days: int | None = models.PositiveIntegerField(null=True, blank=True)
 
-    weekdays: list[str] = ArrayField(
-        models.CharField(choices=Weekday.choices, max_length=255),
-        size=7,
-        default=list,
-    )
+    weekdays: list[Weekday] = ArrayField(TextChoicesField(choices_enum=Weekday), size=7, default=list)
 
     # Relations
 

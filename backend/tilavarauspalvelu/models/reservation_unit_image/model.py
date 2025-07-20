@@ -6,6 +6,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from easy_thumbnails.fields import ThumbnailerImageField
+from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import ReservationUnitImageType
 from utils.lazy import LazyModelAttribute, LazyModelManager
@@ -33,7 +34,7 @@ class ReservationUnitImage(models.Model):
 
     image: ThumbnailerImageFieldFile | None
     image = ThumbnailerImageField(upload_to=settings.RESERVATION_UNIT_IMAGES_ROOT, null=True)
-    image_type: str = models.CharField(max_length=20, choices=ReservationUnitImageType.choices)
+    image_type: ReservationUnitImageType = TextChoicesField(choices_enum=ReservationUnitImageType)
 
     large_url: str = models.URLField(max_length=255, default="", blank=True)
     medium_url: str = models.URLField(max_length=255, default="", blank=True)
@@ -51,4 +52,4 @@ class ReservationUnitImage(models.Model):
         ordering = ["image_type"]
 
     def __str__(self) -> str:
-        return f"{self.reservation_unit.name} ({self.get_image_type_display()})"
+        return f"{self.reservation_unit.name} ({self.image_type})"

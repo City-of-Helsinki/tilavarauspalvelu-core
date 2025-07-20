@@ -48,7 +48,7 @@ class Unit(models.Model):
 
     coordinates: Point | None = PointField(null=True, blank=True, srid=COORDINATE_SYSTEM_ID)
 
-    search_terms = ArrayField(models.CharField(max_length=255), blank=True, default=list)
+    search_terms: list[str] = ArrayField(models.CharField(max_length=255), blank=True, default=list)
 
     allow_permissions_from_ad_groups: bool = models.BooleanField(default=False)
 

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from graphene_django_extensions.fields.model import StrChoiceField
+from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import RejectionReadinessChoice
 from utils.lazy import LazyModelAttribute, LazyModelManager
@@ -27,7 +27,7 @@ __all__ = [
 class RejectedOccurrence(models.Model):
     begin_datetime: datetime.datetime = models.DateTimeField()
     end_datetime: datetime.datetime = models.DateTimeField()
-    rejection_reason: str = StrChoiceField(enum=RejectionReadinessChoice)
+    rejection_reason: RejectionReadinessChoice = TextChoicesField(choices_enum=RejectionReadinessChoice)
     created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
 
     reservation_series: ReservationSeries = models.ForeignKey(

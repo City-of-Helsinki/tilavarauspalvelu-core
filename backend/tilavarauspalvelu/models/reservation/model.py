@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L, lookup_property
+from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -23,7 +24,6 @@ from tilavarauspalvelu.enums import (
 from utils.auditlog_util import AuditLogger
 from utils.date_utils import DEFAULT_TIMEZONE, datetime_range_as_string
 from utils.decimal_utils import round_decimal
-from utils.fields.model import StrChoiceField
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
@@ -54,28 +54,29 @@ class Reservation(SerializableMixin, models.Model):
     name: str = models.CharField(max_length=255, blank=True, default="")
     description: str = models.CharField(max_length=255, blank=True, default="")
     num_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
-    state: str = models.CharField(
-        max_length=32,
-        choices=ReservationStateChoice.choices,
+    state: ReservationStateChoice = TextChoicesField(
+        choices_enum=ReservationStateChoice,
         default=ReservationStateChoice.CREATED,
         db_index=True,
     )
-    type: str | None = models.CharField(
-        max_length=50,
+    type: ReservationTypeChoice | None = TextChoicesField(
+        choices_enum=ReservationTypeChoice,
+        default=ReservationTypeChoice.NORMAL,
         null=True,
         blank=False,
-        choices=ReservationTypeChoice.choices,
-        default=ReservationTypeChoice.NORMAL,
     )
-    municipality: str | None = StrChoiceField(enum=MunicipalityChoice, null=True, blank=True)
+    municipality: MunicipalityChoice | None = TextChoicesField(
+        choices_enum=MunicipalityChoice,
+        null=True,
+        blank=True,
+    )
     handling_details: str = models.TextField(blank=True, default="")
     working_memo: str = models.TextField(blank=True, default="")
 
     # Cancellation information
     cancel_details: str = models.TextField(blank=True, default="")
-    cancel_reason: ReservationCancelReasonChoice | None = models.CharField(
-        choices=ReservationCancelReasonChoice.choices,
-        max_length=255,
+    cancel_reason: ReservationCancelReasonChoice | None = TextChoicesField(
+        choices_enum=ReservationCancelReasonChoice,
         null=True,
         blank=True,
     )
@@ -90,11 +91,7 @@ class Reservation(SerializableMixin, models.Model):
     created_at: datetime.datetime | None = models.DateTimeField(null=True, default=timezone.now)  # noqa: TID251
 
     # Access information
-    access_type: str = models.CharField(
-        max_length=20,
-        choices=AccessType.choices,
-        default=AccessType.UNRESTRICTED.value,
-    )
+    access_type: AccessType = TextChoicesField(choices_enum=AccessType, default=AccessType.UNRESTRICTED)
     access_code_generated_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
     access_code_is_active: bool = models.BooleanField(default=False)
 
@@ -119,7 +116,7 @@ class Reservation(SerializableMixin, models.Model):
     reservee_address_city: str = models.CharField(max_length=255, blank=True, default="")
     reservee_address_zip: str = models.CharField(max_length=255, blank=True, default="")
     reservee_used_ad_login: bool = models.BooleanField(default=False, blank=True)
-    reservee_type: str | None = StrChoiceField(enum=ReserveeType, null=True, blank=True)
+    reservee_type: ReserveeType | None = TextChoicesField(choices_enum=ReserveeType, null=True, blank=True)
 
     # Relations
     reservation_unit: ReservationUnit = models.ForeignKey(
