@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Priority, Weekday
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime

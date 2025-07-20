@@ -4,12 +4,12 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import lookup_property
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 
 from utils.db import SubqueryArray
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Unit

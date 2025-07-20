@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import pgettext_lazy
+from lazy_managers import LazyModelAttribute, LazyModelManager
 from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import TermsOfUseTypeChoices
 from utils.auditlog_util import AuditLogger
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from .actions import TermsOfUseActions

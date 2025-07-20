@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, ClassVar
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import (
@@ -16,7 +17,6 @@ from tilavarauspalvelu.enums import (
 )
 from utils.date_utils import local_datetime
 from utils.db import NowTT
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import TermsOfUse, Unit

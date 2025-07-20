@@ -8,11 +8,11 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
 from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import uuid

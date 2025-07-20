@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.validators import is_numeric, validate_accounting_project
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from .actions import PaymentAccountingActions

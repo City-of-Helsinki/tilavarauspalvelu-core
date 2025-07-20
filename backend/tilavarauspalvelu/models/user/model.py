@@ -10,13 +10,13 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from helusers.models import AbstractUser
+from lazy_managers import LazyModelAttribute, LazyModelManager
 from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.dataclasses import IDToken
 from tilavarauspalvelu.enums import Language, ReservationNotification, UserRoleChoice
 from tilavarauspalvelu.services.permission_resolver import PermissionResolver
 from utils.date_utils import DEFAULT_TIMEZONE
-from utils.lazy import LazyModelAttribute, LazyModelManager
 from utils.utils import get_jwt_payload
 
 if TYPE_CHECKING:

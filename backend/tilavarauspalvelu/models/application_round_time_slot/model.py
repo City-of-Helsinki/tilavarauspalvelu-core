@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING, ClassVar
 from django.contrib.postgres.fields import ArrayField, HStoreField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
 from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import Weekday
 from tilavarauspalvelu.validators import validate_reservable_times
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit

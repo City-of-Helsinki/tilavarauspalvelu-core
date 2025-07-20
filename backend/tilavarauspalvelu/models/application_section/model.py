@@ -9,12 +9,12 @@ from django.db.models import Exists, OrderBy
 from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
+from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
 from utils.date_utils import local_datetime
 from utils.db import NowTT, SubqueryCount
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import AgeGroup, Application, ReservationPurpose
@@ -269,8 +269,10 @@ class ApplicationSection(SerializableMixin, models.Model):
         from tilavarauspalvelu.models import Reservation
 
         exists = Exists(
-            queryset=Reservation.objects.for_application_section(models.OuterRef("pk")).filter(
-                L(access_code_should_be_active=True),
+            queryset=(
+                Reservation.objects.all()
+                .for_application_section(models.OuterRef("pk"))
+                .filter(L(access_code_should_be_active=True))
             ),
         )
         return exists  # type: ignore[return-value]  # noqa: RET504

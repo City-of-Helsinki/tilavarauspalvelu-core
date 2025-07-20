@@ -10,6 +10,7 @@ from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 from django.db.models import Subquery
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 from undine.utils.model_fields import TextChoicesField
 
@@ -23,7 +24,6 @@ from tilavarauspalvelu.enums import (
 )
 from utils.auditlog_util import AuditLogger
 from utils.db import NowTT
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from decimal import Decimal

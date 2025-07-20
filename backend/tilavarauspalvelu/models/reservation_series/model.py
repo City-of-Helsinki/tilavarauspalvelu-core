@@ -9,12 +9,12 @@ from django.db import models
 from django.db.models import Exists
 from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, Weekday
 from utils.db import SubqueryArray
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime

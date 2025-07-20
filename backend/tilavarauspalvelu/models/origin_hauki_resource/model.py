@@ -6,9 +6,9 @@ from typing import TYPE_CHECKING, ClassVar
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from utils.date_utils import local_date
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from .actions import OriginHaukiResourceActions

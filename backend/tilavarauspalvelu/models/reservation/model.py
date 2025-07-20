@@ -10,6 +10,7 @@ from django.db.models.functions import Concat, Trim
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
+from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 from undine.utils.model_fields import TextChoicesField
 
@@ -24,7 +25,6 @@ from tilavarauspalvelu.enums import (
 from utils.auditlog_util import AuditLogger
 from utils.date_utils import DEFAULT_TIMEZONE, datetime_range_as_string
 from utils.decimal_utils import round_decimal
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement

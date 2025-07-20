@@ -6,6 +6,7 @@ from django.db import models
 from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
+from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 from undine.utils.model_fields import TextChoicesField
 
@@ -17,7 +18,6 @@ from tilavarauspalvelu.enums import (
     ReserveeType,
 )
 from utils.db import NowTT
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
