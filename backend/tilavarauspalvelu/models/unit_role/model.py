@@ -4,16 +4,19 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from graphene_django_extensions.fields.model import StrChoiceField
+from lazy_managers import LazyModelAttribute, LazyModelManager
+from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import UserRoleChoice
 from utils.auditlog_util import AuditLogger
-from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
 
-    from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.models import Unit, UnitGroup, User
+    from tilavarauspalvelu.models._base import ManyToManyRelatedManager
+    from tilavarauspalvelu.models.unit.queryset import UnitQuerySet
+    from tilavarauspalvelu.models.unit_group.queryset import UnitGroupQuerySet
 
     from .actions import UnitRoleActions
     from .queryset import UnitRoleManager
@@ -26,17 +29,25 @@ __all__ = [
 
 class UnitRole(models.Model):
     user: User = models.ForeignKey("tilavarauspalvelu.User", related_name="unit_roles", on_delete=models.CASCADE)
-    role: str = StrChoiceField(enum=UserRoleChoice)
+    role: UserRoleChoice = TextChoicesField(choices_enum=UserRoleChoice)
 
-    units = models.ManyToManyField("tilavarauspalvelu.Unit", related_name="unit_roles", blank=True)
-    unit_groups = models.ManyToManyField("tilavarauspalvelu.UnitGroup", related_name="unit_roles", blank=True)
+    units: ManyToManyRelatedManager[Unit, UnitQuerySet] = models.ManyToManyField(
+        "tilavarauspalvelu.Unit",
+        related_name="unit_roles",
+        blank=True,
+    )
+    unit_groups: ManyToManyRelatedManager[UnitGroup, UnitGroupQuerySet] = models.ManyToManyField(
+        "tilavarauspalvelu.UnitGroup",
+        related_name="unit_roles",
+        blank=True,
+    )
 
     assigner: User | None = models.ForeignKey(
         "tilavarauspalvelu.User",
         related_name="assigned_unit_roles",
         on_delete=models.SET_NULL,
-        null=True,
         blank=True,
+        null=True,
     )
     created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
     updated_at: datetime.datetime = models.DateTimeField(auto_now=True)
