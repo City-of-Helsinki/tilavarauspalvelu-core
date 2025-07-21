@@ -1,5 +1,5 @@
 import React from "react";
-import { SpaceEditor } from "./_components/SpaceEditor";
+import { SpaceEditor } from "@lib/units/[id]/spaces/[pk]/SpaceEditor";
 import { ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
