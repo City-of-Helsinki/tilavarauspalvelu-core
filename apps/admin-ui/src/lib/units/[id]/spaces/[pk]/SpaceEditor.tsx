@@ -13,7 +13,7 @@ import { LinkPrev } from "@/component/LinkPrev";
 import { gql } from "@apollo/client";
 import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";
-import { ParentSelector, type SpaceUpdateForm, SpaceForm, SpaceUpdateSchema } from "../../../_components";
+import { ParentSelector, type SpaceUpdateForm, SpaceForm, SpaceUpdateSchema } from "@lib/units/[id]";
 import { SpaceHead } from "./SpaceHead";
 import { SpaceHierarchy } from "./SpaceHierarchy";
 import { getUnitUrl } from "@/common/urls";

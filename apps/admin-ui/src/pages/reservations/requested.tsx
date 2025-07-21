@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import { H1, HR } from "common/styled";
-import { Filters, ReservationsDataLoader } from "./_components";
+import { Filters, ReservationsDataLoader } from "@lib/reservations";
 import { ReservationStateChoice } from "@gql/gql-types";
 import { toUIDate } from "common/src/common/util";
 import { useSearchParams } from "next/navigation";

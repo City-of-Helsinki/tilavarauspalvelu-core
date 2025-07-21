@@ -53,7 +53,7 @@ import {
   ReservationUnitSettingsSection,
   PricingSection,
   ErrorInfo,
-} from "./_components";
+} from "@lib/reservation-units/[pk]/";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
