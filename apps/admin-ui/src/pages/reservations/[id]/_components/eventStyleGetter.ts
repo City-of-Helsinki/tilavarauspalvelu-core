@@ -34,7 +34,7 @@ const REST = {
 export const legend = [
   ...COMMON_LEGEND,
   {
-    label: "Calendar.legend.rest",
+    label: "myUnits:Calendar.legend.reserved",
     style: REST.style,
   },
 ];

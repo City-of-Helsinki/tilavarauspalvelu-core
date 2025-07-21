@@ -14,6 +14,7 @@ import {
   isPossibleToReturn,
 } from "@/modules/reservationModificationRules";
 import { gql } from "@apollo/client";
+import { getReservationUrl } from "@/common/urls";
 
 export const APPROVAL_BUTTONS_FRAGMENT = gql`
   fragment ApprovalButtons on ReservationNode {
@@ -124,7 +125,7 @@ export function ApprovalButtons({ isFree, reservation, handleClose, handleAccept
         </Button>
       )}
       {!disableNonEssentialButtons && isAllowedToModify && (
-        <ButtonLikeLink href="edit" data-testid="approval-buttons__edit-link">
+        <ButtonLikeLink href={`${getReservationUrl(reservation.pk)}/edit`} data-testid="approval-buttons__edit-link">
           {t("reservation:ApprovalButtons.edit")}
         </ButtonLikeLink>
       )}
