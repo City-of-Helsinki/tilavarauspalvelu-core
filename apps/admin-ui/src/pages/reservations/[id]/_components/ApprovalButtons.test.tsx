@@ -107,39 +107,18 @@ describe("Editing allowed", () => {
     const input = createInput({ state: ReservationStateChoice.Confirmed });
     const view = wrappedRender(input);
 
-    expect(view.getByRole("link", { name: "ApprovalButtons.edit" })).toBeInTheDocument();
+    expect(view.getByRole("link", { name: "reservation:ApprovalButtons.edit" })).toBeInTheDocument();
   });
 
-  test("No editing if the event isn't Confirmed", () => {
-    const input = createInput({
-      state: ReservationStateChoice.RequiresHandling,
-    });
-    const view = wrappedRender(input);
+  test.for([
+    ReservationStateChoice.RequiresHandling,
+    ReservationStateChoice.Denied,
+    ReservationStateChoice.Cancelled,
+    ReservationStateChoice.WaitingForPayment,
+    ReservationStateChoice.Created,
+  ] as const)("No editing for state %s", (state) => {
+    const view = wrappedRender(createInput({ state }));
     expect(view.queryAllByRole("link")).toHaveLength(0);
-
-    const view2 = wrappedRender({
-      ...input,
-      state: ReservationStateChoice.Denied,
-    });
-    expect(view2.queryAllByRole("link")).toHaveLength(0);
-
-    const view3 = wrappedRender({
-      ...input,
-      state: ReservationStateChoice.Cancelled,
-    });
-    expect(view3.queryAllByRole("link")).toHaveLength(0);
-
-    const view4 = wrappedRender({
-      ...input,
-      state: ReservationStateChoice.WaitingForPayment,
-    });
-    expect(view4.queryAllByRole("link")).toHaveLength(0);
-
-    const view5 = wrappedRender({
-      ...input,
-      state: ReservationStateChoice.Created,
-    });
-    expect(view5.queryAllByRole("link")).toHaveLength(0);
   });
 
   test("Past Confirmed has a one hour edit window", () => {
@@ -148,6 +127,6 @@ describe("Editing allowed", () => {
       endsAt: addMinutes(new Date(), -45),
     });
     const view = wrappedRender(input);
-    expect(view.getByRole("link", { name: "ApprovalButtons.edit" })).toBeInTheDocument();
+    expect(view.getByRole("link", { name: "reservation:ApprovalButtons.edit" })).toBeInTheDocument();
   });
 });

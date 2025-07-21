@@ -111,7 +111,7 @@ describe("createTag", () => {
 
     const tag = createTagString(input, mockT);
     expect(tag).toContain(
-      "dayShort.MONDAY, dayShort.TUESDAY, dayShort.THURSDAY 12:00–14:00, common:abbreviations:hour"
+      "translation:dayShort.MONDAY, translation:dayShort.TUESDAY, translation:dayShort.THURSDAY 12:00–14:00, common:abbreviations:hour"
     );
     expect(tag).toContain("1.4.2023–1.7.2023");
     expect(tag).toContain("Reservation unit 1");
