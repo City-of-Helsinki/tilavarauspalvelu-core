@@ -164,5 +164,44 @@
     "Heading": "Ajankohta",
     "changeTime": "Muuta aikaa",
     "showInCalendar": "Näytä kalenterissa"
+  },
+  "headings": {
+    "applicant": "Hakija",
+    "schedule": "Vuoro"
+  },
+  "noReservations": "Ei varauksia",
+  "NewReservationModal": {
+    "acceptBtn": "Lisää varaus",
+    "title": "Luo uusi varaus",
+    "successToast": "Uusi aika tallennettu"
+  },
+  "CommonModal": {
+    "form": {
+      "startTime": "Aloitusaika",
+      "length": "Kesto"
+    },
+    "newTime": "Uusi aika",
+    "error": {
+      "reservationCollides": "Toivomasi aika ei ole saatavilla"
+    }
+  },
+  "EditTimeModal": {
+    "title": "Muuta varauksen aikaa",
+    "originalTime": "Muutettava aika",
+    "recurringInfoLabel": "Toistuva varaus aikavälillä",
+    "recurringInfoTimes": "{{ weekdays }} {{begin}} - {{end}}",
+    "acceptBtn": "Muuta aikaa",
+    "successToast": "Uusi aika tallennettu",
+    "error": {
+      "mutation": "Ajan muutos epäonnistui."
+    }
+  },
+  "EditPage": {
+    "title": "Muokkaa varauksen tietoja",
+    "Reservation failed to load": "Varausta {{ pk }} ei pystytty latamaan",
+    "save": "Tallenna",
+    "saveSuccess": "Varauksen muutokset tallennettu",
+    "saveSuccessRecurring": "Muutokset tallennettu tuleviin varauksiin!",
+    "pageThrewError": "Virhe: varausta ei voi muokata"
   }
 }
