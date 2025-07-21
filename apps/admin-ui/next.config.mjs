@@ -56,7 +56,6 @@ const config = {
       },
     ];
   },
-
   basePath: env.NEXT_PUBLIC_BASE_URL,
   compiler: {
     styledComponents: {

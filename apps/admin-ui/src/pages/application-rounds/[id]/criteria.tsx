@@ -9,7 +9,7 @@ import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "com
 import { formatDate } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
 import { Accordion as AccordionBase } from "@/component/Accordion";
-import { TimeframeStatus } from "../_components";
+import { TimeframeStatus } from "@lib/application-rounds";
 import { AuthorizationChecker } from "@/common/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";

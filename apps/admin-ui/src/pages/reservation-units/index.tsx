@@ -6,7 +6,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { UserPermissionChoice } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
-import { ReservationUnitsDataReader, Filters } from "./_components";
+import { ReservationUnitsDataReader, Filters } from "@lib/reservation-units/";
 
 function ReservationUnits(): JSX.Element {
   const { t } = useTranslation();

@@ -30,7 +30,7 @@ import {
   TimeBlockSection,
   ReservationReserveeDetailsSection,
   DataWrapper,
-} from "./_components";
+} from "@lib/reservations/[id]/";
 import { Accordion, ApplicationDatas, Summary } from "@/styled";
 import { base64encode, ignoreMaybeArray, isPriceFree, toNumber } from "common/src/helpers";
 import { formatAgeGroup } from "@/common/util";
