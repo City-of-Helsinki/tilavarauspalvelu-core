@@ -6,6 +6,7 @@
     "moduleResolution": "bundler",
     "paths": {
       "@/*": ["./src/*"],
+      "@lib/*": ["./src/lib/*"],
       "@gql/*": ["./gql/*"]
     }
   },

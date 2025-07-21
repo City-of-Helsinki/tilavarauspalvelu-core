@@ -17,7 +17,7 @@ import { useStaffReservationMutation, useReservationEditData } from "@/hooks";
 import { errorToast } from "common/src/common/toast";
 import { ButtonContainer, CenterSpinner, Flex, HR } from "common/styled";
 import { createTagString } from "@/modules/reservation";
-import { ReservationTitleSection } from "./_components";
+import { ReservationTitleSection } from "@lib/reservations/[id]";
 import { LinkPrev } from "@/component/LinkPrev";
 import { gql } from "@apollo/client";
 import { useRouter } from "next/router";

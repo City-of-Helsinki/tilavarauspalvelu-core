@@ -16,7 +16,7 @@ import { AuthorizationChecker } from "@/common/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
-import { ResourcesTable, SubPageHead, SpacesTable, NewSpaceModal, NewResourceModal } from "./_components";
+import { ResourcesTable, SubPageHead, SpacesTable, NewSpaceModal, NewResourceModal } from "@lib/units/[id]/";
 
 const ActionButton = styled(Button)`
   span {
