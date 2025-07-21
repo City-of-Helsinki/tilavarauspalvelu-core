@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import { type Maybe, type SpacesTableFragment, useDeleteSpaceMutation } from "@gql/gql-types";
 import { PopupMenu } from "common/src/components/PopupMenu";
-import { HDSModal, useModal } from "common/src/components/HDSModal";
 import { NewSpaceModal } from "./space/new-space-modal/NewSpaceModal";
 import { errorToast } from "common/src/common/toast";
 import { CustomTable } from "@/component/Table";
@@ -17,6 +16,8 @@ import { MAX_NAME_LENGTH } from "@/common/const";
 import { TableLink } from "@/styled";
 import { Flex } from "common/styled";
 import { useDisplayError } from "common/src/hooks";
+import { useModal } from "@/context/ModalContext";
+import { FixedDialog } from "@/styled/FixedDialog";
 
 type SpaceT = SpacesTableFragment["spaces"][0];
 
@@ -42,7 +43,7 @@ interface IProps {
 
 export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
   const { t } = useTranslation();
-  const { open: isOpen, openWithContent, closeModal, modalContent } = useModal();
+  const { setModalContent } = useModal();
 
   const [deleteSpaceMutation] = useDeleteSpaceMutation();
   const displayError = useDisplayError();
@@ -86,11 +87,24 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     setSpaceWaitingForDelete(space);
   }
 
+  const closeModal = () => setModalContent(null);
+
   function handeAddSubSpace(space: SpaceT) {
     if (unit == null) {
       return;
     }
-    openWithContent(<NewSpaceModal parentSpacePk={space.pk} unit={unit} closeModal={closeModal} refetch={refetch} />);
+    setModalContent(
+      <FixedDialog
+        id="spaces-table-modal-id"
+        isOpen
+        close={closeModal}
+        focusAfterCloseRef={ref}
+        closeButtonLabelText={t("common:close")}
+        aria-labelledby="modal-header"
+      >
+        <NewSpaceModal parentSpacePk={space.pk} unit={unit} closeModal={closeModal} refetch={refetch} />
+      </FixedDialog>
+    );
   }
 
   function handleEditSpace(space: SpaceT) {
@@ -183,9 +197,6 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
         cols={cols}
         // no sort on purpose
       />
-      <HDSModal id="modal-id" isOpen={isOpen} onClose={closeModal} focusAfterCloseRef={ref}>
-        {modalContent}
-      </HDSModal>
       {spaceWaitingForDelete && (
         <ConfirmationDialog
           isOpen

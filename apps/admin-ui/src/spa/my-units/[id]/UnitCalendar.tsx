@@ -189,7 +189,6 @@ type CellProps = {
   cols: number;
   reservationUnitPk: number;
   date: Date;
-  setModalContent: (content: JSX.Element | null, isHds?: boolean) => void;
   onComplete: () => void;
   reservationUnitOptions: { label: string; value: number }[];
   hasPermission: boolean;
@@ -216,10 +215,10 @@ function Cell({
   reservationUnitPk,
   reservationUnitOptions,
   onComplete,
-  setModalContent,
 }: { offset: number } & Omit<CellProps, "cols">): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
   const [searchParams, setParams] = useSearchParams();
+  const { setModalContent } = useModal();
 
   const now = new Date();
   const isPast = (index: number) => {
@@ -242,8 +241,7 @@ function Cell({
           setModalContent(null);
           onComplete();
         }}
-      />,
-      true
+      />
     );
   };
 
@@ -453,7 +451,6 @@ export function UnitCalendar({
 }: Props): JSX.Element {
   const calendarRef = useRef<HTMLDivElement>(null);
   const orderedResources = sortByDraftStatusAndTitle([...resources]);
-  const { setModalContent } = useModal();
   const startDate = startOfDay(date);
 
   // scroll to around 9 - 17 on load
@@ -531,7 +528,6 @@ export function UnitCalendar({
                 reservationUnitPk={row.pk}
                 reservationUnitOptions={reservationUnitOptions}
                 hasPermission={hasPermission ?? false}
-                setModalContent={setModalContent}
                 onComplete={refetch}
               />
               {/* TODO events should be over the cells (tabindex is not correct now) */}
