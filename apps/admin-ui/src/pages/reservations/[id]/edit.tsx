@@ -154,7 +154,7 @@ function EditReservation({
             variant={isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary}
             iconStart={isSubmitting ? <LoadingSpinner small /> : undefined}
           >
-            {t("Reservation.EditPage.save")}
+            {t("common:save")}
           </Button>
         </ButtonContainer>
       </Flex>
@@ -163,8 +163,8 @@ function EditReservation({
 }
 
 function EditPage({ pk }: { pk: number }): JSX.Element {
-  const { t } = useTranslation("translation", {
-    keyPrefix: "Reservation.EditPage",
+  const { t } = useTranslation("reservation", {
+    keyPrefix: "EditPage",
   });
   const router = useRouter();
 
@@ -198,8 +198,13 @@ type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
 export default function Page(props: PropsNarrowed): JSX.Element {
   // TODO should be done in SSR
-  const { hasPermission } = useCheckReservationPermissions(props.pk);
-  return hasPermission ? <EditPage pk={props.pk} /> : <Error403 />;
+  const { hasPermission, loading } = useCheckReservationPermissions(props.pk);
+  if (loading) {
+    return <CenterSpinner />;
+  } else if (!hasPermission) {
+    return <Error403 />;
+  }
+  return <EditPage pk={props.pk} />;
 }
 
 export async function getServerSideProps({ locale, query }: GetServerSidePropsContext) {

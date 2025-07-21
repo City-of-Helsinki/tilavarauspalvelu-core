@@ -92,7 +92,7 @@ const Calendar = forwardRef(function Calendar(
             {isAllowedToModify && (
               // NOTE don't use HDS buttons in the toolbar, breaks mobile layout
               <VisibleIfPermission reservation={reservation} permission={UserPermissionChoice.CanManageReservations}>
-                <ToolbarBtn onClick={handleEditTimeClick}>{t("Reservation.EditTimeModal.acceptBtn")}</ToolbarBtn>
+                <ToolbarBtn onClick={handleEditTimeClick}>{t("reservation:EditTimeModal.acceptBtn")}</ToolbarBtn>
               </VisibleIfPermission>
             )}
           </Toolbar>

@@ -18,7 +18,7 @@ import { TableLink } from "@/styled";
 import type { StatusLabelType } from "common/src/tags";
 import StatusLabel from "common/src/components/StatusLabel";
 import { IconCheck, IconClock, IconPen, IconQuestionCircleFill } from "hds-react";
-import { getNotificationUrl } from "@/common/urls";
+import { getNotificationListUrl, getNotificationUrl } from "@/common/urls";
 import { CenterSpinner, TitleSection, H1 } from "common/styled";
 import { gql } from "@apollo/client";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -169,7 +169,7 @@ function Notifications() {
           <H1 $noMargin>{t("notification:pageTitle")}</H1>
           <p style={{ maxWidth: "var(--prose-width)" }}>{t("notification:pageDescription")}</p>
         </div>
-        <ButtonLikeLink variant="primary" size="large" href="/messaging/notifications/new">
+        <ButtonLikeLink variant="primary" size="large" href={`${getNotificationListUrl()}/new`}>
           {t("notification:newNotification")}
         </ButtonLikeLink>
       </TitleSection>

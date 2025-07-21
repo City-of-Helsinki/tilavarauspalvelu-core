@@ -75,7 +75,7 @@ function reservationSeriesInfoText({
   end?: Date;
   t: TFunction;
 }) {
-  return t("Reservation.EditTimeModal.recurringInfoTimes", {
+  return t("reservation:EditTimeModal.recurringInfoTimes", {
     weekdays: weekdays
       .sort((a, b) => convertWeekday(a) - convertWeekday(b))
       .map((weekday) => t(`translation:dayShort.${weekday}`))
@@ -184,8 +184,7 @@ function DialogContent({
   const translateError = (errorMsg?: string) => (errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "");
 
   const newTimeString = start && end ? formatDateInterval(t, start, end) : "";
-  const translateKey = type === "move" ? "Reservation.EditTimeModal" : "Reservation.NewReservationModal";
-  const commonTrKey = "Reservation.CommonModal";
+  const translateKey = type === "move" ? "reservation:EditTimeModal" : "reservation:NewReservationModal";
   const isDisabled = (!isDirty && !isValid) || isLoading || hasCollisions;
   return (
     <Dialog.Content>
@@ -208,16 +207,16 @@ function DialogContent({
           <BufferToggles before={bufferTimeBefore} after={bufferTimeAfter} />
         </FormProvider>
         <TimeInfoBox $isDisabled={!isDirty || !isValid}>
-          {t(`${commonTrKey}.newTime`)}: <Bold>{newTimeString}</Bold>
+          {t(`reservation:CommonModal.newTime`)}: <Bold>{newTimeString}</Bold>
         </TimeInfoBox>
         {hasCollisions && (
           <Notification
             size={NotificationSize.Small}
-            label={t(`${commonTrKey}.error.reservationCollides`)}
+            label={t(`reservation:CommonModal.error.reservationCollides`)}
             type="error"
             style={{ marginTop: "var(--spacing-s)", gridColumn: "1 / -1" }}
           >
-            {t(`${commonTrKey}.error.reservationCollides`)}
+            {t(`reservation:CommonModal.error.reservationCollides`)}
           </Notification>
         )}
         <ActionButtons>
@@ -239,7 +238,7 @@ export type NewReservationModalProps = CommonProps & {
 };
 
 export function NewReservationModal({ reservationToCopy, onAccept, onClose }: NewReservationModalProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation("reservation");
   const { isOpen } = useModal();
 
   const reservationUnit = reservationToCopy.reservationUnit;
@@ -283,7 +282,7 @@ export function NewReservationModal({ reservationToCopy, onAccept, onClose }: Ne
       },
     });
     onAccept();
-    successToast({ text: t("Reservation.NewReservationModal.successToast") });
+    successToast({ text: t("NewReservationModal.successToast") });
   };
 
   return (
@@ -294,7 +293,7 @@ export function NewReservationModal({ reservationToCopy, onAccept, onClose }: Ne
       isOpen={isOpen}
       focusAfterCloseRef={undefined}
     >
-      <Dialog.Header id="modal-header" title={t("Reservation.NewReservationModal.title")} />
+      <Dialog.Header id="modal-header" title={t("NewReservationModal.title")} />
       <ErrorBoundary fallback={<div>{t("errors.unexpectedError")}</div>}>
         <DialogContent
           form={form}
@@ -322,7 +321,7 @@ export function EditTimeModal({
   reservation: ChangeReservationTimeFragment;
 }) {
   const { isOpen } = useModal();
-  const { t } = useTranslation();
+  const { t } = useTranslation("reservation");
 
   const startDateTime = new Date(reservation.beginsAt);
   const endDateTime = new Date(reservation.endsAt);
@@ -372,7 +371,7 @@ export function EditTimeModal({
         },
       },
     });
-    successToast({ text: t("Reservation.EditTimeModal.successToast") });
+    successToast({ text: t("EditTimeModal.successToast") });
     onAccept();
   };
 
@@ -385,8 +384,8 @@ export function EditTimeModal({
       isOpen={isOpen}
       focusAfterCloseRef={undefined}
     >
-      <Dialog.Header id="modal-header" title={t("Reservation.EditTimeModal.title")} />
-      <ErrorBoundary fallback={<div>{t("errors.unexpectedError")}</div>}>
+      <Dialog.Header id="modal-header" title={t("EditTimeModal.title")} />
+      <ErrorBoundary fallback={<div>{t("errors:unexpectedError")}</div>}>
         <DialogContent
           form={form}
           reservationUnitPk={reservation.reservationUnit.pk ?? 0}
@@ -398,7 +397,7 @@ export function EditTimeModal({
           topContent={
             <>
               <TimeInfoBox>
-                {t("Reservation.EditTimeModal.recurringInfoLabel")}:{" "}
+                {t("EditTimeModal.recurringInfoLabel")}:{" "}
                 <Bold>
                   {reservationSeriesInfoText({
                     weekdays: filterNonNullable(reservation.reservationSeries?.weekdays),
@@ -409,7 +408,7 @@ export function EditTimeModal({
                 </Bold>
               </TimeInfoBox>
               <TimeInfoBox>
-                {t("Reservation.EditTimeModal.originalTime")}: <Bold>{originalTime}</Bold>
+                {t("EditTimeModal.originalTime")}: <Bold>{originalTime}</Bold>
               </TimeInfoBox>
             </>
           }

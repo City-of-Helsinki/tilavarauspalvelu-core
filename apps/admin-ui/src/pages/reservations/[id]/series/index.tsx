@@ -266,8 +266,8 @@ function SeriesPageInner({ pk }: { pk: number }) {
 
   return (
     <>
-      <LinkPrev />
-      <H1 $noMargin>{t("ReservationEditSeries.heading")}</H1>
+      <LinkPrev route={getReservationUrl(reservation?.pk)} />
+      <H1 $noMargin>{t("myUnits:ReservationSeriesForm.edit.heading")}</H1>
       <FormProvider {...form}>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <AutoGrid $minWidth="12rem" $gap="xl">
@@ -347,9 +347,9 @@ function SeriesPageInner({ pk }: { pk: number }) {
                 justifyContent: "flex-end",
               }}
             >
-              <ButtonLikeLink href="..">{t("common:cancel")}</ButtonLikeLink>
+              <ButtonLikeLink href={getReservationUrl(reservation?.pk)}>{t("common:cancel")}</ButtonLikeLink>
               <Button size={ButtonSize.Small} type="submit" disabled={isDisabled}>
-                {t("ReservationEditSeries.submit")}
+                {t("myUnits:ReservationSeriesForm.edit.submit")}
               </Button>
             </ButtonContainer>
           </AutoGrid>
