@@ -7,7 +7,6 @@ import { useSpacesResourcesQuery } from "@gql/gql-types";
 import { ResourcesTable } from "./ResourcesTable";
 import { SpacesTable } from "./SpacesTable";
 import { SubPageHead } from "./SubPageHead";
-import { HDSModal, useModal } from "common/src/components/HDSModal";
 import { NewSpaceModal } from "./space/new-space-modal/NewSpaceModal";
 import { NewResourceModal } from "./resource/NewResourceModal";
 import { base64encode } from "common/src/helpers";
@@ -16,6 +15,8 @@ import Error404 from "@/common/Error404";
 import { fontBold, H2, CenterSpinner, Flex } from "common/styled";
 import { LinkPrev } from "@/component/LinkPrev";
 import { gql } from "@apollo/client";
+import { useModal } from "@/context/ModalContext";
+import { FixedDialog } from "@/styled/FixedDialog";
 
 interface IProps {
   [key: string]: string;
@@ -50,9 +51,7 @@ function SpacesResources(): JSX.Element {
     },
   });
 
-  const { open: newSpaceDialogIsOpen, openModal: openNewSpaceModal, closeModal: closeNewSpaceModal } = useModal();
-
-  const { openWithContent, modalContent, open: isNewResourceModalOpen, closeModal: closeNewResourceModal } = useModal();
+  const { setModalContent } = useModal();
 
   if (isLoading) {
     return <CenterSpinner />;
@@ -63,16 +62,38 @@ function SpacesResources(): JSX.Element {
     return <Error404 />;
   }
 
+  const handleOpenNewSpaceModal = () => {
+    setModalContent(
+      <FixedDialog
+        id="space-modal"
+        isOpen
+        close={() => setModalContent(null)}
+        focusAfterCloseRef={newSpacesButtonRef}
+        closeButtonLabelText={t("common:close")}
+        aria-labelledby="modal-header"
+      >
+        <NewSpaceModal unit={unit} closeModal={() => setModalContent(null)} refetch={refetch} />
+      </FixedDialog>
+    );
+  };
+
+  const handleOpenNewResourceModal = () => {
+    setModalContent(
+      <FixedDialog
+        id="resource-modal"
+        isOpen
+        close={() => setModalContent(null)}
+        focusAfterCloseRef={newResourceButtonRef}
+        closeButtonLabelText={t("common:close")}
+        aria-labelledby="modal-header"
+      >
+        <NewResourceModal spacePk={0} unit={unit} closeModal={() => setModalContent(null)} refetch={refetch} />
+      </FixedDialog>
+    );
+  };
+
   return (
     <>
-      <HDSModal
-        id="space-modal"
-        isOpen={newSpaceDialogIsOpen}
-        onClose={closeNewSpaceModal}
-        focusAfterCloseRef={newSpacesButtonRef}
-      >
-        <NewSpaceModal unit={unit} closeModal={() => closeNewSpaceModal()} refetch={refetch} />
-      </HDSModal>
       <LinkPrev />
       <SubPageHead title={t("Unit.spacesAndResources")} unit={unit} />
       <Flex $direction="row" $justifyContent="space-between" $alignItems="center">
@@ -81,7 +102,7 @@ function SpacesResources(): JSX.Element {
           ref={newSpacesButtonRef}
           variant={ButtonVariant.Supplementary}
           iconStart={<IconPlusCircleFill />}
-          onClick={() => openNewSpaceModal()}
+          onClick={() => handleOpenNewSpaceModal()}
         >
           {t("Unit.addSpace")}
         </ActionButton>
@@ -93,24 +114,12 @@ function SpacesResources(): JSX.Element {
           variant={ButtonVariant.Supplementary}
           iconStart={<IconPlusCircleFill />}
           disabled={unit.spaces.length === 0}
-          onClick={() => {
-            openWithContent(
-              <NewResourceModal spacePk={0} unit={unit} closeModal={closeNewResourceModal} refetch={refetch} />
-            );
-          }}
+          onClick={handleOpenNewResourceModal}
         >
           {t("Unit.addResource")}
         </ActionButton>
       </Flex>
       <ResourcesTable unit={unit} refetch={refetch} />
-      <HDSModal
-        id="resource-modal"
-        isOpen={isNewResourceModalOpen}
-        onClose={closeNewResourceModal}
-        focusAfterCloseRef={newResourceButtonRef}
-      >
-        {modalContent}
-      </HDSModal>
     </>
   );
 }

@@ -5,9 +5,9 @@ import { breakpoints } from "common/src/const";
 import type { ImageFragment } from "@gql/gql-types";
 import Carousel from "@/components/Carousel";
 import { getImageSource } from "common/src/helpers";
-import { HDSModal } from "common/src/components/HDSModal";
 import { Dialog } from "hds-react";
 import { focusStyles, removeButtonStyles } from "common/styled";
+import { FixedDialog } from "@/styled/FixedDialog";
 
 type Props = {
   images: Readonly<ImageFragment[]>;
@@ -90,11 +90,13 @@ export function Images({ images, contextName }: Props): JSX.Element {
           />
         ))}
       </Carousel>
-      <HDSModal
+      <FixedDialog
         id="reservation-unit-images-modal"
-        onClose={() => setShowModal(false)}
+        close={() => setShowModal(false)}
         isOpen={showModal}
         focusAfterCloseRef={ref}
+        closeButtonLabelText={t("common:close")}
+        aria-labelledby="modal-header"
       >
         <Dialog.Header id="modal-header" title={label} />
         <Dialog.Content>
@@ -115,7 +117,7 @@ export function Images({ images, contextName }: Props): JSX.Element {
             ))}
           </ModalImages>
         </Dialog.Content>
-      </HDSModal>
+      </FixedDialog>
     </>
   );
 }

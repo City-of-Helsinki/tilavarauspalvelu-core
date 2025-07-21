@@ -20,8 +20,8 @@ import { ErrorText } from "common/src/components/ErrorText";
 import { OrderedReservationUnitCard, ReservationUnitModalContent } from ".";
 import { useSearchParams } from "next/navigation";
 import { useSearchModify } from "@/hooks/useSearchValues";
-import { HDSModal } from "common/src/components/HDSModal";
 import { type OptionsT } from "@/modules/search";
+import { FixedDialog } from "@/styled/FixedDialog";
 
 type ReservationUnitType = Pick<OrderedReservationUnitCardFragment, "pk">;
 export type OptionType = Readonly<{ value: number; label: string }>;
@@ -149,14 +149,16 @@ export function ReservationUnitList<T extends FieldValues>({
           {t("reservationUnitList:add")}
         </Button>
       </Flex>
-      <HDSModal
+      <FixedDialog
         id={name}
         isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        fixedHeight
-        maxWidth="xl"
+        close={() => setShowModal(false)}
+        $fixedHeight
+        $maxWidth="xl"
         focusAfterCloseRef={ref}
         scrollable
+        closeButtonLabelText={t("common:close")}
+        aria-labelledby="modal-header"
       >
         <Dialog.Header id="modal-header" title={t("reservationUnitModal:heading")} />
         <Dialog.Content>
@@ -177,7 +179,7 @@ export function ReservationUnitList<T extends FieldValues>({
             {t("reservationUnitModal:returnToApplication")}
           </Button>
         </Dialog.ActionButtons>
-      </HDSModal>
+      </FixedDialog>
     </Flex>
   );
 }

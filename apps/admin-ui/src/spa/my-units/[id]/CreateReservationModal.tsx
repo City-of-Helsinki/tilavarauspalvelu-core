@@ -27,7 +27,7 @@ import { successToast } from "common/src/common/toast";
 import { useDisplayError } from "common/src/hooks";
 import { useSearchParams } from "react-router-dom";
 import { SelectFilter } from "@/component/QueryParamFilters";
-import { HDSModal } from "common/src/components/HDSModal";
+import { FixedDialog } from "@/styled/FixedDialog";
 
 // NOTE HDS forces buttons over each other on mobile, we want them side-by-side
 const ActionButtons = styled(Dialog.ActionButtons)`
@@ -156,7 +156,17 @@ export function CreateReservationModal({
   }
 
   return (
-    <HDSModal id="info-dialog" isOpen={isOpen} focusAfterCloseRef={focusAfterCloseRef} scrollable onClose={onClose}>
+    <FixedDialog
+      id="info-dialog"
+      variant="primary"
+      aria-labelledby="modal-header"
+      close={onClose}
+      closeButtonLabelText={t("common:close")}
+      focusAfterCloseRef={focusAfterCloseRef}
+      isOpen={isOpen}
+      $maxWidth="l"
+      scrollable
+    >
       <Dialog.Header id="modal-header" title={t("ReservationDialog.title")} />
       <Dialog.Content style={{ paddingTop: "var(--spacing-m)" }}>
         <SelectFilter name="reservationUnit" sort options={reservationUnitOptions} />
@@ -169,7 +179,7 @@ export function CreateReservationModal({
           </ErrorBoundary>
         )}
       </Dialog.Content>
-    </HDSModal>
+    </FixedDialog>
   );
 }
 
