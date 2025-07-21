@@ -80,7 +80,7 @@ class QueryInfo:
 
 def match_queries_to_factories(file: Path) -> dict[str, list[QueryInfo]]:
     """Match queries in given file and return a map of the operation name to a map of"""
-    document = file.read_text()
+    document = file.read_text(encoding="utf-8")
 
     document_node = parse(document, no_location=True)
 

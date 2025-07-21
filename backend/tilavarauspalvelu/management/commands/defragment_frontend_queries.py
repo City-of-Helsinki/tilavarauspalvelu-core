@@ -55,13 +55,13 @@ OPERATION_VALUE_MAP = {
 
 def defragment_queries_in_file(path: Path) -> None:
     print(f"Reading queries from '{path.name}'...")
-    document = path.read_text()
+    document = path.read_text(encoding="utf-8")
 
     print(f"Defragmenting queries in '{path.name}'...")
     queries = parse_queries(document)
 
     print(f"Saving queries to '{path.name}'...")
-    path.write_text(queries)
+    path.write_text(queries, encoding="utf-8")
 
 
 @dataclasses.dataclass(slots=True, frozen=True)
