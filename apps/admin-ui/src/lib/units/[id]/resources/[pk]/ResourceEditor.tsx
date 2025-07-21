@@ -24,7 +24,7 @@ import {
   Editor,
   ResourceUpdateSchema,
   type ResourceUpdateForm,
-} from "../../../_components";
+} from "@lib/units/[id]";
 import { getUnitUrl } from "@/common/urls";
 
 type Props = {

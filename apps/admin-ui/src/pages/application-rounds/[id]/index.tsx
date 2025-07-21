@@ -35,7 +35,7 @@ import { GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import Error404 from "@/common/Error404";
 import { createClient } from "@/common/apolloClient";
-import { TimeframeStatus, ApplicationRoundStatusLabel } from "./../_components";
+import { TimeframeStatus, ApplicationRoundStatusLabel } from "@lib/application-rounds";
 import {
   ReviewEndAllocation,
   ApplicationDataLoader,
@@ -43,7 +43,7 @@ import {
   ApplicationSectionDataLoader,
   TimeSlotDataLoader,
   RejectedOccurrencesDataLoader,
-} from "./_components";
+} from "@lib/application-rounds/[id]";
 
 const TabContent = styled(Flex).attrs({
   $direction: "column",

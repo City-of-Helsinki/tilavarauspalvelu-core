@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import type { ReservationUnitEditFormValues } from "./form";
 import { getTranslatedTooltipTex } from "./utils";
 
-const RichTextInput = dynamic(() => import("../../../../component/RichTextInput"), {
+const RichTextInput = dynamic(() => import("@/component/RichTextInput"), {
   ssr: false,
 });
 

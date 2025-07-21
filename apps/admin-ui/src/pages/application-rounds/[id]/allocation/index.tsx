@@ -31,7 +31,7 @@ import { errorToast } from "common/src/common/toast";
 import { ALLOCATION_POLL_INTERVAL, NOT_FOUND_SSR_VALUE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { truncate } from "@/helpers";
 import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
-import { AllocationPageContent, convertPriorityFilter } from "./_components";
+import { AllocationPageContent, convertPriorityFilter } from "@lib/application-rounds/[id]/allocation";
 import { LinkPrev } from "@/component/LinkPrev";
 import { useSession } from "@/hooks/auth";
 import { gql } from "@apollo/client";

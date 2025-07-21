@@ -20,7 +20,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { type GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
-import { CreateReservationModal, ReservationUnitCalendarView, UnitReservations } from "./_components";
+import { CreateReservationModal, ReservationUnitCalendarView, UnitReservations } from "@lib/my-units/[id]/";
 
 const LocationOnlyOnDesktop = styled.p`
   display: none;
