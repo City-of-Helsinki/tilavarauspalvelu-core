@@ -77,74 +77,11 @@
     "welcome": "Tervetuloa",
     "welcomeCustom": "Moro nääs"
   },
-  "ReservationEditSeries": {
-    "heading": "Muokkaa varaussarjaa",
-    "submit": "Luo varaukset"
-  },
   "ApplicationSectionStatusChoice": {
     "HANDLED": "Hyväksytty",
     "IN_ALLOCATION": "Käsittelyssä",
     "UNALLOCATED": "Vastaanotettu",
     "REJECTED": "Hylätty"
-  },
-  "TimeSlotStatusCell": {
-    "declined": "Hylätty",
-    "approved": "Hyväksytty"
-  },
-  "Recommendation": {
-    "actionMassActionSubmit": "Massakäsittele valitut"
-  },
-  "Reservation": {
-    "headings": {
-      "applicant": "Hakija",
-      "schedule": "Vuoro"
-    },
-    "noReservations": "Ei varauksia",
-    "NewReservationModal": {
-      "acceptBtn": "Lisää varaus",
-      "title": "Luo uusi varaus",
-      "successToast": "Uusi aika tallennettu"
-    },
-    "CommonModal": {
-      "form": {
-        "startTime": "Aloitusaika",
-        "length": "Kesto"
-      },
-      "newTime": "Uusi aika",
-      "error": {
-        "reservationCollides": "Toivomasi aika ei ole saatavilla"
-      }
-    },
-    "EditTimeModal": {
-      "title": "Muuta varauksen aikaa",
-      "originalTime": "Muutettava aika",
-      "recurringInfoLabel": "Toistuva varaus aikavälillä",
-      "recurringInfoTimes": "{{ weekdays }} {{begin}} - {{end}}",
-      "acceptBtn": "Muuta aikaa",
-      "successToast": "Uusi aika tallennettu",
-      "error": {
-        "mutation": "Ajan muutos epäonnistui."
-      }
-    },
-    "EditPage": {
-      "title": "Muokkaa varauksen tietoja",
-      "Reservation failed to load": "Varausta {{ pk }} ei pystytty latamaan",
-      "Reservation unit failed to load": "Varausyksikköä ei löytynyt",
-      "save": "Tallenna",
-      "saveSuccess": "Varauksen muutokset tallennettu",
-      "saveSuccessRecurring": "Muutokset tallennettu tuleviin varauksiin!",
-      "pageThrewError": "Virhe: varausta ei voi muokata"
-    }
-  },
-  "ReservationUnit": {
-    "isDraft": {
-      "true": "Luonnos",
-      "false": "Julkaistu"
-    }
-  },
-  "ReservationUnitList": {
-    "typeFilter": "Tyyppi",
-    "statusFilter": "Tila"
   },
   "locationType": {
     "FIXED": "Kiinteä",
@@ -182,24 +119,6 @@
     "INTERVAL_300_MINS": "5 tunnin välein",
     "INTERVAL_360_MINS": "6 tunnin välein",
     "INTERVAL_420_MINS": "7 tunnin välein"
-  },
-  "ReservationStateFilter": {
-    "label": "Käsittelytila",
-    "state": {
-      "CANCELLED": ""
-    }
-  },
-  "Payment": {
-    "status": {
-      "DRAFT": "Maksu kesken",
-      "EXPIRED": "Ei maksettu",
-      "CANCELLED": "Peruutettu",
-      "PAID": "Maksettu",
-      "PAID_MANUALLY": "Paikan päällä",
-      "PAID_BY_INVOICE": "Maksu laskulla",
-      "PENDING": "Odottaa maksua",
-      "REFUNDED": "Maksu palautettu"
-    }
   },
   "Calendar": {
     "legend": {
