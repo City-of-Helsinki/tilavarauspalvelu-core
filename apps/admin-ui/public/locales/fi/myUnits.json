@@ -18,6 +18,7 @@
       "closed": "Suljettu",
       "waitingPayment": "Hyväksytty varaus, Odottaa maksua",
       "staffReservation": "Sisäinen varaus",
+      "reserved": "Varattu",
       "reservationUnitReleased": "Varausyksikkö julkaistu",
       "reservationUnitDraft": "Varausyksikkö luonnostilassa"
     }
@@ -72,6 +73,10 @@
     "reservationsList_one": "Olet tekemässä yhden varauksen",
     "reservationsList_other": "Olet tekemässä {{count}} varausta",
     "name": "Varaussarjan nimi",
-    "newOverlapError": "Varausta ei pystytty tekemään, koska siinä on uusia päällekkäistä varauksia ({{ count }}). Tarkista lista ja yritä uudelleen."
+    "newOverlapError": "Varausta ei pystytty tekemään, koska siinä on uusia päällekkäistä varauksia ({{ count }}). Tarkista lista ja yritä uudelleen.",
+    "edit": {
+      "heading": "Muokkaa varaussarjaa",
+      "submit": "Luo varaukset"
+    }
   }
 }

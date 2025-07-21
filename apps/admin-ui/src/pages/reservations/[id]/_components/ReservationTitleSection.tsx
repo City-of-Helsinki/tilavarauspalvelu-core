@@ -95,7 +95,7 @@ export const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
                 data-testid="reservation_title_section__order_status"
                 icon={<IconEuroSign aria-hidden="true" />}
               >
-                {t(`Payment.status.${reservation.paymentOrder?.status}`)}
+                {t(`translation:orderStatus.${reservation.paymentOrder?.status}`)}
               </StatusLabel>
             )}
             {reservation.state && (
