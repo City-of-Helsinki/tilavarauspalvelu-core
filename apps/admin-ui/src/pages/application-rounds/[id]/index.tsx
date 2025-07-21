@@ -99,10 +99,10 @@ export default function ApplicationRound({ pk }: PropsNarrowed): JSX.Element {
     }
   }, [unitOptions, searchParams, setParams]);
 
-  if (loading) {
+  if (applicationRound == null && loading) {
     return <CenterSpinner />;
   } else if (!canUserSeePage) {
-    return <div>{t("errors.noPermission")}</div>;
+    return <div>{t("errors:noPermission")}</div>;
   } else if (!applicationRound) {
     return <Error404 />;
   }
