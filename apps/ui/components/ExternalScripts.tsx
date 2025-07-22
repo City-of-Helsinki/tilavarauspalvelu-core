@@ -32,6 +32,7 @@ function HotjarScript(): JSX.Element {
     <Script
       id="hotjar"
       strategy="afterInteractive"
+      /* oxlint-disable-next-line react/no-danger */
       dangerouslySetInnerHTML={{
         __html: `
 (function(h,o,t,j,a,r){
