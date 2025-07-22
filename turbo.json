@@ -6,13 +6,16 @@
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
-    "deploy": {
-      "dependsOn": ["build", "test", "lint"]
+    "tsc:check": {
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/packages/common/**/*/*.ts", "$TURBO_ROOT$/packages/common/**/*.tsx"]
     },
-    "tsc:check": {},
-    "tsc:clean": {},
+    "tsc:clean": {
+      "cache": false
+    },
     "lint:css": {},
-    "format": {},
+    "format": {
+      "cache": false
+    },
     "test": {
       "env": ["SKIP_ENV_VALIDATION"],
       "inputs": ["**/*.tsx", "**/*.ts", "test/**/*.ts", "test/**/*.tsx"]
