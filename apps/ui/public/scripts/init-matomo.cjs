@@ -1,17 +1,7 @@
 var _paq = (window._paq = window._paq || []);
 _paq.push([
   "setExcludedQueryParams",
-  [
-    "applicationRound",
-    "next",
-    "hash",
-    "state",
-    "nonce",
-    "first_authz",
-    "scope",
-    "fbclid",
-    "time",
-  ],
+  ["applicationRound", "next", "hash", "state", "nonce", "first_authz", "scope", "fbclid", "time"],
 ]);
 _paq.push(["trackPageView"]);
 _paq.push(["enableLinkTracking"]);
