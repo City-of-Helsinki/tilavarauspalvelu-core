@@ -143,21 +143,22 @@ class User(AbstractUser):
 
     def _calculate_active_unit_roles(self) -> None:
         """Calculate all unit roles by unit id and unit group id for the user."""
-        self._unit_roles: dict[int, list[UserRoleChoice]] = {}
-        self._unit_group_roles: dict[int, list[UserRoleChoice]] = {}
+        # Do not set these to `self` yet, due to possible race conditions when multiple requests are made simultaneously
+        unit_roles: dict[int, list[UserRoleChoice]] = {}
+        unit_group_roles: dict[int, list[UserRoleChoice]] = {}
 
         unit_role: UnitRole
         for unit_role in self.unit_roles.filter(is_role_active=True).prefetch_related("units", "unit_groups"):
             for unit in unit_role.units.all():
                 if unit_role.is_from_ad_group and not unit.allow_permissions_from_ad_groups:
                     continue
-                self._unit_roles.setdefault(int(unit.pk), []).append(UserRoleChoice(unit_role.role))
+                unit_roles.setdefault(int(unit.pk), []).append(UserRoleChoice(unit_role.role))
             for unit_group in unit_role.unit_groups.all():
-                self._unit_group_roles.setdefault(int(unit_group.pk), []).append(UserRoleChoice(unit_role.role))
+                unit_group_roles.setdefault(int(unit_group.pk), []).append(UserRoleChoice(unit_role.role))
 
         # Remove duplicates and sort roles alphabetically
-        self._unit_roles = {pk: sorted(set(roles)) for pk, roles in self._unit_roles.items()}
-        self._unit_group_roles = {pk: sorted(set(roles)) for pk, roles in self._unit_group_roles.items()}
+        self._unit_roles = {pk: sorted(set(roles)) for pk, roles in unit_roles.items()}
+        self._unit_group_roles = {pk: sorted(set(roles)) for pk, roles in unit_group_roles.items()}
 
     @cached_property
     def current_social_auth(self) -> UserSocialAuth | None:
