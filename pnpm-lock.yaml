@@ -35,6 +35,9 @@ importers:
       graphql-config:
         specifier: ^5.1.5
         version: 5.1.5(@types/node@24.0.14)(graphql@16.11.0)(typescript@5.8.3)
+      husky:
+        specifier: ^9.1.7
+        version: 9.1.7
       npkill:
         specifier: ^0.12.2
         version: 0.12.2
@@ -55,7 +58,7 @@ importers:
         version: 2.0.3(@types/react@18.2.7)(react@18.3.1)
       '@sentry/nextjs':
         specifier: ^8.29.0
-        version: 8.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.26.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.53.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.26.0(@opentelemetry/api@1.9.0))(next@15.4.1(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2))(react@18.3.1)(webpack@5.94.0)
+        version: 8.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.26.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.53.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.26.0(@opentelemetry/api@1.9.0))(next@15.4.1(@babel/core@7.27.4)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2))(react@18.3.1)(webpack@5.94.0)
       apollo-upload-client:
         specifier: 18.0.1
         version: 18.0.1(@apollo/client@3.13.8(@types/react@18.2.7)(graphql-ws@6.0.5(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(graphql@16.11.0)
@@ -79,7 +82,7 @@ importers:
         version: 4.6.0
       hds-react:
         specifier: ^4.6.0
-        version: 4.6.0(@types/react@18.2.7)(eslint@9.30.1(jiti@2.4.2))(graphql-ws@6.0.5(graphql@16.11.0)(ws@8.18.3))(postcss@8.5.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+        version: 4.6.0(@types/react@18.2.7)(eslint@9.30.1(jiti@2.4.2))(graphql-ws@6.0.5(graphql@16.11.0)(ws@8.18.3))(postcss@8.5.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
       i18n-iso-countries:
         specifier: ^7.14.0
         version: 7.14.0
@@ -91,10 +94,10 @@ importers:
         version: 4.17.21
       next:
         specifier: 15.4.1
-        version: 15.4.1(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2)
+        version: 15.4.1(@babel/core@7.27.4)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2)
       next-i18next:
         specifier: ^15.4.2
-        version: 15.4.2(i18next@25.2.1(typescript@5.8.3))(next@15.4.1(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2))(react-i18next@15.6.0(i18next@25.2.1(typescript@5.8.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3))(react@18.3.1)
+        version: 15.4.2(i18next@25.2.1(typescript@5.8.3))(next@15.4.1(@babel/core@7.27.4)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2))(react-i18next@15.6.0(i18next@25.2.1(typescript@5.8.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3))(react@18.3.1)
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -173,7 +176,7 @@ importers:
         version: 1.8.0
       postcss-styled-syntax:
         specifier: ^0.7.1
-        version: 0.7.1(postcss@8.5.6)
+        version: 0.7.1(postcss@8.5.5)
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -4500,6 +4503,11 @@ packages:
   https-proxy-agent@7.0.6:
     resolution: {integrity: sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==}
     engines: {node: '>= 14'}
+
+  husky@9.1.7:
+    resolution: {integrity: sha512-5gs5ytaNjBrh5Ow3zrvdUUY+0VxIuWVL4i9irt6friV+BqdCfmV11CQTWMiBYWHbXhco+J1kHfTOUkePhCDvMA==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   hyphenate-style-name@1.1.0:
     resolution: {integrity: sha512-WDC/ui2VVRrz3jOVi+XtjqkDjiVjTtFaAGiW37k6b+ohyQ5wYDOGkvCZa8+H0nx3gyvv0+BST9xuOgIyGQ00gw==}
@@ -11579,6 +11587,8 @@ snapshots:
       debug: 4.4.1
     transitivePeerDependencies:
       - supports-color
+
+  husky@9.1.7: {}
 
   hyphenate-style-name@1.1.0: {}
 
