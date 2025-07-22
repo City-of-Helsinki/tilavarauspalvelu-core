@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Button, ButtonVariant, Dialog, RadioButton, Select, SelectionGroup, TextArea } from "hds-react";
 import {
@@ -89,7 +89,7 @@ const ReturnMoney = ({
   price: number;
 }) => {
   const { t } = useTranslation("translation", {
-    keyPrefix: "RequestedReservation.DenyDialog.refund",
+    keyPrefix: "reservation:DenyDialog.refund",
   });
 
   switch (state) {
@@ -172,9 +172,9 @@ function DialogContent({
             required
             clearable={false}
             texts={{
-              placeholder: t("common.select"),
-              label: t("RequestedReservation.DenyDialog.denyReason"),
-              assistive: t("RequestedReservation.DenyDialog.denyReasonHelper"),
+              placeholder: t("common:select"),
+              label: t("reservation:DenyDialog.denyReason"),
+              assistive: t("reservation:DenyDialog.denyReasonHelper"),
             }}
             options={options.map(convertOptionToHDS)}
             value={denyReasonPk ? denyReasonPk.toString() : undefined}
@@ -186,19 +186,19 @@ function DialogContent({
           <TextArea
             value={handlingDetails}
             onChange={(e) => setHandlingDetails(e.target.value)}
-            label={t("RequestedReservation.handlingDetails")}
+            label={t("reservation:handlingDetails")}
             id="handlingDetails"
-            helperText={t("RequestedReservation.DenyDialog.handlingDetailsHelper")}
+            helperText={t("reservation:DenyDialog.handlingDetailsHelper")}
           />
           {children}
         </Flex>
       </Dialog.Content>
       <ActionButtons>
         <Button disabled={!denyReasonPk || disabled} onClick={handleDeny} data-testid="deny-dialog__deny-button">
-          {t("RequestedReservation.DenyDialog.reject")}
+          {t("reservation:DenyDialog.reject")}
         </Button>
         <Button variant={ButtonVariant.Secondary} onClick={onClose} data-testid="deny-dialog__cancel-button">
-          {t("common.prev")}
+          {t("common:prev")}
         </Button>
       </ActionButtons>
     </>
@@ -227,11 +227,11 @@ function DenyDialogWrapper({
       aria-live="polite"
       isOpen={isOpen}
       close={onClose}
-      closeButtonLabelText={t("common.close")}
+      closeButtonLabelText={t("common:close")}
       focusAfterCloseRef={focusAfterCloseRef}
     >
       <Flex>
-        <Dialog.Header id="deny-dialog__header" title={title ?? t("RequestedReservation.DenyDialog.title")} />
+        <Dialog.Header id="deny-dialog__header" title={title ?? t("reservation:DenyDialog.title")} />
         {children}
       </Flex>
     </Dialog>
@@ -265,7 +265,7 @@ export function DenyDialog({
     try {
       await refundReservationMutation({ variables: { input } });
       successToast({
-        text: t("RequestedReservation.DenyDialog.refund.mutationSuccess"),
+        text: t("reservation:DenyDialog.refund.mutationSuccess"),
       });
     } catch (err) {
       displayError(err);
@@ -299,7 +299,7 @@ export function DenyDialog({
         await refundReservation({ pk: reservation.pk });
       } else {
         successToast({
-          text: t("RequestedReservation.DenyDialog.successNotify"),
+          text: t("reservation:DenyDialog.successNotify"),
         });
       }
       onReject();
@@ -365,7 +365,7 @@ export function DenyDialogSeries({
         });
       }
       successToast({
-        text: t("RequestedReservation.DenyDialog.successNotify"),
+        text: t("reservation:DenyDialog.successNotify"),
       });
       onReject();
     } catch (err) {

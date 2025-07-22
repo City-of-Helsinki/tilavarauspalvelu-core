@@ -1,103 +1,105 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { signIn, signOut } from "common/src/browserHelpers";
 import { useSession } from "@/hooks/auth";
 import { Header, IconSignout, IconStar, IconUser, LogoSize, TitleStyleType } from "hds-react";
 import React from "react";
 import styled from "styled-components";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-use";
 import { useHandling } from "@/hooks";
 import Logo from "common/src/components/Logo";
 import { hasSomePermission } from "@/modules/permissionHelper";
 import { env } from "@/env.mjs";
 import {
-  allReservationsUrl,
-  applicationRoundsUrl,
-  bannerNotificationsUrl,
-  myUnitsUrl,
-  requestedReservationsUrl,
-  reservationUnitsUrl,
-  reservationsUrl,
-  unitsUrl,
-  singleUnitUrl,
+  APPLICATION_ROUNDS_URL_PREFIX,
+  BANNER_NOTIFICATIONS_URL_PREFIX,
+  MY_UNITS_URL_PREFIX,
+  RESERVATION_UNIT_URL_PREFIX,
+  RESERVATIONS_URL_PREFIX,
+  UNITS_URL_PREFIX,
+  REQUESTED_RESERVATIONS_URL_PREFIX,
 } from "@/common/urls";
 import { UserPermissionChoice } from "@gql/gql-types";
 import { getLocalizationLang } from "common/src/helpers";
+import { useRouter } from "next/router";
 
 type Props = {
   apiBaseUrl: string;
 };
 
 const BackgroundHeader = styled(Header)`
-  --header-color: black;
-  --actionbar-background-color: var(--color-bus-dark);
-  --notification-bubble-background-color: var(--tilavaraus-admin-handling-count-color);
-  [class^="HeaderActionBarItem-module_container"] {
-    > button span {
-      color: white !important;
-      svg {
-        color: white;
+  && {
+    --header-color: black;
+    --actionbar-background-color: var(--color-bus-dark);
+    --notification-bubble-background-color: var(--tilavaraus-admin-handling-count-color);
+
+    [class^="HeaderActionBarItem-module_container"] {
+      > button span {
+        color: white !important;
+        svg {
+          color: white;
+        }
       }
     }
-  }
 
-  /* retain text-decoration: underline on the plain text in navigation items, but disable it in the notificationBubble */
-  [class^="HeaderNavigationMenu-module_headerNavigationMenuLinkContent__"]:hover,
-  [class^="HeaderNavigationMenu-module_headerNavigationMenuLinkContent__"]:focus-within {
-    a {
-      text-decoration: none;
-      span {
-        text-decoration: underline;
-      }
-      [class^="HeaderActionBarSubItem-module_notificationBubble__"] {
+    /* retain text-decoration: underline on the plain text in navigation items, but disable it in the notificationBubble */
+    [class^="HeaderNavigationMenu-module_headerNavigationMenuLinkContent__"]:hover,
+    [class^="HeaderNavigationMenu-module_headerNavigationMenuLinkContent__"]:focus-within {
+      a {
         text-decoration: none;
+        span {
+          text-decoration: underline;
+        }
+        [class^="HeaderActionBarSubItem-module_notificationBubble__"] {
+          text-decoration: none;
+        }
       }
     }
-  }
-  #user-menu-dropdown {
-    color: black;
-    button,
-    span,
-    div {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-    }
-    svg {
-      color: var(--header-color);
-    }
-  }
-  #user-menu {
-    > button span {
-      color: white !important;
+    #user-menu-dropdown {
+      color: black;
+      button,
+      span,
+      div {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+      }
       svg {
-        color: white;
+        color: var(--header-color);
       }
     }
-  }
-  #hds-mobile-menu {
-    #user-menu * {
-      color: var(--header-color) !important;
-      box-sizing: border-box;
-      button {
-        padding-inline: var(--spacing-s);
+    #user-menu {
+      > button span {
+        color: white !important;
+        svg {
+          color: white;
+        }
       }
     }
-    ul > li {
-      > span {
+    #hds-mobile-menu {
+      #user-menu * {
+        color: var(--header-color) !important;
         box-sizing: border-box;
-        padding: var(--spacing-s);
-        li {
-          width: 100%;
-          font-size: var(--fontsize-body-xl);
-        }
-        .active {
-          font-weight: bold;
+        button {
+          padding-inline: var(--spacing-s);
         }
       }
+      ul > li {
+        > span {
+          box-sizing: border-box;
+          padding: var(--spacing-s);
+          li {
+            width: 100%;
+            font-size: var(--fontsize-body-xl);
+          }
+          .active {
+            font-weight: bold;
+          }
+        }
 
-      /* hide the big link to frontpage which HDS adds by default */
-      &:first-child {
-        display: none;
+        /* hide the big link to frontpage which HDS adds by default */
+        &:first-child {
+          display: none;
+        }
       }
     }
   }
@@ -136,9 +138,9 @@ function getFilteredMenu(
   const menuItems: IMenuChild[] = [];
   if (hasOwnUnits) {
     menuItems.push({
-      title: "MainMenu.myUnits",
+      title: "navigation:myUnits",
       icon: <IconStar aria-hidden />,
-      routes: [myUnitsUrl],
+      routes: [MY_UNITS_URL_PREFIX],
     });
   }
   if (
@@ -147,14 +149,14 @@ function getFilteredMenu(
   ) {
     menuItems.push(
       {
-        title: "MainMenu.requestedReservations",
-        routes: [requestedReservationsUrl],
+        title: "navigation:requestedReservations",
+        routes: [REQUESTED_RESERVATIONS_URL_PREFIX],
         exact: true,
       },
       {
-        title: "MainMenu.allReservations",
-        routes: [allReservationsUrl, reservationsUrl],
-        excludeRoutes: [requestedReservationsUrl],
+        title: "navigation:allReservations",
+        routes: [RESERVATIONS_URL_PREFIX],
+        excludeRoutes: [REQUESTED_RESERVATIONS_URL_PREFIX],
       }
     );
   }
@@ -162,32 +164,35 @@ function getFilteredMenu(
   // i.e. they have the permission to a unit that is not on any application round
   if (hasPermission(UserPermissionChoice.CanViewApplications)) {
     menuItems.push({
-      title: "MainMenu.applicationRounds",
-      routes: [applicationRoundsUrl],
+      title: "navigation:applicationRounds",
+      routes: [APPLICATION_ROUNDS_URL_PREFIX],
     });
   }
   if (hasPermission(UserPermissionChoice.CanManageReservationUnits)) {
     menuItems.push(
       {
-        title: "MainMenu.reservationUnits",
-        routes: [reservationUnitsUrl],
+        title: "navigation:reservationUnits",
+        routes: [RESERVATION_UNIT_URL_PREFIX],
       },
       {
-        title: "MainMenu.units",
-        routes: [unitsUrl, singleUnitUrl],
+        title: "navigation:units",
+        routes: [UNITS_URL_PREFIX],
       }
     );
   }
   if (hasPermission(UserPermissionChoice.CanManageNotifications, true)) {
     menuItems.push({
-      title: "MainMenu.notifications",
-      routes: [bannerNotificationsUrl],
+      title: "navigation:notifications",
+      routes: [BANNER_NOTIFICATIONS_URL_PREFIX],
     });
   }
   return menuItems;
 }
 
-function checkActive(pathname: string, routes: string[], exact: boolean, exclude?: string[]) {
+function checkActive(pathname: string | undefined, routes: string[], exact: boolean, exclude?: string[]) {
+  if (!pathname) {
+    return false;
+  }
   if (exclude?.includes(pathname)) {
     return false;
   }
@@ -209,10 +214,10 @@ function NavigationLink({
 }>) {
   const { t } = useTranslation();
   const { pathname } = useLocation();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   if (!routes) return null;
-  const shouldDisplayCount = title === "MainMenu.requestedReservations" && count && count > 0;
+  const shouldDisplayCount = title === "navigation:requestedReservations" && count && count > 0;
 
   const handleClick = (evt: React.MouseEvent<HTMLAnchorElement>) => {
     evt.preventDefault();
@@ -221,7 +226,7 @@ function NavigationLink({
       // NOTE: this is a workaround for the HDS Header component not closing the mobile menu on navigation, if there isn't a page reload
       // TODO: remove this when HDS Header is fixed
       document.getElementById("Menu")?.querySelector("button")?.click();
-      navigate(route);
+      router.push(route);
     }
   };
 
@@ -239,12 +244,13 @@ function NavigationLink({
     />
   );
 }
-const Navigation = ({ apiBaseUrl }: Props) => {
+
+export function Navigation({ apiBaseUrl }: Props) {
   const { t, i18n } = useTranslation();
   const { user } = useSession();
   const firstName = user?.firstName?.trim() ?? "";
   const lastName = user?.lastName?.trim() ?? "";
-  const name = `${firstName} ${lastName}`.trim() || t("Navigation.noName");
+  const name = `${firstName} ${lastName}`.trim() || t("navigation:noName");
   const { handlingCount, hasOwnUnits } = useHandling();
   if (!user) {
     return null;
@@ -273,7 +279,7 @@ const Navigation = ({ apiBaseUrl }: Props) => {
             <Header.ActionBarButton
               label={
                 <>
-                  <span>{t("Navigation.logout")}</span>
+                  <span>{t("navigation:logout")}</span>
                   <IconSignout />
                 </>
               }
@@ -282,7 +288,7 @@ const Navigation = ({ apiBaseUrl }: Props) => {
           </Header.ActionBarItem>
         ) : (
           <Header.ActionBarButton
-            label={t("Navigation.login")}
+            label={t("navigation:login")}
             onClick={() =>
               signIn({
                 apiBaseUrl,
@@ -304,13 +310,10 @@ const Navigation = ({ apiBaseUrl }: Props) => {
               exact={item.exact}
               exclude={item.excludeRoutes}
               count={handlingCount}
-              aria-label={t("Navigation.navigation")}
             />
           ))}
         </Header.NavigationMenu>
       </NavigationMenuWrapper>
     </BackgroundHeader>
   );
-};
-
-export default Navigation;
+}

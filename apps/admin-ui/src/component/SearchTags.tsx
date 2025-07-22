@@ -1,7 +1,8 @@
 import React from "react";
-import { useSearchParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { FilterTags, StyledTag, ResetButton } from "common/src/tags";
+import { useSearchParams } from "next/navigation";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
 /// Creates tags from the search params (uses react-router-dom)
 /// @param translateTag callback to format the tag
@@ -23,19 +24,22 @@ export function SearchTags({
   clearButtonAriaLabel?: string;
 }>): JSX.Element {
   const { t } = useTranslation();
-  const [params, setParams] = useSearchParams();
+  const params = useSearchParams();
+  const setParams = useSetSearchParams();
 
   const handleDelete = (tag: { key: string; value: string }) => {
     const vals = new URLSearchParams(params);
     vals.delete(tag.key, tag.value);
-    setParams(vals, { replace: true });
+    setParams(vals);
   };
 
   const handleReset = () => {
-    const newParams = hide.reduce<typeof params>(
-      (acc, s) => (params.get(s) ? { ...acc, [s]: params.get(s) } : acc),
-      new URLSearchParams()
-    );
+    const newParams = new URLSearchParams();
+    for (const [key, value] of params) {
+      if (hide.includes(key) && value !== "") {
+        newParams.append(key, value);
+      }
+    }
     // TODO defaultTags and hide should never overlap
     for (const d of defaultTags) {
       if (Array.isArray(d.value)) {
@@ -46,7 +50,7 @@ export function SearchTags({
         newParams.set(d.key, d.value);
       }
     }
-    setParams(newParams, { replace: true });
+    setParams(newParams);
   };
 
   const tags: { key: string; value: string; tr: string }[] = [];
@@ -70,7 +74,7 @@ export function SearchTags({
           onDelete={() => handleDelete(tag)}
           key={`${tag.key}-${tag.value}`}
           id={`search-tag-${tag.key}`}
-          aria-label={t("common.removeTag", { tag: tag.tr })}
+          aria-label={t("common:removeTag", { tag: tag.tr })}
         >
           {tag.tr}
         </StyledTag>
@@ -79,9 +83,9 @@ export function SearchTags({
         <ResetButton
           onClick={handleReset}
           onDelete={handleReset}
-          aria-label={clearButtonAriaLabel ?? t("common.clearTags")}
+          aria-label={clearButtonAriaLabel ?? t("common:clearTags")}
         >
-          {clearButtonLabel ?? t("common.clear")}
+          {clearButtonLabel ?? t("common:clear")}
         </ResetButton>
       )}
     </FilterTags>

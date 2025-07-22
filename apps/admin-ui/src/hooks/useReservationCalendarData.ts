@@ -9,8 +9,7 @@ import { useTranslation } from "next-i18next";
 import { toApiDate } from "common/src/common/util";
 import { errorToast } from "common/src/common/toast";
 import { base64encode } from "common/src/helpers";
-// TODO move the import
-import { type CalendarEventType } from "@/spa/reservations/[id]/eventStyleGetter";
+import { type CalendarEventType } from "@/modules/reservation";
 import { combineAffectingReservations } from "@/helpers";
 
 // TODO there is an issue here with denied "Blocked" reservations shown in the Calendar as regular "Blocked" reservations
@@ -49,11 +48,11 @@ export function useReservationCalendarData({
       ],
     },
     onError: () => {
-      errorToast({ text: t("errors.errorFetchingData") });
+      errorToast({ text: t("errors:errorFetchingData") });
     },
   });
 
-  const blockedName = t("ReservationUnits.reservationState.RESERVATION_CLOSED");
+  const blockedName = t("reservationUnit:reservationState.RESERVATION_CLOSED");
 
   const reservations = combineAffectingReservations(data, reservationUnitPk);
 
