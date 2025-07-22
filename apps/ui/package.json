@@ -14,7 +14,7 @@
     "lint:css": "stylelint '**/*.tsx'",
     "tsc:check": "tsc --noEmit --project tsconfig.json",
     "tsc:clean": "tsc --build --clean",
-    "format": "prettier --ignore-path \"../.prettierignore\" --write \"**/*.{js,jsx,ts,tsx,json}\""
+    "format": "prettier --ignore-path \"../../.prettierignore\" --write \"**/*.{js,jsx,ts,tsx,json}\""
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
