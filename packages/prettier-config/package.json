@@ -1,0 +1,12 @@
+{
+  "name": "prettier-config",
+  "license": "MIT",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@prettier/plugin-oxc": "^0.0.4",
+    "globals": "^16.2.0",
+    "typescript": "^5.8.3"
+  }
+}

@@ -15,6 +15,8 @@
     "lint": "turbo lint",
     "lint:fix": "turbo lint -- --fix",
     "lint:css": "turbo lint:css",
+    "format": "turbo format",
+    "format:check": "turbo format:check",
     "test": "turbo test",
     "tsc:check": "turbo tsc:check",
     "tsc:clean": "turbo tsc:clean",
@@ -23,7 +25,8 @@
     "codegen:ui": "graphql-codegen --project ui",
     "codegen:common": "graphql-codegen --project common",
     "codegen": "parallel pnpm ::: codegen:admin codegen:ui codegen:common",
-    "codegen:watch": "pnpm codegen:admin --watch & pnpm codegen:ui --watch & pnpm codegen:common --watch"
+    "codegen:watch": "pnpm codegen:admin --watch & pnpm codegen:ui --watch & pnpm codegen:common --watch",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.7",
@@ -35,6 +38,7 @@
     "@parcel/watcher": "^2.5.1",
     "glob": "^11.0.3",
     "graphql-config": "^5.1.5",
+    "husky": "^9.1.7",
     "npkill": "^0.12.2",
     "turbo": "^2.5.4"
   },

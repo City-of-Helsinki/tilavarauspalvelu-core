@@ -24,7 +24,7 @@ const CUSTOMER_OUTPUT_FILE = "customer-queries.graphql";
 function cleanOutput(outputFilePath) {
   try {
     rmSync(outputFilePath, { force: true });
-  } catch (e) {
+  } catch (_) {
     // ignore
   }
 }

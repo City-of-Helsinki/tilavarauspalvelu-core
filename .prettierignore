@@ -5,6 +5,7 @@ docker-compose.yml
 
 # auto gen
 tilavaraus.graphql
+**/gql/gql-types.ts
 
 pnpm-lock.yaml
 
@@ -14,6 +15,7 @@ pnpm-lock.yaml
 **/node_modules
 
 # next.js
+**/.turbo
 **/.next
 **/out
 
