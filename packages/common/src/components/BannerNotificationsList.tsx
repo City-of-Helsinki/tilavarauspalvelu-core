@@ -86,6 +86,7 @@ function NotificationsListItem({ notification, closeFn, closedArray }: Notificat
       >
         {notification && (
           <BannerNotificationText
+            /* oxlint-disable-next-line react/no-danger */
             dangerouslySetInnerHTML={{
               __html: innerHtml,
             }}
