@@ -61,9 +61,7 @@
 
 /* override HDS variables (components define their own variables) */
 * {
-  --notification-z-index-toast: var(
-    --tilavaraus-admin-stack-notification
-  ) !important;
+  --notification-z-index-toast: var(--tilavaraus-admin-stack-notification) !important;
   --header-z-index: var(--tilavaraus-admin-stack-main-menu);
   --header-max-width: var(--tilavaraus-page-max-width);
 }
