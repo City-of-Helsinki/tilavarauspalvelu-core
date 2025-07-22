@@ -66,8 +66,7 @@ strong {
 }
 
 /* Calendar buttons to use black theming */
-[class*="DatePicker-module_hds-datepicker__"]
-  [class*="Button-module_supplementary__"] {
+[class*="DatePicker-module_hds-datepicker__"] [class*="Button-module_supplementary__"] {
   --color: var(--color-black);
 }
 
