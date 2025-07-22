@@ -55,6 +55,7 @@ export function Sanitize({ html }: Props): JSX.Element | null {
 
   return (
     <StyledContent
+      /* oxlint-disable-next-line react/no-danger */
       dangerouslySetInnerHTML={{
         __html: sanitizeHtml(html, config),
       }}
