@@ -1,2 +1,2 @@
-import config from "eslint-config-custom/prettier.mjs";
+import config from "prettier-config/prettier.mjs";
 export default config;
