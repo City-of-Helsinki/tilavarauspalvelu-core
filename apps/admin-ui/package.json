@@ -11,6 +11,7 @@
     "lint": "oxlint . -c ../../.oxlintrc.json",
     "lint:fix": "oxlint . --fix -c ../../.oxlintrc.json",
     "lint:css": "stylelint './src/**/*.tsx'",
+    "format:check": "prettier --ignore-path \"../../.prettierignore\" --check --experimental-cli .",
     "format": "prettier --ignore-path \"../../.prettierignore\" --write --experimental-cli .",
     "test": "SKIP_ENV_VALIDATION=true TZ=Europe/Helsinki vitest",
     "tsc:check": "tsc --noEmit --project tsconfig.json",

@@ -14,6 +14,7 @@
     "lint:css": "stylelint '**/*.tsx'",
     "tsc:check": "tsc --noEmit --project tsconfig.json",
     "tsc:clean": "tsc --build --clean",
+    "format:check": "prettier --ignore-path \"../../.prettierignore\" --check --experimental-cli .",
     "format": "prettier --ignore-path \"../../.prettierignore\" --write --experimental-cli ."
   },
   "dependencies": {
