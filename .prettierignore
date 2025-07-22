@@ -5,6 +5,7 @@ docker-compose.yml
 
 # auto gen
 tilavaraus.graphql
+**/gql/gql-types.ts
 
 pnpm-lock.yaml
 

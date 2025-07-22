@@ -16,6 +16,7 @@
     "lint:fix": "turbo lint -- --fix",
     "lint:css": "turbo lint:css",
     "format": "turbo format",
+    "format:check": "turbo format:check",
     "test": "turbo test",
     "tsc:check": "turbo tsc:check",
     "tsc:clean": "turbo tsc:clean",

@@ -16,6 +16,9 @@
     "format": {
       "cache": false
     },
+    "format:check": {
+      "cache": false
+    },
     "test": {
       "env": ["SKIP_ENV_VALIDATION"],
       "inputs": ["**/*.tsx", "**/*.ts", "test/**/*.ts", "test/**/*.tsx"]
