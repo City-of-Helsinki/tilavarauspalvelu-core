@@ -8,7 +8,7 @@ import {
   useRepairReservationAccessCodeSingleMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { successToast } from "common/src/common/toast";
+import { successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
 import { Button, ButtonSize, IconAlertCircleFill, IconRefresh, Tooltip } from "hds-react";
 import { formatDate, formatTime } from "@/common/util";

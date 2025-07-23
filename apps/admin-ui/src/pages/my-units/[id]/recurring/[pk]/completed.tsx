@@ -6,7 +6,7 @@ import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { getReservationUrl } from "@/common/urls";
 import { Flex, H1 } from "common/styled";
 import { useReservationSeries } from "@/hooks";
-import { AuthorizationChecker } from "@/common/AuthorizationChecker";
+import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { UserPermissionChoice } from "@gql/gql-types";
 import { useRouter } from "next/router";
 import { ignoreMaybeArray, toNumber } from "common/src/helpers";

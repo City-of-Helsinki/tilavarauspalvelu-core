@@ -39,7 +39,7 @@ import { valueForDateInput, valueForTimeInput, dateTime, constructDateTimeSafe }
 import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { ControlledDateInput } from "common/src/components/form";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
-import { successToast } from "common/src/common/toast";
+import { successToast } from "common/src/components/toast";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
 import { CenterSpinner, Flex, TitleSection, H1 } from "common/styled";
@@ -47,7 +47,7 @@ import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { AuthorizationChecker } from "@/common/AuthorizationChecker";
+import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";

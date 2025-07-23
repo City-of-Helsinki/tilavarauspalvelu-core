@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { isApplicationRoundInProgress } from "@/helpers";
 import { CenterSpinner, Flex, H1, NoWrap, TabWrapper, TitleSection } from "common/styled";
@@ -33,7 +33,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
-import { Error404 } from "@/common/Error404";
+import { Error404 } from "@/component/Error404";
 import { createClient } from "@/common/apolloClient";
 import { TimeframeStatus, ApplicationRoundStatusLabel } from "@lib/application-rounds";
 import {

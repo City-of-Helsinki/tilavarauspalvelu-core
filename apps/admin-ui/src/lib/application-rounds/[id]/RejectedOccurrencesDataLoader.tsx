@@ -1,4 +1,4 @@
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { useSort } from "@/hooks/useSort";
 import { RejectedOccurrencesTable, SORT_KEYS } from "./RejectedOccurrencesTable";
 import { type ApolloError, gql } from "@apollo/client";

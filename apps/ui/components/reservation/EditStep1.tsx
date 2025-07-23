@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { filterNonNullable } from "common/src/helpers";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { ApplicationFields, GeneralFields } from "./SummaryFields";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { ReservationInfoCard } from "./ReservationInfoCard";

@@ -1,5 +1,5 @@
 import { type ApiError, getApiErrors } from "../apolloUtils";
-import { errorToast } from "../common/toast";
+import { errorToast } from "../components/toast";
 import { type TFunction, useTranslation } from "next-i18next";
 
 /// formatErrorMessage

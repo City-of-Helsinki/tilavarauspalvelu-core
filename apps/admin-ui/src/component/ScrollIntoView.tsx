@@ -5,7 +5,7 @@ interface Props {
   children: JSX.Element;
 }
 
-const ScrollIntoView = ({ hash, children }: Props): JSX.Element => {
+export function ScrollIntoView({ hash, children }: Props): JSX.Element {
   const selfRef = useRef<HTMLDivElement | null>(null);
 
   const isMatch = hash === document.location.hash?.substring(1);
@@ -24,6 +24,4 @@ const ScrollIntoView = ({ hash, children }: Props): JSX.Element => {
   ) : (
     children
   );
-};
-
-export default ScrollIntoView;
+}

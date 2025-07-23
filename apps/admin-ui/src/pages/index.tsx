@@ -7,7 +7,7 @@ import { H2 } from "common/styled";
 import { HERO_IMAGE_URL } from "@/common/const";
 import { KorosHeading, Heading } from "@/component/KorosHeading";
 import { useSession } from "@/hooks/auth";
-import { AuthorizationChecker } from "@/common/AuthorizationChecker";
+import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 const Ingress = styled(H2)`

@@ -8,7 +8,7 @@ import {
   useUpdateReservationSeriesMutation,
   useUpdateStaffReservationMutation,
 } from "@gql/gql-types";
-import { successToast } from "common/src/common/toast";
+import { successToast } from "common/src/components/toast";
 import { ApolloError, gql } from "@apollo/client";
 import { useDisplayError } from "common/src/hooks";
 

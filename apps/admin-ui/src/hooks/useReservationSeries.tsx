@@ -1,6 +1,6 @@
 import { useTranslation } from "next-i18next";
 import { type Maybe, useReservationSeriesQuery } from "@gql/gql-types";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { gql } from "@apollo/client";
 

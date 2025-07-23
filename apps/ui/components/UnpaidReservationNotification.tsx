@@ -17,7 +17,7 @@ import { getCheckoutUrl } from "@/modules/reservation";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { gql, useApolloClient } from "@apollo/client";
 import { convertLanguageCode, toApiDate } from "common/src/common/util";
-import { errorToast, successToast } from "common/src/common/toast";
+import { errorToast, successToast } from "common/src/components/toast";
 import { getReservationInProgressPath } from "@/modules/urls";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { Flex } from "common/styled";
