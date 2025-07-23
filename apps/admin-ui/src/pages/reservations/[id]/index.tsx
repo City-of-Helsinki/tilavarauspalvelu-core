@@ -6,11 +6,15 @@ import {
   type ReservationPageQuery,
   ReservationStateChoice,
   useReservationCancelReasonsQuery,
-  useReservationPageQuery,
   UserPermissionChoice,
+  CheckPermissionsDocument,
+  type CheckPermissionsQuery,
+  type CheckPermissionsQueryVariables,
+  ReservationPageDocument,
+  useReservationPageLazyQuery,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { ButtonContainer, CenterSpinner } from "common/styled";
+import { ButtonContainer } from "common/styled";
 import { ShowWhenTargetInvisible } from "@/component/ShowWhenTargetInvisible";
 import { StickyHeader } from "@/component/StickyHeader";
 import { ReservationWorkingMemo } from "@/component/WorkingMemo";
@@ -34,13 +38,13 @@ import {
 import { Accordion, ApplicationDatas, Summary } from "@/styled";
 import { base64encode, ignoreMaybeArray, isPriceFree, toNumber } from "common/src/helpers";
 import { formatAgeGroup } from "@/common/util";
-import Error404 from "@/common/Error404";
 import { toUIDateTime } from "common/src/common/util";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { AuthorizationChecker } from "@/common/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
+import { createClient } from "@/common/apolloClient";
 
 type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
@@ -342,62 +346,61 @@ function RequestedReservation({
   );
 }
 
-function PageInner({ pk }: { pk?: number }): JSX.Element {
-  const id = base64encode(`ReservationNode:${pk}`);
-  const { data, loading, refetch, error } = useReservationPageQuery({
+type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
+export default function Page({ reservation, apiBaseUrl }: PropsNarrowed): JSX.Element {
+  const id = base64encode(`ReservationNode:${reservation.pk ?? 0}`);
+  const [_fetch, query] = useReservationPageLazyQuery({
     // NOTE have to be no-cache because we have some key collisions (tag line disappears if cached)
     fetchPolicy: "no-cache",
     variables: { id },
   });
 
-  const { reservation } = data ?? {};
+  const reservationRefreshed = query.data?.reservation ?? reservation;
 
-  // Loader check first
-  if (loading && reservation == null) {
-    return <CenterSpinner />;
-  }
-
-  // NOTE incorrect ids don't return an error (they return a null)
-  if (error != null || reservation == null) {
-    return <Error404 />;
-  }
-
-  return <RequestedReservation reservation={reservation} refetch={refetch} />;
-  /* FIXME move to a hook / SSR
-  (
-    <VisibleIfPermission
-      permission={UserPermissionChoice.CanViewReservations}
-      reservation={reservation}
-      otherwise={
-        <div>
-          <p>{t("errors:noPermission")}</p>
-        </div>
-      }
-    >
-    // </VisibleIfPermission>
-  );
-      */
-}
-
-type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page(props: PropsNarrowed): JSX.Element {
   return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl}>
-      <PageInner pk={props.pk} />
+    // TODO authorization checker (without params) should be in the middleware
+    <AuthorizationChecker apiUrl={apiBaseUrl}>
+      <RequestedReservation reservation={reservationRefreshed} refetch={query.refetch} />
     </AuthorizationChecker>
   );
 }
 
-export async function getServerSideProps({ locale, query }: GetServerSidePropsContext) {
+export async function getServerSideProps({ locale, query, req }: GetServerSidePropsContext) {
   const pk = toNumber(ignoreMaybeArray(query.id));
   if (pk == null || pk <= 0) {
     return NOT_FOUND_SSR_VALUE;
   }
+
+  const commonProps = await getCommonServerSideProps();
+  const apolloClient = createClient(commonProps.apiBaseUrl, req);
+  const reservationPageQuery = await apolloClient.query<ReservationPageQuery>({
+    query: ReservationPageDocument,
+    variables: { id: base64encode(`ReservationNode:${pk}`) },
+  });
+
+  const reservation = reservationPageQuery.data.reservation;
+  const unit = reservation?.reservationUnit?.unit?.pk ?? null;
+  if (reservation == null || unit == null) {
+    return NOT_FOUND_SSR_VALUE;
+  }
+  const permissionQuery = await apolloClient.query<CheckPermissionsQuery, CheckPermissionsQueryVariables>({
+    query: CheckPermissionsDocument,
+    variables: {
+      permission: UserPermissionChoice.CanViewReservations,
+      units: [unit],
+    },
+  });
+
+  // TODO should return 403 instead of 404
+  if (!permissionQuery.data.checkPermissions?.hasPermission) {
+    return NOT_FOUND_SSR_VALUE;
+  }
+
   return {
     props: {
-      pk,
-      ...(await getCommonServerSideProps()),
+      reservation,
+      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
