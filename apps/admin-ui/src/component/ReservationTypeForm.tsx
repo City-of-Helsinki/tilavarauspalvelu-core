@@ -10,7 +10,7 @@ import {
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { type ReservationFormType, ReservationTypes } from "@/schemas";
-import { ShowAllContainer } from "common/src/components/";
+import { ShowAllContainer } from "common/src/components";
 import { ReservationMetadataSetForm, ReserverMetadataSetForm } from "./MetadataSetForm";
 import { BufferToggles } from "./BufferToggles";
 import ShowTOS from "./ShowTOS";

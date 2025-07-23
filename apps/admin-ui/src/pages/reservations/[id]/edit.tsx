@@ -26,7 +26,7 @@ import { GetServerSidePropsContext } from "next";
 import { ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
-import Error403 from "@/common/Error403";
+import { Error403 } from "@/common/Error403";
 import { useCheckReservationPermissions } from "@/hooks/useCheckReservationPermissions";
 
 type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;
