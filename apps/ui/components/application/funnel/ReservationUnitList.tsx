@@ -20,17 +20,16 @@ import { ErrorText } from "common/src/components/ErrorText";
 import { OrderedReservationUnitCard, ReservationUnitModalContent } from ".";
 import { useSearchParams } from "next/navigation";
 import { useSearchModify } from "@/hooks/useSearchValues";
-import { type OptionsT } from "@/modules/search";
+import { type OptionsListT } from "common/src/modules/search";
 import { FixedDialog } from "@/styled/FixedDialog";
 
 type ReservationUnitType = Pick<OrderedReservationUnitCardFragment, "pk">;
-export type OptionType = Readonly<{ value: number; label: string }>;
 
 export interface ReservationUnitListProps<T extends FieldValues> extends UseControllerProps<T> {
   name: Path<T>;
   control: Control<T>;
   applicationRound: Readonly<ApplicationReservationUnitListFragment>;
-  options: Readonly<OptionsT>;
+  options: Readonly<OptionsListT>;
   minSize?: number;
   error?: string;
 }

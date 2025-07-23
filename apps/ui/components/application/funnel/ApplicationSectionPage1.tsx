@@ -13,13 +13,13 @@ import { Accordion } from "@/components/Accordion";
 import { getDurationOptions } from "@/modules/const";
 import { type ApplicationPage1FormValues } from "./form";
 import { ApplicationSectionSummary, ReservationUnitList } from ".";
-import { type OptionsT } from "@/modules/search";
+import { type OptionsListT } from "common/src/modules/search";
 import { startOfDay } from "date-fns/startOfDay";
 
 type Props = Readonly<{
   index: number;
   applicationRound: ApplicationRoundForApplicationFragment;
-  options: Readonly<OptionsT>;
+  options: Readonly<OptionsListT>;
   onDeleteEvent: () => void;
 }>;
 

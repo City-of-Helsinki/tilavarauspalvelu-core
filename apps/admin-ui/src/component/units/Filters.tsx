@@ -3,19 +3,27 @@ import { AutoGrid } from "common/styled";
 import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
 import { SearchTags } from "@/component/SearchTags";
 import { useUnitGroupOptions } from "@/hooks/useUnitGroupOptions";
+import { translateTag, type TagOptionsList } from "@/modules/search";
+import { useTranslation } from "next-i18next";
 
 export function Filters(): JSX.Element {
+  const { t } = useTranslation();
   const { options: unitGroupOptions } = useUnitGroupOptions();
 
-  const translateTag = (key: string, value: string) => {
-    switch (key) {
-      case "search":
-        return value;
-      case "unitGroup":
-        return unitGroupOptions.find((option) => value === String(option.value))?.label ?? value;
-      default:
-        return "";
-    }
+  const options: TagOptionsList = {
+    unitGroups: unitGroupOptions,
+    // Not needed on this page
+    orderChoices: [],
+    priorityChoices: [],
+    reservationUnitStates: [],
+    reservationUnitTypes: [],
+    units: [],
+    stateChoices: [],
+    reservationUnits: [],
+    equipments: [],
+    purposes: [],
+    ageGroups: [],
+    municipalities: [],
   };
 
   return (
@@ -24,7 +32,7 @@ export function Filters(): JSX.Element {
         <SearchFilter name="search" labelKey="unit" />
         <MultiSelectFilter name="unitGroup" options={unitGroupOptions} />
       </AutoGrid>
-      <SearchTags hide={[]} translateTag={translateTag} />
+      <SearchTags hide={[]} translateTag={translateTag(t, options)} />
     </>
   );
 }
