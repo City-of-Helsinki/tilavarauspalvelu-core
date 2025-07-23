@@ -1,5 +1,6 @@
 import styled from "styled-components";
-import { NumberFilter } from "./NumberFilter";
+import { ControlledNumberFilter } from "./NumberFilter";
+import { type Control, type FieldValues, type Path, type UseControllerProps } from "react-hook-form";
 
 const RangeContrainer = styled.div`
   display: grid;
@@ -7,16 +8,39 @@ const RangeContrainer = styled.div`
   text-align: center;
 `;
 
-export function RangeNumberFilter({ label, minName, maxName }: { label: string; minName: string; maxName: string }) {
-  // TODO add a proper label to it (don't use div, and hide it for screen readers)
-  // TODO hide the actual input label (using sr-only or height 0)
+interface RangeNumberFilterProps {
+  label: string;
+  minName: string;
+  maxName: string;
+}
+
+function RangeWrapper({ label, children }: { label: string; children: React.ReactNode }): JSX.Element {
   return (
     <div>
       <div>{label}</div>
-      <RangeContrainer>
-        <NumberFilter name={minName} />
-        <NumberFilter name={maxName} />
-      </RangeContrainer>
+      <RangeContrainer>{children}</RangeContrainer>
     </div>
+  );
+}
+
+interface ControlledRangeNumberFilterProps<T extends FieldValues>
+  extends Omit<UseControllerProps<T>, "name">,
+    Omit<RangeNumberFilterProps, "minName" | "maxName"> {
+  minName: Path<T>;
+  maxName: Path<T>;
+  control: Control<T>;
+}
+
+export function ControlledRangeNumberFilter<T extends FieldValues>({
+  label,
+  minName,
+  maxName,
+  control,
+}: ControlledRangeNumberFilterProps<T>): JSX.Element {
+  return (
+    <RangeWrapper label={label}>
+      <ControlledNumberFilter name={minName} control={control} />
+      <ControlledNumberFilter name={maxName} control={control} />
+    </RangeWrapper>
   );
 }
