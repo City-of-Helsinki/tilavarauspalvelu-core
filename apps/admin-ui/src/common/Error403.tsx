@@ -1,9 +1,9 @@
 import React from "react";
 import { PUBLIC_URL } from "./const";
 import { env } from "@/env.mjs";
-import ErrorContainer from "common/src/components/ErrorContainer";
+import { ErrorContainer } from "common/src/components";
 
-const Error403 = (): JSX.Element => {
+export function Error403(): JSX.Element {
   return (
     <ErrorContainer
       statusCode={403}
@@ -11,6 +11,4 @@ const Error403 = (): JSX.Element => {
       imgSrc={`${PUBLIC_URL}/images/403-error.png`}
     />
   );
-};
-
-export default Error403;
+}
