@@ -32,7 +32,7 @@ import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { base64encode, toNumber } from "common/src/helpers";
-import { successToast } from "common/src/common/toast";
+import { successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
 import { SelectFilter } from "@/component/QueryParamFilters";
 import { FixedDialog } from "@/styled/FixedDialog";

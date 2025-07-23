@@ -28,7 +28,7 @@ import { WeekdaysSelector } from "@/component/WeekdaysSelector";
 import { ReservationListEditor } from "@/component/ReservationListEditor";
 import { useFilteredReservationList, useMultipleReservation } from "@/hooks";
 import { RescheduleReservationSeriesForm, RescheduleReservationSeriesFormSchema } from "@/schemas";
-import { errorToast, successToast } from "common/src/common/toast";
+import { errorToast, successToast } from "common/src/components/toast";
 import { fromAPIDateTime, getBufferTime } from "@/helpers";
 import { BufferToggles } from "@/component/BufferToggles";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
@@ -36,7 +36,8 @@ import { getReservationUrl } from "@/common/urls";
 import { getSeriesOverlapErrors } from "common/src/apolloUtils";
 import { useDisplayError } from "common/src/hooks";
 import { generateReservations } from "@/modules/generateReservations";
-import { Error404 } from "@/common/Error404";
+import { Error404 } from "@/component/Error404";
+import { Error403 } from "@/component/Error403";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -44,7 +45,6 @@ import { type GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { hasPermission } from "@/modules/permissionHelper";
 import { useSession } from "@/hooks/auth";
-import { Error403 } from "@/common/Error403";
 
 type NodeT = NonNullable<SeriesPageQuery["reservation"]>["reservationSeries"];
 

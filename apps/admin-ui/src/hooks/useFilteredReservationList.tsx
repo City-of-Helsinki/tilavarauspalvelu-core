@@ -11,7 +11,7 @@ import {
 import { type NewReservationListItem } from "@/component/ReservationsList";
 import { base64encode, timeToMinutes } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { useTranslation } from "next-i18next";
 
 function useReservationsInInterval({

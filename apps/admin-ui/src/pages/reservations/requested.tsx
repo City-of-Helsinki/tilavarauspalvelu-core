@@ -7,7 +7,7 @@ import { toUIDate } from "common/src/common/util";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { AuthorizationChecker } from "@/common/AuthorizationChecker";
+import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 

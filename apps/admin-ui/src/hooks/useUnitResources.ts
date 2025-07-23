@@ -2,7 +2,7 @@ import { ReservationTypeChoice, useReservationUnitsByUnitQuery } from "@gql/gql-
 import { toApiDate } from "common/src/common/util";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 

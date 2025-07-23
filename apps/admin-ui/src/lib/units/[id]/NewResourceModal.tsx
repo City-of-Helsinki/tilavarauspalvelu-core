@@ -8,7 +8,7 @@ import {
   useCreateResourceMutation,
 } from "@gql/gql-types";
 import { Editor, ResourceUpdateForm, ResourceUpdateSchema } from "./modules/resourceEditor";
-import { FormErrorSummary } from "@/common/FormErrorSummary";
+import { FormErrorSummary } from "@/component/FormErrorSummary";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ResourceEditorFields } from "./ResourceEditForm";
