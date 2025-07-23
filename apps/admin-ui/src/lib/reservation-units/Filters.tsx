@@ -8,6 +8,7 @@ import { MultiSelectFilter, SearchFilter, RangeNumberFilter } from "@/component/
 import { SearchTags } from "@/component/SearchTags";
 import { useUnitGroupOptions } from "@/hooks/useUnitGroupOptions";
 import { Flex } from "common/styled";
+import { type TagOptionsList, translateTag } from "@/modules/search";
 
 const MoreWrapper = styled(ShowAllContainer)`
   .ShowAllContainer__ToggleButton {
@@ -32,36 +33,21 @@ export function Filters(): JSX.Element {
   const { options: reservationUnitTypeOptions } = useReservationUnitTypes();
   const { options: unitGroupOptions } = useUnitGroupOptions();
 
-  function translateTag(tag: string, val: string): string {
-    switch (tag) {
-      case "unit":
-        return unitOptions.find((u) => u.value === Number(val))?.label || val;
-      case "unitGroup":
-        return unitGroupOptions.find((u) => u.value === Number(val))?.label || val;
-      case "reservationUnitType":
-        return reservationUnitTypeOptions.find((u) => u.value === Number(val))?.label || val;
-      case "reservationUnitState":
-        return reservationUnitStateOptions.find((u) => u.value === val)?.label || val;
-      case "maxPersonsGte":
-        return t("filters:tag.maxPersonsGte", {
-          value: val,
-        });
-      case "maxPersonsLte":
-        return t("filters:tag.maxPersonsLte", {
-          value: val,
-        });
-      case "surfaceAreaGte":
-        return t("filters:tag.surfaceAreaGte", {
-          value: val,
-        });
-      case "surfaceAreaLte":
-        return t("filters:tag.surfaceAreaLte", {
-          value: val,
-        });
-      default:
-        return val;
-    }
-  }
+  const options: TagOptionsList = {
+    reservationUnitTypes: reservationUnitTypeOptions,
+    units: unitOptions,
+    unitGroups: unitGroupOptions,
+    reservationUnitStates: reservationUnitStateOptions,
+    // Not needed on this page
+    orderChoices: [],
+    priorityChoices: [],
+    stateChoices: [],
+    reservationUnits: [],
+    equipments: [],
+    purposes: [],
+    ageGroups: [],
+    municipalities: [],
+  };
 
   return (
     <Flex $gap="2-xs">
@@ -73,7 +59,7 @@ export function Filters(): JSX.Element {
         <RangeNumberFilter label={t("filters:label.maxPersons")} minName="maxPersonsGte" maxName="maxPersonsLte" />
         <RangeNumberFilter label={t("filters:label.surfaceArea")} minName="surfaceAreaGte" maxName="surfaceAreaLte" />
       </MoreWrapper>
-      <SearchTags hide={[]} translateTag={translateTag} />
+      <SearchTags hide={[]} translateTag={translateTag(t, options)} />
     </Flex>
   );
 }

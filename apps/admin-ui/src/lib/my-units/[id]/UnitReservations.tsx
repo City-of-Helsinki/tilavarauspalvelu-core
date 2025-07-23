@@ -15,6 +15,7 @@ import { MultiSelectFilter } from "@/component/QueryParamFilters";
 import { DayNavigation } from "@/component/QueryParamFilters/DayNavigation";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
+import { type TagOptionsList, translateTag } from "@/modules/search";
 
 const LegendContainer = styled.div`
   max-width: 100%;
@@ -75,13 +76,20 @@ export function UnitReservations({
 
   const { options: reservationUnitTypeOptions } = useReservationUnitTypes();
 
-  const translateTag = (key: string, value: string) => {
-    switch (key) {
-      case "reservationUnitType":
-        return reservationUnitTypeOptions.find((u) => u.value === Number(value))?.label ?? "";
-      default:
-        return "";
-    }
+  const options: TagOptionsList = {
+    reservationUnitTypes: reservationUnitTypeOptions,
+    // Not needed on this page
+    orderChoices: [],
+    priorityChoices: [],
+    reservationUnitStates: [],
+    unitGroups: [],
+    units: [],
+    stateChoices: [],
+    reservationUnits: [],
+    equipments: [],
+    purposes: [],
+    ageGroups: [],
+    municipalities: [],
   };
 
   const searchParams = useSearchParams();
@@ -108,7 +116,7 @@ export function UnitReservations({
           options={reservationUnitTypeOptions}
         />
       </AutoGrid>
-      <SearchTags hide={["date", "tab", "reservationUnit"]} translateTag={translateTag} />
+      <SearchTags hide={["date", "tab", "reservationUnit"]} translateTag={translateTag(t, options)} />
       <HR />
       <Flex $gap="none" $direction="row" $justifyContent="space-between" $alignItems="center">
         <Button

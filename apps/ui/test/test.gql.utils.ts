@@ -1,7 +1,8 @@
 import { MunicipalityChoice, type OptionsQuery, type ReservationUnitTypeNode } from "@/gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { type DocumentNode } from "graphql";
-import { translateOption, type OptionsT } from "@/modules/search";
+import { translateOption } from "@/modules/search";
+import { type OptionsListT } from "common/src/modules/search";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface ICreateGraphQLMock {}
@@ -28,7 +29,7 @@ export function createOptionMock(
   props: {
     nCount?: number;
   } = {}
-): OptionsT {
+): OptionsListT {
   const opts = createOptionQueryMock(props);
   const lang = "fi" as const;
   return {
