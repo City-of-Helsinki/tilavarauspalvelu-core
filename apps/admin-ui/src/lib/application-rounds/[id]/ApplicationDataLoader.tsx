@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { ApplicationOrderingChoices, useApplicationsQuery } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE } from "@/common/const";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
 import { ApplicationsTable, SORT_KEYS } from "./ApplicationsTable";

@@ -1,5 +1,5 @@
 import { ReservationTypeChoice, useReservationsByReservationUnitQuery } from "@gql/gql-types";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { combineAffectingReservations, doesIntervalCollide, reservationToInterval } from "@/helpers";
 import { base64encode } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";

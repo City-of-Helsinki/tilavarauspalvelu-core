@@ -34,7 +34,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
 import { base64encode, filterNonNullable, toNumber } from "common/src/helpers";
 import { containsField } from "common/src/metaFieldsHelpers";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { getGeneralFields } from "@/components/reservation/SummaryFields";
 import { queryOptions } from "@/modules/queryOptions";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";

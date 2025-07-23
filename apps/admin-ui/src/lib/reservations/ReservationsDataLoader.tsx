@@ -11,7 +11,7 @@ import { ReservationsTable } from "./ReservationsTable";
 import { fromUIDate, toApiDate } from "common/src/common/util";
 import { filterNonNullable, toNumber } from "common/src/helpers";
 import { transformPaymentStatus, transformReservationState, transformReservationType } from "common/src/conversion";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { CenterSpinner } from "common/styled";
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";

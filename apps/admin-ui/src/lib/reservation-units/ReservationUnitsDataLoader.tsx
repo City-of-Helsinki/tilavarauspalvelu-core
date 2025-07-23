@@ -5,7 +5,7 @@ import { filterNonNullable, toNumber } from "common/src/helpers";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { More } from "@/component/More";
 import { ReservationUnitsTable } from "./ReservationUnitsTable";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { CenterSpinner } from "common/styled";
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";

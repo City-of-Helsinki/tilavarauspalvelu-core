@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import { Button, ButtonVariant, Dialog, IconInfoCircle } from "hds-react";
 import { type ReservationNode, useRequireHandlingMutation } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { successToast } from "common/src/common/toast";
+import { successToast } from "common/src/components/toast";
 import { gql } from "@apollo/client";
 import { useDisplayError } from "common/src/hooks";
 

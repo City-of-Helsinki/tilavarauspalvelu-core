@@ -5,7 +5,7 @@ import { H1 } from "common/styled";
 import { Filters, ReservationsDataLoader } from "@lib/reservations";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useSearchParams } from "next/navigation";
-import { AuthorizationChecker } from "@/common/AuthorizationChecker";
+import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";

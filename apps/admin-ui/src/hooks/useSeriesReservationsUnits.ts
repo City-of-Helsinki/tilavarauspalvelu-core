@@ -1,6 +1,6 @@
 import { useSeriesReservationUnitQuery } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 

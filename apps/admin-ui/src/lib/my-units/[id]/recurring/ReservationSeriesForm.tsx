@@ -25,7 +25,7 @@ import { ControlledDateInput } from "common/src/components/form";
 import { base64encode, toNumber } from "common/src/helpers";
 import { Element } from "@/styled";
 import { AutoGrid, Flex, Strong } from "common/styled";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { useDisplayError } from "common/src/hooks";
 import { getSeriesOverlapErrors } from "common/src/apolloUtils";
