@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Select, Tabs } from "hds-react";
+import { Tabs } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { uniqBy } from "lodash-es";
 import styled from "styled-components";
@@ -17,20 +17,17 @@ import {
   useApplicationSectionAllocationsQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import {
-  base64encode,
-  convertOptionToHDS,
-  filterNonNullable,
-  ignoreMaybeArray,
-  sort,
-  toNumber,
-} from "common/src/helpers";
+import { base64encode, filterNonNullable, ignoreMaybeArray, sort, toNumber } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
 import { useOptions } from "@/hooks";
 import { errorToast } from "common/src/components/toast";
 import { ALLOCATION_POLL_INTERVAL, NOT_FOUND_SSR_VALUE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { truncate } from "@/helpers";
-import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
+import {
+  ControlledMultiSelectFilter,
+  ControlledSearchFilter,
+  ControlledSelectFilter,
+} from "@/component/QueryParamFilters";
 import { AllocationPageContent, convertPriorityFilter } from "@lib/application-rounds/[id]/allocation";
 import { LinkPrev } from "@/component/LinkPrev";
 import { useSession } from "@/hooks/auth";
@@ -43,6 +40,8 @@ import { type GetServerSidePropsContext } from "next";
 import { Error403 } from "@/component/Error403";
 import { createClient } from "@/common/apolloClient";
 import { type TagOptionsList, translateTag } from "@/modules/search";
+import { useForm } from "react-hook-form";
+import { SearchButton, SearchButtonContainer } from "@/component/SearchButton";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;
 
@@ -91,13 +90,11 @@ const transformApplicantType = (value: string | null) => {
     return null;
   }
   switch (value) {
-    case "Individual":
+    case ReserveeType.Individual:
       return ReserveeType.Individual;
-    case "Community":
+    case ReserveeType.Nonprofit:
       return ReserveeType.Nonprofit;
-    case "Association":
-      return ReserveeType.Nonprofit;
-    case "Company":
+    case ReserveeType.Company:
       return ReserveeType.Company;
   }
   return null;
@@ -108,9 +105,9 @@ const transformMunicipality = (value: string | null) => {
     return null;
   }
   switch (value) {
-    case "Helsinki":
+    case MunicipalityChoice.Helsinki:
       return MunicipalityChoice.Helsinki;
-    case "Other":
+    case MunicipalityChoice.Other:
       return MunicipalityChoice.Other;
   }
   return null;
@@ -119,6 +116,171 @@ const transformMunicipality = (value: string | null) => {
 type ApplicationRoundFilterQueryType = NonNullable<ApplicationRoundFilterQuery["applicationRound"]>;
 type ReservationUnitFilterQueryType = NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0];
 type UnitFilterQueryType = NonNullable<ReservationUnitFilterQueryType>["unit"];
+
+type SearchFormValues = {
+  unit: number;
+  // TODO replace with Priority
+  priority: number[];
+  order: number[];
+  search: string;
+  municipality: MunicipalityChoice[];
+  applicantType: ReserveeType[];
+  ageGroup: number[];
+  purpose: number[];
+};
+
+function mapFormToSearchParams(values: SearchFormValues): URLSearchParams {
+  const params = new URLSearchParams();
+  if (values.search) {
+    params.set("search", values.search);
+  }
+  if (values.unit) {
+    params.set("unit", values.unit.toString());
+  }
+  if (values.priority.length > 0) {
+    values.priority.forEach((p) => params.append("priority", p.toString()));
+  }
+  if (values.order.length > 0) {
+    values.order.forEach((o) => params.append("order", o.toString()));
+  }
+  if (values.municipality.length > 0) {
+    values.municipality.forEach((m) => params.append("municipality", m));
+  }
+  if (values.applicantType.length > 0) {
+    values.applicantType.forEach((a) => params.append("applicantType", a));
+  }
+  if (values.ageGroup.length > 0) {
+    values.ageGroup.forEach((a) => params.append("ageGroup", a.toString()));
+  }
+  if (values.purpose.length > 0) {
+    values.purpose.forEach((p) => params.append("purpose", p.toString()));
+  }
+  return params;
+}
+
+// TODO cleanup these by using a generic conversion / sanitize function
+// we can reuse the same for the search params -> gql query variables
+function mapParamsToForm(params: URLSearchParams, units: UnitFilterQueryType[]): SearchFormValues {
+  const unitFilter = toNumber(params.get("unit"));
+  const nameFilter = params.get("search");
+  const applicantTypeFilter = params.getAll("applicantType");
+  const priorityFilter = params.getAll("priority");
+  const orderFilter = params.getAll("order");
+  const ageGroupFilter = params.getAll("ageGroup");
+  const municipalityFilter = params.getAll("municipality");
+  const purposeFilter = params.getAll("purpose");
+
+  const municipalityFilterQuery = filterNonNullable(municipalityFilter.map((x) => transformMunicipality(x)));
+  const applicantTypeFilterQuery = filterNonNullable(applicantTypeFilter.map((x) => transformApplicantType(x)));
+  return {
+    unit: unitFilter ?? (units.length > 0 ? (units[0]?.pk ?? 0) : 0),
+    priority: filterNonNullable(priorityFilter.map(toNumber)),
+    order: filterNonNullable(orderFilter.map(toNumber)),
+    search: nameFilter ?? "",
+    municipality: municipalityFilterQuery,
+    applicantType: applicantTypeFilterQuery,
+    ageGroup: filterNonNullable(ageGroupFilter.map(toNumber)),
+    purpose: filterNonNullable(purposeFilter.map(toNumber)),
+  };
+}
+
+interface FilterProps {
+  hideSearchTags: string[];
+  units: UnitFilterQueryType[];
+  isLoading?: boolean;
+}
+function Filters({ hideSearchTags, units, isLoading }: FilterProps): JSX.Element {
+  const { t } = useTranslation();
+  const setSearchParams = useSetSearchParams();
+  const searchParams = useSearchParams();
+
+  const optionsQuery = useOptions();
+  const purposeOptions = optionsQuery.purpose;
+  const ageGroupOptions = optionsQuery.ageGroup;
+
+  const defaultValues: SearchFormValues = mapParamsToForm(searchParams, units);
+  const form = useForm<SearchFormValues>({
+    defaultValues,
+  });
+  const { handleSubmit, control, reset } = form;
+  useEffect(() => {
+    const newValues = mapParamsToForm(searchParams, units);
+    reset(newValues);
+  }, [reset, searchParams, units]);
+
+  const onSubmit = (values: SearchFormValues) => {
+    const searchParams = mapFormToSearchParams(values);
+    setSearchParams(searchParams);
+  };
+
+  const municipalityOptions = Object.values(MunicipalityChoice).map((value) => ({
+    label: t(`common:municipalities.${value}`),
+    value: value,
+  }));
+  const customerFilterOptions = Object.values(ReserveeType).map((value) => ({
+    label: t(`translation:reserveeType.${value}`),
+    value: value,
+  }));
+  const unitOptions = units.map((unit) => ({
+    value: unit?.pk ?? 0,
+    label: unit?.nameFi ?? "",
+  }));
+  const priorityOptions = ([300, 200] as const).map((n) => ({
+    value: n,
+    label: t(`applicationSection:priority.${n}`),
+  }));
+
+  const orderOptions = Array.from(Array(10).keys())
+    .map((n) => ({
+      value: n,
+      label: `${n + 1}. ${t("filters:reservationUnitApplication")}`,
+    }))
+    .concat([
+      {
+        value: 11,
+        label: t("filters:reservationUnitApplicationOthers"),
+      },
+    ]);
+
+  const options: TagOptionsList = {
+    orderChoices: orderOptions,
+    priorityChoices: priorityOptions,
+    units: unitOptions,
+    municipalities: municipalityOptions,
+    ageGroups: ageGroupOptions,
+    purposes: purposeOptions,
+    // Not needed on this page
+    reservationUnits: [],
+    unitGroups: [],
+    reservationUnitStates: [],
+    reservationUnitTypes: [],
+    stateChoices: [],
+    equipments: [],
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} noValidate>
+      <ShowAllContainer
+        showAllLabel={t("filters:moreFilters")}
+        showLessLabel={t("filters:lessFilters")}
+        maximumNumber={4}
+      >
+        <ControlledSelectFilter control={control} name="unit" options={unitOptions} />
+        <ControlledMultiSelectFilter control={control} name="priority" options={priorityOptions} />
+        <ControlledMultiSelectFilter control={control} name="order" options={orderOptions} />
+        <ControlledSearchFilter control={control} name="search" />
+        <ControlledMultiSelectFilter control={control} name="municipality" options={municipalityOptions} />
+        <ControlledMultiSelectFilter control={control} name="applicantType" options={customerFilterOptions} />
+        <ControlledMultiSelectFilter control={control} name="ageGroup" options={ageGroupOptions} />
+        <ControlledMultiSelectFilter control={control} name="purpose" options={purposeOptions} />
+      </ShowAllContainer>
+      <SearchButtonContainer>
+        <SearchTags hide={hideSearchTags} translateTag={translateTag(t, options)} />
+        <SearchButton isLoading={isLoading} />
+      </SearchButtonContainer>
+    </form>
+  );
+}
 
 function ApplicationRoundAllocation({
   applicationRound,
@@ -136,10 +298,6 @@ function ApplicationRoundAllocation({
   applicationRoundStatus: ApplicationRoundStatusChoice;
 }): JSX.Element {
   const { t } = useTranslation();
-
-  const optionsQuery = useOptions();
-  const purposeOptions = optionsQuery.purpose;
-  const ageGroupOptions = optionsQuery.ageGroup;
 
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
@@ -306,23 +464,6 @@ function ApplicationRoundAllocation({
       return section;
     });
 
-  const priorityOptions = ([300, 200] as const).map((n) => ({
-    value: n,
-    label: t(`applicationSection:priority.${n}`),
-  }));
-
-  const orderOptions = Array.from(Array(10).keys())
-    .map((n) => ({
-      value: n,
-      label: `${n + 1}. ${t("filters:reservationUnitApplication")}`,
-    }))
-    .concat([
-      {
-        value: 11,
-        label: t("filters:reservationUnitApplicationOthers"),
-      },
-    ]);
-
   const hideSearchTags = ["unit", "reservation-unit", "aes", "selectionBegin", "selectionEnd", "allocated"];
 
   const handleResetFilters = () => {
@@ -349,35 +490,8 @@ function ApplicationRoundAllocation({
   const reservationUnit =
     unitReservationUnits.find((x) => x.pk != null && x.pk === reservationUnitFilterQuery) ?? reservationUnits[0];
 
-  const municipalityOptions = Object.values(MunicipalityChoice).map((value) => ({
-    label: t(`common:municipalities.${value.toUpperCase()}`),
-    value: value as MunicipalityChoice,
-  }));
-  const customerFilterOptions = Object.keys(ReserveeType).map((value) => ({
-    label: t(`translation:reserveeType.${value.toUpperCase()}`),
-    value: value as ReserveeType,
-  }));
-  const unitOptions = units.map((unit) => ({
-    value: unit?.pk ?? 0,
-    label: unit?.nameFi ?? "",
-  }));
-
-  const options: TagOptionsList = {
-    orderChoices: orderOptions,
-    priorityChoices: priorityOptions,
-    units: unitOptions,
-    municipalities: municipalityOptions,
-    // Not needed on this page
-    reservationUnits: [],
-    unitGroups: [],
-    reservationUnitStates: [],
-    reservationUnitTypes: [],
-    stateChoices: [],
-    equipments: [],
-    purposes: [],
-    ageGroups: [],
-  };
-
+  // TODO need to add the side effect to the select filter
+  // or maybe not? an invalid value is going to get filtered here anyway and we use the first reservation unit
   const setUnitFilter = (value: number) => {
     // NOTE different logic because values are not atomic and we need to set two params
     const vals = new URLSearchParams(searchParams);
@@ -399,39 +513,7 @@ function ApplicationRoundAllocation({
         <H1 $noMargin>{t("allocation:allocationTitle")}</H1>
         <Ingress>{roundName}</Ingress>
       </div>
-      <ShowAllContainer
-        showAllLabel={t("filters:moreFilters")}
-        showLessLabel={t("filters:lessFilters")}
-        maximumNumber={4}
-      >
-        <Select
-          texts={{
-            label: t("filters:label.unit"),
-            placeholder: t("common:selectPlaceholder"),
-            clearButtonAriaLabel_multiple: t("common:clearAllSelections"),
-            clearButtonAriaLabel_one: t("common:removeValue"),
-          }}
-          clearable={false}
-          options={unitOptions.map(convertOptionToHDS)}
-          disabled={unitOptions.length === 0}
-          value={unitOptions.find((v) => v.value === unitFilter)?.value?.toString()}
-          onChange={(selection) => {
-            const val = selection.find(() => true)?.value;
-            const v = toNumber(val);
-            if (v != null) {
-              setUnitFilter(v);
-            }
-          }}
-        />
-        <MultiSelectFilter name="priority" options={priorityOptions} />
-        <MultiSelectFilter name="order" options={orderOptions} />
-        <SearchFilter name="search" />
-        <MultiSelectFilter name="municipality" options={municipalityOptions} />
-        <MultiSelectFilter name="applicantType" options={customerFilterOptions} />
-        <MultiSelectFilter name="ageGroup" options={ageGroupOptions} />
-        <MultiSelectFilter name="purpose" options={purposeOptions} />
-      </ShowAllContainer>
-      <SearchTags hide={hideSearchTags} translateTag={translateTag(t, options)} />
+      <Filters units={units} hideSearchTags={hideSearchTags} isLoading={loading} />
       {/* using a key here is a hack to force remounting the tabs
        * remount causes flickering but HDS doesn't allow programmatically changing the active tab
        */}
