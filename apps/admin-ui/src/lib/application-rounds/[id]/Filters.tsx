@@ -3,9 +3,13 @@ import { useTranslation } from "next-i18next";
 import { AutoGrid, HR } from "common/styled";
 import { SearchTags } from "@/component/SearchTags";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
-import { AccessCodeState, ApplicationSectionStatusChoice, ReserveeType } from "@gql/gql-types";
-import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
+import { AccessCodeState, ApplicationSectionStatusChoice, ApplicationStatusChoice, ReserveeType } from "@gql/gql-types";
+import { ControlledMultiSelectFilter, ControlledSearchFilter } from "@/component/QueryParamFilters";
 import { type TagOptionsList, translateTag } from "@/modules/search";
+import { useForm } from "react-hook-form";
+import { DayT } from "common/src/const";
+import { SearchButton, SearchButtonContainer } from "@/component/SearchButton";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
 type OptionType = {
   value: number;
@@ -23,6 +27,49 @@ type Props = {
   enableAccessCodeState?: boolean;
 };
 
+type SearchFormValues = {
+  unitGroup: number[];
+  unit: number[];
+  sectionStatus: ApplicationSectionStatusChoice[];
+  status: ApplicationStatusChoice[];
+  reservationUnit: number[];
+  applicant: ReserveeType[];
+  weekday: DayT[];
+  accessCodeState: AccessCodeState[];
+  search: string;
+};
+
+function mapFormToSearchParams(data: SearchFormValues): URLSearchParams {
+  const params = new URLSearchParams();
+  if (data.search) {
+    params.set("search", data.search);
+  }
+  if (data.unitGroup.length > 0) {
+    data.unitGroup.forEach((unitGroup) => params.append("unitGroup", unitGroup.toString()));
+  }
+  if (data.unit.length > 0) {
+    data.unit.forEach((unit) => params.append("unit", unit.toString()));
+  }
+  if (data.sectionStatus.length > 0) {
+    data.sectionStatus.forEach((status) => params.append("sectionStatus", status));
+  }
+  if (data.status.length > 0) {
+    data.status.forEach((status) => params.append("status", status));
+  }
+  if (data.reservationUnit.length > 0) {
+    data.reservationUnit.forEach((unit) => params.append("reservationUnit", unit.toString()));
+  }
+  if (data.applicant.length > 0) {
+    data.applicant.forEach((applicant) => params.append("applicant", applicant));
+  }
+  if (data.weekday.length > 0) {
+    data.weekday.forEach((day) => params.append("weekday", day.toString()));
+  }
+  if (data.accessCodeState.length > 0) {
+    data.accessCodeState.forEach((state) => params.append("accessCodeState", state));
+  }
+  return params;
+}
 export function Filters({
   unitGroupOptions,
   unitOptions,
@@ -34,6 +81,21 @@ export function Filters({
   enableAccessCodeState = false,
 }: Props): JSX.Element {
   const { t } = useTranslation();
+
+  const setSearchParams = useSetSearchParams();
+  const form = useForm<SearchFormValues>({
+    defaultValues: {
+      search: "",
+      unitGroup: [],
+      unit: [],
+      sectionStatus: [],
+      status: [],
+      reservationUnit: [],
+      applicant: [],
+      weekday: [],
+      accessCodeState: [],
+    },
+  });
 
   const statusOptions = VALID_ALLOCATION_APPLICATION_STATUSES.map((status) => ({
     label: t(`application:statuses.${status}`),
@@ -89,26 +151,42 @@ export function Filters({
     municipalities: [],
   };
 
+  const { handleSubmit, control } = form;
+  const onSubmit = (data: SearchFormValues) => {
+    const searchParams = mapFormToSearchParams(data);
+    setSearchParams(searchParams);
+  };
+
   return (
-    <>
+    <form noValidate onSubmit={handleSubmit(onSubmit)}>
       <AutoGrid>
-        <MultiSelectFilter name="unitGroup" options={unitGroupOptions} />
-        <MultiSelectFilter name="unit" options={unitOptions} />
+        <ControlledMultiSelectFilter control={control} name="unitGroup" options={unitGroupOptions} />
+        <ControlledMultiSelectFilter control={control} name="unit" options={unitOptions} />
         {statusOption !== "application" ? (
           sectionStatusOptions.length > 0 ? (
-            <MultiSelectFilter name="sectionStatus" options={sectionStatusOptions} />
+            <ControlledMultiSelectFilter control={control} name="sectionStatus" options={sectionStatusOptions} />
           ) : null
         ) : (
-          <MultiSelectFilter name="status" options={statusOptions} />
+          <ControlledMultiSelectFilter control={control} name="status" options={statusOptions} />
         )}
-        {enableReservationUnit && <MultiSelectFilter name="reservationUnit" options={reservationUnitOptions} />}
-        {enableApplicant && <MultiSelectFilter name="applicant" options={applicantOptions} />}
-        {enableWeekday && <MultiSelectFilter name="weekday" options={weekdayOptions} />}
-        {enableAccessCodeState && <MultiSelectFilter name="accessCodeState" options={accessCodeOptions} />}
-        <SearchFilter name="search" />
+
+        {enableReservationUnit && (
+          <ControlledMultiSelectFilter control={control} name="reservationUnit" options={reservationUnitOptions} />
+        )}
+        {enableApplicant && (
+          <ControlledMultiSelectFilter control={control} name="applicant" options={applicantOptions} />
+        )}
+        {enableWeekday && <ControlledMultiSelectFilter control={control} name="weekday" options={weekdayOptions} />}
+        {enableAccessCodeState && (
+          <ControlledMultiSelectFilter control={control} name="accessCodeState" options={accessCodeOptions} />
+        )}
+        <ControlledSearchFilter control={control} name="search" />
       </AutoGrid>
-      <SearchTags hide={hideSearchTags} translateTag={translateTag(t, options)} />
+      <SearchButtonContainer>
+        <SearchTags hide={hideSearchTags} translateTag={translateTag(t, options)} />
+        <SearchButton />
+      </SearchButtonContainer>
       <HR />
-    </>
+    </form>
   );
 }
