@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { gql } from "@apollo/client";
 import { UnitOrderingChoices, useUnitListQuery } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { More } from "@/component/More";
 import { UnitsTable } from "./UnitsTable";

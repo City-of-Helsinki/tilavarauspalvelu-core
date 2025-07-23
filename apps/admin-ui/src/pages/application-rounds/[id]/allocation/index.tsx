@@ -27,7 +27,7 @@ import {
 } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
 import { useOptions } from "@/hooks";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { ALLOCATION_POLL_INTERVAL, NOT_FOUND_SSR_VALUE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { truncate } from "@/helpers";
 import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
@@ -40,7 +40,7 @@ import { useSearchParams } from "next/navigation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
-import { Error403 } from "@/common/Error403";
+import { Error403 } from "@/component/Error403";
 import { createClient } from "@/common/apolloClient";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;

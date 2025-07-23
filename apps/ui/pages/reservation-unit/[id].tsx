@@ -91,7 +91,7 @@ import { useAvailableTimes, useBlockingReservations, useRemoveStoredReservation,
 import { gql } from "@apollo/client";
 import { type ApiError, getApiErrors } from "common/src/apolloUtils";
 import { formatErrorMessage } from "common/src/hooks/useDisplayError";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { QuickReservation } from "@/components/reservation-unit/QuickReservation";
 
 const StyledApplicationRoundScheduleDay = styled.p`

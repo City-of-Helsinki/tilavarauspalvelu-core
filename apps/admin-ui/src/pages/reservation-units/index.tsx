@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { H1, HR } from "common/styled";
-import { AuthorizationChecker } from "@/common/AuthorizationChecker";
+import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { UserPermissionChoice } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";

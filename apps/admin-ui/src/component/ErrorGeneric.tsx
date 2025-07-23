@@ -4,7 +4,7 @@ import { env } from "@/env.mjs";
 import { PUBLIC_URL } from "@/common/const";
 import { Flex } from "common/styled";
 
-function ErrorGeneric(): JSX.Element {
+export function ErrorGeneric(): JSX.Element {
   return (
     <Flex $justifyContent={"center"} $alignItems={"center"} $marginTop={"2-xl"}>
       <ErrorContainer
@@ -15,5 +15,3 @@ function ErrorGeneric(): JSX.Element {
     </Flex>
   );
 }
-
-export default ErrorGeneric;
