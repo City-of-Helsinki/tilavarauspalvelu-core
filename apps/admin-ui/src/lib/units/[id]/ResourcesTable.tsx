@@ -7,7 +7,7 @@ import { useDeleteResourceMutation, type Maybe, type ResourceTableFragment } fro
 import { PopupMenu } from "common/src/components/PopupMenu";
 import { getResourceUrl } from "@/common/urls";
 import { CustomTable } from "@/component/Table";
-import { successToast } from "common/src/common/toast";
+import { successToast } from "common/src/components/toast";
 import { truncate } from "common/src/helpers";
 import { MAX_NAME_LENGTH } from "@/common/const";
 import { TableLink } from "@/styled";

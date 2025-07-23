@@ -26,7 +26,7 @@ import { constructDateTimeSafe, constructDateTimeUnsafe, getBufferTime, getNorma
 import { formatDateTimeRange } from "@/common/util";
 import { gql } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
-import { successToast } from "common/src/common/toast";
+import { successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
 import { convertWeekday } from "common/src/conversion";
 

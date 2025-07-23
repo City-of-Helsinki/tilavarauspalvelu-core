@@ -3,7 +3,7 @@ import { Link, LinkSize } from "hds-react";
 import { H1, HR } from "common/styled";
 import { useTranslation } from "next-i18next";
 import { Filters, UnitsDataLoader } from "@/component/units";
-import { AuthorizationChecker } from "@/common/AuthorizationChecker";
+import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { UserPermissionChoice } from "@gql/gql-types";
 import { type GetServerSidePropsContext } from "next";

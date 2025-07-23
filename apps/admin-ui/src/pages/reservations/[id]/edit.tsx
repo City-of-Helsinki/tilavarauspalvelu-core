@@ -14,7 +14,7 @@ import {
 } from "@/schemas";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { useStaffReservationMutation, useReservationEditData } from "@/hooks";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { ButtonContainer, CenterSpinner, Flex, HR } from "common/styled";
 import { createTagString } from "@/modules/reservation";
 import { ReservationTitleSection } from "@lib/reservations/[id]";
@@ -26,7 +26,7 @@ import { GetServerSidePropsContext } from "next";
 import { ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
-import { Error403 } from "@/common/Error403";
+import { Error403 } from "@/component/Error403";
 import { useCheckReservationPermissions } from "@/hooks/useCheckReservationPermissions";
 
 type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;

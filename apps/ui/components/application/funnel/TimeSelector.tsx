@@ -11,7 +11,7 @@ import {
   type CellState,
   isCellEqual,
 } from "common/src/components/ApplicationTimeSelector";
-import { successToast } from "common/src/common/toast";
+import { successToast } from "common/src/components/toast";
 import { ErrorText } from "common/src/components/ErrorText";
 import { type TimeSelectorFragment } from "@/gql/gql-types";
 import { gql } from "@apollo/client";

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { useTranslation } from "next-i18next";
-import { type TFunction } from "i18next";
+import { type TFunction, useTranslation } from "next-i18next";
 import {
   BannerNotificationOrderingChoices,
   type BannerNotificationTableElementFragment,
@@ -22,7 +21,7 @@ import { getNotificationListUrl, getNotificationUrl } from "@/common/urls";
 import { CenterSpinner, TitleSection, H1 } from "common/styled";
 import { gql } from "@apollo/client";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { AuthorizationChecker } from "@/common/AuthorizationChecker";
+import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSidePropsContext } from "next";
 

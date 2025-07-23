@@ -18,7 +18,7 @@ import eventStyleGetter, { legend } from "./eventStyleGetter";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { getReserveeName } from "@/common/util";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { useCheckPermission } from "@/hooks";
 import { gql } from "@apollo/client";
 import { combineAffectingReservations } from "@/helpers";

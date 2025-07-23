@@ -7,7 +7,7 @@ import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import { type Maybe, type SpacesTableFragment, useDeleteSpaceMutation } from "@gql/gql-types";
 import { PopupMenu } from "common/src/components/PopupMenu";
 import { NewSpaceModal } from "./new-space-modal/NewSpaceModal";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { CustomTable } from "@/component/Table";
 import { getSpaceUrl } from "@/common/urls";
 import { truncate } from "common/src/helpers";

@@ -7,7 +7,7 @@ import {
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { toApiDate } from "common/src/common/util";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { base64encode } from "common/src/helpers";
 import { type CalendarEventType } from "@/modules/reservation";
 import { combineAffectingReservations } from "@/helpers";

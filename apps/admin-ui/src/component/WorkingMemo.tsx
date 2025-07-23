@@ -8,7 +8,7 @@ import {
   type UpdateApplicationWorkingMemoMutation,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
-import { successToast } from "common/src/common/toast";
+import { successToast } from "common/src/components/toast";
 import { ButtonContainer } from "common/styled";
 import { useDisplayError } from "common/src/hooks";
 

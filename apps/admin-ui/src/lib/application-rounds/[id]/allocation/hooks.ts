@@ -14,7 +14,7 @@ import {
   type SuitableTimeRangeNodeT,
   timeSlotKeyToScheduleTime,
 } from "./modules/applicationRoundAllocation";
-import { errorToast, successToast } from "common/src/common/toast";
+import { errorToast, successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
 import { toNumber } from "common/src/helpers";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
