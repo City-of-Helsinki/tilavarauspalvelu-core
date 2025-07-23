@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import ShowAllContainer from "common/src/components/ShowAllContainer";
+import { ShowAllContainer } from "common/src/components";
 import { useReservationUnitTypes, useUnitOptions } from "@/hooks";
 import { ReservationUnitPublishingState } from "@gql/gql-types";
 import { MultiSelectFilter, SearchFilter, RangeNumberFilter } from "@/component/QueryParamFilters";

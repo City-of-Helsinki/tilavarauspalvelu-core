@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { UserPermissionChoice, useSpacesResourcesQuery } from "@gql/gql-types";
 import { base64encode, toNumber, ignoreMaybeArray } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
-import Error404 from "@/common/Error404";
+import { Error404 } from "@/common/Error404";
 import { fontBold, H2, CenterSpinner, Flex } from "common/styled";
 import { LinkPrev } from "@/component/LinkPrev";
 import { gql } from "@apollo/client";

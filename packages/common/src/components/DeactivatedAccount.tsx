@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontBold, H1 } from "../../styled";
-import ErrorContainer from "./ErrorContainer";
+import { ErrorContainer } from "./ErrorContainer";
 
 const Body = styled.p`
   margin: 0;

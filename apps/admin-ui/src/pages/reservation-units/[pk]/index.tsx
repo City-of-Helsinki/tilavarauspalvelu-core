@@ -25,7 +25,7 @@ import { Flex } from "common/styled";
 
 import { errorToast, successToast } from "common/src/common/toast";
 import { useModal } from "@/context/ModalContext";
-import Error404 from "@/common/Error404";
+import { Error404 } from "@/common/Error404";
 
 import { getReservationUnitUrl } from "@/common/urls";
 import { ApolloError, gql } from "@apollo/client";
