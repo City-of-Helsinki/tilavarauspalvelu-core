@@ -63,12 +63,7 @@ export function SearchTags({
   }
 
   return (
-    <FilterTags
-      style={{
-        // if we don't hide them, gap is doubled when there are no tags
-        display: tags.length === 0 ? "none" : "flex",
-      }}
-    >
+    <FilterTags>
       {tags.map((tag) => (
         <StyledTag
           onDelete={() => handleDelete(tag)}

@@ -102,5 +102,6 @@
     "SEASONAL": "Kausivaraus"
   },
   "moreFilters": "Näytä lisää suodattimia",
-  "lessFilters": "Näytä vähemmän suodattimia"
+  "lessFilters": "Näytä vähemmän suodattimia",
+  "searchButton": "Hae"
 }
