@@ -33,7 +33,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
-import Error404 from "@/common/Error404";
+import { Error404 } from "@/common/Error404";
 import { createClient } from "@/common/apolloClient";
 import { TimeframeStatus, ApplicationRoundStatusLabel } from "@lib/application-rounds";
 import {

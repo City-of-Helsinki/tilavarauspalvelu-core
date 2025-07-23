@@ -1,7 +1,7 @@
 import React from "react";
 import { useSession } from "@/hooks/auth";
 import { MainLander } from "@/component/MainLander";
-import Error403 from "./Error403";
+import { Error403 } from "./Error403";
 import { UserPermissionChoice } from "@gql/gql-types";
 import { hasAnyPermission, hasSomePermission } from "@/modules/permissionHelper";
 
