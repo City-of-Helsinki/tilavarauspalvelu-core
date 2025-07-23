@@ -4,7 +4,8 @@ import { TextInput, IconSearch, LoadingSpinner, ButtonVariant } from "hds-react"
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { FilterTagList } from "../FilterTagList";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { mapParamToNumber, type OptionsT } from "@/modules/search";
+import { mapParamToNumber } from "@/modules/search";
+import { type OptionsListT } from "common/src/modules/search";
 import { SearchButtonContainer, StyledSubmitButton } from "../search/styled";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
@@ -43,7 +44,7 @@ function mapSeasonalQueryToForm(params: ReadonlyURLSearchParams): SearchFormValu
 }
 
 export type SearchFormProps = {
-  options: Pick<OptionsT, "purposes" | "reservationUnitTypes" | "units">;
+  options: Pick<OptionsListT, "purposes" | "reservationUnitTypes" | "units">;
   handleSearch: SubmitHandler<SearchFormValues>;
   isLoading: boolean;
 };
