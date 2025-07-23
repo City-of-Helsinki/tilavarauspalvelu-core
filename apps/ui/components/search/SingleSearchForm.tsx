@@ -13,7 +13,8 @@ import { FilterTagList } from "../FilterTagList";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { mapParamToNumber, type OptionsT } from "@/modules/search";
+import { mapParamToNumber } from "@/modules/search";
+import { type OptionsListT } from "common/src/modules/search";
 import { SearchButtonContainer, StyledSubmitButton } from "./styled";
 import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
@@ -85,7 +86,7 @@ const multiSelectFilters = ["units", "reservationUnitTypes", "purposes", "equipm
 const hideTagList = ["showOnlyReservable", "order", "sort", "ref"];
 
 type SingleSearchFormProps = {
-  options: OptionsT;
+  options: Readonly<OptionsListT>;
   isLoading: boolean;
 };
 

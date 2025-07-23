@@ -5,6 +5,7 @@ import { SearchTags } from "@/component/SearchTags";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { AccessCodeState, ApplicationSectionStatusChoice, ReserveeType } from "@gql/gql-types";
 import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
+import { type TagOptionsList, translateTag } from "@/modules/search";
 
 type OptionType = {
   value: number;
@@ -45,32 +46,9 @@ export function Filters({
   }));
 
   const accessCodeOptions = Object.values(AccessCodeState).map((s) => ({
-    value: s,
     label: t(`accessType:accessCodeState.${s}`),
+    value: s,
   }));
-
-  const translateTag = (key: string, value: string) => {
-    switch (key) {
-      case "unitGroup":
-        return unitGroupOptions.find((u) => u.value === Number(value))?.label ?? "-";
-      case "unit":
-        return unitOptions.find((u) => u.value === Number(value))?.label ?? "-";
-      case "status":
-        return t(`application:statuses.${value}`);
-      case "applicant":
-        return t(`translation:reserveeType.${value}`);
-      case "weekday":
-        return t(`translation:dayLong.${value}`);
-      case "reservationUnit":
-        return reservationUnitOptions.find((u) => u.value === Number(value))?.label ?? "-";
-      case "sectionStatus":
-        return t(`translation:ApplicationSectionStatusChoice.${value}`);
-      case "accessCodeState":
-        return t(`accessType:accessCodeState.${value}`);
-      default:
-        return value;
-    }
-  };
 
   const hideSearchTags: string[] = [
     "tab",
@@ -95,6 +73,22 @@ export function Filters({
     value: status,
   }));
 
+  const options: TagOptionsList = {
+    reservationUnits: reservationUnitOptions,
+    units: unitOptions,
+    unitGroups: unitGroupOptions,
+    // Not needed on this page
+    orderChoices: [],
+    priorityChoices: [],
+    reservationUnitStates: [],
+    reservationUnitTypes: [],
+    stateChoices: [],
+    equipments: [],
+    purposes: [],
+    ageGroups: [],
+    municipalities: [],
+  };
+
   return (
     <>
       <AutoGrid>
@@ -113,7 +107,7 @@ export function Filters({
         {enableAccessCodeState && <MultiSelectFilter name="accessCodeState" options={accessCodeOptions} />}
         <SearchFilter name="search" />
       </AutoGrid>
-      <SearchTags hide={hideSearchTags} translateTag={translateTag} />
+      <SearchTags hide={hideSearchTags} translateTag={translateTag(t, options)} />
       <HR />
     </>
   );
