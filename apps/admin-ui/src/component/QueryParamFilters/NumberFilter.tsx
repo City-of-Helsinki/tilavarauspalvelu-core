@@ -1,33 +1,38 @@
-import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { TextInput } from "hds-react";
-import { useSearchParams } from "next/navigation";
 import { useTranslation } from "next-i18next";
+import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
 
-export function NumberFilter({ name }: { name: string }) {
+interface BaseNumberFilterProps {
+  name: string;
+  value: string | null;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+function BaseNumberFilter({ name, onChange, value }: BaseNumberFilterProps): JSX.Element {
   const { t } = useTranslation();
-
-  const searchParams = useSearchParams();
-  const setSearchParams = useSetSearchParams();
-
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const params = new URLSearchParams(searchParams);
-    if (e.target.value.length > 0) {
-      params.set(name, e.target.value);
-    } else {
-      params.delete(name);
-    }
-    setSearchParams(params);
-  };
-
-  const value = searchParams.get(name);
   return (
     <TextInput
       id={name}
       label=" "
-      onChange={handleOnChange}
+      onChange={onChange}
       value={value || ""}
       placeholder={t(`filters:placeholder.${name}`)}
-      errorText={value !== "" && Number.isNaN(Number(value)) ? t("common:notANumber") : undefined}
+      errorText={value != null && value !== "" && Number.isNaN(Number(value)) ? t("common:notANumber") : undefined}
     />
   );
+}
+
+interface ControlledNumberFilterProps<T extends FieldValues> extends UseControllerProps<T> {
+  name: Path<T>;
+  control: Control<T>;
+}
+
+export function ControlledNumberFilter<T extends FieldValues>({
+  name,
+  control,
+}: ControlledNumberFilterProps<T>): JSX.Element {
+  const {
+    field: { value, onChange },
+  } = useController({ name, control });
+  return <BaseNumberFilter name={name} value={value} onChange={(e) => onChange(e.target.value)} />;
 }

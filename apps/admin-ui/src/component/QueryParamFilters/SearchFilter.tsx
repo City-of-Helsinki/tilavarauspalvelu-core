@@ -1,43 +1,46 @@
-import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { TextInput } from "hds-react";
-import { debounce } from "lodash-es";
-import { useSearchParams } from "next/navigation";
 import { useTranslation } from "next-i18next";
+import { useController, type Control, type FieldValues, type Path, type UseControllerProps } from "react-hook-form";
 
-// TODO should we check that name cant be empty?
-/* TODO allow overriding the placeholder / label without changing the key */
-// NOTE use TextInput because it has `id` prop unlike SearchInput
-export function SearchFilter({ name, labelKey }: { name: string; labelKey?: string }) {
+interface SearchFilterProps {
+  name: string;
+  labelKey?: string;
+}
+
+interface BaseSearchFilterProps extends SearchFilterProps {
+  value: string | null;
+  onChange: (evt: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+function BaseSearchFilter({ labelKey, name, value, onChange }: BaseSearchFilterProps): JSX.Element {
   const { t } = useTranslation();
-  const searchParams = useSearchParams();
-  const setParams = useSetSearchParams();
-
-  const filter = searchParams.get(name);
-  const setFilter = (value: string) => {
-    const vals = new URLSearchParams(searchParams);
-    if (value === "") {
-      vals.delete(name);
-    } else {
-      vals.set(name, value);
-    }
-    setParams(vals);
-  };
-
-  const onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-    setFilter(evt.target.value);
-  };
-
   const label = t(`filters:label.${labelKey ?? name}`);
   const placeholder = t(`filters:placeholder.${name}`);
+  return <TextInput label={label} id={name} onChange={onChange} value={value ?? ""} placeholder={placeholder} />;
+}
+
+interface ControlledSearchFilterProps<T extends FieldValues>
+  extends UseControllerProps<T>,
+    Omit<SearchFilterProps, "name"> {
+  name: Path<T>;
+  control: Control<T>;
+}
+
+export function ControlledSearchFilter<T extends FieldValues>({
+  name,
+  labelKey,
+  control,
+}: ControlledSearchFilterProps<T>): JSX.Element {
+  const {
+    field: { value, onChange },
+  } = useController({ name, control });
   return (
-    <TextInput
-      label={label}
-      id={name}
-      onChange={debounce((evt) => onChange(evt), 100, {
-        leading: true,
-      })}
-      value={filter ?? ""}
-      placeholder={placeholder}
+    <BaseSearchFilter
+      name={name}
+      labelKey={labelKey}
+      value={value}
+      onChange={(evt) => onChange(evt.target.value)}
+      {...control}
     />
   );
 }
