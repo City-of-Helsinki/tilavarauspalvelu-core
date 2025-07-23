@@ -14,7 +14,7 @@ import {
 } from "@/component/QueryParamFilters";
 import { SearchTags } from "@/component/SearchTags";
 import { OrderStatusWithFree, ReservationTypeChoice, ReservationStateChoice } from "@gql/gql-types";
-import { fromUIDate, isValidDate } from "common/src/common/util";
+import { type TagOptionsList, translateTag } from "@/modules/search";
 
 const MoreWrapper = styled(ShowAllContainer)`
   .ShowAllContainer__ToggleButton {
@@ -61,73 +61,21 @@ export function Filters({
     { value: "onlyNot", label: t("filters:label.onlyNotRecurring") },
   ];
 
-  function translateTag(tag: string, val: string): string {
-    switch (tag) {
-      case "reservationType":
-        return t(`filters:tag.reservationType`, {
-          type: t(`filters:reservationTypeChoice.${val}`),
-        });
-      case "reservationUnitType":
-        return t("filters:tag.reservationUnitType", {
-          type: reservationUnitTypeOptions.find((x) => x.value === Number(val))?.label,
-        });
-      case "state":
-        return t("filters:tag.state", {
-          state: stateOptions.find((x) => x.value === val)?.label ?? "",
-        });
-      case "reservationUnit":
-        return reservationUnitOptions.find((x) => x.value === Number(val))?.label ?? "";
-      case "unit":
-        return unitOptions.find((x) => x.value === Number(val))?.label ?? "";
-      case "minPrice":
-        return t("filters:tag.minPrice", { price: val });
-      case "maxPrice":
-        return t("filters:tag.maxPrice", { price: val });
-      case "dateGte": {
-        const d = fromUIDate(val);
-        if (d == null || !isValidDate(d)) {
-          return "";
-        }
-        return t("filters:tag.dateGte", { date: val });
-      }
-      case "dateLte": {
-        const d = fromUIDate(val);
-        if (d == null || !isValidDate(d)) {
-          return "";
-        }
-        return t("filters:tag.dateLte", { date: val });
-      }
-      case "createdAtGte": {
-        const d = fromUIDate(val);
-        if (d == null || !isValidDate(d)) {
-          return "";
-        }
-        return t("filters:tag.createdAtGte", { date: val });
-      }
-      case "createdAtLte": {
-        const d = fromUIDate(val);
-        if (d == null || !isValidDate(d)) {
-          return "";
-        }
-        return t("filters:tag.createdAtLte", { date: val });
-      }
-      case "orderStatus":
-        if (val === "-") {
-          return t("filters:noPaymentStatus");
-        }
-        return t("filters:tag.orderStatus", {
-          status: t(`translation:orderStatus.${val}`),
-        });
-      case "recurring":
-        return t(`filters:label.${val}Recurring`);
-      case "freeOfCharge":
-        return t("filters:label.freeOfCharge");
-      case "search":
-        return t("filters:tag.search", { search: val });
-      default:
-        return val;
-    }
-  }
+  const options: TagOptionsList = {
+    reservationUnitTypes: reservationUnitTypeOptions,
+    stateChoices: stateOptions,
+    reservationUnits: reservationUnitOptions,
+    units: unitOptions,
+    // Not needed on this page
+    orderChoices: [],
+    priorityChoices: [],
+    reservationUnitStates: [],
+    unitGroups: [],
+    equipments: [],
+    purposes: [],
+    ageGroups: [],
+    municipalities: [],
+  };
 
   return (
     <Flex>
@@ -146,7 +94,7 @@ export function Filters({
         <CheckboxFilter name="freeOfCharge" />
       </MoreWrapper>
       <SearchTags
-        translateTag={translateTag}
+        translateTag={translateTag(t, options)}
         defaultTags={defaultFilters}
         clearButtonLabel={clearButtonLabel}
         clearButtonAriaLabel={clearButtonAriaLabel}

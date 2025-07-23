@@ -42,6 +42,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { Error403 } from "@/component/Error403";
 import { createClient } from "@/common/apolloClient";
+import { type TagOptionsList, translateTag } from "@/modules/search";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;
 
@@ -136,9 +137,9 @@ function ApplicationRoundAllocation({
 }): JSX.Element {
   const { t } = useTranslation();
 
-  const options = useOptions();
-  const purposeOptions = options.purpose;
-  const ageGroupOptions = options.ageGroup;
+  const optionsQuery = useOptions();
+  const purposeOptions = optionsQuery.purpose;
+  const ageGroupOptions = optionsQuery.ageGroup;
 
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
@@ -322,29 +323,6 @@ function ApplicationRoundAllocation({
       },
     ]);
 
-  const translateTag = (key: string, value: string) => {
-    switch (key) {
-      case "municipality":
-        return t(`common:municipalities.${value.toUpperCase()}`);
-      case "textSearch":
-        return value;
-      case "applicantType":
-        return t(`translation:reserveeType.${value.toUpperCase()}`);
-      case "purpose":
-        return purposeOptions.find((o) => String(o.value) === value)?.label ?? "";
-      case "ageGroup":
-        return ageGroupOptions.find((o) => String(o.value) === value)?.label ?? "";
-      case "priority":
-        return priorityOptions.find((o) => String(o.value) === value)?.label ?? "";
-      case "order":
-        return orderOptions.find((o) => String(o.value) === value)?.label ?? "";
-      case "search":
-        return value;
-      default:
-        return key;
-    }
-  };
-
   const hideSearchTags = ["unit", "reservation-unit", "aes", "selectionBegin", "selectionEnd", "allocated"];
 
   const handleResetFilters = () => {
@@ -383,6 +361,22 @@ function ApplicationRoundAllocation({
     value: unit?.pk ?? 0,
     label: unit?.nameFi ?? "",
   }));
+
+  const options: TagOptionsList = {
+    orderChoices: orderOptions,
+    priorityChoices: priorityOptions,
+    units: unitOptions,
+    municipalities: municipalityOptions,
+    // Not needed on this page
+    reservationUnits: [],
+    unitGroups: [],
+    reservationUnitStates: [],
+    reservationUnitTypes: [],
+    stateChoices: [],
+    equipments: [],
+    purposes: [],
+    ageGroups: [],
+  };
 
   const setUnitFilter = (value: number) => {
     // NOTE different logic because values are not atomic and we need to set two params
@@ -437,7 +431,7 @@ function ApplicationRoundAllocation({
         <MultiSelectFilter name="ageGroup" options={ageGroupOptions} />
         <MultiSelectFilter name="purpose" options={purposeOptions} />
       </ShowAllContainer>
-      <SearchTags hide={hideSearchTags} translateTag={translateTag} />
+      <SearchTags hide={hideSearchTags} translateTag={translateTag(t, options)} />
       {/* using a key here is a hack to force remounting the tabs
        * remount causes flickering but HDS doesn't allow programmatically changing the active tab
        */}

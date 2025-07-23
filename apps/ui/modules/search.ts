@@ -23,6 +23,7 @@ import { SEARCH_PAGING_LIMIT } from "./const";
 import { gql, type ApolloClient } from "@apollo/client";
 import { type ReadonlyURLSearchParams } from "next/navigation";
 import { transformAccessTypeSafe } from "common/src/conversion";
+import { type OptionsListT, type OptionT } from "common/src/modules/search";
 
 function transformOrderByName(desc: boolean, language: LocalizationLanguages) {
   if (language === "fi") {
@@ -187,21 +188,11 @@ export function translateOption(
   };
 }
 
-type OptionT = Readonly<{ value: number; label: string }>;
-export type OptionsT = Readonly<{
-  units: Readonly<OptionT[]>;
-  equipments: Readonly<OptionT[]>;
-  purposes: Readonly<OptionT[]>;
-  reservationUnitTypes: Readonly<OptionT[]>;
-  ageGroups: Readonly<OptionT[]>;
-  municipalities: Readonly<{ value: MunicipalityChoice; label: string }[]>;
-}>;
-
 export async function getSearchOptions(
   apolloClient: ApolloClient<unknown>,
   page: "seasonal" | "direct",
   locale: string
-): Promise<OptionsT> {
+): Promise<OptionsListT> {
   const lang = convertLanguageCode(locale);
   const { data: optionsData } = await apolloClient.query<OptionsQuery, OptionsQueryVariables>({
     query: OptionsDocument,
