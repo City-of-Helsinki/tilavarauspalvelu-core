@@ -6,7 +6,7 @@ import { UserPermissionChoice, useUnitPageQuery } from "@gql/gql-types";
 import { formatAddress } from "@/common/util";
 import { ExternalLink } from "@/component/ExternalLink";
 import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import Error404 from "@/common/Error404";
+import { Error404 } from "@/common/Error404";
 import { ReservationUnitList } from "@lib/units/[id]/ReservationUnitList";
 import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/common/urls";
 import { CenterSpinner, Flex, fontBold, fontMedium, H1, H2, H3 } from "common/styled";

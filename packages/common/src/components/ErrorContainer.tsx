@@ -66,7 +66,7 @@ const Body = styled.p`
   margin: 0;
 `;
 
-const constructFeedbackUrl = (i18n: { language: string }, feedbackUrl?: string | null) => {
+function constructFeedbackUrl(i18n: { language: string }, feedbackUrl?: string | null) {
   if (!feedbackUrl) {
     return null;
   }
@@ -77,7 +77,7 @@ const constructFeedbackUrl = (i18n: { language: string }, feedbackUrl?: string |
   } catch (_) {
     return null;
   }
-};
+}
 
 function statusCodeText({
   statusCode,
@@ -107,7 +107,7 @@ function statusCodeText({
   );
 }
 
-const ErrorContainer = ({
+export function ErrorContainer({
   statusCode,
   title,
   body,
@@ -115,7 +115,7 @@ const ErrorContainer = ({
   imgSrc,
   imgAlt,
   children,
-}: Readonly<ErrorPageProps>) => {
+}: Readonly<ErrorPageProps>) {
   const { t, i18n } = useTranslation("errors");
 
   return (
@@ -154,6 +154,4 @@ const ErrorContainer = ({
       </TextContent>
     </ErrorWrapper>
   );
-};
-
-export default ErrorContainer;
+}

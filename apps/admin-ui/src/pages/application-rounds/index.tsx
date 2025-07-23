@@ -17,7 +17,7 @@ import { truncate } from "@/helpers";
 import { ApplicationRoundCard } from "@lib/application-rounds";
 import { TableLink } from "@/styled";
 import { CustomTable } from "@/component/Table";
-import Error404 from "@/common/Error404";
+import { Error404 } from "@/common/Error404";
 import { Accordion } from "hds-react";
 import { CenterSpinner, Flex, H1 } from "common/styled";
 import { AuthorizationChecker } from "@/common/AuthorizationChecker";

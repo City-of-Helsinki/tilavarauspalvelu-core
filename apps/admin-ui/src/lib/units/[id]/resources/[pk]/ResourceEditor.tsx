@@ -15,7 +15,7 @@ import { errorToast, successToast } from "common/src/common/toast";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
 import { LinkPrev } from "@/component/LinkPrev";
 import { gql } from "@apollo/client";
-import Error404 from "@/common/Error404";
+import { Error404 } from "@/common/Error404";
 import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";
 import {
