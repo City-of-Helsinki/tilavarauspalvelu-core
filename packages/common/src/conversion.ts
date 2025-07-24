@@ -1,8 +1,13 @@
 import {
+  AccessCodeState,
   AccessType,
-  type Maybe,
+  ApplicationSectionStatusChoice,
+  ApplicationStatusChoice,
+  OrderStatusWithFree,
   ReservationStartInterval,
+  ReservationStateChoice,
   ReservationTypeChoice,
+  ReservationUnitPublishingState,
   ReserveeType,
   Weekday,
 } from "../gql/gql-types";
@@ -46,7 +51,7 @@ export function convertWeekday(d: Weekday): DayT {
   }
 }
 
-export function transformReservationTypeSafe(d: string): ReservationTypeChoice | null {
+export function transformReservationType(d: string): ReservationTypeChoice | null {
   switch (d) {
     case ReservationTypeChoice.Staff:
       return ReservationTypeChoice.Staff;
@@ -63,15 +68,15 @@ export function transformReservationTypeSafe(d: string): ReservationTypeChoice |
   }
 }
 
-export function convertReservationType(type: string): ReservationTypeChoice {
-  const t = transformReservationTypeSafe(type);
+export function transformReservationTypeUnsafe(type: string): ReservationTypeChoice {
+  const t = transformReservationType(type);
   if (t == null) {
     throw new Error(`Unknown reservation type: ${type}`);
   }
   return t;
 }
 
-export function transformReserveeType(reserveeType: Maybe<string> | undefined): ReserveeType | undefined {
+export function transformReserveeType(reserveeType: string): ReserveeType | null {
   switch (reserveeType) {
     case ReserveeType.Company:
       return ReserveeType.Company;
@@ -80,8 +85,15 @@ export function transformReserveeType(reserveeType: Maybe<string> | undefined): 
     case ReserveeType.Individual:
       return ReserveeType.Individual;
     default:
-      return undefined;
+      return null;
   }
+}
+export function transformReserveeTypeUnsafe(reserveeType: string): ReserveeType {
+  const transformed = transformReserveeType(reserveeType);
+  if (transformed == null) {
+    throw new Error(`Unknown reservee type: ${reserveeType}`);
+  }
+  return transformed;
 }
 
 export function getIntervalMinutes(reservationStartInterval: ReservationStartInterval): number {
@@ -122,4 +134,151 @@ export function transformAccessTypeSafe(t: string): AccessType | null {
     default:
       return null;
   }
+}
+
+export function transformReservationUnitState(state: string): ReservationUnitPublishingState | null {
+  switch (state) {
+    case ReservationUnitPublishingState.Archived:
+      return ReservationUnitPublishingState.Archived;
+    case ReservationUnitPublishingState.Draft:
+      return ReservationUnitPublishingState.Draft;
+    case ReservationUnitPublishingState.Hidden:
+      return ReservationUnitPublishingState.Hidden;
+    case ReservationUnitPublishingState.Published:
+      return ReservationUnitPublishingState.Published;
+    case ReservationUnitPublishingState.ScheduledHiding:
+      return ReservationUnitPublishingState.ScheduledHiding;
+    case ReservationUnitPublishingState.ScheduledPeriod:
+      return ReservationUnitPublishingState.ScheduledPeriod;
+    case ReservationUnitPublishingState.ScheduledPublishing:
+      return ReservationUnitPublishingState.ScheduledPublishing;
+    default:
+      return null;
+  }
+}
+export function transformReservationUnitStateUnsafe(state: string): ReservationUnitPublishingState {
+  const transformed = transformReservationUnitState(state);
+  if (transformed == null) {
+    throw new Error(`Unknown reservation unit state: ${state}`);
+  }
+  return transformed;
+}
+
+export function transformReservationState(state: string): ReservationStateChoice | null {
+  switch (state) {
+    case ReservationStateChoice.Created:
+      return ReservationStateChoice.Created;
+    case ReservationStateChoice.Cancelled:
+      return ReservationStateChoice.Cancelled;
+    case ReservationStateChoice.Denied:
+      return ReservationStateChoice.Denied;
+    case ReservationStateChoice.Confirmed:
+      return ReservationStateChoice.Confirmed;
+    case ReservationStateChoice.RequiresHandling:
+      return ReservationStateChoice.RequiresHandling;
+    case ReservationStateChoice.WaitingForPayment:
+      return ReservationStateChoice.WaitingForPayment;
+    default:
+      return null;
+  }
+}
+export function transformReservationStateUnsafe(state: string): ReservationStateChoice {
+  const transformed = transformReservationState(state);
+  if (transformed == null) {
+    throw new Error(`Unknown reservation state: ${state}`);
+  }
+  return transformed;
+}
+
+export function transformPaymentStatus(t: string): OrderStatusWithFree | null {
+  switch (t) {
+    case OrderStatusWithFree.Paid:
+      return OrderStatusWithFree.Paid;
+    case OrderStatusWithFree.PaidManually:
+      return OrderStatusWithFree.PaidManually;
+    case OrderStatusWithFree.PaidByInvoice:
+      return OrderStatusWithFree.PaidByInvoice;
+    case OrderStatusWithFree.Draft:
+      return OrderStatusWithFree.Draft;
+    case OrderStatusWithFree.Expired:
+      return OrderStatusWithFree.Expired;
+    case OrderStatusWithFree.Refunded:
+      return OrderStatusWithFree.Refunded;
+    case OrderStatusWithFree.Cancelled:
+      return OrderStatusWithFree.Cancelled;
+    case OrderStatusWithFree.Free:
+      return OrderStatusWithFree.Free;
+    default:
+      return null;
+  }
+}
+export function transformPaymentStatusUnsafe(t: string): OrderStatusWithFree {
+  const transformed = transformPaymentStatus(t);
+  if (transformed == null) {
+    throw new Error(`Unknown payment status: ${t}`);
+  }
+  return transformed;
+}
+
+export function transformAccessCodeState(t: string): AccessCodeState | null {
+  switch (t) {
+    case AccessCodeState.AccessCodeCreated:
+      return AccessCodeState.AccessCodeCreated;
+    case AccessCodeState.AccessCodePending:
+      return AccessCodeState.AccessCodePending;
+    case AccessCodeState.AccessCodeNotRequired:
+      return AccessCodeState.AccessCodeNotRequired;
+    default:
+      return null;
+  }
+}
+export function transformAccessCodeStateUnsafe(t: string): AccessCodeState {
+  const transformed = transformAccessCodeState(t);
+  if (transformed == null) {
+    throw new Error(`Unknown access code state: ${t}`);
+  }
+  return transformed;
+}
+
+export function transformApplicationSectionStatus(t: string): ApplicationSectionStatusChoice | null {
+  switch (t) {
+    case ApplicationSectionStatusChoice.Handled:
+      return ApplicationSectionStatusChoice.Handled;
+    case ApplicationSectionStatusChoice.Unallocated:
+      return ApplicationSectionStatusChoice.Unallocated;
+    case ApplicationSectionStatusChoice.InAllocation:
+      return ApplicationSectionStatusChoice.InAllocation;
+    case ApplicationSectionStatusChoice.Rejected:
+      return ApplicationSectionStatusChoice.Rejected;
+    default:
+      return null;
+  }
+}
+export function transformApplicationSectionStatusUnsafe(t: string): ApplicationSectionStatusChoice {
+  const transformed = transformApplicationSectionStatus(t);
+  if (transformed == null) {
+    throw new Error(`Unknown application section status: ${t}`);
+  }
+  return transformed;
+}
+export function transformApplicationStatus(t: string): ApplicationStatusChoice | null {
+  switch (t) {
+    case ApplicationStatusChoice.Received:
+      return ApplicationStatusChoice.Received;
+    case ApplicationStatusChoice.Handled:
+      return ApplicationStatusChoice.Handled;
+    case ApplicationStatusChoice.ResultsSent:
+      return ApplicationStatusChoice.ResultsSent;
+    case ApplicationStatusChoice.InAllocation:
+      return ApplicationStatusChoice.InAllocation;
+    default:
+      return null;
+  }
+}
+export function transformApplicationStatusUnsafe(t: string): ApplicationStatusChoice {
+  const transformed = transformApplicationStatus(t);
+  if (transformed == null) {
+    throw new Error(`Unknown application status: ${t}`);
+  }
+  return transformed;
 }
