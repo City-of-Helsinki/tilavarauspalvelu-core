@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { DayT } from "common/src/const";
 import { SearchButton, SearchButtonContainer } from "@/component/SearchButton";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
+import { useFilterOptions } from "@/hooks/useFilterOptions";
 
 type OptionType = {
   value: number;
@@ -70,6 +71,7 @@ function mapFormToSearchParams(data: SearchFormValues): URLSearchParams {
   }
   return params;
 }
+
 export function Filters({
   unitGroupOptions,
   unitOptions,
@@ -130,25 +132,20 @@ export function Filters({
   // TODO these are "declined" / "approved" but the decline functionality is not implemented
   // so disabling the filter for now (there is no backend filter for it nor can it be tested)
 
+  // FIXME this probably doesn't work (and the above thing should be removed)
   const sectionStatusOptions = (statusOption === "sectionShort" ? [] : sectionStatusArrayLong).map((status) => ({
     label: t(`translation:ApplicationSectionStatusChoice.${status}`),
     value: status,
   }));
+  const options = useFilterOptions();
 
-  const options: TagOptionsList = {
+  const tagOptions: TagOptionsList = {
+    ...options,
+    // overloads because we are filtering these
+    // TODO should move the filtering to the useFilterOptions hook and pass filter params to it
     reservationUnits: reservationUnitOptions,
     units: unitOptions,
     unitGroups: unitGroupOptions,
-    // Not needed on this page
-    orderChoices: [],
-    priorityChoices: [],
-    reservationUnitStates: [],
-    reservationUnitTypes: [],
-    stateChoices: [],
-    equipments: [],
-    purposes: [],
-    ageGroups: [],
-    municipalities: [],
   };
 
   const { handleSubmit, control } = form;
@@ -183,7 +180,7 @@ export function Filters({
         <ControlledSearchFilter control={control} name="search" />
       </AutoGrid>
       <SearchButtonContainer>
-        <SearchTags hide={hideSearchTags} translateTag={translateTag(t, options)} />
+        <SearchTags hide={hideSearchTags} translateTag={translateTag(t, tagOptions)} />
         <SearchButton />
       </SearchButtonContainer>
       <HR />

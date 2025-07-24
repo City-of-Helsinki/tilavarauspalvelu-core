@@ -1,4 +1,10 @@
-import { ReservationStateChoice, ReservationUnitPublishingState } from "@gql/gql-types";
+import {
+  OrderStatusWithFree,
+  ReservationStateChoice,
+  ReservationTypeChoice,
+  ReservationUnitPublishingState,
+  ReserveeType,
+} from "@gql/gql-types";
 import { fromUIDate, isValidDate } from "common/src/common/util";
 import { toNumber } from "common/src/helpers";
 import { type OptionsListT, type OptionT } from "common/src/modules/search";
@@ -11,6 +17,10 @@ export interface TagOptionsList extends OptionsListT {
   reservationUnitStates: Readonly<Array<{ value: ReservationUnitPublishingState; label: string }>>;
   priorityChoices: Readonly<OptionT[]>;
   orderChoices: Readonly<OptionT[]>;
+  orderStatus: Readonly<Array<{ value: OrderStatusWithFree; label: string }>>;
+  reservationTypeChoices: Readonly<Array<{ value: ReservationTypeChoice; label: string }>>;
+  recurringChoices: Readonly<Array<{ value: "only" | "onlyNot"; label: string }>>;
+  reserveeTypes: Readonly<Array<{ value: ReserveeType; label: string }>>;
 }
 
 export function translateTag(t: TFunction, options: Readonly<TagOptionsList>) {
@@ -118,7 +128,7 @@ export function translateTag(t: TFunction, options: Readonly<TagOptionsList>) {
           status: t(`translation:orderStatus.${value}`),
         });
       case "recurring":
-        return t(`filters:label.${value}Recurring`);
+        return options.recurringChoices.find((x) => x.value === value)?.label ?? "";
       case "freeOfCharge":
         return t("filters:label.freeOfCharge");
       case "search":
