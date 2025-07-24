@@ -21,6 +21,7 @@ import { useSearchParams } from "next/navigation";
 import { transformReservationState, transformReservationType } from "common/src/conversion";
 import { filterNonNullable } from "common/src/helpers";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
+import { mapParamToNumber } from "@/helpers";
 
 const MoreWrapper = styled(ShowAllContainer)`
   .ShowAllContainer__ToggleButton {
@@ -134,7 +135,9 @@ export function Filters({
   const setSearchParams = useSetSearchParams();
   const searchParams = useSearchParams();
 
-  const options = useFilterOptions();
+  // TODO this only filters the options after a search, have to use form data if we want to filter without searching
+  const unitFilter = mapParamToNumber(searchParams.getAll("unit"), 1);
+  const options = useFilterOptions(unitFilter);
   const tagOptions: TagOptionsList = {
     ...options,
   };
