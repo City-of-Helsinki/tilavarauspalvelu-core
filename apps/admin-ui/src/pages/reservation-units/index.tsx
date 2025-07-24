@@ -3,13 +3,21 @@ import { useTranslation } from "next-i18next";
 import { H1, HR } from "common/styled";
 import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { UserPermissionChoice } from "@gql/gql-types";
+import {
+  FilterOptionsDocument,
+  FilterOptionsQuery,
+  FilterOptionsQueryVariables,
+  UserPermissionChoice,
+} from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { ReservationUnitsDataReader, Filters } from "@lib/reservation-units/";
+import { createClient } from "@/common/apolloClient";
+import { getFilterOptions } from "@/hooks/useFilterOptions";
 
-function ReservationUnits(): JSX.Element {
+function ReservationUnits({ optionsData }: { optionsData: PageProps["optionsData"] }): JSX.Element {
   const { t } = useTranslation();
+  const options = getFilterOptions(t, optionsData);
 
   return (
     <>
@@ -17,7 +25,7 @@ function ReservationUnits(): JSX.Element {
         <H1 $marginTop="l">{t("reservationUnit:reservationUnitListHeading")}</H1>
         <p>{t("reservationUnit:reservationUnitListDescription")}</p>
       </div>
-      <Filters />
+      <Filters options={options} />
       <HR />
       <ReservationUnitsDataReader />
     </>
@@ -28,14 +36,21 @@ type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 export default function Page(props: PageProps): JSX.Element {
   return (
     <AuthorizationChecker apiUrl={props.apiBaseUrl} permission={UserPermissionChoice.CanManageReservationUnits}>
-      <ReservationUnits />
+      <ReservationUnits optionsData={props.optionsData} />
     </AuthorizationChecker>
   );
 }
 
-export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
+export async function getServerSideProps({ locale, req }: GetServerSidePropsContext) {
+  const commonProps = await getCommonServerSideProps();
+  const apolloClient = createClient(commonProps.apiBaseUrl, req);
+
+  const options = await apolloClient.query<FilterOptionsQuery, FilterOptionsQueryVariables>({
+    query: FilterOptionsDocument,
+  });
   return {
     props: {
+      optionsData: options.data,
       ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
