@@ -4,13 +4,12 @@ import { TextInput, IconSearch, LoadingSpinner, ButtonVariant } from "hds-react"
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { FilterTagList } from "../FilterTagList";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { mapParamToNumber } from "@/modules/search";
 import { type OptionsListT } from "common/src/modules/search";
 import { SearchButtonContainer, StyledSubmitButton } from "../search/styled";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
 import { ControlledNumberInput } from "common/src/components/form";
-import { toNumber } from "common/src/helpers";
+import { mapParamToInterger, toNumber } from "common/src/helpers";
 import { AutoGrid, Flex } from "common/styled";
 
 const filterOrder = [
@@ -34,9 +33,9 @@ export type SearchFormValues = {
 // TODO combine as much as possible with the one in single-search (move them to a common place)
 function mapSeasonalQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
   return {
-    purposes: mapParamToNumber(params.getAll("purposes"), 1),
-    units: mapParamToNumber(params.getAll("units"), 1),
-    reservationUnitTypes: mapParamToNumber(params.getAll("reservationUnitTypes"), 1),
+    purposes: mapParamToInterger(params.getAll("purposes"), 1),
+    units: mapParamToInterger(params.getAll("units"), 1),
+    reservationUnitTypes: mapParamToInterger(params.getAll("reservationUnitTypes"), 1),
     personsAllowed: toNumber(params.get("personsAllowed")),
     textSearch: params.get("textSearch") ?? "",
     accessTypes: params.getAll("accessTypes"),

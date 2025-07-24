@@ -1,6 +1,12 @@
 /// This file contains the search query for reservation units
 /// e.g. the common search pages (both seasonal and single)
-import { filterNonNullable, getLocalizationLang, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import {
+  filterNonNullable,
+  getLocalizationLang,
+  ignoreMaybeArray,
+  mapParamToInterger,
+  toNumber,
+} from "common/src/helpers";
 import { type LocalizationLanguages } from "common/src/urlBuilder";
 import {
   EquipmentOrderingChoices,
@@ -119,10 +125,10 @@ export function processVariables({
   const isSeasonal = kind === ReservationKind.Season;
   const textSearch = values.get("textSearch");
   const personsAllowed = toNumber(values.get("personsAllowed"));
-  const purposes = mapParamToNumber(values.getAll("purposes"), 1);
-  const unit = mapParamToNumber(values.getAll("units"), 1);
-  const reservationUnitTypes = mapParamToNumber(values.getAll("reservationUnitTypes"), 1);
-  const equipments = mapParamToNumber(values.getAll("equipments"), 1);
+  const purposes = mapParamToInterger(values.getAll("purposes"), 1);
+  const unit = mapParamToInterger(values.getAll("units"), 1);
+  const reservationUnitTypes = mapParamToInterger(values.getAll("reservationUnitTypes"), 1);
+  const equipments = mapParamToInterger(values.getAll("equipments"), 1);
   const showOnlyReservable = ignoreMaybeArray(values.getAll("showOnlyReservable")) !== "false";
   const applicationRound = "applicationRound" in rest && isSeasonal ? rest.applicationRound : null;
   const reservationPeriodBeginDate =
@@ -166,11 +172,6 @@ export function processVariables({
     isVisible: true,
     reservationKind: kind,
   };
-}
-
-export function mapParamToNumber(param: string[], min?: number): number[] {
-  const numbers = param.map(Number).filter(Number.isInteger);
-  return min != null ? numbers.filter((n) => n >= min) : numbers;
 }
 
 export function translateOption(

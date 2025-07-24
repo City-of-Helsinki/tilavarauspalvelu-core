@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { gql } from "@apollo/client";
 import { ReservationUnitOrderingChoices, useSearchReservationUnitsQuery } from "@gql/gql-types";
-import { filterNonNullable, toNumber } from "common/src/helpers";
+import { filterNonNullable, mapParamToInterger, toNumber } from "common/src/helpers";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { More } from "@/component/More";
 import { ReservationUnitsTable } from "./ReservationUnitsTable";
@@ -9,7 +9,6 @@ import { errorToast } from "common/src/components/toast";
 import { CenterSpinner } from "common/styled";
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
-import { mapParamToNumber } from "@/helpers";
 import { transformReservationUnitState } from "common/src/conversion";
 
 function transformOrderBy(orderBy: string, desc: boolean): ReservationUnitOrderingChoices | null {
@@ -61,8 +60,8 @@ export function ReservationUnitsDataReader(): JSX.Element {
 
   const reservationUnitStates = searchParams.getAll("reservationUnitState");
 
-  const unit = mapParamToNumber(searchParams.getAll("unit"), 1);
-  const unitGroupFilter = mapParamToNumber(searchParams.getAll("unitGroup"), 1);
+  const unit = mapParamToInterger(searchParams.getAll("unit"), 1);
+  const unitGroupFilter = mapParamToInterger(searchParams.getAll("unitGroup"), 1);
 
   const searchFilter = searchParams.get("search");
   // it's typed string but it's actually a number (python Decimal)
