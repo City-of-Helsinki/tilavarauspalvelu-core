@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Tabs } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { uniqBy } from "lodash-es";
@@ -10,6 +10,7 @@ import {
   type ApplicationRoundFilterQuery,
   type ApplicationRoundFilterQueryVariables,
   type ApplicationRoundFilterUnitFragment,
+  type ApplicationSectionAllocationsQueryVariables,
   useAllApplicationEventsQuery,
   useApplicationSectionAllocationsQuery,
   UserPermissionChoice,
@@ -81,6 +82,70 @@ const NumberOfResultsContainer = styled.div`
 type ApplicationRoundFilterQueryType = NonNullable<ApplicationRoundFilterQuery["applicationRound"]>;
 type ReservationUnitFilterQueryType = NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0];
 
+/// Trying to wrap used query variables into a hook that is only re-evaluated when the values change
+/// not every time any searchParameter changes
+///
+/// This works: the hook is only ran when the watched values change
+/// Problem with this is that we have to rewrite all queries to use lazy versions and fetch from the cb only
+/// also when using polling we have to implement our own polling logic.
+/// so set all queries to "fetchPolicy": "standby" and manually refetch from both poll hooks and query hook callbacks
+function useQueryVariables(
+  applicationRound: ApplicationRoundFilterQueryType,
+  defaultReservationUnitPk: number,
+  cb: (vals: ApplicationSectionAllocationsQueryVariables) => void = () => {}
+): ApplicationSectionAllocationsQueryVariables {
+  const searchParams = useSearchParams();
+  const nameFilter = searchParams.get("search");
+  const applicantTypeFilter = filterNonNullable(searchParams.getAll("applicantType").map(transformReserveeType));
+  const preferredOrderFilter = mapParamToInterger(searchParams.getAll("order")).filter((x) => x >= 0 && x <= 10);
+  const ageGroupFilter = mapParamToInterger(searchParams.getAll("ageGroup"), 1);
+  const municipalityFilter = filterNonNullable(
+    searchParams.getAll("municipality").map((x) => transformMunicipality(x))
+  );
+  const purposeFilter = mapParamToInterger(searchParams.getAll("purpose"), 1);
+
+  const priorityFilterSanitized = convertPriorityFilter(searchParams.getAll("priority"));
+  const priorityFilterQuery = priorityFilterSanitized.length > 0 ? priorityFilterSanitized : null;
+  const includePreferredOrder10OrHigher =
+    preferredOrderFilter.length > 0 ? preferredOrderFilter.filter((x) => x > 10).length > 0 : null;
+
+  const selectedReservationUnit = toNumber(searchParams.get("reservation-unit")) ?? defaultReservationUnitPk;
+
+  const values = {
+    applicationRound: applicationRound.pk ?? 0,
+    priority: priorityFilterQuery,
+    preferredOrder: preferredOrderFilter,
+    includePreferredOrder10OrHigher,
+    textSearch: nameFilter,
+    municipality: municipalityFilter,
+    applicantType: applicantTypeFilter,
+    purpose: purposeFilter,
+    ageGroup: ageGroupFilter,
+    reservationUnit: selectedReservationUnit,
+    applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
+    beginDate: applicationRound?.reservationPeriodBeginDate ?? "",
+    endDate: applicationRound?.reservationPeriodEndDate ?? "",
+  };
+
+  // TODO use a hash function (or deepEquality) not JSON.stringify (cleaner, faster, doesn't have key order issues)
+  const key = JSON.stringify(values);
+  return useMemo(() => {
+    cb(values);
+    return values;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- on purpose we only update on value change not on rewrites
+  }, [key]);
+}
+
+function mapOrderFilter(val: ApplicationSectionAllocationsQueryVariables["preferredOrder"]): number[] {
+  if (val == null) {
+    return [];
+  }
+  if (typeof val === "number") {
+    return [val];
+  }
+  return val.filter((x): x is number => x != null);
+}
+
 function ApplicationRoundAllocation({
   applicationRound,
   units,
@@ -110,60 +175,30 @@ function ApplicationRoundAllocation({
     setParams(vals);
   };
 
-  const unitReservationUnits = reservationUnits.filter((ru) => ru.unit?.pk != null && ru.unit.pk === unitFilter);
-
-  const selectedReservationUnit = toNumber(searchParams.get("reservation-unit")) ?? unitReservationUnits?.[0]?.pk;
-
   const setSelectedReservationUnit = (value: number | null) => {
     setSingleValueSearchParam("reservation-unit", value?.toString() ?? null);
   };
+  const unitReservationUnits = reservationUnits.filter((ru) => ru.unit?.pk != null && ru.unit.pk === unitFilter);
 
-  const nameFilter = searchParams.get("search");
-  const applicantTypeFilter = filterNonNullable(searchParams.getAll("applicantType").map(transformReserveeType));
-  const preferredOrderFilter = mapParamToInterger(searchParams.getAll("order")).filter((x) => x >= 0 && x <= 10);
-  const ageGroupFilter = mapParamToInterger(searchParams.getAll("ageGroup"), 1);
-  const municipalityFilter = filterNonNullable(
-    searchParams.getAll("municipality").map((x) => transformMunicipality(x))
-  );
-  const purposeFilter = mapParamToInterger(searchParams.getAll("purpose"), 1);
-
-  const priorityFilterSanitized = convertPriorityFilter(searchParams.getAll("priority"));
-  const priorityFilterQuery = priorityFilterSanitized.length > 0 ? priorityFilterSanitized : null;
-  const includePreferredOrder10OrHigher =
-    preferredOrderFilter.length > 0 ? preferredOrderFilter.filter((x) => x > 10).length > 0 : null;
-
+  const queryVariables = useQueryVariables(applicationRound, unitReservationUnits[0]?.pk ?? 0);
   const query = useApplicationSectionAllocationsQuery({
     // On purpose skip if the reservation unit is not selected (it is required)
-    skip: selectedReservationUnit == null,
+    skip: queryVariables.reservationUnit === 0,
     pollInterval: ALLOCATION_POLL_INTERVAL,
     // NOTE required otherwise this returns stale data when filters change
     // there is an issue with the caches (sometimes returns incorrect data, not stale but incorrect)
     fetchPolicy: "network-only",
-    variables: {
-      applicationRound: applicationRound.pk ?? 0,
-      priority: priorityFilterQuery,
-      preferredOrder: preferredOrderFilter,
-      includePreferredOrder10OrHigher,
-      textSearch: nameFilter,
-      municipality: municipalityFilter,
-      applicantType: applicantTypeFilter,
-      purpose: purposeFilter,
-      ageGroup: ageGroupFilter,
-      reservationUnit: selectedReservationUnit ?? 0,
-      applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
-      beginDate: applicationRound?.reservationPeriodBeginDate ?? "",
-      endDate: applicationRound?.reservationPeriodEndDate ?? "",
-    },
+    variables: queryVariables,
     onError: () => {
       errorToast({ text: t("errors:errorFetchingData") });
     },
   });
-  const { data, loading, refetch, previousData, fetchMore } = query;
+  const { data: refreshedData, loading, refetch, previousData, fetchMore } = query;
 
   // NOTE onComplete isn't called more than once
   // how this interacts with the polling is unknown
   useEffect(() => {
-    const { pageInfo } = data?.applicationSections ?? {};
+    const { pageInfo } = refreshedData?.applicationSections ?? {};
     if (pageInfo?.hasNextPage) {
       fetchMore({
         variables: {
@@ -171,10 +206,13 @@ function ApplicationRoundAllocation({
         },
       });
     }
-  }, [data, fetchMore]);
+  }, [refreshedData, fetchMore]);
 
+  const data = refreshedData ?? previousData;
+
+  const selectedReservationUnit = queryVariables.reservationUnit;
   // TODO these should check the loading state also (it's only an error if not loading)
-  if (selectedReservationUnit == null) {
+  if (selectedReservationUnit === 0) {
     // eslint-disable-next-line no-console -- TODO use logger
     console.warn("Skipping allocation query because reservation unit");
   } else if (applicationRound == null) {
@@ -225,10 +263,12 @@ function ApplicationRoundAllocation({
         if (r.allocatedTimeSlots.filter((ats) => ats.reservationUnitOption.pk === r.pk).length > 0) {
           return true;
         }
+
+        const preferredOrderFilter = mapOrderFilter(queryVariables.preferredOrder);
         if (preferredOrderFilter.length > 0) {
           const includedInPreferredOrder =
             preferredOrderFilter.includes(r.preferredOrder) ||
-            (includePreferredOrder10OrHigher && r.preferredOrder >= 10);
+            (queryVariables.includePreferredOrder10OrHigher && r.preferredOrder >= 10);
           return includedInPreferredOrder && r.reservationUnit.pk === selectedReservationUnit;
         }
         return r.reservationUnit.pk === selectedReservationUnit;
@@ -338,6 +378,9 @@ function ApplicationRoundAllocation({
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
+// NOTE any use of searchParams does a full "redraw" though React is smart enough that components
+// are not actually remounted, but all hooks are re-evaluated
+// so every apollo query is sent to the server (including user query, filter query, etc.)
 export default function ApplicationRoundRouted(props: PropsNarrowed): JSX.Element {
   const { applicationRound } = props;
   const { user } = useSession();
