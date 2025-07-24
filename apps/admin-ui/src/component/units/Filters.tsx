@@ -2,12 +2,12 @@ import React from "react";
 import { AutoGrid } from "common/styled";
 import { ControlledMultiSelectFilter, ControlledSearchFilter } from "@/component/QueryParamFilters";
 import { SearchTags } from "@/component/SearchTags";
-import { useUnitGroupOptions } from "@/hooks/useUnitGroupOptions";
 import { translateTag, type TagOptionsList } from "@/modules/search";
 import { useTranslation } from "next-i18next";
 import { useForm } from "react-hook-form";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { SearchButton, SearchButtonContainer } from "../SearchButton";
+import { useFilterOptions } from "@/hooks/useFilterOptions";
 
 type SearchFormValues = {
   search: string;
@@ -16,11 +16,11 @@ type SearchFormValues = {
 
 export function Filters(): JSX.Element {
   const { t } = useTranslation();
-  const { options: unitGroupOptions } = useUnitGroupOptions();
   const setSearchParams = useSetSearchParams();
 
-  const options: TagOptionsList = {
-    unitGroups: unitGroupOptions,
+  const options = useFilterOptions();
+  const tagOptions: TagOptionsList = {
+    ...options,
     // Not needed on this page
     orderChoices: [],
     priorityChoices: [],
@@ -60,10 +60,10 @@ export function Filters(): JSX.Element {
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
       <AutoGrid>
         <ControlledSearchFilter control={control} name="search" labelKey="unit" />
-        <ControlledMultiSelectFilter control={control} name="unitGroup" options={unitGroupOptions} />
+        <ControlledMultiSelectFilter control={control} name="unitGroup" options={options.unitGroups} />
       </AutoGrid>
       <SearchButtonContainer>
-        <SearchTags hide={[]} translateTag={translateTag(t, options)} />
+        <SearchTags hide={[]} translateTag={translateTag(t, tagOptions)} />
         <SearchButton />
       </SearchButtonContainer>
     </form>

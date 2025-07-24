@@ -19,7 +19,6 @@ import {
 } from "@gql/gql-types";
 import { base64encode, filterNonNullable, ignoreMaybeArray, sort, toNumber } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
-import { useOptions } from "@/hooks";
 import { errorToast } from "common/src/components/toast";
 import { ALLOCATION_POLL_INTERVAL, NOT_FOUND_SSR_VALUE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { truncate } from "@/helpers";
@@ -42,6 +41,7 @@ import { createClient } from "@/common/apolloClient";
 import { type TagOptionsList, translateTag } from "@/modules/search";
 import { useForm } from "react-hook-form";
 import { SearchButton, SearchButtonContainer } from "@/component/SearchButton";
+import { useFilterOptions } from "@/hooks/useFilterOptions";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;
 
@@ -194,10 +194,6 @@ function Filters({ hideSearchTags, units, isLoading }: FilterProps): JSX.Element
   const setSearchParams = useSetSearchParams();
   const searchParams = useSearchParams();
 
-  const optionsQuery = useOptions();
-  const purposeOptions = optionsQuery.purpose;
-  const ageGroupOptions = optionsQuery.ageGroup;
-
   const defaultValues: SearchFormValues = mapParamsToForm(searchParams, units);
   const form = useForm<SearchFormValues>({
     defaultValues,
@@ -213,42 +209,10 @@ function Filters({ hideSearchTags, units, isLoading }: FilterProps): JSX.Element
     setSearchParams(searchParams);
   };
 
-  const municipalityOptions = Object.values(MunicipalityChoice).map((value) => ({
-    label: t(`common:municipalities.${value}`),
-    value: value,
-  }));
-  const customerFilterOptions = Object.values(ReserveeType).map((value) => ({
-    label: t(`translation:reserveeType.${value}`),
-    value: value,
-  }));
-  const unitOptions = units.map((unit) => ({
-    value: unit?.pk ?? 0,
-    label: unit?.nameFi ?? "",
-  }));
-  const priorityOptions = ([300, 200] as const).map((n) => ({
-    value: n,
-    label: t(`applicationSection:priority.${n}`),
-  }));
+  const options = useFilterOptions();
 
-  const orderOptions = Array.from(Array(10).keys())
-    .map((n) => ({
-      value: n,
-      label: `${n + 1}. ${t("filters:reservationUnitApplication")}`,
-    }))
-    .concat([
-      {
-        value: 11,
-        label: t("filters:reservationUnitApplicationOthers"),
-      },
-    ]);
-
-  const options: TagOptionsList = {
-    orderChoices: orderOptions,
-    priorityChoices: priorityOptions,
-    units: unitOptions,
-    municipalities: municipalityOptions,
-    ageGroups: ageGroupOptions,
-    purposes: purposeOptions,
+  const tagOptions: TagOptionsList = {
+    ...options,
     // Not needed on this page
     reservationUnits: [],
     unitGroups: [],
@@ -265,17 +229,17 @@ function Filters({ hideSearchTags, units, isLoading }: FilterProps): JSX.Element
         showLessLabel={t("filters:lessFilters")}
         maximumNumber={4}
       >
-        <ControlledSelectFilter control={control} name="unit" options={unitOptions} />
-        <ControlledMultiSelectFilter control={control} name="priority" options={priorityOptions} />
-        <ControlledMultiSelectFilter control={control} name="order" options={orderOptions} />
+        <ControlledSelectFilter control={control} name="unit" options={options.units} />
+        <ControlledMultiSelectFilter control={control} name="priority" options={options.priorityChoices} />
+        <ControlledMultiSelectFilter control={control} name="order" options={options.orderChoices} />
         <ControlledSearchFilter control={control} name="search" />
-        <ControlledMultiSelectFilter control={control} name="municipality" options={municipalityOptions} />
-        <ControlledMultiSelectFilter control={control} name="applicantType" options={customerFilterOptions} />
-        <ControlledMultiSelectFilter control={control} name="ageGroup" options={ageGroupOptions} />
-        <ControlledMultiSelectFilter control={control} name="purpose" options={purposeOptions} />
+        <ControlledMultiSelectFilter control={control} name="municipality" options={options.municipalities} />
+        <ControlledMultiSelectFilter control={control} name="applicantType" options={options.reserveeTypes} />
+        <ControlledMultiSelectFilter control={control} name="ageGroup" options={options.ageGroups} />
+        <ControlledMultiSelectFilter control={control} name="purpose" options={options.purposes} />
       </ShowAllContainer>
       <SearchButtonContainer>
-        <SearchTags hide={hideSearchTags} translateTag={translateTag(t, options)} />
+        <SearchTags hide={hideSearchTags} translateTag={translateTag(t, tagOptions)} />
         <SearchButton isLoading={isLoading} />
       </SearchButtonContainer>
     </form>

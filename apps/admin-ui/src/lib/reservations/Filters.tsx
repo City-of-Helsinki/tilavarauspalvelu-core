@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { ShowAllContainer } from "common/src/components";
-import { useReservationUnitTypes, useUnitOptions, useReservationUnitOptions } from "@/hooks";
 import { Flex } from "common/styled";
 import {
   ControlledCheckboxFilter,
@@ -21,6 +20,7 @@ import { SearchButton, SearchButtonContainer } from "@/component/SearchButton";
 import { useSearchParams } from "next/navigation";
 import { transformReservationState, transformReservationType } from "common/src/conversion";
 import { filterNonNullable } from "common/src/helpers";
+import { useFilterOptions } from "@/hooks/useFilterOptions";
 
 const MoreWrapper = styled(ShowAllContainer)`
   .ShowAllContainer__ToggleButton {
@@ -98,45 +98,6 @@ function mapFormToSearchParams(data: SearchFormValues): URLSearchParams {
   return params;
 }
 
-function useOptions() {
-  const { t } = useTranslation("filters");
-  const { options: reservationUnitTypes } = useReservationUnitTypes();
-  const { options: units } = useUnitOptions();
-  const { options: reservationUnits } = useReservationUnitOptions();
-
-  const states = Object.values(ReservationStateChoice)
-    .filter((s) => s !== ReservationStateChoice.Created)
-    .map((s) => ({
-      value: s,
-      label: t(`reservation:state.${s}`),
-    }));
-
-  const orderStatus = Object.values(OrderStatusWithFree).map((s) => ({
-    value: s,
-    label: t(`translation:orderStatus.${s}`),
-  }));
-
-  const reservationTypes = Object.values(ReservationTypeChoice).map((s) => ({
-    value: s,
-    label: t(`filters:reservationTypeChoice.${s}`),
-  }));
-
-  const recurring = [
-    { value: "only", label: t("filters:label.onlyRecurring") },
-    { value: "onlyNot", label: t("filters:label.onlyNotRecurring") },
-  ];
-
-  return {
-    reservationUnitTypes,
-    units,
-    reservationUnits,
-    states,
-    orderStatus,
-    reservationTypes,
-    recurring,
-  };
-}
-
 // TODO replace with safer version that checks for valid values
 // also a generice would be nice
 function mapParamsToForm(params: URLSearchParams): SearchFormValues {
@@ -173,21 +134,9 @@ export function Filters({
   const setSearchParams = useSetSearchParams();
   const searchParams = useSearchParams();
 
-  const options = useOptions();
+  const options = useFilterOptions();
   const tagOptions: TagOptionsList = {
-    reservationUnitTypes: options.reservationUnitTypes,
-    stateChoices: options.states,
-    reservationUnits: options.reservationUnits,
-    units: options.units,
-    // Not needed on this page
-    orderChoices: [],
-    priorityChoices: [],
-    reservationUnitStates: [],
-    unitGroups: [],
-    equipments: [],
-    purposes: [],
-    ageGroups: [],
-    municipalities: [],
+    ...options,
   };
 
   const defaultValues = mapParamsToForm(searchParams);
@@ -207,8 +156,12 @@ export function Filters({
   return (
     <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)} $direction="column" $gap="s">
       <MoreWrapper showAllLabel={t("filters:moreFilters")} showLessLabel={t("filters:lessFilters")} maximumNumber={4}>
-        <ControlledMultiSelectFilter control={control} options={options.reservationTypes} name="reservationType" />
-        <ControlledMultiSelectFilter control={control} options={options.states} name="state" />
+        <ControlledMultiSelectFilter
+          control={control}
+          options={options.reservationTypeChoices}
+          name="reservationType"
+        />
+        <ControlledMultiSelectFilter control={control} options={options.stateChoices} name="state" />
         <ControlledMultiSelectFilter control={control} options={options.reservationUnits} name="reservationUnit" />
         <ControlledSearchFilter control={control} name="search" labelKey="searchReservation" />
         <ControlledDateRangeFilter control={control} nameBegin="dateGte" nameEnd="dateLte" />
@@ -224,11 +177,9 @@ export function Filters({
           minName="minPrice"
           maxName="maxPrice"
         />
-        {/* FIXME doesn't work properly */}
         <ControlledMultiSelectFilter control={control} name="orderStatus" options={options.orderStatus} />
         <ControlledDateRangeFilter control={control} nameBegin="createdAtGte" nameEnd="createdAtLte" />
-        {/* FIXME doesn't work properly */}
-        <ControlledSelectFilter control={control} name="recurring" options={options.recurring} clearable />
+        <ControlledSelectFilter control={control} name="recurring" options={options.recurringChoices} clearable />
         <ControlledCheckboxFilter control={control} name="freeOfCharge" />
       </MoreWrapper>
       <SearchButtonContainer>
