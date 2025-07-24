@@ -311,3 +311,8 @@ export function formatListToCSV(t: TFunction, list: Readonly<Array<Readonly<stri
 export function formatTimeStruct({ hour, minute }: { hour: number; minute: number }): string {
   return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
 }
+
+export function mapParamToInterger(param: string[], min?: number): number[] {
+  const numbers = param.map(Number).filter(Number.isInteger);
+  return min != null ? numbers.filter((n) => n >= min) : numbers;
+}

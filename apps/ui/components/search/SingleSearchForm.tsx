@@ -13,12 +13,11 @@ import { FilterTagList } from "../FilterTagList";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { mapParamToNumber } from "@/modules/search";
 import { type OptionsListT } from "common/src/modules/search";
 import { SearchButtonContainer, StyledSubmitButton } from "./styled";
 import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
-import { ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { ignoreMaybeArray, mapParamToInterger, toNumber } from "common/src/helpers";
 import { Flex } from "common/styled";
 import { ShowAllContainer } from "common/src/components";
 
@@ -50,10 +49,10 @@ function mapQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
   const duration = dur != null && dur > 0 ? dur : null;
   const showOnlyReservable = ignoreMaybeArray(params.getAll("showOnlyReservable")) !== "false";
   return {
-    purposes: mapParamToNumber(params.getAll("purposes"), 1),
-    units: mapParamToNumber(params.getAll("units"), 1),
-    equipments: mapParamToNumber(params.getAll("equipments"), 1),
-    reservationUnitTypes: mapParamToNumber(params.getAll("reservationUnitTypes"), 1),
+    purposes: mapParamToInterger(params.getAll("purposes"), 1),
+    units: mapParamToInterger(params.getAll("units"), 1),
+    equipments: mapParamToInterger(params.getAll("equipments"), 1),
+    reservationUnitTypes: mapParamToInterger(params.getAll("reservationUnitTypes"), 1),
     accessTypes: params.getAll("accessTypes"),
     timeBegin: params.get("timeBegin"),
     timeEnd: params.get("timeEnd"),

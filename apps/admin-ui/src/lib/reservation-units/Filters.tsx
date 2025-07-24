@@ -15,7 +15,7 @@ import { SearchButton, SearchButtonContainer } from "@/component/SearchButton";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useForm } from "react-hook-form";
 import { useSearchParams } from "next/navigation";
-import { filterNonNullable, toNumber } from "common/src/helpers";
+import { filterNonNullable, mapParamToInterger, toNumber } from "common/src/helpers";
 import { transformReservationUnitState } from "common/src/conversion";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
 
@@ -42,14 +42,8 @@ type SearchFormValues = {
 function mapParamsToForm(params: URLSearchParams): SearchFormValues {
   return {
     search: params.get("search") ?? "",
-    unit: params
-      .getAll("unit")
-      .map((u) => Number(u))
-      .filter((u) => u > 0),
-    reservationUnitType: params
-      .getAll("reservationUnitType")
-      .map((u) => Number(u))
-      .filter((u) => u > 0),
+    unit: mapParamToInterger(params.getAll("unit"), 1),
+    reservationUnitType: mapParamToInterger(params.getAll("reservationUnitType"), 1),
     reservationUnitState: filterNonNullable(
       params.getAll("reservationUnitState").map((state) => transformReservationUnitState(state))
     ),
