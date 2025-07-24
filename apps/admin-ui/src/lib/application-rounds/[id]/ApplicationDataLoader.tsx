@@ -8,7 +8,7 @@ import { errorToast } from "common/src/common/toast";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
 import { ApplicationsTable, SORT_KEYS } from "./ApplicationsTable";
-import { useGetFilterSearchParams } from "./utils";
+import { useGetFilterSearchParams } from "@/hooks";
 import { CenterSpinner } from "common/styled";
 
 type Props = {
