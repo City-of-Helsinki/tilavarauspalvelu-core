@@ -13,81 +13,33 @@ import { formatNumber } from "@/common/util";
 import { useSearchParams } from "next/navigation";
 import { mapParamToNumber } from "@/helpers";
 import type { DayT } from "common/src/const";
-import { transformWeekday } from "common/src/conversion";
+import {
+  transformAccessCodeState,
+  transformApplicationSectionStatus,
+  transformApplicationStatus,
+  transformReserveeType,
+  transformWeekday,
+} from "common/src/conversion";
+import { filterNonNullable } from "common/src/helpers";
 
-function transformApplicationSectionStatus(status: string[]): ApplicationSectionStatusChoice[] {
-  return status
-    .map((s) => {
-      switch (s) {
-        case ApplicationSectionStatusChoice.Handled:
-          return ApplicationSectionStatusChoice.Handled;
-        case ApplicationSectionStatusChoice.Unallocated:
-          return ApplicationSectionStatusChoice.Unallocated;
-        case ApplicationSectionStatusChoice.InAllocation:
-          return ApplicationSectionStatusChoice.InAllocation;
-        case ApplicationSectionStatusChoice.Rejected:
-          return ApplicationSectionStatusChoice.Rejected;
-        default:
-          return undefined;
-      }
-    })
-    .filter((s): s is NonNullable<typeof s> => s != null);
+function transformApplicationSectionStatusList(status: string[]): ApplicationSectionStatusChoice[] {
+  return filterNonNullable(status.map(transformApplicationSectionStatus));
 }
 
-function transformApplicationStatuses(filters: string[]): ApplicationStatusChoice[] {
-  if (filters.length === 0) {
+function transformApplicationStatusList(filters: string[]): ApplicationStatusChoice[] {
+  const vals = filterNonNullable(filters.map(transformApplicationStatus));
+  if (vals.length === 0) {
     return VALID_ALLOCATION_APPLICATION_STATUSES;
   }
-  return filters
-    .map((filter) => {
-      switch (filter) {
-        case ApplicationStatusChoice.Received:
-          return ApplicationStatusChoice.Received;
-        case ApplicationStatusChoice.Handled:
-          return ApplicationStatusChoice.Handled;
-        case ApplicationStatusChoice.ResultsSent:
-          return ApplicationStatusChoice.ResultsSent;
-        case ApplicationStatusChoice.InAllocation:
-          return ApplicationStatusChoice.InAllocation;
-        default:
-          return undefined;
-      }
-    })
-    .filter((asc): asc is NonNullable<typeof asc> => asc != null);
+  return vals;
 }
 
-function transformApplicantType(filters: string[]): ReserveeType[] {
-  return filters
-    .map((filter) => {
-      switch (filter) {
-        case ReserveeType.Individual:
-          return ReserveeType.Individual;
-        case ReserveeType.Company:
-          return ReserveeType.Company;
-        case ReserveeType.Nonprofit:
-          return ReserveeType.Nonprofit;
-        default:
-          return undefined;
-      }
-    })
-    .filter((at): at is NonNullable<typeof at> => at != null);
+function transformApplicantTypeList(filters: string[]): ReserveeType[] {
+  return filterNonNullable(filters.map(transformReserveeType));
 }
 
-function transformAccessCodeState(filters: string[]): AccessCodeState[] {
-  return filters
-    .map((f) => {
-      switch (f) {
-        case AccessCodeState.AccessCodeCreated:
-          return AccessCodeState.AccessCodeCreated;
-        case AccessCodeState.AccessCodePending:
-          return AccessCodeState.AccessCodePending;
-        case AccessCodeState.AccessCodeNotRequired:
-          return AccessCodeState.AccessCodeNotRequired;
-        default:
-          return undefined;
-      }
-    })
-    .filter((act): act is NonNullable<typeof act> => act != null);
+function transformAccessCodeStateList(filters: string[]): AccessCodeState[] {
+  return filterNonNullable(filters.map(transformAccessCodeState));
 }
 
 export function useGetFilterSearchParams({ unitOptions }: { unitOptions?: { label: string; value: number }[] } = {}) {
@@ -104,10 +56,10 @@ export function useGetFilterSearchParams({ unitOptions }: { unitOptions?: { labe
     unitFilter: unitFilter,
     unitGroupFilter: mapParamToNumber(searchParams.getAll("unitGroup"), 1),
     reservationUnitFilter: mapParamToNumber(searchParams.getAll("reservationUnit"), 1),
-    statusFilter: transformApplicationStatuses(searchParams.getAll("status")),
-    sectionStatusFilter: transformApplicationSectionStatus(searchParams.getAll("sectionStatus")),
-    applicantTypeFilter: transformApplicantType(searchParams.getAll("applicant")),
-    accessCodeStateFilter: transformAccessCodeState(searchParams.getAll("accessCodeState")),
+    statusFilter: transformApplicationStatusList(searchParams.getAll("status")),
+    sectionStatusFilter: transformApplicationSectionStatusList(searchParams.getAll("sectionStatus")),
+    applicantTypeFilter: transformApplicantTypeList(searchParams.getAll("applicant")),
+    accessCodeStateFilter: transformAccessCodeStateList(searchParams.getAll("accessCodeState")),
     weekDayFilter: mapParamToNumber(searchParams.getAll("weekday"))
       .filter((n): n is DayT => n >= 0 && n <= 6)
       .map(transformWeekday),
