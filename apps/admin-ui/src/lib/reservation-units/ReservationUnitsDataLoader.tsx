@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { gql } from "@apollo/client";
 import { ReservationUnitOrderingChoices, useSearchReservationUnitsQuery } from "@gql/gql-types";
-import { filterNonNullable, mapParamToInterger, toNumber } from "common/src/helpers";
+import { filterNonNullable, mapParamToInterger, toInteger } from "common/src/helpers";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { More } from "@/component/More";
 import { ReservationUnitsTable } from "./ReservationUnitsTable";
@@ -64,11 +64,12 @@ export function ReservationUnitsDataReader(): JSX.Element {
   const unitGroupFilter = mapParamToInterger(searchParams.getAll("unitGroup"), 1);
 
   const searchFilter = searchParams.get("search");
-  // it's typed string but it's actually a number (python Decimal)
-  const maxPersonsLte = toNumber(searchParams.get("maxPersonsLte"));
-  const maxPersonsGte = toNumber(searchParams.get("maxPersonsGte"));
-  const surfaceAreaLte = toNumber(searchParams.get("surfaceAreaLte"));
-  const surfaceAreaGte = toNumber(searchParams.get("surfaceAreaGte"));
+  // backend error if these are floats
+  // could show validation errors for these but since it's not that important just clip the values to integers
+  const maxPersonsLte = toInteger(searchParams.get("maxPersonsLte"));
+  const maxPersonsGte = toInteger(searchParams.get("maxPersonsGte"));
+  const surfaceAreaLte = toInteger(searchParams.get("surfaceAreaLte"));
+  const surfaceAreaGte = toInteger(searchParams.get("surfaceAreaGte"));
 
   const { t } = useTranslation();
 

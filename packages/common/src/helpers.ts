@@ -49,6 +49,16 @@ export function toNumber(filter: Maybe<string> | undefined): number | null {
   return n;
 }
 
+/// Safe string -> integer conversion
+/// Always truncates the number to an integer
+export function toInteger(filter: Maybe<string> | undefined): number | null {
+  const val = toNumber(filter);
+  if (val == null) {
+    return null;
+  }
+  return Math.floor(val);
+}
+
 export function pick<T, K extends keyof T>(reservation: T, keys: ReadonlyArray<K>): Pick<T, K> {
   return keys.reduce<Pick<T, K>>(
     (acc, key) => {
