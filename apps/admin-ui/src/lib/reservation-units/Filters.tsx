@@ -17,7 +17,6 @@ import { useForm } from "react-hook-form";
 import { useSearchParams } from "next/navigation";
 import { filterNonNullable, mapParamToInterger, toNumber } from "common/src/helpers";
 import { transformReservationUnitState } from "common/src/conversion";
-import { useFilterOptions } from "@/hooks/useFilterOptions";
 
 const MoreWrapper = styled(ShowAllContainer)`
   .ShowAllContainer__ToggleButton {
@@ -85,28 +84,15 @@ function mapFormToSearchParams(data: SearchFormValues): URLSearchParams {
   return params;
 }
 
-export function Filters(): JSX.Element {
+export function Filters({ options }: { options: TagOptionsList }): JSX.Element {
   const { t } = useTranslation();
   const setSearchParams = useSetSearchParams();
   const searchParams = useSearchParams();
 
-  const options = useFilterOptions();
   const defaultValues = mapParamsToForm(searchParams);
   const form = useForm<SearchFormValues>({
     defaultValues,
   });
-  const tagOptions: TagOptionsList = {
-    ...options,
-    // Not needed on this page
-    orderChoices: [],
-    priorityChoices: [],
-    stateChoices: [],
-    reservationUnits: [],
-    equipments: [],
-    purposes: [],
-    ageGroups: [],
-    municipalities: [],
-  };
 
   const onSubmit = (data: SearchFormValues) => {
     const params = mapFormToSearchParams(data);
@@ -156,7 +142,7 @@ export function Filters(): JSX.Element {
         />
       </MoreWrapper>
       <SearchButtonContainer>
-        <SearchTags hide={[]} translateTag={translateTag(t, tagOptions)} />
+        <SearchTags hide={[]} translateTag={translateTag(t, options)} />
         <SearchButton />
       </SearchButtonContainer>
     </Flex>
