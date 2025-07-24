@@ -4,7 +4,7 @@ import { gql } from "@apollo/client";
 import { errorToast } from "common/src/components/toast";
 import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { isApplicationRoundInProgress } from "@/helpers";
-import { CenterSpinner, Flex, H1, NoWrap, TabWrapper, TitleSection } from "common/styled";
+import { Flex, H1, NoWrap, TabWrapper, TitleSection } from "common/styled";
 import { Button, Tabs } from "hds-react";
 import { uniqBy } from "lodash-es";
 import styled from "styled-components";
@@ -21,11 +21,13 @@ import {
   CheckPermissionsQuery,
   CheckPermissionsQueryVariables,
   CheckPermissionsDocument,
+  FilterOptionsDocument,
+  type FilterOptionsQuery,
+  type FilterOptionsQueryVariables,
+  CurrentUserDocument,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { hasPermission } from "@/modules/permissionHelper";
-import { useSession } from "@/hooks/auth";
-import { useUnitGroupOptions } from "@/hooks/useUnitGroupOptions";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import Link from "next/link";
@@ -33,7 +35,6 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
-import { Error404 } from "@/component/Error404";
 import { createClient } from "@/common/apolloClient";
 import { TimeframeStatus, ApplicationRoundStatusLabel } from "@lib/application-rounds";
 import {
@@ -44,6 +45,8 @@ import {
   TimeSlotDataLoader,
   RejectedOccurrencesDataLoader,
 } from "@lib/application-rounds/[id]";
+import { type TagOptionsList } from "@/modules/search";
+import { getFilterOptions } from "@/hooks/useFilterOptions";
 
 const TabContent = styled(Flex).attrs({
   $direction: "column",
@@ -54,22 +57,27 @@ const TabContent = styled(Flex).attrs({
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
 
-export default function ApplicationRound({ pk }: PropsNarrowed): JSX.Element {
+export default function ApplicationRound({
+  applicationRound: applicationRoundOriginal,
+  optionsData,
+  unitOptions,
+}: PropsNarrowed): JSX.Element {
   const { t } = useTranslation();
   const [isInProgress, setIsInProgress] = useState(false);
 
-  const { data, previousData, loading, refetch } = useApplicationRoundQuery({
+  /// NOTE always valid since the application round exists if we are here
+  const pk = applicationRoundOriginal?.pk ?? 0;
+  const { data, previousData, refetch } = useApplicationRoundQuery({
     variables: { id: base64encode(`ApplicationRoundNode:${pk}`) },
     pollInterval: isInProgress ? 10000 : 0,
     onError: () => {
       errorToast({ text: t("errors:errorFetchingData") });
     },
   });
-  const { applicationRound } = data ?? previousData ?? {};
+  const applicationRound = data?.applicationRound ?? previousData?.applicationRound ?? applicationRoundOriginal;
 
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
-  const { user } = useSession();
 
   // NOTE: useEffect works, onCompleted does not work with refetch
   useEffect(() => {
@@ -77,11 +85,6 @@ export default function ApplicationRound({ pk }: PropsNarrowed): JSX.Element {
       setIsInProgress(isApplicationRoundInProgress(data.applicationRound));
     }
   }, [data]);
-
-  const unitOptions = getUserPermissionFilteredUnits(applicationRound, user);
-  const { options: unitGroupOptions } = useUnitGroupOptions({ applicationRoundPk: pk });
-
-  const canUserSeePage = unitOptions.length > 0;
 
   // user has no access to specific unit through URL with search params -> remove it from URL
   useEffect(() => {
@@ -99,13 +102,14 @@ export default function ApplicationRound({ pk }: PropsNarrowed): JSX.Element {
     }
   }, [unitOptions, searchParams, setParams]);
 
-  if (applicationRound == null && loading) {
-    return <CenterSpinner />;
-  } else if (!canUserSeePage) {
-    return <div>{t("errors:noPermission")}</div>;
-  } else if (!applicationRound) {
-    return <Error404 />;
-  }
+  const originalOptions = getFilterOptions(t, optionsData);
+  const reservationUnitOptions = getRoundReservationUnitOptions(applicationRound);
+  const options: TagOptionsList = {
+    ...originalOptions,
+    // overloads because we are filtering these (and because of the translations we have to do it on the client)
+    reservationUnits: reservationUnitOptions,
+    units: unitOptions,
+  };
 
   const selectedTab = searchParams.get("tab") ?? "applications";
   const activeTabIndex = selectedTab === "sections" ? 1 : selectedTab === "allocated" ? 2 : 0;
@@ -115,7 +119,6 @@ export default function ApplicationRound({ pk }: PropsNarrowed): JSX.Element {
     setParams(params);
   };
 
-  const reservationUnitOptions = getRoundReservationUnitOptions(applicationRound);
   const isApplicationRoundEnded = hasApplicationRoundEnded(applicationRound);
 
   // isSettingHandledAllowed = Reservations can be created
@@ -171,19 +174,14 @@ export default function ApplicationRound({ pk }: PropsNarrowed): JSX.Element {
 
           <Tabs.TabPanel>
             <TabContent>
-              <Filters unitGroupOptions={unitGroupOptions} unitOptions={unitOptions} enableApplicant />
+              <Filters options={options} enableApplicant />
               <ApplicationDataLoader applicationRoundPk={applicationRound.pk ?? 0} />
             </TabContent>
           </Tabs.TabPanel>
 
           <Tabs.TabPanel>
             <TabContent>
-              <Filters
-                unitGroupOptions={unitGroupOptions}
-                unitOptions={unitOptions}
-                statusOption="section"
-                enableApplicant
-              />
+              <Filters options={options} statusOption="section" enableApplicant />
               <ApplicationSectionDataLoader applicationRoundPk={applicationRound.pk ?? 0} />
             </TabContent>
           </Tabs.TabPanel>
@@ -191,9 +189,7 @@ export default function ApplicationRound({ pk }: PropsNarrowed): JSX.Element {
           <Tabs.TabPanel>
             <TabContent>
               <Filters
-                unitGroupOptions={unitGroupOptions}
-                unitOptions={unitOptions}
-                reservationUnitOptions={reservationUnitOptions}
+                options={options}
                 enableApplicant
                 enableWeekday
                 enableReservationUnit
@@ -207,13 +203,7 @@ export default function ApplicationRound({ pk }: PropsNarrowed): JSX.Element {
           {isApplicationRoundEnded && (
             <Tabs.TabPanel>
               <TabContent>
-                <Filters
-                  unitGroupOptions={unitGroupOptions}
-                  unitOptions={unitOptions}
-                  reservationUnitOptions={reservationUnitOptions}
-                  enableReservationUnit
-                  statusOption="sectionShort"
-                />
+                <Filters options={options} enableReservationUnit statusOption="sectionShort" />
                 <RejectedOccurrencesDataLoader
                   applicationRoundPk={applicationRound.pk ?? 0}
                   unitOptions={unitOptions}
@@ -266,13 +256,29 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
   const canSeePage =
     viewPermissionData.checkPermissions?.hasPermission || managePermissionData.checkPermissions?.hasPermission;
 
-  if (!canSeePage) {
+  const options = await client.query<FilterOptionsQuery, FilterOptionsQueryVariables>({
+    query: FilterOptionsDocument,
+    variables: {
+      applicationRound: pk,
+    },
+  });
+
+  // User might have permissions to see the page, but not to see any units in the application round
+  const user = await client.query<CurrentUserQuery>({
+    query: CurrentUserDocument,
+  });
+  const unitOptions = getUserPermissionFilteredUnits(applicationRound, user.data.currentUser);
+
+  if (!canSeePage || unitOptions.length === 0) {
     return NOT_FOUND_SSR_VALUE;
   }
 
   return {
     props: {
       pk,
+      optionsData: options.data,
+      unitOptions,
+      applicationRound,
       ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
@@ -293,8 +299,10 @@ function toOption(
   return { label: nameFi, value: pk };
 }
 
-function getRoundReservationUnitOptions(applicationRound: Pick<ApplicationRoundAdminFragment, "reservationUnits">) {
-  return filterNonNullable(applicationRound.reservationUnits.map(toOption));
+function getRoundReservationUnitOptions(
+  applicationRound: Maybe<Pick<ApplicationRoundAdminFragment, "reservationUnits">> | undefined
+) {
+  return filterNonNullable(applicationRound?.reservationUnits.map(toOption));
 }
 
 function getRoundUnitOptions(reservationUnits: ApplicationRoundAdminFragment["reservationUnits"]) {
