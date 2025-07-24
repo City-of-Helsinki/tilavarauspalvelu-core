@@ -5,25 +5,48 @@ import {
   ReservationTypeChoice,
   ReservationUnitPublishingState,
   ReserveeType,
+  useFilterOptionsQuery,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
-import { useReservationUnitTypes } from "./useReservationUnitTypes";
-import { useUnitOptions } from "./useUnitOptions";
-import { useReservationUnitOptions } from "./useReservationUnitOptions";
-import { useUnitGroupOptions } from "./useUnitGroupOptions";
-import { useOptions } from "./useOptions";
-import { TagOptionsList } from "@/modules/search";
+import { type TagOptionsList } from "@/modules/search";
+import { gql } from "@apollo/client";
+import { filterNonNullable, sort } from "common/src/helpers";
 
 export function useFilterOptions(): TagOptionsList {
   const { t } = useTranslation("filters");
-  // TODO create a single query for this
-  const { options: reservationUnitTypes } = useReservationUnitTypes();
-  const { options: units } = useUnitOptions();
-  const { options: reservationUnits } = useReservationUnitOptions();
-  const { options: unitGroups } = useUnitGroupOptions();
-  const optionsQuery = useOptions();
-  const purposeOptions = optionsQuery.purpose;
-  const ageGroupOptions = optionsQuery.ageGroup;
+
+  const { data } = useFilterOptionsQuery({
+    variables: {},
+  });
+  const reservationUnitTypes = filterNonNullable(data?.reservationUnitTypes?.edges.map((e) => e?.node)).map((type) => ({
+    label: type.nameFi ?? "",
+    value: type.pk ?? 0,
+  }));
+  const reservationPurposes = filterNonNullable(data?.reservationPurposes?.edges.map((e) => e?.node)).map(
+    (purpose) => ({
+      label: purpose.nameFi ?? "",
+      value: purpose.pk ?? 0,
+    })
+  );
+  const ageGroups = sort(
+    filterNonNullable(data?.ageGroups?.edges.map((e) => e?.node)),
+    (a, b) => a.minimum - b.minimum
+  ).map((group) => ({
+    label: `${group.minimum}-${group.maximum || ""}`,
+    value: group.pk ?? 0,
+  }));
+  const units = filterNonNullable(data?.unitsAll).map((unit) => ({
+    label: unit.nameFi ?? "",
+    value: unit.pk ?? 0,
+  }));
+  const reservationUnits = filterNonNullable(data?.reservationUnitsAll).map((n) => ({
+    label: n.nameFi ?? "",
+    value: n.pk ?? 0,
+  }));
+  const unitGroups = filterNonNullable(data?.unitGroups?.edges.map((e) => e?.node)).map((group) => ({
+    label: group.nameFi ?? "",
+    value: group.pk ?? 0,
+  }));
 
   const states = Object.values(ReservationStateChoice)
     .filter((s) => s !== ReservationStateChoice.Created)
@@ -93,9 +116,69 @@ export function useFilterOptions(): TagOptionsList {
     reserveeTypes,
     orderChoices: orderOptions,
     priorityChoices: priorities,
-    purposes: purposeOptions,
-    ageGroups: ageGroupOptions,
+    // FIXME name is wrong, we have both purposes and reservationPurposes
+    purposes: reservationPurposes,
+    ageGroups: ageGroups,
     // Not used by admin at all, common interface issue
     equipments: [],
   };
 }
+
+export const FILTER_OTIONS_QUERY = gql`
+  query FilterOptions(
+    $orderReservationUnitTypeBy: [ReservationUnitTypeOrderingChoices!] = [nameFiAsc]
+    $orderReservationPurposesBy: [ReservationPurposeOrderingChoices!] = [rankAsc]
+    $orderUnitsBy: [UnitOrderingChoices!] = [nameFiAsc]
+    $orderReservationUnitsBy: [ReservationUnitOrderingChoices!] = [nameFiAsc]
+    $unit: [Int]
+    $applicationRound: Int
+  ) {
+    reservationUnitTypes(orderBy: $orderReservationUnitTypeBy) {
+      edges {
+        node {
+          id
+          pk
+          nameFi
+        }
+      }
+    }
+    reservationPurposes(orderBy: $orderReservationPurposesBy) {
+      edges {
+        node {
+          id
+          pk
+          nameFi
+        }
+      }
+    }
+    ageGroups {
+      edges {
+        node {
+          id
+          pk
+          minimum
+          maximum
+        }
+      }
+    }
+    unitsAll(onlyWithPermission: true, orderBy: $orderUnitsBy) {
+      id
+      nameFi
+      pk
+    }
+    reservationUnitsAll(onlyWithPermission: true, unit: $unit, orderBy: $orderReservationUnitsBy) {
+      id
+      nameFi
+      pk
+    }
+    unitGroups(onlyWithPermission: true, applicationRound: $applicationRound) {
+      edges {
+        node {
+          id
+          pk
+          nameFi
+        }
+      }
+    }
+  }
+`;
