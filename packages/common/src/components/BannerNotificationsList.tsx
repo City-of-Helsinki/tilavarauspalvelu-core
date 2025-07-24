@@ -7,13 +7,13 @@ import { breakpoints } from "../const";
 import {
   BannerNotificationLevel,
   BannerNotificationTarget,
-  useBannerNotificationsListAllQuery,
   useBannerNotificationsListQuery,
   type BannerNotificationCommonFragment,
 } from "../../gql/gql-types";
 import { filterNonNullable } from "../helpers";
 import { useTranslation } from "next-i18next";
 import { convertLanguageCode, getTranslationSafe } from "../common/util";
+import { gql } from "@apollo/client";
 
 type BannerNotificationListProps = {
   target: BannerNotificationTarget;
@@ -113,11 +113,8 @@ const BannerNotificationsList = ({ target, displayAmount = 2 }: BannerNotificati
     },
     fetchPolicy: "no-cache",
   });
-  const { data: dataAll } = useBannerNotificationsListAllQuery({
-    fetchPolicy: "no-cache",
-  });
   const notificationsTarget = data?.bannerNotifications;
-  const notificationsAll = dataAll?.bannerNotifications;
+  const notificationsAll = data?.bannerNotificationsAll;
   const comb = [...(notificationsAll?.edges ?? []), ...(notificationsTarget?.edges ?? [])];
   const notificationsList = filterNonNullable(comb.map((edge) => edge?.node));
 
@@ -155,3 +152,34 @@ const BannerNotificationsList = ({ target, displayAmount = 2 }: BannerNotificati
 };
 
 export default BannerNotificationsList;
+
+export const BANNER_NOTIFICATION_COMMON_FRAGMENT = gql`
+  fragment BannerNotificationCommon on BannerNotificationNode {
+    id
+    level
+    activeFrom
+    messageEn
+    messageFi
+    messageSv
+  }
+`;
+
+// Always get ALL target + either USER or STAFF target
+export const BANNER_NOTIFICATIONS_LIST_ALL = gql`
+  query BannerNotificationsList($target: BannerNotificationTarget!) {
+    bannerNotifications(isVisible: true, target: $target) {
+      edges {
+        node {
+          ...BannerNotificationCommon
+        }
+      }
+    }
+    bannerNotificationsAll: bannerNotifications(isVisible: true, target: ALL) {
+      edges {
+        node {
+          ...BannerNotificationCommon
+        }
+      }
+    }
+  }
+`;
