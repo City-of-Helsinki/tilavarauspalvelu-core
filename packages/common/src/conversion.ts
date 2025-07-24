@@ -3,6 +3,7 @@ import {
   AccessType,
   ApplicationSectionStatusChoice,
   ApplicationStatusChoice,
+  MunicipalityChoice,
   OrderStatusWithFree,
   ReservationStartInterval,
   ReservationStateChoice,
@@ -279,6 +280,23 @@ export function transformApplicationStatusUnsafe(t: string): ApplicationStatusCh
   const transformed = transformApplicationStatus(t);
   if (transformed == null) {
     throw new Error(`Unknown application status: ${t}`);
+  }
+  return transformed;
+}
+
+export function transformMunicipality(value: string): MunicipalityChoice | null {
+  switch (value) {
+    case MunicipalityChoice.Helsinki:
+      return MunicipalityChoice.Helsinki;
+    case MunicipalityChoice.Other:
+      return MunicipalityChoice.Other;
+  }
+  return null;
+}
+export function transformMunicipalityUnsafe(value: string): MunicipalityChoice {
+  const transformed = transformMunicipality(value);
+  if (transformed == null) {
+    throw new Error(`Unknown municipality: ${value}`);
   }
   return transformed;
 }
