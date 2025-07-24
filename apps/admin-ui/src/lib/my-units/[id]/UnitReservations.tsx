@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { Legend, LegendsWrapper } from "@/component/Legend";
 import { legend } from "./eventStyleGetter";
 import { UnitCalendar } from "./UnitCalendar";
-import { useUnitResources, useReservationUnitTypes } from "@/hooks";
+import { useUnitResources, useGetFilterSearchParams } from "@/hooks";
 import { fromUIDate, isValidDate, toUIDate } from "common/src/common/util";
 import { startOfDay } from "date-fns";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
@@ -15,7 +15,8 @@ import { MultiSelectFilter } from "@/component/QueryParamFilters";
 import { DayNavigation } from "@/component/QueryParamFilters/DayNavigation";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { type TagOptionsList, translateTag } from "@/modules/search";
+import { translateTag } from "@/modules/search";
+import { useFilterOptions } from "@/hooks/useFilterOptions";
 
 const LegendContainer = styled.div`
   max-width: 100%;
@@ -27,22 +28,22 @@ const LegendContainer = styled.div`
   }
 `;
 
-type InnerProps = {
+interface UnitReservationsInnerProps {
   unitPk: number;
-  reservationUnitTypes: number[];
   reservationUnitOptions: { label: string; value: number }[];
-};
+}
 
-function UnitReservationsInner({ unitPk, reservationUnitTypes, reservationUnitOptions }: InnerProps): JSX.Element {
+function UnitReservationsInner({ unitPk, reservationUnitOptions }: UnitReservationsInnerProps): JSX.Element {
   const searchParams = useSearchParams();
   const { t } = useTranslation();
+  const { reservationUnitTypeFilter } = useGetFilterSearchParams();
 
   const d = searchParams.get("date");
   const currentDate = d ? fromUIDate(d) : startOfDay(new Date());
 
   const date = currentDate && isValidDate(currentDate) ? currentDate : new Date();
 
-  const { loading, resources, refetch } = useUnitResources(date, unitPk, reservationUnitTypes);
+  const { loading, resources, refetch } = useUnitResources(date, unitPk, reservationUnitTypeFilter);
 
   return (
     <>
@@ -74,27 +75,10 @@ export function UnitReservations({
 }): JSX.Element {
   const { t } = useTranslation();
 
-  const { options: reservationUnitTypeOptions } = useReservationUnitTypes();
-
-  const options: TagOptionsList = {
-    reservationUnitTypes: reservationUnitTypeOptions,
-    // Not needed on this page
-    orderChoices: [],
-    priorityChoices: [],
-    reservationUnitStates: [],
-    unitGroups: [],
-    units: [],
-    stateChoices: [],
-    reservationUnits: [],
-    equipments: [],
-    purposes: [],
-    ageGroups: [],
-    municipalities: [],
-  };
+  const options = useFilterOptions();
 
   const searchParams = useSearchParams();
   const setSearchParams = useSetSearchParams();
-  const reservationUnitTypes = searchParams.getAll("reservationUnitType").map(Number).filter(Number.isInteger);
 
   useEffect(() => {
     if (searchParams.get("date") == null) {
@@ -105,6 +89,12 @@ export function UnitReservations({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only on page load
   }, []);
 
+  const handleTodayClick = () => {
+    const p = new URLSearchParams(searchParams);
+    p.set("date", toUIDate(new Date()));
+    setSearchParams(p);
+  };
+
   return (
     <Flex>
       <AutoGrid>
@@ -113,34 +103,19 @@ export function UnitReservations({
             zIndex: "var(--tilavaraus-admin-stack-select-over-calendar)",
           }}
           name="reservationUnitType"
-          options={reservationUnitTypeOptions}
+          options={options.reservationUnitTypes}
         />
       </AutoGrid>
       <SearchTags hide={["date", "tab", "reservationUnit"]} translateTag={translateTag(t, options)} />
       <HR />
       <Flex $gap="none" $direction="row" $justifyContent="space-between" $alignItems="center">
-        <Button
-          size={ButtonSize.Small}
-          variant={ButtonVariant.Secondary}
-          onClick={() => {
-            const p = new URLSearchParams(searchParams);
-            p.set("date", toUIDate(new Date()));
-            setSearchParams(p);
-          }}
-        >
+        <Button size={ButtonSize.Small} variant={ButtonVariant.Secondary} onClick={handleTodayClick}>
           {t("common:today")}
         </Button>
         <DayNavigation name="date" />
         <div />
       </Flex>
-      {/* TODO missing unitId is an error, not return null */}
-      {unitPk ? (
-        <UnitReservationsInner
-          reservationUnitTypes={reservationUnitTypes}
-          unitPk={unitPk}
-          reservationUnitOptions={reservationUnitOptions}
-        />
-      ) : null}
+      <UnitReservationsInner unitPk={unitPk} reservationUnitOptions={reservationUnitOptions} />
     </Flex>
   );
 }
