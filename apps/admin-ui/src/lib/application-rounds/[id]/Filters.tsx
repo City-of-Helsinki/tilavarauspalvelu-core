@@ -10,23 +10,15 @@ import { useForm } from "react-hook-form";
 import { DayT } from "common/src/const";
 import { SearchButton, SearchButtonContainer } from "@/component/SearchButton";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { useFilterOptions } from "@/hooks/useFilterOptions";
 
-type OptionType = {
-  value: number;
-  label: string;
-};
-
-type Props = {
-  unitGroupOptions: OptionType[];
-  unitOptions: OptionType[];
-  reservationUnitOptions?: OptionType[];
+interface FilterProps {
+  options: TagOptionsList;
   statusOption?: "application" | "section" | "sectionShort";
   enableApplicant?: boolean;
   enableWeekday?: boolean;
   enableReservationUnit?: boolean;
   enableAccessCodeState?: boolean;
-};
+}
 
 type SearchFormValues = {
   unitGroup: number[];
@@ -73,15 +65,13 @@ function mapFormToSearchParams(data: SearchFormValues): URLSearchParams {
 }
 
 export function Filters({
-  unitGroupOptions,
-  unitOptions,
-  reservationUnitOptions = [],
+  options,
   statusOption = "application",
   enableApplicant = false,
   enableWeekday = false,
   enableReservationUnit = false,
   enableAccessCodeState = false,
-}: Props): JSX.Element {
+}: FilterProps): JSX.Element {
   const { t } = useTranslation();
 
   const setSearchParams = useSetSearchParams();
@@ -137,16 +127,6 @@ export function Filters({
     label: t(`translation:ApplicationSectionStatusChoice.${status}`),
     value: status,
   }));
-  const options = useFilterOptions();
-
-  const tagOptions: TagOptionsList = {
-    ...options,
-    // overloads because we are filtering these
-    // TODO should move the filtering to the useFilterOptions hook and pass filter params to it
-    reservationUnits: reservationUnitOptions,
-    units: unitOptions,
-    unitGroups: unitGroupOptions,
-  };
 
   const { handleSubmit, control } = form;
   const onSubmit = (data: SearchFormValues) => {
@@ -157,8 +137,8 @@ export function Filters({
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
       <AutoGrid>
-        <ControlledMultiSelectFilter control={control} name="unitGroup" options={unitGroupOptions} />
-        <ControlledMultiSelectFilter control={control} name="unit" options={unitOptions} />
+        <ControlledMultiSelectFilter control={control} name="unitGroup" options={options.unitGroups} />
+        <ControlledMultiSelectFilter control={control} name="unit" options={options.units} />
         {statusOption !== "application" ? (
           sectionStatusOptions.length > 0 ? (
             <ControlledMultiSelectFilter control={control} name="sectionStatus" options={sectionStatusOptions} />
@@ -168,7 +148,7 @@ export function Filters({
         )}
 
         {enableReservationUnit && (
-          <ControlledMultiSelectFilter control={control} name="reservationUnit" options={reservationUnitOptions} />
+          <ControlledMultiSelectFilter control={control} name="reservationUnit" options={options.reservationUnits} />
         )}
         {enableApplicant && (
           <ControlledMultiSelectFilter control={control} name="applicant" options={applicantOptions} />
@@ -180,7 +160,7 @@ export function Filters({
         <ControlledSearchFilter control={control} name="search" />
       </AutoGrid>
       <SearchButtonContainer>
-        <SearchTags hide={hideSearchTags} translateTag={translateTag(t, tagOptions)} />
+        <SearchTags hide={hideSearchTags} translateTag={translateTag(t, options)} />
         <SearchButton />
       </SearchButtonContainer>
       <HR />
