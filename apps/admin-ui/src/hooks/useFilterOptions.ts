@@ -12,11 +12,13 @@ import { type TagOptionsList } from "@/modules/search";
 import { gql } from "@apollo/client";
 import { filterNonNullable, sort } from "common/src/helpers";
 
-export function useFilterOptions(): TagOptionsList {
+export function useFilterOptions(unitFilter?: number[]): TagOptionsList {
   const { t } = useTranslation("filters");
 
   const { data } = useFilterOptionsQuery({
-    variables: {},
+    variables: {
+      unit: unitFilter,
+    },
   });
   const reservationUnitTypes = filterNonNullable(data?.reservationUnitTypes?.edges.map((e) => e?.node)).map((type) => ({
     label: type.nameFi ?? "",
