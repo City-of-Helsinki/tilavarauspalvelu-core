@@ -11,7 +11,7 @@ import { LIST_PAGE_SIZE } from "@/common/const";
 import { errorToast } from "common/src/common/toast";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
-import { useGetFilterSearchParams } from "./utils";
+import { useGetFilterSearchParams } from "@/hooks";
 import { AllocatedSectionsTable, SORT_KEYS } from "./AllocatedSectionsTable";
 import { getPermissionErrors } from "common/src/apolloUtils";
 import { CenterSpinner } from "common/styled";
