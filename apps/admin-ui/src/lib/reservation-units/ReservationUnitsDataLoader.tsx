@@ -1,10 +1,6 @@
 import React, { useState } from "react";
 import { gql } from "@apollo/client";
-import {
-  ReservationUnitOrderingChoices,
-  ReservationUnitPublishingState,
-  useSearchReservationUnitsQuery,
-} from "@gql/gql-types";
+import { ReservationUnitOrderingChoices, useSearchReservationUnitsQuery } from "@gql/gql-types";
 import { filterNonNullable, toNumber } from "common/src/helpers";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { More } from "@/component/More";
@@ -14,6 +10,7 @@ import { CenterSpinner } from "common/styled";
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import { mapParamToNumber } from "@/helpers";
+import { transformReservationUnitState } from "common/src/conversion";
 
 function transformOrderBy(orderBy: string, desc: boolean): ReservationUnitOrderingChoices | null {
   switch (orderBy) {
@@ -45,27 +42,6 @@ function transformSortString(orderBy: string | null): ReservationUnitOrderingCho
   }
 
   return [];
-}
-
-function convertToReservationUnitState(state: string): ReservationUnitPublishingState | null {
-  switch (state) {
-    case ReservationUnitPublishingState.Archived:
-      return ReservationUnitPublishingState.Archived;
-    case ReservationUnitPublishingState.Draft:
-      return ReservationUnitPublishingState.Draft;
-    case ReservationUnitPublishingState.Hidden:
-      return ReservationUnitPublishingState.Hidden;
-    case ReservationUnitPublishingState.Published:
-      return ReservationUnitPublishingState.Published;
-    case ReservationUnitPublishingState.ScheduledHiding:
-      return ReservationUnitPublishingState.ScheduledHiding;
-    case ReservationUnitPublishingState.ScheduledPeriod:
-      return ReservationUnitPublishingState.ScheduledPeriod;
-    case ReservationUnitPublishingState.ScheduledPublishing:
-      return ReservationUnitPublishingState.ScheduledPublishing;
-    default:
-      return null;
-  }
 }
 
 export function ReservationUnitsDataReader(): JSX.Element {
@@ -108,7 +84,7 @@ export function ReservationUnitsDataReader(): JSX.Element {
       textSearch: searchFilter,
       unit,
       unitGroup: unitGroupFilter,
-      publishingState: reservationUnitStates.map((state) => convertToReservationUnitState(state)),
+      publishingState: reservationUnitStates.map((state) => transformReservationUnitState(state)),
       reservationUnitType: reservationUnitTypes,
     },
     onError: () => {

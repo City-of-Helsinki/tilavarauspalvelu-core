@@ -10,7 +10,6 @@ import type { ReservationSeriesForm, ReservationFormMeta } from "@/schemas";
 import { fromUIDateUnsafe, toApiDateUnsafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
 import { useSession } from "@/hooks/auth";
-import { transformReserveeType } from "common/src/conversion";
 
 // Not all choices are valid for reservation series (the ui should not allow these)
 function transformReservationTypeStaffChoice(t: ReservationTypeChoice): ReservationTypeStaffChoice {
@@ -71,7 +70,7 @@ export function useCreateReservationSeries() {
       ...rest,
       type: transformReservationTypeStaffChoice(type),
       reserveeIdentifier: !reserveeIsUnregisteredAssociation ? reserveeIdentifier : undefined,
-      reserveeType: transformReserveeType(reserveeType),
+      reserveeType: reserveeType,
       bufferTimeBefore: buffers.before,
       bufferTimeAfter: buffers.after,
       workingMemo: comments,

@@ -3,8 +3,6 @@ import { gql } from "@apollo/client";
 import {
   ReservationOrderingChoices,
   useReservationListQuery,
-  ReservationStateChoice,
-  OrderStatusWithFree,
   type ReservationListQueryVariables,
 } from "@gql/gql-types";
 import { More } from "@/component/More";
@@ -12,66 +10,24 @@ import { LIST_PAGE_SIZE } from "@/common/const";
 import { ReservationsTable } from "./ReservationsTable";
 import { fromUIDate, toApiDate } from "common/src/common/util";
 import { filterNonNullable, toNumber } from "common/src/helpers";
-import { transformReservationTypeSafe } from "common/src/conversion";
+import { transformPaymentStatus, transformReservationState, transformReservationType } from "common/src/conversion";
 import { errorToast } from "common/src/common/toast";
 import { CenterSpinner } from "common/styled";
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
-
-function transformPaymentStatusSafe(t: string): OrderStatusWithFree | null {
-  switch (t) {
-    case OrderStatusWithFree.Paid:
-      return OrderStatusWithFree.Paid;
-    case OrderStatusWithFree.PaidManually:
-      return OrderStatusWithFree.PaidManually;
-    case OrderStatusWithFree.PaidByInvoice:
-      return OrderStatusWithFree.PaidByInvoice;
-    case OrderStatusWithFree.Draft:
-      return OrderStatusWithFree.Draft;
-    case OrderStatusWithFree.Expired:
-      return OrderStatusWithFree.Expired;
-    case OrderStatusWithFree.Refunded:
-      return OrderStatusWithFree.Refunded;
-    case OrderStatusWithFree.Cancelled:
-      return OrderStatusWithFree.Cancelled;
-    case OrderStatusWithFree.Free:
-      return OrderStatusWithFree.Free;
-    default:
-      return null;
-  }
-}
-
-function transformStateSafe(t: string): ReservationStateChoice | null {
-  switch (t) {
-    case ReservationStateChoice.Cancelled:
-      return ReservationStateChoice.Cancelled;
-    case ReservationStateChoice.Denied:
-      return ReservationStateChoice.Denied;
-    case ReservationStateChoice.Created:
-      return ReservationStateChoice.Created;
-    case ReservationStateChoice.Confirmed:
-      return ReservationStateChoice.Confirmed;
-    case ReservationStateChoice.RequiresHandling:
-      return ReservationStateChoice.RequiresHandling;
-    case ReservationStateChoice.WaitingForPayment:
-      return ReservationStateChoice.WaitingForPayment;
-    default:
-      return null;
-  }
-}
 
 function mapFilterParams(searchParams: URLSearchParams): ReservationListQueryVariables {
   const reservationUnitType = searchParams.getAll("reservationUnitType").map(Number).filter(Number.isInteger);
 
   const unit = searchParams.getAll("unit").map(Number).filter(Number.isInteger);
 
-  const orderStatus = filterNonNullable(searchParams.getAll("orderStatus").map(transformPaymentStatusSafe));
+  const orderStatus = filterNonNullable(searchParams.getAll("orderStatus").map(transformPaymentStatus));
 
   const reservationUnits = searchParams.getAll("reservationUnit").map(Number).filter(Number.isInteger);
 
-  const state = filterNonNullable(searchParams.getAll("state").map(transformStateSafe));
+  const state = filterNonNullable(searchParams.getAll("state").map(transformReservationState));
 
-  const reservationType = filterNonNullable(searchParams.getAll("reservationType").map(transformReservationTypeSafe));
+  const reservationType = filterNonNullable(searchParams.getAll("reservationType").map(transformReservationType));
 
   const textSearch = searchParams.get("search");
 
