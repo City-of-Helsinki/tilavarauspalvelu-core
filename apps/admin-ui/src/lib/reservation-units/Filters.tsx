@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { ShowAllContainer } from "common/src/components";
-import { useReservationUnitTypes, useUnitOptions } from "@/hooks";
 import { ReservationUnitPublishingState } from "@gql/gql-types";
 import {
   ControlledSearchFilter,
@@ -10,7 +9,6 @@ import {
   ControlledRangeNumberFilter,
 } from "@/component/QueryParamFilters";
 import { SearchTags } from "@/component/SearchTags";
-import { useUnitGroupOptions } from "@/hooks/useUnitGroupOptions";
 import { Flex } from "common/styled";
 import { type TagOptionsList, translateTag } from "@/modules/search";
 import { SearchButton, SearchButtonContainer } from "@/component/SearchButton";
@@ -19,6 +17,7 @@ import { useForm } from "react-hook-form";
 import { useSearchParams } from "next/navigation";
 import { filterNonNullable, toNumber } from "common/src/helpers";
 import { transformReservationUnitState } from "common/src/conversion";
+import { useFilterOptions } from "@/hooks/useFilterOptions";
 
 const MoreWrapper = styled(ShowAllContainer)`
   .ShowAllContainer__ToggleButton {
@@ -92,42 +91,18 @@ function mapFormToSearchParams(data: SearchFormValues): URLSearchParams {
   return params;
 }
 
-function useOptions() {
-  const { t } = useTranslation();
-  const reservationUnitStates = Object.values(ReservationUnitPublishingState)
-    .filter((x) => x !== ReservationUnitPublishingState.Archived)
-    .map((s) => ({
-      value: s,
-      label: t(`reservationUnit:state.${s}`),
-    }));
-
-  const { options: units } = useUnitOptions();
-  const { options: reservationUnitTypes } = useReservationUnitTypes();
-  const { options: unitGroups } = useUnitGroupOptions();
-
-  return {
-    reservationUnitStates,
-    units,
-    reservationUnitTypes,
-    unitGroups,
-  };
-}
-
 export function Filters(): JSX.Element {
   const { t } = useTranslation();
   const setSearchParams = useSetSearchParams();
   const searchParams = useSearchParams();
 
-  const options = useOptions();
+  const options = useFilterOptions();
   const defaultValues = mapParamsToForm(searchParams);
   const form = useForm<SearchFormValues>({
     defaultValues,
   });
   const tagOptions: TagOptionsList = {
-    reservationUnitTypes: options.reservationUnitTypes,
-    units: options.units,
-    unitGroups: options.unitGroups,
-    reservationUnitStates: options.reservationUnitStates,
+    ...options,
     // Not needed on this page
     orderChoices: [],
     priorityChoices: [],

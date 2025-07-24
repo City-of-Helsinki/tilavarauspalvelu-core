@@ -26,6 +26,7 @@ export function useGetFilterSearchParams({ unitOptions }: { unitOptions?: { labe
     unitFilter: unitFilter,
     unitGroupFilter: mapParamToNumber(searchParams.getAll("unitGroup"), 1),
     reservationUnitFilter: mapParamToNumber(searchParams.getAll("reservationUnit"), 1),
+    reservationUnitTypeFilter: mapParamToNumber(searchParams.getAll("reservationUnitType"), 1),
     statusFilter: transformApplicationStatusList(searchParams.getAll("status")),
     sectionStatusFilter: transformApplicationSectionStatusList(searchParams.getAll("sectionStatus")),
     applicantTypeFilter: transformApplicantTypeList(searchParams.getAll("applicant")),
