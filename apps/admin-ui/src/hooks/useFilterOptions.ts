@@ -15,11 +15,12 @@ import { filterNonNullable, sort } from "common/src/helpers";
 export function useFilterOptions(unitFilter?: number[]): TagOptionsList {
   const { t } = useTranslation("filters");
 
-  const { data } = useFilterOptionsQuery({
+  const { data: freshData, previousData } = useFilterOptionsQuery({
     variables: {
       unit: unitFilter,
     },
   });
+  const data = freshData ?? previousData;
   const reservationUnitTypes = filterNonNullable(data?.reservationUnitTypes?.edges.map((e) => e?.node)).map((type) => ({
     label: type.nameFi ?? "",
     value: type.pk ?? 0,

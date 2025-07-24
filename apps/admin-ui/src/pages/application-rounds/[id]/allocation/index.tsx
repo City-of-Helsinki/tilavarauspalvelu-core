@@ -186,7 +186,7 @@ function ApplicationRoundAllocation({
 
   // NOTE get the count of all application sections for the selected reservation unit
   // TODO this can be combined with the above query (but requires casting the alias)
-  const { data: allEventsData } = useAllApplicationEventsQuery({
+  const { data: allEventsData, previousData: allEventsPreviousData } = useAllApplicationEventsQuery({
     skip: selectedReservationUnit == null || unitFilter == null,
     variables: {
       applicationRound: applicationRound.pk ?? 0,
@@ -200,8 +200,11 @@ function ApplicationRoundAllocation({
 
   // NOTE totalCount is fine, but we need to query the things we want to count otherwise it's off by a mile.
   // default to zero because filter returns empty array if no data
-  const totalCount = allEventsData?.applicationSections?.totalCount ?? 0;
-  const allEvents = filterNonNullable(allEventsData?.applicationSections?.edges.map((e) => e?.node));
+  const totalCount =
+    allEventsData?.applicationSections?.totalCount ?? allEventsPreviousData?.applicationSections?.totalCount ?? 0;
+  const allEvents = filterNonNullable(
+    (allEventsData ?? allEventsPreviousData)?.applicationSections?.edges.map((e) => e?.node)
+  );
   if (allEvents.length !== totalCount && totalCount < 100) {
     // eslint-disable-next-line no-console -- TODO use logger
     console.warn(
