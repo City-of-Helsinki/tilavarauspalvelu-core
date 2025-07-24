@@ -11,9 +11,8 @@ import {
   type CreateStaffReservationFragment,
   CurrentUserDocument,
   type CurrentUserQuery,
-  OptionsDocument,
-  type OptionsQuery,
-  ReservationPurposeOrderingChoices,
+  FilterOptionsDocument,
+  type FilterOptionsQuery,
   TermsOfUseDocument,
   type TermsOfUseQuery,
   CalendarReservationFragment,
@@ -186,13 +185,21 @@ const AdminUserMock: CurrentUserQuery = {
   },
 };
 
-const OptionsMock: OptionsQuery = {
+const OptionsMock: FilterOptionsQuery = {
   reservationPurposes: {
     edges: [],
   },
   ageGroups: {
     edges: [],
   },
+  unitGroups: {
+    edges: [],
+  },
+  reservationUnitTypes: {
+    edges: [],
+  },
+  reservationUnitsAll: [],
+  unitsAll: [],
 };
 
 const TermsOfUseMock: TermsOfUseQuery = {
@@ -204,10 +211,7 @@ const TermsOfUseMock: TermsOfUseQuery = {
 const otherMocks = [
   {
     request: {
-      query: OptionsDocument,
-      variables: {
-        reservationPurposesOrderBy: [ReservationPurposeOrderingChoices.RankAsc],
-      },
+      query: FilterOptionsDocument,
     },
     result: {
       data: OptionsMock,
