@@ -7,20 +7,16 @@ import {
   ReserveeType,
   useFilterOptionsQuery,
 } from "@gql/gql-types";
-import { useTranslation } from "next-i18next";
+import { type TFunction, useTranslation } from "next-i18next";
 import { type TagOptionsList } from "@/modules/search";
 import { gql } from "@apollo/client";
 import { filterNonNullable, sort } from "common/src/helpers";
 
-export function useFilterOptions(unitFilter?: number[]): TagOptionsList {
-  const { t } = useTranslation("filters");
-
-  const { data: freshData, previousData } = useFilterOptionsQuery({
-    variables: {
-      unit: unitFilter,
-    },
-  });
-  const data = freshData ?? previousData;
+export function getFilterOptions(
+  t: TFunction,
+  queryResult: ReturnType<typeof useFilterOptionsQuery>["data"]
+): TagOptionsList {
+  const data = queryResult;
   const reservationUnitTypes = filterNonNullable(data?.reservationUnitTypes?.edges.map((e) => e?.node)).map((type) => ({
     label: type.nameFi ?? "",
     value: type.pk ?? 0,
@@ -125,6 +121,18 @@ export function useFilterOptions(unitFilter?: number[]): TagOptionsList {
     // Not used by admin at all, common interface issue
     equipments: [],
   };
+}
+
+export function useFilterOptions(unitFilter?: number[]): TagOptionsList {
+  const { t } = useTranslation("filters");
+
+  const { data: freshData, previousData } = useFilterOptionsQuery({
+    variables: {
+      unit: unitFilter,
+    },
+  });
+  const data = freshData ?? previousData;
+  return getFilterOptions(t, data);
 }
 
 export const FILTER_OTIONS_QUERY = gql`
