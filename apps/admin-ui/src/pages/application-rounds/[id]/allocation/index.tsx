@@ -10,7 +10,6 @@ import {
   type ApplicationRoundFilterQuery,
   type ApplicationRoundFilterQueryVariables,
   type ApplicationRoundFilterUnitFragment,
-  ApplicationRoundStatusChoice,
   useAllApplicationEventsQuery,
   useApplicationSectionAllocationsQuery,
   UserPermissionChoice,
@@ -86,18 +85,16 @@ function ApplicationRoundAllocation({
   applicationRound,
   units,
   reservationUnits,
-  roundName,
-  applicationRoundStatus,
 }: {
-  applicationRound: ApplicationRoundFilterQueryType;
+  applicationRound: PropsNarrowed["applicationRound"];
   // TODO refactor the others to use the RoundNode
   units: ApplicationRoundFilterUnitFragment[];
   reservationUnits: ReservationUnitFilterQueryType[];
-  // TODO do we want to prop drill these? or include it in every application event?
-  roundName: string;
-  applicationRoundStatus: ApplicationRoundStatusChoice;
 }): JSX.Element {
   const { t } = useTranslation();
+
+  const roundName = applicationRound?.nameFi ?? "-";
+  const applicationRoundStatus = applicationRound.status;
 
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
@@ -281,23 +278,6 @@ function ApplicationRoundAllocation({
   const reservationUnit =
     unitReservationUnits.find((x) => x.pk != null && x.pk === selectedReservationUnit) ?? reservationUnits[0];
 
-  // TODO need to add the side effect to the select filter
-  // or maybe not? an invalid value is going to get filtered here anyway and we use the first reservation unit
-  const setUnitFilter = (value: number) => {
-    // NOTE different logic because values are not atomic and we need to set two params
-    const vals = new URLSearchParams(searchParams);
-    vals.set("unit", value.toString());
-    vals.delete("reservation-unit");
-    setParams(vals);
-  };
-
-  useEffect(() => {
-    if (units.length > 0 && (unitFilter == null || unitFilter < 1)) {
-      setUnitFilter(units[0]?.pk ?? 0);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- this is the correct list, but should be refactored
-  }, [units]);
-
   return (
     <>
       <div>
@@ -353,42 +333,6 @@ function ApplicationRoundAllocation({
   );
 }
 
-// Do a single full query to get filter / page data
-function AllocationWrapper({
-  applicationRound,
-  filteredUnits,
-}: {
-  applicationRound: NonNullable<ApplicationRoundFilterQuery["applicationRound"]>;
-  filteredUnits: ApplicationRoundFilterUnitFragment[];
-}): JSX.Element {
-  // user has no accesss to specific unit through URL with search params -> reset the filter
-  const searchParams = useSearchParams();
-  const setParams = useSetSearchParams();
-  useEffect(() => {
-    const unit = toNumber(searchParams.get("unit"));
-    if (unit != null && !filteredUnits.some((u) => u.pk === unit)) {
-      const p = new URLSearchParams(searchParams);
-      p.delete("unit");
-      setParams(p);
-    }
-  }, [filteredUnits, searchParams, setParams]);
-
-  const roundName = applicationRound?.nameFi ?? "-";
-
-  const reservationUnits = filterNonNullable(applicationRound?.reservationUnits);
-  const resUnits = sort(uniqBy(reservationUnits, "pk"), (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0);
-
-  return (
-    <ApplicationRoundAllocation
-      applicationRound={applicationRound}
-      units={filteredUnits}
-      reservationUnits={resUnits}
-      roundName={roundName}
-      applicationRoundStatus={applicationRound.status}
-    />
-  );
-}
-
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
 export default function ApplicationRoundRouted(props: PropsNarrowed): JSX.Element {
@@ -409,14 +353,49 @@ export default function ApplicationRoundRouted(props: PropsNarrowed): JSX.Elemen
     (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0
   );
 
+  const searchParams = useSearchParams();
+  const setParams = useSetSearchParams();
+  useEffect(() => {
+    // TODO need to add the side effect to the select filter
+    // or maybe not? an invalid value is going to get filtered here anyway and we use the first reservation unit
+    const setUnitFilter = (value: number) => {
+      // NOTE different logic because values are not atomic and we need to set two params
+      const vals = new URLSearchParams(searchParams);
+      vals.set("unit", value.toString());
+      vals.delete("reservation-unit");
+      setParams(vals);
+    };
+    const unitFilter = toNumber(searchParams.get("unit"));
+    if (units.length > 0 && (unitFilter == null || unitFilter < 1)) {
+      setUnitFilter(units[0]?.pk ?? 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- this is the correct list, but should be refactored
+  }, [units]);
+
+  // user has no accesss to specific unit through URL with search params -> reset the filter
+  useEffect(() => {
+    const unit = toNumber(searchParams.get("unit"));
+    if (unit != null && !filteredUnits.some((u) => u.pk === unit)) {
+      const p = new URLSearchParams(searchParams);
+      p.delete("unit");
+      setParams(p);
+    }
+  }, [filteredUnits, searchParams, setParams]);
+
   if (filteredUnits.length === 0) {
     return <Error403 />;
   }
 
+  const resUnits = sort(uniqBy(reservationUnits, "pk"), (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0);
+
   return (
     <>
       <LinkPrev />
-      <AllocationWrapper applicationRound={applicationRound} filteredUnits={filteredUnits} />
+      <ApplicationRoundAllocation
+        applicationRound={applicationRound}
+        units={filteredUnits}
+        reservationUnits={resUnits}
+      />
     </>
   );
 }
