@@ -25,7 +25,7 @@ import { containsField } from "../metaFieldsHelpers";
 import { filterNonNullable } from "../helpers";
 
 type CommonProps = {
-  options: Omit<OptionsRecord, "municipality">;
+  options: Readonly<Omit<OptionsRecord, "municipality">>;
   data?: {
     termsForDiscount?: JSX.Element | string;
   };
