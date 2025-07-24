@@ -17,7 +17,14 @@ import {
   useApplicationSectionAllocationsQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { base64encode, filterNonNullable, ignoreMaybeArray, sort, toNumber } from "common/src/helpers";
+import {
+  base64encode,
+  filterNonNullable,
+  ignoreMaybeArray,
+  mapParamToInterger,
+  sort,
+  toNumber,
+} from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
 import { errorToast } from "common/src/components/toast";
 import { ALLOCATION_POLL_INTERVAL, NOT_FOUND_SSR_VALUE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
@@ -42,6 +49,7 @@ import { type TagOptionsList, translateTag } from "@/modules/search";
 import { useForm } from "react-hook-form";
 import { SearchButton, SearchButtonContainer } from "@/component/SearchButton";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
+import { transformReserveeType } from "common/src/conversion";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;
 
@@ -162,25 +170,22 @@ function mapFormToSearchParams(values: SearchFormValues): URLSearchParams {
 // we can reuse the same for the search params -> gql query variables
 function mapParamsToForm(params: URLSearchParams, units: UnitFilterQueryType[]): SearchFormValues {
   const unitFilter = toNumber(params.get("unit"));
-  const nameFilter = params.get("search");
-  const applicantTypeFilter = params.getAll("applicantType");
-  const priorityFilter = params.getAll("priority");
-  const orderFilter = params.getAll("order");
-  const ageGroupFilter = params.getAll("ageGroup");
-  const municipalityFilter = params.getAll("municipality");
-  const purposeFilter = params.getAll("purpose");
+  const applicantTypeFilter = filterNonNullable(params.getAll("applicantType").map(transformReserveeType));
+  const priorityFilter = mapParamToInterger(params.getAll("priority"));
+  const orderFilter = mapParamToInterger(params.getAll("order"));
+  const ageGroupFilter = mapParamToInterger(params.getAll("ageGroup"), 1);
+  const municipalityFilter = filterNonNullable(params.getAll("municipality").map(transformMunicipality));
+  const purposeFilter = mapParamToInterger(params.getAll("purpose"), 1);
 
-  const municipalityFilterQuery = filterNonNullable(municipalityFilter.map((x) => transformMunicipality(x)));
-  const applicantTypeFilterQuery = filterNonNullable(applicantTypeFilter.map((x) => transformApplicantType(x)));
   return {
     unit: unitFilter ?? (units.length > 0 ? (units[0]?.pk ?? 0) : 0),
-    priority: filterNonNullable(priorityFilter.map(toNumber)),
-    order: filterNonNullable(orderFilter.map(toNumber)),
-    search: nameFilter ?? "",
-    municipality: municipalityFilterQuery,
-    applicantType: applicantTypeFilterQuery,
-    ageGroup: filterNonNullable(ageGroupFilter.map(toNumber)),
-    purpose: filterNonNullable(purposeFilter.map(toNumber)),
+    priority: priorityFilter,
+    order: orderFilter,
+    search: params.get("search") ?? "",
+    municipality: municipalityFilter,
+    applicantType: applicantTypeFilter,
+    ageGroup: ageGroupFilter,
+    purpose: purposeFilter,
   };
 }
 

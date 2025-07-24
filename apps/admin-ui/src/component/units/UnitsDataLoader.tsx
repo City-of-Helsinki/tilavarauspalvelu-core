@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import { gql } from "@apollo/client";
 import { UnitOrderingChoices, useUnitListQuery } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable, mapParamToInterger } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { More } from "@/component/More";
 import { UnitsTable } from "./UnitsTable";
 import { CenterSpinner } from "common/styled";
 import { useTranslation } from "next-i18next";
-import { mapParamToNumber } from "@/helpers";
 import { useSearchParams } from "next/navigation";
 
 type Props = {
@@ -29,7 +28,7 @@ export function UnitsDataLoader({ isMyUnits }: Props): JSX.Element {
 
   const { t } = useTranslation();
   const searchParams = useSearchParams();
-  const unitGroupFilter = mapParamToNumber(searchParams.getAll("unitGroup"), 1);
+  const unitGroupFilter = mapParamToInterger(searchParams.getAll("unitGroup"), 1);
   const nameFilter = searchParams.get("search");
 
   const { fetchMore, loading, data, previousData } = useUnitListQuery({

@@ -18,10 +18,9 @@ import { useForm } from "react-hook-form";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { SearchButton, SearchButtonContainer } from "@/component/SearchButton";
 import { useSearchParams } from "next/navigation";
-import { transformReservationState, transformReservationType } from "common/src/conversion";
-import { filterNonNullable } from "common/src/helpers";
+import { transformPaymentStatus, transformReservationState, transformReservationType } from "common/src/conversion";
+import { filterNonNullable, mapParamToInterger, toNumber } from "common/src/helpers";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
-import { mapParamToNumber } from "@/helpers";
 
 const MoreWrapper = styled(ShowAllContainer)`
   .ShowAllContainer__ToggleButton {
@@ -105,15 +104,15 @@ function mapParamsToForm(params: URLSearchParams): SearchFormValues {
   return {
     reservationType: filterNonNullable(params.getAll("reservationType").map(transformReservationType)),
     state: filterNonNullable(params.getAll("state").map(transformReservationState)),
-    reservationUnit: params.getAll("reservationUnit").map(Number),
+    reservationUnit: mapParamToInterger(params.getAll("reservationUnit"), 1),
     search: params.get("search") ?? undefined,
     dateGte: params.get("dateGte") ?? undefined,
     dateLte: params.get("dateLte") ?? undefined,
-    unit: params.getAll("unit").map(Number),
-    reservationUnitType: params.getAll("reservationUnitType").map(Number),
-    minPrice: params.has("minPrice") ? Number(params.get("minPrice")) : undefined,
-    maxPrice: params.has("maxPrice") ? Number(params.get("maxPrice")) : undefined,
-    orderStatus: params.getAll("orderStatus") as OrderStatusWithFree[],
+    unit: mapParamToInterger(params.getAll("unit"), 1),
+    reservationUnitType: mapParamToInterger(params.getAll("reservationUnitType"), 1),
+    minPrice: toNumber(params.get("minPrice")) ?? undefined,
+    maxPrice: toNumber(params.get("maxPrice")) ?? undefined,
+    orderStatus: filterNonNullable(params.getAll("orderStatus").map(transformPaymentStatus)),
     createdAtGte: params.get("createdAtGte") ?? undefined,
     createdAtLte: params.get("createdAtLte") ?? undefined,
     recurring:
@@ -136,7 +135,7 @@ export function Filters({
   const searchParams = useSearchParams();
 
   // TODO this only filters the options after a search, have to use form data if we want to filter without searching
-  const unitFilter = mapParamToNumber(searchParams.getAll("unit"), 1);
+  const unitFilter = mapParamToInterger(searchParams.getAll("unit"), 1);
   const options = useFilterOptions(unitFilter);
   const tagOptions: TagOptionsList = {
     ...options,
