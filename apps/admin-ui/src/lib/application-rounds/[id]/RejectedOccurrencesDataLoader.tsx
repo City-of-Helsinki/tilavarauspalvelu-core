@@ -8,7 +8,7 @@ import React from "react";
 import { filterNonNullable } from "common/src/helpers";
 import { getPermissionErrors } from "common/src/apolloUtils";
 import { useTranslation } from "next-i18next";
-import { useGetFilterSearchParams } from "./utils";
+import { useGetFilterSearchParams } from "@/hooks";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { CenterSpinner } from "common/styled";
 

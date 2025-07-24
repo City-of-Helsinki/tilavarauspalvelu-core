@@ -15,3 +15,4 @@ export { useCreateReservationSeries } from "./useCreateReservationSeries";
 export { useFilteredReservationList } from "./useFilteredReservationList";
 export { useStaffReservationMutation } from "./useStaffReservationMutation";
 export { useUnitResources } from "./useUnitResources";
+export { useGetFilterSearchParams } from "./useGetFilterSearchParams";
