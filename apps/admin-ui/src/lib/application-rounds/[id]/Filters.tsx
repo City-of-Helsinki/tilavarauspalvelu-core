@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { DayT } from "common/src/const";
 import { SearchButton, SearchButtonContainer } from "@/component/SearchButton";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
+import { mapFormToSearchParams } from "common/src/modules/search";
 
 interface FilterProps {
   options: TagOptionsList;
@@ -31,38 +32,6 @@ type SearchFormValues = {
   accessCodeState: AccessCodeState[];
   search: string;
 };
-
-function mapFormToSearchParams(data: SearchFormValues): URLSearchParams {
-  const params = new URLSearchParams();
-  if (data.search) {
-    params.set("search", data.search);
-  }
-  if (data.unitGroup.length > 0) {
-    data.unitGroup.forEach((unitGroup) => params.append("unitGroup", unitGroup.toString()));
-  }
-  if (data.unit.length > 0) {
-    data.unit.forEach((unit) => params.append("unit", unit.toString()));
-  }
-  if (data.sectionStatus.length > 0) {
-    data.sectionStatus.forEach((status) => params.append("sectionStatus", status));
-  }
-  if (data.status.length > 0) {
-    data.status.forEach((status) => params.append("status", status));
-  }
-  if (data.reservationUnit.length > 0) {
-    data.reservationUnit.forEach((unit) => params.append("reservationUnit", unit.toString()));
-  }
-  if (data.applicant.length > 0) {
-    data.applicant.forEach((applicant) => params.append("applicant", applicant));
-  }
-  if (data.weekday.length > 0) {
-    data.weekday.forEach((day) => params.append("weekday", day.toString()));
-  }
-  if (data.accessCodeState.length > 0) {
-    data.accessCodeState.forEach((state) => params.append("accessCodeState", state));
-  }
-  return params;
-}
 
 export function Filters({
   options,
@@ -130,8 +99,7 @@ export function Filters({
 
   const { handleSubmit, control } = form;
   const onSubmit = (data: SearchFormValues) => {
-    const searchParams = mapFormToSearchParams(data);
-    setSearchParams(searchParams);
+    setSearchParams(mapFormToSearchParams(data));
   };
 
   return (

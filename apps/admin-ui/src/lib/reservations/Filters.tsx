@@ -21,6 +21,7 @@ import { useSearchParams } from "next/navigation";
 import { transformPaymentStatus, transformReservationState, transformReservationType } from "common/src/conversion";
 import { filterNonNullable, mapParamToInterger, toNumber } from "common/src/helpers";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
+import { mapFormToSearchParams } from "common/src/modules/search";
 
 const MoreWrapper = styled(ShowAllContainer)`
   .ShowAllContainer__ToggleButton {
@@ -43,60 +44,8 @@ type SearchFormValues = {
   createdAtGte?: string;
   createdAtLte?: string;
   recurring?: "only" | "onlyNot" | undefined;
-  freeOfCharge: boolean;
+  freeOfCharge?: boolean;
 };
-
-// TODO the reverse of this (from search params to form values)
-// TODO might just be better make this generic and copy all form values to search params (not specific keys)
-function mapFormToSearchParams(data: SearchFormValues): URLSearchParams {
-  const params = new URLSearchParams();
-  if (data.search) {
-    params.set("search", data.search);
-  }
-  if (data.dateGte) {
-    params.set("dateGte", data.dateGte);
-  }
-  if (data.dateLte) {
-    params.set("dateLte", data.dateLte);
-  }
-  if (data.unit.length > 0) {
-    data.unit.forEach((unit) => params.append("unit", unit.toString()));
-  }
-  if (data.reservationUnitType.length > 0) {
-    data.reservationUnitType.forEach((type) => params.append("reservationUnitType", type.toString()));
-  }
-  if (data.minPrice !== undefined) {
-    params.set("minPrice", data.minPrice.toString());
-  }
-  if (data.maxPrice !== undefined) {
-    params.set("maxPrice", data.maxPrice.toString());
-  }
-  if (data.orderStatus.length > 0) {
-    data.orderStatus.forEach((status) => params.append("orderStatus", status));
-  }
-  if (data.createdAtGte) {
-    params.set("createdAtGte", data.createdAtGte);
-  }
-  if (data.createdAtLte) {
-    params.set("createdAtLte", data.createdAtLte);
-  }
-  if (data.recurring !== undefined) {
-    params.set("recurring", data.recurring.toString());
-  }
-  if (data.freeOfCharge) {
-    params.set("freeOfCharge", "true");
-  }
-  if (data.reservationType.length > 0) {
-    data.reservationType.forEach((type) => params.append("reservationType", type));
-  }
-  if (data.state.length > 0) {
-    data.state.forEach((state) => params.append("state", state));
-  }
-  if (data.reservationUnit.length > 0) {
-    data.reservationUnit.forEach((unit) => params.append("reservationUnit", unit.toString()));
-  }
-  return params;
-}
 
 // TODO replace with safer version that checks for valid values
 // also a generice would be nice
@@ -117,7 +66,7 @@ function mapParamsToForm(params: URLSearchParams): SearchFormValues {
     createdAtLte: params.get("createdAtLte") ?? undefined,
     recurring:
       params.get("recurring") === "only" ? "only" : params.get("recurring") === "onlyNot" ? "onlyNot" : undefined,
-    freeOfCharge: params.get("freeOfCharge") === "true",
+    freeOfCharge: params.get("freeOfCharge") ? params.get("freeOfCharge") === "true" : undefined,
   };
 }
 

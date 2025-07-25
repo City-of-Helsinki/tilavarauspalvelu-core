@@ -17,6 +17,7 @@ import { useForm } from "react-hook-form";
 import { useSearchParams } from "next/navigation";
 import { filterNonNullable, mapParamToInterger, toNumber } from "common/src/helpers";
 import { transformReservationUnitState } from "common/src/conversion";
+import { mapFormToSearchParams } from "common/src/modules/search";
 
 const MoreWrapper = styled(ShowAllContainer)`
   .ShowAllContainer__ToggleButton {
@@ -53,37 +54,6 @@ function mapParamsToForm(params: URLSearchParams): SearchFormValues {
   };
 }
 
-function mapFormToSearchParams(data: SearchFormValues): URLSearchParams {
-  const params = new URLSearchParams();
-  if (data.search) {
-    params.set("search", data.search);
-  }
-  for (const u of data.unit) {
-    if (u > 0) {
-      params.append("unit", u.toString());
-    }
-  }
-  for (const u of data.reservationUnitType) {
-    params.append("reservationUnitType", u.toString());
-  }
-  for (const s of data.reservationUnitState) {
-    params.append("reservationUnitState", s.toString());
-  }
-  if (data.maxPersonsGte) {
-    params.set("maxPersonsGte", data.maxPersonsGte.toString());
-  }
-  if (data.maxPersonsLte) {
-    params.set("maxPersonsLte", data.maxPersonsLte.toString());
-  }
-  if (data.surfaceAreaGte) {
-    params.set("surfaceAreaGte", data.surfaceAreaGte.toString());
-  }
-  if (data.surfaceAreaLte) {
-    params.set("surfaceAreaLte", data.surfaceAreaLte.toString());
-  }
-  return params;
-}
-
 export function Filters({ options }: { options: TagOptionsList }): JSX.Element {
   const { t } = useTranslation();
   const setSearchParams = useSetSearchParams();
@@ -95,8 +65,7 @@ export function Filters({ options }: { options: TagOptionsList }): JSX.Element {
   });
 
   const onSubmit = (data: SearchFormValues) => {
-    const params = mapFormToSearchParams(data);
-    setSearchParams(params);
+    setSearchParams(mapFormToSearchParams(data));
   };
   const { handleSubmit, control, reset } = form;
   useEffect(() => {

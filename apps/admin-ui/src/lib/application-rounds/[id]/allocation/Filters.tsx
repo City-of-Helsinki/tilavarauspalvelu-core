@@ -17,6 +17,7 @@ import { filterNonNullable, mapParamToInterger, toNumber } from "common/src/help
 import { transformMunicipality, transformReserveeType } from "common/src/conversion";
 import { useEffect } from "react";
 import { gql } from "@apollo/client";
+import { mapFormToSearchParams } from "common/src/modules/search";
 
 type UnitFilterQueryType = ApplicationRoundFilterUnitFragment;
 
@@ -54,8 +55,7 @@ export function Filters({ hideSearchTags, units, isLoading }: FilterProps): JSX.
   }, [reset, searchParams, units]);
 
   const onSubmit = (values: SearchFormValues) => {
-    const searchParams = mapFormToSearchParams(values);
-    setSearchParams(searchParams);
+    setSearchParams(mapFormToSearchParams(values));
   };
 
   const options = useFilterOptions();
@@ -93,35 +93,6 @@ export function Filters({ hideSearchTags, units, isLoading }: FilterProps): JSX.
       </SearchButtonContainer>
     </form>
   );
-}
-
-function mapFormToSearchParams(values: SearchFormValues): URLSearchParams {
-  const params = new URLSearchParams();
-  if (values.search) {
-    params.set("search", values.search);
-  }
-  if (values.unit) {
-    params.set("unit", values.unit.toString());
-  }
-  if (values.priority.length > 0) {
-    values.priority.forEach((p) => params.append("priority", p.toString()));
-  }
-  if (values.order.length > 0) {
-    values.order.forEach((o) => params.append("order", o.toString()));
-  }
-  if (values.municipality.length > 0) {
-    values.municipality.forEach((m) => params.append("municipality", m));
-  }
-  if (values.applicantType.length > 0) {
-    values.applicantType.forEach((a) => params.append("applicantType", a));
-  }
-  if (values.ageGroup.length > 0) {
-    values.ageGroup.forEach((a) => params.append("ageGroup", a.toString()));
-  }
-  if (values.purpose.length > 0) {
-    values.purpose.forEach((p) => params.append("purpose", p.toString()));
-  }
-  return params;
 }
 
 // TODO cleanup these by using a generic conversion / sanitize function
