@@ -263,6 +263,7 @@ def update_reservation_unit_hierarchy_task(using: str | None = None) -> None:
     ReservationUnitHierarchy.refresh(using=using)
 
 
+@singleton_task  # TODO: Doesn't fix background task piling up...
 @app.task(name="update_affecting_time_spans")
 def update_affecting_time_spans_task(using: str | None = None) -> None:
     AffectingTimeSpan.refresh(using=using)
