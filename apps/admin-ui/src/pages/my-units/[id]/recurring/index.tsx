@@ -5,52 +5,41 @@ import { useSeriesReservationsUnits } from "@/hooks";
 import { LinkPrev } from "@/component/LinkPrev";
 import { CenterSpinner, H1 } from "common/styled";
 import { ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { useRouter } from "next/router";
 import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
+import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 
-function ReservationSeriesInner({ unitPk }: { unitPk: number }) {
+type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
+export default function Page({ apiBaseUrl, unitPk }: PropsNarrowed): JSX.Element {
   const { t } = useTranslation();
-
   const { loading, reservationUnits } = useSeriesReservationsUnits(unitPk);
 
   return (
-    <>
+    <AuthorizationChecker apiUrl={apiBaseUrl}>
+      <LinkPrev />
       <H1 $noMargin>{t("myUnits:ReservationSeries.pageTitle")}</H1>
       {loading ? (
         <CenterSpinner />
       ) : reservationUnits.length > 0 ? (
-        <ReservationSeriesForm reservationUnits={reservationUnits} />
+        <ReservationSeriesForm reservationUnits={reservationUnits} unitPk={unitPk} />
       ) : (
         <p>{t("myUnits:ReservationSeries.error.notPossibleForThisUnit")}</p>
       )}
-    </>
-  );
-}
-
-function ReservationSeriesErrorPage() {
-  const { t } = useTranslation();
-  return <div>{t("myUnits:ReservationSeries.error.invalidUnitId")}</div>;
-}
-
-type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-export default function Page(props: PageProps): JSX.Element {
-  const router = useRouter();
-  const unitPk = toNumber(ignoreMaybeArray(router.query.id)) ?? 0;
-  const isInvalid = unitPk <= 0;
-  return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl}>
-      <LinkPrev />
-      {isInvalid ? <ReservationSeriesErrorPage /> : <ReservationSeriesInner unitPk={unitPk} />}
     </AuthorizationChecker>
   );
 }
 
-export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
+export async function getServerSideProps({ query, locale }: GetServerSidePropsContext) {
+  const unitPk = toNumber(ignoreMaybeArray(query.id)) ?? 0;
+  if (unitPk <= 0) {
+    return NOT_FOUND_SSR_VALUE;
+  }
   return {
     props: {
+      unitPk,
       ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
