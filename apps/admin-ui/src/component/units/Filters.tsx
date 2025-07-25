@@ -2,12 +2,13 @@ import React from "react";
 import { AutoGrid } from "common/styled";
 import { ControlledMultiSelectFilter, ControlledSearchFilter } from "@/component/QueryParamFilters";
 import { SearchTags } from "@/component/SearchTags";
-import { translateTag, type TagOptionsList } from "@/modules/search";
+import { translateTag } from "@/modules/search";
 import { useTranslation } from "next-i18next";
 import { useForm } from "react-hook-form";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { SearchButton, SearchButtonContainer } from "../SearchButton";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
+import { mapFormToSearchParams } from "common/src/modules/search";
 
 type SearchFormValues = {
   search: string;
@@ -19,21 +20,6 @@ export function Filters(): JSX.Element {
   const setSearchParams = useSetSearchParams();
 
   const options = useFilterOptions();
-  const tagOptions: TagOptionsList = {
-    ...options,
-    // Not needed on this page
-    orderChoices: [],
-    priorityChoices: [],
-    reservationUnitStates: [],
-    reservationUnitTypes: [],
-    units: [],
-    stateChoices: [],
-    reservationUnits: [],
-    equipments: [],
-    purposes: [],
-    ageGroups: [],
-    municipalities: [],
-  };
 
   const form = useForm<SearchFormValues>({
     defaultValues: {
@@ -43,16 +29,7 @@ export function Filters(): JSX.Element {
   });
 
   const onSubmit = (data: SearchFormValues) => {
-    const params = new URLSearchParams();
-    if (data.search) {
-      params.set("search", data.search);
-    }
-    for (const grp of data.unitGroup) {
-      if (grp > 0) {
-        params.append("unitGroup", grp.toString());
-      }
-    }
-    setSearchParams(params);
+    setSearchParams(mapFormToSearchParams(data));
   };
   const { handleSubmit, control } = form;
 
@@ -63,7 +40,7 @@ export function Filters(): JSX.Element {
         <ControlledMultiSelectFilter control={control} name="unitGroup" options={options.unitGroups} />
       </AutoGrid>
       <SearchButtonContainer>
-        <SearchTags hide={[]} translateTag={translateTag(t, tagOptions)} />
+        <SearchTags hide={[]} translateTag={translateTag(t, options)} />
         <SearchButton />
       </SearchButtonContainer>
     </form>
