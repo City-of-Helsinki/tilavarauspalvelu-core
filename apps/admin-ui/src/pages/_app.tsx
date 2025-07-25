@@ -11,19 +11,23 @@ import Layout from "./layout";
 import PageWrapper from "@/component/PageWrapper";
 import { ModalContextProvider } from "@/context/ModalContext";
 import {
+  BannerNotificationTarget,
   CurrentUserDocument,
-  CurrentUserQuery,
-  CurrentUserQueryVariables,
+  type CurrentUserQuery,
+  type CurrentUserQueryVariables,
   HandlingDataDocument,
-  HandlingDataQuery,
-  HandlingDataQueryVariables,
+  type HandlingDataQuery,
+  type HandlingDataQueryVariables,
   ReservationStateChoice,
+  ShowNotificationsListDocument,
+  type ShowNotificationsListQuery,
+  type ShowNotificationsListQueryVariables,
 } from "@gql/gql-types";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { toApiDate } from "common/src/common/util";
 
 function MyApp(props: AppProps<PageProps> & AppOwnProps): JSX.Element {
-  const { Component, pageProps, currentUser, handlingData } = props;
+  const { Component, pageProps, currentUser, handlingData, notficationsData } = props;
   const { apiBaseUrl, sentryDsn, sentryEnvironment, version } = pageProps;
   useEffect(() => {
     if (sentryDsn) {
@@ -53,6 +57,15 @@ function MyApp(props: AppProps<PageProps> & AppOwnProps): JSX.Element {
       data: handlingData,
     });
   }
+  if (notficationsData) {
+    apolloClient.writeQuery({
+      query: ShowNotificationsListDocument,
+      data: notficationsData,
+      variables: {
+        target: BannerNotificationTarget.Staff,
+      },
+    });
+  }
 
   return (
     <ApolloProvider client={apolloClient}>
@@ -70,6 +83,7 @@ function MyApp(props: AppProps<PageProps> & AppOwnProps): JSX.Element {
 type AppOwnProps = {
   currentUser: CurrentUserQuery["currentUser"];
   handlingData: HandlingDataQuery | null;
+  notficationsData: ShowNotificationsListQuery | null;
 };
 
 // Override the data fetching for the whole app
@@ -96,14 +110,24 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
         state: ReservationStateChoice.RequiresHandling,
       },
     });
+    const { data: notificationsData } = await client.query<
+      ShowNotificationsListQuery,
+      ShowNotificationsListQueryVariables
+    >({
+      query: ShowNotificationsListDocument,
+      fetchPolicy: "no-cache",
+      variables: {
+        target: BannerNotificationTarget.Staff,
+      },
+    });
 
-    return { ...ctx, currentUser: data.currentUser, handlingData };
+    return { ...ctx, currentUser: data.currentUser, handlingData, notficationsData: notificationsData };
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Error fetching current user:", error);
   }
 
-  return { ...ctx, currentUser: null, handlingData: null };
+  return { ...ctx, currentUser: null, handlingData: null, notficationsData: null };
 };
 
 // NOTE infered type problem so casting to FC
