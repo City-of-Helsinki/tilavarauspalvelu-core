@@ -47,6 +47,7 @@ import {
 } from "@lib/application-rounds/[id]";
 import { type TagOptionsList } from "@/modules/search";
 import { getFilterOptions } from "@/hooks/useFilterOptions";
+import { getApplicationRoundUrl } from "@/common/urls";
 
 const TabContent = styled(Flex).attrs({
   $direction: "column",
@@ -137,7 +138,7 @@ export default function ApplicationRound({
               applicationPeriodBeginsAt={applicationRound.applicationPeriodBeginsAt}
               applicationPeriodEndsAt={applicationRound.applicationPeriodEndsAt}
             />
-            <Link href={`${pk}/criteria`}>{t("applicationRound:roundCriteria")}</Link>
+            <Link href={getApplicationRoundUrl(pk, "criteria")}>{t("applicationRound:roundCriteria")}</Link>
           </Flex>
         </div>
         <ApplicationRoundStatusLabel status={applicationRound.status} />
