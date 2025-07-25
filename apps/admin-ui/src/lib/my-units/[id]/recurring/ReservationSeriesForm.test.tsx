@@ -51,6 +51,10 @@ function customRender(
   } = DEFAULT_DATES
 ) {
   const mocks = createGraphQLMocks(props);
+  const reservationUnitOptions = createReservationUnits().map((unit) => ({
+    label: unit.nameFi ?? "",
+    value: unit.pk ?? 0,
+  }));
   return render(
     <MockedProvider
       mocks={mocks}
@@ -64,7 +68,7 @@ function customRender(
         mutate: { fetchPolicy: "no-cache" },
       }}
     >
-      <ReservationSeriesForm reservationUnits={createReservationUnits()} unitPk={1} />
+      <ReservationSeriesForm reservationUnitOptions={reservationUnitOptions} unitPk={1} />
     </MockedProvider>
   );
 }
