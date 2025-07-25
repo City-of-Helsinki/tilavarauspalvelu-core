@@ -29,7 +29,6 @@ from tilavarauspalvelu.models import (
 )
 from utils.date_utils import (
     DEFAULT_TIMEZONE,
-    combine,
     get_date_range,
     get_periods_between,
     local_date,
@@ -182,8 +181,8 @@ def _create_normal_reservations(
                 if reservation_state == ReservationStateChoice.CONFIRMED:
                     handled_at = local_datetime()
 
-            begin_time = datetime.time(hour=random.randint(6, 10), tzinfo=DEFAULT_TIMEZONE)
-            begin_datetime = combine(reservation_date, begin_time)
+            begin_time = datetime.time(hour=random.randint(6, 10))
+            begin_datetime = datetime.datetime.combine(reservation_date, begin_time, tzinfo=DEFAULT_TIMEZONE)
 
             while reservation_date == begin_datetime.date():
                 customer_type = weighted_choice(reservee_type_choice, weights=[5, 1, 1])
@@ -476,8 +475,8 @@ def _create_full_day_reservations(
             if skip_day:
                 continue
 
-            begin_time = datetime.time(hour=random.randint(6, 10), tzinfo=DEFAULT_TIMEZONE)
-            begin_datetime = combine(reservation_date, begin_time)
+            begin_time = datetime.time(hour=random.randint(6, 10))
+            begin_datetime = datetime.datetime.combine(reservation_date, begin_time, tzinfo=DEFAULT_TIMEZONE)
 
             customer_type = weighted_choice(reservee_type_choices, weights=[5, 1, 1])
             reservation_type = weighted_choice(reservation_type_choices, weights=[5, 1, 1])
@@ -582,8 +581,8 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
         pricing: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
         assert pricing is not None, "Reservation unit must have at least one pricing"
 
-        begin_time = datetime.time(hour=random.randint(8, 12), tzinfo=DEFAULT_TIMEZONE)
-        begin_datetime = combine(reservation_date, begin_time)
+        begin_time = datetime.time(hour=random.randint(8, 12))
+        begin_datetime = datetime.datetime.combine(reservation_date, begin_time, tzinfo=DEFAULT_TIMEZONE)
 
         customer_type = weighted_choice(reservee_type_choices, weights=[5, 1, 1])
 
@@ -618,8 +617,8 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
         pricing: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
         assert pricing is not None, "Reservation unit must have at least one pricing"
 
-        begin_time = datetime.time(hour=random.randint(8, 12), tzinfo=DEFAULT_TIMEZONE)
-        begin_datetime = combine(reservation_date, begin_time)
+        begin_time = datetime.time(hour=random.randint(8, 12))
+        begin_datetime = datetime.datetime.combine(reservation_date, begin_time, tzinfo=DEFAULT_TIMEZONE)
 
         customer_type = weighted_choice(reservee_type_choices, weights=[5, 1, 1])
 

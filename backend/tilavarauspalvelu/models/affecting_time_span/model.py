@@ -1,21 +1,20 @@
 from __future__ import annotations
 
-import datetime
 from typing import TYPE_CHECKING, ClassVar
-from warnings import deprecated
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
-from django.core.cache import cache
 from django.db import models
 from django.db.transaction import get_connection
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, timedelta_to_json
+from utils.date_utils import DEFAULT_TIMEZONE, timedelta_to_json
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
+    import datetime
+
     from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
     from tilavarauspalvelu.models import Reservation
 
@@ -24,19 +23,20 @@ if TYPE_CHECKING:
     from .validators import AffectingTimeSpanValidator
 
 
-@deprecated("REFACTOR: Should just use on-demand calculation to avoid overlapping reservations")
 class AffectingTimeSpan(models.Model):
     """
     A PostgreSQL materialized view that is used to cache reservations as time spans
     for first reservable time calculation. Only future reservations are cached,
     and only reservations that are actually going to occur.
 
+    NOTE: SHOULD ONLY BE USED FOR FIRST RESERVABLE TIME CALCULATIONS, NOT FOR RESERVATION OVERLAP CHECKS!!!
+    The view gets stale quite often, since it's dependent on current time and reservations.
+    Calculating it is somewhat expensive, so it cannot be kept as up to date as is needed for overlap checks.
+    Therefore, this is used as a sort of cache, which is updated by a scheduled task.
+
     View contains an array of reservation unit ids that the time span affects, so it is possible
     to query things like "Give me all time spans that affect reservation units X, Y, and Z".
     """
-
-    CACHE_KEY = "affecting_time_spans"
-    """Key for storing datetime stamp in cache of when the view was last updated."""
 
     reservation: Reservation = models.OneToOneField(
         "tilavarauspalvelu.Reservation",
@@ -95,11 +95,7 @@ class AffectingTimeSpan(models.Model):
         """
         Called to refresh the contents of the materialized view.
 
-        The view gets stale quite often, since it's dependent on current time and reservations.
-        Therefore, this is used as a sort of cache, which is updated as a scheduled task,
-        but can also be called manually if needed.
-
-        Refreshing updated a value in cache that can be used to check if the view is valid.
+        This is called automatically by a scheduled task, but can also be called manually if needed.
         """
         try:
             with get_connection(using).cursor() as cursor:
@@ -109,20 +105,6 @@ class AffectingTimeSpan(models.Model):
             if settings.RAISE_ERROR_ON_REFRESH_FAILURE:
                 raise
             SentryLogger.log_exception(error, details="Failed to refresh materialized view.")
-        else:
-            last_updated = local_datetime().isoformat()
-            max_allowed_age = datetime.timedelta(minutes=settings.AFFECTING_TIME_SPANS_UPDATE_INTERVAL_MINUTES)
-            cache.set(cls.CACHE_KEY, last_updated, timeout=max_allowed_age.total_seconds())
-
-    @classmethod
-    def is_valid(cls) -> bool:
-        """Check last update datetime against a set max allowed age.."""
-        cached_value: str | None = cache.get(cls.CACHE_KEY)
-        if cached_value is None:
-            return False
-        last_updated = datetime.datetime.fromisoformat(cached_value)
-        max_allowed_age = datetime.timedelta(minutes=settings.AFFECTING_TIME_SPANS_UPDATE_INTERVAL_MINUTES)
-        return local_datetime() - last_updated < max_allowed_age
 
     def as_time_span_element(self) -> TimeSpanElement:
         from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement

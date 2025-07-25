@@ -28,7 +28,7 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIEr
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
 from tilavarauspalvelu.models.reservation.actions import ReservationActions
-from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_start_of_day, next_hour
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, local_start_of_day, next_hour
 
 from tests.factories import (
     ApplicationRoundFactory,
@@ -209,7 +209,11 @@ def test_reservation__create__reservation_unit_in_open_application_round(graphql
         application_period_ends_at=start_of_today + datetime.timedelta(days=1),
     )
 
-    begin = combine(application_round.reservation_period_begin_date, datetime.time(hour=12), tzinfo=DEFAULT_TIMEZONE)
+    begin = datetime.datetime.combine(
+        application_round.reservation_period_begin_date,
+        datetime.time(hour=12),
+        tzinfo=DEFAULT_TIMEZONE,
+    )
     end = begin + datetime.timedelta(days=1)
 
     graphql.login_with_superuser()

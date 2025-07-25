@@ -47,7 +47,6 @@ from tilavarauspalvelu.tasks import (
     purge_image_cache_task,
     refresh_reservation_unit_accounting_task,
     refresh_reservation_unit_product_mapping_task,
-    update_affecting_time_spans_task,
     update_reservation_unit_hierarchy_task,
     update_reservation_unit_image_urls_task,
     update_reservation_unit_search_vectors_task,
@@ -105,13 +104,15 @@ def _space_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Space]]) -> No
 @receiver(post_save, sender=Reservation, dispatch_uid="reservation_post_save")
 def _reservation_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Reservation]]) -> None:
     instance = kwargs["instance"]
-    using = kwargs["using"]
+    _using = kwargs["using"]
 
     if settings.SAVE_RESERVATION_STATISTICS:
         create_statistics_for_reservations_task.delay(reservation_pks=[instance.pk])
 
-    if settings.UPDATE_AFFECTING_TIME_SPANS:
-        update_affecting_time_spans_task.delay(using=using)
+    # TODO: Disabled for now, since it might contribute to timeouts in production.
+    #  Refresh still happens on a background task every 2 minutes.
+    #  if settings.UPDATE_AFFECTING_TIME_SPANS:  # noqa: ERA001,RUF100
+    #      update_affecting_time_spans_task.delay(using=using)  # noqa: ERA001,RUF100
 
 
 @receiver(post_save, sender=ReservationUnit, dispatch_uid="reservation_unit_post_save")
@@ -174,10 +175,12 @@ def _space_post_delete(sender: Any, **kwargs: Unpack[PostDeleteKwargs[Space]]) -
 
 @receiver(post_delete, sender=Reservation, dispatch_uid="reservation_post_delete")
 def _reservation_post_delete(sender: Any, **kwargs: Unpack[PostDeleteKwargs[Reservation]]) -> None:
-    using = kwargs["using"]
+    _using = kwargs["using"]
 
-    if settings.UPDATE_AFFECTING_TIME_SPANS:
-        update_affecting_time_spans_task.delay(using=using)
+    # TODO: Disabled for now, since it might contribute to timeouts in production.
+    #  Refresh still happens on a background task every 2 minutes.
+    #  if settings.UPDATE_AFFECTING_TIME_SPANS:  # noqa: ERA001,RUF100
+    #      update_affecting_time_spans_task.delay(using=using)  # noqa: ERA001,RUF100
 
 
 @receiver(post_delete, sender=ReservationUnit, dispatch_uid="reservation_unit_post_delete")

@@ -15,7 +15,13 @@ from tilavarauspalvelu.models import (
     ReservationSeries,
     ReservationUnitOption,
 )
-from utils.date_utils import get_periods_between, local_datetime, local_start_of_day, next_date_matching_weekday
+from utils.date_utils import (
+    DEFAULT_TIMEZONE,
+    get_periods_between,
+    local_datetime,
+    local_start_of_day,
+    next_date_matching_weekday,
+)
 
 from ._base import (
     FakerEN,
@@ -227,6 +233,7 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
                     end_date=reservation_period_end_date,
                     start_time=allocation["begin_time"],
                     end_time=allocation["end_time"],
+                    tzinfo=DEFAULT_TIMEZONE,
                 )
 
                 for begin, end in reservation_times:

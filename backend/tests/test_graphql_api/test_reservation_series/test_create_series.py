@@ -16,8 +16,8 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import AffectingTimeSpan, Reservation, ReservationSeries, ReservationUnitHierarchy
-from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_end_of_day, local_start_of_day
+from tilavarauspalvelu.models import Reservation, ReservationSeries, ReservationUnitHierarchy
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_end_of_day, local_start_of_day
 
 from tests.factories import (
     AgeGroupFactory,
@@ -516,13 +516,16 @@ def test_reservation_series__create_series__check_opening_hours__skip_dates_wher
 def test_reservation_series__create_series__overlapping_reservations(graphql):
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
+
+    ReservationUnitHierarchy.refresh()
+
     user = graphql.login_with_superuser()
     next_year = local_date().year + 1
 
     start = datetime.date(next_year, 1, 1)
     end = datetime.date(next_year, 1, 8)
-    reservation_begin = combine(end, datetime.time(10), tzinfo=DEFAULT_TIMEZONE)
-    reservation_end = combine(end, datetime.time(12), tzinfo=DEFAULT_TIMEZONE)
+    reservation_begin = datetime.datetime.combine(end, datetime.time(10), tzinfo=DEFAULT_TIMEZONE)
+    reservation_end = datetime.datetime.combine(end, datetime.time(12), tzinfo=DEFAULT_TIMEZONE)
 
     ReservationFactory.create(
         reservation_unit=reservation_unit,
@@ -530,9 +533,6 @@ def test_reservation_series__create_series__overlapping_reservations(graphql):
         ends_at=reservation_end,
         state=ReservationStateChoice.CONFIRMED,
     )
-
-    ReservationUnitHierarchy.refresh()
-    AffectingTimeSpan.refresh()
 
     data = get_minimal_series_data(
         reservation_unit,

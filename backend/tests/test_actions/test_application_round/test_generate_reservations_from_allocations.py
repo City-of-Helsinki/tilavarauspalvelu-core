@@ -17,13 +17,7 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIDatePeriod
-from tilavarauspalvelu.models import (
-    AffectingTimeSpan,
-    RejectedOccurrence,
-    Reservation,
-    ReservationSeries,
-    ReservationUnitHierarchy,
-)
+from tilavarauspalvelu.models import RejectedOccurrence, Reservation, ReservationSeries, ReservationUnitHierarchy
 from tilavarauspalvelu.typing import Allocation
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, local_time, next_date_matching_weekday
 
@@ -353,6 +347,8 @@ def test_generate_reservation_series_from_allocations__overlapping_reservation()
     unit = UnitBuilder().with_hauki_resource().create()
     reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_unrestricted_access().create()
 
+    ReservationUnitHierarchy.refresh()
+
     next_monday = next_date_matching_weekday(local_date(), Weekday.MONDAY)
 
     application_round = ApplicationRoundFactory.create_with_allocations(
@@ -374,9 +370,6 @@ def test_generate_reservation_series_from_allocations__overlapping_reservation()
         begins_at=local_datetime(2024, 1, 1, 12, 0),
         ends_at=local_datetime(2024, 1, 1, 14, 0),
     )
-
-    ReservationUnitHierarchy.refresh()
-    AffectingTimeSpan.refresh()
 
     application_round.actions.generate_reservations_from_allocations()
 

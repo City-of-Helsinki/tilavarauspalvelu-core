@@ -12,7 +12,7 @@ from tilavarauspalvelu.integrations.keyless_entry.typing import (
     PindoraReservationSeriesAccessCodeValidity,
     PindoraReservationSeriesResponse,
 )
-from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnitHierarchy
+from tilavarauspalvelu.models import ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, local_time
 
 from tests.factories import ReservationSeriesFactory
@@ -105,8 +105,6 @@ def create_reservation_series(**kwargs: Any) -> ReservationSeries:
     )
 
     ReservationUnitHierarchy.refresh()
-    AffectingTimeSpan.refresh()
-
     return reservation_series
 
 

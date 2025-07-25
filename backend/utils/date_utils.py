@@ -384,14 +384,14 @@ def combine(
     date: datetime.date,
     time: datetime.time,
     *,
-    tzinfo: zoneinfo.ZoneInfo | datetime.timezone | None = None,
+    astimezone: zoneinfo.ZoneInfo | datetime.timezone = datetime.UTC,
 ) -> datetime.datetime:
-    """Combine a date and a timezone aware time to a datetime object."""
-    if tzinfo is None and not (time.tzinfo == datetime.UTC or isinstance(time.tzinfo, zoneinfo.ZoneInfo)):
-        msg = "Must give `tzinfo` or time must be timezone-aware using `zoneinfo.ZoneInfo` objects or `datetime.UTC`."
+    """Combine a date and time to a UTC datetime, and then convert to the given timezone."""
+    if time.tzinfo is not None:
+        msg = "Time must not be timezone-aware."
         raise ValueError(msg)
 
-    return datetime.datetime.combine(date, time, tzinfo=time.tzinfo or tzinfo)
+    return datetime.datetime.combine(date, time, tzinfo=datetime.UTC).astimezone(astimezone)
 
 
 def timedelta_to_json(delta: datetime.timedelta, *, timespec: Literal["minutes", "seconds"] = "seconds") -> str:
@@ -493,8 +493,8 @@ def get_periods_between(
     start_time: datetime.time,
     end_time: datetime.time,
     *,
+    tzinfo: zoneinfo.ZoneInfo | datetime.timezone,
     interval: int = 7,
-    tzinfo: zoneinfo.ZoneInfo | datetime.timezone | None = None,
 ) -> Generator[tuple[datetime.datetime, datetime.datetime]]:
     """
     Generate datetimes based on the given start and end dates (both inclusive).
@@ -507,7 +507,7 @@ def get_periods_between(
     :param start_time: Start time of a period.
     :param end_time: End time of a period.
     :param interval: Days between each period.
-    :param tzinfo: Timezone information for the datetimes (if times are not datetime-aware yet).
+    :param tzinfo: Timezone information for the datetimes.
     """
     if end_date < start_date:
         msg = "End date cannot be before start date."
@@ -516,12 +516,12 @@ def get_periods_between(
         msg = "End time cannot be at or before start time if on the same day."
         raise ValueError(msg)
 
-    start_datetime = combine(start_date, start_time, tzinfo=tzinfo)
+    start_datetime = datetime.datetime.combine(start_date, start_time, tzinfo=tzinfo)
     if end_time == datetime.time(0, 0):
         # Handle cases where end time is at midnight
-        end_datetime = combine(start_date + datetime.timedelta(days=1), end_time, tzinfo=tzinfo)
+        end_datetime = datetime.datetime.combine(start_date + datetime.timedelta(days=1), end_time, tzinfo=tzinfo)
     else:
-        end_datetime = combine(start_date, end_time, tzinfo=tzinfo)
+        end_datetime = datetime.datetime.combine(start_date, end_time, tzinfo=tzinfo)
 
     for delta in range(0, (end_date - start_date).days + 1, interval):
         yield start_datetime + datetime.timedelta(days=delta), end_datetime + datetime.timedelta(days=delta)
@@ -568,8 +568,10 @@ def get_time_range(
 def normalize_as_datetime(value: datetime.date | datetime.datetime, *, timedelta_days: int = 0) -> datetime.datetime:
     if isinstance(value, datetime.datetime):
         return value
+
     # Convert dates to datetimes to include timezone information
-    return combine(value, datetime.time.min, tzinfo=DEFAULT_TIMEZONE) + datetime.timedelta(days=timedelta_days)
+    delta = datetime.timedelta(days=timedelta_days)
+    return datetime.datetime.combine(value, datetime.time.min, tzinfo=DEFAULT_TIMEZONE) + delta
 
 
 def next_date_matching_weekday(date: datetime.date, weekday: Weekday) -> datetime.date:

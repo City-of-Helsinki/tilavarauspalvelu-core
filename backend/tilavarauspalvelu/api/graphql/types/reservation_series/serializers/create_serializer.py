@@ -21,7 +21,7 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationSeries
-from tilavarauspalvelu.tasks import create_statistics_for_reservations_task, update_affecting_time_spans_task
+from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
 from utils.external_service.errors import ExternalServiceError
 from utils.fields.serializer import CurrentUserDefaultNullable, input_only_field
 
@@ -202,8 +202,10 @@ class ReservationSeriesCreateSerializer(NestingModelSerializer):
                 SentryLogger.log_exception(error, details=f"Reservation series: {instance.pk}")
 
         # Must refresh the materialized view since new reservations are created.
-        if settings.UPDATE_AFFECTING_TIME_SPANS:
-            update_affecting_time_spans_task.delay()
+        # TODO: Disabled for now, since it might contribute to timeouts in production.
+        #  Refresh still happens on a background task every 2 minutes.
+        #  if settings.UPDATE_AFFECTING_TIME_SPANS:  # noqa: ERA001,RUF100
+        #      update_affecting_time_spans_task.delay()  # noqa: ERA001,RUF100
 
         if settings.SAVE_RESERVATION_STATISTICS:
             create_statistics_for_reservations_task.delay(

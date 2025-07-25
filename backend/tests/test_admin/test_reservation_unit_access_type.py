@@ -10,7 +10,7 @@ from freezegun import freeze_time
 from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import ReservationUnit
-from utils.date_utils import combine, local_date, local_datetime, local_time
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
 from tests.factories import (
     ReservationFactory,
@@ -393,20 +393,44 @@ def test_reservation_unit_admin__access_types__set_new_access_type_to_reservatio
     )
 
     past_reservation = ReservationFactory.create(
-        begins_at=combine(today - datetime.timedelta(days=1), local_time(12)),
-        ends_at=combine(today - datetime.timedelta(days=1), local_time(13)),
+        begins_at=datetime.datetime.combine(
+            today - datetime.timedelta(days=1),
+            datetime.time(12),
+            tzinfo=DEFAULT_TIMEZONE,
+        ),
+        ends_at=datetime.datetime.combine(
+            today - datetime.timedelta(days=1),
+            datetime.time(13),
+            tzinfo=DEFAULT_TIMEZONE,
+        ),
         access_type=AccessType.PHYSICAL_KEY,
         reservation_unit=reservation_unit,
     )
     todays_reservation = ReservationFactory.create(
-        begins_at=combine(today, local_time(12)),
-        ends_at=combine(today, local_time(13)),
+        begins_at=datetime.datetime.combine(
+            today,
+            datetime.time(12),
+            tzinfo=DEFAULT_TIMEZONE,
+        ),
+        ends_at=datetime.datetime.combine(
+            today,
+            datetime.time(13),
+            tzinfo=DEFAULT_TIMEZONE,
+        ),
         access_type=AccessType.PHYSICAL_KEY,
         reservation_unit=reservation_unit,
     )
     future_reservation = ReservationFactory.create(
-        begins_at=combine(today + datetime.timedelta(days=1), local_time(12)),
-        ends_at=combine(today + datetime.timedelta(days=1), local_time(13)),
+        begins_at=datetime.datetime.combine(
+            today + datetime.timedelta(days=1),
+            datetime.time(12),
+            tzinfo=DEFAULT_TIMEZONE,
+        ),
+        ends_at=datetime.datetime.combine(
+            today + datetime.timedelta(days=1),
+            datetime.time(13),
+            tzinfo=DEFAULT_TIMEZONE,
+        ),
         access_type=AccessType.PHYSICAL_KEY,
         reservation_unit=reservation_unit,
     )

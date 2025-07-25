@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.enums import HaukiResourceState
 from tilavarauspalvelu.exceptions import TimeSpanElementError
-from utils.date_utils import DEFAULT_TIMEZONE, combine, datetime_range_as_string, local_start_of_day
+from utils.date_utils import DEFAULT_TIMEZONE, datetime_range_as_string, local_start_of_day
 
 if TYPE_CHECKING:
     import zoneinfo
@@ -74,7 +74,7 @@ class TimeSpanElement:
             else datetime.datetime.strptime(time_element["start_time"], "%H:%M:%S").time()
         )
 
-        start_datetime = combine(date, start_time, tzinfo=timezone)
+        start_datetime = datetime.datetime.combine(date, start_time, tzinfo=timezone)
 
         if time_element["end_time_on_next_day"] or full_day:
             date += datetime.timedelta(days=1)
@@ -85,7 +85,7 @@ class TimeSpanElement:
             else datetime.datetime.strptime(time_element["end_time"], "%H:%M:%S").time()
         )
 
-        end_datetime = combine(date, end_time, tzinfo=timezone)
+        end_datetime = datetime.datetime.combine(date, end_time, tzinfo=timezone)
 
         # If the time span duration would be zero or negative, return None.
         if start_datetime >= end_datetime:
@@ -265,6 +265,7 @@ class TimeSpanElement:
         if filter_time_start and filter_time_start.tzinfo is not None:
             msg = "`filter_time_start` must be timezone naive."
             raise TimeSpanElementError(msg)
+
         if filter_time_end and filter_time_end.tzinfo is not None:
             msg = "`filter_time_end` must be timezone naive."
             raise TimeSpanElementError(msg)
@@ -277,14 +278,22 @@ class TimeSpanElement:
                 closed_time_spans.append(
                     TimeSpanElement(
                         start_datetime=local_start_of_day(day),
-                        end_datetime=combine(day, filter_time_start, tzinfo=DEFAULT_TIMEZONE),
+                        end_datetime=datetime.datetime.combine(
+                            day,
+                            filter_time_start,
+                            tzinfo=DEFAULT_TIMEZONE,
+                        ),
                         is_reservable=False,
                     )
                 )
             if filter_time_end and filter_time_end != datetime.datetime.min:
                 closed_time_spans.append(
                     TimeSpanElement(
-                        start_datetime=combine(day, filter_time_end, tzinfo=DEFAULT_TIMEZONE),
+                        start_datetime=datetime.datetime.combine(
+                            day,
+                            filter_time_end,
+                            tzinfo=DEFAULT_TIMEZONE,
+                        ),
                         end_datetime=local_start_of_day(day) + datetime.timedelta(days=1),
                         is_reservable=False,
                     )

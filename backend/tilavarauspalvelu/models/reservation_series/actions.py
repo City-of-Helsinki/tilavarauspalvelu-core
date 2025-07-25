@@ -9,14 +9,15 @@ from lookup_property import L
 from tilavarauspalvelu.dataclasses import ReservationSeriesCalculationResults
 from tilavarauspalvelu.enums import AccessType, RejectionReadinessChoice, Weekday
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
-from tilavarauspalvelu.models import AffectingTimeSpan, ApplicationSection, RejectedOccurrence, Reservation
+from tilavarauspalvelu.models import ApplicationSection, RejectedOccurrence, Reservation
 from tilavarauspalvelu.typing import ReservationPeriod
-from utils.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, get_periods_between, local_datetime
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
 
-    from tilavarauspalvelu.models import ReservableTimeSpan, ReservationSeries
+    from tilavarauspalvelu.models import ReservationSeries
+    from tilavarauspalvelu.models.reservable_time_span.queryset import ReservableTimeSpanQuerySet
     from tilavarauspalvelu.typing import ReservationDetails
 
 
@@ -53,23 +54,32 @@ class ReservationSeriesActions:
         :param buffer_time_after: Used buffer time after the reservation.
         :param ignore_reservations: Reservations to ignore when calculating slots, e.g., for rescheduling.
         """
-        affecting_timespans = AffectingTimeSpan.objects.filter(
-            affected_reservation_unit_ids__contains=[self.reservation_series.reservation_unit.pk],
-            buffered_start_datetime__date__lte=self.reservation_series.end_date,
-            buffered_end_datetime__date__gte=self.reservation_series.begin_date,
+        begin_date = self.reservation_series.begin_date
+        end_date = self.reservation_series.end_date
+        begin_time = self.reservation_series.begin_time
+        end_time = self.reservation_series.end_time
+
+        # Times are saved in finnish time.
+        begin_datetime = datetime.datetime.combine(begin_date, begin_time, tzinfo=DEFAULT_TIMEZONE)
+        end_datetime = datetime.datetime.combine(end_date, end_time, tzinfo=DEFAULT_TIMEZONE)
+
+        reservation_unit = self.reservation_series.reservation_unit
+
+        reservations = Reservation.objects.all().overlapping_reservations(
+            reservation_unit=reservation_unit,
+            begin=begin_datetime,
+            end=end_datetime,
+            buffer_time_before=buffer_time_before,
+            buffer_time_after=buffer_time_after,
         )
         if ignore_reservations:
-            affecting_timespans = affecting_timespans.exclude(reservation__in=ignore_reservations)
+            reservations = reservations.exclude(pk__in=ignore_reservations)
 
-        timespans = [timespan.as_time_span_element() for timespan in affecting_timespans]
+        timespans = [timespan.as_time_span_element() for timespan in reservations]
 
         reservable_timespans = self.get_reservable_timespans() if check_opening_hours else []
 
         results = ReservationSeriesCalculationResults()
-
-        begin_time: datetime.time = self.reservation_series.begin_time
-        end_time: datetime.time = self.reservation_series.end_time
-        reservation_unit = self.reservation_series.reservation_unit
 
         weekdays: list[Weekday] = [Weekday(weekday) for weekday in self.reservation_series.weekdays]
         if not weekdays:
@@ -85,7 +95,7 @@ class ReservationSeriesActions:
 
             periods = get_periods_between(
                 start_date=begin_date,
-                end_date=self.reservation_series.end_date,
+                end_date=end_date,
                 start_time=begin_time,
                 end_time=end_time,
                 interval=self.reservation_series.recurrence_in_days,
@@ -147,16 +157,21 @@ class ReservationSeriesActions:
         return results
 
     def get_reservable_timespans(self) -> list[TimeSpanElement]:
-        begin_time = self.reservation_series.begin_time
-        end_time = self.reservation_series.end_time
         hauki_resource = self.reservation_series.reservation_unit.origin_hauki_resource
         if hauki_resource is None:
             return []
 
-        timespans: Iterable[ReservableTimeSpan] = hauki_resource.reservable_time_spans.all().overlapping_with_period(
-            start=combine(self.reservation_series.begin_date, begin_time, tzinfo=DEFAULT_TIMEZONE),
-            end=combine(self.reservation_series.end_date, end_time, tzinfo=DEFAULT_TIMEZONE),
-        )
+        begin_date = self.reservation_series.begin_date
+        begin_time = self.reservation_series.begin_time
+        end_date = self.reservation_series.end_date
+        end_time = self.reservation_series.end_time
+
+        # Times are saved in finnish time.
+        start = datetime.datetime.combine(begin_date, begin_time, tzinfo=DEFAULT_TIMEZONE)
+        end = datetime.datetime.combine(end_date, end_time, tzinfo=DEFAULT_TIMEZONE)
+
+        timespans: ReservableTimeSpanQuerySet = hauki_resource.reservable_time_spans.all()  # type: ignore[assignment]
+        timespans = timespans.overlapping_with_period(start=start, end=end)
 
         return [timespan.as_time_span_element() for timespan in timespans]
 

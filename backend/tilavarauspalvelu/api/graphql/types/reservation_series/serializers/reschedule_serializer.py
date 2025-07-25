@@ -16,9 +16,9 @@ from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateCh
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import ReservationSeries, ReservationStatistic
-from tilavarauspalvelu.tasks import create_statistics_for_reservations_task, update_affecting_time_spans_task
+from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
 from tilavarauspalvelu.typing import ReservationDetails
-from utils.date_utils import DEFAULT_TIMEZONE, combine, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.errors import external_service_errors_as_validation_errors
 from utils.fields.serializer import input_only_field
 
@@ -140,8 +140,10 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
                     PindoraService.sync_access_code(obj=instance)
 
         # Must refresh the materialized view since reservations changed time.
-        if settings.UPDATE_AFFECTING_TIME_SPANS:
-            update_affecting_time_spans_task.delay()
+        # TODO: Disabled for now, since it might contribute to timeouts in production.
+        #  Refresh still happens on a background task every 2 minutes.
+        #  if settings.UPDATE_AFFECTING_TIME_SPANS:  # noqa: ERA001,RUF100
+        #      update_affecting_time_spans_task.delay()  # noqa: ERA001,RUF100
 
         if settings.SAVE_RESERVATION_STATISTICS:
             create_statistics_for_reservations_task.delay(
@@ -185,7 +187,7 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
             }
 
             # If new reservation would already have started, don't create it.
-            if combine(today, instance.begin_time, tzinfo=DEFAULT_TIMEZONE) <= now:
+            if datetime.datetime.combine(today, instance.begin_time, tzinfo=DEFAULT_TIMEZONE) <= now:
                 skip_dates.add(today)
 
             # If series already has a reservation that is ongoing or in the past, don't create new one for today.

@@ -232,15 +232,19 @@ def test_date_utils__utc_time_max():
 
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
 def test_date_utils__combine():
-    dt = combine(utc_date(), utc_time())
-    assert dt == datetime.datetime.now(tz=datetime.UTC)
+    date = datetime.date(2022, 1, 1)
+    time_naive = datetime.time(8, 0)
+    time_aware = datetime.time(8, 0, tzinfo=datetime.UTC)
 
-    msg = "Must give `tzinfo` or time must be timezone-aware using `zoneinfo.ZoneInfo` objects or `datetime.UTC`."
+    dt = combine(date, time_naive, astimezone=datetime.UTC)
+    assert dt == datetime.datetime(2022, 1, 1, 8, 0, tzinfo=datetime.UTC)
+
+    dt = combine(date, time_naive, astimezone=DEFAULT_TIMEZONE)
+    assert dt == datetime.datetime(2022, 1, 1, 10, 0, tzinfo=DEFAULT_TIMEZONE)
+
+    msg = "Time must not be timezone-aware."
     with pytest.raises(ValueError, match=re.escape(msg)):
-        combine(utc_date(), datetime.time.min)
-
-    dt = combine(utc_date(), datetime.time.min, tzinfo=datetime.UTC)
-    assert dt == datetime.datetime.combine(utc_date(), datetime.time.min, tzinfo=datetime.UTC)
+        combine(date, time_aware, astimezone=datetime.UTC)
 
 
 class Params(NamedTuple):
@@ -258,8 +262,8 @@ class Params(NamedTuple):
             "single day": Params(
                 start_date=datetime.date(2024, 1, 1),
                 end_date=datetime.date(2024, 1, 1),
-                start_time=datetime.time(12, 0, 0, tzinfo=DEFAULT_TIMEZONE),
-                end_time=datetime.time(14, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+                start_time=datetime.time(12, 0, 0),
+                end_time=datetime.time(14, 0, 0),
                 periods=[
                     (
                         datetime.datetime(2024, 1, 1, 12, 0, tzinfo=DEFAULT_TIMEZONE),
@@ -270,8 +274,8 @@ class Params(NamedTuple):
             "multiple days": Params(
                 start_date=datetime.date(2024, 1, 1),
                 end_date=datetime.date(2024, 1, 15),
-                start_time=datetime.time(12, 0, 0, tzinfo=DEFAULT_TIMEZONE),
-                end_time=datetime.time(14, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+                start_time=datetime.time(12, 0, 0),
+                end_time=datetime.time(14, 0, 0),
                 periods=[
                     (
                         datetime.datetime(2024, 1, 1, 12, 0, tzinfo=DEFAULT_TIMEZONE),
@@ -290,8 +294,8 @@ class Params(NamedTuple):
             "different interval": Params(
                 start_date=datetime.date(2024, 1, 1),
                 end_date=datetime.date(2024, 1, 12),
-                start_time=datetime.time(12, 0, 0, tzinfo=DEFAULT_TIMEZONE),
-                end_time=datetime.time(14, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+                start_time=datetime.time(12, 0, 0),
+                end_time=datetime.time(14, 0, 0),
                 interval=4,
                 periods=[
                     (
@@ -311,8 +315,8 @@ class Params(NamedTuple):
             "end_time is at midnight": Params(
                 start_date=datetime.date(2024, 1, 1),
                 end_date=datetime.date(2024, 1, 15),
-                start_time=datetime.time(21, 0, 0, tzinfo=DEFAULT_TIMEZONE),
-                end_time=datetime.time(0, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+                start_time=datetime.time(21, 0, 0),
+                end_time=datetime.time(0, 0, 0),
                 periods=[
                     (
                         datetime.datetime(2024, 1, 1, 21, 0, tzinfo=DEFAULT_TIMEZONE),
@@ -332,37 +336,45 @@ class Params(NamedTuple):
     ),
 )
 def test_date_utils__get_periods_between(start_date, end_date, start_time, end_time, periods, interval):
-    assert list(get_periods_between(start_date, end_date, start_time, end_time, interval=interval)) == periods
+    results = get_periods_between(
+        start_date,
+        end_date,
+        start_time,
+        end_time,
+        tzinfo=DEFAULT_TIMEZONE,
+        interval=interval,
+    )
+    assert list(results) == periods
 
 
 def test_date_utils__get_periods_between__end_date_before_start_date():
     start_date = datetime.date(2024, 1, 2)
     end_date = datetime.date(2024, 1, 1)
-    start_time = datetime.time(12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
-    end_time = datetime.time(14, 0, 0, tzinfo=DEFAULT_TIMEZONE)
+    start_time = datetime.time(12, 0, 0)
+    end_time = datetime.time(14, 0, 0)
 
     msg = "End date cannot be before start date."
     with pytest.raises(ValueError, match=re.escape(msg)):
-        list(get_periods_between(start_date, end_date, start_time, end_time))
+        list(get_periods_between(start_date, end_date, start_time, end_time, tzinfo=DEFAULT_TIMEZONE))
 
 
 def test_date_utils__get_periods_between__end_time_before_start_time():
     start_date = datetime.date(2024, 1, 1)
     end_date = datetime.date(2024, 1, 1)
-    start_time = datetime.time(15, 0, 0, tzinfo=DEFAULT_TIMEZONE)
-    end_time = datetime.time(14, 0, 0, tzinfo=DEFAULT_TIMEZONE)
+    start_time = datetime.time(15, 0, 0)
+    end_time = datetime.time(14, 0, 0)
 
     msg = "End time cannot be at or before start time if on the same day."
     with pytest.raises(ValueError, match=re.escape(msg)):
-        list(get_periods_between(start_date, end_date, start_time, end_time))
+        list(get_periods_between(start_date, end_date, start_time, end_time, tzinfo=DEFAULT_TIMEZONE))
 
 
 def test_date_utils__get_periods_between__end_time_sames_as_start_time():
     start_date = datetime.date(2024, 1, 1)
     end_date = datetime.date(2024, 1, 1)
-    start_time = datetime.time(14, 0, 0, tzinfo=DEFAULT_TIMEZONE)
-    end_time = datetime.time(14, 0, 0, tzinfo=DEFAULT_TIMEZONE)
+    start_time = datetime.time(14, 0, 0)
+    end_time = datetime.time(14, 0, 0)
 
     msg = "End time cannot be at or before start time if on the same day."
     with pytest.raises(ValueError, match=re.escape(msg)):
-        list(get_periods_between(start_date, end_date, start_time, end_time))
+        list(get_periods_between(start_date, end_date, start_time, end_time, tzinfo=DEFAULT_TIMEZONE))

@@ -15,7 +15,7 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import ReservationDenyReason, ReservationSeries
-from tilavarauspalvelu.tasks import create_statistics_for_reservations_task, update_affecting_time_spans_task
+from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
 from utils.date_utils import local_datetime
 from utils.external_service.errors import external_service_errors_as_validation_errors
 
@@ -81,8 +81,10 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
                     PindoraService.reschedule_access_code(instance)
 
         # Must refresh the materialized view since reservations state changed to 'DENIED'
-        if settings.UPDATE_AFFECTING_TIME_SPANS:
-            update_affecting_time_spans_task.delay()
+        # TODO: Disabled for now, since it might contribute to timeouts in production.
+        #  Refresh still happens on a background task every 2 minutes.
+        #  if settings.UPDATE_AFFECTING_TIME_SPANS:  # noqa: ERA001,RUF100
+        #      update_affecting_time_spans_task.delay()  # noqa: ERA001,RUF100
 
         if settings.SAVE_RESERVATION_STATISTICS:
             create_statistics_for_reservations_task.delay(

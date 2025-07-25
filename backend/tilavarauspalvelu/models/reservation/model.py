@@ -21,12 +21,13 @@ from tilavarauspalvelu.enums import (
     ReserveeType,
 )
 from utils.auditlog_util import AuditLogger
-from utils.date_utils import datetime_range_as_string
+from utils.date_utils import DEFAULT_TIMEZONE, datetime_range_as_string
 from utils.decimal_utils import round_decimal
 from utils.fields.model import StrChoiceField
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
     from tilavarauspalvelu.models import (
         AgeGroup,
         ReservationDenyReason,
@@ -348,6 +349,18 @@ class Reservation(SerializableMixin, models.Model):
             default=models.Q(access_code_is_active=False),
         )
         return case  # noqa: RET504 type: ignore[return-value]
+
+    def as_time_span_element(self) -> TimeSpanElement:
+        from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
+
+        return TimeSpanElement(
+            start_datetime=self.begins_at.astimezone(DEFAULT_TIMEZONE),
+            end_datetime=self.ends_at.astimezone(DEFAULT_TIMEZONE),
+            is_reservable=False,
+            # Buffers are ignored for blocking reservation even if set.
+            buffer_time_before=None if self.type == ReservationTypeChoice.BLOCKED else self.buffer_time_before,
+            buffer_time_after=None if self.type == ReservationTypeChoice.BLOCKED else self.buffer_time_after,
+        )
 
 
 AuditLogger.register(

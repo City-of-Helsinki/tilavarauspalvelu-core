@@ -10,8 +10,8 @@ from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.keyless_entry.service import PindoraService
-from tilavarauspalvelu.models import AffectingTimeSpan, ReservationStatistic, ReservationUnitHierarchy
-from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_time
+from tilavarauspalvelu.models import ReservationStatistic
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, local_time
 
 from tests.factories import ReservationFactory, ReservationSeriesFactory
 from tests.helpers import patch_method
@@ -512,14 +512,18 @@ def test_reservation_series__reschedule_series__overlapping_reservations(graphql
     # Add overlapping reservation
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_series.reservation_unit,
-        begins_at=combine(begin_date, local_time(hour=8, minute=0)),
-        ends_at=combine(begin_date, local_time(hour=8, minute=30)),
+        begins_at=datetime.datetime.combine(
+            begin_date,
+            datetime.time(hour=8, minute=0),
+            tzinfo=DEFAULT_TIMEZONE,
+        ),
+        ends_at=datetime.datetime.combine(
+            begin_date,
+            datetime.time(hour=8, minute=30),
+            tzinfo=DEFAULT_TIMEZONE,
+        ),
         state=ReservationStateChoice.CONFIRMED,
     )
-
-    # Refresh materialized views so that overlapping reservations are detected.
-    ReservationUnitHierarchy.refresh()
-    AffectingTimeSpan.refresh()
 
     data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:00")
 
@@ -547,14 +551,18 @@ def test_reservation_series__reschedule_series__overlapping_reservations__buffer
     # Add overlapping reservation, but only with the buffer time.
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_series.reservation_unit,
-        begins_at=combine(begin_date, local_time(hour=7, minute=0)),
-        ends_at=combine(begin_date, local_time(hour=8, minute=00)),
+        begins_at=datetime.datetime.combine(
+            begin_date,
+            datetime.time(hour=7, minute=0),
+            tzinfo=DEFAULT_TIMEZONE,
+        ),
+        ends_at=datetime.datetime.combine(
+            begin_date,
+            datetime.time(hour=8, minute=0),
+            tzinfo=DEFAULT_TIMEZONE,
+        ),
         state=ReservationStateChoice.CONFIRMED,
     )
-
-    # Refresh materialized views so that overlapping reservations are detected.
-    ReservationUnitHierarchy.refresh()
-    AffectingTimeSpan.refresh()
 
     data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:00")
 
@@ -582,14 +590,18 @@ def test_reservation_series__reschedule_series__overlapping_reservations__buffer
     # Add overlapping reservation, but only with the buffer time.
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_series.reservation_unit,
-        begins_at=combine(begin_date, local_time(hour=13, minute=0)),
-        ends_at=combine(begin_date, local_time(hour=14, minute=00)),
+        begins_at=datetime.datetime.combine(
+            begin_date,
+            datetime.time(hour=13, minute=0),
+            tzinfo=DEFAULT_TIMEZONE,
+        ),
+        ends_at=datetime.datetime.combine(
+            begin_date,
+            datetime.time(hour=14, minute=0),
+            tzinfo=DEFAULT_TIMEZONE,
+        ),
         state=ReservationStateChoice.CONFIRMED,
     )
-
-    # Refresh materialized views so that overlapping reservations are detected.
-    ReservationUnitHierarchy.refresh()
-    AffectingTimeSpan.refresh()
 
     data = get_minimal_reschedule_data(reservation_series, endTime="13:00:00")
 
@@ -618,14 +630,18 @@ def test_reservation_series__reschedule_series__overlapping_reservations__only_b
     # Add overlapping reservation, but only with the buffer time.
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_series.reservation_unit,
-        begins_at=combine(begin_date, local_time(hour=14, minute=0)),
-        ends_at=combine(begin_date, local_time(hour=15, minute=00)),
+        begins_at=datetime.datetime.combine(
+            begin_date,
+            datetime.time(hour=14, minute=0),
+            tzinfo=DEFAULT_TIMEZONE,
+        ),
+        ends_at=datetime.datetime.combine(
+            begin_date,
+            datetime.time(hour=15, minute=0),
+            tzinfo=DEFAULT_TIMEZONE,
+        ),
         state=ReservationStateChoice.CONFIRMED,
     )
-
-    # Refresh materialized views so that overlapping reservations are detected.
-    ReservationUnitHierarchy.refresh()
-    AffectingTimeSpan.refresh()
 
     data = get_minimal_reschedule_data(reservation_series, endTime="13:00:00")
 

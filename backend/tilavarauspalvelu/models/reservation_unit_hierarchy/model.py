@@ -27,6 +27,11 @@ class ReservationUnitHierarchy(models.Model):
     """
     A PostgreSQL materialized view that is used to pre-calculate
     which reservation units affect a given reservation unit's reservations.
+
+    The view gets stale when:
+      1) Reservation units are created or deleted.
+      2) Spaces or resources are added to or removed from existing reservation units.
+      3) The space hierarchy is changed.
     """
 
     reservation_unit: ReservationUnit = models.OneToOneField(
@@ -56,11 +61,6 @@ class ReservationUnitHierarchy(models.Model):
     def refresh(cls, using: str | None = None) -> None:
         """
         Called to refresh the contents of the materialized view.
-
-        The view gets stale when:
-          1) Reservation units are created or deleted.
-          2) Spaces or resources are added to or removed from existing reservation units.
-          3) The space hierarchy is changed.
 
         This method is called automatically with appropriate signals,
         and with a scheduled task, but can also be called manually if needed.

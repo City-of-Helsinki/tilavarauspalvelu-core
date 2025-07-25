@@ -13,7 +13,7 @@ from tilavarauspalvelu.enums import (
     TermsOfUseTypeChoices,
 )
 from tilavarauspalvelu.models import ReservableTimeSpan, ReservationMetadataSet
-from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date
+from utils.date_utils import DEFAULT_TIMEZONE, local_date
 
 from tests.factories import (
     EquipmentCategoryFactory,
@@ -622,13 +622,15 @@ def _create_caisa() -> None:
     reservable_times = [
         ReservableTimeSpanFactory.build(
             resource=hauki_resource,
-            start_datetime=combine(
+            start_datetime=datetime.datetime.combine(
                 date=today + datetime.timedelta(days=day),
-                time=datetime.time(10, tzinfo=DEFAULT_TIMEZONE),
+                time=datetime.time(10),
+                tzinfo=DEFAULT_TIMEZONE,
             ),
-            end_datetime=combine(
+            end_datetime=datetime.datetime.combine(
                 date=today + datetime.timedelta(days=day),
-                time=datetime.time(20, tzinfo=DEFAULT_TIMEZONE),
+                time=datetime.time(20),
+                tzinfo=DEFAULT_TIMEZONE,
             ),
         )
         for hauki_resource in [

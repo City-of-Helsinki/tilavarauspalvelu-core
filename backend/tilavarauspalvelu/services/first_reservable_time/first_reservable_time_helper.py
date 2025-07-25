@@ -279,9 +279,11 @@ class FirstReservableTimeHelper:
         # fill the page size.
         qs = self.optimized_reservation_unit_queryset
 
-        if not AffectingTimeSpan.is_valid():
-            AffectingTimeSpan.refresh()
-            cache.delete(self.cache_key)
+        # TODO: Disabled for now, since it might contribute to timeouts in production.
+        #  Refresh still happens on a background task every 2 minutes.
+        #  if not AffectingTimeSpan.is_valid():
+        #      AffectingTimeSpan.refresh()  # noqa: ERA001,RUF100
+        #      cache.delete(self.cache_key)  # noqa: ERA001,RUF100
 
         has_valid_results_for_previous_pages = self._read_cached_results()
         if has_valid_results_for_previous_pages:

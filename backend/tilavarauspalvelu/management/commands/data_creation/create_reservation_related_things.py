@@ -28,7 +28,7 @@ from tilavarauspalvelu.models import (
     TaxPercentage,
     TermsOfUse,
 )
-from utils.date_utils import DEFAULT_TIMEZONE, combine, local_start_of_day
+from utils.date_utils import DEFAULT_TIMEZONE, local_start_of_day
 
 from tests.factories import (
     AgeGroupFactory,
@@ -235,19 +235,19 @@ def _create_hauki_resources() -> list[OriginHaukiResource]:
         # One reservable segment
         [
             {
-                "start_time": datetime.time(10, tzinfo=DEFAULT_TIMEZONE),
-                "end_time": datetime.time(20, tzinfo=DEFAULT_TIMEZONE),
+                "start_time": datetime.time(10),
+                "end_time": datetime.time(20),
             },
         ],
         # Two reservable segments
         [
             {
-                "start_time": datetime.time(8, tzinfo=DEFAULT_TIMEZONE),
-                "end_time": datetime.time(11, tzinfo=DEFAULT_TIMEZONE),
+                "start_time": datetime.time(8),
+                "end_time": datetime.time(11),
             },
             {
-                "start_time": datetime.time(14, tzinfo=DEFAULT_TIMEZONE),
-                "end_time": datetime.time(22, tzinfo=DEFAULT_TIMEZONE),
+                "start_time": datetime.time(14),
+                "end_time": datetime.time(22),
             },
         ],
     ]
@@ -265,13 +265,15 @@ def _create_hauki_resources() -> list[OriginHaukiResource]:
             timespans += [
                 ReservableTimeSpanFactory.build(
                     resource=hauki_resource,
-                    start_datetime=combine(
+                    start_datetime=datetime.datetime.combine(
                         date=today + datetime.timedelta(days=day),
                         time=time_span["start_time"],
+                        tzinfo=DEFAULT_TIMEZONE,
                     ),
-                    end_datetime=combine(
+                    end_datetime=datetime.datetime.combine(
                         date=today + datetime.timedelta(days=day + additional_day),
                         time=time_span["end_time"],
+                        tzinfo=DEFAULT_TIMEZONE,
                     ),
                 )
                 for day in range(721)
