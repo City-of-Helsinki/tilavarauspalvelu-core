@@ -10,11 +10,15 @@ export const UNITS_URL_PREFIX = "/units";
 export const BANNER_NOTIFICATIONS_URL_PREFIX = "/notifications";
 export const REQUESTED_RESERVATIONS_URL_PREFIX = "/reservations/requested";
 
-export function getApplicationRoundUrl(applicationRoundId: Maybe<number> | undefined): string {
+type ApplicationRoundPages = "criteria" | "";
+export function getApplicationRoundUrl(
+  applicationRoundId: Maybe<number> | undefined,
+  page: ApplicationRoundPages = ""
+): string {
   if (applicationRoundId == null || !(applicationRoundId > 0)) {
     return "";
   }
-  return `${APPLICATION_ROUNDS_URL_PREFIX}/${applicationRoundId}`;
+  return `${APPLICATION_ROUNDS_URL_PREFIX}/${applicationRoundId}/${page}`;
 }
 
 /// @param pk is the primary key of the reservation
