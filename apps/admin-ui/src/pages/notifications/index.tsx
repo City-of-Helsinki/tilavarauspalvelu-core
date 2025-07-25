@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { type TFunction, useTranslation } from "next-i18next";
 import {
   BannerNotificationOrderingChoices,
   type BannerNotificationTableElementFragment,
   BannerNotificationState,
   UserPermissionChoice,
+  BannerNotificationsListDocument,
+  type BannerNotificationsListQueryVariables,
+  type BannerNotificationsListQuery,
   useBannerNotificationsListQuery,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
@@ -19,11 +22,12 @@ import StatusLabel from "common/src/components/StatusLabel";
 import { IconCheck, IconClock, IconPen, IconQuestionCircleFill } from "hds-react";
 import { getNotificationListUrl, getNotificationUrl } from "@/common/urls";
 import { CenterSpinner, TitleSection, H1 } from "common/styled";
-import { gql } from "@apollo/client";
+import { gql, useApolloClient } from "@apollo/client";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSidePropsContext } from "next";
+import { createClient } from "@/common/apolloClient";
 
 const getStatusLabelProps = (
   state: BannerNotificationState | null | undefined
@@ -134,7 +138,7 @@ function NotificationsTable({
 }
 
 /// @brief this is the listing page for all notifications.
-function Notifications() {
+function Notifications({ notifications: notificationsOriginal }: PageProps) {
   // TODO the default sort should be ["state", "-ends"] but the frontend sort doesn't support multiple options
   // so either leave it with just state or do some custom magic for the initial sort
   const [sort, setSort] = useState<string>("state");
@@ -148,7 +152,7 @@ function Notifications() {
     fetchPolicy: "cache-and-network",
   });
 
-  const { bannerNotifications } = data ?? previousData ?? {};
+  const { bannerNotifications } = data ?? previousData ?? notificationsOriginal;
   const notifications = filterNonNullable(bannerNotifications?.edges?.map((edge) => edge?.node));
 
   const { t } = useTranslation();
@@ -227,17 +231,35 @@ function transformSortString(sort: string | null): BannerNotificationOrderingCho
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 export default function ApplicationRoundRouted(props: PageProps): JSX.Element {
+  // Manually cache SSR query so we get proper pagination and sorting
+  // while still maintaining full initial page loads
+  // useEffect causes the page to redraw, so we pass the data to the Page component also
+  const apolloClient = useApolloClient();
+  useEffect(() => {
+    apolloClient.writeQuery({
+      query: BannerNotificationsListDocument,
+      data: {
+        notifications: props.notifications,
+      },
+    });
+  }, [apolloClient, props]);
   return (
     <AuthorizationChecker apiUrl={props.apiBaseUrl} permission={UserPermissionChoice.CanManageNotifications}>
-      <Notifications />
+      <Notifications {...props} />
     </AuthorizationChecker>
   );
 }
 
-export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
+export async function getServerSideProps({ locale, req }: GetServerSidePropsContext) {
+  const commonProps = await getCommonServerSideProps();
+  const apolloClient = createClient(commonProps.apiBaseUrl, req);
+  const notifications = await apolloClient.query<BannerNotificationsListQuery, BannerNotificationsListQueryVariables>({
+    query: BannerNotificationsListDocument,
+  });
   return {
     props: {
-      ...(await getCommonServerSideProps()),
+      notifications: notifications.data,
+      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
