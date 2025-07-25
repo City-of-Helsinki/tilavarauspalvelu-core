@@ -36,6 +36,7 @@ import { SelectFilter } from "@/component/QueryParamFilters";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { getMyUnitUrl, getReservationSeriesUrl } from "@/common/urls";
+import { type OptionT } from "common/src/modules/search";
 
 const InnerTextInput = styled(TextInput)`
   grid-column: 1 / -1;
@@ -49,21 +50,13 @@ function filterOutRemovedReservations(items: NewReservationListItem[], removedRe
 }
 
 interface SeriesProps {
-  reservationUnits: {
-    pk: number | null | undefined;
-    nameFi: string | null | undefined;
-  }[];
+  reservationUnitOptions: OptionT[];
   unitPk: number;
 }
 
 /// Wrap the form with a separate reservationUnit selector
 /// the schema validator requires us to know the start interval from reservationUnit
-function ReservationSeriesFormWrapper({ reservationUnits, unitPk }: SeriesProps) {
-  const reservationUnitOptions = reservationUnits.map((unit) => ({
-    label: unit?.nameFi ?? "",
-    value: unit?.pk ?? 0,
-  }));
-
+function ReservationSeriesFormWrapper({ reservationUnitOptions, unitPk }: SeriesProps) {
   const params = useSearchParams();
   const reservationUnitPk = toNumber(params.get("reservationUnit"));
   const id = base64encode(`ReservationUnitNode:${reservationUnitPk}`);
@@ -73,7 +66,7 @@ function ReservationSeriesFormWrapper({ reservationUnits, unitPk }: SeriesProps)
     skip: !isValid,
   });
 
-  if (reservationUnits.length === 0) {
+  if (reservationUnitOptions.length === 0) {
     return <Notification type="alert">No reservation units found</Notification>;
   }
 
