@@ -4,8 +4,8 @@ import {
   BannerNotificationOrderingChoices,
   type BannerNotificationTableElementFragment,
   BannerNotificationState,
-  useBannerNotificationListQuery,
   UserPermissionChoice,
+  useBannerNotificationsListQuery,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { valueForDateInput, valueForTimeInput } from "@/helpers";
@@ -140,7 +140,7 @@ function Notifications() {
   const [sort, setSort] = useState<string>("state");
   const orderBy = transformSortString(sort);
 
-  const { data, loading, previousData, fetchMore } = useBannerNotificationListQuery({
+  const { data, loading, previousData, fetchMore } = useBannerNotificationsListQuery({
     variables: {
       first: GQL_MAX_RESULTS_PER_QUERY,
       orderBy,
@@ -258,7 +258,7 @@ export const BANNER_NOTIFICATIONS_TABLE_ELEMENT_FRAGMENT = gql`
 
 // TODO reduce the size of the query (use a different fragment or no fragment at all)
 export const BANNER_NOTIFICATION_LIST_QUERY = gql`
-  query BannerNotificationList($first: Int, $after: String, $orderBy: [BannerNotificationOrderingChoices]) {
+  query BannerNotificationsList($first: Int, $after: String, $orderBy: [BannerNotificationOrderingChoices]) {
     bannerNotifications(first: $first, after: $after, orderBy: $orderBy) {
       edges {
         node {
