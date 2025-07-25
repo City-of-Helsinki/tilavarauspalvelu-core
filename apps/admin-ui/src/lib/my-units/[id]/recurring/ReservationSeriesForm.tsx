@@ -35,6 +35,7 @@ import { getBufferTime, getNormalizedInterval } from "@/helpers";
 import { SelectFilter } from "@/component/QueryParamFilters";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
+import { getMyUnitUrl, getReservationSeriesUrl } from "@/common/urls";
 
 const InnerTextInput = styled(TextInput)`
   grid-column: 1 / -1;
@@ -47,16 +48,17 @@ function filterOutRemovedReservations(items: NewReservationListItem[], removedRe
   return items.filter((x) => !removedReservations.find((y) => isReservationEq(x, y)));
 }
 
-type Props = {
+interface SeriesProps {
   reservationUnits: {
-    pk?: number | null | undefined;
-    nameFi?: string | null | undefined;
+    pk: number | null | undefined;
+    nameFi: string | null | undefined;
   }[];
-};
+  unitPk: number;
+}
 
 /// Wrap the form with a separate reservationUnit selector
 /// the schema validator requires us to know the start interval from reservationUnit
-function ReservationSeriesFormWrapper({ reservationUnits }: Props) {
+function ReservationSeriesFormWrapper({ reservationUnits, unitPk }: SeriesProps) {
   const reservationUnitOptions = reservationUnits.map((unit) => ({
     label: unit?.nameFi ?? "",
     value: unit?.pk ?? 0,
@@ -84,7 +86,7 @@ function ReservationSeriesFormWrapper({ reservationUnits }: Props) {
           <SelectFilter name="reservationUnit" sort options={reservationUnitOptions} />
         </Element>
       </AutoGrid>
-      <ReservationSeriesForm reservationUnit={reservationUnit} />
+      <ReservationSeriesForm reservationUnit={reservationUnit} unitPk={unitPk} />
     </>
   );
 }
@@ -93,7 +95,11 @@ export { ReservationSeriesFormWrapper as ReservationSeriesForm };
 
 type FormValues = ReservationSeriesFormT & ReservationFormMeta;
 
-function ReservationSeriesForm({ reservationUnit }: { reservationUnit: Maybe<CreateStaffReservationFragment> }) {
+interface ReservationSeriesFormProps {
+  reservationUnit: Maybe<CreateStaffReservationFragment>;
+  unitPk: number;
+}
+function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFormProps) {
   const { t } = useTranslation();
 
   const interval = getNormalizedInterval(reservationUnit?.reservationStartInterval);
@@ -195,7 +201,7 @@ function ReservationSeriesForm({ reservationUnit }: { reservationUnit: Maybe<Cre
         buffers,
       });
 
-      router.push(`${recurringPk}/completed`);
+      router.push(getReservationSeriesUrl(unitPk, recurringPk, "completed"));
     } catch (e) {
       const errs = getSeriesOverlapErrors(e);
       if (errs.length > 0) {
@@ -337,7 +343,11 @@ function ReservationSeriesForm({ reservationUnit }: { reservationUnit: Maybe<Cre
 
           <Flex $direction="row" $justifyContent="flex-end" style={{ gridColumn: "1 / -1" }}>
             {/* cancel is disabled while sending because we have no rollback */}
-            <ButtonLikeLink href=".." disabled={isSubmitting} data-testid="recurring-reservation-form__cancel-button">
+            <ButtonLikeLink
+              href={`${getMyUnitUrl(unitPk)}`}
+              disabled={isSubmitting}
+              data-testid="recurring-reservation-form__cancel-button"
+            >
               {t("common:cancel")}
             </ButtonLikeLink>
             <Button

@@ -3,16 +3,16 @@ import { useTranslation } from "next-i18next";
 import { ErrorBoundary } from "react-error-boundary";
 import { ReservationSeriesView } from "@/component/ReservationSeriesView";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
-import { getReservationUrl } from "@/common/urls";
+import { getMyUnitUrl, getReservationUrl } from "@/common/urls";
 import { Flex, H1 } from "common/styled";
 import { useReservationSeries } from "@/hooks";
 import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { UserPermissionChoice } from "@gql/gql-types";
-import { useRouter } from "next/router";
 import { ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
+import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 
 function ReservationSeriesDoneInner({ recurringPk }: { recurringPk: number }) {
   const { t } = useTranslation("myUnits", {
@@ -21,6 +21,8 @@ function ReservationSeriesDoneInner({ recurringPk }: { recurringPk: number }) {
 
   const { reservations } = useReservationSeries(recurringPk);
   const reservationUrl = getReservationUrl(reservations[0]?.pk);
+  const unitPk = reservations[0]?.reservationUnit.unit.pk;
+  const backUrl = getMyUnitUrl(unitPk);
 
   return (
     <>
@@ -28,7 +30,7 @@ function ReservationSeriesDoneInner({ recurringPk }: { recurringPk: number }) {
       <p>{t(`successInfo`)}</p>
       <ReservationSeriesView reservationSeriesPk={recurringPk} />
       <Flex $direction="row" $justifyContent="flex-end" $wrap="wrap">
-        <ButtonLikeLink href="..">{t(`buttonToUnit`)}</ButtonLikeLink>
+        <ButtonLikeLink href={backUrl}>{t(`buttonToUnit`)}</ButtonLikeLink>
         <ButtonLikeLink disabled={reservationUrl === ""} href={reservationUrl}>
           {t(`buttonToReservation`)}
         </ButtonLikeLink>
@@ -43,22 +45,25 @@ function ErrorComponent() {
 }
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-export default function Page(props: PageProps) {
-  const router = useRouter();
-  // TODO handle invalid or missing id
-  const pk = toNumber(ignoreMaybeArray(router.query.pk)) ?? 0;
+type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
+export default function Page(props: PropsNarrowed) {
   return (
     <AuthorizationChecker apiUrl={props.apiBaseUrl} permission={UserPermissionChoice.CanCreateStaffReservations}>
       <ErrorBoundary FallbackComponent={ErrorComponent}>
-        <ReservationSeriesDoneInner recurringPk={pk} />
+        <ReservationSeriesDoneInner recurringPk={props.pk} />
       </ErrorBoundary>
     </AuthorizationChecker>
   );
 }
 
-export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
+export async function getServerSideProps({ query, locale }: GetServerSidePropsContext) {
+  const pk = toNumber(ignoreMaybeArray(query.pk)) ?? 0;
+  if (pk <= 0) {
+    return NOT_FOUND_SSR_VALUE;
+  }
   return {
     props: {
+      pk,
       ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },

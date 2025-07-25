@@ -64,7 +64,7 @@ function customRender(
         mutate: { fetchPolicy: "no-cache" },
       }}
     >
-      <ReservationSeriesForm reservationUnits={createReservationUnits()} />
+      <ReservationSeriesForm reservationUnits={createReservationUnits()} unitPk={1} />
     </MockedProvider>
   );
 }
