@@ -1,11 +1,10 @@
 import { useTranslation } from "next-i18next";
 import { signIn, signOut } from "common/src/browserHelpers";
-import { useSession } from "@/hooks/auth";
+import { useSession, useHandling } from "@/hooks";
 import { Header, IconSignout, IconStar, IconUser, LogoSize, TitleStyleType } from "hds-react";
 import React from "react";
 import styled from "styled-components";
 import { useLocation } from "react-use";
-import { useHandling } from "@/hooks";
 import Logo from "common/src/components/Logo";
 import { hasSomePermission } from "@/modules/permissionHelper";
 import { env } from "@/env.mjs";
