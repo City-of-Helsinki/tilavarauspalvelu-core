@@ -9,7 +9,7 @@ import {
 import type { ReservationSeriesForm, ReservationFormMeta } from "@/schemas";
 import { fromUIDateUnsafe, toApiDateUnsafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
-import { useSession } from "@/hooks/auth";
+import { useSession } from "@/hooks";
 
 // Not all choices are valid for reservation series (the ui should not allow these)
 function transformReservationTypeStaffChoice(t: ReservationTypeChoice): ReservationTypeStaffChoice {
