@@ -144,8 +144,8 @@ export function fromUIDate(date: string): Date | null {
 // another option: combine it to the date conversion functions (return null on invalid dates) => better with TS
 export const isValidDate = (date: Date): boolean => isValid(date) && isAfter(date, new Date("1000-01-01"));
 
-// Returns a string in "d.M.yyyy" format from a Date object
-// TODO returning undefined would be preferably (specificity) but breaks the users of this function
+/// Format a Date (only Date part) into Finnish formatted string
+/// @return string with the date
 export function toUIDate(date: Date | null, formatStr = "d.M.yyyy"): string {
   if (!date || !isValidDate(date)) {
     return "";
@@ -157,14 +157,17 @@ export function toUIDate(date: Date | null, formatStr = "d.M.yyyy"): string {
   }
 }
 
-// Returns a string in "d.M.yyyy klo hh:mm" format from a Date object
-// TODO returning undefined would be preferably (specificity) but breaks the users of this function
-export function toUIDateTime(date: Date | null, formatStr = "d.M.yyyy"): string {
+/// Format a Date (Date and Time) into Finnish formatted string
+/// @param date - Date object to format
+/// @param timePrefix - localized string between date and time
+/// @return string with both the date and time
+export function toUIDateTime(date: Date | null, timePrefix: string): string {
+  const formatStr = "d.M.yyyy";
   if (!date || !isValidDate(date)) {
     return "";
   }
   try {
-    return `${format(date, formatStr, { locale: fi })} klo ${format(date, "hh:mm", { locale: fi })}`;
+    return `${format(date, formatStr, { locale: fi })}${timePrefix} ${format(date, "HH:mm", { locale: fi })}`;
   } catch (_) {
     return "";
   }

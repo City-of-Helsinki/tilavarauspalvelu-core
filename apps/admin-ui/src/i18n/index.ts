@@ -65,6 +65,7 @@ i18n.addResourceBundle("fi", "common", {
   "weekDay.4": "To",
   "weekDay.5": "Pe",
   "weekDay.6": "La",
+  dayTimeSeparator: " klo",
 });
 i18n.addResourceBundle("fi", "reservationCalendar", {
   showCurrentDay: "Näytä tämä päivä",

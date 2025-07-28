@@ -51,7 +51,11 @@ export const PaymentNotification = ({
   const formatter = formatters["currencyWithDecimals"];
   const price = formatter?.format(parseFloat(appliedPricing?.highestPrice ?? "") ?? 0);
   const taxPercentage = formatters.strippedDecimal?.format(parseFloat(appliedPricing?.taxPercentage ?? "")) ?? "0";
-  const deadline = toUIDateTime(new Date(paymentOrder?.handledPaymentDueBy ?? ""));
+
+  const deadline =
+    paymentOrder?.handledPaymentDueBy != null
+      ? toUIDateTime(new Date(paymentOrder.handledPaymentDueBy), t("common:dayTimeSeparator"))
+      : "-";
   const lang = convertLanguageCode(i18n.language);
   const isExpired =
     reservation.state === ReservationStateChoice.Cancelled &&
