@@ -80,19 +80,24 @@ import { useForm, type UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PendingReservationFormSchema, type PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { LoginFragment } from "@/components/LoginFragment";
-import { useReservableTimes } from "@/hooks/useReservableTimes";
 import { SubmitButton } from "@/styled/util";
 import { ReservationUnitPageWrapper } from "@/styled/reservation";
 import { getReservationInProgressPath, getSingleSearchPath } from "@/modules/urls";
 import { Accordion, ButtonVariant, LoadingSpinner } from "hds-react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useDisplayError } from "common/src/hooks";
-import { useAvailableTimes, useBlockingReservations, useRemoveStoredReservation, useToastIfQueryParam } from "@/hooks";
+import {
+  useAvailableTimes,
+  useBlockingReservations,
+  useRemoveStoredReservation,
+  useToastIfQueryParam,
+  useReservableTimes,
+} from "@/hooks";
 import { gql } from "@apollo/client";
 import { type ApiError, getApiErrors } from "common/src/apolloUtils";
 import { formatErrorMessage } from "common/src/hooks/useDisplayError";
 import { errorToast } from "common/src/components/toast";
-import { QuickReservation } from "@/components/reservation-unit/QuickReservation";
+import { QuickReservation } from "@/components/QuickReservation";
 
 const StyledApplicationRoundScheduleDay = styled.p`
   span:first-child {
