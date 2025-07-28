@@ -1,7 +1,6 @@
 import React, { type ReactNode } from "react";
-import { useCheckPermission } from "@/hooks";
+import { useCheckPermission, useSession } from "@/hooks";
 import { UserPermissionChoice, type VisibleIfPermissionFieldsFragment } from "@gql/gql-types";
-import { useSession } from "@/hooks/auth";
 import { gql } from "@apollo/client";
 
 function VisibleIfPermission({

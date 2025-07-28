@@ -6,7 +6,7 @@ import { useTranslation } from "next-i18next";
 import { H2 } from "common/styled";
 import { HERO_IMAGE_URL } from "@/common/const";
 import { KorosHeading, Heading } from "@/component/KorosHeading";
-import { useSession } from "@/hooks/auth";
+import { useSession } from "@/hooks";
 import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 

@@ -10,7 +10,7 @@ import { Navigation } from "./Navigation";
 import { MainLander } from "./MainLander";
 import { ToastContainer } from "common/src/components/toast";
 import { useModal } from "@/context/ModalContext";
-import { useSession } from "@/hooks/auth";
+import { useSession } from "@/hooks";
 import { hasAnyPermission } from "@/modules/permissionHelper";
 import { mainStyles } from "common/styled";
 

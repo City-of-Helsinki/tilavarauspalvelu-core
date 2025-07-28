@@ -26,7 +26,7 @@ import { fromApiDate, fromUIDate, fromUIDateUnsafe, toApiDateUnsafe, toUIDate } 
 import { ControlledDateInput, TimeInput } from "common/src/components/form";
 import { WeekdaysSelector } from "@/component/WeekdaysSelector";
 import { ReservationListEditor } from "@/component/ReservationListEditor";
-import { useFilteredReservationList, useMultipleReservation } from "@/hooks";
+import { useFilteredReservationList, useMultipleReservation, useSession } from "@/hooks";
 import { RescheduleReservationSeriesForm, RescheduleReservationSeriesFormSchema } from "@/schemas";
 import { errorToast, successToast } from "common/src/components/toast";
 import { fromAPIDateTime, getBufferTime } from "@/helpers";
@@ -44,7 +44,6 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { hasPermission } from "@/modules/permissionHelper";
-import { useSession } from "@/hooks/auth";
 
 type NodeT = NonNullable<SeriesPageQuery["reservation"]>["reservationSeries"];
 

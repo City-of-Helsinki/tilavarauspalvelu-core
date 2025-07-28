@@ -28,7 +28,7 @@ import { ALLOCATION_POLL_INTERVAL, NOT_FOUND_SSR_VALUE, VALID_ALLOCATION_APPLICA
 import { truncate } from "@/helpers";
 import { AllocationPageContent, convertPriorityFilter } from "@lib/application-rounds/[id]/allocation";
 import { LinkPrev } from "@/component/LinkPrev";
-import { useSession } from "@/hooks/auth";
+import { useSession } from "@/hooks";
 import { gql } from "@apollo/client";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useSearchParams } from "next/navigation";
