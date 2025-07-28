@@ -17,7 +17,7 @@ import { type UseFormReturn } from "react-hook-form";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
-import { ButtonLikeLink } from "../common/ButtonLikeLink";
+import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { ReservationTimePicker } from "./ReservationTimePicker";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { Sanitize } from "common/src/components/Sanitize";
@@ -28,7 +28,7 @@ import ErrorComponent from "next/error";
 import { useAvailableTimes } from "@/hooks";
 import { useBlockingReservations } from "@/hooks/useBlockingReservations";
 import { isRangeReservable } from "@/modules/reservable";
-import { QuickReservation } from "@/components/reservation-unit/QuickReservation";
+import { QuickReservation } from "@/components/QuickReservation";
 
 const StyledCalendarWrapper = styled.div`
   grid-column: 1 / -1;
