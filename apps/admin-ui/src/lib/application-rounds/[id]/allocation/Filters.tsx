@@ -6,7 +6,7 @@ import {
   ControlledSearchFilter,
   ControlledSelectFilter,
 } from "@/component/QueryParamFilters";
-import { type TagOptionsList, translateTag } from "@/modules/search";
+import { translateTag } from "@/modules/search";
 import { useForm } from "react-hook-form";
 import { SearchButton, SearchButtonContainer } from "@/component/SearchButton";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
@@ -60,17 +60,6 @@ export function Filters({ hideSearchTags, units, isLoading }: FilterProps): JSX.
 
   const options = useFilterOptions();
 
-  const tagOptions: TagOptionsList = {
-    ...options,
-    // Not needed on this page
-    reservationUnits: [],
-    unitGroups: [],
-    reservationUnitStates: [],
-    reservationUnitTypes: [],
-    stateChoices: [],
-    equipments: [],
-  };
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <ShowAllContainer
@@ -88,7 +77,7 @@ export function Filters({ hideSearchTags, units, isLoading }: FilterProps): JSX.
         <ControlledMultiSelectFilter control={control} name="purpose" options={options.purposes} />
       </ShowAllContainer>
       <SearchButtonContainer>
-        <SearchTags hide={hideSearchTags} translateTag={translateTag(t, tagOptions)} />
+        <SearchTags hide={hideSearchTags} translateTag={translateTag(t, options)} />
         <SearchButton isLoading={isLoading} />
       </SearchButtonContainer>
     </form>

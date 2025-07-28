@@ -189,14 +189,7 @@ export default function ApplicationRound({
 
           <Tabs.TabPanel>
             <TabContent>
-              <Filters
-                options={options}
-                enableApplicant
-                enableWeekday
-                enableReservationUnit
-                enableAccessCodeState
-                statusOption="sectionShort"
-              />
+              <Filters options={options} enableApplicant enableWeekday enableReservationUnit enableAccessCodeState />
               <TimeSlotDataLoader applicationRoundPk={applicationRound.pk ?? 0} unitOptions={unitOptions} />
             </TabContent>
           </Tabs.TabPanel>
@@ -204,7 +197,7 @@ export default function ApplicationRound({
           {isApplicationRoundEnded && (
             <Tabs.TabPanel>
               <TabContent>
-                <Filters options={options} enableReservationUnit statusOption="sectionShort" />
+                <Filters options={options} enableReservationUnit />
                 <RejectedOccurrencesDataLoader
                   applicationRoundPk={applicationRound.pk ?? 0}
                   unitOptions={unitOptions}

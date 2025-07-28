@@ -14,7 +14,7 @@ import { mapFormToSearchParams } from "common/src/modules/search";
 
 interface FilterProps {
   options: TagOptionsList;
-  statusOption?: "application" | "section" | "sectionShort";
+  statusOption?: "application" | "section";
   enableApplicant?: boolean;
   enableWeekday?: boolean;
   enableReservationUnit?: boolean;
@@ -86,13 +86,7 @@ export function Filters({
     value: i,
   }));
 
-  // section status is shared on two tabs, but allocated only has two options
-  const sectionStatusArrayLong = Object.values(ApplicationSectionStatusChoice);
-  // TODO these are "declined" / "approved" but the decline functionality is not implemented
-  // so disabling the filter for now (there is no backend filter for it nor can it be tested)
-
-  // FIXME this probably doesn't work (and the above thing should be removed)
-  const sectionStatusOptions = (statusOption === "sectionShort" ? [] : sectionStatusArrayLong).map((status) => ({
+  const sectionStatusOptions = Object.values(ApplicationSectionStatusChoice).map((status) => ({
     label: t(`translation:ApplicationSectionStatusChoice.${status}`),
     value: status,
   }));
@@ -107,13 +101,11 @@ export function Filters({
       <AutoGrid>
         <ControlledMultiSelectFilter control={control} name="unitGroup" options={options.unitGroups} />
         <ControlledMultiSelectFilter control={control} name="unit" options={options.units} />
-        {statusOption !== "application" ? (
-          sectionStatusOptions.length > 0 ? (
-            <ControlledMultiSelectFilter control={control} name="sectionStatus" options={sectionStatusOptions} />
-          ) : null
-        ) : (
+        {statusOption === "section" ? (
+          <ControlledMultiSelectFilter control={control} name="sectionStatus" options={sectionStatusOptions} />
+        ) : statusOption === "application" ? (
           <ControlledMultiSelectFilter control={control} name="status" options={statusOptions} />
-        )}
+        ) : null}
 
         {enableReservationUnit && (
           <ControlledMultiSelectFilter control={control} name="reservationUnit" options={options.reservationUnits} />
