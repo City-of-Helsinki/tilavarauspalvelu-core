@@ -1,8 +1,8 @@
 import React from "react";
 import {
   type ReservationQuotaReachedFragment,
-  ReservationUnitNode,
-  ReservationUnitPageQuery,
+  type ReservationUnitNode,
+  type ReservationUnitPageQuery,
   useReservationQuotaReachedQuery,
 } from "@gql/gql-types";
 import { ReservationTimePicker } from "@/components/reservation";
@@ -12,8 +12,8 @@ import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { useReservableTimes } from "@/hooks";
-import { PendingReservationFormType } from "./schema";
-import { UseFormReturn } from "react-hook-form";
+import { type PendingReservationFormType } from "./schema";
+import { type UseFormReturn } from "react-hook-form";
 import { Flex, H4 } from "common/styled";
 
 type ReservationUnitT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
