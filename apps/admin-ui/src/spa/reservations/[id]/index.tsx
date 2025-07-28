@@ -134,7 +134,10 @@ function ReservationSummary({
           {`${reservationPrice(reservation, t)}${
             reservation.paymentOrder?.handledPaymentDueBy
               ? ` ${t("RequestedReservation.dueByParenthesis", {
-                  date: toUIDateTime(new Date(reservation.paymentOrder?.handledPaymentDueBy)),
+                  date: toUIDateTime(
+                    new Date(reservation.paymentOrder.handledPaymentDueBy),
+                    t("common:dayTimeSeparator")
+                  ),
                 })}`
               : ""
           }${reservation.applyingForFreeOfCharge ? `, ${t("RequestedReservation.appliesSubvention")}` : ""}`}

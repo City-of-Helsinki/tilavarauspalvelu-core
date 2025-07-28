@@ -41,7 +41,7 @@ describe("Component: Payment Notification", () => {
   it("should render the payment notification component with correct deadline", () => {
     customRender();
     const paymentOrderMock = createPaymentOrderMock();
-    const deadlineText = `common:deadline: ${toUIDateTime(new Date(paymentOrderMock.handledPaymentDueBy ?? ""))}`;
+    const deadlineText = `common:deadline: ${toUIDateTime(new Date(paymentOrderMock.handledPaymentDueBy ?? ""), "common:dayTimeSeparator")}`;
     expect(screen.getByText(deadlineText)).toBeInTheDocument();
   });
 });
