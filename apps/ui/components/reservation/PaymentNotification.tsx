@@ -60,11 +60,11 @@ export const PaymentNotification = ({
   const isExpired =
     reservation.state === ReservationStateChoice.Cancelled &&
     reservation.cancelReason === ReservationCancelReasonChoice.NotPaid;
-  const translationPath = isExpired ? "reservation:paymentBanner.expired" : "reservations:paymentBanner";
+  const translationPath = isExpired ? "reservations:paymentBanner.expired" : "reservations:paymentBanner";
   return (
     <Notification
       data-testid="reservation__payment-notification"
-      type={"alert" as NotificationType}
+      type={"alert"}
       label={t(`${translationPath}.title`)}
     >
       <Flex $direction={"column"} $gap={"2-xs"}>
