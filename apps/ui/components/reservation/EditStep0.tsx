@@ -183,18 +183,18 @@ function EditStep0({
   });
 
   const lang = convertLanguageCode(i18n.language);
-  const termsOfUse = getTranslationSafe(reservationUnit, "termsOfUse", lang);
+  const notesWhenReserving = getTranslationSafe(reservationUnit, "notesWhenApplying", lang);
 
   return (
     <>
       <StyledReservationInfoCard reservation={reservation} bgColor="gold" disableImage />
       {/* TODO on mobile in the design this is after the calendar but before action buttons */}
-      {termsOfUse !== "" && (
+      {notesWhenReserving !== "" && (
         <PinkBox>
           <H4 as="h2" $marginTop="none">
             {t("reservations:reservationInfoBoxHeading")}
           </H4>
-          <Sanitize html={termsOfUse} />
+          <Sanitize html={notesWhenReserving} />
         </PinkBox>
       )}
       <StyledQuickReservation

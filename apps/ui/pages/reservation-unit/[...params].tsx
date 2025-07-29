@@ -311,7 +311,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   }, [step, generalFields, reservation, reservationUnit]);
 
   const lang = convertLanguageCode(i18n.language);
-  const termsOfUse = getTranslationSafe(reservationUnit, "termsOfUse", lang);
+  const notesWhenReserving = getTranslationSafe(reservationUnit, "notesWhenApplying", lang);
 
   // TODO hacky should separate the submit handlers and form types
   const onSubmit = (values: Inputs) => {
@@ -336,12 +336,12 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
           bgColor="gold"
           shouldDisplayReservationUnitPrice={shouldDisplayReservationUnitPrice}
         />
-        {termsOfUse && (
+        {notesWhenReserving && (
           <PinkBox>
             <H4 as="h2" $marginTop="none">
               {t("reservations:reservationInfoBoxHeading")}
             </H4>
-            <Sanitize html={termsOfUse} />
+            <Sanitize html={notesWhenReserving} />
           </PinkBox>
         )}
         <TitleSection>

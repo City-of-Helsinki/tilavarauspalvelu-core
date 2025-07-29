@@ -564,12 +564,12 @@ function NoticeWhenReservingSection({
 }): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
-  const termsOfUseContent = getTranslationSafe(reservationUnit, "termsOfUse", lang);
+  const notesWhenReserving = getTranslationSafe(reservationUnit, "notesWhenApplying", lang);
 
   const appRounds = reservationUnit.applicationRounds;
   const futurePricing = getFuturePricing(reservationUnit, appRounds);
 
-  if (!futurePricing && !termsOfUseContent) {
+  if (!futurePricing && !notesWhenReserving) {
     return null;
   }
   return (
@@ -580,7 +580,7 @@ function NoticeWhenReservingSection({
       data-testid="reservation-unit__reservation-notice"
     >
       {futurePricing && <PriceChangeNotice futurePricing={futurePricing} />}
-      {termsOfUseContent && <Sanitize html={termsOfUseContent} />}
+      {notesWhenReserving && <Sanitize html={notesWhenReserving} />}
     </Accordion>
   );
 }
