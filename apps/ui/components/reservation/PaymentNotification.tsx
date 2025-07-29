@@ -1,21 +1,21 @@
-import { ReservationCancelReasonChoice, ReservationStateChoice } from "@gql/gql-types";
-import { Notification, NotificationType } from "hds-react";
-import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
+import {
+  ReservationCancelReasonChoice,
+  type ReservationPaymentUrlFragment,
+  ReservationStateChoice,
+} from "@gql/gql-types";
+import { Notification } from "hds-react";
+import { ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { convertLanguageCode, toUIDateTime } from "common/src/common/util";
 import { Flex, fontMedium } from "common/styled";
 import { formatters as getFormatters } from "common";
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { breakpoints } from "common/src/const";
-import { getCheckoutRedirectUrl } from "@/modules/urls";
+import { getPaymentUrl } from "@/modules/reservation";
 
 type PaymentNotificationProps = {
-  reservation: {
-    pk: number | null;
-    state: ReservationStateChoice | null;
-    cancelReason: ReservationCancelReasonChoice | null;
-  };
+  reservation: ReservationPaymentUrlFragment;
   appliedPricing: {
     highestPrice: string;
     taxPercentage: string;
@@ -61,12 +61,9 @@ export const PaymentNotification = ({
     reservation.state === ReservationStateChoice.Cancelled &&
     reservation.cancelReason === ReservationCancelReasonChoice.NotPaid;
   const translationPath = isExpired ? "reservations:paymentBanner.expired" : "reservations:paymentBanner";
+  const paymentUrl = getPaymentUrl(reservation, lang, apiBaseUrl);
   return (
-    <Notification
-      data-testid="reservation__payment-notification"
-      type={"alert"}
-      label={t(`${translationPath}.title`)}
-    >
+    <Notification data-testid="reservation__payment-notification" type="alert" label={t(`${translationPath}.title`)}>
       <Flex $direction={"column"} $gap={"2-xs"}>
         {t(`${translationPath}.description`)}
         <PriceDetails>
@@ -78,9 +75,9 @@ export const PaymentNotification = ({
             {t("common:deadline")}: {deadline}
           </div>
           {!isExpired && (
-            <ButtonLikeLink href={getCheckoutRedirectUrl(reservation.pk ?? 0, lang, apiBaseUrl)} variant="primary">
+            <ButtonLikeExternalLink href={paymentUrl} disabled={!paymentUrl} variant="primary">
               {t("reservations:payReservation")}
-            </ButtonLikeLink>
+            </ButtonLikeExternalLink>
           )}
         </PriceDetails>
       </Flex>
