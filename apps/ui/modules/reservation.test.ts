@@ -406,7 +406,7 @@ describe("getCheckoutUrl", () => {
   });
 
   test("returns undefined if checkoutUrl is not defined", () => {
-    expect(getCheckoutUrl({ ...order, checkoutUrl: null })).toBeNull();
+    expect(getCheckoutUrl({ ...order, checkoutUrl: null })).toBeUndefined();
   });
 
   test("returns undefined if checkoutUrl is not an url", () => {
@@ -417,7 +417,7 @@ describe("getCheckoutUrl", () => {
         ...order,
         checkoutUrl: "checkout.url?user=1111-2222-3333-4444",
       })
-    ).toBeNull();
+    ).toBeUndefined();
   });
 });
 

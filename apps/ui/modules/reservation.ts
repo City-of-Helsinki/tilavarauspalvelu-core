@@ -12,8 +12,10 @@ import {
   type CancellationRuleFieldsFragment,
   type BlockingReservationFieldsFragment,
   type CanUserCancelReservationFragment,
-  CanReservationBeChangedFragment,
-  PaymentOrderNode,
+  type CanReservationBeChangedFragment,
+  type PaymentOrderNode,
+  ReservationCancelReasonChoice,
+  type ReservationPaymentUrlFragment,
 } from "@gql/gql-types";
 import { getIntervalMinutes } from "common/src/conversion";
 import { fromUIDate } from "./util";
@@ -24,6 +26,7 @@ import { isValidDate, toUIDate } from "common/src/common/util";
 import { getTimeString } from "./reservationUnit";
 import { timeToMinutes } from "common/src/helpers";
 import { gql } from "@apollo/client";
+import { type LocalizationLanguages } from "common/src/urlBuilder";
 
 // TimeSlots change the Calendar view. How many intervals are shown i.e. every half an hour, every hour
 // we use every hour only => 2
@@ -252,28 +255,6 @@ export function isReservationEditable(reservation: CanReservationBeChangedFragme
   return true;
 }
 
-export function getCheckoutUrl(
-  order: Pick<PaymentOrderNode, "checkoutUrl"> | undefined | null,
-  lang = "fi"
-): string | null {
-  const { checkoutUrl } = order ?? {};
-
-  if (!checkoutUrl) {
-    return null;
-  }
-
-  try {
-    const { origin, pathname, searchParams } = new URL(checkoutUrl);
-    const baseUrl = `${origin}${pathname}`;
-    searchParams.set("lang", lang);
-    return `${baseUrl}/paymentmethod?${searchParams.toString()}`;
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e);
-  }
-  return null;
-}
-
 export function getNewReservation({
   start,
   end,
@@ -438,4 +419,100 @@ export function transformReservation(
     time: getTimeString(originalBegin),
     isControlsVisible: false,
   };
+}
+
+export const RESERVATION_PAYMENT_URL_FRAGMENT = gql`
+  fragment ReservationPaymentUrl on ReservationNode {
+    id
+    state
+    pk
+    paymentOrder {
+      id
+      status
+      handledPaymentDueBy
+      checkoutUrl
+    }
+    cancelReason
+  }
+`;
+
+/// Get the payment url for a reservation
+/// unified interface for both handled and direct payments
+/// @return the payment url or undefined if the reservation is not waiting for payment
+/// undefined is safe to assign to html a link href and disables the link
+export function getPaymentUrl(
+  reservation: ReservationPaymentUrlFragment,
+  lang: LocalizationLanguages,
+  apiBaseUrl: string
+): string | undefined {
+  const isExpired =
+    reservation.state === ReservationStateChoice.Cancelled &&
+    reservation.cancelReason === ReservationCancelReasonChoice.NotPaid;
+  if (isExpired) {
+    return undefined;
+  }
+  if (reservation.paymentOrder == null || reservation.pk == null) {
+    return undefined;
+  }
+
+  // backend redirect payment url for handled reservations
+  if (
+    reservation.state === ReservationStateChoice.Confirmed &&
+    reservation.paymentOrder.status === OrderStatus.Pending &&
+    reservation.paymentOrder.handledPaymentDueBy
+  ) {
+    return getCheckoutRedirectUrl(reservation.pk, lang, apiBaseUrl);
+  }
+
+  // webstore checkout url for direct payments
+  if (
+    reservation.state === ReservationStateChoice.WaitingForPayment &&
+    reservation.paymentOrder.status === OrderStatus.Draft &&
+    reservation.paymentOrder.checkoutUrl
+  ) {
+    return getCheckoutUrl(reservation.paymentOrder);
+  }
+
+  return undefined;
+}
+
+/// Get the pending payment url for a reservation (handled reservations)
+function getCheckoutRedirectUrl(pk: number, lang: LocalizationLanguages, apiBaseUrl: string): string {
+  const errorUrl = new URL(`/reservations/${pk}`, window.location.origin);
+  try {
+    const url = new URL(`/v1/pay_pending_reservation/${pk}/`, apiBaseUrl);
+    const { searchParams } = url;
+    searchParams.set("lang", lang);
+    searchParams.set("redirect_on_error", errorUrl.toString());
+    return url.toString();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+  }
+  return "";
+}
+
+/// Get the direct payment (webstore) url for a reservation
+/// @deprecated use getPaymentUrl instead because it's more robust
+/// left because requires refactoring old users to include more ReservationNode parameters
+export function getCheckoutUrl(
+  order: Pick<PaymentOrderNode, "checkoutUrl"> | undefined | null,
+  lang = "fi"
+): string | undefined {
+  const { checkoutUrl } = order ?? {};
+
+  if (!checkoutUrl) {
+    return undefined;
+  }
+
+  try {
+    const { origin, pathname, searchParams } = new URL(checkoutUrl);
+    const baseUrl = `${origin}${pathname}`;
+    searchParams.set("lang", lang);
+    return `${baseUrl}${baseUrl.endsWith("/") ? "" : "/"}paymentmethod?${searchParams.toString()}`;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+  }
+  return undefined;
 }

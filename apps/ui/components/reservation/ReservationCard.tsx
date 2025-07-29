@@ -2,14 +2,14 @@ import React from "react";
 import { ButtonVariant, IconArrowRight, IconCross, IconEuroSign, IconLock } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { trim } from "lodash-es";
-import { OrderStatus, type ReservationCardFragment, ReservationStateChoice } from "@gql/gql-types";
+import { type ReservationCardFragment, ReservationStateChoice } from "@gql/gql-types";
 import { formatDateTimeRange } from "@/modules/util";
-import { getNormalizedReservationOrderStatus, isReservationCancellable } from "@/modules/reservation";
+import { getNormalizedReservationOrderStatus, getPaymentUrl, isReservationCancellable } from "@/modules/reservation";
 import { getPrice } from "@/modules/reservationUnit";
-import { getCheckoutRedirectUrl, getReservationPath } from "@/modules/urls";
+import { getReservationPath } from "@/modules/urls";
 import { ReservationOrderStatus } from "./ReservationOrderStatus";
 import { ReservationStatus } from "./ReservationStatus";
-import { ButtonLikeLink } from "../common/ButtonLikeLink";
+import { ButtonLikeExternalLink, ButtonLikeLink } from "../common/ButtonLikeLink";
 import { capitalize, getImageSource, getMainImage } from "common/src/helpers";
 import Card from "common/src/components/Card";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
@@ -95,18 +95,20 @@ export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<Prop
       <IconArrowRight />
     </ButtonLikeLink>
   );
-  if (reservation.paymentOrder?.status === OrderStatus.Pending) {
+
+  const paymentUrl = getPaymentUrl(reservation, lang, apiBaseUrl);
+  if (paymentUrl) {
     buttons.push(
-      <ButtonLikeLink
+      <ButtonLikeExternalLink
         variant={ButtonVariant.Primary}
-        href={getCheckoutRedirectUrl(reservation.pk ?? 0, lang, apiBaseUrl)}
+        href={paymentUrl}
         data-testid="reservation-card__button--goto-payment"
         key="payment"
         width="full"
       >
         {t("reservations:payReservation")}
         <IconArrowRight />
-      </ButtonLikeLink>
+      </ButtonLikeExternalLink>
     );
   }
   return (
@@ -150,6 +152,7 @@ export const RESERVATION_CARD_FRAGMENT = gql`
     }
     ...ReservationPriceFields
     ...ReservationOrderStatus
+    ...ReservationPaymentUrl
     ...CanUserCancelReservation
   }
 `;

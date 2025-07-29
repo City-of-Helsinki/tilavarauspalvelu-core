@@ -27,6 +27,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { formatDateTimeRange } from "@/modules/util";
 import {
   getNormalizedReservationOrderStatus,
+  getPaymentUrl,
   getWhyReservationCantBeChanged,
   isReservationCancellable,
 } from "@/modules/reservation";
@@ -39,7 +40,6 @@ import { ButtonLikeLink, ButtonLikeExternalLink } from "@/components/common/Butt
 import { ReservationPageWrapper } from "@/styled/reservation";
 import {
   getApplicationPath,
-  getCheckoutRedirectUrl,
   getFeedbackUrl,
   getReservationPath,
   getReservationUnitPath,
@@ -147,6 +147,18 @@ function shouldShowPaymentNotification(reservation: Pick<PropsNarrowed, "reserva
   );
 }
 
+/// Type safe "notify" query param converter
+function convertNotify(str: string | null): ReservationNotifications | null {
+  switch (str) {
+    case "requires_handling":
+    case "confirmed":
+    case "paid":
+      return str;
+    default:
+      return null;
+  }
+}
+
 // TODO add a state check => if state is Created redirect to the reservation funnel
 // if state is Cancelled, Denied, WaitingForPayment what then?
 function Reservation({
@@ -160,8 +172,7 @@ function Reservation({
 >): React.ReactElement | null {
   const { t, i18n } = useTranslation();
   const params = useSearchParams();
-  const statusNotification = params.get("notify") as ReservationNotifications;
-
+  const statusNotification = convertNotify(params.get("notify"));
   const shouldShowAccessCode =
     isBefore(sub(new Date(), { days: 1 }), new Date(reservation.endsAt)) &&
     reservation.state === ReservationStateChoice.Confirmed &&
@@ -211,7 +222,8 @@ function Reservation({
 
   const lang = convertLanguageCode(i18n.language);
 
-  const hasCheckoutUrl = !!reservation.paymentOrder?.checkoutUrl;
+  const paymentUrl = getPaymentUrl(reservation, lang, apiBaseUrl);
+  const hasCheckoutUrl = paymentUrl != null;
   const isWaitingForPayment = reservation.state === ReservationStateChoice.WaitingForPayment;
 
   const routes = [
@@ -309,16 +321,16 @@ function Reservation({
         <div>
           <Actions>
             {isWaitingForPayment && (
-              <ButtonLikeLink
+              <ButtonLikeExternalLink
                 size="large"
                 disabled={!hasCheckoutUrl}
-                href={getCheckoutRedirectUrl(reservation.pk ?? 0, lang, apiBaseUrl)}
+                href={paymentUrl}
                 data-testid="reservation-detail__button--checkout"
                 role="button"
               >
                 {t("reservations:payReservation")}
                 <IconArrowRight />
-              </ButtonLikeLink>
+              </ButtonLikeExternalLink>
             )}
             {canTimeBeModified && (
               <ButtonLikeLink
@@ -517,13 +529,10 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
       ...Instructions
       ...CanReservationBeChanged
       calendarUrl
-      cancelReason
+      ...ReservationPaymentUrl
       paymentOrder {
         id
-        status
-        checkoutUrl
         receiptUrl
-        handledPaymentDueBy
       }
       reservationSeries {
         id
