@@ -6,7 +6,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "preinstall": "npx -y only-allow pnpm",
+    "preinstall": "sh ./scripts/enforce-pm.sh",
     "test:browser:ci": "cd apps/ui && pnpm run test:browser:ci",
     "dev:test": "cd apps/ui && pnpm run dev:test",
     "clean": "npkill",
