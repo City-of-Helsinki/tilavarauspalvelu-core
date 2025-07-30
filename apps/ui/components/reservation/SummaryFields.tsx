@@ -5,7 +5,6 @@ import { type ReservationNode, ReserveeType } from "@/gql/gql-types";
 import { containsField, type FieldName } from "common/src/metaFieldsHelpers";
 import { AutoGrid, H4 } from "common/styled";
 import { type MetaFieldsFragment } from "common/gql/gql-types";
-import { capitalize } from "common/src/helpers";
 import { ParagraphAlt, PreviewLabel, PreviewValue } from "./styles";
 import { LabelValuePair } from "./LabelValuePair";
 import { extendMetaFieldOptions } from "common/src/reservation-form/MetaFields";
@@ -104,7 +103,7 @@ export function ApplicationFields({
             <ParagraphAlt $isWide>
               <PreviewLabel>{t("reservationApplication:reserveeTypePrefix")}</PreviewLabel>
               <PreviewValue data-testid="reservation__reserveeType">
-                {capitalize(t(`reservationApplication:reserveeTypes.labels.${reserveeType.toLowerCase()}`))}
+                {t(`reservationApplication:reserveeTypes.labels.${reserveeType}`)}
               </PreviewValue>
             </ParagraphAlt>
           )}

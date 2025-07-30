@@ -6,13 +6,5 @@
   "edit": "Muokkaa",
   "cancel": "Peru",
   "view": "Näytä",
-  "reservations": "Varaukset",
-  "saved": "Viimeksi tallennettu:",
-  "person": "Hakemus luotu: yksityishenkilönä",
-  "organisation": "Hakemus luotu: {{type}}, {{name}}",
-  "applicantType": {
-    "community": "yhdistykselle",
-    "association": "rekisteröidylle yhdistykselle",
-    "company": "yritykselle"
-  }
+  "saved": "Viimeksi tallennettu:"
 }

@@ -6,9 +6,9 @@
   "reserveeTypePrefix": "Skapa ansökan…",
   "reserveeTypes": {
     "labels": {
-      "nonprofit": "för en organisation, grupp eller samfund",
-      "company": "för ett företag",
-      "individual": "som privatkund"
+      "NONPROFIT": "För en organisation, grupp eller samfund",
+      "COMPANY": "För ett företag",
+      "INDIVIDUAL": "Som privatkund"
     }
   },
   "label": {
