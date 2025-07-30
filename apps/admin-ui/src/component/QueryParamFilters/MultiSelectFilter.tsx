@@ -20,25 +20,18 @@ interface MultiSelectFilterProps {
 // but never accept a combination of any of those types ex. [{label: "foo", value: 1}, {label: "bar", value: "baz"}]
 export function MultiSelectFilter(props: MultiSelectFilterProps): JSX.Element {
   const { name } = props;
-  const params = useSearchParams();
+  const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
 
-  const filter = params.getAll(name);
+  const filter = searchParams.getAll(name);
 
-  // TODO copy paste from allocation/index.tsx
   const setFilter = (value: string[]) => {
-    const vals = new URLSearchParams(params);
-    if (value == null || value.length === 0) {
-      vals.delete(name);
-    } else {
-      vals.set(name, value[0] ?? "");
-      value.forEach((v) => {
-        if (!vals.has(name, v)) {
-          vals.append(name, v);
-        }
-      });
+    const params = new URLSearchParams(searchParams);
+    params.delete(name);
+    for (const v of value) {
+      params.append(name, v);
     }
-    setParams(vals);
+    setParams(params);
   };
   return <BaseMultiSelectFilter {...props} filter={filter} setFilter={setFilter} />;
 }

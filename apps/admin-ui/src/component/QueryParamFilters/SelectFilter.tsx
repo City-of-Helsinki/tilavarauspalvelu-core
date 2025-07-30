@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
-import { Select } from "hds-react";
+import { Option, Select } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { convertOptionToHDS } from "common/src/helpers";
+import { convertOptionToHDS, toNumber } from "common/src/helpers";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
@@ -18,10 +18,10 @@ export function SelectFilter(props: SelectFilterProps) {
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
 
-  const onChange = (value: string | undefined) => {
+  const onChange = (value: string | number | null | undefined) => {
     const params = new URLSearchParams(searchParams);
     if (value != null) {
-      params.set(name, value);
+      params.set(name, value.toString());
     } else {
       params.delete(name);
     }
@@ -35,8 +35,8 @@ export function SelectFilter(props: SelectFilterProps) {
 }
 
 interface BaseSelectFilterProps extends SelectFilterProps {
-  onChange: (value: string | undefined) => void;
-  value: string | number | undefined;
+  onChange: (value: string | number | null | undefined) => void;
+  value: string | number | null | undefined;
 }
 function BaseSelectFilter({
   name,
@@ -59,6 +59,15 @@ function BaseSelectFilter({
     return opts;
   }, [options, sort]);
 
+  const handleChange = (selected: Option[]) => {
+    const val = selected.find(() => true);
+    if (typeof options[0]?.value === "number") {
+      onChange(toNumber(val?.value));
+    } else {
+      onChange(val?.value);
+    }
+  };
+
   return (
     <Select
       texts={{
@@ -66,11 +75,7 @@ function BaseSelectFilter({
         placeholder,
       }}
       options={sortedOptions.map(convertOptionToHDS)}
-      onChange={(selected) => {
-        const val = selected.find(() => true);
-        onChange(val?.value);
-      }}
-      // TODO this breaks form typing -> all values are converted to string no matter what the type is
+      onChange={(sel) => handleChange(sel)}
       value={options.find((x) => x.value.toString() === value?.toString())?.value?.toString()}
       clearable={clearable ?? false}
     />
