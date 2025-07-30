@@ -11,7 +11,7 @@ import {
 import { SearchTags } from "@/component/SearchTags";
 import { Flex } from "common/styled";
 import { type TagOptionsList, translateTag } from "@/modules/search";
-import { SearchButton, SearchButtonContainer } from "@/component/SearchButton";
+import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useForm } from "react-hook-form";
 import { useSearchParams } from "next/navigation";

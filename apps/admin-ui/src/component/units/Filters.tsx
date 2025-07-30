@@ -6,7 +6,7 @@ import { translateTag } from "@/modules/search";
 import { useTranslation } from "next-i18next";
 import { useForm } from "react-hook-form";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { SearchButton, SearchButtonContainer } from "../SearchButton";
+import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { mapFormToSearchParams } from "common/src/modules/search";
 
