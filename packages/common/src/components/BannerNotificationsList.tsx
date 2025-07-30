@@ -14,6 +14,7 @@ import { filterNonNullable } from "../helpers";
 import { useTranslation } from "next-i18next";
 import { convertLanguageCode, getTranslationSafe } from "../common/util";
 import { gql } from "@apollo/client";
+import { ClientOnly } from "./ClientOnly";
 
 type BannerNotificationListProps = {
   target: BannerNotificationTarget;
@@ -140,14 +141,17 @@ const BannerNotificationsList = ({ target, displayAmount = 2 }: BannerNotificati
 
   return (
     <PositionWrapper>
-      {displayedNotificationsList?.slice(0, displayAmount).map((notification) => (
-        <NotificationsListItem
-          key={notification?.id}
-          notification={notification}
-          closedArray={closedNotificationsList ?? []}
-          closeFn={setClosedNotificationsList}
-        />
-      ))}
+      {/* Because of the use of Local storage this has to be ClientOnly, causing page layout shift */}
+      <ClientOnly>
+        {displayedNotificationsList?.slice(0, displayAmount).map((notification) => (
+          <NotificationsListItem
+            key={notification?.id}
+            notification={notification}
+            closedArray={closedNotificationsList ?? []}
+            closeFn={setClosedNotificationsList}
+          />
+        ))}
+      </ClientOnly>
     </PositionWrapper>
   );
 };
