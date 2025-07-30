@@ -80,20 +80,20 @@ export function UnitReservations({
   const searchParams = useSearchParams();
   const setSearchParams = useSetSearchParams();
 
-  useEffect(() => {
-    if (searchParams.get("date") == null) {
-      const p = new URLSearchParams(searchParams);
-      p.set("date", toUIDate(new Date()));
-      setSearchParams(p);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only on page load
-  }, []);
-
   const handleTodayClick = () => {
     const p = new URLSearchParams(searchParams);
     p.set("date", toUIDate(new Date()));
     setSearchParams(p);
   };
+
+  useEffect(() => {
+    if (searchParams.get("date") == null) {
+      handleTodayClick();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only on page load
+  }, []);
+
+  const hideTags = ["date", "tab", "reservationUnit", "isModalOpen", "timeOffset", "cellId"];
 
   return (
     <Flex>
@@ -106,7 +106,7 @@ export function UnitReservations({
           options={options.reservationUnitTypes}
         />
       </AutoGrid>
-      <SearchTags hide={["date", "tab", "reservationUnit"]} translateTag={translateTag(t, options)} />
+      <SearchTags hide={hideTags} translateTag={translateTag(t, options)} />
       <HR />
       <Flex $gap="none" $direction="row" $justifyContent="space-between" $alignItems="center">
         <Button size={ButtonSize.Small} variant={ButtonVariant.Secondary} onClick={handleTodayClick}>

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant, Tabs } from "hds-react";
@@ -21,6 +21,8 @@ import { type GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { CreateReservationModal, ReservationUnitCalendarView, UnitReservations } from "@lib/my-units/[id]/";
+import { fromUIDate } from "common/src/common/util";
+import { addMinutes } from "date-fns";
 
 const LocationOnlyOnDesktop = styled.p`
   display: none;
@@ -70,7 +72,32 @@ function MyUnitView({ unitPk: pk }: { unitPk: number }): JSX.Element {
     value: pk ?? 0,
   }));
 
+  const modalCloseRef = useRef<HTMLInputElement | null>(null);
+
+  // Find the calendar cell used to open the modal
+  useEffect(() => {
+    const cellId = searchParams.get("cellId");
+    const testId = `UnitCalendar__RowCalendar--cell-${cellId}`;
+    const isModalOpen = searchParams.get("isModalOpen") === "true";
+    if (isModalOpen && cellId) {
+      const el = document.querySelector(`[data-testid="${testId}"]`);
+      if (el) {
+        modalCloseRef.current = el as HTMLInputElement;
+      }
+    }
+  }, [searchParams]);
+
+  // Unlike calendar opening this does not cause content jumping when using only client side (modalContext)
+  // The problem with calendar is that it's deeper in the hierarchy
+  // -> searchParams change (reservationUnit)
+  // -> this component is redrawn
+  // -> all sub components redraw
+  // -> something in the chain is completely redrawn / remounted
+  // -> content jumps / flashes
   const handleOpenModal = () => {
+    // Legacy way of opening modal because getting React refs to work with Next.js handling of searchParams is a pain
+    // using searchParams redraws the buttons, and while the ref is set correctly focus is lost
+    // probably due to focus being set first, and then the button being redrawn
     setModalContent(
       <CreateReservationModal
         start={new Date()}
@@ -80,6 +107,10 @@ function MyUnitView({ unitPk: pk }: { unitPk: number }): JSX.Element {
       />
     );
   };
+
+  const isModalOpen = searchParams.get("isModalOpen") === "true";
+  const selectedDate = fromUIDate(searchParams.get("date") ?? "") ?? new Date();
+  const timeOffset = toNumber(searchParams.get("timeOffset")) ?? 0;
 
   const activeTab = selectedTab === "reservation-unit" ? 1 : 0;
 
@@ -120,6 +151,20 @@ function MyUnitView({ unitPk: pk }: { unitPk: number }): JSX.Element {
           </TabPanel>
         </Tabs>
       </TabWrapper>
+      {isModalOpen && (
+        <CreateReservationModal
+          reservationUnitOptions={reservationUnitOptions}
+          focusAfterCloseRef={modalCloseRef}
+          start={addMinutes(selectedDate, timeOffset * 30)}
+          onClose={() => {
+            const params = new URLSearchParams(searchParams);
+            params.delete("isModalOpen");
+            params.delete("timeOffset");
+            params.delete("cellId");
+            setSearchParams(params);
+          }}
+        />
+      )}
     </>
   );
 }
