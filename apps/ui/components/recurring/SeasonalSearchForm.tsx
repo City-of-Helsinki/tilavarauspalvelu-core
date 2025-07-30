@@ -1,11 +1,11 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { TextInput, IconSearch, LoadingSpinner, ButtonVariant } from "hds-react";
+import { TextInput } from "hds-react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { FilterTagList } from "../FilterTagList";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { type OptionsListT } from "common/src/modules/search";
-import { SearchButtonContainer, StyledSubmitButton } from "../search/styled";
+import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
 import { ControlledNumberInput } from "common/src/components/form";
@@ -164,14 +164,7 @@ export function SeasonalSearchForm({
           multiSelectFilters={multiSelectFilters}
           hideList={hideList}
         />
-        <StyledSubmitButton
-          type="submit"
-          variant={isLoading ? ButtonVariant.Clear : ButtonVariant.Primary}
-          iconStart={isLoading ? <LoadingSpinner small /> : <IconSearch />}
-          disabled={isLoading}
-        >
-          {t("searchForm:searchButton")}
-        </StyledSubmitButton>
+        <SearchButton isLoading={isLoading} labelKey="searchForm:searchButton" />
       </SearchButtonContainer>
     </Flex>
   );
