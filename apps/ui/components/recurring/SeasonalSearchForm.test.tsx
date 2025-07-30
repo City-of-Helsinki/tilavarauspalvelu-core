@@ -195,7 +195,7 @@ describe("Tags should modify search params", () => {
     expect(tags).toBeInTheDocument();
     // check that we have one tag + the clear all button
     expect(tags.children).toHaveLength(2);
-    expect(within(tags).getByText("searchForm:resetForm")).toBeInTheDocument();
+    expect(within(tags).getByText("common:clear")).toBeInTheDocument();
     expect(within(tags).getByText(`purposes ${selected.value}`)).toBeInTheDocument();
   });
 
@@ -218,7 +218,7 @@ describe("Tags should modify search params", () => {
       const tags = view.getByTestId("search-form__filter--tags");
       expect(tags).toBeInTheDocument();
       // check that we have one tag + the clear all button
-      expect(within(tags).getByText("searchForm:resetForm")).toBeInTheDocument();
+      expect(within(tags).getByText("common:clear")).toBeInTheDocument();
       expect(within(tags).getByText(`${key} ${selected1.value}`)).toBeInTheDocument();
       expect(within(tags).getByText(`${key} ${selected2.value}`)).toBeInTheDocument();
     }
@@ -241,7 +241,7 @@ describe("Tags should modify search params", () => {
     expect(tags).toBeInTheDocument();
     // check that we have one tag + the clear all button
     expect(tags.children).toHaveLength(3);
-    expect(within(tags).getByText("searchForm:resetForm")).toBeInTheDocument();
+    expect(within(tags).getByText("common:clear")).toBeInTheDocument();
     expect(within(tags).getByText(`purposes ${selected1.value}`)).toBeInTheDocument();
     expect(within(tags).getByText(`reservationUnitTypes ${selected2.value}`)).toBeInTheDocument();
   });
@@ -265,7 +265,7 @@ describe("Tags should modify search params", () => {
     expect(tags).toBeInTheDocument();
     // check that we have one tag + the clear all button
     expect(tags.children).toHaveLength(3);
-    expect(within(tags).getByText("searchForm:resetForm")).toBeInTheDocument();
+    expect(within(tags).getByText("common:clear")).toBeInTheDocument();
     const tagBtns = within(tags).getAllByRole("button", {
       name: 'searchForm:removeFilter {"value":"purposes 1"}',
     });
@@ -299,7 +299,7 @@ describe("Tags should modify search params", () => {
     const tags = view.getByTestId("search-form__filter--tags");
     expect(tags).toBeInTheDocument();
     const resetBtn = within(tags).getByRole("button", {
-      name: "searchForm:resetForm",
+      name: "common:clear",
     });
     expect(resetBtn).toBeInTheDocument();
     await user.click(resetBtn);

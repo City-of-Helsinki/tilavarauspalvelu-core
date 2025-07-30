@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { Checkbox, IconSearch, LoadingSpinner, TextInput } from "hds-react";
+import { Checkbox, TextInput } from "hds-react";
 import { type SubmitHandler, useForm, Controller } from "react-hook-form";
 import styled from "styled-components";
 import { addYears, startOfDay } from "date-fns";
@@ -14,7 +14,7 @@ import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { type OptionsListT } from "common/src/modules/search";
-import { SearchButtonContainer, StyledSubmitButton } from "./styled";
+import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
 import { ignoreMaybeArray, mapParamToInterger, toNumber } from "common/src/helpers";
@@ -297,14 +297,7 @@ export function SingleSearchForm({
           multiSelectFilters={multiSelectFilters}
           hideList={hideTagList}
         />
-        <StyledSubmitButton
-          id="searchButton"
-          type="submit"
-          iconStart={isLoading ? <LoadingSpinner small /> : <IconSearch />}
-          disabled={isLoading}
-        >
-          {t("searchForm:searchButton")}
-        </StyledSubmitButton>
+        <SearchButton isLoading={isLoading} labelKey="searchForm:searchButton" />
       </SearchButtonContainer>
     </Flex>
   );

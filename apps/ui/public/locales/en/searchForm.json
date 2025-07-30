@@ -3,7 +3,6 @@
   "showMoreFilters": "Advanced search",
   "showLessFilters": "Show less options",
   "beginTimeIsBeforeEndTime": "The start time must be before the end time",
-  "resetForm": "Clear",
   "placeholders": {
     "textSearch": "Search spaces or equipment"
   },
