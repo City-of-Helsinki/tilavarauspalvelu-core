@@ -4,6 +4,14 @@ import { FilterTags, StyledTag, ResetButton } from "common/src/tags";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
+interface SearchTagsProps {
+  translateTag: (key: string, val: string) => string;
+  hide?: Readonly<string[]>;
+  defaultTags?: Readonly<Array<{ key: string; value: string | string[] }>>;
+  clearButtonLabel?: string;
+  clearButtonAriaLabel?: string;
+}
+
 /// Creates tags from the search params (uses react-router-dom)
 /// @param translateTag callback to format the tag
 /// @param hide list of search param keys that are not shown as tags
@@ -16,13 +24,7 @@ export function SearchTags({
   defaultTags = [],
   clearButtonLabel,
   clearButtonAriaLabel,
-}: Readonly<{
-  translateTag: (key: string, val: string) => string;
-  hide?: string[];
-  defaultTags?: Array<{ key: string; value: string | string[] }>;
-  clearButtonLabel?: string;
-  clearButtonAriaLabel?: string;
-}>): JSX.Element {
+}: Readonly<SearchTagsProps>): JSX.Element {
   const { t } = useTranslation();
   const params = useSearchParams();
   const setParams = useSetSearchParams();
@@ -30,6 +32,10 @@ export function SearchTags({
   const handleDelete = (tag: { key: string; value: string }) => {
     const vals = new URLSearchParams(params);
     vals.delete(tag.key, tag.value);
+    // Use an empty proxy so default values don't override user choices
+    if (!vals.has(tag.key) && defaultTags.find((d) => d.key === tag.key) != null) {
+      vals.set(tag.key, "");
+    }
     setParams(vals);
   };
 
@@ -59,8 +65,13 @@ export function SearchTags({
       continue;
     }
     const tr = translateTag(key, value);
-    tags.push({ key, value, tr });
+    if (tr !== "") {
+      tags.push({ key, value, tr });
+    }
   }
+
+  // TODO could be improved by comparing default values to current values
+  const shouldShowResetButton = tags.length > 0 || defaultTags.length > 0;
 
   return (
     <FilterTags>
@@ -74,7 +85,7 @@ export function SearchTags({
           {tag.tr}
         </StyledTag>
       ))}
-      {tags.length > 0 && (
+      {shouldShowResetButton && (
         <ResetButton
           onClick={handleReset}
           onDelete={handleReset}
