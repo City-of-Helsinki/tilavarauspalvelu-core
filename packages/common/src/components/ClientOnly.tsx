@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-function ClientOnly({ children }: { children: React.ReactNode }): JSX.Element | null {
+export function ClientOnly({ children }: { children: React.ReactNode }): JSX.Element | null {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
