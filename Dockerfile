@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends dumb-init ca-ce
 RUN npm install -g corepack@latest
 RUN corepack enable
 WORKDIR /app
+COPY --from=builder /app/scripts/ /app/scripts
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 RUN pnpm install --frozen-lockfile

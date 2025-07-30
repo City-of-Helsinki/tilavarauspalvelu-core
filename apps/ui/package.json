@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "preinstall": "npx -y only-allow pnpm",
     "dev": "next dev -p 3000",
     "build": "SKIP_ENV_VALIDATION=true next build",
     "start": "next start",
