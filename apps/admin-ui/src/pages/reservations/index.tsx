@@ -49,7 +49,8 @@ export function ListReservations(): JSX.Element {
 }
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-export default function Page(props: PageProps): JSX.Element {
+type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
+export default function Page(props: PropsNarrowed): JSX.Element {
   return (
     <AuthorizationChecker apiUrl={props.apiBaseUrl}>
       <ListReservations />

@@ -130,7 +130,10 @@ export function translateTag(t: TFunction, options: Readonly<TagOptionsList>) {
       case "recurring":
         return options.recurringChoices.find((x) => x.value === value)?.label ?? "";
       case "freeOfCharge":
-        return t("filters:label.freeOfCharge");
+        if (value === "true") {
+          return t("filters:label.freeOfCharge");
+        }
+        return "";
       case "search":
         return t("filters:tag.search", { search: value });
       default:
