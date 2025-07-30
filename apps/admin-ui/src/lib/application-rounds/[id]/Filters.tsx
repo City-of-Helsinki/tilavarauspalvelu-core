@@ -8,7 +8,7 @@ import { ControlledMultiSelectFilter, ControlledSearchFilter } from "@/component
 import { type TagOptionsList, translateTag } from "@/modules/search";
 import { useForm } from "react-hook-form";
 import { DayT } from "common/src/const";
-import { SearchButton, SearchButtonContainer } from "@/component/SearchButton";
+import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { mapFormToSearchParams } from "common/src/modules/search";
 

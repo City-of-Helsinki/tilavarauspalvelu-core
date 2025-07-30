@@ -16,7 +16,7 @@ import { OrderStatusWithFree, ReservationTypeChoice, ReservationStateChoice } fr
 import { type TagOptionsList, translateTag } from "@/modules/search";
 import { useForm } from "react-hook-form";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { SearchButton, SearchButtonContainer } from "@/component/SearchButton";
+import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useSearchParams } from "next/navigation";
 import { transformPaymentStatus, transformReservationState, transformReservationType } from "common/src/conversion";
 import { filterNonNullable, mapParamToInterger, toNumber } from "common/src/helpers";

@@ -8,7 +8,7 @@ import {
 } from "@/component/QueryParamFilters";
 import { translateTag } from "@/modules/search";
 import { useForm } from "react-hook-form";
-import { SearchButton, SearchButtonContainer } from "@/component/SearchButton";
+import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { type ApplicationRoundFilterUnitFragment, MunicipalityChoice, ReserveeType } from "@gql/gql-types";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
