@@ -3,7 +3,6 @@
   "showMoreFilters": "Detaljerad sökning",
   "showLessFilters": "Visa färre alternativ",
   "beginTimeIsBeforeEndTime": "Sluttiden måste vara senare än starttiden",
-  "resetForm": "Töm",
   "placeholders": {
     "textSearch": "Sök lokaler eller utrustning"
   },

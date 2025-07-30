@@ -206,9 +206,9 @@ export function ReservationCalendarControls({
               onClick={() => reservationForm.reset()}
               disabled={!focusSlot}
               variant={ButtonVariant.Secondary}
-              iconStart={<IconCross aria-hidden="true" />}
+              iconStart={<IconCross />}
             >
-              {t("searchForm:resetForm")}
+              {t("common:clear")}
             </Button>
             {mode === "create" && submitButton ? (
               <Flex
