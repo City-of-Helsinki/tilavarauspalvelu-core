@@ -1,10 +1,9 @@
-import { breakpoints } from "common/src/const";
-import { Flex } from "common/styled";
+import { breakpoints } from "../const";
+import { Flex } from "../../styled";
 import { Button, ButtonSize, ButtonVariant, IconSearch, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 
-// FIXME this is copy pasted from customer ui, make a generic component
 export const SearchButtonContainer = styled(Flex).attrs({
   $justifyContent: "space-between",
   $alignItems: "center",
@@ -18,7 +17,12 @@ export const SearchButtonContainer = styled(Flex).attrs({
   }
 `;
 
-export function SearchButton({ isLoading = false }: { isLoading?: boolean }): JSX.Element {
+interface SearchButtonProps {
+  labelKey?: string;
+  isLoading?: boolean;
+}
+
+export function SearchButton({ isLoading = false, labelKey = "filters:searchButton" }: SearchButtonProps): JSX.Element {
   const { t } = useTranslation();
   return (
     <Flex $direction="row" $justifyContent="flex-end">
@@ -29,7 +33,7 @@ export function SearchButton({ isLoading = false }: { isLoading?: boolean }): JS
         size={ButtonSize.Medium}
         type="submit"
       >
-        {t("filters:searchButton")}
+        {t(labelKey)}
       </Button>
     </Flex>
   );
