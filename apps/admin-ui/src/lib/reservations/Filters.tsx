@@ -13,7 +13,7 @@ import {
 } from "@/component/QueryParamFilters";
 import { SearchTags } from "@/component/SearchTags";
 import { OrderStatusWithFree, ReservationTypeChoice, ReservationStateChoice } from "@gql/gql-types";
-import { type TagOptionsList, translateTag } from "@/modules/search";
+import { translateTag } from "@/modules/search";
 import { useForm } from "react-hook-form";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
@@ -70,15 +70,17 @@ function mapParamsToForm(params: URLSearchParams): SearchFormValues {
   };
 }
 
+interface FilterProps {
+  defaultFilters?: Readonly<Array<{ key: string; value: string | string[] }>>;
+  clearButtonLabel?: string;
+  clearButtonAriaLabel?: string;
+}
+
 export function Filters({
   defaultFilters = [],
   clearButtonLabel,
   clearButtonAriaLabel,
-}: Readonly<{
-  defaultFilters?: Array<{ key: string; value: string | string[] }>;
-  clearButtonLabel?: string;
-  clearButtonAriaLabel?: string;
-}>): JSX.Element {
+}: Readonly<FilterProps>): JSX.Element {
   const { t } = useTranslation();
   const setSearchParams = useSetSearchParams();
   const searchParams = useSearchParams();
@@ -86,9 +88,6 @@ export function Filters({
   // TODO this only filters the options after a search, have to use form data if we want to filter without searching
   const unitFilter = mapParamToInterger(searchParams.getAll("unit"), 1);
   const options = useFilterOptions(unitFilter);
-  const tagOptions: TagOptionsList = {
-    ...options,
-  };
 
   const defaultValues = mapParamsToForm(searchParams);
   const form = useForm<SearchFormValues>({
@@ -100,8 +99,7 @@ export function Filters({
   }, [searchParams, reset]);
 
   const onSubmit = (data: SearchFormValues) => {
-    const searchParams = mapFormToSearchParams(data);
-    setSearchParams(searchParams);
+    setSearchParams(mapFormToSearchParams(data));
   };
 
   return (
@@ -135,7 +133,7 @@ export function Filters({
       </MoreWrapper>
       <SearchButtonContainer>
         <SearchTags
-          translateTag={translateTag(t, tagOptions)}
+          translateTag={translateTag(t, options)}
           defaultTags={defaultFilters}
           clearButtonLabel={clearButtonLabel}
           clearButtonAriaLabel={clearButtonAriaLabel}
