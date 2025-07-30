@@ -24,9 +24,9 @@
   "clientReservationCantBeChanged": "Asiakkaan tekemä varaus",
   "reserveeTypes": {
     "labels": {
-      "nonprofit": "järjestön, ryhmän tai yhteisön puolesta",
-      "company": "yrityksen puolesta",
-      "individual": "yksityishenkilönä"
+      "NONPROFIT": "Järjestön, ryhmän tai yhteisön puolesta",
+      "COMPANY": "Yrityksen puolesta",
+      "INDIVIDUAL": "Yksityishenkilönä"
     }
   },
   "label": {

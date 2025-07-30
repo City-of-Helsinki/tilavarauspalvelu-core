@@ -6,13 +6,5 @@
   "edit": "Edit",
   "cancel": "Cancel",
   "view": "View",
-  "reservations": "Bookings",
-  "saved": "Last saved:",
-  "person": "Application created: as a private person",
-  "organisation": "Application created: {{type}}, {{name}}",
-  "applicantType": {
-    "community": "association",
-    "association": "registered association",
-    "company": "company"
-  }
+  "saved": "Last saved:"
 }
