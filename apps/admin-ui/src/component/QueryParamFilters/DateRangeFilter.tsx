@@ -32,22 +32,22 @@ interface BaseDateRangeFilterProps {
 }
 
 function BaseDateRangeFilter({ filter, names, onChange }: BaseDateRangeFilterProps): JSX.Element {
-  const { t } = useTranslation();
+  const { t } = useTranslation("filters");
   return (
     <DateRangeFilterWrapper>
       <DateInput
         language="fi"
         id={names.begin}
-        label={t(`filters:label.${names.begin}`)}
-        placeholder={t(`filters:placeholder.${names.begin}`)}
+        label={t(`label.${names.begin}`)}
+        placeholder={t(`placeholder.${names.begin}`)}
         onChange={(val: string) => onChange(val, names.begin)}
         value={filter.begin ?? ""}
       />
       <DateInput
         language="fi"
         id={names.end}
-        label={t(`filters:label.${names.end}`)}
-        placeholder={t(`filters:placeholder.${names.end}`)}
+        label={t(`label.${names.end}`)}
+        placeholder={t(`placeholder.${names.end}`)}
         onChange={(val: string) => onChange(val, names.end)}
         value={filter.end ?? ""}
       />
