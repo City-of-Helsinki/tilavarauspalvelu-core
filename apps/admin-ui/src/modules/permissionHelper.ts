@@ -72,7 +72,7 @@ function hasGeneralPermission(permission: UserPermissionChoice, user: UserNode) 
 export function hasPermission(
   user: CurrentUserQuery["currentUser"],
   permissionName: UserPermissionChoice,
-  unitPk?: number
+  unitPk?: number | null
 ): boolean {
   if (!user) {
     return false;

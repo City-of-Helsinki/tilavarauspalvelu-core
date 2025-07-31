@@ -7,9 +7,13 @@ import { breakpoints } from "common/src/const";
 import { formatAddress } from "@/common/util";
 import { getReservationSeriesUrl } from "@/common/urls";
 import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { errorToast } from "common/src/components/toast";
-import { UserPermissionChoice, useUnitViewQuery } from "@gql/gql-types";
-import { useCheckPermission } from "@/hooks";
+import {
+  UnitViewDocument,
+  type UnitViewQuery,
+  type UnitViewQueryVariables,
+  UserPermissionChoice,
+} from "@gql/gql-types";
+import { useSession } from "@/hooks";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { gql } from "@apollo/client";
 import { useModal } from "@/context/ModalContext";
@@ -23,6 +27,8 @@ import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { CreateReservationModal, ReservationUnitCalendarView, UnitReservations } from "@lib/my-units/[id]/";
 import { fromUIDate } from "common/src/common/util";
 import { addMinutes } from "date-fns";
+import { createClient } from "@/common/apolloClient";
+import { hasPermission } from "@/modules/permissionHelper";
 
 const LocationOnlyOnDesktop = styled.p`
   display: none;
@@ -36,25 +42,12 @@ const TabPanel = styled(Tabs.TabPanel)`
   padding-block: var(--spacing-m);
 `;
 
-function MyUnitView({ unitPk: pk }: { unitPk: number }): JSX.Element {
+function MyUnitView({ unit }: Pick<PropsNarrowed, "unit">): JSX.Element {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
 
-  const id = base64encode(`UnitNode:${pk}`);
-  const { loading, data, previousData } = useUnitViewQuery({
-    variables: { id },
-    onError: () => {
-      errorToast({ text: t("errors:errorFetchingData") });
-    },
-  });
-
-  const { unit } = data ?? previousData ?? {};
-
   const createReservationBtnRef = useRef<HTMLButtonElement>(null);
-  const { hasPermission } = useCheckPermission({
-    units: pk != null ? [pk] : [],
-    permission: UserPermissionChoice.CanCreateStaffReservations,
-  });
+  const { user } = useSession();
 
   const searchParams = useSearchParams();
   const setSearchParams = useSetSearchParams();
@@ -65,7 +58,7 @@ function MyUnitView({ unitPk: pk }: { unitPk: number }): JSX.Element {
     setSearchParams(vals);
   };
 
-  const recurringReservationUrl = getReservationSeriesUrl(pk);
+  const recurringReservationUrl = getReservationSeriesUrl(unit.pk);
 
   const reservationUnitOptions = (unit?.reservationUnits ?? []).map(({ pk, nameFi }) => ({
     label: nameFi ?? "-",
@@ -114,8 +107,11 @@ function MyUnitView({ unitPk: pk }: { unitPk: number }): JSX.Element {
 
   const activeTab = selectedTab === "reservation-unit" ? 1 : 0;
 
-  const title = unit?.nameFi ?? (loading ? t("common:loading") : "-");
-  const canCreateReservations = hasPermission && unit != null && reservationUnitOptions.length > 0;
+  const title = unit?.nameFi ?? "-";
+  const canCreateReservations =
+    hasPermission(user, UserPermissionChoice.CanCreateStaffReservations, unit.pk) &&
+    unit != null &&
+    reservationUnitOptions.length > 0;
   const address = formatAddress(unit, "");
   return (
     <>
@@ -144,10 +140,14 @@ function MyUnitView({ unitPk: pk }: { unitPk: number }): JSX.Element {
             <Tabs.Tab onClick={() => handleTabChange("reservation-unit")}>{t("myUnits:Calendar.Tabs.byUnit")}</Tabs.Tab>
           </Tabs.TabList>
           <TabPanel>
-            <UnitReservations reservationUnitOptions={reservationUnitOptions} unitPk={pk} />
+            <UnitReservations
+              reservationUnitOptions={reservationUnitOptions}
+              unitPk={unit.pk ?? 0}
+              canCreateReservations={canCreateReservations}
+            />
           </TabPanel>
           <TabPanel>
-            <ReservationUnitCalendarView reservationUnitOptions={reservationUnitOptions} unitPk={pk} />
+            <ReservationUnitCalendarView reservationUnitOptions={reservationUnitOptions} unitPk={unit.pk ?? 0} />
           </TabPanel>
         </Tabs>
       </TabWrapper>
@@ -171,24 +171,37 @@ function MyUnitView({ unitPk: pk }: { unitPk: number }): JSX.Element {
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page({ apiBaseUrl, pk }: PropsNarrowed): JSX.Element {
+export default function Page({ apiBaseUrl, unit }: PropsNarrowed): JSX.Element {
   return (
     <AuthorizationChecker apiUrl={apiBaseUrl}>
-      <MyUnitView unitPk={pk} />
+      <MyUnitView unit={unit} />
     </AuthorizationChecker>
   );
 }
 
-export async function getServerSideProps({ locale, query }: GetServerSidePropsContext) {
+export async function getServerSideProps({ req, locale, query }: GetServerSidePropsContext) {
   const pk = toNumber(ignoreMaybeArray(query.id));
   if (pk == null || pk <= 0) {
     return NOT_FOUND_SSR_VALUE;
   }
 
+  const commonProps = await getCommonServerSideProps();
+  const apolloClient = createClient(commonProps.apiBaseUrl ?? "", req);
+  const id = base64encode(`UnitNode:${pk}`);
+  const { data } = await apolloClient.query<UnitViewQuery, UnitViewQueryVariables>({
+    query: UnitViewDocument,
+    variables: { id },
+  });
+
+  const { unit } = data;
+  if (unit == null) {
+    return NOT_FOUND_SSR_VALUE;
+  }
+
   return {
     props: {
-      pk,
-      ...(await getCommonServerSideProps()),
+      unit,
+      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
