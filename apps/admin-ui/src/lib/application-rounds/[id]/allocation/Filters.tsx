@@ -58,7 +58,18 @@ export function Filters({ hideSearchTags, units, isLoading }: FilterProps): JSX.
     setSearchParams(mapFormToSearchParams(values));
   };
 
-  const options = useFilterOptions();
+  const originalOptions = useFilterOptions();
+  const options = {
+    ...originalOptions,
+    /// Remove units that the user has no access to or don't have any applications
+    units: units.map((unit) => ({ label: unit.nameFi ?? "", value: unit.pk ?? 0 })),
+  };
+
+  const initiallyOpen =
+    defaultValues.municipality.length > 0 ||
+    defaultValues.applicantType.length > 0 ||
+    defaultValues.ageGroup.length > 0 ||
+    defaultValues.purpose.length > 0;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -66,6 +77,7 @@ export function Filters({ hideSearchTags, units, isLoading }: FilterProps): JSX.
         showAllLabel={t("filters:moreFilters")}
         showLessLabel={t("filters:lessFilters")}
         maximumNumber={4}
+        initiallyOpen={initiallyOpen}
       >
         <ControlledSelectFilter control={control} name="unit" options={options.units} />
         <ControlledMultiSelectFilter control={control} name="priority" options={options.priorityChoices} />
