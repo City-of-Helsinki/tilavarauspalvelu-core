@@ -37,7 +37,7 @@
       "cookies": [
         {
           "name": "varaamo-cookie-consents",
-          "host": "tilavaraus.hel.fi",
+          "host": "varaamo.hel.fi",
           "description": {
             "fi": "Sivusto käyttää tätä evästettä tietojen tallentamiseen siitä, ovatko kävijät antaneet hyväksyntänsä tai kieltäytyneet evästeiden käytöstä.",
             "sv": "Cookie möjliggör hantering av cookies på webbplatsen.",
@@ -52,7 +52,7 @@
         },
         {
           "name": "sessionid",
-          "host": "tilavaraus.hel.fi",
+          "host": "varaamo.hel.fi",
           "description": {
             "fi": "Sivusto käyttää tätä evästettä tietojen tallentamiseen siitä, ovatko kävijät antaneet hyväksyntänsä tai kieltäytyneet evästeiden käytöstä.",
             "sv": "Cookie möjliggör hantering av cookies på webbplatsen.",
@@ -67,7 +67,7 @@
         },
         {
           "name": "csrftoken",
-          "host": "tilavaraus.hel.fi",
+          "host": "varaamo.hel.fi",
           "description": {
             "fi": "Sivusto käyttää tätä evästettä tietojen tallentamiseen siitä, ovatko kävijät antaneet hyväksyntänsä tai kieltäytyneet evästeiden käytöstä.",
             "sv": "Cookie möjliggör hantering av cookies på webbplatsen.",
@@ -82,7 +82,7 @@
         },
         {
           "name": "tilavarausHKIClosedNotificationsList",
-          "host": "tilavaraus.hel.fi",
+          "host": "varaamo.hel.fi",
           "description": {
             "fi": "Sivusto tallentaa tiedon, mitä ilmoituksia on suljettu",
             "sv": "Används av för att lagra information om stängda meddelanden.",
@@ -93,7 +93,7 @@
         },
         {
           "name": "language",
-          "host": "tilavaraus.hel.fi",
+          "host": "varaamo.hel.fi",
           "description": {
             "fi": "Sivuston kielen valintaan liittyvä eväste.",
             "sv": "Cookie relaterad till val av språk på webbplatsen.",
@@ -125,7 +125,7 @@
       "cookies": [
         {
           "name": "_pk_id.*",
-          "host": "tilavaraus.hel.fi",
+          "host": "varaamo.hel.fi",
           "description": {
             "fi": "Matomo-tilastointijärjestelmän eväste.",
             "sv": "Matomo-statistiksystemets kaka samlar information om hur webbplatsen används.",
@@ -140,7 +140,7 @@
         },
         {
           "name": "_pk_ses.*",
-          "host": "tilavaraus.hel.fi",
+          "host": "varaamo.hel.fi",
           "description": {
             "fi": "Matomo-tilastointijärjestelmän eväste.",
             "sv": "Matomo-statistiksystemets kaka samlar information om hur webbplatsen används.",
