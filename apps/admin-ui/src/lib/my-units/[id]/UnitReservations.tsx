@@ -28,12 +28,17 @@ const LegendContainer = styled.div`
   }
 `;
 
-interface UnitReservationsInnerProps {
+interface UnitReservationsProps {
   unitPk: number;
   reservationUnitOptions: { label: string; value: number }[];
+  canCreateReservations?: boolean;
 }
 
-function UnitReservationsInner({ unitPk, reservationUnitOptions }: UnitReservationsInnerProps): JSX.Element {
+function UnitReservationsInner({
+  unitPk,
+  reservationUnitOptions,
+  canCreateReservations,
+}: UnitReservationsProps): JSX.Element {
   const searchParams = useSearchParams();
   const { t } = useTranslation();
   const { reservationUnitTypeFilter } = useGetFilterSearchParams();
@@ -43,7 +48,12 @@ function UnitReservationsInner({ unitPk, reservationUnitOptions }: UnitReservati
 
   const date = currentDate && isValidDate(currentDate) ? currentDate : new Date();
 
-  const { loading, resources, refetch } = useUnitResources(date, unitPk, reservationUnitTypeFilter);
+  const { loading, resources, refetch } = useUnitResources({
+    begin: date,
+    unitPk,
+    reservationUnitOptions,
+    reservationUnitTypeFilter,
+  });
 
   return (
     <>
@@ -51,9 +61,8 @@ function UnitReservationsInner({ unitPk, reservationUnitOptions }: UnitReservati
         date={date}
         resources={resources}
         refetch={refetch}
-        unitPk={unitPk}
         isLoading={loading}
-        reservationUnitOptions={reservationUnitOptions}
+        canCreateReservations={canCreateReservations}
       />
       <LegendContainer>
         <LegendsWrapper>
@@ -66,13 +75,7 @@ function UnitReservationsInner({ unitPk, reservationUnitOptions }: UnitReservati
   );
 }
 
-export function UnitReservations({
-  unitPk,
-  reservationUnitOptions,
-}: {
-  unitPk: number;
-  reservationUnitOptions: { label: string; value: number }[];
-}): JSX.Element {
+export function UnitReservations(props: UnitReservationsProps): JSX.Element {
   const { t } = useTranslation();
 
   const options = useFilterOptions();
@@ -115,7 +118,7 @@ export function UnitReservations({
         <DayNavigation name="date" />
         <div />
       </Flex>
-      <UnitReservationsInner unitPk={unitPk} reservationUnitOptions={reservationUnitOptions} />
+      <UnitReservationsInner {...props} />
     </Flex>
   );
 }

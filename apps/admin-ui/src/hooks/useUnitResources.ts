@@ -1,15 +1,50 @@
-import { ReservationTypeChoice, useReservationUnitsByUnitQuery } from "@gql/gql-types";
+import {
+  Authentication,
+  ReservationTypeChoice,
+  type ReservationUnitsByUnitQuery,
+  useReservationUnitsByUnitQuery,
+} from "@gql/gql-types";
 import { toApiDate } from "common/src/common/util";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { errorToast } from "common/src/components/toast";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
+import { type OptionT } from "common/src/modules/search";
+
+interface UseUnitResourcesProps {
+  begin: Date;
+  unitPk: number;
+  reservationUnitOptions: OptionT[];
+  reservationUnitTypeFilter?: number[];
+}
+
+type ReservationType = NonNullable<ReservationUnitsByUnitQuery["affectingReservations"]>[number];
+type ReservationUnitType = NonNullable<NonNullable<ReservationUnitsByUnitQuery["unit"]>["reservationUnits"]>[number];
+
+function createDummyReservationUnit(opt: OptionT): ReservationUnitType {
+  return {
+    id: base64encode(`ReservationUnitNode:${opt.value}`),
+    pk: opt.value,
+    nameFi: opt.label,
+    bufferTimeBefore: 0,
+    bufferTimeAfter: 0,
+    isDraft: false,
+    reservationUnitType: null,
+    spaces: [],
+    authentication: Authentication.Weak,
+  };
+}
 
 // TODO this should be split into two queries one for the reservation units and one for the daily reservations
 // since the reservation units only change on page load
 // reservations change when the date changes
-export function useUnitResources(begin: Date, unitPk: number, reservationUnitTypes?: number[]) {
+export function useUnitResources({
+  begin,
+  unitPk,
+  reservationUnitOptions,
+  reservationUnitTypeFilter = [],
+}: UseUnitResourcesProps) {
   const { t } = useTranslation();
   const id = base64encode(`UnitNode:${unitPk}`);
   const isValid = Number(unitPk) > 0;
@@ -28,10 +63,8 @@ export function useUnitResources(begin: Date, unitPk: number, reservationUnitTyp
   });
 
   const { affectingReservations, unit } = data ?? previousData ?? {};
-  const resUnits = filterNonNullable(unit?.reservationUnits);
+  const resUnits = unit?.reservationUnits ?? reservationUnitOptions.map(createDummyReservationUnit);
 
-  type ReservationType = NonNullable<typeof affectingReservations>[0];
-  type ReservationUnitType = NonNullable<typeof resUnits>[0];
   function convertToEvent(y: ReservationType, x: ReservationUnitType) {
     return {
       ...y,
@@ -51,8 +84,8 @@ export function useUnitResources(begin: Date, unitPk: number, reservationUnitTyp
   const resources = resUnits
     .filter(
       (x) =>
-        !reservationUnitTypes?.length ||
-        (x.reservationUnitType?.pk != null && reservationUnitTypes.includes(x.reservationUnitType.pk))
+        !reservationUnitTypeFilter?.length ||
+        (x.reservationUnitType?.pk != null && reservationUnitTypeFilter.includes(x.reservationUnitType.pk))
     )
     .map((x) => {
       const affecting = affectingReservations?.filter((y) => doesReservationAffectReservationUnit(y, x.pk ?? 0));
