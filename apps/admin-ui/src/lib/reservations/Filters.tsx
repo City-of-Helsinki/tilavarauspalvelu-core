@@ -102,9 +102,39 @@ export function Filters({
     setSearchParams(mapFormToSearchParams(data));
   };
 
+  const hiddenKeys = [
+    "dateLte",
+    "unit",
+    "reservationUnitType",
+    "minPrice",
+    "maxPrice",
+    "orderStatus",
+    "createdAtGte",
+    "createdAtLte",
+    "recurring",
+    "freeOfCharge",
+  ] as const;
+  const df = Object.entries(defaultValues).map(([key, value]) => ({
+    key,
+    val:
+      hiddenKeys.includes(key as (typeof hiddenKeys)[number]) &&
+      !(
+        value == null ||
+        (Array.isArray(value) && value.length === 0) ||
+        (typeof value === "string" && value.trim() === "") ||
+        (typeof value === "number" && isNaN(value)) ||
+        (typeof value === "boolean" && !value)
+      ),
+  }));
+  const initiallyOpen = df.some((v) => v.val);
   return (
     <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)} $direction="column" $gap="s">
-      <MoreWrapper showAllLabel={t("filters:moreFilters")} showLessLabel={t("filters:lessFilters")} maximumNumber={4}>
+      <MoreWrapper
+        showAllLabel={t("filters:moreFilters")}
+        showLessLabel={t("filters:lessFilters")}
+        maximumNumber={4}
+        initiallyOpen={initiallyOpen}
+      >
         <ControlledMultiSelectFilter
           control={control}
           options={options.reservationTypeChoices}
