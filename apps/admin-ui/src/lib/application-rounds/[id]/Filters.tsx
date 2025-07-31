@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "next-i18next";
-import { AutoGrid, HR } from "common/styled";
+import { AutoGrid, Flex, HR } from "common/styled";
 import { SearchTags } from "@/component/SearchTags";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { AccessCodeState, ApplicationSectionStatusChoice, ApplicationStatusChoice, ReserveeType } from "@gql/gql-types";
@@ -11,6 +11,14 @@ import { DayT } from "common/src/const";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { mapFormToSearchParams } from "common/src/modules/search";
+import { filterNonNullable, mapParamToInterger } from "common/src/helpers";
+import {
+  transformAccessCodeState,
+  transformApplicationSectionStatus,
+  transformApplicationStatus,
+  transformReserveeType,
+} from "common/src/conversion";
+import { useSearchParams } from "next/navigation";
 
 interface FilterProps {
   options: TagOptionsList;
@@ -33,6 +41,20 @@ type SearchFormValues = {
   search: string;
 };
 
+function mapParamsToForm(params: URLSearchParams): SearchFormValues {
+  return {
+    unitGroup: mapParamToInterger(params.getAll("unitGroup"), 1),
+    unit: mapParamToInterger(params.getAll("unit"), 1),
+    sectionStatus: filterNonNullable(params.getAll("sectionStatus").map(transformApplicationSectionStatus)),
+    status: filterNonNullable(params.getAll("status").map(transformApplicationStatus)),
+    reservationUnit: mapParamToInterger(params.getAll("reservationUnit"), 1),
+    applicant: filterNonNullable(params.getAll("applicant").map(transformReserveeType)),
+    weekday: params.getAll("weekday").map(Number) as DayT[],
+    accessCodeState: filterNonNullable(params.getAll("accessCodeState").map(transformAccessCodeState)),
+    search: params.get("search") ?? "",
+  };
+}
+
 export function Filters({
   options,
   statusOption = "application",
@@ -42,21 +64,21 @@ export function Filters({
   enableAccessCodeState = false,
 }: FilterProps): JSX.Element {
   const { t } = useTranslation();
-
+  const searchParams = useSearchParams();
   const setSearchParams = useSetSearchParams();
+
+  const defaultValues = mapParamsToForm(searchParams);
   const form = useForm<SearchFormValues>({
-    defaultValues: {
-      search: "",
-      unitGroup: [],
-      unit: [],
-      sectionStatus: [],
-      status: [],
-      reservationUnit: [],
-      applicant: [],
-      weekday: [],
-      accessCodeState: [],
-    },
+    defaultValues,
   });
+
+  const { handleSubmit, control, reset } = form;
+  const onSubmit = (data: SearchFormValues) => {
+    setSearchParams(mapFormToSearchParams(data));
+  };
+  useEffect(() => {
+    reset(mapParamsToForm(searchParams));
+  }, [reset, searchParams]);
 
   const statusOptions = VALID_ALLOCATION_APPLICATION_STATUSES.map((status) => ({
     label: t(`application:statuses.${status}`),
@@ -73,14 +95,6 @@ export function Filters({
     value: s,
   }));
 
-  const hideSearchTags: string[] = [
-    "tab",
-    "orderBy",
-    ...(statusOption !== "application" ? ["status"] : ["sectionStatus"]),
-    ...(!enableWeekday ? ["weekday"] : []),
-    ...(!enableReservationUnit ? ["reservationUnit"] : []),
-  ];
-
   const weekdayOptions = Array.from(Array(7)).map((_, i) => ({
     label: t(`translation:dayLong.${i}`),
     value: i,
@@ -91,13 +105,16 @@ export function Filters({
     value: status,
   }));
 
-  const { handleSubmit, control } = form;
-  const onSubmit = (data: SearchFormValues) => {
-    setSearchParams(mapFormToSearchParams(data));
-  };
+  const hideSearchTags: string[] = [
+    "tab",
+    "orderBy",
+    ...(statusOption !== "application" ? ["status"] : ["sectionStatus"]),
+    ...(!enableWeekday ? ["weekday"] : []),
+    ...(!enableReservationUnit ? ["reservationUnit"] : []),
+  ];
 
   return (
-    <form noValidate onSubmit={handleSubmit(onSubmit)}>
+    <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)}>
       <AutoGrid>
         <ControlledMultiSelectFilter control={control} name="unitGroup" options={options.unitGroups} />
         <ControlledMultiSelectFilter control={control} name="unit" options={options.units} />
@@ -124,6 +141,6 @@ export function Filters({
         <SearchButton />
       </SearchButtonContainer>
       <HR />
-    </form>
+    </Flex>
   );
 }
