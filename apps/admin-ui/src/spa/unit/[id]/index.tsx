@@ -12,6 +12,7 @@ import { ReservationUnitList } from "./ReservationUnitList";
 import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/common/urls";
 import { CenterSpinner, Flex, fontBold, fontMedium, H1, H2, H3 } from "common/styled";
 import { gql } from "@apollo/client";
+import { PUBLIC_URL } from "@/common/const";
 
 interface IProps {
   [key: string]: string;
@@ -88,7 +89,7 @@ function Unit(): JSX.Element {
   return (
     <>
       <Flex $direction="row" $alignItems="center">
-        <Image src="https://tilavaraus.hel.fi/v1/media/reservation_unit_images/liikumistila2.jfif.250x250_q85_crop.jpg" />
+        <Image src={`${PUBLIC_URL}/images/unit-placeholder.jpg`} />
         <Heading>
           <H1 $noMargin>{unit?.nameFi}</H1>
           {address !== "-" ? <Address>{address}</Address> : <Address $disabled>{t("Unit.noAddress")}</Address>}
