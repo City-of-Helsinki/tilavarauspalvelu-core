@@ -279,7 +279,8 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
         router.push(getReservationPath(pk, undefined, "requires_handling"));
       } else if (state === ReservationStateChoice.WaitingForPayment) {
         const { order } = data?.confirmReservation ?? {};
-        const checkoutUrl = getCheckoutUrl(order, i18n.language);
+        const lang = convertLanguageCode(i18n.language);
+        const checkoutUrl = getCheckoutUrl(order, lang);
         if (!checkoutUrl) {
           throw new Error("No checkout url found");
         }

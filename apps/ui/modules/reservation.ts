@@ -470,15 +470,20 @@ export function getPaymentUrl(
     reservation.paymentOrder.status === OrderStatus.Draft &&
     reservation.paymentOrder.checkoutUrl
   ) {
-    return getCheckoutUrl(reservation.paymentOrder);
+    return getCheckoutUrl(reservation.paymentOrder, lang);
   }
 
   return undefined;
 }
 
 /// Get the pending payment url for a reservation (handled reservations)
+/// browser only
 function getCheckoutRedirectUrl(pk: number, lang: LocalizationLanguages, apiBaseUrl: string): string {
-  const errorUrl = new URL(`/reservations/${pk}`, window.location.origin);
+  if (window?.location == null) {
+    throw new Error("window.location is not available, cannot build redirect url");
+  }
+  const langPrefix = lang !== "fi" ? `/${lang}` : "";
+  const errorUrl = new URL(`${langPrefix}/reservations/${pk}`, window.location.origin);
   try {
     const url = new URL(`/v1/pay_pending_reservation/${pk}/`, apiBaseUrl);
     const { searchParams } = url;
@@ -497,7 +502,7 @@ function getCheckoutRedirectUrl(pk: number, lang: LocalizationLanguages, apiBase
 /// left because requires refactoring old users to include more ReservationNode parameters
 export function getCheckoutUrl(
   order: Pick<PaymentOrderNode, "checkoutUrl"> | undefined | null,
-  lang = "fi"
+  lang: LocalizationLanguages
 ): string | undefined {
   const { checkoutUrl } = order ?? {};
 

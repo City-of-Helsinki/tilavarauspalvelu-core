@@ -406,17 +406,20 @@ describe("getCheckoutUrl", () => {
   });
 
   test("returns undefined if checkoutUrl is not defined", () => {
-    expect(getCheckoutUrl({ ...order, checkoutUrl: null })).toBeUndefined();
+    expect(getCheckoutUrl({ ...order, checkoutUrl: null }, "fi")).toBeUndefined();
   });
 
   test("returns undefined if checkoutUrl is not an url", () => {
     // we are expecting console.errors => suppress
     vi.spyOn(console, "error").mockImplementation(vi.fn());
     expect(
-      getCheckoutUrl({
-        ...order,
-        checkoutUrl: "checkout.url?user=1111-2222-3333-4444",
-      })
+      getCheckoutUrl(
+        {
+          ...order,
+          checkoutUrl: "checkout.url?user=1111-2222-3333-4444",
+        },
+        "fi"
+      )
     ).toBeUndefined();
   });
 });

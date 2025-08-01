@@ -16,7 +16,7 @@ import { useCurrentUser } from "@/hooks";
 import { getCheckoutUrl } from "@/modules/reservation";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { gql, useApolloClient } from "@apollo/client";
-import { toApiDate } from "common/src/common/util";
+import { convertLanguageCode, toApiDate } from "common/src/common/util";
 import { errorToast, successToast } from "common/src/common/toast";
 import { getReservationInProgressPath } from "@/modules/urls";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
@@ -162,7 +162,8 @@ export function InProgressReservationNotification() {
 
   const [deleteReservation, { loading: isDeleteLoading }] = useDeleteReservationMutation();
 
-  const checkoutUrl = getCheckoutUrl(unpaidReservation?.paymentOrder, i18n.language);
+  const lang = convertLanguageCode(i18n.language);
+  const checkoutUrl = getCheckoutUrl(unpaidReservation?.paymentOrder, lang);
 
   // Lazy minimal query to check if the reservation is still valid
   const [reservationQ] = useReservationStateLazyQuery({
