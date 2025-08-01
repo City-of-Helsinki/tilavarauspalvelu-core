@@ -8,7 +8,6 @@ import {
   type ApplicationNameFragment,
   ApplicationStatusChoice,
   type Maybe,
-  ReserveeType,
   useCancelApplicationMutation,
 } from "@gql/gql-types";
 import { formatDateTime } from "@/modules/util";
@@ -27,21 +26,24 @@ const StyledButton = styled(Button)`
   }
 `;
 
-function getApplicant(application: ApplicationNameFragment, t: TFunction): string {
-  if (application.applicantType === ReserveeType.Individual) {
-    return t("applicationCard:person");
-  }
+function formatApplicant(
+  t: TFunction,
+  application: Pick<ApplicationNameFragment, "organisationName" | "applicantType" | "contactPersonFirstName">
+): string {
+  const type = formatApplicantType(t, application);
   if (application.organisationName) {
-    return t("applicationCard:organisation", {
-      type: t(`applicationCard:applicantType.${application.applicantType?.toLocaleLowerCase()}`),
-      name: application.organisationName || t("applicationCard:noName"),
-    });
-  }
-  if (application.contactPersonFirstName) {
-    return t("applicationCard:person");
+    return `${type}: ${application.organisationName}`;
   }
 
-  return "";
+  return type;
+}
+
+function formatApplicantType(t: TFunction, application: Pick<ApplicationNameFragment, "applicantType">): string {
+  const { applicantType } = application;
+  if (!applicantType) {
+    return "";
+  }
+  return t(`reservationApplication:reserveeTypes.labels.${applicantType}`);
 }
 
 function isEditable(status: Maybe<ApplicationStatusChoice> | undefined): boolean {
@@ -120,7 +122,7 @@ export function ApplicationCard({ application, actionCallback }: Props): JSX.Ele
     <Card
       heading={getApplicationRoundName(application.applicationRound, lang)}
       headingLevel={3}
-      text={getApplicant(application, t)}
+      text={formatApplicant(t, application)}
       tags={tags}
       buttons={buttons}
     >

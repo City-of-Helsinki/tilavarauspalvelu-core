@@ -12,7 +12,7 @@ import { IconGroup, IconUser } from "hds-react";
 import React, { Fragment } from "react";
 import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
-import { useTranslation } from "next-i18next";
+import { useTranslation, type TFunction } from "next-i18next";
 import { camelCase } from "lodash-es";
 import { MetadataSetsFragment, MunicipalityChoice, ReserveeType } from "../../gql/gql-types";
 import { ReservationFormField } from "./ReservationFormField";
@@ -22,8 +22,7 @@ import { AutoGrid, fontMedium, fontRegular, H4, H5 } from "../../styled";
 import type { OptionsRecord } from "../../types/common";
 import IconPremises from "../icons/IconPremises";
 import { containsField } from "../metaFieldsHelpers";
-import { capitalize, filterNonNullable } from "../helpers";
-import { TFunction } from "i18next";
+import { filterNonNullable } from "../helpers";
 
 type CommonProps = {
   options: Omit<OptionsRecord, "municipality">;
@@ -250,14 +249,13 @@ function CustomerTypeChoiceSelector() {
               .map(({ id, icon }) => ({
                 choice: id,
                 icon,
-                name: id.toLocaleLowerCase(),
+                name: id,
               }))
               .map(({ choice, icon, name }) => (
                 <RadioButtonWithImage
                   key={choice}
                   id={`reserveeType__${name}`}
-                  // TODO use the enum translation key
-                  label={capitalize(t(`reservationApplication:reserveeTypes.labels.${name}`))}
+                  label={t(`reservationApplication:reserveeTypes.labels.${name}`)}
                   onClick={() => onChange(choice)}
                   icon={icon}
                   checked={value === choice}

@@ -6,9 +6,9 @@
   "reserveeTypePrefix": "I am creating the application...",
   "reserveeTypes": {
     "labels": {
-      "nonprofit": "on behalf of an association or community",
-      "company": "on behalf of the company",
-      "individual": "as a private person"
+      "NONPROFIT": "On behalf of an association or community",
+      "COMPANY": "On behalf of the company",
+      "INDIVIDUAL": "As a private person"
     }
   },
   "label": {

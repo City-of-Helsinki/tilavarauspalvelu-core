@@ -6,13 +6,5 @@
   "edit": "Redigera",
   "cancel": "Ångra",
   "view": "Visa",
-  "reservations": "Bokningar",
-  "saved": "Senast sparad:",
-  "person": "Ansökan skapad: som privatperson",
-  "organisation": "Ansökan skapad: {{type}}, {{name}}",
-  "applicantType": {
-    "community": "förening",
-    "association": "för en registrerad förening",
-    "company": "företag"
-  }
+  "saved": "Senast sparad:"
 }
