@@ -1,19 +1,15 @@
 import React, { useState } from "react";
 import { gql } from "@apollo/client";
-import {
-  ReservationUnitOrderingChoices,
-  ReservationUnitPublishingState,
-  useSearchReservationUnitsQuery,
-} from "@gql/gql-types";
-import { filterNonNullable, toNumber } from "common/src/helpers";
+import { ReservationUnitOrderingChoices, useSearchReservationUnitsQuery } from "@gql/gql-types";
+import { filterNonNullable, mapParamToInterger, toInteger } from "common/src/helpers";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { More } from "@/component/More";
 import { ReservationUnitsTable } from "./ReservationUnitsTable";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { CenterSpinner } from "common/styled";
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
-import { mapParamToNumber } from "@/helpers";
+import { transformReservationUnitState } from "common/src/conversion";
 
 function transformOrderBy(orderBy: string, desc: boolean): ReservationUnitOrderingChoices | null {
   switch (orderBy) {
@@ -47,27 +43,6 @@ function transformSortString(orderBy: string | null): ReservationUnitOrderingCho
   return [];
 }
 
-function convertToReservationUnitState(state: string): ReservationUnitPublishingState | null {
-  switch (state) {
-    case ReservationUnitPublishingState.Archived:
-      return ReservationUnitPublishingState.Archived;
-    case ReservationUnitPublishingState.Draft:
-      return ReservationUnitPublishingState.Draft;
-    case ReservationUnitPublishingState.Hidden:
-      return ReservationUnitPublishingState.Hidden;
-    case ReservationUnitPublishingState.Published:
-      return ReservationUnitPublishingState.Published;
-    case ReservationUnitPublishingState.ScheduledHiding:
-      return ReservationUnitPublishingState.ScheduledHiding;
-    case ReservationUnitPublishingState.ScheduledPeriod:
-      return ReservationUnitPublishingState.ScheduledPeriod;
-    case ReservationUnitPublishingState.ScheduledPublishing:
-      return ReservationUnitPublishingState.ScheduledPublishing;
-    default:
-      return null;
-  }
-}
-
 export function ReservationUnitsDataReader(): JSX.Element {
   const [sort, setSort] = useState<string>("");
   const onSortChanged = (sortField: string) => {
@@ -85,15 +60,16 @@ export function ReservationUnitsDataReader(): JSX.Element {
 
   const reservationUnitStates = searchParams.getAll("reservationUnitState");
 
-  const unit = mapParamToNumber(searchParams.getAll("unit"), 1);
-  const unitGroupFilter = mapParamToNumber(searchParams.getAll("unitGroup"), 1);
+  const unit = mapParamToInterger(searchParams.getAll("unit"), 1);
+  const unitGroupFilter = mapParamToInterger(searchParams.getAll("unitGroup"), 1);
 
   const searchFilter = searchParams.get("search");
-  // it's typed string but it's actually a number (python Decimal)
-  const maxPersonsLte = toNumber(searchParams.get("maxPersonsLte"));
-  const maxPersonsGte = toNumber(searchParams.get("maxPersonsGte"));
-  const surfaceAreaLte = toNumber(searchParams.get("surfaceAreaLte"));
-  const surfaceAreaGte = toNumber(searchParams.get("surfaceAreaGte"));
+  // backend error if these are floats
+  // could show validation errors for these but since it's not that important just clip the values to integers
+  const maxPersonsLte = toInteger(searchParams.get("maxPersonsLte"));
+  const maxPersonsGte = toInteger(searchParams.get("maxPersonsGte"));
+  const surfaceAreaLte = toInteger(searchParams.get("surfaceAreaLte"));
+  const surfaceAreaGte = toInteger(searchParams.get("surfaceAreaGte"));
 
   const { t } = useTranslation();
 
@@ -108,7 +84,7 @@ export function ReservationUnitsDataReader(): JSX.Element {
       textSearch: searchFilter,
       unit,
       unitGroup: unitGroupFilter,
-      publishingState: reservationUnitStates.map((state) => convertToReservationUnitState(state)),
+      publishingState: reservationUnitStates.map((state) => transformReservationUnitState(state)),
       reservationUnitType: reservationUnitTypes,
     },
     onError: () => {

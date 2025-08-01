@@ -7,13 +7,14 @@ import { breakpoints } from "../const";
 import {
   BannerNotificationLevel,
   BannerNotificationTarget,
-  useBannerNotificationsListAllQuery,
-  useBannerNotificationsListQuery,
-  type BannerNotificationCommonFragment,
+  useShowNotificationsListQuery,
+  type ShowNotificationFieldsFragment,
 } from "../../gql/gql-types";
 import { filterNonNullable } from "../helpers";
 import { useTranslation } from "next-i18next";
 import { convertLanguageCode, getTranslationSafe } from "../common/util";
+import { gql } from "@apollo/client";
+import { ClientOnly } from "./ClientOnly";
 
 type BannerNotificationListProps = {
   target: BannerNotificationTarget;
@@ -21,14 +22,17 @@ type BannerNotificationListProps = {
 };
 
 type NotificationsListItemProps = {
-  notification: BannerNotificationCommonFragment;
+  notification: ShowNotificationFieldsFragment;
   closeFn: React.Dispatch<React.SetStateAction<string[] | undefined>>;
   closedArray: string[];
 };
 
 const PositionWrapper = styled.div`
-  width: 100%;
+  width: 100vw;
   display: grid;
+  position: relative;
+  margin-left: -50vw;
+  left: 50%;
 `;
 
 const BannerNotificationBackground = styled.div`
@@ -104,19 +108,14 @@ function NotificationsListItem({ notification, closeFn, closedArray }: Notificat
 /// @desc A component which returns a list of styled banner notifications, clipped at the specified amount, targeted to the specified targets and ordered by level
 /// TODO under testing: can't do target checks to the query because backend doesn't allow querying target without can_manage_notifications permission
 const BannerNotificationsList = ({ target, displayAmount = 2 }: BannerNotificationListProps) => {
-  // no-cache is required because admin is caching bannerNotifications query and
-  // there is no key setup for this so this query returns garbage from the admin cache.
-  const { data } = useBannerNotificationsListQuery({
+  const { data } = useShowNotificationsListQuery({
     variables: {
       target,
     },
-    fetchPolicy: "no-cache",
-  });
-  const { data: dataAll } = useBannerNotificationsListAllQuery({
-    fetchPolicy: "no-cache",
+    fetchPolicy: "cache-first",
   });
   const notificationsTarget = data?.bannerNotifications;
-  const notificationsAll = dataAll?.bannerNotifications;
+  const notificationsAll = data?.bannerNotificationsAll;
   const comb = [...(notificationsAll?.edges ?? []), ...(notificationsTarget?.edges ?? [])];
   const notificationsList = filterNonNullable(comb.map((edge) => edge?.node));
 
@@ -141,16 +140,50 @@ const BannerNotificationsList = ({ target, displayAmount = 2 }: BannerNotificati
 
   return (
     <PositionWrapper>
-      {displayedNotificationsList?.slice(0, displayAmount).map((notification) => (
-        <NotificationsListItem
-          key={notification?.id}
-          notification={notification}
-          closedArray={closedNotificationsList ?? []}
-          closeFn={setClosedNotificationsList}
-        />
-      ))}
+      {/* Because of the use of Local storage this has to be ClientOnly, causing page layout shift */}
+      <ClientOnly>
+        {displayedNotificationsList?.slice(0, displayAmount).map((notification) => (
+          <NotificationsListItem
+            key={notification?.id}
+            notification={notification}
+            closedArray={closedNotificationsList ?? []}
+            closeFn={setClosedNotificationsList}
+          />
+        ))}
+      </ClientOnly>
     </PositionWrapper>
   );
 };
 
 export default BannerNotificationsList;
+
+export const BANNER_NOTIFICATION_COMMON_FRAGMENT = gql`
+  fragment ShowNotificationFields on BannerNotificationNode {
+    id
+    level
+    activeFrom
+    messageEn
+    messageFi
+    messageSv
+  }
+`;
+
+// Always get ALL target + either USER or STAFF target
+export const NOTIFICATIONS_LIST_ALL = gql`
+  query ShowNotificationsList($target: BannerNotificationTarget!) {
+    bannerNotifications(isVisible: true, target: $target) {
+      edges {
+        node {
+          ...ShowNotificationFields
+        }
+      }
+    }
+    bannerNotificationsAll: bannerNotifications(isVisible: true, target: ALL) {
+      edges {
+        node {
+          ...ShowNotificationFields
+        }
+      }
+    }
+  }
+`;

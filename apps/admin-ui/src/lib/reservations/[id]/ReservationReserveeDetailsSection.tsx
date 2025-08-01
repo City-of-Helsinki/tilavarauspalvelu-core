@@ -20,7 +20,7 @@ import {
 } from "hds-react";
 import { Flex, H5 } from "common/styled";
 import styled from "styled-components";
-import { useSession } from "@/hooks/auth";
+import { useSession } from "@/hooks";
 import { trim } from "lodash-es";
 import { gql } from "@apollo/client";
 import { formatDate } from "@/common/util";

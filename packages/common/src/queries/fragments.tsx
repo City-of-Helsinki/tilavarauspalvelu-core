@@ -114,17 +114,6 @@ export const LOCATION_FRAGMENT_I18N = gql`
   }
 `;
 
-export const BANNER_NOTIFICATION_COMMON_FRAGMENT = gql`
-  fragment BannerNotificationCommon on BannerNotificationNode {
-    id
-    level
-    activeFrom
-    messageEn
-    messageFi
-    messageSv
-  }
-`;
-
 export const METADATA_SETS_FRAGMENT = gql`
   fragment MetadataSets on ReservationUnitNode {
     id

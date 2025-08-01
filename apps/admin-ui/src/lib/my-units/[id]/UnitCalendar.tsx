@@ -1,20 +1,17 @@
 import React, { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
-import { addMinutes, differenceInMinutes, isToday, setHours, startOfDay } from "date-fns";
+import { differenceInMinutes, isToday, setHours, startOfDay } from "date-fns";
 import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
-import { ReservationTypeChoice, type ReservationUnitReservationsFragment, UserPermissionChoice } from "@gql/gql-types";
+import { ReservationTypeChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
 import { useTranslation, type TFunction } from "next-i18next";
 import { CalendarEvent } from "common/src/calendar/Calendar";
 import { focusStyles } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { POST_PAUSE, PRE_PAUSE } from "@/common/calendarStyling";
-import { getReserveeName, sortByName } from "@/common/util";
-import { useModal } from "@/context/ModalContext";
+import { getReserveeName } from "@/common/util";
 import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";
 import { ReservationPopupContent } from "./ReservationPopupContent";
 import eventStyleGetter from "./eventStyleGetter";
-import { CreateReservationModal } from "./CreateReservationModal";
-import { useCheckPermission } from "@/hooks";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
@@ -190,7 +187,6 @@ type CellProps = {
   reservationUnitPk: number;
   date: Date;
   onComplete: () => void;
-  reservationUnitOptions: { label: string; value: number }[];
   hasPermission: boolean;
 };
 
@@ -213,11 +209,8 @@ function Cell({
   date,
   hasPermission,
   reservationUnitPk,
-  reservationUnitOptions,
-  onComplete,
 }: { offset: number } & Omit<CellProps, "cols">): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
-  const { setModalContent } = useModal();
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
 
@@ -226,24 +219,19 @@ function Cell({
     return setHours(date, Math.round(index / 2)) < now;
   };
 
+  const cellId = `${reservationUnitPk}-${offset}`;
+  const testId = `UnitCalendar__RowCalendar--cell-${cellId}`;
+
   const handleOpenModal = () => {
     if (!hasPermission) {
       return;
     }
     const params = new URLSearchParams(searchParams);
     params.set("reservationUnit", reservationUnitPk.toString());
+    params.set("isModalOpen", "true");
+    params.set("timeOffset", offset.toString());
+    params.set("cellId", cellId);
     setParams(params);
-    setModalContent(
-      <CreateReservationModal
-        reservationUnitOptions={reservationUnitOptions}
-        focusAfterCloseRef={ref}
-        start={addMinutes(new Date(date), offset * 30)}
-        onClose={() => {
-          setModalContent(null);
-          onComplete();
-        }}
-      />
-    );
   };
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -257,8 +245,6 @@ function Cell({
       handleOpenModal();
     }
   };
-
-  const testId = `UnitCalendar__RowCalendar--cell-${reservationUnitPk}-${offset}`;
 
   return (
     <CellStyled
@@ -424,6 +410,10 @@ function Events({ events, styleGetter }: { events: CalendarEventType[]; styleGet
   );
 }
 
+function sortByName(a?: string, b?: string): number {
+  return a && b ? a.toLowerCase().localeCompare(b.toLowerCase()) : !a ? 1 : -1;
+}
+
 function sortByDraftStatusAndTitle(resources: Resource[]) {
   return resources.sort((a, b) => {
     const draftComparison: number = Number(a.isDraft) - Number(b.isDraft);
@@ -433,16 +423,20 @@ function sortByDraftStatusAndTitle(resources: Resource[]) {
   });
 }
 
-type Props = {
+interface UnitCalendarProps {
   date: Date;
-  unitPk: number;
   resources: Resource[];
   refetch: () => void;
   isLoading?: boolean;
-  reservationUnitOptions: { label: string; value: number }[];
-};
+  canCreateReservations?: boolean;
+}
 
-export function UnitCalendar({ unitPk, date, resources, refetch, reservationUnitOptions }: Props): JSX.Element {
+export function UnitCalendar({
+  date,
+  resources,
+  refetch,
+  canCreateReservations = false,
+}: UnitCalendarProps): JSX.Element {
   const calendarRef = useRef<HTMLDivElement>(null);
   const orderedResources = sortByDraftStatusAndTitle([...resources]);
   const startDate = startOfDay(date);
@@ -487,21 +481,12 @@ export function UnitCalendar({ unitPk, date, resources, refetch, reservationUnit
     return () => window.removeEventListener("resize", updateSize);
   }, []);
 
-  const { hasPermission } = useCheckPermission({
-    units: [unitPk],
-    permission: UserPermissionChoice.CanCreateStaffReservations,
-  });
-
   const margins = windowHeight < MOBILE_CUTOFF ? MOBILE_MARGIN : DESKTOP_MARGIN;
   const containerHeight = windowHeight - margins;
 
   const height = resources.length > MAX_RESOURCES_WITHOUT_SCROLL ? containerHeight : "auto";
-  /* TODO use a darker background if loading
-  if (isLoading) {
-    return <CenterSpinner />;
-  }
-  */
 
+  /* TODO use a darker background if loading */
   return (
     <Container $height={height}>
       <HideTimesOverTitles />
@@ -524,8 +509,7 @@ export function UnitCalendar({ unitPk, date, resources, refetch, reservationUnit
                 cols={N_COLS}
                 date={startDate}
                 reservationUnitPk={row.pk}
-                reservationUnitOptions={reservationUnitOptions}
-                hasPermission={hasPermission ?? false}
+                hasPermission={canCreateReservations}
                 onComplete={refetch}
               />
               {/* TODO events should be over the cells (tabindex is not correct now) */}

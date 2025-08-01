@@ -5,12 +5,11 @@ import { H1 } from "common/styled";
 import { Filters, ReservationsDataLoader } from "@lib/reservations";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useSearchParams } from "next/navigation";
-import { AuthorizationChecker } from "@/common/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 
-export function ListReservations(): JSX.Element {
+export default function ListReservationsPage(): JSX.Element {
   const { t } = useTranslation();
 
   const today = useMemo(() => new Date(), []);
@@ -45,15 +44,6 @@ export function ListReservations(): JSX.Element {
       />
       <ReservationsDataLoader />
     </>
-  );
-}
-
-type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-export default function Page(props: PageProps): JSX.Element {
-  return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl}>
-      <ListReservations />
-    </AuthorizationChecker>
   );
 }
 

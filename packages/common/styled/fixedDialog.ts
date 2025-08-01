@@ -8,7 +8,7 @@ export interface FixedDialogProps {
 /// Export only the CSS because exporting styled(Dialog) from common breaks Dialog.Title (close btn / focus)
 export const fixedDialogCss = css<FixedDialogProps>`
   /* Hack to deal with modal trying to fit content. So an error message -> layout shift */
-  && {
+  &&& {
     /* stylelint-disable custom-property-pattern */
     width: min(calc(100vw - 2rem), var(--container-width-${(props) => props.$maxWidth ?? "l"}));
     /* stylelint-enable custom-property-pattern */

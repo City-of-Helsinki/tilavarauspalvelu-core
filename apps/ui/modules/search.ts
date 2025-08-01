@@ -1,6 +1,12 @@
 /// This file contains the search query for reservation units
 /// e.g. the common search pages (both seasonal and single)
-import { filterNonNullable, getLocalizationLang, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import {
+  filterNonNullable,
+  getLocalizationLang,
+  ignoreMaybeArray,
+  mapParamToInterger,
+  toNumber,
+} from "common/src/helpers";
 import { type LocalizationLanguages } from "common/src/urlBuilder";
 import {
   EquipmentOrderingChoices,
@@ -23,6 +29,7 @@ import { SEARCH_PAGING_LIMIT } from "./const";
 import { gql, type ApolloClient } from "@apollo/client";
 import { type ReadonlyURLSearchParams } from "next/navigation";
 import { transformAccessTypeSafe } from "common/src/conversion";
+import { type OptionsListT, type OptionT } from "common/src/modules/search";
 
 function transformOrderByName(desc: boolean, language: LocalizationLanguages) {
   if (language === "fi") {
@@ -118,10 +125,10 @@ export function processVariables({
   const isSeasonal = kind === ReservationKind.Season;
   const textSearch = values.get("textSearch");
   const personsAllowed = toNumber(values.get("personsAllowed"));
-  const purposes = mapParamToNumber(values.getAll("purposes"), 1);
-  const unit = mapParamToNumber(values.getAll("units"), 1);
-  const reservationUnitTypes = mapParamToNumber(values.getAll("reservationUnitTypes"), 1);
-  const equipments = mapParamToNumber(values.getAll("equipments"), 1);
+  const purposes = mapParamToInterger(values.getAll("purposes"), 1);
+  const unit = mapParamToInterger(values.getAll("units"), 1);
+  const reservationUnitTypes = mapParamToInterger(values.getAll("reservationUnitTypes"), 1);
+  const equipments = mapParamToInterger(values.getAll("equipments"), 1);
   const showOnlyReservable = ignoreMaybeArray(values.getAll("showOnlyReservable")) !== "false";
   const applicationRound = "applicationRound" in rest && isSeasonal ? rest.applicationRound : null;
   const reservationPeriodBeginDate =
@@ -167,11 +174,6 @@ export function processVariables({
   };
 }
 
-export function mapParamToNumber(param: string[], min?: number): number[] {
-  const numbers = param.map(Number).filter(Number.isInteger);
-  return min != null ? numbers.filter((n) => n >= min) : numbers;
-}
-
 export function translateOption(
   val: {
     pk: Maybe<number>;
@@ -187,21 +189,11 @@ export function translateOption(
   };
 }
 
-type OptionT = Readonly<{ value: number; label: string }>;
-export type OptionsT = Readonly<{
-  units: Readonly<OptionT[]>;
-  equipments: Readonly<OptionT[]>;
-  purposes: Readonly<OptionT[]>;
-  reservationUnitTypes: Readonly<OptionT[]>;
-  ageGroups: Readonly<OptionT[]>;
-  municipalities: Readonly<{ value: MunicipalityChoice; label: string }[]>;
-}>;
-
 export async function getSearchOptions(
   apolloClient: ApolloClient<unknown>,
   page: "seasonal" | "direct",
   locale: string
-): Promise<OptionsT> {
+): Promise<OptionsListT> {
   const lang = convertLanguageCode(locale);
   const { data: optionsData } = await apolloClient.query<OptionsQuery, OptionsQueryVariables>({
     query: OptionsDocument,

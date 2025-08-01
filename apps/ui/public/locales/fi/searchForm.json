@@ -3,7 +3,6 @@
   "showMoreFilters": "Tarkennettu haku",
   "showLessFilters": "Näytä vähemmän vaihtoehtoja",
   "beginTimeIsBeforeEndTime": "Alkamisajan on oltava ennen loppumisaikaa",
-  "resetForm": "Tyhjennä",
   "placeholders": {
     "textSearch": "Hae tiloja tai laitetta"
   },

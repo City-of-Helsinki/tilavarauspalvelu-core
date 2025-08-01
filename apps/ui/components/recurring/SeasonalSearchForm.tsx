@@ -1,15 +1,15 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { TextInput, IconSearch, LoadingSpinner, ButtonVariant } from "hds-react";
+import { TextInput } from "hds-react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { FilterTagList } from "../FilterTagList";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { mapParamToNumber, type OptionsT } from "@/modules/search";
-import { SearchButtonContainer, StyledSubmitButton } from "../search/styled";
+import { type OptionsListT } from "common/src/modules/search";
+import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
 import { ControlledNumberInput } from "common/src/components/form";
-import { toNumber } from "common/src/helpers";
+import { mapParamToInterger, toNumber } from "common/src/helpers";
 import { AutoGrid, Flex } from "common/styled";
 
 const filterOrder = [
@@ -33,9 +33,9 @@ export type SearchFormValues = {
 // TODO combine as much as possible with the one in single-search (move them to a common place)
 function mapSeasonalQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
   return {
-    purposes: mapParamToNumber(params.getAll("purposes"), 1),
-    units: mapParamToNumber(params.getAll("units"), 1),
-    reservationUnitTypes: mapParamToNumber(params.getAll("reservationUnitTypes"), 1),
+    purposes: mapParamToInterger(params.getAll("purposes"), 1),
+    units: mapParamToInterger(params.getAll("units"), 1),
+    reservationUnitTypes: mapParamToInterger(params.getAll("reservationUnitTypes"), 1),
     personsAllowed: toNumber(params.get("personsAllowed")),
     textSearch: params.get("textSearch") ?? "",
     accessTypes: params.getAll("accessTypes"),
@@ -43,7 +43,7 @@ function mapSeasonalQueryToForm(params: ReadonlyURLSearchParams): SearchFormValu
 }
 
 export type SearchFormProps = {
-  options: Pick<OptionsT, "purposes" | "reservationUnitTypes" | "units">;
+  options: Pick<OptionsListT, "purposes" | "reservationUnitTypes" | "units">;
   handleSearch: SubmitHandler<SearchFormValues>;
   isLoading: boolean;
 };
@@ -164,14 +164,7 @@ export function SeasonalSearchForm({
           multiSelectFilters={multiSelectFilters}
           hideList={hideList}
         />
-        <StyledSubmitButton
-          type="submit"
-          variant={isLoading ? ButtonVariant.Clear : ButtonVariant.Primary}
-          iconStart={isLoading ? <LoadingSpinner small /> : <IconSearch />}
-          disabled={isLoading}
-        >
-          {t("searchForm:searchButton")}
-        </StyledSubmitButton>
+        <SearchButton isLoading={isLoading} labelKey="searchForm:searchButton" />
       </SearchButtonContainer>
     </Flex>
   );

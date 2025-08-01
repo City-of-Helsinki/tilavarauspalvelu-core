@@ -7,8 +7,8 @@ import { ReservationKind, type ReservationUnitHeadFragment } from "@gql/gql-type
 import { Flex, H1, H3 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { formatDateRange, formatDateTime } from "@/modules/util";
-import { IconWithText } from "../common/IconWithText";
-import { Images } from "./";
+import { IconWithText } from "@/components/common/IconWithText";
+import { Images } from "./Images";
 import {
   getActivePricing,
   getPriceString,

@@ -26,7 +26,7 @@ import { capitalize, filterNonNullable } from "../helpers";
 import { TFunction } from "i18next";
 
 type CommonProps = {
-  options: Omit<OptionsRecord, "municipality">;
+  options: Readonly<Omit<OptionsRecord, "municipality">>;
   data?: {
     termsForDiscount?: JSX.Element | string;
   };

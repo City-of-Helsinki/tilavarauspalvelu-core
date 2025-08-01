@@ -6,8 +6,7 @@ import { useTranslation } from "next-i18next";
 import { H2 } from "common/styled";
 import { HERO_IMAGE_URL } from "@/common/const";
 import { KorosHeading, Heading } from "@/component/KorosHeading";
-import { useSession } from "@/hooks/auth";
-import { AuthorizationChecker } from "@/common/AuthorizationChecker";
+import { useSession } from "@/hooks";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 const Ingress = styled(H2)`
@@ -18,7 +17,8 @@ const Ingress = styled(H2)`
   line-height: 1.8125rem;
 `;
 
-function HomePage(): JSX.Element {
+export type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+export default function Index(_props: PageProps) {
   const { t } = useTranslation();
 
   const { user } = useSession();
@@ -43,15 +43,6 @@ function HomePage(): JSX.Element {
       </KorosHeading>
       <Ingress as="p">{t("translation:MainLander.ingress")}</Ingress>
     </div>
-  );
-}
-
-export type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-export default function Index(props: PageProps) {
-  return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl}>
-      <HomePage />
-    </AuthorizationChecker>
   );
 }
 

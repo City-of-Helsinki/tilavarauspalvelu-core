@@ -15,7 +15,7 @@ import {
 import { useModal } from "@/context/ModalContext";
 import { CenterSpinner, Flex } from "common/styled";
 import { useDenyReasonOptions } from "@/hooks";
-import { successToast } from "common/src/common/toast";
+import { successToast } from "common/src/components/toast";
 import { ApolloError, gql } from "@apollo/client";
 import { convertOptionToHDS, toNumber } from "common/src/helpers";
 import { useDisplayError } from "common/src/hooks";

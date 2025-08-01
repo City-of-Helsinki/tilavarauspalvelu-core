@@ -2,8 +2,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { DateInput } from "hds-react";
 import styled from "styled-components";
-import { useSearchParams } from "next/navigation";
-import { useSetSearchParams } from "@/hooks/useSetSearchParams";
+import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
 
 const DateRangeFilterWrapper = styled.div`
   display: grid;
@@ -20,43 +19,67 @@ const DateRangeFilterWrapper = styled.div`
   }
 `;
 
-export function DateRangeFilter({ name }: { name: string }) {
-  const names = {
-    begin: `${name}Gte`,
-    end: `${name}Lte`,
+interface BaseDateRangeFilterProps {
+  filter: {
+    begin: string | null;
+    end: string | null;
   };
-  const { t } = useTranslation();
-  const searchParams = useSearchParams();
-  const setParams = useSetSearchParams();
-  const beginFilter = searchParams.get(names.begin);
-  const endFilter = searchParams.get(names.end);
-
-  const handleChange = (val: string, paramName: string) => {
-    const params = new URLSearchParams(searchParams);
-    if (val.length > 0) {
-      params.set(paramName, val);
-    }
-    setParams(params);
+  names: {
+    begin: string;
+    end: string;
   };
+  onChange: (val: string, paramName: string) => void;
+}
 
+function BaseDateRangeFilter({ filter, names, onChange }: BaseDateRangeFilterProps): JSX.Element {
+  const { t } = useTranslation("filters");
   return (
     <DateRangeFilterWrapper>
       <DateInput
         language="fi"
         id={names.begin}
-        label={t(`filters:label.${names.begin}`)}
-        placeholder={t(`filters:placeholder.${names.begin}`)}
-        onChange={(val: string) => handleChange(val, names.begin)}
-        value={beginFilter ?? ""}
+        label={t(`label.${names.begin}`)}
+        placeholder={t(`placeholder.${names.begin}`)}
+        onChange={(val: string) => onChange(val, names.begin)}
+        value={filter.begin ?? ""}
       />
       <DateInput
         language="fi"
         id={names.end}
-        label={t(`filters:label.${names.end}`)}
-        placeholder={t(`filters:placeholder.${names.end}`)}
-        onChange={(val: string) => handleChange(val, names.end)}
-        value={endFilter ?? ""}
+        label={t(`label.${names.end}`)}
+        placeholder={t(`placeholder.${names.end}`)}
+        onChange={(val: string) => onChange(val, names.end)}
+        value={filter.end ?? ""}
       />
     </DateRangeFilterWrapper>
   );
+}
+
+interface ControlledDateRangeFilterProps<T extends FieldValues> extends Omit<UseControllerProps<T>, "name"> {
+  nameBegin: Path<T>;
+  nameEnd: Path<T>;
+  control: Control<T>;
+}
+
+export function ControlledDateRangeFilter<T extends FieldValues>({
+  nameBegin,
+  nameEnd,
+  control,
+}: ControlledDateRangeFilterProps<T>): JSX.Element {
+  const { field: fieldBegin } = useController({ name: nameBegin, control });
+  const { field: fieldEnd } = useController({ name: nameEnd, control });
+
+  const beginFilter = fieldBegin.value;
+  const endFilter = fieldEnd.value;
+
+  const handleChange = (val: string, paramName: string) => {
+    if (paramName === nameBegin) {
+      fieldBegin.onChange(val);
+    } else if (paramName === nameEnd) {
+      fieldEnd.onChange(val);
+    }
+  };
+
+  const names = { begin: nameBegin, end: nameEnd };
+  return <BaseDateRangeFilter filter={{ begin: beginFilter, end: endFilter }} names={names} onChange={handleChange} />;
 }

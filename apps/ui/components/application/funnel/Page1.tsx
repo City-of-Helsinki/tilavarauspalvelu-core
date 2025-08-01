@@ -8,11 +8,11 @@ import { type ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { useReservationUnitList } from "@/hooks";
 import { ApplicationSectionPage1 } from ".";
 import { type ApplicationPage1FormValues, createDefaultPage1Section } from "./form";
-import { type OptionsT } from "@/modules/search";
+import { type OptionsListT } from "common/src/modules/search";
 
 type Page1Props = Readonly<{
   applicationRound: Readonly<ApplicationRoundForApplicationFragment>;
-  options: Readonly<OptionsT>;
+  options: Readonly<OptionsListT>;
 }>;
 
 export function Page1({ applicationRound, options }: Page1Props): JSX.Element | null {

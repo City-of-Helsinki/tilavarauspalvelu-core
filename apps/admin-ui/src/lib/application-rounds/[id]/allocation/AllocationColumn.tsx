@@ -11,7 +11,7 @@ import {
   Weekday,
   type ReservationUnitNode,
 } from "@gql/gql-types";
-import { ShowAllContainer } from "common/src/components/";
+import { ShowAllContainer } from "common/src/components";
 import { transformWeekday } from "common/src/conversion";
 import { type DayT } from "common/src/const";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";

@@ -1,9 +1,9 @@
 import React from "react";
-import ErrorContainer from "common/src/components/ErrorContainer";
-import { env } from "../env.mjs";
+import { ErrorContainer } from "common/src/components";
 import { PUBLIC_URL } from "@/common/const";
+import { env } from "../env.mjs";
 
-function Error404(): JSX.Element {
+export function Error404(): JSX.Element {
   return (
     <ErrorContainer
       statusCode={404}
@@ -12,5 +12,3 @@ function Error404(): JSX.Element {
     />
   );
 }
-
-export default Error404;

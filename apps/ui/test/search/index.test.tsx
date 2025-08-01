@@ -3,7 +3,7 @@ import { render, within } from "@testing-library/react";
 import SearchSingle from "@/pages/search";
 import { createOptionMock } from "@/test/test.gql.utils";
 import { AccessType } from "@gql/gql-types";
-import type { OptionsT } from "@/modules/search";
+import { type OptionsListT } from "common/src/modules/search";
 import { MockedGraphQLProvider } from "../test.react.utils";
 import { createGraphQLMocks } from "../gql.mocks";
 
@@ -34,7 +34,7 @@ vi.mock("next/router", () => ({
   useRouter,
 }));
 
-const options: OptionsT = createOptionMock();
+const options: OptionsListT = createOptionMock();
 const accessTypeOptions = Object.values(AccessType).map((value) => ({
   value,
   label: `access type ${value}`,
