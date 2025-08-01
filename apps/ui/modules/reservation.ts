@@ -477,8 +477,13 @@ export function getPaymentUrl(
 }
 
 /// Get the pending payment url for a reservation (handled reservations)
+/// browser only
 function getCheckoutRedirectUrl(pk: number, lang: LocalizationLanguages, apiBaseUrl: string): string {
-  const errorUrl = new URL(`/reservations/${pk}`, window.location.origin);
+  if (window?.location == null) {
+    throw new Error("window.location is not available, cannot build redirect url");
+  }
+  const langPrefix = lang !== "fi" ? `/${lang}` : "";
+  const errorUrl = new URL(`${langPrefix}/reservations/${pk}`, window.location.origin);
   try {
     const url = new URL(`/v1/pay_pending_reservation/${pk}/`, apiBaseUrl);
     const { searchParams } = url;
