@@ -4,7 +4,6 @@ import dataclasses
 from typing import Literal, NamedTuple
 
 import pytest
-from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.models import ReservationUnit
 

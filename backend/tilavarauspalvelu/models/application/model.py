@@ -151,7 +151,7 @@ class Application(SerializableMixin, models.Model):
                 models.Q(sent_at__isnull=True),
                 then=models.Value(ApplicationStatusChoice.EXPIRED.value),
             ),
-            # NOTE: Some copy-pasta from Application Round status for efficiency
+            # NOTE: Some copy-pasta from `ApplicationRound.status` for efficiency
             models.When(
                 # If the application round has been marked as sent
                 models.Q(application_round__sent_at__isnull=False),
@@ -173,7 +173,7 @@ class Application(SerializableMixin, models.Model):
                 then=models.Value(ApplicationStatusChoice.IN_ALLOCATION.value),
             ),
             default=models.Value(ApplicationStatusChoice.HANDLED.value),
-            output_field=models.CharField(),
+            output_field=TextChoicesField(choices_enum=ApplicationStatusChoice),
         )
 
     @status.override

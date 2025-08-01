@@ -8,6 +8,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
+from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import (
     ApplicationRoundReservationCreationStatusChoice,
@@ -156,7 +157,7 @@ class ApplicationRound(models.Model):
                 then=models.Value(ApplicationRoundStatusChoice.OPEN.value),
             ),
             default=models.Value(ApplicationRoundStatusChoice.IN_ALLOCATION.value),
-            output_field=models.CharField(),
+            output_field=TextChoicesField(choices_enum=ApplicationRoundStatusChoice),
         )
 
     @status.override
@@ -192,7 +193,7 @@ class ApplicationRound(models.Model):
                 then=models.F("application_period_begins_at"),
             ),
             default=models.F("application_period_ends_at"),  # IN_ALLOCATION
-            output_field=models.DateTimeField(),
+            output_field=models.DateTimeField(null=True),
         )
 
     @status_timestamp.override
@@ -255,12 +256,7 @@ class ApplicationRound(models.Model):
         from tilavarauspalvelu.models import ReservationSeries
 
         timeout = datetime.timedelta(minutes=settings.APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES)
-
-        reservation_series_filters = {
-            "allocated_time_slot__reservation_unit_option__application_section__application__application_round": (
-                models.OuterRef("id")
-            )
-        }
+        lookup = "allocated_time_slot__reservation_unit_option__application_section__application__application_round"
 
         return models.Case(  # type: ignore[return-value]
             models.When(
@@ -268,7 +264,7 @@ class ApplicationRound(models.Model):
                 then=models.Value(ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED.value),
             ),
             models.When(
-                models.Exists(ReservationSeries.objects.filter(**reservation_series_filters)),
+                models.Exists(ReservationSeries.objects.filter(**{lookup: models.OuterRef("id")})),
                 then=models.Value(ApplicationRoundReservationCreationStatusChoice.COMPLETED.value),
             ),
             models.When(
@@ -276,7 +272,7 @@ class ApplicationRound(models.Model):
                 then=models.Value(ApplicationRoundReservationCreationStatusChoice.FAILED.value),
             ),
             default=models.Value(ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED.value),
-            output_field=models.CharField(),
+            output_field=TextChoicesField(choices_enum=ApplicationRoundReservationCreationStatusChoice),
         )
 
     @reservation_creation_status.override

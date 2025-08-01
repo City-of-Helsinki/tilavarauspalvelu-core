@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
-from graphene_django_extensions.testing import build_mutation
 
 from tilavarauspalvelu.enums import (
     AccessType,

@@ -3,12 +3,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
-from graphene_django_extensions.testing import parametrize_helper
 
 from tilavarauspalvelu.enums import BannerNotificationTarget, UserRoleChoice
 
 from tests.factories import BannerNotificationFactory
 from tests.factories.banner_notification import BannerNotificationBuilder
+from tests.helpers import parametrize_helper
 
 from .helpers import FieldParams, TargetParams, UserType, UserTypeParams
 

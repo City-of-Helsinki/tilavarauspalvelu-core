@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Any, NamedTuple
 import freezegun
 import pytest
 from freezegun import freeze_time
-from graphene_django_extensions.testing import parametrize_helper
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -39,7 +38,7 @@ from tests.factories import (
     SpaceFactory,
     UserFactory,
 )
-from tests.helpers import ResponseMock, patch_method
+from tests.helpers import ResponseMock, parametrize_helper, patch_method
 
 from .helpers import CREATE_MUTATION, get_create_data, mock_profile_reader
 

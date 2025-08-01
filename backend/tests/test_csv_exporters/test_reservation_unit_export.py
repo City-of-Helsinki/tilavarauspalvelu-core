@@ -5,7 +5,6 @@ import itertools
 from decimal import Decimal
 
 import pytest
-from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import AuthenticationType, PaymentType, ReservationKind, ReservationStartInterval
 from tilavarauspalvelu.models import ReservationUnit

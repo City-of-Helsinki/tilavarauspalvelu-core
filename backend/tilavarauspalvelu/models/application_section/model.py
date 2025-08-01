@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
+from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
 from utils.date_utils import local_datetime
@@ -165,7 +166,7 @@ class ApplicationSection(SerializableMixin, models.Model):
             ),
             # Otherwise, the section is still in allocation
             default=models.Value(ApplicationSectionStatusChoice.IN_ALLOCATION.value),
-            output_field=models.CharField(),
+            output_field=TextChoicesField(choices_enum=ApplicationSectionStatusChoice),
         )
 
     @status.override

@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING
 import freezegun
 import pytest
 from graphql import OperationType
-from graphql_relay import to_global_id
 
 from tilavarauspalvelu.enums import AccessType, BannerNotificationTarget, ReservationStateChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService

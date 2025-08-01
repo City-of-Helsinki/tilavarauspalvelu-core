@@ -6,8 +6,6 @@ from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo
 
 import pytest
-from graphene_django_extensions.testing import build_query
-from graphql_relay import to_global_id
 
 from utils.date_utils import DEFAULT_TIMEZONE
 

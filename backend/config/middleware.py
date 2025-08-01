@@ -1,23 +1,15 @@
-from __future__ import annotations
-
 import logging
-import traceback
+from collections.abc import Callable
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from django.conf import settings
 from django.core.signals import got_request_exception
-from graphql import GraphQLFieldResolver
+from django.http import HttpResponse
+from graphql import GraphQLFieldResolver, GraphQLResolveInfo
 
+from tilavarauspalvelu.typing import WSGIRequest
 from utils.date_utils import local_datetime
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
-
-    from django.http import HttpResponse
-
-    from tilavarauspalvelu.typing import GQLInfo, WSGIRequest
-
 
 logger = logging.getLogger(__name__)
 
@@ -63,23 +55,31 @@ class KeycloakRefreshTokenExpiredMiddleware:
         return response
 
 
-class GraphQLSentryMiddleware:
-    def resolve(self, next_: GraphQLFieldResolver, root: Any, info: GQLInfo, **kwargs: Any) -> Any:
-        try:
-            return next_(root, info, **kwargs)
-        except Exception as err:  # noqa: BLE001
-            # Send the exception to `tilavarauspalvelu.signals.sentry_log_exception`
-            got_request_exception.send(sender=None, request=info.context)
-            return err
+def graphql_sentry_middleware(
+    resolver: GraphQLFieldResolver,
+    root: Any,
+    info: GraphQLResolveInfo,
+    **kwargs: Any,
+) -> Any:
+    try:
+        return resolver(root, info, **kwargs)
+    except Exception as err:  # noqa: BLE001
+        # Send the exception to `tilavarauspalvelu.signals.sentry_log_exception`
+        got_request_exception.send(sender=None, request=info.context)
+        return err
 
 
-class GraphQLErrorLoggingMiddleware:
-    def resolve(self, next_: GraphQLFieldResolver, root: Any, info: GQLInfo, **kwargs: Any) -> Any:
-        try:
-            return next_(root, info, **kwargs)
-        except Exception as err:  # noqa: BLE001
-            logger.info(traceback.format_exc())
-            return err
+def graphql_error_logging_middleware(
+    resolver: GraphQLFieldResolver,
+    root: Any,
+    info: GraphQLResolveInfo,
+    **kwargs: Any,
+) -> Any:
+    try:
+        return resolver(root, info, **kwargs)
+    except Exception as err:
+        logger.exception("Unhandled exception")
+        return err
 
 
 class ProfilerMiddleware:

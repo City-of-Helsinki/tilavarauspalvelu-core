@@ -3,14 +3,13 @@ from __future__ import annotations
 from typing import Any, NamedTuple
 
 import pytest
-from graphene_django_extensions.testing.utils import parametrize_helper
-from graphql_relay import to_global_id
 
-from tilavarauspalvelu.api.graphql.types.banner_notification.types import BannerNotificationNode
+from tilavarauspalvelu.api.graphql.types.banner_notification.queries import BannerNotificationNode
 from tilavarauspalvelu.enums import BannerNotificationTarget
 
 from tests.factories import BannerNotificationFactory, UserFactory
 from tests.factories.banner_notification import BannerNotificationBuilder
+from tests.helpers import parametrize_helper
 
 # Applied to all tests
 pytestmark = [

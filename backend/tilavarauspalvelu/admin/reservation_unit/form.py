@@ -14,10 +14,10 @@ from django.utils.translation import gettext_lazy as _
 from subforms.fields import DynamicArrayField
 from tinymce.widgets import TinyMCE
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType, TermsOfUseTypeChoices
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, ReservationUnitPricing, TermsOfUse
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date
 from utils.external_service.errors import ExternalServiceError
 from utils.utils import only_django_validation_errors
@@ -88,7 +88,7 @@ class ReservationUnitAccessTypeFormSet(BaseInlineFormSet):
         has_active = next(only_begun, None) is not None
         if not has_active:
             msg = "At least one active access type is required."
-            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_ACTIVE_ACCESS_TYPE)
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_ACCESS_TYPE_MISSING)
 
     @transaction.atomic
     def save(self, commit: bool = True) -> list[ReservationUnitAccessType]:  # noqa: FBT001, FBT002

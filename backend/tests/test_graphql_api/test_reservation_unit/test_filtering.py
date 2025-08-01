@@ -4,7 +4,6 @@ import datetime
 from typing import NamedTuple
 
 import pytest
-from graphene_django_extensions.testing import parametrize_helper
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -24,6 +23,7 @@ from tests.factories import (
     UnitGroupFactory,
     UserFactory,
 )
+from tests.helpers import parametrize_helper
 
 from .helpers import (
     create_reservation_units_for_reservation_state_filtering,

@@ -4,7 +4,7 @@ import re
 from contextlib import contextmanager
 from functools import wraps
 from types import SimpleNamespace
-from typing import TYPE_CHECKING, Any, Self
+from typing import TYPE_CHECKING, Any, NamedTuple, Self, TypedDict, TypeVar
 from unittest import mock
 from unittest.mock import patch
 
@@ -15,7 +15,6 @@ from django.conf import settings
 from django.utils import translation
 from django.utils.functional import lazy
 from django.utils.translation import trans_real
-from graphene_django_extensions.testing import GraphQLClient as BaseGraphQLClient
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -44,6 +43,30 @@ class GraphQLClient(BaseGraphQLClient):
         user = UserFactory.create_with_general_role(role=role)
         self.force_login(user)
         return user
+
+
+TNamedTuple = TypeVar("TNamedTuple", bound=NamedTuple)
+
+
+class ParametrizeArgs(TypedDict):
+    argnames: list[str]
+    argvalues: list[TNamedTuple]  # type: ignore[valid-type]
+    ids: list[str]
+
+
+def parametrize_helper[TNamedTuple: NamedTuple](__tests: dict[str, TNamedTuple], /) -> ParametrizeArgs:
+    """Construct parametrize input while setting test IDs."""
+    assert __tests, "I need some tests, please!"
+    values = list(__tests.values())
+    try:
+        return ParametrizeArgs(
+            argnames=list(values[0].__class__.__annotations__),
+            argvalues=values,
+            ids=list(__tests),
+        )
+    except AttributeError as error:
+        msg = "Improper configuration. Did you use a NamedTuple for TNamedTuple?"
+        raise RuntimeError(msg) from error
 
 
 class ResponseMock:

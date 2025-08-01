@@ -3281,14 +3281,14 @@ devenv = ["check-manifest", "pytest (>=4.3)", "pytest-cov", "pytest-mock (>=3.3)
 
 [[package]]
 name = "undine"
-version = "0.0.6"
+version = "0.0.14"
 description = "A GraphQL library for Django"
 optional = false
 python-versions = "<4,>=3.11"
 groups = ["main"]
 files = [
-    {file = "undine-0.0.6-py3-none-any.whl", hash = "sha256:e4e738ddd0d76a90ad24f0e287b6c5236d11cbac421400fc48b240b99ed46620"},
-    {file = "undine-0.0.6.tar.gz", hash = "sha256:699c54f71ffcca6ebe4510c54f17f8e9cd4412ca7532a2b15cbe1623d9993441"},
+    {file = "undine-0.0.14-py3-none-any.whl", hash = "sha256:79af293a5a78c8a22e2f8570df13fdc78a479e5ad8f1d55214921158f64d69a3"},
+    {file = "undine-0.0.14.tar.gz", hash = "sha256:d97ca9ec2dbc0b4dc123d77caff8da81e29075c490c8ff39afbaaf61ce46739a"},
 ]
 
 [package.dependencies]
@@ -3449,4 +3449,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "64567ac0a18c1ae40a00856e388442a0e9b5e9def38eefd2768adedf12fc121a"
+content-hash = "f91db06e62327bbe374731a5c1be87c84e017512b25f2cf5a54b02e994138729"

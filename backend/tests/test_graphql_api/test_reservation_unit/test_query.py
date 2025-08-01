@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime
 
 import pytest
-from graphql_relay import to_global_id
 
 from tilavarauspalvelu.enums import (
     ReservationStateChoice,

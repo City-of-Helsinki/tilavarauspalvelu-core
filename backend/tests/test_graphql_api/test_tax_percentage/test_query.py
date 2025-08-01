@@ -3,7 +3,6 @@ from __future__ import annotations
 from decimal import Decimal
 
 import pytest
-from graphene_django_extensions.testing import build_query
 
 from tests.factories import TaxPercentageFactory
 

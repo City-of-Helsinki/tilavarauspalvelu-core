@@ -4,8 +4,6 @@ from enum import Enum, auto
 from functools import partial
 from typing import TYPE_CHECKING, Any, NamedTuple
 
-from graphene_django_extensions.testing import build_mutation, build_query
-
 if TYPE_CHECKING:
     from tilavarauspalvelu.enums import BannerNotificationTarget
 

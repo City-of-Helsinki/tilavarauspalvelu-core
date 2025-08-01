@@ -13,8 +13,6 @@ from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 
-from tilavarauspalvelu.typing import permission
-
 __all__ = [
     "AccessType",
     "ApplicationRoundReservationCreationStatusChoice",
@@ -56,6 +54,9 @@ __all__ = [
     "UserRoleChoice",
     "Weekday",
 ]
+
+
+class permission(classmethod): ...  # noqa: N801
 
 
 class ReservationNotification(models.TextChoices):
@@ -292,7 +293,10 @@ class UserRoleChoice(models.TextChoices):
 # There is the disadvantage that we don't get autocomplete of permissions like this,
 # but we also don't duplicate permissions from the roles above. This should be fine,
 # as the enum is not really used in our code but meant for the frontend.
-UserPermissionChoice = models.TextChoices("UserPermissionChoice", UserRoleChoice.permission_choices())
+UserPermissionChoice: type[models.TextChoices] = models.TextChoices(
+    "UserPermissionChoice",
+    UserRoleChoice.permission_choices(),
+)
 
 
 class HaukiResourceState(models.TextChoices):

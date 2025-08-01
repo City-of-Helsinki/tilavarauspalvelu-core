@@ -101,7 +101,7 @@ class BannerNotification(models.Model):
         )
 
     @lookup_property
-    def state() -> BannerNotificationState:
+    def notification_state() -> BannerNotificationState:
         return models.Case(  # type: ignore[return-value]
             models.When(
                 draft=True,
@@ -116,7 +116,7 @@ class BannerNotification(models.Model):
                 then=models.Value(BannerNotificationState.ACTIVE.value),
             ),
             default=models.Value(BannerNotificationState.DRAFT.value),  # past notifications are considered drafts
-            output_field=models.CharField(),
+            output_field=TextChoicesField(choices_enum=BannerNotificationState),
         )
 
     @lookup_property

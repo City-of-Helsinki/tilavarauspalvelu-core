@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING, Any, NamedTuple
 import freezegun
 import pytest
 from django.core.cache import cache
-from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -32,12 +31,11 @@ from tests.factories import (
     ResourceFactory,
     SpaceFactory,
 )
+from tests.helpers import parametrize_helper
 
 from .helpers import reservation_units_query
 
 if TYPE_CHECKING:
-    from graphene_django_extensions.testing.client import GQLResponse
-
     from tilavarauspalvelu.models import ReservationUnit
 
 # Applied to all tests

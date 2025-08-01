@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from itertools import islice
-from typing import TYPE_CHECKING, Any, Self
+from typing import TYPE_CHECKING, Self
 
 from django.contrib.postgres.search import SearchVector
 from django.db import connections, models
@@ -11,13 +11,11 @@ from lookup_property import L
 
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
-from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
 from utils.date_utils import local_date
 from utils.db import ArrayUnnest, NowTT, SubqueryArray
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
-    from decimal import Decimal
 
     from tilavarauspalvelu.enums import AccessType
 
@@ -32,33 +30,6 @@ type ReservationUnitPK = int
 
 
 class ReservationUnitQuerySet(ModelQuerySet[ReservationUnit]):
-    def with_first_reservable_time(
-        self,
-        *,
-        filter_date_start: datetime.date | None,
-        filter_date_end: datetime.date | None,
-        filter_time_start: datetime.time | None,
-        filter_time_end: datetime.time | None,
-        minimum_duration_minutes: float | Decimal | None,
-        show_only_reservable: bool = False,
-        pagination_args: dict[str, Any] | None = None,
-        cache_key: str = "",
-    ) -> Self:
-        """Annotate the queryset with `first_reservable_time` and `is_closed` for each reservation unit."""
-        helper = FirstReservableTimeHelper(
-            reservation_unit_queryset=self,
-            filter_date_start=filter_date_start,
-            filter_date_end=filter_date_end,
-            filter_time_start=filter_time_start,
-            filter_time_end=filter_time_end,
-            minimum_duration_minutes=minimum_duration_minutes,
-            show_only_reservable=show_only_reservable,
-            pagination_args=pagination_args,
-            cache_key=cache_key,
-        )
-        helper.calculate_all_first_reservable_times()
-        return helper.get_annotated_queryset()
-
     @property
     def affected_reservation_unit_ids(self) -> models.QuerySet[dict[str, int]]:
         """

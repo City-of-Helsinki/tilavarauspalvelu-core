@@ -158,7 +158,7 @@ class PermissionResolver:
         self,
         *,
         permission: UserPermissionChoice,
-        unit_ids: Iterable[Unit] = (),
+        unit_ids: Iterable[int] = (),
         require_all: bool = False,
     ) -> bool:
         from tilavarauspalvelu.models import Unit

@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from typing import Any, Generic, TypeVar
+from typing import Any
 
-from django.db.models import Model, QuerySet
+from django.db.models import QuerySet
 from django.db.models.manager import BaseManager
 from helsinki_gdpr.models import SerializableMixin
 from mptt.managers import TreeManager
-from mptt.models import MPTTModel
 from mptt.querysets import TreeQuerySet
 
 __all__ = [
@@ -20,74 +19,115 @@ __all__ = [
     "SerializableModelMixin",
 ]
 
-TModel = TypeVar("TModel", bound=Model)
-TMPTTModel = TypeVar("TMPTTModel", bound=MPTTModel)
-TQuerySet = TypeVar("TQuerySet", bound=QuerySet)
-
-
-class ModelManagerMeta(type):
-    """
-    Metaclass that allows Manager subclassing to automatically copy queryset methods.
-    So, instead of using `Manager.from_queryset(QuerySet)`, you can use `Manager[Model, QuerySet]`.
-    """
-
-    def __new__(cls, name: str, bases: tuple[type, ...], attrs: dict[str, Any]) -> ModelManagerMeta:
-        if hasattr(ModelManagerMeta, "__queryset_class__"):
-            queryset_class = ModelManagerMeta.__queryset_class__
-            del ModelManagerMeta.__queryset_class__
-
-            attrs["_queryset_class"] = queryset_class
-            attrs |= BaseManager._get_queryset_methods(queryset_class)  # noqa: SLF001
-
-        return super().__new__(cls, name, bases, attrs)
-
-    def __getitem__(cls, item: tuple[type[Model], type[QuerySet]]) -> type[ModelManager[type[Model], type[QuerySet]]]:
-        ModelManagerMeta.__queryset_class__ = item[1]
-        return cls  # type: ignore[return-value]
-
 
 # Normal models
 
 
-class ModelQuerySet(Generic[TModel], QuerySet[TModel]): ...  # noqa: UP046
+class ModelQuerySet(QuerySet):
+    """QuerySet class that offers better typing than a regular QuerySet."""
 
 
-class ModelManager(Generic[TModel, TQuerySet], BaseManager[TModel], metaclass=ModelManagerMeta):  # noqa: UP046
-    # Properly implement equality checks so that lazy managers are properly compared
+class ModelManager(BaseManager):
+    """
+    Manager class that offers better typing than a regular Manager.
+    Type hints can be added by subclassing `ModelManager[MyModel, MyModelQuerySet]`.
+    """
+
+    def __class_getitem__(cls, item: Any) -> Any:
+        # When subclassing like this:
+        #
+        # >>> class MyManager(ModelManager[MyModel, MyModelQuerySet]): ...
+        #
+        # The method is called with the generic arguments as a tuple.
+        # Save the queryset class to use in `__init_subclass__`.
+        ModelManager.__queryset_class__ = item[1]
+        return cls  # type: ignore[return-value]
+
+    def __init_subclass__(cls, **kwargs: Any) -> None:
+        # If subclassed like this:
+        #
+        # >>> class MyManager(ModelManager[MyModel, MyModelQuerySet]): ...
+        #
+        # The queryset class is saved to `ModelManager.__queryset_class__`
+        # in `__class_getitem__`. Use this to add the queryset methods
+        # to the manager class.
+        if hasattr(ModelManager, "__queryset_class__"):
+            queryset_class: type[ModelQuerySet] = ModelManager.__queryset_class__
+            del ModelManager.__queryset_class__
+
+            cls._queryset_class = queryset_class
+            methods = BaseManager._get_queryset_methods(queryset_class)  # noqa: SLF001
+            for name, method in methods.items():
+                setattr(cls, name, method)
+
     def __eq__(self, other: object) -> bool:
+        # Properly implement equality checks so that lazy managers are properly compared
         if not isinstance(other, type(self)):
             return NotImplemented
         return self._constructor_args == other._constructor_args  # type: ignore[attr-defined]
 
-    # Copied from 'BaseManager.__hash__'
     def __hash__(self) -> int:
+        # Copied from 'BaseManager.__hash__'
         return id(self)
 
 
 # Related managers
 
 
-class OneToManyRelatedManager(ModelManager[TModel, TQuerySet]): ...
+class OneToManyRelatedManager(ModelManager): ...
 
 
-class ManyToManyRelatedManager(ModelManager[TModel, TQuerySet]): ...
+class ManyToManyRelatedManager(ModelManager): ...
 
 
 # MPTT models
 
 
-class ModelTreeQuerySet(Generic[TMPTTModel], TreeQuerySet[TMPTTModel]): ...  # noqa: UP046
+class ModelTreeQuerySet(TreeQuerySet):
+    """TreeQuerySet class that offers better typing than a regular TreeQuerySet."""
 
 
-class ModelTreeManager(Generic[TMPTTModel, TQuerySet], TreeManager[TMPTTModel], metaclass=ModelManagerMeta):  # noqa: UP046
-    # Properly implement equality checks so that lazy managers are properly compared
+class ModelTreeManager(TreeManager):
+    """
+    TreeManager class that offers better typing than a regular TreeManager.
+    Type hints can be added by subclassing `ModelTreeManager[MyTreeModel, MyModelTreeQuerySet]`.
+    """
+
+    def __class_getitem__(cls, item: Any) -> Any:
+        # When subclassing like this:
+        #
+        # >>> class MyManager(ModelTreeManager[MyTreeModel, MyModelTreeQuerySet]): ...
+        #
+        # The method is called with the generic arguments as a tuple.
+        # Save the queryset class to use in `__init_subclass__`.
+        ModelTreeManager.__queryset_class__ = item[1]
+        return cls  # type: ignore[return-value]
+
+    def __init_subclass__(cls, **kwargs: Any) -> None:
+        # If subclassed like this:
+        #
+        # >>> class MyManager(ModelTreeManager[MyModel, MyModelTreeQuerySet]): ...
+        #
+        # The queryset class is saved to `ModelTreeManager.__queryset_class__`
+        # in `__class_getitem__`. Use this to add the queryset methods
+        # to the manager class.
+        if hasattr(ModelTreeManager, "__queryset_class__"):
+            queryset_class: type[ModelTreeQuerySet] = ModelTreeManager.__queryset_class__
+            del ModelTreeManager.__queryset_class__
+
+            cls._queryset_class = queryset_class
+            methods = BaseManager._get_queryset_methods(queryset_class)  # noqa: SLF001
+            for name, method in methods.items():
+                setattr(cls, name, method)
+
     def __eq__(self, other: object) -> bool:
+        # Properly implement equality checks so that lazy managers are properly compared
         if not isinstance(other, type(self)):
             return NotImplemented
         return self._constructor_args == other._constructor_args  # type: ignore[attr-defined]
 
-    # Copied from 'BaseManager.__hash__'
     def __hash__(self) -> int:
+        # Copied from 'BaseManager.__hash__'
         return id(self)
 
 

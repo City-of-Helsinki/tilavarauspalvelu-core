@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING
 import freezegun
 import pytest
 from freezegun import freeze_time
-from graphql_relay import to_global_id
 
 from tilavarauspalvelu.enums import (
     AccessType,

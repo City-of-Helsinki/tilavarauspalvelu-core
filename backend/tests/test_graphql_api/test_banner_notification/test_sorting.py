@@ -5,13 +5,13 @@ from typing import NamedTuple
 
 import pytest
 from freezegun import freeze_time
-from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget
 from utils.date_utils import local_datetime
 
 from tests.factories import BannerNotificationFactory, UserFactory
 from tests.factories.banner_notification import BannerNotificationBuilder
+from tests.helpers import parametrize_helper
 
 # Applied to all tests
 pytestmark = [
