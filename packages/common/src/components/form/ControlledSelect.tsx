@@ -6,8 +6,8 @@ import { convertOptionToHDS, filterNonNullable, toNumber } from "../../helpers";
 import { convertLanguageCode } from "../../common/util";
 import styled from "styled-components";
 
-// Used to override the default max-width of HDS Select component, which causes different width fields in the form
 const StyledControlledSelect = styled(Select)`
+  /* Used to override the default max-width of HDS Select component, which causes different width fields in the form */
   && {
     max-width: none;
   }

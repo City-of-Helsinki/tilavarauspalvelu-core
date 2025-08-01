@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, ButtonVariant, LoadingSpinner } from "hds-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import type { ApolloQueryResult } from "@apollo/client";
 import type { PageInfo, Query } from "@gql/gql-types";
 import { Flex } from "common/styled";
@@ -29,7 +29,7 @@ export function More({ count, totalCount, pageInfo, fetchMore }: Props): JSX.Ele
       {totalCount > count ? (
         <Flex style={{ textAlign: "center" }}>
           <div>
-            {t("paging.numResults", {
+            {t("translation:paging.numResults", {
               count,
               totalCount,
             })}
@@ -40,13 +40,13 @@ export function More({ count, totalCount, pageInfo, fetchMore }: Props): JSX.Ele
             disabled={isFetching}
             onClick={handleClick}
           >
-            {t("common.showMore")}
+            {t("common:showMore")}
           </Button>
         </Flex>
       ) : (
         count > 0 && (
           <div>
-            {t("paging.allResults", {
+            {t("translation:paging.allResults", {
               totalCount,
             })}
           </div>

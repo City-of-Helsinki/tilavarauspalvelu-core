@@ -2,10 +2,10 @@ import React from "react";
 import { IconLinkExternal, IconSize } from "hds-react";
 import styled from "styled-components";
 import { fontMedium } from "common/styled";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 type Props = {
-  to: string;
+  href: string;
   children: string;
   size?: IconSize;
   isBold?: boolean;
@@ -24,9 +24,9 @@ const StyledLink = styled(Link)<{ $isBold?: boolean }>`
   }
 `;
 
-export function ExternalLink({ children, to, size, isBold = false }: Props): JSX.Element | null {
+export function ExternalLink({ children, href, size, isBold = false }: Props): JSX.Element | null {
   return (
-    <StyledLink to={to} target="_blank" rel="noopener noreferrer" $isBold={isBold}>
+    <StyledLink href={href} target="_blank" rel="noopener noreferrer" $isBold={isBold}>
       <span>{children}</span>
       <IconLinkExternal size={size} aria-hidden />
     </StyledLink>

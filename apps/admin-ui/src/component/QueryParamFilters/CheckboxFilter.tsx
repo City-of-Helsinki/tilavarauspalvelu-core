@@ -1,8 +1,9 @@
+import React from "react";
 import styled from "styled-components";
 import { Checkbox } from "hds-react";
-import { useSearchParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import React from "react";
+import { useTranslation } from "next-i18next";
+import { useSearchParams } from "next/navigation";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
 // "&& > *" needed to position the checkbox and label correctly in the grid block
 const CenteredCheckbox = styled(Checkbox)`
@@ -14,22 +15,23 @@ const CenteredCheckbox = styled(Checkbox)`
 `;
 
 export function CheckboxFilter({ name }: { name: string }) {
-  const [searchParams, setParams] = useSearchParams();
+  const searchParams = useSearchParams();
+  const setParams = useSetSearchParams();
   const { t } = useTranslation();
   const handleChange = (val: boolean) => {
     const params = new URLSearchParams(searchParams);
     if (val) {
       params.set(name, "true");
-      setParams(params, { replace: true });
     } else {
       params.delete(name);
-      setParams(params, { replace: true });
     }
+    setParams(params);
   };
+
   return (
     <CenteredCheckbox
       id={name}
-      label={t(`filters.label.${name}`)}
+      label={t(`filters:label.${name}`)}
       onChange={(e) => handleChange(e.target.checked)}
       checked={searchParams.has(name)}
     />
