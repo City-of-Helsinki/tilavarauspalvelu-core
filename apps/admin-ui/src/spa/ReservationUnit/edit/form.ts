@@ -10,6 +10,8 @@ import {
   ReservationStartInterval,
   type ReservationUnitEditQuery,
   type ReservationUnitPricingSerializerInput,
+  type UpdateApplicationRoundTimeSlotSerializerInput,
+  type ReservationUnitAccessTypeSerializerInput,
   Weekday,
 } from "@gql/gql-types";
 import { addDays, endOfDay, format } from "date-fns";
@@ -896,18 +898,18 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     notesWhenApplyingFi,
     notesWhenApplyingSv,
     seasons,
-    accessTypes,
+    accessTypes: accessTypesForm,
     images, // images are updated with a separate mutation
     ...vals
   } = values;
 
   const isReservableTime = (t?: SeasonalFormType["reservableTimes"][0]) => t && t.begin && t.end;
   // NOTE mutation doesn't support pks (even if changing not adding) unlike other mutations
-  const applicationRoundTimeSlots = seasons
+  const applicationRoundTimeSlots: UpdateApplicationRoundTimeSlotSerializerInput[] = seasons
     .filter((s) => s.reservableTimes.filter(isReservableTime).length > 0 || s.closed)
     .map((s) => ({
       weekday: s.weekday,
-      closed: s.closed,
+      isClosed: s.closed,
       reservableTimes: !s.closed ? filterNonNullable(s.reservableTimes.filter(isReservableTime)) : [],
     }));
 
@@ -915,6 +917,13 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     const d = fromUIDateTime(date, time);
     return d != null ? d.toISOString() : null;
   }
+  const accessTypes: ReservationUnitAccessTypeSerializerInput[] = filterNonNullable(
+    accessTypesForm.map((at) => ({
+      pk: at.pk,
+      accessType: at.accessType,
+      beginDate: toApiDate(fromUIDate(at.beginDate) || new Date()) || "",
+    }))
+  );
 
   return {
     ...vals,
@@ -947,13 +956,7 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     notesWhenApplyingSv: notesWhenApplyingSv !== "" ? notesWhenApplyingSv : null,
     cancellationRule: hasCancellationRule ? cancellationRule : null,
     pricings: filterNonNullable(pricings.map((p) => transformPricing(p, hasFuturePricing, taxPercentageOptions))),
-    accessTypes: filterNonNullable(
-      accessTypes.map((at) => ({
-        pk: at.pk,
-        accessType: at.accessType,
-        beginDate: toApiDate(fromUIDate(at.beginDate) || new Date()) || "",
-      }))
-    ),
+    accessTypes,
     applicationRoundTimeSlots,
   };
 }
