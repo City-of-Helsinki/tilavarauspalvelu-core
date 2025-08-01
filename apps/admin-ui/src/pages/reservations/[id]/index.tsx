@@ -40,7 +40,6 @@ import { base64encode, ignoreMaybeArray, isPriceFree, toNumber } from "common/sr
 import { formatAgeGroup } from "@/common/util";
 import { toUIDateTime } from "common/src/common/util";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
@@ -348,7 +347,7 @@ function RequestedReservation({
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page({ reservation, apiBaseUrl }: PropsNarrowed): JSX.Element {
+export default function Page({ reservation }: PropsNarrowed): JSX.Element {
   const id = base64encode(`ReservationNode:${reservation.pk ?? 0}`);
   const [_fetch, query] = useReservationPageLazyQuery({
     // NOTE have to be no-cache because we have some key collisions (tag line disappears if cached)
@@ -358,12 +357,7 @@ export default function Page({ reservation, apiBaseUrl }: PropsNarrowed): JSX.El
 
   const reservationRefreshed = query.data?.reservation ?? reservation;
 
-  return (
-    // TODO authorization checker (without params) should be in the middleware
-    <AuthorizationChecker apiUrl={apiBaseUrl}>
-      <RequestedReservation reservation={reservationRefreshed} refetch={query.refetch} />
-    </AuthorizationChecker>
-  );
+  return <RequestedReservation reservation={reservationRefreshed} refetch={query.refetch} />;
 }
 
 export async function getServerSideProps({ locale, query, req }: GetServerSidePropsContext) {
