@@ -41,7 +41,6 @@ import { ApplicationDatas, Summary } from "@/styled";
 import { ApplicationStatusLabel } from "common/src/components/statuses";
 import { useDisplayError } from "common/src/hooks";
 import { Error403 } from "@/component/Error403";
-import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { GetServerSidePropsContext } from "next";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -551,18 +550,18 @@ function RejectApplicationButton({
   );
 }
 
-function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.Element | null {
+export default function ApplicationPage({ pk }: PropsNarrowed): JSX.Element | null {
   const ref = useRef<HTMLHeadingElement>(null);
   const { t } = useTranslation();
 
-  const id = base64encode(`ApplicationNode:${applicationPk}`);
+  const id = base64encode(`ApplicationNode:${pk}`);
   const {
     data,
     loading: isLoading,
     refetch,
     error,
   } = useApplicationAdminQuery({
-    skip: !(applicationPk > 0),
+    skip: !(pk > 0),
     variables: { id },
   });
 
@@ -636,11 +635,7 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
         </Summary>
 
         <Accordion heading={t("reservation:workingMemo")} initiallyOpen={application.workingMemo.length > 0}>
-          <ApplicationWorkingMemo
-            applicationPk={applicationPk}
-            refetch={refetch}
-            initialValue={application.workingMemo}
-          />
+          <ApplicationWorkingMemo applicationPk={pk} refetch={refetch} initialValue={application.workingMemo} />
         </Accordion>
         {applicationSections.map((section) => (
           <ApplicationSectionDetails section={section} application={application} key={section.pk} refetch={refetch} />
@@ -710,13 +705,6 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page(props: PropsNarrowed): JSX.Element {
-  return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl}>
-      <ApplicationDetails applicationPk={props.pk} />
-    </AuthorizationChecker>
-  );
-}
 
 export async function getServerSideProps({ locale, query }: GetServerSidePropsContext) {
   const pk = toNumber(ignoreMaybeArray(query.id));

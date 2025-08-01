@@ -11,6 +11,7 @@ import { type GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import {
   SeriesReservationUnitDocument,
+  UserPermissionChoice,
   type SeriesReservationUnitQuery,
   type SeriesReservationUnitQueryVariables,
 } from "@gql/gql-types";
@@ -28,7 +29,11 @@ export default function Page({ apiBaseUrl, unitPk, reservationUnits }: PropsNarr
   }));
 
   return (
-    <AuthorizationChecker apiUrl={apiBaseUrl}>
+    <AuthorizationChecker
+      apiUrl={apiBaseUrl}
+      permission={UserPermissionChoice.CanCreateStaffReservations}
+      unitPk={unitPk}
+    >
       <LinkPrev />
       <H1 $noMargin>{t("myUnits:ReservationSeries.pageTitle")}</H1>
       {reservationUnitOptions.length > 0 ? (

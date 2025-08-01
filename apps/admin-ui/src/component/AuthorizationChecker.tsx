@@ -3,23 +3,31 @@ import { useSession } from "@/hooks";
 import { MainLander } from "@/component/MainLander";
 import { Error403 } from "./Error403";
 import { UserPermissionChoice } from "@gql/gql-types";
-import { hasAnyPermission, hasSomePermission } from "@/modules/permissionHelper";
+import { hasAnyPermission, hasPermission } from "@/modules/permissionHelper";
 
-export function AuthorizationChecker({
-  apiUrl,
-  children,
-  permission,
-}: {
+interface BaseProps {
   apiUrl: string;
   children: React.ReactElement | React.ReactElement[];
-  permission?: UserPermissionChoice;
-}): React.ReactElement {
+}
+interface PropsWithPermission extends BaseProps {
+  permission: UserPermissionChoice;
+  unitPk?: number | null;
+}
+type AuthorizationCheckerProps = BaseProps | PropsWithPermission;
+
+export function AuthorizationChecker({ apiUrl, children, ...rest }: AuthorizationCheckerProps): React.ReactElement {
   const { user: currentUser, isAuthenticated } = useSession();
   if (!isAuthenticated) {
     return <MainLander apiBaseUrl={apiUrl} />;
   }
 
-  const hasAccess = permission ? hasSomePermission(currentUser, permission) : hasAnyPermission(currentUser);
+  let hasAccess = false;
+  if ("permission" in rest) {
+    const { permission, unitPk } = rest;
+    hasAccess = hasPermission(currentUser, permission, unitPk);
+  } else {
+    hasAccess = hasAnyPermission(currentUser);
+  }
 
   // eslint-disable-next-line react/jsx-no-useless-fragment
   return hasAccess ? <>{children}</> : <Error403 />;
