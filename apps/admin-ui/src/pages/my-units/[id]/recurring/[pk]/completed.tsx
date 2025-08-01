@@ -46,11 +46,15 @@ function ErrorComponent() {
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page(props: PropsNarrowed) {
+export default function Page({ apiBaseUrl, pk, unitPk }: PropsNarrowed) {
   return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl} permission={UserPermissionChoice.CanCreateStaffReservations}>
+    <AuthorizationChecker
+      apiUrl={apiBaseUrl}
+      permission={UserPermissionChoice.CanCreateStaffReservations}
+      unitPk={unitPk}
+    >
       <ErrorBoundary FallbackComponent={ErrorComponent}>
-        <ReservationSeriesDoneInner recurringPk={props.pk} />
+        <ReservationSeriesDoneInner recurringPk={pk} />
       </ErrorBoundary>
     </AuthorizationChecker>
   );
@@ -58,12 +62,14 @@ export default function Page(props: PropsNarrowed) {
 
 export async function getServerSideProps({ query, locale }: GetServerSidePropsContext) {
   const pk = toNumber(ignoreMaybeArray(query.pk)) ?? 0;
-  if (pk <= 0) {
+  const unitPk = toNumber(ignoreMaybeArray(query.id)) ?? 0;
+  if (pk <= 0 || unitPk <= 0) {
     return NOT_FOUND_SSR_VALUE;
   }
   return {
     props: {
       pk,
+      unitPk,
       ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },

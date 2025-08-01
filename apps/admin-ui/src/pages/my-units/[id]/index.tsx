@@ -19,7 +19,6 @@ import { gql } from "@apollo/client";
 import { useModal } from "@/context/ModalContext";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { type GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -42,7 +41,7 @@ const TabPanel = styled(Tabs.TabPanel)`
   padding-block: var(--spacing-m);
 `;
 
-function MyUnitView({ unit }: Pick<PropsNarrowed, "unit">): JSX.Element {
+export default function MyUnitsPage({ unit }: Pick<PropsNarrowed, "unit">): JSX.Element {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
 
@@ -171,13 +170,6 @@ function MyUnitView({ unit }: Pick<PropsNarrowed, "unit">): JSX.Element {
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page({ apiBaseUrl, unit }: PropsNarrowed): JSX.Element {
-  return (
-    <AuthorizationChecker apiUrl={apiBaseUrl}>
-      <MyUnitView unit={unit} />
-    </AuthorizationChecker>
-  );
-}
 
 export async function getServerSideProps({ req, locale, query }: GetServerSidePropsContext) {
   const pk = toNumber(ignoreMaybeArray(query.id));
