@@ -6,12 +6,13 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
+import { UserPermissionChoice } from "@gql/gql-types";
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
 export default function Page(props: PropsNarrowed): JSX.Element {
   return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl}>
+    <AuthorizationChecker apiUrl={props.apiBaseUrl} permission={UserPermissionChoice.CanManageReservationUnits}>
       <ResourceEditor resourcePk={props.resourcePk} unitPk={props.unitPk} />
     </AuthorizationChecker>
   );

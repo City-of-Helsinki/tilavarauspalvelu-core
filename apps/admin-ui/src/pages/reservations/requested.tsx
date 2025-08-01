@@ -7,7 +7,6 @@ import { toUIDate } from "common/src/common/util";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 
@@ -17,7 +16,7 @@ const defaultStates = [
   ReservationStateChoice.RequiresHandling,
 ];
 
-function RequestedListing(): JSX.Element {
+export default function RequestedListingPage(_props: PageProps) {
   const { t } = useTranslation();
 
   const today = useMemo(() => new Date(), []);
@@ -60,13 +59,6 @@ function RequestedListing(): JSX.Element {
 }
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-export default function Page(props: PageProps) {
-  return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl}>
-      <RequestedListing />
-    </AuthorizationChecker>
-  );
-}
 
 export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
   return {

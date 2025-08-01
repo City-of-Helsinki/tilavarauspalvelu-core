@@ -39,8 +39,14 @@ export default function PageWrapper({ apiBaseUrl, children }: Props): JSX.Elemen
     <ErrorBoundary FallbackComponent={(e) => FallbackComponent(e)}>
       <Navigation apiBaseUrl={apiBaseUrl} />
       <Content>
-        {hasAccess && <BannerNotificationsList target={BannerNotificationTarget.Staff} />}
-        {user != null ? children : <MainLander apiBaseUrl={apiBaseUrl} />}
+        {hasAccess ? (
+          <>
+            <BannerNotificationsList target={BannerNotificationTarget.Staff} />
+            {children}
+          </>
+        ) : (
+          <MainLander apiBaseUrl={apiBaseUrl} />
+        )}
         <ToastContainer />
       </Content>
       <ScrollToTop />
