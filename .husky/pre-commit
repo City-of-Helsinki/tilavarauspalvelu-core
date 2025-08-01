@@ -1,5 +1,2 @@
 pnpm tsc:check
-pnpm lint:fix
-pnpm lint:css
-pnpm format
-git update-index --again
+npx lint-staged
