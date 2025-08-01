@@ -1,0 +1,2 @@
+pnpm tsc:check
+npx lint-staged
