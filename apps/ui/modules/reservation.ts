@@ -470,7 +470,7 @@ export function getPaymentUrl(
     reservation.paymentOrder.status === OrderStatus.Draft &&
     reservation.paymentOrder.checkoutUrl
   ) {
-    return getCheckoutUrl(reservation.paymentOrder);
+    return getCheckoutUrl(reservation.paymentOrder, lang);
   }
 
   return undefined;
@@ -502,7 +502,7 @@ function getCheckoutRedirectUrl(pk: number, lang: LocalizationLanguages, apiBase
 /// left because requires refactoring old users to include more ReservationNode parameters
 export function getCheckoutUrl(
   order: Pick<PaymentOrderNode, "checkoutUrl"> | undefined | null,
-  lang = "fi"
+  lang: LocalizationLanguages
 ): string | undefined {
   const { checkoutUrl } = order ?? {};
 
