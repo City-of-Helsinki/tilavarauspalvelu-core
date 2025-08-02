@@ -3,12 +3,12 @@ import { NewReservationListItem } from "@/component/ReservationsList";
 import { ApolloError, gql, useApolloClient } from "@apollo/client";
 import {
   ReservationSeriesDocument,
-  ReservationSeriesQuery,
-  ReservationSeriesQueryVariables,
-  ReservationSeriesRescheduleMutationInput,
+  type ReservationSeriesPageFragment,
+  type ReservationSeriesQuery,
+  type ReservationSeriesQueryVariables,
+  ReservationSeriesRescheduleMutation,
   ReservationStartInterval,
   ReservationTypeChoice,
-  type SeriesPageQuery,
   useRescheduleReservationSeriesMutation,
   useSeriesPageQuery,
 } from "@gql/gql-types";
@@ -38,9 +38,9 @@ import { useDisplayError } from "common/src/hooks";
 import { generateReservations } from "@/spa/my-units/recurring/generateReservations";
 import Error404 from "@/common/Error404";
 
-type NodeT = NonNullable<SeriesPageQuery["reservation"]>["reservationSeries"];
+type NodeT = ReservationSeriesPageFragment;
 
-function convertToForm(value: NodeT): RescheduleReservationSeriesForm {
+function convertToForm(value: NodeT["reservationSeries"]): RescheduleReservationSeriesForm {
   // buffer times can be changed individually but the base value is not saved to the recurring series
   // so we take the most common value from all future reservations
   const reservations = filterNonNullable(value?.reservations).filter((x) => new Date(x.beginsAt) >= new Date());
@@ -78,7 +78,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
   const { data, refetch, error, loading } = useSeriesPageQuery({
     variables: { id: base64encode(`ReservationNode:${pk}`) },
   });
-  const { reservation } = data ?? {};
+  const reservation = data?.node != null && "pk" in data.node ? data.node : null;
   const reservationSeries = reservation?.reservationSeries ?? null;
 
   const [mutate] = useRescheduleReservationSeriesMutation();
@@ -172,15 +172,15 @@ function SeriesPageInner({ pk }: { pk: number }) {
     const bufferTimeAfter = getBufferTime(reservationUnit.bufferTimeAfter, values.type, values.bufferTimeAfter);
 
     try {
-      const input: ReservationSeriesRescheduleMutationInput = {
+      const input: ReservationSeriesRescheduleMutation = {
         pk: reservationSeries.pk,
         beginDate: toApiDateUnsafe(fromUIDateUnsafe(values.startingDate)),
         beginTime: values.startTime,
         endDate: toApiDateUnsafe(fromUIDateUnsafe(values.endingDate)),
         endTime: values.endTime,
         weekdays: values.repeatOnDays,
-        bufferTimeBefore: bufferTimeBefore.toString(),
-        bufferTimeAfter: bufferTimeAfter.toString(),
+        bufferTimeBefore,
+        bufferTimeAfter,
         skipDates: skipDates.map((x) => toApiDateUnsafe(x)),
       };
       const mutRes = await mutate({ variables: { input } });
@@ -198,7 +198,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
         // NOTE disable cache is mandatory, all the old data is invalid here
         fetchPolicy: "no-cache",
       });
-      const d = res.data?.reservationSeries;
+      const d = res.data?.node != null && "pk" in res.data.node ? res.data.node : null;
       const createdReservations = filterNonNullable(d?.reservations);
       // find the first reservation that is in the future and redirect to it
       const first = createdReservations.find((x) => new Date(x.beginsAt) >= new Date()) ?? createdReservations[0];
@@ -339,34 +339,42 @@ function SeriesPageInner({ pk }: { pk: number }) {
   );
 }
 
+export const SERIES_PAGE_FRAGMENT = gql`
+  fragment ReservationSeriesPage on ReservationNode {
+    id
+    pk
+    type
+    reservationSeries {
+      ...ReservationSeriesFields
+      recurrenceInDays
+      endTime
+      beginTime
+    }
+    reservationUnit {
+      id
+      pk
+      nameFi
+      bufferTimeBefore
+      bufferTimeAfter
+      reservationStartInterval
+    }
+  }
+`;
+
 // TODO can we make ReservationSeries fragment smaller?
 // it has paymentOrder and reservationUnit for each reservation (not necessary)
 export const SERIES_PAGE_QUERY = gql`
   query SeriesPage($id: ID!) {
-    reservation(id: $id) {
-      id
-      pk
-      type
-      reservationSeries {
-        ...ReservationSeriesFields
-        recurrenceInDays
-        endTime
-        beginTime
-      }
-      reservationUnit {
-        id
-        pk
-        nameFi
-        bufferTimeBefore
-        bufferTimeAfter
-        reservationStartInterval
+    node(id: $id) {
+      ... on ReservationNode {
+        ...ReservationSeriesPage
       }
     }
   }
 `;
 
 export const RescheduleReservationSeries = gql`
-  mutation RescheduleReservationSeries($input: ReservationSeriesRescheduleMutationInput!) {
+  mutation RescheduleReservationSeries($input: ReservationSeriesRescheduleMutation!) {
     rescheduleReservationSeries(input: $input) {
       pk
     }

@@ -32,7 +32,7 @@ export function useCheckPermission({
 }
 
 export const CHECK_PERMISSIONS_QUERY = gql`
-  query CheckPermissions($permission: UserPermissionChoice!, $units: [Int!], $requireAll: Boolean = false) {
+  query CheckPermissions($permission: UserPermissionChoice!, $units: [Int!]!, $requireAll: Boolean = false) {
     checkPermissions(permission: $permission, units: $units, requireAll: $requireAll) {
       hasPermission
     }

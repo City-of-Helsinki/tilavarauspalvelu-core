@@ -9,7 +9,7 @@ import {
 import { ReservationCancellation } from "@/components/reservation/ReservationCancellation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import { createNodeId, filterNonNullable } from "common/src/helpers";
 import { isReservationCancellable } from "@/modules/reservation";
 import { getApplicationPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
@@ -74,15 +74,15 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
 
   if (Number.isFinite(Number(pk))) {
-    const id = base64encode(`ReservationNode:${pk}`);
+    const id = createNodeId("ReservationNode", Number(pk));
     const { data } = await client.query<ReservationCancelPageQuery, ReservationCancelPageQueryVariables>({
       query: ReservationCancelPageDocument,
       fetchPolicy: "no-cache",
       variables: { id },
     });
-    const { reservation } = data || {};
+    const  reservation  = data.node != null && "pk" in data.node ? data.node : null;
 
-    const reasons = filterNonNullable(data?.reservationCancelReasons);
+    const reasons = filterNonNullable(data.allReservationCancelReasons);
     const canCancel = reservation != null && isReservationCancellable(reservation);
     if (canCancel) {
       return {
@@ -118,44 +118,15 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 export const RESERVATION_CANCEL_PAGE_QUERY = gql`
   query ReservationCancelPage($id: ID!) {
-    reservation(id: $id) {
-      id
-      ...ReservationInfoCard
-      name
-      reservationUnit {
+    node(id: $id) {
+      ... on ReservationNode {
         id
-        ...CancellationRuleFields
-        cancellationTerms {
-          ...TermsOfUseTextFields
-        }
-      }
-      reservationSeries {
-        id
-        name
-        allocatedTimeSlot {
-          id
-          pk
-          reservationUnitOption {
-            id
-            applicationSection {
-              id
-              application {
-                id
-                pk
-                applicationRound {
-                  id
-                  termsOfUse {
-                    ...TermsOfUseTextFields
-                  }
-                }
-              }
-            }
-          }
-        }
+        ...ReservationCancellation
+        ...CanUserCancelReservation
       }
     }
 
-    reservationCancelReasons {
+    allReservationCancelReasons {
       ...CancelReasonFields
     }
   }

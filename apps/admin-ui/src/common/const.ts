@@ -38,5 +38,5 @@ export const VALID_ALLOCATION_APPLICATION_STATUSES = [
   ApplicationStatusChoice.Received,
   ApplicationStatusChoice.InAllocation,
   ApplicationStatusChoice.Handled,
-  ApplicationStatusChoice.ResultsSent,
+  ApplicationStatusChoice.ResultSent,
 ];

@@ -53,7 +53,7 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 // TODO should have a relay query for application sections
 export const APPLICATION_SECTION_VIEW_QUERY = gql`
   query ApplicationSectionView($pk: Int!, $beginDate: Date = null) {
-    applicationSections(pk: [$pk]) {
+    applicationSections(filter: { pk: [$pk] }) {
       edges {
         node {
           ...ApplicationSectionReservation
@@ -102,12 +102,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     variables: { pk },
   });
 
-  const applicationSection = data?.applicationSections?.edges[0]?.node;
+  const applicationSection = data?.applicationSections?.edges?.[0]?.node;
   if (!applicationSection) {
     return notFoundRetvalue;
   }
   const { application } = applicationSection;
-  const showReservations = application.status === ApplicationStatusChoice.ResultsSent;
+  const showReservations = application.status === ApplicationStatusChoice.ResultSent;
   if (!showReservations) {
     return notFoundRetvalue;
   }

@@ -7,7 +7,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { ViewApplication } from "@/components/application/ViewApplication";
 import { ApplicationHead } from "@/components/application/ApplicationHead";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
-import { base64encode, getLocalizationLang, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, getLocalizationLang, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import {
   ApplicationStatusChoice,
   ApplicationViewDocument,
@@ -97,7 +97,7 @@ function View({ application, tos }: Readonly<Pick<PropsNarrowed, "application" |
   const { sentAt } = applicationRound;
   const handledAt = sentAt ? new Date(sentAt) : new Date();
   const showReservations =
-    application.status === ApplicationStatusChoice.ResultsSent &&
+    application.status === ApplicationStatusChoice.ResultSent &&
     application.applicationSections?.some((section) => section.hasReservations);
 
   const routes = [
@@ -171,10 +171,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const { data } = await apolloClient.query<ApplicationViewQuery, ApplicationViewQueryVariables>({
     query: ApplicationViewDocument,
-    variables: { id: base64encode(`ApplicationNode:${pk}`) },
+    variables: { id: createNodeId("ApplicationNode", pk) },
   });
 
-  const { application } = data;
+  const application = data?.node && "pk" in data.node ? data.node : null;
   if (application == null) {
     return notFound;
   }
@@ -195,11 +195,13 @@ export default View;
 
 export const APPLICATION_VIEW_QUERY = gql`
   query ApplicationView($id: ID!) {
-    application(id: $id) {
-      ...ApplicationView
-      applicationSections {
-        id
-        hasReservations
+    node(id: $id) {
+      ... on ApplicationNode {
+        ...ApplicationView
+        applicationSections {
+          id
+          hasReservations
+        }
       }
     }
   }

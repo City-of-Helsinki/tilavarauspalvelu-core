@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { AutoGrid, fontBold } from "../../styled";
 import { WEEKDAYS } from "../const";
 import { fromMondayFirstUnsafe, formatDayTimes } from "../helpers";
-import { Priority, SuitableTimeFragment } from "../../gql/gql-types";
+import { Priority, type SuitableTimeFieldsFragment } from "../../gql/gql-types";
 
 const WeekWrapper = styled.div`
   display: flex;
@@ -48,7 +48,7 @@ const Heading = styled.p.attrs({ as: "h4" })`
   margin: 0 0 var(--spacing-xs);
 `;
 
-type SchedulesT = Omit<SuitableTimeFragment, "pk" | "id">;
+type SchedulesT = Omit<SuitableTimeFieldsFragment, "pk" | "id">;
 
 export function ApplicationTimePreview({ schedules }: { schedules: readonly SchedulesT[] }): JSX.Element {
   const { t } = useTranslation();

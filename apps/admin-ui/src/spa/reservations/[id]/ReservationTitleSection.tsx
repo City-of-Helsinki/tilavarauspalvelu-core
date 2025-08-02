@@ -76,9 +76,10 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
       skip: !reservation.reservationSeries?.id,
     });
 
+    const reservationSeries = data?.node != null && "id" in data.node ? data.node : null;
     const applicationPk =
-      data?.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
-    const sectionPk = data?.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.pk;
+      reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
+    const sectionPk = reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.pk;
     const applicationLink = getApplicationUrl(applicationPk, sectionPk);
 
     const paymentStatusLabelType = getStatusLabelType(reservation.paymentOrder?.status);
@@ -127,7 +128,8 @@ export default ReservationTitleSection;
 
 export const APPLICATION_LINK_QUERY = gql`
   query ReservationApplicationLink($id: ID!) {
-    reservationSeries(id: $id) {
+    node(id: $id) {
+      ... on ReservationSeriesNode {
       id
       allocatedTimeSlot {
         id
@@ -146,6 +148,7 @@ export const APPLICATION_LINK_QUERY = gql`
         }
       }
     }
+}
   }
 `;
 

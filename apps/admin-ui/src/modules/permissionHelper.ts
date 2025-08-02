@@ -13,7 +13,16 @@ export const CURRENT_USER = gql`
       email
       isSuperuser
       isAdAuthenticated
-      unitRoles {
+      generalRoles {
+        id
+        permissions
+        role
+      }
+    }
+  }
+`;
+/*
+ *      unitRoles {
         id
         permissions
         units {
@@ -30,14 +39,8 @@ export const CURRENT_USER = gql`
         }
         role
       }
-      generalRoles {
-        id
-        permissions
-        role
-      }
-    }
-  }
-`;
+
+ */
 
 type UserNode = CurrentUserQuery["currentUser"];
 

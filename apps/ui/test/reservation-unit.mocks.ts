@@ -1,9 +1,9 @@
 import {
   type ApplicationRoundTimeSlotNode,
-  Authentication,
-  ImageType,
+  AuthenticationType,
+  ReservationUnitImageType,
   type IsReservableFieldsFragment,
-  ReservationForm,
+  ReservationFormType,
   ReservationKind,
   ReservationStartInterval,
   type ReservationUnitNode,
@@ -106,7 +106,7 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
         largeUrl: "https://example.com/image1_large.jpg",
         mediumUrl: "https://example.com/image1_medium.jpg",
         smallUrl: "https://example.com/image1_small.jpg",
-        imageType: ImageType.Main,
+        imageType: ReservationUnitImageType.Main,
       },
     ] as const,
     accessTypes: [],
@@ -116,7 +116,7 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     // applicationRoundTimeSlots: [] as const, // ReadonlyArray<ApplicationRoundTimeSlotNode>;
     applicationRoundTimeSlots: [timeSelector],
     applicationRounds: [] as const, // ReadonlyArray<ApplicationRoundNode>;
-    authentication: Authentication.Weak,
+    authentication: AuthenticationType.Weak,
     bufferTimeAfter: 0, //Scalars["Duration"]["output"];
     bufferTimeBefore: 0, // Scalars["Duration"]["output"];
     calculatedSurfaceArea: 0, // Scalars["Int"]["output"];
@@ -162,7 +162,7 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     reservationPendingInstructionsSv: null, // Maybe<Scalars["String"]["output"]>;
     reservationStartInterval: ReservationStartInterval.Interval_30Mins,
     reservationState: ReservationUnitReservationState.Reservable,
-    reservations: null, //Maybe<ReadonlyArray<ReservationNode>>;
+    reservations: [], //Maybe<ReadonlyArray<ReservationNode>>;
     reservationsMaxDaysBefore: null, // Maybe<Scalars["Int"]["output"]>;
     reservationsMinDaysBefore: null, // Maybe<Scalars["Int"]["output"]>;
     resources: [] as const, // ReadonlyArray<ResourceNode>;
@@ -174,7 +174,7 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     notesWhenApplyingFi: null, // Maybe<Scalars["String"]["output"]>;
     notesWhenApplyingSv: null, // Maybe<Scalars["String"]["output"]>;
     extUuid: "dummy-uuid", // Scalars["UUID"]["output"];
-    reservationForm: ReservationForm.ReserveeInfoForm,
+    reservationForm: ReservationFormType.ReserveeInfoForm,
   };
 }
 

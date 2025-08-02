@@ -6,7 +6,7 @@ import { H1 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import {
   type CancelReasonFieldsFragment,
-  type ReservationCancelPageQuery,
+  type ReservationCancellationFragment,
   useCancelReservationMutation,
 } from "@gql/gql-types";
 import { ReservationInfoCard } from "./ReservationInfoCard";
@@ -33,12 +33,18 @@ const StyledReservationInfoCard = styled(ReservationInfoCard)`
   ${infoCss}
 `;
 
-type NodeT = ReservationCancelPageQuery["reservation"];
 type CancellationProps = {
   apiBaseUrl: string;
   reasons: CancelReasonFieldsFragment[];
-  reservation: NonNullable<NodeT>;
+  reservation: ReservationCancellationFragment;
 };
+
+export const RESERVATION_CANCELLATION_FRAGMENT= gql`
+  fragment ReservationCancellation on ReservationNode {
+    ...ReservationInfoCard
+    ...ApplicationInfoCard
+  }
+`
 
 export function ReservationCancellation(props: CancellationProps): JSX.Element {
   const { t, i18n } = useTranslation();
@@ -69,6 +75,7 @@ export function ReservationCancellation(props: CancellationProps): JSX.Element {
           input: {
             pk: reservation.pk,
             cancelReason: reason,
+            cancelDetails: "",
           },
         },
       });
@@ -113,7 +120,47 @@ const ApplicationInfo = styled(Card)`
   ${infoCss}
 `;
 
-function ApplicationInfoCard({ reservation }: { reservation: CancellationProps["reservation"] }) {
+export const APPLICATION_INFO_CARD_FRAGMENT = gql`
+  fragment ApplicationInfoCard on ReservationNode {
+    id
+    reservationSeries {
+      id
+      name
+      allocatedTimeSlot {
+        id
+        reservationUnitOption {
+          id
+          applicationSection {
+            id
+            application {
+              id
+              pk
+              applicationRound {
+                id
+                pk
+                termsOfUse {
+                  ...TermsOfUseTextFields
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    reservationUnit {
+      id
+      nameFi
+      nameEn
+      nameSv
+      cancellationTerms {
+        ...TermsOfUseTextFields
+      }
+    }
+    pk
+  }
+`;
+
+function ApplicationInfoCard({ reservation }: { reservation: ReservationCancellationFragment}) {
   // NOTE assumes that the name of the reservationSeries is copied from applicationSection when it's created
   const name = reservation.reservationSeries?.name;
   const { t, i18n } = useTranslation();
@@ -142,11 +189,11 @@ function ApplicationInfoCard({ reservation }: { reservation: CancellationProps["
   return <ApplicationInfo heading={name ?? ""} text={text} variant="vertical" infos={icons} />;
 }
 
-function isPartOfApplication(reservation: Pick<NonNullable<NodeT>, "reservationSeries">): boolean {
+function isPartOfApplication(reservation: Pick<NonNullable<ReservationCancellationFragment>, "reservationSeries">): boolean {
   return reservation?.reservationSeries != null;
 }
 
-function getBackPath(reservation: Pick<NonNullable<NodeT>, "reservationSeries" | "pk">): string {
+function getBackPath(reservation: Pick<NonNullable<ReservationCancellationFragment>, "reservationSeries" | "pk">): string {
   if (reservation == null) {
     return "";
   }
@@ -160,7 +207,7 @@ function getBackPath(reservation: Pick<NonNullable<NodeT>, "reservationSeries" |
 
 /// For applications use application round terms of use
 function getTranslatedTerms(
-  reservation: Pick<NonNullable<NodeT>, "reservationSeries" | "reservationUnit" | "pk">,
+  reservation: Pick<NonNullable<ReservationCancellationFragment>, "reservationSeries" | "reservationUnit" | "pk">,
   lang: LocalizationLanguages
 ) {
   if (reservation.reservationSeries) {
@@ -181,7 +228,7 @@ function getTranslatedTerms(
 }
 
 export const CANCEL_RESERVATION = gql`
-  mutation CancelReservation($input: ReservationCancellationMutationInput!) {
+  mutation CancelReservation($input: ReservationCancelMutation!) {
     cancelReservation(input: $input) {
       pk
     }

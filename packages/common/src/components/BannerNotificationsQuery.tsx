@@ -8,7 +8,7 @@ import { BANNER_NOTIFICATION_COMMON_FRAGMENT } from "../queries/fragments";
 export const BANNER_NOTIFICATIONS_LIST_ALL = gql`
   ${BANNER_NOTIFICATION_COMMON_FRAGMENT}
   query BannerNotificationsListAll {
-    bannerNotifications(isVisible: true, target: ALL) {
+    bannerNotifications(filter: { isVisible: true target: ALL }) {
       edges {
         node {
           ...BannerNotificationCommon
@@ -21,7 +21,7 @@ export const BANNER_NOTIFICATIONS_LIST_ALL = gql`
 export const BANNER_NOTIFICATIONS_LIST_TARGET = gql`
   ${BANNER_NOTIFICATION_COMMON_FRAGMENT}
   query BannerNotificationsList($target: BannerNotificationTarget!) {
-    bannerNotifications(isVisible: true, target: $target) {
+    bannerNotifications(filter: { isVisible: true, target: $target }) {
       edges {
         node {
           ...BannerNotificationCommon

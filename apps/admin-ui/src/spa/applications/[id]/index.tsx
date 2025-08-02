@@ -564,7 +564,7 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
     variables: { id },
   });
 
-  const application = data?.application;
+  const application = data?.node != null && "pk" in data.node ? data.node : null;
   const applicationRound = application?.applicationRound;
 
   if (isLoading) {
@@ -731,9 +731,7 @@ export default ApplicationDetailsRouted;
 export const APPLICATION_PAGE_SECTION_FRAGMENT = gql`
   fragment ApplicationPageSection on ApplicationSectionNode {
     ...ApplicationSectionCommon
-    suitableTimeRanges {
-      ...SuitableTime
-    }
+    ...TimeSelector
     purpose {
       id
       pk
@@ -796,19 +794,21 @@ export const RESERVATION_UNIT_OPTION_FRAGMENT = gql`
 
 export const APPLICATION_ADMIN_QUERY = gql`
   query ApplicationAdmin($id: ID!) {
-    application(id: $id) {
-      ...ApplicationPageFields
-      workingMemo
-      user {
-        id
-        email
+    node(id: $id) {
+      ... on ApplicationNode {
+        ...ApplicationPageFields
+        workingMemo
+        user {
+          id
+          email
+        }
       }
     }
   }
 `;
 
 export const REJECT_ALL_SECTION_OPTIONS = gql`
-  mutation RejectAllSectionOptions($input: RejectAllSectionOptionsMutationInput!) {
+  mutation RejectAllSectionOptions($input: RejectAllSectionOptionsMutation!) {
     rejectAllSectionOptions(input: $input) {
       pk
     }
@@ -816,7 +816,7 @@ export const REJECT_ALL_SECTION_OPTIONS = gql`
 `;
 
 export const RESTORE_ALL_SECTION_OPTIONS = gql`
-  mutation RestoreAllSectionOptions($input: RestoreAllSectionOptionsMutationInput!) {
+  mutation RestoreAllSectionOptions($input: RestoreAllSectionOptionsMutation!) {
     restoreAllSectionOptions(input: $input) {
       pk
     }
@@ -824,7 +824,7 @@ export const RESTORE_ALL_SECTION_OPTIONS = gql`
 `;
 
 export const REJECT_APPLICATION = gql`
-  mutation RejectAllApplicationOptions($input: RejectAllApplicationOptionsMutationInput!) {
+  mutation RejectAllApplicationOptions($input: RejectAllApplicationOptionsMutation!) {
     rejectAllApplicationOptions(input: $input) {
       pk
     }
@@ -832,7 +832,7 @@ export const REJECT_APPLICATION = gql`
 `;
 
 export const RESTORE_APPLICATION = gql`
-  mutation RestoreAllApplicationOptions($input: RestoreAllApplicationOptionsMutationInput!) {
+  mutation RestoreAllApplicationOptions($input: RestoreAllApplicationOptionsMutation!) {
     restoreAllApplicationOptions(input: $input) {
       pk
     }

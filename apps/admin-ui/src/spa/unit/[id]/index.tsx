@@ -68,7 +68,7 @@ function Unit(): JSX.Element {
     fetchPolicy: "network-only",
   });
 
-  const { unit } = data ?? {};
+  const unit = data?.node != null && "spaces" in data.node ? data.node : null;
   const hasSpacesResources = Boolean(unit?.spaces?.length);
 
   if (isLoading) {
@@ -136,18 +136,25 @@ function Unit(): JSX.Element {
 
 export default Unit;
 
+export const UNIT_PAGE_FRAGMENT = gql`
+  fragment UnitPage on UnitNode {
+    id
+    pk
+    nameFi
+    tprekId
+    shortDescriptionFi
+    reservationUnits {
+      ...ReservationUnitCard
+    }
+    ...NewResourceUnitFields
+  }
+`;
 export const UNIT_PAGE_QUERY = gql`
   query UnitPage($id: ID!) {
-    unit(id: $id) {
-      id
-      pk
-      nameFi
-      tprekId
-      shortDescriptionFi
-      reservationUnits {
-        ...ReservationUnitCard
-      }
-      ...NewResourceUnitFields
+    node(id: $id) {
+      ... on UnitNode {
+        ...UnitPage
+       }
     }
   }
 `;

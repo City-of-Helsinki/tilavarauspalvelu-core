@@ -1,8 +1,6 @@
 import { Controller, UseFormReturn } from "react-hook-form";
 import type { ReservationUnitEditFormValues } from "@/spa/ReservationUnit/edit/form";
-import type { ReservationUnitEditorParametersQuery } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
-import { filterNonNullable } from "common/src/helpers";
 import { EditAccordion } from "@/spa/ReservationUnit/edit/components/styled";
 import { AutoGrid } from "common/styled";
 import { ControlledSelect } from "common/src/components/form";
@@ -18,32 +16,19 @@ const RichTextInput = dynamic(() => import("../../../../component/RichTextInput"
 
 export function DescriptionSection({
   form,
-  equipments,
-  purposes,
-  reservationUnitTypes,
+  equipmentOptions,
+  purposeOptions,
+  reservationUnitTypeOptions,
 }: Readonly<{
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  equipments: ReservationUnitEditorParametersQuery["equipmentsAll"] | undefined;
-  purposes: ReservationUnitEditorParametersQuery["purposes"] | undefined;
-  reservationUnitTypes: ReservationUnitEditorParametersQuery["reservationUnitTypes"] | undefined;
+  equipmentOptions: Array<{ label: string; value: number }>;
+  purposeOptions: Array<{ label: string; value: number }>;
+  reservationUnitTypeOptions: Array<{ label: string; value: number }>;
 }>) {
   const { t } = useTranslation();
   const { control, formState } = form;
   const { errors } = formState;
 
-  const equipmentOptions = filterNonNullable(equipments).map((n) => ({
-    value: n.pk ?? -1,
-    label: n.nameFi ?? "no-name",
-  }));
-
-  const purposeOptions = filterNonNullable(purposes?.edges.map((n) => n?.node)).map((n) => ({
-    value: n.pk ?? -1,
-    label: n.nameFi ?? "no-name",
-  }));
-  const reservationUnitTypeOptions = filterNonNullable(reservationUnitTypes?.edges.map((n) => n?.node)).map((n) => ({
-    value: n.pk ?? -1,
-    label: n.nameFi ?? "no-name",
-  }));
 
   const hasErrors =
     errors.reservationUnitType != null ||

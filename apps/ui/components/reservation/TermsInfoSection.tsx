@@ -4,18 +4,19 @@ import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { Sanitize } from "common/src/components/Sanitize";
-import type { ReservationPageQuery } from "@gql/gql-types";
+import type { TermsInfoSectionFragment } from "@gql/gql-types";
 import { getServerSideProps } from "@/pages/reservations/[id]";
+import { gql } from "@apollo/client";
 
+// FIXME don't import this from a page
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
-type NodeT = NonNullable<ReservationPageQuery["reservation"]>;
 
 export function TermsInfoSection({
   reservation,
   termsOfUse,
 }: Readonly<{
-  reservation: Pick<NodeT, "reservationUnit" | "beginsAt" | "applyingForFreeOfCharge">;
+  reservation: TermsInfoSectionFragment;
   termsOfUse: PropsNarrowed["termsOfUse"];
 }>) {
   const { t, i18n } = useTranslation();
@@ -69,3 +70,18 @@ export function TermsInfoSection({
     </div>
   );
 }
+
+export const TERMS_INFO_SECTION_FRAGMENT = gql`
+  fragment TermsInfoSection on ReservationNode {
+    id
+    applyingForFreeOfCharge
+    beginsAt
+    reservationUnit {
+      pricings {
+        ...PricingFields
+      }
+      canApplyFreeOfCharge
+      ...TermsOfUse
+    }
+  }
+`;

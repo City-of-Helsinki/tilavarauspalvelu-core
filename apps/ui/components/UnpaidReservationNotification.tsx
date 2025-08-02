@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import {
   type ReservationNotificationFragment,
-  ReservationOrderingChoices,
+  ReservationOrderSet,
   ReservationStateChoice,
   ReservationTypeChoice,
   useDeleteReservationMutation,
@@ -14,7 +14,7 @@ import {
 import NotificationWrapper from "common/src/components/NotificationWrapper";
 import { useCurrentUser } from "@/hooks";
 import { getCheckoutUrl } from "@/modules/reservation";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import { createNodeId, filterNonNullable } from "common/src/helpers";
 import { gql, useApolloClient } from "@apollo/client";
 import { toApiDate } from "common/src/common/util";
 import { errorToast, successToast } from "common/src/common/toast";
@@ -127,7 +127,7 @@ export function InProgressReservationNotification() {
     skip: !currentUser?.pk,
     variables: {
       state: [ReservationStateChoice.WaitingForPayment, ReservationStateChoice.Created],
-      orderBy: ReservationOrderingChoices.PkDesc,
+      orderBy: ReservationOrderSet.PkDesc,
       user: currentUser?.pk ?? 0,
       beginDate: toApiDate(new Date()) ?? "",
       reservationType: ReservationTypeChoice.Normal,
@@ -135,7 +135,7 @@ export function InProgressReservationNotification() {
     fetchPolicy: "no-cache",
   });
 
-  const reservations = filterNonNullable(data?.reservations?.edges.map((e) => e?.node));
+  const reservations = filterNonNullable(data?.reservations?.edges?.map((e) => e?.node));
 
   // Hide on some routes
   // We want to filter these two routes for
@@ -189,12 +189,11 @@ export function InProgressReservationNotification() {
         const { data } = await deleteReservation({
           variables: {
             input: {
-              pk: reservation.pk.toString(),
+              pk: reservation.pk,
             },
           },
         });
-        const deleted = data?.deleteTentativeReservation?.deleted;
-        if (deleted) {
+        if (data?.deleteTentativeReservation?.pk) {
           successToast({
             text: t("notification:waitingForPayment.reservationCancelledTitle"),
           });
@@ -226,10 +225,10 @@ export function InProgressReservationNotification() {
     }
     const res = await reservationQ({
       variables: {
-        id: base64encode(`ReservationNode:${reservation.pk}`),
+        id: createNodeId("ReservationNode", reservation.pk),
       },
     });
-    if (res.data?.reservation == null) {
+    if (res.data?.node == null) {
       errorToast({
         text: t("errors:api:NOT_FOUND"),
       });
@@ -303,17 +302,19 @@ export const RESERVATION_NOTIFICATION_FRAGMENT = gql`
 export const IN_PROGRESS_RESERVATION_NOTIFICATION_QUERY = gql`
   query ListInProgressReservations(
     $state: [ReservationStateChoice!]
-    $orderBy: [ReservationOrderingChoices!]
-    $user: [Int]!
+    $orderBy: [ReservationOrderSet!]
+    $user: [Int!]!
     $beginDate: Date!
-    $reservationType: [ReservationTypeChoice!]
+    $reservationType: ReservationTypeChoice!
   ) {
     reservations(
+filter: {
       user: $user
       state: $state
-      orderBy: $orderBy
       beginDate: $beginDate
       reservationType: $reservationType
+}
+      orderBy: $orderBy
     ) {
       edges {
         node {

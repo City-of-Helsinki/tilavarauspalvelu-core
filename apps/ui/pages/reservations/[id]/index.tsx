@@ -17,9 +17,9 @@ import {
   OrderStatus,
   useAccessCodeQuery,
   AccessType,
-  type AccessCodeQuery,
   MunicipalityChoice,
   ReservationCancelReasonChoice,
+  type PindoraReservationFragment,
 } from "@gql/gql-types";
 import Link from "next/link";
 import { isBefore, sub } from "date-fns";
@@ -34,7 +34,7 @@ import { getReservationUnitName } from "@/modules/reservationUnit";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { AddressSection } from "@/components/reservation-unit";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
-import { base64encode, capitalize, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { capitalize, createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { ButtonLikeLink, ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import {
@@ -170,10 +170,11 @@ function Reservation({
   const { data: accessCodeData } = useAccessCodeQuery({
     skip: !reservation || !shouldShowAccessCode,
     variables: {
-      id: base64encode(`ReservationNode:${reservation.pk}`),
+      id: createNodeId("ReservationNode", reservation.pk),
     },
   });
-  const pindoraInfo = accessCodeData?.reservation?.pindoraInfo ?? null;
+  const pindoraInfo = accessCodeData?.node != null && "pindoraInfo" in accessCodeData.node ?
+    accessCodeData?.node?.pindoraInfo : null;
 
   const modifyTimeReason = getWhyReservationCantBeChanged(reservation);
   const canTimeBeModified = modifyTimeReason == null;
@@ -357,7 +358,7 @@ function Reservation({
           <Instructions reservation={reservation} />
           <GeneralFields supportedFields={supportedFields} reservation={reservation} options={options} />
           <ApplicationFields reservation={reservation} options={options} supportedFields={supportedFields} />
-          {shouldShowAccessCode && <AccessCodeInfo pindoraInfo={pindoraInfo} feedbackUrl={feedbackUrl} />}
+          {shouldShowAccessCode && pindoraInfo != null && <AccessCodeInfo pindoraInfo={pindoraInfo} feedbackUrl={feedbackUrl} />}
           <TermsInfoSection reservation={reservation} termsOfUse={termsOfUse} />
           <AddressSection
             title={getReservationUnitName(reservation.reservationUnit, lang) ?? "-"}
@@ -372,9 +373,10 @@ function Reservation({
 function AccessCodeInfo({
   pindoraInfo,
   feedbackUrl,
-}: Readonly<
-  Pick<NonNullable<AccessCodeQuery["reservation"]>, "pindoraInfo"> & Pick<PropsNarrowed, "feedbackUrl">
->): React.ReactElement {
+}: Readonly<{
+  pindoraInfo: Readonly< PindoraReservationFragment>;
+  feedbackUrl: PropsNarrowed["feedbackUrl"];
+  }>): React.ReactElement {
   const { t, i18n } = useTranslation();
   return (
     <div>
@@ -430,14 +432,14 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const bookingTerms = await getGenericTerms(apolloClient);
 
     // NOTE errors will fallback to 404
-    const id = base64encode(`ReservationNode:${pk}`);
+    const id = createNodeId("ReservationNode", pk);
     const { data } = await apolloClient.query<ReservationPageQuery, ReservationPageQueryVariables>({
       query: ReservationPageDocument,
       fetchPolicy: "no-cache",
       variables: { id },
     });
 
-    const { reservation } = data ?? {};
+    const reservation = data.node != null && "pk" in data.node ? data.node : null;
 
     if (reservation?.reservationSeries != null) {
       const recurringId = reservation.reservationSeries.id;
@@ -448,8 +450,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         query: ApplicationReservationSeriesDocument,
         variables: { id: recurringId },
       });
-      const applicationPk =
-        recurringData?.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
+      const allocatedTimeSlot = recurringData?.node != null && "allocatedTimeSlot" in recurringData.node ? recurringData.node.allocatedTimeSlot : null;
+      const applicationPk = allocatedTimeSlot?.reservationUnitOption.applicationSection?.application?.pk;
       return {
         redirect: {
           permanent: true,
@@ -488,7 +490,8 @@ export default Reservation;
 
 export const GET_APPLICATION_RESERVATION_SERIES_QUERY = gql`
   query ApplicationReservationSeries($id: ID!) {
-    reservationSeries(id: $id) {
+    node(id: $id) {
+      ... on ReservationSeriesNode {
       id
       allocatedTimeSlot {
         id
@@ -505,37 +508,47 @@ export const GET_APPLICATION_RESERVATION_SERIES_QUERY = gql`
       }
     }
   }
+  }
+`;
+
+// TODO don't use massive fragments just for typing
+// split the fragment into component specific fragments
+export const RESERVATION_PAGE_FRAGMENT = gql`
+  fragment ReservationPage on ReservationNode {
+    id
+    type
+    ...MetaFields
+    ...ReservationInfoCard
+    ...Instructions
+    ...CanReservationBeChanged
+    ...TermsInfoSection
+    calendarUrl
+    cancelReason
+    paymentOrder {
+      id
+      status
+      checkoutUrl
+      receiptUrl
+      handledPaymentDueBy
+    }
+    reservationSeries {
+      id
+    }
+    reservationUnit {
+      id
+      unit {
+        ...AddressFields
+      }
+      ...MetadataSets
+    }
+  }
 `;
 
 export const GET_RESERVATION_PAGE_QUERY = gql`
   query ReservationPage($id: ID!) {
-    reservation(id: $id) {
-      id
-      type
-      ...MetaFields
-      ...ReservationInfoCard
-      ...Instructions
-      ...CanReservationBeChanged
-      calendarUrl
-      cancelReason
-      paymentOrder {
-        id
-        status
-        checkoutUrl
-        receiptUrl
-        handledPaymentDueBy
-      }
-      reservationSeries {
-        id
-      }
-      reservationUnit {
-        id
-        unit {
-          ...AddressFields
-        }
-        canApplyFreeOfCharge
-        ...MetadataSets
-        ...TermsOfUse
+    node(id: $id) {
+      ... on ReservationNode {
+        ...ReservationPage
       }
     }
   }

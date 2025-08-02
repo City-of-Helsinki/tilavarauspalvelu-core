@@ -1,18 +1,13 @@
 import { gql } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
-import { ReservationUnitTypeOrderingChoices, useReservationUnitTypesFilterQuery } from "@gql/gql-types";
+import { ReservationUnitTypeOrderSet, useReservationUnitTypesFilterQuery } from "@gql/gql-types";
 
 export const RESERVATION_UNIT_TYPES_QUERY = gql`
-  query ReservationUnitTypesFilter($after: String, $orderBy: [ReservationUnitTypeOrderingChoices]) {
-    reservationUnitTypes(after: $after, orderBy: $orderBy) {
-      edges {
-        node {
-          id
-          pk
-          nameFi
-        }
-      }
-      totalCount
+  query ReservationUnitTypesFilter($orderBy: [ReservationUnitTypeOrderSet!]) {
+    allReservationUnitTypes(orderBy: $orderBy) {
+      id
+      pk
+      nameFi
     }
   }
 `;
@@ -20,14 +15,11 @@ export const RESERVATION_UNIT_TYPES_QUERY = gql`
 export function useReservationUnitTypes() {
   const { data, loading } = useReservationUnitTypesFilterQuery({
     variables: {
-      orderBy: ReservationUnitTypeOrderingChoices.NameFiAsc,
+      orderBy: ReservationUnitTypeOrderSet.NameFiAsc,
     },
   });
 
-  const qd = data?.reservationUnitTypes;
-  const types = filterNonNullable(qd?.edges.map((x) => x?.node));
-
-  const options = types.map((type) => ({
+  const options = filterNonNullable(data?.allReservationUnitTypes).map((type) => ({
     label: type?.nameFi ?? "",
     value: type?.pk ?? 0,
   }));

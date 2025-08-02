@@ -3,7 +3,7 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { gql } from "@apollo/client";
 import { errorToast } from "common/src/common/toast";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import { createNodeId, filterNonNullable } from "common/src/helpers";
 import { isApplicationRoundInProgress } from "@/helpers";
 import { CenterSpinner, Flex, H1, TabWrapper, TitleSection } from "common/styled";
 import { Button, Tabs } from "hds-react";
@@ -43,20 +43,20 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   const isPkValid = pk > 0;
   const { data, loading, refetch } = useApplicationRoundQuery({
     skip: !isPkValid,
-    variables: { id: base64encode(`ApplicationRoundNode:${pk}`) },
+    variables: { id: createNodeId("ApplicationRoundNode", pk) },
     pollInterval: isInProgress ? 10000 : 0,
     onError: () => {
       errorToast({ text: t("errors.errorFetchingData") });
     },
   });
-  const { applicationRound } = data ?? {};
+  const applicationRound = data?.node != null && "pk" in data.node ? data.node : null;
 
   // NOTE: useEffect works, onCompleted does not work with refetch
   useEffect(() => {
-    if (data) {
-      setIsInProgress(isApplicationRoundInProgress(data.applicationRound));
+    if (applicationRound != null) {
+      setIsInProgress(isApplicationRoundInProgress(applicationRound));
     }
-  }, [data]);
+  }, [applicationRound]);
 
   const { user } = useSession();
   const unitOptions = getUserPermissionFilteredUnits(applicationRound, user);
@@ -275,7 +275,7 @@ function isAllocationEnabled(
 function hasApplicationRoundEnded(applicationRound: Pick<ApplicationRoundAdminFragment, "status">): boolean {
   return (
     applicationRound.status === ApplicationRoundStatusChoice.Handled ||
-    applicationRound.status === ApplicationRoundStatusChoice.ResultsSent
+    applicationRound.status === ApplicationRoundStatusChoice.Sent
   );
 }
 
@@ -307,8 +307,10 @@ export const APPLICATION_ROUND_ADMIN_FRAGMENT = gql`
 
 export const APPLICATION_ROUND_QUERY = gql`
   query ApplicationRound($id: ID!) {
-    applicationRound(id: $id) {
-      ...ApplicationRoundAdmin
+    node(id: $id) {
+      ... on ApplicationRoundNode {
+        ...ApplicationRoundAdmin
+      }
     }
   }
 `;

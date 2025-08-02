@@ -25,7 +25,7 @@ import {
   useBannerNotificationUpdateMutation,
   useBannerNotificationCreateMutation,
   useBannerNotificationPageQuery,
-  type BannerNotificationPageQuery,
+  type BannerNotificationPageFragment,
 } from "@gql/gql-types";
 import { fromUIDate } from "common/src/common/util";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
@@ -36,7 +36,7 @@ import {
   checkLengthWithoutHtml,
 } from "common/src/schemas/schemaCommon";
 import { valueForDateInput, valueForTimeInput, dateTime, constructDateTimeSafe } from "@/helpers";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 import { ControlledDateInput } from "common/src/components/form";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { successToast } from "common/src/common/toast";
@@ -52,7 +52,7 @@ const RichTextInput = dynamic(() => import("@/component/RichTextInput"), {
 
 // export for codegen (otherwise they might get removed)
 export const BANNER_NOTIFICATIONS_CREATE = gql`
-  mutation BannerNotificationCreate($input: BannerNotificationCreateMutationInput!) {
+  mutation BannerNotificationCreate($input: BannerNotificationCreateMutation!) {
     createBannerNotification(input: $input) {
       pk
     }
@@ -60,7 +60,7 @@ export const BANNER_NOTIFICATIONS_CREATE = gql`
 `;
 
 export const BANNER_NOTIFICATIONS_UPDATE = gql`
-  mutation BannerNotificationUpdate($input: BannerNotificationUpdateMutationInput!) {
+  mutation BannerNotificationUpdate($input: BannerNotificationUpdateMutation!) {
     updateBannerNotification(input: $input) {
       pk
     }
@@ -68,9 +68,9 @@ export const BANNER_NOTIFICATIONS_UPDATE = gql`
 `;
 
 export const BANNER_NOTIFICATIONS_DELETE = gql`
-  mutation BannerNotificationDelete($input: BannerNotificationDeleteMutationInput!) {
+  mutation BannerNotificationDelete($input: BannerNotificationDeleteMutation!) {
     deleteBannerNotification(input: $input) {
-      deleted
+      pk
     }
   }
 `;
@@ -247,7 +247,7 @@ const GridForm = styled.form`
 `;
 
 /// @brief This is the create / edit page for a single notification.
-const NotificationForm = ({ notification }: { notification?: BannerNotificationPageQuery["bannerNotification"] }) => {
+const NotificationForm = ({ notification }: { notification : BannerNotificationPageFragment | null }) => {
   const { t } = useTranslation("translation", { keyPrefix: "Notifications" });
 
   const today = new Date();
@@ -519,7 +519,7 @@ function getName(isNew: boolean, isLoading: boolean, name: string | undefined, t
   return t("Notifications.error.notFound");
 }
 
-function useRemoveNotification({ notification }: { notification?: BannerNotificationPageQuery["bannerNotification"] }) {
+function useRemoveNotification({ notification }: { notification: Pick<BannerNotificationPageFragment, "pk"> | null }) {
   const { t } = useTranslation();
 
   const [removeMutation] = useBannerNotificationDeleteMutation();
@@ -528,11 +528,14 @@ function useRemoveNotification({ notification }: { notification?: BannerNotifica
   const displayError = useDisplayError();
 
   const removeNotification = async () => {
+    if (notification?.pk == null) {
+      throw new Error("Notification pk is required for removal");
+    }
     try {
       const res = await removeMutation({
         variables: {
           input: {
-            pk: String(notification?.pk ?? 0),
+            pk: notification.pk,
           },
         },
       });
@@ -558,7 +561,7 @@ function LoadedContent({
   children,
 }: {
   isNew: boolean;
-  notification?: BannerNotificationPageQuery["bannerNotification"];
+  notification: BannerNotificationPageFragment | null;
   children?: ReactNode;
 }) {
   const { t } = useTranslation();
@@ -572,7 +575,7 @@ function LoadedContent({
         <H1 $noMargin>{name}</H1>
         {notification?.state && <BannerNotificationStatusLabel state={notification.state} />}
       </TitleSection>
-      {(notification || isNew) && <NotificationForm notification={notification ?? undefined} />}
+      {(notification || isNew) && <NotificationForm notification={notification} />}
       {notification && (
         <ButtonContainer style={{ marginTop: "2rem", justifyContent: "flex-start" }}>
           <Button onClick={removeNotification} variant={ButtonVariant.Secondary}>
@@ -591,13 +594,13 @@ function LoadedContent({
 function PageWrapped({ pk }: { pk?: number }): JSX.Element {
   const typename = "BannerNotificationNode";
 
-  const id = base64encode(`${typename}:${pk}`);
+  const id = createNodeId(typename, pk ?? 0);
   const { data, loading: isLoading } = useBannerNotificationPageQuery({
     skip: !pk,
     variables: { id },
   });
 
-  const notification = data?.bannerNotification ?? undefined;
+  const notification = data?.node && "pk" in data.node ? data.node : null;
 
   const isNew = pk === 0;
 
@@ -617,21 +620,29 @@ function PageRouted() {
 
 export default PageRouted;
 
+export const BANNER_NOTIFICATION_PAGE_FRAGMENT = gql`
+  fragment BannerNotificationPage on BannerNotificationNode {
+    id
+    pk
+    level
+    activeFrom
+    messageEn
+    messageFi
+    messageSv
+    name
+    target
+    activeUntil
+    draft
+    state
+  }
+`;
+
 export const BANNER_NOTIFICATION_PAGE_QUERY = gql`
   query BannerNotificationPage($id: ID!) {
-    bannerNotification(id: $id) {
-      id
-      pk
-      level
-      activeFrom
-      messageEn
-      messageFi
-      messageSv
-      name
-      target
-      activeUntil
-      draft
-      state
+    node(id: $id) {
+      ... on BannerNotificationNode {
+        ...BannerNotificationPage
+      }
     }
   }
 `;

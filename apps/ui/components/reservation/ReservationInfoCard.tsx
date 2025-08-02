@@ -14,7 +14,7 @@ import {
 } from "@gql/gql-types";
 import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
 import { formatDateTimeRange, formatDuration } from "@/modules/util";
-import { base64encode, capitalize, getImageSource, getMainImage } from "common/src/helpers";
+import { capitalize, createNodeId, getImageSource, getMainImage } from "common/src/helpers";
 import { getReservationUnitPath } from "@/modules/urls";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 
@@ -68,14 +68,16 @@ export function ReservationInfoCard({
 }: Readonly<Props>): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const reservationUnit = reservation.reservationUnit;
-  const { data: accessCodeData } = useAccessCodeQuery({
+  const { data } = useAccessCodeQuery({
     skip: !reservation || reservation.accessType !== AccessType.AccessCode,
     variables: {
-      id: base64encode(`ReservationNode:${reservation.pk}`),
+      id: createNodeId("ReservationNode", reservation.pk),
     },
   });
-  const { accessCode } = accessCodeData?.reservation?.pindoraInfo ?? {};
-  const shouldDisplayAccessCode = accessCodeData?.reservation?.pindoraInfo?.accessCodeIsActive;
+  const accessCodeNode = data?.node != null && "pindoraInfo" in data.node ? data.node : null;
+  const { pindoraInfo } = accessCodeNode ?? {};
+  const { accessCode } = pindoraInfo ?? {};
+  const shouldDisplayAccessCode = pindoraInfo?.accessCodeIsActive;
 
   const { beginsAt, endsAt } = reservation || {};
   // NOTE can be removed after this has been refactored not to be used for PendingReservation

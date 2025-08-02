@@ -1,7 +1,7 @@
 import { ReservationTypeChoice, useReservationsByReservationUnitQuery } from "@gql/gql-types";
 import { errorToast } from "common/src/common/toast";
 import { combineAffectingReservations, doesIntervalCollide, reservationToInterval } from "@/helpers";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { gql } from "@apollo/client";
@@ -29,7 +29,7 @@ export function useCheckCollisions({
   const today = new Date();
 
   const typename = "ReservationUnitNode";
-  const id = base64encode(`${typename}:${reservationUnitPk}`);
+  const id = createNodeId(typename, reservationUnitPk);
 
   const { data, loading } = useReservationsByReservationUnitQuery({
     fetchPolicy: "no-cache",
@@ -46,7 +46,8 @@ export function useCheckCollisions({
     },
   });
 
-  const reservations = combineAffectingReservations(data, reservationUnitPk);
+  const reservations = (data?.node != null && "reservations" in data.node
+    ? combineAffectingReservations({ ...data, node: data.node }, reservationUnitPk) : [])
 
   const collisions = reservations
     .filter((x) => x?.pk !== reservationPk)
@@ -70,15 +71,17 @@ export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
   query ReservationsByReservationUnit(
     $id: ID!
     $pk: Int!
-    $beginDate: Date
-    $endDate: Date
-    $state: [ReservationStateChoice]
+    $beginDate: Date!
+    $endDate: Date!
+    $state: [ReservationStateChoice!]
   ) {
-    reservationUnit(id: $id) {
-      id
-      reservations(state: $state, beginDate: $beginDate, endDate: $endDate) {
-        ...CalendarReservation
-        ...CombineAffectedReservations
+    node(id: $id) {
+      ... on ReservationUnitNode {
+        id
+        reservations(filter: { state: $state, beginDate: $beginDate, endDate: $endDate }) {
+          ...CalendarReservation
+          ...CombineAffectedReservations
+        }
       }
     }
     affectingReservations(forReservationUnits: [$pk], state: $state, beginDate: $beginDate, endDate: $endDate) {

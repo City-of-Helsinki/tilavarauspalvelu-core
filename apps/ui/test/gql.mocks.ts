@@ -2,8 +2,8 @@ import {
   CurrentUserDocument,
   OptionsDocument,
   OptionsQuery,
-  ReservationPurposeOrderingChoices,
-  ReservationUnitTypeOrderingChoices,
+  ReservationPurposeOrderSet,
+  ReservationUnitTypeOrderSet,
   type CurrentUserQuery,
 } from "@/gql/gql-types";
 import { createApplicationMutationMocks } from "./application.mocks";
@@ -65,8 +65,8 @@ function createOptionsQueryMocks(): CreateGraphQLMocksReturn {
       request: {
         query: OptionsDocument,
         variables: {
-          reservationUnitTypesOrderBy: ReservationUnitTypeOrderingChoices.RankAsc,
-          reservationPurposesOrderBy: ReservationPurposeOrderingChoices.RankAsc,
+          reservationUnitTypesOrderBy: ReservationUnitTypeOrderSet.RankAsc,
+          reservationPurposesOrderBy: ReservationPurposeOrderSet.RankAsc,
           unitsOrderBy: [],
           equipmentsOrderBy: [],
           purposesOrderBy: [],

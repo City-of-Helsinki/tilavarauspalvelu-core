@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { gql } from "@apollo/client";
 import {
-  ReservationUnitOrderingChoices,
+  ReservationUnitOrderSet,
   ReservationUnitPublishingState,
   useSearchReservationUnitsQuery,
 } from "@gql/gql-types";
@@ -15,24 +15,24 @@ import { CenterSpinner } from "common/styled";
 import { useTranslation } from "react-i18next";
 import { mapParamToNumber } from "@/helpers";
 
-function transformOrderBy(orderBy: string, desc: boolean): ReservationUnitOrderingChoices | null {
+function transformOrderBy(orderBy: string, desc: boolean): ReservationUnitOrderSet | null {
   switch (orderBy) {
     case "nameFi":
-      return desc ? ReservationUnitOrderingChoices.NameFiDesc : ReservationUnitOrderingChoices.NameFiAsc;
+      return desc ? ReservationUnitOrderSet.NameFiDesc : ReservationUnitOrderSet.NameFiAsc;
     case "unitNameFi":
-      return desc ? ReservationUnitOrderingChoices.UnitNameFiDesc : ReservationUnitOrderingChoices.UnitNameFiAsc;
+      return desc ? ReservationUnitOrderSet.UnitNameFiDesc : ReservationUnitOrderSet.UnitNameFiAsc;
     case "typeFi":
-      return desc ? ReservationUnitOrderingChoices.TypeFiDesc : ReservationUnitOrderingChoices.TypeFiAsc;
+      return desc ? ReservationUnitOrderSet.TypeFiDesc : ReservationUnitOrderSet.TypeFiAsc;
     case "maxPersons":
-      return desc ? ReservationUnitOrderingChoices.MaxPersonsDesc : ReservationUnitOrderingChoices.MaxPersonsAsc;
+      return desc ? ReservationUnitOrderSet.MaxPersonsDesc : ReservationUnitOrderSet.MaxPersonsAsc;
     case "surfaceArea":
-      return desc ? ReservationUnitOrderingChoices.SurfaceAreaDesc : ReservationUnitOrderingChoices.SurfaceAreaAsc;
+      return desc ? ReservationUnitOrderSet.SurfaceAreaDesc : ReservationUnitOrderSet.SurfaceAreaAsc;
     default:
       return null;
   }
 }
 
-function transformSortString(orderBy: string | null): ReservationUnitOrderingChoices[] {
+function transformSortString(orderBy: string | null): ReservationUnitOrderSet[] {
   if (!orderBy) {
     return [];
   }
@@ -108,7 +108,7 @@ export function ReservationUnitsDataReader(): JSX.Element {
       textSearch: searchFilter,
       unit,
       unitGroup: unitGroupFilter,
-      publishingState: reservationUnitStates.map((state) => convertToReservationUnitState(state)),
+      publishingState: filterNonNullable(reservationUnitStates.map(convertToReservationUnitState)),
       reservationUnitType: reservationUnitTypes,
     },
     onError: () => {
@@ -121,7 +121,7 @@ export function ReservationUnitsDataReader(): JSX.Element {
   const { fetchMore, loading, data, previousData } = query;
 
   const { reservationUnits } = data ?? previousData ?? {};
-  const resUnits = filterNonNullable(reservationUnits?.edges.map((edge) => edge?.node));
+  const resUnits = filterNonNullable(reservationUnits?.edges?.map((edge) => edge?.node));
 
   if (loading && resUnits.length === 0) {
     return <CenterSpinner />;
@@ -149,16 +149,17 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
     $maxPersonsLte: Int
     $surfaceAreaGte: Int
     $surfaceAreaLte: Int
-    $unit: [Int]
-    $unitGroup: [Int]
-    $reservationUnitType: [Int]
-    $orderBy: [ReservationUnitOrderingChoices]
-    $publishingState: [ReservationUnitPublishingState]
+    $unit: [Int!]
+    $unitGroup: [Int!]
+    $reservationUnitType: [Int!]
+    $orderBy: [ReservationUnitOrderSet!]
+    $publishingState: [ReservationUnitPublishingState!]
   ) {
     reservationUnits(
       first: $first
       after: $after
       orderBy: $orderBy
+    filter: {
       textSearch: $textSearch
       maxPersonsGte: $maxPersonsGte
       minPersonsGte: $maxPersonsGte
@@ -171,6 +172,7 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
       reservationUnitType: $reservationUnitType
       publishingState: $publishingState
       onlyWithPermission: true
+}
     ) {
       edges {
         node {

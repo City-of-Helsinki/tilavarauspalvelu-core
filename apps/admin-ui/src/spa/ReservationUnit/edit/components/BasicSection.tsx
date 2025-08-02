@@ -1,6 +1,6 @@
 import { UseFormReturn } from "react-hook-form";
 import type { ReservationUnitEditFormValues } from "@/spa/ReservationUnit/edit/form";
-import { ReservationKind, ReservationUnitEditQuery, ReservationUnitEditUnitFragment } from "@gql/gql-types";
+import { ReservationKind, type ReservationUnitEditPageFragment, type ReservationUnitEditUnitFragment } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
 import { TextInput } from "hds-react";
@@ -12,8 +12,7 @@ import { SpecializedRadioGroup } from "@/spa/ReservationUnit/edit/components/Spe
 import { EditAccordion } from "@/spa/ReservationUnit/edit/components/styled";
 import { AutoGrid, FullRow } from "common/styled";
 
-type QueryData = ReservationUnitEditQuery["reservationUnit"];
-type Node = NonNullable<QueryData>;
+type Node = ReservationUnitEditPageFragment;
 
 // default is 20 if no spaces selected
 function getMaxPersons(spaceList: Pick<Node, "maxPersons">[]) {

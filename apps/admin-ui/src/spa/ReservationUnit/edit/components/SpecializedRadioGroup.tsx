@@ -7,7 +7,7 @@ import { ControlledRadioGroup } from "common/src/components/form";
 import { breakpoints } from "common/src/const";
 import { getTranslatedError } from "@/common/util";
 
-export function SpecializedRadioGroup({
+export function SpecializedRadioGroup<T>({
   name,
   options,
   control,
@@ -18,7 +18,7 @@ export function SpecializedRadioGroup({
   noTranslation,
 }: {
   name: "reservationKind" | "bufferType" | "cancellationRule";
-  options: readonly string[] | readonly { label: string; value: number }[];
+  options: readonly string[] | readonly { label: string; value: T }[];
   control: Control<ReservationUnitEditFormValues>;
   direction?: "horizontal" | "vertical";
   required?: boolean;
@@ -37,7 +37,7 @@ export function SpecializedRadioGroup({
   const opts = options.map((opt) => {
     const prefix = `ReservationUnitEditor.label.options.${name}`;
     const label = typeof opt === "string" ? `${prefix}.${opt}` : opt.label;
-    const value = typeof opt === "string" ? opt : opt.value;
+    const value = typeof opt === "string" ? opt : opt.value?.toString() ?? "";
     return {
       value,
       label,

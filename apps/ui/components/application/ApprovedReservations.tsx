@@ -257,7 +257,7 @@ export function ApprovedReservations({ application, applicationRound }: Readonly
       beginDate: toApiDate(new Date()) ?? "",
     },
   });
-  const { application: app } = data || {};
+  const app = data?.node != null && "pk" in data.node ? data.node : null;
 
   const sections = filterNonNullable(
     app?.applicationSections?.filter((aes) => {
@@ -1059,7 +1059,7 @@ export const APPLICATION_SECTION_RESERVATION_FRAGMENT = gql`
             beginDatetime
             endDatetime
           }
-          reservations(orderBy: [beginsAtAsc], beginDate: $beginDate) {
+          reservations(orderBy: [beginsAtAsc], filter: { beginDate: $beginDate }) {
             id
             pk
             endsAt
@@ -1083,11 +1083,13 @@ export const APPLICATION_SECTION_RESERVATION_FRAGMENT = gql`
 // we can cache data on client side (when user opens Accordions)
 export const APPLICATION_RESERVATIONS_QUERY = gql`
   query ApplicationReservations($id: ID!, $beginDate: Date!) {
-    application(id: $id) {
-      id
-      pk
-      applicationSections {
-        ...ApplicationSectionReservation
+    node(id: $id) {
+      ... on ApplicationNode {
+        id
+        pk
+        applicationSections {
+          ...ApplicationSectionReservation
+        }
       }
     }
   }

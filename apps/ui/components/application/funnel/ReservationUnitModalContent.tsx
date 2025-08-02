@@ -153,7 +153,7 @@ export function ReservationUnitModalContent({
     handleSearch(criteria, true);
   };
 
-  const reservationUnits = filterNonNullable(data?.reservationUnits?.edges.map((n) => n?.node));
+  const reservationUnits = filterNonNullable(data?.reservationUnits?.edges?.map((n) => n?.node));
 
   return (
     <Flex>
@@ -168,8 +168,8 @@ export function ReservationUnitModalContent({
       ) : (
         reservationUnits.map((ru) => (
           <ReservationUnitCard
-            handleAdd={(pk) => handleAdd({ pk })}
-            handleRemove={(pk) => handleRemove({ pk })}
+            handleAdd={(pk) => handleAdd({ pk: pk ?? 0 })}
+            handleRemove={(pk) => handleRemove({ pk: pk ?? 0 })}
             isSelected={currentReservationUnits.find((i) => i.pk === ru.pk) !== undefined}
             reservationUnit={ru}
             key={ru.pk}

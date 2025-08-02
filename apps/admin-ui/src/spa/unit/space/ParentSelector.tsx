@@ -2,11 +2,11 @@ import React from "react";
 import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 import { Select } from "hds-react";
-import { UnitSpacesQuery, useUnitSpacesQuery } from "@gql/gql-types";
-import { base64encode, convertOptionToHDS, filterNonNullable, toNumber } from "common/src/helpers";
+import { type UnitSpacesFragment, useUnitSpacesQuery } from "@gql/gql-types";
+import { convertOptionToHDS, createNodeId, filterNonNullable, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
-function spacesAsHierarchy(unit: UnitSpacesQuery["unit"] | undefined, paddingChar: string) {
+function spacesAsHierarchy(unit: UnitSpacesFragment | undefined, paddingChar: string) {
   const allSpaces = filterNonNullable(unit?.spaces);
   type SpaceNode = (typeof allSpaces)[0];
 
@@ -31,7 +31,7 @@ function spacesAsHierarchy(unit: UnitSpacesQuery["unit"] | undefined, paddingCha
 
 type Props = {
   unitPk: number;
-  value: number | null;
+  value: number | null | undefined;
   label: string;
   placeholder?: string;
   helperText?: string;
@@ -62,13 +62,14 @@ export function ParentSelector({
 }: Props): JSX.Element {
   const { data } = useUnitSpacesQuery({
     fetchPolicy: "no-cache",
-    variables: { id: base64encode(`UnitNode:${unitPk}`) },
+    variables: { id: createNodeId("UnitNode", unitPk) },
     skip: !unitPk,
   });
 
   const { t } = useTranslation();
 
-  const unitSpaces = spacesAsHierarchy(data?.unit, "\u2007");
+  const unit = data?.node != null && "id" in data.node ? data.node : undefined;
+  const unitSpaces = spacesAsHierarchy(unit, "\u2007");
 
   // NOTE there used to be children filtering, but it filtered out all possible options
   // this handles the first level of children, but if it's a deeper hierarchy, it's not handled
@@ -106,18 +107,26 @@ export function ParentSelector({
   );
 }
 
-export const SPACE_HIERARCHY_QUERY = gql`
-  query UnitSpaces($id: ID!) {
-    unit(id: $id) {
+export const UNIT_SPACES_FRAGMENT = gql`
+  fragment UnitSpaces on UnitNode {
+    id
+    spaces {
       id
-      spaces {
+      pk
+      nameFi
+      parent {
         id
         pk
-        nameFi
-        parent {
-          id
-          pk
-        }
+      }
+    }
+  }
+`;
+
+export const SPACE_HIERARCHY_QUERY = gql`
+  query UnitSpaces($id: ID!) {
+    node(id: $id) {
+      ... on UnitNode {
+        ...UnitSpaces
       }
     }
   }

@@ -1,10 +1,7 @@
 import {
   ReservationStateChoice,
-  ReservationTypeChoice,
-  ReservationTypeStaffChoice,
-  type ReservationSeriesCreateMutationInput,
   useCreateReservationSeriesMutation,
-  type ReservationSeriesReservationCreateSerializerInput,
+  type ReservationSeriesCreateMutation,
 } from "@gql/gql-types";
 import type { ReservationSeriesForm, ReservationFormMeta } from "@/schemas";
 import { fromUIDateUnsafe, toApiDateUnsafe } from "common/src/common/util";
@@ -12,24 +9,10 @@ import { gql } from "@apollo/client";
 import { useSession } from "@/hooks/auth";
 import { transformReserveeType } from "common/src/conversion";
 
-// Not all choices are valid for reservation series (the ui should not allow these)
-function transformReservationTypeStaffChoice(t: ReservationTypeChoice): ReservationTypeStaffChoice {
-  switch (t) {
-    case ReservationTypeChoice.Staff:
-      return ReservationTypeStaffChoice.Staff;
-    case ReservationTypeChoice.Behalf:
-      return ReservationTypeStaffChoice.Behalf;
-    case ReservationTypeChoice.Blocked:
-      return ReservationTypeStaffChoice.Blocked;
-    default:
-      throw new Error("Invalid reservation type");
-  }
-}
-
 export function useCreateReservationSeries() {
   const [create] = useCreateReservationSeriesMutation();
 
-  const createReservationSeries = (input: ReservationSeriesCreateMutationInput) => create({ variables: { input } });
+  const createReservationSeries = (input: ReservationSeriesCreateMutation) => create({ variables: { input } });
 
   const { user } = useSession();
 
@@ -58,6 +41,7 @@ export function useCreateReservationSeries() {
       enableBufferTimeAfter,
       enableBufferTimeBefore,
       reserveeIdentifier,
+      numPersons,
       ...rest
     } = data;
 
@@ -67,9 +51,10 @@ export function useCreateReservationSeries() {
       throw new Error("Current user pk missing");
     }
 
-    const reservationDetails: ReservationSeriesReservationCreateSerializerInput = {
+    const reservationDetails: ReservationSeriesCreateMutation["reservationDetails"] = {
       ...rest,
-      type: transformReservationTypeStaffChoice(type),
+      numPersons: numPersons ?? 1,
+      type: type,
       reserveeIdentifier: !reserveeIsUnregisteredAssociation ? reserveeIdentifier : undefined,
       reserveeType: transformReserveeType(reserveeType),
       bufferTimeBefore: buffers.before,
@@ -81,7 +66,7 @@ export function useCreateReservationSeries() {
     };
 
     const skipDates: string[] = props.skipDates.map((d) => toApiDateUnsafe(d));
-    const input: ReservationSeriesCreateMutationInput = {
+    const input: ReservationSeriesCreateMutation = {
       reservationDetails,
       skipDates,
       // checkOpeningHours: true,
@@ -106,7 +91,7 @@ export function useCreateReservationSeries() {
 }
 
 export const CREATE_RESERVATION_SERIES = gql`
-  mutation CreateReservationSeries($input: ReservationSeriesCreateMutationInput!) {
+  mutation CreateReservationSeries($input: ReservationSeriesCreateMutation!) {
     createReservationSeries(input: $input) {
       pk
     }

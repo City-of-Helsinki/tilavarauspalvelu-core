@@ -1,7 +1,7 @@
 import React from "react";
 import { type ApolloError, gql } from "@apollo/client";
 import {
-  AllocatedTimeSlotOrderingChoices,
+  AllocatedTimeSlotOrderSet,
   ApplicationSectionStatusChoice,
   useAllocatedTimeSlotsQuery,
 } from "@gql/gql-types";
@@ -71,7 +71,7 @@ export function TimeSlotDataLoader({ unitOptions, applicationRoundPk }: Props): 
   }
 
   const totalCount = dataToUse?.allocatedTimeSlots?.totalCount ?? 0;
-  const aes = filterNonNullable(dataToUse?.allocatedTimeSlots?.edges.map((edge) => edge?.node));
+  const aes = filterNonNullable(dataToUse?.allocatedTimeSlots?.edges?.map((edge) => edge?.node));
 
   return (
     <>
@@ -91,7 +91,7 @@ export function TimeSlotDataLoader({ unitOptions, applicationRoundPk }: Props): 
   );
 }
 
-function transformOrderBy(orderBy: string | null): AllocatedTimeSlotOrderingChoices[] {
+function transformOrderBy(orderBy: string | null): AllocatedTimeSlotOrderSet[] {
   if (orderBy == null) {
     return [];
   }
@@ -100,30 +100,30 @@ function transformOrderBy(orderBy: string | null): AllocatedTimeSlotOrderingChoi
   switch (rest) {
     case "allocated_reservation_unit_name_fi":
       return desc
-        ? [AllocatedTimeSlotOrderingChoices.AllocatedReservationUnitNameFiDesc]
-        : [AllocatedTimeSlotOrderingChoices.AllocatedReservationUnitNameFiAsc];
+        ? [AllocatedTimeSlotOrderSet.AllocatedReservationUnitNameFiDesc]
+        : [AllocatedTimeSlotOrderSet.AllocatedReservationUnitNameFiAsc];
     case "allocated_unit_name_fi":
       return desc
-        ? [AllocatedTimeSlotOrderingChoices.AllocatedUnitNameFiDesc]
-        : [AllocatedTimeSlotOrderingChoices.AllocatedUnitNameFiAsc];
+        ? [AllocatedTimeSlotOrderSet.AllocatedUnitNameFiDesc]
+        : [AllocatedTimeSlotOrderSet.AllocatedUnitNameFiAsc];
     case "application_event_name_fi":
       return desc
-        ? [AllocatedTimeSlotOrderingChoices.ApplicationSectionNameDesc]
-        : [AllocatedTimeSlotOrderingChoices.ApplicationSectionNameAsc];
+        ? [AllocatedTimeSlotOrderSet.ApplicationSectionNameDesc]
+        : [AllocatedTimeSlotOrderSet.ApplicationSectionNameAsc];
     case "applicant":
-      return desc ? [AllocatedTimeSlotOrderingChoices.ApplicantDesc] : [AllocatedTimeSlotOrderingChoices.ApplicantAsc];
+      return desc ? [AllocatedTimeSlotOrderSet.ApplicantDesc] : [AllocatedTimeSlotOrderSet.ApplicantAsc];
     case "application_id,application_section_id":
     case "application_id,-application_section_id":
       return desc
         ? [
-            AllocatedTimeSlotOrderingChoices.ApplicationPkDesc,
-            AllocatedTimeSlotOrderingChoices.ApplicationSectionPkDesc,
+            AllocatedTimeSlotOrderSet.ApplicationPkDesc,
+            AllocatedTimeSlotOrderSet.ApplicationSectionPkDesc,
           ]
-        : [AllocatedTimeSlotOrderingChoices.ApplicationPkAsc, AllocatedTimeSlotOrderingChoices.ApplicationSectionPkAsc];
+        : [AllocatedTimeSlotOrderSet.ApplicationPkAsc, AllocatedTimeSlotOrderSet.ApplicationSectionPkAsc];
     case "allocated_time_of_week":
       return desc
-        ? [AllocatedTimeSlotOrderingChoices.AllocatedTimeOfWeekDesc]
-        : [AllocatedTimeSlotOrderingChoices.AllocatedTimeOfWeekAsc];
+        ? [AllocatedTimeSlotOrderSet.AllocatedTimeOfWeekDesc]
+        : [AllocatedTimeSlotOrderSet.AllocatedTimeOfWeekAsc];
     default:
       return [];
   }
@@ -132,21 +132,23 @@ function transformOrderBy(orderBy: string | null): AllocatedTimeSlotOrderingChoi
 export const ALLOCATED_TIME_SLOTS_QUERY = gql`
   query AllocatedTimeSlots(
     $applicationRound: Int!
-    $allocatedUnit: [Int]
-    $unitGroup: [Int]
-    $applicantType: [ReserveeType]
-    $applicationSectionStatus: [ApplicationSectionStatusChoice]
-    $allocatedReservationUnit: [Int]
-    $dayOfTheWeek: [Weekday]
+    $allocatedUnit: [Int!]
+    $unitGroup: [Int!]
+    $applicantType: [ReserveeType!]
+    $applicationSectionStatus: [ApplicationSectionStatusChoice!]
+    $allocatedReservationUnit: [Int!]
+    $dayOfTheWeek: [Weekday!]
     $textSearch: String
-    $accessCodeState: [AccessCodeState]
-    $orderBy: [AllocatedTimeSlotOrderingChoices]
+    $accessCodeState: [AccessCodeState!]
+    $orderBy: [AllocatedTimeSlotOrderSet!]
     $after: String
     $first: Int
   ) {
     allocatedTimeSlots(
       after: $after
       first: $first
+      orderBy: $orderBy
+filter: {
       applicationRound: $applicationRound
       allocatedUnit: $allocatedUnit
       unitGroup: $unitGroup
@@ -156,7 +158,7 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
       accessCodeState: $accessCodeState
       dayOfTheWeek: $dayOfTheWeek
       textSearch: $textSearch
-      orderBy: $orderBy
+}
     ) {
       edges {
         node {

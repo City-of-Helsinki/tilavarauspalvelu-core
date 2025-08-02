@@ -1,13 +1,12 @@
 import {
   ReservationKind,
-  ReservationUnitOrderingChoices,
+  ReservationUnitOrderSet,
   SearchReservationUnitsDocument,
   type SearchReservationUnitsQuery,
   type SearchReservationUnitsQueryVariables,
 } from "@/gql/gql-types";
 import { CreateGraphQLMocksReturn, ICreateGraphQLMock } from "./test.gql.utils";
 import { createMockReservationUnit } from "./reservation-unit.mocks";
-import { addYears } from "date-fns";
 
 interface SearchQueryProps extends ICreateGraphQLMock {
   isSearchError: boolean;
@@ -98,9 +97,7 @@ function createSearchVariablesMock({
     unit: [],
     reservationUnitType: [],
     equipments: [],
-    accessType: [],
-    accessTypeBeginDate: date ? date.toISOString() : null,
-    accessTypeEndDate: date ? addYears(date, 1).toISOString() : null,
+    accessType: null,
     reservableDateStart: date ? date.toISOString() : null,
     reservableDateEnd: null,
     reservableTimeStart: null,
@@ -109,9 +106,10 @@ function createSearchVariablesMock({
     applicationRound: [1],
     personsAllowed: null,
     first: 36,
-    orderBy: [ReservationUnitOrderingChoices.NameFiAsc, ReservationUnitOrderingChoices.PkAsc],
+    orderBy: [ReservationUnitOrderSet.NameFiAsc, ReservationUnitOrderSet.PkAsc],
     isDraft: false,
     isVisible: true,
     reservationKind: ReservationKind.Season,
+    showOnlyReservable: false,
   } as const;
 }

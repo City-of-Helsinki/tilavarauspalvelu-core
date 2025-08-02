@@ -9,6 +9,7 @@ import {
   useReservationCancelReasonsQuery,
   useReservationPageQuery,
   UserPermissionChoice,
+  type ReservationPageFragment,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { ButtonContainer, CenterSpinner } from "common/styled";
@@ -36,7 +37,8 @@ import { TimeBlockSection } from "./ReservationTimeBlockSection";
 import { ReservationReserveeDetailsSection } from "@/spa/reservations/[id]/ReservationReserveeDetailsSection";
 import { toUIDateTime } from "common/src/common/util";
 
-type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
+type ReservationType = ReservationPageFragment;
+// NonNullable<ReservationPageQuery["reservation"]>;
 
 function ApprovalButtonsWithPermChecks({
   reservation,
@@ -96,7 +98,7 @@ function ReservationSummary({
     skip: reservation.state !== ReservationStateChoice.Cancelled,
   });
 
-  const reservationCancelReasons = data?.reservationCancelReasons ?? [];
+  const reservationCancelReasons = data?.allReservationCancelReasons ?? [];
   let cancelReason;
   if (reservationCancelReasons) {
     cancelReason = reservationCancelReasons.find((reason) => reservation.cancelReason === reason.value)?.reasonFi;
@@ -344,7 +346,7 @@ export function ReservationPage() {
     variables: { id },
   });
 
-  const { reservation } = data ?? {};
+  const reservation = data?.node != null && "pk" in data.node ? data.node : null;
 
   // Loader check first
   if (loading && reservation == null) {
@@ -371,46 +373,54 @@ export function ReservationPage() {
   );
 }
 
+export const RESERVATION_PAGE_FRAGMENT = gql`
+  fragment ReservationPage on ReservationNode {
+   id
+    ...CreateTagString
+    ...ReservationCommonFields
+    ...TimeBlockSection
+    ...ReservationTitleSectionFields
+    ...ReservationKeylessEntry
+    reservationSeries {
+      id
+      pk
+      beginDate
+      beginTime
+      endDate
+      endTime
+      weekdays
+      name
+      description
+    }
+    ...ApprovalButtons
+    cancelReason
+    denyReason {
+      id
+      reasonFi
+    }
+    reservationUnit {
+      id
+      pk
+      reservationStartInterval
+      ...ReservationTypeFormFields
+    }
+    ...ReservationMetaFields
+  }
+`;
+
 export const RESERVATION_PAGE_QUERY = gql`
   query ReservationPage($id: ID!) {
-    reservation(id: $id) {
-      id
-      ...CreateTagString
-      ...ReservationCommonFields
-      ...TimeBlockSection
-      ...ReservationTitleSectionFields
-      ...ReservationKeylessEntry
-      reservationSeries {
-        id
-        pk
-        beginDate
-        beginTime
-        endDate
-        endTime
-        weekdays
-        name
-        description
+    node(id: $id) {
+      ... on ReservationNode {
+        ...ReservationPage
       }
-      ...ApprovalButtons
-      cancelReason
-      denyReason {
-        id
-        reasonFi
-      }
-      reservationUnit {
-        id
-        pk
-        reservationStartInterval
-        ...ReservationTypeFormFields
-      }
-      ...ReservationMetaFields
     }
   }
 `;
 
 export const RESERVATION_CANCEL_REASONS_QUERY = gql`
   query ReservationCancelReasons {
-    reservationCancelReasons {
+    allReservationCancelReasons {
       ...CancelReasonFields
     }
   }

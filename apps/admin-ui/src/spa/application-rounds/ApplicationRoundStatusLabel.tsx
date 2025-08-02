@@ -35,7 +35,7 @@ export function getApplicationRoundStatus(status: Maybe<ApplicationRoundStatusCh
         icon: <IconCheck aria-hidden="true" />,
         label: status,
       };
-    case ApplicationRoundStatusChoice.ResultsSent:
+    case ApplicationRoundStatusChoice.Sent:
       return {
         group: "g2",
         type: "success",

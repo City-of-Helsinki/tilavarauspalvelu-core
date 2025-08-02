@@ -5,7 +5,7 @@ import { MunicipalityChoice, ReserveeType } from "@gql/gql-types";
 import { z } from "zod";
 
 export const ReservationFormMetaSchema = z.object({
-  name: z.string().optional(),
+  name: z.string(),
   description: z.string().optional(),
   ageGroup: z.number().optional(),
   applyingForFreeOfCharge: z.boolean().optional(),

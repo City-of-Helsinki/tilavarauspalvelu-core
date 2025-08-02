@@ -15,7 +15,7 @@ import { set } from "date-fns";
 
 // TODO use a fragment
 type QueryT = NonNullable<ApplicationSectionAllocationsQuery["applicationSections"]>;
-type EdgeT = NonNullable<QueryT["edges"][0]>;
+type EdgeT = NonNullable<NonNullable<QueryT["edges"]>[0]>;
 export type SectionNodeT = NonNullable<EdgeT["node"]>;
 export type SuitableTimeRangeNodeT = SectionNodeT["suitableTimeRanges"][0];
 export type ReservationUnitOptionNodeT = NonNullable<SectionNodeT["reservationUnitOptions"]>[0];

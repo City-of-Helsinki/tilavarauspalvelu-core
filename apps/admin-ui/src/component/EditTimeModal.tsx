@@ -6,7 +6,7 @@ import { z } from "zod";
 import { type TFunction } from "i18next";
 import {
   type ChangeReservationTimeFragment,
-  type ReservationSeriesAddMutationInput,
+  type ReservationSeriesAddMutation,
   ReservationTypeChoice,
   useAddReservationToSeriesMutation,
   useStaffAdjustReservationTimeMutation,
@@ -265,15 +265,15 @@ export function NewReservationModal({ reservationToCopy, onAccept, onClose }: Ne
 
   const [create] = useAddReservationToSeriesMutation();
 
-  function createInput({ begin, end, buffers }: MutationValues): ReservationSeriesAddMutationInput {
+  function createInput({ begin, end, buffers }: MutationValues): ReservationSeriesAddMutation {
     if (reservationToCopy?.reservationSeries?.pk == null) {
       throw new Error("recurring reservation pk missing");
     }
     return {
       pk: reservationToCopy?.reservationSeries?.pk,
       ...convertToApiFormat(begin, end),
-      bufferTimeAfter: buffers.after?.toString(),
-      bufferTimeBefore: buffers.before?.toString(),
+      bufferTimeAfter: buffers.after,
+      bufferTimeBefore: buffers.before,
     };
   }
 
@@ -421,7 +421,7 @@ export function EditTimeModal({
 }
 
 export const CHANGE_RESERVATION_TIME = gql`
-  mutation StaffAdjustReservationTime($input: ReservationStaffAdjustTimeMutationInput!) {
+  mutation StaffAdjustReservationTime($input: ReservationStaffAdjustTimeMutation!) {
     staffAdjustReservationTime(input: $input) {
       pk
       beginsAt
@@ -432,7 +432,7 @@ export const CHANGE_RESERVATION_TIME = gql`
 `;
 
 export const ADD_RESERVATION_TO_SERIES = gql`
-  mutation AddReservationToSeries($input: ReservationSeriesAddMutationInput!) {
+  mutation AddReservationToSeries($input: ReservationSeriesAddMutation!) {
     addReservationToSeries(input: $input) {
       pk
     }

@@ -10,7 +10,8 @@ import {
   type ApplicationsQueryVariables,
   CurrentUserDocument,
   type CurrentUserQuery,
-  ApplicationOrderingChoices,
+  type ApplicationsGroupFragment,
+  ApplicationOrderSet,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { ApplicationsGroup } from "@/components/application";
@@ -27,7 +28,7 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 const VALID_STATUSES = [
   ApplicationStatusChoice.Draft,
-  ApplicationStatusChoice.ResultsSent,
+  ApplicationStatusChoice.ResultSent,
   ApplicationStatusChoice.InAllocation,
   ApplicationStatusChoice.Handled,
   ApplicationStatusChoice.Received,
@@ -37,7 +38,7 @@ function ApplicationGroups({
   applications,
   actionCallback,
 }: {
-  applications: NonNullable<NonNullable<NonNullable<ApplicationsQuery["applications"]>["edges"][0]>["node"]>[];
+  applications: ApplicationsGroupFragment[]; // NonNullable<NonNullable<NonNullable<ApplicationsQuery["applications"]>["edges"][0]>["node"]>[];
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 }) {
   const { t } = useTranslation();
@@ -45,7 +46,7 @@ function ApplicationGroups({
     return <span>{t("applications:noApplications")}</span>;
   }
 
-  const sent = applications.filter((a) => a.status === ApplicationStatusChoice.ResultsSent);
+  const sent = applications.filter((a) => a.status === ApplicationStatusChoice.ResultSent);
   const received = applications.filter((a) => a.status === ApplicationStatusChoice.Received);
   const processing = applications.filter(
     (a) => a.status === ApplicationStatusChoice.InAllocation || a.status === ApplicationStatusChoice.Handled
@@ -86,7 +87,7 @@ function ApplicationsPage({ data: initialData }: PropsNarrowed): JSX.Element | n
     variables: {
       user: currentUser?.pk ?? 0,
       status: VALID_STATUSES,
-      orderBy: [ApplicationOrderingChoices.SentAtDesc],
+      orderBy: [ApplicationOrderSet.SentAtDesc],
     },
   });
 
@@ -155,7 +156,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     variables: {
       user: user.pk,
       status: VALID_STATUSES,
-      orderBy: [ApplicationOrderingChoices.SentAtDesc],
+      orderBy: [ApplicationOrderSet.SentAtDesc],
     },
   });
 
@@ -171,8 +172,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 // NOTE because this doesn't have pagination we use orderBy for development purposes only
 // if you create new application it's the first one in the list
 export const APPLICATIONS = gql`
-  query Applications($user: Int!, $status: [ApplicationStatusChoice]!, $orderBy: [ApplicationOrderingChoices]!) {
-    applications(user: $user, status: $status, orderBy: $orderBy) {
+  query Applications($user: Int!, $status: [ApplicationStatusChoice!]!, $orderBy: [ApplicationOrderSet!]!) {
+    applications(filter: { user: $user, status: $status }, orderBy: $orderBy) {
       edges {
         node {
           ...ApplicationsGroup

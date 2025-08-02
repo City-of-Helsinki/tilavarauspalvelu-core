@@ -45,8 +45,8 @@ function transformApplicationStatuses(filters: string[]): ApplicationStatusChoic
           return ApplicationStatusChoice.Received;
         case ApplicationStatusChoice.Handled:
           return ApplicationStatusChoice.Handled;
-        case ApplicationStatusChoice.ResultsSent:
-          return ApplicationStatusChoice.ResultsSent;
+        case ApplicationStatusChoice.ResultSent:
+          return ApplicationStatusChoice.ResultSent;
         case ApplicationStatusChoice.InAllocation:
           return ApplicationStatusChoice.InAllocation;
         default:

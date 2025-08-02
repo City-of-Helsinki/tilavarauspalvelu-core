@@ -3,6 +3,7 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import {
   ApplicationSectionCancelDocument,
+  ApplicationSectionCancelFragment,
   useCancelApplicationSectionMutation,
   type ApplicationSectionCancelQuery,
   type ApplicationSectionCancelQueryVariables,
@@ -11,7 +12,7 @@ import { type CancelFormValues, CancellationForm } from "@/components/Cancellati
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import { base64encode, filterNonNullable, formatApiTimeInterval } from "common/src/helpers";
+import { createNodeId, filterNonNullable, formatApiTimeInterval } from "common/src/helpers";
 import { getApplicationPath } from "@/modules/urls";
 import { useTranslation } from "next-i18next";
 import { ApolloError, gql } from "@apollo/client";
@@ -69,6 +70,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
           input: {
             pk: applicationSection.pk,
             cancelReason: reason,
+            cancelDetails: "",
           },
         },
       });
@@ -79,7 +81,10 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
       } else {
         const res = data?.cancelAllApplicationSectionReservations;
         if (res) {
-          const { future, cancelled } = res;
+          // FIXME
+          const cancelled = 0;
+          const future = 0;
+          // const { future, cancelled } = res;
           const url = `${backLink}?cancelled=${cancelled}&future=${future}`;
           router.push(url);
         }
@@ -146,7 +151,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
   );
 }
 
-function getNReservations(applicationSection: Readonly<ApplicationSectionCancelQuery["applicationSection"]>) {
+function getNReservations(applicationSection: Readonly<ApplicationSectionCancelFragment>) {
   const opts = applicationSection?.reservationUnitOptions;
   const allocatedSlots = opts?.flatMap((option) => option.allocatedTimeSlots);
   const reservations = allocatedSlots?.flatMap((slot) =>
@@ -165,7 +170,7 @@ const ApplicationInfo = styled(Card)`
 function ApplicationSectionInfoCard({
   applicationSection,
 }: {
-  applicationSection: ApplicationSectionCancelQuery["applicationSection"];
+  applicationSection: Readonly<ApplicationSectionCancelFragment>
 }) {
   // NOTE assumes that the name of the reservationSeries is copied from applicationSection when it's created
   const name = applicationSection?.name;
@@ -220,13 +225,13 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
 
   if (Number.isFinite(Number(pk))) {
-    const id = base64encode(`ApplicationSectionNode:${pk}`);
+    const id = createNodeId("ApplicationSectionNode", Number(pk));
     const { data } = await client.query<ApplicationSectionCancelQuery, ApplicationSectionCancelQueryVariables>({
       query: ApplicationSectionCancelDocument,
       fetchPolicy: "no-cache",
       variables: { id },
     });
-    const { applicationSection } = data || {};
+    const applicationSection = data?.node != null && "pk" in data.node ? data.node : null;
     const section = applicationSection;
 
     // TODO do we need a check for all sections? so do we have to query their reservations also?
@@ -236,7 +241,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     // but that requires we query the CancelFields for the reservations
     // - should we disable the cancel button? probably
     // - should we redirect here or show an error if the section can't be cancelled? (assuming url access)
-    const reasons = filterNonNullable(data?.reservationCancelReasons);
+    const reasons = filterNonNullable(data.allReservationCancelReasons);
     const canCancel = section != null; // && isReservationCancellable(reservation);
     if (canCancel) {
       return {
@@ -273,63 +278,71 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 export default ReservationCancelPage;
 
-// TODO remove the extra reservationUnit fields (included in the CanUserCancelReservationFragment)
-// need to do frontend mods to call the function but the query is a lot simpler for backend
-export const APPLICATION_SECTION_CANCEL_QUERY = gql`
-  query ApplicationSectionCancel($id: ID!) {
-    applicationSection(id: $id) {
-      pk
+export const APPLICATION_SECTION_CANCEL_FRAGMENT = gql`
+  fragment ApplicationSectionCancel on ApplicationSectionNode {
+    pk
+    id
+    name
+    reservationsBeginDate
+    reservationsEndDate
+    reservationUnitOptions {
       id
-      name
-      reservationsBeginDate
-      reservationsEndDate
-      reservationUnitOptions {
-        id
-        reservationUnit {
-          id
-          pk
-          nameEn
-          nameFi
-          nameSv
-        }
-        allocatedTimeSlots {
-          id
-          dayOfTheWeek
-          beginTime
-          endTime
-          reservationSeries {
-            id
-            reservations {
-              id
-              state
-              ...CanUserCancelReservation
-            }
-          }
-        }
-      }
-      application {
+      reservationUnit {
         id
         pk
-        applicationRound {
+        nameEn
+        nameFi
+        nameSv
+      }
+      allocatedTimeSlots {
+        id
+        dayOfTheWeek
+        beginTime
+        endTime
+        reservationSeries {
           id
-          termsOfUse {
-            ...TermsOfUseTextFields
+          reservations {
+            id
+            state
+            ...CanUserCancelReservation
           }
         }
       }
     }
+    application {
+      id
+      pk
+      applicationRound {
+        id
+        termsOfUse {
+          ...TermsOfUseTextFields
+        }
+      }
+    }
+  }
+`;
 
-    reservationCancelReasons {
+// TODO remove the extra reservationUnit fields (included in the CanUserCancelReservationFragment)
+// need to do frontend mods to call the function but the query is a lot simpler for backend
+export const APPLICATION_SECTION_CANCEL_QUERY = gql`
+  query ApplicationSectionCancel($id: ID!) {
+    node(id: $id) {
+      ... on ApplicationSectionNode {
+        ...ApplicationSectionCancel
+      }
+    }
+
+    allReservationCancelReasons {
       ...CancelReasonFields
     }
   }
 `;
 
+/* FIXME future and cancelled have disappeared from the mutation response */
 export const CANCEL_APPLICATION_SECTION_MUTATION = gql`
-  mutation CancelApplicationSection($input: ApplicationSectionReservationCancellationMutationInput!) {
+  mutation CancelApplicationSection($input: ApplicationSectionReservationCancellationMutation!) {
     cancelAllApplicationSectionReservations(input: $input) {
-      future
-      cancelled
+      hasReservations
     }
   }
 `;

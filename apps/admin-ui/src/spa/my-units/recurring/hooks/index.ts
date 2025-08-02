@@ -17,7 +17,7 @@ export function useSeriesReservationsUnits(unitId: number) {
     },
   });
 
-  const { unit } = data ?? {};
+  const unit = data?.node != null && "pk" in data.node ? data.node : null;
   const reservationUnits = filterNonNullable(unit?.reservationUnits);
 
   return { loading, reservationUnits };
@@ -25,7 +25,8 @@ export function useSeriesReservationsUnits(unitId: number) {
 
 export const SERIES_RESERVATION_UNIT_QUERY = gql`
   query SeriesReservationUnit($id: ID!) {
-    unit(id: $id) {
+    node(id: $id) {
+      ... on UnitNode {
       id
       nameFi
       pk
@@ -38,5 +39,6 @@ export const SERIES_RESERVATION_UNIT_QUERY = gql`
         bufferTimeAfter
       }
     }
+}
   }
 `;

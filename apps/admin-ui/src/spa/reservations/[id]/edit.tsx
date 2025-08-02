@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type Maybe, type ReservationEditPageQuery } from "@gql/gql-types";
+import { type ReservationEditPageFragment, type Maybe } from "@gql/gql-types";
 import { Button, ButtonVariant, LoadingSpinner, TextInput } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
@@ -22,8 +22,8 @@ import ReservationTitleSection from "./ReservationTitleSection";
 import { LinkPrev } from "@/component/LinkPrev";
 import { useReservationEditData } from "@/hooks";
 import { gql } from "@apollo/client";
+import { toNumber } from "common/src/helpers";
 
-type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;
 type FormValueType = ReservationChangeFormType & ReservationFormMeta;
 
 const InnerTextInput = styled(TextInput)`
@@ -37,7 +37,7 @@ function EditReservation({
   onSuccess,
 }: {
   onCancel: () => void;
-  reservation: ReservationType;
+  reservation: ReservationEditPageFragment;
   onSuccess: () => void;
 }) {
   const { t } = useTranslation();
@@ -158,14 +158,14 @@ function EditReservation({
 
 export function EditPage() {
   const params = useParams();
-  const id = params.id ?? undefined;
+  const pk = toNumber(params.id);
 
   const { t } = useTranslation("translation", {
     keyPrefix: "Reservation.EditPage",
   });
   const navigate = useNavigate();
 
-  const { reservation, loading, refetch } = useReservationEditData(id);
+  const { reservation, loading, refetch } = useReservationEditData(pk);
 
   const handleCancel = () => {
     navigate(-1);
@@ -181,7 +181,7 @@ export function EditPage() {
       {loading ? (
         <CenterSpinner />
       ) : !reservation ? (
-        t("Reservation failed to load", { pk: id })
+        t("Reservation failed to load", { pk })
       ) : (
         <ErrorBoundary fallback={<div>{t("pageThrewError")}</div>}>
           <EditReservation reservation={reservation} onCancel={handleCancel} onSuccess={handleSuccess} />
@@ -197,7 +197,7 @@ function EditPageWrapper({
   title,
 }: {
   title: string;
-  reservation: Maybe<ReservationType> | undefined;
+  reservation: Maybe<ReservationEditPageFragment> | undefined;
   children: React.ReactNode;
 }) {
   const { t } = useTranslation();
@@ -214,25 +214,33 @@ function EditPageWrapper({
   );
 }
 
-export const RESERVATION_EDIT_PAGE_QUERY = gql`
-  query ReservationEditPage($id: ID!) {
-    reservation(id: $id) {
+export const RESERVATION_EDIT_PAGE_FRAGMENT = gql`
+  fragment ReservationEditPage on ReservationNode {
+    id
+    pk
+    ...CreateTagString
+    ...ReservationCommonFields
+    ...ReservationMetaFields
+    ...ReservationTitleSectionFields
+    ...UseStaffReservation
+    reservationSeries {
       id
       pk
-      ...CreateTagString
-      ...ReservationCommonFields
-      ...ReservationMetaFields
-      ...ReservationTitleSectionFields
-      ...UseStaffReservation
-      reservationSeries {
-        id
-        pk
-        name
-      }
-      reservationUnit {
-        id
-        pk
-        ...ReservationTypeFormFields
+      name
+    }
+    reservationUnit {
+      id
+      pk
+      ...ReservationTypeFormFields
+    }
+  }
+`;
+
+export const RESERVATION_EDIT_PAGE_QUERY = gql`
+  query ReservationEditPage($id: ID!) {
+    node(id: $id) {
+      ... on ReservationNode {
+        ...ReservationEditPage
       }
     }
   }

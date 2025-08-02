@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   type NewResourceUnitFieldsFragment,
   useCreateSpaceMutation,
-  type SpaceCreateMutationInput,
+  type SpaceCreateMutation,
 } from "@gql/gql-types";
 import { Page1 } from "./Page1";
 import { Page2 } from "./Page2";
@@ -23,16 +23,16 @@ type Props = {
 export function NewSpaceModal({ unit, closeModal, refetch, parentSpacePk }: Props): JSX.Element | null {
   const [mutation] = useCreateSpaceMutation();
 
-  const createSpace = (input: SpaceCreateMutationInput) => mutation({ variables: { input } });
+  const createSpace = (input: SpaceCreateMutation) => mutation({ variables: { input } });
 
   const form = useForm<SpaceUpdateForm>({
     resolver: zodResolver(SpaceUpdateSchema),
     values: {
-      unit: unit?.pk ?? 0,
+      unit: unit.pk,
       nameFi: "",
       nameSv: "",
       nameEn: "",
-      parent: parentSpacePk ?? null,
+      parent: parentSpacePk ?? undefined,
       pk: undefined,
     },
   });
@@ -96,7 +96,7 @@ export const NEW_RESOURCE_UNIT_FRAGMENT = gql`
 `;
 
 export const CREATE_SPACE_MUTATION = gql`
-  mutation CreateSpace($input: SpaceCreateMutationInput!) {
+  mutation CreateSpace($input: SpaceCreateMutation!) {
     createSpace(input: $input) {
       pk
     }

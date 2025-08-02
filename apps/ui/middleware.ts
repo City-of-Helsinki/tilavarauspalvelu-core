@@ -9,7 +9,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { env } from "@/env.mjs";
 import { buildGraphQLUrl, getSignInUrl, type LocalizationLanguages } from "common/src/urlBuilder";
-import { base64encode, getLocalizationLang } from "common/src/helpers";
+import { createNodeId, getLocalizationLang } from "common/src/helpers";
 import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
 import { getReservationInProgressPath } from "./modules/urls";
 
@@ -84,26 +84,30 @@ type Data = {
 };
 
 const RESERVATION_QUERY = `
-  reservation(id: $reservationId) {
-    id
-    type
-    state
-    reservationUnit {
+  node(id: $reservationId) {
+    ... on ReservationNode {
       id
-      pk
-    }
-    user {
-      id
-      pk
+      type
+      state
+      reservationUnit {
+        id
+        pk
+      }
+      user {
+        id
+        pk
+      }
     }
   }`;
 
 const APPLICATION_QUERY = `
-  application(id: $applicationId) {
-    id
-    user {
+  node(id: $applicationId) {
+    ... on ApplicationNode {
       id
-      pk
+      user {
+        id
+        pk
+      }
     }
   }`;
 
@@ -131,8 +135,8 @@ async function fetchUserData(
     return null;
   }
 
-  const applicationId = opts?.applicationPk != null ? base64encode(`ApplicationNode:${opts.applicationPk}`) : null;
-  const reservationId = opts?.reservationPk != null ? base64encode(`ReservationNode:${opts.reservationPk}`) : null;
+  const applicationId = opts?.applicationPk != null ? createNodeId("ApplicationNode", opts.applicationPk) : null;
+  const reservationId = opts?.reservationPk != null ? createNodeId("ReservationNode", opts.reservationPk) : null;
 
   // NOTE: need to build queries dynamically because of the optional parameters
   const params =
@@ -187,8 +191,8 @@ ${applicationId ? "$applicationId: ID!" : ""}
 
 /// return reservation data from the gql query or null if it's not found
 function parseReservationGQLquery(data: unknown): Data["reservation"] | null {
-  if (data != null && typeof data === "object" && "reservation" in data) {
-    const { reservation } = data;
+  if (data != null && typeof data === "object" && "node" in data) {
+    const reservation = data.node;
 
     if (reservation != null && typeof reservation === "object") {
       let type: ReservationTypeChoice | null = null;

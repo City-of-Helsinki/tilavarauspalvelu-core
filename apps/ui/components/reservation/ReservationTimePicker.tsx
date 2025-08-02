@@ -335,8 +335,10 @@ export function ReservationTimePicker({
     skip: !currentUser || !reservationUnit.pk,
     variables: {
       beginDate: toApiDate(now),
+      endDate: null,
+      orderBy: [],
       user: currentUser?.pk ?? 0,
-      reservationUnits: [reservationUnit.pk ?? 0],
+      reservationUnit: [reservationUnit.pk ?? 0],
       state: RELATED_RESERVATION_STATES,
       reservationType: ReservationTypeChoice.Normal,
     },
@@ -419,7 +421,7 @@ export const RESERVATION_TIME_PICKER_FRAGMENT = gql`
     pk
     ...IsReservableFields
     ...PriceReservationUnitFields
-    applicationRounds(ongoing: true) {
+    applicationRounds(filter: { ongoing: true }) {
       id
       reservationPeriodBeginDate
       reservationPeriodEndDate

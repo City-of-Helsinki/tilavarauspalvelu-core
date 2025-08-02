@@ -3,7 +3,7 @@ import { describe, expect, test, vi } from "vitest";
 import { type ApplicationPage2FormValues, convertApplicationPage2 } from "./form";
 import { TimeSelectorForm, type TimeSelectorProps } from "./TimeSelector";
 import { createMockApplicationFragment, type CreateMockApplicationFragmentProps } from "@test/application.mocks";
-import { type ApplicationPage2Query, Priority, type TimeSelectorFragment, Weekday } from "@/gql/gql-types";
+import { type ApplicationPage2Fragment, Priority, type TimeSelectorFragment, Weekday } from "@/gql/gql-types";
 import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { transformWeekday } from "common/src/conversion";
@@ -12,8 +12,6 @@ import { type OpenHoursState } from "common/src/components/ApplicationTimeSelect
 import { selectOption } from "@/test/test.utils";
 import { toApiTime } from "common/src/common/util";
 import { type DayT, WEEKDAYS_SORTED } from "common/src/const";
-
-type ApplicationPage2 = NonNullable<ApplicationPage2Query["application"]>;
 
 interface TimeSelectorMockProps extends CreateMockApplicationFragmentProps {
   onSubmit?: (appToSave: ApplicationPage2FormValues) => Promise<void>;
@@ -29,7 +27,7 @@ function customRender(props: TimeSelectorMockProps = {}): ReturnType<typeof rend
 
 // To use hooks have to use component wrap
 function WrapTimeSelector({ onSubmit = vi.fn(), reservationUnitOpeningHours = [], ...props }: TimeSelectorMockProps) {
-  const application: ApplicationPage2 = createMockApplicationFragment(props);
+  const application: ApplicationPage2Fragment = createMockApplicationFragment(props);
   const form = useForm<ApplicationPage2FormValues>({
     mode: "onChange",
     defaultValues: convertApplicationPage2(application),
@@ -224,8 +222,7 @@ describe("TimeSelector render single section", () => {
     },
   ])(
     "should render available time slots based on opening hours $label",
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    ({ label, days }) => {
+    ({ label: _, days }) => {
       const openTimes: TimeSelectorFragment[] = days.map((day, index) => ({
         id: base64encode(`TimeSelector:${index}`),
         weekday: day.day,

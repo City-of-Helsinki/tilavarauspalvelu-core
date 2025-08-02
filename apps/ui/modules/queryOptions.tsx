@@ -1,4 +1,4 @@
-import { type ApolloClient } from "@apollo/client";
+import { gql, type ApolloClient } from "@apollo/client";
 import { OptionsDocument, type OptionsQueryVariables, type OptionsQuery } from "@gql/gql-types";
 import { getTranslationSafe } from "common/src/common/util";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
@@ -9,8 +9,8 @@ export async function queryOptions(apolloClient: ApolloClient<unknown>, locale: 
     fetchPolicy: "no-cache",
   });
 
-  const reservationPurposes = filterNonNullable(paramsData.reservationPurposes?.edges?.map((e) => e?.node));
-  const ageGroups = filterNonNullable(paramsData.ageGroups?.edges?.map((e) => e?.node));
+  const reservationPurposes = filterNonNullable(paramsData.allReservationPurposes);
+  const ageGroups = filterNonNullable(paramsData.allAgeGroups);
   if (!ageGroups || ageGroups.length < 1) {
     // eslint-disable-next-line no-console
     console.warn("No ageGroups received!");
@@ -37,3 +37,65 @@ export async function queryOptions(apolloClient: ApolloClient<unknown>, locale: 
     ageGroup: ageGroupOptions,
   };
 }
+
+// There is a duplicate in admin-ui but it doesn't have translations
+export const OPTIONS_QUERY = gql`
+  query Options(
+    $reservationUnitTypesOrderBy: [ReservationUnitTypeOrderSet!]
+    $purposesOrderBy: [PurposeOrderSet!]
+    $unitsOrderBy: [UnitOrderSet!]
+    $equipmentsOrderBy: [EquipmentOrderSet!]
+    $reservationPurposesOrderBy: [ReservationPurposeOrderSet!]
+    $onlyDirectBookable: Boolean
+    $onlySeasonalBookable: Boolean
+  ) {
+    allReservationUnitTypes(orderBy: $reservationUnitTypesOrderBy) {
+          id
+          pk
+          nameFi
+          nameEn
+          nameSv
+    }
+    allPurposes(orderBy: $purposesOrderBy) {
+          id
+          pk
+          nameFi
+          nameEn
+          nameSv
+    }
+    allReservationPurposes(orderBy: $reservationPurposesOrderBy) {
+          id
+          pk
+          nameFi
+          nameEn
+          nameSv
+    }
+    allAgeGroups {
+          id
+          pk
+          minimum
+          maximum
+    }
+    allEquipments(orderBy: $equipmentsOrderBy) {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+    }
+    allUnits(
+      filter: {
+        publishedReservationUnits: true
+        onlyDirectBookable: $onlyDirectBookable
+        onlySeasonalBookable: $onlySeasonalBookable
+      }
+      orderBy: $unitsOrderBy
+    ) {
+      id
+      pk
+      nameFi
+      nameSv
+      nameEn
+    }
+  }
+`;

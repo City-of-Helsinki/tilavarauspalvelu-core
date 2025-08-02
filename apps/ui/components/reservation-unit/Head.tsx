@@ -267,7 +267,7 @@ export const RESERVATION_UNIT_HEAD_FRAGMENT = gql`
       ...PricingFields
     }
     currentAccessType
-    accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
+    accessTypes(filter: { isActiveOrFuture: true }, orderBy: [beginDateAsc]) {
       id
       pk
       accessType

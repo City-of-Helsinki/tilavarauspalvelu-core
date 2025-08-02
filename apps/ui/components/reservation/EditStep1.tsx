@@ -193,7 +193,7 @@ export function EditStep1({ reservation, options, onBack, form }: Props): JSX.El
 }
 
 export const ADJUST_RESERVATION_TIME = gql`
-  mutation AdjustReservationTime($input: ReservationAdjustTimeMutationInput!) {
+  mutation AdjustReservationTime($input: ReservationAdjustTimeMutation!) {
     adjustReservationTime(input: $input) {
       pk
       state

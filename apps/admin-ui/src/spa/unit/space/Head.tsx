@@ -12,7 +12,7 @@ import { breakpoints } from "common/src/const";
 interface IProps {
   title: string;
   // TODO narrow down
-  space?: SpaceQuery["space"];
+  space?: SpaceQuery["node"];
   maxPersons?: number;
   surfaceArea?: number;
 }
@@ -44,7 +44,7 @@ const Prop = styled(Flex).attrs({
 `;
 
 export function Head({ title, space, surfaceArea, maxPersons }: IProps): JSX.Element {
-  const { unit } = space || {};
+  const  unit = space != null && "unit" in space ? space.unit : null;
   const { t } = useTranslation();
 
   const unitUrl = getUnitUrl(unit?.pk);

@@ -57,7 +57,7 @@ function SpacesResources(): JSX.Element {
     return <CenterSpinner />;
   }
 
-  const { unit } = data ?? {};
+  const unit = data?.node != null && "pk" in data.node ? data.node : null;
   if (unit == null) {
     return <Error404 />;
   }
@@ -128,11 +128,13 @@ export default SpacesResources;
 
 export const SPACES_RESOURCES_QUERY = gql`
   query SpacesResources($id: ID!) {
-    unit(id: $id) {
-      id
-      ...UnitSubpageHead
-      ...SpacesTable
-      ...ResourceTable
+    node(id: $id) {
+      ... on UnitNode {
+        id
+        ...UnitSubpageHead
+        ...SpacesTable
+        ...ResourceTable
+      }
     }
   }
 `;

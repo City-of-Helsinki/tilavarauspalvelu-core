@@ -7,7 +7,7 @@ import styled from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
 import {
   ReservationTypeChoice,
-  type ReservationUnitCalendarQuery,
+  type ReservationUnitCalendarReservationFragment,
   useReservationUnitCalendarQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
@@ -35,16 +35,13 @@ const Container = styled.div`
   }
 `;
 
-type ReservationUnitType = NonNullable<ReservationUnitCalendarQuery["reservationUnit"]>;
-type ReservationType = NonNullable<NonNullable<ReservationUnitType["reservations"]>[0]>;
-
 function getEventTitle({
   reservationUnitPk,
   reservation,
   t,
 }: {
   reservationUnitPk: number;
-  reservation: ReservationType;
+  reservation: ReservationUnitCalendarReservationFragment;
   t: TFunction;
 }) {
   const reserveeName = getReserveeName(reservation, t);
@@ -58,7 +55,7 @@ function getEventTitle({
   return [reserveeName, ""];
 }
 
-function constructEventTitle(res: ReservationType, resUnitPk: number, t: TFunction) {
+function constructEventTitle(res: ReservationUnitCalendarReservationFragment, resUnitPk: number, t: TFunction) {
   const [reservee, unit] = getEventTitle({
     reservationUnitPk: resUnitPk,
     reservation: res,
@@ -99,7 +96,8 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
     },
   });
 
-  const reservations = combineAffectingReservations(data, reservationUnitPk);
+  const reservations = data?.node != null && "reservations" in data.node
+    ? combineAffectingReservations({ ...data, node: data.node }, reservationUnitPk) : [];
 
   const events = reservations.map((reservation) => {
     const isBlocked = reservation.type === ReservationTypeChoice.Blocked;
@@ -142,20 +140,33 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
   );
 }
 
+export const RESERVATION_UNIT_CALENDAR_RESERVATION_FRAGMENT = gql`
+  fragment ReservationUnitCalendarReservation on ReservationNode {
+    ...ReservationUnitReservations
+    ...CombineAffectedReservations
+  }
+`;
+export const RESERVATION_UNIT_CALENDAR_FRAGMENT = gql`
+  fragment ReservationUnitCalendar on ReservationUnitNode {
+    id
+    pk
+    reservations(filter: { state: $state, beginDate: $beginDate, endDate: $endDate }) {
+      ...ReservationUnitCalendarReservation
+    }
+  }
+`;
+
 export const RESERVATION_UNIT_CALENDAR_QUERY = gql`
   query ReservationUnitCalendar(
     $id: ID!
     $pk: Int!
-    $state: [ReservationStateChoice]
-    $beginDate: Date
-    $endDate: Date
+    $state: [ReservationStateChoice!]
+    $beginDate: Date!
+    $endDate: Date!
   ) {
-    reservationUnit(id: $id) {
-      id
-      pk
-      reservations(state: $state, beginDate: $beginDate, endDate: $endDate) {
-        ...ReservationUnitReservations
-        ...CombineAffectedReservations
+    node(id: $id) {
+      ... on ReservationUnitNode {
+        ...ReservationUnitCalendar
       }
     }
     affectingReservations(forReservationUnits: [$pk], state: $state, beginDate: $beginDate, endDate: $endDate) {

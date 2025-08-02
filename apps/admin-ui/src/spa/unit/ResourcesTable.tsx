@@ -72,7 +72,7 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
 
   const [deleteResourceMutation] = useDeleteResourceMutation();
 
-  const deleteResource = (pk: number) => deleteResourceMutation({ variables: { input: { pk: String(pk) } } });
+  const deleteResource = (pk: number) => deleteResourceMutation({ variables: { input: { pk } } });
 
   const { t } = useTranslation();
 
@@ -145,9 +145,9 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
 }
 
 export const DELETE_RESOURCE = gql`
-  mutation DeleteResource($input: ResourceDeleteMutationInput!) {
+  mutation DeleteResource($input: ResourceDeleteMutation!) {
     deleteResource(input: $input) {
-      deleted
+      pk
     }
   }
 `;

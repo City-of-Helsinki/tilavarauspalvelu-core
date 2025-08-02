@@ -74,7 +74,7 @@ function ReservationSeriesFormWrapper({ reservationUnits }: Props) {
     return <Notification type="alert">No reservation units found</Notification>;
   }
 
-  const reservationUnit = queryData?.reservationUnit ?? null;
+  const reservationUnit = queryData?.node != null && "pk" in queryData.node ? queryData.node : null;
   // NOTE requires a second auto grid so that the select scales similar to others
   return (
     <>

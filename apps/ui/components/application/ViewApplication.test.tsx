@@ -63,7 +63,7 @@ describe("Processing Notification", () => {
     [ApplicationStatusChoice.Handled, true],
     [ApplicationStatusChoice.InAllocation, true],
     [ApplicationStatusChoice.Received, true],
-    [ApplicationStatusChoice.ResultsSent, false],
+    [ApplicationStatusChoice.ResultSent, false],
   ] as const)("should show if %s is not Results sent", ([status, isShown]) => {
     const view = customRender({ status });
 

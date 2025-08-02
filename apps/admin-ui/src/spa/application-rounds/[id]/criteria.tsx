@@ -45,7 +45,8 @@ const ReservationUnit = styled.div`
 // export so it doesn't get removed (codegen makes a copy of it)
 export const APPLICATION_ROUND_QUERY = gql`
   query ApplicationRoundCriteria($id: ID!) {
-    applicationRound(id: $id) {
+    node(id: $id) {
+      ... on ApplicationRoundNode {
       id
       pk
       nameFi
@@ -68,6 +69,7 @@ export const APPLICATION_ROUND_QUERY = gql`
         }
       }
     }
+    }
   }
 `;
 
@@ -82,7 +84,7 @@ function Criteria({ applicationRoundPk }: { applicationRoundPk: number }): JSX.E
       errorToast({ text: t("errors.errorFetchingData") });
     },
   });
-  const { applicationRound } = data ?? {};
+  const applicationRound = data?.node != null && "pk" in data.node ? data.node : null;
   const reservationUnits = filterNonNullable(applicationRound?.reservationUnits);
 
   if (loading) {

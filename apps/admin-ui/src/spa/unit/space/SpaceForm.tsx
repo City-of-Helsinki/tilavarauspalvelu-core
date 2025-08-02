@@ -34,13 +34,13 @@ export const SpaceUpdateSchema = z.object({
   nameFi: z.string().max(80).min(1),
   nameSv: z.string().max(80),
   nameEn: z.string().max(80),
-  surfaceArea: z.number().min(1).nullish(),
-  maxPersons: z.number().min(1).nullish(),
+  surfaceArea: z.number().min(1).optional(),
+  maxPersons: z.number().min(1).optional(),
   unit: z.number(),
   // optional because of TS, update requires it, create can't have it
   pk: z.number().optional(),
-  parent: z.number().nullable(),
-  code: z.string().nullish(),
+  parent: z.number().optional(),
+  code: z.string().optional(),
 });
 
 export type SpaceUpdateForm = z.infer<typeof SpaceUpdateSchema>;

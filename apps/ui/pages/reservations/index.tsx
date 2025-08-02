@@ -8,7 +8,7 @@ import { useRouter } from "next/router";
 import { TabWrapper, H1, CenterSpinner } from "common/styled";
 import {
   ReservationStateChoice,
-  ReservationOrderingChoices,
+  ReservationOrderSet,
   useListReservationsQuery,
   ReservationTypeChoice,
 } from "@gql/gql-types";
@@ -49,6 +49,8 @@ function Reservations(props: { apiBaseUrl: string }): JSX.Element | null {
   const { data, loading: isLoading } = useListReservationsQuery({
     skip: !currentUser?.pk,
     variables: {
+      orderBy:
+        tab === "upcoming" ? [ReservationOrderSet.BeginsAtAsc] : [ReservationOrderSet.BeginsAtDesc],
       state:
         tab === "cancelled"
           ? [ReservationStateChoice.Cancelled]
@@ -58,12 +60,11 @@ function Reservations(props: { apiBaseUrl: string }): JSX.Element | null {
               ReservationStateChoice.WaitingForPayment,
               ReservationStateChoice.Denied,
             ],
-      orderBy:
-        tab === "upcoming" ? [ReservationOrderingChoices.BeginsAtAsc] : [ReservationOrderingChoices.BeginsAtDesc],
+      reservationUnit: [],
       user: currentUser?.pk ?? 0,
       // NOTE today's reservations are always shown in upcoming (even when they are in the past)
-      beginDate: tab === "upcoming" ? toApiDate(today) : undefined,
-      endDate: tab === "past" ? toApiDate(addDays(today, -1)) : undefined,
+      beginDate: tab === "upcoming" ? toApiDate(today) : null,
+      endDate: tab === "past" ? toApiDate(addDays(today, -1)) : null,
       reservationType: ReservationTypeChoice.Normal,
     },
     onError: () => {
@@ -177,20 +178,22 @@ export const LIST_RESERVATIONS = gql`
   query ListReservations(
     $beginDate: Date
     $endDate: Date
-    $state: [ReservationStateChoice]
-    $user: [Int]
-    $reservationUnits: [Int]
-    $orderBy: [ReservationOrderingChoices]
-    $reservationType: [ReservationTypeChoice]!
+    $state: [ReservationStateChoice!]
+    $user: [Int!]
+    $reservationUnit: [Int!]
+    $orderBy: [ReservationOrderSet!]
+    $reservationType: ReservationTypeChoice
   ) {
     reservations(
+filter: {
       beginDate: $beginDate
       endDate: $endDate
       state: $state
       user: $user
-      reservationUnits: $reservationUnits
-      orderBy: $orderBy
+      reservationUnit: $reservationUnit
       reservationType: $reservationType
+}
+      orderBy: $orderBy
     ) {
       edges {
         node {

@@ -1,7 +1,7 @@
 import { ApolloError, gql, type ApolloQueryResult } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import {
-  type AllocatedTimeSlotCreateMutationInput,
+  type AllocatedTimeSlotCreateMutation,
   useCreateAllocatedTimeSlotMutation,
   useDeleteAllocatedTimeSlotMutation,
   type ApplicationSectionAllocationsQuery,
@@ -219,7 +219,7 @@ export function useAcceptSlotMutation({
 
     // NOTE the pk is an update pk that matches AllocatedTimeSlot (not the applicationSection)
     // TODO check the inputs
-    const input: AllocatedTimeSlotCreateMutationInput = {
+    const input: AllocatedTimeSlotCreateMutation = {
       reservationUnitOption: reservationUnitOptionPk,
       dayOfTheWeek: timeRange.dayOfTheWeek,
       beginTime: allocatedBegin,
@@ -276,7 +276,7 @@ export function useRemoveAllocation({
       const { data, errors } = await resetApplicationEvent({
         variables: {
           input: {
-            pk: String(allocatedPk),
+            pk: allocatedPk,
           },
         },
       });
@@ -288,7 +288,7 @@ export function useRemoveAllocation({
         });
       }
       const { deleteAllocatedTimeslot: res } = data || {};
-      if (res?.deleted) {
+      if (res?.pk) {
         const { name } = applicationSection;
         const msg = t("Allocation.resetSuccess", { name });
         successToast({ text: msg });
@@ -302,21 +302,23 @@ export function useRemoveAllocation({
 }
 
 export const CREATE_ALLOCATED_TIME_SLOT = gql`
-  mutation CreateAllocatedTimeSlot($input: AllocatedTimeSlotCreateMutationInput!) {
+  mutation CreateAllocatedTimeSlot($input: AllocatedTimeSlotCreateMutation!) {
     createAllocatedTimeslot(input: $input) {
       beginTime
       dayOfTheWeek
       endTime
       pk
-      reservationUnitOption
+      reservationUnitOption {
+        pk
+      }
     }
   }
 `;
 
 export const DELETE_ALLOCATED_TIME_SLOT = gql`
-  mutation DeleteAllocatedTimeSlot($input: AllocatedTimeSlotDeleteMutationInput!) {
+  mutation DeleteAllocatedTimeSlot($input: AllocatedTimeSlotDeleteMutation!) {
     deleteAllocatedTimeslot(input: $input) {
-      deleted
+      pk
     }
   }
 `;

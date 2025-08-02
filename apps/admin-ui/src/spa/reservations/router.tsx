@@ -28,13 +28,15 @@ function ReservationsRouter(): JSX.Element {
 
 export const GET_RESERVATION_PERMISSION_QUERY = gql`
   query ReservationPermissions($id: ID!) {
-    reservation(id: $id) {
-      id
-      reservationUnit {
+    node(id: $id) {
+      ... on ReservationNode {
         id
-        unit {
+        reservationUnit {
           id
-          pk
+          unit {
+            id
+            pk
+          }
         }
       }
     }
@@ -47,7 +49,8 @@ function useCheckReservationPermissions(pk?: string) {
     variables: { id },
     skip: !pk,
   });
-  const units = filterNonNullable([data?.reservation?.reservationUnit?.unit?.pk]);
+  const { node } = data || {};
+  const units = node != null && "reservationUnit" in node ? filterNonNullable([node.reservationUnit?.unit?.pk]) : [];
   const { hasPermission, isLoading } = useCheckPermission({
     units,
     permission: UserPermissionChoice.CanManageReservations,

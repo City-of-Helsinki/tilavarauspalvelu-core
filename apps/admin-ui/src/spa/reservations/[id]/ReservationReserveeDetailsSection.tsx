@@ -3,7 +3,7 @@ import { Accordion, DataWrapper } from "@/spa/reservations/[id]/components";
 import { ApplicationDatas } from "@/styled";
 import React, { useState } from "react";
 import {
-  ReservationPageQuery,
+  type ReservationPageFragment,
   useReservationDateOfBirthQuery,
   useReservationProfileDataContactInfoQuery,
   useReservationProfileDataSsnQuery,
@@ -30,8 +30,6 @@ import { getApiErrors } from "common/src/apolloUtils";
 import { formatErrorMessage } from "common/src/hooks/useDisplayError";
 
 registerCountryLocale(countriesJson);
-
-type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
 const ReserveeDetailsAccordion = styled(Accordion)`
   div {
@@ -68,7 +66,7 @@ function ReserveeDetailsButton({
 export function ReservationReserveeDetailsSection({
   reservation,
 }: Readonly<{
-  reservation: ReservationType;
+  reservation: ReservationPageFragment;
 }>) {
   const { t } = useTranslation();
   const { user: currentUser } = useSession();
@@ -149,7 +147,9 @@ export function ReservationReserveeDetailsSection({
 
         {isBirthDateVisible && (
           <DataWrapper label={t("RequestedReservation.birthDate")} isLoading={isDateOfBirthLoading}>
-            {formatDate(dateOfBirthData?.reservation?.user?.dateOfBirth) || "-"}
+            {dateOfBirthData?.node != null && "user" in dateOfBirthData?.node ? (
+              formatDate(dateOfBirthData?.node?.user?.dateOfBirth)
+            ) : "-" }
           </DataWrapper>
         )}
 
@@ -242,12 +242,14 @@ export function ReservationReserveeDetailsSection({
 // so don't make them automatically or inside other queries
 export const RESERVATION_DATE_OF_BIRTH_QUERY = gql`
   query ReservationDateOfBirth($id: ID!) {
-    reservation(id: $id) {
-      id
-      user {
+    node(id: $id) {
+      ... on ReservationNode {
         id
-        pk
-        dateOfBirth
+        user {
+          id
+          pk
+          dateOfBirth
+        }
       }
     }
   }

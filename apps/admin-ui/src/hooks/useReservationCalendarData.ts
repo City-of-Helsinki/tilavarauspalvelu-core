@@ -8,7 +8,7 @@ import {
 import { useTranslation } from "next-i18next";
 import { toApiDate } from "common/src/common/util";
 import { errorToast } from "common/src/common/toast";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 // TODO move the import
 import { type CalendarEventType } from "@/spa/reservations/[id]/eventStyleGetter";
 import { combineAffectingReservations } from "@/helpers";
@@ -31,7 +31,7 @@ export function useReservationCalendarData({
 
   const today = new Date();
 
-  const id = base64encode(`ReservationUnitNode:${reservationUnitPk}`);
+  const id = createNodeId("ReservationUnitNode", reservationUnitPk ?? 0);
   const { data, ...rest } = useReservationsByReservationUnitQuery({
     fetchPolicy: "no-cache",
     skip: !reservationUnitPk,
@@ -55,7 +55,8 @@ export function useReservationCalendarData({
 
   const blockedName = t("ReservationUnits.reservationState.RESERVATION_CLOSED");
 
-  const reservations = combineAffectingReservations(data, reservationUnitPk);
+  const reservations = (data?.node != null && "reservations" in data.node
+    ? combineAffectingReservations({ ...data, node: data.node }, reservationUnitPk) : [])
 
   const events =
     reservations

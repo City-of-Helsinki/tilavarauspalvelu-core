@@ -7,14 +7,13 @@ import type { ReservationUnitEditFormValues } from "@/spa/ReservationUnit/edit/f
 import { useNavigate } from "react-router-dom";
 import { getUnitUrl } from "@/common/urls";
 import { successToast } from "common/src/common/toast";
-import type { ReservationUnitEditQuery, UnitSubpageHeadFragment } from "@gql/gql-types";
+import type { ReservationUnitEditPageFragment, UnitSubpageHeadFragment } from "@gql/gql-types";
 import { breakpoints } from "common/src/const";
 import { Flex, pageSideMargins, WhiteButton } from "common/styled";
 import { useDisplayError } from "common/src/hooks";
 import { useModal } from "@/context/ModalContext";
 
-type QueryData = ReservationUnitEditQuery["reservationUnit"];
-type Node = NonNullable<QueryData>;
+type Node = ReservationUnitEditPageFragment;
 
 const PreviewLink = styled.a`
   display: flex;
@@ -190,7 +189,7 @@ export function BottomButtonsStripe({
   onSubmit,
   form,
 }: {
-  reservationUnit: Node | undefined;
+  reservationUnit: Node | null;
   unit?: UnitSubpageHeadFragment | null;
   previewUrlPrefix: string;
   setModalContent: (content: JSX.Element | null) => void;

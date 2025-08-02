@@ -5,7 +5,7 @@ import { Notification, NotificationSize } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H1 } from "common/styled";
 import {
-  type ApplicationCreateMutationInput,
+  type ApplicationCreateMutation,
   ApplicationRoundDocument,
   type ApplicationRoundQuery,
   type ApplicationRoundQueryVariables,
@@ -17,7 +17,7 @@ import {
   type CurrentUserQuery,
   ReservationKind,
 } from "@gql/gql-types";
-import { base64encode, filterNonNullable, ignoreMaybeArray, type ReadonlyDeep, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, type ReadonlyDeep, toNumber } from "common/src/helpers";
 import { type SearchFormValues, SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
 import { createApolloClient } from "@/modules/apolloClient";
 import { RecurringCard } from "@/components/recurring/RecurringCard";
@@ -140,10 +140,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { data } = await apolloClient.query<ApplicationRoundQuery, ApplicationRoundQueryVariables>({
     query: ApplicationRoundDocument,
     variables: {
-      id: base64encode(`ApplicationRoundNode:${pk}`),
+      id: createNodeId("ApplicationRoundNode", pk),
     },
   });
-  const { applicationRound } = data;
+  const applicationRound = data?.node != null && "pk" in data.node ? data.node : null;
   if (applicationRound == null) {
     return notFound;
   }
@@ -164,7 +164,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   });
 
   if (isPostLogin && userData.currentUser != null) {
-    const input: ApplicationCreateMutationInput = {
+    const input: ApplicationCreateMutation = {
       applicationRound: applicationRound.pk ?? 0,
     };
 
@@ -213,7 +213,8 @@ export default SeasonalSearch;
 
 export const APPLICATION_ROUND_QUERY = gql`
   query ApplicationRound($id: ID!) {
-    applicationRound(id: $id) {
+    node(id: $id) {
+      ... on ApplicationRoundNode {
       id
       pk
       nameFi
@@ -227,11 +228,12 @@ export const APPLICATION_ROUND_QUERY = gql`
         pk
       }
     }
+}
   }
 `;
 
 export const CREATE_APPLICATION_MUTATION = gql`
-  mutation CreateApplication($input: ApplicationCreateMutationInput!) {
+  mutation CreateApplication($input: ApplicationCreateMutation!) {
     createApplication(input: $input) {
       pk
     }

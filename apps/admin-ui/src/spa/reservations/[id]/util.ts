@@ -8,10 +8,10 @@ import {
   PriceUnit,
   type PricingFieldsFragment,
   type ReservationNode,
-  type ReservationPageQuery,
-  ReservationPriceDetailsFieldsFragment,
+  type ReservationPageFragment,
+  type ReservationPriceDetailsFieldsFragment,
   ReservationTypeChoice,
-  ReservationUnitPricingFieldsFragment,
+  type ReservationUnitPricingFieldsFragment,
 } from "@gql/gql-types";
 import { formatDuration, fromApiDate } from "common/src/common/util";
 import { formatDate, formatDateTimeRange, getReserveeName } from "@/common/util";
@@ -20,13 +20,11 @@ import { filterNonNullable, sort, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 import { convertWeekday } from "common/src/conversion";
 
-type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
-
 function reservationUnitName(reservationUnit: Maybe<CreateTagStringFragment["reservationUnit"]>): string {
   return reservationUnit ? `${reservationUnit.nameFi}, ${reservationUnit.unit?.nameFi || ""}` : "-";
 }
 
-export function reservationPrice(reservation: ReservationType, t: TFunction): string {
+export function reservationPrice(reservation: ReservationPageFragment, t: TFunction): string {
   return getReservationPrice(reservation.price, t("RequestedReservation.noPrice"), true);
 }
 
@@ -146,7 +144,7 @@ export function getTranslationKeyForCustomerTypeChoice(
 }
 
 export function translateReservationCustomerType(
-  res: Pick<ReservationType, "type" | "reserveeType" | "reserveeIdentifier">,
+  res: Pick<ReservationPageFragment, "type" | "reserveeType" | "reserveeIdentifier">,
   t: TFunction
 ): string {
   const [part1, part2] = getTranslationKeyForCustomerTypeChoice(res.type, res.reserveeType, res.reserveeIdentifier);

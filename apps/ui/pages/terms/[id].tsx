@@ -2,7 +2,7 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
-import { TermsType, TermsOfUseDocument, type TermsOfUseQuery, type TermsOfUseQueryVariables } from "@gql/gql-types";
+import { TermsOfUseTypeChoices, TermsOfUseDocument, type TermsOfUseQuery, type TermsOfUseQueryVariables } from "@gql/gql-types";
 import { H1 } from "common/styled";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -20,10 +20,10 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { data } = await apolloClient.query<TermsOfUseQuery, TermsOfUseQueryVariables>({
     query: TermsOfUseDocument,
     variables: {
-      termsType: TermsType.GenericTerms,
+      termsType: TermsOfUseTypeChoices.GenericTerms,
     },
   });
-  const genericTerms = data.termsOfUse?.edges?.map((n) => n?.node).find((n) => n?.pk === genericTermsId);
+  const genericTerms = data.allTermsOfUse?.find((n) => n?.pk === genericTermsId);
   if (genericTerms == null) {
     return {
       props: {

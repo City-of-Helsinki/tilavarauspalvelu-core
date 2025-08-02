@@ -3,14 +3,13 @@ import { filterNonNullable, type ReadonlyDeep, timeToMinutes } from "common/src/
 import {
   type ApplicantFieldsFragment,
   type ApplicationFormFragment,
-  type ApplicationPage2Query,
-  type ApplicationUpdateMutationInput,
+  type ApplicationPage2Fragment,
+  ApplicationSectionInput,
+  type ApplicationUpdateMutation,
   type Maybe,
   MunicipalityChoice,
   Priority,
   ReserveeType,
-  type SuitableTimeRangeSerializerInput,
-  type UpdateApplicationSectionForApplicationSerializerInput,
   Weekday,
 } from "@gql/gql-types";
 import { z } from "zod";
@@ -21,7 +20,7 @@ import { CELL_STATES } from "common/src/components/ApplicationTimeSelector";
 
 type SectionType = NonNullable<ApplicationFormFragment["applicationSections"]>[0];
 
-type NodePage2 = NonNullable<ApplicationPage2Query["application"]>;
+type NodePage2 = ApplicationPage2Fragment;
 type SectionTypePage2 = NonNullable<NodePage2["applicationSections"]>[0];
 
 const SuitableTimeRangeFormTypeSchema = z.object({
@@ -149,11 +148,11 @@ const ApplicationSectionPage2Schema = z
 
 function transformApplicationSectionPage2(
   values: ApplicationSectionPage2FormValues
-): UpdateApplicationSectionForApplicationSerializerInput {
+) {
   // NOTE: there is a type issue somewhere that causes this to be a string for some cases
   return {
     pk: Number(values.pk),
-    suitableTimeRanges: values.suitableTimeRanges.map(transformSuitableTimeRange),
+    suitableTimeRanges: values.suitableTimeRanges,
   };
 }
 
@@ -405,19 +404,15 @@ const transformEventReservationUnit = (pk: number, priority: number) => ({
   reservationUnit: pk,
 });
 
-function transformSuitableTimeRange(timeRange: SuitableTimeRangeFormValues): SuitableTimeRangeSerializerInput {
-  return timeRange;
-}
-
 // NOTE this works only for subsections of an application mutation
 // if needed without an application mutation needs to use a different SerializerInput
 function transformApplicationSection(
   ae: ApplicationSectionPage1FormValues
-): UpdateApplicationSectionForApplicationSerializerInput {
+): ApplicationSectionInput {
   const begin = transformDateString(ae.begin);
   const end = transformDateString(ae.end);
 
-  const commonData: UpdateApplicationSectionForApplicationSerializerInput = {
+  const commonData: ApplicationSectionInput = {
     ...(begin != null ? { reservationsBeginDate: begin } : {}),
     ...(end != null ? { reservationsEndDate: end } : {}),
     name: ae.name,
@@ -440,7 +435,7 @@ function transformApplicationSection(
   return commonData;
 }
 
-export function transformApplicationPage2(values: ApplicationPage2FormValues): ApplicationUpdateMutationInput {
+export function transformApplicationPage2(values: ApplicationPage2FormValues): ApplicationUpdateMutation {
   const { pk } = values;
   const appEvents = values.applicationSections;
   return {
@@ -450,13 +445,13 @@ export function transformApplicationPage2(values: ApplicationPage2FormValues): A
 }
 
 // For page 1
-export function transformApplicationPage1(values: ApplicationPage1FormValues): ApplicationUpdateMutationInput {
+export function transformApplicationPage1(values: ApplicationPage1FormValues): ApplicationUpdateMutation {
   const { pk, applicantType } = values;
   const appEvents = filterNonNullable(values.applicationSections);
   return {
     pk,
     ...(applicantType != null ? { applicantType } : {}),
-    applicationSections: appEvents.map((ae) => transformApplicationSection(ae)),
+    applicationSections: appEvents.map(transformApplicationSection),
   };
 }
 
@@ -545,7 +540,7 @@ function isAddressValid(streetAddress?: string, postCode?: string, city?: string
   );
 }
 
-export function transformPage3Application(values: ApplicationPage3FormValues): ApplicationUpdateMutationInput {
+export function transformPage3Application(values: ApplicationPage3FormValues): ApplicationUpdateMutation {
   const shouldSaveBillingAddress = values.applicantType === ReserveeType.Individual || values.hasBillingAddress;
 
   const isOrganisation = values.organisationName != null && values.applicantType !== ReserveeType.Individual;

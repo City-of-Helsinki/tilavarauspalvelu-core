@@ -8,9 +8,9 @@ export function useUnitGroupOptions({ applicationRoundPk }: { applicationRoundPk
     fetchPolicy: "cache-and-network",
   });
 
-  const options = filterNonNullable(data?.unitGroups?.edges)?.map((edge) => ({
-    label: edge?.node?.nameFi ?? "",
-    value: edge?.node?.pk ?? 0,
+  const options = filterNonNullable(data?.allUnitGroups).map((n) => ({
+    label: n.nameFi ?? "",
+    value: n.pk,
   }));
 
   return { options, loading };
@@ -20,14 +20,10 @@ export function useUnitGroupOptions({ applicationRoundPk }: { applicationRoundPk
 // TODO combine with other options queries so we only make a single request for all of them
 export const OWN_UNIT_GROUPS_QUERY = gql`
   query OwnUnitGroups($applicationRound: Int) {
-    unitGroups(onlyWithPermission: true, applicationRound: $applicationRound) {
-      edges {
-        node {
+    allUnitGroups(filter: { onlyWithPermission: true, applicationRound: $applicationRound }) {
           id
           pk
           nameFi
-        }
-      }
     }
   }
 `;

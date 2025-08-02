@@ -1,7 +1,7 @@
 import { type FieldValues, useController, type UseControllerProps, UseFormReturn } from "react-hook-form";
 import { BUFFER_TIME_OPTIONS, ReservationUnitEditFormValues } from "@/spa/ReservationUnit/edit/form";
 import { useTranslation } from "next-i18next";
-import { Authentication, ReservationStartInterval } from "@gql/gql-types";
+import { AuthenticationType, ReservationCancelReasonChoice, ReservationStartInterval } from "@gql/gql-types";
 import { EditAccordion } from "@/spa/ReservationUnit/edit/components/styled";
 import { AutoGrid, Flex } from "common/styled";
 import { FieldGroup } from "@/spa/ReservationUnit/edit/components/FieldGroup";
@@ -80,7 +80,7 @@ export function ReservationUnitSettingsSection({
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
   metadataOptions: Array<{ value: number; label: string }>;
-  cancellationRuleOptions: Array<{ value: number; label: string }>;
+  cancellationRuleOptions: Array<{ value: ReservationCancelReasonChoice; label: string }>;
 }) {
   const { t } = useTranslation();
   const { control, watch, formState } = form;
@@ -91,7 +91,7 @@ export function ReservationUnitSettingsSection({
     label: t(`reservationStartInterval.${choice}`),
   }));
 
-  const authenticationOptions = Object.values(Authentication).map((choice) => ({
+  const authenticationOptions = Object.values(AuthenticationType).map((choice) => ({
     value: choice,
     label: t(`authentication.${choice}`),
   }));

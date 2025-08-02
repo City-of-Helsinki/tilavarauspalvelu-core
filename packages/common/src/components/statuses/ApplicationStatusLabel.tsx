@@ -27,7 +27,7 @@ function getAdminApplicationStatusLabelProps(status: ApplicationStatusChoice): {
       return { type: "alert", icon: <IconArrowBottomRight /> };
     case ApplicationStatusChoice.Handled:
       return { type: "success", icon: <IconCheck /> };
-    case ApplicationStatusChoice.ResultsSent:
+    case ApplicationStatusChoice.ResultSent:
       return { type: "success", icon: <IconEnvelope /> };
     case ApplicationStatusChoice.Expired:
     case ApplicationStatusChoice.Cancelled:
@@ -42,7 +42,7 @@ function getCustomerApplicationStatusLabelProps(status: ApplicationStatusChoice)
   switch (status) {
     case ApplicationStatusChoice.Draft:
       return { type: "draft", icon: <IconPen /> };
-    case ApplicationStatusChoice.ResultsSent:
+    case ApplicationStatusChoice.ResultSent:
       return { type: "success", icon: <IconCheck /> };
     case ApplicationStatusChoice.Handled:
     case ApplicationStatusChoice.InAllocation:

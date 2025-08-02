@@ -79,7 +79,7 @@ export function reservationToInterval(
 // NOTE: because we are combining two queries here we need to manually define the type
 // this is type safe because this is gonna type error if the endpoints change
 type AffectedReservations = {
-  reservationUnit: Readonly<{
+  node: Readonly<{
     reservations: readonly CombineAffectedReservationsFragment[] | null;
   }> | null;
   affectingReservations: readonly CombineAffectedReservationsFragment[] | null;
@@ -102,9 +102,10 @@ function isAffecting(
 }
 
 export function combineAffectingReservations<T extends AffectedReservations>(
+  // reservations: T | undefined | null,
   data: Maybe<T> | undefined,
   reservationUnitPk: Maybe<number> | undefined
-): NonNullable<NonNullable<T["reservationUnit"]>["reservations"]> {
+): NonNullable<NonNullable<T["node"]>["reservations"]> {
   if (data == null || reservationUnitPk == null) {
     return [];
   }
@@ -113,7 +114,7 @@ export function combineAffectingReservations<T extends AffectedReservations>(
   const affectingReservations = filterNonNullable(data.affectingReservations).filter((y) =>
     isAffecting(y, reservationUnitPk)
   );
-  const reservationSet = filterNonNullable(data?.reservationUnit?.reservations).concat(affectingReservations);
+  const reservationSet = filterNonNullable(data?.node?.reservations).concat(affectingReservations);
   return filterNonNullable(reservationSet);
 }
 

@@ -96,7 +96,7 @@ function AllApplicationRounds(): JSX.Element | null {
   );
   const openApplicationRounds = allApplicationRounds.filter((ar) => ar.status === ApplicationRoundStatusChoice.Open);
   const sentApplicationRounds = allApplicationRounds.filter(
-    (ar) => ar.status === ApplicationRoundStatusChoice.ResultsSent
+    (ar) => ar.status === ApplicationRoundStatusChoice.Sent
   );
   const upcomingApplicationRounds = allApplicationRounds.filter(
     (ar) => ar.status === ApplicationRoundStatusChoice.Upcoming
@@ -201,7 +201,7 @@ export const APPLICATION_ROUND_LIST_FRAGMENT = gql`
 
 export const APPLICATION_ROUND_LIST_QUERY = gql`
   query ApplicationRoundList {
-    applicationRounds(onlyWithPermissions: true) {
+    applicationRounds(filter: { onlyWithPermissions: true }) {
       edges {
         node {
           ...ApplicationRoundListElement

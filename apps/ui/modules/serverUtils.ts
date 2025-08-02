@@ -1,7 +1,6 @@
 import { env } from "@/env.mjs";
 import { gql, NormalizedCacheObject, type ApolloClient } from "@apollo/client";
 import {
-  TermsType,
   TermsOfUseDocument,
   type TermsOfUseQuery,
   type TermsOfUseQueryVariables,
@@ -9,6 +8,7 @@ import {
   type OrderQueryVariables,
   OrderDocument,
   TermsOfUseFieldsFragment,
+  TermsOfUseTypeChoices,
 } from "@gql/gql-types";
 import { genericTermsVariant } from "./const";
 import { getVersion } from "./baseUtils.mjs";
@@ -44,13 +44,13 @@ export async function getGenericTerms(apolloClient: ApolloClient<unknown>): Prom
   const { data: tosData } = await apolloClient.query<TermsOfUseQuery, TermsOfUseQueryVariables>({
     query: TermsOfUseDocument,
     variables: {
-      termsType: TermsType.GenericTerms,
+      termsType: TermsOfUseTypeChoices.GenericTerms,
     },
   });
 
   // TODO missing backend filtering
   const tos =
-    tosData?.termsOfUse?.edges?.map((e) => e?.node).find((node) => node?.pk === genericTermsVariant.BOOKING) ?? null;
+    tosData?.allTermsOfUse?.find((node) => node?.pk === genericTermsVariant.BOOKING) ?? null;
 
   // NOTE there is no error reporting in the Pages even though this is required data
   // so Pages / Components might return null if tos is missing

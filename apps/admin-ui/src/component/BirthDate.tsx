@@ -5,13 +5,14 @@ import { useTranslation } from "next-i18next";
 import { useReservationDateOfBirthQuery, useApplicationDateOfBirthQuery } from "@gql/gql-types";
 import { formatDate } from "@/common/util";
 import { Flex } from "common/styled";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 
 // NOTE separate query because all requests for dateOfBirth are logged
 // so don't make them automatically or inside other queries
 export const APPLICATION_DATE_OF_BIRTH_QUERY = gql`
   query ApplicationDateOfBirth($id: ID!) {
-    application(id: $id) {
+    node(id: $id) {
+      ... on ApplicationNode {
       id
       user {
         id
@@ -19,6 +20,7 @@ export const APPLICATION_DATE_OF_BIRTH_QUERY = gql`
         dateOfBirth
       }
     }
+}
   }
 `;
 
@@ -56,7 +58,7 @@ export function BirthDate(props: Props): JSX.Element {
     error: errorReservation,
   } = useReservationDateOfBirthQuery({
     variables: {
-      id: base64encode(`ReservationNode:${reservationPk}`),
+      id: createNodeId("ReservationNode", reservationPk ?? 0),
     },
     fetchPolicy: "no-cache",
     skip: !reservationPk || !visible,
@@ -68,7 +70,7 @@ export function BirthDate(props: Props): JSX.Element {
     error: errorApplication,
   } = useApplicationDateOfBirthQuery({
     variables: {
-      id: base64encode(`ApplicationNode:${applicationPk}`),
+      id: createNodeId("ApplicationNode", applicationPk ?? 0),
     },
     fetchPolicy: "no-cache",
     skip: !applicationPk || !visible,
@@ -84,11 +86,8 @@ export function BirthDate(props: Props): JSX.Element {
     if (d == null) {
       return null;
     }
-    if ("reservation" in d) {
-      return d.reservation?.user;
-    }
-    if ("application" in d) {
-      return d.application?.user;
+    if ("node" in d && d.node != null && "user" in d.node) {
+      return d.node.user;
     }
     return null;
   }

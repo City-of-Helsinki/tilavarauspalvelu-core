@@ -2,8 +2,7 @@ import React from "react";
 import { Button, ButtonVariant, Dialog } from "hds-react";
 import { useTranslation } from "react-i18next";
 import {
-  LocationType,
-  type ResourceCreateMutationInput,
+  type ResourceCreateMutation,
   type NewResourceUnitFieldsFragment,
   useCreateResourceMutation,
 } from "@gql/gql-types";
@@ -16,6 +15,7 @@ import { DialogActionsButtons } from "@/styled";
 import { UnitInfo } from "../space/UnitInfo";
 import { gql } from "@apollo/client";
 import { useDisplayError } from "common/src/hooks";
+import { ResourceLocationType } from "common/gql/gql-types";
 
 interface IProps {
   unit: NewResourceUnitFieldsFragment;
@@ -30,7 +30,7 @@ export function NewResourceModal({ unit, closeModal, refetch, spacePk }: IProps)
 
   const [createResourceMutation, { loading: isMutationLoading }] = useCreateResourceMutation();
 
-  const createResource = (input: ResourceCreateMutationInput) => createResourceMutation({ variables: { input } });
+  const createResource = (input: ResourceCreateMutation) => createResourceMutation({ variables: { input } });
 
   const form = useForm<ResourceUpdateForm>({
     resolver: zodResolver(ResourceUpdateSchema),
@@ -51,7 +51,7 @@ export function NewResourceModal({ unit, closeModal, refetch, spacePk }: IProps)
       await createResource({
         ...rest,
         name: values.nameFi,
-        locationType: LocationType.Fixed,
+        locationType: ResourceLocationType.Fixed,
       });
       closeModal();
       refetch();
@@ -88,7 +88,7 @@ export function NewResourceModal({ unit, closeModal, refetch, spacePk }: IProps)
 }
 
 export const CREATE_RESOURCE = gql`
-  mutation CreateResource($input: ResourceCreateMutationInput!) {
+  mutation CreateResource($input: ResourceCreateMutation!) {
     createResource(input: $input) {
       pk
     }

@@ -158,7 +158,7 @@ export function isSent(status: Maybe<ApplicationStatusChoice> | undefined): bool
     case ApplicationStatusChoice.Cancelled:
       return false;
     case ApplicationStatusChoice.Received:
-    case ApplicationStatusChoice.ResultsSent:
+    case ApplicationStatusChoice.ResultSent:
     case ApplicationStatusChoice.Handled:
     case ApplicationStatusChoice.InAllocation:
       return true;

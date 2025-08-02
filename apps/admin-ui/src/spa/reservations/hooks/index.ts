@@ -1,7 +1,8 @@
 import { useTranslation } from "react-i18next";
 import {
   type Maybe,
-  type ReservationSeriesUpdateMutationInput,
+  ReservationSeriesReservationUpdateInput,
+  type ReservationSeriesUpdateMutation,
   ReserveeType,
   type UpdateStaffReservationMutationVariables,
   type UseStaffReservationFragment,
@@ -42,18 +43,21 @@ export function useStaffReservationMutation({ reservation, onSuccess }: Props) {
     try {
       if (reservation.reservationSeries?.pk != null) {
         const { type, ...details } = rest;
-        const reserveeType = convertReserveeType(rest.reserveeType);
-        const reservationDetails = {
+        const reserveeType = convertReserveeType(rest.reserveeType) ?? null;
+
+        const reservationDetails: ReservationSeriesReservationUpdateInput = {
           ...details,
           reserveeType,
+          workingMemo
         };
 
-        const input: ReservationSeriesUpdateMutationInput = {
-          name: seriesName,
+        const input: ReservationSeriesUpdateMutation = {
+          name: seriesName ?? "",
           pk: reservation.reservationSeries.pk,
           description: workingMemo,
           ageGroup: rest.ageGroup,
           reservationDetails,
+          skipReservations: [],
         };
         const res = await recurringMutation({
           variables: {
@@ -119,8 +123,8 @@ export const USE_STAFF_RESERVATION_FRAGMENT = gql`
 
 export const UPDATE_STAFF_RESERVATION_MUTATION = gql`
   mutation UpdateStaffReservation(
-    $input: ReservationStaffModifyMutationInput!
-    $workingMemo: ReservationWorkingMemoMutationInput!
+    $input: ReservationStaffModifyMutation!
+    $workingMemo: ReservationWorkingMemoMutation!
   ) {
     staffReservationModify(input: $input) {
       pk
@@ -132,7 +136,7 @@ export const UPDATE_STAFF_RESERVATION_MUTATION = gql`
 `;
 
 export const UPDATE_STAFF_RECURRING_RESERVATION_MUTATION = gql`
-  mutation UpdateReservationSeries($input: ReservationSeriesUpdateMutationInput!) {
+  mutation UpdateReservationSeries($input: ReservationSeriesUpdateMutation!) {
     updateReservationSeries(input: $input) {
       pk
     }

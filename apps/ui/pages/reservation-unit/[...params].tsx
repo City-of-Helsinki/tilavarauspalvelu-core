@@ -9,15 +9,15 @@ import { useTranslation } from "next-i18next";
 import { Flex, H1, H4 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import {
-  ReservationDocument,
-  type ReservationQuery,
-  type ReservationQueryVariables,
+  ReservationInProgressDocument,
+  type ReservationInProgressQuery,
+  type ReservationInProgressQueryVariables,
   ReservationStateChoice,
-  type ReservationUpdateMutationInput,
+  type ReservationUpdateMutation,
   ReserveeType,
   useConfirmReservationMutation,
   useDeleteReservationMutation,
-  useReservationLazyQuery,
+  useReservationInProgressLazyQuery,
   useUpdateReservationMutation,
 } from "@gql/gql-types";
 import { type Inputs } from "common/src/reservation-form/types";
@@ -32,7 +32,7 @@ import { Step0 } from "@/components/reservation/Step0";
 import { Step1 } from "@/components/reservation/Step1";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
-import { base64encode, filterNonNullable, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, toNumber } from "common/src/helpers";
 import { containsField } from "common/src/metaFieldsHelpers";
 import { errorToast } from "common/src/common/toast";
 import { getGeneralFields } from "@/components/reservation/SummaryFields";
@@ -93,12 +93,12 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  const [refetch, { data: resData }] = useReservationLazyQuery({
+  const [refetch, { data: resData }] = useReservationInProgressLazyQuery({
     variables: { id: props.reservation.id },
     fetchPolicy: "no-cache",
   });
 
-  const reservation = resData?.reservation ?? props.reservation;
+  const reservation = resData?.node != null && "pk" in resData.node ? resData.node : props.reservation;
   const reservationUnit = reservation.reservationUnit;
 
   useRemoveStoredReservation();
@@ -175,7 +175,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     return deleteReservation({
       variables: {
         input: {
-          pk: reservation?.pk?.toString() ?? "",
+          pk: reservation.pk,
         },
       },
     });
@@ -228,7 +228,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
       throw new Error("Reservation pk is required");
     }
 
-    const input: ReservationUpdateMutationInput = {
+    const input: ReservationUpdateMutation= {
       ...rest,
       // force update to empty -> NA
       reserveeIdentifier:
@@ -278,8 +278,8 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
       } else if (state === ReservationStateChoice.RequiresHandling) {
         router.push(getReservationPath(pk, undefined, "requires_handling"));
       } else if (state === ReservationStateChoice.WaitingForPayment) {
-        const { order } = data?.confirmReservation ?? {};
-        const checkoutUrl = getCheckoutUrl(order, i18n.language);
+        const { paymentOrder } = data?.confirmReservation ?? {};
+        const checkoutUrl = getCheckoutUrl(paymentOrder , i18n.language);
         if (!checkoutUrl) {
           throw new Error("No checkout url found");
         }
@@ -436,12 +436,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     };
   }
 
-  const { data: resData } = await apolloClient.query<ReservationQuery, ReservationQueryVariables>({
-    query: ReservationDocument,
-    variables: { id: base64encode(`ReservationNode:${reservationPk}`) },
+  const { data: resData } = await apolloClient.query<ReservationInProgressQuery, ReservationInProgressQueryVariables>({
+    query: ReservationInProgressDocument,
+    variables: { id: createNodeId("ReservationNode", reservationPk) },
   });
 
-  const { reservation } = resData;
+  const reservation = resData.node != null && "pk" in resData.node ? resData.node : null;
 
   // Valid path but no reservation found -> redirect to reservation unit page
   if (reservation?.pk == null) {
@@ -482,31 +482,39 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-export const RESERVATION_IN_PROGRESS_QUERY = gql`
-  query Reservation($id: ID!) {
-    reservation(id: $id) {
+export const RESERVATION_IN_PROGRESS_FRAGMENT = gql`
+  fragment ReservationInProgress on ReservationNode {
+    id
+    pk
+    name
+    ...MetaFields
+    ...ReservationInfoCard
+    bufferTimeBefore
+    bufferTimeAfter
+    calendarUrl
+    reservationUnit {
       id
-      pk
-      name
-      ...MetaFields
-      ...ReservationInfoCard
-      bufferTimeBefore
-      bufferTimeAfter
-      calendarUrl
-      reservationUnit {
-        id
-        canApplyFreeOfCharge
-        ...CancellationRuleFields
-        ...MetadataSets
-        ...TermsOfUse
-        requireReservationHandling
+      canApplyFreeOfCharge
+      ...CancellationRuleFields
+      ...MetadataSets
+      ...TermsOfUse
+      requireReservationHandling
+    }
+  }
+`;
+
+export const RESERVATION_IN_PROGRESS_QUERY = gql`
+  query ReservationInProgress($id: ID!) {
+    node(id: $id) {
+      ... on ReservationNode {
+        ...ReservationInProgress
       }
     }
   }
 `;
 
 export const UPDATE_RESERVATION = gql`
-  mutation UpdateReservation($input: ReservationUpdateMutationInput!) {
+  mutation UpdateReservation($input: ReservationUpdateMutation!) {
     updateReservation(input: $input) {
       pk
       state
@@ -515,11 +523,11 @@ export const UPDATE_RESERVATION = gql`
 `;
 
 export const CONFIRM_RESERVATION = gql`
-  mutation ConfirmReservation($input: ReservationConfirmMutationInput!) {
+  mutation ConfirmReservation($input: ReservationConfirmMutation!) {
     confirmReservation(input: $input) {
       pk
       state
-      order {
+      paymentOrder {
         id
         checkoutUrl
       }
@@ -528,9 +536,9 @@ export const CONFIRM_RESERVATION = gql`
 `;
 
 export const DELETE_RESERVATION = gql`
-  mutation DeleteReservation($input: ReservationDeleteTentativeMutationInput!) {
+  mutation DeleteReservation($input: ReservationDeleteTentativeMutation!) {
     deleteTentativeReservation(input: $input) {
-      deleted
+      pk
     }
   }
 `;

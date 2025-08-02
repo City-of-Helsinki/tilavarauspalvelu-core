@@ -1,7 +1,6 @@
 import React from "react";
 import { Button, ButtonVariant, Dialog, IconArrowRight } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { type UnitPageQuery } from "@gql/gql-types";
 import { ParentSelector } from "../ParentSelector";
 import { StyledTag } from "./modules/newSpaceModal";
 import { Controller, UseFormReturn } from "react-hook-form";
@@ -10,7 +9,7 @@ import { DialogActionsButtons } from "@/styled";
 import { H4 } from "common/styled";
 
 type Props = {
-  unit: Pick<NonNullable<UnitPageQuery["unit"]>, "pk">;
+  unit: { pk: number } | null;
   closeModal: () => void;
   hasFixedParent: boolean;
   form: UseFormReturn<SpaceUpdateForm>;

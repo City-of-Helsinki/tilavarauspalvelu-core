@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { gql } from "@apollo/client";
-import { UnitOrderingChoices, useUnitListQuery } from "@gql/gql-types";
+import { UnitOrderSet, useUnitListQuery } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
@@ -35,6 +35,7 @@ export function UnitsDataLoader({ isMyUnits }: Props): JSX.Element {
   const { fetchMore, loading, data, previousData } = useUnitListQuery({
     variables: {
       orderBy,
+      after: null,
       first: LARGE_LIST_PAGE_SIZE,
       nameFi: nameFilter,
       unitGroup: unitGroupFilter,
@@ -71,37 +72,39 @@ export function UnitsDataLoader({ isMyUnits }: Props): JSX.Element {
   );
 }
 
-function transformSortString(orderBy: string | null): UnitOrderingChoices[] {
+function transformSortString(orderBy: string | null): UnitOrderSet[] {
   if (!orderBy) {
     return [];
   }
   switch (orderBy) {
     case "nameFi":
-      return [UnitOrderingChoices.NameFiAsc];
+      return [UnitOrderSet.NameFiAsc];
     case "-nameFi":
-      return [UnitOrderingChoices.NameFiDesc];
+      return [UnitOrderSet.NameFiDesc];
     case "reservationUnitCount":
-      return [UnitOrderingChoices.ReservationUnitsCountAsc];
+      return [UnitOrderSet.ReservationUnitsCountAsc];
     case "-reservationUnitCount":
-      return [UnitOrderingChoices.ReservationUnitsCountDesc];
+      return [UnitOrderSet.ReservationUnitsCountDesc];
     case "unitGroup":
-      return [UnitOrderingChoices.UnitGroupNameFiAsc];
+      return [UnitOrderSet.UnitGroupNameFiAsc];
     case "-unitGroup":
-      return [UnitOrderingChoices.UnitGroupNameFiDesc];
+      return [UnitOrderSet.UnitGroupNameFiDesc];
     default:
       return [];
   }
 }
 
 export const UNIT_LIST_QUERY = gql`
-  query UnitList($first: Int, $after: String, $orderBy: [UnitOrderingChoices], $nameFi: String, $unitGroup: [Int]) {
+  query UnitList($first: Int, $after: String, $orderBy: [UnitOrderSet!], $nameFi: String, $unitGroup: [Int!]) {
     units(
       first: $first
       after: $after
       orderBy: $orderBy
-      nameFi: $nameFi
+    filter: {
+      nameFiStartswith: $nameFi
       onlyWithPermission: true
       unitGroup: $unitGroup
+}
     ) {
       edges {
         node {

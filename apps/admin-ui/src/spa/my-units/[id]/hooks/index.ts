@@ -28,7 +28,8 @@ export function useUnitResources(begin: Date, unitPk: string, reservationUnitTyp
   });
 
   const { affectingReservations } = data ?? {};
-  const resUnits = filterNonNullable(data?.unit?.reservationUnits);
+  const unit = data?.node != null && "reservationUnits" in data.node ? data.node : null;
+  const resUnits = filterNonNullable(unit?.reservationUnits);
 
   type ReservationType = NonNullable<typeof affectingReservations>[0];
   type ReservationUnitType = NonNullable<typeof resUnits>[0];
@@ -79,28 +80,30 @@ export const RESERVATION_UNITS_BY_UNIT_QUERY = gql`
   query ReservationUnitsByUnit(
     $id: ID!
     $pk: Int!
-    $state: [ReservationStateChoice]
-    $beginDate: Date
-    $endDate: Date
+    $state: [ReservationStateChoice!]
+    $beginDate: Date!
+    $endDate: Date!
   ) {
-    unit(id: $id) {
-      id
-      reservationUnits {
+    node(id: $id) {
+      ... on UnitNode {
         id
-        pk
-        nameFi
-        spaces {
+        reservationUnits {
           id
           pk
+          nameFi
+          spaces {
+            id
+            pk
+          }
+          reservationUnitType {
+            id
+            pk
+          }
+          bufferTimeBefore
+          bufferTimeAfter
+          isDraft
+          authentication
         }
-        reservationUnitType {
-          id
-          pk
-        }
-        bufferTimeBefore
-        bufferTimeAfter
-        isDraft
-        authentication
       }
     }
     affectingReservations(beginDate: $beginDate, endDate: $endDate, state: $state, forUnits: [$pk]) {

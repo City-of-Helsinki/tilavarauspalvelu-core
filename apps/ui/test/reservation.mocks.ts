@@ -1,6 +1,5 @@
 import {
   AccessType,
-  ImageType,
   MetaFieldsFragment,
   MunicipalityChoice,
   OrderStatus,
@@ -8,11 +7,12 @@ import {
   PaymentType,
   PriceUnit,
   ReservationCancelReasonChoice,
-  type ReservationPageQuery,
+  type ReservationPageFragment,
   ReservationStateChoice,
   ReservationTypeChoice,
+  ReservationUnitImageType,
   ReserveeType,
-  TermsType,
+  TermsOfUseTypeChoices,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
 import type { FieldName } from "common/src/metaFieldsHelpers";
@@ -60,7 +60,7 @@ export type MockReservationProps = {
   isHandled?: boolean;
   type?: ReservationTypeChoice;
   price?: string;
-  paymentOrder?: ReservationPaymentOrderFragment & { handledPaymentDueBy: string };
+  paymentOrder?: ReservationPaymentOrderFragment
   appliedPricing?: { highestPrice: string; taxPercentage: string };
   cancellable?: boolean;
   canApplyFreeOfCharge?: boolean;
@@ -96,12 +96,12 @@ export type MockReservationProps = {
 
 export type ReservationPaymentOrderFragment = Pick<
   PaymentOrderNode,
-  "id" | "reservationPk" | "status" | "paymentType" | "receiptUrl" | "checkoutUrl"
+  "id" | "reservation" | "status" | "paymentType" | "receiptUrl" | "checkoutUrl" | "handledPaymentDueBy"
 >;
 
 export function createMockReservation(
-  props: MockReservationProps
-): Readonly<NonNullable<ReservationPageQuery["reservation"]>> {
+  props: Readonly<MockReservationProps>
+): Readonly<ReservationPageFragment> {
   const {
     applyingForFreeOfCharge = false,
     beginsAt = new Date(2024, 0, 1, 10, 0, 0, 0).toISOString(),
@@ -186,7 +186,7 @@ export function createMockReservation(
           mediumUrl: "https://example.com/image-medium.jpg",
           smallUrl: "https://example.com/image-small.jpg",
           imageUrl: "https://example.com/image-image.jpg",
-          imageType: ImageType.Main,
+          imageType: ReservationUnitImageType.Main,
         },
       ],
       unit: {
@@ -284,7 +284,7 @@ export function createTermsOfUseMock(empty: boolean = false) {
       : {
           id: base64encode("TermsOfUseNode:1"),
           pk: "1",
-          termsType: TermsType.GenericTerms,
+          termsType: TermsOfUseTypeChoices.GenericTerms,
           ...generateNameFragment("TermsOfUse name"),
           ...generateTextFragment("Test terms of use"),
         },
@@ -295,6 +295,24 @@ export const future1hReservation = () => ({
   beginsAt: new Date(2024, 0, 7, 9, 0, 0).toISOString(),
   endsAt: new Date(2024, 0, 7, 10, 0, 0).toISOString(),
 });
+
+function createPaymentOrder({
+  paymentStatus = OrderStatus.PaidManually,
+  receiptUrl = "https://example.com/receipt",
+}: {
+  paymentStatus?: OrderStatus;
+  receiptUrl?: string | null
+}): ReservationPaymentOrderFragment  {
+  return {
+    id: "1",
+    reservation: null,
+    status: paymentStatus,
+    paymentType: PaymentType.OnlineOrInvoice,
+    receiptUrl: receiptUrl,
+    checkoutUrl: "https://example.com/checkout",
+    handledPaymentDueBy: new Date(2024, 0, 1, 12, 0, 0).toISOString(),
+  }
+}
 
 export const reservationRenderProps = (
   variant:
@@ -310,6 +328,8 @@ export const reservationRenderProps = (
   paymentStatus: OrderStatus = OrderStatus.Paid,
   receiptUrl: string | null = "https://example.com/receipt"
 ) => {
+
+
   switch (variant) {
     case "inThePast":
       return {
@@ -355,11 +375,8 @@ export const reservationRenderProps = (
         isHandled: false,
       };
     case "waitingForPayment":
-      return {
-        state: ReservationStateChoice.WaitingForPayment,
-        ...future1hReservation(),
-        price: "40.0",
-        paymentOrder: {
+      /*
+      const paymentOrder: ReservationPaymentOrderFragment = {
           id: "1",
           reservationPk: "1",
           status: paymentStatus,
@@ -367,11 +384,21 @@ export const reservationRenderProps = (
           receiptUrl: receiptUrl,
           checkoutUrl: "https://example.com/checkout",
           handledPaymentDueBy: new Date(2024, 0, 1, 12, 0, 0).toISOString(),
-        },
+      }
+      */
+      return {
+        state: ReservationStateChoice.WaitingForPayment,
+        ...future1hReservation(),
+        price: "40.0",
+        paymentOrder: createPaymentOrder({
+          receiptUrl,
+          paymentStatus,
+        }),
       };
+      // Set all available attribute defaults
     case "default":
     default:
-      // Set all available attribute defaults
+
       return {
         pk: 1,
         state: ReservationStateChoice.Confirmed,
@@ -381,15 +408,7 @@ export const reservationRenderProps = (
         type: ReservationTypeChoice.Normal,
         price: "10.0",
         cancellable: false,
-        paymentOrder: {
-          id: "1",
-          reservationPk: "1",
-          status: paymentStatus,
-          paymentType: PaymentType.OnlineOrInvoice,
-          receiptUrl: receiptUrl,
-          checkoutUrl: "https://example.com/checkout",
-          handledPaymentDueBy: new Date(2024, 0, 1, 12, 0, 0).toISOString(),
-        },
+        paymentOrder: createPaymentOrder({ receiptUrl, paymentStatus }),
       };
   }
 };
@@ -412,9 +431,9 @@ export function createReservationPageMock({
   isHandled?: boolean;
   type?: ReservationTypeChoice;
   price?: string;
-  paymentOrder?: ReservationPaymentOrderFragment & { handledPaymentDueBy: string };
+  paymentOrder?: ReservationPaymentOrderFragment;
   cancellable?: boolean;
-}): Readonly<NonNullable<ReservationPageQuery["reservation"]>> {
+}): Readonly<ReservationPageFragment> {
   return createMockReservation({
     pk,
     state: state,

@@ -4,8 +4,8 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 import {
-  type ApplicationCreateMutationInput,
-  ReservationUnitNode,
+  type ApplicationCreateMutation,
+  type ReservationUnitNode,
   useCreateApplicationMutation,
 } from "@/gql/gql-types";
 import { getApplicationPath } from "@/modules/urls";
@@ -77,7 +77,7 @@ export function StartApplicationBar({ apiBaseUrl, applicationRound }: Readonly<P
 
   const displayError = useDisplayError();
   const createNewApplication = async (applicationRoundPk: number) => {
-    const input: ApplicationCreateMutationInput = {
+    const input: ApplicationCreateMutation = {
       applicationRound: applicationRoundPk,
     };
     try {

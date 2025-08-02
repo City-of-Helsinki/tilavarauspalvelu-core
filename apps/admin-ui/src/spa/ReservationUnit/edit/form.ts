@@ -2,14 +2,14 @@ import { convertTime, filterNonNullable, timeToMinutes, toNumber } from "common/
 import { fromApiDate, fromUIDate, toApiDate, toUIDate } from "common/src/common/util";
 import {
   AccessType,
-  Authentication,
-  ImageType,
+  AuthenticationType,
   PaymentType,
   PriceUnit,
   ReservationKind,
   ReservationStartInterval,
-  type ReservationUnitEditQuery,
-  type ReservationUnitPricingSerializerInput,
+  type ReservationUnitEditPageFragment,
+  ReservationUnitImageType,
+  type ReservationUnitPricingCreateInput,
   Weekday,
 } from "@gql/gql-types";
 import { addDays, endOfDay, format } from "date-fns";
@@ -22,7 +22,7 @@ import { type TaxOption } from "./components/PricingSection";
 
 export const AccessTypes = ["ACCESS_CODE", "OPENED_BY_STAFF", "PHYSICAL_KEY", "UNRESTRICTED"] as const;
 
-type QueryData = ReservationUnitEditQuery["reservationUnit"];
+type QueryData = ReservationUnitEditPageFragment;
 type Node = NonNullable<QueryData>;
 
 /// @param date string in UI format
@@ -146,8 +146,8 @@ const ImageFormSchema = z.object({
   pk: z.number().optional(),
   mediumUrl: z.string().optional(),
   imageUrl: z.string().optional(),
-  imageType: z.nativeEnum(ImageType).optional(),
-  originalImageType: z.nativeEnum(ImageType).optional(),
+  imageType: z.nativeEnum(ReservationUnitImageType).optional(),
+  originalImageType: z.nativeEnum(ReservationUnitImageType).optional(),
   bytes: z.instanceof(File).optional(),
   deleted: z.boolean().optional(),
 });
@@ -370,7 +370,7 @@ export const BUFFER_TIME_OPTIONS = ["noBuffer", "bufferTimesSet"] as const;
 
 export const ReservationUnitEditSchema = z
   .object({
-    authentication: z.nativeEnum(Authentication),
+    authentication: z.nativeEnum(AuthenticationType),
     // TODO these are optional (0 is bit different than not set)
     // because if they are set (non undefined) we should show the active checkbox
     bufferTimeAfter: z.number(),
@@ -774,7 +774,7 @@ function convertAccessTypes(accessTypes: NonNullable<Node["accessTypes"]>): Acce
   }));
 }
 
-export function convertReservationUnit(data?: Node): ReservationUnitEditFormValues {
+export function convertReservationUnit(data: Node | null): ReservationUnitEditFormValues {
   // Convert from API data to form values
   return {
     bufferType:
@@ -831,7 +831,7 @@ export function convertReservationUnit(data?: Node): ReservationUnitEditFormValu
     equipments: filterNonNullable(data?.equipments?.map((e) => e?.pk)),
     purposes: filterNonNullable(data?.purposes?.map((p) => p?.pk)),
     surfaceArea: data?.surfaceArea ?? 0,
-    authentication: data?.authentication ?? Authentication.Weak,
+    authentication: data?.authentication ?? AuthenticationType.Weak,
     reservationUnitType: data?.reservationUnitType?.pk ?? null,
     metadataSet: data?.metadataSet?.pk ?? null,
     paymentTerms: data?.paymentTerms?.pk ?? null,
@@ -962,7 +962,7 @@ function transformPricing(
   values: PricingFormValues,
   hasFuturePricing: boolean,
   taxPercentageOptions: TaxOption[]
-): ReservationUnitPricingSerializerInput | null {
+): ReservationUnitPricingCreateInput | null {
   if (!hasFuturePricing && isAfterToday(values.begins)) {
     return null;
   }

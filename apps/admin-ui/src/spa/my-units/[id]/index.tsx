@@ -52,7 +52,7 @@ export function MyUnitView() {
     },
   });
 
-  const { unit } = data ?? {};
+  const unit = data?.node != null && "pk" in data.node ? data.node : null;
 
   const createReservationBtnRef = useRef<HTMLButtonElement>(null);
   const { hasPermission } = useCheckPermission({
@@ -141,7 +141,8 @@ export function MyUnitView() {
 
 export const UNIT_VIEW_QUERY = gql`
   query UnitView($id: ID!) {
-    unit(id: $id) {
+    node(id: $id) {
+      ... on UnitNode {
       id
       pk
       nameFi
@@ -156,5 +157,6 @@ export const UNIT_VIEW_QUERY = gql`
         }
       }
     }
+}
   }
 `;

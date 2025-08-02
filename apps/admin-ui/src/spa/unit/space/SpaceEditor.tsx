@@ -3,7 +3,7 @@ import { Button, ButtonVariant, LoadingSpinner, Notification } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { useUpdateSpaceMutation, type SpaceUpdateMutationInput, useSpaceQuery } from "@gql/gql-types";
+import { useUpdateSpaceMutation, type SpaceUpdateMutation, useSpaceQuery } from "@gql/gql-types";
 import { errorToast, successToast } from "common/src/common/toast";
 import { ButtonContainer, CenterSpinner, H2, H3 } from "common/styled";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
@@ -37,7 +37,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
 
   const [mutation, { loading: isMutationLoading }] = useUpdateSpaceMutation();
 
-  const updateSpace = (input: SpaceUpdateMutationInput) => mutation({ variables: { input } });
+  const updateSpace = (input: SpaceUpdateMutation) => mutation({ variables: { input } });
 
   const displayError = useDisplayError();
   const {
@@ -60,8 +60,8 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
   const { errors, isDirty } = formState;
 
   useEffect(() => {
-    if (data?.space != null) {
-      const { space: s } = data;
+    const s = data?.node;
+    if (s != null && "nameFi" in s) {
       reset({
         nameFi: s.nameFi ?? "",
         nameSv: s.nameSv ?? "",
@@ -70,7 +70,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
         maxPersons: s.maxPersons ?? undefined,
         unit,
         pk: s.pk ?? 0,
-        parent: s.parent?.pk ?? null,
+        parent: s.parent?.pk ?? undefined,
         code: s.code,
       });
     }
@@ -122,12 +122,14 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
     }
   };
 
+  const spaceNode = data?.node != null && "pk" in data.node ? data.node : null;
+  const parent = spaceNode?.parent;
   return (
     <>
       <LinkPrev route="../.." />
       <Head
-        title={data?.space?.parent?.nameFi || t("SpaceEditor.noParent")}
-        space={data?.space}
+        title={parent?.nameFi || t("SpaceEditor.noParent")}
+        space={data?.node}
         maxPersons={watch("maxPersons") || undefined}
         surfaceArea={watch("surfaceArea") || undefined}
       />
@@ -136,7 +138,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
         <FormErrorSummary errors={errors} />
         <section>
           <H3>{t("SpaceEditor.hierarchy")}</H3>
-          <SpaceHierarchy space={data?.space} />
+          <SpaceHierarchy space={spaceNode} />
           <Controller
             control={control}
             name="parent"
@@ -183,9 +185,45 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
 export default SpaceEditor;
 
 export const UPDATE_SPACE = gql`
-  mutation UpdateSpace($input: SpaceUpdateMutationInput!) {
+  mutation UpdateSpace($input: SpaceUpdateMutation!) {
     updateSpace(input: $input) {
       pk
+    }
+  }
+`;
+
+export const SPACE_HIERARCHY_FRAGMENT = gql`
+  fragment SpaceHierarchyFields on SpaceNode {
+    id
+    pk
+    nameFi
+    nameSv
+    nameEn
+    code
+    surfaceArea
+    maxPersons
+    unit {
+      id
+      ...UnitSubpageHead
+      descriptionFi
+      spaces {
+        id
+        pk
+        nameFi
+      }
+    }
+    parent {
+      id
+      pk
+      nameFi
+      parent {
+        id
+        nameFi
+        parent {
+          id
+          nameFi
+        }
+      }
     }
   }
 `;
@@ -193,37 +231,9 @@ export const UPDATE_SPACE = gql`
 // TODO why does this query parents up the tree?
 export const SPACE_QUERY = gql`
   query Space($id: ID!) {
-    space(id: $id) {
-      id
-      pk
-      nameFi
-      nameSv
-      nameEn
-      code
-      surfaceArea
-      maxPersons
-      unit {
-        id
-        ...UnitSubpageHead
-        descriptionFi
-        spaces {
-          id
-          pk
-          nameFi
-        }
-      }
-      parent {
-        id
-        pk
-        nameFi
-        parent {
-          id
-          nameFi
-          parent {
-            id
-            nameFi
-          }
-        }
+    node(id: $id) {
+      ... on SpaceNode {
+        ...SpaceHierarchyFields
       }
     }
   }

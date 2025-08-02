@@ -108,60 +108,64 @@ function SearchSingle({ options }: Readonly<Props>): JSX.Element {
 
 export default SearchSingle;
 
+/*
+ * moved to accessType filter set
+    $accessTypeBeginDate: Date
+    $accessTypeEndDate: Date
+  * */
 // TODO why isDraft and isVisible are options here?
 export const SEARCH_RESERVATION_UNITS = gql`
   query SearchReservationUnits(
     $textSearch: String
-    $pk: [Int]
-    $applicationRound: [Int]
+    $pk: [Int!]
+    $applicationRound: [Int!]
     $personsAllowed: Int
-    $unit: [Int]
-    $reservationUnitType: [Int]
-    $purposes: [Int]
-    $equipments: [Int]
-    $accessType: [AccessType]
-    $accessTypeBeginDate: Date
-    $accessTypeEndDate: Date
+    $unit: [Int!]
+    $reservationUnitType: [Int!]
+    $purposes: [Int!]
+    $equipments: [Int!]
+    $accessType: AccessTypeFilterDataInput
     $reservableDateStart: Date
     $reservableDateEnd: Date
     $reservableTimeStart: Time
     $reservableTimeEnd: Time
     $reservableMinimumDurationMinutes: Int
-    $showOnlyReservable: Boolean
+    $showOnlyReservable: Boolean!
     $first: Int
     $before: String
     $after: String
-    $orderBy: [ReservationUnitOrderingChoices]
+    $orderBy: [ReservationUnitOrderSet!]
     $isDraft: Boolean
     $isVisible: Boolean
     $reservationKind: ReservationKind
   ) {
     reservationUnits(
-      textSearch: $textSearch
-      pk: $pk
-      applicationRound: $applicationRound
-      personsAllowed: $personsAllowed
-      unit: $unit
-      reservationUnitType: $reservationUnitType
-      purposes: $purposes
-      equipments: $equipments
-      accessType: $accessType
-      accessTypeBeginDate: $accessTypeBeginDate
-      accessTypeEndDate: $accessTypeEndDate
-      reservableDateStart: $reservableDateStart
-      reservableDateEnd: $reservableDateEnd
-      reservableTimeStart: $reservableTimeStart
-      reservableTimeEnd: $reservableTimeEnd
-      reservableMinimumDurationMinutes: $reservableMinimumDurationMinutes
-      showOnlyReservable: $showOnlyReservable
-      first: $first
-      after: $after
-      before: $before
-      orderBy: $orderBy
-      isDraft: $isDraft
-      isVisible: $isVisible
-      reservationKind: $reservationKind
-      calculateFirstReservableTime: true
+firstReservableTime: {
+        reservableDateStart: $reservableDateStart
+        reservableDateEnd: $reservableDateEnd
+        reservableTimeStart: $reservableTimeStart
+        reservableTimeEnd: $reservableTimeEnd
+        reservableMinimumDurationMinutes: $reservableMinimumDurationMinutes
+        showOnlyReservable: $showOnlyReservable
+}
+  filter: {
+        textSearch: $textSearch
+        pk: $pk
+        applicationRound: $applicationRound
+        personsAllowed: $personsAllowed
+        unit: $unit
+        reservationUnitType: $reservationUnitType
+        purposes: $purposes
+        equipments: $equipments
+        accessType: $accessType
+        isDraft: $isDraft
+        isVisible: $isVisible
+        reservationKind: $reservationKind
+  }
+        first: $first
+        after: $after
+        before: $before
+        orderBy: $orderBy
     ) {
       edges {
         node {

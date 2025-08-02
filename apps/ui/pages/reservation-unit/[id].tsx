@@ -28,7 +28,7 @@ import {
   type RelatedReservationUnitsQuery,
   type RelatedReservationUnitsQueryVariables,
   type RelatedUnitCardFieldsFragment,
-  type ReservationCreateMutationInput,
+  type ReservationCreateMutation,
   ReservationUnitPageDocument,
   type ReservationUnitPageQuery,
   type ReservationUnitPageQueryVariables,
@@ -36,7 +36,7 @@ import {
   useCreateReservationMutation,
 } from "@gql/gql-types";
 import {
-  base64encode,
+  createNodeId,
   filterNonNullable,
   formatListToCSV,
   formatTimeRange,
@@ -301,7 +301,7 @@ function ReservationUnit({
       throw new Error("Reservation slot is not reservable");
     }
     const { start, end } = slot;
-    const input: ReservationCreateMutationInput = {
+    const input: ReservationCreateMutation = {
       beginsAt: start.toISOString(),
       endsAt: end.toISOString(),
       reservationUnit: reservationUnit.pk,
@@ -354,7 +354,7 @@ function ReservationUnit({
 
   const [createReservationMutation] = useCreateReservationMutation();
 
-  const createReservation = async (input: ReservationCreateMutationInput): Promise<void> => {
+  const createReservation = async (input: ReservationCreateMutation): Promise<void> => {
     try {
       if (reservationUnit.pk == null) {
         throw new Error("Reservation unit pk is missing");
@@ -652,7 +652,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const endsAt = ignoreMaybeArray(query.end);
 
     if (beginsAt != null && endsAt != null) {
-      const input: ReservationCreateMutationInput = {
+      const input: ReservationCreateMutation = {
         beginsAt,
         endsAt,
         reservationUnit: pk,
@@ -693,19 +693,19 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     >({
       query: ReservationUnitPageDocument,
       variables: {
-        id: base64encode(`ReservationUnitNode:${pk}`),
+        id: createNodeId("ReservationUnitNode", pk),
         beginDate: toApiDate(startDate) ?? "",
         endDate: toApiDate(endDate) ?? "",
       },
     });
 
-    const { reservationUnit } = reservationUnitData;
+    const reservationUnit = reservationUnitData.node != null && "pk" in reservationUnitData.node ? reservationUnitData.node : null;
 
     if (reservationUnit == null) {
       return notFound;
     }
 
-    const previewPass = uuid === reservationUnitData.reservationUnit?.extUuid;
+    const previewPass = uuid === reservationUnit.extUuid;
     if (!isReservationUnitPublished(reservationUnit) && !previewPass) {
       return notFound;
     }
@@ -729,7 +729,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         },
       });
       relatedReservationUnits = filterNonNullable(relatedData?.reservationUnits?.edges?.map((n) => n?.node)).filter(
-        (n) => n?.pk !== reservationUnitData.reservationUnit?.pk
+        (n) => n?.pk !== reservationUnit?.pk
       );
     }
 
@@ -760,7 +760,8 @@ export default ReservationUnitWrapped;
 
 export const RESERVATION_UNIT_PAGE_QUERY = gql`
   query ReservationUnitPage($id: ID!, $beginDate: Date!, $endDate: Date!) {
-    reservationUnit(id: $id) {
+    node(id: $id) {
+... on ReservationUnitNode {
       id
       pk
       nameFi
@@ -792,12 +793,13 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
         ...EquipmentFields
       }
     }
+}
   }
 `;
 
 export const RELATED_RESERVATION_UNITS_QUERY = gql`
-  query RelatedReservationUnits($unit: [Int]!) {
-    reservationUnits(unit: $unit, isVisible: true) {
+  query RelatedReservationUnits($unit: [Int!]!) {
+    reservationUnits(filter: { unit: $unit, isVisible: true }) {
       edges {
         node {
           ...RelatedUnitCardFields
@@ -808,7 +810,7 @@ export const RELATED_RESERVATION_UNITS_QUERY = gql`
 `;
 
 export const CREATE_RESERVATION = gql`
-  mutation CreateReservation($input: ReservationCreateMutationInput!) {
+  mutation CreateReservation($input: ReservationCreateMutation!) {
     createReservation(input: $input) {
       pk
     }

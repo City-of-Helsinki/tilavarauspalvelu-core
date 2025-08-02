@@ -12,7 +12,7 @@ type ViewApplicationProps = {
 
 export function ViewApplication({ application, children }: ViewApplicationProps): JSX.Element {
   const { t } = useTranslation();
-  const shouldShowNotification = application.status !== ApplicationStatusChoice.ResultsSent;
+  const shouldShowNotification = application.status !== ApplicationStatusChoice.ResultSent;
   return (
     <>
       <div>
