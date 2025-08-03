@@ -4,7 +4,7 @@ import pytest
 
 from tilavarauspalvelu.enums import UserRoleChoice
 
-from tests.factories import ApplicationFactory
+from tests.factories import ApplicationFactory, UserFactory
 
 from .helpers import section_options_query
 
@@ -38,7 +38,8 @@ def test_reservation_unit_option__query__perms__general_admin(graphql):
 
     assert option is not None
 
-    graphql.login_user_with_role(role=UserRoleChoice.ADMIN)
+    user = UserFactory.create_with_general_role(role=UserRoleChoice.ADMIN)
+    graphql.force_login(user)
 
     query = section_options_query()
     response = graphql(query)

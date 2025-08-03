@@ -5,8 +5,6 @@ from decimal import Decimal
 from functools import partial
 from typing import TYPE_CHECKING, Any, NamedTuple
 
-from graphene_django_extensions.testing import build_mutation, build_query
-
 from tilavarauspalvelu.enums import (
     AccessType,
     AuthenticationType,
@@ -28,6 +26,7 @@ from tests.factories import (
     TaxPercentageFactory,
     UnitFactory,
 )
+from tests.query_builder import build_mutation, build_query
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit

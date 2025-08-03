@@ -4,7 +4,7 @@ import urllib.parse
 
 import freezegun
 import pytest
-from graphql_relay import to_global_id
+from undine.relay import to_global_id
 
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater

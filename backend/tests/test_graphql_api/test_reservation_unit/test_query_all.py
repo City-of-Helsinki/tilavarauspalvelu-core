@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pytest
-from graphene_django.settings import graphene_settings
 
 from tests.factories import ReservationUnitFactory, UserFactory
 from tests.test_graphql_api.test_reservation_unit.helpers import reservation_units_all_query

@@ -44,7 +44,8 @@ def test_reservation_series__deny_series__general_admin(graphql):
         "denyReason": reason.pk,
     }
 
-    graphql.login_user_with_role(role=UserRoleChoice.ADMIN)
+    user = UserFactory.create_with_general_role(role=UserRoleChoice.ADMIN)
+    graphql.force_login(user)
 
     response = graphql(DENY_SERIES_MUTATION, input_data=data)
 

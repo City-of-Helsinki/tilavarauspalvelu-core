@@ -4,7 +4,7 @@ import re
 from contextlib import contextmanager
 from functools import wraps
 from types import SimpleNamespace
-from typing import TYPE_CHECKING, Any, Self
+from typing import TYPE_CHECKING, Any, NamedTuple, Self, TypedDict, TypeVar
 from unittest import mock
 from unittest.mock import patch
 
@@ -15,7 +15,6 @@ from django.conf import settings
 from django.utils import translation
 from django.utils.functional import lazy
 from django.utils.translation import trans_real
-from graphene_django_extensions.testing import GraphQLClient as BaseGraphQLClient
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -24,26 +23,37 @@ if TYPE_CHECKING:
 
     from django.http import HttpRequest
 
-    from tilavarauspalvelu.enums import UserRoleChoice
-    from tilavarauspalvelu.models import User
     from tilavarauspalvelu.typing import HTTPMethod, Lang
 
 __all__ = [
-    "GraphQLClient",
     "ResponseMock",
     "TranslationsFromPOFiles",
     "exact",
 ]
 
 
-class GraphQLClient(BaseGraphQLClient):
-    def login_user_with_role(self, role: UserRoleChoice) -> User | None:
-        """Login with a user with the given role."""
-        from .factories import UserFactory
+TNamedTuple = TypeVar("TNamedTuple", bound=NamedTuple)
 
-        user = UserFactory.create_with_general_role(role=role)
-        self.force_login(user)
-        return user
+
+class ParametrizeArgs(TypedDict):
+    argnames: list[str]
+    argvalues: list[TNamedTuple]  # type: ignore[valid-type]
+    ids: list[str]
+
+
+def parametrize_helper[TNamedTuple: NamedTuple](__tests: dict[str, TNamedTuple], /) -> ParametrizeArgs:
+    """Construct parametrize input while setting test IDs."""
+    assert __tests, "I need some tests, please!"
+    values = list(__tests.values())
+    try:
+        return ParametrizeArgs(
+            argnames=list(values[0].__class__.__annotations__),
+            argvalues=values,
+            ids=list(__tests),
+        )
+    except AttributeError as error:
+        msg = "Improper configuration. Did you use a NamedTuple for TNamedTuple?"
+        raise RuntimeError(msg) from error
 
 
 class ResponseMock:

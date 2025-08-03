@@ -28,7 +28,9 @@ def test_reservation_series__update_series__general_admin(graphql, role, has_per
     series = ReservationSeriesFactory.create()
 
     data = {"pk": series.id, "name": "New name"}
-    graphql.login_user_with_role(role=role)
+    user = UserFactory.create_with_general_role(role=role)
+    graphql.force_login(user)
+
     response = graphql(UPDATE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is not has_permission

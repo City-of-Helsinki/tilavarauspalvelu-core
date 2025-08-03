@@ -22,15 +22,14 @@ __all__ = [
 
 class ApplicationQuerySet(ModelQuerySet[Application]):
     def _fetch_all(self) -> None:
+        fetch_permissions = "FETCH_UNITS_FOR_PERMISSIONS_FLAG" in self.query.annotations
         super()._fetch_all()
-        if "FETCH_UNITS_FOR_PERMISSIONS_FLAG" in self._hints:
-            self._hints.pop("FETCH_UNITS_FOR_PERMISSIONS_FLAG", None)
+        if fetch_permissions:
             self._add_units_for_permissions()
 
     def with_permissions(self) -> Self:
         """Indicates that we need to fetch units for permissions checks when the queryset is evaluated."""
-        self._hints["FETCH_UNITS_FOR_PERMISSIONS_FLAG"] = True
-        return self
+        return self.alias("FETCH_UNITS_FOR_PERMISSIONS_FLAG", models.Value(""))
 
     def _add_units_for_permissions(self) -> None:
         # This works sort of like a 'prefetch_related', since it makes another query

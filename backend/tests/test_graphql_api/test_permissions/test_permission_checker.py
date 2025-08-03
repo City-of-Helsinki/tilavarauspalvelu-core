@@ -3,11 +3,11 @@ from __future__ import annotations
 from functools import partial
 
 import pytest
-from graphene_django_extensions.testing import build_query
 
 from tilavarauspalvelu.enums import UserPermissionChoice, UserRoleChoice
 
 from tests.factories import UnitFactory, UnitGroupFactory, UnitRoleFactory, UserFactory
+from tests.query_builder import build_query
 
 pytestmark = [
     pytest.mark.django_db,

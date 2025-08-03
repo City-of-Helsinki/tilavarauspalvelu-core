@@ -4,9 +4,9 @@ import datetime
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
-from graphene_django_extensions.testing import build_mutation, build_query
-
 from tilavarauspalvelu.enums import Weekday
+
+from tests.query_builder import build_mutation, build_query
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnitOption

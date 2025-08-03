@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import pytest
-from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationUnitTypeFactory
+from tests.query_builder import build_query
 
 # Applied to all tests
 pytestmark = [

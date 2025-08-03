@@ -3,9 +3,9 @@ from __future__ import annotations
 from decimal import Decimal
 
 import pytest
-from graphene_django_extensions.testing import build_query
 
 from tests.factories import TaxPercentageFactory
+from tests.query_builder import build_query
 
 # Applied to all tests
 pytestmark = [

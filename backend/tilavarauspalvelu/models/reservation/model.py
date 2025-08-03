@@ -9,7 +9,6 @@ from django.db import models
 from django.db.models.functions import Concat, Trim
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from helsinki_gdpr.models import SerializableMixin
 from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 from undine.utils.model_fields import TextChoicesField
@@ -22,6 +21,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
     ReserveeType,
 )
+from tilavarauspalvelu.models._base import SerializableModelMixin
 from utils.auditlog_util import AuditLogger
 from utils.date_utils import DEFAULT_TIMEZONE, datetime_range_as_string
 from utils.decimal_utils import round_decimal
@@ -48,7 +48,7 @@ __all__ = [
 ]
 
 
-class Reservation(SerializableMixin, models.Model):
+class Reservation(SerializableModelMixin, models.Model):
     # Basic information
     ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
     name: str = models.CharField(max_length=255, blank=True, default="")
@@ -62,7 +62,7 @@ class Reservation(SerializableMixin, models.Model):
     type: ReservationTypeChoice | None = TextChoicesField(
         choices_enum=ReservationTypeChoice,
         default=ReservationTypeChoice.NORMAL,
-        null=True,
+        null=True,  # TODO: Nullable?
         blank=False,
     )
     municipality: MunicipalityChoice | None = TextChoicesField(
@@ -317,7 +317,7 @@ class Reservation(SerializableMixin, models.Model):
         Whether the reservation's access code _should_ be active or not. This is used by background tasks
         to update access code state in Pindora in case an API call to Pindora fails in the endpoint.
         """
-        case = models.Case(
+        return models.Case(  # type: ignore[return-value]
             models.When(
                 (
                     models.Q(access_type=AccessType.ACCESS_CODE.value)
@@ -329,7 +329,6 @@ class Reservation(SerializableMixin, models.Model):
             default=models.Value(False),  # noqa: FBT003
             output_field=models.BooleanField(),
         )
-        return case  # noqa: RET504 type: ignore[return-value]
 
     @lookup_property
     def is_access_code_is_active_correct() -> bool:
@@ -338,14 +337,14 @@ class Reservation(SerializableMixin, models.Model):
         # 1. Not generated AND active -> Not possible
         # 2. Not generated AND not active -> Reservation doesn't use an access code
         # Otherwise, we should generate the access code if its are somehow missing.
-        case = models.Case(
+        return models.Case(  # type: ignore[return-value]
             models.When(
                 L(access_code_should_be_active=True),
                 then=models.Q(access_code_is_active=True),
             ),
             default=models.Q(access_code_is_active=False),
+            output_field=models.BooleanField(),
         )
-        return case  # noqa: RET504 type: ignore[return-value]
 
     def as_time_span_element(self) -> TimeSpanElement:
         from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement

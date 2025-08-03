@@ -4,12 +4,12 @@ import datetime
 from typing import Any, NamedTuple
 
 import pytest
-from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
 
 from tests.factories import BannerNotificationFactory, UserFactory
+from tests.helpers import parametrize_helper
 
 from .helpers import UPDATE_MUTATION
 

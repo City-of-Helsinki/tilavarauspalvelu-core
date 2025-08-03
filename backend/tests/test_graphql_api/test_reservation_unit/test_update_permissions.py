@@ -4,7 +4,7 @@ import pytest
 
 from tilavarauspalvelu.enums import UserRoleChoice
 
-from tests.factories import ReservationUnitFactory
+from tests.factories import ReservationUnitFactory, UserFactory
 
 from .helpers import UPDATE_MUTATION, get_draft_update_input_data
 
@@ -46,7 +46,9 @@ def test_reservation_unit__update__staff_user(graphql):
     # - The given user is using the system
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     data = get_draft_update_input_data(reservation_unit)
-    graphql.login_user_with_role(role=UserRoleChoice.VIEWER)
+
+    user = UserFactory.create_with_general_role(role=UserRoleChoice.VIEWER)
+    graphql.force_login(user)
 
     # when:
     # - The user tries to update a reservation unit with new timeslots

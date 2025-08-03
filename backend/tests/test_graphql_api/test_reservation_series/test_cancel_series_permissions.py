@@ -87,7 +87,9 @@ def test_reservation_series__cancel_section_series__general_admin(graphql):
         "cancelDetails": "Cancellation details",
     }
 
-    graphql.login_user_with_role(UserRoleChoice.ADMIN)
+    user = UserFactory.create_with_general_role(role=UserRoleChoice.ADMIN)
+    graphql.force_login(user)
+
     response = graphql(CANCEL_SECTION_SERIES_MUTATION, input_data=data)
 
     assert response.error_message() == "No permission to update."

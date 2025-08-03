@@ -4,7 +4,7 @@ import pytest
 
 from tilavarauspalvelu.enums import UserRoleChoice
 
-from tests.factories import ReservationFactory
+from tests.factories import ReservationFactory, UserFactory
 
 from .helpers import UPDATE_STAFF_MUTATION, get_staff_modify_data
 
@@ -15,7 +15,9 @@ pytestmark = [
 
 @pytest.mark.parametrize("role", [UserRoleChoice.HANDLER, UserRoleChoice.ADMIN])
 def test_reservation__staff_modify__allowed(graphql, role):
-    graphql.login_user_with_role(role=role)
+    user = UserFactory.create_with_general_role(role=role)
+    graphql.force_login(user)
+
     reservation = ReservationFactory.create_for_staff_update()
 
     data = get_staff_modify_data(reservation)
@@ -26,7 +28,9 @@ def test_reservation__staff_modify__allowed(graphql, role):
 
 def test_reservation__staff_modify__allowed__own(graphql):
     # Reservers are allowed to modify their own reservations.
-    user = graphql.login_user_with_role(role=UserRoleChoice.RESERVER)
+    user = UserFactory.create_with_general_role(role=UserRoleChoice.RESERVER)
+    graphql.force_login(user)
+
     reservation = ReservationFactory.create_for_staff_update(user=user)
 
     data = get_staff_modify_data(reservation)

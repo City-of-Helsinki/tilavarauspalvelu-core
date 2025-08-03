@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import ReservationKind, ReservationTypeChoice, ReservationUnitPublishingState
 from tilavarauspalvelu.models import Reservation
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_datetime, local_start_of_day
 
 if TYPE_CHECKING:
@@ -123,6 +123,7 @@ class ReservationUnitValidator:
         new_buffer_time_after: datetime.timedelta | None = None,
         ignore_ids: Collection[int] = (),
     ) -> None:
+        # TODO: Using this might fail unrelated mutations if there is an overlapping reservation in one mutation.
         if self.reservation_unit.actions.has_overlapping_reservations(
             start_datetime=begins_at,
             end_datetime=ends_at,

@@ -15,6 +15,7 @@ from lookup_property import L, lookup_property
 from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import (
+    AccessType,
     AuthenticationType,
     ReservationFormType,
     ReservationKind,
@@ -28,7 +29,6 @@ from utils.db import NowTT
 if TYPE_CHECKING:
     from decimal import Decimal
 
-    from tilavarauspalvelu.enums import AccessType
     from tilavarauspalvelu.models import (
         OriginHaukiResource,
         PaymentAccounting,
@@ -384,7 +384,7 @@ class ReservationUnit(models.Model):
             ),
             # Otherwise, Reservation Unit is published.
             default=models.Value(ReservationUnitPublishingState.PUBLISHED.value),
-            output_field=models.CharField(),
+            output_field=TextChoicesField(choices_enum=ReservationUnitPublishingState),
         )
         return case  # type: ignore[return-value]  # noqa: RET504
 
@@ -478,7 +478,7 @@ class ReservationUnit(models.Model):
             ),
             # Otherwise, Reservation Unit is reservable
             default=models.Value(ReservationUnitReservationState.RESERVABLE.value),
-            output_field=models.CharField(),
+            output_field=TextChoicesField(choices_enum=ReservationUnitReservationState),
         )
 
         return case  # type: ignore[return-value]  # noqa: RET504
@@ -494,7 +494,7 @@ class ReservationUnit(models.Model):
                 .active()
                 .values("access_type")[:1]
             ),
-            output_field=models.CharField(null=True),
+            output_field=TextChoicesField(choices_enum=AccessType, null=True),
         )
         return sq  # type: ignore[return-value]  # noqa: RET504
 
@@ -502,14 +502,26 @@ class ReservationUnit(models.Model):
     def _(self) -> AccessType | None:
         return self.access_types.active().values_list("access_type", flat=True).first()
 
+    @lookup_property
+    def is_visible() -> bool:
+        return (  # type: ignore[return-value]
+            models.Q(publish_begins_at__isnull=True)  #
+            | models.Q(publish_begins_at__lte=NowTT())
+        ) & (
+            models.Q(publish_ends_at__isnull=True)  #
+            | models.Q(publish_ends_at__gt=NowTT())
+            | models.Q(publish_ends_at__lt=models.F("publish_begins_at"))
+        )
+
 
 AuditLogger.register(
     ReservationUnit,
     # Exclude lookup properties, since they are calculated values.
     exclude_fields=[
+        "_active_pricing_price",
         "_publishing_state",
         "_reservation_state",
-        "_active_pricing_price",
         "_current_access_type",
+        "_is_visible",
     ],
 )

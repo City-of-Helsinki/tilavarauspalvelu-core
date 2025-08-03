@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import pytest
-from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationPurposeFactory
+from tests.query_builder import build_query
 
 # Applied to all tests
 pytestmark = [
@@ -29,7 +29,7 @@ def test_reservation_purpose__query(graphql):
     assert response.has_errors is False
 
     assert len(response.edges) == 1
-    assert response.node() == {
+    assert response.node(0) == {
         "pk": res_purpose.pk,
         "nameFi": res_purpose.name_fi,
         "nameSv": res_purpose.name_sv,

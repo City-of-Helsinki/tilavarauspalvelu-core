@@ -3,9 +3,9 @@ from __future__ import annotations
 from functools import partial
 
 import pytest
-from graphene_django_extensions.testing import build_query
 
 from tests.factories import AgeGroupFactory
+from tests.query_builder import build_query
 
 # Applied to all tests
 pytestmark = [

@@ -3,12 +3,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
-from graphene_django_extensions.testing import parametrize_helper
 
 from tilavarauspalvelu.enums import BannerNotificationTarget, UserRoleChoice
 
-from tests.factories import BannerNotificationFactory
+from tests.factories import BannerNotificationFactory, UserFactory
 from tests.factories.banner_notification import BannerNotificationBuilder
+from tests.helpers import parametrize_helper
 
 from .helpers import FieldParams, TargetParams, UserType, UserTypeParams
 
@@ -33,9 +33,11 @@ def login_based_on_type(graphql, user_type: UserType) -> User | None:
         case UserType.SUPERUSER:
             return graphql.login_with_superuser()
         case UserType.STAFF:
-            return graphql.login_user_with_role(role=UserRoleChoice.RESERVER)
+            user = UserFactory.create_with_general_role(role=UserRoleChoice.RESERVER)
+            return graphql.force_login(user)
         case UserType.NOTIFICATION_MANAGER:
-            return graphql.login_user_with_role(role=UserRoleChoice.NOTIFICATION_MANAGER)
+            user = UserFactory.create_with_general_role(role=UserRoleChoice.NOTIFICATION_MANAGER)
+            return graphql.force_login(user)
 
 
 @pytest.mark.parametrize(

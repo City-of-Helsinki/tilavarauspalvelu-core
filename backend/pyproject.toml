@@ -38,7 +38,7 @@ redis = { version = "5.3.0", extras = ["hiredis"] }
 sentry-sdk = "2.32.0"
 social-auth-app-django = "5.5.1"
 stamina = "25.1.0"
-undine = "0.0.6"
+undine = "0.0.15"
 # Skip installation on Windows as uWSGI does not support it without Cygwin.
 uWSGI = { version = "2.0.30", markers = "sys_platform != 'win32'" }
 whitenoise = "6.9.0"
@@ -236,6 +236,11 @@ ignore = [
 
     # To be enabled in the future
     "PLW2901",  # redefined-loop-name
+
+    # No type-checking blocks
+    "TC001",
+    "TC002",
+    "TC003",
 ]
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^options$|^info$|^name$|^obj$|^request$|^user|^view$|^input_data$|^filters$"
 task-tags = ["TODO", "FIXME", "XXX", "type"]
@@ -277,10 +282,6 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
     "N815",     # Allow mixedCase variables for webhook serializers.
 ]
 "tilavarauspalvelu/api/graphql/*.py" = [
-    # No type-checking blocks in the GraphQL schema
-    "TC001",
-    "TC002",
-    "TC003",
     # Undine uses some special dunder methods
     "PLW3201",
 ]
@@ -318,9 +319,6 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
 [tool.ruff.lint.isort]
 combine-as-imports = false
 split-on-trailing-comma = false
-required-imports = [
-    "from __future__ import annotations",
-]
 known-third-party = [
     "django",
 ]
@@ -373,8 +371,7 @@ builtins-allowed-modules = [
 "django.utils.timezone.now".msg = "Use `utils.date_utils.local_datetime` instead."
 "django.utils.timezone.get_default_timezone".msg = "Use `utils.date_utils.DEFAULT_TIMEZONE` instead."
 
-"graphene_django_extensions.typing.GQLInfo".msg = "Use `tilavarauspalvelu.typing.GQLInfo` instead."
-"undine.typing.GQLInfo".msg = "Use `tilavarauspalvelu.typing.GQLInfo` instead."
+"tilavarauspalvelu.typing.GQLInfo".msg = "Use `undine.typing.GQLInfo` instead."
 
 "django.contrib.auth.get_user_model".msg = "Use `tilavarauspalvelu.models.User` instead."
 
@@ -403,8 +400,6 @@ banned-from = [
     "uuid",
     "xml",
     "yaml",
-    # Project-specific
-    "error_codes",
 ]
 
 [tool.ruff.lint.flake8-self]

@@ -35,7 +35,7 @@ def test_resources__filter__only_with_permissions__general_admin__can_manage_res
 
     assert response.has_errors is False
     assert len(response.edges) == 1
-    assert response.node() == {"pk": resource.pk}
+    assert response.node(0) == {"pk": resource.pk}
 
 
 def test_resources__filter__only_with_permissions__unit_admin__can_manage_resources(graphql):
@@ -50,7 +50,7 @@ def test_resources__filter__only_with_permissions__unit_admin__can_manage_resour
 
     assert response.has_errors is False
     assert len(response.edges) == 1
-    assert response.node() == {"pk": resource_1.pk}
+    assert response.node(0) == {"pk": resource_1.pk}
 
 
 def test_resources__filter__only_with_permissions__unit_group_admin__can_manage_resources(graphql):
@@ -67,4 +67,4 @@ def test_resources__filter__only_with_permissions__unit_group_admin__can_manage_
 
     assert response.has_errors is False
     assert len(response.edges) == 1
-    assert response.node() == {"pk": resource_1.pk}
+    assert response.node(0) == {"pk": resource_1.pk}

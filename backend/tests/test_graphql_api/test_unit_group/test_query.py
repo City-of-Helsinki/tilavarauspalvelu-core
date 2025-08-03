@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import pytest
-from graphene_django_extensions.testing import build_query
 
 from tilavarauspalvelu.enums import UserRoleChoice
 
-from tests.factories import UnitFactory, UnitGroupFactory
+from tests.factories import UnitFactory, UnitGroupFactory, UserFactory
+from tests.query_builder import build_query
 
 # Applied to all tests
 pytestmark = [
@@ -18,7 +18,8 @@ def test_unit_groups__query(graphql):
     unit_2 = UnitFactory.create(rank=2)
     unit_group = UnitGroupFactory.create(units=[unit_1, unit_2])
 
-    graphql.login_user_with_role(role=UserRoleChoice.ADMIN)
+    user = UserFactory.create_with_general_role(role=UserRoleChoice.ADMIN)
+    graphql.force_login(user)
 
     fields = """
         pk
@@ -58,7 +59,8 @@ def test_unit_groups__query__only_with_permission(graphql):
 def test_unit_groups__query__unit_groups_with_no_units_are_excluded(graphql):
     UnitGroupFactory.create()
 
-    graphql.login_user_with_role(role=UserRoleChoice.ADMIN)
+    user = UserFactory.create_with_general_role(role=UserRoleChoice.ADMIN)
+    graphql.force_login(user)
 
     query = build_query("unitGroups", connection=True)
     response = graphql(query)

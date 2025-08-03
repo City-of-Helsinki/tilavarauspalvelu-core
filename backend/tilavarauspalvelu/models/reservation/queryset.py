@@ -36,6 +36,47 @@ __all__ = [
 
 
 class ReservationQuerySet(ModelQuerySet[Reservation]):
+    def _fetch_all(self) -> None:
+        fetch_permissions = "FETCH_UNITS_FOR_PERMISSIONS_FLAG" in self.query.annotations
+        super()._fetch_all()
+        if fetch_permissions:
+            self._add_units_for_permissions()
+
+    def with_permissions(self) -> Self:
+        """Indicates that we need to fetch units for permissions checks when the queryset is evaluated."""
+        return self.alias("FETCH_UNITS_FOR_PERMISSIONS_FLAG", models.Value(""))
+
+    def _add_units_for_permissions(self) -> None:
+        # This works sort of like a 'prefetch_related', since it makes another query
+        # to fetch units and unit groups for the permission checks when the queryset is evaluated,
+        # and 'joins' them to the correct model instances in python.
+
+        items: list[Reservation] = list(self)
+        if not items:
+            return
+
+        units = (
+            Unit.objects.prefetch_related("unit_groups")
+            .filter(reservation_units__reservations__in=items)
+            .annotate(
+                reservation_ids=Coalesce(
+                    ArrayAgg(
+                        "reservation_units__reservations",
+                        distinct=True,
+                        filter=(
+                            models.Q(reservation_units__isnull=False)
+                            & models.Q(reservation_units__reservations__isnull=False)
+                        ),
+                    ),
+                    models.Value([]),
+                )
+            )
+            .distinct()
+        )
+
+        for item in items:
+            item.units_for_permissions = [unit for unit in units if item.pk in unit.reservation_ids]
+
     def with_buffered_begin_and_end(self) -> Self:
         """Annotate the queryset with buffered begin and end times."""
         return self.annotate(
@@ -173,48 +214,6 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
                 ReservationStateChoice.DENIED,
             ]
         )
-
-    def _fetch_all(self) -> None:
-        super()._fetch_all()
-        if "FETCH_UNITS_FOR_PERMISSIONS_FLAG" in self._hints:
-            self._hints.pop("FETCH_UNITS_FOR_PERMISSIONS_FLAG", None)
-            self._add_units_for_permissions()
-
-    def with_permissions(self) -> Self:
-        """Indicates that we need to fetch units for permissions checks when the queryset is evaluated."""
-        self._hints["FETCH_UNITS_FOR_PERMISSIONS_FLAG"] = True
-        return self
-
-    def _add_units_for_permissions(self) -> None:
-        # This works sort of like a 'prefetch_related', since it makes another query
-        # to fetch units and unit groups for the permission checks when the queryset is evaluated,
-        # and 'joins' them to the correct model instances in python.
-
-        items: list[Reservation] = list(self)
-        if not items:
-            return
-
-        units = (
-            Unit.objects.prefetch_related("unit_groups")
-            .filter(reservation_units__reservations__in=items)
-            .annotate(
-                reservation_ids=Coalesce(
-                    ArrayAgg(
-                        "reservation_units__reservations",
-                        distinct=True,
-                        filter=(
-                            models.Q(reservation_units__isnull=False)
-                            & models.Q(reservation_units__reservations__isnull=False)
-                        ),
-                    ),
-                    models.Value([]),
-                )
-            )
-            .distinct()
-        )
-
-        for item in items:
-            item.units_for_permissions = [unit for unit in units if item.pk in unit.reservation_ids]
 
     def filter_for_user_num_active_reservations(
         self,

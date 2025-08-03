@@ -4,7 +4,7 @@ import contextlib
 from functools import partial
 from unittest.mock import patch
 
-from graphene_django_extensions.testing import build_mutation, build_query
+from tests.query_builder import build_mutation, build_query
 
 rounds_query = partial(build_query, "applicationRounds", connection=True, order_by="pkAsc")
 

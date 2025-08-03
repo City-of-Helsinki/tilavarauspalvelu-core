@@ -4,7 +4,6 @@ import datetime
 
 import freezegun
 import pytest
-from graphene_django.settings import graphene_settings
 
 from tilavarauspalvelu.enums import ReservationKind
 from utils.date_utils import DEFAULT_TIMEZONE

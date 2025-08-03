@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import pytest
-from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationUnitCancellationRuleFactory
+from tests.query_builder import build_query
 
 # Applied to all tests
 pytestmark = [
@@ -28,7 +28,7 @@ def test_reservation_unit_cancellation_rules__query(graphql):
     assert response.has_errors is False
 
     assert len(response.edges) == 1
-    assert response.node() == {
+    assert response.node(0) == {
         "pk": rules.pk,
         "nameFi": rules.name_fi,
         "nameSv": rules.name_sv,

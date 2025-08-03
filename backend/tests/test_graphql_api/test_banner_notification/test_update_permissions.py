@@ -4,7 +4,7 @@ import pytest
 
 from tilavarauspalvelu.enums import UserRoleChoice
 
-from tests.factories import BannerNotificationFactory
+from tests.factories import BannerNotificationFactory, UserFactory
 
 from .helpers import UPDATE_MUTATION
 
@@ -47,7 +47,8 @@ def test_banner_notification__update__regular_user(graphql):
 
 def test_banner_notification__update__no_perms(graphql):
     notification = BannerNotificationFactory.create(draft=True, name="foo", message="bar")
-    graphql.login_user_with_role(role=UserRoleChoice.VIEWER)
+    user = UserFactory.create_with_general_role(role=UserRoleChoice.VIEWER)
+    graphql.force_login(user)
 
     response = graphql(
         UPDATE_MUTATION,
@@ -63,7 +64,8 @@ def test_banner_notification__update__no_perms(graphql):
 
 def test_banner_notification__update__notification_manager(graphql):
     notification = BannerNotificationFactory.create(draft=True, name="foo", message="bar")
-    graphql.login_user_with_role(role=UserRoleChoice.NOTIFICATION_MANAGER)
+    user = UserFactory.create_with_general_role(role=UserRoleChoice.NOTIFICATION_MANAGER)
+    graphql.force_login(user)
 
     response = graphql(
         UPDATE_MUTATION,

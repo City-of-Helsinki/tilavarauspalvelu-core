@@ -5,8 +5,6 @@ import uuid
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
-from graphene_django_extensions.testing import build_mutation, build_query
-
 from tilavarauspalvelu.enums import ReservationTypeChoice, Weekday
 from tilavarauspalvelu.integrations.keyless_entry.typing import (
     PindoraReservationSeriesAccessCodeValidity,
@@ -16,6 +14,7 @@ from tilavarauspalvelu.models import ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, local_time
 
 from tests.factories import ReservationSeriesFactory
+from tests.query_builder import build_mutation, build_query
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationSeries, ReservationUnit, User

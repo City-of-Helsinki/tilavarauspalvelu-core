@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
+from tilavarauspalvelu.typing import error_codes
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnitPricing

@@ -4,7 +4,7 @@ import pytest
 
 from tilavarauspalvelu.enums import UserRoleChoice
 
-from tests.factories import ReservationFactory
+from tests.factories import ReservationFactory, UserFactory
 
 from .helpers import REQUIRE_HANDLING_MUTATION, get_require_handling_data
 
@@ -15,7 +15,9 @@ pytestmark = [
 
 @pytest.mark.parametrize("role", [UserRoleChoice.HANDLER, UserRoleChoice.ADMIN])
 def test_reservation__requires_handling__allowed(graphql, role):
-    graphql.login_user_with_role(role=role)
+    user = UserFactory.create_with_general_role(role=role)
+    graphql.force_login(user)
+
     reservation = ReservationFactory.create_for_requires_handling()
 
     data = get_require_handling_data(reservation)
@@ -26,7 +28,9 @@ def test_reservation__requires_handling__allowed(graphql, role):
 
 def test_reservation__requires_handling__allowed__own(graphql):
     # Reservers are allowed to set handling required for their own reservations.
-    user = graphql.login_user_with_role(role=UserRoleChoice.RESERVER)
+    user = UserFactory.create_with_general_role(role=UserRoleChoice.RESERVER)
+    graphql.force_login(user)
+
     reservation = ReservationFactory.create_for_requires_handling(user=user)
 
     data = get_require_handling_data(reservation)

@@ -8,13 +8,13 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from helsinki_gdpr.models import SerializableMixin
 from helusers.models import AbstractUser
 from lazy_managers import LazyModelAttribute, LazyModelManager
 from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.dataclasses import IDToken
 from tilavarauspalvelu.enums import Language, ReservationNotification, UserRoleChoice
+from tilavarauspalvelu.models._base import SerializableModelMixin
 from tilavarauspalvelu.services.permission_resolver import PermissionResolver
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.utils import get_jwt_payload
@@ -217,7 +217,7 @@ class User(AbstractUser):
 AnonymousUser.permissions = PermissionResolver()
 
 
-class ProfileUser(SerializableMixin, User):
+class ProfileUser(SerializableModelMixin, User):
     """User model for the GDPR API"""
 
     objects: ClassVar[ProfileUserManager] = LazyModelManager.new()

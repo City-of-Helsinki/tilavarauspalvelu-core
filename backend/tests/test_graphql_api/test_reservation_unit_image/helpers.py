@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from graphene_django_extensions.testing import build_mutation
+from tests.query_builder import build_mutation
 
 CREATE_MUTATION = build_mutation(
     "createReservationUnitImage",

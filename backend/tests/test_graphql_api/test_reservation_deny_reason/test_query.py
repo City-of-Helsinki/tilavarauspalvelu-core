@@ -3,9 +3,9 @@ from __future__ import annotations
 from functools import partial
 
 import pytest
-from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationDenyReasonFactory
+from tests.query_builder import build_query
 
 # Applied to all tests
 pytestmark = [
@@ -27,7 +27,7 @@ def test_reservation_deny_reasons__query(graphql):
     assert response.has_errors is False
 
     assert len(response.edges) == 1
-    assert response.node() == {
+    assert response.node(0) == {
         "pk": deny_reason.pk,
         "reasonFi": deny_reason.reason_fi,
         "reasonEn": deny_reason.reason_en,

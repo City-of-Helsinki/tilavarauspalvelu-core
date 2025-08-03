@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
-from graphene_django_extensions.testing import build_mutation
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -30,6 +29,7 @@ from tests.factories import (
     UserFactory,
 )
 from tests.helpers import patch_method
+from tests.query_builder import build_mutation
 
 from .helpers import CONFIRM_MUTATION, get_confirm_data
 

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import pytest
-from graphene_django_extensions.testing import build_query
 
 from tilavarauspalvelu.models import ReservationUnitHierarchy
 
 from tests.factories import AllocatedTimeSlotFactory, ReservationSeriesFactory, ReservationUnitFactory, SpaceFactory
+from tests.query_builder import build_query
 
 from .helpers import allocations_query
 

@@ -32,7 +32,7 @@ def test_purpose__query(graphql):
     assert response.has_errors is False
 
     assert len(response.edges) == 1
-    assert response.node() == {
+    assert response.node(0) == {
         "pk": purpose.pk,
         "nameFi": purpose.name_fi,
         "nameEn": purpose.name_en,

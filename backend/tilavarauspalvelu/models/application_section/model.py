@@ -8,11 +8,12 @@ from django.db import models
 from django.db.models import Exists, OrderBy
 from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
-from helsinki_gdpr.models import SerializableMixin
 from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
+from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
+from tilavarauspalvelu.models._base import SerializableModelMixin
 from utils.date_utils import local_datetime
 from utils.db import NowTT, SubqueryCount
 
@@ -29,7 +30,7 @@ __all__ = [
 ]
 
 
-class ApplicationSection(SerializableMixin, models.Model):
+class ApplicationSection(SerializableModelMixin, models.Model):
     """
     Represents a section of an application, which contains the reservation unit options
     and suitable time ranges that can be used fulfill the slot request included in it.
@@ -165,7 +166,7 @@ class ApplicationSection(SerializableMixin, models.Model):
             ),
             # Otherwise, the section is still in allocation
             default=models.Value(ApplicationSectionStatusChoice.IN_ALLOCATION.value),
-            output_field=models.CharField(),
+            output_field=TextChoicesField(choices_enum=ApplicationSectionStatusChoice),
         )
 
     @status.override
