@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { Button, ButtonSize, ButtonVariant, FileInput } from "hds-react";
+import { FileInput } from "hds-react";
 import { ImageType } from "@gql/gql-types";
 import { type ImageFormType } from "./form";
-import { AutoGrid, Flex, fontRegular } from "common/styled";
+import { AutoGrid, Flex, focusStyles, removeButtonStyles } from "common/styled";
 
 const StyledImage = styled.img`
   max-height: 12.5em;
@@ -64,23 +64,14 @@ const FileInputContainer = styled.div`
   }
 `;
 
-const SmallButton = styled(Button).attrs({
-  variant: ButtonVariant.Secondary,
-  size: ButtonSize.Small,
-})`
-  ${fontRegular};
-  border: 0;
-  padding: 0;
-  min-height: 0;
+const SmallButton = styled.button`
+  ${removeButtonStyles}
 
-  span {
-    padding: 0;
-    margin: 0 !important;
-    text-decoration: underline;
-  }
-
-  :hover {
-    background-color: transparent;
+  text-decoration: underline;
+  ${focusStyles}
+  &:hover {
+    background-color: var(--color-black-10);
+    cursor: pointer;
   }
 `;
 
@@ -137,6 +128,7 @@ export function ImageEditor({ images, setImages, style, className }: Props): JSX
   };
 
   const deleteImage = (pk: number) => {
+    // NOTE this doesn't swap the main image, but customer UI defaults to the first other image if there is no main image
     if (pk > 0) {
       setImages(
         images.map((image) => ({
