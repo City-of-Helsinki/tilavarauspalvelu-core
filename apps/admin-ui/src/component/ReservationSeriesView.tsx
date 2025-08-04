@@ -99,7 +99,7 @@ export function ReservationSeriesView({
   const forDisplay: NewReservationListItem[] = reservations.map((x) => {
     const buttons = [];
     const startDate = new Date(x.beginsAt);
-    const endDate = new Date(x.beginsAt);
+    const endDate = new Date(x.endsAt);
 
     if (hasPermission && onChange && isPossibleToEdit(x.state, endDate)) {
       buttons.push(<ReservationListButton key="change" callback={() => handleChange(x)} type="change" t={t} />);
