@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { gql } from "@apollo/client";
 import { ReservationUnitOrderingChoices, useSearchReservationUnitsQuery } from "@gql/gql-types";
-import { filterNonNullable, mapParamToInterger, toInteger } from "common/src/helpers";
+import { filterEmptyArray, filterNonNullable, mapParamToInterger, toInteger } from "common/src/helpers";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { More } from "@/component/More";
 import { ReservationUnitsTable } from "./ReservationUnitsTable";
@@ -53,21 +53,23 @@ export function ReservationUnitsDataReader(): JSX.Element {
     }
   };
 
-  const orderBy = transformSortString(sort);
+  const orderBy = filterEmptyArray(transformSortString(sort));
 
   const searchParams = useSearchParams();
 
-  const reservationUnitTypes = mapParamToInterger(searchParams.getAll("reservationUnitType"), 1);
-  const reservationUnitStates = searchParams.getAll("reservationUnitState");
-  const unit = mapParamToInterger(searchParams.getAll("unit"), 1);
-  const unitGroupFilter = mapParamToInterger(searchParams.getAll("unitGroup"), 1);
-  const searchFilter = searchParams.get("search");
+  const reservationUnitType = filterEmptyArray(mapParamToInterger(searchParams.getAll("reservationUnitType"), 1));
+  const reservationUnitStates = filterEmptyArray(
+    filterNonNullable(searchParams.getAll("reservationUnitState").map((state) => transformReservationUnitState(state)))
+  );
+  const unit = filterEmptyArray(mapParamToInterger(searchParams.getAll("unit"), 1));
+  const unitGroupFilter = filterEmptyArray(mapParamToInterger(searchParams.getAll("unitGroup"), 1));
+  const searchFilter = searchParams.get("search") ?? undefined;
   // backend error if these are floats
   // could show validation errors for these but since it's not that important just clip the values to integers
-  const maxPersonsLte = toInteger(searchParams.get("maxPersonsLte"));
-  const maxPersonsGte = toInteger(searchParams.get("maxPersonsGte"));
-  const surfaceAreaLte = toInteger(searchParams.get("surfaceAreaLte"));
-  const surfaceAreaGte = toInteger(searchParams.get("surfaceAreaGte"));
+  const maxPersonsLte = toInteger(searchParams.get("maxPersonsLte")) ?? undefined;
+  const maxPersonsGte = toInteger(searchParams.get("maxPersonsGte")) ?? undefined;
+  const surfaceAreaLte = toInteger(searchParams.get("surfaceAreaLte")) ?? undefined;
+  const surfaceAreaGte = toInteger(searchParams.get("surfaceAreaGte")) ?? undefined;
 
   const { t } = useTranslation();
 
@@ -82,8 +84,8 @@ export function ReservationUnitsDataReader(): JSX.Element {
       textSearch: searchFilter,
       unit,
       unitGroup: unitGroupFilter,
-      publishingState: reservationUnitStates.map((state) => transformReservationUnitState(state)),
-      reservationUnitType: reservationUnitTypes,
+      publishingState: reservationUnitStates,
+      reservationUnitType,
     },
     onError: () => {
       errorToast({ text: t("errors:errorFetchingData") });
