@@ -45,13 +45,15 @@ export function getApplicationUrl(pk: Maybe<number> | undefined, sectionPk?: May
 }
 
 export function getReservationUnitUrl(
-  reservationUnitPk: Maybe<number> | undefined,
-  unitPk: Maybe<number> | undefined
+  unitPk: Maybe<number> | undefined,
+  reservationUnitPk: Maybe<number> | "new" | undefined = "new"
 ): string {
-  if (unitPk == null) {
+  if (unitPk == null && (reservationUnitPk == null || reservationUnitPk === "new")) {
     return "";
+  } else if (unitPk == null || unitPk <= 0) {
+    return `${RESERVATION_UNIT_URL_PREFIX}/${reservationUnitPk}`;
   }
-  return `${UNITS_URL_PREFIX}/${unitPk}/reservation-unit/${reservationUnitPk ?? ""}`;
+  return `${UNITS_URL_PREFIX}/${unitPk}/reservation-units/${reservationUnitPk}`;
 }
 
 export function getSpacesResourcesUrl(unitPk: Maybe<number> | undefined): string {

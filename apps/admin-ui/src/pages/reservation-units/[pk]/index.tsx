@@ -54,6 +54,7 @@ import {
   PricingSection,
   ErrorInfo,
 } from "@lib/reservation-units/[pk]/";
+import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
@@ -152,11 +153,13 @@ function ReservationUnitEditor({
   form,
   refetch,
   previewUrlPrefix,
+  unitPk,
 }: {
   reservationUnit?: Node;
   form: UseFormReturn<ReservationUnitEditFormValues>;
   refetch: () => void;
   previewUrlPrefix: string;
+  unitPk: number;
 }): JSX.Element | null {
   // ----------------------------- State and Hooks ----------------------------
   const { t } = useTranslation();
@@ -175,8 +178,6 @@ function ReservationUnitEditor({
       equipmentsOrderBy: EquipmentOrderingChoices.CategoryRankAsc,
     },
   });
-
-  const unitPk = reservationUnit?.unit?.pk ?? 0;
 
   // Fetch unit data only when creating a new reservation unit
   const { data: unitData } = useReservationUnitCreateUnitQuery({
@@ -258,7 +259,7 @@ function ReservationUnitEditor({
       if (success) {
         // redirect if new one was created
         if (formValues.pk === 0 && upPk > 0) {
-          router.push(getReservationUnitUrl(upPk, unitPk));
+          router.push(getReservationUnitUrl(unitPk, upPk));
         }
         const tkey =
           formValues.pk === 0
@@ -333,12 +334,11 @@ function ReservationUnitEditor({
 }
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
 
 /// Wrap the editor so we never reset the form after async loading (because of HDS TimeInput bug)
-export default function EditorPage(props: PageProps): JSX.Element {
-  const router = useRouter();
-  const reservationUnitPk = toNumber(ignoreMaybeArray(router.query.pk)) ?? 0;
-
+export default function EditorPage(props: PropsNarrowed): JSX.Element {
+  const { reservationUnitPk, unitPk } = props;
   const typename = "ReservationUnitNode";
   const id = base64encode(`${typename}:${reservationUnitPk}`);
   const {
@@ -372,8 +372,7 @@ export default function EditorPage(props: PageProps): JSX.Element {
     }
   }, [data, reset]);
 
-  // we use null for "new" units (could also be "new" slug)
-  const isNew = ignoreMaybeArray(router.query.pk) == null;
+  const isNew = unitPk !== 0 && reservationUnitPk === 0;
   if (!isNew && reservationUnitPk === 0) {
     return <Error404 />;
   }
@@ -391,14 +390,24 @@ export default function EditorPage(props: PageProps): JSX.Element {
         form={form}
         refetch={refetch}
         previewUrlPrefix={cleanPreviewUrlPrefix}
+        unitPk={unitPk}
       />
     </AuthorizationChecker>
   );
 }
 
-export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
+export async function getServerSideProps({ query, locale }: GetServerSidePropsContext) {
+  const reservationUnitPk = toNumber(ignoreMaybeArray(query.pk)) ?? 0;
+  const unitPk = toNumber(ignoreMaybeArray(query.id)) ?? 0;
+
+  if (reservationUnitPk <= 0 && unitPk <= 0) {
+    return NOT_FOUND_SSR_VALUE;
+  }
+
   return {
     props: {
+      unitPk,
+      reservationUnitPk,
       ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },

@@ -11,15 +11,15 @@ import { gql } from "@apollo/client";
 
 interface IProps {
   reservationUnit: ReservationUnitCardFragment;
-  unitId: number;
+  unitPk: number;
 }
 
-export function ReservationUnitCard({ reservationUnit, unitId }: Readonly<IProps>): JSX.Element {
+export function ReservationUnitCard({ reservationUnit, unitPk }: Readonly<IProps>): JSX.Element {
   const { t } = useTranslation();
 
   const image = getMainImage(reservationUnit);
   const hasPurposes = (reservationUnit.purposes.length ?? 0) > 0;
-  const link = getReservationUnitUrl(reservationUnit.pk, unitId);
+  const link = getReservationUnitUrl(unitPk, reservationUnit.pk);
   const imgSrc = getImageSource(image, "medium");
 
   const infos = [];
