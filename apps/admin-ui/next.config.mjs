@@ -37,13 +37,20 @@ const config = {
   // eslint-disable-next-line require-await
   async rewrites() {
     return [
+      // secondary route when accessed through unit pages
       {
         source: "/units/:id/reservation-unit/:any*",
         destination: "/reservation-units/:any*",
       },
+      // old notifications route
       {
         source: "/messaging/notifications/:any*",
         destination: "/notifications/:any*",
+      },
+      // old all reservations route
+      {
+        source: "/reservations/all",
+        destination: "/reservations",
       },
       // Fix missing 's' in resources and spaces
       {
