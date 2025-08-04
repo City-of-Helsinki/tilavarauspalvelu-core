@@ -3,6 +3,7 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ErrorContainer } from "common/src/components";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { PUBLIC_URL } from "@/common/const";
 
 // TODO this is a copy of 404.tsx, but with 500 instead of 404
 
@@ -23,7 +24,15 @@ type Props = {
 };
 
 function Page500({ title, body, feedbackUrl }: Readonly<Props>): JSX.Element {
-  return <ErrorContainer statusCode={500} title={title} body={body} feedbackUrl={feedbackUrl} />;
+  return (
+    <ErrorContainer
+      statusCode={500}
+      title={title}
+      body={body}
+      feedbackUrl={feedbackUrl}
+      imgSrc={`${PUBLIC_URL}/images/500-error.png`}
+    />
+  );
 }
 
 export default Page500;
