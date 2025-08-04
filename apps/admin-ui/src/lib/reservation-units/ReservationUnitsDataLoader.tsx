@@ -56,13 +56,11 @@ export function ReservationUnitsDataReader(): JSX.Element {
   const orderBy = transformSortString(sort);
 
   const searchParams = useSearchParams();
-  const reservationUnitTypes = searchParams.getAll("reservationUnitType").map(Number).filter(Number.isInteger);
 
+  const reservationUnitTypes = mapParamToInterger(searchParams.getAll("reservationUnitType"), 1);
   const reservationUnitStates = searchParams.getAll("reservationUnitState");
-
   const unit = mapParamToInterger(searchParams.getAll("unit"), 1);
   const unitGroupFilter = mapParamToInterger(searchParams.getAll("unitGroup"), 1);
-
   const searchFilter = searchParams.get("search");
   // backend error if these are floats
   // could show validation errors for these but since it's not that important just clip the values to integers

@@ -66,8 +66,8 @@ const getColConfig = (t: TFunction) => [
   {
     headerName: t("reservationUnit:headings.name"),
     key: "nameFi",
-    transform: ({ nameFi, pk, unit }: ReservationUnitTableElementFragment) => (
-      <TableLink href={getReservationUnitUrl(pk, unit?.pk)}>{truncate(nameFi ?? "-", MAX_NAME_LENGTH)}</TableLink>
+    transform: ({ nameFi, pk }: ReservationUnitTableElementFragment) => (
+      <TableLink href={getReservationUnitUrl(null, pk)}>{truncate(nameFi ?? "-", MAX_NAME_LENGTH)}</TableLink>
     ),
     isSortable: true,
   },
@@ -166,7 +166,6 @@ export const RESERVATION_UNIT_TABLE_ELEMENT_FRAGMENT = gql`
     unit {
       id
       nameFi
-      pk
     }
     reservationUnitType {
       id
