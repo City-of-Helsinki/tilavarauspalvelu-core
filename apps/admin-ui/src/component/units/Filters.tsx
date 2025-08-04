@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { AutoGrid } from "common/styled";
 import { ControlledMultiSelectFilter, ControlledSearchFilter } from "@/component/QueryParamFilters";
 import { SearchTags } from "@/component/SearchTags";
@@ -9,29 +9,41 @@ import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { mapFormToSearchParams } from "common/src/modules/search";
+import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
+import { mapParamToInterger } from "common/src/helpers";
 
 type SearchFormValues = {
   search: string;
   unitGroup: number[];
 };
 
+function mapSearchParamsToForm(searchParams: ReadonlyURLSearchParams): SearchFormValues {
+  return {
+    search: searchParams.get("search") ?? "",
+    unitGroup: mapParamToInterger(searchParams.getAll("unitGroup"), 1),
+  };
+}
+
 export function Filters(): JSX.Element {
   const { t } = useTranslation();
   const setSearchParams = useSetSearchParams();
+  const searchParams = useSearchParams();
 
   const options = useFilterOptions();
 
+  const defaultValues = mapSearchParamsToForm(searchParams);
   const form = useForm<SearchFormValues>({
-    defaultValues: {
-      search: "",
-      unitGroup: [],
-    },
+    defaultValues,
   });
+  const { handleSubmit, control, reset } = form;
+
+  useEffect(() => {
+    reset(mapSearchParamsToForm(searchParams));
+  }, [reset, searchParams]);
 
   const onSubmit = (data: SearchFormValues) => {
     setSearchParams(mapFormToSearchParams(data));
   };
-  const { handleSubmit, control } = form;
 
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
