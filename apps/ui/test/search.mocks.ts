@@ -81,7 +81,7 @@ export function createSearchQueryMocks({ isSearchError }: SearchQueryProps): Cre
 }
 
 function createSearchVariablesMock({
-  textSearch = null,
+  textSearch = undefined,
   date = new Date(2024, 1, 1),
 }: {
   textSearch?: string | null;
@@ -94,20 +94,10 @@ function createSearchVariablesMock({
 } = {}): Readonly<SearchReservationUnitsQueryVariables> {
   return {
     textSearch,
-    purposes: [],
-    unit: [],
-    reservationUnitType: [],
-    equipments: [],
-    accessType: [],
-    accessTypeBeginDate: date ? date.toISOString() : null,
-    accessTypeEndDate: date ? addYears(date, 1).toISOString() : null,
-    reservableDateStart: date ? date.toISOString() : null,
-    reservableDateEnd: null,
-    reservableTimeStart: null,
-    reservableTimeEnd: null,
-    reservableMinimumDurationMinutes: null,
+    accessTypeBeginDate: date ? date.toISOString() : undefined,
+    accessTypeEndDate: date ? addYears(date, 1).toISOString() : undefined,
+    reservableDateStart: date ? date.toISOString() : undefined,
     applicationRound: [1],
-    personsAllowed: null,
     first: 36,
     orderBy: [ReservationUnitOrderingChoices.NameFiAsc, ReservationUnitOrderingChoices.PkAsc],
     isDraft: false,
