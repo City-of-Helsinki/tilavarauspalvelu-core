@@ -9,7 +9,7 @@ import {
   transformReserveeType,
   transformWeekday,
 } from "common/src/conversion";
-import { filterNonNullable, mapParamToInterger } from "common/src/helpers";
+import { filterEmptyArray, filterNonNullable, mapParamToInterger } from "common/src/helpers";
 
 export function useGetFilterSearchParams({ unitOptions }: { unitOptions?: { label: string; value: number }[] } = {}) {
   // Process search params from the URL to get filter values used in the application review data loaders
@@ -21,18 +21,20 @@ export function useGetFilterSearchParams({ unitOptions }: { unitOptions?: { labe
   const unitFilter = unitParam.length > 0 ? unitParam : (unitOptions ?? []).map((u) => u.value);
 
   return {
-    textFilter: searchParams.get("search"),
-    unitFilter: unitFilter,
-    unitGroupFilter: mapParamToInterger(searchParams.getAll("unitGroup"), 1),
-    reservationUnitFilter: mapParamToInterger(searchParams.getAll("reservationUnit"), 1),
-    reservationUnitTypeFilter: mapParamToInterger(searchParams.getAll("reservationUnitType"), 1),
-    statusFilter: transformApplicationStatusList(searchParams.getAll("status")),
-    sectionStatusFilter: transformApplicationSectionStatusList(searchParams.getAll("sectionStatus")),
-    applicantTypeFilter: transformApplicantTypeList(searchParams.getAll("applicant")),
-    accessCodeStateFilter: transformAccessCodeStateList(searchParams.getAll("accessCodeState")),
-    weekDayFilter: mapParamToInterger(searchParams.getAll("weekday"))
-      .filter((n): n is DayT => n >= 0 && n <= 6)
-      .map(transformWeekday),
+    textFilter: searchParams.get("search") ?? undefined,
+    unitFilter: filterEmptyArray(unitFilter),
+    unitGroupFilter: filterEmptyArray(mapParamToInterger(searchParams.getAll("unitGroup"), 1)),
+    reservationUnitFilter: filterEmptyArray(mapParamToInterger(searchParams.getAll("reservationUnit"), 1)),
+    reservationUnitTypeFilter: filterEmptyArray(mapParamToInterger(searchParams.getAll("reservationUnitType"), 1)),
+    statusFilter: filterEmptyArray(transformApplicationStatusList(searchParams.getAll("status"))),
+    sectionStatusFilter: filterEmptyArray(transformApplicationSectionStatusList(searchParams.getAll("sectionStatus"))),
+    applicantTypeFilter: filterEmptyArray(transformApplicantTypeList(searchParams.getAll("applicant"))),
+    accessCodeStateFilter: filterEmptyArray(transformAccessCodeStateList(searchParams.getAll("accessCodeState"))),
+    weekDayFilter: filterEmptyArray(
+      mapParamToInterger(searchParams.getAll("weekday"))
+        .filter((n): n is DayT => n >= 0 && n <= 6)
+        .map(transformWeekday)
+    ),
   };
 }
 

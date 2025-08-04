@@ -326,3 +326,10 @@ export function mapParamToInterger(param: string[], min?: number): number[] {
   const numbers = param.map(Number).filter(Number.isInteger);
   return min != null ? numbers.filter((n) => n >= min) : numbers;
 }
+
+export function filterEmptyArray<T>(param: T[]): T[] | undefined {
+  if (param.length === 0) {
+    return undefined;
+  }
+  return param;
+}

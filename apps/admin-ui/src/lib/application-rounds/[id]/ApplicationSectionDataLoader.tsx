@@ -2,7 +2,7 @@ import React from "react";
 import { gql } from "@apollo/client";
 import { ApplicationSectionOrderingChoices, useApplicationSectionsQuery } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
-import { filterNonNullable } from "common/src/helpers";
+import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { errorToast } from "common/src/components/toast";
 import { More } from "@/component/More";
@@ -28,7 +28,7 @@ export function ApplicationSectionDataLoader({ applicationRoundPk }: Props): JSX
     variables: {
       first: LIST_PAGE_SIZE,
       applicationRound: applicationRoundPk,
-      orderBy: transformOrderBy(orderBy),
+      orderBy: filterEmptyArray(transformOrderBy(orderBy)),
       textSearch: textFilter,
       unit: unitFilter,
       unitGroup: unitGroupFilter,

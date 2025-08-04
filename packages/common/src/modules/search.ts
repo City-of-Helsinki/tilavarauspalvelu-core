@@ -20,6 +20,9 @@ export function mapFormToSearchParams<T extends object>(data: T): URLSearchParam
       continue;
     }
     if (Array.isArray(v)) {
+      if (v.length === 0) {
+        continue;
+      }
       for (const item of v) {
         if (item != null) {
           params.append(k, item.toString());

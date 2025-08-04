@@ -9,7 +9,7 @@ import { More } from "@/component/More";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { ReservationsTable } from "./ReservationsTable";
 import { fromUIDate, toApiDate } from "common/src/common/util";
-import { filterNonNullable, toNumber } from "common/src/helpers";
+import { filterEmptyArray, filterNonNullable, mapParamToInterger, toNumber } from "common/src/helpers";
 import { transformPaymentStatus, transformReservationState, transformReservationType } from "common/src/conversion";
 import { errorToast } from "common/src/components/toast";
 import { CenterSpinner } from "common/styled";
@@ -17,41 +17,39 @@ import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 
 function mapFilterParams(searchParams: URLSearchParams): ReservationListQueryVariables {
-  const reservationUnitType = searchParams.getAll("reservationUnitType").map(Number).filter(Number.isInteger);
+  const reservationUnitType = filterEmptyArray(mapParamToInterger(searchParams.getAll("reservationUnitType")));
+  const unit = filterEmptyArray(mapParamToInterger(searchParams.getAll("unit")));
+  const orderStatus = filterEmptyArray(
+    filterNonNullable(searchParams.getAll("orderStatus").map(transformPaymentStatus))
+  );
+  const reservationUnits = filterEmptyArray(mapParamToInterger(searchParams.getAll("reservationUnit")));
+  const state = filterEmptyArray(filterNonNullable(searchParams.getAll("state").map(transformReservationState)));
+  const reservationType = filterEmptyArray(
+    filterNonNullable(searchParams.getAll("reservationType").map(transformReservationType))
+  );
 
-  const unit = searchParams.getAll("unit").map(Number).filter(Number.isInteger);
+  const textSearch = searchParams.get("search") ?? undefined;
+  const minPrice = toNumber(searchParams.get("minPrice")) ?? undefined;
+  const maxPrice = toNumber(searchParams.get("maxPrice")) ?? undefined;
 
-  const orderStatus = filterNonNullable(searchParams.getAll("orderStatus").map(transformPaymentStatus));
+  const uiDateBegin = searchParams.get("dateGte") ?? undefined;
+  const dateBegin = uiDateBegin ? (fromUIDate(uiDateBegin) ?? undefined) : undefined;
+  const beginDate = dateBegin ? (toApiDate(dateBegin) ?? undefined) : undefined;
 
-  const reservationUnits = searchParams.getAll("reservationUnit").map(Number).filter(Number.isInteger);
+  const uiDateEnd = searchParams.get("dateLte") ?? undefined;
+  const dateEnd = uiDateEnd ? (fromUIDate(uiDateEnd) ?? undefined) : undefined;
+  const endDate = dateEnd ? (toApiDate(dateEnd) ?? undefined) : undefined;
 
-  const state = filterNonNullable(searchParams.getAll("state").map(transformReservationState));
+  const uiCreatedBegin = searchParams.get("createdAtGte") ?? undefined;
+  const createdBegin = uiCreatedBegin ? (fromUIDate(uiCreatedBegin) ?? undefined) : undefined;
+  const createdAtGte = createdBegin ? (toApiDate(createdBegin) ?? undefined) : undefined;
 
-  const reservationType = filterNonNullable(searchParams.getAll("reservationType").map(transformReservationType));
-
-  const textSearch = searchParams.get("search");
-
-  const minPrice = searchParams.get("minPrice");
-  const maxPrice = searchParams.get("maxPrice");
-
-  const uiDateBegin = searchParams.get("dateGte");
-  const dateBegin = uiDateBegin ? fromUIDate(uiDateBegin) : undefined;
-  const beginDate = dateBegin ? toApiDate(dateBegin) : undefined;
-
-  const uiDateEnd = searchParams.get("dateLte");
-  const dateEnd = uiDateEnd ? fromUIDate(uiDateEnd) : undefined;
-  const endDate = dateEnd ? toApiDate(dateEnd) : undefined;
-
-  const uiCreatedBegin = searchParams.get("createdAtGte");
-  const createdBegin = uiCreatedBegin ? fromUIDate(uiCreatedBegin) : undefined;
-  const createdAtGte = createdBegin ? toApiDate(createdBegin) : undefined;
-
-  const uiCreatedEnd = searchParams.get("createdAtLte");
-  const createdEnd = uiCreatedEnd ? fromUIDate(uiCreatedEnd) : undefined;
-  const createdAtLte = createdEnd ? toApiDate(createdEnd) : undefined;
+  const uiCreatedEnd = searchParams.get("createdAtLte") ?? undefined;
+  const createdEnd = uiCreatedEnd ? (fromUIDate(uiCreatedEnd) ?? undefined) : undefined;
+  const createdAtLte = createdEnd ? (toApiDate(createdEnd) ?? undefined) : undefined;
 
   const recurringKey = searchParams.get("recurring");
-  let isRecurring;
+  let isRecurring: boolean | undefined = undefined;
   if (recurringKey === "only") {
     isRecurring = true;
   }
@@ -70,8 +68,8 @@ function mapFilterParams(searchParams: URLSearchParams): ReservationListQueryVar
     state,
     orderStatus,
     textSearch,
-    priceGte: toNumber(minPrice)?.toString(),
-    priceLte: toNumber(maxPrice)?.toString(),
+    priceGte: minPrice?.toString(),
+    priceLte: maxPrice?.toString(),
     beginDate,
     endDate,
     createdAtGte,
@@ -93,7 +91,7 @@ export function ReservationsDataLoader(): JSX.Element {
   };
 
   // TODO the sort string should be in the url
-  const orderBy = transformSortString(sort);
+  const orderBy = filterEmptyArray(transformSortString(sort));
   const searchParams = useSearchParams();
   const { fetchMore, loading, data, previousData } = useReservationListQuery({
     fetchPolicy: "cache-and-network",

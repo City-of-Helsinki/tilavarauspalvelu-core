@@ -6,7 +6,7 @@ import {
   useAllocatedTimeSlotsQuery,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
-import { filterNonNullable } from "common/src/helpers";
+import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { errorToast } from "common/src/components/toast";
 import { More } from "@/component/More";
@@ -41,7 +41,7 @@ export function TimeSlotDataLoader({ unitOptions, applicationRoundPk }: Props): 
     variables: {
       first: LIST_PAGE_SIZE,
       applicationRound: applicationRoundPk,
-      orderBy: transformOrderBy(orderBy),
+      orderBy: filterEmptyArray(transformOrderBy(orderBy)),
       textSearch: textFilter,
       allocatedUnit: unitFilter,
       unitGroup: unitGroupFilter,
