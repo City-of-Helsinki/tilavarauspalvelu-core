@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { gql } from "@apollo/client";
 import { UnitOrderingChoices, useUnitListQuery } from "@gql/gql-types";
-import { filterNonNullable, mapParamToInterger } from "common/src/helpers";
+import { filterEmptyArray, filterNonNullable, mapParamToInterger } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { More } from "@/component/More";
@@ -24,12 +24,12 @@ export function UnitsDataLoader({ isMyUnits }: Props): JSX.Element {
     }
   };
 
-  const orderBy = transformSortString(sort);
+  const orderBy = filterEmptyArray(transformSortString(sort));
 
   const { t } = useTranslation();
   const searchParams = useSearchParams();
-  const unitGroupFilter = mapParamToInterger(searchParams.getAll("unitGroup"), 1);
-  const nameFilter = searchParams.get("search");
+  const unitGroupFilter = filterEmptyArray(mapParamToInterger(searchParams.getAll("unitGroup"), 1));
+  const nameFilter = searchParams.get("search") ?? undefined;
 
   const { fetchMore, loading, data, previousData } = useUnitListQuery({
     variables: {
