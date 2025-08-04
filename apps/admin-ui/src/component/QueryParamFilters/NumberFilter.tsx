@@ -34,5 +34,5 @@ export function ControlledNumberFilter<T extends FieldValues>({
   const {
     field: { value, onChange },
   } = useController({ name, control });
-  return <BaseNumberFilter name={name} value={value} onChange={(e) => onChange(e.target.value)} />;
+  return <BaseNumberFilter name={name} value={value?.toString() ?? null} onChange={(e) => onChange(e.target.value)} />;
 }
