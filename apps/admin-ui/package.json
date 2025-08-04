@@ -48,6 +48,7 @@
     "react-dom": "^18.3.1",
     "react-error-boundary": "^6.0.0",
     "react-hook-form": "7.54.2",
+    "react-i18next": "^15.6.1",
     "react-quill": "2.0.0",
     "react-use": "^17.6.0",
     "reactjs-popup": "^2.0.6",
