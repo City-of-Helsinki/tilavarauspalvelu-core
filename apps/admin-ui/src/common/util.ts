@@ -88,7 +88,7 @@ export function getTranslatedError(t: TFunction, error: string | undefined): str
   if (error == null) {
     return undefined;
   }
-  return t(`form:errors.${error}`);
+  return t(`forms:errors.${error}`);
 }
 
 export function getReserveeName(
