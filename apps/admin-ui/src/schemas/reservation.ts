@@ -84,7 +84,11 @@ const ReservationFormSchemaRefined = (interval: ReservationStartInterval) =>
     .superRefine((val, ctx) => checkTimeStringFormat(val.endTime, ctx, "endTime"))
     .superRefine((val, ctx) => checkStartEndTime(val, ctx))
     .superRefine((val, ctx) => checkReservationInterval(val.startTime, ctx, "startTime", intervalToNumber(interval)))
-    .superRefine((val, ctx) => checkReservationInterval(val.endTime, ctx, "endTime", 15));
+    .superRefine((val, ctx) => checkReservationInterval(val.endTime, ctx, "endTime", 15))
+    .refine((s) => s.type, {
+      path: ["type"],
+      message: "Required",
+    });
 
 // NOTE duplicated schema because schemas need to be refined after merge (only times in this case)
 export const TimeChangeFormSchemaRefined = (interval: ReservationStartInterval) =>
