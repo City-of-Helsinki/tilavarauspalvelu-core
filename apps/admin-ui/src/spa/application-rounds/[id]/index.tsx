@@ -5,7 +5,7 @@ import { gql } from "@apollo/client";
 import { errorToast } from "common/src/common/toast";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { isApplicationRoundInProgress } from "@/helpers";
-import { CenterSpinner, Flex, H1, TabWrapper, TitleSection } from "common/styled";
+import { CenterSpinner, Flex, H1, NoWrap, TabWrapper, TitleSection } from "common/styled";
 import { Button, Tabs } from "hds-react";
 import { uniqBy } from "lodash-es";
 import styled from "styled-components";
@@ -126,7 +126,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
         {!isApplicationRoundEnded &&
           (isAllocationEnabled(applicationRound) ? (
             <ButtonLikeLink to="allocation" variant="primary" size="large">
-              {t("ApplicationRound.allocate")}
+              <NoWrap>{t("ApplicationRound.allocate")}</NoWrap>
             </ButtonLikeLink>
           ) : (
             <Button disabled>{t("ApplicationRound.allocate")}</Button>
