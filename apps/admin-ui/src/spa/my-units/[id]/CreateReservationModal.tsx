@@ -1,7 +1,16 @@
 import React, { type RefObject, useEffect } from "react";
 import { gql } from "@apollo/client";
 import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
-import { Button, ButtonSize, ButtonVariant, Dialog, Notification, NotificationSize } from "hds-react";
+import {
+  Button,
+  ButtonSize,
+  ButtonVariant,
+  Dialog,
+  IconSearch,
+  LoadingSpinner,
+  Notification,
+  NotificationSize,
+} from "hds-react";
 import { useTranslation } from "react-i18next";
 import {
   type CreateStaffReservationFragment,
@@ -330,12 +339,12 @@ function ActionContainer({
   const { t } = useTranslation();
   const {
     handleSubmit,
-    formState: { isDirty, isSubmitting, isValid },
+    formState: { isDirty, isSubmitting },
   } = form;
 
   const { hasCollisions } = useCheckFormCollisions({ form, reservationUnit });
 
-  const isDisabled = !isDirty || isSubmitting || !isValid || hasCollisions;
+  const isDisabled = !isDirty || isSubmitting || hasCollisions;
 
   return (
     <ActionButtons>
@@ -343,6 +352,7 @@ function ActionContainer({
       <Button
         type="button"
         size={ButtonSize.Small}
+        iconStart={isSubmitting ? <LoadingSpinner small /> : <IconSearch />}
         disabled={isDisabled}
         onClick={() => {
           handleSubmit(onSubmit)();
