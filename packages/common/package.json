@@ -51,8 +51,8 @@
     "@apollo/client": "^3.13.8",
     "@happy-dom/jest-environment": "^18.0.1",
     "@sentry/nextjs": "^8.29.0",
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.6.4",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/lodash-es": "^4.17.12",
@@ -71,6 +71,6 @@
     "typescript": "^5.8.3",
     "typescript-cookie": "^1.0.6",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.3"
+    "vitest": "^3.2.4"
   }
 }
