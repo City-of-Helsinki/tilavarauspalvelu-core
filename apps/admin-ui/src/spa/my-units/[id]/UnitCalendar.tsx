@@ -265,7 +265,7 @@ function Cell({
       onClick={handleClick}
       $isPast={isPast(offset)}
       data-testid={testId}
-      tabIndex={0}
+      tabIndex={isPast(offset) ? -1 : 0}
       onKeyDown={handleKeyDown}
     />
   );
