@@ -7,7 +7,7 @@ type Props = {
   ref?: RefObject<HTMLAnchorElement>;
 };
 
-const Btn = styled.button`
+const StyledSubventionButton = styled.button`
   display: inline;
   background-color: unset;
   border: unset;
@@ -16,19 +16,20 @@ const Btn = styled.button`
   text-decoration: underline;
   color: var(--color-black);
   word-break: keep-all;
+  cursor: pointer;
 `;
 
 export function SubventionSuffix({ setIsDialogOpen }: Props): JSX.Element {
   const { t } = useTranslation();
 
   return (
-    <Btn
+    <StyledSubventionButton
       onClick={(e) => {
         e.preventDefault();
         setIsDialogOpen(true);
       }}
     >
       {t("reservationCalendar:subventionAvailable")}
-    </Btn>
+    </StyledSubventionButton>
   );
 }
