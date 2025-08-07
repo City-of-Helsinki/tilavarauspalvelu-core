@@ -6,6 +6,7 @@ import io
 import json
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Any
+from urllib.parse import urlparse
 
 from django.apps import apps
 from django.conf import settings
@@ -364,6 +365,12 @@ def reservable_time_spans_export(request: WSGIRequest) -> HttpResponse:
     )
 
 
+def append_payment_method_to_checkout_url(checkout_url: str) -> str:
+    # Append "/paymentmethod" to the checkout URL path to skip entering customer information in the checkout process.
+    parsed_url = urlparse(checkout_url)
+    return parsed_url._replace(path=f"{parsed_url.path.removesuffix('/')}/paymentmethod").geturl()
+
+
 @require_GET
 @redirect_back_on_error
 def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: int) -> HttpResponseRedirect:
@@ -405,7 +412,7 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
 
     # Could already have a verkkokauppa order from previous checkout attempt.
     if is_valid_url(payment_order.checkout_url) and payment_order.expires_at > cutoff:
-        return HttpResponseRedirect(payment_order.checkout_url)
+        return HttpResponseRedirect(append_payment_method_to_checkout_url(payment_order.checkout_url))
 
     begin_date = reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
     reservation_unit: ReservationUnit = reservation.reservation_unit
@@ -431,4 +438,4 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
     payment_order.created_at = local_datetime()
     payment_order.save(update_fields=["remote_id", "checkout_url", "receipt_url", "created_at"])
 
-    return HttpResponseRedirect(payment_order.checkout_url)
+    return HttpResponseRedirect(append_payment_method_to_checkout_url(payment_order.checkout_url))

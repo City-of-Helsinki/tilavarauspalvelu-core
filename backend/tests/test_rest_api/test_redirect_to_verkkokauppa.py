@@ -36,7 +36,7 @@ def test_redirect_to_verkkokauppa__success(api_client):
     response = api_client.get(url)
 
     assert response.status_code == 302
-    assert response.url == "https://checkout.url"
+    assert response.url == "https://checkout.url/paymentmethod"
 
     # Tax percentage value should be updated
     reservation.refresh_from_db()
@@ -87,7 +87,7 @@ def test_redirect_to_verkkokauppa__redirect_on_error_from_referer(api_client):
     response = api_client.get(url, headers={"Referer": "https://fake.varaamo.hel.fi"})
 
     assert response.status_code == 302
-    assert response.url == "https://checkout.url"
+    assert response.url == "https://checkout.url/paymentmethod"
 
 
 def test_redirect_to_verkkokauppa__reservation_not_found(api_client):
@@ -244,7 +244,7 @@ def test_redirect_to_verkkokauppa__reservation_already_has_verkkokauppa_order(ap
     response = api_client.get(url)
 
     assert response.status_code == 302
-    assert response.url == "https://fake.varaamo.hel.fi/checkout"
+    assert response.url == "https://fake.varaamo.hel.fi/checkout/paymentmethod"
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
@@ -269,7 +269,7 @@ def test_redirect_to_verkkokauppa__reservation_already_has_verkkokauppa_order__e
 
     # Current order was not valid, so a new order was created
     assert response.status_code == 302
-    assert response.url == "https://checkout.url"
+    assert response.url == "https://checkout.url/paymentmethod"
 
 
 def test_redirect_to_verkkokauppa__reservation_unit_has_no_active_pricing(api_client):
