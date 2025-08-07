@@ -235,7 +235,7 @@ function ReservationUnit({
   const router = useRouter();
   useRemoveStoredReservation();
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isPricingTermsDialogOpen, setIsPricingTermsDialogOpen] = useState(false);
 
   const durationOptions = getDurationOptions(reservationUnit, t);
 
@@ -432,7 +432,10 @@ function ReservationUnit({
   });
 
   const subventionSuffix = useMemo(
-    () => (reservationUnit.canApplyFreeOfCharge ? <SubventionSuffix setIsDialogOpen={setIsDialogOpen} /> : undefined),
+    () =>
+      reservationUnit.canApplyFreeOfCharge ? (
+        <SubventionSuffix setIsDialogOpen={setIsPricingTermsDialogOpen} />
+      ) : undefined,
     [reservationUnit.canApplyFreeOfCharge]
   );
 
@@ -535,8 +538,8 @@ function ReservationUnit({
         id="pricing-terms"
         heading={t("reservationUnit:pricingTerms")}
         text={pricingTermsContent ?? ""}
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
+        isOpen={isPricingTermsDialogOpen}
+        onClose={() => setIsPricingTermsDialogOpen(false)}
       />
       {/* TODO this breaks the layout when inside a grid (the RelatedUnits) */}
       {shouldDisplayBottomWrapper && <StyledRelatedUnits units={relatedReservationUnits} />}
