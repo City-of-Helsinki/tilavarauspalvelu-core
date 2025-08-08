@@ -177,8 +177,8 @@ function PaidPricingPart({
         control={control}
         required
         options={paymentTypeOptions}
-        label={t("label.paymentTypes")}
-        tooltip={t("tooltip.paymentTypes")}
+        label={t("label.paymentType")}
+        tooltip={t("tooltip.paymentType")}
         error={getTranslatedError(t, errors.pricings?.[index]?.paymentType?.message)}
       />
     </>
