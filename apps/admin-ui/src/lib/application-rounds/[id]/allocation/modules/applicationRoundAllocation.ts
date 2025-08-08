@@ -1,4 +1,4 @@
-import { padStart, sortBy } from "lodash-es";
+import { padStart } from "lodash-es";
 import {
   type SuitableTimeRangeNode,
   type ApplicationSectionNode,
@@ -7,7 +7,7 @@ import {
   type ApplicationSectionAllocationsQuery,
 } from "@gql/gql-types";
 import { type TFunction } from "next-i18next";
-import { filterNonNullable, formatTimeRange, timeToMinutes, toNumber } from "common/src/helpers";
+import { filterNonNullable, formatTimeRange, sort, timeToMinutes, toNumber } from "common/src/helpers";
 import { formatDuration } from "common/src/common/util";
 import { convertWeekday, transformWeekday } from "common/src/conversion";
 import { type DayT } from "common/src/const";
@@ -163,9 +163,20 @@ export function formatTimeRangeList(
   aes: Pick<SuitableTimeRangeNode, "dayOfTheWeek" | "beginTime" | "endTime" | "priority">[],
   priority: Priority
 ): string {
-  const schedules = sortBy(
+  const schedules = sort(
     aes.filter((s) => s.priority === priority),
-    ["dayOfTheWeek", "beginTime"]
+    (a, b) => {
+      const d1 = convertWeekday(a.dayOfTheWeek);
+      const d2 = convertWeekday(b.dayOfTheWeek);
+      if (d1 < d2) {
+        return -1;
+      } else if (d1 > d2) {
+        return 1;
+      }
+      const begin1 = timeToMinutes(a.beginTime);
+      const begin2 = timeToMinutes(b.beginTime);
+      return begin1 - begin2;
+    }
   );
 
   return filterNonNullable(schedules)
