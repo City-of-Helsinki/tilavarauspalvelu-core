@@ -235,7 +235,7 @@ export function ApplicationSectionCard({
         <div>
           {t("allocation:desiredReservationUnit")}:{" "}
           <SemiBold>
-            {n + 1}/{nReservationUnits + 1}
+            {n + 1}/{nReservationUnits}
           </SemiBold>
         </div>
       </Details>
