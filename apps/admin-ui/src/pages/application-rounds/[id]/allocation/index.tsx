@@ -1,47 +1,44 @@
-import React, { useEffect } from "react";
-import { Select, Tabs } from "hds-react";
+import React, { useEffect, useMemo } from "react";
+import { Tabs } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { uniqBy } from "lodash-es";
 import styled from "styled-components";
-import { CenterSpinner, fontBold, fontMedium, H1, TabWrapper } from "common/styled";
-import { ShowAllContainer } from "common/src/components";
+import { CenterSpinner, fontMedium, H1, Strong, TabWrapper } from "common/styled";
 import { hasPermission as hasUnitPermission } from "@/modules/permissionHelper";
 import {
   ApplicationRoundFilterDocument,
   type ApplicationRoundFilterQuery,
-  ApplicationRoundFilterQueryVariables,
-  ApplicationRoundStatusChoice,
-  MunicipalityChoice,
-  ReserveeType,
+  type ApplicationRoundFilterQueryVariables,
+  type ApplicationRoundFilterUnitFragment,
+  type ApplicationSectionAllocationsQueryVariables,
   useAllApplicationEventsQuery,
   useApplicationSectionAllocationsQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
 import {
   base64encode,
-  convertOptionToHDS,
   filterNonNullable,
   ignoreMaybeArray,
+  mapParamToInterger,
   sort,
   toNumber,
 } from "common/src/helpers";
-import { SearchTags } from "@/component/SearchTags";
-import { useOptions } from "@/hooks";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { ALLOCATION_POLL_INTERVAL, NOT_FOUND_SSR_VALUE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { truncate } from "@/helpers";
-import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
 import { AllocationPageContent, convertPriorityFilter } from "@lib/application-rounds/[id]/allocation";
 import { LinkPrev } from "@/component/LinkPrev";
-import { useSession } from "@/hooks/auth";
+import { useSession } from "@/hooks";
 import { gql } from "@apollo/client";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useSearchParams } from "next/navigation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
-import Error403 from "@/common/Error403";
+import { Error403 } from "@/component/Error403";
 import { createClient } from "@/common/apolloClient";
+import { transformMunicipality, transformReserveeType } from "common/src/conversion";
+import { Filters } from "@/lib/application-rounds/[id]/allocation/Filters";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;
 
@@ -81,141 +78,134 @@ const NumberOfResultsContainer = styled.div`
     }
   }
 `;
-const NumberOfResults = styled.span`
-  ${fontBold}
-`;
-
-const transformApplicantType = (value: string | null) => {
-  if (value == null) {
-    return null;
-  }
-  switch (value) {
-    case "Individual":
-      return ReserveeType.Individual;
-    case "Community":
-      return ReserveeType.Nonprofit;
-    case "Association":
-      return ReserveeType.Nonprofit;
-    case "Company":
-      return ReserveeType.Company;
-  }
-  return null;
-};
-
-const transformMunicipality = (value: string | null) => {
-  if (value == null) {
-    return null;
-  }
-  switch (value) {
-    case "Helsinki":
-      return MunicipalityChoice.Helsinki;
-    case "Other":
-      return MunicipalityChoice.Other;
-  }
-  return null;
-};
 
 type ApplicationRoundFilterQueryType = NonNullable<ApplicationRoundFilterQuery["applicationRound"]>;
 type ReservationUnitFilterQueryType = NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0];
-type UnitFilterQueryType = NonNullable<ReservationUnitFilterQueryType>["unit"];
+
+/// Trying to wrap used query variables into a hook that is only re-evaluated when the values change
+/// not every time any searchParameter changes
+///
+/// This works: the hook is only ran when the watched values change
+/// Problem with this is that we have to rewrite all queries to use lazy versions and fetch from the cb only
+/// also when using polling we have to implement our own polling logic.
+/// so set all queries to "fetchPolicy": "standby" and manually refetch from both poll hooks and query hook callbacks
+function useQueryVariables(
+  applicationRound: ApplicationRoundFilterQueryType,
+  defaultReservationUnitPk: number,
+  cb: (vals: ApplicationSectionAllocationsQueryVariables) => void = () => {}
+): ApplicationSectionAllocationsQueryVariables {
+  const searchParams = useSearchParams();
+  const nameFilter = searchParams.get("search");
+  const applicantTypeFilter = filterNonNullable(searchParams.getAll("applicantType").map(transformReserveeType));
+  const preferredOrderFilter = mapParamToInterger(searchParams.getAll("order")).filter((x) => x >= 0 && x <= 10);
+  const ageGroupFilter = mapParamToInterger(searchParams.getAll("ageGroup"), 1);
+  const municipalityFilter = filterNonNullable(
+    searchParams.getAll("municipality").map((x) => transformMunicipality(x))
+  );
+  const purposeFilter = mapParamToInterger(searchParams.getAll("purpose"), 1);
+
+  const priorityFilterSanitized = convertPriorityFilter(searchParams.getAll("priority"));
+  const priorityFilterQuery = priorityFilterSanitized.length > 0 ? priorityFilterSanitized : null;
+  const includePreferredOrder10OrHigher =
+    preferredOrderFilter.length > 0 ? preferredOrderFilter.filter((x) => x > 10).length > 0 : null;
+
+  const selectedReservationUnit = toNumber(searchParams.get("reservation-unit")) ?? defaultReservationUnitPk;
+
+  const values = {
+    applicationRound: applicationRound.pk ?? 0,
+    priority: priorityFilterQuery,
+    preferredOrder: preferredOrderFilter,
+    includePreferredOrder10OrHigher,
+    textSearch: nameFilter,
+    municipality: municipalityFilter,
+    applicantType: applicantTypeFilter,
+    purpose: purposeFilter,
+    ageGroup: ageGroupFilter,
+    reservationUnit: selectedReservationUnit,
+    applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
+    beginDate: applicationRound?.reservationPeriodBeginDate ?? "",
+    endDate: applicationRound?.reservationPeriodEndDate ?? "",
+  };
+
+  // TODO use a hash function (or deepEquality) not JSON.stringify (cleaner, faster, doesn't have key order issues)
+  const key = JSON.stringify(values);
+  return useMemo(() => {
+    cb(values);
+    return values;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- on purpose we only update on value change not on rewrites
+  }, [key]);
+}
+
+function mapOrderFilter(val: ApplicationSectionAllocationsQueryVariables["preferredOrder"]): number[] {
+  if (val == null) {
+    return [];
+  }
+  if (typeof val === "number") {
+    return [val];
+  }
+  return val.filter((x): x is number => x != null);
+}
+
+interface ApplicationRoundAllocationProps {
+  applicationRound: PropsNarrowed["applicationRound"];
+  // TODO refactor the others to use the RoundNode
+  units: ApplicationRoundFilterUnitFragment[];
+  reservationUnits: ReservationUnitFilterQueryType[];
+}
 
 function ApplicationRoundAllocation({
   applicationRound,
   units,
   reservationUnits,
-  roundName,
-  applicationRoundStatus,
-}: {
-  applicationRound: ApplicationRoundFilterQueryType;
-  // TODO refactor the others to use the RoundNode
-  units: UnitFilterQueryType[];
-  reservationUnits: ReservationUnitFilterQueryType[];
-  // TODO do we want to prop drill these? or include it in every application event?
-  roundName: string;
-  applicationRoundStatus: ApplicationRoundStatusChoice;
-}): JSX.Element {
+}: ApplicationRoundAllocationProps): JSX.Element {
   const { t } = useTranslation();
-
-  const options = useOptions();
-  const purposeOptions = options.purpose;
-  const ageGroupOptions = options.ageGroup;
 
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
 
-  const unitFilter = toNumber(searchParams.get("unit"));
-  const setSingleValueSearchParam = (param: string, value: string | null) => {
-    const vals = new URLSearchParams(searchParams);
-    if (value == null) {
-      vals.delete(param);
-    } else {
-      vals.set(param, value);
-    }
-    setParams(vals);
-  };
-
-  const unitReservationUnits = reservationUnits.filter((ru) => ru.unit?.pk != null && ru.unit.pk === unitFilter);
-
-  const selectedReservationUnit =
-    searchParams.get("reservation-unit") ?? unitReservationUnits?.[0]?.pk?.toString() ?? null;
-
   const setSelectedReservationUnit = (value: number | null) => {
+    const setSingleValueSearchParam = (param: string, value: string | null) => {
+      const vals = new URLSearchParams(searchParams);
+      if (value == null) {
+        vals.delete(param);
+      } else {
+        vals.set(param, value);
+      }
+      setParams(vals);
+    };
+
     setSingleValueSearchParam("reservation-unit", value?.toString() ?? null);
   };
 
-  const nameFilter = searchParams.get("search");
-  const applicantTypeFilter = searchParams.getAll("applicantType");
-  const priorityFilter = searchParams.getAll("priority");
-  const orderFilter = searchParams.getAll("order");
-  const ageGroupFilter = searchParams.getAll("ageGroup");
-  const municipalityFilter = searchParams.getAll("municipality");
-  const purposeFilter = searchParams.getAll("purpose");
+  const unitFilter = toNumber(searchParams.get("unit"));
+  const selectedUnitReservationUnits = reservationUnits.filter(
+    (ru) => ru.unit?.pk != null && ru.unit.pk === unitFilter
+  );
+  // remove invalid unit selection (from manipulating query param, or user has no access to the unit)
+  const unitReservationUnits =
+    selectedUnitReservationUnits.length > 0
+      ? selectedUnitReservationUnits
+      : reservationUnits.filter((ru) => ru.unit?.pk != null && ru.unit.pk === units[0]?.pk);
 
-  // NOTE sanitize all other query filters similar to this
-  // backend returns an error on invalid filter values, but user can cause them by manipulating the url
-  const priorityFilterSanitized = convertPriorityFilter(priorityFilter);
-  const priorityFilterQuery = priorityFilterSanitized.length > 0 ? priorityFilterSanitized : null;
-  const ageGroupFilterQuery = ageGroupFilter.map(Number).filter(Number.isFinite);
-  const municipalityFilterQuery = filterNonNullable(municipalityFilter.map((x) => transformMunicipality(x)));
-  const purposeFilterQuery = purposeFilter.map(Number).filter(Number.isFinite);
-  const applicantTypeFilterQuery = filterNonNullable(applicantTypeFilter.map((x) => transformApplicantType(x)));
-  const reservationUnitFilterQuery = toNumber(selectedReservationUnit);
-  const preferredOrderFilterQuery = orderFilter.map(Number).filter((x) => x >= 0 && x <= 10);
-  const includePreferredOrder10OrHigher =
-    orderFilter.length > 0 ? orderFilter.filter((x) => Number(x) > 10).length > 0 : null;
-
+  const queryVariables = useQueryVariables(applicationRound, unitReservationUnits[0]?.pk ?? 0);
   const query = useApplicationSectionAllocationsQuery({
     // On purpose skip if the reservation unit is not selected (it is required)
-    skip: reservationUnitFilterQuery == null,
+    skip: queryVariables.reservationUnit === 0,
     pollInterval: ALLOCATION_POLL_INTERVAL,
     // NOTE required otherwise this returns stale data when filters change
     // there is an issue with the caches (sometimes returns incorrect data, not stale but incorrect)
     fetchPolicy: "network-only",
-    variables: {
-      applicationRound: applicationRound.pk ?? 0,
-      priority: priorityFilterQuery,
-      preferredOrder: preferredOrderFilterQuery,
-      includePreferredOrder10OrHigher,
-      textSearch: nameFilter,
-      municipality: municipalityFilterQuery,
-      applicantType: applicantTypeFilterQuery,
-      purpose: purposeFilterQuery,
-      ageGroup: ageGroupFilterQuery,
-      reservationUnit: reservationUnitFilterQuery ?? 0,
-      applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
-      beginDate: applicationRound?.reservationPeriodBeginDate ?? "",
-      endDate: applicationRound?.reservationPeriodEndDate ?? "",
-    },
+    variables: queryVariables,
     onError: () => {
       errorToast({ text: t("errors:errorFetchingData") });
     },
   });
-  const { data, loading, refetch, previousData, fetchMore } = query;
+  const { data: refreshedData, loading, refetch, previousData, fetchMore } = query;
 
   // NOTE onComplete isn't called more than once
   // how this interacts with the polling is unknown
   useEffect(() => {
-    const { pageInfo } = data?.applicationSections ?? {};
+    const { pageInfo } = refreshedData?.applicationSections ?? {};
     if (pageInfo?.hasNextPage) {
       fetchMore({
         variables: {
@@ -223,26 +213,25 @@ function ApplicationRoundAllocation({
         },
       });
     }
-  }, [data, fetchMore]);
+  }, [refreshedData, fetchMore]);
 
-  // TODO these should check the loading state also (it's only an error if not loading)
-  if (reservationUnitFilterQuery == null) {
+  const data = refreshedData ?? previousData;
+
+  const selectedReservationUnit = queryVariables.reservationUnit;
+  if (selectedReservationUnit === 0) {
     // eslint-disable-next-line no-console -- TODO use logger
     console.warn("Skipping allocation query because reservation unit");
-  } else if (applicationRound == null) {
-    // eslint-disable-next-line no-console -- TODO use logger
-    console.warn("Skipping allocation query because application round is not set");
   }
 
   const affectingAllocations = filterNonNullable(data?.affectingAllocatedTimeSlots);
 
   // NOTE get the count of all application sections for the selected reservation unit
   // TODO this can be combined with the above query (but requires casting the alias)
-  const { data: allEventsData } = useAllApplicationEventsQuery({
-    skip: reservationUnitFilterQuery == null || unitFilter == null,
+  const { data: allEventsData, previousData: allEventsPreviousData } = useAllApplicationEventsQuery({
+    skip: selectedReservationUnit == null || unitFilter == null,
     variables: {
       applicationRound: applicationRound.pk ?? 0,
-      reservationUnit: [reservationUnitFilterQuery],
+      reservationUnit: [selectedReservationUnit ?? 0],
       unit: [unitFilter],
       applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
     },
@@ -252,8 +241,11 @@ function ApplicationRoundAllocation({
 
   // NOTE totalCount is fine, but we need to query the things we want to count otherwise it's off by a mile.
   // default to zero because filter returns empty array if no data
-  const totalCount = allEventsData?.applicationSections?.totalCount ?? 0;
-  const allEvents = filterNonNullable(allEventsData?.applicationSections?.edges.map((e) => e?.node));
+  const totalCount =
+    allEventsData?.applicationSections?.totalCount ?? allEventsPreviousData?.applicationSections?.totalCount ?? 0;
+  const allEvents = filterNonNullable(
+    (allEventsData ?? allEventsPreviousData)?.applicationSections?.edges.map((e) => e?.node)
+  );
   if (allEvents.length !== totalCount && totalCount < 100) {
     // eslint-disable-next-line no-console -- TODO use logger
     console.warn(
@@ -274,14 +266,15 @@ function ApplicationRoundAllocation({
         if (r.allocatedTimeSlots.filter((ats) => ats.reservationUnitOption.pk === r.pk).length > 0) {
           return true;
         }
-        if (preferredOrderFilterQuery.length > 0) {
+
+        const preferredOrderFilter = mapOrderFilter(queryVariables.preferredOrder);
+        if (preferredOrderFilter.length > 0) {
           const includedInPreferredOrder =
-            preferredOrderFilterQuery.includes(r.preferredOrder) ||
-            (includePreferredOrder10OrHigher && r.preferredOrder >= 10);
-          const orderFiltered = includedInPreferredOrder && r.reservationUnit.pk === reservationUnitFilterQuery;
-          return orderFiltered;
+            preferredOrderFilter.includes(r.preferredOrder) ||
+            (queryVariables.includePreferredOrder10OrHigher && r.preferredOrder >= 10);
+          return includedInPreferredOrder && r.reservationUnit.pk === selectedReservationUnit;
         }
-        return r.reservationUnit.pk === reservationUnitFilterQuery;
+        return r.reservationUnit.pk === selectedReservationUnit;
       });
       return opts.length > 0;
     })
@@ -290,7 +283,7 @@ function ApplicationRoundAllocation({
       // but no allocation can be made to those
       // which are made using suitableTimeRanges so filter them out
       const opts = section.reservationUnitOptions.filter((r) => {
-        if (r.reservationUnit.pk !== reservationUnitFilterQuery) {
+        if (r.reservationUnit.pk !== selectedReservationUnit) {
           return false;
         }
         return !(r.isLocked || r.isRejected);
@@ -304,46 +297,6 @@ function ApplicationRoundAllocation({
       }
       return section;
     });
-
-  const priorityOptions = ([300, 200] as const).map((n) => ({
-    value: n,
-    label: t(`applicationSection:priority.${n}`),
-  }));
-
-  const orderOptions = Array.from(Array(10).keys())
-    .map((n) => ({
-      value: n,
-      label: `${n + 1}. ${t("filters:reservationUnitApplication")}`,
-    }))
-    .concat([
-      {
-        value: 11,
-        label: t("filters:reservationUnitApplicationOthers"),
-      },
-    ]);
-
-  const translateTag = (key: string, value: string) => {
-    switch (key) {
-      case "municipality":
-        return t(`common:municipalities.${value.toUpperCase()}`);
-      case "textSearch":
-        return value;
-      case "applicantType":
-        return t(`translation:reserveeType.${value.toUpperCase()}`);
-      case "purpose":
-        return purposeOptions.find((o) => String(o.value) === value)?.label ?? "";
-      case "ageGroup":
-        return ageGroupOptions.find((o) => String(o.value) === value)?.label ?? "";
-      case "priority":
-        return priorityOptions.find((o) => String(o.value) === value)?.label ?? "";
-      case "order":
-        return orderOptions.find((o) => String(o.value) === value)?.label ?? "";
-      case "search":
-        return value;
-      default:
-        return key;
-    }
-  };
 
   const hideSearchTags = ["unit", "reservation-unit", "aes", "selectionBegin", "selectionEnd", "allocated"];
 
@@ -366,38 +319,13 @@ function ApplicationRoundAllocation({
   };
 
   // NOTE findIndex returns -1 if not found
-  const initiallyActiveTab = unitReservationUnits.findIndex((x) => x.pk != null && x.pk === reservationUnitFilterQuery);
+  const initiallyActiveTab = unitReservationUnits.findIndex((x) => x.pk != null && x.pk === selectedReservationUnit);
 
   const reservationUnit =
-    unitReservationUnits.find((x) => x.pk != null && x.pk === reservationUnitFilterQuery) ?? reservationUnits[0];
+    unitReservationUnits.find((x) => x.pk != null && x.pk === selectedReservationUnit) ?? reservationUnits[0];
 
-  const municipalityOptions = Object.values(MunicipalityChoice).map((value) => ({
-    label: t(`common:municipalities.${value.toUpperCase()}`),
-    value: value as MunicipalityChoice,
-  }));
-  const customerFilterOptions = Object.keys(ReserveeType).map((value) => ({
-    label: t(`translation:reserveeType.${value.toUpperCase()}`),
-    value: value as ReserveeType,
-  }));
-  const unitOptions = units.map((unit) => ({
-    value: unit?.pk ?? 0,
-    label: unit?.nameFi ?? "",
-  }));
-
-  const setUnitFilter = (value: number) => {
-    // NOTE different logic because values are not atomic and we need to set two params
-    const vals = new URLSearchParams(searchParams);
-    vals.set("unit", value.toString());
-    vals.delete("reservation-unit");
-    setParams(vals);
-  };
-
-  useEffect(() => {
-    if (units.length > 0 && (unitFilter == null || unitFilter < 1)) {
-      setUnitFilter(units[0]?.pk ?? 0);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- this is the correct list, but should be refactored
-  }, [units]);
+  const roundName = applicationRound?.nameFi ?? "-";
+  const applicationRoundStatus = applicationRound.status;
 
   return (
     <>
@@ -405,39 +333,7 @@ function ApplicationRoundAllocation({
         <H1 $noMargin>{t("allocation:allocationTitle")}</H1>
         <Ingress>{roundName}</Ingress>
       </div>
-      <ShowAllContainer
-        showAllLabel={t("filters:moreFilters")}
-        showLessLabel={t("filters:lessFilters")}
-        maximumNumber={4}
-      >
-        <Select
-          texts={{
-            label: t("filters:label.unit"),
-            placeholder: t("common:selectPlaceholder"),
-            clearButtonAriaLabel_multiple: t("common:clearAllSelections"),
-            clearButtonAriaLabel_one: t("common:removeValue"),
-          }}
-          clearable={false}
-          options={unitOptions.map(convertOptionToHDS)}
-          disabled={unitOptions.length === 0}
-          value={unitOptions.find((v) => v.value === unitFilter)?.value?.toString()}
-          onChange={(selection) => {
-            const val = selection.find(() => true)?.value;
-            const v = toNumber(val);
-            if (v != null) {
-              setUnitFilter(v);
-            }
-          }}
-        />
-        <MultiSelectFilter name="priority" options={priorityOptions} />
-        <MultiSelectFilter name="order" options={orderOptions} />
-        <SearchFilter name="search" />
-        <MultiSelectFilter name="municipality" options={municipalityOptions} />
-        <MultiSelectFilter name="applicantType" options={customerFilterOptions} />
-        <MultiSelectFilter name="ageGroup" options={ageGroupOptions} />
-        <MultiSelectFilter name="purpose" options={purposeOptions} />
-      </ShowAllContainer>
-      <SearchTags hide={hideSearchTags} translateTag={translateTag} />
+      <Filters units={units} hideSearchTags={hideSearchTags} isLoading={loading} />
       {/* using a key here is a hack to force remounting the tabs
        * remount causes flickering but HDS doesn't allow programmatically changing the active tab
        */}
@@ -445,7 +341,7 @@ function ApplicationRoundAllocation({
         <Tabs initiallyActiveTab={initiallyActiveTab >= 0 ? initiallyActiveTab : 0} key={unitFilter ?? "unit-none"}>
           <TabList>
             {unitReservationUnits.map((ru) => (
-              <Tab onClick={() => setSelectedReservationUnit(ru.pk ?? null)} key={ru?.pk}>
+              <Tab onClick={() => setSelectedReservationUnit(ru.pk)} key={ru?.pk}>
                 {truncate(ru?.nameFi ?? "-", MAX_RES_UNIT_NAME_LENGTH)}
               </Tab>
             ))}
@@ -459,9 +355,9 @@ function ApplicationRoundAllocation({
           t("allocation:countAllResults", { count: totalNumberOfEvents })
         ) : (
           <>
-            <NumberOfResults>
+            <Strong>
               {applicationSections.length} / {totalNumberOfEvents}
-            </NumberOfResults>
+            </Strong>
             {t("allocation:countResultsPostfix")}
             <button type="button" onClick={handleResetFilters}>
               {t("allocation:clearFiltersButton")}
@@ -486,17 +382,57 @@ function ApplicationRoundAllocation({
   );
 }
 
-// Do a single full query to get filter / page data
-function AllocationWrapper({
-  applicationRound,
-  filteredUnits,
-}: {
-  applicationRound: NonNullable<ApplicationRoundFilterQuery["applicationRound"]>;
-  filteredUnits: NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0]["unit"][];
-}): JSX.Element {
-  // user has no accesss to specific unit through URL with search params -> reset the filter
+/// filter the list of individual units so user can select only the ones they have permission to
+function useFilteredUnits(applicationRound: ApplicationRoundFilterQueryType | null) {
+  const { user } = useSession();
+
+  const resUnits = filterNonNullable(applicationRound?.reservationUnits);
+  const unitData = resUnits.map((ru) => ru?.unit);
+  const units = uniqBy(filterNonNullable(unitData), "pk");
+
+  const hasAccess = (unit: (typeof units)[0]) =>
+    unit.pk != null && hasUnitPermission(user, UserPermissionChoice.CanManageApplications, unit?.pk);
+
+  const sortedUnits = sort(
+    units.filter(hasAccess),
+    // TODO name sort fails with numbers because 11 < 2
+    (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0
+  );
+
+  const reservationUnits = sort(uniqBy(resUnits, "pk"), (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0);
+
+  return [sortedUnits, reservationUnits] as const;
+}
+
+type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
+// NOTE any use of searchParams does a full "redraw" though React is smart enough that components
+// are not actually remounted, but all hooks are re-evaluated
+// so every apollo query is sent to the server (including user query, filter query, etc.)
+export default function ApplicationRoundRouted(props: PropsNarrowed): JSX.Element {
+  const { applicationRound } = props;
+
+  const [filteredUnits, resUnits] = useFilteredUnits(applicationRound);
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
+  useEffect(() => {
+    // TODO need to add the side effect to the select filter
+    // or maybe not? an invalid value is going to get filtered here anyway and we use the first reservation unit
+    const setUnitFilter = (value: number) => {
+      // NOTE different logic because values are not atomic and we need to set two params
+      const vals = new URLSearchParams(searchParams);
+      vals.set("unit", value.toString());
+      vals.delete("reservation-unit");
+      setParams(vals);
+    };
+    const unitFilter = toNumber(searchParams.get("unit"));
+    if (filteredUnits.length > 0 && (unitFilter == null || unitFilter < 1)) {
+      setUnitFilter(filteredUnits[0]?.pk ?? 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- this is the correct list, but should be refactored
+  }, [filteredUnits]);
+
+  // user has no accesss to specific unit through URL with search params -> reset the filter
   useEffect(() => {
     const unit = toNumber(searchParams.get("unit"));
     if (unit != null && !filteredUnits.some((u) => u.pk === unit)) {
@@ -506,42 +442,6 @@ function AllocationWrapper({
     }
   }, [filteredUnits, searchParams, setParams]);
 
-  const roundName = applicationRound?.nameFi ?? "-";
-
-  const reservationUnits = filterNonNullable(applicationRound?.reservationUnits);
-  const resUnits = sort(uniqBy(reservationUnits, "pk"), (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0);
-
-  return (
-    <ApplicationRoundAllocation
-      applicationRound={applicationRound}
-      units={filteredUnits}
-      reservationUnits={resUnits}
-      roundName={roundName}
-      applicationRoundStatus={applicationRound.status}
-    />
-  );
-}
-
-type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function ApplicationRoundRouted(props: PropsNarrowed): JSX.Element {
-  const { applicationRound } = props;
-  const { user } = useSession();
-
-  const reservationUnits = filterNonNullable(applicationRound?.reservationUnits);
-  const unitData = reservationUnits.map((ru) => ru?.unit);
-  const units = uniqBy(filterNonNullable(unitData), "pk");
-
-  const hasAccess = (unit: (typeof units)[0]) =>
-    unit.pk != null && hasUnitPermission(user, UserPermissionChoice.CanManageApplications, unit?.pk);
-
-  // filter the list of individual units so user can select only the ones they have permission to
-  const filteredUnits = sort(
-    units.filter(hasAccess),
-    // TODO name sort fails with numbers because 11 < 2
-    (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0
-  );
-
   if (filteredUnits.length === 0) {
     return <Error403 />;
   }
@@ -549,7 +449,11 @@ export default function ApplicationRoundRouted(props: PropsNarrowed): JSX.Elemen
   return (
     <>
       <LinkPrev />
-      <AllocationWrapper applicationRound={applicationRound} filteredUnits={filteredUnits} />
+      <ApplicationRoundAllocation
+        applicationRound={applicationRound}
+        units={filteredUnits}
+        reservationUnits={resUnits}
+      />
     </>
   );
 }
@@ -711,9 +615,7 @@ export const APPLICATION_ROUND_FILTER_OPTIONS = gql`
         pk
         nameFi
         unit {
-          id
-          pk
-          nameFi
+          ...ApplicationRoundFilterUnit
         }
       }
     }

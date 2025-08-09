@@ -1,20 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import ShowAllContainer from "common/src/components/ShowAllContainer";
-import { useReservationUnitTypes, useUnitOptions, useReservationUnitOptions } from "@/hooks";
+import { ShowAllContainer } from "common/src/components";
 import { Flex } from "common/styled";
 import {
-  CheckboxFilter,
-  DateRangeFilter,
-  MultiSelectFilter,
-  RangeNumberFilter,
-  SearchFilter,
-  SelectFilter,
+  ControlledCheckboxFilter,
+  ControlledMultiSelectFilter,
+  ControlledSearchFilter,
+  ControlledSelectFilter,
+  ControlledDateRangeFilter,
+  ControlledRangeNumberFilter,
 } from "@/component/QueryParamFilters";
 import { SearchTags } from "@/component/SearchTags";
 import { OrderStatusWithFree, ReservationTypeChoice, ReservationStateChoice } from "@gql/gql-types";
-import { fromUIDate, isValidDate } from "common/src/common/util";
+import { translateTag } from "@/modules/search";
+import { useForm } from "react-hook-form";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
+import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
+import { useSearchParams } from "next/navigation";
+import { transformPaymentStatus, transformReservationState, transformReservationType } from "common/src/conversion";
+import { filterNonNullable, mapParamToInterger, toNumber } from "common/src/helpers";
+import { useFilterOptions } from "@/hooks/useFilterOptions";
+import { mapFormToSearchParams } from "common/src/modules/search";
 
 const MoreWrapper = styled(ShowAllContainer)`
   .ShowAllContainer__ToggleButton {
@@ -22,135 +29,147 @@ const MoreWrapper = styled(ShowAllContainer)`
   }
 `;
 
+type SearchFormValues = {
+  reservationType: ReservationTypeChoice[];
+  state: ReservationStateChoice[];
+  reservationUnit: number[];
+  search?: string;
+  dateGte?: string;
+  dateLte?: string;
+  unit: number[];
+  reservationUnitType: number[];
+  minPrice?: number;
+  maxPrice?: number;
+  orderStatus: OrderStatusWithFree[];
+  createdAtGte?: string;
+  createdAtLte?: string;
+  recurring?: "only" | "onlyNot" | undefined;
+  freeOfCharge?: boolean;
+};
+
+// TODO replace with safer version that checks for valid values
+// also a generice would be nice
+function mapParamsToForm(params: URLSearchParams): SearchFormValues {
+  return {
+    reservationType: filterNonNullable(params.getAll("reservationType").map(transformReservationType)),
+    state: filterNonNullable(params.getAll("state").map(transformReservationState)),
+    reservationUnit: mapParamToInterger(params.getAll("reservationUnit"), 1),
+    search: params.get("search") ?? undefined,
+    dateGte: params.get("dateGte") ?? undefined,
+    dateLte: params.get("dateLte") ?? undefined,
+    unit: mapParamToInterger(params.getAll("unit"), 1),
+    reservationUnitType: mapParamToInterger(params.getAll("reservationUnitType"), 1),
+    minPrice: toNumber(params.get("minPrice")) ?? undefined,
+    maxPrice: toNumber(params.get("maxPrice")) ?? undefined,
+    orderStatus: filterNonNullable(params.getAll("orderStatus").map(transformPaymentStatus)),
+    createdAtGte: params.get("createdAtGte") ?? undefined,
+    createdAtLte: params.get("createdAtLte") ?? undefined,
+    recurring:
+      params.get("recurring") === "only" ? "only" : params.get("recurring") === "onlyNot" ? "onlyNot" : undefined,
+    freeOfCharge: params.get("freeOfCharge") ? params.get("freeOfCharge") === "true" : undefined,
+  };
+}
+
+interface FilterProps {
+  defaultFilters?: Readonly<Array<{ key: string; value: string | string[] }>>;
+  clearButtonLabel?: string;
+  clearButtonAriaLabel?: string;
+}
+
 export function Filters({
   defaultFilters = [],
   clearButtonLabel,
   clearButtonAriaLabel,
-}: Readonly<{
-  defaultFilters?: Array<{ key: string; value: string | string[] }>;
-  clearButtonLabel?: string;
-  clearButtonAriaLabel?: string;
-}>): JSX.Element {
+}: Readonly<FilterProps>): JSX.Element {
   const { t } = useTranslation();
+  const setSearchParams = useSetSearchParams();
+  const searchParams = useSearchParams();
 
-  const { options: reservationUnitTypeOptions } = useReservationUnitTypes();
+  // TODO this only filters the options after a search, have to use form data if we want to filter without searching
+  const unitFilter = mapParamToInterger(searchParams.getAll("unit"), 1);
+  const options = useFilterOptions(unitFilter);
 
-  const stateOptions = Object.values(ReservationStateChoice)
-    .filter((s) => s !== ReservationStateChoice.Created)
-    .map((s) => ({
-      value: s,
-      label: t(`reservation:state.${s}`),
-    }));
+  const defaultValues = mapParamsToForm(searchParams);
+  const form = useForm<SearchFormValues>({
+    defaultValues,
+  });
+  const { handleSubmit, control, reset } = form;
+  useEffect(() => {
+    reset(mapParamsToForm(searchParams));
+  }, [searchParams, reset]);
 
-  const paymentStatusOptions = Object.values(OrderStatusWithFree).map((s) => ({
-    value: s,
-    label: t(`translation:orderStatus.${s}`),
+  const onSubmit = (data: SearchFormValues) => {
+    setSearchParams(mapFormToSearchParams(data));
+  };
+
+  const hiddenKeys = [
+    "dateLte",
+    "unit",
+    "reservationUnitType",
+    "minPrice",
+    "maxPrice",
+    "orderStatus",
+    "createdAtGte",
+    "createdAtLte",
+    "recurring",
+    "freeOfCharge",
+  ] as const;
+  const df = Object.entries(defaultValues).map(([key, value]) => ({
+    key,
+    val:
+      hiddenKeys.includes(key as (typeof hiddenKeys)[number]) &&
+      !(
+        value == null ||
+        (Array.isArray(value) && value.length === 0) ||
+        (typeof value === "string" && value.trim() === "") ||
+        (typeof value === "number" && isNaN(value)) ||
+        (typeof value === "boolean" && !value)
+      ),
   }));
-
-  const reservationTypeOptions = Object.values(ReservationTypeChoice).map((s) => ({
-    value: s,
-    label: t(`filters:reservationTypeChoice.${s}`),
-  }));
-
-  const { options: unitOptions } = useUnitOptions();
-
-  const { options: reservationUnitOptions } = useReservationUnitOptions();
-
-  const recurringOptions = [
-    { value: "only", label: t("filters:label.onlyRecurring") },
-    { value: "onlyNot", label: t("filters:label.onlyNotRecurring") },
-  ];
-
-  function translateTag(tag: string, val: string): string {
-    switch (tag) {
-      case "reservationType":
-        return t(`filters:tag.reservationType`, {
-          type: t(`filters:reservationTypeChoice.${val}`),
-        });
-      case "reservationUnitType":
-        return t("filters:tag.reservationUnitType", {
-          type: reservationUnitTypeOptions.find((x) => x.value === Number(val))?.label,
-        });
-      case "state":
-        return t("filters:tag.state", {
-          state: stateOptions.find((x) => x.value === val)?.label ?? "",
-        });
-      case "reservationUnit":
-        return reservationUnitOptions.find((x) => x.value === Number(val))?.label ?? "";
-      case "unit":
-        return unitOptions.find((x) => x.value === Number(val))?.label ?? "";
-      case "minPrice":
-        return t("filters:tag.minPrice", { price: val });
-      case "maxPrice":
-        return t("filters:tag.maxPrice", { price: val });
-      case "dateGte": {
-        const d = fromUIDate(val);
-        if (d == null || !isValidDate(d)) {
-          return "";
-        }
-        return t("filters:tag.dateGte", { date: val });
-      }
-      case "dateLte": {
-        const d = fromUIDate(val);
-        if (d == null || !isValidDate(d)) {
-          return "";
-        }
-        return t("filters:tag.dateLte", { date: val });
-      }
-      case "createdAtGte": {
-        const d = fromUIDate(val);
-        if (d == null || !isValidDate(d)) {
-          return "";
-        }
-        return t("filters:tag.createdAtGte", { date: val });
-      }
-      case "createdAtLte": {
-        const d = fromUIDate(val);
-        if (d == null || !isValidDate(d)) {
-          return "";
-        }
-        return t("filters:tag.createdAtLte", { date: val });
-      }
-      case "orderStatus":
-        if (val === "-") {
-          return t("filters:noPaymentStatus");
-        }
-        return t("filters:tag.orderStatus", {
-          status: t(`translation:orderStatus.${val}`),
-        });
-      case "recurring":
-        return t(`filters:label.${val}Recurring`);
-      case "freeOfCharge":
-        return t("filters:label.freeOfCharge");
-      case "search":
-        return t("filters:tag.search", { search: val });
-      default:
-        return val;
-    }
-  }
-
+  const initiallyOpen = df.some((v) => v.val);
   return (
-    <Flex>
-      <MoreWrapper showAllLabel={t("filters:moreFilters")} showLessLabel={t("filters:lessFilters")} maximumNumber={4}>
-        <MultiSelectFilter options={reservationTypeOptions} name="reservationType" />
-        <MultiSelectFilter options={stateOptions} name="state" />
-        <MultiSelectFilter options={reservationUnitOptions} name="reservationUnit" />
-        <SearchFilter name="search" labelKey="searchReservation" />
-        <DateRangeFilter name="date" />
-        <MultiSelectFilter options={unitOptions} name="unit" />
-        <MultiSelectFilter options={reservationUnitTypeOptions} name="reservationUnitType" />
-        <RangeNumberFilter label={t("filters:label.price")} minName="minPrice" maxName="maxPrice" />
-        <MultiSelectFilter name="orderStatus" options={paymentStatusOptions} />
-        <DateRangeFilter name="createdAt" />
-        <SelectFilter name="recurring" options={recurringOptions} clearable />
-        <CheckboxFilter name="freeOfCharge" />
+    <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)} $direction="column" $gap="s">
+      <MoreWrapper
+        showAllLabel={t("filters:moreFilters")}
+        showLessLabel={t("filters:lessFilters")}
+        maximumNumber={4}
+        initiallyOpen={initiallyOpen}
+      >
+        <ControlledMultiSelectFilter
+          control={control}
+          options={options.reservationTypeChoices}
+          name="reservationType"
+        />
+        <ControlledMultiSelectFilter control={control} options={options.stateChoices} name="state" />
+        <ControlledMultiSelectFilter control={control} options={options.reservationUnits} name="reservationUnit" />
+        <ControlledSearchFilter control={control} name="search" labelKey="searchReservation" />
+        <ControlledDateRangeFilter control={control} nameBegin="dateGte" nameEnd="dateLte" />
+        <ControlledMultiSelectFilter control={control} options={options.units} name="unit" />
+        <ControlledMultiSelectFilter
+          control={control}
+          options={options.reservationUnitTypes}
+          name="reservationUnitType"
+        />
+        <ControlledRangeNumberFilter
+          control={control}
+          label={t("filters:label.price")}
+          minName="minPrice"
+          maxName="maxPrice"
+        />
+        <ControlledMultiSelectFilter control={control} name="orderStatus" options={options.orderStatus} />
+        <ControlledDateRangeFilter control={control} nameBegin="createdAtGte" nameEnd="createdAtLte" />
+        <ControlledSelectFilter control={control} name="recurring" options={options.recurringChoices} clearable />
+        <ControlledCheckboxFilter control={control} name="freeOfCharge" />
       </MoreWrapper>
-      <SearchTags
-        translateTag={translateTag}
-        defaultTags={defaultFilters}
-        clearButtonLabel={clearButtonLabel}
-        clearButtonAriaLabel={clearButtonAriaLabel}
-      />
+      <SearchButtonContainer>
+        <SearchTags
+          translateTag={translateTag(t, options)}
+          defaultTags={defaultFilters}
+          clearButtonLabel={clearButtonLabel}
+          clearButtonAriaLabel={clearButtonAriaLabel}
+        />
+        <SearchButton />
+      </SearchButtonContainer>
     </Flex>
   );
 }

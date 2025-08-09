@@ -6,15 +6,15 @@ import { UserPermissionChoice, useUnitPageQuery } from "@gql/gql-types";
 import { formatAddress } from "@/common/util";
 import { ExternalLink } from "@/component/ExternalLink";
 import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import Error404 from "@/common/Error404";
+import { Error404 } from "@/component/Error404";
 import { ReservationUnitList } from "@lib/units/[id]/ReservationUnitList";
 import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/common/urls";
-import { CenterSpinner, Flex, fontBold, fontMedium, H1, H2, H3 } from "common/styled";
+import { CenterSpinner, Flex, fontMedium, H1, H2, H3 } from "common/styled";
 import { gql } from "@apollo/client";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { AuthorizationChecker } from "@/common/AuthorizationChecker";
+import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { PUBLIC_URL, NOT_FOUND_SSR_VALUE } from "@/common/const";
@@ -37,13 +37,15 @@ const Address = styled.div<{ $disabled?: boolean }>`
 `;
 
 const ResourceUnitCount = styled.div`
-  ${fontBold};
+  ${fontMedium};
   padding: var(--spacing-s) 0;
   font-size: var(--fontsize-heading-xs);
 `;
 
 const StyledBoldButton = styled(Button)`
-  ${fontBold};
+  && {
+    ${fontMedium};
+  }
   span {
     color: var(--color-black);
   }
@@ -117,14 +119,14 @@ function Unit({ unitPk }: { unitPk: number }): JSX.Element {
           variant={ButtonVariant.Supplementary}
           iconStart={<IconPlusCircleFill />}
           onClick={() => {
-            router.push(getReservationUnitUrl(null, unitPk));
+            router.push(getReservationUnitUrl(unitPk));
           }}
         >
           {t("unit:reservationUnitCreate")}
         </StyledBoldButton>
       </Flex>
       {reservationUnits.length > 0 ? (
-        <ReservationUnitList reservationUnits={reservationUnits} unitId={unitPk ?? 0} />
+        <ReservationUnitList reservationUnits={reservationUnits} unitPk={unitPk ?? 0} />
       ) : (
         <EmptyContainer>
           <H3 as="p">{t("unit:noReservationUnitsTitle")}</H3>

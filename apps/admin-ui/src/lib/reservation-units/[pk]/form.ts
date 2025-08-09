@@ -21,6 +21,7 @@ import { fromUIDateTime } from "@/helpers";
 import { intervalToNumber } from "@/schemas/utils";
 import { WEEKDAYS_SORTED } from "common/src/const";
 import { type TaxOption } from "./PricingSection";
+import sanitizeHtml from "sanitize-html";
 
 export const AccessTypes = ["ACCESS_CODE", "OPENED_BY_STAFF", "PHYSICAL_KEY", "UNRESTRICTED"] as const;
 
@@ -951,14 +952,24 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     reservationKind,
     isDraft,
     isArchived,
-    notesWhenApplyingEn: notesWhenApplyingEn !== "" ? notesWhenApplyingEn : null,
-    notesWhenApplyingFi: notesWhenApplyingFi !== "" ? notesWhenApplyingFi : null,
-    notesWhenApplyingSv: notesWhenApplyingSv !== "" ? notesWhenApplyingSv : null,
+    notesWhenApplyingEn: cleanHtmlContent(notesWhenApplyingEn),
+    notesWhenApplyingFi: cleanHtmlContent(notesWhenApplyingFi),
+    notesWhenApplyingSv: cleanHtmlContent(notesWhenApplyingSv),
     cancellationRule: hasCancellationRule ? cancellationRule : null,
     pricings: filterNonNullable(pricings.map((p) => transformPricing(p, hasFuturePricing, taxPercentageOptions))),
     accessTypes,
     applicationRoundTimeSlots,
   };
+}
+
+function cleanHtmlContent(html: string): string | null {
+  if (html === "") {
+    return null;
+  }
+  if (sanitizeHtml(html, { allowedTags: [] }) === "") {
+    return null;
+  }
+  return html;
 }
 
 function transformPricing(

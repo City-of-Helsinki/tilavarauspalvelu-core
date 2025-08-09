@@ -38,12 +38,23 @@ const config = {
   async rewrites() {
     return [
       {
-        source: "/units/:id/reservation-unit/:any*",
+        source: "/units/:id/reservation-units/new",
+        destination: "/reservation-units/new?id=:id",
+      },
+      // secondary route when accessed through unit pages
+      {
+        source: "/units/:id/reservation-units/:any*",
         destination: "/reservation-units/:any*",
       },
+      // old notifications route
       {
         source: "/messaging/notifications/:any*",
         destination: "/notifications/:any*",
+      },
+      // old all reservations route
+      {
+        source: "/reservations/all",
+        destination: "/reservations",
       },
       // Fix missing 's' in resources and spaces
       {

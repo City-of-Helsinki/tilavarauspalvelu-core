@@ -27,7 +27,7 @@ export interface ShowAllContainerProps extends Omit<HTMLAttributes<HTMLDivElemen
 // styled component so we can use "as" to cast the html element
 const Div = styled.div``;
 
-function ShowAllContainer({
+export function ShowAllContainer({
   showAllLabel,
   showLessLabel = showAllLabel,
   maximumNumber = 0,
@@ -88,5 +88,3 @@ function ShowAllContainer({
     </Flex>
   );
 }
-
-export default ShowAllContainer;

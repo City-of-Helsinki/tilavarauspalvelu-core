@@ -30,7 +30,7 @@ export default class MyDocument extends Document {
   }
 
   render() {
-    const basePath = env.NEXT_PUBLIC_BASE_URL;
+    const basePath = env.NEXT_PUBLIC_BASE_URL ?? "";
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore: this works in ui/pages/_document.js for some reason
     const { locale, hdsCriticalRules } = this.props;

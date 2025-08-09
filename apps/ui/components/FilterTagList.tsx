@@ -122,7 +122,7 @@ export function FilterTagList({ filters, multiSelectFilters, hideList, translate
           onDelete={() => handleResetTags(hideList)}
           data-testid="search-form__reset-button"
         >
-          {t("searchForm:resetForm")}
+          {t("common:clear")}
         </ResetButton>
       )}
     </FilterTags>

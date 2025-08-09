@@ -49,6 +49,16 @@ export function toNumber(filter: Maybe<string> | undefined): number | null {
   return n;
 }
 
+/// Safe string -> integer conversion
+/// Always truncates the number to an integer
+export function toInteger(filter: Maybe<string> | undefined): number | null {
+  const val = toNumber(filter);
+  if (val == null) {
+    return null;
+  }
+  return Math.floor(val);
+}
+
 export function pick<T, K extends keyof T>(reservation: T, keys: ReadonlyArray<K>): Pick<T, K> {
   return keys.reduce<Pick<T, K>>(
     (acc, key) => {
@@ -310,4 +320,16 @@ export function formatListToCSV(t: TFunction, list: Readonly<Array<Readonly<stri
 /// @return string in format HH:MM
 export function formatTimeStruct({ hour, minute }: { hour: number; minute: number }): string {
   return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+}
+
+export function mapParamToInterger(param: string[], min?: number): number[] {
+  const numbers = param.map(Number).filter(Number.isInteger);
+  return min != null ? numbers.filter((n) => n >= min) : numbers;
+}
+
+export function filterEmptyArray<T>(param: T[]): T[] | undefined {
+  if (param.length === 0) {
+    return undefined;
+  }
+  return param;
 }

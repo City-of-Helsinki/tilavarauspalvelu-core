@@ -68,7 +68,7 @@ export function ErrorInfo({ form }: { form: UseFormReturn<ReservationUnitEditFor
 
   // TODO errors should be sorted based on the order of the form fields
   return (
-    <Notification label={t("form:ErrorSummary.label")} type="error">
+    <Notification label={t("forms:ErrorSummary.label")} type="error">
       <ol>
         {Object.entries(otherErrors).map(([key, value]) => (
           <li key={key}>

@@ -20,7 +20,7 @@ import { useCurrentUser } from "@/hooks";
 import { H1 } from "common/styled";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { gql } from "@apollo/client";
-import { errorToast, successToast } from "common/src/common/toast";
+import { errorToast, successToast } from "common/src/components/toast";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

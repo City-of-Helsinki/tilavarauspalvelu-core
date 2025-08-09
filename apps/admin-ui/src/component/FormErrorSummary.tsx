@@ -24,7 +24,7 @@ function cleanUpFieldName(fieldName?: string): string | null {
 }
 
 export function FormErrorSummary<T extends FieldValues>({ errors, fieldNamePrefix }: Props<T>): JSX.Element | null {
-  const { t } = useTranslation();
+  const { t } = useTranslation("forms");
 
   const keys: string[] = [];
   for (const err in errors) {
@@ -38,14 +38,14 @@ export function FormErrorSummary<T extends FieldValues>({ errors, fieldNamePrefi
   const cleanPrefix = cleanUpFieldName(fieldNamePrefix);
 
   // TODO use a common translation key for these
-  const prefix = cleanPrefix != null ? `${cleanPrefix}.` : "form:errors.";
+  const prefix = cleanPrefix != null ? `${cleanPrefix}.` : "errors.";
 
   return (
     <Wrapper>
-      <ErrorSummary label={t("form:ErrorSummary.label")} autofocus>
+      <ErrorSummary label={t("ErrorSummary.label")} autofocus>
         <ul>
           {Object.values(errors).map((err, index: number) => {
-            const label = t(`form:ErrorSummary.errorLabel`, {
+            const label = t(`ErrorSummary.errorLabel`, {
               index: index + 1,
             });
             // TODO undefined should be filtered out

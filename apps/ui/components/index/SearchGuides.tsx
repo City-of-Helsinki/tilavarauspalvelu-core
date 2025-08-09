@@ -3,11 +3,11 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { Button, IconArrowRight, ImageWithCard } from "hds-react";
-import { Flex, fontMedium, H3 } from "common/styled";
+import { Flex, H3 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { seasonalPrefix } from "@/modules/urls";
 
-const StyledImageWithCard = styled(ImageWithCard)<{ cardAlignment: string }>`
+const StyledImageWithCard = styled(ImageWithCard)`
   && {
     --card-color-primary: var(--color-black-90);
     --card-background-primary: var(--color-black-5);
@@ -24,7 +24,6 @@ const StyledImageWithCard = styled(ImageWithCard)<{ cardAlignment: string }>`
 
     > div:nth-of-type(2) {
       > div {
-        ${({ cardAlignment }) => (cardAlignment === "right" ? `right: 8%;` : `left: 8%;`)}
         position: relative;
         min-height: unset;
       }
@@ -32,28 +31,6 @@ const StyledImageWithCard = styled(ImageWithCard)<{ cardAlignment: string }>`
 
     @media (max-width: ${breakpoints.m}) {
       display: contents;
-      padding-bottom: 200px;
-
-      > div:nth-of-type(1) {
-        margin-right: 0;
-        margin-left: 0;
-        max-width: unset;
-        max-height: unset;
-      }
-
-      > div:nth-of-type(2) {
-        > div {
-          position: static;
-          margin-right: 0;
-          margin-left: 0;
-        }
-      }
-    }
-
-    @media (max-width: ${breakpoints.s}) {
-      > div:nth-of-type(1) {
-        max-height: 160px;
-      }
     }
   }
 `;
@@ -69,10 +46,12 @@ const InfoContainer = styled(Flex).attrs({
     padding-top: var(--spacing-m);
     padding-bottom: var(--spacing-m);
   }
+`;
 
-  a {
-    ${fontMedium};
-    text-decoration: underline;
+const OuterWrapper = styled.div`
+  padding: 0;
+  @media (min-width: ${breakpoints.l}) {
+    padding: 0 var(--spacing-2-xl);
   }
 `;
 
@@ -81,22 +60,24 @@ export function SearchGuides(): JSX.Element {
   const router = useRouter();
 
   return (
-    <StyledImageWithCard cardAlignment="left" cardLayout="hover" color="primary" src="images/guide-recurring.png">
-      <InfoContainer data-testid="search-guide__recurring">
-        <H3 as="h2" $noMargin>
-          {t("infoRecurring.heading")}
-        </H3>
-        <p>{t("infoRecurring.text")}</p>
-        <Flex $marginTop="s">
-          <Button
-            id="browseSeriesReservationUnits"
-            onClick={() => router.push(seasonalPrefix)}
-            iconEnd={<IconArrowRight />}
-          >
-            {t("browseReservationSeriesButton")}
-          </Button>
-        </Flex>
-      </InfoContainer>
-    </StyledImageWithCard>
+    <OuterWrapper>
+      <StyledImageWithCard color="primary" src="images/guide-recurring.png">
+        <InfoContainer data-testid="search-guide__recurring">
+          <H3 as="h2" $noMargin>
+            {t("infoRecurring.heading")}
+          </H3>
+          <p>{t("infoRecurring.text")}</p>
+          <Flex $marginTop="s">
+            <Button
+              id="browseSeriesReservationUnits"
+              onClick={() => router.push(seasonalPrefix)}
+              iconEnd={<IconArrowRight />}
+            >
+              {t("browseReservationSeriesButton")}
+            </Button>
+          </Flex>
+        </InfoContainer>
+      </StyledImageWithCard>
+    </OuterWrapper>
   );
 }

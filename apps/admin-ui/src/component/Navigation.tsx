@@ -1,11 +1,10 @@
 import { useTranslation } from "next-i18next";
 import { signIn, signOut } from "common/src/browserHelpers";
-import { useSession } from "@/hooks/auth";
+import { useSession, useHandling } from "@/hooks";
 import { Header, IconSignout, IconStar, IconUser, LogoSize, TitleStyleType } from "hds-react";
 import React from "react";
 import styled from "styled-components";
 import { useLocation } from "react-use";
-import { useHandling } from "@/hooks";
 import Logo from "common/src/components/Logo";
 import { hasSomePermission } from "@/modules/permissionHelper";
 import { env } from "@/env.mjs";
@@ -21,6 +20,7 @@ import {
 import { UserPermissionChoice } from "@gql/gql-types";
 import { getLocalizationLang } from "common/src/helpers";
 import { useRouter } from "next/router";
+import { PUBLIC_URL } from "@/common/const";
 
 type Props = {
   apiBaseUrl: string;
@@ -189,7 +189,12 @@ function getFilteredMenu(
   return menuItems;
 }
 
-function checkActive(pathname: string | undefined, routes: string[], exact: boolean, exclude?: string[]) {
+function checkActive(
+  pathname: string | undefined,
+  routes: string[],
+  exact: boolean | undefined = false,
+  exclude?: string[]
+) {
   if (!pathname) {
     return false;
   }
@@ -230,17 +235,19 @@ function NavigationLink({
     }
   };
 
+  const routesWithPrefix = routes.map((route) => `${PUBLIC_URL}${route}`);
+
   return (
     <Header.ActionBarSubItem
       key={routes[0]}
       onClick={handleClick}
-      href={`/kasittely${routes[0]}`}
+      href={routesWithPrefix[0]}
       label={t(title)}
       aria-label={t(title)}
-      className={checkActive(pathname, routes, exact ?? false, exclude) ? "active" : ""}
+      className={checkActive(pathname, routesWithPrefix, exact, exclude) ? "active" : ""}
       notificationBubbleAriaLabel={shouldDisplayCount ? "Määrä" : undefined}
       notificationBubbleContent={shouldDisplayCount ? count?.toString() : undefined}
-      aria-current={checkActive(pathname, routes, exact ?? false, exclude)}
+      aria-current={checkActive(pathname, routesWithPrefix, exact, exclude)}
     />
   );
 }

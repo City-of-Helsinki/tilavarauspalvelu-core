@@ -25,7 +25,7 @@ import { ControlledDateInput } from "common/src/components/form";
 import { base64encode, toNumber } from "common/src/helpers";
 import { Element } from "@/styled";
 import { AutoGrid, Flex, Strong } from "common/styled";
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { useDisplayError } from "common/src/hooks";
 import { getSeriesOverlapErrors } from "common/src/apolloUtils";
@@ -35,6 +35,8 @@ import { getBufferTime, getNormalizedInterval } from "@/helpers";
 import { SelectFilter } from "@/component/QueryParamFilters";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
+import { getMyUnitUrl, getReservationSeriesUrl } from "@/common/urls";
+import { type OptionT } from "common/src/modules/search";
 
 const InnerTextInput = styled(TextInput)`
   grid-column: 1 / -1;
@@ -47,21 +49,14 @@ function filterOutRemovedReservations(items: NewReservationListItem[], removedRe
   return items.filter((x) => !removedReservations.find((y) => isReservationEq(x, y)));
 }
 
-type Props = {
-  reservationUnits: {
-    pk?: number | null | undefined;
-    nameFi?: string | null | undefined;
-  }[];
-};
+interface SeriesProps {
+  reservationUnitOptions: OptionT[];
+  unitPk: number;
+}
 
 /// Wrap the form with a separate reservationUnit selector
 /// the schema validator requires us to know the start interval from reservationUnit
-function ReservationSeriesFormWrapper({ reservationUnits }: Props) {
-  const reservationUnitOptions = reservationUnits.map((unit) => ({
-    label: unit?.nameFi ?? "",
-    value: unit?.pk ?? 0,
-  }));
-
+function ReservationSeriesFormWrapper({ reservationUnitOptions, unitPk }: SeriesProps) {
   const params = useSearchParams();
   const reservationUnitPk = toNumber(params.get("reservationUnit"));
   const id = base64encode(`ReservationUnitNode:${reservationUnitPk}`);
@@ -71,7 +66,7 @@ function ReservationSeriesFormWrapper({ reservationUnits }: Props) {
     skip: !isValid,
   });
 
-  if (reservationUnits.length === 0) {
+  if (reservationUnitOptions.length === 0) {
     return <Notification type="alert">No reservation units found</Notification>;
   }
 
@@ -84,7 +79,7 @@ function ReservationSeriesFormWrapper({ reservationUnits }: Props) {
           <SelectFilter name="reservationUnit" sort options={reservationUnitOptions} />
         </Element>
       </AutoGrid>
-      <ReservationSeriesForm reservationUnit={reservationUnit} />
+      <ReservationSeriesForm reservationUnit={reservationUnit} unitPk={unitPk} />
     </>
   );
 }
@@ -93,7 +88,11 @@ export { ReservationSeriesFormWrapper as ReservationSeriesForm };
 
 type FormValues = ReservationSeriesFormT & ReservationFormMeta;
 
-function ReservationSeriesForm({ reservationUnit }: { reservationUnit: Maybe<CreateStaffReservationFragment> }) {
+interface ReservationSeriesFormProps {
+  reservationUnit: Maybe<CreateStaffReservationFragment>;
+  unitPk: number;
+}
+function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFormProps) {
   const { t } = useTranslation();
 
   const interval = getNormalizedInterval(reservationUnit?.reservationStartInterval);
@@ -195,7 +194,7 @@ function ReservationSeriesForm({ reservationUnit }: { reservationUnit: Maybe<Cre
         buffers,
       });
 
-      router.push(`${recurringPk}/completed`);
+      router.push(getReservationSeriesUrl(unitPk, recurringPk, "completed"));
     } catch (e) {
       const errs = getSeriesOverlapErrors(e);
       if (errs.length > 0) {
@@ -337,7 +336,11 @@ function ReservationSeriesForm({ reservationUnit }: { reservationUnit: Maybe<Cre
 
           <Flex $direction="row" $justifyContent="flex-end" style={{ gridColumn: "1 / -1" }}>
             {/* cancel is disabled while sending because we have no rollback */}
-            <ButtonLikeLink href=".." disabled={isSubmitting} data-testid="recurring-reservation-form__cancel-button">
+            <ButtonLikeLink
+              href={`${getMyUnitUrl(unitPk)}`}
+              disabled={isSubmitting}
+              data-testid="recurring-reservation-form__cancel-button"
+            >
               {t("common:cancel")}
             </ButtonLikeLink>
             <Button

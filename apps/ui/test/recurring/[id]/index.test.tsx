@@ -9,7 +9,7 @@ import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import userEvent from "@testing-library/user-event";
 import { getApplicationPath } from "@/modules/urls";
 import { MockedGraphQLProvider } from "@/test/test.react.utils";
-import { type OptionsT } from "@/modules/search";
+import { type OptionsListT } from "common/src/modules/search";
 
 const { mockedRouterReplace, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
@@ -50,7 +50,7 @@ function customRender(props: CreateGraphQLMockProps = {}): ReturnType<typeof ren
     applicationPeriodBeginsAt: new Date(2024, 0, 1, 0, 0, 0),
     applicationPeriodEndsAt: addYears(new Date(), 1),
   });
-  const options: OptionsT = createOptionMock();
+  const options: OptionsListT = createOptionMock();
   return render(
     <MockedGraphQLProvider mocks={mocks}>
       <SeasonalSearch applicationRound={round} apiBaseUrl="http://localhost:8000" options={options} />

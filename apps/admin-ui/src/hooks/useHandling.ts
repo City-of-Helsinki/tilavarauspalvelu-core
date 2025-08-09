@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { startOfDay } from "date-fns";
-import { useSession } from "@/hooks/auth";
+import { useSession } from "@/hooks";
 import { useHandlingDataQuery } from "@gql/gql-types";
 import { toApiDate } from "common/src/common/util";
 import { ReservationStateChoice } from "common/gql/gql-types";

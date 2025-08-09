@@ -1,6 +1,13 @@
 /// This file contains the search query for reservation units
 /// e.g. the common search pages (both seasonal and single)
-import { filterNonNullable, getLocalizationLang, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import {
+  filterEmptyArray,
+  filterNonNullable,
+  getLocalizationLang,
+  ignoreMaybeArray,
+  mapParamToInterger,
+  toNumber,
+} from "common/src/helpers";
 import { type LocalizationLanguages } from "common/src/urlBuilder";
 import {
   EquipmentOrderingChoices,
@@ -23,6 +30,7 @@ import { SEARCH_PAGING_LIMIT } from "./const";
 import { gql, type ApolloClient } from "@apollo/client";
 import { type ReadonlyURLSearchParams } from "next/navigation";
 import { transformAccessTypeSafe } from "common/src/conversion";
+import { type OptionsListT, type OptionT } from "common/src/modules/search";
 
 function transformOrderByName(desc: boolean, language: LocalizationLanguages) {
   if (language === "fi") {
@@ -78,8 +86,14 @@ function transformSortString(
   return [transformed, sec];
 }
 
-function filterEmpty(str: string | null | undefined): string | null {
-  return str && str.trim() !== "" ? str : null;
+function filterEmpty<T>(val: T | null | undefined): T | undefined {
+  if (val == null) {
+    return undefined;
+  }
+  if (typeof val === "string") {
+    return val.trim() !== "" ? val : undefined;
+  }
+  return val;
 }
 
 type ProcessVariablesParams =
@@ -114,23 +128,23 @@ export function processVariables({
   const reservableDateEnd = endDate && endDate >= today ? toApiDate(endDate) : null;
 
   const dur = toNumber(ignoreMaybeArray(values.getAll("duration")));
-  const duration = dur != null && dur > 0 ? dur : null;
+  const duration = dur != null && dur > 0 ? dur : undefined;
   const isSeasonal = kind === ReservationKind.Season;
-  const textSearch = values.get("textSearch");
-  const personsAllowed = toNumber(values.get("personsAllowed"));
-  const purposes = mapParamToNumber(values.getAll("purposes"), 1);
-  const unit = mapParamToNumber(values.getAll("units"), 1);
-  const reservationUnitTypes = mapParamToNumber(values.getAll("reservationUnitTypes"), 1);
-  const equipments = mapParamToNumber(values.getAll("equipments"), 1);
+  const textSearch = filterEmpty(values.get("textSearch"));
+  const personsAllowed = filterEmpty(toNumber(values.get("personsAllowed")));
+  const purposes = filterEmptyArray(mapParamToInterger(values.getAll("purposes"), 1));
+  const unit = filterEmptyArray(mapParamToInterger(values.getAll("units"), 1));
+  const reservationUnitTypes = filterEmptyArray(mapParamToInterger(values.getAll("reservationUnitTypes"), 1));
+  const equipments = filterEmptyArray(mapParamToInterger(values.getAll("equipments"), 1));
   const showOnlyReservable = ignoreMaybeArray(values.getAll("showOnlyReservable")) !== "false";
-  const applicationRound = "applicationRound" in rest && isSeasonal ? rest.applicationRound : null;
+  const applicationRound = "applicationRound" in rest && isSeasonal ? rest.applicationRound : undefined;
   const reservationPeriodBeginDate =
-    "reservationPeriodBeginDate" in rest && isSeasonal ? rest.reservationPeriodBeginDate : null;
+    "reservationPeriodBeginDate" in rest && isSeasonal ? rest.reservationPeriodBeginDate : undefined;
   const reservationPeriodEndDate =
-    "reservationPeriodEndDate" in rest && isSeasonal ? rest.reservationPeriodEndDate : null;
-  const timeEnd = ignoreMaybeArray(values.getAll("timeEnd"));
-  const timeBegin = ignoreMaybeArray(values.getAll("timeBegin"));
-  const accessType = values.getAll("accessTypes").map(transformAccessTypeSafe);
+    "reservationPeriodEndDate" in rest && isSeasonal ? rest.reservationPeriodEndDate : undefined;
+  const timeEnd = filterEmpty(ignoreMaybeArray(values.getAll("timeEnd")));
+  const timeBegin = filterEmpty(ignoreMaybeArray(values.getAll("timeBegin")));
+  const accessType = filterEmptyArray(filterNonNullable(values.getAll("accessTypes").map(transformAccessTypeSafe)));
 
   return {
     textSearch: filterEmpty(textSearch),
@@ -139,8 +153,8 @@ export function processVariables({
     reservationUnitType: reservationUnitTypes,
     equipments,
     accessType,
-    accessTypeBeginDate: isSeasonal ? reservationPeriodBeginDate : reservableDateStart,
-    accessTypeEndDate: isSeasonal ? reservationPeriodEndDate : reservableDateEnd,
+    accessTypeBeginDate: filterEmpty(isSeasonal ? reservationPeriodBeginDate : reservableDateStart),
+    accessTypeEndDate: filterEmpty(isSeasonal ? reservationPeriodEndDate : reservableDateEnd),
     ...(startDate != null || isSeasonal
       ? isSeasonal
         ? { reservableDateStart: reservationPeriodBeginDate } // Used to find effectiveAccessType in /recurring/[id] page
@@ -152,12 +166,8 @@ export function processVariables({
     reservableTimeStart: filterEmpty(timeBegin),
     reservableTimeEnd: filterEmpty(timeEnd),
     reservableMinimumDurationMinutes: duration,
-    ...(!isSeasonal && showOnlyReservable
-      ? {
-          showOnlyReservable: true,
-        }
-      : {}),
-    ...(isSeasonal && applicationRound != null && applicationRound > 0 ? { applicationRound: [applicationRound] } : {}),
+    showOnlyReservable: !isSeasonal && showOnlyReservable ? true : undefined,
+    applicationRound: isSeasonal && applicationRound != null && applicationRound > 0 ? [applicationRound] : undefined,
     personsAllowed,
     first: SEARCH_PAGING_LIMIT,
     orderBy,
@@ -165,11 +175,6 @@ export function processVariables({
     isVisible: true,
     reservationKind: kind,
   };
-}
-
-export function mapParamToNumber(param: string[], min?: number): number[] {
-  const numbers = param.map(Number).filter(Number.isInteger);
-  return min != null ? numbers.filter((n) => n >= min) : numbers;
 }
 
 export function translateOption(
@@ -187,21 +192,11 @@ export function translateOption(
   };
 }
 
-type OptionT = Readonly<{ value: number; label: string }>;
-export type OptionsT = Readonly<{
-  units: Readonly<OptionT[]>;
-  equipments: Readonly<OptionT[]>;
-  purposes: Readonly<OptionT[]>;
-  reservationUnitTypes: Readonly<OptionT[]>;
-  ageGroups: Readonly<OptionT[]>;
-  municipalities: Readonly<{ value: MunicipalityChoice; label: string }[]>;
-}>;
-
 export async function getSearchOptions(
   apolloClient: ApolloClient<unknown>,
   page: "seasonal" | "direct",
   locale: string
-): Promise<OptionsT> {
+): Promise<OptionsListT> {
   const lang = convertLanguageCode(locale);
   const { data: optionsData } = await apolloClient.query<OptionsQuery, OptionsQueryVariables>({
     query: OptionsDocument,

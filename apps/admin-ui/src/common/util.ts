@@ -84,14 +84,11 @@ export function formatAddress(location: LocationFieldsFragment | null | undefine
   return res;
 }
 
-export const sortByName = (a?: string, b?: string): number =>
-  a && b ? a.toLowerCase().localeCompare(b.toLowerCase()) : !a ? 1 : -1;
-
 export function getTranslatedError(t: TFunction, error: string | undefined): string | undefined {
   if (error == null) {
     return undefined;
   }
-  return t(`form:errors.${error}`);
+  return t(`forms:errors.${error}`);
 }
 
 export function getReserveeName(

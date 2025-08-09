@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
-import toast from "common/src/common/toast";
+import toast from "common/src/components/toast";
 
 export function useToastIfQueryParam({
   key,

@@ -26,7 +26,7 @@ import {
 import { formatDuration } from "common/src/common/util";
 import { ApplicationTimePreview } from "common/src/components/ApplicationTimePreview";
 import { formatAgeGroups, formatDate, formatDateRange, formatNumber } from "@/common/util";
-import ScrollIntoView from "@/common/ScrollIntoView";
+import { ScrollIntoView } from "@/component/ScrollIntoView";
 import { Accordion as AccordionBase } from "@/component/Accordion";
 import { ApplicationWorkingMemo } from "@/component/WorkingMemo";
 import { ShowWhenTargetInvisible } from "@/component/ShowWhenTargetInvisible";
@@ -35,13 +35,12 @@ import { BirthDate } from "@/component/BirthDate";
 import { ValueBox } from "@/component/ValueBox";
 import { TimeSelector } from "@/component/TimeSelector";
 import { getApplicantName, translateReserveeType } from "@/helpers";
-import Error404 from "@/common/Error404";
+import { Error404 } from "@/component/Error404";
 import { useCheckPermission } from "@/hooks";
 import { ApplicationDatas, Summary } from "@/styled";
 import { ApplicationStatusLabel } from "common/src/components/statuses";
 import { useDisplayError } from "common/src/hooks";
-import Error403 from "@/common/Error403";
-import { AuthorizationChecker } from "@/common/AuthorizationChecker";
+import { Error403 } from "@/component/Error403";
 import { GetServerSidePropsContext } from "next";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -551,18 +550,18 @@ function RejectApplicationButton({
   );
 }
 
-function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.Element | null {
+export default function ApplicationPage({ pk }: PropsNarrowed): JSX.Element | null {
   const ref = useRef<HTMLHeadingElement>(null);
   const { t } = useTranslation();
 
-  const id = base64encode(`ApplicationNode:${applicationPk}`);
+  const id = base64encode(`ApplicationNode:${pk}`);
   const {
     data,
     loading: isLoading,
     refetch,
     error,
   } = useApplicationAdminQuery({
-    skip: !(applicationPk > 0),
+    skip: !(pk > 0),
     variables: { id },
   });
 
@@ -636,11 +635,7 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
         </Summary>
 
         <Accordion heading={t("reservation:workingMemo")} initiallyOpen={application.workingMemo.length > 0}>
-          <ApplicationWorkingMemo
-            applicationPk={applicationPk}
-            refetch={refetch}
-            initialValue={application.workingMemo}
-          />
+          <ApplicationWorkingMemo applicationPk={pk} refetch={refetch} initialValue={application.workingMemo} />
         </Accordion>
         {applicationSections.map((section) => (
           <ApplicationSectionDetails section={section} application={application} key={section.pk} refetch={refetch} />
@@ -710,13 +705,6 @@ function ApplicationDetails({ applicationPk }: { applicationPk: number }): JSX.E
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page(props: PropsNarrowed): JSX.Element {
-  return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl}>
-      <ApplicationDetails applicationPk={props.pk} />
-    </AuthorizationChecker>
-  );
-}
 
 export async function getServerSideProps({ locale, query }: GetServerSidePropsContext) {
   const pk = toNumber(ignoreMaybeArray(query.id));

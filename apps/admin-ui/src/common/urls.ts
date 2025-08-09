@@ -10,11 +10,15 @@ export const UNITS_URL_PREFIX = "/units";
 export const BANNER_NOTIFICATIONS_URL_PREFIX = "/notifications";
 export const REQUESTED_RESERVATIONS_URL_PREFIX = "/reservations/requested";
 
-export function getApplicationRoundUrl(applicationRoundId: Maybe<number> | undefined): string {
+type ApplicationRoundPages = "criteria" | "";
+export function getApplicationRoundUrl(
+  applicationRoundId: Maybe<number> | undefined,
+  page: ApplicationRoundPages = ""
+): string {
   if (applicationRoundId == null || !(applicationRoundId > 0)) {
     return "";
   }
-  return `${APPLICATION_ROUNDS_URL_PREFIX}/${applicationRoundId}`;
+  return `${APPLICATION_ROUNDS_URL_PREFIX}/${applicationRoundId}/${page}`;
 }
 
 /// @param pk is the primary key of the reservation
@@ -41,13 +45,15 @@ export function getApplicationUrl(pk: Maybe<number> | undefined, sectionPk?: May
 }
 
 export function getReservationUnitUrl(
-  reservationUnitPk: Maybe<number> | undefined,
-  unitPk: Maybe<number> | undefined
+  unitPk: Maybe<number> | undefined,
+  reservationUnitPk: Maybe<number> | "new" | undefined = "new"
 ): string {
-  if (unitPk == null) {
+  if (unitPk == null && (reservationUnitPk == null || reservationUnitPk === "new")) {
     return "";
+  } else if (unitPk == null || unitPk <= 0) {
+    return `${RESERVATION_UNIT_URL_PREFIX}/${reservationUnitPk}`;
   }
-  return `${UNITS_URL_PREFIX}/${unitPk}/reservation-unit/${reservationUnitPk ?? ""}`;
+  return `${UNITS_URL_PREFIX}/${unitPk}/reservation-units/${reservationUnitPk}`;
 }
 
 export function getSpacesResourcesUrl(unitPk: Maybe<number> | undefined): string {
@@ -77,14 +83,22 @@ export function getUnitUrl(unitPk: Maybe<number> | undefined, page?: UnitPage): 
 }
 
 export function getMyUnitUrl(unitPk: Maybe<number> | undefined): string {
-  return `/my-units/${unitPk}`;
+  return `${MY_UNITS_URL_PREFIX}/${unitPk}`;
 }
 
-export function getReservationSeriesUrl(pk: Maybe<string | number> | undefined): string {
-  if (pk == null || !(Number(pk) > 0)) {
+type SeriesPage = "completed";
+export function getReservationSeriesUrl(
+  unitPk: Maybe<number> | undefined,
+  seriesPk?: Maybe<number> | undefined,
+  page?: SeriesPage
+): string {
+  if (unitPk == null || !(Number(unitPk) > 0)) {
     return "";
   }
-  return `/my-units/${pk}/recurring`;
+  if (seriesPk != null && seriesPk > 0) {
+    return `${MY_UNITS_URL_PREFIX}/${unitPk}/recurring/${seriesPk}/${page ?? ""}`;
+  }
+  return `${MY_UNITS_URL_PREFIX}/${unitPk}/recurring`;
 }
 
 export function getNotificationListUrl(): string {

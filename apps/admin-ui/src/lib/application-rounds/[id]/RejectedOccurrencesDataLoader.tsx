@@ -1,14 +1,14 @@
-import { errorToast } from "common/src/common/toast";
+import { errorToast } from "common/src/components/toast";
 import { useSort } from "@/hooks/useSort";
 import { RejectedOccurrencesTable, SORT_KEYS } from "./RejectedOccurrencesTable";
 import { type ApolloError, gql } from "@apollo/client";
 import { RejectedOccurrenceOrderingChoices, useRejectedOccurrencesQuery } from "@gql/gql-types";
 import { More } from "@/component/More";
 import React from "react";
-import { filterNonNullable } from "common/src/helpers";
+import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
 import { getPermissionErrors } from "common/src/apolloUtils";
 import { useTranslation } from "next-i18next";
-import { useGetFilterSearchParams } from "./utils";
+import { useGetFilterSearchParams } from "@/hooks";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { CenterSpinner } from "common/styled";
 
@@ -30,7 +30,7 @@ export function RejectedOccurrencesDataLoader({ applicationRoundPk, unitOptions 
     variables: {
       first: LIST_PAGE_SIZE,
       applicationRound: applicationRoundPk,
-      orderBy: transformOrderBy(orderBy),
+      orderBy: filterEmptyArray(transformOrderBy(orderBy)),
       textSearch: textFilter,
       unit: unitFilter,
       unitGroup: unitGroupFilter,

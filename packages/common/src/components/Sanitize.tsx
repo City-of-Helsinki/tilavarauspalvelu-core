@@ -53,6 +53,11 @@ export function Sanitize({ html }: Props): JSX.Element | null {
     return null;
   }
 
+  // disallow empty HTML content e.g. <p></p> or <p><br></p>
+  if (sanitizeHtml(html, { allowedTags: [] }).length === 0) {
+    return null;
+  }
+
   return (
     <StyledContent
       /* oxlint-disable-next-line react/no-danger */
