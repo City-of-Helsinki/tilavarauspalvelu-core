@@ -294,15 +294,13 @@ export function isInsideCell(
   return cellTime >= beginMinutes && cellTime < endMinutes;
 }
 
-export function convertPriorityFilter(values: string[]): Priority[] {
-  return values
-    ?.map((x) => Number(x))
-    .reduce<Array<Priority>>((acc, x) => {
-      if (x === 200) {
-        return [...acc, Priority.Secondary];
-      } else if (x === 300) {
-        return [...acc, Priority.Primary];
-      }
-      return acc;
-    }, []);
+export function convertPriorityFilter(values: number[]): Priority[] {
+  return values.reduce<Array<Priority>>((acc, x) => {
+    if (x === 200) {
+      return [...acc, Priority.Secondary];
+    } else if (x === 300) {
+      return [...acc, Priority.Primary];
+    }
+    return acc;
+  }, []);
 }

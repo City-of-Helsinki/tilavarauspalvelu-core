@@ -11,14 +11,9 @@ import { DayT } from "common/src/const";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { mapFormToSearchParams } from "common/src/modules/search";
-import { filterNonNullable, mapParamToInterger } from "common/src/helpers";
-import {
-  transformAccessCodeState,
-  transformApplicationSectionStatus,
-  transformApplicationStatus,
-  transformReserveeType,
-} from "common/src/conversion";
-import { useSearchParams } from "next/navigation";
+import { convertWeekday } from "common/src/conversion";
+import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
+import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
 
 interface FilterProps {
   options: TagOptionsList;
@@ -41,17 +36,28 @@ type SearchFormValues = {
   search: string;
 };
 
-function mapParamsToForm(params: URLSearchParams): SearchFormValues {
+function mapParamsToForm(params: ReadonlyURLSearchParams): SearchFormValues {
+  const {
+    unitGroupFilter,
+    unitFilter,
+    sectionStatusFilter,
+    applicationStatusFilter,
+    reservationUnitFilter,
+    applicantTypeFilter,
+    weekDayFilter,
+    accessCodeStateFilter,
+    textFilter,
+  } = getFilterSearchParams({ searchParams: params });
   return {
-    unitGroup: mapParamToInterger(params.getAll("unitGroup"), 1),
-    unit: mapParamToInterger(params.getAll("unit"), 1),
-    sectionStatus: filterNonNullable(params.getAll("sectionStatus").map(transformApplicationSectionStatus)),
-    status: filterNonNullable(params.getAll("status").map(transformApplicationStatus)),
-    reservationUnit: mapParamToInterger(params.getAll("reservationUnit"), 1),
-    applicant: filterNonNullable(params.getAll("applicant").map(transformReserveeType)),
-    weekday: params.getAll("weekday").map(Number) as DayT[],
-    accessCodeState: filterNonNullable(params.getAll("accessCodeState").map(transformAccessCodeState)),
-    search: params.get("search") ?? "",
+    unitGroup: unitGroupFilter ?? [],
+    unit: unitFilter ?? [],
+    sectionStatus: sectionStatusFilter ?? [],
+    status: applicationStatusFilter ?? [],
+    reservationUnit: reservationUnitFilter ?? [],
+    applicant: applicantTypeFilter ?? [],
+    weekday: (weekDayFilter ?? []).map(convertWeekday),
+    accessCodeState: accessCodeStateFilter ?? [],
+    search: textFilter ?? "",
   };
 }
 

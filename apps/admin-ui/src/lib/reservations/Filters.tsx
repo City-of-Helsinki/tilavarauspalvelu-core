@@ -17,11 +17,11 @@ import { translateTag } from "@/modules/search";
 import { useForm } from "react-hook-form";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
-import { useSearchParams } from "next/navigation";
-import { transformPaymentStatus, transformReservationState, transformReservationType } from "common/src/conversion";
-import { filterNonNullable, mapParamToInterger, toNumber } from "common/src/helpers";
+import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
+import { mapParamToInterger } from "common/src/helpers";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { mapFormToSearchParams } from "common/src/modules/search";
+import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
 
 const MoreWrapper = styled(ShowAllContainer)`
   .ShowAllContainer__ToggleButton {
@@ -47,26 +47,41 @@ type SearchFormValues = {
   freeOfCharge?: boolean;
 };
 
-// TODO replace with safer version that checks for valid values
-// also a generice would be nice
-function mapParamsToForm(params: URLSearchParams): SearchFormValues {
+function mapParamsToForm(searchParams: ReadonlyURLSearchParams): SearchFormValues {
+  const {
+    unitFilter,
+    reservationStatusFilter,
+    reservationUnitFilter,
+    reservationTypeFilter,
+    reservationUnitTypeFilter,
+    orderStatusFilter,
+    textFilter,
+    recurringFilter,
+    dateGteFilter: dateGte,
+    dateLteFilter: dateLte,
+    minPriceFilter: minPrice,
+    maxPriceFilter: maxPrice,
+    createdAtGteFilter: createdAtGte,
+    createdAtLteFilter: createdAtLte,
+    freeOfChargeFilter: freeOfCharge,
+  } = getFilterSearchParams({ searchParams });
+
   return {
-    reservationType: filterNonNullable(params.getAll("reservationType").map(transformReservationType)),
-    state: filterNonNullable(params.getAll("state").map(transformReservationState)),
-    reservationUnit: mapParamToInterger(params.getAll("reservationUnit"), 1),
-    search: params.get("search") ?? undefined,
-    dateGte: params.get("dateGte") ?? undefined,
-    dateLte: params.get("dateLte") ?? undefined,
-    unit: mapParamToInterger(params.getAll("unit"), 1),
-    reservationUnitType: mapParamToInterger(params.getAll("reservationUnitType"), 1),
-    minPrice: toNumber(params.get("minPrice")) ?? undefined,
-    maxPrice: toNumber(params.get("maxPrice")) ?? undefined,
-    orderStatus: filterNonNullable(params.getAll("orderStatus").map(transformPaymentStatus)),
-    createdAtGte: params.get("createdAtGte") ?? undefined,
-    createdAtLte: params.get("createdAtLte") ?? undefined,
-    recurring:
-      params.get("recurring") === "only" ? "only" : params.get("recurring") === "onlyNot" ? "onlyNot" : undefined,
-    freeOfCharge: params.get("freeOfCharge") ? params.get("freeOfCharge") === "true" : undefined,
+    reservationType: reservationTypeFilter ?? [],
+    state: reservationStatusFilter ?? [],
+    reservationUnit: reservationUnitFilter ?? [],
+    search: textFilter,
+    dateGte,
+    dateLte,
+    unit: unitFilter ?? [],
+    reservationUnitType: reservationUnitTypeFilter ?? [],
+    minPrice,
+    maxPrice,
+    orderStatus: orderStatusFilter ?? [],
+    createdAtGte,
+    createdAtLte,
+    freeOfCharge,
+    recurring: recurringFilter,
   };
 }
 
@@ -102,31 +117,17 @@ export function Filters({
     setSearchParams(mapFormToSearchParams(data));
   };
 
-  const hiddenKeys = [
-    "dateLte",
-    "unit",
-    "reservationUnitType",
-    "minPrice",
-    "maxPrice",
-    "orderStatus",
-    "createdAtGte",
-    "createdAtLte",
-    "recurring",
-    "freeOfCharge",
-  ] as const;
-  const df = Object.entries(defaultValues).map(([key, value]) => ({
-    key,
-    val:
-      hiddenKeys.includes(key as (typeof hiddenKeys)[number]) &&
-      !(
-        value == null ||
-        (Array.isArray(value) && value.length === 0) ||
-        (typeof value === "string" && value.trim() === "") ||
-        (typeof value === "number" && isNaN(value)) ||
-        (typeof value === "boolean" && !value)
-      ),
-  }));
-  const initiallyOpen = df.some((v) => v.val);
+  const initiallyOpen =
+    defaultValues.dateLte != null ||
+    defaultValues.unit.length > 0 ||
+    defaultValues.reservationUnitType.length > 0 ||
+    defaultValues.minPrice != null ||
+    defaultValues.maxPrice != null ||
+    defaultValues.orderStatus.length > 0 ||
+    defaultValues.createdAtGte != null ||
+    defaultValues.createdAtLte != null ||
+    defaultValues.recurring != null ||
+    defaultValues.freeOfCharge != null;
   return (
     <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)} $direction="column" $gap="s">
       <MoreWrapper
