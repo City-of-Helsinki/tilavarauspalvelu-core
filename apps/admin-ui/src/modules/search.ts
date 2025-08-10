@@ -1,5 +1,6 @@
 import {
   OrderStatusWithFree,
+  Priority,
   ReservationStateChoice,
   ReservationTypeChoice,
   ReservationUnitPublishingState,
@@ -15,7 +16,7 @@ export interface TagOptionsList extends OptionsListT {
   reservationUnits: Readonly<OptionT[]>;
   unitGroups: Readonly<OptionT[]>;
   reservationUnitStates: Readonly<Array<{ value: ReservationUnitPublishingState; label: string }>>;
-  priorityChoices: Readonly<OptionT[]>;
+  priorityChoices: Readonly<Array<{ value: Priority; label: string }>>;
   orderChoices: Readonly<OptionT[]>;
   orderStatus: Readonly<Array<{ value: OrderStatusWithFree; label: string }>>;
   reservationTypeChoices: Readonly<Array<{ value: ReservationTypeChoice; label: string }>>;

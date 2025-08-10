@@ -23,9 +23,8 @@
     "RESERVED": "Varattu"
   },
   "priority": {
-    "300": "Ensisijaiset aikatoiveet",
-    "200": "Muut aikatoiveet",
-    "all": "Kaikki"
+    "PRIMARY": "Ensisijaiset aikatoiveet",
+    "SECONDARY": "Muut aikatoiveet"
   },
   "headings": {
     "id": "Id",
