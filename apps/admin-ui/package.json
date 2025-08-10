@@ -16,16 +16,6 @@
     "tsc:check": "tsc --noEmit --project tsconfig.json",
     "tsc:clean": "tsc --build --clean"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.{js,css,md,ts,tsx}": "prettier --write",
-    "*.{js,ts,tsx}": "eslint --cache",
-    "*.{tsx,css,scss}": "stylelint"
-  },
   "dependencies": {
     "@apollo/client": "^3.13.8",
     "@hookform/resolvers": "4.1.3",
