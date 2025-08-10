@@ -221,7 +221,9 @@ function NavigationLink({
   const { pathname } = useLocation();
   const router = useRouter();
 
-  if (!routes) return null;
+  if (routes.length === 0) {
+    return null;
+  }
   const shouldDisplayCount = title === "navigation:requestedReservations" && count && count > 0;
 
   const handleClick = (evt: React.MouseEvent<HTMLAnchorElement>) => {
