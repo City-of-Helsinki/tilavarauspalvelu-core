@@ -1,4 +1,4 @@
-import { ApplicationStatusChoice } from "@gql/gql-types";
+import { ApplicationStatusChoice, Priority } from "@gql/gql-types";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import type { DayT } from "common/src/const";
@@ -34,7 +34,7 @@ export function getFilterSearchParams({
       : searchParams.getAll("applicant");
   const applicantTypeFilter = filterEmptyArray(filterNonNullable(applicantTypeParam.map(transformReserveeType)));
 
-  const priorityFilter = filterEmptyArray(mapParamToInterger(searchParams.getAll("priority")));
+  const priorityFilter = filterEmptyArray(transformPriorityFilter(searchParams.getAll("priority")));
   const orderFilter = filterEmptyArray(mapParamToInterger(searchParams.getAll("order")));
   const ageGroupFilter = filterEmptyArray(mapParamToInterger(searchParams.getAll("ageGroup"), 1));
   const purposeFilter = filterEmptyArray(mapParamToInterger(searchParams.getAll("purpose"), 1));
@@ -100,6 +100,17 @@ function convertRecurringParam(recurring: string | null): "only" | "onlyNot" | u
     return "onlyNot";
   }
   return undefined;
+}
+
+function transformPriorityFilter(values: string[]): Priority[] {
+  return values.reduce<Array<Priority>>((acc, x) => {
+    if (x === Priority.Secondary) {
+      return [...acc, Priority.Secondary];
+    } else if (x === Priority.Primary) {
+      return [...acc, Priority.Primary];
+    }
+    return acc;
+  }, []);
 }
 
 export function useGetFilterSearchParams({

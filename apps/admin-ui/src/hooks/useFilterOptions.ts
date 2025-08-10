@@ -1,6 +1,7 @@
 import {
   MunicipalityChoice,
   OrderStatusWithFree,
+  Priority,
   ReservationStateChoice,
   ReservationTypeChoice,
   ReservationUnitPublishingState,
@@ -84,7 +85,7 @@ export function getFilterOptions(
     label: t(`translation:reserveeType.${value}`),
     value: value,
   }));
-  const priorities = ([300, 200] as const).map((n) => ({
+  const priorities = Object.values(Priority).map((n) => ({
     value: n,
     label: t(`applicationSection:priority.${n}`),
   }));
