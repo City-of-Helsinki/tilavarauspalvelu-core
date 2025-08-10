@@ -19,7 +19,7 @@ import { base64encode, filterNonNullable, ignoreMaybeArray, sort, toNumber } fro
 import { errorToast } from "common/src/components/toast";
 import { ALLOCATION_POLL_INTERVAL, NOT_FOUND_SSR_VALUE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { truncate } from "@/helpers";
-import { AllocationPageContent, convertPriorityFilter } from "@lib/application-rounds/[id]/allocation";
+import { AllocationPageContent } from "@lib/application-rounds/[id]/allocation";
 import { LinkPrev } from "@/component/LinkPrev";
 import { useGetFilterSearchParams, useSession } from "@/hooks";
 import { gql } from "@apollo/client";
@@ -89,8 +89,6 @@ function useQueryVariables(
     reservationUnitFilter,
   } = useGetFilterSearchParams();
 
-  const priorityFilterSanitized = convertPriorityFilter(priorityFilter ?? []);
-  const priorityFilterQuery = priorityFilterSanitized.length > 0 ? priorityFilterSanitized : null;
   const includePreferredOrder10OrHigher =
     preferredOrderFilter != null && preferredOrderFilter.length > 0
       ? preferredOrderFilter.filter((x) => x > 10).length > 0
@@ -99,7 +97,7 @@ function useQueryVariables(
 
   return {
     applicationRound: applicationRound.pk ?? 0,
-    priority: priorityFilterQuery,
+    priority: priorityFilter,
     preferredOrder: preferredOrderFilter,
     includePreferredOrder10OrHigher,
     textSearch: nameFilter,

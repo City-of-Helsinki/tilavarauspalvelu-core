@@ -11,7 +11,7 @@ import { translateTag } from "@/modules/search";
 import { useForm } from "react-hook-form";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
-import { type ApplicationRoundFilterUnitFragment, MunicipalityChoice, ReserveeType } from "@gql/gql-types";
+import { type ApplicationRoundFilterUnitFragment, MunicipalityChoice, Priority, ReserveeType } from "@gql/gql-types";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { gql } from "@apollo/client";
@@ -28,8 +28,7 @@ interface FilterProps {
 
 type SearchFormValues = {
   unit: number;
-  // TODO replace with Priority
-  priority: number[];
+  priority: Priority[];
   order: number[];
   search: string;
   municipality: MunicipalityChoice[];
