@@ -252,7 +252,7 @@ function TimeSelection(): JSX.Element {
     <TimeSelectWrapper>
       <Select
         texts={{
-          label: t("allocationLstartingTime"),
+          label: t("allocation:startingTime"),
         }}
         clearable={false}
         options={startTimeOptions}
