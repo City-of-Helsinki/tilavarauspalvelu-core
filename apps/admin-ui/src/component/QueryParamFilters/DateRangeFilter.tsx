@@ -1,4 +1,4 @@
-import React from "react";
+import React, { type ReactElement } from "react";
 import { useTranslation } from "next-i18next";
 import { DateInput } from "hds-react";
 import styled from "styled-components";
@@ -19,42 +19,6 @@ const DateRangeFilterWrapper = styled.div`
   }
 `;
 
-interface BaseDateRangeFilterProps {
-  filter: {
-    begin: string | null;
-    end: string | null;
-  };
-  names: {
-    begin: string;
-    end: string;
-  };
-  onChange: (val: string, paramName: string) => void;
-}
-
-function BaseDateRangeFilter({ filter, names, onChange }: BaseDateRangeFilterProps): JSX.Element {
-  const { t } = useTranslation("filters");
-  return (
-    <DateRangeFilterWrapper>
-      <DateInput
-        language="fi"
-        id={names.begin}
-        label={t(`label.${names.begin}`)}
-        placeholder={t(`placeholder.${names.begin}`)}
-        onChange={(val: string) => onChange(val, names.begin)}
-        value={filter.begin ?? ""}
-      />
-      <DateInput
-        language="fi"
-        id={names.end}
-        label={t(`label.${names.end}`)}
-        placeholder={t(`placeholder.${names.end}`)}
-        onChange={(val: string) => onChange(val, names.end)}
-        value={filter.end ?? ""}
-      />
-    </DateRangeFilterWrapper>
-  );
-}
-
 interface ControlledDateRangeFilterProps<T extends FieldValues> extends Omit<UseControllerProps<T>, "name"> {
   nameBegin: Path<T>;
   nameEnd: Path<T>;
@@ -65,7 +29,8 @@ export function ControlledDateRangeFilter<T extends FieldValues>({
   nameBegin,
   nameEnd,
   control,
-}: ControlledDateRangeFilterProps<T>): JSX.Element {
+}: ControlledDateRangeFilterProps<T>): ReactElement {
+  const { t } = useTranslation("filters");
   const { field: fieldBegin } = useController({ name: nameBegin, control });
   const { field: fieldEnd } = useController({ name: nameEnd, control });
 
@@ -81,5 +46,24 @@ export function ControlledDateRangeFilter<T extends FieldValues>({
   };
 
   const names = { begin: nameBegin, end: nameEnd };
-  return <BaseDateRangeFilter filter={{ begin: beginFilter, end: endFilter }} names={names} onChange={handleChange} />;
+  return (
+    <DateRangeFilterWrapper>
+      <DateInput
+        language="fi"
+        id={names.begin}
+        label={t(`label.${names.begin}`)}
+        placeholder={t(`placeholder.${names.begin}`)}
+        onChange={(val: string) => handleChange(val, names.begin)}
+        value={beginFilter ?? ""}
+      />
+      <DateInput
+        language="fi"
+        id={names.end}
+        label={t(`label.${names.end}`)}
+        placeholder={t(`placeholder.${names.end}`)}
+        onChange={(val: string) => handleChange(val, names.end)}
+        value={endFilter ?? ""}
+      />
+    </DateRangeFilterWrapper>
+  );
 }

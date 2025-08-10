@@ -7,6 +7,7 @@ import { DenyDialogSeries } from "@/component/DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import { useReservationSeries } from "@/hooks";
 import { isPossibleToDeny } from "@/modules/reservationModificationRules";
+import { getReservationUrl } from "@/common/urls";
 
 type Props = {
   reservationSeries: Pick<ReservationSeriesNode, "pk">;
@@ -73,10 +74,13 @@ export function ApprovalButtonsRecurring({
       </Button>
       {!disableNonEssentialButtons && (
         <>
-          <ButtonLikeLink href={`./${reservation?.pk}/edit`} data-testid="approval-buttons-recurring__edit-link">
+          <ButtonLikeLink
+            href={`${getReservationUrl(reservation?.pk)}/edit`}
+            data-testid="approval-buttons-recurring__edit-link"
+          >
             {t("reservation:ApprovalButtons.edit")}
           </ButtonLikeLink>
-          <ButtonLikeLink href={`./${reservation?.pk}/series`}>
+          <ButtonLikeLink href={`${getReservationUrl(reservation?.pk)}/series`}>
             {t("reservation:ApprovalButtons.editSeriesTime")}
           </ButtonLikeLink>
         </>

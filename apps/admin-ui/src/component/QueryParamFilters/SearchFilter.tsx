@@ -7,18 +7,6 @@ interface SearchFilterProps {
   labelKey?: string;
 }
 
-interface BaseSearchFilterProps extends SearchFilterProps {
-  value: string | null;
-  onChange: (evt: React.ChangeEvent<HTMLInputElement>) => void;
-}
-
-function BaseSearchFilter({ labelKey, name, value, onChange }: BaseSearchFilterProps): JSX.Element {
-  const { t } = useTranslation();
-  const label = t(`filters:label.${labelKey ?? name}`);
-  const placeholder = t(`filters:placeholder.${name}`);
-  return <TextInput label={label} id={name} onChange={onChange} value={value ?? ""} placeholder={placeholder} />;
-}
-
 interface ControlledSearchFilterProps<T extends FieldValues>
   extends UseControllerProps<T>,
     Omit<SearchFilterProps, "name"> {
@@ -34,13 +22,17 @@ export function ControlledSearchFilter<T extends FieldValues>({
   const {
     field: { value, onChange },
   } = useController({ name, control });
+
+  const { t } = useTranslation();
+  const label = t(`filters:label.${labelKey ?? name}`);
+  const placeholder = t(`filters:placeholder.${name}`);
   return (
-    <BaseSearchFilter
-      name={name}
-      labelKey={labelKey}
-      value={value}
+    <TextInput
+      label={label}
+      id={name}
       onChange={(evt) => onChange(evt.target.value)}
-      {...control}
+      value={value ?? ""}
+      placeholder={placeholder}
     />
   );
 }
