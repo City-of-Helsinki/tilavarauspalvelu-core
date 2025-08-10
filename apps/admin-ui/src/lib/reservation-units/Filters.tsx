@@ -14,10 +14,9 @@ import { type TagOptionsList, translateTag } from "@/modules/search";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useForm } from "react-hook-form";
-import { useSearchParams } from "next/navigation";
-import { filterNonNullable, mapParamToInterger, toNumber } from "common/src/helpers";
-import { transformReservationUnitState } from "common/src/conversion";
+import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { mapFormToSearchParams } from "common/src/modules/search";
+import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
 
 const MoreWrapper = styled(ShowAllContainer)`
   .ShowAllContainer__ToggleButton {
@@ -39,18 +38,26 @@ type SearchFormValues = {
   surfaceAreaLte?: number;
 };
 
-function mapParamsToForm(params: URLSearchParams): SearchFormValues {
+function mapParamsToForm(searchParams: ReadonlyURLSearchParams): SearchFormValues {
+  const {
+    unitFilter,
+    reservationUnitTypeFilter,
+    textFilter,
+    reservationUnitStateFilter,
+    maxPersonsGteFilter: maxPersonsGte,
+    maxPersonsLteFilter: maxPersonsLte,
+    surfaceAreaGteFilter: surfaceAreaGte,
+    surfaceAreaLteFilter: surfaceAreaLte,
+  } = getFilterSearchParams({ searchParams });
   return {
-    search: params.get("search") ?? "",
-    unit: mapParamToInterger(params.getAll("unit"), 1),
-    reservationUnitType: mapParamToInterger(params.getAll("reservationUnitType"), 1),
-    reservationUnitState: filterNonNullable(
-      params.getAll("reservationUnitState").map((state) => transformReservationUnitState(state))
-    ),
-    maxPersonsGte: toNumber(params.get("maxPersonsGte")) ?? undefined,
-    maxPersonsLte: toNumber(params.get("maxPersonsLte")) ?? undefined,
-    surfaceAreaGte: toNumber(params.get("surfaceAreaGte")) ?? undefined,
-    surfaceAreaLte: toNumber(params.get("surfaceAreaLte")) ?? undefined,
+    search: textFilter ?? "",
+    unit: unitFilter ?? [],
+    reservationUnitType: reservationUnitTypeFilter ?? [],
+    reservationUnitState: reservationUnitStateFilter ?? [],
+    maxPersonsGte,
+    maxPersonsLte,
+    surfaceAreaGte,
+    surfaceAreaLte,
   };
 }
 

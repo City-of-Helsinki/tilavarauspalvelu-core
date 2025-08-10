@@ -9,73 +9,72 @@ import { More } from "@/component/More";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { ReservationsTable } from "./ReservationsTable";
 import { fromUIDate, toApiDate } from "common/src/common/util";
-import { filterEmptyArray, filterNonNullable, mapParamToInterger, toNumber } from "common/src/helpers";
-import { transformPaymentStatus, transformReservationState, transformReservationType } from "common/src/conversion";
+import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
 import { CenterSpinner } from "common/styled";
 import { useTranslation } from "next-i18next";
-import { useSearchParams } from "next/navigation";
+import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
+import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
 
-function mapFilterParams(searchParams: URLSearchParams): ReservationListQueryVariables {
-  const reservationUnitType = filterEmptyArray(mapParamToInterger(searchParams.getAll("reservationUnitType")));
-  const unit = filterEmptyArray(mapParamToInterger(searchParams.getAll("unit")));
-  const orderStatus = filterEmptyArray(
-    filterNonNullable(searchParams.getAll("orderStatus").map(transformPaymentStatus))
-  );
-  const reservationUnits = filterEmptyArray(mapParamToInterger(searchParams.getAll("reservationUnit")));
-  const state = filterEmptyArray(filterNonNullable(searchParams.getAll("state").map(transformReservationState)));
-  const reservationType = filterEmptyArray(
-    filterNonNullable(searchParams.getAll("reservationType").map(transformReservationType))
-  );
+function mapFilterParams(searchParams: ReadonlyURLSearchParams): ReservationListQueryVariables {
+  const {
+    unitFilter,
+    reservationUnitTypeFilter,
+    reservationUnitFilter,
+    reservationTypeFilter,
+    orderStatusFilter,
+    reservationStatusFilter,
+    textFilter: textSearch,
+    maxPriceFilter,
+    minPriceFilter,
+    recurringFilter,
+    createdAtGteFilter,
+    createdAtLteFilter,
+    dateGteFilter,
+    dateLteFilter,
+    freeOfChargeFilter,
+  } = getFilterSearchParams({ searchParams });
 
-  const textSearch = searchParams.get("search") ?? undefined;
-  const minPrice = toNumber(searchParams.get("minPrice")) ?? undefined;
-  const maxPrice = toNumber(searchParams.get("maxPrice")) ?? undefined;
-
-  const uiDateBegin = searchParams.get("dateGte") ?? undefined;
+  const uiDateBegin = dateGteFilter;
   const dateBegin = uiDateBegin ? (fromUIDate(uiDateBegin) ?? undefined) : undefined;
   const beginDate = dateBegin ? (toApiDate(dateBegin) ?? undefined) : undefined;
 
-  const uiDateEnd = searchParams.get("dateLte") ?? undefined;
+  const uiDateEnd = dateLteFilter;
   const dateEnd = uiDateEnd ? (fromUIDate(uiDateEnd) ?? undefined) : undefined;
   const endDate = dateEnd ? (toApiDate(dateEnd) ?? undefined) : undefined;
 
-  const uiCreatedBegin = searchParams.get("createdAtGte") ?? undefined;
+  const uiCreatedBegin = createdAtGteFilter;
   const createdBegin = uiCreatedBegin ? (fromUIDate(uiCreatedBegin) ?? undefined) : undefined;
   const createdAtGte = createdBegin ? (toApiDate(createdBegin) ?? undefined) : undefined;
 
-  const uiCreatedEnd = searchParams.get("createdAtLte") ?? undefined;
+  const uiCreatedEnd = createdAtLteFilter;
   const createdEnd = uiCreatedEnd ? (fromUIDate(uiCreatedEnd) ?? undefined) : undefined;
   const createdAtLte = createdEnd ? (toApiDate(createdEnd) ?? undefined) : undefined;
 
-  const recurringKey = searchParams.get("recurring");
   let isRecurring: boolean | undefined = undefined;
-  if (recurringKey === "only") {
+  if (recurringFilter === "only") {
     isRecurring = true;
   }
-  if (recurringKey === "onlyNot") {
+  if (recurringFilter === "onlyNot") {
     isRecurring = false;
   }
 
-  const freeOfCharge = searchParams.get("freeOfCharge");
-  const applyingForFreeOfCharge = freeOfCharge ? freeOfCharge === "true" : undefined;
-
   return {
-    unit,
-    reservationUnits,
-    reservationUnitType,
-    reservationType,
-    state,
-    orderStatus,
+    unit: unitFilter,
+    reservationUnits: reservationUnitFilter,
+    reservationUnitType: reservationUnitTypeFilter,
+    reservationType: reservationTypeFilter,
+    state: reservationStatusFilter,
+    orderStatus: orderStatusFilter,
     textSearch,
-    priceGte: minPrice?.toString(),
-    priceLte: maxPrice?.toString(),
+    priceGte: minPriceFilter?.toString(),
+    priceLte: maxPriceFilter?.toString(),
     beginDate,
     endDate,
     createdAtGte,
     createdAtLte,
     isRecurring,
-    applyingForFreeOfCharge,
+    applyingForFreeOfCharge: freeOfChargeFilter,
   };
 }
 

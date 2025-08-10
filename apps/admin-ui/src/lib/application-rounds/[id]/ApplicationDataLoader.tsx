@@ -19,7 +19,8 @@ export function ApplicationDataLoader({ applicationRoundPk }: Props): JSX.Elemen
   const { t } = useTranslation();
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
 
-  const { textFilter, unitFilter, unitGroupFilter, statusFilter, applicantTypeFilter } = useGetFilterSearchParams();
+  const { textFilter, unitFilter, unitGroupFilter, applicationStatusFilter, applicantTypeFilter } =
+    useGetFilterSearchParams();
 
   const { fetchMore, previousData, loading, data } = useApplicationsQuery({
     skip: !applicationRoundPk,
@@ -31,7 +32,7 @@ export function ApplicationDataLoader({ applicationRoundPk }: Props): JSX.Elemen
       unit: unitFilter,
       unitGroup: unitGroupFilter,
       // Hack for the old graphql API
-      status: statusFilter ?? [],
+      status: applicationStatusFilter ?? [],
       applicantType: applicantTypeFilter,
     },
     onError: () => {
