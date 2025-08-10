@@ -12,6 +12,8 @@
     "tsc:clean": {
       "cache": false
     },
+    "lint": {},
+    "lint:fix": {},
     "lint:css": {},
     "format": {
       "cache": false
@@ -23,7 +25,6 @@
       "env": ["SKIP_ENV_VALIDATION"],
       "inputs": ["**/*.tsx", "**/*.ts", "test/**/*.ts", "test/**/*.tsx"]
     },
-    "lint": {},
     "dev": {
       "cache": false,
       "persistent": true
