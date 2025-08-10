@@ -1,3 +1,4 @@
+import React, { useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import { ShowAllContainer } from "common/src/components";
 import { SearchTags } from "@/component/SearchTags";
@@ -12,12 +13,10 @@ import { SearchButton, SearchButtonContainer } from "common/src/components/Searc
 import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { type ApplicationRoundFilterUnitFragment, MunicipalityChoice, ReserveeType } from "@gql/gql-types";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { useSearchParams } from "next/navigation";
-import { filterNonNullable, mapParamToInterger, toNumber } from "common/src/helpers";
-import { transformMunicipality, transformReserveeType } from "common/src/conversion";
-import { useEffect } from "react";
+import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { gql } from "@apollo/client";
 import { mapFormToSearchParams } from "common/src/modules/search";
+import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
 
 type UnitFilterQueryType = ApplicationRoundFilterUnitFragment;
 
@@ -96,26 +95,28 @@ export function Filters({ hideSearchTags, units, isLoading }: FilterProps): JSX.
   );
 }
 
-// TODO cleanup these by using a generic conversion / sanitize function
-// we can reuse the same for the search params -> gql query variables
-function mapParamsToForm(params: URLSearchParams, units: UnitFilterQueryType[]): SearchFormValues {
-  const unitFilter = toNumber(params.get("unit"));
-  const applicantTypeFilter = filterNonNullable(params.getAll("applicantType").map(transformReserveeType));
-  const priorityFilter = mapParamToInterger(params.getAll("priority"));
-  const orderFilter = mapParamToInterger(params.getAll("order"));
-  const ageGroupFilter = mapParamToInterger(params.getAll("ageGroup"), 1);
-  const municipalityFilter = filterNonNullable(params.getAll("municipality").map(transformMunicipality));
-  const purposeFilter = mapParamToInterger(params.getAll("purpose"), 1);
+function mapParamsToForm(params: ReadonlyURLSearchParams, units: UnitFilterQueryType[]): SearchFormValues {
+  const {
+    unitFilter,
+    orderFilter,
+    priorityFilter,
+    applicantTypeFilter,
+    municipalityFilter,
+    purposeFilter,
+    ageGroupFilter,
+    textFilter,
+  } = getFilterSearchParams({ searchParams: params });
 
+  const firstUnit = unitFilter?.[0];
   return {
-    unit: unitFilter ?? (units.length > 0 ? (units[0]?.pk ?? 0) : 0),
-    priority: priorityFilter,
-    order: orderFilter,
-    search: params.get("search") ?? "",
-    municipality: municipalityFilter,
-    applicantType: applicantTypeFilter,
-    ageGroup: ageGroupFilter,
-    purpose: purposeFilter,
+    unit: firstUnit ?? (units.length > 0 ? (units[0]?.pk ?? 0) : 0),
+    priority: priorityFilter ?? [],
+    order: orderFilter ?? [],
+    search: textFilter ?? "",
+    municipality: municipalityFilter ?? [],
+    applicantType: applicantTypeFilter ?? [],
+    ageGroup: ageGroupFilter ?? [],
+    purpose: purposeFilter ?? [],
   };
 }
 

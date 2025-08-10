@@ -21,7 +21,7 @@ import {
   ReservationUnitOptionNodeT,
 } from "./modules/applicationRoundAllocation";
 import { useFocusAllocatedSlot, useFocusApplicationEvent, useSlotSelection } from "./hooks";
-import { useSearchParams } from "next/navigation";
+import { useGetFilterSearchParams } from "@/hooks";
 
 type Props = {
   applicationSections: SectionNodeT[];
@@ -261,16 +261,16 @@ function isAllocated(ae: ReservationUnitOptionNodeT, cell: Cell, day: DayT): boo
 }
 
 function usePriorityFilteredApplicationSections(aes: Props["applicationSections"]): SectionNodeT[] {
-  const searchParams = useSearchParams();
-  const priorityFilter = convertPriorityFilter(searchParams.getAll("priority"));
+  const { priorityFilter } = useGetFilterSearchParams();
+  const priority = convertPriorityFilter(priorityFilter ?? []);
 
   return aes.map((ae) => {
     // if priority filter is set, we need to filter what is shown in calendar based on that
     // these are included in the backend request because we want to show them elsewhere, but not in the calendar
-    if (priorityFilter.length > 0) {
+    if (priority.length > 0) {
       return {
         ...ae,
-        suitableTimeRanges: ae.suitableTimeRanges.filter((tr) => priorityFilter.find((p) => p === tr.priority)),
+        suitableTimeRanges: ae.suitableTimeRanges.filter((tr) => priority.find((p) => p === tr.priority)),
       };
     }
     return ae;

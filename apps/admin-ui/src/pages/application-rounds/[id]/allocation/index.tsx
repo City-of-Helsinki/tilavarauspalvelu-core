@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import { Tabs } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { uniqBy } from "lodash-es";
@@ -15,20 +15,13 @@ import {
   useApplicationSectionAllocationsQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import {
-  base64encode,
-  filterNonNullable,
-  ignoreMaybeArray,
-  mapParamToInterger,
-  sort,
-  toNumber,
-} from "common/src/helpers";
+import { base64encode, filterNonNullable, ignoreMaybeArray, sort, toNumber } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
 import { ALLOCATION_POLL_INTERVAL, NOT_FOUND_SSR_VALUE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { truncate } from "@/helpers";
 import { AllocationPageContent, convertPriorityFilter } from "@lib/application-rounds/[id]/allocation";
 import { LinkPrev } from "@/component/LinkPrev";
-import { useSession } from "@/hooks";
+import { useGetFilterSearchParams, useSession } from "@/hooks";
 import { gql } from "@apollo/client";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useSearchParams } from "next/navigation";
@@ -37,7 +30,6 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { Error403 } from "@/component/Error403";
 import { createClient } from "@/common/apolloClient";
-import { transformMunicipality, transformReserveeType } from "common/src/conversion";
 import { Filters } from "@/lib/application-rounds/[id]/allocation/Filters";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;
@@ -82,36 +74,30 @@ const NumberOfResultsContainer = styled.div`
 type ApplicationRoundFilterQueryType = NonNullable<ApplicationRoundFilterQuery["applicationRound"]>;
 type ReservationUnitFilterQueryType = NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0];
 
-/// Trying to wrap used query variables into a hook that is only re-evaluated when the values change
-/// not every time any searchParameter changes
-///
-/// This works: the hook is only ran when the watched values change
-/// Problem with this is that we have to rewrite all queries to use lazy versions and fetch from the cb only
-/// also when using polling we have to implement our own polling logic.
-/// so set all queries to "fetchPolicy": "standby" and manually refetch from both poll hooks and query hook callbacks
 function useQueryVariables(
   applicationRound: ApplicationRoundFilterQueryType,
-  defaultReservationUnitPk: number,
-  cb: (vals: ApplicationSectionAllocationsQueryVariables) => void = () => {}
+  defaultReservationUnitPk: number
 ): ApplicationSectionAllocationsQueryVariables {
-  const searchParams = useSearchParams();
-  const nameFilter = searchParams.get("search");
-  const applicantTypeFilter = filterNonNullable(searchParams.getAll("applicantType").map(transformReserveeType));
-  const preferredOrderFilter = mapParamToInterger(searchParams.getAll("order")).filter((x) => x >= 0 && x <= 10);
-  const ageGroupFilter = mapParamToInterger(searchParams.getAll("ageGroup"), 1);
-  const municipalityFilter = filterNonNullable(
-    searchParams.getAll("municipality").map((x) => transformMunicipality(x))
-  );
-  const purposeFilter = mapParamToInterger(searchParams.getAll("purpose"), 1);
+  const {
+    textFilter: nameFilter,
+    applicantTypeFilter,
+    orderFilter: preferredOrderFilter,
+    ageGroupFilter,
+    municipalityFilter,
+    purposeFilter,
+    priorityFilter,
+    reservationUnitFilter,
+  } = useGetFilterSearchParams();
 
-  const priorityFilterSanitized = convertPriorityFilter(searchParams.getAll("priority"));
+  const priorityFilterSanitized = convertPriorityFilter(priorityFilter ?? []);
   const priorityFilterQuery = priorityFilterSanitized.length > 0 ? priorityFilterSanitized : null;
   const includePreferredOrder10OrHigher =
-    preferredOrderFilter.length > 0 ? preferredOrderFilter.filter((x) => x > 10).length > 0 : null;
+    preferredOrderFilter != null && preferredOrderFilter.length > 0
+      ? preferredOrderFilter.filter((x) => x > 10).length > 0
+      : null;
+  const selectedReservationUnit = reservationUnitFilter?.[0] ?? defaultReservationUnitPk;
 
-  const selectedReservationUnit = toNumber(searchParams.get("reservation-unit")) ?? defaultReservationUnitPk;
-
-  const values = {
+  return {
     applicationRound: applicationRound.pk ?? 0,
     priority: priorityFilterQuery,
     preferredOrder: preferredOrderFilter,
@@ -126,14 +112,6 @@ function useQueryVariables(
     beginDate: applicationRound?.reservationPeriodBeginDate ?? "",
     endDate: applicationRound?.reservationPeriodEndDate ?? "",
   };
-
-  // TODO use a hash function (or deepEquality) not JSON.stringify (cleaner, faster, doesn't have key order issues)
-  const key = JSON.stringify(values);
-  return useMemo(() => {
-    cb(values);
-    return values;
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- on purpose we only update on value change not on rewrites
-  }, [key]);
 }
 
 function mapOrderFilter(val: ApplicationSectionAllocationsQueryVariables["preferredOrder"]): number[] {
@@ -174,7 +152,7 @@ function ApplicationRoundAllocation({
       setParams(vals);
     };
 
-    setSingleValueSearchParam("reservation-unit", value?.toString() ?? null);
+    setSingleValueSearchParam("reservationUnit", value?.toString() ?? null);
   };
 
   const unitFilter = toNumber(searchParams.get("unit"));
@@ -298,7 +276,7 @@ function ApplicationRoundAllocation({
       return section;
     });
 
-  const hideSearchTags = ["unit", "reservation-unit", "aes", "selectionBegin", "selectionEnd", "allocated"];
+  const hideSearchTags = ["unit", "reservationUnit", "aes", "selectionBegin", "selectionEnd", "allocated"];
 
   const handleResetFilters = () => {
     const newParams = new URLSearchParams();
@@ -422,7 +400,7 @@ export default function ApplicationRoundRouted(props: PropsNarrowed): JSX.Elemen
       // NOTE different logic because values are not atomic and we need to set two params
       const vals = new URLSearchParams(searchParams);
       vals.set("unit", value.toString());
-      vals.delete("reservation-unit");
+      vals.delete("reservationUnit");
       setParams(vals);
     };
     const unitFilter = toNumber(searchParams.get("unit"));
