@@ -30,13 +30,13 @@ def test_redirect_to_verkkokauppa__success(api_client):
     reservation = ReservationFactory.create_with_pending_payment()
 
     url = reverse("verkkokauppa_pending_reservation", kwargs={"pk": reservation.pk})
-    url = update_query_params(url, redirect_on_error="https://fake.varaamo.hel.fi")
+    url = update_query_params(url, redirect_on_error="https://fake.varaamo.hel.fi", lang="en")
 
     api_client.force_login(reservation.user)
     response = api_client.get(url)
 
     assert response.status_code == 302
-    assert response.url == "https://checkout.url/paymentmethod"
+    assert response.url == "https://checkout.url/paymentmethod?lang=en"
 
     # Tax percentage value should be updated
     reservation.refresh_from_db()

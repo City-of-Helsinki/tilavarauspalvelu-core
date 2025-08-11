@@ -25,7 +25,7 @@ from tilavarauspalvelu.models import ReservableTimeSpan, Reservation, Reservatio
 from tilavarauspalvelu.services.export import ReservationUnitExporter
 from tilavarauspalvelu.services.pdf import render_to_pdf
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
-from utils.utils import ical_hmac_signature
+from utils.utils import ical_hmac_signature, update_query_params
 
 from .utils import (
     ReservableTimeSpansParams,
@@ -365,10 +365,16 @@ def reservable_time_spans_export(request: WSGIRequest) -> HttpResponse:
     )
 
 
-def append_payment_method_to_checkout_url(checkout_url: str) -> str:
+def append_payment_method_to_checkout_url(checkout_url: str, request: WSGIRequest) -> str:
     # Append "/paymentmethod" to the checkout URL path to skip entering customer information in the checkout process.
     parsed_url = urlparse(checkout_url)
-    return parsed_url._replace(path=f"{parsed_url.path.removesuffix('/')}/paymentmethod").geturl()
+    parsed_url = parsed_url._replace(path=f"{parsed_url.path.removesuffix('/')}/paymentmethod").geturl()
+
+    # Update the query parameters to include the language from the request, keep existing query params as-is.
+    if (request_lang := request.GET.get("lang")) is not None:
+        return update_query_params(url=parsed_url, lang=request_lang)
+
+    return parsed_url
 
 
 @require_GET
@@ -412,7 +418,7 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
 
     # Could already have a verkkokauppa order from previous checkout attempt.
     if is_valid_url(payment_order.checkout_url) and payment_order.expires_at > cutoff:
-        return HttpResponseRedirect(append_payment_method_to_checkout_url(payment_order.checkout_url))
+        return HttpResponseRedirect(append_payment_method_to_checkout_url(payment_order.checkout_url, request))
 
     begin_date = reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
     reservation_unit: ReservationUnit = reservation.reservation_unit
@@ -438,4 +444,4 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
     payment_order.created_at = local_datetime()
     payment_order.save(update_fields=["remote_id", "checkout_url", "receipt_url", "created_at"])
 
-    return HttpResponseRedirect(append_payment_method_to_checkout_url(payment_order.checkout_url))
+    return HttpResponseRedirect(append_payment_method_to_checkout_url(payment_order.checkout_url, request))
