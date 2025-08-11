@@ -42,7 +42,7 @@ jobs:
       - name: "Create release name"
         id: release
         run: >-
-          echo "release=$(
+          echo "release=tilavarauspalvelu-ui@$(
             echo ${{ github.ref_name || github.sha }} | tr '/' '-'
           )" >> $GITHUB_OUTPUT
       - name: Create Sentry release
@@ -80,7 +80,7 @@ jobs:
       - name: "Create release name"
         id: release
         run: >-
-          echo "release=$(
+          echo "release=tilavarauspalvelu-admin-ui@$(
             echo ${{ github.ref_name || github.sha }} | tr '/' '-'
           )" >> $GITHUB_OUTPUT
       - name: Create Sentry release
