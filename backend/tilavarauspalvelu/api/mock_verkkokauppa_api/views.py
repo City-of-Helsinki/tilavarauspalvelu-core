@@ -9,12 +9,11 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 
-from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice
+from tilavarauspalvelu.enums import OrderStatus, PaymentType
 from tilavarauspalvelu.models import PaymentOrder
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Reservation
     from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
@@ -43,16 +42,14 @@ class MockVerkkokauppaView(TemplateView):
         else:
             payment_order.status = OrderStatus.PAID
 
-        payment_order.payment_id = uuid.uuid4()
+        payment_order.payment_id = str(uuid.uuid4())
         payment_order.processed_at = local_datetime()
-        payment_order.save()
+        payment_order.save(update_fields=["status", "processed_at", "payment_id"])
 
-        reservation: Reservation | None = payment_order.reservation
-        if reservation is not None:
-            reservation.state = ReservationStateChoice.CONFIRMED
-            reservation.save()
+        # Update the reservation state to CONFIRMED
+        payment_order.actions.complete_payment()
 
-    def get(self, request: WSGIRequest, *args: Any, **kwargs: Any) -> HttpResponseRedirect:
+    def get(self, request: WSGIRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         payment_order = self.get_payment_order(order_uuid=kwargs.get("order_uuid"))
 
         context = {
