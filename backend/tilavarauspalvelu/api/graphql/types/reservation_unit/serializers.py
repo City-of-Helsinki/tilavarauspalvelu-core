@@ -21,6 +21,7 @@ from tilavarauspalvelu.api.graphql.types.reservation_unit_image.serializers impo
 from tilavarauspalvelu.api.graphql.types.reservation_unit_pricing.serializers import ReservationUnitPricingSerializer
 from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, ReservationUnitPublishingState, Weekday
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, ReservationUnitPricing
 from utils.date_utils import local_date, local_datetime
@@ -321,6 +322,8 @@ class ReservationUnitSerializer(NestingModelSerializer):
         if need_to_check_pindora:
             try:
                 PindoraClient.get_reservation_unit(self.instance)
+            except PindoraNotFoundError as error:
+                raise ValidationError(str(error), code=error_codes.RESERVATION_UNIT_NOT_FOUND_IN_PINDORA) from error
             except ExternalServiceError as error:
                 raise ValidationError(str(error)) from error
 
