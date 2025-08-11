@@ -119,6 +119,10 @@ class PaymentOrderActions:
         return OrderStatus.DRAFT
 
     def complete_payment(self) -> None:
+        """
+        Update reservation state to CONFIRMED if the payment order is paid.
+        Activate Pindora access code and send confirmation emails if applicable.
+        """
         if self.payment_order.status not in OrderStatus.paid_in_webshop:
             return
 
