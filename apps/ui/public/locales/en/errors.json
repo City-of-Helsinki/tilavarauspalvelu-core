@@ -49,7 +49,7 @@
     "OVERLAPPING_RESERVATIONS": "There are duplicate bookings.",
     "RESERVATION_UNIT_IS_NOT_OPEN": "The item is closed at the moment.",
     "RESERVATION_UNIT_IN_OPEN_ROUND": "You can make a seasonal booking application for this item.",
-    "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "Please shorten the booking time.",
+    "RESERVATION_UNIT_MAX_DURATION_EXCEEDED": "Please shorten the booking time.",
     "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "Please extend the booking time.",
     "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "You have exceeded the maximum number of bookings.",
     "RESERVATION_OVERLAP": "There are duplicate bookings.",
@@ -69,7 +69,7 @@
       "APPLICATION_APPLICANT_TYPE_MISSING": "Applicant type is missing.",
       "APPLICATION_STATUS_CANNOT_SEND": "Application cannot be sent.",
       "OVERLAPPING_RESERVATIONS": "There are duplicate bookings.",
-      "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "The booking time is too long.",
+      "RESERVATION_UNIT_MAX_DURATION_EXCEEDED": "The booking time is too long.",
       "RESERVATION_CANCELLATION_NOT_ALLOWED": "Cancellation is not allowed.",
       "invalid": "Invalid value.",
       "generic_validation_error": "An error occurred."
