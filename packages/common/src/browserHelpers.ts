@@ -15,7 +15,7 @@ function cleanupUrlParam(url: unknown): string | undefined {
 
 // Redirect the user to the sign in dialog and return to returnUrl (or
 // current url if none is provided) after sign in
-/// Thows if called on the server
+/// Throws if called on the server
 export function signIn({
   apiBaseUrl,
   language,
@@ -48,7 +48,7 @@ function removeTrailingSlash(url: string): string {
 export const isTouchDevice = (): boolean => isBrowser && window?.matchMedia("(any-hover: none)").matches;
 
 /// Sign the user out and redirect to route /auth/logout/ after the session is destroyed
-/// Thows if called on the server
+/// Throws if called on the server
 /// @param apiBaseUrl - base url for api
 /// @param appUrlBasePath - base path for the app (only required if next app is not in host root)
 export function signOut(apiBaseUrl: string, appUrlBasePath = "") {

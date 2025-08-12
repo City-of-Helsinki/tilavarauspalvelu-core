@@ -275,7 +275,7 @@ export function ReserverMetaFields({
   options,
   data,
 }: {
-  // TODO should not be arbitary strings
+  // TODO should not be arbitrary strings
   fields: string[];
   reservationUnit: MetadataSetsFragment;
 } & CommonProps) {

@@ -27,7 +27,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { toApiDate } from "common/src/common/util";
 
 function MyApp(props: AppProps<PageProps> & AppOwnProps): JSX.Element {
-  const { Component, pageProps, currentUser, handlingData, notficationsData } = props;
+  const { Component, pageProps, currentUser, handlingData, notificationsData } = props;
   const { apiBaseUrl, sentryDsn, sentryEnvironment, version } = pageProps;
   useEffect(() => {
     if (sentryDsn) {
@@ -57,10 +57,10 @@ function MyApp(props: AppProps<PageProps> & AppOwnProps): JSX.Element {
       data: handlingData,
     });
   }
-  if (notficationsData) {
+  if (notificationsData) {
     apolloClient.writeQuery({
       query: ShowNotificationsListDocument,
-      data: notficationsData,
+      data: notificationsData,
       variables: {
         target: BannerNotificationTarget.Staff,
       },
@@ -83,7 +83,7 @@ function MyApp(props: AppProps<PageProps> & AppOwnProps): JSX.Element {
 type AppOwnProps = {
   currentUser: CurrentUserQuery["currentUser"];
   handlingData: HandlingDataQuery | null;
-  notficationsData: ShowNotificationsListQuery | null;
+  notificationsData: ShowNotificationsListQuery | null;
 };
 
 // Override the data fetching for the whole app
@@ -121,14 +121,14 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
       },
     });
 
-    return { ...ctx, currentUser: data.currentUser, handlingData, notficationsData: notificationsData };
+    return { ...ctx, currentUser: data.currentUser, handlingData, notificationsData: notificationsData };
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Error fetching current user:", error);
   }
 
-  return { ...ctx, currentUser: null, handlingData: null, notficationsData: null };
+  return { ...ctx, currentUser: null, handlingData: null, notificationsData: null };
 };
 
-// NOTE infered type problem so casting to FC
+// NOTE inferred type problem so casting to FC
 export default appWithTranslation(MyApp) as FC;
