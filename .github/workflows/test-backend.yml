@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - name: "Checkout code"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: "Set up python"
         id: setup-python
@@ -127,7 +127,7 @@ jobs:
 
     steps:
       - name: "Checkout code"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: "Set up python"
         id: setup-python
@@ -185,7 +185,7 @@ jobs:
 
     steps:
       - name: "Checkout code"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # Disable shallow cloning to improve relevancy of reporting in SonarCloud
           fetch-depth: 0
@@ -199,7 +199,7 @@ jobs:
           )" >> $GITHUB_OUTPUT
 
       - name: "Download coverage artifacts"
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           path: ./backend
           pattern: cov-${{ steps.artifact.outputs.artifact }}-*
