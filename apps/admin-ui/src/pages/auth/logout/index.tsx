@@ -6,7 +6,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-/* Page to redirect to the front page after a succesful logout
+/* Page to redirect to the front page after a successful logout
  * TODO might be able to replace this with middleware
  * */
 export default function LogoutPage({ redirectUrl }: Props) {
