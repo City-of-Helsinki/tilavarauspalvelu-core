@@ -32,6 +32,7 @@ export function SearchButton({ isLoading = false, labelKey = "filters:searchButt
         variant={ButtonVariant.Primary}
         size={ButtonSize.Medium}
         type="submit"
+        data-testid="searchButton"
       >
         {t(labelKey)}
       </Button>
