@@ -17,20 +17,10 @@ from django.core.signals import got_request_exception
 from django.db.models.signals import m2m_changed, post_delete, post_save, pre_save
 from django.dispatch import receiver
 from easy_thumbnails.files import get_thumbnailer
-from graphene_django_extensions.errors import (
-    GQLCreatePermissionDeniedError,
-    GQLDeletePermissionDeniedError,
-    GQLFieldPermissionDeniedError,
-    GQLFilterPermissionDeniedError,
-    GQLMutationPermissionDeniedError,
-    GQLNodePermissionDeniedError,
-    GQLNotFoundError,
-    GQLUpdatePermissionDeniedError,
-    GQLValidationError,
-)
 from rest_framework.exceptions import ValidationError
 from sentry_sdk.integrations.django import _got_request_exception  # noqa: PLC2701
 from social_core.exceptions import AuthCanceled, AuthFailed, AuthStateForbidden, AuthStateMissing, AuthTokenError
+from undine.exceptions import GraphQLModelNotFoundError, GraphQLPermissionError, GraphQLValidationError
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import (
@@ -298,30 +288,19 @@ if sentry_disconnected:
 
         # Validation errors
 
-        if isinstance(exception, ValidationError | GQLValidationError):
+        if isinstance(exception, ValidationError | GraphQLValidationError):
             # No need to log these as they are handled errors
             return
 
         # Permission errors
 
-        if isinstance(
-            exception,
-            (
-                GQLNodePermissionDeniedError
-                | GQLFilterPermissionDeniedError
-                | GQLCreatePermissionDeniedError
-                | GQLUpdatePermissionDeniedError
-                | GQLDeletePermissionDeniedError
-                | GQLMutationPermissionDeniedError
-                | GQLFieldPermissionDeniedError
-            ),
-        ):
+        if isinstance(exception, GraphQLPermissionError):
             # No need to log these as they are handled errors
             return
 
         # Not found errors
 
-        if isinstance(exception, GQLNotFoundError):
+        if isinstance(exception, GraphQLModelNotFoundError):
             msg = "Resource not found"
             SentryLogger.log_message(msg, details=str(exception), level="info")
             return
