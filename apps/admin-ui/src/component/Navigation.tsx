@@ -238,6 +238,8 @@ function NavigationLink({
   };
 
   const routesWithPrefix = routes.map((route) => `${PUBLIC_URL}${route}`);
+  const excludesWithPrefix = exclude?.map((route) => `${PUBLIC_URL}${route}`);
+  const isActive = checkActive(pathname, routesWithPrefix, exact, excludesWithPrefix);
 
   return (
     <Header.ActionBarSubItem
@@ -246,10 +248,10 @@ function NavigationLink({
       href={routesWithPrefix[0]}
       label={t(title)}
       aria-label={t(title)}
-      className={checkActive(pathname, routesWithPrefix, exact, exclude) ? "active" : ""}
+      className={isActive ? "active" : ""}
       notificationBubbleAriaLabel={shouldDisplayCount ? "Määrä" : undefined}
       notificationBubbleContent={shouldDisplayCount ? count?.toString() : undefined}
-      aria-current={checkActive(pathname, routesWithPrefix, exact, exclude)}
+      aria-current={isActive}
     />
   );
 }
