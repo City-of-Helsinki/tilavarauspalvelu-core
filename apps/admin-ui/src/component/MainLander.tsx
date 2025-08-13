@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { signIn } from "common/src/browserHelpers";
@@ -8,6 +8,7 @@ import { breakpoints } from "common/src/const";
 import { HERO_IMAGE_URL } from "@/common/const";
 import { KorosHeading, Heading } from "./KorosHeading";
 import { getLocalizationLang } from "common/src/helpers";
+import { useRouter } from "next/router";
 
 const LoginBtn = styled(Button)`
   --background-color: var(--color-white);
@@ -44,6 +45,15 @@ const Ingress = styled(H2)`
 
 export function MainLander({ apiBaseUrl }: Readonly<{ apiBaseUrl: string }>) {
   const { t, i18n } = useTranslation();
+
+  // Redirect to root url if not already there, useful e.g. in /auth/logout page
+  const router = useRouter();
+  useEffect(() => {
+    if (router.pathname !== "/") {
+      router.replace("/");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
