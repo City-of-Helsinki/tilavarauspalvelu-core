@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.utils.functional import classproperty
-from graphene_django_extensions.utils import get_nested
 from requests import HTTPError
 from rest_framework.status import HTTP_200_OK
 from social_django.models import DjangoStorage
@@ -18,6 +17,7 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceRequestError
+from utils.utils import get_nested
 
 from .exceptions import HelsinkiProfileError
 from .parsers import ProfileDataParser
