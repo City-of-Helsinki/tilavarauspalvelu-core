@@ -7,16 +7,14 @@ import { BannerNotificationsList } from "common/src/components";
 import { BannerNotificationTarget } from "@gql/gql-types";
 import { ScrollToTop } from "@/component/ScrollToTop";
 import { Navigation } from "./Navigation";
-import { MainLander } from "./MainLander";
 import { ToastContainer } from "common/src/components/toast";
 import { useModal } from "@/context/ModalContext";
-import { useSession } from "@/hooks";
-import { hasAnyPermission } from "@/modules/permissionHelper";
 import { mainStyles } from "common/styled";
+import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 
 type Props = {
   apiBaseUrl: string;
-  children: React.ReactNode;
+  children: React.ReactElement;
 };
 
 const Content = styled.main`
@@ -31,22 +29,16 @@ const FallbackComponent = (err: unknown) => {
 };
 
 export default function PageWrapper({ apiBaseUrl, children }: Props): JSX.Element {
-  const { user } = useSession();
-  const hasAccess = hasAnyPermission(user);
   const { modalContent } = useModal();
 
   return (
     <ErrorBoundary FallbackComponent={(e) => FallbackComponent(e)}>
       <Navigation apiBaseUrl={apiBaseUrl} />
       <Content>
-        {hasAccess ? (
-          <>
-            <BannerNotificationsList target={BannerNotificationTarget.Staff} />
-            {children}
-          </>
-        ) : (
-          <MainLander apiBaseUrl={apiBaseUrl} />
-        )}
+        <AuthorizationChecker apiUrl={apiBaseUrl}>
+          <BannerNotificationsList target={BannerNotificationTarget.Staff} />
+          {children}
+        </AuthorizationChecker>
         <ToastContainer />
       </Content>
       <ScrollToTop />
