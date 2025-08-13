@@ -5,10 +5,11 @@ from typing import TYPE_CHECKING
 
 import pytest
 import stamina
+from pytest_undine.client import GraphQLClient
 from rest_framework.test import APIClient
 
 from tests.factories._base import FakerEN, FakerFI, FakerSV
-from tests.helpers import GraphQLClient, patch_method
+from tests.helpers import patch_method
 
 if TYPE_CHECKING:
     from _pytest.mark import Mark

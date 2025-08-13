@@ -1,5 +1,3 @@
-# type: EmailType.SEASONAL_BOOKING_DENIED_SERIES
-
 from __future__ import annotations
 
 from inspect import cleandoc

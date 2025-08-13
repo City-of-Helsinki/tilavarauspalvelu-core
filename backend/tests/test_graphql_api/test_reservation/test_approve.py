@@ -34,7 +34,7 @@ def test_reservation__approve__free(graphql):
 
     graphql.login_with_superuser()
     data = get_approve_data(reservation)
-    response = graphql(APPROVE_MUTATION, input_data=data)
+    response = graphql(APPROVE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -58,7 +58,7 @@ def test_reservation__approve__paid__on_site(graphql):
     graphql.login_with_superuser()
     data = get_approve_data(reservation)
     data["price"] = "10.59"
-    response = graphql(APPROVE_MUTATION, input_data=data)
+    response = graphql(APPROVE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -85,7 +85,7 @@ def test_reservation__approve__paid__in_webshop(graphql):
 
     graphql.login_with_superuser()
     data = get_approve_data(reservation, price="10.59")
-    response = graphql(APPROVE_MUTATION, input_data=data)
+    response = graphql(APPROVE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -136,7 +136,7 @@ def test_reservation__approve__paid__in_webshop__close_to_begin_date(graphql):
 
     graphql.login_with_superuser()
     data = get_approve_data(reservation, price="10.59")
-    response = graphql(APPROVE_MUTATION, input_data=data)
+    response = graphql(APPROVE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -167,7 +167,7 @@ def test_reservation__approve__paid__in_webshop__paid_on_site_since_begin_too_cl
 
     graphql.login_with_superuser()
     data = get_approve_data(reservation, price="10.59")
-    response = graphql(APPROVE_MUTATION, input_data=data)
+    response = graphql(APPROVE_MUTATION, variables={"input": data})
 
     assert EmailService.send_reservation_approved_email.called is True
     assert EmailService.send_reservation_confirmed_staff_notification_email.called is True
@@ -208,7 +208,7 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__with_
 
     graphql.login_with_superuser()
     data = get_approve_data(reservation, price="10.59")
-    response = graphql(APPROVE_MUTATION, input_data=data)
+    response = graphql(APPROVE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -244,10 +244,9 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__diffe
 
     graphql.login_with_superuser()
     data = get_approve_data(reservation, price="10.59")
-    response = graphql(APPROVE_MUTATION, input_data=data)
+    response = graphql(APPROVE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation already has a paid payment order with a different price."]
+    assert response.error_message(0) == "Reservation already has a paid payment order with a different price."
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
@@ -273,7 +272,7 @@ def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online(gr
 
     graphql.login_with_superuser()
     data = get_approve_data(reservation, price="10.59")
-    response = graphql(APPROVE_MUTATION, input_data=data)
+    response = graphql(APPROVE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -312,7 +311,7 @@ def test_reservation__approve__pindora_api__call_succeeds(graphql):
 
     graphql.login_with_superuser()
     data = get_approve_data(reservation)
-    response = graphql(APPROVE_MUTATION, input_data=data)
+    response = graphql(APPROVE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -341,7 +340,7 @@ def test_reservation__approve__pindora_api__call_fails(graphql):
 
     graphql.login_with_superuser()
     data = get_approve_data(reservation)
-    response = graphql(APPROVE_MUTATION, input_data=data)
+    response = graphql(APPROVE_MUTATION, variables={"input": data})
 
     # Request is still successful, even if Pindora API call fails
     assert response.has_errors is False, response.errors
@@ -369,10 +368,9 @@ def test_reservation__approve__no_pricing(graphql):
 
     graphql.login_with_superuser()
     data = get_approve_data(reservation, price="10.59")
-    response = graphql(APPROVE_MUTATION, input_data=data)
+    response = graphql(APPROVE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["No pricing found for reservation's begin date."]
+    assert response.error_message(0) == "No pricing found for reservation's begin date."
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
@@ -393,10 +391,9 @@ def test_reservation__approve__no_payment_product_if_paid_online(graphql):
 
     graphql.login_with_superuser()
     data = get_approve_data(reservation, price="10.59")
-    response = graphql(APPROVE_MUTATION, input_data=data)
+    response = graphql(APPROVE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation unit is missing payment product"]
+    assert response.error_message(0) == "Reservation unit is missing payment product"
 
 
 def test_reservation__approve__status_not_requires_handling(graphql):
@@ -409,10 +406,9 @@ def test_reservation__approve__status_not_requires_handling(graphql):
 
     graphql.login_with_superuser()
     data = get_approve_data(reservation)
-    response = graphql(APPROVE_MUTATION, input_data=data)
+    response = graphql(APPROVE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation cannot be approved based on its state"]
+    assert response.error_message(0) == "Reservation cannot be approved based on its state"
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CREATED
@@ -429,7 +425,7 @@ def test_reservation__approve__price_missing(graphql):
     graphql.login_with_superuser()
     input_data = get_approve_data(reservation)
     input_data.pop("price")
-    response = graphql(APPROVE_MUTATION, input_data=input_data)
+    response = graphql(APPROVE_MUTATION, variables={"input": input_data})
 
     assert response.has_errors is True
 
@@ -448,7 +444,7 @@ def test_reservation__approve__handling_details_missing(graphql):
     graphql.login_with_superuser()
     input_data = get_approve_data(reservation)
     input_data.pop("handlingDetails")
-    response = graphql(APPROVE_MUTATION, input_data=input_data)
+    response = graphql(APPROVE_MUTATION, variables={"input": input_data})
 
     assert response.has_errors is True
 
@@ -467,7 +463,7 @@ def test_reservation__approve__empty_handling_details(graphql):
     graphql.login_with_superuser()
     data = get_approve_data(reservation)
     data["handlingDetails"] = ""
-    response = graphql(APPROVE_MUTATION, input_data=data)
+    response = graphql(APPROVE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 

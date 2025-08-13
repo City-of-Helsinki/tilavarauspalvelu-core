@@ -4,15 +4,9 @@ from typing import TYPE_CHECKING
 
 import pytest
 from freezegun import freeze_time
-from graphql_relay import to_global_id
+from undine.relay import to_global_id
 
-from tilavarauspalvelu.enums import (
-    AccessType,
-    RejectionReadinessChoice,
-    ReservationStateChoice,
-    ReservationTypeChoice,
-    Weekday,
-)
+from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.keyless_entry.typing import (
@@ -32,8 +26,6 @@ from tests.factories import (
 )
 from tests.helpers import patch_method
 
-from .helpers import reservation_series_many_query, reservation_series_single_query
-
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationSeries
 
@@ -41,131 +33,6 @@ if TYPE_CHECKING:
 pytestmark = [
     pytest.mark.django_db,
 ]
-
-
-def test_reservation_series__query(graphql):
-    reservation_series = ReservationSeriesFactory.create()
-    graphql.login_with_superuser()
-
-    fields = """
-        pk
-        extUuid
-        name
-        description
-        beginDate
-        endDate
-        beginTime
-        endTime
-        recurrenceInDays
-        weekdays
-        createdAt
-        shouldHaveActiveAccessCode
-        accessType
-    """
-    query = reservation_series_many_query(fields=fields)
-    response = graphql(query)
-
-    assert response.has_errors is False
-
-    assert len(response.edges) == 1
-    assert response.node(0) == {
-        "pk": reservation_series.pk,
-        "extUuid": str(reservation_series.ext_uuid),
-        "name": reservation_series.name,
-        "description": reservation_series.description,
-        "beginDate": reservation_series.begin_date.isoformat(),
-        "endDate": reservation_series.end_date.isoformat(),
-        "beginTime": reservation_series.begin_time.isoformat(),
-        "endTime": reservation_series.end_time.isoformat(),
-        "recurrenceInDays": reservation_series.recurrence_in_days,
-        "weekdays": [Weekday.MONDAY.value],
-        "createdAt": reservation_series.created_at.isoformat(),
-        "shouldHaveActiveAccessCode": False,
-        "accessType": AccessType.UNRESTRICTED.value,
-    }
-
-
-def test_reservation_series__query__relations(graphql):
-    reservation_series = ReservationSeriesFactory.create(
-        reservations__name="foo",
-        age_group__minimum=18,
-        age_group__maximum=30,
-        rejected_occurrences__rejection_reason=RejectionReadinessChoice.INTERVAL_NOT_ALLOWED,
-        allocated_time_slot__day_of_the_week=Weekday.MONDAY,
-    )
-    graphql.login_with_superuser()
-
-    fields = """
-        pk
-        user {
-            email
-        }
-        ageGroup {
-            minimum
-            maximum
-        }
-        reservationUnit {
-            nameFi
-        }
-        reservations {
-            pk
-            name
-        }
-        rejectedOccurrences {
-            pk
-            beginDatetime
-            endDatetime
-            rejectionReason
-            createdAt
-        }
-        allocatedTimeSlot {
-            pk
-            beginTime
-            endTime
-        }
-    """
-    query = reservation_series_many_query(fields=fields)
-    response = graphql(query)
-
-    assert response.has_errors is False
-
-    reservation = reservation_series.reservations.first()
-    occurrence = reservation_series.rejected_occurrences.first()
-
-    assert len(response.edges) == 1
-    assert response.node(0) == {
-        "pk": reservation_series.pk,
-        "user": {
-            "email": reservation_series.user.email,
-        },
-        "ageGroup": {
-            "minimum": reservation_series.age_group.minimum,
-            "maximum": reservation_series.age_group.maximum,
-        },
-        "reservationUnit": {
-            "nameFi": reservation_series.reservation_unit.name_fi,
-        },
-        "reservations": [
-            {
-                "pk": reservation.pk,
-                "name": reservation.name,
-            }
-        ],
-        "rejectedOccurrences": [
-            {
-                "pk": occurrence.pk,
-                "beginDatetime": occurrence.begin_datetime.isoformat(),
-                "endDatetime": occurrence.end_datetime.isoformat(),
-                "rejectionReason": occurrence.rejection_reason,
-                "createdAt": occurrence.created_at.isoformat(),
-            }
-        ],
-        "allocatedTimeSlot": {
-            "pk": reservation_series.allocated_time_slot.pk,
-            "beginTime": reservation_series.allocated_time_slot.begin_time.isoformat(),
-            "endTime": reservation_series.allocated_time_slot.end_time.isoformat(),
-        },
-    }
 
 
 def pindora_response(series: ReservationSeries) -> PindoraReservationSeriesResponse:
@@ -189,26 +56,29 @@ def pindora_response(series: ReservationSeries) -> PindoraReservationSeriesRespo
     )
 
 
-def pindora_query(series: ReservationSeries) -> str:
-    fields = """
-        pindoraInfo {
-            accessCode
-            accessCodeGeneratedAt
-            accessCodeIsActive
-            accessCodeKeypadUrl
-            accessCodePhoneNumber
-            accessCodeSmsNumber
-            accessCodeSmsMessage
-            accessCodeValidity {
-                reservationId
-                reservationSeriesId
-                accessCodeBeginsAt
-                accessCodeEndsAt
+PINDORA_QUERY = """
+    query ($id: ID!) {
+        node(id: $id) {
+            ... on ReservationSeriesNode {
+                pindoraInfo {
+                    accessCode
+                    accessCodeGeneratedAt
+                    accessCodeIsActive
+                    accessCodeKeypadUrl
+                    accessCodePhoneNumber
+                    accessCodeSmsNumber
+                    accessCodeSmsMessage
+                    accessCodeValidity {
+                        reservationId
+                        reservationSeriesId
+                        accessCodeBeginsAt
+                        accessCodeEndsAt
+                    }
+                }
             }
         }
-    """
-    global_id = to_global_id("ReservationSeriesNode", series.pk)
-    return reservation_series_single_query(fields=fields, id=global_id)
+    }
+"""
 
 
 @freeze_time(local_datetime(2022, 1, 1))
@@ -228,14 +98,14 @@ def test_reservation_series__query__pindora_info(graphql):
 
     graphql.login_with_superuser()
 
-    query = pindora_query(series)
+    global_id = to_global_id("ReservationSeriesNode", series.pk)
 
     with patch_method(PindoraClient.get_reservation_series, return_value=pindora_response(series)):
-        response = graphql(query)
+        response = graphql(PINDORA_QUERY, variables={"id": global_id})
 
     assert response.has_errors is False, response
 
-    assert response.first_query_object["pindoraInfo"] == {
+    assert response.results["pindoraInfo"] == {
         "accessCode": "1234",
         "accessCodeGeneratedAt": "2022-01-01T12:00:00+02:00",
         "accessCodeIsActive": True,
@@ -273,20 +143,20 @@ def test_reservation_series__query__pindora_info__access_code_not_active(graphql
     else:
         graphql.login_with_superuser()
 
-    query = pindora_query(series)
+    global_id = to_global_id("ReservationSeriesNode", series.pk)
 
     response = pindora_response(series)
     response["access_code_is_active"] = False
 
     with patch_method(PindoraClient.get_reservation_series, return_value=response):
-        response = graphql(query)
+        response = graphql(PINDORA_QUERY, variables={"id": global_id})
 
     assert response.has_errors is False, response
 
     if as_reservee:
-        assert response.first_query_object["pindoraInfo"] is None
+        assert response.results["pindoraInfo"] is None
     else:
-        assert response.first_query_object["pindoraInfo"] is not None
+        assert response.results["pindoraInfo"] is not None
 
 
 @freeze_time(local_datetime(2022, 1, 1))
@@ -304,14 +174,14 @@ def test_reservation_series__query__pindora_info__access_type_not_access_code(gr
 
     graphql.login_with_superuser()
 
-    query = pindora_query(series)
+    global_id = to_global_id("ReservationSeriesNode", series.pk)
 
     with patch_method(PindoraClient.get_reservation_series, return_value=pindora_response(series)):
-        response = graphql(query)
+        response = graphql(PINDORA_QUERY, variables={"id": global_id})
 
     assert response.has_errors is False, response
 
-    assert response.first_query_object["pindoraInfo"] is None
+    assert response.results["pindoraInfo"] is None
 
 
 @freeze_time(local_datetime(2022, 1, 1))
@@ -329,14 +199,14 @@ def test_reservation_series__query__pindora_info__pindora_call_fails(graphql):
 
     graphql.login_with_superuser()
 
-    query = pindora_query(series)
+    global_id = to_global_id("ReservationSeriesNode", series.pk)
 
     with patch_method(PindoraClient.get_reservation_series, side_effect=PindoraAPIError("Error")):
-        response = graphql(query)
+        response = graphql(PINDORA_QUERY, variables={"id": global_id})
 
     assert response.has_errors is False, response
 
-    assert response.first_query_object["pindoraInfo"] is None
+    assert response.results["pindoraInfo"] is None
 
 
 @freeze_time(local_datetime(2022, 1, 3))
@@ -354,14 +224,14 @@ def test_reservation_series__query__pindora_info__reservation_past(graphql):
 
     graphql.login_with_superuser()
 
-    query = pindora_query(series)
+    global_id = to_global_id("ReservationSeriesNode", series.pk)
 
     with patch_method(PindoraClient.get_reservation_series, return_value=pindora_response(series)):
-        response = graphql(query)
+        response = graphql(PINDORA_QUERY, variables={"id": global_id})
 
     assert response.has_errors is False, response
 
-    assert response.first_query_object["pindoraInfo"] is None
+    assert response.results["pindoraInfo"] is None
 
 
 @freeze_time(local_datetime(2022, 1, 1))
@@ -386,7 +256,7 @@ def test_reservation_series__query__pindora_info__in_application_section(graphql
 
     graphql.force_login(series.user)
 
-    query = pindora_query(series)
+    global_id = to_global_id("ReservationSeriesNode", series.pk)
 
     response = PindoraSeasonalBookingResponse(
         access_code="12345",
@@ -408,11 +278,11 @@ def test_reservation_series__query__pindora_info__in_application_section(graphql
     )
 
     with patch_method(PindoraClient.get_seasonal_booking, return_value=response):
-        response = graphql(query)
+        response = graphql(PINDORA_QUERY, variables={"id": global_id})
 
     assert response.has_errors is False, response.errors
 
-    assert response.first_query_object["pindoraInfo"] == {
+    assert response.results["pindoraInfo"] == {
         "accessCode": "12345",
         "accessCodeGeneratedAt": "2022-01-01T00:00:00+02:00",
         "accessCodeIsActive": True,
@@ -454,7 +324,7 @@ def test_reservation_series__query__pindora_info__in_application_section__not_se
 
     graphql.force_login(series.user)
 
-    query = pindora_query(series)
+    global_id = to_global_id("ReservationSeriesNode", series.pk)
 
     response = PindoraSeasonalBookingResponse(
         access_code="12345",
@@ -476,8 +346,8 @@ def test_reservation_series__query__pindora_info__in_application_section__not_se
     )
 
     with patch_method(PindoraClient.get_seasonal_booking, return_value=response):
-        response = graphql(query)
+        response = graphql(PINDORA_QUERY, variables={"id": global_id})
 
     assert response.has_errors is False, response.errors
 
-    assert response.first_query_object["pindoraInfo"] is None
+    assert response.results["pindoraInfo"] is None

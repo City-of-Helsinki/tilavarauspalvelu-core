@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 
 import pytest
+from pytest_undine.query_logging import capture_database_queries
 
 from tilavarauspalvelu.enums import Weekday
 from tilavarauspalvelu.models import AllocatedTimeSlot, ReservationUnitHierarchy
@@ -55,7 +56,7 @@ def test_allocated_time_slot__allocated_time_of_week__day_of_the_week_number():
     assert allocation.day_of_the_week_number == 7
 
 
-def test_allocated_time_slot__affecting_allocations(query_counter):
+def test_allocated_time_slot__affecting_allocations():
     parent_space = SpaceFactory.create()
     common_space = SpaceFactory.create(parent=parent_space)
 
@@ -115,8 +116,8 @@ def test_allocated_time_slot__affecting_allocations(query_counter):
 
     ReservationUnitHierarchy.refresh()
 
-    with query_counter() as counter:
-        allocations = AllocatedTimeSlot.objects.affecting_allocations(
+    with capture_database_queries() as counter:
+        allocations = AllocatedTimeSlot.objects.all().affecting_allocations(
             reservation_unit=common_unit.pk,
             begin_date=period_begin,
             end_date=period_end,

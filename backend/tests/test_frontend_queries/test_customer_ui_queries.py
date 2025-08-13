@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 from graphql import OperationType
-from graphql_relay import to_global_id
+from undine.relay import to_global_id
 
 from tilavarauspalvelu.enums import BannerNotificationTarget
 from tilavarauspalvelu.models import ReservationUnitHierarchy

@@ -25,14 +25,14 @@ def test_delete_space(graphql):
 
     # when:
     # - User tries to delete the space
-    response = graphql(DELETE_MUTATION, input_data={"pk": pk})
+    response = graphql(DELETE_MUTATION, variables={"input": {"pk": pk}})
 
     # then:
     # - Response contains no errors
     # - Response implies the space was deleted
     # - Space is not found in the database
     assert response.has_errors is False, response
-    assert response.first_query_object["deleted"] is True
+
     assert Space.objects.filter(pk=pk).exists() is False
 
 
@@ -57,11 +57,12 @@ def test_space_not_deleted_because_in_active_application_round(graphql, status):
 
     # when:
     # - User tries to delete the space
-    response = graphql(DELETE_MUTATION, input_data={"pk": pk})
+    response = graphql(DELETE_MUTATION, variables={"input": {"pk": pk}})
 
     # then:
     # - Response contains no errors
     # - The space is still in the database
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Space occurs in active application round."]
+
+    assert response.error_message(0) == "Space occurs in active application round."
+
     assert Space.objects.filter(pk=pk).exists() is True

@@ -26,9 +26,9 @@ def test_reservation_series__regular_user(graphql):
     data = get_minimal_add_data(reservation_series)
 
     graphql.login_with_regular_user()
-    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, input_data=data)
+    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "No permission to update."
+    assert response.error_message(0) == "No permission to access reservation series."
 
 
 @freeze_time(local_datetime(2024, 1, 1))
@@ -42,7 +42,7 @@ def test_reservation_series__unit_admin(graphql):
     user = UserFactory.create_with_unit_role(units=[reservation_series.reservation_unit.unit])
 
     graphql.force_login(user)
-    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, input_data=data)
+    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is False
 
@@ -60,7 +60,7 @@ def test_reservation_series__general_admin(graphql):
     user = UserFactory.create_with_general_role()
 
     graphql.force_login(user)
-    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, input_data=data)
+    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is False
 

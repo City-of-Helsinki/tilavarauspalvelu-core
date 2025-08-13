@@ -4,13 +4,13 @@ import datetime
 from typing import Any, NamedTuple
 
 import pytest
-from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import HaukiResourceState
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIOpeningHoursResponseTime
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from utils.date_utils import DEFAULT_TIMEZONE
 
+from tests.helpers import parametrize_helper
 from tests.test_integrations.test_hauki.test_reservable_time_spans_client import _get_date
 
 

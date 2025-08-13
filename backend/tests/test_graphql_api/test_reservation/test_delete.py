@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from unittest import mock
+from unittest.mock import patch
 
 import pytest
 from django.test import override_settings
@@ -34,7 +34,7 @@ def test_reservation__delete__waiting_for_payment__can_be_deleted(graphql):
 
     graphql.login_with_superuser()
     data = get_delete_data(reservation)
-    response = graphql(DELETE_MUTATION, input_data=data)
+    response = graphql(DELETE_MUTATION, variables={"input": data})
 
     assert VerkkokauppaAPIClient.get_payment.called is False
     assert response.has_errors is False, response.errors
@@ -55,7 +55,7 @@ def test_reservation__delete__waiting_for_payment__can_be_deleted(graphql):
     ],
 )
 def test_reservation__delete__draft__call_webshop_cancel(graphql, order_status):
-    VerkkokauppaAPIClient.cancel_order.return_value = OrderFactory(status=order_status.value.lower())
+    VerkkokauppaAPIClient.cancel_order.return_value = OrderFactory.create(status=order_status.value.lower())
 
     reservation = ReservationFactory.create_for_delete(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
     payment_order = PaymentOrderFactory.create(
@@ -64,7 +64,7 @@ def test_reservation__delete__draft__call_webshop_cancel(graphql, order_status):
 
     graphql.login_with_superuser()
     data = get_delete_data(reservation)
-    response = graphql(DELETE_MUTATION, input_data=data)
+    response = graphql(DELETE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
     assert Reservation.objects.filter(pk=reservation.pk).exists() is False
@@ -88,7 +88,7 @@ def test_reservation__delete__cancelled__dont_call_webshop_cancel_when_order_is_
 
     graphql.login_with_superuser()
     data = get_delete_data(reservation)
-    response = graphql(DELETE_MUTATION, input_data=data)
+    response = graphql(DELETE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
     assert Reservation.objects.filter(pk=reservation.pk).exists() is False
@@ -117,7 +117,7 @@ def test_reservation__delete__webshop_error__log_error_on_cancel_order_failure_b
 
     graphql.login_with_superuser()
     data = get_delete_data(reservation)
-    response = graphql(DELETE_MUTATION, input_data=data)
+    response = graphql(DELETE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
     assert Reservation.objects.filter(pk=reservation.pk).exists() is False
@@ -135,12 +135,11 @@ def test_reservation__delete__confirmed__cannot_delete_when_status_not_created_n
 
     graphql.login_with_superuser()
     data = get_delete_data(reservation)
-    response = graphql(DELETE_MUTATION, input_data=data)
+    response = graphql(DELETE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == [
+    assert response.error_message(0) == (
         "Reservation which is not in 'CREATED' or 'WAITING_FOR_PAYMENT' state cannot be deleted."
-    ]
+    )
     assert Reservation.objects.filter(pk=reservation.pk).exists() is True
 
 
@@ -155,10 +154,9 @@ def test_reservation__delete__reservation_is_in_draft_state_but_paid_in_verkkoka
 
     graphql.login_with_superuser()
     data = get_delete_data(reservation)
-    response = graphql(DELETE_MUTATION, input_data=data)
+    response = graphql(DELETE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation which is paid cannot be deleted."]
+    assert response.error_message(0) == "Reservation which is paid cannot be deleted."
     assert Reservation.objects.filter(pk=reservation.pk).exists() is True
 
     assert VerkkokauppaAPIClient.get_payment.called is True
@@ -180,7 +178,7 @@ def test_reservation__delete__mock_verkkokauppa(graphql):
 
     graphql.login_with_superuser()
     data = get_delete_data(reservation)
-    response = graphql(DELETE_MUTATION, input_data=data)
+    response = graphql(DELETE_MUTATION, variables={"input": data})
 
     payment_order.refresh_from_db()
 
@@ -198,7 +196,7 @@ def test_reservation__delete__delete_from_pindora__call_succeeds(graphql):
 
     graphql.login_with_superuser()
     data = get_delete_data(reservation)
-    response = graphql(DELETE_MUTATION, input_data=data)
+    response = graphql(DELETE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -215,12 +213,12 @@ def test_reservation__delete__delete_from_pindora__call_fails_runs_task(graphql)
     graphql.login_with_superuser()
     data = get_delete_data(reservation)
 
-    path = "tilavarauspalvelu.api.graphql.types.reservation.mutations."
+    path = "tilavarauspalvelu.api.graphql.types.reservation.mutations.delete_reservation."
     path += delete_pindora_reservation_task.__name__
     path += ".delay"
 
-    with mock.patch(path) as task:
-        response = graphql(DELETE_MUTATION, input_data=data)
+    with patch(path) as task:
+        response = graphql(DELETE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 

@@ -50,7 +50,7 @@ def test_staff_repair_access_code(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -82,7 +82,7 @@ def test_staff_repair_access_code__was_active(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -111,10 +111,9 @@ def test_staff_repair_access_code__access_type_not_access_code(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation access type does not use access codes."]
+    assert response.error_message(0) == "Reservation access type does not use access codes."
 
 
 def test_staff_repair_access_code__in_series(graphql):
@@ -134,10 +133,9 @@ def test_staff_repair_access_code__in_series(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation cannot be in a reservation series."]
+    assert response.error_message(0) == "Reservation cannot be in a reservation series."
 
 
 @patch_method(PindoraService.sync_access_code)
@@ -164,7 +162,7 @@ def test_staff_repair_access_code__ongoing(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
     assert EmailService.send_reservation_access_code_added_email.call_count == 1
@@ -187,10 +185,9 @@ def test_staff_repair_access_code__has_ended(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation has already ended."]
+    assert response.error_message(0) == "Reservation has already ended."
 
 
 @patch_method(PindoraService.sync_access_code, side_effect=PindoraAPIError("Pindora Error"))
@@ -210,9 +207,8 @@ def test_staff_repair_access_code__pindora_call_fails(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Pindora Error"]
+    assert response.error_message(0) == "Pindora Error"
 
     assert PindoraService.sync_access_code.call_count == 1

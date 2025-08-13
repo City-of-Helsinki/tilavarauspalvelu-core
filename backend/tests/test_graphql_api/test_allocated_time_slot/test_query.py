@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pytest
-from graphene_django_extensions.testing import build_query
 
 from tilavarauspalvelu.models import ReservationUnitHierarchy
 
@@ -51,6 +50,8 @@ def test_allocated_time_slot__query__all_fields(graphql):
     query = allocations_query(fields=fields)
     response = graphql(query)
 
+    assert response.has_errors is False, response.errors
+
     # then:
     # - The response contains the selected fields from the allocated time slots
     assert len(response.edges) == 1
@@ -87,28 +88,39 @@ def test_affecting_allocated_time_slots__query(graphql):
 
     graphql.login_with_superuser()
 
-    fields = """
-        pk
-        dayOfTheWeek
-        beginTime
-        endTime
-    """
-
     # when:
     # - User tries to query timeslots that affect the given reservation unit
-    query = build_query(
-        "affectingAllocatedTimeSlots",
-        fields=fields,
-        reservation_unit=allocation.reservation_unit_option.reservation_unit.pk,
-        begin_date=allocation.reservation_unit_option.application_section.reservations_begin_date.isoformat(),
-        end_date=allocation.reservation_unit_option.application_section.reservations_end_date.isoformat(),
-    )
-    response = graphql(query)
+    query = """
+        query (
+            $reservationUnit: Int!
+            $beginDate: Date!
+            $endDate: Date!
+        ) {
+            affectingAllocatedTimeSlots(
+                reservationUnit: $reservationUnit
+                beginDate: $beginDate
+                endDate: $endDate
+            ) {
+                pk
+                dayOfTheWeek
+                beginTime
+                endTime
+            }
+        }
+    """
+
+    variables = {
+        "reservationUnit": allocation.reservation_unit_option.reservation_unit.pk,
+        "beginDate": allocation.reservation_unit_option.application_section.reservations_begin_date.isoformat(),
+        "endDate": allocation.reservation_unit_option.application_section.reservations_end_date.isoformat(),
+    }
+
+    response = graphql(query, variables=variables)
 
     # then:
     # - The response contains the allocations that affect the given reservation unit
-    assert len(response.first_query_object) == 1
-    assert response.first_query_object[0] == {
+    assert len(response.results) == 1
+    assert response.results[0] == {
         "pk": allocation.pk,
         "dayOfTheWeek": allocation.day_of_the_week,
         "beginTime": allocation.begin_time.isoformat(),
