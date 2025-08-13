@@ -1,9 +1,11 @@
 # ruff: noqa: N802
 from __future__ import annotations
 
+import copy
 import os
 import zoneinfo
 from pathlib import Path
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 from env_config import Environment, values
@@ -71,9 +73,8 @@ class Common(Environment):
         "django_celery_beat",
         "django_celery_results",
         "django_extensions",
-        "django_filters",
         "easy_thumbnails",
-        "graphene_django",
+        "undine",
         "import_export",
         "mptt",
         "rangefilter",
@@ -386,14 +387,22 @@ class Common(Environment):
 
     PINDORA_MOCK_ENABLED = values.BooleanValue(default=False)
 
-    # --- Graphene settings ------------------------------------------------------------------------------------------
+    # --- Undine settings --------------------------------------------------------------------------------------------
 
-    GRAPHENE = {
-        "SCHEMA": "tilavarauspalvelu.api.graphql.schema.schema",
-        "MIDDLEWARE": [
-            "config.middleware.GraphQLSentryMiddleware",
-        ],
-    }
+    @classproperty
+    def UNDINE(cls) -> dict[str, Any]:
+        return {
+            "SCHEMA": "tilavarauspalvelu.api.graphql.schema.schema",
+            "MAX_QUERY_COMPLEXITY": 50,
+            "AUTOGENERATION": False,
+            "GRAPHIQL_ENABLED": cls.DEBUG,
+            "ALLOW_DID_YOU_MEAN_SUGGESTIONS": cls.DEBUG,
+            "ALLOW_INTROSPECTION_QUERIES": cls.DEBUG,
+            "FILE_UPLOAD_ENABLED": True,
+            "MIDDLEWARE": [
+                "config.middleware.graphql_sentry_middleware",
+            ],
+        }
 
     # --- Django REST Framework settings -----------------------------------------------------------------------------
 
@@ -503,7 +512,6 @@ class Common(Environment):
     REMOVE_EXPIRED_APPLICATIONS_OLDER_THAN_DAYS = 365
     TEXT_SEARCH_CACHE_TIME_DAYS = 30
     USER_IS_ADULT_AT_AGE = 18
-    MAXIMUM_SECTIONS_PER_APPLICATION = 100
 
     APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES = values.IntegerValue(default=10)
     ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS = values.IntegerValue(default=730)
@@ -520,10 +528,6 @@ class Common(Environment):
     ROBOT_TEST_DATA_CREATION_RATE_LIMIT_SECONDS = values.IntegerValue(default=60)
     ROBOT_TEST_DATA_RATE_LIMIT_KEY = "robot-test-data-create-view-rate-limit"
     ROBOT_TEST_DATA_LOCK_KEY = "robot-test-data-create-view-lock"
-
-    GRAPHENE_DJANGO_EXTENSIONS = {
-        "EXPERIMENTAL_REMOVE_TRANSLATION_BASE_FIELDS": True,
-    }
 
     # Allows faking membership to certain AD groups for testing automatic role assignment
     FAKE_SUPERUSER_AD_GROUPS = values.ListValue(default=[])
@@ -638,16 +642,6 @@ class Local(Common, overrides_from=LocalMixin):
     MOCK_VERKKOKAUPPA_API_ENABLED = values.BooleanValue(default=True)
     MOCK_VERKKOKAUPPA_FRONTEND_URL = values.StringValue(default="http://localhost:3000")
     MOCK_VERKKOKAUPPA_BACKEND_URL = values.StringValue(default="http://localhost:8000")
-
-    # --- Graphene settings ------------------------------------------------------------------------------------------
-
-    GRAPHENE = {
-        "SCHEMA": Common.GRAPHENE["SCHEMA"],
-        "MIDDLEWARE": [
-            "graphene_django.debug.DjangoDebugMiddleware",
-            "config.middleware.GraphQLErrorLoggingMiddleware",
-        ],
-    }
 
     # --- Celery settings --------------------------------------------------------------------------------------------
 
@@ -773,16 +767,6 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
 
     CELERY_TASK_ALWAYS_EAGER = True
 
-    # --- Graphene settings ------------------------------------------------------------------------------------------
-
-    GRAPHENE = {
-        "SCHEMA": Common.GRAPHENE["SCHEMA"],
-        "TESTING_ENDPOINT": "/graphql/",
-        "MIDDLEWARE": [
-            "config.middleware.GraphQLErrorLoggingMiddleware",
-        ],
-    }
-
     # --- Static file settings ---------------------------------------------------------------------------------------
 
     STORAGES = {
@@ -839,6 +823,18 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     # --- Redis settings ---------------------------------------------------------------------------------------------
 
     REDIS_URL = values.StringValue(default="redis://localhost:6379/0")
+
+    # --- Undine settings --------------------------------------------------------------------------------------------
+
+    @classproperty
+    def UNDINE(cls) -> dict[str, Any]:
+        common_settings = copy.deepcopy(super().UNDINE)
+        # We need to remove sentry middleware, as it sends the `got_request_exception` signal,
+        # which causes the testing client to raise an exception.
+        common_settings["MIDDLEWARE"].remove("config.middleware.graphql_sentry_middleware")
+        # Include error tracebacks for debugging
+        common_settings["INCLUDE_ERROR_TRACEBACK"] = True
+        return common_settings
 
     # --- Misc settings ----------------------------------------------------------------------------------------------
 

@@ -4,7 +4,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path, re_path, reverse
-from graphene_django_extensions import FileUploadGraphQLView
 
 from tilavarauspalvelu.api.gdpr.views import TilavarauspalveluGDPRAPIView
 from tilavarauspalvelu.api.rest.views import (
@@ -36,7 +35,7 @@ admin.site.each_context = lambda request: original_each_context(request) | {
 }
 
 urlpatterns = [
-    path("graphql/", FileUploadGraphQLView.as_view(graphiql=settings.DEBUG)),
+    path("", include("undine.http.urls")),
     path("admin/", admin.site.urls),
     path("v1/reservation_calendar/<int:pk>/", reservation_ical, name="reservation_calendar"),
     path(
