@@ -447,7 +447,7 @@ class EmailService:
     @staticmethod
     def send_seasonal_booking_application_round_in_allocation_emails() -> None:
         """Sends an email to all applicants when an application round has entered the allocation phase."""
-        applications = Application.objects.should_send_in_allocation_email().order_by("created_at")
+        applications = Application.objects.all().should_send_in_allocation_email().order_by("created_at")
         if not applications:
             msg = "Zero applications require the 'seasonal booking application round in allocation email' to be sent"
             SentryLogger.log_message(msg)
@@ -475,7 +475,7 @@ class EmailService:
     @staticmethod
     def send_seasonal_booking_application_round_handled_emails() -> None:
         """Sends an email to all applicants when an application round has its allocation results available."""
-        applications = Application.objects.should_send_handled_email().order_by("created_at")
+        applications = Application.objects.order_by("created_at").should_send_handled_email()
         if not applications:
             msg = "Zero applications require the 'seasonal booking application round handled email' to be sent"
             SentryLogger.log_message(msg)

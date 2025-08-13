@@ -1,11 +1,7 @@
-from __future__ import annotations
+import datetime
+from typing import Literal, TypedDict
 
-from typing import TYPE_CHECKING, Literal, TypedDict
-
-if TYPE_CHECKING:
-    import datetime
-
-    from tilavarauspalvelu.enums import LoginMethod
+from tilavarauspalvelu.enums import LoginMethod
 
 # Profile raw response
 
@@ -121,3 +117,7 @@ class UserProfileInfo(TypedDict):
     municipality_name: str | None
     login_method: LoginMethod
     is_strong_login: bool
+
+
+class PermissionCheckResult(TypedDict):
+    has_permission: bool
