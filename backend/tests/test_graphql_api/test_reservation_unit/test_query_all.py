@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pytest
-from graphene_django.settings import graphene_settings
 
 from tests.factories import ReservationUnitFactory, UserFactory
 from tests.test_graphql_api.test_reservation_unit.helpers import reservation_units_all_query
@@ -12,30 +11,16 @@ pytestmark = [
 ]
 
 
-def test_reservation_unit_all__no_pagination_limit(graphql):
-    graphene_settings.RELAY_CONNECTION_MAX_LIMIT = 1
-
-    ReservationUnitFactory.create_batch(2)
-    ReservationUnitFactory.create(is_archived=True)  # Should not be returned
-
-    graphql.login_with_superuser()
-    query = reservation_units_all_query(fields="pk nameFi nameEn nameSv")
-    response = graphql(query)
-
-    assert response.has_errors is False, response.errors
-    assert len(response.first_query_object) == 2
-
-
 def test_reservation_unit_all__filter__by_name_fi(graphql):
     reservation_unit = ReservationUnitFactory.create(name_fi="foo")
     ReservationUnitFactory.create(name_fi="bar")
 
-    query = reservation_units_all_query(nameFi="foo")
+    query = reservation_units_all_query(nameFiExact="foo")
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
-    assert len(response.first_query_object) == 1
-    assert response.first_query_object[0] == {"pk": reservation_unit.pk}
+    assert len(response.results) == 1
+    assert response.results[0] == {"pk": reservation_unit.pk}
 
 
 def test_reservation_unit_all__filter__only_with_permission__general_admin(graphql):
@@ -49,6 +34,6 @@ def test_reservation_unit_all__filter__only_with_permission__general_admin(graph
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
-    assert len(response.first_query_object) == 2
-    assert response.first_query_object[0] == {"pk": reservation_unit_1.pk}
-    assert response.first_query_object[1] == {"pk": reservation_unit_2.pk}
+    assert len(response.results) == 2
+    assert response.results[0] == {"pk": reservation_unit_1.pk}
+    assert response.results[1] == {"pk": reservation_unit_2.pk}

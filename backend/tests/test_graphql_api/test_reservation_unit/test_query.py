@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 
 import pytest
-from graphql_relay import to_global_id
+from undine.relay import to_global_id
 
 from tilavarauspalvelu.enums import (
     ReservationStateChoice,
@@ -31,7 +31,7 @@ from tests.factories import (
     UserFactory,
 )
 
-from .helpers import reservation_unit_query, reservation_units_query
+from .helpers import reservation_units_query
 
 # Applied to all tests
 pytestmark = [
@@ -46,12 +46,23 @@ def test_reservation_unit__single__query(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create()
+
     global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
-    query = reservation_unit_query(id=global_id)
-    response = graphql(query)
+
+    query = """
+        query ($id: ID!) {
+            node(id: $id) {
+                ... on ReservationUnitNode {
+                    pk
+                }
+            }
+        }
+    """
+
+    response = graphql(query, variables={"id": global_id})
 
     assert response.has_errors is False, response.errors
-    assert response.first_query_object == {"pk": reservation_unit.pk}
+    assert response.results == {"pk": reservation_unit.pk}
 
 
 def test_reservation_unit__single__query__authentication(graphql):
@@ -59,14 +70,23 @@ def test_reservation_unit__single__query__authentication(graphql):
 
     reservation_unit = ReservationUnitFactory.create()
 
-    fields = "authentication"
     global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
-    query = reservation_unit_query(fields=fields, id=global_id)
-    response = graphql(query)
+
+    query = """
+        query ($id: ID!) {
+            node(id: $id) {
+                ... on ReservationUnitNode {
+                    authentication
+                }
+            }
+        }
+    """
+
+    response = graphql(query, variables={"id": global_id})
 
     assert response.has_errors is False, response.errors
-    assert response.first_query_object == {
-        "authentication": reservation_unit.authentication.upper(),
+    assert response.results == {
+        "authentication": reservation_unit.authentication,
     }
 
 
@@ -75,13 +95,22 @@ def test_reservation_unit__single__query__reservation_blocks_whole_day(graphql):
 
     reservation_unit = ReservationUnitFactory.create(reservation_block_whole_day=True)
 
-    fields = "reservationBlockWholeDay"
     global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
-    query = reservation_unit_query(id=global_id, fields=fields)
-    response = graphql(query)
+
+    query = """
+        query ($id: ID!) {
+            node(id: $id) {
+                ... on ReservationUnitNode {
+                    reservationBlockWholeDay
+                }
+            }
+        }
+    """
+
+    response = graphql(query, variables={"id": global_id})
 
     assert response.has_errors is False
-    assert response.first_query_object == {
+    assert response.results == {
         "reservationBlockWholeDay": reservation_unit.reservation_block_whole_day,
     }
 
@@ -217,9 +246,9 @@ def test_reservation_unit__query__all_fields(graphql):
         "canApplyFreeOfCharge": reservation_unit.can_apply_free_of_charge,
         "allowReservationsWithoutOpeningHours": reservation_unit.allow_reservations_without_opening_hours,
         #
-        "authentication": reservation_unit.authentication.upper(),
-        "reservationStartInterval": reservation_unit.reservation_start_interval.upper(),
-        "reservationKind": reservation_unit.reservation_kind.upper(),
+        "authentication": reservation_unit.authentication,
+        "reservationStartInterval": reservation_unit.reservation_start_interval,
+        "reservationKind": reservation_unit.reservation_kind,
         "publishingState": reservation_unit.publishing_state,
         "reservationState": reservation_unit.reservation_state,
         "currentAccessType": reservation_unit.current_access_type,
@@ -293,16 +322,16 @@ def test_reservation_unit__query__all_to_one_relations(graphql):
             "name": reservation_unit.metadata_set.name,
         },
         "cancellationTerms": {
-            "termsType": reservation_unit.cancellation_terms.terms_type.upper(),
+            "termsType": reservation_unit.cancellation_terms.terms_type,
         },
         "serviceSpecificTerms": {
-            "termsType": reservation_unit.service_specific_terms.terms_type.upper(),
+            "termsType": reservation_unit.service_specific_terms.terms_type,
         },
         "pricingTerms": {
-            "termsType": reservation_unit.pricing_terms.terms_type.upper(),
+            "termsType": reservation_unit.pricing_terms.terms_type,
         },
         "paymentTerms": {
-            "termsType": reservation_unit.payment_terms.terms_type.upper(),
+            "termsType": reservation_unit.payment_terms.terms_type,
         },
         "paymentProduct": {
             "pk": str(reservation_unit.payment_product.pk),

@@ -20,17 +20,17 @@ def test_create_space(graphql):
     unit = UnitFactory.create()
 
     data = {
-        "name": "foo",
+        "nameFi": "foo",
         "unit": unit.pk,
     }
 
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(CREATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response
     assert Space.objects.count() == 1
 
 
-def test_create_space__name_is_required(graphql):
+def test_create_space__name_fi_is_required(graphql):
     graphql.login_with_superuser()
 
     unit = UnitFactory.create()
@@ -40,9 +40,9 @@ def test_create_space__name_is_required(graphql):
         "unit": unit.pk,
     }
 
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(CREATE_MUTATION, variables={"input": data})
 
-    assert response.error_message().startswith("Variable '$input'")
+    assert response.error_message(0) == "This field cannot be blank."
     assert Space.objects.count() == 0
 
 
@@ -52,12 +52,12 @@ def test_create_space__unit_is_required(graphql):
     UnitFactory.create()
 
     data = {
-        "name": "foo",
+        "nameFi": "foo",
     }
 
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(CREATE_MUTATION, variables={"input": data})
 
-    assert response.error_message().startswith("Variable '$input'")
+    assert response.error_message(0).startswith("Variable '$input'")
     assert Space.objects.count() == 0
 
 
@@ -68,12 +68,11 @@ def test_create_space__name_cannot_be_empty(graphql, value):
     unit = UnitFactory.create()
 
     data = {
-        "name": value,
+        "nameFi": value,
         "unit": unit.pk,
     }
 
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(CREATE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages("name") == ["This field may not be blank."]
+    assert response.error_message(0) == "This field cannot be blank."
     assert Space.objects.count() == 0

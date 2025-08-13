@@ -322,7 +322,7 @@ def test_frontend_queries__customer_ui__CreateImage(graphql, mock_png):
     variables = deepcopy(query_info.variables)
     variables["image"] = mock_png
     variables["reservationUnit"] = reservation_unit.pk
-    variables["imageType"] = ReservationUnitImageType.MAIN.value.upper()
+    variables["imageType"] = ReservationUnitImageType.MAIN
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -405,7 +405,7 @@ def test_frontend_queries__customer_ui__CreateResource(graphql):
     variables = deepcopy(query_info.variables)
     variables["input"] = {
         "name": "Resource",
-        "locationType": ResourceLocationType.MOVABLE.value.upper(),
+        "locationType": ResourceLocationType.MOVABLE,
     }
     assert_no_undefined_variables(variables)
 
@@ -972,7 +972,7 @@ def test_frontend_queries__customer_ui__UpdateImage(graphql):
 
     variables = deepcopy(query_info.variables)
     variables["pk"] = image.pk
-    variables["imageType"] = ReservationUnitImageType.OTHER.value.upper()
+    variables["imageType"] = ReservationUnitImageType.OTHER
     assert_no_undefined_variables(variables)
 
     query = query_info.query

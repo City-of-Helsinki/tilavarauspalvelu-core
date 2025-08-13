@@ -21,11 +21,11 @@ def test_regular_user_cannot_update_space(graphql):
 
     # when:
     # - User tries to update the space's name
-    response = graphql(UPDATE_MUTATION, input_data={"pk": space.pk, "nameFi": "bar"})
+    response = graphql(UPDATE_MUTATION, variables={"input": {"pk": space.pk, "nameFi": "bar"}})
 
     # then:
     # - The response has errors about permissions
-    assert response.error_message() == "No permission to update."
+    assert response.error_message(0) == "No permission to update a space"
 
 
 def test_unit_admin_can_update_space(graphql):
@@ -38,7 +38,7 @@ def test_unit_admin_can_update_space(graphql):
 
     # when:
     # - User tries to update the space's name
-    response = graphql(UPDATE_MUTATION, input_data={"pk": space.pk, "nameFi": "bar"})
+    response = graphql(UPDATE_MUTATION, variables={"input": {"pk": space.pk, "nameFi": "bar"}})
 
     # then:
     # - The response has no errors
@@ -56,11 +56,11 @@ def test_unit_admin_cannot_update_space_for_other_unit(graphql):
 
     # when:
     # - User tries to update the space's name
-    response = graphql(UPDATE_MUTATION, input_data={"pk": space.pk, "nameFi": "bar"})
+    response = graphql(UPDATE_MUTATION, variables={"input": {"pk": space.pk, "nameFi": "bar"}})
 
     # then:
     # - The response has errors about permissions
-    assert response.error_message() == "No permission to update."
+    assert response.error_message(0) == "No permission to update a space"
 
 
 def test_general_admin_can_update_space(graphql):
@@ -73,7 +73,7 @@ def test_general_admin_can_update_space(graphql):
 
     # when:
     # - User tries to update the space's name
-    response = graphql(UPDATE_MUTATION, input_data={"pk": space.pk, "nameFi": "bar"})
+    response = graphql(UPDATE_MUTATION, variables={"input": {"pk": space.pk, "nameFi": "bar"}})
 
     # then:
     # - The response has no errors

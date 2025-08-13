@@ -26,10 +26,11 @@ pytestmark = [
 )
 def test_reservation_series__create_series__general_role(graphql, role, has_permission):
     reservation_unit = ReservationUnitFactory.create()
-    user = graphql.login_user_with_role(role=role)
+    user = UserFactory.create_with_general_role(role=role)
+    graphql.force_login(user)
 
     data = get_minimal_series_data(reservation_unit, user)
-    response = graphql(CREATE_SERIES_MUTATION, input_data=data)
+    response = graphql(CREATE_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is not has_permission
 
@@ -50,6 +51,6 @@ def test_reservation_series__create_series__unit_role(graphql, role, has_permiss
 
     graphql.force_login(user)
     data = get_minimal_series_data(reservation_unit, user)
-    response = graphql(CREATE_SERIES_MUTATION, input_data=data)
+    response = graphql(CREATE_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is not has_permission

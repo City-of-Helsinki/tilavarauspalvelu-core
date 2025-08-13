@@ -12,10 +12,11 @@ from tilavarauspalvelu.enums import (
     ReserveeType,
     Weekday,
 )
-from tilavarauspalvelu.models import AgeGroup, ReservationStatistic
+from tilavarauspalvelu.models import ReservationStatistic
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import (
+    AgeGroupFactory,
     ReservationFactory,
     ReservationPurposeFactory,
     ReservationSeriesFactory,
@@ -37,7 +38,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
         allocated_time_slot__day_of_the_week=Weekday.MONDAY,
     )
     reservation = ReservationFactory.create(
-        age_group=AgeGroup.objects.create(minimum=18, maximum=30),
+        age_group=AgeGroupFactory.create(minimum=18, maximum=30),
         applying_for_free_of_charge=True,
         begins_at=datetime.datetime(2020, 1, 1, 12, 0, tzinfo=DEFAULT_TIMEZONE),
         description="movies&popcorn",

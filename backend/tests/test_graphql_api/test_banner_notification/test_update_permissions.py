@@ -4,7 +4,7 @@ import pytest
 
 from tilavarauspalvelu.enums import UserRoleChoice
 
-from tests.factories import BannerNotificationFactory
+from tests.factories import BannerNotificationFactory, UserFactory
 
 from .helpers import UPDATE_MUTATION
 
@@ -17,61 +17,59 @@ pytestmark = [
 def test_banner_notification__update__anonymous_user(graphql):
     notification = BannerNotificationFactory.create(draft=True, name="foo", message="bar")
 
-    response = graphql(
-        UPDATE_MUTATION,
-        input_data={
-            "pk": notification.pk,
-            "name": "1",
-            "message": "2",
-        },
-    )
+    input_data = {
+        "pk": notification.pk,
+        "name": "1",
+        "messageFi": "2",
+    }
 
-    assert response.error_message() == "No permission to update."
+    response = graphql(UPDATE_MUTATION, variables={"input": input_data})
+
+    assert response.error_message(0) == "No permission to update this banner notification."
 
 
 def test_banner_notification__update__regular_user(graphql):
     notification = BannerNotificationFactory.create(draft=True, name="foo", message="bar")
     graphql.login_with_regular_user()
 
-    response = graphql(
-        UPDATE_MUTATION,
-        input_data={
-            "pk": notification.pk,
-            "name": "1",
-            "message": "2",
-        },
-    )
+    input_data = {
+        "pk": notification.pk,
+        "name": "1",
+        "messageFi": "2",
+    }
 
-    assert response.error_message() == "No permission to update."
+    response = graphql(UPDATE_MUTATION, variables={"input": input_data})
+
+    assert response.error_message(0) == "No permission to update this banner notification."
 
 
 def test_banner_notification__update__no_perms(graphql):
     notification = BannerNotificationFactory.create(draft=True, name="foo", message="bar")
-    graphql.login_user_with_role(role=UserRoleChoice.VIEWER)
+    user = UserFactory.create_with_general_role(role=UserRoleChoice.VIEWER)
+    graphql.force_login(user)
 
-    response = graphql(
-        UPDATE_MUTATION,
-        input_data={
-            "pk": notification.pk,
-            "name": "1",
-            "message": "2",
-        },
-    )
+    input_data = {
+        "pk": notification.pk,
+        "name": "1",
+        "messageFi": "2",
+    }
 
-    assert response.error_message() == "No permission to update."
+    response = graphql(UPDATE_MUTATION, variables={"input": input_data})
+
+    assert response.error_message(0) == "No permission to update this banner notification."
 
 
 def test_banner_notification__update__notification_manager(graphql):
     notification = BannerNotificationFactory.create(draft=True, name="foo", message="bar")
-    graphql.login_user_with_role(role=UserRoleChoice.NOTIFICATION_MANAGER)
+    user = UserFactory.create_with_general_role(role=UserRoleChoice.NOTIFICATION_MANAGER)
+    graphql.force_login(user)
 
-    response = graphql(
-        UPDATE_MUTATION,
-        input_data={
-            "pk": notification.pk,
-            "name": "1",
-            "message": "2",
-        },
-    )
+    input_data = {
+        "pk": notification.pk,
+        "name": "1",
+        "messageFi": "2",
+    }
+
+    response = graphql(UPDATE_MUTATION, variables={"input": input_data})
 
     assert response.has_errors is False

@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
-from graphene_django_extensions.testing import build_mutation
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -30,6 +29,7 @@ from tests.factories import (
     UserFactory,
 )
 from tests.helpers import patch_method
+from tests.query_builder import build_mutation
 
 from .helpers import CONFIRM_MUTATION, get_confirm_data
 
@@ -55,7 +55,7 @@ def test_reservation__confirm__changes_state__confirmed(graphql, outbox):
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -83,7 +83,7 @@ def test_reservation__confirm__changes_state__requires_handling(graphql, outbox)
 
     graphql.login_with_superuser()
     input_data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=input_data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": input_data})
 
     assert response.has_errors is False, response.errors
 
@@ -113,7 +113,7 @@ def test_reservation__confirm__changes_state_to_requires_handling_on_subsidy_req
     graphql.login_with_superuser()
 
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -131,10 +131,9 @@ def test_reservation__confirm__fails_if_state_is_not_created(graphql):
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation cannot be changed anymore."]
+    assert response.error_message(0) == "Reservation cannot be changed anymore."
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.DENIED
@@ -145,7 +144,7 @@ def test_reservation__confirm__reservation_owner_can_confirm(graphql):
 
     graphql.force_login(reservation.user)
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -158,9 +157,9 @@ def test_reservation__confirm__regular_user_cannot_confirm(graphql):
 
     graphql.login_with_regular_user()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "No permission to update."
+    assert response.error_message(0) == "No permission to confirm reservation."
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CREATED
@@ -171,7 +170,7 @@ def test_reservation__confirm__updates_confirmed_at(graphql):
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -190,7 +189,7 @@ def test_reservation__confirm__succeeds_if_reservation_has_all_required_fields(g
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -209,10 +208,9 @@ def test_reservation__confirm__fails_if_any_required_field_are_missing(graphql):
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Value for required field 'reservee_email' is missing."]
+    assert response.error_message(0) == "Value for required field 'reservee_email' is missing."
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CREATED
@@ -227,7 +225,7 @@ def test_reservation__confirm__does_not_create_order_when_handling_is_required(g
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -247,7 +245,7 @@ def test_reservation__confirm__creates_local_order_when_payment_type_is_on_site(
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -276,7 +274,7 @@ def test_reservation__confirm__calls_verkkokauppa_api_when_payment_type_is_not_o
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -306,10 +304,9 @@ def test_reservation__confirm__does_not_save_when_api_call_fails(graphql):
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Upstream service call failed. Unable to confirm the reservation."]
+    assert response.error_message(0) == "Upstream service call failed. Unable to confirm the reservation."
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CREATED
@@ -323,7 +320,7 @@ def test_reservation__confirm__default_payment_type__on_site(graphql):
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -342,7 +339,7 @@ def test_reservation__confirm__default_payment_type__online(graphql):
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -369,7 +366,7 @@ def test_reservation__confirm__default_payment_type__online_or_invoice(graphql):
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -390,12 +387,11 @@ def test_reservation__confirm__cannot_confirm_if_order_exists(graphql):
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == [
+    assert response.error_message(0) == (
         "Reservation cannot be changed anymore because it is attached to a payment order"
-    ]
+    )
 
 
 def test_reservation__confirm__order_not_created_when_price_is_zero(graphql):
@@ -403,7 +399,7 @@ def test_reservation__confirm__order_not_created_when_price_is_zero(graphql):
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
     assert PaymentOrder.objects.count() == 0
@@ -417,12 +413,12 @@ def test_reservation__confirm__return_order_data(graphql):
 
     VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
 
-    fields = "state order { paymentType checkoutUrl }"
+    fields = "state paymentOrder { paymentType checkoutUrl }"
     query = build_mutation("confirmReservation", "ReservationConfirmMutation", fields=fields)
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(query, input_data=data)
+    response = graphql(query, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -430,9 +426,9 @@ def test_reservation__confirm__return_order_data(graphql):
 
     reservation.refresh_from_db()
 
-    assert response.first_query_object == {
+    assert response.results == {
         "state": reservation.state.upper(),
-        "order": {
+        "paymentOrder": {
             "checkoutUrl": "https://checkout.url",
             "paymentType": reservation.payment_order.payment_type,
         },
@@ -447,10 +443,9 @@ def test_reservation__confirm__payment_type_online_requires_payment_product(grap
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation unit is missing payment product"]
+    assert response.error_message(0) == "Reservation unit is missing payment product"
 
 
 def test_reservation__confirm__payment_type_onsite_doesnt_require_payment_product(graphql):
@@ -461,7 +456,7 @@ def test_reservation__confirm__payment_type_onsite_doesnt_require_payment_produc
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response
 
@@ -476,7 +471,7 @@ def test_reservation__confirm__without_price_and_with_free_pricing_does_not_requ
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -496,7 +491,7 @@ def test_reservation__confirm__pindora_api__call_succeeds(graphql):
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -517,7 +512,7 @@ def test_reservation__confirm__pindora_api__call_fails(graphql):
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
+    response = graphql(CONFIRM_MUTATION, variables={"input": data})
 
     # Request is still successful, even if Pindora API call fails
     assert response.has_errors is False, response.errors

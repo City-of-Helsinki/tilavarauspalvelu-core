@@ -1,5 +1,3 @@
-# type: EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_HANDLED
-
 from __future__ import annotations
 
 from inspect import cleandoc

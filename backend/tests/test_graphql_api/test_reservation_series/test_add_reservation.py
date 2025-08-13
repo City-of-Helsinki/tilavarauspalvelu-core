@@ -34,7 +34,7 @@ def test_reservation_series__add_reservation(graphql):
     data = get_minimal_add_data(series)
 
     graphql.login_with_superuser()
-    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, input_data=data)
+    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is False
 
@@ -54,10 +54,9 @@ def test_reservation_series__add_reservation__overlapping(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, input_data=data)
+    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
+    assert response.error_message(0) == "Reservation overlaps with existing reservations."
 
     assert series.reservations.count() == 9
 
@@ -75,10 +74,9 @@ def test_reservation_series__add_reservation__begin_after_end(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, input_data=data)
+    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation cannot end before it begins"]
+    assert response.error_message(0) == "Reservation cannot end before it begins"
 
     assert series.reservations.count() == 9
 
@@ -99,7 +97,7 @@ def test_reservation_series__add_reservation__access_code(graphql):
     data = get_minimal_add_data(series)
 
     graphql.login_with_superuser()
-    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, input_data=data)
+    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is False
 
@@ -134,7 +132,7 @@ def test_reservation_series__add_reservation__access_code__create_if_not_found(g
     data = get_minimal_add_data(series)
 
     graphql.login_with_superuser()
-    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, input_data=data)
+    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is False
 
@@ -172,7 +170,7 @@ def test_reservation_series__add_reservation__access_code__failed_pindora_call(g
     data = get_minimal_add_data(series)
 
     graphql.login_with_superuser()
-    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, input_data=data)
+    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is False
 
@@ -222,7 +220,7 @@ def test_reservation_series__add_reservation__new_one_is_not_access_code(graphql
     data = get_minimal_add_data(series)
 
     graphql.login_with_superuser()
-    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, input_data=data)
+    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is False
 

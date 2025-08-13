@@ -56,7 +56,7 @@ def test_reservation_series__cancel_section_series__applicant(graphql):
     }
 
     graphql.force_login(user)
-    response = graphql(CANCEL_SECTION_SERIES_MUTATION, input_data=data)
+    response = graphql(CANCEL_SECTION_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -72,9 +72,9 @@ def test_reservation_series__cancel_section_series__superuser(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(CANCEL_SECTION_SERIES_MUTATION, input_data=data)
+    response = graphql(CANCEL_SECTION_SERIES_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "No permission to update."
+    assert response.error_message(0) == "No permission to manage this application."
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
@@ -87,7 +87,9 @@ def test_reservation_series__cancel_section_series__general_admin(graphql):
         "cancelDetails": "Cancellation details",
     }
 
-    graphql.login_user_with_role(UserRoleChoice.ADMIN)
-    response = graphql(CANCEL_SECTION_SERIES_MUTATION, input_data=data)
+    user = UserFactory.create_with_general_role(role=UserRoleChoice.ADMIN)
+    graphql.force_login(user)
 
-    assert response.error_message() == "No permission to update."
+    response = graphql(CANCEL_SECTION_SERIES_MUTATION, variables={"input": data})
+
+    assert response.error_message(0) == "No permission to manage this application."

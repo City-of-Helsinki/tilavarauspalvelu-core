@@ -4,7 +4,7 @@ from enum import Enum, auto
 from functools import partial
 from typing import TYPE_CHECKING, Any, NamedTuple
 
-from graphene_django_extensions.testing import build_mutation, build_query
+from tests.query_builder import build_mutation, build_query
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.enums import BannerNotificationTarget
@@ -22,7 +22,6 @@ UPDATE_MUTATION = build_mutation(
 DELETE_MUTATION = build_mutation(
     "deleteBannerNotification",
     "BannerNotificationDeleteMutation",
-    fields="deleted",
 )
 
 

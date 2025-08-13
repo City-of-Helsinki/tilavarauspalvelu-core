@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from functools import partial
+from inspect import cleandoc
 
 import pytest
-from graphene_django_extensions.testing import build_query
 
 from tilavarauspalvelu.enums import UserPermissionChoice, UserRoleChoice
 
@@ -14,10 +13,18 @@ pytestmark = [
 ]
 
 
-permissions_query = partial(
-    build_query,
-    "checkPermissions",
-    fields="hasPermission",
+PERMISSIONS_QUERY = cleandoc(
+    """
+    query (
+        $permission: UserPermissionChoice!
+        $units: [Int!]! = []
+        $requireAll: Boolean! = false
+    ) {
+        checkPermissions(permission: $permission units: $units requireAll: $requireAll) {
+            hasPermission
+        }
+    }
+    """
 )
 
 
@@ -25,11 +32,10 @@ def test_permission_checker__superuser(graphql):
     graphql.login_with_superuser()
 
     permission = UserPermissionChoice.CAN_MANAGE_APPLICATIONS
-    query = permissions_query(permission=permission)
-    response = graphql(query)
+    response = graphql(PERMISSIONS_QUERY, variables={"permission": permission})
 
     assert response.has_errors is False
-    assert response.first_query_object == {"hasPermission": True}
+    assert response.results == {"hasPermission": True}
 
 
 def test_permission_checker__inactive(graphql):
@@ -38,11 +44,10 @@ def test_permission_checker__inactive(graphql):
     user.save()
 
     permission = UserPermissionChoice.CAN_MANAGE_APPLICATIONS
-    query = permissions_query(permission=permission)
-    response = graphql(query)
+    response = graphql(PERMISSIONS_QUERY, variables={"permission": permission})
 
     assert response.has_errors is False
-    assert response.first_query_object == {"hasPermission": False}
+    assert response.results == {"hasPermission": False}
 
 
 def test_permission_checker__general_role__admin(graphql):
@@ -50,11 +55,10 @@ def test_permission_checker__general_role__admin(graphql):
     graphql.force_login(admin)
 
     permission = UserPermissionChoice.CAN_MANAGE_APPLICATIONS
-    query = permissions_query(permission=permission)
-    response = graphql(query)
+    response = graphql(PERMISSIONS_QUERY, variables={"permission": permission})
 
     assert response.has_errors is False
-    assert response.first_query_object == {"hasPermission": True}
+    assert response.results == {"hasPermission": True}
 
 
 def test_permission_checker__general_role__reserver__has_permission(graphql):
@@ -62,11 +66,10 @@ def test_permission_checker__general_role__reserver__has_permission(graphql):
     graphql.force_login(admin)
 
     permission = UserPermissionChoice.CAN_CREATE_STAFF_RESERVATIONS
-    query = permissions_query(permission=permission)
-    response = graphql(query)
+    response = graphql(PERMISSIONS_QUERY, variables={"permission": permission})
 
     assert response.has_errors is False
-    assert response.first_query_object == {"hasPermission": True}
+    assert response.results == {"hasPermission": True}
 
 
 def test_permission_checker__general_role__reserver__no_permission(graphql):
@@ -74,11 +77,10 @@ def test_permission_checker__general_role__reserver__no_permission(graphql):
     graphql.force_login(admin)
 
     permission = UserPermissionChoice.CAN_MANAGE_APPLICATIONS
-    query = permissions_query(permission=permission)
-    response = graphql(query)
+    response = graphql(PERMISSIONS_QUERY, variables={"permission": permission})
 
     assert response.has_errors is False
-    assert response.first_query_object == {"hasPermission": False}
+    assert response.results == {"hasPermission": False}
 
 
 def test_permission_checker__unit_role__admin(graphql):
@@ -87,11 +89,10 @@ def test_permission_checker__unit_role__admin(graphql):
     graphql.force_login(admin)
 
     permission = UserPermissionChoice.CAN_MANAGE_APPLICATIONS
-    query = permissions_query(permission=permission, units=[unit.pk])
-    response = graphql(query)
+    response = graphql(PERMISSIONS_QUERY, variables={"permission": permission, "units": [unit.pk]})
 
     assert response.has_errors is False
-    assert response.first_query_object == {"hasPermission": True}
+    assert response.results == {"hasPermission": True}
 
 
 def test_permission_checker__unit_role__admin__different_unit(graphql):
@@ -101,11 +102,10 @@ def test_permission_checker__unit_role__admin__different_unit(graphql):
     graphql.force_login(admin)
 
     permission = UserPermissionChoice.CAN_MANAGE_APPLICATIONS
-    query = permissions_query(permission=permission, units=[unit_2.pk])
-    response = graphql(query)
+    response = graphql(PERMISSIONS_QUERY, variables={"permission": permission, "units": [unit_2.pk]})
 
     assert response.has_errors is False
-    assert response.first_query_object == {"hasPermission": False}
+    assert response.results == {"hasPermission": False}
 
 
 def test_permission_checker__unit_role__admin__unit_group(graphql):
@@ -115,11 +115,10 @@ def test_permission_checker__unit_role__admin__unit_group(graphql):
     graphql.force_login(admin)
 
     permission = UserPermissionChoice.CAN_MANAGE_APPLICATIONS
-    query = permissions_query(permission=permission, units=[unit.pk])
-    response = graphql(query)
+    response = graphql(PERMISSIONS_QUERY, variables={"permission": permission, "units": [unit.pk]})
 
     assert response.has_errors is False
-    assert response.first_query_object == {"hasPermission": True}
+    assert response.results == {"hasPermission": True}
 
 
 def test_permission_checker__unit_role__admin__require_any__has_permission(graphql):
@@ -129,11 +128,10 @@ def test_permission_checker__unit_role__admin__require_any__has_permission(graph
     graphql.force_login(admin)
 
     permission = UserPermissionChoice.CAN_MANAGE_APPLICATIONS
-    query = permissions_query(permission=permission, units=[unit_1.pk, unit_2.pk])
-    response = graphql(query)
+    response = graphql(PERMISSIONS_QUERY, variables={"permission": permission, "units": [unit_1.pk, unit_2.pk]})
 
     assert response.has_errors is False
-    assert response.first_query_object == {"hasPermission": True}
+    assert response.results == {"hasPermission": True}
 
 
 def test_permission_checker__unit_role__admin__require_all__no_permission(graphql):
@@ -143,11 +141,11 @@ def test_permission_checker__unit_role__admin__require_all__no_permission(graphq
     graphql.force_login(admin)
 
     permission = UserPermissionChoice.CAN_MANAGE_APPLICATIONS
-    query = permissions_query(permission=permission, units=[unit_1.pk, unit_2.pk], require_all=True)
-    response = graphql(query)
+    variables = {"permission": permission, "units": [unit_1.pk, unit_2.pk], "requireAll": True}
+    response = graphql(PERMISSIONS_QUERY, variables=variables)
 
     assert response.has_errors is False
-    assert response.first_query_object == {"hasPermission": False}
+    assert response.results == {"hasPermission": False}
 
 
 def test_permission_checker__unit_role__admin__require_all__has_permission(graphql):
@@ -158,11 +156,11 @@ def test_permission_checker__unit_role__admin__require_all__has_permission(graph
     graphql.force_login(admin)
 
     permission = UserPermissionChoice.CAN_MANAGE_APPLICATIONS
-    query = permissions_query(permission=permission, units=[unit_1.pk, unit_2.pk], require_all=True)
-    response = graphql(query)
+    variables = {"permission": permission, "units": [unit_1.pk, unit_2.pk], "requireAll": True}
+    response = graphql(PERMISSIONS_QUERY, variables=variables)
 
     assert response.has_errors is False
-    assert response.first_query_object == {"hasPermission": True}
+    assert response.results == {"hasPermission": True}
 
 
 def test_permission_checker__unit_role__admin__require_all__has_permission__one_through_unit_group(graphql):
@@ -174,8 +172,8 @@ def test_permission_checker__unit_role__admin__require_all__has_permission__one_
     graphql.force_login(admin)
 
     permission = UserPermissionChoice.CAN_MANAGE_APPLICATIONS
-    query = permissions_query(permission=permission, units=[unit_1.pk, unit_2.pk], require_all=True)
-    response = graphql(query)
+    variables = {"permission": permission, "units": [unit_1.pk, unit_2.pk], "requireAll": True}
+    response = graphql(PERMISSIONS_QUERY, variables=variables)
 
     assert response.has_errors is False
-    assert response.first_query_object == {"hasPermission": True}
+    assert response.results == {"hasPermission": True}

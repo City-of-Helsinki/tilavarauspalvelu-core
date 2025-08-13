@@ -166,7 +166,7 @@ def test_application_round_query__is_setting_handled_allowed__no_permissions__fa
     response = graphql(rounds_query(fields="isSettingHandledAllowed"))
 
     assert application_round.is_setting_handled_allowed is True  # lookup_property does not check for permissions
-    assert response.node() == {"isSettingHandledAllowed": False}
+    assert response.node(0) == {"isSettingHandledAllowed": False}
 
 
 def test_application_round_query__is_setting_handled_allowed__application_in_allocation__false(graphql):
@@ -180,7 +180,7 @@ def test_application_round_query__is_setting_handled_allowed__application_in_all
     response = graphql(rounds_query(fields="isSettingHandledAllowed"))
 
     assert application_round.is_setting_handled_allowed is False
-    assert response.node() == {"isSettingHandledAllowed": False}
+    assert response.node(0) == {"isSettingHandledAllowed": False}
 
 
 @pytest.mark.parametrize(
@@ -202,7 +202,7 @@ def test_application_round_query__is_setting_handled_allowed__application_status
     response = graphql(rounds_query(fields="isSettingHandledAllowed"))
 
     assert application_round.is_setting_handled_allowed is True
-    assert response.node() == {"isSettingHandledAllowed": True}
+    assert response.node(0) == {"isSettingHandledAllowed": True}
 
 
 def test_application_round_query__reservation_creation_status__NOT_COMPLETED__not_set_as_handled(graphql):
@@ -214,7 +214,7 @@ def test_application_round_query__reservation_creation_status__NOT_COMPLETED__no
 
     state = ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED
     assert application_round.reservation_creation_status == state
-    assert response.node() == {"reservationCreationStatus": state}
+    assert response.node(0) == {"reservationCreationStatus": state}
 
 
 def test_application_round_query__reservation_creation_status__NOT_COMPLETED__before_timeout(graphql):
@@ -228,7 +228,7 @@ def test_application_round_query__reservation_creation_status__NOT_COMPLETED__be
 
     state = ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED
     assert application_round.reservation_creation_status == state
-    assert response.node() == {"reservationCreationStatus": state}
+    assert response.node(0) == {"reservationCreationStatus": state}
 
 
 def test_application_round_query__reservation_creation_status__FAILED__after_timeout(graphql):
@@ -242,7 +242,7 @@ def test_application_round_query__reservation_creation_status__FAILED__after_tim
 
     state = ApplicationRoundReservationCreationStatusChoice.FAILED
     assert application_round.reservation_creation_status == state
-    assert response.node() == {"reservationCreationStatus": state}
+    assert response.node(0) == {"reservationCreationStatus": state}
 
 
 def test_application_round_query__reservation_creation_status__COMPLETED__before_timeout(graphql):
@@ -250,7 +250,7 @@ def test_application_round_query__reservation_creation_status__COMPLETED__before
         handled_at=local_datetime() - datetime.timedelta(minutes=9)
     )
     application = ApplicationFactory.create_in_status_handled(application_round=application_round)
-    ReservationFactory(
+    ReservationFactory.create(
         reservation_series__allocated_time_slot__reservation_unit_option__application_section__application=application
     )
 
@@ -259,7 +259,7 @@ def test_application_round_query__reservation_creation_status__COMPLETED__before
 
     state = ApplicationRoundReservationCreationStatusChoice.COMPLETED
     assert application_round.reservation_creation_status == state
-    assert response.node() == {"reservationCreationStatus": state}
+    assert response.node(0) == {"reservationCreationStatus": state}
 
 
 def test_application_round_query__reservation_creation_status__COMPLETED__after_timeout(graphql):
@@ -267,7 +267,7 @@ def test_application_round_query__reservation_creation_status__COMPLETED__after_
         handled_at=local_datetime() - datetime.timedelta(minutes=11)
     )
     application = ApplicationFactory.create_in_status_handled(application_round=application_round)
-    ReservationFactory(
+    ReservationFactory.create(
         reservation_series__allocated_time_slot__reservation_unit_option__application_section__application=application
     )
 
@@ -276,4 +276,4 @@ def test_application_round_query__reservation_creation_status__COMPLETED__after_
 
     state = ApplicationRoundReservationCreationStatusChoice.COMPLETED
     assert application_round.reservation_creation_status == state
-    assert response.node() == {"reservationCreationStatus": state}
+    assert response.node(0) == {"reservationCreationStatus": state}
