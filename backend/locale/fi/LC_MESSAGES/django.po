@@ -1057,6 +1057,10 @@ msgid "Receipt URL"
 msgstr "Kuitin URL"
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Handled payment due by"
+msgstr "Käsiteltävän varauksen maksun määräaika"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
 msgid "The reservation associated with this payment order"
 msgstr "Varaus, joka liittyy tähän maksutilaan"
 
@@ -1071,6 +1075,10 @@ msgstr "eCommerce-maksutunniste"
 #: tilavarauspalvelu/admin/payment_order/admin.py
 msgid "Available only when order has been refunded"
 msgstr "Saatavilla vain, kun maksu on palautettu"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Date by which the payment for a handled reservation must be paid"
+msgstr "Päivä jolloin käsiteltävän varauksen maksun on oltava maksettuna"
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
 #: tilavarauspalvelu/models/reservation_unit/model.py

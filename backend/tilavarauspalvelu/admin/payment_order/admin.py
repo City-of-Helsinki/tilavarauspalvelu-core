@@ -41,12 +41,14 @@ class PaymentOrderForm(forms.ModelForm):
             "reservation_user_uuid": _("Reservation user UUID"),
             "checkout_url": _("Checkout URL"),
             "receipt_url": _("Receipt URL"),
+            "handled_payment_due_by": _("Handled payment due by"),
         }
         help_texts = {
             "reservation": _("The reservation associated with this payment order"),
             "remote_id": _("eCommerce order ID"),
             "payment_id": _("eCommerce payment ID"),
             "refund_id": _("Available only when order has been refunded"),
+            "handled_payment_due_by": _("Date by which the payment for a handled reservation must be paid"),
         }
 
 
