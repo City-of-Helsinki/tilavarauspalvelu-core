@@ -585,3 +585,24 @@ def test_refresh_expired_payments_in_verkkokauppa__handled_payment__refresh_erro
     assert payment_order.status == OrderStatus.PENDING
 
     assert VerkkokauppaAPIClient.get_payment.called is True
+
+
+@patch_method(VerkkokauppaAPIClient.get_payment)
+def test_refresh_expired_payments_in_verkkokauppa__handled_payment__payment_not_attempted(settings):
+    settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
+
+    reservation = ReservationFactory.create(state=ReservationStateChoice.CONFIRMED)
+    payment_order = PaymentOrderFactory.create_at(
+        reservation=reservation,
+        status=OrderStatus.PENDING,
+        handled_payment_due_by=local_datetime(2024, 1, 1, 11, 59),
+        created_at=local_datetime(2024, 1, 1, 11, 55),
+        remote_id=None,  # Payment never attempted, so no order id from verkkokauppa
+    )
+
+    refresh_expired_payments_in_verkkokauppa_task()
+
+    payment_order.refresh_from_db()
+    assert payment_order.status == OrderStatus.EXPIRED
+
+    assert VerkkokauppaAPIClient.get_payment.called is False
