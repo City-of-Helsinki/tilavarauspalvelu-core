@@ -4,9 +4,8 @@ import datetime
 import re
 from typing import TYPE_CHECKING
 
-from graphene_django_extensions.utils import get_nested
-
 from tilavarauspalvelu.enums import LoginMethod, MunicipalityChoice
+from utils.utils import get_nested
 
 from .typing import (
     AfterLoginAdditionalInfo,

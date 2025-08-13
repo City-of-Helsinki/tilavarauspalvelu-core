@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 from django.conf import settings
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django.utils.functional import Promise
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import override
 from helsinki_gdpr.views import DryRunSerializer, GDPRAPIView
@@ -17,7 +18,6 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ProfileUser
 
 if TYPE_CHECKING:
-    from promise import Promise
     from rest_framework.request import Request
 
 
