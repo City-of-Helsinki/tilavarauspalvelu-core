@@ -326,6 +326,7 @@ class ReservationActions:
             price_vat=self.reservation.price_vat_amount,
             price_total=self.reservation.price,
             reservation=self.reservation,
+            reservation_user_uuid=self.reservation.user.uuid,
             handled_payment_due_by=handled_payment_due_by,
         )
 
