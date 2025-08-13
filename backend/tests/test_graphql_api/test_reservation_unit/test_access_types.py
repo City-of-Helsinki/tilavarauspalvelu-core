@@ -18,7 +18,7 @@ from .helpers import (
     UPDATE_MUTATION,
     get_create_draft_input_data,
     get_create_non_draft_input_data,
-    get_draft_update_input_data,
+    get_update_draft_input_data,
 )
 
 # Applied to all tests
@@ -43,11 +43,11 @@ def test_reservation_unit__create__access_types(graphql):
     ]
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(CREATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
+    reservation_unit = ReservationUnit.objects.get(pk=response.results["pk"])
 
     access_type = list(reservation_unit.access_types.order_by("begin_date").all())
     assert len(access_type) == 2
@@ -68,10 +68,9 @@ def test_reservation_unit__create__access_types__not_access_code(graphql):
     ]
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(CREATE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Cannot set access type to access code on reservation unit create."]
+    assert response.error_message(0) == "Cannot set access type to access code on reservation unit create."
 
 
 def test_reservation_unit__create__access_types__not_in_the_past(graphql):
@@ -86,21 +85,20 @@ def test_reservation_unit__create__access_types__not_in_the_past(graphql):
     ]
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(CREATE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Access type cannot be created in the past."]
+    assert response.error_message(0) == "Access type cannot be created in the past."
 
 
 def test_reservation_unit__create__access_types__published(graphql):
     data = get_create_non_draft_input_data()
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(CREATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
+    reservation_unit = ReservationUnit.objects.get(pk=response.results["pk"])
 
     access_type = list(reservation_unit.access_types.order_by("begin_date").all())
     assert len(access_type) == 1
@@ -113,10 +111,9 @@ def test_reservation_unit__create__access_types__published__no_access_types(grap
     data["accessTypes"] = []
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(CREATE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["At least one active access type is required."]
+    assert response.error_message(0) == "At least one active access type is required for non-draft reservation units."
 
 
 @freeze_time(local_datetime(2024, 1, 1))
@@ -130,10 +127,9 @@ def test_reservation_unit__create__access_types__published__no_active_access_typ
     ]
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(CREATE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["At least one active access type is required."]
+    assert response.error_message(0) == "At least one active access type is required for non-draft reservation units."
 
 
 def test_reservation_unit__update__access_types(graphql):
@@ -147,7 +143,7 @@ def test_reservation_unit__update__access_types(graphql):
 
     today = local_date()
 
-    data = get_draft_update_input_data(reservation_unit=reservation_unit)
+    data = get_update_draft_input_data(reservation_unit=reservation_unit)
     data["accessTypes"] = [
         {
             "pk": access_type.pk,
@@ -165,11 +161,11 @@ def test_reservation_unit__update__access_types(graphql):
     ]
 
     graphql.login_with_superuser()
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
+    reservation_unit = ReservationUnit.objects.get(pk=response.results["pk"])
 
     access_type = list(reservation_unit.access_types.order_by("begin_date").all())
     assert len(access_type) == 3
@@ -179,11 +175,10 @@ def test_reservation_unit__update__access_types(graphql):
     assert access_type[2].access_type == AccessType.UNRESTRICTED
 
 
-@pytest.mark.parametrize("started_days_ago", [0, 1])
-def test_reservation_unit__update__access_types__cannot_change_access_type_begin_date(graphql, started_days_ago):
+def test_reservation_unit__update__access_types__cannot_change_active_access_type_begin_date(graphql):
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
 
-    today = local_date() - datetime.timedelta(days=started_days_ago)
+    today = local_date()
 
     access_type = ReservationUnitAccessTypeFactory.create(
         reservation_unit=reservation_unit,
@@ -191,7 +186,7 @@ def test_reservation_unit__update__access_types__cannot_change_access_type_begin
         access_type=AccessType.PHYSICAL_KEY,
     )
 
-    data = get_draft_update_input_data(reservation_unit=reservation_unit)
+    data = get_update_draft_input_data(reservation_unit=reservation_unit)
     data["accessTypes"] = [
         {
             "pk": access_type.pk,
@@ -201,10 +196,35 @@ def test_reservation_unit__update__access_types__cannot_change_access_type_begin
     ]
 
     graphql.login_with_superuser()
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Past of active access type begin date cannot be changed."]
+    assert response.error_message(0) == "Active access type cannot be moved to another date."
+
+
+def test_reservation_unit__update__access_types__cannot_change_past_access_type_begin_date(graphql):
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+
+    today = local_date() - datetime.timedelta(days=1)
+
+    access_type = ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        begin_date=today,
+        access_type=AccessType.PHYSICAL_KEY,
+    )
+
+    data = get_update_draft_input_data(reservation_unit=reservation_unit)
+    data["accessTypes"] = [
+        {
+            "pk": access_type.pk,
+            "beginDate": (today + datetime.timedelta(days=1)).isoformat(),
+            "accessType": AccessType.PHYSICAL_KEY.value,
+        },
+    ]
+
+    graphql.login_with_superuser()
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
+
+    assert response.error_message(0) == "Past or active access type cannot be changed."
 
 
 def test_reservation_unit__update__access_types__cannot_move_to_the_past(graphql):
@@ -223,7 +243,7 @@ def test_reservation_unit__update__access_types__cannot_move_to_the_past(graphql
         access_type=AccessType.PHYSICAL_KEY,
     )
 
-    data = get_draft_update_input_data(reservation_unit=reservation_unit)
+    data = get_update_draft_input_data(reservation_unit=reservation_unit)
     data["accessTypes"] = [
         {
             "pk": access_type.pk,
@@ -233,10 +253,9 @@ def test_reservation_unit__update__access_types__cannot_move_to_the_past(graphql
     ]
 
     graphql.login_with_superuser()
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Access type cannot be moved to the past."]
+    assert response.error_message(0) == "Access type cannot be moved to the past."
 
 
 @freeze_time(local_datetime(2023, 1, 1, hour=0))
@@ -298,7 +317,7 @@ def test_reservation_unit__update__access_types__set_new_access_type_to_reservat
 
     graphql.login_with_superuser()
 
-    data = get_draft_update_input_data(reservation_unit=reservation_unit)
+    data = get_update_draft_input_data(reservation_unit=reservation_unit)
     data["accessTypes"] = [
         {
             "pk": access_type.pk,
@@ -307,7 +326,7 @@ def test_reservation_unit__update__access_types__set_new_access_type_to_reservat
         },
     ]
 
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -327,11 +346,11 @@ def test_reservation_unit__update__access_types__check_from_pindora__switch_to_a
 
     access_type = ReservationUnitAccessTypeFactory.create(
         reservation_unit=reservation_unit,
-        begin_date=local_date() - datetime.timedelta(days=1),
+        begin_date=local_date(),
         access_type=AccessType.PHYSICAL_KEY,
     )
 
-    data = get_draft_update_input_data(reservation_unit=reservation_unit)
+    data = get_update_draft_input_data(reservation_unit=reservation_unit)
     data["accessTypes"] = [
         {
             "pk": access_type.pk,
@@ -341,7 +360,7 @@ def test_reservation_unit__update__access_types__check_from_pindora__switch_to_a
     ]
 
     graphql.login_with_superuser()
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -359,7 +378,7 @@ def test_reservation_unit__update__access_types__check_from_pindora__new_access_
         access_type=AccessType.PHYSICAL_KEY,
     )
 
-    data = get_draft_update_input_data(reservation_unit=reservation_unit)
+    data = get_update_draft_input_data(reservation_unit=reservation_unit)
     data["accessTypes"] = [
         {
             "pk": access_type.pk,
@@ -373,7 +392,7 @@ def test_reservation_unit__update__access_types__check_from_pindora__new_access_
     ]
 
     graphql.login_with_superuser()
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -386,11 +405,11 @@ def test_reservation_unit__update__access_types__dont_check_from_pindora__still_
 
     access_type = ReservationUnitAccessTypeFactory.create(
         reservation_unit=reservation_unit,
-        begin_date=local_date() - datetime.timedelta(days=1),
+        begin_date=local_date(),
         access_type=AccessType.ACCESS_CODE,
     )
 
-    data = get_draft_update_input_data(reservation_unit=reservation_unit)
+    data = get_update_draft_input_data(reservation_unit=reservation_unit)
     data["accessTypes"] = [
         {
             "pk": access_type.pk,
@@ -400,7 +419,7 @@ def test_reservation_unit__update__access_types__dont_check_from_pindora__still_
     ]
 
     graphql.login_with_superuser()
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -424,15 +443,15 @@ def test_reservation_unit__update__access_types__future_one_is_deleted(graphql):
         access_type=AccessType.UNRESTRICTED,
     )
 
-    data = get_draft_update_input_data(reservation_unit=reservation_unit)
+    data = get_update_draft_input_data(reservation_unit=reservation_unit)
     data["accessTypes"] = []
 
     graphql.login_with_superuser()
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
+    reservation_unit = ReservationUnit.objects.get(pk=response.results["pk"])
 
     access_type = list(reservation_unit.access_types.order_by("begin_date").all())
     assert len(access_type) == 1

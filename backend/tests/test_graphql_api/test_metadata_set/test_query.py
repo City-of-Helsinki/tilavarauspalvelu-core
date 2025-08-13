@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import pytest
-from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationMetadataFieldFactory, ReservationMetadataSetFactory
+from tests.query_builder import build_query
 
 # Applied to all tests
 pytestmark = [
@@ -24,31 +24,21 @@ def test_metadata_sets__query(graphql):
 
     graphql.login_with_superuser()
     fields = "name supportedFields { fieldName } requiredFields { fieldName }"
-    query = build_query("metadataSets", fields=fields, connection=True)
+    query = build_query("allMetadataSets", fields=fields)
     response = graphql(query)
 
     assert response.has_errors is False
-    assert len(response.edges) == 1
-
-    assert response.node() == {
-        "name": field_set.name,
-        "requiredFields": [
-            {
-                "fieldName": "reservee_first_name",
-            },
-            {
-                "fieldName": "reservee_last_name",
-            },
-        ],
-        "supportedFields": [
-            {
-                "fieldName": "reservee_first_name",
-            },
-            {
-                "fieldName": "reservee_last_name",
-            },
-            {
-                "fieldName": "reservee_phone",
-            },
-        ],
-    }
+    assert response.results == [
+        {
+            "name": field_set.name,
+            "requiredFields": [
+                {"fieldName": "reservee_first_name"},
+                {"fieldName": "reservee_last_name"},
+            ],
+            "supportedFields": [
+                {"fieldName": "reservee_first_name"},
+                {"fieldName": "reservee_last_name"},
+                {"fieldName": "reservee_phone"},
+            ],
+        }
+    ]

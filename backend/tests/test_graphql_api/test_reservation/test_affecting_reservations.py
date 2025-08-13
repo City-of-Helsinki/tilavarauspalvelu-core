@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import datetime
-from functools import partial
 
 import pytest
-from graphene_django_extensions.testing import build_query
 
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.models import ReservationUnitHierarchy
@@ -17,7 +15,24 @@ pytestmark = [
     pytest.mark.django_db,
 ]
 
-affecting_reservations_query = partial(build_query, "affectingReservations", order_by="pkAsc")
+
+AFFECTING_RESERVATIONS_QUERY = """
+    query (
+        $beginDate: Date!
+        $endDate: Date!
+        $forUnits: [Int!]
+        $forReservationUnits: [Int!]
+    ) {
+        affectingReservations(
+            beginDate: $beginDate
+            endDate: $endDate
+            forUnits: $forUnits
+            forReservationUnits: $forReservationUnits
+        ) {
+            pk
+        }
+    }
+"""
 
 
 def test_reservation__affecting__time_and_state(graphql):
@@ -80,15 +95,15 @@ def test_reservation__affecting__time_and_state(graphql):
 
     ReservationUnitHierarchy.refresh()
 
-    query = affecting_reservations_query(
-        for_units=[unit.pk],
-        begin_date=start_date.isoformat(),
-        end_date=end_date.isoformat(),
-    )
-    response = graphql(query)
+    variables = {
+        "forUnits": [unit.pk],
+        "beginDate": start_date.isoformat(),
+        "endDate": end_date.isoformat(),
+    }
+    response = graphql(AFFECTING_RESERVATIONS_QUERY, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert response.first_query_object == [
+    assert response.results == [
         {"pk": reservation_1.pk},
         {"pk": reservation_2.pk},
     ]
@@ -150,11 +165,15 @@ def test_reservation__affecting__for_unit(graphql):
 
     ReservationUnitHierarchy.refresh()
 
-    query = affecting_reservations_query(for_units=[unit.pk])
-    response = graphql(query)
+    variables = {
+        "forUnits": [unit.pk],
+        "beginDate": datetime.date.min.isoformat(),
+        "endDate": datetime.date.max.isoformat(),
+    }
+    response = graphql(AFFECTING_RESERVATIONS_QUERY, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert response.first_query_object == [
+    assert sorted(response.results, key=lambda x: x["pk"]) == [
         {"pk": reservation_2.pk},
         {"pk": reservation_3.pk},
         {"pk": reservation_4.pk},
@@ -202,11 +221,15 @@ def test_reservation__affecting__for_reservation_unit(graphql):
 
     ReservationUnitHierarchy.refresh()
 
-    query = affecting_reservations_query(for_reservation_units=[reservation_unit_1.pk])
-    response = graphql(query)
+    variables = {
+        "forReservationUnits": [reservation_unit_1.pk],
+        "beginDate": datetime.date.min.isoformat(),
+        "endDate": datetime.date.max.isoformat(),
+    }
+    response = graphql(AFFECTING_RESERVATIONS_QUERY, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert response.first_query_object == [
+    assert sorted(response.results, key=lambda x: x["pk"]) == [
         {"pk": reservation_1.pk},
         {"pk": reservation_2.pk},
         {"pk": reservation_3.pk},
@@ -238,12 +261,17 @@ def test_reservation__affecting__affected_reservation_units(graphql):
 
     graphql.login_with_superuser()
 
-    fields = "pk affectedReservationUnits"
-    query = affecting_reservations_query(fields=fields, for_reservation_units=[reservation_unit_1.pk])
-    response = graphql(query)
+    query = AFFECTING_RESERVATIONS_QUERY.replace("pk", "pk affectedReservationUnits")
+
+    variables = {
+        "forReservationUnits": [reservation_unit_1.pk],
+        "beginDate": datetime.date.min.isoformat(),
+        "endDate": datetime.date.max.isoformat(),
+    }
+    response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert response.first_query_object == [
+    assert sorted(response.results, key=lambda x: x["pk"]) == [
         {
             "pk": reservation_1.pk,
             "affectedReservationUnits": [

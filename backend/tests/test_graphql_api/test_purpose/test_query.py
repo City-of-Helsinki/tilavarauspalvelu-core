@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+from inspect import cleandoc
+
 import pytest
 
 from tests.factories import PurposeFactory
-
-from .helpers import purposes_query
 
 # Applied to all tests
 pytestmark = [
@@ -17,30 +17,36 @@ def test_purpose__query(graphql):
 
     graphql.login_with_superuser()
 
-    fields = """
-        pk
-        nameFi
-        nameEn
-        nameSv
-        imageUrl
-        smallUrl
-        rank
-    """
-    query = purposes_query(fields=fields)
+    query = cleandoc(
+        """
+        query {
+            allPurposes {
+                pk
+                nameFi
+                nameEn
+                nameSv
+                imageUrl
+                smallUrl
+                rank
+            }
+        }
+        """
+    )
     response = graphql(query)
 
     assert response.has_errors is False
 
-    assert len(response.edges) == 1
-    assert response.node() == {
-        "pk": purpose.pk,
-        "nameFi": purpose.name_fi,
-        "nameEn": purpose.name_en,
-        "nameSv": purpose.name_sv,
-        "imageUrl": None,
-        "smallUrl": None,
-        "rank": purpose.rank,
-    }
+    assert response.results == [
+        {
+            "pk": purpose.pk,
+            "nameFi": purpose.name_fi,
+            "nameEn": purpose.name_en,
+            "nameSv": purpose.name_sv,
+            "imageUrl": None,
+            "smallUrl": None,
+            "rank": purpose.rank,
+        }
+    ]
 
 
 def test_purpose__order__by_rank(graphql):
@@ -50,12 +56,21 @@ def test_purpose__order__by_rank(graphql):
 
     graphql.login_with_superuser()
 
-    query = purposes_query(order_by="rankDesc")
+    query = cleandoc(
+        """
+        query {
+            allPurposes(orderBy: rankDesc) {
+                pk
+            }
+        }
+        """
+    )
+
     response = graphql(query)
 
     assert response.has_errors is False
 
-    assert len(response.edges) == 3
-    assert response.node(0) == {"pk": purpose_2.pk}
-    assert response.node(1) == {"pk": purpose_3.pk}
-    assert response.node(2) == {"pk": purpose_1.pk}
+    assert len(response.results) == 3
+    assert response.results[0] == {"pk": purpose_2.pk}
+    assert response.results[1] == {"pk": purpose_3.pk}
+    assert response.results[2] == {"pk": purpose_1.pk}

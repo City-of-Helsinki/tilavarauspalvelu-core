@@ -5,7 +5,6 @@ import itertools
 from decimal import Decimal
 
 import pytest
-from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import AuthenticationType, PaymentType, ReservationKind, ReservationStartInterval
 from tilavarauspalvelu.models import ReservationUnit
@@ -13,6 +12,7 @@ from tilavarauspalvelu.services.export import ReservationUnitExporter
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime_string, local_timedelta_string
 
 from tests.factories import ReservationUnitFactory
+from tests.helpers import parametrize_helper
 
 from .helpers import Missing, MissingParams, mock_csv_writer
 

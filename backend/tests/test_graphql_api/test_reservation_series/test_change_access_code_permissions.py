@@ -42,9 +42,9 @@ def test_change_reservation_series_access_code__regular_user(graphql):
 
     graphql.login_with_regular_user()
 
-    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, input_data={"pk": series.pk})
+    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, variables={"input": {"pk": series.pk}})
 
-    assert response.error_message() == "No permission to update."
+    assert response.error_message(0) == "No permission to access reservation series."
 
 
 @patch_method(
@@ -72,6 +72,6 @@ def test_change_reservation_series_access_code__general_admin(graphql):
     user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
-    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, input_data={"pk": series.pk})
+    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, variables={"input": {"pk": series.pk}})
 
     assert response.has_errors is False, response.errors

@@ -21,11 +21,11 @@ def test_application__cancel__regular_user(graphql):
 
     # when:
     # - The user tries to cancel the application
-    response = graphql(CANCEL_MUTATION, input_data={"pk": application.pk})
+    response = graphql(CANCEL_MUTATION, variables={"input": {"pk": application.pk}})
 
     # then:
     # - The response contains errors about mutation permissions
-    assert response.error_message() == "No permission to update."
+    assert response.error_message(0) == "No permission to manage this application."
 
 
 def test_application__cancel__regular_user__own_application(graphql):
@@ -37,7 +37,7 @@ def test_application__cancel__regular_user__own_application(graphql):
 
     # when:
     # - The user tries to cancel the application
-    response = graphql(CANCEL_MUTATION, input_data={"pk": application.pk})
+    response = graphql(CANCEL_MUTATION, variables={"input": {"pk": application.pk}})
 
     # then:
     # - The response contains no errors
@@ -56,11 +56,11 @@ def test_application__cancel__regular_user__own_application__application_period_
 
     # when:
     # - The user tries to cancel the application
-    response = graphql(CANCEL_MUTATION, input_data={"pk": application.pk})
+    response = graphql(CANCEL_MUTATION, variables={"input": {"pk": application.pk}})
 
     # then:
     # - The response contains errors
-    assert response.error_message() == "No permission to update."
+    assert response.error_message(0) == "No permission to manage this application."
 
 
 def test_application__cancel__general_user(graphql):
@@ -73,7 +73,7 @@ def test_application__cancel__general_user(graphql):
 
     # when:
     # - The user tries to cancel the application
-    response = graphql(CANCEL_MUTATION, input_data={"pk": application.pk})
+    response = graphql(CANCEL_MUTATION, variables={"input": {"pk": application.pk}})
 
     # then:
     # - The response contains no errors
@@ -97,7 +97,7 @@ def test_application__update__unit_admin(graphql):
 
     # when:
     # - The user tries to cancel the application
-    response = graphql(CANCEL_MUTATION, input_data={"pk": application.pk})
+    response = graphql(CANCEL_MUTATION, variables={"input": {"pk": application.pk}})
 
     # then:
     # - The response contains no errors

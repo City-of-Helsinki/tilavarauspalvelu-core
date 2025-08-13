@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pytest
+from pytest_undine.query_logging import capture_database_queries
 
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitHierarchy
 
@@ -12,7 +13,7 @@ pytestmark = [
 ]
 
 
-def test_reservation_units_with_common_hierarchy__queryset(query_counter):
+def test_reservation_units_with_common_hierarchy__queryset():
     # Space 1
     # └── Space 2
     # Space 3
@@ -39,7 +40,7 @@ def test_reservation_units_with_common_hierarchy__queryset(query_counter):
     ReservationUnitHierarchy.refresh()
 
     def get_affecting(pks: list[int]) -> list[int]:
-        with query_counter() as counter:
+        with capture_database_queries() as counter:
             ids = list(
                 ReservationUnit.objects.filter(pk__in=pks)
                 .reservation_units_with_common_hierarchy()
@@ -62,7 +63,7 @@ def test_reservation_units_with_common_hierarchy__queryset(query_counter):
     assert get_affecting([res_1.pk, res_6.pk]) == [res_1.pk, res_2.pk, res_3.pk, res_5.pk, res_6.pk]
 
 
-def test_reservation_units_with_common_hierarchy__model(query_counter):
+def test_reservation_units_with_common_hierarchy__model():
     # Space 1
     # └── Space 2
     # Space 3
@@ -89,7 +90,7 @@ def test_reservation_units_with_common_hierarchy__model(query_counter):
     ReservationUnitHierarchy.refresh()
 
     def get_affecting(ru: ReservationUnit) -> list[int]:
-        with query_counter() as counter:
+        with capture_database_queries() as counter:
             ids = list(ru.actions.reservation_units_with_common_hierarchy.order_by("pk").values_list("pk", flat=True))
 
         assert len(counter.queries) == 1

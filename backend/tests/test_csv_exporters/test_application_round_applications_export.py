@@ -4,7 +4,6 @@ import datetime
 from typing import TYPE_CHECKING
 
 import pytest
-from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import MunicipalityChoice, Priority, ReserveeType, Weekday
 from tilavarauspalvelu.services.export import ApplicationRoundApplicationsCSVExporter
@@ -13,6 +12,7 @@ from utils.date_utils import local_date_string, local_datetime, local_timedelta_
 
 from tests.factories import ApplicationFactory, ApplicationRoundFactory
 from tests.factories.application import ApplicationBuilder
+from tests.helpers import parametrize_helper
 
 from .helpers import Missing, MissingParams, mock_csv_writer
 

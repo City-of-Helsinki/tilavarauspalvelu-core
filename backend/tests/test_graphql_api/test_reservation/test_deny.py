@@ -33,7 +33,7 @@ def test_reservation__deny__state_is_confirmed(graphql, reservation_type):
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
-    response = graphql(DENY_MUTATION, input_data=input_data)
+    response = graphql(DENY_MUTATION, variables={"input": input_data})
 
     assert response.has_errors is False, response.errors
 
@@ -48,12 +48,9 @@ def test_reservation__deny__status_not_allowed_states(graphql):
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
-    response = graphql(DENY_MUTATION, input_data=input_data)
+    response = graphql(DENY_MUTATION, variables={"input": input_data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == [
-        "Reservation cannot be denied based on its state",
-    ]
+    assert response.error_message(0) == "Reservation cannot be denied based on its state"
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CREATED
@@ -65,9 +62,9 @@ def test_reservation__deny__reason_missing(graphql):
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
     input_data.pop("denyReason")
-    response = graphql(DENY_MUTATION, input_data=input_data)
+    response = graphql(DENY_MUTATION, variables={"input": input_data})
 
-    assert response.has_schema_errors
+    assert response.has_errors
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
@@ -79,9 +76,9 @@ def test_reservation__deny__handling_details_missing(graphql):
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
     input_data.pop("handlingDetails")
-    response = graphql(DENY_MUTATION, input_data=input_data)
+    response = graphql(DENY_MUTATION, variables={"input": input_data})
 
-    assert response.has_schema_errors
+    assert response.has_errors
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
@@ -99,12 +96,9 @@ def test_reservation__deny__state_confirmed_and_reservation_ended(graphql):
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
-    response = graphql(DENY_MUTATION, input_data=input_data)
+    response = graphql(DENY_MUTATION, variables={"input": input_data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == [
-        "Reservation cannot be denied after it has ended.",
-    ]
+    assert response.error_message(0) == "Reservation cannot be denied after it has ended."
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
@@ -120,7 +114,7 @@ def test_reservation__deny__state_requires_handling_and_reservation_ended(graphq
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
-    response = graphql(DENY_MUTATION, input_data=input_data)
+    response = graphql(DENY_MUTATION, variables={"input": input_data})
 
     assert response.has_errors is False, response.errors
 
@@ -134,7 +128,7 @@ def test_reservation__deny__send_email(graphql, outbox):
 
     graphql.login_with_superuser()
     data = get_deny_data(reservation)
-    response = graphql(DENY_MUTATION, input_data=data)
+    response = graphql(DENY_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -161,7 +155,7 @@ def test_reservation__deny__dont_send_email_for_reservation_type_x(graphql, outb
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
-    response = graphql(DENY_MUTATION, input_data=input_data)
+    response = graphql(DENY_MUTATION, variables={"input": input_data})
 
     assert response.has_errors is False, response.errors
 
@@ -182,7 +176,7 @@ def test_reservation__deny__send_email_if_reservation_started_but_not_ended(grap
 
     graphql.login_with_superuser()
     data = get_deny_data(reservation)
-    response = graphql(DENY_MUTATION, input_data=data)
+    response = graphql(DENY_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -204,7 +198,7 @@ def test_reservation__deny__dont_send_notification_if_reservation_already_ended(
 
     graphql.login_with_superuser()
     data = get_deny_data(reservation)
-    response = graphql(DENY_MUTATION, input_data=data)
+    response = graphql(DENY_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -224,7 +218,7 @@ def test_reservation__deny__delete_from_pindora__call_success(graphql):
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
-    response = graphql(DENY_MUTATION, input_data=input_data)
+    response = graphql(DENY_MUTATION, variables={"input": input_data})
 
     assert response.has_errors is False, response.errors
 
@@ -244,10 +238,9 @@ def test_reservation__deny__delete_from_pindora__call_fails(graphql):
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
-    response = graphql(DENY_MUTATION, input_data=input_data)
+    response = graphql(DENY_MUTATION, variables={"input": input_data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Pindora Error"]
+    assert response.error_message(0) == "Pindora Error"
 
     assert PindoraService.delete_access_code.called is True
 
@@ -265,7 +258,7 @@ def test_reservation__deny__delete_from_pindora__call_fails__404(graphql):
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
-    response = graphql(DENY_MUTATION, input_data=input_data)
+    response = graphql(DENY_MUTATION, variables={"input": input_data})
 
     # Request is still successful if Pindora fails with 404
     assert response.has_errors is False, response.errors
@@ -292,7 +285,7 @@ def test_reservation__deny__has_order__status_unchanged_after_webshop_refresh(gr
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
-    response = graphql(DENY_MUTATION, input_data=input_data)
+    response = graphql(DENY_MUTATION, variables={"input": input_data})
 
     assert response.has_errors is False, response.errors
 
@@ -318,12 +311,11 @@ def test_reservation__deny__has_order__status_changed_after_webshop_refresh(grap
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
-    response = graphql(DENY_MUTATION, input_data=input_data)
+    response = graphql(DENY_MUTATION, variables={"input": input_data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == [
-        "Payment order status has changed to paid. Must re-evaluate if reservation should be denied.",
-    ]
+    assert response.error_message(0) == (
+        "Payment order status has changed to paid. Must re-evaluate if reservation should be denied."
+    )
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.PAID
@@ -345,7 +337,7 @@ def test_reservation__deny__has_order__deny_successful_if_webshop_unresponsive(g
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
-    response = graphql(DENY_MUTATION, input_data=input_data)
+    response = graphql(DENY_MUTATION, variables={"input": input_data})
 
     assert response.has_errors is False, response.errors
 
@@ -367,7 +359,7 @@ def test_reservation__deny__has_order__unpaid_payment_cancelled(graphql):
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
-    response = graphql(DENY_MUTATION, input_data=input_data)
+    response = graphql(DENY_MUTATION, variables={"input": input_data})
 
     assert response.has_errors is False, response.errors
 

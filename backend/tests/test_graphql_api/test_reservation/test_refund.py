@@ -34,7 +34,7 @@ def test_reservation__refund__general_admin(graphql):
     graphql.force_login(admin)
 
     input_data = get_refund_data(reservation)
-    response = graphql(REFUND_MUTATION, input_data=input_data)
+    response = graphql(REFUND_MUTATION, variables={"input": input_data})
 
     assert response.has_errors is False, response.errors
 
@@ -51,9 +51,9 @@ def test_reservation__refund__regular_user(graphql):
     graphql.login_with_regular_user()
 
     input_data = get_refund_data(reservation)
-    response = graphql(REFUND_MUTATION, input_data=input_data)
+    response = graphql(REFUND_MUTATION, variables={"input": input_data})
 
-    assert response.error_message() == "No permission to update."
+    assert response.error_message(0) == "No permission to refund this reservation."
 
     assert VerkkokauppaAPIClient.refund_order.called is False
     payment_order.refresh_from_db()
@@ -68,7 +68,7 @@ def test_reservation__refund__correct_state(graphql):
     graphql.login_with_superuser()
 
     input_data = get_refund_data(reservation)
-    response = graphql(REFUND_MUTATION, input_data=input_data)
+    response = graphql(REFUND_MUTATION, variables={"input": input_data})
 
     assert response.has_errors is False, response.errors
 
@@ -87,10 +87,9 @@ def test_reservation__refund__invalid_state(graphql):
 
     graphql.login_with_superuser()
     input_data = get_refund_data(reservation)
-    response = graphql(REFUND_MUTATION, input_data=input_data)
+    response = graphql(REFUND_MUTATION, variables={"input": input_data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation cannot be refunded based on its state"]
+    assert response.error_message(0) == "Reservation cannot be refunded based on its state"
 
     assert VerkkokauppaAPIClient.refund_order.called is False
 
@@ -103,10 +102,9 @@ def test_reservation__refund__reservation_price_is_zero(graphql):
     graphql.login_with_superuser()
 
     input_data = get_refund_data(reservation)
-    response = graphql(REFUND_MUTATION, input_data=input_data)
+    response = graphql(REFUND_MUTATION, variables={"input": input_data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Only paid reservations can be refunded."]
+    assert response.error_message(0) == "Only paid reservations can be refunded."
 
     payment_order.refresh_from_db()
     assert payment_order.refund_id is None
@@ -119,10 +117,9 @@ def test_reservation__refund__payment_order_is_missing(graphql):
 
     graphql.login_with_superuser()
     input_data = get_refund_data(reservation)
-    response = graphql(REFUND_MUTATION, input_data=input_data)
+    response = graphql(REFUND_MUTATION, variables={"input": input_data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation doesn't have an order."]
+    assert response.error_message(0) == "Reservation doesn't have an order."
 
     assert VerkkokauppaAPIClient.refund_order.called is False
 
@@ -135,10 +132,9 @@ def test_reservation__refund__payment_order_is_waiting_for_refund(graphql):
 
     graphql.login_with_superuser()
     input_data = get_refund_data(reservation)
-    response = graphql(REFUND_MUTATION, input_data=input_data)
+    response = graphql(REFUND_MUTATION, variables={"input": input_data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Order has already been refunded."]
+    assert response.error_message(0) == "Order has already been refunded."
 
     assert VerkkokauppaAPIClient.refund_order.called is False
 
@@ -155,7 +151,7 @@ def test_reservation__refund__invoiced__cancel_if_paid_by_invoice(graphql):
 
     graphql.login_with_superuser()
     input_data = get_refund_data(reservation)
-    response = graphql(REFUND_MUTATION, input_data=input_data)
+    response = graphql(REFUND_MUTATION, variables={"input": input_data})
 
     assert response.has_errors is False, response.errors
 
@@ -181,9 +177,8 @@ def test_reservation__refund__invoiced__date_in_the_past(graphql):
 
     graphql.login_with_superuser()
     input_data = get_refund_data(reservation)
-    response = graphql(REFUND_MUTATION, input_data=input_data)
+    response = graphql(REFUND_MUTATION, variables={"input": input_data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Order cannot be cancelled after its reservation start date."]
+    assert response.error_message(0) == "Order cannot be cancelled after its reservation start date."
 
     assert VerkkokauppaAPIClient.cancel_order.called is False

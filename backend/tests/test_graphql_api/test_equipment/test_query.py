@@ -20,11 +20,11 @@ def test_equipment__query(graphql):
     response = graphql(query)
 
     assert response.has_errors is False
-    assert len(response.edges) == 1
-
-    assert response.node(0) == {
-        "nameFi": equipment.name_fi,
-    }
+    assert response.results == [
+        {
+            "nameFi": equipment.name_fi,
+        },
+    ]
 
 
 def test_equipment__order__by_category_rank(graphql):
@@ -37,22 +37,20 @@ def test_equipment__order__by_category_rank(graphql):
     response = graphql(query)
 
     assert response.has_errors is False
-    assert len(response.edges) == 3
-
-    assert response.node(0) == {
-        "nameFi": equipment_3.name_fi,
-        "category": {"nameFi": equipment_3.category.name_fi},
-    }
-
-    assert response.node(1) == {
-        "nameFi": equipment_1.name_fi,
-        "category": {"nameFi": equipment_1.category.name_fi},
-    }
-
-    assert response.node(2) == {
-        "nameFi": equipment_2.name_fi,
-        "category": {"nameFi": equipment_2.category.name_fi},
-    }
+    assert response.results == [
+        {
+            "nameFi": equipment_3.name_fi,
+            "category": {"nameFi": equipment_3.category.name_fi},
+        },
+        {
+            "nameFi": equipment_1.name_fi,
+            "category": {"nameFi": equipment_1.category.name_fi},
+        },
+        {
+            "nameFi": equipment_2.name_fi,
+            "category": {"nameFi": equipment_2.category.name_fi},
+        },
+    ]
 
 
 def test_equipment__filter__by_category_rank(graphql):
@@ -65,14 +63,13 @@ def test_equipment__filter__by_category_rank(graphql):
     response = graphql(query)
 
     assert response.has_errors is False
-    assert len(response.edges) == 2
-
-    assert response.node(0) == {
-        "nameFi": equipment_1.name_fi,
-        "category": {"nameFi": equipment_1.category.name_fi},
-    }
-
-    assert response.node(1) == {
-        "nameFi": equipment_2.name_fi,
-        "category": {"nameFi": equipment_2.category.name_fi},
-    }
+    assert response.results == [
+        {
+            "nameFi": equipment_1.name_fi,
+            "category": {"nameFi": equipment_1.category.name_fi},
+        },
+        {
+            "nameFi": equipment_2.name_fi,
+            "category": {"nameFi": equipment_2.category.name_fi},
+        },
+    ]

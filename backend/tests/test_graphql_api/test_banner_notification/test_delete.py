@@ -22,14 +22,13 @@ def test_user_deletes_banner_notification(graphql):
     user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
+    input_data = {
+        "pk": notification.pk,
+    }
+
     # when:
     # - User tries to delete the banner notification
-    response = graphql(
-        DELETE_MUTATION,
-        input_data={
-            "pk": notification.pk,
-        },
-    )
+    response = graphql(DELETE_MUTATION, variables={"input": input_data})
 
     # then:
     # - The response has no errors
@@ -46,13 +45,15 @@ def test_primary_key_is_required_for_deleting(graphql):
     user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
+    input_data = {}
+
     # when:
     # - User tries to delete the banner notification
-    response = graphql(DELETE_MUTATION, input_data={})
+    response = graphql(DELETE_MUTATION, variables={"input": input_data})
 
     # then:
     # - The response complains about the improper input
-    assert response.error_message().startswith("Variable '$input'")
+    assert response.error_message(0).startswith("Variable '$input'")
 
 
 def test_user_tries_to_delete_non_existing_banner_notification(graphql):
@@ -63,15 +64,17 @@ def test_user_tries_to_delete_non_existing_banner_notification(graphql):
     user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
+    input_data = {
+        "pk": 1,
+    }
+
     # when:
     # - User tries to delete a banner notification
-    response = graphql(
-        DELETE_MUTATION,
-        input_data={
-            "pk": 1,
-        },
-    )
+    response = graphql(DELETE_MUTATION, variables={"input": input_data})
 
     # then:
     # - The response complains about missing banner notification
-    assert response.error_message() == "`BannerNotification` object matching query `{'pk': '1'}` does not exist."
+    assert response.error_message(0) == (
+        "Primary key 1 on model 'tilavarauspalvelu.models.banner_notification.model.BannerNotification' "
+        "did not match any row."
+    )
