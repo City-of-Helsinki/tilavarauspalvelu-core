@@ -7,9 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 from django.core.cache import cache
 from django.db import models
-from graphene_django.settings import graphene_settings
 from lookup_property import L
-from query_optimizer.utils import calculate_queryset_slice
 
 from tilavarauspalvelu.enums import AccessType, ApplicationRoundStatusChoice
 from tilavarauspalvelu.exceptions import FirstReservableTimeError
@@ -22,8 +20,6 @@ from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_rese
 from utils.date_utils import local_datetime, local_datetime_max, local_datetime_min, local_start_of_day
 
 if TYPE_CHECKING:
-    from decimal import Decimal
-
     from django.db.models import QuerySet, When
 
     from tilavarauspalvelu.models import ReservationUnit
@@ -143,17 +139,24 @@ class FirstReservableTimeHelper:
     # Contains a list of hard closed time spans that are shared by all ReservationUnits.
     shared_hard_closed_time_spans: list[TimeSpanElement]
 
-    def __init__(  # noqa: PLR0915
+    def __init__(
         self,
         reservation_unit_queryset: ReservationUnitQuerySet,
         *,
+        #
+        # Filter arguments
         filter_date_start: datetime.date | None = None,
         filter_date_end: datetime.date | None = None,
         filter_time_start: datetime.time | None = None,
         filter_time_end: datetime.time | None = None,
-        minimum_duration_minutes: float | Decimal | None = None,
+        minimum_duration_minutes: int | None = None,
         show_only_reservable: bool = False,
-        pagination_args: dict[str, Any] | None = None,
+        #
+        # Pagination arguments
+        start: int = 0,
+        stop: int | None = None,
+        #
+        # Cache key
         cache_key: str = "",
     ) -> None:
         self.now = local_datetime()
@@ -199,12 +202,12 @@ class FirstReservableTimeHelper:
             msg = "'reservable_time_start' must be before 'reservable_time_end'."
             raise FirstReservableTimeError(msg)
 
-        if minimum_duration_minutes is not None and int(minimum_duration_minutes) < 15:  # noqa: PLR2004
+        if minimum_duration_minutes is not None and minimum_duration_minutes < 15:  # noqa: PLR2004
             msg = "'minimum_duration_minutes' can not be less than '15'."
             raise FirstReservableTimeError(msg)
 
         # Shortest possible reservation unit interval is 15 minutes, so it's used as the default value
-        minimum_duration_minutes = int(minimum_duration_minutes) if minimum_duration_minutes else 15
+        minimum_duration_minutes = minimum_duration_minutes or 15
 
         self.filter_date_start = filter_date_start
         self.filter_date_end = filter_date_end
@@ -219,24 +222,13 @@ class FirstReservableTimeHelper:
         # Pagination #
         ##############
 
-        if pagination_args is not None:
-            pagination_args["size"] = reservation_unit_queryset.count()
-            qs_slice = calculate_queryset_slice(**pagination_args)
-            self.start_offset = qs_slice.start
-            self.stop_offset = qs_slice.stop
-            self.needed_reservation_units = self.stop_offset - self.start_offset
-            # If we should only show reservable reservation units, increase the chunk size to max page size
-            # so that if filtering occurs, we don't need to fetch so many chunks.
-            self.chunk_size = (
-                graphene_settings.RELAY_CONNECTION_MAX_LIMIT
-                if self.show_only_reservable
-                else self.needed_reservation_units
-            )
-        else:
-            self.start_offset = 0
-            self.stop_offset = reservation_unit_queryset.count()
-            self.needed_reservation_units = self.stop_offset
-            self.chunk_size = self.stop_offset
+        self.start_offset = start
+        self.stop_offset = stop if stop is not None else reservation_unit_queryset.count()
+        self.needed_reservation_units = self.stop_offset - self.start_offset
+
+        # If we should only show reservable reservation units, increase the chunk size to max page size
+        # so that if filtering occurs, we don't need to fetch so many chunks.
+        self.chunk_size = 100 if self.show_only_reservable else self.needed_reservation_units
 
         ##########################################
         # Get required objects from the database #
@@ -435,10 +427,12 @@ class FirstReservableTimeHelper:
                 # Required for calculating first reservable time
                 models.Prefetch(
                     "origin_hauki_resource__reservable_time_spans",
-                    ReservableTimeSpan.objects.overlapping_with_period(
+                    ReservableTimeSpan.objects.all()
+                    .overlapping_with_period(
                         start=self.filter_date_start,
                         end=self.filter_date_end,
-                    ).order_by("start_datetime"),
+                    )
+                    .order_by("start_datetime"),
                 ),
                 models.Prefetch(
                     "application_rounds",
