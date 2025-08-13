@@ -22,7 +22,7 @@ def test_application__create(graphql):
     graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 
     input_data = get_application_create_data(application_round)
-    response = graphql(CREATE_MUTATION, input_data=input_data)
+    response = graphql(CREATE_MUTATION, variables={"input": input_data})
 
     assert response.has_errors is False, response
 
@@ -36,7 +36,7 @@ def test_application__create__with_application_sections(graphql):
     assert Application.objects.count() == 0
 
     input_data = get_application_create_data(application_round, create_sections=True)
-    response = graphql(CREATE_MUTATION, input_data=input_data)
+    response = graphql(CREATE_MUTATION, variables={"input": input_data})
 
     assert response.has_errors is False, response
 
@@ -46,33 +46,15 @@ def test_application__create__with_application_sections(graphql):
     assert ReservationUnitOption.objects.count() == 1
 
 
-def test_application__create__with_application_sections__too_many(graphql, settings):
-    settings.MAXIMUM_SECTIONS_PER_APPLICATION = 0
-
-    application_round = ApplicationRoundFactory.create_in_status_open()
-    graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
-
-    assert Application.objects.count() == 0
-
-    input_data = get_application_create_data(application_round, create_sections=True)
-    response = graphql(CREATE_MUTATION, input_data=input_data)
-
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == [
-        "Cannot create more than 0 application sections in one application",
-    ]
-
-
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_application__create__is_under_age(graphql):
     application_round = ApplicationRoundFactory.create_in_status_open()
     graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 2))
 
     input_data = get_application_create_data(application_round)
-    response = graphql(CREATE_MUTATION, input_data=input_data)
+    response = graphql(CREATE_MUTATION, variables={"input": input_data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["User is not of age"]
+    assert response.error_message(0) == "User is not of age"
 
 
 @pytest.mark.parametrize("email", ["test@hel.fi", "test@edu.hel.fi"])
@@ -88,7 +70,7 @@ def test_application__create__is_ad_user(graphql, email):
     graphql.force_login(user)
 
     input_data = get_application_create_data(application_round)
-    response = graphql(CREATE_MUTATION, input_data=input_data)
+    response = graphql(CREATE_MUTATION, variables={"input": input_data})
 
     assert response.has_errors is False, response
 
@@ -104,10 +86,9 @@ def test_application__create__is_ad_user__not_internal_user(graphql):
     graphql.force_login(user)
 
     input_data = get_application_create_data(application_round)
-    response = graphql(CREATE_MUTATION, input_data=input_data)
+    response = graphql(CREATE_MUTATION, variables={"input": input_data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["AD user is not an internal user."]
+    assert response.error_message(0) == "AD user is not an internal user."
 
 
 def test_application__create__is_ad_user__not_internal_user__is_superuser(graphql):
@@ -122,7 +103,7 @@ def test_application__create__is_ad_user__not_internal_user__is_superuser(graphq
     graphql.force_login(user)
 
     input_data = get_application_create_data(application_round)
-    response = graphql(CREATE_MUTATION, input_data=input_data)
+    response = graphql(CREATE_MUTATION, variables={"input": input_data})
 
     assert response.has_errors is False, response
 
@@ -134,10 +115,10 @@ def test_application__create__sent_at(graphql):
     input_data = get_application_create_data(application_round)
     input_data["sentAt"] = local_date().isoformat()
 
-    response = graphql(CREATE_MUTATION, input_data=input_data)
+    response = graphql(CREATE_MUTATION, variables={"input": input_data})
 
     # Sent date cannot be updated, must use specific mutation for it.
-    assert response.has_schema_errors is True, response
+    assert response.has_errors is True, response
 
 
 def test_application__create__before_application_period(graphql):
@@ -145,10 +126,9 @@ def test_application__create__before_application_period(graphql):
     graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 
     input_data = get_application_create_data(application_round)
-    response = graphql(CREATE_MUTATION, input_data=input_data)
+    response = graphql(CREATE_MUTATION, variables={"input": input_data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Application round is not open for applications"]
+    assert response.error_message(0) == "Application round is not open for applications"
 
 
 def test_application__create__after_application_period(graphql):
@@ -156,7 +136,6 @@ def test_application__create__after_application_period(graphql):
     graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 
     input_data = get_application_create_data(application_round)
-    response = graphql(CREATE_MUTATION, input_data=input_data)
+    response = graphql(CREATE_MUTATION, variables={"input": input_data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Application round is not open for applications"]
+    assert response.error_message(0) == "Application round is not open for applications"

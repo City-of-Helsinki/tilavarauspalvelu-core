@@ -1,5 +1,3 @@
-# type: EmailType.RESERVATION_ACCESS_CODE_ADDED
-
 from __future__ import annotations
 
 import datetime

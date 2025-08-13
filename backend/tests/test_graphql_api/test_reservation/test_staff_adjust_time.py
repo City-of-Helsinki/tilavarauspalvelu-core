@@ -37,7 +37,7 @@ def test_reservation__staff_adjust_time__send_email_if_type_normal_or_seasonal(g
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation)
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -54,7 +54,7 @@ def test_reservation__staff_adjust_time__dont_send_email_to_staff_type_reservati
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation)
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -74,7 +74,7 @@ def test_reservation__staff_adjust_time__buffer_change_success(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -88,10 +88,9 @@ def test_reservation__staff_adjust_time__wrong_state(graphql):
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation)
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation cannot be rescheduled based on its state"]
+    assert response.error_message(0) == "Reservation cannot be rescheduled based on its state"
 
 
 def test_reservation__staff_adjust_time__end_before_begin(graphql):
@@ -102,10 +101,9 @@ def test_reservation__staff_adjust_time__end_before_begin(graphql):
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation, begins_at=begin, ends_at=end)
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation cannot end before it begins"]
+    assert response.error_message(0) == "Reservation cannot end before it begins"
 
 
 def test_reservation__staff_adjust_time__begin_date_in_the_past(graphql):
@@ -119,10 +117,9 @@ def test_reservation__staff_adjust_time__begin_date_in_the_past(graphql):
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation, begins_at=begin, ends_at=end)
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation cannot begin this much in the past."]
+    assert response.error_message(0) == "Reservation cannot begin this much in the past."
 
 
 @freezegun.freeze_time(datetime.datetime(2021, 1, 5, hour=12, minute=15, tzinfo=DEFAULT_TIMEZONE))
@@ -140,7 +137,7 @@ def test_reservation__staff_adjust_time__begin_date_in_the_past__today(graphql):
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation, begins_at=begin, ends_at=end)
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -158,10 +155,9 @@ def test_reservation__staff_adjust_time__reservation_in_the_past(graphql):
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation, begins_at=begin, ends_at=end)
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation cannot be changed anymore."]
+    assert response.error_message(0) == "Reservation cannot be changed anymore."
 
 
 def test_reservation__staff_adjust_time__reservation_in_the_past__timezone_check(graphql):
@@ -186,7 +182,7 @@ def test_reservation__staff_adjust_time__reservation_in_the_past__timezone_check
 
         graphql.login_with_superuser()
         data = get_staff_adjust_data(reservation, begins_at=new_begin, ends_at=new_end)
-        response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+        response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -210,7 +206,7 @@ def test_reservation__staff_adjust_time__begin_date_in_the_past__move_to_yesterd
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation, begins_at=begin, ends_at=end)
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -243,10 +239,9 @@ def test_reservation__staff_adjust_time__overlaps_with_another_reservation(graph
 
     ReservationUnitHierarchy.refresh()
 
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
+    assert response.error_message(0) == "Reservation overlaps with existing reservations."
 
     reservation.refresh_from_db()
     assert reservation.begins_at == begin
@@ -281,10 +276,9 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_before_due_to
 
     ReservationUnitHierarchy.refresh()
 
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
+    assert response.error_message(0) == "Reservation overlaps with existing reservations."
 
     reservation.refresh_from_db()
     assert reservation.begins_at == begin
@@ -319,10 +313,9 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_after_due_to_
 
     ReservationUnitHierarchy.refresh()
 
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
+    assert response.error_message(0) == "Reservation overlaps with existing reservations."
 
     reservation.refresh_from_db()
     assert reservation.begins_at == begin
@@ -363,10 +356,9 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_before_due_to
 
     ReservationUnitHierarchy.refresh()
 
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
+    assert response.error_message(0) == "Reservation overlaps with existing reservations."
 
     reservation.refresh_from_db()
     assert reservation.begins_at == begin
@@ -407,10 +399,9 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_after_due_to_
 
     ReservationUnitHierarchy.refresh()
 
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
+    assert response.error_message(0) == "Reservation overlaps with existing reservations."
 
     reservation.refresh_from_db()
     assert reservation.begins_at == begin
@@ -427,12 +418,11 @@ def test_reservation__staff_adjust_time__reservation_start_time_not_in_interval(
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation, begins_at=begin, ends_at=end)
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == [
-        "Reservation start time does not match the reservation unit's allowed start interval.",
-    ]
+    assert response.error_message(0) == (
+        "Reservation start time does not match the reservation unit's allowed start interval."
+    )
 
 
 @pytest.mark.parametrize("interval", ReservationStartInterval.values)
@@ -446,7 +436,7 @@ def test_reservation__staff_adjust_time__reservation_start_interval_over_30_trea
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation, begins_at=begin, ends_at=end)
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -484,7 +474,7 @@ def test_reservation__staff_adjust_time__reservation_block_whole_day(graphql):
         "endsAt": datetime.datetime(2023, 1, 1, 13, tzinfo=DEFAULT_TIMEZONE).isoformat(),
     }
 
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=input_data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": input_data})
     assert response.has_errors is False, response.errors
 
     reservation: Reservation | None = Reservation.objects.filter(name="foo").first()
@@ -526,7 +516,7 @@ def test_reservation__staff_adjust_time__reservation_block_whole_day__ignore_giv
         "bufferTimeAfter": int(datetime.timedelta(hours=1).total_seconds()),
     }
 
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=input_data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": input_data})
     assert response.has_errors is False, response.errors
 
     reservation: Reservation | None = Reservation.objects.filter(name="foo").first()
@@ -549,7 +539,7 @@ def test_reservation__staff_adjust_time__same_access_type(graphql):
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation)
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -569,7 +559,7 @@ def test_reservation__staff_adjust_time__same_access_type__requires_handling(gra
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation)
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -590,7 +580,7 @@ def test_reservation__staff_adjust_time__change_to_access_code(graphql):
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation)
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -609,7 +599,7 @@ def test_reservation__staff_adjust_time__change_to_access_code__requires_handlin
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation)
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -628,7 +618,7 @@ def test_reservation__staff_adjust_time__change_from_access_code(graphql):
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation)
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -647,10 +637,9 @@ def test_reservation__staff_adjust_time__pindora_call_failed(graphql):
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation)
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Pindora Error"]
+    assert response.error_message(0) == "Pindora Error"
 
     assert PindoraService.sync_access_code.called is True
 
@@ -673,10 +662,9 @@ def test_reservation__staff_adjust_time__overlapping_reservation_created_at_the_
         return Reservation.objects.filter(pk=res.pk)
 
     with patch_method(ReservationActions.overlapping_reservations, side_effect=callback):
-        response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+        response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Overlapping reservations were created at the same time."]
+    assert response.error_message(0) == "Overlapping reservations were created at the same time."
 
     # Reservation is not changed
     reservation.refresh_from_db()

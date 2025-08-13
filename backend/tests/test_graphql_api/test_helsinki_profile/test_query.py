@@ -12,7 +12,7 @@ from tests.factories import ApplicationFactory, ReservationFactory, UserFactory
 from tests.factories.helsinki_profile import MyProfileDataFactory
 from tests.helpers import ResponseMock, patch_method
 
-from .helpers import profile_query
+from .helpers import PROFILE_QUERY, PROFILE_QUERY_MIN
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import SessionMapping
@@ -35,31 +35,13 @@ def test_helsinki_profile_data__query__all_fields(graphql):
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
-    fields = """
-        pk
-        firstName
-        lastName
-        email
-        phone
-        birthday
-        ssn
-        streetAddress
-        postalCode
-        city
-        countryCode
-        additionalAddress
-        municipalityCode
-        municipalityName
-        loginMethod
-        isStrongLogin
-    """
-    query = profile_query(fields=fields, application_pk=application.pk)
-    response = graphql(query)
 
-    assert HelsinkiProfileClient.request.call_count == 1
+    response = graphql(PROFILE_QUERY, variables={"applicationPk": application.pk})
     assert response.has_errors is False, response.errors
 
-    assert response.first_query_object == {
+    assert HelsinkiProfileClient.request.call_count == 1
+
+    assert response.results == {
         "pk": user.pk,
         "firstName": profile_data["verifiedPersonalInformation"]["firstName"],
         "lastName": profile_data["verifiedPersonalInformation"]["lastName"],
@@ -89,13 +71,13 @@ def test_helsinki_profile_data__query__application_user(graphql):
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
-    query = profile_query(application_pk=application.pk)
-    response = graphql(query)
 
-    assert HelsinkiProfileClient.request.call_count == 1
+    response = graphql(PROFILE_QUERY_MIN, variables={"applicationPk": application.pk})
     assert response.has_errors is False, response.errors
 
-    assert response.first_query_object == {
+    assert HelsinkiProfileClient.request.call_count == 1
+
+    assert response.results == {
         "firstName": profile_data["verifiedPersonalInformation"]["firstName"],
         "lastName": profile_data["verifiedPersonalInformation"]["lastName"],
     }
@@ -111,13 +93,13 @@ def test_helsinki_profile_data__query__reservation_user(graphql):
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
-    query = profile_query(reservation_pk=reservation.pk)
-    response = graphql(query)
 
-    assert HelsinkiProfileClient.request.call_count == 1
+    response = graphql(PROFILE_QUERY_MIN, variables={"reservationPk": reservation.pk})
     assert response.has_errors is False, response.errors
 
-    assert response.first_query_object == {
+    assert HelsinkiProfileClient.request.call_count == 1
+
+    assert response.results == {
         "firstName": profile_data["verifiedPersonalInformation"]["firstName"],
         "lastName": profile_data["verifiedPersonalInformation"]["lastName"],
     }
@@ -133,29 +115,15 @@ def test_helsinki_profile_data__query__ad_user(graphql):
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
-    fields = """
-        pk
-        firstName
-        lastName
-        email
-        phone
-        birthday
-        ssn
-        streetAddress
-        postalCode
-        city
-        municipalityCode
-        municipalityName
-        loginMethod
-        isStrongLogin
-    """
-    query = profile_query(fields=fields, application_pk=application.pk)
-    response = graphql(query)
 
-    assert HelsinkiProfileClient.request.call_count == 0
+    response = graphql(PROFILE_QUERY, variables={"applicationPk": application.pk})
     assert response.has_errors is False, response.errors
 
-    assert response.first_query_object == {
+    assert HelsinkiProfileClient.request.call_count == 0
+
+    assert response.results == {
+        "additionalAddress": None,
+        "countryCode": None,
         "pk": user.pk,
         "firstName": user.first_name,
         "lastName": user.last_name,
@@ -183,29 +151,15 @@ def test_helsinki_profile_data__query__non_helauth_user(graphql):
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
-    fields = """
-        pk
-        firstName
-        lastName
-        email
-        phone
-        birthday
-        ssn
-        streetAddress
-        postalCode
-        city
-        municipalityCode
-        municipalityName
-        loginMethod
-        isStrongLogin
-    """
-    query = profile_query(fields=fields, application_pk=application.pk)
-    response = graphql(query)
 
-    assert HelsinkiProfileClient.request.call_count == 0
+    response = graphql(PROFILE_QUERY, variables={"applicationPk": application.pk})
     assert response.has_errors is False, response.errors
 
-    assert response.first_query_object == {
+    assert HelsinkiProfileClient.request.call_count == 0
+
+    assert response.results == {
+        "additionalAddress": None,
+        "countryCode": None,
         "pk": user.pk,
         "firstName": user.first_name,
         "lastName": user.last_name,
@@ -233,11 +187,11 @@ def test_helsinki_profile_data__query__no_profile_id(graphql):
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
-    query = profile_query(application_pk=application.pk)
-    response = graphql(query)
+
+    response = graphql(PROFILE_QUERY_MIN, variables={"applicationPk": application.pk})
+    assert response.error_message(0) == "User does not have a profile id. Cannot fetch profile data."
 
     assert HelsinkiProfileClient.request.call_count == 0
-    assert response.error_message() == "User does not have a profile id. Cannot fetch profile data."
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value=None)
@@ -250,11 +204,11 @@ def test_helsinki_profile_data__query__no_token(graphql):
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
-    query = profile_query(application_pk=application.pk)
-    response = graphql(query)
+
+    response = graphql(PROFILE_QUERY_MIN, variables={"applicationPk": application.pk})
+    assert response.error_message(0) == "Helsinki profile token is not valid and could not be refreshed."
 
     assert HelsinkiProfileClient.request.call_count == 0
-    assert response.error_message() == "Helsinki profile token is not valid and could not be refreshed."
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
@@ -267,12 +221,12 @@ def test_helsinki_profile_data__query__profile_request_has_errors(graphql):
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"errors": [{"message": "foo"}]})
 
     graphql.login_with_superuser()
-    query = profile_query(application_pk=application.pk)
-    response = graphql(query)
+
+    response = graphql(PROFILE_QUERY_MIN, variables={"applicationPk": application.pk})
+
+    assert response.error_message(0) == 'Helsinki profile: Response contains errors. [{"message": "foo"}]'
 
     assert HelsinkiProfileClient.request.call_count == 1
-    assert response.error_message() == 'Helsinki profile: Response contains errors. [{"message": "foo"}]'
-
     assert SentryLogger.log_message.call_count == 1
 
 
@@ -286,11 +240,11 @@ def test_helsinki_profile_data__query__no_permission(graphql):
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_regular_user()
-    query = profile_query(application_pk=application.pk)
-    response = graphql(query)
+
+    response = graphql(PROFILE_QUERY_MIN, variables={"applicationPk": application.pk})
+    assert response.error_message(0) == "No permission to view application data."
 
     assert HelsinkiProfileClient.request.call_count == 0
-    assert response.error_message() == "No permission to access node."
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
@@ -305,13 +259,12 @@ def test_helsinki_profile_data__query__general_admin(graphql):
     admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
-    query = profile_query(application_pk=application.pk)
-    response = graphql(query)
-
-    assert HelsinkiProfileClient.request.call_count == 1
+    response = graphql(PROFILE_QUERY_MIN, variables={"applicationPk": application.pk})
     assert response.has_errors is False, response.errors
 
-    assert response.first_query_object == {
+    assert HelsinkiProfileClient.request.call_count == 1
+
+    assert response.results == {
         "firstName": profile_data["verifiedPersonalInformation"]["firstName"],
         "lastName": profile_data["verifiedPersonalInformation"]["lastName"],
     }
@@ -333,13 +286,12 @@ def test_helsinki_profile_data__query__unit_admin(graphql):
     admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
-    query = profile_query(application_pk=application.pk)
-    response = graphql(query)
-
-    assert HelsinkiProfileClient.request.call_count == 1
+    response = graphql(PROFILE_QUERY_MIN, variables={"applicationPk": application.pk})
     assert response.has_errors is False, response.errors
 
-    assert response.first_query_object == {
+    assert HelsinkiProfileClient.request.call_count == 1
+
+    assert response.results == {
         "firstName": profile_data["verifiedPersonalInformation"]["firstName"],
         "lastName": profile_data["verifiedPersonalInformation"]["lastName"],
     }
@@ -350,12 +302,11 @@ def test_helsinki_profile_data__query__keycloak_token_expired(graphql):
     application = ApplicationFactory.create(user=user)
 
     graphql.login_with_superuser()
-    query = profile_query(application_pk=application.pk)
 
     def change_session(session: SessionMapping, **kwargs: Any) -> None:
         session["keycloak_refresh_token_expired"] = True
 
     with patch_method(HelsinkiProfileClient.get_user_profile_info, side_effect=change_session):
-        response = graphql(query)
+        response = graphql(PROFILE_QUERY_MIN, variables={"applicationPk": application.pk})
 
-    assert response.error_message() == "Keycloak refresh token is expired. Please log out and back in again."
+    assert response.error_message(0) == "Keycloak refresh token is expired. Please log out and back in again."

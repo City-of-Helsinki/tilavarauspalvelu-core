@@ -22,6 +22,7 @@ from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeS
 from tilavarauspalvelu.models import ReservableTimeSpan
 from utils.date_utils import DEFAULT_TIMEZONE, local_date
 
+from tests.factories import ReservableTimeSpanFactory
 from tests.helpers import ResponseMock, patch_method
 
 # Applied to all tests
@@ -433,7 +434,7 @@ def test__ReservableTimeSpanClient__create_reservable_time_spans(reservation_uni
 def test__ReservableTimeSpanClient__create_reservable_time_spans__overlapping_with_last_existing(reservation_unit):
     client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)
 
-    ReservableTimeSpan.objects.create(
+    ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=1, hour=8),
         end_datetime=_get_date(day=1, hour=12),

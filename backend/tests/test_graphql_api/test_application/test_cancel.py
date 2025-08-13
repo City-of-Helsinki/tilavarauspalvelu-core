@@ -24,7 +24,7 @@ def test_cancel_application(graphql):
 
     # when:
     # - The user tries to cancel the application
-    response = graphql(CANCEL_MUTATION, input_data={"pk": application.pk})
+    response = graphql(CANCEL_MUTATION, variables={"input": {"pk": application.pk}})
 
     # then:
     # - The response contains no errors
@@ -53,11 +53,9 @@ def test_cancel_application__wrong_status(graphql, status):
 
     # when:
     # - The user tries to cancel the application
-    response = graphql(CANCEL_MUTATION, input_data={"pk": application.pk})
+    response = graphql(CANCEL_MUTATION, variables={"input": {"pk": application.pk}})
 
     # then:
     # - The response contains errors about the state of the application
     assert response.has_errors is True
-    assert response.field_error_messages() == [
-        f"Application in status '{status.value}' cannot be cancelled.",
-    ]
+    assert response.error_message(0) == f"Application in status '{status.value}' cannot be cancelled."

@@ -24,9 +24,9 @@ def test_resource__update(graphql):
         "nameEn": "b",
         "nameSv": "c",
         "space": resource.space.pk,
-        "locationType": ResourceLocationType.FIXED.value.upper(),
+        "locationType": ResourceLocationType.FIXED,
     }
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False
 
@@ -44,11 +44,11 @@ def test_resource__update__remove_translations(graphql):
 
     data = {
         "pk": resource.pk,
-        "name": "abc",
+        "nameFi": "abc",
         "nameEn": None,
         "nameSv": None,
     }
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False
 
@@ -63,12 +63,11 @@ def test_resource__update__empty_name_fi(graphql):
 
     data = {
         "pk": resource.pk,
-        "name": "",
+        "nameFi": "",
     }
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages("name") == ["This field may not be blank."]
+    assert response.error_message("name") == "This field cannot be blank."
 
 
 def test_resource__update__null_space_with_fixed_location(graphql):
@@ -79,10 +78,9 @@ def test_resource__update__null_space_with_fixed_location(graphql):
         "pk": resource.pk,
         "space": None,
     }
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Location type 'fixed' needs a space to be defined."]
+    assert response.error_message(0) == "Location type 'fixed' needs a space to be defined."
 
 
 def test_resource__update__null_space_with_movable_location(graphql):
@@ -93,7 +91,7 @@ def test_resource__update__null_space_with_movable_location(graphql):
         "pk": resource.pk,
         "space": None,
     }
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False
 
@@ -110,6 +108,6 @@ def test_resource__update__bad_location(graphql):
         "pk": resource.pk,
         "locationType": "foo",
     }
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
-    assert response.error_message().startswith("Variable '$input'")
+    assert response.error_message(0).startswith("Variable '$input'")

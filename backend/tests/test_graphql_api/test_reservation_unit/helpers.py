@@ -5,8 +5,6 @@ from decimal import Decimal
 from functools import partial
 from typing import TYPE_CHECKING, Any, NamedTuple
 
-from graphene_django_extensions.testing import build_mutation, build_query
-
 from tilavarauspalvelu.enums import (
     AccessType,
     AuthenticationType,
@@ -28,6 +26,7 @@ from tests.factories import (
     TaxPercentageFactory,
     UnitFactory,
 )
+from tests.query_builder import build_mutation, build_query
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
@@ -39,18 +38,16 @@ __all__ = [
     "create_reservation_units_for_reservation_unit_state_filtering",
     "get_create_draft_input_data",
     "get_create_non_draft_input_data",
-    "get_draft_update_input_data",
     "get_non_draft_update_input_data",
     "get_pricing_data",
-    "reservation_unit_query",
+    "get_update_draft_input_data",
     "reservation_units_query",
 ]
 
 
-reservation_unit_query = partial(build_query, "reservationUnit")
 reservation_units_query = partial(build_query, "reservationUnits", connection=True, order_by="pkAsc")
 
-reservation_units_all_query = partial(build_query, "reservationUnitsAll", connection=False, order_by="pkAsc")
+reservation_units_all_query = partial(build_query, "allReservationUnits", connection=False, order_by="pkAsc")
 
 CREATE_MUTATION = build_mutation("createReservationUnit", "ReservationUnitCreateMutation")
 UPDATE_MUTATION = build_mutation("updateReservationUnit", "ReservationUnitUpdateMutation")
@@ -69,11 +66,9 @@ def get_create_non_draft_input_data(**overrides: Any) -> dict[str, Any]:
 
     return {
         "isDraft": False,
-        "name": "Name",
         "nameFi": "Name FI",
         "nameEn": "Name EN",
         "nameSv": "Name SV",
-        "description": "desc",
         "descriptionFi": "desc FI",
         "descriptionEn": "desc EN",
         "descriptionSv": "desc SV",
@@ -88,7 +83,7 @@ def get_create_non_draft_input_data(**overrides: Any) -> dict[str, Any]:
         "bufferTimeBefore": 3600,
         "bufferTimeAfter": 3600,
         "cancellationRule": rule.pk,
-        "reservationStartInterval": ReservationStartInterval.INTERVAL_60_MINUTES.value.upper(),
+        "reservationStartInterval": ReservationStartInterval.INTERVAL_60_MINUTES,
         "publishBeginsAt": "2021-05-03T00:00:00+00:00",
         "publishEndsAt": "2021-05-03T00:00:00+00:00",
         "reservationBeginsAt": "2021-05-03T00:00:00+00:00",
@@ -96,15 +91,15 @@ def get_create_non_draft_input_data(**overrides: Any) -> dict[str, Any]:
         "metadataSet": metadata_set.pk,
         "maxReservationsPerUser": 2,
         "requireReservationHandling": True,
-        "authentication": AuthenticationType.STRONG.name,
+        "authentication": AuthenticationType.STRONG,
         "canApplyFreeOfCharge": True,
         "reservationsMinDaysBefore": 1,
         "reservationsMaxDaysBefore": 360,
-        "reservationKind": ReservationKind.DIRECT.name,
+        "reservationKind": ReservationKind.DIRECT,
         "pricings": [
             {
                 "begins": today.isoformat(),
-                "priceUnit": PriceUnit.PER_15_MINS.name,
+                "priceUnit": PriceUnit.PER_15_MINS,
                 "lowestPrice": "10.5",
                 "highestPrice": "18.8",
                 "taxPercentage": tax_percentage.id,
@@ -114,7 +109,7 @@ def get_create_non_draft_input_data(**overrides: Any) -> dict[str, Any]:
         "accessTypes": [
             {
                 "beginDate": today.isoformat(),
-                "accessType": AccessType.UNRESTRICTED.value,
+                "accessType": AccessType.UNRESTRICTED,
             },
         ],
         **overrides,
@@ -129,11 +124,9 @@ def get_create_draft_input_data(**overrides: Any) -> dict[str, Any]:
 
     return {
         "isDraft": True,
-        "name": "Name",
         "nameFi": "Name FI",
         "nameEn": "Name EN",
         "nameSv": "Name SV",
-        "description": "desc",
         "descriptionFi": "desc FI",
         "descriptionEn": "desc EN",
         "descriptionSv": "desc SV",
@@ -150,7 +143,7 @@ def get_pricing_data(**overrides: Any) -> dict[str, Any]:
 
     return {
         "begins": "2022-09-11",
-        "priceUnit": PriceUnit.PER_15_MINS.name,
+        "priceUnit": PriceUnit.PER_15_MINS,
         "lowestPrice": "18.2",
         "highestPrice": "21.5",
         "taxPercentage": tax_percentage.id,
@@ -159,10 +152,10 @@ def get_pricing_data(**overrides: Any) -> dict[str, Any]:
     }
 
 
-def get_draft_update_input_data(reservation_unit: ReservationUnit, **overrides) -> dict[str, Any]:
+def get_update_draft_input_data(reservation_unit: ReservationUnit, **overrides) -> dict[str, Any]:
     return {
         "pk": reservation_unit.pk,
-        "name": "name",
+        "nameFi": "name",
         **overrides,
     }
 
@@ -171,7 +164,6 @@ def get_non_draft_update_input_data(reservation_unit: ReservationUnit, **overrid
     today = local_date()
     return {
         "pk": reservation_unit.pk,
-        "name": "name",
         "nameFi": "name",
         "nameEn": "name",
         "nameSv": "name",
@@ -182,7 +174,7 @@ def get_non_draft_update_input_data(reservation_unit: ReservationUnit, **overrid
         "accessTypes": [
             {
                 "beginDate": today.isoformat(),
-                "accessType": AccessType.UNRESTRICTED.value,
+                "accessType": AccessType.UNRESTRICTED,
             },
         ],
         **overrides,
