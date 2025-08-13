@@ -8,10 +8,7 @@ from typing import Any
 from django.conf import settings
 from django.core.management import BaseCommand
 from django.utils.translation import activate
-
-# Remove `graphiql_debug_toolbar` from INSTALLED_APPS to prevent `debug` from being included in the schema.
-if "graphiql_debug_toolbar" in settings.INSTALLED_APPS:
-    settings.INSTALLED_APPS.pop(settings.INSTALLED_APPS.index("graphiql_debug_toolbar"))
+from undine.settings import undine_settings
 
 # Must be called before importing schema to force translation to English
 activate("en")
@@ -27,7 +24,7 @@ class Command(BaseCommand):
 
     def handle(self, *args: Any, **options: Any) -> None:
         filepath = settings.BASE_DIR.parent / "tilavaraus.graphql"
-        new_schema = str(schema)
+        new_schema = undine_settings.SDL_PRINTER.print_schema(schema)
 
         old_schema = Path(filepath).read_text(encoding="utf-8")
 
