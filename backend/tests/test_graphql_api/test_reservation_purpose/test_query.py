@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import pytest
-from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationPurposeFactory
+from tests.query_builder import build_query
 
 # Applied to all tests
 pytestmark = [
@@ -23,13 +23,13 @@ def test_reservation_purpose__query(graphql):
         nameEn
         rank
     """
-    query = build_query("reservationPurposes", fields=fields, connection=True)
+    query = build_query("allReservationPurposes", fields=fields)
     response = graphql(query)
 
     assert response.has_errors is False
 
-    assert len(response.edges) == 1
-    assert response.node() == {
+    assert len(response.results) == 1
+    assert response.results[0] == {
         "pk": res_purpose.pk,
         "nameFi": res_purpose.name_fi,
         "nameSv": res_purpose.name_sv,
@@ -45,15 +45,15 @@ def test_reservation_purpose__order__by_name(graphql):
 
     graphql.login_with_superuser()
 
-    query = build_query("reservationPurposes", order_by="nameFiDesc", connection=True)
+    query = build_query("allReservationPurposes", order_by="nameFiDesc")
     response = graphql(query)
 
     assert response.has_errors is False
 
-    assert len(response.edges) == 3
-    assert response.node(0) == {"pk": res_purpose_2.pk}
-    assert response.node(1) == {"pk": res_purpose_3.pk}
-    assert response.node(2) == {"pk": res_purpose_1.pk}
+    assert len(response.results) == 3
+    assert response.results[0] == {"pk": res_purpose_2.pk}
+    assert response.results[1] == {"pk": res_purpose_3.pk}
+    assert response.results[2] == {"pk": res_purpose_1.pk}
 
 
 def test_reservation_purpose__order__by_rank(graphql):
@@ -63,12 +63,12 @@ def test_reservation_purpose__order__by_rank(graphql):
 
     graphql.login_with_superuser()
 
-    query = build_query("reservationPurposes", order_by="rankDesc", connection=True)
+    query = build_query("allReservationPurposes", order_by="rankDesc")
     response = graphql(query)
 
     assert response.has_errors is False
 
-    assert len(response.edges) == 3
-    assert response.node(0) == {"pk": res_purpose_2.pk}
-    assert response.node(1) == {"pk": res_purpose_3.pk}
-    assert response.node(2) == {"pk": res_purpose_1.pk}
+    assert len(response.results) == 3
+    assert response.results[0] == {"pk": res_purpose_2.pk}
+    assert response.results[1] == {"pk": res_purpose_3.pk}
+    assert response.results[2] == {"pk": res_purpose_1.pk}

@@ -3,9 +3,9 @@ from __future__ import annotations
 from functools import partial
 
 import pytest
-from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationDenyReasonFactory
+from tests.query_builder import build_query
 
 # Applied to all tests
 pytestmark = [
@@ -13,7 +13,7 @@ pytestmark = [
 ]
 
 
-deny_query = partial(build_query, "reservationDenyReasons", connection=True)
+deny_query = partial(build_query, "allReservationDenyReasons")
 
 
 def test_reservation_deny_reasons__query(graphql):
@@ -26,8 +26,8 @@ def test_reservation_deny_reasons__query(graphql):
 
     assert response.has_errors is False
 
-    assert len(response.edges) == 1
-    assert response.node() == {
+    assert len(response.results) == 1
+    assert response.results[0] == {
         "pk": deny_reason.pk,
         "reasonFi": deny_reason.reason_fi,
         "reasonEn": deny_reason.reason_en,
@@ -41,7 +41,7 @@ def test_reservation_deny_reasons__query__anonymous_user(graphql):
     query = deny_query()
     response = graphql(query)
 
-    assert response.error_message() == "No permission to access node."
+    assert response.error_message(0) == "No permission to access reservation deny reason."
 
 
 def test_reservation_deny_reasons__order__by_rank(graphql):
@@ -56,17 +56,17 @@ def test_reservation_deny_reasons__order__by_rank(graphql):
 
     assert response.has_errors is False
 
-    assert len(response.edges) == 3
-    assert response.node(0) == {"pk": deny_reason_1.pk}
-    assert response.node(1) == {"pk": deny_reason_3.pk}
-    assert response.node(2) == {"pk": deny_reason_2.pk}
+    assert len(response.results) == 3
+    assert response.results[0] == {"pk": deny_reason_1.pk}
+    assert response.results[1] == {"pk": deny_reason_3.pk}
+    assert response.results[2] == {"pk": deny_reason_2.pk}
 
     query = deny_query(order_by="rankDesc")
     response = graphql(query)
 
     assert response.has_errors is False
 
-    assert len(response.edges) == 3
-    assert response.node(0) == {"pk": deny_reason_2.pk}
-    assert response.node(1) == {"pk": deny_reason_3.pk}
-    assert response.node(2) == {"pk": deny_reason_1.pk}
+    assert len(response.results) == 3
+    assert response.results[0] == {"pk": deny_reason_2.pk}
+    assert response.results[1] == {"pk": deny_reason_3.pk}
+    assert response.results[2] == {"pk": deny_reason_1.pk}

@@ -5,13 +5,13 @@ from typing import NamedTuple
 
 import pytest
 from freezegun import freeze_time
-from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget
 from utils.date_utils import local_datetime
 
 from tests.factories import BannerNotificationFactory, UserFactory
 from tests.factories.banner_notification import BannerNotificationBuilder
+from tests.helpers import parametrize_helper
 
 # Applied to all tests
 pytestmark = [
@@ -30,19 +30,19 @@ class OrderingParams(NamedTuple):
             "Ascending order": OrderingParams(
                 order_by="stateAsc",
                 expected=[
-                    {"node": {"messageFi": "2", "state": "ACTIVE"}},
-                    {"node": {"messageFi": "3", "state": "SCHEDULED"}},
-                    {"node": {"messageFi": "1", "state": "DRAFT"}},
-                    {"node": {"messageFi": "4", "state": "DRAFT"}},
+                    {"node": {"messageFi": "active", "state": "ACTIVE"}},
+                    {"node": {"messageFi": "scheduled", "state": "SCHEDULED"}},
+                    {"node": {"messageFi": "draft", "state": "DRAFT"}},
+                    {"node": {"messageFi": "past", "state": "DRAFT"}},
                 ],
             ),
             "Descending order": OrderingParams(
                 order_by="stateDesc",
                 expected=[
-                    {"node": {"messageFi": "4", "state": "DRAFT"}},
-                    {"node": {"messageFi": "1", "state": "DRAFT"}},
-                    {"node": {"messageFi": "3", "state": "SCHEDULED"}},
-                    {"node": {"messageFi": "2", "state": "ACTIVE"}},
+                    {"node": {"messageFi": "past", "state": "DRAFT"}},
+                    {"node": {"messageFi": "draft", "state": "DRAFT"}},
+                    {"node": {"messageFi": "scheduled", "state": "SCHEDULED"}},
+                    {"node": {"messageFi": "active", "state": "ACTIVE"}},
                 ],
             ),
         },
@@ -52,42 +52,53 @@ def test_sort_banner_notifications_by_state(graphql, order_by, expected):
     # given:
     # - There are banner notification of all different states in the system
     # - Notification manager user is using the system
+    now = local_datetime()
+
     BannerNotificationFactory.create(
-        message="1",
+        message="draft",
         draft=True,
         target=BannerNotificationTarget.ALL,
     )
-    BannerNotificationBuilder().active().create(
-        message="2",
+    BannerNotificationFactory.create(
+        message="active",
+        draft=False,
+        active_from=now - datetime.timedelta(days=1),
+        active_until=now + datetime.timedelta(days=1),
         target=BannerNotificationTarget.ALL,
     )
-    BannerNotificationBuilder().scheduled().create(
-        message="3",
+    BannerNotificationFactory.create(
+        message="scheduled",
+        draft=False,
+        active_from=now + datetime.timedelta(days=1),
+        active_until=now + datetime.timedelta(days=2),
         target=BannerNotificationTarget.ALL,
     )
-    BannerNotificationBuilder().past().create(
-        message="4",
+    BannerNotificationFactory.create(
+        message="past",
+        draft=False,
+        active_from=now - datetime.timedelta(days=2),
+        active_until=now - datetime.timedelta(days=1),
         target=BannerNotificationTarget.ALL,
     )
+
     user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
     # - User requests all banner notifications in the given order
-    response = graphql(
-        f"""
-        query {{
-          bannerNotifications(orderBy: {order_by}) {{
-            edges {{
-              node {{
+    query = """
+        query {
+          bannerNotifications(orderBy: %s) {
+            edges {
+              node {
                 messageFi
                 state
-              }}
-            }}
-          }}
-        }}
-        """,
-    )
+              }
+            }
+          }
+        }
+    """
+    response = graphql(query % order_by)
 
     # then:
     # - The response contains the notifications in the expected order
@@ -133,20 +144,19 @@ def test_sort_banner_notifications_by_name(graphql, order_by, expected):
 
     # when:
     # - User requests all banner notifications in the given order
-    response = graphql(
-        f"""
-        query {{
-          bannerNotifications(orderBy: {order_by}) {{
-            edges {{
-              node {{
+    query = """
+        query {
+          bannerNotifications(orderBy: %s) {
+            edges {
+              node {
                 messageFi
                 name
-              }}
-            }}
-          }}
-        }}
-        """,
-    )
+              }
+            }
+          }
+        }
+    """
+    response = graphql(query % order_by)
 
     # then:
     # - The response contains the notifications in the expected order
@@ -201,20 +211,19 @@ def test_sort_banner_notifications_by_start_date(graphql, order_by, expected):
 
     # when:
     # - User requests all banner notifications in the given order
-    response = graphql(
-        f"""
-        query {{
-          bannerNotifications(orderBy: {order_by}) {{
-            edges {{
-              node {{
+    query = """
+        query {
+          bannerNotifications(orderBy: %s) {
+            edges {
+              node {
                 messageFi
                 activeFrom
-              }}
-            }}
-          }}
-        }}
-        """,
-    )
+              }
+            }
+          }
+        }
+    """
+    response = graphql(query % order_by)
 
     # then:
     # - The response contains the notifications in the expected order
@@ -269,20 +278,19 @@ def test_sort_banner_notifications_by_end_date(graphql, order_by, expected):
 
     # when:
     # - User requests all banner notifications in the given order
-    response = graphql(
-        f"""
-        query {{
-          bannerNotifications(orderBy: {order_by}) {{
-            edges {{
-              node {{
+    query = """
+        query {
+          bannerNotifications(orderBy: %s) {
+            edges {
+              node {
                 messageFi
                 activeUntil
-              }}
-            }}
-          }}
-        }}
-        """,
-    )
+              }
+            }
+          }
+        }
+    """
+    response = graphql(query % order_by)
 
     # then:
     # - The response contains the notifications in the expected order
@@ -332,20 +340,19 @@ def test_sort_banner_notifications_by_target(graphql, order_by, expected):
 
     # when:
     # - User requests all banner notifications in the given order
-    response = graphql(
-        f"""
-        query {{
-          bannerNotifications(orderBy: {order_by}) {{
-            edges {{
-              node {{
+    query = """
+        query {
+          bannerNotifications(orderBy: %s) {
+            edges {
+              node {
                 messageFi
                 target
-              }}
-            }}
-          }}
-        }}
-        """,
-    )
+              }
+            }
+          }
+        }
+    """
+    response = graphql(query % order_by)
 
     # then:
     # - The response contains the notifications in the expected order
@@ -395,20 +402,19 @@ def test_sort_banner_notifications_by_level(graphql, order_by, expected):
 
     # when:
     # - User requests all banner notifications in the given order
-    response = graphql(
-        f"""
-        query {{
-          bannerNotifications(orderBy: {order_by}) {{
-            edges {{
-              node {{
+    query = """
+        query {
+          bannerNotifications(orderBy: %s) {
+            edges {
+              node {
                 messageFi
                 level
-              }}
-            }}
-          }}
-        }}
-        """,
-    )
+              }
+            }
+          }
+        }
+    """
+    response = graphql(query % order_by)
 
     # then:
     # - The response contains the notifications in the expected order

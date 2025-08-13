@@ -56,11 +56,11 @@ def test_reservation_series__cancel_section_series__cancel_whole_remaining(graph
     }
 
     graphql.force_login(user)
-    response = graphql(CANCEL_SECTION_SERIES_MUTATION, input_data=data)
+    response = graphql(CANCEL_SECTION_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    assert response.first_query_object == {"cancelled": 5, "future": 5}
+    assert response.results == {"cancelled": 5, "future": 5}
     assert reservation_series.reservations.count() == 9
 
     assert EmailService.send_seasonal_booking_cancelled_all_email.called is True
@@ -94,11 +94,11 @@ def test_reservation_series__cancel_section_series__cancel_details_not_required(
     }
 
     graphql.force_login(user)
-    response = graphql(CANCEL_SECTION_SERIES_MUTATION, input_data=data)
+    response = graphql(CANCEL_SECTION_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    assert response.first_query_object == {"cancelled": 5, "future": 5}
+    assert response.results == {"cancelled": 5, "future": 5}
     assert reservation_series.reservations.count() == 9
 
 
@@ -130,11 +130,11 @@ def test_reservation_series__cancel_section_series__not_seasonal_type(graphql):
     }
 
     graphql.force_login(user)
-    response = graphql(CANCEL_SECTION_SERIES_MUTATION, input_data=data)
+    response = graphql(CANCEL_SECTION_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    assert response.first_query_object == {"cancelled": 0, "future": 5}
+    assert response.results == {"cancelled": 0, "future": 5}
     assert reservation_series.reservations.count() == 9
 
 
@@ -166,11 +166,11 @@ def test_reservation_series__cancel_section_series__paid(graphql):
     }
 
     graphql.force_login(user)
-    response = graphql(CANCEL_SECTION_SERIES_MUTATION, input_data=data)
+    response = graphql(CANCEL_SECTION_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    assert response.first_query_object == {"cancelled": 0, "future": 5}
+    assert response.results == {"cancelled": 0, "future": 5}
     assert reservation_series.reservations.count() == 9
 
 
@@ -203,11 +203,11 @@ def test_reservation_series__cancel_section_series__not_confirmed_state(graphql)
     }
 
     graphql.force_login(user)
-    response = graphql(CANCEL_SECTION_SERIES_MUTATION, input_data=data)
+    response = graphql(CANCEL_SECTION_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    assert response.first_query_object == {"cancelled": 0, "future": 5}
+    assert response.results == {"cancelled": 0, "future": 5}
     assert reservation_series.reservations.count() == 9
 
 
@@ -239,12 +239,12 @@ def test_reservation_series__cancel_section_series__cancellation_rule(graphql):
     }
 
     graphql.force_login(user)
-    response = graphql(CANCEL_SECTION_SERIES_MUTATION, input_data=data)
+    response = graphql(CANCEL_SECTION_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
     # First future reservation is not cancelled since it's too soon according to the cancellation rule.
-    assert response.first_query_object == {"cancelled": 4, "future": 5}
+    assert response.results == {"cancelled": 4, "future": 5}
     assert reservation_series.reservations.count() == 9
 
     future_reservations = reservation_series.reservations.filter(begins_at__date__gte=local_date()).iterator()
@@ -290,7 +290,7 @@ def test_reservation_series__cancel_section_series__access_codes(graphql):
     }
 
     graphql.force_login(user)
-    response = graphql(CANCEL_SECTION_SERIES_MUTATION, input_data=data)
+    response = graphql(CANCEL_SECTION_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 

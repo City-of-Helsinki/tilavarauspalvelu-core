@@ -1,16 +1,18 @@
 from __future__ import annotations
 
+import datetime
 from typing import Any, NamedTuple
 
 import pytest
-from graphene_django_extensions.testing.utils import parametrize_helper
-from graphql_relay import to_global_id
+from undine.relay import to_global_id
 
-from tilavarauspalvelu.api.graphql.types.banner_notification.types import BannerNotificationNode
+from tilavarauspalvelu.api.graphql.types.banner_notification.queries import BannerNotificationNode
 from tilavarauspalvelu.enums import BannerNotificationTarget
+from utils.date_utils import local_datetime
 
 from tests.factories import BannerNotificationFactory, UserFactory
 from tests.factories.banner_notification import BannerNotificationBuilder
+from tests.helpers import parametrize_helper
 
 # Applied to all tests
 pytestmark = [
@@ -34,10 +36,9 @@ def test_filter_banner_notifications_by_name(graphql):
 
     # when:
     # - The user requests banner notifications with the given name
-    response = graphql(
-        """
+    query = """
         query {
-            bannerNotifications(name: "foo") {
+            bannerNotifications(filter: {name: "foo"}) {
                 edges {
                     node {
                         name
@@ -45,8 +46,8 @@ def test_filter_banner_notifications_by_name(graphql):
                 }
             }
         }
-        """,
-    )
+    """
+    response = graphql(query)
 
     # then:
     # - The response contains only the expected banner notification
@@ -58,15 +59,15 @@ def test_filter_banner_notifications_by_name(graphql):
     **parametrize_helper(
         {
             "All": FilteringParams(
-                value=BannerNotificationTarget.ALL.value,
+                value=BannerNotificationTarget.ALL,
                 expected={"name": "baz"},
             ),
             "Staff": FilteringParams(
-                value=BannerNotificationTarget.STAFF.value,
+                value=BannerNotificationTarget.STAFF,
                 expected={"name": "bar"},
             ),
             "User": FilteringParams(
-                value=BannerNotificationTarget.USER.value,
+                value=BannerNotificationTarget.USER,
                 expected={"name": "foo"},
             ),
         },
@@ -84,19 +85,18 @@ def test_filter_banner_notifications_by_target(graphql, value, expected):
 
     # when:
     # - The user requests banner notifications filtered by is_active
-    response = graphql(
-        f"""
-        query {{
-            bannerNotifications(target:{value}) {{
-                edges {{
-                    node {{
+    query = """
+        query ($target: BannerNotificationTarget!) {
+            bannerNotifications(filter: {target: $target}) {
+                edges {
+                    node {
                         name
-                    }}
-                }}
-            }}
-        }}
-        """,
-    )
+                    }
+                }
+            }
+        }
+    """
+    response = graphql(query, variables={"target": value})
 
     # then:
     # - The response contains only the expected banner notifications
@@ -122,17 +122,27 @@ def test_filter_banner_notifications_by_is_active(graphql, value, expected):
     # given:
     # - There are two banner notifications in the system, one active and one inactive
     # - Notification manager user is using the system
-    BannerNotificationFactory.create(name="foo")
-    BannerNotificationBuilder().active().create(name="bar")
+    now = local_datetime()
+
+    BannerNotificationFactory.create(  # inactive
+        name="foo",
+        draft=True,
+    )
+    BannerNotificationFactory.create(  # active
+        name="bar",
+        draft=False,
+        active_from=now - datetime.timedelta(days=1),
+        active_until=now + datetime.timedelta(days=1),
+    )
+
     user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
     # - The user requests banner notifications filtered by is_active
-    response = graphql(
-        """
+    query = """
         query BannerNotifications($isActive: Boolean!) {
-            bannerNotifications(isActive: $isActive) {
+            bannerNotifications(filter: {isActive: $isActive}) {
                 edges {
                     node {
                         name
@@ -140,9 +150,8 @@ def test_filter_banner_notifications_by_is_active(graphql, value, expected):
                 }
             }
         }
-        """,
-        variables={"isActive": value},
-    )
+    """
+    response = graphql(query, variables={"isActive": value})
 
     # then:
     # - The response contains only the expected banner notifications
@@ -187,10 +196,9 @@ def test_filter_banner_notifications_by_is_visible(graphql, value, expected):
 
     # when:
     # - The user requests banner notifications filtered by is_active
-    response = graphql(
-        """
+    query = """
         query BannerNotifications($isVisible: Boolean!) {
-            bannerNotifications(isVisible: $isVisible, orderBy: pkAsc) {
+            bannerNotifications(filter: {isVisible: $isVisible}, orderBy: pkAsc) {
                 edges {
                     node {
                         name
@@ -198,9 +206,8 @@ def test_filter_banner_notifications_by_is_visible(graphql, value, expected):
                 }
             }
         }
-        """,
-        variables={"isVisible": value},
-    )
+    """
+    response = graphql(query, variables={"isVisible": value})
 
     # then:
     # - The response contains only the expected banner notifications
@@ -221,17 +228,17 @@ def test_fetch_single_banner_notification_by_id(graphql):
 
     # when:
     # - The user requests a banner notification with the given id
-    response = graphql(
-        """
+    query = """
         query ($id: ID!) {
-            bannerNotification(id: $id) {
-                name
+            node(id: $id) {
+                ... on BannerNotificationNode {
+                    name
+                }
             }
         }
-        """,
-        variables={"id": global_id},
-    )
+    """
+    response = graphql(query, variables={"id": global_id})
 
     # then:
     # - The response contains the expected banner notification
-    assert response.first_query_object == {"name": "foo"}, response
+    assert response.results == {"name": "foo"}, response

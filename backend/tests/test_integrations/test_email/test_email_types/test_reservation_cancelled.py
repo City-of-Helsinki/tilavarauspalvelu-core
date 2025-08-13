@@ -1,5 +1,3 @@
-# type: EmailType.RESERVATION_CANCELLED
-
 from __future__ import annotations
 
 from inspect import cleandoc

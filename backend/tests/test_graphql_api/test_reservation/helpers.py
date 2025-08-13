@@ -5,8 +5,6 @@ from contextlib import contextmanager
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
-from graphene_django_extensions.testing import build_mutation, build_query
-
 from tilavarauspalvelu.enums import ReservationCancelReasonChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from utils.date_utils import next_hour
@@ -14,20 +12,20 @@ from utils.date_utils import next_hour
 from tests.factories import ReservationDenyReasonFactory
 from tests.factories.helsinki_profile import MyProfileDataFactory
 from tests.helpers import ResponseMock, patch_method
+from tests.query_builder import build_mutation, build_query
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation, ReservationUnit
 
-reservation_query = partial(build_query, "reservation")
 reservations_query = partial(build_query, "reservations", connection=True, order_by="pkAsc")
 
 CREATE_MUTATION = build_mutation("createReservation", "ReservationCreateMutation")
 UPDATE_MUTATION = build_mutation("updateReservation", "ReservationUpdateMutation")
-DELETE_MUTATION = build_mutation("deleteTentativeReservation", "ReservationDeleteTentativeMutation", fields="deleted")
+DELETE_MUTATION = build_mutation("deleteTentativeReservation", "ReservationDeleteTentativeMutation")
 ADJUST_MUTATION = build_mutation("adjustReservationTime", "ReservationAdjustTimeMutation")
 APPROVE_MUTATION = build_mutation("approveReservation", "ReservationApproveMutation")
 DENY_MUTATION = build_mutation("denyReservation", "ReservationDenyMutation")
-CANCEL_MUTATION = build_mutation("cancelReservation", "ReservationCancellationMutation")
+CANCEL_MUTATION = build_mutation("cancelReservation", "ReservationCancelMutation")
 CONFIRM_MUTATION = build_mutation("confirmReservation", "ReservationConfirmMutation")
 REFUND_MUTATION = build_mutation("refundReservation", "ReservationRefundMutation")
 REQUIRE_HANDLING_MUTATION = build_mutation("requireHandlingForReservation", "ReservationRequiresHandlingMutation")

@@ -25,7 +25,7 @@ def test_send_application__draft(graphql):
     application = ApplicationFactory.create_application_ready_for_sending()
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is False, response
 
@@ -40,7 +40,7 @@ def test_send_application__sent(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(sent_at=local_datetime())
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is False, response.errors
 
@@ -54,10 +54,10 @@ def test_send_application__cancelled(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(cancelled_at=local_datetime())
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application in status 'CANCELLED' cannot be sent."]
+    assert response.error_message(0) == "Application in status 'CANCELLED' cannot be sent."
 
 
 def test_send_application__expired(graphql):
@@ -67,20 +67,20 @@ def test_send_application__expired(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application in status 'EXPIRED' cannot be sent."]
+    assert response.error_message(0) == "Application in status 'EXPIRED' cannot be sent."
 
 
 def test_send_application__no_sections(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(application_sections=[])
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application requires application sections before it can be sent."]
+    assert response.error_message(0) == "Application requires application sections before it can be sent."
 
 
 def test_send_application__no_purpose(graphql):
@@ -88,10 +88,10 @@ def test_send_application__no_purpose(graphql):
     section = application.application_sections.first()
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == [f"Application section {section.pk} must have its purpose set."]
+    assert response.error_message(0) == f"Application section {section.pk} must have its purpose set."
 
 
 def test_send_application__no_age_group(graphql):
@@ -99,10 +99,10 @@ def test_send_application__no_age_group(graphql):
     section = application.application_sections.first()
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == [f"Application section {section.pk} must have age group set."]
+    assert response.error_message(0) == f"Application section {section.pk} must have age group set."
 
 
 def test_send_application__no_suitable_time_ranges(graphql):
@@ -112,12 +112,12 @@ def test_send_application__no_suitable_time_ranges(graphql):
     section = application.application_sections.first()
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == [
+    assert response.error_message(0) == (
         f"Application section {section.pk} must have at least one suitable time range selected."
-    ]
+    )
 
 
 def test_send_application__no_reservation_unit_options(graphql):
@@ -127,12 +127,12 @@ def test_send_application__no_reservation_unit_options(graphql):
     section = application.application_sections.first()
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == [
+    assert response.error_message(0) == (
         f"Application section {section.pk} must have at least one reservation unit option selected."
-    ]
+    )
 
 
 def test_send_application__section_empty_name(graphql):
@@ -140,10 +140,10 @@ def test_send_application__section_empty_name(graphql):
     section = application.application_sections.first()
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == [f"Application section {section.pk} name cannot be empty."]
+    assert response.error_message(0) == f"Application section {section.pk} name cannot be empty."
 
 
 def test_send_application__section_num_persons_zero(graphql):
@@ -151,10 +151,10 @@ def test_send_application__section_num_persons_zero(graphql):
     section = application.application_sections.first()
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == [f"Application section {section.pk} must be for at least one person."]
+    assert response.error_message(0) == f"Application section {section.pk} must be for at least one person."
 
 
 def test_send_application__section_suitable_time_range_too_short(graphql):
@@ -167,14 +167,14 @@ def test_send_application__section_suitable_time_range_too_short(graphql):
     section = application.application_sections.first()
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == [
+    assert response.error_message(0) == (
         f"Suitable time ranges for Monday in application section {section.pk} "
         f"do not contain a contiguous time range that is at least as long as the "
         f"requested minimum reservation duration of 2 h."
-    ]
+    )
 
 
 def test_send_application__section_suitable_time_range__combined_are_long_enough(graphql):
@@ -200,7 +200,7 @@ def test_send_application__section_suitable_time_range__combined_are_long_enough
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is False, response.errors
 
@@ -226,14 +226,14 @@ def test_send_application__section_suitable_time_range__not_contiguous(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == [
+    assert response.error_message(0) == (
         f"Suitable time ranges for Monday in application section {section.pk} "
         f"do not contain a contiguous time range that is at least as long as the "
         f"requested minimum reservation duration of 2 h."
-    ]
+    )
 
 
 def test_send_application__section_suitable_time_range__different_days(graphql):
@@ -257,18 +257,19 @@ def test_send_application__section_suitable_time_range__different_days(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == [
+    assert response.error_message(0) == (
         f"Suitable time ranges for Monday in application section {section.pk} "
         f"do not contain a contiguous time range that is at least as long as the "
-        f"requested minimum reservation duration of 2 h.",
-        #
+        f"requested minimum reservation duration of 2 h."
+    )
+    assert response.error_message(1) == (
         f"Suitable time ranges for Tuesday in application section {section.pk} "
         f"do not contain a contiguous time range that is at least as long as the "
-        f"requested minimum reservation duration of 2 h.",
-    ]
+        f"requested minimum reservation duration of 2 h."
+    )
 
 
 def test_send_application__section_suitable_time_range__not_enough_suitable_ranges(graphql):
@@ -278,13 +279,13 @@ def test_send_application__section_suitable_time_range__not_enough_suitable_rang
     section = application.application_sections.first()
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == [
+    assert response.error_message(0) == (
         f"Application section {section.pk} must have suitable time ranges on at least as many days "
         f"as requested reservations per week. Counted 1 but expected at least 2."
-    ]
+    )
 
 
 def test_send_application__section_suitable_time_range__only_count_different_days(graphql):
@@ -308,83 +309,83 @@ def test_send_application__section_suitable_time_range__only_count_different_day
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == [
+    assert response.error_message(0) == (
         f"Application section {section.pk} must have suitable time ranges on at least as many days "
         f"as requested reservations per week. Counted 1 but expected at least 2."
-    ]
+    )
 
 
 def test_send_application__contact_person_first_name_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(contact_person_first_name="")
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application contact person first name missing."]
+    assert response.error_message(0) == "Application contact person first name missing."
 
 
 def test_send_application__contact_person_last_name_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(contact_person_last_name="")
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application contact person last name missing."]
+    assert response.error_message(0) == "Application contact person last name missing."
 
 
 def test_send_application__contact_person_email_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(contact_person_email=None)
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application contact person email address missing."]
+    assert response.error_message(0) == "Application contact person email address missing."
 
 
 def test_send_application__contact_person_phone_number_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(contact_person_phone_number="")
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application contact person phone number missing."]
+    assert response.error_message(0) == "Application contact person phone number missing."
 
 
 def test_send_application__billing_address_street_address_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(billing_street_address="")
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application billing street address missing."]
+    assert response.error_message(0) == "Application billing street address missing."
 
 
 def test_send_application__billing_address_post_code_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(billing_post_code="")
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application billing post code missing."]
+    assert response.error_message(0) == "Application billing post code missing."
 
 
 def test_send_application__billing_address_city_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(billing_city="")
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application billing city missing."]
+    assert response.error_message(0) == "Application billing city missing."
 
 
 @patch_method(EmailService.send_seasonal_booking_application_received_email)
@@ -394,7 +395,7 @@ def test_send_application__community_applicant(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is False, response.errors
 
@@ -411,10 +412,10 @@ def test_send_application__community_applicant__org_name_missing(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application organisation must have a name."]
+    assert response.error_message(0) == "Application organisation must have a name."
 
 
 def test_send_application__community_applicant__org_core_business_missing(graphql):
@@ -424,10 +425,10 @@ def test_send_application__community_applicant__org_core_business_missing(graphq
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application organisation must have a core business."]
+    assert response.error_message(0) == "Application organisation must have a core business."
 
 
 def test_send_application__community_applicant__missing_municipality(graphql):
@@ -437,10 +438,10 @@ def test_send_application__community_applicant__missing_municipality(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application municipality is required with organisation."]
+    assert response.error_message(0) == "Application municipality is required with organisation."
 
 
 def test_send_application__community_applicant__organisation_street_address_missing(graphql):
@@ -450,10 +451,10 @@ def test_send_application__community_applicant__organisation_street_address_miss
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application organisation street address missing."]
+    assert response.error_message(0) == "Application organisation street address missing."
 
 
 def test_send_application__community_applicant__organisation_post_code_missing(graphql):
@@ -463,10 +464,10 @@ def test_send_application__community_applicant__organisation_post_code_missing(g
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application organisation post code missing."]
+    assert response.error_message(0) == "Application organisation post code missing."
 
 
 def test_send_application__community_applicant__organisation_city_missing(graphql):
@@ -476,10 +477,10 @@ def test_send_application__community_applicant__organisation_city_missing(graphq
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application organisation city missing."]
+    assert response.error_message(0) == "Application organisation city missing."
 
 
 def test_send_application__community_applicant__billing_details_not_given(graphql):
@@ -491,7 +492,7 @@ def test_send_application__community_applicant__billing_details_not_given(graphq
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is False, response.errors
 
@@ -505,10 +506,10 @@ def test_send_application__community_applicant__billing_street_address_missing(g
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application billing street address missing."]
+    assert response.error_message(0) == "Application billing street address missing."
 
 
 def test_send_application__community_applicant__billing_post_code_missing(graphql):
@@ -520,10 +521,10 @@ def test_send_application__community_applicant__billing_post_code_missing(graphq
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application billing post code missing."]
+    assert response.error_message(0) == "Application billing post code missing."
 
 
 def test_send_application__community_applicant__billing_city_missing(graphql):
@@ -535,10 +536,10 @@ def test_send_application__community_applicant__billing_city_missing(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application billing city missing."]
+    assert response.error_message(0) == "Application billing city missing."
 
 
 @patch_method(EmailService.send_seasonal_booking_application_received_email)
@@ -548,7 +549,7 @@ def test_send_application__association_applicant(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is False, response.errors
 
@@ -565,7 +566,7 @@ def test_send_application__company_applicant(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is False, response.errors
 
@@ -582,10 +583,10 @@ def test_send_application__company_applicant__identifier_missing(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is True
-    assert response.field_error_messages() == ["Application organisation must have an identifier."]
+    assert response.error_message(0) == "Application organisation must have an identifier."
 
 
 @freeze_time("2024-01-01")
@@ -595,10 +596,9 @@ def test_send_application__user_is_not_adult(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["User is not of age"]
+    assert response.error_message(0) == "User is not of age"
 
 
 def test_send_application__is_ad_user__not_internal_user(graphql):
@@ -610,10 +610,9 @@ def test_send_application__is_ad_user__not_internal_user(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(user=user)
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["AD user is not an internal user."]
+    assert response.error_message(0) == "AD user is not an internal user."
 
 
 def test_send_application__is_ad_user__not_internal_user__is_superuser(graphql):
@@ -626,6 +625,6 @@ def test_send_application__is_ad_user__not_internal_user__is_superuser(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(user=user)
 
     graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
 
     assert response.has_errors is False, response.errors

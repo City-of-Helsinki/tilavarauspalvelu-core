@@ -8,6 +8,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from tilavarauspalvelu.enums import ReservationUnitImageType
 
 from tests.factories import ReservationUnitFactory
+from tests.helpers import create_png
 
 from .helpers import CREATE_MUTATION
 
@@ -20,17 +21,17 @@ pytestmark = [
 ]
 
 
-def test_reservation_unit_image__create(graphql, mock_png):
+def test_reservation_unit_image__create(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
     graphql.login_with_superuser()
 
     data = {
-        "image": mock_png,
-        "imageType": ReservationUnitImageType.MAIN.value.upper(),
+        "image": create_png(),
+        "imageType": ReservationUnitImageType.MAIN,
         "reservationUnit": reservation_unit.id,
     }
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(CREATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False
 
@@ -40,21 +41,21 @@ def test_reservation_unit_image__create(graphql, mock_png):
     assert reservation_unit_image.image_type == ReservationUnitImageType.MAIN
 
 
-def test_reservation_unit_image__create__invalid_image_type(graphql, mock_png):
+def test_reservation_unit_image__create__invalid_image_type(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
     graphql.login_with_superuser()
 
     data = {
-        "image": mock_png,
+        "image": create_png(),
         "imageType": "FOO",
         "reservationUnit": reservation_unit.id,
     }
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(CREATE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == (
+    assert response.error_message(0) == (
         "Variable '$input' got invalid value 'FOO' at 'input.imageType'; "
-        "Value 'FOO' does not exist in 'ImageType' enum."
+        "Value 'FOO' does not exist in 'ReservationUnitImageType' enum."
     )
 
     reservation_unit_image: ReservationUnitImage | None = reservation_unit.images.first()
@@ -72,39 +73,40 @@ def test_reservation_unit_image__create__not_a_valid_image(graphql, settings):
 
     data = {
         "image": test_file,
-        "imageType": ReservationUnitImageType.MAIN.value.upper(),
+        "imageType": ReservationUnitImageType.MAIN,
         "reservationUnit": reservation_unit.id,
     }
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(CREATE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages("image") == [
-        "Upload a valid image. The file you uploaded was either not an image or a corrupted image.",
-    ]
+    assert response.error_message(0) == (
+        "Variable '$input' got invalid value <InMemoryUploadedFile instance> at 'input.image'; "
+        "'Image' cannot represent value <InMemoryUploadedFile instance>: "
+        "File either not an image or a corrupted image."
+    )
 
     reservation_unit_image: ReservationUnitImage | None = reservation_unit.images.first()
     assert reservation_unit_image is None
 
 
-def test_reservation_unit_image__create__extension_not_allowed(graphql, settings, mock_png):
+def test_reservation_unit_image__create__extension_not_allowed(graphql, settings):
     settings.LANGUAGE_CODE = "en"
 
     reservation_unit = ReservationUnitFactory.create()
 
     graphql.login_with_superuser()
 
-    mock_png.name = "test_file.foo"
-
     data = {
-        "image": mock_png,
-        "imageType": ReservationUnitImageType.MAIN.value.upper(),
+        "image": create_png(name="test_file.foo"),
+        "imageType": ReservationUnitImageType.MAIN,
         "reservationUnit": reservation_unit.id,
     }
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(CREATE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages("image")[0].startswith(
-        "File extension “foo” is not allowed. Allowed extensions are:",
+    assert response.error_message(0).startswith(
+        "Variable '$input' got invalid value <InMemoryUploadedFile instance> at 'input.image'; "
+        "'Image' cannot represent value <InMemoryUploadedFile instance>: "
+        "File extension 'foo' is not allowed. "
+        "Allowed extensions are:"
     )
 
     reservation_unit_image: ReservationUnitImage | None = reservation_unit.images.first()
