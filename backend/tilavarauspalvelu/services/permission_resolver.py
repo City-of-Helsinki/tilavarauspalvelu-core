@@ -158,7 +158,7 @@ class PermissionResolver:
         self,
         *,
         permission: UserPermissionChoice,
-        unit_ids: Iterable[Unit] = (),
+        unit_ids: Iterable[int] = (),
         require_all: bool = False,
     ) -> bool:
         from tilavarauspalvelu.models import Unit
@@ -267,9 +267,8 @@ class PermissionResolver:
         if self.has_general_role(role_choices=role_choices):
             return True
 
-        units = application.units_for_permissions
         return self.has_role_for_units_or_their_unit_groups(
-            units=units,
+            units=application.units_for_permissions,
             role_choices=role_choices,
             require_all=all_units,
         )

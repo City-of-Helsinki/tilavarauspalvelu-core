@@ -1,15 +1,10 @@
 from __future__ import annotations
 
-import contextlib
 from typing import TYPE_CHECKING
-
-from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
-
     from requests import Response
 
 
@@ -38,11 +33,3 @@ class ExternalServiceRequestError(ExternalServiceError):
 
 class ExternalServiceParseJSONError(ExternalServiceError):
     """Exception for when parsing a JSON response from an external service fails."""
-
-
-@contextlib.contextmanager
-def external_service_errors_as_validation_errors(*, code: str) -> Generator[None]:
-    try:
-        yield
-    except ExternalServiceError as error:
-        raise ValidationError(str(error), code=code) from error

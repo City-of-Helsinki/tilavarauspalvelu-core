@@ -34,11 +34,11 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
         "name",
         "reservation_period_begin_date",
         "reservation_period_end_date",
-        "_status",
+        "_lookup_property_status",
         "handled_at",
         "sent_at",
     ]
-    list_filter = ["_status"]
+    list_filter = ["_lookup_property_status"]
     ordering = ["-reservation_period_begin_date"]
 
     # Form
