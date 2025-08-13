@@ -1018,6 +1018,10 @@ msgid "Receipt URL"
 msgstr ""
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Handled payment due by"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
 msgid "The reservation associated with this payment order"
 msgstr ""
 
@@ -1031,6 +1035,10 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
 msgid "Available only when order has been refunded"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Date by which the payment for a handled reservation must be paid"
 msgstr ""
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
