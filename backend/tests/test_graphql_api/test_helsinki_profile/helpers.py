@@ -1,7 +1,51 @@
 from __future__ import annotations
 
-from functools import partial
+from inspect import cleandoc
 
-from graphene_django_extensions.testing import build_query
+PROFILE_QUERY = cleandoc(
+    """
+    query (
+        $applicationPk: Int
+        $reservationPk: Int
+    ) {
+        profileData (
+            applicationPk: $applicationPk
+            reservationPk: $reservationPk
+        ) {
+            pk
+            firstName
+            lastName
+            email
+            phone
+            birthday
+            ssn
+            streetAddress
+            postalCode
+            city
+            countryCode
+            additionalAddress
+            municipalityCode
+            municipalityName
+            loginMethod
+            isStrongLogin
+        }
+    }
+    """
+)
 
-profile_query = partial(build_query, "profileData", fields="firstName lastName")
+PROFILE_QUERY_MIN = cleandoc(
+    """
+    query (
+        $applicationPk: Int
+        $reservationPk: Int
+    ) {
+        profileData (
+            applicationPk: $applicationPk
+            reservationPk: $reservationPk
+        ) {
+            firstName
+            lastName
+        }
+    }
+    """
+)

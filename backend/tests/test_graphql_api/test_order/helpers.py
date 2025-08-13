@@ -1,33 +1,30 @@
 from __future__ import annotations
 
 import uuid
-from functools import partial
+from inspect import cleandoc
 from typing import TYPE_CHECKING
-
-from graphene_django_extensions.testing import build_mutation, build_query
 
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import PaymentOrder
 
-order_query = partial(
-    build_query,
-    "order",
-    fields="""
-        orderUuid
-        status
-        paymentType
-        receiptUrl
-        checkoutUrl
-        reservationPk
-        refundUuid
-        expiresInMinutes
-    """,
+
+ORDER_QUERY = cleandoc(
+    """
+        query ($orderUuid: UUID!) {
+          order(orderUuid: $orderUuid) {
+            orderUuid
+            status
+            paymentType
+            receiptUrl
+            checkoutUrl
+            refundUuid
+            expiresInMinutes
+          }
+        }
+    """
 )
-
-
-REFRESH_MUTATION = build_mutation("refreshOrder", "RefreshOrderMutation", fields="orderUuid status")
 
 
 def get_order() -> PaymentOrder:

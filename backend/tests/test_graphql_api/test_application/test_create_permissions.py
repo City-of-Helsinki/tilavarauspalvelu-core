@@ -23,11 +23,11 @@ def test_unauthenticated_cannot_create_application(graphql):
     # when:
     # - User tries to create a new application
     input_data = get_application_create_data(application_round)
-    response = graphql(CREATE_MUTATION, input_data=input_data)
+    response = graphql(CREATE_MUTATION, variables={"input": input_data})
 
     # then:
     # - The response complains about missing permissions
-    assert response.error_message() == "No permission to create."
+    assert response.error_message(0) == "Must be authenticated to create an application."
 
 
 def test_regular_user_can_create_application(graphql):
@@ -40,7 +40,7 @@ def test_regular_user_can_create_application(graphql):
     # when:
     # - User tries to create a new application
     input_data = get_application_create_data(application_round)
-    response = graphql(CREATE_MUTATION, input_data=input_data)
+    response = graphql(CREATE_MUTATION, variables={"input": input_data})
 
     # then:
     # - The response contains no errors

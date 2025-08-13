@@ -1,31 +1,19 @@
 from __future__ import annotations
 
-from contextlib import contextmanager
-from unittest.mock import patch
-
 import pytest
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 
 from tests.factories import ApplicationFactory, ApplicationRoundFactory
-from tests.test_graphql_api.test_application_round.helpers import SET_RESULTS_SENT_MUTATION
+from tests.test_graphql_api.test_application_round.helpers import (
+    SET_RESULTS_SENT_MUTATION,
+    mock_send_application_handled_email_task,
+)
 
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
-
-
-@contextmanager
-def mock_send_application_handled_email_task():
-    from tilavarauspalvelu.tasks import send_application_handled_email_task
-
-    path = "tilavarauspalvelu.api.graphql.types.application_round.serializers."
-    path += send_application_handled_email_task.__name__
-    path += ".delay"
-
-    with patch(path) as mock:
-        yield mock
 
 
 def test_application_round__set_results_sent(graphql):
@@ -37,7 +25,7 @@ def test_application_round__set_results_sent(graphql):
     graphql.login_with_superuser()
 
     with mock_send_application_handled_email_task() as mock:
-        response = graphql(SET_RESULTS_SENT_MUTATION, input_data=data)
+        response = graphql(SET_RESULTS_SENT_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -56,10 +44,9 @@ def test_application_round__set_results_sent__not_handled(graphql):
     graphql.login_with_superuser()
 
     with mock_send_application_handled_email_task() as mock:
-        response = graphql(SET_RESULTS_SENT_MUTATION, input_data=data)
+        response = graphql(SET_RESULTS_SENT_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Application round is not in handled status."]
+    assert response.error_message(0) == "Application round is not in handled status."
 
     application_round.refresh_from_db()
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION

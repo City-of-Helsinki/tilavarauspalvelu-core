@@ -27,7 +27,7 @@ def test_reservation__update(graphql):
 
     graphql.login_with_superuser()
     data = get_update_data(reservation)
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -64,7 +64,7 @@ def test_reservation__update__with_additional_data(graphql):
 
     graphql.login_with_superuser()
     data = get_update_data(reservation, **additional_data)
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -99,10 +99,10 @@ def test_reservation__update__cannot_update_price(graphql):
 
     graphql.login_with_superuser()
     data = get_update_data(reservation, price=0)
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     # Actual error doesn't matter too much, as long as price can't be updated.
-    assert response.has_schema_errors
+    assert response.has_errors
 
 
 def test_reservation__update__cannot_update_time(graphql):
@@ -110,10 +110,10 @@ def test_reservation__update__cannot_update_time(graphql):
 
     graphql.login_with_superuser()
     data = get_update_data(reservation, beginsAt=local_datetime().isoformat())
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     # Actual error doesn't matter too much, as long as price can't be updated.
-    assert response.has_schema_errors
+    assert response.has_errors
 
 
 def test_reservation__update__regular_user(graphql):
@@ -121,9 +121,9 @@ def test_reservation__update__regular_user(graphql):
 
     graphql.login_with_regular_user()
     input_data = get_update_data(reservation)
-    response = graphql(UPDATE_MUTATION, input_data=input_data)
+    response = graphql(UPDATE_MUTATION, variables={"input": input_data})
 
-    assert response.error_message() == "No permission to update."
+    assert response.error_message(0) == "No permission to update this reservation."
 
 
 def test_reservation__update__all_required_fields_are_filled(graphql):
@@ -139,7 +139,7 @@ def test_reservation__update__all_required_fields_are_filled(graphql):
     data["reserveePhone"] = "+358123456789"
 
     graphql.login_with_superuser()
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -173,7 +173,7 @@ def test_reservation__update__missing_reservee_id(graphql):
     data["reserveeLastName"] = "Doe"
 
     graphql.login_with_superuser()
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -209,7 +209,7 @@ def test_reservation__update__missing_reservee_id_for_individual(graphql):
     data["reserveeType"] = ReserveeType.INDIVIDUAL.value
 
     graphql.login_with_superuser()
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -246,7 +246,7 @@ def test_reservation__update__missing_reservee_organisation_name_for_individual(
     data["reserveeType"] = ReserveeType.INDIVIDUAL.value
 
     graphql.login_with_superuser()
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -267,18 +267,18 @@ def test_reservation__update__some_required_fields_are_missing(graphql):
     data["reserveeEmail"] = "john.doe@example.com"
 
     graphql.login_with_superuser()
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Value for required field 'reservee_phone' is missing."]
+    assert response.error_message(0) == "Value for required field 'reservee_phone' is missing."
 
 
 def test_reservation__update__already_has_max_reservations_per_user(graphql):
     reservation = ReservationFactory.create_for_update(reservation_unit__max_reservations_per_user=1)
 
     graphql.login_with_superuser()
-    update_data = get_update_data(reservation)
-    response = graphql(UPDATE_MUTATION, input_data=update_data)
+    data = get_update_data(reservation)
+
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -291,10 +291,9 @@ def test_reservation__update__require_free_of_charge_reason_if_applying_for_free
 
     graphql.login_with_superuser()
     data = get_update_data(reservation, applyingForFreeOfCharge=True)
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Free of charge reason is mandatory when applying for free of charge."]
+    assert response.error_message(0) == "Free of charge reason is mandatory when applying for free of charge."
 
 
 def test_reservation__update__reservation_details_does_not_get_overridden_with_profile_data(graphql, settings):
@@ -308,7 +307,7 @@ def test_reservation__update__reservation_details_does_not_get_overridden_with_p
     graphql.login_with_superuser()
     data = get_update_data(reservation)
     with mock_profile_reader():
-        response = graphql(UPDATE_MUTATION, input_data=data)
+        response = graphql(UPDATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 

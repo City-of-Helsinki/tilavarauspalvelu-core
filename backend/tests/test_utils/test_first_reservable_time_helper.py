@@ -6,7 +6,6 @@ from types import SimpleNamespace
 from typing import NamedTuple, cast
 
 import pytest
-from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import ReservationStartInterval
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
@@ -21,6 +20,7 @@ from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_rese
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory, ReservationUnitFactory
+from tests.helpers import parametrize_helper
 
 # Applied to all tests
 pytestmark = [

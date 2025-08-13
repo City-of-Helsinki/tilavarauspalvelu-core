@@ -4,14 +4,14 @@ import datetime
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
-from graphene_django_extensions.testing import build_mutation, build_query
-
 from tilavarauspalvelu.enums import Weekday
+
+from tests.query_builder import build_mutation, build_query
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnitOption
 
-allocations_query = partial(build_query, "allocatedTimeSlots", connection=True, order_by="pkAsc")
+allocations_query = partial(build_query, "allocatedTimeSlots", connection=True, orderBy="pkAsc")
 
 
 CREATE_ALLOCATION = build_mutation(
@@ -22,7 +22,6 @@ CREATE_ALLOCATION = build_mutation(
 DELETE_ALLOCATION = build_mutation(
     "deleteAllocatedTimeslot",
     "AllocatedTimeSlotDeleteMutation",
-    fields="deleted",
 )
 
 

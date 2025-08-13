@@ -25,11 +25,11 @@ def test_application__update__regular_user(graphql):
         "pk": application.id,
         "additionalInformation": "bar",
     }
-    response = graphql(UPDATE_MUTATION, input_data=input_data)
+    response = graphql(UPDATE_MUTATION, variables={"input": input_data})
 
     # then:
     # - The response complains about mutation permissions
-    assert response.error_message() == "No permission to update."
+    assert response.error_message(0) == "No permission to manage this application."
 
 
 def test_application__update__regular_user__own_application(graphql):
@@ -45,7 +45,7 @@ def test_application__update__regular_user__own_application(graphql):
         "pk": application.id,
         "additionalInformation": "bar",
     }
-    response = graphql(UPDATE_MUTATION, input_data=input_data)
+    response = graphql(UPDATE_MUTATION, variables={"input": input_data})
 
     # then:
     # - The response contains no errors
@@ -63,11 +63,11 @@ def test_application__update__regular_user__own_application__application_period_
         "pk": application.pk,
         "additionalInformation": "bar",
     }
-    response = graphql(UPDATE_MUTATION, input_data=input_data)
+    response = graphql(UPDATE_MUTATION, variables={"input": input_data})
 
     # then:
     # - The response contains errors
-    assert response.error_message() == "No permission to update."
+    assert response.error_message(0) == "No permission to manage this application."
 
 
 def test_application__update__general_admin(graphql):
@@ -84,7 +84,7 @@ def test_application__update__general_admin(graphql):
         "pk": application.id,
         "additionalInformation": "bar",
     }
-    response = graphql(UPDATE_MUTATION, input_data=input_data)
+    response = graphql(UPDATE_MUTATION, variables={"input": input_data})
 
     # then:
     # - The response contains no errors
@@ -109,7 +109,7 @@ def test_application__update__unit_admin(graphql):
         "pk": application.id,
         "additionalInformation": "bar",
     }
-    response = graphql(UPDATE_MUTATION, input_data=input_data)
+    response = graphql(UPDATE_MUTATION, variables={"input": input_data})
 
     # then:
     # - The response contains no errors

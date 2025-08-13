@@ -18,7 +18,7 @@ def test_resource__delete(graphql):
     resource = ResourceFactory.create()
     graphql.login_with_superuser()
 
-    response = graphql(DELETE_MUTATION, input_data={"pk": resource.pk})
+    response = graphql(DELETE_MUTATION, variables={"input": {"pk": resource.pk}})
 
     assert response.has_errors is False
 

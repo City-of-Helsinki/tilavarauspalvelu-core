@@ -20,16 +20,15 @@ def test_resource__create__regular_user(graphql):
     graphql.login_with_regular_user()
 
     data = {
-        "name": "abc",
         "nameFi": "a",
         "nameEn": "b",
         "nameSv": "c",
         "space": space.pk,
-        "locationType": ResourceLocationType.FIXED.value.upper(),
+        "locationType": ResourceLocationType.FIXED,
     }
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(CREATE_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "No permission to create."
+    assert response.error_message(0) == "No permission to create a resource"
 
 
 def test_resource__create__unit_admin__can_manage_resources(graphql):
@@ -39,18 +38,17 @@ def test_resource__create__unit_admin__can_manage_resources(graphql):
     graphql.force_login(user)
 
     data = {
-        "name": "abc",
         "nameFi": "a",
         "nameEn": "b",
         "nameSv": "c",
         "space": space.pk,
-        "locationType": ResourceLocationType.FIXED.value.upper(),
+        "locationType": ResourceLocationType.FIXED,
     }
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(CREATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False
 
-    assert Resource.objects.filter(pk=response.first_query_object["pk"]).exists()
+    assert Resource.objects.filter(pk=response.results["pk"]).exists()
 
 
 def test_resource__create__unit_group_admin__can_manage_resources(graphql):
@@ -61,15 +59,14 @@ def test_resource__create__unit_group_admin__can_manage_resources(graphql):
     graphql.force_login(user)
 
     data = {
-        "name": "abc",
         "nameFi": "a",
         "nameEn": "b",
         "nameSv": "c",
         "space": space.pk,
-        "locationType": ResourceLocationType.FIXED.value.upper(),
+        "locationType": ResourceLocationType.FIXED,
     }
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(CREATE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False
 
-    assert Resource.objects.filter(pk=response.first_query_object["pk"]).exists()
+    assert Resource.objects.filter(pk=response.results["pk"]).exists()

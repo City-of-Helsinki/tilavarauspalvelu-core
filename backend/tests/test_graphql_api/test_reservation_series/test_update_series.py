@@ -65,7 +65,7 @@ def test_reservation_series__update_series(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(UPDATE_SERIES_MUTATION, input_data=data)
+    response = graphql(UPDATE_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is False
 
@@ -110,7 +110,7 @@ def test_reservation_series__update_series__skip_reservations(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(UPDATE_SERIES_MUTATION, input_data=data)
+    response = graphql(UPDATE_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is False
 
@@ -138,7 +138,7 @@ def test_reservation_series__update_series__update_statistics(graphql, settings)
     }
 
     graphql.login_with_superuser()
-    response = graphql(UPDATE_SERIES_MUTATION, input_data=data)
+    response = graphql(UPDATE_SERIES_MUTATION, variables={"input": data})
 
     assert response.has_errors is False
 

@@ -30,7 +30,7 @@ pytestmark = [
 
 
 def test_application_section__status():
-    now = datetime.datetime.now(tz=datetime.UTC)
+    now = local_datetime()
     application_round = ApplicationRoundFactory.create(
         application_period_begins_at=now - datetime.timedelta(days=7),
         application_period_ends_at=now + datetime.timedelta(days=1),

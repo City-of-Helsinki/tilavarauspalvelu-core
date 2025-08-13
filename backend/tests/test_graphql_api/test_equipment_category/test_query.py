@@ -20,8 +20,4 @@ def test_equipment_category__query(graphql):
     response = graphql(query)
 
     assert response.has_errors is False
-    assert len(response.edges) == 1
-
-    assert response.node(0) == {
-        "nameFi": category.name_fi,
-    }
+    assert response.results == [{"nameFi": category.name_fi}]

@@ -62,12 +62,12 @@ def test_reservation__staff_create__reservation_block_whole_day(graphql):
         "name": "foo",
         "description": "bar",
         "type": ReservationTypeChoice.STAFF.value,
-        "beginsAt": datetime.datetime(2023, 1, 1, hour=12).isoformat(),
-        "endsAt": datetime.datetime(2023, 1, 1, hour=13).isoformat(),
+        "beginsAt": datetime.datetime(2023, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "endsAt": datetime.datetime(2023, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE).isoformat(),
         "reservationUnit": reservation_unit.pk,
     }
 
-    response = graphql(CREATE_STAFF_MUTATION, input_data=input_data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": input_data})
     assert response.has_errors is False, response.errors
 
     reservation: Reservation | None = Reservation.objects.filter(name="foo").first()
@@ -98,14 +98,14 @@ def test_reservation__staff_create__reservation_block_whole_day__ignore_given_bu
         "name": "foo",
         "description": "bar",
         "type": ReservationTypeChoice.STAFF.value,
-        "beginsAt": datetime.datetime(2023, 1, 1, hour=12).isoformat(),
-        "endsAt": datetime.datetime(2023, 1, 1, hour=13).isoformat(),
+        "beginsAt": datetime.datetime(2023, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "endsAt": datetime.datetime(2023, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE).isoformat(),
         "reservationUnit": reservation_unit.pk,
         "bufferTimeBefore": int(datetime.timedelta(hours=1).total_seconds()),
         "bufferTimeAfter": int(datetime.timedelta(hours=1).total_seconds()),
     }
 
-    response = graphql(CREATE_STAFF_MUTATION, input_data=input_data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": input_data})
     assert response.has_errors is False, response.errors
 
     reservation: Reservation | None = Reservation.objects.filter(name="foo").first()
@@ -123,11 +123,11 @@ def test_reservation__staff_create__general_admin_can_create(graphql):
     graphql.force_login(admin)
 
     data = get_staff_create_data(reservation_unit)
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    reservation = Reservation.objects.get(pk=response.results["pk"])
     assert reservation.type == ReservationTypeChoice.STAFF
 
 
@@ -138,11 +138,11 @@ def test_reservation__staff_create__unit_admin_can_create(graphql):
     graphql.force_login(admin)
 
     data = get_staff_create_data(reservation_unit)
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    reservation = Reservation.objects.get(pk=response.results["pk"])
     assert reservation.type == ReservationTypeChoice.STAFF
 
 
@@ -152,9 +152,9 @@ def test_reservation__staff_create__regular_user_cannot_create(graphql):
     graphql.login_with_regular_user()
 
     data = get_staff_create_data(reservation_unit)
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "No permission to create."
+    assert response.error_message(0) == "No permission to create this reservation."
     assert Reservation.objects.exists() is False
 
 
@@ -165,7 +165,7 @@ def test_reservation__staff_create__missing_fields(graphql, field):
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit)
     data.pop(field)
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is True, response
 
@@ -176,10 +176,9 @@ def test_reservation__staff_create__end_before_begin(graphql):
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit)
     data["beginsAt"], data["endsAt"] = data["endsAt"], data["beginsAt"]
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation cannot end before it begins"]
+    assert response.error_message(0) == "Reservation cannot end before it begins"
 
 
 def test_reservation__staff_create__begin_date_in_the_past(graphql):
@@ -193,10 +192,9 @@ def test_reservation__staff_create__begin_date_in_the_past(graphql):
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit, begins_at=begin, ends_at=end)
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation cannot begin this much in the past."]
+    assert response.error_message(0) == "Reservation cannot begin this much in the past."
 
 
 @freezegun.freeze_time(datetime.datetime(2021, 1, 5, hour=12, minute=15, tzinfo=DEFAULT_TIMEZONE))
@@ -214,11 +212,11 @@ def test_reservation__staff_create__begin_date_in_the_past__today(graphql):
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit, begins_at=begin, ends_at=end)
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    reservation = Reservation.objects.get(pk=response.results["pk"])
     assert reservation.begins_at == begin
     assert reservation.ends_at == end
 
@@ -238,21 +236,23 @@ def test_reservation__staff_create__begin_date_in_the_past__move_to_yesterday_on
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit, begins_at=begin, ends_at=end)
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    reservation = Reservation.objects.get(pk=response.results["pk"])
     assert reservation.begins_at == begin
     assert reservation.ends_at == end
 
 
 def test_reservation__staff_create__optional_fields(graphql):
     reservation_unit = ReservationUnitFactory.create()
+    purpose = ReservationPurposeFactory.create(name="purpose")
+    age_group = AgeGroupFactory.create(minimum=18, maximum=30)
 
     data = get_staff_create_data(
         reservation_unit,
-        ageGroup=AgeGroupFactory.create(minimum=18, maximum=30).pk,
+        ageGroup=age_group.pk,
         applyingForFreeOfCharge=True,
         bufferTimeAfter=int(datetime.timedelta(minutes=30).total_seconds()),
         bufferTimeBefore=int(datetime.timedelta(minutes=30).total_seconds()),
@@ -261,7 +261,7 @@ def test_reservation__staff_create__optional_fields(graphql):
         municipality=MunicipalityChoice.HELSINKI.value,
         name="Test reservation",
         numPersons=1,
-        purpose=ReservationPurposeFactory.create(name="purpose").pk,
+        purpose=purpose.pk,
         reserveeAddressCity="Helsinki",
         reserveeAddressStreet="Mannerheimintie 2",
         reserveeAddressZip="00100",
@@ -272,15 +272,15 @@ def test_reservation__staff_create__optional_fields(graphql):
         reserveeOrganisationName="Test Organisation ry",
         reserveePhone="+358123456789",
         reserveeType=ReserveeType.INDIVIDUAL,
-        type=ReservationTypeChoice.BLOCKED,
+        type=ReservationTypeChoice.BEHALF,
     )
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    reservation = Reservation.objects.get(pk=response.results["pk"])
 
     assert reservation.age_group.maximum == 30
     assert reservation.age_group.minimum == 18
@@ -302,8 +302,8 @@ def test_reservation__staff_create__optional_fields(graphql):
     assert reservation.reservee_last_name == "Doe"
     assert reservation.reservee_organisation_name == "Test Organisation ry"
     assert reservation.reservee_phone == "+358123456789"
-    assert reservation.reservee_type == "INDIVIDUAL"
-    assert reservation.type == ReservationTypeChoice.BLOCKED
+    assert reservation.reservee_type == ReserveeType.INDIVIDUAL
+    assert reservation.type == ReservationTypeChoice.BEHALF
 
 
 def test_reservation__staff_create__reservation_overlapping_fails(graphql):
@@ -325,10 +325,9 @@ def test_reservation__staff_create__reservation_overlapping_fails(graphql):
 
     ReservationUnitHierarchy.refresh()
 
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
+    assert response.error_message(0) == "Reservation overlaps with existing reservations."
 
 
 def test_reservation__staff_create__buffer_times_cause_overlap_fails(graphql):
@@ -351,10 +350,9 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails(graphql):
 
     ReservationUnitHierarchy.refresh()
 
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
+    assert response.error_message(0) == "Reservation overlaps with existing reservations."
 
 
 def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer_time_before(graphql):
@@ -381,10 +379,9 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer
 
     ReservationUnitHierarchy.refresh()
 
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
+    assert response.error_message(0) == "Reservation overlaps with existing reservations."
 
 
 def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer_time_after(graphql):
@@ -411,10 +408,9 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer
 
     ReservationUnitHierarchy.refresh()
 
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
+    assert response.error_message(0) == "Reservation overlaps with existing reservations."
 
 
 def test_reservation__staff_create__interval_not_respected_fails(graphql):
@@ -425,12 +421,11 @@ def test_reservation__staff_create__interval_not_respected_fails(graphql):
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit, begins_at=begin, ends_at=end)
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == [
-        "Reservation start time does not match the reservation unit's allowed start interval.",
-    ]
+    assert response.error_message(0) == (
+        "Reservation start time does not match the reservation unit's allowed start interval."
+    )
 
 
 def test_reservation__staff_create__reservation_type_normal_not_accepted(graphql):
@@ -438,10 +433,9 @@ def test_reservation__staff_create__reservation_type_normal_not_accepted(graphql
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit, type=ReservationTypeChoice.NORMAL)
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Staff users are not allowed to create reservations of this type."]
+    assert response.error_message(0) == "Staff users are not allowed to create reservations of this type."
 
 
 def test_reservation__staff_create__reservation_type_behalf_accepted(graphql):
@@ -449,11 +443,11 @@ def test_reservation__staff_create__reservation_type_behalf_accepted(graphql):
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit, type=ReservationTypeChoice.BEHALF)
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    reservation = Reservation.objects.get(pk=response.results["pk"])
     assert reservation.type == ReservationTypeChoice.BEHALF
 
 
@@ -470,11 +464,11 @@ def test_reservation__staff_create__reservee_used_ad_login(graphql, amr, expecte
     graphql.force_login(user)
 
     data = get_staff_create_data(reservation_unit)
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    reservation = Reservation.objects.get(pk=response.results["pk"])
     assert reservation.reservee_used_ad_login is expected
 
 
@@ -484,11 +478,11 @@ def test_reservation__staff_create__access_type__access_code(graphql):
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit)
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    reservation = Reservation.objects.get(pk=response.results["pk"])
     assert reservation.access_type == AccessType.ACCESS_CODE
 
     assert PindoraService.create_access_code.call_count == 1
@@ -504,11 +498,11 @@ def test_reservation__staff_create__access_type__changed_to_access_code_in_the_f
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit)
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    reservation = Reservation.objects.get(pk=response.results["pk"])
     assert reservation.access_type == AccessType.UNRESTRICTED
 
     assert PindoraService.create_access_code.call_count == 0
@@ -532,11 +526,11 @@ def test_reservation__staff_create__access_type__access_code_has_ended(graphql):
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit)
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    reservation = Reservation.objects.get(pk=response.results["pk"])
     assert reservation.access_type == AccessType.UNRESTRICTED
 
     assert PindoraService.create_access_code.call_count == 0
@@ -550,11 +544,11 @@ def test_reservation__staff_create__access_type__access_code__blocked(graphql):
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit, type=ReservationTypeChoice.BLOCKED)
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    reservation = Reservation.objects.get(pk=response.results["pk"])
     assert reservation.access_type == AccessType.ACCESS_CODE
 
     assert PindoraService.create_access_code.call_count == 1
@@ -570,7 +564,7 @@ def test_reservation__staff_create__access_type__access_code__pindora_failure(gr
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit)
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+    response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
     # Reservation is is created, even if Pindora call failed.
     # Access code will be created later in a background task.
@@ -605,10 +599,9 @@ def test_reservation__staff_create__two_overlapping_reservation_created_at_the_s
         return Reservation.objects.filter(pk=reservation.pk)
 
     with patch_method(ReservationActions.overlapping_reservations, side_effect=callback):
-        response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+        response = graphql(CREATE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Overlapping reservations were created at the same time."]
+    assert response.error_message(0) == "Overlapping reservations were created at the same time."
 
     # The other reservation is retained, but might be deleted during its own endpoint
     assert Reservation.objects.first() == reservation

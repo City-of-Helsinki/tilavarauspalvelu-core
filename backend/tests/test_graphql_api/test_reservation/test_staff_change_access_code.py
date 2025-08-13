@@ -49,7 +49,7 @@ def test_staff_change_access_code(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -84,7 +84,7 @@ def test_staff_change_access_code__not_active(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -121,7 +121,7 @@ def test_staff_change_access_code__not_active__pindora_call_fails(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -153,10 +153,9 @@ def test_staff_change_access_code__not_generated(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation must have an access code to change it."]
+    assert response.error_message(0) == "Reservation must have an access code to change it."
 
 
 @patch_method(PindoraService.change_access_code)
@@ -177,10 +176,9 @@ def test_staff_change_access_code__not_access_type_access_code(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation access type does not use access codes."]
+    assert response.error_message(0) == "Reservation access type does not use access codes."
 
 
 @patch_method(PindoraService.change_access_code)
@@ -202,10 +200,9 @@ def test_staff_change_access_code__in_series(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation cannot be in a reservation series."]
+    assert response.error_message(0) == "Reservation cannot be in a reservation series."
 
 
 @patch_method(PindoraService.change_access_code)
@@ -226,10 +223,9 @@ def test_staff_change_access_code__state_not_confirmed(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation access code cannot be changed based on its state."]
+    assert response.error_message(0) == "Reservation access code cannot be changed based on its state."
 
 
 @patch_method(PindoraService.change_access_code)
@@ -250,10 +246,9 @@ def test_staff_change_access_code__type_is_blocked(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation access code cannot be changed based on its type."]
+    assert response.error_message(0) == "Reservation access code cannot be changed based on its type."
 
 
 @patch_method(
@@ -281,7 +276,7 @@ def test_staff_change_access_code__ongoing(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -308,10 +303,9 @@ def test_staff_change_access_code__already_ended(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation has already ended."]
+    assert response.error_message(0) == "Reservation has already ended."
 
 
 @patch_method(PindoraService.change_access_code, side_effect=PindoraAPIError("Pindora Error"))
@@ -332,10 +326,9 @@ def test_staff_change_access_code__pindora_error(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Pindora Error"]
+    assert response.error_message(0) == "Pindora Error"
 
 
 @patch_method(PindoraService.change_access_code, side_effect=PindoraNotFoundError("Not found"))
@@ -356,11 +349,11 @@ def test_staff_change_access_code__pindora_error__404(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
-    assert response.first_query_object["accessCodeGeneratedAt"] is None
-    assert response.first_query_object["accessCodeIsActive"] is False
+    assert response.results["accessCodeGeneratedAt"] is None
+    assert response.results["accessCodeIsActive"] is False
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at is None

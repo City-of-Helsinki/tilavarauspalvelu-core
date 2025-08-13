@@ -24,7 +24,7 @@ def test_application__anonymous_user(graphql):
 
     # then:
     # - The response complains about permissions
-    assert response.error_message() == "No permission to access node."
+    assert response.edges == []
 
 
 def test_application__regular_user__other_users_applications(graphql):
@@ -173,7 +173,7 @@ def test_application__regular_user__working_memo(graphql):
 
     # then:
     # - The response complains about permissions to working memo.
-    assert response.error_message("workingMemo") == "No permission to access field."
+    assert response.error_message("workingMemo") == "No permission to access working memo."
 
 
 def test_application__unit_admin__working_memo(graphql):

@@ -1,5 +1,3 @@
-# type: EmailType.SEASONAL_BOOKING_CANCELLED_SINGLE
-
 from __future__ import annotations
 
 import datetime

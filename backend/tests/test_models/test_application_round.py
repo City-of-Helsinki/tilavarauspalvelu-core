@@ -7,6 +7,7 @@ from lookup_property import L
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 from tilavarauspalvelu.models import ApplicationRound
+from utils.date_utils import local_datetime
 
 from tests.factories import ApplicationRoundFactory
 
@@ -17,7 +18,7 @@ pytestmark = [
 
 
 def test_application_round__status():
-    now = datetime.datetime.now(tz=datetime.UTC)
+    now = local_datetime()
     application_round = ApplicationRoundFactory.create(
         application_period_begins_at=now + datetime.timedelta(days=1),
         application_period_ends_at=now + datetime.timedelta(days=2),

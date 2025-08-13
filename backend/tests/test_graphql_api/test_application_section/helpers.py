@@ -4,31 +4,16 @@ import datetime
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
-from graphene_django_extensions.testing import build_mutation, build_query
-
 from tilavarauspalvelu.enums import Priority, Weekday
 
 from tests.factories import AgeGroupFactory, ReservationPurposeFactory, ReservationUnitFactory
+from tests.query_builder import build_mutation, build_query
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Application, ApplicationSection
 
-section_query = partial(build_query, "applicationSection")
 sections_query = partial(build_query, "applicationSections", connection=True, order_by="pkAsc")
 
-CREATE_MUTATION = build_mutation(
-    "createApplicationSection",
-    "ApplicationSectionCreateMutation",
-)
-UPDATE_MUTATION = build_mutation(
-    "updateApplicationSection",
-    "ApplicationSectionUpdateMutation",
-)
-DELETE_MUTATION = build_mutation(
-    "deleteApplicationSection",
-    "ApplicationSectionDeleteMutation",
-    fields="deleted",
-)
 REJECT_MUTATION = build_mutation(
     "rejectAllSectionOptions",
     "RejectAllSectionOptionsMutation",
@@ -37,6 +22,26 @@ RESTORE_MUTATION = build_mutation(
     "restoreAllSectionOptions",
     "RestoreAllSectionOptionsMutation",
 )
+
+PREFERRED_ORDER_QUERY = """
+    query ($preferredOrder: [Int!]! $allHigherThan10: Boolean! = false) {
+        applicationSections(
+            filter: {
+                preferredOrder: {
+                    values: $preferredOrder
+                    allHigherThan10: $allHigherThan10
+                }
+            }
+            orderBy: pkAsc
+        ) {
+            edges {
+                node {
+                    pk
+                }
+            }
+        }
+    }
+"""
 
 
 def get_application_section_create_data(application: Application) -> dict[str, Any]:

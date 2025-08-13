@@ -39,7 +39,7 @@ def test_reservation__cancel__success(graphql, reservation_type):
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -55,7 +55,7 @@ def test_reservation__cancel__adds_cancel_details(graphql):
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation, cancelDetails="foo")
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -76,10 +76,9 @@ def test_reservation__cancel__fails_type_wrong(graphql, reservation_type):
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation cannot be cancelled based on its type"]
+    assert response.error_message(0) == "Reservation cannot be cancelled based on its type"
 
 
 def test_reservation__cancel__fails_when_type_is_seasonal_and_reservation_is_paid(graphql):
@@ -87,10 +86,9 @@ def test_reservation__cancel__fails_when_type_is_seasonal_and_reservation_is_pai
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Paid seasonal reservations cannot be cancelled."]
+    assert response.error_message(0) == "Paid seasonal reservations cannot be cancelled."
 
 
 def test_reservation__cancel__fails_if_state_is_not_confirmed(graphql):
@@ -98,10 +96,9 @@ def test_reservation__cancel__fails_if_state_is_not_confirmed(graphql):
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation cannot be cancelled based on its state"]
+    assert response.error_message(0) == "Reservation cannot be cancelled based on its state"
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CREATED
@@ -113,7 +110,7 @@ def test_reservation__cancel__fails_if_cancel_reason_not_given(graphql):
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
     data.pop("cancelReason")
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
     assert response.has_errors
 
@@ -126,7 +123,7 @@ def test_reservation__cancel__regular_user_can_cancel_own_reservation(graphql):
 
     graphql.force_login(reservation.user)
     data = get_cancel_data(reservation)
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -139,9 +136,9 @@ def test_reservation__cancel__regular_user_cannot_cancel_other_users_reservation
 
     graphql.login_with_regular_user()
     data = get_cancel_data(reservation)
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "No permission to update."
+    assert response.error_message(0) == "No permission to approve reservation."
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
@@ -154,12 +151,11 @@ def test_reservation__cancel__fails_when_cancellation_time_is_over(graphql):
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == [
-        "Reservation time cannot be changed because the cancellation period has expired.",
-    ]
+    assert response.error_message(0) == (
+        "Reservation time cannot be changed because the cancellation period has expired."
+    )
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
@@ -174,10 +170,9 @@ def test_reservation__cancel__fails_when_reservation_in_the_past(graphql):
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Past or ongoing reservations cannot be modified"]
+    assert response.error_message(0) == "Past or ongoing reservations cannot be modified"
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
@@ -188,12 +183,9 @@ def test_reservation__cancel__fails_if_no_cancellation_rule(graphql):
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == [
-        "Reservation cannot be changed because it has no cancellation rule.",
-    ]
+    assert response.error_message(0) == "Reservation cannot be changed because it has no cancellation rule."
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
@@ -205,7 +197,7 @@ def test_reservation__cancel__sends_email_notification(graphql, outbox):
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -234,7 +226,7 @@ def test_reservation__cancel__refund_for_paid_reservation(graphql):
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -268,7 +260,7 @@ def test_reservation__cancel__cancel_invoiced_reservation(graphql):
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -298,7 +290,7 @@ def test_reservation__cancel__cancel_unpaid_reservation(graphql):
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -327,7 +319,7 @@ def test_reservation__cancel__cancel_unpaid_reservation__also_cancel_verkkokaupp
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -350,7 +342,7 @@ def test_reservation__cancel__delete_from_pindora__call_success(graphql):
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
 
@@ -370,10 +362,9 @@ def test_reservation__cancel__delete_from_pindora__call_fails(graphql):
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Pindora API error"]
+    assert response.error_message(0) == "Pindora API error"
 
     assert PindoraService.delete_access_code.called is True
 
@@ -391,7 +382,7 @@ def test_reservation__cancel__delete_from_pindora__call_fails__404(graphql):
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
-    response = graphql(CANCEL_MUTATION, input_data=data)
+    response = graphql(CANCEL_MUTATION, variables={"input": data})
 
     # Request is still successful if Pindora fails with 404
     assert response.has_errors is False, response.errors

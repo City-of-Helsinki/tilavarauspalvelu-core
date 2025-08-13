@@ -7,7 +7,7 @@ import uuid
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Self
 
-from factory import LazyAttribute, fuzzy
+from factory import LazyAttribute, LazyFunction, fuzzy
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -57,7 +57,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     buffer_time_after = datetime.timedelta()
     handled_at = None
     confirmed_at = None
-    created_at = None
+    created_at = LazyFunction(local_datetime)
 
     # Access information
     access_type = AccessType.UNRESTRICTED.value
@@ -78,7 +78,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     reservee_identifier = FakerFI("company_business_id")
     reservee_first_name = FakerFI("first_name")
     reservee_last_name = FakerFI("last_name")
-    reservee_email = FakerFI("email")
+    reservee_email = FakerFI("ascii_email")
     reservee_phone = FakerFI("phone_number")
     reservee_organisation_name = FakerFI("company")
     reservee_address_street = FakerFI("street_address")
