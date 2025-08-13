@@ -61,6 +61,13 @@ class PaymentOrderManager(_BaseManager):
                 payment_order.actions.refresh_order_status_from_webshop()
 
         for payment_order in self.all().expired_handled_payments():
+            # Payment never attempted
+            if payment_order.remote_id is None:
+                payment_order.status = OrderStatus.EXPIRED
+                payment_order.processed_at = local_datetime()
+                payment_order.save(update_fields=["status", "processed_at"])
+                continue
+
             # Do not update PaymentOrder status if an error occurs
             with suppress(GetPaymentError, CancelOrderError), transaction.atomic():
                 payment_order.actions.refresh_order_status_from_webshop()
