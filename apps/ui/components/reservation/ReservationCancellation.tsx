@@ -4,11 +4,7 @@ import { IconClock, IconEuroSign, IconLocation } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { H1 } from "common/styled";
 import { breakpoints } from "common/src/const";
-import {
-  type CancelReasonFieldsFragment,
-  type ReservationCancelPageQuery,
-  useCancelReservationMutation,
-} from "@gql/gql-types";
+import { type ReservationCancelPageQuery, useCancelReservationMutation } from "@gql/gql-types";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";
@@ -36,7 +32,6 @@ const StyledReservationInfoCard = styled(ReservationInfoCard)`
 type NodeT = ReservationCancelPageQuery["reservation"];
 type CancellationProps = {
   apiBaseUrl: string;
-  reasons: CancelReasonFieldsFragment[];
   reservation: NonNullable<NodeT>;
 };
 
@@ -101,7 +96,6 @@ export function ReservationCancellation(props: CancellationProps): JSX.Element {
       <CancellationForm
         onNext={onSubmit}
         isLoading={loading}
-        cancelReasons={props.reasons}
         cancellationTerms={cancellationTerms}
         backLink={backLink}
       />

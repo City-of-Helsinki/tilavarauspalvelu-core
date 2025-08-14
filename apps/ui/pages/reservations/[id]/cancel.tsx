@@ -1,21 +1,21 @@
-import React from "react";
-import type { GetServerSidePropsContext } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { ReservationCancellation } from "@/components/reservation/ReservationCancellation";
+import { createApolloClient } from "@/modules/apolloClient";
+import { isReservationCancellable } from "@/modules/reservation";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getApplicationPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
+import { gql } from "@apollo/client";
 import {
   ReservationCancelPageDocument,
   type ReservationCancelPageQuery,
   type ReservationCancelPageQueryVariables,
 } from "@gql/gql-types";
-import { ReservationCancellation } from "@/components/reservation/ReservationCancellation";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { createApolloClient } from "@/modules/apolloClient";
-import { base64encode, filterNonNullable } from "common/src/helpers";
-import { isReservationCancellable } from "@/modules/reservation";
-import { getApplicationPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { useTranslation } from "next-i18next";
-import { gql } from "@apollo/client";
+import { base64encode } from "common/src/helpers";
 import { type TFunction } from "i18next";
+import type { GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import React from "react";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -82,7 +82,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     });
     const { reservation } = data || {};
 
-    const reasons = filterNonNullable(data?.reservationCancelReasons);
     const canCancel = reservation != null && isReservationCancellable(reservation);
     if (canCancel) {
       return {
@@ -90,7 +89,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
           ...commonProps,
           ...(await serverSideTranslations(locale ?? "fi")),
           reservation: reservation ?? null,
-          reasons,
         },
       };
     } else if (reservation != null) {
@@ -153,10 +151,6 @@ export const RESERVATION_CANCEL_PAGE_QUERY = gql`
           }
         }
       }
-    }
-
-    reservationCancelReasons {
-      ...CancelReasonFields
     }
   }
 `;
