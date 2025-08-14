@@ -142,7 +142,7 @@ function ReservationSummary({
         <DataWrapper isSummary label={t("reservation:price")}>
           {`${reservationPrice(reservation, t)}${
             reservation.paymentOrder?.handledPaymentDueBy
-              ? ` ${t("reservation.dueByParenthesis", {
+              ? ` ${t("reservation:dueByParenthesis", {
                   date: toUIDateTime(
                     new Date(reservation.paymentOrder.handledPaymentDueBy),
                     t("common:dayTimeSeparator")
