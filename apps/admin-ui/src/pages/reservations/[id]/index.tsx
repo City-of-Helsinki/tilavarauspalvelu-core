@@ -5,7 +5,6 @@ import {
   ReserveeType,
   type ReservationPageQuery,
   ReservationStateChoice,
-  useReservationCancelReasonsQuery,
   UserPermissionChoice,
   ReservationPageDocument,
   useReservationPageLazyQuery,
@@ -101,16 +100,6 @@ function ReservationSummary({
 }>) {
   const { t } = useTranslation();
 
-  const { data } = useReservationCancelReasonsQuery({
-    skip: reservation.state !== ReservationStateChoice.Cancelled,
-  });
-
-  const reservationCancelReasons = data?.reservationCancelReasons ?? [];
-  let cancelReason;
-  if (reservationCancelReasons) {
-    cancelReason = reservationCancelReasons.find((reason) => reservation.cancelReason === reason.value)?.reasonFi;
-  }
-
   return (
     <Summary>
       {reservation.reserveeType && (
@@ -154,7 +143,7 @@ function ReservationSummary({
       )}
       {reservation.state === ReservationStateChoice.Cancelled && (
         <DataWrapper isSummary label={t("reservation:cancelReason")}>
-          {cancelReason || reservation.cancelReason || "-"}
+          {reservation.cancelReason ? t(`reservation:CancelReasons.${reservation.cancelReason}`) : "-"}
         </DataWrapper>
       )}
       {reservation.state === ReservationStateChoice.Denied && (
@@ -427,14 +416,6 @@ export const RESERVATION_PAGE_QUERY = gql`
         ...ReservationTypeFormFields
       }
       ...ReservationMetaFields
-    }
-  }
-`;
-
-export const RESERVATION_CANCEL_REASONS_QUERY = gql`
-  query ReservationCancelReasons {
-    reservationCancelReasons {
-      ...CancelReasonFields
     }
   }
 `;
