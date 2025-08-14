@@ -203,5 +203,14 @@
     "saveSuccess": "Varauksen muutokset tallennettu",
     "saveSuccessRecurring": "Muutokset tallennettu tuleviin varauksiin!",
     "pageThrewError": "Virhe: varausta ei voi muokata"
+  },
+  "CancelReasons": {
+    "CHANGE_OF_PLANS": "Suunnitelmiini tuli muutos",
+    "FOUND_ANOTHER_SPACE_ELSEWHERE": "Löysin toisen tilan muualta",
+    "FOUND_ANOTHER_SPACE_VARAAMO": "Löysin toisen tilan Varaamosta",
+    "UNSUITABLE_SPACE": "Tila ei sovellu käyttötarkoituksiini",
+    "PROCESSING_TIME_TOO_LONG": "Varauksen käsittelyaika on liian pitkä",
+    "OTHER": "Muu syy",
+    "NOT_PAID": "Varausta ei maksettu tai laskua valittu maksutavaksi määräpäivään mennessä"
   }
 }
