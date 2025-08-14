@@ -124,7 +124,6 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
           onNext={onSubmit}
           isLoading={loading}
           isDisabled={getNReservations(applicationSection) === 0}
-          cancelReasons={props.reasons}
           cancellationTerms={cancellationTerms}
           backLink={backLink}
         />
@@ -236,7 +235,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     // but that requires we query the CancelFields for the reservations
     // - should we disable the cancel button? probably
     // - should we redirect here or show an error if the section can't be cancelled? (assuming url access)
-    const reasons = filterNonNullable(data?.reservationCancelReasons);
     const canCancel = section != null; // && isReservationCancellable(reservation);
     if (canCancel) {
       return {
@@ -244,7 +242,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
           ...commonProps,
           ...(await serverSideTranslations(locale ?? "fi")),
           applicationSection: section,
-          reasons,
         },
       };
     } /* TODO redirect if the applicationSection is already cancelled?
@@ -317,10 +314,6 @@ export const APPLICATION_SECTION_CANCEL_QUERY = gql`
           }
         }
       }
-    }
-
-    reservationCancelReasons {
-      ...CancelReasonFields
     }
   }
 `;

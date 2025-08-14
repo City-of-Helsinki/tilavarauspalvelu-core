@@ -28,7 +28,16 @@
     "ingressApplication": "You are about to cancel a booking that is part of a seasonal booking.",
     "infoBody": "We want to make the Varaamo service even better. We would love to hear why you are cancelling your booking.",
     "infoBodyApplication": "We want to make the Varaamo service even better. We would love to hear why you are cancelling your seasonal booking.",
-    "reason": "Reason for the cancellation"
+    "reason": "Reason for the cancellation",
+    "reasons": {
+      "CHANGE_OF_PLANS": "My plans have changed",
+      "FOUND_ANOTHER_SPACE_ELSEWHERE": "I found another space somewhere else",
+      "FOUND_ANOTHER_SPACE_VARAAMO": "I found another space through Varaamo",
+      "UNSUITABLE_SPACE": "The space is not suitable for my purpose",
+      "PROCESSING_TIME_TOO_LONG": "The booking processing time is too long",
+      "OTHER": "Other reason",
+      "NOT_PAID": "The booking was not paid for or invoice was not selected as the payment method by the deadline"
+    }
   },
   "cancelSection": {
     "title": "Cancel all bookings",
