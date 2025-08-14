@@ -199,6 +199,8 @@ export function transformPaymentStatus(t: string): OrderStatusWithFree | null {
       return OrderStatusWithFree.PaidManually;
     case OrderStatusWithFree.PaidByInvoice:
       return OrderStatusWithFree.PaidByInvoice;
+    case OrderStatusWithFree.Pending:
+      return OrderStatusWithFree.Pending;
     case OrderStatusWithFree.Draft:
       return OrderStatusWithFree.Draft;
     case OrderStatusWithFree.Expired:
