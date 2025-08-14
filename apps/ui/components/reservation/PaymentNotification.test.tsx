@@ -28,8 +28,8 @@ describe("Component: Payment Notification", () => {
 
   it("should render the payment notification component with correct price details", () => {
     customRender();
-    const appliedPricingMock = createAppliedPricingMock();
-    const formattedPrice = appliedPricingMock.highestPrice.split(".").join(",") + "0";
+    const reservation = createReservationPageMock({});
+    const formattedPrice = reservation.price?.split(".").join(",") + "0";
     // eslint-disable-next-line no-irregular-whitespace
     const priceText = `common:price: ${formattedPrice} € (common:inclTax {"taxPercentage":"25,5"})`;
     const priceElement = screen.getByTestId("reservation__payment-notification__price");
@@ -66,7 +66,7 @@ function createPaymentOrderMock(): PaymentOrderNode {
 function createAppliedPricingMock(): AppliedPricingInfo {
   return {
     begins: new Date("2023-10-01T12:00:00Z").toISOString(),
-    highestPrice: "40.0",
+    highestPrice: "10.0",
     lowestPrice: "0",
     priceUnit: PriceUnit.PerHour,
     taxPercentage: "25.5",
