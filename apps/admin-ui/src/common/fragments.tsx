@@ -190,10 +190,3 @@ export const APPLICATION_ROUND_TIME_SLOTS_FRAGMENT = gql`
     }
   }
 `;
-
-export const CANCEL_REASON_FRAGMENT = gql`
-  fragment CancelReasonFields on ReservationCancelReasonType {
-    value
-    reasonFi
-  }
-`;
