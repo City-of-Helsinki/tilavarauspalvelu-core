@@ -316,11 +316,11 @@ function CollisionWarning({
   return (
     <StyledNotification
       size={NotificationSize.Small}
-      label={t("errors.timeCollision")}
+      label={t("errors:timeCollision")}
       type="error"
       data-testid="CreateReservationModal__collision-warning"
     >
-      {t("errors.timeCollision")}
+      {t("errors:timeCollision")}
     </StyledNotification>
   );
 }
