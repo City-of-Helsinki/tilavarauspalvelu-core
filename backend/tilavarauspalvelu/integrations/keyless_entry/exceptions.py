@@ -26,7 +26,9 @@ class PindoraClientError(ExternalServiceError):
     error_formatter: Formatter = Formatter()
 
     def __init__(self, msg: str = "", /, **kwargs: Any) -> None:
-        msg = self.error_formatter.format(msg or self.msg, **kwargs)
+        msg = msg or self.msg
+        if kwargs:
+            msg = self.error_formatter.format(msg, **kwargs)
         super().__init__(msg)
 
 
