@@ -1,13 +1,12 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
 import { useForm } from "react-hook-form";
 import { Button, ButtonVariant, IconCross, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { AutoGrid, ButtonContainer, Flex, fontMedium } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { type CancelReasonFieldsFragment, ReservationCancelReasonChoice } from "@gql/gql-types";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { ControlledSelect } from "common/src/components/form";
+import { ReservationCancelReasonChoice } from "@gql/gql-types";
 import { ButtonLikeLink } from "./common/ButtonLikeLink";
 import TermsBox from "common/src/termsbox/TermsBox";
 import { AccordionWithState } from "./Accordion";
@@ -38,29 +37,23 @@ const FormWrapper = styled(Flex)`
 
 export function CancellationForm(props: {
   onNext: (values: CancelFormValues) => void;
-  cancelReasons: CancelReasonFieldsFragment[];
   cancellationTerms: string | null;
   backLink: string;
   isLoading?: boolean;
   isDisabled?: boolean;
 }): JSX.Element {
-  const { cancelReasons, onNext, isLoading, isDisabled, cancellationTerms, backLink } = props;
-  const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const { onNext, isLoading, isDisabled, cancellationTerms, backLink } = props;
+  const { t } = useTranslation();
 
-  const reasons = cancelReasons.map((node) => ({
-    label: getTranslationSafe(node, "reason", lang),
-    value: node?.value,
-  }));
+  const reasons = (Object.keys(ReservationCancelReasonChoice) as Array<keyof typeof ReservationCancelReasonChoice>)
+    .map((r) => ({
+      label: t(`reservations:cancel.reasons.${ReservationCancelReasonChoice[r]}`),
+      value: ReservationCancelReasonChoice[r],
+    }))
+    .filter((r) => r.value !== ReservationCancelReasonChoice.NotPaid);
 
   const form = useForm<CancelFormValues>();
-  const { register, handleSubmit, watch, control } = form;
-
-  // TODO can we remove this? should be auto registered when the form is created
-  // should we add zod schema for the required fields?
-  useEffect(() => {
-    register("reason", { required: true });
-  }, [register]);
+  const { handleSubmit, watch, control } = form;
 
   return (
     <FormWrapper>
