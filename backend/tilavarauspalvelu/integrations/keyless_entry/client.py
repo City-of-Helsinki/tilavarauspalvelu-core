@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import datetime
 import json
+import random
+import string
 import uuid
 from typing import TYPE_CHECKING, Any
 
@@ -16,7 +18,7 @@ from rest_framework.status import (
     HTTP_409_CONFLICT,
 )
 
-from utils.date_utils import local_iso_format
+from utils.date_utils import local_datetime, local_from_iso_format, local_iso_format
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 
 from .exceptions import (
@@ -126,6 +128,12 @@ class BasePindoraClient(BaseExternalServiceClient):
         if response.status_code == HTTP_400_BAD_REQUEST:
             raise PindoraBadRequestError(text=response.text)
 
+    # ----------------------------------------------------------------------------------------------------------------
+
+    @classmethod
+    def _mock_create_access_code(cls) -> str:
+        return "".join(random.choices(string.digits, k=5))  # noqa: S311
+
 
 class PindoraReservationUnitClient(BasePindoraClient):
     """Pindora client for working with reservation units."""
@@ -136,6 +144,9 @@ class PindoraReservationUnitClient(BasePindoraClient):
         reservation_unit_uuid = (
             reservation_unit if isinstance(reservation_unit, uuid.UUID) else reservation_unit.ext_uuid
         )
+
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_get_reservation_unit(reservation_unit_uuid)
 
         response = cls._get_cached_reservation_unit_response(ext_uuid=reservation_unit_uuid)
         if response is not None:
@@ -150,7 +161,7 @@ class PindoraReservationUnitClient(BasePindoraClient):
             action="fetching reservation unit",
         )
 
-        data = cls.response_json(response)
+        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
         parsed_data = cls._parse_reservation_unit_response(data)
         cls._cache_reservation_unit_response(data=data, ext_uuid=reservation_unit_uuid)
         return parsed_data
@@ -158,7 +169,24 @@ class PindoraReservationUnitClient(BasePindoraClient):
     # ----------------------------------------------------------------------------------------------------------------
 
     @classmethod
-    def _cache_reservation_unit_response(cls, data: PindoraReservationUnitResponse, *, ext_uuid: uuid.UUID) -> str:
+    def _mock_get_reservation_unit(cls, reservation_unit_uuid: uuid.UUID) -> PindoraReservationUnitResponse:
+        from tilavarauspalvelu.models import ReservationUnit
+
+        try:
+            reservation_unit = ReservationUnit.objects.get(ext_uuid=reservation_unit_uuid)
+        except ReservationUnit.DoesNotExist as error:
+            raise PindoraNotFoundError(entity="Reservation unit", uuid=reservation_unit_uuid) from error
+
+        return PindoraReservationUnitResponse(
+            reservation_unit_id=reservation_unit_uuid,
+            name=reservation_unit.name,
+            keypad_url="",
+        )
+
+    # ----------------------------------------------------------------------------------------------------------------
+
+    @classmethod
+    def _cache_reservation_unit_response(cls, data: dict[str, Any], *, ext_uuid: uuid.UUID) -> str:
         return cls._cache_response(data, ext_uuid=ext_uuid, prefix="reservation-unit")
 
     @classmethod
@@ -223,6 +251,9 @@ class PindoraReservationClient(BasePindoraClient):
         if response is not None:
             return response
 
+        if settings.PINDORA_MOCK_ENABLED:
+            raise PindoraNotFoundError(entity="Reservation", uuid=reservation_uuid)
+
         url = cls._build_url(f"reservation/{reservation_uuid}")
 
         response = cls.get(url=url)
@@ -232,7 +263,7 @@ class PindoraReservationClient(BasePindoraClient):
             action="fetching reservation",
         )
 
-        data = cls.response_json(response)
+        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
         parsed_data = cls._parse_reservation_response(data)
         cls._cache_reservation_response(parsed_data, ext_uuid=reservation_uuid)
         return parsed_data
@@ -240,11 +271,9 @@ class PindoraReservationClient(BasePindoraClient):
     @classmethod
     def create_reservation(cls, reservation: Reservation, *, is_active: bool = False) -> PindoraReservationResponse:
         """Create a new reservation in Pindora."""
-        url = cls._build_url("reservation")
-
         reservation_unit: ReservationUnit = reservation.reservation_unit
 
-        data = PindoraReservationCreateData(
+        create_data = PindoraReservationCreateData(
             reservation_id=str(reservation.ext_uuid),
             reservation_unit_id=str(reservation_unit.ext_uuid),
             begin=local_iso_format(reservation.begins_at),
@@ -252,33 +281,44 @@ class PindoraReservationClient(BasePindoraClient):
             is_active=is_active,
         )
 
-        response = cls.post(url=url, json=data)
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_create_reservation(create_data)
+
+        url = cls._build_url("reservation")
+
+        response = cls.post(url=url, json=create_data)  # type: ignore[arg-type]
         cls._validate_reservation_response(
             response,
             reservation_uuid=reservation.ext_uuid,
             action="creating reservation",
         )
 
-        data = cls.response_json(response)
+        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
         parsed_data = cls._parse_reservation_response(data)
         cls._cache_reservation_response(parsed_data, ext_uuid=reservation.ext_uuid)
         return parsed_data
 
     @classmethod
     def reschedule_reservation(
-        cls, reservation: Reservation, *, is_active: bool = ...
+        cls,
+        reservation: Reservation,
+        *,
+        is_active: bool = ...,  # type: ignore[assignment]
     ) -> PindoraAccessCodeModifyResponse:
         """Reschedule a reservation in Pindora."""
-        url = cls._build_url(f"reservation/reschedule/{reservation.ext_uuid}")
-
-        data = PindoraReservationRescheduleData(
+        reschedule_data = PindoraReservationRescheduleData(
             begin=local_iso_format(reservation.begins_at),
             end=local_iso_format(reservation.ends_at),
         )
         if is_active is not ...:
-            data["is_active"] = is_active
+            reschedule_data["is_active"] = is_active
 
-        response = cls.put(url=url, json=data)
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_reschedule_reservation(reservation.ext_uuid, reschedule_data)
+
+        url = cls._build_url(f"reservation/reschedule/{reservation.ext_uuid}")
+
+        response = cls.put(url=url, json=reschedule_data)  # type: ignore[arg-type]
         cls._validate_reservation_response(
             response,
             reservation_uuid=reservation.ext_uuid,
@@ -288,13 +328,16 @@ class PindoraReservationClient(BasePindoraClient):
 
         cls._clear_cached_reservation_response(ext_uuid=reservation.ext_uuid)
 
-        data = cls.response_json(response)
+        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
         return cls._parse_access_code_modify_response(data)
 
     @classmethod
     def change_reservation_access_code(cls, reservation: Reservation | uuid.UUID) -> PindoraAccessCodeModifyResponse:
         """Change a reservation's access code in Pindora."""
         reservation_uuid = reservation if isinstance(reservation, uuid.UUID) else reservation.ext_uuid
+
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_change_reservation_access_code(reservation_uuid)
 
         url = cls._build_url(f"reservation/change-access-code/{reservation_uuid}")
 
@@ -308,13 +351,16 @@ class PindoraReservationClient(BasePindoraClient):
 
         cls._clear_cached_reservation_response(ext_uuid=reservation_uuid)
 
-        data = cls.response_json(response)
+        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
         return cls._parse_access_code_modify_response(data)
 
     @classmethod
     def activate_reservation_access_code(cls, reservation: Reservation | uuid.UUID) -> None:
         """Activate a reservation's access code in Pindora."""
         reservation_uuid = reservation if isinstance(reservation, uuid.UUID) else reservation.ext_uuid
+
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_activate_reservation_access_code(reservation_uuid)
 
         url = cls._build_url(f"reservation/activate/{reservation_uuid}")
 
@@ -326,11 +372,15 @@ class PindoraReservationClient(BasePindoraClient):
             expected_status_code=HTTP_204_NO_CONTENT,
         )
         cls._clear_cached_reservation_response(ext_uuid=reservation_uuid)
+        return None
 
     @classmethod
     def deactivate_reservation_access_code(cls, reservation: Reservation | uuid.UUID) -> None:
         """Deactivate a reservation's access code in Pindora."""
         reservation_uuid = reservation if isinstance(reservation, uuid.UUID) else reservation.ext_uuid
+
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_deactivate_reservation_access_code(reservation_uuid)
 
         url = cls._build_url(f"reservation/deactivate/{reservation_uuid}")
 
@@ -342,11 +392,15 @@ class PindoraReservationClient(BasePindoraClient):
             expected_status_code=HTTP_204_NO_CONTENT,
         )
         cls._clear_cached_reservation_response(ext_uuid=reservation_uuid)
+        return None
 
     @classmethod
     def delete_reservation(cls, reservation: Reservation | uuid.UUID) -> None:
         """Delete a reservation from Pindora."""
         reservation_uuid = reservation if isinstance(reservation, uuid.UUID) else reservation.ext_uuid
+
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_delete_reservation(reservation_uuid)
 
         url = cls._build_url(f"reservation/{reservation_uuid}")
 
@@ -358,12 +412,107 @@ class PindoraReservationClient(BasePindoraClient):
             expected_status_code=HTTP_204_NO_CONTENT,
         )
         cls._clear_cached_reservation_response(ext_uuid=reservation_uuid)
+        return None
+
+    # ----------------------------------------------------------------------------------------------------------------
+
+    @classmethod
+    def _mock_create_reservation(cls, data: PindoraReservationCreateData) -> PindoraReservationResponse:
+        reservation_uuid = uuid.UUID(data["reservation_id"])
+
+        existing = cls._get_cached_reservation_response(ext_uuid=reservation_uuid)
+        if existing is not None:
+            raise PindoraConflictError(entity="Reservation", uuid=reservation_uuid)
+
+        response = PindoraReservationResponse(
+            reservation_unit_id=uuid.UUID(data["reservation_unit_id"]),
+            access_code=cls._mock_create_access_code(),
+            access_code_keypad_url="",
+            access_code_phone_number="",
+            access_code_sms_number="",
+            access_code_sms_message="",
+            access_code_valid_minutes_before=0,
+            access_code_valid_minutes_after=0,
+            access_code_generated_at=local_datetime(),
+            access_code_is_active=data.get("is_active", False),
+            begin=local_from_iso_format(data["begin"]),
+            end=local_from_iso_format(data["end"]),
+        )
+
+        cls._cache_reservation_response(data=response, ext_uuid=reservation_uuid)
+        return response
+
+    @classmethod
+    def _mock_reschedule_reservation(
+        cls,
+        reservation_uuid: uuid.UUID,
+        data: PindoraReservationRescheduleData,
+    ) -> PindoraAccessCodeModifyResponse:
+        existing = cls._get_cached_reservation_response(ext_uuid=reservation_uuid)
+        if existing is None:
+            raise PindoraNotFoundError(entity="Reservation", uuid=reservation_uuid)
+
+        existing["begin"] = local_from_iso_format(data["begin"])
+        existing["end"] = local_from_iso_format(data["end"])
+        if "is_active" in data:
+            existing["access_code_is_active"] = data["is_active"]
+
+        cls._cache_reservation_response(existing, ext_uuid=reservation_uuid)
+
+        return PindoraAccessCodeModifyResponse(
+            access_code_generated_at=existing["access_code_generated_at"],
+            access_code_is_active=existing["access_code_is_active"],
+        )
+
+    @classmethod
+    def _mock_change_reservation_access_code(cls, reservation_uuid: uuid.UUID) -> PindoraAccessCodeModifyResponse:
+        existing = cls._get_cached_reservation_response(ext_uuid=reservation_uuid)
+        if existing is None:
+            raise PindoraNotFoundError(entity="Reservation", uuid=reservation_uuid)
+
+        existing["access_code"] = cls._mock_create_access_code()
+        existing["access_code_generated_at"] = local_datetime()
+
+        cls._cache_reservation_response(existing, ext_uuid=reservation_uuid)
+
+        return PindoraAccessCodeModifyResponse(
+            access_code_generated_at=existing["access_code_generated_at"],
+            access_code_is_active=existing["access_code_is_active"],
+        )
+
+    @classmethod
+    def _mock_activate_reservation_access_code(cls, reservation_uuid: uuid.UUID) -> None:
+        existing = cls._get_cached_reservation_response(ext_uuid=reservation_uuid)
+        if existing is None:
+            raise PindoraNotFoundError(entity="Reservation", uuid=reservation_uuid)
+
+        existing["access_code_is_active"] = True
+
+        cls._cache_reservation_response(existing, ext_uuid=reservation_uuid)
+
+    @classmethod
+    def _mock_deactivate_reservation_access_code(cls, reservation_uuid: uuid.UUID) -> None:
+        existing = cls._get_cached_reservation_response(ext_uuid=reservation_uuid)
+        if existing is None:
+            raise PindoraNotFoundError(entity="Reservation", uuid=reservation_uuid)
+
+        existing["access_code_is_active"] = False
+
+        cls._cache_reservation_response(existing, ext_uuid=reservation_uuid)
+
+    @classmethod
+    def _mock_delete_reservation(cls, reservation_uuid: uuid.UUID) -> None:
+        existing = cls._get_cached_reservation_response(ext_uuid=reservation_uuid)
+        if existing is None:
+            raise PindoraNotFoundError(entity="Reservation", uuid=reservation_uuid)
+
+        cls._clear_cached_reservation_response(ext_uuid=reservation_uuid)
 
     # ----------------------------------------------------------------------------------------------------------------
 
     @classmethod
     def _cache_reservation_response(cls, data: PindoraReservationResponse, *, ext_uuid: uuid.UUID) -> str:
-        return cls._cache_response(data, ext_uuid=ext_uuid, prefix="reservation")
+        return cls._cache_response(data, ext_uuid=ext_uuid, prefix="reservation")  # type: ignore[arg-type]
 
     @classmethod
     def _get_cached_reservation_response(cls, *, ext_uuid: uuid.UUID) -> PindoraReservationResponse | None:
@@ -388,10 +537,10 @@ class PindoraReservationClient(BasePindoraClient):
                 access_code_sms_message=data["access_code_sms_message"],
                 access_code_valid_minutes_before=int(data["access_code_valid_minutes_before"]),
                 access_code_valid_minutes_after=int(data["access_code_valid_minutes_after"]),
-                access_code_generated_at=datetime.datetime.fromisoformat(data["access_code_generated_at"]),
+                access_code_generated_at=local_from_iso_format(data["access_code_generated_at"]),
                 access_code_is_active=bool(data["access_code_is_active"]),
-                begin=datetime.datetime.fromisoformat(data["begin"]),
-                end=datetime.datetime.fromisoformat(data["end"]),
+                begin=local_from_iso_format(data["begin"]),
+                end=local_from_iso_format(data["end"]),
             )
 
         except KeyError as error:
@@ -439,6 +588,9 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
         if response is not None:
             return response
 
+        if settings.PINDORA_MOCK_ENABLED:
+            raise PindoraNotFoundError(entity="Seasonal booking", uuid=section_uuid)
+
         url = cls._build_url(f"seasonal-booking/{section_uuid}")
 
         response = cls.get(url=url)
@@ -448,7 +600,7 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
             action="fetching seasonal booking",
         )
 
-        data = cls.response_json(response)
+        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
         parsed_data = cls._parse_seasonal_booking_response(data)
         cls._cache_seasonal_booking_response(parsed_data, ext_uuid=section_uuid)
         return parsed_data
@@ -461,19 +613,17 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
         is_active: bool = True,
     ) -> PindoraSeasonalBookingResponse:
         """Create a new seasonal booking in Pindora."""
-        url = cls._build_url("seasonal-booking")
-
         reservations: list[Reservation] = list(
             section.actions.get_reservations()
             .requires_active_access_code()
             .select_related("reservation_series__reservation_unit")
         )
 
-        data = PindoraSeasonalBookingCreateData(
+        create_data = PindoraSeasonalBookingCreateData(
             seasonal_booking_id=str(section.ext_uuid),
             series=[
                 PindoraSeasonalBookingReservationData(
-                    reservation_unit_id=str(reservation.reservation_series.reservation_unit.ext_uuid),
+                    reservation_unit_id=str(reservation.reservation_series.reservation_unit.ext_uuid),  # type: ignore[union-attr]
                     begin=local_iso_format(reservation.begins_at),
                     end=local_iso_format(reservation.ends_at),
                 )
@@ -482,14 +632,19 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
             is_active=is_active,
         )
 
-        response = cls.post(url=url, json=data)
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_create_seasonal_booking(create_data)
+
+        url = cls._build_url("seasonal-booking")
+
+        response = cls.post(url=url, json=create_data)  # type: ignore[arg-type]
         cls._validate_seasonal_booking_response(
             response,
             application_section_uuid=section.ext_uuid,
             action="creating seasonal booking",
         )
 
-        data = cls.response_json(response)
+        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
         parsed_data = cls._parse_seasonal_booking_response(data)
         cls._cache_seasonal_booking_response(parsed_data, ext_uuid=section.ext_uuid)
         return parsed_data
@@ -497,8 +652,6 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
     @classmethod
     def reschedule_seasonal_booking(cls, section: ApplicationSection) -> PindoraAccessCodeModifyResponse:
         """Reschedule a seasonal booking in Pindora."""
-        url = cls._build_url(f"seasonal-booking/reschedule/{section.ext_uuid}")
-
         # This only selects confirmed non-blocking reservations.
         reservations: list[Reservation] = list(
             section.actions.get_reservations()
@@ -506,10 +659,10 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
             .select_related("reservation_series__reservation_unit")
         )
 
-        data = PindoraSeasonalBookingRescheduleData(
+        reschedule_data = PindoraSeasonalBookingRescheduleData(
             series=[
                 PindoraSeasonalBookingReservationData(
-                    reservation_unit_id=str(reservation.reservation_series.reservation_unit.ext_uuid),
+                    reservation_unit_id=str(reservation.reservation_series.reservation_unit.ext_uuid),  # type: ignore[union-attr]
                     begin=local_iso_format(reservation.begins_at),
                     end=local_iso_format(reservation.ends_at),
                 )
@@ -517,7 +670,12 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
             ],
         )
 
-        response = cls.put(url=url, json=data)
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_reschedule_seasonal_booking(section.ext_uuid, reschedule_data)
+
+        url = cls._build_url(f"seasonal-booking/reschedule/{section.ext_uuid}")
+
+        response = cls.put(url=url, json=reschedule_data)  # type: ignore[arg-type]
         cls._validate_seasonal_booking_response(
             response,
             application_section_uuid=section.ext_uuid,
@@ -527,7 +685,7 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
 
         cls._clear_cached_seasonal_booking_response(ext_uuid=section.ext_uuid)
 
-        data = cls.response_json(response)
+        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
         return cls._parse_access_code_modify_response(data)
 
     @classmethod
@@ -537,6 +695,9 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
     ) -> PindoraAccessCodeModifyResponse:
         """Change a seasonal booking's access code in Pindora."""
         section_uuid = section if isinstance(section, uuid.UUID) else section.ext_uuid
+
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_change_seasonal_booking_access_code(section_uuid)
 
         url = cls._build_url(f"seasonal-booking/change-access-code/{section_uuid}")
 
@@ -550,13 +711,16 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
 
         cls._clear_cached_seasonal_booking_response(ext_uuid=section_uuid)
 
-        data = cls.response_json(response)
+        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
         return cls._parse_access_code_modify_response(data)
 
     @classmethod
     def activate_seasonal_booking_access_code(cls, section: ApplicationSection | uuid.UUID) -> None:
         """Activate a seasonal booking's access code in Pindora."""
         section_uuid = section if isinstance(section, uuid.UUID) else section.ext_uuid
+
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_activate_seasonal_booking_access_code(section_uuid)
 
         url = cls._build_url(f"seasonal-booking/activate/{section_uuid}")
 
@@ -568,11 +732,15 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
             expected_status_code=HTTP_204_NO_CONTENT,
         )
         cls._clear_cached_seasonal_booking_response(ext_uuid=section_uuid)
+        return None
 
     @classmethod
     def deactivate_seasonal_booking_access_code(cls, section: ApplicationSection | uuid.UUID) -> None:
         """Deactivate a seasonal booking's access code in Pindora."""
         section_uuid = section if isinstance(section, uuid.UUID) else section.ext_uuid
+
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_deactivate_seasonal_booking_access_code(section_uuid)
 
         url = cls._build_url(f"seasonal-booking/deactivate/{section_uuid}")
 
@@ -584,11 +752,15 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
             expected_status_code=HTTP_204_NO_CONTENT,
         )
         cls._clear_cached_seasonal_booking_response(ext_uuid=section_uuid)
+        return None
 
     @classmethod
     def delete_seasonal_booking(cls, section: ApplicationSection | uuid.UUID) -> None:
         """Delete a seasonal booking from Pindora."""
         section_uuid = section if isinstance(section, uuid.UUID) else section.ext_uuid
+
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_delete_seasonal_booking(section_uuid)
 
         url = cls._build_url(f"seasonal-booking/{section_uuid}")
 
@@ -600,12 +772,117 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
             expected_status_code=HTTP_204_NO_CONTENT,
         )
         cls._clear_cached_seasonal_booking_response(ext_uuid=section_uuid)
+        return None
+
+    # ----------------------------------------------------------------------------------------------------------------
+
+    @classmethod
+    def _mock_create_seasonal_booking(cls, data: PindoraSeasonalBookingCreateData) -> PindoraSeasonalBookingResponse:
+        section_uuid = uuid.UUID(data["seasonal_booking_id"])
+        existing = cls._get_cached_seasonal_booking_response(ext_uuid=section_uuid)
+        if existing is not None:
+            raise PindoraConflictError(entity="Seasonal booking", uuid=section_uuid)
+
+        response = PindoraSeasonalBookingResponse(
+            access_code=cls._mock_create_access_code(),
+            access_code_keypad_url="",
+            access_code_phone_number="",
+            access_code_sms_number="",
+            access_code_sms_message="",
+            access_code_generated_at=local_datetime(),
+            access_code_is_active=data["is_active"],
+            reservation_unit_code_validity=[
+                PindoraSeasonalBookingAccessCodeValidity(
+                    reservation_unit_id=uuid.UUID(reservation["reservation_unit_id"]),
+                    access_code_valid_minutes_before=0,
+                    access_code_valid_minutes_after=0,
+                    begin=local_from_iso_format(reservation["begin"]),
+                    end=local_from_iso_format(reservation["end"]),
+                )
+                for reservation in data["series"]
+            ],
+        )
+
+        cls._cache_seasonal_booking_response(data=response, ext_uuid=section_uuid)
+        return response
+
+    @classmethod
+    def _mock_reschedule_seasonal_booking(
+        cls,
+        section_uuid: uuid.UUID,
+        reschedule_data: PindoraSeasonalBookingRescheduleData,
+    ) -> PindoraAccessCodeModifyResponse:
+        existing = cls._get_cached_seasonal_booking_response(ext_uuid=section_uuid)
+        if existing is None:
+            raise PindoraNotFoundError(entity="Seasonal booking", uuid=section_uuid)
+
+        existing["reservation_unit_code_validity"] = [
+            PindoraSeasonalBookingAccessCodeValidity(
+                reservation_unit_id=uuid.UUID(validity["reservation_unit_id"]),
+                access_code_valid_minutes_before=0,
+                access_code_valid_minutes_after=0,
+                begin=local_from_iso_format(validity["begin"]),
+                end=local_from_iso_format(validity["end"]),
+            )
+            for validity in reschedule_data["series"]
+        ]
+
+        cls._cache_seasonal_booking_response(existing, ext_uuid=section_uuid)
+
+        return PindoraAccessCodeModifyResponse(
+            access_code_generated_at=existing["access_code_generated_at"],
+            access_code_is_active=existing["access_code_is_active"],
+        )
+
+    @classmethod
+    def _mock_change_seasonal_booking_access_code(cls, section_uuid: uuid.UUID) -> PindoraAccessCodeModifyResponse:
+        existing = cls._get_cached_seasonal_booking_response(ext_uuid=section_uuid)
+        if existing is None:
+            raise PindoraNotFoundError(entity="Seasonal booking", uuid=section_uuid)
+
+        existing["access_code"] = cls._mock_create_access_code()
+        existing["access_code_generated_at"] = local_datetime()
+
+        cls._cache_seasonal_booking_response(existing, ext_uuid=section_uuid)
+
+        return PindoraAccessCodeModifyResponse(
+            access_code_generated_at=existing["access_code_generated_at"],
+            access_code_is_active=existing["access_code_is_active"],
+        )
+
+    @classmethod
+    def _mock_activate_seasonal_booking_access_code(cls, section_uuid: uuid.UUID) -> None:
+        existing = cls._get_cached_seasonal_booking_response(ext_uuid=section_uuid)
+        if not existing:
+            raise PindoraNotFoundError(entity="Seasonal booking", uuid=section_uuid)
+
+        existing["access_code_is_active"] = True
+
+        cls._cache_seasonal_booking_response(existing, ext_uuid=section_uuid)
+
+    @classmethod
+    def _mock_deactivate_seasonal_booking_access_code(cls, section_uuid: uuid.UUID) -> None:
+        existing = cls._get_cached_seasonal_booking_response(ext_uuid=section_uuid)
+        if not existing:
+            raise PindoraNotFoundError(entity="Seasonal booking", uuid=section_uuid)
+
+        existing["access_code_is_active"] = False
+
+        cls._cache_seasonal_booking_response(existing, ext_uuid=section_uuid)
+
+    @classmethod
+    def _mock_delete_seasonal_booking(cls, section_uuid: uuid.UUID) -> None:
+        existing = cls._get_cached_seasonal_booking_response(ext_uuid=section_uuid)
+        if existing is None:
+            raise PindoraNotFoundError(entity="Seasonal booking", uuid=section_uuid)
+
+        cls._clear_cached_seasonal_booking_response(ext_uuid=section_uuid)
 
     # ----------------------------------------------------------------------------------------------------------------
 
     @classmethod
     def _cache_seasonal_booking_response(cls, data: PindoraSeasonalBookingResponse, *, ext_uuid: uuid.UUID) -> str:
-        return cls._cache_response(data, ext_uuid=ext_uuid, prefix="seasonal-booking")
+        return cls._cache_response(data, ext_uuid=ext_uuid, prefix="seasonal-booking")  # type: ignore[arg-type]
 
     @classmethod
     def _get_cached_seasonal_booking_response(cls, *, ext_uuid: uuid.UUID) -> PindoraSeasonalBookingResponse | None:
@@ -627,15 +904,15 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
                 access_code_phone_number=data["access_code_phone_number"],
                 access_code_sms_number=data["access_code_sms_number"],
                 access_code_sms_message=data["access_code_sms_message"],
-                access_code_generated_at=datetime.datetime.fromisoformat(data["access_code_generated_at"]),
+                access_code_generated_at=local_from_iso_format(data["access_code_generated_at"]),
                 access_code_is_active=bool(data["access_code_is_active"]),
                 reservation_unit_code_validity=[
                     PindoraSeasonalBookingAccessCodeValidity(
                         reservation_unit_id=uuid.UUID(validity["reservation_unit_id"]),
                         access_code_valid_minutes_before=int(validity["access_code_valid_minutes_before"]),
                         access_code_valid_minutes_after=int(validity["access_code_valid_minutes_after"]),
-                        begin=datetime.datetime.fromisoformat(validity["begin"]),
-                        end=datetime.datetime.fromisoformat(validity["end"]),
+                        begin=local_from_iso_format(validity["begin"]),
+                        end=local_from_iso_format(validity["end"]),
                     )
                     for validity in data["reservation_unit_code_validity"]
                 ],
@@ -686,6 +963,9 @@ class PindoraReservationSeriesClient(BasePindoraClient):
         if response is not None:
             return response
 
+        if settings.PINDORA_MOCK_ENABLED:
+            raise PindoraNotFoundError(entity="Reservation series", uuid=series_uuid)
+
         url = cls._build_url(f"reservation-series/{series_uuid}")
 
         response = cls.get(url=url)
@@ -695,7 +975,7 @@ class PindoraReservationSeriesClient(BasePindoraClient):
             action="fetching reservation series",
         )
 
-        data = cls.response_json(response)
+        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
         parsed_data = cls._parse_reservation_series_response(data)
         cls._cache_reservation_series_response(parsed_data, ext_uuid=series_uuid)
         return parsed_data
@@ -708,11 +988,9 @@ class PindoraReservationSeriesClient(BasePindoraClient):
         is_active: bool = True,
     ) -> PindoraReservationSeriesResponse:
         """Create a new reservation series in Pindora."""
-        url = cls._build_url("reservation-series")
-
         reservations: list[Reservation] = list(series.reservations.requires_active_access_code())
 
-        data = PindoraReservationSeriesCreateData(
+        create_data = PindoraReservationSeriesCreateData(
             reservation_series_id=str(series.ext_uuid),
             reservation_unit_id=str(series.reservation_unit.ext_uuid),
             series=[
@@ -725,14 +1003,19 @@ class PindoraReservationSeriesClient(BasePindoraClient):
             is_active=is_active,
         )
 
-        response = cls.post(url=url, json=data)
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_create_reservation_series(create_data)
+
+        url = cls._build_url("reservation-series")
+
+        response = cls.post(url=url, json=create_data)  # type: ignore[arg-type]
         cls._validate_reservation_series_response(
             response,
             series_uuid=series.ext_uuid,
             action="creating reservation series",
         )
 
-        data = cls.response_json(response)
+        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
         parsed_data = cls._parse_reservation_series_response(data)
         cls._cache_reservation_series_response(parsed_data, ext_uuid=series.ext_uuid)
         return parsed_data
@@ -740,12 +1023,10 @@ class PindoraReservationSeriesClient(BasePindoraClient):
     @classmethod
     def reschedule_reservation_series(cls, series: ReservationSeries) -> PindoraAccessCodeModifyResponse:
         """Reschedule a reservation series in Pindora."""
-        url = cls._build_url(f"reservation-series/reschedule/{series.ext_uuid}")
-
         # This only selects confirmed non-blocking reservations.
         reservations: list[Reservation] = list(series.reservations.requires_active_access_code())
 
-        data = PindoraReservationSeriesRescheduleData(
+        reschedule_data = PindoraReservationSeriesRescheduleData(
             series=[
                 PindoraReservationSeriesReservationData(
                     begin=local_iso_format(reservation.begins_at),
@@ -755,7 +1036,12 @@ class PindoraReservationSeriesClient(BasePindoraClient):
             ],
         )
 
-        response = cls.put(url=url, json=data)
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_reschedule_reservation_series(series.ext_uuid, reschedule_data)
+
+        url = cls._build_url(f"reservation-series/reschedule/{series.ext_uuid}")
+
+        response = cls.put(url=url, json=reschedule_data)  # type: ignore[arg-type]
         cls._validate_reservation_series_response(
             response,
             series_uuid=series.ext_uuid,
@@ -765,7 +1051,7 @@ class PindoraReservationSeriesClient(BasePindoraClient):
 
         cls._clear_cached_reservation_series_response(ext_uuid=series.ext_uuid)
 
-        data = cls.response_json(response)
+        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
         return cls._parse_access_code_modify_response(data)
 
     @classmethod
@@ -775,6 +1061,9 @@ class PindoraReservationSeriesClient(BasePindoraClient):
     ) -> PindoraAccessCodeModifyResponse:
         """Change a reservation series' access code in Pindora."""
         series_uuid = series if isinstance(series, uuid.UUID) else series.ext_uuid
+
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_change_reservation_series_access_code(series_uuid)
 
         url = cls._build_url(f"reservation-series/change-access-code/{series_uuid}")
 
@@ -788,13 +1077,16 @@ class PindoraReservationSeriesClient(BasePindoraClient):
 
         cls._clear_cached_reservation_series_response(ext_uuid=series_uuid)
 
-        data = cls.response_json(response)
+        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
         return cls._parse_access_code_modify_response(data)
 
     @classmethod
     def activate_reservation_series_access_code(cls, series: ReservationSeries | uuid.UUID) -> None:
         """Activate a reservation series' access code in Pindora."""
         series_uuid = series if isinstance(series, uuid.UUID) else series.ext_uuid
+
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_activate_reservation_series_access_code(series_uuid)
 
         url = cls._build_url(f"reservation-series/activate/{series_uuid}")
 
@@ -806,11 +1098,15 @@ class PindoraReservationSeriesClient(BasePindoraClient):
             expected_status_code=HTTP_204_NO_CONTENT,
         )
         cls._clear_cached_reservation_series_response(ext_uuid=series_uuid)
+        return None
 
     @classmethod
     def deactivate_reservation_series_access_code(cls, series: ReservationSeries | uuid.UUID) -> None:
         """Deactivate a reservation series' access code in Pindora."""
         series_uuid = series if isinstance(series, uuid.UUID) else series.ext_uuid
+
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_deactivate_reservation_series_access_code(series_uuid)
 
         url = cls._build_url(f"reservation-series/deactivate/{series_uuid}")
 
@@ -822,11 +1118,15 @@ class PindoraReservationSeriesClient(BasePindoraClient):
             expected_status_code=HTTP_204_NO_CONTENT,
         )
         cls._clear_cached_reservation_series_response(ext_uuid=series_uuid)
+        return None
 
     @classmethod
     def delete_reservation_series(cls, series: ReservationSeries | uuid.UUID) -> None:
         """Delete a reservation series from Pindora."""
         series_uuid = series if isinstance(series, uuid.UUID) else series.ext_uuid
+
+        if settings.PINDORA_MOCK_ENABLED:
+            return cls._mock_delete_reservation_series(series_uuid)
 
         url = cls._build_url(f"reservation-series/{series_uuid}")
 
@@ -838,12 +1138,119 @@ class PindoraReservationSeriesClient(BasePindoraClient):
             expected_status_code=HTTP_204_NO_CONTENT,
         )
         cls._clear_cached_reservation_series_response(ext_uuid=series_uuid)
+        return None
+
+    # ----------------------------------------------------------------------------------------------------------------
+
+    @classmethod
+    def _mock_create_reservation_series(
+        cls,
+        data: PindoraReservationSeriesCreateData,
+    ) -> PindoraReservationSeriesResponse:
+        series_uuid = uuid.UUID(data["reservation_series_id"])
+        existing = cls._get_cached_reservation_series_response(ext_uuid=series_uuid)
+        if existing is not None:
+            raise PindoraConflictError(entity="Reservation series", uuid=series_uuid)
+
+        response = PindoraReservationSeriesResponse(
+            reservation_unit_id=uuid.UUID(data["reservation_unit_id"]),
+            access_code=cls._mock_create_access_code(),
+            access_code_keypad_url="",
+            access_code_phone_number="",
+            access_code_sms_number="",
+            access_code_sms_message="",
+            access_code_generated_at=local_datetime(),
+            access_code_is_active=data["is_active"],
+            reservation_unit_code_validity=[
+                PindoraReservationSeriesAccessCodeValidity(
+                    access_code_valid_minutes_before=0,
+                    access_code_valid_minutes_after=0,
+                    begin=local_from_iso_format(reservation["begin"]),
+                    end=local_from_iso_format(reservation["end"]),
+                )
+                for reservation in data["series"]
+            ],
+        )
+
+        cls._cache_reservation_series_response(data=response, ext_uuid=series_uuid)
+        return response
+
+    @classmethod
+    def _mock_reschedule_reservation_series(
+        cls,
+        series_uuid: uuid.UUID,
+        data: PindoraReservationSeriesRescheduleData,
+    ) -> PindoraAccessCodeModifyResponse:
+        existing = cls._get_cached_reservation_series_response(ext_uuid=series_uuid)
+        if existing is None:
+            raise PindoraNotFoundError(entity="Reservation series", uuid=series_uuid)
+
+        existing["reservation_unit_code_validity"] = [
+            PindoraReservationSeriesAccessCodeValidity(
+                access_code_valid_minutes_before=0,
+                access_code_valid_minutes_after=0,
+                begin=local_from_iso_format(validity["begin"]),
+                end=local_from_iso_format(validity["end"]),
+            )
+            for validity in data["series"]
+        ]
+
+        cls._cache_reservation_series_response(existing, ext_uuid=series_uuid)
+
+        return PindoraAccessCodeModifyResponse(
+            access_code_generated_at=existing["access_code_generated_at"],
+            access_code_is_active=existing["access_code_is_active"],
+        )
+
+    @classmethod
+    def _mock_change_reservation_series_access_code(cls, series_uuid: uuid.UUID) -> PindoraAccessCodeModifyResponse:
+        existing = cls._get_cached_reservation_series_response(ext_uuid=series_uuid)
+        if existing is None:
+            raise PindoraNotFoundError(entity="Reservation series", uuid=series_uuid)
+
+        existing["access_code"] = cls._mock_create_access_code()
+        existing["access_code_generated_at"] = local_datetime()
+
+        cls._cache_reservation_series_response(existing, ext_uuid=series_uuid)
+
+        return PindoraAccessCodeModifyResponse(
+            access_code_generated_at=existing["access_code_generated_at"],
+            access_code_is_active=existing["access_code_is_active"],
+        )
+
+    @classmethod
+    def _mock_activate_reservation_series_access_code(cls, series_uuid: uuid.UUID) -> None:
+        existing = cls._get_cached_reservation_series_response(ext_uuid=series_uuid)
+        if existing is None:
+            raise PindoraNotFoundError(entity="Reservation series", uuid=series_uuid)
+
+        existing["access_code_is_active"] = True
+
+        cls._cache_reservation_series_response(existing, ext_uuid=series_uuid)
+
+    @classmethod
+    def _mock_deactivate_reservation_series_access_code(cls, series_uuid: uuid.UUID) -> None:
+        existing = cls._get_cached_reservation_series_response(ext_uuid=series_uuid)
+        if existing is None:
+            raise PindoraNotFoundError(entity="Reservation series", uuid=series_uuid)
+
+        existing["access_code_is_active"] = False
+
+        cls._cache_reservation_series_response(existing, ext_uuid=series_uuid)
+
+    @classmethod
+    def _mock_delete_reservation_series(cls, series_uuid: uuid.UUID) -> None:
+        existing = cls._get_cached_reservation_series_response(ext_uuid=series_uuid)
+        if existing is None:
+            raise PindoraNotFoundError(entity="Reservation series", uuid=series_uuid)
+
+        cls._clear_cached_reservation_series_response(ext_uuid=series_uuid)
 
     # ----------------------------------------------------------------------------------------------------------------
 
     @classmethod
     def _cache_reservation_series_response(cls, data: PindoraReservationSeriesResponse, *, ext_uuid: uuid.UUID) -> str:
-        return cls._cache_response(data, ext_uuid=ext_uuid, prefix="reservation-series")
+        return cls._cache_response(data, ext_uuid=ext_uuid, prefix="reservation-series")  # type: ignore[arg-type]
 
     @classmethod
     def _get_cached_reservation_series_response(cls, *, ext_uuid: uuid.UUID) -> PindoraReservationSeriesResponse | None:
@@ -866,14 +1273,14 @@ class PindoraReservationSeriesClient(BasePindoraClient):
                 access_code_phone_number=data["access_code_phone_number"],
                 access_code_sms_number=data["access_code_sms_number"],
                 access_code_sms_message=data["access_code_sms_message"],
-                access_code_generated_at=datetime.datetime.fromisoformat(data["access_code_generated_at"]),
+                access_code_generated_at=local_from_iso_format(data["access_code_generated_at"]),
                 access_code_is_active=bool(data["access_code_is_active"]),
                 reservation_unit_code_validity=[
                     PindoraReservationSeriesAccessCodeValidity(
                         access_code_valid_minutes_before=int(validity["access_code_valid_minutes_before"]),
                         access_code_valid_minutes_after=int(validity["access_code_valid_minutes_after"]),
-                        begin=datetime.datetime.fromisoformat(validity["begin"]),
-                        end=datetime.datetime.fromisoformat(validity["end"]),
+                        begin=local_from_iso_format(validity["begin"]),
+                        end=local_from_iso_format(validity["end"]),
                     )
                     for validity in data["reservation_unit_code_validity"]
                 ],

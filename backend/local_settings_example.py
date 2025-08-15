@@ -18,10 +18,17 @@ class LocalMixin:
     CELERY_TASK_ALWAYS_EAGER = True
 
     MOCK_VERKKOKAUPPA_API_ENABLED = True
+    PINDORA_MOCK_ENABLED = True
 
 
 class DockerMixin:
     """Add custom docker settings here."""
+
+    # Required for allowing redirecting back to the frontend after login.
+    SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS = ["localhost:3000", "localhost:3001"]
+
+    MOCK_VERKKOKAUPPA_API_ENABLED = True
+    PINDORA_MOCK_ENABLED = True
 
 
 class AutomatedTestMixin:
