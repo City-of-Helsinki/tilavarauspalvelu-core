@@ -384,6 +384,8 @@ class Common(Environment):
     PINDORA_API_URL = values.StringValue()
     PINDORA_API_KEY = values.StringValue()
 
+    PINDORA_MOCK_ENABLED = values.BooleanValue(default=False)
+
     # --- Graphene settings ------------------------------------------------------------------------------------------
 
     GRAPHENE = {
