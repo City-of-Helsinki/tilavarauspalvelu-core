@@ -5,14 +5,17 @@ import { useRouter } from "next/router";
 /// ex. without keys a path with [id] param turns .../8 into .../[id]. there is no automatic substitution
 export function useSetSearchParams(keysToCopy: string[] = ["id", "pk"]): (params: URLSearchParams) => void {
   const router = useRouter();
-  const setSearchParams = (params: URLSearchParams) => {
+
+  return (params: URLSearchParams) => {
     const { pathname, query } = router;
-    for (const key in keysToCopy) {
+
+    for (const key of keysToCopy) {
       const val = ignoreMaybeArray(query[key]);
       if (val != null) {
-        params.set("key", val);
+        params.set(key, val);
       }
     }
+
     router.replace(
       {
         pathname,
@@ -25,6 +28,4 @@ export function useSetSearchParams(keysToCopy: string[] = ["id", "pk"]): (params
       }
     );
   };
-
-  return setSearchParams;
 }
