@@ -8,7 +8,7 @@ import { useRouter } from "next/router";
 import { TabWrapper, H1, CenterSpinner } from "common/styled";
 import {
   ReservationStateChoice,
-  ReservationOrderingChoices,
+  ReservationOrderSet,
   useListReservationsQuery,
   ReservationTypeChoice,
 } from "@gql/gql-types";
@@ -58,8 +58,7 @@ function Reservations(props: { apiBaseUrl: string }): JSX.Element | null {
               ReservationStateChoice.WaitingForPayment,
               ReservationStateChoice.Denied,
             ],
-      orderBy:
-        tab === "upcoming" ? [ReservationOrderingChoices.BeginsAtAsc] : [ReservationOrderingChoices.BeginsAtDesc],
+      orderBy: tab === "upcoming" ? [ReservationOrderSet.BeginsAtAsc] : [ReservationOrderSet.BeginsAtDesc],
       user: currentUser?.pk ?? 0,
       // NOTE today's reservations are always shown in upcoming (even when they are in the past)
       beginDate: tab === "upcoming" ? toApiDate(today) : undefined,
@@ -180,7 +179,7 @@ export const LIST_RESERVATIONS = gql`
     $state: [ReservationStateChoice]
     $user: [Int]
     $reservationUnits: [Int]
-    $orderBy: [ReservationOrderingChoices]
+    $orderBy: [ReservationOrderSet!]
     $reservationType: [ReservationTypeChoice]!
   ) {
     reservations(
