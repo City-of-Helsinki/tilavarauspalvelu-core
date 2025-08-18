@@ -149,7 +149,7 @@ export const APPLICATION_CARD_FRAGMENT = gql`
   fragment ApplicationCard on ApplicationNode {
     id
     pk
-    ...ApplicationName
+    ...ApplicationNameFields
     status
     updatedAt
     applicationRound {
