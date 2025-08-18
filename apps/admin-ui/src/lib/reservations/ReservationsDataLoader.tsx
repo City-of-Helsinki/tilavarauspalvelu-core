@@ -1,10 +1,6 @@
 import React, { useState } from "react";
 import { gql } from "@apollo/client";
-import {
-  ReservationOrderingChoices,
-  useReservationListQuery,
-  type ReservationListQueryVariables,
-} from "@gql/gql-types";
+import { ReservationOrderSet, useReservationListQuery, type ReservationListQueryVariables } from "@gql/gql-types";
 import { More } from "@/component/More";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { ReservationsTable } from "./ReservationsTable";
@@ -128,40 +124,34 @@ export function ReservationsDataLoader(): JSX.Element {
   );
 }
 
-function transformOrderBy(orderBy: string, desc: boolean): ReservationOrderingChoices | null {
+function transformOrderBy(orderBy: string, desc: boolean): ReservationOrderSet | null {
   switch (orderBy) {
     case "pk":
-      return desc ? ReservationOrderingChoices.PkDesc : ReservationOrderingChoices.PkAsc;
+      return desc ? ReservationOrderSet.PkDesc : ReservationOrderSet.PkAsc;
     case "begin":
-      return desc ? ReservationOrderingChoices.BeginsAtDesc : ReservationOrderingChoices.BeginsAtAsc;
+      return desc ? ReservationOrderSet.BeginsAtDesc : ReservationOrderSet.BeginsAtAsc;
     case "end":
-      return desc ? ReservationOrderingChoices.EndsAtDesc : ReservationOrderingChoices.EndsAtAsc;
+      return desc ? ReservationOrderSet.EndsAtDesc : ReservationOrderSet.EndsAtAsc;
     case "created_at":
-      return desc ? ReservationOrderingChoices.CreatedAtDesc : ReservationOrderingChoices.CreatedAtAsc;
+      return desc ? ReservationOrderSet.CreatedAtDesc : ReservationOrderSet.CreatedAtAsc;
     case "reservee_name":
-      return desc ? ReservationOrderingChoices.ReserveeNameDesc : ReservationOrderingChoices.ReserveeNameAsc;
+      return desc ? ReservationOrderSet.ReserveeNameDesc : ReservationOrderSet.ReserveeNameAsc;
     case "reservation_unit_name_fi":
-      return desc
-        ? ReservationOrderingChoices.ReservationUnitNameFiDesc
-        : ReservationOrderingChoices.ReservationUnitNameFiAsc;
+      return desc ? ReservationOrderSet.ReservationUnitNameFiDesc : ReservationOrderSet.ReservationUnitNameFiAsc;
     case "unit_name_fi":
-      return desc ? ReservationOrderingChoices.UnitNameFiDesc : ReservationOrderingChoices.UnitNameFiAsc;
+      return desc ? ReservationOrderSet.UnitNameFiDesc : ReservationOrderSet.UnitNameFiAsc;
     // NOTE inconsistent naming
     case "orderStatus":
-      return desc ? ReservationOrderingChoices.OrderStatusDesc : ReservationOrderingChoices.OrderStatusAsc;
+      return desc ? ReservationOrderSet.OrderStatusDesc : ReservationOrderSet.OrderStatusAsc;
     case "state":
-      return desc ? ReservationOrderingChoices.StateDesc : ReservationOrderingChoices.StateAsc;
+      return desc ? ReservationOrderSet.StateDesc : ReservationOrderSet.StateAsc;
     default:
       return null;
   }
 }
 
-function transformSortString(orderBy: string | null): ReservationOrderingChoices[] {
-  const defaultSort = [
-    ReservationOrderingChoices.StateDesc,
-    ReservationOrderingChoices.BeginsAtAsc,
-    ReservationOrderingChoices.EndsAtAsc,
-  ];
+function transformSortString(orderBy: string | null): ReservationOrderSet[] {
+  const defaultSort = [ReservationOrderSet.StateDesc, ReservationOrderSet.BeginsAtAsc, ReservationOrderSet.EndsAtAsc];
   if (!orderBy) {
     return defaultSort;
   }
@@ -173,20 +163,20 @@ function transformSortString(orderBy: string | null): ReservationOrderingChoices
     return defaultSort;
   }
 
-  if (transformed === ReservationOrderingChoices.BeginsAtAsc) {
-    return [transformed, ReservationOrderingChoices.EndsAtAsc];
+  if (transformed === ReservationOrderSet.BeginsAtAsc) {
+    return [transformed, ReservationOrderSet.EndsAtAsc];
   }
-  if (transformed === ReservationOrderingChoices.BeginsAtDesc) {
-    return [transformed, ReservationOrderingChoices.EndsAtDesc];
+  if (transformed === ReservationOrderSet.BeginsAtDesc) {
+    return [transformed, ReservationOrderSet.EndsAtDesc];
   }
-  return [transformed, ReservationOrderingChoices.BeginsAtAsc, ReservationOrderingChoices.EndsAtAsc];
+  return [transformed, ReservationOrderSet.BeginsAtAsc, ReservationOrderSet.EndsAtAsc];
 }
 
 export const RESERVATION_LIST_QUERY = gql`
   query ReservationList(
     $first: Int
     $after: String
-    $orderBy: [ReservationOrderingChoices]
+    $orderBy: [ReservationOrderSet!]
     $unit: [Int]
     $reservationUnits: [Int]
     $reservationUnitType: [Int]

@@ -10,18 +10,18 @@ import {
 } from "common/src/helpers";
 import { type LocalizationLanguages } from "common/src/urlBuilder";
 import {
-  EquipmentOrderingChoices,
+  EquipmentOrderSet,
   type Maybe,
   MunicipalityChoice,
   OptionsDocument,
   type OptionsQuery,
   type OptionsQueryVariables,
-  PurposeOrderingChoices,
+  PurposeOrderSet,
   type QueryReservationUnitsArgs,
   ReservationKind,
-  ReservationUnitOrderingChoices,
-  ReservationUnitTypeOrderingChoices,
-  UnitOrderingChoices,
+  ReservationUnitOrderSet,
+  ReservationUnitTypeOrderSet,
+  UnitOrderSet,
 } from "@gql/gql-types";
 import { convertLanguageCode, getTranslationSafe, toApiDate } from "common/src/common/util";
 import { fromUIDate } from "./util";
@@ -34,33 +34,33 @@ import { type OptionsListT, type OptionT } from "common/src/modules/search";
 
 function transformOrderByName(desc: boolean, language: LocalizationLanguages) {
   if (language === "fi") {
-    return desc ? ReservationUnitOrderingChoices.NameFiDesc : ReservationUnitOrderingChoices.NameFiAsc;
+    return desc ? ReservationUnitOrderSet.NameFiDesc : ReservationUnitOrderSet.NameFiAsc;
   }
   if (language === "sv") {
-    return desc ? ReservationUnitOrderingChoices.NameSvDesc : ReservationUnitOrderingChoices.NameSvAsc;
+    return desc ? ReservationUnitOrderSet.NameSvDesc : ReservationUnitOrderSet.NameSvAsc;
   }
-  return desc ? ReservationUnitOrderingChoices.NameEnDesc : ReservationUnitOrderingChoices.NameEnAsc;
+  return desc ? ReservationUnitOrderSet.NameEnDesc : ReservationUnitOrderSet.NameEnAsc;
 }
 
 function transformOrderByUnitName(desc: boolean, language: LocalizationLanguages) {
   if (language === "fi") {
-    return desc ? ReservationUnitOrderingChoices.UnitNameFiDesc : ReservationUnitOrderingChoices.UnitNameFiAsc;
+    return desc ? ReservationUnitOrderSet.UnitNameFiDesc : ReservationUnitOrderSet.UnitNameFiAsc;
   }
   if (language === "sv") {
-    return desc ? ReservationUnitOrderingChoices.UnitNameSvDesc : ReservationUnitOrderingChoices.UnitNameSvAsc;
+    return desc ? ReservationUnitOrderSet.UnitNameSvDesc : ReservationUnitOrderSet.UnitNameSvAsc;
   }
-  return desc ? ReservationUnitOrderingChoices.UnitNameEnDesc : ReservationUnitOrderingChoices.UnitNameEnAsc;
+  return desc ? ReservationUnitOrderSet.UnitNameEnDesc : ReservationUnitOrderSet.UnitNameEnAsc;
 }
 
 function transformOrderByTypeRank(desc: boolean, _language: LocalizationLanguages) {
-  return desc ? ReservationUnitOrderingChoices.TypeRankDesc : ReservationUnitOrderingChoices.TypeRankAsc;
+  return desc ? ReservationUnitOrderSet.TypeRankDesc : ReservationUnitOrderSet.TypeRankAsc;
 }
 
 function transformOrderBy(
   orderBy: string | null,
   desc: boolean,
   language: LocalizationLanguages
-): ReservationUnitOrderingChoices | null {
+): ReservationUnitOrderSet | null {
   switch (orderBy) {
     case "name":
       return transformOrderByName(desc, language);
@@ -74,15 +74,11 @@ function transformOrderBy(
 }
 
 /// Defaults to name sorting
-function transformSortString(
-  orderBy: string | null,
-  language: string,
-  desc: boolean
-): ReservationUnitOrderingChoices[] {
+function transformSortString(orderBy: string | null, language: string, desc: boolean): ReservationUnitOrderSet[] {
   const lang = getLocalizationLang(language);
   const transformed = transformOrderBy(orderBy ?? "name", desc, lang) ?? transformOrderByName(false, lang);
   // NOTE a weird backend issue that requires two orderBy params (otherwise 2nd+ page is sometimes incorrect)
-  const sec = desc ? ReservationUnitOrderingChoices.PkDesc : ReservationUnitOrderingChoices.PkAsc;
+  const sec = desc ? ReservationUnitOrderSet.PkDesc : ReservationUnitOrderSet.PkAsc;
   return [transformed, sec];
 }
 
@@ -201,10 +197,10 @@ export async function getSearchOptions(
   const { data: optionsData } = await apolloClient.query<OptionsQuery, OptionsQueryVariables>({
     query: OptionsDocument,
     variables: {
-      reservationUnitTypesOrderBy: ReservationUnitTypeOrderingChoices.RankAsc,
-      purposesOrderBy: PurposeOrderingChoices.RankAsc,
-      unitsOrderBy: UnitOrderingChoices.NameFiAsc,
-      equipmentsOrderBy: EquipmentOrderingChoices.CategoryRankAsc,
+      reservationUnitTypesOrderBy: ReservationUnitTypeOrderSet.RankAsc,
+      purposesOrderBy: PurposeOrderSet.RankAsc,
+      unitsOrderBy: UnitOrderSet.NameFiAsc,
+      equipmentsOrderBy: EquipmentOrderSet.CategoryRankAsc,
       ...(page === "direct" ? { onlyDirectBookable: true } : {}),
       ...(page === "seasonal" ? { onlySeasonalBookable: true } : {}),
     },
@@ -255,11 +251,11 @@ function sortAgeGroups(ageGroups: AgeGroup[]): NonNullable<AgeGroup>[] {
 // There is a duplicate in admin-ui but it doesn't have translations
 export const OPTIONS_QUERY = gql`
   query Options(
-    $reservationUnitTypesOrderBy: [ReservationUnitTypeOrderingChoices]
-    $purposesOrderBy: [PurposeOrderingChoices]
-    $unitsOrderBy: [UnitOrderingChoices]
-    $equipmentsOrderBy: [EquipmentOrderingChoices]
-    $reservationPurposesOrderBy: [ReservationPurposeOrderingChoices]
+    $reservationUnitTypesOrderBy: [ReservationUnitTypeOrderSet]
+    $purposesOrderBy: [PurposeOrderSet]
+    $unitsOrderBy: [UnitOrderSet]
+    $equipmentsOrderBy: [EquipmentOrderSet]
+    $reservationPurposesOrderBy: [ReservationPurposeOrderSet]
     $onlyDirectBookable: Boolean
     $onlySeasonalBookable: Boolean
   ) {
