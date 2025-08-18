@@ -31,7 +31,7 @@ import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
-import { base64encode, toNumber } from "common/src/helpers";
+import { createNodeId, toNumber } from "common/src/helpers";
 import { successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
 import { SelectFilter } from "@/component/QueryParamFilters";
@@ -95,9 +95,8 @@ export function CreateReservationModal({
   const params = useSearchParams();
   const reservationUnitPk = toNumber(params.get("reservationUnit")) ?? reservationUnitOptions[0]?.value;
 
-  const id = base64encode(`ReservationUnitNode:${reservationUnitPk}`);
   const { data, loading } = useReservationUnitQuery({
-    variables: { id },
+    variables: { id: createNodeId("ReservationUnitNode", reservationUnitPk ?? 0) },
     skip: !reservationUnitPk,
   });
 

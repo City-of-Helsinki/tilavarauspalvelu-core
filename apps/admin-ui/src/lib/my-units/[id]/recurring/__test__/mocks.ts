@@ -22,7 +22,7 @@ import {
   ReservationsByReservationUnitDocument,
   type ReservationsByReservationUnitQuery,
 } from "@gql/gql-types";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { toApiDateUnsafe } from "common/src/common/util";
 
@@ -89,7 +89,7 @@ function createReservationUnitFragment({ pk, nameFi }: { pk: number; nameFi: str
     authentication: Authentication.Weak,
     nameFi,
     pk,
-    id: base64encode(`ReservationUnitNode:${pk}`),
+    id: createNodeId("ReservationUnitNode", pk),
     minPersons: null,
     maxPersons: null,
     bufferTimeBefore: 0,
@@ -154,7 +154,7 @@ const reservationsByUnitResponse: CalendarReservationFragment[] = mondayMorningR
   .sort((x, y) => x.begin.getTime() - y.begin.getTime())
   .map((x) => ({
     __typename: "ReservationNode",
-    id: base64encode(`ReservationNode:1`),
+    id: createNodeId("ReservationNode", 1),
     beginsAt: x.begin.toUTCString(),
     endsAt: x.end.toUTCString(),
     bufferTimeBefore: 0,
@@ -239,7 +239,7 @@ const otherMocks = [
   {
     request: {
       query: ReservationUnitDocument,
-      variables: { id: base64encode(`ReservationUnitNode:1`) },
+      variables: { id: createNodeId("ReservationUnitNode", 1) },
     },
     result: {
       data: createReservationUnitResponse(),
@@ -271,7 +271,7 @@ function createInIntervalQueryMock({ begin, end }: { begin: Date; end: Date }) {
   const beginDate = toApiDateUnsafe(begin);
   const endDate = toApiDateUnsafe(end);
   const variables: ReservationsByReservationUnitQueryVariables = {
-    id: base64encode(`ReservationUnitNode:1`),
+    id: createNodeId("ReservationUnitNode", 1),
     pk: 1,
     beginDate,
     endDate,
@@ -313,7 +313,7 @@ function createReservationUnitResponse(): ReservationUnitQuery {
 function createReservationsInIntervalResponse(): ReservationsByReservationUnitQuery {
   return {
     reservationUnit: {
-      id: base64encode(`ReservationUnitNode:1`),
+      id: createNodeId("ReservationUnitNode", 1),
       reservations: reservationsByUnitResponse,
     },
     affectingReservations: reservationsByUnitResponse,

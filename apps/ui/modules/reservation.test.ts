@@ -20,7 +20,7 @@ import { isSlotWithinReservationTime } from "./reservable";
 import { toApiDate } from "common/src/common/util";
 import { type TFunction } from "i18next";
 import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 
 function createMockCancellationRule({
   canBeCancelledTimeBefore = 0,
@@ -110,13 +110,13 @@ function createMockCanUserCancelReservation({
   canBeCancelledTimeBefore?: number; // in seconds
 }): CanUserCancelReservationFragment {
   return {
-    id: base64encode("ReservationNode:1"),
+    id: createNodeId("ReservationNode", 1),
     state,
     beginsAt: beginsAt.toISOString(),
     reservationUnit: {
-      id: base64encode("ReservationUnitNode:1"),
+      id: createNodeId("ReservationUnitNode", 1),
       cancellationRule: {
-        id: base64encode("CancellationRuleNode:1"),
+        id: createNodeId("CancellationRuleNode", 1),
         canBeCancelledTimeBefore,
       },
     },
@@ -258,10 +258,10 @@ function createReservationOrderStatusFragment({
   state: ReservationStateChoice;
 }): ReservationOrderStatusFragment {
   return {
-    id: base64encode("ReservationNode:1"),
+    id: createNodeId("ReservationNode", 1),
     state,
     paymentOrder: {
-      id: base64encode("PaymentOrderNode:1"),
+      id: createNodeId("PaymentOrderNode", 1),
       status: orderStatus,
       checkoutUrl: "https://checkout.url/path?user=1111-2222-3333-4444",
     },
