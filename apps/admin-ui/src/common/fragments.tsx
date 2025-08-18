@@ -50,7 +50,7 @@ export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
       id
       pk
       status
-      ...ApplicationName
+      ...ApplicationNameFields
     }
     reservationUnitOptions {
       id

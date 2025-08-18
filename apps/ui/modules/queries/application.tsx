@@ -42,7 +42,7 @@ export const APPLICATION_FORM_FRAGMENT = gql`
         }
       }
       suitableTimeRanges {
-        ...SuitableTime
+        ...SuitableTimeFields
       }
       purpose {
         id
