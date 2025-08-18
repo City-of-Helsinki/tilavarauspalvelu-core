@@ -94,7 +94,7 @@ class ApplicationCreateSerializer(NestingModelSerializer):
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         user: User = data["user"]
-        user.validators.validate_is_of_age()
+        user.validators.validate_is_of_age(code=error_codes.APPLICATION_ADULT_RESERVEE_REQUIRED)
         user.validators.validate_is_internal_user_if_ad_user()
 
         application_round: ApplicationRound = data["application_round"]
