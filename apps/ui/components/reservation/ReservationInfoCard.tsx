@@ -14,7 +14,7 @@ import {
 } from "@gql/gql-types";
 import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
 import { formatDateTimeRange, formatDuration } from "@/modules/util";
-import { base64encode, capitalize, getImageSource, getMainImage } from "common/src/helpers";
+import { createNodeId, capitalize, getImageSource, getMainImage } from "common/src/helpers";
 import { getReservationUnitPath } from "@/modules/urls";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 
@@ -71,7 +71,7 @@ export function ReservationInfoCard({
   const { data: accessCodeData } = useAccessCodeQuery({
     skip: !reservation || reservation.accessType !== AccessType.AccessCode,
     variables: {
-      id: base64encode(`ReservationNode:${reservation.pk}`),
+      id: createNodeId("ReservationNode", reservation.pk ?? 0),
     },
   });
   const { accessCode } = accessCodeData?.reservation?.pindoraInfo ?? {};

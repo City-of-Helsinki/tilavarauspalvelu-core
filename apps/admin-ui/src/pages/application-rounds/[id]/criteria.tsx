@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { H1, H3, SemiBold, Strong, CenterSpinner, Flex, TitleSection } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useApplicationRoundCriteriaQuery, UserPermissionChoice } from "@gql/gql-types";
-import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { formatDate } from "@/common/util";
 import { errorToast } from "common/src/components/toast";
 import { Accordion as AccordionBase } from "@/component/Accordion";
@@ -44,9 +44,8 @@ const ReservationUnit = styled.div`
 function Criteria({ applicationRoundPk }: { applicationRoundPk: number }): JSX.Element {
   const { t } = useTranslation();
 
-  const id = base64encode(`ApplicationRoundNode:${applicationRoundPk}`);
   const { data, loading } = useApplicationRoundCriteriaQuery({
-    variables: { id },
+    variables: { id: createNodeId("ApplicationRoundNode", applicationRoundPk) },
     skip: !applicationRoundPk,
     onError: () => {
       errorToast({ text: t("errors:errorFetchingData") });

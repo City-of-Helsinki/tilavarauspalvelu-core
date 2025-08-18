@@ -5,7 +5,7 @@ import { vi, describe, test, expect } from "vitest";
 import { getReservationUnitPath } from "@/modules/urls";
 import { createMockReservationUnitType, generateNameFragment } from "@/test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 
 describe("RecurringCard", () => {
   test("should render recurring card", () => {
@@ -131,7 +131,7 @@ function createReservationUnit({
 
 function createUnitMock({ name }: { name: string }): RecurringCardFragment["unit"] {
   return {
-    id: base64encode("UnitNode:1"),
+    id: createNodeId("UnitNode", 1),
     ...generateNameFragment(name),
   };
 }

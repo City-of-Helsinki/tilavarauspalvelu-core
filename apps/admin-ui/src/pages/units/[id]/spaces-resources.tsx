@@ -3,7 +3,7 @@ import React, { createRef } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { UserPermissionChoice, useSpacesResourcesQuery } from "@gql/gql-types";
-import { base64encode, toNumber, ignoreMaybeArray } from "common/src/helpers";
+import { createNodeId, toNumber, ignoreMaybeArray } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
 import { Error404 } from "@/component/Error404";
 import { fontBold, H2, CenterSpinner, Flex } from "common/styled";
@@ -32,13 +32,12 @@ function SpacesResources({ unitPk }: { unitPk: number }): JSX.Element {
   const newSpacesButtonRef = createRef<HTMLButtonElement>();
   const newResourceButtonRef = createRef<HTMLButtonElement>();
 
-  const id = base64encode(`UnitNode:${unitPk}`);
   const {
     data,
     refetch,
     loading: isLoading,
   } = useSpacesResourcesQuery({
-    variables: { id },
+    variables: { id: createNodeId("UnitNode", unitPk) },
     fetchPolicy: "network-only",
     onError: () => {
       errorToast({ text: t("errors:errorFetchingData") });
