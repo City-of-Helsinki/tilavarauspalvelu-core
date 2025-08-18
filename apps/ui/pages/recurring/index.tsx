@@ -5,7 +5,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Flex, H1, H2 } from "common/styled";
 import {
   type ApplicationRoundFieldsFragment,
-  ApplicationRoundOrderingChoices,
+  ApplicationRoundOrderSet,
   ApplicationRoundStatusChoice,
   ApplicationRoundsUiDocument,
   type ApplicationRoundsUiQuery,
@@ -29,7 +29,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { data } = await apolloClient.query<ApplicationRoundsUiQuery, ApplicationRoundsUiQueryVariables>({
     query: ApplicationRoundsUiDocument,
     variables: {
-      orderBy: [ApplicationRoundOrderingChoices.PkAsc],
+      orderBy: [ApplicationRoundOrderSet.PkAsc],
     },
   });
   const applicationRounds = filterNonNullable(data?.applicationRounds?.edges.map((n) => n?.node));
@@ -152,7 +152,7 @@ export const APPLICATION_ROUND_FRAGMENT = gql`
 
 export const APPLICATION_ROUNDS = gql`
   ${APPLICATION_ROUND_FRAGMENT}
-  query ApplicationRoundsUi($orderBy: [ApplicationRoundOrderingChoices]) {
+  query ApplicationRoundsUi($orderBy: [ApplicationRoundOrderSet!]) {
     applicationRounds(orderBy: $orderBy) {
       edges {
         node {
