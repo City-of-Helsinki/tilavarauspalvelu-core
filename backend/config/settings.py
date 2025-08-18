@@ -509,6 +509,7 @@ class Common(Environment):
     PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS = values.IntegerValue(default=365)
     PERMISSION_NOTIFICATION_BEFORE_DAYS = values.IntegerValue(default=14)
     RAISE_ERROR_ON_REFRESH_FAILURE = False
+    ENABLE_NOW_TT = False
 
     ICAL_HASH_SECRET = values.StringValue()
     EXPORT_AUTHORIZATION_TOKEN = values.StringValue()
@@ -859,6 +860,8 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     FRONTEND_TESTING_API_ENABLED = True
     # Enable feature flag for testing
     PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED = True
+    # Enable NowTT for testing
+    ENABLE_NOW_TT = True
 
     EMAIL_VARAAMO_EXT_LINK = "https://fake.varaamo.hel.fi"
     EMAIL_FEEDBACK_EXT_LINK = "https://fake.varaamo.hel.fi/feedback"
