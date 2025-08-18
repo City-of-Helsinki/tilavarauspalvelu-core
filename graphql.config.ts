@@ -3,7 +3,7 @@ import type { IGraphQLConfig } from "graphql-config";
 const scalars = {
   DateTime: "string",
   Date: "string",
-  // Python decimal is a string but it allows numbers also for mutations
+  // Python decimal is a string, but it allows numbers also for mutations
   // using number in mutation has two benefits:
   // - we don't have to toNumber(val).toString() for all values
   // - removes server errors from passing "" as a value (which can't be type checked on client)
@@ -13,6 +13,9 @@ const scalars = {
   Long: "number",
   Time: "string",
   TimeString: "string",
+  Email: "string",
+  Image: "unknown",
+  URL: "string",
   Upload: "unknown",
   UUID: "string",
   Void: "unknown",
@@ -43,11 +46,7 @@ const gqlConfig = {
 };
 
 const schema = "tilavaraus.graphql";
-const plugins = [
-  "typescript",
-  "typescript-operations",
-  "typescript-react-apollo",
-] as const;
+const plugins = ["typescript", "typescript-operations", "typescript-react-apollo"] as const;
 
 const config: IGraphQLConfig = {
   projects: {
