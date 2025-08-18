@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { useGenericTerms } from "common/src/hooks/useGenericTerms";
+import { useGenericTermsOfUse } from "common/src/hooks/useGenericTermsOfUse";
 import { type Maybe, type TermsOfUseTextFieldsFragment } from "@gql/gql-types";
 import { Sanitize } from "common/src/components/Sanitize";
 
@@ -48,7 +48,7 @@ function ShowTOS({ reservationUnit }: { reservationUnit: Node }) {
   const priceTerms = reservationUnit.pricingTerms;
   const cancelTerms = reservationUnit.cancellationTerms;
 
-  const genericTerms = useGenericTerms();
+  const genericTermsOfUse = useGenericTermsOfUse();
 
   return (
     <div>
@@ -58,7 +58,7 @@ function ShowTOS({ reservationUnit }: { reservationUnit: Node }) {
       {serviceTerms?.textFi && (
         <TOSElement title={t("tos:serviceTermsTitle")} text={serviceTerms?.textFi ?? ""} isHtml />
       )}
-      <TOSElement title={t("tos:generalTermsTitle")} text={genericTerms?.textFi ?? ""} isHtml />
+      <TOSElement title={t("tos:generalTermsTitle")} text={genericTermsOfUse?.textFi ?? ""} isHtml />
     </div>
   );
 }
