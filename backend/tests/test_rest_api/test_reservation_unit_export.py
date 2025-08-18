@@ -28,6 +28,7 @@ def test_reservation_unit_export(api_client, settings):
     # Assume that the data per reservation unit is correct from the exporter
     # -> Simply check the keys are what we expect
     assert list(data[0]) == [
+        "access_type",
         "additional_instructions_for_cancelled_reservations_en",
         "additional_instructions_for_cancelled_reservations_fi",
         "additional_instructions_for_cancelled_reservations_sv",
