@@ -6,7 +6,7 @@ import { isEqual, trim } from "lodash-es";
 import { type ApolloQueryResult, gql } from "@apollo/client";
 import { CenterSpinner, Flex, fontMedium, H1, H3, H4, TitleSection } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import {
   type ApplicationAdminQuery,
   type ApplicationPageFieldsFragment,
@@ -554,7 +554,6 @@ export default function ApplicationPage({ pk }: PropsNarrowed): JSX.Element | nu
   const ref = useRef<HTMLHeadingElement>(null);
   const { t } = useTranslation();
 
-  const id = base64encode(`ApplicationNode:${pk}`);
   const {
     data,
     loading: isLoading,
@@ -562,7 +561,7 @@ export default function ApplicationPage({ pk }: PropsNarrowed): JSX.Element | nu
     error,
   } = useApplicationAdminQuery({
     skip: !(pk > 0),
-    variables: { id },
+    variables: { id: createNodeId("ApplicationNode", pk) },
   });
 
   const application = data?.application;

@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 import { useReservationDateOfBirthQuery, useApplicationDateOfBirthQuery } from "@gql/gql-types";
 import { formatDate } from "@/common/util";
 import { Flex } from "common/styled";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 
 // NOTE separate query because all requests for dateOfBirth are logged
 // so don't make them automatically or inside other queries
@@ -56,7 +56,7 @@ export function BirthDate(props: Props): JSX.Element {
     error: errorReservation,
   } = useReservationDateOfBirthQuery({
     variables: {
-      id: base64encode(`ReservationNode:${reservationPk}`),
+      id: createNodeId("ReservationNode", reservationPk ?? 0),
     },
     fetchPolicy: "no-cache",
     skip: !reservationPk || !visible,
@@ -68,7 +68,7 @@ export function BirthDate(props: Props): JSX.Element {
     error: errorApplication,
   } = useApplicationDateOfBirthQuery({
     variables: {
-      id: base64encode(`ApplicationNode:${applicationPk}`),
+      id: createNodeId("ApplicationNode", applicationPk ?? 0),
     },
     fetchPolicy: "no-cache",
     skip: !applicationPk || !visible,

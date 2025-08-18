@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { useDisplayError } from "common/src/hooks";
 import { Flex } from "common/styled";
 import { uniq } from "lodash-es";
@@ -106,7 +106,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { data } = await client.query<ApplicationPage1Query, ApplicationPage1QueryVariables>({
     query: ApplicationPage1Document,
     variables: {
-      id: base64encode(`ApplicationNode:${pk}`),
+      id: createNodeId("ApplicationNode", pk),
     },
   });
   const { application } = data;

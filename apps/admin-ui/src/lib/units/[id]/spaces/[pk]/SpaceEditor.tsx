@@ -6,7 +6,7 @@ import { useUpdateSpaceMutation, type SpaceUpdateMutationInput, useSpaceQuery } 
 import { errorToast, successToast } from "common/src/components/toast";
 import { ButtonContainer, CenterSpinner, H2, H3 } from "common/styled";
 import { FormErrorSummary } from "@/component/FormErrorSummary";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LinkPrev } from "@/component/LinkPrev";
@@ -41,7 +41,7 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
     refetch,
     loading: isQueryLoading,
   } = useSpaceQuery({
-    variables: { id: base64encode(`SpaceNode:${space}`) },
+    variables: { id: createNodeId("SpaceNode", space) },
     onError: () => {
       errorToast({ text: t("errors:errorFetchingData") });
     },
