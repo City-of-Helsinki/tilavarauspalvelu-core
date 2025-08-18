@@ -59,7 +59,7 @@ class IDToken:
     authentication methods reference:
     suomi_fi | heltunnistussuomifi | helsinki_adfs | helsinkiad | helsinkiazuread | eduad
     """
-    loa: Literal["substantial", "low"]
+    loa: Literal["substantial", "high", "low"]
     """level of authentication"""
 
     @classmethod
@@ -118,7 +118,7 @@ class IDToken:
 
     @property
     def is_strong_login(self) -> bool:
-        return self.loa == "substantial"
+        return self.loa in {"substantial", "high"}
 
 
 @dataclasses.dataclass
