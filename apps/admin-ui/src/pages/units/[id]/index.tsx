@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { UserPermissionChoice, useUnitPageQuery } from "@gql/gql-types";
 import { formatAddress } from "@/common/util";
 import { ExternalLink } from "@/component/ExternalLink";
-import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { Error404 } from "@/component/Error404";
 import { ReservationUnitList } from "@lib/units/[id]/ReservationUnitList";
 import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/common/urls";
@@ -63,10 +63,8 @@ function Unit({ unitPk }: { unitPk: number }): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
 
-  const typename = "UnitNode";
-  const id = base64encode(`${typename}:${unitPk}`);
   const { data, loading: isLoading } = useUnitPageQuery({
-    variables: { id },
+    variables: { id: createNodeId("UnitNode", unitPk) },
     fetchPolicy: "network-only",
   });
 

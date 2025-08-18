@@ -5,7 +5,7 @@ import {
   useReservationUnitsByUnitQuery,
 } from "@gql/gql-types";
 import { toApiDate } from "common/src/common/util";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import { createNodeId, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { errorToast } from "common/src/components/toast";
 import { gql } from "@apollo/client";
@@ -24,7 +24,7 @@ type ReservationUnitType = NonNullable<NonNullable<ReservationUnitsByUnitQuery["
 
 function createDummyReservationUnit(opt: OptionT): ReservationUnitType {
   return {
-    id: base64encode(`ReservationUnitNode:${opt.value}`),
+    id: createNodeId("ReservationUnitNode", opt.value),
     pk: opt.value,
     nameFi: opt.label,
     bufferTimeBefore: 0,
@@ -46,12 +46,11 @@ export function useUnitResources({
   reservationUnitTypeFilter = [],
 }: UseUnitResourcesProps) {
   const { t } = useTranslation();
-  const id = base64encode(`UnitNode:${unitPk}`);
   const isValid = Number(unitPk) > 0;
   const { data, previousData, ...rest } = useReservationUnitsByUnitQuery({
     skip: !isValid,
     variables: {
-      id,
+      id: createNodeId("UnitNode", unitPk),
       pk: Number(unitPk),
       beginDate: toApiDate(begin) ?? "",
       endDate: toApiDate(begin) ?? "",

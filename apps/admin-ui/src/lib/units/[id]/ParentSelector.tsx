@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation, type TFunction } from "next-i18next";
 import { Select } from "hds-react";
 import { UnitSpacesQuery, useUnitSpacesQuery } from "@gql/gql-types";
-import { base64encode, convertOptionToHDS, filterNonNullable, toNumber } from "common/src/helpers";
+import { createNodeId, convertOptionToHDS, filterNonNullable, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
 function spacesAsHierarchy(unit: UnitSpacesQuery["unit"] | undefined, paddingChar: string) {
@@ -61,7 +61,7 @@ export function ParentSelector({
 }: Props): JSX.Element {
   const { data } = useUnitSpacesQuery({
     fetchPolicy: "no-cache",
-    variables: { id: base64encode(`UnitNode:${unitPk}`) },
+    variables: { id: createNodeId("UnitNode", unitPk) },
     skip: !unitPk,
   });
 

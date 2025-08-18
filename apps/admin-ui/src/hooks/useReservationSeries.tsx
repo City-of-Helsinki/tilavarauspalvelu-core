@@ -1,7 +1,7 @@
 import { useTranslation } from "next-i18next";
 import { type Maybe, useReservationSeriesQuery } from "@gql/gql-types";
 import { errorToast } from "common/src/components/toast";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import { createNodeId, filterNonNullable } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
 /// @param recurringPk fetch reservations related to this pk
@@ -10,12 +10,11 @@ import { gql } from "@apollo/client";
 export function useReservationSeries(recurringPk: Maybe<number> | undefined) {
   const { t } = useTranslation();
 
-  const id = base64encode(`ReservationSeriesNode:${recurringPk}`);
   const { data, loading, refetch } = useReservationSeriesQuery({
     skip: !recurringPk,
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
-    variables: { id },
+    variables: { id: createNodeId("ReservationSeriesNode", recurringPk ?? 0) },
     onError: () => {
       errorToast({ text: t("errors:errorFetchingData") });
     },

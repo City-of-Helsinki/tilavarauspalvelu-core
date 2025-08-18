@@ -22,7 +22,7 @@ import { useCreateReservationSeries, useFilteredReservationList, useMultipleRese
 import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
-import { base64encode, toNumber } from "common/src/helpers";
+import { createNodeId, toNumber } from "common/src/helpers";
 import { Element } from "@/styled";
 import { AutoGrid, Flex, Strong } from "common/styled";
 import { errorToast } from "common/src/components/toast";
@@ -59,10 +59,9 @@ interface SeriesProps {
 function ReservationSeriesFormWrapper({ reservationUnitOptions, unitPk }: SeriesProps) {
   const params = useSearchParams();
   const reservationUnitPk = toNumber(params.get("reservationUnit"));
-  const id = base64encode(`ReservationUnitNode:${reservationUnitPk}`);
   const isValid = reservationUnitPk != null && reservationUnitPk > 0;
   const { data: queryData } = useReservationUnitQuery({
-    variables: { id },
+    variables: { id: createNodeId("ReservationUnitNode", reservationUnitPk ?? 0) },
     skip: !isValid,
   });
 

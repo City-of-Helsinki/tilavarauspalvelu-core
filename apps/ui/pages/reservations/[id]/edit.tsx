@@ -11,7 +11,7 @@ import {
   ReservationEditPageDocument,
   MunicipalityChoice,
 } from "@gql/gql-types";
-import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
 import { addYears } from "date-fns";
 import { breakpoints } from "common/src/const";
@@ -152,7 +152,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const { data } = await client.query<ReservationEditPageQuery, ReservationEditPageQueryVariables>({
       query: ReservationEditPageDocument,
       variables: {
-        id: base64encode(`ReservationNode:${pk}`),
+        id: createNodeId("ReservationNode", pk),
         beginDate: toApiDate(new Date()) ?? "",
         endDate: toApiDate(addYears(new Date(), 2)) ?? "",
       },

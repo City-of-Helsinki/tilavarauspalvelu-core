@@ -7,7 +7,7 @@ import { type ApplicationPage2Query, Priority, type TimeSelectorFragment, Weekda
 import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { transformWeekday } from "common/src/conversion";
-import { base64encode, formatTimeStruct } from "common/src/helpers";
+import { createNodeId, formatTimeStruct } from "common/src/helpers";
 import { type OpenHoursState } from "common/src/components/ApplicationTimeSelector";
 import { selectOption } from "@/test/test.utils";
 import { toApiTime } from "common/src/common/util";
@@ -227,7 +227,7 @@ describe("TimeSelector render single section", () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ({ label, days }) => {
       const openTimes: TimeSelectorFragment[] = days.map((day, index) => ({
-        id: base64encode(`TimeSelector:${index}`),
+        id: createNodeId("TimeSelector", index),
         weekday: day.day,
         isClosed: false,
         reservableTimes: day.times.map((time) => ({

@@ -11,7 +11,7 @@ import { createTagString, getReservationUnitPricing } from "./reservation";
 import { addHours, addMonths } from "date-fns";
 import { toApiDate, toApiDateUnsafe } from "common/src/common/util";
 import { describe, expect, test } from "vitest";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 
 const mockT = ((x: string) => x) as TFunction;
 
@@ -65,12 +65,12 @@ function constructReservation({
   enableRecurrence?: boolean;
 }): CreateTagStringFragment {
   return {
-    id: base64encode("ReservationNode:1"),
+    id: createNodeId("ReservationNode", 1),
     beginsAt: beginsAt.toISOString(),
     endsAt: endsAt.toISOString(),
     reservationSeries: enableRecurrence
       ? {
-          id: base64encode("ReservationSeriesNode:1"),
+          id: createNodeId("ReservationSeriesNode", 1),
           beginTime: "12:00",
           endTime: "14:00",
           beginDate: toApiDateUnsafe(beginsAt),
@@ -79,10 +79,10 @@ function constructReservation({
         }
       : null,
     reservationUnit: {
-      id: base64encode("ReservationUnitNode:1"),
+      id: createNodeId("ReservationUnitNode", 1),
       nameFi: "Reservation unit 1",
       unit: {
-        id: base64encode("UnitNode:1"),
+        id: createNodeId("UnitNode", 1),
         nameFi: "Unit 1",
       },
     },

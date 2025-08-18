@@ -13,7 +13,7 @@ import {
   ReservationStateChoice,
 } from "@/gql/gql-types";
 import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
-import { base64encode, toNumber } from "common/src/helpers";
+import { createNodeId, toNumber } from "common/src/helpers";
 import { createMockIsReservableFieldsFragment, createMockReservableTimes } from "@/test/reservation-unit.mocks";
 
 describe("generateReservableMap", () => {
@@ -448,7 +448,7 @@ describe("isRangeReservable", () => {
       isBlocked?: boolean;
     }): BlockingReservationFieldsFragment {
       return {
-        id: base64encode("ReservationNode:1"),
+        id: createNodeId("ReservationNode", 1),
         pk: 1,
         bufferTimeAfter: 60 * 60 * bufferTimeAfter,
         bufferTimeBefore: 60 * 60 * bufferTimeBefore,

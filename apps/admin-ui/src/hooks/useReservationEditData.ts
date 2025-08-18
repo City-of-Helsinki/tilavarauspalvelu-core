@@ -4,7 +4,7 @@ import {
   ReservationStateChoice,
   useReservationEditPageQuery,
 } from "@gql/gql-types";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 import { useReservationSeries } from "@/hooks";
 
 type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;
@@ -19,11 +19,10 @@ export function useReservationEditData(pk: number): {
   loading: boolean;
   refetch: () => Promise<unknown>;
 } {
-  const id = base64encode(`ReservationNode:${pk}`);
   const { data, loading, refetch } = useReservationEditPageQuery({
     skip: !pk,
     fetchPolicy: "no-cache",
-    variables: { id },
+    variables: { id: createNodeId("ReservationNode", pk) },
   });
 
   const recurringPk = data?.reservation?.reservationSeries?.pk;
@@ -37,13 +36,13 @@ export function useReservationEditData(pk: number): {
     .filter((x) => x.state === ReservationStateChoice.Confirmed);
 
   const nextPk = possibleReservations?.at(0)?.pk ?? 0;
-  const nextRecurrenceId = base64encode(`ReservationNode:${nextPk}`);
+  const nextRecurrenceId = createNodeId("ReservationNode", nextPk);
   const { data: nextRecurrence, loading: nextReservationLoading } = useReservationEditPageQuery({
     skip: nextPk === 0,
-    fetchPolicy: "no-cache",
     variables: {
       id: nextRecurrenceId,
     },
+    fetchPolicy: "no-cache",
   });
 
   const reservation = recurringPk ? nextRecurrence?.reservation : data?.reservation;
