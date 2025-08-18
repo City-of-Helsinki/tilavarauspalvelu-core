@@ -13,7 +13,7 @@ import {
   Weekday,
 } from "@/gql/gql-types";
 import { ReservableMap, type RoundPeriod } from "@/modules/reservable";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 import { addDays, addYears, endOfDay, format, startOfDay, startOfToday } from "date-fns";
 import { createMockReservationUnitType, generateDescriptionFragment, generateNameFragment } from "./test.gql.utils";
 
@@ -68,7 +68,7 @@ export function createMockIsReservableFieldsFragment({
 
 export function createMockReservationUnit({ pk }: { pk: number }): ReservationUnitNode {
   const timeSelector: ApplicationRoundTimeSlotNode = {
-    id: base64encode(`ApplicationRoundTimeSlotNode:1`),
+    id: createNodeId("ApplicationRoundTimeSlotNode", 1),
     pk,
     weekday: Weekday.Tuesday,
     isClosed: false,
@@ -80,7 +80,7 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     ],
   };
   return {
-    id: base64encode(`ReservationUnitNode:${pk}`),
+    id: createNodeId("ReservationUnitNode", pk),
     pk,
     ...generateNameFragment(`ReservationUnit ${pk}`),
     // TODO this is weird
@@ -100,7 +100,7 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     }),
     images: [
       {
-        id: base64encode("Image:1"),
+        id: createNodeId("Image", 1),
         pk: 1,
         imageUrl: "https://example.com/image1.jpg",
         largeUrl: "https://example.com/image1_large.jpg",
@@ -180,7 +180,7 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
 
 function createMockUnit({ pk }: { pk: number }): UnitNode {
   return {
-    id: base64encode(`UnitNode:${pk}`),
+    id: createNodeId("UnitNode", 1),
     pk, // Maybe<Scalars["Int"]["output"]>;
     ...generateNameFragment(`Unit ${pk}`),
     ...generateDescriptionFragment(`Unit Description ${pk}`),

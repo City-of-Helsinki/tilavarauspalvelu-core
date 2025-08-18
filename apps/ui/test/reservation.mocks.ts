@@ -14,7 +14,7 @@ import {
   ReserveeType,
   TermsType,
 } from "@gql/gql-types";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 import type { FieldName } from "common/src/metaFieldsHelpers";
 import { generateNameFragment } from "@/test/test.gql.utils";
 
@@ -36,7 +36,7 @@ export function generateDescriptionFragment(description: string) {
 
 export function generatePurposeFragment(name: string) {
   return {
-    id: base64encode(`PurposeNode:${name}`),
+    id: createNodeId("PurposeNode", 1),
     pk: 1,
     ...generateNameFragment(name),
   };
@@ -45,7 +45,7 @@ export function generatePurposeFragment(name: string) {
 export function generateAgeGroupFragment(props: { id: number; min: number; max: number }) {
   const { id, min, max } = props;
   return {
-    id: base64encode(`AgeGroupNode:${id}`),
+    id: createNodeId("AgeGroupNode", id),
     pk: id,
     minimum: min,
     maximum: max,
@@ -108,7 +108,7 @@ export function createMockReservation(
     canApplyFreeOfCharge = true,
     cancellable = false,
     cancellationTerms = {
-      id: base64encode(`CancellationTermsNode:1`),
+      id: createNodeId("CancellationTermsNode", 1),
       ...generateTextFragment("Test cancellation terms"),
     },
     endsAt = new Date(2024, 0, 1, 12, 0, 0, 0).toISOString(),
@@ -123,11 +123,11 @@ export function createMockReservation(
       handledPaymentDueBy: new Date(2024, 0, 1, 12, 0, 0, 0).toISOString(),
     },
     paymentTerms = {
-      id: base64encode(`PaymentTermsNode:1`),
+      id: createNodeId("PaymentTermsNode", 1),
       ...generateTextFragment("Test payment terms"),
     },
     appliedPricing = {
-      id: base64encode(`AppliedPricingNode:1`),
+      id: createNodeId("AppliedPricingNode", 1),
       begins: new Date(2000, 0, 1, 0, 0, 0, 0).toISOString(),
       priceUnit: PriceUnit.PerHour,
       paymentType: PaymentType.Online,
@@ -138,12 +138,12 @@ export function createMockReservation(
     pk = 1,
     price = "10.0",
     pricingTerms = {
-      id: base64encode(`PricingTermsNode:1`),
+      id: createNodeId("PricingTermsNode", 1),
       ...generateNameFragment("Test Pricing Terms"),
       ...generateTextFragment("Test pricing terms text"),
     },
     serviceSpecificTerms = {
-      id: base64encode(`ServiceSpecificTermsNode:1`),
+      id: createNodeId("ServiceSpecificTermsNode", 1),
       ...generateTextFragment("Test service specific terms"),
     },
     state = ReservationStateChoice.Confirmed,
@@ -161,7 +161,7 @@ export function createMockReservation(
     endsAt: endsAt,
     freeOfChargeReason: "Test free of charge reason",
     municipality: MunicipalityChoice.Helsinki,
-    id: base64encode(`ReservationNode:${pk}`),
+    id: createNodeId("ReservationNode", pk),
     isHandled: cancellable ? false : isHandled,
     numPersons: 5,
     appliedPricing: appliedPricing,
@@ -175,13 +175,13 @@ export function createMockReservation(
     },
     reservationSeries: null,
     reservationUnit: {
-      id: base64encode(`ReservationUnitNode:1`),
+      id: createNodeId("ReservationUnitNode", 1),
       pk: 1,
       ...generateNameFragment("Test Reservation Unit"),
       ...generateDescriptionFragment("Test reservation unit description"),
       images: [
         {
-          id: base64encode(`ReservationUnitImageNode:1`),
+          id: createNodeId("ReservationUnitImageNode", 1),
           largeUrl: "https://example.com/image-large.jpg",
           mediumUrl: "https://example.com/image-medium.jpg",
           smallUrl: "https://example.com/image-small.jpg",
@@ -190,7 +190,7 @@ export function createMockReservation(
         },
       ],
       unit: {
-        id: base64encode("UnitNode:1"),
+        id: createNodeId("UnitNode", 1),
         pk: 1,
         tprekId: "123456",
         addressZip: "00100",
@@ -206,16 +206,16 @@ export function createMockReservation(
       minPersons: 1,
       maxPersons: 100,
       metadataSet: {
-        id: base64encode(`MetadataSetNode:1`),
+        id: createNodeId("MetadataSetNode", 1),
         requiredFields: [
           {
-            id: base64encode(`RequiredFieldsNode:1`),
+            id: createNodeId("RequiredFieldsNode", 1),
             fieldName: "Test required field",
           },
         ],
         supportedFields: [
           {
-            id: base64encode(`SupportedFieldsNode:1`),
+            id: createNodeId("SupportedFieldsNode", 1),
             fieldName: "Test supported field",
           },
         ],
@@ -240,14 +240,14 @@ export function createMockReservation(
       reservationEndsAt: null,
       pricings: [
         {
-          id: base64encode("PricingNode:1"),
+          id: createNodeId("PricingNode", 1),
           begins: new Date(2000, 0, 1, 0, 0, 0, 0).toISOString(),
           priceUnit: PriceUnit.PerHour,
           paymentType: PaymentType.Online,
           highestPrice: price,
           lowestPrice: "0.0",
           taxPercentage: {
-            id: base64encode("TaxPercentageNode:1"),
+            id: createNodeId("TaxPercentageNode", 1),
             pk: 1,
             value: "24.5",
           },
@@ -255,7 +255,7 @@ export function createMockReservation(
       ],
       cancellationRule: cancellable
         ? {
-            id: base64encode("ReservationUnitCancellationRuleNode:1"),
+            id: createNodeId("ReservationUnitCancellationRuleNode", 1),
             canBeCancelledTimeBefore: 0,
             ...generateNameFragment("Test cancelation rule"),
           }
@@ -282,7 +282,7 @@ export function createTermsOfUseMock(empty: boolean = false) {
     genericTerms: empty
       ? null
       : {
-          id: base64encode("TermsOfUseNode:1"),
+          id: createNodeId("TermsOfUseNode", 1),
           pk: "1",
           termsType: TermsType.GenericTerms,
           ...generateNameFragment("TermsOfUse name"),

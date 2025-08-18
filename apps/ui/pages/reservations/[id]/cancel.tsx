@@ -1,21 +1,21 @@
-import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { ReservationCancellation } from "@/components/reservation/ReservationCancellation";
-import { createApolloClient } from "@/modules/apolloClient";
-import { isReservationCancellable } from "@/modules/reservation";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { getApplicationPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
-import { gql } from "@apollo/client";
+import React from "react";
 import {
   ReservationCancelPageDocument,
   type ReservationCancelPageQuery,
   type ReservationCancelPageQueryVariables,
 } from "@gql/gql-types";
-import { base64encode } from "common/src/helpers";
-import { type TFunction } from "i18next";
-import type { GetServerSidePropsContext } from "next";
+import { ReservationCancellation } from "@/components/reservation/ReservationCancellation";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { createApolloClient } from "@/modules/apolloClient";
+import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { isReservationCancellable } from "@/modules/reservation";
+import { getApplicationPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
+import { type TFunction } from "i18next";
+import { type GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import React from "react";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -68,17 +68,16 @@ type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
-  const pk = params?.id;
 
   const commonProps = getCommonServerSideProps();
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
 
+  const pk = toNumber(ignoreMaybeArray(params?.id));
   if (Number.isFinite(Number(pk))) {
-    const id = base64encode(`ReservationNode:${pk}`);
     const { data } = await client.query<ReservationCancelPageQuery, ReservationCancelPageQueryVariables>({
       query: ReservationCancelPageDocument,
       fetchPolicy: "no-cache",
-      variables: { id },
+      variables: { id: createNodeId("ReservationNode", pk ?? 0) },
     });
     const { reservation } = data || {};
 

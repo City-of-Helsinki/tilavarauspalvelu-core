@@ -32,7 +32,7 @@ import {
   DataWrapper,
 } from "@lib/reservations/[id]/";
 import { Accordion, ApplicationDatas, Summary } from "@/styled";
-import { base64encode, ignoreMaybeArray, isPriceFree, toNumber } from "common/src/helpers";
+import { createNodeId, ignoreMaybeArray, isPriceFree, toNumber } from "common/src/helpers";
 import { formatAgeGroup } from "@/common/util";
 import { toUIDateTime } from "common/src/common/util";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -337,11 +337,10 @@ function RequestedReservation({
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
 export default function Page({ reservation }: PropsNarrowed): JSX.Element {
-  const id = base64encode(`ReservationNode:${reservation.pk ?? 0}`);
   const [_fetch, query] = useReservationPageLazyQuery({
     // NOTE have to be no-cache because we have some key collisions (tag line disappears if cached)
     fetchPolicy: "no-cache",
-    variables: { id },
+    variables: { id: createNodeId("ReservationNode", reservation.pk ?? 0) },
   });
 
   const { user } = useSession();
@@ -366,7 +365,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
   const apolloClient = createClient(commonProps.apiBaseUrl, req);
   const reservationPageQuery = await apolloClient.query<ReservationPageQuery>({
     query: ReservationPageDocument,
-    variables: { id: base64encode(`ReservationNode:${pk}`) },
+    variables: { id: createNodeId("ReservationNode", pk) },
   });
 
   const reservation = reservationPageQuery.data.reservation;

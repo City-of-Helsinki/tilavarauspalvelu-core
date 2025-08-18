@@ -10,7 +10,7 @@ import {
   UpdateReservationSeriesDocument,
   UpdateStaffReservationDocument,
 } from "@gql/gql-types";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 import { toApiDateUnsafe } from "common/src/common/util";
 
 export const CHANGED_WORKING_MEMO = "Sisaisen kommentti";
@@ -75,20 +75,20 @@ function createReservation({
     bufferTimeBefore: 0,
     paymentOrder: null,
     reservationUnit: {
-      id: base64encode("ReservationUnitNode:1"),
+      id: createNodeId("ReservationUnitNode", 1),
       pk: null,
       bufferTimeBefore: 0,
       bufferTimeAfter: 0,
       reservationStartInterval: ReservationStartInterval.Interval_15Mins,
       unit: {
-        id: base64encode("UnitNode:1"),
+        id: createNodeId("UnitNode", 1),
         pk: 0,
       },
     },
     type: ReservationTypeChoice.Behalf,
     handlingDetails: null,
     reservationSeries: {
-      id: base64encode(`ReservationSeriesNode:${recurringPk}`),
+      id: createNodeId("ReservationSeriesNode", recurringPk),
       pk: recurringPk,
       // TODO these should not be empty
       weekdays: [],
@@ -96,7 +96,7 @@ function createReservation({
       endDate: "",
     },
     state,
-    id: base64encode(`ReservationNode:${pk}`),
+    id: createNodeId("ReservationNode", pk),
     pk,
     beginsAt,
     endsAt,
@@ -154,7 +154,7 @@ function correctReservationSeriesQueryResult(
     recurringPk,
   });
   const reservationSeries: NonNullable<ReservationSeriesQuery["reservationSeries"]> = {
-    id: base64encode(`ReservationSeriesNode:${recurringPk}`),
+    id: createNodeId("ReservationSeriesNode", recurringPk),
     pk: recurringPk,
     // TODO this should not be empty
     weekdays: [],
@@ -170,7 +170,7 @@ function correctReservationSeriesQueryResult(
       request: {
         query: ReservationSeriesDocument,
         variables: {
-          id: base64encode(`ReservationSeriesNode:${recurringPk}`),
+          id: createNodeId("ReservationSeriesNode", recurringPk),
         },
       },
       result: {

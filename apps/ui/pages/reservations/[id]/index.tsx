@@ -35,7 +35,7 @@ import { getReservationUnitName } from "@/modules/reservationUnit";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { AddressSection } from "@/components/reservation-unit";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
-import { base64encode, capitalize, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, capitalize, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { ButtonLikeLink, ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import {
@@ -181,7 +181,7 @@ function Reservation({
   const { data: accessCodeData } = useAccessCodeQuery({
     skip: !reservation || !shouldShowAccessCode,
     variables: {
-      id: base64encode(`ReservationNode:${reservation.pk}`),
+      id: createNodeId("ReservationNode", reservation.pk ?? 0),
     },
   });
   const pindoraInfo = accessCodeData?.reservation?.pindoraInfo ?? null;
@@ -451,11 +451,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const bookingTerms = await getGenericTerms(apolloClient);
 
     // NOTE errors will fallback to 404
-    const id = base64encode(`ReservationNode:${pk}`);
     const { data } = await apolloClient.query<ReservationPageQuery, ReservationPageQueryVariables>({
       query: ReservationPageDocument,
       fetchPolicy: "no-cache",
-      variables: { id },
+      variables: { id: createNodeId("ReservationNode", pk) },
     });
 
     const { reservation } = data ?? {};

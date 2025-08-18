@@ -14,7 +14,7 @@ import {
   type CreateGraphQLMocksReturn,
   createOptionQueryMock,
 } from "./test.gql.utils";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 
 export function createGraphQLMocks({
   noUser = false,
@@ -36,7 +36,7 @@ function createCurrentUserQueryMocks({ noUser }: CurrentUserQueryMocksProps): Cr
   const CurrentUserMock: CurrentUserQuery = {
     currentUser: !noUser
       ? {
-          id: base64encode("UserNode:1"),
+          id: createNodeId("UserNode", 1),
           pk: 1,
           firstName: "Test",
           lastName: "User",

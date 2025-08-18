@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import { ReservationSeriesForm } from "@lib/my-units/[id]/recurring/ReservationSeriesForm";
 import { LinkPrev } from "@/component/LinkPrev";
 import { H1 } from "common/styled";
-import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -54,7 +54,7 @@ export async function getServerSideProps({ query, locale, req }: GetServerSidePr
   const apolloClient = createClient(commonProps.apiBaseUrl, req);
   const unitData = await apolloClient.query<SeriesReservationUnitQuery, SeriesReservationUnitQueryVariables>({
     query: SeriesReservationUnitDocument,
-    variables: { id: base64encode(`UnitNode:${unitPk}`) },
+    variables: { id: createNodeId("UnitNode", unitPk) },
   });
   const reservationUnits = unitData.data.unit?.reservationUnits ?? [];
   return {
