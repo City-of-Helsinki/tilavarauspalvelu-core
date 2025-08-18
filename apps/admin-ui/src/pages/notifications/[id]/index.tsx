@@ -36,7 +36,7 @@ import {
   checkLengthWithoutHtml,
 } from "common/src/schemas/schemaCommon";
 import { valueForDateInput, valueForTimeInput, dateTime, constructDateTimeSafe } from "@/helpers";
-import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { ControlledDateInput } from "common/src/components/form";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { successToast } from "common/src/components/toast";
@@ -571,12 +571,9 @@ function LoadedContent({
 /// Client only: uses hooks, window, and react-router-dom
 /// We don't have proper layouts yet, so just separate the container stuff here
 function PageWrapped({ pk }: { pk?: number }): JSX.Element {
-  const typename = "BannerNotificationNode";
-
-  const id = base64encode(`${typename}:${pk}`);
   const { data, loading: isLoading } = useBannerNotificationPageQuery({
     skip: !pk,
-    variables: { id },
+    variables: { id: createNodeId("BannerNotificationNode", pk ?? 0) },
   });
 
   const notification = data?.bannerNotification ?? undefined;

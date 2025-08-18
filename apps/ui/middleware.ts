@@ -9,7 +9,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { env } from "@/env.mjs";
 import { buildGraphQLUrl, getSignInUrl, type LocalizationLanguages } from "common/src/urlBuilder";
-import { base64encode, getLocalizationLang } from "common/src/helpers";
+import { createNodeId, getLocalizationLang } from "common/src/helpers";
 import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
 import { getReservationInProgressPath } from "./modules/urls";
 
@@ -131,8 +131,8 @@ async function fetchUserData(
     return null;
   }
 
-  const applicationId = opts?.applicationPk != null ? base64encode(`ApplicationNode:${opts.applicationPk}`) : null;
-  const reservationId = opts?.reservationPk != null ? base64encode(`ReservationNode:${opts.reservationPk}`) : null;
+  const applicationId = opts?.applicationPk != null ? createNodeId("ApplicationNode", opts.applicationPk) : null;
+  const reservationId = opts?.reservationPk != null ? createNodeId("ReservationNode", opts.reservationPk) : null;
 
   // NOTE: need to build queries dynamically because of the optional parameters
   const params =

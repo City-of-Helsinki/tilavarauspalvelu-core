@@ -15,7 +15,7 @@ import { getEventBuffers } from "common/src/calendar/util";
 import { getReservationUrl } from "@/common/urls";
 import { Legend, LegendsWrapper } from "@/component/Legend";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import { createNodeId, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { getReserveeName } from "@/common/util";
 import { errorToast } from "common/src/components/toast";
@@ -80,13 +80,11 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
 
   const calendarEventExcludedLegends = ["RESERVATION_UNIT_RELEASED", "RESERVATION_UNIT_DRAFT"];
 
-  const typename = "ReservationUnitNode";
-  const id = base64encode(`${typename}:${reservationUnitPk}`);
   const { data, loading: isLoading } = useReservationUnitCalendarQuery({
     fetchPolicy: "network-only",
     skip: reservationUnitPk === 0,
     variables: {
-      id,
+      id: createNodeId("ReservationUnitNode", reservationUnitPk),
       pk: reservationUnitPk,
       state: RELATED_RESERVATION_STATES,
       beginDate: toApiDate(startOfISOWeek(new Date(begin))) ?? "",

@@ -9,7 +9,7 @@ import {
   useUpdateResourceMutation,
   useResourceQuery,
 } from "@gql/gql-types";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 import { ButtonContainer, CenterSpinner } from "common/styled";
 import { errorToast, successToast } from "common/src/components/toast";
 import { FormErrorSummary } from "@/component/FormErrorSummary";
@@ -39,8 +39,8 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
 
   const { data, loading, previousData, refetch } = useResourceQuery({
     variables: {
-      id: base64encode(`ResourceNode:${resourcePk}`),
-      unitId: base64encode(`UnitNode:${unitPk}`),
+      id: createNodeId("ResourceNode", resourcePk ?? 0),
+      unitId: createNodeId("UnitNode", unitPk),
     },
     skip: !resourcePk || Number.isNaN(resourcePk),
     onError: (e) => {
