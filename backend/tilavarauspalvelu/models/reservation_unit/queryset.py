@@ -12,7 +12,7 @@ from lookup_property import L
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType
 from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
 from utils.date_utils import local_date
-from utils.db import ArrayUnnest, NowTT, SubqueryArray
+from utils.db import ArrayUnnest, Now, SubqueryArray
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
@@ -150,10 +150,10 @@ class ReservationUnitQuerySet(models.QuerySet):
     @property
     def _is_visible(self) -> Q:
         return (
-            Q(publish_begins_at__lte=NowTT())  #
+            Q(publish_begins_at__lte=Now())  #
             | Q(publish_begins_at__isnull=True)
         ) & (
-            Q(publish_ends_at__gt=NowTT())  #
+            Q(publish_ends_at__gt=Now())  #
             | Q(publish_ends_at__isnull=True)
             | Q(publish_ends_at__lt=models.F("publish_begins_at"))
         )

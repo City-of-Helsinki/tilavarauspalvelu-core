@@ -25,7 +25,7 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ApplicationRound, ApplicationSection, Reservation
 from utils.date_utils import local_datetime
-from utils.db import NowTT
+from utils.db import Now
 from utils.utils import comma_sep_str
 
 if TYPE_CHECKING:
@@ -263,7 +263,7 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
             )
             .alias(
                 cancellation_time=models.F("reservation_unit__cancellation_rule__can_be_cancelled_time_before"),
-                cancellation_cutoff=NowTT() + models.F("cancellation_time"),
+                cancellation_cutoff=Now() + models.F("cancellation_time"),
             )
             .filter(
                 begins_at__gt=models.F("cancellation_cutoff"),

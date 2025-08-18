@@ -15,7 +15,7 @@ from tilavarauspalvelu.enums import (
     MunicipalityChoice,
     ReserveeType,
 )
-from utils.db import NowTT
+from utils.db import Now
 from utils.fields.model import StrChoiceField
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
@@ -141,7 +141,7 @@ class Application(SerializableMixin, models.Model):
                     # NOTE: Some copy-pasta from Application Round status for efficiency
                     & models.Q(application_round__sent_at__isnull=True)
                     & models.Q(application_round__handled_at__isnull=True)
-                    & models.Q(application_round__application_period_ends_at__gt=NowTT())
+                    & models.Q(application_round__application_period_ends_at__gt=Now())
                 ),
                 then=models.Value(ApplicationStatusChoice.DRAFT.value),
             ),
@@ -164,7 +164,7 @@ class Application(SerializableMixin, models.Model):
             ),
             models.When(
                 # If the application round application period has not ended
-                models.Q(application_round__application_period_ends_at__gt=NowTT()),
+                models.Q(application_round__application_period_ends_at__gt=Now()),
                 then=models.Value(ApplicationStatusChoice.RECEIVED.value),
             ),
             models.When(

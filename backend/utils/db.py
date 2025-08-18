@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import ast
+from functools import cache
 from inspect import cleandoc
 from typing import TYPE_CHECKING, Any, Literal
 
+from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.db import migrations, models
 from django.db.models import Func
+from django.db.models.functions import Now as NowDB  # noqa: TID251
 from django.db.transaction import get_connection
 from lookup_property import State
 from lookup_property.converters.expressions import expression_to_ast
@@ -19,6 +22,7 @@ if TYPE_CHECKING:
 __all__ = [
     "ArrayRemove",
     "ArrayUnnest",
+    "Now",
     "NowTT",
     "SubqueryArray",
     "SubqueryCount",
@@ -237,6 +241,12 @@ class NowTT(Func):  # TT = Time Travel, as in "time travel tests"
             DROP FUNCTION IF EXISTS NOW_TT;
             """
         )
+
+
+@cache
+def Now() -> Func:  # noqa: N802
+    """Use `Now()` either with time travel or without depending on settings."""
+    return NowTT() if settings.ENABLE_NOW_TT else NowDB()
 
 
 @expression_to_ast.register

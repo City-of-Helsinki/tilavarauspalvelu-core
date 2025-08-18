@@ -372,6 +372,9 @@ builtins-allowed-modules = [
 
 "html2text".msg = "Use `utils.utils.html_2_text` instead."
 
+"utils.db.NowTT".msg = "Use `utils.db.Now` instead."
+"django.db.models.functions.Now".msg = "Use `utils.db.Now` instead."
+
 [tool.ruff.lint.flake8-import-conventions]
 banned-from = [
     # Python standard libraries

@@ -16,7 +16,7 @@ __all__ = [
 ]
 
 from utils.date_utils import local_datetime
-from utils.db import NowTT
+from utils.db import Now
 
 
 class ApplicationSectionQuerySet(models.QuerySet):
@@ -63,7 +63,7 @@ class ApplicationSectionQuerySet(models.QuerySet):
                     state=ReservationStateChoice.CONFIRMED,
                     access_type=AccessType.ACCESS_CODE,
                     access_code_generated_at=None,
-                    ends_at__gt=NowTT(),
+                    ends_at__gt=Now(),
                 ),
             )
         ).filter(has_missing_access_codes=True)
