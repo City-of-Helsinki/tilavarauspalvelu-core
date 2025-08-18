@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { type TFunction, useTranslation } from "next-i18next";
 import {
-  BannerNotificationOrderingChoices,
+  BannerNotificationOrderSet,
   type BannerNotificationTableElementFragment,
   BannerNotificationState,
   UserPermissionChoice,
@@ -198,35 +198,35 @@ function Notifications({ notifications: notificationsOriginal }: PageProps) {
   );
 }
 
-function transformOrderBy(orderBy: string, desc: boolean): BannerNotificationOrderingChoices | null {
+function transformOrderBy(orderBy: string, desc: boolean): BannerNotificationOrderSet | null {
   switch (orderBy) {
     case "pk":
-      return desc ? BannerNotificationOrderingChoices.PkDesc : BannerNotificationOrderingChoices.PkAsc;
+      return desc ? BannerNotificationOrderSet.PkDesc : BannerNotificationOrderSet.PkAsc;
     case "state":
-      return desc ? BannerNotificationOrderingChoices.StateDesc : BannerNotificationOrderingChoices.StateAsc;
+      return desc ? BannerNotificationOrderSet.StateDesc : BannerNotificationOrderSet.StateAsc;
     case "name":
-      return desc ? BannerNotificationOrderingChoices.NameDesc : BannerNotificationOrderingChoices.NameAsc;
+      return desc ? BannerNotificationOrderSet.NameDesc : BannerNotificationOrderSet.NameAsc;
     case "starts":
-      return desc ? BannerNotificationOrderingChoices.StartsDesc : BannerNotificationOrderingChoices.StartsAsc;
+      return desc ? BannerNotificationOrderSet.StartsDesc : BannerNotificationOrderSet.StartsAsc;
     case "ends":
-      return desc ? BannerNotificationOrderingChoices.EndsDesc : BannerNotificationOrderingChoices.EndsAsc;
+      return desc ? BannerNotificationOrderSet.EndsDesc : BannerNotificationOrderSet.EndsAsc;
     case "target":
-      return desc ? BannerNotificationOrderingChoices.TargetDesc : BannerNotificationOrderingChoices.TargetAsc;
+      return desc ? BannerNotificationOrderSet.TargetDesc : BannerNotificationOrderSet.TargetAsc;
     case "level":
-      return desc ? BannerNotificationOrderingChoices.LevelDesc : BannerNotificationOrderingChoices.LevelAsc;
+      return desc ? BannerNotificationOrderSet.LevelDesc : BannerNotificationOrderSet.LevelAsc;
     default:
       return null;
   }
 }
 
-function transformSortString(sort: string | null): BannerNotificationOrderingChoices[] {
+function transformSortString(sort: string | null): BannerNotificationOrderSet[] {
   if (!sort) {
-    return [BannerNotificationOrderingChoices.StateDesc];
+    return [BannerNotificationOrderSet.StateDesc];
   }
   const desc = sort.startsWith("-");
   const sortKey = desc ? sort.slice(1) : sort;
   const orderBy = transformOrderBy(sortKey, desc);
-  return orderBy ? [orderBy] : [BannerNotificationOrderingChoices.StateDesc];
+  return orderBy ? [orderBy] : [BannerNotificationOrderSet.StateDesc];
 }
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -280,7 +280,7 @@ export const BANNER_NOTIFICATIONS_TABLE_ELEMENT_FRAGMENT = gql`
 
 // TODO reduce the size of the query (use a different fragment or no fragment at all)
 export const BANNER_NOTIFICATION_LIST_QUERY = gql`
-  query BannerNotificationsList($first: Int, $after: String, $orderBy: [BannerNotificationOrderingChoices]) {
+  query BannerNotificationsList($first: Int, $after: String, $orderBy: [BannerNotificationOrderSet!]) {
     bannerNotifications(first: $first, after: $after, orderBy: $orderBy) {
       edges {
         node {

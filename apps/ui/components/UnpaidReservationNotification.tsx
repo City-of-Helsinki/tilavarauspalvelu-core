@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import {
   type ReservationNotificationFragment,
-  ReservationOrderingChoices,
+  ReservationOrderSet,
   ReservationStateChoice,
   ReservationTypeChoice,
   useDeleteReservationMutation,
@@ -127,7 +127,7 @@ export function InProgressReservationNotification() {
     skip: !currentUser?.pk,
     variables: {
       state: [ReservationStateChoice.WaitingForPayment, ReservationStateChoice.Created],
-      orderBy: ReservationOrderingChoices.PkDesc,
+      orderBy: ReservationOrderSet.PkDesc,
       user: currentUser?.pk ?? 0,
       beginDate: toApiDate(new Date()) ?? "",
       reservationType: ReservationTypeChoice.Normal,
@@ -304,7 +304,7 @@ export const RESERVATION_NOTIFICATION_FRAGMENT = gql`
 export const IN_PROGRESS_RESERVATION_NOTIFICATION_QUERY = gql`
   query ListInProgressReservations(
     $state: [ReservationStateChoice!]
-    $orderBy: [ReservationOrderingChoices!]
+    $orderBy: [ReservationOrderSet!]
     $user: [Int]!
     $beginDate: Date!
     $reservationType: [ReservationTypeChoice!]

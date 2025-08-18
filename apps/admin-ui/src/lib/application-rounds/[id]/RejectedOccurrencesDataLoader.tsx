@@ -2,7 +2,7 @@ import { errorToast } from "common/src/components/toast";
 import { useSort } from "@/hooks/useSort";
 import { RejectedOccurrencesTable, SORT_KEYS } from "./RejectedOccurrencesTable";
 import { type ApolloError, gql } from "@apollo/client";
-import { RejectedOccurrenceOrderingChoices, useRejectedOccurrencesQuery } from "@gql/gql-types";
+import { RejectedOccurrenceOrderSet, useRejectedOccurrencesQuery } from "@gql/gql-types";
 import { More } from "@/component/More";
 import React from "react";
 import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
@@ -79,7 +79,7 @@ export function RejectedOccurrencesDataLoader({ applicationRoundPk, unitOptions 
   );
 }
 
-function transformOrderBy(orderBy: string | null): RejectedOccurrenceOrderingChoices[] {
+function transformOrderBy(orderBy: string | null): RejectedOccurrenceOrderSet[] {
   if (orderBy == null) {
     return [];
   }
@@ -89,30 +89,24 @@ function transformOrderBy(orderBy: string | null): RejectedOccurrenceOrderingCho
     case "application_id,application_section_id":
     case "application_id,-application_section_id":
       return desc
-        ? [RejectedOccurrenceOrderingChoices.ApplicationPkDesc, RejectedOccurrenceOrderingChoices.PkDesc]
-        : [RejectedOccurrenceOrderingChoices.ApplicationPkAsc, RejectedOccurrenceOrderingChoices.PkAsc];
+        ? [RejectedOccurrenceOrderSet.ApplicationPkDesc, RejectedOccurrenceOrderSet.PkDesc]
+        : [RejectedOccurrenceOrderSet.ApplicationPkAsc, RejectedOccurrenceOrderSet.PkAsc];
     case "applicant":
-      return desc
-        ? [RejectedOccurrenceOrderingChoices.ApplicantDesc]
-        : [RejectedOccurrenceOrderingChoices.ApplicantAsc];
+      return desc ? [RejectedOccurrenceOrderSet.ApplicantDesc] : [RejectedOccurrenceOrderSet.ApplicantAsc];
     case "rejected_event_name_fi":
       return desc
-        ? [RejectedOccurrenceOrderingChoices.ApplicationSectionNameDesc]
-        : [RejectedOccurrenceOrderingChoices.ApplicationSectionNameAsc];
+        ? [RejectedOccurrenceOrderSet.ApplicationSectionNameDesc]
+        : [RejectedOccurrenceOrderSet.ApplicationSectionNameAsc];
     case "rejected_unit_name_fi":
-      return desc ? [RejectedOccurrenceOrderingChoices.UnitNameDesc] : [RejectedOccurrenceOrderingChoices.UnitNameAsc];
+      return desc ? [RejectedOccurrenceOrderSet.UnitNameDesc] : [RejectedOccurrenceOrderSet.UnitNameAsc];
     case "rejected_reservation_unit_name_fi":
       return desc
-        ? [RejectedOccurrenceOrderingChoices.ReservationUnitNameDesc]
-        : [RejectedOccurrenceOrderingChoices.ReservationUnitNameAsc];
+        ? [RejectedOccurrenceOrderSet.ReservationUnitNameDesc]
+        : [RejectedOccurrenceOrderSet.ReservationUnitNameAsc];
     case "time_of_occurrence":
-      return desc
-        ? [RejectedOccurrenceOrderingChoices.BeginDatetimeDesc]
-        : [RejectedOccurrenceOrderingChoices.BeginDatetimeAsc];
+      return desc ? [RejectedOccurrenceOrderSet.BeginDatetimeDesc] : [RejectedOccurrenceOrderSet.BeginDatetimeAsc];
     case "rejection_reason":
-      return desc
-        ? [RejectedOccurrenceOrderingChoices.RejectionReasonDesc]
-        : [RejectedOccurrenceOrderingChoices.RejectionReasonAsc];
+      return desc ? [RejectedOccurrenceOrderSet.RejectionReasonDesc] : [RejectedOccurrenceOrderSet.RejectionReasonAsc];
     default:
       return [];
   }
@@ -124,7 +118,7 @@ export const REJECTED_OCCURRENCES_QUERY = gql`
     $unit: [Int]
     $unitGroup: [Int]
     $reservationUnit: [Int]
-    $orderBy: [RejectedOccurrenceOrderingChoices]
+    $orderBy: [RejectedOccurrenceOrderSet!]
     $textSearch: String
     $after: String
     $first: Int
