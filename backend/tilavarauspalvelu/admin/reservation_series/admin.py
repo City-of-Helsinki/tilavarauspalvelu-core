@@ -25,6 +25,22 @@ __all__ = [
 
 @admin.register(ReservationSeries)
 class ReservationSeriesAdmin(admin.ModelAdmin):
+    # Functions
+    search_fields = [
+        "name",
+        "user__first_name",
+        "user__last_name",
+        "description",
+        "ext_uuid",
+        "reservation_unit__name",
+        "reservation_unit__ext_uuid",
+        "allocated_time_slot__reservation_unit_option__application_section__ext_uuid",
+    ]
+    search_help_text = _(
+        "Search by name, user's first name or last name, description, external ID, "
+        "reservation unit name or external ID or application section external ID"
+    )
+
     # List
     list_display = [
         "name",

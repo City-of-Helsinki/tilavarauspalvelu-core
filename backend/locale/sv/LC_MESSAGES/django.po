@@ -675,7 +675,8 @@ msgid "Is the reservation unit closed on this weekday?"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/admin.py
-msgid "Search by name, application user's first name or last name"
+msgid ""
+"Search by name, application user's first name or last name, or external ID"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/admin.py
@@ -1057,7 +1058,10 @@ msgid "processed at"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/admin.py
-msgid "Search by Reservation ID or name"
+msgid ""
+"Search by ID, name, user's first name or last name, reservation unit name or "
+"external ID, reservation series name or external ID, or application section "
+"external ID"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/admin.py
@@ -1432,6 +1436,12 @@ msgstr ""
 msgid "Required fields must be a subset of supported fields"
 msgstr ""
 
+#: tilavarauspalvelu/admin/reservation_series/admin.py
+msgid ""
+"Search by name, user's first name or last name, description, external ID, "
+"reservation unit name or external ID or application section external ID"
+msgstr ""
+
 #: tilavarauspalvelu/admin/reservation_series/form.py
 msgid "Weekdays"
 msgstr ""
@@ -1535,7 +1545,7 @@ msgid "Current access type"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
-msgid "Search by ID, name or unit name"
+msgid "Search by ID, name, unit name, or external ID"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py

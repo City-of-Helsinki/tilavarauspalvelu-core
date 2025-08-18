@@ -692,8 +692,10 @@ msgid "Is the reservation unit closed on this weekday?"
 msgstr "Onko varausyksikkö suljettu tänä viikonpäivänä?"
 
 #: tilavarauspalvelu/admin/application_section/admin.py
-msgid "Search by name, application user's first name or last name"
-msgstr "Etsi nimellä, hakijan etu- tai sukunimellä"
+msgid ""
+"Search by name, application user's first name or last name, or external ID"
+msgstr ""
+"Etsi nimellä, hakijan etu- tai sukunimellä, tai ulkoisella tunnisteella"
 
 #: tilavarauspalvelu/admin/application_section/admin.py
 #: tilavarauspalvelu/admin/reservation/admin.py
@@ -1098,8 +1100,14 @@ msgid "processed at"
 msgstr "käsitelty alkaen"
 
 #: tilavarauspalvelu/admin/reservation/admin.py
-msgid "Search by Reservation ID or name"
-msgstr "Etsi varauksen ID:llä tai nimellä"
+msgid ""
+"Search by ID, name, user's first name or last name, reservation unit name or "
+"external ID, reservation series name or external ID, or application section "
+"external ID"
+msgstr ""
+"Hae varauksen tunnisteella, nimellä, varausyksikön nimellä tai ulkoisella "
+"tunnisteella, varaussarjan nimellä tai ulkoisella tunnisteella, tai "
+"hakemuksen osan ulkoisella tunnisteella"
 
 #: tilavarauspalvelu/admin/reservation/admin.py
 #: tilavarauspalvelu/admin/reservation/form.py
@@ -1473,6 +1481,15 @@ msgstr "Ikäryhmä tälle ryhmälle tai yhdistykselle"
 msgid "Required fields must be a subset of supported fields"
 msgstr "Vaadittujen kenttien täytyy olla tuettujen kenttien alijoukko"
 
+#: tilavarauspalvelu/admin/reservation_series/admin.py
+msgid ""
+"Search by name, user's first name or last name, description, external ID, "
+"reservation unit name or external ID or application section external ID"
+msgstr ""
+"Hae sarjan nimellä, varaajan etu- tai sukunimellä, kuvauksella, ulkoisella "
+"tunnisteella, varausyksikön nimellä tai ulkoisella tunnisteella, tai "
+"hakemuksen osan ulkoisella tunnisteella"
+
 #: tilavarauspalvelu/admin/reservation_series/form.py
 msgid "Weekdays"
 msgstr "Viikonpäivät"
@@ -1580,8 +1597,10 @@ msgid "Current access type"
 msgstr "Nykyinen kulkutapa"
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
-msgid "Search by ID, name or unit name"
-msgstr "Etsi ID:llä, nimellä tai toimipisteen nimellä"
+msgid "Search by ID, name, unit name, or external ID"
+msgstr ""
+"Etsi varausyksikön tunnisteella, nimellä, toimipisteen nimellä, tai "
+"ulkoisella tunnisteella"
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
 msgid "Reservation restrictions"
