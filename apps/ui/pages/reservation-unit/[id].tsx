@@ -36,7 +36,7 @@ import {
   useCreateReservationMutation,
 } from "@gql/gql-types";
 import {
-  base64encode,
+  createNodeId,
   filterNonNullable,
   formatListToCSV,
   formatTimeRange,
@@ -701,7 +701,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     >({
       query: ReservationUnitPageDocument,
       variables: {
-        id: base64encode(`ReservationUnitNode:${pk}`),
+        id: createNodeId("ReservationUnitNode", pk),
         beginDate: toApiDate(startDate) ?? "",
         endDate: toApiDate(endDate) ?? "",
       },

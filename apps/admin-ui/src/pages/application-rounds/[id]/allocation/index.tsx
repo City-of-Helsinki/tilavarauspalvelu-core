@@ -15,7 +15,7 @@ import {
   useApplicationSectionAllocationsQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { base64encode, filterNonNullable, ignoreMaybeArray, sort, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, sort, toNumber } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
 import { ALLOCATION_POLL_INTERVAL, NOT_FOUND_SSR_VALUE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { truncate } from "@/helpers";
@@ -287,7 +287,7 @@ function ApplicationRoundAllocation({
   };
 
   const handleRefetchApplicationEvents = async () => {
-    const id = base64encode(`ApplicationRoundNode:${applicationRound.pk}`);
+    const id = createNodeId("ApplicationRoundNode", applicationRound.pk ?? 0);
     await query.client.refetchQueries({
       include: ["ApplicationRound", id],
     });
@@ -446,7 +446,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const client = createClient(commonProps.apiBaseUrl, req);
   const { data } = await client.query<ApplicationRoundFilterQuery, ApplicationRoundFilterQueryVariables>({
     query: ApplicationRoundFilterDocument,
-    variables: { id: base64encode(`ApplicationRoundNode:${pk}`) },
+    variables: { id: createNodeId("ApplicationRoundNode", pk) },
   });
 
   const { applicationRound } = data;

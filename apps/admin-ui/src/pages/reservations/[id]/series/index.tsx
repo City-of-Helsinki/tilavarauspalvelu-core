@@ -13,7 +13,7 @@ import {
   UserPermissionChoice,
   useSeriesPageQuery,
 } from "@gql/gql-types";
-import { base64encode, calculateMedian, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, calculateMedian, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { format, isSameDay } from "date-fns";
 import { useTranslation } from "next-i18next";
 import { Element } from "@/styled";
@@ -95,7 +95,7 @@ export async function getServerSideProps({ locale, query }: GetServerSidePropsCo
 function SeriesPageInner({ pk }: { pk: number }) {
   const { t } = useTranslation();
   const { data, refetch, error, loading } = useSeriesPageQuery({
-    variables: { id: base64encode(`ReservationNode:${pk}`) },
+    variables: { id: createNodeId("ReservationNode", pk) },
   });
   const { reservation } = data ?? {};
   const reservationSeries = reservation?.reservationSeries ?? null;
@@ -213,7 +213,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
       const seriesPk = mutRes.data.rescheduleReservationSeries.pk;
       const res = await client.query<ReservationSeriesQuery, ReservationSeriesQueryVariables>({
         query: ReservationSeriesDocument,
-        variables: { id: base64encode(`ReservationSeriesNode:${seriesPk}`) },
+        variables: { id: createNodeId("ReservationSeriesNode", seriesPk) },
         // NOTE disable cache is mandatory, all the old data is invalid here
         fetchPolicy: "no-cache",
       });

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { errorToast } from "common/src/components/toast";
-import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { isApplicationRoundInProgress } from "@/helpers";
 import { Flex, H1, NoWrap, TabWrapper, TitleSection } from "common/styled";
 import { Button, Tabs } from "hds-react";
@@ -69,7 +69,7 @@ export default function ApplicationRound({
   /// NOTE always valid since the application round exists if we are here
   const pk = applicationRoundOriginal?.pk ?? 0;
   const { data, previousData, refetch } = useApplicationRoundQuery({
-    variables: { id: base64encode(`ApplicationRoundNode:${pk}`) },
+    variables: { id: createNodeId("ApplicationRoundNode", pk) },
     pollInterval: isInProgress ? 10000 : 0,
     onError: () => {
       errorToast({ text: t("errors:errorFetchingData") });
@@ -223,7 +223,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
   const client = createClient(commonProps.apiBaseUrl, req);
   const { data } = await client.query<ApplicationRoundQuery, ApplicationRoundQueryVariables>({
     query: ApplicationRoundDocument,
-    variables: { id: base64encode(`ApplicationRoundNode:${pk}`) },
+    variables: { id: createNodeId("ApplicationRoundNode", pk) },
   });
   const { applicationRound } = data;
   const units = filterNonNullable(applicationRound?.reservationUnits.map((x) => x.unit?.pk));

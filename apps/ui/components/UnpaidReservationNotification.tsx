@@ -14,7 +14,7 @@ import {
 import NotificationWrapper from "common/src/components/NotificationWrapper";
 import { useCurrentUser } from "@/hooks";
 import { getCheckoutUrl } from "@/modules/reservation";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import { createNodeId, filterNonNullable } from "common/src/helpers";
 import { gql, useApolloClient } from "@apollo/client";
 import { convertLanguageCode, toApiDate } from "common/src/common/util";
 import { errorToast, successToast } from "common/src/components/toast";
@@ -227,7 +227,7 @@ export function InProgressReservationNotification() {
     }
     const res = await reservationQ({
       variables: {
-        id: base64encode(`ReservationNode:${reservation.pk}`),
+        id: createNodeId("ReservationNode", reservation.pk ?? 0),
       },
     });
     if (res.data?.reservation == null) {
