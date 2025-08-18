@@ -63,7 +63,7 @@ export function getApplicationSectionPath(
 }
 
 type ReservationPages = "cancel" | "edit";
-export type ReservationNotifications = "requires_handling" | "confirmed" | "paid";
+export type ReservationNotifications = "requires_handling" | "confirmed" | "paid" | "polling_timeout";
 export function getReservationPath(
   pk: Maybe<number> | undefined,
   page?: ReservationPages | undefined,
