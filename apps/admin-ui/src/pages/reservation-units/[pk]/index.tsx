@@ -4,7 +4,7 @@ import { useForm, type UseFormReturn } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  EquipmentOrderingChoices,
+  EquipmentOrderSet,
   ImageType,
   ReservationKind,
   type ReservationUnitEditorParametersQuery,
@@ -175,7 +175,7 @@ function ReservationUnitEditor({
       errorToast({ text: t("errors:errorFetchingData") });
     },
     variables: {
-      equipmentsOrderBy: EquipmentOrderingChoices.CategoryRankAsc,
+      equipmentsOrderBy: EquipmentOrderSet.CategoryRankAsc,
     },
   });
 
@@ -598,7 +598,7 @@ export const UPDATE_IMAGE_TYPE = gql`
 `;
 
 export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
-  query ReservationUnitEditorParameters($equipmentsOrderBy: EquipmentOrderingChoices) {
+  query ReservationUnitEditorParameters($equipmentsOrderBy: EquipmentOrderSet) {
     equipmentsAll(orderBy: [$equipmentsOrderBy]) {
       id
       nameFi
