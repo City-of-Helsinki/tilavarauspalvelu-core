@@ -210,7 +210,7 @@ export const ALLOCATED_SECTIONS_TABLE_ELEMENT_FRAGMENT = gql`
         application {
           pk
           id
-          ...ApplicationName
+          ...ApplicationNameFields
         }
       }
       reservationUnit {

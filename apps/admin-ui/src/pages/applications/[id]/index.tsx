@@ -724,7 +724,7 @@ export const APPLICATION_PAGE_SECTION_FRAGMENT = gql`
   fragment ApplicationPageSection on ApplicationSectionNode {
     ...ApplicationSectionCommon
     suitableTimeRanges {
-      ...SuitableTime
+      ...SuitableTimeFields
     }
     purpose {
       id

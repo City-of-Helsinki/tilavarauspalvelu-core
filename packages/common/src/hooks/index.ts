@@ -1,4 +1,4 @@
 export { useApplicationFields } from "./useApplicationFields";
 export { useGeneralFields } from "./useGeneralFields";
-export { useGenericTerms } from "./useGenericTerms";
+export { useGenericTermsOfUse } from "./useGenericTermsOfUse";
 export { useDisplayError } from "./useDisplayError";
