@@ -64,8 +64,9 @@ class ApplicationSectionAdmin(admin.ModelAdmin):
         "name",
         "application__user__first_name",
         "application__user__last_name",
+        "ext_uuid",
     ]
-    search_help_text = _("Search by name, application user's first name or last name")
+    search_help_text = _("Search by name, application user's first name or last name, or external ID")
 
     # List
     list_display = [

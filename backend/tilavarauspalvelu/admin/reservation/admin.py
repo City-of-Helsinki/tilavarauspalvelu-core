@@ -44,8 +44,19 @@ class ReservationAdmin(admin.ModelAdmin):
     search_fields = [
         # 'id' handled separately in `get_search_results()`
         "name",
+        "ext_uuid",
+        "user__first_name",
+        "user__last_name",
+        "reservation_unit__name",
+        "reservation_unit__ext_uuid",
+        "reservation_series__name",
+        "reservation_series__ext_uuid",
+        "reservation_series__allocated_time_slot__reservation_unit_option__application_section__ext_uuid",
     ]
-    search_help_text = _("Search by Reservation ID or name")
+    search_help_text = _(
+        "Search by ID, name, user's first name or last name, reservation unit name or external ID, "
+        "reservation series name or external ID, or application section external ID"
+    )
 
     # List
     list_display = [
