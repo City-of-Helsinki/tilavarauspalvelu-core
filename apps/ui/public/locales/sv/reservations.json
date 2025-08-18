@@ -155,6 +155,10 @@
     "paid": {
       "title": "Din bokning är betald",
       "body": ""
+    },
+    "polling_timeout": {
+      "title": "Betalningsstatusen för bokningen kunde inte verifieras.",
+      "body": "Kontrollera bokningsstatusen på den här sidan efter 10 minuter. Om statusen har ännu heller inte ändrats, vänligen kontakta kundtjänsten."
     }
   }
 }

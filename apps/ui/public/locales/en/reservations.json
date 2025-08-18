@@ -155,6 +155,10 @@
     "paid": {
       "title": "Your booking has been paid",
       "body": ""
+    },
+    "polling_timeout": {
+      "title": "The status of the payment related to the booking could not be verified.",
+      "body": "Please recheck the status of the booking at this page after 10 minutes. If the status still has not changed by then, please contact the customer service."
     }
   }
 }

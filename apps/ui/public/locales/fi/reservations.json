@@ -151,6 +151,10 @@
     "paid": {
       "title": "Varauksesi on maksettu.",
       "body": ""
+    },
+    "polling_timeout": {
+      "title": "Varaukseen liittyvän maksun tilaa ei voitu vahvistaa.",
+      "body": "Tarkista varauksen tila tältä sivulta 10 minuutin päästä uudelleen ja ellei maksu vieläkään ole vahvistunut, ole yhteydessä asiakaspalveluun."
     }
   }
 }
