@@ -157,7 +157,7 @@ def get_extra_data(instance: UserSocialAuth, **kwargs: Any) -> dict[str, Any]:
 def get_id_token(
     instance: UserSocialAuth,
     amr: ADLoginAMR | ProfileLoginAMR = ADLoginAMR.HELSINKIAZUREAD,
-    loa: Literal["substantial", "low"] = "low",
+    loa: Literal["substantial", "high", "low"] = "low",
     ad_groups: Iterable[str] = (),
 ) -> str:
     return ".".join([
