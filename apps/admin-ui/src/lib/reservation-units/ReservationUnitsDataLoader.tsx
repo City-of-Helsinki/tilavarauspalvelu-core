@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { gql } from "@apollo/client";
-import { ReservationUnitOrderingChoices, useSearchReservationUnitsQuery } from "@gql/gql-types";
+import { ReservationUnitOrderSet, useSearchReservationUnitsQuery } from "@gql/gql-types";
 import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { More } from "@/component/More";
@@ -10,24 +10,24 @@ import { CenterSpinner } from "common/styled";
 import { useTranslation } from "next-i18next";
 import { useGetFilterSearchParams } from "@/hooks";
 
-function transformOrderBy(orderBy: string, desc: boolean): ReservationUnitOrderingChoices | null {
+function transformOrderBy(orderBy: string, desc: boolean): ReservationUnitOrderSet | null {
   switch (orderBy) {
     case "nameFi":
-      return desc ? ReservationUnitOrderingChoices.NameFiDesc : ReservationUnitOrderingChoices.NameFiAsc;
+      return desc ? ReservationUnitOrderSet.NameFiDesc : ReservationUnitOrderSet.NameFiAsc;
     case "unitNameFi":
-      return desc ? ReservationUnitOrderingChoices.UnitNameFiDesc : ReservationUnitOrderingChoices.UnitNameFiAsc;
+      return desc ? ReservationUnitOrderSet.UnitNameFiDesc : ReservationUnitOrderSet.UnitNameFiAsc;
     case "typeFi":
-      return desc ? ReservationUnitOrderingChoices.TypeFiDesc : ReservationUnitOrderingChoices.TypeFiAsc;
+      return desc ? ReservationUnitOrderSet.TypeFiDesc : ReservationUnitOrderSet.TypeFiAsc;
     case "maxPersons":
-      return desc ? ReservationUnitOrderingChoices.MaxPersonsDesc : ReservationUnitOrderingChoices.MaxPersonsAsc;
+      return desc ? ReservationUnitOrderSet.MaxPersonsDesc : ReservationUnitOrderSet.MaxPersonsAsc;
     case "surfaceArea":
-      return desc ? ReservationUnitOrderingChoices.SurfaceAreaDesc : ReservationUnitOrderingChoices.SurfaceAreaAsc;
+      return desc ? ReservationUnitOrderSet.SurfaceAreaDesc : ReservationUnitOrderSet.SurfaceAreaAsc;
     default:
       return null;
   }
 }
 
-function transformSortString(orderBy: string | null): ReservationUnitOrderingChoices[] {
+function transformSortString(orderBy: string | null): ReservationUnitOrderSet[] {
   if (!orderBy) {
     return [];
   }
@@ -123,7 +123,7 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
     $unit: [Int]
     $unitGroup: [Int]
     $reservationUnitType: [Int]
-    $orderBy: [ReservationUnitOrderingChoices]
+    $orderBy: [ReservationUnitOrderSet!]
     $publishingState: [ReservationUnitPublishingState]
   ) {
     reservationUnits(

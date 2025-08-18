@@ -1,6 +1,6 @@
 import {
   ReservationKind,
-  ReservationUnitOrderingChoices,
+  ReservationUnitOrderSet,
   SearchReservationUnitsDocument,
   type SearchReservationUnitsQuery,
   type SearchReservationUnitsQueryVariables,
@@ -99,7 +99,7 @@ function createSearchVariablesMock({
     reservableDateStart: date ? date.toISOString() : undefined,
     applicationRound: [1],
     first: 36,
-    orderBy: [ReservationUnitOrderingChoices.NameFiAsc, ReservationUnitOrderingChoices.PkAsc],
+    orderBy: [ReservationUnitOrderSet.NameFiAsc, ReservationUnitOrderSet.PkAsc],
     isDraft: false,
     isVisible: true,
     reservationKind: ReservationKind.Season,
