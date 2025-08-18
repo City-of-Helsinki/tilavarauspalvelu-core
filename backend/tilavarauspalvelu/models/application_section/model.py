@@ -13,7 +13,7 @@ from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
 from utils.date_utils import local_datetime
-from utils.db import NowTT, SubqueryCount
+from utils.db import Now, SubqueryCount
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
@@ -128,7 +128,7 @@ class ApplicationSection(SerializableMixin, models.Model):
         return models.Case(  # type: ignore[return-value]
             models.When(
                 # The application round has not yet moved to the allocation stage
-                models.Q(application__application_round__application_period_ends_at__gte=NowTT()),
+                models.Q(application__application_round__application_period_ends_at__gte=Now()),
                 then=models.Value(ApplicationSectionStatusChoice.UNALLOCATED.value),
             ),
             models.When(
