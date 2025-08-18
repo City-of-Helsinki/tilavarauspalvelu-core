@@ -1,6 +1,6 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import { ApplicationSectionOrderingChoices, useApplicationSectionsQuery } from "@gql/gql-types";
+import { ApplicationSectionOrderSet, useApplicationSectionsQuery } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
@@ -78,7 +78,7 @@ export function ApplicationSectionDataLoader({ applicationRoundPk }: Props): JSX
   );
 }
 
-function transformOrderBy(orderBy: string | null): ApplicationSectionOrderingChoices[] {
+function transformOrderBy(orderBy: string | null): ApplicationSectionOrderSet[] {
   if (orderBy == null) {
     return [];
   }
@@ -86,22 +86,20 @@ function transformOrderBy(orderBy: string | null): ApplicationSectionOrderingCho
   const rest = desc ? orderBy.slice(1) : orderBy;
   switch (rest) {
     case "nameFi":
-      return desc ? [ApplicationSectionOrderingChoices.NameDesc] : [ApplicationSectionOrderingChoices.NameAsc];
+      return desc ? [ApplicationSectionOrderSet.NameDesc] : [ApplicationSectionOrderSet.NameAsc];
     case "preferredUnitNameFi":
       return desc
-        ? [ApplicationSectionOrderingChoices.PreferredUnitNameFiDesc]
-        : [ApplicationSectionOrderingChoices.PreferredUnitNameFiAsc];
+        ? [ApplicationSectionOrderSet.PreferredUnitNameFiDesc]
+        : [ApplicationSectionOrderSet.PreferredUnitNameFiAsc];
     case "status":
-      return desc ? [ApplicationSectionOrderingChoices.StatusDesc] : [ApplicationSectionOrderingChoices.StatusAsc];
+      return desc ? [ApplicationSectionOrderSet.StatusDesc] : [ApplicationSectionOrderSet.StatusAsc];
     case "applicant":
-      return desc
-        ? [ApplicationSectionOrderingChoices.ApplicantDesc]
-        : [ApplicationSectionOrderingChoices.ApplicantAsc];
+      return desc ? [ApplicationSectionOrderSet.ApplicantDesc] : [ApplicationSectionOrderSet.ApplicantAsc];
     case "application_id,pk":
     case "application_id,-pk":
       return desc
-        ? [ApplicationSectionOrderingChoices.ApplicationPkDesc, ApplicationSectionOrderingChoices.PkDesc]
-        : [ApplicationSectionOrderingChoices.ApplicationPkAsc, ApplicationSectionOrderingChoices.PkAsc];
+        ? [ApplicationSectionOrderSet.ApplicationPkDesc, ApplicationSectionOrderSet.PkDesc]
+        : [ApplicationSectionOrderSet.ApplicationPkAsc, ApplicationSectionOrderSet.PkAsc];
     default:
       return [];
   }
@@ -124,7 +122,7 @@ export const APPLICATION_SECTIONS_QUERY = gql`
     $ageGroup: [Int]
     $municipality: [MunicipalityChoice]
     $includePreferredOrder10OrHigher: Boolean
-    $orderBy: [ApplicationSectionOrderingChoices]
+    $orderBy: [ApplicationSectionOrderSet!]
     $first: Int
     $after: String
   ) {

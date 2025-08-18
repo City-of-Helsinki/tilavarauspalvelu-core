@@ -138,10 +138,10 @@ export function useFilterOptions(unitFilter?: number[]): TagOptionsList {
 
 export const FILTER_OTIONS_QUERY = gql`
   query FilterOptions(
-    $orderReservationUnitTypeBy: [ReservationUnitTypeOrderingChoices!] = [nameFiAsc]
-    $orderReservationPurposesBy: [ReservationPurposeOrderingChoices!] = [rankAsc]
-    $orderUnitsBy: [UnitOrderingChoices!] = [nameFiAsc]
-    $orderReservationUnitsBy: [ReservationUnitOrderingChoices!] = [nameFiAsc]
+    $orderReservationUnitTypeBy: [ReservationUnitTypeOrderSet!] = [nameFiAsc]
+    $orderReservationPurposesBy: [ReservationPurposeOrderSet!] = [rankAsc]
+    $orderUnitsBy: [UnitOrderSet!] = [nameFiAsc]
+    $orderReservationUnitsBy: [ReservationUnitOrderSet!] = [nameFiAsc]
     $unit: [Int]
     $applicationRound: Int
   ) {
