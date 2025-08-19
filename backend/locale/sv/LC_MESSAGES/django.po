@@ -164,6 +164,7 @@ msgstr ""
 #: tilavarauspalvelu/admin/application/admin.py
 #: tilavarauspalvelu/admin/application_round/admin.py
 #: tilavarauspalvelu/admin/application_section/admin.py
+#: tilavarauspalvelu/admin/email_message/admin.py
 #: tilavarauspalvelu/admin/reservation/admin.py
 #: tilavarauspalvelu/admin/reservation_series/admin.py
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
@@ -886,6 +887,14 @@ msgstr ""
 msgid ""
 "Is the notification a draft. Drafts won't be shown to users, even if they "
 "would be active."
+msgstr ""
+
+#: tilavarauspalvelu/admin/email_message/admin.py
+msgid "Content"
+msgstr ""
+
+#: tilavarauspalvelu/admin/email_message/admin.py
+msgid "Attachments"
 msgstr ""
 
 #: tilavarauspalvelu/admin/email_template/tester.py
@@ -3559,6 +3568,14 @@ msgstr ""
 msgid ""
 "Both 'active_from' and 'active_until' must be either empty or set. If both "
 "are set, 'active_until' must be after 'active_from'."
+msgstr ""
+
+#: tilavarauspalvelu/models/email_message/model.py
+msgid "email message"
+msgstr ""
+
+#: tilavarauspalvelu/models/email_message/model.py
+msgid "email messages"
 msgstr ""
 
 #: tilavarauspalvelu/models/equipment/model.py

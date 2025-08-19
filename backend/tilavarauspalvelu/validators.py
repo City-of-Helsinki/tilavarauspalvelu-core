@@ -9,6 +9,8 @@ from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from tilavarauspalvelu.typing import EmailAttachment
+
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import TimeSlot
 
@@ -22,7 +24,7 @@ def is_numeric(value: str) -> None:
 def validate_accounting_project(project_value: str) -> None:
     allowed_lengths = [7, 10, 12, 14, 16]
     if len(project_value) not in allowed_lengths:
-        msg = f"Value must be string of one of the following lenghts: {', '.join(map(str, allowed_lengths))}"
+        msg = f"Value must be string of one of the following lengths: {', '.join(map(str, allowed_lengths))}"
         raise ValidationError(msg)
 
 
@@ -110,3 +112,17 @@ def validate_string_time(value: str) -> datetime.time:
             continue
 
     raise ValidationError(_("Enter a valid time."), code="invalid")
+
+
+def validate_email_attachments(value: list[dict[str, Any]]) -> None:
+    keys = sorted(EmailAttachment.__annotations__)
+
+    for attachment in value:
+        if sorted(attachment) != keys:
+            msg = f"Not a valid email attachment: dict keys must be {keys}"
+            raise ValidationError(msg)
+
+        for name in EmailAttachment.__annotations__:
+            if not isinstance(attachment[name], str):
+                msg = f"Email attachment '{name}' must be of type 'str', got {type(attachment[name])}"
+                raise ValidationError(msg)
