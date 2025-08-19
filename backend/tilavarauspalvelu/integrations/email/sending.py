@@ -9,6 +9,7 @@ from django.core.mail import EmailMultiAlternatives
 
 from config.celery import app
 from tilavarauspalvelu.integrations.email.typing import EmailData
+from tilavarauspalvelu.models import EmailMessage
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -39,10 +40,31 @@ def send_emails_in_batches_task(email_data: EmailData) -> None:
     for attachment in email_data.attachments:
         email_message.attach(**attachment)
 
+    db_email_message: EmailMessage | None = None
+
     for batch in batched(email_data.recipients, settings.EMAIL_MAX_RECIPIENTS, strict=False):
+        if db_email_message is not None:
+            db_email_message.recipients.extend(batch)
+            continue
+
         email_message_copy = copy(email_message)
         email_message_copy.bcc = list(batch)
-        email_message_copy.send(fail_silently=False)
+
+        try:
+            email_message_copy.send(fail_silently=False)
+        except TimeoutError:
+            db_email_message = EmailMessage(
+                recipients=list(batch),
+                subject=email_data.subject,
+                text_content=email_data.text_content,
+                html_content=email_data.html_content,
+                attachments=email_data.attachments,
+                valid_until=email_data.valid_until,
+                created_at=email_data.created_at,
+            )
+
+    if db_email_message is not None:
+        db_email_message.save()
 
 
 @app.task(name="send_multiple_emails_in_batches")
