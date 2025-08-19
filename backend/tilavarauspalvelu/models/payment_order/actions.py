@@ -4,7 +4,7 @@ import dataclasses
 import datetime
 import uuid
 from contextlib import suppress
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 
@@ -161,19 +161,24 @@ class PaymentOrderActions:
                     user_uuid=self.payment_order.reservation_user_uuid,
                 )
 
-                # Don't update if order is missing or something other than cancelled
-                if webshop_order is None or webshop_order.status != WebShopOrderStatus.CANCELLED:
+                if webshop_order is None:
+                    msg = "Verkkokauppa: Order not found from verkkokauppa, do not cancel payment order"
+                    details: dict[str, Any] = {"payment_order": self.payment_order.remote_id}
+                    SentryLogger.log_message(msg, details=details, level="warning")
+                    return
+
+                if webshop_order.status != WebShopOrderStatus.CANCELLED:
+                    msg = "Verkkokauppa: Order not cancelled in verkkokauppa, do not cancel payment order"
+                    details = {"payment_order": self.payment_order.remote_id, "webshop_status": webshop_order.status}
+                    SentryLogger.log_message(msg, details=details, level="warning")
                     return
 
             # If there is an unexpected response or error from verkkokauppa,
             # payment order should still be cancelled
             except CancelOrderError as error:
                 msg = "Verkkokauppa: Failed to cancel order"
-                details = {
-                    "error": str(error),
-                    "payment_order": self.payment_order.pk,
-                }
-                SentryLogger.log_message(msg, details=details)
+                details = {"payment_order": self.payment_order.remote_id, "error": str(error)}
+                SentryLogger.log_message(msg, details=details, level="warning")
 
                 if not cancel_on_error:
                     raise
