@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 from django.conf import settings
@@ -8,7 +9,7 @@ from django.db import models
 from tilavarauspalvelu.enums import AccessType, ApplicationStatusChoice, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Application, User
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_end_of_day
 
 from .attachements import get_reservation_ical_attachment
 from .find_language import get_application_email_language, get_reservation_email_language, get_series_email_language
@@ -71,7 +72,7 @@ class EmailService:
 
         email_type = EmailType.RESERVATION_ACCESS_CODE_ADDED
         context = email_type.get_email_context(reservation, language=language)
-        email = EmailData.build(recipients, context, email_type)
+        email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -108,7 +109,13 @@ class EmailService:
         email_type = EmailType.RESERVATION_ACCESS_CODE_CHANGED
         context = email_type.get_email_context(reservation, language=language)
         attachment = get_reservation_ical_attachment(reservation)
-        email = EmailData.build(recipients, context, email_type, attachment=attachment)
+        email = EmailData.build(
+            recipients,
+            context,
+            email_type,
+            valid_until=reservation.ends_at,
+            attachment=attachment,
+        )
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -134,7 +141,13 @@ class EmailService:
         email_type = EmailType.RESERVATION_APPROVED
         context = email_type.get_email_context(reservation, language=language)
         attachment = get_reservation_ical_attachment(reservation)
-        email = EmailData.build(recipients, context, email_type, attachment=attachment)
+        email = EmailData.build(
+            recipients,
+            context,
+            email_type,
+            valid_until=reservation.ends_at,
+            attachment=attachment,
+        )
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -163,7 +176,7 @@ class EmailService:
 
         email_type = EmailType.RESERVATION_CANCELLED
         context = email_type.get_email_context(reservation, language=language)
-        email = EmailData.build(recipients, context, email_type)
+        email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -186,7 +199,13 @@ class EmailService:
         email_type = EmailType.RESERVATION_CONFIRMED
         context = email_type.get_email_context(reservation, language=language)
         attachment = get_reservation_ical_attachment(reservation)
-        email = EmailData.build(recipients, context, email_type, attachment=attachment)
+        email = EmailData.build(
+            recipients,
+            context,
+            email_type,
+            attachment=attachment,
+            valid_until=reservation.ends_at,
+        )
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -211,7 +230,7 @@ class EmailService:
 
         for language, recipients in recipients_by_language.items():
             context = email_type.get_email_context(reservation, language=language)
-            email = EmailData.build(recipients, context, email_type)
+            email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
             emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
@@ -245,7 +264,7 @@ class EmailService:
 
         email_type = EmailType.RESERVATION_DENIED
         context = email_type.get_email_context(reservation, language=language)
-        email = EmailData.build(recipients, context, email_type)
+        email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -273,7 +292,7 @@ class EmailService:
 
         email_type = EmailType.RESERVATION_REQUIRES_HANDLING
         context = email_type.get_email_context(reservation, language=language)
-        email = EmailData.build(recipients, context, email_type)
+        email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -298,7 +317,7 @@ class EmailService:
 
         for language, recipients in recipients_by_language.items():
             context = email_type.get_email_context(reservation, language=language)
-            email = EmailData.build(recipients, context, email_type)
+            email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
             emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
@@ -322,7 +341,7 @@ class EmailService:
 
         email_type = EmailType.RESERVATION_REQUIRES_PAYMENT
         context = email_type.get_email_context(reservation, language=language)
-        email = EmailData.build(recipients, context, email_type)
+        email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -352,7 +371,13 @@ class EmailService:
         email_type = EmailType.RESERVATION_RESCHEDULED
         context = email_type.get_email_context(reservation, language=language)
         attachment = get_reservation_ical_attachment(reservation)
-        email = EmailData.build(recipients, context, email_type, attachment=attachment)
+        email = EmailData.build(
+            recipients,
+            context,
+            email_type,
+            valid_until=reservation.ends_at,
+            attachment=attachment,
+        )
         send_emails_in_batches_task.delay(email_data=email)
 
     # Seasonal booking #################################################################################################
@@ -386,7 +411,8 @@ class EmailService:
 
         email_type = EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED
         context = email_type.get_email_context(application_section, language=language)
-        email = EmailData.build(recipients, context, email_type)
+        valid_until = local_end_of_day(application_section.application.application_round.reservation_period_end_date)
+        email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -415,7 +441,8 @@ class EmailService:
 
         email_type = EmailType.SEASONAL_BOOKING_ACCESS_CODE_CHANGED
         context = email_type.get_email_context(application_section, language=language)
-        email = EmailData.build(recipients, context, email_type)
+        valid_until = local_end_of_day(application_section.application.application_round.reservation_period_end_date)
+        email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -441,7 +468,8 @@ class EmailService:
 
         email_type = EmailType.SEASONAL_BOOKING_APPLICATION_RECEIVED
         context = email_type.get_email_context(language=language)
-        email = EmailData.build(recipients, context, email_type)
+        valid_until = application.application_round.application_period_ends_at
+        email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -463,10 +491,11 @@ class EmailService:
 
         emails: list[EmailData] = []
         email_type = EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_IN_ALLOCATION
+        valid_until = local_datetime() + datetime.timedelta(days=settings.SEASONAL_BOOKING_ALLOCATION_EMAIL_VALID_DAYS)
 
         for language, recipients in recipients_by_language.items():
             context = email_type.get_email_context(language=language)
-            email = EmailData.build(recipients, context, email_type)
+            email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
             emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
@@ -491,10 +520,11 @@ class EmailService:
 
         emails: list[EmailData] = []
         email_type = EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_HANDLED
+        valid_until = local_datetime() + datetime.timedelta(days=settings.SEASONAL_BOOKING_HANDLED_EMAIL_VALID_DAYS)
 
         for language, recipients in recipients_by_language.items():
             context = email_type.get_email_context(language=language)
-            email = EmailData.build(recipients, context, email_type)
+            email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
             emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
@@ -529,8 +559,10 @@ class EmailService:
             language = get_application_email_language(application=application_section.application)
 
         email_type = EmailType.SEASONAL_BOOKING_CANCELLED_ALL
+        valid_until = local_datetime() + datetime.timedelta(days=settings.SEASONAL_BOOKING_CANCEL_ALL_EMAIL_VALID_DAYS)
+
         context = email_type.get_email_context(application_section, language=language)
-        email = EmailData.build(recipients, context, email_type)
+        email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -558,10 +590,11 @@ class EmailService:
 
         emails: list[EmailData] = []
         email_type = EmailType.SEASONAL_BOOKING_CANCELLED_ALL_STAFF_NOTIFICATION
+        valid_until = local_end_of_day(application_section.application.application_round.reservation_period_end_date)
 
         for language, recipients in recipients_by_language.items():
             context = email_type.get_email_context(application_section, language=language)
-            email = EmailData.build(recipients, context, email_type)
+            email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
             emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
@@ -595,7 +628,7 @@ class EmailService:
 
         email_type = EmailType.SEASONAL_BOOKING_CANCELLED_SINGLE
         context = email_type.get_email_context(reservation, language=language)
-        email = EmailData.build(recipients, context, email_type)
+        email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -626,7 +659,8 @@ class EmailService:
 
         email_type = EmailType.SEASONAL_BOOKING_DENIED_SERIES
         context = email_type.get_email_context(series, language=language)
-        email = EmailData.build(recipients, context, email_type)
+        valid_until = local_end_of_day(series.end_date)
+        email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -658,7 +692,7 @@ class EmailService:
 
         email_type = EmailType.SEASONAL_BOOKING_DENIED_SINGLE
         context = email_type.get_email_context(reservation, language=language)
-        email = EmailData.build(recipients, context, email_type)
+        email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -689,7 +723,8 @@ class EmailService:
 
         email_type = EmailType.SEASONAL_BOOKING_RESCHEDULED_SERIES
         context = email_type.get_email_context(series, language=language)
-        email = EmailData.build(recipients, context, email_type)
+        valid_until = local_end_of_day(series.end_date)
+        email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -719,7 +754,13 @@ class EmailService:
         email_type = EmailType.SEASONAL_BOOKING_RESCHEDULED_SINGLE
         context = email_type.get_email_context(reservation, language=language)
         attachment = get_reservation_ical_attachment(reservation)
-        email = EmailData.build(recipients, context, email_type, attachment=attachment)
+        email = EmailData.build(
+            recipients,
+            context,
+            email_type,
+            valid_until=reservation.ends_at,
+            attachment=attachment,
+        )
         send_emails_in_batches_task.delay(email_data=email)
 
     # User #############################################################################################################
@@ -740,10 +781,11 @@ class EmailService:
         emails: list[EmailData] = []
         email_type = EmailType.USER_PERMISSIONS_DEACTIVATION
 
+        valid_until = local_datetime() + datetime.timedelta(days=settings.PERMISSION_NOTIFICATION_BEFORE_DAYS)
+
         for language, recipients in recipients_by_language.items():
             context = email_type.get_email_context(language=language)
-
-            email = EmailData.build(recipients, context, email_type)
+            email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
             emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
@@ -765,9 +807,11 @@ class EmailService:
         emails: list[EmailData] = []
         email_type = EmailType.USER_ANONYMIZATION
 
+        valid_until = local_datetime() + datetime.timedelta(days=settings.ANONYMIZATION_NOTIFICATION_BEFORE_DAYS)
+
         for language, recipients in recipients_by_language.items():
             context = email_type.get_email_context(language=language)
-            email = EmailData.build(recipients, context, email_type)
+            email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
             emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)

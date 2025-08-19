@@ -15,6 +15,7 @@ from tilavarauspalvelu.enums import Language
 from tilavarauspalvelu.integrations.email.sending import send_emails_in_batches_task
 from tilavarauspalvelu.integrations.email.typing import EmailData, EmailType
 from tilavarauspalvelu.models import ReservationUnit
+from utils.date_utils import local_datetime
 from utils.utils import safe_getattr
 
 from .forms import EmailTesterForm
@@ -79,7 +80,12 @@ def email_tester_admin_view(request: WSGIRequest, email_type: str) -> HttpRespon
         if tester_form.is_valid():
             recipients = [tester_form.cleaned_data["send_to"]]
             context = tester_form.to_context()
-            email = EmailData.build(recipients=recipients, context=context, email_type=email_template_type)
+            email = EmailData.build(
+                recipients=recipients,
+                context=context,
+                email_type=email_template_type,
+                valid_until=local_datetime(),
+            )
             send_emails_in_batches_task(email)
 
             messages.add_message(

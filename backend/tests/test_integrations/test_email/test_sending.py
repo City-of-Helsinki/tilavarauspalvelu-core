@@ -8,6 +8,7 @@ from tilavarauspalvelu.integrations.email.sending import (
 )
 from tilavarauspalvelu.integrations.email.typing import EmailData
 from tilavarauspalvelu.typing import EmailAttachment
+from utils.date_utils import local_datetime
 
 
 @override_settings(SEND_EMAILS=True)
@@ -18,6 +19,7 @@ def test_send_emails_in_batches_task(outbox):
             subject="subject",
             text_content="content",
             html_content="<html>content</html>",
+            valid_until=local_datetime(),
         )
     )
 
@@ -37,6 +39,7 @@ def test_send_emails_in_batches_task__sent_emails_off(outbox):
             subject="subject",
             text_content="content",
             html_content="<html>content</html>",
+            valid_until=local_datetime(),
         )
     )
 
@@ -51,6 +54,7 @@ def test_send_emails_in_batches_task__multiple_batches(outbox):
             subject="subject",
             text_content="content",
             html_content="<html>content</html>",
+            valid_until=local_datetime(),
         )
     )
 
@@ -76,6 +80,7 @@ def test_send_emails_in_batches_task__attachments(outbox):
             text_content="content",
             html_content="<html>content</html>",
             attachments=[EmailAttachment(filename="file.txt", content="content", mimetype="text/plain")],
+            valid_until=local_datetime(),
         )
     )
 
@@ -93,6 +98,7 @@ def test_send_multiple_emails_in_batches_task(outbox):
             text_content="content 1",
             html_content="<html>content 1</html>",
             attachments=[],
+            valid_until=local_datetime(),
         ),
         EmailData(
             recipients=["user2@example.com"],
@@ -100,6 +106,7 @@ def test_send_multiple_emails_in_batches_task(outbox):
             text_content="content 2",
             html_content="<html>content 2</html>",
             attachments=[],
+            valid_until=local_datetime(),
         ),
     ]
 
