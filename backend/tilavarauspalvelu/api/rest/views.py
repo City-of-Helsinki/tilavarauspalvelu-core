@@ -22,12 +22,13 @@ from import_export.formats.base_formats import JSON
 from rest_framework.exceptions import ValidationError as DRFValidationError
 
 from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice
+from tilavarauspalvelu.integrations.opening_hours.hauki_link_generator import generate_hauki_link
 from tilavarauspalvelu.management.commands.create_robot_test_data import create_robot_test_data
 from tilavarauspalvelu.models import ReservableTimeSpan, Reservation, ReservationStatistic, ReservationUnit, TermsOfUse
 from tilavarauspalvelu.services.export import ReservationUnitExporter
 from tilavarauspalvelu.services.pdf import render_to_pdf
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
-from utils.utils import ical_hmac_signature, update_query_params
+from utils.utils import comma_sep_str, ical_hmac_signature, update_query_params
 
 from .utils import (
     ReservableTimeSpansParams,
@@ -36,12 +37,16 @@ from .utils import (
     create_reservable_time_spans_exporter,
     create_statistics_exporter,
     is_valid_url,
+    parse_list_of_pks,
     redirect_back_on_error,
     validate_pagination,
     validation_error_as_response,
 )
 
 if TYPE_CHECKING:
+    import uuid
+
+    from tilavarauspalvelu.models import User
     from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
@@ -445,6 +450,76 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
     payment_order.save(update_fields=["remote_id", "checkout_url", "receipt_url", "created_at"])
 
     return HttpResponseRedirect(append_payment_method_to_checkout_url(payment_order.checkout_url, request))
+
+
+@require_GET
+@redirect_back_on_error
+def redirect_to_hauki(request: WSGIRequest) -> HttpResponseRedirect:
+    if not request.user.is_authenticated:
+        msg = "User must be authenticated to use Hauki"
+        raise ValidationError(msg, code="HAUKI_USER_NOT_AUTHENTICATED")
+
+    user: User = request.user
+    if not user.email:
+        msg = "User does not have email address"
+        raise ValidationError(msg, code="HAUKI_USER_NO_EMAIL")
+
+    given_pks = parse_list_of_pks(request, "reservation_units")
+    if not given_pks:
+        msg = "No reservation units provided"
+        raise ValidationError(msg, code="HAUKI_MISSING_RESERVATION_UNITS")
+
+    reservation_units: list[ReservationUnit] = list(
+        ReservationUnit.objects.all()
+        .filter(pk__in=given_pks)
+        .select_related(
+            "origin_hauki_resource",
+            "unit",
+        )
+        .prefetch_related(
+            "unit__unit_groups",
+        )
+    )
+
+    existing_pks = {reservation_unit.pk for reservation_unit in reservation_units}
+    missing_pks = set(given_pks) - existing_pks
+
+    if missing_pks:
+        msg = f"Some of the reservation units could not be found: {comma_sep_str(sorted(missing_pks))}"
+        raise ValidationError(msg, code="HAUKI_INVALID_RESERVATION_UNITS")
+
+    # At this point we should have at least one reservation unit.
+    # Always use the first one given by frontend as the primary reservation unit.
+    primary = reservation_units[0]
+
+    if primary.unit.tprek_department_id is None:
+        msg = f"Primary reservation unit '{primary.ext_uuid}' department ID is missing"
+        raise ValidationError(msg, code="HAUKI_DEPARTMENT_ID_MISSING")
+
+    target_resources: list[uuid.UUID] = []
+
+    for reservation_unit in reservation_units:
+        if reservation_unit.origin_hauki_resource is None:
+            msg = f"Reservation unit '{reservation_unit.ext_uuid}' is not linked to a Hauki resource"
+            raise ValidationError(msg, code="HAUKI_RESOURCE_NOT_LINKED")
+
+        if not user.permissions.can_manage_unit(reservation_unit.unit):
+            msg = f"User does not have permission to manage reservation unit '{reservation_unit.ext_uuid}'"
+            raise ValidationError(msg, code="HAUKI_PERMISSIONS_DENIED")
+
+        target_resources.append(reservation_unit.ext_uuid)
+
+    hauki_url = generate_hauki_link(
+        reservation_unit_uuid=primary.ext_uuid,
+        user_email=user.email,
+        organization_id=primary.unit.hauki_department_id,
+        target_resources=target_resources if len(target_resources) > 1 else None,
+    )
+    if hauki_url is None:
+        msg = "Could not generate Hauki link"
+        raise ValidationError(msg, code="HAUKI_URL_GENERATION_FAILED")
+
+    return HttpResponseRedirect(hauki_url)
 
 
 @require_POST
