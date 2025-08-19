@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import uuid
+
 import pytest
 import requests
 from graphene_django_extensions.testing import parametrize_helper
@@ -20,6 +22,7 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import (
     PindoraPermissionError,
     PindoraUnexpectedResponseError,
 )
+from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraReservationUnitResponse
 from utils.external_service.errors import ExternalServiceRequestError
 
 from tests.factories import ReservationUnitFactory
@@ -156,3 +159,32 @@ def test_pindora_client__get_reservation_unit__invalid_data():
     msg = "Invalid value in reservation unit response from Pindora: badly formed hexadecimal UUID string"
     with patch, pytest.raises(PindoraAPIError, match=exact(msg)):
         PindoraClient.get_reservation_unit(reservation_unit)
+
+
+@patch_method(PindoraClient.request)
+@pytest.mark.django_db
+def test_pindora_client__get_reservation_unit__pindora_mock(settings):
+    settings.PINDORA_MOCK_ENABLED = True
+
+    reservation_unit = ReservationUnitFactory.create(name="Test Reservation Unit")
+
+    response = PindoraClient.get_reservation_unit(reservation_unit)
+
+    assert response == PindoraReservationUnitResponse(
+        reservation_unit_id=reservation_unit.ext_uuid,
+        name="Test Reservation Unit",
+        keypad_url="",
+    )
+
+    assert PindoraClient.request.call_count == 0
+
+
+@patch_method(PindoraClient.request)
+@pytest.mark.django_db
+def test_pindora_client__get_reservation_unit__pindora_mock__not_found(settings):
+    settings.PINDORA_MOCK_ENABLED = True
+
+    with pytest.raises(PindoraNotFoundError):
+        PindoraClient.get_reservation_unit(uuid.uuid4())
+
+    assert PindoraClient.request.call_count == 0
