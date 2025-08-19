@@ -17,6 +17,7 @@ from tilavarauspalvelu.models import (
     AffectingTimeSpan,
     Application,
     ApplicationRound,
+    EmailMessage,
     PaymentOrder,
     PersonalInfoViewLog,
     Reservation,
@@ -415,6 +416,23 @@ def send_user_anonymization_email_task() -> None:
     from tilavarauspalvelu.integrations.email.main import EmailService
 
     EmailService.send_user_anonymization_emails()
+
+
+@app.task(name="send_valid_saved_emails")
+def send_valid_saved_emails_task() -> None:
+    from tilavarauspalvelu.integrations.email.sending import send_emails_in_batches_task
+
+    EmailMessage.objects.all().expired().delete()
+
+    for message in EmailMessage.objects.all():
+        email_data = message.actions.to_email_data()
+
+        # If sending fails again, we create a copy of the current EmailMessage in `send_emails_in_batches_task`
+        # This way we don't need logic for handling emails which were partially successful
+        # (i.e. batch 1 succeeded but batch 2 failed), since the copy is then created with
+        # the failed batch's recipients. That's why we always delete the original EmailMessage here.
+        send_emails_in_batches_task(email_data=email_data)
+        message.delete()
 
 
 @app.task(name="anonymize_old_users")
