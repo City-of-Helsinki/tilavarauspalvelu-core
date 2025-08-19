@@ -1,9 +1,8 @@
-# ruff: noqa: E501
-
+from __future__ import annotations
 
 from django.db import migrations
 
-from utils.db import NowTT
+from utils.db import NowTT  # noqa: TID251
 
 
 class Migration(migrations.Migration):

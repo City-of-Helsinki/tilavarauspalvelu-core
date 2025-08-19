@@ -15,7 +15,7 @@ from tilavarauspalvelu.enums import (
     ReservationKind,
 )
 from utils.date_utils import local_datetime
-from utils.db import NowTT
+from utils.db import Now
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
@@ -148,11 +148,11 @@ class ApplicationRound(models.Model):
                 then=models.Value(ApplicationRoundStatusChoice.HANDLED.value),
             ),
             models.When(
-                models.Q(application_period_begins_at__gt=NowTT()),
+                models.Q(application_period_begins_at__gt=Now()),
                 then=models.Value(ApplicationRoundStatusChoice.UPCOMING.value),
             ),
             models.When(
-                models.Q(application_period_ends_at__gt=NowTT()),
+                models.Q(application_period_ends_at__gt=Now()),
                 then=models.Value(ApplicationRoundStatusChoice.OPEN.value),
             ),
             default=models.Value(ApplicationRoundStatusChoice.IN_ALLOCATION.value),
@@ -184,11 +184,11 @@ class ApplicationRound(models.Model):
                 then=models.F("handled_at"),
             ),
             models.When(
-                models.Q(application_period_begins_at__gt=NowTT()),  # UPCOMING
+                models.Q(application_period_begins_at__gt=Now()),  # UPCOMING
                 then=models.F("public_display_begins_at"),
             ),
             models.When(
-                models.Q(application_period_ends_at__gt=NowTT()),  # OPEN
+                models.Q(application_period_ends_at__gt=Now()),  # OPEN
                 then=models.F("application_period_begins_at"),
             ),
             default=models.F("application_period_ends_at"),  # IN_ALLOCATION
@@ -272,7 +272,7 @@ class ApplicationRound(models.Model):
                 then=models.Value(ApplicationRoundReservationCreationStatusChoice.COMPLETED.value),
             ),
             models.When(
-                models.Q(handled_at__lte=NowTT() - timeout),
+                models.Q(handled_at__lte=Now() - timeout),
                 then=models.Value(ApplicationRoundReservationCreationStatusChoice.FAILED.value),
             ),
             default=models.Value(ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED.value),
