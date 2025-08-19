@@ -7,7 +7,13 @@ from decimal import Decimal
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from tilavarauspalvelu.enums import AuthenticationType, PaymentType, ReservationKind, ReservationStartInterval
+from tilavarauspalvelu.enums import (
+    AccessType,
+    AuthenticationType,
+    PaymentType,
+    ReservationKind,
+    ReservationStartInterval,
+)
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.services.export import ReservationUnitExporter
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime_string, local_timedelta_string
@@ -42,6 +48,7 @@ def test_reservation_unit_export_multiple():
         reservation_unit_type__name="Normal",
         pricings__highest_price=Decimal(20),
         pricings__payment_type=PaymentType.ONLINE,
+        access_types__access_type=AccessType.UNRESTRICTED,
     )
 
     # when:
@@ -102,6 +109,7 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.require_reservation_handling
     assert row_2[next(index)] == AuthenticationType(reservation_unit_1.authentication).label
     assert row_2[next(index)] == ReservationKind(reservation_unit_1.reservation_kind).label
+    assert row_2[next(index)] == AccessType(reservation_unit_1.current_access_type).label
     assert row_2[next(index)] == PaymentType(reservation_unit_1.pricings.first().payment_type).label
     assert row_2[next(index)] == reservation_unit_1.can_apply_free_of_charge
     assert row_2[next(index)] == reservation_unit_1.reservation_pending_instructions_fi
@@ -201,6 +209,10 @@ def test_reservation_unit_export_multiple():
                 missing=Missing(null=["reservation_unit_type"]),
                 column_value_mapping={"Type": ""},
             ),
+            "Missing Access type": MissingParams(
+                missing=Missing(deleted=["access_types__access_type"]),
+                column_value_mapping={"Access type": ""},
+            ),
         },
     ),
 )
@@ -221,6 +233,7 @@ def test_reservation_unit_export_missing_relations(column_value_mapping, missing
         "cancellation_rule__name": "Cancellation rule",
         "metadata_set__name": "Metadata set",
         "pricings__highest_price": Decimal(20),
+        "access_types__access_type": AccessType.UNRESTRICTED,
     }
     missing.remove_from_data(data)
     ReservationUnitFactory.create(**data)

@@ -6,7 +6,13 @@ from typing import TYPE_CHECKING, Literal
 from django.db import models
 from lookup_property import L
 
-from tilavarauspalvelu.enums import AuthenticationType, PaymentType, ReservationKind, ReservationStartInterval
+from tilavarauspalvelu.enums import (
+    AccessType,
+    AuthenticationType,
+    PaymentType,
+    ReservationKind,
+    ReservationStartInterval,
+)
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing
 from utils.date_utils import local_date
 
@@ -61,6 +67,7 @@ class ReservationUnitExportRow(BaseExportRow):
     require_a_handling: str | bool = ""
     authentication: str = ""
     reservation_kind: str = ""
+    access_type: str = ""
     payment_type: str = ""
     can_apply_free_of_charge: str | bool = ""
     additional_instructions_for_pending_reservation_fi: str = ""
@@ -180,6 +187,7 @@ class ReservationUnitExporter(BaseCSVExporter):
                 require_a_handling="Require a handling",
                 authentication="Authentication",
                 reservation_kind="Reservation kind",
+                access_type="Access type",
                 payment_type="Payment type",
                 can_apply_free_of_charge="Can apply free of charge",
                 additional_instructions_for_pending_reservation_fi=(
@@ -236,6 +244,7 @@ class ReservationUnitExporter(BaseCSVExporter):
         pricing: ReservationUnitPricing = next(iter(instance.pricings.all()), None)
         start_interval = ReservationStartInterval(instance.reservation_start_interval)
         payment_type = getattr(pricing, "payment_type", None)
+        access_type = instance.current_access_type
         return [
             ReservationUnitExportRow(
                 reservation_unit_id=instance.id,
@@ -273,9 +282,10 @@ class ReservationUnitExporter(BaseCSVExporter):
                 reservation_ends_at=self.format_datetime(instance.reservation_ends_at),
                 reservation_metadata_set=getattr(instance.metadata_set, "name", ""),
                 require_a_handling=instance.require_reservation_handling,
-                authentication=AuthenticationType(instance.authentication).label,
-                reservation_kind=ReservationKind(instance.reservation_kind).label,
-                payment_type=PaymentType(payment_type).label if payment_type else "",
+                authentication=str(AuthenticationType(instance.authentication).label),
+                reservation_kind=str(ReservationKind(instance.reservation_kind).label),
+                access_type=str(AccessType(access_type).label) if access_type is not None else "",
+                payment_type=str(PaymentType(payment_type).label) if payment_type else "",
                 can_apply_free_of_charge=instance.can_apply_free_of_charge,
                 additional_instructions_for_pending_reservation_fi=instance.reservation_pending_instructions_fi,
                 additional_instructions_for_pending_reservation_sv=instance.reservation_pending_instructions_sv,
