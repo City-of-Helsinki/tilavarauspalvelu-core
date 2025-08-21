@@ -265,23 +265,25 @@ function Wrapper({
 
 export const RESERVATION_EDIT_PAGE_QUERY = gql`
   query ReservationEditPage($id: ID!) {
-    reservation(id: $id) {
-      id
-      pk
-      ...CreateTagString
-      ...ReservationCommonFields
-      ...ReservationMetaFields
-      ...ReservationTitleSectionFields
-      ...UseStaffReservation
-      reservationSeries {
+    node(id: $id) {
+      ... on ReservationNode {
         id
         pk
-        name
-      }
-      reservationUnit {
-        id
-        pk
-        ...ReservationTypeFormFields
+        ...CreateTagString
+        ...ReservationCommonFields
+        ...ReservationMetaFields
+        ...ReservationTitleSectionFields
+        ...UseStaffReservation
+        reservationSeries {
+          id
+          pk
+          name
+        }
+        reservationUnit {
+          id
+          pk
+          ...ReservationTypeFormFields
+        }
       }
     }
   }

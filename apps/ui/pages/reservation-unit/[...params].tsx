@@ -485,22 +485,24 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 export const RESERVATION_IN_PROGRESS_QUERY = gql`
   query Reservation($id: ID!) {
-    reservation(id: $id) {
-      id
-      pk
-      name
-      ...MetaFields
-      ...ReservationInfoCard
-      bufferTimeBefore
-      bufferTimeAfter
-      calendarUrl
-      reservationUnit {
+    node(id: $id) {
+      ... on ReservationNode {
         id
-        canApplyFreeOfCharge
-        ...CancellationRuleFields
-        ...MetadataSets
-        ...TermsOfUse
-        requireReservationHandling
+        pk
+        name
+        ...MetaFields
+        ...ReservationInfoCard
+        bufferTimeBefore
+        bufferTimeAfter
+        calendarUrl
+        reservationUnit {
+          id
+          canApplyFreeOfCharge
+          ...CancellationRuleFields
+          ...MetadataSets
+          ...TermsOfUse
+          requireReservationHandling
+        }
       }
     }
   }

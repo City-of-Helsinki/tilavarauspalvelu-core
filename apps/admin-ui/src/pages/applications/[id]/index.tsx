@@ -788,12 +788,14 @@ export const RESERVATION_UNIT_OPTION_FRAGMENT = gql`
 
 export const APPLICATION_ADMIN_QUERY = gql`
   query ApplicationAdmin($id: ID!) {
-    application(id: $id) {
-      ...ApplicationPageFields
-      workingMemo
-      user {
-        id
-        email
+    node(id: $id) {
+      ... on ApplicationNode {
+        ...ApplicationPageFields
+        workingMemo
+        user {
+          id
+          email
+        }
       }
     }
   }

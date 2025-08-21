@@ -436,124 +436,126 @@ export const RESERVATION_UNIT_EDIT_UNIT_FRAGMENT = gql`
 
 export const RESERVATION_UNIT_EDIT_QUERY = gql`
   query ReservationUnitEdit($id: ID!) {
-    reservationUnit(id: $id) {
-      id
-      pk
-      publishingState
-      reservationState
-      images {
-        pk
-        ...Image
-      }
-      haukiUrl
-      cancellationRule {
+    node(id: $id) {
+      ... on ReservationUnitNode {
         id
         pk
-      }
-      requireReservationHandling
-      nameFi
-      nameSv
-      nameEn
-      isDraft
-      authentication
-      spaces {
-        id
-        pk
+        publishingState
+        reservationState
+        images {
+          pk
+          ...Image
+        }
+        haukiUrl
+        cancellationRule {
+          id
+          pk
+        }
+        requireReservationHandling
         nameFi
-      }
-      resources {
-        id
-        pk
-        nameFi
-      }
-      purposes {
-        id
-        pk
-        nameFi
-      }
-      pricingTerms {
-        id
-        pk
-      }
-      reservationUnitType {
-        id
-        pk
-        nameFi
-      }
-      extUuid
-      requireAdultReservee
-      notesWhenApplyingFi
-      notesWhenApplyingSv
-      notesWhenApplyingEn
-      reservationKind
-      reservationPendingInstructionsFi
-      reservationPendingInstructionsSv
-      reservationPendingInstructionsEn
-      reservationConfirmedInstructionsFi
-      reservationConfirmedInstructionsSv
-      reservationConfirmedInstructionsEn
-      reservationCancelledInstructionsFi
-      reservationCancelledInstructionsSv
-      reservationCancelledInstructionsEn
-      maxReservationDuration
-      minReservationDuration
-      reservationStartInterval
-      canApplyFreeOfCharge
-      reservationsMinDaysBefore
-      reservationsMaxDaysBefore
-      equipments {
-        id
-        pk
-        nameFi
-      }
-      unit {
-        ...ReservationUnitEditUnit
-      }
-      minPersons
-      maxPersons
-      surfaceArea
-      descriptionFi
-      descriptionSv
-      descriptionEn
-      paymentTerms {
-        id
-        pk
-      }
-      cancellationTerms {
-        id
-        pk
-      }
-      serviceSpecificTerms {
-        id
-        pk
-      }
-      reservationBlockWholeDay
-      bufferTimeBefore
-      bufferTimeAfter
-      contactInformation
-      reservationBeginsAt
-      reservationEndsAt
-      publishBeginsAt
-      publishEndsAt
-      maxReservationsPerUser
-      metadataSet {
-        id
-        pk
-      }
-      pricings {
-        pk
-        ...PricingFields
-        lowestPriceNet
-        highestPriceNet
-      }
-      applicationRoundTimeSlots {
-        ...ApplicationRoundTimeSlots
-      }
-      accessTypes(isActiveOrFuture: true) {
-        id
-        pk
-        accessType
-        beginDate
+        nameSv
+        nameEn
+        isDraft
+        authentication
+        spaces {
+          id
+          pk
+          nameFi
+        }
+        resources {
+          id
+          pk
+          nameFi
+        }
+        purposes {
+          id
+          pk
+          nameFi
+        }
+        pricingTerms {
+          id
+          pk
+        }
+        reservationUnitType {
+          id
+          pk
+          nameFi
+        }
+        extUuid
+        requireAdultReservee
+        notesWhenApplyingFi
+        notesWhenApplyingSv
+        notesWhenApplyingEn
+        reservationKind
+        reservationPendingInstructionsFi
+        reservationPendingInstructionsSv
+        reservationPendingInstructionsEn
+        reservationConfirmedInstructionsFi
+        reservationConfirmedInstructionsSv
+        reservationConfirmedInstructionsEn
+        reservationCancelledInstructionsFi
+        reservationCancelledInstructionsSv
+        reservationCancelledInstructionsEn
+        maxReservationDuration
+        minReservationDuration
+        reservationStartInterval
+        canApplyFreeOfCharge
+        reservationsMinDaysBefore
+        reservationsMaxDaysBefore
+        equipments {
+          id
+          pk
+          nameFi
+        }
+        unit {
+          ...ReservationUnitEditUnit
+        }
+        minPersons
+        maxPersons
+        surfaceArea
+        descriptionFi
+        descriptionSv
+        descriptionEn
+        paymentTerms {
+          id
+          pk
+        }
+        cancellationTerms {
+          id
+          pk
+        }
+        serviceSpecificTerms {
+          id
+          pk
+        }
+        reservationBlockWholeDay
+        bufferTimeBefore
+        bufferTimeAfter
+        contactInformation
+        reservationBeginsAt
+        reservationEndsAt
+        publishBeginsAt
+        publishEndsAt
+        maxReservationsPerUser
+        metadataSet {
+          id
+          pk
+        }
+        pricings {
+          pk
+          ...PricingFields
+          lowestPriceNet
+          highestPriceNet
+        }
+        applicationRoundTimeSlots {
+          ...ApplicationRoundTimeSlots
+        }
+        accessTypes(filter: { isActiveOrFuture: true }) {
+          id
+          pk
+          accessType
+          beginDate
+        }
       }
     }
   }
@@ -647,11 +649,13 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
 
 export const RESERVATION_UNIT_CREATE_UNIT_QUERY = gql`
   query ReservationUnitCreateUnit($id: ID!) {
-    unit(id: $id) {
-      id
-      pk
-      nameFi
-      ...ReservationUnitEditUnit
+    node(id: $id) {
+      ... on UnitNode {
+        id
+        pk
+        nameFi
+        ...ReservationUnitEditUnit
+      }
     }
   }
 `;

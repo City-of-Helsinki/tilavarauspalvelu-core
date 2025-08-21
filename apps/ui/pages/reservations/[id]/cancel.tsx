@@ -115,34 +115,36 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 export const RESERVATION_CANCEL_PAGE_QUERY = gql`
   query ReservationCancelPage($id: ID!) {
-    reservation(id: $id) {
-      id
-      ...ReservationInfoCard
-      name
-      reservationUnit {
+    node(id: $id) {
+      ... on ReservationNode {
         id
-        ...CancellationRuleFields
-        cancellationTerms {
-          ...TermsOfUseTextFields
-        }
-      }
-      reservationSeries {
-        id
+        ...ReservationInfoCard
         name
-        allocatedTimeSlot {
+        reservationUnit {
           id
-          pk
-          reservationUnitOption {
+          ...CancellationRuleFields
+          cancellationTerms {
+            ...TermsOfUseTextFields
+          }
+        }
+        reservationSeries {
+          id
+          name
+          allocatedTimeSlot {
             id
-            applicationSection {
+            pk
+            reservationUnitOption {
               id
-              application {
+              applicationSection {
                 id
-                pk
-                applicationRound {
+                application {
                   id
-                  termsOfUse {
-                    ...TermsOfUseTextFields
+                  pk
+                  applicationRound {
+                    id
+                    termsOfUse {
+                      ...TermsOfUseTextFields
+                    }
                   }
                 }
               }

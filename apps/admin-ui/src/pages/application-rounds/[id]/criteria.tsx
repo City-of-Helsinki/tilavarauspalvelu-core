@@ -141,26 +141,28 @@ export async function getServerSideProps({ locale, query }: GetServerSidePropsCo
 
 export const APPLICATION_ROUND_QUERY = gql`
   query ApplicationRoundCriteria($id: ID!) {
-    applicationRound(id: $id) {
-      id
-      pk
-      nameFi
-      reservationUnitCount
-      applicationPeriodBeginsAt
-      applicationPeriodEndsAt
-      reservationPeriodBeginDate
-      reservationPeriodEndDate
-      reservationUnits {
+    node(id: $id) {
+      ... on ApplicationRoundNode {
         id
         pk
         nameFi
-        spaces {
+        reservationUnitCount
+        applicationPeriodBeginsAt
+        applicationPeriodEndsAt
+        reservationPeriodBeginDate
+        reservationPeriodEndDate
+        reservationUnits {
           id
+          pk
           nameFi
-        }
-        unit {
-          id
-          nameFi
+          spaces {
+            id
+            nameFi
+          }
+          unit {
+            id
+            nameFi
+          }
         }
       }
     }
