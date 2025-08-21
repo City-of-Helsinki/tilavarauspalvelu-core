@@ -171,7 +171,10 @@ export const BANNER_NOTIFICATION_COMMON_FRAGMENT = gql`
 
 // Always get ALL target + either USER or STAFF target
 export const NOTIFICATIONS_LIST_ALL = gql`
-  query ShowNotificationsList($target: BannerNotificationTarget!) {
+  query ShowNotificationsList(
+    # Filter
+    $target: BannerNotificationTarget!
+  ) {
     bannerNotifications(filter: { isVisible: true, target: $target }) {
       edges {
         node {

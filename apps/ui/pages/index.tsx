@@ -63,7 +63,11 @@ export default Home;
 
 // TODO we can limit the number of purposes and units fetched
 export const FRONT_PAGE_QUERY = gql`
-  query FrontPage($orderBy: [PurposeOrderSet], $orderUnitsBy: [UnitOrderSet!]) {
+  query FrontPage(
+    $orderBy: [PurposeOrderSet]
+    # Filter
+    $orderUnitsBy: [UnitOrderSet!]
+  ) {
     purposes(orderBy: $orderBy) {
       edges {
         node {
@@ -71,7 +75,7 @@ export const FRONT_PAGE_QUERY = gql`
         }
       }
     }
-    units(publishedReservationUnits: true, orderBy: $orderUnitsBy) {
+    units(orderBy: $orderUnitsBy, filter: { publishedReservationUnits: true }) {
       edges {
         node {
           ...UnitListFields
