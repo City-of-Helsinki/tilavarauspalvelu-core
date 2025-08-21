@@ -318,7 +318,7 @@ export const APPLICATION_SECTION_CANCEL_QUERY = gql`
       }
     }
 
-    reservationCancelReasons {
+    allReservationCancelReasons {
       ...CancelReasonFields
     }
   }

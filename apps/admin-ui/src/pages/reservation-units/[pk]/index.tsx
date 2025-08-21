@@ -598,48 +598,32 @@ export const UPDATE_IMAGE_TYPE = gql`
 `;
 
 export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
-  query ReservationUnitEditorParameters($equipmentsOrderBy: EquipmentOrderSet) {
-    equipmentsAll(orderBy: [$equipmentsOrderBy]) {
+  query ReservationUnitEditorParameters($equipmentsOrderBy: EquipmentOrderSet!) {
+    allEquipments(orderBy: [$equipmentsOrderBy]) {
       id
       nameFi
       pk
     }
-    taxPercentages {
-      edges {
-        node {
-          id
-          pk
-          value
-        }
-      }
+    allTaxPercentages {
+      id
+      pk
+      value
     }
-    purposes {
-      edges {
-        node {
-          id
-          pk
-          nameFi
-        }
-      }
+    allPurposes {
+      id
+      pk
+      nameFi
     }
-    reservationUnitTypes {
-      edges {
-        node {
-          id
-          nameFi
-          pk
-        }
-      }
+    allReservationUnitTypes {
+      id
+      nameFi
+      pk
     }
-    termsOfUse {
-      edges {
-        node {
-          id
-          pk
-          nameFi
-          termsType
-        }
-      }
+    allTermsOfUse {
+      id
+      pk
+      nameFi
+      termsType
     }
     reservationUnitCancellationRules {
       edges {
@@ -650,14 +634,10 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
         }
       }
     }
-    metadataSets {
-      edges {
-        node {
-          id
-          name
-          pk
-        }
-      }
+    allMetadataSets {
+      id
+      name
+      pk
     }
   }
 `;

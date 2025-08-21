@@ -438,7 +438,7 @@ export const RESERVATION_PAGE_QUERY = gql`
 
 export const RESERVATION_CANCEL_REASONS_QUERY = gql`
   query ReservationCancelReasons {
-    reservationCancelReasons {
+    allReservationCancelReasons {
       ...CancelReasonFields
     }
   }

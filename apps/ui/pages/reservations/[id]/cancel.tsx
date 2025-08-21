@@ -154,7 +154,7 @@ export const RESERVATION_CANCEL_PAGE_QUERY = gql`
       }
     }
 
-    reservationCancelReasons {
+    allReservationCancelReasons {
       ...CancelReasonFields
     }
   }
