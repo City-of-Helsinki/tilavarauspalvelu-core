@@ -222,7 +222,7 @@ export const APPLICATION_ROUND_LIST_FRAGMENT = gql`
 
 export const APPLICATION_ROUND_LIST_QUERY = gql`
   query ApplicationRoundList {
-    applicationRounds(onlyWithPermissions: true) {
+    applicationRounds(filter: { onlyWithPermissions: true }) {
       edges {
         node {
           ...ApplicationRoundListElement

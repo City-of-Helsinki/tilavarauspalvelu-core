@@ -466,42 +466,44 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
   query ApplicationSectionAllocations(
+    $after: String
+    # Filter
+    $ageGroup: [Int!]
+    $applicantType: [ReserveeType!]
     $applicationRound: Int!
-    $applicationStatus: [ApplicationStatusChoice]!
-    $status: [ApplicationSectionStatusChoice]
-    $applicantType: [ReserveeType]
-    $preferredOrder: [Int]
-    $textSearch: String
-    $priority: [Priority]
-    $purpose: [Int]
-    $reservationUnit: Int!
+    $applicationStatus: [ApplicationStatusChoice!]!
     $beginDate: Date!
     $endDate: Date!
-    $ageGroup: [Int]
-    $municipality: [MunicipalityChoice]
-    $includePreferredOrder10OrHigher: Boolean
-    $after: String
+    $includePreferredOrder10OrHigher: Boolean!
+    $municipality: [MunicipalityChoice!]
+    $preferredOrder: [Int!]!
+    $priority: [Priority!]
+    $purpose: [Int!]
+    $reservationUnit: Int!
+    $status: [ApplicationSectionStatusChoice!]
+    $textSearch: String
   ) {
     applicationSections(
-      applicationRound: $applicationRound
-      applicationStatus: $applicationStatus
-      status: $status
-      applicantType: $applicantType
-      preferredOrder: $preferredOrder
-      textSearch: $textSearch
-      priority: $priority
-      purpose: $purpose
-      reservationUnit: [$reservationUnit]
-      ageGroup: $ageGroup
-      municipality: $municipality
-      includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
       after: $after
+      filter: {
+        ageGroup: $ageGroup
+        applicantType: $applicantType
+        applicationRound: $applicationRound
+        applicationStatus: $applicationStatus
+        municipality: $municipality
+        preferredOrder: { values: $preferredOrder, allHigherThan10: $includePreferredOrder10OrHigher }
+        priority: $priority
+        purpose: $purpose
+        reservationUnit: [$reservationUnit]
+        status: $status
+        textSearch: $textSearch
+      }
     ) {
       edges {
         node {
           ...ApplicationSectionFields
           allocations
-          suitableTimeRanges(fulfilled: false) {
+          suitableTimeRanges(filter: { fulfilled: false }) {
             id
             beginTime
             endTime
@@ -545,15 +547,17 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
 export const ALL_EVENTS_PER_UNIT_QUERY = gql`
   query AllApplicationEvents(
     $applicationRound: Int!
-    $applicationStatus: [ApplicationStatusChoice]!
-    $unit: [Int]!
-    $reservationUnit: [Int]!
+    $applicationStatus: [ApplicationStatusChoice!]!
+    $reservationUnit: [Int!]!
+    $unit: [Int!]!
   ) {
     applicationSections(
-      applicationRound: $applicationRound
-      reservationUnit: $reservationUnit
-      unit: $unit
-      applicationStatus: $applicationStatus
+      filter: {
+        applicationRound: $applicationRound
+        applicationStatus: $applicationStatus
+        reservationUnit: $reservationUnit
+        unit: $unit
+      }
     ) {
       edges {
         node {

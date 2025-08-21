@@ -171,8 +171,13 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 // NOTE because this doesn't have pagination we use orderBy for development purposes only
 // if you create new application it's the first one in the list
 export const APPLICATIONS = gql`
-  query Applications($user: Int!, $status: [ApplicationStatusChoice]!, $orderBy: [ApplicationOrderSet!]!) {
-    applications(user: $user, status: $status, orderBy: $orderBy) {
+  query Applications(
+    $orderBy: [ApplicationOrderSet!]!
+    # Filter
+    $user: Int!
+    $status: [ApplicationStatusChoice!]!
+  ) {
+    applications(orderBy: $orderBy, filter: { user: $user, status: $status }) {
       edges {
         node {
           ...ApplicationsGroup

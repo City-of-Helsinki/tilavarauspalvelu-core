@@ -520,7 +520,7 @@ export const CONFIRM_RESERVATION = gql`
     confirmReservation(input: $input) {
       pk
       state
-      order {
+      paymentOrder {
         id
         checkoutUrl
       }
