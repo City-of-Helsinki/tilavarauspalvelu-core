@@ -273,43 +273,45 @@ export default ReservationCancelPage;
 // need to do frontend mods to call the function but the query is a lot simpler for backend
 export const APPLICATION_SECTION_CANCEL_QUERY = gql`
   query ApplicationSectionCancel($id: ID!) {
-    applicationSection(id: $id) {
-      pk
-      id
-      name
-      reservationsBeginDate
-      reservationsEndDate
-      reservationUnitOptions {
+    node(id: $id) {
+      ... on ApplicationSectionNode {
+        pk
         id
-        reservationUnit {
+        name
+        reservationsBeginDate
+        reservationsEndDate
+        reservationUnitOptions {
           id
-          pk
-          nameEn
-          nameFi
-          nameSv
-        }
-        allocatedTimeSlots {
-          id
-          dayOfTheWeek
-          beginTime
-          endTime
-          reservationSeries {
+          reservationUnit {
             id
-            reservations {
+            pk
+            nameEn
+            nameFi
+            nameSv
+          }
+          allocatedTimeSlots {
+            id
+            dayOfTheWeek
+            beginTime
+            endTime
+            reservationSeries {
               id
-              state
-              ...CanUserCancelReservation
+              reservations {
+                id
+                state
+                ...CanUserCancelReservation
+              }
             }
           }
         }
-      }
-      application {
-        id
-        pk
-        applicationRound {
+        application {
           id
-          termsOfUse {
-            ...TermsOfUseTextFields
+          pk
+          applicationRound {
+            id
+            termsOfUse {
+              ...TermsOfUseTextFields
+            }
           }
         }
       }

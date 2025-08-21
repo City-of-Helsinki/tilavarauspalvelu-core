@@ -508,17 +508,19 @@ export default Reservation;
 
 export const GET_APPLICATION_RESERVATION_SERIES_QUERY = gql`
   query ApplicationReservationSeries($id: ID!) {
-    reservationSeries(id: $id) {
-      id
-      allocatedTimeSlot {
+    node(id: $id) {
+      ... on ReservationSeriesNode {
         id
-        reservationUnitOption {
+        allocatedTimeSlot {
           id
-          applicationSection {
+          reservationUnitOption {
             id
-            application {
+            applicationSection {
               id
-              pk
+              application {
+                id
+                pk
+              }
             }
           }
         }
@@ -529,30 +531,32 @@ export const GET_APPLICATION_RESERVATION_SERIES_QUERY = gql`
 
 export const GET_RESERVATION_PAGE_QUERY = gql`
   query ReservationPage($id: ID!) {
-    reservation(id: $id) {
-      id
-      type
-      ...MetaFields
-      ...ReservationInfoCard
-      ...Instructions
-      ...CanReservationBeChanged
-      calendarUrl
-      ...ReservationPaymentUrl
-      paymentOrder {
+    node(id: $id) {
+      ... on ReservationNode {
         id
-        receiptUrl
-      }
-      reservationSeries {
-        id
-      }
-      reservationUnit {
-        id
-        unit {
-          ...AddressFields
+        type
+        ...MetaFields
+        ...ReservationInfoCard
+        ...Instructions
+        ...CanReservationBeChanged
+        calendarUrl
+        ...ReservationPaymentUrl
+        paymentOrder {
+          id
+          receiptUrl
         }
-        canApplyFreeOfCharge
-        ...MetadataSets
-        ...TermsOfUse
+        reservationSeries {
+          id
+        }
+        reservationUnit {
+          id
+          unit {
+            ...AddressFields
+          }
+          canApplyFreeOfCharge
+          ...MetadataSets
+          ...TermsOfUse
+        }
       }
     }
   }

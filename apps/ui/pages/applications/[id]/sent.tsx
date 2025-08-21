@@ -102,10 +102,12 @@ export default Sent;
 
 export const APPLICATION_SENT_PAGE_QUERY = gql`
   query ApplicationSentPage($id: ID!) {
-    application(id: $id) {
-      id
-      pk
-      status
+    node(id: $id) {
+      ... on ApplicationNode {
+        id
+        pk
+        status
+      }
     }
   }
 `;

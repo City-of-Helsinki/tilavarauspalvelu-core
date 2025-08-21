@@ -33,11 +33,13 @@ export function useReservationSeries(recurringPk: Maybe<number> | undefined) {
 
 export const RESERVATION_SERIES_QUERY = gql`
   query ReservationSeries($id: ID!) {
-    reservationSeries(id: $id) {
-      ...ReservationSeriesFields
-      reservations {
-        id
-        handlingDetails
+    node(id: $id) {
+      ... on ReservationSeriesNode {
+        ...ReservationSeriesFields
+        reservations {
+          id
+          handlingDetails
+        }
       }
     }
   }

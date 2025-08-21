@@ -242,12 +242,14 @@ export function ReservationReserveeDetailsSection({
 // so don't make them automatically or inside other queries
 export const RESERVATION_DATE_OF_BIRTH_QUERY = gql`
   query ReservationDateOfBirth($id: ID!) {
-    reservation(id: $id) {
-      id
-      user {
+    node(id: $id) {
+      ... on ReservationNode {
         id
-        pk
-        dateOfBirth
+        user {
+          id
+          pk
+          dateOfBirth
+        }
       }
     }
   }

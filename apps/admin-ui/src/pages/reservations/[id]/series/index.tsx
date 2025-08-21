@@ -381,23 +381,25 @@ function SeriesPageInner({ pk }: { pk: number }) {
 // it has paymentOrder and reservationUnit for each reservation (not necessary)
 export const SERIES_PAGE_QUERY = gql`
   query SeriesPage($id: ID!) {
-    reservation(id: $id) {
-      id
-      pk
-      type
-      reservationSeries {
-        ...ReservationSeriesFields
-        recurrenceInDays
-        endTime
-        beginTime
-      }
-      reservationUnit {
+    node(id: $id) {
+      ... on ReservationNode {
         id
         pk
-        nameFi
-        bufferTimeBefore
-        bufferTimeAfter
-        reservationStartInterval
+        type
+        reservationSeries {
+          ...ReservationSeriesFields
+          recurrenceInDays
+          endTime
+          beginTime
+        }
+        reservationUnit {
+          id
+          pk
+          nameFi
+          bufferTimeBefore
+          bufferTimeAfter
+          reservationStartInterval
+        }
       }
     }
   }

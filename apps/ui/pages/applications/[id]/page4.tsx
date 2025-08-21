@@ -165,8 +165,10 @@ export default Page4;
 // TODO narrow down the query fragment (if possible), need at least TermsOfUse and ApplicationForm
 export const APPLICATION_PREVIEW_QUERY = gql`
   query ApplicationPage4($id: ID!) {
-    application(id: $id) {
-      ...ApplicationView
+    node(id: $id) {
+      ... on ApplicationNode {
+        ...ApplicationView
+      }
     }
   }
 `;

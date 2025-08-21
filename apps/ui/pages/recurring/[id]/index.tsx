@@ -213,18 +213,20 @@ export default SeasonalSearch;
 
 export const APPLICATION_ROUND_QUERY = gql`
   query ApplicationRound($id: ID!) {
-    applicationRound(id: $id) {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-      status
-      reservationPeriodBeginDate
-      reservationPeriodEndDate
-      reservationUnits {
+    node(id: $id) {
+      ... on ApplicationRoundNode {
         id
         pk
+        nameFi
+        nameEn
+        nameSv
+        status
+        reservationPeriodBeginDate
+        reservationPeriodEndDate
+        reservationUnits {
+          id
+          pk
+        }
       }
     }
   }
