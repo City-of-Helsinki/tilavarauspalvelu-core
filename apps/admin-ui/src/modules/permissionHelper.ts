@@ -68,7 +68,8 @@ function hasGeneralPermission(permission: UserPermissionChoice, user: UserNode) 
   return roles.find((x) => x.permissions?.find((y) => y === permission) != null);
 }
 
-/// Returns true if the user is allowed to perform operation for a specific unit or service sector
+/// Check if the user has a specific permission in any of their roles
+/// If a unitPk is provided, check if the user has that permission for that specific unit, otherwise check for any units
 export function hasPermission(
   user: CurrentUserQuery["currentUser"],
   permissionName: UserPermissionChoice,
@@ -85,6 +86,9 @@ export function hasPermission(
   }
 
   if (unitPk && hasUnitPermission(permissionName, unitPk, user)) {
+    return true;
+  }
+  if (!unitPk && hasSomePermission(user, permissionName)) {
     return true;
   }
 
