@@ -220,7 +220,7 @@ enum ApplicationStatusChoice {
   """Handled"""
   HANDLED
   """Results Sent"""
-  RESULT_SENT
+  RESULTS_SENT
   """Expired"""
   EXPIRED
   """Cancelled"""
