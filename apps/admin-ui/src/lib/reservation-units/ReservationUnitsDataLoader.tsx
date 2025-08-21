@@ -113,35 +113,38 @@ export function ReservationUnitsDataReader(): JSX.Element {
 
 export const SEARCH_RESERVATION_UNITS_QUERY = gql`
   query SearchReservationUnits(
-    $after: String
     $first: Int
-    $textSearch: String
+    $after: String
+    $orderBy: [ReservationUnitOrderSet!]
+    # Filter
     $maxPersonsGte: Int
     $maxPersonsLte: Int
+    $publishingState: [ReservationUnitPublishingState!]
+    $reservationUnitType: [Int!]
     $surfaceAreaGte: Int
     $surfaceAreaLte: Int
-    $unit: [Int]
-    $unitGroup: [Int]
-    $reservationUnitType: [Int]
-    $orderBy: [ReservationUnitOrderSet!]
-    $publishingState: [ReservationUnitPublishingState]
+    $textSearch: String
+    $unit: [Int!]
+    $unitGroup: [Int!]
   ) {
     reservationUnits(
       first: $first
       after: $after
       orderBy: $orderBy
-      textSearch: $textSearch
-      maxPersonsGte: $maxPersonsGte
-      minPersonsGte: $maxPersonsGte
-      maxPersonsLte: $maxPersonsLte
-      minPersonsLte: $maxPersonsLte
-      surfaceAreaGte: $surfaceAreaGte
-      surfaceAreaLte: $surfaceAreaLte
-      unit: $unit
-      unitGroup: $unitGroup
-      reservationUnitType: $reservationUnitType
-      publishingState: $publishingState
-      onlyWithPermission: true
+      filter: {
+        maxPersonsGte: $maxPersonsGte
+        maxPersonsLte: $maxPersonsLte
+        minPersonsGte: $maxPersonsGte
+        minPersonsLte: $maxPersonsLte
+        onlyWithPermission: true
+        publishingState: $publishingState
+        reservationUnitType: $reservationUnitType
+        surfaceAreaGte: $surfaceAreaGte
+        surfaceAreaLte: $surfaceAreaLte
+        textSearch: $textSearch
+        unit: $unit
+        unitGroup: $unitGroup
+      }
     ) {
       edges {
         node {

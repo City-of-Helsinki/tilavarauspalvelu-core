@@ -156,7 +156,7 @@ export const SINGLE_SEARCH_CARD_FRAGMENT = gql`
     isClosed
     firstReservableDatetime
     currentAccessType
-    accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
+    accessTypes(orderBy: [beginDateAsc], filter: { isActiveOrFuture: true }) {
       id
       accessType
     }

@@ -1059,7 +1059,7 @@ export const APPLICATION_SECTION_RESERVATION_FRAGMENT = gql`
             beginDatetime
             endDatetime
           }
-          reservations(orderBy: [beginsAtAsc], beginDate: $beginDate) {
+          reservations(orderBy: [beginsAtAsc], filter: { beginDate: $beginDate }) {
             id
             pk
             endsAt

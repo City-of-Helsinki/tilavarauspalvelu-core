@@ -26,8 +26,12 @@ export function useHandling() {
 }
 
 export const HANDLING_COUNT_QUERY = gql`
-  query HandlingData($beginDate: Date!, $state: [ReservationStateChoice]!) {
-    reservations(state: $state, beginDate: $beginDate, onlyWithHandlingPermission: true) {
+  query HandlingData(
+    # Filter
+    $beginDate: Date!
+    $state: [ReservationStateChoice!]!
+  ) {
+    reservations(filter: { state: $state, beginDate: $beginDate, onlyWithHandlingPermission: true }) {
       edges {
         node {
           id
