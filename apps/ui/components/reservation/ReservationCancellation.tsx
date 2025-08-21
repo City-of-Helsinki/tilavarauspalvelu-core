@@ -175,7 +175,7 @@ function getTranslatedTerms(
 }
 
 export const CANCEL_RESERVATION = gql`
-  mutation CancelReservation($input: ReservationCancellationMutationInput!) {
+  mutation CancelReservation($input: ReservationCancellationMutation!) {
     cancelReservation(input: $input) {
       pk
     }

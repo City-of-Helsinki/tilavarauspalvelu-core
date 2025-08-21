@@ -557,7 +557,7 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
 `;
 
 export const UPDATE_RESERVATION_UNIT = gql`
-  mutation UpdateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
+  mutation UpdateReservationUnit($input: ReservationUnitUpdateMutation!) {
     updateReservationUnit(input: $input) {
       pk
     }
@@ -565,7 +565,7 @@ export const UPDATE_RESERVATION_UNIT = gql`
 `;
 
 export const CREATE_RESERVATION_UNIT = gql`
-  mutation CreateReservationUnit($input: ReservationUnitCreateMutationInput!) {
+  mutation CreateReservationUnit($input: ReservationUnitCreateMutation!) {
     createReservationUnit(input: $input) {
       pk
     }

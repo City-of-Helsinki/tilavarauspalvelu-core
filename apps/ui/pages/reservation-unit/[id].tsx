@@ -28,7 +28,7 @@ import {
   type RelatedReservationUnitsQuery,
   type RelatedReservationUnitsQueryVariables,
   type RelatedUnitCardFieldsFragment,
-  type ReservationCreateMutationInput,
+  type ReservationCreateMutation,
   ReservationUnitPageDocument,
   type ReservationUnitPageQuery,
   type ReservationUnitPageQueryVariables,
@@ -306,7 +306,7 @@ function ReservationUnit({
       throw new Error("Reservation slot is not reservable");
     }
     const { start, end } = slot;
-    const input: ReservationCreateMutationInput = {
+    const input: ReservationCreateMutation = {
       beginsAt: start.toISOString(),
       endsAt: end.toISOString(),
       reservationUnit: reservationUnit.pk,
@@ -359,7 +359,7 @@ function ReservationUnit({
 
   const [createReservationMutation] = useCreateReservationMutation();
 
-  const createReservation = async (input: ReservationCreateMutationInput): Promise<void> => {
+  const createReservation = async (input: ReservationCreateMutation): Promise<void> => {
     try {
       if (reservationUnit.pk == null) {
         throw new Error("Reservation unit pk is missing");
@@ -660,7 +660,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const endsAt = ignoreMaybeArray(query.end);
 
     if (beginsAt != null && endsAt != null) {
-      const input: ReservationCreateMutationInput = {
+      const input: ReservationCreateMutation = {
         beginsAt,
         endsAt,
         reservationUnit: pk,
@@ -816,7 +816,7 @@ export const RELATED_RESERVATION_UNITS_QUERY = gql`
 `;
 
 export const CREATE_RESERVATION = gql`
-  mutation CreateReservation($input: ReservationCreateMutationInput!) {
+  mutation CreateReservation($input: ReservationCreateMutation!) {
     createReservation(input: $input) {
       pk
     }
