@@ -767,37 +767,44 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 export default ReservationUnitWrapped;
 
 export const RESERVATION_UNIT_PAGE_QUERY = gql`
-  query ReservationUnitPage($id: ID!, $beginDate: Date!, $endDate: Date!) {
-    reservationUnit(id: $id) {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-      ...AvailableTimesReservationUnitFields
-      ...NotReservableFields
-      ...ReservationTimePickerFields
-      ...MetadataSets
-      ...ReservationUnitHead
-      unit {
-        ...AddressFields
-      }
-      extUuid
-      ...TermsOfUse
-      isDraft
-      applicationRoundTimeSlots {
-        ...ApplicationRoundTimeSlotFields
-      }
-      descriptionFi
-      descriptionEn
-      descriptionSv
-      canApplyFreeOfCharge
-      ...ReservationInfoSection
-      ...ReservationQuotaReached
-      publishingState
-      equipments {
+  query ReservationUnitPage(
+    # Filter
+    $id: ID!
+    $beginDate: Date! # Used in fragments
+    $endDate: Date! # Used in fragments
+  ) {
+    node(id: $id) {
+      ... on ReservationUnitNode {
         id
-        ...EquipmentFields
+        pk
+        nameFi
+        nameEn
+        nameSv
+        ...AvailableTimesReservationUnitFields
+        ...NotReservableFields
+        ...ReservationTimePickerFields
+        ...MetadataSets
+        ...ReservationUnitHead
+        unit {
+          ...AddressFields
+        }
+        extUuid
+        ...TermsOfUse
+        isDraft
+        applicationRoundTimeSlots {
+          ...ApplicationRoundTimeSlotFields
+        }
+        descriptionFi
+        descriptionEn
+        descriptionSv
+        canApplyFreeOfCharge
+        ...ReservationInfoSection
+        ...ReservationQuotaReached
+        publishingState
+        equipments {
+          id
+          ...EquipmentFields
+        }
       }
     }
   }

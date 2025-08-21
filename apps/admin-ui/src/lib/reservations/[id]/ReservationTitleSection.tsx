@@ -125,20 +125,22 @@ export const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
 
 export const APPLICATION_LINK_QUERY = gql`
   query ReservationApplicationLink($id: ID!) {
-    reservationSeries(id: $id) {
-      id
-      allocatedTimeSlot {
+    node(id: $id) {
+      ... on ReservationSeriesNode {
         id
-        pk
-        reservationUnitOption {
+        allocatedTimeSlot {
           id
           pk
-          applicationSection {
+          reservationUnitOption {
             id
             pk
-            application {
+            applicationSection {
               id
               pk
+              application {
+                id
+                pk
+              }
             }
           }
         }
