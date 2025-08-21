@@ -7,10 +7,12 @@ export function useToastIfQueryParam({
   key,
   message,
   type = "success",
+  title,
 }: {
   key: string | string[];
   message: string | (() => string);
-  type?: "success" | "error";
+  type?: "success" | "error" | "alert";
+  title?: string | (() => string);
 }) {
   const router = useRouter();
   const { t } = useTranslation();
@@ -43,11 +45,13 @@ export function useToastIfQueryParam({
     };
     const q = router.query;
 
+    const titleText = title ? (typeof title === "string" ? title : title()) : undefined;
     const text = typeof message === "string" ? message : message();
     const handle = () => {
       toast({
         text,
         type,
+        label: titleText,
       });
       removeTimeUpdatedParam();
     };

@@ -202,6 +202,13 @@ function Reservation({
   });
 
   useToastIfQueryParam({
+    key: "polling_timeout",
+    title: t("reservations:notifications.polling_timeout.title"),
+    message: t("reservations:notifications.polling_timeout.body"),
+    type: "alert",
+  });
+
+  useToastIfQueryParam({
     key: "error_code",
     message:
       params.get("error_code") === "RESERVATION_NOT_CONFIRMED" ||

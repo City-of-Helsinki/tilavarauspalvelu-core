@@ -4,11 +4,14 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath } from "@/modules/urls";
 import { createApolloClient } from "@/modules/apolloClient";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { CenterSpinner } from "common/styled";
 import { ignoreMaybeArray } from "common/src/helpers";
 import { gql } from "@apollo/client";
+
+const POLL_INTERVAL_MS = 500;
+const STOP_POLLING_TIMEOUT_MS = 30000;
 
 // TODO should be moved to /reservations/success
 // but because this is webstore callback page we need to leave the url (use an url rewrite)
@@ -38,6 +41,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   if (reservation == null) {
     return notFoundValue;
   }
+
   const destination = getRedirectUrl(reservation);
   if (destination != null) {
     return {
@@ -51,6 +55,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       },
     };
   }
+
   return {
     props: {
       reservation,
@@ -93,15 +98,24 @@ type NarrowedProps = Exclude<Props, { notFound: boolean }>;
 /// the reservation is paid and confirmed but our backend hasn't updated the state yet
 function Page(props: NarrowedProps): JSX.Element {
   const id = props.reservation.id;
+  const [isPolling, setIsPolling] = useState(true);
   // is there a point where we stop polling and return an error to the user?
-  const { data } = useReservationStateQuery({
+  const { data, stopPolling } = useReservationStateQuery({
     variables: {
       id,
     },
-    pollInterval: 500,
+    pollInterval: isPolling ? POLL_INTERVAL_MS : 0,
   });
 
   const router = useRouter();
+  useEffect(() => {
+    const endPolling = setTimeout(() => {
+      setIsPolling(false);
+      stopPolling();
+      router.replace(getReservationPath(props.reservation.pk, undefined, "polling_timeout"));
+    }, STOP_POLLING_TIMEOUT_MS);
+    return () => clearTimeout(endPolling);
+  }, [stopPolling, props.reservation.pk, router]);
 
   useEffect(() => {
     const reservation = data?.reservation;
@@ -114,9 +128,11 @@ function Page(props: NarrowedProps): JSX.Element {
     }
     const redirectUrl = getRedirectUrl(reservation);
     if (redirectUrl != null) {
+      setIsPolling(false);
+      stopPolling();
       router.replace(redirectUrl);
     }
-  }, [data, router]);
+  }, [data, router, stopPolling]);
 
   return <CenterSpinner />;
 }
