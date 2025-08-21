@@ -19,7 +19,7 @@ export function useHandling() {
   });
 
   const handlingCount: number = data?.reservations?.edges?.length ?? 0;
-  const unitCount: number = data?.unitsAll?.length ?? 0;
+  const unitCount: number = data?.allUnits?.length ?? 0;
   const hasOwnUnits: boolean = unitCount > 0;
 
   return { handlingCount, hasOwnUnits, refetch };
@@ -39,7 +39,7 @@ export const HANDLING_COUNT_QUERY = gql`
         }
       }
     }
-    unitsAll(onlyWithPermission: true) {
+    allUnits(filter: { onlyWithPermission: true }) {
       id
     }
   }
