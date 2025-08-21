@@ -635,19 +635,21 @@ export const BANNER_NOTIFICATIONS_DELETE = gql`
 
 export const BANNER_NOTIFICATION_PAGE_QUERY = gql`
   query BannerNotificationPage($id: ID!) {
-    bannerNotification(id: $id) {
-      id
-      pk
-      level
-      activeFrom
-      messageEn
-      messageFi
-      messageSv
-      name
-      target
-      activeUntil
-      draft
-      state
+    node(id: $id) {
+      ... on BannerNotificationNode {
+        id
+        pk
+        level
+        activeFrom
+        messageEn
+        messageFi
+        messageSv
+        name
+        target
+        activeUntil
+        draft
+        state
+      }
     }
   }
 `;

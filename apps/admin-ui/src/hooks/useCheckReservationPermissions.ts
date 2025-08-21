@@ -19,13 +19,15 @@ export function useCheckReservationPermissions(pk: number) {
 
 export const GET_RESERVATION_PERMISSION_QUERY = gql`
   query ReservationPermissions($id: ID!) {
-    reservation(id: $id) {
-      id
-      reservationUnit {
+    node(id: $id) {
+      ... on ReservationNode {
         id
-        unit {
+        reservationUnit {
           id
-          pk
+          unit {
+            id
+            pk
+          }
         }
       }
     }

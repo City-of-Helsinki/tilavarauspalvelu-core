@@ -135,22 +135,26 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
 
 export const RESOURCE_QUERY = gql`
   query Resource($id: ID!, $unitId: ID!) {
-    resource(id: $id) {
-      id
-      pk
-      nameFi
-      nameSv
-      nameEn
-      space {
+    node(id: $id) {
+      ... on ResourceNode {
         id
         pk
+        nameFi
+        nameSv
+        nameEn
+        space {
+          id
+          pk
+        }
       }
     }
-    unit(id: $unitId) {
-      id
-      pk
-      nameFi
-      ...LocationFields
+    node(id: $id) {
+      ... on UnitNode {
+        id
+        pk
+        nameFi
+        ...LocationFields
+      }
     }
   }
 `;

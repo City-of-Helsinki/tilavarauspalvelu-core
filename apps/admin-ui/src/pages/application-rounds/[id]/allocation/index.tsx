@@ -583,19 +583,21 @@ export const ALL_EVENTS_PER_UNIT_QUERY = gql`
  */
 export const APPLICATION_ROUND_FILTER_OPTIONS = gql`
   query ApplicationRoundFilter($id: ID!) {
-    applicationRound(id: $id) {
-      id
-      pk
-      nameFi
-      status
-      reservationPeriodBeginDate
-      reservationPeriodEndDate
-      reservationUnits {
+    node(id: $id) {
+      ... on ApplicationRoundNode {
         id
         pk
         nameFi
-        unit {
-          ...ApplicationRoundFilterUnit
+        status
+        reservationPeriodBeginDate
+        reservationPeriodEndDate
+        reservationUnits {
+          id
+          pk
+          nameFi
+          unit {
+            ...ApplicationRoundFilterUnit
+          }
         }
       }
     }

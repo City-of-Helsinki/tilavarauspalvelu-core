@@ -1082,12 +1082,18 @@ export const APPLICATION_SECTION_RESERVATION_FRAGMENT = gql`
 // this allows faster iteration and splitting the query if needed (based on open Accordions)
 // we can cache data on client side (when user opens Accordions)
 export const APPLICATION_RESERVATIONS_QUERY = gql`
-  query ApplicationReservations($id: ID!, $beginDate: Date!) {
-    application(id: $id) {
-      id
-      pk
-      applicationSections {
-        ...ApplicationSectionReservation
+  query ApplicationReservations(
+    $id: ID!
+    # Filter
+    $beginDate: Date! # Used in fragments
+  ) {
+    node(id: $id) {
+      ... on ApplicationNode {
+        id
+        pk
+        applicationSections {
+          ...ApplicationSectionReservation
+        }
       }
     }
   }

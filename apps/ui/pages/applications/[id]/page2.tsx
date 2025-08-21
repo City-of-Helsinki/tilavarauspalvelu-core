@@ -127,26 +127,28 @@ export default Page2;
 
 export const APPLICATION_PAGE2_QUERY = gql`
   query ApplicationPage2($id: ID!) {
-    application(id: $id) {
-      ...ApplicationForm
-      applicationSections {
-        id
-        reservationUnitOptions {
+    node(id: $id) {
+      ... on ApplicationNode {
+        ...ApplicationForm
+        applicationSections {
           id
-          reservationUnit {
+          reservationUnitOptions {
             id
-            pk
-            nameFi
-            nameEn
-            nameSv
-            unit {
+            reservationUnit {
               id
+              pk
               nameFi
               nameEn
               nameSv
-            }
-            applicationRoundTimeSlots {
-              ...TimeSelector
+              unit {
+                id
+                nameFi
+                nameEn
+                nameSv
+              }
+              applicationRoundTimeSlots {
+                ...TimeSelector
+              }
             }
           }
         }
