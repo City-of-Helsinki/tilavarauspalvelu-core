@@ -251,69 +251,56 @@ function sortAgeGroups(ageGroups: AgeGroup[]): NonNullable<AgeGroup>[] {
 // There is a duplicate in admin-ui but it doesn't have translations
 export const OPTIONS_QUERY = gql`
   query Options(
-    $reservationUnitTypesOrderBy: [ReservationUnitTypeOrderSet]
-    $purposesOrderBy: [PurposeOrderSet]
-    $unitsOrderBy: [UnitOrderSet]
-    $equipmentsOrderBy: [EquipmentOrderSet]
-    $reservationPurposesOrderBy: [ReservationPurposeOrderSet]
-    $onlyDirectBookable: Boolean
-    $onlySeasonalBookable: Boolean
+    $reservationUnitTypesOrderBy: [ReservationUnitTypeOrderSet!]
+    $purposesOrderBy: [PurposeOrderSet!]
+    $unitsOrderBy: [UnitOrderSet!]
+    $equipmentsOrderBy: [EquipmentOrderSet!]
+    $reservationPurposesOrderBy: [ReservationPurposeOrderSet!]
+    # Filter
+    $onlyDirectBookable: Boolean!
+    $onlySeasonalBookable: Boolean!
   ) {
-    reservationUnitTypes(orderBy: $reservationUnitTypesOrderBy) {
-      edges {
-        node {
-          id
-          pk
-          nameFi
-          nameEn
-          nameSv
-        }
-      }
-    }
-    purposes(orderBy: $purposesOrderBy) {
-      edges {
-        node {
-          id
-          pk
-          nameFi
-          nameEn
-          nameSv
-        }
-      }
-    }
-    reservationPurposes(orderBy: $reservationPurposesOrderBy) {
-      edges {
-        node {
-          id
-          pk
-          nameFi
-          nameEn
-          nameSv
-        }
-      }
-    }
-    ageGroups {
-      edges {
-        node {
-          id
-          pk
-          minimum
-          maximum
-        }
-      }
-    }
-    equipmentsAll(orderBy: $equipmentsOrderBy) {
+    allReservationUnitTypes(orderBy: $reservationUnitTypesOrderBy) {
       id
       pk
       nameFi
       nameEn
       nameSv
     }
-    unitsAll(
-      publishedReservationUnits: true
-      onlyDirectBookable: $onlyDirectBookable
-      onlySeasonalBookable: $onlySeasonalBookable
+    allPurposes(orderBy: $purposesOrderBy) {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+    }
+    allReservationPurposes(orderBy: $reservationPurposesOrderBy) {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+    }
+    allAgeGroups {
+      id
+      pk
+      minimum
+      maximum
+    }
+    allEquipments(orderBy: $equipmentsOrderBy) {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+    }
+    allUnits(
       orderBy: $unitsOrderBy
+      filter: {
+        onlyDirectBookable: $onlyDirectBookable
+        onlySeasonalBookable: $onlySeasonalBookable
+        publishedReservationUnits: true
+      }
     ) {
       id
       pk

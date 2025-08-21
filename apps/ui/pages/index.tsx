@@ -46,8 +46,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       orderUnitsBy: [UnitOrderSet.RankAsc],
     },
   });
-  const purposes = filterNonNullable(data?.purposes?.edges.map((edge) => edge?.node));
-  const units = filterNonNullable(data?.units?.edges.map((edge) => edge?.node));
+  const purposes = filterNonNullable(data?.allPurposes);
+  const units = filterNonNullable(data?.units?.edges?.map((edge) => edge?.node));
 
   return {
     props: {
@@ -64,16 +64,12 @@ export default Home;
 // TODO we can limit the number of purposes and units fetched
 export const FRONT_PAGE_QUERY = gql`
   query FrontPage(
-    $orderBy: [PurposeOrderSet]
+    $orderBy: [PurposeOrderSet!]
     # Filter
     $orderUnitsBy: [UnitOrderSet!]
   ) {
-    purposes(orderBy: $orderBy) {
-      edges {
-        node {
-          ...PurposeCard
-        }
-      }
+    allPurposes(orderBy: $orderBy) {
+      ...PurposeCard
     }
     units(orderBy: $orderUnitsBy, filter: { publishedReservationUnits: true }) {
       edges {
