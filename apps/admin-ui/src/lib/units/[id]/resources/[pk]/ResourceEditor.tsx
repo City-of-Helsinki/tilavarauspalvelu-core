@@ -3,7 +3,12 @@ import { Button, ButtonVariant } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type ResourceUpdateMutation, LocationType, useUpdateResourceMutation, useResourceQuery } from "@gql/gql-types";
+import {
+  type ResourceUpdateMutation,
+  ResourceLocationType,
+  useUpdateResourceMutation,
+  useResourceQuery,
+} from "@gql/gql-types";
 import { createNodeId } from "common/src/helpers";
 import { ButtonContainer, CenterSpinner } from "common/styled";
 import { errorToast, successToast } from "common/src/components/toast";
@@ -89,7 +94,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
       await updateResource({
         ...values,
         pk: values.pk,
-        locationType: LocationType.Fixed,
+        locationType: ResourceLocationType.Fixed,
       });
 
       successToast({

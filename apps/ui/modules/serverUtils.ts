@@ -1,7 +1,7 @@
 import { env } from "@/env.mjs";
 import { gql, NormalizedCacheObject, type ApolloClient } from "@apollo/client";
 import {
-  TermsType,
+  TermsOfUseTypeChoices,
   TermsOfUseDocument,
   type TermsOfUseQuery,
   type TermsOfUseQueryVariables,
@@ -44,7 +44,7 @@ export async function getGenericTerms(apolloClient: ApolloClient<unknown>): Prom
   const { data: tosData } = await apolloClient.query<TermsOfUseQuery, TermsOfUseQueryVariables>({
     query: TermsOfUseDocument,
     variables: {
-      termsType: TermsType.GenericTerms,
+      termsType: TermsOfUseTypeChoices.GenericTerms,
     },
   });
 
@@ -85,7 +85,7 @@ export async function getReservationByOrderUuid(
 
 // NOTE: Needs to match ReservationStateQuery
 export const GET_ORDER = gql`
-  query Order($orderUuid: String!) {
+  query Order($orderUuid: UUID!) {
     order(orderUuid: $orderUuid) {
       id
       reservation {
