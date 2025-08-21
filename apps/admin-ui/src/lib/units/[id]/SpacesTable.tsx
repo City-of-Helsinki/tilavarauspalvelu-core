@@ -235,7 +235,7 @@ export const SPACE_TABLE_FRAGMENT = gql`
 `;
 
 export const DELETE_SPACE = gql`
-  mutation DeleteSpace($input: SpaceDeleteMutationInput!) {
+  mutation DeleteSpace($input: SpaceDeleteMutation!) {
     deleteSpace(input: $input) {
       deleted
     }

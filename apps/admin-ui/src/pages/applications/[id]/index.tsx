@@ -800,7 +800,7 @@ export const APPLICATION_ADMIN_QUERY = gql`
 `;
 
 export const REJECT_ALL_SECTION_OPTIONS = gql`
-  mutation RejectAllSectionOptions($input: RejectAllSectionOptionsMutationInput!) {
+  mutation RejectAllSectionOptions($input: RejectAllSectionOptionsMutation!) {
     rejectAllSectionOptions(input: $input) {
       pk
     }
@@ -808,7 +808,7 @@ export const REJECT_ALL_SECTION_OPTIONS = gql`
 `;
 
 export const RESTORE_ALL_SECTION_OPTIONS = gql`
-  mutation RestoreAllSectionOptions($input: RestoreAllSectionOptionsMutationInput!) {
+  mutation RestoreAllSectionOptions($input: RestoreAllSectionOptionsMutation!) {
     restoreAllSectionOptions(input: $input) {
       pk
     }
@@ -816,7 +816,7 @@ export const RESTORE_ALL_SECTION_OPTIONS = gql`
 `;
 
 export const REJECT_APPLICATION = gql`
-  mutation RejectAllApplicationOptions($input: RejectAllApplicationOptionsMutationInput!) {
+  mutation RejectAllApplicationOptions($input: RejectAllApplicationOptionsMutation!) {
     rejectAllApplicationOptions(input: $input) {
       pk
     }
@@ -824,7 +824,7 @@ export const REJECT_APPLICATION = gql`
 `;
 
 export const RESTORE_APPLICATION = gql`
-  mutation RestoreAllApplicationOptions($input: RestoreAllApplicationOptionsMutationInput!) {
+  mutation RestoreAllApplicationOptions($input: RestoreAllApplicationOptionsMutation!) {
     restoreAllApplicationOptions(input: $input) {
       pk
     }
