@@ -1,5 +1,5 @@
 import { type SuitableTimeRangeFormValues } from "./form";
-import { type ApplicationRoundTimeSlotNode, Priority, SuitableTimeFragment, Weekday } from "@/gql/gql-types";
+import { type ApplicationRoundTimeSlotNode, Priority, SuitableTimeFieldsFragment, Weekday } from "@/gql/gql-types";
 import { type Cell, type CellState } from "common/src/components/ApplicationTimeSelector";
 import { DayT, WEEKDAYS, WEEKDAYS_SORTED } from "common/src/const";
 import { convertWeekday, transformWeekday } from "common/src/conversion";
@@ -9,7 +9,7 @@ export type DailyOpeningHours = Readonly<
   Pick<ApplicationRoundTimeSlotNode, "weekday" | "isClosed" | "reservableTimes">[]
 >;
 
-type SchedulesT = Omit<SuitableTimeFragment, "pk" | "id">;
+type SchedulesT = Omit<SuitableTimeFieldsFragment, "pk" | "id">;
 
 type DayCells = Readonly<Cell[]>;
 type WeekCells = Readonly<DayCells[]>;

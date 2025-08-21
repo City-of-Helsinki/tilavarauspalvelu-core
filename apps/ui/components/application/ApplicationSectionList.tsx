@@ -7,7 +7,7 @@ import {
   Priority,
   ApplicationSectionStatusChoice,
   type ApplicationViewFragment,
-  type SuitableTimeFragment,
+  type SuitableTimeFieldsFragment,
 } from "@gql/gql-types";
 import { WEEKDAYS } from "common/src/const";
 import { filterNonNullable, formatDayTimes, fromMondayFirstUnsafe } from "common/src/helpers";
@@ -189,7 +189,7 @@ export function ApplicationSectionList({ application }: { application: Applicati
   );
 }
 
-type SchedulesT = Omit<SuitableTimeFragment, "pk" | "id" | "priority">;
+type SchedulesT = Omit<SuitableTimeFieldsFragment, "pk" | "id" | "priority">;
 function Weekdays({ primary, secondary }: { primary: SchedulesT[]; secondary: SchedulesT[] }) {
   const { t } = useTranslation();
 
