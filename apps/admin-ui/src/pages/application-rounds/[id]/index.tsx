@@ -361,8 +361,10 @@ export const APPLICATION_ROUND_ADMIN_FRAGMENT = gql`
 
 export const APPLICATION_ROUND_QUERY = gql`
   query ApplicationRound($id: ID!) {
-    applicationRound(id: $id) {
-      ...ApplicationRoundAdmin
+    node(id: $id) {
+      ... on ApplicationRoundNode {
+        ...ApplicationRoundAdmin
+      }
     }
   }
 `;

@@ -71,11 +71,13 @@ export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
     $endDate: Date!
     $state: [ReservationStateChoice!]
   ) {
-    reservationUnit(id: $id) {
-      id
-      reservations(state: $state, beginDate: $beginDate, endDate: $endDate) {
-        ...CalendarReservation
-        ...CombineAffectedReservations
+    node(id: $id) {
+      ... on ReservationUnitNode {
+        id
+        reservations(filter: { state: $state, beginDate: $beginDate, endDate: $endDate }) {
+          ...CalendarReservation
+          ...CombineAffectedReservations
+        }
       }
     }
     affectingReservations(forReservationUnits: [$pk], state: $state, beginDate: $beginDate, endDate: $endDate) {

@@ -162,16 +162,18 @@ export async function getServerSideProps({ locale, query }: GetServerSidePropsCo
 
 export const UNIT_PAGE_QUERY = gql`
   query UnitPage($id: ID!) {
-    unit(id: $id) {
-      id
-      pk
-      nameFi
-      tprekId
-      shortDescriptionFi
-      reservationUnits {
-        ...ReservationUnitCard
+    node(id: $id) {
+      ... on UnitNode {
+        id
+        pk
+        nameFi
+        tprekId
+        shortDescriptionFi
+        reservationUnits {
+          ...ReservationUnitCard
+        }
+        ...NewResourceUnitFields
       }
-      ...NewResourceUnitFields
     }
   }
 `;

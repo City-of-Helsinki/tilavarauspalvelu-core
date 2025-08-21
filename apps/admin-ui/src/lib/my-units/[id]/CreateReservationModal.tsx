@@ -375,8 +375,10 @@ function ActionContainer({
 // TODO this is reused for create ReservationSeries also (though we have a common fragment)
 export const RESERVATION_UNIT_QUERY = gql`
   query ReservationUnit($id: ID!) {
-    reservationUnit(id: $id) {
-      ...CreateStaffReservation
+    node(id: $id) {
+      ... on ReservationUnitNode {
+        ...CreateStaffReservation
+      }
     }
   }
 `;

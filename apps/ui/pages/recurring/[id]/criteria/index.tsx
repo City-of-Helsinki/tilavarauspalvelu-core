@@ -129,18 +129,20 @@ export default Criteria;
 
 export const APPLICATION_ROUND_CRITERIA_QUERY = gql`
   query ApplicationRoundCriteria($id: ID!) {
-    applicationRound(id: $id) {
-      pk
-      id
-      nameFi
-      nameEn
-      nameSv
-      criteriaFi
-      criteriaEn
-      criteriaSv
-      notesWhenApplyingFi
-      notesWhenApplyingEn
-      notesWhenApplyingSv
+    node(id: $id) {
+      ... on ApplicationRoundNode {
+        pk
+        id
+        nameFi
+        nameEn
+        nameSv
+        criteriaFi
+        criteriaEn
+        criteriaSv
+        notesWhenApplyingFi
+        notesWhenApplyingEn
+        notesWhenApplyingSv
+      }
     }
   }
 `;

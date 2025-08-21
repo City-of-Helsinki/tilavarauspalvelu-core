@@ -143,11 +143,13 @@ export async function getServerSideProps({ locale, query }: GetServerSidePropsCo
 
 export const SPACES_RESOURCES_QUERY = gql`
   query SpacesResources($id: ID!) {
-    unit(id: $id) {
-      id
-      ...UnitSubpageHead
-      ...SpacesTable
-      ...ResourceTable
+    node(id: $id) {
+      ... on UnitNode {
+        id
+        ...UnitSubpageHead
+        ...SpacesTable
+        ...ResourceTable
+      }
     }
   }
 `;

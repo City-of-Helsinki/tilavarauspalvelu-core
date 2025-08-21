@@ -24,7 +24,7 @@ type Props =
       applicationPk: number;
     };
 
-/// Component for toggling the visibility of the user's birth date
+/// Component for toggling the visibility of the user's birthdate
 /// Queries through reservation or application because of permission checks (most users are not allowed query users api)
 /// @param reservationPk - the pk of the reservation
 /// @param applicationPk - the pk of the application
@@ -106,12 +106,14 @@ export function BirthDate(props: Props): JSX.Element {
 // so don't make them automatically or inside other queries
 export const APPLICATION_DATE_OF_BIRTH_QUERY = gql`
   query ApplicationDateOfBirth($id: ID!) {
-    application(id: $id) {
-      id
-      user {
+    node(id: $id) {
+      ... on ApplicationNode {
         id
-        pk
-        dateOfBirth
+        user {
+          id
+          pk
+          dateOfBirth
+        }
       }
     }
   }
