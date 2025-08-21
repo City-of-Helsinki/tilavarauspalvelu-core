@@ -4,7 +4,7 @@ import { future1hReservation } from "@test/reservation.mocks";
 import { describe, expect, it } from "vitest";
 import {
   AccessType,
-  ImageType,
+  ReservationUnitImageType,
   PaymentType,
   PriceUnit,
   type ReservationInfoCardFragment,
@@ -107,7 +107,7 @@ function createMockReservationInfoCard(price?: string): ReservationInfoCardFragm
         {
           id: createNodeId("ReservationUnitImageNode", 1),
           imageUrl: "https://example.com/image-image.jpg",
-          imageType: ImageType.Main,
+          imageType: ReservationUnitImageType.Main,
           largeUrl: "https://example.com/image-large.jpg",
           mediumUrl: "https://example.com/image-medium.jpg",
           smallUrl: "https://example.com/image-small.jpg",
