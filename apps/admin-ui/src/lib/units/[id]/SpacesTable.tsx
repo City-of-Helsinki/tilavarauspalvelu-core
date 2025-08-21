@@ -63,7 +63,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
           graphQLErrors: res.errors,
         });
       }
-      if (res.data?.deleteSpace?.deleted) {
+      if (res.data?.deleteSpace?.pk) {
         setSpaceWaitingForDelete(null);
         refetch();
       } else {
@@ -237,7 +237,7 @@ export const SPACE_TABLE_FRAGMENT = gql`
 export const DELETE_SPACE = gql`
   mutation DeleteSpace($input: SpaceDeleteMutation!) {
     deleteSpace(input: $input) {
-      deleted
+      pk
     }
   }
 `;
