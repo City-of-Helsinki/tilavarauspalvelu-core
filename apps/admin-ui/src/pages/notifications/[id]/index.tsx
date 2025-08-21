@@ -628,7 +628,7 @@ export const BANNER_NOTIFICATIONS_UPDATE = gql`
 export const BANNER_NOTIFICATIONS_DELETE = gql`
   mutation BannerNotificationDelete($input: BannerNotificationDeleteMutation!) {
     deleteBannerNotification(input: $input) {
-      deleted
+      pk
     }
   }
 `;
