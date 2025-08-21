@@ -225,7 +225,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
         throw new Error("No reservations found");
       }
       successToast({
-        text: t("ReservationDialog.saveSuccess", {
+        text: t("myUnits:ReservationDialog.saveSuccess", {
           reservationUnit: reservationUnit.nameFi,
         }),
       });

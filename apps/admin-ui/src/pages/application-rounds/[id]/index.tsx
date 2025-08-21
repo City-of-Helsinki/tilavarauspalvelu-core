@@ -148,7 +148,7 @@ export default function ApplicationRound({
         {!isApplicationRoundEnded &&
           (isAllocationEnabled(applicationRound) ? (
             <ButtonLikeLink href={`${pk}/allocation`} variant="primary" size="large">
-              <NoWrap>{t("ApplicationRound.allocate")}</NoWrap>
+              <NoWrap>{t("applicationRound:allocate")}</NoWrap>
             </ButtonLikeLink>
           ) : (
             <Button disabled>{t("applicationRound:allocate")}</Button>
