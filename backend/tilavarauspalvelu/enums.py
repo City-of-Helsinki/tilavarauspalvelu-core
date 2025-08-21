@@ -1083,7 +1083,7 @@ class ApplicationStatusChoice(models.TextChoices):
     HANDLED = "HANDLED", pgettext_lazy("ApplicationStatus", "Handled")
     """Application's events have all been allocated"""
 
-    RESULTS_SENT = "RESULT_SENT", pgettext_lazy("ApplicationStatus", "Results Sent")
+    RESULTS_SENT = "RESULTS_SENT", pgettext_lazy("ApplicationStatus", "Results Sent")
     """Application's results have been sent to user"""
 
     EXPIRED = "EXPIRED", pgettext_lazy("ApplicationStatus", "Expired")
