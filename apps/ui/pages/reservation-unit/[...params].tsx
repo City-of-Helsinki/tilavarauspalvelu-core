@@ -13,7 +13,7 @@ import {
   type ReservationQuery,
   type ReservationQueryVariables,
   ReservationStateChoice,
-  type ReservationUpdateMutationInput,
+  type ReservationUpdateMutation,
   ReserveeType,
   useConfirmReservationMutation,
   useDeleteReservationMutation,
@@ -228,7 +228,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
       throw new Error("Reservation pk is required");
     }
 
-    const input: ReservationUpdateMutationInput = {
+    const input: ReservationUpdateMutation = {
       ...rest,
       // force update to empty -> NA
       reserveeIdentifier:
@@ -507,7 +507,7 @@ export const RESERVATION_IN_PROGRESS_QUERY = gql`
 `;
 
 export const UPDATE_RESERVATION = gql`
-  mutation UpdateReservation($input: ReservationUpdateMutationInput!) {
+  mutation UpdateReservation($input: ReservationUpdateMutation!) {
     updateReservation(input: $input) {
       pk
       state
@@ -516,7 +516,7 @@ export const UPDATE_RESERVATION = gql`
 `;
 
 export const CONFIRM_RESERVATION = gql`
-  mutation ConfirmReservation($input: ReservationConfirmMutationInput!) {
+  mutation ConfirmReservation($input: ReservationConfirmMutation!) {
     confirmReservation(input: $input) {
       pk
       state
@@ -529,7 +529,7 @@ export const CONFIRM_RESERVATION = gql`
 `;
 
 export const DELETE_RESERVATION = gql`
-  mutation DeleteReservation($input: ReservationDeleteTentativeMutationInput!) {
+  mutation DeleteReservation($input: ReservationDeleteTentativeMutation!) {
     deleteTentativeReservation(input: $input) {
       deleted
     }

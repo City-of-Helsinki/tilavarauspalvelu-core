@@ -417,7 +417,7 @@ function AllocatedScheduleSection({
 }
 
 export const REJECT_REST_MUTATION = gql`
-  mutation RejectRest($input: ReservationUnitOptionUpdateMutationInput!) {
+  mutation RejectRest($input: ReservationUnitOptionUpdateMutation!) {
     updateReservationUnitOption(input: $input) {
       pk
       isRejected
