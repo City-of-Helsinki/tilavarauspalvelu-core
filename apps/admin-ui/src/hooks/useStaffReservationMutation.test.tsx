@@ -3,7 +3,7 @@ import { MockedProvider } from "@apollo/client/testing";
 import { render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { type UseStaffReservationFragment } from "@gql/gql-types";
-import { type MutationInputParams, useStaffReservationMutation } from "./useStaffReservationMutation";
+import { type MutationParams, useStaffReservationMutation } from "./useStaffReservationMutation";
 import { vi, describe, test, expect, beforeEach } from "vitest";
 import { MUTATION_DATA, createMocks } from "./__test__/mocks";
 import { createNodeId } from "common/src/helpers";
@@ -30,7 +30,7 @@ function TestComponent({
     onSuccess,
   });
 
-  const input: MutationInputParams = {
+  const input: MutationParams = {
     ...MUTATION_DATA.input,
     ...MUTATION_DATA.workingMemo,
     seriesName,

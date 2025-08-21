@@ -172,7 +172,7 @@ export const APPLICATION_PREVIEW_QUERY = gql`
 `;
 
 export const SEND_APPLICATION_MUTATION = gql`
-  mutation SendApplication($input: ApplicationSendMutationInput!) {
+  mutation SendApplication($input: ApplicationSendMutation!) {
     sendApplication(input: $input) {
       pk
     }

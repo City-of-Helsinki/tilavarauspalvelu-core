@@ -5,7 +5,7 @@ import { Notification, NotificationSize } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H1 } from "common/styled";
 import {
-  type ApplicationCreateMutationInput,
+  type ApplicationCreateMutation,
   ApplicationRoundDocument,
   type ApplicationRoundQuery,
   type ApplicationRoundQueryVariables,
@@ -164,7 +164,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   });
 
   if (isPostLogin && userData.currentUser != null) {
-    const input: ApplicationCreateMutationInput = {
+    const input: ApplicationCreateMutation = {
       applicationRound: applicationRound.pk ?? 0,
     };
 
@@ -231,7 +231,7 @@ export const APPLICATION_ROUND_QUERY = gql`
 `;
 
 export const CREATE_APPLICATION_MUTATION = gql`
-  mutation CreateApplication($input: ApplicationCreateMutationInput!) {
+  mutation CreateApplication($input: ApplicationCreateMutation!) {
     createApplication(input: $input) {
       pk
     }
