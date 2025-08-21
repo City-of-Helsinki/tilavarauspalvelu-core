@@ -1,10 +1,10 @@
 import { isAfter, isBefore } from "date-fns";
 import {
-  ImageType,
+  ReservationUnitImageType,
   type PricingFieldsFragment,
   type ImageFragment,
   type Maybe,
-  type SuitableTimeFragment,
+  type SuitableTimeFieldsFragment,
 } from "../gql/gql-types";
 import { type OptionInProps } from "hds-react";
 import { type DayT, pixel } from "./const";
@@ -169,7 +169,7 @@ function getImageSourceWithoutDefault(
 }
 
 export function getMainImage(ru?: { images: Readonly<ImageFragment[]> }): ImageFragment | null {
-  return ru?.images.find((img) => img.imageType === ImageType.Main) ?? null;
+  return ru?.images.find((img) => img.imageType === ReservationUnitImageType.Main) ?? null;
 }
 
 /// Returns if price is free
@@ -254,7 +254,10 @@ export function formatApiTimeInterval({
   return `${btime}–${etime}`;
 }
 
-export function formatDayTimes(schedule: Omit<SuitableTimeFragment, "pk" | "id" | "priority">[], day: number): string {
+export function formatDayTimes(
+  schedule: Omit<SuitableTimeFieldsFragment, "pk" | "id" | "priority">[],
+  day: number
+): string {
   return schedule
     .filter((s) => convertWeekday(s.dayOfTheWeek) === day)
     .map((s) => formatApiTimeInterval(s))

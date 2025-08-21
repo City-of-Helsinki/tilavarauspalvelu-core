@@ -5,11 +5,11 @@ import { useTranslation } from "next-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   EquipmentOrderSet,
-  ImageType,
+  ReservationUnitImageType,
   ReservationKind,
   type ReservationUnitEditorParametersQuery,
   type ReservationUnitEditQuery,
-  TermsType,
+  TermsOfUseTypeChoices,
   useCreateImageMutation,
   useCreateReservationUnitMutation,
   useDeleteImageMutation,
@@ -76,7 +76,10 @@ const StyledContainerMedium = styled(Flex)`
 `;
 
 // Terms PK is not a number but any valid string
-function makeTermsOptions(parameters: ReservationUnitEditorParametersQuery | undefined, termsType: TermsType) {
+function makeTermsOptions(
+  parameters: ReservationUnitEditorParametersQuery | undefined,
+  termsType: TermsOfUseTypeChoices
+) {
   return filterNonNullable(parameters?.termsOfUse?.edges.map((e) => e?.node))
     .filter((tou) => termsType === tou?.termsType)
     .map((tou) => {
@@ -112,7 +115,7 @@ function useImageMutations() {
             variables: {
               image: image.bytes,
               reservationUnit: resUnitPk,
-              imageType: image.imageType ?? ImageType.Other,
+              imageType: image.imageType ?? ReservationUnitImageType.Other,
             },
           })
         );
@@ -132,7 +135,7 @@ function useImageMutations() {
           return updateImagetype({
             variables: {
               pk: image.pk ?? 0,
-              imageType: image.imageType ?? ImageType.Other,
+              imageType: image.imageType ?? ReservationUnitImageType.Other,
             },
           });
         });
@@ -196,11 +199,11 @@ function ReservationUnitEditor({
       label: n.value,
     })
   );
-  const pricingTermsOptions = makeTermsOptions(parametersData, TermsType.PricingTerms);
+  const pricingTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.PricingTerms);
 
-  const serviceSpecificTermsOptions = makeTermsOptions(parametersData, TermsType.ServiceTerms);
-  const paymentTermsOptions = makeTermsOptions(parametersData, TermsType.PaymentTerms);
-  const cancellationTermsOptions = makeTermsOptions(parametersData, TermsType.CancellationTerms);
+  const serviceSpecificTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.ServiceTerms);
+  const paymentTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.PaymentTerms);
+  const cancellationTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.CancellationTerms);
 
   const metadataOptions = filterNonNullable(parametersData?.metadataSets?.edges.map((e) => e?.node)).map((n) => ({
     value: n?.pk ?? -1,
@@ -574,7 +577,7 @@ export const CREATE_RESERVATION_UNIT = gql`
 
 // TODO this allows for a pk input (is it for a change? i.e. not needing to delete and create a new one)
 export const CREATE_IMAGE = gql`
-  mutation CreateImage($image: Upload!, $reservationUnit: Int!, $imageType: ImageType!) {
+  mutation CreateImage($image: Image!, $reservationUnit: Int!, $imageType: ReservationUnitImageType!) {
     createReservationUnitImage(input: { image: $image, reservationUnit: $reservationUnit, imageType: $imageType }) {
       pk
     }
@@ -590,7 +593,7 @@ export const DELETE_IMAGE = gql`
 `;
 
 export const UPDATE_IMAGE_TYPE = gql`
-  mutation UpdateImage($pk: Int!, $imageType: ImageType!) {
+  mutation UpdateImage($pk: Int!, $imageType: ReservationUnitImageType!) {
     updateReservationUnitImage(input: { pk: $pk, imageType: $imageType }) {
       pk
     }
