@@ -98,26 +98,29 @@ function transformOrderBy(orderBy: string | null): ApplicationOrderSet[] {
 
 export const APPLICATIONS_QUERY = gql`
   query Applications(
-    $applicationRound: Int!
-    $unit: [Int]
-    $unitGroup: [Int]
-    $applicantType: [ReserveeType]
-    $status: [ApplicationStatusChoice]!
-    $textSearch: String
-    $orderBy: [ApplicationOrderSet!]
     $first: Int
     $after: String
+    $orderBy: [ApplicationOrderSet!]
+    # Filter
+    $applicantType: [ReserveeType!]
+    $applicationRound: Int!
+    $status: [ApplicationStatusChoice!]!
+    $textSearch: String
+    $unit: [Int!]
+    $unitGroup: [Int!]
   ) {
     applications(
-      applicationRound: $applicationRound
-      unit: $unit
-      unitGroup: $unitGroup
-      applicantType: $applicantType
-      status: $status
-      textSearch: $textSearch
-      orderBy: $orderBy
       first: $first
       after: $after
+      orderBy: $orderBy
+      filter: {
+        applicantType: $applicantType
+        applicationRound: $applicationRound
+        status: $status
+        textSearch: $textSearch
+        unit: $unit
+        unitGroup: $unitGroup
+      }
     ) {
       edges {
         node {

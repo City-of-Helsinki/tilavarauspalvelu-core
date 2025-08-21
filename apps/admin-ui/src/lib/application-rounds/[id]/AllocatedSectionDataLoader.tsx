@@ -124,32 +124,35 @@ function transformOrderBy(orderBy: string | null): AllocatedTimeSlotOrderSet[] {
 
 export const ALLOCATED_TIME_SLOTS_QUERY = gql`
   query AllocatedTimeSlots(
-    $applicationRound: Int!
-    $allocatedUnit: [Int]
-    $unitGroup: [Int]
-    $applicantType: [ReserveeType]
-    $applicationSectionStatus: [ApplicationSectionStatusChoice]
-    $allocatedReservationUnit: [Int]
-    $dayOfTheWeek: [Weekday]
-    $textSearch: String
-    $accessCodeState: [AccessCodeState]
-    $orderBy: [AllocatedTimeSlotOrderSet!]
-    $after: String
     $first: Int
+    $after: String
+    $orderBy: [AllocatedTimeSlotOrderSet!]
+    # Filter
+    $accessCodeState: [AccessCodeState!]
+    $allocatedReservationUnit: [Int!]
+    $allocatedUnit: [Int!]
+    $applicantType: [ReserveeType!]
+    $applicationRound: Int!
+    $applicationSectionStatus: [ApplicationSectionStatusChoice!]
+    $dayOfTheWeek: [Weekday!]
+    $textSearch: String
+    $unitGroup: [Int!]
   ) {
     allocatedTimeSlots(
-      after: $after
       first: $first
-      applicationRound: $applicationRound
-      allocatedUnit: $allocatedUnit
-      unitGroup: $unitGroup
-      applicantType: $applicantType
-      applicationSectionStatus: $applicationSectionStatus
-      allocatedReservationUnit: $allocatedReservationUnit
-      accessCodeState: $accessCodeState
-      dayOfTheWeek: $dayOfTheWeek
-      textSearch: $textSearch
+      after: $after
       orderBy: $orderBy
+      filter: {
+        accessCodeState: $accessCodeState
+        allocatedReservationUnit: $allocatedReservationUnit
+        allocatedUnit: $allocatedUnit
+        applicantType: $applicantType
+        applicationRound: $applicationRound
+        applicationSectionStatus: $applicationSectionStatus
+        dayOfTheWeek: $dayOfTheWeek
+        textSearch: $textSearch
+        unitGroup: $unitGroup
+      }
     ) {
       edges {
         node {

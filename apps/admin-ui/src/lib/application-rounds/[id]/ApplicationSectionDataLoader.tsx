@@ -108,42 +108,44 @@ function transformOrderBy(orderBy: string | null): ApplicationSectionOrderSet[] 
 /// NOTE might have some cache issues (because it collides with the other sections query)
 export const APPLICATION_SECTIONS_QUERY = gql`
   query ApplicationSections(
-    $applicationRound: Int!
-    $applicationStatus: [ApplicationStatusChoice]!
-    $status: [ApplicationSectionStatusChoice]
-    $unit: [Int]
-    $unitGroup: [Int]
-    $applicantType: [ReserveeType]
-    $preferredOrder: [Int]
-    $textSearch: String
-    $priority: [Priority]
-    $purpose: [Int]
-    $reservationUnit: [Int]
-    $ageGroup: [Int]
-    $municipality: [MunicipalityChoice]
-    $includePreferredOrder10OrHigher: Boolean
-    $orderBy: [ApplicationSectionOrderSet!]
     $first: Int
     $after: String
+    $orderBy: [ApplicationSectionOrderSet!]
+    # Filter
+    $ageGroup: [Int!]
+    $applicantType: [ReserveeType!]
+    $applicationRound: Int!
+    $applicationStatus: [ApplicationStatusChoice!]!
+    $includePreferredOrder10OrHigher: Boolean!
+    $municipality: [MunicipalityChoice!]
+    $preferredOrder: [Int!]!
+    $priority: [Priority!]
+    $purpose: [Int!]
+    $reservationUnit: [Int!]
+    $status: [ApplicationSectionStatusChoice!]
+    $textSearch: String
+    $unit: [Int!]
+    $unitGroup: [Int!]
   ) {
     applicationSections(
-      applicationRound: $applicationRound
-      applicationStatus: $applicationStatus
-      status: $status
-      unit: $unit
-      unitGroup: $unitGroup
-      applicantType: $applicantType
-      preferredOrder: $preferredOrder
-      textSearch: $textSearch
-      priority: $priority
-      purpose: $purpose
-      reservationUnit: $reservationUnit
-      ageGroup: $ageGroup
-      municipality: $municipality
-      includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
-      orderBy: $orderBy
       first: $first
       after: $after
+      orderBy: $orderBy
+      filter: {
+        ageGroup: $ageGroup
+        applicantType: $applicantType
+        applicationRound: $applicationRound
+        applicationStatus: $applicationStatus
+        municipality: $municipality
+        preferredOrder: { values: $preferredOrder, allHigherThan10: $includePreferredOrder10OrHigher }
+        priority: $priority
+        purpose: $purpose
+        reservationUnit: $reservationUnit
+        status: $status
+        textSearch: $textSearch
+        unit: $unit
+        unitGroup: $unitGroup
+      }
     ) {
       edges {
         node {

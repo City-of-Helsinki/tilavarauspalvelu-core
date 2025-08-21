@@ -804,8 +804,8 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
 `;
 
 export const RELATED_RESERVATION_UNITS_QUERY = gql`
-  query RelatedReservationUnits($unit: [Int]!) {
-    reservationUnits(unit: $unit, isVisible: true) {
+  query RelatedReservationUnits($unit: [Int!]!) {
+    reservationUnits(filter: { unit: $unit, isVisible: true }) {
       edges {
         node {
           ...RelatedUnitCardFields
