@@ -144,7 +144,7 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
 export const DELETE_RESOURCE = gql`
   mutation DeleteResource($input: ResourceDeleteMutation!) {
     deleteResource(input: $input) {
-      deleted
+      pk
     }
   }
 `;
