@@ -7,21 +7,6 @@ import { formatDate } from "@/common/util";
 import { Flex } from "common/styled";
 import { createNodeId } from "common/src/helpers";
 
-// NOTE separate query because all requests for dateOfBirth are logged
-// so don't make them automatically or inside other queries
-export const APPLICATION_DATE_OF_BIRTH_QUERY = gql`
-  query ApplicationDateOfBirth($id: ID!) {
-    application(id: $id) {
-      id
-      user {
-        id
-        pk
-        dateOfBirth
-      }
-    }
-  }
-`;
-
 const Button = styled.button`
   margin: 0;
   padding: 0;
@@ -116,3 +101,18 @@ export function BirthDate(props: Props): JSX.Element {
     </Flex>
   );
 }
+
+// NOTE separate query because all requests for dateOfBirth are logged
+// so don't make them automatically or inside other queries
+export const APPLICATION_DATE_OF_BIRTH_QUERY = gql`
+  query ApplicationDateOfBirth($id: ID!) {
+    application(id: $id) {
+      id
+      user {
+        id
+        pk
+        dateOfBirth
+      }
+    }
+  }
+`;
