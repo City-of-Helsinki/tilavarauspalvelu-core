@@ -141,14 +141,16 @@ export default Page;
 
 export const GET_RESERVATION_STATE = gql`
   query ReservationState($id: ID!) {
-    reservation(id: $id) {
-      id
-      pk
-      state
-      paymentOrder {
+    node(id: $id) {
+      ... on ReservationNode {
         id
-        status
-        handledPaymentDueBy
+        pk
+        state
+        paymentOrder {
+          id
+          status
+          handledPaymentDueBy
+        }
       }
     }
   }

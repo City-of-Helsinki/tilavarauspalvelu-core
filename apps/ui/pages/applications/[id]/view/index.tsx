@@ -195,11 +195,13 @@ export default View;
 
 export const APPLICATION_VIEW_QUERY = gql`
   query ApplicationView($id: ID!) {
-    application(id: $id) {
-      ...ApplicationView
-      applicationSections {
-        id
-        hasReservations
+    node(id: $id) {
+      ... on ApplicationNode {
+        ...ApplicationView
+        applicationSections {
+          id
+          hasReservations
+        }
       }
     }
   }

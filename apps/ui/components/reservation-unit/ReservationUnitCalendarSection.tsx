@@ -61,22 +61,6 @@ export function ReservationUnitCalendarSection({
   );
 }
 
-export const RESERVATION_QUOTA_REACHED_FRAGMENT = gql`
-  fragment ReservationQuotaReached on ReservationUnitNode {
-    id
-    maxReservationsPerUser
-    numActiveUserReservations
-  }
-`;
-
-export const RESERVATION_QUOTA_REACHED_QUERY = gql`
-  query ReservationQuotaReached($id: ID!) {
-    reservationUnit(id: $id) {
-      ...ReservationQuotaReached
-    }
-  }
-`;
-
 function ReservationQuotaReached(props: ReservationQuotaReachedFragment): JSX.Element | null {
   const { t } = useTranslation("reservationCalendar", {
     keyPrefix: "reservationQuota",
@@ -111,3 +95,21 @@ export function isReservationQuotaReached(
     reservationUnit.numActiveUserReservations >= reservationUnit.maxReservationsPerUser
   );
 }
+
+export const RESERVATION_QUOTA_REACHED_FRAGMENT = gql`
+  fragment ReservationQuotaReached on ReservationUnitNode {
+    id
+    maxReservationsPerUser
+    numActiveUserReservations
+  }
+`;
+
+export const RESERVATION_QUOTA_REACHED_QUERY = gql`
+  query ReservationQuotaReached($id: ID!) {
+    node(id: $id) {
+      ... on ReservationUnitNode {
+        ...ReservationQuotaReached
+      }
+    }
+  }
+`;

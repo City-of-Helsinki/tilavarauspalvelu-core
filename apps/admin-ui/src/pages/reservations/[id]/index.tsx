@@ -384,37 +384,39 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
 
 export const RESERVATION_PAGE_QUERY = gql`
   query ReservationPage($id: ID!) {
-    reservation(id: $id) {
-      id
-      ...CreateTagString
-      ...ReservationCommonFields
-      ...TimeBlockSection
-      ...ReservationTitleSectionFields
-      ...ReservationKeylessEntry
-      reservationSeries {
+    node(id: $id) {
+      ... on ReservationNode {
         id
-        pk
-        beginDate
-        beginTime
-        endDate
-        endTime
-        weekdays
-        name
-        description
+        ...CreateTagString
+        ...ReservationCommonFields
+        ...TimeBlockSection
+        ...ReservationTitleSectionFields
+        ...ReservationKeylessEntry
+        reservationSeries {
+          id
+          pk
+          beginDate
+          beginTime
+          endDate
+          endTime
+          weekdays
+          name
+          description
+        }
+        ...ApprovalButtons
+        cancelReason
+        denyReason {
+          id
+          reasonFi
+        }
+        reservationUnit {
+          id
+          pk
+          reservationStartInterval
+          ...ReservationTypeFormFields
+        }
+        ...ReservationMetaFields
       }
-      ...ApprovalButtons
-      cancelReason
-      denyReason {
-        id
-        reasonFi
-      }
-      reservationUnit {
-        id
-        pk
-        reservationStartInterval
-        ...ReservationTypeFormFields
-      }
-      ...ReservationMetaFields
     }
   }
 `;

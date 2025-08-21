@@ -130,8 +130,10 @@ export default Page1;
 
 export const APPLICATION_PAGE1_QUERY = gql`
   query ApplicationPage1($id: ID!) {
-    application(id: $id) {
-      ...ApplicationForm
+    node(id: $id) {
+      ... on ApplicationNode {
+        ...ApplicationForm
+      }
     }
   }
 `;

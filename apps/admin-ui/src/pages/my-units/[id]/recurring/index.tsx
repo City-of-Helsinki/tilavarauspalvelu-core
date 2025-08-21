@@ -69,17 +69,19 @@ export async function getServerSideProps({ query, locale, req }: GetServerSidePr
 
 export const SERIES_RESERVATION_UNIT_QUERY = gql`
   query SeriesReservationUnit($id: ID!) {
-    unit(id: $id) {
-      id
-      nameFi
-      pk
-      reservationUnits {
+    node(id: $id) {
+      ... on UnitNode {
         id
-        pk
         nameFi
-        reservationStartInterval
-        bufferTimeBefore
-        bufferTimeAfter
+        pk
+        reservationUnits {
+          id
+          pk
+          nameFi
+          reservationStartInterval
+          bufferTimeBefore
+          bufferTimeAfter
+        }
       }
     }
   }

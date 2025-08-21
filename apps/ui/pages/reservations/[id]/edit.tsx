@@ -196,9 +196,16 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 // NOTE fragment input parameters lack documentation IsReservableFields requires $beginDate and $endDate
 export const RESERVATION_EDIT_PAGE_QUERY = gql`
-  query ReservationEditPage($id: ID!, $beginDate: Date!, $endDate: Date!) {
-    reservation(id: $id) {
-      ...EditPageReservation
+  query ReservationEditPage(
+    # Filter
+    $id: ID!
+    $beginDate: Date! # Used in fragments
+    $endDate: Date! # Used in fragments
+  ) {
+    node(id: $id) {
+      ... on ReservationNode {
+        ...EditPageReservation
+      }
     }
   }
 `;

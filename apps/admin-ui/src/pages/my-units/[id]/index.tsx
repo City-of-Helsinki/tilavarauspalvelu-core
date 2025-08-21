@@ -200,18 +200,20 @@ export async function getServerSideProps({ req, locale, query }: GetServerSidePr
 
 export const UNIT_VIEW_QUERY = gql`
   query UnitView($id: ID!) {
-    unit(id: $id) {
-      id
-      pk
-      nameFi
-      ...LocationFields
-      reservationUnits {
+    node(id: $id) {
+      ... on UnitNode {
         id
         pk
         nameFi
-        spaces {
+        ...LocationFields
+        reservationUnits {
           id
           pk
+          nameFi
+          spaces {
+            id
+            pk
+          }
         }
       }
     }
