@@ -194,7 +194,7 @@ export function InProgressReservationNotification() {
             },
           },
         });
-        const deleted = data?.deleteTentativeReservation?.deleted;
+        const deleted = data?.deleteTentativeReservation?.pk;
         if (deleted) {
           successToast({
             text: t("notification:waitingForPayment.reservationCancelledTitle"),
