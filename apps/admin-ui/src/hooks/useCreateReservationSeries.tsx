@@ -4,7 +4,7 @@ import {
   ReservationTypeStaffChoice,
   type ReservationSeriesCreateMutation,
   useCreateReservationSeriesMutation,
-  type ReservationSeriesReservationCreateSerializerInput,
+  type ReservationSeriesReservationCreateInput,
 } from "@gql/gql-types";
 import type { ReservationSeriesForm, ReservationFormMeta } from "@/schemas";
 import { fromUIDateUnsafe, toApiDateUnsafe } from "common/src/common/util";
@@ -66,7 +66,7 @@ export function useCreateReservationSeries() {
       throw new Error("Current user pk missing");
     }
 
-    const reservationDetails: ReservationSeriesReservationCreateSerializerInput = {
+    const reservationDetails: ReservationSeriesReservationCreateInput = {
       ...rest,
       type: transformReservationTypeStaffChoice(type),
       reserveeIdentifier: !reserveeIsUnregisteredAssociation ? reserveeIdentifier : undefined,
