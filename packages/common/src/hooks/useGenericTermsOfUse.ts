@@ -14,7 +14,10 @@ export function useGenericTermsOfUse() {
 }
 
 export const TERMS_OF_USE_QUERY = gql`
-  query TermsOfUse($termsType: TermsOfUseTypeChoices) {
+  query TermsOfUse(
+    # Filter
+    $termsType: TermsOfUseTypeChoices
+  ) {
     allTermsOfUse(filter: { termsType: $termsType }) {
       id
       ...TermsOfUseFields
