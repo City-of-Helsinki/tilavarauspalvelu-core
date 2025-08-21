@@ -114,24 +114,27 @@ function transformOrderBy(orderBy: string | null): RejectedOccurrenceOrderSet[] 
 
 export const REJECTED_OCCURRENCES_QUERY = gql`
   query RejectedOccurrences(
-    $applicationRound: Int
-    $unit: [Int]
-    $unitGroup: [Int]
-    $reservationUnit: [Int]
-    $orderBy: [RejectedOccurrenceOrderSet!]
-    $textSearch: String
-    $after: String
     $first: Int
+    $after: String
+    $orderBy: [RejectedOccurrenceOrderSet!]
+    # Filter
+    $applicationRound: Int!
+    $reservationUnit: [Int!]
+    $textSearch: String
+    $unit: [Int!]
+    $unitGroup: [Int!]
   ) {
     rejectedOccurrences(
-      applicationRound: $applicationRound
-      unit: $unit
-      unitGroup: $unitGroup
-      reservationUnit: $reservationUnit
-      orderBy: $orderBy
-      textSearch: $textSearch
-      after: $after
       first: $first
+      after: $after
+      orderBy: $orderBy
+      filter: {
+        applicationRound: $applicationRound
+        reservationUnit: $reservationUnit
+        textSearch: $textSearch
+        unit: $unit
+        unitGroup: $unitGroup
+      }
     ) {
       totalCount
       pageInfo {

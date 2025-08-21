@@ -303,18 +303,16 @@ export const RESERVATION_NOTIFICATION_FRAGMENT = gql`
 
 export const IN_PROGRESS_RESERVATION_NOTIFICATION_QUERY = gql`
   query ListInProgressReservations(
-    $state: [ReservationStateChoice!]
     $orderBy: [ReservationOrderSet!]
-    $user: [Int]!
+    # Filter
     $beginDate: Date!
     $reservationType: [ReservationTypeChoice!]
+    $state: [ReservationStateChoice!]
+    $user: [Int!]!
   ) {
     reservations(
-      user: $user
-      state: $state
       orderBy: $orderBy
-      beginDate: $beginDate
-      reservationType: $reservationType
+      filter: { beginDate: $beginDate, reservationType: $reservationType, state: $state, user: $user }
     ) {
       edges {
         node {

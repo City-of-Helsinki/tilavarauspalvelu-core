@@ -93,14 +93,19 @@ function transformSortString(orderBy: string | null): UnitOrderSet[] {
 }
 
 export const UNIT_LIST_QUERY = gql`
-  query UnitList($first: Int, $after: String, $orderBy: [UnitOrderSet!], $nameFi: String, $unitGroup: [Int]) {
+  query UnitList(
+    $first: Int
+    $after: String
+    $orderBy: [UnitOrderSet!]
+    # Filter
+    $nameFi: String
+    $unitGroup: [Int!]
+  ) {
     units(
       first: $first
       after: $after
       orderBy: $orderBy
-      nameFi: $nameFi
-      onlyWithPermission: true
-      unitGroup: $unitGroup
+      filter: { nameFiStartswith: $nameFi, unitGroup: $unitGroup, onlyWithPermission: true }
     ) {
       edges {
         node {

@@ -255,7 +255,7 @@ export const EDIT_PAGE_RESERVATION_UNIT_FRAGMENT = gql`
     ...TermsOfUse
     ...ReservationTimePickerFields
     ...MetadataSets
-    applicationRounds(ongoing: true) {
+    applicationRounds(filter: { ongoing: true }) {
       id
       reservationPeriodBeginDate
       reservationPeriodEndDate

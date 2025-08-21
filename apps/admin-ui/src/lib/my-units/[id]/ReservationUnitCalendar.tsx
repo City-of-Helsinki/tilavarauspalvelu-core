@@ -144,14 +144,14 @@ export const RESERVATION_UNIT_CALENDAR_QUERY = gql`
   query ReservationUnitCalendar(
     $id: ID!
     $pk: Int!
-    $state: [ReservationStateChoice]
-    $beginDate: Date
-    $endDate: Date
+    $state: [ReservationStateChoice!]
+    $beginDate: Date!
+    $endDate: Date!
   ) {
     reservationUnit(id: $id) {
       id
       pk
-      reservations(state: $state, beginDate: $beginDate, endDate: $endDate) {
+      reservations(filter: { beginDate: $beginDate, endDate: $endDate, state: $state }) {
         ...ReservationUnitReservations
         ...CombineAffectedReservations
       }
