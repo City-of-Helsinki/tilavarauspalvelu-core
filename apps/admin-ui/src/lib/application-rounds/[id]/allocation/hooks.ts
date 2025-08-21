@@ -1,7 +1,7 @@
 import { ApolloError, gql, type ApolloQueryResult } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import {
-  type AllocatedTimeSlotCreateMutationInput,
+  type AllocatedTimeSlotCreateMutation,
   useCreateAllocatedTimeSlotMutation,
   useDeleteAllocatedTimeSlotMutation,
   type ApplicationSectionAllocationsQuery,
@@ -212,7 +212,7 @@ export function useAcceptSlotMutation({
 
     // NOTE the pk is an update pk that matches AllocatedTimeSlot (not the applicationSection)
     // TODO check the inputs
-    const input: AllocatedTimeSlotCreateMutationInput = {
+    const input: AllocatedTimeSlotCreateMutation = {
       reservationUnitOption: reservationUnitOptionPk,
       dayOfTheWeek: timeRange.dayOfTheWeek,
       beginTime: allocatedBegin,
@@ -295,7 +295,7 @@ export function useRemoveAllocation({
 }
 
 export const CREATE_ALLOCATED_TIME_SLOT = gql`
-  mutation CreateAllocatedTimeSlot($input: AllocatedTimeSlotCreateMutationInput!) {
+  mutation CreateAllocatedTimeSlot($input: AllocatedTimeSlotCreateMutation!) {
     createAllocatedTimeslot(input: $input) {
       beginTime
       dayOfTheWeek
@@ -307,7 +307,7 @@ export const CREATE_ALLOCATED_TIME_SLOT = gql`
 `;
 
 export const DELETE_ALLOCATED_TIME_SLOT = gql`
-  mutation DeleteAllocatedTimeSlot($input: AllocatedTimeSlotDeleteMutationInput!) {
+  mutation DeleteAllocatedTimeSlot($input: AllocatedTimeSlotDeleteMutation!) {
     deleteAllocatedTimeslot(input: $input) {
       deleted
     }

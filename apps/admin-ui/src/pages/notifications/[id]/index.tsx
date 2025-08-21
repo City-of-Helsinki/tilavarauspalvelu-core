@@ -610,7 +610,7 @@ export async function getServerSideProps({ locale, query }: GetServerSidePropsCo
 }
 
 export const BANNER_NOTIFICATIONS_CREATE = gql`
-  mutation BannerNotificationCreate($input: BannerNotificationCreateMutationInput!) {
+  mutation BannerNotificationCreate($input: BannerNotificationCreateMutation!) {
     createBannerNotification(input: $input) {
       pk
     }
@@ -618,7 +618,7 @@ export const BANNER_NOTIFICATIONS_CREATE = gql`
 `;
 
 export const BANNER_NOTIFICATIONS_UPDATE = gql`
-  mutation BannerNotificationUpdate($input: BannerNotificationUpdateMutationInput!) {
+  mutation BannerNotificationUpdate($input: BannerNotificationUpdateMutation!) {
     updateBannerNotification(input: $input) {
       pk
     }
@@ -626,7 +626,7 @@ export const BANNER_NOTIFICATIONS_UPDATE = gql`
 `;
 
 export const BANNER_NOTIFICATIONS_DELETE = gql`
-  mutation BannerNotificationDelete($input: BannerNotificationDeleteMutationInput!) {
+  mutation BannerNotificationDelete($input: BannerNotificationDeleteMutation!) {
     deleteBannerNotification(input: $input) {
       deleted
     }

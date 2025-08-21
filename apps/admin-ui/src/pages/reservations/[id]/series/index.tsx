@@ -8,7 +8,7 @@ import {
   ReservationSeriesDocument,
   type ReservationSeriesQuery,
   type ReservationSeriesQueryVariables,
-  ReservationSeriesRescheduleMutationInput,
+  type ReservationSeriesRescheduleMutation,
   ReservationStartInterval,
   ReservationTypeChoice,
   type SeriesPageQuery,
@@ -210,7 +210,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
     const bufferTimeAfter = getBufferTime(reservationUnit.bufferTimeAfter, values.type, values.bufferTimeAfter);
 
     try {
-      const input: ReservationSeriesRescheduleMutationInput = {
+      const input: ReservationSeriesRescheduleMutation = {
         pk: reservationSeries.pk,
         beginDate: toApiDateUnsafe(fromUIDateUnsafe(values.startingDate)),
         beginTime: values.startTime,
@@ -404,7 +404,7 @@ export const SERIES_PAGE_QUERY = gql`
 `;
 
 export const RescheduleReservationSeries = gql`
-  mutation RescheduleReservationSeries($input: ReservationSeriesRescheduleMutationInput!) {
+  mutation RescheduleReservationSeries($input: ReservationSeriesRescheduleMutation!) {
     rescheduleReservationSeries(input: $input) {
       pk
     }

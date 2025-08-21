@@ -318,7 +318,7 @@ export const APPLICATION_SECTION_CANCEL_QUERY = gql`
 `;
 
 export const CANCEL_APPLICATION_SECTION_MUTATION = gql`
-  mutation CancelApplicationSection($input: ApplicationSectionReservationCancellationMutationInput!) {
+  mutation CancelApplicationSection($input: ApplicationSectionReservationCancellationMutation!) {
     cancelAllApplicationSectionReservations(input: $input) {
       future
       cancelled
