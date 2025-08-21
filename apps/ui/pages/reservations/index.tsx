@@ -174,22 +174,25 @@ export default Reservations;
 // NOTE bang user ID so this doesn't get abused (don't use it without a user)
 export const LIST_RESERVATIONS = gql`
   query ListReservations(
+    $orderBy: [ReservationOrderSet!]
+    # Filter
     $beginDate: Date
     $endDate: Date
-    $state: [ReservationStateChoice]
-    $user: [Int]
-    $reservationUnits: [Int]
-    $orderBy: [ReservationOrderSet!]
-    $reservationType: [ReservationTypeChoice]!
+    $reservationType: [ReservationTypeChoice!]!
+    $reservationUnits: [Int!]
+    $state: [ReservationStateChoice!]
+    $user: [Int!]
   ) {
     reservations(
-      beginDate: $beginDate
-      endDate: $endDate
-      state: $state
-      user: $user
-      reservationUnits: $reservationUnits
       orderBy: $orderBy
-      reservationType: $reservationType
+      filter: {
+        beginDate: $beginDate
+        endDate: $endDate
+        reservationType: $reservationType
+        reservationUnit: $reservationUnits
+        state: $state
+        user: $user
+      }
     ) {
       edges {
         node {

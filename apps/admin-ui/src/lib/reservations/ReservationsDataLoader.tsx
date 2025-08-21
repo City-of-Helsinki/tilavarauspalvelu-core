@@ -177,42 +177,45 @@ export const RESERVATION_LIST_QUERY = gql`
     $first: Int
     $after: String
     $orderBy: [ReservationOrderSet!]
-    $unit: [Int]
-    $reservationUnits: [Int]
-    $reservationUnitType: [Int]
-    $reservationType: [ReservationTypeChoice]
-    $state: [ReservationStateChoice]
-    $orderStatus: [OrderStatusWithFree]
-    $textSearch: String
-    $priceLte: Decimal
-    $priceGte: Decimal
+    # Filter
+    $applyingForFreeOfCharge: Boolean
     $beginDate: Date
-    $endDate: Date
     $createdAtGte: Date
     $createdAtLte: Date
-    $applyingForFreeOfCharge: Boolean
+    $endDate: Date
     $isRecurring: Boolean
+    $orderStatus: [OrderStatusWithFree!]
+    $priceGte: Decimal
+    $priceLte: Decimal
+    $reservationType: [ReservationTypeChoice!]
+    $reservationUnitType: [Int!]
+    $reservationUnits: [Int!]
+    $state: [ReservationStateChoice!]
+    $textSearch: String
+    $unit: [Int!]
   ) {
     reservations(
       first: $first
       after: $after
       orderBy: $orderBy
-      unit: $unit
-      reservationUnits: $reservationUnits
-      reservationUnitType: $reservationUnitType
-      reservationType: $reservationType
-      state: $state
-      orderStatus: $orderStatus
-      textSearch: $textSearch
-      priceLte: $priceLte
-      priceGte: $priceGte
-      beginDate: $beginDate
-      endDate: $endDate
-      createdAtGte: $createdAtGte
-      createdAtLte: $createdAtLte
-      isRecurring: $isRecurring
-      applyingForFreeOfCharge: $applyingForFreeOfCharge
-      onlyWithPermission: true
+      filter: {
+        applyingForFreeOfCharge: $applyingForFreeOfCharge
+        beginDate: $beginDate
+        createdAfter: $createdAtGte
+        createdBefore: $createdAtLte
+        endDate: $endDate
+        isRecurring: $isRecurring
+        onlyWithPermission: true
+        orderStatus: $orderStatus
+        priceGte: $priceGte
+        priceLte: $priceLte
+        reservationType: $reservationType
+        reservationUnit: $reservationUnits
+        reservationUnitType: $reservationUnitType
+        state: $state
+        textSearch: $textSearch
+        unit: $unit
+      }
     ) {
       edges {
         node {
