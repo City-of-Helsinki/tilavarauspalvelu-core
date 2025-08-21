@@ -141,56 +141,41 @@ export const FILTER_OTIONS_QUERY = gql`
     $orderReservationUnitTypeBy: [ReservationUnitTypeOrderSet!] = [nameFiAsc]
     $orderReservationPurposesBy: [ReservationPurposeOrderSet!] = [rankAsc]
     $orderUnitsBy: [UnitOrderSet!] = [nameFiAsc]
-    $orderReservationUnitsBy: [ReservationUnitOrderSet!] = [nameFiAsc]
-    $unit: [Int]
+    $orderReservationUnitsBy: [ReservationUnitAllOrderSet!] = [nameFiAsc]
+    # Filter
     $applicationRound: Int
+    $unit: [Int!]
   ) {
-    reservationUnitTypes(orderBy: $orderReservationUnitTypeBy) {
-      edges {
-        node {
-          id
-          pk
-          nameFi
-        }
-      }
+    allReservationUnitTypes(orderBy: $orderReservationUnitTypeBy) {
+      id
+      pk
+      nameFi
     }
-    reservationPurposes(orderBy: $orderReservationPurposesBy) {
-      edges {
-        node {
-          id
-          pk
-          nameFi
-        }
-      }
+    allReservationPurposes(orderBy: $orderReservationPurposesBy) {
+      id
+      pk
+      nameFi
     }
-    ageGroups {
-      edges {
-        node {
-          id
-          pk
-          minimum
-          maximum
-        }
-      }
+    allAgeGroups {
+      id
+      pk
+      minimum
+      maximum
     }
-    unitsAll(onlyWithPermission: true, orderBy: $orderUnitsBy) {
+    allUnits(orderBy: $orderUnitsBy, filter: { onlyWithPermission: true }) {
       id
       nameFi
       pk
     }
-    reservationUnitsAll(onlyWithPermission: true, unit: $unit, orderBy: $orderReservationUnitsBy) {
+    allReservationUnits(orderBy: $orderReservationUnitsBy, filter: { onlyWithPermission: true, unit: $unit }) {
       id
       nameFi
       pk
     }
-    unitGroups(onlyWithPermission: true, applicationRound: $applicationRound) {
-      edges {
-        node {
-          id
-          pk
-          nameFi
-        }
-      }
+    allUnitGroups(filter: { onlyWithPermission: true, applicationRound: $applicationRound }) {
+      id
+      pk
+      nameFi
     }
   }
 `;
