@@ -107,15 +107,17 @@ export function ParentSelector({
 
 export const SPACE_HIERARCHY_QUERY = gql`
   query UnitSpaces($id: ID!) {
-    unit(id: $id) {
-      id
-      spaces {
+    node(id: $id) {
+      ... on UnitNode {
         id
-        pk
-        nameFi
-        parent {
+        spaces {
           id
           pk
+          nameFi
+          parent {
+            id
+            pk
+          }
         }
       }
     }

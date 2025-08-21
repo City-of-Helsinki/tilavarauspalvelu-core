@@ -53,9 +53,9 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 // TODO should have a relay query for application sections
 export const APPLICATION_SECTION_VIEW_QUERY = gql`
   query ApplicationSectionView(
-    # Filters
+    # Filter
     $pk: [Int!]
-    $beginDate: Date = null # Used in ApplicationSectionReservation
+    $beginDate: Date = null # Used in fragments
   ) {
     applicationSections(filter: { pk: $pk }) {
       edges {
