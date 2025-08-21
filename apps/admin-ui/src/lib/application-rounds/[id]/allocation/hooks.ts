@@ -281,7 +281,7 @@ export function useRemoveAllocation({
         });
       }
       const { deleteAllocatedTimeslot: res } = data || {};
-      if (res?.deleted) {
+      if (res?.pk) {
         const { name } = applicationSection;
         const msg = t("allocation:resetSuccess", { name });
         successToast({ text: msg });
@@ -301,7 +301,9 @@ export const CREATE_ALLOCATED_TIME_SLOT = gql`
       dayOfTheWeek
       endTime
       pk
-      reservationUnitOption
+      reservationUnitOption {
+        id
+      }
     }
   }
 `;
@@ -309,7 +311,7 @@ export const CREATE_ALLOCATED_TIME_SLOT = gql`
 export const DELETE_ALLOCATED_TIME_SLOT = gql`
   mutation DeleteAllocatedTimeSlot($input: AllocatedTimeSlotDeleteMutation!) {
     deleteAllocatedTimeslot(input: $input) {
-      deleted
+      pk
     }
   }
 `;

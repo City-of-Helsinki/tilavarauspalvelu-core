@@ -531,7 +531,7 @@ export const CONFIRM_RESERVATION = gql`
 export const DELETE_RESERVATION = gql`
   mutation DeleteReservation($input: ReservationDeleteTentativeMutation!) {
     deleteTentativeReservation(input: $input) {
-      deleted
+      pk
     }
   }
 `;

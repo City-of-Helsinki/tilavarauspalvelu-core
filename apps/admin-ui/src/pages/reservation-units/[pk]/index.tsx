@@ -582,9 +582,9 @@ export const CREATE_IMAGE = gql`
 `;
 
 export const DELETE_IMAGE = gql`
-  mutation DeleteImage($pk: ID!) {
+  mutation DeleteImage($pk: Int!) {
     deleteReservationUnitImage(input: { pk: $pk }) {
-      deleted
+      pk
     }
   }
 `;
