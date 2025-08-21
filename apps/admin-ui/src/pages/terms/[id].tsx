@@ -1,15 +1,10 @@
 import { createClient } from "@/common/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { TermsOfUseDocument, type TermsOfUseQuery, type TermsOfUseQueryVariables, TermsType } from "@gql/gql-types";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
-import { Sanitize } from "common/src/components/Sanitize";
-import { H1 } from "common/styled";
-import { Button, ButtonVariant, IconArrowLeft } from "hds-react";
+import TermsContent from "common/src/components/TermsContent";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import React from "react";
-import styled from "styled-components";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -44,39 +39,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   };
 };
 
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  margin-top: var(--spacing-l);
-`;
-
-const GenericTerms = ({ genericTerms }: Props): JSX.Element => {
-  const { t, i18n } = useTranslation();
-
-  if (genericTerms == null) {
-    return <div>404</div>;
-  }
-
-  const lang = convertLanguageCode(i18n.language);
-  const title = getTranslationSafe(genericTerms, "name", lang);
-  const text = getTranslationSafe(genericTerms, "text", lang);
-
-  return (
-    <>
-      <H1>{title}</H1>
-      <Sanitize html={text} />
-      <ButtonContainer>
-        <Button
-          title="Takaisin"
-          variant={ButtonVariant.Primary}
-          onClick={() => window.history.back()}
-          iconStart={<IconArrowLeft />}
-        >
-          {t("common:prev")}
-        </Button>
-      </ButtonContainer>
-    </>
-  );
-};
+const GenericTerms = ({ genericTerms }: Props): JSX.Element => <TermsContent genericTerms={genericTerms} />;
 
 export default GenericTerms;
