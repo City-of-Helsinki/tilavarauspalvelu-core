@@ -6,7 +6,7 @@ import { Button, ButtonVariant, Checkbox, Dialog, Notification, NumberInput, Tex
 import {
   type ApprovalDialogFieldsFragment,
   useApproveReservationMutation,
-  type ReservationApproveMutationInput,
+  type ReservationApproveMutation,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { Flex } from "common/styled";
@@ -42,7 +42,7 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
   const [mutation] = useApproveReservationMutation();
   const displayError = useDisplayError();
 
-  const approveReservation = async (input: ReservationApproveMutationInput) => {
+  const approveReservation = async (input: ReservationApproveMutation) => {
     try {
       await mutation({ variables: { input } });
       successToast({ text: t("reservation:ApproveDialog.approved") });
@@ -171,7 +171,7 @@ export const APPROVAL_DIALOG_FRAGMENT = gql`
 `;
 
 export const APPROVE_RESERVATION_MUTATION = gql`
-  mutation ApproveReservation($input: ReservationApproveMutationInput!) {
+  mutation ApproveReservation($input: ReservationApproveMutation!) {
     approveReservation(input: $input) {
       pk
       state

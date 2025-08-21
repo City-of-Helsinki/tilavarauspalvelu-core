@@ -4,7 +4,7 @@ import {
   type ApplicantFieldsFragment,
   type ApplicationFormFragment,
   type ApplicationPage2Query,
-  type ApplicationUpdateMutationInput,
+  type ApplicationUpdateMutation,
   type Maybe,
   MunicipalityChoice,
   Priority,
@@ -440,7 +440,7 @@ function transformApplicationSection(
   return commonData;
 }
 
-export function transformApplicationPage2(values: ApplicationPage2FormValues): ApplicationUpdateMutationInput {
+export function transformApplicationPage2(values: ApplicationPage2FormValues): ApplicationUpdateMutation {
   const { pk } = values;
   const appEvents = values.applicationSections;
   return {
@@ -450,7 +450,7 @@ export function transformApplicationPage2(values: ApplicationPage2FormValues): A
 }
 
 // For page 1
-export function transformApplicationPage1(values: ApplicationPage1FormValues): ApplicationUpdateMutationInput {
+export function transformApplicationPage1(values: ApplicationPage1FormValues): ApplicationUpdateMutation {
   const { pk, applicantType } = values;
   const appEvents = filterNonNullable(values.applicationSections);
   return {
@@ -545,7 +545,7 @@ function isAddressValid(streetAddress?: string, postCode?: string, city?: string
   );
 }
 
-export function transformPage3Application(values: ApplicationPage3FormValues): ApplicationUpdateMutationInput {
+export function transformPage3Application(values: ApplicationPage3FormValues): ApplicationUpdateMutation {
   const shouldSaveBillingAddress = values.applicantType === ReserveeType.Individual || values.hasBillingAddress;
 
   const isOrganisation = values.organisationName != null && values.applicantType !== ReserveeType.Individual;
