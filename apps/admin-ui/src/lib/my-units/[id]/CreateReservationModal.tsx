@@ -14,7 +14,7 @@ import {
 import { useTranslation } from "next-i18next";
 import {
   type CreateStaffReservationFragment,
-  type ReservationStaffCreateMutationInput,
+  type ReservationStaffCreateMutation,
   useCreateStaffReservationMutation,
   useReservationUnitQuery,
 } from "@gql/gql-types";
@@ -122,7 +122,7 @@ export function CreateReservationModal({
     },
   });
   const [create] = useCreateStaffReservationMutation();
-  const createStaffReservation = (input: ReservationStaffCreateMutationInput) => create({ variables: { input } });
+  const createStaffReservation = (input: ReservationStaffCreateMutation) => create({ variables: { input } });
   const displayError = useDisplayError();
   const onSubmit = async (values: FormValueType) => {
     try {
@@ -135,7 +135,7 @@ export function CreateReservationModal({
 
       const bufferBefore = getBufferTime(reservationUnit.bufferTimeBefore, type, enableBufferTimeBefore);
       const bufferAfter = getBufferTime(reservationUnit.bufferTimeAfter, type, enableBufferTimeAfter);
-      const input: ReservationStaffCreateMutationInput = {
+      const input: ReservationStaffCreateMutation = {
         ...rest,
         reservationUnit: reservationUnit.pk,
         type,
@@ -391,7 +391,7 @@ export const CREATE_STAFF_RESERVATION_FRAGMENT = gql`
 `;
 
 export const CREATE_STAFF_RESERVATION = gql`
-  mutation CreateStaffReservation($input: ReservationStaffCreateMutationInput!) {
+  mutation CreateStaffReservation($input: ReservationStaffCreateMutation!) {
     createStaffReservation(input: $input) {
       pk
     }

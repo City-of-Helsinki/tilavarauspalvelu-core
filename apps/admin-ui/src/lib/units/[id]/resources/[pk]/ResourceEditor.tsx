@@ -3,12 +3,7 @@ import { Button, ButtonVariant } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  type ResourceUpdateMutationInput,
-  LocationType,
-  useUpdateResourceMutation,
-  useResourceQuery,
-} from "@gql/gql-types";
+import { type ResourceUpdateMutation, LocationType, useUpdateResourceMutation, useResourceQuery } from "@gql/gql-types";
 import { createNodeId } from "common/src/helpers";
 import { ButtonContainer, CenterSpinner } from "common/styled";
 import { errorToast, successToast } from "common/src/components/toast";
@@ -50,7 +45,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
 
   const [mutation, { loading: isMutationLoading }] = useUpdateResourceMutation();
 
-  const updateResource = async (input: ResourceUpdateMutationInput) => {
+  const updateResource = async (input: ResourceUpdateMutation) => {
     const res = await mutation({ variables: { input } });
     await refetch();
     return res;
@@ -156,7 +151,7 @@ export const RESOURCE_QUERY = gql`
 `;
 
 export const UPDATE_RESOURCE = gql`
-  mutation UpdateResource($input: ResourceUpdateMutationInput!) {
+  mutation UpdateResource($input: ResourceUpdateMutation!) {
     updateResource(input: $input) {
       pk
     }

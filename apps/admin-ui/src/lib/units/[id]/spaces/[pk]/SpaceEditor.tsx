@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Button, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { useUpdateSpaceMutation, type SpaceUpdateMutationInput, useSpaceQuery } from "@gql/gql-types";
+import { useUpdateSpaceMutation, type SpaceUpdateMutation, useSpaceQuery } from "@gql/gql-types";
 import { errorToast, successToast } from "common/src/components/toast";
 import { ButtonContainer, CenterSpinner, H2, H3 } from "common/styled";
 import { FormErrorSummary } from "@/component/FormErrorSummary";
@@ -77,7 +77,7 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
     return <CenterSpinner />;
   }
 
-  const updateSpace = (input: SpaceUpdateMutationInput) => mutation({ variables: { input } });
+  const updateSpace = (input: SpaceUpdateMutation) => mutation({ variables: { input } });
   const onSubmit = async (values: SpaceUpdateForm) => {
     try {
       const { parent, surfaceArea, pk, ...rest } = values;
@@ -158,7 +158,7 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
 }
 
 export const UPDATE_SPACE = gql`
-  mutation UpdateSpace($input: SpaceUpdateMutationInput!) {
+  mutation UpdateSpace($input: SpaceUpdateMutation!) {
     updateSpace(input: $input) {
       pk
     }

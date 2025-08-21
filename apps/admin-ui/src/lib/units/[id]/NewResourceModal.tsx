@@ -3,7 +3,7 @@ import { Button, ButtonVariant, Dialog } from "hds-react";
 import { useTranslation } from "next-i18next";
 import {
   LocationType,
-  type ResourceCreateMutationInput,
+  type ResourceCreateMutation,
   type NewResourceUnitFieldsFragment,
   useCreateResourceMutation,
 } from "@gql/gql-types";
@@ -30,7 +30,7 @@ export function NewResourceModal({ unit, closeModal, refetch, spacePk }: ModalPr
 
   const [createResourceMutation, { loading: isMutationLoading }] = useCreateResourceMutation();
 
-  const createResource = (input: ResourceCreateMutationInput) => createResourceMutation({ variables: { input } });
+  const createResource = (input: ResourceCreateMutation) => createResourceMutation({ variables: { input } });
 
   const form = useForm<ResourceUpdateForm>({
     resolver: zodResolver(ResourceUpdateSchema),
@@ -88,7 +88,7 @@ export function NewResourceModal({ unit, closeModal, refetch, spacePk }: ModalPr
 }
 
 export const CREATE_RESOURCE = gql`
-  mutation CreateResource($input: ResourceCreateMutationInput!) {
+  mutation CreateResource($input: ResourceCreateMutation!) {
     createResource(input: $input) {
       pk
     }

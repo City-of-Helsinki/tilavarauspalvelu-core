@@ -2,7 +2,7 @@ import {
   ReservationStateChoice,
   ReservationTypeChoice,
   ReservationTypeStaffChoice,
-  type ReservationSeriesCreateMutationInput,
+  type ReservationSeriesCreateMutation,
   useCreateReservationSeriesMutation,
   type ReservationSeriesReservationCreateSerializerInput,
 } from "@gql/gql-types";
@@ -28,7 +28,7 @@ function transformReservationTypeStaffChoice(t: ReservationTypeChoice): Reservat
 export function useCreateReservationSeries() {
   const [create] = useCreateReservationSeriesMutation();
 
-  const createReservationSeries = (input: ReservationSeriesCreateMutationInput) => create({ variables: { input } });
+  const createReservationSeries = (input: ReservationSeriesCreateMutation) => create({ variables: { input } });
 
   const { user } = useSession();
 
@@ -80,7 +80,7 @@ export function useCreateReservationSeries() {
     };
 
     const skipDates: string[] = props.skipDates.map((d) => toApiDateUnsafe(d));
-    const input: ReservationSeriesCreateMutationInput = {
+    const input: ReservationSeriesCreateMutation = {
       reservationDetails,
       skipDates,
       // checkOpeningHours: true,
@@ -105,7 +105,7 @@ export function useCreateReservationSeries() {
 }
 
 export const CREATE_RESERVATION_SERIES = gql`
-  mutation CreateReservationSeries($input: ReservationSeriesCreateMutationInput!) {
+  mutation CreateReservationSeries($input: ReservationSeriesCreateMutation!) {
     createReservationSeries(input: $input) {
       pk
     }
