@@ -1,5 +1,5 @@
 import {
-  Authentication,
+  AuthenticationType,
   ReservationTypeChoice,
   type ReservationUnitsByUnitQuery,
   useReservationUnitsByUnitQuery,
@@ -32,7 +32,7 @@ function createDummyReservationUnit(opt: OptionT): ReservationUnitType {
     isDraft: false,
     reservationUnitType: null,
     spaces: [],
-    authentication: Authentication.Weak,
+    authentication: AuthenticationType.Weak,
   };
 }
 

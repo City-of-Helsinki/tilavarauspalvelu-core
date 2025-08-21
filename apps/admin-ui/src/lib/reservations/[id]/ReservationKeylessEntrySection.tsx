@@ -363,7 +363,6 @@ export const CHANGE_RESERVATION_ACCESS_CODE_SERIES = gql`
 export const REPAIR_RESERVATION_ACCESS_CODE_SERIES = gql`
   mutation RepairReservationAccessCodeSeries($input: ReservationSeriesRepairAccessCodeMutation!) {
     repairReservationSeriesAccessCode(input: $input) {
-      pk
       accessCodeIsActive
       accessCodeGeneratedAt
     }
