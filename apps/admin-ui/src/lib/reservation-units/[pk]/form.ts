@@ -2,16 +2,17 @@ import { convertTime, filterNonNullable, timeToMinutes, toNumber } from "common/
 import { fromApiDate, fromUIDate, toApiDate, toUIDate } from "common/src/common/util";
 import {
   AccessType,
-  Authentication,
-  ImageType,
+  type ApplicationRoundTimeSlotUpdateInput,
+  AuthenticationType,
   PaymentType,
   PriceUnit,
   ReservationKind,
   ReservationStartInterval,
+  type ReservationUnitAccessTypeUpdateInput,
   type ReservationUnitEditQuery,
-  type ReservationUnitPricingSerializerInput,
-  type UpdateApplicationRoundTimeSlotSerializerInput,
-  type ReservationUnitAccessTypeSerializerInput,
+  ReservationUnitImageType,
+  ReservationUnitPricingCreateInput,
+  ReservationUnitPricingUpdateInput,
   Weekday,
 } from "@gql/gql-types";
 import { addDays, endOfDay, format } from "date-fns";
@@ -149,8 +150,8 @@ const ImageFormSchema = z.object({
   pk: z.number().optional(),
   mediumUrl: z.string().optional(),
   imageUrl: z.string().optional(),
-  imageType: z.nativeEnum(ImageType).optional(),
-  originalImageType: z.nativeEnum(ImageType).optional(),
+  imageType: z.nativeEnum(ReservationUnitImageType).optional(),
+  originalImageType: z.nativeEnum(ReservationUnitImageType).optional(),
   bytes: z.instanceof(File).optional(),
   deleted: z.boolean().optional(),
 });
@@ -373,7 +374,7 @@ export const BUFFER_TIME_OPTIONS = ["noBuffer", "bufferTimesSet"] as const;
 
 export const ReservationUnitEditSchema = z
   .object({
-    authentication: z.nativeEnum(Authentication),
+    authentication: z.nativeEnum(AuthenticationType),
     // TODO these are optional (0 is bit different than not set)
     // because if they are set (non undefined) we should show the active checkbox
     bufferTimeAfter: z.number(),
@@ -834,7 +835,7 @@ export function convertReservationUnit(data?: Node): ReservationUnitEditFormValu
     equipments: filterNonNullable(data?.equipments?.map((e) => e?.pk)),
     purposes: filterNonNullable(data?.purposes?.map((p) => p?.pk)),
     surfaceArea: data?.surfaceArea ?? 0,
-    authentication: data?.authentication ?? Authentication.Weak,
+    authentication: data?.authentication ?? AuthenticationType.Weak,
     reservationUnitType: data?.reservationUnitType?.pk ?? null,
     metadataSet: data?.metadataSet?.pk ?? null,
     paymentTerms: data?.paymentTerms?.pk ?? null,
@@ -906,7 +907,7 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
 
   const isReservableTime = (t?: SeasonalFormType["reservableTimes"][0]) => t && t.begin && t.end;
   // NOTE mutation doesn't support pks (even if changing not adding) unlike other mutations
-  const applicationRoundTimeSlots: UpdateApplicationRoundTimeSlotSerializerInput[] = seasons
+  const applicationRoundTimeSlots: ApplicationRoundTimeSlotUpdateInput[] = seasons
     .filter((s) => s.reservableTimes.filter(isReservableTime).length > 0 || s.closed)
     .map((s) => ({
       weekday: s.weekday,
@@ -918,7 +919,8 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     const d = fromUIDateTime(date, time);
     return d != null ? d.toISOString() : null;
   }
-  const accessTypes: ReservationUnitAccessTypeSerializerInput[] = filterNonNullable(
+
+  const accessTypes: ReservationUnitAccessTypeUpdateInput[] = filterNonNullable(
     accessTypesForm.map((at) => ({
       pk: at.pk,
       accessType: at.accessType,
@@ -976,11 +978,11 @@ function transformPricing(
   values: PricingFormValues,
   hasFuturePricing: boolean,
   taxPercentageOptions: TaxOption[]
-): ReservationUnitPricingSerializerInput | null {
+): ReservationUnitPricingCreateInput | ReservationUnitPricingUpdateInput | null {
   if (!hasFuturePricing && isAfterToday(values.begins)) {
     return null;
   }
-  // without a valid taxPrecentage mutation fails even if it's free pricing
+  // Without a valid taxPercentage mutation fails even if it's free pricing,
   // but we don't have a valid taxPercentage for free pricings (user has made no selection)
   const taxPercentage = values.taxPercentage > 0 ? values.taxPercentage : (taxPercentageOptions[0]?.pk ?? 0);
   if (taxPercentage === 0) {
@@ -989,10 +991,10 @@ function transformPricing(
 
   const begins = fromUIDate(values.begins) ?? new Date();
   return {
-    taxPercentage,
     begins: toApiDate(begins) ?? "",
     highestPrice: values.isPaid ? values.highestPrice.toString() : "0",
     lowestPrice: values.isPaid ? values.lowestPrice.toString() : "0",
+    taxPercentage,
     ...(values.pk > 0 ? { pk: values.pk } : {}),
     ...(values.priceUnit != null ? { priceUnit: values.priceUnit } : {}),
     ...(values.paymentType != null ? { paymentType: values.paymentType } : {}),

@@ -5,7 +5,7 @@ import { Button, ButtonSize, ButtonVariant, IconArrowRight, IconCross, IconPen, 
 import { breakpoints } from "common/src/const";
 import {
   type ApplicationCardFragment,
-  type ApplicationNameFragment,
+  type ApplicationNameFieldsFragment,
   ApplicationStatusChoice,
   type Maybe,
   useCancelApplicationMutation,
@@ -28,7 +28,7 @@ const StyledButton = styled(Button)`
 
 function formatApplicant(
   t: TFunction,
-  application: Pick<ApplicationNameFragment, "organisationName" | "applicantType" | "contactPersonFirstName">
+  application: Pick<ApplicationNameFieldsFragment, "organisationName" | "applicantType" | "contactPersonFirstName">
 ): string {
   const type = formatApplicantType(t, application);
   if (application.organisationName) {
@@ -38,7 +38,7 @@ function formatApplicant(
   return type;
 }
 
-function formatApplicantType(t: TFunction, application: Pick<ApplicationNameFragment, "applicantType">): string {
+function formatApplicantType(t: TFunction, application: Pick<ApplicationNameFieldsFragment, "applicantType">): string {
   const { applicantType } = application;
   if (!applicantType) {
     return "";

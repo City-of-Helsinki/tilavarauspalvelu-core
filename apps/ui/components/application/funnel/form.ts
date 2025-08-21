@@ -9,8 +9,8 @@ import {
   MunicipalityChoice,
   Priority,
   ReserveeType,
-  type SuitableTimeRangeSerializerInput,
-  type UpdateApplicationSectionForApplicationSerializerInput,
+  type SuitableTimeRangeInput,
+  type ApplicationSectionInput,
   Weekday,
 } from "@gql/gql-types";
 import { z } from "zod";
@@ -147,9 +147,7 @@ const ApplicationSectionPage2Schema = z
     }
   });
 
-function transformApplicationSectionPage2(
-  values: ApplicationSectionPage2FormValues
-): UpdateApplicationSectionForApplicationSerializerInput {
+function transformApplicationSectionPage2(values: ApplicationSectionPage2FormValues): ApplicationSectionInput {
   // NOTE: there is a type issue somewhere that causes this to be a string for some cases
   return {
     pk: Number(values.pk),
@@ -405,19 +403,17 @@ const transformEventReservationUnit = (pk: number, priority: number) => ({
   reservationUnit: pk,
 });
 
-function transformSuitableTimeRange(timeRange: SuitableTimeRangeFormValues): SuitableTimeRangeSerializerInput {
+function transformSuitableTimeRange(timeRange: SuitableTimeRangeFormValues): SuitableTimeRangeInput {
   return timeRange;
 }
 
 // NOTE this works only for subsections of an application mutation
 // if needed without an application mutation needs to use a different SerializerInput
-function transformApplicationSection(
-  ae: ApplicationSectionPage1FormValues
-): UpdateApplicationSectionForApplicationSerializerInput {
+function transformApplicationSection(ae: ApplicationSectionPage1FormValues): ApplicationSectionInput {
   const begin = transformDateString(ae.begin);
   const end = transformDateString(ae.end);
 
-  const commonData: UpdateApplicationSectionForApplicationSerializerInput = {
+  const commonData: ApplicationSectionInput = {
     ...(begin != null ? { reservationsBeginDate: begin } : {}),
     ...(end != null ? { reservationsEndDate: end } : {}),
     name: ae.name,
