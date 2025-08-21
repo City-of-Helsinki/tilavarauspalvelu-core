@@ -15,8 +15,8 @@ export function useDenyReasonOptions() {
       errorToast({ text: t("errors:errorFetchingData") });
     },
   });
-  const { reservationDenyReasons } = data ?? {};
-  const denyReasonOptions = filterNonNullable(reservationDenyReasons?.edges.map((x) => x?.node)).map((dr) => ({
+  const { allReservationDenyReasons } = data ?? {};
+  const denyReasonOptions = filterNonNullable(allReservationDenyReasons).map((dr) => ({
     value: dr?.pk ?? 0,
     label: dr?.reasonFi ?? "",
   }));
@@ -25,15 +25,11 @@ export function useDenyReasonOptions() {
 }
 
 export const RESERVATION_DENY_REASONS_QUERY = gql`
-  query ReservationDenyReasons($orderBy: [ReservationDenyReasonOrderSet]) {
-    reservationDenyReasons(orderBy: $orderBy) {
-      edges {
-        node {
-          id
-          pk
-          reasonFi
-        }
-      }
+  query ReservationDenyReasons($orderBy: [ReservationDenyReasonOrderSet!]) {
+    allReservationDenyReasons(orderBy: $orderBy) {
+      id
+      pk
+      reasonFi
     }
   }
 `;
