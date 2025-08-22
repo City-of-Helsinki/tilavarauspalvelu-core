@@ -1,3 +1,4 @@
+import { getOpeningHoursUrl } from "@/common/urls";
 import React from "react";
 import { IconLinkExternal } from "hds-react";
 import { useTranslation } from "next-i18next";
@@ -9,10 +10,12 @@ import type { ReservationUnitEditPageFragment } from "@gql/gql-types";
 export function OpeningHoursSection({
   reservationUnit,
   previewUrlPrefix,
+  apiBaseUrl,
 }: {
   // TODO can we simplify this by passing the hauki url only?
   reservationUnit: ReservationUnitEditPageFragment | null;
   previewUrlPrefix: string;
+  apiBaseUrl: string;
 }) {
   const { t } = useTranslation();
 
@@ -26,8 +29,8 @@ export function OpeningHoursSection({
           <p style={{ gridColumn: "1 / -1" }}>{t("reservationUnitEditor:openingHoursHelperTextHasLink")}</p>
           {/* TODO this should be external? i.e. standard a link */}
           <ButtonLikeLink
-            disabled={!reservationUnit?.haukiUrl}
-            href={reservationUnit?.haukiUrl ?? ""}
+            disabled={!apiBaseUrl || !reservationUnit?.pk}
+            href={getOpeningHoursUrl(apiBaseUrl, reservationUnit?.pk)}
             target="_blank"
             fontSize="small"
             rel="noopener noreferrer"
