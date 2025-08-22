@@ -9,7 +9,7 @@ import { SearchButton, SearchButtonContainer } from "common/src/components/Searc
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
 import { ControlledNumberInput } from "common/src/components/form";
-import { mapParamToInterger, toNumber } from "common/src/helpers";
+import { mapParamToInteger, toNumber } from "common/src/helpers";
 import { AutoGrid, Flex } from "common/styled";
 
 const filterOrder = [
@@ -33,9 +33,9 @@ export type SearchFormValues = {
 // TODO combine as much as possible with the one in single-search (move them to a common place)
 function mapSeasonalQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
   return {
-    purposes: mapParamToInterger(params.getAll("purposes"), 1),
-    units: mapParamToInterger(params.getAll("units"), 1),
-    reservationUnitTypes: mapParamToInterger(params.getAll("reservationUnitTypes"), 1),
+    purposes: mapParamToInteger(params.getAll("purposes"), 1),
+    units: mapParamToInteger(params.getAll("units"), 1),
+    reservationUnitTypes: mapParamToInteger(params.getAll("reservationUnitTypes"), 1),
     personsAllowed: toNumber(params.get("personsAllowed")),
     textSearch: params.get("textSearch") ?? "",
     accessTypes: params.getAll("accessTypes"),

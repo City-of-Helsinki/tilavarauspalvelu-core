@@ -17,7 +17,7 @@ import { type OptionsListT } from "common/src/modules/search";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
-import { ignoreMaybeArray, mapParamToInterger, toNumber } from "common/src/helpers";
+import { ignoreMaybeArray, mapParamToInteger, toNumber } from "common/src/helpers";
 import { Flex } from "common/styled";
 import { ShowAllContainer } from "common/src/components";
 
@@ -49,10 +49,10 @@ function mapQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
   const duration = dur != null && dur > 0 ? dur : null;
   const showOnlyReservable = ignoreMaybeArray(params.getAll("showOnlyReservable")) !== "false";
   return {
-    purposes: mapParamToInterger(params.getAll("purposes"), 1),
-    units: mapParamToInterger(params.getAll("units"), 1),
-    equipments: mapParamToInterger(params.getAll("equipments"), 1),
-    reservationUnitTypes: mapParamToInterger(params.getAll("reservationUnitTypes"), 1),
+    purposes: mapParamToInteger(params.getAll("purposes"), 1),
+    units: mapParamToInteger(params.getAll("units"), 1),
+    equipments: mapParamToInteger(params.getAll("equipments"), 1),
+    reservationUnitTypes: mapParamToInteger(params.getAll("reservationUnitTypes"), 1),
     accessTypes: params.getAll("accessTypes"),
     timeBegin: params.get("timeBegin"),
     timeEnd: params.get("timeEnd"),
