@@ -1,10 +1,13 @@
-import TermsContent from "common/src/components/TermsContent";
 import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
 import { TermsType, TermsOfUseDocument, type TermsOfUseQuery, type TermsOfUseQueryVariables } from "@gql/gql-types";
+import { H1 } from "common/styled";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
+import { Sanitize } from "common/src/components/Sanitize";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -39,6 +42,23 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   };
 };
 
-const GenericTerms = ({ genericTerms }: Props): JSX.Element => <TermsContent genericTerms={genericTerms} />;
+const GenericTerms = ({ genericTerms }: Props): JSX.Element => {
+  const { i18n } = useTranslation();
+
+  if (genericTerms == null) {
+    return <div>404</div>;
+  }
+
+  const lang = convertLanguageCode(i18n.language);
+  const title = getTranslationSafe(genericTerms, "name", lang);
+  const text = getTranslationSafe(genericTerms, "text", lang);
+
+  return (
+    <>
+      <H1>{title}</H1>
+      <Sanitize html={text} />
+    </>
+  );
+};
 
 export default GenericTerms;

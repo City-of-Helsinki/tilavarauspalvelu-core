@@ -1,8 +1,10 @@
+import { getClientUrl } from "@/common/urls";
+import IconButton from "common/src/components/IconButton";
 import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { signIn } from "common/src/browserHelpers";
-import { Button, IconArrowRight, IconGroup } from "hds-react";
+import { Button, IconArrowRight, IconGroup, IconLinkExternal } from "hds-react";
 import { fontBold, H2 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { HERO_IMAGE_URL } from "@/common/const";
@@ -41,11 +43,13 @@ const Content = styled.div`
 
 const Ingress = styled(H2)`
   line-height: 1.8125rem;
+  && {
+    margin-bottom: var(--spacing-layout-2-xl);
+  }
 `;
 
-export function MainLander({ apiBaseUrl }: Readonly<{ apiBaseUrl: string }>) {
+export function MainLander({ apiBaseUrl }: Readonly<{ apiBaseUrl: string }>): React.ReactElement {
   const { t, i18n } = useTranslation();
-
   // Redirect to root url if not already there, useful e.g. in /auth/logout page
   const router = useRouter();
   useEffect(() => {
@@ -75,6 +79,12 @@ export function MainLander({ apiBaseUrl }: Readonly<{ apiBaseUrl: string }>) {
       </KorosHeading>
       <Content>
         <Ingress as="p">{t("translation:MainLander.ingress")}</Ingress>
+        <IconButton
+          label={t("navigation:a11yTerms")}
+          icon={<IconLinkExternal />}
+          href={`${getClientUrl()}terms/accessibility-admin`}
+          openInNewTab
+        />
       </Content>
     </>
   );
