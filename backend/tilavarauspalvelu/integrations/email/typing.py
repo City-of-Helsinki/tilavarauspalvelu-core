@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, Any, ClassVar, Self, TypedDict
 from django.utils.functional import classproperty
 from django.utils.translation import pgettext_lazy
 
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+
 from .rendering import render_html, render_text
 from .template_context import (
     get_context_for_reservation_access_code_added,
@@ -77,7 +79,9 @@ class EmailData:
     subject: str
     text_content: str
     html_content: str
-    attachments: Iterable[EmailAttachment] = ()
+    valid_until: datetime.datetime
+    attachments: list[EmailAttachment] = dataclasses.field(default_factory=list)
+    created_at: datetime.datetime = dataclasses.field(default_factory=local_datetime)
 
     @classmethod
     def build(
@@ -85,6 +89,7 @@ class EmailData:
         recipients: Iterable[str],
         context: EmailContext,
         email_type: EmailTemplateType,
+        valid_until: datetime.datetime,
         attachment: EmailAttachment | None = None,
     ) -> Self:
         """Helper method to build an EmailData object with the given context and email type."""
@@ -93,6 +98,7 @@ class EmailData:
             subject=context["title"],
             text_content=render_text(email_type=email_type, context=context),
             html_content=render_html(email_type=email_type, context=context),
+            valid_until=valid_until.astimezone(DEFAULT_TIMEZONE),
             attachments=[attachment] if attachment else [],
         )
 
