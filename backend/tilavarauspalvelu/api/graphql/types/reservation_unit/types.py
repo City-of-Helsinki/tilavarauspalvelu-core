@@ -298,7 +298,11 @@ class ReservationUnitNode(DjangoNode):
         if root.origin_hauki_resource is None:
             return None
 
-        return generate_hauki_link(root.ext_uuid, info.context.user.email, root.unit.hauki_department_id)
+        return generate_hauki_link(
+            reservation_unit_uuid=root.ext_uuid,
+            user_email=info.context.user.email,
+            organization_id=root.unit.hauki_department_id,
+        )
 
     def resolve_reservable_time_spans(
         root: ReservationUnit,
