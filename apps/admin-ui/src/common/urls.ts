@@ -111,3 +111,13 @@ export function getNotificationUrl(pk: Maybe<number> | undefined): string {
   }
   return `${BANNER_NOTIFICATIONS_URL_PREFIX}/${pk}`;
 }
+
+export function getOpeningHoursUrl(apiBaseUrl: string, reservationUnitPk: number | null): string {
+  let reservationUnitString = "";
+  if (reservationUnitPk == null || !(reservationUnitPk > 0)) {
+    return "";
+  } else {
+    reservationUnitString = reservationUnitPk.toString();
+  }
+  return `${apiBaseUrl}/v1/edit_opening_hours/?reservationUnits=${reservationUnitString}`;
+}
