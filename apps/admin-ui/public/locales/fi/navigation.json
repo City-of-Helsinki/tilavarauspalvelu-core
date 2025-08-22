@@ -25,5 +25,6 @@
   "spaces": "Tilat",
   "resources": "Resurssit",
   "units": "Toimipisteet",
-  "notifications": "Ilmoitukset"
+  "notifications": "Ilmoitukset",
+  "a11yTerms": "Saavutettavuusseloste"
 }

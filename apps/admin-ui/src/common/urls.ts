@@ -9,6 +9,8 @@ export const MY_UNITS_URL_PREFIX = "/my-units";
 export const UNITS_URL_PREFIX = "/units";
 export const BANNER_NOTIFICATIONS_URL_PREFIX = "/notifications";
 export const REQUESTED_RESERVATIONS_URL_PREFIX = "/reservations/requested";
+const LOCAL_CLIENT_BASE_URL = "http://localhost:3000/";
+const CLIENT_BASE_URL = "/";
 
 type ApplicationRoundPages = "criteria" | "";
 export function getApplicationRoundUrl(
@@ -110,4 +112,9 @@ export function getNotificationUrl(pk: Maybe<number> | undefined): string {
     return "";
   }
   return `${BANNER_NOTIFICATIONS_URL_PREFIX}/${pk}`;
+}
+
+export function getClientUrl(): string {
+  // Return the localhost client side base URL if in dev environment, to ease with development & testing
+  return process.env.NEXT_ENV === "development" ? LOCAL_CLIENT_BASE_URL : CLIENT_BASE_URL;
 }

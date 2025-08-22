@@ -1,7 +1,7 @@
 import { useTranslation } from "next-i18next";
 import { signIn, signOut } from "common/src/browserHelpers";
 import { useSession, useHandling } from "@/hooks";
-import { Header, IconSignout, IconStar, IconUser, LogoSize, TitleStyleType } from "hds-react";
+import { Header, IconLinkExternal, IconSignout, IconStar, IconUser, LogoSize, TitleStyleType } from "hds-react";
 import React from "react";
 import styled from "styled-components";
 import { useLocation } from "react-use";
@@ -16,6 +16,7 @@ import {
   RESERVATIONS_URL_PREFIX,
   UNITS_URL_PREFIX,
   REQUESTED_RESERVATIONS_URL_PREFIX,
+  getClientUrl,
 } from "@/common/urls";
 import { UserPermissionChoice } from "@gql/gql-types";
 import { getLocalizationLang } from "common/src/helpers";
@@ -121,6 +122,11 @@ const NavigationMenuWrapper = styled.div`
     /* using box-shadow for a bottom border inside of the element, without affecting text positioning */
     box-shadow: 0 -4px 0 0 var(--color-black) inset;
   }
+`;
+
+const ProfileMenuLink = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
 interface IMenuChild {
@@ -289,10 +295,20 @@ export function Navigation({ apiBaseUrl }: Props) {
           <Header.ActionBarItem id="user-menu" label={name} icon={<IconUser />} fixedRightPosition>
             <Header.ActionBarButton
               label={
-                <>
+                <ProfileMenuLink>
+                  <span>{t("navigation:a11yTerms")}</span>
+                  <IconLinkExternal />
+                </ProfileMenuLink>
+              }
+              onClick={() => window.open(`${getClientUrl()}terms/accessibility-admin`, "_blank", "noopener noreferrer")}
+              aria-label={t("navigation:a11yTerms")}
+            />
+            <Header.ActionBarButton
+              label={
+                <ProfileMenuLink>
                   <span>{t("navigation:logout")}</span>
                   <IconSignout />
-                </>
+                </ProfileMenuLink>
               }
               onClick={() => signOut(apiBaseUrl, env.NEXT_PUBLIC_BASE_URL)}
             />
