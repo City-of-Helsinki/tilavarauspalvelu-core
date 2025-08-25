@@ -1,3 +1,5 @@
+import { useToastIfQueryParam } from "common/src/hooks/useToastIfQueryParam";
+import { useSearchParams } from "next/navigation";
 import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useForm, type UseFormReturn } from "react-hook-form";
@@ -168,6 +170,7 @@ function ReservationUnitEditor({
   const router = useRouter();
   const { setModalContent } = useModal();
   const [reconcileImageChanges] = useImageMutations();
+  const params = useSearchParams();
 
   const [updateMutation] = useUpdateReservationUnitMutation();
   const [createMutation] = useCreateReservationUnitMutation();
@@ -188,6 +191,12 @@ function ReservationUnitEditor({
     skip: unitPk <= 0,
   });
   const unit = reservationUnit?.unit ?? unitData?.unit;
+
+  useToastIfQueryParam({
+    key: ["error_code", "error_message"],
+    message: params.get("error_message") ?? t("reservationUnit:editErrorMessage"),
+    type: "error",
+  });
 
   // ----------------------------- Constants ---------------------------------
 
