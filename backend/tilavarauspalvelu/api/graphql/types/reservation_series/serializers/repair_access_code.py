@@ -51,10 +51,9 @@ class ReservationSeriesRepairAccessCodeSerializer(NestingModelSerializer):
 
         has_access_code_after = instance.actions.has_upcoming_or_ongoing_reservations_with_active_access_codes()
 
-        if instance.allocated_time_slot is not None:
-            section = instance.allocated_time_slot.reservation_unit_option.application_section
-
-            if no_access_code_before and has_access_code_after:
-                EmailService.send_seasonal_booking_access_code_added_email(section)
+        allocation = instance.allocated_time_slot
+        if allocation is not None and no_access_code_before and has_access_code_after:
+            section = allocation.reservation_unit_option.application_section
+            EmailService.send_seasonal_booking_access_type_changed_email(section)
 
         return instance

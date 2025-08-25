@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from tilavarauspalvelu.enums import PriceUnit, ReservationStateChoice, Weekday
+from tilavarauspalvelu.enums import AccessType, PriceUnit, ReservationStateChoice, Weekday
 from utils.date_utils import local_datetime
 
 from tests.factories import (
@@ -34,6 +34,8 @@ def email_reservation() -> Reservation:
         pricings__lowest_price=Decimal("10.00"),
         pricings__highest_price=Decimal("12.30"),
         pricings__price_unit=PriceUnit.FIXED,
+        access_types__access_type=AccessType.UNRESTRICTED,
+        access_types__begin_date=datetime.date(2024, 1, 1),
     )
     application_section = ApplicationSectionFactory.create(
         name="[HAKEMUKSEN OSAN NIMI]",

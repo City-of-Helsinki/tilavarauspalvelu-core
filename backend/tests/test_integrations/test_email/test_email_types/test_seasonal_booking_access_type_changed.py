@@ -1,4 +1,4 @@
-# type: EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED
+# type: EmailType.SEASONAL_BOOKING_ACCESS_TYPE_CHANGED
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock
 from tilavarauspalvelu.enums import AccessType, ReservationTypeChoice, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
-from tilavarauspalvelu.integrations.email.template_context import get_context_for_seasonal_booking_access_code_added
+from tilavarauspalvelu.integrations.email.template_context import get_context_for_seasonal_booking_access_type_changed
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.typing import (
@@ -186,7 +186,7 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_seasonal_booking_access_code_added__get_context(lang: Lang):
+def test_seasonal_booking_access_type_changed__get_context(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     params = {
@@ -196,14 +196,14 @@ def test_seasonal_booking_access_code_added__get_context(lang: Lang):
         "language": lang,
     }
     with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_booking_access_code_added(**get_mock_params(**params))
+        context = get_context_for_seasonal_booking_access_type_changed(**get_mock_params(**params))
 
     assert context == expected
 
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_seasonal_booking_access_code_added__get_context__get_mock_data(lang: Lang):
+def test_seasonal_booking_access_type_changed__get_context__get_mock_data(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     params = {
@@ -213,7 +213,7 @@ def test_seasonal_booking_access_code_added__get_context__get_mock_data(lang: La
         "language": lang,
     }
     with TranslationsFromPOFiles():
-        context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED, **params)
+        context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_ACCESS_TYPE_CHANGED, **params)
 
     assert context == expected
 
@@ -221,7 +221,7 @@ def test_seasonal_booking_access_code_added__get_context__get_mock_data(lang: La
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(PindoraService.get_access_code)
-def test_seasonal_booking_access_code_added__get_context__instance(email_reservation):
+def test_seasonal_booking_access_type_changed__get_context__instance(email_reservation):
     section = email_reservation.actions.get_application_section()
     reservations = section.actions.get_reservations()
 
@@ -247,7 +247,7 @@ def test_seasonal_booking_access_code_added__get_context__instance(email_reserva
     expected["allocations"][1]["series_url"] = f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_2.id}"
 
     with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_booking_access_code_added(section, language="en")
+        context = get_context_for_seasonal_booking_access_type_changed(section, language="en")
 
     assert context == expected
 
@@ -255,7 +255,7 @@ def test_seasonal_booking_access_code_added__get_context__instance(email_reserva
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(PindoraService.get_access_code)
-def test_seasonal_booking_access_code_added__get_context__instance__inactive(email_reservation):
+def test_seasonal_booking_access_type_changed__get_context__instance__inactive(email_reservation):
     section = email_reservation.actions.get_application_section()
     reservations = section.actions.get_reservations()
 
@@ -286,7 +286,7 @@ def test_seasonal_booking_access_code_added__get_context__instance__inactive(ema
     expected["allocations"][1]["series_url"] = f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_2.id}"
 
     with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_booking_access_code_added(section, language="en")
+        context = get_context_for_seasonal_booking_access_type_changed(section, language="en")
 
     assert context == expected
 
@@ -295,9 +295,9 @@ def test_seasonal_booking_access_code_added__get_context__instance__inactive(ema
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_access_code_added__render__text():
-    context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED, language="en")
-    text_content = render_text(email_type=EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED, context=context)
+def test_seasonal_booking_access_type_changed__render__text():
+    context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_ACCESS_TYPE_CHANGED, language="en")
+    text_content = render_text(email_type=EmailType.SEASONAL_BOOKING_ACCESS_TYPE_CHANGED, context=context)
     text_content = text_content.replace("&amp;", "&")
     url = "https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678"
 
@@ -339,9 +339,9 @@ def test_seasonal_booking_access_code_added__render__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_access_code_added__render__html():
-    context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED, language="en")
-    html_content = render_html(email_type=EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED, context=context)
+def test_seasonal_booking_access_type_changed__render__html():
+    context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_ACCESS_TYPE_CHANGED, language="en")
+    html_content = render_html(email_type=EmailType.SEASONAL_BOOKING_ACCESS_TYPE_CHANGED, context=context)
     text_content = html_email_to_text(html_content)
     url = "https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678"
 
@@ -385,7 +385,7 @@ def test_seasonal_booking_access_code_added__render__html():
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(PindoraClient.get_seasonal_booking)
-def test_seasonal_booking_access_code_added__send_email(outbox):
+def test_seasonal_booking_access_type_changed__send_email(outbox):
     ext_uuid = uuid.uuid4()
 
     PindoraClient.get_seasonal_booking.return_value = PindoraSeasonalBookingResponse(
@@ -418,7 +418,7 @@ def test_seasonal_booking_access_code_added__send_email(outbox):
 
     section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
 
-    EmailService.send_seasonal_booking_access_code_added_email(section)
+    EmailService.send_seasonal_booking_access_type_changed_email(section)
 
     assert len(outbox) == 1
 
@@ -429,7 +429,7 @@ def test_seasonal_booking_access_code_added__send_email(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_access_code_added__send_email__no_reservations(outbox):
+def test_seasonal_booking_access_type_changed__send_email__no_reservations(outbox):
     user = UserFactory.create(email="user@email.com")
     application = ApplicationFactory.create(
         user=user,
@@ -445,7 +445,7 @@ def test_seasonal_booking_access_code_added__send_email__no_reservations(outbox)
 
     section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
 
-    EmailService.send_seasonal_booking_access_code_added_email(section)
+    EmailService.send_seasonal_booking_access_type_changed_email(section)
 
     assert len(outbox) == 0
 
@@ -454,7 +454,7 @@ def test_seasonal_booking_access_code_added__send_email__no_reservations(outbox)
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(SentryLogger.log_message)
-def test_seasonal_booking_access_code_added__send_email__no_recipients(outbox):
+def test_seasonal_booking_access_type_changed__send_email__no_recipients(outbox):
     application = ApplicationFactory.create(
         user__email="",
         contact_person_email=None,
@@ -470,7 +470,7 @@ def test_seasonal_booking_access_code_added__send_email__no_recipients(outbox):
 
     section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
 
-    EmailService.send_seasonal_booking_access_code_added_email(section)
+    EmailService.send_seasonal_booking_access_type_changed_email(section)
 
     assert len(outbox) == 0
 

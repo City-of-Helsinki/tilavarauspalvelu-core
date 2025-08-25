@@ -12,11 +12,13 @@ from django.core.cache import cache
 from django.db import transaction
 
 from config.celery import app
+from tilavarauspalvelu.enums import ReservationTypeChoice
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
     Application,
     ApplicationRound,
+    ApplicationSection,
     PaymentOrder,
     PersonalInfoViewLog,
     Reservation,
@@ -34,7 +36,7 @@ from utils.date_utils import local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
-    from collections.abc import Collection
+    from collections.abc import Collection, Iterable
 
     from celery.contrib.django.task import Task
 
@@ -46,6 +48,7 @@ __all__ = [
     "delete_expired_applications_task",
     "delete_pindora_reservation_task",
     "generate_reservation_series_from_allocations_task",
+    "notify_reservation_on_access_type_change_task",
     "prune_reservation_statistics_task",
     "prune_reservations_task",
     "purge_image_cache_task",
@@ -454,3 +457,39 @@ def update_pindora_access_code_is_active_task() -> None:
     from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 
     PindoraService.update_access_code_is_active()
+
+
+@app.task(name="notify_reservation_on_access_type_change")
+def notify_reservation_on_access_type_change_task(reservation_pks: list[int]) -> None:
+    """Send email to given reservations assuming that their access types have changed."""
+    from tilavarauspalvelu.integrations.email.main import EmailService
+
+    now = local_datetime()
+
+    reservations: Iterable[Reservation] = (
+        Reservation.objects.all()
+        .filter(
+            pk__in=reservation_pks,
+            # Still only send email for reservations that are ongoing or in the future
+            ends_at__gt=now,
+        )
+        .exclude(type=ReservationTypeChoice.SEASONAL)
+    )
+
+    # Fetch application section series separately so that we don't send multiple emails for the same series
+    sections: Iterable[ApplicationSection] = (
+        ApplicationSection.objects.all()
+        .filter(
+            reservation_unit_options__allocated_time_slot__reservation_series__reservations__in=reservation_pks,
+            # Still only send email for series that have reservations that are ongoing or in the future
+            reservation_unit_options__allocated_time_slot__reservation_series__reservations__ends_at__gt=now,
+        )
+        .distinct()
+        .select_related("allocated_time_slot__reservation_unit_option__application_section__application")
+    )
+
+    for reservation in reservations:
+        EmailService.send_reservation_access_type_changed_email(reservation)
+
+    for section in sections:
+        EmailService.send_seasonal_booking_access_type_changed_email(section)
