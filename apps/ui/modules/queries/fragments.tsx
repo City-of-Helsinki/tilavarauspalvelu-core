@@ -22,15 +22,6 @@ export const TERMS_OF_USE_FRAGMENT = gql`
   }
 `;
 
-export const CANCEL_REASON_FRAGMENT = gql`
-  fragment CancelReasonFields on ReservationCancelReasonType {
-    value
-    reasonFi
-    reasonEn
-    reasonSv
-  }
-`;
-
 export const CANCELLATION_RULE_FRAGMENT = gql`
   fragment CancellationRuleFields on ReservationUnitNode {
     id

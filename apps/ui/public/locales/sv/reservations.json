@@ -28,7 +28,16 @@
     "ingressApplication": "Du håller på att avboka en bokning som ingår i en säsongsbokning.",
     "infoBody": "Vi vill göra Varaamo ännu bättre. Vi vill gärna veta varför du avbokar din bokning.",
     "infoBodyApplication": "Vi vill göra Varaamo ännu bättre. Vi vill gärna veta varför du avbokar din säsöngsbokning.",
-    "reason": "Orsak till avbokningen"
+    "reason": "Orsak till avbokningen",
+    "reasons": {
+      "CHANGE_OF_PLANS": "Mina planer har ändrats",
+      "FOUND_ANOTHER_SPACE_ELSEWHERE": "Jag hittade en annan lokal någon annanstans",
+      "FOUND_ANOTHER_SPACE_VARAAMO": "Jag hittade en annan lokal på Varaamo",
+      "UNSUITABLE_SPACE": "Lokalen är inte lämplig för ändamålet",
+      "PROCESSING_TIME_TOO_LONG": "Bokningens handläggningstid är för lång",
+      "OTHER": "Annan orsak",
+      "NOT_PAID": "Bokningen betalades inte eller faktura valdes inte som betalningsmetod inom angiven tid"
+    }
   },
   "cancelSection": {
     "title": "Avboka alla bokningar",

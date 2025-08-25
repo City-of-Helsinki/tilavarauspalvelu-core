@@ -62,6 +62,7 @@ const getPaymentStatusLabelType = (status: OrderStatus | null | undefined): Stat
     case OrderStatus.PaidManually:
     case OrderStatus.PaidByInvoice:
     case OrderStatus.Draft:
+    case OrderStatus.Pending:
       return "alert";
     case OrderStatus.Cancelled:
     default:

@@ -206,7 +206,9 @@ function Reservation({
     message:
       params.get("error_code") === "RESERVATION_NOT_CONFIRMED" ||
       params.get("error_code") === "RESERVATION_NOT_FOUND" ||
-      params.get("error_code") === "RESERVATION_CANCELLED"
+      params.get("error_code") === "CANCELLED" ||
+      params.get("error_code") === "RESERVATION_PAYMENT_ORDER_PAST_DUE_BY" ||
+      params.get("error_code") === "RESERVATION_PAYMENT_NOT_PENDING"
         ? t("reservations:reservationNoLongerPayable")
         : params.get("error_message") || t("error:genericError"),
     type: "error",
