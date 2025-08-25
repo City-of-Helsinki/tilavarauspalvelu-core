@@ -64,6 +64,7 @@ function createEnv() {
   return {
     ...(isServer && serverConfig?.success ? serverConfig.data : {}),
     ...(clientConfig.success ? clientConfig.data : {}),
+    NEXT_ENV: process.env.NEXT_ENV,
   };
 }
 
