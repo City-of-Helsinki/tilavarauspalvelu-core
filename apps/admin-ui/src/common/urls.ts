@@ -125,11 +125,14 @@ export function getAccessibilityTermsUrl(): string {
   return `${getCustomerUrl()}/terms/accessibility-admin`;
 }
 
-export function getOpeningHoursUrl(apiBaseUrl: string, reservationUnitPk: number | number[] | null): string {
+export function getOpeningHoursUrl(
+  apiBaseUrl: string,
+  reservationUnitPk: number | number[] | null,
+  errorUrl: URL = new URL(window.location.pathname, window.location.origin)
+): string {
   if (window?.location == null) {
     throw new Error("window.location is not available, cannot build redirect url");
   }
-  const errorUrl = new URL(`/kasittely/reservation-units`, window.location.origin);
 
   let reservationUnitsParam = "";
   if (Array.isArray(reservationUnitPk)) {
@@ -146,8 +149,8 @@ export function getOpeningHoursUrl(apiBaseUrl: string, reservationUnitPk: number
   try {
     const url = new URL(`/v1/edit_opening_hours/`, apiBaseUrl);
     const { searchParams } = url;
+    searchParams.set("reservation_units", reservationUnitsParam);
     searchParams.set("redirect_on_error", errorUrl.toString());
-    searchParams.set("reservationUnits", reservationUnitsParam);
     return url.toString();
   } catch (e) {
     // eslint-disable-next-line no-console
