@@ -125,12 +125,33 @@ export function getAccessibilityTermsUrl(): string {
   return `${getCustomerUrl()}/terms/accessibility-admin`;
 }
 
-export function getOpeningHoursUrl(apiBaseUrl: string, reservationUnitPk: number | null): string {
-  let reservationUnitString = "";
-  if (reservationUnitPk == null || !(reservationUnitPk > 0)) {
+export function getOpeningHoursUrl(apiBaseUrl: string, reservationUnitPk: number | number[] | null): string {
+  if (window?.location == null) {
+    throw new Error("window.location is not available, cannot build redirect url");
+  }
+  const errorUrl = new URL(`/kasittely/reservation-units`, window.location.origin);
+
+  let reservationUnitsParam = "";
+  if (Array.isArray(reservationUnitPk)) {
+    reservationUnitPk.filter((pk) => pk > 0);
+    if (reservationUnitPk.length === 0) {
+      return "";
+    }
+    reservationUnitsParam = reservationUnitPk.join(",");
+  } else if (reservationUnitPk == null || !(reservationUnitPk > 0)) {
     return "";
   } else {
-    reservationUnitString = reservationUnitPk.toString();
+    reservationUnitsParam = reservationUnitPk.toString();
   }
-  return `${apiBaseUrl}/v1/edit_opening_hours/?reservationUnits=${reservationUnitString}`;
+  try {
+    const url = new URL(`/v1/edit_opening_hours/`, apiBaseUrl);
+    const { searchParams } = url;
+    searchParams.set("redirect_on_error", errorUrl.toString());
+    searchParams.set("reservationUnits", reservationUnitsParam);
+    return url.toString();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+  }
+  return "";
 }
