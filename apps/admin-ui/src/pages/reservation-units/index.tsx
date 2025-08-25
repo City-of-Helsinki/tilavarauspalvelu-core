@@ -1,4 +1,7 @@
-import React from "react";
+import EditOpeningHoursBar from "@lib/reservation-units/EditOpeningHoursBar";
+import { useToastIfQueryParam } from "common/src/hooks/useToastIfQueryParam";
+import { useSearchParams } from "next/navigation";
+import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { H1, HR } from "common/styled";
 import { AuthorizationChecker } from "@/component/AuthorizationChecker";
@@ -15,9 +18,25 @@ import { ReservationUnitsDataReader, Filters } from "@lib/reservation-units/";
 import { createClient } from "@/common/apolloClient";
 import { getFilterOptions } from "@/hooks/useFilterOptions";
 
-function ReservationUnits({ optionsData }: { optionsData: PageProps["optionsData"] }): JSX.Element {
+export type SelectedRow = number | string;
+
+function ReservationUnits({
+  optionsData,
+  apiBaseUrl,
+}: {
+  optionsData: PageProps["optionsData"];
+  apiBaseUrl: string;
+}): JSX.Element {
   const { t } = useTranslation();
   const options = getFilterOptions(t, optionsData);
+  const [selectedRows, setSelectedRows] = useState<SelectedRow[]>([]);
+  const params = useSearchParams();
+
+  useToastIfQueryParam({
+    key: ["error_code", "error_message"],
+    message: params.get("error_message") ?? t("reservationUnit:editErrorMessage"),
+    type: "error",
+  });
 
   return (
     <>
@@ -27,7 +46,8 @@ function ReservationUnits({ optionsData }: { optionsData: PageProps["optionsData
       </div>
       <Filters options={options} />
       <HR />
-      <ReservationUnitsDataReader />
+      <ReservationUnitsDataReader selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
+      <EditOpeningHoursBar selectedRows={selectedRows} setSelectedRows={setSelectedRows} apiBaseUrl={apiBaseUrl} />,
     </>
   );
 }
@@ -36,7 +56,7 @@ type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 export default function Page(props: PageProps): JSX.Element {
   return (
     <AuthorizationChecker apiUrl={props.apiBaseUrl} permission={UserPermissionChoice.CanManageReservationUnits}>
-      <ReservationUnits optionsData={props.optionsData} />
+      <ReservationUnits optionsData={props.optionsData} apiBaseUrl={props.apiBaseUrl} />
     </AuthorizationChecker>
   );
 }

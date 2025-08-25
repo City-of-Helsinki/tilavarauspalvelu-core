@@ -20,6 +20,9 @@ const StyledTable = styled(Table)<TableWrapperProps>`
     width: 100%;
     white-space: nowrap;
     border-collapse: collapse;
+    thead {
+      background: var(--color-black-10);
+    }
     th {
       text-align: left;
       ${fontBold};
@@ -67,7 +70,7 @@ export function CustomTable({ isLoading, setSort, enableFrontendSorting, ...prop
         // otherwise the table header is not updated
         // unmounting on other data changes is not necessary and causes other bugs like automatic scrolling.
         key={`custom-table-${keyOverride}`}
-        $tableBackground={isLoading ? "var(--color-black-10)" : "var(--color-white)"}
+        $tableBackground={isLoading ? "var(--color-black-10)" : "transparent"}
         $colWidths={props?.cols ? props.cols.map((col) => get(col, "width", "auto")) : []}
       />
     </Wrapper>

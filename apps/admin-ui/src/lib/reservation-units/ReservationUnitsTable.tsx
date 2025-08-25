@@ -1,6 +1,7 @@
-import React from "react";
+import type { SelectedRow } from "@/pages/reservation-units";
+import React, { type Dispatch, type SetStateAction } from "react";
 import { useTranslation } from "next-i18next";
-import type { TFunction } from "i18next";
+import { type TFunction } from "i18next";
 import {
   ReservationUnitPublishingState,
   ReservationUnitReservationState,
@@ -21,6 +22,8 @@ type Props = {
   sortChanged: (field: string) => void;
   reservationUnits: ReservationUnitTableElementFragment[];
   isLoading?: boolean;
+  selectedRows: SelectedRow[];
+  setSelectedRows: Dispatch<SetStateAction<SelectedRow[]>>;
 };
 
 const getStatusLabelProps = (
@@ -63,6 +66,10 @@ const getPublishingStateProps = (
 };
 
 const getColConfig = (t: TFunction) => [
+  {
+    headerName: "Select checkbox heading - not rendered",
+    key: "pk",
+  },
   {
     headerName: t("reservationUnit:headings.name"),
     key: "nameFi",
@@ -136,6 +143,8 @@ export function ReservationUnitsTable({
   sortChanged: onSortChanged,
   reservationUnits,
   isLoading,
+  selectedRows,
+  setSelectedRows,
 }: Props): JSX.Element {
   const { t } = useTranslation();
 
@@ -149,11 +158,18 @@ export function ReservationUnitsTable({
     <CustomTable
       setSort={onSortChanged}
       indexKey="pk"
+      renderIndexCol={false}
       rows={reservationUnits}
       cols={cols}
       initialSortingColumnKey={sort.startsWith("-") ? sort.slice(1) : sort}
       initialSortingOrder={sort.startsWith("-") ? "desc" : "asc"}
       isLoading={isLoading}
+      checkboxSelection
+      ariaLabelCheckboxSelection={t("common:select")}
+      selectedRows={selectedRows}
+      selectAllRowsText={"Valitse kaikki"}
+      clearSelectionsText={"Tyhjennä valinnat"}
+      setSelectedRows={setSelectedRows}
     />
   );
 }
