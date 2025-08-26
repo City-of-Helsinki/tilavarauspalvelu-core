@@ -82,8 +82,9 @@ export function MainLander({ apiBaseUrl }: Readonly<{ apiBaseUrl: string }>): Re
         <IconButton
           label={t("navigation:a11yTerms")}
           icon={<IconLinkExternal />}
-          href={getAccessibilityTermsUrl()}
-          openInNewTab
+          onClick={() => window.open(getAccessibilityTermsUrl(), "_blank", "noopener noreferrer")}
+          aria-label={t("navigation:a11yTerms")}
+          aria-roledescription="link"
         />
       </Content>
     </>
