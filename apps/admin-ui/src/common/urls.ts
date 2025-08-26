@@ -128,12 +128,8 @@ export function getAccessibilityTermsUrl(): string {
 export function getOpeningHoursUrl(
   apiBaseUrl: string,
   reservationUnitPk: number | number[] | null,
-  errorUrl: URL = new URL(window.location.pathname, window.location.origin)
+  errorUrl: string
 ): string {
-  if (window?.location == null) {
-    throw new Error("window.location is not available, cannot build redirect url");
-  }
-
   let reservationUnitsParam = "";
   if (Array.isArray(reservationUnitPk)) {
     reservationUnitPk.filter((pk) => pk > 0);

@@ -1,4 +1,4 @@
-import type { SelectedRow } from "@/pages/reservation-units";
+import type { SelectedRow } from "@/lib/reservation-units";
 import React, { type Dispatch, type SetStateAction } from "react";
 import { useTranslation } from "next-i18next";
 import { type TFunction } from "i18next";
@@ -167,8 +167,8 @@ export function ReservationUnitsTable({
       checkboxSelection
       ariaLabelCheckboxSelection={t("common:select")}
       selectedRows={selectedRows}
-      selectAllRowsText={"Valitse kaikki"}
-      clearSelectionsText={"Tyhjennä valinnat"}
+      selectAllRowsText={t("common:selectAllRows")}
+      clearSelectionsText={t("common:clearAllSelections")}
       setSelectedRows={setSelectedRows}
     />
   );
