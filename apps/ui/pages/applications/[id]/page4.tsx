@@ -14,7 +14,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
 import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { getApplicationPath } from "@/modules/urls";
-import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
+import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { ButtonContainer, Flex } from "common/styled";
 import { Button, ButtonSize, ButtonVariant, IconArrowLeft, LoadingSpinner } from "hds-react";
 import { useDisplayError } from "common/src/hooks";

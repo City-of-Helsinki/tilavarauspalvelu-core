@@ -6,7 +6,7 @@ import { format, isToday, isTomorrow, isValid } from "date-fns";
 import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import { isBrowser } from "@/modules/const";
-import { ButtonLikeLink } from "../common/ButtonLikeLink";
+import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { getImageSource, getMainImage } from "common/src/helpers";
 import Card from "common/src/components/Card";
 import Tag from "common/src/components/Tag";

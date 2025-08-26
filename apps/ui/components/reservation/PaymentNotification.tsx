@@ -1,6 +1,6 @@
 import { PaymentNotificationFragment, ReservationCancelReasonChoice, ReservationStateChoice } from "@gql/gql-types";
 import { Notification } from "hds-react";
-import { ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
+import { ButtonLikeExternalLink } from "common/src/components/ButtonLikeLink";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { convertLanguageCode, toUIDateTime } from "common/src/common/util";
