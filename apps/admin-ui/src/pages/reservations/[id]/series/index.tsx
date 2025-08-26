@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import { NewReservationListItem } from "@/component/ReservationsList";
 import { ApolloError, gql, useApolloClient } from "@apollo/client";
 import {
+  ReservationPermissionsDocument,
+  type ReservationPermissionsQuery,
+  type ReservationPermissionsQueryVariables,
   ReservationSeriesDocument,
-  ReservationSeriesQuery,
-  ReservationSeriesQueryVariables,
+  type ReservationSeriesQuery,
+  type ReservationSeriesQueryVariables,
   ReservationSeriesRescheduleMutationInput,
   ReservationStartInterval,
   ReservationTypeChoice,
@@ -43,6 +46,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
+import { createClient } from "@/common/apolloClient";
 import { hasPermission } from "@/modules/permissionHelper";
 
 type NodeT = NonNullable<SeriesPageQuery["reservation"]>["reservationSeries"];
@@ -70,23 +74,38 @@ function convertToForm(value: NodeT): RescheduleReservationSeriesForm {
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function SeriesPage(props: PropsNarrowed): JSX.Element {
+export default function SeriesPage({ pk, unitPk }: PropsNarrowed): JSX.Element {
   const { user } = useSession();
-  const hasAccess = hasPermission(user, UserPermissionChoice.CanCreateStaffReservations, props.pk);
-  return hasAccess ? <SeriesPageInner pk={props.pk} /> : <Error403 />;
+  const hasAccess = hasPermission(user, UserPermissionChoice.CanCreateStaffReservations, unitPk);
+  if (!hasAccess) {
+    return <Error403 />;
+  }
+  return <SeriesPageInner pk={pk} />;
 }
 
-export async function getServerSideProps({ locale, query }: GetServerSidePropsContext) {
+export async function getServerSideProps({ locale, query, req }: GetServerSidePropsContext) {
   const pk = toNumber(ignoreMaybeArray(query.id));
 
   if (pk == null || pk <= 0) {
     return NOT_FOUND_SSR_VALUE;
   }
 
+  const commonProps = await getCommonServerSideProps();
+  const apolloClient = createClient(commonProps.apiBaseUrl, req);
+  const { data } = await apolloClient.query<ReservationPermissionsQuery, ReservationPermissionsQueryVariables>({
+    query: ReservationPermissionsDocument,
+    variables: { id: base64encode(`ReservationNode:${pk}`) },
+  });
+  const unitPk = data?.reservation?.reservationUnit?.unit?.pk;
+  if (unitPk == null) {
+    return NOT_FOUND_SSR_VALUE;
+  }
+
   return {
     props: {
       pk,
-      ...(await getCommonServerSideProps()),
+      unitPk,
+      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

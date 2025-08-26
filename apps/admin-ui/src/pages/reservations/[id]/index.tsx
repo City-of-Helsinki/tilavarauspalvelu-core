@@ -7,9 +7,6 @@ import {
   ReservationStateChoice,
   useReservationCancelReasonsQuery,
   UserPermissionChoice,
-  CheckPermissionsDocument,
-  type CheckPermissionsQuery,
-  type CheckPermissionsQueryVariables,
   ReservationPageDocument,
   useReservationPageLazyQuery,
 } from "@gql/gql-types";
@@ -44,6 +41,9 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { createClient } from "@/common/apolloClient";
+import { hasPermission } from "@/modules/permissionHelper";
+import { useSession } from "@/hooks";
+import { Error403 } from "@/component/Error403";
 
 type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
@@ -355,6 +355,13 @@ export default function Page({ reservation }: PropsNarrowed): JSX.Element {
     variables: { id },
   });
 
+  const { user } = useSession();
+  const unitPk = reservation.reservationUnit?.unit?.pk;
+  const hasAccess = hasPermission(user, UserPermissionChoice.CanViewReservations, unitPk);
+  if (!hasAccess) {
+    return <Error403 />;
+  }
+
   const reservationRefreshed = query.data?.reservation ?? reservation;
 
   return <RequestedReservation reservation={reservationRefreshed} refetch={query.refetch} />;
@@ -374,20 +381,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
   });
 
   const reservation = reservationPageQuery.data.reservation;
-  const unit = reservation?.reservationUnit?.unit?.pk ?? null;
-  if (reservation == null || unit == null) {
-    return NOT_FOUND_SSR_VALUE;
-  }
-  const permissionQuery = await apolloClient.query<CheckPermissionsQuery, CheckPermissionsQueryVariables>({
-    query: CheckPermissionsDocument,
-    variables: {
-      permission: UserPermissionChoice.CanViewReservations,
-      units: [unit],
-    },
-  });
-
-  // TODO should return 403 instead of 404
-  if (!permissionQuery.data.checkPermissions?.hasPermission) {
+  if (reservation == null) {
     return NOT_FOUND_SSR_VALUE;
   }
 
