@@ -516,6 +516,11 @@ class Common(Environment):
     ICAL_HASH_SECRET = values.StringValue()
     EXPORT_AUTHORIZATION_TOKEN = values.StringValue()
 
+    ROBOT_TEST_DATA_TOKEN = values.StringValue()
+    ROBOT_TEST_DATA_CREATION_RATE_LIMIT_SECONDS = values.IntegerValue(default=60)
+    ROBOT_TEST_DATA_RATE_LIMIT_KEY = "robot-test-data-create-view-rate-limit"
+    ROBOT_TEST_DATA_LOCK_KEY = "robot-test-data-create-view-lock"
+
     GRAPHENE_DJANGO_EXTENSIONS = {
         "EXPERIMENTAL_REMOVE_TRANSLATION_BASE_FIELDS": True,
     }
@@ -577,6 +582,7 @@ class EmptyDefaults:
     TPREK_UNIT_URL = ""
     ICAL_HASH_SECRET = ""  # nosec # NOSONAR
     EXPORT_AUTHORIZATION_TOKEN = ""
+    ROBOT_TEST_DATA_TOKEN = ""
 
     EMAIL_VARAAMO_EXT_LINK = ""
     EMAIL_FEEDBACK_EXT_LINK = ""
@@ -659,6 +665,7 @@ class Local(Common, overrides_from=LocalMixin):
     SENTRY_LOGGER_ALWAYS_RE_RAISE = True
     ICAL_HASH_SECRET = values.StringValue(default="")  # nosec # NOSONAR
     EXPORT_AUTHORIZATION_TOKEN = values.StringValue(default="")  # nosec # NOSONAR
+    ROBOT_TEST_DATA_TOKEN = values.StringValue(default="")  # nosec # NOSONAR
     UPDATE_RESERVATION_UNIT_HIERARCHY = values.BooleanValue(default=True)
     UPDATE_SEARCH_VECTORS = values.BooleanValue(default=True)
     UPDATE_AFFECTING_TIME_SPANS = values.BooleanValue(default=True)
@@ -716,6 +723,7 @@ class Docker(Common, overrides_from=DockerMixin):
 
     ICAL_HASH_SECRET = values.StringValue(default="")  # nosec # NOSONAR
     EXPORT_AUTHORIZATION_TOKEN = values.StringValue(default="")  # nosec # NOSONAR
+    ROBOT_TEST_DATA_TOKEN = values.StringValue(default="")  # nosec # NOSONAR
     RAISE_ERROR_ON_REFRESH_FAILURE = True
     FRONTEND_TESTING_API_ENABLED = values.BooleanValue(default=True)
 
@@ -841,8 +849,9 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     }
 
     TPREK_UNIT_URL = "https://fake.test.tprek.com"
-    ICAL_HASH_SECRET = "qhoew923uqqwee"  # noqa: S105 # nosec # NOSONAR
-    EXPORT_AUTHORIZATION_TOKEN = "CASO8I4V4ITNKCKTM48ZZNK8RT"  # noqa: S105 # nosec # NOSONAR
+    ICAL_HASH_SECRET = "fake-ical-hash-secret"  # noqa: S105 # nosec # NOSONAR
+    EXPORT_AUTHORIZATION_TOKEN = "fake-export-authorization-token"  # noqa: S105 # nosec # NOSONAR
+    ROBOT_TEST_DATA_TOKEN = "fake-robot-test-token"  # noqa: S105 # nosec # NOSONAR
 
     # Turn off materialized view updates from signals during tests,
     # since they slow them down a lot in CI. Refresh should be called manually when needed.
