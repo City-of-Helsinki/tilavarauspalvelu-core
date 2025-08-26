@@ -1,6 +1,6 @@
-import { getOpeningHoursUrl } from "@/common/urls";
-import { ButtonLikeLink } from "@/component/ButtonLikeLink";
-import type { SelectedRow } from "@/pages/reservation-units";
+import { getOpeningHoursUrl, RESERVATION_UNIT_URL_PREFIX } from "@/common/urls";
+import { ButtonLikeExternalLink } from "common/src/components/ButtonLikeLink";
+import type { SelectedRow } from "@/lib/reservation-units";
 import { breakpoints } from "common/src/const";
 import { Flex, pageSideMargins } from "common/styled";
 import { Button, ButtonVariant, IconInfoCircle, IconLinkExternal, IconSize } from "hds-react";
@@ -51,20 +51,19 @@ const EditOpeningHoursBar = ({ selectedRows, setSelectedRows, apiBaseUrl }: Prop
   const { t } = useTranslation();
   const count = selectedRows.length;
   const selectedPks = selectedRows.map((id) => Number(id)).filter((id) => !isNaN(id));
-
+  const editLink =
+    getOpeningHoursUrl(apiBaseUrl, selectedPks, RESERVATION_UNIT_URL_PREFIX) !== ""
+      ? getOpeningHoursUrl(apiBaseUrl, selectedPks, RESERVATION_UNIT_URL_PREFIX)
+      : undefined;
   return (
     <SpaceWrapper>
       {count > 0 && (
         <InnerContainer>
-          <Flex $gap={"xs"} $direction={"row"}>
-            <ButtonLikeLink
-              href={getOpeningHoursUrl(apiBaseUrl, selectedPks)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+          <Flex $direction={"row"}>
+            <ButtonLikeExternalLink disabled={!editLink} href={editLink} target="_blank" rel="noopener noreferrer">
               {t("reservationUnit:goToMassEdit")}
-              <IconLinkExternal style={{ marginLeft: "var(--spacing-xs)" }} />
-            </ButtonLikeLink>
+              <IconLinkExternal />
+            </ButtonLikeExternalLink>
             <Button
               variant={ButtonVariant.Primary}
               onClick={() => setSelectedRows([])}

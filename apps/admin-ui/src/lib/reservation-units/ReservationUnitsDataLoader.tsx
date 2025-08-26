@@ -1,4 +1,4 @@
-import type { SelectedRow } from "@/pages/reservation-units";
+import type { SelectedRow } from "@/lib/reservation-units";
 import React, { type Dispatch, type SetStateAction, useState } from "react";
 import { gql } from "@apollo/client";
 import { ReservationUnitOrderSet, useSearchReservationUnitsQuery } from "@gql/gql-types";
