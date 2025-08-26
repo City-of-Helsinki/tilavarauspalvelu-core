@@ -2,7 +2,14 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type Maybe, type ReservationEditPageQuery } from "@gql/gql-types";
+import {
+  ReservationPermissionsDocument,
+  type ReservationPermissionsQuery,
+  type ReservationPermissionsQueryVariables,
+  UserPermissionChoice,
+  type Maybe,
+  type ReservationEditPageQuery,
+} from "@gql/gql-types";
 import { Button, ButtonVariant, LoadingSpinner, TextInput } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ErrorBoundary } from "react-error-boundary";
@@ -13,7 +20,7 @@ import {
   ReservationTypeSchema,
 } from "@/schemas";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
-import { useStaffReservationMutation, useReservationEditData } from "@/hooks";
+import { useStaffReservationMutation, useReservationEditData, useSession } from "@/hooks";
 import { errorToast } from "common/src/components/toast";
 import { ButtonContainer, CenterSpinner, Flex, HR } from "common/styled";
 import { createTagString } from "@/modules/reservation";
@@ -23,11 +30,12 @@ import { gql } from "@apollo/client";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { GetServerSidePropsContext } from "next";
-import { ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { Error403 } from "@/component/Error403";
-import { useCheckReservationPermissions } from "@/hooks/useCheckReservationPermissions";
+import { createClient } from "@/common/apolloClient";
+import { hasPermission } from "@/modules/permissionHelper";
 
 type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;
 type FormValueType = ReservationChangeFormType & ReservationFormMeta;
@@ -196,27 +204,37 @@ function EditPage({ pk }: { pk: number }): JSX.Element {
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page(props: PropsNarrowed): JSX.Element {
-  // TODO should be done in SSR
-  const { hasPermission, loading } = useCheckReservationPermissions(props.pk);
-  if (loading) {
-    return <CenterSpinner />;
-  } else if (!hasPermission) {
+export default function Page({ pk, unitPk }: PropsNarrowed): JSX.Element {
+  const { user } = useSession();
+  const hasAccess = hasPermission(user, UserPermissionChoice.CanManageReservations, unitPk);
+  if (!hasAccess) {
     return <Error403 />;
   }
-  return <EditPage pk={props.pk} />;
+  return <EditPage pk={pk} />;
 }
 
-export async function getServerSideProps({ locale, query }: GetServerSidePropsContext) {
+export async function getServerSideProps({ locale, query, req }: GetServerSidePropsContext) {
   const pk = toNumber(ignoreMaybeArray(query.id));
   if (pk == null || pk <= 0) {
+    return NOT_FOUND_SSR_VALUE;
+  }
+
+  const commonProps = await getCommonServerSideProps();
+  const apolloClient = createClient(commonProps.apiBaseUrl, req);
+  const { data } = await apolloClient.query<ReservationPermissionsQuery, ReservationPermissionsQueryVariables>({
+    query: ReservationPermissionsDocument,
+    variables: { id: base64encode(`ReservationNode:${pk}`) },
+  });
+  const unitPk = data?.reservation?.reservationUnit?.unit?.pk;
+  if (unitPk == null) {
     return NOT_FOUND_SSR_VALUE;
   }
 
   return {
     props: {
       pk,
-      ...(await getCommonServerSideProps()),
+      unitPk,
+      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
