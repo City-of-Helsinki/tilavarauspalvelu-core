@@ -17,7 +17,7 @@ import { type UseFormReturn } from "react-hook-form";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
-import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
+import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { ReservationTimePicker } from "./ReservationTimePicker";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { Sanitize } from "common/src/components/Sanitize";

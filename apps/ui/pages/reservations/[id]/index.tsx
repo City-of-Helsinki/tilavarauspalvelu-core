@@ -36,7 +36,7 @@ import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { AddressSection } from "@/components/reservation-unit";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
 import { createNodeId, capitalize, filterNonNullable, ignoreMaybeArray, toNumber, getNode } from "common/src/helpers";
-import { ButtonLikeLink, ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
+import { ButtonLikeLink, ButtonLikeExternalLink } from "common/src/components/ButtonLikeLink";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import {
   getApplicationPath,

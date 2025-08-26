@@ -7,7 +7,7 @@ import styled from "styled-components";
 import { filterNonNullable } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
 import { ApplicationFields, GeneralFields } from "./SummaryFields";
-import { ButtonLikeLink } from "../common/ButtonLikeLink";
+import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { PendingReservationFormType } from "../reservation-unit/schema";
 import { type UseFormReturn } from "react-hook-form";

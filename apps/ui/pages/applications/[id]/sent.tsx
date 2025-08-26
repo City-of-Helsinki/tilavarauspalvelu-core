@@ -8,7 +8,7 @@ import type { GetServerSidePropsContext } from "next";
 import { applicationsPath, applicationsPrefix, getApplicationPath } from "@/modules/urls";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
+import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 import { ApplicationSentPageDocument, type ApplicationSentPageQuery } from "@/gql/gql-types";
