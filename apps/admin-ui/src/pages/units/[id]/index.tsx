@@ -68,7 +68,7 @@ function Unit({ unitPk }: { unitPk: number }): JSX.Element {
     fetchPolicy: "network-only",
   });
 
-  const { unit } = data ?? {};
+  const unit = data?.node != null && "pk" in data.node ? data.node : null;
   const hasSpacesResources = Boolean(unit?.spaces?.length);
 
   if (isLoading) {

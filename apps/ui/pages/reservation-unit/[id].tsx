@@ -707,13 +707,14 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       },
     });
 
-    const { reservationUnit } = reservationUnitData;
+    const reservationUnit =
+      reservationUnitData.node != null && "pk" in reservationUnitData.node ? reservationUnitData.node : null;
 
     if (reservationUnit == null) {
       return notFound;
     }
 
-    const previewPass = uuid === reservationUnitData.reservationUnit?.extUuid;
+    const previewPass = uuid === reservationUnit?.extUuid;
     if (!isReservationUnitPublished(reservationUnit) && !previewPass) {
       return notFound;
     }
@@ -737,7 +738,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         },
       });
       relatedReservationUnits = filterNonNullable(relatedData?.reservationUnits?.edges?.map((n) => n?.node)).filter(
-        (n) => n?.pk !== reservationUnitData.reservationUnit?.pk
+        (n) => n?.pk !== reservationUnit?.pk
       );
     }
 

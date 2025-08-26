@@ -4,17 +4,14 @@ import { useTranslation } from "next-i18next";
 import { AutoGrid } from "common/styled";
 import { EditAccordion } from "./styled";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
-import type { ReservationUnitEditQuery } from "@gql/gql-types";
-
-type QueryData = ReservationUnitEditQuery["reservationUnit"];
-type Node = NonNullable<QueryData>;
+import type { ReservationUnitEditPageFragment } from "@gql/gql-types";
 
 export function OpeningHoursSection({
   reservationUnit,
   previewUrlPrefix,
 }: {
   // TODO can we simplify this by passing the hauki url only?
-  reservationUnit: Node | undefined;
+  reservationUnit: ReservationUnitEditPageFragment | null;
   previewUrlPrefix: string;
 }) {
   const { t } = useTranslation();

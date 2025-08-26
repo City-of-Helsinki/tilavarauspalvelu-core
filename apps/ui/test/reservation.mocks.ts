@@ -1,14 +1,13 @@
 import {
   AccessType,
   ReservationUnitImageType,
-  MetaFieldsFragment,
+  type MetaFieldsFragment,
   MunicipalityChoice,
   OrderStatus,
-  type PaymentOrderNode,
   PaymentType,
   PriceUnit,
   ReservationCancelReasonChoice,
-  type ReservationPageQuery,
+  type ReservationPageFragment,
   ReservationStateChoice,
   ReservationTypeChoice,
   ReserveeType,
@@ -17,6 +16,7 @@ import {
 import { createNodeId } from "common/src/helpers";
 import type { FieldName } from "common/src/metaFieldsHelpers";
 import { generateNameFragment } from "@/test/test.gql.utils";
+import { OptionsRecord } from "common";
 
 export function generateTextFragment(text: string) {
   return {
@@ -94,14 +94,9 @@ export type MockReservationProps = {
   } | null;
 };
 
-export type ReservationPaymentOrderFragment = Pick<
-  PaymentOrderNode,
-  "id" | "reservationPk" | "status" | "paymentType" | "receiptUrl" | "checkoutUrl"
->;
+export type ReservationPaymentOrderFragment = ReservationPageFragment["paymentOrder"];
 
-export function createMockReservation(
-  props: MockReservationProps
-): Readonly<NonNullable<ReservationPageQuery["reservation"]>> {
+export function createMockReservation(props: MockReservationProps): Readonly<ReservationPageFragment> {
   const {
     applyingForFreeOfCharge = false,
     beginsAt = new Date(2024, 0, 1, 10, 0, 0, 0).toISOString(),
@@ -414,7 +409,7 @@ export function createReservationPageMock({
   price?: string;
   paymentOrder?: ReservationPaymentOrderFragment & { handledPaymentDueBy: string };
   cancellable?: boolean;
-}): Readonly<NonNullable<ReservationPageQuery["reservation"]>> {
+}): ReservationPageFragment {
   return createMockReservation({
     pk,
     state: state,
@@ -428,9 +423,9 @@ export function createReservationPageMock({
   });
 }
 
-export function createOptionsMock() {
+export function createOptionsMock(): Readonly<OptionsRecord> {
   return {
-    purpose: [
+    reservationPurposes: [
       {
         label: "Test purpose FI",
         value: 1,
@@ -444,7 +439,7 @@ export function createOptionsMock() {
         value: 3,
       },
     ],
-    ageGroup: [
+    ageGroups: [
       {
         label: "1 - 15",
         value: 1,
@@ -462,7 +457,7 @@ export function createOptionsMock() {
         value: 4,
       },
     ],
-    municipality: [
+    municipalities: [
       {
         label: "Helsinki",
         value: MunicipalityChoice.Helsinki,

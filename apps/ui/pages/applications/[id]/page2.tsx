@@ -109,7 +109,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       id: createNodeId("ApplicationNode", pk),
     },
   });
-  const { application } = data;
+  const application = data.node != null && "id" in data.node ? data.node : null;
   if (application == null) {
     return notFound;
   }
@@ -125,33 +125,38 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 export default Page2;
 
+export const APPLICATION_PAGE2_FRAGMENT = gql`
+  fragment ApplicationPage2 on ApplicationNode {
+    ...ApplicationForm
+    applicationSections {
+      id
+      reservationUnitOptions {
+        id
+        reservationUnit {
+          id
+          pk
+          nameFi
+          nameEn
+          nameSv
+          unit {
+            id
+            nameFi
+            nameEn
+            nameSv
+          }
+          applicationRoundTimeSlots {
+            ...TimeSelector
+          }
+        }
+      }
+    }
+  }
+`;
 export const APPLICATION_PAGE2_QUERY = gql`
   query ApplicationPage2($id: ID!) {
     node(id: $id) {
       ... on ApplicationNode {
-        ...ApplicationForm
-        applicationSections {
-          id
-          reservationUnitOptions {
-            id
-            reservationUnit {
-              id
-              pk
-              nameFi
-              nameEn
-              nameSv
-              unit {
-                id
-                nameFi
-                nameEn
-                nameSv
-              }
-              applicationRoundTimeSlots {
-                ...TimeSelector
-              }
-            }
-          }
-        }
+        ...ApplicationPage2
       }
     }
   }

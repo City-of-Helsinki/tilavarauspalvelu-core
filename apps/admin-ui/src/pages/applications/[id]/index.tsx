@@ -16,11 +16,11 @@ import {
   type ReservationUnitOptionFieldsFragment,
   ReserveeType,
   useApplicationAdminQuery,
-  useRejectAllApplicationOptionsMutation,
-  useRejectAllSectionOptionsMutation,
+  useRejectAllApplicationsMutation,
+  useRejectAllSectionsMutation,
   useRejectRestMutation,
-  useRestoreAllApplicationOptionsMutation,
-  useRestoreAllSectionOptionsMutation,
+  useRestoreAllApplicationsMutation,
+  useRestoreAllSectionsMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { formatDuration } from "common/src/common/util";
@@ -189,9 +189,9 @@ function RejectAllOptionsButton({
     requireAll: true,
   });
 
-  const [rejectMutation, { loading: rejectLoading }] = useRejectAllSectionOptionsMutation();
+  const [rejectMutation, { loading: rejectLoading }] = useRejectAllSectionsMutation();
 
-  const [restoreMutation, { loading: restoreLoading }] = useRestoreAllSectionOptionsMutation();
+  const [restoreMutation, { loading: restoreLoading }] = useRestoreAllSectionsMutation();
 
   const displayError = useDisplayError();
 
@@ -460,9 +460,9 @@ function RejectApplicationButton({
     requireAll: true,
   });
 
-  const [rejectionMutation, { loading: isRejectionLoading }] = useRejectAllApplicationOptionsMutation();
+  const [rejectionMutation, { loading: isRejectionLoading }] = useRejectAllApplicationsMutation();
 
-  const [restoreMutation, { loading: isRestoreLoading }] = useRestoreAllApplicationOptionsMutation();
+  const [restoreMutation, { loading: isRestoreLoading }] = useRestoreAllApplicationsMutation();
   const displayError = useDisplayError();
 
   const isLoading = isRejectionLoading || isRestoreLoading;
@@ -564,7 +564,7 @@ export default function ApplicationPage({ pk }: PropsNarrowed): JSX.Element | nu
     variables: { id: createNodeId("ApplicationNode", pk) },
   });
 
-  const application = data?.application;
+  const application = data?.node != null && "id" in data.node ? data.node : null;
   const applicationRound = application?.applicationRound;
 
   if (isLoading) {
@@ -802,7 +802,7 @@ export const APPLICATION_ADMIN_QUERY = gql`
 `;
 
 export const REJECT_ALL_SECTION_OPTIONS = gql`
-  mutation RejectAllSectionOptions($input: RejectAllSectionOptionsMutation!) {
+  mutation RejectAllSections($input: RejectAllSectionOptionsMutation!) {
     rejectAllSectionOptions(input: $input) {
       pk
     }
@@ -810,7 +810,7 @@ export const REJECT_ALL_SECTION_OPTIONS = gql`
 `;
 
 export const RESTORE_ALL_SECTION_OPTIONS = gql`
-  mutation RestoreAllSectionOptions($input: RestoreAllSectionOptionsMutation!) {
+  mutation RestoreAllSections($input: RestoreAllSectionOptionsMutation!) {
     restoreAllSectionOptions(input: $input) {
       pk
     }
@@ -818,7 +818,7 @@ export const RESTORE_ALL_SECTION_OPTIONS = gql`
 `;
 
 export const REJECT_APPLICATION = gql`
-  mutation RejectAllApplicationOptions($input: RejectAllApplicationOptionsMutation!) {
+  mutation RejectAllApplications($input: RejectAllApplicationOptionsMutation!) {
     rejectAllApplicationOptions(input: $input) {
       pk
     }
@@ -826,7 +826,7 @@ export const REJECT_APPLICATION = gql`
 `;
 
 export const RESTORE_APPLICATION = gql`
-  mutation RestoreAllApplicationOptions($input: RestoreAllApplicationOptionsMutation!) {
+  mutation RestoreAllApplications($input: RestoreAllApplicationOptionsMutation!) {
     restoreAllApplicationOptions(input: $input) {
       pk
     }

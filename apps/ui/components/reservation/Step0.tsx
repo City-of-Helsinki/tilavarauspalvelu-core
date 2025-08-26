@@ -10,7 +10,7 @@ import styled from "styled-components";
 import MetaFields from "common/src/reservation-form/MetaFields";
 import { ActionContainer } from "./styles";
 import InfoDialog from "../common/InfoDialog";
-import { type ReservationQuery, ReserveeType } from "@gql/gql-types";
+import { type ReservationInProgressFragment, ReserveeType } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { containsField, FieldName } from "common/src/metaFieldsHelpers";
 import { getApplicationFields, getGeneralFields } from "./SummaryFields";
@@ -19,11 +19,10 @@ import { LinkLikeButton } from "common/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { type OptionsRecord } from "common";
 
-type ReservationT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
   cancelReservation: () => void;
-  reservation: ReservationT;
-  options: Omit<OptionsRecord, "municipality">;
+  reservation: ReservationInProgressFragment;
+  options: Omit<OptionsRecord, "municipalities">;
 };
 
 export function Step0({ reservation, cancelReservation, options }: Props): JSX.Element {

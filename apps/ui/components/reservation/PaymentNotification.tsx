@@ -1,9 +1,4 @@
-import {
-  ReservationCancelReasonChoice,
-  type ReservationPaymentUrlFragment,
-  type ReservationPriceFieldsFragment,
-  ReservationStateChoice,
-} from "@gql/gql-types";
+import { PaymentNotificationFragment, ReservationCancelReasonChoice, ReservationStateChoice } from "@gql/gql-types";
 import { Notification } from "hds-react";
 import { ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
 import { useTranslation } from "next-i18next";
@@ -14,16 +9,10 @@ import { formatters as getFormatters } from "common";
 import React, { useMemo } from "react";
 import { breakpoints } from "common/src/const";
 import { getPaymentUrl } from "@/modules/reservation";
+import { gql } from "@apollo/client";
 
 type PaymentNotificationProps = {
-  reservation: ReservationPaymentUrlFragment & Pick<ReservationPriceFieldsFragment, "price">;
-  appliedPricing: {
-    taxPercentage: string;
-  } | null;
-  paymentOrder: {
-    handledPaymentDueBy: string | null;
-    checkoutUrl: string | null;
-  } | null;
+  reservation: PaymentNotificationFragment;
   apiBaseUrl: string;
 };
 
@@ -40,16 +29,12 @@ const PriceDetails = styled.div`
   }
 `;
 
-export const PaymentNotification = ({
-  reservation,
-  appliedPricing,
-  paymentOrder,
-  apiBaseUrl,
-}: PaymentNotificationProps) => {
+export function PaymentNotification({ reservation, apiBaseUrl }: PaymentNotificationProps) {
   const { t, i18n } = useTranslation();
   const formatters = useMemo(() => getFormatters(i18n.language), [i18n.language]);
   const formatter = formatters["currencyWithDecimals"];
-  const price = formatter?.format(parseFloat(reservation.price ?? "") ?? 0);
+  const { appliedPricing, paymentOrder } = reservation;
+  const price = formatter?.format(parseFloat(appliedPricing?.highestPrice ?? "") ?? 0);
   const taxPercentage = formatters.strippedDecimal?.format(parseFloat(appliedPricing?.taxPercentage ?? "")) ?? "0";
 
   const deadline =
@@ -83,6 +68,20 @@ export const PaymentNotification = ({
       </Flex>
     </Notification>
   );
-};
+}
 
-export default PaymentNotification;
+export const PAYMENT_NOTIFICATION_ORDER_FRAGMENT = gql`
+  fragment PaymentNotification on ReservationNode {
+    id
+    ...ReservationPaymentUrl
+    appliedPricing {
+      highestPrice
+      taxPercentage
+    }
+    paymentOrder {
+      id
+      handledPaymentDueBy
+      checkoutUrl
+    }
+  }
+`;

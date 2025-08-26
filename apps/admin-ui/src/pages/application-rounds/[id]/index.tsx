@@ -75,7 +75,6 @@ export default function ApplicationRound({
       errorToast({ text: t("errors:errorFetchingData") });
     },
   });
-  const applicationRound = data?.applicationRound ?? previousData?.applicationRound ?? applicationRoundOriginal;
 
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
@@ -83,7 +82,8 @@ export default function ApplicationRound({
   // NOTE: useEffect works, onCompleted does not work with refetch
   useEffect(() => {
     if (data) {
-      setIsInProgress(isApplicationRoundInProgress(data.applicationRound));
+      const node = data?.node != null && "pk" in data.node ? data.node : null;
+      setIsInProgress(isApplicationRoundInProgress(node));
     }
   }, [data]);
 
@@ -102,6 +102,10 @@ export default function ApplicationRound({
       }
     }
   }, [unitOptions, searchParams, setParams]);
+
+  const previousNode = previousData?.node != null && "pk" in previousData.node ? previousData.node : null;
+  const node = data?.node != null && "pk" in data.node ? data.node : null;
+  const applicationRound = node ?? previousNode ?? applicationRoundOriginal;
 
   const originalOptions = getFilterOptions(t, optionsData);
   const reservationUnitOptions = getRoundReservationUnitOptions(applicationRound);
@@ -225,7 +229,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
     query: ApplicationRoundDocument,
     variables: { id: createNodeId("ApplicationRoundNode", pk) },
   });
-  const { applicationRound } = data;
+  const applicationRound = data?.node != null && "pk" in data.node ? data.node : null;
   const units = filterNonNullable(applicationRound?.reservationUnits.map((x) => x.unit?.pk));
 
   if (!applicationRound) {
@@ -331,7 +335,7 @@ function isAllocationEnabled(
 function hasApplicationRoundEnded(applicationRound: Pick<ApplicationRoundAdminFragment, "status">): boolean {
   return (
     applicationRound.status === ApplicationRoundStatusChoice.Handled ||
-    applicationRound.status === ApplicationRoundStatusChoice.ResultsSent
+    applicationRound.status === ApplicationRoundStatusChoice.Sent
   );
 }
 

@@ -98,7 +98,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     fetchPolicy: "no-cache",
   });
 
-  const reservation = resData?.reservation ?? props.reservation;
+  const reservation = resData?.node != null && "pk" in resData.node ? resData.node : props.reservation;
   const reservationUnit = reservation.reservationUnit;
 
   useRemoveStoredReservation();
@@ -175,7 +175,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     return deleteReservation({
       variables: {
         input: {
-          pk: reservation?.pk?.toString() ?? "",
+          pk: reservation.pk,
         },
       },
     });
@@ -278,9 +278,9 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
       } else if (state === ReservationStateChoice.RequiresHandling) {
         router.push(getReservationPath(pk, undefined, "requires_handling"));
       } else if (state === ReservationStateChoice.WaitingForPayment) {
-        const { order } = data?.confirmReservation ?? {};
+        const { paymentOrder } = data?.confirmReservation ?? {};
         const lang = convertLanguageCode(i18n.language);
-        const checkoutUrl = getCheckoutUrl(order, lang);
+        const checkoutUrl = getCheckoutUrl(paymentOrder, lang);
         if (!checkoutUrl) {
           throw new Error("No checkout url found");
         }
@@ -442,7 +442,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     variables: { id: createNodeId("ReservationNode", reservationPk) },
   });
 
-  const { reservation } = resData;
+  const reservation = resData.node != null && "pk" in resData.node ? resData.node : null;
 
   // Valid path but no reservation found -> redirect to reservation unit page
   if (reservation?.pk == null) {
@@ -483,26 +483,32 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
+export const RESERVATION_IN_PROGRESS_FRAGMENT = gql`
+  fragment ReservationInProgress on ReservationNode {
+    id
+    pk
+    name
+    ...MetaFields
+    ...ReservationInfoCard
+    bufferTimeBefore
+    bufferTimeAfter
+    calendarUrl
+    reservationUnit {
+      id
+      canApplyFreeOfCharge
+      ...CancellationRuleFields
+      ...MetadataSets
+      ...TermsOfUse
+      requireReservationHandling
+    }
+  }
+`;
+
 export const RESERVATION_IN_PROGRESS_QUERY = gql`
   query Reservation($id: ID!) {
     node(id: $id) {
       ... on ReservationNode {
-        id
-        pk
-        name
-        ...MetaFields
-        ...ReservationInfoCard
-        bufferTimeBefore
-        bufferTimeAfter
-        calendarUrl
-        reservationUnit {
-          id
-          canApplyFreeOfCharge
-          ...CancellationRuleFields
-          ...MetadataSets
-          ...TermsOfUse
-          requireReservationHandling
-        }
+        ...ReservationInProgress
       }
     }
   }

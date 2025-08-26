@@ -35,13 +35,15 @@ const FormWrapper = styled(Flex)`
   }
 `;
 
-export function CancellationForm(props: {
+type CancellationFormProps = {
   onNext: (values: CancelFormValues) => void;
   cancellationTerms: string | null;
   backLink: string;
   isLoading?: boolean;
   isDisabled?: boolean;
-}): JSX.Element {
+};
+
+export function CancellationForm(props: Readonly<CancellationFormProps>): JSX.Element {
   const { onNext, isLoading, isDisabled, cancellationTerms, backLink } = props;
   const { t } = useTranslation();
 

@@ -100,7 +100,7 @@ export function CreateReservationModal({
     skip: !reservationUnitPk,
   });
 
-  const { reservationUnit } = data ?? {};
+  const reservationUnit = data?.node != null && "pk" in data.node ? data.node : null;
 
   const interval = getNormalizedInterval(reservationUnit?.reservationStartInterval);
   const startDate = start ?? new Date();

@@ -106,7 +106,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     variables: { pk },
   });
 
-  const applicationSection = data?.applicationSections?.edges[0]?.node;
+  const applicationSection = data?.applicationSections?.edges?.[0]?.node;
   if (!applicationSection) {
     return notFoundRetvalue;
   }

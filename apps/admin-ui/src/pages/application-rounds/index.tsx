@@ -100,9 +100,7 @@ function AllApplicationRounds(): JSX.Element | null {
     (ar) => ar.status === ApplicationRoundStatusChoice.InAllocation
   );
   const openApplicationRounds = allApplicationRounds.filter((ar) => ar.status === ApplicationRoundStatusChoice.Open);
-  const sentApplicationRounds = allApplicationRounds.filter(
-    (ar) => ar.status === ApplicationRoundStatusChoice.ResultsSent
-  );
+  const sentApplicationRounds = allApplicationRounds.filter((ar) => ar.status === ApplicationRoundStatusChoice.Sent);
   const upcomingApplicationRounds = allApplicationRounds.filter(
     (ar) => ar.status === ApplicationRoundStatusChoice.Upcoming
   );

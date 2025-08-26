@@ -1,8 +1,7 @@
 import React from "react";
 import {
   type ReservationQuotaReachedFragment,
-  type ReservationUnitNode,
-  type ReservationUnitPageQuery,
+  type ReservationTimePickerFieldsFragment,
   useReservationQuotaReachedQuery,
 } from "@gql/gql-types";
 import { ReservationTimePicker } from "@/components/reservation";
@@ -16,14 +15,12 @@ import { type PendingReservationFormType } from "./schema";
 import { type UseFormReturn } from "react-hook-form";
 import { Flex, H4 } from "common/styled";
 
-type ReservationUnitT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
-
 export function ReservationUnitCalendarSection({
   reservationUnit,
   reservationForm,
   ...rest
 }: {
-  reservationUnit: ReservationUnitT;
+  reservationUnit: Readonly<ReservationTimePickerFieldsFragment>;
   reservationForm: UseFormReturn<PendingReservationFormType>;
 } & Pick<
   ReservationTimePickerProps,
@@ -39,7 +36,8 @@ export function ReservationUnitCalendarSection({
     },
   });
 
-  const refreshedIsQuoteReached = data?.reservationUnit ?? reservationUnit;
+  const node = data?.node != null && "id" in data.node ? data.node : null;
+  const refreshedIsQuoteReached = node ?? reservationUnit;
   const quotaReached = isReservationQuotaReached(refreshedIsQuoteReached);
 
   return (
@@ -87,9 +85,7 @@ function ReservationQuotaReached(props: ReservationQuotaReachedFragment): JSX.El
   );
 }
 
-export function isReservationQuotaReached(
-  reservationUnit: Pick<ReservationUnitNode, "maxReservationsPerUser" | "numActiveUserReservations">
-): boolean {
+export function isReservationQuotaReached(reservationUnit: ReservationQuotaReachedFragment): boolean {
   return (
     reservationUnit.maxReservationsPerUser != null &&
     reservationUnit.numActiveUserReservations >= reservationUnit.maxReservationsPerUser
