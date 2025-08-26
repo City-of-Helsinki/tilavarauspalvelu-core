@@ -1,6 +1,10 @@
 import { UseFormReturn } from "react-hook-form";
 import type { ReservationUnitEditFormValues } from "./form";
-import { ReservationKind, ReservationUnitEditQuery, ReservationUnitEditUnitFragment } from "@gql/gql-types";
+import {
+  ReservationKind,
+  type ReservationUnitEditPageFragment,
+  type ReservationUnitEditUnitFragment,
+} from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
 import { TextInput } from "hds-react";
@@ -12,17 +16,14 @@ import { SpecializedRadioGroup } from "./SpecializedRadioGroup";
 import { EditAccordion } from "./styled";
 import { AutoGrid, FullRow } from "common/styled";
 
-type QueryData = ReservationUnitEditQuery["reservationUnit"];
-type Node = NonNullable<QueryData>;
-
 // default is 20 if no spaces selected
-function getMaxPersons(spaceList: Pick<Node, "maxPersons">[]) {
+function getMaxPersons(spaceList: Pick<ReservationUnitEditPageFragment, "maxPersons">[]) {
   const persons = spaceList.map((s) => s.maxPersons ?? 0).reduce((a, x) => a + x, 0) || 20;
   return Math.floor(persons);
 }
 
 // default is 1 if no spaces selected
-function getMinSurfaceArea(spaceList: Pick<Node, "surfaceArea">[]) {
+function getMinSurfaceArea(spaceList: Pick<ReservationUnitEditPageFragment, "surfaceArea">[]) {
   const area = spaceList.map((s) => s.surfaceArea ?? 0).reduce((a, x) => a + x, 0) || 1;
   return Math.floor(area);
 }
@@ -39,12 +40,12 @@ export function BasicSection({
   const { errors } = formState;
 
   const spaceOptions = filterNonNullable(spaces).map((s) => ({
-    label: s?.nameFi ?? "-",
-    value: s?.pk ?? 0,
+    label: s.nameFi ?? "-",
+    value: s.pk,
   }));
   const resourceOptions = filterNonNullable(spaces?.flatMap((s) => s?.resources)).map((r) => ({
-    label: r?.nameFi ?? "-",
-    value: r?.pk ?? 0,
+    label: r.nameFi ?? "-",
+    value: r.pk,
   }));
 
   const spacePks = watch("spaces");

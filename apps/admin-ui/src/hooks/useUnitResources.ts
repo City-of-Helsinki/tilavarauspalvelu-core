@@ -1,7 +1,8 @@
 import {
   AuthenticationType,
   ReservationTypeChoice,
-  type ReservationUnitsByUnitQuery,
+  type ReservationUnitReservationsFragment,
+  type ReservationUnitsByUnitFieldsFragment,
   useReservationUnitsByUnitQuery,
 } from "@gql/gql-types";
 import { toApiDate } from "common/src/common/util";
@@ -19,10 +20,7 @@ interface UseUnitResourcesProps {
   reservationUnitTypeFilter?: number[];
 }
 
-type ReservationType = NonNullable<ReservationUnitsByUnitQuery["affectingReservations"]>[number];
-type ReservationUnitType = NonNullable<NonNullable<ReservationUnitsByUnitQuery["unit"]>["reservationUnits"]>[number];
-
-function createDummyReservationUnit(opt: OptionT): ReservationUnitType {
+function createDummyReservationUnit(opt: OptionT): ReservationUnitsByUnitFieldsFragment {
   return {
     id: createNodeId("ReservationUnitNode", opt.value),
     pk: opt.value,
@@ -61,10 +59,12 @@ export function useUnitResources({
     },
   });
 
-  const { affectingReservations, unit } = data ?? previousData ?? {};
+  const affectingReservations = data?.affectingReservations;
+
+  const unit = data?.node != null && "reservationUnits" in data.node ? data.node : null;
   const resUnits = unit?.reservationUnits ?? reservationUnitOptions.map(createDummyReservationUnit);
 
-  function convertToEvent(y: ReservationType, x: ReservationUnitType) {
+  function convertToEvent(y: ReservationUnitReservationsFragment, x: ReservationUnitsByUnitFieldsFragment) {
     return {
       ...y,
       ...(y.type !== ReservationTypeChoice.Blocked
@@ -76,7 +76,10 @@ export function useUnitResources({
     };
   }
 
-  function doesReservationAffectReservationUnit(reservation: ReservationType, reservationUnitPk: number) {
+  function doesReservationAffectReservationUnit(
+    reservation: ReservationUnitReservationsFragment,
+    reservationUnitPk: number
+  ) {
     return reservation.affectedReservationUnits?.some((pk) => pk === reservationUnitPk);
   }
 
@@ -107,6 +110,26 @@ export function useUnitResources({
   return { ...rest, resources };
 }
 
+export const RESERVATION_UNITS_BY_UNIT_FIELDS_FRAGMENT = gql`
+  fragment ReservationUnitsByUnitFields on ReservationUnitNode {
+    id
+    pk
+    nameFi
+    spaces {
+      id
+      pk
+    }
+    reservationUnitType {
+      id
+      pk
+    }
+    bufferTimeBefore
+    bufferTimeAfter
+    isDraft
+    authentication
+  }
+`;
+
 export const RESERVATION_UNITS_BY_UNIT_QUERY = gql`
   query ReservationUnitsByUnit(
     $id: ID!
@@ -119,21 +142,7 @@ export const RESERVATION_UNITS_BY_UNIT_QUERY = gql`
       ... on UnitNode {
         id
         reservationUnits {
-          id
-          pk
-          nameFi
-          spaces {
-            id
-            pk
-          }
-          reservationUnitType {
-            id
-            pk
-          }
-          bufferTimeBefore
-          bufferTimeAfter
-          isDraft
-          authentication
+          ...ReservationUnitsByUnitFields
         }
       }
     }

@@ -52,11 +52,11 @@ export async function getServerSideProps({ query, locale, req }: GetServerSidePr
   }
   const commonProps = await getCommonServerSideProps();
   const apolloClient = createClient(commonProps.apiBaseUrl, req);
-  const unitData = await apolloClient.query<SeriesReservationUnitQuery, SeriesReservationUnitQueryVariables>({
+  const { data } = await apolloClient.query<SeriesReservationUnitQuery, SeriesReservationUnitQueryVariables>({
     query: SeriesReservationUnitDocument,
     variables: { id: createNodeId("UnitNode", unitPk) },
   });
-  const reservationUnits = unitData.data.unit?.reservationUnits ?? [];
+  const reservationUnits = data.node != null && "id" in data.node ? data.node.reservationUnits : [];
   return {
     props: {
       unitPk,

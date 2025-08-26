@@ -1,8 +1,4 @@
-import {
-  ReservationCancelReasonChoice,
-  type ReservationPaymentUrlFragment,
-  ReservationStateChoice,
-} from "@gql/gql-types";
+import { PaymentNotificationFragment, ReservationCancelReasonChoice, ReservationStateChoice } from "@gql/gql-types";
 import { Notification } from "hds-react";
 import { ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
 import { useTranslation } from "next-i18next";
@@ -13,17 +9,21 @@ import { formatters as getFormatters } from "common";
 import React, { useMemo } from "react";
 import { breakpoints } from "common/src/const";
 import { getPaymentUrl } from "@/modules/reservation";
+import { gql } from "@apollo/client";
 
 type PaymentNotificationProps = {
-  reservation: ReservationPaymentUrlFragment;
+  reservation: PaymentNotificationFragment;
+  /*
   appliedPricing: {
     highestPrice: string;
     taxPercentage: string;
   } | null;
-  paymentOrder: {
+  paymentOrder:PaymentNotificationOrderFragment
+  {
     handledPaymentDueBy: string | null;
     checkoutUrl: string | null;
   } | null;
+*/
   apiBaseUrl: string;
 };
 
@@ -40,15 +40,11 @@ const PriceDetails = styled.div`
   }
 `;
 
-export const PaymentNotification = ({
-  reservation,
-  appliedPricing,
-  paymentOrder,
-  apiBaseUrl,
-}: PaymentNotificationProps) => {
+export function PaymentNotification({ reservation, apiBaseUrl }: PaymentNotificationProps) {
   const { t, i18n } = useTranslation();
   const formatters = useMemo(() => getFormatters(i18n.language), [i18n.language]);
   const formatter = formatters["currencyWithDecimals"];
+  const { appliedPricing, paymentOrder } = reservation;
   const price = formatter?.format(parseFloat(appliedPricing?.highestPrice ?? "") ?? 0);
   const taxPercentage = formatters.strippedDecimal?.format(parseFloat(appliedPricing?.taxPercentage ?? "")) ?? "0";
 
@@ -83,6 +79,20 @@ export const PaymentNotification = ({
       </Flex>
     </Notification>
   );
-};
+}
 
-export default PaymentNotification;
+export const PAYMENT_NOTIFICATION_ORDER_FRAGMENT = gql`
+  fragment PaymentNotification on ReservationNode {
+    id
+    ...ReservationPaymentUrl
+    appliedPricing {
+      highestPrice
+      taxPercentage
+    }
+    paymentOrder {
+      id
+      handledPaymentDueBy
+      checkoutUrl
+    }
+  }
+`;

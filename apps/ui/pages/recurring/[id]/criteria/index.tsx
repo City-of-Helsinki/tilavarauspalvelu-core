@@ -112,7 +112,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   });
 
-  const { applicationRound } = data;
+  const applicationRound = data.node != null && "criteriaFi" in data.node ? data.node : null;
   if (applicationRound == null) {
     return notFound;
   }

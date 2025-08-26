@@ -143,7 +143,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       id: createNodeId("ApplicationRoundNode", pk),
     },
   });
-  const { applicationRound } = data;
+
+  const applicationRound = data?.node != null && "pk" in data.node ? data.node : null;
   if (applicationRound == null) {
     return notFound;
   }

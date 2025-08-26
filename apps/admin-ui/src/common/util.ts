@@ -5,7 +5,7 @@ import {
   type ReservationNode,
   ReservationTypeChoice,
   type LocationFieldsFragment,
-  type ReservationCommonFieldsFragment,
+  type CalendarReservationNameFragment,
 } from "@gql/gql-types";
 import type { TFunction } from "next-i18next";
 import { toMondayFirstUnsafe, truncate } from "common/src/helpers";
@@ -92,7 +92,7 @@ export function getTranslatedError(t: TFunction, error: string | undefined): str
 }
 
 export function getReserveeName(
-  reservation: Pick<ReservationCommonFieldsFragment, "reserveeName" | "type">,
+  reservation: Pick<CalendarReservationNameFragment, "reserveeName" | "type">,
   t: TFunction,
   length = 50
 ): string {

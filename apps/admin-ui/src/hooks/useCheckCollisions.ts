@@ -43,7 +43,10 @@ export function useCheckCollisions({
     },
   });
 
-  const reservations = combineAffectingReservations(data, reservationUnitPk);
+  const reservations =
+    data?.node != null && "reservations" in data.node
+      ? combineAffectingReservations({ ...data, node: data.node }, reservationUnitPk)
+      : [];
 
   const collisions = reservations
     .filter((x) => x?.pk !== reservationPk)

@@ -52,7 +52,7 @@ export function ApplicationSectionDataLoader({ applicationRoundPk }: Props): JSX
     return <CenterSpinner />;
   }
 
-  const applicationSections = filterNonNullable(dataToUse?.applicationSections?.edges.map((edge) => edge?.node));
+  const applicationSections = filterNonNullable(dataToUse?.applicationSections?.edges?.map((edge) => edge?.node));
   const totalCount = dataToUse?.applicationSections?.totalCount ?? 0;
 
   return (
@@ -98,8 +98,8 @@ function transformOrderBy(orderBy: string | null): ApplicationSectionOrderSet[] 
     case "application_id,pk":
     case "application_id,-pk":
       return desc
-        ? [ApplicationSectionOrderSet.ApplicationPkDesc, ApplicationSectionOrderSet.PkDesc]
-        : [ApplicationSectionOrderSet.ApplicationPkAsc, ApplicationSectionOrderSet.PkAsc];
+        ? [ApplicationSectionOrderSet.ApplicationDesc, ApplicationSectionOrderSet.PkDesc]
+        : [ApplicationSectionOrderSet.ApplicationAsc, ApplicationSectionOrderSet.PkAsc];
     default:
       return [];
   }
@@ -116,9 +116,7 @@ export const APPLICATION_SECTIONS_QUERY = gql`
     $applicantType: [ReserveeType!]
     $applicationRound: Int!
     $applicationStatus: [ApplicationStatusChoice!]!
-    $includePreferredOrder10OrHigher: Boolean!
     $municipality: [MunicipalityChoice!]
-    $preferredOrder: [Int!]!
     $priority: [Priority!]
     $purpose: [Int!]
     $reservationUnit: [Int!]
@@ -137,7 +135,6 @@ export const APPLICATION_SECTIONS_QUERY = gql`
         applicationRound: $applicationRound
         applicationStatus: $applicationStatus
         municipality: $municipality
-        preferredOrder: { values: $preferredOrder, allHigherThan10: $includePreferredOrder10OrHigher }
         priority: $priority
         purpose: $purpose
         reservationUnit: $reservationUnit

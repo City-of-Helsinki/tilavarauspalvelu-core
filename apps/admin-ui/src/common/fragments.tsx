@@ -68,6 +68,7 @@ export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
   }
 `;
 
+// TODO don't use convenience fragments
 export const RESERVATION_COMMON_FRAGMENT = gql`
   fragment ReservationCommonFields on ReservationNode {
     id
@@ -76,10 +77,8 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
     endsAt
     createdAt
     state
-    type
     isBlocked
     workingMemo
-    reserveeName
     paymentOrder {
       id
       status
@@ -105,13 +104,12 @@ export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
   fragment ReservationUnitReservations on ReservationNode {
     ...ReservationCommonFields
     ...VisibleIfPermissionFields
+    ...CalendarReservationName
     name
     numPersons
     calendarUrl
     reservationUnit {
       id
-      pk
-      nameFi
       bufferTimeBefore
       bufferTimeAfter
       unit {

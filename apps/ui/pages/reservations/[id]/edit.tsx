@@ -46,7 +46,7 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
   const { reservation } = props;
   const options = {
     ...props.options,
-    municipality: Object.values(MunicipalityChoice).map((value) => ({
+    municipalities: Object.values(MunicipalityChoice).map((value) => ({
       label: t(`common:municipalities.${value.toUpperCase()}`),
       value: value,
     })),
@@ -157,7 +157,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         endDate: toApiDate(addYears(new Date(), 2)) ?? "",
       },
     });
-    const { reservation } = data;
+    const reservation = data.node != null && "id" in data.node ? data.node : null;
 
     if (reservation == null) {
       return notFound;

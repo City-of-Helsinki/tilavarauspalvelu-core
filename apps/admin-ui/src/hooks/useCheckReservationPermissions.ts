@@ -9,7 +9,8 @@ export function useCheckReservationPermissions(pk: number) {
     variables: { id: createNodeId("ReservationNode", pk) },
     skip: !pk,
   });
-  const units = filterNonNullable([data?.reservation?.reservationUnit?.unit?.pk]);
+  const node = data?.node != null && "reservationUnit" in data.node ? data.node : null;
+  const units = filterNonNullable([node?.reservationUnit?.unit?.pk]);
   const { hasPermission, isLoading } = useCheckPermission({
     units,
     permission: UserPermissionChoice.CanManageReservations,

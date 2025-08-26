@@ -1,6 +1,6 @@
 import {
   type AgeGroupNode,
-  type ApplicationPage2Query,
+  type ApplicationPage2Fragment,
   type ApplicationRoundNode,
   ApplicationRoundReservationCreationStatusChoice,
   ApplicationRoundStatusChoice,
@@ -72,8 +72,7 @@ function createMockReservationUnits({
   return Array.from({ length: nReservationUnits }, (_, i) => createMockReservationUnit({ pk: i + 1 }));
 }
 
-type ApplicationMockType = NonNullable<ApplicationPage2Query["application"]>;
-type ApplicationSectionMockType = NonNullable<ApplicationMockType["applicationSections"]>[number];
+type ApplicationSectionMockType = NonNullable<ApplicationPage2Fragment["applicationSections"]>[number];
 
 /// @param page which page is valid (page0 => nothing is valid), preview => it's sent
 function createMockApplicationSection({
@@ -184,7 +183,7 @@ export function createMockApplicationFragment({
   status = ApplicationStatusChoice.Draft,
   nReservationUnitOptions = 1,
   nSections = 1,
-}: CreateMockApplicationFragmentProps = {}): ApplicationMockType {
+}: CreateMockApplicationFragmentProps = {}): ApplicationPage2Fragment {
   const page3Data = {
     applicantType: ReserveeType.Nonprofit,
     additionalInformation: "",

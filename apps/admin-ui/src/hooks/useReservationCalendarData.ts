@@ -53,7 +53,10 @@ export function useReservationCalendarData({
 
   const blockedName = t("reservationUnit:reservationState.RESERVATION_CLOSED");
 
-  const reservations = combineAffectingReservations(data, reservationUnitPk);
+  const reservations =
+    data?.node != null && "reservations" in data.node
+      ? combineAffectingReservations({ ...data, node: data.node }, reservationUnitPk)
+      : [];
 
   const events =
     reservations
