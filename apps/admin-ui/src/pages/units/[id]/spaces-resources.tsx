@@ -50,7 +50,7 @@ function SpacesResources({ unitPk }: { unitPk: number }): JSX.Element {
     return <CenterSpinner />;
   }
 
-  const { unit } = data ?? {};
+  const unit = data?.node != null && "pk" in data.node ? data.node : null;
   if (unit == null) {
     return <Error404 />;
   }

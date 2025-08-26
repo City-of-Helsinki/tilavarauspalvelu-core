@@ -56,7 +56,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     }
     try {
       const res = await deleteSpaceMutation({
-        variables: { input: { pk: String(pk) } },
+        variables: { input: { pk } },
       });
       if (res.errors != null && res.errors.length > 0) {
         throw new ApolloError({

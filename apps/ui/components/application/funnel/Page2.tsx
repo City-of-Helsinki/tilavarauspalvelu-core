@@ -3,7 +3,7 @@ import { Button, ButtonSize, ButtonVariant, IconArrowLeft, IconArrowRight } from
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { useFormContext } from "react-hook-form";
-import { type ApplicationPage2Query } from "@gql/gql-types";
+import { ApplicationSectionTimePickerFragment } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { ButtonContainer } from "common/styled";
@@ -11,10 +11,14 @@ import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { getApplicationPath } from "@/modules/urls";
 import { type ApplicationPage2FormValues } from "./form";
 import { TimeSelectorForm } from ".";
+import { gql } from "@apollo/client";
 
-type Node = NonNullable<ApplicationPage2Query["application"]>;
 type Props = {
-  application: Pick<Node, "applicationSections" | "pk">;
+  application: Readonly<{
+    pk: number;
+    applicationSections: Readonly<ApplicationSectionTimePickerFragment[]>;
+  }>;
+
   onNext: (appToSave: ApplicationPage2FormValues) => void;
 };
 
@@ -69,7 +73,7 @@ function ApplicationSectionTimePicker({
   section,
 }: {
   index: number;
-  section: NonNullable<Node["applicationSections"]>[0] | undefined;
+  section: ApplicationSectionTimePickerFragment;
 }): JSX.Element {
   const { watch } = useFormContext<ApplicationPage2FormValues>();
 
@@ -110,3 +114,28 @@ function ApplicationSectionTimePicker({
     </Accordion>
   );
 }
+
+export const APPLICATION_SECTION_TIME_PICKER_FRAGMENT = gql`
+  fragment ApplicationSectionTimePicker on ApplicationSectionNode {
+    id
+    reservationUnitOptions {
+      id
+      reservationUnit {
+        id
+        pk
+        nameFi
+        nameEn
+        nameSv
+        unit {
+          id
+          nameFi
+          nameEn
+          nameSv
+        }
+        applicationRoundTimeSlots {
+          ...TimeSelector
+        }
+      }
+    }
+  }
+`;

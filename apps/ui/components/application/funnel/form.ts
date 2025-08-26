@@ -3,14 +3,14 @@ import { filterNonNullable, type ReadonlyDeep, timeToMinutes } from "common/src/
 import {
   type ApplicantFieldsFragment,
   type ApplicationFormFragment,
-  type ApplicationPage2Query,
   type ApplicationUpdateMutation,
+  type ApplicationPage2Fragment,
   type Maybe,
   MunicipalityChoice,
   Priority,
   ReserveeType,
-  type SuitableTimeRangeInput,
-  type ApplicationSectionInput,
+  type SuitableTimeRangeCreateInput,
+  type ApplicationSectionUpdateInput,
   Weekday,
 } from "@gql/gql-types";
 import { z } from "zod";
@@ -20,9 +20,6 @@ import { checkValidDateOnly, lessThanMaybeDate } from "common/src/schemas/schema
 import { CELL_STATES } from "common/src/components/ApplicationTimeSelector";
 
 type SectionType = NonNullable<ApplicationFormFragment["applicationSections"]>[0];
-
-type NodePage2 = NonNullable<ApplicationPage2Query["application"]>;
-type SectionTypePage2 = NonNullable<NodePage2["applicationSections"]>[0];
 
 const SuitableTimeRangeFormTypeSchema = z.object({
   pk: z.number().optional(),
@@ -147,7 +144,7 @@ const ApplicationSectionPage2Schema = z
     }
   });
 
-function transformApplicationSectionPage2(values: ApplicationSectionPage2FormValues): ApplicationSectionInput {
+function transformApplicationSectionPage2(values: ApplicationSectionPage2FormValues): ApplicationSectionUpdateInput {
   // NOTE: there is a type issue somewhere that causes this to be a string for some cases
   return {
     pk: Number(values.pk),
@@ -155,6 +152,7 @@ function transformApplicationSectionPage2(values: ApplicationSectionPage2FormVal
   };
 }
 
+type SectionTypePage2 = NonNullable<ApplicationPage2Fragment["applicationSections"]>[0];
 function convertApplicationSectionPage2(section: ReadonlyDeep<SectionTypePage2>): ApplicationSectionPage2FormValues {
   const reservationUnitPk = section.reservationUnitOptions.find(() => true)?.reservationUnit.pk ?? 0;
   const { name, appliedReservationsPerWeek } = section;
@@ -403,26 +401,26 @@ const transformEventReservationUnit = (pk: number, priority: number) => ({
   reservationUnit: pk,
 });
 
-function transformSuitableTimeRange(timeRange: SuitableTimeRangeFormValues): SuitableTimeRangeInput {
+function transformSuitableTimeRange(timeRange: SuitableTimeRangeFormValues): SuitableTimeRangeCreateInput {
   return timeRange;
 }
 
 // NOTE this works only for subsections of an application mutation
 // if needed without an application mutation needs to use a different SerializerInput
-function transformApplicationSection(ae: ApplicationSectionPage1FormValues): ApplicationSectionInput {
+function transformApplicationSection(ae: ApplicationSectionPage1FormValues): ApplicationSectionUpdateInput {
   const begin = transformDateString(ae.begin);
   const end = transformDateString(ae.end);
 
-  const commonData: ApplicationSectionInput = {
+  const commonData: ApplicationSectionUpdateInput = {
     ...(begin != null ? { reservationsBeginDate: begin } : {}),
     ...(end != null ? { reservationsEndDate: end } : {}),
     name: ae.name,
-    numPersons: ae.numPersons,
+    numPersons: ae.numPersons ?? 0,
     ageGroup: ae.ageGroup,
     purpose: ae.purpose,
     reservationMinDuration: ae.minDuration ?? 0, // "3600" == 1h
     reservationMaxDuration: ae.maxDuration ?? 0, // "7200" == 2h
-    appliedReservationsPerWeek: ae.appliedReservationsPerWeek,
+    appliedReservationsPerWeek: ae.appliedReservationsPerWeek ?? 0,
     // TODO should validate that the units are on the application round
     reservationUnitOptions: ae.reservationUnits.map((ruo, ruoIndex) => transformEventReservationUnit(ruo, ruoIndex)),
   };
@@ -457,7 +455,7 @@ export function transformApplicationPage1(values: ApplicationPage1FormValues): A
 }
 
 export function convertApplicationPage2(
-  app: ReadonlyDeep<Pick<NodePage2, "pk" | "applicationSections">>
+  app: ReadonlyDeep<Pick<ApplicationPage2Fragment, "pk" | "applicationSections">>
 ): ApplicationPage2FormValues {
   return {
     pk: app?.pk ?? 0,

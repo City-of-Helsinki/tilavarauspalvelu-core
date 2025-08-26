@@ -51,8 +51,7 @@ function Criteria({ applicationRoundPk }: { applicationRoundPk: number }): JSX.E
       errorToast({ text: t("errors:errorFetchingData") });
     },
   });
-  const { applicationRound } = data ?? {};
-  const reservationUnits = filterNonNullable(applicationRound?.reservationUnits);
+  const applicationRound = data?.node != null && "pk" in data.node ? data.node : null;
 
   if (loading) {
     return <CenterSpinner />;
@@ -61,6 +60,7 @@ function Criteria({ applicationRoundPk }: { applicationRoundPk: number }): JSX.E
     return <div>Error: failed to load application round</div>;
   }
 
+  const reservationUnits = filterNonNullable(applicationRound.reservationUnits);
   return (
     <>
       <TitleSection>

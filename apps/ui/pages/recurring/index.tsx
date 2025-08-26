@@ -32,7 +32,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       orderBy: [ApplicationRoundOrderSet.PkAsc],
     },
   });
-  const applicationRounds = filterNonNullable(data?.applicationRounds?.edges.map((n) => n?.node));
+  const applicationRounds = filterNonNullable(data?.applicationRounds?.edges?.map((n) => n?.node));
 
   const filteredApplicationRounds = applicationRounds.filter(
     (applicationRound) =>

@@ -59,7 +59,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
   return (
     <>
       <Breadcrumb routes={routes} />
-      <ReservationCancellation {...props} reservation={reservation} />
+      <ReservationCancellation {...props} />
     </>
   );
 }
@@ -79,7 +79,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       fetchPolicy: "no-cache",
       variables: { id: createNodeId("ReservationNode", pk ?? 0) },
     });
-    const { reservation } = data || {};
+    const reservation = data.node != null && "id" in data.node ? data.node : null;
 
     const canCancel = reservation != null && isReservationCancellable(reservation);
     if (canCancel) {
@@ -117,40 +117,8 @@ export const RESERVATION_CANCEL_PAGE_QUERY = gql`
   query ReservationCancelPage($id: ID!) {
     node(id: $id) {
       ... on ReservationNode {
-        id
-        ...ReservationInfoCard
-        name
-        reservationUnit {
-          id
-          ...CancellationRuleFields
-          cancellationTerms {
-            ...TermsOfUseTextFields
-          }
-        }
-        reservationSeries {
-          id
-          name
-          allocatedTimeSlot {
-            id
-            pk
-            reservationUnitOption {
-              id
-              applicationSection {
-                id
-                application {
-                  id
-                  pk
-                  applicationRound {
-                    id
-                    termsOfUse {
-                      ...TermsOfUseTextFields
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+        ...ReservationCancellation
+        ...CanUserCancelReservation
       }
     }
   }

@@ -3,13 +3,11 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createMockReservation, createTermsOfUseMock, generateTextFragment } from "@test/reservation.mocks";
-import type { ReservationPageQuery } from "@gql/gql-types";
+import type { ReservationPageFragment } from "@gql/gql-types";
 import { generateNameFragment } from "@/test/test.gql.utils";
 
-type NodeT = NonNullable<ReservationPageQuery["reservation"]>;
-
 const customRender = (
-  reservation: NodeT,
+  reservation: ReservationPageFragment,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tos?: any
 ): ReturnType<typeof render> => {

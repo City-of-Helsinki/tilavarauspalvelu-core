@@ -67,7 +67,7 @@ export function TimeSlotDataLoader({ unitOptions, applicationRoundPk }: Props): 
   }
 
   const totalCount = dataToUse?.allocatedTimeSlots?.totalCount ?? 0;
-  const aes = filterNonNullable(dataToUse?.allocatedTimeSlots?.edges.map((edge) => edge?.node));
+  const aes = filterNonNullable(dataToUse?.allocatedTimeSlots?.edges?.map((edge) => edge?.node));
 
   return (
     <>

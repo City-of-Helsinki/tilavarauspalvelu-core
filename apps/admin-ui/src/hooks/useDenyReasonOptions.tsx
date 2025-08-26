@@ -15,8 +15,8 @@ export function useDenyReasonOptions() {
       errorToast({ text: t("errors:errorFetchingData") });
     },
   });
-  const { allReservationDenyReasons } = data ?? {};
-  const denyReasonOptions = filterNonNullable(allReservationDenyReasons).map((dr) => ({
+
+  const denyReasonOptions = filterNonNullable(data?.allReservationDenyReasons).map((dr) => ({
     value: dr?.pk ?? 0,
     label: dr?.reasonFi ?? "",
   }));

@@ -71,7 +71,7 @@ export function ApplicationFields({
   supportedFields,
 }: {
   reservation: MetaFieldsFragment;
-  options: Omit<OptionsRecord, "municipality">;
+  options: Omit<OptionsRecord, "municipalities">;
   supportedFields: FieldName[];
 }): JSX.Element {
   const { t } = useTranslation();
@@ -128,7 +128,7 @@ export function GeneralFields({
 }: {
   supportedFields: FieldName[];
   reservation: MetaFieldsFragment;
-  options: Omit<OptionsRecord, "municipality">;
+  options: Omit<OptionsRecord, "municipalities">;
 }): JSX.Element | null {
   const { t } = useTranslation();
 

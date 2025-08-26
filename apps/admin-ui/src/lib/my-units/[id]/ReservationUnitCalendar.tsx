@@ -7,7 +7,7 @@ import styled from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
 import {
   ReservationTypeChoice,
-  type ReservationUnitCalendarQuery,
+  type CalendarReservationNameFragment,
   useReservationUnitCalendarQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
@@ -35,16 +35,13 @@ const Container = styled.div`
   }
 `;
 
-type ReservationUnitType = NonNullable<ReservationUnitCalendarQuery["reservationUnit"]>;
-type ReservationType = NonNullable<NonNullable<ReservationUnitType["reservations"]>[0]>;
-
 function getEventTitle({
   reservationUnitPk,
   reservation,
   t,
 }: {
   reservationUnitPk: number;
-  reservation: ReservationType;
+  reservation: CalendarReservationNameFragment;
   t: TFunction;
 }) {
   const reserveeName = getReserveeName(reservation, t);
@@ -58,7 +55,7 @@ function getEventTitle({
   return [reserveeName, ""];
 }
 
-function constructEventTitle(res: ReservationType, resUnitPk: number, t: TFunction) {
+function constructEventTitle(res: CalendarReservationNameFragment, resUnitPk: number, t: TFunction) {
   const [reservee, unit] = getEventTitle({
     reservationUnitPk: resUnitPk,
     reservation: res,
@@ -97,7 +94,10 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
     },
   });
 
-  const reservations = combineAffectingReservations(data, reservationUnitPk);
+  const reservations =
+    data?.node != null && "reservations" in data.node
+      ? combineAffectingReservations({ ...data, node: data.node }, reservationUnitPk)
+      : [];
 
   const events = reservations.map((reservation) => {
     const isBlocked = reservation.type === ReservationTypeChoice.Blocked;
@@ -161,6 +161,18 @@ export const RESERVATION_UNIT_CALENDAR_QUERY = gql`
     affectingReservations(forReservationUnits: [$pk], state: $state, beginDate: $beginDate, endDate: $endDate) {
       ...ReservationUnitReservations
       ...CombineAffectedReservations
+    }
+  }
+`;
+
+export const CALENDAR_RESERVATION_NAME_FRAGMENT = gql`
+  fragment CalendarReservationName on ReservationNode {
+    id
+    reserveeName
+    type
+    reservationUnit {
+      pk
+      nameFi
     }
   }
 `;

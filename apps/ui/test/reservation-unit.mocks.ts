@@ -162,7 +162,7 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     reservationPendingInstructionsSv: null, // Maybe<Scalars["String"]["output"]>;
     reservationStartInterval: ReservationStartInterval.Interval_30Mins,
     reservationState: ReservationUnitReservationState.Reservable,
-    reservations: null, //Maybe<ReadonlyArray<ReservationNode>>;
+    reservations: [], //Maybe<ReadonlyArray<ReservationNode>>;
     reservationsMaxDaysBefore: null, // Maybe<Scalars["Int"]["output"]>;
     reservationsMinDaysBefore: null, // Maybe<Scalars["Int"]["output"]>;
     resources: [] as const, // ReadonlyArray<ResourceNode>;
