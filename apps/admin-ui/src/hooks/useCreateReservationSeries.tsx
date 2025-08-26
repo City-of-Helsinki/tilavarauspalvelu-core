@@ -57,6 +57,7 @@ export function useCreateReservationSeries() {
       enableBufferTimeAfter,
       enableBufferTimeBefore,
       reserveeIdentifier,
+      numPersons,
       ...rest
     } = data;
 
@@ -68,6 +69,7 @@ export function useCreateReservationSeries() {
 
     const reservationDetails: ReservationSeriesReservationCreateInput = {
       ...rest,
+      numPersons: numPersons ?? 0,
       type: transformReservationTypeStaffChoice(type),
       reserveeIdentifier: !reserveeIsUnregisteredAssociation ? reserveeIdentifier : undefined,
       reserveeType: reserveeType,

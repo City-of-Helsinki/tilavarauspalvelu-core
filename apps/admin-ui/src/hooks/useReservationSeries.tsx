@@ -20,13 +20,13 @@ export function useReservationSeries(recurringPk: Maybe<number> | undefined) {
     },
   });
 
-  const { reservationSeries } = data ?? {};
+  const reservationSeries = data?.node != null && "pk" in data.node ? data.node : null;
   const reservations = filterNonNullable(reservationSeries?.reservations);
 
   return {
-    loading,
     reservations,
     reservationSeries,
+    loading,
     refetch,
   };
 }

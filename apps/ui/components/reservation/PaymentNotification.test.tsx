@@ -1,22 +1,12 @@
 import { createReservationPageMock } from "@test/reservation.mocks";
 import { render, screen } from "@testing-library/react";
-import PaymentNotification from "@/components/reservation/PaymentNotification";
+import { PaymentNotification } from "@/components/reservation/PaymentNotification";
 import { describe, it, expect } from "vitest";
-import { AppliedPricingInfoType, OrderStatus, PaymentOrderNode, PaymentType, PriceUnit } from "@gql/gql-types";
 import { toUIDateTime } from "common/src/common/util";
 
 function customRender() {
-  const paymentOrder = createPaymentOrderMock();
-  const appliedPricing = createAppliedPricingMock();
   const reservation = createReservationPageMock({});
-  return render(
-    <PaymentNotification
-      reservation={reservation}
-      paymentOrder={paymentOrder}
-      appliedPricing={appliedPricing}
-      apiBaseUrl={"http://localhost:8000"}
-    />
-  );
+  return render(<PaymentNotification reservation={reservation} apiBaseUrl={"http://localhost:8000"} />);
 }
 
 describe("Component: Payment Notification", () => {
@@ -29,7 +19,11 @@ describe("Component: Payment Notification", () => {
   it("should render the payment notification component with correct price details", () => {
     customRender();
     const reservation = createReservationPageMock({});
-    const formattedPrice = reservation.price?.split(".").join(",") + "0";
+    const appliedPricingMock = reservation.appliedPricing;
+    if (!appliedPricingMock) {
+      throw new Error("Applied pricing mock is undefined");
+    }
+    const formattedPrice = appliedPricingMock.highestPrice.split(".").join(",") + "0";
     // eslint-disable-next-line no-irregular-whitespace
     const priceText = `common:price: ${formattedPrice} € (common:inclTax {"taxPercentage":"25,5"})`;
     const priceElement = screen.getByTestId("reservation__payment-notification__price");
@@ -40,35 +34,12 @@ describe("Component: Payment Notification", () => {
 
   it("should render the payment notification component with correct deadline", () => {
     customRender();
-    const paymentOrderMock = createPaymentOrderMock();
+    const reservation = createReservationPageMock({});
+    const paymentOrderMock = reservation.paymentOrder;
+    if (!paymentOrderMock) {
+      throw new Error("Payment order mock is undefined");
+    }
     const deadlineText = `common:deadline: ${toUIDateTime(new Date(paymentOrderMock.handledPaymentDueBy ?? ""), "common:dayTimeSeparator")}`;
     expect(screen.getByText(deadlineText)).toBeInTheDocument();
   });
 });
-
-function createPaymentOrderMock(): PaymentOrderNode {
-  return {
-    checkoutUrl: "https://example.com/checkout",
-    expiresInMinutes: 360,
-    handledPaymentDueBy: new Date("2023-10-01T12:00:00Z").toISOString(),
-    orderUuid: "23",
-    paymentType: PaymentType.OnlineOrInvoice,
-    processedAt: new Date("2023-10-01T12:00:00Z").toISOString(),
-    receiptUrl: "https://example.com/receipt",
-    refundUuid: "123",
-    reservation: null,
-    reservationPk: "1",
-    id: "paymentOrderId",
-    status: OrderStatus.Pending,
-  };
-}
-
-function createAppliedPricingMock(): AppliedPricingInfoType {
-  return {
-    begins: new Date("2023-10-01T12:00:00Z").toISOString(),
-    highestPrice: "10.0",
-    lowestPrice: "0",
-    priceUnit: PriceUnit.PerHour,
-    taxPercentage: "25.5",
-  };
-}

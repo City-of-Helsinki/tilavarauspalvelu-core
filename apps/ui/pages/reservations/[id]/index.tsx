@@ -17,9 +17,9 @@ import {
   OrderStatus,
   useAccessCodeQuery,
   AccessType,
-  type AccessCodeQuery,
   MunicipalityChoice,
   ReservationCancelReasonChoice,
+  PindoraReservationFragment,
 } from "@gql/gql-types";
 import Link from "next/link";
 import { isBefore, sub } from "date-fns";
@@ -65,6 +65,7 @@ import {
 } from "@/components/reservation";
 import { useSearchParams } from "next/navigation";
 import { queryOptions } from "@/modules/queryOptions";
+import { OptionsRecord } from "common";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -184,7 +185,8 @@ function Reservation({
       id: createNodeId("ReservationNode", reservation.pk ?? 0),
     },
   });
-  const pindoraInfo = accessCodeData?.reservation?.pindoraInfo ?? null;
+  const pindoraInfo =
+    accessCodeData?.node != null && "pindoraInfo" in accessCodeData.node ? accessCodeData?.node?.pindoraInfo : null;
 
   const modifyTimeReason = getWhyReservationCantBeChanged(reservation);
   const canTimeBeModified = modifyTimeReason == null;
@@ -368,17 +370,14 @@ function Reservation({
         </div>
         <Flex>
           {shouldShowPaymentNotification(reservation) && (
-            <PaymentNotification
-              reservation={reservation}
-              paymentOrder={reservation.paymentOrder}
-              appliedPricing={reservation.appliedPricing}
-              apiBaseUrl={apiBaseUrl}
-            />
+            <PaymentNotification reservation={reservation} apiBaseUrl={apiBaseUrl} />
           )}
           <Instructions reservation={reservation} />
           <GeneralFields supportedFields={supportedFields} reservation={reservation} options={options} />
           <ApplicationFields reservation={reservation} options={options} supportedFields={supportedFields} />
-          {shouldShowAccessCode && <AccessCodeInfo pindoraInfo={pindoraInfo} feedbackUrl={feedbackUrl} />}
+          {shouldShowAccessCode && pindoraInfo != null && (
+            <AccessCodeInfo pindoraInfo={pindoraInfo} feedbackUrl={feedbackUrl} />
+          )}
           <TermsInfoSection reservation={reservation} termsOfUse={termsOfUse} />
           <AddressSection
             title={getReservationUnitName(reservation.reservationUnit, lang) ?? "-"}
@@ -393,9 +392,10 @@ function Reservation({
 function AccessCodeInfo({
   pindoraInfo,
   feedbackUrl,
-}: Readonly<
-  Pick<NonNullable<AccessCodeQuery["reservation"]>, "pindoraInfo"> & Pick<PropsNarrowed, "feedbackUrl">
->): React.ReactElement {
+}: Readonly<{
+  pindoraInfo: Readonly<PindoraReservationFragment>;
+  feedbackUrl: PropsNarrowed["feedbackUrl"];
+}>): React.ReactElement {
   const { t, i18n } = useTranslation();
   return (
     <div>
@@ -457,7 +457,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       variables: { id: createNodeId("ReservationNode", pk) },
     });
 
-    const { reservation } = data ?? {};
+    const reservation = data?.node != null && "pk" in data.node ? data.node : null;
 
     if (reservation?.reservationSeries != null) {
       const recurringId = reservation.reservationSeries.id;
@@ -468,8 +468,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         query: ApplicationReservationSeriesDocument,
         variables: { id: recurringId },
       });
-      const applicationPk =
-        recurringData?.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
+
+      const allocatedTimeSlot =
+        recurringData?.node != null && "allocatedTimeSlot" in recurringData.node
+          ? recurringData.node.allocatedTimeSlot
+          : null;
+      const applicationPk = allocatedTimeSlot?.reservationUnitOption.applicationSection?.application?.pk;
       return {
         redirect: {
           permanent: true,
@@ -480,18 +484,19 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         },
       };
     } else if (reservation != null) {
-      const options = await queryOptions(apolloClient, locale ?? "");
+      const qOptions = await queryOptions(apolloClient, locale ?? "");
+      const options: OptionsRecord = {
+        ...qOptions,
+        municipalities: Object.values(MunicipalityChoice).map((value) => ({
+          label: value.toString(),
+          value: value,
+        })) as ReadonlyArray<Readonly<{ label: string; value: MunicipalityChoice }>>,
+      };
       return {
         props: {
           ...commonProps,
           ...(await serverSideTranslations(locale ?? "fi")),
-          options: {
-            ...options,
-            municipality: Object.values(MunicipalityChoice).map((value) => ({
-              label: value as string,
-              value: value,
-            })),
-          },
+          options,
           reservation,
           termsOfUse: {
             genericTerms: bookingTerms ?? null,
@@ -529,34 +534,40 @@ export const GET_APPLICATION_RESERVATION_SERIES_QUERY = gql`
   }
 `;
 
-export const GET_RESERVATION_PAGE_QUERY = gql`
+export const RESERVATION_PAGE_FRAGMENT = gql`
+  fragment ReservationPage on ReservationNode {
+    id
+    type
+    ...MetaFields
+    ...ReservationInfoCard
+    ...Instructions
+    ...CanReservationBeChanged
+    calendarUrl
+    ...PaymentNotification
+    paymentOrder {
+      id
+      receiptUrl
+    }
+    reservationSeries {
+      id
+    }
+    reservationUnit {
+      id
+      unit {
+        ...AddressFields
+      }
+      canApplyFreeOfCharge
+      ...MetadataSets
+      ...TermsOfUse
+    }
+  }
+`;
+
+export const RESERVATION_PAGE_QUERY = gql`
   query ReservationPage($id: ID!) {
     node(id: $id) {
       ... on ReservationNode {
-        id
-        type
-        ...MetaFields
-        ...ReservationInfoCard
-        ...Instructions
-        ...CanReservationBeChanged
-        calendarUrl
-        ...ReservationPaymentUrl
-        paymentOrder {
-          id
-          receiptUrl
-        }
-        reservationSeries {
-          id
-        }
-        reservationUnit {
-          id
-          unit {
-            ...AddressFields
-          }
-          canApplyFreeOfCharge
-          ...MetadataSets
-          ...TermsOfUse
-        }
+        ...ReservationPage
       }
     }
   }

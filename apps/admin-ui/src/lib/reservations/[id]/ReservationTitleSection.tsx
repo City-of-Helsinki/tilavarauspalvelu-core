@@ -76,9 +76,10 @@ export const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
       skip: !reservation.reservationSeries?.id,
     });
 
-    const applicationPk =
-      data?.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
-    const sectionPk = data?.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.pk;
+    const node = data?.node != null && "id" in data.node ? data.node : null;
+
+    const applicationPk = node?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
+    const sectionPk = node?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.pk;
     const applicationLink = getApplicationUrl(applicationPk, sectionPk);
 
     const paymentStatusLabelType = getStatusLabelType(reservation.paymentOrder?.status);

@@ -3,7 +3,7 @@ import { describe, expect, test, vi } from "vitest";
 import { type ApplicationPage2FormValues, convertApplicationPage2 } from "./form";
 import { TimeSelectorForm, type TimeSelectorProps } from "./TimeSelector";
 import { createMockApplicationFragment, type CreateMockApplicationFragmentProps } from "@test/application.mocks";
-import { type ApplicationPage2Query, Priority, type TimeSelectorFragment, Weekday } from "@/gql/gql-types";
+import { type ApplicationPage2Fragment, Priority, type TimeSelectorFragment, Weekday } from "@/gql/gql-types";
 import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { transformWeekday } from "common/src/conversion";
@@ -12,8 +12,6 @@ import { type OpenHoursState } from "common/src/components/ApplicationTimeSelect
 import { selectOption } from "@/test/test.utils";
 import { toApiTime } from "common/src/common/util";
 import { type DayT, WEEKDAYS_SORTED } from "common/src/const";
-
-type ApplicationPage2 = NonNullable<ApplicationPage2Query["application"]>;
 
 interface TimeSelectorMockProps extends CreateMockApplicationFragmentProps {
   onSubmit?: (appToSave: ApplicationPage2FormValues) => Promise<void>;
@@ -29,7 +27,7 @@ function customRender(props: TimeSelectorMockProps = {}): ReturnType<typeof rend
 
 // To use hooks have to use component wrap
 function WrapTimeSelector({ onSubmit = vi.fn(), reservationUnitOpeningHours = [], ...props }: TimeSelectorMockProps) {
-  const application: ApplicationPage2 = createMockApplicationFragment(props);
+  const application: ApplicationPage2Fragment = createMockApplicationFragment(props);
   const form = useForm<ApplicationPage2FormValues>({
     mode: "onChange",
     defaultValues: convertApplicationPage2(application),
@@ -222,52 +220,48 @@ describe("TimeSelector render single section", () => {
         },
       ],
     },
-  ])(
-    "should render available time slots based on opening hours $label",
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    ({ label, days }) => {
-      const openTimes: TimeSelectorFragment[] = days.map((day, index) => ({
-        id: createNodeId("TimeSelector", index),
-        weekday: day.day,
-        isClosed: false,
-        reservableTimes: day.times.map((time) => ({
-          begin: toApiTime({ hours: time.start }) ?? "",
-          end: toApiTime({ hours: time.end }) ?? "",
-        })),
-      }));
-      const view = customRender({ reservationUnitOpeningHours: openTimes });
-      const calendar = view.getByLabelText("application:TimeSelector.calendarLabel");
+  ])("should render available time slots based on opening hours $label", ({ label: _, days }) => {
+    const openTimes: TimeSelectorFragment[] = days.map((day, index) => ({
+      id: createNodeId("TimeSelector", index),
+      weekday: day.day,
+      isClosed: false,
+      reservableTimes: day.times.map((time) => ({
+        begin: toApiTime({ hours: time.start }) ?? "",
+        end: toApiTime({ hours: time.end }) ?? "",
+      })),
+    }));
+    const view = customRender({ reservationUnitOpeningHours: openTimes });
+    const calendar = view.getByLabelText("application:TimeSelector.calendarLabel");
 
-      // smoke
-      const open = within(calendar).getAllByRole("option", {
-        name: /application:TimeSelector.legend.open/,
-      });
-      const totalHours = days.reduce((acc, x) => {
-        return acc + x.times.reduce((count, y) => count + (y.end - y.start), 0);
-      }, 0);
-      expect(open).toHaveLength(totalHours);
-      const unavailable = within(calendar).getAllByRole("option", {
-        name: /application:TimeSelector.legend.unavailable/,
-      });
-      expect(unavailable).toHaveLength(7 * 17 - totalHours); // 7 days, 17 hours (7-23)
+    // smoke
+    const open = within(calendar).getAllByRole("option", {
+      name: /application:TimeSelector.legend.open/,
+    });
+    const totalHours = days.reduce((acc, x) => {
+      return acc + x.times.reduce((count, y) => count + (y.end - y.start), 0);
+    }, 0);
+    expect(open).toHaveLength(totalHours);
+    const unavailable = within(calendar).getAllByRole("option", {
+      name: /application:TimeSelector.legend.unavailable/,
+    });
+    expect(unavailable).toHaveLength(7 * 17 - totalHours); // 7 days, 17 hours (7-23)
 
-      function isAvailable(day: Weekday, hour: number): boolean {
-        // sunday first
-        const time = days.find((t) => t.day === day && t.times.some((x) => hour >= x.start && hour < x.end));
-        return !!time;
-      }
+    function isAvailable(day: Weekday, hour: number): boolean {
+      // sunday first
+      const time = days.find((t) => t.day === day && t.times.some((x) => hour >= x.start && hour < x.end));
+      return !!time;
+    }
 
-      for (const day of WEEKDAYS_SORTED) {
-        for (let hour = 7; hour <= 23; hour += 1) {
-          const state: OpenHoursState = isAvailable(day, hour) ? "open" : "unavailable";
-          const btn = within(calendar).getByRole("option", {
-            name: `application:TimeSelector.legend.${state}: common:weekdayShortEnum.${day} ${hour} - ${hour + 1}`,
-          });
-          expect(btn).toBeInTheDocument();
-        }
+    for (const day of WEEKDAYS_SORTED) {
+      for (let hour = 7; hour <= 23; hour += 1) {
+        const state: OpenHoursState = isAvailable(day, hour) ? "open" : "unavailable";
+        const btn = within(calendar).getByRole("option", {
+          name: `application:TimeSelector.legend.${state}: common:weekdayShortEnum.${day} ${hour} - ${hour + 1}`,
+        });
+        expect(btn).toBeInTheDocument();
       }
     }
-  );
+  });
 
   test("single application section should not have copy button", () => {
     const view = customRender();

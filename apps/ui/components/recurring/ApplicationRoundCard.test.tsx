@@ -56,7 +56,7 @@ describe("ApplicationRoundCard Open Round", () => {
 describe.for([
   [ApplicationRoundStatusChoice.Handled],
   [ApplicationRoundStatusChoice.Upcoming],
-  [ApplicationRoundStatusChoice.ResultsSent],
+  [ApplicationRoundStatusChoice.Sent],
   [ApplicationRoundStatusChoice.InAllocation],
 ] as const)("should not render start round for %s", ([status]) => {
   test("should not render start for invalid round status", () => {

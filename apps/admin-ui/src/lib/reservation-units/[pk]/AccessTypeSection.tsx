@@ -11,11 +11,8 @@ import { AutoGrid, Flex, H6 } from "common/styled";
 import { KVWrapper, Label, Value } from "@/styled";
 import { Button, ButtonVariant, IconPlus, IconTrash } from "hds-react";
 import { formatDate, getTranslatedError } from "@/common/util";
-import { AccessType, ReservationUnitEditQuery } from "@gql/gql-types";
+import { AccessType, type ReservationUnitEditPageFragment } from "@gql/gql-types";
 import { NotificationInline } from "@/component/NotificationInline";
-
-type QueryData = ReservationUnitEditQuery["reservationUnit"];
-type Node = NonNullable<QueryData>;
 
 const CurrentAccessTypeContainer = styled(Flex).attrs({
   $gap: "s",
@@ -31,7 +28,11 @@ const WidthLimitedContainer = styled(Flex)`
   max-width: calc(var(--tilavaraus-page-max-width) * 0.6);
 `;
 
-function CurrentAccessType({ currentAccessType }: { currentAccessType?: Node["accessTypes"][0] }) {
+function CurrentAccessType({
+  currentAccessType,
+}: {
+  currentAccessType?: ReservationUnitEditPageFragment["accessTypes"][0];
+}) {
   const { t } = useTranslation();
 
   const accessType = currentAccessType?.accessType;
@@ -131,7 +132,7 @@ export function AccessTypeSection({
   accessTypes,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  accessTypes: Node["accessTypes"];
+  accessTypes: ReservationUnitEditPageFragment["accessTypes"];
 }) {
   const { t } = useTranslation();
   const {

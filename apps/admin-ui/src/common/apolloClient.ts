@@ -51,7 +51,7 @@ export function createClient(hostUrl: string, req?: IncomingMessage): ApolloClie
             applications: relayStylePagination(),
             applicationSections: relayStylePagination(),
             allocatedTimeSlots: relayStylePagination(),
-            bannerNotifications: relayStylePagination(["target"]),
+            bannerNotifications: relayStylePagination(["target", "isVisible", "orderBy"]),
             rejectedOccurrences: relayStylePagination(),
           },
         },

@@ -5,6 +5,7 @@ import { ReserverMetaFields, ReservationMetaFields } from "common/src/reservatio
 import { useGeneralFields, useApplicationFields } from "common/src/hooks";
 import { type MetadataSetsFragment } from "@gql/gql-types";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
+import { type OptionsRecord } from "common";
 
 type Props = {
   reservationUnit: MetadataSetsFragment;
@@ -12,9 +13,9 @@ type Props = {
 
 export const ReservationMetadataSetForm = ({ reservationUnit }: Props): JSX.Element => {
   const { ageGroups, purposes } = useFilterOptions();
-  const options = {
-    ageGroup: ageGroups,
-    purpose: purposes,
+  const options: Omit<OptionsRecord, "municipalities"> = {
+    ageGroups,
+    reservationPurposes: purposes,
   };
 
   // TODO naming: generalFields = reservationFields (Varauksen tiedot)
@@ -35,9 +36,9 @@ export const ReservationMetadataSetForm = ({ reservationUnit }: Props): JSX.Elem
 export const ReserverMetadataSetForm = ({ reservationUnit }: Props): JSX.Element => {
   const { watch } = useFormContext<Reservation>();
   const { ageGroups, purposes } = useFilterOptions();
-  const options = {
-    ageGroup: ageGroups,
-    purpose: purposes,
+  const options: Omit<OptionsRecord, "municipalities"> = {
+    ageGroups,
+    reservationPurposes: purposes,
   };
 
   // TODO naming: applicationFields = reserverFields (Varaajan tiedot)

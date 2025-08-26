@@ -66,14 +66,8 @@ export function BirthDate(props: Props): JSX.Element {
   const error = "reservationPk" in props ? errorReservation : errorApplication;
 
   function getUser(d: typeof data) {
-    if (d == null) {
-      return null;
-    }
-    if ("reservation" in d) {
-      return d.reservation?.user;
-    }
-    if ("application" in d) {
-      return d.application?.user;
+    if (d != null && "node" in d && "user" in d.node) {
+      return d.node.user;
     }
     return null;
   }

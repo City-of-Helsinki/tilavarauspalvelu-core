@@ -55,8 +55,8 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
   const { errors, isDirty } = formState;
 
   useEffect(() => {
-    if (data?.space != null) {
-      const { space: s } = data;
+    if (data?.node != null && "id" in data.node) {
+      const { node: s } = data;
       reset({
         nameFi: s.nameFi ?? "",
         nameSv: s.nameSv ?? "",
@@ -100,12 +100,14 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
     }
   };
 
+  const node = data?.node != null && "id" in data.node ? data.node : null;
+
   return (
     <>
       <LinkPrev route={getUnitUrl(unit, "spaces-resources")} />
       <SpaceHead
-        title={data?.space?.parent?.nameFi || t("spaces:noParent")}
-        space={data?.space}
+        title={node?.parent?.nameFi || t("spaces:noParent")}
+        space={node}
         maxPersons={watch("maxPersons")}
         surfaceArea={watch("surfaceArea")}
       />
@@ -114,7 +116,7 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
         <FormErrorSummary errors={errors} />
         <section>
           <H3>{t("spaces:SpaceEditor.hierarchy")}</H3>
-          <SpaceHierarchy space={data?.space} />
+          <SpaceHierarchy space={node} />
           <Controller
             control={control}
             name="parent"
@@ -165,42 +167,48 @@ export const UPDATE_SPACE = gql`
   }
 `;
 
+export const SPACE_PAGE_FRAGMENT = gql`
+  fragment SpacePage on SpaceNode {
+    id
+    pk
+    nameFi
+    nameSv
+    nameEn
+    code
+    surfaceArea
+    maxPersons
+    unit {
+      id
+      ...UnitSubpageHead
+      descriptionFi
+      spaces {
+        id
+        pk
+        nameFi
+      }
+    }
+    parent {
+      id
+      pk
+      nameFi
+      parent {
+        id
+        nameFi
+        parent {
+          id
+          nameFi
+        }
+      }
+    }
+  }
+`;
+
 // TODO why does this query parents up the tree?
 export const SPACE_QUERY = gql`
   query Space($id: ID!) {
     node(id: $id) {
       ... on SpaceNode {
-        id
-        pk
-        nameFi
-        nameSv
-        nameEn
-        code
-        surfaceArea
-        maxPersons
-        unit {
-          id
-          ...UnitSubpageHead
-          descriptionFi
-          spaces {
-            id
-            pk
-            nameFi
-          }
-        }
-        parent {
-          id
-          pk
-          nameFi
-          parent {
-            id
-            nameFi
-            parent {
-              id
-              nameFi
-            }
-          }
-        }
+        ...SpacePage
       }
     }
   }

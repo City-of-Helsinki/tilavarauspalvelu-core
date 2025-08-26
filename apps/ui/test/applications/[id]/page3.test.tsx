@@ -1,4 +1,4 @@
-import { type ApplicationPage3Query } from "@/gql/gql-types";
+import { type ApplicationFormFragment } from "@/gql/gql-types";
 import Page3 from "@/pages/applications/[id]/page3";
 import { render, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
@@ -48,7 +48,7 @@ vi.mock("next/router", () => ({
   useRouter,
 }));
 
-type ApplicationPage3 = NonNullable<ApplicationPage3Query["application"]>;
+type ApplicationPage3 = ApplicationFormFragment;
 function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnType<typeof render> {
   // TODO need a graphql mutation mock (but have to have separate error / success cases)
   if (props.page == null) {

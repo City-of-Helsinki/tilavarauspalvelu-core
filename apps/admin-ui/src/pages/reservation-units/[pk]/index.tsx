@@ -8,7 +8,7 @@ import {
   ReservationUnitImageType,
   ReservationKind,
   type ReservationUnitEditorParametersQuery,
-  type ReservationUnitEditQuery,
+  type ReservationUnitEditPageFragment,
   TermsOfUseTypeChoices,
   useCreateImageMutation,
   useCreateReservationUnitMutation,
@@ -56,9 +56,6 @@ import {
 } from "@lib/reservation-units/[pk]/";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 
-type QueryData = ReservationUnitEditQuery["reservationUnit"];
-type Node = NonNullable<QueryData>;
-
 // Override the Accordion style: force border even if the accordion is open
 // because the last section is not an accordion but a button and it looks funny otherwise
 // TODO should we limit the width of the text boxes? or the whole form?
@@ -80,12 +77,12 @@ function makeTermsOptions(
   parameters: ReservationUnitEditorParametersQuery | undefined,
   termsType: TermsOfUseTypeChoices
 ) {
-  return filterNonNullable(parameters?.termsOfUse?.edges.map((e) => e?.node))
+  return filterNonNullable(parameters?.allTermsOfUse)
     .filter((tou) => termsType === tou?.termsType)
-    .map((tou) => {
+    .map(({ pk, nameFi }) => {
       return {
-        value: tou?.pk ?? "",
-        label: tou?.nameFi ?? "no-name",
+        value: pk,
+        label: nameFi ?? "no-name",
       };
     });
 }
@@ -100,7 +97,8 @@ function useImageMutations() {
     try {
       const deletePromises = images
         .filter((image) => image.deleted)
-        .map((image) => delImage({ variables: { pk: image.pk?.toString() ?? "" } }));
+        .filter((image) => image.pk && image.pk > 0)
+        .map((image) => delImage({ variables: { pk: image.pk ?? 0 } }));
       await Promise.all(deletePromises);
     } catch (_) {
       return false;
@@ -158,7 +156,7 @@ function ReservationUnitEditor({
   previewUrlPrefix,
   unitPk,
 }: {
-  reservationUnit?: Node;
+  reservationUnit: ReservationUnitEditPageFragment | null;
   form: UseFormReturn<ReservationUnitEditFormValues>;
   refetch: () => void;
   previewUrlPrefix: string;
@@ -186,33 +184,32 @@ function ReservationUnitEditor({
   const { data: unitData } = useReservationUnitCreateUnitQuery({
     variables: { id: createNodeId("UnitNode", unitPk) },
     fetchPolicy: "network-only",
-    skip: unitPk <= 0,
+    skip: unitPk <= 0 || reservationUnit != null,
   });
-  const unit = reservationUnit?.unit ?? unitData?.unit;
+  const node = unitData?.node != null && "pk" in unitData.node ? unitData.node : null;
+  const unit = reservationUnit?.unit ?? node ?? null;
 
   // ----------------------------- Constants ---------------------------------
 
-  const taxPercentageOptions = filterNonNullable(parametersData?.taxPercentages?.edges.map((e) => e?.node)).map(
-    (n) => ({
-      value: Number(n.value),
-      pk: n.pk ?? -1,
-      label: n.value,
-    })
-  );
+  const taxPercentageOptions = filterNonNullable(parametersData?.allTaxPercentages).map((n) => ({
+    value: Number(n.value),
+    pk: n.pk ?? -1,
+    label: n.value,
+  }));
   const pricingTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.PricingTerms);
 
   const serviceSpecificTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.ServiceTerms);
   const paymentTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.PaymentTerms);
   const cancellationTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.CancellationTerms);
 
-  const metadataOptions = filterNonNullable(parametersData?.metadataSets?.edges.map((e) => e?.node)).map((n) => ({
-    value: n?.pk ?? -1,
+  const metadataOptions = filterNonNullable(parametersData?.allMetadataSets).map((n) => ({
+    value: n.pk,
     label: n?.name ?? "no-name",
   }));
   const cancellationRuleOptions = filterNonNullable(
-    parametersData?.reservationUnitCancellationRules?.edges.map((e) => e?.node)
+    parametersData?.reservationUnitCancellationRules.edges?.map((e) => e?.node)
   ).map((n) => ({
-    value: n?.pk ?? -1,
+    value: n.pk,
     label: n?.nameFi ?? "no-name",
   }));
 
@@ -294,9 +291,9 @@ function ReservationUnitEditor({
         <BasicSection form={form} spaces={unit?.spaces ?? []} />
         <DescriptionSection
           form={form}
-          equipments={parametersData?.equipmentsAll}
-          purposes={parametersData?.purposes}
-          reservationUnitTypes={parametersData?.reservationUnitTypes}
+          equipments={parametersData?.allEquipments}
+          purposes={parametersData?.allPurposes}
+          reservationUnitTypes={parametersData?.allReservationUnitTypes}
         />
         <ReservationUnitSettingsSection
           form={form}
@@ -351,7 +348,7 @@ export default function EditorPage(props: PropsNarrowed): JSX.Element {
     skip: reservationUnitPk <= 0,
   });
 
-  const reservationUnit = data?.reservationUnit ?? undefined;
+  const reservationUnit = data?.node && "pk" in data.node ? data.node : null;
 
   const form = useForm<ReservationUnitEditFormValues>({
     mode: "onBlur",
@@ -366,9 +363,10 @@ export default function EditorPage(props: PropsNarrowed): JSX.Element {
   });
   const { reset } = form;
   useEffect(() => {
-    if (data?.reservationUnit != null) {
+    const node = data?.node && "pk" in data.node ? data.node : null;
+    if (node != null) {
       reset({
-        ...convertReservationUnit(data.reservationUnit),
+        ...convertReservationUnit(node),
       });
     }
   }, [data, reset]);
@@ -434,128 +432,134 @@ export const RESERVATION_UNIT_EDIT_UNIT_FRAGMENT = gql`
   }
 `;
 
+export const RESERVATION_UNIT_EDIT_PAGE_FRAGMENT = gql`
+  fragment ReservationUnitEditPage on ReservationUnitNode {
+    id
+    pk
+    publishingState
+    reservationState
+    images {
+      pk
+      ...Image
+    }
+    haukiUrl
+    cancellationRule {
+      id
+      pk
+    }
+    requireReservationHandling
+    nameFi
+    nameSv
+    nameEn
+    isDraft
+    authentication
+    spaces {
+      id
+      pk
+      nameFi
+    }
+    resources {
+      id
+      pk
+      nameFi
+    }
+    purposes {
+      id
+      pk
+      nameFi
+    }
+    pricingTerms {
+      id
+      pk
+    }
+    reservationUnitType {
+      id
+      pk
+      nameFi
+    }
+    extUuid
+    requireAdultReservee
+    notesWhenApplyingFi
+    notesWhenApplyingSv
+    notesWhenApplyingEn
+    reservationKind
+    reservationPendingInstructionsFi
+    reservationPendingInstructionsSv
+    reservationPendingInstructionsEn
+    reservationConfirmedInstructionsFi
+    reservationConfirmedInstructionsSv
+    reservationConfirmedInstructionsEn
+    reservationCancelledInstructionsFi
+    reservationCancelledInstructionsSv
+    reservationCancelledInstructionsEn
+    maxReservationDuration
+    minReservationDuration
+    reservationStartInterval
+    canApplyFreeOfCharge
+    reservationsMinDaysBefore
+    reservationsMaxDaysBefore
+    equipments {
+      id
+      pk
+      nameFi
+    }
+    unit {
+      ...ReservationUnitEditUnit
+    }
+    minPersons
+    maxPersons
+    surfaceArea
+    descriptionFi
+    descriptionSv
+    descriptionEn
+    paymentTerms {
+      id
+      pk
+    }
+    cancellationTerms {
+      id
+      pk
+    }
+    serviceSpecificTerms {
+      id
+      pk
+    }
+    reservationBlockWholeDay
+    bufferTimeBefore
+    bufferTimeAfter
+    contactInformation
+    reservationBeginsAt
+    reservationEndsAt
+    publishBeginsAt
+    publishEndsAt
+    maxReservationsPerUser
+    metadataSet {
+      id
+      pk
+    }
+    pricings {
+      pk
+      ...PricingFields
+      lowestPriceNet
+      highestPriceNet
+    }
+    applicationRoundTimeSlots {
+      ...ApplicationRoundTimeSlots
+    }
+    accessTypes(filter: { isActiveOrFuture: true }) {
+      id
+      pk
+      accessType
+      beginDate
+    }
+  }
+`;
+
 export const RESERVATION_UNIT_EDIT_QUERY = gql`
   query ReservationUnitEdit($id: ID!) {
     node(id: $id) {
       ... on ReservationUnitNode {
-        id
-        pk
-        publishingState
-        reservationState
-        images {
-          pk
-          ...Image
-        }
-        haukiUrl
-        cancellationRule {
-          id
-          pk
-        }
-        requireReservationHandling
-        nameFi
-        nameSv
-        nameEn
-        isDraft
-        authentication
-        spaces {
-          id
-          pk
-          nameFi
-        }
-        resources {
-          id
-          pk
-          nameFi
-        }
-        purposes {
-          id
-          pk
-          nameFi
-        }
-        pricingTerms {
-          id
-          pk
-        }
-        reservationUnitType {
-          id
-          pk
-          nameFi
-        }
-        extUuid
-        requireAdultReservee
-        notesWhenApplyingFi
-        notesWhenApplyingSv
-        notesWhenApplyingEn
-        reservationKind
-        reservationPendingInstructionsFi
-        reservationPendingInstructionsSv
-        reservationPendingInstructionsEn
-        reservationConfirmedInstructionsFi
-        reservationConfirmedInstructionsSv
-        reservationConfirmedInstructionsEn
-        reservationCancelledInstructionsFi
-        reservationCancelledInstructionsSv
-        reservationCancelledInstructionsEn
-        maxReservationDuration
-        minReservationDuration
-        reservationStartInterval
-        canApplyFreeOfCharge
-        reservationsMinDaysBefore
-        reservationsMaxDaysBefore
-        equipments {
-          id
-          pk
-          nameFi
-        }
-        unit {
-          ...ReservationUnitEditUnit
-        }
-        minPersons
-        maxPersons
-        surfaceArea
-        descriptionFi
-        descriptionSv
-        descriptionEn
-        paymentTerms {
-          id
-          pk
-        }
-        cancellationTerms {
-          id
-          pk
-        }
-        serviceSpecificTerms {
-          id
-          pk
-        }
-        reservationBlockWholeDay
-        bufferTimeBefore
-        bufferTimeAfter
-        contactInformation
-        reservationBeginsAt
-        reservationEndsAt
-        publishBeginsAt
-        publishEndsAt
-        maxReservationsPerUser
-        metadataSet {
-          id
-          pk
-        }
-        pricings {
-          pk
-          ...PricingFields
-          lowestPriceNet
-          highestPriceNet
-        }
-        applicationRoundTimeSlots {
-          ...ApplicationRoundTimeSlots
-        }
-        accessTypes(filter: { isActiveOrFuture: true }) {
-          id
-          pk
-          accessType
-          beginDate
-        }
+        ...ReservationUnitEditPage
       }
     }
   }

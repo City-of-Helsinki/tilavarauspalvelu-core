@@ -70,7 +70,7 @@ function getColConfig({
 export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
   const [deleteResourceMutation] = useDeleteResourceMutation();
 
-  const deleteResource = (pk: number) => deleteResourceMutation({ variables: { input: { pk: String(pk) } } });
+  const deleteResource = (pk: number) => deleteResourceMutation({ variables: { input: { pk } } });
 
   const { t } = useTranslation();
   const router = useRouter();

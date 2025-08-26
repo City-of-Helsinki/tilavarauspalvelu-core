@@ -56,7 +56,7 @@ function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnTyp
   const application = createMockApplicationViewFragment(props);
   const tos: TermsOfUseFieldsFragment = {
     id: createNodeId("TermsOfUseNode", 1),
-    pk: null,
+    pk: "foobar",
     termsType: TermsOfUseTypeChoices.GenericTerms,
     nameFi: null,
     nameEn: null,

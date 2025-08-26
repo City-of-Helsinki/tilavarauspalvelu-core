@@ -135,7 +135,7 @@ export function InProgressReservationNotification() {
     fetchPolicy: "no-cache",
   });
 
-  const reservations = filterNonNullable(data?.reservations?.edges.map((e) => e?.node));
+  const reservations = filterNonNullable(data?.reservations?.edges?.map((e) => e?.node));
 
   // Hide on some routes
   // We want to filter these two routes for
@@ -190,7 +190,7 @@ export function InProgressReservationNotification() {
         const { data } = await deleteReservation({
           variables: {
             input: {
-              pk: reservation.pk.toString(),
+              pk: reservation.pk,
             },
           },
         });
@@ -230,7 +230,7 @@ export function InProgressReservationNotification() {
         id: createNodeId("ReservationNode", reservation.pk ?? 0),
       },
     });
-    if (res.data?.reservation == null) {
+    if (res.data?.node == null) {
       errorToast({
         text: t("errors:api:NOT_FOUND"),
       });

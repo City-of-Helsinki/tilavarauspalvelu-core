@@ -1,5 +1,5 @@
 import { MunicipalityChoice, type OptionsQuery, type ReservationUnitTypeNode } from "@/gql/gql-types";
-import { createNodeId, filterNonNullable } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 import { type DocumentNode } from "graphql";
 import { translateOption } from "@/modules/search";
 import { type OptionsListT } from "common/src/modules/search";
@@ -32,16 +32,17 @@ export function createOptionMock(
 ): OptionsListT {
   const opts = createOptionQueryMock(props);
   const lang = "fi" as const;
+  type FT = Parameters<typeof translateOption>[0];
+  const translate = (val: FT) => translateOption(val, lang);
+
   return {
-    units: filterNonNullable(opts.unitsAll).map((n) => translateOption(n, lang)),
-    equipments: filterNonNullable(opts.equipmentsAll).map((n) => translateOption(n, lang)),
-    purposes: filterNonNullable(opts.purposes?.edges.map((edge) => edge?.node)).map((n) => translateOption(n, lang)),
-    reservationUnitTypes: filterNonNullable(opts.reservationUnitTypes?.edges.map((edge) => edge?.node)).map((n) =>
-      translateOption(n, lang)
-    ),
-    ageGroups: filterNonNullable(opts.ageGroups?.edges.map((edge) => edge?.node)).map((op) => ({
-      value: op.pk ?? 0,
-      label: `${op.minimum ?? ""}-${op.maximum ?? ""}`,
+    units: opts.allUnits.map(translate),
+    equipments: opts.allEquipments.map(translate),
+    purposes: opts.allPurposes.map(translate),
+    reservationUnitTypes: opts.allReservationUnitTypes.map(translate),
+    ageGroups: opts.allAgeGroups.map((ag) => ({
+      value: ag.pk ?? 0,
+      label: `${ag.minimum ?? ""}-${ag.maximum ?? ""}`,
     })),
     municipalities: Object.values(MunicipalityChoice).map((value) => ({
       label: value as string,
@@ -107,20 +108,12 @@ export function createOptionQueryMock({
   }));
 
   return {
-    reservationPurposes: {
-      edges: reservationPurposes.map((node) => ({ node })),
-    },
-    ageGroups: {
-      edges: ageGroups.map((node) => ({ node })),
-    },
-    reservationUnitTypes: {
-      edges: reservationUnitTypes.map((node) => ({ node })),
-    },
-    purposes: {
-      edges: purposes.map((node) => ({ node })),
-    },
-    equipmentsAll: equipments,
-    unitsAll: units,
+    allAgeGroups: ageGroups,
+    allEquipments: equipments,
+    allPurposes: purposes,
+    allReservationPurposes: reservationPurposes,
+    allReservationUnitTypes: reservationUnitTypes,
+    allUnits: units,
   };
 }
 

@@ -1,7 +1,6 @@
 import React from "react";
 import { Button, ButtonVariant, Dialog, IconArrowRight } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { type UnitPageQuery } from "@gql/gql-types";
 import { ParentSelector } from "../ParentSelector";
 import { StyledTag } from "./modules/newSpaceModal";
 import { Controller, UseFormReturn } from "react-hook-form";
@@ -10,14 +9,14 @@ import { DialogActionsButtons } from "@/styled";
 import { H4 } from "common/styled";
 
 type Props = {
-  unit: Pick<NonNullable<UnitPageQuery["unit"]>, "pk">;
+  unitPk: number;
   closeModal: () => void;
   hasFixedParent: boolean;
   form: UseFormReturn<SpaceUpdateForm>;
   onNextPage: () => void;
   children: React.ReactNode;
 };
-export function Page1({ unit, closeModal, hasFixedParent, form, onNextPage, children }: Props): JSX.Element {
+export function Page1({ unitPk, closeModal, hasFixedParent, form, onNextPage, children }: Props): JSX.Element {
   const { t } = useTranslation();
   const { control } = form;
 
@@ -42,7 +41,7 @@ export function Page1({ unit, closeModal, hasFixedParent, form, onNextPage, chil
             render={({ field: { onChange, value } }) => (
               <ParentSelector
                 label={t("spaces:SpaceModal.page1.parentLabel")}
-                unitPk={unit?.pk ?? 0}
+                unitPk={unitPk}
                 value={value}
                 onChange={(parent) => onChange(parent)}
               />

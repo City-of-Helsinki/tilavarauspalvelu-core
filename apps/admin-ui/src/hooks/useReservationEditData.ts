@@ -1,31 +1,31 @@
 import {
   type Maybe,
-  type ReservationEditPageQuery,
+  type ReservationEditPageFragment,
   ReservationStateChoice,
   useReservationEditPageQuery,
 } from "@gql/gql-types";
 import { createNodeId } from "common/src/helpers";
 import { useReservationSeries } from "@/hooks";
 
-type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;
-
+type ReturnValue = {
+  reservation: Maybe<ReservationEditPageFragment>;
+  loading: boolean;
+  refetch: () => Promise<unknown>;
+};
 /// @param id fetch reservation related to this pk
 /// Overly complex because editing DENIED or past reservations is not allowed
 /// but the UI makes no distinction between past and present instances of a recurrence.
 /// If we don't get the next valid reservation for edits: the mutations work,
 /// but the UI is not updated to show the changes (since it's looking at a past instance).
-export function useReservationEditData(pk: number): {
-  reservation: Maybe<ReservationType> | undefined;
-  loading: boolean;
-  refetch: () => Promise<unknown>;
-} {
+export function useReservationEditData(pk: number): ReturnValue {
   const { data, loading, refetch } = useReservationEditPageQuery({
     skip: !pk,
     fetchPolicy: "no-cache",
     variables: { id: createNodeId("ReservationNode", pk) },
   });
 
-  const recurringPk = data?.reservation?.reservationSeries?.pk;
+  const node = data?.node != null && "id" in data.node ? data.node : null;
+  const recurringPk = node?.reservationSeries?.pk;
   const { reservations: reservationSeries } = useReservationSeries(recurringPk);
 
   // NOTE have to be done like this instead of query params because of cache
@@ -45,7 +45,8 @@ export function useReservationEditData(pk: number): {
     fetchPolicy: "no-cache",
   });
 
-  const reservation = recurringPk ? nextRecurrence?.reservation : data?.reservation;
+  const nextNode = nextRecurrence?.node != null && "id" in nextRecurrence.node ? nextRecurrence.node : null;
+  const reservation = recurringPk ? nextNode : node;
 
   return {
     reservation,

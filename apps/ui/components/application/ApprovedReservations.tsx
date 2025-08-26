@@ -22,14 +22,14 @@ import { useMedia } from "react-use";
 import { useRouter } from "next/router";
 import { isBefore } from "date-fns";
 import {
+  ButtonContainer,
+  CenterSpinner,
+  Flex,
   fontBold,
   fontMedium,
   fontRegular,
-  ButtonContainer,
-  Flex,
-  LinkLikeButton,
   H5,
-  CenterSpinner,
+  LinkLikeButton,
 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { getTranslationSafe, toApiDate, toUIDate } from "common/src/common/util";
@@ -48,18 +48,18 @@ import { IconButton, StatusLabel } from "common/src/components";
 import type { StatusLabelType } from "common/src/tags";
 import { Sanitize } from "common/src/components/Sanitize";
 import {
-  type ApplicationSectionReservationFragment,
-  useApplicationReservationsQuery,
-  ReservationStateChoice,
   AccessType,
-  type ApplicationNode,
-  ApplicationSectionReservationUnitFragment,
   AccessTypeWithMultivalued,
-  PindoraSectionFragment,
-  PindoraReservationFragment,
-  ReservationUnitAccessTypeNode,
-  Maybe,
+  type ApplicationNode,
   ApplicationRoundNode,
+  type ApplicationSectionReservationFragment,
+  ApplicationSectionReservationUnitFragment,
+  Maybe,
+  PindoraReservationFragment,
+  PindoraSectionFragment,
+  ReservationStateChoice,
+  ReservationUnitAccessTypeNode,
+  useApplicationReservationsQuery,
 } from "@/gql/gql-types";
 import { gql } from "@apollo/client";
 import { getApplicationReservationPath, getApplicationSectionPath, getReservationUnitPath } from "@/modules/urls";
@@ -102,13 +102,16 @@ const TableWrapper = styled.div`
       padding-top: 0;
       padding-bottom: 0;
     }
+
     & > div {
       overflow-x: auto;
+
       > table {
         width: max-content;
         min-width: 100%;
       }
     }
+
     .hide-on-desktop {
       display: none;
     }
@@ -122,10 +125,13 @@ const TableWrapper = styled.div`
       border-bottom: var(--border-width) solid var(--border-color);
 
       /* No heading, cards have their own headings */
+
       & thead {
         display: none;
       }
+
       /* absolute positioning of status tags */
+
       & tr {
         position: relative;
       }
@@ -135,6 +141,7 @@ const TableWrapper = styled.div`
         border: var(--border-width) solid var(--border-color);
         border-bottom: none;
         border-top: none;
+
         &:first-child {
           border-top: var(--border-width) solid var(--border-color);
         }
@@ -145,6 +152,7 @@ const TableWrapper = styled.div`
       }
 
       /* card padding has to be implemented with tds because we can't style tr */
+
       & td:first-of-type {
         padding-top: var(--spacing-s);
         font-size: var(--fontsize-heading-xs);
@@ -152,24 +160,30 @@ const TableWrapper = styled.div`
       }
 
       /* last-of-type is not enough because we are hiding some rows on mobile */
+
       & td:last-of-type,
       & td > *.last-on-mobile {
         padding-bottom: var(--spacing-s);
       }
 
       /* stylelint-disable no-descending-specificity */
+
       & > thead > tr > th,
       & > tbody > tr > td {
         display: flex;
+
         &:empty {
           display: none;
         }
+
         /* remove the whole td element if the child is hidden
          * NOTE this will remove the element if any child is hidden */
+
         :has(.hide-on-mobile) {
           display: none;
         }
       }
+
       /* stylelint-enable no-descending-specificity */
     }
   }
@@ -257,8 +271,8 @@ export function ApprovedReservations({ application, applicationRound }: Readonly
       beginDate: toApiDate(new Date()) ?? "",
     },
   });
-  const { application: app } = data || {};
 
+  const app = data?.node != null && "pk" in data.node ? data.node : null;
   const sections = filterNonNullable(
     app?.applicationSections?.filter((aes) => {
       const slots = aes.reservationUnitOptions.flatMap((x) => x.allocatedTimeSlots);
@@ -327,9 +341,11 @@ const IconTextWrapper = styled.span`
   gap: var(--spacing-3-xs);
 
   /* mobile uses icons instead of header text */
+
   > svg {
     display: inline;
   }
+
   @media (min-width: ${BREAKPOINT}) {
     > svg {
       display: none;
@@ -359,6 +375,7 @@ const TooltipIconWrapper = styled.span`
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-3-xs);
+
   > div {
     justify-self: center;
   }
@@ -493,11 +510,14 @@ const AccessTypeList = styled.ul`
   margin: 0;
   padding: 0;
   list-style-type: none;
+
   li {
     display: flex;
+
     span {
       width: 50%;
     }
+
     &:first-child {
       ${fontBold}
     }
@@ -612,6 +632,7 @@ const ReservationUnitLink = styled(IconButton)`
   }
 
   /* table hides icons by default, override this behaviour */
+
   &&& svg {
     display: inline;
   }
