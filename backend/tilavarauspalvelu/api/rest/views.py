@@ -10,17 +10,19 @@ from urllib.parse import urlparse
 
 from django.apps import apps
 from django.conf import settings
-from django.core.exceptions import ValidationError
+from django.core.cache import cache
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import connection
-from django.http import FileResponse, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
+from django.http import FileResponse, HttpResponse, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.middleware.csrf import get_token
 from django.views.csrf import csrf_failure
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_POST
 from import_export.formats.base_formats import JSON
 from rest_framework.exceptions import ValidationError as DRFValidationError
 
 from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice
+from tilavarauspalvelu.management.commands.create_robot_test_data import create_robot_test_data
 from tilavarauspalvelu.models import ReservableTimeSpan, Reservation, ReservationStatistic, ReservationUnit, TermsOfUse
 from tilavarauspalvelu.services.export import ReservationUnitExporter
 from tilavarauspalvelu.services.pdf import render_to_pdf
@@ -40,8 +42,6 @@ from .utils import (
 )
 
 if TYPE_CHECKING:
-    from django.http import HttpResponse
-
     from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
@@ -445,3 +445,55 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
     payment_order.save(update_fields=["remote_id", "checkout_url", "receipt_url", "created_at"])
 
     return HttpResponseRedirect(append_payment_method_to_checkout_url(payment_order.checkout_url, request))
+
+
+@require_POST
+@csrf_exempt  # NOSONAR
+@validation_error_as_response
+def robot_test_data_create_view(request: WSGIRequest) -> HttpResponse:
+    token = request.META.get("HTTP_AUTHORIZATION")
+    if token is None:
+        msg = "Missing authorization header"
+        raise PermissionDenied(msg)
+
+    if token != settings.ROBOT_TEST_DATA_TOKEN:
+        msg = "Invalid authorization header"
+        raise PermissionDenied(msg)
+
+    rate_limit_key = settings.ROBOT_TEST_DATA_RATE_LIMIT_KEY
+
+    now = int(local_datetime().timestamp())
+    last_called_at = int(cache.get(key=rate_limit_key, default=0))
+
+    time_left = settings.ROBOT_TEST_DATA_CREATION_RATE_LIMIT_SECONDS - (now - last_called_at)
+
+    if time_left > 0:
+        detail = {"detail": "Robot test data creation is rate limited", "code": "too_many_requests"}
+        return JsonResponse(detail, status=HTTPStatus.TOO_MANY_REQUESTS, headers={"Retry-After": time_left})
+
+    cache.set(key=rate_limit_key, value=now, timeout=None)
+
+    lock_key = settings.ROBOT_TEST_DATA_LOCK_KEY
+
+    lock = bool(cache.get(key=lock_key))
+    if lock:
+        detail = {"detail": "Robot test data creation is already in progress", "code": "too_early"}
+        return JsonResponse(detail, status=HTTPStatus.TOO_EARLY)
+
+    try:
+        cache.set(key=lock_key, value=True, timeout=None)
+
+        try:
+            create_robot_test_data()
+
+        except ValidationError:
+            raise
+
+        except Exception as error:
+            msg = f"Failed to create robot test data: {error}"
+            raise ValidationError(msg, code="failed_to_create_robot_test_data") from error
+
+    finally:
+        cache.delete(lock_key)
+
+    return HttpResponse(status=204)
