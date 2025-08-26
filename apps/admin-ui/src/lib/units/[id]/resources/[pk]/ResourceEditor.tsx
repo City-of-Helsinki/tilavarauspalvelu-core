@@ -64,8 +64,8 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
   const { errors, isDirty } = formState;
 
   useEffect(() => {
-    if (data?.resource) {
-      const { resource } = data;
+    const resource = data?.node != null && "pk" in data.node ? data.node : null;
+    if (resource) {
       reset({
         nameFi: resource.nameFi ?? "",
         nameEn: resource.nameEn,

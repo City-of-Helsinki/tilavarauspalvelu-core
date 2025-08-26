@@ -154,7 +154,7 @@ export function ReservationUnitModalContent({
     handleSearch(criteria, true);
   };
 
-  const reservationUnits = filterNonNullable(data?.reservationUnits?.edges.map((n) => n?.node));
+  const reservationUnits = filterNonNullable(data?.reservationUnits?.edges?.map((n) => n?.node));
 
   return (
     <Flex>

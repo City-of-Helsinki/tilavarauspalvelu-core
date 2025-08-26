@@ -27,7 +27,7 @@ import { convertLanguageCode, getTranslationSafe, toApiDate } from "common/src/c
 import { fromUIDate } from "./util";
 import { startOfDay } from "date-fns";
 import { SEARCH_PAGING_LIMIT } from "./const";
-import { gql, type ApolloClient } from "@apollo/client";
+import { type ApolloClient, gql } from "@apollo/client";
 import { type ReadonlyURLSearchParams } from "next/navigation";
 import { transformAccessTypeSafe } from "common/src/conversion";
 import { type OptionsListT, type OptionT } from "common/src/modules/search";
@@ -89,6 +89,9 @@ function filterEmpty<T>(val: T | null | undefined): T | undefined {
   if (typeof val === "string") {
     return val.trim() !== "" ? val : undefined;
   }
+  if (typeof val === "number") {
+    return val > 0 ? val : undefined;
+  }
   return val;
 }
 
@@ -117,59 +120,61 @@ export function processVariables({
   const desc = values.getAll("order").includes("desc");
   const orderBy = transformSortString(ignoreMaybeArray(sortCriteria), language, desc);
 
-  const today = startOfDay(new Date());
-  const startDate = fromUIDate(ignoreMaybeArray(values.getAll("startDate")) ?? "");
-  const reservableDateStart = startDate && startDate >= today ? toApiDate(startDate) : null;
-  const endDate = fromUIDate(ignoreMaybeArray(values.getAll("endDate")) ?? "");
-  const reservableDateEnd = endDate && endDate >= today ? toApiDate(endDate) : null;
-
-  const dur = toNumber(ignoreMaybeArray(values.getAll("duration")));
-  const duration = dur != null && dur > 0 ? dur : undefined;
   const isSeasonal = kind === ReservationKind.Season;
+  const today = startOfDay(new Date());
+
+  const accessType = filterNonNullable(values.getAll("accessTypes").map(transformAccessTypeSafe));
+
   const textSearch = filterEmpty(values.get("textSearch"));
   const personsAllowed = filterEmpty(toNumber(values.get("personsAllowed")));
   const purposes = filterEmptyArray(mapParamToInteger(values.getAll("purposes"), 1));
   const unit = filterEmptyArray(mapParamToInteger(values.getAll("units"), 1));
   const reservationUnitTypes = filterEmptyArray(mapParamToInteger(values.getAll("reservationUnitTypes"), 1));
   const equipments = filterEmptyArray(mapParamToInteger(values.getAll("equipments"), 1));
-  const showOnlyReservable = ignoreMaybeArray(values.getAll("showOnlyReservable")) !== "false";
-  const applicationRound = "applicationRound" in rest && isSeasonal ? rest.applicationRound : undefined;
-  const reservationPeriodBeginDate =
-    "reservationPeriodBeginDate" in rest && isSeasonal ? rest.reservationPeriodBeginDate : undefined;
-  const reservationPeriodEndDate =
-    "reservationPeriodEndDate" in rest && isSeasonal ? rest.reservationPeriodEndDate : undefined;
+
+  const applicationRound = "applicationRound" in rest ? filterEmpty(rest.applicationRound) : undefined;
+  const reservationPeriodBeginDate = "reservationPeriodBeginDate" in rest ? rest.reservationPeriodBeginDate : undefined;
+  const reservationPeriodEndDate = "reservationPeriodEndDate" in rest ? rest.reservationPeriodEndDate : undefined;
+
+  const startDate = fromUIDate(ignoreMaybeArray(values.getAll("startDate")) ?? "");
+  const endDate = fromUIDate(ignoreMaybeArray(values.getAll("endDate")) ?? "");
+  const reservableDateStart = startDate && startDate >= today ? toApiDate(startDate) : undefined;
+  const reservableDateEnd = endDate && endDate >= today ? toApiDate(endDate) : undefined;
+
   const timeEnd = filterEmpty(ignoreMaybeArray(values.getAll("timeEnd")));
   const timeBegin = filterEmpty(ignoreMaybeArray(values.getAll("timeBegin")));
-  const accessType = filterEmptyArray(filterNonNullable(values.getAll("accessTypes").map(transformAccessTypeSafe)));
+  const duration = filterEmpty(toNumber(ignoreMaybeArray(values.getAll("duration"))));
+  const showOnlyReservable = ignoreMaybeArray(values.getAll("showOnlyReservable")) !== "false";
 
   return {
-    textSearch: filterEmpty(textSearch),
-    purposes,
-    unit,
-    reservationUnitType: reservationUnitTypes,
-    equipments,
-    accessType,
-    accessTypeBeginDate: filterEmpty(isSeasonal ? reservationPeriodBeginDate : reservableDateStart),
-    accessTypeEndDate: filterEmpty(isSeasonal ? reservationPeriodEndDate : reservableDateEnd),
-    ...(startDate != null || isSeasonal
-      ? isSeasonal
-        ? { reservableDateStart: reservationPeriodBeginDate } // Used to find effectiveAccessType in /recurring/[id] page
-        : {
-            reservableDateStart,
-          }
-      : {}),
-    reservableDateEnd: filterEmpty(reservableDateEnd),
-    reservableTimeStart: filterEmpty(timeBegin),
-    reservableTimeEnd: filterEmpty(timeEnd),
-    reservableMinimumDurationMinutes: duration,
-    showOnlyReservable: !isSeasonal && showOnlyReservable ? true : undefined,
-    applicationRound: isSeasonal && applicationRound != null && applicationRound > 0 ? [applicationRound] : undefined,
-    personsAllowed,
     first: SEARCH_PAGING_LIMIT,
     orderBy,
-    isDraft: false,
-    isVisible: true,
-    reservationKind: kind,
+    filter: {
+      accessType: {
+        accessTypes: accessType,
+        accessTypeBeginDate: filterEmpty(isSeasonal ? reservationPeriodBeginDate : reservableDateStart),
+        accessTypeEndDate: filterEmpty(isSeasonal ? reservationPeriodEndDate : reservableDateEnd),
+      },
+      applicationRound: isSeasonal && applicationRound ? [applicationRound] : undefined,
+      equipments,
+      isDraft: false,
+      isVisible: true,
+      personsAllowed,
+      purposes,
+      reservationKind: kind,
+      reservationUnitType: reservationUnitTypes,
+      textSearch: textSearch,
+      unit,
+    },
+    firstReservableTime: {
+      // reservableDateStart is used to find effectiveAccessType in /recurring/[id] page
+      reservableDateStart: filterEmpty(isSeasonal ? reservationPeriodBeginDate : reservableDateStart),
+      reservableDateEnd: filterEmpty(isSeasonal ? reservationPeriodEndDate : reservableDateEnd),
+      reservableTimeStart: timeBegin,
+      reservableTimeEnd: timeEnd,
+      reservableMinimumDurationMinutes: duration,
+      showOnlyReservable: !isSeasonal && showOnlyReservable,
+    },
   };
 }
 
@@ -201,21 +206,18 @@ export async function getSearchOptions(
       purposesOrderBy: PurposeOrderSet.RankAsc,
       unitsOrderBy: UnitOrderSet.NameFiAsc,
       equipmentsOrderBy: EquipmentOrderSet.CategoryRankAsc,
-      ...(page === "direct" ? { onlyDirectBookable: true } : {}),
-      ...(page === "seasonal" ? { onlySeasonalBookable: true } : {}),
+      onlyDirectBookable: page === "direct",
+      onlySeasonalBookable: page === "seasonal",
     },
   });
 
-  const reservationUnitTypes = filterNonNullable(
-    optionsData?.reservationUnitTypes?.edges?.map((edge) => edge?.node)
-  ).map((n) => translateOption(n, lang));
-  const purposes = filterNonNullable(optionsData?.purposes?.edges?.map((edge) => edge?.node)).map((n) =>
+  const reservationUnitTypes = filterNonNullable(optionsData?.allReservationUnitTypes).map((n) =>
     translateOption(n, lang)
   );
-
-  const equipments = filterNonNullable(optionsData?.equipmentsAll).map((n) => translateOption(n, lang));
-  const units = filterNonNullable(optionsData?.unitsAll).map((n) => translateOption(n, lang));
-  const ageGroups = sortAgeGroups(optionsData?.ageGroups?.edges?.map((edge) => edge?.node ?? null) ?? []).map((n) => ({
+  const purposes = filterNonNullable(optionsData?.allPurposes).map((n) => translateOption(n, lang));
+  const equipments = filterNonNullable(optionsData?.allEquipments).map((n) => translateOption(n, lang));
+  const units = filterNonNullable(optionsData?.allUnits).map((n) => translateOption(n, lang));
+  const ageGroups = sortAgeGroups(filterNonNullable(optionsData?.allAgeGroups)).map((n) => ({
     value: n.pk ?? 0,
     label: `${n.minimum || ""} - ${n.maximum || ""}`,
   }));
@@ -235,7 +237,8 @@ export async function getSearchOptions(
   };
 }
 
-type AgeGroup = NonNullable<NonNullable<OptionsQuery["ageGroups"]>["edges"][0]>["node"];
+type AgeGroup = NonNullable<NonNullable<OptionsQuery["allAgeGroups"]>[0]>;
+
 function sortAgeGroups(ageGroups: AgeGroup[]): NonNullable<AgeGroup>[] {
   return filterNonNullable(ageGroups).sort((a, b) => {
     const order = ["1-99"];
@@ -248,7 +251,7 @@ function sortAgeGroups(ageGroups: AgeGroup[]): NonNullable<AgeGroup>[] {
   });
 }
 
-// There is a duplicate in admin-ui but it doesn't have translations
+// There is a duplicate in admin-ui, but it doesn't have translations
 export const OPTIONS_QUERY = gql`
   query Options(
     $reservationUnitTypesOrderBy: [ReservationUnitTypeOrderSet!]

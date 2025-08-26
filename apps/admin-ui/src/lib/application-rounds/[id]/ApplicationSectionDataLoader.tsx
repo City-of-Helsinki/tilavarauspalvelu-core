@@ -52,7 +52,7 @@ export function ApplicationSectionDataLoader({ applicationRoundPk }: Props): JSX
     return <CenterSpinner />;
   }
 
-  const applicationSections = filterNonNullable(dataToUse?.applicationSections?.edges.map((edge) => edge?.node));
+  const applicationSections = filterNonNullable(dataToUse?.applicationSections?.edges?.map((edge) => edge?.node));
   const totalCount = dataToUse?.applicationSections?.totalCount ?? 0;
 
   return (

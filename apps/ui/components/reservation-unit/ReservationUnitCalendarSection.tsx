@@ -2,7 +2,7 @@ import React from "react";
 import {
   type ReservationQuotaReachedFragment,
   type ReservationUnitNode,
-  type ReservationUnitPageQuery,
+  type ReservationTimePickerFieldsFragment,
   useReservationQuotaReachedQuery,
 } from "@gql/gql-types";
 import { ReservationTimePicker } from "@/components/reservation";
@@ -16,7 +16,7 @@ import { type PendingReservationFormType } from "./schema";
 import { type UseFormReturn } from "react-hook-form";
 import { Flex, H4 } from "common/styled";
 
-type ReservationUnitT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
+type ReservationUnitT = ReservationTimePickerFieldsFragment;
 
 export function ReservationUnitCalendarSection({
   reservationUnit,
@@ -39,7 +39,7 @@ export function ReservationUnitCalendarSection({
     },
   });
 
-  const refreshedIsQuoteReached = data?.reservationUnit ?? reservationUnit;
+  const refreshedIsQuoteReached = data?.node ?? reservationUnit;
   const quotaReached = isReservationQuotaReached(refreshedIsQuoteReached);
 
   return (

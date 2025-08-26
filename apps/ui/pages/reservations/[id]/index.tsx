@@ -20,6 +20,7 @@ import {
   type AccessCodeQuery,
   MunicipalityChoice,
   ReservationCancelReasonChoice,
+  PindoraReservationFragment,
 } from "@gql/gql-types";
 import Link from "next/link";
 import { isBefore, sub } from "date-fns";
@@ -184,7 +185,8 @@ function Reservation({
       id: createNodeId("ReservationNode", reservation.pk ?? 0),
     },
   });
-  const pindoraInfo = accessCodeData?.reservation?.pindoraInfo ?? null;
+  const pindoraInfo =
+    accessCodeData?.node != null && "pindoraInfo" in accessCodeData.node ? accessCodeData?.node?.pindoraInfo : null;
 
   const modifyTimeReason = getWhyReservationCantBeChanged(reservation);
   const canTimeBeModified = modifyTimeReason == null;
@@ -369,7 +371,9 @@ function Reservation({
           <Instructions reservation={reservation} />
           <GeneralFields supportedFields={supportedFields} reservation={reservation} options={options} />
           <ApplicationFields reservation={reservation} options={options} supportedFields={supportedFields} />
-          {shouldShowAccessCode && <AccessCodeInfo pindoraInfo={pindoraInfo} feedbackUrl={feedbackUrl} />}
+          {shouldShowAccessCode && pindoraInfo != null && (
+            <AccessCodeInfo pindoraInfo={pindoraInfo} feedbackUrl={feedbackUrl} />
+          )}
           <TermsInfoSection reservation={reservation} termsOfUse={termsOfUse} />
           <AddressSection
             title={getReservationUnitName(reservation.reservationUnit, lang) ?? "-"}
@@ -384,9 +388,10 @@ function Reservation({
 function AccessCodeInfo({
   pindoraInfo,
   feedbackUrl,
-}: Readonly<
-  Pick<NonNullable<AccessCodeQuery["reservation"]>, "pindoraInfo"> & Pick<PropsNarrowed, "feedbackUrl">
->): React.ReactElement {
+}: Readonly<{
+  pindoraInfo: Readonly<PindoraReservationFragment>;
+  feedbackUrl: PropsNarrowed["feedbackUrl"];
+}>): React.ReactElement {
   const { t, i18n } = useTranslation();
   return (
     <div>
@@ -448,7 +453,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       variables: { id: createNodeId("ReservationNode", pk) },
     });
 
-    const { reservation } = data ?? {};
+    const reservation = data?.node != null && "pk" in data.node ? data.node : null;
 
     if (reservation?.reservationSeries != null) {
       const recurringId = reservation.reservationSeries.id;
@@ -459,8 +464,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         query: ApplicationReservationSeriesDocument,
         variables: { id: recurringId },
       });
-      const applicationPk =
-        recurringData?.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
+
+      const allocatedTimeSlot =
+        recurringData?.node != null && "allocatedTimeSlot" in recurringData.node
+          ? recurringData.node.allocatedTimeSlot
+          : null;
+      const applicationPk = allocatedTimeSlot?.reservationUnitOption.applicationSection?.application?.pk;
       return {
         redirect: {
           permanent: true,

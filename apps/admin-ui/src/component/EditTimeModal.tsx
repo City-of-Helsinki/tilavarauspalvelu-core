@@ -270,8 +270,8 @@ export function NewReservationModal({ reservationToCopy, onAccept, onClose }: Ne
     return {
       pk: reservationToCopy?.reservationSeries?.pk,
       ...convertToApiFormat(begin, end),
-      bufferTimeAfter: buffers.after?.toString(),
-      bufferTimeBefore: buffers.before?.toString(),
+      bufferTimeAfter: buffers.after,
+      bufferTimeBefore: buffers.before,
     };
   }
 

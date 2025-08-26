@@ -54,7 +54,7 @@ export function RejectedOccurrencesDataLoader({ applicationRoundPk, unitOptions 
   }
 
   const totalCount = dataToUse?.rejectedOccurrences?.totalCount ?? 0;
-  const rejectedOccurrences = filterNonNullable(dataToUse?.rejectedOccurrences?.edges.map((edge) => edge?.node));
+  const rejectedOccurrences = filterNonNullable(dataToUse?.rejectedOccurrences?.edges?.map((edge) => edge?.node));
 
   return (
     <>
