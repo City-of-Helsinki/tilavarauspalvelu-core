@@ -92,7 +92,7 @@ export function ReservationUnitsDataReader(): JSX.Element {
   const { fetchMore, loading, data, previousData } = query;
 
   const { reservationUnits } = data ?? previousData ?? {};
-  const resUnits = filterNonNullable(reservationUnits?.edges.map((edge) => edge?.node));
+  const resUnits = filterNonNullable(reservationUnits?.edges?.map((edge) => edge?.node));
 
   if (loading && resUnits.length === 0) {
     return <CenterSpinner />;

@@ -3,6 +3,7 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import {
   ApplicationSectionCancelDocument,
+  ApplicationSectionCancelPageFragment,
   useCancelApplicationSectionMutation,
   type ApplicationSectionCancelQuery,
   type ApplicationSectionCancelQueryVariables,
@@ -145,7 +146,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
   );
 }
 
-function getNReservations(applicationSection: Readonly<ApplicationSectionCancelQuery["applicationSection"]>) {
+function getNReservations(applicationSection: Readonly<ApplicationSectionCancelPageFragment>): number {
   const opts = applicationSection?.reservationUnitOptions;
   const allocatedSlots = opts?.flatMap((option) => option.allocatedTimeSlots);
   const reservations = allocatedSlots?.flatMap((slot) =>
@@ -164,7 +165,7 @@ const ApplicationInfo = styled(Card)`
 function ApplicationSectionInfoCard({
   applicationSection,
 }: {
-  applicationSection: ApplicationSectionCancelQuery["applicationSection"];
+  applicationSection: ApplicationSectionCancelPageFragment;
 }) {
   // NOTE assumes that the name of the reservationSeries is copied from applicationSection when it's created
   const name = applicationSection?.name;
@@ -224,7 +225,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       fetchPolicy: "no-cache",
       variables: { id: createNodeId("ApplicationSectionNode", pk ?? 0) },
     });
-    const { applicationSection } = data || {};
+    const applicationSection = data.node != null && "id" in data.node ? data.node : null;
     const section = applicationSection;
 
     // TODO do we need a check for all sections? so do we have to query their reservations also?
@@ -269,51 +270,55 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 export default ReservationCancelPage;
 
-// TODO remove the extra reservationUnit fields (included in the CanUserCancelReservationFragment)
-// need to do frontend mods to call the function but the query is a lot simpler for backend
+export const APPLICATION_SECTION_CANCEL_FRAGMENT = gql`
+  fragment ApplicationSectionCancelPage on ApplicationSectionNode {
+    pk
+    id
+    name
+    reservationsBeginDate
+    reservationsEndDate
+    reservationUnitOptions {
+      id
+      reservationUnit {
+        id
+        pk
+        nameEn
+        nameFi
+        nameSv
+      }
+      allocatedTimeSlots {
+        id
+        dayOfTheWeek
+        beginTime
+        endTime
+        reservationSeries {
+          id
+          reservations {
+            id
+            state
+            ...CanUserCancelReservation
+          }
+        }
+      }
+    }
+    application {
+      id
+      pk
+      applicationRound {
+        id
+        termsOfUse {
+          ...TermsOfUseTextFields
+        }
+      }
+    }
+  }
+`;
+
 export const APPLICATION_SECTION_CANCEL_QUERY = gql`
   query ApplicationSectionCancel($id: ID!) {
     node(id: $id) {
       ... on ApplicationSectionNode {
-        pk
-        id
-        name
-        reservationsBeginDate
-        reservationsEndDate
-        reservationUnitOptions {
-          id
-          reservationUnit {
-            id
-            pk
-            nameEn
-            nameFi
-            nameSv
-          }
-          allocatedTimeSlots {
-            id
-            dayOfTheWeek
-            beginTime
-            endTime
-            reservationSeries {
-              id
-              reservations {
-                id
-                state
-                ...CanUserCancelReservation
-              }
-            }
-          }
-        }
-        application {
-          id
-          pk
-          applicationRound {
-            id
-            termsOfUse {
-              ...TermsOfUseTextFields
-            }
-          }
-        }
+        ...ApplicationSectionCancelPage
       }
     }
   }

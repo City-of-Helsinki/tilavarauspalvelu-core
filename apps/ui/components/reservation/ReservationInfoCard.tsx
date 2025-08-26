@@ -74,8 +74,10 @@ export function ReservationInfoCard({
       id: createNodeId("ReservationNode", reservation.pk ?? 0),
     },
   });
-  const { accessCode } = accessCodeData?.reservation?.pindoraInfo ?? {};
-  const shouldDisplayAccessCode = accessCodeData?.reservation?.pindoraInfo?.accessCodeIsActive;
+  const node = accessCodeData?.node != null && "pindoraInfo" in accessCodeData.node ? accessCodeData.node : null;
+  const pindoraInfo = node?.pindoraInfo ?? null;
+  const { accessCode } = pindoraInfo ?? {};
+  const shouldDisplayAccessCode = pindoraInfo?.accessCodeIsActive;
 
   const { beginsAt, endsAt } = reservation || {};
   // NOTE can be removed after this has been refactored not to be used for PendingReservation

@@ -1,11 +1,10 @@
 import React from "react";
 import styled from "styled-components";
-import type { SpaceQuery } from "@gql/gql-types";
+import { type SpacePageFragment } from "@gql/gql-types";
 import { fontMedium } from "common/styled";
 
-type Node = SpaceQuery["space"];
 type Props = {
-  space: Node | undefined;
+  space: SpacePageFragment | null;
 };
 
 const Tree = styled.div`
@@ -14,9 +13,9 @@ const Tree = styled.div`
   margin-bottom: var(--spacing-xs);
 `;
 
-type SpaceNode = Pick<NonNullable<Node>, "pk" | "nameFi" | "parent">;
+type ParentNode = Pick<NonNullable<SpacePageFragment>, "pk" | "nameFi" | "parent">;
 
-function getParents(root: SpaceNode | null | undefined, spaces?: SpaceNode[], hierarchy: SpaceNode[] = []) {
+function getParents(root: ParentNode | null | undefined, spaces?: ParentNode[], hierarchy: ParentNode[] = []) {
   if (root) {
     hierarchy.push(root);
     const nextParentId = root.parent?.pk;

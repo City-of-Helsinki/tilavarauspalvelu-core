@@ -1,5 +1,10 @@
 import type { GetServerSidePropsContext } from "next";
-import { OrderStatus, ReservationStateChoice, ReservationStateQuery, useReservationStateQuery } from "@gql/gql-types";
+import {
+  OrderStatus,
+  ReservationStateChoice,
+  type SuccessRedirectFragment,
+  useReservationStateQuery,
+} from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath } from "@/modules/urls";
@@ -65,13 +70,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-type QueryT = NonNullable<ReservationStateQuery["reservation"]>;
-type RedirectProps = Pick<QueryT, "state" | "pk" | "paymentOrder">;
-
 /// @returns the url of the reservation or null if the reservation is still waiting for payment
 /// because payments are done with webhooks, we might need to wait for it
 /// the reservation is valid (and should be payed) but wait for the backend to confirm it
-function getRedirectUrl(reservation: RedirectProps): string | null {
+function getRedirectUrl(reservation: SuccessRedirectFragment): string | null {
   switch (reservation.state) {
     case ReservationStateChoice.RequiresHandling:
       return getReservationPath(reservation.pk, undefined, "requires_handling");
@@ -118,7 +120,7 @@ function Page(props: NarrowedProps): JSX.Element {
   }, [stopPolling, props.reservation.pk, router]);
 
   useEffect(() => {
-    const reservation = data?.reservation;
+    const reservation = data?.node != null && "pk" in data.node ? data.node : null;
     if (
       reservation == null ||
       (reservation.paymentOrder?.status !== OrderStatus.Paid &&
@@ -139,18 +141,24 @@ function Page(props: NarrowedProps): JSX.Element {
 
 export default Page;
 
+export const REDIRECT_FRAGMENT = gql`
+  fragment SuccessRedirect on ReservationNode {
+    id
+    pk
+    state
+    paymentOrder {
+      id
+      status
+      handledPaymentDueBy
+    }
+  }
+`;
+
 export const GET_RESERVATION_STATE = gql`
   query ReservationState($id: ID!) {
     node(id: $id) {
       ... on ReservationNode {
-        id
-        pk
-        state
-        paymentOrder {
-          id
-          status
-          handledPaymentDueBy
-        }
+        ...SuccessRedirect
       }
     }
   }

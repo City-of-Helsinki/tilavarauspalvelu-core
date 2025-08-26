@@ -184,7 +184,7 @@ export async function getServerSideProps({ req, locale, query }: GetServerSidePr
     variables: { id: createNodeId("UnitNode", pk) },
   });
 
-  const { unit } = data;
+  const unit = data.node != null && "id" in data.node ? data.node : null;
   if (unit == null) {
     return NOT_FOUND_SSR_VALUE;
   }

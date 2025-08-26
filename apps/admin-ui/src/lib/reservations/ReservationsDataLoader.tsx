@@ -104,7 +104,7 @@ export function ReservationsDataLoader(): JSX.Element {
 
   const currData = data ?? previousData;
 
-  const reservations = filterNonNullable(currData?.reservations?.edges.map((edge) => edge?.node));
+  const reservations = filterNonNullable(currData?.reservations?.edges?.map((edge) => edge?.node));
   const totalCount = currData?.reservations?.totalCount;
 
   if (loading && reservations.length === 0) {

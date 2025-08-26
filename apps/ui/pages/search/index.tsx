@@ -114,11 +114,9 @@ export const SEARCH_RESERVATION_UNITS = gql`
     $first: Int
     $before: String
     $after: String
-    # Filter
     $orderBy: [ReservationUnitOrderSet!]
-    $accessType: [AccessType!]!
-    $accessTypeBeginDate: Date
-    $accessTypeEndDate: Date
+    # Filter
+    $accessType: AccessTypeFilterDataInput
     $applicationRound: [Int!]
     $equipments: [Int!]
     $isDraft: Boolean
@@ -136,7 +134,7 @@ export const SEARCH_RESERVATION_UNITS = gql`
     $reservableMinimumDurationMinutes: Int
     $reservableTimeEnd: Time
     $reservableTimeStart: Time
-    $showOnlyReservable: Boolean!
+    $showOnlyReservable: Boolean! = false
   ) {
     reservationUnits(
       first: $first
@@ -144,11 +142,7 @@ export const SEARCH_RESERVATION_UNITS = gql`
       before: $before
       orderBy: $orderBy
       filter: {
-        accessType: {
-          accessTypeBeginDate: $accessTypeBeginDate
-          accessTypeEndDate: $accessTypeEndDate
-          accessTypes: $accessType
-        }
+        accessType: $accessType
         applicationRound: $applicationRound
         equipments: $equipments
         isDraft: $isDraft

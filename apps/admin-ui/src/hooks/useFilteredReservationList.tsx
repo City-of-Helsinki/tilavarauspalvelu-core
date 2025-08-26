@@ -51,7 +51,11 @@ function useReservationsInInterval({
     },
   });
 
-  const reservations = combineAffectingReservations(data, reservationUnitPk)
+  const reservations = (
+    data?.node != null && "reservations" in data.node
+      ? combineAffectingReservations({ ...data, node: data.node }, reservationUnitPk)
+      : []
+  )
     .map((x) => reservationToInterval(x, reservationType))
     .filter((x): x is CollisionInterval => x != null);
 

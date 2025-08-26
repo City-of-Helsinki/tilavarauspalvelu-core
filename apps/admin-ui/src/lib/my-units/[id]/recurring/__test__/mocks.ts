@@ -186,26 +186,16 @@ const AdminUserMock: CurrentUserQuery = {
 };
 
 const OptionsMock: FilterOptionsQuery = {
-  reservationPurposes: {
-    edges: [],
-  },
-  ageGroups: {
-    edges: [],
-  },
-  unitGroups: {
-    edges: [],
-  },
-  reservationUnitTypes: {
-    edges: [],
-  },
-  reservationUnitsAll: [],
-  unitsAll: [],
+  allReservationPurposes: [],
+  allAgeGroups: [],
+  allUnitGroups: [],
+  allReservationUnitTypes: [],
+  allReservationUnits: [],
+  allUnits: [],
 };
 
 const TermsOfUseMock: TermsOfUseQuery = {
-  termsOfUse: {
-    edges: [],
-  },
+  allTermsOfUse: [],
 };
 
 const otherMocks = [
@@ -303,7 +293,7 @@ export function createGraphQLMocks({ begin, end }: { begin: Date; end: Date }) {
 
 function createReservationUnitResponse(): ReservationUnitQuery {
   return {
-    reservationUnit: createReservationUnitFragment({
+    node: createReservationUnitFragment({
       pk: 1,
       nameFi: "Studiohuone 1 + soittimet",
     }),
@@ -312,7 +302,7 @@ function createReservationUnitResponse(): ReservationUnitQuery {
 
 function createReservationsInIntervalResponse(): ReservationsByReservationUnitQuery {
   return {
-    reservationUnit: {
+    node: {
       id: createNodeId("ReservationUnitNode", 1),
       reservations: reservationsByUnitResponse,
     },

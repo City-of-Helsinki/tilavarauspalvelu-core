@@ -39,7 +39,7 @@ export function NewSpaceModal({ unit, closeModal, refetch, parentSpacePk }: Prop
       await createSpace({
         ...values,
         parent: parent != null && parent > 0 ? parent : null,
-        name: values.nameFi,
+        code: values.code,
       });
       closeModal();
       refetch();
@@ -62,7 +62,7 @@ export function NewSpaceModal({ unit, closeModal, refetch, parentSpacePk }: Prop
     <form noValidate onSubmit={form.handleSubmit(createSpaces)}>
       {page === 0 ? (
         <Page1
-          unit={unit}
+          unitPk={unit.pk}
           closeModal={closeModal}
           hasFixedParent={hasFixedParent}
           form={form}

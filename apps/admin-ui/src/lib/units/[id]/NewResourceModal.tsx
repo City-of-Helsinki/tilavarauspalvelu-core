@@ -50,7 +50,6 @@ export function NewResourceModal({ unit, closeModal, refetch, spacePk }: ModalPr
       const { pk, ...rest } = values;
       await createResource({
         ...rest,
-        name: values.nameFi,
         locationType: ResourceLocationType.Fixed,
       });
       closeModal();

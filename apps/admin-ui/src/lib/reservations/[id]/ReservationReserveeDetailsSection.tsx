@@ -3,7 +3,7 @@ import { Accordion, ApplicationDatas } from "@/styled";
 import { DataWrapper } from "./DataWrapper";
 import React, { useState } from "react";
 import {
-  ReservationPageQuery,
+  type ReservationPageFragment,
   useReservationDateOfBirthQuery,
   useReservationProfileDataContactInfoQuery,
   useReservationProfileDataSsnQuery,
@@ -30,8 +30,6 @@ import { getApiErrors } from "common/src/apolloUtils";
 import { formatErrorMessage } from "common/src/hooks/useDisplayError";
 
 registerCountryLocale(countriesJson);
-
-type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
 const ReserveeDetailsAccordion = styled(Accordion)`
   div {
@@ -68,7 +66,7 @@ function ReserveeDetailsButton({
 export function ReservationReserveeDetailsSection({
   reservation,
 }: Readonly<{
-  reservation: ReservationType;
+  reservation: ReservationPageFragment;
 }>) {
   const { t } = useTranslation();
   const { user: currentUser } = useSession();
@@ -83,6 +81,8 @@ export function ReservationReserveeDetailsSection({
     fetchPolicy: "no-cache",
     skip: !reservation.id || !isBirthDateVisible,
   });
+
+  const dateOfBirthNode = dateOfBirthData?.node != null && "user" in dateOfBirthData.node ? dateOfBirthData.node : null;
 
   const [isSSNVisible, setIsSSNVisible] = useState(false);
   const {
@@ -149,7 +149,7 @@ export function ReservationReserveeDetailsSection({
 
         {isBirthDateVisible && (
           <DataWrapper label={t("reservation:birthDate")} isLoading={isDateOfBirthLoading}>
-            {formatDate(dateOfBirthData?.reservation?.user?.dateOfBirth) || "-"}
+            {formatDate(dateOfBirthNode?.user?.dateOfBirth) || "-"}
           </DataWrapper>
         )}
 

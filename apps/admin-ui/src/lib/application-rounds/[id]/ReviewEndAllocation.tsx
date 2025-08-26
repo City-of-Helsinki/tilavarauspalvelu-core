@@ -71,7 +71,7 @@ export function ReviewEndAllocation({
     applicationRound.reservationCreationStatus === ApplicationRoundReservationCreationStatusChoice.Failed;
 
   const isHandled = applicationRound.status === ApplicationRoundStatusChoice.Handled;
-  const isResultsSent = applicationRound.status === ApplicationRoundStatusChoice.ResultsSent;
+  const isResultsSent = applicationRound.status === ApplicationRoundStatusChoice.Sent;
 
   const showSendResults = isHandled && !isInProgress;
   // TODO futher work: (separate spec)
