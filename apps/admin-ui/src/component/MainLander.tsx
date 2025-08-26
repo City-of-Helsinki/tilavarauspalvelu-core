@@ -1,4 +1,4 @@
-import { getClientUrl } from "@/common/urls";
+import { getAccessibilityTermsUrl } from "@/common/urls";
 import IconButton from "common/src/components/IconButton";
 import React, { useEffect } from "react";
 import styled from "styled-components";
@@ -82,7 +82,7 @@ export function MainLander({ apiBaseUrl }: Readonly<{ apiBaseUrl: string }>): Re
         <IconButton
           label={t("navigation:a11yTerms")}
           icon={<IconLinkExternal />}
-          href={`${getClientUrl()}terms/accessibility-admin`}
+          href={getAccessibilityTermsUrl()}
           openInNewTab
         />
       </Content>

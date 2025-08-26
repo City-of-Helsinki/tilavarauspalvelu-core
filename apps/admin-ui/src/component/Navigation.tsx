@@ -16,7 +16,7 @@ import {
   RESERVATIONS_URL_PREFIX,
   UNITS_URL_PREFIX,
   REQUESTED_RESERVATIONS_URL_PREFIX,
-  getClientUrl,
+  getAccessibilityTermsUrl,
 } from "@/common/urls";
 import { UserPermissionChoice } from "@gql/gql-types";
 import { getLocalizationLang } from "common/src/helpers";
@@ -300,7 +300,7 @@ export function Navigation({ apiBaseUrl }: Props) {
                   <IconLinkExternal />
                 </ProfileMenuLink>
               }
-              onClick={() => window.open(`${getClientUrl()}terms/accessibility-admin`, "_blank", "noopener noreferrer")}
+              onClick={() => window.open(getAccessibilityTermsUrl(), "_blank", "noopener noreferrer")}
               aria-label={t("navigation:a11yTerms")}
             />
             <Header.ActionBarButton

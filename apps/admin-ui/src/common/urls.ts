@@ -1,5 +1,5 @@
 import { type Maybe } from "@gql/gql-types";
-import { PUBLIC_URL } from "./const";
+import { isBrowser, PUBLIC_URL } from "./const";
 
 export const APPLICATIONS_URL_PREFIX = "/applications";
 export const RESERVATION_UNIT_URL_PREFIX = "/reservation-units";
@@ -9,8 +9,7 @@ export const MY_UNITS_URL_PREFIX = "/my-units";
 export const UNITS_URL_PREFIX = "/units";
 export const BANNER_NOTIFICATIONS_URL_PREFIX = "/notifications";
 export const REQUESTED_RESERVATIONS_URL_PREFIX = "/reservations/requested";
-const LOCAL_CLIENT_BASE_URL = "http://localhost:3000/";
-const CLIENT_BASE_URL = "/";
+const LOCAL_CLIENT_BASE_URL = "http://localhost:3000";
 
 type ApplicationRoundPages = "criteria" | "";
 export function getApplicationRoundUrl(
@@ -114,7 +113,14 @@ export function getNotificationUrl(pk: Maybe<number> | undefined): string {
   return `${BANNER_NOTIFICATIONS_URL_PREFIX}/${pk}`;
 }
 
-export function getClientUrl(): string {
+function getCustomerUrl(): string {
+  if (!isBrowser) {
+    return "";
+  }
   // Return the localhost client side base URL if in dev environment, to ease with development & testing
-  return process.env.NEXT_ENV === "development" ? LOCAL_CLIENT_BASE_URL : CLIENT_BASE_URL;
+  return process.env.NODE_ENV === "development" ? LOCAL_CLIENT_BASE_URL : window.location.origin;
+}
+
+export function getAccessibilityTermsUrl(): string {
+  return `${getCustomerUrl()}/terms/accessibility-admin`;
 }
