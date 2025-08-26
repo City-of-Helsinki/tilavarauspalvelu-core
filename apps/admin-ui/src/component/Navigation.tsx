@@ -302,6 +302,7 @@ export function Navigation({ apiBaseUrl }: Props) {
               }
               onClick={() => window.open(getAccessibilityTermsUrl(), "_blank", "noopener noreferrer")}
               aria-label={t("navigation:a11yTerms")}
+              aria-roledescription="link"
             />
             <Header.ActionBarButton
               label={
