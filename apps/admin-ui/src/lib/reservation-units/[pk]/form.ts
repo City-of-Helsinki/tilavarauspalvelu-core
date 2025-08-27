@@ -556,7 +556,7 @@ export const ReservationUnitEditSchema = z
           path: ["reservationsMinDaysBefore"],
         });
       }
-      if (v.reservationsMaxDaysBefore == null) {
+      if (v.reservationsMaxDaysBefore == null || v.reservationsMaxDaysBefore === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Required",
