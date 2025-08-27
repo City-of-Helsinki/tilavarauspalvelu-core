@@ -39,7 +39,7 @@
   "reserveeType": "Asiakastyyppi",
   "reserveeOrganisationName": "Yhdistyksen nimi",
   "reserveeBusinessName": "Yrityksen nimi",
-  "reserveeShowInfosNotification": "Tiedot haetaan Helsinki-profiilista ja sen kautta Väestötietovirastolta.",
+  "reserveeShowInfosNotification": "Tiedot haetaan Helsinki-profiilista ja sen kautta Digi- ja väestötietovirastolta.",
   "reserveeUnableToShowData": "Tietoja ei voida näyttää",
   "reserveeSSN": "Henkilötunnus",
   "reserveeAuthenticationStrength": "Tunnistautuminen",
