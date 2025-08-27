@@ -128,7 +128,7 @@ export function getAccessibilityTermsUrl(): string {
 export function getOpeningHoursUrl(
   apiBaseUrl: string,
   reservationUnitPk: number | number[] | null,
-  errorUrl: string
+  errorUrl?: string
 ): string {
   let reservationUnitsParam = "";
   if (Array.isArray(reservationUnitPk)) {
@@ -146,7 +146,9 @@ export function getOpeningHoursUrl(
     const url = new URL(`/v1/edit_opening_hours/`, apiBaseUrl);
     const { searchParams } = url;
     searchParams.set("reservation_units", reservationUnitsParam);
-    searchParams.set("redirect_on_error", errorUrl.toString());
+    if (errorUrl) {
+      searchParams.set("redirect_on_error", errorUrl);
+    }
     return url.toString();
   } catch (e) {
     // eslint-disable-next-line no-console
