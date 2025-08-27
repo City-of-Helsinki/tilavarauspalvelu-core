@@ -35,11 +35,11 @@ const StyledReservationInfoCard = styled(ReservationInfoCard)`
 
 type CancellationProps = {
   apiBaseUrl: string;
-  reasons: CancelReasonFieldsFragment[];
-  reservation: ReservationCancellationFragment;
+  reasons: Readonly<CancelReasonFieldsFragment[]>;
+  reservation: Readonly<ReservationCancellationFragment>;
 };
 
-export function ReservationCancellation(props: CancellationProps): JSX.Element {
+export function ReservationCancellation(props: Readonly<CancellationProps>): JSX.Element {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const displayError = useDisplayError();

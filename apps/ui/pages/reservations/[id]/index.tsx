@@ -17,7 +17,6 @@ import {
   OrderStatus,
   useAccessCodeQuery,
   AccessType,
-  type AccessCodeQuery,
   MunicipalityChoice,
   ReservationCancelReasonChoice,
   PindoraReservationFragment,
@@ -66,6 +65,7 @@ import {
 } from "@/components/reservation";
 import { useSearchParams } from "next/navigation";
 import { queryOptions } from "@/modules/queryOptions";
+import { OptionsRecord } from "common";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -361,12 +361,7 @@ function Reservation({
         </div>
         <Flex>
           {shouldShowPaymentNotification(reservation) && (
-            <PaymentNotification
-              reservation={reservation}
-              paymentOrder={reservation.paymentOrder}
-              appliedPricing={reservation.appliedPricing}
-              apiBaseUrl={apiBaseUrl}
-            />
+            <PaymentNotification reservation={reservation} apiBaseUrl={apiBaseUrl} />
           )}
           <Instructions reservation={reservation} />
           <GeneralFields supportedFields={supportedFields} reservation={reservation} options={options} />
@@ -480,18 +475,19 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         },
       };
     } else if (reservation != null) {
-      const options = await queryOptions(apolloClient, locale ?? "");
+      const qOptions = await queryOptions(apolloClient, locale ?? "");
+      const options: OptionsRecord = {
+        ...qOptions,
+        municipalities: Object.values(MunicipalityChoice).map((value) => ({
+          label: value.toString(),
+          value: value,
+        })) as ReadonlyArray<Readonly<{ label: string; value: MunicipalityChoice }>>,
+      };
       return {
         props: {
           ...commonProps,
           ...(await serverSideTranslations(locale ?? "fi")),
-          options: {
-            ...options,
-            municipality: Object.values(MunicipalityChoice).map((value) => ({
-              label: value as string,
-              value: value,
-            })),
-          },
+          options,
           reservation,
           termsOfUse: {
             genericTerms: bookingTerms ?? null,
@@ -529,34 +525,40 @@ export const GET_APPLICATION_RESERVATION_SERIES_QUERY = gql`
   }
 `;
 
-export const GET_RESERVATION_PAGE_QUERY = gql`
+export const RESERVATION_PAGE_FRAGMENT = gql`
+  fragment ReservationPage on ReservationNode {
+    id
+    type
+    ...MetaFields
+    ...ReservationInfoCard
+    ...Instructions
+    ...CanReservationBeChanged
+    calendarUrl
+    ...PaymentNotification
+    paymentOrder {
+      id
+      receiptUrl
+    }
+    reservationSeries {
+      id
+    }
+    reservationUnit {
+      id
+      unit {
+        ...AddressFields
+      }
+      canApplyFreeOfCharge
+      ...MetadataSets
+      ...TermsOfUse
+    }
+  }
+`;
+
+export const RESERVATION_PAGE_QUERY = gql`
   query ReservationPage($id: ID!) {
     node(id: $id) {
       ... on ReservationNode {
-        id
-        type
-        ...MetaFields
-        ...ReservationInfoCard
-        ...Instructions
-        ...CanReservationBeChanged
-        calendarUrl
-        ...ReservationPaymentUrl
-        paymentOrder {
-          id
-          receiptUrl
-        }
-        reservationSeries {
-          id
-        }
-        reservationUnit {
-          id
-          unit {
-            ...AddressFields
-          }
-          canApplyFreeOfCharge
-          ...MetadataSets
-          ...TermsOfUse
-        }
+        ...ReservationPage
       }
     }
   }

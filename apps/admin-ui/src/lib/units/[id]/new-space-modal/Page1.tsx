@@ -1,7 +1,6 @@
 import React from "react";
 import { Button, ButtonVariant, Dialog, IconArrowRight } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { type UnitPageQuery } from "@gql/gql-types";
 import { ParentSelector } from "../ParentSelector";
 import { StyledTag } from "./modules/newSpaceModal";
 import { Controller, UseFormReturn } from "react-hook-form";

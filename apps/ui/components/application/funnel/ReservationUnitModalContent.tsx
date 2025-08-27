@@ -14,7 +14,6 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import {
   type ApplicationReservationUnitListFragment,
-  type Maybe,
   type RecurringCardFragment,
   ReservationKind,
 } from "@gql/gql-types";
@@ -46,8 +45,8 @@ const ImageSizeWrapper = styled.div`
 type ReservationUnitCardProps = Readonly<{
   reservationUnit: Omit<RecurringCardFragment, "currentAccessType" | "effectiveAccessType">;
   isSelected: boolean;
-  handleAdd: (pk: Maybe<number>) => void;
-  handleRemove: (pk: Maybe<number>) => void;
+  handleAdd: (pk: number) => void;
+  handleRemove: (pk: number) => void;
 }>;
 
 function ReservationUnitCard({ reservationUnit, handleAdd, handleRemove, isSelected }: ReservationUnitCardProps) {

@@ -8,7 +8,6 @@ import {
   ReservationUnitImageType,
   ReservationKind,
   type ReservationUnitEditorParametersQuery,
-  type ReservationUnitEditQuery,
   type ReservationUnitEditPageFragment,
   TermsOfUseTypeChoices,
   useCreateImageMutation,
@@ -82,8 +81,8 @@ function makeTermsOptions(
     .filter((tou) => termsType === tou?.termsType)
     .map(({ pk, nameFi }) => {
       return {
-        value: tou?.pk ?? "",
-        label: tou?.nameFi ?? "no-name",
+        value: pk,
+        label: nameFi ?? "no-name",
       };
     });
 }
@@ -185,9 +184,10 @@ function ReservationUnitEditor({
   const { data: unitData } = useReservationUnitCreateUnitQuery({
     variables: { id: createNodeId("UnitNode", unitPk) },
     fetchPolicy: "network-only",
-    skip: unitPk <= 0,
+    skip: unitPk <= 0 || reservationUnit != null,
   });
-  const unit = reservationUnit?.unit ?? unitData?.unit;
+  const node = unitData?.node != null && "pk" in unitData.node ? unitData.node : null;
+  const unit = reservationUnit?.unit ?? node ?? null;
 
   // ----------------------------- Constants ---------------------------------
 
@@ -203,11 +203,13 @@ function ReservationUnitEditor({
   const cancellationTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.CancellationTerms);
 
   const metadataOptions = filterNonNullable(parametersData?.allMetadataSets).map((n) => ({
-    value: n?.pk ?? -1,
+    value: n.pk,
     label: n?.name ?? "no-name",
   }));
-  const cancellationRuleOptions = filterNonNullable(parametersData?.reservationUnitCancellationRules).map((n) => ({
-    value: n?.pk ?? -1,
+  const cancellationRuleOptions = filterNonNullable(
+    parametersData?.reservationUnitCancellationRules.edges?.map((e) => e?.node)
+  ).map((n) => ({
+    value: n.pk,
     label: n?.nameFi ?? "no-name",
   }));
 
@@ -346,7 +348,7 @@ export default function EditorPage(props: PropsNarrowed): JSX.Element {
     skip: reservationUnitPk <= 0,
   });
 
-  const reservationUnit = data?.reservationUnit ?? undefined;
+  const reservationUnit = data?.node && "pk" in data.node ? data.node : null;
 
   const form = useForm<ReservationUnitEditFormValues>({
     mode: "onBlur",
@@ -361,9 +363,10 @@ export default function EditorPage(props: PropsNarrowed): JSX.Element {
   });
   const { reset } = form;
   useEffect(() => {
-    if (data?.reservationUnit != null) {
+    const node = data?.node && "pk" in data.node ? data.node : null;
+    if (node != null) {
       reset({
-        ...convertReservationUnit(data.reservationUnit),
+        ...convertReservationUnit(node),
       });
     }
   }, [data, reset]);

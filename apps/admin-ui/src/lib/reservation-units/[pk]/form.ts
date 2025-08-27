@@ -2,17 +2,16 @@ import { convertTime, filterNonNullable, timeToMinutes, toNumber } from "common/
 import { fromApiDate, fromUIDate, toApiDate, toUIDate } from "common/src/common/util";
 import {
   AccessType,
-  type ApplicationRoundTimeSlotUpdateInput,
+  type ApplicationRoundTimeSlotCreateInput,
   AuthenticationType,
   PaymentType,
   PriceUnit,
   ReservationKind,
   ReservationStartInterval,
-  type ReservationUnitAccessTypeUpdateInput,
-  type ReservationUnitEditQuery,
+  type ReservationUnitAccessTypeCreateInput,
+  type ReservationUnitEditPageFragment,
   ReservationUnitImageType,
-  ReservationUnitPricingCreateInput,
-  ReservationUnitPricingUpdateInput,
+  type ReservationUnitPricingCreateInput,
   Weekday,
 } from "@gql/gql-types";
 import { addDays, endOfDay, format } from "date-fns";
@@ -26,8 +25,7 @@ import sanitizeHtml from "sanitize-html";
 
 export const AccessTypes = ["ACCESS_CODE", "OPENED_BY_STAFF", "PHYSICAL_KEY", "UNRESTRICTED"] as const;
 
-type QueryData = ReservationUnitEditQuery["reservationUnit"];
-type Node = NonNullable<QueryData>;
+type Node = ReservationUnitEditPageFragment;
 
 /// @param date string in UI format
 /// @returns true if date is in the future
@@ -778,7 +776,7 @@ function convertAccessTypes(accessTypes: NonNullable<Node["accessTypes"]>): Acce
   }));
 }
 
-export function convertReservationUnit(data?: Node): ReservationUnitEditFormValues {
+export function convertReservationUnit(data?: Node | null): ReservationUnitEditFormValues {
   // Convert from API data to form values
   return {
     bufferType:
@@ -907,7 +905,7 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
 
   const isReservableTime = (t?: SeasonalFormType["reservableTimes"][0]) => t && t.begin && t.end;
   // NOTE mutation doesn't support pks (even if changing not adding) unlike other mutations
-  const applicationRoundTimeSlots: ApplicationRoundTimeSlotUpdateInput[] = seasons
+  const applicationRoundTimeSlots: ApplicationRoundTimeSlotCreateInput[] = seasons
     .filter((s) => s.reservableTimes.filter(isReservableTime).length > 0 || s.closed)
     .map((s) => ({
       weekday: s.weekday,
@@ -920,7 +918,7 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     return d != null ? d.toISOString() : null;
   }
 
-  const accessTypes: ReservationUnitAccessTypeUpdateInput[] = filterNonNullable(
+  const accessTypes: ReservationUnitAccessTypeCreateInput[] = filterNonNullable(
     accessTypesForm.map((at) => ({
       pk: at.pk,
       accessType: at.accessType,
@@ -978,7 +976,7 @@ function transformPricing(
   values: PricingFormValues,
   hasFuturePricing: boolean,
   taxPercentageOptions: TaxOption[]
-): ReservationUnitPricingCreateInput | ReservationUnitPricingUpdateInput | null {
+): ReservationUnitPricingCreateInput | null {
   if (!hasFuturePricing && isAfterToday(values.begins)) {
     return null;
   }
@@ -997,6 +995,6 @@ function transformPricing(
     taxPercentage,
     ...(values.pk > 0 ? { pk: values.pk } : {}),
     ...(values.priceUnit != null ? { priceUnit: values.priceUnit } : {}),
-    ...(values.paymentType != null ? { paymentType: values.paymentType } : {}),
+    paymentType: values.paymentType ?? PaymentType.Online,
   };
 }

@@ -9,7 +9,7 @@ import {
 import { ReservationCancellation } from "@/components/reservation/ReservationCancellation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { isReservationCancellable } from "@/modules/reservation";
 import { getApplicationPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
@@ -59,7 +59,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
   return (
     <>
       <Breadcrumb routes={routes} />
-      <ReservationCancellation {...props} reservation={reservation} />
+      <ReservationCancellation {...props} />
     </>
   );
 }
@@ -79,9 +79,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       fetchPolicy: "no-cache",
       variables: { id: createNodeId("ReservationNode", pk ?? 0) },
     });
-    const { reservation } = data || {};
+    const reservation = data.node != null && "id" in data.node ? data.node : null;
+    const reasons = data.allReservationCancelReasons;
 
-    const reasons = filterNonNullable(data?.reservationCancelReasons);
     const canCancel = reservation != null && isReservationCancellable(reservation);
     if (canCancel) {
       return {
@@ -119,8 +119,18 @@ export const RESERVATION_CANCEL_PAGE_QUERY = gql`
   query ReservationCancelPage($id: ID!) {
     node(id: $id) {
       ... on ReservationNode {
-        id
-        ...ReservationInfoCard
+        ...ReservationCancellation
+        ...CanUserCancelReservation
+      }
+    }
+
+    allReservationCancelReasons {
+      ...CancelReasonFields
+    }
+  }
+`;
+/*
+ ...ReservationInfoCard
         name
         reservationUnit {
           id
@@ -154,12 +164,7 @@ export const RESERVATION_CANCEL_PAGE_QUERY = gql`
           }
         }
       }
-    }
 
-    allReservationCancelReasons {
-      ...CancelReasonFields
-    }
-  }
-`;
+ * */
 
 export default ReservationCancelPage;

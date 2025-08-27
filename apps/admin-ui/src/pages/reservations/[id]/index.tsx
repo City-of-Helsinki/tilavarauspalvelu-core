@@ -12,6 +12,7 @@ import {
   type CheckPermissionsQueryVariables,
   ReservationPageDocument,
   useReservationPageLazyQuery,
+  ReservationPageFragment,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { ButtonContainer } from "common/styled";
@@ -45,7 +46,7 @@ import { type GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { createClient } from "@/common/apolloClient";
 
-type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
+type ReservationType = ReservationPageFragment;
 
 function ApprovalButtonsWithPermChecks({
   reservation,
@@ -96,7 +97,7 @@ function ReservationSummary({
   reservation,
   isFree,
 }: Readonly<{
-  reservation: ReservationType;
+  reservation: ReservationPageFragment;
   isFree: boolean;
 }>) {
   const { t } = useTranslation();
@@ -105,7 +106,7 @@ function ReservationSummary({
     skip: reservation.state !== ReservationStateChoice.Cancelled,
   });
 
-  const reservationCancelReasons = data?.reservationCancelReasons ?? [];
+  const reservationCancelReasons = data?.allReservationCancelReasons ?? [];
   let cancelReason;
   if (reservationCancelReasons) {
     cancelReason = reservationCancelReasons.find((reason) => reservation.cancelReason === reason.value)?.reasonFi;
@@ -175,7 +176,7 @@ function ReservationWorkingMemoAccordion({
   reservation,
   onReservationUpdated,
 }: Readonly<{
-  reservation: ReservationType;
+  reservation: ReservationPageFragment;
   onReservationUpdated: () => void;
 }>) {
   const { t } = useTranslation();
@@ -200,7 +201,7 @@ function ReservationWorkingMemoAccordion({
 function ReservationDetailsAccordion({
   reservation,
 }: Readonly<{
-  reservation: ReservationType;
+  reservation: ReservationPageFragment;
 }>) {
   const { t } = useTranslation();
 
@@ -224,7 +225,7 @@ function ReservationDetailsAccordion({
 function ReservationUserAccordion({
   reservation,
 }: Readonly<{
-  reservation: ReservationType;
+  reservation: ReservationPageFragment;
 }>) {
   const { t } = useTranslation();
 
@@ -261,7 +262,7 @@ function ReservationUserAccordion({
 function ReservationPricingDetailsAccordion({
   reservation,
 }: Readonly<{
-  reservation: ReservationType;
+  reservation: ReservationPageFragment;
 }>) {
   const { t } = useTranslation();
 
@@ -289,7 +290,7 @@ function RequestedReservation({
   reservation,
   refetch,
 }: {
-  reservation: ReservationType;
+  reservation: ReservationPageFragment;
   refetch: () => Promise<ApolloQueryResult<ReservationPageQuery>>;
 }): JSX.Element | null {
   const { t } = useTranslation();
@@ -354,7 +355,8 @@ export default function Page({ reservation }: PropsNarrowed): JSX.Element {
     variables: { id: createNodeId("ReservationNode", reservation.pk ?? 0) },
   });
 
-  const reservationRefreshed = query.data?.reservation ?? reservation;
+  const node = query.data?.node != null && "id" in query.data.node ? query.data.node : null;
+  const reservationRefreshed = node ?? reservation;
 
   return <RequestedReservation reservation={reservationRefreshed} refetch={query.refetch} />;
 }
@@ -367,13 +369,13 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
 
   const commonProps = await getCommonServerSideProps();
   const apolloClient = createClient(commonProps.apiBaseUrl, req);
-  const reservationPageQuery = await apolloClient.query<ReservationPageQuery>({
+  const { data } = await apolloClient.query<ReservationPageQuery>({
     query: ReservationPageDocument,
     variables: { id: createNodeId("ReservationNode", pk) },
   });
 
-  const reservation = reservationPageQuery.data.reservation;
-  const unit = reservation?.reservationUnit?.unit?.pk ?? null;
+  const reservation = data?.node != null && "id" in data.node ? data.node : null;
+  const unit = reservation?.reservationUnit?.unit?.pk;
   if (reservation == null || unit == null) {
     return NOT_FOUND_SSR_VALUE;
   }
@@ -399,40 +401,46 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
   };
 }
 
+export const RESERVATION_PAGE_FRAGMENT = gql`
+  fragment ReservationPage on ReservationNode {
+    id
+    ...CreateTagString
+    ...ReservationCommonFields
+    ...TimeBlockSection
+    ...ReservationTitleSectionFields
+    ...ReservationKeylessEntry
+    reservationSeries {
+      id
+      pk
+      beginDate
+      beginTime
+      endDate
+      endTime
+      weekdays
+      name
+      description
+    }
+    ...ApprovalButtons
+    cancelReason
+    denyReason {
+      id
+      reasonFi
+    }
+    reservationUnit {
+      id
+      pk
+      reservationStartInterval
+      ...ReservationTypeFormFields
+    }
+    ...ReservationMetaFields
+  }
+`;
+
 export const RESERVATION_PAGE_QUERY = gql`
   query ReservationPage($id: ID!) {
     node(id: $id) {
       ... on ReservationNode {
-        id
-        ...CreateTagString
-        ...ReservationCommonFields
-        ...TimeBlockSection
-        ...ReservationTitleSectionFields
-        ...ReservationKeylessEntry
-        reservationSeries {
-          id
-          pk
-          beginDate
-          beginTime
-          endDate
-          endTime
-          weekdays
-          name
-          description
-        }
-        ...ApprovalButtons
-        cancelReason
-        denyReason {
-          id
-          reasonFi
-        }
-        reservationUnit {
-          id
-          pk
-          reservationStartInterval
-          ...ReservationTypeFormFields
-        }
-        ...ReservationMetaFields
+        ...ReservationPage
       }
     }
   }

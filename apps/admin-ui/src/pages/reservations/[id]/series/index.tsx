@@ -215,7 +215,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
         // NOTE disable cache is mandatory, all the old data is invalid here
         fetchPolicy: "no-cache",
       });
-      const d = res.data?.reservationSeries;
+      const d = res.data?.node != null && "pk" in res.data.node ? res.data.node : null;
       const createdReservations = filterNonNullable(d?.reservations);
       // find the first reservation that is in the future and redirect to it
       const first = createdReservations.find((x) => new Date(x.beginsAt) >= new Date()) ?? createdReservations[0];

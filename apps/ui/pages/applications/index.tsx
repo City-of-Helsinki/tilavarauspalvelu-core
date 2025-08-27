@@ -11,6 +11,7 @@ import {
   CurrentUserDocument,
   type CurrentUserQuery,
   ApplicationOrderSet,
+  ApplicationsGroupFragment,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { ApplicationsGroup } from "@/components/application";
@@ -37,7 +38,7 @@ function ApplicationGroups({
   applications,
   actionCallback,
 }: {
-  applications: NonNullable<NonNullable<NonNullable<ApplicationsQuery["applications"]>["edges"][0]>["node"]>[];
+  applications: ApplicationsGroupFragment[];
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 }) {
   const { t } = useTranslation();

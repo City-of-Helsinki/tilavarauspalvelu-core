@@ -269,7 +269,7 @@ export function useRemoveAllocation({
       const { data, errors } = await resetApplicationEvent({
         variables: {
           input: {
-            pk: String(allocatedPk),
+            pk: allocatedPk,
           },
         },
       });

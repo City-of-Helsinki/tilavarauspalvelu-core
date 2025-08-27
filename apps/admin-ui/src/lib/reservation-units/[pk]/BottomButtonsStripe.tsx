@@ -6,15 +6,12 @@ import { UseFormReturn } from "react-hook-form";
 import type { ReservationUnitEditFormValues } from "./form";
 import { getUnitUrl } from "@/common/urls";
 import { successToast } from "common/src/components/toast";
-import type { ReservationUnitEditQuery, UnitSubpageHeadFragment } from "@gql/gql-types";
+import type { Maybe, ReservationUnitEditPageFragment, UnitSubpageHeadFragment } from "@gql/gql-types";
 import { breakpoints } from "common/src/const";
 import { Flex, pageSideMargins, WhiteButton } from "common/styled";
 import { useDisplayError } from "common/src/hooks";
 import { useModal } from "@/context/ModalContext";
 import { useRouter } from "next/router";
-
-type QueryData = ReservationUnitEditQuery["reservationUnit"];
-type Node = NonNullable<QueryData>;
 
 const PreviewLink = styled.a`
   display: flex;
@@ -149,7 +146,7 @@ function ArchiveDialog({
   onClose,
   onAccept,
 }: {
-  reservationUnit: Pick<Node, "nameFi">;
+  reservationUnit: Pick<ReservationUnitEditPageFragment, "nameFi">;
   onClose: () => void;
   onAccept: () => void;
 }): JSX.Element {
@@ -190,8 +187,8 @@ export function BottomButtonsStripe({
   onSubmit,
   form,
 }: {
-  reservationUnit: Node | undefined;
-  unit?: UnitSubpageHeadFragment | null;
+  reservationUnit: Maybe<ReservationUnitEditPageFragment>;
+  unit: Maybe<UnitSubpageHeadFragment>;
   previewUrlPrefix: string;
   setModalContent: (content: JSX.Element | null) => void;
   onSubmit: (formValues: ReservationUnitEditFormValues) => Promise<number>;

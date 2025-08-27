@@ -11,17 +11,12 @@ export async function queryOptions(apolloClient: ApolloClient<unknown>, locale: 
 
   const lang = getLocalizationLang(locale);
 
-  const reservationPurposes = filterNonNullable(data.reservationPurposes?.edges?.map((e) => e?.node));
-  const purposeOptions = reservationPurposes.map((purpose) => ({
+  const reservationPurposeOptions = data.allReservationPurposes.map((purpose) => ({
     label: getTranslationSafe(purpose, "name", lang),
     value: purpose.pk ?? 0,
   }));
 
-  const ageGroups = filterNonNullable(data.ageGroups?.edges?.map((e) => e?.node));
-  if (!ageGroups || ageGroups.length < 1) {
-    // eslint-disable-next-line no-console
-    console.warn("No ageGroups received!");
-  }
+  const ageGroups = filterNonNullable(data.allAgeGroups);
   const sortedAgeGroups = ageGroups.sort((a, b) => a.minimum - b.minimum);
   const ageGroupOptions = [
     // the sortedAgeGroups array has "1 - 99" as the first element, so let's move it to the end for correct order
@@ -33,7 +28,7 @@ export async function queryOptions(apolloClient: ApolloClient<unknown>, locale: 
   }));
 
   return {
-    purpose: purposeOptions,
-    ageGroup: ageGroupOptions,
+    reservationPurposes: reservationPurposeOptions,
+    ageGroups: ageGroupOptions,
   };
 }

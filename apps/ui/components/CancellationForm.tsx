@@ -36,14 +36,16 @@ const FormWrapper = styled(Flex)`
   }
 `;
 
-export function CancellationForm(props: {
+type CancellationFormProps = {
   onNext: (values: CancelFormValues) => void;
-  cancelReasons: CancelReasonFieldsFragment[];
+  cancelReasons: Readonly<CancelReasonFieldsFragment[]>;
   cancellationTerms: string | null;
   backLink: string;
   isLoading?: boolean;
   isDisabled?: boolean;
-}): JSX.Element {
+};
+
+export function CancellationForm(props: Readonly<CancellationFormProps>): JSX.Element {
   const { cancelReasons, onNext, isLoading, isDisabled, cancellationTerms, backLink } = props;
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);

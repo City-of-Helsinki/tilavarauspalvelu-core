@@ -28,7 +28,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       termsType: TermsOfUseTypeChoices.GenericTerms,
     },
   });
-  const genericTerms = data.termsOfUse?.edges?.map((n) => n?.node).find((n) => n?.pk === genericTermsId);
+  const genericTerms = data.allTermsOfUse?.find((n) => n?.pk === genericTermsId);
   if (genericTerms == null) {
     return {
       props: {

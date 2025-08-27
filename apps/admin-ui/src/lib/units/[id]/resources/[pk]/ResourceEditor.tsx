@@ -64,7 +64,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
   const { errors, isDirty } = formState;
 
   useEffect(() => {
-    const resource = data?.node != null && "pk" in data.node ? data.node : null;
+    const resource = data?.resource != null && "pk" in data.resource ? data.resource : null;
     if (resource) {
       reset({
         nameFi: resource.nameFi ?? "",
@@ -76,12 +76,13 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
     }
   }, [data, reset]);
 
-  if (loading) {
+  const possibleData = data ?? previousData;
+  const unit = possibleData?.unit != null && "pk" in possibleData.unit ? possibleData.unit : null;
+  const resource = possibleData?.resource != null && "pk" in possibleData.resource ? possibleData.resource : null;
+
+  if ((resource == null || unit == null) && loading) {
     return <CenterSpinner />;
   }
-
-  const { unit, resource } = data ?? previousData ?? {};
-
   if (resource == null || unit == null) {
     return <Error404 />;
   }
@@ -135,7 +136,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
 
 export const RESOURCE_QUERY = gql`
   query Resource($id: ID!, $unitId: ID!) {
-    node(id: $id) {
+    resource: node(id: $id) {
       ... on ResourceNode {
         id
         pk
@@ -148,7 +149,7 @@ export const RESOURCE_QUERY = gql`
         }
       }
     }
-    node(id: $id) {
+    unit: node(id: $unitId) {
       ... on UnitNode {
         id
         pk

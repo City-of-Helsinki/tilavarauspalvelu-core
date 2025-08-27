@@ -109,7 +109,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       id: createNodeId("ApplicationNode", pk),
     },
   });
-  const { application } = data;
+  const application = data?.node != null && "id" in data.node ? data.node : null;
   if (application == null) {
     return notFound;
   }

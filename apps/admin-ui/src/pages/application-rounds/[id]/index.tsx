@@ -75,7 +75,6 @@ export default function ApplicationRound({
       errorToast({ text: t("errors:errorFetchingData") });
     },
   });
-  const applicationRound = data?.node ?? previousData?.node ?? applicationRoundOriginal;
 
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
@@ -83,7 +82,8 @@ export default function ApplicationRound({
   // NOTE: useEffect works, onCompleted does not work with refetch
   useEffect(() => {
     if (data) {
-      setIsInProgress(isApplicationRoundInProgress(applicationRound));
+      const node = data?.node != null && "pk" in data.node ? data.node : null;
+      setIsInProgress(isApplicationRoundInProgress(node));
     }
   }, [data]);
 
@@ -102,6 +102,10 @@ export default function ApplicationRound({
       }
     }
   }, [unitOptions, searchParams, setParams]);
+
+  const previousNode = previousData?.node != null && "pk" in previousData.node ? previousData.node : null;
+  const node = data?.node != null && "pk" in data.node ? data.node : null;
+  const applicationRound = node ?? previousNode ?? applicationRoundOriginal;
 
   const originalOptions = getFilterOptions(t, optionsData);
   const reservationUnitOptions = getRoundReservationUnitOptions(applicationRound);

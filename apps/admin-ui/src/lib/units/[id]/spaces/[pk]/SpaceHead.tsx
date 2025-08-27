@@ -2,7 +2,7 @@ import React from "react";
 import { IconGroup, IconLocation } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import type { Maybe, SpaceQuery } from "@gql/gql-types";
+import type { LocationFieldsFragment, Maybe, ReservationUnitNode } from "@gql/gql-types";
 import { formatAddress } from "@/common/util";
 import { getUnitUrl } from "@/common/urls";
 import { Flex, fontMedium, H1 } from "common/styled";
@@ -11,8 +11,9 @@ import Link from "next/link";
 
 interface IProps {
   title: string;
-  // TODO narrow down
-  space?: SpaceQuery["space"];
+  space: {
+    unit: LocationFieldsFragment & Pick<ReservationUnitNode, "nameFi" | "pk">;
+  } | null;
   maxPersons?: Maybe<number>;
   surfaceArea?: Maybe<number>;
 }

@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type Maybe, type ReservationEditPageQuery } from "@gql/gql-types";
+import { type ReservationEditPageFragment, type Maybe } from "@gql/gql-types";
 import { Button, ButtonVariant, LoadingSpinner, TextInput } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ErrorBoundary } from "react-error-boundary";
@@ -29,7 +29,7 @@ import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { Error403 } from "@/component/Error403";
 import { useCheckReservationPermissions } from "@/hooks/useCheckReservationPermissions";
 
-type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;
+type ReservationType = ReservationEditPageFragment;
 type FormValueType = ReservationChangeFormType & ReservationFormMeta;
 
 const InnerTextInput = styled(TextInput)`
@@ -245,27 +245,33 @@ function Wrapper({
   );
 }
 
+export const RESERVATION_EDIT_PAGE_FRAGMENT = gql`
+  fragment ReservationEditPage on ReservationNode {
+    id
+    pk
+    ...CreateTagString
+    ...ReservationCommonFields
+    ...ReservationMetaFields
+    ...ReservationTitleSectionFields
+    ...UseStaffReservation
+    reservationSeries {
+      id
+      pk
+      name
+    }
+    reservationUnit {
+      id
+      pk
+      ...ReservationTypeFormFields
+    }
+  }
+`;
+
 export const RESERVATION_EDIT_PAGE_QUERY = gql`
   query ReservationEditPage($id: ID!) {
     node(id: $id) {
       ... on ReservationNode {
-        id
-        pk
-        ...CreateTagString
-        ...ReservationCommonFields
-        ...ReservationMetaFields
-        ...ReservationTitleSectionFields
-        ...UseStaffReservation
-        reservationSeries {
-          id
-          pk
-          name
-        }
-        reservationUnit {
-          id
-          pk
-          ...ReservationTypeFormFields
-        }
+        ...ReservationEditPage
       }
     }
   }

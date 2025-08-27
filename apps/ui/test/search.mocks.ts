@@ -7,7 +7,6 @@ import {
 } from "@/gql/gql-types";
 import { CreateGraphQLMocksReturn, ICreateGraphQLMock } from "./test.gql.utils";
 import { createMockReservationUnit } from "./reservation-unit.mocks";
-import { addYears } from "date-fns";
 
 interface SearchQueryProps extends ICreateGraphQLMock {
   isSearchError: boolean;
@@ -94,8 +93,13 @@ function createSearchVariablesMock({
 } = {}): Readonly<SearchReservationUnitsQueryVariables> {
   return {
     textSearch,
-    accessTypeBeginDate: date ? date.toISOString() : undefined,
-    accessTypeEndDate: date ? addYears(date, 1).toISOString() : undefined,
+    /*
+    accessType: {
+      accessTypeBeginDate: date ? date.toISOString() : undefined,
+      accessTypeEndDate: date ? addYears(date, 1).toISOString() : undefined,
+      accessTypes
+    },
+    */
     reservableDateStart: date ? date.toISOString() : undefined,
     applicationRound: [1],
     first: 36,

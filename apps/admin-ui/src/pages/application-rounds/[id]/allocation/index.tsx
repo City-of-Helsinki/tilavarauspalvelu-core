@@ -99,10 +99,13 @@ function useQueryVariables(
   return {
     applicationRound: applicationRound.pk ?? 0,
     priority: priorityFilter,
-    preferredOrder: {
-      values: preferredOrderFilter,
-      allHigherThan10: includePreferredOrder10OrHigher ?? false,
-    },
+    preferredOrder:
+      preferredOrderFilter != null && preferredOrderFilter.length > 0
+        ? {
+            values: preferredOrderFilter,
+            allHigherThan10: includePreferredOrder10OrHigher ?? false,
+          }
+        : undefined,
     textSearch: nameFilter,
     municipality: municipalityFilter,
     applicantType: applicantTypeFilter,
@@ -115,7 +118,7 @@ function useQueryVariables(
   };
 }
 
-function mapOrderFilter(val: ApplicationSectionAllocationsQueryVariables["preferredOrder"]): number[] {
+function mapOrderFilter(val: readonly number[] | null | undefined): number[] {
   if (val == null) {
     return [];
   }
@@ -246,11 +249,11 @@ function ApplicationRoundAllocation({
           return true;
         }
 
-        const preferredOrderFilter = mapOrderFilter(queryVariables.preferredOrder);
+        const preferredOrderFilter = mapOrderFilter(queryVariables.preferredOrder?.values);
         if (preferredOrderFilter.length > 0) {
           const includedInPreferredOrder =
             preferredOrderFilter.includes(r.preferredOrder) ||
-            (queryVariables.includePreferredOrder10OrHigher && r.preferredOrder >= 10);
+            (queryVariables.preferredOrder?.allHigherThan10 && r.preferredOrder >= 10);
           return includedInPreferredOrder && r.reservationUnit.pk === selectedReservationUnit;
         }
         return r.reservationUnit.pk === selectedReservationUnit;
@@ -465,6 +468,39 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
+export const APPLICATION_SECTION_ALLOCATION_FRAGMENT = gql`
+  fragment ApplicationSectionAllocation on ApplicationSectionNode {
+    ...ApplicationSectionFields
+    allocations
+    suitableTimeRanges(filter: { fulfilled: false }) {
+      id
+      beginTime
+      endTime
+      dayOfTheWeek
+      priority
+      fulfilled
+    }
+    reservationUnitOptions {
+      id
+      pk
+      isRejected
+      isLocked
+      allocatedTimeSlots {
+        pk
+        ...AllocatedTimeSlot
+        reservationUnitOption {
+          id
+          pk
+          applicationSection {
+            id
+            pk
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
   query ApplicationSectionAllocations(
     $after: String
@@ -475,9 +511,8 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
     $applicationStatus: [ApplicationStatusChoice!]!
     $beginDate: Date!
     $endDate: Date!
-    $includePreferredOrder10OrHigher: Boolean!
     $municipality: [MunicipalityChoice!]
-    $preferredOrder: [Int!]!
+    $preferredOrder: PreferredOrderFilterInput
     $priority: [Priority!]
     $purpose: [Int!]
     $reservationUnit: Int!
@@ -492,7 +527,7 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
         applicationRound: $applicationRound
         applicationStatus: $applicationStatus
         municipality: $municipality
-        preferredOrder: { values: $preferredOrder, allHigherThan10: $includePreferredOrder10OrHigher }
+        preferredOrder: $preferredOrder
         priority: $priority
         purpose: $purpose
         reservationUnit: [$reservationUnit]
@@ -502,34 +537,7 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
     ) {
       edges {
         node {
-          ...ApplicationSectionFields
-          allocations
-          suitableTimeRanges(filter: { fulfilled: false }) {
-            id
-            beginTime
-            endTime
-            dayOfTheWeek
-            priority
-            fulfilled
-          }
-          reservationUnitOptions {
-            id
-            pk
-            isRejected
-            isLocked
-            allocatedTimeSlots {
-              pk
-              ...AllocatedTimeSlot
-              reservationUnitOption {
-                id
-                pk
-                applicationSection {
-                  id
-                  pk
-                }
-              }
-            }
-          }
+          ...ApplicationSectionAllocation
         }
       }
       pageInfo {
