@@ -40,6 +40,8 @@ gql-pluck-output/
 backend/local_settings.py
 backend/.env
 backend/pytest.ini
+.claude/
+CLAUDE.md
 
 # misc
 **/.DS_Store
