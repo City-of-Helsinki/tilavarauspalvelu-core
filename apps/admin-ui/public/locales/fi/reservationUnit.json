@@ -30,5 +30,5 @@
   },
   "goToMassEdit": "Siirry muokkaamaan aukioloaikoja",
   "editBarText": "Valitse varausyksiköt joiden aukioloaikoja haluat muokata. Ensimmäisestä valinnasta voidaan kopioida halutut tiedot muihin.",
-  "editErrorMessage": "Muokkaus epäonnistui. Yritä uudelleen."
+  "editErrorMessage": "Linkkiä Aukiolosovellukseen ei saatu muodostettua. Ole yhteydessä palvelun ylläpitoon, jos virhe toistuu.\n {{code}}: {{message}}"
 }

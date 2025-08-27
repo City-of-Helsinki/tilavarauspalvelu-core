@@ -100,6 +100,7 @@ const HDSNotification = styled(Notification)`
   }
   [class^="Notification-module_content"] {
     padding-top: 8px;
+    white-space: pre-line;
   }
   .progress-bar {
     position: absolute;
