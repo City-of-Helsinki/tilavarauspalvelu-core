@@ -42,12 +42,13 @@ function SearchSingle({ options }: Readonly<Props>): JSX.Element {
 
   const searchValues = useSearchParams();
 
-  const vars = processVariables({
+  const searchVariables = processVariables({
     values: searchValues,
     language: i18n.language,
     kind: ReservationKind.Direct,
   });
-  const query = useSearchQuery(vars);
+
+  const query = useSearchQuery(searchVariables);
   const { data, isLoading, error, fetchMore, previousData } = query;
 
   const currData = data ?? previousData;
@@ -116,7 +117,7 @@ export const SEARCH_RESERVATION_UNITS = gql`
     $after: String
     $orderBy: [ReservationUnitOrderSet!]
     # Filter
-    $accessType: AccessTypeFilterDataInput
+    $accessTypes: [AccessType!]! = []
     $applicationRound: [Int!]
     $equipments: [Int!]
     $isDraft: Boolean
@@ -142,7 +143,11 @@ export const SEARCH_RESERVATION_UNITS = gql`
       before: $before
       orderBy: $orderBy
       filter: {
-        accessType: $accessType
+        accessType: {
+          accessTypes: $accessTypes
+          accessTypeBeginDate: $reservableDateStart # Intentionally use $reservableDateStart
+          accessTypeEndDate: $reservableDateEnd # Intentionally use $reservableDateEnd
+        }
         applicationRound: $applicationRound
         equipments: $equipments
         isDraft: $isDraft
