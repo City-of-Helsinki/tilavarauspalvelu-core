@@ -2,7 +2,6 @@ from typing import Any
 
 from undine import GQLInfo, Input, MutationType
 from undine.exceptions import GraphQLPermissionError, GraphQLValidationError
-from undine.utils.model_utils import get_instance_or_raise
 
 from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ReservationUnitOption, User
 from tilavarauspalvelu.typing import error_codes
@@ -12,13 +11,11 @@ __all__ = [
 ]
 
 
-class RejectAllApplicationOptionsMutation(MutationType[Application]):
+class RejectAllApplicationOptionsMutation(MutationType[Application], kind="update"):
     pk = Input(required=True)
 
     @classmethod
-    def __mutate__(cls, root: Any, info: GQLInfo[User], input_data: Any) -> Application:
-        instance = get_instance_or_raise(model=Application, pk=input_data["pk"])
-
+    def __mutate__(cls, instance: Application, info: GQLInfo[User], input_data: dict[str, Any]) -> Application:
         user = info.context.user
         if not user.permissions.can_manage_application(instance, reserver_needs_role=True, all_units=True):
             msg = "No permission to reject all application options."

@@ -5,7 +5,6 @@ from graphql import GraphQLOutputType
 from undine import GQLInfo, Input, MutationType
 from undine.converters import convert_to_graphql_type
 from undine.exceptions import GraphQLPermissionError, GraphQLValidationError
-from undine.utils.model_utils import get_instance_or_raise
 
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
@@ -26,7 +25,7 @@ class ReservationSeriesChangeAccessCodeMutationOutput(TypedDict):
     access_code_is_active: bool
 
 
-class ReservationSeriesChangeAccessCodeMutation(MutationType[ReservationSeries]):
+class ReservationSeriesChangeAccessCodeMutation(MutationType[ReservationSeries], kind="update"):
     """Change the access code of a reservation series."""
 
     pk = Input(required=True)
@@ -34,11 +33,10 @@ class ReservationSeriesChangeAccessCodeMutation(MutationType[ReservationSeries])
     @classmethod
     def __mutate__(
         cls,
-        root: Any,
+        instance: ReservationSeries,
         info: GQLInfo[User],
         input_data: dict[str, Any],
     ) -> ReservationSeriesChangeAccessCodeMutationOutput:
-        instance = get_instance_or_raise(model=ReservationSeries, pk=input_data["pk"])
         reservation_unit = instance.reservation_unit
 
         user = info.context.user

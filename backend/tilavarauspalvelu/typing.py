@@ -35,6 +35,7 @@ if TYPE_CHECKING:
 
     from tilavarauspalvelu.models import (
         AgeGroup,
+        ApplicationRound,
         Equipment,
         Purpose,
         ReservationDenyReason,
@@ -42,6 +43,7 @@ if TYPE_CHECKING:
         ReservationPurpose,
         ReservationUnit,
         ReservationUnitCancellationRule,
+        ReservationUnitOption,
         ReservationUnitType,
         Resource,
         Space,
@@ -166,15 +168,142 @@ class ExtraData(TypedDict):
 
 
 class AllocatedTimeSlotCreateData(TypedDict):
-    reservation_unit_option: int
+    reservation_unit_option: ReservationUnitOption
     day_of_the_week: Weekday
     begin_time: datetime.time
     end_time: datetime.time
     force: bool
 
 
+class ReservationUnitOptionRelatedCreateData(TypedDict):
+    preferred_order: int
+    reservation_unit: ReservationUnit
+
+
+class ReservationUnitOptionRelatedUpdateData(TypedDict, total=False):
+    pk: Required[int]
+
+    preferred_order: int
+    reservation_unit: ReservationUnit
+
+
+class SuitableTimeRangeRelatedCreateData(TypedDict):
+    priority: int
+
+    day_of_the_week: Weekday
+    begin_time: datetime.time
+    end_time: datetime.time
+
+
+class SuitableTimeRangeRelatedUpdateData(TypedDict, total=False):
+    pk: Required[int]
+
+    priority: int
+    day_of_the_week: Weekday
+    begin_time: datetime.time
+    end_time: datetime.time
+
+
+class ApplicationSectionRelatedCreateData(TypedDict):
+    name: str
+    num_persons: int
+
+    reservations_begin_date: datetime.date
+    reservations_end_date: datetime.date
+
+    reservation_min_duration: datetime.timedelta
+    reservation_max_duration: datetime.timedelta
+    applied_reservations_per_week: int
+
+    purpose: NotRequired[ReservationPurpose | None]
+    age_group: NotRequired[AgeGroup | None]
+
+    reservation_unit_options: list[ReservationUnitOptionRelatedCreateData]
+    suitable_time_ranges: list[SuitableTimeRangeRelatedCreateData]
+
+
+class ApplicationSectionRelatedUpdateData(TypedDict, total=False):
+    pk: Required[int]
+
+    name: str
+    num_persons: int
+
+    reservations_begin_date: datetime.date
+    reservations_end_date: datetime.date
+
+    reservation_min_duration: datetime.timedelta
+    reservation_max_duration: datetime.timedelta
+    applied_reservations_per_week: int
+
+    purpose: ReservationPurpose | None
+    age_group: AgeGroup | None
+
+    reservation_unit_options: list[ReservationUnitOptionRelatedUpdateData]
+    suitable_time_ranges: list[SuitableTimeRangeRelatedUpdateData]
+
+
+class ApplicationCreateData(TypedDict):
+    applicant_type: ReserveeType | None
+    additional_information: str
+
+    user: User | None
+    application_round: ApplicationRound
+    application_sections: list[ApplicationSectionRelatedCreateData]
+
+    contact_person_first_name: str
+    contact_person_last_name: str
+    contact_person_email: str | None
+    contact_person_phone_number: str
+
+    billing_street_address: str
+    billing_post_code: str
+    billing_city: str
+
+    organisation_name: str
+    organisation_email: str | None
+    organisation_identifier: str
+    organisation_year_established: int | None
+    organisation_active_members: int | None
+    organisation_core_business: bool
+    organisation_street_address: str
+    organisation_post_code: str
+    organisation_city: str
+    municipality: MunicipalityChoice | None
+
+
+class ApplicationUpdateData(TypedDict, total=False):
+    pk: Required[int]
+
+    applicant_type: ReserveeType | None
+    additional_information: str
+
+    application_sections: list[ApplicationSectionRelatedUpdateData]
+
+    contact_person_first_name: str
+    contact_person_last_name: str
+    contact_person_email: str | None
+    contact_person_phone_number: str
+
+    billing_street_address: str
+    billing_post_code: str
+    billing_city: str
+
+    organisation_name: str
+    organisation_email: str | None
+    organisation_identifier: str
+    organisation_year_established: int | None
+    organisation_active_members: int | None
+    organisation_core_business: bool
+    organisation_street_address: str
+    organisation_post_code: str
+    organisation_city: str
+    municipality: MunicipalityChoice | None
+
+    sent_at: None
+
+
 class ReservationCreateData(TypedDict):
-    reservation_unit: int
+    reservation_unit: ReservationUnit
     begins_at: datetime.datetime
     ends_at: datetime.datetime
 

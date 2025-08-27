@@ -277,5 +277,5 @@ class ApplicationSendMutation(MutationType[Application], kind="update"):
             errors.append(error)
 
     @classmethod
-    def __after__(cls, instance: Application, info: GQLInfo[User], previous_data: dict[str, Any]) -> None:
+    def __after__(cls, instance: Application, info: GQLInfo[User], input_data: dict[str, Any]) -> None:
         EmailService.send_seasonal_booking_application_received_email(application=instance)

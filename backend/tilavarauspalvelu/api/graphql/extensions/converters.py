@@ -1,10 +1,9 @@
 import dataclasses
-from enum import StrEnum
 from typing import Any
 
 from django.db.models import Q
 from django.db.models.constants import LOOKUP_SEP
-from graphql import GraphQLBoolean, GraphQLEnumValue, GraphQLFieldResolver, GraphQLInputType, GraphQLOutputType
+from graphql import GraphQLBoolean, GraphQLFieldResolver, GraphQLInputType, GraphQLOutputType
 from lookup_property import L
 from lookup_property.field import LookupPropertyField
 from lookup_property.typing import LOOKUP_PREFIX
@@ -25,7 +24,6 @@ from undine.converters import (
 from undine.optimizer import OptimizationData
 from undine.resolvers import ModelAttributeResolver
 from undine.typing import GraphQLFilterResolver
-from undine.utils.graphql.type_registry import get_or_create_graphql_enum
 from undine.utils.model_utils import determine_output_field, get_model_field
 
 from tilavarauspalvelu.models import User
@@ -188,16 +186,4 @@ def _(ref: NullablePermissions, **kwargs: Any) -> GraphQLFieldResolver:
         field=caller,
         permission_check=ref.permission_check,
         resolver=resolver,
-    )
-
-
-@convert_to_graphql_type.register
-def _(ref: type[StrEnum], **kwargs: Any) -> GraphQLInputType | GraphQLOutputType:
-    return get_or_create_graphql_enum(
-        name=ref.__name__,
-        values={
-            str(value.value): GraphQLEnumValue(value=value, description=str(value.value))
-            for name, value in ref.__members__.items()
-        },
-        description=convert_to_description(ref),
     )
