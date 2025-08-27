@@ -196,7 +196,10 @@ function ReservationUnitEditor({
 
   useToastIfQueryParam({
     key: ["error_code", "error_message"],
-    message: params.get("error_message") ?? t("reservationUnit:editErrorMessage"),
+    message: t("reservationUnit:editErrorMessage", {
+      code: params.get("error_code"),
+      message: params.get("error_message"),
+    }),
     type: "error",
   });
 
