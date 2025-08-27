@@ -1,5 +1,4 @@
 import datetime
-from typing import Any
 
 from django.conf import settings
 from django.db import transaction
@@ -57,7 +56,7 @@ class ReservationSeriesReservationCreateInput(MutationType[Reservation], kind="r
     purpose = Input(ReservationPurpose)
 
 
-class ReservationSeriesCreateMutation(MutationType[ReservationSeries]):
+class ReservationSeriesCreateMutation(MutationType[ReservationSeries], kind="create"):
     """Create the reservation series with all its reservations."""
 
     name = Input(required=True, default_value="")
@@ -78,7 +77,12 @@ class ReservationSeriesCreateMutation(MutationType[ReservationSeries]):
     skip_dates = Input(list[datetime.date], default_value=[], input_only=False)
 
     @classmethod
-    def __mutate__(cls, root: Any, info: GQLInfo[User], input_data: ReservationSeriesCreateData) -> ReservationSeries:
+    def __mutate__(
+        cls,
+        instance: ReservationSeries,
+        info: GQLInfo[User],
+        input_data: ReservationSeriesCreateData,
+    ) -> ReservationSeries:
         reservation_unit = input_data["reservation_unit"]
 
         user: User = info.context.user

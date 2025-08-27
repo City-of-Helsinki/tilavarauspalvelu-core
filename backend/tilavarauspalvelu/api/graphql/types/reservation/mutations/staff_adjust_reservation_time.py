@@ -2,7 +2,6 @@ from typing import Any
 
 from undine import GQLInfo, Input, MutationType
 from undine.exceptions import GraphQLPermissionError, GraphQLValidationError
-from undine.utils.model_utils import get_instance_or_raise
 
 from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.integrations.email.main import EmailService
@@ -13,7 +12,7 @@ from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.errors import ExternalServiceError
 
 
-class ReservationStaffAdjustTimeMutation(MutationType[Reservation]):
+class ReservationStaffAdjustTimeMutation(MutationType[Reservation], kind="update"):
     """Adjust a reservation's time as a staff member."""
 
     pk = Input(required=True)
@@ -24,9 +23,12 @@ class ReservationStaffAdjustTimeMutation(MutationType[Reservation]):
     buffer_time_after = Input(required=False)
 
     @classmethod
-    def __mutate__(cls, root: Any, info: GQLInfo[User], input_data: StaffReservationAdjustTimeData) -> Reservation:
-        instance = get_instance_or_raise(model=Reservation, pk=input_data["pk"])
-
+    def __mutate__(
+        cls,
+        instance: Reservation,
+        info: GQLInfo[User],
+        input_data: StaffReservationAdjustTimeData,
+    ) -> Reservation:
         user = info.context.user
         if not user.permissions.can_manage_reservation(
             instance,

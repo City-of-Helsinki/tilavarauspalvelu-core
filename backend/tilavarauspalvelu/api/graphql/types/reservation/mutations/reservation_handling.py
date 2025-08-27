@@ -2,7 +2,6 @@ from typing import Any
 
 from undine import GQLInfo, Input, MutationType
 from undine.exceptions import GraphQLPermissionError, GraphQLValidationError
-from undine.utils.model_utils import get_instance_or_raise
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
@@ -18,15 +17,13 @@ __all__ = [
 ]
 
 
-class ReservationRequiresHandlingMutation(MutationType[Reservation]):
+class ReservationRequiresHandlingMutation(MutationType[Reservation], kind="update"):
     """Move an 'approved' or 'denied' reservation back to 'requires handling' state."""
 
     pk = Input(required=True)
 
     @classmethod
-    def __mutate__(cls, root: Any, info: GQLInfo[User], input_data: dict[str, Any]) -> Reservation:
-        instance = get_instance_or_raise(model=Reservation, pk=input_data["pk"])
-
+    def __mutate__(cls, instance: Reservation, info: GQLInfo[User], input_data: dict[str, Any]) -> Reservation:
         user = info.context.user
         if not user.permissions.can_manage_reservation(
             instance,

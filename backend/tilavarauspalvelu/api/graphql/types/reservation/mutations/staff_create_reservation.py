@@ -1,5 +1,4 @@
 import datetime
-from typing import Any
 
 from undine import GQLInfo, Input, MutationType
 from undine.exceptions import GraphQLPermissionError, GraphQLValidationError
@@ -17,7 +16,7 @@ __all__ = [
 ]
 
 
-class ReservationStaffCreateMutation(MutationType[Reservation]):
+class ReservationStaffCreateMutation(MutationType[Reservation], kind="create"):
     """Create a reservation as a staff user."""
 
     # Basic information
@@ -25,7 +24,7 @@ class ReservationStaffCreateMutation(MutationType[Reservation]):
     description = Input(required=True, default_value="")
     num_persons = Input()
     working_memo = Input(required=True, default_value="")
-    type = Input(required=True)
+    type = Input(required=True, default_value=ReservationTypeChoice.STAFF)
     municipality = Input()
 
     # Time information
@@ -56,7 +55,12 @@ class ReservationStaffCreateMutation(MutationType[Reservation]):
     purpose = Input(ReservationPurpose)
 
     @classmethod
-    def __mutate__(cls, root: Any, info: GQLInfo[User], input_data: StaffCreateReservationData) -> Reservation:
+    def __mutate__(
+        cls,
+        instance: Reservation,
+        info: GQLInfo[User],
+        input_data: StaffCreateReservationData,
+    ) -> Reservation:
         reservation_unit = input_data["reservation_unit"]
 
         user: User = info.context.user

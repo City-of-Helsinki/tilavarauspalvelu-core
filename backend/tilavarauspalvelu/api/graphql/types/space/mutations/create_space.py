@@ -10,7 +10,7 @@ __all__ = [
 ]
 
 
-class SpaceCreateMutation(MutationType[Space]):
+class SpaceCreateMutation(MutationType[Space], kind="create"):
     name_fi = Input(required=True)
     name_sv = Input()
     name_en = Input()
@@ -18,8 +18,8 @@ class SpaceCreateMutation(MutationType[Space]):
     max_persons = Input()
     code = Input()
 
-    unit = Input(required=True)
-    parent = Input()
+    unit = Input(Unit, required=True)
+    parent = Input(Space)
 
     # Set tree fields to zero and rebuild tree in `__after__`
     tree_id = Input(int, hidden=True, default_value=0)
@@ -35,18 +35,12 @@ class SpaceCreateMutation(MutationType[Space]):
 
     @classmethod
     def __permissions__(cls, instance: Space, info: GQLInfo[User], input_data: dict[str, Any]) -> None:
-        unit_pk: int = input_data["unit"]
-
-        unit = Unit.objects.filter(pk=unit_pk).first()
-        if unit is None:
-            msg = f"Unit with primary key {unit_pk!r} does not exist."
-            raise GraphQLPermissionError(msg)
-
+        unit: Unit = input_data["unit"]
         user = info.context.user
         if not user.permissions.can_manage_spaces(unit):
             msg = "No permission to create a space"
             raise GraphQLPermissionError(msg)
 
     @classmethod
-    def __after__(cls, instance: Space, info: GQLInfo, previous_data: dict[str, Any]) -> None:
+    def __after__(cls, instance: Space, info: GQLInfo, input_data: dict[str, Any]) -> None:
         Space.objects.rebuild()

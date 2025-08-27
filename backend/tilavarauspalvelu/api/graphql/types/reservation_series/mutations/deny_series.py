@@ -1,4 +1,4 @@
-from typing import Any, TypedDict
+from typing import TypedDict
 
 from django.conf import settings
 from django.db import models, transaction
@@ -29,7 +29,7 @@ class ReservationSeriesDenyMutationOutput(TypedDict):
     future: int
 
 
-class ReservationSeriesDenyMutation(MutationType[ReservationSeries]):
+class ReservationSeriesDenyMutation(MutationType[ReservationSeries], kind="update"):
     pk = Input(required=True)
 
     deny_reason = Input(int, required=True, input_only=False)
@@ -38,14 +38,12 @@ class ReservationSeriesDenyMutation(MutationType[ReservationSeries]):
     @classmethod
     def __mutate__(
         cls,
-        root: Any,
+        instance: ReservationSeries,
         info: GQLInfo[User],
         input_data: ReservationSeriesDenyData,
     ) -> ReservationSeriesDenyMutationOutput:
-        deny_reason = get_instance_or_raise(model=ReservationDenyReason, pk=input_data["deny_reason"])
-
-        instance = get_instance_or_raise(model=ReservationSeries, pk=input_data["pk"])
         reservation_unit = instance.reservation_unit
+        deny_reason = get_instance_or_raise(model=ReservationDenyReason, pk=input_data["deny_reason"])
 
         user = info.context.user
         is_reservee = instance.user == user

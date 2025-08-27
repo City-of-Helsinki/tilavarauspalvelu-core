@@ -83,7 +83,7 @@ class ApplicationRoundTimeSlotCreateInput(MutationType[ApplicationRoundTimeSlot]
     reservable_times = Input(list[TimeSlot], default_value=[])
 
 
-class ReservationUnitCreateMutation(MutationType[ReservationUnit], kind="custom"):
+class ReservationUnitCreateMutation(MutationType[ReservationUnit], kind="create"):
     """Create a new ReservationUnit."""
 
     # Strings

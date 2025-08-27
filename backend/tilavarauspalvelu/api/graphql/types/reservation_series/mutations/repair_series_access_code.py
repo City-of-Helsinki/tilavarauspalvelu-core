@@ -5,7 +5,6 @@ from graphql import GraphQLOutputType
 from undine import GQLInfo, Input, MutationType
 from undine.converters import convert_to_graphql_type
 from undine.exceptions import GraphQLPermissionError, GraphQLValidationError
-from undine.utils.model_utils import get_instance_or_raise
 
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
@@ -23,7 +22,7 @@ class ReservationSeriesRepairAccessCodeMutationOutput(TypedDict):
     access_code_is_active: bool
 
 
-class ReservationSeriesRepairAccessCodeMutation(MutationType[ReservationSeries]):
+class ReservationSeriesRepairAccessCodeMutation(MutationType[ReservationSeries], kind="update"):
     """
     Synchronize the state of the reservation series' access code between Varaamo and Pindora
     to what Varaamo thinks is should be its correct state.
@@ -32,8 +31,7 @@ class ReservationSeriesRepairAccessCodeMutation(MutationType[ReservationSeries])
     pk = Input(required=True)
 
     @classmethod
-    def __mutate__(cls, root: Any, info: GQLInfo[User], input_data: dict[str, Any]) -> Any:
-        instance = get_instance_or_raise(model=ReservationSeries, pk=input_data["pk"])
+    def __mutate__(cls, instance: ReservationSeries, info: GQLInfo[User], input_data: dict[str, Any]) -> Any:
         reservation_unit = instance.reservation_unit
 
         user = info.context.user

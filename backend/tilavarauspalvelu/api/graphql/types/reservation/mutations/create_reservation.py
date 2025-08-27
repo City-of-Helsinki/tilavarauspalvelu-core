@@ -1,9 +1,6 @@
-from typing import Any
-
 from django.conf import settings
 from undine import GQLInfo, Input, MutationType
 from undine.exceptions import GraphQLPermissionError, GraphQLValidationError
-from undine.utils.model_utils import get_instance_or_raise
 
 from tilavarauspalvelu.enums import AccessType, PaymentType
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
@@ -20,15 +17,15 @@ __all__ = [
 ]
 
 
-class ReservationCreateMutation(MutationType[Reservation]):
+class ReservationCreateMutation(MutationType[Reservation], kind="create"):
     """Create a tentative reservation before moving to the checkout flow."""
 
-    reservation_unit = Input(required=True)
+    reservation_unit = Input(ReservationUnit, required=True)
     begins_at = Input(required=True)
     ends_at = Input(required=True)
 
     @classmethod
-    def __mutate__(cls, root: Any, info: GQLInfo[User], input_data: ReservationCreateData) -> Reservation:  # noqa: PLR0915
+    def __mutate__(cls, instance: Reservation, info: GQLInfo[User], input_data: ReservationCreateData) -> Reservation:  # noqa: PLR0915
         user: User = info.context.user
         if not user.is_authenticated:
             msg = "Must be authenticated to create a reservation."
@@ -39,7 +36,7 @@ class ReservationCreateMutation(MutationType[Reservation]):
 
         user.validators.validate_is_internal_user_if_ad_user()
 
-        reservation_unit = get_instance_or_raise(model=ReservationUnit, pk=input_data["reservation_unit"])
+        reservation_unit = input_data["reservation_unit"]
 
         reservation_unit.validators.validate_reservation_unit_is_direct_bookable()
         reservation_unit.validators.validate_reservation_unit_is_published()

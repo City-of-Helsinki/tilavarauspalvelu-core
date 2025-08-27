@@ -36,5 +36,5 @@ class SetApplicationRoundResultsSentMutation(MutationType[ApplicationRound], kin
             raise GraphQLValidationError(msg, code=error_codes.APPLICATION_ROUND_NOT_HANDLED)
 
     @classmethod
-    def __after__(cls, instance: ApplicationRound, info: GQLInfo[User], previous_data: dict[str, Any]) -> None:
+    def __after__(cls, instance: ApplicationRound, info: GQLInfo[User], input_data: dict[str, Any]) -> None:
         send_application_handled_email_task.delay()
