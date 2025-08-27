@@ -49,7 +49,7 @@
     "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
     "RESERVATION_UNIT_IS_NOT_OPEN": "Objektet är för närvarande stängt.",
     "RESERVATION_UNIT_IN_OPEN_ROUND": "Du kan ansöka om en säsongsbokning för detta objekt.",
-    "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "Förkorta bokningstiden.",
+    "RESERVATION_UNIT_MAX_DURATION_EXCEEDED": "Förkorta bokningstiden.",
     "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "Förläng bokningstiden.",
     "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Det maximala antalet bokningar har överskridits.",
     "RESERVATION_OVERLAP": "Överlappande bokningar.",
@@ -69,7 +69,7 @@
       "APPLICATION_APPLICANT_TYPE_MISSING": "Sökandens typ saknas.",
       "APPLICATION_STATUS_CANNOT_SEND": "Ansökan kan inte skickas.",
       "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
-      "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "För lång bokningstid.",
+      "RESERVATION_UNIT_MAX_DURATION_EXCEEDED": "För lång bokningstid.",
       "RESERVATION_CANCELLATION_NOT_ALLOWED": "Avbokning är inte tillåten.",
       "invalid": "Ogiltigt värde.",
       "generic_validation_error": "Ett fel uppstod."
