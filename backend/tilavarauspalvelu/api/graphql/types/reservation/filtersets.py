@@ -118,7 +118,7 @@ class ReservationFilterSet(ModelFilterSet):
                     | Q(reservation_unit__unit__unit_groups__in=reserver_g_ids)
                 )
             )
-        )
+        ).distinct()
 
     def filter_by_only_with_handling_permission(self, qs: QuerySet, name: str, value: bool) -> QuerySet:
         if not value:
@@ -141,7 +141,7 @@ class ReservationFilterSet(ModelFilterSet):
         return qs.filter(
             Q(reservation_unit__unit__in=u_ids)  #
             | Q(reservation_unit__unit__unit_groups__in=g_ids)
-        )
+        ).distinct()
 
     @staticmethod
     def filter_by_requested(qs: QuerySet, name, value: str) -> QuerySet:
