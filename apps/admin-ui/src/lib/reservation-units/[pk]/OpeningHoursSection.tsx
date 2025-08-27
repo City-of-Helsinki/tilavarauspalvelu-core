@@ -1,5 +1,6 @@
-import { getOpeningHoursUrl, getReservationUnitUrl } from "@/common/urls";
+import { getOpeningHoursUrl } from "@/common/urls";
 import { ButtonLikeExternalLink } from "common/src/components/ButtonLikeLink";
+import { isBrowser } from "common/src/helpers";
 import React from "react";
 import { IconLinkExternal } from "hds-react";
 import { useTranslation } from "next-i18next";
@@ -23,17 +24,10 @@ export function OpeningHoursSection({
 
   const previewUrl = `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.extUuid}#calendar`;
   const previewDisabled = previewUrlPrefix === "" || !reservationUnit?.pk || !reservationUnit?.extUuid;
+  const redirectOnErrorUrl = isBrowser ? window.location.href : undefined;
   const editUrl =
-    getOpeningHoursUrl(
-      apiBaseUrl,
-      reservationUnit?.pk ?? 0,
-      getReservationUnitUrl(reservationUnit?.unit.pk, reservationUnit?.pk)
-    ) !== ""
-      ? getOpeningHoursUrl(
-          apiBaseUrl,
-          reservationUnit?.pk ?? 0,
-          getReservationUnitUrl(reservationUnit?.unit.pk, reservationUnit?.pk)
-        )
+    getOpeningHoursUrl(apiBaseUrl, reservationUnit?.pk ?? 0, redirectOnErrorUrl) !== ""
+      ? getOpeningHoursUrl(apiBaseUrl, reservationUnit?.pk ?? 0, redirectOnErrorUrl)
       : undefined;
   return (
     <EditAccordion heading={t("reservationUnitEditor:openingHours")}>
@@ -55,7 +49,6 @@ export function OpeningHoursSection({
             href={previewUrl}
             target="_blank"
             fontSize="small"
-            rel="noopener noreferrer"
             style={{ textWrap: "wrap" }}
           >
             {t("reservationUnitEditor:previewCalendarLink")}

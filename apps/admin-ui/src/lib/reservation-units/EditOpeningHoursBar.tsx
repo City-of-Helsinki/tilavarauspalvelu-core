@@ -1,4 +1,4 @@
-import { getOpeningHoursUrl, RESERVATION_UNIT_URL_PREFIX } from "@/common/urls";
+import { getOpeningHoursUrl } from "@/common/urls";
 import { ButtonLikeExternalLink } from "common/src/components/ButtonLikeLink";
 import type { SelectedRow } from "@/lib/reservation-units";
 import { breakpoints } from "common/src/const";
@@ -7,6 +7,7 @@ import { Button, ButtonVariant, IconInfoCircle, IconLinkExternal, IconSize } fro
 import { useTranslation } from "next-i18next";
 import type { Dispatch, SetStateAction } from "react";
 import styled from "styled-components";
+import { isBrowser } from "@/common/const";
 
 const SpaceWrapper = styled.div`
   height: 76px;
@@ -51,16 +52,18 @@ const EditOpeningHoursBar = ({ selectedRows, setSelectedRows, apiBaseUrl }: Prop
   const { t } = useTranslation();
   const count = selectedRows.length;
   const selectedPks = selectedRows.map((id) => Number(id)).filter((id) => !isNaN(id));
+  const redirectOnErrorUrl = isBrowser ? window.location.href : undefined;
   const editLink =
-    getOpeningHoursUrl(apiBaseUrl, selectedPks, RESERVATION_UNIT_URL_PREFIX) !== ""
-      ? getOpeningHoursUrl(apiBaseUrl, selectedPks, RESERVATION_UNIT_URL_PREFIX)
+    getOpeningHoursUrl(apiBaseUrl, selectedPks, redirectOnErrorUrl) !== ""
+      ? getOpeningHoursUrl(apiBaseUrl, selectedPks, redirectOnErrorUrl)
       : undefined;
+
   return (
     <SpaceWrapper>
       {count > 0 && (
         <InnerContainer>
           <Flex $direction={"row"}>
-            <ButtonLikeExternalLink disabled={!editLink} href={editLink} target="_blank" rel="noopener noreferrer">
+            <ButtonLikeExternalLink disabled={!editLink} href={editLink} target={"_blank"}>
               {t("reservationUnit:goToMassEdit")}
               <IconLinkExternal />
             </ButtonLikeExternalLink>
