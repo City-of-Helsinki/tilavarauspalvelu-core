@@ -1,33 +1,28 @@
 import operator
-from typing import Any
 
 from graphql.pyutils import Path
 from undine.exceptions import GraphQLErrorGroup, GraphQLValidationError
 
 from tilavarauspalvelu.models import ApplicationRound, ApplicationSection, ReservationUnitOption
-from tilavarauspalvelu.typing import ErrorList
+from tilavarauspalvelu.typing import (
+    ApplicationSectionRelatedCreateData,
+    ApplicationSectionRelatedUpdateData,
+    ErrorList,
+    ReservationUnitOptionRelatedCreateData,
+    ReservationUnitOptionRelatedUpdateData,
+)
 from utils.utils import comma_sep_str
 
 __all__ = [
-    "validate_application_sections",
     "validate_reservation_period",
     "validate_reservation_unit_options",
 ]
 
 
-def validate_application_sections(
-    application_round: ApplicationRound,
-    application_sections: list[dict[str, Any]],
-    path: Path,
-) -> None:
-    for i, section_data in enumerate(application_sections):
-        sub_path = path.add_key(i)
-        validate_reservation_period(application_round, section_data, sub_path)
-
-
 def validate_reservation_period(
     application_round: ApplicationRound,
-    section_data: dict[str, Any],
+    section_data: ApplicationSectionRelatedCreateData | ApplicationSectionRelatedUpdateData,
+    *,
     path: Path,
 ) -> None:
     pk = section_data.get("pk")
@@ -66,13 +61,14 @@ def validate_reservation_period(
 
 
 def validate_reservation_unit_options(
-    instance: ApplicationSection,
-    option_data: list[dict[str, Any]],
+    option_data: list[ReservationUnitOptionRelatedCreateData | ReservationUnitOptionRelatedUpdateData],
+    *,
     path: Path,
+    instance: ApplicationSection | None = None,
 ) -> None:
     # Fetch current ordering for existing event reservation units
     current_ordering: dict[str, int] = {}
-    if instance.pk is not None:
+    if instance is not None:
         qs = ReservationUnitOption.objects.filter(application_section=instance).values("pk", "preferred_order")
         current_ordering = {option["pk"]: option["preferred_order"] for option in qs}
 

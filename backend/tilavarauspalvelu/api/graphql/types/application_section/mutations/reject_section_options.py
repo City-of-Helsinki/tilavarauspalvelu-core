@@ -31,5 +31,5 @@ class RejectAllSectionOptionsMutation(MutationType[ApplicationSection], kind="up
             raise GraphQLValidationError(msg, code=error_codes.CANNOT_REJECT_SECTION_OPTIONS)
 
     @classmethod
-    def __after__(cls, instance: ApplicationSection, info: GQLInfo[User], previous_data: dict[str, Any]) -> None:
+    def __after__(cls, instance: ApplicationSection, info: GQLInfo[User], input_data: dict[str, Any]) -> None:
         instance.reservation_unit_options.update(is_rejected=True)

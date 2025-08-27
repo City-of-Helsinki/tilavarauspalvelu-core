@@ -35,5 +35,5 @@ class SpaceUpdateMutation(MutationType[Space], kind="update"):
             raise GraphQLPermissionError(msg)
 
     @classmethod
-    def __after__(cls, instance: Space, info: GQLInfo, previous_data: dict[str, Any]) -> None:
+    def __after__(cls, instance: Space, info: GQLInfo, input_data: dict[str, Any]) -> None:
         Space.objects.rebuild()

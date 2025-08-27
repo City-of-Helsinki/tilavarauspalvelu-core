@@ -1,12 +1,10 @@
 import datetime
-from typing import Any
 
 from django.conf import settings
 from django.db import transaction
 from graphql import GraphQLError
 from undine import GQLInfo, Input, MutationType
 from undine.exceptions import GraphQLPermissionError, GraphQLValidationError
-from undine.utils.model_utils import get_instance_or_raise
 
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
@@ -22,7 +20,7 @@ __all__ = [
 ]
 
 
-class ReservationSeriesRescheduleMutation(MutationType[ReservationSeries]):
+class ReservationSeriesRescheduleMutation(MutationType[ReservationSeries], kind="update"):
     """Reschedule reservation series."""
 
     pk = Input(required=True)
@@ -40,11 +38,10 @@ class ReservationSeriesRescheduleMutation(MutationType[ReservationSeries]):
     @classmethod
     def __mutate__(
         cls,
-        root: Any,
+        instance: ReservationSeries,
         info: GQLInfo[User],
         input_data: ReservationSeriesRescheduleData,
     ) -> ReservationSeries:
-        instance = get_instance_or_raise(model=ReservationSeries, pk=input_data["pk"])
         reservation_unit = instance.reservation_unit
 
         user = info.context.user

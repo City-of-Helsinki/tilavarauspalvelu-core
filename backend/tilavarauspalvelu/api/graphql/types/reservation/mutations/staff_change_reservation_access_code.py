@@ -2,7 +2,6 @@ from typing import Any
 
 from undine import GQLInfo, Input, MutationType
 from undine.exceptions import GraphQLPermissionError, GraphQLValidationError
-from undine.utils.model_utils import get_instance_or_raise
 
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
@@ -17,15 +16,13 @@ __all__ = [
 ]
 
 
-class ReservationStaffChangeAccessCodeMutation(MutationType[Reservation]):
+class ReservationStaffChangeAccessCodeMutation(MutationType[Reservation], kind="update"):
     """Change the access code of a reservation."""
 
     pk = Input(required=True)
 
     @classmethod
-    def __mutate__(cls, root: Any, info: GQLInfo[User], input_data: dict[str, Any]) -> Reservation:
-        instance = get_instance_or_raise(model=Reservation, pk=input_data["pk"])
-
+    def __mutate__(cls, instance: Reservation, info: GQLInfo[User], input_data: dict[str, Any]) -> Reservation:
         user = info.context.user
         if not user.permissions.can_manage_reservation(
             instance,

@@ -1,9 +1,8 @@
 from contextlib import suppress
-from typing import Any
 
+from django.db import transaction
 from undine import GQLInfo, Input, MutationType
 from undine.exceptions import GraphQLPermissionError, GraphQLValidationError
-from undine.utils.model_utils import get_instance_or_raise
 
 from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
@@ -20,7 +19,7 @@ __all__ = [
 ]
 
 
-class ReservationDenyMutation(MutationType[Reservation]):
+class ReservationDenyMutation(MutationType[Reservation], kind="update"):
     """Deny a reservation during handling."""
 
     pk = Input(required=True)
@@ -28,9 +27,7 @@ class ReservationDenyMutation(MutationType[Reservation]):
     handling_details = Input(required=True)
 
     @classmethod
-    def __mutate__(cls, root: Any, info: GQLInfo[User], input_data: ReservationDenyData) -> Reservation:
-        instance = get_instance_or_raise(model=Reservation, pk=input_data["pk"])
-
+    def __mutate__(cls, instance: Reservation, info: GQLInfo[User], input_data: ReservationDenyData) -> Reservation:
         user = info.context.user
         if not user.permissions.can_manage_reservation(
             instance,
@@ -57,23 +54,27 @@ class ReservationDenyMutation(MutationType[Reservation]):
                 msg = "Payment order status has changed to paid. Must re-evaluate if reservation should be denied."
                 raise GraphQLValidationError(msg, code=error_codes.ORDER_STATUS_CHANGED)
 
-            # Only cancel unpaid orders. Refunds are made optionally with 'ReservationRefundMutation'.
-            if payment_order.actions.has_no_payment_through_webshop():
-                payment_order.actions.cancel_together_with_verkkokauppa(cancel_on_error=True)
+        with transaction.atomic():
+            if hasattr(instance, "payment_order"):
+                payment_order = instance.payment_order
 
-        if instance.access_type == AccessType.ACCESS_CODE:
-            try:
-                PindoraService.delete_access_code(obj=instance)
-            except PindoraNotFoundError:
-                pass
-            except ExternalServiceError as error:
-                raise GraphQLValidationError(str(error), code=error_codes.PINDORA_ERROR) from error
+                # Only cancel unpaid orders. Refunds are made optionally with 'ReservationRefundMutation'.
+                if payment_order.actions.has_no_payment_through_webshop():
+                    payment_order.actions.cancel_together_with_verkkokauppa(cancel_on_error=True)
 
-        instance.state = ReservationStateChoice.DENIED
-        instance.handled_at = local_datetime()
-        instance.handling_details = input_data["handling_details"]
-        instance.deny_reason = input_data["deny_reason"]
-        instance.save()
+            if instance.access_type == AccessType.ACCESS_CODE:
+                try:
+                    PindoraService.delete_access_code(obj=instance)
+                except PindoraNotFoundError:
+                    pass
+                except ExternalServiceError as error:
+                    raise GraphQLValidationError(str(error), code=error_codes.PINDORA_ERROR) from error
+
+            instance.state = ReservationStateChoice.DENIED
+            instance.handled_at = local_datetime()
+            instance.handling_details = input_data["handling_details"]
+            instance.deny_reason = input_data["deny_reason"]
+            instance.save()
 
         EmailService.send_reservation_denied_email(reservation=instance)
 

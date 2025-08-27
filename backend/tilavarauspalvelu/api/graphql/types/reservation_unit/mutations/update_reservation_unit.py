@@ -88,8 +88,7 @@ class ApplicationRoundTimeSlotUpdateInput(MutationType[ApplicationRoundTimeSlot]
     reservable_times = Input(list[TimeSlot])
 
 
-# TODO: Must be able to return archived reservation unit
-class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="custom"):
+class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"):
     """Update a ReservationUnit."""
 
     pk = Input(required=True)

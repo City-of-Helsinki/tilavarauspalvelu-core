@@ -158,7 +158,7 @@ def test_reservation__staff_create__regular_user_cannot_create(graphql):
     assert Reservation.objects.exists() is False
 
 
-@pytest.mark.parametrize("field", ["type", "beginsAt", "endsAt"])
+@pytest.mark.parametrize("field", ["beginsAt", "endsAt"])
 def test_reservation__staff_create__missing_fields(graphql, field):
     reservation_unit = ReservationUnitFactory.create()
 

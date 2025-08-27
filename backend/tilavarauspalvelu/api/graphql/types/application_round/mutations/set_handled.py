@@ -41,5 +41,5 @@ class SetApplicationRoundHandledMutation(MutationType[ApplicationRound], kind="u
             raise GraphQLValidationError(msg, code=error_codes.APPLICATION_ROUND_HAS_UNHANDLED_APPLICATIONS)
 
     @classmethod
-    def __after__(cls, instance: ApplicationRound, info: GQLInfo[User], previous_data: dict[str, Any]) -> None:
+    def __after__(cls, instance: ApplicationRound, info: GQLInfo[User], input_data: dict[str, Any]) -> None:
         generate_reservation_series_from_allocations_task.delay(instance.pk)

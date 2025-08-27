@@ -29,14 +29,7 @@ class ResourceCreateMutation(MutationType[Resource], kind="create"):
 
     @classmethod
     def __permissions__(cls, instance: Resource, info: GQLInfo[User], input_data: dict[str, Any]) -> None:
-        space_pk = input_data.get("space")
-        space: Space | None = None
-
-        if space_pk is not None:
-            space = Space.objects.filter(pk=space_pk).select_related("unit").first()
-            if space is None:
-                msg = f"Space with primary key {space_pk!r} does not exist."
-                raise GraphQLValidationError(msg)
+        space: Space | None = input_data.get("space")
 
         user = info.context.user
         if not user.permissions.can_manage_resources(space):

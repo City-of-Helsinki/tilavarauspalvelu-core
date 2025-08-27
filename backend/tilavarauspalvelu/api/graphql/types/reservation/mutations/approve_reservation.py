@@ -1,11 +1,9 @@
 import datetime
 from decimal import Decimal
-from typing import Any
 
 from django.conf import settings
 from undine import GQLInfo, Input, MutationType
 from undine.exceptions import GraphQLPermissionError, GraphQLValidationError
-from undine.utils.model_utils import get_instance_or_raise
 
 from tilavarauspalvelu.enums import AccessType, OrderStatus, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
@@ -22,7 +20,7 @@ __all__ = [
 ]
 
 
-class ReservationApproveMutation(MutationType[Reservation]):
+class ReservationApproveMutation(MutationType[Reservation], kind="update"):
     """Approve a reservation during handling."""
 
     pk = Input(required=True)
@@ -30,9 +28,7 @@ class ReservationApproveMutation(MutationType[Reservation]):
     handling_details = Input(required=True)
 
     @classmethod
-    def __mutate__(cls, root: Any, info: GQLInfo[User], input_data: ReservationApproveData) -> Reservation:
-        instance = get_instance_or_raise(model=Reservation, pk=input_data["pk"])
-
+    def __mutate__(cls, instance: Reservation, info: GQLInfo[User], input_data: ReservationApproveData) -> Reservation:
         user = info.context.user
         if not user.permissions.can_manage_reservation(
             instance,

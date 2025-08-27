@@ -1,10 +1,8 @@
 import datetime
 import uuid
-from typing import Any
 
 from undine import GQLInfo, Input, MutationType
 from undine.exceptions import GraphQLPermissionError, GraphQLValidationError
-from undine.utils.model_utils import get_instance_or_raise
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
@@ -20,7 +18,7 @@ __all__ = [
 ]
 
 
-class ReservationSeriesAddMutation(MutationType[ReservationSeries]):
+class ReservationSeriesAddMutation(MutationType[ReservationSeries], kind="update"):
     """Add a reservation to a reservation series."""
 
     pk = Input(required=True)
@@ -31,8 +29,12 @@ class ReservationSeriesAddMutation(MutationType[ReservationSeries]):
     buffer_time_after = Input(datetime.timedelta, required=False, input_only=False)
 
     @classmethod
-    def __mutate__(cls, root: Any, info: GQLInfo[User], input_data: ReservationSeriesAddData) -> Any:
-        instance = get_instance_or_raise(model=ReservationSeries, pk=input_data["pk"])
+    def __mutate__(
+        cls,
+        instance: ReservationSeries,
+        info: GQLInfo[User],
+        input_data: ReservationSeriesAddData,
+    ) -> ReservationSeries:
         reservation_unit = instance.reservation_unit
 
         user = info.context.user
