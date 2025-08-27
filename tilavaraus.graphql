@@ -2009,7 +2009,7 @@ input ApplicationCreateMutation {
   additionalInformation: String! = ""
   applicantType: ReserveeType = null
   applicationRound: Int!
-  applicationSections: [ApplicationSectionInput!]
+  applicationSections: [ApplicationSectionCreateInput!]! = []
   billingCity: String! = ""
   billingPostCode: String! = ""
   billingStreetAddress: String! = ""
@@ -2069,6 +2069,20 @@ input ApplicationRoundTimeSlotUpdateInput {
   weekday: Weekday
 }
 
+input ApplicationSectionCreateInput {
+  ageGroup: Int
+  appliedReservationsPerWeek: Int!
+  name: String!
+  numPersons: Int!
+  purpose: Int
+  reservationMaxDuration: Duration!
+  reservationMinDuration: Duration!
+  reservationUnitOptions: [ReservationUnitOptionCreateInput!]! = []
+  reservationsBeginDate: Date!
+  reservationsEndDate: Date!
+  suitableTimeRanges: [SuitableTimeRangeCreateInput!]! = []
+}
+
 input ApplicationSectionFilterSet {
   ageGroup: [Int!]
   applicantType: [ReserveeType!]
@@ -2095,21 +2109,6 @@ input ApplicationSectionFilterSet {
   XOR: ApplicationSectionFilterSet
 }
 
-input ApplicationSectionInput {
-  ageGroup: Int
-  appliedReservationsPerWeek: Int
-  name: String
-  numPersons: Int
-  pk: Int
-  purpose: Int
-  reservationMaxDuration: Duration
-  reservationMinDuration: Duration
-  reservationUnitOptions: [ReservationUnitOptionInput!]
-  reservationsBeginDate: Date
-  reservationsEndDate: Date
-  suitableTimeRanges: [SuitableTimeRangeInput!]
-}
-
 """
 Cancel all reservations in the given application section that can be cancelled.
 """
@@ -2119,6 +2118,21 @@ input ApplicationSectionReservationCancellationMutation {
   pk: Int!
 }
 
+input ApplicationSectionUpdateInput {
+  ageGroup: Int
+  appliedReservationsPerWeek: Int
+  name: String
+  numPersons: Int
+  pk: Int
+  purpose: Int
+  reservationMaxDuration: Duration
+  reservationMinDuration: Duration
+  reservationUnitOptions: [ReservationUnitOptionUpdateInput!]
+  reservationsBeginDate: Date
+  reservationsEndDate: Date
+  suitableTimeRanges: [SuitableTimeRangeUpdateInput!]
+}
+
 input ApplicationSendMutation {
   pk: Int!
 }
@@ -2126,7 +2140,7 @@ input ApplicationSendMutation {
 input ApplicationUpdateMutation {
   additionalInformation: String
   applicantType: ReserveeType
-  applicationSections: [ApplicationSectionInput!]
+  applicationSections: [ApplicationSectionUpdateInput!]
   billingCity: String
   billingPostCode: String
   billingStreetAddress: String
@@ -2387,7 +2401,7 @@ input ReservationSeriesChangeAccessCodeMutation {
 
 """Create the reservation series with all its reservations."""
 input ReservationSeriesCreateMutation {
-  ageGroup: Int
+  ageGroup: Int = null
   beginDate: Date!
   beginTime: Time!
   checkOpeningHours: Boolean! = false
@@ -2505,30 +2519,30 @@ input ReservationStaffChangeAccessCodeMutation {
 
 """Create a reservation as a staff user."""
 input ReservationStaffCreateMutation {
-  ageGroup: Int
+  ageGroup: Int = null
   applyingForFreeOfCharge: Boolean! = false
   beginsAt: DateTime!
-  bufferTimeAfter: Duration
-  bufferTimeBefore: Duration
+  bufferTimeAfter: Duration! = 0
+  bufferTimeBefore: Duration! = 0
   description: String! = ""
   endsAt: DateTime!
-  freeOfChargeReason: String
-  municipality: MunicipalityChoice
+  freeOfChargeReason: String = null
+  municipality: MunicipalityChoice = null
   name: String! = ""
-  numPersons: Int
-  purpose: Int
+  numPersons: Int = null
+  purpose: Int = null
   reservationUnit: Int!
   reserveeAddressCity: String! = ""
   reserveeAddressStreet: String! = ""
   reserveeAddressZip: String! = ""
-  reserveeEmail: Email
+  reserveeEmail: Email = null
   reserveeFirstName: String! = ""
   reserveeIdentifier: String! = ""
   reserveeLastName: String! = ""
   reserveeOrganisationName: String! = ""
   reserveePhone: String! = ""
-  reserveeType: ReserveeType
-  type: ReservationTypeChoice!
+  reserveeType: ReserveeType = null
+  type: ReservationTypeChoice! = STAFF
   workingMemo: String! = ""
 }
 
@@ -2620,11 +2634,11 @@ input ReservationUnitCreateMutation {
   allowReservationsWithoutOpeningHours: Boolean! = false
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotCreateInput!]
   authentication: AuthenticationType! = weak
-  bufferTimeAfter: Duration
-  bufferTimeBefore: Duration
+  bufferTimeAfter: Duration! = 0
+  bufferTimeBefore: Duration! = 0
   canApplyFreeOfCharge: Boolean! = false
-  cancellationRule: Int
-  cancellationTerms: String
+  cancellationRule: Int = null
+  cancellationTerms: String = null
   contactInformation: String! = ""
   descriptionEn: String
   descriptionFi: String
@@ -2632,27 +2646,27 @@ input ReservationUnitCreateMutation {
   equipments: [Int!]
   images: [ReservationUnitImageCreateInput!]
   isDraft: Boolean! = false
-  maxPersons: Int
-  maxReservationDuration: Duration
-  maxReservationsPerUser: Int
-  metadataSet: Int
-  minPersons: Int
-  minReservationDuration: Duration
+  maxPersons: Int = null
+  maxReservationDuration: Duration = null
+  maxReservationsPerUser: Int = null
+  metadataSet: Int = null
+  minPersons: Int = null
+  minReservationDuration: Duration = null
   nameEn: String
   nameFi: String!
   nameSv: String
   notesWhenApplyingEn: String
   notesWhenApplyingFi: String
   notesWhenApplyingSv: String
-  paymentTerms: String
-  pricingTerms: String
+  paymentTerms: String = null
+  pricingTerms: String = null
   pricings: [ReservationUnitPricingCreateInput!]
-  publishBeginsAt: DateTime
-  publishEndsAt: DateTime
+  publishBeginsAt: DateTime = null
+  publishEndsAt: DateTime = null
   purposes: [Int!]
   requireAdultReservee: Boolean! = false
   requireReservationHandling: Boolean! = false
-  reservationBeginsAt: DateTime
+  reservationBeginsAt: DateTime = null
   reservationBlockWholeDay: Boolean! = false
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsFi: String
@@ -2660,21 +2674,21 @@ input ReservationUnitCreateMutation {
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsSv: String
-  reservationEndsAt: DateTime
+  reservationEndsAt: DateTime = null
   reservationForm: ReservationFormType! = CONTACT_INFO_FORM
   reservationKind: ReservationKind! = DIRECT_AND_SEASON
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsSv: String
   reservationStartInterval: ReservationStartInterval! = interval_15_mins
-  reservationUnitType: Int
-  reservationsMaxDaysBefore: Int
-  reservationsMinDaysBefore: Int
+  reservationUnitType: Int = null
+  reservationsMaxDaysBefore: Int = null
+  reservationsMinDaysBefore: Int = null
   resources: [Int!]
   searchTerms: [String!]! = []
-  serviceSpecificTerms: String
+  serviceSpecificTerms: String = null
   spaces: [Int!]
-  surfaceArea: Int
+  surfaceArea: Int = null
   unit: Int!
 }
 
@@ -2771,6 +2785,11 @@ input ReservationUnitImageUpdateMutation {
   pk: Int!
 }
 
+input ReservationUnitOptionCreateInput {
+  preferredOrder: Int!
+  reservationUnit: Int!
+}
+
 input ReservationUnitOptionFilterSet {
   pk: [Int!]
   preferredOrder: [Int!]
@@ -2781,7 +2800,7 @@ input ReservationUnitOptionFilterSet {
   XOR: ReservationUnitOptionFilterSet
 }
 
-input ReservationUnitOptionInput {
+input ReservationUnitOptionUpdateInput {
   pk: Int
   preferredOrder: Int
   reservationUnit: Int
@@ -3026,6 +3045,13 @@ input SpaceUpdateMutation {
   surfaceArea: Int
 }
 
+input SuitableTimeRangeCreateInput {
+  beginTime: Time!
+  dayOfTheWeek: Weekday!
+  endTime: Time!
+  priority: Priority!
+}
+
 input SuitableTimeRangeFilterSet {
   fulfilled: Boolean
   pk: [Int!]
@@ -3036,7 +3062,7 @@ input SuitableTimeRangeFilterSet {
   XOR: SuitableTimeRangeFilterSet
 }
 
-input SuitableTimeRangeInput {
+input SuitableTimeRangeUpdateInput {
   beginTime: Time
   dayOfTheWeek: Weekday
   endTime: Time
@@ -3067,40 +3093,6 @@ input TimeSlotInput {
   end: Time!
 }
 
-"""
-Note: If you need to use multiples of the following filters in the same query,
-you'll likely want to combine them using an `AND` block.
-
-- `ownReservations`
-- `publishedReservationUnits`
-- `onlyDirectBookable`
-- `onlySeasonalBookable`
-
-These filters use information across the relationship between a Unit and its ReservationUnits.
-Due to how Django works when "spanning multi-valued relationships" in `queryset.filter(...)` calls
-(see https://docs.djangoproject.com/en/stable/topics/db/queries/#spanning-multi-valued-relationships),
-the results are changed depending on if an `AND` block is used or not.
-
-```graphql
-filter: {
-  publishedReservationUnits: true
-  onlyDirectBookable: true
-}
-```
-
-Returns all Units where ANY of their ReservationUnit are EITHER published OR directly bookable.
-
-```graphql
-filter: {
-  AND: {
-    publishedReservationUnits: true
-    onlyDirectBookable: true
-  }
-}
-```
-
-Returns all Units where ANY of their ReservationUnits are BOTH published AND directly bookable.
-"""
 input UnitFilterSet {
   nameEnContains: String
   nameEnExact: String
@@ -3306,7 +3298,7 @@ type Query {
   """
   Get information about a user from Helsinki profile.
   If user is not a profile user, still return data stored in our database, e.g. first and last name.
-  
+
   Use only one of 'reservationPk' or 'applicationPk' to select the user.
   This determines the required permissions to view the user's data.
   If neither is given, the user is the currently logged in user.
@@ -3358,7 +3350,7 @@ type Query {
     offset: Int
     """
     Filter reservation units by their reservability.
-    
+
     If 'showOnlyReservable' is True, then only reservation units,
     which are reservable with the given filters are returned.
     Otherwise, all reservation units are returned.

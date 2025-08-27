@@ -16,7 +16,7 @@ __all__ = [
 ]
 
 
-class ReservationDeleteTentativeMutation(MutationType[Reservation]):
+class ReservationDeleteTentativeMutation(MutationType[Reservation], kind="delete"):
     """Delete a reservation before it's confirmed."""
 
     pk = Input(required=True)

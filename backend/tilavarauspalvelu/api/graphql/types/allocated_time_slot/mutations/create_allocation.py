@@ -22,7 +22,7 @@ __all__ = [
 class AllocatedTimeSlotCreateMutation(MutationType[AllocatedTimeSlot], kind="create"):
     """Create an allocated time slot for a reservation unit option."""
 
-    reservation_unit_option = Input(required=True)
+    reservation_unit_option = Input(ReservationUnitOption, required=True)
 
     day_of_the_week = Input()
     begin_time = Input()
@@ -37,14 +37,9 @@ class AllocatedTimeSlotCreateMutation(MutationType[AllocatedTimeSlot], kind="cre
         info: GQLInfo[User],
         input_data: AllocatedTimeSlotCreateData,
     ) -> None:
-        option_pk = input_data["reservation_unit_option"]
-
-        option = ReservationUnitOption.objects.select_related("reservation_unit__unit").filter(pk=option_pk).first()
-        if option is None:
-            msg = f"Reservation Unit Option with pk {option_pk} does not exist."
-            raise GraphQLPermissionError(msg)
-
         user = info.context.user
+
+        option = input_data["reservation_unit_option"]
         unit = option.reservation_unit.unit
 
         if user.permissions.can_manage_applications_for_units([unit]):
@@ -62,12 +57,7 @@ class AllocatedTimeSlotCreateMutation(MutationType[AllocatedTimeSlot], kind="cre
     ) -> None:
         force = input_data["force"]
 
-        option = (
-            ReservationUnitOption.objects.select_related("application_section")
-            .filter(pk=input_data["reservation_unit_option"])
-            .first()
-        )
-
+        option = input_data["reservation_unit_option"]
         section = option.application_section
 
         cls.validate_statuses(section=section)

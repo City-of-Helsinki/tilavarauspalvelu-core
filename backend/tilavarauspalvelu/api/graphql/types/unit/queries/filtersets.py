@@ -13,41 +13,6 @@ __all__ = [
 
 
 class UnitFilterSet(FilterSet[Unit]):
-    """
-    Note: If you need to use multiples of the following filters in the same query,
-    you'll likely want to combine them using an `AND` block.
-
-    - `ownReservations`
-    - `publishedReservationUnits`
-    - `onlyDirectBookable`
-    - `onlySeasonalBookable`
-
-    These filters use information across the relationship between a Unit and its ReservationUnits.
-    Due to how Django works when "spanning multi-valued relationships" in `queryset.filter(...)` calls
-    (see https://docs.djangoproject.com/en/stable/topics/db/queries/#spanning-multi-valued-relationships),
-    the results are changed depending on if an `AND` block is used or not.
-
-    ```graphql
-    filter: {
-      publishedReservationUnits: true
-      onlyDirectBookable: true
-    }
-    ```
-
-    Returns all Units where ANY of their ReservationUnit are EITHER published OR directly bookable.
-
-    ```graphql
-    filter: {
-      AND: {
-        publishedReservationUnits: true
-        onlyDirectBookable: true
-      }
-    }
-    ```
-
-    Returns all Units where ANY of their ReservationUnits are BOTH published AND directly bookable.
-    """
-
     pk = Filter(lookup="in")
     unit_group = Filter("unit_groups", lookup="in")
 

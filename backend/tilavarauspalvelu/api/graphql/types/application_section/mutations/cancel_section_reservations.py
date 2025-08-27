@@ -17,22 +17,20 @@ class ApplicationSectionReservationCancellationMutationOutput(TypedDict):
     cancelled: int
 
 
-class ApplicationSectionReservationCancellationMutation(MutationType[ApplicationSection]):
+class ApplicationSectionReservationCancellationMutation(MutationType[ApplicationSection], kind="update"):
     """Cancel all reservations in the given application section that can be cancelled."""
 
     pk = Input(required=True)
-    cancel_reason = Input(ReservationCancelReasonChoice, input_only=False)
+    cancel_reason = Input(ReservationCancelReasonChoice, required=True, input_only=False)
     cancel_details = Input(str, input_only=False, default_value="")
 
     @classmethod
     def __mutate__(
         cls,
-        root: Any,
+        instance: ApplicationSection,
         info: GQLInfo[User],
         input_data: dict[str, Any],
     ) -> ApplicationSectionReservationCancellationMutationOutput:
-        instance = ApplicationSection.objects.get(pk=input_data["pk"])
-
         user = info.context.user
         if user != instance.application.user:
             msg = "No permission to manage this application."

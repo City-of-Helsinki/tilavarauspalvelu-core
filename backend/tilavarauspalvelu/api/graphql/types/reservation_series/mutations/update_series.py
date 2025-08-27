@@ -1,10 +1,7 @@
-from typing import Any
-
 from django.conf import settings
 from django.db import transaction
 from undine import GQLInfo, Input, MutationType
 from undine.exceptions import GraphQLPermissionError
-from undine.utils.model_utils import get_instance_or_raise
 
 from tilavarauspalvelu.models import AgeGroup, Reservation, ReservationPurpose, ReservationSeries, User
 from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
@@ -44,7 +41,7 @@ class ReservationSeriesReservationUpdateInput(MutationType[Reservation], kind="r
     age_group = Input(AgeGroup, required=False)
 
 
-class ReservationSeriesUpdateMutation(MutationType[ReservationSeries]):
+class ReservationSeriesUpdateMutation(MutationType[ReservationSeries], kind="update"):
     """Update reservation series and its reservation data."""
 
     pk = Input(required=True)
@@ -58,8 +55,12 @@ class ReservationSeriesUpdateMutation(MutationType[ReservationSeries]):
     skip_reservations = Input(list[int], default_value=[], input_only=False)
 
     @classmethod
-    def __mutate__(cls, root: Any, info: GQLInfo[User], input_data: ReservationSeriesUpdateData) -> ReservationSeries:
-        instance = get_instance_or_raise(model=ReservationSeries, pk=input_data["pk"])
+    def __mutate__(
+        cls,
+        instance: ReservationSeries,
+        info: GQLInfo[User],
+        input_data: ReservationSeriesUpdateData,
+    ) -> ReservationSeries:
         reservation_unit = instance.reservation_unit
 
         user = info.context.user
