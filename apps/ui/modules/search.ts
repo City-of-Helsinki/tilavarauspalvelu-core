@@ -17,10 +17,10 @@ import {
   type OptionsQuery,
   type OptionsQueryVariables,
   PurposeOrderSet,
-  type QueryReservationUnitsArgs,
   ReservationKind,
   ReservationUnitOrderSet,
   ReservationUnitTypeOrderSet,
+  SearchReservationUnitsQueryVariables,
   UnitOrderSet,
 } from "@gql/gql-types";
 import { convertLanguageCode, getTranslationSafe, toApiDate } from "common/src/common/util";
@@ -115,7 +115,9 @@ export function processVariables({
   language,
   kind,
   ...rest
-}: ProcessVariablesParams): QueryReservationUnitsArgs {
+}: ProcessVariablesParams): SearchReservationUnitsQueryVariables {
+  // Convert URLSearchParams to GQL variables
+
   const sortCriteria = values.getAll("sort");
   const desc = values.getAll("order").includes("desc");
   const orderBy = transformSortString(ignoreMaybeArray(sortCriteria), language, desc);
@@ -123,58 +125,59 @@ export function processVariables({
   const isSeasonal = kind === ReservationKind.Season;
   const today = startOfDay(new Date());
 
-  const accessType = filterNonNullable(values.getAll("accessTypes").map(transformAccessTypeSafe));
-
+  const applicationRound = "applicationRound" in rest ? filterEmpty(rest.applicationRound) : undefined;
+  const accessTypes = filterNonNullable(values.getAll("accessTypes").map(transformAccessTypeSafe));
   const textSearch = filterEmpty(values.get("textSearch"));
   const personsAllowed = filterEmpty(toNumber(values.get("personsAllowed")));
+
   const purposes = filterEmptyArray(mapParamToInteger(values.getAll("purposes"), 1));
   const unit = filterEmptyArray(mapParamToInteger(values.getAll("units"), 1));
   const reservationUnitTypes = filterEmptyArray(mapParamToInteger(values.getAll("reservationUnitTypes"), 1));
   const equipments = filterEmptyArray(mapParamToInteger(values.getAll("equipments"), 1));
 
-  const applicationRound = "applicationRound" in rest ? filterEmpty(rest.applicationRound) : undefined;
-  const reservationPeriodBeginDate = "reservationPeriodBeginDate" in rest ? rest.reservationPeriodBeginDate : undefined;
-  const reservationPeriodEndDate = "reservationPeriodEndDate" in rest ? rest.reservationPeriodEndDate : undefined;
-
   const startDate = fromUIDate(ignoreMaybeArray(values.getAll("startDate")) ?? "");
   const endDate = fromUIDate(ignoreMaybeArray(values.getAll("endDate")) ?? "");
-  const reservableDateStart = startDate && startDate >= today ? toApiDate(startDate) : undefined;
-  const reservableDateEnd = endDate && endDate >= today ? toApiDate(endDate) : undefined;
+  const reservableDateStartCleaned = startDate && startDate >= today ? toApiDate(startDate) : undefined;
+  const reservableDateEndCleaned = endDate && endDate >= today ? toApiDate(endDate) : undefined;
+  const reservationPeriodBeginDate = "reservationPeriodBeginDate" in rest ? rest.reservationPeriodBeginDate : undefined;
+  const reservationPeriodEndDate = "reservationPeriodEndDate" in rest ? rest.reservationPeriodEndDate : undefined;
 
   const timeEnd = filterEmpty(ignoreMaybeArray(values.getAll("timeEnd")));
   const timeBegin = filterEmpty(ignoreMaybeArray(values.getAll("timeBegin")));
   const duration = filterEmpty(toNumber(ignoreMaybeArray(values.getAll("duration"))));
   const showOnlyReservable = ignoreMaybeArray(values.getAll("showOnlyReservable")) !== "false";
 
+  // reservableDateStart is used to find effectiveAccessType in /recurring/[id] page
+  const reservableDateStart = filterEmpty(isSeasonal ? reservationPeriodBeginDate : reservableDateStartCleaned);
+  const reservableDateEnd = filterEmpty(isSeasonal ? reservationPeriodEndDate : reservableDateEndCleaned);
+
   return {
     first: SEARCH_PAGING_LIMIT,
     orderBy,
-    filter: {
-      accessType: {
-        accessTypes: accessType,
-        accessTypeBeginDate: filterEmpty(isSeasonal ? reservationPeriodBeginDate : reservableDateStart),
-        accessTypeEndDate: filterEmpty(isSeasonal ? reservationPeriodEndDate : reservableDateEnd),
-      },
-      applicationRound: isSeasonal && applicationRound ? [applicationRound] : undefined,
-      equipments,
-      isDraft: false,
-      isVisible: true,
-      personsAllowed,
-      purposes,
-      reservationKind: kind,
-      reservationUnitType: reservationUnitTypes,
-      textSearch: textSearch,
-      unit,
-    },
-    firstReservableTime: {
-      // reservableDateStart is used to find effectiveAccessType in /recurring/[id] page
-      reservableDateStart: filterEmpty(isSeasonal ? reservationPeriodBeginDate : reservableDateStart),
-      reservableDateEnd: filterEmpty(isSeasonal ? reservationPeriodEndDate : reservableDateEnd),
-      reservableTimeStart: timeBegin,
-      reservableTimeEnd: timeEnd,
-      reservableMinimumDurationMinutes: duration,
-      showOnlyReservable: !isSeasonal && showOnlyReservable,
-    },
+    accessType:
+      accessTypes.length > 0
+        ? {
+            accessTypes,
+            accessTypeBeginDate: reservableDateStart,
+            accessTypeEndDate: reservableDateEnd,
+          }
+        : undefined,
+    applicationRound: isSeasonal && applicationRound ? [applicationRound] : undefined,
+    equipments,
+    isDraft: false,
+    isVisible: true,
+    personsAllowed,
+    purposes,
+    reservationKind: kind,
+    reservationUnitType: reservationUnitTypes,
+    textSearch: textSearch,
+    unit,
+    reservableDateEnd,
+    reservableDateStart,
+    reservableTimeStart: timeBegin,
+    reservableTimeEnd: timeEnd,
+    reservableMinimumDurationMinutes: duration,
+    showOnlyReservable: !isSeasonal && showOnlyReservable,
   };
 }
 
