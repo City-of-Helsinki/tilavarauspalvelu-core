@@ -157,8 +157,6 @@ export function processVariables({
     accessTypes,
     applicationRound: isSeasonal && applicationRound ? [applicationRound] : undefined,
     equipments,
-    isDraft: false,
-    isVisible: true,
     personsAllowed,
     purposes,
     reservationKind: kind,
