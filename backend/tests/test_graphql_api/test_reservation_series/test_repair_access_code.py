@@ -55,7 +55,7 @@ def test_repair_reservation_series_access_code(graphql):
 
 
 @patch_method(PindoraService.sync_access_code)
-@patch_method(EmailService.send_seasonal_booking_access_code_added_email)
+@patch_method(EmailService.send_seasonal_booking_access_type_changed_email)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_repair_reservation_series_access_code__in_seasonal_booking(graphql):
     user = UserFactory.create()
@@ -92,8 +92,8 @@ def test_repair_reservation_series_access_code__in_seasonal_booking(graphql):
     assert PindoraService.sync_access_code.call_count == 1
 
     # Since connected to seasonal booking, email should be sent.
-    assert EmailService.send_seasonal_booking_access_code_added_email.call_count == 1
-    assert EmailService.send_seasonal_booking_access_code_added_email.call_args.args[0] == section
+    assert EmailService.send_seasonal_booking_access_type_changed_email.call_count == 1
+    assert EmailService.send_seasonal_booking_access_type_changed_email.call_args.args[0] == section
 
 
 @patch_method(PindoraService.sync_access_code)

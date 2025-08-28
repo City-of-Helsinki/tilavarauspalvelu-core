@@ -123,6 +123,7 @@ def test_create_missing_access_codes__reservation__already_generated():
 def test_create_missing_access_codes__reservation__get_if_exists():
     reservation = ReservationFactory.create(
         reservation_unit__ext_uuid=uuid.uuid4(),
+        reservation_unit__access_types__access_type=AccessType.ACCESS_CODE,
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
         ends_at=local_datetime(2024, 1, 1, 13),

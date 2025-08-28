@@ -458,7 +458,7 @@ class PindoraService:
                 # User needs to be informed that their reservation now has an access code,
                 # since we previously thought there was no access code.
                 if reservation.access_code_should_be_active:
-                    EmailService.send_reservation_access_code_added_email(reservation=reservation)
+                    EmailService.send_reservation_access_type_changed_email(reservation=reservation)
 
             except ExternalServiceError as error:
                 SentryLogger.log_exception(error, details=f"Reservation: {reservation.pk}")
@@ -469,8 +469,8 @@ class PindoraService:
         Create access codes for reservation series that are missing them.
         Do not include series in seasonal bookings.
         """
-        all_series: Iterable[ReservationSeries] = ReservationSeries.objects.requiring_access_code().filter(
-            allocated_time_slot__isnull=True
+        all_series: Iterable[ReservationSeries] = (
+            ReservationSeries.objects.all().requiring_access_code().filter(allocated_time_slot__isnull=True)
         )
 
         for series in all_series:
@@ -518,15 +518,15 @@ class PindoraService:
                     # User needs to be informed that their seasonal booking now has an access code,
                     # since we previously thought there was no access code.
                     if is_active:
-                        EmailService.send_seasonal_booking_access_code_added_email(section)
+                        EmailService.send_seasonal_booking_access_type_changed_email(section)
 
             except ExternalServiceError as error:
                 SentryLogger.log_exception(error, details=f"Application section: {section.pk}")
 
     @classmethod
     def _update_access_code_is_active_for_reservations(cls) -> None:
-        reservations: Iterable[Reservation] = Reservation.objects.has_incorrect_access_code_is_active().filter(
-            reservation_series__isnull=True,
+        reservations: Iterable[Reservation] = (
+            Reservation.objects.all().has_incorrect_access_code_is_active().filter(reservation_series__isnull=True)
         )
 
         for reservation in reservations:
@@ -537,7 +537,7 @@ class PindoraService:
 
                         # User needs to be informed that their reservation now has an access code,
                         # since inactive access codes are not shown to users.
-                        EmailService.send_reservation_access_code_added_email(reservation=reservation)
+                        EmailService.send_reservation_access_type_changed_email(reservation=reservation)
 
                     else:
                         cls.deactivate_access_code(obj=reservation)
@@ -588,7 +588,7 @@ class PindoraService:
 
                         # User needs to be informed that their seasonal booking now has an access code,
                         # since inactive access codes are not shown to users.
-                        EmailService.send_seasonal_booking_access_code_added_email(section)
+                        EmailService.send_seasonal_booking_access_type_changed_email(section)
 
                     else:
                         cls.deactivate_access_code(obj=section)

@@ -9,7 +9,12 @@ from django.conf import settings
 from django.db import models
 from lookup_property import L
 
-from tilavarauspalvelu.enums import AccessType, ApplicationRoundStatusChoice, ReservationStartInterval
+from tilavarauspalvelu.enums import (
+    AccessType,
+    ApplicationRoundStatusChoice,
+    ReservationStartInterval,
+    ReservationTypeChoice,
+)
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiTranslatedField
@@ -22,7 +27,10 @@ from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
 )
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import OriginHaukiResource, PaymentProduct, Reservation, ReservationUnit
-from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting_task
+from tilavarauspalvelu.tasks import (
+    notify_reservation_on_access_type_change_task,
+    refresh_reservation_unit_accounting_task,
+)
 from utils.date_utils import (
     DEFAULT_TIMEZONE,
     local_date,
@@ -234,7 +242,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         reservation: Reservation | None = None,
         exclude_blocked: bool = False,
     ) -> Reservation | None:
-        from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
+        from tilavarauspalvelu.enums import ReservationStateChoice
         from tilavarauspalvelu.models import Reservation
 
         qs = Reservation.objects.filter(
@@ -257,7 +265,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         reservation: Reservation | None = None,
         exclude_blocked: bool = False,
     ) -> Reservation | None:
-        from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
+        from tilavarauspalvelu.enums import ReservationStateChoice
         from tilavarauspalvelu.models import Reservation
 
         qs = Reservation.objects.filter(
@@ -509,14 +517,26 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         ]
 
         # Update all future or ongoing reservations in the reservation unit to their current access types
-        Reservation.objects.filter(reservation_unit=self.reservation_unit, ends_at__gt=now).update(
-            access_type=models.Case(
-                *whens,
-                # Use the active access type as the default (even though we should never reach this)
-                default=models.Value(access_types[-1].access_type),
-                output_field=models.CharField(),
+        qs = (
+            Reservation.objects.filter(reservation_unit=self.reservation_unit, ends_at__gt=now)
+            .annotate(
+                new_access_type=models.Case(
+                    *whens,
+                    # Use the active access type as the default (even though we should never reach this)
+                    default=models.Value(access_types[-1].access_type),
+                    output_field=models.CharField(),
+                ),
             )
+            # Only update reservations that have changed their access type
+            .exclude(access_type=models.F("new_access_type"))
         )
+
+        updated_reservations = list(qs.order_by("pk").values_list("pk", flat=True))
+
+        qs.update(access_type=models.F("new_access_type"))
+
+        # Send emails to reservations that have changed their access type
+        notify_reservation_on_access_type_change_task.delay(reservation_pks=updated_reservations)
 
     def refresh_reservation_unit_product_mapping(self) -> None:
         payment_merchant = self.get_merchant()

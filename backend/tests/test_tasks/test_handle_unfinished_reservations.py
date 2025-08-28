@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from contextlib import contextmanager
+from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
@@ -24,6 +25,10 @@ from utils.date_utils import local_datetime
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
 from tests.helpers import patch_method
 
+if TYPE_CHECKING:
+    from collections.abc import Generator
+    from unittest.mock import NonCallableMock
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -31,7 +36,7 @@ pytestmark = [
 
 
 @contextmanager
-def mock_delete_pindora_reservation_task():
+def mock_delete_pindora_reservation_task() -> Generator[NonCallableMock]:
     path = "tilavarauspalvelu.models.reservation.queryset."
     path += delete_pindora_reservation_task.__name__
     path += ".delay"
