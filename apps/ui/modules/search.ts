@@ -154,14 +154,7 @@ export function processVariables({
   return {
     first: SEARCH_PAGING_LIMIT,
     orderBy,
-    accessType:
-      accessTypes.length > 0
-        ? {
-            accessTypes,
-            accessTypeBeginDate: reservableDateStart,
-            accessTypeEndDate: reservableDateEnd,
-          }
-        : undefined,
+    accessTypes,
     applicationRound: isSeasonal && applicationRound ? [applicationRound] : undefined,
     equipments,
     isDraft: false,
