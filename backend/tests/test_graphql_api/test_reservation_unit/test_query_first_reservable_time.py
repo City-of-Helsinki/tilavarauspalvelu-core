@@ -2684,7 +2684,7 @@ def test__reservation_unit__first_reservable_time__previous_page_cached(graphql,
         }
     """
 
-    response_2 = graphql(query_2)
+    response_2 = graphql(query_2, count_queries=True)
     assert response_2.has_errors is False, response_2
 
     assert len(response_2.edges) == 1
@@ -2756,7 +2756,7 @@ def test__reservation_unit__first_reservable_time__previous_page_not_cached(grap
         }
     """
 
-    response = graphql(query)
+    response = graphql(query, count_queries=True)
     assert response.has_errors is False, response
 
     assert len(response.edges) == 1
@@ -2856,7 +2856,7 @@ def test__reservation_unit__first_reservable_time__different_filters_dont_share_
         }
     """
 
-    response_2 = graphql(query_2)
+    response_2 = graphql(query_2, count_queries=True)
     assert response_2.has_errors is False, response_2
 
     assert len(response_2.edges) == 1
@@ -2937,7 +2937,7 @@ def test__reservation_unit__first_reservable_time__use_cached_results(graphql, r
     cached_value: dict[str, dict[str, Any]] = json.loads(cache.get(cache_key_1))
     assert len(cached_value) == 1
 
-    response_2 = graphql(query)
+    response_2 = graphql(query, count_queries=True)
     assert response_2.has_errors is False, response_2
 
     assert len(response_2.edges) == 1
@@ -3029,7 +3029,7 @@ def test__reservation_unit__first_reservable_time__use_cached_results__not_first
     assert frt(response_2) == dt(hour=10)
     assert is_closed(response_2) is False
 
-    response_3 = graphql(query_2)
+    response_3 = graphql(query_2, count_queries=True)
     assert response_3.has_errors is False, response_3
 
     assert len(response_3.edges) == 1
@@ -3133,7 +3133,7 @@ def test__reservation_unit__first_reservable_time__cached_results_not_valid_anym
     """
 
     # Query the second page
-    response = graphql(query)
+    response = graphql(query, count_queries=True)
     assert response.has_errors is False, response
 
     assert len(response.edges) == 1
