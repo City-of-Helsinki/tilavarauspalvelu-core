@@ -28,11 +28,7 @@ export function createApolloClient(hostUrl: string, ctx?: GetServerSidePropsCont
     ssrMode: isServer,
     link: from([errorLink, httpLink]),
     defaultOptions: {
-      watchQuery: {
-        errorPolicy: "ignore",
-      },
       query: {
-        errorPolicy: "ignore",
         fetchPolicy: isBrowser ? "cache-first" : "no-cache",
       },
     },

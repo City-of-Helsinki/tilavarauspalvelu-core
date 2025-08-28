@@ -37,11 +37,7 @@ export function createClient(hostUrl: string, req?: IncomingMessage): ApolloClie
     ssrMode: isServer,
     link: isServer ? from([errorLink, httpLink]) : from([errorLink, uploadLink]),
     defaultOptions: {
-      watchQuery: {
-        errorPolicy: "ignore",
-      },
       query: {
-        errorPolicy: "ignore",
         fetchPolicy: isBrowser ? "cache-first" : "no-cache",
       },
     },
