@@ -38,7 +38,7 @@ redis = { version = "5.3.0", extras = ["hiredis"] }
 sentry-sdk = "2.32.0"
 social-auth-app-django = "5.5.1"
 stamina = "25.1.0"
-undine = "0.0.33"
+undine = "0.0.34"
 # Skip installation on Windows as uWSGI does not support it without Cygwin.
 uWSGI = { version = "2.0.30", markers = "sys_platform != 'win32'" }
 whitenoise = "6.9.0"
