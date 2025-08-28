@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import { H1, HR } from "common/styled";
 import { Filters, ReservationsDataLoader } from "@lib/reservations";
 import { ReservationStateChoice } from "@gql/gql-types";
-import { toUIDate } from "common/src/common/util";
+import { toUIDate } from "common/src/date-utils";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -25,7 +25,7 @@ export default function RequestedListingPage(_props: PageProps) {
   useEffect(() => {
     if (params.size === 0) {
       const p = new URLSearchParams(params);
-      p.set("dateGte", toUIDate(today));
+      p.set("dateGte", toUIDate({ date: today }));
       for (const state of defaultStates) {
         p.append("state", state);
       }
@@ -37,7 +37,7 @@ export default function RequestedListingPage(_props: PageProps) {
   const defaultFilters = [
     {
       key: "dateGte",
-      value: toUIDate(today),
+      value: toUIDate({ date: today }),
     },
     {
       key: "state",

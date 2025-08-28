@@ -26,7 +26,8 @@ import { ReservationFormSchema, type ReservationFormType, type ReservationFormMe
 import { CenterSpinner, Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useCheckCollisions } from "@/hooks";
-import { constructDateTimeSafe, dateTime, getBufferTime, getNormalizedInterval } from "@/helpers";
+import { getBufferTime, getNormalizedInterval } from "@/helpers";
+import { dateTimeToISOString, fromUIDateTimeUnsafe } from "common/src/date-utils";
 import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
@@ -140,8 +141,8 @@ export function CreateReservationModal({
         ...rest,
         reservationUnit: reservationUnit.pk,
         type,
-        beginsAt: dateTime(date, startTime),
-        endsAt: dateTime(date, endTime),
+        beginsAt: dateTimeToISOString({ date, time: startTime }) || new Date().toISOString(),
+        endsAt: dateTimeToISOString({ date, time: endTime }) || new Date().toISOString(),
         bufferTimeBefore: bufferBefore,
         bufferTimeAfter: bufferAfter,
         workingMemo: comments,
@@ -283,8 +284,8 @@ function useCheckFormCollisions({
   const bufferBeforeSeconds = getBufferTime(reservationUnit.bufferTimeBefore, type, enableBufferTimeBefore);
   const bufferAfterSeconds = getBufferTime(reservationUnit.bufferTimeAfter, type, enableBufferTimeAfter);
 
-  const start = constructDateTimeSafe(formDate, formStartTime);
-  const end = constructDateTimeSafe(formDate, formEndTime);
+  const start = fromUIDateTimeUnsafe({ date: formDate, time: formStartTime });
+  const end = fromUIDateTimeUnsafe({ date: formDate, time: formEndTime });
   const { hasCollisions } = useCheckCollisions({
     reservationPk: undefined,
     reservationUnitPk: reservationUnit?.pk ?? 0,

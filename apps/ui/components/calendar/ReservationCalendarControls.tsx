@@ -3,13 +3,12 @@ import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Button, ButtonVariant, IconAngleDown, IconAngleUp, IconCross, IconSize } from "hds-react";
 import { maxBy } from "lodash-es";
-import { fromUIDate } from "common/src/common/util";
+import { fromUIDate, formatDateTimeRange } from "common/src/date-utils";
 import { Transition } from "react-transition-group";
 import { Flex, fontBold, fontMedium, fontRegular, SemiBold } from "common/styled";
 import { breakpoints } from "common/src/const";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
-import { formatDateTimeRange } from "@/modules/util";
 import { type Control, type FieldValues, type SubmitHandler, useController, type UseFormReturn } from "react-hook-form";
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
@@ -134,7 +133,7 @@ export function ReservationCalendarControls({
   const { control, watch, handleSubmit } = reservationForm;
   const formDate = watch("date");
   const formDuration = watch("duration");
-  const dateValue = useMemo(() => fromUIDate(formDate ?? ""), [formDate]);
+  const dateValue = useMemo(() => fromUIDate({ date: formDate ?? "" }), [formDate]);
 
   const duration = !Number.isNaN(Number(formDuration)) ? formDuration : (reservationUnit.minReservationDuration ?? 0);
 
@@ -246,7 +245,7 @@ function ControlledToggler({
     if (!focusSlot.isReservable) {
       return t("reservationCalendar:selectTime");
     }
-    const dateStr = capitalize(formatDateTimeRange(t, focusSlot.start, focusSlot.end));
+    const dateStr = capitalize(formatDateTimeRange({ t, start: focusSlot.start, end: focusSlot.end }));
     const selected = durationOptions.find((opt) => opt.value === duration);
     const durationStr = selected?.label ?? "";
 

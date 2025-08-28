@@ -14,7 +14,8 @@ import { filterNonNullable, formatDayTimes, fromMondayFirstUnsafe } from "common
 import StatusLabel from "common/src/components/StatusLabel";
 import type { StatusLabelType } from "common/src/tags";
 import { NoWrap } from "common/styled";
-import { convertLanguageCode, formatDurationRange, getTranslationSafe, toUIDate } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { formatDurationRange, toUIDate } from "common/src/date-utils";
 import {
   ApplicationInfoContainer,
   ApplicationSection,
@@ -85,9 +86,13 @@ function SingleApplicationSection({
     aes.status === ApplicationSectionStatusChoice.Rejected || aes.status === ApplicationSectionStatusChoice.Handled;
   const statusProps = getLabelProps(aes.status);
 
-  const reservationsBegin = toUIDate(new Date(aes.reservationsBeginDate));
-  const reservationsEnd = toUIDate(new Date(aes.reservationsEndDate));
-  const duration = formatDurationRange(t, aes.reservationMinDuration, aes.reservationMaxDuration);
+  const reservationsBegin = toUIDate({ date: new Date(aes.reservationsBeginDate) });
+  const reservationsEnd = toUIDate({ date: new Date(aes.reservationsEndDate) });
+  const duration = formatDurationRange({
+    t,
+    beginSecs: aes.reservationMinDuration,
+    endSecs: aes.reservationMaxDuration,
+  });
   const infos = [
     {
       key: "numPersons",

@@ -5,12 +5,13 @@ import { useFieldArray, UseFormReturn } from "react-hook-form";
 import { AccessTypes, type ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 import { ControlledDateInput, ControlledSelect } from "common/src/components/form";
-import { fromUIDate } from "common/src/common/util";
+import { fromUIDate } from "common/src/date-utils";
 import StatusLabel from "common/src/components/StatusLabel";
 import { AutoGrid, Flex, H6 } from "common/styled";
 import { KVWrapper, Label, Value } from "@/styled";
 import { Button, ButtonVariant, IconPlus, IconTrash } from "hds-react";
-import { formatDate, getTranslatedError } from "@/common/util";
+import { format } from "date-fns";
+import { getTranslatedError } from "@/common/util";
 import { AccessType, ReservationUnitEditQuery } from "@gql/gql-types";
 import { NotificationInline } from "@/component/NotificationInline";
 
@@ -47,7 +48,7 @@ function CurrentAccessType({ currentAccessType }: { currentAccessType?: Node["ac
         </KVWrapper>
         <KVWrapper>
           <Label>{t("accessType:validity.activeFrom")}:</Label>
-          <Value>{beginDate ? formatDate(beginDate) : "-"}</Value>
+          <Value>{beginDate ? format(beginDate, "d.M.yyyy") : "-"}</Value>
         </KVWrapper>
         <StatusLabel type={beginDate ? "success" : "error"}>
           {beginDate ? t(`accessType:status.active`) : t(`accessType:status.inactive`)}
@@ -89,7 +90,7 @@ function AccessTypePart({
   const isAccessTypeStarted =
     firstAccessType?.pk &&
     firstAccessType?.beginDate &&
-    (fromUIDate(firstAccessType.beginDate) || new Date()) <= new Date();
+    (fromUIDate({ date: firstAccessType.beginDate }) || new Date()) <= new Date();
   // Only the first access type can be active, and it must have already started.
   const isActiveAccessType = !!(
     index === 0 &&

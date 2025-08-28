@@ -15,15 +15,20 @@ import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
 import { differenceInMinutes, format } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { formatDuration, toUIDate } from "common/src/common/util";
+import {
+  formatDuration,
+  formatDateTimeRange,
+  toUIDate,
+  fromUIDateTime,
+  fromUIDateTimeUnsafe,
+} from "common/src/date-utils";
 import { useModal } from "@/context/ModalContext";
 import { TimeChangeFormSchemaRefined, TimeFormSchema } from "@/schemas";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { BufferToggles } from "@/component/BufferToggles";
 import { useCheckCollisions } from "@/hooks";
-import { constructDateTimeSafe, constructDateTimeUnsafe, getBufferTime, getNormalizedInterval } from "@/helpers";
-import { formatDateTimeRange } from "@/common/util";
+import { getBufferTime, getNormalizedInterval } from "@/helpers";
 import { gql } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
 import { successToast } from "common/src/components/toast";
@@ -80,17 +85,20 @@ function reservationSeriesInfoText({
       .sort((a, b) => convertWeekday(a) - convertWeekday(b))
       .map((weekday) => t(`translation:dayShort.${weekday}`))
       .join(", "),
-    begin: begin && toUIDate(begin),
-    end: end && toUIDate(end),
+    begin: begin && toUIDate({ date: begin }),
+    end: end && toUIDate({ date: end }),
   });
 }
 
 type EditFormValueType = z.infer<typeof TimeFormSchema>;
 
 function formatDateInterval(t: TFunction, begin: Date, end: Date) {
-  const dateString = formatDateTimeRange(t, begin, end);
-  const durationString = formatDuration(t, {
-    minutes: differenceInMinutes(end, begin),
+  const dateString = formatDateTimeRange({ t, start: begin, end });
+  const durationString = formatDuration({
+    t,
+    duration: {
+      minutes: differenceInMinutes(end, begin),
+    },
   });
   return `${dateString} (${durationString})`;
 }
@@ -147,8 +155,8 @@ function DialogContent({
   const formPks = watch("pk");
   const formType = watch("type");
 
-  const start = constructDateTimeSafe(formDate, formStartTime);
-  const end = constructDateTimeSafe(formDate, formEndTime);
+  const start = fromUIDateTime({ date: formDate, time: formStartTime });
+  const end = fromUIDateTime({ date: formDate, time: formEndTime });
   const { hasCollisions, isLoading } = useCheckCollisions({
     reservationPk: formPks,
     reservationUnitPk,
@@ -164,8 +172,8 @@ function DialogContent({
 
   const onSubmit = async (values: EditFormValueType) => {
     try {
-      const newStart = constructDateTimeUnsafe(formDate, formStartTime);
-      const newEnd = constructDateTimeUnsafe(formDate, formEndTime);
+      const newStart = fromUIDateTimeUnsafe({ date: formDate, time: formStartTime });
+      const newEnd = fromUIDateTimeUnsafe({ date: formDate, time: formEndTime });
       const { pk } = values;
       await mutate({
         pk,

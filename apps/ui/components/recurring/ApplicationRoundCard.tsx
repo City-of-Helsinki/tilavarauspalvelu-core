@@ -2,12 +2,12 @@ import React from "react";
 import { IconArrowRight, IconLinkExternal } from "hds-react";
 import { type TFunction, useTranslation } from "next-i18next";
 import { type ApplicationRoundCardFragment, ApplicationRoundStatusChoice } from "@gql/gql-types";
-import { formatDateTime } from "@/modules/util";
 import { isValid } from "date-fns";
 import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { getApplicationRoundPath } from "@/modules/urls";
-import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { formatDateTime, toUIDate } from "common/src/date-utils";
 import { gql } from "@apollo/client";
 
 interface CardProps {
@@ -27,13 +27,13 @@ function translateRoundDate(
   switch (round.status) {
     case ApplicationRoundStatusChoice.Upcoming:
       return t("applicationRound:card.pending", {
-        opening: formatDateTime(t, begin),
+        opening: formatDateTime({ t, date: begin }),
       });
     case ApplicationRoundStatusChoice.Open:
-      return t("applicationRound:card.open", { until: formatDateTime(t, end) });
+      return t("applicationRound:card.open", { until: formatDateTime({ t, date: end }) });
     default:
       return t("applicationRound:card.past", {
-        closing: formatDateTime(t, end),
+        closing: formatDateTime({ t, date: end }),
       });
   }
 }
@@ -46,8 +46,8 @@ export function ApplicationRoundCard({ applicationRound }: Readonly<CardProps>):
   const timeString = translateRoundDate(t, applicationRound);
   const begin = new Date(applicationRound.reservationPeriodBeginDate);
   const end = new Date(applicationRound.reservationPeriodEndDate);
-  const reservationPeriodBeginDate = toUIDate(begin);
-  const reservationPeriodEndDate = toUIDate(end);
+  const reservationPeriodBeginDate = toUIDate({ date: begin });
+  const reservationPeriodEndDate = toUIDate({ date: end });
 
   const reservationPeriod = t(`applicationRound:card.reservationPeriod`, {
     reservationPeriodBeginDate,

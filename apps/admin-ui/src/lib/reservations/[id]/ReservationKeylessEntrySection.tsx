@@ -11,7 +11,8 @@ import {
 import { successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
 import { Button, ButtonSize, IconAlertCircleFill, IconRefresh, Tooltip } from "hds-react";
-import { formatDate, formatTime } from "@/common/util";
+import { format } from "date-fns";
+import { formatTime } from "common/src/date-utils";
 import React, { useState } from "react";
 import { Accordion } from "@/styled";
 import { DataWrapper } from "./DataWrapper";
@@ -135,7 +136,7 @@ function ReservationKeylessEntrySingle({
 
       <DataWrapper label={t("accessType:validity.label")}>
         {reservation.pindoraInfo
-          ? `${formatTime(pindoraInfo?.accessCodeBeginsAt)}–${formatTime(pindoraInfo?.accessCodeEndsAt)}`
+          ? `${formatTime({ t, date: pindoraInfo?.accessCodeBeginsAt })}–${formatTime({ t, date: pindoraInfo?.accessCodeEndsAt })}`
           : "-"}
       </DataWrapper>
 
@@ -173,18 +174,24 @@ function ReservationKeylessEntryRecurring({
         )}
       </Flex>
 
-      <DataWrapper label={t("common:startingDate")}>{formatDate(validityBeginsDate) || "-"}</DataWrapper>
-      <DataWrapper label={t("common:endingDate")}>{formatDate(validityEndsDate) || "-"}</DataWrapper>
+      <DataWrapper label={t("common:startingDate")}>
+        {validityBeginsDate ? format(validityBeginsDate, "d.M.yyyy") : "-"}
+      </DataWrapper>
+      <DataWrapper label={t("common:endingDate")}>
+        {validityEndsDate ? format(validityEndsDate, "d.M.yyyy") : "-"}
+      </DataWrapper>
 
       <Flex $alignItems="center" $gap="xs" $direction="row">
         <DataWrapper label={t("accessType:validity.label")}>
           <NoWrap>
-            {validityBeginsTime ? `${formatTime(validityBeginsTime)}–${formatTime(validityEndsTime)}` : "-"}
+            {validityBeginsTime
+              ? `${formatTime({ t, date: validityBeginsTime })}–${formatTime({ t, date: validityEndsTime })}`
+              : "-"}
           </NoWrap>
         </DataWrapper>
         {validityBeginsTime && (
           <Tooltip placement="top">
-            {t("accessType:validity.fromNextReservation")} ({formatDate(validityBeginsTime)})
+            {t("accessType:validity.fromNextReservation")} ({format(validityBeginsTime, "d.M.yyy")})
           </Tooltip>
         )}
       </Flex>

@@ -18,12 +18,10 @@ import {
   type ReservationPaymentUrlFragment,
 } from "@gql/gql-types";
 import { getIntervalMinutes } from "common/src/conversion";
-import { fromUIDate } from "./util";
 import { type TFunction } from "i18next";
 import { type ReservableMap, type RoundPeriod, isRangeReservable } from "./reservable";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
-import { isValidDate, toUIDate } from "common/src/common/util";
-import { getTimeString } from "./reservationUnit";
+import { formatTime, fromUIDate, isValidDate, toUIDate } from "common/src/date-utils";
 import { timeToMinutes } from "common/src/helpers";
 import { gql } from "@apollo/client";
 import { type LocalizationLanguages } from "common/src/urlBuilder";
@@ -352,9 +350,9 @@ export function convertFormToFocustimeSlot({
     .split(":")
     .map(Number)
     .filter((n) => Number.isFinite(n));
-  const maybeDate = fromUIDate(data.date);
+  const maybeDate = fromUIDate({ date: data.date });
   let start: Date | null = null;
-  if (maybeDate != null && isValidDate(maybeDate)) {
+  if (maybeDate != null && isValidDate({ date: maybeDate })) {
     start = set(maybeDate, { hours, minutes });
   }
   if (hours == null || minutes == null || start == null) {
@@ -385,8 +383,8 @@ export function convertFormToFocustimeSlot({
 
 export function createDateTime(date: string, time: string): Date {
   const minutes = timeToMinutes(time);
-  const maybeDate = fromUIDate(date);
-  if (maybeDate != null && isValidDate(maybeDate)) {
+  const maybeDate = fromUIDate({ date });
+  if (maybeDate != null && isValidDate({ date: maybeDate })) {
     return set(maybeDate, { minutes });
   }
   return new Date();
@@ -397,7 +395,7 @@ export function convertReservationFormToApi(
   formValues: PendingReservationFormType
 ): { beginsAt: string; endsAt: string } | null {
   const time = formValues.time;
-  const date = fromUIDate(formValues.date);
+  const date = fromUIDate({ date: formValues.date });
   const duration = formValues.duration;
   if (date == null || time === "" || duration === 0) {
     return null;
@@ -409,14 +407,15 @@ export function convertReservationFormToApi(
 }
 
 export function transformReservation(
+  t: TFunction,
   reservation?: Pick<ReservationNodeT, "beginsAt" | "endsAt">
 ): PendingReservationFormType {
   const originalBegin = new Date(reservation?.beginsAt ?? "");
   const originalEnd = new Date(reservation?.endsAt ?? "");
   return {
-    date: toUIDate(originalBegin),
+    date: toUIDate({ date: originalBegin }),
     duration: differenceInMinutes(originalEnd, originalBegin),
-    time: getTimeString(originalBegin),
+    time: formatTime({ t, date: originalBegin }),
     isControlsVisible: false,
   };
 }

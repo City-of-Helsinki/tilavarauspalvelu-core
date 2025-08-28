@@ -24,7 +24,7 @@ import {
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
-import { toApiDateUnsafe } from "common/src/common/util";
+import { toApiDateUnsafe } from "common/src/date-utils";
 
 export function createReservationUnits(): CreateStaffReservationFragment[] {
   return [
@@ -268,8 +268,8 @@ const otherMocks = [
 ];
 
 function createInIntervalQueryMock({ begin, end }: { begin: Date; end: Date }) {
-  const beginDate = toApiDateUnsafe(begin);
-  const endDate = toApiDateUnsafe(end);
+  const beginDate = toApiDateUnsafe({ date: begin });
+  const endDate = toApiDateUnsafe({ date: end });
   const variables: ReservationsByReservationUnitQueryVariables = {
     id: base64encode(`ReservationUnitNode:1`),
     pk: 1,

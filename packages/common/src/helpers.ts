@@ -204,6 +204,11 @@ export function dayMax(days: Array<Date | undefined>): Date | undefined {
   }, undefined);
 }
 
+/// Converts a date to minutes discarding date and seconds
+export function toMinutes(d: Date): number {
+  return d.getHours() * 60 + d.getMinutes();
+}
+
 /// @description Convert time string "HH:MM" to minutes
 /// safe for invalid time strings but not for invalid time values
 /// removes trailing seconds if present

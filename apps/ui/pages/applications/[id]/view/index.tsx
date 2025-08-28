@@ -15,7 +15,7 @@ import {
   type ApplicationViewQuery,
 } from "@gql/gql-types";
 import { Tabs } from "hds-react";
-import { formatDateTime } from "@/modules/util";
+import { formatDateTime } from "common/src/date-utils";
 import { ApprovedReservations, BREAKPOINT } from "@/components/application/ApprovedReservations";
 import { gql } from "@apollo/client";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
@@ -111,7 +111,7 @@ function View({ application, tos }: Readonly<Pick<PropsNarrowed, "application" |
   ] as const;
 
   const subTitle = showReservations
-    ? `${t("application:view.handledAt")} ${formatDateTime(t, handledAt, false)}`
+    ? `${t("application:view.handledAt")} ${formatDateTime({ t, date: handledAt, options: { includeWeekday: false } })}`
     : undefined;
   return (
     <>

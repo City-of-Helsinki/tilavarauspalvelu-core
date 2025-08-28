@@ -16,7 +16,8 @@ import { useCurrentUser } from "@/hooks";
 import { getCheckoutUrl } from "@/modules/reservation";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { gql, useApolloClient } from "@apollo/client";
-import { convertLanguageCode, toApiDate } from "common/src/common/util";
+import { convertLanguageCode } from "common/src/common/util";
+import { toApiDate } from "common/src/date-utils";
 import { errorToast, successToast } from "common/src/components/toast";
 import { getReservationInProgressPath } from "@/modules/urls";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
@@ -129,7 +130,7 @@ export function InProgressReservationNotification() {
       state: [ReservationStateChoice.WaitingForPayment, ReservationStateChoice.Created],
       orderBy: ReservationOrderingChoices.PkDesc,
       user: currentUser?.pk ?? 0,
-      beginDate: toApiDate(new Date()) ?? "",
+      beginDate: toApiDate({ date: new Date() }) ?? "",
       reservationType: ReservationTypeChoice.Normal,
     },
     fetchPolicy: "no-cache",

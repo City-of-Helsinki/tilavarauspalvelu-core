@@ -13,7 +13,7 @@ import {
   useAccessCodeQuery,
 } from "@gql/gql-types";
 import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
-import { formatDateTimeRange, formatDuration } from "@/modules/util";
+import { formatDateTimeRange, formatDuration } from "common/src/date-utils";
 import { base64encode, capitalize, getImageSource, getMainImage } from "common/src/helpers";
 import { getReservationUnitPath } from "@/modules/urls";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
@@ -80,7 +80,7 @@ export function ReservationInfoCard({
   const { beginsAt, endsAt } = reservation || {};
   // NOTE can be removed after this has been refactored not to be used for PendingReservation
 
-  const timeString = capitalize(formatDateTimeRange(t, new Date(beginsAt), new Date(endsAt)));
+  const timeString = capitalize(formatDateTimeRange({ t, start: new Date(beginsAt), end: new Date(endsAt) }));
 
   const formatters = useMemo(() => getFormatters(i18n.language), [i18n.language]);
 
@@ -129,7 +129,7 @@ export function ReservationInfoCard({
         <Subheading>{unitName}</Subheading>
         <div data-testid="reservation__reservation-info-card__duration">
           <Strong>
-            {capitalize(timeString)}, {formatDuration(t, { minutes: duration })}
+            {capitalize(timeString)}, {formatDuration({ t, duration: { minutes: duration } })}
           </Strong>
         </div>
         <div data-testid="reservation__reservation-info-card__price">

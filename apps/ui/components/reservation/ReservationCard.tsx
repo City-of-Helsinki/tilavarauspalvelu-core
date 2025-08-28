@@ -3,7 +3,7 @@ import { ButtonVariant, IconArrowRight, IconCross, IconEuroSign, IconLock } from
 import { useTranslation } from "next-i18next";
 import { trim } from "lodash-es";
 import { type ReservationCardFragment, ReservationStateChoice } from "@gql/gql-types";
-import { formatDateTimeRange } from "@/modules/util";
+import { formatDateTimeRange } from "common/src/date-utils";
 import { getNormalizedReservationOrderStatus, getPaymentUrl, isReservationCancellable } from "@/modules/reservation";
 import { getPrice } from "@/modules/reservationUnit";
 import { getReservationPath } from "@/modules/urls";
@@ -30,7 +30,7 @@ export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<Prop
   const link = reservation.pk ? `/reservations/${reservation.pk}` : "";
 
   const { beginsAt, endsAt } = reservation;
-  const timeString = capitalize(formatDateTimeRange(t, new Date(beginsAt), new Date(endsAt)));
+  const timeString = capitalize(formatDateTimeRange({ t, start: new Date(beginsAt), end: new Date(endsAt) }));
 
   const lang = convertLanguageCode(i18n.language);
   const price = getPrice(t, reservation, lang);

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { subDays } from "date-fns";
-import { fromUIDate } from "../common/util";
+import { fromUIDate } from "../date-utils";
 
 const THREE_YEARS_MS = 3 * 365 * 24 * 60 * 60 * 1000;
 const TIME_PATTERN = /^[0-2][0-9]:[0-5][0-9]$/;
@@ -105,8 +105,8 @@ export function lessThanMaybeDate(a?: string | null, b?: string | null): boolean
   if (a == null || b == null) {
     return false;
   }
-  const aDate = fromUIDate(a);
-  const bDate = fromUIDate(b);
+  const aDate = fromUIDate({ date: a });
+  const bDate = fromUIDate({ date: b });
   if (aDate == null || bDate == null) {
     return false;
   }

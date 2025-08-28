@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import { toUIDate } from "common/src/common/util";
+import { toUIDate } from "common/src/date-utils";
 import { useTranslation } from "next-i18next";
 import { H1 } from "common/styled";
 import { Filters, ReservationsDataLoader } from "@lib/reservations";
@@ -18,7 +18,7 @@ export default function ListReservationsPage(): JSX.Element {
   useEffect(() => {
     if (params.size === 0) {
       const p = new URLSearchParams(params);
-      p.set("dateGte", toUIDate(today));
+      p.set("dateGte", toUIDate({ date: today }));
       setParams(p);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only on page load
@@ -27,7 +27,7 @@ export default function ListReservationsPage(): JSX.Element {
   const defaultFilters = [
     {
       key: "dateGte",
-      value: toUIDate(today),
+      value: toUIDate({ date: today }),
     },
   ];
 

@@ -1,6 +1,6 @@
 import { get as mockGet } from "lodash-es";
 import { addDays, addHours, addMonths, endOfDay, format, getHours, set, startOfDay, startOfToday } from "date-fns";
-import { toApiDateUnsafe } from "common/src/common/util";
+import { toApiDateUnsafe } from "common/src/date-utils";
 import {
   PriceUnit,
   ReservationUnitPublishingState,
@@ -628,7 +628,7 @@ function constructPricing({
   const p = highestPrice ?? lowestPrice ?? 0;
   return {
     id: "1",
-    begins: toApiDateUnsafe(begins ?? new Date()),
+    begins: toApiDateUnsafe({ date: begins ?? new Date() }),
     priceUnit: priceUnit ?? PriceUnit.PerHour,
     lowestPrice: lowestPrice?.toString() ?? p.toString(),
     highestPrice: highestPrice?.toString() ?? p.toString(),

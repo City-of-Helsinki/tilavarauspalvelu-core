@@ -12,7 +12,7 @@ import {
   MunicipalityChoice,
 } from "@gql/gql-types";
 import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { toApiDate } from "common/src/common/util";
+import { toApiDate } from "common/src/date-utils";
 import { addYears } from "date-fns";
 import { breakpoints } from "common/src/const";
 import { H1 } from "common/styled";
@@ -55,15 +55,15 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
   const [step, setStep] = useState<0 | 1>(0);
 
   const form = useForm<PendingReservationFormType>({
-    defaultValues: transformReservation(reservation),
+    defaultValues: transformReservation(t, reservation),
     mode: "onChange",
     resolver: zodResolver(PendingReservationFormSchema),
   });
 
   const { reset } = form;
   useEffect(() => {
-    reset(transformReservation(reservation));
-  }, [reservation, reset]);
+    reset(transformReservation(t, reservation));
+  }, [reservation, reset, t]);
 
   const title = step === 0 ? "reservations:editReservationTime" : "reservationCalendar:heading.pendingReservation";
 
@@ -153,8 +153,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       query: ReservationEditPageDocument,
       variables: {
         id: base64encode(`ReservationNode:${pk}`),
-        beginDate: toApiDate(new Date()) ?? "",
-        endDate: toApiDate(addYears(new Date(), 2)) ?? "",
+        beginDate: toApiDate({ date: new Date() }) ?? "",
+        endDate: toApiDate({ date: addYears(new Date(), 2) }) ?? "",
       },
     });
     const { reservation } = data;

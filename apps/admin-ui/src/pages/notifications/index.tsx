@@ -11,7 +11,7 @@ import {
   useBannerNotificationsListQuery,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
-import { valueForDateInput, valueForTimeInput } from "@/helpers";
+import { dateForInput, timeForInput } from "common/src/date-utils";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
 import { CustomTable } from "@/component/Table";
 import { filterNonNullable } from "common/src/helpers";
@@ -79,7 +79,7 @@ const getColConfig = (t: TFunction) => [
     isSortable: true,
     transform: (notification: BannerNotificationTableElementFragment) =>
       notification.activeFrom
-        ? `${valueForDateInput(notification.activeFrom)} ${valueForTimeInput(notification.activeFrom)}`
+        ? `${dateForInput({ date: notification.activeFrom })} ${timeForInput({ time: notification.activeFrom })}`
         : "-",
   },
   {
@@ -88,7 +88,7 @@ const getColConfig = (t: TFunction) => [
     isSortable: true,
     transform: (notification: BannerNotificationTableElementFragment) =>
       notification.activeUntil
-        ? `${valueForDateInput(notification.activeUntil)} ${valueForTimeInput(notification.activeUntil)}`
+        ? `${dateForInput({ date: notification.activeUntil })} ${timeForInput({ time: notification.activeUntil })}`
         : "-",
   },
   {

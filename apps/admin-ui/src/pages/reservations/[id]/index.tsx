@@ -38,7 +38,7 @@ import {
 import { Accordion, ApplicationDatas, Summary } from "@/styled";
 import { base64encode, ignoreMaybeArray, isPriceFree, toNumber } from "common/src/helpers";
 import { formatAgeGroup } from "@/common/util";
-import { toUIDateTime } from "common/src/common/util";
+import { toUIDateTime } from "common/src/date-utils";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
@@ -143,10 +143,10 @@ function ReservationSummary({
           {`${reservationPrice(reservation, t)}${
             reservation.paymentOrder?.handledPaymentDueBy
               ? ` ${t("reservation.dueByParenthesis", {
-                  date: toUIDateTime(
-                    new Date(reservation.paymentOrder.handledPaymentDueBy),
-                    t("common:dayTimeSeparator")
-                  ),
+                  date: toUIDateTime({
+                    date: new Date(reservation.paymentOrder.handledPaymentDueBy),
+                    dayTimeSeparator: t("common:dayTimeSeparator"),
+                  }),
                 })}`
               : ""
           }${reservation.applyingForFreeOfCharge ? `, ${t("reservation:appliesSubvention")}` : ""}`}

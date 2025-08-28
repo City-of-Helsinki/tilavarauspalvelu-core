@@ -6,7 +6,7 @@ import { type ApolloQueryResult } from "@apollo/client";
 import { type ApplicationSectionAllocationsQuery, Priority } from "@gql/gql-types";
 import { filterNonNullable, timeToMinutes } from "common/src/helpers";
 import { Flex, fontMedium, H5, SemiBold, Strong } from "common/styled";
-import { formatDuration } from "common/src/common/util";
+import { formatDuration } from "common/src/date-utils";
 import { Accordion } from "@/component/Accordion";
 import {
   type AllocatedTimeSlotNodeT,
@@ -218,7 +218,7 @@ export function SuitableTimeCard({
   const selectionMins = selection.length * 30;
   const minDurationSeconds = applicationSection.reservationMinDuration ?? 0;
   const maxDurationSeconds = applicationSection.reservationMaxDuration ?? 0;
-  const selectionDurationString = formatDuration(t, { minutes: selectionMins });
+  const selectionDurationString = formatDuration({ t, duration: { minutes: selectionMins } });
   // TODO this should be cleaner, only pass things we need here
   // TODO should not default to empty string (unless this is designed zero by default)
   const firstSelected = selection[0] ?? "";

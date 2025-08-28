@@ -10,7 +10,7 @@ import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonVariant, LoadingSpinner, Notification, TextInput } from "hds-react";
 import styled from "styled-components";
-import { fromUIDate } from "common/src/common/util";
+import { fromUIDate } from "common/src/date-utils";
 import {
   type ReservationFormMeta,
   type ReservationSeriesForm as ReservationSeriesFormT,
@@ -154,8 +154,8 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
   const checkedReservations = useFilteredReservationList({
     items: newReservations,
     reservationUnitPk: reservationUnit?.pk ?? 0,
-    begin: fromUIDate(watch("startingDate")) ?? new Date(),
-    end: fromUIDate(watch("endingDate")) ?? new Date(),
+    begin: fromUIDate({ date: watch("startingDate") }) ?? new Date(),
+    end: fromUIDate({ date: watch("endingDate") }) ?? new Date(),
     startTime,
     endTime,
     reservationType,

@@ -17,7 +17,7 @@ import {
   type CanReservationBeChangedProps,
 } from "./reservation";
 import { isSlotWithinReservationTime } from "./reservable";
-import { toApiDate } from "common/src/common/util";
+import { toApiDate } from "common/src/date-utils";
 import { type TFunction } from "i18next";
 import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
 import { base64encode } from "common/src/helpers";
@@ -53,8 +53,8 @@ function createMockReservationUnit({
     reservationEndsAt: reservationEndsAt?.toISOString() ?? null,
     reservableTimeSpans: Array.from(Array(100)).map((_val, index) => {
       return {
-        startDatetime: `${toApiDate(addDays(new Date(), index))}T07:00:00+00:00`,
-        endDatetime: `${toApiDate(addDays(new Date(), index))}T20:00:00+00:00`,
+        startDatetime: `${toApiDate({ date: addDays(new Date(), index) })}T07:00:00+00:00`,
+        endDatetime: `${toApiDate({ date: addDays(new Date(), index) })}T20:00:00+00:00`,
       };
     }),
   };

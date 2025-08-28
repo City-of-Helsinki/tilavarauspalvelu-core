@@ -10,7 +10,7 @@ import {
   useReservationApplicationLinkQuery,
 } from "@gql/gql-types";
 import { getName } from "@/modules/reservation";
-import { formatDateTime } from "@/common/util";
+import { formatDateTime } from "common/src/date-utils";
 import { getApplicationUrl } from "@/common/urls";
 import { gql } from "@apollo/client";
 import { ExternalLink } from "@/component/ExternalLink";
@@ -111,7 +111,7 @@ export const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
         </TitleSection>
         <p data-testid="reservation_title_section__tagline">{tagline}</p>
         <Flex $gap="xs" $direction="row">
-          {t("reservation:createdAt")} {formatDateTime(reservation.createdAt ?? "")}
+          {t("reservation:createdAt")} {formatDateTime({ t, date: reservation.createdAt })}
           {applicationLink !== "" && (
             <ExternalLink href={applicationLink} size={IconSize.Small} isBold>
               {`${t("reservation:applicationLink")}: ${applicationPk}-${sectionPk}`}

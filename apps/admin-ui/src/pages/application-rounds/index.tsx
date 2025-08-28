@@ -12,7 +12,7 @@ import {
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { getApplicationRoundUrl } from "@/common/urls";
-import { formatDate } from "@/common/util";
+import { format } from "date-fns";
 import { truncate } from "@/helpers";
 import { ApplicationRoundCard } from "@lib/application-rounds";
 import { TableLink } from "@/styled";
@@ -137,7 +137,7 @@ function AllApplicationRounds(): JSX.Element | null {
       isSortable: true,
       headerName: t("applicationRound:headings.sent"),
       transform: (applicationRound: ApplicationRoundNode) =>
-        formatDate(applicationRound.statusTimestamp || null) || "-",
+        applicationRound.statusTimestamp ? format(applicationRound.statusTimestamp, "d.M.yyyy") : "-",
       key: "statusTimestampSort",
     },
   ];

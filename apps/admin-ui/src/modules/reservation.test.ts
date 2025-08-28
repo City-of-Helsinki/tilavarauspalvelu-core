@@ -9,7 +9,7 @@ import {
 } from "@gql/gql-types";
 import { createTagString, getReservationUnitPricing } from "./reservation";
 import { addHours, addMonths } from "date-fns";
-import { toApiDate, toApiDateUnsafe } from "common/src/common/util";
+import { toApiDate, toApiDateUnsafe } from "common/src/date-utils";
 import { describe, expect, test } from "vitest";
 import { base64encode } from "common/src/helpers";
 
@@ -25,7 +25,7 @@ function constructPricing({
   begin: Date;
 }): PricingFieldsFragment {
   return {
-    begins: toApiDate(begin) ?? "",
+    begins: toApiDateUnsafe({ date: begin }),
     id: "1",
     priceUnit: PriceUnit.PerHour,
     lowestPrice: lowestPrice.toString(),
@@ -73,8 +73,8 @@ function constructReservation({
           id: base64encode("ReservationSeriesNode:1"),
           beginTime: "12:00",
           endTime: "14:00",
-          beginDate: toApiDateUnsafe(beginsAt),
-          endDate: toApiDateUnsafe(addMonths(endsAt, 3)),
+          beginDate: toApiDate({ date: beginsAt }) ?? "",
+          endDate: toApiDate({ date: addMonths(endsAt, 3) }) ?? "",
           weekdays: [Weekday.Monday, Weekday.Tuesday, Weekday.Thursday],
         }
       : null,

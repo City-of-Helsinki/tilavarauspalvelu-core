@@ -5,7 +5,7 @@ import { Legend, LegendsWrapper } from "@/component/Legend";
 import { legend } from "./eventStyleGetter";
 import { UnitCalendar } from "./UnitCalendar";
 import { useUnitResources, useGetFilterSearchParams } from "@/hooks";
-import { fromUIDate, isValidDate, toUIDate } from "common/src/common/util";
+import { fromUIDate, isValidDate, toUIDate } from "common/src/date-utils";
 import { startOfDay } from "date-fns";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { AutoGrid, Flex, HR } from "common/styled";
@@ -44,9 +44,9 @@ function UnitReservationsInner({
   const { reservationUnitTypeFilter } = useGetFilterSearchParams();
 
   const d = searchParams.get("date");
-  const currentDate = d ? fromUIDate(d) : startOfDay(new Date());
+  const currentDate = d ? fromUIDate({ date: d }) : startOfDay(new Date());
 
-  const date = currentDate && isValidDate(currentDate) ? currentDate : new Date();
+  const date = currentDate && isValidDate({ date: currentDate }) ? currentDate : new Date();
 
   const { loading, resources, refetch } = useUnitResources({
     begin: date,
@@ -85,7 +85,7 @@ export function UnitReservations(props: UnitReservationsProps): JSX.Element {
 
   const handleTodayClick = () => {
     const p = new URLSearchParams(searchParams);
-    p.set("date", toUIDate(new Date()));
+    p.set("date", toUIDate({ date: new Date() }));
     setSearchParams(p);
   };
 
