@@ -339,7 +339,7 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
             raise GraphQLValidationError(msg, code=error_codes.RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS)
 
     @classmethod
-    def _validate_pricings(  # noqa: PLR0912
+    def _validate_pricings(
         cls,
         instance: ReservationUnit,
         input_data: ReservationUnitUpdateData,
@@ -351,43 +351,25 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
         has_active_pricing = instance.pricings.filter(begins__lte=today).exists()
         dates_seen: set[datetime.date] = set()
 
-        existing_pricings = {pricing.pk: pricing for pricing in instance.pricings.all()}
-
-        updated_pks = {pricing["pk"] for pricing in pricings if "pk" in pricing}
-        dates_seen.update(
-            pricing.begins
-            for pricing in existing_pricings.values()
-            if pricing.begins <= today and pricing.pk not in updated_pks
-        )
+        existing = {pricing.pk: pricing for pricing in instance.pricings.all()}
+        dates_seen.update(pricing.begins for pricing in existing.values() if pricing.begins <= today)
 
         for pricing_data in pricings:
             pk = pricing_data.get("pk")
 
             # Modifying or picking an existing pricing
             if pk is not None:
-                existing_pricing = existing_pricings.get(pk)
+                existing_pricing = existing.get(pk)
                 if existing_pricing is None:
                     msg = f"Pricing with primary key {pk!r} doesn't belong to this reservation unit"
                     raise GraphQLValidationError(msg)
 
+                # Date might have been changed, we'll add the new date back.
+                dates_seen.discard(existing_pricing.begins)
+
                 begins = pricing_data.get("begins", existing_pricing.begins)
                 highest_price = pricing_data.get("highest_price", existing_pricing.highest_price)
                 lowest_price = pricing_data.get("lowest_price", existing_pricing.lowest_price)
-
-                same_begin_date = existing_pricing.begins == begins
-                only_picked = "pk" in pricing_data and len(pricing_data) == 1
-
-                if existing_pricing.begins < today and not only_picked:
-                    msg = "Past or active pricing cannot be changed."
-                    raise GraphQLValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICING_CANNOT_CHANGE_PAST)
-
-                if existing_pricing.begins == today and not same_begin_date:
-                    msg = "Active pricing cannot be moved to another date."
-                    raise GraphQLValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICING_CANNOT_CHANGE_ACTIVE)
-
-                if begins < today < existing_pricing.begins:
-                    msg = "Pricing cannot be moved to the past."
-                    raise GraphQLValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICING_BEGIN_DATE_IN_PAST)
 
             # Create new pricing
             else:
@@ -433,25 +415,21 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
         has_active_access_type = instance.access_types.filter(begin_date__lte=today).exists()
         dates_seen: set[datetime.date] = set()
 
-        existing_access_types = {access_type.pk: access_type for access_type in instance.access_types.all()}
-
-        # Add dates for past access types that are not updated.
-        updated_pks = {access_type["pk"] for access_type in access_types if "pk" in access_type}
-        dates_seen.update(
-            access_type.begin_date
-            for access_type in existing_access_types.values()
-            if access_type.begin_date <= today and access_type.pk not in updated_pks
-        )
+        existing = {access_type.pk: access_type for access_type in instance.access_types.all()}
+        dates_seen.update(ac.begin_date for ac in existing.values() if ac.begin_date <= today)
 
         for access_type_data in access_types:
             pk = access_type_data.get("pk")
 
             # Modifying or picking an existing access type
             if pk is not None:
-                existing_access_type = existing_access_types.get(pk)
+                existing_access_type = existing.get(pk)
                 if existing_access_type is None:
                     msg = f"Access type with primary key {pk!r} doesn't belong to this reservation unit"
                     raise GraphQLValidationError(msg)
+
+                # Date might have been changed, we'll add the new date back.
+                dates_seen.discard(existing_access_type.begin_date)
 
                 access_type = access_type_data.get("access_type", existing_access_type.access_type)
                 begin_date = access_type_data.get("begin_date", existing_access_type.begin_date)
