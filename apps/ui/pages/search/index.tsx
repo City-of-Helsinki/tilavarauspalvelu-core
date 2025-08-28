@@ -109,7 +109,6 @@ function SearchSingle({ options }: Readonly<Props>): JSX.Element {
 
 export default SearchSingle;
 
-// TODO why isDraft and isVisible are options here?
 export const SEARCH_RESERVATION_UNITS = gql`
   query SearchReservationUnits(
     $first: Int
@@ -120,8 +119,6 @@ export const SEARCH_RESERVATION_UNITS = gql`
     $accessTypes: [AccessType!]! = []
     $applicationRound: [Int!]
     $equipments: [Int!]
-    $isDraft: Boolean
-    $isVisible: Boolean
     $personsAllowed: Int
     $pk: [Int!]
     $purposes: [Int!]
@@ -150,8 +147,8 @@ export const SEARCH_RESERVATION_UNITS = gql`
         }
         applicationRound: $applicationRound
         equipments: $equipments
-        isDraft: $isDraft
-        isVisible: $isVisible
+        isDraft: false
+        isVisible: true
         personsAllowed: $personsAllowed
         pk: $pk
         purposes: $purposes
