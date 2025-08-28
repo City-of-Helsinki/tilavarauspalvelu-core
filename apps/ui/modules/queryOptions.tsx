@@ -1,7 +1,7 @@
 import { type ApolloClient } from "@apollo/client";
 import { OptionsDocument, type OptionsQueryVariables, type OptionsQuery } from "@gql/gql-types";
 import { getTranslationSafe } from "common/src/common/util";
-import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
+import { filterNonNullable, getLocalizationLang, sort } from "common/src/helpers";
 
 export async function queryOptions(apolloClient: ApolloClient<unknown>, locale: string) {
   const { data } = await apolloClient.query<OptionsQuery, OptionsQueryVariables>({
@@ -11,13 +11,13 @@ export async function queryOptions(apolloClient: ApolloClient<unknown>, locale: 
 
   const lang = getLocalizationLang(locale);
 
-  const reservationPurposeOptions = data.allReservationPurposes.map((purpose) => ({
+  // incorrect non-nullable types for data
+  const reservationPurposeOptions = filterNonNullable(data?.allReservationPurposes).map((purpose) => ({
     label: getTranslationSafe(purpose, "name", lang),
     value: purpose.pk ?? 0,
   }));
 
-  const ageGroups = filterNonNullable(data.allAgeGroups);
-  const sortedAgeGroups = ageGroups.sort((a, b) => a.minimum - b.minimum);
+  const sortedAgeGroups = sort(filterNonNullable(data?.allAgeGroups), (a, b) => a.minimum - b.minimum);
   const ageGroupOptions = [
     // the sortedAgeGroups array has "1 - 99" as the first element, so let's move it to the end for correct order
     ...sortedAgeGroups.slice(1),
