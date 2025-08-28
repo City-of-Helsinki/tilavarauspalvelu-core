@@ -53,6 +53,6 @@ class StaffRepairReservationAccessCodeSerializer(NestingModelSerializer):
         has_access_code_after = instance.access_code_generated_at is not None and instance.access_code_is_active
 
         if no_access_code_before and has_access_code_after:
-            EmailService.send_reservation_access_code_added_email(reservation=instance)
+            EmailService.send_reservation_access_type_changed_email(reservation=instance)
 
         return instance

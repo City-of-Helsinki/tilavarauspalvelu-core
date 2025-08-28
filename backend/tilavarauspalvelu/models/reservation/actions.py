@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     from decimal import Decimal
 
     from tilavarauspalvelu.integrations.verkkokauppa.order.types import Order
-    from tilavarauspalvelu.models import ReservationUnit, Unit
+    from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, Unit
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
     from tilavarauspalvelu.typing import Lang
 
@@ -387,3 +387,12 @@ class ReservationActions:
             return False
 
         return accounting.actions.supports_invoicing()
+
+    def get_applying_reservation_unit_access_type(self) -> ReservationUnitAccessType | None:
+        """Get the reservation unit access type that is currently being applied to the reservation."""
+        return (
+            self.reservation.reservation_unit.access_types.all()
+            .filter(begin_date__lte=self.reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date())
+            .order_by("-begin_date")
+            .first()
+        )

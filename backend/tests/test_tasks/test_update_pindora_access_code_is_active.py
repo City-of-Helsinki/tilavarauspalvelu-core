@@ -20,7 +20,7 @@ from tests.helpers import patch_method
 @freeze_time("2023-01-01")
 @patch_method(PindoraClient.activate_reservation_access_code)
 @patch_method(PindoraClient.deactivate_reservation_access_code)
-@patch_method(EmailService.send_reservation_access_code_added_email)
+@patch_method(EmailService.send_reservation_access_type_changed_email)
 def test_update_pindora_access_code_is_active__activate():
     now = local_datetime()
 
@@ -38,7 +38,7 @@ def test_update_pindora_access_code_is_active__activate():
 
     assert PindoraClient.activate_reservation_access_code.call_count == 1
     assert PindoraClient.deactivate_reservation_access_code.call_count == 0
-    assert EmailService.send_reservation_access_code_added_email.call_count == 1
+    assert EmailService.send_reservation_access_type_changed_email.call_count == 1
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is True

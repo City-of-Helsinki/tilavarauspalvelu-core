@@ -2834,22 +2834,22 @@ msgstr ""
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessType"
 msgid "access code"
-msgstr ""
+msgstr "dörrkod"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessType"
 msgid "opened by staff"
-msgstr ""
+msgstr "öppnades av personalen"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessType"
 msgid "physical key"
-msgstr ""
+msgstr "nyckel"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessType"
 msgid "unrestricted"
-msgstr ""
+msgstr "direkt tillgång"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessType"
@@ -3085,24 +3085,43 @@ msgstr "Du kan kontrollera dina bokningsuppgifter på"
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
+msgid "The door code of your booking has changed"
+msgstr "Dörrkoden för din bokning har ändrats"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
 msgid "Access to the space has changed"
 msgstr "Tillgången till utrymmet har ändrats"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format
 msgctxt "Email"
-msgid ""
-"You can find the door code in this message and at %(my_reservations)s page "
-"at Varaamo"
-msgstr ""
-"Du hittar dörrkoden i detta meddelande och på sidan %(my_reservations)s på "
-"Varaamo"
+msgid "Access to the space will change starting from %(date)s"
+msgstr "Tillträde till lokalen ändras från och med %(date)s"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
-#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
+#, python-format
 msgctxt "Email"
-msgid "The door code of your booking has changed"
-msgstr "Dörrkoden för din bokning har ändrats"
+msgid ""
+"You can access the space with a door code, which you can find on the "
+"%(my_reservations)s page"
+msgstr ""
+"Du får tillträde med en dörrkod, som du hittar på sidan %(my_reservations)s"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "The staff will open the door to the space"
+msgstr "Personalen öppnar dörren till lokalen"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Please arrange the collection of the key with the staff"
+msgstr "Kom överens med personalen om att hämta nyckeln"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "You will have a direct access to the space"
+msgstr "Du har direkt tillträde till lokalen"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
@@ -3216,6 +3235,11 @@ msgstr "Din bokning har uppdaterats"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
+msgid "Access to your season booking is changing"
+msgstr "Tillträdet till din säsongsbokning håller på att ändras"
+
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
+msgctxt "Email"
 msgid "My applications"
 msgstr "Egna ansökningar"
 
@@ -3223,11 +3247,16 @@ msgstr "Egna ansökningar"
 #, python-format
 msgctxt "Email"
 msgid ""
-"You can find the door code in this message and at %(my_applications)s page "
-"at Varaamo"
+"You can find the access method in this message and on the "
+"%(my_applications)s page at Varaamo"
 msgstr ""
-"Du hittar dörrkoden i detta meddelande och på sidan %(my_applications)s på "
+"Du hittar tillträdet i detta meddelande samt på sidan %(my_applications)s på "
 "Varaamo"
+
+#: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
+msgctxt "Email"
+msgid "Access types"
+msgstr "Tillträdet"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 #, python-format
@@ -3345,12 +3374,12 @@ msgstr "Logga in i tjänsten på"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Reservation access code added"
+msgid "Reservation access code changed"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Reservation access code changed"
+msgid "Reservation access type changed"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
@@ -3400,12 +3429,12 @@ msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal reservation access code added"
+msgid "Seasonal reservation access code changed"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal reservation access code changed"
+msgid "Seasonal reservation access type changed"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py

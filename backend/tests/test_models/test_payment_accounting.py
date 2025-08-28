@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
 
 import pytest
@@ -11,6 +11,10 @@ from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting_task
 
 from tests.factories import PaymentAccountingFactory, ReservationUnitFactory
 
+if TYPE_CHECKING:
+    from collections.abc import Generator
+    from unittest.mock import NonCallableMock
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -18,7 +22,7 @@ pytestmark = [
 
 
 @contextmanager
-def mock_refresh_reservation_unit_accounting_task():
+def mock_refresh_reservation_unit_accounting_task() -> Generator[NonCallableMock]:
     path = "tilavarauspalvelu.tasks."
     path += refresh_reservation_unit_accounting_task.__name__
     path += ".delay"

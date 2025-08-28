@@ -10,8 +10,8 @@ from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from .rendering import render_html, render_text
 from .template_context import (
-    get_context_for_reservation_access_code_added,
     get_context_for_reservation_access_code_changed,
+    get_context_for_reservation_access_type_changed,
     get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
     get_context_for_reservation_confirmed,
@@ -21,8 +21,8 @@ from .template_context import (
     get_context_for_reservation_requires_handling_staff_notification,
     get_context_for_reservation_requires_payment,
     get_context_for_reservation_rescheduled,
-    get_context_for_seasonal_booking_access_code_added,
     get_context_for_seasonal_booking_access_code_changed,
+    get_context_for_seasonal_booking_access_type_changed,
     get_context_for_seasonal_booking_application_received,
     get_context_for_seasonal_booking_application_round_handled,
     get_context_for_seasonal_booking_application_round_in_allocation,
@@ -44,14 +44,15 @@ if TYPE_CHECKING:
 
     from django.utils.functional import Promise
 
+    from tilavarauspalvelu.enums import AccessType
     from tilavarauspalvelu.typing import EmailAttachment, EmailContext
 
 __all__ = [
     "EmailData",
     "EmailTemplateType",
     "EmailType",
-    "ReservationAccessCodeAddedContext",
     "ReservationAccessCodeChangedContext",
+    "ReservationAccessTypeChangedContext",
     "ReservationApprovedContext",
     "ReservationCancelledContext",
     "ReservationConfirmedContext",
@@ -61,8 +62,8 @@ __all__ = [
     "ReservationRequiresHandlingStaffNotificationContext",
     "ReservationRequiresPaymentContext",
     "ReservationRescheduledContext",
-    "SeasonalBookingAccessCodeAddedContext",
     "SeasonalBookingAccessCodeChangedContext",
+    "SeasonalBookingAccessTypeChangedContext",
     "SeasonalBookingCancelledAllContext",
     "SeasonalBookingCancelledAllStaffNotificationContext",
     "SeasonalBookingCancelledSingleContext",
@@ -110,7 +111,7 @@ class EmailData:
 # Contexts
 
 
-class ReservationAccessCodeAddedContext(TypedDict, total=False):
+class ReservationAccessTypeChangedContext(TypedDict, total=False):
     email_recipient_name: str
     reservation_unit_name: str
     unit_name: str
@@ -124,6 +125,8 @@ class ReservationAccessCodeAddedContext(TypedDict, total=False):
     access_code_is_used: bool
     access_code: str
     access_code_validity_period: str
+    access_type: AccessType
+    change_date: datetime.date
 
 
 class ReservationAccessCodeChangedContext(TypedDict, total=False):
@@ -268,7 +271,7 @@ class ReservationRescheduledContext(TypedDict, total=False):
     access_code_validity_period: str
 
 
-class SeasonalBookingAccessCodeAddedContext(TypedDict, total=False):
+class SeasonalBookingAccessTypeChangedContext(TypedDict, total=False):
     email_recipient_name: str
     application_section_name: str
     application_round_name: str
@@ -276,7 +279,7 @@ class SeasonalBookingAccessCodeAddedContext(TypedDict, total=False):
     application_section_id: int | None
     access_code_is_used: bool
     access_code: str
-    allocations: list[dict[str, Any]]
+    reservation_units: list[dict[str, Any]]
 
 
 class SeasonalBookingAccessCodeChangedContext(TypedDict, total=False):
@@ -414,15 +417,15 @@ class EmailType(_EmailTypeOptions):
 
     # Reservation
 
-    RESERVATION_ACCESS_CODE_ADDED = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Reservation access code added"),
-        get_email_context=get_context_for_reservation_access_code_added,
-        context_variables=list(ReservationAccessCodeAddedContext.__annotations__),
-    )
     RESERVATION_ACCESS_CODE_CHANGED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation access code changed"),
         get_email_context=get_context_for_reservation_access_code_changed,
         context_variables=list(ReservationAccessCodeChangedContext.__annotations__),
+    )
+    RESERVATION_ACCESS_TYPE_CHANGED = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Reservation access type changed"),
+        get_email_context=get_context_for_reservation_access_type_changed,
+        context_variables=list(ReservationAccessTypeChangedContext.__annotations__),
     )
     RESERVATION_APPROVED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation approved"),
@@ -472,15 +475,15 @@ class EmailType(_EmailTypeOptions):
 
     # Seasonal booking
 
-    SEASONAL_BOOKING_ACCESS_CODE_ADDED = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Seasonal reservation access code added"),
-        get_email_context=get_context_for_seasonal_booking_access_code_added,
-        context_variables=list(SeasonalBookingAccessCodeAddedContext.__annotations__),
-    )
     SEASONAL_BOOKING_ACCESS_CODE_CHANGED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal reservation access code changed"),
         get_email_context=get_context_for_seasonal_booking_access_code_changed,
         context_variables=list(SeasonalBookingAccessCodeChangedContext.__annotations__),
+    )
+    SEASONAL_BOOKING_ACCESS_TYPE_CHANGED = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Seasonal reservation access type changed"),
+        get_email_context=get_context_for_seasonal_booking_access_type_changed,
+        context_variables=list(SeasonalBookingAccessTypeChangedContext.__annotations__),
     )
     SEASONAL_BOOKING_APPLICATION_RECEIVED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal booking application received"),
@@ -549,8 +552,7 @@ class EmailType(_EmailTypeOptions):
     @classproperty
     def access_code_always_used(cls) -> list[EmailTemplateType]:
         return [
-            cls.RESERVATION_ACCESS_CODE_ADDED,
+            cls.RESERVATION_ACCESS_TYPE_CHANGED,
             cls.RESERVATION_ACCESS_CODE_CHANGED,
-            cls.SEASONAL_BOOKING_ACCESS_CODE_ADDED,
             cls.SEASONAL_BOOKING_ACCESS_CODE_CHANGED,
         ]

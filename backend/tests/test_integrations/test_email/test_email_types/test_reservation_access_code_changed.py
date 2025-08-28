@@ -317,8 +317,7 @@ def test_reservation_access_code_changed__send_email(outbox):
     assert outbox[0].subject == "The door code of your booking has changed"
     assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]
 
-    assert len(outbox[0].attachments) == 1
-    assert outbox[0].attachments[0][0] == "reservation_calendar.ics"
+    assert len(outbox[0].attachments) == 0
 
 
 @pytest.mark.django_db
