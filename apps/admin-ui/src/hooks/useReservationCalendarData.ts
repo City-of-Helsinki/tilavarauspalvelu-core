@@ -96,7 +96,7 @@ function convertReservationToCalendarEvent(
       reservationSeries: null,
     },
     start: new Date(r.beginsAt),
-    end: new Date(r.beginsAt),
+    end: new Date(r.endsAt),
   };
 }
 
