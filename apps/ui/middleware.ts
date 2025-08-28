@@ -84,26 +84,30 @@ type Data = {
 };
 
 const RESERVATION_QUERY = `
-  reservation(id: $reservationId) {
-    id
-    type
-    state
-    reservationUnit {
+  reservation: node(id: $reservationId) {
+    ... on ReservationNode {
       id
-      pk
-    }
-    user {
-      id
-      pk
+      type
+      state
+      reservationUnit {
+        id
+        pk
+      }
+      user {
+        id
+        pk
+      }
     }
   }`;
 
 const APPLICATION_QUERY = `
-  application(id: $applicationId) {
-    id
-    user {
+  application: node(id: $applicationId) {
+    ... on ApplicationNode {
       id
-      pk
+      user {
+        id
+        pk
+      }
     }
   }`;
 
