@@ -1,4 +1,3 @@
-import EditOpeningHoursBar from "@lib/reservation-units/EditOpeningHoursBar";
 import { useToastIfQueryParam } from "common/src/hooks/useToastIfQueryParam";
 import { useSearchParams } from "next/navigation";
 import React, { useState } from "react";
@@ -47,8 +46,11 @@ function ReservationUnits({
       </div>
       <Filters options={options} />
       <HR />
-      <ReservationUnitsDataReader selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
-      <EditOpeningHoursBar selectedRows={selectedRows} setSelectedRows={setSelectedRows} apiBaseUrl={apiBaseUrl} />,
+      <ReservationUnitsDataReader
+        selectedRows={selectedRows}
+        setSelectedRows={setSelectedRows}
+        apiBaseUrl={apiBaseUrl}
+      />
     </>
   );
 }
