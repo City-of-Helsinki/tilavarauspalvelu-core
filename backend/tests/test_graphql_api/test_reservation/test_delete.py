@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import uuid
+from contextlib import contextmanager
+from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 import pytest
@@ -21,6 +23,10 @@ from tests.factories import OrderFactory, PaymentFactory, PaymentOrderFactory, R
 from tests.helpers import patch_method
 
 from .helpers import DELETE_MUTATION, get_delete_data
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
+    from unittest.mock import NonCallableMock
 
 # Applied to all tests
 pytestmark = [
@@ -203,6 +209,16 @@ def test_reservation__delete__delete_from_pindora__call_succeeds(graphql):
     assert PindoraService.delete_access_code.called is True
 
 
+@contextmanager
+def mock_delete_pindora_reservation_task() -> Generator[NonCallableMock]:
+    path = "tilavarauspalvelu.api.graphql.types.reservation.mutations.delete_reservation."
+    path += delete_pindora_reservation_task.__name__
+    path += ".delay"
+
+    with patch(path) as mock:
+        yield mock
+
+
 @patch_method(PindoraService.delete_access_code, side_effect=PindoraAPIError())
 def test_reservation__delete__delete_from_pindora__call_fails_runs_task(graphql):
     reservation = ReservationFactory.create_for_delete(
@@ -213,11 +229,7 @@ def test_reservation__delete__delete_from_pindora__call_fails_runs_task(graphql)
     graphql.login_with_superuser()
     data = get_delete_data(reservation)
 
-    path = "tilavarauspalvelu.api.graphql.types.reservation.mutations.delete_reservation."
-    path += delete_pindora_reservation_task.__name__
-    path += ".delay"
-
-    with patch(path) as task:
+    with mock_delete_pindora_reservation_task() as task:
         response = graphql(DELETE_MUTATION, variables={"input": data})
 
     assert response.has_errors is False, response.errors
