@@ -166,7 +166,7 @@ def test_application_section__all_statuses(graphql):
     """
 
     graphql.login_with_superuser()
-    response = graphql(query)
+    response = graphql(query, count_queries=True)
 
     assert response.has_errors is False, response
     # (1 query for session, doesn't always happen for some reason)
