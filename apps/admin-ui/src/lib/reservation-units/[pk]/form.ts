@@ -929,7 +929,7 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
   return {
     ...vals,
     ...(pk > 0 ? { pk } : {}),
-    name: vals.nameFi.trim(),
+    nameFi: vals.nameFi.trim(),
     surfaceArea: surfaceArea != null && surfaceArea > 0 ? Math.floor(surfaceArea) : null,
     reservationBeginsAt:
       hasScheduledReservation && hasReservationBegins
