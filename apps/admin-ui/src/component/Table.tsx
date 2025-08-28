@@ -13,6 +13,10 @@ type TableWrapperProps = {
 const Wrapper = styled.div`
   display: grid;
   flex-grow: 1;
+
+  [class*="actionContainer"] [class*="actionButtonContainer"] {
+    width: 100%;
+  }
 `;
 
 const StyledTable = styled(Table)<TableWrapperProps>`

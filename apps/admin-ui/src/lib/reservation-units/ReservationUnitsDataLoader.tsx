@@ -14,6 +14,7 @@ import { useGetFilterSearchParams } from "@/hooks";
 type Props = {
   selectedRows: SelectedRow[];
   setSelectedRows: Dispatch<SetStateAction<SelectedRow[]>>;
+  apiBaseUrl: string;
 };
 
 function transformOrderBy(orderBy: string, desc: boolean): ReservationUnitOrderSet | null {
@@ -48,7 +49,7 @@ function transformSortString(orderBy: string | null): ReservationUnitOrderSet[] 
   return [];
 }
 
-export function ReservationUnitsDataReader({ selectedRows, setSelectedRows }: Props): JSX.Element {
+export function ReservationUnitsDataReader({ selectedRows, setSelectedRows, apiBaseUrl }: Props): JSX.Element {
   const [sort, setSort] = useState<string>("");
   const onSortChanged = (sortField: string) => {
     if (sort === sortField) {
@@ -113,6 +114,7 @@ export function ReservationUnitsDataReader({ selectedRows, setSelectedRows }: Pr
         isLoading={loading}
         selectedRows={selectedRows}
         setSelectedRows={setSelectedRows}
+        apiBaseUrl={apiBaseUrl}
       />
       <More
         totalCount={data?.reservationUnits?.totalCount ?? 0}
