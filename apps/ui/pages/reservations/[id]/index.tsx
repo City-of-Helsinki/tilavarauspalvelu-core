@@ -24,7 +24,7 @@ import {
 import Link from "next/link";
 import { isBefore, sub } from "date-fns";
 import { createApolloClient } from "@/modules/apolloClient";
-import { formatDateTimeRange } from "@/modules/util";
+import { formatDateTimeRange } from "common/src/date-utils";
 import {
   getNormalizedReservationOrderStatus,
   getPaymentUrl,
@@ -215,7 +215,7 @@ function Reservation({
   });
 
   const { beginsAt, endsAt } = reservation;
-  const timeString = capitalize(formatDateTimeRange(t, new Date(beginsAt), new Date(endsAt)));
+  const timeString = capitalize(formatDateTimeRange({ t, start: new Date(beginsAt), end: new Date(endsAt) }));
 
   const supportedFields = filterNonNullable(reservation.reservationUnit.metadataSet?.supportedFields);
 
@@ -402,11 +402,11 @@ function AccessCodeInfo({
           />
           <LabelValuePair
             label={t("reservations:accessCodeDuration")}
-            value={formatDateTimeRange(
+            value={formatDateTimeRange({
               t,
-              new Date(pindoraInfo.accessCodeBeginsAt),
-              new Date(pindoraInfo.accessCodeEndsAt)
-            )}
+              start: new Date(pindoraInfo.accessCodeBeginsAt),
+              end: new Date(pindoraInfo.accessCodeEndsAt),
+            })}
             testId="reservation__access-code-duration"
           />
         </>

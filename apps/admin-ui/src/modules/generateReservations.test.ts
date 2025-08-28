@@ -1,6 +1,6 @@
 import { addDays, nextMonday } from "date-fns";
 import { generateReservations } from "./generateReservations";
-import { toUIDate } from "common/src/common/util";
+import { toUIDate } from "common/src/date-utils";
 import { describe, expect, test } from "vitest";
 import { Weekday } from "@gql/gql-types";
 import { WEEKDAYS_SORTED } from "common/src/const";
@@ -27,8 +27,8 @@ function createInput({
   // two weeks is 13 days since the last day is inclusive
   const end = endingDate ?? addDays(dtoday, 13);
   return {
-    startingDate: toUIDate(start),
-    endingDate: toUIDate(end),
+    startingDate: toUIDate({ date: start }),
+    endingDate: toUIDate({ date: end }),
     startTime,
     endTime,
     repeatOnDays,

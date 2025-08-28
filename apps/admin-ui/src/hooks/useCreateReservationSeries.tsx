@@ -7,7 +7,7 @@ import {
   type ReservationSeriesReservationCreateSerializerInput,
 } from "@gql/gql-types";
 import type { ReservationSeriesForm, ReservationFormMeta } from "@/schemas";
-import { fromUIDateUnsafe, toApiDateUnsafe } from "common/src/common/util";
+import { fromUIDateUnsafe, toApiDateUnsafe } from "common/src/date-utils";
 import { gql } from "@apollo/client";
 import { useSession } from "@/hooks";
 
@@ -79,16 +79,16 @@ export function useCreateReservationSeries() {
       user: user.pk,
     };
 
-    const skipDates: string[] = props.skipDates.map((d) => toApiDateUnsafe(d));
+    const skipDates: string[] = props.skipDates.map((d) => toApiDateUnsafe({ date: d }));
     const input: ReservationSeriesCreateMutationInput = {
       reservationDetails,
       skipDates,
       // checkOpeningHours: true,
       ageGroup: !Number.isNaN(ageGroup) ? ageGroup : undefined,
       reservationUnit: reservationUnitPk,
-      beginDate: toApiDateUnsafe(fromUIDateUnsafe(startingDate)),
+      beginDate: toApiDateUnsafe({ date: fromUIDateUnsafe({ date: startingDate }) }),
       beginTime: startTime,
-      endDate: toApiDateUnsafe(fromUIDateUnsafe(endingDate)),
+      endDate: toApiDateUnsafe({ date: fromUIDateUnsafe({ date: endingDate }) }),
       endTime,
       weekdays: repeatOnDays,
       recurrenceInDays: repeatPattern === "weekly" ? 7 : 14,

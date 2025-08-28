@@ -2,11 +2,11 @@ import { IconClock, IconGroup, IconEuroSign, IconHome, IconSize, IconLock, Toolt
 import React from "react";
 import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { convertLanguageCode, formatDuration, getTranslationSafe, toUIDate } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { ReservationKind, type ReservationUnitHeadFragment } from "@gql/gql-types";
 import { Flex, H1, H3 } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { formatDateRange, formatDateTime } from "@/modules/util";
+import { formatDateRange, formatDateTime, formatDuration, toUIDate } from "common/src/date-utils";
 import { IconWithText } from "@/components/common/IconWithText";
 import { Images } from "./Images";
 import {
@@ -43,7 +43,7 @@ function formatErrorMessages(t: TFunction, reservationUnit: NonReservableNotific
     const begin = new Date(reservationUnit.reservationBeginsAt);
     if (begin > new Date()) {
       const futureOpeningText = t("reservationUnit:notifications.futureOpening", {
-        date: formatDateTime(t, begin),
+        date: formatDateTime({ t, date: begin }),
       });
       returnText = futureOpeningText;
     }
@@ -136,15 +136,22 @@ function AccessTypeTooltip({ accessTypes }: Pick<ReservationUnitHeadFragment, "a
     <Tooltip>
       <ul>
         {accessTypeDurations.map((accessTypeDuration) => (
-          <li key={toUIDate(accessTypeDuration.beginDate)}>
+          <li key={toUIDate({ date: accessTypeDuration.beginDate })}>
             <span>
               {t(`reservationUnit:accessTypes.${accessTypeDuration.accessType}`)}
               {": "}
             </span>
             <span>
               {accessTypeDuration.endDate != null
-                ? formatDateRange(accessTypeDuration.beginDate, accessTypeDuration.endDate)
-                : `${t("common:dateGte", { value: toUIDate(accessTypeDuration.beginDate) })}`}
+                ? formatDateRange({
+                    t,
+                    start: accessTypeDuration.beginDate,
+                    end: accessTypeDuration.endDate,
+                    options: {
+                      includeWeekday: false,
+                    },
+                  })
+                : `${t("common:dateGte", { value: toUIDate({ date: accessTypeDuration.beginDate }) })}`}
             </span>
           </li>
         ))}
@@ -161,8 +168,8 @@ function IconList({
   const lang = convertLanguageCode(i18n.language);
   const minDur = reservationUnit.minReservationDuration ?? 0;
   const maxDur = reservationUnit.maxReservationDuration ?? 0;
-  const minReservationDuration = formatDuration(t, { seconds: minDur }, true);
-  const maxReservationDuration = formatDuration(t, { seconds: maxDur }, true);
+  const minReservationDuration = formatDuration({ t, duration: { seconds: minDur }, abbreviated: true });
+  const maxReservationDuration = formatDuration({ t, duration: { seconds: maxDur }, abbreviated: true });
   const pricing = getActivePricing(reservationUnit);
   const isPaid = isReservationUnitPaid(reservationUnit.pricings);
   const unitPrice = pricing ? getPriceString({ t, pricing }) : undefined;

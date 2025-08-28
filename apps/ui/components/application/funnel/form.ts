@@ -14,8 +14,7 @@ import {
   Weekday,
 } from "@gql/gql-types";
 import { z } from "zod";
-import { toApiDate, toUIDate } from "common/src/common/util";
-import { fromUIDate } from "@/modules/util";
+import { fromUIDate, toApiDate, toUIDate } from "common/src/date-utils";
 import { checkValidDateOnly, lessThanMaybeDate } from "common/src/schemas/schemaCommon";
 import { CELL_STATES } from "common/src/components/ApplicationTimeSelector";
 
@@ -71,10 +70,10 @@ const ApplicationSectionPage1Schema = z
     message: "Maximum duration must be greater than minimum duration",
   })
   .superRefine((val, ctx) => {
-    checkValidDateOnly(fromUIDate(val.begin ?? ""), ctx, `begin`);
+    checkValidDateOnly(fromUIDate({ date: val.begin ?? "" }), ctx, `begin`);
   })
   .superRefine((val, ctx) => {
-    checkValidDateOnly(fromUIDate(val.end ?? ""), ctx, `end`);
+    checkValidDateOnly(fromUIDate({ date: val.end ?? "" }), ctx, `end`);
   })
   .superRefine((val, ctx) => {
     if (lessThanMaybeDate(val.end, val.begin)) {
@@ -223,7 +222,7 @@ function convertDate(date: string | null | undefined): string | undefined {
   if (date == null) {
     return undefined;
   }
-  return toUIDate(new Date(date)) || undefined;
+  return toUIDate({ date: new Date(date) }) || undefined;
 }
 
 const ApplicantTypeSchema = z.enum([ReserveeType.Individual, ReserveeType.Company, ReserveeType.Nonprofit]);
@@ -279,8 +278,8 @@ function checkApplicationRoundDates(
   if (begin == null || end == null) {
     return;
   }
-  const b = fromUIDate(begin);
-  const e = fromUIDate(end);
+  const b = fromUIDate({ date: begin });
+  const e = fromUIDate({ date: end });
 
   if (b != null) {
     checkDateRange({
@@ -392,9 +391,9 @@ function transformDateString(date?: string | null): string | null {
   if (date == null) {
     return null;
   }
-  const d = fromUIDate(date);
+  const d = fromUIDate({ date });
   if (d != null) {
-    return toApiDate(d);
+    return toApiDate({ date: d });
   }
   return null;
 }

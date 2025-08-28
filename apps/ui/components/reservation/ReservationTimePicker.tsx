@@ -33,10 +33,9 @@ import {
   getSlotPropGetter,
   isRangeReservable,
 } from "@/modules/reservable";
-import { formatDuration, fromUIDate, toApiDate, toUIDate } from "common/src/common/util";
+import { formatDuration, formatTime, fromUIDate, toApiDate, toUIDate } from "common/src/date-utils";
 import { useTranslation } from "next-i18next";
 import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";
-import { getTimeString } from "@/modules/reservationUnit";
 import { type UseFormReturn } from "react-hook-form";
 import { type PendingReservationFormType } from "../reservation-unit/schema";
 import { useCurrentUser } from "@/hooks";
@@ -129,7 +128,7 @@ function useCalendarEventChange({
         beginsAt: start,
         endsAt: end,
         state: "INITIAL",
-        durationString: diff >= 90 ? `(${formatDuration(t, { minutes: diff })})` : "",
+        durationString: diff >= 90 ? `(${formatDuration({ t, duration: { minutes: diff } })})` : "",
       };
     }
 
@@ -192,7 +191,7 @@ export function ReservationTimePicker({
   const dateValue = watch("date");
 
   const now = useMemo(() => new Date(), []);
-  const focusDate = fromUIDate(dateValue) ?? new Date();
+  const focusDate = fromUIDate({ date: dateValue }) ?? new Date();
 
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
   useEffect(() => {
@@ -264,8 +263,8 @@ export function ReservationTimePicker({
       reservationUnit,
     });
 
-    const newDate = toUIDate(begin);
-    const newTime = getTimeString(begin);
+    const newDate = toUIDate({ date: begin });
+    const newTime = formatTime({ t, date: begin });
 
     setValue("date", newDate, { shouldDirty: true });
     setValue("duration", duration, { shouldDirty: true });
@@ -319,8 +318,8 @@ export function ReservationTimePicker({
       reservationUnit,
     });
 
-    const uiDate = toUIDate(begin);
-    const uiTime = getTimeString(begin);
+    const uiDate = toUIDate({ date: begin });
+    const uiTime = formatTime({ t, date: begin });
     // click doesn't change the duration
     setValue("date", uiDate, { shouldDirty: true });
     setValue("time", uiTime, { shouldDirty: true });
@@ -334,7 +333,7 @@ export function ReservationTimePicker({
     fetchPolicy: "no-cache",
     skip: !currentUser || !reservationUnit.pk,
     variables: {
-      beginDate: toApiDate(now),
+      beginDate: toApiDate({ date: now }),
       user: currentUser?.pk ?? 0,
       reservationUnits: [reservationUnit.pk ?? 0],
       state: RELATED_RESERVATION_STATES,
@@ -363,7 +362,7 @@ export function ReservationTimePicker({
         <Calendar<ReservationNode>
           events={calendarEvents}
           begin={focusDate}
-          onNavigate={(d: Date) => setValue("date", toUIDate(d))}
+          onNavigate={(d: Date) => setValue("date", toUIDate({ date: d }))}
           eventStyleGetter={(event) =>
             eventStyleGetter(event, filterNonNullable(userReservations?.map((n) => n?.pk)), !isReservationQuotaReached)
           }

@@ -4,7 +4,7 @@ import {
   type ReservationUnitsByUnitQuery,
   useReservationUnitsByUnitQuery,
 } from "@gql/gql-types";
-import { toApiDate } from "common/src/common/util";
+import { toApiDate } from "common/src/date-utils";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { errorToast } from "common/src/components/toast";
@@ -53,8 +53,8 @@ export function useUnitResources({
     variables: {
       id,
       pk: Number(unitPk),
-      beginDate: toApiDate(begin) ?? "",
-      endDate: toApiDate(begin) ?? "",
+      beginDate: toApiDate({ date: begin }) ?? "",
+      endDate: toApiDate({ date: begin }) ?? "",
       state: RELATED_RESERVATION_STATES,
     },
     onError: () => {

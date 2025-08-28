@@ -23,8 +23,8 @@ import {
   ReservationUnitTypeOrderingChoices,
   UnitOrderingChoices,
 } from "@gql/gql-types";
-import { convertLanguageCode, getTranslationSafe, toApiDate } from "common/src/common/util";
-import { fromUIDate } from "./util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { fromUIDate, toApiDate } from "common/src/date-utils";
 import { startOfDay } from "date-fns";
 import { SEARCH_PAGING_LIMIT } from "./const";
 import { gql, type ApolloClient } from "@apollo/client";
@@ -122,10 +122,10 @@ export function processVariables({
   const orderBy = transformSortString(ignoreMaybeArray(sortCriteria), language, desc);
 
   const today = startOfDay(new Date());
-  const startDate = fromUIDate(ignoreMaybeArray(values.getAll("startDate")) ?? "");
-  const reservableDateStart = startDate && startDate >= today ? toApiDate(startDate) : null;
-  const endDate = fromUIDate(ignoreMaybeArray(values.getAll("endDate")) ?? "");
-  const reservableDateEnd = endDate && endDate >= today ? toApiDate(endDate) : null;
+  const startDate = fromUIDate({ date: ignoreMaybeArray(values.getAll("startDate")) ?? "" });
+  const reservableDateStart = startDate && startDate >= today ? toApiDate({ date: startDate }) : null;
+  const endDate = fromUIDate({ date: ignoreMaybeArray(values.getAll("endDate")) ?? "" });
+  const reservableDateEnd = endDate && endDate >= today ? toApiDate({ date: endDate }) : null;
 
   const dur = toNumber(ignoreMaybeArray(values.getAll("duration")));
   const duration = dur != null && dur > 0 ? dur : undefined;

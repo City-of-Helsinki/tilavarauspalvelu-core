@@ -5,14 +5,8 @@ import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { addYears } from "date-fns";
-import {
-  convertLanguageCode,
-  fromUIDate,
-  getTranslationSafe,
-  isValidDate,
-  toApiDate,
-  toUIDate,
-} from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { formatTime, fromUIDate, isValidDate, toApiDate, toUIDate } from "common/src/date-utils";
 import { formatters as getFormatters } from "common";
 import { Flex, H4 } from "common/styled";
 import { breakpoints } from "common/src/const";
@@ -53,7 +47,6 @@ import {
   getFuturePricing,
   getPriceString,
   getReservationUnitName,
-  getTimeString,
   isReservationUnitPublished,
   isReservationUnitReservable,
 } from "@/modules/reservationUnit";
@@ -242,20 +235,20 @@ function ReservationUnit({
   const minReservationDurationMinutes = getMinReservationDuration(reservationUnit);
   const maxReservationDurationMinutes = getMaxReservationDuration(reservationUnit);
 
-  const searchUIDate = fromUIDate(searchDate ?? "");
+  const searchUIDate = fromUIDate({ date: searchDate ?? "" });
   // TODO should be the first reservable day (the reservableTimeSpans logic is too complex and needs refactoring)
   // i.e. using a naive approach will return empty timespsans either reuse the logic for QuickReservation or refactor
   const defaultDate = new Date();
-  const defaultDateString = toUIDate(defaultDate);
+  const defaultDateString = toUIDate({ date: defaultDate });
   const defaultValues = {
-    date: searchUIDate != null && isValidDate(searchUIDate) ? (searchDate ?? "") : defaultDateString,
+    date: searchUIDate != null && isValidDate({ date: searchUIDate }) ? (searchDate ?? "") : defaultDateString,
     duration: clampDuration(
       searchDuration ?? 0,
       minReservationDurationMinutes,
       maxReservationDurationMinutes,
       durationOptions
     ),
-    time: searchTime ?? getTimeString(defaultDate),
+    time: searchTime ?? formatTime({ t, date: defaultDate }),
     isControlsVisible: true,
   };
 
@@ -612,7 +605,7 @@ function PriceChangeNotice({ futurePricing }: { futurePricing: PricingFieldsFrag
         i18nKey="reservationUnit:futurePricingNotice"
         defaults="Huomioi <bold>hinnoittelumuutos {{date}} alkaen. Uusi hinta on {{price}}</bold>."
         values={{
-          date: toUIDate(begins),
+          date: toUIDate({ date: begins }),
           price: priceString,
         }}
         components={{ bold: <strong /> }}
@@ -702,8 +695,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       query: ReservationUnitPageDocument,
       variables: {
         id: base64encode(`ReservationUnitNode:${pk}`),
-        beginDate: toApiDate(startDate) ?? "",
-        endDate: toApiDate(endDate) ?? "",
+        beginDate: toApiDate({ date: startDate }) ?? "",
+        endDate: toApiDate({ date: endDate }) ?? "",
       },
     });
 

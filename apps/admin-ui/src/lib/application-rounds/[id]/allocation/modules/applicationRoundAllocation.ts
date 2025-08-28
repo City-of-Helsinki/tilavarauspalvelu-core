@@ -8,7 +8,7 @@ import {
 } from "@gql/gql-types";
 import { type TFunction } from "next-i18next";
 import { filterNonNullable, formatTimeRange, sort, timeToMinutes, toNumber } from "common/src/helpers";
-import { formatDuration } from "common/src/common/util";
+import { formatDuration } from "common/src/date-utils";
 import { convertWeekday, transformWeekday } from "common/src/conversion";
 import { type DayT } from "common/src/const";
 import { set } from "date-fns";
@@ -208,8 +208,8 @@ export function createDurationString(
   const minDuration = section.reservationMinDuration;
   const maxDuration = section.reservationMaxDuration;
 
-  const minDurString = formatDuration(t, { seconds: minDuration });
-  const maxDurString = formatDuration(t, { seconds: maxDuration });
+  const minDurString = formatDuration({ t, duration: { seconds: minDuration } });
+  const maxDurString = formatDuration({ t, duration: { seconds: maxDuration } });
   const durationString = minDuration === maxDuration ? minDurString : `${minDurString ?? ""} - ${maxDurString ?? ""}`;
   return durationString;
 }

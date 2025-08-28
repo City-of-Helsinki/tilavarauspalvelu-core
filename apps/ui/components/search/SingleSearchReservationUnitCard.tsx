@@ -3,7 +3,8 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { type SingleSearchCardFragment } from "@gql/gql-types";
 import { format, isToday, isTomorrow, isValid } from "date-fns";
-import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { toUIDate } from "common/src/date-utils";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import { isBrowser } from "@/modules/const";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
@@ -26,7 +27,7 @@ function StatusTag(props: Pick<SingleSearchCardFragment, "isClosed" | "firstRese
   if (!availableAt || !isValid(availableAt)) {
     return <Tag type="neutral">{t("reservationUnitCard:noTimes")}</Tag>;
   }
-  let dayText = toUIDate(availableAt);
+  let dayText = toUIDate({ date: availableAt });
   if (isToday(availableAt)) {
     dayText = t("common:today");
   } else if (isTomorrow(availableAt)) {

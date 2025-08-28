@@ -25,14 +25,21 @@ import { LinkPrev } from "@/component/LinkPrev";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonSize, Notification } from "hds-react";
-import { fromApiDate, fromUIDate, fromUIDateUnsafe, toApiDateUnsafe, toUIDate } from "common/src/common/util";
+import {
+  fromApiDate,
+  fromApiDateTime,
+  fromUIDate,
+  toUIDate,
+  fromUIDateUnsafe,
+  toApiDateUnsafe,
+} from "common/src/date-utils";
 import { ControlledDateInput, TimeInput } from "common/src/components/form";
 import { WeekdaysSelector } from "@/component/WeekdaysSelector";
 import { ReservationListEditor } from "@/component/ReservationListEditor";
 import { useFilteredReservationList, useMultipleReservation, useSession } from "@/hooks";
 import { RescheduleReservationSeriesForm, RescheduleReservationSeriesFormSchema } from "@/schemas";
 import { errorToast, successToast } from "common/src/components/toast";
-import { fromAPIDateTime, getBufferTime } from "@/helpers";
+import { getBufferTime } from "@/helpers";
 import { BufferToggles } from "@/component/BufferToggles";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { getReservationUrl } from "@/common/urls";
@@ -57,11 +64,11 @@ function convertToForm(value: NodeT): RescheduleReservationSeriesForm {
   const reservations = filterNonNullable(value?.reservations).filter((x) => new Date(x.beginsAt) >= new Date());
   const bufferTimeBefore = calculateMedian(reservations.map((x) => x.bufferTimeBefore));
   const bufferTimeAfter = calculateMedian(reservations.map((x) => x.bufferTimeAfter));
-  const begin = fromAPIDateTime(value?.beginDate, value?.beginTime);
-  const end = fromAPIDateTime(value?.endDate, value?.endTime);
+  const begin = fromApiDateTime({ date: value?.beginDate, time: value?.beginTime });
+  const end = fromApiDateTime({ date: value?.endDate, time: value?.endTime });
   return {
-    startingDate: value?.beginDate != null ? toUIDate(fromApiDate(value.beginDate)) : "",
-    endingDate: value?.endDate != null ? toUIDate(fromApiDate(value.endDate)) : "",
+    startingDate: value?.beginDate != null ? toUIDate({ date: fromApiDate({ date: value.beginDate }) }) : "",
+    endingDate: value?.endDate != null ? toUIDate({ date: fromApiDate({ date: value.endDate }) }) : "",
     startTime: begin ? format(begin, "HH:mm") : "",
     endTime: end ? format(end, "HH:mm") : "",
     repeatOnDays: filterNonNullable(value?.weekdays),
@@ -168,8 +175,8 @@ function SeriesPageInner({ pk }: { pk: number }) {
   const checkedReservations = useFilteredReservationList({
     items: newReservations,
     reservationUnitPk: reservationUnit?.pk ?? 0,
-    begin: fromUIDate(watch("startingDate")) ?? new Date(),
-    end: fromUIDate(watch("endingDate")) ?? new Date(),
+    begin: fromUIDate({ date: watch("startingDate") }) ?? new Date(),
+    end: fromUIDate({ date: watch("endingDate") }) ?? new Date(),
     startTime: watch("startTime"),
     endTime: watch("endTime"),
     reservationType: reservation?.type ?? ReservationTypeChoice.Staff,
@@ -212,14 +219,14 @@ function SeriesPageInner({ pk }: { pk: number }) {
     try {
       const input: ReservationSeriesRescheduleMutationInput = {
         pk: reservationSeries.pk,
-        beginDate: toApiDateUnsafe(fromUIDateUnsafe(values.startingDate)),
+        beginDate: toApiDateUnsafe({ date: fromUIDateUnsafe({ date: values.startingDate }) }),
         beginTime: values.startTime,
-        endDate: toApiDateUnsafe(fromUIDateUnsafe(values.endingDate)),
+        endDate: toApiDateUnsafe({ date: fromUIDateUnsafe({ date: values.endingDate }) }),
         endTime: values.endTime,
         weekdays: values.repeatOnDays,
         bufferTimeBefore: bufferTimeBefore.toString(),
         bufferTimeAfter: bufferTimeAfter.toString(),
-        skipDates: skipDates.map((x) => toApiDateUnsafe(x)),
+        skipDates: skipDates.map((x) => toApiDateUnsafe({ date: x })),
       };
       const mutRes = await mutate({ variables: { input } });
       if (mutRes.data?.rescheduleReservationSeries?.pk == null) {

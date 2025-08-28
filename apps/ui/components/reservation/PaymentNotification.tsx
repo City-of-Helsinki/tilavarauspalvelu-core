@@ -8,7 +8,8 @@ import { Notification } from "hds-react";
 import { ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { convertLanguageCode, toUIDateTime } from "common/src/common/util";
+import { convertLanguageCode } from "common/src/common/util";
+import { toUIDateTime } from "common/src/date-utils";
 import { Flex, fontMedium } from "common/styled";
 import { formatters as getFormatters } from "common";
 import React, { useMemo } from "react";
@@ -54,7 +55,10 @@ export const PaymentNotification = ({
 
   const deadline =
     paymentOrder?.handledPaymentDueBy != null
-      ? toUIDateTime(new Date(paymentOrder.handledPaymentDueBy), t("common:dayTimeSeparator"))
+      ? toUIDateTime({
+          date: new Date(paymentOrder.handledPaymentDueBy),
+          dayTimeSeparator: t("common:dayTimeSeparator"),
+        })
       : "-";
   const lang = convertLanguageCode(i18n.language);
   const isExpired =

@@ -8,7 +8,7 @@ import { AutoGrid, Flex, H4 } from "common/styled";
 import { getLocalizationLang } from "common/src/helpers";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import { ControlledNumberInput, ControlledSelect } from "common/src/components/form";
-import { toUIDate } from "common/src/common/util";
+import { toUIDate } from "common/src/date-utils";
 import { Accordion } from "@/components/Accordion";
 import { getDurationOptions } from "@/modules/const";
 import { type ApplicationPage1FormValues } from "./form";
@@ -43,8 +43,8 @@ function ApplicationSectionInner({ index, applicationRound, options, onDeleteEve
 
   const selectDefaultPeriod = (): void => {
     clearErrors([`applicationSections.${index}.begin`, `applicationSections.${index}.end`]);
-    const begin = toUIDate(periodStartDate);
-    const end = toUIDate(periodEndDate);
+    const begin = toUIDate({ date: periodStartDate });
+    const end = toUIDate({ date: periodEndDate });
     setValue(`applicationSections.${index}.begin`, begin);
     setValue(`applicationSections.${index}.end`, end);
   };
@@ -56,8 +56,8 @@ function ApplicationSectionInner({ index, applicationRound, options, onDeleteEve
   const selectionIsDefaultPeriod =
     applicationPeriodEndsAt != null &&
     applicationPeriodBeginsAt != null &&
-    applicationPeriodBeginsAt === toUIDate(periodStartDate) &&
-    applicationPeriodEndsAt === toUIDate(periodEndDate);
+    applicationPeriodBeginsAt === toUIDate({ date: periodStartDate }) &&
+    applicationPeriodEndsAt === toUIDate({ date: periodEndDate });
 
   type FieldName =
     | "begin"
@@ -139,9 +139,9 @@ function ApplicationSectionInner({ index, applicationRound, options, onDeleteEve
       <Checkbox
         id={`applicationSections.${index}.defaultPeriod`}
         checked={selectionIsDefaultPeriod}
-        label={`${t("application:Page1.defaultPeriodPrefix")} ${toUIDate(
-          periodStartDate
-        )} - ${toUIDate(periodEndDate)}`}
+        label={`${t("application:Page1.defaultPeriodPrefix")} ${toUIDate({
+          date: periodStartDate,
+        })} - ${toUIDate({ date: periodEndDate })}`}
         onChange={selectDefaultPeriod}
         disabled={selectionIsDefaultPeriod}
       />

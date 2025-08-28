@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { ReservationTypeChoice, type Maybe, useReservationsByReservationUnitQuery } from "@gql/gql-types";
-import { isValidDate, toApiDate } from "common/src/common/util";
+import { isValidDate, toApiDate } from "common/src/date-utils";
 import { addDays, addMinutes, startOfDay } from "date-fns";
 import {
   type CollisionInterval,
@@ -26,9 +26,9 @@ function useReservationsInInterval({
   reservationType: ReservationTypeChoice;
 }) {
   const { t } = useTranslation();
-  const apiStart = toApiDate(begin);
+  const apiStart = toApiDate({ date: begin });
   // NOTE backend error, it returns all till 00:00 not 23:59
-  const apiEnd = toApiDate(addDays(end, 1));
+  const apiEnd = toApiDate({ date: addDays(end, 1) });
   const isIntervalValid = begin < end;
   const isValidQuery =
     isIntervalValid && reservationUnitPk != null && reservationUnitPk > 0 && apiStart != null && apiEnd != null;
@@ -132,7 +132,7 @@ function listItemToInterval(
 ): CollisionInterval {
   const start = addMinutes(startOfDay(date), startTime);
   const end = addMinutes(startOfDay(date), endTime);
-  if (!isValidDate(start) && !isValidDate(end)) {
+  if (!isValidDate({ date: start }) && !isValidDate({ date: end })) {
     throw new Error("Invalid date");
   }
   const before = type !== ReservationTypeChoice.Blocked ? (buffers?.before ?? 0) : 0;

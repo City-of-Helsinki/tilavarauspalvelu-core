@@ -24,7 +24,7 @@ import {
   type ShowNotificationsListQueryVariables,
 } from "@gql/gql-types";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { toApiDate } from "common/src/common/util";
+import { toApiDate } from "common/src/date-utils";
 
 function MyApp(props: AppProps<PageProps> & AppOwnProps): JSX.Element {
   const { Component, pageProps, currentUser, handlingData, notificationsData } = props;
@@ -106,7 +106,7 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
       query: HandlingDataDocument,
       fetchPolicy: "no-cache",
       variables: {
-        beginDate: toApiDate(new Date()) ?? "",
+        beginDate: toApiDate({ date: new Date() }) ?? "",
         state: ReservationStateChoice.RequiresHandling,
       },
     });

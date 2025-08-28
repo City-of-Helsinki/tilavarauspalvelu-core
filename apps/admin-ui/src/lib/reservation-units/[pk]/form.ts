@@ -1,5 +1,5 @@
 import { convertTime, filterNonNullable, timeToMinutes, toNumber } from "common/src/helpers";
-import { fromApiDate, fromUIDate, toApiDate, toUIDate } from "common/src/common/util";
+import { fromApiDate, fromUIDate, fromUIDateTime, toApiDate, toUIDate } from "common/src/date-utils";
 import {
   AccessType,
   Authentication,
@@ -17,7 +17,6 @@ import {
 import { addDays, endOfDay, format } from "date-fns";
 import { z } from "zod";
 import { checkLengthWithoutHtml, checkTimeStringFormat } from "common/src/schemas/schemaCommon";
-import { fromUIDateTime } from "@/helpers";
 import { intervalToNumber } from "@/schemas/utils";
 import { WEEKDAYS_SORTED } from "common/src/const";
 import { type TaxOption } from "./PricingSection";
@@ -31,7 +30,7 @@ type Node = NonNullable<QueryData>;
 /// @param date string in UI format
 /// @returns true if date is in the future
 function isAfterToday(date: string) {
-  const d = fromUIDate(date);
+  const d = fromUIDate({ date });
   if (d == null) {
     return false;
   }
@@ -72,7 +71,7 @@ function refinePricing(data: PricingFormValues | undefined, ctx: z.RefinementCtx
       code: z.ZodIssueCode.custom,
     });
   }
-  const date = fromUIDate(data.begins);
+  const date = fromUIDate({ date: data.begins });
   if (date == null || Number.isNaN(date.getTime())) {
     ctx.addIssue({
       message: "Invalid date",
@@ -185,7 +184,7 @@ function validateAccessTypes(accessTypes: AccessTypesFormType[], ctx: z.Refineme
   const seenDates: string[] = [];
 
   accessTypes.forEach((at, index) => {
-    if (fromUIDate(at.beginDate) == null) {
+    if (fromUIDate({ date: at.beginDate }) == null) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "access type invalid beginDate",
@@ -340,8 +339,8 @@ function validateDateTimeInterval({
     });
   }
 
-  const begin = fromUIDateTime(beginDate, beginTime);
-  const end = fromUIDateTime(endDate, endTime);
+  const begin = fromUIDateTime({ date: beginDate, time: beginTime });
+  const end = fromUIDateTime({ date: endDate, time: endTime });
   if (beginDate !== "" && begin == null) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -674,12 +673,12 @@ export const ReservationUnitEditSchema = z
 export type ReservationUnitEditFormValues = z.infer<typeof ReservationUnitEditSchema>;
 
 function convertBegins(begins?: string) {
-  const d = begins != null && begins !== "" ? fromApiDate(begins) : undefined;
+  const d = begins != null && begins !== "" ? fromApiDate({ date: begins }) : undefined;
   const today = new Date();
   if (d != null) {
-    return toUIDate(d);
+    return toUIDate({ date: d });
   }
-  return toUIDate(today);
+  return toUIDate({ date: today });
 }
 
 type PricingNode = NonNullable<Node["pricings"]>[0];
@@ -718,7 +717,7 @@ function convertPricingList(pricings: PricingNode[]): PricingFormValues[] {
   while (prices.length < 2 || !prices.some((p) => p?.isFuture)) {
     // if we need to add first price, it's always current
     const isFuture = prices.length > 0;
-    const begins = prices.length === 0 ? toUIDate(new Date()) : toUIDate(addDays(new Date(), 1));
+    const begins = prices.length === 0 ? toUIDate({ date: new Date() }) : toUIDate({ date: addDays(new Date(), 1) });
 
     prices.push({
       pk: rollingIndex--,
@@ -915,14 +914,14 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     }));
 
   function maybeToApiDateTime(date: string, time: string): string | null {
-    const d = fromUIDateTime(date, time);
+    const d = fromUIDateTime({ date, time });
     return d != null ? d.toISOString() : null;
   }
   const accessTypes: ReservationUnitAccessTypeSerializerInput[] = filterNonNullable(
     accessTypesForm.map((at) => ({
       pk: at.pk,
       accessType: at.accessType,
-      beginDate: toApiDate(fromUIDate(at.beginDate) || new Date()) || "",
+      beginDate: toApiDate({ date: fromUIDate({ date: at.beginDate }) || new Date() }) || "",
     }))
   );
 
@@ -987,10 +986,10 @@ function transformPricing(
     throw new Error("Tax percentage is required for pricing");
   }
 
-  const begins = fromUIDate(values.begins) ?? new Date();
+  const begins = fromUIDate({ date: values.begins }) ?? new Date();
   return {
     taxPercentage,
-    begins: toApiDate(begins) ?? "",
+    begins: toApiDate({ date: begins }) ?? "",
     highestPrice: values.isPaid ? values.highestPrice.toString() : "0",
     lowestPrice: values.isPaid ? values.lowestPrice.toString() : "0",
     ...(values.pk > 0 ? { pk: values.pk } : {}),

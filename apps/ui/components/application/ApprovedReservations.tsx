@@ -32,7 +32,7 @@ import {
   CenterSpinner,
 } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { getTranslationSafe, toApiDate, toUIDate } from "common/src/common/util";
+import { getTranslationSafe } from "common/src/common/util";
 import {
   filterNonNullable,
   formatApiTimeInterval,
@@ -66,7 +66,7 @@ import { getApplicationReservationPath, getApplicationSectionPath, getReservatio
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { AccordionWithIcons } from "@/components/AccordionWithIcons";
 import { isReservationCancellableReason, ReservationCancellableReason } from "@/modules/reservation";
-import { formatDateRange, formatDateTimeStrings } from "@/modules/util";
+import { formatDateRange, formatDateTimeStrings, toApiDate, toUIDate } from "common/src/date-utils";
 import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 
 const N_RESERVATIONS_TO_SHOW = 20;
@@ -254,7 +254,7 @@ export function ApprovedReservations({ application, applicationRound }: Readonly
   const { data, loading } = useApplicationReservationsQuery({
     variables: {
       id: application.id,
-      beginDate: toApiDate(new Date()) ?? "",
+      beginDate: toApiDate({ date: new Date() }) ?? "",
     },
   });
   const { application: app } = data || {};
@@ -553,7 +553,14 @@ function ReservationUnitAccessTypeList({
                       ? ` (${reservationUnit?.pindoraInfo?.accessCode})`
                       : "")}
                 </span>
-                <span>{formatDateRange(periodBeginDate, periodEndDate)}</span>
+                <span>
+                  {formatDateRange({
+                    t,
+                    start: periodBeginDate,
+                    end: periodEndDate,
+                    options: { includeWeekday: false },
+                  })}
+                </span>
               </li>
             );
           })}
@@ -721,7 +728,7 @@ function ReservationsTable({
         return (
           <Flex $direction="row" $gap="2-xs" $justifyContent="space-between" $width="full">
             <span style={{ position: "relative" }} aria-label={t("common:dateLabel")}>
-              <span>{toUIDate(date)}</span>
+              <span>{toUIDate({ date })}</span>
               <OnlyForMobile>
                 {/* span removes whitespace */}
                 <pre style={{ display: "inline" }}>{" - "}</pre>
@@ -867,7 +874,7 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
   function getRejected(r: (typeof reservationSeries)[0]): ReservationsTableElem[] {
     return r.rejectedOccurrences.map((res) => {
       const reservation = { beginsAt: res.beginDatetime, endsAt: res.endDatetime };
-      const rest = formatDateTimeStrings(t, reservation);
+      const rest = formatDateTimeStrings({ t, reservation });
       return {
         ...rest,
         reservationUnit: r.reservationUnit,
@@ -890,11 +897,12 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
 
   function getReservations(r: (typeof reservationSeries)[0]): ReservationsTableElem[] {
     return r.reservations.reduce<ReservationsTableElem[]>((acc, res, idx, ar) => {
-      const { isModified, ...rest } = formatDateTimeStrings(t, res, r.allocatedTimeSlot);
+      const { isModified, ...rest } = formatDateTimeStrings({ t, reservation: res, orig: r.allocatedTimeSlot });
       const status = getReservationStatusChoice(res.state, isModified);
       const accessTypeChanged = idx !== 0 && res.accessType !== ar[idx - 1]?.accessType;
       const accessCodeValidThru = getAccessCodeValidThru(res.pindoraInfo);
-      const accessCodeTime = accessCodeValidThru != null ? formatDateTimeStrings(t, accessCodeValidThru).time : null;
+      const accessCodeTime =
+        accessCodeValidThru != null ? formatDateTimeStrings({ t, reservation: accessCodeValidThru }).time : null;
       const reservationTableElem: ReservationsTableElem = {
         ...rest,
         reservationUnit: r.reservationUnit,

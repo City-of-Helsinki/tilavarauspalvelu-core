@@ -10,7 +10,7 @@ import { type SuitableTimeRangeFormValues } from "./form";
 import { Priority, Weekday } from "@/gql/gql-types";
 import { type Cell } from "common/src/components/ApplicationTimeSelector";
 import { type DayT, WEEKDAYS_SORTED } from "common/src/const";
-import { toApiTimeUnsafe } from "common/src/common/util";
+import { toApiTimeUnsafe } from "common/src/date-utils";
 import { transformWeekday } from "common/src/conversion";
 
 function createDayCells(

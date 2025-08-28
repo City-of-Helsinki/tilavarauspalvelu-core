@@ -1,5 +1,5 @@
 import { timeToMinutes, toMondayFirst } from "common/src/helpers";
-import { fromUIDateUnsafe } from "common/src/common/util";
+import { fromUIDateUnsafe } from "common/src/date-utils";
 import { TimeSelectionForm } from "@/schemas";
 import { Weekday } from "@gql/gql-types";
 import { transformWeekday } from "common/src/conversion";
@@ -49,8 +49,8 @@ export function generateReservations(props: TimeSelectionForm) {
   const max = (a: number, b: number) => (a > b ? a : b);
 
   try {
-    const rawStartingDate = fromUIDateUnsafe(startingDate);
-    const rawEndingDate = fromUIDateUnsafe(endingDate);
+    const rawStartingDate = fromUIDateUnsafe({ date: startingDate });
+    const rawEndingDate = fromUIDateUnsafe({ date: endingDate });
     if (Number.isNaN(rawStartingDate) || Number.isNaN(rawEndingDate)) {
       return [];
     }
@@ -63,10 +63,10 @@ export function generateReservations(props: TimeSelectionForm) {
       return [];
     }
 
-    const sDay = max(utcDate(new Date()), utcDate(fromUIDateUnsafe(startingDate)));
+    const sDay = max(utcDate(new Date()), utcDate(fromUIDateUnsafe({ date: startingDate })));
 
     // end date with time 23:59:59
-    const eDay = utcDate(fromUIDateUnsafe(endingDate)) + (MILLISECONDS_IN_DAY - 1);
+    const eDay = utcDate(fromUIDateUnsafe({ date: endingDate })) + (MILLISECONDS_IN_DAY - 1);
     const firstWeek = eachDayOfInterval(sDay, min(sDay + MILLISECONDS_IN_DAY * 7, eDay));
 
     return firstWeek

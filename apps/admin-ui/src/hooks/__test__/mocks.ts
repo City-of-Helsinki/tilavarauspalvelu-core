@@ -11,7 +11,7 @@ import {
   UpdateStaffReservationDocument,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
-import { toApiDateUnsafe } from "common/src/common/util";
+import { toApiDateUnsafe } from "common/src/date-utils";
 
 export const CHANGED_WORKING_MEMO = "Sisaisen kommentti";
 
@@ -137,7 +137,7 @@ function createReservationEdge({
 // convert ISO string -> Date -> API date string "YYYY-MM-DD"
 function convertDate(str: string) {
   const date = new Date(str);
-  return toApiDateUnsafe(date);
+  return toApiDateUnsafe({ date });
 }
 
 function correctReservationSeriesQueryResult(

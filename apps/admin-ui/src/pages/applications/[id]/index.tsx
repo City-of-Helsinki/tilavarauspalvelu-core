@@ -23,9 +23,10 @@ import {
   useRestoreAllSectionOptionsMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { formatDuration } from "common/src/common/util";
+import { formatDateRange, formatDuration } from "common/src/date-utils";
 import { ApplicationTimePreview } from "common/src/components/ApplicationTimePreview";
-import { formatAgeGroups, formatDate, formatDateRange, formatNumber } from "@/common/util";
+import { formatAgeGroups, formatNumber } from "@/common/util";
+import { format } from "date-fns";
 import { ScrollIntoView } from "@/component/ScrollIntoView";
 import { Accordion as AccordionBase } from "@/component/Accordion";
 import { ApplicationWorkingMemo } from "@/component/WorkingMemo";
@@ -88,7 +89,7 @@ function formatApplicationDuration(durationSeconds: number | undefined, t: TFunc
     return "";
   }
   const translationKey = `common:${type}Amount`;
-  return `${type ? t(translationKey) : ""} ${formatDuration(t, { seconds: durationSeconds })}`;
+  return `${type ? t(translationKey) : ""} ${formatDuration({ t, duration: { seconds: durationSeconds } })}`;
 }
 
 function appEventDuration(min: number | undefined, max: number | undefined, t: TFunction): string {
@@ -393,7 +394,7 @@ function ApplicationSectionDetails({
 
   const beginDate = new Date(section.reservationsBeginDate);
   const endDate = new Date(section.reservationsEndDate);
-  const dates = formatDateRange(t, beginDate, endDate);
+  const dates = formatDateRange({ t, start: beginDate, end: endDate });
 
   return (
     <ScrollIntoView key={section.pk} hash={hash}>
@@ -620,7 +621,7 @@ export default function ApplicationPage({ pk }: PropsNarrowed): JSX.Element | nu
           {application.status != null && <ApplicationStatusLabel status={application.status} user="admin" />}
         </TitleSection>
         <PreCard>
-          {t("application:applicationReceivedTime")} {formatDate(application.updatedAt, "d.M.yyyy HH:mm")}
+          {t("application:applicationReceivedTime")} {format(application.updatedAt, "d.M.yyyy HH:mm")}
         </PreCard>
         <div>
           <RejectApplicationButton application={application} refetch={refetch} />

@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { startOfDay } from "date-fns";
 import { useSession } from "@/hooks";
 import { useHandlingDataQuery } from "@gql/gql-types";
-import { toApiDate } from "common/src/common/util";
+import { toApiDate } from "common/src/date-utils";
 import { ReservationStateChoice } from "common/gql/gql-types";
 import { gql } from "@apollo/client";
 
@@ -13,7 +13,7 @@ export function useHandling() {
   const { data, refetch } = useHandlingDataQuery({
     skip: !isAuthenticated,
     variables: {
-      beginDate: toApiDate(today) ?? "",
+      beginDate: toApiDate({ date: today }) ?? "",
       state: ReservationStateChoice.RequiresHandling,
     },
   });
