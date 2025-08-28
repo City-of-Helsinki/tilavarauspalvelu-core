@@ -63,7 +63,7 @@ import {
 } from "@/gql/gql-types";
 import { gql } from "@apollo/client";
 import { getApplicationReservationPath, getApplicationSectionPath, getReservationUnitPath } from "@/modules/urls";
-import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
+import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { AccordionWithIcons } from "@/components/AccordionWithIcons";
 import { isReservationCancellableReason, ReservationCancellableReason } from "@/modules/reservation";
 import { formatDateRange, formatDateTimeStrings } from "@/modules/util";

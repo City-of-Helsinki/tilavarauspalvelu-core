@@ -111,3 +111,35 @@ export function getNotificationUrl(pk: Maybe<number> | undefined): string {
   }
   return `${BANNER_NOTIFICATIONS_URL_PREFIX}/${pk}`;
 }
+
+export function getOpeningHoursUrl(
+  apiBaseUrl: string,
+  reservationUnitPk: number | number[] | null,
+  errorUrl?: string
+): string {
+  let reservationUnitsParam = "";
+  if (Array.isArray(reservationUnitPk)) {
+    reservationUnitPk.filter((pk) => pk > 0);
+    if (reservationUnitPk.length === 0) {
+      return "";
+    }
+    reservationUnitsParam = reservationUnitPk.join(",");
+  } else if (reservationUnitPk == null || !(reservationUnitPk > 0)) {
+    return "";
+  } else {
+    reservationUnitsParam = reservationUnitPk.toString();
+  }
+  try {
+    const url = new URL(`/v1/edit_opening_hours/`, apiBaseUrl);
+    const { searchParams } = url;
+    searchParams.set("reservation_units", reservationUnitsParam);
+    if (errorUrl) {
+      searchParams.set("redirect_on_error", errorUrl);
+    }
+    return url.toString();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+  }
+  return "";
+}

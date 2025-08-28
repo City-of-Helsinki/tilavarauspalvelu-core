@@ -1,3 +1,5 @@
+import { useToastIfQueryParam } from "common/src/hooks/useToastIfQueryParam";
+import { useSearchParams } from "next/navigation";
 import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useForm, type UseFormReturn } from "react-hook-form";
@@ -154,18 +156,21 @@ function ReservationUnitEditor({
   refetch,
   previewUrlPrefix,
   unitPk,
+  apiBaseUrl,
 }: {
   reservationUnit?: Node;
   form: UseFormReturn<ReservationUnitEditFormValues>;
   refetch: () => void;
   previewUrlPrefix: string;
   unitPk: number;
+  apiBaseUrl: string;
 }): JSX.Element | null {
   // ----------------------------- State and Hooks ----------------------------
   const { t } = useTranslation();
   const router = useRouter();
   const { setModalContent } = useModal();
   const [reconcileImageChanges] = useImageMutations();
+  const params = useSearchParams();
 
   const [updateMutation] = useUpdateReservationUnitMutation();
   const [createMutation] = useCreateReservationUnitMutation();
@@ -186,6 +191,15 @@ function ReservationUnitEditor({
     skip: unitPk <= 0,
   });
   const unit = reservationUnit?.unit ?? unitData?.unit;
+
+  useToastIfQueryParam({
+    key: ["error_code", "error_message"],
+    message: t("reservationUnit:editErrorMessage", {
+      code: params.get("error_code"),
+      message: params.get("error_message"),
+    }),
+    type: "error",
+  });
 
   // ----------------------------- Constants ---------------------------------
 
@@ -316,7 +330,11 @@ function ReservationUnitEditor({
           />
         )}
         <CommunicationSection form={form} />
-        <OpeningHoursSection reservationUnit={reservationUnit} previewUrlPrefix={previewUrlPrefix} />
+        <OpeningHoursSection
+          reservationUnit={reservationUnit}
+          previewUrlPrefix={previewUrlPrefix}
+          apiBaseUrl={apiBaseUrl}
+        />
         {isSeasonal && <SeasonalSection form={form} />}
         <AccessTypeSection form={form} accessTypes={reservationUnit?.accessTypes || []} />
       </StyledContainerMedium>
@@ -391,6 +409,7 @@ export default function EditorPage(props: PropsNarrowed): JSX.Element {
         refetch={refetch}
         previewUrlPrefix={cleanPreviewUrlPrefix}
         unitPk={unitPk}
+        apiBaseUrl={props.apiBaseUrl}
       />
     </AuthorizationChecker>
   );

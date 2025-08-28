@@ -27,5 +27,8 @@
     "surfaceArea": "Pinta-ala",
     "state": "Tila",
     "reservationState": "Varauskalenteri"
-  }
+  },
+  "goToMassEdit": "Siirry muokkaamaan aukioloaikoja",
+  "editInfoText": "Valitse varausyksiköt joiden aukioloaikoja haluat muokata.",
+  "editErrorMessage": "Linkkiä Aukiolosovellukseen ei saatu muodostettua. Ole yhteydessä palvelun ylläpitoon, jos virhe toistuu.\n {{code}}: {{message}}"
 }
