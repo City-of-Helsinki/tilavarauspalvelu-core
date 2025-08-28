@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from tilavarauspalvelu.enums import PriceUnit, ReservationStateChoice, Weekday
+from tilavarauspalvelu.enums import AccessType, PriceUnit, ReservationStateChoice, Weekday
 from utils.date_utils import local_datetime
 
 from tests.factories import (
@@ -34,17 +34,22 @@ def email_reservation() -> Reservation:
         pricings__lowest_price=Decimal("10.00"),
         pricings__highest_price=Decimal("12.30"),
         pricings__price_unit=PriceUnit.FIXED,
+        access_types__access_type=AccessType.UNRESTRICTED,
+        access_types__begin_date=datetime.date(2024, 1, 1),
     )
     application_section = ApplicationSectionFactory.create(
         name="[HAKEMUKSEN OSAN NIMI]",
         application__application_round__name_en="[KAUSIVARAUSKIERROKSEN NIMI]",
         application__organisation_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        reservations_begin_date=datetime.date(2024, 1, 1),
+        reservations_end_date=datetime.date(2024, 3, 1),
     )
     reservation_series = ReservationSeriesFactory.create(
         reservation_unit=reservation_unit,
         weekdays=[Weekday.MONDAY.value],
         begin_date=datetime.date(2024, 1, 1),
         begin_time=datetime.time(13),
+        end_date=datetime.date(2024, 2, 1),
         end_time=datetime.time(15),
         allocated_time_slot__reservation_unit_option__reservation_unit=reservation_unit,
         allocated_time_slot__reservation_unit_option__application_section=application_section,
@@ -71,6 +76,7 @@ def email_reservation() -> Reservation:
         weekdays=[Weekday.TUESDAY.value],
         begin_date=datetime.date(2024, 1, 2),
         begin_time=datetime.time(21),
+        end_date=datetime.date(2024, 2, 2),
         end_time=datetime.time(22),
         allocated_time_slot__reservation_unit_option__reservation_unit=reservation_unit,
         allocated_time_slot__reservation_unit_option__application_section=application_section,

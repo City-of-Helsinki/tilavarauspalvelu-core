@@ -49,7 +49,7 @@ def test_staff_repair_access_code__regular_user(graphql):
 
 
 @patch_method(PindoraService.sync_access_code)
-@patch_method(EmailService.send_reservation_access_code_added_email)
+@patch_method(EmailService.send_reservation_access_type_changed_email)
 def test_staff_repair_access_code__unit_handler(graphql):
     now = local_datetime()
 
@@ -83,11 +83,11 @@ def test_staff_repair_access_code__unit_handler(graphql):
     assert response.has_errors is False, response.errors
 
     assert PindoraService.sync_access_code.call_count == 1
-    assert EmailService.send_reservation_access_code_added_email.call_count == 1
+    assert EmailService.send_reservation_access_type_changed_email.call_count == 1
 
 
 @patch_method(PindoraService.sync_access_code)
-@patch_method(EmailService.send_reservation_access_code_added_email)
+@patch_method(EmailService.send_reservation_access_type_changed_email)
 def test_staff_repair_access_code__general_handler(graphql):
     now = local_datetime()
 
@@ -119,4 +119,4 @@ def test_staff_repair_access_code__general_handler(graphql):
     assert response.has_errors is False, response.errors
 
     assert PindoraService.sync_access_code.call_count == 1
-    assert EmailService.send_reservation_access_code_added_email.call_count == 1
+    assert EmailService.send_reservation_access_type_changed_email.call_count == 1

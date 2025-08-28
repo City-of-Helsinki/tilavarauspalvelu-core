@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING, Annotated, Unpack
 
 from django.utils.translation import pgettext
 
-from tilavarauspalvelu.enums import ReservationCancelReasonChoice
+from tilavarauspalvelu.enums import AccessType, ReservationCancelReasonChoice
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
-from utils.date_utils import local_datetime_string
+from utils.date_utils import local_date_string, local_datetime_string
 from utils.utils import convert_html_to_text
 
 from .common import (
@@ -28,8 +28,8 @@ from .common import (
 if TYPE_CHECKING:
     from tilavarauspalvelu.integrations.email.typing import (
         EmailType,
-        ReservationAccessCodeAddedContext,
         ReservationAccessCodeChangedContext,
+        ReservationAccessTypeChangedContext,
         ReservationApprovedContext,
         ReservationCancelledContext,
         ReservationConfirmedContext,
@@ -45,8 +45,8 @@ if TYPE_CHECKING:
 
 
 __all__ = [
-    "get_context_for_reservation_access_code_added",
     "get_context_for_reservation_access_code_changed",
+    "get_context_for_reservation_access_type_changed",
     "get_context_for_reservation_approved",
     "get_context_for_reservation_cancelled",
     "get_context_for_reservation_confirmed",
@@ -57,35 +57,6 @@ __all__ = [
     "get_context_for_reservation_requires_payment",
     "get_context_for_reservation_rescheduled",
 ]
-
-
-@get_translated
-def get_context_for_reservation_access_code_added(
-    reservation: Reservation | None = None,
-    *,
-    language: Lang,
-    **data: Unpack[ReservationAccessCodeAddedContext],
-) -> Annotated[EmailContext, EmailType.RESERVATION_ACCESS_CODE_ADDED]:
-    if reservation is not None:
-        context = get_context_for_reservation_access_code_changed(reservation=reservation, language=language)
-    else:
-        context = get_context_for_reservation_access_code_changed(**data, language=language)
-
-    title = pgettext("Email", "Access to the space has changed")
-
-    text = pgettext("Email", "My bookings")
-    text = f"{text!r}"
-    link = get_my_reservations_ext_link(language=language)
-
-    body = pgettext("Email", "You can find the door code in this message and at %(my_reservations)s page at Varaamo")
-    body_html = body % {"my_reservations": create_anchor_tag(link=link, text=text)}
-    body_text = body % {"my_reservations": f"{text} ({link})"}
-
-    context["title"] = title
-    context["text_reservation_modified_html"] = f"{title}. {body_html}."
-    context["text_reservation_modified"] = f"{title}. {body_text}."
-
-    return context
 
 
 @get_translated
@@ -105,6 +76,69 @@ def get_context_for_reservation_access_code_changed(
     context["title"] = title
     context["text_reservation_modified_html"] = title
     context["text_reservation_modified"] = title
+
+    return context
+
+
+@get_translated
+def get_context_for_reservation_access_type_changed(
+    reservation: Reservation | None = None,
+    *,
+    language: Lang,
+    **data: Unpack[ReservationAccessTypeChangedContext],
+) -> Annotated[EmailContext, EmailType.RESERVATION_ACCESS_TYPE_CHANGED]:
+    if reservation is not None:
+        context = get_context_for_reservation_rescheduled(reservation=reservation, language=language)
+
+        access_type = AccessType(reservation.access_type)
+        res_unit_access_type = reservation.actions.get_applying_reservation_unit_access_type()
+
+        # Should not happen, since all published units should have an active access type
+        if res_unit_access_type is None:  # pragma: no cover
+            msg = "Reservation has no reservation unit access type"
+            raise ValueError(msg)
+
+        change_date = res_unit_access_type.begin_date
+
+    else:
+        context = get_context_for_reservation_rescheduled(**data, language=language)
+
+        access_type = AccessType(data["access_type"])
+        change_date = data["change_date"]
+
+    title = pgettext("Email", "Access to the space has changed")
+
+    body = pgettext("Email", "Access to the space will change starting from %(date)s")
+    body %= {"date": local_date_string(change_date)}
+
+    match access_type:
+        case AccessType.ACCESS_CODE:
+            text = pgettext("Email", "My bookings")
+            text = f"{text!r}"
+            link = get_my_reservations_ext_link(language=language)
+            body_base = pgettext(
+                "Email",
+                "You can access the space with a door code, which you can find on the %(my_reservations)s page",
+            )
+            body_html = body_base % {"my_reservations": create_anchor_tag(link=link, text=text)}
+            body_text = body_base % {"my_reservations": f"{text} ({link})"}
+
+        case AccessType.OPENED_BY_STAFF:
+            body_html = body_text = pgettext("Email", "The staff will open the door to the space")
+
+        case AccessType.PHYSICAL_KEY:
+            body_html = body_text = pgettext("Email", "Please arrange the collection of the key with the staff")
+
+        case AccessType.UNRESTRICTED:
+            body_html = body_text = pgettext("Email", "You will have a direct access to the space")
+
+        case _:  # pragma: no cover
+            msg = f"Unknown access type: {access_type}"
+            raise ValueError(msg)
+
+    context["title"] = title
+    context["text_reservation_modified_html"] = f"{body}. {body_html}."
+    context["text_reservation_modified"] = f"{body}. {body_text}."
 
     return context
 
