@@ -1,4 +1,6 @@
 import type { SelectedRow } from "@/lib/reservation-units";
+import { breakpoints } from "common/src/const";
+import { Flex } from "common/styled";
 import React, { type Dispatch, type SetStateAction } from "react";
 import { useTranslation } from "next-i18next";
 import { type TFunction } from "i18next";
@@ -8,14 +10,27 @@ import {
   type ReservationUnitTableElementFragment,
 } from "@gql/gql-types";
 import { truncate } from "@/helpers";
-import { getReservationUnitUrl } from "@/common/urls";
+import { getOpeningHoursUrl, getReservationUnitUrl } from "@/common/urls";
 import { CustomTable } from "@/component/Table";
-import { MAX_NAME_LENGTH } from "@/common/const";
+import { isBrowser, MAX_NAME_LENGTH } from "@/common/const";
 import { TableLink } from "@/styled";
-import { IconCheck, IconClock, IconEye, IconEyeCrossed, IconLock, IconPen, IconQuestionCircleFill } from "hds-react";
+import {
+  IconCheck,
+  IconClock,
+  IconEye,
+  IconEyeCrossed,
+  IconInfoCircle,
+  IconLinkExternal,
+  IconLock,
+  IconPen,
+  IconQuestionCircleFill,
+  IconSize,
+} from "hds-react";
+import { ButtonLikeExternalLink } from "common/src/components/ButtonLikeLink";
 import type { StatusLabelType } from "common/src/tags";
 import StatusLabel from "common/src/components/StatusLabel";
 import { gql } from "@apollo/client";
+import styled from "styled-components";
 
 type Props = {
   sort: string;
@@ -24,6 +39,7 @@ type Props = {
   isLoading?: boolean;
   selectedRows: SelectedRow[];
   setSelectedRows: Dispatch<SetStateAction<SelectedRow[]>>;
+  apiBaseUrl: string;
 };
 
 const getStatusLabelProps = (
@@ -145,6 +161,7 @@ export function ReservationUnitsTable({
   isLoading,
   selectedRows,
   setSelectedRows,
+  apiBaseUrl,
 }: Props): JSX.Element {
   const { t } = useTranslation();
 
@@ -170,7 +187,51 @@ export function ReservationUnitsTable({
       selectAllRowsText={t("common:selectAllRows")}
       clearSelectionsText={t("common:clearAllSelections")}
       setSelectedRows={setSelectedRows}
+      customActionButtons={[<ActionButtons t={t} selectedRows={selectedRows} apiBaseUrl={apiBaseUrl}></ActionButtons>]}
     />
+  );
+}
+
+const Spacer = styled.div`
+  flex-grow: 1;
+  @media (min-width: ${breakpoints.m}) {
+    margin-left: var(--spacing-s);
+  }
+`;
+
+function ActionButtons({
+  t,
+  selectedRows,
+  apiBaseUrl,
+}: {
+  t: TFunction;
+  selectedRows: SelectedRow[];
+  apiBaseUrl: string;
+}): JSX.Element {
+  const selectedPks = selectedRows.map((id) => Number(id)).filter((id) => !isNaN(id));
+  const redirectOnErrorUrl = isBrowser ? window.location.href : undefined;
+  const editLink =
+    getOpeningHoursUrl(apiBaseUrl, selectedPks, redirectOnErrorUrl) !== ""
+      ? getOpeningHoursUrl(apiBaseUrl, selectedPks, redirectOnErrorUrl)
+      : undefined;
+  return (
+    <Spacer>
+      <Flex $gap={"xs"} $direction={"row"} $wrap={"wrap"}>
+        <Flex
+          $gap={"xs"}
+          $direction={"row"}
+          $alignItems={"center"}
+          style={{ flexShrink: "1", maxWidth: "490px", marginRight: "auto" }}
+        >
+          <IconInfoCircle size={IconSize.Medium} />
+          <div>{t("reservationUnit:editInfoText")}</div>
+        </Flex>
+        <ButtonLikeExternalLink disabled={!editLink} href={editLink} target={"_blank"}>
+          {t("reservationUnit:goToMassEdit")}
+          <IconLinkExternal />
+        </ButtonLikeExternalLink>
+      </Flex>
+    </Spacer>
   );
 }
 
