@@ -57,7 +57,6 @@
     "RESERVATION_UNIT_NOT_RESERVABLE": "Objektet går inte att boka.",
     "RESERVATION_UNIT_TYPE_IS_SEASON": "Du kan bara göra en ansökan om säsongsbokning för detta objekt.",
     "UNKNOWN": "Ett fel uppstod.",
-    "USER_NOT_INTERNAL_USER": "Det är inte tillåtet att göra en bokning.",
     "validation": {
       "APPLICATION_ADULT_RESERVEE_REQUIRED": "Sökanden måste vara myndig.",
       "APPLICATION_APPLICANT_TYPE_MISSING": "Sökandens typ saknas.",
@@ -72,6 +71,7 @@
       "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "För lång bokningstid.",
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "Personen som gör bokningen måste vara myndig.",
       "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED": "Du har det maximala antalet bokningar för detta objekt.",
+      "USER_NOT_INTERNAL_USER": "Det är inte tillåtet att göra en bokning.",
       "generic_validation_error": "Ett fel uppstod.",
       "invalid": "Ogiltigt värde."
     }

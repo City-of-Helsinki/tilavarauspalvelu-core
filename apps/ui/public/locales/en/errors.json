@@ -57,7 +57,6 @@
     "RESERVATION_UNIT_NOT_RESERVABLE": "The item cannot be booked.",
     "RESERVATION_UNIT_TYPE_IS_SEASON": "You can only make a seasonal booking application for this item.",
     "UNKNOWN": "An error occurred.",
-    "USER_NOT_INTERNAL_USER": "Making a booking is not allowed.",
     "validation": {
       "APPLICATION_ADULT_RESERVEE_REQUIRED": "The applicant must be 18 years old.",
       "APPLICATION_APPLICANT_TYPE_MISSING": "Applicant type is missing.",
@@ -72,6 +71,7 @@
       "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "The booking time is too long.",
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "The person making the reservation must be 18 years old",
       "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED": "You have the maximum number of bookings for this space.",
+      "USER_NOT_INTERNAL_USER": "Making a booking is not allowed.",
       "generic_validation_error": "An error occurred.",
       "invalid": "Invalid value."
     }
