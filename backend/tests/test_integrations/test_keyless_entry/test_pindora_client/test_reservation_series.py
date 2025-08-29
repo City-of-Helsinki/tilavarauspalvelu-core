@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 import requests
+from freezegun import freeze_time
 from graphene_django_extensions.testing import parametrize_helper
 from rest_framework.status import (
     HTTP_204_NO_CONTENT,
@@ -22,6 +23,11 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import (
     PindoraNotFoundError,
     PindoraPermissionError,
     PindoraUnexpectedResponseError,
+)
+from tilavarauspalvelu.integrations.keyless_entry.typing import (
+    PindoraAccessCodeModifyResponse,
+    PindoraReservationSeriesAccessCodeValidity,
+    PindoraReservationSeriesResponse,
 )
 from utils.date_utils import local_datetime
 from utils.external_service.errors import ExternalServiceRequestError
@@ -484,3 +490,443 @@ def test_pindora_client__deactivate_reservation_series_access_code__errors(statu
 
     with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.deactivate_reservation_series_access_code(series)
+
+
+@patch_method(PindoraClient.request)
+@freeze_time(local_datetime(2024, 1, 1, 12))
+@pytest.mark.django_db
+def test_pindora_client__get_reservation_series__pindora_mock(settings):
+    settings.PINDORA_MOCK_ENABLED = True
+
+    series = ReservationSeriesFactory.create()
+    ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
+        created_at=local_datetime(),
+        reservation_series=series,
+    )
+
+    series_data = PindoraReservationSeriesResponse(
+        reservation_unit_id=series.reservation_unit.ext_uuid,
+        access_code="12345",
+        access_code_keypad_url="",
+        access_code_phone_number="",
+        access_code_sms_number="",
+        access_code_sms_message="",
+        access_code_generated_at=local_datetime(),
+        access_code_is_active=True,
+        reservation_unit_code_validity=[
+            PindoraReservationSeriesAccessCodeValidity(
+                access_code_valid_minutes_before=0,
+                access_code_valid_minutes_after=0,
+                begin=local_datetime(2024, 1, 1, 12),
+                end=local_datetime(2024, 1, 1, 13),
+            )
+        ],
+    )
+
+    PindoraClient._cache_reservation_series_response(series_data, ext_uuid=series.ext_uuid)
+
+    response = PindoraClient.get_reservation_series(series)
+
+    assert response == series_data
+
+    assert PindoraClient.request.call_count == 0
+
+
+@patch_method(PindoraClient.request)
+@freeze_time(local_datetime(2024, 1, 1, 12))
+@pytest.mark.django_db
+def test_pindora_client__get_reservation_series__pindora_mock__not_found(settings):
+    settings.PINDORA_MOCK_ENABLED = True
+
+    series = ReservationSeriesFactory.create()
+    ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
+        created_at=local_datetime(),
+        reservation_series=series,
+    )
+
+    with pytest.raises(PindoraNotFoundError):
+        PindoraClient.get_reservation_series(series)
+
+    assert PindoraClient.request.call_count == 0
+
+
+@patch_method(PindoraClient.request)
+@patch_method(PindoraClient._mock_create_access_code, return_value="12345")
+@freeze_time(local_datetime(2024, 1, 1, 12))
+@pytest.mark.django_db
+def test_pindora_client__create_reservation_series__pindora_mock(settings):
+    settings.PINDORA_MOCK_ENABLED = True
+
+    series = ReservationSeriesFactory.create()
+    ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
+        created_at=local_datetime(),
+        reservation_series=series,
+    )
+
+    response = PindoraClient.create_reservation_series(series)
+
+    assert response == PindoraReservationSeriesResponse(
+        reservation_unit_id=series.reservation_unit.ext_uuid,
+        access_code="12345",
+        access_code_keypad_url="",
+        access_code_phone_number="",
+        access_code_sms_number="",
+        access_code_sms_message="",
+        access_code_generated_at=local_datetime(),
+        access_code_is_active=True,
+        reservation_unit_code_validity=[
+            PindoraReservationSeriesAccessCodeValidity(
+                access_code_valid_minutes_before=0,
+                access_code_valid_minutes_after=0,
+                begin=local_datetime(2024, 1, 1, 12),
+                end=local_datetime(2024, 1, 1, 13),
+            )
+        ],
+    )
+
+    assert PindoraClient.request.call_count == 0
+
+
+@patch_method(PindoraClient.request)
+@freeze_time(local_datetime(2024, 1, 1, 12))
+@pytest.mark.django_db
+def test_pindora_client__create_reservation_series__pindora_mock__already_exists(settings):
+    settings.PINDORA_MOCK_ENABLED = True
+
+    series = ReservationSeriesFactory.create()
+    ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
+        created_at=local_datetime(),
+        reservation_series=series,
+    )
+
+    series_data = PindoraReservationSeriesResponse(
+        reservation_unit_id=series.reservation_unit.ext_uuid,
+        access_code="12345",
+        access_code_keypad_url="",
+        access_code_phone_number="",
+        access_code_sms_number="",
+        access_code_sms_message="",
+        access_code_generated_at=local_datetime(),
+        access_code_is_active=True,
+        reservation_unit_code_validity=[
+            PindoraReservationSeriesAccessCodeValidity(
+                access_code_valid_minutes_before=0,
+                access_code_valid_minutes_after=0,
+                begin=local_datetime(2024, 1, 1, 12),
+                end=local_datetime(2024, 1, 1, 13),
+            )
+        ],
+    )
+
+    PindoraClient._cache_reservation_series_response(series_data, ext_uuid=series.ext_uuid)
+
+    with pytest.raises(PindoraConflictError):
+        PindoraClient.create_reservation_series(series)
+
+    assert PindoraClient.request.call_count == 0
+
+
+@patch_method(PindoraClient.request)
+@patch_method(PindoraClient._mock_create_access_code, return_value="54321")
+@freeze_time(local_datetime(2024, 1, 1, 12))
+@pytest.mark.django_db
+def test_pindora_client__change_reservation_series_access_code__pindora_mock(settings):
+    settings.PINDORA_MOCK_ENABLED = True
+
+    series = ReservationSeriesFactory.create()
+    ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
+        created_at=local_datetime(),
+        reservation_series=series,
+    )
+
+    series_data = PindoraReservationSeriesResponse(
+        reservation_unit_id=series.reservation_unit.ext_uuid,
+        access_code="12345",
+        access_code_keypad_url="",
+        access_code_phone_number="",
+        access_code_sms_number="",
+        access_code_sms_message="",
+        access_code_generated_at=local_datetime(),
+        access_code_is_active=True,
+        reservation_unit_code_validity=[
+            PindoraReservationSeriesAccessCodeValidity(
+                access_code_valid_minutes_before=0,
+                access_code_valid_minutes_after=0,
+                begin=local_datetime(2024, 1, 1, 12),
+                end=local_datetime(2024, 1, 1, 13),
+            )
+        ],
+    )
+
+    PindoraClient._cache_reservation_series_response(series_data, ext_uuid=series.ext_uuid)
+
+    response = PindoraClient.change_reservation_series_access_code(series)
+
+    assert response == PindoraAccessCodeModifyResponse(
+        access_code_generated_at=local_datetime(),
+        access_code_is_active=True,
+    )
+
+    cached_response = PindoraClient._get_cached_reservation_series_response(ext_uuid=series.ext_uuid)
+
+    assert cached_response["access_code"] == "54321"
+
+    assert PindoraClient.request.call_count == 0
+
+
+@patch_method(PindoraClient.request)
+@freeze_time(local_datetime(2024, 1, 1, 12))
+@pytest.mark.django_db
+def test_pindora_client__change_reservation_series_access_code__pindora_mock__not_found(settings):
+    settings.PINDORA_MOCK_ENABLED = True
+
+    series = ReservationSeriesFactory.create()
+    ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
+        created_at=local_datetime(),
+        reservation_series=series,
+    )
+
+    with pytest.raises(PindoraNotFoundError):
+        PindoraClient.change_reservation_series_access_code(series)
+
+    assert PindoraClient.request.call_count == 0
+
+
+@patch_method(PindoraClient.request)
+@freeze_time(local_datetime(2024, 1, 1, 12))
+@pytest.mark.django_db
+def test_pindora_client__activate_reservation_series_access_code__pindora_mock(settings):
+    settings.PINDORA_MOCK_ENABLED = True
+
+    series = ReservationSeriesFactory.create()
+    ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
+        created_at=local_datetime(),
+        reservation_series=series,
+    )
+
+    series_data = PindoraReservationSeriesResponse(
+        reservation_unit_id=series.reservation_unit.ext_uuid,
+        access_code="12345",
+        access_code_keypad_url="",
+        access_code_phone_number="",
+        access_code_sms_number="",
+        access_code_sms_message="",
+        access_code_generated_at=local_datetime(),
+        access_code_is_active=False,
+        reservation_unit_code_validity=[
+            PindoraReservationSeriesAccessCodeValidity(
+                access_code_valid_minutes_before=0,
+                access_code_valid_minutes_after=0,
+                begin=local_datetime(2024, 1, 1, 12),
+                end=local_datetime(2024, 1, 1, 13),
+            )
+        ],
+    )
+
+    PindoraClient._cache_reservation_series_response(series_data, ext_uuid=series.ext_uuid)
+
+    PindoraClient.activate_reservation_series_access_code(series)
+
+    cached_response = PindoraClient._get_cached_reservation_series_response(ext_uuid=series.ext_uuid)
+
+    assert cached_response["access_code_is_active"] is True
+
+    assert PindoraClient.request.call_count == 0
+
+
+@patch_method(PindoraClient.request)
+@freeze_time(local_datetime(2024, 1, 1, 12))
+@pytest.mark.django_db
+def test_pindora_client__activate_reservation_series_access_code__pindora_mock__not_found(settings):
+    settings.PINDORA_MOCK_ENABLED = True
+
+    series = ReservationSeriesFactory.create()
+    ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
+        created_at=local_datetime(),
+        reservation_series=series,
+    )
+
+    with pytest.raises(PindoraNotFoundError):
+        PindoraClient.activate_reservation_series_access_code(series)
+
+    assert PindoraClient.request.call_count == 0
+
+
+@patch_method(PindoraClient.request)
+@freeze_time(local_datetime(2024, 1, 1, 12))
+@pytest.mark.django_db
+def test_pindora_client__deactivate_reservation_series_access_code__pindora_mock(settings):
+    settings.PINDORA_MOCK_ENABLED = True
+
+    series = ReservationSeriesFactory.create()
+    ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
+        created_at=local_datetime(),
+        reservation_series=series,
+    )
+
+    series_data = PindoraReservationSeriesResponse(
+        reservation_unit_id=series.reservation_unit.ext_uuid,
+        access_code="12345",
+        access_code_keypad_url="",
+        access_code_phone_number="",
+        access_code_sms_number="",
+        access_code_sms_message="",
+        access_code_generated_at=local_datetime(),
+        access_code_is_active=True,
+        reservation_unit_code_validity=[
+            PindoraReservationSeriesAccessCodeValidity(
+                access_code_valid_minutes_before=0,
+                access_code_valid_minutes_after=0,
+                begin=local_datetime(2024, 1, 1, 12),
+                end=local_datetime(2024, 1, 1, 13),
+            )
+        ],
+    )
+
+    PindoraClient._cache_reservation_series_response(series_data, ext_uuid=series.ext_uuid)
+
+    PindoraClient.deactivate_reservation_series_access_code(series)
+
+    cached_response = PindoraClient._get_cached_reservation_series_response(ext_uuid=series.ext_uuid)
+
+    assert cached_response["access_code_is_active"] is False
+
+    assert PindoraClient.request.call_count == 0
+
+
+@patch_method(PindoraClient.request)
+@freeze_time(local_datetime(2024, 1, 1, 12))
+@pytest.mark.django_db
+def test_pindora_client__deactivate_reservation_series_access_code__pindora_mock__not_found(settings):
+    settings.PINDORA_MOCK_ENABLED = True
+
+    series = ReservationSeriesFactory.create()
+    ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
+        created_at=local_datetime(),
+        reservation_series=series,
+    )
+
+    with pytest.raises(PindoraNotFoundError):
+        PindoraClient.deactivate_reservation_series_access_code(series)
+
+    assert PindoraClient.request.call_count == 0
+
+
+@patch_method(PindoraClient.request)
+@freeze_time(local_datetime(2024, 1, 1, 12))
+@pytest.mark.django_db
+def test_pindora_client__delete_reservation_series__pindora_mock(settings):
+    settings.PINDORA_MOCK_ENABLED = True
+
+    series = ReservationSeriesFactory.create()
+    ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
+        created_at=local_datetime(),
+        reservation_series=series,
+    )
+
+    series_data = PindoraReservationSeriesResponse(
+        reservation_unit_id=series.reservation_unit.ext_uuid,
+        access_code="12345",
+        access_code_keypad_url="",
+        access_code_phone_number="",
+        access_code_sms_number="",
+        access_code_sms_message="",
+        access_code_generated_at=local_datetime(),
+        access_code_is_active=True,
+        reservation_unit_code_validity=[
+            PindoraReservationSeriesAccessCodeValidity(
+                access_code_valid_minutes_before=0,
+                access_code_valid_minutes_after=0,
+                begin=local_datetime(2024, 1, 1, 12),
+                end=local_datetime(2024, 1, 1, 13),
+            )
+        ],
+    )
+
+    PindoraClient._cache_reservation_series_response(series_data, ext_uuid=series.ext_uuid)
+
+    PindoraClient.delete_reservation_series(series)
+
+    cached_response = PindoraClient._get_cached_reservation_series_response(ext_uuid=series.ext_uuid)
+
+    assert cached_response is None
+
+    assert PindoraClient.request.call_count == 0
+
+
+@patch_method(PindoraClient.request)
+@freeze_time(local_datetime(2024, 1, 1, 12))
+@pytest.mark.django_db
+def test_pindora_client__delete_reservation_series__pindora_mock__not_found(settings):
+    settings.PINDORA_MOCK_ENABLED = True
+
+    series = ReservationSeriesFactory.create()
+    ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
+        created_at=local_datetime(),
+        reservation_series=series,
+    )
+
+    with pytest.raises(PindoraNotFoundError):
+        PindoraClient.delete_reservation_series(series)
+
+    assert PindoraClient.request.call_count == 0
