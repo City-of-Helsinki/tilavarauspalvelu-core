@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
+from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 import pytest
@@ -10,6 +11,10 @@ from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 from tests.factories import ApplicationFactory, ApplicationRoundFactory
 from tests.test_graphql_api.test_application_round.helpers import SET_RESULTS_SENT_MUTATION
 
+if TYPE_CHECKING:
+    from collections.abc import Generator
+    from unittest.mock import NonCallableMock
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -17,7 +22,7 @@ pytestmark = [
 
 
 @contextmanager
-def mock_send_application_handled_email_task():
+def mock_send_application_handled_email_task() -> Generator[NonCallableMock]:
     from tilavarauspalvelu.tasks import send_application_handled_email_task
 
     path = "tilavarauspalvelu.api.graphql.types.application_round.serializers."
