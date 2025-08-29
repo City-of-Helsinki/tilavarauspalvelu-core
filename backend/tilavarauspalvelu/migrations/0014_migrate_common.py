@@ -9,7 +9,7 @@ from django.db import migrations, models
 
 import tilavarauspalvelu.enums
 import utils.fields.model
-from utils.db import NowTT
+from utils.db import NowTT  # noqa: TID251
 
 
 def create_reservation_unit_hierarchy():
