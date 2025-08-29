@@ -774,22 +774,40 @@ class ReservationKind(models.TextChoices):
 class ReservationFormType(models.TextChoices):
     """Reservation forms for that are supported by the system."""
 
-    CONTACT_INFO_FORM = "CONTACT_INFO_FORM", _("Contact info form")
+    CONTACT_INFO_FORM = (
+        "CONTACT_INFO_FORM",
+        pgettext_lazy("ReservationFormType", "Contact information only"),
+    )
     """Asks for user's contact information."""
 
-    RESERVEE_INFO_FORM = "RESERVEE_INFO_FORM", _("Reservee info form")
+    RESERVEE_INFO_FORM = (
+        "RESERVEE_INFO_FORM",
+        pgettext_lazy("ReservationFormType", "Contact information and event description"),
+    )
     """Asks for reservee information depending on the user's reservee type, in addition to contact information."""
 
-    PURPOSE_FORM = "PURPOSE_FORM", _("Purpose form")
+    PURPOSE_FORM = (
+        "PURPOSE_FORM",
+        pgettext_lazy("ReservationFormType", "Purpose of use"),
+    )
     """Asks for user's purpose of use, in addition to contact and reservee information."""
 
-    AGE_GROUP_FORM = "AGE_GROUP_FORM", _("Age group form")
+    AGE_GROUP_FORM = (
+        "AGE_GROUP_FORM",
+        pgettext_lazy("ReservationFormType", "Age group"),
+    )
     """Asks for user's age group, in addition to contact and reservee information, and purpose of use."""
 
-    PURPOSE_SUBVENTION_FORM = "PURPOSE_SUBVENTION_FORM", _("Purpose subvention form")
+    PURPOSE_SUBVENTION_FORM = (
+        "PURPOSE_SUBVENTION_FORM",
+        pgettext_lazy("ReservationFormType", "Purpose of use + discount"),
+    )
     """Adds option to apply for subvention to the purpose form."""
 
-    AGE_GROUP_SUBVENTION_FORM = "AGE_GROUP_SUBVENTION_FORM", _("Age group subvention form")
+    AGE_GROUP_SUBVENTION_FORM = (
+        "AGE_GROUP_SUBVENTION_FORM",
+        pgettext_lazy("ReservationFormType", "Age group + discount"),
+    )
     """Adds option to apply for subvention to the age group form."""
 
 
