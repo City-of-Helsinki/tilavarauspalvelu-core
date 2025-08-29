@@ -2593,28 +2593,34 @@ msgid "Direct and season"
 msgstr "Suora ja kausi"
 
 #: tilavarauspalvelu/enums.py
-msgid "Contact info form"
-msgstr "Yhteystietolomake"
+msgctxt "ReservationFormType"
+msgid "Contact information only"
+msgstr "Vain yhteystiedot"
 
 #: tilavarauspalvelu/enums.py
-msgid "Reservee info form"
-msgstr "Varaajatietolomake"
+msgctxt "ReservationFormType"
+msgid "Contact information and event description"
+msgstr "Yhteystiedot ja tilaisuuden kuvaus"
 
 #: tilavarauspalvelu/enums.py
-msgid "Purpose form"
-msgstr "Käyttötarkoituslomake"
+msgctxt "ReservationFormType"
+msgid "Purpose of use"
+msgstr "Käyttötarkoitus"
 
 #: tilavarauspalvelu/enums.py
-msgid "Age group form"
-msgstr "Ikäryhmälomake"
+msgctxt "ReservationFormType"
+msgid "Age group"
+msgstr "Ikäryhmä"
 
 #: tilavarauspalvelu/enums.py
-msgid "Purpose subvention form"
-msgstr "Käyttötarkoituslomake subventiolla"
+msgctxt "ReservationFormType"
+msgid "Purpose of use + discount"
+msgstr "Käyttötarkoitus + alenus"
 
 #: tilavarauspalvelu/enums.py
-msgid "Age group subvention form"
-msgstr "Ikäryhmälomake subventiolla"
+msgctxt "ReservationFormType"
+msgid "Age group + discount"
+msgstr "Ikäryhmä + alenus"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "PricingType"
