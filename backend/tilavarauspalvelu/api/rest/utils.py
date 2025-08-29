@@ -4,10 +4,11 @@ import dataclasses
 import datetime
 import uuid
 from functools import cache, wraps
+from http import HTTPStatus
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.validators import URLValidator
 from django.http import HttpRequest, HttpResponseRedirect, JsonResponse
 from import_export.admin import ExportMixin
@@ -39,8 +40,14 @@ def validation_error_as_response[R, **P](func: Callable[P, R]) -> Callable[P, R]
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         try:
             return func(*args, **kwargs)
+
         except ValidationError as error:
-            return JsonResponse({"detail": str(error.message), "code": error.code or ""}, status=400)
+            detail = {"detail": str(error.message), "code": error.code or ""}
+            return JsonResponse(detail, status=HTTPStatus.BAD_REQUEST)
+
+        except PermissionDenied as error:
+            detail = {"detail": str(error), "code": "permission_denied"}
+            return JsonResponse(detail, status=HTTPStatus.UNAUTHORIZED)
 
     return wrapper
 

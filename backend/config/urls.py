@@ -16,6 +16,7 @@ from tilavarauspalvelu.api.rest.views import (
     reservation_ical,
     reservation_statistics_export,
     reservation_unit_export,
+    robot_test_data_create_view,
     terms_of_use_pdf,
 )
 from tilavarauspalvelu.api.webhooks.urls import webhook_router
@@ -42,6 +43,7 @@ urlpatterns = [
         redirect_to_verkkokauppa_for_pending_reservations,
         name="verkkokauppa_pending_reservation",
     ),
+    path("v1/create_robot_test_data/", robot_test_data_create_view, name="robot_test_data"),
     path("v1/terms_of_use_pdf/", terms_of_use_pdf, name="terms_of_use_pdf"),
     path("v1/webhook/", include(webhook_router.urls)),
     path("v1/palvelukartta/", include("tilavarauspalvelu.api.palvelukartta.urls")),
