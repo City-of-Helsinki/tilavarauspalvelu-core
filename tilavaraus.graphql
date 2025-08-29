@@ -984,22 +984,22 @@ enum ReservationKind {
 
 """An enumeration."""
 enum ReservationForm {
-  """Contact info form"""
+  """Contact information only"""
   CONTACT_INFO_FORM
 
-  """Reservee info form"""
+  """Contact information and event description"""
   RESERVEE_INFO_FORM
 
-  """Purpose form"""
+  """Purpose of use"""
   PURPOSE_FORM
 
-  """Age group form"""
+  """Age group"""
   AGE_GROUP_FORM
 
-  """Purpose subvention form"""
+  """Purpose of use + discount"""
   PURPOSE_SUBVENTION_FORM
 
-  """Age group subvention form"""
+  """Age group + discount"""
   AGE_GROUP_SUBVENTION_FORM
 }
 
