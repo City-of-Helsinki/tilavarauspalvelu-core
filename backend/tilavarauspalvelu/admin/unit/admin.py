@@ -11,7 +11,7 @@ from modeltranslation.admin import TabbedTranslationAdmin
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.tprek.tprek_unit_importer import TprekUnitImporter
-from tilavarauspalvelu.models import Unit
+from tilavarauspalvelu.models import Unit, UnitGroup
 
 from .form import UnitAdminForm
 
@@ -19,6 +19,19 @@ if TYPE_CHECKING:
     from django.db.models import QuerySet
 
     from tilavarauspalvelu.typing import WSGIRequest
+
+
+class UnitGroupInlineAdmin(admin.TabularInline):
+    model = UnitGroup.units.through
+    fk_name = "unit"
+    fields = ["unitgroup"]
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None) -> bool:
+        return False
+
+    def has_delete_permission(self, request, obj=None) -> bool:
+        return False
 
 
 @admin.register(Unit)
@@ -114,6 +127,9 @@ class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TabbedTranslationAdmin):
     readonly_fields = [
         "tprek_last_modified",
     ]
+    inlines = [
+        UnitGroupInlineAdmin,
+    ]
 
     def get_queryset(self, request: WSGIRequest) -> QuerySet[Unit]:
         return (
@@ -123,6 +139,9 @@ class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TabbedTranslationAdmin):
                 "origin_hauki_resource",
                 "payment_merchant",
                 "payment_accounting",
+            )
+            .prefetch_related(
+                "unit_groups",
             )
         )
 
