@@ -23,7 +23,7 @@ class ReservationSeriesReservationCreateInput(MutationType[Reservation], kind="r
     # Basic information
     name = Input(required=True, default_value="")
     description = Input(required=True, default_value="")
-    num_persons = Input(required=True, default_value=None)
+    num_persons = Input(default_value=None)
     state = Input(required=True, default_value=ReservationStateChoice.CONFIRMED)
     type = Input(ReservationTypeStaffChoice, required=True, default_value=ReservationTypeStaffChoice.STAFF)
     working_memo = Input(required=True, default_value="")

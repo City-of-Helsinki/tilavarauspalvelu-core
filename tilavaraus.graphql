@@ -2453,7 +2453,7 @@ input ReservationSeriesReservationCreateInput {
   handledAt: DateTime = null
   municipality: MunicipalityChoice = null
   name: String! = ""
-  numPersons: Int!
+  numPersons: Int = null
   purpose: Int
   reserveeAddressCity: String! = ""
   reserveeAddressStreet: String! = ""

@@ -521,14 +521,14 @@ class ReservationPeriod(TypedDict):
 class ReservationDetails(TypedDict, total=False):
     name: str
     description: str
-    num_persons: int
+    num_persons: int | None
     state: ReservationStateChoice
     type: ReservationTypeChoice | ReservationTypeStaffChoice
     municipality: MunicipalityChoice
     working_memo: str
 
-    buffer_time_before: datetime.timedelta
-    buffer_time_after: datetime.timedelta
+    buffer_time_before: datetime.timedelta | None
+    buffer_time_after: datetime.timedelta | None
     handled_at: datetime.datetime
     confirmed_at: datetime.datetime
 
