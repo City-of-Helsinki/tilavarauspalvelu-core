@@ -7,6 +7,8 @@ export async function queryOptions(apolloClient: ApolloClient<unknown>, locale: 
   const { data } = await apolloClient.query<OptionsQuery, OptionsQueryVariables>({
     query: OptionsDocument,
     fetchPolicy: "no-cache",
+    // NOTE always include (empty) variables otherwise the Variable type is not enforced
+    variables: {},
   });
 
   const lang = getLocalizationLang(locale);

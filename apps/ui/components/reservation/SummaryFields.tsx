@@ -9,6 +9,7 @@ import { ParagraphAlt, PreviewLabel, PreviewValue } from "./styles";
 import { LabelValuePair } from "./LabelValuePair";
 import { extendMetaFieldOptions } from "common/src/reservation-form/MetaFields";
 import { type OptionsRecord } from "common";
+import { convertOptionsToField } from "common/src/reservation-form/ReservationFormField";
 
 const Container = styled(AutoGrid)`
   margin-bottom: var(--spacing-2-xl);
@@ -169,15 +170,16 @@ function convertMaybeOptionValue(
   t: TFunction
 ): string {
   const rawValue = reservation[key];
-  if (key in options) {
-    const optionsKey = key as keyof OptionsRecord;
+  const fieldOptions = convertOptionsToField(options);
+  if (key in fieldOptions) {
+    const optionsKey = key as keyof typeof fieldOptions;
     if (rawValue == null) {
       // eslint-disable-next-line no-console
       console.warn("convertMaybeOptionValue: rawValue is not object: ", rawValue);
     } else if (typeof rawValue === "object" && "pk" in rawValue && typeof rawValue.pk === "number") {
-      return options[optionsKey].find((option) => option.value === rawValue.pk)?.label ?? "";
+      return fieldOptions[optionsKey].find((option) => option.value === rawValue.pk)?.label ?? "";
     } else if (typeof rawValue === "string" && rawValue !== "") {
-      return options[optionsKey].find((option) => option.value === rawValue)?.label ?? "";
+      return fieldOptions[optionsKey].find((option) => option.value === rawValue)?.label ?? "";
     }
     // eslint-disable-next-line no-console
     console.warn("convertMaybeOptionValue: rawValue is not pk, but object: ", rawValue);
