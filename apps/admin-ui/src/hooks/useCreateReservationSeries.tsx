@@ -9,7 +9,6 @@ import {
 import type { ReservationSeriesForm, ReservationFormMeta } from "@/schemas";
 import { fromUIDateUnsafe, toApiDateUnsafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
-import { useSession } from "@/hooks";
 
 // Not all choices are valid for reservation series (the ui should not allow these)
 function transformReservationTypeStaffChoice(t: ReservationTypeChoice): ReservationTypeStaffChoice {
@@ -29,8 +28,6 @@ export function useCreateReservationSeries() {
   const [create] = useCreateReservationSeriesMutation();
 
   const createReservationSeries = (input: ReservationSeriesCreateMutation) => create({ variables: { input } });
-
-  const { user } = useSession();
 
   // NOTE unsafe
   const mutate = async (props: {
@@ -63,13 +60,9 @@ export function useCreateReservationSeries() {
 
     const name = data.type === "BLOCKED" ? "BLOCKED" : (seriesName ?? "");
 
-    if (user?.pk == null) {
-      throw new Error("Current user pk missing");
-    }
-
     const reservationDetails: ReservationSeriesReservationCreateInput = {
       ...rest,
-      numPersons: numPersons ?? 0,
+      numPersons: !Number.isNaN(numPersons) ? numPersons : undefined,
       type: transformReservationTypeStaffChoice(type),
       reserveeIdentifier: !reserveeIsUnregisteredAssociation ? reserveeIdentifier : undefined,
       reserveeType: reserveeType,
@@ -77,8 +70,6 @@ export function useCreateReservationSeries() {
       bufferTimeAfter: buffers.after,
       workingMemo: comments,
       state: ReservationStateChoice.Confirmed,
-      // TODO why is this needed in the mutation?
-      user: user.pk,
     };
 
     const skipDates: string[] = props.skipDates.map((d) => toApiDateUnsafe(d));
