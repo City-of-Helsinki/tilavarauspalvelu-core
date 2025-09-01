@@ -111,7 +111,7 @@ function View({ application, tos }: Readonly<Pick<PropsNarrowed, "application" |
   ] as const;
 
   const subTitle = showReservations
-    ? `${t("application:view.handledAt")} ${formatDateTime({ t, date: handledAt, options: { includeWeekday: false } })}`
+    ? `${t("application:view.handledAt")} ${formatDateTime(handledAt, { includeWeekday: false, locale: lang })}`
     : undefined;
   return (
     <>

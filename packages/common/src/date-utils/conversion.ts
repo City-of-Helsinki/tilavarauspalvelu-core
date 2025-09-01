@@ -1,8 +1,6 @@
 import { format, isValid, isAfter, parse } from "date-fns";
-import { type Maybe } from "./types";
-
-export const API_DATE_FORMAT = "yyyy-MM-dd";
-export const UI_DATE_FORMAT = "d.M.yyyy";
+import { formatDate, formatDateTime, formatTime } from "./formatting";
+import { UI_DATE_FORMAT, API_DATE_FORMAT } from "./";
 
 /**
  * Converts a Date object to API date format (yyyy-MM-dd)
@@ -11,7 +9,7 @@ export const UI_DATE_FORMAT = "d.M.yyyy";
  * @returns API date string or null if invalid
  * @example toApiDate({ date: new Date("2023-12-25") }) // "2023-12-25"
  */
-export function toApiDate({ date }: { date: Maybe<Date> }): string | null {
+export function toApiDate({ date }: { date: Date }): string | null {
   if (!date || !isValidDate({ date })) {
     return null;
   }
@@ -30,7 +28,7 @@ export function toApiDate({ date }: { date: Maybe<Date> }): string | null {
  * @throws Error if date is invalid
  * @example toApiDateUnsafe({ date: new Date("2023-12-25") }) // "2023-12-25"
  */
-export function toApiDateUnsafe({ date }: { date: Maybe<Date> }): string {
+export function toApiDateUnsafe({ date }: { date: Date }): string {
   const apiDate = toApiDate({ date });
   if (apiDate == null) {
     throw new Error("Invalid date: " + date);
@@ -45,7 +43,7 @@ export function toApiDateUnsafe({ date }: { date: Maybe<Date> }): string {
  * @returns Date object or null if invalid
  * @example fromApiDate({ date: "2023-12-25" }) // Date object for Dec 25, 2023
  */
-export function fromApiDate({ date }: { date: Maybe<string> }): Date | null {
+export function fromApiDate({ date }: { date: string }): Date | null {
   if (!date) return null;
 
   try {
@@ -60,17 +58,10 @@ export function fromApiDate({ date }: { date: Maybe<string> }): Date | null {
  * Converts a Date object to UI date format (d.M.yyyy)
  * @param params - Parameters object
  * @param params.date - Date object or ISO string to convert
- * @param params.formatStr - Custom format string (defaults to "d.M.yyyy")
  * @returns UI date string or empty string if invalid
  * @example toUIDate({ date: new Date("2023-12-25") }) // "25.12.2023"
  */
-export function toUIDate({
-  date,
-  formatStr = UI_DATE_FORMAT,
-}: {
-  date: Maybe<Date> | string;
-  formatStr?: string;
-}): string {
+export function toUIDate({ date }: { date: Date | string | null | undefined }): string {
   if (typeof date === "string") {
     const parsedDate = new Date(date);
     if (isValidDate({ date: parsedDate })) {
@@ -82,27 +73,31 @@ export function toUIDate({
   if (!date || !isValidDate({ date })) {
     return "";
   }
-  try {
-    return format(date, formatStr);
-  } catch {
-    return "";
-  }
+  const formatted = formatDate(date);
+  return formatted || "";
 }
 
 /**
  * Converts a Date object to UI datetime format (d.M.yyyy HH:mm)
  * @param params - Parameters object
- * @param params.date - Date object or ISO string to convert
- * @param params.dayTimeSeparator - Separator between date and time (defaults to empty)
+ * @param date - Date object or ISO string to convert
+ * @param options - Date format options
+ * @param options.includeWeekday - Whether to include the weekday name (defaults to false)
+ * @param options.includeDayTimeSeparator - Whether to include loaclized separator between date and time
+ * (defaults to false)
  * @returns UI datetime string or empty string if invalid
- * @example toUIDateTime({ date: new Date("2023-12-25T15:30:00"), dayTimeSeparator: " klo " }) // "25.12.2023 klo 15:30"
+ * @example toUIDateTime({ date: new Date("2023-12-25T15:30:00"), options: { dayTimeSeparator: true } }) //
+ * "25.12.2023 klo 15:30"
  */
 export function toUIDateTime({
   date,
-  dayTimeSeparator = "",
+  options,
 }: {
-  date: Maybe<Date> | string;
-  dayTimeSeparator?: string;
+  date: Date | string | null | undefined;
+  options?: {
+    includeWeekday?: boolean;
+    includeDayTimeSeparator?: boolean;
+  };
 }): string {
   if (typeof date === "string") {
     const parsedDate = new Date(date);
@@ -115,11 +110,8 @@ export function toUIDateTime({
   if (!date || !isValidDate({ date })) {
     return "";
   }
-  try {
-    return format(date, `${UI_DATE_FORMAT} ${dayTimeSeparator} HH:mm`);
-  } catch (_) {
-    return "";
-  }
+  const { includeWeekday = false, includeDayTimeSeparator = false } = options || {};
+  return formatDateTime(date, { includeWeekday, includeTimeSeparator: includeDayTimeSeparator });
 }
 
 /**
@@ -129,7 +121,7 @@ export function toUIDateTime({
  * @returns Date object or null if invalid
  * @example fromUIDate({ date: "25.12.2023" }) // Date object for Dec 25, 2023
  */
-export function fromUIDate({ date }: { date: Maybe<string> }): Date | null {
+export function fromUIDate({ date }: { date: string }): Date | null {
   if (!date) return null;
 
   try {
@@ -148,7 +140,7 @@ export function fromUIDate({ date }: { date: Maybe<string> }): Date | null {
  * @throws Error if date is invalid
  * @example fromUIDateUnsafe({ date: "25.12.2023" }) // Date object for Dec 25, 2023
  */
-export function fromUIDateUnsafe({ date }: { date: Maybe<string> }): Date {
+export function fromUIDateUnsafe({ date }: { date: string }): Date {
   const uiDate = fromUIDate({ date });
   if (uiDate == null) {
     throw new Error("Invalid date: " + date);
@@ -197,23 +189,25 @@ export function toApiTimeUnsafe({ hours, minutes = 0 }: { hours: number; minutes
  * @example dateForInput({ date: new Date("2023-12-25") }) // "25.12.2023"
  * @example dateForInput({ date: null }) // Current date in UI format
  */
-export function dateForInput({ date }: { date: Maybe<Date | string> }): string {
+export function dateForInput({ date }: { date: Date | string }): string {
   if (date instanceof Date) {
-    return toUIDate({ date });
+    const formatted = formatDate(date);
+    return formatted || "";
   }
-  if (typeof date === "string") {
-    // Try to parse as API date first, then as UI date
-    const apiDate = fromApiDate({ date });
-    if (apiDate) {
-      return toUIDate({ date: apiDate });
-    }
-    const uiDate = fromUIDate({ date });
-    if (uiDate) {
-      return toUIDate({ date: uiDate });
-    }
+  // Try to parse as API date first, then as UI date
+  const apiDate = fromApiDate({ date });
+  if (apiDate) {
+    const formatted = formatDate(apiDate);
+    return formatted || "";
+  }
+  const uiDate = fromUIDate({ date });
+  if (uiDate) {
+    const formatted = formatDate(uiDate);
+    return formatted || "";
   }
   // Fallback to current date
-  return toUIDate({ date: new Date() });
+  const formatted = formatDate(new Date());
+  return formatted || "";
 }
 
 /**
@@ -224,44 +218,75 @@ export function dateForInput({ date }: { date: Maybe<Date | string> }): string {
  * @example timeForInput({ time: new Date("2023-12-25T15:30:00") }) // "15:30"
  * @example timeForInput({ time: null }) // Current time
  */
-export function timeForInput({ time }: { time: Maybe<Date | string> }): string {
+export function timeForInput({ time }: { time: Date | string }): string {
   if (time instanceof Date) {
-    try {
-      return format(time, "HH:mm");
-    } catch {
-      return format(new Date(), "HH:mm");
+    const formatted = formatTime(time);
+    if (formatted) {
+      return formatted;
     }
+    const fallback = formatTime(new Date());
+    return fallback || "00:00";
   }
-  if (typeof time === "string") {
-    // Try to parse as ISO string first
-    try {
-      const date = new Date(time);
-      if (isValidDate({ date })) {
-        return format(date, "HH:mm");
-      }
-    } catch {
-      // If it's already in HH:mm format, return as-is if valid
-      if (/^\d{1,2}:\d{2}$/.test(time)) {
-        const timeParts = time.split(":").map(Number);
-        const hours = timeParts[0];
-        const minutes = timeParts[1];
-        if (hours != null && minutes != null && hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59) {
-          return time.padStart(5, "0");
-        }
+  // Try to parse as ISO string first
+  try {
+    const date = new Date(time);
+    if (isValidDate({ date })) {
+      const formatted = formatTime(date);
+      return formatted || "";
+    }
+  } catch {
+    // If it's already in HH:mm format, return as-is if valid
+    if (/^\d{1,2}:\d{2}$/.test(time)) {
+      const timeParts = time.split(":").map(Number);
+      const hours = timeParts[0];
+      const minutes = timeParts[1];
+      if (hours != null && minutes != null && hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59) {
+        return time.padStart(5, "0");
       }
     }
   }
   // Fallback to current time
-  return format(new Date(), "HH:mm");
+  const fallback = formatTime(new Date());
+  return fallback || "00:00";
 }
 
 /**
  * Checks if a date is valid and after year 1000
  * @param params - Parameters object
- * @param params.date - Date to validate
+ * @param {Date} params.date - Date to validate
  * @returns True if date is valid and reasonable
- * @example isValidDate({ date: new Date() }) // true
+ * @example
+ *   isValidDate({ date: new Date() }) // true
+ *   isValidDate({ date: new Date("999-12-31") }) // false
+ *   isValidDate({ date: new Date("invalid-date") }) // false
  */
-export function isValidDate({ date }: { date: Maybe<Date> }): boolean {
+export function isValidDate({ date }: { date: Date }): boolean {
   return date != null && isValid(date) && isAfter(date, new Date("1000-01-01"));
+}
+
+/// Converts a date to minutes discarding date and seconds
+export function dateToMinutes(d: Date): number {
+  return d.getHours() * 60 + d.getMinutes();
+}
+
+export function minutesToHoursString(minutes: number, trailingMinutes = false): string {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  const showMins = trailingMinutes || mins > 0;
+  if (showMins) {
+    return `${hours}:${mins < 10 ? `0${mins}` : mins}`;
+  }
+  return `${hours}`;
+}
+
+/// @description Convert time string "HH:MM" to minutes
+/// safe for invalid time strings but not for invalid time values
+/// removes trailing seconds if present
+/// @return 0 if time is invalid otherwise the time in minutes
+export function timeToMinutes(time: string): number {
+  const [hours, minutes] = time.split(":").map(Number);
+  if (hours != null && minutes != null && isFinite(hours) && isFinite(minutes)) {
+    return hours * 60 + minutes;
+  }
+  return 0;
 }

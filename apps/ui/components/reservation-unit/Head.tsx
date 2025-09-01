@@ -1,3 +1,4 @@
+import type { LocalizationLanguages } from "common/src/urlBuilder";
 import { IconClock, IconGroup, IconEuroSign, IconHome, IconSize, IconLock, Tooltip } from "hds-react";
 import React from "react";
 import { type TFunction, useTranslation } from "next-i18next";
@@ -15,7 +16,7 @@ import {
   getReservationUnitAccessPeriods,
   isReservationUnitPaid,
 } from "@/modules/reservationUnit";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
 interface HeadProps {
@@ -35,7 +36,11 @@ type NonReservableNotificationProps = {
   reservationUnit: Pick<ReservationUnitHeadFragment, "reservationKind" | "reservationBeginsAt">;
 };
 
-function formatErrorMessages(t: TFunction, reservationUnit: NonReservableNotificationProps["reservationUnit"]): string {
+function formatErrorMessages(
+  t: TFunction,
+  locale: LocalizationLanguages,
+  reservationUnit: NonReservableNotificationProps["reservationUnit"]
+): string {
   let returnText = t("reservationUnit:notifications.notReservable");
   if (reservationUnit.reservationKind === ReservationKind.Season) {
     returnText = t("reservationUnit:notifications.onlyRecurring");
@@ -43,7 +48,7 @@ function formatErrorMessages(t: TFunction, reservationUnit: NonReservableNotific
     const begin = new Date(reservationUnit.reservationBeginsAt);
     if (begin > new Date()) {
       const futureOpeningText = t("reservationUnit:notifications.futureOpening", {
-        date: formatDateTime({ t, date: begin }),
+        date: formatDateTime(begin, { locale }),
       });
       returnText = futureOpeningText;
     }
@@ -52,8 +57,9 @@ function formatErrorMessages(t: TFunction, reservationUnit: NonReservableNotific
 }
 
 function NonReservableNotification({ reservationUnit }: NonReservableNotificationProps) {
-  const { t } = useTranslation();
-  const returnText = formatErrorMessages(t, reservationUnit);
+  const { t, i18n } = useTranslation();
+  const lang = getLocalizationLang(i18n.language);
+  const returnText = formatErrorMessages(t, lang, reservationUnit);
 
   return (
     <NotificationWrapper data-testid="reservation-unit--notification__reservation-start">
@@ -143,14 +149,7 @@ function AccessTypeTooltip({ accessTypes }: Pick<ReservationUnitHeadFragment, "a
             </span>
             <span>
               {accessTypeDuration.endDate != null
-                ? formatDateRange({
-                    t,
-                    start: accessTypeDuration.beginDate,
-                    end: accessTypeDuration.endDate,
-                    options: {
-                      includeWeekday: false,
-                    },
-                  })
+                ? formatDateRange(accessTypeDuration.beginDate, accessTypeDuration.endDate, { includeWeekday: false })
                 : `${t("common:dateGte", { value: toUIDate({ date: accessTypeDuration.beginDate }) })}`}
             </span>
           </li>

@@ -14,7 +14,7 @@ import {
 } from "@gql/gql-types";
 import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
 import { formatDateTimeRange, formatDuration } from "common/src/date-utils";
-import { base64encode, capitalize, getImageSource, getMainImage } from "common/src/helpers";
+import { base64encode, capitalize, getImageSource, getLocalizationLang, getMainImage } from "common/src/helpers";
 import { getReservationUnitPath } from "@/modules/urls";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 
@@ -80,7 +80,9 @@ export function ReservationInfoCard({
   const { beginsAt, endsAt } = reservation || {};
   // NOTE can be removed after this has been refactored not to be used for PendingReservation
 
-  const timeString = capitalize(formatDateTimeRange({ t, start: new Date(beginsAt), end: new Date(endsAt) }));
+  const timeString = capitalize(
+    formatDateTimeRange(new Date(beginsAt), new Date(endsAt), { locale: getLocalizationLang(i18n.language) })
+  );
 
   const formatters = useMemo(() => getFormatters(i18n.language), [i18n.language]);
 

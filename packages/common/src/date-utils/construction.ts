@@ -1,6 +1,6 @@
 import { parse, set } from "date-fns";
 import { fromUIDate, fromApiDate, isValidDate } from "./conversion";
-import { type Maybe } from "./types";
+import { UI_DATE_FORMAT, UI_TIME_FORMAT } from "./index";
 
 /**
  * Constructs a Date object from UI date and time strings
@@ -57,7 +57,13 @@ export function fromUIDateTimeUnsafe({ date, time }: { date: string; time: strin
  * @returns Date object or null if invalid
  * @example fromApiDateTime({ date: "2023-12-25", time: "15:30" }) // Date for Dec 25, 2023 at 3:30 PM
  */
-export function fromApiDateTime({ date, time }: { date: Maybe<string>; time: Maybe<string> }): Date | null {
+export function fromApiDateTime({
+  date,
+  time,
+}: {
+  date: string | null | undefined;
+  time: string | null | undefined;
+}): Date | null {
   if (!date || !time) {
     return null;
   }
@@ -100,7 +106,13 @@ export function dateTimeToISOString({ date, time }: { date: string; time: string
  * @returns Date object or null if invalid
  * @deprecated Use fromUIDateTime instead
  */
-export function dateTime({ date, time }: { date: Maybe<string>; time: Maybe<string> }): Date | null {
+export function dateTime({
+  date,
+  time,
+}: {
+  date: string | null | undefined;
+  time: string | null | undefined;
+}): Date | null {
   return fromUIDateTime({ date: date ?? "", time: time ?? "" });
 }
 
@@ -146,7 +158,7 @@ export function parseCombinedUIDateTime({ dateTime }: { dateTime: string }): Dat
   }
 
   try {
-    const parsedDate = parse(dateTime, "dd.MM.yyyy HH:mm", new Date());
+    const parsedDate = parse(dateTime, `${UI_DATE_FORMAT} ${UI_TIME_FORMAT}`, new Date());
     return isValidDate({ date: parsedDate }) ? parsedDate : null;
   } catch {
     return null;

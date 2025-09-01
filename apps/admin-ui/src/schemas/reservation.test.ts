@@ -2,9 +2,7 @@ import { ReservationStartInterval } from "@gql/gql-types";
 import { addDays, addHours, format, setMinutes, subDays } from "date-fns";
 import { ReservationFormSchema } from "./reservation";
 import { describe, test, expect } from "vitest";
-
-const TIME_FORMAT = "HH:mm";
-const DATE_FORMAT = "dd.MM.yyyy";
+import { UI_TIME_FORMAT as TIME_FORMAT, UI_DATE_FORMAT as DATE_FORMAT } from "common/src/date-utils";
 
 describe("with schema", () => {
   const futureEndTime = format(addHours(new Date(), 3), "HH:00");

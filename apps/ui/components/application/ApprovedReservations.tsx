@@ -517,7 +517,8 @@ function ReservationUnitAccessTypeList({
   roundReservationBegin: Date;
   roundReservationEnd: Date;
 }>) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = getLocalizationLang(i18n.language);
   if (!accessTypes || accessTypes.length === 0 || !pk) {
     return null;
   }
@@ -553,14 +554,7 @@ function ReservationUnitAccessTypeList({
                       ? ` (${reservationUnit?.pindoraInfo?.accessCode})`
                       : "")}
                 </span>
-                <span>
-                  {formatDateRange({
-                    t,
-                    start: periodBeginDate,
-                    end: periodEndDate,
-                    options: { includeWeekday: false },
-                  })}
-                </span>
+                <span>{formatDateRange(periodBeginDate, periodEndDate, { includeWeekday: false, locale })}</span>
               </li>
             );
           })}

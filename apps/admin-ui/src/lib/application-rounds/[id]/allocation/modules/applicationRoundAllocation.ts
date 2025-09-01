@@ -7,8 +7,8 @@ import {
   type ApplicationSectionAllocationsQuery,
 } from "@gql/gql-types";
 import { type TFunction } from "next-i18next";
-import { filterNonNullable, formatTimeRange, sort, timeToMinutes, toNumber } from "common/src/helpers";
-import { formatDuration } from "common/src/date-utils";
+import { filterNonNullable, sort, toNumber } from "common/src/helpers";
+import { formatDuration, formatTimeRange, timeToMinutes } from "common/src/date-utils";
 import { convertWeekday, transformWeekday } from "common/src/conversion";
 import { type DayT } from "common/src/const";
 import { set } from "date-fns";

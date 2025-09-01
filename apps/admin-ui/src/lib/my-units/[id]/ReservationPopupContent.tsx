@@ -1,8 +1,9 @@
+import { getLocalizationLang } from "common/src/helpers";
 import React from "react";
 import styled from "styled-components";
 import { type ReservationUnitReservationsFragment, UserPermissionChoice } from "@gql/gql-types";
 import { getReservationUrl } from "@/common/urls";
-import { formatTime } from "common/src/date-utils";
+import { formatTime, toValidDateObject } from "common/src/date-utils";
 import { getReserveeName } from "@/common/util";
 import { truncate } from "@/helpers";
 import { Flex } from "common/styled";
@@ -41,13 +42,16 @@ export function ReservationPopupContent({
 }: {
   reservation: ReservationUnitReservationsFragment;
 }): JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = getLocalizationLang(i18n.language);
+  const reservationStart = toValidDateObject(reservation.beginsAt);
+  const reservationEnd = toValidDateObject(reservation.endsAt);
   const eventName = getReserveeName(reservation, t, 22) || "-";
   return (
     <PopupContent>
       <Flex $gap="xs">
         <Heading>
-          {formatTime({ t, date: reservation.beginsAt })} - {formatTime({ t, date: reservation.endsAt })} /{" "}
+          {formatTime(reservationStart, { locale })} - {formatTime(reservationEnd, { locale })} /{" "}
           {reservation.reservationUnit?.nameFi ?? "-"}
         </Heading>
         <VisibleIfPermission reservation={reservation} permission={UserPermissionChoice.CanViewReservations}>

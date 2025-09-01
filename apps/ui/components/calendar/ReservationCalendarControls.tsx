@@ -15,7 +15,7 @@ import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { useMedia } from "react-use";
 import { type FocusTimeSlot } from "@/modules/reservation";
 import { ControlledDateInput } from "common/src/components/form";
-import { capitalize } from "common/src/helpers";
+import { capitalize, getLocalizationLang } from "common/src/helpers";
 
 type CommonProps = {
   reservationUnit: ReservationTimePickerFieldsFragment;
@@ -236,7 +236,7 @@ function ControlledToggler({
   price: string | null;
   durationOptions: { label: string; value: number }[];
 }): JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { control, watch } = form;
 
   const duration = watch("duration");
@@ -245,7 +245,9 @@ function ControlledToggler({
     if (!focusSlot.isReservable) {
       return t("reservationCalendar:selectTime");
     }
-    const dateStr = capitalize(formatDateTimeRange({ t, start: focusSlot.start, end: focusSlot.end }));
+    const dateStr = capitalize(
+      formatDateTimeRange(focusSlot.start, focusSlot.end, { locale: getLocalizationLang(i18n.language) })
+    );
     const selected = durationOptions.find((opt) => opt.value === duration);
     const durationStr = selected?.label ?? "";
 

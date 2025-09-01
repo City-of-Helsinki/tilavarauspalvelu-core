@@ -1,15 +1,6 @@
 import { type TFunction } from "i18next";
-import { formatApiTimeInterval, formatListToCSV, formatMinutes } from "./helpers";
+import { formatApiTimeInterval, formatListToCSV } from "./helpers";
 import { describe, test, expect } from "vitest";
-
-describe("formatMinutes", () => {
-  test("should return 0:00 when given 0 when trailingMinutes is true", () => {
-    expect(formatMinutes(0, true)).toBe("0:00");
-  });
-  test("should return 0 when given 0 when trailingMinutes is false", () => {
-    expect(formatMinutes(0, false)).toBe("0");
-  });
-});
 
 describe("formatApiTimeInterval", () => {
   test("should properly format api time interval", () => {

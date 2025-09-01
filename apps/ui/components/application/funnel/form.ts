@@ -1,5 +1,5 @@
 import { startOfDay } from "date-fns";
-import { filterNonNullable, type ReadonlyDeep, timeToMinutes } from "common/src/helpers";
+import { filterNonNullable, type ReadonlyDeep } from "common/src/helpers";
 import {
   type ApplicantFieldsFragment,
   type ApplicationFormFragment,
@@ -14,7 +14,7 @@ import {
   Weekday,
 } from "@gql/gql-types";
 import { z } from "zod";
-import { fromUIDate, toApiDate, toUIDate } from "common/src/date-utils";
+import { fromUIDate, timeToMinutes, toApiDate, toUIDate } from "common/src/date-utils";
 import { checkValidDateOnly, lessThanMaybeDate } from "common/src/schemas/schemaCommon";
 import { CELL_STATES } from "common/src/components/ApplicationTimeSelector";
 

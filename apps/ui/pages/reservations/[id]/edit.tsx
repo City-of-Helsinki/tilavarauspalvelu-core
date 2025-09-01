@@ -11,7 +11,7 @@ import {
   ReservationEditPageDocument,
   MunicipalityChoice,
 } from "@gql/gql-types";
-import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { base64encode, getLocalizationLang, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { toApiDate } from "common/src/date-utils";
 import { addYears } from "date-fns";
 import { breakpoints } from "common/src/const";
@@ -44,6 +44,7 @@ const StepperWrapper = styled.div`
 function ReservationEditPage(props: PropsNarrowed): JSX.Element {
   const { t, i18n } = useTranslation();
   const { reservation } = props;
+  const locale = getLocalizationLang(i18n.language);
   const options = {
     ...props.options,
     municipality: Object.values(MunicipalityChoice).map((value) => ({
@@ -55,15 +56,15 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
   const [step, setStep] = useState<0 | 1>(0);
 
   const form = useForm<PendingReservationFormType>({
-    defaultValues: transformReservation(t, reservation),
+    defaultValues: transformReservation(locale, reservation),
     mode: "onChange",
     resolver: zodResolver(PendingReservationFormSchema),
   });
 
   const { reset } = form;
   useEffect(() => {
-    reset(transformReservation(t, reservation));
-  }, [reservation, reset, t]);
+    reset(transformReservation(locale, reservation));
+  }, [reservation, reset, locale]);
 
   const title = step === 0 ? "reservations:editReservationTime" : "reservationCalendar:heading.pendingReservation";
 

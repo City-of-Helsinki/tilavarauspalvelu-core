@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import PaymentNotification from "@/components/reservation/PaymentNotification";
 import { describe, it, expect } from "vitest";
 import { AppliedPricingInfo, OrderStatus, PaymentOrderNode, PaymentType, PriceUnit } from "@gql/gql-types";
-import { toUIDateTime } from "common/src/date-utils";
+import { formatDateTime, toValidDateObject } from "common/src/date-utils";
 
 function customRender() {
   const paymentOrder = createPaymentOrderMock();
@@ -41,7 +41,10 @@ describe("Component: Payment Notification", () => {
   it("should render the payment notification component with correct deadline", () => {
     customRender();
     const paymentOrderMock = createPaymentOrderMock();
-    const deadlineText = `common:deadline: ${toUIDateTime({ date: new Date(paymentOrderMock.handledPaymentDueBy ?? ""), dayTimeSeparator: "common:dayTimeSeparator" })}`;
+    const deadlineText = `common:deadline: ${formatDateTime(
+      toValidDateObject(paymentOrderMock.handledPaymentDueBy ?? ""),
+      { includeWeekday: false, locale: "fi" }
+    )}`;
     expect(screen.getByText(deadlineText)).toBeInTheDocument();
   });
 });

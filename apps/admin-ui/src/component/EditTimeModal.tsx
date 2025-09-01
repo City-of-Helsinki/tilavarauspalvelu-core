@@ -1,3 +1,5 @@
+import type { LocalizationLanguages } from "common/src/urlBuilder";
+import { t } from "i18next";
 import React from "react";
 import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
@@ -12,7 +14,7 @@ import {
   Weekday,
 } from "@gql/gql-types";
 import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
-import { differenceInMinutes, format } from "date-fns";
+import { differenceInMinutes } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -21,6 +23,8 @@ import {
   toUIDate,
   fromUIDateTime,
   fromUIDateTimeUnsafe,
+  formatTime,
+  formatDate,
 } from "common/src/date-utils";
 import { useModal } from "@/context/ModalContext";
 import { TimeChangeFormSchemaRefined, TimeFormSchema } from "@/schemas";
@@ -30,7 +34,7 @@ import { BufferToggles } from "@/component/BufferToggles";
 import { useCheckCollisions } from "@/hooks";
 import { getBufferTime, getNormalizedInterval } from "@/helpers";
 import { gql } from "@apollo/client";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import { successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
 import { convertWeekday } from "common/src/conversion";
@@ -92,8 +96,8 @@ function reservationSeriesInfoText({
 
 type EditFormValueType = z.infer<typeof TimeFormSchema>;
 
-function formatDateInterval(t: TFunction, begin: Date, end: Date) {
-  const dateString = formatDateTimeRange({ t, start: begin, end });
+function formatDateInterval(locale: LocalizationLanguages, begin: Date, end: Date) {
+  const dateString = formatDateTimeRange(begin, end, { locale });
   const durationString = formatDuration({
     t,
     duration: {
@@ -140,8 +144,8 @@ function DialogContent({
   topContent,
   type,
 }: DialogContentProps) {
-  const { t } = useTranslation();
-
+  const { t, i18n } = useTranslation();
+  const locale = getLocalizationLang(i18n.language);
   const {
     handleSubmit,
     control,
@@ -191,7 +195,7 @@ function DialogContent({
 
   const translateError = (errorMsg?: string) => (errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "");
 
-  const newTimeString = start && end ? formatDateInterval(t, start, end) : "";
+  const newTimeString = start && end ? formatDateInterval(locale, start, end) : "";
   const translateKey = type === "move" ? "reservation:EditTimeModal" : "reservation:NewReservationModal";
   const isDisabled = (!isDirty && !isValid) || isLoading || hasCollisions;
   return (
@@ -329,7 +333,8 @@ export function EditTimeModal({
   reservation: ChangeReservationTimeFragment;
 }) {
   const { isOpen } = useModal();
-  const { t } = useTranslation("reservation");
+  const { t, i18n } = useTranslation("reservation");
+  const locale = getLocalizationLang(i18n.language);
 
   const startDateTime = new Date(reservation.beginsAt);
   const endDateTime = new Date(reservation.endsAt);
@@ -353,9 +358,9 @@ export function EditTimeModal({
     mode: "onChange",
     defaultValues: {
       pk: reservation.pk ?? undefined,
-      date: format(startDateTime, "dd.MM.yyyy"),
-      startTime: format(startDateTime, "HH:mm"),
-      endTime: format(endDateTime, "HH:mm"),
+      date: formatDate(startDateTime, { locale }),
+      startTime: formatTime(startDateTime, { locale }),
+      endTime: formatTime(endDateTime, { locale }),
       enableBufferTimeAfter: !!reservation.bufferTimeAfter,
       enableBufferTimeBefore: !!reservation.bufferTimeBefore,
       type: reservation.type ?? ReservationTypeChoice.Staff,
@@ -383,7 +388,7 @@ export function EditTimeModal({
     onAccept();
   };
 
-  const originalTime = formatDateInterval(t, startDateTime, endDateTime);
+  const originalTime = formatDateInterval(locale, startDateTime, endDateTime);
   return (
     <StyledDialog
       variant="primary"

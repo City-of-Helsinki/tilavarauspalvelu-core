@@ -32,7 +32,7 @@ import {
   DataWrapper,
 } from "@lib/reservations/[id]/";
 import { Accordion, ApplicationDatas, Summary } from "@/styled";
-import { base64encode, ignoreMaybeArray, isPriceFree, toNumber } from "common/src/helpers";
+import { base64encode, getLocalizationLang, ignoreMaybeArray, isPriceFree, toNumber } from "common/src/helpers";
 import { formatAgeGroup } from "@/common/util";
 import { toUIDateTime } from "common/src/date-utils";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -134,7 +134,9 @@ function ReservationSummary({
               ? ` ${t("reservation.dueByParenthesis", {
                   date: toUIDateTime({
                     date: new Date(reservation.paymentOrder.handledPaymentDueBy),
-                    dayTimeSeparator: t("common:dayTimeSeparator"),
+                    options: {
+                      includeDayTimeSeparator: true,
+                    },
                   }),
                 })}`
               : ""
@@ -281,7 +283,7 @@ function RequestedReservation({
   reservation: ReservationType;
   refetch: () => Promise<ApolloQueryResult<ReservationPageQuery>>;
 }): JSX.Element | null {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const ref = useRef<HTMLHeadingElement>(null);
 
@@ -289,7 +291,7 @@ function RequestedReservation({
 
   const isNonFree = pricing != null ? !isPriceFree(pricing) : false;
 
-  const reservationTagline = createTagString(reservation, t);
+  const reservationTagline = createTagString(reservation, t, getLocalizationLang(i18n.language));
 
   return (
     <>

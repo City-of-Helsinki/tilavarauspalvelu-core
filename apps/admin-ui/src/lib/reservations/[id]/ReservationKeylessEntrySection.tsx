@@ -1,3 +1,4 @@
+import { getLocalizationLang } from "common/src/helpers";
 import { useTranslation } from "next-i18next";
 import {
   AccessType,
@@ -12,7 +13,7 @@ import { successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
 import { Button, ButtonSize, IconAlertCircleFill, IconRefresh, Tooltip } from "hds-react";
 import { format } from "date-fns";
-import { formatTime } from "common/src/date-utils";
+import { formatTime, toValidDateObject } from "common/src/date-utils";
 import React, { useState } from "react";
 import { Accordion } from "@/styled";
 import { DataWrapper } from "./DataWrapper";
@@ -119,9 +120,11 @@ function ReservationKeylessEntrySingle({
   reservation: ReservationKeylessEntryFragment;
   onSuccess: () => void;
 }>) {
-  const { t } = useTranslation();
-
+  const { t, i18n } = useTranslation();
+  const locale = getLocalizationLang(i18n.language);
   const pindoraInfo = reservation.pindoraInfo;
+  const pindoraAccessCodeBegins = toValidDateObject(pindoraInfo?.accessCodeBeginsAt ?? "");
+  const pindoraAccessCodeEnds = toValidDateObject(pindoraInfo?.accessCodeEndsAt ?? "");
 
   return (
     <SummaryHorizontal>
@@ -136,7 +139,7 @@ function ReservationKeylessEntrySingle({
 
       <DataWrapper label={t("accessType:validity.label")}>
         {reservation.pindoraInfo
-          ? `${formatTime({ t, date: pindoraInfo?.accessCodeBeginsAt })}–${formatTime({ t, date: pindoraInfo?.accessCodeEndsAt })}`
+          ? `${formatTime(pindoraAccessCodeBegins, { locale })}–${formatTime(pindoraAccessCodeEnds, { locale })}`
           : "-"}
       </DataWrapper>
 
@@ -152,8 +155,8 @@ function ReservationKeylessEntryRecurring({
   reservation: ReservationKeylessEntryFragment;
   onSuccess: () => void;
 }>) {
-  const { t } = useTranslation();
-
+  const { t, i18n } = useTranslation();
+  const locale = getLocalizationLang(i18n.language);
   if (!reservation.reservationSeries) return null;
 
   const pindoraInfo = reservation.reservationSeries.pindoraInfo;
@@ -185,7 +188,7 @@ function ReservationKeylessEntryRecurring({
         <DataWrapper label={t("accessType:validity.label")}>
           <NoWrap>
             {validityBeginsTime
-              ? `${formatTime({ t, date: validityBeginsTime })}–${formatTime({ t, date: validityEndsTime })}`
+              ? `${formatTime(toValidDateObject(validityBeginsTime), { locale })}–${formatTime(toValidDateObject(validityEndsTime ?? ""), { locale })}`
               : "-"}
           </NoWrap>
         </DataWrapper>

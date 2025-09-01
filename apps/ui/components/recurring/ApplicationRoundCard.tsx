@@ -1,3 +1,4 @@
+import type { LocalizationLanguages } from "common/src/urlBuilder";
 import React from "react";
 import { IconArrowRight, IconLinkExternal } from "hds-react";
 import { type TFunction, useTranslation } from "next-i18next";
@@ -16,6 +17,7 @@ interface CardProps {
 
 function translateRoundDate(
   t: TFunction,
+  locale: LocalizationLanguages,
   round: Pick<ApplicationRoundCardFragment, "applicationPeriodBeginsAt" | "applicationPeriodEndsAt" | "status">
 ) {
   const begin = new Date(round.applicationPeriodBeginsAt);
@@ -27,13 +29,13 @@ function translateRoundDate(
   switch (round.status) {
     case ApplicationRoundStatusChoice.Upcoming:
       return t("applicationRound:card.pending", {
-        opening: formatDateTime({ t, date: begin }),
+        opening: formatDateTime(begin, { locale }),
       });
     case ApplicationRoundStatusChoice.Open:
-      return t("applicationRound:card.open", { until: formatDateTime({ t, date: end }) });
+      return t("applicationRound:card.open", { until: formatDateTime(end, { locale }) });
     default:
       return t("applicationRound:card.past", {
-        closing: formatDateTime({ t, date: end }),
+        closing: formatDateTime(end, { locale }),
       });
   }
 }
@@ -43,7 +45,7 @@ export function ApplicationRoundCard({ applicationRound }: Readonly<CardProps>):
   const lang = convertLanguageCode(i18n.language);
 
   const name = getTranslationSafe(applicationRound, "name", lang);
-  const timeString = translateRoundDate(t, applicationRound);
+  const timeString = translateRoundDate(t, lang, applicationRound);
   const begin = new Date(applicationRound.reservationPeriodBeginDate);
   const end = new Date(applicationRound.reservationPeriodEndDate);
   const reservationPeriodBeginDate = toUIDate({ date: begin });

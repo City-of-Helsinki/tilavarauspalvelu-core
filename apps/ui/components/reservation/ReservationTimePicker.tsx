@@ -187,7 +187,7 @@ export function ReservationTimePicker({
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
   const { watch, setValue } = reservationForm;
   const activeApplicationRounds = reservationUnit.applicationRounds;
-
+  const locale = getLocalizationLang(i18n.language);
   const dateValue = watch("date");
 
   const now = useMemo(() => new Date(), []);
@@ -264,7 +264,7 @@ export function ReservationTimePicker({
     });
 
     const newDate = toUIDate({ date: begin });
-    const newTime = formatTime({ t, date: begin });
+    const newTime = formatTime(begin, { locale });
 
     setValue("date", newDate, { shouldDirty: true });
     setValue("duration", duration, { shouldDirty: true });
@@ -319,7 +319,7 @@ export function ReservationTimePicker({
     });
 
     const uiDate = toUIDate({ date: begin });
-    const uiTime = formatTime({ t, date: begin });
+    const uiTime = formatTime(begin, { locale });
     // click doesn't change the duration
     setValue("date", uiDate, { shouldDirty: true });
     setValue("time", uiTime, { shouldDirty: true });
@@ -389,7 +389,7 @@ export function ReservationTimePicker({
           resizableAccessor={({ event }) => event?.state?.toString() === "INITIAL"}
           step={30}
           timeslots={SLOTS_EVERY_HOUR}
-          culture={getLocalizationLang(i18n.language)}
+          culture={locale}
           aria-hidden
           longPressThreshold={100}
         />

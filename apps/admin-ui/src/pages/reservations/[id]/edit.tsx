@@ -30,7 +30,7 @@ import { gql } from "@apollo/client";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { GetServerSidePropsContext } from "next";
-import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { base64encode, getLocalizationLang, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { Error403 } from "@/component/Error403";
@@ -249,8 +249,8 @@ function Wrapper({
   reservation: Maybe<ReservationType> | undefined;
   children: React.ReactNode;
 }) {
-  const { t } = useTranslation();
-  const tagline = reservation ? createTagString(reservation, t) : "";
+  const { t, i18n } = useTranslation();
+  const tagline = reservation ? createTagString(reservation, t, getLocalizationLang(i18n.language)) : "";
 
   return (
     <>

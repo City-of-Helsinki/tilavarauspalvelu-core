@@ -37,18 +37,11 @@ function ReservationPeriod({
   reservationPeriodBeginDate: string;
   reservationPeriodEndDate: string;
 }): JSX.Element {
-  const { t } = useTranslation();
-
   return (
     <Flex $gap="xs" $direction="row" $alignItems="center">
       <IconCalendar size={IconSize.ExtraSmall} />
-      {formatDateRange({
-        t,
-        start: new Date(reservationPeriodBeginDate),
-        end: new Date(reservationPeriodEndDate),
-        options: {
-          includeWeekday: false,
-        },
+      {formatDateRange(new Date(reservationPeriodBeginDate), new Date(reservationPeriodEndDate), {
+        includeWeekday: false,
       })}
     </Flex>
   );

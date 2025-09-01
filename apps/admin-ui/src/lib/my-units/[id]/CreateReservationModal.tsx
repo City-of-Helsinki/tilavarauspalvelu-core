@@ -19,7 +19,6 @@ import {
   useReservationUnitQuery,
 } from "@gql/gql-types";
 import styled from "styled-components";
-import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorBoundary } from "react-error-boundary";
 import { ReservationFormSchema, type ReservationFormType, type ReservationFormMeta } from "@/schemas";
@@ -27,12 +26,12 @@ import { CenterSpinner, Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useCheckCollisions } from "@/hooks";
 import { getBufferTime, getNormalizedInterval } from "@/helpers";
-import { dateTimeToISOString, fromUIDateTimeUnsafe } from "common/src/date-utils";
+import { dateTimeToISOString, fromUIDateTimeUnsafe, formatDate, formatTime } from "common/src/date-utils";
 import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
-import { base64encode, toNumber } from "common/src/helpers";
+import { base64encode, getLocalizationLang, toNumber } from "common/src/helpers";
 import { successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
 import { SelectFilter } from "@/component/QueryParamFilters";
@@ -91,11 +90,11 @@ export function CreateReservationModal({
   onClose,
   focusAfterCloseRef,
 }: CreateReservationModalProps): JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { isOpen } = useModal();
   const params = useSearchParams();
   const reservationUnitPk = toNumber(params.get("reservationUnit")) ?? reservationUnitOptions[0]?.value;
-
+  const locale = getLocalizationLang(i18n.language);
   const id = base64encode(`ReservationUnitNode:${reservationUnitPk}`);
   const { data, loading } = useReservationUnitQuery({
     variables: { id },
@@ -117,8 +116,8 @@ export function CreateReservationModal({
 
     mode: "onChange",
     defaultValues: {
-      date: format(startDate, "dd.MM.yyyy"),
-      startTime: format(startDate, "HH:mm"),
+      date: formatDate(startDate, { locale }),
+      startTime: formatTime(startDate, { locale }),
       enableBufferTimeBefore: false,
       enableBufferTimeAfter: false,
     },

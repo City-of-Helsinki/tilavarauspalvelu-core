@@ -35,7 +35,14 @@ import { getReservationUnitName } from "@/modules/reservationUnit";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { AddressSection } from "@/components/reservation-unit";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
-import { base64encode, capitalize, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import {
+  base64encode,
+  capitalize,
+  filterNonNullable,
+  getLocalizationLang,
+  ignoreMaybeArray,
+  toNumber,
+} from "common/src/helpers";
 import { ButtonLikeLink, ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import {
@@ -171,6 +178,7 @@ function Reservation({
   Pick<PropsNarrowed, "termsOfUse" | "reservation" | "feedbackUrl" | "options" | "apiBaseUrl">
 >): React.ReactElement | null {
   const { t, i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
   const params = useSearchParams();
   const statusNotification = convertNotify(params.get("notify"));
   const shouldShowAccessCode =
@@ -215,14 +223,12 @@ function Reservation({
   });
 
   const { beginsAt, endsAt } = reservation;
-  const timeString = capitalize(formatDateTimeRange({ t, start: new Date(beginsAt), end: new Date(endsAt) }));
+  const timeString = capitalize(formatDateTimeRange(new Date(beginsAt), new Date(endsAt), { locale: lang }));
 
   const supportedFields = filterNonNullable(reservation.reservationUnit.metadataSet?.supportedFields);
 
   const isBeingHandled = reservation.state === ReservationStateChoice.RequiresHandling;
   const isCancellable = isReservationCancellable(reservation);
-
-  const lang = convertLanguageCode(i18n.language);
 
   const paymentUrl = getPaymentUrl(reservation, lang, apiBaseUrl);
   const hasCheckoutUrl = paymentUrl != null;
@@ -402,11 +408,11 @@ function AccessCodeInfo({
           />
           <LabelValuePair
             label={t("reservations:accessCodeDuration")}
-            value={formatDateTimeRange({
-              t,
-              start: new Date(pindoraInfo.accessCodeBeginsAt),
-              end: new Date(pindoraInfo.accessCodeEndsAt),
-            })}
+            value={formatDateTimeRange(
+              new Date(pindoraInfo.accessCodeBeginsAt),
+              new Date(pindoraInfo.accessCodeEndsAt),
+              { locale: getLocalizationLang(i18n.language) }
+            )}
             testId="reservation__access-code-duration"
           />
         </>

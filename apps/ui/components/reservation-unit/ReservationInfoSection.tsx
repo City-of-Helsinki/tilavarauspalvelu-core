@@ -1,10 +1,11 @@
+import { getLocalizationLang } from "common/src/helpers";
 import React from "react";
 import { gql } from "@apollo/client";
 import { type ReservationInfoSectionFragment } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { H4, Strong } from "common/styled";
 import styled from "styled-components";
-import { formatDurationRange, formatDateTime } from "common/src/date-utils";
+import { formatDurationRange, formatDateTime, toValidDateObject } from "common/src/date-utils";
 import { formatNDays } from "@/modules/reservationUnit";
 
 const Subheading = styled(H4).attrs({ as: "h2", $noMargin: true })`
@@ -151,13 +152,13 @@ function ReservationStatus({
 }: {
   reservationUnit: Pick<NodeT, "reservationEndsAt" | "reservationBeginsAt">;
 }): JSX.Element | null {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = getLocalizationLang(i18n.language);
   const reservationStatus = getStatus(reservationUnit);
   if (reservationStatus === "willOpen") {
-    const dateTime = formatDateTime({
-      t,
-      date: reservationUnit.reservationBeginsAt,
-      options: { includeWeekday: false },
+    const dateTime = formatDateTime(toValidDateObject(reservationUnit.reservationBeginsAt ?? ""), {
+      locale,
+      includeWeekday: false,
     });
     return (
       <p>
@@ -167,7 +168,10 @@ function ReservationStatus({
   }
 
   if (reservationStatus === "isOpen") {
-    const dateTime = formatDateTime({ t, date: reservationUnit.reservationEndsAt, options: { includeWeekday: false } });
+    const dateTime = formatDateTime(toValidDateObject(reservationUnit.reservationEndsAt ?? ""), {
+      locale,
+      includeWeekday: false,
+    });
     return (
       <p>
         <Strong>{t("reservationUnit:reservationInfoSection.isOpen", { dateTime })}</Strong>
@@ -176,7 +180,10 @@ function ReservationStatus({
   }
 
   if (reservationStatus === "hasClosed") {
-    const dateTime = formatDateTime({ t, date: reservationUnit.reservationEndsAt, options: { includeWeekday: false } });
+    const dateTime = formatDateTime(toValidDateObject(reservationUnit.reservationEndsAt ?? ""), {
+      locale,
+      includeWeekday: false,
+    });
     return (
       <p>
         <Strong>{t("reservationUnit:reservationInfoSection.hasClosed", { dateTime })}</Strong>

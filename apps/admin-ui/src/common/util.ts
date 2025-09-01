@@ -9,9 +9,6 @@ import {
 import type { TFunction } from "next-i18next";
 import { truncate } from "common/src/helpers";
 
-export const DATE_FORMAT = "d.M.yyyy";
-export const DATE_FORMAT_SHORT = "d.M.";
-
 export const formatNumber = (input?: number | null, suffix?: string): string => {
   if (input == null) return "";
 

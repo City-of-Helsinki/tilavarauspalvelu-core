@@ -6,7 +6,15 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { addYears } from "date-fns";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
-import { formatTime, fromUIDate, isValidDate, toApiDate, toUIDate } from "common/src/date-utils";
+import {
+  formatTime,
+  formatTimeRange,
+  fromUIDate,
+  isValidDate,
+  timeToMinutes,
+  toApiDate,
+  toUIDate,
+} from "common/src/date-utils";
 import { formatters as getFormatters } from "common";
 import { Flex, H4 } from "common/styled";
 import { breakpoints } from "common/src/const";
@@ -33,10 +41,8 @@ import {
   base64encode,
   filterNonNullable,
   formatListToCSV,
-  formatTimeRange,
   ignoreMaybeArray,
   isPriceFree,
-  timeToMinutes,
   toNumber,
 } from "common/src/helpers";
 import { Sanitize } from "common/src/components/Sanitize";
@@ -227,7 +233,6 @@ function ReservationUnit({
   const lang = convertLanguageCode(i18n.language);
   const router = useRouter();
   useRemoveStoredReservation();
-
   const [isPricingTermsDialogOpen, setIsPricingTermsDialogOpen] = useState(false);
 
   const durationOptions = getDurationOptions(reservationUnit, t);
@@ -248,7 +253,7 @@ function ReservationUnit({
       maxReservationDurationMinutes,
       durationOptions
     ),
-    time: searchTime ?? formatTime({ t, date: defaultDate }),
+    time: searchTime ?? formatTime(defaultDate, { locale: lang }),
     isControlsVisible: true,
   };
 

@@ -16,8 +16,15 @@ import {
   UserPermissionChoice,
   useSeriesPageQuery,
 } from "@gql/gql-types";
-import { base64encode, calculateMedian, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { format, isSameDay } from "date-fns";
+import {
+  base64encode,
+  calculateMedian,
+  filterNonNullable,
+  getLocalizationLang,
+  ignoreMaybeArray,
+  toNumber,
+} from "common/src/helpers";
+import { isSameDay } from "date-fns";
 import { useTranslation } from "next-i18next";
 import { Element } from "@/styled";
 import { AutoGrid, ButtonContainer, CenterSpinner, H1, Strong } from "common/styled";
@@ -32,6 +39,7 @@ import {
   toUIDate,
   fromUIDateUnsafe,
   toApiDateUnsafe,
+  formatTime,
 } from "common/src/date-utils";
 import { ControlledDateInput, TimeInput } from "common/src/components/form";
 import { WeekdaysSelector } from "@/component/WeekdaysSelector";
@@ -58,7 +66,7 @@ import { hasPermission } from "@/modules/permissionHelper";
 
 type NodeT = NonNullable<SeriesPageQuery["reservation"]>["reservationSeries"];
 
-function convertToForm(value: NodeT): RescheduleReservationSeriesForm {
+function convertToForm(value: NodeT, lang: string): RescheduleReservationSeriesForm {
   // buffer times can be changed individually but the base value is not saved to the recurring series
   // so we take the most common value from all future reservations
   const reservations = filterNonNullable(value?.reservations).filter((x) => new Date(x.beginsAt) >= new Date());
@@ -66,11 +74,12 @@ function convertToForm(value: NodeT): RescheduleReservationSeriesForm {
   const bufferTimeAfter = calculateMedian(reservations.map((x) => x.bufferTimeAfter));
   const begin = fromApiDateTime({ date: value?.beginDate, time: value?.beginTime });
   const end = fromApiDateTime({ date: value?.endDate, time: value?.endTime });
+  const locale = getLocalizationLang(lang);
   return {
     startingDate: value?.beginDate != null ? toUIDate({ date: fromApiDate({ date: value.beginDate }) }) : "",
     endingDate: value?.endDate != null ? toUIDate({ date: fromApiDate({ date: value.endDate }) }) : "",
-    startTime: begin ? format(begin, "HH:mm") : "",
-    endTime: end ? format(end, "HH:mm") : "",
+    startTime: begin ? formatTime(begin, { locale }) : "",
+    endTime: end ? formatTime(end, { locale }) : "",
     repeatOnDays: filterNonNullable(value?.weekdays),
     bufferTimeBefore: bufferTimeBefore > 0,
     bufferTimeAfter: bufferTimeAfter > 0,
@@ -119,7 +128,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
 }
 
 function SeriesPageInner({ pk }: { pk: number }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { data, refetch, error, loading } = useSeriesPageQuery({
     variables: { id: base64encode(`ReservationNode:${pk}`) },
   });
@@ -135,16 +144,16 @@ function SeriesPageInner({ pk }: { pk: number }) {
   const form = useForm<RescheduleReservationSeriesForm>({
     // FIXME there is no validation here (schema is incomplete, need to run the same refinements as in the create form)
     resolver: zodResolver(RescheduleReservationSeriesFormSchema(interval)),
-    values: convertToForm(reservationSeries),
+    values: convertToForm(reservationSeries, i18n.language),
   });
 
   const { control, formState, reset, handleSubmit, watch } = form;
   const { errors } = formState;
   useEffect(() => {
     if (reservationSeries) {
-      reset(convertToForm(reservationSeries));
+      reset(convertToForm(reservationSeries, i18n.language));
     }
-  }, [reservationSeries, reset]);
+  }, [reservationSeries, reset, i18n.language]);
   const reservationUnit = reservation?.reservationUnit ?? null;
 
   const [removedReservations, setRemovedReservations] = useState<NewReservationListItem[]>([]);
@@ -158,7 +167,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
   // can't change when the form values change -> otherwise we overwrite user selection
   useEffect(() => {
     const compareList = reservationSeries?.reservations.map((x) => new Date(x.beginsAt));
-    const values = convertToForm(reservationSeries);
+    const values = convertToForm(reservationSeries, i18n.language);
     const vals = {
       startingDate: values.startingDate,
       endingDate: values.endingDate,
@@ -170,7 +179,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
     const result = generateReservations(vals);
     const removed = result.filter((x) => compareList?.find((y) => isSameDay(y, x.date)) == null);
     setRemovedReservations(removed);
-  }, [reservationSeries]);
+  }, [reservationSeries, i18n.language]);
 
   const checkedReservations = useFilteredReservationList({
     items: newReservations,
