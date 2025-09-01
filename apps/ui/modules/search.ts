@@ -254,8 +254,8 @@ export const OPTIONS_QUERY = gql`
     $equipmentsOrderBy: [EquipmentOrderSet!]
     $reservationPurposesOrderBy: [ReservationPurposeOrderSet!]
     # Filter
-    $onlyDirectBookable: Boolean!
-    $onlySeasonalBookable: Boolean!
+    $onlyDirectBookable: Boolean
+    $onlySeasonalBookable: Boolean
   ) {
     allReservationUnitTypes(orderBy: $reservationUnitTypesOrderBy) {
       id

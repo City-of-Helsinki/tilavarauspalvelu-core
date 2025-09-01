@@ -78,8 +78,9 @@ type FieldOptions = {
   purpose: OptionsRecord["reservationPurposes"];
   muncipality: OptionsRecord["municipalities"];
 };
+
 // Fix to match the Field required options
-function convertOptions(options: OptionsRecord): FieldOptions {
+export function convertOptionsToField(options: OptionsRecord): FieldOptions {
   return {
     ageGroup: options.ageGroups,
     purpose: options.reservationPurposes,
@@ -97,7 +98,7 @@ export function ReservationFormField({
   data = {},
 }: Props) {
   const { t } = useTranslation();
-  const options = convertOptions(originalOptions);
+  const options = convertOptionsToField(originalOptions);
 
   const lowerCaseTranslationKey = translationKey?.toLocaleLowerCase() || "individual";
 
