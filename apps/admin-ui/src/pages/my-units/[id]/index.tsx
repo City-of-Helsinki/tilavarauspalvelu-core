@@ -59,9 +59,10 @@ export default function MyUnitsPage({ unit }: Pick<PropsNarrowed, "unit">): JSX.
 
   const recurringReservationUrl = getReservationSeriesUrl(unit.pk);
 
-  const reservationUnitOptions = (unit?.reservationUnits ?? []).map(({ pk, nameFi }) => ({
+  const reservationUnitOptions = unit.reservationUnits.map(({ pk, nameFi, isDraft }) => ({
     label: nameFi ?? "-",
-    value: pk ?? 0,
+    value: pk,
+    isDraft,
   }));
 
   const modalCloseRef = useRef<HTMLInputElement | null>(null);
@@ -210,6 +211,7 @@ export const UNIT_VIEW_QUERY = gql`
           id
           pk
           nameFi
+          isDraft
           spaces {
             id
             pk
