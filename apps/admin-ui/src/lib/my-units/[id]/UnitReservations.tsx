@@ -17,6 +17,7 @@ import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { translateTag } from "@/modules/search";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
+import { type ReservationUnitOption } from "@/hooks/useUnitResources";
 
 const LegendContainer = styled.div`
   max-width: 100%;
@@ -30,8 +31,8 @@ const LegendContainer = styled.div`
 
 interface UnitReservationsProps {
   unitPk: number;
-  reservationUnitOptions: { label: string; value: number }[];
-  canCreateReservations?: boolean;
+  reservationUnitOptions: ReadonlyArray<ReservationUnitOption>;
+  canCreateReservations: boolean;
 }
 
 function UnitReservationsInner({

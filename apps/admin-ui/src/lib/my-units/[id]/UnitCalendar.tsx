@@ -19,7 +19,6 @@ type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
 type Resource = {
   title: string;
   pk: number;
-  url: string;
   isDraft: boolean;
   events: CalendarEventType[];
 };
@@ -500,7 +499,7 @@ export function UnitCalendar({
           </CellContent>
         </HeadingRow>
         {orderedResources.map((row) => (
-          <Row key={row.url}>
+          <Row key={row.pk}>
             <ResourceNameContainer title={row.title} $isDraft={row.isDraft}>
               <TitleCell>{row.title}</TitleCell>
             </ResourceNameContainer>
