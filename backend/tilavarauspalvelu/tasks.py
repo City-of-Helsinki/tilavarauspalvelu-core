@@ -6,7 +6,6 @@ import uuid
 from decimal import Decimal
 from functools import wraps
 from typing import TYPE_CHECKING
-from warnings import deprecated
 
 from django.core.cache import cache
 from django.db import transaction
@@ -47,7 +46,6 @@ __all__ = [
     "delete_pindora_reservation_task",
     "generate_reservation_series_from_allocations_task",
     "prune_reservation_statistics_task",
-    "prune_reservations_task",
     "purge_image_cache_task",
     "rebuild_space_tree_hierarchy_task",
     "refresh_expired_payments_in_verkkokauppa_task",
@@ -156,12 +154,6 @@ def update_origin_hauki_resource_reservable_time_spans_task() -> None:
     HaukiResourceHashUpdater().run()
 
 
-@app.task(name="prune_reservations")
-@deprecated("Use 'handle_unfinished_reservations' instead. This can be removed in next release.")
-def prune_reservations_task() -> None:
-    handle_unfinished_reservations_task()
-
-
 @app.task(name="handle_unfinished_reservations")
 def handle_unfinished_reservations_task() -> None:
     # Remove reservations that did not complete checkout in time.
@@ -185,12 +177,6 @@ def send_application_handled_email_task() -> None:
     EmailService.send_seasonal_booking_application_round_handled_emails()
 
 
-@app.task(name="update_expired_orders")
-@deprecated("Use 'refresh_expired_payments_in_verkkokauppa_task' instead. Can be removed in next release.")
-def update_expired_orders_task() -> None:
-    refresh_expired_payments_in_verkkokauppa_task()
-
-
 @app.task(name="refresh_expired_payments_in_verkkokauppa")
 def refresh_expired_payments_in_verkkokauppa_task() -> None:
     PaymentOrder.objects.refresh_expired_payments_from_verkkokauppa()
@@ -206,14 +192,6 @@ def create_missing_reservation_statistics_task() -> None:
     Reservation.objects.create_missing_statistics()
 
 
-@app.task(name="refund_paid_reservation")
-@deprecated("Use 'refund_payment_order_for_webshop_task' instead. Can be removed in next release.")
-def refund_paid_reservation_task(reservation_pk: int) -> None:
-    payment_order: PaymentOrder | None = PaymentOrder.objects.filter(reservation__pk=reservation_pk).first()
-    if payment_order is not None:
-        refund_payment_order_for_webshop_task(payment_order.pk)
-
-
 @app.task(
     name="refund_payment_order_for_webshop",
     autoretry_for=(Exception,),
@@ -224,14 +202,6 @@ def refund_payment_order_for_webshop_task(payment_order_pk: int) -> None:
     payment_order: PaymentOrder | None = PaymentOrder.objects.filter(pk=payment_order_pk).first()
     if payment_order is not None:
         payment_order.actions.issue_refund_in_verkkokauppa()
-
-
-@app.task(name="cancel_reservation_invoice")
-@deprecated("Use 'cancel_payment_order_for_invoice_task' instead. Can be removed in next release.")
-def cancel_reservation_invoice_task(reservation_pk: int) -> None:
-    payment_order: PaymentOrder | None = PaymentOrder.objects.filter(reservation__pk=reservation_pk).first()
-    if payment_order is not None:
-        cancel_payment_order_for_invoice_task(payment_order.pk)
 
 
 @app.task(
