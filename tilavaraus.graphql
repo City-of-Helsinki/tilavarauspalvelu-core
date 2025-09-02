@@ -3298,7 +3298,7 @@ type Query {
   """
   Get information about a user from Helsinki profile.
   If user is not a profile user, still return data stored in our database, e.g. first and last name.
-
+  
   Use only one of 'reservationPk' or 'applicationPk' to select the user.
   This determines the required permissions to view the user's data.
   If neither is given, the user is the currently logged in user.
@@ -3350,7 +3350,7 @@ type Query {
     offset: Int
     """
     Filter reservation units by their reservability.
-
+    
     If 'showOnlyReservable' is True, then only reservation units,
     which are reservable with the given filters are returned.
     Otherwise, all reservation units are returned.
