@@ -5,7 +5,7 @@ from undine.exceptions import EmptyFilterResult
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, UserRoleChoice
 from tilavarauspalvelu.models import ApplicationRound, User
-from utils.db import NowTT
+from utils.db import Now
 
 __all__ = [
     "ApplicationRoundFilterSet",
@@ -18,7 +18,7 @@ class ApplicationRoundFilterSet(FilterSet[ApplicationRound]):
 
     @Filter
     def active(self, info: GQLInfo[User], *, value: bool) -> models.Q:
-        is_active = models.Q(application_period_begins_at__lte=NowTT(), application_period_ends_at__gte=NowTT())
+        is_active = models.Q(application_period_begins_at__lte=Now(), application_period_ends_at__gte=Now())
         return is_active if value else ~is_active
 
     @Filter
