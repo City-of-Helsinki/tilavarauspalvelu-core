@@ -1,4 +1,12 @@
-import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, NormalizedCacheObject, from } from "@apollo/client";
+import {
+  ApolloClient,
+  ApolloLink,
+  HttpLink,
+  InMemoryCache,
+  NormalizedCacheObject,
+  from,
+  disableFragmentWarnings,
+} from "@apollo/client";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore -- types require nodenext which breaks bundler option that breaks the build
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
@@ -9,6 +17,10 @@ import { isBrowser } from "./const";
 import { relayStylePagination } from "@apollo/client/utilities";
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
 import { enchancedFetch, errorLink } from "common/src/apolloUtils";
+
+// graphql-codegen does not allow fragments with non unique names
+// -> this is not needed but it has false positives due to codegen
+disableFragmentWarnings();
 
 if (process.env.NODE_ENV !== "production") {
   // Adds messages only in a dev environment
