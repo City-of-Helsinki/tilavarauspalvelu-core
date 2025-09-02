@@ -56,7 +56,7 @@ function ReserveeDetailsButton({
     <Button
       variant={ButtonVariant.Secondary}
       iconStart={isLoading ? <LoadingSpinner small /> : icon}
-      style={{ cursor: isLoading ? "wait" : "" }}
+      style={{ cursor: isLoading ? "wait" : undefined }}
       onClick={onClick}
       disabled={disabled}
     >
