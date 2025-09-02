@@ -1,4 +1,4 @@
-import { MunicipalityChoice, type OptionsQuery, type ReservationUnitTypeNode } from "@/gql/gql-types";
+import { MunicipalityChoice, ReservationKind, type OptionsQuery, type ReservationUnitTypeNode } from "@/gql/gql-types";
 import { createNodeId } from "common/src/helpers";
 import { type DocumentNode } from "graphql";
 import { translateOption } from "@/modules/search";
@@ -11,6 +11,7 @@ export interface CreateGraphQLMockProps extends ICreateGraphQLMock {
   noUser?: boolean;
   isSearchError?: boolean;
   dateOverride?: Date | null;
+  reservationKind?: ReservationKind;
 }
 
 export type CreateGraphQLMocksReturn = Array<{
