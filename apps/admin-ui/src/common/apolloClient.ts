@@ -57,14 +57,14 @@ export function createClient(hostUrl: string, req?: IncomingMessage): ApolloClie
       typePolicies: {
         Query: {
           fields: {
-            reservationUnits: relayStylePagination(),
-            units: relayStylePagination(),
-            reservations: relayStylePagination(["onlyWithHandlingPermission"]),
-            applications: relayStylePagination(),
-            applicationSections: relayStylePagination(),
-            allocatedTimeSlots: relayStylePagination(),
-            bannerNotifications: relayStylePagination(["target", "isVisible", "orderBy"]),
-            rejectedOccurrences: relayStylePagination(),
+            reservationUnits: relayStylePagination(["filter"]),
+            units: relayStylePagination(["filter"]),
+            reservations: relayStylePagination(["filter"]),
+            applications: relayStylePagination(["filter"]),
+            applicationSections: relayStylePagination(["filter"]),
+            allocatedTimeSlots: relayStylePagination(["filter"]),
+            bannerNotifications: relayStylePagination(["filter"]),
+            rejectedOccurrences: relayStylePagination(["filter"]),
           },
         },
       },
