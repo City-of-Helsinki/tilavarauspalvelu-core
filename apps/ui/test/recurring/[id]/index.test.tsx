@@ -70,7 +70,7 @@ afterEach(() => {
 });
 
 describe("Page: SeasonalSearch", () => {
-  test("should render page", async () => {
+  test.only("should render page", async () => {
     const view = customRender();
     const title = view.getByRole("heading", {
       name: "applicationRound:search.title",

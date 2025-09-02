@@ -19,9 +19,10 @@ import { createNodeId } from "common/src/helpers";
 export function createGraphQLMocks({
   noUser = false,
   isSearchError = false,
+  reservationKind,
 }: CreateGraphQLMockProps = {}): CreateGraphQLMocksReturn {
   return [
-    ...createSearchQueryMocks({ isSearchError }),
+    ...createSearchQueryMocks({ isSearchError, reservationKind }),
     ...createOptionsQueryMocks(),
     ...createCurrentUserQueryMocks({ noUser }),
     ...createApplicationMutationMocks(),
