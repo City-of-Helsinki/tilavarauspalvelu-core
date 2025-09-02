@@ -2,6 +2,7 @@ import {
   CurrentUserDocument,
   OptionsDocument,
   OptionsQuery,
+  ReservationKind,
   ReservationPurposeOrderSet,
   ReservationUnitTypeOrderSet,
   type CurrentUserQuery,
@@ -19,7 +20,7 @@ import { createNodeId } from "common/src/helpers";
 export function createGraphQLMocks({
   noUser = false,
   isSearchError = false,
-  reservationKind,
+  reservationKind = ReservationKind.Direct,
 }: CreateGraphQLMockProps = {}): CreateGraphQLMocksReturn {
   return [
     ...createSearchQueryMocks({ isSearchError, reservationKind }),
