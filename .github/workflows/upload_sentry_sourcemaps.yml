@@ -13,6 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  SENTRY_ENABLE_SOURCE_MAPS: "true"
   SKIP_ENV_VALIDATION: "true"
   SENTRY_ORG: "city-of-helsinki"
   SENTRY_URL: "https://sentry.hel.fi/"
