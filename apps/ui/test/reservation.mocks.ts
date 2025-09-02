@@ -244,7 +244,7 @@ export function createMockReservation(props: MockReservationProps): Readonly<Res
           taxPercentage: {
             id: createNodeId("TaxPercentageNode", 1),
             pk: 1,
-            value: "24.5",
+            value: "25.5",
           },
         },
       ],

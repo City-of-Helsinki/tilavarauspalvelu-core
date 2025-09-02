@@ -25,7 +25,7 @@ describe("Component: Payment Notification", () => {
     }
     const formattedPrice = appliedPricingMock.highestPrice.split(".").join(",") + "0";
     // eslint-disable-next-line no-irregular-whitespace
-    const priceText = `common:price: ${formattedPrice} € (common:inclTax {"taxPercentage":"25,5"})`;
+    const priceText = `common:price: ${formattedPrice} € (common:inclTax {"taxPercentage":"24,5"})`;
     const priceElement = screen.getByTestId("reservation__payment-notification__price");
 
     expect(screen.getByText((_, element) => element?.textContent?.trim() === priceText)).toBeInTheDocument();
