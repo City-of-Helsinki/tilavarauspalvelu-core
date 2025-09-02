@@ -5,6 +5,7 @@ from inspect import cleandoc
 
 import django.contrib.postgres.fields
 import undine.utils.model_fields
+from django.conf import settings
 from django.db import migrations
 
 import tilavarauspalvelu.enums
@@ -23,34 +24,38 @@ def drop_affecting_reservations() -> str:
 
 
 def create_affecting_reservations() -> str:
+    now_func = "NOW_TT()" if settings.ENABLE_NOW_TT else "STATEMENT_TIMESTAMP()"
+
     # SELECT 1 is for syntax highlighting in PyCharm
     return cleandoc(
-        """
+        f"""
         SELECT 1;
+
         CREATE MATERIALIZED VIEW affecting_time_spans AS
              SELECT
-                res.reservation_id,
-                array_agg(res.ru_id ORDER BY res.ru_id) AS affected_reservation_unit_ids,
-                res.buffered_start_datetime,
-                res.buffered_end_datetime,
-                res.buffer_time_before,
-                res.buffer_time_after,
-                res.is_blocking
-            FROM (
-                SELECT DISTINCT
-                    r.id as reservation_id,
-                    unnest(ruh.related_reservation_unit_ids) as ru_id,
-                    (r.begins_at - r.buffer_time_before) as buffered_start_datetime,
-                    (r.ends_at + r.buffer_time_after) as buffered_end_datetime,
-                    r.buffer_time_before as buffer_time_before,
-                    r.buffer_time_after as buffer_time_after,
-                    (CASE WHEN UPPER(r."type") = 'BLOCKED' THEN true ELSE false END) as is_blocking
-                FROM reservation r
-                INNER JOIN "reservation_unit_hierarchy" ruh ON r.reservation_unit_id = ruh.reservation_unit_id
-                WHERE (
-                    (r.ends_at + r.buffer_time_after)::date >= NOW_TT()::date
-                    AND UPPER(r.state) IN ('CREATED', 'CONFIRMED', 'WAITING_FOR_PAYMENT', 'REQUIRES_HANDLING')
-                )
+                 res.reservation_id,
+                 array_agg(res.ru_id ORDER BY res.ru_id) AS affected_reservation_unit_ids,
+                 res.buffered_start_datetime,
+                 res.buffered_end_datetime,
+                 res.buffer_time_before,
+                 res.buffer_time_after,
+                 res.is_blocking
+             FROM (
+                 SELECT DISTINCT
+                     r.id as reservation_id,
+                     unnest(ruh.related_reservation_unit_ids) as ru_id,
+                     (r.begins_at - r.buffer_time_before) as buffered_start_datetime,
+                     (r.ends_at + r.buffer_time_after) as buffered_end_datetime,
+                     r.buffer_time_before as buffer_time_before,
+                     r.buffer_time_after as buffer_time_after,
+                     (CASE WHEN UPPER(r."type") = 'BLOCKED' THEN true ELSE false END) as is_blocking
+                 FROM reservation r
+                 INNER JOIN "reservation_unit_hierarchy" ruh ON r.reservation_unit_id = ruh.reservation_unit_id
+                 WHERE (
+                     -- Make use of reservation's index on 'ends_at', even if this fetches some past reservations
+                     r.ends_at >= DATE_TRUNC('day', {now_func} - interval '1 day')
+                     AND UPPER(r.state) IN ('CREATED', 'CONFIRMED', 'WAITING_FOR_PAYMENT', 'REQUIRES_HANDLING')
+                 )
             ) res
             GROUP BY
                 res.reservation_id,
@@ -73,7 +78,7 @@ def create_affecting_reservations() -> str:
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("tilavarauspalvelu", "0147_remove_bannernotification_level_priority_index_and_more"),
+        ("tilavarauspalvelu", "0150_remove_bannernotification_level_priority_index_and_more"),
     ]
 
     operations = [
