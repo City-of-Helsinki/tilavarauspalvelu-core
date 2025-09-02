@@ -10,7 +10,7 @@ export function useHandling() {
   const { isAuthenticated } = useSession();
 
   const today = useMemo(() => startOfDay(new Date()), []);
-  const { data, refetch } = useHandlingDataQuery({
+  const { data, previousData, refetch } = useHandlingDataQuery({
     skip: !isAuthenticated,
     variables: {
       beginDate: toApiDate(today) ?? "",
@@ -18,8 +18,9 @@ export function useHandling() {
     },
   });
 
-  const handlingCount: number = data?.reservations?.edges?.length ?? 0;
-  const unitCount: number = data?.allUnits?.length ?? 0;
+  const d = data ?? previousData;
+  const handlingCount: number = d?.reservations?.totalCount ?? 0;
+  const unitCount: number = d?.allUnits?.length ?? 0;
   const hasOwnUnits: boolean = unitCount > 0;
 
   return { handlingCount, hasOwnUnits, refetch };
@@ -38,6 +39,7 @@ export const HANDLING_COUNT_QUERY = gql`
           pk
         }
       }
+      totalCount
     }
     allUnits(filter: { onlyWithPermission: true }) {
       id
