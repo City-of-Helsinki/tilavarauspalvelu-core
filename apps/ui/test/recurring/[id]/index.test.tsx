@@ -4,12 +4,13 @@ import { createGraphQLMocks } from "@test/gql.mocks";
 import { createMockApplicationRound } from "@test/application.mocks";
 import { type CreateGraphQLMockProps, createOptionMock } from "@/test/test.gql.utils";
 import SeasonalSearch from "@/pages/recurring/[id]";
-import { addYears } from "date-fns";
+import { endOfMonth, startOfDay } from "date-fns";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import userEvent from "@testing-library/user-event";
 import { getApplicationPath } from "@/modules/urls";
 import { MockedGraphQLProvider } from "@/test/test.react.utils";
 import { type OptionsListT } from "common/src/modules/search";
+import { ReservationKind } from "@/gql/gql-types";
 
 const { mockedRouterReplace, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
@@ -45,10 +46,14 @@ vi.mock("next/router", () => ({
 }));
 
 function customRender(props: CreateGraphQLMockProps = {}): ReturnType<typeof render> {
-  const mocks = createGraphQLMocks(props);
+  const mocks = createGraphQLMocks({
+    ...props,
+    reservationKind: ReservationKind.Season,
+  });
+  const begin = new Date(2024, 0, 1, 0, 0, 0);
   const round = createMockApplicationRound({
-    applicationPeriodBeginsAt: new Date(2024, 0, 1, 0, 0, 0),
-    applicationPeriodEndsAt: addYears(new Date(), 1),
+    applicationPeriodBeginsAt: begin,
+    applicationPeriodEndsAt: startOfDay(endOfMonth(begin)),
   });
   const options: OptionsListT = createOptionMock();
   return render(
@@ -70,7 +75,7 @@ afterEach(() => {
 });
 
 describe("Page: SeasonalSearch", () => {
-  test.only("should render page", async () => {
+  test("should render page", async () => {
     const view = customRender();
     const title = view.getByRole("heading", {
       name: "applicationRound:search.title",
