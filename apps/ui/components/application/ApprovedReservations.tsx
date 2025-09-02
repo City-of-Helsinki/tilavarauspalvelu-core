@@ -66,7 +66,7 @@ import { getApplicationReservationPath, getApplicationSectionPath, getReservatio
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { AccordionWithIcons } from "@/components/AccordionWithIcons";
 import { isReservationCancellableReason, ReservationCancellableReason } from "@/modules/reservation";
-import { formatDateRange, formatDateTimeStrings, toApiDate, toUIDate } from "common/src/date-utils";
+import { formatDate, formatDateRange, formatDateTimeStrings, toApiDate } from "common/src/date-utils";
 import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 
 const N_RESERVATIONS_TO_SHOW = 20;
@@ -722,7 +722,7 @@ function ReservationsTable({
         return (
           <Flex $direction="row" $gap="2-xs" $justifyContent="space-between" $width="full">
             <span style={{ position: "relative" }} aria-label={t("common:dateLabel")}>
-              <span>{toUIDate({ date })}</span>
+              <span>{formatDate(date)}</span>
               <OnlyForMobile>
                 {/* span removes whitespace */}
                 <pre style={{ display: "inline" }}>{" - "}</pre>

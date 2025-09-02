@@ -4,6 +4,7 @@ import type { LocalizationLanguages } from "../urlBuilder";
 export type TimeStruct = {
   hours: number;
   minutes?: number;
+  seconds?: number;
 };
 
 export interface CommonDateOptions {

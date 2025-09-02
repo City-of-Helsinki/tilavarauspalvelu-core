@@ -15,7 +15,7 @@ import StatusLabel from "common/src/components/StatusLabel";
 import type { StatusLabelType } from "common/src/tags";
 import { NoWrap } from "common/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
-import { formatDurationRange, toUIDate } from "common/src/date-utils";
+import { formatDurationRange, formatDate } from "common/src/date-utils";
 import {
   ApplicationInfoContainer,
   ApplicationSection,
@@ -86,8 +86,8 @@ function SingleApplicationSection({
     aes.status === ApplicationSectionStatusChoice.Rejected || aes.status === ApplicationSectionStatusChoice.Handled;
   const statusProps = getLabelProps(aes.status);
 
-  const reservationsBegin = toUIDate({ date: new Date(aes.reservationsBeginDate) });
-  const reservationsEnd = toUIDate({ date: new Date(aes.reservationsEndDate) });
+  const reservationsBegin = formatDate(new Date(aes.reservationsBeginDate));
+  const reservationsEnd = formatDate(new Date(aes.reservationsEndDate));
   const duration = formatDurationRange({
     t,
     beginSecs: aes.reservationMinDuration,

@@ -6,7 +6,7 @@ import { MockedProvider } from "@apollo/client/testing";
 import { ReservationSeriesForm } from "./ReservationSeriesForm";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { createGraphQLMocks, createReservationUnits, mondayMorningReservations, YEAR } from "./__test__/mocks";
-import { toUIDate } from "common/src/date-utils";
+import { formatDate } from "common/src/date-utils";
 import { Weekday } from "@gql/gql-types";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
@@ -303,8 +303,8 @@ describe("Filling the form", () => {
     const end = addDays(begin, 30);
     const view = customRender({ begin, end });
     await fillForm({
-      begin: toUIDate({ date: begin }),
-      end: toUIDate({ date: end }),
+      begin: formatDate(begin),
+      end: formatDate(end),
       weekday: Weekday.Tuesday,
     });
     const user = userEvent.setup({
@@ -326,8 +326,8 @@ describe("Filling the form", () => {
     const end = addDays(begin, 30);
     const view = customRender({ begin, end });
     await fillForm({
-      begin: toUIDate({ date: begin }),
-      end: toUIDate({ date: end }),
+      begin: formatDate(begin),
+      end: formatDate(end),
       weekday: Weekday.Tuesday,
     });
 
@@ -366,8 +366,8 @@ describe("Filling the form", () => {
       advanceTimers: vi.advanceTimersByTime.bind(vi),
     });
     await fillForm({
-      begin: toUIDate({ date: begin }),
-      end: toUIDate({ date: end }),
+      begin: formatDate(begin),
+      end: formatDate(end),
       weekday: Weekday.Monday,
     });
 
@@ -410,8 +410,8 @@ describe("Filling the form", () => {
       advanceTimers: vi.advanceTimersByTime.bind(vi),
     });
     await fillForm({
-      begin: toUIDate({ date: begin }),
-      end: toUIDate({ date: end }),
+      begin: formatDate(begin),
+      end: formatDate(end),
       weekday: Weekday.Tuesday,
     });
 

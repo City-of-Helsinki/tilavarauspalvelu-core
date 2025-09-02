@@ -7,13 +7,13 @@ import styled from "styled-components";
 import { addYears } from "date-fns";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import {
+  formatDate,
   formatTime,
   formatTimeRange,
   fromUIDate,
   isValidDate,
   timeToMinutes,
   toApiDate,
-  toUIDate,
 } from "common/src/date-utils";
 import { formatters as getFormatters } from "common";
 import { Flex, H4 } from "common/styled";
@@ -244,7 +244,7 @@ function ReservationUnit({
   // TODO should be the first reservable day (the reservableTimeSpans logic is too complex and needs refactoring)
   // i.e. using a naive approach will return empty timespsans either reuse the logic for QuickReservation or refactor
   const defaultDate = new Date();
-  const defaultDateString = toUIDate({ date: defaultDate });
+  const defaultDateString = formatDate(defaultDate);
   const defaultValues = {
     date: searchUIDate != null && isValidDate({ date: searchUIDate }) ? (searchDate ?? "") : defaultDateString,
     duration: clampDuration(
@@ -610,7 +610,7 @@ function PriceChangeNotice({ futurePricing }: { futurePricing: PricingFieldsFrag
         i18nKey="reservationUnit:futurePricingNotice"
         defaults="Huomioi <bold>hinnoittelumuutos {{date}} alkaen. Uusi hinta on {{price}}</bold>."
         values={{
-          date: toUIDate({ date: begins }),
+          date: formatDate(begins),
           price: priceString,
         }}
         components={{ bold: <strong /> }}

@@ -8,7 +8,7 @@ import { type ReservationCancelPageQuery, useCancelReservationMutation } from "@
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
-import { toUIDate, formatDateTimeStrings } from "common/src/date-utils";
+import { formatDate, formatDateTimeStrings } from "common/src/date-utils";
 import { useDisplayError } from "common/src/hooks";
 import { getApplicationPath, getReservationPath } from "@/modules/urls";
 import { getPrice } from "@/modules/reservationUnit";
@@ -132,7 +132,7 @@ function ApplicationInfoCard({ reservation }: { reservation: CancellationProps["
     },
   ];
 
-  const text = `${toUIDate({ date })} - ${dayOfWeek}`;
+  const text = `${formatDate(date)} - ${dayOfWeek}`;
   return <ApplicationInfo heading={name ?? ""} text={text} variant="vertical" infos={icons} />;
 }
 

@@ -7,7 +7,7 @@ import { convertLanguageCode, getTranslationSafe } from "common/src/common/util"
 import { ReservationKind, type ReservationUnitHeadFragment } from "@gql/gql-types";
 import { Flex, H1, H3 } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { formatDateRange, formatDateTime, formatDuration, toUIDate } from "common/src/date-utils";
+import { formatDateRange, formatDateTime, formatDuration, formatDate } from "common/src/date-utils";
 import { IconWithText } from "@/components/common/IconWithText";
 import { Images } from "./Images";
 import {
@@ -142,7 +142,7 @@ function AccessTypeTooltip({ accessTypes }: Pick<ReservationUnitHeadFragment, "a
     <Tooltip>
       <ul>
         {accessTypeDurations.map((accessTypeDuration) => (
-          <li key={toUIDate({ date: accessTypeDuration.beginDate })}>
+          <li key={formatDate(accessTypeDuration.beginDate)}>
             <span>
               {t(`reservationUnit:accessTypes.${accessTypeDuration.accessType}`)}
               {": "}
@@ -150,7 +150,7 @@ function AccessTypeTooltip({ accessTypes }: Pick<ReservationUnitHeadFragment, "a
             <span>
               {accessTypeDuration.endDate != null
                 ? formatDateRange(accessTypeDuration.beginDate, accessTypeDuration.endDate, { includeWeekday: false })
-                : `${t("common:dateGte", { value: toUIDate({ date: accessTypeDuration.beginDate }) })}`}
+                : `${t("common:dateGte", { value: formatDate(accessTypeDuration.beginDate) })}`}
             </span>
           </li>
         ))}

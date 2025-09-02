@@ -20,7 +20,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   formatDuration,
   formatDateTimeRange,
-  toUIDate,
   fromUIDateTime,
   fromUIDateTimeUnsafe,
   formatTime,
@@ -89,8 +88,8 @@ function reservationSeriesInfoText({
       .sort((a, b) => convertWeekday(a) - convertWeekday(b))
       .map((weekday) => t(`translation:dayShort.${weekday}`))
       .join(", "),
-    begin: begin && toUIDate({ date: begin }),
-    end: end && toUIDate({ date: end }),
+    begin: begin && formatDate(begin),
+    end: end && formatDate(end),
   });
 }
 

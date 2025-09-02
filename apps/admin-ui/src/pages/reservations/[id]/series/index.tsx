@@ -36,7 +36,7 @@ import {
   fromApiDate,
   fromApiDateTime,
   fromUIDate,
-  toUIDate,
+  formatDate,
   fromUIDateUnsafe,
   toApiDateUnsafe,
   formatTime,
@@ -76,8 +76,8 @@ function convertToForm(value: NodeT, lang: string): RescheduleReservationSeriesF
   const end = fromApiDateTime({ date: value?.endDate, time: value?.endTime });
   const locale = getLocalizationLang(lang);
   return {
-    startingDate: value?.beginDate != null ? toUIDate({ date: fromApiDate({ date: value.beginDate }) }) : "",
-    endingDate: value?.endDate != null ? toUIDate({ date: fromApiDate({ date: value.endDate }) }) : "",
+    startingDate: value?.beginDate != null ? formatDate(fromApiDate({ date: value.beginDate })) : "",
+    endingDate: value?.endDate != null ? formatDate(fromApiDate({ date: value.endDate })) : "",
     startTime: begin ? formatTime(begin, { locale }) : "",
     endTime: end ? formatTime(end, { locale }) : "",
     repeatOnDays: filterNonNullable(value?.weekdays),

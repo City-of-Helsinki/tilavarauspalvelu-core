@@ -33,7 +33,7 @@ import {
   getSlotPropGetter,
   isRangeReservable,
 } from "@/modules/reservable";
-import { formatDuration, formatTime, fromUIDate, toApiDate, toUIDate } from "common/src/date-utils";
+import { formatDuration, formatTime, fromUIDate, toApiDate, formatDate } from "common/src/date-utils";
 import { useTranslation } from "next-i18next";
 import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";
 import { type UseFormReturn } from "react-hook-form";
@@ -263,7 +263,7 @@ export function ReservationTimePicker({
       reservationUnit,
     });
 
-    const newDate = toUIDate({ date: begin });
+    const newDate = formatDate(begin);
     const newTime = formatTime(begin, { locale });
 
     setValue("date", newDate, { shouldDirty: true });
@@ -318,7 +318,7 @@ export function ReservationTimePicker({
       reservationUnit,
     });
 
-    const uiDate = toUIDate({ date: begin });
+    const uiDate = formatDate(begin);
     const uiTime = formatTime(begin, { locale });
     // click doesn't change the duration
     setValue("date", uiDate, { shouldDirty: true });
@@ -362,7 +362,7 @@ export function ReservationTimePicker({
         <Calendar<ReservationNode>
           events={calendarEvents}
           begin={focusDate}
-          onNavigate={(d: Date) => setValue("date", toUIDate({ date: d }))}
+          onNavigate={(d: Date) => setValue("date", formatDate(d))}
           eventStyleGetter={(event) =>
             eventStyleGetter(event, filterNonNullable(userReservations?.map((n) => n?.pk)), !isReservationQuotaReached)
           }

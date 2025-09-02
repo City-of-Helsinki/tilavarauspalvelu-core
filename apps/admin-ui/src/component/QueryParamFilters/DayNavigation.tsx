@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { addDays, subDays } from "date-fns";
 import { useTranslation } from "next-i18next";
 import { Button, IconAngleLeft, IconAngleRight, DateInput, ButtonSize, ButtonVariant } from "hds-react";
-import { fromUIDate, toUIDate } from "common/src/date-utils";
+import { fromUIDate, formatDate } from "common/src/date-utils";
 import { Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { toMondayFirstUnsafe } from "common/src/helpers";
@@ -74,10 +74,10 @@ export function DayNavigation({ name }: Props): JSX.Element {
   const d = fromUIDate({ date: uiDate }) ?? new Date();
 
   const onPreviousDay = () => {
-    handleChange(toUIDate({ date: subDays(d, 1) }));
+    handleChange(formatDate(subDays(d, 1)));
   };
   const onNextDay = () => {
-    handleChange(toUIDate({ date: addDays(d, 1) }));
+    handleChange(formatDate(addDays(d, 1)));
   };
 
   // unsafe is fine here d is a valid date and getDay has only 6 possible values

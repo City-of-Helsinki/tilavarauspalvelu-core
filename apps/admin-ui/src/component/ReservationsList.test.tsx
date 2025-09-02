@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import { addDays } from "date-fns";
-import { toUIDate } from "common/src/date-utils";
+import { formatDate } from "common/src/date-utils";
 import { ReservationList } from "./ReservationsList";
 import { describe, test, expect } from "vitest";
 
@@ -19,7 +19,7 @@ describe("ReservationsList", () => {
 
     const screen = render(<ReservationList items={items} />);
 
-    const dstring = toUIDate({ date: today });
+    const dstring = formatDate(today);
     expect(await screen.findByText(/19:00/)).toBeInTheDocument();
     expect(await screen.findByText(/20:00/)).toBeInTheDocument();
     expect(await screen.findByText(RegExp(dstring))).toBeInTheDocument();
@@ -35,7 +35,7 @@ describe("ReservationsList", () => {
 
     const screen = render(<ReservationList items={items} />);
 
-    const dstring = toUIDate({ date: today });
+    const dstring = formatDate(today);
     expect(await screen.findAllByText(/19:00/)).toHaveLength(N_DAYS);
     expect(await screen.findAllByText(/20:00/)).toHaveLength(N_DAYS);
     expect(await screen.findByText(RegExp(dstring))).toBeInTheDocument();

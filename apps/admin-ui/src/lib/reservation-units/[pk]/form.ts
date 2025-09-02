@@ -1,5 +1,5 @@
 import { convertTime, filterNonNullable, toNumber } from "common/src/helpers";
-import { fromApiDate, fromUIDate, fromUIDateTime, timeToMinutes, toApiDate, toUIDate } from "common/src/date-utils";
+import { fromApiDate, fromUIDate, fromUIDateTime, timeToMinutes, toApiDate, formatDate } from "common/src/date-utils";
 import {
   AccessType,
   Authentication,
@@ -676,9 +676,9 @@ function convertBegins(begins?: string) {
   const d = begins != null && begins !== "" ? fromApiDate({ date: begins }) : undefined;
   const today = new Date();
   if (d != null) {
-    return toUIDate({ date: d });
+    return formatDate(d);
   }
-  return toUIDate({ date: today });
+  return formatDate(today);
 }
 
 type PricingNode = NonNullable<Node["pricings"]>[0];
@@ -717,7 +717,7 @@ function convertPricingList(pricings: PricingNode[]): PricingFormValues[] {
   while (prices.length < 2 || !prices.some((p) => p?.isFuture)) {
     // if we need to add first price, it's always current
     const isFuture = prices.length > 0;
-    const begins = prices.length === 0 ? toUIDate({ date: new Date() }) : toUIDate({ date: addDays(new Date(), 1) });
+    const begins = prices.length === 0 ? formatDate(new Date()) : formatDate(addDays(new Date(), 1));
 
     prices.push({
       pk: rollingIndex--,

@@ -73,6 +73,7 @@ export function formatTime(date: Date | null, options?: FormatTimeOptions): stri
   }
 
   const separator = t ? (includeTimeSeparator ? t("common:dayTimeSeparator") : "") : "@";
+
   return `${separator} ${format(date, formatString, getFormatLocaleObject(locale))}`.trim();
 }
 
@@ -129,9 +130,9 @@ export function formatDateTime(date: Date | null, options?: FormatDateTimeOption
     return "";
   }
 
-  const separator = includeTimeSeparator ? (t ? t("common:dayTimeSeparator") : "@") : "";
+  const separator = includeTimeSeparator ? (t ? t("common:dayTimeSeparator") : " @") : "";
 
-  return format(date, `${formatString} '${separator}${UI_TIME_FORMAT}`, getFormatLocaleObject(locale)).trim();
+  return format(date, `${formatString}'${separator} ${UI_TIME_FORMAT}`, getFormatLocaleObject(locale)).trim();
 }
 
 /**

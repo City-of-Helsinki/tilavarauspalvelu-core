@@ -14,7 +14,7 @@ import {
   Weekday,
 } from "@gql/gql-types";
 import { z } from "zod";
-import { fromUIDate, timeToMinutes, toApiDate, toUIDate } from "common/src/date-utils";
+import { fromUIDate, timeToMinutes, toApiDate, formatDate } from "common/src/date-utils";
 import { checkValidDateOnly, lessThanMaybeDate } from "common/src/schemas/schemaCommon";
 import { CELL_STATES } from "common/src/components/ApplicationTimeSelector";
 
@@ -222,7 +222,7 @@ function convertDate(date: string | null | undefined): string | undefined {
   if (date == null) {
     return undefined;
   }
-  return toUIDate({ date: new Date(date) }) || undefined;
+  return formatDate(new Date(date)) || undefined;
 }
 
 const ApplicantTypeSchema = z.enum([ReserveeType.Individual, ReserveeType.Company, ReserveeType.Nonprofit]);

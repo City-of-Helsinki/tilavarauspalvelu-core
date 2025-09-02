@@ -8,7 +8,7 @@ import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { getApplicationRoundPath } from "@/modules/urls";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
-import { formatDateTime, toUIDate } from "common/src/date-utils";
+import { formatDateTime, formatDate } from "common/src/date-utils";
 import { gql } from "@apollo/client";
 
 interface CardProps {
@@ -48,8 +48,8 @@ export function ApplicationRoundCard({ applicationRound }: Readonly<CardProps>):
   const timeString = translateRoundDate(t, lang, applicationRound);
   const begin = new Date(applicationRound.reservationPeriodBeginDate);
   const end = new Date(applicationRound.reservationPeriodEndDate);
-  const reservationPeriodBeginDate = toUIDate({ date: begin });
-  const reservationPeriodEndDate = toUIDate({ date: end });
+  const reservationPeriodBeginDate = formatDate(begin);
+  const reservationPeriodEndDate = formatDate(end);
 
   const reservationPeriod = t(`applicationRound:card.reservationPeriod`, {
     reservationPeriodBeginDate,

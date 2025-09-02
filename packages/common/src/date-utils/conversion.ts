@@ -1,5 +1,5 @@
 import { format, isValid, isAfter, parse } from "date-fns";
-import { formatDate, formatDateTime, formatTime } from "./formatting";
+import { formatDate, formatTime } from "./formatting";
 import { UI_DATE_FORMAT, API_DATE_FORMAT } from "./";
 
 /**
@@ -52,66 +52,6 @@ export function fromApiDate({ date }: { date: string }): Date | null {
   } catch {
     return null;
   }
-}
-
-/**
- * Converts a Date object to UI date format (d.M.yyyy)
- * @param params - Parameters object
- * @param params.date - Date object or ISO string to convert
- * @returns UI date string or empty string if invalid
- * @example toUIDate({ date: new Date("2023-12-25") }) // "25.12.2023"
- */
-export function toUIDate({ date }: { date: Date | string | null | undefined }): string {
-  if (typeof date === "string") {
-    const parsedDate = new Date(date);
-    if (isValidDate({ date: parsedDate })) {
-      date = parsedDate;
-    } else {
-      return "";
-    }
-  }
-  if (!date || !isValidDate({ date })) {
-    return "";
-  }
-  const formatted = formatDate(date);
-  return formatted || "";
-}
-
-/**
- * Converts a Date object to UI datetime format (d.M.yyyy HH:mm)
- * @param params - Parameters object
- * @param date - Date object or ISO string to convert
- * @param options - Date format options
- * @param options.includeWeekday - Whether to include the weekday name (defaults to false)
- * @param options.includeDayTimeSeparator - Whether to include loaclized separator between date and time
- * (defaults to false)
- * @returns UI datetime string or empty string if invalid
- * @example toUIDateTime({ date: new Date("2023-12-25T15:30:00"), options: { dayTimeSeparator: true } }) //
- * "25.12.2023 klo 15:30"
- */
-export function toUIDateTime({
-  date,
-  options,
-}: {
-  date: Date | string | null | undefined;
-  options?: {
-    includeWeekday?: boolean;
-    includeDayTimeSeparator?: boolean;
-  };
-}): string {
-  if (typeof date === "string") {
-    const parsedDate = new Date(date);
-    if (isValidDate({ date: parsedDate })) {
-      date = parsedDate;
-    } else {
-      return "";
-    }
-  }
-  if (!date || !isValidDate({ date })) {
-    return "";
-  }
-  const { includeWeekday = false, includeDayTimeSeparator = false } = options || {};
-  return formatDateTime(date, { includeWeekday, includeTimeSeparator: includeDayTimeSeparator });
 }
 
 /**
