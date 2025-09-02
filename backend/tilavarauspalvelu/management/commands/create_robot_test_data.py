@@ -30,16 +30,21 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.models import (
     Application,
     ApplicationRound,
+    ApplicationRoundTimeSlot,
     Equipment,
     OriginHaukiResource,
     PaymentAccounting,
+    PaymentMerchant,
+    PaymentProduct,
     Purpose,
     Reservation,
     ReservationMetadataSet,
     ReservationPurpose,
     ReservationSeries,
     ReservationUnit,
+    ReservationUnitAccessType,
     ReservationUnitCancellationRule,
+    ReservationUnitPricing,
     ReservationUnitType,
     Space,
     TaxPercentage,
@@ -49,14 +54,6 @@ from tilavarauspalvelu.models import (
 )
 from tilavarauspalvelu.typing import TimeSlotDB
 from utils.date_utils import local_date, local_datetime
-
-from tests.factories import (
-    ApplicationRoundFactory,
-    ApplicationRoundTimeSlotFactory,
-    ReservationFactory,
-    ReservationUnitFactory,
-    UnitFactory,
-)
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -203,6 +200,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     nolla_veroprosentti = TaxPercentage.objects.get(value=Decimal("0.0"))
     uusi_veroprosentti = TaxPercentage.objects.get(value=Decimal("25.5"))
 
+    harakka_hauki_resource = OriginHaukiResource.objects.get(id="2952865")
     mankeli_hauki_resource = OriginHaukiResource.objects.get(id="2956668")
     aitio_hauki_resource = OriginHaukiResource.objects.get(id="2958620")
     kellarikerros_hauki_resource = OriginHaukiResource.objects.get(id="2956344")
@@ -214,13 +212,22 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     kalevi_hauki_resource = OriginHaukiResource.objects.get(id="2959580")
     piitu_hauki_resource = OriginHaukiResource.objects.get(id="2959581")
 
+    harakka_merchant = PaymentMerchant.objects.get(id="c9acaa73-b582-471c-b002-b038a8c00fb1")
+    kellarikerros_payment_merchant = PaymentMerchant.objects.get(id="9be158db-8e3a-4560-8e68-f3214b207d6c")
+
+    kellarikerros_payment_product = PaymentProduct.objects.get(id="630dcc27-1ff1-3e12-b1ea-9df2571a36bc")
+    aitio_payment_product = PaymentProduct.objects.get(id="eee7a1a4-b309-3919-aa7b-6d7eb675f9f4")
+    aula_payment_product = PaymentProduct.objects.get(id="19161df6-9f1c-3a0f-a953-d013ca2e3c0c")
+    kalevi_payment_product = PaymentProduct.objects.get(id="3cc8c05f-78cc-391c-b442-4f1b251697d3")
+    piitu_payment_product = PaymentProduct.objects.get(id="db9cb2d4-0a72-3e5e-a5b6-9479ef59e256")
+
     pihlajasarten_accounting = PaymentAccounting.objects.get(name="Pihlajasaarten testikirjasto")
 
     # ------------------------------------------------------------------------------------------------------------
     # HARAKKA
     # ------------------------------------------------------------------------------------------------------------
 
-    harakka = UnitFactory.create(
+    harakka = Unit.objects.create(
         name="Harakka, piilokoju",
         description=(
             "Luonnonsuojelualueen laidalla sijaitsevassa piilokojussa on lintuopasteita ja istuinpenkkejä. "
@@ -233,8 +240,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         address_city="Helsinki",
         allow_permissions_from_ad_groups=False,
         coordinates=Point(x=2778530.371378948912024, y=8433140.38941946811974),
-        origin_hauki_resource__id="2952865",
-        payment_merchant__id="c9acaa73-b582-471c-b002-b038a8c00fb1",
+        origin_hauki_resource=harakka_hauki_resource,
+        payment_merchant=harakka_merchant,
         payment_accounting=pihlajasarten_accounting,
     )
 
@@ -242,7 +249,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     # DESKTOP
     # ------------------------------------------------------------------------------------------------------------
 
-    _maksuton_mankeli = ReservationUnitFactory.create(
+    _maksuton_mankeli = ReservationUnit.objects.create(
         #
         # IDs
         ext_uuid="7bbd9b47-ad06-495a-a530-b094574208d6",
@@ -375,34 +382,41 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         payment_product=None,
         payment_merchant=None,
         payment_accounting=None,
-        #
-        # Many-to-Many related
-        spaces__name="Maksuton Mankeli (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__name_en="Maksuton Mankeli ENG (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__name_sv="Maksuton Mankeli SW (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__surface_area=100,
-        spaces__max_persons=1,
-        spaces__unit=harakka,
-        resources=[],
-        purposes=[
-            kauta_laitteita_tarkoitus,
-        ],
-        equipments=[
-            click_share_laite,
-        ],
-        #
-        # One-to-Many related
-        pricings__begins=local_date(2023, 9, 25),
-        pricings__price_unit=PriceUnit.PER_15_MINS,
-        pricings__payment_type=None,
-        pricings__is_activated_on_begins=False,
-        pricings__lowest_price=0,
-        pricings__highest_price=0,
-        pricings__tax_percentage=nolla_veroprosentti,
-        access_types__begin_date=local_date(2025, 6, 6),
-        access_types__access_type=AccessType.UNRESTRICTED,
     )
-    _aina_maksullinen_aitio = ReservationUnitFactory.create(
+    _maksuton_mankeli_space = Space.objects.create(
+        name="Maksuton Mankeli (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="Maksuton Mankeli ENG (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_sv="Maksuton Mankeli SW (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        surface_area=100,
+        max_persons=1,
+        unit=harakka,
+    )
+    _maksuton_mankeli.spaces.set([
+        _maksuton_mankeli_space,
+    ])
+    _maksuton_mankeli.purposes.set([
+        kauta_laitteita_tarkoitus,
+    ])
+    _maksuton_mankeli.equipments.set([
+        click_share_laite,
+    ])
+    _maksuton_mankeli_pricing = ReservationUnitPricing.objects.create(
+        reservation_unit=_maksuton_mankeli,
+        begins=local_date(2023, 9, 25),
+        price_unit=PriceUnit.PER_15_MINS,
+        payment_type=None,
+        is_activated_on_begins=False,
+        lowest_price=0,
+        highest_price=0,
+        tax_percentage=nolla_veroprosentti,
+    )
+    _maksuton_mankeli_access_type = ReservationUnitAccessType.objects.create(
+        reservation_unit=_maksuton_mankeli,
+        begin_date=local_date(2025, 6, 6),
+        access_type=AccessType.UNRESTRICTED,
+    )
+
+    _aina_maksullinen_aitio = ReservationUnit.objects.create(
         #
         # IDs
         ext_uuid="f34b4c81-5b1b-4311-9f03-1c45e67ab45a",
@@ -541,43 +555,50 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         service_specific_terms=maksulliset_palveluehto,
         pricing_terms=None,
         payment_terms=verkkokauppa_vain_maksuehto,
-        payment_product__id="eee7a1a4-b309-3919-aa7b-6d7eb675f9f4",
+        payment_product=aitio_payment_product,
         payment_merchant=None,
         payment_accounting=None,
-        #
-        # Many-to-Many related
-        spaces__name="Aina maksullinen aitio (AUTOMAATIO TESTI ÄLÄ POISTA)",
-        spaces__name_en="Aina maksullinen aitio (AUTOMAATIO TESTI ÄLÄ POISTA) ENG",
-        spaces__name_sv="Aina maksullinen aitio (AUTOMAATIO TESTI ÄLÄ POISTA) SV",
-        spaces__surface_area=50,
-        spaces__max_persons=6,
-        spaces__unit=harakka,
-        resources=[],
-        purposes=[
-            pida_kokous_tarkoitus,
-            loyda_juhlatila_tarkoitus,
-            yksin_tai_ryhma_tarkoitus,
-            kauta_laitteita_tarkoitus,
-        ],
-        equipments=[
-            liesi_laite,
-            kahvinkeitin_laite,
-            biljardi_laite,
-            liikuntavaline_laite,
-        ],
-        #
-        # One-to-Many related
-        pricings__begins=local_date(2024, 9, 1),
-        pricings__price_unit=PriceUnit.PER_HOUR,
-        pricings__payment_type=PaymentType.ONLINE,
-        pricings__is_activated_on_begins=False,
-        pricings__lowest_price=0,
-        pricings__highest_price=40,
-        pricings__tax_percentage=uusi_veroprosentti,
-        access_types__begin_date=local_date(2025, 6, 6),
-        access_types__access_type=AccessType.UNRESTRICTED,
     )
-    _aina_kasiteltava_kellarikerros = ReservationUnitFactory.create(
+    _aina_maksullinen_aitio_space = Space.objects.create(
+        name="Aina maksullinen aitio (AUTOMAATIO TESTI ÄLÄ POISTA)",
+        name_en="Aina maksullinen aitio (AUTOMAATIO TESTI ÄLÄ POISTA) ENG",
+        name_sv="Aina maksullinen aitio (AUTOMAATIO TESTI ÄLÄ POISTA) SV",
+        surface_area=50,
+        max_persons=6,
+        unit=harakka,
+    )
+    _aina_maksullinen_aitio.spaces.set([
+        _aina_maksullinen_aitio_space,
+    ])
+    _aina_maksullinen_aitio.purposes.set([
+        pida_kokous_tarkoitus,
+        loyda_juhlatila_tarkoitus,
+        yksin_tai_ryhma_tarkoitus,
+        kauta_laitteita_tarkoitus,
+    ])
+    _aina_maksullinen_aitio.equipments.set([
+        liesi_laite,
+        kahvinkeitin_laite,
+        biljardi_laite,
+        liikuntavaline_laite,
+    ])
+    _aina_maksullinen_aitio_pricing = ReservationUnitPricing.objects.create(
+        reservation_unit=_aina_maksullinen_aitio,
+        begins=local_date(2024, 9, 1),
+        price_unit=PriceUnit.PER_HOUR,
+        payment_type=PaymentType.ONLINE,
+        is_activated_on_begins=False,
+        lowest_price=0,
+        highest_price=40,
+        tax_percentage=uusi_veroprosentti,
+    )
+    _aina_maksullinen_aitio_access_type = ReservationUnitAccessType.objects.create(
+        reservation_unit=_aina_maksullinen_aitio,
+        begin_date=local_date(2025, 6, 6),
+        access_type=AccessType.UNRESTRICTED,
+    )
+
+    _aina_kasiteltava_kellarikerros = ReservationUnit.objects.create(
         #
         # IDs
         ext_uuid="2b6ed117-b53d-45b7-b931-94ac0a617743",
@@ -719,46 +740,53 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         service_specific_terms=nupa_palveluehto,
         pricing_terms=nupa_hinnoitteluehto,
         payment_terms=verkkokauppa_kasittely_maksuehto,
-        payment_product__id="630dcc27-1ff1-3e12-b1ea-9df2571a36bc",
-        payment_merchant__id="9be158db-8e3a-4560-8e68-f3214b207d6c",
+        payment_product=kellarikerros_payment_product,
+        payment_merchant=kellarikerros_payment_merchant,
         payment_accounting=pihlajasarten_accounting,
-        #
-        # Many-to-Many related
-        spaces__name="Aina käsiteltävä kellarikerros (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__name_en="Aina käsiteltävä kellarikerrosEN (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__name_sv="Aina käsiteltävä kellarikerrosSV (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__surface_area=100,
-        spaces__max_persons=50,
-        spaces__unit=harakka,
-        resources=[],
-        purposes=[
-            loyda_juhlatila_tarkoitus,
-            jarjesta_tapahtuma_tarkoitus,
-            harrasta_yhdessa_tarkoitus,
-        ],
-        equipments=[
-            poyta_laite,
-            sohva_laite,
-            istumapaikka_laite,
-            aani_laite,
-            hdmi_laite,
-            jaakaappi_laite,
-            naytto_laite,
-            jatkojohto_laite,
-        ],
-        #
-        # One-to-Many related
-        pricings__begins=local_date(2024, 8, 23),
-        pricings__price_unit=PriceUnit.PER_HOUR,
-        pricings__payment_type=PaymentType.ONLINE_OR_INVOICE,
-        pricings__is_activated_on_begins=False,
-        pricings__lowest_price=0,
-        pricings__highest_price=40,
-        pricings__tax_percentage=uusi_veroprosentti,
-        access_types__begin_date=local_date(2025, 5, 28),
-        access_types__access_type=AccessType.UNRESTRICTED,
     )
-    _alennuskelpoinen_aula = ReservationUnitFactory.create(
+    _aina_kasiteltava_kellarikerros_space = Space.objects.create(
+        name="Aina käsiteltävä kellarikerros (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="Aina käsiteltävä kellarikerrosEN (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_sv="Aina käsiteltävä kellarikerrosSV (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        surface_area=100,
+        max_persons=50,
+        unit=harakka,
+    )
+    _aina_kasiteltava_kellarikerros.spaces.set([
+        _aina_kasiteltava_kellarikerros_space,
+    ])
+    _aina_kasiteltava_kellarikerros.purposes.set([
+        loyda_juhlatila_tarkoitus,
+        jarjesta_tapahtuma_tarkoitus,
+        harrasta_yhdessa_tarkoitus,
+    ])
+    _aina_kasiteltava_kellarikerros.equipments.set([
+        poyta_laite,
+        sohva_laite,
+        istumapaikka_laite,
+        aani_laite,
+        hdmi_laite,
+        jaakaappi_laite,
+        naytto_laite,
+        jatkojohto_laite,
+    ])
+    _aina_kasiteltava_kellarikerros_pricing = ReservationUnitPricing.objects.create(
+        reservation_unit=_aina_kasiteltava_kellarikerros,
+        begins=local_date(2024, 8, 23),
+        price_unit=PriceUnit.PER_HOUR,
+        payment_type=PaymentType.ONLINE_OR_INVOICE,
+        is_activated_on_begins=False,
+        lowest_price=0,
+        highest_price=40,
+        tax_percentage=uusi_veroprosentti,
+    )
+    _aina_kasiteltava_kellarikerros_access_type = ReservationUnitAccessType.objects.create(
+        reservation_unit=_aina_kasiteltava_kellarikerros,
+        begin_date=local_date(2025, 5, 28),
+        access_type=AccessType.UNRESTRICTED,
+    )
+
+    _alennuskelpoinen_aula = ReservationUnit.objects.create(
         #
         # IDs
         ext_uuid="d2c6c5c3-6024-4ff1-9275-73a4025501e9",
@@ -900,41 +928,48 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         service_specific_terms=nupa_palveluehto,
         pricing_terms=nupa_hinnoitteluehto,
         payment_terms=verkkokauppa_alennus_maksuehto,
-        payment_product__id="19161df6-9f1c-3a0f-a953-d013ca2e3c0c",
+        payment_product=aula_payment_product,
         payment_merchant=None,
         payment_accounting=None,
-        #
-        # Many-to-Many related
-        spaces__name="Alennuskelpoinen aula (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__name_en="Alennuskelpoinen aulaEN (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__name_sv="Alennuskelpoinen aulaSV (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__surface_area=10,
-        spaces__max_persons=5,
-        spaces__unit=harakka,
-        resources=[],
-        purposes=[
-            jarjesta_tapahtuma_tarkoitus,
-            harrasta_yhdessa_tarkoitus,
-            yksin_tai_ryhma_tarkoitus,
-        ],
-        equipments=[
-            sohva_laite,
-            scart_laite,
-            studio_laite,
-        ],
-        #
-        # One-to-Many related
-        pricings__begins=local_date(2024, 9, 1),
-        pricings__price_unit=PriceUnit.PER_HOUR,
-        pricings__payment_type=PaymentType.ONLINE,
-        pricings__is_activated_on_begins=False,
-        pricings__lowest_price=0,
-        pricings__highest_price=30,
-        pricings__tax_percentage=uusi_veroprosentti,
-        access_types__begin_date=local_date(2025, 7, 15),
-        access_types__access_type=AccessType.UNRESTRICTED,
     )
-    _perumiskelvoton_parveke = ReservationUnitFactory.create(
+    _alennuskelpoinen_aula_space = Space.objects.create(
+        name="Alennuskelpoinen aula (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="Alennuskelpoinen aulaEN (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_sv="Alennuskelpoinen aulaSV (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        surface_area=10,
+        max_persons=5,
+        unit=harakka,
+    )
+    _alennuskelpoinen_aula.spaces.set([
+        _alennuskelpoinen_aula_space,
+    ])
+    _alennuskelpoinen_aula.purposes.set([
+        jarjesta_tapahtuma_tarkoitus,
+        harrasta_yhdessa_tarkoitus,
+        yksin_tai_ryhma_tarkoitus,
+    ])
+    _alennuskelpoinen_aula.equipments.set([
+        sohva_laite,
+        scart_laite,
+        studio_laite,
+    ])
+    _alennuskelpoinen_aula_pricing = ReservationUnitPricing.objects.create(
+        reservation_unit=_alennuskelpoinen_aula,
+        begins=local_date(2024, 9, 1),
+        price_unit=PriceUnit.PER_HOUR,
+        payment_type=PaymentType.ONLINE,
+        is_activated_on_begins=False,
+        lowest_price=0,
+        highest_price=30,
+        tax_percentage=uusi_veroprosentti,
+    )
+    _alennuskelpoinen_aula_access_type = ReservationUnitAccessType.objects.create(
+        reservation_unit=_alennuskelpoinen_aula,
+        begin_date=local_date(2025, 7, 15),
+        access_type=AccessType.UNRESTRICTED,
+    )
+
+    _perumiskelvoton_parveke = ReservationUnit.objects.create(
         #
         # IDs
         ext_uuid="e645a464-af29-41ee-a483-3163b7c9867a",
@@ -1009,37 +1044,42 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         payment_product=None,
         payment_merchant=None,
         payment_accounting=None,
-        #
-        # Many-to-Many related
-        spaces__name="Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__name_en="Perumiskelvoton parveke, maksuton EN (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__name_sv="Perumiskelvoton parveke, maksuton SV (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__surface_area=35,
-        spaces__max_persons=4,
-        spaces__unit=harakka,
-        resources=[],
-        purposes=[
-            pida_kokous_tarkoitus,
-        ],
-        equipments=[],
-        #
-        # One-to-Many related
-        pricings__begins=local_date(2024, 3, 1),
-        pricings__price_unit=PriceUnit.PER_HOUR,
-        pricings__payment_type=None,
-        pricings__is_activated_on_begins=False,
-        pricings__lowest_price=0,
-        pricings__highest_price=0,
-        pricings__tax_percentage=nolla_veroprosentti,
-        access_types__begin_date=local_date(2025, 7, 15),
-        access_types__access_type=AccessType.UNRESTRICTED,
+    )
+    _perumiskelvoton_parveke_space = Space.objects.create(
+        name="Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="Perumiskelvoton parveke, maksuton EN (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_sv="Perumiskelvoton parveke, maksuton SV (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        surface_area=35,
+        max_persons=4,
+        unit=harakka,
+    )
+    _perumiskelvoton_parveke.spaces.set([
+        _perumiskelvoton_parveke_space,
+    ])
+    _perumiskelvoton_parveke.purposes.set([
+        pida_kokous_tarkoitus,
+    ])
+    _perumiskelvoton_parveke_pricing = ReservationUnitPricing.objects.create(
+        reservation_unit=_perumiskelvoton_parveke,
+        begins=local_date(2024, 3, 1),
+        price_unit=PriceUnit.PER_HOUR,
+        payment_type=None,
+        is_activated_on_begins=False,
+        lowest_price=0,
+        highest_price=0,
+        tax_percentage=nolla_veroprosentti,
+    )
+    _perumiskelvoton_parveke_access_type = ReservationUnitAccessType.objects.create(
+        reservation_unit=_perumiskelvoton_parveke,
+        begin_date=local_date(2025, 7, 15),
+        access_type=AccessType.UNRESTRICTED,
     )
 
     # ------------------------------------------------------------------------------------------------------------
     # DESKTOP / KAUSIVARAUS
     # ------------------------------------------------------------------------------------------------------------
 
-    _kausivarausyksikko_malmi = ReservationUnitFactory.create(
+    _kausivarausyksikko_malmi = ReservationUnit.objects.create(
         #
         # IDs
         ext_uuid="52f16e97-4986-4c4e-8fc5-8fab4ab66933",
@@ -1114,46 +1154,52 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         payment_product=None,
         payment_merchant=None,
         payment_accounting=None,
-        #
-        # Many-to-Many related
-        spaces__name="KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__name_en="KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA) en",
-        spaces__name_sv="KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
-        spaces__surface_area=100,
-        spaces__max_persons=1,
-        spaces__unit=harakka,
-        resources=[],
-        purposes=[
-            jarjesta_tapahtuma_tarkoitus,
-            harrasta_yhdessa_tarkoitus,
-            liiku_ja_rentoudu_tarkoitus,
-        ],
-        equipments=[
-            istumapaikka_laite,
-            piano_laite,
-            rummut_laite,
-        ],
-        #
-        # One-to-Many related
-        pricings__begins=local_date(2025, 6, 12),
-        pricings__price_unit=PriceUnit.PER_HOUR,
-        pricings__payment_type=None,
-        pricings__is_activated_on_begins=False,
-        pricings__lowest_price=0,
-        pricings__highest_price=0,
-        pricings__tax_percentage=nolla_veroprosentti,
-        access_types__begin_date=local_date(2025, 6, 12),
-        access_types__access_type=AccessType.UNRESTRICTED,
     )
-    for weekday in Weekday:
-        ApplicationRoundTimeSlotFactory.create(
+    _kausivarausyksikko_malmi_space = Space.objects.create(
+        name="KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA) en",
+        name_sv="KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
+        surface_area=100,
+        max_persons=1,
+        unit=harakka,
+    )
+    _kausivarausyksikko_malmi.spaces.set([
+        _kausivarausyksikko_malmi_space,
+    ])
+    _kausivarausyksikko_malmi.purposes.set([
+        jarjesta_tapahtuma_tarkoitus,
+        harrasta_yhdessa_tarkoitus,
+        liiku_ja_rentoudu_tarkoitus,
+    ])
+    _kausivarausyksikko_malmi.equipments.set([
+        istumapaikka_laite,
+        piano_laite,
+        rummut_laite,
+    ])
+    _kausivarausyksikko_malmi_pricing = ReservationUnitPricing.objects.create(
+        reservation_unit=_kausivarausyksikko_malmi,
+        begins=local_date(2025, 6, 12),
+        price_unit=PriceUnit.PER_HOUR,
+        payment_type=None,
+        is_activated_on_begins=False,
+        lowest_price=0,
+        highest_price=0,
+        tax_percentage=nolla_veroprosentti,
+    )
+    _kausivarausyksikko_malmi_access_type = ReservationUnitAccessType.objects.create(
+        reservation_unit=_kausivarausyksikko_malmi,
+        begin_date=local_date(2025, 6, 12),
+        access_type=AccessType.UNRESTRICTED,
+    )
+    for weekday in Weekday:  # type: ignore[attr-defined]
+        ApplicationRoundTimeSlot.objects.create(
             reservation_unit=_kausivarausyksikko_malmi,
             weekday=weekday,
             is_closed=False,
             reservable_times=[TimeSlotDB(begin="09:00:00", end="21:00:00")],
         )
 
-    _kausivarausyksikko_keskusta = ReservationUnitFactory.create(
+    _kausivarausyksikko_keskusta = ReservationUnit.objects.create(
         #
         # IDs
         ext_uuid="99c2f30e-40ad-4aca-aa78-01ac92a0b1ff",
@@ -1228,47 +1274,53 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         payment_product=None,
         payment_merchant=None,
         payment_accounting=None,
-        #
-        # Many-to-Many related
-        spaces__name="KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__name_en="KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA) en",
-        spaces__name_sv="KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
-        spaces__surface_area=100,
-        spaces__max_persons=1,
-        spaces__unit=harakka,
-        resources=[],
-        purposes=[
-            loyda_juhlatila_tarkoitus,
-            jarjesta_tapahtuma_tarkoitus,
-            harrasta_yhdessa_tarkoitus,
-        ],
-        equipments=[
-            sohva_laite,
-            istumapaikka_laite,
-            piano_laite,
-            rummut_laite,
-        ],
-        #
-        # One-to-Many related
-        pricings__begins=local_date(2025, 6, 12),
-        pricings__price_unit=PriceUnit.PER_HOUR,
-        pricings__payment_type=None,
-        pricings__is_activated_on_begins=False,
-        pricings__lowest_price=0,
-        pricings__highest_price=0,
-        pricings__tax_percentage=nolla_veroprosentti,
-        access_types__begin_date=local_date(2025, 6, 12),
-        access_types__access_type=AccessType.UNRESTRICTED,
     )
-    for weekday in Weekday:
-        ApplicationRoundTimeSlotFactory.create(
+    _kausivarausyksikko_keskusta_space = Space.objects.create(
+        name="KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA) en",
+        name_sv="KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
+        surface_area=100,
+        max_persons=1,
+        unit=harakka,
+    )
+    _kausivarausyksikko_keskusta.spaces.set([
+        _kausivarausyksikko_keskusta_space,
+    ])
+    _kausivarausyksikko_keskusta.purposes.set([
+        loyda_juhlatila_tarkoitus,
+        jarjesta_tapahtuma_tarkoitus,
+        harrasta_yhdessa_tarkoitus,
+    ])
+    _kausivarausyksikko_keskusta.equipments.set([
+        sohva_laite,
+        istumapaikka_laite,
+        piano_laite,
+        rummut_laite,
+    ])
+    _kausivarausyksikko_keskusta_pricing = ReservationUnitPricing.objects.create(
+        reservation_unit=_kausivarausyksikko_keskusta,
+        begins=local_date(2025, 6, 12),
+        price_unit=PriceUnit.PER_HOUR,
+        payment_type=None,
+        is_activated_on_begins=False,
+        lowest_price=0,
+        highest_price=0,
+        tax_percentage=nolla_veroprosentti,
+    )
+    _kausivarausyksikko_keskusta_access_type = ReservationUnitAccessType.objects.create(
+        reservation_unit=_kausivarausyksikko_keskusta,
+        begin_date=local_date(2025, 6, 12),
+        access_type=AccessType.UNRESTRICTED,
+    )
+    for weekday in Weekday:  # type: ignore[attr-defined]
+        ApplicationRoundTimeSlot.objects.create(
             reservation_unit=_kausivarausyksikko_keskusta,
             weekday=weekday,
             is_closed=False,
             reservable_times=[TimeSlotDB(begin="09:00:00", end="21:00:00")],
         )
 
-    _kausivarausyksikko_yrjo = ReservationUnitFactory.create(
+    _kausivarausyksikko_yrjo = ReservationUnit.objects.create(
         #
         # IDs
         ext_uuid="1ba828f9-620f-4dea-ba60-c86ea5487648",
@@ -1343,82 +1395,88 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         payment_product=None,
         payment_merchant=None,
         payment_accounting=None,
-        #
-        # Many-to-Many related
-        spaces__name="KAUSIVARAUS yksikkö Yrjö (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__name_en="KAUSIVARAUS yksikkö Yrjö (AUTOMAATIOTESTI ÄLÄ POISTA) E",
-        spaces__name_sv="KAUSIVARAUS yksikkö Yrjö (AUTOMAATIOTESTI ÄLÄ POISTA) S",
-        spaces__surface_area=50,
-        spaces__max_persons=10,
-        spaces__unit=harakka,
-        resources=[],
-        purposes=[
-            harrasta_yhdessa_tarkoitus,
-            liiku_ja_rentoudu_tarkoitus,
-        ],
-        equipments=[
-            poyta_laite,
-            sohva_laite,
-            esiintymislava_laite,
-            peiliseina_laite,
-            liikuntavaline_laite,
-        ],
-        #
-        # One-to-Many related
-        pricings__begins=local_date(2024, 8, 27),
-        pricings__price_unit=PriceUnit.FIXED,
-        pricings__payment_type=PaymentType.ONLINE,
-        pricings__is_activated_on_begins=False,
-        pricings__lowest_price=Decimal("12.40"),
-        pricings__highest_price=Decimal("50.00"),
-        pricings__tax_percentage=nolla_veroprosentti,
-        access_types__begin_date=local_date(2025, 8, 1),
-        access_types__access_type=AccessType.ACCESS_CODE,
     )
-    ApplicationRoundTimeSlotFactory.create(
+    _kausivarausyksikko_yrjo_space = Space.objects.create(
+        name="KAUSIVARAUS yksikkö Yrjö (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="KAUSIVARAUS yksikkö Yrjö (AUTOMAATIOTESTI ÄLÄ POISTA) E",
+        name_sv="KAUSIVARAUS yksikkö Yrjö (AUTOMAATIOTESTI ÄLÄ POISTA) S",
+        surface_area=50,
+        max_persons=10,
+        unit=harakka,
+    )
+    _kausivarausyksikko_yrjo.spaces.set([
+        _kausivarausyksikko_yrjo_space,
+    ])
+    _kausivarausyksikko_yrjo.purposes.set([
+        harrasta_yhdessa_tarkoitus,
+        liiku_ja_rentoudu_tarkoitus,
+    ])
+    _kausivarausyksikko_yrjo.equipments.set([
+        poyta_laite,
+        sohva_laite,
+        esiintymislava_laite,
+        peiliseina_laite,
+        liikuntavaline_laite,
+    ])
+    _kausivarausyksikko_yrjo_pricing = ReservationUnitPricing.objects.create(
+        reservation_unit=_kausivarausyksikko_yrjo,
+        begins=local_date(2024, 8, 27),
+        price_unit=PriceUnit.FIXED,
+        payment_type=PaymentType.ONLINE,
+        is_activated_on_begins=False,
+        lowest_price=Decimal("12.40"),
+        highest_price=Decimal("50.00"),
+        tax_percentage=nolla_veroprosentti,
+    )
+    _kausivarausyksikko_yrjo_access_type = ReservationUnitAccessType.objects.create(
+        reservation_unit=_kausivarausyksikko_yrjo,
+        begin_date=local_date(2025, 8, 1),
+        access_type=AccessType.ACCESS_CODE,
+    )
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_yrjo,
         weekday=Weekday.MONDAY,
         is_closed=False,
         reservable_times=[TimeSlotDB(begin="10:00:00", end="19:00:00")],
     )
-    ApplicationRoundTimeSlotFactory.create(
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_yrjo,
         weekday=Weekday.TUESDAY,
         is_closed=False,
         reservable_times=[TimeSlotDB(begin="11:00:00", end="18:00:00")],
     )
-    ApplicationRoundTimeSlotFactory.create(
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_yrjo,
         weekday=Weekday.WEDNESDAY,
         is_closed=False,
         reservable_times=[TimeSlotDB(begin="09:00:00", end="21:00:00")],
     )
-    ApplicationRoundTimeSlotFactory.create(
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_yrjo,
         weekday=Weekday.THURSDAY,
         is_closed=False,
         reservable_times=[TimeSlotDB(begin="12:00:00", end="18:00:00")],
     )
-    ApplicationRoundTimeSlotFactory.create(
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_yrjo,
         weekday=Weekday.FRIDAY,
         is_closed=False,
         reservable_times=[TimeSlotDB(begin="10:00:00", end="18:00:00")],
     )
-    ApplicationRoundTimeSlotFactory.create(
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_yrjo,
         weekday=Weekday.SATURDAY,
         is_closed=False,
         reservable_times=[TimeSlotDB(begin="09:00:00", end="12:00:00"), TimeSlotDB(begin="15:00:00", end="23:00:00")],
     )
-    ApplicationRoundTimeSlotFactory.create(
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_yrjo,
         weekday=Weekday.SUNDAY,
         is_closed=False,
         reservable_times=[TimeSlotDB(begin="12:00:00", end="14:00:00")],
     )
 
-    _kausivarausyksikko_kalevi = ReservationUnitFactory.create(
+    _kausivarausyksikko_kalevi = ReservationUnit.objects.create(
         #
         # IDs
         ext_uuid="b0dc03b7-19ef-4130-b0a2-b6f5827b0eb3",
@@ -1490,84 +1548,90 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         service_specific_terms=kausi_palveluehto,
         pricing_terms=nupa_hinnoitteluehto,
         payment_terms=verkkokauppa_vain_maksuehto,
-        payment_product__id="3cc8c05f-78cc-391c-b442-4f1b251697d3",
+        payment_product=kalevi_payment_product,
         payment_merchant=None,
         payment_accounting=None,
-        #
-        # Many-to-Many related
-        spaces__name="KAUSIVARAUS yksikkö Kalevi (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__name_en="KAUSIVARAUS yksikkö Kalevi en (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__name_sv="KAUSIVARAUS yksikkö Kalevi sv (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__surface_area=60,
-        spaces__max_persons=20,
-        spaces__unit=harakka,
-        resources=[],
-        purposes=[
-            pida_kokous_tarkoitus,
-            jarjesta_tapahtuma_tarkoitus,
-            harrasta_yhdessa_tarkoitus,
-            tee_musiikkia_tarkoitus,
-            kauta_laitteita_tarkoitus,
-        ],
-        equipments=[
-            poyta_laite,
-            sohva_laite,
-            internet_laite,
-            aani_laite,
-            tietokone_laite,
-            studio_laite,
-            naytto_laite,
-        ],
-        #
-        # One-to-Many related
-        pricings__begins=local_date(2024, 8, 27),
-        pricings__price_unit=PriceUnit.PER_15_MINS,
-        pricings__payment_type=PaymentType.ONLINE,
-        pricings__is_activated_on_begins=False,
-        pricings__lowest_price=Decimal("24.80"),
-        pricings__highest_price=Decimal("60.00"),
-        pricings__tax_percentage=nolla_veroprosentti,
-        access_types__begin_date=local_date(2025, 8, 1),
-        access_types__access_type=AccessType.UNRESTRICTED,
     )
-    ApplicationRoundTimeSlotFactory.create(
+    _kausivarausyksikko_kalevi_space = Space.objects.create(
+        name="KAUSIVARAUS yksikkö Kalevi (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="KAUSIVARAUS yksikkö Kalevi en (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_sv="KAUSIVARAUS yksikkö Kalevi sv (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        surface_area=60,
+        max_persons=20,
+        unit=harakka,
+    )
+    _kausivarausyksikko_kalevi.spaces.set([
+        _kausivarausyksikko_kalevi_space,
+    ])
+    _kausivarausyksikko_kalevi.purposes.set([
+        pida_kokous_tarkoitus,
+        jarjesta_tapahtuma_tarkoitus,
+        harrasta_yhdessa_tarkoitus,
+        tee_musiikkia_tarkoitus,
+        kauta_laitteita_tarkoitus,
+    ])
+    _kausivarausyksikko_kalevi.equipments.set([
+        poyta_laite,
+        sohva_laite,
+        internet_laite,
+        aani_laite,
+        tietokone_laite,
+        studio_laite,
+        naytto_laite,
+    ])
+    _kausivarausyksikko_kalevi_pricing = ReservationUnitPricing.objects.create(
+        reservation_unit=_kausivarausyksikko_kalevi,
+        begins=local_date(2024, 8, 27),
+        price_unit=PriceUnit.PER_15_MINS,
+        payment_type=PaymentType.ONLINE,
+        is_activated_on_begins=False,
+        lowest_price=Decimal("24.80"),
+        highest_price=Decimal("60.00"),
+        tax_percentage=nolla_veroprosentti,
+    )
+    _kausivarausyksikko_kalevi_access_type = ReservationUnitAccessType.objects.create(
+        reservation_unit=_kausivarausyksikko_kalevi,
+        begin_date=local_date(2025, 8, 1),
+        access_type=AccessType.UNRESTRICTED,
+    )
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_kalevi,
         weekday=Weekday.MONDAY,
         is_closed=False,
         reservable_times=[TimeSlotDB(begin="14:00:00", end="18:00:00")],
     )
-    ApplicationRoundTimeSlotFactory.create(
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_kalevi,
         weekday=Weekday.TUESDAY,
         is_closed=False,
         reservable_times=[TimeSlotDB(begin="10:00:00", end="22:00:00")],
     )
-    ApplicationRoundTimeSlotFactory.create(
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_kalevi,
         weekday=Weekday.WEDNESDAY,
         is_closed=True,
         reservable_times=[],
     )
-    ApplicationRoundTimeSlotFactory.create(
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_kalevi,
         weekday=Weekday.THURSDAY,
         is_closed=False,
         reservable_times=[TimeSlotDB(begin="07:00:00", end="23:00:00")],
     )
-    ApplicationRoundTimeSlotFactory.create(
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_kalevi,
         weekday=Weekday.FRIDAY,
         is_closed=False,
         reservable_times=[TimeSlotDB(begin="03:00:00", end="20:00:00")],
     )
-    ApplicationRoundTimeSlotFactory.create(
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_kalevi,
         weekday=Weekday.SUNDAY,
         is_closed=False,
         reservable_times=[TimeSlotDB(begin="12:00:00", end="23:00:00")],
     )
 
-    _kausivarausyksikko_piitu = ReservationUnitFactory.create(
+    _kausivarausyksikko_piitu = ReservationUnit.objects.create(
         #
         # IDs
         ext_uuid="d9085bea-4998-4b9b-a8b1-72c8069c6f63",
@@ -1639,79 +1703,85 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         service_specific_terms=kausi_palveluehto,
         pricing_terms=nupa_hinnoitteluehto,
         payment_terms=verkkokauppa_vain_maksuehto,
-        payment_product__id="db9cb2d4-0a72-3e5e-a5b6-9479ef59e256",
+        payment_product=piitu_payment_product,
         payment_merchant=None,
         payment_accounting=None,
-        #
-        # Many-to-Many related
-        spaces__name="KAUSIVARAUS yksikkö Piitu (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__name_en="KAUSIVARAUS yksikkö Piitu en (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__name_sv="KAUSIVARAUS yksikkö Piitu sv (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        spaces__surface_area=60,
-        spaces__max_persons=20,
-        spaces__unit=harakka,
-        resources=[],
-        purposes=[
-            pida_kokous_tarkoitus,
-            yksin_tai_ryhma_tarkoitus,
-        ],
-        equipments=[
-            poyta_laite,
-            valkotaulu_laite,
-            vesipiste_laite,
-            astiasto_laite,
-            liesi_laite,
-            uuni_laite,
-            jaakaappi_laite,
-            pakastin_laite,
-            mikro_laite,
-            kahvinkeitin_laite,
-            vedenkeitin_laite,
-            astianpesukone_laite,
-        ],
-        #
-        # One-to-Many related
-        pricings__begins=local_date(2024, 2, 23),
-        pricings__price_unit=PriceUnit.PER_HOUR,
-        pricings__payment_type=PaymentType.ONLINE,
-        pricings__is_activated_on_begins=False,
-        pricings__lowest_price=Decimal("30.00"),
-        pricings__highest_price=Decimal("80.00"),
-        pricings__tax_percentage=nolla_veroprosentti,
-        access_types__begin_date=local_date(2025, 8, 1),
-        access_types__access_type=AccessType.UNRESTRICTED,
     )
-    ApplicationRoundTimeSlotFactory.create(
+    _kausivarausyksikko_piitu_space = Space.objects.create(
+        name="KAUSIVARAUS yksikkö Piitu (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="KAUSIVARAUS yksikkö Piitu en (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_sv="KAUSIVARAUS yksikkö Piitu sv (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        surface_area=60,
+        max_persons=20,
+        unit=harakka,
+    )
+    _kausivarausyksikko_piitu.spaces.set([
+        _kausivarausyksikko_piitu_space,
+    ])
+    _kausivarausyksikko_piitu.purposes.set([
+        pida_kokous_tarkoitus,
+        yksin_tai_ryhma_tarkoitus,
+    ])
+    _kausivarausyksikko_piitu.equipments.set([
+        poyta_laite,
+        valkotaulu_laite,
+        vesipiste_laite,
+        astiasto_laite,
+        liesi_laite,
+        uuni_laite,
+        jaakaappi_laite,
+        pakastin_laite,
+        mikro_laite,
+        kahvinkeitin_laite,
+        vedenkeitin_laite,
+        astianpesukone_laite,
+    ])
+    _kausivarausyksikko_piitu_pricing = ReservationUnitPricing.objects.create(
+        reservation_unit=_kausivarausyksikko_piitu,
+        begins=local_date(2024, 2, 23),
+        price_unit=PriceUnit.PER_HOUR,
+        payment_type=PaymentType.ONLINE,
+        is_activated_on_begins=False,
+        lowest_price=Decimal("30.00"),
+        highest_price=Decimal("80.00"),
+        tax_percentage=nolla_veroprosentti,
+    )
+    _kausivarausyksikko_piitu_access_type = ReservationUnitAccessType.objects.create(
+        reservation_unit=_kausivarausyksikko_piitu,
+        begin_date=local_date(2025, 8, 1),
+        access_type=AccessType.UNRESTRICTED,
+    )
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_piitu,
         weekday=Weekday.MONDAY,
         is_closed=False,
         reservable_times=[TimeSlotDB(begin="12:00:00", end="18:00:00")],
     )
-    ApplicationRoundTimeSlotFactory.create(
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_piitu,
         weekday=Weekday.TUESDAY,
         is_closed=False,
         reservable_times=[TimeSlotDB(begin="10:00:00", end="20:00:00")],
     )
-    ApplicationRoundTimeSlotFactory.create(
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_piitu,
         weekday=Weekday.WEDNESDAY,
         is_closed=False,
         reservable_times=[TimeSlotDB(begin="11:00:00", end="22:00:00")],
     )
-    ApplicationRoundTimeSlotFactory.create(
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_piitu,
         weekday=Weekday.THURSDAY,
         is_closed=False,
         reservable_times=[TimeSlotDB(begin="15:00:00", end="19:00:00")],
     )
-    ApplicationRoundTimeSlotFactory.create(
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_piitu,
         weekday=Weekday.FRIDAY,
         is_closed=False,
         reservable_times=[TimeSlotDB(begin="07:00:00", end="23:00:00")],
     )
-    ApplicationRoundTimeSlotFactory.create(
+    ApplicationRoundTimeSlot.objects.create(
         reservation_unit=_kausivarausyksikko_piitu,
         weekday=Weekday.SATURDAY,
         is_closed=False,
@@ -2409,7 +2479,7 @@ def create_application_rounds() -> None:
     kausivarausyksikko_malmi = ReservationUnit.objects.get(ext_uuid="52f16e97-4986-4c4e-8fc5-8fab4ab66933")
     kausivarausyksikko_keskusta = ReservationUnit.objects.get(ext_uuid="99c2f30e-40ad-4aca-aa78-01ac92a0b1ff")
 
-    ApplicationRoundFactory.create(
+    _kausivaraus_round = ApplicationRound.objects.create(
         name="Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA)",
         name_en="Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA) eng",
         name_sv="Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA) sv",
@@ -2427,10 +2497,15 @@ def create_application_rounds() -> None:
         public_display_ends_at=local_datetime(2029, 6, 11),
         handled_at=None,
         sent_at=None,
-        reservation_units=[kausivarausyksikko_malmi, kausivarausyksikko_keskusta],
-        purposes=[harrastustoiminta],
         terms_of_use=nupa_kausivarausehto,
     )
+    _kausivaraus_round.purposes.set([
+        harrastustoiminta,
+    ])
+    _kausivaraus_round.reservation_units.set([
+        kausivarausyksikko_malmi,
+        kausivarausyksikko_keskusta,
+    ])
 
 
 def create_past_reservations() -> None:
@@ -2438,7 +2513,7 @@ def create_past_reservations() -> None:
 
     maksuton_mankeli = ReservationUnit.objects.get(ext_uuid="7bbd9b47-ad06-495a-a530-b094574208d6")
 
-    ReservationFactory.create(
+    Reservation.objects.create(
         user=user,
         reservation_unit=maksuton_mankeli,
         begins_at=local_datetime(2025, 6, 12, 10),

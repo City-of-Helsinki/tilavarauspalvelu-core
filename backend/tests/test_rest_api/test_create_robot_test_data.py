@@ -16,7 +16,6 @@ from tilavarauspalvelu.management.commands.create_robot_test_data import create_
 from tilavarauspalvelu.models import (
     Application,
     ApplicationRound,
-    OriginHaukiResource,
     Reservation,
     ReservationSeries,
     ReservationUnit,
@@ -32,7 +31,10 @@ from tests.factories import (
     ApplicationFactory,
     ApplicationRoundFactory,
     EquipmentFactory,
+    OriginHaukiResourceFactory,
     PaymentAccountingFactory,
+    PaymentMerchantFactory,
+    PaymentProductFactory,
     PurposeFactory,
     ReservationFactory,
     ReservationMetadataSetFactory,
@@ -355,15 +357,25 @@ def _create_required_data():
     TaxPercentageFactory.create(value=Decimal("0.0"))
     TaxPercentageFactory.create(value=Decimal("25.5"))
 
-    OriginHaukiResource.objects.create(id="2956668")
-    OriginHaukiResource.objects.create(id="2958620")
-    OriginHaukiResource.objects.create(id="2956344")
-    OriginHaukiResource.objects.create(id="2959295")
-    OriginHaukiResource.objects.create(id="2959623")
-    OriginHaukiResource.objects.create(id="2964786")
-    OriginHaukiResource.objects.create(id="2964787")
-    OriginHaukiResource.objects.create(id="2959579")
-    OriginHaukiResource.objects.create(id="2959580")
-    OriginHaukiResource.objects.create(id="2959581")
+    OriginHaukiResourceFactory.create(id="2952865")
+    OriginHaukiResourceFactory.create(id="2956668")
+    OriginHaukiResourceFactory.create(id="2958620")
+    OriginHaukiResourceFactory.create(id="2956344")
+    OriginHaukiResourceFactory.create(id="2959295")
+    OriginHaukiResourceFactory.create(id="2959623")
+    OriginHaukiResourceFactory.create(id="2964786")
+    OriginHaukiResourceFactory.create(id="2964787")
+    OriginHaukiResourceFactory.create(id="2959579")
+    OriginHaukiResourceFactory.create(id="2959580")
+    OriginHaukiResourceFactory.create(id="2959581")
+
+    PaymentMerchantFactory.create(id="c9acaa73-b582-471c-b002-b038a8c00fb1")
+    PaymentMerchantFactory.create(id="9be158db-8e3a-4560-8e68-f3214b207d6c")
+
+    PaymentProductFactory.create(id="630dcc27-1ff1-3e12-b1ea-9df2571a36bc")
+    PaymentProductFactory.create(id="eee7a1a4-b309-3919-aa7b-6d7eb675f9f4")
+    PaymentProductFactory.create(id="19161df6-9f1c-3a0f-a953-d013ca2e3c0c")
+    PaymentProductFactory.create(id="3cc8c05f-78cc-391c-b442-4f1b251697d3")
+    PaymentProductFactory.create(id="db9cb2d4-0a72-3e5e-a5b6-9479ef59e256")
 
     PaymentAccountingFactory.create(name="Pihlajasaarten testikirjasto")
