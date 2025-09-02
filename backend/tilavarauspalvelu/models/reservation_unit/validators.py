@@ -68,7 +68,7 @@ class ReservationUnitValidator:
 
         if self.reservation_unit.max_reservation_duration and duration > self.reservation_unit.max_reservation_duration:
             msg = "Reservation duration exceeds reservation unit's maximum allowed duration."
-            raise ValidationError(msg, code=error_codes.RESERVATION_UNITS_MAX_DURATION_EXCEEDED)
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MAX_DURATION_EXCEEDED)
 
         if self.reservation_unit.min_reservation_duration and duration < self.reservation_unit.min_reservation_duration:
             msg = "Reservation duration is less than the reservation unit's minimum allowed duration."
