@@ -94,7 +94,8 @@ updates:
           - "hds-*"
       linter:
         patterns:
-          - "*eslint*"
+          - "oxlint"
+          - "husky"
           - "prettier*"
           - "stylelint*"
           - "globals"
