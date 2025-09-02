@@ -142,4 +142,19 @@ class Migration(migrations.Migration):
                 blank=True, null=True, upload_to="reservation_unit_images"
             ),
         ),
+        migrations.AlterField(
+            model_name="reservationunit",
+            name="search_vector_en",
+            field=django.contrib.postgres.search.SearchVectorField(blank=True, default=""),
+        ),
+        migrations.AlterField(
+            model_name="reservationunit",
+            name="search_vector_fi",
+            field=django.contrib.postgres.search.SearchVectorField(blank=True, default=""),
+        ),
+        migrations.AlterField(
+            model_name="reservationunit",
+            name="search_vector_sv",
+            field=django.contrib.postgres.search.SearchVectorField(blank=True, default=""),
+        ),
     ]
