@@ -9,7 +9,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("tilavarauspalvelu", "0148_alter_allocatedtimeslot_day_of_the_week_and_more"),
+        ("tilavarauspalvelu", "0151_alter_allocatedtimeslot_day_of_the_week_and_more"),
     ]
 
     operations = [

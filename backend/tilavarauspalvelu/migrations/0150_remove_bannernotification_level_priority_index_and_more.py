@@ -6,7 +6,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("tilavarauspalvelu", "0146_migrate_metadata_fields"),
+        ("tilavarauspalvelu", "0149_alter_reservationunit_reservation_form"),
     ]
 
     operations = [
