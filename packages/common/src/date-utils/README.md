@@ -37,13 +37,13 @@ import {
   // Basic conversions
   toApiDate, fromApiDate,
   toUIDate, fromUIDate,
-  
+
   // Input helpers
   dateForInput, timeForInput,
-  
+
   // DateTime construction
   fromUIDateTime, fromApiDateTime,
-  
+
   // Display formatting
   formatDateTime, formatDateTimeRange, formatDateRange
 } from "common/src/date-utils";
