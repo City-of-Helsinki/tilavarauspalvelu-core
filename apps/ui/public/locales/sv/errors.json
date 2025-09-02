@@ -30,8 +30,7 @@
     "heading": "Ditt användar-ID är inte giltigt.",
     "subHeadingA": "Var god och kontakta vår kundtjänst via email på",
     "subHeadingB": "eller via Ta kontakt-formuläret.",
-    "email": "varaamo@hel.fi",
-    "button": "Ta kontakt"
+    "email": "varaamo@hel.fi"
   },
   "applicationMutation": {
     "Validation error": "Ett fel uppstod i API-anropet",
@@ -66,6 +65,9 @@
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_MISSING": "Passande tider saknas.",
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_TOO_SHORT": "Önskad tid är för kort.",
       "APPLICATION_STATUS_CANNOT_SEND": "Ansökan kan inte skickas.",
+      "CANCELLATION_NOT_ALLOWED": "Avbokning är inte tillåten.",
+      "CANCELLATION_TIME_PAST": "Avbokningstiden är passerad.",
+      "CANCEL_REASON_DOES_NOT_EXIST": "Avbokningsorsak finns inte.",
       "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
       "RESERVATION_CANCELLATION_NOT_ALLOWED": "Avbokning är inte tillåten.",
       "RESERVATION_UNIT_MAX_DURATION_EXCEEDED": "För lång bokningstid.",
