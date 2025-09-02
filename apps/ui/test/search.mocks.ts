@@ -8,12 +8,12 @@ import {
 } from "@/gql/gql-types";
 import { CreateGraphQLMocksReturn, ICreateGraphQLMock } from "./test.gql.utils";
 import { createMockReservationUnit } from "./reservation-unit.mocks";
-import { endOfYear, startOfDay } from "date-fns";
+import { addMonths, endOfYear, startOfDay } from "date-fns";
 import { SEARCH_PAGING_LIMIT } from "@/modules/const";
 
 interface SearchQueryProps extends ICreateGraphQLMock {
   isSearchError: boolean;
-  reservationKind?: ReservationKind;
+  reservationKind: ReservationKind;
 }
 export function createSearchQueryMocks({ isSearchError, reservationKind }: SearchQueryProps): CreateGraphQLMocksReturn {
   // TODO this should enforce non nullable for the query
@@ -216,8 +216,8 @@ export function createSearchQueryMocks({ isSearchError, reservationKind }: Searc
 
 function createSearchVariablesMock({
   textSearch = undefined,
-  date = new Date(2024, 1, 1),
-  reservationKind = ReservationKind.Season,
+  date = new Date(2024, 0, 1),
+  reservationKind,
   personsAllowed,
   reservableTimeEnd,
   reservableTimeStart,
@@ -230,7 +230,7 @@ function createSearchVariablesMock({
 }: {
   textSearch?: string | null;
   date?: Date | null;
-  reservationKind?: ReservationKind;
+  reservationKind: ReservationKind;
   personsAllowed?: number;
   reservableTimeEnd?: string;
   reservableTimeStart?: string;
@@ -245,7 +245,7 @@ function createSearchVariablesMock({
   // so what happens:
   // a new query param is added but that is not reflected in the mock
   // -> this is not a lint / type error but a runtime error in the tests
-} = {}): Readonly<SearchReservationUnitsQueryVariables> {
+}): Readonly<SearchReservationUnitsQueryVariables> {
   return {
     textSearch,
     ...(accessTypes.length > 0 ? { accessTypes } : {}),
@@ -253,7 +253,12 @@ function createSearchVariablesMock({
     ...(equipments?.length > 0 ? { equipments } : {}),
     ...(unit.length > 0 ? { unit } : {}),
     ...(purposes.length > 0 ? { purposes } : {}),
-    reservableDateStart: date ? date.toISOString() : undefined,
+    // hacky, but Seasonal query uses (Feb - Dec) while single uses (Jan - Dec)
+    reservableDateStart: date
+      ? reservationKind === ReservationKind.Season
+        ? addMonths(date, 1).toISOString()
+        : date.toISOString()
+      : undefined,
     reservableDateEnd: date ? startOfDay(endOfYear(date)).toISOString() : undefined,
     first: SEARCH_PAGING_LIMIT,
     orderBy: [ReservationUnitOrderSet.NameFiAsc, ReservationUnitOrderSet.PkAsc],

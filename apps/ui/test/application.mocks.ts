@@ -21,7 +21,7 @@ import {
   Weekday,
 } from "@/gql/gql-types";
 import { createNodeId } from "common/src/helpers";
-import { addDays, addMonths, addYears } from "date-fns";
+import { addDays, addMonths, addYears, endOfYear, startOfDay } from "date-fns";
 import { type CreateGraphQLMocksReturn, generateNameFragment, generateTextFragment } from "./test.gql.utils";
 import { createMockReservationUnit } from "./reservation-unit.mocks";
 
@@ -279,25 +279,25 @@ export function createMockApplicationRound({
     notesWhenApplyingEn: notesWhenApplying ? `${notesWhenApplying} EN` : null,
     notesWhenApplyingSv: notesWhenApplying ? `${notesWhenApplying} SV` : null,
     reservationPeriodBeginDate: reservationPeriodBeginDate.toISOString(),
-    reservationPeriodEndDate: addYears(reservationPeriodBeginDate, 1).toISOString(),
+    reservationPeriodEndDate: startOfDay(endOfYear(reservationPeriodBeginDate)).toISOString(),
     publicDisplayBeginsAt: applicationPeriodBeginsAt.toISOString(),
     publicDisplayEndsAt: applicationPeriodEndsAt.toISOString(),
     applicationPeriodBeginsAt: applicationPeriodBeginsAt.toISOString(),
     applicationPeriodEndsAt: applicationPeriodEndsAt.toISOString(),
     status,
     reservationUnits,
-    applicationsCount: 0, // Scalars["Int"]["output"];
-    criteriaEn: null, // Maybe<Scalars["String"]["output"]>;
-    criteriaFi: null, // Maybe<Scalars["String"]["output"]>;
-    criteriaSv: null, // Maybe<Scalars["String"]["output"]>;
-    handledAt: null, // Maybe<Scalars["DateTime"]["output"]>;
-    isSettingHandledAllowed: false, // Scalars["Boolean"]["output"];
-    purposes: [] as const, // ReadonlyArray<ReservationPurposeNode>;
+    applicationsCount: 0,
+    criteriaEn: null,
+    criteriaFi: null,
+    criteriaSv: null,
+    handledAt: null,
+    isSettingHandledAllowed: false,
+    purposes: [] as const,
     reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice.NotCompleted,
-    reservationUnitCount: 10, // Scalars["Int"]["output"];
-    sentAt: null, // Maybe<Scalars["DateTime"]["output"]>;
-    statusTimestamp: null, // Maybe<Scalars["DateTime"]["output"]>;
-    termsOfUse: null, // Maybe<TermsOfUseNode>;
+    reservationUnitCount: 10,
+    sentAt: null,
+    statusTimestamp: null,
+    termsOfUse: null,
   };
 }
 
