@@ -113,9 +113,7 @@ const BannerNotificationsList = ({ target, displayAmount = 2 }: BannerNotificati
     variables: {
       target,
     },
-    // cache is broken for some reason on admin ui
-    fetchPolicy: "no-cache",
-    // fetchPolicy: "cache-first",
+    fetchPolicy: "cache-first",
   });
   const notificationsTarget = data?.bannerNotifications;
   const notificationsAll = data?.bannerNotificationsAll;
