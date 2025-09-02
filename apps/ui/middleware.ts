@@ -162,7 +162,7 @@ ${applicationId ? "$applicationId: ID!" : ""}
   if (!res.ok) {
     const text = await res.text();
     // eslint-disable-next-line no-console
-    console.warn(`Middleware request failed: ${res.status} with message: ${text}`);
+    console.warn(`Middleware: request failed: ${res.status} with message: ${text}`);
     // prefer throw here because we want all query failures -> end in same fail state
     throw new Error(res.statusText);
   }
@@ -170,7 +170,7 @@ ${applicationId ? "$applicationId: ID!" : ""}
   const data: unknown = await res.json();
   if (typeof data !== "object" || data == null || !("data" in data)) {
     // eslint-disable-next-line no-console
-    console.warn("no data in response");
+    console.warn("Middleware: no data in response");
     return null;
   }
 
@@ -451,7 +451,7 @@ export async function middleware(req: NextRequest) {
     // block infinite redirect loop (there is no graceful way to handle this)
     if (req.url.includes("redirect_to")) {
       // eslint-disable-next-line no-console
-      console.error("Infinite redirect loop detected");
+      console.error("Middleware: Infinite redirect loop detected");
       return NextResponse.next();
     }
     return NextResponse.redirect(csrfRedirectUrl);
@@ -469,25 +469,25 @@ export async function middleware(req: NextRequest) {
   if (RESERVATION_ROUTES.some((route) => doesUrlMatch(req.url, route))) {
     const id = url.pathname.match(/\/reservations?\/(\d+)/)?.[1];
     const pk = Number(id);
-    // can be either an url issues (user error) or a bug in our matcher
     if (pk > 0) {
       reservationPk = pk;
-    } else if (id !== "") {
+    } else if (id != null && id !== "") {
+      // can be either an url issues (user error) or a bug in our matcher
       // fall through empty for listing page
       // eslint-disable-next-line no-console
-      console.error("Invalid reservation id");
+      console.error("Middleware: Invalid reservation id");
     }
   }
   if (APPLICATION_ROUTES.some((route) => doesUrlMatch(req.url, route))) {
     const id = url.pathname.match(/\/applications?\/(\d+)/)?.[1];
     const pk = Number(id);
-    // can be either an url issues (user error) or a bug in our matcher
     if (pk > 0) {
       applicationPk = pk;
-    } else if (id !== "") {
+    } else if (id == null && id !== "") {
+      // can be either an url issues (user error) or a bug in our matcher
       // fall through empty for listing page
       // eslint-disable-next-line no-console
-      console.error("Invalid application id");
+      console.error("Middleware: Invalid application id");
     }
   }
 
