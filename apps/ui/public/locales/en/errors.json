@@ -30,8 +30,7 @@
     "heading": "Your User ID is not valid.",
     "subHeadingA": "Please contact support via email at",
     "subHeadingB": "or via the Contact us form.",
-    "email": "varaamo@hel.fi",
-    "button": "Contact us"
+    "email": "varaamo@hel.fi"
   },
   "applicationMutation": {
     "Validation error": "Error in the API call",
@@ -66,6 +65,9 @@
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_MISSING": "Suitable times are missing.",
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_TOO_SHORT": "The desired time is too short.",
       "APPLICATION_STATUS_CANNOT_SEND": "Application cannot be sent.",
+      "CANCELLATION_NOT_ALLOWED": "Cancellation is not allowed",
+      "CANCELLATION_TIME_PAST": "Cancellation time is in the past",
+      "CANCEL_REASON_DOES_NOT_EXIST": "Cancel reason does not exist",
       "OVERLAPPING_RESERVATIONS": "There are duplicate bookings.",
       "RESERVATION_CANCELLATION_NOT_ALLOWED": "Cancellation is not allowed.",
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "The person making the reservation must be 18 years old",
