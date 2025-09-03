@@ -34,8 +34,9 @@ export function PaymentNotification({ reservation, apiBaseUrl }: PaymentNotifica
   const formatters = useMemo(() => getFormatters(i18n.language), [i18n.language]);
   const formatter = formatters["currencyWithDecimals"];
   const { appliedPricing, paymentOrder } = reservation;
-  const price = formatter?.format(parseFloat(appliedPricing?.highestPrice ?? "") ?? 0);
-  const taxPercentage = formatters.strippedDecimal?.format(parseFloat(appliedPricing?.taxPercentage ?? "")) ?? "0";
+  const price = formatter?.format(Number.parseFloat(appliedPricing?.highestPrice ?? "") ?? 0);
+  const taxPercentage =
+    formatters.strippedDecimal?.format(Number.parseFloat(appliedPricing?.taxPercentage ?? "")) ?? "0";
 
   const deadline =
     paymentOrder?.handledPaymentDueBy != null

@@ -279,8 +279,8 @@ export function getPriceString(props: GetPriceType): string {
   }
 
   const volume = getReservationVolume(minutes, pricing.priceUnit);
-  const highestPrice = parseFloat(pricing.highestPrice) * volume;
-  const lowestPrice = parseFloat(pricing.lowestPrice) * volume;
+  const highestPrice = Number.parseFloat(pricing.highestPrice) * volume;
+  const lowestPrice = Number.parseFloat(pricing.lowestPrice) * volume;
   const priceString =
     lowestPrice === highestPrice
       ? formatPrice(lowestPrice, true)
