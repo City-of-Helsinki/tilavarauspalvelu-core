@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { errorToast } from "common/src/components/toast";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { isApplicationRoundInProgress } from "@/helpers";
 import { Flex, H1, NoWrap, TabWrapper, TitleSection } from "common/styled";
 import { Button, Tabs } from "hds-react";
@@ -82,7 +82,7 @@ export default function ApplicationRound({
   // NOTE: useEffect works, onCompleted does not work with refetch
   useEffect(() => {
     if (data) {
-      const node = data?.node != null && "pk" in data.node ? data.node : null;
+      const node = getNode(data);
       setIsInProgress(isApplicationRoundInProgress(node));
     }
   }, [data]);
@@ -103,8 +103,8 @@ export default function ApplicationRound({
     }
   }, [unitOptions, searchParams, setParams]);
 
-  const previousNode = previousData?.node != null && "pk" in previousData.node ? previousData.node : null;
-  const node = data?.node != null && "pk" in data.node ? data.node : null;
+  const previousNode = getNode(previousData);
+  const node = getNode(data);
   const applicationRound = node ?? previousNode ?? applicationRoundOriginal;
 
   const originalOptions = getFilterOptions(t, optionsData);
@@ -229,7 +229,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
     query: ApplicationRoundDocument,
     variables: { id: createNodeId("ApplicationRoundNode", pk) },
   });
-  const applicationRound = data?.node != null && "pk" in data.node ? data.node : null;
+  const applicationRound = getNode(data);
   const units = filterNonNullable(applicationRound?.reservationUnits.map((x) => x.unit?.pk));
 
   if (!applicationRound) {

@@ -37,7 +37,7 @@ import {
   checkLengthWithoutHtml,
 } from "common/src/schemas/schemaCommon";
 import { valueForDateInput, valueForTimeInput, dateTime, constructDateTimeSafe } from "@/helpers";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { ControlledDateInput } from "common/src/components/form";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { successToast } from "common/src/components/toast";
@@ -580,7 +580,7 @@ function PageWrapped({ pk }: { pk?: number }): JSX.Element {
     variables: { id: createNodeId("BannerNotificationNode", pk ?? 0) },
   });
 
-  const notification = data?.node != null && "id" in data.node ? data.node : null;
+  const notification = getNode(data);
 
   if (isLoading && !isNew) {
     return <CenterSpinner />;

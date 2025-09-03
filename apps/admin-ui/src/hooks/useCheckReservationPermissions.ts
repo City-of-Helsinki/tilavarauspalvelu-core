@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useCheckPermission } from "./useCheckPermission";
-import { createNodeId, filterNonNullable } from "common/src/helpers";
+import { createNodeId, filterNonNullable, getNode } from "common/src/helpers";
 import { useReservationPermissionsQuery, UserPermissionChoice } from "@gql/gql-types";
 
 /// @param pk - Primary key of the reservation
@@ -9,7 +9,7 @@ export function useCheckReservationPermissions(pk: number) {
     variables: { id: createNodeId("ReservationNode", pk) },
     skip: !pk,
   });
-  const node = data?.node != null && "reservationUnit" in data.node ? data.node : null;
+  const node = getNode(data);
   const units = filterNonNullable([node?.reservationUnit?.unit?.pk]);
   const { hasPermission, isLoading } = useCheckPermission({
     units,

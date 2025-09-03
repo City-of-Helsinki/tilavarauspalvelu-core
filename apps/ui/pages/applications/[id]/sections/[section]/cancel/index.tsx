@@ -12,7 +12,14 @@ import { type CancelFormValues, CancellationForm } from "@/components/Cancellati
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import { createNodeId, filterNonNullable, formatApiTimeInterval, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import {
+  createNodeId,
+  filterNonNullable,
+  formatApiTimeInterval,
+  getNode,
+  ignoreMaybeArray,
+  toNumber,
+} from "common/src/helpers";
 import { getApplicationPath } from "@/modules/urls";
 import { useTranslation } from "next-i18next";
 import { ApolloError, gql } from "@apollo/client";
@@ -219,14 +226,13 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
 
   const pk = toNumber(ignoreMaybeArray(params?.section));
-  if (Number.isFinite(Number(pk))) {
+  if (pk != null && Number.isFinite(Number(pk))) {
     const { data } = await client.query<ApplicationSectionCancelQuery, ApplicationSectionCancelQueryVariables>({
       query: ApplicationSectionCancelDocument,
       fetchPolicy: "no-cache",
-      variables: { id: createNodeId("ApplicationSectionNode", pk ?? 0) },
+      variables: { id: createNodeId("ApplicationSectionNode", pk) },
     });
-    const applicationSection = data.node != null && "id" in data.node ? data.node : null;
-    const section = applicationSection;
+    const applicationSection = getNode(data);
 
     // TODO do we need a check for all sections? so do we have to query their reservations also?
     // or is it just reservationUnit since the cancel reason is tied to the unit not the reservation
@@ -235,13 +241,13 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     // but that requires we query the CancelFields for the reservations
     // - should we disable the cancel button? probably
     // - should we redirect here or show an error if the section can't be cancelled? (assuming url access)
-    const canCancel = section != null; // && isReservationCancellable(reservation);
+    const canCancel = applicationSection != null; // && isReservationCancellable(reservation);
     if (canCancel) {
       return {
         props: {
           ...commonProps,
           ...(await serverSideTranslations(locale ?? "fi")),
-          applicationSection: section,
+          applicationSection,
         },
       };
     } /* TODO redirect if the applicationSection is already cancelled?

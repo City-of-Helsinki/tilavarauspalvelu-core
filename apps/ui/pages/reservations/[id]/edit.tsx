@@ -11,7 +11,7 @@ import {
   ReservationEditPageDocument,
   MunicipalityChoice,
 } from "@gql/gql-types";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
 import { addYears } from "date-fns";
 import { breakpoints } from "common/src/const";
@@ -157,7 +157,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         endDate: toApiDate(addYears(new Date(), 2)) ?? "",
       },
     });
-    const reservation = data.node != null && "id" in data.node ? data.node : null;
+    const reservation = getNode(data);
 
     if (reservation == null) {
       return notFound;
