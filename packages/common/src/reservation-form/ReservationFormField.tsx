@@ -216,6 +216,7 @@ export function ReservationFormField({
   if (isNumField) {
     return (
       <NumberInput
+        key={field}
         label={label}
         id={id}
         {...register(field, {
@@ -224,7 +225,6 @@ export function ReservationFormField({
           min: minValue,
           max: maxValue,
         })}
-        key={field}
         errorText={errorText}
         invalid={!!error}
         required={required}
@@ -243,6 +243,7 @@ export function ReservationFormField({
   if (isTextArea) {
     return (
       <StyledTextArea
+        key={field}
         label={label}
         id={id}
         {...register(field, {
@@ -251,7 +252,6 @@ export function ReservationFormField({
             pattern: emailPattern,
           }),
         })}
-        key={field}
         defaultValue={defaultValue?.toString() ?? ""}
         errorText={errorText}
         invalid={!!error}
@@ -308,13 +308,13 @@ export function ReservationFormField({
     case "reserveeIdentifier":
       return (
         <StyledTextInput
+          key={field}
           label={label}
           id={id}
           {...register(field, {
             required: isReserveeIdRequired,
             minLength: 3,
           })}
-          key={field}
           type="text"
           defaultValue={typeof defaultValue === "string" ? defaultValue : ""}
           errorText={errorText}
@@ -332,6 +332,7 @@ export function ReservationFormField({
     default:
       return (
         <StyledTextInput
+          key={field}
           label={label}
           id={id}
           {...register(field, {
@@ -340,7 +341,6 @@ export function ReservationFormField({
               pattern: emailPattern,
             }),
           })}
-          key={field}
           type="text"
           errorText={errorText}
           defaultValue={defaultValue ? String(defaultValue) : undefined}

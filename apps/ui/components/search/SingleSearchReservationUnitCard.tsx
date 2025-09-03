@@ -86,7 +86,7 @@ export function SingleSearchCard({ reservationUnit }: PropsT): JSX.Element {
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "small");
 
-  const tags = [<StatusTag {...reservationUnit} key={`status-tag-${reservationUnit.pk}`} />];
+  const tags = [<StatusTag key={`status-tag-${reservationUnit.pk}`} {...reservationUnit} />];
 
   const infos = [];
   if (reservationUnitTypeName) {
