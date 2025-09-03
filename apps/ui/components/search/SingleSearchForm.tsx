@@ -250,7 +250,7 @@ export function SingleSearchForm({
           name="units"
           label={t("searchForm:labels.units")}
           control={control}
-          options={units}
+          options={units.toSorted((a, b) => (a.label > b.label ? 1 : -1))}
           multiselect
           clearable
           enableSearch
