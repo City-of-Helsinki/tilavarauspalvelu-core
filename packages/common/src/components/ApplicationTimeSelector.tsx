@@ -172,7 +172,7 @@ export function ApplicationTimeSelector({
 }: Readonly<ApplicationTimeSelectorProps>): JSX.Element {
   return (
     <>
-      <CalendarContainer {...rest} aria-multiselectable role="table">
+      <CalendarContainer {...rest} role="table">
         {WEEKDAYS_SORTED.map((day) => (
           <DayColumn
             key={`day-${day}`}
