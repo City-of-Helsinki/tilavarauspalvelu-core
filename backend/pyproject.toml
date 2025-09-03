@@ -19,7 +19,7 @@ django-auditlog = "3.2.1"
 django-cors-headers = "4.8.0"
 django-environment-config = { version = "0.2.3", extras = ["db"] }
 django-health-check = "3.20.0"
-django-helusers = "0.13.3"
+django-helusers = "0.14.0"
 django-jinja = "2.11.0"
 django-lazy-managers = "0.0.1"
 django-lookup-property = "0.2.0"
