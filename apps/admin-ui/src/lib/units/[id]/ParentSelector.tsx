@@ -124,7 +124,9 @@ export const UNIT_SPACES_HIERARCHY_FRAGMENT = gql`
 export const SPACE_HIERARCHY_QUERY = gql`
   query UnitSpacesHierarchy($id: ID!) {
     node(id: $id) {
-      ...UnitSpacesHierarchyFields
+      ... on UnitNode {
+        ...UnitSpacesHierarchyFields
+      }
     }
   }
 `;
