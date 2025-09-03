@@ -47,6 +47,7 @@ export function useToastIfQueryParam({
 
     const titleText = title ? (typeof title === "string" ? title : title()) : undefined;
     const text = typeof message === "string" ? message : message();
+
     const handle = () => {
       toast({
         text,
@@ -55,6 +56,7 @@ export function useToastIfQueryParam({
       });
       removeTimeUpdatedParam();
     };
+
     if (Array.isArray(key)) {
       if (key.every((k) => q[k])) {
         handle();
