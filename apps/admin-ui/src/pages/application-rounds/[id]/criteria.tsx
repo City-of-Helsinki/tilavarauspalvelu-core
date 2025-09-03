@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { H1, H3, SemiBold, Strong, CenterSpinner, Flex, TitleSection } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useApplicationRoundCriteriaQuery, UserPermissionChoice } from "@gql/gql-types";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { formatDate } from "@/common/util";
 import { errorToast } from "common/src/components/toast";
 import { Accordion as AccordionBase } from "@/component/Accordion";
@@ -51,7 +51,7 @@ function Criteria({ applicationRoundPk }: { applicationRoundPk: number }): JSX.E
       errorToast({ text: t("errors:errorFetchingData") });
     },
   });
-  const applicationRound = data?.node != null && "pk" in data.node ? data.node : null;
+  const applicationRound = getNode(data);
 
   if (loading) {
     return <CenterSpinner />;

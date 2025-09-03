@@ -12,7 +12,7 @@ import Link from "next/link";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { getApplicationPath } from "@/modules/urls";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { ButtonContainer, Flex } from "common/styled";
@@ -145,7 +145,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     query: ApplicationPage4Document,
     variables: { id: createNodeId("ApplicationNode", pk) },
   });
-  const application = data?.node != null && "id" in data.node ? data.node : null;
+  const application = getNode(data);
   if (application == null) {
     return notFound;
   }

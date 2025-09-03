@@ -32,7 +32,7 @@ import { Step0 } from "@/components/reservation/Step0";
 import { Step1 } from "@/components/reservation/Step1";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
-import { createNodeId, filterNonNullable, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, getNode, toNumber } from "common/src/helpers";
 import { containsField } from "common/src/metaFieldsHelpers";
 import { errorToast } from "common/src/components/toast";
 import { getGeneralFields } from "@/components/reservation/SummaryFields";
@@ -442,7 +442,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     variables: { id: createNodeId("ReservationNode", reservationPk) },
   });
 
-  const reservation = resData.node != null && "pk" in resData.node ? resData.node : null;
+  const reservation = getNode(resData);
 
   // Valid path but no reservation found -> redirect to reservation unit page
   if (reservation?.pk == null) {

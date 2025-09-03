@@ -4,7 +4,7 @@ import {
   ReservationStateChoice,
   useReservationEditPageQuery,
 } from "@gql/gql-types";
-import { createNodeId } from "common/src/helpers";
+import { createNodeId, getNode } from "common/src/helpers";
 import { useReservationSeries } from "@/hooks";
 
 type ReturnValue = {
@@ -24,7 +24,7 @@ export function useReservationEditData(pk: number): ReturnValue {
     variables: { id: createNodeId("ReservationNode", pk) },
   });
 
-  const node = data?.node != null && "id" in data.node ? data.node : null;
+  const node = getNode(data);
   const recurringPk = node?.reservationSeries?.pk;
   const { reservations: reservationSeries } = useReservationSeries(recurringPk);
 
@@ -45,7 +45,7 @@ export function useReservationEditData(pk: number): ReturnValue {
     fetchPolicy: "no-cache",
   });
 
-  const nextNode = nextRecurrence?.node != null && "id" in nextRecurrence.node ? nextRecurrence.node : null;
+  const nextNode = getNode(nextRecurrence);
   const reservation = recurringPk ? nextNode : node;
 
   return {

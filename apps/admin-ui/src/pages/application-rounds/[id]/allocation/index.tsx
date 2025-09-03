@@ -16,7 +16,7 @@ import {
   useApplicationSectionAllocationsQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, sort, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, sort, toNumber } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
 import { ALLOCATION_POLL_INTERVAL, NOT_FOUND_SSR_VALUE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { truncate } from "@/helpers";
@@ -455,7 +455,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     variables: { id: createNodeId("ApplicationRoundNode", pk) },
   });
 
-  const applicationRound = data?.node != null && "id" in data.node ? data.node : null;
+  const applicationRound = getNode(data);
   if (applicationRound == null) {
     return NOT_FOUND_SSR_VALUE;
   }

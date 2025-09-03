@@ -30,7 +30,7 @@ import { gql } from "@apollo/client";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { GetServerSidePropsContext } from "next";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { Error403 } from "@/component/Error403";
@@ -225,7 +225,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
     query: ReservationPermissionsDocument,
     variables: { id: createNodeId("ReservationNode", pk) },
   });
-  const node = data.node != null && "id" in data.node ? data.node : null;
+  const node = getNode(data);
   const unitPk = node?.reservationUnit?.unit?.pk;
   if (unitPk == null) {
     return NOT_FOUND_SSR_VALUE;

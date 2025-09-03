@@ -7,7 +7,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { ViewApplication } from "@/components/application/ViewApplication";
 import { ApplicationHead } from "@/components/application/ApplicationHead";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
-import { createNodeId, getLocalizationLang, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, getLocalizationLang, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import {
   ApplicationStatusChoice,
   ApplicationViewDocument,
@@ -174,7 +174,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     variables: { id: createNodeId("ApplicationNode", pk) },
   });
 
-  const application = data?.node != null && "id" in data.node ? data.node : null;
+  const application = getNode(data);
   if (application == null) {
     return notFound;
   }
