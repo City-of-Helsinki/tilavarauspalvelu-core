@@ -6,7 +6,7 @@
   "type": "module",
   "devDependencies": {
     "@prettier/plugin-oxc": "^0.0.4",
-    "globals": "^16.2.0",
+    "globals": "^16.3.0",
     "typescript": "^5.8.3"
   }
 }
