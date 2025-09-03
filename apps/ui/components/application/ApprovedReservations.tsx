@@ -256,9 +256,8 @@ function formatReservationTimes(t: TFunction, aes: ApplicationSectionReservation
 function accessCodeSafe(pindoraInfo: PindoraSectionFragment | null, t: TFunction) {
   if (!pindoraInfo?.accessCode) {
     return t("reservations:contactSupport");
-  } else {
-    return pindoraInfo.accessCode;
   }
+  return pindoraInfo.accessCode;
 }
 
 export function ApprovedReservations({ application, applicationRound }: Readonly<Props>) {
@@ -591,11 +590,11 @@ function getReservationSeriesAccessText(reservationUnit: ReservationSeriesTableE
     case AccessTypeWithMultivalued.Multivalued:
       if (usedAccessTypes.includes(AccessType.AccessCode)) {
         return `${t("reservationUnit:accessTypes." + AccessType.AccessCode)}: ${accessCodeSafe(pindoraInfo, t)}`;
-      } else
-        return usedAccessTypes
-          .filter((aT) => aT != null && aT !== AccessType.Unrestricted)
-          .map((aT) => t(`reservationUnit:accessTypes.${aT}`))
-          .join(" / ");
+      }
+      return usedAccessTypes
+        .filter((aT) => aT != null && aT !== AccessType.Unrestricted)
+        .map((aT) => t(`reservationUnit:accessTypes.${aT}`))
+        .join(" / ");
     case AccessTypeWithMultivalued.AccessCode:
       return `${t("reservationUnit:accessTypes." + accessType)}: ${accessCodeSafe(pindoraInfo, t)}`;
     default:
