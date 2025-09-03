@@ -20,11 +20,12 @@ import {
   calculateMedian,
   createNodeId,
   filterNonNullable,
+  getLocalizationLang,
   getNode,
   ignoreMaybeArray,
   toNumber,
 } from "common/src/helpers";
-import { format, isSameDay } from "date-fns";
+import { isSameDay } from "date-fns";
 import { useTranslation } from "next-i18next";
 import { Element } from "@/styled";
 import { AutoGrid, ButtonContainer, CenterSpinner, H1, Strong } from "common/styled";
@@ -32,14 +33,22 @@ import { LinkPrev } from "@/component/LinkPrev";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonSize, Notification } from "hds-react";
-import { fromApiDate, fromUIDate, fromUIDateUnsafe, toApiDateUnsafe, toUIDate } from "common/src/common/util";
+import {
+  fromApiDate,
+  fromApiDateTime,
+  fromUIDate,
+  formatDate,
+  fromUIDateUnsafe,
+  toApiDateUnsafe,
+  formatTime,
+} from "common/src/date-utils";
 import { ControlledDateInput, TimeInput } from "common/src/components/form";
 import { WeekdaysSelector } from "@/component/WeekdaysSelector";
 import { ReservationListEditor } from "@/component/ReservationListEditor";
 import { useFilteredReservationList, useMultipleReservation, useSession } from "@/hooks";
 import { RescheduleReservationSeriesForm, RescheduleReservationSeriesFormSchema } from "@/schemas";
 import { errorToast, successToast } from "common/src/components/toast";
-import { fromAPIDateTime, getBufferTime } from "@/helpers";
+import { getBufferTime } from "@/helpers";
 import { BufferToggles } from "@/component/BufferToggles";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { getReservationUrl } from "@/common/urls";
@@ -56,19 +65,23 @@ import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { createClient } from "@/common/apolloClient";
 import { hasPermission } from "@/modules/permissionHelper";
 
-function convertToForm(value: ReservationSeriesPageFragment["reservationSeries"]): RescheduleReservationSeriesForm {
+function convertToForm(
+  value: ReservationSeriesPageFragment["reservationSeries"],
+  lang: string
+): RescheduleReservationSeriesForm {
   // buffer times can be changed individually but the base value is not saved to the recurring series
   // so we take the most common value from all future reservations
   const reservations = filterNonNullable(value?.reservations).filter((x) => new Date(x.beginsAt) >= new Date());
   const bufferTimeBefore = calculateMedian(reservations.map((x) => x.bufferTimeBefore));
   const bufferTimeAfter = calculateMedian(reservations.map((x) => x.bufferTimeAfter));
-  const begin = fromAPIDateTime(value?.beginDate, value?.beginTime);
-  const end = fromAPIDateTime(value?.endDate, value?.endTime);
+  const begin = fromApiDateTime(value?.beginDate, value?.beginTime);
+  const end = fromApiDateTime(value?.endDate, value?.endTime);
+  const locale = getLocalizationLang(lang);
   return {
-    startingDate: value?.beginDate != null ? toUIDate(fromApiDate(value.beginDate)) : "",
-    endingDate: value?.endDate != null ? toUIDate(fromApiDate(value.endDate)) : "",
-    startTime: begin ? format(begin, "HH:mm") : "",
-    endTime: end ? format(end, "HH:mm") : "",
+    startingDate: value?.beginDate != null ? formatDate(fromApiDate(value.beginDate)) : "",
+    endingDate: value?.endDate != null ? formatDate(fromApiDate(value.endDate)) : "",
+    startTime: begin ? formatTime(begin, { locale }) : "",
+    endTime: end ? formatTime(end, { locale }) : "",
     repeatOnDays: filterNonNullable(value?.weekdays),
     bufferTimeBefore: bufferTimeBefore > 0,
     bufferTimeAfter: bufferTimeAfter > 0,
@@ -118,7 +131,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
 }
 
 function SeriesPageInner({ pk }: { pk: number }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { data, refetch, error, loading } = useSeriesPageQuery({
     variables: { id: createNodeId("ReservationNode", pk) },
   });
@@ -134,16 +147,16 @@ function SeriesPageInner({ pk }: { pk: number }) {
   const form = useForm<RescheduleReservationSeriesForm>({
     // FIXME there is no validation here (schema is incomplete, need to run the same refinements as in the create form)
     resolver: zodResolver(RescheduleReservationSeriesFormSchema(interval)),
-    values: convertToForm(reservationSeries),
+    values: convertToForm(reservationSeries, i18n.language),
   });
 
   const { control, formState, reset, handleSubmit, watch } = form;
   const { errors } = formState;
   useEffect(() => {
     if (reservationSeries) {
-      reset(convertToForm(reservationSeries));
+      reset(convertToForm(reservationSeries, i18n.language));
     }
-  }, [reservationSeries, reset]);
+  }, [reservationSeries, reset, i18n.language]);
   const reservationUnit = reservation?.reservationUnit ?? null;
 
   const [removedReservations, setRemovedReservations] = useState<NewReservationListItem[]>([]);
@@ -157,7 +170,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
   // can't change when the form values change -> otherwise we overwrite user selection
   useEffect(() => {
     const compareList = reservationSeries?.reservations.map((x) => new Date(x.beginsAt));
-    const values = convertToForm(reservationSeries);
+    const values = convertToForm(reservationSeries, i18n.language);
     const vals = {
       startingDate: values.startingDate,
       endingDate: values.endingDate,
@@ -169,7 +182,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
     const result = generateReservations(vals);
     const removed = result.filter((x) => compareList?.find((y) => isSameDay(y, x.date)) == null);
     setRemovedReservations(removed);
-  }, [reservationSeries]);
+  }, [reservationSeries, i18n.language]);
 
   const checkedReservations = useFilteredReservationList({
     items: newReservations,

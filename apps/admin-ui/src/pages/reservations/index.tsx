@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import { toUIDate } from "common/src/common/util";
+import { formatDate } from "common/src/date-utils";
 import { useTranslation } from "next-i18next";
 import { H1 } from "common/styled";
 import { Filters, ReservationsDataLoader } from "@lib/reservations";
@@ -19,7 +19,7 @@ export default function ListReservationsPage(): JSX.Element {
     // oxlint-disable react/exhaustive-deps -- only on page load
     if (params.size === 0) {
       const p = new URLSearchParams(params);
-      p.set("dateGte", toUIDate(today));
+      p.set("dateGte", formatDate(today));
       setParams(p);
     }
     // oxlint-enable react/exhaustive-deps -- only on page load
@@ -28,7 +28,7 @@ export default function ListReservationsPage(): JSX.Element {
   const defaultFilters = [
     {
       key: "dateGte",
-      value: toUIDate(today),
+      value: formatDate(today),
     },
   ];
 

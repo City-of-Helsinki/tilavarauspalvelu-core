@@ -16,7 +16,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { useSession } from "@/hooks";
 import { ReservationCard } from "@/components/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { toApiDate } from "common/src/common/util";
+import { toApiDate } from "common/src/date-utils";
 import { addDays } from "date-fns";
 import { errorToast } from "common/src/components/toast";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
