@@ -18,6 +18,7 @@ from .models import (
     ReservationPurpose,
     ReservationUnit,
     ReservationUnitCancellationRule,
+    ReservationUnitPricing,
     ReservationUnitType,
     Resource,
     Space,
@@ -130,6 +131,11 @@ class ApplicationRoundTranslationOptions(TranslationOptions):
 @register(BannerNotification)
 class BannerNotificationTranslationOptions(TranslationOptions):
     fields = ["message"]
+
+
+@register(ReservationUnitPricing)
+class ReservationUnitPricingTranslationOptions(TranslationOptions):
+    fields = ["material_price_description"]
 
 
 def get_translated[**P, R](func: Callable[P, R]) -> Callable[P, R]:

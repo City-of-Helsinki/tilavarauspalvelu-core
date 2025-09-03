@@ -34,6 +34,9 @@ class AppliedPricingInfo(TypedDict):
     lowest_price: Decimal
     highest_price: Decimal
     tax_percentage: Decimal
+    material_price_description_fi: str
+    material_price_description_en: str
+    material_price_description_sv: str
 
 
 def can_view_private_info(reservation: Reservation, info: GQLInfo[User]) -> bool:
@@ -245,6 +248,9 @@ class ReservationNode(
             lowest_price=Decimal(str(applied_pricing["lowest_price"])),
             highest_price=Decimal(str(applied_pricing["highest_price"])),
             tax_percentage=Decimal(str(applied_pricing["tax_percentage"])),
+            material_price_description_fi=applied_pricing["material_price_description_fi"] or "",
+            material_price_description_en=applied_pricing["material_price_description_en"] or "",
+            material_price_description_sv=applied_pricing["material_price_description_sv"] or "",
         )
 
     @applied_pricing.optimize
@@ -262,6 +268,9 @@ class ReservationNode(
                         lowest_price=models.F("lowest_price"),
                         highest_price=models.F("highest_price"),
                         tax_percentage=models.F("tax_percentage__value"),
+                        material_price_description_fi=models.F("material_price_description_fi"),
+                        material_price_description_en=models.F("material_price_description_en"),
+                        material_price_description_sv=models.F("material_price_description_sv"),
                     ),
                 )
                 .values("data")[:1]
