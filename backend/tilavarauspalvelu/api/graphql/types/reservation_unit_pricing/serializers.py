@@ -19,6 +19,9 @@ class ReservationUnitPricingSerializer(NestingModelSerializer):
             "highest_price",
             "highest_price_net",
             "tax_percentage",
+            "material_price_description_fi",
+            "material_price_description_en",
+            "material_price_description_sv",
         ]
         extra_kwargs = {
             "lowest_price_net": {"read_only": True},

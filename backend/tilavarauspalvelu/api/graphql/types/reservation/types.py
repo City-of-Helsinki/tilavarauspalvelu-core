@@ -75,6 +75,9 @@ class AppliedPricingInfo(graphene.ObjectType):
         required=True,
         description="This is a 'Decimal', but graphene doesn't know how to serialize it from string...",
     )
+    material_price_description_fi = graphene.String()
+    material_price_description_en = graphene.String()
+    material_price_description_sv = graphene.String()
 
 
 def private_field_check(user: AnyUser, reservation: Reservation) -> bool | None:
@@ -352,6 +355,9 @@ class ReservationNode(DjangoNode):
                         lowest_price=models.F("lowest_price"),
                         highest_price=models.F("highest_price"),
                         tax_percentage=models.F("tax_percentage__value"),
+                        material_price_description_fi=models.F("material_price_description_fi"),
+                        material_price_description_en=models.F("material_price_description_en"),
+                        material_price_description_sv=models.F("material_price_description_sv"),
                     ),
                 )
                 .values("data")[:1]

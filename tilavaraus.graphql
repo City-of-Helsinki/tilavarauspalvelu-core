@@ -2334,6 +2334,9 @@ type AppliedPricingInfo {
   This is a 'Decimal', but graphene doesn't know how to serialize it from string...
   """
   taxPercentage: String!
+  materialPriceDescriptionFi: String
+  materialPriceDescriptionEn: String
+  materialPriceDescriptionSv: String
 }
 
 """An enumeration."""
@@ -2403,6 +2406,9 @@ type ReservationUnitPricingNode implements Node {
   paymentType: PaymentType
   lowestPrice: Decimal!
   highestPrice: Decimal!
+  materialPriceDescriptionFi: String
+  materialPriceDescriptionEn: String
+  materialPriceDescriptionSv: String
   taxPercentage: TaxPercentageNode!
 
   """The ID of the object"""
@@ -4002,6 +4008,9 @@ input ReservationUnitPricingSerializerInput {
   highestPrice: Decimal
   highestPriceNet: String
   taxPercentage: Int!
+  materialPriceDescriptionFi: String
+  materialPriceDescriptionEn: String
+  materialPriceDescriptionSv: String
 }
 
 input ReservationUnitAccessTypeSerializerInput {
@@ -4184,6 +4193,9 @@ input UpdateReservationUnitPricingSerializerInput {
   highestPrice: Decimal
   highestPriceNet: String
   taxPercentage: Int
+  materialPriceDescriptionFi: String
+  materialPriceDescriptionEn: String
+  materialPriceDescriptionSv: String
 }
 
 input UpdateReservationUnitAccessTypeSerializerInput {

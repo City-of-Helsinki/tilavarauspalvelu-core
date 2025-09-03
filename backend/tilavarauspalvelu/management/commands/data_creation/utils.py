@@ -228,6 +228,14 @@ class AccessTypeInfo:
 
 
 @dataclasses.dataclass(slots=True, frozen=True)
+class MaterialPriceInfo:
+    name: str
+    fi: str
+    en: str
+    sv: str
+
+
+@dataclasses.dataclass(slots=True, frozen=True)
 class HandlingInfo:
     name: str
     handling_required: bool
@@ -263,6 +271,7 @@ class FreeReservationUnitData:
     cancellation_rule_info: CancelInfo
     handling_info: HandlingInfo
     access_type_info: AccessTypeInfo
+    material_price_info: MaterialPriceInfo
 
 
 @dataclasses.dataclass(slots=True, frozen=True)
