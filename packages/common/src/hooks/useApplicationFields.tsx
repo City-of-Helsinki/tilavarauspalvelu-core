@@ -1,26 +1,6 @@
-import { useMemo } from "react";
-import { filterNonNullable } from "../modules/helpers";
-import { containsField, FieldName } from "../modules/metaFieldsHelpers";
-import {
-  type MetadataSetsFragment,
-  ReserveeType,
-  type ReservationMetaFieldsFragment,
-  ReservationNode,
-} from "../../gql/gql-types";
+import { ReserveeType, type ReservationMetaFieldsFragment, ReservationNode } from "../../gql/gql-types";
+import { type FieldName } from "../modules/metaFieldsHelpers";
 import { getReservationApplicationFields } from "../reservation-form/util";
-import { gql } from "@apollo/client";
-
-// TODO is the hook necessary?
-export function useApplicationFields(reservationUnit: MetadataSetsFragment, reserveeType?: ReserveeType) {
-  return useMemo(() => {
-    const fields = filterNonNullable(reservationUnit.metadataSet?.supportedFields);
-
-    const type = reserveeType != null && containsField(fields, "reserveeType") ? reserveeType : ReserveeType.Individual;
-
-    const baseFields = getReservationApplicationFields({ supportedFields: fields, reserveeType: type });
-    return extendApplicationFields(baseFields as Array<keyof ReservationNode>);
-  }, [reservationUnit.metadataSet?.supportedFields, reserveeType]);
-}
 
 function extendApplicationFields(
   fields: Array<keyof ReservationNode>
@@ -78,30 +58,3 @@ export function getGeneralFields({
 
   return generalFields.filter((key): key is keyof ReservationNode => key in reservation);
 }
-
-export const RESERVATION_META_FRAGMENT = gql`
-  fragment ReservationMetaFields on ReservationNode {
-    ...ReserveeBillingFields
-    municipality
-    name
-    description
-    applyingForFreeOfCharge
-    freeOfChargeReason
-    description
-    numPersons
-    ageGroup {
-      id
-      pk
-      maximum
-      minimum
-    }
-    purpose {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-    }
-    municipality
-  }
-`;

@@ -3,13 +3,13 @@ import { render, within } from "@testing-library/react";
 import user from "@testing-library/user-event";
 import { FormProvider, useForm } from "react-hook-form";
 import { ReservationFormField } from "./ReservationFormField";
-import type { Inputs, Reservation } from "./types";
+import type { InputsT, ReservationFormT } from "./types";
 import { test, expect } from "vitest";
 import { MunicipalityChoice } from "../../gql/gql-types";
 import { type OptionsRecord } from "../../types/common";
 
 function Wrapper({ children }: { children: React.ReactNode }): JSX.Element {
-  const formMethods = useForm<Reservation>();
+  const formMethods = useForm<ReservationFormT>();
 
   if (children == null) {
     return <div />;
@@ -48,14 +48,14 @@ function WrappedComponent({
   },
   defaultValues = {},
 }: {
-  field: keyof Inputs;
+  field: keyof InputsT;
   required?: boolean;
   params?: Record<string, Record<string, string | number>>;
   translationKey?: "COMMON";
   data?: {
     termsForDiscount?: JSX.Element | string;
   };
-  reservationData?: Reservation;
+  reservationData?: ReservationFormT;
   defaultValues?: Record<string, string | number>;
 }): JSX.Element {
   return (

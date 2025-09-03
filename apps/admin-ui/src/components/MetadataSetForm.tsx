@@ -1,16 +1,18 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import type { Reservation } from "common/src/reservation-form/types";
+import type { ReservationFormT } from "common/src/reservation-form/types";
 import { ReserverMetaFields, ReservationMetaFields } from "common/src/reservation-form/MetaFields";
-import { useGeneralFields, useApplicationFields } from "common/src/hooks";
-import { type MetadataSetsFragment } from "@gql/gql-types";
+import { ReserveeType, type MetadataSetsFragment } from "@gql/gql-types";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
+import { filterNonNullable } from "common/src/modules/helpers";
+import { getReservationApplicationFields } from "common/src/reservation-form/util";
+import { containsField } from "common/src/modules/metaFieldsHelpers";
 
 type Props = {
   reservationUnit: MetadataSetsFragment;
 };
 
-export const ReservationMetadataSetForm = ({ reservationUnit }: Props): JSX.Element => {
+export function ReservationMetadataSetForm({ reservationUnit }: Props): JSX.Element {
   const { ageGroups, reservationPurposes } = useFilterOptions();
   const options = {
     ageGroup: ageGroups,
@@ -19,7 +21,11 @@ export const ReservationMetadataSetForm = ({ reservationUnit }: Props): JSX.Elem
 
   // TODO naming: generalFields = reservationFields (Varauksen tiedot)
   // or maybe metadataReservationFields?
-  const generalFields = useGeneralFields(reservationUnit);
+  const fields = filterNonNullable(reservationUnit.metadataSet?.supportedFields);
+  const generalFields = getReservationApplicationFields({
+    supportedFields: fields,
+    reserveeType: "common",
+  }).filter((n) => n !== "reserveeType");
 
   return (
     <ReservationMetaFields
@@ -29,21 +35,28 @@ export const ReservationMetadataSetForm = ({ reservationUnit }: Props): JSX.Elem
       noHeadingMarginal
     />
   );
-};
+}
 
 // TODO this component can be wholly deprecated maybe? translations / options?
-export const ReserverMetadataSetForm = ({ reservationUnit }: Props): JSX.Element => {
-  const { watch } = useFormContext<Reservation>();
+export function ReserverMetadataSetForm({ reservationUnit }: Props): JSX.Element {
+  const { watch } = useFormContext<ReservationFormT>();
   const { ageGroups, reservationPurposes } = useFilterOptions();
   const options = {
     ageGroup: ageGroups,
     purpose: reservationPurposes,
   };
 
+  const fields = filterNonNullable(reservationUnit.metadataSet?.supportedFields);
+
+  const reserveeType = watch("reserveeType");
+  const type = reserveeType != null && containsField(fields, "reserveeType") ? reserveeType : ReserveeType.Individual;
   // TODO naming: applicationFields = reserverFields (Varaajan tiedot)
-  const reservationApplicationFields = useApplicationFields(reservationUnit, watch("reserveeType"));
+  const reservationApplicationFields = getReservationApplicationFields({
+    supportedFields: fields,
+    reserveeType: type,
+  });
 
   return (
     <ReserverMetaFields fields={reservationApplicationFields} reservationUnit={reservationUnit} options={options} />
   );
-};
+}

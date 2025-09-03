@@ -20,7 +20,7 @@ import {
   useReservationLazyQuery,
   useUpdateReservationMutation,
 } from "@gql/gql-types";
-import { type Inputs } from "common/src/reservation-form/types";
+import { type InputsT } from "common/src/reservation-form/types";
 import { createApolloClient } from "@/modules/apolloClient";
 import { default as NextError } from "next/error";
 import { getReservationPath, getReservationUnitPath, getSingleSearchPath } from "@/modules/urls";
@@ -100,7 +100,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
   // Get prefilled profile user fields from the reservation (backend fills them when created).
   // NOTE this is only updated on load (not after mutation or refetch)
-  const defaultValues: Inputs = {
+  const defaultValues: InputsT = {
     // NOTE never undefined (this page is not accessible without reservation)
     pk: reservation?.pk ?? 0,
     name: reservation?.name ?? "",
@@ -126,7 +126,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   // TODO is defaultValues correct? it's prefilled from the profile data and we are not refetching at any point.
   // If we would refetch values would be more correct with reset hook.
   // Also if this is ever initialised without the data it will not prefill the form.
-  const form = useForm<Inputs>({ defaultValues, mode: "onChange" });
+  const form = useForm<InputsT>({ defaultValues, mode: "onChange" });
   const { handleSubmit, watch } = form;
 
   const reserveeType = watch("reserveeType");
@@ -197,7 +197,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
   const displayError = useDisplayError();
 
-  const onSubmitStep0 = async (payload: Inputs): Promise<void> => {
+  const onSubmitStep0 = async (payload: InputsT): Promise<void> => {
     const {
       // boolean toggles
       applyingForFreeOfCharge,
@@ -306,7 +306,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   const notesWhenReserving = getTranslationSafe(reservationUnit, "notesWhenApplying", lang);
 
   // TODO hacky should separate the submit handlers and form types
-  const onSubmit = (values: Inputs) => {
+  const onSubmit = (values: InputsT) => {
     if (step === 0) {
       onSubmitStep0(values);
     }

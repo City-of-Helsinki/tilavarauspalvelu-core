@@ -1,6 +1,7 @@
 import {
   AccessType,
   ReservationUnitImageType,
+  type ReservationMetaFieldsFragment,
   MunicipalityChoice,
   OrderStatus,
   type PaymentOrderNode,
@@ -12,11 +13,11 @@ import {
   ReservationTypeChoice,
   ReserveeType,
   TermsOfUseTypeChoices,
+  ReservationFormType,
 } from "@gql/gql-types";
 import { createNodeId } from "common/src/modules/helpers";
 import type { FieldName } from "common/src/modules/metaFieldsHelpers";
 import { generateNameFragment } from "@/test/test.gql.utils";
-import { ReservationMetaFieldsFragment } from "common/gql/gql-types";
 
 export function generateTextFragment(text: string) {
   return {
@@ -206,6 +207,7 @@ export function createMockReservation(
       canApplyFreeOfCharge: canApplyFreeOfCharge,
       minPersons: 1,
       maxPersons: 100,
+      reservationForm: ReservationFormType.PurposeForm,
       metadataSet: {
         id: createNodeId("MetadataSetNode", 1),
         requiredFields: [
@@ -494,6 +496,9 @@ export function createMetaFieldsFragment(type: ReserveeType = ReserveeType.Compa
     reserveeIdentifier: type === ReserveeType.Company ? "1234567-8" : null,
     reserveeOrganisationName: "Test Organisation",
     municipality: MunicipalityChoice.Helsinki,
+    reservationUnit: {
+      reservationForm: ReservationFormType.PurposeForm,
+    },
   };
 }
 
