@@ -175,7 +175,7 @@ function RowCells({ hasPermission, cols, ...rest }: CellProps): JSX.Element {
   return (
     <CellContent $numCols={cols} data-testid={testId}>
       {Array.from(Array(cols).keys()).map((i) => (
-        <Cell {...rest} key={i} offset={i} hasPermission={hasPermission} />
+        <Cell key={i} {...rest} offset={i} hasPermission={hasPermission} />
       ))}
     </CellContent>
   );
