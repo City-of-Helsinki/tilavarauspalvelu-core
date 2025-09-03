@@ -1,22 +1,13 @@
-/**
- * MetaFields component
- * Defines the form fields that are available and required when making a
- * reservation.
- *
- * This is not really metadata but it's named metadata in the backend
- *
- * TODO this file should be split logically (and renamed after)
- * TODO when admin-ui uses translation namespaces remove passing the t function
- */
-import { IconGroup, IconUser } from "hds-react";
 import React, { Fragment } from "react";
+import { IconGroup, IconUser } from "hds-react";
 import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation, type TFunction } from "next-i18next";
+import { gql } from "@apollo/client";
 import { camelCase } from "lodash-es";
 import { MetadataSetsFragment, MunicipalityChoice, ReserveeType } from "../../gql/gql-types";
 import { ReservationFormField } from "./ReservationFormField";
-import { Inputs, type Reservation } from "./types";
+import { type InputsT, type ReservationFormT } from "./types";
 import { RadioButtonWithImage } from "./RadioButtonWithImage";
 import { AutoGrid, fontMedium, fontRegular, H4, H5 } from "../styled";
 import type { OptionsRecord } from "../../types/common";
@@ -151,7 +142,7 @@ function ReservationFormFields({
   params?: { numPersons: { min?: number; max?: number } };
 }) {
   const { t } = useTranslation();
-  const { getValues } = useFormContext<Reservation>();
+  const { getValues } = useFormContext<ReservationFormT>();
 
   const requiredFields = filterNonNullable(metadata?.requiredFields)
     .map((x) => x.fieldName)
@@ -173,7 +164,7 @@ function ReservationFormFields({
           )}
           <ReservationFormField
             key={`key-${field}`}
-            field={field as unknown as keyof Inputs}
+            field={field as unknown as keyof InputsT}
             options={extendMetaFieldOptions(options, t)}
             required={required}
             translationKey={headingKey}
@@ -279,7 +270,7 @@ export function ReserverMetaFields({
   fields: string[];
   reservationUnit: MetadataSetsFragment;
 } & CommonProps) {
-  const { watch } = useFormContext<Reservation & Partial<Inputs>>();
+  const { watch } = useFormContext<ReservationFormT & Partial<InputsT>>();
   const { t } = useTranslation();
 
   const supportedFields = filterNonNullable(reservationUnit?.metadataSet?.supportedFields);
@@ -349,3 +340,38 @@ function MetaFields({ reservationUnit, generalFields, reservationApplicationFiel
 }
 
 export default MetaFields;
+
+export const RESERVATION_META_FIELDS_FRAGMENT = gql`
+  fragment ReservationMetaFields on ReservationNode {
+    id
+    reserveeFirstName
+    reserveeLastName
+    reserveeEmail
+    reserveePhone
+    reserveeType
+    reserveeOrganisationName
+    reserveeIdentifier
+    ageGroup {
+      id
+      pk
+      maximum
+      minimum
+    }
+    purpose {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+    }
+    municipality
+    numPersons
+    name
+    description
+    freeOfChargeReason
+    applyingForFreeOfCharge
+    reservationUnit {
+      reservationForm
+    }
+  }
+`;

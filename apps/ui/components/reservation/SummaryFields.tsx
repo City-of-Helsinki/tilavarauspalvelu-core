@@ -3,12 +3,12 @@ import { type TFunction, useTranslation } from "next-i18next";
 import { type ReservationNode, ReserveeType } from "@/gql/gql-types";
 import { containsField, type FieldName } from "common/src/modules/metaFieldsHelpers";
 import { AutoGrid, H4 } from "common/src/styled";
+import { type ReservationMetaFieldsFragment } from "common/gql/gql-types";
 import { ParagraphAlt, PreviewLabel, PreviewValue } from "./styles";
 import { LabelValuePair } from "./LabelValuePair";
 import { extendMetaFieldOptions } from "common/src/reservation-form/MetaFields";
 import { type OptionsRecord } from "common";
 import { getApplicationFields, getGeneralFields } from "common/src/hooks/useApplicationFields";
-import { type ReservationMetaFieldsFragment } from "common/gql/gql-types";
 
 const Container = styled(AutoGrid)`
   margin-bottom: var(--spacing-2-xl);

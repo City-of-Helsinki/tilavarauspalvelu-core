@@ -22,7 +22,7 @@ type CommonInputs = {
   applyingForFreeOfCharge: boolean;
 };
 
-export type Inputs = {
+export type InputsT = {
   pk: number;
   reserveeIsUnregisteredAssociation?: boolean;
   reserveeIdentifier?: string;
@@ -30,7 +30,7 @@ export type Inputs = {
 } & Reservee &
   CommonInputs;
 
-export type Reservation = {
+export type ReservationFormT = {
   pk: number;
   begin: string;
   end: string;
