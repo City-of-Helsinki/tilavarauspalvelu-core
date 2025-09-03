@@ -299,6 +299,7 @@
     "unicorn/consistent-empty-array-spread": "error",
     "unicorn/empty-brace-spaces": "off",
     "unicorn/escape-case": "error",
+    "unicorn/explicit-length-check": "error",
     "unicorn/no-abusive-eslint-disable": "error",
     "unicorn/no-accessor-recursion": "error",
     "unicorn/no-anonymous-default-export": "error",

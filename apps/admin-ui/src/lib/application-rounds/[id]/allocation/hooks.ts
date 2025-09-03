@@ -75,7 +75,7 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
   const { selection, setSelection } = useSelectedSlots();
 
   const setSelectedSlots = (slots: string[]) => {
-    if (slots.length < 1) {
+    if (slots.length === 0) {
       setSelection(null);
     } else {
       const selectionBegin = slots[0];

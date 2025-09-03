@@ -70,7 +70,7 @@ function EventGroupList({
   type: AllocationApplicationSectionCardType;
   refetch: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
 }): JSX.Element {
-  if (applicationSections.length < 1) {
+  if (applicationSections.length === 0) {
     return <div>-</div>;
   }
 

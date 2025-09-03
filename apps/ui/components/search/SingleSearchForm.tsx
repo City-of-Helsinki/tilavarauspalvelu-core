@@ -150,11 +150,11 @@ export function SingleSearchForm({
     formValues.timeBegin ||
     formValues.timeEnd ||
     formValues.duration ||
-    formValues.units.length ||
+    formValues.units.length > 0 ||
     formValues.personsAllowed ||
-    formValues.purposes.length ||
-    formValues.equipments.length ||
-    formValues.accessTypes.length
+    formValues.purposes.length > 0 ||
+    formValues.equipments.length > 0 ||
+    formValues.accessTypes.length > 0
   );
 
   return (
