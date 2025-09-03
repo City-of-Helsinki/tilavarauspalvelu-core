@@ -80,7 +80,7 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
   const updateSpace = (input: SpaceUpdateMutation) => mutation({ variables: { input } });
   const onSubmit = async (values: SpaceUpdateForm) => {
     try {
-      const { parent, surfaceArea, pk, ...rest } = values;
+      const { parent, surfaceArea, pk, unit, ...rest } = values;
       if (pk == null || pk === 0) {
         throw new Error("Space pk is not defined");
       }
@@ -89,7 +89,7 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
         pk,
         parent: parent != null && parent > 0 ? parent : null,
         surfaceArea: Math.ceil(surfaceArea ?? 0),
-      });
+      } satisfies SpaceUpdateMutation);
       successToast({
         text: t("spaces:SpaceEditor.spaceUpdatedNotification"),
       });
