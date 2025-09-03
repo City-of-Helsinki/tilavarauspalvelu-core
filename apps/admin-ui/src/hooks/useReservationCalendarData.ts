@@ -28,16 +28,14 @@ export function useReservationCalendarData({
 }) {
   const { t } = useTranslation();
 
-  const today = new Date();
-
   const { data, ...rest } = useReservationsByReservationUnitQuery({
     fetchPolicy: "no-cache",
     skip: !reservationUnitPk,
     variables: {
       id: createNodeId("ReservationUnitNode", reservationUnitPk ?? 0),
       pk: reservationUnitPk ?? 0,
-      beginDate: toApiDate(begin ?? today) ?? "",
-      endDate: toApiDate(end ?? today) ?? "",
+      beginDate: toApiDate(begin) ?? "",
+      endDate: toApiDate(end) ?? "",
       // NOTE we need denied to show the past reservations
       state: [
         ReservationStateChoice.Confirmed,

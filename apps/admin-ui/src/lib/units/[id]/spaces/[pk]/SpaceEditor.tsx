@@ -6,7 +6,7 @@ import { useUpdateSpaceMutation, type SpaceUpdateMutation, useSpaceQuery } from 
 import { errorToast, successToast } from "common/src/components/toast";
 import { ButtonContainer, CenterSpinner, H2, H3 } from "common/styled";
 import { FormErrorSummary } from "@/component/FormErrorSummary";
-import { createNodeId } from "common/src/helpers";
+import { createNodeId, getNode } from "common/src/helpers";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LinkPrev } from "@/component/LinkPrev";
@@ -55,18 +55,18 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
   const { errors, isDirty } = formState;
 
   useEffect(() => {
-    if (data?.node != null && "id" in data.node) {
-      const { node: s } = data;
+    const space = getNode(data);
+    if (space) {
       reset({
-        nameFi: s.nameFi ?? "",
-        nameSv: s.nameSv ?? "",
-        nameEn: s.nameEn ?? "",
-        surfaceArea: s.surfaceArea ?? undefined,
-        maxPersons: s.maxPersons ?? undefined,
+        nameFi: space.nameFi ?? "",
+        nameSv: space.nameSv ?? "",
+        nameEn: space.nameEn ?? "",
+        surfaceArea: space.surfaceArea ?? undefined,
+        maxPersons: space.maxPersons ?? undefined,
         unit,
-        pk: s.pk ?? 0,
-        parent: s.parent?.pk ?? null,
-        code: s.code,
+        pk: space.pk,
+        parent: space.parent?.pk ?? null,
+        code: space.code,
       });
     }
   }, [data, reset, unit]);
@@ -100,7 +100,7 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
     }
   };
 
-  const node = data?.node != null && "id" in data.node ? data.node : null;
+  const node = getNode(data);
 
   return (
     <>

@@ -33,7 +33,7 @@ import {
   DataWrapper,
 } from "@lib/reservations/[id]/";
 import { Accordion, ApplicationDatas, Summary } from "@/styled";
-import { createNodeId, ignoreMaybeArray, isPriceFree, toNumber } from "common/src/helpers";
+import { createNodeId, getNode, ignoreMaybeArray, isPriceFree, toNumber } from "common/src/helpers";
 import { formatAgeGroup } from "@/common/util";
 import { toUIDateTime } from "common/src/common/util";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -351,7 +351,7 @@ export default function Page({ reservation }: PropsNarrowed): JSX.Element {
     return <Error403 />;
   }
 
-  const node = query.data?.node != null && "id" in query.data.node ? query.data.node : null;
+  const node = getNode(query.data);
   const reservationRefreshed = node ?? reservation;
 
   return <RequestedReservation reservation={reservationRefreshed} refetch={query.refetch} />;
@@ -370,7 +370,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
     variables: { id: createNodeId("ReservationNode", pk) },
   });
 
-  const reservation = data?.node != null && "id" in data.node ? data.node : null;
+  const reservation = getNode(data);
   const unit = reservation?.reservationUnit?.unit?.pk;
   if (reservation == null || unit == null) {
     return NOT_FOUND_SSR_VALUE;

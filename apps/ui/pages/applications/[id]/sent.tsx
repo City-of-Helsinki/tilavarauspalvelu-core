@@ -9,7 +9,7 @@ import { applicationsPath, applicationsPrefix, getApplicationPath } from "@/modu
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 import { ApplicationSentPageDocument, type ApplicationSentPageQuery } from "@/gql/gql-types";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -80,7 +80,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     variables: { id: createNodeId("ApplicationNode", pk) },
   });
 
-  const application = data?.node != null && "id" in data.node ? data.node : null;
+  const application = getNode(data);
   if (application == null) {
     return notFound;
   }

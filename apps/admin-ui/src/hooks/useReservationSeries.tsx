@@ -1,7 +1,7 @@
 import { useTranslation } from "next-i18next";
 import { type Maybe, useReservationSeriesQuery } from "@gql/gql-types";
 import { errorToast } from "common/src/components/toast";
-import { createNodeId, filterNonNullable } from "common/src/helpers";
+import { createNodeId, filterNonNullable, getNode } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
 /// @param recurringPk fetch reservations related to this pk
@@ -20,7 +20,7 @@ export function useReservationSeries(recurringPk: Maybe<number> | undefined) {
     },
   });
 
-  const reservationSeries = data?.node != null && "pk" in data.node ? data.node : null;
+  const reservationSeries = getNode(data);
   const reservations = filterNonNullable(reservationSeries?.reservations);
 
   return {

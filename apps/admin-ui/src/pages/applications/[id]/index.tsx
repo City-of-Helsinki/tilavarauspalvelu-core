@@ -6,7 +6,7 @@ import { isEqual, trim } from "lodash-es";
 import { type ApolloQueryResult, gql } from "@apollo/client";
 import { CenterSpinner, Flex, fontMedium, H1, H3, H4, TitleSection } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import {
   type ApplicationAdminQuery,
   type ApplicationPageFieldsFragment,
@@ -564,7 +564,7 @@ export default function ApplicationPage({ pk }: PropsNarrowed): JSX.Element | nu
     variables: { id: createNodeId("ApplicationNode", pk) },
   });
 
-  const application = data?.node != null && "id" in data.node ? data.node : null;
+  const application = getNode(data);
   const applicationRound = application?.applicationRound;
 
   if (isLoading) {

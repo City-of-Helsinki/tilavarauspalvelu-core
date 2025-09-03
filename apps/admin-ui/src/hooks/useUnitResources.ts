@@ -5,7 +5,7 @@ import {
   useReservationUnitsByUnitQuery,
 } from "@gql/gql-types";
 import { toApiDate } from "common/src/common/util";
-import { createNodeId } from "common/src/helpers";
+import { createNodeId, getNode } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { errorToast } from "common/src/components/toast";
 import { gql } from "@apollo/client";
@@ -64,7 +64,7 @@ export function useUnitResources({
   const affectingReservations = data?.affectingReservations ?? previousData?.affectingReservations ?? [];
 
   const dataToUse = data ?? previousData;
-  const unit = dataToUse?.node != null && "id" in dataToUse.node ? dataToUse.node : null;
+  const unit = getNode(dataToUse);
   const resUnits = unit?.reservationUnits ?? reservationUnitOptions.map(createDummyReservationUnit);
 
   const resources = resUnits

@@ -227,7 +227,7 @@ export function InProgressReservationNotification() {
     }
     const res = await reservationQ({
       variables: {
-        id: createNodeId("ReservationNode", reservation.pk ?? 0),
+        id: createNodeId("ReservationNode", reservation.pk),
       },
     });
     if (res.data?.node == null) {

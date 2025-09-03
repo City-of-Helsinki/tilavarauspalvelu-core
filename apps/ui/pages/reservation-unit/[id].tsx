@@ -40,6 +40,7 @@ import {
   filterNonNullable,
   formatListToCSV,
   formatTimeRange,
+  getNode,
   ignoreMaybeArray,
   isPriceFree,
   timeToMinutes,
@@ -707,8 +708,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       },
     });
 
-    const reservationUnit =
-      reservationUnitData.node != null && "pk" in reservationUnitData.node ? reservationUnitData.node : null;
+    const reservationUnit = getNode(reservationUnitData);
 
     if (reservationUnit == null) {
       return notFound;

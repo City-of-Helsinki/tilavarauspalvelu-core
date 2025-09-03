@@ -6,7 +6,7 @@ import { Flex, H1, TabWrapper, TitleSection } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { formatAddress } from "@/common/util";
 import { getReservationSeriesUrl } from "@/common/urls";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import {
   UnitViewDocument,
   type UnitViewQuery,
@@ -185,7 +185,7 @@ export async function getServerSideProps({ req, locale, query }: GetServerSidePr
     variables: { id: createNodeId("UnitNode", pk) },
   });
 
-  const unit = data.node != null && "id" in data.node ? data.node : null;
+  const unit = getNode(data);
   if (unit == null) {
     return NOT_FOUND_SSR_VALUE;
   }

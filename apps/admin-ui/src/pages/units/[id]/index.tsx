@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { UserPermissionChoice, useUnitPageQuery } from "@gql/gql-types";
 import { formatAddress } from "@/common/util";
 import { ExternalLink } from "@/component/ExternalLink";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { Error404 } from "@/component/Error404";
 import { ReservationUnitList } from "@lib/units/[id]/ReservationUnitList";
 import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/common/urls";
@@ -68,7 +68,7 @@ function Unit({ unitPk }: { unitPk: number }): JSX.Element {
     fetchPolicy: "network-only",
   });
 
-  const unit = data?.node != null && "pk" in data.node ? data.node : null;
+  const unit = getNode(data);
   const hasSpacesResources = Boolean(unit?.spaces?.length);
 
   if (isLoading) {

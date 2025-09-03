@@ -17,7 +17,14 @@ import {
   type CurrentUserQuery,
   ReservationKind,
 } from "@gql/gql-types";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, type ReadonlyDeep, toNumber } from "common/src/helpers";
+import {
+  createNodeId,
+  filterNonNullable,
+  getNode,
+  ignoreMaybeArray,
+  type ReadonlyDeep,
+  toNumber,
+} from "common/src/helpers";
 import { type SearchFormValues, SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
 import { createApolloClient } from "@/modules/apolloClient";
 import { RecurringCard } from "@/components/recurring/RecurringCard";
@@ -144,7 +151,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   });
 
-  const applicationRound = data?.node != null && "pk" in data.node ? data.node : null;
+  const applicationRound = getNode(data);
   if (applicationRound == null) {
     return notFound;
   }

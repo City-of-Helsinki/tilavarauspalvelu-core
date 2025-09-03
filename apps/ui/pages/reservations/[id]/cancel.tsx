@@ -7,7 +7,7 @@ import {
 import { ReservationCancellation } from "@/components/reservation/ReservationCancellation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, getNode, ignoreMaybeArray, toInteger } from "common/src/helpers";
 import { isReservationCancellable } from "@/modules/reservation";
 import { getApplicationPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
@@ -72,14 +72,14 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const commonProps = getCommonServerSideProps();
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  const pk = toNumber(ignoreMaybeArray(params?.id));
-  if (Number.isFinite(Number(pk))) {
+  const pk = toInteger(ignoreMaybeArray(params?.id));
+  if (pk != null) {
     const { data } = await client.query<ReservationCancelPageQuery, ReservationCancelPageQueryVariables>({
       query: ReservationCancelPageDocument,
       fetchPolicy: "no-cache",
-      variables: { id: createNodeId("ReservationNode", pk ?? 0) },
+      variables: { id: createNodeId("ReservationNode", pk) },
     });
-    const reservation = data.node != null && "id" in data.node ? data.node : null;
+    const reservation = getNode(data);
 
     const canCancel = reservation != null && isReservationCancellable(reservation);
     if (canCancel) {
@@ -87,7 +87,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         props: {
           ...commonProps,
           ...(await serverSideTranslations(locale ?? "fi")),
-          reservation: reservation ?? null,
+          reservation,
         },
       };
     } else if (reservation != null) {

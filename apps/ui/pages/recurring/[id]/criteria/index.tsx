@@ -11,7 +11,7 @@ import {
 import { Flex, H1 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { Sanitize } from "common/src/components/Sanitize";
-import { createNodeId, capitalize, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, capitalize, ignoreMaybeArray, toNumber, getNode } from "common/src/helpers";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
@@ -112,7 +112,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   });
 
-  const applicationRound = data.node != null && "criteriaFi" in data.node ? data.node : null;
+  const applicationRound = getNode(data);
   if (applicationRound == null) {
     return notFound;
   }

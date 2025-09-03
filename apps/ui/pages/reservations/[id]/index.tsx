@@ -35,7 +35,7 @@ import { getReservationUnitName } from "@/modules/reservationUnit";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { AddressSection } from "@/components/reservation-unit";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
-import { createNodeId, capitalize, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, capitalize, filterNonNullable, ignoreMaybeArray, toNumber, getNode } from "common/src/helpers";
 import { ButtonLikeLink, ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import {
@@ -180,13 +180,13 @@ function Reservation({
     reservation.accessType === AccessType.AccessCode;
 
   const { data: accessCodeData } = useAccessCodeQuery({
-    skip: !reservation || !shouldShowAccessCode,
+    skip: !shouldShowAccessCode,
     variables: {
-      id: createNodeId("ReservationNode", reservation.pk ?? 0),
+      id: createNodeId("ReservationNode", reservation.pk),
     },
   });
-  const pindoraInfo =
-    accessCodeData?.node != null && "pindoraInfo" in accessCodeData.node ? accessCodeData?.node?.pindoraInfo : null;
+  const node = getNode(accessCodeData);
+  const pindoraInfo = node?.pindoraInfo;
 
   const modifyTimeReason = getWhyReservationCantBeChanged(reservation);
   const canTimeBeModified = modifyTimeReason == null;
@@ -457,7 +457,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       variables: { id: createNodeId("ReservationNode", pk) },
     });
 
-    const reservation = data?.node != null && "pk" in data.node ? data.node : null;
+    const reservation = getNode(data);
 
     if (reservation?.reservationSeries != null) {
       const recurringId = reservation.reservationSeries.id;

@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import { ReservationSeriesForm } from "@lib/my-units/[id]/recurring/ReservationSeriesForm";
 import { LinkPrev } from "@/component/LinkPrev";
 import { H1 } from "common/styled";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -56,7 +56,8 @@ export async function getServerSideProps({ query, locale, req }: GetServerSidePr
     query: SeriesReservationUnitDocument,
     variables: { id: createNodeId("UnitNode", unitPk) },
   });
-  const reservationUnits = data.node != null && "id" in data.node ? data.node.reservationUnits : [];
+  const unit = getNode(data);
+  const reservationUnits = unit?.reservationUnits ?? [];
   return {
     props: {
       unitPk,

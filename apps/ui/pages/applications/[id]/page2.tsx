@@ -6,7 +6,7 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { gql } from "@apollo/client";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { useDisplayError } from "common/src/hooks";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -109,7 +109,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       id: createNodeId("ApplicationNode", pk),
     },
   });
-  const application = data.node != null && "id" in data.node ? data.node : null;
+  const application = getNode(data);
   if (application == null) {
     return notFound;
   }
