@@ -144,7 +144,7 @@ function Errors({
   // TODO clean this up
   const errorKeys =
     Object.keys(errors).sort((a, b) => {
-      const fields = [...supportedFields.map((x) => x.fieldName)];
+      const fields = supportedFields.map((x) => x.fieldName);
       // Why?
       return fields.indexOf(a) - fields.indexOf(b);
     }) ?? [];

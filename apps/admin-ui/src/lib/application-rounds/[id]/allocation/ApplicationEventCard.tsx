@@ -278,12 +278,10 @@ function SchedulesList({
       if (ruo.allocatedTimeSlots == null) {
         return null;
       }
-      return [
-        ...ruo.allocatedTimeSlots.map((ats) => ({
-          ...ats,
-          reservationUnitOption: ruo,
-        })),
-      ];
+      return ruo.allocatedTimeSlots.map((ats) => ({
+        ...ats,
+        reservationUnitOption: ruo,
+      }));
     })
   ).sort((a, b) => convertWeekday(a.dayOfTheWeek) - convertWeekday(b.dayOfTheWeek));
 
