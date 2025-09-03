@@ -28,6 +28,7 @@ import {
   singleSearchPrefix,
 } from "@/modules/urls";
 import { fontBold, fontMedium } from "common/styled";
+import Link from "next/link";
 
 type HeaderProps = {
   apiBaseUrl: string;
@@ -253,10 +254,10 @@ function ActionBar({ apiBaseUrl, profileLink, languageOptions }: Readonly<Header
       {isAuthenticated ? (
         <Header.ActionBarItem fixedRightPosition id="user-menu" label={userName} avatar={userInitials ?? <IconUser />}>
           {!user?.isAdAuthenticated && (
-            <a href={profileLink} target="_blank" rel="noopener noreferrer">
+            <Link href={profileLink} target="_blank" rel="noopener noreferrer">
               {t("navigation:profileLinkLabel")}
               <IconLinkExternal />
-            </a>
+            </Link>
           )}
           <button type="button" aria-label={t("common:logout")} onClick={() => signOut(apiBaseUrl)}>
             {t("common:logout")}
