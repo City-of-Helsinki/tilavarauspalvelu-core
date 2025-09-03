@@ -198,8 +198,8 @@ function getReservationSeriesAccessCodeValidity(
   pindoraInfo: NonNullable<ReservationKeylessEntryFragment["reservationSeries"]>["pindoraInfo"]
 ) {
   let validityBeginsDate = null,
-    validityEndsDate = null,
     validityBeginsTime = null,
+    validityEndsDate = null,
     validityEndsTime = null;
 
   const accessCodeValidity = pindoraInfo?.accessCodeValidity;
