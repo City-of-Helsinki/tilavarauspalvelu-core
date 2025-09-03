@@ -202,8 +202,7 @@ function getAesReservationUnits(aes: ApplicationSectionT) {
   return filterNonNullable(
     aes.reservationUnitOptions
       .map((x) => x.allocatedTimeSlots)
-      .map((x) => x.map((y) => y.reservationSeries?.reservationUnit))
-      .flat()
+      .flatMap((x) => x.map((y) => y.reservationSeries?.reservationUnit))
   );
 }
 
@@ -945,8 +944,7 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
 function sectionToReservationUnits(t: TFunction, section: ApplicationSectionT): ReservationSeriesTableElem[] {
   const reservationUnitsByDay = filterNonNullable(
     section.reservationUnitOptions
-      .map((ruo) => ruo.allocatedTimeSlots.map((ats) => ats))
-      .flat()
+      .flatMap((ruo) => ruo.allocatedTimeSlots.map((ats) => ats))
       .map((ats) => {
         const { reservationSeries: r, dayOfTheWeek } = ats;
         if (r == null) {
