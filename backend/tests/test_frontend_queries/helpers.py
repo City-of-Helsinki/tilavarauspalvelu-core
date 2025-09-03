@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 from django.conf import settings
-from graphql import Undefined
+from graphql import UndefinedType
 
 from utils.utils import check_path
 
@@ -30,7 +30,7 @@ def get_admin_query_info() -> dict[str, list[QueryInfo]]:
 
 
 def assert_no_undefined_variables(args: dict[str, Any]) -> None:
-    undefined = "\n".join(key for key, value in args.items() if value is Undefined)
+    undefined = "\n".join(key for key, value in args.items() if isinstance(value, UndefinedType))
     if undefined:
         msg = f"Some variables are still undefined:\n{undefined}"
         raise pytest.fail(msg, pytrace=False)

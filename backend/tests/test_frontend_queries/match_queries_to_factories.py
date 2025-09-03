@@ -18,7 +18,9 @@ from django.db.models.fields.related import RelatedField
 from graphql import (
     FieldNode,
     GraphQLInputObjectType,
+    GraphQLInterfaceType,
     GraphQLObjectType,
+    InlineFragmentNode,
     NonNullTypeNode,
     OperationDefinitionNode,
     OperationType,
@@ -181,15 +183,13 @@ def get_operation_variables(operation: OperationDefinitionNode) -> dict[str, Any
 
 
 def get_factory(root_type: GraphQLObjectType, field_node: FieldNode) -> type[GenericDjangoModelFactory]:
-    name = field_node.name.value
-
     match root_type.name:
         case "Query":
-            object_type = get_object_type_for_root_operation(name, root_type)
+            object_type = get_object_type(root_type, field_node)
             query_type = get_undine_query_type(object_type)
             model = query_type.__model__
         case "Mutation":
-            input_object_type = get_input_object_type_for_root_operation(name, root_type)
+            input_object_type = get_input_object_type(root_type, field_node)
             mutation_type = get_undine_mutation_type(input_object_type)
             model = mutation_type.__model__
         case _:
@@ -204,14 +204,22 @@ def get_factory(root_type: GraphQLObjectType, field_node: FieldNode) -> type[Gen
     return factory
 
 
-def get_object_type_for_root_operation(name: str, root_type: GraphQLObjectType) -> GraphQLObjectType:
+def get_object_type(root_type: GraphQLObjectType, field_node: FieldNode) -> GraphQLObjectType:
+    name = field_node.name.value
+
     entrypoint = root_type.fields.get(name)
     if entrypoint is None:
         msg = f"No entrypoint found for '{name}'"
         raise KeyError(msg)
 
-    gql_type: GraphQLObjectType = get_underlying_type(entrypoint.type)  # type: ignore[assignment]
-    if gql_type.name.endswith("Connection"):
+    gql_type: GraphQLObjectType | GraphQLInterfaceType = get_underlying_type(entrypoint.type)  # type: ignore[assignment]
+
+    if isinstance(gql_type, GraphQLInterfaceType) and gql_type.name == "Node":
+        inline_fragment = next(s for s in field_node.selection_set.selections if isinstance(s, InlineFragmentNode))
+        inline_type_name = inline_fragment.type_condition.name.value
+        gql_type = undine_settings.SCHEMA.get_type(inline_type_name)  # type: ignore[assignment]
+
+    elif gql_type.name.endswith("Connection"):
         edge_type: GraphQLObjectType = get_underlying_type(gql_type.fields["edges"].type)  # type: ignore[assignment]
         node_type: GraphQLObjectType = get_underlying_type(edge_type.fields["node"].type)  # type: ignore[assignment]
         gql_type = node_type
@@ -219,7 +227,9 @@ def get_object_type_for_root_operation(name: str, root_type: GraphQLObjectType) 
     return gql_type
 
 
-def get_input_object_type_for_root_operation(name: str, root_type: GraphQLObjectType) -> GraphQLInputObjectType:
+def get_input_object_type(root_type: GraphQLObjectType, field_node: FieldNode) -> GraphQLInputObjectType:
+    name = field_node.name.value
+
     entrypoint = root_type.fields.get(name)
     if entrypoint is None:
         msg = f"No entrypoint found for '{name}'"
@@ -235,10 +245,10 @@ def get_input_object_type_for_root_operation(name: str, root_type: GraphQLObject
 
 def get_root_operation_typename(root_type: GraphQLObjectType, field_node: FieldNode) -> str:
     if root_type.name == "Mutation":
-        input_object_type = get_input_object_type_for_root_operation(field_node.name.value, root_type)
+        input_object_type = get_input_object_type(root_type, field_node)
         return input_object_type.name
 
-    object_type = get_object_type_for_root_operation(field_node.name.value, root_type)
+    object_type = get_object_type(root_type, field_node)
     return object_type.name
 
 
@@ -260,6 +270,12 @@ def get_factory_arguments(
     model: type[models.Model],
     lookup: str = "",
 ) -> dict[str, Any]:
+    if isinstance(selection_node, InlineFragmentNode):
+        factory_args: dict[str, Any] = {}
+        for selection in selection_node.selection_set.selections:
+            factory_args |= get_factory_arguments(selection, model=model, lookup=lookup)
+        return factory_args
+
     if not isinstance(selection_node, FieldNode):
         msg = f"Unhandled selection node type: ({type(selection_node)}) {selection_node}"
         raise NotImplementedError(msg)
@@ -336,6 +352,12 @@ def determine_value_for_field(field: ModelField) -> Any:  # noqa: PLR0911, PLR09
         return field.default
 
     match field:
+        case models.EmailField():
+            return "admin@example.com"
+
+        case models.URLField():
+            return "https://www.example.com"
+
         case models.CharField():
             if field.choices:
                 return field.choices[0][0]
@@ -366,12 +388,6 @@ def determine_value_for_field(field: ModelField) -> Any:  # noqa: PLR0911, PLR09
 
         case models.DurationField():
             return datetime.timedelta()
-
-        case models.EmailField():
-            return "admin@example.com"
-
-        case models.URLField():
-            return "https://www.example.com"
 
         case models.UUIDField():
             return uuid.uuid4()
