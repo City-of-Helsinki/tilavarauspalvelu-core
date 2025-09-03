@@ -201,8 +201,18 @@
     "promise/valid-params": "error",
     "react/button-has-type": "error",
     "react/exhaustive-deps": "error",
+    "react/forbid-elements": "error",
     "react/forward-ref-uses-ref": "error",
     "react/jsx-boolean-value": "error",
+    "react/jsx-filename-extension": [
+      "error",
+      {
+        "extensions": [
+          ".jsx",
+          ".tsx"
+        ]
+      }
+    ],
     "react/jsx-key": "error",
     "react/jsx-no-duplicate-props": "error",
     "react/jsx-no-script-url": "error",
@@ -219,6 +229,7 @@
     "react/no-is-mounted": "error",
     "react/no-render-return-value": "error",
     "react/no-string-refs": "error",
+    "react/no-unknown-property": "error",
     "react/react-in-jsx-scope": "off",
     "react/rules-of-hooks": "error",
     "react/void-dom-elements-no-children": "error",
