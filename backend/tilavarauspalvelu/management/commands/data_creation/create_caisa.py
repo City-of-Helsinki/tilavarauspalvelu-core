@@ -344,7 +344,7 @@ def _create_caisa() -> None:
         main_ledger_account="340025",
         vat_code="44",
         internal_order="2941505900",
-        profit_center="2941505",
+        profit_center="",
         operation_area="290010",
     )
     payment_accounting_library_pih = PaymentAccountingFactory.create(
@@ -353,7 +353,7 @@ def _create_caisa() -> None:
         main_ledger_account="340025",
         vat_code="44",
         internal_order="2941505900",
-        profit_center="2941505",
+        profit_center="",
     )
 
     ###########################################################################################################
