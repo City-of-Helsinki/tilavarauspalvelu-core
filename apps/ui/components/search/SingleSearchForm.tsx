@@ -89,6 +89,10 @@ type SingleSearchFormProps = {
   isLoading: boolean;
 };
 
+function sortByLabel(a: { label: string }, b: { label: string }): number {
+  return a.label.localeCompare(b.label);
+}
+
 // TODO rewrite this without the form state (use query params directly, but don't refresh the page)
 export function SingleSearchForm({
   options: { reservationUnitTypes, purposes, units, equipments },
@@ -196,7 +200,7 @@ export function SingleSearchForm({
           name="reservationUnitTypes"
           label={t("searchForm:labels.reservationUnitTypes")}
           control={control}
-          options={reservationUnitTypes}
+          options={reservationUnitTypes.toSorted(sortByLabel)}
           multiselect
           clearable
           enableSearch
@@ -250,7 +254,7 @@ export function SingleSearchForm({
           name="units"
           label={t("searchForm:labels.units")}
           control={control}
-          options={units.toSorted((a, b) => (a.label > b.label ? 1 : -1))}
+          options={units.toSorted(sortByLabel)}
           multiselect
           clearable
           enableSearch
@@ -265,7 +269,7 @@ export function SingleSearchForm({
         <ControlledSelect
           name="purposes"
           label={t("searchForm:labels.purposes")}
-          options={purposes}
+          options={purposes.toSorted(sortByLabel)}
           control={control}
           multiselect
           clearable
@@ -275,7 +279,7 @@ export function SingleSearchForm({
           name="equipments"
           label={t("searchForm:labels.equipments")}
           control={control}
-          options={equipments}
+          options={equipments.toSorted(sortByLabel)}
           multiselect
           clearable
           enableSearch
