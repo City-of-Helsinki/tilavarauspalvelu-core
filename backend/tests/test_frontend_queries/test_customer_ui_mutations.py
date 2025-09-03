@@ -168,7 +168,12 @@ def test_frontend_queries__customer_ui__ConfirmReservation(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
+    del factory_args["payment_order__id"]
+    del factory_args["payment_order__checkout_url"]
+
     reservation = ReservationFactory.create_for_confirmation(**factory_args)
+
+    assert not hasattr(reservation, "payment_order")
 
     variables = deepcopy(query_info.variables)
     variables["input"] = {

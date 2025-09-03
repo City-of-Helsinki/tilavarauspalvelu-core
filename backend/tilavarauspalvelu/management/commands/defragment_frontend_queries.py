@@ -13,6 +13,7 @@ from graphql import (
     FieldNode,
     FragmentDefinitionNode,
     FragmentSpreadNode,
+    InlineFragmentNode,
     NameNode,
     Node,
     OperationDefinitionNode,
@@ -133,7 +134,7 @@ def separate_fragments_and_nodes(node: DocumentNode) -> FragmentsAndOperations:
     return data
 
 
-def replace_fragments(node: Node, *, fragments: dict[str, FragmentDefinitionNode], parent: Node | None = None) -> None:
+def replace_fragments(node: Node, *, fragments: dict[str, FragmentDefinitionNode], parent: Node | None = None) -> None:  # noqa: PLR0912
     match node:
         case OperationDefinitionNode():
             node: OperationDefinitionNode
@@ -168,6 +169,11 @@ def replace_fragments(node: Node, *, fragments: dict[str, FragmentDefinitionNode
             selections = (selection for selection in selection_set.selections if selection != node)
             selection_set.selections = tuple(chain(selections, fragment.selection_set.selections))
 
+        case InlineFragmentNode():
+            node: InlineFragmentNode
+            for selection in node.selection_set.selections:
+                replace_fragments(selection, fragments=fragments, parent=node)
+
         case _:
             msg = f"Unhandled node type: ({type(node)}) {node}"
             raise NotImplementedError(msg)
@@ -191,6 +197,11 @@ def combine_duplicate_fields(node: Node) -> None:
                 for selection in node.selection_set.selections:
                     combine_duplicate_fields(selection)
 
+        case InlineFragmentNode():
+            node: InlineFragmentNode
+            for selection in node.selection_set.selections:
+                deduplicate_fields(selection)
+
         case _:
             msg = f"Unhandled node type: ({type(node)}) {node}"
             raise NotImplementedError(msg)
@@ -203,13 +214,18 @@ def deduplicate_fields(node: OperationDefinitionNode | FieldNode) -> None:
     field_map: dict[str, FieldNode] = {}
 
     for field in node.selection_set.selections:
-        if not isinstance(field, FieldNode):
-            msg = f"Unhandled selection node type: ({type(field)}) {field}"
-            raise NotImplementedError(msg)
+        match field:
+            case FieldNode():
+                name: str = field.name.value
+                if field.alias is not None:
+                    name = field.alias.value
 
-        name = field.name.value
-        if field.alias is not None:
-            name = field.alias.value
+            case InlineFragmentNode():
+                name = "__InlineFragmentOn" + field.type_condition.name.value
+
+            case _:
+                msg = f"Unhandled selection node type: ({type(field)}) {field}"
+                raise NotImplementedError(msg)
 
         if name not in field_map:
             field_map[name] = field

@@ -24,6 +24,7 @@ if TYPE_CHECKING:
         Application,
         ApplicationSection,
         BannerNotification,
+        RejectedOccurrence,
         Reservation,
         ReservationUnit,
         Resource,
@@ -406,33 +407,11 @@ def test_frontend_queries__admin_ui__BannerNotificationPage(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__admin_ui__BannerNotificationList(graphql):
-    admin_factories = get_admin_query_info()
-    factories = admin_factories["BannerNotificationList"]
-
-    assert len(factories) == 1
-    query_info = factories[0]
-
-    factory_args = deepcopy(query_info.factory_args)
-    query_info.factory.create(**factory_args)
-
-    variables = deepcopy(query_info.variables)
-    assert_no_undefined_variables(variables)
-
-    query = query_info.query
-    graphql.login_with_superuser()
-
-    response = graphql(query, variables=variables)
-
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 1
-
-
 def test_frontend_queries__admin_ui__BannerNotificationsList(graphql):
     admin_factories = get_admin_query_info()
-    factories = admin_factories["BannerNotificationsList"]
+    factories = admin_factories["ShowNotificationsList"]
 
-    assert len(factories) == 1
+    assert len(factories) == 2
     query_info = factories[0]
 
     now = local_datetime()
@@ -445,6 +424,7 @@ def test_frontend_queries__admin_ui__BannerNotificationsList(graphql):
     factory_args["draft"] = False
     factory_args["active_from"] = now - datetime.timedelta(days=1)
     factory_args["active_until"] = now + datetime.timedelta(days=1)
+    factory_args["target"] = BannerNotificationTarget.ALL
     obj: BannerNotification = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -460,11 +440,11 @@ def test_frontend_queries__admin_ui__BannerNotificationsList(graphql):
     assert len(response.edges) == 1
 
 
-def test_frontend_queries__admin_ui__BannerNotificationsListAll(graphql):
+def test_frontend_queries__admin_ui__ShowNotificationsList(graphql):
     admin_factories = get_admin_query_info()
-    factories = admin_factories["BannerNotificationsListAll"]
+    factories = admin_factories["ShowNotificationsList"]
 
-    assert len(factories) == 1
+    assert len(factories) == 2
     query_info = factories[0]
 
     now = local_datetime()
@@ -478,9 +458,10 @@ def test_frontend_queries__admin_ui__BannerNotificationsListAll(graphql):
     factory_args["active_from"] = now - datetime.timedelta(days=1)
     factory_args["active_until"] = now + datetime.timedelta(days=1)
     factory_args["target"] = BannerNotificationTarget.ALL
-    query_info.factory.create(**factory_args)
+    obj: BannerNotification = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
+    variables["target"] = obj.target
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -532,6 +513,27 @@ def test_frontend_queries__admin_ui__CurrentUser(graphql):
     assert response.has_errors is False, response.errors
 
 
+def test_frontend_queries__admin_ui__FilterOptions(graphql):
+    admin_factories = get_admin_query_info()
+    factories = admin_factories["FilterOptions"]
+
+    assert len(factories) == 6
+
+    for query_info in factories:
+        factory_args = deepcopy(query_info.factory_args)
+        query_info.factory.create(**factory_args)
+
+    variables = factories[0].variables
+    assert_no_undefined_variables(variables)
+
+    query = factories[0].query
+    graphql.login_with_superuser()
+
+    response = graphql(query, variables=variables)
+
+    assert response.has_errors is False, response.errors
+
+
 def test_frontend_queries__admin_ui__HandlingData(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["HandlingData"]
@@ -563,31 +565,6 @@ def test_frontend_queries__admin_ui__HandlingData(graphql):
 
     assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
-
-
-def test_frontend_queries__admin_ui__Options(graphql):
-    admin_factories = get_admin_query_info()
-    factories = admin_factories["Options"]
-
-    assert len(factories) == 2
-    query_info_1 = factories[0]
-    query_info_2 = factories[1]
-
-    factory_args_1 = deepcopy(query_info_1.factory_args)
-    query_info_1.factory.create(**factory_args_1)
-
-    factory_args_2 = deepcopy(query_info_2.factory_args)
-    query_info_2.factory.create(**factory_args_2)
-
-    variables = query_info_1.variables
-    assert_no_undefined_variables(variables)
-
-    query = query_info_1.query
-    graphql.login_with_superuser()
-
-    response = graphql(query, variables=variables)
-
-    assert response.has_errors is False, response.errors
 
 
 def test_frontend_queries__admin_ui__ReservationSeries(graphql):
@@ -642,9 +619,13 @@ def test_frontend_queries__admin_ui__RejectedOccurrences(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
-    query_info.factory.create(**factory_args)
+    obj: RejectedOccurrence = query_info.factory.create(**factory_args)
+
+    slot = obj.reservation_series.allocated_time_slot
+    application_round = slot.reservation_unit_option.application_section.application.application_round
 
     variables = deepcopy(query_info.variables)
+    variables["applicationRound"] = application_round.pk
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -763,7 +744,7 @@ def test_frontend_queries__admin_ui__ReservationDenyReasons(graphql):
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert len(response.edges) == 1
+    assert len(response.results) == 1
 
 
 def test_frontend_queries__admin_ui__ReservationPermissions(graphql):
@@ -828,6 +809,8 @@ def test_frontend_queries__admin_ui__ReservationUnitCalendar(graphql):
     variables = query_info_1.variables
     variables["id"] = to_global_id(query_info_1.typename, obj.id)
     variables["pk"] = obj.pk
+    variables["beginDate"] = datetime.date.min.isoformat()
+    variables["endDate"] = datetime.date.max.isoformat()
     assert_no_undefined_variables(variables)
 
     query = query_info_1.query
@@ -871,31 +854,10 @@ def test_frontend_queries__admin_ui__ReservationUnitEditorParameters(graphql):
         query_info.factory.create(**factory_args)
 
     variables = factories[0].variables
+    variables["equipmentsOrderBy"] = "nameAsc"
     assert_no_undefined_variables(variables)
 
     query = factories[0].query
-    graphql.login_with_superuser()
-
-    response = graphql(query, variables=variables)
-
-    assert response.has_errors is False, response.errors
-
-
-def test_frontend_queries__admin_ui__ReservationUnitTypesFilter(graphql):
-    admin_factories = get_admin_query_info()
-    factories = admin_factories["ReservationUnitTypesFilter"]
-
-    assert len(factories) == 1
-    query_info = factories[0]
-
-    factory_args = deepcopy(query_info.factory_args)
-    obj = query_info.factory.create(**factory_args)
-
-    variables = deepcopy(query_info.variables)
-    variables["id"] = to_global_id(query_info.typename, obj.id)
-    assert_no_undefined_variables(variables)
-
-    query = query_info.query
     graphql.login_with_superuser()
 
     response = graphql(query, variables=variables)
@@ -921,30 +883,11 @@ def test_frontend_queries__admin_ui__ReservationUnitsByUnit(graphql):
     variables = query_info_1.variables
     variables["id"] = to_global_id(query_info_1.typename, obj.id)
     variables["pk"] = obj.pk
+    variables["beginDate"] = datetime.date.min.isoformat()
+    variables["endDate"] = datetime.date.max.isoformat()
     assert_no_undefined_variables(variables)
 
     query = query_info_1.query
-    graphql.login_with_superuser()
-
-    response = graphql(query, variables=variables)
-
-    assert response.has_errors is False, response.errors
-
-
-def test_frontend_queries__admin_ui__ReservationUnitsFilterParams(graphql):
-    admin_factories = get_admin_query_info()
-    factories = admin_factories["ReservationUnitsFilterParams"]
-
-    assert len(factories) == 1
-    query_info = factories[0]
-
-    factory_args = deepcopy(query_info.factory_args)
-    query_info.factory.create(**factory_args)
-
-    variables = deepcopy(query_info.variables)
-    assert_no_undefined_variables(variables)
-
-    query = query_info.query
     graphql.login_with_superuser()
 
     response = graphql(query, variables=variables)
@@ -991,6 +934,8 @@ def test_frontend_queries__admin_ui__ReservationsByReservationUnit(graphql):
     variables = query_info_1.variables
     variables["id"] = to_global_id(query_info_1.typename, obj.id)
     variables["pk"] = obj.pk
+    variables["beginDate"] = datetime.date.min.isoformat()
+    variables["endDate"] = datetime.date.max.isoformat()
     assert_no_undefined_variables(variables)
 
     query = query_info_1.query
@@ -1036,29 +981,6 @@ def test_frontend_queries__admin_ui__SearchReservationUnits(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
-    query_info.factory.create(**factory_args)
-
-    variables = deepcopy(query_info.variables)
-    assert_no_undefined_variables(variables)
-
-    query = query_info.query
-    graphql.login_with_superuser()
-
-    response = graphql(query, variables=variables)
-
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 1
-
-
-def test_frontend_queries__admin_ui__OwnUnitGroups(graphql):
-    admin_factories = get_admin_query_info()
-    factories = admin_factories["OwnUnitGroups"]
-
-    assert len(factories) == 1
-    query_info = factories[0]
-
-    factory_args = deepcopy(query_info.factory_args)
-    factory_args["units__name"] = "Create a unit for the group so it's not hidden in the GQL endpoint"
     query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -1182,9 +1104,9 @@ def test_frontend_queries__admin_ui__ReservationUnitCreateUnit(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__admin_ui__UnitSpaces(graphql):
+def test_frontend_queries__admin_ui__UnitSpacesHierarchy(graphql):
     admin_factories = get_admin_query_info()
-    factories = admin_factories["UnitSpaces"]
+    factories = admin_factories["UnitSpacesHierarchy"]
 
     assert len(factories) == 1
     query_info = factories[0]
@@ -1270,27 +1192,6 @@ def test_frontend_queries__admin_ui__UnitList(graphql):
     assert len(response.edges) == 1
 
 
-def test_frontend_queries__admin_ui__UnitsFilter(graphql):
-    admin_factories = get_admin_query_info()
-    factories = admin_factories["UnitsFilter"]
-
-    assert len(factories) == 1
-    query_info = factories[0]
-
-    factory_args = deepcopy(query_info.factory_args)
-    query_info.factory.create(**factory_args)
-
-    variables = deepcopy(query_info.variables)
-    assert_no_undefined_variables(variables)
-
-    query = query_info.query
-    graphql.login_with_superuser()
-
-    response = graphql(query, variables=variables)
-
-    assert response.has_errors is False, response.errors
-
-
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
 @patch_method(HelsinkiProfileClient.request)
 def test_frontend_queries__admin_ui__ReservationProfileDataContactInfo(graphql):
@@ -1346,19 +1247,4 @@ def test_frontend_queries__admin_ui__ReservationProfileDataSSN(graphql):
 
     response = graphql(query, variables=variables)
 
-    assert response.has_errors is False, response.errors
-
-
-def test_frontend_queries__admin_ui__ReservationCancelReasons(graphql):
-    admin_factories = get_admin_query_info()
-    factories = admin_factories["ReservationCancelReasons"]
-
-    assert len(factories) == 1
-    query_info = factories[0]
-    assert query_info.factory is None
-
-    query = query_info.query
-    graphql.login_with_superuser()
-
-    response = graphql(query)
     assert response.has_errors is False, response.errors
