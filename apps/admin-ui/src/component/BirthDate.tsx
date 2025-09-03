@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 import { useReservationDateOfBirthQuery, useApplicationDateOfBirthQuery } from "@gql/gql-types";
 import { formatDate } from "@/common/util";
 import { Flex } from "common/styled";
-import { createNodeId } from "common/src/helpers";
+import { createNodeId, getNode } from "common/src/helpers";
 
 const Button = styled.button`
   margin: 0;
@@ -65,15 +65,8 @@ export function BirthDate(props: Props): JSX.Element {
   const isLoading = "reservationPk" in props ? isReservationLoading : isApplicationLoading;
   const error = "reservationPk" in props ? errorReservation : errorApplication;
 
-  function getUser(d: typeof data) {
-    if (d != null && "node" in d && "user" in d.node) {
-      return d.node.user;
-    }
-    return null;
-  }
-
-  const user = getUser(data);
-  const dateOfBirth = user?.dateOfBirth;
+  const node = getNode(data);
+  const dateOfBirth = node?.user?.dateOfBirth;
 
   const hideLabel = t("reservation:hideBirthDate");
   const showLabel = t("reservation:showBirthDate");

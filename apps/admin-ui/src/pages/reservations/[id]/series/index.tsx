@@ -16,7 +16,14 @@ import {
   UserPermissionChoice,
   useSeriesPageQuery,
 } from "@gql/gql-types";
-import { calculateMedian, createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import {
+  calculateMedian,
+  createNodeId,
+  filterNonNullable,
+  getNode,
+  ignoreMaybeArray,
+  toNumber,
+} from "common/src/helpers";
 import { format, isSameDay } from "date-fns";
 import { useTranslation } from "next-i18next";
 import { Element } from "@/styled";
@@ -94,7 +101,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
     query: ReservationPermissionsDocument,
     variables: { id: createNodeId("ReservationNode", pk) },
   });
-  const node = data.node != null && "id" in data.node ? data.node : null;
+  const node = getNode(data);
   const unitPk = node?.reservationUnit?.unit?.pk;
   if (unitPk == null) {
     return NOT_FOUND_SSR_VALUE;
@@ -115,7 +122,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
   const { data, refetch, error, loading } = useSeriesPageQuery({
     variables: { id: createNodeId("ReservationNode", pk) },
   });
-  const reservation = data?.node != null && "pk" in data.node ? data.node : null;
+  const reservation = getNode(data);
   const reservationSeries = reservation?.reservationSeries ?? null;
 
   const [mutate] = useRescheduleReservationSeriesMutation();
@@ -235,7 +242,8 @@ function SeriesPageInner({ pk }: { pk: number }) {
         // NOTE disable cache is mandatory, all the old data is invalid here
         fetchPolicy: "no-cache",
       });
-      const d = res.data?.node != null && "pk" in res.data.node ? res.data.node : null;
+
+      const d = getNode(res.data);
       const createdReservations = filterNonNullable(d?.reservations);
       // find the first reservation that is in the future and redirect to it
       const first = createdReservations.find((x) => new Date(x.beginsAt) >= new Date()) ?? createdReservations[0];

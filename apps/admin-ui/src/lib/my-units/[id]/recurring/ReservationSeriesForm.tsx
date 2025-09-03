@@ -22,7 +22,7 @@ import { useCreateReservationSeries, useFilteredReservationList, useMultipleRese
 import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
-import { createNodeId, toNumber } from "common/src/helpers";
+import { createNodeId, getNode, toNumber } from "common/src/helpers";
 import { Element } from "@/styled";
 import { AutoGrid, Flex, Strong } from "common/styled";
 import { errorToast } from "common/src/components/toast";
@@ -69,7 +69,7 @@ function ReservationSeriesFormWrapper({ reservationUnitOptions, unitPk }: Series
     return <Notification type="alert">No reservation units found</Notification>;
   }
 
-  const reservationUnit = queryData?.node != null && "id" in queryData.node ? queryData.node : null;
+  const reservationUnit = getNode(queryData);
   // NOTE requires a second auto grid so that the select scales similar to others
   return (
     <>

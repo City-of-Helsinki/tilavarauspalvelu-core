@@ -2,7 +2,7 @@ import React from "react";
 import { type TFunction, useTranslation } from "next-i18next";
 import { Select } from "hds-react";
 import { UnitSpacesHierarchyFieldsFragment, useUnitSpacesHierarchyQuery } from "@gql/gql-types";
-import { convertOptionToHDS, createNodeId, filterNonNullable, toNumber } from "common/src/helpers";
+import { convertOptionToHDS, createNodeId, filterNonNullable, getNode, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
 function spacesAsHierarchy(unit: UnitSpacesHierarchyFieldsFragment | null, paddingChar: string) {
@@ -67,7 +67,7 @@ export function ParentSelector({
 
   const { t } = useTranslation();
 
-  const unit = data?.node != null && "spaces" in data.node ? data.node : null;
+  const unit = getNode(data);
   const unitSpaces = spacesAsHierarchy(unit, "\u2007");
 
   // NOTE there used to be children filtering, but it filtered out all possible options

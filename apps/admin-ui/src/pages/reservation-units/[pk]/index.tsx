@@ -20,7 +20,7 @@ import {
   useUpdateReservationUnitMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { Flex } from "common/styled";
 
 import { errorToast, successToast } from "common/src/components/toast";
@@ -186,7 +186,7 @@ function ReservationUnitEditor({
     fetchPolicy: "network-only",
     skip: unitPk <= 0 || reservationUnit != null,
   });
-  const node = unitData?.node != null && "pk" in unitData.node ? unitData.node : null;
+  const node = getNode(unitData);
   const unit = reservationUnit?.unit ?? node ?? null;
 
   // ----------------------------- Constants ---------------------------------
@@ -348,7 +348,7 @@ export default function EditorPage(props: PropsNarrowed): JSX.Element {
     skip: reservationUnitPk <= 0,
   });
 
-  const reservationUnit = data?.node && "pk" in data.node ? data.node : null;
+  const reservationUnit = getNode(data);
 
   const form = useForm<ReservationUnitEditFormValues>({
     mode: "onBlur",
@@ -363,7 +363,7 @@ export default function EditorPage(props: PropsNarrowed): JSX.Element {
   });
   const { reset } = form;
   useEffect(() => {
-    const node = data?.node && "pk" in data.node ? data.node : null;
+    const node = getNode(data);
     if (node != null) {
       reset({
         ...convertReservationUnit(node),

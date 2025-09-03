@@ -3,7 +3,7 @@ import React, { createRef } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { UserPermissionChoice, useSpacesResourcesQuery } from "@gql/gql-types";
-import { createNodeId, toNumber, ignoreMaybeArray } from "common/src/helpers";
+import { createNodeId, toNumber, ignoreMaybeArray, getNode } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
 import { Error404 } from "@/component/Error404";
 import { fontBold, H2, CenterSpinner, Flex } from "common/styled";
@@ -50,7 +50,7 @@ function SpacesResources({ unitPk }: { unitPk: number }): JSX.Element {
     return <CenterSpinner />;
   }
 
-  const unit = data?.node != null && "pk" in data.node ? data.node : null;
+  const unit = getNode(data);
   if (unit == null) {
     return <Error404 />;
   }
