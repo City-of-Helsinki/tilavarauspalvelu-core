@@ -1,5 +1,13 @@
-import { convertTime, filterNonNullable, timeToMinutes, toNumber } from "common/src/helpers";
-import { fromApiDate, fromUIDate, toApiDate, toUIDate } from "common/src/common/util";
+import { convertTime, filterNonNullable, toNumber } from "common/src/helpers";
+import {
+  fromApiDate,
+  fromUIDate,
+  fromUIDateTime,
+  timeToMinutes,
+  toApiDate,
+  formatDate,
+  formatTime,
+} from "common/src/date-utils";
 import {
   AccessType,
   AuthenticationType,
@@ -14,10 +22,9 @@ import {
   type ReservationUnitAccessTypeSerializerInput,
   Weekday,
 } from "@gql/gql-types";
-import { addDays, endOfDay, format } from "date-fns";
+import { addDays, endOfDay } from "date-fns";
 import { z } from "zod";
 import { checkLengthWithoutHtml, checkTimeStringFormat } from "common/src/schemas/schemaCommon";
-import { fromUIDateTime } from "@/helpers";
 import { intervalToNumber } from "@/schemas/utils";
 import { WEEKDAYS_SORTED } from "common/src/const";
 import { type TaxOption } from "./PricingSection";
@@ -681,9 +688,9 @@ function convertBegins(begins?: string) {
   const d = begins != null && begins !== "" ? fromApiDate(begins) : undefined;
   const today = new Date();
   if (d != null) {
-    return toUIDate(d);
+    return formatDate(d);
   }
-  return toUIDate(today);
+  return formatDate(today);
 }
 
 type PricingNode = NonNullable<Node["pricings"]>[0];
@@ -726,7 +733,7 @@ function convertPricingList(pricings: PricingNode[]): PricingFormValues[] {
   while (prices.length < 2 || !prices.some((p) => p?.isFuture)) {
     // if we need to add first price, it's always current
     const isFuture = prices.length > 0;
-    const begins = prices.length === 0 ? toUIDate(new Date()) : toUIDate(addDays(new Date(), 1));
+    const begins = prices.length === 0 ? formatDate(new Date()) : formatDate(addDays(new Date(), 1));
 
     prices.push({
       pk: rollingIndex--,
@@ -807,14 +814,14 @@ export function convertReservationUnit(data?: Node): ReservationUnitEditFormValu
     minReservationDuration: data?.minReservationDuration ?? null,
     pk: data?.pk ?? 0,
     // Date split for ui components
-    publishBeginsDate: data?.publishBeginsAt ? format(new Date(data.publishBeginsAt), "d.M.yyyy") : "",
-    publishBeginsTime: data?.publishBeginsAt ? format(new Date(data.publishBeginsAt), "H:mm") : "",
-    publishEndsDate: data?.publishEndsAt ? format(new Date(data.publishEndsAt), "d.M.yyyy") : "",
-    publishEndsTime: data?.publishEndsAt ? format(new Date(data.publishEndsAt), "H:mm") : "",
-    reservationBeginsDate: data?.reservationBeginsAt ? format(new Date(data.reservationBeginsAt), "d.M.yyyy") : "",
-    reservationBeginsTime: data?.reservationBeginsAt ? format(new Date(data.reservationBeginsAt), "H:mm") : "",
-    reservationEndsDate: data?.reservationEndsAt ? format(new Date(data.reservationEndsAt), "d.M.yyyy") : "",
-    reservationEndsTime: data?.reservationEndsAt ? format(new Date(data.reservationEndsAt), "H:mm") : "",
+    publishBeginsDate: data?.publishBeginsAt ? formatDate(new Date(data.publishBeginsAt)) : "",
+    publishBeginsTime: data?.publishBeginsAt ? formatTime(new Date(data.publishBeginsAt)) : "",
+    publishEndsDate: data?.publishEndsAt ? formatDate(new Date(data.publishEndsAt)) : "",
+    publishEndsTime: data?.publishEndsAt ? formatTime(new Date(data.publishEndsAt)) : "",
+    reservationBeginsDate: data?.reservationBeginsAt ? formatDate(new Date(data.reservationBeginsAt)) : "",
+    reservationBeginsTime: data?.reservationBeginsAt ? formatTime(new Date(data.reservationBeginsAt)) : "",
+    reservationEndsDate: data?.reservationEndsAt ? formatDate(new Date(data.reservationEndsAt)) : "",
+    reservationEndsTime: data?.reservationEndsAt ? formatTime(new Date(data.reservationEndsAt)) : "",
     requireAdultReservee: data?.requireAdultReservee ?? false,
     requireReservationHandling: data?.requireReservationHandling ?? false,
     reservationStartInterval: data?.reservationStartInterval ?? ReservationStartInterval.Interval_15Mins,

@@ -1,4 +1,5 @@
-import { differenceInMinutes, format } from "date-fns";
+import type { LocalizationLanguages } from "common/src/urlBuilder";
+import { differenceInMinutes } from "date-fns";
 import type { TFunction } from "i18next";
 import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "common";
 import {
@@ -14,9 +15,17 @@ import {
   ReservationUnitPricingFieldsFragment,
   EventStyleReservationFieldsFragment,
 } from "@gql/gql-types";
-import { formatDuration, fromApiDate } from "common/src/common/util";
-import { formatDate, formatDateTimeRange, getReserveeName } from "@/common/util";
-import { fromAPIDateTime, getReserveeTypeTranslationKey } from "@/helpers";
+import {
+  formatDateRange,
+  formatDateTimeRange,
+  formatDuration,
+  formatTime,
+  fromApiDate,
+  fromApiDateTime,
+  toValidDateObject,
+} from "common/src/date-utils";
+import { getReserveeName } from "@/common/util";
+import { getReserveeTypeTranslationKey } from "@/helpers";
 import { filterNonNullable, sort, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 import { convertWeekday } from "common/src/conversion";
@@ -157,21 +166,29 @@ export function getName(
 // TODO rename: it's the time + duration
 // recurring format: {weekday(s)} {time}, {duration} | {startDate}-{endDate} | {unit}
 // single format   : {weekday} {date} {time}, {duration} | {unit}
-export function createTagString(reservation: CreateTagStringFragment, t: TFunction): string {
+export function createTagString(
+  reservation: CreateTagStringFragment,
+  t: TFunction,
+  locale: LocalizationLanguages
+): string {
   try {
     if (reservation.reservationSeries != null) {
       return createRecurringTagString(reservation, t);
     }
-    return createSingleTagString(reservation, t);
+    return createSingleTagString(reservation, t, locale);
   } catch (_) {
     return "";
   }
 }
 
-function createSingleTagString(reservation: CreateTagStringFragment, t: TFunction): string {
+function createSingleTagString(
+  reservation: CreateTagStringFragment,
+  t: TFunction,
+  locale: LocalizationLanguages
+): string {
   const begin = new Date(reservation.beginsAt);
   const end = new Date(reservation.endsAt);
-  const singleDateTimeTag = formatDateTimeRange(t, begin, end);
+  const singleDateTimeTag = formatDateTimeRange(begin, end, { t, locale });
 
   const unitTag = reservationUnitName(reservation.reservationUnit);
 
@@ -194,11 +211,11 @@ function createRecurringTagString(reservation: CreateTagStringFragment, t: TFunc
     return "";
   }
 
-  const recurringTag = `${formatDate(beginDate)}–${formatDate(endDate)}`;
+  const recurringTag = `${formatDateRange(toValidDateObject(beginDate), toValidDateObject(endDate), { includeWeekday: false })}`;
   const unitTag = reservationUnitName(reservation.reservationUnit);
 
-  const begin = fromAPIDateTime(beginDate, beginTime);
-  const end = fromAPIDateTime(endDate, endTime);
+  const begin = fromApiDateTime(beginDate, beginTime);
+  const end = fromApiDateTime(endDate, endTime);
   if (begin == null || end == null) {
     return "";
   }
@@ -210,7 +227,7 @@ function createRecurringTagString(reservation: CreateTagStringFragment, t: TFunc
   const durMinutes = differenceInMinutes(new Date(reservation.endsAt), new Date(reservation.beginsAt));
   const durationTag = formatDuration(t, { minutes: durMinutes });
 
-  const recurringDateTag = `${weekDayTag} ${format(begin, "HH:mm")}–${format(end, "HH:mm")}`;
+  const recurringDateTag = `${weekDayTag} ${formatTime(begin)}–${formatTime(end)}`;
 
   return `${recurringDateTag}, ${durationTag} ${recurringTag.length > 0 ? " | " : ""} ${recurringTag} | ${unitTag}`;
 }

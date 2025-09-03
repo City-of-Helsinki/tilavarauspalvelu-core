@@ -2,7 +2,8 @@ import React, { useMemo } from "react";
 import { Button } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { chunkArray, fromUIDate, toUIDate } from "common/src/common/util";
+import { chunkArray } from "common/src/common/util";
+import { fromUIDate, formatDate } from "common/src/date-utils";
 import { Flex, fontMedium, H4, NoWrap } from "common/styled";
 import { breakpoints } from "common/src/const";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
@@ -252,7 +253,7 @@ function TimeChunkSection({
             type="button"
             onClick={(e) => {
               e.preventDefault();
-              setValue("date", toUIDate(nextAvailableTime), {
+              setValue("date", formatDate(nextAvailableTime), {
                 shouldDirty: true,
               });
             }}

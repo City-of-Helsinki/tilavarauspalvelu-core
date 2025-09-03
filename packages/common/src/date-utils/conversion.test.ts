@@ -183,7 +183,7 @@ describe("conversion", () => {
 
     it("handles single digit hours", () => {
       const result = timeForInput("9:30");
-      expect(result).toMatch(/@ \d{2}:\d{2}/); // Should pad to 09:30
+      expect(result).toMatch(/\d{2}:\d{2}/); // Should pad to 09:30
     });
 
     it("handles ISO string", () => {
@@ -193,7 +193,7 @@ describe("conversion", () => {
 
     it("falls back to current time on invalid input", () => {
       const result = timeForInput("invalid");
-      expect(result).toMatch(/@ \d{2}:\d{2}/); // Should still be time format
+      expect(result).toMatch(/\d{2}:\d{2}/); // Should still be time format
     });
   });
 

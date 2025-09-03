@@ -1,5 +1,5 @@
 import { startOfDay } from "date-fns";
-import { filterNonNullable, type ReadonlyDeep, timeToMinutes } from "common/src/helpers";
+import { filterNonNullable, type ReadonlyDeep } from "common/src/helpers";
 import {
   type ApplicantFieldsFragment,
   type ApplicationFormFragment,
@@ -14,8 +14,7 @@ import {
   Weekday,
 } from "@gql/gql-types";
 import { z } from "zod";
-import { toApiDate, toUIDate } from "common/src/common/util";
-import { fromUIDate } from "@/modules/util";
+import { fromUIDate, timeToMinutes, toApiDate, formatDate } from "common/src/date-utils";
 import { checkValidDateOnly, lessThanMaybeDate } from "common/src/schemas/schemaCommon";
 import { CELL_STATES } from "common/src/components/ApplicationTimeSelector";
 
@@ -223,7 +222,7 @@ function convertDate(date: string | null | undefined): string | undefined {
   if (date == null) {
     return undefined;
   }
-  return toUIDate(new Date(date)) || undefined;
+  return formatDate(new Date(date)) || undefined;
 }
 
 const ApplicantTypeSchema = z.enum([ReserveeType.Individual, ReserveeType.Company, ReserveeType.Nonprofit]);

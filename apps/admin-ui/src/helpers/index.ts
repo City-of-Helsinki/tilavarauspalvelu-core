@@ -17,8 +17,6 @@ import { type TFunction } from "next-i18next";
 
 export { truncate } from "common/src/helpers";
 
-export * from "./date";
-
 export type CollisionInterval = {
   start: Date;
   end: Date;

@@ -5,13 +5,13 @@ import { useFieldArray, UseFormReturn } from "react-hook-form";
 import { AccessTypes, type ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 import { ControlledDateInput, ControlledSelect } from "common/src/components/form";
-import { fromUIDate } from "common/src/common/util";
+import { formatDate, fromUIDate, toValidDateObject } from "common/src/date-utils";
 import StatusLabel from "common/src/components/StatusLabel";
 import { AutoGrid, Flex, H6 } from "common/styled";
 import { KVWrapper, Label, Value } from "@/styled";
 import { Button, ButtonVariant, IconPlus, IconTrash } from "hds-react";
-import { formatDate, getTranslatedError } from "@/common/util";
 import { AccessType, ReservationUnitEditQuery } from "@gql/gql-types";
+import { getTranslatedError } from "@/common/util";
 import { NotificationInline } from "@/component/NotificationInline";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
@@ -47,7 +47,7 @@ function CurrentAccessType({ currentAccessType }: { currentAccessType?: Node["ac
         </KVWrapper>
         <KVWrapper>
           <Label>{t("accessType:validity.activeFrom")}:</Label>
-          <Value>{beginDate ? formatDate(beginDate) : "-"}</Value>
+          <Value>{beginDate ? formatDate(toValidDateObject(beginDate)) : "-"}</Value>
         </KVWrapper>
         <StatusLabel type={beginDate ? "success" : "error"}>
           {beginDate ? t(`accessType:status.active`) : t(`accessType:status.inactive`)}

@@ -23,11 +23,11 @@ import styled from "styled-components";
 import { useSession } from "@/hooks";
 import { trim } from "lodash-es";
 import { gql } from "@apollo/client";
-import { formatDate } from "@/common/util";
 import { getName as getCountryName, registerLocale as registerCountryLocale } from "i18n-iso-countries";
 import countriesJson from "i18n-iso-countries/langs/fi.json";
 import { getApiErrors } from "common/src/apolloUtils";
 import { formatErrorMessage } from "common/src/hooks/useDisplayError";
+import { formatDate, toValidDateObject } from "common/src/date-utils";
 
 registerCountryLocale(countriesJson);
 
@@ -149,7 +149,7 @@ export function ReservationReserveeDetailsSection({
 
         {isBirthDateVisible && (
           <DataWrapper label={t("reservation:birthDate")} isLoading={isDateOfBirthLoading}>
-            {formatDate(dateOfBirthData?.reservation?.user?.dateOfBirth) || "-"}
+            {formatDate(toValidDateObject(dateOfBirthData?.reservation?.user?.dateOfBirth)) || "-"}
           </DataWrapper>
         )}
 

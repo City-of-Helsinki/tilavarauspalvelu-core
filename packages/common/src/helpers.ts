@@ -7,8 +7,9 @@ import {
   type SuitableTimeFragment,
 } from "../gql/gql-types";
 import { type OptionInProps } from "hds-react";
-import { type DayT, pixel } from "./const";
+import { pixel } from "./const";
 import { type TFunction } from "i18next";
+import { minutesToHoursString, timeToMinutes } from "./date-utils";
 import { type LocalizationLanguages } from "./urlBuilder";
 import { convertWeekday } from "./conversion";
 
@@ -69,28 +70,6 @@ export function pick<T, K extends keyof T>(reservation: T, keys: ReadonlyArray<K
     },
     {} as Pick<T, K>
   );
-}
-
-export function toMondayFirstUnsafe(day: number): DayT {
-  if (day < 0 || day > 6) {
-    throw new Error(`Invalid day ${day}`);
-  }
-  return day === 0 ? 6 : ((day - 1) as DayT);
-}
-
-export function toMondayFirst(day: DayT): DayT {
-  return day === 0 ? 6 : ((day - 1) as DayT);
-}
-
-export function fromMondayFirstUnsafe(day: number): DayT {
-  if (day < 0 || day > 6) {
-    throw new Error(`Invalid day ${day}`);
-  }
-  return day === 6 ? 0 : ((day + 1) as DayT);
-}
-
-export function fromMondayFirst(day: DayT): DayT {
-  return day === 6 ? 0 : ((day + 1) as DayT);
 }
 
 export function getLocalizationLang(code?: string): LocalizationLanguages {
@@ -175,10 +154,7 @@ export function getMainImage(ru?: { images: Readonly<ImageFragment[]> }): ImageF
 /// NOTE Only check highestPrice because lowestPrice < highestPrice
 export function isPriceFree(pricing: Pick<PricingFieldsFragment, "highestPrice">): boolean {
   const price = toNumber(pricing.highestPrice);
-  if (price == null || price === 0) {
-    return true;
-  }
-  return false;
+  return price == null || price === 0;
 }
 
 function pickMaybeDay(
@@ -208,32 +184,6 @@ export function dayMax(days: Array<Date | undefined>): Date | undefined {
   }, undefined);
 }
 
-/// @description Convert time string "HH:MM" to minutes
-/// safe for invalid time strings but not for invalid time values
-/// removes trailing seconds if present
-/// @return 0 if time is invalid otherwise the time in minutes
-export function timeToMinutes(time: string): number {
-  const [hours, minutes] = time.split(":").map(Number);
-  if (hours != null && minutes != null && isFinite(hours) && isFinite(minutes)) {
-    return hours * 60 + minutes;
-  }
-  return 0;
-}
-
-export function formatMinutes(minutes: number, trailingMinutes = false): string {
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  const showMins = trailingMinutes || mins > 0;
-  if (showMins) {
-    return `${hours}:${mins < 10 ? `0${mins}` : mins}`;
-  }
-  return `${hours}`;
-}
-
-export function formatTimeRange(beginMins: number, endMins: number, trailingMinutes = false): string {
-  return `${formatMinutes(beginMins, trailingMinutes)}–${formatMinutes(endMins, trailingMinutes)}`;
-}
-
 export function formatApiTimeInterval({
   beginTime,
   endTime,
@@ -247,9 +197,9 @@ export function formatApiTimeInterval({
     return "";
   }
   // NOTE this uses extra cycles because of double conversions but it's safer than stripping from raw data
-  const btime = formatMinutes(timeToMinutes(beginTime), trailingMinutes);
+  const btime = minutesToHoursString(timeToMinutes(beginTime), trailingMinutes);
   const endTimeMins = timeToMinutes(endTime);
-  const etime = formatMinutes(endTimeMins === 0 ? 24 * 60 : endTimeMins, trailingMinutes);
+  const etime = minutesToHoursString(endTimeMins === 0 ? 24 * 60 : endTimeMins, trailingMinutes);
   return `${btime}–${etime}`;
 }
 
@@ -285,14 +235,6 @@ export function calculateMedian(numbers: number[]): number {
     return (a + b) / 2;
   }
   return sorted[middle] ?? 0;
-}
-
-export function constructUrl(basePath: string, page: string): string {
-  const startSlash = page.startsWith("/");
-  const endSlash = basePath.endsWith("/");
-  const hasSlash = startSlash || endSlash;
-  const separator = hasSlash ? "" : "/";
-  return `${basePath}${separator}${page}`;
 }
 
 export function ignoreMaybeArray<T>(value: T | T[]): T | null {

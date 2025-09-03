@@ -10,7 +10,7 @@ import { type SuitableTimeRangeFormValues } from "./form";
 import { Priority, Weekday } from "@/gql/gql-types";
 import { type Cell } from "common/src/components/ApplicationTimeSelector";
 import { type DayT, WEEKDAYS_SORTED } from "common/src/const";
-import { toApiTimeUnsafe } from "common/src/common/util";
+import { toApiTimeUnsafe } from "common/src/date-utils";
 import { transformWeekday } from "common/src/conversion";
 
 function createDayCells(
@@ -127,8 +127,8 @@ describe("createCells", () => {
     // one hour slots with holes
     {
       times: [7, 9, 11, 13, 15, 17].map((i) => ({
-        begin: toApiTimeUnsafe({ hours: i }),
-        end: toApiTimeUnsafe({ hours: i + 1 }),
+        begin: toApiTimeUnsafe(i, 0),
+        end: toApiTimeUnsafe(i + 1, 0),
       })),
       expectedOpenCount: 6,
     },
@@ -136,16 +136,16 @@ describe("createCells", () => {
     // API allows 0:00 - 24:00, but we remove the first 7 hours
     {
       times: Array.from({ length: 12 }, (_, i) => ({
-        begin: toApiTimeUnsafe({ hours: 2 * i }),
-        end: toApiTimeUnsafe({ hours: 2 * i + 1 }),
+        begin: toApiTimeUnsafe(2 * i, 0),
+        end: toApiTimeUnsafe(2 * i + 1, 0),
       })),
       expectedOpenCount: 8,
     },
     // every hour is set as individual span -> maximum open slots (7:00 - 24:00)
     {
       times: Array.from({ length: 24 }, (_, i) => ({
-        begin: toApiTimeUnsafe({ hours: i }),
-        end: toApiTimeUnsafe({ hours: i + 1 }),
+        begin: toApiTimeUnsafe(i, 0),
+        end: toApiTimeUnsafe(i + 1, 0),
       })),
       expectedOpenCount: 24 - 7,
     },

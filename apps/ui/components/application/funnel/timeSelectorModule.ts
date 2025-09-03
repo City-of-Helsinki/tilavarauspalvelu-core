@@ -3,7 +3,8 @@ import { type ApplicationRoundTimeSlotNode, Priority, SuitableTimeFragment, Week
 import { type Cell, type CellState } from "common/src/components/ApplicationTimeSelector";
 import { DayT, WEEKDAYS, WEEKDAYS_SORTED } from "common/src/const";
 import { convertWeekday, transformWeekday } from "common/src/conversion";
-import { filterNonNullable, formatTimeStruct, timeToMinutes } from "common/src/helpers";
+import { filterNonNullable, formatTimeStruct } from "common/src/helpers";
+import { timeToMinutes } from "common/src/date-utils";
 
 export type DailyOpeningHours = Readonly<
   Pick<ApplicationRoundTimeSlotNode, "weekday" | "isClosed" | "reservableTimes">[]

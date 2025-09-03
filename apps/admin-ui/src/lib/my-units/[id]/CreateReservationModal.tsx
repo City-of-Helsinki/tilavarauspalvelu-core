@@ -19,14 +19,14 @@ import {
   useReservationUnitQuery,
 } from "@gql/gql-types";
 import styled from "styled-components";
-import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorBoundary } from "react-error-boundary";
 import { ReservationFormSchema, type ReservationFormType, type ReservationFormMeta } from "@/schemas";
 import { CenterSpinner, Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useCheckCollisions } from "@/hooks";
-import { constructDateTimeSafe, dateTime, getBufferTime, getNormalizedInterval } from "@/helpers";
+import { getBufferTime, getNormalizedInterval } from "@/helpers";
+import { dateTimeToISOString, fromUIDateTimeUnsafe, formatDate, formatTime } from "common/src/date-utils";
 import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
@@ -90,10 +90,11 @@ export function CreateReservationModal({
   onClose,
   focusAfterCloseRef,
 }: CreateReservationModalProps): JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { isOpen } = useModal();
   const params = useSearchParams();
   const reservationUnitPk = toNumber(params.get("reservationUnit")) ?? reservationUnitOptions[0]?.value;
+  const locale = getLocalizationLang(i18n.language);
 
   const { data, loading } = useReservationUnitQuery({
     variables: { id: createNodeId("ReservationUnitNode", reservationUnitPk ?? 0) },
@@ -115,8 +116,8 @@ export function CreateReservationModal({
 
     mode: "onChange",
     defaultValues: {
-      date: format(startDate, "dd.MM.yyyy"),
-      startTime: format(startDate, "HH:mm"),
+      date: formatDate(startDate, { locale }),
+      startTime: formatTime(startDate, { locale }),
       enableBufferTimeBefore: false,
       enableBufferTimeAfter: false,
     },
@@ -139,8 +140,8 @@ export function CreateReservationModal({
         ...rest,
         reservationUnit: reservationUnit.pk,
         type,
-        beginsAt: dateTime(date, startTime),
-        endsAt: dateTime(date, endTime),
+        beginsAt: dateTimeToISOString(date, startTime) || new Date().toISOString(),
+        endsAt: dateTimeToISOString(date, endTime) || new Date().toISOString(),
         bufferTimeBefore: bufferBefore,
         bufferTimeAfter: bufferAfter,
         workingMemo: comments,
@@ -282,8 +283,8 @@ function useCheckFormCollisions({
   const bufferBeforeSeconds = getBufferTime(reservationUnit.bufferTimeBefore, type, enableBufferTimeBefore);
   const bufferAfterSeconds = getBufferTime(reservationUnit.bufferTimeAfter, type, enableBufferTimeAfter);
 
-  const start = constructDateTimeSafe(formDate, formStartTime);
-  const end = constructDateTimeSafe(formDate, formEndTime);
+  const start = fromUIDateTimeUnsafe(formDate, formStartTime);
+  const end = fromUIDateTimeUnsafe(formDate, formEndTime);
   const { hasCollisions } = useCheckCollisions({
     reservationPk: undefined,
     reservationUnitPk: reservationUnit?.pk ?? 0,

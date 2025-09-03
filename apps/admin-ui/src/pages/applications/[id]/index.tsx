@@ -23,9 +23,9 @@ import {
   useRestoreAllSectionOptionsMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { formatDuration } from "common/src/common/util";
+import { formatDateRange, formatDateTime, formatDuration, toValidDateObject } from "common/src/date-utils";
 import { ApplicationTimePreview } from "common/src/components/ApplicationTimePreview";
-import { formatAgeGroups, formatDate, formatDateRange, formatNumber } from "@/common/util";
+import { formatAgeGroups, formatNumber } from "@/common/util";
 import { ScrollIntoView } from "@/component/ScrollIntoView";
 import { Accordion as AccordionBase } from "@/component/Accordion";
 import { ApplicationWorkingMemo } from "@/component/WorkingMemo";
@@ -395,9 +395,9 @@ function ApplicationSectionDetails({
   const hash = section.pk?.toString() ?? "";
   const heading = `${application.pk ?? "-"}-${section.pk ?? "-"} ${section.name}`;
 
-  const beginDate = new Date(section.reservationsBeginDate);
-  const endDate = new Date(section.reservationsEndDate);
-  const dates = formatDateRange(t, beginDate, endDate);
+  const beginDate = toValidDateObject(section.reservationsBeginDate);
+  const endDate = toValidDateObject(section.reservationsEndDate);
+  const dates = formatDateRange(beginDate, endDate);
 
   return (
     <ScrollIntoView key={section.pk} hash={hash}>
@@ -623,7 +623,11 @@ export default function ApplicationPage({ pk }: PropsNarrowed): JSX.Element | nu
           {application.status != null && <ApplicationStatusLabel status={application.status} user="admin" />}
         </TitleSection>
         <PreCard>
-          {t("application:applicationReceivedTime")} {formatDate(application.updatedAt, "d.M.yyyy HH:mm")}
+          {t("application:applicationReceivedTime")},{" "}
+          {formatDateTime(toValidDateObject(application?.updatedAt), {
+            includeWeekday: false,
+            includeTimeSeparator: false,
+          })}
         </PreCard>
         <div>
           <RejectApplicationButton application={application} refetch={refetch} />
