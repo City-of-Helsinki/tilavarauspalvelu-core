@@ -1107,6 +1107,9 @@ type AppliedPricingInfoType {
   lowestPrice: Decimal!
   highestPrice: Decimal!
   taxPercentage: Decimal!
+  materialPriceDescriptionFi: String!
+  materialPriceDescriptionEn: String!
+  materialPriceDescriptionSv: String!
 }
 
 type BannerNotificationDeleteMutationOutput {
@@ -1728,6 +1731,9 @@ type ReservationUnitPricingNode implements Node {
   id: ID!
   lowestPrice: Decimal!
   lowestPriceNet: Decimal!
+  materialPriceDescriptionEn: String
+  materialPriceDescriptionFi: String
+  materialPriceDescriptionSv: String
   paymentType: PaymentType
   pk: Int!
   priceUnit: PriceUnit!
@@ -2821,6 +2827,9 @@ input ReservationUnitPricingCreateInput {
   highestPrice: Decimal! = "0"
   isActivatedOnBegins: Boolean! = false
   lowestPrice: Decimal! = "0"
+  materialPriceDescriptionEn: String
+  materialPriceDescriptionFi: String
+  materialPriceDescriptionSv: String
   paymentType: PaymentType!
   priceUnit: PriceUnit! = per_hour
   taxPercentage: Int!
@@ -2831,6 +2840,9 @@ input ReservationUnitPricingUpdateInput {
   highestPrice: Decimal
   isActivatedOnBegins: Boolean
   lowestPrice: Decimal
+  materialPriceDescriptionEn: String
+  materialPriceDescriptionFi: String
+  materialPriceDescriptionSv: String
   paymentType: PaymentType
   pk: Int
   priceUnit: PriceUnit

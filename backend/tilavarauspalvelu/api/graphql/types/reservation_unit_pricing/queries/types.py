@@ -22,6 +22,10 @@ class ReservationUnitPricingNode(QueryType[ReservationUnitPricing], interfaces=[
     lowest_price = Field()
     highest_price = Field()
 
+    material_price_description_fi = Field()
+    material_price_description_en = Field()
+    material_price_description_sv = Field()
+
     tax_percentage = Field()
 
     @Field
