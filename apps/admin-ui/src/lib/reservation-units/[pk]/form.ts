@@ -510,7 +510,7 @@ export const ReservationUnitEditSchema = z
       }
     }
 
-    if (!v.isDraft || v.pricings.length) {
+    if (!v.isDraft || v.pricings.length > 0) {
       for (let i = 0; i < v.pricings.length; i++) {
         refinePricing(v.pricings[i], ctx, `pricings.${i}`);
       }
