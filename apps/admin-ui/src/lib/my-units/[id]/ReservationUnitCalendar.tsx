@@ -75,7 +75,7 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
     permission: UserPermissionChoice.CanViewReservations,
   });
 
-  const calendarEventExcludedLegends = ["RESERVATION_UNIT_RELEASED", "RESERVATION_UNIT_DRAFT"];
+  const calendarEventExcludedLegends = new Set(["RESERVATION_UNIT_RELEASED", "RESERVATION_UNIT_DRAFT"]);
 
   const { data, loading: isLoading } = useReservationUnitCalendarQuery({
     fetchPolicy: "network-only",
@@ -131,7 +131,7 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
       />
       <LegendsWrapper>
         {legend
-          .filter((l) => !calendarEventExcludedLegends.includes(l.key))
+          .filter((l) => !calendarEventExcludedLegends.has(l.key))
           .map((l) => (
             <Legend key={l.label} style={l.style} label={t(l.label)} />
           ))}
