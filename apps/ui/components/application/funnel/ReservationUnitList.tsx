@@ -85,7 +85,7 @@ export function ReservationUnitList<T extends FieldValues>({
   };
 
   const handleRemove = (ru: ReservationUnitType) => {
-    onChange([...value.filter((pk: T) => Number(pk) !== ru.pk)]);
+    onChange(value.filter((pk: T) => Number(pk) !== ru.pk));
   };
 
   const moveUp = (reservationUnit: ReservationUnitType) => {
