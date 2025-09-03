@@ -428,6 +428,8 @@ class Common(Environment):
     CELERY_QUEUE_FOLDER_IN = values.StringValue(default="/broker/queue/")
     CELERY_PROCESSED_FOLDER = values.StringValue(default="/broker/processed/")
 
+    AUTO_CREATE_CELERY_TASKS = values.BooleanValue(default=False)
+
     @classproperty
     def CELERY_BROKER_URL(cls) -> str:
         return "filesystem://"
@@ -650,6 +652,8 @@ class Local(Common, overrides_from=LocalMixin):
     CELERY_QUEUE_FOLDER_IN = values.StringValue(default="./broker/queue/")
     CELERY_PROCESSED_FOLDER = values.StringValue(default="./broker/processed/")
 
+    AUTO_CREATE_CELERY_TASKS = True
+
     # --- Redis settings ---------------------------------------------------------------------------------------------
 
     REDIS_URL = values.StringValue(default="redis://127.0.0.1:6379/0")
@@ -704,6 +708,8 @@ class Docker(Common, overrides_from=DockerMixin):
     SOCIAL_AUTH_TUNNISTAMO_INACTIVE_USER_URL = "http://localhost:3000/deactivated-account"
 
     REDIS_URL = values.StringValue(default="redis://redis:6379/0")
+
+    AUTO_CREATE_CELERY_TASKS = True
 
     @classproperty
     def CELERY_BROKER_URL(cls):
@@ -932,6 +938,8 @@ class Platta(Common, use_environ=True):
         }
 
     # --- Celery settings --------------------------------------------------------------------------------------------
+
+    AUTO_CREATE_CELERY_TASKS = True
 
     @classproperty
     def CELERY_BROKER_URL(cls) -> str:
