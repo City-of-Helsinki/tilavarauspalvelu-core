@@ -1,6 +1,7 @@
 import {
   AccessType,
   ReservationUnitImageType,
+  type ReservationMetaFieldsFragment,
   MunicipalityChoice,
   OrderStatus,
   PaymentType,
@@ -16,7 +17,6 @@ import { createNodeId } from "common/src/helpers";
 import type { FieldName } from "common/src/metaFieldsHelpers";
 import { generateNameFragment } from "@/test/test.gql.utils";
 import { OptionsRecord } from "common";
-import { ReservationMetaFieldsFragment } from "common/gql/gql-types";
 
 export function generateTextFragment(text: string) {
   return {
