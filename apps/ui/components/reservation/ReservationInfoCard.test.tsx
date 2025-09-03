@@ -55,7 +55,10 @@ describe("Component: ReservationInfoCard", () => {
   it("should show the reservation duration", () => {
     customRender();
     const durationText =
-      'Common:dateWithWeekday {"date":"2024-01-07T07:00:00.000Z","formatParams":{"date":{"weekday":"short"}}} common:dateWithWeekday {"date":"2024-01-07T07:00:00.000Z","formatParams":{"date":{"year":"numeric","month":"numeric","day":"numeric","locale":"fi"}}}common:dayTimeSeparator common:dateWithWeekday {"date":"2024-01-07T07:00:00.000Z","formatParams":{"date":{"hour":"numeric","minute":"numeric","hour12":false,"locale":"en-GB"}}}–common:dateWithWeekday {"date":"2024-01-07T08:00:00.000Z","formatParams":{"date":{"hour":"numeric","minute":"numeric","hour12":false,"locale":"en-GB"}}}, common:abbreviations:hour {"count":1}';
+      'Common:dateWithWeekday {"date":"2024-01-07T07:00:00.000Z","formatParams":{"date":{"weekday":"short"}}} common:dateWithWeekday ' +
+      '{"date":"2024-01-07T07:00:00.000Z","formatParams":{"date":{"year":"numeric","month":"numeric","day":"numeric","locale":"fi"}}}common:dayTimeSeparator common:dateWithWeekday ' +
+      '{"date":"2024-01-07T07:00:00.000Z","formatParams":{"date":{"hour":"numeric","minute":"numeric","hour12":false,"locale":"en-GB"}}}–common:dateWithWeekday ' +
+      '{"date":"2024-01-07T08:00:00.000Z","formatParams":{"date":{"hour":"numeric","minute":"numeric","hour12":false,"locale":"en-GB"}}}, common:abbreviations:hour {"count":1}';
     expect(screen.getByText(durationText)).toBeInTheDocument();
   });
 

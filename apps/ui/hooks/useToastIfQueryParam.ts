@@ -62,5 +62,5 @@ export function useToastIfQueryParam({
     } else if (q[key]) {
       handle();
     }
-  }, [router, t, key, message, type]);
+  }, [router, t, key, message, type, title]);
 }
