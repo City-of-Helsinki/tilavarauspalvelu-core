@@ -1,5 +1,5 @@
 import { addSeconds } from "date-fns";
-import { type CalendarEventBuffer } from "./Calendar";
+import type { CalendarEventBuffer } from "./Calendar";
 
 export type ReservationEventType = {
   beginsAt: string;

@@ -1,7 +1,7 @@
 import { isValid, parse, set } from "date-fns";
 import { formatDate } from "../common/util";
 import { fromApiDate, fromUIDate } from "common/src/common/util";
-import { type Maybe } from "@gql/gql-types";
+import type { Maybe } from "@gql/gql-types";
 
 /* Convert api datetime to date required by date input, defaults to current date */
 export const valueForDateInput = (from: string): string => {

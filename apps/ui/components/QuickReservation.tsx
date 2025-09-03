@@ -12,11 +12,11 @@ import {
   isReservationUnitFreeOfCharge,
 } from "@/modules/reservationUnit";
 import Carousel from "@/components/Carousel";
-import { type Control, type FieldValues, type SubmitHandler, type UseFormReturn } from "react-hook-form";
+import type { Control, FieldValues, SubmitHandler, UseFormReturn } from "react-hook-form";
 import { ControlledDateInput } from "common/src/components/form";
-import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
+import type { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { type FocusTimeSlot } from "@/modules/reservation";
+import type { FocusTimeSlot } from "@/modules/reservation";
 
 type Props = {
   reservationUnit: ReservationTimePickerFieldsFragment;

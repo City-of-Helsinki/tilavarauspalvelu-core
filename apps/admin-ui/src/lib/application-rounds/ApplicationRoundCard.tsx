@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { IconArrowRight, IconCalendar, IconSize } from "hds-react";
-import { type ApplicationRoundCardFragment } from "@gql/gql-types";
+import type { ApplicationRoundCardFragment } from "@gql/gql-types";
 import { formatDate } from "@/common/util";
 import { ApplicationRoundStatusLabel } from "./ApplicationRoundStatusLabel";
 import { getApplicationRoundUrl } from "@/common/urls";

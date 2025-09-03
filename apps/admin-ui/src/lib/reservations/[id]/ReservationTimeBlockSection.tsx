@@ -10,7 +10,7 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { type CalendarEventType, type EventType } from "@/modules/reservation";
+import type { CalendarEventType, EventType } from "@/modules/reservation";
 import { eventStyleGetter, legend } from "./eventStyleGetter";
 import { Legend, LegendsWrapper } from "@/component/Legend";
 import { EditTimeModal } from "@/component/EditTimeModal";

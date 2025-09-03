@@ -6,9 +6,9 @@ import {
   type DailyOpeningHours,
   type TimeSpan,
 } from "./timeSelectorModule";
-import { type SuitableTimeRangeFormValues } from "./form";
+import type { SuitableTimeRangeFormValues } from "./form";
 import { Priority, Weekday } from "@/gql/gql-types";
-import { type Cell } from "common/src/components/ApplicationTimeSelector";
+import type { Cell } from "common/src/components/ApplicationTimeSelector";
 import { type DayT, WEEKDAYS_SORTED } from "common/src/const";
 import { toApiTimeUnsafe } from "common/src/common/util";
 import { transformWeekday } from "common/src/conversion";

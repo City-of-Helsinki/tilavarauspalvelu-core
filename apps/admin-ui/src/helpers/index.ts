@@ -13,7 +13,7 @@ import {
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { addSeconds } from "date-fns";
-import { type TFunction } from "next-i18next";
+import type { TFunction } from "next-i18next";
 
 export { truncate } from "common/src/helpers";
 

@@ -20,7 +20,7 @@ import { checkLengthWithoutHtml, checkTimeStringFormat } from "common/src/schema
 import { fromUIDateTime } from "@/helpers";
 import { intervalToNumber } from "@/schemas/utils";
 import { WEEKDAYS_SORTED } from "common/src/const";
-import { type TaxOption } from "./PricingSection";
+import type { TaxOption } from "./PricingSection";
 import sanitizeHtml from "sanitize-html";
 
 export const AccessTypes = ["ACCESS_CODE", "OPENED_BY_STAFF", "PHYSICAL_KEY", "UNRESTRICTED"] as const;

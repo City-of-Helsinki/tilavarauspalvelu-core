@@ -1,7 +1,7 @@
 import { differenceInWeeks } from "date-fns";
 import { fromApiDate } from "common/src/common/util";
 import { formatters as getFormatters } from "common";
-import { type ApplicationSectionNode } from "@gql/gql-types";
+import type { ApplicationSectionNode } from "@gql/gql-types";
 import { formatNumber } from "@/common/util";
 
 export function calculateAppliedReservationTime(

@@ -13,7 +13,7 @@ import { FilterTagList } from "../FilterTagList";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { type OptionsListT } from "common/src/modules/search";
+import type { OptionsListT } from "common/src/modules/search";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";

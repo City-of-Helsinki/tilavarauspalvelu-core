@@ -1,7 +1,7 @@
 import { ApolloClient, HttpLink, InMemoryCache, from, disableFragmentWarnings } from "@apollo/client";
 import { relayStylePagination } from "@apollo/client/utilities";
-import { type ParsedUrlQuery } from "node:querystring";
-import { type GetServerSidePropsContext, type PreviewData } from "next";
+import type { ParsedUrlQuery } from "node:querystring";
+import type { GetServerSidePropsContext, PreviewData } from "next";
 import { buildGraphQLUrl } from "common/src/urlBuilder";
 import { env } from "@/env.mjs";
 import { isBrowser } from "./const";
