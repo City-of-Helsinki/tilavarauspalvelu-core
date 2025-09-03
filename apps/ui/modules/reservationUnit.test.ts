@@ -1,6 +1,6 @@
 import { get as mockGet } from "lodash-es";
-import { addDays, addHours, addMonths, endOfDay, format, getHours, set, startOfDay, startOfToday } from "date-fns";
-import { toApiDateUnsafe } from "common/src/common/util";
+import { addDays, addHours, addMonths, endOfDay, getHours, set, startOfDay, startOfToday } from "date-fns";
+import { toApiDateUnsafe } from "common/src/date-utils";
 import {
   PriceUnit,
   ReservationUnitPublishingState,
@@ -60,7 +60,7 @@ describe("getPossibleTimesForDay", () => {
     const map: ReservableMap = new Map();
     for (let i = 0; i < 30; i++) {
       const date = addDays(startOfToday(), i);
-      const key = format(date, "yyyy-MM-dd");
+      const key = toApiDateUnsafe(date);
       const value = [{ start: startOfDay(date), end: endOfDay(date) }];
       map.set(key, value);
     }
@@ -1075,13 +1075,13 @@ describe("getNextAvailableTime", () => {
   beforeEach(() => {
     const today = new Date();
     reservableTimes = new Map();
-    reservableTimes.set(format(today, "yyyy-MM-dd"), [
+    reservableTimes.set(toApiDateUnsafe(today), [
       { start: constructDate(today, 11, 0), end: constructDate(today, 12, 0) },
       { start: constructDate(today, 13, 0), end: constructDate(today, 15, 0) },
       { start: constructDate(today, 16, 0), end: constructDate(today, 17, 0) },
       { start: constructDate(today, 18, 0), end: constructDate(today, 20, 0) },
     ]);
-    reservableTimes.set(format(addDays(today, 1), "yyyy-MM-dd"), [
+    reservableTimes.set(toApiDateUnsafe(addDays(today, 1)), [
       {
         start: constructDate(addDays(today, 1), 10, 0),
         end: constructDate(addDays(today, 1), 15, 0),
@@ -1186,7 +1186,7 @@ describe("getNextAvailableTime", () => {
 
   test("finds no available times if the duration is too long", () => {
     const today = new Date();
-    const shortTimes = reservableTimes.get(format(today, "yyyy-MM-dd"));
+    const shortTimes = reservableTimes.get(toApiDateUnsafe(today));
     if (!shortTimes) {
       throw new Error("Mock data broken");
     }
@@ -1203,7 +1203,7 @@ describe("getNextAvailableTime", () => {
     const today = new Date();
     mockOpenTimes(today, 7, []);
     const date = addDays(today, 7);
-    reservableTimes.set(format(date, "yyyy-MM-dd"), [
+    reservableTimes.set(toApiDateUnsafe(date), [
       {
         start: constructDate(date, 10, 0),
         end: constructDate(date, 15, 0),
@@ -1221,7 +1221,7 @@ describe("getNextAvailableTime", () => {
     const today = new Date();
     mockOpenTimes(today, 7, []);
     const date = addMonths(today, 2);
-    reservableTimes.set(format(date, "yyyy-MM-dd"), [
+    reservableTimes.set(toApiDateUnsafe(date), [
       {
         start: constructDate(date, 10, 0),
         end: constructDate(date, 15, 0),
@@ -1240,13 +1240,13 @@ describe("getNextAvailableTime", () => {
     const date1 = addMonths(today, 1);
     const date2 = addMonths(today, 6);
     mockOpenTimes(today, 7, []);
-    reservableTimes.set(format(date1, "yyyy-MM-dd"), [
+    reservableTimes.set(toApiDateUnsafe(today), [
       {
         start: constructDate(date1, 10, 0),
         end: constructDate(date1, 15, 0),
       },
     ]);
-    reservableTimes.set(format(date2, "yyyy-MM-dd"), [
+    reservableTimes.set(toApiDateUnsafe(date2), [
       {
         start: constructDate(date2, 10, 0),
         end: constructDate(date2, 15, 0),
@@ -1358,7 +1358,7 @@ describe("getNextAvailableTime", () => {
     test("NO times if times are only available after reservationsMaxDaysBefore", () => {
       const today = new Date();
       const cpy = new Date(today);
-      reservableTimes.set(format(today, "yyyy-MM-dd"), []);
+      reservableTimes.set(toApiDateUnsafe(today), []);
       const input = createInput({
         start: today,
         duration: 30,

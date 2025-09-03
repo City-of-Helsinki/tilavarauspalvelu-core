@@ -18,13 +18,10 @@ import {
   type ReservationPaymentUrlFragment,
 } from "@gql/gql-types";
 import { getIntervalMinutes } from "common/src/conversion";
-import { fromUIDate } from "./util";
 import { type TFunction } from "i18next";
 import { type ReservableMap, type RoundPeriod, isRangeReservable } from "./reservable";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
-import { isValidDate, toUIDate } from "common/src/common/util";
-import { getTimeString } from "./reservationUnit";
-import { timeToMinutes } from "common/src/helpers";
+import { formatTime, fromUIDate, isValidDate, timeToMinutes, formatDate } from "common/src/date-utils";
 import { gql } from "@apollo/client";
 import { type LocalizationLanguages } from "common/src/urlBuilder";
 
@@ -409,14 +406,15 @@ export function convertReservationFormToApi(
 }
 
 export function transformReservation(
+  locale: LocalizationLanguages,
   reservation?: Pick<ReservationNodeT, "beginsAt" | "endsAt">
 ): PendingReservationFormType {
   const originalBegin = new Date(reservation?.beginsAt ?? "");
   const originalEnd = new Date(reservation?.endsAt ?? "");
   return {
-    date: toUIDate(originalBegin),
+    date: formatDate(originalBegin),
     duration: differenceInMinutes(originalEnd, originalBegin),
-    time: getTimeString(originalBegin),
+    time: formatTime(originalBegin, { locale }),
     isControlsVisible: false,
   };
 }

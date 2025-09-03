@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { subDays } from "date-fns";
-import { fromUIDate } from "../common/util";
+import { fromUIDate } from "../date-utils";
 
 const THREE_YEARS_MS = 3 * 365 * 24 * 60 * 60 * 1000;
 const TIME_PATTERN = /^[0-2][0-9]:[0-5][0-9]$/;

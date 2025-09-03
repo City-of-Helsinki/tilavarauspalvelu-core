@@ -32,15 +32,8 @@ import {
   CenterSpinner,
 } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { getTranslationSafe, toApiDate, toUIDate } from "common/src/common/util";
-import {
-  filterNonNullable,
-  formatApiTimeInterval,
-  fromMondayFirst,
-  getLocalizationLang,
-  sort,
-  toNumber,
-} from "common/src/helpers";
+import { getTranslationSafe } from "common/src/common/util";
+import { filterNonNullable, formatApiTimeInterval, getLocalizationLang, sort, toNumber } from "common/src/helpers";
 import type { LocalizationLanguages } from "common/src/urlBuilder";
 import { convertWeekday } from "common/src/conversion";
 import { PopupMenu } from "common/src/components/PopupMenu";
@@ -66,7 +59,7 @@ import { getApplicationReservationPath, getApplicationSectionPath, getReservatio
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { AccordionWithIcons } from "@/components/AccordionWithIcons";
 import { isReservationCancellableReason, ReservationCancellableReason } from "@/modules/reservation";
-import { formatDateRange, formatDateTimeStrings } from "@/modules/util";
+import { formatDate, formatDateRange, formatDateTimeStrings, fromMondayFirst, toApiDate } from "common/src/date-utils";
 import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 
 const N_RESERVATIONS_TO_SHOW = 20;
@@ -517,7 +510,8 @@ function ReservationUnitAccessTypeList({
   roundReservationBegin: Date;
   roundReservationEnd: Date;
 }>) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = getLocalizationLang(i18n.language);
   if (!accessTypes || accessTypes.length === 0 || !pk) {
     return null;
   }
@@ -553,7 +547,7 @@ function ReservationUnitAccessTypeList({
                       ? ` (${reservationUnit?.pindoraInfo?.accessCode})`
                       : "")}
                 </span>
-                <span>{formatDateRange(periodBeginDate, periodEndDate)}</span>
+                <span>{formatDateRange(periodBeginDate, periodEndDate, { includeWeekday: false, locale })}</span>
               </li>
             );
           })}
@@ -721,7 +715,7 @@ function ReservationsTable({
         return (
           <Flex $direction="row" $gap="2-xs" $justifyContent="space-between" $width="full">
             <span style={{ position: "relative" }} aria-label={t("common:dateLabel")}>
-              <span>{toUIDate(date)}</span>
+              <span>{formatDate(date)}</span>
               <OnlyForMobile>
                 {/* span removes whitespace */}
                 <pre style={{ display: "inline" }}>{" - "}</pre>
@@ -867,7 +861,7 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
   function getRejected(r: (typeof reservationSeries)[0]): ReservationsTableElem[] {
     return r.rejectedOccurrences.map((res) => {
       const reservation = { beginsAt: res.beginDatetime, endsAt: res.endDatetime };
-      const rest = formatDateTimeStrings(t, reservation);
+      const rest = formatDateTimeStrings({ t, reservation });
       return {
         ...rest,
         reservationUnit: r.reservationUnit,
@@ -890,11 +884,12 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
 
   function getReservations(r: (typeof reservationSeries)[0]): ReservationsTableElem[] {
     return r.reservations.reduce<ReservationsTableElem[]>((acc, res, idx, ar) => {
-      const { isModified, ...rest } = formatDateTimeStrings(t, res, r.allocatedTimeSlot);
+      const { isModified, ...rest } = formatDateTimeStrings({ t, reservation: res, orig: r.allocatedTimeSlot });
       const status = getReservationStatusChoice(res.state, isModified);
       const accessTypeChanged = idx !== 0 && res.accessType !== ar[idx - 1]?.accessType;
       const accessCodeValidThru = getAccessCodeValidThru(res.pindoraInfo);
-      const accessCodeTime = accessCodeValidThru != null ? formatDateTimeStrings(t, accessCodeValidThru).time : null;
+      const accessCodeTime =
+        accessCodeValidThru != null ? formatDateTimeStrings({ t, reservation: accessCodeValidThru }).time : null;
       const reservationTableElem: ReservationsTableElem = {
         ...rest,
         reservationUnit: r.reservationUnit,

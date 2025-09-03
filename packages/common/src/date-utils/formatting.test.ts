@@ -47,7 +47,7 @@ describe("formatting", () => {
       const date = new Date("2023-12-25T15:30:00");
       const result = formatTime(date);
       // Function may include default separator, so check for time pattern
-      expect(result).toMatch("@ 15:30");
+      expect(result).toMatch("15:30");
     });
 
     it("includes time separator when requested", () => {
@@ -118,10 +118,10 @@ describe("formatting", () => {
     it("formats datetime with weekday and separator", () => {
       const date = new Date("2023-12-25T15:30:00");
       const result = formatDateTime(date, { t: mockT });
-      expect(result).toContain("ma");
+      expect(result).toContain("common:dayShort.0");
       expect(result).toContain("25.12.2023");
       expect(result).toContain("common:dayTimeSeparator");
-      expect(result).toMatch("ma 25.12.2023common:dayTimeSeparator HH:mm");
+      expect(result).toMatch("common:dayShort.0 25.12.2023common:dayTimeSeparator 15:30");
     });
 
     it("formats without weekday", () => {
@@ -129,14 +129,14 @@ describe("formatting", () => {
       const result = formatDateTime(date, { includeWeekday: false });
       expect(result).toContain("25.12.2023");
       expect(result).toContain("@");
-      expect(result).toMatch("25.12.2023 @ HH:mm");
+      expect(result).toMatch("25.12.2023 @ 15:30");
     });
 
     it("formats without time separator", () => {
       const date = new Date("2023-12-25T15:30:00");
       const result = formatDateTime(date, { includeTimeSeparator: false });
       expect(result).toContain("25.12.2023");
-      expect(result).toMatch("ma 25.12.2023 HH:mm");
+      expect(result).toMatch("ma 25.12.2023 15:30");
     });
 
     it("handles null date", () => {
@@ -150,7 +150,7 @@ describe("formatting", () => {
       expect(result).toContain("ma");
       expect(result).toContain("25.12.2023");
       expect(result).toContain("@");
-      expect(result).toMatch("ma 25.12.2023 @ HH:mm");
+      expect(result).toMatch("ma 25.12.2023 @ 15:30");
     });
   });
 
@@ -267,7 +267,7 @@ describe("formatting", () => {
       const result = formatDateRange(start, end, { includeWeekday: false });
       expect(result).not.toContain("ma");
       expect(result).not.toContain("ti");
-      expect(result).toBe("25.12.2023 – 26.12.2023");
+      expect(result).toBe("25.12.2023–26.12.2023");
     });
 
     it("handles null dates", () => {

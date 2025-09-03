@@ -32,9 +32,15 @@ import {
   DataWrapper,
 } from "@lib/reservations/[id]/";
 import { Accordion, ApplicationDatas, Summary } from "@/styled";
-import { createNodeId, ignoreMaybeArray, isPriceFree, toNumber } from "common/src/helpers";
+import {
+  createNodeId,
+  getLocalizationLang,
+  ignoreMaybeArray,
+  isPriceFree,
+  toNumber,
+} from "common/src/helpers";
 import { formatAgeGroup } from "@/common/util";
-import { toUIDateTime } from "common/src/common/util";
+import { formatDateTime } from "common/src/date-utils";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
@@ -131,11 +137,10 @@ function ReservationSummary({
         <DataWrapper isSummary label={t("reservation:price")}>
           {`${reservationPrice(reservation, t)}${
             reservation.paymentOrder?.handledPaymentDueBy
-              ? ` ${t("reservation:dueByParenthesis", {
-                  date: toUIDateTime(
-                    new Date(reservation.paymentOrder.handledPaymentDueBy),
-                    t("common:dayTimeSeparator")
-                  ),
+              ? ` ${t("reservation.dueByParenthesis", {
+                  date: formatDateTime(new Date(reservation.paymentOrder.handledPaymentDueBy), {
+                    includeTimeSeparator: true,
+                  }),
                 })}`
               : ""
           }${reservation.applyingForFreeOfCharge ? `, ${t("reservation:appliesSubvention")}` : ""}`}
@@ -281,7 +286,7 @@ function RequestedReservation({
   reservation: ReservationType;
   refetch: () => Promise<ApolloQueryResult<ReservationPageQuery>>;
 }): JSX.Element | null {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const ref = useRef<HTMLHeadingElement>(null);
 
@@ -289,7 +294,7 @@ function RequestedReservation({
 
   const isNonFree = pricing != null ? !isPriceFree(pricing) : false;
 
-  const reservationTagline = createTagString(reservation, t);
+  const reservationTagline = createTagString(reservation, t, getLocalizationLang(i18n.language));
 
   return (
     <>

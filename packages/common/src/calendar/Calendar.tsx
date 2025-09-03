@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { addHours, endOfMonth, format, startOfWeek, getDay, startOfDay } from "date-fns";
+import { addHours, endOfMonth, format, startOfWeek, getDay, startOfDay, parseISO } from "date-fns";
 import { fi } from "date-fns/locale/fi";
 import { enGB } from "date-fns/locale/en-GB";
 import { sv } from "date-fns/locale/sv";
@@ -8,7 +8,7 @@ import { Calendar as BigCalendar, dateFnsLocalizer, ToolbarProps } from "react-b
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
-import { parseDate } from "../common/util";
+import { formatTime } from "../date-utils";
 import type { LocalizationLanguages } from "../urlBuilder";
 
 export type CalendarEvent<T> = {
@@ -465,7 +465,7 @@ const localizer = (locale: LocalizationLanguages) =>
       }
       return format(date, fmt, { locale: locales[locale] });
     },
-    parse: parseDate,
+    parse: (date: string): Date => parseISO(date),
     startOfWeek: (date: Date) => startOfWeek(date, { weekStartsOn: 1 }),
     getDay,
     locales,
@@ -512,8 +512,7 @@ function Calendar<T extends Record<string, unknown>>({
       formats={{
         dayFormat: "EEEEEE d.M.",
         timeGutterFormat: "H",
-        eventTimeRangeFormat: ({ start, end }: { start: Date; end: Date }) =>
-          `${format(start, "H:mm")}-${format(end, "H:mm")}`,
+        eventTimeRangeFormat: ({ start, end }: { start: Date; end: Date }) => `${formatTime(start)}-${formatTime(end)}`,
       }}
       eventPropGetter={eventStyleGetter}
       events={events}

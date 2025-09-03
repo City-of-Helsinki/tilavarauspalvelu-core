@@ -1,4 +1,3 @@
-import { format, getDay, isSameDay, parseISO } from "date-fns";
 import { trim } from "lodash-es";
 import {
   type Maybe,
@@ -8,44 +7,7 @@ import {
   type ReservationCommonFieldsFragment,
 } from "@gql/gql-types";
 import type { TFunction } from "next-i18next";
-import { toMondayFirstUnsafe, truncate } from "common/src/helpers";
-
-export const DATE_FORMAT = "d.M.yyyy";
-export const DATE_FORMAT_SHORT = "d.M.";
-
-/// @deprecated use format directly
-/// why convert date -> string -> date?
-export function formatDate(date: string | null | undefined, outputFormat = DATE_FORMAT): string | null {
-  return date ? format(parseISO(date), outputFormat) : null;
-}
-
-export function formatTime(date: string | null | undefined, outputFormat = "HH:mm"): string | null {
-  return date ? format(parseISO(date), outputFormat) : null;
-}
-
-// TODO why is this taking in a string?
-export function formatDateTime(date: string): string {
-  return `${formatDate(date)} ${formatTime(date)}`;
-}
-
-// TODO move to common and combine with ui (requires i18n changes: replace messages.ts with json)
-export function formatDateTimeRange(t: TFunction, start: Date, end: Date): string {
-  const startDay = t(`translation:dayShort.${toMondayFirstUnsafe(getDay(start))}`);
-
-  if (isSameDay(start, end)) {
-    return `${startDay} ${format(start, DATE_FORMAT)} ${format(start, "HH:mm")}–${format(end, "HH:mm")}`;
-  }
-
-  return `${format(start, DATE_FORMAT)} ${format(start, "HH:mm")}–${format(end, "HH:mm")} ${format(end, "HH:mm")}`;
-}
-
-export function formatDateRange(t: TFunction, start: Date, end: Date): string {
-  const startDay = t(`translation:dayShort.${toMondayFirstUnsafe(getDay(start))}`);
-  if (isSameDay(start, end)) {
-    return `${startDay} ${format(start, DATE_FORMAT)}`;
-  }
-  return `${startDay} ${format(start, DATE_FORMAT)}–${format(end, DATE_FORMAT)}`;
-}
+import { truncate } from "common/src/helpers";
 
 export const formatNumber = (input?: number | null, suffix?: string): string => {
   if (input == null) return "";

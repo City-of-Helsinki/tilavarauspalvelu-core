@@ -1,5 +1,5 @@
 import React from "react";
-import { toApiDate } from "common/src/common/util";
+import { toApiDate } from "common/src/date-utils";
 import CommonCalendar from "common/src/calendar/Calendar";
 import { get } from "lodash-es";
 import { addDays, endOfISOWeek, startOfISOWeek } from "date-fns";

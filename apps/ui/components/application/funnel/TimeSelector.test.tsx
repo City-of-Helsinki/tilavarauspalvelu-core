@@ -10,7 +10,7 @@ import { transformWeekday } from "common/src/conversion";
 import { createNodeId, formatTimeStruct } from "common/src/helpers";
 import { type OpenHoursState } from "common/src/components/ApplicationTimeSelector";
 import { selectOption } from "@/test/test.utils";
-import { toApiTime } from "common/src/common/util";
+import { toApiTime } from "common/src/date-utils";
 import { type DayT, WEEKDAYS_SORTED } from "common/src/const";
 
 type ApplicationPage2 = NonNullable<ApplicationPage2Query["application"]>;
@@ -225,14 +225,14 @@ describe("TimeSelector render single section", () => {
   ])(
     "should render available time slots based on opening hours $label",
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    ({ label, days }) => {
+    ({ label: _, days }) => {
       const openTimes: TimeSelectorFragment[] = days.map((day, index) => ({
         id: createNodeId("TimeSelector", index),
         weekday: day.day,
         isClosed: false,
         reservableTimes: day.times.map((time) => ({
-          begin: toApiTime({ hours: time.start }) ?? "",
-          end: toApiTime({ hours: time.end }) ?? "",
+          begin: toApiTime(time.start) ?? "",
+          end: toApiTime(time.end) ?? "",
         })),
       }));
       const view = customRender({ reservationUnitOpeningHours: openTimes });

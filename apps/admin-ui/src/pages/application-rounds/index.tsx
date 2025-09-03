@@ -12,7 +12,6 @@ import {
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { getApplicationRoundUrl } from "@/common/urls";
-import { formatDate } from "@/common/util";
 import { truncate } from "@/helpers";
 import { ApplicationRoundCard } from "@lib/application-rounds";
 import { TableLink } from "@/styled";
@@ -24,6 +23,7 @@ import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
+import { formatDate, toValidDateObject } from "common/src/date-utils";
 
 const AccordionWithoutTopPadding = styled(Accordion).attrs({
   closeButton: false,
@@ -137,7 +137,7 @@ function AllApplicationRounds(): JSX.Element | null {
       isSortable: true,
       headerName: t("applicationRound:headings.sent"),
       transform: (applicationRound: ApplicationRoundNode) =>
-        formatDate(applicationRound.statusTimestamp || null) || "-",
+        applicationRound.statusTimestamp ? formatDate(toValidDateObject(applicationRound.statusTimestamp)) : "-",
       key: "statusTimestampSort",
     },
   ];
