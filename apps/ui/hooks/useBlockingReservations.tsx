@@ -2,7 +2,7 @@ import { addYears } from "date-fns";
 import { gql } from "@apollo/client";
 import { useAffectingReservationsQuery } from "@/gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { toApiDate } from "common/src/common/util";
+import { toApiDate } from "common/src/date-utils";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { BLOCKING_RESERVATIONS_POLL_INTERVAL } from "@/modules/const";
 

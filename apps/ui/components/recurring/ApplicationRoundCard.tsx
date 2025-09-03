@@ -1,13 +1,14 @@
+import type { LocalizationLanguages } from "common/src/urlBuilder";
 import React from "react";
 import { IconArrowRight, IconLinkExternal } from "hds-react";
 import { type TFunction, useTranslation } from "next-i18next";
 import { type ApplicationRoundCardFragment, ApplicationRoundStatusChoice } from "@gql/gql-types";
-import { formatDateTime } from "@/modules/util";
 import { isValid } from "date-fns";
 import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { getApplicationRoundPath } from "@/modules/urls";
-import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { formatDateTime, formatDate } from "common/src/date-utils";
 import { gql } from "@apollo/client";
 
 interface CardProps {
@@ -16,6 +17,7 @@ interface CardProps {
 
 function translateRoundDate(
   t: TFunction,
+  locale: LocalizationLanguages,
   round: Pick<ApplicationRoundCardFragment, "applicationPeriodBeginsAt" | "applicationPeriodEndsAt" | "status">
 ) {
   const begin = new Date(round.applicationPeriodBeginsAt);
@@ -27,13 +29,13 @@ function translateRoundDate(
   switch (round.status) {
     case ApplicationRoundStatusChoice.Upcoming:
       return t("applicationRound:card.pending", {
-        opening: formatDateTime(t, begin),
+        opening: formatDateTime(begin, { locale }),
       });
     case ApplicationRoundStatusChoice.Open:
-      return t("applicationRound:card.open", { until: formatDateTime(t, end) });
+      return t("applicationRound:card.open", { until: formatDateTime(end, { locale }) });
     default:
       return t("applicationRound:card.past", {
-        closing: formatDateTime(t, end),
+        closing: formatDateTime(end, { locale }),
       });
   }
 }
@@ -43,11 +45,11 @@ export function ApplicationRoundCard({ applicationRound }: Readonly<CardProps>):
   const lang = convertLanguageCode(i18n.language);
 
   const name = getTranslationSafe(applicationRound, "name", lang);
-  const timeString = translateRoundDate(t, applicationRound);
+  const timeString = translateRoundDate(t, lang, applicationRound);
   const begin = new Date(applicationRound.reservationPeriodBeginDate);
   const end = new Date(applicationRound.reservationPeriodEndDate);
-  const reservationPeriodBeginDate = toUIDate(begin);
-  const reservationPeriodEndDate = toUIDate(end);
+  const reservationPeriodBeginDate = formatDate(begin);
+  const reservationPeriodEndDate = formatDate(end);
 
   const reservationPeriod = t(`applicationRound:card.reservationPeriod`, {
     reservationPeriodBeginDate,

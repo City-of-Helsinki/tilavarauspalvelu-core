@@ -1,5 +1,4 @@
-import { timeToMinutes, toMondayFirst } from "common/src/helpers";
-import { fromUIDateUnsafe } from "common/src/common/util";
+import { fromUIDateUnsafe, timeToMinutes, toMondayFirst } from "common/src/date-utils";
 import { TimeSelectionForm } from "@/schemas";
 import { Weekday } from "@gql/gql-types";
 import { transformWeekday } from "common/src/conversion";

@@ -11,11 +11,11 @@ import {
   type Maybe,
   BlockingReservationFieldsFragment,
 } from "@/gql/gql-types";
+import { toApiDateUnsafe } from "common/src/date-utils";
 import { dayMax, dayMin } from "common/src/helpers";
 import {
   differenceInSeconds,
   isValid,
-  format,
   addMinutes,
   areIntervalsOverlapping,
   startOfDay,
@@ -55,7 +55,7 @@ export type ReservableMapKey = string; // format: "yyyy-mm-dd"
 export type ReservableMap = Map<ReservableMapKey, Array<{ start: Date; end: Date }>>;
 
 export function dateToKey(date: Date): ReservableMapKey {
-  return format(date, "yyyy-MM-dd");
+  return toApiDateUnsafe(date);
 }
 
 /// This function converts a time span array into a map of days with the time spans

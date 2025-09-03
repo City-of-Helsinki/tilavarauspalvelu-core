@@ -5,7 +5,7 @@ import { Legend, LegendsWrapper } from "@/component/Legend";
 import { legend } from "./eventStyleGetter";
 import { UnitCalendar } from "./UnitCalendar";
 import { useUnitResources, useGetFilterSearchParams } from "@/hooks";
-import { fromUIDate, isValidDate, toUIDate } from "common/src/common/util";
+import { fromUIDate, isValidDate, formatDate } from "common/src/date-utils";
 import { startOfDay } from "date-fns";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { AutoGrid, Flex, HR } from "common/styled";
@@ -84,7 +84,7 @@ export function UnitReservations({ tagOptions, ...props }: UnitReservationsProps
 
   const handleTodayClick = () => {
     const p = new URLSearchParams(searchParams);
-    p.set("date", toUIDate(new Date()));
+    p.set("date", formatDate(new Date()));
     setSearchParams(p);
   };
 

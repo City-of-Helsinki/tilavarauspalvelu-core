@@ -1,9 +1,10 @@
 import { createReservationPageMock } from "@test/reservation.mocks";
 import { render, screen } from "@testing-library/react";
 import PaymentNotification from "@/components/reservation/PaymentNotification";
+import type { TFunction } from "i18next";
 import { describe, it, expect } from "vitest";
+import { formatDateTime, toValidDateObject } from "common/src/date-utils";
 import { OrderStatus, PaymentOrderNode, PaymentType, PriceUnit } from "@gql/gql-types";
-import { toUIDateTime } from "common/src/common/util";
 
 function customRender() {
   const paymentOrder = createPaymentOrderMock();
@@ -41,7 +42,10 @@ describe("Component: Payment Notification", () => {
   it("should render the payment notification component with correct deadline", () => {
     customRender();
     const paymentOrderMock = createPaymentOrderMock();
-    const deadlineText = `common:deadline: ${toUIDateTime(new Date(paymentOrderMock.handledPaymentDueBy ?? ""), "common:dayTimeSeparator")}`;
+    const deadlineText = `common:deadline: ${formatDateTime(
+      toValidDateObject(paymentOrderMock.handledPaymentDueBy ?? ""),
+      { t: ((key: string) => key) as TFunction, includeWeekday: false, locale: "fi" }
+    )}`;
     expect(screen.getByText(deadlineText)).toBeInTheDocument();
   });
 });

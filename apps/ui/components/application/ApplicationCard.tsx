@@ -10,7 +10,7 @@ import {
   type Maybe,
   useCancelApplicationMutation,
 } from "@gql/gql-types";
-import { formatDateTime } from "@/modules/util";
+import { formatDateTime, toValidDateObject } from "common/src/date-utils";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
@@ -127,7 +127,7 @@ export function ApplicationCard({ application, actionCallback }: Props): JSX.Ele
       buttons={buttons}
     >
       <br />
-      {t("applicationCard:saved")} {formatDateTime(t, new Date(application.updatedAt))}
+      {t("applicationCard:saved")} {formatDateTime(toValidDateObject(application.updatedAt), { locale: lang })}
       {isWaitingForDelete && (
         <ConfirmationDialog
           isOpen

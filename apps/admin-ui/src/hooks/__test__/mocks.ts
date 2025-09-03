@@ -11,7 +11,7 @@ import {
   UpdateStaffReservationDocument,
 } from "@gql/gql-types";
 import { createNodeId } from "common/src/helpers";
-import { toApiDateUnsafe } from "common/src/common/util";
+import { toApiDateUnsafe } from "common/src/date-utils";
 
 export const CHANGED_WORKING_MEMO = "Sisaisen kommentti";
 

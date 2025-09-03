@@ -33,10 +33,9 @@ import {
   getSlotPropGetter,
   isRangeReservable,
 } from "@/modules/reservable";
-import { formatDuration, fromUIDate, toApiDate, toUIDate } from "common/src/common/util";
+import { formatDuration, formatTime, fromUIDate, toApiDate, formatDate } from "common/src/date-utils";
 import { useTranslation } from "next-i18next";
 import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";
-import { getTimeString } from "@/modules/reservationUnit";
 import { type UseFormReturn } from "react-hook-form";
 import { type PendingReservationFormType } from "../reservation-unit/schema";
 import { useCurrentUser } from "@/hooks";
@@ -188,7 +187,7 @@ export function ReservationTimePicker({
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
   const { watch, setValue } = reservationForm;
   const activeApplicationRounds = reservationUnit.applicationRounds;
-
+  const locale = getLocalizationLang(i18n.language);
   const dateValue = watch("date");
 
   const now = useMemo(() => new Date(), []);
@@ -264,8 +263,8 @@ export function ReservationTimePicker({
       reservationUnit,
     });
 
-    const newDate = toUIDate(begin);
-    const newTime = getTimeString(begin);
+    const newDate = formatDate(begin);
+    const newTime = formatTime(begin, { locale });
 
     setValue("date", newDate, { shouldDirty: true });
     setValue("duration", duration, { shouldDirty: true });
@@ -319,8 +318,8 @@ export function ReservationTimePicker({
       reservationUnit,
     });
 
-    const uiDate = toUIDate(begin);
-    const uiTime = getTimeString(begin);
+    const uiDate = formatDate(begin);
+    const uiTime = formatTime(begin, { locale });
     // click doesn't change the duration
     setValue("date", uiDate, { shouldDirty: true });
     setValue("time", uiTime, { shouldDirty: true });
@@ -363,7 +362,7 @@ export function ReservationTimePicker({
         <Calendar<ReservationNode>
           events={calendarEvents}
           begin={focusDate}
-          onNavigate={(d: Date) => setValue("date", toUIDate(d))}
+          onNavigate={(d: Date) => setValue("date", formatDate(d))}
           eventStyleGetter={(event) =>
             eventStyleGetter(event, filterNonNullable(userReservations?.map((n) => n?.pk)), !isReservationQuotaReached)
           }
@@ -390,7 +389,7 @@ export function ReservationTimePicker({
           resizableAccessor={({ event }) => event?.state?.toString() === "INITIAL"}
           step={30}
           timeslots={SLOTS_EVERY_HOUR}
-          culture={getLocalizationLang(i18n.language)}
+          culture={locale}
           aria-hidden
           longPressThreshold={100}
         />

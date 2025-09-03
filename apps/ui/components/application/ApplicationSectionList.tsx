@@ -10,11 +10,12 @@ import {
   type SuitableTimeFragment,
 } from "@gql/gql-types";
 import { WEEKDAYS } from "common/src/const";
-import { filterNonNullable, formatDayTimes, fromMondayFirstUnsafe } from "common/src/helpers";
+import { filterNonNullable, formatDayTimes } from "common/src/helpers";
 import StatusLabel from "common/src/components/StatusLabel";
 import type { StatusLabelType } from "common/src/tags";
 import { NoWrap } from "common/styled";
-import { convertLanguageCode, formatDurationRange, getTranslationSafe, toUIDate } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { formatDurationRange, formatDate, fromMondayFirst } from "common/src/date-utils";
 import {
   ApplicationInfoContainer,
   ApplicationSection,
@@ -85,9 +86,13 @@ function SingleApplicationSection({
     aes.status === ApplicationSectionStatusChoice.Rejected || aes.status === ApplicationSectionStatusChoice.Handled;
   const statusProps = getLabelProps(aes.status);
 
-  const reservationsBegin = toUIDate(new Date(aes.reservationsBeginDate));
-  const reservationsEnd = toUIDate(new Date(aes.reservationsEndDate));
-  const duration = formatDurationRange(t, aes.reservationMinDuration, aes.reservationMaxDuration);
+  const reservationsBegin = formatDate(new Date(aes.reservationsBeginDate));
+  const reservationsEnd = formatDate(new Date(aes.reservationsEndDate));
+  const duration = formatDurationRange({
+    t,
+    beginSecs: aes.reservationMinDuration,
+    endSecs: aes.reservationMaxDuration,
+  });
   const infos = [
     {
       key: "numPersons",
@@ -197,7 +202,7 @@ function Weekdays({ primary, secondary }: { primary: SchedulesT[]; secondary: Sc
     <>
       {WEEKDAYS.map((day) => (
         <ScheduleDay key={day}>
-          <span>{t(`common:weekDay.${fromMondayFirstUnsafe(day)}`)}</span>
+          <span>{t(`common:weekDay.${fromMondayFirst(day)}`)}</span>
           <span>{formatDayTimes(primary, day) || "-"}</span>
           <span>{formatDayTimes(secondary, day) ? `(${formatDayTimes(secondary, day)})` : "-"}</span>
         </ScheduleDay>

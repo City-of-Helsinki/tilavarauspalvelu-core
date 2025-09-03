@@ -1,14 +1,14 @@
+import type { LocalizationLanguages } from "common/src/urlBuilder";
 import React from "react";
 import { CustomTable } from "@/component/Table";
 import { getApplicationUrl, getReservationUrl } from "@/common/urls";
 import type { RejectedOccurrencesTableElementFragment } from "@gql/gql-types";
-import { truncate } from "common/src/helpers";
+import { getLocalizationLang, truncate } from "common/src/helpers";
 import { IconLinkExternal, IconSize } from "hds-react";
 import { memoize } from "lodash-es";
 import { useTranslation, type TFunction } from "next-i18next";
 import { getApplicantName } from "@/helpers";
-import { toUIDate } from "common/src/common/util";
-import { formatTime } from "@/common/util";
+import { formatDate, formatTime, toValidDateObject } from "common/src/date-utils";
 import { ExternalTableLink } from "@/styled";
 import { gql } from "@apollo/client";
 
@@ -35,7 +35,11 @@ type RejectedOccurrencesView = {
   link: string;
 };
 
-function timeSlotMapper(t: TFunction, slot: RejectedOccurrencesTableElementFragment): RejectedOccurrencesView {
+function timeSlotMapper(
+  t: TFunction,
+  locale: LocalizationLanguages,
+  slot: RejectedOccurrencesTableElementFragment
+): RejectedOccurrencesView {
   const allocatedSlot = slot.reservationSeries?.allocatedTimeSlot;
   const allocatedReservationUnit = allocatedSlot?.reservationUnitOption.reservationUnit;
   const allocatedReservationUnitName = allocatedReservationUnit?.nameFi ?? "-";
@@ -44,9 +48,9 @@ function timeSlotMapper(t: TFunction, slot: RejectedOccurrencesTableElementFragm
   const application = allocatedSlot?.reservationUnitOption.applicationSection?.application;
   const applicantName = application != null ? getApplicantName(application) : "-";
 
-  const date = toUIDate(new Date(slot?.beginDatetime));
-  const begin = formatTime(slot?.beginDatetime);
-  const end = formatTime(slot?.endDatetime);
+  const date = formatDate(toValidDateObject(slot?.beginDatetime));
+  const begin = formatTime(toValidDateObject(slot?.beginDatetime), { locale });
+  const end = formatTime(toValidDateObject(slot?.endDatetime), { locale });
   const timeString = `${date} ${begin}–${end}`;
   const name = allocatedSlot?.reservationUnitOption.applicationSection.name ?? "-";
 
@@ -140,9 +144,10 @@ export function RejectedOccurrencesTable({
   sort,
   sortChanged: onSortChanged,
 }: Readonly<Props>) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
-  const rows = rejectedOccurrences.map((ro) => timeSlotMapper(t, ro));
+  const locale = getLocalizationLang(i18n.language);
+  const rows = rejectedOccurrences.map((ro) => timeSlotMapper(t, locale, ro));
   const cols = memoize(() => getColConfig(t))();
 
   if (rows.length === 0) {

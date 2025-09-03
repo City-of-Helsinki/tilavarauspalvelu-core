@@ -1,22 +1,20 @@
 import { ReservationStartInterval } from "@gql/gql-types";
-import { addDays, addHours, format, setMinutes, subDays } from "date-fns";
+import { addDays, addHours, setMinutes, subDays } from "date-fns";
 import { ReservationFormSchema } from "./reservation";
 import { describe, test, expect } from "vitest";
-
-const TIME_FORMAT = "HH:mm";
-const DATE_FORMAT = "dd.MM.yyyy";
+import { formatTime, formatDate } from "common/src/date-utils";
 
 describe("with schema", () => {
-  const futureEndTime = format(addHours(new Date(), 3), "HH:00");
+  const futureEndTime = formatTime(setMinutes(addHours(new Date(), 3), 0));
   const tomorrow = addDays(new Date(), 1);
 
   // FIXME broken
   test.skip(`date ${tomorrow} is valid`, () => {
-    const futureStartTime = format(setMinutes(addHours(new Date(), 1), 0), TIME_FORMAT);
+    const futureStartTime = formatTime(setMinutes(addHours(new Date(), 1), 0));
 
     const reservation = {
       type: "BLOCKED",
-      date: format(tomorrow, DATE_FORMAT),
+      date: formatDate(tomorrow),
       startTime: futureStartTime,
       endTime: futureEndTime,
     };
@@ -28,11 +26,11 @@ describe("with schema", () => {
   const yesterday = subDays(new Date(), 1);
 
   test(`yesterdays date ${yesterday} is not valid`, () => {
-    const futureStartTime = format(addHours(new Date(), 1), TIME_FORMAT);
+    const futureStartTime = formatTime(addHours(new Date(), 1));
 
     const reservation = {
       type: "BLOCKED",
-      date: format(yesterday, DATE_FORMAT),
+      date: formatDate(yesterday),
       startTime: futureStartTime,
       endTime: futureEndTime,
     };
@@ -47,11 +45,11 @@ describe("with schema", () => {
 
   // FIXME broken
   test.skip(`date ${tomorrow},  with correct interval is valid`, () => {
-    const futureStartTime = format(setMinutes(addHours(new Date(), 2), 30), TIME_FORMAT);
+    const futureStartTime = formatTime(setMinutes(addHours(new Date(), 2), 30));
 
     const reservation = {
       type: "BLOCKED",
-      date: format(tomorrow, DATE_FORMAT),
+      date: formatDate(tomorrow),
       startTime: futureStartTime,
       endTime: futureEndTime,
     };
@@ -61,11 +59,11 @@ describe("with schema", () => {
   });
 
   test(`date ${tomorrow} with incorrect interval is invalid`, () => {
-    const futureStartTime = format(setMinutes(addHours(new Date(), 2), 3), TIME_FORMAT);
+    const futureStartTime = formatTime(setMinutes(addHours(new Date(), 2), 3));
 
     const reservation = {
       type: "BLOCKED",
-      date: format(tomorrow, DATE_FORMAT),
+      date: formatDate(tomorrow),
       startTime: futureStartTime,
       endTime: futureEndTime,
     };

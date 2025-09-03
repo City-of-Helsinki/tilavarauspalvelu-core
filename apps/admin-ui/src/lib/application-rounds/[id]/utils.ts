@@ -1,5 +1,5 @@
 import { differenceInWeeks } from "date-fns";
-import { fromApiDate } from "common/src/common/util";
+import { fromApiDate } from "common/src/date-utils";
 import { formatters as getFormatters } from "common";
 import { type ApplicationSectionNode } from "@gql/gql-types";
 import { formatNumber } from "@/common/util";

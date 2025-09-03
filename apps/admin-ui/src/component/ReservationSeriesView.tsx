@@ -1,6 +1,6 @@
+import { formatTime } from "common/src/date-utils";
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { format } from "date-fns";
 import { ReservationStateChoice, type ReservationToCopyFragment, UserPermissionChoice } from "@gql/gql-types";
 import { NewReservationListItem, ReservationList } from "@/component/ReservationsList";
 import { ReservationListButton } from "@/component/ReservationListButton";
@@ -88,8 +88,8 @@ export function ReservationSeriesView({
       const endDate = new Date(x.endDatetime);
       return {
         date: startDate,
-        startTime: format(startDate, "H:mm"),
-        endTime: format(endDate, "H:mm"),
+        startTime: formatTime(startDate),
+        endTime: formatTime(endDate),
         isRemoved: true,
         reason: x.rejectionReason,
         buttons: [],
@@ -115,8 +115,8 @@ export function ReservationSeriesView({
 
     return {
       date: startDate,
-      startTime: format(startDate, "H:mm"),
-      endTime: format(endDate, "H:mm"),
+      startTime: formatTime(startDate),
+      endTime: formatTime(endDate),
       isRemoved: x.state === ReservationStateChoice.Denied,
       isCancelled: x.state === ReservationStateChoice.Cancelled,
       buttons,

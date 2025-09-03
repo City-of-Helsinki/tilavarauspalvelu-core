@@ -1,5 +1,5 @@
 import React from "react";
-import { toUIDate } from "common/src/common/util";
+import { formatDate } from "common/src/date-utils";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { startOfDay } from "date-fns";
@@ -239,7 +239,7 @@ export function ReservationList(props: Props | ExtendedProps) {
           <StyledListItem key={`${item.date}-${item.startTime}-${item.endTime}`}>
             <TextWrapper $failed={!!item.error}>
               <DateElement $isRemoved={(item.isRemoved || item.isOverlapping || item.isCancelled) ?? false}>
-                {`${toUIDate(item.date, "cccccc d.M.yyyy")}, ${stripTimeZeros(
+                {`${formatDate(new Date(item.date), { includeWeekday: true })}, ${stripTimeZeros(
                   item.startTime
                 )}-${stripTimeZeros(item.endTime)}`}
               </DateElement>

@@ -2,8 +2,9 @@ import { IconArrowRight, IconEuroSign, IconGroup, IconHome, IconLock, IconSize }
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { type SingleSearchCardFragment } from "@gql/gql-types";
-import { format, isToday, isTomorrow, isValid } from "date-fns";
-import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";
+import { isToday, isTomorrow, isValid } from "date-fns";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { formatDate, formatTime } from "common/src/date-utils";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import { isBrowser } from "@/modules/const";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
@@ -26,13 +27,13 @@ function StatusTag(props: Pick<SingleSearchCardFragment, "isClosed" | "firstRese
   if (!availableAt || !isValid(availableAt)) {
     return <Tag type="neutral">{t("reservationUnitCard:noTimes")}</Tag>;
   }
-  let dayText = toUIDate(availableAt);
+  let dayText = formatDate(availableAt);
   if (isToday(availableAt)) {
     dayText = t("common:today");
   } else if (isTomorrow(availableAt)) {
     dayText = t("common:tomorrow");
   }
-  const timeText = format(new Date(availableAt), "HH:mm");
+  const timeText = formatTime(new Date(availableAt));
   const ariaLabel = t("reservationUnitCard:firstAvailableTime");
   return (
     <Tag ariaLabel={ariaLabel} type="success">

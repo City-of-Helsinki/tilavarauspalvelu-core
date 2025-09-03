@@ -3,14 +3,14 @@ import { ButtonVariant, IconArrowRight, IconCross, IconEuroSign, IconLock } from
 import { useTranslation } from "next-i18next";
 import { trim } from "lodash-es";
 import { type ReservationCardFragment, ReservationStateChoice } from "@gql/gql-types";
-import { formatDateTimeRange } from "@/modules/util";
+import { formatDateTimeRange } from "common/src/date-utils";
 import { getNormalizedReservationOrderStatus, getPaymentUrl, isReservationCancellable } from "@/modules/reservation";
 import { getPrice } from "@/modules/reservationUnit";
 import { getReservationPath } from "@/modules/urls";
 import { ReservationOrderStatus } from "./ReservationOrderStatus";
 import { ReservationStatus } from "./ReservationStatus";
 import { ButtonLikeExternalLink, ButtonLikeLink } from "common/src/components/ButtonLikeLink";
-import { capitalize, getImageSource, getMainImage } from "common/src/helpers";
+import { capitalize, getImageSource, getLocalizationLang, getMainImage } from "common/src/helpers";
 import Card from "common/src/components/Card";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
@@ -30,7 +30,9 @@ export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<Prop
   const link = reservation.pk ? `/reservations/${reservation.pk}` : "";
 
   const { beginsAt, endsAt } = reservation;
-  const timeString = capitalize(formatDateTimeRange(t, new Date(beginsAt), new Date(endsAt)));
+  const timeString = capitalize(
+    formatDateTimeRange(new Date(beginsAt), new Date(endsAt), { locale: getLocalizationLang(i18n.language) })
+  );
 
   const lang = convertLanguageCode(i18n.language);
   const price = getPrice(t, reservation, lang);

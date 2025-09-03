@@ -6,7 +6,7 @@ import {
   useReservationsByReservationUnitQuery,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
-import { toApiDate } from "common/src/common/util";
+import { toApiDate } from "common/src/date-utils";
 import { errorToast } from "common/src/components/toast";
 import { createNodeId } from "common/src/helpers";
 import { type CalendarEventType } from "@/modules/reservation";
