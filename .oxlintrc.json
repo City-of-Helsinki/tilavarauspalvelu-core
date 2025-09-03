@@ -230,7 +230,9 @@
     "unicorn/no-useless-spread": "error",
     "unicorn/number-literal-case": "off",
     "unicorn/prefer-set-size": "error",
-    "unicorn/prefer-string-starts-ends-with": "error"
+    "unicorn/prefer-string-starts-ends-with": "error",
+    "vitest/no-conditional-tests": "error",
+    "vitest/require-local-test-context-for-concurrent-snapshots": "error"
   },
   "ignorePatterns": [
     "node_modules/",
