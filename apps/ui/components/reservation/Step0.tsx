@@ -13,11 +13,11 @@ import InfoDialog from "../common/InfoDialog";
 import { type ReservationInProgressFragment, ReserveeType } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { containsField, FieldName } from "common/src/metaFieldsHelpers";
-import { type Inputs } from "common/src/reservation-form/types";
+import { getApplicationFields, getGeneralFields } from "common/src/hooks/useApplicationFields";
+import { type InputsT } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { type OptionsRecord } from "common";
-import { getApplicationFields, getGeneralFields } from "common/src/hooks/useApplicationFields";
 
 type Props = {
   cancelReservation: () => void;
@@ -29,7 +29,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
   const { t, i18n } = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const form = useFormContext<Inputs>();
+  const form = useFormContext<InputsT>();
   const {
     watch,
     formState: { isSubmitting, isValid },
@@ -133,7 +133,7 @@ function Errors({
   supportedFields,
   generalFields,
 }: {
-  form: UseFormReturn<Inputs>;
+  form: UseFormReturn<InputsT>;
   supportedFields: FieldName[];
   generalFields: string[];
 }) {
