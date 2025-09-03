@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar
 
+from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
@@ -30,7 +31,8 @@ class PaymentAccounting(models.Model):
     name: str = models.CharField(max_length=128)
     company_code: str = models.CharField(max_length=4, validators=[is_numeric])
     main_ledger_account: str = models.CharField(max_length=6, validators=[is_numeric])
-    vat_code: str = models.CharField(max_length=2)
+    vat_code: str = models.CharField(max_length=2, validators=[MinLengthValidator(2)])
+
     internal_order: str = models.CharField(blank=True, default="", max_length=10, validators=[is_numeric])
     profit_center: str = models.CharField(blank=True, default="", max_length=7, validators=[is_numeric])
     project: str = models.CharField(
@@ -39,14 +41,35 @@ class PaymentAccounting(models.Model):
         max_length=16,
         validators=[validate_accounting_project, is_numeric],
     )
+
     operation_area: str = models.CharField(blank=True, default="", max_length=6, validators=[is_numeric])
-    balance_profit_center: str = models.CharField(max_length=10)
+    balance_profit_center: str = models.CharField(max_length=10, validators=[is_numeric])
 
     # Must be provided together or not at all
-    product_invoicing_sales_org = models.CharField(max_length=4, blank=True, default="", validators=[is_numeric])
-    product_invoicing_sales_office = models.CharField(max_length=4, blank=True, default="", validators=[is_numeric])
-    product_invoicing_material = models.CharField(max_length=8, blank=True, default="", validators=[is_numeric])
-    product_invoicing_order_type = models.CharField(max_length=4, blank=True, default="")
+    product_invoicing_sales_org = models.CharField(
+        max_length=4,
+        blank=True,
+        default="",
+        validators=[MinLengthValidator(4), is_numeric],
+    )
+    product_invoicing_sales_office = models.CharField(
+        max_length=4,
+        blank=True,
+        default="",
+        validators=[MinLengthValidator(4), is_numeric],
+    )
+    product_invoicing_material = models.CharField(
+        max_length=8,
+        blank=True,
+        default="",
+        validators=[MinLengthValidator(8), is_numeric],
+    )
+    product_invoicing_order_type = models.CharField(
+        max_length=4,
+        blank=True,
+        default="",
+        validators=[MinLengthValidator(4)],
+    )
 
     objects: ClassVar[PaymentAccountingManager] = LazyModelManager.new()
     actions: PaymentAccountingActions = LazyModelAttribute.new()
@@ -86,6 +109,11 @@ class PaymentAccounting(models.Model):
                 violation_error_message=(
                     "At least one of the following fields must be filled: 'internal_order', 'profit_center', 'project'"
                 ),
+            ),
+            models.CheckConstraint(
+                check=models.Q(profit_center="") | models.Q(internal_order=""),
+                name="either_internal_order_or_profit_center",
+                violation_error_message="Can fill either 'internal_order' or 'profit_center'",
             ),
         ]
 
