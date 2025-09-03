@@ -440,7 +440,7 @@ function isSlotWithinTimeframe(
 }
 
 function doesSlotCollideWithApplicationRounds(slot: Date, rounds: readonly RoundPeriod[]): boolean {
-  if (rounds.length < 1) return false;
+  if (rounds.length === 0) return false;
 
   return rounds.some((round) =>
     isWithinInterval(slot, {
