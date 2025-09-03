@@ -372,6 +372,7 @@ function isPageRequest(url: URL): boolean {
   if (
     // ignore healthcheck because it's for automated test suite that can't do redirects
     url.pathname.startsWith("/healthcheck") ||
+    url.pathname.startsWith("/api/healthcheck") ||
     url.pathname.startsWith("/_next") ||
     url.pathname.match(/\.(webmanifest|js|css|png|jpg|jpeg|svg|gif|ico|json|woff|woff2|ttf|eot|otf|pdf)$/) ||
     url.pathname.startsWith("/503") ||
