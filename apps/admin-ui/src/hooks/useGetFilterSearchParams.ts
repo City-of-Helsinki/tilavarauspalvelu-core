@@ -14,7 +14,7 @@ import {
   transformReserveeType,
   transformWeekday,
 } from "common/src/conversion";
-import { filterEmptyArray, filterNonNullable, mapParamToInterger, toInteger, toNumber } from "common/src/helpers";
+import { filterEmptyArray, filterNonNullable, mapParamsToIntegers, toInteger, toNumber } from "common/src/helpers";
 
 export function getFilterSearchParams({
   searchParams,
@@ -25,7 +25,7 @@ export function getFilterSearchParams({
 }) {
   // If unitParam is empty, use all units the user has permission to as the filter
   // This is required on some endpoints, in case the user is missing permissions for some units
-  const unitParam = mapParamToInterger(searchParams.getAll("unit"), 1);
+  const unitParam = mapParamsToIntegers(searchParams.getAll("unit"), 1);
   const unitFilter = unitParam.length > 0 ? unitParam : unitOptions.map((u) => u.value);
 
   const applicantTypeParam =
@@ -35,15 +35,15 @@ export function getFilterSearchParams({
   const applicantTypeFilter = filterEmptyArray(filterNonNullable(applicantTypeParam.map(transformReserveeType)));
 
   const priorityFilter = filterEmptyArray(transformPriorityFilter(searchParams.getAll("priority")));
-  const orderFilter = filterEmptyArray(mapParamToInterger(searchParams.getAll("order")));
-  const ageGroupFilter = filterEmptyArray(mapParamToInterger(searchParams.getAll("ageGroup"), 1));
-  const purposeFilter = filterEmptyArray(mapParamToInterger(searchParams.getAll("purpose"), 1));
+  const orderFilter = filterEmptyArray(mapParamsToIntegers(searchParams.getAll("order")));
+  const ageGroupFilter = filterEmptyArray(mapParamsToIntegers(searchParams.getAll("ageGroup"), 1));
+  const purposeFilter = filterEmptyArray(mapParamsToIntegers(searchParams.getAll("purpose"), 1));
   return {
     textFilter: searchParams.get("search") ?? undefined,
     unitFilter: filterEmptyArray(unitFilter),
-    unitGroupFilter: filterEmptyArray(mapParamToInterger(searchParams.getAll("unitGroup"), 1)),
-    reservationUnitFilter: filterEmptyArray(mapParamToInterger(searchParams.getAll("reservationUnit"), 1)),
-    reservationUnitTypeFilter: filterEmptyArray(mapParamToInterger(searchParams.getAll("reservationUnitType"), 1)),
+    unitGroupFilter: filterEmptyArray(mapParamsToIntegers(searchParams.getAll("unitGroup"), 1)),
+    reservationUnitFilter: filterEmptyArray(mapParamsToIntegers(searchParams.getAll("reservationUnit"), 1)),
+    reservationUnitTypeFilter: filterEmptyArray(mapParamsToIntegers(searchParams.getAll("reservationUnitType"), 1)),
     applicationStatusFilter: filterEmptyArray(transformApplicationStatusList(searchParams.getAll("status"))),
     reservationStatusFilter: filterEmptyArray(
       filterNonNullable(searchParams.getAll("state").map(transformReservationState))
@@ -86,7 +86,7 @@ export function getFilterSearchParams({
     createdAtLteFilter: searchParams.get("createdAtLte") ?? undefined,
     freeOfChargeFilter: searchParams.get("freeOfCharge") ? searchParams.get("freeOfCharge") === "true" : undefined,
     weekDayFilter: filterEmptyArray(
-      mapParamToInterger(searchParams.getAll("weekday"))
+      mapParamsToIntegers(searchParams.getAll("weekday"))
         .filter((n): n is DayT => n >= 0 && n <= 6)
         .map(transformWeekday)
     ),

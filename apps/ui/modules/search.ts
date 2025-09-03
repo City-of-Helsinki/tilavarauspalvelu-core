@@ -5,7 +5,7 @@ import {
   filterNonNullable,
   getLocalizationLang,
   ignoreMaybeArray,
-  mapParamToInterger,
+  mapParamsToIntegers,
   toNumber,
 } from "common/src/helpers";
 import { type LocalizationLanguages } from "common/src/urlBuilder";
@@ -132,10 +132,10 @@ export function processVariables({
   const isSeasonal = kind === ReservationKind.Season;
   const textSearch = filterEmpty(values.get("textSearch"));
   const personsAllowed = filterEmpty(toNumber(values.get("personsAllowed")));
-  const purposes = filterEmptyArray(mapParamToInterger(values.getAll("purposes"), 1));
-  const unit = filterEmptyArray(mapParamToInterger(values.getAll("units"), 1));
-  const reservationUnitTypes = filterEmptyArray(mapParamToInterger(values.getAll("reservationUnitTypes"), 1));
-  const equipments = filterEmptyArray(mapParamToInterger(values.getAll("equipments"), 1));
+  const purposes = filterEmptyArray(mapParamsToIntegers(values.getAll("purposes"), 1));
+  const unit = filterEmptyArray(mapParamsToIntegers(values.getAll("units"), 1));
+  const reservationUnitTypes = filterEmptyArray(mapParamsToIntegers(values.getAll("reservationUnitTypes"), 1));
+  const equipments = filterEmptyArray(mapParamsToIntegers(values.getAll("equipments"), 1));
   const showOnlyReservable = ignoreMaybeArray(values.getAll("showOnlyReservable")) !== "false";
   const applicationRound = "applicationRound" in rest && isSeasonal ? rest.applicationRound : undefined;
   const reservationPeriodBeginDate =
