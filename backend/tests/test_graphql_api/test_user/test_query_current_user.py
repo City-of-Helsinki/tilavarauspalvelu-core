@@ -4,9 +4,10 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+from tilavarauspalvelu.enums import UserRoleChoice
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 
-from tests.factories import UnitFactory, UserFactory
+from tests.factories import GeneralRoleFactory, UnitFactory, UnitGroupFactory, UnitRoleFactory, UserFactory
 from tests.helpers import patch_method
 
 from .helpers import current_user_query
@@ -222,6 +223,200 @@ def test_query_current_user__unit_admin(graphql):
                     "CAN_VIEW_APPLICATIONS",
                     "CAN_VIEW_RESERVATIONS",
                     "CAN_VIEW_USERS",
+                ],
+            },
+        ],
+    }
+
+
+@patch_method(HelsinkiProfileClient.ensure_token_valid)
+def test_query_current_user__unit_admin__unit_group(graphql):
+    unit = UnitFactory.create()
+    unit_group = UnitGroupFactory.create(units=[unit])
+
+    user = UserFactory.create_with_unit_role(unit_groups=[unit_group])
+    unit_role = user.unit_roles.first()
+    graphql.force_login(user)
+
+    fields = """
+        pk
+        unitRoles {
+            role
+            units {
+                pk
+            }
+            unitGroups {
+                pk
+            }
+            assigner {
+                firstName
+                lastName
+            }
+            createdAt
+            updatedAt
+            permissions
+        }
+    """
+
+    response = graphql(current_user_query(fields=fields))
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {
+        "pk": user.pk,
+        "unitRoles": [
+            {
+                "role": unit_role.role,
+                "units": [],
+                "unitGroups": [
+                    {
+                        "pk": unit_group.pk,
+                    },
+                ],
+                "assigner": None,
+                "createdAt": unit_role.created_at.isoformat(),
+                "updatedAt": unit_role.updated_at.isoformat(),
+                "permissions": [
+                    "CAN_CREATE_STAFF_RESERVATIONS",
+                    "CAN_MANAGE_APPLICATIONS",
+                    "CAN_MANAGE_NOTIFICATIONS",
+                    "CAN_MANAGE_RESERVATIONS",
+                    "CAN_MANAGE_RESERVATION_RELATED_DATA",
+                    "CAN_MANAGE_RESERVATION_UNITS",
+                    "CAN_VIEW_APPLICATIONS",
+                    "CAN_VIEW_RESERVATIONS",
+                    "CAN_VIEW_USERS",
+                ],
+            },
+        ],
+    }
+
+
+@patch_method(HelsinkiProfileClient.ensure_token_valid)
+def test_query_current_user__unit_admin__multiple_roles(graphql):
+    unit_1 = UnitFactory.create()
+    unit_2 = UnitFactory.create()
+
+    user = UserFactory.create()
+
+    unit_role_1 = UnitRoleFactory.create(user=user, role=UserRoleChoice.RESERVER, units=[unit_1])
+    unit_role_2 = UnitRoleFactory.create(user=user, role=UserRoleChoice.VIEWER, units=[unit_2])
+
+    graphql.force_login(user)
+
+    fields = """
+        pk
+        unitRoles {
+            role
+            units {
+                pk
+            }
+            permissions
+        }
+    """
+
+    response = graphql(current_user_query(fields=fields))
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {
+        "pk": user.pk,
+        "unitRoles": [
+            {
+                "role": unit_role_1.role,
+                "units": [
+                    {
+                        "pk": unit_1.pk,
+                    },
+                ],
+                "permissions": [
+                    "CAN_CREATE_STAFF_RESERVATIONS",
+                ],
+            },
+            {
+                "role": unit_role_2.role,
+                "units": [
+                    {
+                        "pk": unit_2.pk,
+                    },
+                ],
+                "permissions": [
+                    "CAN_VIEW_RESERVATIONS",
+                ],
+            },
+        ],
+    }
+
+
+@patch_method(HelsinkiProfileClient.ensure_token_valid)
+def test_query_current_user__inactive_general_roles(graphql):
+    user = UserFactory.create()
+
+    general_role = GeneralRoleFactory.create(user=user, role=UserRoleChoice.RESERVER)
+    GeneralRoleFactory.create(user=user, role=UserRoleChoice.VIEWER, is_role_active=False)
+
+    graphql.force_login(user)
+
+    fields = """
+        pk
+        generalRoles {
+            role
+            permissions
+        }
+    """
+
+    response = graphql(current_user_query(fields=fields))
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {
+        "pk": user.pk,
+        "generalRoles": [
+            {
+                "role": general_role.role,
+                "permissions": [
+                    "CAN_CREATE_STAFF_RESERVATIONS",
+                ],
+            },
+        ],
+    }
+
+
+@patch_method(HelsinkiProfileClient.ensure_token_valid)
+def test_query_current_user__inactive_unit_roles(graphql):
+    unit_1 = UnitFactory.create()
+    unit_2 = UnitFactory.create()
+
+    user = UserFactory.create()
+
+    unit_role = UnitRoleFactory.create(user=user, role=UserRoleChoice.RESERVER, units=[unit_1])
+    UnitRoleFactory.create(user=user, role=UserRoleChoice.VIEWER, units=[unit_2], is_role_active=False)
+
+    graphql.force_login(user)
+
+    fields = """
+        pk
+        unitRoles {
+            role
+            units {
+                pk
+            }
+            permissions
+        }
+    """
+
+    response = graphql(current_user_query(fields=fields))
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {
+        "pk": user.pk,
+        "unitRoles": [
+            {
+                "role": unit_role.role,
+                "units": [
+                    {
+                        "pk": unit_1.pk,
+                    },
+                ],
+                "permissions": [
+                    "CAN_CREATE_STAFF_RESERVATIONS",
                 ],
             },
         ],

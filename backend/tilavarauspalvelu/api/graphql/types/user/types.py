@@ -17,6 +17,8 @@ from .permissions import UserPermission
 if TYPE_CHECKING:
     import datetime
 
+    from tilavarauspalvelu.models.general_role.queryset import GeneralRoleQuerySet
+    from tilavarauspalvelu.models.unit_role.queryset import UnitRoleQuerySet
     from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
@@ -60,6 +62,12 @@ class UserNode(DjangoNode):
         model = User
         fields = _FIELDS
         permission_classes = [UserPermission]
+
+    def resolve_general_roles(root: User, info: GQLInfo) -> GeneralRoleQuerySet:
+        return root.general_roles.filter(is_role_active=True)
+
+    def resolve_unit_roles(root: User, info: GQLInfo) -> UnitRoleQuerySet:
+        return root.unit_roles.filter(is_role_active=True)
 
     def resolve_reservation_notification(root: User, info: GQLInfo) -> str | None:
         if root.permissions.has_any_role():
