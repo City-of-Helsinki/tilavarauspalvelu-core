@@ -13,6 +13,7 @@ from tilavarauspalvelu.enums import (
     ReservationKind,
     ReservationUnitPublishingState,
     ReservationUnitReservationState,
+    UserRoleChoice,
 )
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, User
 from utils.date_utils import local_date
@@ -101,6 +102,11 @@ class ReservationUnitFilterSet(FilterSet[ReservationUnit]):
     def only_with_permission(self, info: GQLInfo[User], *, value: bool) -> models.Q:
         """Returns reservation units where the user has any kind of permissions in its unit"""
         return filter_only_with_permission(info, value=value)
+
+    @Filter(distinct=True)
+    def only_with_manage_permission(self, info: GQLInfo[User], *, value: bool) -> models.Q:
+        """Returns reservation units where the user has a manage permissions in its unit"""
+        return filter_only_with_manage_permission(info, value=value)
 
     application_round = Filter("application_rounds", lookup="in", distinct=True)
 
@@ -200,6 +206,11 @@ class ReservationUnitAllFilterSet(FilterSet[ReservationUnit]):
         """Returns reservation units where the user has any kind of permissions in its unit"""
         return filter_only_with_permission(info, value=value)
 
+    @Filter(distinct=True)
+    def only_with_manage_permission(self, info: GQLInfo[User], *, value: bool) -> models.Q:
+        """Returns reservation units where the user has a manage permissions in its unit"""
+        return filter_only_with_manage_permission(info, value=value)
+
 
 def filter_only_with_permission(info: GQLInfo[User], *, value: bool) -> models.Q:
     if not value:
@@ -217,5 +228,26 @@ def filter_only_with_permission(info: GQLInfo[User], *, value: bool) -> models.Q
 
     unit_ids = list(user.active_unit_roles)
     unit_group_ids = list(user.active_unit_group_roles)
+
+    return models.Q(unit__in=unit_ids) | models.Q(unit__unit_groups__in=unit_group_ids)
+
+
+def filter_only_with_manage_permission(info: GQLInfo[User], *, value: bool) -> models.Q:
+    if not value:
+        return models.Q()
+
+    user = info.context.user
+    if user.is_anonymous:
+        raise EmptyFilterResult
+
+    if user.is_superuser:
+        return models.Q()
+
+    role_choices = UserRoleChoice.can_manage_reservations()
+    if user.permissions.has_general_role(role_choices=role_choices):
+        return models.Q()
+
+    unit_ids = user.permissions.unit_ids_where_has_role(role_choices=role_choices)
+    unit_group_ids = user.permissions.unit_group_ids_where_has_role(role_choices=role_choices)
 
     return models.Q(unit__in=unit_ids) | models.Q(unit__unit_groups__in=unit_group_ids)

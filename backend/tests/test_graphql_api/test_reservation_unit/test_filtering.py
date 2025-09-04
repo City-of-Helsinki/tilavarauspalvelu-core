@@ -10,6 +10,7 @@ from tilavarauspalvelu.enums import (
     ReservationKind,
     ReservationUnitPublishingState,
     ReservationUnitReservationState,
+    UserRoleChoice,
 )
 from utils.date_utils import local_date, local_datetime
 
@@ -21,6 +22,7 @@ from tests.factories import (
     ReservationUnitTypeFactory,
     UnitFactory,
     UnitGroupFactory,
+    UnitRoleFactory,
     UserFactory,
 )
 from tests.helpers import parametrize_helper
@@ -585,18 +587,60 @@ def test_reservation_unit__filter__only_with_permission__general_admin(graphql):
 
 
 def test_reservation_unit__filter__only_with_permission__unit_admin(graphql):
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit_1 = ReservationUnitFactory.create()
+    reservation_unit_2 = ReservationUnitFactory.create()
     ReservationUnitFactory.create()
 
-    user = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
+    user = UserFactory.create()
+
+    UnitRoleFactory.create(user=user, role=UserRoleChoice.ADMIN, units=[reservation_unit_1.unit])
+    UnitRoleFactory.create(user=user, role=UserRoleChoice.VIEWER, units=[reservation_unit_2.unit])
+
     graphql.force_login(user)
 
     query = reservation_units_query(onlyWithPermission=True)
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+
+
+def test_reservation_unit__filter__only_with_manage_permission__general_admin(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create()
+    reservation_unit_2 = ReservationUnitFactory.create()
+
+    user = UserFactory.create_with_general_role()
+    graphql.force_login(user)
+
+    query = reservation_units_query(onlyWithManagePermission=True)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+
+
+def test_reservation_unit__filter__only_with_manage_permission__unit_admin(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create()
+    reservation_unit_2 = ReservationUnitFactory.create()
+    ReservationUnitFactory.create()
+
+    user = UserFactory.create()
+
+    UnitRoleFactory.create(user=user, role=UserRoleChoice.ADMIN, units=[reservation_unit_1.unit])
+    UnitRoleFactory.create(user=user, role=UserRoleChoice.VIEWER, units=[reservation_unit_2.unit])
+
+    graphql.force_login(user)
+
+    query = reservation_units_query(onlyWithManagePermission=True)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
-    assert response.node(0) == {"pk": reservation_unit.pk}
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
 
 
 # Reservation state
