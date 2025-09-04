@@ -71,7 +71,8 @@ def test_redirect_to_hauki__multiple_reservation_units(api_client):
 
     url = update_query_params(
         reverse("edit_opening_hours"),
-        reservation_units=f"{reservation_unit_1.pk},{reservation_unit_2.pk}",
+        # Intentionally reversed order to test that primary the first given, not one with the lowest pk.
+        reservation_units=f"{reservation_unit_2.pk},{reservation_unit_1.pk}",
         redirect_on_error="https://fake.varaamo.hel.fi",
         lang="en",
     )
@@ -82,18 +83,16 @@ def test_redirect_to_hauki__multiple_reservation_units(api_client):
 
     assert response.status_code == 302
     assert response.url == (
-        "https://fake.test.hauki.admin.com/resource/test-origin%3Af08dcb9f-9765-4747-b0c8-6d472326e562/"
+        "https://fake.test.hauki.admin.com/resource/test-origin%3Ab06643c1-955f-45b3-8372-ec29fa03a778/"
         "?hsa_source=test-origin"
         "&hsa_username=test.user%40varaamo.fi"
         "&hsa_organization=tprek%3A1234"
         "&hsa_created_at=2024-01-01T00%3A00%3A00%2B02%3A00"
         "&hsa_valid_until=2024-01-01T00%3A30%3A00%2B02%3A00"
-        "&hsa_resource=test-origin%3Af08dcb9f-9765-4747-b0c8-6d472326e562"
+        "&hsa_resource=test-origin%3Ab06643c1-955f-45b3-8372-ec29fa03a778"
         "&hsa_has_organization_rights=true"
-        "&hsa_signature=8d9dc19ae6332d50477cf80f5a853a995b3cf4a17f32da5571ed2f7d10cb9edf"
-        "&target_resources="
-        "test-origin%3Af08dcb9f-9765-4747-b0c8-6d472326e562%2C"
-        "test-origin%3Ab06643c1-955f-45b3-8372-ec29fa03a778"
+        "&hsa_signature=93e2e589a704a9630536a7ffa1bc54acbbafb1307db1bb3974f431d6f5c6fbdb"
+        "&target_resources=test-origin%3Af08dcb9f-9765-4747-b0c8-6d472326e562"
     )
 
 

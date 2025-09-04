@@ -12,7 +12,7 @@ from django.apps import apps
 from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import connection
+from django.db import connection, models
 from django.http import FileResponse, HttpResponse, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.middleware.csrf import get_token
 from django.views.csrf import csrf_failure
@@ -53,10 +53,13 @@ __all__ = [
     "csrf_view",
     "liveness_check",
     "readiness_check",
+    "redirect_to_hauki",
+    "redirect_to_verkkokauppa_for_pending_reservations",
     "reservable_time_spans_export",
     "reservation_ical",
     "reservation_statistics_export",
     "reservation_unit_export",
+    "robot_test_data_create_view",
     "terms_of_use_pdf",
 ]
 
@@ -479,6 +482,15 @@ def redirect_to_hauki(request: WSGIRequest) -> HttpResponseRedirect:
         .prefetch_related(
             "unit__unit_groups",
         )
+        .alias(
+            # Return reservation units in the same order as the pks were given.
+            given_ordering=models.Case(
+                *(models.When(pk=pk, then=models.Value(index)) for index, pk in enumerate(given_pks)),
+                default=models.Value(len(given_pks)),
+                output_field=models.IntegerField(),
+            )
+        )
+        .order_by(models.F("given_ordering"))
     )
 
     existing_pks = {reservation_unit.pk for reservation_unit in reservation_units}
@@ -498,7 +510,8 @@ def redirect_to_hauki(request: WSGIRequest) -> HttpResponseRedirect:
 
     target_resources: list[uuid.UUID] = []
 
-    for reservation_unit in reservation_units:
+    # Don't include the primary reservation unit in the target resources.
+    for reservation_unit in reservation_units[1:]:
         if reservation_unit.origin_hauki_resource is None:
             msg = f"Reservation unit '{reservation_unit.ext_uuid}' is not linked to a Hauki resource"
             raise ValidationError(msg, code="HAUKI_RESOURCE_NOT_LINKED")
@@ -513,7 +526,7 @@ def redirect_to_hauki(request: WSGIRequest) -> HttpResponseRedirect:
         reservation_unit_uuid=primary.ext_uuid,
         user_email=user.email,
         organization_id=primary.unit.hauki_department_id,
-        target_resources=target_resources if len(target_resources) > 1 else None,
+        target_resources=target_resources or None,
     )
     if hauki_url is None:
         msg = "Could not generate Hauki link"
