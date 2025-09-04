@@ -305,6 +305,7 @@ type Query {
     accessTypeBeginDate: Date
     accessTypeEndDate: Date
     onlyWithPermission: Boolean
+    onlyWithManagePermission: Boolean
     reservableDateStart: Date
     reservableDateEnd: Date
     reservableTimeStart: Time
@@ -328,6 +329,7 @@ type Query {
     nameEn_Istartswith: String
     unit: [Int]
     onlyWithPermission: Boolean
+    onlyWithManagePermission: Boolean
 
     """Ordering"""
     orderBy: [ReservationUnitOrderingChoices]
@@ -686,6 +688,7 @@ type ApplicationRoundNode implements Node {
     accessTypeBeginDate: Date
     accessTypeEndDate: Date
     onlyWithPermission: Boolean
+    onlyWithManagePermission: Boolean
     reservableDateStart: Date
     reservableDateEnd: Date
     reservableTimeStart: Time
@@ -1062,6 +1065,7 @@ type UnitNode implements Node {
     accessTypeBeginDate: Date
     accessTypeEndDate: Date
     onlyWithPermission: Boolean
+    onlyWithManagePermission: Boolean
     reservableDateStart: Date
     reservableDateEnd: Date
     reservableTimeStart: Time

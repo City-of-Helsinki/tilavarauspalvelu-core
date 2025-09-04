@@ -21,6 +21,7 @@ from tilavarauspalvelu.enums import (
     ReservationKind,
     ReservationUnitPublishingState,
     ReservationUnitReservationState,
+    UserRoleChoice,
 )
 from tilavarauspalvelu.models import ReservationUnit
 from utils.db import build_search
@@ -61,6 +62,26 @@ class ReservationUnitFilterSetMixin:
         unit_group_ids = list(user.active_unit_group_roles)
 
         return qs.filter(Q(unit_id__in=unit_ids) | Q(unit__unit_groups__in=unit_group_ids)).distinct()
+
+    def get_only_with_manage_permission(self, qs: ReservationUnitQuerySet, name: str, value: bool) -> QuerySet:
+        """Returns reservation units where the user has a manage permissions in its unit"""
+        if not value:
+            return qs
+
+        user: AnyUser = self.request.user
+        if user.is_anonymous:
+            raise qs.none()
+        if user.is_superuser:
+            return qs
+
+        role_choices = UserRoleChoice.can_manage_reservations()
+        if user.permissions.has_general_role(role_choices=role_choices):
+            return qs
+
+        unit_ids = user.permissions.unit_ids_where_has_role(role_choices=role_choices)
+        unit_group_ids = user.permissions.unit_group_ids_where_has_role(role_choices=role_choices)
+
+        return qs.filter(models.Q(unit__in=unit_ids) | models.Q(unit__unit_groups__in=unit_group_ids)).distinct()
 
 
 class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
@@ -122,6 +143,7 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
     access_type_end_date = django_filters.DateFilter(method="filter_by_access_type")
 
     only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
+    only_with_manage_permission = django_filters.BooleanFilter(method="get_only_with_manage_permission")
 
     reservable_date_start = django_filters.DateFilter(method="get_filter_reservable")
     reservable_date_end = django_filters.DateFilter(method="get_filter_reservable")
@@ -295,6 +317,7 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
 class ReservationUnitAllFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
     unit = IntMultipleChoiceFilter()
     only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
+    only_with_manage_permission = django_filters.BooleanFilter(method="get_only_with_manage_permission")
 
     class Meta:
         model = ReservationUnit
