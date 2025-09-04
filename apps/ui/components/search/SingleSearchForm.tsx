@@ -17,7 +17,7 @@ import { type OptionsListT } from "common/src/modules/search";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
-import { ignoreMaybeArray, mapParamToInterger, toNumber } from "common/src/helpers";
+import { ignoreMaybeArray, mapParamsToIntegers, toNumber } from "common/src/helpers";
 import { Flex } from "common/styled";
 import { ShowAllContainer } from "common/src/components";
 
@@ -49,10 +49,10 @@ function mapQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
   const duration = dur != null && dur > 0 ? dur : null;
   const showOnlyReservable = ignoreMaybeArray(params.getAll("showOnlyReservable")) !== "false";
   return {
-    purposes: mapParamToInterger(params.getAll("purposes"), 1),
-    units: mapParamToInterger(params.getAll("units"), 1),
-    equipments: mapParamToInterger(params.getAll("equipments"), 1),
-    reservationUnitTypes: mapParamToInterger(params.getAll("reservationUnitTypes"), 1),
+    purposes: mapParamsToIntegers(params.getAll("purposes"), 1),
+    units: mapParamsToIntegers(params.getAll("units"), 1),
+    equipments: mapParamsToIntegers(params.getAll("equipments"), 1),
+    reservationUnitTypes: mapParamsToIntegers(params.getAll("reservationUnitTypes"), 1),
     accessTypes: params.getAll("accessTypes"),
     timeBegin: params.get("timeBegin"),
     timeEnd: params.get("timeEnd"),
@@ -88,6 +88,10 @@ type SingleSearchFormProps = {
   options: Readonly<OptionsListT>;
   isLoading: boolean;
 };
+
+function sortByLabel(a: { label: string }, b: { label: string }): number {
+  return a.label.localeCompare(b.label);
+}
 
 // TODO rewrite this without the form state (use query params directly, but don't refresh the page)
 export function SingleSearchForm({
@@ -196,7 +200,7 @@ export function SingleSearchForm({
           name="reservationUnitTypes"
           label={t("searchForm:labels.reservationUnitTypes")}
           control={control}
-          options={reservationUnitTypes}
+          options={reservationUnitTypes.toSorted(sortByLabel)}
           multiselect
           clearable
           enableSearch
@@ -250,7 +254,7 @@ export function SingleSearchForm({
           name="units"
           label={t("searchForm:labels.units")}
           control={control}
-          options={units}
+          options={units.toSorted(sortByLabel)}
           multiselect
           clearable
           enableSearch
@@ -265,7 +269,7 @@ export function SingleSearchForm({
         <ControlledSelect
           name="purposes"
           label={t("searchForm:labels.purposes")}
-          options={purposes}
+          options={purposes.toSorted(sortByLabel)}
           control={control}
           multiselect
           clearable
@@ -275,7 +279,7 @@ export function SingleSearchForm({
           name="equipments"
           label={t("searchForm:labels.equipments")}
           control={control}
-          options={equipments}
+          options={equipments.toSorted(sortByLabel)}
           multiselect
           clearable
           enableSearch
