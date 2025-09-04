@@ -2608,6 +2608,10 @@ input ReservationUnitAllFilterSet {
   nameSvExact: String
   nameSvStartswith: String
   """
+  Returns reservation units where the user has a manage permissions in its unit
+  """
+  onlyWithManagePermission: Boolean
+  """
   Returns reservation units where the user has any kind of permissions in its unit
   """
   onlyWithPermission: Boolean
@@ -2733,6 +2737,10 @@ input ReservationUnitFilterSet {
   nameSvContains: String
   nameSvExact: String
   nameSvStartswith: String
+  """
+  Returns reservation units where the user has a manage permissions in its unit
+  """
+  onlyWithManagePermission: Boolean
   """
   Returns reservation units where the user has any kind of permissions in its unit
   """
