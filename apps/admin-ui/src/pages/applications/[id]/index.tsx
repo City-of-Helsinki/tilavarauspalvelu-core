@@ -260,7 +260,7 @@ function RejectAllOptionsButton({
 
 const TimeSection = styled.div`
   display: grid;
-  grid-gap: var(--spacing-m);
+  gap: var(--spacing-m);
 
   grid-template-columns: 1fr;
   @media (min-width: ${breakpoints.l}) {

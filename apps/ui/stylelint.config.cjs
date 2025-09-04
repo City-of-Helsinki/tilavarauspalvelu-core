@@ -5,6 +5,7 @@ module.exports = {
   rules: {
     "media-feature-range-notation": "prefix",
     // temp rules after upgrade
+    "nesting-selector-no-missing-scoping-root": null,
     "no-empty-source": null,
     "media-query-no-invalid": null,
     "selector-pseudo-element-colon-notation": null,
