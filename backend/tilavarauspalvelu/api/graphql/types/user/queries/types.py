@@ -1,5 +1,6 @@
 import datetime
 
+from django.db import models
 from undine import Field, GQLInfo, QueryType
 from undine.exceptions import GraphQLPermissionError
 from undine.optimizer import OptimizationData
@@ -26,7 +27,26 @@ class UserNode(QueryType[User], interfaces=[Node]):
     is_superuser = Field()
 
     general_roles = Field()
+
+    @general_roles.optimize
+    def optimize_general_roles(self, data: OptimizationData, info: GQLInfo[User]) -> None:
+        general_data = data.add_prefetch_related("general_roles")
+
+        def only_active(queryset: models.QuerySet, info: GQLInfo[User]) -> models.QuerySet:
+            return queryset.filter(is_role_active=True)
+
+        general_data.pre_filter_callback = only_active
+
     unit_roles = Field()
+
+    @unit_roles.optimize
+    def optimize_unit_roles(self, data: OptimizationData, info: GQLInfo[User]) -> None:
+        unit_data_data = data.add_prefetch_related("unit_roles")
+
+        def only_active(queryset: models.QuerySet, info: GQLInfo[User]) -> models.QuerySet:
+            return queryset.filter(is_role_active=True)
+
+        unit_data_data.pre_filter_callback = only_active
 
     @Field
     def name(root: User, info: GQLInfo[User]) -> str:
