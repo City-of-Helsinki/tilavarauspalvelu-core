@@ -136,7 +136,7 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
         maxPersonsLte: $maxPersonsLte
         minPersonsGte: $maxPersonsGte
         minPersonsLte: $maxPersonsLte
-        onlyWithPermission: true
+        onlyWithManagePermission: true
         publishingState: $publishingState
         reservationUnitType: $reservationUnitType
         surfaceAreaGte: $surfaceAreaGte
