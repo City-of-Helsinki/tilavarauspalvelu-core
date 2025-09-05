@@ -149,11 +149,11 @@ describe("formatting", () => {
       const result = formatDateTimeStrings({
         t: mockT,
         reservation,
-        trailingMinutes: false,
+        trailingMinutes: true,
       });
 
       expect(result.date).toBeInstanceOf(Date);
-      expect(result.time).toMatch(/\d{1,2}:\d{2} - \d{1,2}(:\d{2})?/); // Account for timezone differences
+      expect(result.time).toMatch("17:30–19:00");
       expect(result.dayOfWeek).toBe("weekDayLong.1");
       expect(result.isModified).toBe(false);
     });
@@ -190,7 +190,7 @@ describe("formatting", () => {
         trailingMinutes: true,
       });
 
-      expect(result.time).toMatch(/\d{1,2}:\d{2} - \d{1,2}:\d{2}/);
+      expect(result.time).toMatch("17:00–19:00");
     });
   });
 
@@ -216,7 +216,7 @@ describe("formatting", () => {
 
     it("handles zero minutes", () => {
       const result = formatTimeRange(0, 60); // 00:00 to 01:00
-      expect(result).toBe("0–1");
+      expect(result).toBe("0:00–1:00");
     });
   });
 

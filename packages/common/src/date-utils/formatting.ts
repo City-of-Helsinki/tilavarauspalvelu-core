@@ -149,7 +149,7 @@ export function formatDateTime(date: Date | null, options?: FormatDateTimeOption
  *   @param {TFunction} params.t - i18n translation function
  *   @param params.reservation - Reservation object
  *   @param params.orig - Original reservation object (use undefined if not possible to modify)
- * @param {boolean} [params.trailingMinutes=false] - Whether to include trailing minutes
+ * @param {boolean} [params.trailingMinutes=true] - Whether to include trailing minutes
  * @returns Object with date, time, dayOfWeek, and isModified properties
  * @example
  *   formatDateTimeStrings({ t, reservation: { beginsAt: "2023-12-25T15:30:00", endsAt: "2023-12-25T17:00:00" } })
@@ -162,7 +162,7 @@ export function formatDateTimeStrings({
   t,
   reservation,
   orig,
-  trailingMinutes = false,
+  trailingMinutes = true,
 }: {
   t: TFunction;
   reservation: {
@@ -206,9 +206,9 @@ export function formatDateTimeStrings({
 export function formatTimeRange(
   beginMins: number | null,
   endMins: number | null,
-  trailingMinutes: boolean = false
+  trailingMinutes: boolean = true
 ): string {
-  if (!beginMins || beginMins < 0 || beginMins > 1440) {
+  if (beginMins == null || beginMins < 0 || beginMins > 1440) {
     return "";
   }
   if (!endMins) {
