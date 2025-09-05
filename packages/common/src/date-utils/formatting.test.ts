@@ -149,11 +149,11 @@ describe("formatting", () => {
       const result = formatDateTimeStrings({
         t: mockT,
         reservation,
-        trailingMinutes: false,
+        trailingMinutes: true,
       });
 
       expect(result.date).toBeInstanceOf(Date);
-      expect(result.time).toMatch(/\d{1,2}:\d{2} - \d{1,2}(:\d{2})?/); // Account for timezone differences
+      expect(result.time).toMatch("17:30–19:00");
       expect(result.dayOfWeek).toBe("weekDayLong.1");
       expect(result.isModified).toBe(false);
     });
@@ -190,7 +190,7 @@ describe("formatting", () => {
         trailingMinutes: true,
       });
 
-      expect(result.time).toMatch(/\d{1,2}:\d{2} - \d{1,2}:\d{2}/);
+      expect(result.time).toMatch("17:00–19:00");
     });
   });
 
@@ -216,7 +216,7 @@ describe("formatting", () => {
 
     it("handles zero minutes", () => {
       const result = formatTimeRange(0, 60); // 00:00 to 01:00
-      expect(result).toBe("0–1");
+      expect(result).toBe("0:00–1:00");
     });
   });
 
@@ -337,7 +337,7 @@ describe("formatting", () => {
 
     it("handles zero duration", () => {
       const result = formatDuration(mockT, {});
-      expect(result).toBe("-");
+      expect(result).toBe("common:abbreviations:minute"); // 0 min
     });
 
     it("uses unabbreviated format", () => {
@@ -350,17 +350,17 @@ describe("formatting", () => {
     it("formats different duration range", () => {
       const result = formatDurationRange({
         t: mockT,
-        beginSecs: 3600, // 1 hour
-        endSecs: 7200, // 2 hours
+        minDuration: { seconds: 3600 }, // 1 hour
+        maxDuration: { seconds: 7200 }, // 2 hours
       });
-      expect(result).toBe("common:abbreviations:hour – common:abbreviations:hour");
+      expect(result).toBe("common:abbreviations:hour–common:abbreviations:hour");
     });
 
     it("formats same duration as single value", () => {
       const result = formatDurationRange({
         t: mockT,
-        beginSecs: 3600,
-        endSecs: 3600,
+        minDuration: { minutes: 60 },
+        maxDuration: { hours: 1 },
       });
       expect(result).toBe("common:abbreviations:hour");
     });
@@ -368,11 +368,11 @@ describe("formatting", () => {
     it("uses unabbreviated format", () => {
       const result = formatDurationRange({
         t: mockT,
-        beginSecs: 3600,
-        endSecs: 7200,
+        minDuration: { seconds: 3600 },
+        maxDuration: { minutes: 120 },
         abbreviated: false,
       });
-      expect(result).toBe("common:hour – common:hour");
+      expect(result).toBe("common:hour–common:hour");
     });
   });
 });

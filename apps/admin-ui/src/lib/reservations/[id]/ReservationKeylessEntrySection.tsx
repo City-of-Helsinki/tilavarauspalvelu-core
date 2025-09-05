@@ -11,7 +11,7 @@ import {
 import { successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
 import { Button, ButtonSize, IconAlertCircleFill, IconRefresh, Tooltip } from "hds-react";
-import { formatDate, formatTime, toValidDateObject } from "common/src/date-utils";
+import { dateToMinutes, formatDate, formatTimeRange, toValidDateObject } from "common/src/date-utils";
 import React, { useState } from "react";
 import { Accordion } from "@/styled";
 import { DataWrapper } from "./DataWrapper";
@@ -135,7 +135,9 @@ function ReservationKeylessEntrySingle({
       </Flex>
 
       <DataWrapper label={t("accessType:validity.label")}>
-        {reservation.pindoraInfo ? `${formatTime(pindoraAccessCodeBegins)}–${formatTime(pindoraAccessCodeEnds)}` : "-"}
+        {reservation.pindoraInfo
+          ? `${formatTimeRange(dateToMinutes(pindoraAccessCodeBegins), dateToMinutes(pindoraAccessCodeEnds))}`
+          : "-"}
       </DataWrapper>
 
       <AccessCodeChangeRepairButton reservation={reservation} onSuccess={onSuccess} />
@@ -183,7 +185,7 @@ function ReservationKeylessEntryRecurring({
         <DataWrapper label={t("accessType:validity.label")}>
           <NoWrap>
             {validityBeginsTime
-              ? `${formatTime(toValidDateObject(validityBeginsTime))}–${formatTime(toValidDateObject(validityEndsTime ?? ""))}`
+              ? `${formatTimeRange(dateToMinutes(toValidDateObject(validityBeginsTime)), dateToMinutes(toValidDateObject(validityEndsTime ?? "")))}`
               : "-"}
           </NoWrap>
         </DataWrapper>

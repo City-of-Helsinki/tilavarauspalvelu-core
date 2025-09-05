@@ -8,7 +8,7 @@ import { Calendar as BigCalendar, dateFnsLocalizer, ToolbarProps } from "react-b
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
-import { formatTime } from "../date-utils";
+import { dateToMinutes, formatTimeRange } from "../date-utils";
 import type { LocalizationLanguages } from "../urlBuilder";
 
 export type CalendarEvent<T> = {
@@ -512,7 +512,8 @@ function Calendar<T extends Record<string, unknown>>({
       formats={{
         dayFormat: "EEEEEE d.M.",
         timeGutterFormat: "H",
-        eventTimeRangeFormat: ({ start, end }: { start: Date; end: Date }) => `${formatTime(start)}-${formatTime(end)}`,
+        eventTimeRangeFormat: ({ start, end }: { start: Date; end: Date }) =>
+          `${formatTimeRange(dateToMinutes(start) ?? 0, dateToMinutes(end) ?? 0)}`,
       }}
       eventPropGetter={eventStyleGetter}
       events={events}

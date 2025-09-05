@@ -1,4 +1,4 @@
-import { format, isSameDay, type Locale } from "date-fns";
+import { format, isBefore, isSameDay, type Locale } from "date-fns";
 import { fi, sv, enGB } from "date-fns/locale";
 import { type TFunction } from "next-i18next";
 import type { LocalizationLanguages } from "../urlBuilder";
@@ -149,7 +149,7 @@ export function formatDateTime(date: Date | null, options?: FormatDateTimeOption
  *   @param {TFunction} params.t - i18n translation function
  *   @param params.reservation - Reservation object
  *   @param params.orig - Original reservation object (use undefined if not possible to modify)
- * @param {boolean} [params.trailingMinutes=false] - Whether to include trailing minutes
+ * @param {boolean} [params.trailingMinutes=true] - Whether to include trailing minutes
  * @returns Object with date, time, dayOfWeek, and isModified properties
  * @example
  *   formatDateTimeStrings({ t, reservation: { beginsAt: "2023-12-25T15:30:00", endsAt: "2023-12-25T17:00:00" } })
@@ -162,7 +162,7 @@ export function formatDateTimeStrings({
   t,
   reservation,
   orig,
-  trailingMinutes = false,
+  trailingMinutes = true,
 }: {
   t: TFunction;
   reservation: {
@@ -181,12 +181,10 @@ export function formatDateTimeStrings({
 
   const originalBeginMins = orig != null ? timeToMinutes(orig.beginTime) : -1;
   const originalEndMins = orig != null ? timeToMinutes(orig.endTime) : -1;
-  const beginMins = dateToMinutes(start);
-  const endMins = dateToMinutes(end);
+  const beginMins = dateToMinutes(start) ?? 0;
+  const endMins = dateToMinutes(end) ?? 0;
   const isModified = orig != null && (originalBeginMins !== beginMins || originalEndMins !== endMins);
-  const btime = minutesToHoursString(beginMins, trailingMinutes);
-  const etime = minutesToHoursString(endMins, trailingMinutes);
-  const time = `${btime} - ${etime}`;
+  const time = formatTimeRange(beginMins, endMins, trailingMinutes);
   return {
     date: start,
     time,
@@ -205,7 +203,17 @@ export function formatDateTimeStrings({
  *   formatTimeRange(930, 1020) // "15:30–17:00"
  *   formatTimeRange(930, 1020, true) // "15:30–17:00"
  */
-export function formatTimeRange(beginMins: number, endMins: number, trailingMinutes: boolean = false): string {
+export function formatTimeRange(
+  beginMins: number | null,
+  endMins: number | null,
+  trailingMinutes: boolean = true
+): string {
+  if (beginMins == null || beginMins < 0 || beginMins > 1440) {
+    return "";
+  }
+  if (!endMins) {
+    return minutesToHoursString(beginMins, trailingMinutes);
+  }
   return `${minutesToHoursString(beginMins, trailingMinutes)}–${minutesToHoursString(endMins, trailingMinutes)}`;
 }
 
@@ -302,8 +310,8 @@ export function formatDateTimeRange(
  */
 export function formatDuration(t: TFunction, duration: TimeStruct, abbreviated: boolean = true): string {
   const { hours = 0, minutes = 0, seconds = 0 } = duration;
-  const secs = hours * 3600 + minutes * 60 + seconds;
-  if (!secs) {
+  const secs = (hours ?? 0) * 3600 + (minutes ?? 0) * 60 + (seconds ?? 0);
+  if (!secs && secs !== 0) {
     return "-";
   }
 
@@ -321,6 +329,9 @@ export function formatDuration(t: TFunction, duration: TimeStruct, abbreviated: 
   if (min) {
     p.push(t(minuteKey, { count: min }).toLocaleLowerCase());
   }
+  if (!hour && !min) {
+    p.push(t(minuteKey, { count: 0 }).toLocaleLowerCase());
+  }
 
   return p.join(" ");
 }
@@ -329,8 +340,8 @@ export function formatDuration(t: TFunction, duration: TimeStruct, abbreviated: 
  * Formats a duration range into hours and minutes with proper localization
  * @param params - Parameters object
  *   @param {TFunction} params.t - I18next Translation function
- *   @param {number} params.beginSecs - Start of duration range in seconds
- *   @param {number} params.endSecs - End of duration range in seconds
+ *   @param {number} params.minDuration - Minimum duration TimeStruct
+ *   @param {number} params.maxDuration - Maximum duration TimeStruct
  *   @param {boolean} [params.abbreviated=true] - Whether to use abbreviated units (e.g. "h" instead of "hours"),
  * @returns Formatted duration range if beginSecs and endSecs are different values, otherwise single duration
  * @example
@@ -339,16 +350,42 @@ export function formatDuration(t: TFunction, duration: TimeStruct, abbreviated: 
  */
 export function formatDurationRange({
   t,
-  beginSecs,
-  endSecs,
+  minDuration,
+  maxDuration,
   abbreviated = true,
 }: {
   t: TFunction;
-  beginSecs: number;
-  endSecs: number;
+  minDuration: TimeStruct;
+  maxDuration: TimeStruct;
   abbreviated?: boolean;
 }): string {
-  const beginHours = formatDuration(t, { seconds: beginSecs }, abbreviated);
-  const endHours = formatDuration(t, { seconds: endSecs }, abbreviated);
-  return beginSecs === endSecs ? beginHours : `${beginHours} – ${endHours}`;
+  const min = formatDuration(t, minDuration, abbreviated);
+  const max = formatDuration(t, maxDuration, abbreviated);
+  const minSecs = (minDuration.hours ?? 0) * 3600 + (minDuration.minutes ?? 0) * 60 + (minDuration.seconds ?? 0);
+  const maxSecs = (maxDuration.hours ?? 0) * 3600 + (maxDuration.minutes ?? 0) * 60 + (maxDuration.seconds ?? 0);
+  return minSecs === maxSecs ? max : `${min}–${max}`;
+}
+
+export function formatDurationFromDates(
+  t: TFunction,
+  start: Date | null,
+  end: Date | null,
+  abbreviated: boolean = true
+): string {
+  if (!start || !end || !isValidDate(start) || !isValidDate(end)) {
+    return "";
+  }
+  if (isBefore(start, end)) {
+    return "-";
+  }
+  const beginMins = dateToMinutes(start);
+  const endMins = dateToMinutes(end);
+  if (beginMins == null || endMins == null) {
+    return "";
+  }
+  return formatDuration(
+    t,
+    { hours: Math.floor((endMins - beginMins) / 60), minutes: (endMins - beginMins) % 60 },
+    abbreviated
+  );
 }

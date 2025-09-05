@@ -1,5 +1,5 @@
 import React from "react";
-import { formatDate } from "common/src/date-utils";
+import { formatDateRange } from "common/src/date-utils";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { startOfDay } from "date-fns";
@@ -71,8 +71,6 @@ const DateElement = styled.div<{ $isRemoved: boolean }>`
 const ErrorLabel = styled(StatusLabel)`
   margin-inline: -8px;
 `;
-
-const stripTimeZeros = (time: string) => (time.startsWith("0") ? time.substring(1) : time);
 
 // TODO this function should be refactored
 // all the messages and label types should be enum -> object mapping (or similar)
@@ -239,9 +237,7 @@ export function ReservationList(props: Props | ExtendedProps) {
           <StyledListItem key={`${item.date}-${item.startTime}-${item.endTime}`}>
             <TextWrapper $failed={!!item.error}>
               <DateElement $isRemoved={(item.isRemoved || item.isOverlapping || item.isCancelled) ?? false}>
-                {`${formatDate(new Date(item.date), { includeWeekday: true })}, ${stripTimeZeros(
-                  item.startTime
-                )}-${stripTimeZeros(item.endTime)}`}
+                {`${formatDateRange(new Date(item.date), new Date(item.endTime), { includeWeekday: true })}`}
               </DateElement>
               <StatusElement item={item} />
             </TextWrapper>

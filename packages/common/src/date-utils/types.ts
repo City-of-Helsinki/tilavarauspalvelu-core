@@ -2,9 +2,9 @@ import type { TFunction } from "next-i18next";
 import type { LocalizationLanguages } from "../urlBuilder";
 
 export type TimeStruct = {
-  hours?: number;
-  minutes?: number;
-  seconds?: number;
+  hours?: number | null;
+  minutes?: number | null;
+  seconds?: number | null;
 };
 
 export interface CommonDateOptions {
