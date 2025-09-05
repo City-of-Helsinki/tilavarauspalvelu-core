@@ -205,7 +205,10 @@ export function isValidDate(date: Date): boolean {
  * Converts a date to only amount of minutes (discarding date and seconds)
  * @param {Date} d - Date object
  */
-export function dateToMinutes(d: Date): number {
+export function dateToMinutes(d: Date | null): number | null {
+  if (!d || !isValidDate(d)) {
+    return null;
+  }
   return d.getHours() * 60 + d.getMinutes();
 }
 
