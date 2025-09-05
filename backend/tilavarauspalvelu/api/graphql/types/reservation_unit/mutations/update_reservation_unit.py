@@ -73,6 +73,9 @@ class ReservationUnitPricingUpdateInput(MutationType[ReservationUnitPricing], ki
     lowest_price = Input()
     highest_price = Input()
     tax_percentage = Input(TaxPercentage)
+    material_price_fi = Input()
+    material_price_en = Input()
+    material_price_sv = Input()
 
 
 class ReservationUnitAccessTypeUpdateInput(MutationType[ReservationUnitAccessType], kind="related"):
