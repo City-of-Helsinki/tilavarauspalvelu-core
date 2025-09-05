@@ -1,4 +1,5 @@
 import { parse, set } from "date-fns";
+import { toNumber } from "../helpers";
 import { fromUIDate, fromApiDate, isValidDate } from "./conversion";
 import { UI_DATE_FORMAT, UI_TIME_FORMAT } from "./index";
 import type { TimeStruct } from "./types";
@@ -23,16 +24,12 @@ export function fromUIDateTime(date: string, time: string): Date | null {
 
   try {
     const baseDate = fromUIDate(date);
-    if (!baseDate) {
+
+    if (!baseDate || !parseStringTimeStruct(time)) {
       return null;
     }
 
-    const timeComponents = parseTimeString(time);
-    if (!timeComponents) {
-      return null;
-    }
-
-    return setTimeOnDate(baseDate, { hours: timeComponents.hours, minutes: timeComponents.minutes });
+    return setTimeOnDate(baseDate, { ...parseStringTimeStruct(time) });
   } catch {
     return null;
   }
@@ -72,16 +69,12 @@ export function fromApiDateTime(date: string | null | undefined, time: string | 
 
   try {
     const baseDate = fromApiDate(date);
-    if (!baseDate) {
+
+    if (!baseDate || !parseStringTimeStruct(time)) {
       return null;
     }
 
-    const timeComponents = parseTimeString(time);
-    if (!timeComponents) {
-      return null;
-    }
-
-    return setTimeOnDate(baseDate, { hours: timeComponents.hours, minutes: timeComponents.minutes });
+    return setTimeOnDate(baseDate, { ...parseStringTimeStruct(time) });
   } catch {
     return null;
   }
@@ -110,18 +103,23 @@ export function dateTimeToISOString(date: string, time: string): string | null {
  */
 export function setTimeOnDate(date: Date, time: string | TimeStruct): Date {
   if (typeof time === "string") {
-    const timeComponents = parseTimeString(time);
+    const timeComponents = parseStringTimeStruct(time);
     if (!timeComponents) {
       return date;
     }
     return set(date, {
-      hours: timeComponents.hours,
+      hours: timeComponents.hours ?? 0,
       minutes: timeComponents.minutes ?? 0,
       seconds: 0,
       milliseconds: 0,
     });
   }
-  return set(date, { hours: time.hours, minutes: time.minutes ?? 0, seconds: 0, milliseconds: 0 });
+  return set(date, {
+    hours: time.hours ?? 0,
+    minutes: time.minutes ?? 0,
+    seconds: 0,
+    milliseconds: 0,
+  });
 }
 
 /**
@@ -144,39 +142,49 @@ export function parseCombinedUIDateTime(dateTime: string): Date | null {
 }
 
 /**
- * Extracts TimeStruct from a Date object
- * @param {Date} date - Date object
- * @returns {TimeStruct} - Time components object
- * @example timeStructFromDate(new Date("2023-12-25T15:30:00")) // { hours: 15, minutes: 30 }
- */
-export function timeStructFromDate(date: Date): TimeStruct {
-  return {
-    hours: date.getHours(),
-    minutes: date.getMinutes(),
-  };
-}
-
-/**
  * Parses a time string into TimeStruct
  * @param timeString - Time in HH:mm or H:mm format
  * @returns Time components or null if invalid
- * @example parseTimeString("15:30") // { hours: 15, minutes: 30 }
- * @example parseTimeString("9:05") // { hours: 9, minutes: 5 }
+ * @example parseStringTimeStruct("15:30") // { hours: 15, minutes: 30 }
+ * @example parseStringTimeStruct("9:05") // { hours: 9, minutes: 5 }
  */
-function parseTimeString(timeString: string): TimeStruct | null {
-  const timeRegex = /^(\d{1,2}):(\d{2})$/;
-  const match = timeString.match(timeRegex);
+export function parseStringTimeStruct(timeString: string): TimeStruct | null {
+  const timeUnits = timeString.split(":");
 
-  if (!match || !match[1] || !match[2]) {
+  if (!timeUnits || !timeUnits[0] || !timeUnits[1]) {
     return null;
   }
 
-  const hours = parseInt(match[1], 10);
-  const minutes = parseInt(match[2], 10);
+  const hours = toNumber(timeUnits[0]);
+  const minutes = toNumber(timeUnits[1]);
 
-  if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+  if ((hours && (hours < 0 || hours > 23)) || (minutes && (minutes < 0 || minutes > 59))) {
     return null;
   }
 
-  return { hours, minutes };
+  return { hours, minutes, seconds: 0 };
+}
+
+/**
+ * Parses a Date to TimeStruct
+ * @param {Date} date - Date object
+ * @returns {TimeStruct} - Time components object
+ * @example parseDateTimeStruct(new Date("2023-12-25T15:30:00")) // { hours: 15, minutes: 30 }
+ */
+export function parseDateTimeStruct(date: Date | null | undefined): TimeStruct | null {
+  if (!date) {
+    return null;
+  }
+  const secs = date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds();
+  if (!secs && secs !== 0) {
+    return null;
+  }
+
+  const hours = Math.floor(secs / 60 / 60);
+  const minutes = Math.floor((secs / 60) % 60);
+  return {
+    hours,
+    minutes,
+    seconds: 0,
+  };
 }
