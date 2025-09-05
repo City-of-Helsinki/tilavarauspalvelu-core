@@ -1,0 +1,5 @@
+{% if access_code %}
+{{ access_code_label | safe }}: {{ access_code }}
+{% elif access_code_is_used %}
+{{ text_access_code_unavailable_instructions_html | sentence }}
+{% endif %}

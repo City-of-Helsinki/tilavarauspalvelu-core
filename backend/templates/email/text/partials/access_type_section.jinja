@@ -1,0 +1,6 @@
+{% for reservation_unit in reservation_units %}
+{{ reservation_unit.reservation_unit_name | safe }}
+{{ reservation_unit.unit_name | safe }}, {{ reservation_unit.unit_location | safe }}
+{{ access_types_label | safe }}:{% for access_type in reservation_unit.access_types %}
+* {{ access_type.access_type | safe }}: {{ access_type.begin_date }} -{% if access_type.end_date %} {{ access_type.end_date }}{% endif %}{% endfor %}
+{% endfor %}
