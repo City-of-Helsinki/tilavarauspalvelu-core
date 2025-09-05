@@ -26,8 +26,9 @@ import {
 } from "./modules/applicationRoundAllocation";
 import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import { useSlotSelection } from "./hooks";
-import { convertOptionToHDS, filterNonNullable, formatTimeRange, timeToMinutes, toNumber } from "common/src/helpers";
+import { convertOptionToHDS, filterNonNullable, toNumber } from "common/src/helpers";
 import { addMinutes, startOfDay } from "date-fns";
+import { timeToMinutes, formatTimeRange } from "common/src/date-utils";
 
 type Props = {
   applicationSections: SectionNodeT[] | null;

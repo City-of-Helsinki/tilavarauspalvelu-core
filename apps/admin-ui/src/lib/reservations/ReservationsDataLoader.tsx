@@ -4,7 +4,7 @@ import { ReservationOrderSet, useReservationListQuery, type ReservationListQuery
 import { More } from "@/component/More";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { ReservationsTable } from "./ReservationsTable";
-import { fromUIDate, toApiDate } from "common/src/common/util";
+import { fromUIDate, toApiDate } from "common/src/date-utils";
 import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
 import { CenterSpinner } from "common/styled";

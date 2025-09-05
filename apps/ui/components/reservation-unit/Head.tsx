@@ -1,12 +1,13 @@
+import type { LocalizationLanguages } from "common/src/urlBuilder";
 import { IconClock, IconGroup, IconEuroSign, IconHome, IconSize, IconLock, Tooltip } from "hds-react";
 import React from "react";
 import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { convertLanguageCode, formatDuration, getTranslationSafe, toUIDate } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { ReservationKind, type ReservationUnitHeadFragment } from "@gql/gql-types";
 import { Flex, H1, H3 } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { formatDateRange, formatDateTime } from "@/modules/util";
+import { formatDateRange, formatDateTime, formatDuration, formatDate } from "common/src/date-utils";
 import { IconWithText } from "@/components/common/IconWithText";
 import { Images } from "./Images";
 import {
@@ -15,7 +16,7 @@ import {
   getReservationUnitAccessPeriods,
   isReservationUnitPaid,
 } from "@/modules/reservationUnit";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
 interface HeadProps {
@@ -35,7 +36,11 @@ type NonReservableNotificationProps = {
   reservationUnit: Pick<ReservationUnitHeadFragment, "reservationKind" | "reservationBeginsAt">;
 };
 
-function formatErrorMessages(t: TFunction, reservationUnit: NonReservableNotificationProps["reservationUnit"]): string {
+function formatErrorMessages(
+  t: TFunction,
+  locale: LocalizationLanguages,
+  reservationUnit: NonReservableNotificationProps["reservationUnit"]
+): string {
   let returnText = t("reservationUnit:notifications.notReservable");
   if (reservationUnit.reservationKind === ReservationKind.Season) {
     returnText = t("reservationUnit:notifications.onlyRecurring");
@@ -43,7 +48,7 @@ function formatErrorMessages(t: TFunction, reservationUnit: NonReservableNotific
     const begin = new Date(reservationUnit.reservationBeginsAt);
     if (begin > new Date()) {
       const futureOpeningText = t("reservationUnit:notifications.futureOpening", {
-        date: formatDateTime(t, begin),
+        date: formatDateTime(begin, { locale }),
       });
       returnText = futureOpeningText;
     }
@@ -52,8 +57,9 @@ function formatErrorMessages(t: TFunction, reservationUnit: NonReservableNotific
 }
 
 function NonReservableNotification({ reservationUnit }: NonReservableNotificationProps) {
-  const { t } = useTranslation();
-  const returnText = formatErrorMessages(t, reservationUnit);
+  const { t, i18n } = useTranslation();
+  const lang = getLocalizationLang(i18n.language);
+  const returnText = formatErrorMessages(t, lang, reservationUnit);
 
   return (
     <NotificationWrapper data-testid="reservation-unit--notification__reservation-start">
@@ -136,15 +142,15 @@ function AccessTypeTooltip({ accessTypes }: Pick<ReservationUnitHeadFragment, "a
     <Tooltip>
       <ul>
         {accessTypeDurations.map((accessTypeDuration) => (
-          <li key={toUIDate(accessTypeDuration.beginDate)}>
+          <li key={formatDate(accessTypeDuration.beginDate)}>
             <span>
               {t(`reservationUnit:accessTypes.${accessTypeDuration.accessType}`)}
               {": "}
             </span>
             <span>
               {accessTypeDuration.endDate != null
-                ? formatDateRange(accessTypeDuration.beginDate, accessTypeDuration.endDate)
-                : `${t("common:dateGte", { value: toUIDate(accessTypeDuration.beginDate) })}`}
+                ? formatDateRange(accessTypeDuration.beginDate, accessTypeDuration.endDate, { includeWeekday: false })
+                : `${t("common:dateGte", { value: formatDate(accessTypeDuration.beginDate) })}`}
             </span>
           </li>
         ))}
@@ -161,8 +167,8 @@ function IconList({
   const lang = convertLanguageCode(i18n.language);
   const minDur = reservationUnit.minReservationDuration ?? 0;
   const maxDur = reservationUnit.maxReservationDuration ?? 0;
-  const minReservationDuration = formatDuration(t, { seconds: minDur }, true);
-  const maxReservationDuration = formatDuration(t, { seconds: maxDur }, true);
+  const minReservationDuration = formatDuration(t, { seconds: minDur });
+  const maxReservationDuration = formatDuration(t, { seconds: maxDur });
   const pricing = getActivePricing(reservationUnit);
   const isPaid = isReservationUnitPaid(reservationUnit.pricings);
   const unitPrice = pricing ? getPriceString({ t, pricing }) : undefined;

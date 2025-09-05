@@ -7,11 +7,11 @@ import { breakpoints } from "common/src/const";
 import { type ReservationCancellationFragment, useCancelReservationMutation } from "@gql/gql-types";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { ReservationPageWrapper } from "@/styled/reservation";
-import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { formatDate, formatDateTimeStrings } from "common/src/date-utils";
 import { useDisplayError } from "common/src/hooks";
 import { getApplicationPath, getReservationPath } from "@/modules/urls";
 import { getPrice } from "@/modules/reservationUnit";
-import { formatDateTimeStrings } from "@/modules/util";
 import { type LocalizationLanguages } from "common/src/urlBuilder";
 import { useRouter } from "next/router";
 import { type CancelFormValues, CancellationForm } from "../CancellationForm";
@@ -114,7 +114,7 @@ function ApplicationInfoCard({ reservation }: { reservation: ReservationCancella
   const reservationUnitName = getTranslationSafe(reservation.reservationUnit, "name", lang);
   const price = getPrice(t, reservation, lang);
 
-  const { dayOfWeek, time, date } = formatDateTimeStrings(t, reservation, undefined, true);
+  const { dayOfWeek, time, date } = formatDateTimeStrings({ t, reservation, orig: undefined, trailingMinutes: true });
 
   const icons = [
     {
@@ -131,7 +131,7 @@ function ApplicationInfoCard({ reservation }: { reservation: ReservationCancella
     },
   ];
 
-  const text = `${toUIDate(date)} - ${dayOfWeek}`;
+  const text = `${formatDate(date)} - ${dayOfWeek}`;
   return <ApplicationInfo heading={name ?? ""} text={text} variant="vertical" infos={icons} />;
 }
 
