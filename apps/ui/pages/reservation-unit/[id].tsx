@@ -254,7 +254,7 @@ function ReservationUnit({
       maxReservationDurationMinutes,
       durationOptions
     ),
-    time: searchTime ?? formatTime(defaultDate, { locale: lang }),
+    time: searchTime ?? formatTime(defaultDate),
     isControlsVisible: true,
   };
 

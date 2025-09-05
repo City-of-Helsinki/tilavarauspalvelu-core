@@ -13,10 +13,6 @@ export interface CommonDateOptions {
   formatString?: string;
 }
 
-export interface FormatTimeOptions extends CommonDateOptions {
-  includeTimeSeparator?: boolean;
-}
-
 export interface FormatDateOptions extends CommonDateOptions {
   includeWeekday?: boolean;
 }
