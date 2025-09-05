@@ -90,8 +90,8 @@ function SingleApplicationSection({
   const reservationsEnd = formatDate(new Date(aes.reservationsEndDate));
   const duration = formatDurationRange({
     t,
-    beginSecs: aes.reservationMinDuration,
-    endSecs: aes.reservationMaxDuration,
+    minDuration: { seconds: aes.reservationMinDuration },
+    maxDuration: { seconds: aes.reservationMaxDuration },
   });
   const infos = [
     {

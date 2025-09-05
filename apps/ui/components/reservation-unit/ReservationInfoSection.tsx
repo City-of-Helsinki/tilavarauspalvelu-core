@@ -122,7 +122,9 @@ function ReservationDuration({
   return (
     <p>
       {t("reservationUnit:reservationInfoSection.duration")}{" "}
-      <Strong>{formatDurationRange({ t, beginSecs: minDuration, endSecs: maxDuration })}</Strong>
+      <Strong>
+        {formatDurationRange({ t, minDuration: { seconds: minDuration }, maxDuration: { seconds: maxDuration } })}
+      </Strong>
       {"."}
     </p>
   );

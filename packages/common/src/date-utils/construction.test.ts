@@ -6,7 +6,8 @@ import {
   dateTimeToISOString,
   setTimeOnDate,
   parseCombinedUIDateTime,
-  timeStructFromDate,
+  parseDateTimeStruct,
+  parseStringTimeStruct,
 } from "./construction";
 
 function testDateWithContents(
@@ -158,12 +159,6 @@ describe("construction", () => {
       testDateWithContents(result, 2023, 11, 25, 15, 30);
     });
 
-    it("defaults minutes to 0", () => {
-      const baseDate = new Date("2023-12-25T10:30:45");
-      const result = setTimeOnDate(baseDate, { hours: 15 });
-      testDateWithContents(result, 2023, 11, 25, 15, 0);
-    });
-
     it("creates new date object (immutable)", () => {
       const baseDate = new Date("2023-12-25T10:00:00");
       const result = setTimeOnDate(baseDate, { hours: 15, minutes: 30 });
@@ -251,74 +246,198 @@ describe("construction", () => {
     });
   });
 
-  describe("extractTimeComponents", () => {
+  describe("parseDateTimeStruct", () => {
     it("extracts hours and minutes from date", () => {
       const date = new Date("2023-12-25T15:30:45");
-      const result = timeStructFromDate(date);
+      const result = parseDateTimeStruct(date);
 
       expect(result).toEqual({
         hours: 15,
         minutes: 30,
+        seconds: 0,
       });
     });
 
     it("handles midnight", () => {
       const date = new Date("2023-12-25T00:00:00");
-      const result = timeStructFromDate(date);
+      const result = parseDateTimeStruct(date);
 
       expect(result).toEqual({
         hours: 0,
         minutes: 0,
+        seconds: 0,
       });
     });
 
     it("handles late evening", () => {
       const date = new Date("2023-12-25T23:59:59");
-      const result = timeStructFromDate(date);
+      const result = parseDateTimeStruct(date);
 
       expect(result).toEqual({
         hours: 23,
         minutes: 59,
+        seconds: 0,
       });
     });
 
     it("ignores seconds and milliseconds", () => {
       const date = new Date("2023-12-25T15:30:45.123");
-      const result = timeStructFromDate(date);
+      const result = parseDateTimeStruct(date);
 
       expect(result).toEqual({
         hours: 15,
         minutes: 30,
+        seconds: 0,
       });
     });
   });
 
-  // Test the private parseTimeString function through public methods
-  describe("parseTimeString (via public methods)", () => {
-    it("parses valid time formats", () => {
-      // Test through fromUIDateTime since it uses parseTimeString internally
-      expect(fromUIDateTime("1.1.2023", "09:30")).toBeTruthy();
-      expect(fromUIDateTime("1.1.2023", "9:30")).toBeTruthy();
-      expect(fromUIDateTime("1.1.2023", "00:00")).toBeTruthy();
-      expect(fromUIDateTime("1.1.2023", "23:59")).toBeTruthy();
+  describe("parseStringTimeStruct", () => {
+    it("parses valid time string with double digits", () => {
+      const result = parseStringTimeStruct("15:30");
+
+      expect(result).toEqual({
+        hours: 15,
+        minutes: 30,
+        seconds: 0,
+      });
     });
 
-    it("rejects invalid time formats", () => {
-      expect(fromUIDateTime("1.1.2023", "9:5")).toBeNull(); // Missing leading zero
-      expect(fromUIDateTime("1.1.2023", "9")).toBeNull(); // No minutes
-      expect(fromUIDateTime("1.1.2023", "9:30:00")).toBeNull(); // Has seconds
-      expect(fromUIDateTime("1.1.2023", "24:00")).toBeNull(); // Invalid hour
-      expect(fromUIDateTime("1.1.2023", "12:60")).toBeNull(); // Invalid minute
+    it("parses valid time string with single digit hours", () => {
+      const result = parseStringTimeStruct("9:30");
+
+      expect(result).toEqual({
+        hours: 9,
+        minutes: 30,
+        seconds: 0,
+      });
     });
 
-    it("rejects negative values", () => {
-      expect(fromUIDateTime("1.1.2023", "-1:30")).toBeNull();
-      expect(fromUIDateTime("1.1.2023", "12:-5")).toBeNull();
+    it("parses valid time string with single digit minutes", () => {
+      const result = parseStringTimeStruct("15:05");
+
+      expect(result).toEqual({
+        hours: 15,
+        minutes: 5,
+        seconds: 0,
+      });
     });
 
-    it("handles boundary values", () => {
-      expect(fromUIDateTime("1.1.2023", "00:00")).toBeTruthy();
-      expect(fromUIDateTime("1.1.2023", "23:59")).toBeTruthy();
+    it("parses valid time string with single digits for both", () => {
+      const result = parseStringTimeStruct("9:05");
+
+      expect(result).toEqual({
+        hours: 9,
+        minutes: 5,
+        seconds: 0,
+      });
+    });
+
+    it("handles midnight", () => {
+      const result = parseStringTimeStruct("00:00");
+
+      expect(result).toEqual({
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+      });
+    });
+
+    it("handles end of day", () => {
+      const result = parseStringTimeStruct("23:59");
+
+      expect(result).toEqual({
+        hours: 23,
+        minutes: 59,
+        seconds: 0,
+      });
+    });
+
+    it("returns null for empty string", () => {
+      const result = parseStringTimeStruct("");
+      expect(result).toBeNull();
+    });
+
+    it("returns null for string without colon", () => {
+      const result = parseStringTimeStruct("1530");
+      expect(result).toBeNull();
+    });
+
+    it("returns null for string with only hours", () => {
+      const result = parseStringTimeStruct("15:");
+      expect(result).toBeNull();
+    });
+
+    it("returns null for string with only minutes", () => {
+      const result = parseStringTimeStruct(":30");
+      expect(result).toBeNull();
+    });
+
+    it("returns null for hours out of range (too high)", () => {
+      const result = parseStringTimeStruct("25:30");
+      expect(result).toBeNull();
+    });
+
+    it("returns null for hours out of range (negative)", () => {
+      const result = parseStringTimeStruct("-1:30");
+      expect(result).toBeNull();
+    });
+
+    it("returns null for minutes out of range (too high)", () => {
+      const result = parseStringTimeStruct("15:60");
+      expect(result).toBeNull();
+    });
+
+    it("returns null for minutes out of range (negative)", () => {
+      const result = parseStringTimeStruct("15:-1");
+      expect(result).toBeNull();
+    });
+
+    it("handles non-numeric hours by setting hours to null", () => {
+      const result = parseStringTimeStruct("abc:30");
+      expect(result).toEqual({
+        hours: null,
+        minutes: 30,
+        seconds: 0,
+      });
+    });
+
+    it("handles non-numeric minutes by setting minutes to null", () => {
+      const result = parseStringTimeStruct("15:abc");
+      expect(result).toEqual({
+        hours: 15,
+        minutes: null,
+        seconds: 0,
+      });
+    });
+
+    it("returns null for completely invalid format", () => {
+      const result = parseStringTimeStruct("invalid");
+      expect(result).toBeNull();
+    });
+
+    it("ignores extra parts with multiple colons", () => {
+      const result = parseStringTimeStruct("15:30:45");
+      expect(result).toEqual({
+        hours: 15,
+        minutes: 30,
+        seconds: 0,
+      });
+    });
+
+    it("handles edge case: hour 24 should be invalid", () => {
+      const result = parseStringTimeStruct("24:00");
+      expect(result).toBeNull();
+    });
+
+    it("handles leading zeros correctly", () => {
+      const result = parseStringTimeStruct("08:09");
+
+      expect(result).toEqual({
+        hours: 8,
+        minutes: 9,
+        seconds: 0,
+      });
     });
   });
 });
