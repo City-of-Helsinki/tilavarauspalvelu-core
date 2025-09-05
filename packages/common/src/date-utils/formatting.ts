@@ -4,7 +4,6 @@ import { type TFunction } from "next-i18next";
 import type { LocalizationLanguages } from "../urlBuilder";
 import { dateToMinutes, isValidDate, minutesToHoursString, timeToMinutes, toMondayFirst } from "./conversion";
 import type {
-  FormatTimeOptions,
   FormatDateOptions,
   FormatDateTimeOptions,
   FormatDateTimeRangeOptions,
@@ -67,26 +66,16 @@ export function toValidDateObject(date: Date | string): Date | null {
 
 /**
  * Returns just the time portion of a date as a string, with optional localized separator
- * @param date - Date object to format
- * @param [options] - Format options
- *   @param {TFunction} [options.t] - i18n translation function, needed for localized separator
- *   @param {boolean} [options.includeTimeSeparator=false] - Whether to include localized separator before time
- *   @param {"fi" | "sv" | "en"} [options.locale="fi"] - Locale for formatting
+ * @param {Date} date - Date object to format
+ * @param {"fi" | "sv" | "en"} [locale="fi"] - Locale for formatting
  * @returns Formatted time string
  * @example
- *   formatTime(date: new Date("2023-12-25T15:30:00")) // "15:30"
- *   formatTime(date: new Date("2023-12-25T15:30:00"), { t, includeTimeSeparator: true }) // "klo 15:30"
+ *   formatTime(new Date("2023-12-25T15:30:00")) // "15:30"
+ *   formatTime(new Date("invalid")) // ""
+ *   formatTime(null) // ""
  */
-export function formatTime(date: Date | null, options?: FormatTimeOptions): string {
-  const { t, includeTimeSeparator = false, locale = "fi", formatString = UI_TIME_FORMAT } = options || {};
-
-  if (!date || !isValidDate(date)) {
-    return "";
-  }
-
-  const separator = includeTimeSeparator ? (t ? t("common:dayTimeSeparator") : "@") : "";
-
-  return `${separator} ${format(date, formatString, getFormatLocaleObject(locale))}`.trim();
+export function formatTime(date: Date | null, locale: LocalizationLanguages = "fi"): string {
+  return !date || !isValidDate(date) ? "" : format(date, UI_TIME_FORMAT, getFormatLocaleObject(locale));
 }
 
 /**

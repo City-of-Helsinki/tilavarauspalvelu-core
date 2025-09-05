@@ -16,7 +16,13 @@ import {
   UserPermissionChoice,
   useSeriesPageQuery,
 } from "@gql/gql-types";
-import { createNodeId, calculateMedian, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import {
+  calculateMedian,
+  createNodeId,
+  filterNonNullable,
+  ignoreMaybeArray,
+  toNumber,
+} from "common/src/helpers";
 import { isSameDay } from "date-fns";
 import { useTranslation } from "next-i18next";
 import { Element } from "@/styled";
@@ -67,12 +73,12 @@ function convertToForm(value: NodeT): RescheduleReservationSeriesForm {
   const bufferTimeAfter = calculateMedian(reservations.map((x) => x.bufferTimeAfter));
   const begin = fromApiDateTime(value?.beginDate, value?.beginTime);
   const end = fromApiDateTime(value?.endDate, value?.endTime);
-  const locale = getLocalizationLang(lang);
+
   return {
     startingDate: value?.beginDate != null ? formatDate(fromApiDate(value.beginDate)) : "",
     endingDate: value?.endDate != null ? formatDate(fromApiDate(value.endDate)) : "",
-    startTime: begin ? formatTime(begin, { locale }) : "",
-    endTime: end ? formatTime(end, { locale }) : "",
+    startTime: begin ? formatTime(begin) : "",
+    endTime: end ? formatTime(end) : "",
     repeatOnDays: filterNonNullable(value?.weekdays),
     bufferTimeBefore: bufferTimeBefore > 0,
     bufferTimeAfter: bufferTimeAfter > 0,
@@ -121,7 +127,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
 }
 
 function SeriesPageInner({ pk }: { pk: number }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { data, refetch, error, loading } = useSeriesPageQuery({
     variables: { id: createNodeId("ReservationNode", pk) },
   });
@@ -137,16 +143,16 @@ function SeriesPageInner({ pk }: { pk: number }) {
   const form = useForm<RescheduleReservationSeriesForm>({
     // FIXME there is no validation here (schema is incomplete, need to run the same refinements as in the create form)
     resolver: zodResolver(RescheduleReservationSeriesFormSchema(interval)),
-    values: convertToForm(reservationSeries, i18n.language),
+    values: convertToForm(reservationSeries),
   });
 
   const { control, formState, reset, handleSubmit, watch } = form;
   const { errors } = formState;
   useEffect(() => {
     if (reservationSeries) {
-      reset(convertToForm(reservationSeries, i18n.language));
+      reset(convertToForm(reservationSeries));
     }
-  }, [reservationSeries, reset, i18n.language]);
+  }, [reservationSeries, reset]);
   const reservationUnit = reservation?.reservationUnit ?? null;
 
   const [removedReservations, setRemovedReservations] = useState<NewReservationListItem[]>([]);
@@ -160,7 +166,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
   // can't change when the form values change -> otherwise we overwrite user selection
   useEffect(() => {
     const compareList = reservationSeries?.reservations.map((x) => new Date(x.beginsAt));
-    const values = convertToForm(reservationSeries, i18n.language);
+    const values = convertToForm(reservationSeries);
     const vals = {
       startingDate: values.startingDate,
       endingDate: values.endingDate,
@@ -172,7 +178,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
     const result = generateReservations(vals);
     const removed = result.filter((x) => compareList?.find((y) => isSameDay(y, x.date)) == null);
     setRemovedReservations(removed);
-  }, [reservationSeries, i18n.language]);
+  }, [reservationSeries]);
 
   const checkedReservations = useFilteredReservationList({
     items: newReservations,

@@ -44,7 +44,7 @@ const StepperWrapper = styled.div`
 function ReservationEditPage(props: PropsNarrowed): JSX.Element {
   const { t, i18n } = useTranslation();
   const { reservation } = props;
-  const locale = getLocalizationLang(i18n.language);
+
   const options = {
     ...props.options,
     municipality: Object.values(MunicipalityChoice).map((value) => ({
@@ -56,15 +56,15 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
   const [step, setStep] = useState<0 | 1>(0);
 
   const form = useForm<PendingReservationFormType>({
-    defaultValues: transformReservation(locale, reservation),
+    defaultValues: transformReservation(reservation),
     mode: "onChange",
     resolver: zodResolver(PendingReservationFormSchema),
   });
 
   const { reset } = form;
   useEffect(() => {
-    reset(transformReservation(locale, reservation));
-  }, [reservation, reset, locale]);
+    reset(transformReservation(reservation));
+  }, [reservation, reset]);
 
   const title = step === 0 ? "reservations:editReservationTime" : "reservationCalendar:heading.pendingReservation";
 

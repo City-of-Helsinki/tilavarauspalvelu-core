@@ -1,4 +1,3 @@
-import { getLocalizationLang } from "common/src/helpers";
 import React from "react";
 import styled from "styled-components";
 import { type ReservationUnitReservationsFragment, UserPermissionChoice } from "@gql/gql-types";
@@ -42,8 +41,8 @@ export function ReservationPopupContent({
 }: {
   reservation: ReservationUnitReservationsFragment;
 }): JSX.Element {
-  const { t, i18n } = useTranslation();
-  const locale = getLocalizationLang(i18n.language);
+  const { t } = useTranslation();
+
   const reservationStart = toValidDateObject(reservation.beginsAt);
   const reservationEnd = toValidDateObject(reservation.endsAt);
   const eventName = getReserveeName(reservation, t, 22) || "-";
@@ -51,8 +50,7 @@ export function ReservationPopupContent({
     <PopupContent>
       <Flex $gap="xs">
         <Heading>
-          {formatTime(reservationStart, { locale })} - {formatTime(reservationEnd, { locale })} /{" "}
-          {reservation.reservationUnit?.nameFi ?? "-"}
+          {formatTime(reservationStart)} - {formatTime(reservationEnd)} / {reservation.reservationUnit?.nameFi ?? "-"}
         </Heading>
         <VisibleIfPermission reservation={reservation} permission={UserPermissionChoice.CanViewReservations}>
           <Reservee>

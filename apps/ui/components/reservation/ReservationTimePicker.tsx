@@ -264,7 +264,7 @@ export function ReservationTimePicker({
     });
 
     const newDate = formatDate(begin);
-    const newTime = formatTime(begin, { locale });
+    const newTime = formatTime(begin);
 
     setValue("date", newDate, { shouldDirty: true });
     setValue("duration", duration, { shouldDirty: true });
@@ -319,7 +319,7 @@ export function ReservationTimePicker({
     });
 
     const uiDate = formatDate(begin);
-    const uiTime = formatTime(begin, { locale });
+    const uiTime = formatTime(begin);
     // click doesn't change the duration
     setValue("date", uiDate, { shouldDirty: true });
     setValue("time", uiTime, { shouldDirty: true });
