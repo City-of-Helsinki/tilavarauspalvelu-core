@@ -398,6 +398,7 @@ export default function ApplicationRoundRouted(props: PropsNarrowed): JSX.Elemen
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
   useEffect(() => {
+    // oxlint-disable react/exhaustive-deps -- this is the correct list, but should be refactored
     // TODO need to add the side effect to the select filter
     // or maybe not? an invalid value is going to get filtered here anyway and we use the first reservation unit
     const setUnitFilter = (value: number) => {
@@ -411,7 +412,7 @@ export default function ApplicationRoundRouted(props: PropsNarrowed): JSX.Elemen
     if (filteredUnits.length > 0 && (unitFilter == null || unitFilter < 1)) {
       setUnitFilter(filteredUnits[0]?.pk ?? 0);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- this is the correct list, but should be refactored
+    // oxlint-enable react/exhaustive-deps -- this is the correct list, but should be refactored
   }, [filteredUnits]);
 
   // user has no accesss to specific unit through URL with search params -> reset the filter

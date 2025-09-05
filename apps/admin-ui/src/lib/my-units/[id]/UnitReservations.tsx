@@ -91,10 +91,10 @@ export function UnitReservations(props: UnitReservationsProps): JSX.Element {
   };
 
   useEffect(() => {
+    // oxlint-disable-next-line react/exhaustive-deps -- only on page load
     if (searchParams.get("date") == null) {
       handleTodayClick();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only on page load
   }, []);
 
   const hideTags = ["date", "tab", "reservationUnit", "isModalOpen", "timeOffset", "cellId"];

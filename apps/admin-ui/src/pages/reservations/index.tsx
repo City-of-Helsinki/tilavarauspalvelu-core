@@ -16,12 +16,13 @@ export default function ListReservationsPage(): JSX.Element {
   const params = useSearchParams();
   const setParams = useSetSearchParams();
   useEffect(() => {
+    // oxlint-disable react/exhaustive-deps -- only on page load
     if (params.size === 0) {
       const p = new URLSearchParams(params);
       p.set("dateGte", toUIDate(today));
       setParams(p);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only on page load
+    // oxlint-enable react/exhaustive-deps -- only on page load
   }, []);
 
   const defaultFilters = [

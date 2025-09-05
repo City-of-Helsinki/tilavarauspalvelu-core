@@ -19,10 +19,11 @@ export function TrackingWrapper({ children, matomoEnabled }: TrackingWrapperProp
   const router = useRouter();
 
   useEffect(() => {
+    // oxlint-disable react/exhaustive-deps -- should be refactored to remove event handler on unmount
     if (matomoEnabled) {
       router.events.on("routeChangeComplete", trackPageView);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-enable react/exhaustive-deps -- should be refactored to remove event handler on unmount
   }, []);
 
   // eslint-disable-next-line react/jsx-no-useless-fragment -- return type issues
