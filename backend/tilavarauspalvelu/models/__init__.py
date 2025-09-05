@@ -8,6 +8,7 @@ from .application_round.model import ApplicationRound
 from .application_round_time_slot.model import ApplicationRoundTimeSlot
 from .application_section.model import ApplicationSection
 from .banner_notification.model import BannerNotification
+from .email_message.model import EmailMessage
 from .equipment.model import Equipment
 from .equipment_category.model import EquipmentCategory
 from .general_role.model import GeneralRole
@@ -54,6 +55,7 @@ __all__ = [
     "ApplicationRoundTimeSlot",
     "ApplicationSection",
     "BannerNotification",
+    "EmailMessage",
     "Equipment",
     "EquipmentCategory",
     "GeneralRole",
