@@ -1,9 +1,8 @@
-import type { LocalizationLanguages } from "common/src/urlBuilder";
 import React from "react";
 import { CustomTable } from "@/component/Table";
 import { getApplicationUrl, getReservationUrl } from "@/common/urls";
 import type { RejectedOccurrencesTableElementFragment } from "@gql/gql-types";
-import { getLocalizationLang, truncate } from "common/src/helpers";
+import { truncate } from "common/src/helpers";
 import { IconLinkExternal, IconSize } from "hds-react";
 import { memoize } from "lodash-es";
 import { useTranslation, type TFunction } from "next-i18next";
@@ -35,11 +34,7 @@ type RejectedOccurrencesView = {
   link: string;
 };
 
-function timeSlotMapper(
-  t: TFunction,
-  locale: LocalizationLanguages,
-  slot: RejectedOccurrencesTableElementFragment
-): RejectedOccurrencesView {
+function timeSlotMapper(t: TFunction, slot: RejectedOccurrencesTableElementFragment): RejectedOccurrencesView {
   const allocatedSlot = slot.reservationSeries?.allocatedTimeSlot;
   const allocatedReservationUnit = allocatedSlot?.reservationUnitOption.reservationUnit;
   const allocatedReservationUnitName = allocatedReservationUnit?.nameFi ?? "-";
@@ -49,8 +44,8 @@ function timeSlotMapper(
   const applicantName = application != null ? getApplicantName(application) : "-";
 
   const date = formatDate(toValidDateObject(slot?.beginDatetime));
-  const begin = formatTime(toValidDateObject(slot?.beginDatetime), { locale });
-  const end = formatTime(toValidDateObject(slot?.endDatetime), { locale });
+  const begin = formatTime(toValidDateObject(slot?.beginDatetime));
+  const end = formatTime(toValidDateObject(slot?.endDatetime));
   const timeString = `${date} ${begin}–${end}`;
   const name = allocatedSlot?.reservationUnitOption.applicationSection.name ?? "-";
 
@@ -144,10 +139,9 @@ export function RejectedOccurrencesTable({
   sort,
   sortChanged: onSortChanged,
 }: Readonly<Props>) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
-  const locale = getLocalizationLang(i18n.language);
-  const rows = rejectedOccurrences.map((ro) => timeSlotMapper(t, locale, ro));
+  const rows = rejectedOccurrences.map((ro) => timeSlotMapper(t, ro));
   const cols = memoize(() => getColConfig(t))();
 
   if (rows.length === 0) {

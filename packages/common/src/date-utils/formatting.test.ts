@@ -43,25 +43,10 @@ describe("formatting", () => {
   });
 
   describe("formatTime", () => {
-    it("formats time without separator", () => {
+    it("formats time with valid date", () => {
       const date = new Date("2023-12-25T15:30:00");
       const result = formatTime(date);
-      // Function may include default separator, so check for time pattern
       expect(result).toMatch("15:30");
-    });
-
-    it("includes time separator when requested", () => {
-      const date = new Date("2023-12-25T15:30:00");
-      const result = formatTime(date, { t: mockT, includeTimeSeparator: true });
-      expect(result).toContain("common:dayTimeSeparator");
-      expect(result).toMatch("common:dayTimeSeparator 15:30");
-    });
-
-    it("uses default separator when no t function provided", () => {
-      const date = new Date("2023-12-25T15:30:00");
-      const result = formatTime(date, { includeTimeSeparator: true });
-      expect(result).toContain("@");
-      expect(result).toMatch("@ 15:30");
     });
 
     it("handles null date", () => {
@@ -77,7 +62,7 @@ describe("formatting", () => {
 
     it("formats with different locales", () => {
       const date = new Date("2023-12-25T15:30:00");
-      const result = formatTime(date, { locale: "en" });
+      const result = formatTime(date, "en");
       expect(result).toMatch("15:30");
     });
   });

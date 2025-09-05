@@ -117,7 +117,7 @@ export function CreateReservationModal({
     mode: "onChange",
     defaultValues: {
       date: formatDate(startDate, { locale }),
-      startTime: formatTime(startDate, { locale }),
+      startTime: formatTime(startDate),
       enableBufferTimeBefore: false,
       enableBufferTimeAfter: false,
     },

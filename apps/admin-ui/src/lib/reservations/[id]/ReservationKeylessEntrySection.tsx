@@ -1,4 +1,3 @@
-import { getLocalizationLang } from "common/src/helpers";
 import { useTranslation } from "next-i18next";
 import {
   AccessType,
@@ -119,8 +118,7 @@ function ReservationKeylessEntrySingle({
   reservation: ReservationKeylessEntryFragment;
   onSuccess: () => void;
 }>) {
-  const { t, i18n } = useTranslation();
-  const locale = getLocalizationLang(i18n.language);
+  const { t } = useTranslation();
   const pindoraInfo = reservation.pindoraInfo;
   const pindoraAccessCodeBegins = toValidDateObject(pindoraInfo?.accessCodeBeginsAt ?? "");
   const pindoraAccessCodeEnds = toValidDateObject(pindoraInfo?.accessCodeEndsAt ?? "");
@@ -137,9 +135,7 @@ function ReservationKeylessEntrySingle({
       </Flex>
 
       <DataWrapper label={t("accessType:validity.label")}>
-        {reservation.pindoraInfo
-          ? `${formatTime(pindoraAccessCodeBegins, { locale })}–${formatTime(pindoraAccessCodeEnds, { locale })}`
-          : "-"}
+        {reservation.pindoraInfo ? `${formatTime(pindoraAccessCodeBegins)}–${formatTime(pindoraAccessCodeEnds)}` : "-"}
       </DataWrapper>
 
       <AccessCodeChangeRepairButton reservation={reservation} onSuccess={onSuccess} />
@@ -154,8 +150,8 @@ function ReservationKeylessEntryRecurring({
   reservation: ReservationKeylessEntryFragment;
   onSuccess: () => void;
 }>) {
-  const { t, i18n } = useTranslation();
-  const locale = getLocalizationLang(i18n.language);
+  const { t } = useTranslation();
+
   if (!reservation.reservationSeries) return null;
 
   const pindoraInfo = reservation.reservationSeries.pindoraInfo;
@@ -187,7 +183,7 @@ function ReservationKeylessEntryRecurring({
         <DataWrapper label={t("accessType:validity.label")}>
           <NoWrap>
             {validityBeginsTime
-              ? `${formatTime(toValidDateObject(validityBeginsTime), { locale })}–${formatTime(toValidDateObject(validityEndsTime ?? ""), { locale })}`
+              ? `${formatTime(toValidDateObject(validityBeginsTime))}–${formatTime(toValidDateObject(validityEndsTime ?? ""))}`
               : "-"}
           </NoWrap>
         </DataWrapper>
