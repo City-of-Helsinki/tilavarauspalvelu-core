@@ -355,8 +355,8 @@ export function EditTimeModal({
     defaultValues: {
       pk: reservation.pk ?? undefined,
       date: formatDate(startDateTime, { locale }),
-      startTime: formatTime(startDateTime, { locale }),
-      endTime: formatTime(endDateTime, { locale }),
+      startTime: formatTime(startDateTime),
+      endTime: formatTime(endDateTime),
       enableBufferTimeAfter: !!reservation.bufferTimeAfter,
       enableBufferTimeBefore: !!reservation.bufferTimeBefore,
       type: reservation.type ?? ReservationTypeChoice.Staff,

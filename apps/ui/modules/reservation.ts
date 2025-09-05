@@ -406,7 +406,6 @@ export function convertReservationFormToApi(
 }
 
 export function transformReservation(
-  locale: LocalizationLanguages,
   reservation?: Pick<ReservationNodeT, "beginsAt" | "endsAt">
 ): PendingReservationFormType {
   const originalBegin = new Date(reservation?.beginsAt ?? "");
@@ -414,7 +413,7 @@ export function transformReservation(
   return {
     date: formatDate(originalBegin),
     duration: differenceInMinutes(originalEnd, originalBegin),
-    time: formatTime(originalBegin, { locale }),
+    time: formatTime(originalBegin),
     isControlsVisible: false,
   };
 }
