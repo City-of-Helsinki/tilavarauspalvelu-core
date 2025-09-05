@@ -76,7 +76,7 @@ const MAX_TEXT_LENGTH = 255;
 type FieldOptions = {
   ageGroup: OptionsRecord["ageGroups"];
   purpose: OptionsRecord["reservationPurposes"];
-  muncipality: OptionsRecord["municipalities"];
+  municipality: OptionsRecord["municipalities"];
 };
 
 // Fix to match the Field required options
@@ -84,7 +84,7 @@ export function convertOptionsToField(options: OptionsRecord): FieldOptions {
   return {
     ageGroup: options.ageGroups,
     purpose: options.reservationPurposes,
-    muncipality: options.municipalities,
+    municipality: options.municipalities,
   };
 }
 
