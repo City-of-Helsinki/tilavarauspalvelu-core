@@ -16,10 +16,11 @@ import {
   EventStyleReservationFieldsFragment,
 } from "@gql/gql-types";
 import {
+  dateToMinutes,
   formatDateRange,
   formatDateTimeRange,
   formatDuration,
-  formatTime,
+  formatTimeRange,
   fromApiDate,
   fromApiDateTime,
   toValidDateObject,
@@ -227,7 +228,7 @@ function createRecurringTagString(reservation: CreateTagStringFragment, t: TFunc
   const durMinutes = differenceInMinutes(new Date(reservation.endsAt), new Date(reservation.beginsAt));
   const durationTag = formatDuration(t, { minutes: durMinutes });
 
-  const recurringDateTag = `${weekDayTag} ${formatTime(begin)}–${formatTime(end)}`;
+  const recurringDateTag = `${weekDayTag} ${formatTimeRange(dateToMinutes(begin), dateToMinutes(end))}`;
 
   return `${recurringDateTag}, ${durationTag} ${recurringTag.length > 0 ? " | " : ""} ${recurringTag} | ${unitTag}`;
 }

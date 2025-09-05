@@ -174,7 +174,7 @@ export function timeForInput(time: Date | string): string {
     }
   } catch {
     // If it's already in HH:mm format, return as-is if valid
-    if (/^\d{1,2}:\d{2}$/.test(time)) {
+    if (time.split(":").length >= 2) {
       const timeParts = time.split(":").map(Number);
       const hours = timeParts[0];
       const minutes = timeParts[1];
@@ -205,7 +205,10 @@ export function isValidDate(date: Date): boolean {
  * Converts a date to only amount of minutes (discarding date and seconds)
  * @param {Date} d - Date object
  */
-export function dateToMinutes(d: Date): number {
+export function dateToMinutes(d: Date | null): number | null {
+  if (!d || !isValidDate(d)) {
+    return null;
+  }
   return d.getHours() * 60 + d.getMinutes();
 }
 
