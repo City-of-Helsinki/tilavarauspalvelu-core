@@ -4,7 +4,7 @@
     "UPCOMING": "Tulossa",
     "OPEN": "Haku avoinna",
     "IN_ALLOCATION": "Käsittelyssä",
-    "RESULTS_SENT": "Lähetetty",
+    "SENT": "Lähetetty",
     "HANDLED": "Käsitelty"
   },
   "groupLabel": {
