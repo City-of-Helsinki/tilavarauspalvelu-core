@@ -271,7 +271,7 @@ export const EDIT_PAGE_RESERVATION_FRAGMENT = gql`
     endsAt
     ...CanReservationBeChanged
     ...ReservationInfoCard
-    ...MetaFields
+    ...ReservationMetaFields
     reservationUnit {
       ...EditPageReservationUnit
     }

@@ -120,10 +120,7 @@ function ReservationTypeForm({
             </Element>
           )}
           {!disableBufferToggle && (
-            <BufferToggles
-              before={reservationUnit.bufferTimeBefore ?? 0}
-              after={reservationUnit.bufferTimeAfter ?? 0}
-            />
+            <BufferToggles before={reservationUnit.bufferTimeBefore} after={reservationUnit.bufferTimeAfter} />
           )}
           {children}
           <CommentsTextArea
