@@ -9,6 +9,7 @@ import {
   type ReservationPermissionsQuery,
   type ReservationPermissionsQueryVariables,
   UserPermissionChoice,
+  ReserveeType,
 } from "@gql/gql-types";
 import { Button, ButtonVariant, LoadingSpinner, TextInput } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -76,6 +77,8 @@ function EditReservation({
       description: reservation.description ?? "",
       ageGroup: reservation.ageGroup?.pk ?? undefined,
       applyingForFreeOfCharge: reservation.applyingForFreeOfCharge ?? undefined,
+      reserveeIsUnregisteredAssociation:
+        reservation.reserveeType === ReserveeType.Nonprofit && reservation.reserveeIdentifier === "",
       freeOfChargeReason: reservation.freeOfChargeReason ?? undefined,
       municipality: reservation.municipality ?? undefined,
       numPersons: reservation.numPersons ?? undefined,
@@ -86,7 +89,6 @@ function EditReservation({
       reserveeEmail: reservation.reserveeEmail ?? "",
       reserveeFirstName: reservation.reserveeFirstName ?? "",
       reserveeIdentifier: reservation.reserveeIdentifier ?? "",
-      reserveeIsUnregisteredAssociation: !!reservation.reserveeIdentifier,
       reserveeLastName: reservation.reserveeLastName ?? "",
       reserveeOrganisationName: reservation.reserveeOrganisationName ?? "",
       reserveePhone: reservation.reserveePhone ?? "",
@@ -112,6 +114,7 @@ function EditReservation({
     const { seriesName, comments, reserveeIsUnregisteredAssociation, reserveeIdentifier, ...rest } = values;
 
     const toSubmit = {
+      // TODO don't use spread it breaks type checking for unknown fields
       ...rest,
       seriesName: seriesName !== "" ? seriesName : undefined,
       // force update to empty -> NA

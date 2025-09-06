@@ -13,11 +13,11 @@ import InfoDialog from "../common/InfoDialog";
 import { type ReservationQuery, ReserveeType } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/modules/helpers";
 import { containsField, FieldName } from "common/src/modules/metaFieldsHelpers";
-import { getApplicationFields, getGeneralFields } from "./SummaryFields";
 import { type Inputs } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/src/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { type OptionsRecord } from "common";
+import { getApplicationFields, getGeneralFields } from "common/src/hooks/useApplicationFields";
 
 type ReservationT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
