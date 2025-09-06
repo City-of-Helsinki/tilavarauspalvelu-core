@@ -1,7 +1,6 @@
 import {
   AccessType,
   ReservationUnitImageType,
-  MetaFieldsFragment,
   MunicipalityChoice,
   OrderStatus,
   type PaymentOrderNode,
@@ -17,6 +16,7 @@ import {
 import { createNodeId } from "common/src/modules/helpers";
 import type { FieldName } from "common/src/modules/metaFieldsHelpers";
 import { generateNameFragment } from "@/test/test.gql.utils";
+import { ReservationMetaFieldsFragment } from "common/gql/gql-types";
 
 export function generateTextFragment(text: string) {
   return {
@@ -158,6 +158,7 @@ export function createMockReservation(
     beginsAt: beginsAt,
     calendarUrl: "https://example.com/calendar.ics",
     description: "Test reservation description",
+    name: "Name",
     endsAt: endsAt,
     freeOfChargeReason: "Test free of charge reason",
     municipality: MunicipalityChoice.Helsinki,
@@ -478,10 +479,11 @@ export function createOptionsMock() {
   };
 }
 
-export function createMetaFieldsFragment(type: ReserveeType = ReserveeType.Company): MetaFieldsFragment {
+export function createMetaFieldsFragment(type: ReserveeType = ReserveeType.Company): ReservationMetaFieldsFragment {
   return {
     id: "1",
     description: "Test description",
+    name: "Name",
     numPersons: 4,
     purpose: { ...generatePurposeFragment("Test purpose") },
     ageGroup: { ...generateAgeGroupFragment({ id: 1, min: 1, max: 15 }) },

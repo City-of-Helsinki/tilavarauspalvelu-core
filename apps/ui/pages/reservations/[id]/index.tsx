@@ -535,12 +535,12 @@ export const GET_APPLICATION_RESERVATION_SERIES_QUERY = gql`
   }
 `;
 
-export const GET_RESERVATION_PAGE_QUERY = gql`
+export const RESERVATION_PAGE_QUERY = gql`
   query ReservationPage($id: ID!) {
     reservation(id: $id) {
       id
       type
-      ...MetaFields
+      ...ReservationMetaFields
       ...ReservationInfoCard
       ...Instructions
       ...CanReservationBeChanged

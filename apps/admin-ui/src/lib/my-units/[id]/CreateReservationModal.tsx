@@ -130,23 +130,7 @@ export function CreateReservationModal({
         throw new Error("Missing reservation unit");
       }
 
-      const { comments, date, startTime, endTime, type, enableBufferTimeBefore, enableBufferTimeAfter, ...rest } =
-        values;
-
-      const bufferBefore = getBufferTime(reservationUnit.bufferTimeBefore, type, enableBufferTimeBefore);
-      const bufferAfter = getBufferTime(reservationUnit.bufferTimeAfter, type, enableBufferTimeAfter);
-      const input: ReservationStaffCreateMutationInput = {
-        ...rest,
-        reservationUnit: reservationUnit.pk,
-        type,
-        beginsAt: fromUIDateTimeUnsafe(date, startTime).toISOString(),
-        endsAt: fromUIDateTimeUnsafe(date, endTime).toISOString(),
-        bufferTimeBefore: bufferBefore,
-        bufferTimeAfter: bufferAfter,
-        workingMemo: comments,
-      };
-
-      await createStaffReservation(input);
+      await createStaffReservation(transformCreateReservationMutation(values, reservationUnit));
 
       successToast({
         text: t("myUnits:ReservationDialog.saveSuccess", {
@@ -189,6 +173,40 @@ export function CreateReservationModal({
       </Dialog.Content>
     </FixedDialog>
   );
+}
+
+function transformCreateReservationMutation(
+  values: FormValueType,
+  reservationUnit: Pick<CreateStaffReservationFragment, "bufferTimeBefore" | "bufferTimeAfter" | "pk">
+): ReservationStaffCreateMutationInput {
+  if (!reservationUnit?.pk) {
+    throw new Error("Missing reservation unit");
+  }
+  const {
+    comments,
+    date,
+    startTime,
+    endTime,
+    type,
+    enableBufferTimeBefore,
+    enableBufferTimeAfter,
+    reserveeIsUnregisteredAssociation,
+    ...rest
+  } = values;
+
+  const bufferBefore = getBufferTime(reservationUnit.bufferTimeBefore, type, enableBufferTimeBefore);
+  const bufferAfter = getBufferTime(reservationUnit.bufferTimeAfter, type, enableBufferTimeAfter);
+  return {
+    // TODO don't use spread it allows passing unknown attributes to the object (even with Exact)
+    ...rest,
+    reservationUnit: reservationUnit.pk,
+    type,
+    beginsAt: fromUIDateTimeUnsafe(date, startTime).toISOString(),
+    endsAt: fromUIDateTimeUnsafe(date, endTime).toISOString(),
+    bufferTimeBefore: bufferBefore,
+    bufferTimeAfter: bufferAfter,
+    workingMemo: comments,
+  } satisfies ReservationStaffCreateMutationInput;
 }
 
 function DialogContent({
