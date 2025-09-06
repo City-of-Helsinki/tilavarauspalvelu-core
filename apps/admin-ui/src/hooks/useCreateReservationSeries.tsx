@@ -59,6 +59,7 @@ export function useCreateReservationSeries() {
     } = data;
 
     const reservationDetails: ReservationSeriesReservationCreateInput = {
+      // TODO don't use spread it breaks type checking for unknown fields
       ...rest,
       numPersons: !Number.isNaN(numPersons) ? numPersons : undefined,
       type: transformReservationTypeStaffChoice(type),

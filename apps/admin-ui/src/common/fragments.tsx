@@ -121,29 +121,6 @@ export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
   }
 `;
 
-export const RESERVATION_META_FRAGMENT = gql`
-  fragment ReservationMetaFields on ReservationNode {
-    ageGroup {
-      id
-      minimum
-      maximum
-      pk
-    }
-    purpose {
-      id
-      nameFi
-      pk
-    }
-    municipality
-    numPersons
-    name
-    description
-    ...ReserveeBillingFields
-    freeOfChargeReason
-    applyingForFreeOfCharge
-  }
-`;
-
 export const RECURRING_RESERVATION_FRAGMENT = gql`
   fragment ReservationSeriesFields on ReservationSeriesNode {
     id

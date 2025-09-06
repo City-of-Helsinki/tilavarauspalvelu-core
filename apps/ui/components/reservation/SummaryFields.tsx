@@ -1,15 +1,15 @@
 import styled from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
-import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { type ReservationNode, ReserveeType } from "@/gql/gql-types";
 import { containsField, type FieldName } from "common/src/metaFieldsHelpers";
 import { AutoGrid, H4 } from "common/styled";
-import { type MetaFieldsFragment } from "common/gql/gql-types";
 import { ParagraphAlt, PreviewLabel, PreviewValue } from "./styles";
 import { LabelValuePair } from "./LabelValuePair";
 import { extendMetaFieldOptions } from "common/src/reservation-form/MetaFields";
 import { type OptionsRecord } from "common";
 import { convertOptionsToField } from "common/src/reservation-form/ReservationFormField";
+import { ReservationMetaFieldsFragment } from "common/gql/gql-types";
+import { getApplicationFields, getGeneralFields } from "common/src/hooks/useApplicationFields";
 
 const Container = styled(AutoGrid)`
   margin-bottom: var(--spacing-2-xl);
@@ -24,46 +24,6 @@ function isNotEmpty(
   return !(rawValue == null || rawValue === "" || rawValue === false || rawValue === 0);
 }
 
-/// Helper function to type safely pick the application fields from the reservation
-// TODO move to common (and reuse in the hooks)
-export function getApplicationFields({
-  supportedFields,
-  reservation,
-  reserveeType,
-}: {
-  supportedFields: FieldName[];
-  reservation: MetaFieldsFragment;
-  reserveeType: ReserveeType;
-}) {
-  const applicationFields = getReservationApplicationFields({
-    supportedFields,
-    reserveeType,
-  });
-
-  // Special case for reserveeIsUnregisteredAssociation due to it not being included in the schema,
-  // but we use it in the form to decide if reserveeIdentifier is required or not
-  return applicationFields.filter(
-    (key): key is keyof ReservationNode => key in reservation || key === "reserveeIsUnregisteredAssociation"
-  );
-}
-
-/// Helper function to type safely pick the general fields from the reservation
-// TODO move to common (and reuse in the hooks)
-export function getGeneralFields({
-  supportedFields,
-  reservation,
-}: {
-  supportedFields: FieldName[];
-  reservation: MetaFieldsFragment;
-}) {
-  const generalFields = getReservationApplicationFields({
-    supportedFields,
-    reserveeType: "common",
-  }).filter((n) => n !== "reserveeType");
-
-  return generalFields.filter((key): key is keyof ReservationNode => key in reservation);
-}
-
 /// Component to show the application fields in the reservation confirmation
 /// This requires the reservation to be finalized (reserveeType is set)
 export function ApplicationFields({
@@ -71,7 +31,7 @@ export function ApplicationFields({
   options,
   supportedFields,
 }: {
-  reservation: MetaFieldsFragment;
+  reservation: ReservationMetaFieldsFragment;
   options: Omit<OptionsRecord, "municipalities">;
   supportedFields: FieldName[];
 }): JSX.Element {
@@ -91,7 +51,9 @@ export function ApplicationFields({
     supportedFields,
     reservation,
     reserveeType,
-  }).filter((key) => isNotEmpty(key, reservation));
+  })
+    .filter((key): key is keyof ReservationNode => key !== "reserveeIsUnregisteredAssociation")
+    .filter((key) => isNotEmpty(key, reservation));
 
   const hasReserveeType = filteredApplicationFields.find((x) => x === "reserveeType") != null;
 
@@ -128,7 +90,7 @@ export function GeneralFields({
   options,
 }: {
   supportedFields: FieldName[];
-  reservation: MetaFieldsFragment;
+  reservation: ReservationMetaFieldsFragment;
   options: Omit<OptionsRecord, "municipalities">;
 }): JSX.Element | null {
   const { t } = useTranslation();
