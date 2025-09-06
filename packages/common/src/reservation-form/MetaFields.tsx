@@ -287,7 +287,7 @@ export function ReserverMetaFields({
 
   const reserveeType = watch("reserveeType");
 
-  if (!reservationUnit.metadataSet) {
+  if (reservationUnit.metadataSet == null) {
     return null;
   }
   return (

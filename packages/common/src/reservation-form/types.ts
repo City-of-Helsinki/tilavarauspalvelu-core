@@ -66,13 +66,7 @@ const fieldsCommon = [
 
 export const reservationApplicationFields = {
   individual: fieldsCommon,
-  nonprofit: [
-    "reservee_organisation_name",
-    "municipality",
-    "reservee_is_unregistered_association",
-    "reservee_identifier",
-    ...fieldsCommon,
-  ],
+  nonprofit: ["reservee_organisation_name", "municipality", "reservee_identifier", ...fieldsCommon],
   company: ["reservee_organisation_name", "municipality", "reservee_identifier", ...fieldsCommon],
   common: [
     "reservee_type",

@@ -52,7 +52,6 @@ const supportedFields = [
   "reservee_phone",
   "reservee_email",
   "reservee_identifier",
-  "reservee_is_unregistered_association",
   "reservee_address_street",
   "reservee_address_city",
   "reservee_address_zip",

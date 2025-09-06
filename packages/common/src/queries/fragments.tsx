@@ -16,30 +16,6 @@ export const RESERVEE_BILLING_FRAGMENT = gql`
   }
 `;
 
-export const METAFIELDS_FRAGMENT = gql`
-  fragment MetaFields on ReservationNode {
-    ...ReserveeBillingFields
-    applyingForFreeOfCharge
-    freeOfChargeReason
-    description
-    numPersons
-    ageGroup {
-      id
-      pk
-      maximum
-      minimum
-    }
-    purpose {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-    }
-    municipality
-  }
-`;
-
 export const TERMS_OF_USE_NAME_FRAGMENT = gql`
   fragment TermsOfUseNameFields on TermsOfUseNode {
     id

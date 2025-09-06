@@ -35,7 +35,6 @@ import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
 import { createNodeId, filterNonNullable, getNode, toNumber } from "common/src/helpers";
 import { containsField } from "common/src/metaFieldsHelpers";
 import { errorToast } from "common/src/components/toast";
-import { getGeneralFields } from "@/components/reservation/SummaryFields";
 import { queryOptions } from "@/modules/queryOptions";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
@@ -44,6 +43,7 @@ import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { useDisplayError } from "common/src/hooks";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
+import { getGeneralFields } from "common/src/hooks/useApplicationFields";
 
 const StyledReservationInfoCard = styled(ReservationInfoCard)`
   grid-column: 1 / -1;
@@ -229,10 +229,11 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     }
 
     const input: ReservationUpdateMutation = {
+      // TODO don't use spread it breaks type checking for unknown fields
       ...rest,
       // force update to empty -> NA
       reserveeIdentifier:
-        !reserveeIsUnregisteredAssociation && reserveeType !== ReserveeType.Individual ? reserveeIdentifier : "",
+        reserveeType !== ReserveeType.Individual && !reserveeIsUnregisteredAssociation ? reserveeIdentifier : "",
       applyingForFreeOfCharge,
       freeOfChargeReason: applyingForFreeOfCharge ? freeOfChargeReason : "",
       pk: reservationPk,
@@ -488,7 +489,7 @@ export const RESERVATION_IN_PROGRESS_FRAGMENT = gql`
     id
     pk
     name
-    ...MetaFields
+    ...ReservationMetaFields
     ...ReservationInfoCard
     bufferTimeBefore
     bufferTimeAfter

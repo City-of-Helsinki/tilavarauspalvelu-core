@@ -14,6 +14,7 @@ import {
 import { useTranslation } from "next-i18next";
 import {
   type CreateStaffReservationFragment,
+  type Exact,
   type ReservationStaffCreateMutation,
   useCreateStaffReservationMutation,
   useReservationUnitQuery,
@@ -122,7 +123,7 @@ export function CreateReservationModal({
     },
   });
   const [create] = useCreateStaffReservationMutation();
-  const createStaffReservation = (input: ReservationStaffCreateMutation) => create({ variables: { input } });
+  const createStaffReservation = (input: Exact<ReservationStaffCreateMutation>) => create({ variables: { input } });
   const displayError = useDisplayError();
   const onSubmit = async (values: FormValueType) => {
     try {
@@ -130,23 +131,7 @@ export function CreateReservationModal({
         throw new Error("Missing reservation unit");
       }
 
-      const { comments, date, startTime, endTime, type, enableBufferTimeBefore, enableBufferTimeAfter, ...rest } =
-        values;
-
-      const bufferBefore = getBufferTime(reservationUnit.bufferTimeBefore, type, enableBufferTimeBefore);
-      const bufferAfter = getBufferTime(reservationUnit.bufferTimeAfter, type, enableBufferTimeAfter);
-      const input: ReservationStaffCreateMutation = {
-        ...rest,
-        reservationUnit: reservationUnit.pk,
-        type,
-        beginsAt: dateTime(date, startTime),
-        endsAt: dateTime(date, endTime),
-        bufferTimeBefore: bufferBefore,
-        bufferTimeAfter: bufferAfter,
-        workingMemo: comments,
-      };
-
-      await createStaffReservation(input);
+      await createStaffReservation(transformCreateReservationMutation(values, reservationUnit));
 
       successToast({
         text: t("myUnits:ReservationDialog.saveSuccess", {
@@ -189,6 +174,37 @@ export function CreateReservationModal({
       </Dialog.Content>
     </FixedDialog>
   );
+}
+
+function transformCreateReservationMutation(
+  values: FormValueType,
+  reservationUnit: Pick<CreateStaffReservationFragment, "bufferTimeBefore" | "bufferTimeAfter" | "pk">
+): Exact<ReservationStaffCreateMutation> {
+  const {
+    comments,
+    date,
+    startTime,
+    endTime,
+    type,
+    enableBufferTimeBefore,
+    enableBufferTimeAfter,
+    reserveeIsUnregisteredAssociation,
+    ...rest
+  } = values;
+
+  const bufferBefore = getBufferTime(reservationUnit.bufferTimeBefore, type, enableBufferTimeBefore);
+  const bufferAfter = getBufferTime(reservationUnit.bufferTimeAfter, type, enableBufferTimeAfter);
+  return {
+    // TODO don't use spread it allows passing unknown attributes to the object (even with Exact)
+    ...rest,
+    reservationUnit: reservationUnit.pk,
+    type,
+    beginsAt: dateTime(date, startTime),
+    endsAt: dateTime(date, endTime),
+    bufferTimeBefore: bufferBefore,
+    bufferTimeAfter: bufferAfter,
+    workingMemo: comments,
+  } satisfies Exact<ReservationStaffCreateMutation>;
 }
 
 function DialogContent({

@@ -538,7 +538,7 @@ export const RESERVATION_PAGE_FRAGMENT = gql`
   fragment ReservationPage on ReservationNode {
     id
     type
-    ...MetaFields
+    ...ReservationMetaFields
     ...ReservationInfoCard
     ...Instructions
     ...CanReservationBeChanged

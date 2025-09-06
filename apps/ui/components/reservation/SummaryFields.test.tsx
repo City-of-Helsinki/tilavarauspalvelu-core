@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { ApplicationFields, GeneralFields } from "@/components/reservation/SummaryFields";
-import { MetaFieldsFragment, ReserveeType } from "@gql/gql-types";
+import { ReservationMetaFieldsFragment, ReserveeType } from "@gql/gql-types";
 import { createMetaFieldsFragment, createOptionsMock, createSupportedFieldsMock } from "@test/reservation.mocks";
 import { type FieldName } from "common/src/metaFieldsHelpers";
 import { describe, expect, it } from "vitest";
@@ -177,23 +177,23 @@ function createMockWithMissingField({
   missingField,
   emptyValue,
 }: {
-  mock: MetaFieldsFragment;
+  mock: ReservationMetaFieldsFragment;
   supportedFields: FieldName[];
   missingField: string;
   emptyValue: null | "";
-}): MetaFieldsFragment {
+}): ReservationMetaFieldsFragment {
   const fields = supportedFields.map((f) => f.fieldName);
 
   // Generate mock data with the specific field missing
-  return fields.reduce(
+  return fields.reduce<ReservationMetaFieldsFragment>(
     (mockWithMissingField, fieldName) => {
       return {
         ...mockWithMissingField,
-        [fieldName as keyof MetaFieldsFragment]:
-          fieldName === missingField ? emptyValue : mock[fieldName as keyof MetaFieldsFragment],
+        [fieldName as keyof ReservationMetaFieldsFragment]:
+          fieldName === missingField ? emptyValue : mock[fieldName as keyof ReservationMetaFieldsFragment],
       };
     },
-    { reserveeType: mock.reserveeType } as MetaFieldsFragment
+    { reserveeType: mock.reserveeType } as ReservationMetaFieldsFragment
   );
 }
 

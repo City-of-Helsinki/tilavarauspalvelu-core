@@ -5,7 +5,7 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontMedium, Strongish } from "../../styled";
-import { type ReserveeType } from "../../gql/gql-types";
+import { ReserveeType } from "../../gql/gql-types";
 import { type Inputs, type Reservation } from "./types";
 import { type OptionsRecord } from "../../types/common";
 import { ControlledCheckbox, ControlledSelect } from "../components/form";
@@ -124,10 +124,7 @@ export function ReservationFormField({
 
   const isSelectField = Object.keys(options).includes(field);
 
-  const isReserveeIdRequired =
-    field === "reserveeIdentifier" && watch("reserveeIsUnregisteredAssociation") !== undefined
-      ? watch("reserveeIsUnregisteredAssociation") !== true
-      : required;
+  const isReserveeIdRequired = watch("reserveeIsUnregisteredAssociation") === true;
 
   const isFreeOfChargeReasonRequired = field === "freeOfChargeReason" && watch("applyingForFreeOfCharge") === true;
 
@@ -263,6 +260,9 @@ export function ReservationFormField({
     );
   }
 
+  const shouldHideOrganisationIdentifier =
+    watch("reserveeType") === ReserveeType.Nonprofit && watch("reserveeIsUnregisteredAssociation") === true;
+
   const checkParams = {
     id,
     name: field,
@@ -283,6 +283,9 @@ export function ReservationFormField({
         </StyledCheckboxWrapper>
       );
     case "reserveeIsUnregisteredAssociation":
+      if (watch("reserveeType") !== ReserveeType.Nonprofit) {
+        return null;
+      }
       return (
         <StyledCheckboxWrapper key={field}>
           <ControlledCheckbox {...checkParams} defaultValue={watch("reserveeIsUnregisteredAssociation")} />
@@ -322,11 +325,7 @@ export function ReservationFormField({
           required={required}
           maxLength={MAX_TEXT_LENGTH}
           $isWide={isWideRow}
-          $hidden={
-            watch("reserveeIsUnregisteredAssociation") === undefined
-              ? get(reservation, "reserveeIsUnregisteredAssociation") === true
-              : watch("reserveeIsUnregisteredAssociation") === true
-          }
+          $hidden={shouldHideOrganisationIdentifier}
         />
       );
     default:
