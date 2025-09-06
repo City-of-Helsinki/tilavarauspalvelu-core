@@ -60,13 +60,13 @@ export function useCreateReservationSeries() {
       ...rest
     } = data;
 
-    const name = data.type === "BLOCKED" ? "BLOCKED" : (seriesName ?? "");
-
     if (user?.pk == null) {
       throw new Error("Current user pk missing");
     }
+    const name = data.type === "BLOCKED" ? "BLOCKED" : (seriesName ?? "");
 
     const reservationDetails: ReservationSeriesReservationCreateSerializerInput = {
+      // TODO don't use spread it breaks type checking for unknown fields
       ...rest,
       type: transformReservationTypeStaffChoice(type),
       reserveeIdentifier: !reserveeIsUnregisteredAssociation ? reserveeIdentifier : undefined,
