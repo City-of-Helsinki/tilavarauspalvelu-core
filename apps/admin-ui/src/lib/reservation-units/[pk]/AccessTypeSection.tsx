@@ -40,7 +40,7 @@ function CurrentAccessType({
 
   return (
     <div>
-      <H6 $marginBottom={"s"}>{t("accessType:validity.currentlyActive")}</H6>
+      <H6 $marginBottom="s">{t("accessType:validity.currentlyActive")}</H6>
       <CurrentAccessTypeContainer>
         <KVWrapper>
           <Label>{t("accessType:accessTypeLabel")}:</Label>

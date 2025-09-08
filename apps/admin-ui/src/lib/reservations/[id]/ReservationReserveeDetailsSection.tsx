@@ -119,7 +119,7 @@ export function ReservationReserveeDetailsSection({
     <ReserveeDetailsAccordion id="reservation__reservee-details" heading={t("reservation:reserveeDetails")}>
       {gqlError && (
         <Notification
-          type={"alert"}
+          type="alert"
           size={NotificationSize.Large}
           label={<H5 $noMargin>{t("reservation:reserveeUnableToShowData")}</H5>}
         >
@@ -203,7 +203,7 @@ export function ReservationReserveeDetailsSection({
         <>
           <Notification>{t("reservation:reserveeShowInfosNotification")}</Notification>
 
-          <Flex $direction={"row"}>
+          <Flex $direction="row">
             <ReserveeDetailsButton
               isLoading={isContactInfoLoading}
               onClick={() => {

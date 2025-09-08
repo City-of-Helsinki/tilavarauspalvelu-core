@@ -134,7 +134,7 @@ export function ErrorContainer({
       />
       <TextContent>
         {children || statusCodeText({ statusCode, title, body, t })}
-        <Flex $direction={"column"} $gap="xs">
+        <Flex $direction="column" $gap="xs">
           <IconButton
             label={t("buttons.contact")}
             icon={<IconArrowRight />}
