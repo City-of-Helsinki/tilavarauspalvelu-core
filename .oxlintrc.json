@@ -347,6 +347,7 @@
     "unicorn/prefer-set-size": "error",
     "unicorn/prefer-string-replace-all": "error",
     "unicorn/prefer-string-starts-ends-with": "error",
+    "unicorn/prefer-type-error": "error",
     "unicorn/require-number-to-fixed-digits-argument": "error",
     "unicorn/require-post-message-target-origin": "error",
     "vitest/no-conditional-tests": "error",
