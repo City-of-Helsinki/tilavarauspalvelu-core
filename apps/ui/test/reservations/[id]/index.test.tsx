@@ -95,7 +95,7 @@ function customRender(
         reservation={reservation}
         feedbackUrl=""
         options={createOptionsMock()}
-        apiBaseUrl={"http://localhost:8000"}
+        apiBaseUrl="http://localhost:8000"
       />
     </MockedGraphQLProvider>
   );

@@ -6,7 +6,7 @@ import { Flex } from "common/styled";
 
 export function ErrorGeneric(): JSX.Element {
   return (
-    <Flex $justifyContent={"center"} $alignItems={"center"} $marginTop={"2-xl"}>
+    <Flex $justifyContent="center" $alignItems="center" $marginTop="2-xl">
       <ErrorContainer
         statusCode={500}
         feedbackUrl={env.EMAIL_VARAAMO_EXT_LINK}

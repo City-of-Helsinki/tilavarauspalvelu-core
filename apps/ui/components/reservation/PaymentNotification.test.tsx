@@ -6,7 +6,7 @@ import { toUIDateTime } from "common/src/common/util";
 
 function customRender() {
   const reservation = createReservationPageMock({});
-  return render(<PaymentNotification reservation={reservation} apiBaseUrl={"http://localhost:8000"} />);
+  return render(<PaymentNotification reservation={reservation} apiBaseUrl="http://localhost:8000" />);
 }
 
 describe("Component: Payment Notification", () => {

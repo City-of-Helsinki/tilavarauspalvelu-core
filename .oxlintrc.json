@@ -262,7 +262,14 @@
     "react/forbid-elements": "error",
     "react/forward-ref-uses-ref": "error",
     "react/jsx-boolean-value": "error",
-    "react/jsx-no-comment-textnodes": "error",
+    "react/jsx-curly-brace-presence": [
+      "error",
+      {
+        "props": "never",
+        "children": "ignore",
+        "propElementValues": "always"
+      }
+    ],
     "react/jsx-filename-extension": [
       "error",
       {
@@ -273,6 +280,7 @@
       }
     ],
     "react/jsx-key": "error",
+    "react/jsx-no-comment-textnodes": "error",
     "react/jsx-no-duplicate-props": "error",
     "react/jsx-no-script-url": "error",
     "react/jsx-no-target-blank": "error",
@@ -288,10 +296,13 @@
     "react/no-is-mounted": "error",
     "react/no-namespace": "error",
     "react/no-render-return-value": "error",
+    "react/no-set-state": "off",
     "react/no-string-refs": "error",
     "react/no-unknown-property": "error",
+    "react/prefer-es6-class": "error",
     "react/react-in-jsx-scope": "off",
     "react/rules-of-hooks": "error",
+    "react/self-closing-comp": "error",
     "react/style-prop-object": "error",
     "react/void-dom-elements-no-children": "error",
     "typescript/ban-ts-comment": "error",

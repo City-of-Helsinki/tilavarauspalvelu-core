@@ -48,12 +48,12 @@ function customRender(): ReturnType<typeof render> {
         options={options}
         matomoEnabled={false}
         hotjarEnabled={false}
-        profileLink={""}
-        apiBaseUrl={"http://localhost:8000"}
-        feedbackUrl={"http://localhost:8000"}
-        sentryDsn={""}
-        sentryEnvironment={"CI"}
-        version={""}
+        profileLink=""
+        apiBaseUrl="http://localhost:8000"
+        feedbackUrl="http://localhost:8000"
+        sentryDsn=""
+        sentryEnvironment="CI"
+        version=""
       />
     </MockedGraphQLProvider>
   );
