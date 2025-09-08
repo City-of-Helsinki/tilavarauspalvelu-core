@@ -416,7 +416,7 @@ export const RESERVATION_PAGE_FRAGMENT = gql`
       reservationStartInterval
       ...ReservationTypeFormFields
     }
-    ...ReservationMetaFields
+    ...ReservationFormFields
   }
 `;
 

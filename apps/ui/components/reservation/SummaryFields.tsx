@@ -3,13 +3,13 @@ import { type TFunction, useTranslation } from "next-i18next";
 import { type ReservationNode, ReserveeType } from "@/gql/gql-types";
 import { containsField, type FieldName } from "common/src/metaFieldsHelpers";
 import { AutoGrid, H4 } from "common/styled";
-import { type ReservationMetaFieldsFragment } from "common/gql/gql-types";
+import { type ReservationFormFieldsFragment } from "common/gql/gql-types";
 import { ParagraphAlt, PreviewLabel, PreviewValue } from "./styles";
 import { LabelValuePair } from "./LabelValuePair";
-import { extendMetaFieldOptions } from "common/src/reservation-form/MetaFields";
 import { type OptionsRecord } from "common";
 import { convertOptionsToField } from "common/src/reservation-form/ReservationFormField";
 import { getApplicationFields, getGeneralFields } from "common/src/hooks/useApplicationFields";
+import { extendMetaFieldOptions } from "common/src/reservation-form/util";
 
 const Container = styled(AutoGrid)`
   margin-bottom: var(--spacing-2-xl);
@@ -31,7 +31,7 @@ export function ApplicationFields({
   options,
   supportedFields,
 }: {
-  reservation: ReservationMetaFieldsFragment;
+  reservation: ReservationFormFieldsFragment;
   options: Omit<OptionsRecord, "municipalities">;
   supportedFields: FieldName[];
 }): JSX.Element {
@@ -90,7 +90,7 @@ export function GeneralFields({
   options,
 }: {
   supportedFields: FieldName[];
-  reservation: ReservationMetaFieldsFragment;
+  reservation: ReservationFormFieldsFragment;
   options: Omit<OptionsRecord, "municipalities">;
 }): JSX.Element | null {
   const { t } = useTranslation();
