@@ -9,7 +9,7 @@ from django.contrib.admin import helpers
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
-from modeltranslation.admin import TranslationAdmin
+from modeltranslation.admin import TabbedTranslationAdmin
 
 from tilavarauspalvelu.admin.application_round.form import ApplicationRoundAdminForm
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 
 
 @admin.register(ApplicationRound)
-class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
+class ApplicationRoundAdmin(ExtraButtonsMixin, TabbedTranslationAdmin):
     # Functions
     actions = ["reset_application_rounds"]
 
