@@ -8,7 +8,7 @@ import userEvent from "@testing-library/user-event";
 import { selectFirstOption } from "@test/test.utils";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
-import { type OptionsListT } from "common/src/modules/search";
+import type { OptionsListT } from "common/src/modules/search";
 
 const { mockedRouterPush, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();

@@ -9,7 +9,7 @@ import {
   useFilterOptionsQuery,
 } from "@gql/gql-types";
 import { type TFunction, useTranslation } from "next-i18next";
-import { type TagOptionsList } from "@/modules/search";
+import type { TagOptionsList } from "@/modules/search";
 import { gql } from "@apollo/client";
 import { filterNonNullable, sort } from "common/src/helpers";
 

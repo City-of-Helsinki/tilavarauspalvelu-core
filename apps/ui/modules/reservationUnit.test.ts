@@ -38,9 +38,9 @@ import { type ReservableMap, dateToKey, type RoundPeriod } from "./reservable";
 import { generateNameFragment } from "@/test/test.gql.utils";
 import { TIMERS_TO_FAKE } from "@/test/test.utils";
 import { createNodeId, ReadonlyDeep } from "common/src/helpers";
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { vi, describe, test, expect, beforeEach, afterEach, beforeAll, afterAll } from "vitest";
-import { type DeepRequired } from "react-hook-form";
+import type { DeepRequired } from "react-hook-form";
 import { createMockIsReservableFieldsFragment } from "@/test/reservation-unit.mocks";
 
 // Turn into describe block and spec the tests

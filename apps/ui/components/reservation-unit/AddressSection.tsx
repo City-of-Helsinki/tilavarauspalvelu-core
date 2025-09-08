@@ -7,7 +7,7 @@ import { IconButton } from "common/src/components";
 import { mapUrlPrefix } from "@/modules/const";
 import { Flex, H4, fontMedium } from "common/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
-import { type LocalizationLanguages } from "common/src/urlBuilder";
+import type { LocalizationLanguages } from "common/src/urlBuilder";
 import { gql } from "@apollo/client";
 
 const AddressSpan = styled.span`

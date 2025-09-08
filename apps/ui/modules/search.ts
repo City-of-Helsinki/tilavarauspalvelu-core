@@ -8,7 +8,7 @@ import {
   mapParamToInteger,
   toNumber,
 } from "common/src/helpers";
-import { type LocalizationLanguages } from "common/src/urlBuilder";
+import type { LocalizationLanguages } from "common/src/urlBuilder";
 import {
   EquipmentOrderSet,
   type Maybe,
@@ -28,9 +28,9 @@ import { fromUIDate } from "./util";
 import { startOfDay } from "date-fns";
 import { SEARCH_PAGING_LIMIT } from "./const";
 import { type ApolloClient, gql } from "@apollo/client";
-import { type ReadonlyURLSearchParams } from "next/navigation";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import { transformAccessTypeSafe } from "common/src/conversion";
-import { type OptionsListT, type OptionT } from "common/src/modules/search";
+import type { OptionsListT, OptionT } from "common/src/modules/search";
 
 function transformOrderByName(desc: boolean, language: LocalizationLanguages) {
   if (language === "fi") {

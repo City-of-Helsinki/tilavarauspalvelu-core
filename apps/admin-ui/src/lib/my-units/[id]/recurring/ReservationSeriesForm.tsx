@@ -16,7 +16,7 @@ import {
   type ReservationSeriesForm as ReservationSeriesFormT,
   ReservationSeriesFormSchema,
 } from "@/schemas";
-import { type NewReservationListItem } from "@/component/ReservationsList";
+import type { NewReservationListItem } from "@/component/ReservationsList";
 import { WeekdaysSelector } from "@/component/WeekdaysSelector";
 import { useCreateReservationSeries, useFilteredReservationList, useMultipleReservation } from "@/hooks";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
@@ -36,7 +36,7 @@ import { SelectFilter } from "@/component/QueryParamFilters";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { getMyUnitUrl, getReservationSeriesUrl } from "@/common/urls";
-import { type OptionT } from "common/src/modules/search";
+import type { OptionT } from "common/src/modules/search";
 
 const InnerTextInput = styled(TextInput)`
   grid-column: 1 / -1;

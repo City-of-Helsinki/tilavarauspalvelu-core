@@ -1,4 +1,4 @@
-import { type CalendarEvent } from "common/src/calendar/Calendar";
+import type { CalendarEvent } from "common/src/calendar/Calendar";
 import {
   ReservationStateChoice,
   ReservationTypeChoice,

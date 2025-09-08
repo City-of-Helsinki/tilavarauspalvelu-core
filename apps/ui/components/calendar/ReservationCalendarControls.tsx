@@ -14,7 +14,7 @@ import { type Control, type FieldValues, type SubmitHandler, useController, type
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { useMedia } from "react-use";
-import { type FocusTimeSlot } from "@/modules/reservation";
+import type { FocusTimeSlot } from "@/modules/reservation";
 import { ControlledDateInput } from "common/src/components/form";
 import { capitalize } from "common/src/helpers";
 
