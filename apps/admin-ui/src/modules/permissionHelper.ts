@@ -46,11 +46,11 @@ function hasUnitPermission(permission: UserPermissionChoice, unitPk: number, use
 
   for (const role of unitRoles) {
     const perms = filterNonNullable(role.permissions?.map((x) => x));
-    if (perms.find((x) => x === permission) == null) {
+    if (perms.some((x) => x === permission) == null) {
       continue;
     }
     const unitsInGroups = filterNonNullable(role.unitGroups?.flatMap((x) => x.units.map((y) => y.pk)));
-    if (unitsInGroups.find((x) => x === unitPk)) {
+    if (unitsInGroups.some((x) => x === unitPk)) {
       return true;
     }
 

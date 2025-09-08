@@ -93,7 +93,7 @@ export function ApplicationFields({
     reserveeType,
   }).filter((key) => isNotEmpty(key, reservation));
 
-  const hasReserveeType = filteredApplicationFields.find((x) => x === "reserveeType") != null;
+  const hasReserveeType = filteredApplicationFields.some((x) => x === "reserveeType") != null;
 
   return (
     <>
@@ -149,7 +149,7 @@ export function GeneralFields({
         <>
           {filteredGeneralFields.map((key) => {
             const value = convertMaybeOptionValue(key, reservation, extendMetaFieldOptions(options, t), t);
-            const isWide = ["name", "description", "freeOfChargeReason"].find((x) => x === key) != null;
+            const isWide = ["name", "description", "freeOfChargeReason"].some((x) => x === key) != null;
             const label = t(`reservationApplication:label.common.${key}`);
             const testId = `reservation__${key}`;
             return <LabelValuePair key={key} label={label} value={value} testId={testId} isWide={isWide} />;
