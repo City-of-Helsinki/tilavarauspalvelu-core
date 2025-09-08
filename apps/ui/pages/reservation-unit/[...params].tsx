@@ -1,5 +1,5 @@
+import React, { useCallback, useMemo } from "react";
 import TimeZoneNotification from "common/src/components/TimeZoneNotification";
-import React, { useCallback, useMemo, useState } from "react";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
@@ -13,37 +13,35 @@ import {
   type ReservationQuery,
   type ReservationQueryVariables,
   ReservationStateChoice,
-  type ReservationUpdateMutationInput,
   ReserveeType,
-  useConfirmReservationMutation,
   useDeleteReservationMutation,
-  useReservationLazyQuery,
-  useUpdateReservationMutation,
 } from "@gql/gql-types";
 import { type InputsT } from "common/src/reservation-form/types";
 import { createApolloClient } from "@/modules/apolloClient";
 import { default as NextError } from "next/error";
-import { getReservationPath, getReservationUnitPath, getSingleSearchPath } from "@/modules/urls";
+import {
+  getReservationInProgressPath,
+  getReservationPath,
+  getReservationUnitPath,
+  getSingleSearchPath,
+} from "@/modules/urls";
 import { Sanitize } from "common/src/components/Sanitize";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
-import { getCheckoutUrl } from "@/modules/reservation";
 import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
 import { Step0 } from "@/components/reservation/Step0";
 import { Step1 } from "@/components/reservation/Step1";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
 import { createNodeId, filterNonNullable, toNumber } from "common/src/modules/helpers";
-import { containsField } from "common/src/modules/metaFieldsHelpers";
-import { errorToast } from "common/src/components/toast";
 import { queryOptions } from "@/modules/queryOptions";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { gql } from "@apollo/client";
 import { PinkBox as PinkBoxBase } from "@/components/reservation/styles";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ReservationPageWrapper, ReservationStepper, ReservationTitleSection } from "@/styled/reservation";
-import { useDisplayError } from "common/src/hooks";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
 import { getGeneralFields } from "common/src/hooks/useApplicationFields";
+import { useSearchParams } from "next/navigation";
 
 const StyledReservationInfoCard = styled(ReservationInfoCard)`
   grid-column: 1 / -1;
@@ -63,14 +61,12 @@ const PinkBox = styled(PinkBoxBase)`
   }
 `;
 
-const StyledForm = styled.form`
-  grid-column: 1 / -1;
-  grid-row: 3;
-  @media (min-width: ${breakpoints.m}) {
-    grid-column: span 1;
-    grid-row: 2 / -1;
+function filterStep(step: number | null): 0 | 1 {
+  if (step === 0 || step === 1) {
+    return step;
   }
-`;
+  return 0;
+}
 
 // NOTE back / forward buttons (browser) do NOT work properly
 // router.beforePopState could be used to handle them but it's super hackish
@@ -86,50 +82,41 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  const [refetch, { data: resData }] = useReservationLazyQuery({
-    variables: { id: props.reservation.id },
-    fetchPolicy: "no-cache",
-  });
-
-  const reservation = resData?.reservation ?? props.reservation;
+  const reservation = props.reservation;
   const reservationUnit = reservation.reservationUnit;
 
   useRemoveStoredReservation();
 
-  const [step, setStep] = useState(0);
+  const params = useSearchParams();
+  const step = filterStep(toNumber(params.get("step")));
 
   // Get prefilled profile user fields from the reservation (backend fills them when created).
   // NOTE this is only updated on load (not after mutation or refetch)
   const defaultValues: InputsT = {
     // NOTE never undefined (this page is not accessible without reservation)
-    pk: reservation?.pk ?? 0,
-    name: reservation?.name ?? "",
-    description: reservation?.description ?? "",
-    reserveeFirstName: reservation?.reserveeFirstName ?? "",
-    reserveeLastName: reservation?.reserveeLastName ?? "",
-    reserveePhone: reservation?.reserveePhone ?? "",
-    reserveeEmail: reservation?.reserveeEmail ?? "",
-    reserveeIdentifier: reservation?.reserveeIdentifier ?? "",
-    reserveeOrganisationName: reservation?.reserveeOrganisationName ?? "",
-    municipality: reservation?.municipality ?? undefined,
-    reserveeType: reservation?.reserveeType ?? ReserveeType.Individual,
-    applyingForFreeOfCharge: reservation?.applyingForFreeOfCharge ?? false,
-    freeOfChargeReason: reservation?.freeOfChargeReason ?? "",
-    purpose: reservation?.purpose?.pk ?? undefined,
-    numPersons: reservation?.numPersons ?? undefined,
-    ageGroup: reservation?.ageGroup?.pk ?? undefined,
+    pk: reservation.pk ?? 0,
+    name: reservation.name ?? "",
+    description: reservation.description ?? "",
+    reserveeFirstName: reservation.reserveeFirstName ?? "",
+    reserveeLastName: reservation.reserveeLastName ?? "",
+    reserveePhone: reservation.reserveePhone ?? "",
+    reserveeEmail: reservation.reserveeEmail ?? "",
+    reserveeIdentifier: reservation.reserveeIdentifier ?? "",
+    reserveeOrganisationName: reservation.reserveeOrganisationName ?? "",
+    municipality: reservation.municipality ?? undefined,
+    reserveeType: reservation.reserveeType ?? undefined,
+    applyingForFreeOfCharge: reservation.applyingForFreeOfCharge ?? false,
+    freeOfChargeReason: reservation.freeOfChargeReason ?? "",
+    purpose: reservation.purpose?.pk ?? undefined,
+    numPersons: reservation.numPersons ?? undefined,
+    ageGroup: reservation.ageGroup?.pk ?? undefined,
     showBillingAddress: false,
     reserveeIsUnregisteredAssociation: false,
-    spaceTerms: false,
-    resourceTerms: false,
   };
   // TODO is defaultValues correct? it's prefilled from the profile data and we are not refetching at any point.
   // If we would refetch values would be more correct with reset hook.
   // Also if this is ever initialised without the data it will not prefill the form.
   const form = useForm<InputsT>({ defaultValues, mode: "onChange" });
-  const { handleSubmit, watch } = form;
-
-  const reserveeType = watch("reserveeType");
 
   const requireHandling = reservationUnit.requireReservationHandling || reservation?.applyingForFreeOfCharge;
 
@@ -184,112 +171,23 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     whitelist,
   });
 
-  const [updateReservation] = useUpdateReservationMutation();
-  const [confirmReservation] = useConfirmReservationMutation();
-
-  const { pk: reservationPk } = reservation || {};
-
   const pageTitle =
     step === 0 ? t("reservationCalendar:heading.newReservation") : t("reservationCalendar:heading.pendingReservation");
 
   // TODO all this is copy pasta from EditStep1
   const supportedFields = filterNonNullable(reservationUnit?.metadataSet?.supportedFields);
 
-  const displayError = useDisplayError();
-
-  const onSubmitStep0 = async (payload: InputsT): Promise<void> => {
-    const {
-      // boolean toggles
-      applyingForFreeOfCharge,
-      freeOfChargeReason,
-      showBillingAddress,
-      reserveeIsUnregisteredAssociation,
-      reserveeIdentifier,
-      // ignore on step 0
-      spaceTerms,
-      resourceTerms,
-      ...rest
-    } = payload;
-    const hasReserveeTypeField = containsField(supportedFields, "reserveeType");
-    if (hasReserveeTypeField && !reserveeType) {
-      throw new Error("Reservee type is required");
-    }
-    if (reservationPk == null) {
-      throw new Error("Reservation pk is required");
-    }
-
-    const input: ReservationUpdateMutationInput = {
-      // TODO don't use spread it breaks type checking for unknown fields
-      ...rest,
-      // force update to empty -> NA
-      reserveeIdentifier:
-        reserveeType !== ReserveeType.Individual && !reserveeIsUnregisteredAssociation ? reserveeIdentifier : "",
-      applyingForFreeOfCharge,
-      freeOfChargeReason: applyingForFreeOfCharge ? freeOfChargeReason : "",
-      pk: reservationPk,
-    };
-
-    try {
-      const { data } = await updateReservation({
-        variables: {
-          input,
-        },
-      });
-      if (data?.updateReservation?.state === "CANCELLED") {
-        router.push(getReservationUnitPath(reservationUnit?.pk));
-      } else {
-        await refetch();
-        setStep(1);
-        window.scrollTo(0, 0);
-      }
-    } catch (err) {
-      // TODO: NOT_FOUND at least is non-recoverable so we should redirect to the reservation unit page
-      displayError(err);
-    }
-  };
-
-  const onSubmitStep1 = async (): Promise<void> => {
-    try {
-      const { data } = await confirmReservation({
-        variables: {
-          input: {
-            pk: reservationPk ?? 0,
-          },
-        },
-      });
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-      const { pk, state } = data?.confirmReservation ?? {};
-      if (pk == null) {
-        errorToast({ text: t("errors:general_error") });
-        return;
-      }
-
-      if (state === ReservationStateChoice.Confirmed) {
-        router.push(getReservationPath(pk, undefined, "confirmed"));
-      } else if (state === ReservationStateChoice.RequiresHandling) {
-        router.push(getReservationPath(pk, undefined, "requires_handling"));
-      } else if (state === ReservationStateChoice.WaitingForPayment) {
-        const { order } = data?.confirmReservation ?? {};
-        const lang = convertLanguageCode(i18n.language);
-        const checkoutUrl = getCheckoutUrl(order, lang);
-        if (!checkoutUrl) {
-          throw new Error("No checkout url found");
-        }
-
-        router.push(checkoutUrl);
-      } else {
-        throw new Error("Invalid state");
-      }
-    } catch (err) {
-      // TODO: NOT_FOUND at least is non-recoverable so we should redirect to the reservation unit page
-      displayError(err);
-    }
-  };
-
   // NOTE: only navigate away from the page if the reservation is cancelled the confirmation hook handles delete
   const cancelReservation = useCallback(() => {
     router.push(getReservationUnitPath(reservationUnit?.pk));
   }, [router, reservationUnit]);
+
+  const handleStepClick = async (_: unknown, index: number) => {
+    const newStep = filterStep(index);
+    if (newStep !== step) {
+      await router.push(getReservationInProgressPath(reservation.reservationUnit.pk, reservation.pk, newStep));
+    }
+  };
 
   const generalFields = getGeneralFields({ supportedFields, reservation });
   const shouldDisplayReservationUnitPrice = useMemo(() => {
@@ -304,16 +202,6 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
   const lang = convertLanguageCode(i18n.language);
   const notesWhenReserving = getTranslationSafe(reservationUnit, "notesWhenApplying", lang);
-
-  // TODO hacky should separate the submit handlers and form types
-  const onSubmit = (values: InputsT) => {
-    if (step === 0) {
-      onSubmitStep0(values);
-    }
-    if (step === 1) {
-      onSubmitStep1();
-    }
-  };
 
   // it should be Created only here (SSR should have redirected)
   if (reservation.state !== ReservationStateChoice.Created) {
@@ -349,25 +237,22 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
               language={i18n.language}
               selectedStep={step}
               style={{ width: "100%" }}
-              onStepClick={(_, index) => setStep(index)}
+              onStepClick={handleStepClick}
               steps={steps}
             />
           )}
         </ReservationTitleSection>
-        <StyledForm onSubmit={handleSubmit(onSubmit)} noValidate>
-          {step === 0 && (
-            <Step0 reservation={reservation} cancelReservation={cancelReservation} options={props.options} />
-          )}
-          {step === 1 && (
-            <Step1
-              reservation={reservation}
-              supportedFields={supportedFields}
-              options={props.options}
-              setStep={setStep}
-              requiresPayment={steps.length > 2}
-            />
-          )}
-        </StyledForm>
+        {step === 0 && (
+          <Step0 reservation={reservation} cancelReservation={cancelReservation} options={props.options} />
+        )}
+        {step === 1 && (
+          <Step1
+            reservation={reservation}
+            supportedFields={supportedFields}
+            options={props.options}
+            requiresPayment={steps.length > 2}
+          />
+        )}
       </ReservationPageWrapper>
     </FormProvider>
   );
@@ -493,28 +378,6 @@ export const RESERVATION_IN_PROGRESS_QUERY = gql`
         ...MetadataSets
         ...TermsOfUse
         requireReservationHandling
-      }
-    }
-  }
-`;
-
-export const UPDATE_RESERVATION = gql`
-  mutation UpdateReservation($input: ReservationUpdateMutationInput!) {
-    updateReservation(input: $input) {
-      pk
-      state
-    }
-  }
-`;
-
-export const CONFIRM_RESERVATION = gql`
-  mutation ConfirmReservation($input: ReservationConfirmMutationInput!) {
-    confirmReservation(input: $input) {
-      pk
-      state
-      order {
-        id
-        checkoutUrl
       }
     }
   }
