@@ -336,6 +336,7 @@
     "unicorn/prefer-array-flat-map": "error",
     "unicorn/prefer-blob-reading-methods": "error",
     "unicorn/prefer-code-point": "error",
+    "unicorn/prefer-date-now": "error",
     "unicorn/prefer-dom-node-dataset": "error",
     "unicorn/prefer-event-target": "error",
     "unicorn/prefer-math-min-max": "error",
