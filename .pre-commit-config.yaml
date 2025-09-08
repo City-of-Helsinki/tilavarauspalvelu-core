@@ -16,7 +16,7 @@ repos:
         exclude: "^tilavaraus\\.graphql$"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.11
+    rev: v0.12.12
     hooks:
       - id: ruff-check
         entry: bash -c 'cd backend && ruff check --force-exclude'
