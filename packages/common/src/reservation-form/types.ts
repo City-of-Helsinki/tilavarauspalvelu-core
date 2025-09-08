@@ -12,8 +12,6 @@ type CommonInputs = {
   name: string;
   description: string;
   municipality?: MunicipalityChoice;
-  spaceTerms: boolean;
-  resourceTerms: boolean;
   purpose?: number;
   numPersons?: number;
   ageGroup?: number;
