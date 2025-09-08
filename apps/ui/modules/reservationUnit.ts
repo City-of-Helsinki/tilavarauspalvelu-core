@@ -576,7 +576,7 @@ function getAvailableTimesForDay({
   }
   const [timeHours, timeMinutesRaw] = [0, 0];
 
-  const timeMinutes = timeMinutesRaw > 59 ? 59 : timeMinutesRaw;
+  const timeMinutes = Math.min(59, timeMinutesRaw);
   return getPossibleTimesForDay({
     reservableTimes,
     date: start,
