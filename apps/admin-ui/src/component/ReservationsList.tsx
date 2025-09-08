@@ -72,7 +72,7 @@ const ErrorLabel = styled(StatusLabel)`
   margin-inline: -8px;
 `;
 
-const stripTimeZeros = (time: string) => (time.startsWith("0") ? time.substring(1) : time);
+const stripTimeZeros = (time: string) => (time.startsWith("0") ? time.slice(1) : time);
 
 // TODO this function should be refactored
 // all the messages and label types should be enum -> object mapping (or similar)
