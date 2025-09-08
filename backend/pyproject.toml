@@ -16,7 +16,7 @@ requires-poetry = ">=2.0"
 [tool.poetry.dependencies]
 Django = "5.1.12"
 django-auditlog = "3.2.1"
-django-cors-headers = "4.7.0"
+django-cors-headers = "4.8.0"
 django-environment-config = { version = "0.2.3", extras = ["db"] }
 django-health-check = "3.20.0"
 django-helusers = "0.13.3"
