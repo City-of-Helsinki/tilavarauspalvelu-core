@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { Checkbox } from "hds-react";
+import React from "react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import { MunicipalityChoice } from "@gql/gql-types";
@@ -16,8 +15,8 @@ export function OrganisationForm(): JSX.Element {
     watch,
   } = useFormContext<ApplicationPage3FormValues>();
 
-  const [isRegisteredNonProfit, setIsRegisteredNonProfit] = useState(true);
   const hasBillingAddress = watch("hasBillingAddress");
+  const isUnregisteredAssociation = watch("reserveeIsUnregisteredAssociation");
 
   const translateError = (errorMsg?: string) => (errorMsg ? t(`application:validation.${errorMsg}`) : "");
 
@@ -38,14 +37,13 @@ export function OrganisationForm(): JSX.Element {
         options={municipalityOptions}
         error={translateError(errors.municipality?.message)}
       />
-      <Checkbox
+      <ControlledCheckbox
+        control={control}
         label={t("application:Page3.organisationNotRegistered")}
-        id="organisationNotRegistered"
-        name="organisationNotRegistered"
-        checked={!isRegisteredNonProfit}
-        onClick={() => setIsRegisteredNonProfit(!isRegisteredNonProfit)}
+        id="reserveeIsUnregisteredAssociation"
+        name="reserveeIsUnregisteredAssociation"
       />
-      <ApplicationFormTextInput name="organisationIdentifier" disabled={!isRegisteredNonProfit} />
+      <ApplicationFormTextInput name="organisationIdentifier" disabled={isUnregisteredAssociation} />
       <FormSubHeading>{t("application:Page3.sectionHeadings.postalAddress")}</FormSubHeading>
       <ApplicationFormTextInput name="organisationStreetAddress" />
       <ApplicationFormTextInput name="organisationPostCode" />

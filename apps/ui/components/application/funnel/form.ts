@@ -343,8 +343,10 @@ export const ApplicationPage3Schema = z
     billingStreetAddress: z.string().min(1).max(80).optional(),
     billingCity: z.string().min(1).max(80).optional(),
     billingPostCode: z.string().min(1).max(32).optional(),
-    // this is not submitted, we can use it to remove the billing address from submit without losing the frontend state
+    // not submitted, we use it to remove the billing address from submit without losing the frontend state
     hasBillingAddress: z.boolean(),
+    // not submitted
+    reserveeIsUnregisteredAssociation: z.boolean(),
     additionalInformation: z.string().max(255).optional(),
     // municipality is only for Organisations
     municipality: z.enum([MunicipalityChoice.Helsinki, MunicipalityChoice.Other]).optional(),
@@ -355,25 +357,23 @@ export const ApplicationPage3Schema = z
     path: ["applicantType"],
   })
   .superRefine((val, ctx) => {
-    switch (val.applicantType) {
-      case ReserveeType.Nonprofit:
-      case ReserveeType.Company:
-        if (!val.organisationIdentifier) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ["organisation", "identifier"],
-            message: "Required",
-          });
-        }
-        break;
-      default:
-        break;
+    if (val.applicantType === ReserveeType.Company || val.applicantType === ReserveeType.Nonprofit) {
+      const requiredToHaveId = val.applicantType !== ReserveeType.Nonprofit;
+      const userToggleNoId = val.reserveeIsUnregisteredAssociation;
+      const hasId = val.organisationIdentifier != null && val.organisationIdentifier !== "";
+      if ((requiredToHaveId || !userToggleNoId) && !hasId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["organisationIdentifier"],
+          message: "Required",
+        });
+      }
     }
     if (val.applicantType === ReserveeType.Nonprofit) {
       if (!val.municipality) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: ["homeCity"],
+          path: ["municipality"],
           message: "Required",
         });
       }
@@ -500,12 +500,31 @@ export function createDefaultPage1Section(
   };
 }
 
-export function convertApplicationPage3(app?: Maybe<ApplicantFieldsFragment>): ApplicationPage3FormValues {
+function isOrganisationEmpty(app: ApplicantFieldsFragment): boolean {
+  return (
+    app.organisationName === "" &&
+    app.organisationIdentifier === "" &&
+    app.organisationCoreBusiness === "" &&
+    app.organisationStreetAddress === "" &&
+    app.organisationCity === "" &&
+    app.organisationPostCode === ""
+  );
+}
+
+export function convertApplicationPage3(app: Maybe<ApplicantFieldsFragment>): ApplicationPage3FormValues {
   const isOrganisation = app?.applicantType !== ReserveeType.Individual;
 
   const hasBillingAddress =
     app?.applicantType === ReserveeType.Individual ||
     (app?.billingStreetAddress != null && app?.billingStreetAddress !== "");
+
+  // complex due to we want to default this to false even for Nonprofits unless the user
+  // is editing an existing application (they have once set this explicitly to true)
+  const reserveeIsUnregisteredAssociation =
+    app != null &&
+    app.applicantType === ReserveeType.Nonprofit &&
+    !isOrganisationEmpty(app) &&
+    app.organisationIdentifier === "";
 
   return {
     pk: app?.pk ?? 0,
@@ -524,6 +543,8 @@ export function convertApplicationPage3(app?: Maybe<ApplicantFieldsFragment>): A
     contactPersonPhoneNumber: app?.contactPersonPhoneNumber ?? "",
 
     hasBillingAddress,
+    reserveeIsUnregisteredAssociation,
+
     billingStreetAddress: hasBillingAddress ? app?.billingStreetAddress : undefined,
     billingCity: hasBillingAddress ? app?.billingCity : undefined,
     billingPostCode: hasBillingAddress ? app?.billingPostCode : undefined,
@@ -550,6 +571,8 @@ export function transformPage3Application(values: ApplicationPage3FormValues): A
   );
 
   const isBillingAddressValid = isAddressValid(values.billingStreetAddress, values.billingPostCode, values.billingCity);
+  const shouldSaveIdentifier =
+    !values.reserveeIsUnregisteredAssociation || values.applicantType !== ReserveeType.Nonprofit;
 
   return {
     pk: values.pk,
@@ -563,7 +586,8 @@ export function transformPage3Application(values: ApplicationPage3FormValues): A
     ...(isOrganisation
       ? {
           organisationName: values.organisationName || undefined,
-          organisationIdentifier: values.organisationIdentifier || undefined,
+          // force update to empty
+          organisationIdentifier: shouldSaveIdentifier ? (values.organisationIdentifier ?? "") : "",
           organisationCoreBusiness: values.organisationCoreBusiness || undefined,
           organisationStreetAddress: isOrganisationAddressValid ? values.organisationStreetAddress : undefined,
           organisationPostCode: isOrganisationAddressValid ? values.organisationPostCode : undefined,
