@@ -338,6 +338,7 @@
     "unicorn/prefer-code-point": "error",
     "unicorn/prefer-dom-node-dataset": "error",
     "unicorn/prefer-event-target": "error",
+    "unicorn/prefer-math-min-max": "error",
     "unicorn/prefer-math-trunc": "error",
     "unicorn/prefer-modern-math-apis": "error",
     "unicorn/prefer-native-coercion-functions": "error",

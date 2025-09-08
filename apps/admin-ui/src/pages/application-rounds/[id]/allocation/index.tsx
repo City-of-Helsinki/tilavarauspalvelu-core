@@ -320,7 +320,7 @@ function ApplicationRoundAllocation({
        * remount causes flickering but HDS doesn't allow programmatically changing the active tab
        */}
       <TabWrapper>
-        <Tabs initiallyActiveTab={initiallyActiveTab >= 0 ? initiallyActiveTab : 0} key={unitFilter ?? "unit-none"}>
+        <Tabs initiallyActiveTab={Math.max(initiallyActiveTab, 0)} key={unitFilter ?? "unit-none"}>
           <TabList>
             {unitReservationUnits.map((ru) => (
               <Tab onClick={() => setSelectedReservationUnit(ru.pk)} key={ru?.pk}>
