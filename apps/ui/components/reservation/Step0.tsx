@@ -7,7 +7,7 @@ import { useFormContext, UseFormReturn } from "react-hook-form";
 import React, { useState } from "react";
 import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
-import MetaFields from "common/src/reservation-form/MetaFields";
+import { ReservationForm } from "common/src/reservation-form/MetaFields";
 import { ActionContainer } from "./styles";
 import InfoDialog from "../common/InfoDialog";
 import {
@@ -122,7 +122,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
 
   return (
     <NewReservationForm onSubmit={handleSubmit(onSubmit)} noValidate>
-      <MetaFields
+      <ReservationForm
         reservationUnit={reservation.reservationUnit}
         options={options}
         generalFields={generalFields}

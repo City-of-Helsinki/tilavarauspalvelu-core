@@ -19,7 +19,7 @@ function ReservationFormImpl(): React.ReactElement {
 }
 
 export const RESERVATION_META_FIELDS_FRAGMENT = gql`
-  fragment ReservationMetaFields on ReservationNode {
+  fragment ReservationFormFields on ReservationNode {
     ...ReserveeBillingFields
     ageGroup {
       id

@@ -1,4 +1,4 @@
-import { ReserveeType, type ReservationMetaFieldsFragment, ReservationNode } from "../../gql/gql-types";
+import { ReserveeType, type ReservationFormFieldsFragment, ReservationNode } from "../../gql/gql-types";
 import { type FieldName } from "../metaFieldsHelpers";
 import { getReservationApplicationFields } from "../reservation-form/util";
 
@@ -30,7 +30,7 @@ export function getApplicationFields({
   reserveeType,
 }: {
   supportedFields: FieldName[];
-  reservation: ReservationMetaFieldsFragment;
+  reservation: ReservationFormFieldsFragment;
   reserveeType: ReserveeType;
 }) {
   const applicationFields = getReservationApplicationFields({
@@ -49,7 +49,7 @@ export function getGeneralFields({
   reservation,
 }: {
   supportedFields: FieldName[];
-  reservation: ReservationMetaFieldsFragment;
+  reservation: ReservationFormFieldsFragment;
 }) {
   const generalFields = getReservationApplicationFields({
     supportedFields,

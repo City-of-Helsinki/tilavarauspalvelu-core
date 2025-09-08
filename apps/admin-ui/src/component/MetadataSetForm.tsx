@@ -1,7 +1,10 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import type { ReservationFormT } from "common/src/reservation-form/types";
-import { ReserverMetaFields, ReservationMetaFields } from "common/src/reservation-form/MetaFields";
+import {
+  ReservationFormFieldsDetailsSection,
+  ReservationFormFieldsReserveeSection,
+} from "common/src/reservation-form/MetaFields";
 import { ReserveeType, type MetadataSetsFragment } from "@gql/gql-types";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { type OptionsRecord } from "common";
@@ -29,7 +32,7 @@ export function ReservationMetadataSetForm({ reservationUnit }: Props): JSX.Elem
   }).filter((n) => n !== "reserveeType");
 
   return (
-    <ReservationMetaFields
+    <ReservationFormFieldsDetailsSection
       fields={generalFields}
       reservationUnit={reservationUnit}
       options={options}
@@ -58,6 +61,10 @@ export function ReserverMetadataSetForm({ reservationUnit }: Props): JSX.Element
   });
 
   return (
-    <ReserverMetaFields fields={reservationApplicationFields} reservationUnit={reservationUnit} options={options} />
+    <ReservationFormFieldsReserveeSection
+      fields={reservationApplicationFields}
+      reservationUnit={reservationUnit}
+      options={options}
+    />
   );
 }

@@ -372,8 +372,7 @@ export const RESERVATION_IN_PROGRESS_FRAGMENT = gql`
   fragment ReservationInProgress on ReservationNode {
     id
     pk
-    name
-    ...ReservationMetaFields
+    ...ReservationFormFields
     ...ReservationInfoCard
     bufferTimeBefore
     bufferTimeAfter
