@@ -133,7 +133,7 @@ export async function hash(val: string): Promise<string> {
 }
 
 export function truncate(val: string, maxLen: number): string {
-  return val.length > maxLen ? `${val.substring(0, maxLen - 1)}…` : val;
+  return val.length > maxLen ? `${val.slice(0, maxLen - 1)}…` : val;
 }
 
 /// Always return an image because the Design and process should not allow imageless reservation units

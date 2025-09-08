@@ -8,7 +8,7 @@ interface Props {
 export function ScrollIntoView({ hash, children }: Props): JSX.Element {
   const selfRef = useRef<HTMLDivElement | null>(null);
 
-  const isMatch = hash === document.location.hash?.substring(1);
+  const isMatch = hash === document.location.hash?.slice(1);
 
   useEffect(() => {
     if (isMatch && selfRef.current?.scrollIntoView) {
