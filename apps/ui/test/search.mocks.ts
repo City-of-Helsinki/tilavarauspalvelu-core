@@ -8,7 +8,7 @@ import {
 } from "@/gql/gql-types";
 import { CreateGraphQLMocksReturn, ICreateGraphQLMock } from "./test.gql.utils";
 import { createMockReservationUnit } from "./reservation-unit.mocks";
-import { addMonths, endOfYear, startOfDay } from "date-fns";
+import { endOfYear, startOfDay } from "date-fns";
 import { SEARCH_PAGING_LIMIT } from "@/modules/const";
 
 interface SearchQueryProps extends ICreateGraphQLMock {
@@ -253,13 +253,9 @@ function createSearchVariablesMock({
     ...(equipments?.length > 0 ? { equipments } : {}),
     ...(unit.length > 0 ? { unit } : {}),
     ...(purposes.length > 0 ? { purposes } : {}),
-    // hacky, but Seasonal query uses (Feb - Dec) while single uses (Jan - Dec)
-    reservableDateStart: date
-      ? reservationKind === ReservationKind.Season
-        ? addMonths(date, 1).toISOString()
-        : date.toISOString()
-      : undefined,
-    reservableDateEnd: date ? startOfDay(endOfYear(date)).toISOString() : undefined,
+    reservableDateStart: reservationKind !== ReservationKind.Season ? date?.toISOString() : undefined,
+    reservableDateEnd:
+      reservationKind !== ReservationKind.Season && date ? startOfDay(endOfYear(date)).toISOString() : undefined,
     first: SEARCH_PAGING_LIMIT,
     orderBy: [ReservationUnitOrderSet.NameFiAsc, ReservationUnitOrderSet.PkAsc],
     reservationKind,
