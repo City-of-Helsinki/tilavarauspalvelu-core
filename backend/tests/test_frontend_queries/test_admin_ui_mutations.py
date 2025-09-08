@@ -43,7 +43,6 @@ from tests.factories import (
     SpaceFactory,
     SuitableTimeRangeFactory,
     UnitFactory,
-    UserFactory,
 )
 from tests.helpers import create_png, patch_method
 
@@ -340,7 +339,6 @@ def test_frontend_queries__customer_ui__CreateReservationSeries(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    user = UserFactory.create()
     reservation_unit = ReservationUnitFactory.create()
 
     begin = next_hour()
@@ -357,7 +355,6 @@ def test_frontend_queries__customer_ui__CreateReservationSeries(graphql):
         "weekdays": [Weekday.MONDAY],
         "reservationDetails": {
             "type": ReservationTypeStaffChoice.STAFF.value,
-            "user": user.pk,
         },
     }
     assert_no_undefined_variables(variables)
