@@ -20,7 +20,7 @@ import {
   type ReservationFormMeta,
   ReservationTypeSchema,
 } from "@/schemas";
-import ReservationTypeForm from "@/component/ReservationTypeForm";
+import { ReservationTypeForm } from "@/component/ReservationTypeForm";
 import { useReservationEditData, useSession, useStaffReservationMutation } from "@/hooks";
 import { errorToast } from "common/src/components/toast";
 import { ButtonContainer, CenterSpinner, Flex, HR } from "common/styled";
@@ -270,7 +270,7 @@ export const RESERVATION_EDIT_PAGE_QUERY = gql`
       pk
       ...CreateTagString
       ...ReservationCommonFields
-      ...ReservationMetaFields
+      ...ReservationFormFields
       ...ReservationTitleSectionFields
       ...UseStaffReservation
       reservationSeries {
