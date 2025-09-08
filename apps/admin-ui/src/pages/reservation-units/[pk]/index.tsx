@@ -260,15 +260,17 @@ function ReservationUnitEditor({
       // res unit is saved, we can save changes to images
       const success = await reconcileImageChanges?.(upPk, images);
       if (success) {
-        // redirect if new one was created
-        if (formValues.pk === 0 && upPk > 0) {
-          router.push(getReservationUnitUrl(unitPk, upPk));
-        }
         const tkey =
           formValues.pk === 0
             ? "reservationUnitEditor:reservationUnitCreatedNotification"
             : "reservationUnitEditor:reservationUnitUpdatedNotification";
         successToast({ text: t(tkey, { name: getValues("nameFi") }) });
+        // redirect if new one was created
+        if (formValues.pk === 0 && upPk > 0) {
+          await router.push(getReservationUnitUrl(unitPk, upPk));
+        } else {
+          refetch();
+        }
       } else {
         const msg = t("reservationUnitEditor:imageSaveFailed");
         throw new Error(msg);
@@ -277,7 +279,6 @@ function ReservationUnitEditor({
       const msg = t("reservationUnitEditor:saveFailed", { error: "" });
       throw new Error(msg);
     }
-    refetch();
     return upPk;
   };
 
