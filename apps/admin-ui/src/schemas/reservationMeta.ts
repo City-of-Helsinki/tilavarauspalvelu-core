@@ -16,7 +16,7 @@ export const ReservationFormMetaSchema = z.object({
   reserveeAddressCity: z.string().optional(),
   reserveeAddressStreet: z.string().optional(),
   reserveeAddressZip: z.string().optional(),
-  reserveeEmail: z.string().optional(),
+  reserveeEmail: z.union([z.string().email(), z.string().length(0)]).optional(),
   reserveeFirstName: z.string().optional(),
   reserveeIdentifier: z.string().optional(),
   reserveeIsUnregisteredAssociation: z.boolean().optional(),

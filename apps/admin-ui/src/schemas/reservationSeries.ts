@@ -63,7 +63,19 @@ const ReservationSeriesFormSchemaRefined = (interval: ReservationStartInterval) 
     .superRefine((val, ctx) => checkTimeStringFormat(val.endTime, ctx, "endTime"))
     .superRefine((val, ctx) => checkReservationInterval(val.startTime, ctx, "startTime", intervalToNumber(interval)))
     .superRefine((val, ctx) => checkReservationInterval(val.endTime, ctx, "endTime", 15))
-    .superRefine((val, ctx) => checkStartEndTime(val, ctx));
+    .superRefine((val, ctx) => checkStartEndTime(val, ctx))
+    // custom email validator because the base schema doesn't work for Series and Django validates email strings
+    .superRefine((val, ctx) => {
+      const emailValidator = z.union([z.string().email(), z.string().length(0)]).optional();
+      const res = emailValidator.safeParse(val.reserveeEmail);
+      if (!res.success) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.invalid_string,
+          validation: "email",
+          path: ["reserveeEmail"],
+        });
+      }
+    });
 
 export { ReservationSeriesFormSchemaRefined as ReservationSeriesFormSchema };
 
