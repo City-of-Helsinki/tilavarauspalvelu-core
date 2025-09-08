@@ -139,17 +139,14 @@ export function processVariables({
   const endDate = fromUIDate(ignoreMaybeArray(values.getAll("endDate")) ?? "");
   const reservableDateStartCleaned = startDate && startDate >= today ? toApiDate(startDate) : undefined;
   const reservableDateEndCleaned = endDate && endDate >= today ? toApiDate(endDate) : undefined;
-  const reservationPeriodBeginDate = "reservationPeriodBeginDate" in rest ? rest.reservationPeriodBeginDate : undefined;
-  const reservationPeriodEndDate = "reservationPeriodEndDate" in rest ? rest.reservationPeriodEndDate : undefined;
 
   const timeEnd = filterEmpty(ignoreMaybeArray(values.getAll("timeEnd")));
   const timeBegin = filterEmpty(ignoreMaybeArray(values.getAll("timeBegin")));
   const duration = filterEmpty(toNumber(ignoreMaybeArray(values.getAll("duration"))));
   const showOnlyReservable = ignoreMaybeArray(values.getAll("showOnlyReservable")) !== "false";
 
-  // reservableDateStart is used to find effectiveAccessType in /recurring/[id] page
-  const reservableDateStart = filterEmpty(isSeasonal ? reservationPeriodBeginDate : reservableDateStartCleaned);
-  const reservableDateEnd = filterEmpty(isSeasonal ? reservationPeriodEndDate : reservableDateEndCleaned);
+  const reservableDateStart = filterEmpty(reservableDateStartCleaned);
+  const reservableDateEnd = filterEmpty(reservableDateEndCleaned);
 
   return {
     first: SEARCH_PAGING_LIMIT,
