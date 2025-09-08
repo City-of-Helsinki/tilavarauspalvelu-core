@@ -72,17 +72,18 @@ export function getReservationPath(
   if (pk == null) {
     return "";
   }
-  return `${reservationsPrefix}/${pk}/${page ?? ""}${notify ? `?notify=${notify}` : ""}`;
+  return `${reservationsPrefix}/${pk}/${page ?? ""}${notify != null ? `?notify=${notify}` : ""}`;
 }
 
 export function getReservationInProgressPath(
   pk: Maybe<number> | undefined,
-  reservationPk: Maybe<number> | undefined
+  reservationPk: Maybe<number> | undefined,
+  step?: 0 | 1
 ): string {
   if (pk == null || reservationPk == null) {
     return "";
   }
-  return `${reservationUnitPrefix}/${pk}/reservation/${reservationPk}`;
+  return `${reservationUnitPrefix}/${pk}/reservation/${reservationPk}${step != null ? `?step=${step}` : ""}`;
 }
 
 export function getReservationUnitPath(pk: Maybe<number> | undefined, params?: Readonly<URLSearchParams>): string {
