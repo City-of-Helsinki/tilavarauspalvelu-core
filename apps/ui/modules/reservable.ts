@@ -325,7 +325,7 @@ function isRangeReservable_({
   const slots = generateSlots(start, end, ReservationStartInterval.Interval_15Mins);
 
   const res = slots.map((slot) => areReservableTimesAvailable(reservableTimes, slot));
-  if (!res.every((val) => val)) {
+  if (!res.every(Boolean)) {
     return false;
   }
 
