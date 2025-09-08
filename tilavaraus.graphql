@@ -2467,7 +2467,6 @@ input ReservationSeriesReservationCreateInput {
   reserveeType: ReserveeType = null
   state: ReservationStateChoice! = CONFIRMED
   type: ReservationTypeStaffChoice! = STAFF
-  user: Int
   workingMemo: String! = ""
 }
 

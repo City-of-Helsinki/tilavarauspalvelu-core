@@ -17,7 +17,7 @@ from tests.factories import ReservationSeriesFactory
 from tests.query_builder import build_mutation, build_query
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationSeries, ReservationUnit, User
+    from tilavarauspalvelu.models import ReservationSeries, ReservationUnit
 
 reservation_series_query = partial(build_query, "reservationSeries", connection=True, order_by="nameAsc")
 
@@ -47,7 +47,7 @@ REPAIR_ACCESS_CODE_SERIES_MUTATION = build_mutation(
 )
 
 
-def get_minimal_series_data(reservation_unit: ReservationUnit, user: User, **overrides: Any) -> dict[str, Any]:
+def get_minimal_series_data(reservation_unit: ReservationUnit, **overrides: Any) -> dict[str, Any]:
     return {
         "weekdays": [Weekday.MONDAY.value],
         "beginDate": datetime.date(2024, 1, 1).isoformat(),  # Mon
@@ -58,7 +58,6 @@ def get_minimal_series_data(reservation_unit: ReservationUnit, user: User, **ove
         "recurrenceInDays": 7,
         "reservationDetails": {
             "type": ReservationTypeChoice.STAFF.value,
-            "user": user.pk,
         },
         **overrides,
     }

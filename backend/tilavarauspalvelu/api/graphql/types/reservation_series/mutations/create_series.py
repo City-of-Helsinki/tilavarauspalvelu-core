@@ -52,8 +52,13 @@ class ReservationSeriesReservationCreateInput(MutationType[Reservation], kind="r
     reservee_type = Input(default_value=None)
 
     # Relations
-    user = Input(User)
     purpose = Input(ReservationPurpose)
+
+    @Input(hidden=True)
+    def user(self, info: GQLInfo[User]) -> User | None:
+        if info.context.user.is_anonymous:
+            return None
+        return info.context.user
 
 
 class ReservationSeriesCreateMutation(MutationType[ReservationSeries], kind="create"):
