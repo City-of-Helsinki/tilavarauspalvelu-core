@@ -899,7 +899,7 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
   const isReservableTime = (t?: SeasonalFormType["reservableTimes"][0]) => t && t.begin && t.end;
   // NOTE mutation doesn't support pks (even if changing not adding) unlike other mutations
   const applicationRoundTimeSlots: ApplicationRoundTimeSlotCreateInput[] = seasons
-    .filter((s) => s.reservableTimes.filter(isReservableTime).length > 0 || s.closed)
+    .filter((s) => s.reservableTimes.some(isReservableTime) || s.closed)
     .map((s) => ({
       weekday: s.weekday,
       isClosed: s.closed,

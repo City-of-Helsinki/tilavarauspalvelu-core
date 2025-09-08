@@ -334,6 +334,7 @@
     "unicorn/prefer-add-event-listener": "error",
     "unicorn/prefer-array-find": "error",
     "unicorn/prefer-array-flat-map": "error",
+    "unicorn/prefer-array-some": "error",
     "unicorn/prefer-blob-reading-methods": "error",
     "unicorn/prefer-code-point": "error",
     "unicorn/prefer-date-now": "error",
