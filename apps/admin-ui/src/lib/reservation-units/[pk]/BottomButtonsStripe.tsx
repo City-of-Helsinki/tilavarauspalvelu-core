@@ -2,45 +2,17 @@ import React from "react";
 import { Button, ButtonSize, ButtonVariant, Dialog, IconArrowLeft, LoadingSpinner } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { UseFormReturn } from "react-hook-form";
-import type { ReservationUnitEditFormValues } from "./form";
+import { type UseFormReturn } from "react-hook-form";
+import { type ReservationUnitEditFormValues } from "./form";
 import { getUnitUrl } from "@/common/urls";
 import { successToast } from "common/src/components/toast";
 import { useArchiveReservationUnitMutation, type Maybe, type ReservationUnitEditPageFragment } from "@gql/gql-types";
 import { breakpoints } from "common/src/const";
-import { Flex, pageSideMargins, WhiteButton } from "common/styled";
+import { ButtonLikeExternalLink, Flex, pageSideMargins, WhiteButton } from "common/styled";
 import { useDisplayError } from "common/src/hooks";
 import { useModal } from "@/context/ModalContext";
 import { useRouter } from "next/router";
 import { gql } from "@apollo/client";
-
-const PreviewLink = styled.a`
-  display: flex;
-  place-items: center;
-  border: 2px solid var(--color-white);
-  background-color: transparent;
-  text-decoration: none;
-
-  opacity: 0.5;
-  cursor: not-allowed;
-  color: var(--color-white);
-
-  :link,
-  :visited {
-    opacity: 1;
-    color: var(--color-white);
-    cursor: pointer;
-
-    &:hover {
-      background-color: var(--color-white);
-      color: var(--color-black);
-    }
-  }
-
-  > span {
-    margin: 0 var(--spacing-m);
-  }
-`;
 
 const ButtonsStripe = styled(Flex).attrs({
   $direction: "row",
@@ -268,6 +240,13 @@ export function BottomButtonsStripe({
     }
   };
 
+  const previewUrl = !isPreviewDisabled
+    ? `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.extUuid}`
+    : undefined;
+  const previewTitle = t(
+    hasChanges ? "reservationUnitEditor:noPreviewUnsavedChangesTooltip" : "reservationUnitEditor:previewTooltip"
+  );
+
   return (
     <ButtonsStripe>
       <WhiteButton
@@ -292,20 +271,17 @@ export function BottomButtonsStripe({
         {t("reservationUnitEditor:archive")}
       </WhiteButton>
 
-      <PreviewLink
+      <ButtonLikeExternalLink
         target="_blank"
         rel="noopener noreferrer"
         className="preview-link"
-        href={
-          !isPreviewDisabled ? `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.extUuid}` : undefined
-        }
-        onClick={(e) => isPreviewDisabled && e.preventDefault()}
-        title={t(
-          hasChanges ? "reservationUnitEditor:noPreviewUnsavedChangesTooltip" : "reservationUnitEditor:previewTooltip"
-        )}
+        href={previewUrl}
+        disabled={previewUrl == null}
+        variant="inverted"
+        title={previewTitle}
       >
         <span>{t("reservationUnitEditor:preview")}</span>
-      </PreviewLink>
+      </ButtonLikeExternalLink>
 
       <WhiteButton
         size={ButtonSize.Small}
