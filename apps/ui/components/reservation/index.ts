@@ -10,7 +10,7 @@ export { CancelledLinkSet } from "./CancelledLinkSet";
 export { ReservationTimePicker } from "./ReservationTimePicker";
 export { SubventionSuffix } from "./SubventionSuffix";
 export { TermsInfoSection } from "./TermsInfoSection";
-export { ApplicationFields, GeneralFields } from "./SummaryFields";
+export { SummaryGeneralFields, SummaryReserveeFields } from "./SummaryFields";
 export { EditStep0 } from "./EditStep0";
 export { EditStep1 } from "./EditStep1";
 export { Step0 } from "./Step0";
