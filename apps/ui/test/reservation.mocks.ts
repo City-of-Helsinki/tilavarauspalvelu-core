@@ -272,9 +272,9 @@ export function createMockReservation(props: MockReservationProps): Readonly<Res
   } as const;
 }
 
-export function createTermsOfUseMock(empty: boolean = false) {
+export function createTermsOfUseMock(isEmpty = false) {
   return {
-    genericTerms: empty
+    genericTerms: isEmpty
       ? null
       : {
           id: createNodeId("TermsOfUseNode", 1),
