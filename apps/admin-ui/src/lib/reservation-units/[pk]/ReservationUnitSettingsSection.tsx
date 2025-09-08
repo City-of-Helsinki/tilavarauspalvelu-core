@@ -79,8 +79,8 @@ export function ReservationUnitSettingsSection({
   cancellationRuleOptions,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  metadataOptions: Array<{ value: number; label: string }>;
-  cancellationRuleOptions: Array<{ value: number; label: string }>;
+  metadataOptions: { value: number; label: string }[];
+  cancellationRuleOptions: { value: number; label: string }[];
 }) {
   const { t } = useTranslation();
   const { control, watch, formState } = form;

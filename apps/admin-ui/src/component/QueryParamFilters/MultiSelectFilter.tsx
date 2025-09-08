@@ -8,7 +8,7 @@ import { type Control, type FieldValues, type Path, useController, type UseContr
 
 interface MultiSelectFilterProps {
   name: string;
-  options: Readonly<Array<{ label: string; value: string | number }>>;
+  options: Readonly<{ label: string; value: string | number }[]>;
   style?: React.CSSProperties;
   className?: string;
 }
@@ -38,7 +38,7 @@ export function MultiSelectFilter(props: MultiSelectFilterProps): JSX.Element {
 
 interface BaseMultiSelectFilterProps extends MultiSelectFilterProps {
   filter: string[];
-  setFilter: (value: Array<string>) => void;
+  setFilter: (value: string[]) => void;
 }
 
 function BaseMultiSelectFilter({ name, options, filter, setFilter, ...rest }: BaseMultiSelectFilterProps): JSX.Element {

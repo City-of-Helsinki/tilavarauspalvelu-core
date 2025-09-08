@@ -348,7 +348,7 @@ export function convertFormToFocustimeSlot({
   activeApplicationRounds: readonly RoundPeriod[];
   blockingReservations: readonly BlockingReservationFieldsFragment[];
 }): FocusTimeSlot | { isReservable: false } {
-  const [hours, minutes]: Array<number | undefined> = data.time
+  const [hours, minutes]: (number | undefined)[] = data.time
     .split(":")
     .map(Number)
     .filter((n) => Number.isFinite(n));

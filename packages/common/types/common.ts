@@ -8,5 +8,5 @@ type OptionType = {
 };
 
 export type OptionsRecord = Record<"reservationPurposes" | "ageGroups", Readonly<OptionType[]>> & {
-  municipalities: Readonly<Array<{ label: string; value: MunicipalityChoice }>>;
+  municipalities: Readonly<{ label: string; value: MunicipalityChoice }[]>;
 };

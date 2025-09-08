@@ -94,7 +94,7 @@ export function getEquipmentCategories(equipment: Readonly<Pick<EquipmentFieldsF
   if (!equipment || equipment.length === 0) {
     return [];
   }
-  const categories: Array<(typeof equipmentCategoryOrder)[number]> = filterNonNullable(
+  const categories: (typeof equipmentCategoryOrder)[number][] = filterNonNullable(
     equipment.map((n) => {
       const index = equipmentCategoryOrder.findIndex((order) => order === n.category?.nameFi);
       if (index === -1) {
@@ -435,7 +435,7 @@ export function getDayIntervals(
   const startMins = start.h * 60 + start.m;
   const endMins = end.h * 60 + end.m;
 
-  const intervals: Array<{ h: number; m: number }> = [];
+  const intervals: { h: number; m: number }[] = [];
   for (let i = startMins; i < endMins; i += iMins) {
     // don't allow interval overflow but handle 0:00 as 23:59
     if (i + iMins > endMins + 1) {
@@ -470,7 +470,7 @@ export function getPossibleTimesForDay({
   blockingReservations,
 }: GetPossibleTimesForDayProps): { label: string; value: string }[] {
   const interval = reservationUnit.reservationStartInterval;
-  const allTimes: Array<{ h: number; m: number }> = [];
+  const allTimes: { h: number; m: number }[] = [];
   const slotsForDay = reservableTimes.get(dateToKey(date)) ?? [];
   for (const slot of slotsForDay) {
     const startDate = slot.start;

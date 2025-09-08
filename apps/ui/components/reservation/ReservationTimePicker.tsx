@@ -79,7 +79,7 @@ export type ReservationTimePickerProps = Readonly<{
   submitReservation: (d: PendingReservationFormType) => void;
   // TODO replace with mode selector
   loginAndSubmitButton?: JSX.Element;
-  startingTimeOptions: Array<{ value: string; label: string }>;
+  startingTimeOptions: { value: string; label: string }[];
 }>;
 
 function useSlotPropGetter({
@@ -115,11 +115,11 @@ function useCalendarEventChange({
 }: Pick<ReservationTimePickerProps, "reservationUnit"> & {
   focusSlot: ReturnType<typeof convertFormToFocustimeSlot>;
   blockingReservations: readonly BlockingReservationFieldsFragment[];
-}): Array<CalendarEventBuffer | CalendarEvent<ReservationNode>> {
+}): (CalendarEventBuffer | CalendarEvent<ReservationNode>)[] {
   const { t } = useTranslation();
   // TODO this doesn't optimize anything
   // any change in the event will cause a full recalculation
-  const calendarEvents: Array<CalendarEventBuffer | CalendarEvent<ReservationNode>> = useMemo(() => {
+  const calendarEvents: (CalendarEventBuffer | CalendarEvent<ReservationNode>)[] = useMemo(() => {
     const shouldDisplayFocusSlot = focusSlot.isReservable;
 
     let focusEvent = null;

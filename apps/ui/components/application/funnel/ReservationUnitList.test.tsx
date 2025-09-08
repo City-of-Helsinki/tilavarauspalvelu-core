@@ -84,7 +84,7 @@ function customRender({
 }
 
 type FormValues = {
-  reservationUnits: Array<number>;
+  reservationUnits: number[];
 };
 
 function WrappedRender({

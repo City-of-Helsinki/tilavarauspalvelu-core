@@ -12,16 +12,16 @@ import type { OptionsListT, OptionT } from "common/src/modules/search";
 import type { TFunction } from "next-i18next";
 
 export interface TagOptionsList extends OptionsListT {
-  stateChoices: Readonly<Array<{ value: ReservationStateChoice; label: string }>>;
+  stateChoices: Readonly<{ value: ReservationStateChoice; label: string }[]>;
   reservationUnits: Readonly<OptionT[]>;
   unitGroups: Readonly<OptionT[]>;
-  reservationUnitStates: Readonly<Array<{ value: ReservationUnitPublishingState; label: string }>>;
-  priorityChoices: Readonly<Array<{ value: Priority; label: string }>>;
+  reservationUnitStates: Readonly<{ value: ReservationUnitPublishingState; label: string }[]>;
+  priorityChoices: Readonly<{ value: Priority; label: string }[]>;
   orderChoices: Readonly<OptionT[]>;
-  orderStatus: Readonly<Array<{ value: OrderStatusWithFree; label: string }>>;
-  reservationTypeChoices: Readonly<Array<{ value: ReservationTypeChoice; label: string }>>;
-  recurringChoices: Readonly<Array<{ value: "only" | "onlyNot"; label: string }>>;
-  reserveeTypes: Readonly<Array<{ value: ReserveeType; label: string }>>;
+  orderStatus: Readonly<{ value: OrderStatusWithFree; label: string }[]>;
+  reservationTypeChoices: Readonly<{ value: ReservationTypeChoice; label: string }[]>;
+  recurringChoices: Readonly<{ value: "only" | "onlyNot"; label: string }[]>;
+  reserveeTypes: Readonly<{ value: ReserveeType; label: string }[]>;
 }
 
 export function translateTag(t: TFunction, options: Readonly<TagOptionsList>) {

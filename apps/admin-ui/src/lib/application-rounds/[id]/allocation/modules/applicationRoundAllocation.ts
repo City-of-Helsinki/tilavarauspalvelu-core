@@ -76,7 +76,7 @@ export function getTimeSlotOptions(
   startMinutes: number,
   endHours: number,
   endOptions?: boolean
-): Array<{ label: string; value: string }> {
+): { label: string; value: string }[] {
   const timeSlots = [];
   for (let i = startHours; i <= endHours; i += 1) {
     if (endOptions) {
@@ -304,7 +304,7 @@ export function isInsideCell(
 }
 
 export function convertPriorityFilter(values: number[]): Priority[] {
-  return values.reduce<Array<Priority>>((acc, x) => {
+  return values.reduce<Priority[]>((acc, x) => {
     if (x === 200) {
       return [...acc, Priority.Secondary];
     } else if (x === 300) {
