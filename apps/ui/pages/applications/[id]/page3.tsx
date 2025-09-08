@@ -39,6 +39,7 @@ function Page3Form(): JSX.Element | null {
   const { watch, unregister, register, setValue } = useFormContext<ApplicationPage3FormValues>();
   const type = watch("applicantType");
 
+  const hasRegistration = !watch("reserveeIsUnregisteredAssociation");
   useEffect(() => {
     if (type === ReserveeType.Individual) {
       unregister("organisationName");
@@ -47,17 +48,12 @@ function Page3Form(): JSX.Element | null {
       unregister("organisationStreetAddress");
       unregister("organisationCity");
       unregister("organisationPostCode");
-    }
-
-    const hasRegistration = type === ReserveeType.Nonprofit || type === ReserveeType.Company;
-    if (hasRegistration) {
+    } else if (type === ReserveeType.Company || hasRegistration) {
       register("organisationIdentifier", { required: true });
     } else {
-      // Unregister does not remove the form value (neither from DOM nor from the form state)
-      setValue("organisationIdentifier", undefined);
       unregister("organisationIdentifier");
     }
-  }, [type, register, unregister, setValue]);
+  }, [hasRegistration, type, register, unregister, setValue]);
 
   const hasBillingAddress = watch("hasBillingAddress");
   useEffect(() => {
@@ -86,18 +82,12 @@ function Page3({ application }: Pick<PropsNarrowed, "application">): JSX.Element
 
   const form = useForm<ApplicationPage3FormValues>({
     mode: "onChange",
-    defaultValues: convertApplicationPage3(application),
+    values: convertApplicationPage3(application),
     resolver: zodResolver(ApplicationPage3Schema),
     reValidateMode: "onChange",
   });
 
-  const { handleSubmit, reset } = form;
-
-  useEffect(() => {
-    if (application != null) {
-      reset(convertApplicationPage3(application));
-    }
-  }, [application, reset]);
+  const { handleSubmit } = form;
 
   const { t } = useTranslation();
   const [mutate] = useUpdateApplicationMutation();
