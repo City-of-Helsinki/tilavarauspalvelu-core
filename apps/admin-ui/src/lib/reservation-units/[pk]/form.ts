@@ -440,7 +440,6 @@ export const ReservationUnitEditSchema = z
     images: z.array(ImageFormSchema),
     // internal values
     isDraft: z.boolean(),
-    isArchived: z.boolean(),
     // do we show optional fields to the user? not sent to backend but changes if the field is sent
     hasFuturePricing: z.boolean(),
     hasScheduledPublish: z.boolean(),
@@ -455,10 +454,6 @@ export const ReservationUnitEditSchema = z
     accessTypes: z.array(AccessTypesFormSchema),
   })
   .superRefine((v, ctx) => {
-    if (v.isArchived) {
-      return;
-    }
-
     validateAccessTypes(v.accessTypes, ctx);
 
     // Drafts also require seasonal times validation
@@ -844,7 +839,6 @@ export function convertReservationUnit(data?: Node | null): ReservationUnitEditF
     pricings: convertPricingList(filterNonNullable(data?.pricings)),
     images: filterNonNullable(data?.images).map((i) => convertImage(i)),
     isDraft: data?.isDraft ?? false,
-    isArchived: false,
     seasons: convertSeasonalList(filterNonNullable(data?.applicationRoundTimeSlots)),
     hasFuturePricing: data?.pricings?.some((p) => new Date(p.begins) > new Date()) ?? false,
     hasScheduledPublish: data?.publishBeginsAt != null || data?.publishEndsAt != null,
@@ -866,7 +860,6 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
   const {
     pk,
     isDraft,
-    isArchived,
     surfaceArea,
     reservationKind,
     reservationEndsDate,
@@ -951,7 +944,6 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     bufferTimeBefore: hasBufferTimeBefore && bufferType === "bufferTimesSet" ? bufferTimeBefore : 0,
     reservationKind,
     isDraft,
-    isArchived,
     notesWhenApplyingEn: cleanHtmlContent(notesWhenApplyingEn),
     notesWhenApplyingFi: cleanHtmlContent(notesWhenApplyingFi),
     notesWhenApplyingSv: cleanHtmlContent(notesWhenApplyingSv),

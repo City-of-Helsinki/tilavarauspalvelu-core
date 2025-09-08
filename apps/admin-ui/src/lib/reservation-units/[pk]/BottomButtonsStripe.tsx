@@ -6,12 +6,13 @@ import { UseFormReturn } from "react-hook-form";
 import type { ReservationUnitEditFormValues } from "./form";
 import { getUnitUrl } from "@/common/urls";
 import { successToast } from "common/src/components/toast";
-import type { Maybe, ReservationUnitEditPageFragment, UnitSubpageHeadFragment } from "@gql/gql-types";
+import { useArchiveReservationUnitMutation, type Maybe, type ReservationUnitEditPageFragment } from "@gql/gql-types";
 import { breakpoints } from "common/src/const";
 import { Flex, pageSideMargins, WhiteButton } from "common/styled";
 import { useDisplayError } from "common/src/hooks";
 import { useModal } from "@/context/ModalContext";
 import { useRouter } from "next/router";
+import { gql } from "@apollo/client";
 
 const PreviewLink = styled.a`
   display: flex;
@@ -181,14 +182,12 @@ function DiscardChangesDialog({ onClose, onAccept }: { onClose: () => void; onAc
 
 export function BottomButtonsStripe({
   reservationUnit,
-  unit,
   previewUrlPrefix,
   setModalContent,
   onSubmit,
   form,
 }: {
   reservationUnit: Maybe<ReservationUnitEditPageFragment>;
-  unit: Maybe<UnitSubpageHeadFragment>;
   previewUrlPrefix: string;
   setModalContent: (content: JSX.Element | null) => void;
   onSubmit: (formValues: ReservationUnitEditFormValues) => Promise<number>;
@@ -197,20 +196,19 @@ export function BottomButtonsStripe({
   const { t } = useTranslation();
   const displayError = useDisplayError();
   const router = useRouter();
+  const [archiveMutation] = useArchiveReservationUnitMutation();
 
   const { setValue, watch, formState, handleSubmit } = form;
   const { isDirty: hasChanges, isSubmitting: isSaving } = formState;
 
-  const archiveEnabled = watch("pk") !== 0 && !watch("isArchived");
+  const archiveEnabled = watch("pk") !== 0;
   const draftEnabled = hasChanges || !watch("isDraft");
   const publishEnabled = hasChanges || watch("isDraft");
-
   const isPreviewDisabled = isSaving || !reservationUnit?.pk || !reservationUnit?.extUuid || previewUrlPrefix === "";
 
   // Have to define these like this because otherwise the state changes don't work
   const handlePublish = async () => {
     setValue("isDraft", false);
-    setValue("isArchived", false);
     try {
       await handleSubmit(onSubmit)();
     } catch (error) {
@@ -220,7 +218,6 @@ export function BottomButtonsStripe({
 
   const handleSaveAsDraft = async () => {
     setValue("isDraft", true);
-    setValue("isArchived", false);
     try {
       await handleSubmit(onSubmit)();
     } catch (error) {
@@ -229,13 +226,15 @@ export function BottomButtonsStripe({
   };
 
   const handleAcceptArchive = async () => {
-    setValue("isArchived", true);
-    setValue("isDraft", false);
     setModalContent(null);
     try {
-      await handleSubmit(onSubmit)();
+      if (reservationUnit == null) {
+        throw new Error("Can't try to archive non existing reservation unit.");
+      }
+      const { unit, pk } = reservationUnit;
+      await archiveMutation({ variables: { input: { pk } } });
       successToast({ text: t("reservationUnitEditor:ArchiveDialog.success") });
-      router.push(getUnitUrl(unit?.pk));
+      router.push(getUnitUrl(unit.pk));
     } catch (e) {
       displayError(e);
     }
@@ -332,3 +331,11 @@ export function BottomButtonsStripe({
     </ButtonsStripe>
   );
 }
+
+export const ARCHIVE_RESERVATION_UNIT = gql`
+  mutation ArchiveReservationUnit($input: ReservationUnitArchiveMutation!) {
+    archiveReservationUnit(input: $input) {
+      pk
+    }
+  }
+`;

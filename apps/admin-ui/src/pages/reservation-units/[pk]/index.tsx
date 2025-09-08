@@ -222,10 +222,10 @@ function ReservationUnitEditor({
 
   // unsafe because the handleSubmit doesn't pass return value (so throw is the only way to manipulate control flow)
   const onSubmit = async (formValues: ReservationUnitEditFormValues) => {
-    const { pk, isArchived, ...input } = transformReservationUnit(formValues, taxPercentageOptions);
+    const { pk, ...input } = transformReservationUnit(formValues, taxPercentageOptions);
     const promise =
       pk != null
-        ? updateMutation({ variables: { input: { ...input, pk, isArchived } } })
+        ? updateMutation({ variables: { input: { ...input, pk } } })
         : createMutation({
             variables: { input: { ...input, unit: unitPk } },
           });
@@ -252,7 +252,7 @@ function ReservationUnitEditor({
     const upPk = getPk(data);
 
     // crude way to handle different logic for archive vs save (avoids double toast)
-    if (upPk && !formValues.isArchived) {
+    if (upPk) {
       const { images } = formValues;
       // res unit is saved, we can save changes to images
       const success = await reconcileImageChanges?.(upPk, images);
@@ -324,7 +324,6 @@ function ReservationUnitEditor({
 
       <BottomButtonsStripe
         reservationUnit={reservationUnit}
-        unit={unit}
         previewUrlPrefix={previewUrlPrefix}
         setModalContent={setModalContent}
         onSubmit={onSubmit}
