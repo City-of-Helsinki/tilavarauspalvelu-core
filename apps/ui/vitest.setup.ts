@@ -29,7 +29,7 @@ vi.mock("next-i18next", async (importOriginal) => {
           changeLanguage: () => new Promise(() => {}),
           language: "fi",
           exists: (str: string) => {
-            return !str.match(/failExistsOnPurpose/i);
+            return !/failExistsOnPurpose/i.test(str);
           },
         },
       };

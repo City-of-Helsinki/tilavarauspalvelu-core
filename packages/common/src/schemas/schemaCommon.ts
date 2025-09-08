@@ -60,7 +60,7 @@ export function checkTimeStringFormat(data: string | undefined, ctx: z.Refinemen
       path: [path],
       message: `Required`,
     });
-  } else if (!data.match(TIME_PATTERN)) {
+  } else if (!TIME_PATTERN.test(data)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: [path],

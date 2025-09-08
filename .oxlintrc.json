@@ -343,6 +343,7 @@
     "unicorn/prefer-node-protocol": "error",
     "unicorn/prefer-number-properties": "error",
     "unicorn/prefer-prototype-methods": "error",
+    "unicorn/prefer-regexp-test": "error",
     "unicorn/prefer-set-has": "error",
     "unicorn/prefer-set-size": "error",
     "unicorn/prefer-string-replace-all": "error",
