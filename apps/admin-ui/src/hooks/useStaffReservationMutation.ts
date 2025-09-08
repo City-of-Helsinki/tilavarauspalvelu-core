@@ -31,7 +31,7 @@ export function useStaffReservationMutation({ reservation, onSuccess }: Props) {
   const [recurringMutation] = useUpdateReservationSeriesMutation();
 
   const handleSuccess = (isRecurring: boolean) => {
-    const trKey = `Reservation.EditPage.${isRecurring ? "saveSuccessRecurring" : "saveSuccess"}`;
+    const trKey = `reservation:EditPage.${isRecurring ? "saveSuccessRecurring" : "saveSuccess"}`;
     successToast({ text: t(trKey) });
     onSuccess();
   };
