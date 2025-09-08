@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { type OptionsRecord } from "common";
 import { type FieldName } from "common/src/modules/metaFieldsHelpers";
 import { ActionContainer } from "./styles";
-import { ApplicationFields, GeneralFields } from "./SummaryFields";
+import { SummaryGeneralFields, SummaryReserveeFields } from "./SummaryFields";
 import { AcceptTerms } from "./AcceptTerms";
 import { NewReservationForm } from "@/styled/reservation";
 import { useDisplayError } from "common/src/hooks";
@@ -93,8 +93,8 @@ export function Step1({ reservation, supportedFields, options, requiresPayment }
 
   return (
     <NewReservationForm onSubmit={handleSubmit(onSubmit)} noValidate>
-      <GeneralFields supportedFields={supportedFields} reservation={reservation} options={options} />
-      <ApplicationFields reservation={reservation} options={options} supportedFields={supportedFields} />
+      <SummaryGeneralFields reservation={reservation} options={options} />
+      <SummaryReserveeFields reservation={reservation} options={options} supportedFields={supportedFields} />
       <AcceptTerms
         reservationUnit={reservation.reservationUnit}
         isTermsAccepted={isTermsAccepted}

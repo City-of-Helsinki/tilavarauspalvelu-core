@@ -31,30 +31,14 @@
       "reserveeOrganisationName": "Officiellt namn",
       "reserveeIdentifier": "FO-nummer",
       "reserveeIsUnregisteredAssociation": "Sammanslutningen är inte registrerad",
-      "municipality": "Hemort",
-      "showBillingAddress": "Faktureringsadress",
-      "billingFirstName": "Bokarens förnamn",
-      "billingLastName": "Bokarens efternamn",
-      "billingPhone": "Telefonnummer",
-      "billingEmail": "E-postadress",
-      "billingAddressStreet": "Gatuadress",
-      "billingAddressZip": "Postnummer",
-      "billingAddressCity": "Postanstalt"
+      "municipality": "Hemort"
     },
     "individual": {
       "reserveeFirstName": "Förnamn",
       "reserveeLastName": "Efternamn",
       "reserveeEmail": "E-postadress",
       "reserveePhone": "Telefonnummer",
-      "municipality": "Hemort",
-      "showBillingAddress": "Faktureringsadress",
-      "billingFirstName": "Bokarens förnamn",
-      "billingLastName": "Bokarens efternamn",
-      "billingPhone": "Telefonnummer",
-      "billingEmail": "E-postadress",
-      "billingAddressStreet": "Gatuadress",
-      "billingAddressZip": "Postnummer",
-      "billingAddressCity": "Postanstalt"
+      "municipality": "Hemort"
     },
     "company": {
       "reserveeFirstName": "Kontaktpersonens förnamn",
@@ -63,15 +47,7 @@
       "reserveePhone": "Kontaktpersonens telefonnummer",
       "reserveeOrganisationName": "Officiellt namn",
       "reserveeIdentifier": "FO-nummer",
-      "municipality": "Hemort",
-      "showBillingAddress": "Faktureringsadress",
-      "billingFirstName": "Bokarens förnamn",
-      "billingLastName": "Bokarens efternamn",
-      "billingPhone": "Telefonnummer",
-      "billingEmail": "E-postadress",
-      "billingAddressStreet": "Gatuadress",
-      "billingAddressZip": "Postnummer",
-      "billingAddressCity": "Postanstalt"
+      "municipality": "Hemort"
     },
     "headings": {
       "companyInfo": "Uppgifter om företaget",
@@ -81,8 +57,5 @@
     "subHeadings": {
       "subvention": "Ansökan om rabatt på priset"
     }
-  },
-  "processLabels": {
-    "handlingRequired": "Bokningen behandlas"
   }
 }

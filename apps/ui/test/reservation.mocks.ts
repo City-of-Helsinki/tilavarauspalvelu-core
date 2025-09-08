@@ -1,7 +1,7 @@
 import {
   AccessType,
   ReservationUnitImageType,
-  type ReservationMetaFieldsFragment,
+  type ReservationFormFieldsFragment,
   MunicipalityChoice,
   OrderStatus,
   type PaymentOrderNode,
@@ -478,7 +478,7 @@ export function createOptionsMock() {
   };
 }
 
-export function createMetaFieldsFragment(type: ReserveeType = ReserveeType.Company): ReservationMetaFieldsFragment {
+export function createMetaFieldsFragment(type: ReserveeType = ReserveeType.Company): ReservationFormFieldsFragment {
   return {
     id: "1",
     description: "Test description",

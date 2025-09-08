@@ -2,10 +2,10 @@ import React, { Fragment } from "react";
 import { IconGroup, IconUser } from "hds-react";
 import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
-import { useTranslation, type TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { camelCase } from "lodash-es";
-import { MetadataSetsFragment, MunicipalityChoice, ReserveeType } from "../../gql/gql-types";
+import { MetadataSetsFragment, ReserveeType } from "../../gql/gql-types";
 import { ReservationFormField } from "./ReservationFormField";
 import { type InputsT, type ReservationFormT } from "./types";
 import { RadioButtonWithImage } from "./RadioButtonWithImage";
@@ -14,6 +14,7 @@ import type { OptionsRecord } from "../../types/common";
 import IconPremises from "../icons/IconPremises";
 import { containsField } from "../modules/metaFieldsHelpers";
 import { filterNonNullable } from "../modules/helpers";
+import { extendMetaFieldOptions } from "./util";
 
 type CommonProps = {
   options: Readonly<Omit<OptionsRecord, "municipality">>;
@@ -34,26 +35,6 @@ const Subheading = styled(H4).attrs({ as: "h2" })``;
 const GroupHeading = styled(H5)`
   grid-column: 1 / -1;
   margin-bottom: 0;
-`;
-
-const Container = styled.div`
-  margin-bottom: var(--spacing-m);
-
-  label {
-    ${fontMedium};
-
-    span {
-      line-height: unset;
-      transform: unset;
-      margin-left: 0;
-      display: inline;
-      font-size: unset;
-    }
-  }
-
-  input[type="radio"] + label {
-    ${fontRegular};
-  }
 `;
 
 const CustomerTypeChoiceContainer = styled.div`
@@ -179,7 +160,7 @@ function ReservationFormFields({
 }
 
 // TODO reduce prop drilling / remove unused props
-export function ReservationMetaFields({
+export function ReservationFormFieldsDetailsSection({
   fields,
   reservationUnit,
   options,
@@ -260,7 +241,7 @@ function CustomerTypeChoiceSelector() {
 }
 
 // TODO reduce prop drilling / remove unused props
-export function ReserverMetaFields({
+export function ReservationFormFieldsReserveeSection({
   fields,
   reservationUnit,
   options,
@@ -304,32 +285,46 @@ export function ReserverMetaFields({
   );
 }
 
-// Modify options to include static enums
-// the options Record (and down stream components don't narrow types properly)
-// so missing keys are not type errors but instead turn Select components -> TextFields
-export function extendMetaFieldOptions(options: Omit<OptionsRecord, "municipality">, t: TFunction): OptionsRecord {
-  return {
-    ...options,
-    municipality: Object.values(MunicipalityChoice).map((value) => ({
-      label: t(`common:municipalities.${value.toUpperCase()}`),
-      value: value,
-    })),
-  };
-}
+const Container = styled.div`
+  margin-bottom: var(--spacing-m);
 
-// TODO this should be deprecated (use the individual components instead)
-// because we need the individual components for admin-ui (placement in dom changes)
-// and this component has more props than dom nodes.
-// Not removed yet since requires ui/ refactoring.
-function MetaFields({ reservationUnit, generalFields, reservationApplicationFields, options, data }: Props) {
+  label {
+    ${fontMedium};
+
+    span {
+      line-height: unset;
+      transform: unset;
+      margin-left: 0;
+      display: inline;
+      font-size: unset;
+    }
+  }
+
+  input[type="radio"] + label {
+    ${fontRegular};
+  }
+`;
+
+export function ReservationForm({
+  reservationUnit,
+  generalFields,
+  reservationApplicationFields,
+  options,
+  data,
+}: Props) {
   if (!reservationUnit.metadataSet) {
     return null;
   }
 
   return (
     <Container>
-      <ReservationMetaFields fields={generalFields} options={options} reservationUnit={reservationUnit} data={data} />
-      <ReserverMetaFields
+      <ReservationFormFieldsDetailsSection
+        fields={generalFields}
+        options={options}
+        reservationUnit={reservationUnit}
+        data={data}
+      />
+      <ReservationFormFieldsReserveeSection
         fields={reservationApplicationFields}
         options={options}
         reservationUnit={reservationUnit}
@@ -339,10 +334,8 @@ function MetaFields({ reservationUnit, generalFields, reservationApplicationFiel
   );
 }
 
-export default MetaFields;
-
 export const RESERVATION_META_FIELDS_FRAGMENT = gql`
-  fragment ReservationMetaFields on ReservationNode {
+  fragment ReservationFormFields on ReservationNode {
     id
     reserveeFirstName
     reserveeLastName

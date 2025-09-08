@@ -7,21 +7,22 @@ import { useFormContext, UseFormReturn } from "react-hook-form";
 import React, { useState } from "react";
 import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
-import MetaFields from "common/src/reservation-form/MetaFields";
+import { ReservationForm } from "common/src/reservation-form/MetaFields";
 import { ActionContainer } from "./styles";
 import InfoDialog from "../common/InfoDialog";
 import { filterNonNullable } from "common/src/modules/helpers";
 import { containsField, FieldName } from "common/src/modules/metaFieldsHelpers";
 import {
   type ReservationQuery,
+  type ReservationFormFieldsFragment,
   type ReservationUpdateMutationInput,
   ReserveeType,
   useUpdateReservationMutation,
 } from "@gql/gql-types";
+import { getFilteredGeneralFields, getFilteredReserveeFields } from "common/src/reservation-form/util";
 import { type InputsT } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/src/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
-import { getApplicationFields, getGeneralFields } from "common/src/hooks/useApplicationFields";
 import { type OptionsRecord } from "common";
 import { NewReservationForm } from "@/styled/reservation";
 import { useDisplayError } from "common/src/hooks";
@@ -58,7 +59,6 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
       // boolean toggles
       applyingForFreeOfCharge,
       freeOfChargeReason,
-      showBillingAddress,
       reserveeIsUnregisteredAssociation,
       reserveeIdentifier,
       ...rest
@@ -105,8 +105,8 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
   const includesHomeCity = containsField(supportedFields, "municipality");
   const includesReserveeType = containsField(supportedFields, "reserveeType");
 
-  const generalFields = getGeneralFields({ supportedFields, reservation });
-  const reservationApplicationFields = getApplicationFields({
+  const generalFields = getFilteredGeneralFields({ supportedFields, reservation });
+  const reservationApplicationFields = getFilteredReserveeFields({
     supportedFields,
     reservation,
     reserveeType: reserveeType ?? ReserveeType.Individual,
@@ -123,7 +123,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
 
   return (
     <NewReservationForm onSubmit={handleSubmit(onSubmit)} noValidate>
-      <MetaFields
+      <ReservationForm
         reservationUnit={reservation.reservationUnit}
         options={options}
         generalFields={generalFields}
@@ -199,7 +199,7 @@ function Errors({
 }: {
   form: UseFormReturn<InputsT>;
   supportedFields: FieldName[];
-  generalFields: string[];
+  generalFields: Array<keyof ReservationFormFieldsFragment>;
 }) {
   const { t } = useTranslation();
 
@@ -227,11 +227,13 @@ function Errors({
     <ErrorBox label={t("forms:heading.errorsTitle")} type="error" position="inline">
       <div>{t("forms:heading.errorsSubtitle")}</div>
       <ErrorList>
-        {errorKeys.map((key: string) => {
-          const fieldType =
+        {errorKeys.map((key) => {
+          // TODO why?
+          const parentTrKey =
             generalFields.find((x) => x === key) != null || key === "reserveeType"
               ? "common"
               : reserveeType?.toLocaleLowerCase() || "individual";
+          const label = t(`reservationApplication:label.${parentTrKey}.${key}`);
           return (
             <li key={key}>
               <ErrorAnchor
@@ -250,7 +252,7 @@ function Errors({
                   }, 500);
                 }}
               >
-                {t(`reservationApplication:label.${fieldType}.${key}`)}
+                {label}
               </ErrorAnchor>
             </li>
           );

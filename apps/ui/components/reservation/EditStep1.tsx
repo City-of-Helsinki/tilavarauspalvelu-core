@@ -6,7 +6,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { filterNonNullable } from "common/src/modules/helpers";
 import { errorToast } from "common/src/components/toast";
-import { ApplicationFields, GeneralFields } from "./SummaryFields";
+import { SummaryGeneralFields, SummaryReserveeFields } from "./SummaryFields";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { PendingReservationFormType } from "../reservation-unit/schema";
@@ -153,8 +153,8 @@ export function EditStep1({ reservation, options, onBack, form }: Props): JSX.El
     <>
       <StyledReservationInfoCard reservation={modifiedReservation} bgColor="gold" />
       <StyledForm onSubmit={handleSubmit(onSubmit)}>
-        <GeneralFields supportedFields={supportedFields} reservation={reservation} options={options} />
-        <ApplicationFields supportedFields={supportedFields} reservation={reservation} options={options} />
+        <SummaryGeneralFields reservation={reservation} options={options} />
+        <SummaryReserveeFields supportedFields={supportedFields} reservation={reservation} options={options} />
         <AcceptTerms
           reservationUnit={reservationUnit}
           isTermsAccepted={isTermsAccepted}

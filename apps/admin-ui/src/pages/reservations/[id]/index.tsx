@@ -413,7 +413,7 @@ export const RESERVATION_PAGE_QUERY = gql`
         reservationStartInterval
         ...ReservationTypeFormFields
       }
-      ...ReservationMetaFields
+      ...ReservationFormFields
     }
   }
 `;
