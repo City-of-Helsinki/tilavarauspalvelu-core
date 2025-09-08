@@ -42,7 +42,7 @@ type CalendarProps = {
   reservation: TimeBlockSectionFragment;
   refetch: (focusDate?: Date) => void;
   focusDate: Date;
-  events: Array<CalendarEventType>;
+  events: CalendarEventType[];
 };
 
 /// @param reservation the current reservation to show in calendar

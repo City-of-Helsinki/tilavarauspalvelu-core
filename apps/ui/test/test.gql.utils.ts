@@ -14,7 +14,7 @@ export interface CreateGraphQLMockProps extends ICreateGraphQLMock {
   reservationKind?: ReservationKind;
 }
 
-export type CreateGraphQLMocksReturn = Array<{
+export type CreateGraphQLMocksReturn = {
   request: {
     query: DocumentNode;
     variables?: Record<string, unknown>;
@@ -24,7 +24,7 @@ export type CreateGraphQLMocksReturn = Array<{
     data: Record<string, unknown>;
   };
   error?: Error | undefined;
-}>;
+}[];
 
 export function createOptionMock(
   props: {

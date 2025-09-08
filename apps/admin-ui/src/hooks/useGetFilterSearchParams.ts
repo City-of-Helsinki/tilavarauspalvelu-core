@@ -103,7 +103,7 @@ function convertRecurringParam(recurring: string | null): "only" | "onlyNot" | u
 }
 
 function transformPriorityFilter(values: string[]): Priority[] {
-  return values.reduce<Array<Priority>>((acc, x) => {
+  return values.reduce<Priority[]>((acc, x) => {
     if (x === Priority.Secondary) {
       return [...acc, Priority.Secondary];
     } else if (x === Priority.Primary) {

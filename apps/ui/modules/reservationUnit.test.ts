@@ -1086,7 +1086,7 @@ describe("getNextAvailableTime", () => {
     ]);
   });
 
-  function mockOpenTimes(start: Date, days: number, data?: Array<{ start: Date; end: Date }>) {
+  function mockOpenTimes(start: Date, days: number, data?: { start: Date; end: Date }[]) {
     for (let i = 0; i < days; i++) {
       reservableTimes.set(
         dateToKey(addDays(start, i)),

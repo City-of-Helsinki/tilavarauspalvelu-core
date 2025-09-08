@@ -25,7 +25,7 @@ export function useConfirmNavigation(props: {
   confirm: boolean;
   confirmMessage: string;
   onNavigationConfirmed?: () => Promise<unknown>;
-  whitelist?: Array<RegExp | string>;
+  whitelist?: (RegExp | string)[];
 }) {
   const { confirm, confirmMessage, onNavigationConfirmed, whitelist } = props;
   const router = useRouter();

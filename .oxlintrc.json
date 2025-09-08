@@ -305,6 +305,7 @@
     "react/self-closing-comp": "error",
     "react/style-prop-object": "error",
     "react/void-dom-elements-no-children": "error",
+    "typescript/array-type": "error",
     "typescript/ban-ts-comment": "error",
     "typescript/explicit-function-return-type": "off",
     "typescript/explicit-module-boundary-types": "off",
