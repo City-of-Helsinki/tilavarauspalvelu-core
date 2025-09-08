@@ -10,7 +10,12 @@ import styled from "styled-components";
 import MetaFields from "common/src/reservation-form/MetaFields";
 import { ActionContainer } from "./styles";
 import InfoDialog from "../common/InfoDialog";
-import { type ReservationQuery, ReserveeType } from "@gql/gql-types";
+import {
+  type ReservationQuery,
+  type ReservationUpdateMutationInput,
+  ReserveeType,
+  useUpdateReservationMutation,
+} from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { containsField, FieldName } from "common/src/metaFieldsHelpers";
 import { getApplicationFields, getGeneralFields } from "common/src/hooks/useApplicationFields";
@@ -18,6 +23,11 @@ import { type InputsT } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { type OptionsRecord } from "common";
+import { NewReservationForm } from "@/styled/reservation";
+import { useDisplayError } from "common/src/hooks";
+import { useRouter } from "next/router";
+import { getReservationInProgressPath, getReservationUnitPath } from "@/modules/urls";
+import { gql } from "@apollo/client";
 
 type ReservationT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
@@ -28,13 +38,66 @@ type Props = {
 
 export function Step0({ reservation, cancelReservation, options }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
+  const router = useRouter();
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useFormContext<InputsT>();
   const {
     watch,
     formState: { isSubmitting, isValid },
+    handleSubmit,
   } = form;
+
+  const { pk: reservationPk } = reservation || {};
+  const displayError = useDisplayError();
+  const [updateReservation] = useUpdateReservationMutation();
+
+  const onSubmit = async (payload: InputsT): Promise<void> => {
+    const {
+      // boolean toggles
+      applyingForFreeOfCharge,
+      freeOfChargeReason,
+      showBillingAddress,
+      reserveeIsUnregisteredAssociation,
+      reserveeIdentifier,
+      ...rest
+    } = payload;
+    const hasReserveeTypeField = containsField(supportedFields, "reserveeType");
+    if (hasReserveeTypeField && !reserveeType) {
+      throw new Error("Reservee type is required");
+    }
+    if (reservationPk == null) {
+      throw new Error("Reservation pk is required");
+    }
+
+    const input: ReservationUpdateMutationInput = {
+      // TODO don't use spread it breaks type checking for unknown fields
+      ...rest,
+      // force update to empty -> NA
+      reserveeIdentifier:
+        reserveeType !== ReserveeType.Individual && !reserveeIsUnregisteredAssociation ? reserveeIdentifier : "",
+      applyingForFreeOfCharge,
+      freeOfChargeReason: applyingForFreeOfCharge ? freeOfChargeReason : "",
+      pk: reservationPk,
+    };
+
+    try {
+      const { data } = await updateReservation({
+        variables: {
+          input,
+        },
+      });
+      if (data?.updateReservation?.state === "CANCELLED") {
+        await router.push(getReservationUnitPath(reservation.reservationUnit.pk));
+      } else {
+        await router.push(getReservationInProgressPath(reservation.reservationUnit.pk, reservation.pk, 1));
+      }
+    } catch (err) {
+      // TODO: NOT_FOUND at least is non-recoverable so we should redirect to the reservation unit page
+      displayError(err);
+    }
+  };
 
   const supportedFields = filterNonNullable(reservation.reservationUnit.metadataSet?.supportedFields);
   const reserveeType = watch("reserveeType");
@@ -59,7 +122,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
     : "";
 
   return (
-    <>
+    <NewReservationForm onSubmit={handleSubmit(onSubmit)} noValidate>
       <MetaFields
         reservationUnit={reservation.reservationUnit}
         options={options}
@@ -98,7 +161,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
         <Button
           type="button"
           variant={ButtonVariant.Secondary}
-          iconStart={<IconCross aria-hidden="true" />}
+          iconStart={<IconCross />}
           disabled={isSubmitting}
           onClick={cancelReservation}
           data-testid="reservation__button--cancel"
@@ -106,7 +169,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
           {t("common:stop")}
         </Button>
       </ActionContainer>
-    </>
+    </NewReservationForm>
   );
 }
 
@@ -196,3 +259,12 @@ function Errors({
     </ErrorBox>
   );
 }
+
+export const UPDATE_RESERVATION = gql`
+  mutation UpdateReservation($input: ReservationUpdateMutationInput!) {
+    updateReservation(input: $input) {
+      pk
+      state
+    }
+  }
+`;
