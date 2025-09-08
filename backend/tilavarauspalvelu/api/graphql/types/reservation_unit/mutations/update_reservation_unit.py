@@ -1,7 +1,6 @@
 import datetime
 from decimal import Decimal
 
-from auditlog.models import LogEntry
 from django.conf import settings
 from django.db import transaction
 from undine import GQLInfo, Input, MutationType
@@ -38,8 +37,6 @@ from tilavarauspalvelu.models import (
     TaxPercentage,
     TermsOfUse,
 )
-from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
-from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
 from tilavarauspalvelu.typing import (
     ApplicationRoundTimeSlotUpdateData,
     ReservationUnitAccessTypeUpdateData,
@@ -50,7 +47,7 @@ from tilavarauspalvelu.typing import (
     error_codes,
 )
 from tilavarauspalvelu.validators import validate_reservable_times_begin_end, validate_reservable_times_overlap
-from utils.date_utils import local_date, local_datetime
+from utils.date_utils import local_date
 from utils.external_service.errors import ExternalServiceError
 
 __all__ = [
@@ -135,7 +132,6 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
 
     # Booleans
     is_draft = Input()
-    is_archived = Input()
     require_adult_reservee = Input()
     require_reservation_handling = Input()
     reservation_block_whole_day = Input()
@@ -173,11 +169,6 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
     application_round_time_slots = Input(ApplicationRoundTimeSlotUpdateInput)
 
     @classmethod
-    def __filter_queryset__(cls, queryset: ReservationUnitQuerySet, info: GQLInfo) -> ReservationUnitQuerySet:
-        # Allow returning archived reservation units from this mutation
-        return queryset
-
-    @classmethod
     def __mutate__(  # noqa: PLR0915,PLR0912
         cls,
         instance: ReservationUnit,
@@ -194,7 +185,6 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
             raise GraphQLValidationError(msg)
 
         is_draft = input_data.get("is_draft", instance.is_draft)
-        is_archived = input_data.get("is_archived", instance.is_archived)
         min_reservation_duration = input_data.get("min_reservation_duration", instance.min_reservation_duration)
         max_reservation_duration = input_data.get("max_reservation_duration", instance.max_reservation_duration)
         reservation_start_interval = input_data.get("reservation_start_interval", instance.reservation_start_interval)
@@ -228,9 +218,8 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
         cls._validate_pricings(instance, input_data)
         cls._validate_access_types(instance, input_data)
         cls._validate_application_round_time_slots(instance, input_data)
-        cls._validate_archival(instance, input_data)
 
-        if not is_draft and not is_archived:
+        if not is_draft:
             name_fi = input_data.get("name_fi", instance.name_fi)
             name_sv = input_data.get("name_sv", instance.name_sv)
             name_en = input_data.get("name_en", instance.name_en)
@@ -264,8 +253,6 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
                 max_persons=max_persons,
             )
 
-        was_archived = instance.is_archived
-
         cls._remove_to_many_fields(input_data)
 
         with transaction.atomic():
@@ -296,9 +283,6 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
             if has_application_round_time_slots:
                 cls.update_application_round_time_slots(instance, application_round_time_slots)
 
-            if instance.is_archived and not was_archived:
-                cls.remove_personal_data_and_logs_on_archive(instance)
-
             instance.actions.update_access_types_for_reservations()
 
         cls.update_hauki(instance)
@@ -319,24 +303,6 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
         ]
         for key in to_many_fields:
             input_data.pop(key, None)
-
-    @classmethod
-    def _validate_archival(
-        cls,
-        instance: ReservationUnit,
-        input_data: ReservationUnitUpdateData,
-    ) -> None:
-        going_to_be_archived = input_data.get("is_archived", False)
-
-        if instance.is_archived or not going_to_be_archived:
-            return
-
-        reservations: ReservationQuerySet = instance.reservations.all()  # type: ignore[assignment]
-        future_reservations = reservations.going_to_occur().filter(ends_at__gt=local_datetime())
-
-        if future_reservations.exists():
-            msg = "Reservation unit can't be archived if it has any reservations in the future"
-            raise GraphQLValidationError(msg, code=error_codes.RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS)
 
     @classmethod
     def _validate_pricings(
@@ -681,13 +647,3 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
             except ExternalServiceError as err:
                 msg = "Sending reservation unit as resource to aukiolosovellus failed"
                 raise GraphQLValidationError(msg, code=error_codes.HAUKI_EXPORTS_ERROR) from err
-
-    @classmethod
-    def remove_personal_data_and_logs_on_archive(cls, instance: ReservationUnit) -> None:
-        # Remove PII
-        instance.contact_information = ""
-        instance.is_draft = True
-        instance.save(update_fields=["contact_information", "is_draft"])
-
-        # Remove all logs related to the reservation unit
-        LogEntry.objects.get_for_object(instance).delete()

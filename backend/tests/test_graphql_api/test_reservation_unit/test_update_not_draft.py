@@ -3,8 +3,8 @@ from __future__ import annotations
 import pytest
 from freezegun import freeze_time
 
-from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, ReservationStateChoice, TermsOfUseTypeChoices
-from utils.date_utils import local_date, local_datetime, next_hour
+from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, TermsOfUseTypeChoices
+from utils.date_utils import local_date, local_datetime
 
 from tests.factories import (
     ReservationFactory,
@@ -273,73 +273,6 @@ def test_reservation_unit__update__instructions(graphql):
     assert reservation_unit.reservation_cancelled_instructions_fi == "Cancelled instructions fi"
     assert reservation_unit.reservation_cancelled_instructions_sv == "Cancelled instructions sv"
     assert reservation_unit.reservation_cancelled_instructions_en == "Cancelled instructions en"
-
-
-def test_reservation_unit__update__archiving_also_sets_as_draft(graphql):
-    graphql.login_with_superuser()
-
-    space = SpaceFactory.create()
-    reservation_unit = ReservationUnitFactory.create(is_draft=False, spaces=[space])
-    data = get_non_draft_update_input_data(
-        reservation_unit,
-        isDraft=True,  # This should be ignored
-        isArchived=True,
-    )
-
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
-    assert response.has_errors is False, response
-
-    reservation_unit.refresh_from_db()
-    assert reservation_unit.is_archived is True
-    assert reservation_unit.is_draft is True
-
-
-def test_reservation_unit__update__archiving_is_blocked_if_reservation_unit_has_future_reservations(graphql):
-    graphql.login_with_superuser()
-
-    space = SpaceFactory.create()
-    reservation_unit = ReservationUnitFactory.create(is_draft=False, spaces=[space])
-    ReservationFactory.create_for_reservation_unit(
-        reservation_unit,
-        begins_at=next_hour(plus_days=1),
-        ends_at=next_hour(plus_days=1, plus_hours=1),
-    )
-    data = get_non_draft_update_input_data(
-        reservation_unit,
-        isArchived=True,
-    )
-
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
-    assert response.has_errors is True, response
-    assert response.error_message(0) == "Reservation unit can't be archived if it has any reservations in the future"
-
-    reservation_unit.refresh_from_db()
-    assert reservation_unit.is_archived is False
-    assert reservation_unit.is_draft is False
-
-
-def test_reservation_unit__update__archiving_not_blocked_if_reservation_unit_has_future_inactive_reservations(graphql):
-    graphql.login_with_superuser()
-
-    space = SpaceFactory.create()
-    reservation_unit = ReservationUnitFactory.create(is_draft=False, spaces=[space])
-    ReservationFactory.create_for_reservation_unit(
-        reservation_unit,
-        state=ReservationStateChoice.CANCELLED,
-        begins_at=next_hour(plus_days=1),
-        ends_at=next_hour(plus_days=1, plus_hours=1),
-    )
-    data = get_non_draft_update_input_data(
-        reservation_unit,
-        isArchived=True,
-    )
-
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
-    assert response.has_errors is False, response
-
-    reservation_unit.refresh_from_db()
-    assert reservation_unit.is_archived is True
-    assert reservation_unit.is_draft is True
 
 
 @freeze_time(local_datetime(2024, 1, 1))

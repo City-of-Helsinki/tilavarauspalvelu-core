@@ -67,6 +67,7 @@ from .types import (
     ReservationStaffModifyMutation,
     ReservationStaffRepairAccessCodeMutation,
     ReservationUnitAllNode,
+    ReservationUnitArchiveMutation,
     ReservationUnitCancellationRuleNode,
     ReservationUnitCreateMutation,
     ReservationUnitImageCreateMutation,
@@ -370,6 +371,7 @@ class Mutation(RootType):
 
     create_reservation_unit = Entrypoint(ReservationUnitCreateMutation)
     update_reservation_unit = Entrypoint(ReservationUnitUpdateMutation)
+    archive_reservation_unit = Entrypoint(ReservationUnitArchiveMutation)
     create_reservation_unit_image = Entrypoint(ReservationUnitImageCreateMutation)
     update_reservation_unit_image = Entrypoint(ReservationUnitImageUpdateMutation)
     delete_reservation_unit_image = Entrypoint(ReservationUnitImageDeleteMutation)

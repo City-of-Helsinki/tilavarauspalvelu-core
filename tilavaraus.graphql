@@ -2618,6 +2618,11 @@ input ReservationUnitAllFilterSet {
   XOR: ReservationUnitAllFilterSet
 }
 
+"""Archive a reservation unit."""
+input ReservationUnitArchiveMutation {
+  pk: Int!
+}
+
 input ReservationUnitCancellationRuleFilterSet {
   name: String
   pk: [Int!]
@@ -2866,7 +2871,6 @@ input ReservationUnitUpdateMutation {
   descriptionSv: String
   equipments: [Int!]
   images: [ReservationUnitImageUpdateInput!]
-  isArchived: Boolean
   isDraft: Boolean
   maxPersons: Int
   maxReservationDuration: Duration
@@ -3401,6 +3405,10 @@ type Mutation {
   approveReservation(
     input: ReservationApproveMutation!
   ): ReservationNode!
+  """Archive a reservation unit."""
+  archiveReservationUnit(
+    input: ReservationUnitArchiveMutation!
+  ): ReservationUnitNode!
   """
   Cancel all reservations in the given application section that can be cancelled.
   """

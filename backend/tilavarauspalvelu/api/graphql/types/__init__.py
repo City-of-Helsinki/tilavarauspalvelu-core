@@ -66,7 +66,11 @@ from .reservation_series.mutations import (
     ReservationSeriesUpdateMutation,
 )
 from .reservation_series.queries import ReservationSeriesNode
-from .reservation_unit.mutations import ReservationUnitCreateMutation, ReservationUnitUpdateMutation
+from .reservation_unit.mutations import (
+    ReservationUnitArchiveMutation,
+    ReservationUnitCreateMutation,
+    ReservationUnitUpdateMutation,
+)
 from .reservation_unit.queries import ReservationUnitAllNode, ReservationUnitNode
 from .reservation_unit_access_type.queries import ReservationUnitAccessTypeNode
 from .reservation_unit_cancellation_rule.queries import ReservationUnitCancellationRuleNode
@@ -149,6 +153,7 @@ __all__ = [
     "ReservationStaffRepairAccessCodeMutation",
     "ReservationUnitAccessTypeNode",
     "ReservationUnitAllNode",
+    "ReservationUnitArchiveMutation",
     "ReservationUnitCancellationRuleNode",
     "ReservationUnitCreateMutation",
     "ReservationUnitImageCreateMutation",
