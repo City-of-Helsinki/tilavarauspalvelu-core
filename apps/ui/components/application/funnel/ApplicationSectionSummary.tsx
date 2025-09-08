@@ -5,7 +5,7 @@ import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Flex, H4 } from "common/styled";
 import { formatDuration, fromUIDate } from "common/src/common/util";
-import { type ApplicationSectionPage1FormValues } from "./form";
+import type { ApplicationSectionPage1FormValues } from "./form";
 import { IconWithText } from "@/components/common/IconWithText";
 
 const Message = styled.p`

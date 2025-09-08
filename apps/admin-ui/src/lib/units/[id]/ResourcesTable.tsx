@@ -12,7 +12,7 @@ import { truncate } from "common/src/helpers";
 import { MAX_NAME_LENGTH } from "@/common/const";
 import { TableLink } from "@/styled";
 import { Flex } from "common/styled";
-import { type TFunction } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";
 

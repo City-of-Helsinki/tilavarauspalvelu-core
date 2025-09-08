@@ -20,7 +20,7 @@ import {
   useReservationLazyQuery,
   useUpdateReservationMutation,
 } from "@gql/gql-types";
-import { type Inputs } from "common/src/reservation-form/types";
+import type { Inputs } from "common/src/reservation-form/types";
 import { createApolloClient } from "@/modules/apolloClient";
 import { default as NextError } from "next/error";
 import { getReservationPath, getReservationUnitPath, getSingleSearchPath } from "@/modules/urls";

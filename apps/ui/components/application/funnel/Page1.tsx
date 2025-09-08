@@ -4,11 +4,11 @@ import { useTranslation } from "next-i18next";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { filterNonNullable } from "common/src/helpers";
 import { ButtonContainer } from "common/styled";
-import { type ApplicationRoundForApplicationFragment } from "@gql/gql-types";
+import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { useReservationUnitList } from "@/hooks";
 import { ApplicationSectionPage1 } from ".";
 import { type ApplicationPage1FormValues, createDefaultPage1Section } from "./form";
-import { type OptionsListT } from "common/src/modules/search";
+import type { OptionsListT } from "common/src/modules/search";
 
 type Page1Props = Readonly<{
   applicationRound: Readonly<ApplicationRoundForApplicationFragment>;

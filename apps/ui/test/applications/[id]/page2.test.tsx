@@ -1,4 +1,4 @@
-import { type ApplicationPage2Fragment } from "@/gql/gql-types";
+import type { ApplicationPage2Fragment } from "@/gql/gql-types";
 import Page2 from "@/pages/applications/[id]/page2";
 import { render } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";

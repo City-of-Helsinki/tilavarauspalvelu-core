@@ -3,7 +3,7 @@ import { IconArrowTopRight, IconCheck, IconClock, IconCogwheel, IconEnvelope, Ic
 import { useTranslation } from "next-i18next";
 import { ApplicationRoundStatusChoice, type Maybe } from "@gql/gql-types";
 import StatusLabel from "common/src/components/StatusLabel";
-import { type StatusLabelType } from "common/src/tags";
+import type { StatusLabelType } from "common/src/tags";
 
 type RoundStatus = {
   type: StatusLabelType;

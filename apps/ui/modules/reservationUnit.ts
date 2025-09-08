@@ -52,8 +52,8 @@ import {
   type ReadonlyDeep,
   timeToMinutes,
 } from "common/src/helpers";
-import { type LocalizationLanguages } from "common/src/urlBuilder";
-import { type TFunction } from "i18next";
+import type { LocalizationLanguages } from "common/src/urlBuilder";
+import type { TFunction } from "i18next";
 
 function formatTimeObject(time: { h: number; m: number }): string {
   return `${time.h.toString().padStart(2, "0")}:${time.m.toString().padStart(2, "0")}`;

@@ -9,7 +9,7 @@ import { convertLanguageCode, getTranslationSafe } from "common/src/common/util"
 import { ButtonContainer } from "common/styled";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { getApplicationPath } from "@/modules/urls";
-import { type ApplicationPage2FormValues } from "./form";
+import type { ApplicationPage2FormValues } from "./form";
 import { TimeSelectorForm } from ".";
 import { gql } from "@apollo/client";
 

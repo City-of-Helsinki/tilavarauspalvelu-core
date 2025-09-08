@@ -8,8 +8,8 @@ import {
 } from "@gql/gql-types";
 import { fromUIDate, isValidDate } from "common/src/common/util";
 import { toNumber } from "common/src/helpers";
-import { type OptionsListT, type OptionT } from "common/src/modules/search";
-import { type TFunction } from "next-i18next";
+import type { OptionsListT, OptionT } from "common/src/modules/search";
+import type { TFunction } from "next-i18next";
 
 export interface TagOptionsList extends OptionsListT {
   stateChoices: Readonly<Array<{ value: ReservationStateChoice; label: string }>>;

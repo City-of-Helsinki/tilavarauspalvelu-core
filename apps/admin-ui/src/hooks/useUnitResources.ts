@@ -10,7 +10,7 @@ import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { errorToast } from "common/src/components/toast";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
-import { type OptionT } from "common/src/modules/search";
+import type { OptionT } from "common/src/modules/search";
 
 export interface ReservationUnitOption extends OptionT {
   isDraft: boolean;

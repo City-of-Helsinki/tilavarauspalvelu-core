@@ -6,10 +6,10 @@ import {
   type Maybe,
   type SuitableTimeFieldsFragment,
 } from "../gql/gql-types";
-import { type OptionInProps } from "hds-react";
+import type { OptionInProps } from "hds-react";
 import { type DayT, pixel } from "./const";
-import { type TFunction } from "i18next";
-import { type LocalizationLanguages } from "./urlBuilder";
+import type { TFunction } from "i18next";
+import type { LocalizationLanguages } from "./urlBuilder";
 import { convertWeekday } from "./conversion";
 
 /// Enforce readonly on all nested properties

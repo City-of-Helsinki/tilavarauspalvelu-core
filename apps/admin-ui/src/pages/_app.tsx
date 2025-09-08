@@ -5,7 +5,7 @@ import "../styles/global.scss";
 import { ApolloProvider } from "@apollo/client";
 import { createClient } from "@/common/apolloClient";
 import { updateSentryConfig } from "../../sentry.client.config";
-import { type PageProps } from ".";
+import type { PageProps } from ".";
 import { appWithTranslation } from "next-i18next";
 import Layout from "./layout";
 import PageWrapper from "@/component/PageWrapper";

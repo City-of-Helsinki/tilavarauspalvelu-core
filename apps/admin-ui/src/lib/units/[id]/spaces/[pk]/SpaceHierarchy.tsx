@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { type SpacePageFragment } from "@gql/gql-types";
+import type { SpacePageFragment } from "@gql/gql-types";
 import { fontMedium } from "common/styled";
 
 type Props = {
