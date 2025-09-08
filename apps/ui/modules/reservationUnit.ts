@@ -131,7 +131,7 @@ export function getEquipmentList(
           n.category?.nameFi === category ||
           (category === "Muu" &&
             n.category?.nameFi &&
-            !equipmentCategoryOrder.find((order) => order === n.category.nameFi))
+            !equipmentCategoryOrder.some((order) => order === n.category.nameFi))
       )
       .sort((a, b) => (a.nameFi && b.nameFi ? a.nameFi.localeCompare(b.nameFi) : 0))
   );
@@ -398,7 +398,7 @@ export function isReservationUnitPaid(pricings: Readonly<PricingFieldsFragment[]
           const start = new Date(p.begins);
           return start <= date;
         });
-  return d.filter((p) => !isPriceFree(p)).length > 0;
+  return d.some((p) => !isPriceFree(p));
 }
 
 /// Returns true if the given time is 'inside' the time span

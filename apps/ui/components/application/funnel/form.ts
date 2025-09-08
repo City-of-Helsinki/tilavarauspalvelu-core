@@ -127,7 +127,7 @@ const ApplicationSectionPage2Schema = z
   })
   .superRefine((s, ctx) => {
     const rangesPerWeek = s.suitableTimeRanges.reduce<typeof s.suitableTimeRanges>((acc, tr) => {
-      if (acc.find((x) => x.dayOfTheWeek === tr.dayOfTheWeek)) {
+      if (acc.some((x) => x.dayOfTheWeek === tr.dayOfTheWeek)) {
         return acc;
       }
       return [...acc, tr];

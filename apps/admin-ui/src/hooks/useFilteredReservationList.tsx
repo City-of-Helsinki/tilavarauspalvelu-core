@@ -110,7 +110,7 @@ export function useFilteredReservationList({
     };
 
     return items.map((x) =>
-      reservations.find((y) => {
+      reservations.some((y) => {
         if (existingReservationSeriesPk != null && y.reservationSeriesPk === existingReservationSeriesPk) {
           return false;
         }

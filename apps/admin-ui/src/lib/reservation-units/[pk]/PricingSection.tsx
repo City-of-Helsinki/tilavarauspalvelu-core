@@ -286,7 +286,7 @@ export function PricingSection({
   const { errors } = formState;
 
   const pricings = watch("pricings");
-  const isPaid = pricings.filter((p) => p.isPaid).length > 0;
+  const isPaid = pricings.some((p) => p.isPaid);
   const hasErrors = errors.pricings != null;
 
   return (
