@@ -59,16 +59,16 @@ import { gql } from "@apollo/client";
 import StatusLabel from "common/src/components/StatusLabel";
 import IconButton from "common/src/components/IconButton";
 import {
-  ApplicationFields,
-  GeneralFields,
   Instructions,
   LabelValuePair,
   NotModifiableReason,
-  PaymentNotification,
   ReservationInfoCard,
   ReservationOrderStatus,
   ReservationStatus,
   TermsInfoSection,
+  SummaryGeneralFields,
+  SummaryReserveeFields,
+  PaymentNotification,
 } from "@/components/reservation";
 import { useSearchParams } from "next/navigation";
 import { queryOptions } from "@/modules/queryOptions";
@@ -384,8 +384,8 @@ function Reservation({
             />
           )}
           <Instructions reservation={reservation} />
-          <GeneralFields supportedFields={supportedFields} reservation={reservation} options={options} />
-          <ApplicationFields reservation={reservation} options={options} supportedFields={supportedFields} />
+          <SummaryGeneralFields reservation={reservation} options={options} />
+          <SummaryReserveeFields reservation={reservation} options={options} supportedFields={supportedFields} />
           {shouldShowAccessCode && <AccessCodeInfo pindoraInfo={pindoraInfo} feedbackUrl={feedbackUrl} />}
           <TermsInfoSection reservation={reservation} termsOfUse={termsOfUse} />
           <AddressSection
@@ -540,7 +540,7 @@ export const RESERVATION_PAGE_QUERY = gql`
     reservation(id: $id) {
       id
       type
-      ...ReservationMetaFields
+      ...ReservationFormFields
       ...ReservationInfoCard
       ...Instructions
       ...CanReservationBeChanged

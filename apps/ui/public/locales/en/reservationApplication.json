@@ -31,30 +31,14 @@
       "reserveeOrganisationName": "Official name",
       "reserveeIdentifier": "Business ID",
       "reserveeIsUnregisteredAssociation": "The community is not registered",
-      "municipality": "Domicile",
-      "showBillingAddress": "Invoicing address",
-      "billingFirstName": "Booker’s first name",
-      "billingLastName": "Booker’s last name",
-      "billingPhone": "Telephone",
-      "billingEmail": "E-mail address",
-      "billingAddressStreet": "Street address",
-      "billingAddressZip": "Postal code",
-      "billingAddressCity": "City"
+      "municipality": "Domicile"
     },
     "individual": {
       "reserveeFirstName": "First name",
       "reserveeLastName": "Last name",
       "reserveeEmail": "E-mail address",
       "reserveePhone": "Telephone",
-      "municipality": "Domicile",
-      "showBillingAddress": "Invoicing address",
-      "billingFirstName": "Booker’s first name",
-      "billingLastName": "Booker’s last name",
-      "billingPhone": "Telephone",
-      "billingEmail": "E-mail address",
-      "billingAddressStreet": "Street address",
-      "billingAddressZip": "Postal code",
-      "billingAddressCity": "City"
+      "municipality": "Domicile"
     },
     "company": {
       "reserveeFirstName": "Contact person’s first name",
@@ -63,15 +47,7 @@
       "reserveePhone": "Contact person’s telephone number",
       "reserveeOrganisationName": "Official name",
       "reserveeIdentifier": "Business ID",
-      "municipality": "Domicile",
-      "showBillingAddress": "Invoicing address",
-      "billingFirstName": "Booker’s first name",
-      "billingLastName": "Booker’s last name",
-      "billingPhone": "Telephone",
-      "billingEmail": "E-mail address",
-      "billingAddressStreet": "Street address",
-      "billingAddressZip": "Postal code",
-      "billingAddressCity": "City"
+      "municipality": "Domicile"
     },
     "headings": {
       "companyInfo": "Company information",
@@ -81,8 +57,5 @@
     "subHeadings": {
       "subvention": "Apply for a reduced price"
     }
-  },
-  "processLabels": {
-    "handlingRequired": "Booking is being processed"
   }
 }

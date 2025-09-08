@@ -40,7 +40,6 @@ import { PinkBox as PinkBoxBase } from "@/components/reservation/styles";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ReservationPageWrapper, ReservationStepper, ReservationTitleSection } from "@/styled/reservation";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
-import { getGeneralFields } from "common/src/hooks/useApplicationFields";
 import { useSearchParams } from "next/navigation";
 
 const StyledReservationInfoCard = styled(ReservationInfoCard)`
@@ -110,7 +109,6 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     purpose: reservation.purpose?.pk ?? undefined,
     numPersons: reservation.numPersons ?? undefined,
     ageGroup: reservation.ageGroup?.pk ?? undefined,
-    showBillingAddress: false,
     reserveeIsUnregisteredAssociation: false,
   };
   // TODO is defaultValues correct? it's prefilled from the profile data and we are not refetching at any point.
@@ -189,16 +187,10 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     }
   };
 
-  const generalFields = getGeneralFields({ supportedFields, reservation });
-  const shouldDisplayReservationUnitPrice = useMemo(() => {
-    switch (step) {
-      case 0:
-        return reservationUnit?.canApplyFreeOfCharge && generalFields?.includes("applyingForFreeOfCharge");
-      case 1:
-      default:
-        return reservationUnit?.canApplyFreeOfCharge && reservation?.applyingForFreeOfCharge === true;
-    }
-  }, [step, generalFields, reservation, reservationUnit]);
+  const shouldDisplayReservationUnitPrice =
+    step === 0
+      ? reservationUnit.canApplyFreeOfCharge
+      : reservationUnit.canApplyFreeOfCharge && reservation.applyingForFreeOfCharge === true;
 
   const lang = convertLanguageCode(i18n.language);
   const notesWhenReserving = getTranslationSafe(reservationUnit, "notesWhenApplying", lang);
@@ -366,7 +358,7 @@ export const RESERVATION_IN_PROGRESS_QUERY = gql`
       id
       pk
       name
-      ...ReservationMetaFields
+      ...ReservationFormFields
       ...ReservationInfoCard
       bufferTimeBefore
       bufferTimeAfter

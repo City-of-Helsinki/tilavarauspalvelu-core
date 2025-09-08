@@ -31,30 +31,14 @@
       "reserveeOrganisationName": "Virallinen nimi",
       "reserveeIdentifier": "Y-tunnus",
       "reserveeIsUnregisteredAssociation": "Yhteisöä ei ole rekisteröity",
-      "municipality": "Kotipaikka",
-      "showBillingAddress": "Erillinen laskutusosoite",
-      "billingFirstName": "Varaajan etunimi",
-      "billingLastName": "Varaajan sukunimi",
-      "billingPhone": "Puhelinnumero",
-      "billingEmail": "Sähköpostiosoite",
-      "billingAddressStreet": "Katuosoite",
-      "billingAddressZip": "Postinumero",
-      "billingAddressCity": "Postitoimipaikka"
+      "municipality": "Kotipaikka"
     },
     "individual": {
       "reserveeFirstName": "Etunimi",
       "reserveeLastName": "Sukunimi",
       "reserveeEmail": "Sähköpostiosoite",
       "reserveePhone": "Puhelinnumero",
-      "municipality": "Kotipaikka",
-      "showBillingAddress": "Erillinen laskutusosoite",
-      "billingFirstName": "Varaajan etunimi",
-      "billingLastName": "Varaajan sukunimi",
-      "billingPhone": "Puhelinnumero",
-      "billingEmail": "Sähköpostiosoite",
-      "billingAddressStreet": "Katuosoite",
-      "billingAddressZip": "Postinumero",
-      "billingAddressCity": "Postitoimipaikka"
+      "municipality": "Kotipaikka"
     },
     "company": {
       "reserveeFirstName": "Yhteyshenkilön etunimi",
@@ -63,15 +47,7 @@
       "reserveePhone": "Yhteyshenkilön puhelinnumero",
       "reserveeOrganisationName": "Virallinen nimi",
       "reserveeIdentifier": "Y-tunnus",
-      "municipality": "Kotipaikka",
-      "showBillingAddress": "Erillinen laskutusosoite",
-      "billingFirstName": "Varaajan etunimi",
-      "billingLastName": "Varaajan sukunimi",
-      "billingPhone": "Puhelinnumero",
-      "billingEmail": "Sähköpostiosoite",
-      "billingAddressStreet": "Katuosoite",
-      "billingAddressZip": "Postinumero",
-      "billingAddressCity": "Postitoimipaikka"
+      "municipality": "Kotipaikka"
     },
     "headings": {
       "companyInfo": "Yrityksen tiedot",
@@ -81,8 +57,5 @@
     "subHeadings": {
       "subvention": "Hinnan alennuksen hakeminen"
     }
-  },
-  "processLabels": {
-    "handlingRequired": "Varaus käsittelyssä"
   }
 }

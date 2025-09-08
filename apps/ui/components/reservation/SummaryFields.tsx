@@ -1,18 +1,16 @@
-import styled from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
 import { type ReservationNode, ReserveeType } from "@/gql/gql-types";
 import { containsField, type FieldName } from "common/src/modules/metaFieldsHelpers";
 import { AutoGrid, H4 } from "common/src/styled";
-import { type ReservationMetaFieldsFragment } from "common/gql/gql-types";
 import { ParagraphAlt, PreviewLabel, PreviewValue } from "./styles";
 import { LabelValuePair } from "./LabelValuePair";
-import { extendMetaFieldOptions } from "common/src/reservation-form/MetaFields";
 import { type OptionsRecord } from "common";
-import { getApplicationFields, getGeneralFields } from "common/src/hooks/useApplicationFields";
-
-const Container = styled(AutoGrid)`
-  margin-bottom: var(--spacing-2-xl);
-`;
+import {
+  extendMetaFieldOptions,
+  getReservationFormGeneralFields,
+  getReservationFormReserveeFields,
+} from "common/src/reservation-form/util";
+import { type ReservationFormFieldsFragment } from "common/gql/gql-types";
 
 function isNotEmpty(
   key: keyof ReservationNode,
@@ -25,12 +23,12 @@ function isNotEmpty(
 
 /// Component to show the application fields in the reservation confirmation
 /// This requires the reservation to be finalized (reserveeType is set)
-export function ApplicationFields({
+export function SummaryReserveeFields({
   reservation,
   options,
   supportedFields,
 }: {
-  reservation: ReservationMetaFieldsFragment;
+  reservation: ReservationFormFieldsFragment;
   options: Omit<OptionsRecord, "municipality">;
   supportedFields: FieldName[];
 }): JSX.Element {
@@ -46,58 +44,51 @@ export function ApplicationFields({
     ? (reservation.reserveeType ?? ReserveeType.Individual)
     : ReserveeType.Individual;
 
-  const filteredApplicationFields = getApplicationFields({
-    supportedFields,
-    reservation,
-    reserveeType,
-  })
-    .filter((key): key is keyof ReservationNode => key !== "reserveeIsUnregisteredAssociation")
-    .filter((key) => isNotEmpty(key, reservation));
+  const reserveeFields = getReservationFormReserveeFields({ reserveeType });
+  const filteredReserveeFields = reserveeFields.filter((key) => isNotEmpty(key, reservation));
 
-  const hasReserveeType = filteredApplicationFields.find((x) => x === "reserveeType") != null;
+  const hasReserveeType = includesReserveeType && reservation.reserveeType != null;
 
   return (
     <>
       <H4 as="h2">{t("reservationCalendar:reserverInfo")}</H4>
-      <Container>
-        <>
-          {hasReserveeType && (
-            <ParagraphAlt $isWide>
-              <PreviewLabel>{t("reservationApplication:reserveeTypePrefix")}</PreviewLabel>
-              <PreviewValue data-testid="reservation__reserveeType">
-                {t(`reservationApplication:reserveeTypes.labels.${reserveeType}`)}
-              </PreviewValue>
-            </ParagraphAlt>
-          )}
-          {filteredApplicationFields.map((key) => {
-            const value = convertMaybeOptionValue(key, reservation, extendMetaFieldOptions(options, t), t);
-            const typeNamespace = reserveeType?.toLocaleLowerCase() || "individual";
-            const labelKey = `reservationApplication:label.${typeNamespace}.${key}`;
-            const label = t(labelKey);
-            const testId = `reservation__${key}`;
-            return <LabelValuePair key={key} label={label} value={value} testId={testId} />;
-          })}
-        </>
-      </Container>
+      <AutoGrid>
+        {hasReserveeType && (
+          <ParagraphAlt $isWide>
+            <PreviewLabel>{t("reservationApplication:reserveeTypePrefix")}</PreviewLabel>
+            <PreviewValue data-testid="reservation__reserveeType">
+              {t(`reservationApplication:reserveeTypes.labels.${reserveeType}`)}
+            </PreviewValue>
+          </ParagraphAlt>
+        )}
+        {filteredReserveeFields.map((key) => {
+          const value = convertMaybeOptionValue(key, reservation, extendMetaFieldOptions(options, t), t);
+          const typeNamespace = reserveeType?.toLocaleLowerCase() || "individual";
+          const labelKey = `reservationApplication:label.${typeNamespace}.${key}`;
+          const label = t(labelKey);
+          const testId = `reservation__${key}`;
+          return <LabelValuePair key={key} label={label} value={value} testId={testId} />;
+        })}
+      </AutoGrid>
     </>
   );
 }
 
-export function GeneralFields({
-  supportedFields,
+const WIDE_FIELDS = ["name", "description", "freeOfChargeReason"];
+
+export function SummaryGeneralFields({
   reservation,
   options,
 }: {
-  supportedFields: FieldName[];
+  reservation: ReservationFormFieldsFragment;
   options: Omit<OptionsRecord, "municipality">;
-  reservation: ReservationMetaFieldsFragment;
 }): JSX.Element | null {
   const { t } = useTranslation();
 
-  const filteredGeneralFields = getGeneralFields({
-    supportedFields,
-    reservation,
-  }).filter((key) => isNotEmpty(key, reservation));
+  const generalFields = getReservationFormGeneralFields();
+  const filteredGeneralFields = generalFields
+    .filter((key) => isNotEmpty(key, reservation))
+    .filter((key) => key !== "reserveeType");
 
   if (filteredGeneralFields.length === 0) {
     return null;
@@ -106,17 +97,15 @@ export function GeneralFields({
   return (
     <>
       <H4 as="h2">{t("reservationCalendar:reservationInfo")}</H4>
-      <Container>
-        <>
-          {filteredGeneralFields.map((key) => {
-            const value = convertMaybeOptionValue(key, reservation, extendMetaFieldOptions(options, t), t);
-            const isWide = ["name", "description", "freeOfChargeReason"].find((x) => x === key) != null;
-            const label = t(`reservationApplication:label.common.${key}`);
-            const testId = `reservation__${key}`;
-            return <LabelValuePair key={key} label={label} value={value} testId={testId} isWide={isWide} />;
-          })}
-        </>
-      </Container>
+      <AutoGrid>
+        {filteredGeneralFields.map((key) => {
+          const value = convertMaybeOptionValue(key, reservation, extendMetaFieldOptions(options, t), t);
+          const isWide = WIDE_FIELDS.find((x) => x === key) != null;
+          const label = t(`reservationApplication:label.common.${key}`);
+          const testId = `reservation__${key}`;
+          return <LabelValuePair key={key} label={label} value={value} testId={testId} isWide={isWide} />;
+        })}
+      </AutoGrid>
     </>
   );
 }
@@ -124,9 +113,9 @@ export function GeneralFields({
 /// Type safe conversion from key value maps for the metadata fields
 /// TODO this is pretty awful (dynamic type checking) but requires refactoring metafields more
 function convertMaybeOptionValue(
-  key: keyof ReservationNode,
+  key: keyof ReservationFormFieldsFragment,
   // TODO use proper fieldNames (string literals or enums), the Record is a hack around required fields
-  reservation: Record<string, unknown>,
+  reservation: ReservationFormFieldsFragment,
   options: OptionsRecord,
   t: TFunction
 ): string {
