@@ -64,11 +64,7 @@ export function createApplicationMutationMocks(): CreateGraphQLMocksReturn {
   ];
 }
 
-function createMockReservationUnits({
-  nReservationUnits = 1,
-}: {
-  nReservationUnits?: number;
-}): Array<ReservationUnitNode> {
+function createMockReservationUnits({ nReservationUnits = 1 }: { nReservationUnits?: number }): ReservationUnitNode[] {
   return Array.from({ length: nReservationUnits }, (_, i) => createMockReservationUnit({ pk: i + 1 }));
 }
 
