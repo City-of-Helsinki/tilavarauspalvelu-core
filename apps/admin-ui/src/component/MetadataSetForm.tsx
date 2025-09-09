@@ -8,9 +8,8 @@ import {
 import { ReserveeType, type MetadataSetsFragment } from "@gql/gql-types";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { type OptionsRecord } from "common";
-import { filterNonNullable } from "common/src/helpers";
 import { getReservationFormFields } from "common/src/reservation-form/util";
-import { containsField } from "common/src/metaFieldsHelpers";
+import { formContainsField } from "common/src/metaFieldsHelpers";
 
 type Props = {
   reservationUnit: MetadataSetsFragment;
@@ -23,9 +22,9 @@ export function ReservationMetadataSetForm({ reservationUnit }: Props): JSX.Elem
     reservationPurposes,
   };
 
-  const fields = filterNonNullable(reservationUnit.metadataSet?.supportedFields);
+  const formType = reservationUnit.reservationForm;
   const generalFields = getReservationFormFields({
-    supportedFields: fields,
+    formType,
     reserveeType: "common",
   }).filter((n) => n !== "reserveeType");
 
@@ -48,12 +47,13 @@ export function ReserverMetadataSetForm({ reservationUnit }: Props): JSX.Element
     reservationPurposes,
   };
 
-  const fields = filterNonNullable(reservationUnit.metadataSet?.supportedFields);
+  const formType = reservationUnit.reservationForm;
 
   const reserveeType = watch("reserveeType");
-  const type = reserveeType != null && containsField(fields, "reserveeType") ? reserveeType : ReserveeType.Individual;
+  const type =
+    reserveeType != null && formContainsField(formType, "reserveeType") ? reserveeType : ReserveeType.Individual;
   const reserverFields = getReservationFormFields({
-    supportedFields: fields,
+    formType,
     reserveeType: type,
   });
 

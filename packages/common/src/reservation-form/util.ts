@@ -1,20 +1,16 @@
 import {
-  type ReservationMetadataFieldNode,
   ReserveeType,
   MunicipalityChoice,
   type ReservationFormFieldsFragment,
+  ReservationFormType,
 } from "../../gql/gql-types";
-import { containsField } from "../metaFieldsHelpers";
+import { formContainsField } from "../metaFieldsHelpers";
 import { type TFunction } from "next-i18next";
 import { type OptionsRecord } from "../../types/common";
-import { type FieldName } from "../metaFieldsHelpers";
 
 const COMMON_RESERVEE_FIELDS = [
   "reserveeFirstName",
   "reserveeLastName",
-  "reserveeAddressStreet",
-  "reserveeAddressZip",
-  "reserveeAddressCity",
   "reserveeEmail",
   "reserveePhone",
   "municipality",
@@ -65,17 +61,14 @@ export function getReservationFormGeneralFields() {
 }
 
 export function getReservationFormFields({
-  supportedFields,
+  formType,
   reserveeType,
 }: {
-  supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
+  formType: ReservationFormType;
   reserveeType: ReserveeType | "common";
 }): string[] {
-  if (supportedFields.length === 0) {
-    return [];
-  }
   const type = convertTypeToKey(reserveeType);
-  return RESERVATION_FIELDS[type].filter((field) => containsField(supportedFields, field));
+  return RESERVATION_FIELDS[type].filter((field) => formContainsField(formType, field));
 }
 
 export function removeRefParam<Type>(params: Type & { ref: unknown }): Omit<Type, "ref"> {
@@ -125,16 +118,16 @@ export function getReservationFormReserveeFields({ reserveeType }: { reserveeTyp
 /// filters based on supportedFields so it's safe to use for form construction
 /// TODO clean (if possible) so that we can just chain the base and a filter
 export function getFilteredReserveeFields({
-  supportedFields,
+  formType,
   reservation,
   reserveeType,
 }: {
-  supportedFields: FieldName[];
+  formType: ReservationFormType;
   reservation: ReservationFormFieldsFragment;
   reserveeType: ReserveeType;
 }): ExtendedFormField[] {
   const applicationFields = getReservationFormFields({
-    supportedFields,
+    formType,
     reserveeType,
   });
 
@@ -144,14 +137,14 @@ export function getFilteredReserveeFields({
 
 /// Helper function to type safely pick the general fields from the reservation
 export function getFilteredGeneralFields({
-  supportedFields,
+  formType,
   reservation,
 }: {
-  supportedFields: FieldName[];
+  formType: ReservationFormType;
   reservation: ReservationFormFieldsFragment;
 }): Array<keyof ReservationFormFieldsFragment> {
   const generalFields = getReservationFormFields({
-    supportedFields,
+    formType,
     reserveeType: "common",
   }).filter((n) => n !== "reserveeType");
 

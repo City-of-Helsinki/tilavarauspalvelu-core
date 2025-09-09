@@ -20,7 +20,14 @@ function ReservationFormImpl(): React.ReactElement {
 
 export const RESERVATION_META_FIELDS_FRAGMENT = gql`
   fragment ReservationFormFields on ReservationNode {
-    ...ReserveeBillingFields
+    id
+    reserveeFirstName
+    reserveeLastName
+    reserveeEmail
+    reserveePhone
+    reserveeType
+    reserveeOrganisationName
+    reserveeIdentifier
     ageGroup {
       id
       pk
@@ -40,5 +47,8 @@ export const RESERVATION_META_FIELDS_FRAGMENT = gql`
     description
     freeOfChargeReason
     applyingForFreeOfCharge
+    reservationUnit {
+      reservationForm
+    }
   }
 `;

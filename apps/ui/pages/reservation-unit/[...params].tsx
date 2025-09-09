@@ -31,7 +31,7 @@ import { Step0 } from "@/components/reservation/Step0";
 import { Step1 } from "@/components/reservation/Step1";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
-import { createNodeId, filterNonNullable, getNode, toNumber } from "common/src/helpers";
+import { createNodeId, getNode, toNumber } from "common/src/helpers";
 import { queryOptions } from "@/modules/queryOptions";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
@@ -106,9 +106,6 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     reserveeLastName: reservation.reserveeLastName ?? "",
     reserveePhone: reservation.reserveePhone ?? "",
     reserveeEmail: reservation.reserveeEmail ?? "",
-    reserveeAddressStreet: reservation.reserveeAddressStreet ?? "",
-    reserveeAddressCity: reservation.reserveeAddressCity ?? "",
-    reserveeAddressZip: reservation.reserveeAddressZip ?? "",
     reserveeIdentifier: reservation.reserveeIdentifier ?? "",
     reserveeOrganisationName: reservation.reserveeOrganisationName ?? "",
     municipality: reservation.municipality ?? undefined,
@@ -181,9 +178,6 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   const pageTitle =
     step === 0 ? t("reservationCalendar:heading.newReservation") : t("reservationCalendar:heading.pendingReservation");
 
-  // TODO all this is copy pasta from EditStep1
-  const supportedFields = filterNonNullable(reservationUnit?.metadataSet?.supportedFields);
-
   // NOTE: only navigate away from the page if the reservation is cancelled the confirmation hook handles delete
   const cancelReservation = useCallback(() => {
     router.push(getReservationUnitPath(reservationUnit?.pk));
@@ -245,14 +239,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
         {step === 0 && (
           <Step0 reservation={reservation} cancelReservation={cancelReservation} options={props.options} />
         )}
-        {step === 1 && (
-          <Step1
-            reservation={reservation}
-            supportedFields={supportedFields}
-            options={props.options}
-            requiresPayment={steps.length > 2}
-          />
-        )}
+        {step === 1 && <Step1 reservation={reservation} options={props.options} requiresPayment={steps.length > 2} />}
       </ReservationPageWrapper>
     </FormProvider>
   );
@@ -372,6 +359,7 @@ export const RESERVATION_IN_PROGRESS_FRAGMENT = gql`
     reservationUnit {
       id
       canApplyFreeOfCharge
+      reservationForm
       ...CancellationRuleFields
       ...MetadataSets
       ...TermsOfUse

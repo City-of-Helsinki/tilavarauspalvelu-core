@@ -1,27 +1,44 @@
-import { camelCase } from "lodash-es";
-import type { ReservationMetadataFieldNode } from "../gql/gql-types";
+import { type ReservationFormFieldsFragment, ReservationFormType } from "../gql/gql-types";
 
-export type FieldName = Pick<ReservationMetadataFieldNode, "fieldName">;
-/// Transitional helper when moving from string fields
-/// backend field names are in snake_case so we convert them to camelCase
-/// TODO should be enums or string literals instead of arbitary strings
-export function containsField(formFields: FieldName[], fieldName: string): boolean {
-  if (!formFields || formFields?.length === 0 || !fieldName) {
-    return false;
+export function getFormFields(type: ReservationFormType): ReadonlyArray<keyof ReservationFormFieldsFragment> {
+  const base = ["reserveeFirstName", "reserveeLastName", "reserveeEmail", "reserveePhone"] as const;
+  const info = [
+    ...base,
+    "numPersons", // optional (but required in purposeForm?)
+    "description",
+    "reserveeType",
+    "reserveeOrganisationName",
+    "reserveeIdentifier",
+  ] as const;
+
+  const purposeForm = [
+    ...info,
+    "name", // name is optional currently
+    "municipality",
+    "purpose",
+  ] as const;
+
+  /* free of charge is moved to reservationUnit toggle only */
+
+  switch (type) {
+    /** Contact information only */
+    case ReservationFormType.ContactInfoForm:
+      return base;
+    /** Contact information and event description */
+    case ReservationFormType.ReserveeInfoForm:
+      return info;
+    /** Purpose of use : Lomake 3 */
+    case ReservationFormType.PurposeForm:
+    case ReservationFormType.PurposeSubventionForm:
+      return purposeForm;
+    /** Age group : Lomake 4 */
+    case ReservationFormType.AgeGroupForm:
+    case ReservationFormType.AgeGroupSubventionForm:
+      return [...purposeForm, "ageGroup"] as const;
   }
-  const found = formFields
-    .map((x) => x.fieldName)
-    .map(camelCase)
-    .find((x) => x === fieldName);
-  return found != null;
 }
 
-/// backend fields are in snake_case, containsField handles the conversion
-export function containsNameField(formFields: FieldName[]): boolean {
-  return containsField(formFields, "reserveeFirstName") || containsField(formFields, "reserveeLastName");
-}
-
-export function containsBillingField(formFields: FieldName[]): boolean {
-  const formFieldsNames = formFields.map((x) => x.fieldName).map(camelCase);
-  return formFieldsNames.some((x) => x.startsWith("billing"));
+export function formContainsField(type: ReservationFormType, fieldName: keyof ReservationFormFieldsFragment): boolean {
+  const fields = getFormFields(type);
+  return fields.find((k) => k === fieldName) != null;
 }
