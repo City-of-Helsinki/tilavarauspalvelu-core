@@ -87,8 +87,7 @@ export function ReservationFormField({
   const lowerCaseTranslationKey = translationKey?.toLocaleLowerCase() || "individual";
 
   const isWideRow = useMemo(
-    (): boolean =>
-      ["name", "description", "reserveeAddressStreet", "applyingForFreeOfCharge", "purpose"].includes(field),
+    (): boolean => ["name", "description", "applyingForFreeOfCharge", "purpose"].includes(field),
     [field]
   );
 
