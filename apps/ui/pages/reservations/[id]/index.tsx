@@ -59,8 +59,8 @@ import {
   ReservationInfoCard,
   ReservationOrderStatus,
   TermsInfoSection,
-  GeneralFields,
-  ApplicationFields,
+  SummaryGeneralFields,
+  SummaryReserveeFields,
   PaymentNotification,
 } from "@/components/reservation";
 import { useSearchParams } from "next/navigation";
@@ -373,8 +373,8 @@ function Reservation({
             <PaymentNotification reservation={reservation} apiBaseUrl={apiBaseUrl} />
           )}
           <Instructions reservation={reservation} />
-          <GeneralFields supportedFields={supportedFields} reservation={reservation} options={options} />
-          <ApplicationFields reservation={reservation} options={options} supportedFields={supportedFields} />
+          <SummaryGeneralFields reservation={reservation} options={options} />
+          <SummaryReserveeFields reservation={reservation} options={options} supportedFields={supportedFields} />
           {shouldShowAccessCode && pindoraInfo != null && (
             <AccessCodeInfo pindoraInfo={pindoraInfo} feedbackUrl={feedbackUrl} />
           )}
