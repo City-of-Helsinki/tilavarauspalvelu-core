@@ -4,7 +4,6 @@ import { breakpoints } from "common/src/modules/const";
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { filterNonNullable } from "common/src/modules/helpers";
 import { errorToast } from "common/src/components/toast";
 import { SummaryGeneralFields, SummaryReserveeFields } from "./SummaryFields";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
@@ -96,8 +95,6 @@ export function EditStep1({ reservation, options, onBack, form }: Props): JSX.El
     setIsTermsAccepted({ ...isTermsAccepted, [key]: val });
   };
 
-  const supportedFields = filterNonNullable(reservationUnit?.metadataSet?.supportedFields);
-
   const {
     handleSubmit,
     watch,
@@ -154,7 +151,7 @@ export function EditStep1({ reservation, options, onBack, form }: Props): JSX.El
       <StyledReservationInfoCard reservation={modifiedReservation} bgColor="gold" />
       <StyledForm onSubmit={handleSubmit(onSubmit)}>
         <SummaryGeneralFields reservation={reservation} options={options} />
-        <SummaryReserveeFields supportedFields={supportedFields} reservation={reservation} options={options} />
+        <SummaryReserveeFields reservation={reservation} options={options} />
         <AcceptTerms
           reservationUnit={reservationUnit}
           isTermsAccepted={isTermsAccepted}

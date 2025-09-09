@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
-import { type ReservationQuery } from "@gql/gql-types";
-import { ReservationStateChoice, useConfirmReservationMutation } from "@gql/gql-types";
 import { Button, ButtonVariant, IconArrowLeft, LoadingSpinner } from "hds-react";
+import { type ReservationQuery, ReservationStateChoice, useConfirmReservationMutation } from "@gql/gql-types";
 import { useForm } from "react-hook-form";
 import { type OptionsRecord } from "common";
-import { type FieldName } from "common/src/modules/metaFieldsHelpers";
 import { ActionContainer } from "./styles";
 import { SummaryGeneralFields, SummaryReserveeFields } from "./SummaryFields";
 import { AcceptTerms } from "./AcceptTerms";
@@ -20,12 +18,11 @@ import { gql } from "@apollo/client";
 type NodeT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
   reservation: NodeT;
-  supportedFields: FieldName[];
   options: Omit<OptionsRecord, "municipality">;
   requiresPayment: boolean;
 };
 
-export function Step1({ reservation, supportedFields, options, requiresPayment }: Props): JSX.Element {
+export function Step1({ reservation, options, requiresPayment }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
   // empty react-hook-form on purpose (still using old useState for data)
   const {
@@ -94,7 +91,7 @@ export function Step1({ reservation, supportedFields, options, requiresPayment }
   return (
     <NewReservationForm onSubmit={handleSubmit(onSubmit)} noValidate>
       <SummaryGeneralFields reservation={reservation} options={options} />
-      <SummaryReserveeFields reservation={reservation} options={options} supportedFields={supportedFields} />
+      <SummaryReserveeFields reservation={reservation} options={options} />
       <AcceptTerms
         reservationUnit={reservation.reservationUnit}
         isTermsAccepted={isTermsAccepted}

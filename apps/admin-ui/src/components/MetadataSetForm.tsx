@@ -1,15 +1,10 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import type { ReservationFormT } from "common/src/reservation-form/types";
-import {
-  ReservationFormFieldsDetailsSection,
-  ReservationFormFieldsReserveeSection,
-} from "common/src/reservation-form/MetaFields";
+import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "common/src/reservation-form/MetaFields";
 import { ReserveeType, type MetadataSetsFragment } from "@gql/gql-types";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
-import { filterNonNullable } from "common/src/modules/helpers";
-import { containsField } from "common/src/modules/metaFieldsHelpers";
-import { getReservationFormFields } from "common/src/reservation-form/util";
+import { formContainsField, getReservationFormFields } from "common/src/reservation-form/util";
 
 type Props = {
   reservationUnit: MetadataSetsFragment;
@@ -22,20 +17,12 @@ export function ReservationMetadataSetForm({ reservationUnit }: Props): JSX.Elem
     purpose: reservationPurposes,
   };
 
-  const fields = filterNonNullable(reservationUnit.metadataSet?.supportedFields);
-  const generalFields = getReservationFormFields({
-    supportedFields: fields,
+  const fields = getReservationFormFields({
+    formType: reservationUnit.reservationForm,
     reserveeType: "common",
   }).filter((n) => n !== "reserveeType");
 
-  return (
-    <ReservationFormFieldsDetailsSection
-      fields={generalFields}
-      reservationUnit={reservationUnit}
-      options={options}
-      noHeadingMarginal
-    />
-  );
+  return <ReservationFormGeneralSection fields={fields} reservationUnit={reservationUnit} options={options} />;
 }
 
 // TODO this component can be wholly deprecated maybe? translations / options?
@@ -47,16 +34,15 @@ export function ReserverMetadataSetForm({ reservationUnit }: Props): JSX.Element
     purpose: reservationPurposes,
   };
 
-  const fields = filterNonNullable(reservationUnit.metadataSet?.supportedFields);
+  const formType = reservationUnit.reservationForm;
 
   const reserveeType = watch("reserveeType");
-  const type = reserveeType != null && containsField(fields, "reserveeType") ? reserveeType : ReserveeType.Individual;
-  const reserverFields = getReservationFormFields({
-    supportedFields: fields,
+  const type =
+    reserveeType != null && formContainsField(formType, "reserveeType") ? reserveeType : ReserveeType.Individual;
+  const fields = getReservationFormFields({
+    formType,
     reserveeType: type,
   });
 
-  return (
-    <ReservationFormFieldsReserveeSection fields={reserverFields} reservationUnit={reservationUnit} options={options} />
-  );
+  return <ReservationFormReserveeSection fields={fields} reservationUnit={reservationUnit} options={options} />;
 }

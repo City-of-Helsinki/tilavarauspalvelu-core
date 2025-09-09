@@ -13,10 +13,9 @@ import {
   type ReservationQuery,
   type ReservationQueryVariables,
   ReservationStateChoice,
-  ReserveeType,
   useDeleteReservationMutation,
 } from "@gql/gql-types";
-import { type InputsT } from "common/src/reservation-form/types";
+import { type ReservationFormT } from "common/src/reservation-form/types";
 import { createApolloClient } from "@/modules/apolloClient";
 import { default as NextError } from "next/error";
 import {
@@ -32,7 +31,7 @@ import { Step0 } from "@/components/reservation/Step0";
 import { Step1 } from "@/components/reservation/Step1";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
-import { createNodeId, filterNonNullable, toNumber } from "common/src/modules/helpers";
+import { createNodeId, toNumber } from "common/src/modules/helpers";
 import { queryOptions } from "@/modules/queryOptions";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { gql } from "@apollo/client";
@@ -91,7 +90,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
   // Get prefilled profile user fields from the reservation (backend fills them when created).
   // NOTE this is only updated on load (not after mutation or refetch)
-  const defaultValues: InputsT = {
+  const defaultValues: ReservationFormT = {
     // NOTE never undefined (this page is not accessible without reservation)
     pk: reservation.pk ?? 0,
     name: reservation.name ?? "",
@@ -114,7 +113,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   // TODO is defaultValues correct? it's prefilled from the profile data and we are not refetching at any point.
   // If we would refetch values would be more correct with reset hook.
   // Also if this is ever initialised without the data it will not prefill the form.
-  const form = useForm<InputsT>({ defaultValues, mode: "onChange" });
+  const form = useForm<ReservationFormT>({ defaultValues, mode: "onChange" });
 
   const requireHandling = reservationUnit.requireReservationHandling || reservation?.applyingForFreeOfCharge;
 
@@ -171,9 +170,6 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
   const pageTitle =
     step === 0 ? t("reservationCalendar:heading.newReservation") : t("reservationCalendar:heading.pendingReservation");
-
-  // TODO all this is copy pasta from EditStep1
-  const supportedFields = filterNonNullable(reservationUnit?.metadataSet?.supportedFields);
 
   // NOTE: only navigate away from the page if the reservation is cancelled the confirmation hook handles delete
   const cancelReservation = useCallback(() => {
@@ -237,14 +233,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
         {step === 0 && (
           <Step0 reservation={reservation} cancelReservation={cancelReservation} options={props.options} />
         )}
-        {step === 1 && (
-          <Step1
-            reservation={reservation}
-            supportedFields={supportedFields}
-            options={props.options}
-            requiresPayment={steps.length > 2}
-          />
-        )}
+        {step === 1 && <Step1 reservation={reservation} options={props.options} requiresPayment={steps.length > 2} />}
       </ReservationPageWrapper>
     </FormProvider>
   );
@@ -366,6 +355,7 @@ export const RESERVATION_IN_PROGRESS_QUERY = gql`
       reservationUnit {
         id
         canApplyFreeOfCharge
+        reservationForm
         ...CancellationRuleFields
         ...MetadataSets
         ...TermsOfUse

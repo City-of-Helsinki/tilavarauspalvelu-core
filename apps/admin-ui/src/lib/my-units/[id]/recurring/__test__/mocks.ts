@@ -21,6 +21,7 @@ import {
   type ReservationsByReservationUnitQueryVariables,
   ReservationsByReservationUnitDocument,
   type ReservationsByReservationUnitQuery,
+  ReservationFormType,
 } from "@gql/gql-types";
 import { createNodeId } from "common/src/modules/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/modules/const";
@@ -44,45 +45,6 @@ const emptyTerms = {
 // requires refactoring the mocks to use constructors instead of static values
 export const YEAR = 2024;
 
-const supportedFields = [
-  "reservee_type",
-  "reservee_first_name",
-  "reservee_last_name",
-  "reservee_organisation_name",
-  "reservee_phone",
-  "reservee_email",
-  "reservee_identifier",
-  "reservee_address_street",
-  "reservee_address_city",
-  "reservee_address_zip",
-  "billing_first_name",
-  "billing_last_name",
-  "billing_phone",
-  "billing_email",
-  "billing_address_street",
-  "billing_address_city",
-  "billing_address_zip",
-  "municipality",
-  "age_group",
-  "applying_for_free_of_charge",
-  "free_of_charge_reason",
-  "name",
-  "description",
-  "num_persons",
-  "purpose",
-];
-
-const requiredFields = [
-  "reservee_first_name",
-  "reservee_type",
-  "reservee_email",
-  "age_group",
-  "name",
-  "description",
-  "num_persons",
-  "purpose",
-];
-
 function createReservationUnitFragment({ pk, nameFi }: { pk: number; nameFi: string }): CreateStaffReservationFragment {
   return {
     authentication: AuthenticationType.Weak,
@@ -98,17 +60,7 @@ function createReservationUnitFragment({ pk, nameFi }: { pk: number; nameFi: str
     paymentTerms: emptyTerms,
     cancellationTerms: emptyTerms,
     serviceSpecificTerms: emptyTerms,
-    metadataSet: {
-      id: "1",
-      supportedFields: supportedFields.map((x) => ({
-        fieldName: x,
-        id: x,
-      })),
-      requiredFields: requiredFields.map((x) => ({
-        fieldName: x,
-        id: x,
-      })),
-    },
+    reservationForm: ReservationFormType.PurposeForm,
   };
 }
 
