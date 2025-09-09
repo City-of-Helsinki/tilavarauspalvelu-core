@@ -3,14 +3,13 @@ import {
   ReserveeType,
   MunicipalityChoice,
   type ReservationFormFieldsFragment,
-  type ReservationNode,
 } from "../../gql/gql-types";
 import { containsField } from "../metaFieldsHelpers";
 import { type TFunction } from "next-i18next";
 import { type OptionsRecord } from "../../types/common";
 import { type FieldName } from "../metaFieldsHelpers";
 
-const fieldsCommon = [
+const COMMON_RESERVEE_FIELDS = [
   "reserveeFirstName",
   "reserveeLastName",
   "reserveeAddressStreet",
@@ -19,20 +18,21 @@ const fieldsCommon = [
   "reserveeEmail",
   "reserveePhone",
   "municipality",
-  "billingFirstName",
-  "billingLastName",
-  "billingPhone",
-  "billingEmail",
-  "billingAddressStreet",
-  "billingAddressZip",
-  "billingAddressCity",
 ] as const;
 
-const reservationApplicationFields = {
-  individual: fieldsCommon,
-  nonprofit: ["reserveeOrganisationName", "municipality", "reserveeIdentifier", ...fieldsCommon],
-  company: ["reserveeOrganisationName", "municipality", "reserveeIdentifier", ...fieldsCommon],
-  common: [
+const ORGANISATION_FIELDS = [...COMMON_RESERVEE_FIELDS, "reserveeOrganisationName", "reserveeIdentifier"] as const;
+
+// reservation fields is always shown first
+// reserver is shown after it
+const RESERVATION_FIELDS = {
+  // reserver : Varaajan tiedot
+  // also known as applicationFields in the code
+  individual: COMMON_RESERVEE_FIELDS,
+  nonprofit: ORGANISATION_FIELDS,
+  company: ORGANISATION_FIELDS,
+  // reservation : Varauksen tiedot
+  // also known as generalFields in the code
+  general: [
     "reserveeType",
     "name",
     "purpose",
@@ -44,7 +44,7 @@ const reservationApplicationFields = {
   ] as const,
 } as const;
 
-function convertTypeToKey(t: ReserveeType | "common"): keyof typeof reservationApplicationFields {
+function convertTypeToKey(t: ReserveeType | "common"): keyof typeof RESERVATION_FIELDS {
   switch (t) {
     case ReserveeType.Company:
       return "company";
@@ -53,8 +53,15 @@ function convertTypeToKey(t: ReserveeType | "common"): keyof typeof reservationA
     case ReserveeType.Nonprofit:
       return "nonprofit";
     case "common":
-      return "common";
+      return "general";
   }
+}
+
+/// new non filtered version of the Varauksen tiedot section
+/// non filtered (no reservationType / supportedFields) so this is only applicable for Summaries
+/// for actual forms need to use either reservationType (new) or supportedFields (old)
+export function getReservationFormGeneralFields() {
+  return RESERVATION_FIELDS["general"];
 }
 
 export function getReservationApplicationFields({
@@ -68,10 +75,7 @@ export function getReservationApplicationFields({
     return [];
   }
   const type = convertTypeToKey(reserveeType);
-
-  const fields = reservationApplicationFields[type].filter((field) => containsField(supportedFields, field));
-
-  return fields;
+  return RESERVATION_FIELDS[type].filter((field) => containsField(supportedFields, field));
 }
 
 export function removeRefParam<Type>(params: Type & { ref: unknown }): Omit<Type, "ref"> {
@@ -92,9 +96,10 @@ export function extendMetaFieldOptions(options: Omit<OptionsRecord, "municipalit
   };
 }
 
-function extendApplicationFields(
-  fields: Array<keyof ReservationNode>
-): Array<keyof ReservationNode | "reserveeIsUnregisteredAssociation"> {
+// used to inject frontend only boolean toggle into the FormFields
+type ExtendedFormField = keyof ReservationFormFieldsFragment | "reserveeIsUnregisteredAssociation";
+
+function extendApplicationFields(fields: Array<keyof ReservationFormFieldsFragment>): ExtendedFormField[] {
   const key = "reserveeIdentifier" as const;
   const identifierIndex = fields.findIndex((k) => k === key);
   if (identifierIndex > 0) {
@@ -112,8 +117,14 @@ function extendApplicationFields(
   return fields;
 }
 
+export function getReservationFormReserveeFields({ reserveeType }: { reserveeType: ReserveeType }) {
+  return RESERVATION_FIELDS[convertTypeToKey(reserveeType)];
+}
+
 /// Helper function to type safely pick the application fields from the reservation
-export function getApplicationFields({
+/// filters based on supportedFields so it's safe to use for form construction
+/// TODO clean (if possible) so that we can just chain the base and a filter
+export function getFilteredReserveeFields({
   supportedFields,
   reservation,
   reserveeType,
@@ -121,28 +132,28 @@ export function getApplicationFields({
   supportedFields: FieldName[];
   reservation: ReservationFormFieldsFragment;
   reserveeType: ReserveeType;
-}) {
+}): ExtendedFormField[] {
   const applicationFields = getReservationApplicationFields({
     supportedFields,
     reserveeType,
   });
 
-  const baseFields = applicationFields.filter((key): key is keyof ReservationNode => key in reservation);
+  const baseFields = applicationFields.filter((key): key is keyof ReservationFormFieldsFragment => key in reservation);
   return extendApplicationFields(baseFields);
 }
 
 /// Helper function to type safely pick the general fields from the reservation
-export function getGeneralFields({
+export function getFilteredGeneralFields({
   supportedFields,
   reservation,
 }: {
   supportedFields: FieldName[];
   reservation: ReservationFormFieldsFragment;
-}) {
+}): Array<keyof ReservationFormFieldsFragment> {
   const generalFields = getReservationApplicationFields({
     supportedFields,
     reserveeType: "common",
   }).filter((n) => n !== "reserveeType");
 
-  return generalFields.filter((key): key is keyof ReservationNode => key in reservation);
+  return generalFields.filter((key): key is keyof ReservationFormFieldsFragment => key in reservation);
 }

@@ -18,7 +18,7 @@ import {
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { containsField, FieldName } from "common/src/metaFieldsHelpers";
-import { getApplicationFields, getGeneralFields } from "common/src/reservation-form/util";
+import { getFilteredGeneralFields, getFilteredReserveeFields } from "common/src/reservation-form/util";
 import { type InputsT } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
@@ -104,8 +104,8 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
   const includesHomeCity = containsField(supportedFields, "municipality");
   const includesReserveeType = containsField(supportedFields, "reserveeType");
 
-  const generalFields = getGeneralFields({ supportedFields, reservation });
-  const reservationApplicationFields = getApplicationFields({
+  const generalFields = getFilteredGeneralFields({ supportedFields, reservation });
+  const reservationApplicationFields = getFilteredReserveeFields({
     supportedFields,
     reservation,
     reserveeType: reserveeType ?? ReserveeType.Individual,
