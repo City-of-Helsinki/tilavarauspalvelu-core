@@ -18,7 +18,7 @@ import {
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { containsField, FieldName } from "common/src/metaFieldsHelpers";
-import { getApplicationFields, getGeneralFields } from "common/src/hooks/useApplicationFields";
+import { getApplicationFields, getGeneralFields } from "common/src/reservation-form/util";
 import { type InputsT } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
