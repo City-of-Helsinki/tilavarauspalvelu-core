@@ -26,9 +26,6 @@
     "nonprofit": {
       "reserveeFirstName": "Kontaktpersonens förnamn",
       "reserveeLastName": "Kontaktpersonens efternamn",
-      "reserveeAddressStreet": "Gatuadress",
-      "reserveeAddressZip": "Postnummer",
-      "reserveeAddressCity": "Postanstalt",
       "reserveeEmail": "Kontaktpersonens e-postadress",
       "reserveePhone": "Kontaktpersonens telefonnummer",
       "reserveeOrganisationName": "Officiellt namn",
@@ -47,9 +44,6 @@
     "individual": {
       "reserveeFirstName": "Förnamn",
       "reserveeLastName": "Efternamn",
-      "reserveeAddressStreet": "Gatuadress",
-      "reserveeAddressZip": "Postnummer",
-      "reserveeAddressCity": "Postanstalt",
       "reserveeEmail": "E-postadress",
       "reserveePhone": "Telefonnummer",
       "municipality": "Hemort",
@@ -65,9 +59,6 @@
     "company": {
       "reserveeFirstName": "Kontaktpersonens förnamn",
       "reserveeLastName": "Kontaktpersonens efternamn",
-      "reserveeAddressStreet": "Gatuadress",
-      "reserveeAddressZip": "Postnummer",
-      "reserveeAddressCity": "Postanstalt",
       "reserveeEmail": "Kontaktpersonens e-postadress",
       "reserveePhone": "Kontaktpersonens telefonnummer",
       "reserveeOrganisationName": "Officiellt namn",

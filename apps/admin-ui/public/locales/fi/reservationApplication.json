@@ -51,9 +51,6 @@
     "nonprofit": {
       "reserveeFirstName": "Yhteyshenkilön etunimi",
       "reserveeLastName": "Yhteyshenkilön sukunimi",
-      "reserveeAddressStreet": "Katuosoite",
-      "reserveeAddressZip": "Postinumero",
-      "reserveeAddressCity": "Postitoimipaikka",
       "reserveeEmail": "Yhteyshenkilön sähköpostiosoite",
       "reserveePhone": "Yhteyshenkilön puhelinnumero",
       "reserveeOrganisationName": "Virallinen nimi",
@@ -72,9 +69,6 @@
     "individual": {
       "reserveeFirstName": "Etunimi",
       "reserveeLastName": "Sukunimi",
-      "reserveeAddressStreet": "Katuosoite",
-      "reserveeAddressZip": "Postinumero",
-      "reserveeAddressCity": "Postitoimipaikka",
       "reserveeEmail": "Sähköpostiosoite",
       "reserveePhone": "Puhelinnumero",
       "municipality": "Kotipaikka",
@@ -90,9 +84,6 @@
     "company": {
       "reserveeFirstName": "Yhteyshenkilön etunimi",
       "reserveeLastName": "Yhteyshenkilön sukunimi",
-      "reserveeAddressStreet": "Katuosoite",
-      "reserveeAddressZip": "Postinumero",
-      "reserveeAddressCity": "Postitoimipaikka",
       "reserveeEmail": "Yhteyshenkilön sähköpostiosoite",
       "reserveePhone": "Yhteyshenkilön puhelinnumero",
       "reserveeOrganisationName": "Virallinen nimi",

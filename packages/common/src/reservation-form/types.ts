@@ -4,9 +4,6 @@ type Reservee = {
   reserveeFirstName: string;
   reserveeLastName: string;
   reserveePhone: string;
-  reserveeAddressStreet: string;
-  reserveeAddressZip: string;
-  reserveeAddressCity: string;
   reserveeEmail: string;
   reserveeOrganisationName: string;
 };
@@ -49,9 +46,6 @@ export type Reservation = {
 const fieldsCommon = [
   "reservee_first_name",
   "reservee_last_name",
-  "reservee_address_street",
-  "reservee_address_zip",
-  "reservee_address_city",
   "reservee_email",
   "reservee_phone",
   "municipality",
