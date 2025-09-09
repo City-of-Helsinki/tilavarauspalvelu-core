@@ -39,7 +39,7 @@ import { PinkBox as PinkBoxBase } from "@/components/reservation/styles";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
-import { getGeneralFields } from "common/src/hooks/useApplicationFields";
+import { getGeneralFields } from "common/src/reservation-form/util";
 import { useSearchParams } from "next/navigation";
 
 const StyledReservationInfoCard = styled(ReservationInfoCard)`
@@ -199,15 +199,10 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   };
 
   const generalFields = getGeneralFields({ supportedFields, reservation });
-  const shouldDisplayReservationUnitPrice = useMemo(() => {
-    switch (step) {
-      case 0:
-        return reservationUnit?.canApplyFreeOfCharge && generalFields?.includes("applyingForFreeOfCharge");
-      case 1:
-      default:
-        return reservationUnit?.canApplyFreeOfCharge && reservation?.applyingForFreeOfCharge === true;
-    }
-  }, [step, generalFields, reservation, reservationUnit]);
+  const shouldDisplayReservationUnitPrice =
+    step === 0
+      ? reservationUnit.canApplyFreeOfCharge && generalFields.includes("applyingForFreeOfCharge")
+      : reservationUnit.canApplyFreeOfCharge && reservation.applyingForFreeOfCharge === true;
 
   const lang = convertLanguageCode(i18n.language);
   const notesWhenReserving = getTranslationSafe(reservationUnit, "notesWhenApplying", lang);

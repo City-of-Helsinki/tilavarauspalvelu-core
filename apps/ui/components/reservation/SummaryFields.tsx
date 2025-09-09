@@ -8,8 +8,7 @@ import { ParagraphAlt, PreviewLabel, PreviewValue } from "./styles";
 import { LabelValuePair } from "./LabelValuePair";
 import { type OptionsRecord } from "common";
 import { convertOptionsToField } from "common/src/reservation-form/ReservationFormField";
-import { getApplicationFields, getGeneralFields } from "common/src/hooks/useApplicationFields";
-import { extendMetaFieldOptions } from "common/src/reservation-form/util";
+import { extendMetaFieldOptions, getApplicationFields, getGeneralFields } from "common/src/reservation-form/util";
 
 const Container = styled(AutoGrid)`
   margin-bottom: var(--spacing-2-xl);
