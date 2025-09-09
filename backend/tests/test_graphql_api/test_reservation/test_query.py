@@ -17,6 +17,7 @@ from tilavarauspalvelu.enums import (
     ReservationStateChoice,
     ReservationTypeChoice,
     ReserveeType,
+    UserRoleChoice,
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
@@ -478,6 +479,77 @@ def test_reservation__query__reservation_unit_is_archived_but_data_is_still_retu
     response = graphql(query)
     assert response.has_errors is False, response.errors
     assert response.node(0) == expected_response
+
+
+def test_reservation__query__user_returned_since_has_permission_to_reservation(graphql):
+    reservation = ReservationFactory.create()
+    unit = reservation.reservation_unit.unit
+
+    # Viewer doesn't have permission to view users normally, but they can see
+    # reservee's information if they have permission to view the unit
+    user = UserFactory.create_with_unit_role(units=[unit], role=UserRoleChoice.VIEWER)
+    graphql.force_login(user)
+
+    # Single
+    query = """
+        query ($id: ID!) {
+          node(id: $id) {
+            ... on ReservationNode {
+              pk
+              user {
+                pk
+                firstName
+              }
+            }
+          }
+        }
+    """
+    global_id = to_global_id("ReservationNode", reservation.pk)
+    response = graphql(query, variables={"id": global_id})
+
+    assert response.has_errors is False, response
+
+    assert response.results == {
+        "pk": reservation.pk,
+        "user": {
+            "pk": reservation.user.pk,
+            "firstName": reservation.user.first_name,
+        },
+    }
+
+
+def test_reservation__query__user_null_since_no_permission_to_reservation(graphql):
+    reservation = ReservationFactory.create()
+    unit = UnitFactory.create()
+
+    # Here viewer doesn't have permission to view this unit specifically, so they won't
+    # see the reservee's information either, only common information
+    user = UserFactory.create_with_unit_role(units=[unit], role=UserRoleChoice.VIEWER)
+    graphql.force_login(user)
+
+    # Single
+    query = """
+        query ($id: ID!) {
+          node(id: $id) {
+            ... on ReservationNode {
+              pk
+              user {
+                pk
+                firstName
+              }
+            }
+          }
+        }
+    """
+    global_id = to_global_id("ReservationNode", reservation.pk)
+    response = graphql(query, variables={"id": global_id})
+
+    assert response.has_errors is False, response
+
+    assert response.results == {
+        "pk": reservation.pk,
+        "user": None,
+    }
 
 
 @freeze_time(local_datetime(2024, 1, 1))

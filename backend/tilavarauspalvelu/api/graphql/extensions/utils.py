@@ -12,7 +12,7 @@ from graphql import (
 )
 from undine import Field, GQLInfo
 
-from tilavarauspalvelu.models import Reservation, User
+from tilavarauspalvelu.models import User
 
 __all__ = [
     "NullablePermissions",
@@ -60,7 +60,11 @@ class NullablePermissions:
         if not isinstance(field, Field):
             return NotImplemented
 
-        field.resolver_func = self  # Replaced with 'NullablePermissionResolver' using converters
+        # Replaced with 'NullablePermissionResolver' using converters
+        field.resolver_func = self
+        # Don't run any permission checks for subtypes, e.g. related QueryTypes
+        field.permissions_func = lambda *args, **kwargs: None
+        # Field can now return null, even if otherwise it wouldn't
         field.nullable = True
         return field
 
@@ -73,7 +77,7 @@ class NullablePermissionResolver:
     permission_check: Callable[[Any, GQLInfo], bool]
     resolver: GraphQLFieldResolver
 
-    def __call__(self, reservation: Reservation, info: GQLInfo[User], **kwargs: Any) -> Any:
-        if not self.permission_check(reservation, info):
+    def __call__(self, root: Any, info: GQLInfo[User], **kwargs: Any) -> Any:
+        if not self.permission_check(root, info):
             return None
-        return self.resolver(reservation, info, **kwargs)
+        return self.resolver(root, info, **kwargs)
