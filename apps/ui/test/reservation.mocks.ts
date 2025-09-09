@@ -265,9 +265,6 @@ export function createMockReservation(
           }
         : null,
     },
-    reserveeAddressCity: "Helsinki",
-    reserveeAddressStreet: "Testikatu 1",
-    reserveeAddressZip: "00100",
     reserveeEmail: "teppo.testaaja@hel.fi",
     reserveeFirstName: "Teppo",
     reserveeLastName: "Testaaja",
@@ -496,9 +493,6 @@ export function createMetaFieldsFragment(type: ReserveeType = ReserveeType.Compa
     reserveeEmail: "teppo.testicle@hel.fi",
     reserveeIdentifier: type === ReserveeType.Company ? "1234567-8" : null,
     reserveeOrganisationName: "Test Organisation",
-    reserveeAddressStreet: "Testikuja 1",
-    reserveeAddressZip: "00100",
-    reserveeAddressCity: "Helsinki",
     municipality: MunicipalityChoice.Helsinki,
   };
 }
