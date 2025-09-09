@@ -77,21 +77,12 @@ export const LOCATION_FRAGMENT_I18N = gql`
   }
 `;
 
+// TODO rename to ReservationFormMetadata
 export const METADATA_SETS_FRAGMENT = gql`
   fragment MetadataSets on ReservationUnitNode {
     id
     minPersons
     maxPersons
-    metadataSet {
-      id
-      requiredFields {
-        id
-        fieldName
-      }
-      supportedFields {
-        id
-        fieldName
-      }
-    }
+    reservationForm
   }
 `;

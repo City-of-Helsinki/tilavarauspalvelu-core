@@ -1,6 +1,5 @@
 import { type TFunction, useTranslation } from "next-i18next";
-import { type ReservationNode, ReserveeType } from "@/gql/gql-types";
-import { containsField, type FieldName } from "common/src/modules/metaFieldsHelpers";
+import { type ReservationNode, ReserveeType, type ReservationFormFieldsFragment } from "@/gql/gql-types";
 import { AutoGrid, H4 } from "common/src/styled";
 import { ParagraphAlt, PreviewLabel, PreviewValue } from "./styles";
 import { LabelValuePair } from "./LabelValuePair";
@@ -9,8 +8,8 @@ import {
   extendMetaFieldOptions,
   getReservationFormGeneralFields,
   getReservationFormReserveeFields,
+  formContainsField,
 } from "common/src/reservation-form/util";
-import { type ReservationFormFieldsFragment } from "common/gql/gql-types";
 
 function isNotEmpty(
   key: keyof ReservationNode,
@@ -21,20 +20,18 @@ function isNotEmpty(
   return !(rawValue == null || rawValue === "" || rawValue === false || rawValue === 0);
 }
 
-/// Component to show the application fields in the reservation confirmation
-/// This requires the reservation to be finalized (reserveeType is set)
-export function SummaryReserveeFields({
-  reservation,
-  options,
-  supportedFields,
-}: {
+type SummaryReserveeFieldsProps = {
   reservation: ReservationFormFieldsFragment;
   options: Omit<OptionsRecord, "municipality">;
-  supportedFields: FieldName[];
-}): JSX.Element {
-  const { t } = useTranslation();
+};
 
-  const includesReserveeType = containsField(supportedFields, "reserveeType");
+/// Component to show the application fields in the reservation confirmation
+/// This requires the reservation to be finalized (reserveeType is set)
+export function SummaryReserveeFields({ reservation, options }: Readonly<SummaryReserveeFieldsProps>): JSX.Element {
+  const { t } = useTranslation();
+  const formType = reservation.reservationUnit.reservationForm;
+
+  const includesReserveeType = formContainsField(formType, "reserveeType");
 
   if (includesReserveeType && reservation.reserveeType == null) {
     // eslint-disable-next-line no-console

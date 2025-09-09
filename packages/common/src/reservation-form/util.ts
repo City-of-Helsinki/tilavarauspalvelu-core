@@ -1,9 +1,8 @@
-import { containsField, type FieldName } from "../modules/metaFieldsHelpers";
 import {
-  type ReservationMetadataFieldNode,
   ReserveeType,
   MunicipalityChoice,
   type ReservationFormFieldsFragment,
+  ReservationFormType,
 } from "../../gql/gql-types";
 import { type TFunction } from "next-i18next";
 import { type OptionsRecord } from "../../types/common";
@@ -61,17 +60,14 @@ export function getReservationFormGeneralFields() {
 }
 
 export function getReservationFormFields({
-  supportedFields,
+  formType,
   reserveeType,
-}: {
-  supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
+}: Readonly<{
+  formType: ReservationFormType;
   reserveeType: ReserveeType | "common";
-}): string[] {
-  if (supportedFields.length === 0) {
-    return [];
-  }
+}>): FormFieldArray {
   const type = convertTypeToKey(reserveeType);
-  return RESERVATION_FIELDS[type].filter((field) => containsField(supportedFields, field));
+  return RESERVATION_FIELDS[type].filter((field) => formContainsField(formType, field));
 }
 
 export function removeRefParam<Type>(params: Type & { ref: unknown }): Omit<Type, "ref"> {
@@ -93,9 +89,12 @@ export function extendMetaFieldOptions(options: Omit<OptionsRecord, "municipalit
 }
 
 // used to inject frontend only boolean toggle into the FormFields
-type ExtendedFormField = keyof ReservationFormFieldsFragment | "reserveeIsUnregisteredAssociation";
+export type FormField = keyof Omit<ReservationFormFieldsFragment, "id" | "reservationUnit">;
+export type FormFieldArray = ReadonlyArray<FormField>;
+export type ExtendedFormField = FormField | "reserveeIsUnregisteredAssociation";
+export type ExtendedFormFieldArray = ReadonlyArray<ExtendedFormField>;
 
-function extendReserverFields(fields: Array<keyof ReservationFormFieldsFragment>): ExtendedFormField[] {
+function extendReserverFields(fields: FormFieldArray): ExtendedFormField[] {
   const key = "reserveeIdentifier" as const;
   const identifierIndex = fields.findIndex((k) => k === key);
   if (identifierIndex > 0) {
@@ -110,7 +109,7 @@ function extendReserverFields(fields: Array<keyof ReservationFormFieldsFragment>
     }
     return [...fields, "reserveeIsUnregisteredAssociation"];
   }
-  return fields;
+  return [...fields];
 }
 
 export function getReservationFormReserveeFields({ reserveeType }: { reserveeType: ReserveeType }) {
@@ -121,35 +120,72 @@ export function getReservationFormReserveeFields({ reserveeType }: { reserveeTyp
 /// filters based on supportedFields so it's safe to use for form construction
 /// TODO clean (if possible) so that we can just chain the base and a filter
 export function getFilteredReserveeFields({
-  supportedFields,
+  formType,
   reservation,
   reserveeType,
-}: {
-  supportedFields: FieldName[];
+}: Readonly<{
+  formType: ReservationFormType;
   reservation: ReservationFormFieldsFragment;
   reserveeType: ReserveeType;
-}): ExtendedFormField[] {
-  const applicationFields = getReservationFormFields({
-    supportedFields,
+}>): ExtendedFormFieldArray {
+  const fields = getReservationFormFields({
+    formType,
     reserveeType,
   });
 
-  const baseFields = applicationFields.filter((key): key is keyof ReservationFormFieldsFragment => key in reservation);
+  const baseFields = fields.filter((key): key is FormField => key in reservation);
   return extendReserverFields(baseFields);
 }
 
 /// Helper function to type safely pick the general fields from the reservation
-export function getFilteredGeneralFields({
-  supportedFields,
-  reservation,
-}: {
-  supportedFields: FieldName[];
-  reservation: ReservationFormFieldsFragment;
-}): Array<keyof ReservationFormFieldsFragment> {
+export function getFilteredGeneralFields(formType: ReservationFormType): FormFieldArray {
   const generalFields = getReservationFormFields({
-    supportedFields,
+    formType,
     reserveeType: "common",
   }).filter((n) => n !== "reserveeType");
 
-  return generalFields.filter((key): key is keyof ReservationFormFieldsFragment => key in reservation);
+  return generalFields;
+}
+
+export function getFormFields(type: ReservationFormType): ReadonlyArray<keyof ReservationFormFieldsFragment> {
+  const base = ["reserveeFirstName", "reserveeLastName", "reserveeEmail", "reserveePhone"] as const;
+  // TODO order matters or no but we are getting the fields in wrong order in the Form
+  const info = [
+    ...base,
+    "numPersons", // optional (but required in purposeForm?)
+    "description",
+    "reserveeType",
+    "reserveeOrganisationName",
+    "reserveeIdentifier",
+  ] as const;
+
+  const purposeForm = [
+    ...info,
+    "name", // name is optional currently
+    "municipality",
+    "purpose",
+  ] as const;
+
+  // subbention (free of charge) is moved to reservationUnit toggle only
+  switch (type) {
+    /** Contact information only */
+    case ReservationFormType.ContactInfoForm:
+      return base;
+    /** Contact information and event description */
+    case ReservationFormType.ReserveeInfoForm:
+      return info;
+    /** Purpose of use : Lomake 3 */
+    case ReservationFormType.PurposeForm:
+    case ReservationFormType.PurposeSubventionForm:
+      return purposeForm;
+    /** Age group : Lomake 4 */
+    case ReservationFormType.AgeGroupForm:
+    case ReservationFormType.AgeGroupSubventionForm:
+      return [...purposeForm, "ageGroup"] as const;
+  }
+}
+
+export function formContainsField(type: ReservationFormType, fieldName: keyof ReservationFormFieldsFragment): boolean {
+  const fields = getFormFields(type);
+  return fields.find((k) => k === fieldName) != null;
 }

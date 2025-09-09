@@ -36,14 +36,7 @@ import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { AddressSection } from "@/components/reservation-unit";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
 import { ButtonLikeLink, ButtonLikeExternalLink } from "common/src/components/ButtonLikeLink";
-import {
-  createNodeId,
-  capitalize,
-  filterNonNullable,
-  getLocalizationLang,
-  ignoreMaybeArray,
-  toNumber,
-} from "common/src/modules/helpers";
+import { createNodeId, capitalize, getLocalizationLang, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import {
   getApplicationPath,
@@ -234,8 +227,6 @@ function Reservation({
   const { beginsAt, endsAt } = reservation;
   const timeString = capitalize(formatDateTimeRange(new Date(beginsAt), new Date(endsAt), { locale: lang }));
 
-  const supportedFields = filterNonNullable(reservation.reservationUnit.metadataSet?.supportedFields);
-
   const isBeingHandled = reservation.state === ReservationStateChoice.RequiresHandling;
   const isCancellable = isReservationCancellable(reservation);
 
@@ -385,7 +376,7 @@ function Reservation({
           )}
           <Instructions reservation={reservation} />
           <SummaryGeneralFields reservation={reservation} options={options} />
-          <SummaryReserveeFields reservation={reservation} options={options} supportedFields={supportedFields} />
+          <SummaryReserveeFields reservation={reservation} options={options} />
           {shouldShowAccessCode && <AccessCodeInfo pindoraInfo={pindoraInfo} feedbackUrl={feedbackUrl} />}
           <TermsInfoSection reservation={reservation} termsOfUse={termsOfUse} />
           <AddressSection

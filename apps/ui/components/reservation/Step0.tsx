@@ -7,20 +7,26 @@ import { useFormContext, UseFormReturn } from "react-hook-form";
 import React, { useState } from "react";
 import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { ReservationForm } from "common/src/reservation-form/MetaFields";
+import { ReservationFormReserveeSection, ReservationFormGeneralSection } from "common/src/reservation-form/MetaFields";
 import { ActionContainer } from "./styles";
 import InfoDialog from "../common/InfoDialog";
-import { filterNonNullable } from "common/src/modules/helpers";
-import { containsField, FieldName } from "common/src/modules/metaFieldsHelpers";
 import {
   type ReservationQuery,
-  type ReservationFormFieldsFragment,
   type ReservationUpdateMutationInput,
+  type MetadataSetsFragment,
+  ReservationFormType,
   ReserveeType,
   useUpdateReservationMutation,
 } from "@gql/gql-types";
-import { getFilteredGeneralFields, getFilteredReserveeFields } from "common/src/reservation-form/util";
-import { type InputsT } from "common/src/reservation-form/types";
+import {
+  getFilteredGeneralFields,
+  getFilteredReserveeFields,
+  formContainsField,
+  getFormFields,
+  type FormFieldArray,
+  type ExtendedFormFieldArray,
+} from "common/src/reservation-form/util";
+import { type ReservationFormT } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/src/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { type OptionsRecord } from "common";
@@ -43,7 +49,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const form = useFormContext<InputsT>();
+  const form = useFormContext<ReservationFormT>();
   const {
     watch,
     formState: { isSubmitting, isValid },
@@ -54,7 +60,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
   const displayError = useDisplayError();
   const [updateReservation] = useUpdateReservationMutation();
 
-  const onSubmit = async (payload: InputsT): Promise<void> => {
+  const onSubmit = async (payload: ReservationFormT): Promise<void> => {
     const {
       // boolean toggles
       applyingForFreeOfCharge,
@@ -63,7 +69,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
       reserveeIdentifier,
       ...rest
     } = payload;
-    const hasReserveeTypeField = containsField(supportedFields, "reserveeType");
+    const hasReserveeTypeField = formContainsField(formType, "reserveeType");
     if (hasReserveeTypeField && !reserveeType) {
       throw new Error("Reservee type is required");
     }
@@ -99,15 +105,15 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
     }
   };
 
-  const supportedFields = filterNonNullable(reservation.reservationUnit.metadataSet?.supportedFields);
   const reserveeType = watch("reserveeType");
   const municipality = watch("municipality");
-  const includesHomeCity = containsField(supportedFields, "municipality");
-  const includesReserveeType = containsField(supportedFields, "reserveeType");
+  const formType = reservation.reservationUnit.reservationForm;
+  const includesHomeCity = formContainsField(formType, "municipality");
+  const includesReserveeType = formContainsField(formType, "reserveeType");
 
-  const generalFields = getFilteredGeneralFields({ supportedFields, reservation });
+  const generalFields = getFilteredGeneralFields(formType);
   const reservationApplicationFields = getFilteredReserveeFields({
-    supportedFields,
+    formType,
     reservation,
     reserveeType: reserveeType ?? ReserveeType.Individual,
   });
@@ -121,6 +127,8 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
     ? getTranslationSafe(reservation.reservationUnit.pricingTerms, "text", lang)
     : "";
 
+  const enableSubvention = reservation.reservationUnit.canApplyFreeOfCharge;
+
   return (
     <NewReservationForm onSubmit={handleSubmit(onSubmit)} noValidate>
       <ReservationForm
@@ -129,6 +137,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
         generalFields={generalFields}
         reservationApplicationFields={reservationApplicationFields}
         data={{
+          enableSubvention,
           termsForDiscount: (
             <Trans
               i18nKey="reservationApplication:label.common.applyingForFreeOfChargeButton"
@@ -147,7 +156,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
       />
-      <Errors form={form} supportedFields={supportedFields} generalFields={generalFields} />
+      <FormErrors form={form} formType={formType} generalFields={generalFields} />
       <ActionContainer>
         <Button
           type="submit"
@@ -174,9 +183,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
 }
 
 const ErrorBox = styled(Notification)`
-  max-width: 360px;
-  align-self: flex-end;
-  margin-bottom: var(--spacing-m);
+  margin: var(--spacing-m) 0;
 `;
 
 const ErrorList = styled.ul`
@@ -192,29 +199,30 @@ const ErrorAnchor = styled.a`
   }
 `;
 
-function Errors({
+// TODO this should be a general component -> or at least the error display part should be
+function FormErrors({
   form,
-  supportedFields,
+  formType,
   generalFields,
 }: {
-  form: UseFormReturn<InputsT>;
-  supportedFields: FieldName[];
-  generalFields: Array<keyof ReservationFormFieldsFragment>;
+  form: UseFormReturn<ReservationFormT>;
+  formType: ReservationFormType;
+  generalFields: FormFieldArray;
 }) {
   const { t } = useTranslation();
 
   const { formState, watch } = form;
   const { errors, isSubmitted } = formState;
-  // TODO clean this up
+  // TODO clean this up (wrap it into a function that clearly tells what it's doing)
   const errorKeys =
     Object.keys(errors).sort((a, b) => {
-      const fields = [...supportedFields.map((x) => x.fieldName)];
+      const fields = getFormFields(formType).map((x) => x.toString());
       // Why?
       return fields.indexOf(a) - fields.indexOf(b);
     }) ?? [];
 
   const reserveeType = watch("reserveeType");
-  const includesReserveeType = containsField(supportedFields, "reserveeType");
+  const includesReserveeType = formContainsField(formType, "reserveeType");
   if (includesReserveeType && isSubmitted && !reserveeType) {
     errorKeys.push("reserveeType");
   }
@@ -239,6 +247,7 @@ function Errors({
               <ErrorAnchor
                 href="#!"
                 onClick={(e) => {
+                  // TODO this is awful -> move to handler func and refactor
                   e.preventDefault();
                   const element = document.getElementById(key) || document.getElementById(`${key}-label`);
                   const top = element?.getBoundingClientRect()?.y || 0;
@@ -259,6 +268,54 @@ function Errors({
         })}
       </ErrorList>
     </ErrorBox>
+  );
+}
+
+const MandatoryFieldsInfoText = styled.p`
+  font-size: var(--fontsize-body-s);
+  margin-top: calc(var(--spacing-xs) * -1);
+  && {
+    margin-bottom: var(--spacing-s);
+  }
+`;
+
+interface ReservationFormProps {
+  reservationUnit: MetadataSetsFragment;
+  generalFields: FormFieldArray;
+  reservationApplicationFields: ExtendedFormFieldArray;
+  options: Readonly<Omit<OptionsRecord, "municipality">>;
+  data?: {
+    termsForDiscount?: JSX.Element | string;
+    enableSubvention?: boolean;
+  };
+}
+
+function ReservationForm({
+  reservationUnit,
+  generalFields,
+  reservationApplicationFields,
+  options,
+  data,
+}: ReservationFormProps) {
+  const { t } = useTranslation();
+  return (
+    <>
+      <MandatoryFieldsInfoText>{t("forms:mandatoryFieldsText")}</MandatoryFieldsInfoText>
+      <ReservationFormGeneralSection
+        fields={generalFields}
+        options={options}
+        reservationUnit={reservationUnit}
+        data={data}
+      />
+      <ReservationFormReserveeSection
+        fields={reservationApplicationFields}
+        options={options}
+        reservationUnit={reservationUnit}
+        data={data}
+        // inconsistency between admin and customer ui (could handle by refactoring customer to have gap on the parent)
+        style={{ marginTop: "var(--spacing-xl)" }}
+      />
+    </>
   );
 }
 
