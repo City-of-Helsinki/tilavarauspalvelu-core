@@ -118,7 +118,6 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     purpose: reservation.purpose?.pk ?? undefined,
     numPersons: reservation.numPersons ?? undefined,
     ageGroup: reservation.ageGroup?.pk ?? undefined,
-    showBillingAddress: false,
     reserveeIsUnregisteredAssociation: false,
   };
   // TODO is defaultValues correct? it's prefilled from the profile data and we are not refetching at any point.

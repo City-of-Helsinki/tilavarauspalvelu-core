@@ -27,7 +27,6 @@ export type InputsT = {
   pk: number;
   reserveeIsUnregisteredAssociation?: boolean;
   reserveeIdentifier?: string;
-  showBillingAddress?: boolean;
 } & Reservee &
   CommonInputs;
 

@@ -64,7 +64,7 @@ export function getReservationFormGeneralFields() {
   return RESERVATION_FIELDS["general"];
 }
 
-export function getReservationApplicationFields({
+export function getReservationFormFields({
   supportedFields,
   reserveeType,
 }: {
@@ -99,7 +99,7 @@ export function extendMetaFieldOptions(options: Omit<OptionsRecord, "municipalit
 // used to inject frontend only boolean toggle into the FormFields
 type ExtendedFormField = keyof ReservationFormFieldsFragment | "reserveeIsUnregisteredAssociation";
 
-function extendApplicationFields(fields: Array<keyof ReservationFormFieldsFragment>): ExtendedFormField[] {
+function extendReserverFields(fields: Array<keyof ReservationFormFieldsFragment>): ExtendedFormField[] {
   const key = "reserveeIdentifier" as const;
   const identifierIndex = fields.findIndex((k) => k === key);
   if (identifierIndex > 0) {
@@ -133,13 +133,13 @@ export function getFilteredReserveeFields({
   reservation: ReservationFormFieldsFragment;
   reserveeType: ReserveeType;
 }): ExtendedFormField[] {
-  const applicationFields = getReservationApplicationFields({
+  const applicationFields = getReservationFormFields({
     supportedFields,
     reserveeType,
   });
 
   const baseFields = applicationFields.filter((key): key is keyof ReservationFormFieldsFragment => key in reservation);
-  return extendApplicationFields(baseFields);
+  return extendReserverFields(baseFields);
 }
 
 /// Helper function to type safely pick the general fields from the reservation
@@ -150,7 +150,7 @@ export function getFilteredGeneralFields({
   supportedFields: FieldName[];
   reservation: ReservationFormFieldsFragment;
 }): Array<keyof ReservationFormFieldsFragment> {
-  const generalFields = getReservationApplicationFields({
+  const generalFields = getReservationFormFields({
     supportedFields,
     reserveeType: "common",
   }).filter((n) => n !== "reserveeType");

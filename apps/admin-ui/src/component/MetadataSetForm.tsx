@@ -9,7 +9,7 @@ import { ReserveeType, type MetadataSetsFragment } from "@gql/gql-types";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { type OptionsRecord } from "common";
 import { filterNonNullable } from "common/src/helpers";
-import { getReservationApplicationFields } from "common/src/reservation-form/util";
+import { getReservationFormFields } from "common/src/reservation-form/util";
 import { containsField } from "common/src/metaFieldsHelpers";
 
 type Props = {
@@ -23,10 +23,8 @@ export function ReservationMetadataSetForm({ reservationUnit }: Props): JSX.Elem
     reservationPurposes,
   };
 
-  // TODO naming: generalFields = reservationFields (Varauksen tiedot)
-  // or maybe metadataReservationFields?
   const fields = filterNonNullable(reservationUnit.metadataSet?.supportedFields);
-  const generalFields = getReservationApplicationFields({
+  const generalFields = getReservationFormFields({
     supportedFields: fields,
     reserveeType: "common",
   }).filter((n) => n !== "reserveeType");
@@ -54,17 +52,12 @@ export function ReserverMetadataSetForm({ reservationUnit }: Props): JSX.Element
 
   const reserveeType = watch("reserveeType");
   const type = reserveeType != null && containsField(fields, "reserveeType") ? reserveeType : ReserveeType.Individual;
-  // TODO naming: applicationFields = reserverFields (Varaajan tiedot)
-  const reservationApplicationFields = getReservationApplicationFields({
+  const reserverFields = getReservationFormFields({
     supportedFields: fields,
     reserveeType: type,
   });
 
   return (
-    <ReservationFormFieldsReserveeSection
-      fields={reservationApplicationFields}
-      reservationUnit={reservationUnit}
-      options={options}
-    />
+    <ReservationFormFieldsReserveeSection fields={reserverFields} reservationUnit={reservationUnit} options={options} />
   );
 }
