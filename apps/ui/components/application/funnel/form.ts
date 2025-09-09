@@ -350,7 +350,7 @@ export const ApplicationPage3Schema = z
     // not submitted, we use it to remove the billing address from submit without losing the frontend state
     hasBillingAddress: z.boolean(),
     // not submitted
-    reserveeIsUnregisteredAssociation: z.boolean(),
+    isRegisteredAssociation: z.boolean(),
     additionalInformation: z.string().max(255).optional(),
     // municipality is only for Organisations
     municipality: z.enum([MunicipalityChoice.Helsinki, MunicipalityChoice.Other]).optional(),
@@ -363,9 +363,9 @@ export const ApplicationPage3Schema = z
   .superRefine((val, ctx) => {
     if (val.applicantType === ReserveeType.Company || val.applicantType === ReserveeType.Nonprofit) {
       const requiredToHaveId = val.applicantType !== ReserveeType.Nonprofit;
-      const userToggleNoId = val.reserveeIsUnregisteredAssociation;
+      const { isRegisteredAssociation } = val;
       const hasId = val.organisationIdentifier != null && val.organisationIdentifier !== "";
-      if ((requiredToHaveId || !userToggleNoId) && !hasId) {
+      if ((requiredToHaveId || isRegisteredAssociation) && !hasId) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["organisationIdentifier"],
@@ -506,14 +506,14 @@ export function createDefaultPage1Section(
   };
 }
 
-function isOrganisationEmpty(app: ApplicantFieldsFragment): boolean {
+function isAnyOrganisationField(app: ApplicantFieldsFragment): boolean {
   return (
-    app.organisationName === "" &&
-    app.organisationIdentifier === "" &&
-    app.organisationCoreBusiness === "" &&
-    app.organisationStreetAddress === "" &&
-    app.organisationCity === "" &&
-    app.organisationPostCode === ""
+    app.organisationName !== "" ||
+    app.organisationIdentifier !== "" ||
+    app.organisationCoreBusiness !== "" ||
+    app.organisationStreetAddress !== "" ||
+    app.organisationCity !== "" ||
+    app.organisationPostCode !== ""
   );
 }
 
@@ -526,10 +526,10 @@ export function convertApplicationPage3(app: Maybe<ApplicantFieldsFragment>): Ap
 
   // complex due to we want to default this to false even for Nonprofits unless the user
   // is editing an existing application (they have once set this explicitly to true)
-  const reserveeIsUnregisteredAssociation =
+  const isUnregisteredAssociation =
     app != null &&
     app.applicantType === ReserveeType.Nonprofit &&
-    !isOrganisationEmpty(app) &&
+    isAnyOrganisationField(app) &&
     app.organisationIdentifier === "";
 
   return {
@@ -549,7 +549,7 @@ export function convertApplicationPage3(app: Maybe<ApplicantFieldsFragment>): Ap
     contactPersonPhoneNumber: app?.contactPersonPhoneNumber ?? "",
 
     hasBillingAddress,
-    reserveeIsUnregisteredAssociation,
+    isRegisteredAssociation: !isUnregisteredAssociation,
 
     billingStreetAddress: hasBillingAddress ? app?.billingStreetAddress : undefined,
     billingCity: hasBillingAddress ? app?.billingCity : undefined,
@@ -577,8 +577,7 @@ export function transformPage3Application(values: ApplicationPage3FormValues): A
   );
 
   const isBillingAddressValid = isAddressValid(values.billingStreetAddress, values.billingPostCode, values.billingCity);
-  const shouldSaveIdentifier =
-    !values.reserveeIsUnregisteredAssociation || values.applicantType !== ReserveeType.Nonprofit;
+  const shouldSaveIdentifier = values.isRegisteredAssociation || values.applicantType !== ReserveeType.Nonprofit;
 
   return {
     pk: values.pk,

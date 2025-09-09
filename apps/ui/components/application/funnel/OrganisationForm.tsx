@@ -16,7 +16,7 @@ export function OrganisationForm(): JSX.Element {
   } = useFormContext<ApplicationPage3FormValues>();
 
   const hasBillingAddress = watch("hasBillingAddress");
-  const isUnregisteredAssociation = watch("reserveeIsUnregisteredAssociation");
+  const isRegisteredAssociation = watch("isRegisteredAssociation");
 
   const translateError = (errorMsg?: string) => (errorMsg ? t(`application:validation.${errorMsg}`) : "");
 
@@ -40,10 +40,11 @@ export function OrganisationForm(): JSX.Element {
       <ControlledCheckbox
         control={control}
         label={t("application:Page3.organisationNotRegistered")}
-        id="reserveeIsUnregisteredAssociation"
-        name="reserveeIsUnregisteredAssociation"
+        id="isRegisteredAssociation"
+        name="isRegisteredAssociation"
+        inverted
       />
-      <ApplicationFormTextInput name="organisationIdentifier" disabled={isUnregisteredAssociation} />
+      <ApplicationFormTextInput name="organisationIdentifier" disabled={!isRegisteredAssociation} />
       <FormSubHeading>{t("application:Page3.sectionHeadings.postalAddress")}</FormSubHeading>
       <ApplicationFormTextInput name="organisationStreetAddress" />
       <ApplicationFormTextInput name="organisationPostCode" />
