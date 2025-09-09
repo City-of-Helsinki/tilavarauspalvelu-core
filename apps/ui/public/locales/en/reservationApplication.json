@@ -26,9 +26,6 @@
     "nonprofit": {
       "reserveeFirstName": "Contact person’s first name",
       "reserveeLastName": "Contact person’s last name",
-      "reserveeAddressStreet": "Street address",
-      "reserveeAddressZip": "Postal code",
-      "reserveeAddressCity": "City",
       "reserveeEmail": "Contact person’s e-mail address",
       "reserveePhone": "Contact person’s telephone number",
       "reserveeOrganisationName": "Official name",
@@ -47,9 +44,6 @@
     "individual": {
       "reserveeFirstName": "First name",
       "reserveeLastName": "Last name",
-      "reserveeAddressStreet": "Street address",
-      "reserveeAddressZip": "Postal code",
-      "reserveeAddressCity": "City",
       "reserveeEmail": "E-mail address",
       "reserveePhone": "Telephone",
       "municipality": "Domicile",
@@ -65,9 +59,6 @@
     "company": {
       "reserveeFirstName": "Contact person’s first name",
       "reserveeLastName": "Contact person’s last name",
-      "reserveeAddressStreet": "Street address",
-      "reserveeAddressZip": "Postal code",
-      "reserveeAddressCity": "City",
       "reserveeEmail": "Contact person’s e-mail address",
       "reserveePhone": "Contact person’s telephone number",
       "reserveeOrganisationName": "Official name",

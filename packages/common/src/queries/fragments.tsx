@@ -10,9 +10,6 @@ export const RESERVEE_BILLING_FRAGMENT = gql`
     reserveeType
     reserveeOrganisationName
     reserveeIdentifier
-    reserveeAddressStreet
-    reserveeAddressCity
-    reserveeAddressZip
   }
 `;
 
