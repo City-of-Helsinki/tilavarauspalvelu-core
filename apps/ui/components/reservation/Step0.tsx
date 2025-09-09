@@ -11,14 +11,14 @@ import { ReservationForm } from "common/src/reservation-form/MetaFields";
 import { ActionContainer } from "./styles";
 import InfoDialog from "../common/InfoDialog";
 import {
-  ReservationFormFieldsFragment,
+  type ReservationFormFieldsFragment,
+  ReservationFormType,
   type ReservationInProgressFragment,
   type ReservationUpdateMutation,
   ReserveeType,
   useUpdateReservationMutation,
 } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/helpers";
-import { containsField, FieldName } from "common/src/metaFieldsHelpers";
+import { formContainsField, getFormFields } from "common/src/metaFieldsHelpers";
 import { getFilteredGeneralFields, getFilteredReserveeFields } from "common/src/reservation-form/util";
 import { type InputsT } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/styled";
@@ -62,7 +62,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
       reserveeIdentifier,
       ...rest
     } = payload;
-    const hasReserveeTypeField = containsField(supportedFields, "reserveeType");
+    const hasReserveeTypeField = formContainsField(formType, "reserveeType");
     if (hasReserveeTypeField && !reserveeType) {
       throw new Error("Reservee type is required");
     }
@@ -98,15 +98,15 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
     }
   };
 
-  const supportedFields = filterNonNullable(reservation.reservationUnit.metadataSet?.supportedFields);
   const reserveeType = watch("reserveeType");
   const municipality = watch("municipality");
-  const includesHomeCity = containsField(supportedFields, "municipality");
-  const includesReserveeType = containsField(supportedFields, "reserveeType");
+  const formType = reservation.reservationUnit.reservationForm;
+  const includesHomeCity = formContainsField(formType, "municipality");
+  const includesReserveeType = formContainsField(formType, "reserveeType");
 
-  const generalFields = getFilteredGeneralFields({ supportedFields, reservation });
+  const generalFields = getFilteredGeneralFields({ formType, reservation });
   const reservationApplicationFields = getFilteredReserveeFields({
-    supportedFields,
+    formType,
     reservation,
     reserveeType: reserveeType ?? ReserveeType.Individual,
   });
@@ -146,7 +146,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
       />
-      <Errors form={form} supportedFields={supportedFields} generalFields={generalFields} />
+      <Errors form={form} formType={formType} generalFields={generalFields} />
       <ActionContainer>
         <Button
           type="submit"
@@ -191,29 +191,30 @@ const ErrorAnchor = styled.a`
   }
 `;
 
+// TODO this should be a general component -> or at least the error display part should be
 function Errors({
   form,
-  supportedFields,
+  formType,
   generalFields,
 }: {
   form: UseFormReturn<InputsT>;
-  supportedFields: FieldName[];
+  formType: ReservationFormType;
   generalFields: Array<keyof ReservationFormFieldsFragment>;
 }) {
   const { t } = useTranslation();
 
   const { formState, watch } = form;
   const { errors, isSubmitted } = formState;
-  // TODO clean this up
+  // TODO clean this up (wrap it into a function that clearly tells what it's doing)
   const errorKeys =
     Object.keys(errors).sort((a, b) => {
-      const fields = [...supportedFields.map((x) => x.fieldName)];
+      const fields = getFormFields(formType).map((x) => x.toString());
       // Why?
       return fields.indexOf(a) - fields.indexOf(b);
     }) ?? [];
 
   const reserveeType = watch("reserveeType");
-  const includesReserveeType = containsField(supportedFields, "reserveeType");
+  const includesReserveeType = formContainsField(formType, "reserveeType");
   if (includesReserveeType && isSubmitted && !reserveeType) {
     errorKeys.push("reserveeType");
   }
@@ -238,6 +239,7 @@ function Errors({
               <ErrorAnchor
                 href="#!"
                 onClick={(e) => {
+                  // TODO this is awful -> move to handler func and refactor
                   e.preventDefault();
                   const element = document.getElementById(key) || document.getElementById(`${key}-label`);
                   const top = element?.getBoundingClientRect()?.y || 0;

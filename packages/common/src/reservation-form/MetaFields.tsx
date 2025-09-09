@@ -3,16 +3,14 @@ import { IconGroup, IconUser } from "hds-react";
 import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import { camelCase } from "lodash-es";
-import { MetadataSetsFragment, ReserveeType } from "../../gql/gql-types";
+import { MetadataSetsFragment, ReservationFormType, type ReservationUnitNode, ReserveeType } from "../../gql/gql-types";
 import { ReservationFormField } from "./ReservationFormField";
 import { type InputsT, type ReservationFormT } from "./types";
 import { RadioButtonWithImage } from "./RadioButtonWithImage";
 import { AutoGrid, fontMedium, fontRegular, H4, H5 } from "../../styled";
 import { type OptionsRecord } from "../../types/common";
 import IconPremises from "../icons/IconPremises";
-import { containsField } from "../metaFieldsHelpers";
-import { filterNonNullable } from "../helpers";
+import { formContainsField } from "../metaFieldsHelpers";
 import { extendMetaFieldOptions } from "./util";
 
 type CommonProps = {
@@ -111,25 +109,24 @@ function ReservationFormFields({
   // subheading is needed because application form uses it and requires index / field data to render it
   headingKey,
   hasSubheading,
-  metadata,
   params,
   data,
+  // TODO need to add usage for this to get required field (unless we hard code it in the Form itself?)
+  formType: _,
 }: CommonProps & {
   fields: Field[];
   headingKey?: ReserveeType | "COMMON";
   hasSubheading?: boolean;
-  metadata: MetadataSetsFragment["metadataSet"];
+  formType: ReservationFormType;
   params?: { numPersons: { min?: number; max?: number } };
 }) {
   const { t } = useTranslation();
   const { getValues } = useFormContext<ReservationFormT>();
 
-  const requiredFields = filterNonNullable(metadata?.requiredFields)
-    .map((x) => x.fieldName)
-    .map(camelCase);
   const fieldsExtended = fields.map((field) => ({
     field,
-    required: requiredFields.find((x) => x === field) != null,
+    // TODO should have a separate function to check against formType
+    required: true,
   }));
 
   // TODO the subheading logic is weird / inefficient
@@ -175,10 +172,6 @@ export function ReservationFormFieldsDetailsSection({
   if (fields.length === 0) {
     return null;
   }
-  if (!reservationUnit.metadataSet) {
-    return null;
-  }
-
   return (
     <>
       <InfoHeading $zeroMargin={noHeadingMarginal}>{t("reservationCalendar:reservationInfo")}</InfoHeading>
@@ -187,7 +180,7 @@ export function ReservationFormFieldsDetailsSection({
         <ReservationFormFields
           options={extendMetaFieldOptions(options, t)}
           fields={fields}
-          metadata={reservationUnit.metadataSet}
+          formType={reservationUnit.reservationForm}
           headingKey="COMMON"
           params={{
             numPersons: {
@@ -248,19 +241,15 @@ export function ReservationFormFieldsReserveeSection({
 }: {
   // TODO should not be arbitrary strings
   fields: string[];
-  reservationUnit: MetadataSetsFragment;
+  reservationUnit: Pick<ReservationUnitNode, "reservationForm">;
 } & CommonProps) {
   const { watch } = useFormContext<ReservationFormT & Partial<InputsT>>();
   const { t } = useTranslation();
 
-  const supportedFields = filterNonNullable(reservationUnit?.metadataSet?.supportedFields);
-  const isTypeSelectable = containsField(supportedFields, "reserveeType");
+  const isTypeSelectable = formContainsField(reservationUnit.reservationForm, "reserveeType");
 
   const reserveeType = watch("reserveeType");
 
-  if (reservationUnit.metadataSet == null) {
-    return null;
-  }
   return (
     <>
       <ReserverInfoHeading>{t("reservationCalendar:reserverInfo")}</ReserverInfoHeading>
@@ -273,7 +262,7 @@ export function ReservationFormFieldsReserveeSection({
       <ReservationApplicationFieldsContainer data-testid="reservation__form--reservee-info">
         <ReservationFormFields
           fields={fields}
-          metadata={reservationUnit.metadataSet}
+          formType={reservationUnit.reservationForm}
           options={extendMetaFieldOptions(options, t)}
           hasSubheading
           headingKey={reserveeType}
@@ -311,10 +300,6 @@ export function ReservationForm({
   options,
   data,
 }: Props) {
-  if (!reservationUnit.metadataSet) {
-    return null;
-  }
-
   return (
     <Container>
       <ReservationFormFieldsDetailsSection

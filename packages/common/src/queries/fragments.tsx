@@ -1,21 +1,5 @@
 import { gql } from "@apollo/client";
 
-export const RESERVEE_BILLING_FRAGMENT = gql`
-  fragment ReserveeBillingFields on ReservationNode {
-    id
-    reserveeFirstName
-    reserveeLastName
-    reserveeEmail
-    reserveePhone
-    reserveeType
-    reserveeOrganisationName
-    reserveeIdentifier
-    reserveeAddressStreet
-    reserveeAddressCity
-    reserveeAddressZip
-  }
-`;
-
 export const TERMS_OF_USE_NAME_FRAGMENT = gql`
   fragment TermsOfUseNameFields on TermsOfUseNode {
     id
@@ -90,21 +74,12 @@ export const LOCATION_FRAGMENT_I18N = gql`
   }
 `;
 
+// TODO rename to ReservationFormMetadata
 export const METADATA_SETS_FRAGMENT = gql`
   fragment MetadataSets on ReservationUnitNode {
     id
     minPersons
     maxPersons
-    metadataSet {
-      id
-      requiredFields {
-        id
-        fieldName
-      }
-      supportedFields {
-        id
-        fieldName
-      }
-    }
+    reservationForm
   }
 `;

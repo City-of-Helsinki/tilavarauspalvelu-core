@@ -4,9 +4,6 @@ type Reservee = {
   reserveeFirstName: string;
   reserveeLastName: string;
   reserveePhone: string;
-  reserveeAddressStreet: string;
-  reserveeAddressZip: string;
-  reserveeAddressCity: string;
   reserveeEmail: string;
   reserveeOrganisationName: string;
 };

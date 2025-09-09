@@ -12,11 +12,11 @@ import {
   ReservationTypeChoice,
   ReserveeType,
   TermsOfUseTypeChoices,
+  ReservationFormType,
 } from "@gql/gql-types";
 import { createNodeId } from "common/src/helpers";
-import type { FieldName } from "common/src/metaFieldsHelpers";
 import { generateNameFragment } from "@/test/test.gql.utils";
-import { OptionsRecord } from "common";
+import { type OptionsRecord } from "common";
 
 export function generateTextFragment(text: string) {
   return {
@@ -201,21 +201,7 @@ export function createMockReservation(props: MockReservationProps): Readonly<Res
       canApplyFreeOfCharge: canApplyFreeOfCharge,
       minPersons: 1,
       maxPersons: 100,
-      metadataSet: {
-        id: createNodeId("MetadataSetNode", 1),
-        requiredFields: [
-          {
-            id: createNodeId("RequiredFieldsNode", 1),
-            fieldName: "Test required field",
-          },
-        ],
-        supportedFields: [
-          {
-            id: createNodeId("SupportedFieldsNode", 1),
-            fieldName: "Test supported field",
-          },
-        ],
-      },
+      reservationForm: ReservationFormType.PurposeForm,
       reservationPendingInstructionsFi: "Test pending instructions FI",
       reservationPendingInstructionsEn: "Test pending instructions EN",
       reservationPendingInstructionsSv: "Test pending instructions SV",
@@ -257,9 +243,6 @@ export function createMockReservation(props: MockReservationProps): Readonly<Res
           }
         : null,
     },
-    reserveeAddressCity: "Helsinki",
-    reserveeAddressStreet: "Testikatu 1",
-    reserveeAddressZip: "00100",
     reserveeEmail: "teppo.testaaja@hel.fi",
     reserveeFirstName: "Teppo",
     reserveeLastName: "Testaaja",
@@ -488,63 +471,33 @@ export function createMetaFieldsFragment(type: ReserveeType = ReserveeType.Compa
     reserveeEmail: "teppo.testicle@hel.fi",
     reserveeIdentifier: type === ReserveeType.Company ? "1234567-8" : null,
     reserveeOrganisationName: "Test Organisation",
-    reserveeAddressStreet: "Testikuja 1",
-    reserveeAddressZip: "00100",
-    reserveeAddressCity: "Helsinki",
     municipality: MunicipalityChoice.Helsinki,
+    reservationUnit: {
+      reservationForm: ReservationFormType.PurposeForm,
+    },
   };
 }
 
-export function createSupportedFieldsMock(type: ReserveeType | "reservation" = "reservation"): FieldName[] {
+// TODO use ReservationFormType (getFormFields)
+export function createSupportedFieldsMock(type: ReserveeType | "reservation" = "reservation") {
   // We need to include the reserveeType field in the supported fields
   // so that the application fields can be rendered correctly.
   if (type === "reservation") {
-    return [
-      {
-        fieldName: "reserveeType",
-      },
-      {
-        fieldName: "numPersons",
-      },
-      {
-        fieldName: "purpose",
-      },
-      {
-        fieldName: "ageGroup",
-      },
-    ];
+    return ["reserveeType", "numPersons", "purpose", "ageGroup"] as const;
   }
-  const fieldNames = [
-    {
-      fieldName: "reserveeType",
-    },
-    {
-      fieldName: "reserveeFirstName",
-    },
-    {
-      fieldName: "reserveeLastName",
-    },
-    {
-      fieldName: "reserveePhone",
-    },
-    {
-      fieldName: "reserveeEmail",
-    },
-  ];
-  if (type === ReserveeType.Nonprofit) {
-    fieldNames.push({
-      fieldName: "reserveeOrganisationName",
-    });
+  const baseReserveeFields = [
+    "reserveeType",
+    "reserveeFirstName",
+    "reserveeLastName",
+    "reserveePhone",
+    "reserveeEmail",
+  ] as const;
+  switch (type) {
+    case ReserveeType.Nonprofit:
+      return [...baseReserveeFields, "reserveeOrganisationName"] as const;
+    case ReserveeType.Company:
+      return [...baseReserveeFields, "reserveeOrganisationName", "reserveeIdentifier"] as const;
+    case ReserveeType.Individual:
+      return baseReserveeFields;
   }
-  if (type === ReserveeType.Company) {
-    fieldNames.push(
-      {
-        fieldName: "reserveeOrganisationName",
-      },
-      {
-        fieldName: "reserveeIdentifier",
-      }
-    );
-  }
-  return fieldNames;
 }
