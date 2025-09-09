@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev -p 3001",
+    "dev": "next dev -p 3001 --turbopack",
     "build": "SKIP_ENV_VALIDATION=true next build",
     "start": "next start",
     "lint": "oxlint . -c ../../.oxlintrc.json",
