@@ -140,6 +140,30 @@ def test_frontend_queries__customer_ui__ApproveReservation(graphql):
     assert response.has_errors is False, response.errors
 
 
+def test_frontend_queries__customer_ui__ArchiveReservationUnit(graphql):
+    admin_factories = get_admin_query_info()
+    factories = admin_factories["ArchiveReservationUnit"]
+
+    assert len(factories) == 1
+    query_info = factories[0]
+
+    factory_args = deepcopy(query_info.factory_args)
+    reservation_unit = ReservationUnitFactory.create(**factory_args)
+
+    variables = deepcopy(query_info.variables)
+    variables["input"] = {
+        "pk": reservation_unit.pk,
+    }
+    assert_no_undefined_variables(variables)
+
+    query = query_info.query
+    graphql.login_with_superuser()
+
+    response = graphql(query, variables=variables)
+
+    assert response.has_errors is False, response.errors
+
+
 def test_frontend_queries__customer_ui__BannerNotificationCreate(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["BannerNotificationCreate"]
