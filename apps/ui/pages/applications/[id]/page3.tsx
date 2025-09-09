@@ -39,7 +39,7 @@ function Page3Form(): JSX.Element | null {
   const { watch, unregister, register, setValue } = useFormContext<ApplicationPage3FormValues>();
   const type = watch("applicantType");
 
-  const hasRegistration = !watch("reserveeIsUnregisteredAssociation");
+  const hasRegistration = watch("isRegisteredAssociation");
   useEffect(() => {
     if (type === ReserveeType.Individual) {
       unregister("organisationName");
