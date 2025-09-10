@@ -17,15 +17,17 @@ from .common import (
     get_my_applications_ext_link,
     get_section_allocation,
     params_for_access_code_section,
+    params_for_access_code_section_plain,
     params_for_access_code_series,
+    params_for_access_type_change_section,
     params_for_base_info,
 )
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.integrations.email.typing import (
         EmailType,
-        SeasonalBookingAccessCodeAddedContext,
         SeasonalBookingAccessCodeChangedContext,
+        SeasonalBookingAccessTypeChangedContext,
         SeasonalBookingCancelledAllContext,
         SeasonalBookingCancelledAllStaffNotificationContext,
         SeasonalBookingCancelledSingleContext,
@@ -38,8 +40,8 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 __all__ = [
-    "get_context_for_seasonal_booking_access_code_added",
     "get_context_for_seasonal_booking_access_code_changed",
+    "get_context_for_seasonal_booking_access_type_changed",
     "get_context_for_seasonal_booking_application_received",
     "get_context_for_seasonal_booking_application_round_handled",
     "get_context_for_seasonal_booking_application_round_in_allocation",
@@ -51,35 +53,6 @@ __all__ = [
     "get_context_for_seasonal_booking_rescheduled_series",
     "get_context_for_seasonal_booking_rescheduled_single",
 ]
-
-
-@get_translated
-def get_context_for_seasonal_booking_access_code_added(
-    section: ApplicationSection | None = None,
-    *,
-    language: Lang,
-    **data: Unpack[SeasonalBookingAccessCodeAddedContext],
-) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED]:
-    if section is not None:
-        context = get_context_for_seasonal_booking_access_code_changed(section, language=language)
-    else:
-        context = get_context_for_seasonal_booking_access_code_changed(**data, language=language)
-
-    title = pgettext("Email", "Access to the space has changed")
-
-    link = get_my_applications_ext_link(language=language)
-    text = pgettext("Email", "My applications")
-    text = f"{text!r}"
-
-    body = pgettext("Email", "You can find the door code in this message and at %(my_applications)s page at Varaamo")
-    body_html = body % {"my_applications": create_anchor_tag(link=link, text=text)}
-    body_text = body % {"my_applications": f"{text} ({link})"}
-
-    context["title"] = title
-    context["text_reservation_modified_html"] = f"{title}. {body_html}."
-    context["text_reservation_modified"] = f"{title}. {body_text}."
-
-    return context
 
 
 @get_translated
@@ -119,6 +92,61 @@ def get_context_for_seasonal_booking_access_code_changed(
             access_code_is_used=data["access_code_is_used"],
             access_code=data["access_code"],
             access_code_validity_period="",  # Allocations have different validity periods
+        ),
+    }
+
+
+@get_translated
+def get_context_for_seasonal_booking_access_type_changed(
+    section: ApplicationSection | None = None,
+    *,
+    language: Lang,
+    **data: Unpack[SeasonalBookingAccessTypeChangedContext],
+) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_ACCESS_TYPE_CHANGED]:
+    if section is not None:
+        application_round = section.application.application_round
+
+        data["email_recipient_name"] = section.application.applicant
+        data["application_id"] = section.application.pk
+        data["application_section_id"] = section.pk
+        data["application_section_name"] = section.name
+        data["application_round_name"] = get_attr_by_language(application_round, "name", language)
+
+        data |= params_for_access_type_change_section(section=section)
+        data |= params_for_access_code_section_plain(section=section)
+
+    title = pgettext("Email", "Access to your season booking is changing")
+
+    link = get_my_applications_ext_link(language=language)
+    text = pgettext("Email", "My applications")
+    text = f"{text!r}"
+
+    body = pgettext(
+        "Email",
+        "You can find the access method in this message and on the %(my_applications)s page at Varaamo",
+    )
+    body_html = body % {"my_applications": create_anchor_tag(link=link, text=text)}
+    body_text = body % {"my_applications": f"{text} ({link})"}
+
+    return {
+        "title": title,
+        "text_reservation_modified_html": f"{title}. {body_html}.",
+        "text_reservation_modified": f"{title}. {body_text}.",
+        "application_section_name": data["application_section_name"],
+        "application_round_name": data["application_round_name"],
+        "reservation_units": data["reservation_units"],
+        "access_types_label": pgettext("Email", "Access types"),
+        **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
+        **get_contex_for_seasonal_reservation_check_details_url(
+            language=language,
+            application_id=data["application_id"],
+            application_section_id=data["application_section_id"],
+        ),
+        **get_context_for_keyless_entry(
+            language=language,
+            access_code_is_used=data["access_code_is_used"],
+            access_code=data["access_code"],
+            access_code_validity_period="",  # Allocations have different validity periods, not used here.
         ),
     }
 
@@ -175,10 +203,11 @@ def get_context_for_seasonal_booking_application_round_in_allocation(
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_IN_ALLOCATION]:
     link = get_my_applications_ext_link(language=language)
     text = pgettext("Email", "My applications")
+    text = f"{text!r}"
 
     body = pgettext("Email", "You can view the application you have sent on the %(my_applications)s page")
-    body_html = body % {"my_applications": create_anchor_tag(link=link, text=f"{text!r}")}
-    body_text = body % {"my_applications": f"{text!r}"} + f": {link}"
+    body_html = body % {"my_applications": create_anchor_tag(link=link, text=text)}
+    body_text = body % {"my_applications": f"{text}"} + f": {link}"
 
     return {
         "title": pgettext("Email", "Your application is being processed"),

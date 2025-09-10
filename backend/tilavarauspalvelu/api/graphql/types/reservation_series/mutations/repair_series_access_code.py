@@ -53,13 +53,12 @@ class ReservationSeriesRepairAccessCodeMutation(MutationType[ReservationSeries],
 
         has_access_code_after = instance.actions.has_upcoming_or_ongoing_reservations_with_active_access_codes()
 
-        if instance.allocated_time_slot is not None:
-            section = instance.allocated_time_slot.reservation_unit_option.application_section
+        allocation = instance.allocated_time_slot
+        if allocation is not None and no_access_code_before and has_access_code_after:
+            section = allocation.reservation_unit_option.application_section
+            EmailService.send_seasonal_booking_access_type_changed_email(section)
 
-            if no_access_code_before and has_access_code_after:
-                EmailService.send_seasonal_booking_access_code_added_email(section)
-
-        last_reservation: Reservation = instance.reservations.requires_active_access_code().last()
+        last_reservation: Reservation = instance.reservations.all().requires_active_access_code().last()
         return ReservationSeriesRepairAccessCodeMutationOutput(
             access_code_generated_at=last_reservation.access_code_generated_at,
             access_code_is_active=last_reservation.access_code_is_active,
