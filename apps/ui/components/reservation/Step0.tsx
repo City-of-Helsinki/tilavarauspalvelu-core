@@ -11,7 +11,6 @@ import { ReservationForm } from "common/src/reservation-form/MetaFields";
 import { ActionContainer } from "./styles";
 import InfoDialog from "../common/InfoDialog";
 import {
-  type ReservationFormFieldsFragment,
   ReservationFormType,
   type ReservationInProgressFragment,
   type ReservationUpdateMutation,
@@ -23,6 +22,7 @@ import {
   getFilteredReserveeFields,
   formContainsField,
   getFormFields,
+  type FormFieldArray,
 } from "common/src/reservation-form/util";
 import { type InputsT } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/styled";
@@ -108,7 +108,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
   const includesHomeCity = formContainsField(formType, "municipality");
   const includesReserveeType = formContainsField(formType, "reserveeType");
 
-  const generalFields = getFilteredGeneralFields({ formType, reservation });
+  const generalFields = getFilteredGeneralFields(formType);
   const reservationApplicationFields = getFilteredReserveeFields({
     formType,
     reservation,
@@ -124,6 +124,8 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
     ? getTranslationSafe(reservation.reservationUnit.pricingTerms, "text", lang)
     : "";
 
+  const enableSubvention = reservation.reservationUnit.canApplyFreeOfCharge;
+
   return (
     <NewReservationForm onSubmit={handleSubmit(onSubmit)} noValidate>
       <ReservationForm
@@ -132,6 +134,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
         generalFields={generalFields}
         reservationApplicationFields={reservationApplicationFields}
         data={{
+          enableSubvention,
           termsForDiscount: (
             <Trans
               i18nKey="reservationApplication:label.common.applyingForFreeOfChargeButton"
@@ -203,7 +206,7 @@ function Errors({
 }: {
   form: UseFormReturn<InputsT>;
   formType: ReservationFormType;
-  generalFields: Array<keyof ReservationFormFieldsFragment>;
+  generalFields: FormFieldArray;
 }) {
   const { t } = useTranslation();
 

@@ -1,49 +1,60 @@
 import React, { Fragment } from "react";
-import { IconGroup, IconUser } from "hds-react";
 import styled from "styled-components";
-import { Controller, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import { MetadataSetsFragment, ReservationFormType, type ReservationUnitNode, ReserveeType } from "../../gql/gql-types";
+import {
+  type MetadataSetsFragment,
+  ReservationFormType,
+  type ReservationUnitNode,
+  ReserveeType,
+} from "../../gql/gql-types";
 import { ReservationFormField } from "./ReservationFormField";
 import { type InputsT, type ReservationFormT } from "./types";
-import { RadioButtonWithImage } from "./RadioButtonWithImage";
-import { AutoGrid, fontMedium, fontRegular, H4, H5 } from "../../styled";
+import { AutoGrid, H4, H5 } from "../../styled";
 import { type OptionsRecord } from "../../types/common";
-import IconPremises from "../icons/IconPremises";
-import { extendMetaFieldOptions, formContainsField } from "./util";
+import { type ExtendedFormFieldArray, extendMetaFieldOptions, formContainsField, type FormFieldArray } from "./util";
+import { CustomerTypeSelector } from "./CustomerTypeSelector";
 
-type CommonProps = {
+interface CommonProps {
   options: Readonly<Omit<OptionsRecord, "municipalities">>;
   data?: {
     termsForDiscount?: JSX.Element | string;
+    enableSubvention?: boolean;
   };
-};
+}
 
-type Field = string;
-type Props = CommonProps & {
+interface ReservationFormProps extends CommonProps {
   reservationUnit: MetadataSetsFragment;
-  generalFields: Field[];
-  reservationApplicationFields: Field[];
-};
+  generalFields: FormFieldArray;
+  reservationApplicationFields: ExtendedFormFieldArray;
+}
 
-const Subheading = styled(H4).attrs({ as: "h2" })``;
+interface CommonWithFields extends CommonProps {
+  fields: ExtendedFormFieldArray;
+}
+
+interface ReservationFormFieldsProps extends CommonWithFields {
+  headingKey?: ReserveeType | "COMMON";
+  hasSubheading?: boolean;
+  params?: { numPersons: { min?: number; max?: number } };
+  formType: ReservationFormType;
+  section: "general" | "reservee";
+}
+
+interface ReservationFormFieldsDetailsSectionProps extends CommonWithFields {
+  reservationUnit: MetadataSetsFragment;
+}
+
+interface ReservationFormFieldsReserveeSectionProps extends CommonWithFields {
+  reservationUnit: Pick<ReservationUnitNode, "reservationForm">;
+}
 
 const GroupHeading = styled(H5)`
   grid-column: 1 / -1;
   margin-bottom: 0;
 `;
 
-const CustomerTypeChoiceContainer = styled.div`
-  display: flex;
-  margin-bottom: var(--spacing-3-xl);
-  width: 100%;
-  gap: var(--spacing-xs);
-  flex-wrap: wrap;
-`;
-
-const InfoHeading = styled(Subheading)<{ $zeroMargin?: boolean }>`
-  margin: ${({ $zeroMargin }) => ($zeroMargin ? 0 : "var(--spacing-layout-m) 0 var(--spacing-xs)")};
-`;
+const Subheading = styled(H4).attrs({ as: "h2" })``;
 
 const MandatoryFieldsInfoText = styled.p`
   font-size: var(--fontsize-body-s);
@@ -52,25 +63,6 @@ const MandatoryFieldsInfoText = styled.p`
 const ReserverInfoHeading = styled(Subheading)`
   margin: var(--spacing-layout-m) 0 var(--spacing-xs);
 `;
-
-const ReservationApplicationFieldsContainer = styled(AutoGrid)`
-  margin: var(--spacing-layout-m) 0 var(--spacing-layout-m);
-`;
-
-const reserveeOptions = [
-  {
-    id: ReserveeType.Individual,
-    icon: <IconUser />,
-  },
-  {
-    id: ReserveeType.Nonprofit,
-    icon: <IconGroup />,
-  },
-  {
-    id: ReserveeType.Company,
-    icon: <IconPremises width="24" height="24" aria-hidden />,
-  },
-];
 
 function SubheadingByType({
   reserveeType,
@@ -110,23 +102,33 @@ function ReservationFormFields({
   hasSubheading,
   params,
   data,
+  section,
   // TODO need to add usage for this to get required field (unless we hard code it in the Form itself?)
   formType: _,
-}: CommonProps & {
-  fields: Field[];
-  headingKey?: ReserveeType | "COMMON";
-  hasSubheading?: boolean;
-  formType: ReservationFormType;
-  params?: { numPersons: { min?: number; max?: number } };
-}) {
+}: ReservationFormFieldsProps) {
   const { t } = useTranslation();
   const { getValues } = useFormContext<ReservationFormT>();
 
   const fieldsExtended = fields.map((field) => ({
     field,
     // TODO should have a separate function to check against formType
+    // there are very few fields that are required and some have interlinks
+    // required here only matters for the label rendering (we should check against a schema for validation)
     required: true,
   }));
+
+  if (section === "general" && data?.enableSubvention) {
+    fieldsExtended.push(
+      {
+        field: "applyingForFreeOfCharge",
+        required: false,
+      },
+      {
+        field: "freeOfChargeReason",
+        required: true,
+      }
+    );
+  }
 
   // TODO the subheading logic is weird / inefficient
   // instead of adding it to sections (or dividing the fields array into sections with headings)
@@ -155,17 +157,12 @@ function ReservationFormFields({
 }
 
 // TODO reduce prop drilling / remove unused props
-export function ReservationFormFieldsDetailsSection({
+export function ReservationFormGeneralSection({
   fields,
   reservationUnit,
   options,
   data,
-  noHeadingMarginal,
-}: {
-  fields: string[];
-  reservationUnit: MetadataSetsFragment;
-  noHeadingMarginal?: boolean;
-} & CommonProps) {
+}: ReservationFormFieldsDetailsSectionProps) {
   const { t } = useTranslation();
 
   if (fields.length === 0) {
@@ -173,7 +170,7 @@ export function ReservationFormFieldsDetailsSection({
   }
   return (
     <>
-      <InfoHeading $zeroMargin={noHeadingMarginal}>{t("reservationCalendar:reservationInfo")}</InfoHeading>
+      <Subheading>{t("reservationCalendar:reservationInfo")}</Subheading>
       <MandatoryFieldsInfoText>{t("forms:mandatoryFieldsText")}</MandatoryFieldsInfoText>
       <AutoGrid>
         <ReservationFormFields
@@ -181,6 +178,7 @@ export function ReservationFormFieldsDetailsSection({
           fields={fields}
           formType={reservationUnit.reservationForm}
           headingKey="COMMON"
+          section="general"
           params={{
             numPersons: {
               min: !reservationUnit.minPersons || reservationUnit.minPersons === 0 ? 1 : reservationUnit.minPersons,
@@ -199,49 +197,13 @@ export function ReservationFormFieldsDetailsSection({
   );
 }
 
-function CustomerTypeChoiceSelector() {
-  const { t } = useTranslation();
-
-  return (
-    <CustomerTypeChoiceContainer data-testid="reservation__checkbox--reservee-type">
-      <Controller
-        name="reserveeType"
-        render={({ field: { value, onChange } }) => (
-          <>
-            {reserveeOptions
-              .map(({ id, icon }) => ({
-                choice: id,
-                icon,
-                name: id,
-              }))
-              .map(({ choice, icon, name }) => (
-                <RadioButtonWithImage
-                  key={choice}
-                  id={`reserveeType__${name}`}
-                  label={t(`reservationApplication:reserveeTypes.labels.${name}`)}
-                  onClick={() => onChange(choice)}
-                  icon={icon}
-                  checked={value === choice}
-                />
-              ))}
-          </>
-        )}
-      />
-    </CustomerTypeChoiceContainer>
-  );
-}
-
 // TODO reduce prop drilling / remove unused props
-export function ReservationFormFieldsReserveeSection({
+export function ReservationFormReserveeSection({
   fields,
   reservationUnit,
   options,
   data,
-}: {
-  // TODO should not be arbitrary strings
-  fields: string[];
-  reservationUnit: Pick<ReservationUnitNode, "reservationForm">;
-} & CommonProps) {
+}: ReservationFormFieldsReserveeSectionProps) {
   const { watch } = useFormContext<ReservationFormT & Partial<InputsT>>();
   const { t } = useTranslation();
 
@@ -252,13 +214,8 @@ export function ReservationFormFieldsReserveeSection({
   return (
     <>
       <ReserverInfoHeading>{t("reservationCalendar:reserverInfo")}</ReserverInfoHeading>
-      {isTypeSelectable && (
-        <>
-          <p id="reserveeType-label">{t("reservationApplication:reserveeTypePrefix")}</p>
-          <CustomerTypeChoiceSelector />
-        </>
-      )}
-      <ReservationApplicationFieldsContainer data-testid="reservation__form--reservee-info">
+      {isTypeSelectable && <CustomerTypeSelector />}
+      <AutoGrid data-testid="reservation__form--reservee-info">
         <ReservationFormFields
           fields={fields}
           formType={reservationUnit.reservationForm}
@@ -266,31 +223,12 @@ export function ReservationFormFieldsReserveeSection({
           hasSubheading
           headingKey={reserveeType}
           data={data}
+          section="reservee"
         />
-      </ReservationApplicationFieldsContainer>
+      </AutoGrid>
     </>
   );
 }
-
-const Container = styled.div`
-  margin-bottom: var(--spacing-m);
-
-  label {
-    ${fontMedium};
-
-    span {
-      line-height: unset;
-      transform: unset;
-      margin-left: 0;
-      display: inline;
-      font-size: unset;
-    }
-  }
-
-  input[type="radio"] + label {
-    ${fontRegular};
-  }
-`;
 
 export function ReservationForm({
   reservationUnit,
@@ -298,21 +236,21 @@ export function ReservationForm({
   reservationApplicationFields,
   options,
   data,
-}: Props) {
+}: ReservationFormProps) {
   return (
-    <Container>
-      <ReservationFormFieldsDetailsSection
+    <>
+      <ReservationFormGeneralSection
         fields={generalFields}
         options={options}
         reservationUnit={reservationUnit}
         data={data}
       />
-      <ReservationFormFieldsReserveeSection
+      <ReservationFormReserveeSection
         fields={reservationApplicationFields}
         options={options}
         reservationUnit={reservationUnit}
         data={data}
       />
-    </Container>
+    </>
   );
 }
