@@ -8,8 +8,7 @@ import {
 import { ReserveeType, type MetadataSetsFragment } from "@gql/gql-types";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { type OptionsRecord } from "common";
-import { getReservationFormFields } from "common/src/reservation-form/util";
-import { formContainsField } from "common/src/metaFieldsHelpers";
+import { getReservationFormFields, formContainsField } from "common/src/reservation-form/util";
 
 type Props = {
   reservationUnit: MetadataSetsFragment;

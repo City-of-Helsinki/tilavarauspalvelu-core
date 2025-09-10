@@ -18,8 +18,12 @@ import {
   ReserveeType,
   useUpdateReservationMutation,
 } from "@gql/gql-types";
-import { formContainsField, getFormFields } from "common/src/metaFieldsHelpers";
-import { getFilteredGeneralFields, getFilteredReserveeFields } from "common/src/reservation-form/util";
+import {
+  getFilteredGeneralFields,
+  getFilteredReserveeFields,
+  formContainsField,
+  getFormFields,
+} from "common/src/reservation-form/util";
 import { type InputsT } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";

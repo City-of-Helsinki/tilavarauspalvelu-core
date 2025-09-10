@@ -10,8 +10,7 @@ import { RadioButtonWithImage } from "./RadioButtonWithImage";
 import { AutoGrid, fontMedium, fontRegular, H4, H5 } from "../../styled";
 import { type OptionsRecord } from "../../types/common";
 import IconPremises from "../icons/IconPremises";
-import { formContainsField } from "../metaFieldsHelpers";
-import { extendMetaFieldOptions } from "./util";
+import { extendMetaFieldOptions, formContainsField } from "./util";
 
 type CommonProps = {
   options: Readonly<Omit<OptionsRecord, "municipalities">>;

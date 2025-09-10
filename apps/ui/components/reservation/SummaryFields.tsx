@@ -1,6 +1,5 @@
 import { type TFunction, useTranslation } from "next-i18next";
 import { type ReservationNode, ReserveeType, type ReservationFormFieldsFragment } from "@/gql/gql-types";
-import { formContainsField } from "common/src/metaFieldsHelpers";
 import { AutoGrid, H4 } from "common/styled";
 import { ParagraphAlt, PreviewLabel, PreviewValue } from "./styles";
 import { LabelValuePair } from "./LabelValuePair";
@@ -10,6 +9,7 @@ import {
   extendMetaFieldOptions,
   getReservationFormGeneralFields,
   getReservationFormReserveeFields,
+  formContainsField,
 } from "common/src/reservation-form/util";
 
 function isNotEmpty(
