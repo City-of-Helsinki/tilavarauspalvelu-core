@@ -1,7 +1,7 @@
 import { NumberInput, TextArea, TextInput } from "hds-react";
 import { get } from "lodash-es";
 import React, { useMemo } from "react";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, type UseFormRegister } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontMedium, Strongish } from "../../styled";
@@ -9,13 +9,11 @@ import { ReserveeType } from "../../gql/gql-types";
 import { type ReservationFormT } from "./types";
 import { type OptionsRecord } from "../../types/common";
 import { ControlledCheckbox, ControlledSelect } from "../components/form";
-import { ExtendedFormField } from "./util";
 
 type Props = {
-  field: ExtendedFormField;
+  field: keyof ReservationFormT;
   options: OptionsRecord;
   translationKey?: ReserveeType | "COMMON";
-  reservation: ReservationFormT;
   required: boolean;
   params?: Record<string, Record<string, string | number>>;
   data?: {
@@ -40,7 +38,7 @@ const Subheading = styled(Strongish)`
   margin-bottom: var(--spacing-s);
 `;
 
-const StyledControlledSelect = styled(ControlledSelect)<{ $isWide?: boolean }>`
+const StyledControlledSelect = styled(ControlledSelect<ReservationFormT>)<{ $isWide?: boolean }>`
   ${({ $isWide }) => $isWide && "grid-column: 1 / -1"};
 `;
 
@@ -94,19 +92,13 @@ export function ReservationFormField({
   options: originalOptions,
   translationKey,
   required,
-  reservation,
   params = {},
   data = {},
 }: Props) {
   const { t } = useTranslation();
   const options = convertOptionsToField(originalOptions);
 
-  const lowerCaseTranslationKey = translationKey?.toLocaleLowerCase() || "individual";
-
-  const isWideRow = useMemo(
-    (): boolean => ["name", "description", "applyingForFreeOfCharge", "purpose"].includes(field),
-    [field]
-  );
+  const isWideRow = ["name", "applyingForFreeOfCharge", "purpose"].includes(field);
 
   const {
     watch,
@@ -114,13 +106,7 @@ export function ReservationFormField({
     control,
     formState: { errors },
     trigger,
-  } = useFormContext();
-
-  const isTextArea = useMemo((): boolean => ["description"].includes(field), [field]);
-
-  const isNumField = useMemo((): boolean => ["numPersons"].includes(field), [field]);
-
-  const isEmailField = useMemo((): boolean => ["reserveeEmail"].includes(field), [field]);
+  } = useFormContext<ReservationFormT>();
 
   const isSelectField = Object.keys(options).includes(field);
 
@@ -128,8 +114,10 @@ export function ReservationFormField({
 
   const isFreeOfChargeReasonRequired = field === "freeOfChargeReason" && watch("applyingForFreeOfCharge") === true;
 
+  const lowerCaseTranslationKey = translationKey?.toLocaleLowerCase() || "individual";
   const label = t(`reservationApplication:label.${lowerCaseTranslationKey}.${field}`);
 
+  const isNumField = "numPersons" === field;
   const minValue =
     get(params, field)?.min != null && !Number.isNaN(get(params, field).min) ? Number(get(params, field)?.min) : 1;
   const maxValue =
@@ -141,11 +129,7 @@ export function ReservationFormField({
 
   const error = get(errors, field);
 
-  const errorPrefix = useMemo(() => {
-    if (isSelectField) return t("forms:prefix.select");
-
-    return t("forms:prefix.text");
-  }, [isSelectField, t]);
+  const errorPrefix = isSelectField ? t("forms:prefix.select") : t("forms:prefix.text");
 
   const errorText = useMemo(() => {
     if (!error || !field) return "";
@@ -183,13 +167,6 @@ export function ReservationFormField({
 
     return "";
   }, [error, field, label, t, minValue, maxValue, errorPrefix]);
-
-  const defaultValue = get(reservation, field);
-
-  const emailPattern = {
-    value: /^[A-ZÖÄÅ0-9._%+-]+@[A-ZÖÄÅ0-9.-]+\.[A-ZÖÄÅ]{2,}$/i,
-    message: "email",
-  };
 
   const id = `reservation-form-field__${field}`;
   if (isSelectField) {
@@ -237,28 +214,6 @@ export function ReservationFormField({
       />
     );
   }
-  if (isTextArea) {
-    return (
-      <StyledTextArea
-        label={label}
-        id={id}
-        {...register(field, {
-          required,
-          ...(isEmailField && {
-            pattern: emailPattern,
-          }),
-        })}
-        key={field}
-        defaultValue={defaultValue?.toString() ?? ""}
-        errorText={errorText}
-        invalid={!!error}
-        required={required}
-        maxLength={MAX_TEXT_LENGTH - (isEmailField ? 1 : 0)}
-        $isWide={isWideRow}
-        $height="119px"
-      />
-    );
-  }
 
   const shouldHideOrganisationIdentifier =
     watch("reserveeType") === ReserveeType.Nonprofit && watch("reserveeIsUnregisteredAssociation") === true;
@@ -267,13 +222,14 @@ export function ReservationFormField({
     id,
     name: field,
     control,
-    defaultValue: typeof defaultValue === "boolean" ? defaultValue : undefined,
     label,
     required,
     errorText,
   };
 
   switch (field) {
+    case "description":
+      return <DescriptionField field={field} label={label} errorText={errorText} register={register} id={id} />;
     case "applyingForFreeOfCharge":
       return (
         <StyledCheckboxWrapper key={field} $isWide={isWideRow}>
@@ -298,7 +254,6 @@ export function ReservationFormField({
           id={id}
           key={field}
           {...register(field, { required: isFreeOfChargeReasonRequired })}
-          defaultValue={defaultValue?.toString() ?? ""}
           errorText={errorText}
           invalid={!!error}
           required={isFreeOfChargeReasonRequired}
@@ -319,7 +274,6 @@ export function ReservationFormField({
           })}
           key={field}
           type="text"
-          defaultValue={typeof defaultValue === "string" ? defaultValue : ""}
           errorText={errorText}
           invalid={!!error}
           required={required}
@@ -328,27 +282,94 @@ export function ReservationFormField({
           disabled={shouldHideOrganisationIdentifier}
         />
       );
+    case "reserveeEmail":
+      return <EmailInput label={label} field={field} register={register} errorText={errorText} id={id} />;
     default:
       return (
         <StyledTextInput
           label={label}
           id={id}
-          {...register(field, {
-            required,
-            ...(isEmailField && {
-              pattern: emailPattern,
-            }),
-          })}
+          {...register(field, { required })}
           key={field}
           type="text"
           errorText={errorText}
-          defaultValue={defaultValue ? String(defaultValue) : undefined}
           invalid={!!error}
           required={required}
-          // email field is special and has one less character than the rest
-          maxLength={MAX_TEXT_LENGTH - (isEmailField ? 1 : 0)}
+          maxLength={MAX_TEXT_LENGTH}
           $isWide={isWideRow}
         />
       );
   }
+}
+
+function DescriptionField({
+  id,
+  label,
+  field,
+  register,
+  errorText,
+}: {
+  id: string;
+  label: string;
+  field: keyof ReservationFormT;
+  register: UseFormRegister<ReservationFormT>;
+  errorText: string;
+}): React.ReactElement {
+  const required = true;
+  return (
+    <StyledTextArea
+      label={label}
+      id={id}
+      {...register(field, { required })}
+      key={field}
+      errorText={errorText}
+      invalid={errorText !== ""}
+      required
+      maxLength={MAX_TEXT_LENGTH}
+      $isWide
+      $height="119px"
+    />
+  );
+}
+
+function EmailInput({
+  id,
+  label,
+  field,
+  register,
+  errorText,
+}: {
+  id: string;
+  label: string;
+  field: keyof ReservationFormT;
+  register: UseFormRegister<ReservationFormT>;
+  errorText: string;
+}): React.ReactElement {
+  const isEmailField = true;
+  const required = true;
+
+  const emailPattern = {
+    value: /^[A-ZÖÄÅ0-9._%+-]+@[A-ZÖÄÅ0-9.-]+\.[A-ZÖÄÅ]{2,}$/i,
+    message: "email",
+  };
+
+  return (
+    <StyledTextInput
+      label={label}
+      id={id}
+      {...register(field, {
+        required,
+        ...(isEmailField && {
+          pattern: emailPattern,
+        }),
+      })}
+      key={field}
+      type="text"
+      errorText={errorText}
+      invalid={errorText !== ""}
+      required={required}
+      // email field is special and has one less character than the rest
+      maxLength={MAX_TEXT_LENGTH - (isEmailField ? 1 : 0)}
+    />
+  );
 }

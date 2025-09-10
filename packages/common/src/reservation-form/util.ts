@@ -89,12 +89,12 @@ export function extendMetaFieldOptions(options: Omit<OptionsRecord, "municipalit
 }
 
 // used to inject frontend only boolean toggle into the FormFields
-export type ExtendedFormField = keyof ReservationFormFieldsFragment | "reserveeIsUnregisteredAssociation";
-export type ExtendedFormFieldArray = ReadonlyArray<ExtendedFormField>;
-export type FormField = keyof ReservationFormFieldsFragment;
+export type FormField = keyof Omit<ReservationFormFieldsFragment, "id" | "reservationUnit">;
 export type FormFieldArray = ReadonlyArray<FormField>;
+export type ExtendedFormField = FormField | "reserveeIsUnregisteredAssociation";
+export type ExtendedFormFieldArray = ReadonlyArray<ExtendedFormField>;
 
-function extendReserverFields(fields: Array<keyof ReservationFormFieldsFragment>): ExtendedFormField[] {
+function extendReserverFields(fields: FormFieldArray): ExtendedFormField[] {
   const key = "reserveeIdentifier" as const;
   const identifierIndex = fields.findIndex((k) => k === key);
   if (identifierIndex > 0) {
@@ -109,7 +109,7 @@ function extendReserverFields(fields: Array<keyof ReservationFormFieldsFragment>
     }
     return [...fields, "reserveeIsUnregisteredAssociation"];
   }
-  return fields;
+  return [...fields];
 }
 
 export function getReservationFormReserveeFields({ reserveeType }: { reserveeType: ReserveeType }) {
@@ -133,7 +133,7 @@ export function getFilteredReserveeFields({
     reserveeType,
   });
 
-  const baseFields = fields.filter((key): key is keyof ReservationFormFieldsFragment => key in reservation);
+  const baseFields = fields.filter((key): key is FormField => key in reservation);
   return extendReserverFields(baseFields);
 }
 

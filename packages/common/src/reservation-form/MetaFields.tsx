@@ -108,7 +108,6 @@ function ReservationFormFields({
   formType: _,
 }: ReservationFormFieldsProps) {
   const { t } = useTranslation();
-  const { getValues } = useFormContext<ReservationFormT>();
 
   const fieldsExtended = fields.map((field) => ({
     field,
@@ -147,7 +146,6 @@ function ReservationFormFields({
             options={extendMetaFieldOptions(options, t)}
             required={required}
             translationKey={headingKey}
-            reservation={getValues()}
             params={params}
             data={data}
           />
