@@ -166,6 +166,7 @@ msgstr "Luotu"
 #: tilavarauspalvelu/admin/application/admin.py
 #: tilavarauspalvelu/admin/application_round/admin.py
 #: tilavarauspalvelu/admin/application_section/admin.py
+#: tilavarauspalvelu/admin/email_message/admin.py
 #: tilavarauspalvelu/admin/reservation/admin.py
 #: tilavarauspalvelu/admin/reservation_series/admin.py
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
@@ -921,6 +922,14 @@ msgid ""
 msgstr ""
 "Onko ilmoitus luonnos. Luonnoksia ei näytetä käyttäjille, vaikka ne olisivat "
 "aktiivisia."
+
+#: tilavarauspalvelu/admin/email_message/admin.py
+msgid "Content"
+msgstr "Sisältö"
+
+#: tilavarauspalvelu/admin/email_message/admin.py
+msgid "Attachments"
+msgstr "Liitteet"
 
 #: tilavarauspalvelu/admin/email_template/tester.py
 #, python-format
@@ -3644,6 +3653,14 @@ msgid ""
 msgstr ""
 "'active_from' ja 'active_until' täytyy olla joko tyhjiä tai asetettuja. Jos "
 "molemmat on asetettu, 'active_until' täytyy olla 'active_from' jälkeen."
+
+#: tilavarauspalvelu/models/email_message/model.py
+msgid "email message"
+msgstr "sähköpostiviesti"
+
+#: tilavarauspalvelu/models/email_message/model.py
+msgid "email messages"
+msgstr "sähköpostiviestit"
 
 #: tilavarauspalvelu/models/equipment/model.py
 msgid "equipment"
