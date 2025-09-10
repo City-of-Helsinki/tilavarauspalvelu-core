@@ -51,7 +51,8 @@
   "general_error": "Tapahtui määrittämätön virhe.",
   "api": {
     "UNKNOWN": "Tapahtui virhe.",
-    "ENTITY_NOT_FOUND": "Kohdetta ei löytynyt",
+    "ENTITY_NOT_FOUND": "Kohdetta ei löytynyt.",
+    "MODEL_INSTANCE_NOT_FOUND": "Ei löytynyt.",
     "HELSINKI_PROFILE_KEYCLOAK_REFRESH_TOKEN_EXPIRED": "Henkilötietoja ei voida näyttää, koska niiden katselun vaatimaa käyttöoikeustunnusta ei saatu noudettua. Kirjaudu ulos ja takaisin sisään sen virkistämiseksi.",
     "HELSINKI_PROFILE_PERMISSION_DENIED": "Käyttöoikeutesi eivät riitä henkilötietojen näyttämiseen",
     "HELSINKI_PROFILE_USER_MISSING_PROFILE_ID": "Varauksen luoneen käyttäjän Helsinki-profiilin tunniste puuttuu.",

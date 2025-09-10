@@ -46,6 +46,7 @@
     "CREATE_PERMISSION_DENIED": "Ingen behörighet att skapa.",
     "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Det maximala antalet bokningar har överskridits.",
     "NOT_FOUND": "Bokningen hittades inte.",
+    "MODEL_INSTANCE_NOT_FOUND": "Hittades inte.",
     "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
     "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Kontrollera bokningstiden.",
     "RESERVATION_OVERLAP": "Överlappande bokningar.",

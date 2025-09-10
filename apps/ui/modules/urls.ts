@@ -90,7 +90,7 @@ export function getReservationUnitPath(pk: Maybe<number> | undefined, params?: R
   if (pk == null) {
     return "";
   }
-  return `${reservationUnitPrefix}/${pk}?${params?.toString() ?? ""}`;
+  return `${reservationUnitPrefix}/${pk}${params != null ? `?${params.toString()}` : ""}`;
 }
 
 export function getFeedbackUrl(feedbackUrl: string, i18n: { language: string }) {
