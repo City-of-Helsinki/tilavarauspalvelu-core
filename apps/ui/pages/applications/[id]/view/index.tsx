@@ -25,6 +25,7 @@ import { useRouter } from "next/router";
 import { useSearchParams } from "next/navigation";
 import { applicationsPrefix } from "@/modules/urls";
 import { ApplicationTerms } from "@/components/application/ApplicationTerms";
+import { Flex } from "common/styled";
 
 const TabPanel = styled(Tabs.TabPanel)`
   && {
@@ -128,7 +129,9 @@ function View({ application, tos }: Readonly<Pick<PropsNarrowed, "application" |
             <ApprovedReservations application={application} applicationRound={applicationRound} />
           </TabPanel>
           <TabPanel>
-            <WrappedViewApplication application={application} tos={tos} />
+            <Flex $gap="l">
+              <WrappedViewApplication application={application} tos={tos} />
+            </Flex>
           </TabPanel>
         </Tabs>
       ) : (
