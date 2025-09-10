@@ -148,6 +148,11 @@ function useImageMutations() {
   return [reconcileImageChanges];
 }
 
+// Button stripe floats on top of the form so add padding
+const ReservationUnitForm = styled.form`
+  padding-bottom: var(--spacing-3-xl);
+`;
+
 function ReservationUnitEditor({
   reservationUnit,
   form,
@@ -280,7 +285,7 @@ function ReservationUnitEditor({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate>
+    <ReservationUnitForm onSubmit={handleSubmit(onSubmit)} noValidate>
       <StyledContainerMedium>
         <DisplayUnit
           heading={reservationUnit?.nameFi ?? t("reservationUnitEditor:defaultHeading")}
@@ -330,7 +335,7 @@ function ReservationUnitEditor({
         onSubmit={onSubmit}
         form={form}
       />
-    </form>
+    </ReservationUnitForm>
   );
 }
 
