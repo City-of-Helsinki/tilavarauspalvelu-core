@@ -12,7 +12,7 @@ import { ReservationFormField } from "./ReservationFormField";
 import { type InputsT, type ReservationFormT } from "./types";
 import { AutoGrid, H4, H5 } from "../../styled";
 import { type OptionsRecord } from "../../types/common";
-import { type ExtendedFormFieldArray, extendMetaFieldOptions, formContainsField, type FormFieldArray } from "./util";
+import { type ExtendedFormFieldArray, extendMetaFieldOptions, formContainsField } from "./util";
 import { CustomerTypeSelector } from "./CustomerTypeSelector";
 
 interface CommonProps {
@@ -21,12 +21,6 @@ interface CommonProps {
     termsForDiscount?: JSX.Element | string;
     enableSubvention?: boolean;
   };
-}
-
-interface ReservationFormProps extends CommonProps {
-  reservationUnit: MetadataSetsFragment;
-  generalFields: FormFieldArray;
-  reservationApplicationFields: ExtendedFormFieldArray;
 }
 
 interface CommonWithFields extends CommonProps {
@@ -41,29 +35,29 @@ interface ReservationFormFieldsProps extends CommonWithFields {
   section: "general" | "reservee";
 }
 
-interface ReservationFormFieldsDetailsSectionProps extends CommonWithFields {
+interface ReservationFormGeneralSectionProps extends CommonWithFields {
   reservationUnit: MetadataSetsFragment;
 }
 
-interface ReservationFormFieldsReserveeSectionProps extends CommonWithFields {
+interface ReservationFormReserveeSectionProps extends CommonWithFields {
   reservationUnit: Pick<ReservationUnitNode, "reservationForm">;
+  style?: React.CSSProperties;
+  className?: string;
 }
 
 const GroupHeading = styled(H5)`
   grid-column: 1 / -1;
   margin-bottom: 0;
+  margin-top: 0;
 `;
 
-const Subheading = styled(H4).attrs({ as: "h2" })``;
-
-const MandatoryFieldsInfoText = styled.p`
-  font-size: var(--fontsize-body-s);
+const Subheading = styled(H4).attrs({ as: "h2" })`
+  grid-column: 1 / -1;
+  margin: 0;
 `;
 
-const ReserverInfoHeading = styled(Subheading)`
-  margin: var(--spacing-layout-m) 0 var(--spacing-xs);
-`;
-
+// TODO this is used in a silly way, it should be before we iterate over the form fields
+// the heading label should be picked based on possible fields and selected type, not position etc.
 function SubheadingByType({
   reserveeType,
   index,
@@ -72,26 +66,33 @@ function SubheadingByType({
   reserveeType: ReserveeType;
   index: number;
   field: string;
-}) {
+}): React.ReactElement | null {
   const { t } = useTranslation();
 
-  const headingForNonProfit = reserveeType === ReserveeType.Nonprofit && index === 0;
+  if (reserveeType === ReserveeType.Individual) {
+    return null;
+  }
 
-  const headingForNonProfitContactInfo = reserveeType === ReserveeType.Nonprofit && field === "reserveeFirstName";
+  if (reserveeType === ReserveeType.Nonprofit) {
+    const headingForNonProfit = index === 0;
 
-  const headingForCompanyInfo = reserveeType === ReserveeType.Company && index === 0;
+    if (headingForNonProfit) {
+      return <GroupHeading>{t("reservationApplication:label.headings.nonprofitInfo")}</GroupHeading>;
+    }
+  }
+  if (reserveeType === ReserveeType.Company) {
+    const headingForCompanyInfo = index === 0;
 
-  const headingForContactInfo = reserveeType === ReserveeType.Company && field === "reserveeFirstName";
+    if (headingForCompanyInfo) {
+      return <GroupHeading>{t("reservationApplication:label.headings.companyInfo")}</GroupHeading>;
+    }
+  }
 
-  return headingForNonProfit ? (
-    <GroupHeading style={{ marginTop: 0 }}>{t("reservationApplication:label.headings.nonprofitInfo")}</GroupHeading>
-  ) : headingForNonProfitContactInfo ? (
-    <GroupHeading>{t("reservationApplication:label.headings.contactInfo")}</GroupHeading>
-  ) : headingForCompanyInfo ? (
-    <GroupHeading style={{ marginTop: 0 }}>{t("reservationApplication:label.headings.companyInfo")}</GroupHeading>
-  ) : headingForContactInfo ? (
-    <GroupHeading>{t("reservationApplication:label.headings.contactInfo")}</GroupHeading>
-  ) : null;
+  // TODO in what case does the above checks fall to here?
+  if (field === "reserveeFirstName") {
+    return <GroupHeading>{t("reservationApplication:label.headings.contactInfo")}</GroupHeading>;
+  }
+  return null;
 }
 
 function ReservationFormFields({
@@ -162,38 +163,35 @@ export function ReservationFormGeneralSection({
   reservationUnit,
   options,
   data,
-}: ReservationFormFieldsDetailsSectionProps) {
+}: ReservationFormGeneralSectionProps) {
   const { t } = useTranslation();
 
   if (fields.length === 0) {
     return null;
   }
   return (
-    <>
+    <AutoGrid>
       <Subheading>{t("reservationCalendar:reservationInfo")}</Subheading>
-      <MandatoryFieldsInfoText>{t("forms:mandatoryFieldsText")}</MandatoryFieldsInfoText>
-      <AutoGrid>
-        <ReservationFormFields
-          options={extendMetaFieldOptions(options, t)}
-          fields={fields}
-          formType={reservationUnit.reservationForm}
-          headingKey="COMMON"
-          section="general"
-          params={{
-            numPersons: {
-              min: !reservationUnit.minPersons || reservationUnit.minPersons === 0 ? 1 : reservationUnit.minPersons,
-              max:
-                reservationUnit.maxPersons != null &&
-                !Number.isNaN(reservationUnit.maxPersons) &&
-                reservationUnit.maxPersons > 0
-                  ? reservationUnit.maxPersons
-                  : undefined,
-            },
-          }}
-          data={data}
-        />
-      </AutoGrid>
-    </>
+      <ReservationFormFields
+        options={extendMetaFieldOptions(options, t)}
+        fields={fields}
+        formType={reservationUnit.reservationForm}
+        headingKey="COMMON"
+        section="general"
+        params={{
+          numPersons: {
+            min: !reservationUnit.minPersons || reservationUnit.minPersons === 0 ? 1 : reservationUnit.minPersons,
+            max:
+              reservationUnit.maxPersons != null &&
+              !Number.isNaN(reservationUnit.maxPersons) &&
+              reservationUnit.maxPersons > 0
+                ? reservationUnit.maxPersons
+                : undefined,
+          },
+        }}
+        data={data}
+      />
+    </AutoGrid>
   );
 }
 
@@ -203,7 +201,9 @@ export function ReservationFormReserveeSection({
   reservationUnit,
   options,
   data,
-}: ReservationFormFieldsReserveeSectionProps) {
+  style,
+  className,
+}: ReservationFormReserveeSectionProps) {
   const { watch } = useFormContext<ReservationFormT & Partial<InputsT>>();
   const { t } = useTranslation();
 
@@ -212,45 +212,18 @@ export function ReservationFormReserveeSection({
   const reserveeType = watch("reserveeType");
 
   return (
-    <>
-      <ReserverInfoHeading>{t("reservationCalendar:reserverInfo")}</ReserverInfoHeading>
+    <AutoGrid data-testid="reservation__form--reservee-info" className={className} style={style}>
+      <Subheading>{t("reservationCalendar:reserverInfo")}</Subheading>
       {isTypeSelectable && <CustomerTypeSelector />}
-      <AutoGrid data-testid="reservation__form--reservee-info">
-        <ReservationFormFields
-          fields={fields}
-          formType={reservationUnit.reservationForm}
-          options={extendMetaFieldOptions(options, t)}
-          hasSubheading
-          headingKey={reserveeType}
-          data={data}
-          section="reservee"
-        />
-      </AutoGrid>
-    </>
-  );
-}
-
-export function ReservationForm({
-  reservationUnit,
-  generalFields,
-  reservationApplicationFields,
-  options,
-  data,
-}: ReservationFormProps) {
-  return (
-    <>
-      <ReservationFormGeneralSection
-        fields={generalFields}
-        options={options}
-        reservationUnit={reservationUnit}
+      <ReservationFormFields
+        fields={fields}
+        formType={reservationUnit.reservationForm}
+        options={extendMetaFieldOptions(options, t)}
+        hasSubheading
+        headingKey={reserveeType}
         data={data}
+        section="reservee"
       />
-      <ReservationFormReserveeSection
-        fields={reservationApplicationFields}
-        options={options}
-        reservationUnit={reservationUnit}
-        data={data}
-      />
-    </>
+    </AutoGrid>
   );
 }

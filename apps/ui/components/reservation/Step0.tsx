@@ -7,10 +7,11 @@ import { useFormContext, UseFormReturn } from "react-hook-form";
 import React, { useState } from "react";
 import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { ReservationForm } from "common/src/reservation-form/MetaFields";
+import { ReservationFormReserveeSection, ReservationFormGeneralSection } from "common/src/reservation-form/MetaFields";
 import { ActionContainer } from "./styles";
 import InfoDialog from "../common/InfoDialog";
 import {
+  type MetadataSetsFragment,
   ReservationFormType,
   type ReservationInProgressFragment,
   type ReservationUpdateMutation,
@@ -23,6 +24,7 @@ import {
   formContainsField,
   getFormFields,
   type FormFieldArray,
+  type ExtendedFormFieldArray,
 } from "common/src/reservation-form/util";
 import { type InputsT } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/styled";
@@ -153,7 +155,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
       />
-      <Errors form={form} formType={formType} generalFields={generalFields} />
+      <FormErrors form={form} formType={formType} generalFields={generalFields} />
       <ActionContainer>
         <Button
           type="submit"
@@ -180,9 +182,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
 }
 
 const ErrorBox = styled(Notification)`
-  max-width: 360px;
-  align-self: flex-end;
-  margin-bottom: var(--spacing-m);
+  margin: var(--spacing-m) 0;
 `;
 
 const ErrorList = styled.ul`
@@ -199,7 +199,7 @@ const ErrorAnchor = styled.a`
 `;
 
 // TODO this should be a general component -> or at least the error display part should be
-function Errors({
+function FormErrors({
   form,
   formType,
   generalFields,
@@ -267,6 +267,54 @@ function Errors({
         })}
       </ErrorList>
     </ErrorBox>
+  );
+}
+
+const MandatoryFieldsInfoText = styled.p`
+  font-size: var(--fontsize-body-s);
+  margin-top: calc(var(--spacing-xs) * -1);
+  && {
+    margin-bottom: var(--spacing-s);
+  }
+`;
+
+interface ReservationFormProps {
+  reservationUnit: MetadataSetsFragment;
+  generalFields: FormFieldArray;
+  reservationApplicationFields: ExtendedFormFieldArray;
+  options: Readonly<Omit<OptionsRecord, "municipalities">>;
+  data?: {
+    termsForDiscount?: JSX.Element | string;
+    enableSubvention?: boolean;
+  };
+}
+
+function ReservationForm({
+  reservationUnit,
+  generalFields,
+  reservationApplicationFields,
+  options,
+  data,
+}: ReservationFormProps) {
+  const { t } = useTranslation();
+  return (
+    <>
+      <MandatoryFieldsInfoText>{t("forms:mandatoryFieldsText")}</MandatoryFieldsInfoText>
+      <ReservationFormGeneralSection
+        fields={generalFields}
+        options={options}
+        reservationUnit={reservationUnit}
+        data={data}
+      />
+      <ReservationFormReserveeSection
+        fields={reservationApplicationFields}
+        options={options}
+        reservationUnit={reservationUnit}
+        data={data}
+        // inconsistency between admin and customer ui (could handle by refactoring customer to have gap on the parent)
+        style={{ marginTop: "var(--spacing-xl)" }}
+      />
+    </>
   );
 }
 
