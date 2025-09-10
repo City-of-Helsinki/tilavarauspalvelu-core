@@ -106,20 +106,20 @@
     "missingPrice": "Varauksen hinta puuttuu tai on virheellinen",
     "priceBreakdown": "Alkuperäinen hinta = {{volume}} {{units}} * {{unitPrice}} / {{unit}} sis. alv {{vatPercent}}% = {{price}}",
     "priceUnit": {
-      "PER_15_MINS": "15 min",
-      "PER_30_MINS": "30 min",
-      "PER_DAY": "päivä",
-      "PER_HALF_DAY": "puoli päivää",
-      "PER_HOUR": "tunti",
-      "PER_WEEK": "viikko"
+      "per_15_mins": "15 min",
+      "per_30_mins": "30 min",
+      "per_day": "päivä",
+      "per_half_day": "puoli päivää",
+      "per_hour": "tunti",
+      "per_week": "viikko"
     },
     "priceUnits": {
-      "PER_15_MINS": "",
-      "PER_30_MINS": "",
-      "PER_DAY": "päivää",
-      "PER_HALF_DAY": "puolta päivää",
-      "PER_HOUR": "tuntia",
-      "PER_WEEK": "viikkoa"
+      "per_15_mins": "",
+      "per_30_mins": "",
+      "per_day": "päivää",
+      "per_half_day": "puolta päivää",
+      "per_hour": "tuntia",
+      "per_week": "viikkoa"
     }
   },
   "ReturnToRequiresHandlingDialog": {
