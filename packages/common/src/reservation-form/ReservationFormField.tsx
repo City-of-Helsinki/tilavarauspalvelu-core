@@ -6,12 +6,13 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontMedium, Strongish } from "../../styled";
 import { ReserveeType } from "../../gql/gql-types";
-import { type InputsT, type ReservationFormT } from "./types";
+import { type ReservationFormT } from "./types";
 import { type OptionsRecord } from "../../types/common";
 import { ControlledCheckbox, ControlledSelect } from "../components/form";
+import { ExtendedFormField } from "./util";
 
 type Props = {
-  field: keyof InputsT;
+  field: ExtendedFormField;
   options: OptionsRecord;
   translationKey?: ReserveeType | "COMMON";
   reservation: ReservationFormT;
