@@ -25,7 +25,7 @@ class SpaceFilterSet(FilterSet[Space]):
     name_sv_startswith = Filter("name_fi", lookup="istartswith")
     name_en_startswith = Filter("name_fi", lookup="istartswith")
 
-    @Filter
+    @Filter(distinct=True)
     def only_with_permission(self, info: GQLInfo[User], *, value: bool) -> models.Q:
         """Returns spaces where the user has space management permissions"""
         if not value:

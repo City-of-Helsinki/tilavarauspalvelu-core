@@ -20,7 +20,7 @@ class RejectedOccurrenceFilterSet(FilterSet[RejectedOccurrence]):
     application_round = Filter(f"{SECTION_LOOKUP}__application__application_round")
     reservation_unit = Filter("reservation_series__reservation_unit", lookup="in")
     unit = Filter("reservation_series__reservation_unit__unit", lookup="in")
-    unit_group = Filter("reservation_series__reservation_unit__unit__unit_groups", lookup="in")
+    unit_group = Filter("reservation_series__reservation_unit__unit__unit_groups", lookup="in", distinct=True)
 
     @Filter
     def text_search(self, info: GQLInfo[User], value: str) -> models.Q:

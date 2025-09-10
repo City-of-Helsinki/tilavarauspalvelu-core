@@ -26,7 +26,7 @@ class ApplicationRoundFilterSet(FilterSet[ApplicationRound]):
         is_ongoing: models.Q = ~L(status=ApplicationRoundStatusChoice.RESULTS_SENT)
         return is_ongoing if value else ~is_ongoing
 
-    @Filter
+    @Filter(distinct=True)
     def only_with_permissions(self, info: GQLInfo[User], *, value: bool) -> models.Q:
         if not value:
             return models.Q()

@@ -25,7 +25,7 @@ class ResourceFilterSet(FilterSet[Resource]):
     name_sv_startswith = Filter("name_sv", lookup="istartswith")
     name_en_startswith = Filter("name_en", lookup="istartswith")
 
-    @Filter
+    @Filter(distinct=True)
     def only_with_permission(self, info: GQLInfo[User], *, value: bool) -> models.Q:
         """Returns resources where the user has resource management permissions"""
         if not value:

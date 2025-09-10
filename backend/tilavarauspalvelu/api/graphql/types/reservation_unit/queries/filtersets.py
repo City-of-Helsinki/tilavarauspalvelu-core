@@ -37,7 +37,7 @@ class ReservationUnitFilterSet(FilterSet[ReservationUnit]):
     tprek_id = Filter("unit__tprek_id")
     tprek_department_id = Filter("unit__tprek_department_id")
     unit = Filter(lookup="in")
-    unit_group = Filter("unit__unit_groups", lookup="in")
+    unit_group = Filter("unit__unit_groups", lookup="in", distinct=True)
     reservation_unit_type = Filter(lookup="in")
 
     @Filter
@@ -102,7 +102,7 @@ class ReservationUnitFilterSet(FilterSet[ReservationUnit]):
         """Returns reservation units where the user has any kind of permissions in its unit"""
         return filter_only_with_permission(info, value=value)
 
-    application_round = Filter("application_rounds", lookup="in")
+    application_round = Filter("application_rounds", lookup="in", distinct=True)
 
     name_fi_exact = Filter("name_fi", lookup="iexact")
     name_en_exact = Filter("name_sv", lookup="iexact")
