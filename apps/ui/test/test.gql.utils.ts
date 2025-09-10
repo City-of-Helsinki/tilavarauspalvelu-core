@@ -40,6 +40,7 @@ export function createOptionMock(
     units: opts.allUnits.map(translate),
     equipments: opts.allEquipments.map(translate),
     purposes: opts.allPurposes.map(translate),
+    reservationPurposes: opts.allReservationPurposes.map(translate),
     reservationUnitTypes: opts.allReservationUnitTypes.map(translate),
     ageGroups: opts.allAgeGroups.map((ag) => ({
       value: ag.pk ?? 0,
