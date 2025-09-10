@@ -324,7 +324,7 @@ export function ReservationFormField({
           required={required}
           maxLength={MAX_TEXT_LENGTH}
           $isWide={isWideRow}
-          $hidden={shouldHideOrganisationIdentifier}
+          disabled={shouldHideOrganisationIdentifier}
         />
       );
     default:

@@ -1,10 +1,7 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import type { ReservationFormT } from "common/src/reservation-form/types";
-import {
-  ReservationFormFieldsDetailsSection,
-  ReservationFormFieldsReserveeSection,
-} from "common/src/reservation-form/MetaFields";
+import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "common/src/reservation-form/MetaFields";
 import { ReserveeType, type MetadataSetsFragment } from "@gql/gql-types";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { type OptionsRecord } from "common";
@@ -21,20 +18,12 @@ export function ReservationMetadataSetForm({ reservationUnit }: Props): JSX.Elem
     reservationPurposes,
   };
 
-  const formType = reservationUnit.reservationForm;
-  const generalFields = getReservationFormFields({
-    formType,
+  const fields = getReservationFormFields({
+    formType: reservationUnit.reservationForm,
     reserveeType: "common",
   }).filter((n) => n !== "reserveeType");
 
-  return (
-    <ReservationFormFieldsDetailsSection
-      fields={generalFields}
-      reservationUnit={reservationUnit}
-      options={options}
-      noHeadingMarginal
-    />
-  );
+  return <ReservationFormGeneralSection fields={fields} reservationUnit={reservationUnit} options={options} />;
 }
 
 // TODO this component can be wholly deprecated maybe? translations / options?
@@ -51,12 +40,10 @@ export function ReserverMetadataSetForm({ reservationUnit }: Props): JSX.Element
   const reserveeType = watch("reserveeType");
   const type =
     reserveeType != null && formContainsField(formType, "reserveeType") ? reserveeType : ReserveeType.Individual;
-  const reserverFields = getReservationFormFields({
+  const fields = getReservationFormFields({
     formType,
     reserveeType: type,
   });
 
-  return (
-    <ReservationFormFieldsReserveeSection fields={reserverFields} reservationUnit={reservationUnit} options={options} />
-  );
+  return <ReservationFormReserveeSection fields={fields} reservationUnit={reservationUnit} options={options} />;
 }
