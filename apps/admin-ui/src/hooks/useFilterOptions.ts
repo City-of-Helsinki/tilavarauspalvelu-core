@@ -107,8 +107,9 @@ export function getFilterOptions(
     reserveeTypes,
     orderChoices: orderOptions,
     priorityChoices: priorities,
-    // FIXME name is wrong, we have both purposes and reservationPurposes
-    purposes: reservationPurposes,
+    // Not used for filter options
+    purposes: [],
+    reservationPurposes,
     ageGroups: ageGroups,
     // Not used by admin at all, common interface issue
     equipments: [],

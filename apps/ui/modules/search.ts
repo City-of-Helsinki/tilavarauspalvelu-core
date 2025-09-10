@@ -223,6 +223,9 @@ export async function getSearchOptions(
     value: n.pk ?? 0,
     label: `${n.minimum || ""} - ${n.maximum || ""}`,
   }));
+  const reservationPurposes = filterNonNullable(optionsData?.allReservationPurposes).map((n) =>
+    translateOption(n, lang)
+  );
 
   const municipalities = Object.values(MunicipalityChoice).map((value) => ({
     label: value as string, // TODO: Translate this
@@ -233,6 +236,7 @@ export async function getSearchOptions(
     units,
     equipments,
     purposes,
+    reservationPurposes,
     reservationUnitTypes,
     ageGroups,
     municipalities,
