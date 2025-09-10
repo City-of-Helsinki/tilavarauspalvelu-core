@@ -12,10 +12,10 @@ type Props = {
 };
 
 export const ReservationMetadataSetForm = ({ reservationUnit }: Props): JSX.Element => {
-  const { ageGroups, purposes } = useFilterOptions();
+  const { ageGroups, reservationPurposes } = useFilterOptions();
   const options: Omit<OptionsRecord, "municipalities"> = {
     ageGroups,
-    reservationPurposes: purposes,
+    reservationPurposes,
   };
 
   // TODO naming: generalFields = reservationFields (Varauksen tiedot)
@@ -35,10 +35,10 @@ export const ReservationMetadataSetForm = ({ reservationUnit }: Props): JSX.Elem
 // TODO this component can be wholly deprecated maybe? translations / options?
 export const ReserverMetadataSetForm = ({ reservationUnit }: Props): JSX.Element => {
   const { watch } = useFormContext<Reservation>();
-  const { ageGroups, purposes } = useFilterOptions();
+  const { ageGroups, reservationPurposes } = useFilterOptions();
   const options: Omit<OptionsRecord, "municipalities"> = {
     ageGroups,
-    reservationPurposes: purposes,
+    reservationPurposes,
   };
 
   // TODO naming: applicationFields = reserverFields (Varaajan tiedot)

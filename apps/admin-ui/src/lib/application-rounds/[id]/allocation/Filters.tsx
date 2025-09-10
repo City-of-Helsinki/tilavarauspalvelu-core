@@ -84,7 +84,7 @@ export function Filters({ hideSearchTags, units, isLoading }: FilterProps): JSX.
         <ControlledMultiSelectFilter control={control} name="municipality" options={options.municipalities} />
         <ControlledMultiSelectFilter control={control} name="applicantType" options={options.reserveeTypes} />
         <ControlledMultiSelectFilter control={control} name="ageGroup" options={options.ageGroups} />
-        <ControlledMultiSelectFilter control={control} name="purpose" options={options.purposes} />
+        <ControlledMultiSelectFilter control={control} name="purpose" options={options.reservationPurposes} />
       </ShowAllContainer>
       <SearchButtonContainer>
         <SearchTags hide={hideSearchTags} translateTag={translateTag(t, options)} />
