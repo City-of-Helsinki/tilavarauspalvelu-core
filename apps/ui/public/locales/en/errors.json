@@ -45,6 +45,7 @@
     "CREATE_PERMISSION_DENIED": "No permission to create.",
     "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "You have exceeded the maximum number of bookings.",
     "NOT_FOUND": "Booking expired.",
+    "MODEL_INSTANCE_NOT_FOUND": "Not found.",
     "OVERLAPPING_RESERVATIONS": "There are duplicate bookings.",
     "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Please check the booking time.",
     "RESERVATION_OVERLAP": "There are duplicate bookings.",

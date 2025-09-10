@@ -21,13 +21,17 @@ import { useEffect } from "react";
 /// @param confirmMessage - the message to show to the user
 /// @param onNavigationConfirmed - the callback function to call when the user confirms the navigation
 /// @param whitelist - a list of urls to ignore the confirmation
-export function useConfirmNavigation(props: {
+export function useConfirmNavigation({
+  confirm,
+  confirmMessage,
+  onNavigationConfirmed,
+  whitelist = [],
+}: {
   confirm: boolean;
   confirmMessage: string;
   onNavigationConfirmed?: () => Promise<unknown>;
   whitelist?: Array<RegExp | string>;
 }) {
-  const { confirm, confirmMessage, onNavigationConfirmed, whitelist } = props;
   const router = useRouter();
   useEffect(() => {
     // The only way to escape the routing is to throw an error
@@ -36,29 +40,26 @@ export function useConfirmNavigation(props: {
       if (!confirm) {
         return;
       }
-      if (whitelist != null) {
-        for (const whitelisted of whitelist) {
-          const m = url.match(whitelisted);
-          if (m != null) {
-            return;
-          }
+      for (const whitelisted of whitelist) {
+        const m = url.match(whitelisted);
+        if (m != null) {
+          return;
         }
       }
 
       if (!window.confirm(confirmMessage)) {
-        // TODO should use a custom error type and catch it in the page / component
-        // but if we inherit from Error we need to catch it and error-boundary is not designed for ignoring errors.
-
+        router.events.emit("routeChangeError");
+        // NOTE: has to be a string literal
         throw "Route Canceled";
       }
       if (onNavigationConfirmed != null) {
         await onNavigationConfirmed();
       }
     };
-    router.events.on("beforeHistoryChange", handler);
+    router.events.on("routeChangeStart", handler);
 
     return () => {
-      router.events.off("beforeHistoryChange", handler);
+      router.events.off("routeChangeStart", handler);
     };
   }, [confirm, confirmMessage, onNavigationConfirmed, router, whitelist]);
 }

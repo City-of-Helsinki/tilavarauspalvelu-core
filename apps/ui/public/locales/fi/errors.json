@@ -45,6 +45,7 @@
     "CREATE_PERMISSION_DENIED": "Ei lupaa luoda.",
     "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Varausten enimmäismäärä on ylittynyt.",
     "NOT_FOUND": "Varaus on vanhentunut.",
+    "MODEL_INSTANCE_NOT_FOUND": "Ei löytynyt.",
     "OVERLAPPING_RESERVATIONS": "Päällekkäisiä varauksia.",
     "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Tarkista varausaika.",
     "RESERVATION_OVERLAP": "Päällekkäisiä varauksia.",

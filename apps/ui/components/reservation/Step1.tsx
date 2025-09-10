@@ -13,11 +13,13 @@ import { SummaryGeneralFields, SummaryReserveeFields } from "./SummaryFields";
 import { AcceptTerms } from "./AcceptTerms";
 import { NewReservationForm } from "@/styled/reservation";
 import { useDisplayError } from "common/src/hooks";
-import { getReservationInProgressPath, getReservationPath } from "@/modules/urls";
+import { getReservationInProgressPath, getReservationPath, getReservationUnitPath } from "@/modules/urls";
 import { convertLanguageCode } from "common/src/common/util";
 import { getCheckoutUrl } from "@/modules/reservation";
 import { useRouter } from "next/router";
 import { gql } from "@apollo/client";
+import { getApiErrors } from "common/src/apolloUtils";
+import { errorToast } from "common/src/components/toast";
 
 type Props = {
   reservation: ReservationInProgressFragment;
@@ -82,8 +84,17 @@ export function Step1({ reservation, options, requiresPayment }: Props): JSX.Ele
         throw new Error("Invalid state");
       }
     } catch (err) {
-      // TODO: NOT_FOUND at least is non-recoverable so we should redirect to the reservation unit page
-      displayError(err);
+      const apiErrors = getApiErrors(err);
+      // The reservation has been destroyed by the backend (timeout)
+      if (apiErrors.find((e) => e.code === "MODEL_INSTANCE_NOT_FOUND")) {
+        errorToast({ text: t("errors:api.NOT_FOUND") });
+        // FIXME this doesn't bypass the alert (check) that destroys the reservation
+        // can't do url matching for it, so maybe we should refactor it to use an url param and remove url match?
+        // we also need to remove the url param everywhere after
+        await router.push(getReservationUnitPath(reservation.reservationUnit.pk));
+      } else {
+        displayError(err);
+      }
     }
   };
 

@@ -162,10 +162,13 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     });
   }, [deleteReservation, reservation?.pk]);
 
-  // whitelist to allow language change and confirmation
   const whitelist = [
-    RegExp(`.*/reservations/${reservation?.pk}\\?.+`),
-    RegExp(`.*/reservation-unit/${reservationUnit?.pk}/reservation/${reservation?.pk}`),
+    // reservation made succesfully
+    RegExp(`.*/reservations/${reservation.pk}\\?.+`),
+    // self to allow language change
+    RegExp(`.*/reservation-unit/${reservationUnit.pk}/reservation/${reservation.pk}`),
+    // NOTE using regexp for query params is pretty awful (error prone)
+    // if we want such mechanism use a separate param instead
   ];
   // only block nextjs navigation (we should not have any <a> links and we don't want to block refresh)
   useConfirmNavigation({
@@ -180,7 +183,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
   // NOTE: only navigate away from the page if the reservation is cancelled the confirmation hook handles delete
   const cancelReservation = useCallback(() => {
-    router.push(getReservationUnitPath(reservationUnit?.pk));
+    router.push(getReservationUnitPath(reservationUnit.pk));
   }, [router, reservationUnit]);
 
   const handleStepClick = async (_: unknown, index: number) => {
