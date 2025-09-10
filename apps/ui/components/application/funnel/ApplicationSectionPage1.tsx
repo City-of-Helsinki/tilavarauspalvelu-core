@@ -119,7 +119,7 @@ function ApplicationSectionInner({ index, applicationRound, options, onDeleteEve
         />
         <ControlledSelect
           control={control}
-          options={options.purposes}
+          options={options.reservationPurposes}
           name={`applicationSections.${index}.purpose`}
           label={t("application:Page1.purpose")}
           required
