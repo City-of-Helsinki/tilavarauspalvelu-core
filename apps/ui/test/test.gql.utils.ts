@@ -39,6 +39,9 @@ export function createOptionMock(
     reservationUnitTypes: filterNonNullable(opts.reservationUnitTypes?.edges.map((edge) => edge?.node)).map((n) =>
       translateOption(n, lang)
     ),
+    reservationPurposes: filterNonNullable(opts.reservationPurposes?.edges.map((edge) => edge?.node)).map((n) =>
+      translateOption(n, lang)
+    ),
     ageGroups: filterNonNullable(opts.ageGroups?.edges.map((edge) => edge?.node)).map((op) => ({
       value: op.pk ?? 0,
       label: `${op.minimum ?? ""}-${op.maximum ?? ""}`,

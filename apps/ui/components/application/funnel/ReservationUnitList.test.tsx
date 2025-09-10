@@ -103,6 +103,7 @@ function WrappedRender({
     units: [],
     equipments: [],
     purposes: [],
+    reservationPurposes: [],
     reservationUnitTypes: [],
     ageGroups: [],
     municipalities: [],
