@@ -42,6 +42,7 @@ class ApplicationRoundAdminForm(forms.ModelForm):
         self.base_fields["terms_of_use"].queryset = TermsOfUse.objects.filter(
             terms_type=TermsOfUseTypeChoices.RECURRING
         )
+        self.base_fields["terms_of_use"].required = True
         super().__init__(*args, **kwargs)
 
     class Meta:
