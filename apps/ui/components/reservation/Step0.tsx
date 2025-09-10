@@ -26,7 +26,7 @@ import {
   type FormFieldArray,
   type ExtendedFormFieldArray,
 } from "common/src/reservation-form/util";
-import { type InputsT } from "common/src/reservation-form/types";
+import { type ReservationFormT } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { type OptionsRecord } from "common";
@@ -48,7 +48,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const form = useFormContext<InputsT>();
+  const form = useFormContext<ReservationFormT>();
   const {
     watch,
     formState: { isSubmitting, isValid },
@@ -59,7 +59,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
   const displayError = useDisplayError();
   const [updateReservation] = useUpdateReservationMutation();
 
-  const onSubmit = async (payload: InputsT): Promise<void> => {
+  const onSubmit = async (payload: ReservationFormT): Promise<void> => {
     const {
       // boolean toggles
       applyingForFreeOfCharge,
@@ -204,7 +204,7 @@ function FormErrors({
   formType,
   generalFields,
 }: {
-  form: UseFormReturn<InputsT>;
+  form: UseFormReturn<ReservationFormT>;
   formType: ReservationFormType;
   generalFields: FormFieldArray;
 }) {

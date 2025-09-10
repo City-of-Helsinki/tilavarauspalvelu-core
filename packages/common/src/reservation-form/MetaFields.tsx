@@ -9,7 +9,7 @@ import {
   ReserveeType,
 } from "../../gql/gql-types";
 import { ReservationFormField } from "./ReservationFormField";
-import { type InputsT, type ReservationFormT } from "./types";
+import { type ReservationFormT } from "./types";
 import { AutoGrid, H4, H5 } from "../../styled";
 import { type OptionsRecord } from "../../types/common";
 import { type ExtendedFormFieldArray, extendMetaFieldOptions, formContainsField } from "./util";
@@ -143,7 +143,7 @@ function ReservationFormFields({
           )}
           <ReservationFormField
             key={`key-${field}`}
-            field={field as unknown as keyof InputsT}
+            field={field}
             options={extendMetaFieldOptions(options, t)}
             required={required}
             translationKey={headingKey}
@@ -204,7 +204,7 @@ export function ReservationFormReserveeSection({
   style,
   className,
 }: ReservationFormReserveeSectionProps) {
-  const { watch } = useFormContext<ReservationFormT & Partial<InputsT>>();
+  const { watch } = useFormContext<ReservationFormT>();
   const { t } = useTranslation();
 
   const isTypeSelectable = formContainsField(reservationUnit.reservationForm, "reserveeType");
