@@ -17,7 +17,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formatDuration, toUIDate } from "common/src/common/util";
 import { useModal } from "@/context/ModalContext";
-import { TimeChangeFormSchemaRefined, TimeFormSchema } from "@/schemas";
+import { TimeChangeFormSchemaRefined, TimeFormSchema } from "common/src/schemas";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { BufferToggles } from "@/component/BufferToggles";
