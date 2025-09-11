@@ -6,6 +6,7 @@ from undine.exceptions import GraphQLPermissionError
 from undine.optimizer import OptimizationData
 from undine.relay import Node
 
+from tilavarauspalvelu.api.graphql.extensions.utils import TranslatedField
 from tilavarauspalvelu.enums import BannerNotificationTarget
 from tilavarauspalvelu.models import BannerNotification, User
 from tilavarauspalvelu.models.banner_notification.queryset import BannerNotificationQuerySet
@@ -27,9 +28,10 @@ class BannerNotificationNode(
     pk = Field()
     name = Field()
 
-    message_fi = Field()
-    message_en = Field()
-    message_sv = Field()
+    message = Field(TranslatedField)
+    message_fi = Field(deprecation_reason="Use 'message' instead.")
+    message_en = Field(deprecation_reason="Use 'message' instead.")
+    message_sv = Field(deprecation_reason="Use 'message' instead.")
 
     draft = Field()
     level = Field()

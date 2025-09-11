@@ -2,6 +2,7 @@ from undine import Field, GQLInfo, QueryType
 from undine.exceptions import GraphQLPermissionError
 from undine.relay import Node
 
+from tilavarauspalvelu.api.graphql.extensions.utils import TranslatedField
 from tilavarauspalvelu.models import ReservationUnitCancellationRule, User
 
 from .filtersets import ReservationUnitCancellationRuleFilterSet
@@ -20,9 +21,10 @@ class ReservationUnitCancellationRuleNode(
 ):
     pk = Field()
 
-    name_fi = Field()
-    name_sv = Field()
-    name_en = Field()
+    name = Field(TranslatedField)
+    name_fi = Field(deprecation_reason="Use 'name' instead.")
+    name_sv = Field(deprecation_reason="Use 'name' instead.")
+    name_en = Field(deprecation_reason="Use 'name' instead.")
 
     can_be_cancelled_time_before = Field()
 

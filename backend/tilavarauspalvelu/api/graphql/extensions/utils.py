@@ -2,15 +2,25 @@ import dataclasses
 from collections.abc import Callable, Iterable
 from typing import Any
 
+from django.db import models
 from graphql import (
     FieldNode,
     FragmentDefinitionNode,
     FragmentSpreadNode,
+    GraphQLField,
     GraphQLFieldResolver,
+    GraphQLObjectType,
+    GraphQLString,
     InlineFragmentNode,
     SelectionNode,
 )
+from modeltranslation.manager import get_translatable_fields_for_model
+from modeltranslation.settings import AVAILABLE_LANGUAGES
+from modeltranslation.utils import build_lang, build_localized_fieldname
 from undine import Field, GQLInfo
+from undine.optimizer import OptimizationData
+from undine.utils.graphql.type_registry import get_or_create_graphql_object_type
+from undine.utils.text import to_schema_name
 
 from tilavarauspalvelu.models import User
 
@@ -81,3 +91,50 @@ class NullablePermissionResolver:
         if not self.permission_check(root, info):
             return None
         return self.resolver(root, info, **kwargs)
+
+
+@dataclasses.dataclass(frozen=True, slots=True, kw_only=True)
+class TranslatedField:
+    """
+    Use on the translated field of a model to resolve to its translations.
+
+    >>> class TaskType(QueryType[Task]):
+    >>>     name = Field(TranslatedField)
+
+    Creates a field like this:
+
+    ```graphql
+    type TranslatedField {
+        fi: String
+        en: String
+        sv: String
+    }
+
+    type TaskType {
+        name: TranslatedField
+    }
+    ```
+    """
+
+    field: models.CharField
+
+    def __post_init__(self) -> None:
+        translatable_fields = get_translatable_fields_for_model(model=self.field.model)
+        if self.field.name not in translatable_fields:
+            msg = f"Field {self.field.name} is not translatable."
+            raise ValueError(msg)
+
+    def resolve(self, root: Any, info: GQLInfo, **kwargs: Any) -> dict[str, str]:
+        return {lang: getattr(root, build_localized_fieldname(self.field.name, lang)) for lang in AVAILABLE_LANGUAGES}
+
+    def graphql_type(self) -> GraphQLObjectType:
+        return get_or_create_graphql_object_type(
+            name="TranslatedField",
+            fields={to_schema_name(build_lang(lang)): GraphQLField(GraphQLString) for lang in AVAILABLE_LANGUAGES},
+            description="Resolves a translatable field to its translations.",
+        )
+
+    def optimize(self, data: OptimizationData, info: GQLInfo) -> None:
+        for lang in AVAILABLE_LANGUAGES:
+            field_name = build_localized_fieldname(self.field.name, lang)
+            data.only_fields.add(field_name)
