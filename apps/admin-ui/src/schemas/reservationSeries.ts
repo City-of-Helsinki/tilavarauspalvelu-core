@@ -1,9 +1,14 @@
 import { z } from "zod";
 import { ReservationStartInterval, ReservationTypeChoice, Weekday } from "@gql/gql-types";
 import { parseUIDate } from "common/src/modules/date-utils";
-import { checkReservationInterval, checkStartEndTime, ReservationTypeSchema } from "./reservation";
-import { checkDateNotInPast, checkTimeStringFormat } from "common/src/schemas/schemaCommon";
-import { intervalToNumber } from "./utils";
+import { getIntervalMinutes } from "common/src/modules/conversion";
+import {
+  checkReservationInterval,
+  checkStartEndTime,
+  checkDateNotInPast,
+  checkTimeStringFormat,
+  ReservationTypeSchema,
+} from "common/src/schemas";
 
 // TODO handle metadata (variable form fields) instead of using .passthrough
 // It should be it's own schema object that is included in both forms
@@ -61,7 +66,7 @@ const ReservationSeriesFormSchemaRefined = (interval: ReservationStartInterval) 
     })
     .superRefine((val, ctx) => checkTimeStringFormat(val.startTime, ctx, "startTime"))
     .superRefine((val, ctx) => checkTimeStringFormat(val.endTime, ctx, "endTime"))
-    .superRefine((val, ctx) => checkReservationInterval(val.startTime, ctx, "startTime", intervalToNumber(interval)))
+    .superRefine((val, ctx) => checkReservationInterval(val.startTime, ctx, "startTime", getIntervalMinutes(interval)))
     .superRefine((val, ctx) => checkReservationInterval(val.endTime, ctx, "endTime", 15))
     .superRefine((val, ctx) => checkStartEndTime(val, ctx))
     // custom email validator because the base schema doesn't work for Series and Django validates email strings
@@ -109,7 +114,7 @@ const RescheduleReservationSeriesFormSchemaRefined = (interval: ReservationStart
     })
     .superRefine((val, ctx) => checkTimeStringFormat(val.startTime, ctx, "startTime"))
     .superRefine((val, ctx) => checkTimeStringFormat(val.endTime, ctx, "endTime"))
-    .superRefine((val, ctx) => checkReservationInterval(val.startTime, ctx, "startTime", intervalToNumber(interval)))
+    .superRefine((val, ctx) => checkReservationInterval(val.startTime, ctx, "startTime", getIntervalMinutes(interval)))
     .superRefine((val, ctx) => checkReservationInterval(val.endTime, ctx, "endTime", 15))
     .superRefine((val, ctx) => checkStartEndTime(val, ctx));
 

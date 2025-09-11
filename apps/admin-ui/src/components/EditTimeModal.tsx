@@ -24,7 +24,7 @@ import {
   formatDate,
 } from "common/src/modules/date-utils";
 import { useModal } from "@/context/ModalContext";
-import { TimeChangeFormSchemaRefined, TimeFormSchema } from "@/schemas";
+import { TimeChangeFormSchemaRefined, TimeFormSchema } from "common/src/schemas";
 import { ControlledTimeInput } from "@/components/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { BufferToggles } from "@/components/BufferToggles";

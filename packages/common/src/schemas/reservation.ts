@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { parseUIDate } from "common/src/modules/date-utils";
-import { ReservationStartInterval, ReservationTypeChoice } from "@gql/gql-types";
-import { intervalToNumber } from "./utils";
-import { checkTimeStringFormat, checkValidFutureDate } from "common/src/schemas/schemaCommon";
+import { parseUIDate } from "../modules/date-utils";
+import { MunicipalityChoice, ReservationStartInterval, ReservationTypeChoice, ReserveeType } from "../../gql/gql-types";
+import { checkTimeStringFormat, checkValidFutureDate } from "./schemaCommon";
+import { getIntervalMinutes } from "../modules/conversion";
 
 export const ReservationTypes = Object.values(ReservationTypeChoice);
 export const ReservationTypeSchema = z.nativeEnum(ReservationTypeChoice);
@@ -20,7 +20,7 @@ export const TimeFormSchema = z.object({
   type: ReservationTypeSchema,
 });
 
-const ReservationFormSchema = z
+const CreateStaffReservationFormSchema = z
   .object({
     comments: z.string().optional(),
     // backend doesn't accept bad emails (empty is fine)
@@ -35,11 +35,11 @@ const ReservationFormSchema = z
 // this shows refinement errors before required of course we need to either do a second
 // pass or add custom Required refinements
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ReservationFormSchemaPartial = ReservationFormSchema.partial();
-type ReservationFormSchemaPartialType = z.infer<typeof ReservationFormSchemaPartial>;
+const CreateStaffReservationFormSchemaPartial = CreateStaffReservationFormSchema.partial();
+type CreateStaffReservationFormSchemaPartialType = z.infer<typeof CreateStaffReservationFormSchemaPartial>;
 
 export const checkStartEndTime = (
-  data: Pick<ReservationFormSchemaPartialType, "startTime" | "endTime">,
+  data: Pick<CreateStaffReservationFormSchemaPartialType, "startTime" | "endTime">,
   ctx: z.RefinementCtx
 ) => {
   if (
@@ -73,8 +73,8 @@ export const checkReservationInterval = (
 // Date can't be in past
 // Time is allowed to be in the past on purpose so it's not validated
 // i.e. you can make a reservation for today 10:00 even if it's 10:30
-const ReservationFormSchemaRefined = (interval: ReservationStartInterval) =>
-  ReservationFormSchema.partial()
+const CreateStaffReservationFormSchemaRefined = (interval: ReservationStartInterval) =>
+  CreateStaffReservationFormSchema.partial()
     .superRefine((val, ctx) => {
       if (val.date) {
         checkValidFutureDate(parseUIDate(val.date), ctx, "date");
@@ -83,7 +83,7 @@ const ReservationFormSchemaRefined = (interval: ReservationStartInterval) =>
     .superRefine((val, ctx) => checkTimeStringFormat(val.startTime, ctx, "startTime"))
     .superRefine((val, ctx) => checkTimeStringFormat(val.endTime, ctx, "endTime"))
     .superRefine((val, ctx) => checkStartEndTime(val, ctx))
-    .superRefine((val, ctx) => checkReservationInterval(val.startTime, ctx, "startTime", intervalToNumber(interval)))
+    .superRefine((val, ctx) => checkReservationInterval(val.startTime, ctx, "startTime", getIntervalMinutes(interval)))
     .superRefine((val, ctx) => checkReservationInterval(val.endTime, ctx, "endTime", 15))
     .refine((s) => s.type, {
       path: ["type"],
@@ -100,17 +100,18 @@ export const TimeChangeFormSchemaRefined = (interval: ReservationStartInterval) 
     .superRefine((val, ctx) => checkTimeStringFormat(val.startTime, ctx, "startTime"))
     .superRefine((val, ctx) => checkTimeStringFormat(val.endTime, ctx, "endTime"))
     .superRefine((val, ctx) => checkStartEndTime(val, ctx))
-    .superRefine((val, ctx) => checkReservationInterval(val.startTime, ctx, "startTime", intervalToNumber(interval)))
+    .superRefine((val, ctx) => checkReservationInterval(val.startTime, ctx, "startTime", getIntervalMinutes(interval)))
     .superRefine((val, ctx) => checkReservationInterval(val.endTime, ctx, "endTime", 15))
     .refine((s) => s.type, {
       path: ["type"],
       message: "Required",
     });
 
-export { ReservationFormSchemaRefined as ReservationFormSchema };
+export { CreateStaffReservationFormSchemaRefined as CreateStaffReservationFormSchema };
 
-export type ReservationFormType = z.infer<typeof ReservationFormSchema>;
+export type CreateReservationFormType = z.infer<typeof CreateStaffReservationFormSchema>;
 
+// TODO what is this for?
 export const ReservationChangeFormSchema = z
   .object({
     type: ReservationTypeSchema,
@@ -121,3 +122,28 @@ export const ReservationChangeFormSchema = z
   .passthrough();
 
 export type ReservationChangeFormType = z.infer<typeof ReservationChangeFormSchema>;
+
+// FIXME name is wrong (not Meta)
+export const ReservationFormMetaSchema = z.object({
+  name: z.string().optional(),
+  description: z.string().optional(),
+  ageGroup: z.number().optional(),
+  applyingForFreeOfCharge: z.boolean().optional(),
+  freeOfChargeReason: z.string().optional(),
+  municipality: z.enum([MunicipalityChoice.Helsinki, MunicipalityChoice.Other]).optional(),
+  numPersons: z.number().optional(),
+  purpose: z.number().optional(),
+  reserveeEmail: z.union([z.string().email(), z.string().length(0)]).optional(),
+  reserveeFirstName: z.string().optional(),
+  reserveeIdentifier: z.string().optional(),
+  reserveeIsUnregisteredAssociation: z.boolean().optional(),
+  reserveeLastName: z.string().optional(),
+  reserveeOrganisationName: z.string().optional(),
+  reserveePhone: z.string().optional(),
+  // TODO the reserveeType is problematic
+  // radio buttons should have a default value and form inputs don't like null (uncontrolled input)
+  // TODO test what happens if the user submits a form with a null value?
+  reserveeType: z.enum([ReserveeType.Individual, ReserveeType.Nonprofit, ReserveeType.Company]).nullable(),
+});
+
+export type ReservationFormMeta = z.infer<typeof ReservationFormMetaSchema>;
