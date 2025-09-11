@@ -17,12 +17,16 @@ def test_terms_of_use__query(graphql):
 
     fields = """
         pk
-        nameFi
-        nameSv
-        nameEn
-        textFi
-        textSv
-        textEn
+        name {
+            fi
+            sv
+            en
+        }
+        text {
+            fi
+            sv
+            en
+        }
         termsType
     """
     query = build_query("allTermsOfUse", fields=fields)
@@ -33,12 +37,16 @@ def test_terms_of_use__query(graphql):
     assert response.results == [
         {
             "pk": terms_of_use.pk,
-            "nameFi": terms_of_use.name_fi,
-            "nameSv": terms_of_use.name_sv,
-            "nameEn": terms_of_use.name_en,
-            "textFi": terms_of_use.text_fi,
-            "textSv": terms_of_use.text_sv,
-            "textEn": terms_of_use.text_en,
+            "name": {
+                "fi": terms_of_use.name_fi,
+                "sv": terms_of_use.name_sv,
+                "en": terms_of_use.name_en,
+            },
+            "text": {
+                "fi": terms_of_use.text_fi,
+                "sv": terms_of_use.text_sv,
+                "en": terms_of_use.text_en,
+            },
             "termsType": terms_of_use.terms_type,
         },
     ]
