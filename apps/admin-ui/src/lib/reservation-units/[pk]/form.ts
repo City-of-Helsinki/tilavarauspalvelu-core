@@ -18,10 +18,10 @@ import { addDays, endOfDay, format } from "date-fns";
 import { z } from "zod";
 import { checkLengthWithoutHtml, checkTimeStringFormat } from "common/src/schemas/schemaCommon";
 import { fromUIDateTime } from "@/helpers";
-import { intervalToNumber } from "@/schemas/utils";
 import { WEEKDAYS_SORTED } from "common/src/const";
 import { type TaxOption } from "./PricingSection";
 import sanitizeHtml from "sanitize-html";
+import { getIntervalMinutes } from "common/src/conversion";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
@@ -483,14 +483,14 @@ export const ReservationUnitEditSchema = z
 
       if (v.minReservationDuration != null) {
         const minDurationMinutes = Math.floor(v.minReservationDuration / 60);
-        if (minDurationMinutes < intervalToNumber(v.reservationStartInterval)) {
+        if (minDurationMinutes < getIntervalMinutes(v.reservationStartInterval)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: "duration can't be less than reservation start interval",
             path: ["minReservationDuration"],
           });
         }
-        if (minDurationMinutes % intervalToNumber(v.reservationStartInterval) !== 0) {
+        if (minDurationMinutes % getIntervalMinutes(v.reservationStartInterval) !== 0) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: "duration must be a multiple of the reservation start interval",
@@ -501,14 +501,14 @@ export const ReservationUnitEditSchema = z
 
       if (v.maxReservationDuration != null) {
         const maxDurationMinutes = Math.floor(v.maxReservationDuration / 60);
-        if (maxDurationMinutes % intervalToNumber(v.reservationStartInterval) !== 0) {
+        if (maxDurationMinutes % getIntervalMinutes(v.reservationStartInterval) !== 0) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: "duration must be a multiple of the reservation start interval",
             path: ["maxReservationDuration"],
           });
         }
-        if (maxDurationMinutes < intervalToNumber(v.reservationStartInterval)) {
+        if (maxDurationMinutes < getIntervalMinutes(v.reservationStartInterval)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: "duration can't be less than reservation start interval",
