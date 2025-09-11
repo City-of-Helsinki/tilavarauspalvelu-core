@@ -11,11 +11,8 @@ import { useTranslation } from "next-i18next";
 import { Button, ButtonVariant, LoadingSpinner, Notification, TextInput } from "hds-react";
 import styled from "styled-components";
 import { parseUIDate } from "common/src/modules/date-utils";
-import {
-  type ReservationFormMeta,
-  type ReservationSeriesForm as ReservationSeriesFormT,
-  ReservationSeriesFormSchema,
-} from "@/schemas";
+import { type ReservationFormMeta } from "common/src/schemas";
+import { type ReservationSeriesForm as ReservationSeriesFormT, ReservationSeriesFormSchema } from "@/schemas";
 import { type NewReservationListItem } from "@/components/ReservationsList";
 import { WeekdaysSelector } from "@/components/WeekdaysSelector";
 import { useCreateReservationSeries, useFilteredReservationList, useMultipleReservation } from "@/hooks";

@@ -1,8 +1,8 @@
-import { ReservationStartInterval } from "@gql/gql-types";
 import { addDays, addHours, setMinutes, subDays } from "date-fns";
-import { ReservationFormSchema } from "./reservation";
+import { formatDate, formatTime } from "../modules/date-utils";
+import { CreateStaffReservationFormSchema } from "./reservation";
 import { describe, test, expect } from "vitest";
-import { formatTime, formatDate } from "common/src/modules/date-utils";
+import { ReservationStartInterval } from "../../gql/gql-types";
 
 describe("with schema", () => {
   const futureEndTime = formatTime(setMinutes(addHours(new Date(), 3), 0));
@@ -19,7 +19,7 @@ describe("with schema", () => {
       endTime: futureEndTime,
     };
 
-    const res = ReservationFormSchema(ReservationStartInterval.Interval_15Mins).safeParse(reservation);
+    const res = CreateStaffReservationFormSchema(ReservationStartInterval.Interval_15Mins).safeParse(reservation);
     expect(res.success).toBeTruthy();
   });
 
@@ -35,7 +35,7 @@ describe("with schema", () => {
       endTime: futureEndTime,
     };
 
-    const res = ReservationFormSchema(ReservationStartInterval.Interval_15Mins).safeParse(reservation);
+    const res = CreateStaffReservationFormSchema(ReservationStartInterval.Interval_15Mins).safeParse(reservation);
     expect(res.success).toBeFalsy();
     if (!res.success) {
       expect(res.error.issues.filter((x) => x.path.includes("date"))).toHaveLength(1);
@@ -54,7 +54,7 @@ describe("with schema", () => {
       endTime: futureEndTime,
     };
 
-    const res = ReservationFormSchema(ReservationStartInterval.Interval_30Mins).safeParse(reservation);
+    const res = CreateStaffReservationFormSchema(ReservationStartInterval.Interval_30Mins).safeParse(reservation);
     expect(res.success).toBeTruthy();
   });
 
@@ -68,7 +68,7 @@ describe("with schema", () => {
       endTime: futureEndTime,
     };
 
-    const res = ReservationFormSchema(ReservationStartInterval.Interval_30Mins).safeParse(reservation);
+    const res = CreateStaffReservationFormSchema(ReservationStartInterval.Interval_30Mins).safeParse(reservation);
     expect(res.success).toBeFalsy();
     if (!res.success) {
       expect(res.error.issues.filter((x) => x.path.includes("startTime"))).toHaveLength(1);
